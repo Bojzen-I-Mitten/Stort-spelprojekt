@@ -1,5 +1,4 @@
 #include "Rigidbody.h"
-
 #include "../../GameObject.h"
 #include "../../../utils/Math.h"
 #include "../Transform.h"
@@ -11,19 +10,6 @@ namespace thomas
 	{
 		namespace component
 		{
-			void Rigidbody::UpdateRigidbodyMass()
-			{
-				float mass = m_kinematic ? 0 : m_mass;
-				btVector3 inertia = getLocalInertia();
-				if (getCollisionShape())
-				{
-					getCollisionShape()->calculateLocalInertia(mass, inertia);
-					
-				}
-				setMassProps(mass, inertia);
-				updateInertiaTensor();
-				
-			}
 			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL)
 			{
 				Physics::RemoveRigidBody(this);
@@ -41,6 +27,7 @@ namespace thomas
 				Physics::s_world->removeCollisionObject(this);
 				delete getCollisionShape();				
 			}
+
 			void Rigidbody::OnEnable()
 			{
 				btTransform trans;
@@ -49,9 +36,7 @@ namespace thomas
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
 				Physics::AddRigidBody(this);
-
 			}
-
 
 			void Rigidbody::OnDisable()
 			{
@@ -85,13 +70,11 @@ namespace thomas
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
-				}
-				
+				}			
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
-			{
-				
+			{	
 				if (kinematic != m_kinematic)
 				{
 					m_kinematic = kinematic;
@@ -100,14 +83,10 @@ namespace thomas
 						Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
 						Physics::AddRigidBody(this);
-					}
-					
+					}		
 				}	
 			}
-			bool Rigidbody::IsKinematic()
-			{
-				return m_kinematic;
-			}
+	
 			void Rigidbody::SetCollider(btCollisionShape * collider)
 			{
 				Physics::RemoveRigidBody(this);
@@ -116,6 +95,7 @@ namespace thomas
 				UpdateRigidbodyMass();
 				Physics::AddRigidBody(this);
 			}
+
 			void Rigidbody::SetMass(float mass)
 			{
 				m_mass = mass;
@@ -123,13 +103,30 @@ namespace thomas
 				{
 					Physics::RemoveRigidBody(this);
 					UpdateRigidbodyMass();
-					Physics::AddRigidBody(this);
-					
+					Physics::AddRigidBody(this);				
 				}
 			}
+
 			float Rigidbody::GetMass()
 			{
 				return m_mass;
+			}
+
+			bool Rigidbody::IsKinematic()
+			{
+				return m_kinematic;
+			}
+
+			void Rigidbody::UpdateRigidbodyMass()
+			{
+				float mass = m_kinematic ? 0 : m_mass;
+				btVector3 inertia = getLocalInertia();
+
+				if (getCollisionShape())
+					getCollisionShape()->calculateLocalInertia(mass, inertia);
+
+				setMassProps(mass, inertia);
+				updateInertiaTensor();
 			}
 		}
 	}
