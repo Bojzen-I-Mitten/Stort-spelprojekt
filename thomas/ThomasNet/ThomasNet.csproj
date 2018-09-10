@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client.cs" />
     <Compile Include="LiteNetLib\BaseChannel.cs" />
     <Compile Include="LiteNetLib\ConnectionRequest.cs" />
     <Compile Include="LiteNetLib\INetEventListener.cs" />
@@ -66,7 +67,9 @@
     <Compile Include="LiteNetLib\Utils\NetPacketProcessor.cs" />
     <Compile Include="LiteNetLib\Utils\NetSerializer.cs" />
     <Compile Include="LiteNetLib\Utils\NetSerializerExceptions.cs" />
+    <Compile Include="NetworkManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThomasEngine\ThomasEngine.vcxproj">
