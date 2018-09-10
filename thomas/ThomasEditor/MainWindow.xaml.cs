@@ -393,6 +393,7 @@ namespace ThomasEditor
                     {
                         Project proj = new Project(fileName, dir);
                         ThomasEngine.Application.currentProject = proj;
+                        utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
                     }
                     hideBusyIndicator();
                 }));
@@ -402,39 +403,20 @@ namespace ThomasEditor
             }
                       
         }
-
-
-       private void showBusyIndicator(string message)
-       {
-            busyCator.IsBusy = true;
-            busyCator.BusyContent = message;
-            editor.Visibility = Visibility.Hidden;
-            game.Visibility = Visibility.Hidden;
-        }
-        private void hideBusyIndicator()
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                busyCator.IsBusy = false;
-                editor.Visibility = Visibility.Visible;
-                game.Visibility = Visibility.Visible;
-            }));
-        }
-
         private void OpenProject_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
-            
+
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() == true)
             {
                 OpenProject(openFileDialog.FileName);
-                
+
             }
-            
+
         }
         public void OpenProject(string projectPath)
         {
@@ -449,6 +431,7 @@ namespace ThomasEditor
                     ThomasEngine.Application.currentProject = Project.LoadProject(projectPath);
                     Properties.Settings.Default.latestProjectPath = projectPath;
                     Properties.Settings.Default.Save();
+                    utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
                 }
                 hideBusyIndicator();
             }));
@@ -456,9 +439,38 @@ namespace ThomasEditor
             worker.Start();
         }
 
+
+        public void showBusyIndicator(string message)
+       {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = message;
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
+        }
+        public void hideBusyIndicator()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = false;
+                editor.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
+            }));
+        }
+
+
         private void ReloadAssembly(object sender, RoutedEventArgs e)
         {
-            ScriptingManger.LoadAssembly();
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                utils.ScriptAssemblyManager.BuildSolution();
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+            
+            //ScriptingManger.LoadAssembly();
         }
 
         private void __layoutRoot_PropertyChanged(object sender, PropertyChangedEventArgs e)
