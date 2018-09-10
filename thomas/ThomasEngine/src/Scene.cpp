@@ -139,7 +139,7 @@ namespace ThomasEngine
 		if (obj->GetType()->BaseType == Resource::typeid)
 		{
 			Resource^ resource = (Resource^)obj;
-			return gcnew SceneResource(resource->GetPath());
+			return gcnew SceneResource(resource->GetAssetRelativePath());
 		}
 		return obj;
 	}

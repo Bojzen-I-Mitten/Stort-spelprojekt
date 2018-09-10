@@ -10,7 +10,10 @@ namespace ThomasEngine
 		delegate void CurrentProjectChangedEvent(Project^ newProject);
 		static event CurrentProjectChangedEvent^ currentProjectChanged;
 		static Project^ m_currentProject;
-		static String^ editorAssets = "..\\Data\\";
+		static property String^ editorAssets {
+			String^ get() { return IO::Path::GetFullPath(
+				IO::Path::GetDirectoryName(Reflection::Assembly::GetExecutingAssembly()->Location) + "\\..\\Data"); }
+		}
 
 		static property Project^ currentProject
 		{

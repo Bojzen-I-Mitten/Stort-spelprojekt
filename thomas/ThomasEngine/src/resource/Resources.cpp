@@ -10,10 +10,10 @@ namespace ThomasEngine
 {
 	Resource^ Resources::Load(String^ path)
 	{
-		String^ fullPath = System::IO::Path::GetFullPath(path);
-		if (resources->ContainsKey(fullPath))
+		String^ thomasPath = ConvertToThomasPath(path);
+		if (resources->ContainsKey(thomasPath))
 		{
-			Resource^ obj = resources[fullPath];
+			Resource^ obj = resources[thomasPath];
 			return obj;
 		}
 		else
@@ -60,7 +60,7 @@ namespace ThomasEngine
 			
 			if (obj != nullptr)
 			{
-				resources[fullPath] = obj;
+				resources[thomasPath] = obj;
 			}
 			return obj;
 		}
@@ -96,22 +96,25 @@ namespace ThomasEngine
 	}
 	Resource ^ Resources::Find(String ^ path)
 	{
-		if (resources->ContainsKey(System::IO::Path::GetFullPath(path)))
+		String^ thomasPath = ConvertToThomasPath(path);
+		if (resources->ContainsKey(thomasPath))
 		{
-			return resources[System::IO::Path::GetFullPath(path)];
+			return resources[thomasPath];
 		}
 		return nullptr;
 	}
 	void Resources::RenameResource(String ^ oldPath, String ^ newPath)
 	{
-		if (resources->ContainsKey(System::IO::Path::GetFullPath(oldPath)))
+		String^ thomasPathOld = ConvertToThomasPath(oldPath);
+		String^ thomasPathNew = ConvertToThomasPath(oldPath);
+		if (resources->ContainsKey(thomasPathOld))
 		{
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 
 			System::Threading::Monitor::Enter(lock);
-			Resource^ resource = resources[System::IO::Path::GetFullPath(oldPath)];
-			resources->Remove(System::IO::Path::GetFullPath(oldPath));
-			resources[System::IO::Path::GetFullPath(newPath)] = resource;
+			Resource^ resource = resources[thomasPathOld];
+			resources->Remove(thomasPathOld);
+			resources[thomasPathNew] = resource;
 			if (resource)
 				resource->Rename(newPath);
 

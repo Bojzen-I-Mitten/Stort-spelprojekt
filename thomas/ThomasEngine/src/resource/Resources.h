@@ -160,13 +160,25 @@ namespace ThomasEngine
 			}
 		}
 
+		static String^ ConvertToThomasPath(String^ value) {
+			value = System::IO::Path::GetFullPath(value);
+			if (value->Contains(Application::editorAssets)) return value->Replace(Application::editorAssets, "%THOMAS_DATA%");
+			else return value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
+		}
+		static String^ ConvertToRealPath(String^ value) {
+			value = value->Replace("%THOMAS_DATA%", Application::editorAssets);
+			value = value->Replace("%THOMAS_ASSETS%", Application::currentProject->assetPath);
+			return value;
+		}
+
 		generic<typename T>
 		where T : Resource
 		static T Load(String^ path) 
 		{
-			if (resources->ContainsKey(System::IO::Path::GetFullPath(path)))
+			String^ thomasPath = ConvertToThomasPath(path);
+			if (resources->ContainsKey(thomasPath))
 			{
-				Resource^ obj = resources[System::IO::Path::GetFullPath(path)];
+				Resource^ obj = resources[thomasPath];
 				if (obj->GetType() == T::typeid)
 					return (T)obj;
 				else
@@ -178,7 +190,7 @@ namespace ThomasEngine
 			else
 			{
 				T resource = (T)Activator::CreateInstance(T::typeid, path);
-				resources[System::IO::Path::GetFullPath(path)] = resource;
+				resources[thomasPath] = resource;
 				return resource;
 			}
 		}

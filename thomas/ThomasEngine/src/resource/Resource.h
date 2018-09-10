@@ -3,7 +3,7 @@
 #include "thomas\resource\Resource.h"
 #include <memory>
 #pragma managed
-
+#include "../Application.h"
 #include "../Utility.h"
 #include "../Scene.h"
 
@@ -20,6 +20,13 @@ namespace ThomasEngine
 		thomas::resource::Resource* m_nativePtr;
 
 		[DataMemberAttribute(Order = 0)]
+		property String^ asset_path {
+			String^ get() { return GetAssetRelativePath(); }
+			void set(String^ value) {
+				m_path = value->Replace("%THOMAS_DATA%", Application::editorAssets);
+				m_path = m_path->Replace("%THOMAS_ASSETS%", Application::currentProject->assetPath);
+			}
+		}
 		String^ m_path;
 
 		Resource(String^ path, thomas::resource::Resource* ptr)
@@ -56,6 +63,12 @@ namespace ThomasEngine
 		String ^ GetPath()
 		{
 			return m_path;
+		}
+
+		String^ GetAssetRelativePath()
+		{
+			if (m_path->Contains(Application::editorAssets)) return m_path->Replace(Application::editorAssets, "%THOMAS_DATA%");
+			else return m_path->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
 		}
 
 		virtual property String^ name
