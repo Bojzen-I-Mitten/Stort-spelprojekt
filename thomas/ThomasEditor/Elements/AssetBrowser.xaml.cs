@@ -10,6 +10,7 @@ using System.IO;
 using ThomasEditor.utils;
 using ThomasEditor.Inspectors;
 using ThomasEngine;
+using System.Threading;
 
 namespace ThomasEditor
 {
@@ -165,6 +166,12 @@ namespace ThomasEditor
                     {
                         ThomasEngine.Resources.Unload(foundItem.DataContext as Resource);
                     }
+
+                    ThomasEngine.Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(p);
+                    if (type == ThomasEngine.Resources.AssetTypes.SCRIPT)
+                    {
+                        utils.ScriptAssemblyManager.RemoveScript(p);
+                    }
                 }
               
             }), e.FullPath);
@@ -232,13 +239,9 @@ namespace ThomasEditor
 
                 AddNode(p);
                 ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(p);
-                if(assetType == ThomasEngine.Resources.AssetTypes.SCRIPT)
-                {
-                    //utils.ScriptAssemblyManager.AddScript(p);
-                }
-
             }), e.FullPath);
         }
+
 
         private void LoadAssetImages()
         {
@@ -470,21 +473,14 @@ namespace ThomasEditor
 
         private void Menu_CreateCSharpScript(object sender, RoutedEventArgs e)
         {
+            utils.ScriptAssemblyManager.fsw.EnableRaisingEvents = false;
             string selectedDir = ThomasEngine.Application.currentProject.assetPath;
-            //Här väntar vi på bättre tider...
-            //if (fileTree.SelectedItem != null)
-            //{
-            //    TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
-            //    StackPanel stack = item.Header as StackPanel;
-            //    String fullPath = stack.DataContext as String;
-            //    if (System.IO.Directory.Exists(fullPath))
-            //        selectedDir = fullPath;
-            //    else
-            //        selectedDir = System.IO.Path.GetDirectoryName(fullPath);
-            //}
-            System.IO.File.Copy(ThomasEngine.Application.editorAssets + "\\assemblyFiles\\newComponent.cs", selectedDir + "\\newComponent.cs");
+
+            String uniquePath = ThomasEngine.Resources.GetUniqueName(selectedDir + "\\newComponent.cs");
+            System.IO.File.Copy(ThomasEngine.Application.editorAssets + "\\assemblyFiles\\newComponent.cs", uniquePath);
+            utils.ScriptAssemblyManager.AddScript(uniquePath);
             renameNextAddedItem = true;
-            
+            utils.ScriptAssemblyManager.fsw.EnableRaisingEvents = true;
         }
 
         private void Menu_CreateShader(object sender, RoutedEventArgs e)
@@ -530,7 +526,20 @@ namespace ThomasEditor
 
         private void Menu_DeleteAsset(object sender, RoutedEventArgs e)
         {
-
+            if (fileTree.SelectedItem != null)
+            {
+                try
+                {
+                    TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
+                    StackPanel stack = item.Header as StackPanel;
+                    String file = stack.DataContext as String;
+                    File.Delete(file);
+                }catch(Exception error)
+                {
+                    Debug.Log("Failed to delete file: " + error.Message);
+                }
+                
+            }
         }
 
         private void MenuItem_Rename(object sender, RoutedEventArgs e)

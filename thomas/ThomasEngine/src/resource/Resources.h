@@ -86,12 +86,10 @@ namespace ThomasEngine
 			Monitor::Exit(resourceLock);
 		}
 
-		static void CreateResource(Resource^ resource, String^ path)
-		{
-			path = Application::currentProject->assetPath + "\\" + path;
+		static String^ GetUniqueName(String^ path) {
 			String^ extension = IO::Path::GetExtension(path);
 			String^ modifier = "";
-			path = path->Remove(path->Length - extension->Length, extension->Length);
+			path = IO::Path::GetDirectoryName(path) + "\\" + IO::Path::GetFileNameWithoutExtension(path);
 			int i = 0;
 			while (IO::File::Exists(path + modifier + extension))
 			{
@@ -99,6 +97,12 @@ namespace ThomasEngine
 				modifier = "(" + i + ")";
 			}
 			path = path + modifier + extension;
+			return path;
+		}
+
+		static void CreateResource(Resource^ resource, String^ path)
+		{
+			path = GetUniqueName(path);
 			Monitor::Enter(resourceLock);
 			using namespace System::Runtime::Serialization;
 			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
