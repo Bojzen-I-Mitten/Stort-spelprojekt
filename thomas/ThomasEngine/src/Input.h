@@ -2,9 +2,9 @@
 #pragma unmanaged
 #include <thomas\Input.h>
 #pragma managed
+#include "Utility.h"
 #include <string>
 #include <msclr\marshal_cppstd.h>
-#include "math\Math.h"
 
 
 namespace ThomasEngine
@@ -258,7 +258,7 @@ namespace ThomasEngine
 		static float GetLeftTriggerDelta() { return thomas::Input::GetLeftTriggerDelta(); }
 		static float GetRightTriggerDelta() { return thomas::Input::GetRightTriggerDelta(); }
 
-		static Vector2 GetMousePosition() { return Vector2(thomas::Input::GetMousePosition()); }
+		static Vector2 GetMousePosition() { return Utility::Convert(thomas::Input::GetMousePosition()); }
 
 		static void SetMouseMode(MouseMode mode) { return thomas::Input::SetMouseMode((thomas::Input::MouseMode)mode); }
 

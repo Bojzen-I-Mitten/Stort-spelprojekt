@@ -4,7 +4,6 @@
 #pragma managed
 #include <string>
 #include <msclr\marshal_cppstd.h>
-#include "../math/Math.h"
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::ComponentModel;
