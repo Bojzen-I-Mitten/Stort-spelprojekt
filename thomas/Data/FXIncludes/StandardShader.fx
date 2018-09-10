@@ -111,8 +111,6 @@ struct Light
 	float   spotInnerAngle;
 	float3  attenuation;
     float   pad;
-
-    
 };
 
 

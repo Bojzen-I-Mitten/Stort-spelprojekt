@@ -20,58 +20,52 @@ namespace thomas
 			{
 
 			private:
-				
-			public:
-				virtual bool SetLightColor(thomas::math::Vector4 other) = 0;
+				static graphics::LightManager s_lightManager;
 
-				virtual bool Bind() = 0;
-			protected:
+				graphics::LightManager::LightStruct lightComponentData;
+			public:
+				void Update();
+
 				LightComponent();
 				~LightComponent();
+
+				enum LIGHT_TYPES
+				{
+					DIRECTIONAL = 0,
+					POINT = 1,
+					SPOT = 2
+				};
+				LIGHT_TYPES type;
+
+				LIGHT_TYPES GetType();
+				void SetType(LIGHT_TYPES other);
+
+				thomas::math::Color GetColor();
+				void SetColor(thomas::math::Color other);
+				
+
+				float GetIntensity();
+				void SetIntensity(float value);
+				
+				float GetSpotInnerAngle();
+				void SetSpotInnerAngle(float value);
+
+				float GetSpotOuterAngle();
+				void SetSpotOuterAngle(float value);
+
+				float GetConstantAttenuation();
+				void SetConstantAttenuation(float value);
+
+				float GetLinearAttenuation();
+				void SetLinearAttenuation(float value);
+
+				float GetQuadraticAttenuation();
+				void SetQuadraticAttenuation(float value);
+
 				
 			};
 
-
-			class THOMAS_API DirectionalLight : public LightComponent
-			{
-			public:
-				DirectionalLight();
-				~DirectionalLight();
-
-				bool SetLightColor(thomas::math::Vector4 other);
-
-				bool Bind();
-
-				void Update();
-			private:
-				int m_index;
-				graphics::LightManager::DirectionalLightStruct m_thisLight;
-			};
-
-			class THOMAS_API PointLight : public LightComponent
-			{
-			public:
-				PointLight();
-				~PointLight();
-
-				bool SetLightColor(thomas::math::Vector4 other);
-				bool SetConstantAttenuation(float other);
-				bool SetLinearAttenuation(float other);
-				bool SetQuadraticAttenuation(float other);
-				bool SetPower(float other);
-
-				bool Bind();
-
-				void Update();
-				
-
-			private:
-				int m_index;
-				graphics::LightManager::PointLightStruct m_thisLight;
-			};
-			
 		}
 	}
-
 
 }

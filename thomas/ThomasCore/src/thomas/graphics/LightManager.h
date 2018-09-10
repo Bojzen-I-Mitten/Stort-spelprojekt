@@ -8,7 +8,7 @@ namespace thomas
 		class LightManager
 		{
 		public:
-			struct DirectionalLightStruct
+			/*struct DirectionalLightStruct
 			{
 				thomas::math::Vector4 lightColor;
 				thomas::math::Vector3 lightDirection;
@@ -35,30 +35,45 @@ namespace thomas
 				DirectionalLightStruct directionalLights[3];
 				PointLightStruct pointLights[20];
 				
-			} static s_lightstruct;
+			} static s_lightstruct;*/
 
-		public:	
-			LightManager();
-			~LightManager();
-			static void Destroy();
 
-		public:
-			static int AddDirectionalLight(DirectionalLightStruct directionalLight);	
-			static int AddPointLight(PointLightStruct pointLight);
 
-		public:
-			static bool UpdateDirectionalLight(DirectionalLightStruct other, int index);
-			static bool UpdatePointLight(PointLightStruct other, int index);
+			/*MATCH ON GPU*/
+			struct ConstantBufferForLights
+			{
+			    unsigned nrOfPointLights;
+				unsigned nrOfSpotLights;
+				unsigned nrOfDirectionalLights;
+				unsigned pad;
+			};
 
-		public:
-			static bool BindDirectionalLight(unsigned int index);
-			static bool BindPointLight(unsigned int index);
-
-		private:
-			static bool UpdateLightBuffer();
+			struct LightStruct
+			{
+				thomas::math::Vector3  color;
+				float   intensity;
+				thomas::math::Vector3  position;
+				float   spotOuterAngle;
+				thomas::math::Vector3  direction;
+				float   spotInnerAngle;
+				thomas::math::Vector3  attenuation;
+				float   pad;
+			};
 			
+		public:	
+			void Destroy();
+			void AddPointLight(const LightStruct &light);
+			void AddSpotLight(const LightStruct &light);
+			void AddDirectionalLight(const LightStruct &light);
+			
+			void BindLights();
 		private:
-			static ID3D11Buffer* s_lightBuffer;
+			ConstantBufferForLights lightsCounts;
+			std::vector<LightStruct> pointLights;
+			std::vector<LightStruct> spotLights;
+			std::vector<LightStruct> directionalLights;
+			std::vector<LightStruct> allLights;
+			ID3D11Buffer* s_lightBuffer;
 		};
 	}
 }
