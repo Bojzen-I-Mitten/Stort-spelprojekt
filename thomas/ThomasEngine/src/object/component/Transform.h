@@ -98,6 +98,48 @@ namespace ThomasEngine
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetLocalScale()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalScale(thomas::math::Vector3(value.x, value.y, value.z)); }
 		}
+		[BrowsableAttribute(false)]
+		property Vector3 forward
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->Forward()); }
+		}
+		[BrowsableAttribute(false)]
+		property Vector3 up
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->Up()); }
+		}
+		[BrowsableAttribute(false)]
+		property Vector3 right
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->Right()); }
+		}
+
+		void LookAt(Transform^ target) {
+			((thomas::object::component::Transform*)nativePtr)->LookAt((thomas::object::component::Transform*)nativePtr);
+		}
+
+		void LookAt(Vector3 target) {
+			((thomas::object::component::Transform*)nativePtr)->LookAt(Utility::Convert(target));
+		}
+
+		void Rotate(Vector3 angles) {
+			((thomas::object::component::Transform*)nativePtr)->Rotate(Utility::Convert(angles));
+		}
+
+		void Rotate(float x, float y, float z) {
+			Rotate(Vector3(x, y, z));
+		}
+
+		void RotateByAxis(Vector3 axis, float angle) {
+			((thomas::object::component::Transform*)nativePtr)->RotateByAxis(Utility::Convert(axis), angle);
+		}
+
+		void Translate(Vector3 translation) {
+			((thomas::object::component::Transform*)nativePtr)->Translate(Utility::Convert(translation));
+		}
+		void Translate(float x, float y, float z) {
+			Translate(Vector3(x, y, z));
+		}
 
 		bool IsChildOf(Transform^ _parent)
 		{
