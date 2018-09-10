@@ -12,6 +12,9 @@ namespace ThomasEngine {
 		{
 			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
+			Component::LoadExternalComponents();
+
+
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			ScriptingManger::Init();

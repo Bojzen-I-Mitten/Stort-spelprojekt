@@ -22,6 +22,9 @@ namespace ThomasEngine
 		Component();
 
 	internal:
+		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
+		static void LoadExternalComponents();
+
 		Component(thomas::object::component::Component* ptr);
 		
 		void setGameObject(GameObject^ gObj);
