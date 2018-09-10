@@ -2,8 +2,7 @@
 #pragma unmanaged
 #include <thomas\object\component\Transform.h>
 #pragma managed
-
-#include "../../math/Math.h"
+#include "../../Utility.h"
 #include "../Component.h"
 #include <string>
 #include <msclr\marshal_cppstd.h>
@@ -54,49 +53,49 @@ namespace ThomasEngine
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetPosition()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetPosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetPosition(thomas::math::Vector3(value.x, value.y, value.z)); OnPropertyChanged("localPosition");}
 		}
 
 		[DisplayNameAttribute("position")]
 		property Vector3 localPosition
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetLocalPosition()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetLocalPosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalPosition(value.x, value.y, value.z); }
 		}
 
 		[BrowsableAttribute(false)]
 		property Quaternion rotation
 		{
-			Quaternion get() { return Quaternion(((thomas::object::component::Transform*)nativePtr)->GetRotation()); }
+			Quaternion get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetRotation()); }
 			void set(Quaternion value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(thomas::math::Quaternion(value.x, value.y, value.z, value.w)); OnPropertyChanged("localEulerAngles");}
 		}
 	
 		[BrowsableAttribute(false)]
 		property Vector3 eulerAngles
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetEulerAngles()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetEulerAngles()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(value.y, value.x, value.z); OnPropertyChanged("localEulerAngles");}
 		}
 
 		[DisplayNameAttribute("rotation")]
 		property Vector3 localEulerAngles
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetLocalEulerAngles()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetLocalEulerAngles()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalRotation(value.y, value.x, value.z); }
 		}
 		
 		[BrowsableAttribute(false)]
 		property Vector3 scale
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetScale()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetScale()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetScale(thomas::math::Vector3(value.x, value.y, value.z)); OnPropertyChanged("localScale");}
 		}
 
 		[DisplayNameAttribute("scale")]
 		property Vector3 localScale
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetLocalScale()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetLocalScale()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalScale(thomas::math::Vector3(value.x, value.y, value.z)); }
 		}
 
