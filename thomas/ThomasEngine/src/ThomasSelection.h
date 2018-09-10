@@ -11,7 +11,10 @@ namespace ThomasEngine {
 	public ref class ThomasSelection {
 	private:
 		ObservableCollection<GameObject^>^ m_SelectedGameObjects;
-
+		Object^ m_lock;
+#if _DEBUG
+		String^ lockOwner;
+#endif
 	public:
 
 		ThomasSelection();
