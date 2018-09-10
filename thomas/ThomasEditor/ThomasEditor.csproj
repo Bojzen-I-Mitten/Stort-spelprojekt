@@ -437,6 +437,10 @@
       <Project>{64d247ed-db4d-4ea3-b8ae-680bf66a8f2e}</Project>
       <Name>ThomasEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ThomasNet\ThomasNet.csproj">
+      <Project>{545a181e-838c-4bac-b10a-f3459ad670a4}</Project>
+      <Name>ThomasNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
