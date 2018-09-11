@@ -4,7 +4,6 @@
 #pragma managed
 
 #include "Texture.h"
-#include "../../math/Math.h"
 namespace ThomasEngine
 {
 	[DataContractAttribute]
@@ -38,7 +37,7 @@ namespace ThomasEngine
 			std::vector<thomas::math::Color>& nativePixels = ((thomas::resource::Texture2D*)m_nativePtr)->GetPixels();
 			for(int i = 0; i < nativePixels.size(); i++)
 			{
-				pixels[i] = Color(nativePixels[i]);
+				pixels[i] = Utility::Convert(nativePixels[i]);
 			}
 			return pixels;
 		}

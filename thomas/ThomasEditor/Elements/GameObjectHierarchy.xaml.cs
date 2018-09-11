@@ -168,7 +168,7 @@ namespace ThomasEditor
 
         private void SceneSelectedGameObjectChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 if (e.NewItems != null)
                 {

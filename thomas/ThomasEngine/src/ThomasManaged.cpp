@@ -6,6 +6,7 @@
 namespace ThomasEngine {
 
 	void ThomasWrapper::Start() {
+		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
 		{

@@ -8,6 +8,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:editor="clr-namespace:ThomasEditor"
              xmlns:managed="clr-namespace:ThomasEngine;assembly=ThomasEngine"
+             xmlns:math="clr-namespace:ThomasEngine;assembly=ThomasMath"
              mc:Ignorable="d" 
               xmlns:p="clr-namespace:PropertyTools.Wpf;assembly=PropertyTools.Wpf"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -135,22 +136,22 @@
         <xctk:PropertyGrid.EditorDefinitions>
             <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource Vector2Editor}">
                 <xctk:EditorTemplateDefinition.TargetProperties>
-                    <xctk:TargetPropertyType Type="managed:Vector2"/>
+                    <xctk:TargetPropertyType Type="math:Vector2"/>
                 </xctk:EditorTemplateDefinition.TargetProperties>
             </xctk:EditorTemplateDefinition>
             <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource Vector3Editor}">
                 <xctk:EditorTemplateDefinition.TargetProperties>
-                    <xctk:TargetPropertyType Type="managed:Vector3"/>
+                    <xctk:TargetPropertyType Type="math:Vector3"/>
                 </xctk:EditorTemplateDefinition.TargetProperties>
             </xctk:EditorTemplateDefinition>
             <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource Vector4Editor}">
                 <xctk:EditorTemplateDefinition.TargetProperties>
-                    <xctk:TargetPropertyType Type="managed:Vector4"/>
+                    <xctk:TargetPropertyType Type="math:Vector4"/>
                 </xctk:EditorTemplateDefinition.TargetProperties>
             </xctk:EditorTemplateDefinition>
             <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource ColorEditor}">
                 <xctk:EditorTemplateDefinition.TargetProperties>
-                    <xctk:TargetPropertyType Type="managed:Color"/>
+                    <xctk:TargetPropertyType Type="math:Color"/>
                 </xctk:EditorTemplateDefinition.TargetProperties>
             </xctk:EditorTemplateDefinition>
 

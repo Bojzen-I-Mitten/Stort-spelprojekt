@@ -14,7 +14,7 @@ namespace ThomasEngine
 
 		property Vector3 center
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::SphereCollider*)nativePtr)->getCenter()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::SphereCollider*)nativePtr)->getCenter()); }
 			void set(Vector3 value) { ((thomas::object::component::SphereCollider*)nativePtr)->SetCenter(thomas::math::Vector3(value.x, value.y, value.z)); }
 		}
 
