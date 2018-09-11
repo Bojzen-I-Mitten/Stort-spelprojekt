@@ -39,11 +39,14 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="ThomasEngine">
-      <HintPath>..\thomas\DebugEditorBuild64\ThomasEngine.dll</HintPath>
+      <HintPath>$(THOMAS_ENGINE)\ThomasEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="ThomasMath">
+      <HintPath>$(THOMAS_ENGINE)\ThomasMath.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\New Component1.cs" />
+    <Compile Include="Assets\MoveTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

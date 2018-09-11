@@ -154,6 +154,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="ThomasMath">
+      <HintPath>lib\ThomasMath.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +186,6 @@
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\resource\Material.h" />
-    <ClInclude Include="src\math\Math.h" />
     <ClInclude Include="src\object\Component.h" />
     <ClInclude Include="src\object\component\RenderComponent.h" />
     <ClInclude Include="src\object\component\ScriptComponent.h" />
@@ -204,7 +206,6 @@
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
-    <ClCompile Include="src\math\Math.cpp" />
     <ClCompile Include="src\object\Component.cpp" />
     <ClCompile Include="src\object\component\Camera.cpp" />
     <ClCompile Include="src\object\component\RenderComponent.cpp" />

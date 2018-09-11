@@ -41,6 +41,9 @@
     <Reference Include="ThomasEngine">
       <HintPath>$(THOMAS_ENGINE)\ThomasEngine.dll</HintPath>
     </Reference>
+    <Reference Include="ThomasMath">
+      <HintPath>$(THOMAS_ENGINE)\ThomasMath.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
