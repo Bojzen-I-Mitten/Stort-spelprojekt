@@ -43,8 +43,8 @@ namespace ThomasEngine.Network
                 dataReader.Recycle();
             };
         }
-        
-        public void SendData(object StringData, DeliveryMethod Order)
+
+        public void SendDataOverEvent(object StringData, DeliveryMethod Order)
         {
             listener.PeerConnectedEvent += peer =>
             {
