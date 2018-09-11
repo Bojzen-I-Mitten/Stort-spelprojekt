@@ -49,11 +49,22 @@ namespace ThomasEngine.Network
             server.Stop();
         }
 
+        public void ExecuteEvent()
+        {
+            listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
+            {
+                ThomasEngine.Debug.Log("ServerSide: " + dataReader.GetString(100 /* max length of string */));
+                // Console.WriteLine("We got: {0}" , dataReader.GetString(100 /* max length of string */));
+                dataReader.Recycle();
+            };
+        }
+
+
         public void SendData(String StringData)
         {
             listener.PeerConnectedEvent += peer =>
             {
-                ThomasEngine.Debug.Log("We got connection: {0}" + peer.EndPoint);// Show peer ip
+             //   ThomasEngine.Debug.Log("Server " + peer.EndPoint);// Show peer ip
                 NetDataWriter writer = new NetDataWriter();                 // Create writer class
                 writer.Put(StringData);                                // Put some string
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
