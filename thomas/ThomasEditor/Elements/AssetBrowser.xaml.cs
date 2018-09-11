@@ -253,6 +253,7 @@ namespace ThomasEditor
             assetImages[ThomasEngine.Resources.AssetTypes.MODEL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.MATERIAL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/material.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT] = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.PREFAB] = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
         }
 
 
@@ -301,7 +302,10 @@ namespace ThomasEditor
                 stack.Children.Add(lbl);
                 stack.DataContext = filePath;
 
-                return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.Load(filePath) };
+                if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefab(filePath) };
+                else
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.Load(filePath) };
             }
             return null;
         }
@@ -495,7 +499,8 @@ namespace ThomasEditor
 
         private void Menu_CreatePrefab(object sender, RoutedEventArgs e)
         {
-
+            GameObject prefab = GameObject.CreatePrefab();
+            ThomasEngine.Resources.SavePrefab(prefab, prefab.Name + ".prefab");
         }
 
         private void Menu_CreateMaterial(object sender, RoutedEventArgs e)

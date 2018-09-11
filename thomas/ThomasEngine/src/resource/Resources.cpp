@@ -6,6 +6,7 @@
 #include "texture\Texture2D.h"
 #include "Resources.h"
 #include "../Scene.h"
+#include "..\object\GameObject.h"
 namespace ThomasEngine
 {
 	Resource^ Resources::Load(String^ path)
@@ -65,6 +66,30 @@ namespace ThomasEngine
 			return obj;
 		}
 		
+	}
+	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
+	{
+		path = Application::currentProject->assetPath + "\\" + path;
+		String^ extension = IO::Path::GetExtension(path);
+		String^ modifier = "";
+		path = path->Remove(path->Length - extension->Length, extension->Length);
+		int i = 0;
+		while (IO::File::Exists(path + modifier + extension))
+		{
+			i++;
+			modifier = "(" + i + ")";
+		}
+		path = path + modifier + extension;
+
+		GameObject::SerializeGameObject(path, gameObject);
+
+	}
+	GameObject ^ Resources::LoadPrefab(String^ path)
+	{
+		IO::FileStream^ fileStream = IO::File::OpenRead(path);
+		GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
+		fileStream->Close();
+		return prefab;
 	}
 	Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
 	{

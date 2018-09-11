@@ -39,9 +39,7 @@ namespace ThomasEngine {
 
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = DeSerializeGameObject(serialized);
-		clone->scene = Scene::CurrentScene;
-		Scene::CurrentScene->GameObjects->Add(clone);
-		
+		clone->PostInstantiate(Scene::CurrentScene);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
@@ -71,6 +69,24 @@ namespace ThomasEngine {
 
 
 
+	void GameObject::SerializeGameObject(String ^ path, GameObject ^ gObj)
+	{
+		using namespace System::Runtime::Serialization;
+		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
+		auto list = Component::GetAllComponentTypes();
+		list->Add(SceneResource::typeid);
+		serializerSettings->KnownTypes = list;
+		serializerSettings->PreserveObjectReferences = true;
+		serializerSettings->DataContractSurrogate = gcnew Scene::SceneSurrogate();
+		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
+
+		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+		settings->Indent = true;
+		Xml::XmlWriter^ writer = Xml::XmlWriter::Create(path, settings);
+		serializer->WriteObject(writer, gObj);
+		writer->Close();
+	}
+
 	System::IO::Stream^ GameObject::SerializeGameObject(GameObject ^ gObj)
 	{
 		using namespace System::Runtime::Serialization;
@@ -83,12 +99,7 @@ namespace ThomasEngine {
 		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
 
 		System::IO::Stream^ stream = gcnew System::IO::MemoryStream();
-
-		Xml::XmlWriter^ writer = Xml::XmlWriter::Create(stream);
-
-		serializer->WriteObject(writer, gObj);
-
-		Xml::XmlReader^ file = Xml::XmlReader::Create(stream);
+		serializer->WriteObject(stream, gObj);
 		return stream;
 	}
 
@@ -103,9 +114,9 @@ namespace ThomasEngine {
 		serializerSettings->DataContractSurrogate = gcnew Scene::SceneSurrogate();
 		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
 
-		Xml::XmlReader^ reader = Xml::XmlReader::Create(stream);
-
-		GameObject^ gObj = (GameObject^)serializer->ReadObject(reader);
+		stream->Seek(0, SeekOrigin::Begin);
+		GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
+		gObj->PostLoad(nullptr);
 		return gObj;
 
 	}
