@@ -6,19 +6,23 @@ using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
+
 namespace ThomasEngine.Network
 {
     public class NetworkManager : ScriptComponent
     {
-
+        Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
+        int iD = -1;
         Server server = new Server();
         Client client = new Client();
         public string IP { get; set; } = "localhost";
         public bool Server { get; set; } = false;
-//       public int port { get; set; } = 9050;
+        //       public int port { get; set; } = 9050;
 
+        public static NetworkManager instance;
         public override void Start()
         { 
+            instance = this;
             if(!Server)
             { 
                 client.SetIp(IP);
@@ -32,6 +36,8 @@ namespace ThomasEngine.Network
                 server.SendDataOverEvent("You are Connected To the server", DeliveryMethod.ReliableOrdered);
                 server.ExecuteEvent();
             }
+
+
         }
         public override void Update()
         {
@@ -44,7 +50,13 @@ namespace ThomasEngine.Network
             client.Stop();
             base.Destroy();
         }
- 
+
+        public int Register(NetworkID netID)
+        {
+            iD++;
+            networkIDObjects.Add(iD, netID);
+            return iD;
+        }
 
 
     }
