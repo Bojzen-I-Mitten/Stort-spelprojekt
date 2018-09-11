@@ -1,48 +1,21 @@
 #pragma once
 #include "..\utils\Math.h"
-
+#include <vector>
+#include <memory>
+#include "..\utils\Buffers.h"
+//namespace thomas { namespace utils { namespace buffers { class StructuredBuffer; } } }
 namespace thomas
 {
+	
 	namespace graphics
 	{
 		class LightManager
 		{
 		public:
-			/*struct DirectionalLightStruct
-			{
-				thomas::math::Vector4 lightColor;
-				thomas::math::Vector3 lightDirection;
-				float padding;
-			};
-
-			struct PointLightStruct
-			{
-				float constantAttenuation;
-				float linearAttenuation;
-				float quadraticAttenuation;
-				float power;
-				thomas::math::Vector4 lightColor;
-				thomas::math::Vector3 position;
-				float padding;		
-			};
-
-			struct LightBufferStruct
-			{
-				int nrOfDirectionalLights;
-				int nrOfPointLights;
-				int padding1;
-				int padding2;
-				DirectionalLightStruct directionalLights[3];
-				PointLightStruct pointLights[20];
-				
-			} static s_lightstruct;*/
-
-
-
 			/*MATCH ON GPU*/
-			struct ConstantBufferForLights
+			struct LightCountsStruct
 			{
-			    unsigned nrOfPointLights;
+				unsigned nrOfPointLights;
 				unsigned nrOfSpotLights;
 				unsigned nrOfDirectionalLights;
 				unsigned pad;
@@ -59,21 +32,26 @@ namespace thomas
 				thomas::math::Vector3  attenuation;
 				float   pad;
 			};
-			
-		public:	
+
+		public:
+			void Initialize();
+			void Reset();//call at the beginning of a frame, before the scripts update
 			void Destroy();
 			void AddPointLight(const LightStruct &light);
 			void AddSpotLight(const LightStruct &light);
 			void AddDirectionalLight(const LightStruct &light);
-			
+
 			void BindLights();
 		private:
-			ConstantBufferForLights lightsCounts;
-			std::vector<LightStruct> pointLights;
-			std::vector<LightStruct> spotLights;
-			std::vector<LightStruct> directionalLights;
-			std::vector<LightStruct> allLights;
-			ID3D11Buffer* s_lightBuffer;
+
+			LightCountsStruct m_lightsCounts;
+			std::vector<LightStruct> m_pointLights;
+			std::vector<LightStruct> m_spotLights;
+			std::vector<LightStruct> m_directionalLights;
+			std::vector<LightStruct> m_allLights;
+
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_lightsCountsBuffer;
 		};
 	}
 }

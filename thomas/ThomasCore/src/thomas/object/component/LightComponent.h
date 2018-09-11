@@ -4,7 +4,6 @@
 
 #include "../../utils/Math.h"
 #include "../../graphics/LightManager.h"
-
 /**
 LightComponent class
 */
@@ -16,6 +15,7 @@ namespace thomas
 	{
 		namespace component
 		{
+			
 			class THOMAS_API LightComponent : public Component
 			{
 
@@ -24,6 +24,7 @@ namespace thomas
 
 				graphics::LightManager::LightStruct lightComponentData;
 			public:
+				
 				void Update();
 
 				LightComponent();

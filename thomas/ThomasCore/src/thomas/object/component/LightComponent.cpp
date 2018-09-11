@@ -3,6 +3,11 @@
 #include "../GameObject.h"
 #include "Transform.h"
 
+
+
+thomas::graphics::LightManager thomas::object::component::LightComponent::s_lightManager;
+
+
 namespace thomas
 {
 	namespace object
@@ -10,9 +15,17 @@ namespace thomas
 		namespace component
 		{
 
+			
+
 			LightComponent::LightComponent()
 			{
 				type = LIGHT_TYPES::POINT;
+
+				lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
+				lightComponentData.color = math::Vector3(1.0f, 1.0f, 1.0f);
+				lightComponentData.intensity = 1.0f;
+				lightComponentData.spotInnerAngle = 0.0f;
+				lightComponentData.spotOuterAngle = 20.0f;
 			}
 			LightComponent::~LightComponent()
 			{
@@ -26,11 +39,11 @@ namespace thomas
 				}
 				else if (type == LIGHT_TYPES::DIRECTIONAL)
 				{
-					//s_lightManager.AddPointLight(lightComponentData);
+					//s_lightManager.AddDirectionalLight(lightComponentData);
 				}
 				else if (type == LIGHT_TYPES::SPOT)
 				{
-					//s_lightManager.AddPointLight(lightComponentData);
+					//s_lightManager.AddSpotLight(lightComponentData);
 				}
 			}
 			
