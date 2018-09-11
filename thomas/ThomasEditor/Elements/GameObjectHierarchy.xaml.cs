@@ -204,6 +204,7 @@ namespace ThomasEditor
                     
                     if (!ThomasWrapper.Selection.Contain((GameObject)item.DataContext))
                         ThomasWrapper.Selection.SelectGameObject((GameObject)item.DataContext);
+                    hiearchyContextMenu.DataContext = true;
                 }
 
             }else
@@ -269,9 +270,17 @@ namespace ThomasEditor
                     }
                     else if (source != null && target == null)
                     {
-                        GameObject child = source.DataContext as GameObject;
-                        child.transform.parent = null;
-                        ResetTreeView();
+                        GameObject gameObject = source.DataContext as GameObject;
+                        if(gameObject.inScene)
+                        {
+                            gameObject.transform.parent = null;
+                            ResetTreeView();
+                        }
+                        else
+                        {
+                            GameObject.Instantiate(gameObject);
+                        }
+                        
                     }
                 }
                
@@ -299,5 +308,26 @@ namespace ThomasEditor
         private void hierarchy_MouseDown(object sender, MouseButtonEventArgs e)
         {
         }
+
+        private void MenuItem_DeleteGameObject(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+        private void MenuItem_SaveAsPrefab(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+            if (item != null)
+            {
+                GameObject gObj = (GameObject)item.DataContext;
+                if (gObj)
+                    ThomasEngine.Resources.SavePrefab(gObj, gObj.Name + ".prefab");
+            }
+            e.Handled = true;
+        }
+
     }
 }
