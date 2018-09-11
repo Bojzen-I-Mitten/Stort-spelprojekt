@@ -28,22 +28,32 @@ namespace ThomasEngine.Network
         {
             client.Start();
             client.Connect(IP /* host ip or name */, port /* port */, "SomeConnectionKey" /* text key or NetDataWriter */);
-            listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
-            {
-                ThomasEngine.Debug.Log("We got: {0}" + dataReader.GetString(100 /* max length of string */));
-                // Console.WriteLine("We got: {0}" , dataReader.GetString(100 /* max length of string */));
-                dataReader.Recycle();
-            };
+         
         }
         public void Stop()
         {
             client.Stop();
         }
-
-
-
-
-
+        public void ExecuteEvent()
+        {
+            listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
+            {
+                ThomasEngine.Debug.Log("ClientSide: " + dataReader.GetString(100 /* max length of string */));
+                // Console.WriteLine("We got: {0}" , dataReader.GetString(100 /* max length of string */));
+                dataReader.Recycle();
+            };
+        }
+        public void SendData(String StringData)
+        {
+            listener.PeerConnectedEvent += peer =>
+            {
+            //   ThomasEngine.Debug.Log("Client " + peer.EndPoint);// Show peer ip
+                NetDataWriter writer = new NetDataWriter();                 // Create writer class
+                writer.Put(StringData);                                // Put some string
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+            };
+        }
+        
         public void SetPort(int newPort)
         {
             port = newPort;
