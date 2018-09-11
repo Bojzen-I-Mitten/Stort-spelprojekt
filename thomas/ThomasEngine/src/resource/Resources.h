@@ -48,6 +48,7 @@ namespace ThomasEngine
 			MATERIAL,
 			SCRIPT,
 			AUDIO_CLIP,
+			PREFAB,
 			UNKNOWN
 		};
 
@@ -158,6 +159,8 @@ namespace ThomasEngine
 			{
 				return AssetTypes::TEXTURE2D;
 			}
+			else if (extension == "prefab")
+				return AssetTypes::PREFAB;
 			else
 			{
 				return AssetTypes::UNKNOWN;

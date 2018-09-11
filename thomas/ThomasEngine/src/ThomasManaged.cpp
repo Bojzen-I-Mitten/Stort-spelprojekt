@@ -122,6 +122,7 @@ namespace ThomasEngine {
 				{
 					camera->Render();
 				}
+				thomas::object::component::RenderComponent::ClearList();
 				RenderFinished->WaitOne();
 				CopyCommandList();
 				RenderFinished->Reset();
