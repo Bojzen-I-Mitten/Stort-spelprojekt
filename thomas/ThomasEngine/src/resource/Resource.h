@@ -44,7 +44,7 @@ namespace ThomasEngine
 		void Rename(String^ newPath) {
 			m_path = newPath;
 			m_nativePtr->Rename(Utility::ConvertString(newPath));
-			OnPropertyChanged("name");
+			OnPropertyChanged("Name");
 		}
 
 	public:
@@ -65,6 +65,7 @@ namespace ThomasEngine
 			return m_path;
 		}
 
+		virtual property String^ Name
 		String^ GetAssetRelativePath()
 		{
 			if (m_path->Contains(Application::editorAssets)) return m_path->Replace(Application::editorAssets, "%THOMAS_DATA%");
@@ -78,7 +79,7 @@ namespace ThomasEngine
 
 		virtual String^ ToString() override
 		{
-			return name;
+			return Name;
 		}
 
 		static bool operator ==(Resource^ a, Resource^ b)
