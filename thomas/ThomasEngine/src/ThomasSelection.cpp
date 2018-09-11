@@ -22,6 +22,16 @@ namespace ThomasEngine {
 
 	}
 
+	void ThomasSelection::SelectGameObject(Guid guid)
+	{
+		if (guid != Guid::Empty)
+		{
+			GameObject^ gObj = (GameObject^)ThomasEngine::Object::Find(guid);
+			if (gObj)
+				SelectGameObject(gObj);
+		}
+	}
+
 	void ThomasSelection::UnSelectGameObject(GameObject ^ gObj)
 	{
 		Monitor::Enter(m_SelectedGameObjects);
@@ -77,6 +87,14 @@ namespace ThomasEngine {
 		}
 		Monitor::Exit(m_SelectedGameObjects);
 		thomas::editor::EditorCamera::SetHasSelectionChanged(false);
+	}
+
+	Guid ThomasSelection::GetSelectedGUID()
+	{
+		if (m_SelectedGameObjects->Count > 0)
+			return m_SelectedGameObjects[0]->m_guid;
+		else
+			return Guid::Empty;
 	}
 
 	bool ThomasSelection::Contain(GameObject ^ gObj)
