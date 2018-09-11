@@ -10,7 +10,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL), m_collided(false)
+			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL)
 			{
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
@@ -117,10 +117,15 @@ namespace thomas
 				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
 
-			bool Rigidbody::OnCollisionEnter(const std::string & name)
+			bool Rigidbody::OnCollision(Collision collision)
 			{
+				if (this == collision.thisRigidbody)
+				{
+					LOG(std::to_string(collision.thisRigidbody->m_gameObject->GetComponent<Transform>()->GetPosition().y) + " Collided with: " + 
+						std::to_string(collision.otherRigidbody->m_gameObject->GetComponent<Transform>()->GetPosition().y));
+				}
 
-				//if(this->get)
+				return true;
 			}
 
 			float Rigidbody::GetMass()
