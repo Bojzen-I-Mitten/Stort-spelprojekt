@@ -37,10 +37,12 @@ namespace thomas
 				void SetKinematic(bool kinematic);
 				void SetCollider(btCollisionShape* collider);
 				void SetMass(float mass);
+				void SetCollided(bool collided);
 
 			public:
 				float GetMass();
 				bool IsKinematic();
+				const bool hasCollided() const;
 
 			private:
 				void UpdateRigidbodyMass();
@@ -49,6 +51,7 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
+				bool m_collided;
 			};
 		}
 	}

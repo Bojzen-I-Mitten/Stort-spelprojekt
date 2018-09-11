@@ -99,6 +99,8 @@ namespace thomas
 				if (oneTime == false)
 				{
 					LOG("Collision");
+					rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetCollided(true);
+					rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetCollided(true);
 					rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->OnCollision(colA);
 					rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->OnCollision(colB);
 					oneTime = true;
