@@ -21,11 +21,14 @@ namespace ThomasEngine.Network
             { 
                 client.SetIp(IP);
                 client.Start();
+                client.ExecuteEvent();
+            //   client.SendData("client send data");
             }
             else
             { 
                 server.Start();
                 server.SendData("You are Connected To the server");
+                server.ExecuteEvent();
             }
         }
         public override void Update()
