@@ -1,7 +1,7 @@
 // This is the main DLL file.
 
 #include "ThomasManaged.h"
-
+#include "ScriptingManager.h"
 
 namespace ThomasEngine {
 
@@ -134,6 +134,8 @@ namespace ThomasEngine {
 			if (updateEditor)
 				OnEditorUpdate();
 			updateEditor = false;
+
+			ScriptingManger::ReloadIfNeeded();
 		}
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
