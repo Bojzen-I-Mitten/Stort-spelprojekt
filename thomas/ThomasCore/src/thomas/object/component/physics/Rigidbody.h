@@ -29,6 +29,8 @@ namespace thomas
 				void OnDestroy();
 				void UpdateRigidbodyToTransform();
 				void UpdateTransformToRigidBody();
+				void ApplyCentralForce(const math::Vector3 & force);
+				void ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos);
 
 			public:
 				void SetKinematic(bool kinematic);

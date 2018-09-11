@@ -107,6 +107,16 @@ namespace thomas
 				}
 			}
 
+			void Rigidbody::ApplyCentralForce(const math::Vector3 & force)
+			{
+				this->applyCentralForce(Physics::ToBullet(force));
+			}
+
+			void Rigidbody::ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos)
+			{
+				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
+			}
+
 			float Rigidbody::GetMass()
 			{
 				return m_mass;

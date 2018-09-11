@@ -15,8 +15,19 @@ namespace ThomasEngine
 
 		void Awake() override;
 
-
 		void OnDestroy() override;
+
+		void ApplyCentralForce(Vector3 force) 
+		{ 
+			((thomas::object::component::Rigidbody*)nativePtr)->ApplyCentralForce(thomas::math::Vector3(force.x, force.y, force.z)); 
+		}
+
+		void ApplyForce(Vector3 force, Vector3 relPos)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->ApplyForce(
+			thomas::math::Vector3(force.x, force.y, force.z),
+			thomas::math::Vector3(relPos.x, relPos.y, relPos.z));
+		}
 
 		property bool IsKinematic 
 		{
