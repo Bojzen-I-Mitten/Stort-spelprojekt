@@ -60,14 +60,14 @@ namespace ThomasEngine.Network
         }
 
 
-        public void SendData(String StringData)
+        public void SendDataOverEvent(object StringData, DeliveryMethod Order)
         {
             listener.PeerConnectedEvent += peer =>
             {
              //   ThomasEngine.Debug.Log("Server " + peer.EndPoint);// Show peer ip
                 NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                writer.Put(StringData);                                // Put some string
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+                writer.Put((string)StringData);                                // Put some string
+                peer.Send(writer, Order);             // Send with reliability
             };
         }
         public void SetPort(int newPort)
