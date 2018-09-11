@@ -48,6 +48,7 @@ namespace ThomasEngine
 			MATERIAL,
 			SCRIPT,
 			AUDIO_CLIP,
+			PREFAB,
 			UNKNOWN
 		};
 
@@ -85,6 +86,9 @@ namespace ThomasEngine
 			file->Close();
 			Monitor::Exit(resourceLock);
 		}
+
+		static void SavePrefab(GameObject^ gameObject, String^ path);
+		static GameObject^ LoadPrefab(String^ path);
 
 		static void CreateResource(Resource^ resource, String^ path)
 		{
@@ -154,6 +158,8 @@ namespace ThomasEngine
 			{
 				return AssetTypes::TEXTURE2D;
 			}
+			else if (extension == "prefab")
+				return AssetTypes::PREFAB;
 			else
 			{
 				return AssetTypes::UNKNOWN;
