@@ -10,11 +10,11 @@ using LiteNetLib.Utils;
 namespace ThomasEngine.Network
 {
     public class Client
-    {
+    { 
         public EventBasedNetListener listener;
         public NetManager client;
-        public int Port { set; get; } = 9050;
-        public String IP { set; get; } = "localhost";
+        public int port = 9050;
+        public String IP = "localhost";
         public Client()
         { 
             listener = new EventBasedNetListener();
@@ -27,7 +27,7 @@ namespace ThomasEngine.Network
         public void Start()
         {
             client.Start();
-            client.Connect(IP /* host ip or name */, Port /* port */, "SomeConnectionKey" /* text key or NetDataWriter */);
+            client.Connect(IP /* host ip or name */, port /* port */, "SomeConnectionKey" /* text key or NetDataWriter */);
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
                 ThomasEngine.Debug.Log("We got: {0}" + dataReader.GetString(100 /* max length of string */));
@@ -39,5 +39,29 @@ namespace ThomasEngine.Network
         {
             client.Stop();
         }
+
+
+
+
+
+        public void SetPort(int newPort)
+        {
+            port = newPort;
+        }
+        public int GetPort()
+        {
+            return port;
+        }
+        public void SetIp(String newIP)
+        {
+            IP = newIP;
+        }
+        public string GetIp()
+        {
+            return IP;
+        }
+
+
+
     }
 }
