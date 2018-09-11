@@ -34,7 +34,7 @@ namespace thomas {
 			/* Bone transform in model space
 			*/
 			std::vector<math::Matrix> _pose;
-			/* Transformation from rest pose -> world space.
+			/* Skin Transforms in model space
 			*/
 			std::vector<math::Matrix> _skinTransform;
 

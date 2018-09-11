@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <map>
-#include "Bone.h"
-#include "Animation.h"
+#include "data/Bone.h"
+#include "data/Animation.h"
 #include <memory>
 
 namespace thomas {
