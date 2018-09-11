@@ -37,7 +37,7 @@ namespace ThomasEngine
 		void Rename(String^ newPath) {
 			m_path = newPath;
 			m_nativePtr->Rename(Utility::ConvertString(newPath));
-			OnPropertyChanged("name");
+			OnPropertyChanged("Name");
 		}
 
 	public:
@@ -58,14 +58,14 @@ namespace ThomasEngine
 			return m_path;
 		}
 
-		virtual property String^ name
+		virtual property String^ Name
 		{
 			String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
 		};
 
 		virtual String^ ToString() override
 		{
-			return name;
+			return Name;
 		}
 
 		static bool operator ==(Resource^ a, Resource^ b)
