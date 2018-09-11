@@ -37,6 +37,7 @@ namespace ThomasEngine
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 		}
 
+
 	internal:
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
@@ -46,9 +47,12 @@ namespace ThomasEngine
 		}
 
 		void PostLoad()
+		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
+		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
+
+		void PostLoad(Scene^ scene)
 		{
-									
-			scene = Scene::CurrentScene;
+			this->scene = scene;
 			m_transform = GetComponent<Transform^>();
 			
 			List<Component^>^ editorComponents = gcnew List<Component^>;
@@ -141,6 +145,12 @@ namespace ThomasEngine
 			Monitor::Exit(m_componentsLock);
 		}
 
+		GameObject^ CreatePrefab() {
+			GameObject^ newGobj = gcnew GameObject();
+			s_lastObject = nullptr;
+			return newGobj;
+		}
+
 	public:
 		static GameObject^ s_lastObject;
 
@@ -159,6 +169,7 @@ namespace ThomasEngine
 			
 			Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		}
+		
 
 		virtual void Destroy() override;
 
@@ -296,5 +307,10 @@ namespace ThomasEngine
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		}
+
+		static GameObject^ Instantiate(GameObject^ original);
+		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
 	};
 }
