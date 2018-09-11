@@ -11,13 +11,22 @@ namespace ThomasEngine.Network
 
         Server server = new Server();
         Client client = new Client();
+        public string IP { get; set; } = "localhost";
+        public bool Server { get; set; } = false;
+//       public int port { get; set; } = 9050;
 
         public override void Start()
-        {
-            server.Start();
-            client.Start();
-            server.SendData("You are Connected To the server");
-
+        { 
+            if(!Server)
+            { 
+                client.SetIp(IP);
+                client.Start();
+            }
+            else
+            { 
+                server.Start();
+                server.SendData("You are Connected To the server");
+            }
         }
         public override void Update()
         {
@@ -30,5 +39,8 @@ namespace ThomasEngine.Network
             client.Stop();
             base.Destroy();
         }
+ 
+
+
     }
 }
