@@ -7,7 +7,7 @@ using ThomasEngine;
 
 namespace ThomasEditor
 {
-    public class chadControls : ScriptComponent
+    public class ChadControls : ScriptComponent
     {
         //public GameObject aDude;
         public int speed { get; set; }
@@ -25,27 +25,17 @@ namespace ThomasEditor
             float y = gameObject.transform.position.y;
             float z = gameObject.transform.position.z;
 
-            float xMult = 0;
-            float zMult = 0;
-            float localSpeed = speed;
-
-
+            Vector3 test = gameObject.transform.forward;
+            float test2 = gameObject.transform.forward.z + t * speed;
+            
             if (Input.GetKey(Input.Keys.W))
-                zMult = -1;
+                gameObject.transform.position = new Vector3(gameObject.transform.position.x + gameObject.transform.forward.x * t * speed, gameObject.transform.position.y + gameObject.transform.forward.y * t*speed, gameObject.transform.position.z+ gameObject.transform.forward.z * t*speed);
             if (Input.GetKey(Input.Keys.S))
-                zMult = 1;
+                gameObject.transform.position = new Vector3(gameObject.transform.position.x - gameObject.transform.forward.x * t * speed, gameObject.transform.position.y - gameObject.transform.forward.y * t * speed, gameObject.transform.position.z - gameObject.transform.forward.z * t * speed);
             if (Input.GetKey(Input.Keys.A))
-                xMult = -1;
+                gameObject.transform.position = new Vector3(gameObject.transform.position.x - gameObject.transform.right.x * t * speed, gameObject.transform.position.y - gameObject.transform.right.y * t * speed, gameObject.transform.position.z - gameObject.transform.right.z * t * speed);
             if (Input.GetKey(Input.Keys.D))
-                xMult = 1;
-
-            //Avoid double speed diagonally
-            if (xMult != 0 && zMult != 0)
-            {
-                localSpeed *= 0.67f;
-            }
-
-            gameObject.transform.position = new Vector3(x + (localSpeed * t * xMult), y, z + (localSpeed * t * zMult));
+                gameObject.transform.position = new Vector3(gameObject.transform.position.x + gameObject.transform.right.x * t * speed, gameObject.transform.position.y + gameObject.transform.right.y * t * speed, gameObject.transform.position.z + gameObject.transform.right.z * t * speed);
         }
     }
 }
