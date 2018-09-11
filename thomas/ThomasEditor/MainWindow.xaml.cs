@@ -21,12 +21,15 @@ namespace ThomasEditor
 
     public partial class MainWindow : Window
     {
+        
         double scrollRatio = 0;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
+        Guid g;
         public MainWindow()
         {
+            
             string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
@@ -51,6 +54,32 @@ namespace ThomasEditor
 
             LoadLayout();
             Closing += MainWindow_Closing;
+
+            ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
+            ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+        }
+
+        private void ScriptingManger_scriptReloadFinished()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = false;
+                editor.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
+                ThomasWrapper.Selection.SelectGameObject(g);
+            }));
+        }
+
+        private void ScriptingManger_scriptReloadStarted()
+        {
+            g = ThomasWrapper.Selection.GetSelectedGUID();
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = "Reloading scripts...";
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)

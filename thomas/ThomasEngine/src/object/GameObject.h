@@ -34,15 +34,20 @@ namespace ThomasEngine
 			s_lastObject = this;
 			m_name = "gameobject";
 
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 		}
 
 	internal:
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
+		void SyncComponents() {
+			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+		}
+
 		void PostLoad()
 		{
+									
 			scene = Scene::CurrentScene;
 			m_transform = GetComponent<Transform^>();
 			
@@ -150,7 +155,7 @@ namespace ThomasEngine
 
 			Scene::CurrentScene->GameObjects->Add(this);
 			scene = Scene::CurrentScene;
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 			
 			Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		}

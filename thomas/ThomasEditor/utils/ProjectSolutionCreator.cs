@@ -24,7 +24,6 @@ namespace ThomasEditor.utils
                 fsw.EnableRaisingEvents = false;
             fsw = new FileSystemWatcher();
             fsw.Changed += Fsw_Changed;
-            fsw.Created += Fsw_Created;
             fsw.Renamed += Fsw_Renamed;
             fsw.Path = path;
             fsw.IncludeSubdirectories = true;
@@ -34,6 +33,14 @@ namespace ThomasEditor.utils
 
         private static void Fsw_Renamed(object sender, RenamedEventArgs e)
         {
+            if (Path.GetExtension(e.Name) != ".cs" || Path.GetExtension(e.OldName) != ".cs")
+            {
+                if(Path.GetExtension(e.Name) == ".cs")
+                {
+                    FileChanged();
+                }
+                return;
+            }
             Thread worker = new Thread(new ThreadStart(() =>
             {
                 var includePath = e.OldFullPath.Substring(projectEval.DirectoryPath.Length + 1);
@@ -49,14 +56,14 @@ namespace ThomasEditor.utils
             worker.Start();
         }
 
-        private static void Fsw_Created(object sender, FileSystemEventArgs e)
+        private static void FileChanged()
         {
-            //Thread worker = new Thread(new ThreadStart(() =>
-            //{
-            //    BuildSolution();
-            //}));
-            //worker.SetApartmentState(ApartmentState.STA);
-            //worker.Start();
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                BuildSolution();
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
         }
 
         private static void Fsw_Changed(object sender, FileSystemEventArgs e)
@@ -186,7 +193,7 @@ namespace ThomasEditor.utils
 
     public class ThomasBuildLogger : Microsoft.Build.Framework.ILogger
     {
-        public LoggerVerbosity Verbosity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public LoggerVerbosity Verbosity { get => LoggerVerbosity.Normal; set => throw new NotImplementedException(); }
         public string Parameters { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Initialize(IEventSource eventSource)

@@ -21,6 +21,7 @@ namespace ThomasEngine {
 		~ThomasSelection();
 
 		void SelectGameObject(GameObject^ gObj);
+		void SelectGameObject(Guid guid);
 		void UnSelectGameObject(GameObject^ gObj);
 
 		void UnselectGameObjects();
@@ -29,6 +30,8 @@ namespace ThomasEngine {
 
 		void UpdateSelectedObjects();
 
+		Guid GetSelectedGUID();
+		
 
 		bool Contain(GameObject^ gObj);
 
