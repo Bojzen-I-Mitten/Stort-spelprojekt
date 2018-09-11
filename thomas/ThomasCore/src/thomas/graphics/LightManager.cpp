@@ -8,13 +8,13 @@ namespace thomas
 	{
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 25, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;
 			m_lightsCounts.nrOfPointLights = 0;
 			m_lightsCounts.pad = 0;
-			//m_lightsCountsBuffer = std::make_unique<utils::buffers::StructuredBuffer>(&m_lightsCounts, sizeof(LightCountsStruct), 1, DYNAMIC_BUFFER);
+			m_lightsCountsBuffer = std::make_unique<utils::buffers::Buffer>(&m_lightsCounts, sizeof(LightCountsStruct), D3D11_BIND_CONSTANT_BUFFER, DYNAMIC_BUFFER);
 		}
 		void LightManager::Reset()
 		{
@@ -46,7 +46,7 @@ namespace thomas
 			m_lightsCounts.nrOfDirectionalLights++;
 			m_directionalLights.push_back(light);
 		}
-		void LightManager::BindLights()
+		void LightManager::Update()
 		{
 			m_allLights.insert(m_allLights.end(), m_pointLights.begin(), m_pointLights.end());
 			m_allLights.insert(m_allLights.end(), m_spotLights.begin(), m_spotLights.end());

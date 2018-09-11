@@ -41,7 +41,10 @@ namespace thomas
 			void AddSpotLight(const LightStruct &light);
 			void AddDirectionalLight(const LightStruct &light);
 
-			void BindLights();
+			void Update();
+
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
+			std::unique_ptr<utils::buffers::Buffer> m_lightsCountsBuffer;
 		private:
 
 			LightCountsStruct m_lightsCounts;
@@ -50,8 +53,7 @@ namespace thomas
 			std::vector<LightStruct> m_directionalLights;
 			std::vector<LightStruct> m_allLights;
 
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_lightsCountsBuffer;
+			
 		};
 	}
 }

@@ -12,6 +12,8 @@
 #include "utils\Primitives.h"
 #include <D3d11_4.h>
 
+#include "object/component/LightComponent.h"
+
 namespace thomas 
 {
 	ID3D11Debug* ThomasCore::s_debug;
@@ -41,6 +43,8 @@ namespace thomas
 		editor::Gizmos::Init();
 		utils::Primitives::Init();
 
+		thomas::object::component::LightComponent::s_lightManager.Initialize();
+
 		s_initialized = true;
 		return s_initialized;
 	}
@@ -58,11 +62,17 @@ namespace thomas
 		resource::Shader::Update();
 		Input::Update();		
 		Sound::Update();
+		thomas::object::component::LightComponent::s_lightManager.Reset();
 	}
 
 	void ThomasCore::Exit()
 	{
 		s_initialized = false;
+	}
+
+	void ThomasCore::TEST()
+	{
+		thomas::object::component::LightComponent::s_lightManager.Update();
 	}
 
 	bool ThomasCore::Initialized()

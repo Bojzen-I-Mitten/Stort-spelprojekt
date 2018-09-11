@@ -93,7 +93,7 @@ v2f vert(appdata_thomas v)
     uint    type;
 };*/
 
-struct ConstantBufferForLights
+cbuffer LightCounts
 {
     uint nrOfPointLights;
     uint nrOfSpotLights;
@@ -101,7 +101,7 @@ struct ConstantBufferForLights
     uint pad;
 };
 
-struct Light
+struct LightStruct
 {
 	float3  color;
 	float   intensity;
@@ -113,6 +113,8 @@ struct Light
     float   pad;
 };
 
+
+StructuredBuffer<LightStruct> lights;
 
 float CalculatePointLightContribution(float4 lightColor, float lightIntensity, float lightDistance, float3 lightAttenuation)
 {
@@ -154,7 +156,7 @@ void Apply(inout float4 colorAcculmulator, float3 lightMultiplyer, float3 normal
 float4 frag(v2f input) : SV_TARGET
 {
 
-    Light tempLight;
+	LightStruct tempLight;
     tempLight.color = float3(0.5f, 0.5f, 0.5f);
     tempLight.position = float3(3, 3, 3);
     tempLight.intensity = 1;
@@ -162,11 +164,11 @@ float4 frag(v2f input) : SV_TARGET
     tempLight.spotInnerAngle = 10.0f;
     tempLight.spotOuterAngle = 30.0f;
     tempLight.attenuation = float3(0.4f, 0.02f, 0.1f);
-
-    ConstantBufferForLights testCBuffer;
+	/*
+	LightCountsStruct testCBuffer;
     testCBuffer.nrOfDirectionalLights = 1;
     testCBuffer.nrOfPointLights = 0;
-    testCBuffer.nrOfSpotLights = 0;
+    testCBuffer.nrOfSpotLights = 0;*/
     
     
     float4 finalColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -176,14 +178,14 @@ float4 frag(v2f input) : SV_TARGET
     float3 lightMultiplyer = float3(0.0f, 0.0f, 0.0f);
     
     int i = 0;
-    int roof = testCBuffer.nrOfDirectionalLights;
+	int roof = 1;// nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
-        lightDir = -tempLight.direction;
-        lightMultiplyer = tempLight.color * tempLight.intensity;
+        lightDir = -lights[i].direction;
+        lightMultiplyer = lights[i].color * lights[i].intensity;
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
-    roof += testCBuffer.nrOfPointLights;
+    roof += nrOfPointLights;
     for (; i < roof; ++i) //point
     {
         lightDir = tempLight.position - input.worldPos.xyz;
@@ -193,7 +195,7 @@ float4 frag(v2f input) : SV_TARGET
         lightMultiplyer = tempLight.color * tempLight.intensity / (tempLight.attenuation.x + tempLight.attenuation.y * lightDistance + tempLight.attenuation.z * lightDistance * lightDistance);
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
-    roof += testCBuffer.nrOfSpotLights;
+    roof += nrOfSpotLights;
     for (; i < roof; ++i) //spot
     {
         lightDir = tempLight.position - input.worldPos.xyz;

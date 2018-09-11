@@ -19,13 +19,15 @@ namespace thomas
 
 			LightComponent::LightComponent()
 			{
-				type = LIGHT_TYPES::POINT;
+				m_type = LIGHT_TYPES::POINT;
 
-				lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
-				lightComponentData.color = math::Vector3(1.0f, 1.0f, 1.0f);
-				lightComponentData.intensity = 1.0f;
-				lightComponentData.spotInnerAngle = 0.0f;
-				lightComponentData.spotOuterAngle = 20.0f;
+				m_lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
+				m_lightComponentData.color = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.position = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.direction = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.intensity = 1.0f;
+				m_lightComponentData.spotInnerAngle = 0.0f;
+				m_lightComponentData.spotOuterAngle = 20.0f;
 			}
 			LightComponent::~LightComponent()
 			{
@@ -33,99 +35,99 @@ namespace thomas
 			
 			void LightComponent::Update()
 			{
-				if (type == LIGHT_TYPES::POINT)
+				if (m_type == LIGHT_TYPES::POINT)
 				{
-					//s_lightManager.AddPointLight(lightComponentData);
+					s_lightManager.AddPointLight(m_lightComponentData);
 				}
-				else if (type == LIGHT_TYPES::DIRECTIONAL)
+				else if (m_type == LIGHT_TYPES::DIRECTIONAL)
 				{
-					//s_lightManager.AddDirectionalLight(lightComponentData);
+					s_lightManager.AddDirectionalLight(m_lightComponentData);
 				}
-				else if (type == LIGHT_TYPES::SPOT)
+				else if (m_type == LIGHT_TYPES::SPOT)
 				{
-					//s_lightManager.AddSpotLight(lightComponentData);
+					s_lightManager.AddSpotLight(m_lightComponentData);
 				}
 			}
 			
 
 			LightComponent::LIGHT_TYPES LightComponent::GetType()
 			{
-				return type;
+				return m_type;
 			}
 
 			void LightComponent::SetType(LIGHT_TYPES other)
 			{
-				type = other;
+				m_type = other;
 			}
 
 			thomas::math::Color LightComponent::GetColor()
 			{
-				return lightComponentData.color;
+				return m_lightComponentData.color;
 			}
 
 			void LightComponent::SetColor(thomas::math::Color other)
 			{
-				lightComponentData.color = other.ToVector3();
+				m_lightComponentData.color = other.ToVector3();
 			}
 
 			float LightComponent::GetIntensity()
 			{
-				return lightComponentData.intensity;
+				return m_lightComponentData.intensity;
 			}
 
 			void LightComponent::SetIntensity(float value)
 			{
-				lightComponentData.intensity = value;
+				m_lightComponentData.intensity = value;
 			}
 
 			float LightComponent::GetSpotInnerAngle()
 			{
-				return lightComponentData.spotInnerAngle;
+				return m_lightComponentData.spotInnerAngle;
 			}
 
 			void LightComponent::SetSpotInnerAngle(float value)
 			{
-				lightComponentData.spotInnerAngle = value;
+				m_lightComponentData.spotInnerAngle = value;
 			}
 
 			float LightComponent::GetSpotOuterAngle()
 			{
-				return lightComponentData.spotOuterAngle;
+				return m_lightComponentData.spotOuterAngle;
 			}
 
 			void LightComponent::SetSpotOuterAngle(float value)
 			{
-				lightComponentData.spotOuterAngle = value;
+				m_lightComponentData.spotOuterAngle = value;
 			}
 
 			float LightComponent::GetConstantAttenuation()
 			{
-				return lightComponentData.attenuation.x;
+				return m_lightComponentData.attenuation.x;
 			}
 
 			void LightComponent::SetConstantAttenuation(float value)
 			{
-				lightComponentData.attenuation.x = value;
+				m_lightComponentData.attenuation.x = value;
 			}
 
 			float LightComponent::GetLinearAttenuation()
 			{
-				return lightComponentData.attenuation.y;
+				return m_lightComponentData.attenuation.y;
 			}
 
 			void LightComponent::SetLinearAttenuation(float value)
 			{
-				lightComponentData.attenuation.y = value;
+				m_lightComponentData.attenuation.y = value;
 			}
 
 			float LightComponent::GetQuadraticAttenuation()
 			{
-				return lightComponentData.attenuation.z;
+				return m_lightComponentData.attenuation.z;
 			}
 
 			void LightComponent::SetQuadraticAttenuation(float value)
 			{
-				lightComponentData.attenuation.z = value;
+				m_lightComponentData.attenuation.z = value;
 			}
 
 		}

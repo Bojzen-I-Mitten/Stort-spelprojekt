@@ -165,11 +165,14 @@ namespace ThomasEngine {
 					}
 					Monitor::Exit(SelectedGameObjects);
 					//end editor rendering
-
+					
 					for (object::component::Camera* camera : object::component::Camera::s_allCameras)
 					{
 						camera->Render();
 					}
+					
+					ThomasCore::TEST();
+
 					RenderFinished->WaitOne();
 					CopyCommandList();
 					RenderFinished->Reset();

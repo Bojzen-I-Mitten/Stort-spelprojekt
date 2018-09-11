@@ -25,6 +25,9 @@ namespace thomas
 			float dt = ThomasTime::GetDeltaTime();
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
 			resource::Shader::SetGlobalVector("thomas_DeltaTime", thomas_DeltaTime);
+
+			resource::Shader::SetGlobalConstantBuffer("LightCounts", thomas::object::component::LightComponent::s_lightManager.m_lightsCountsBuffer->GetBuffer());
+			resource::Shader::SetGlobalResource("lights", thomas::object::component::LightComponent::s_lightManager.m_lightBuffer->GetSRV());
 		}
 
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
