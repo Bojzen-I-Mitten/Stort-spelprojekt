@@ -15,12 +15,14 @@ namespace ThomasEngine.Network
         public int port{get; set;}
         private NetManager server;
         private EventBasedNetListener listener;
+        private NetDataWriter writer;                 // Create writer class
+
         public Server()
         {
             port = 9050;
              listener = new EventBasedNetListener();
-             server = new NetManager(listener); 
-
+             server = new NetManager(listener);
+            writer = new NetDataWriter();
 
         }
         public void Start()
@@ -53,6 +55,16 @@ namespace ThomasEngine.Network
         {
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
+                /*     while (!dataReader.EndOfData)
+                     {
+                         int networkId = dataReader.GetInt();
+                         GetNetworkIdentityComponent(networkId)->read(dataReader);
+
+
+                         AllnetworkComponents
+                         for each component
+                             component->read(dataReader);
+                     }*/
                 ThomasEngine.Debug.Log("ServerSide: " + dataReader.GetString(100 /* max length of string */));
                 // Console.WriteLine("We got: {0}" , dataReader.GetString(100 /* max length of string */));
                 dataReader.Recycle();
@@ -60,16 +72,24 @@ namespace ThomasEngine.Network
         }
 
 
-        public void SendDataOverEvent(object StringData, DeliveryMethod Order)
+        public void SendDataOverEvent(object Data, DeliveryMethod Order)
         {
             listener.PeerConnectedEvent += peer =>
             {
-             //   ThomasEngine.Debug.Log("Server " + peer.EndPoint);// Show peer ip
-                NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                writer.Put((string)StringData);                                // Put some string
-                peer.Send(writer, Order);             // Send with reliability
+             //  ThomasEngine.Debug.Log("Server " + peer.EndPoint);// Show peer ip 
+                writer.Put((string)Data);             // Put some string
+                peer.Send(writer, Order);                   // Send with reliability
+                writer.Reset();                             //Resets the writer and emptying its array.
             };
         }
+
+        public void SendDataOnPeer(NetPeer peer, DeliveryMethod Order,object Datatosend)
+        {
+            writer.Put((string) Datatosend);
+            peer.Send(writer, Order);
+        }
+
+
         public void SetPort(int newPort)
         {
             port = newPort;
