@@ -231,7 +231,7 @@ namespace thomas
 		{
 			if (HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::MATRIX)
 			{
-				((shaderProperty::ShaderPropertyMatrix*)m_properties[name].get())->GetValue();
+				return ((shaderProperty::ShaderPropertyMatrix*)m_properties[name].get())->GetValue();
 			}
 			else
 			{
