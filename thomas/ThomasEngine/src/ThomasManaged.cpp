@@ -24,7 +24,6 @@ namespace ThomasEngine {
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
 		}
-
 	}
 
 	void ThomasWrapper::UpdateEditor()
