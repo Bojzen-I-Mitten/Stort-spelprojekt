@@ -2,7 +2,7 @@
 /* Mattias F 2017
 	- Modified 2018
 */
-#include "../../utils/Math.h"
+#include "../../../utils/Math.h"
 
 namespace thomas {
 	namespace animation {

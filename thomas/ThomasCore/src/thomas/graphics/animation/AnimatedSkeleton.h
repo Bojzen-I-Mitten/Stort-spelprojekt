@@ -2,9 +2,9 @@
 #include <vector>
 #include <math.h>
 #include "../../object/component/Transform.h"
-#include "Bone.h"
-#include "Skeleton.h"
-#include "BoneFrame.h"
+#include "data/Bone.h"
+#include "data/Skeleton.h"
+#include "data/BoneFrame.h"
 #include "../../utils/Math.h"
 
 namespace thomas {

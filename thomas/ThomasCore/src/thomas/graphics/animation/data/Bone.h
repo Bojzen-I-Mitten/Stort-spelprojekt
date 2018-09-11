@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-#include "../../utils/Math.h"
+#include "../../../utils/Math.h"
 
 namespace thomas {
 	namespace animation {

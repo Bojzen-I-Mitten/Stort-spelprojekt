@@ -7,7 +7,7 @@
 #include "ChannelKeys.h"
 #include "Channel.h"
 #include "Animation.h"
-#include "../../utils/Math.h"
+#include "../../../utils/Math.h"
 
 namespace thomas {
 	namespace animation {

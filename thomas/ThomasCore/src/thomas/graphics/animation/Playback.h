@@ -10,6 +10,13 @@ namespace thomas {
 		public:
 			Playback();
 			~Playback();
+
+			virtual float update(float dT);
+
+		private:
+
+			float _elapTime;
+			float _duration;
 		};
 
 	}

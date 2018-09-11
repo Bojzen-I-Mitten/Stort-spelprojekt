@@ -13,5 +13,9 @@ namespace thomas {
 		Playback::~Playback()
 		{
 		}
+		float Playback::update(float dT)
+		{
+			return 0.0f;
+		}
 	}
 }

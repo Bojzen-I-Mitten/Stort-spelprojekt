@@ -1,5 +1,4 @@
 #include "AnimatedSkeleton.h"
-#include "BoneNode.h"
 
 
 namespace thomas {
