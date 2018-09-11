@@ -31,6 +31,7 @@ namespace thomas
 				void UpdateTransformToRigidBody();
 				void ApplyCentralForce(const math::Vector3 & force);
 				void ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos);
+				bool OnCollisionEnter(const std::string & name);
 
 			public:
 				void SetKinematic(bool kinematic);
@@ -48,6 +49,7 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
+				bool m_collided;
 			};
 		}
 	}

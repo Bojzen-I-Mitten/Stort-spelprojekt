@@ -10,7 +10,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL)
+			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL), m_collided(false)
 			{
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
@@ -115,6 +115,12 @@ namespace thomas
 			void Rigidbody::ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos)
 			{
 				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
+			}
+
+			bool Rigidbody::OnCollisionEnter(const std::string & name)
+			{
+
+				//if(this->get)
 			}
 
 			float Rigidbody::GetMass()

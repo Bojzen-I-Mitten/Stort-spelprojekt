@@ -92,6 +92,8 @@ namespace thomas
 				colA.otherRigidbody = rbB;
 				colB.thisRigidbody = rbB;
 				colB.otherRigidbody = rbA;
+				
+				//rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->checkCollideWith(colA.otherRigidbody->getCollisionShape());
 				/*rbA->m_gameObject->OnCollision(colA);
 				rbB->m_gameObject->OnCollision(colB);*/
 			}
