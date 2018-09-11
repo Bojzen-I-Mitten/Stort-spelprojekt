@@ -124,6 +124,8 @@ namespace thomas
 
 			bool Rigidbody::OnCollision(Collision collision)
 			{
+				// Remove other body:
+				//if(this != collision.thisRigidbody)...
 				if (m_collided)
 				{
 					if (this == collision.thisRigidbody)
