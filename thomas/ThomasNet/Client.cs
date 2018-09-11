@@ -43,14 +43,15 @@ namespace ThomasEngine.Network
                 dataReader.Recycle();
             };
         }
-        public void SendData(String StringData)
+        
+        public void SendData(object StringData, DeliveryMethod Order)
         {
             listener.PeerConnectedEvent += peer =>
             {
             //   ThomasEngine.Debug.Log("Client " + peer.EndPoint);// Show peer ip
                 NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                writer.Put(StringData);                                // Put some string
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+                writer.Put((string)StringData);                                // Put some string
+                peer.Send(writer, Order);             // Send
             };
         }
         

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteNetLib;
+using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
@@ -22,12 +24,12 @@ namespace ThomasEngine.Network
                 client.SetIp(IP);
                 client.Start();
                 client.ExecuteEvent();
-            //   client.SendData("client send data");
+                //   client.SendDataOverEvent("client send data",DeliveryMethod.ReliableOrdered);
             }
             else
             { 
                 server.Start();
-                server.SendData("You are Connected To the server");
+                server.SendDataOverEvent("You are Connected To the server", DeliveryMethod.ReliableOrdered);
                 server.ExecuteEvent();
             }
         }
