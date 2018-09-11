@@ -59,6 +59,14 @@ namespace ThomasEngine.Network
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
             };
         }
+        public void SetPort(int newPort)
+        {
+            port = newPort;
+        }
+        public int GetPort()
+        {
+            return port;
+        }
     }
 
 }
