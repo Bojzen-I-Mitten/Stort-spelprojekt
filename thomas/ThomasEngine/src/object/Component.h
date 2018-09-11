@@ -64,6 +64,12 @@ namespace ThomasEngine
 			
 		}
 
+		[BrowsableAttribute(false)]
+		property String^ Name
+		{
+			String^ get() override;
+		};
+
 		virtual void Destroy() override;
 
 		static List<Type^>^ GetAllComponentTypes();

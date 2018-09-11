@@ -14,12 +14,16 @@ namespace ThomasEditor
         public AudioClip audioClip { get; set; }
         public Material mat { get; set; }
         public Model m { get; set; }
+        public GameObject coolPrefab { get; set; }
+        public RenderComponent otherObjectsRender { get; set; }
 
         float t = 0;
 
         public override void Start()
         {
-           // m.GenerateBones(gameObject);
+            // m.GenerateBones(gameObject);
+            GameObject.Instantiate(coolPrefab, new Vector3(10, 10, 10), new Quaternion());
+            //otherObjectsRender.Destroy();
         }
 
         public override void Update()

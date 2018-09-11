@@ -6,6 +6,7 @@
 ThomasEngine::Component::Component() : Object(new thomas::object::component::Component())
 {
 	setGameObject(GameObject::s_lastObject);
+
 }
 
 void ThomasEngine::Component::LoadExternalComponents()
@@ -89,6 +90,10 @@ List<Type^>^ ThomasEngine::Component::GetAllComponentTypes()
 		}
 	}
 	return types;
+}
+
+String^ ThomasEngine::Component::Name::get() {
+	return gameObject->Name + " (" + this->GetType()->Name + ")";
 }
 
 List<Type^>^ ThomasEngine::Component::GetAllAddableComponentTypes()

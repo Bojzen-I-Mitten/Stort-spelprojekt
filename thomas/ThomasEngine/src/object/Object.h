@@ -8,6 +8,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::ComponentModel;
+using namespace System::Linq;
 namespace ThomasEngine {
 
 	[SerializableAttribute]
@@ -50,7 +51,7 @@ namespace ThomasEngine {
 		}
 
 		[BrowsableAttribute(false)]
-		property String^ Name
+		virtual property String^ Name
 		{
 			String^ get() { return m_name; }
 
@@ -89,6 +90,21 @@ namespace ThomasEngine {
 		static List<Object^>^ GetObjects()
 		{
 			return %s_objects;
+		}
+		generic<typename T>
+		where T: Object
+		static List<T>^ GetObjectsOfType() {
+			List<T>^ list = gcnew List<T>(Enumerable::OfType<T>(%s_objects));
+			return list;
+		}
+
+		static List<Object^>^ GetObjectsOfType(Type^ type) {
+			List<Object^>^ list = gcnew List<Object^>();
+			for (int i = 0; i < s_objects.Count; i++) {
+				if (s_objects[i]->GetType() == type)
+					list->Add(s_objects[i]);
+			}
+			return list;
 		}
 
 		static bool operator ==(Object^ a, Object^ b)
