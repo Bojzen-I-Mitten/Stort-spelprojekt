@@ -24,7 +24,9 @@ namespace ThomasEngine.Network
             foreach (NetworkComponent comp in networkComponents)
             {
                 if (comp != this)
+                {
                     comp.Read(reader);
+                }
             }
         }
         public override void Write(NetDataWriter writer)
