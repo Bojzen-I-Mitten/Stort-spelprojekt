@@ -18,6 +18,7 @@ namespace ThomasEditor.utils
         private static Microsoft.Build.Evaluation.Project projectEval;
         public static FileSystemWatcher fsw;
         private static bool building = false;
+        private static ILogger logger = new ThomasBuildLogger();
         public static void SetWatcher(string path)
         {
             if(fsw != null)
@@ -133,23 +134,33 @@ namespace ThomasEditor.utils
 
         public static bool BuildSolution()
         {
-            if (building)
-                return true;
-            building = true;
-            MainWindow._instance.showBusyIndicator("Compiling scripts...");
-            projectEval = new Microsoft.Build.Evaluation.Project(projectPath, null, null, new ProjectCollection());
-            GC.Collect();
-            var logger = new ThomasBuildLogger();
+            try
+            {
+                if (building)
+                    return true;
+                building = true;
+                MainWindow._instance.showBusyIndicator("Compiling scripts...");
+                projectEval = new Microsoft.Build.Evaluation.Project(projectPath, null, null, new ProjectCollection());
+                GC.Collect();
+
 #if DEBUG
-            projectEval.SetGlobalProperty("Configuration", "Debug");
+                projectEval.SetGlobalProperty("Configuration", "Debug");
 #else
             projectEval.SetGlobalProperty("Configuration", "Release");
 #endif
-            
-            projectEval.Build(logger);
-            MainWindow._instance.hideBusyIndicator();
-            building = false;
-            return true;
+
+
+                projectEval.Build(logger);
+                MainWindow._instance.hideBusyIndicator();
+                building = false;
+                return true;
+            }catch(Exception e)
+            {
+                Debug.Log("Something went wrong building scripts. Try to close project solution.");
+                MainWindow._instance.hideBusyIndicator();
+                return true;
+            }
+           
         }
 
         public static void AddScript(string script)
@@ -200,6 +211,12 @@ namespace ThomasEditor.utils
         {
             eventSource.ErrorRaised += EventSource_ErrorRaised;
             eventSource.WarningRaised += EventSource_WarningRaised;
+            eventSource.BuildFinished += EventSource_BuildFinished;
+        }
+
+        private void EventSource_BuildFinished(object sender, BuildFinishedEventArgs e)
+        {
+            Debug.Log("Build succeded");
         }
 
         private void EventSource_WarningRaised(object sender, BuildWarningEventArgs e)
@@ -213,6 +230,8 @@ namespace ThomasEditor.utils
             string line = String.Format("ERROR {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
             Debug.Log(line);
         }
+
+
 
         public void Shutdown()
         {
