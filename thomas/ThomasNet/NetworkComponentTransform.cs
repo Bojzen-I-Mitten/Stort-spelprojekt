@@ -26,8 +26,20 @@ namespace ThomasEngine.Network
             position.x = reader.GetFloat();
             position.y = reader.GetFloat();
             position.z = reader.GetFloat();
-            
             transform.position = position;
+
+            Quaternion rotation = new Quaternion();
+            rotation.w = reader.GetFloat();
+            rotation.x = reader.GetFloat();
+            rotation.y = reader.GetFloat();
+            rotation.z = reader.GetFloat();
+            transform.rotation = rotation;
+
+            Vector3 scale = new Vector3();
+            scale.x = reader.GetFloat();
+            scale.y = reader.GetFloat();
+            scale.z = reader.GetFloat();
+            transform.scale = scale;
         }
 
         public override void Write(NetDataWriter writer)
@@ -35,6 +47,15 @@ namespace ThomasEngine.Network
             writer.Put(transform.position.x);
             writer.Put(transform.position.y);
             writer.Put(transform.position.z);
+
+            writer.Put(transform.rotation.w);
+            writer.Put(transform.rotation.x);
+            writer.Put(transform.rotation.y);
+            writer.Put(transform.rotation.z);
+            
+            writer.Put(transform.scale.x);
+            writer.Put(transform.scale.y);
+            writer.Put(transform.scale.z);
         }
      
     }

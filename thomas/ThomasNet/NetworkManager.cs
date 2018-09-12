@@ -13,7 +13,6 @@ namespace ThomasEngine.Network
     {
         public int ID { get; set; } = 0;
         public Vector3 transformPos = new Vector3(0.0F, 0.0F, 0.0F);
-
         static public void PrintPacket(ExamplePacket packet, NetPeer peer)
         {
             
@@ -33,7 +32,6 @@ namespace ThomasEngine.Network
         int iD = -1;
 
         private readonly NetPacketProcessor netPacketProcessor = new NetPacketProcessor();
-
         private EventBasedNetListener listener;
         private NetManager netManager;
         private NetDataWriter writer;
@@ -70,7 +68,6 @@ namespace ThomasEngine.Network
             else //server
             {
                 netManager.Start(9050 /* port */);
-
                // SendEvent(testPacket, DeliveryMethod.ReliableOrdered);
             }
 
