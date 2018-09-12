@@ -3,6 +3,7 @@
 #include "object\Component.h"
 #include "resource\Resources.h"
 #include "ThomasManaged.h"
+#include <msclr/marshal_cppstd.h>
 namespace ThomasEngine
 {
 	void Scene::Play()
@@ -86,7 +87,16 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
-			return nullptr;
+			try {
+				LOG("Loading scene: ");
+				LOG(msclr::interop::marshal_as<std::string>(fullPath));
+				LOG("with error:")
+				LOG(msclr::interop::marshal_as<std::string>(e->Message));
+				return nullptr;
+			}
+			finally{
+
+			}
 		}
 
 	}
