@@ -84,34 +84,21 @@ namespace thomas
 			btPersistentManifold* contactManifold = s_world->getDispatcher()->getManifoldByIndexInternal(i);
 			btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
 			btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
+
+			// Avoid self collisions
+			if (obA == obB) continue;
+
 			object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
 			object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
 
-			//if (rbA->isActive() && rbB->isActive()) // Set one body to static?
-			//{
-				object::component::Rigidbody::Collision colA;
-				object::component::Rigidbody::Collision colB;
-				colA.thisRigidbody = rbA;
-				colA.otherRigidbody = rbB;
-				colB.thisRigidbody = rbB;
-				colB.otherRigidbody = rbA;
-
-				if (oneTime == false)
-				{
-					LOG("Collision");
-					rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetCollided(true);
-					rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetCollided(true);
-					rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->OnCollision(colA);
-					rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->OnCollision(colB);
-					oneTime = true;
-				}
-				
-				//rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->checkCollideWith(colA.otherRigidbody->getCollisionShape());
-				/*rbA->m_gameObject->OnCollision(colA);
-				rbB->m_gameObject->OnCollision(colB);*/
-			//}
-				
+			if (oneTime == false)
+			{
+				LOG("Collision");
+				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
+				oneTime = true;
+			}
 		}
+
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateRigidbodyToTransform();

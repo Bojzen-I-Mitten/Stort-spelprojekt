@@ -13,13 +13,6 @@ namespace thomas
 			class THOMAS_API Rigidbody : public Component, public btRigidBody
 			{
 			public:
-				struct Collision
-				{
-					Rigidbody* thisRigidbody;
-					Rigidbody* otherRigidbody;
-				};
-
-			public:
 				Rigidbody();
 				~Rigidbody();
 
@@ -31,18 +24,17 @@ namespace thomas
 				void UpdateTransformToRigidBody();
 				void ApplyCentralForce(const math::Vector3 & force);
 				void ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos);
-				bool OnCollision(Collision collider);
+				bool HasCollided(GameObject* collider);
 
 			public:
 				void SetKinematic(bool kinematic);
 				void SetCollider(btCollisionShape* collider);
 				void SetMass(float mass);
-				void SetCollided(bool collided);
+				void SetTargetCollider(GameObject* collider);
 
 			public:
 				float GetMass();
 				bool IsKinematic();
-				const bool hasCollided() const;
 
 			private:
 				void UpdateRigidbodyMass();
@@ -51,7 +43,7 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
-				bool m_collided;
+				GameObject* m_targetCollider; // Temp
 			};
 		}
 	}

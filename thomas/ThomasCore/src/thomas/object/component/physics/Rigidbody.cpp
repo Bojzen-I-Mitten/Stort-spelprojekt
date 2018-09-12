@@ -10,7 +10,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL), m_collided(false)
+			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL)
 			{
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
@@ -107,9 +107,9 @@ namespace thomas
 				}
 			}
 
-			void Rigidbody::SetCollided(bool collided)
+			void Rigidbody::SetTargetCollider(GameObject* collider)
 			{
-				m_collided = collided;
+				m_targetCollider = collider;
 			}
 
 			void Rigidbody::ApplyCentralForce(const math::Vector3 & force)
@@ -122,23 +122,19 @@ namespace thomas
 				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
 
-			bool Rigidbody::OnCollision(Collision collision)
+			bool Rigidbody::HasCollided(GameObject* collider)
 			{
-				// Remove other body:
-				//if(this != collision.thisRigidbody)...
-				if (m_collided)
+				// Temp solution for now
+				if (m_targetCollider != nullptr)
 				{
-					if (this == collision.thisRigidbody)
+					if (this->hasContactResponse() && 
+						m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
 					{
-						LOG(std::to_string(collision.thisRigidbody->m_gameObject->GetComponent<Transform>()->GetPosition().y) + " Collided with: " +
-							std::to_string(collision.otherRigidbody->m_gameObject->GetComponent<Transform>()->GetPosition().y));
+						collider = m_targetCollider;
+						return true;
 					}
-
-					// Test code
-					m_collided = false;
-					return true;
 				}
-
+				
 				return false;
 			}
 
@@ -150,11 +146,6 @@ namespace thomas
 			bool Rigidbody::IsKinematic()
 			{
 				return m_kinematic;
-			}
-
-			const bool Rigidbody::hasCollided() const
-			{
-				return m_collided;
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()

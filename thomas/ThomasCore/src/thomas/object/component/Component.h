@@ -10,10 +10,8 @@ namespace thomas
 		{
 			class THOMAS_API Component : public Object
 			{
-			private:
 			public:
-				bool initialized = false;
-				GameObject* m_gameObject;
+				virtual ~Component();	
 				virtual void Awake() {};
 				virtual void OnEnable() { };
 				virtual void OnDisable() {};
@@ -21,12 +19,11 @@ namespace thomas
 				virtual void FixedUpdate() {};
 				virtual void OnDrawGizmos() {};
 				virtual void OnDrawGizmosSelected() {};
-				virtual ~Component();
+				virtual void OnCollisionEnter() {}; // TODO: add param
 
-
-			private:
-			protected:
-				
+			public:
+				bool initialized = false;
+				GameObject* m_gameObject;	
 			};
 		}
 	}
