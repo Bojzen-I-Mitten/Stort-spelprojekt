@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,9 +60,8 @@ namespace ThomasEngine.Network
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
-        
-            
-
+            listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+            listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             if (isClient) //client
             {
                 netManager.Start();
@@ -77,8 +76,14 @@ namespace ThomasEngine.Network
 
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
         }
-
-
+        private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+        }
+        private void Listener_PeerConnectedEvent(NetPeer peer)
+        {
+            ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
+        }
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
             while(reader.AvailableBytes > 0)
@@ -101,7 +106,6 @@ namespace ThomasEngine.Network
                 }
             }
         }
-
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
             if (netManager.PeersCount < 10 /* max connections */)
@@ -109,7 +113,6 @@ namespace ThomasEngine.Network
             else
                 request.Reject();
         }
-
         public override void Update()
         {
             netManager.PollEvents();
@@ -121,27 +124,21 @@ namespace ThomasEngine.Network
             netManager.Stop();
             base.Destroy();
         }
-
         public int Register(NetworkID netID)
         {
             iD++;
             networkIDObjects.Add(iD, netID);
             return iD;
         }
-
-
         public void SubscribeToEvent<T>(Action<T, NetPeer> onReceive) where T : class, new()
         {
             netPacketProcessor.SubscribeReusable<T, NetPeer>(onReceive);
         }
-
-
         public void SendEvent<T>(NetDataWriter writer, T data) where T : class, new()
         {
             writer.Put((int)PacketType.EVENT);
             netPacketProcessor.Write<T>(writer, data);
         }
-
         public void SendEvent<T>(T data, DeliveryMethod method) where T : class, new()
         {
             NetDataWriter writer = new NetDataWriter();
@@ -150,15 +147,12 @@ namespace ThomasEngine.Network
             netPacketProcessor.Write<T>(writer, data);
             netManager.SendToAll(writer, method);
         }
-
-
         public void WriteData(NetDataWriter writer)
         {
             writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
                 id.Write(writer);
         }
-
         public void WriteData(DeliveryMethod method)
         {
             NetDataWriter writer = new NetDataWriter();
@@ -169,6 +163,5 @@ namespace ThomasEngine.Network
 
             netManager.SendToAll(writer, method);
         }
-
     }
 }
