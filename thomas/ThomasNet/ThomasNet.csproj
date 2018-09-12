@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
     <Compile Include="NetworkComponent.cs" />
     <Compile Include="NetworkComponentTransform.cs" />
     <Compile Include="LiteNetLib\BaseChannel.cs" />
@@ -72,7 +71,6 @@
     <Compile Include="NetworkID.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThomasEngine\ThomasEngine.vcxproj">
