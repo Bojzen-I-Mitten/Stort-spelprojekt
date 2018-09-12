@@ -13,7 +13,7 @@ namespace ThomasEngine.Network
     {
         Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
         int iD = -1;
-
+   
       
         private EventBasedNetListener listener;
         private NetManager netManager;
@@ -51,9 +51,9 @@ namespace ThomasEngine.Network
                         request.Reject();
                 };
 
-                 SendDataOverEvent("You are Connected To the server", DeliveryMethod.ReliableOrdered);
+                 //SendDataOverEvent("You are Connected To the server", DeliveryMethod.ReliableOrdered);
 
-              //  SendDataOverEvent(0.0f, 2.2f, 0.0f, DeliveryMethod.ReliableOrdered);
+                SendDataOverEvent(0.0f, 2.2f, 0.0f, DeliveryMethod.ReliableOrdered);
               
             }
             ExecuteEvent();
@@ -80,9 +80,10 @@ namespace ThomasEngine.Network
         {
             listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
             {
-                 ThomasEngine.Debug.Log(dataReader.GetString());
+                //   ThomasEngine.Debug.Log(dataReader.GetString());
                 // Console.WriteLine("We got: {0}" , dataReader.GetString(100 /* max length of string */));  dataReader.GetString(100 /* max length of string */)+
-               // networkIDObjects[]
+                foreach (NetworkID id in networkIDObjects.Values)
+                    id.Read(dataReader);
 
                 dataReader.Recycle();
             };

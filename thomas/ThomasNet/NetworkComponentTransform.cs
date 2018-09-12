@@ -9,7 +9,7 @@ using LiteNetLib.Utils;
 namespace ThomasEngine.Network
 {
 
-    class NetworkComponentTransform : NetworkComponent
+    public class NetworkComponentTransform : NetworkComponent
     {
         public override void Start()
         {
