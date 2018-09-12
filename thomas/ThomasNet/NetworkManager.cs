@@ -11,14 +11,20 @@ namespace ThomasEngine.Network
 {
     public class ExamplePacket
     {
-        public string test1 { get; set; } = "asd";
-        public int test2 { get; set; } = 123;
-        public Vector3 test3 = new Vector3(0.0F, 0.0F, 0.0F);
+        public int ID { get; set; } = 0;
+        public Vector3 transformPos = new Vector3(0.0F, 0.0F, 0.0F);
 
         static public void PrintPacket(ExamplePacket packet, NetPeer peer)
         {
-            ThomasEngine.Debug.Log(System.String.Format("Received: \n {0}\n {1}\n {2}\t{3}\t{4}", packet.test1, packet.test2, packet.test3.x, packet.test3.y, packet.test3.z));
+            
+            ThomasEngine.Debug.Log(System.String.Format("Received: \n {0}\n {1}\n {2}\t{3}\t", packet.ID, packet.transformPos.x, packet.transformPos.y, packet.transformPos.z));
         }
+    }
+
+    public enum PacketType
+    {
+        EVENT,
+        DATA
     }
 
     public class NetworkManager : ScriptComponent
@@ -32,17 +38,32 @@ namespace ThomasEngine.Network
         private NetManager netManager;
         private NetDataWriter writer;
         public string IP { get; set; } = "localhost";
-        public bool Server { get; set; } = false;
+        public bool isServer { get; set; } = false;
         //public int port { get; set; } = 9050;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
+
+
+        public bool isClient
+        {
+            get { return !isServer; }
+        }
+
         public override void Start()
         {
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
             instance = this;
             writer = new NetDataWriter();
-            if (!Server) //client
+
+
+            //Here all events are defined.
+            listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
+            listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
+        
+            
+
+            if (isClient) //client
             {
                 netManager.Start();
                 netManager.Connect(IP /* host ip or name */, 9050 /* port */, "SomeConnectionKey" /* text key or NetDataWriter */);
@@ -51,26 +72,49 @@ namespace ThomasEngine.Network
             {
                 netManager.Start(9050 /* port */);
 
-
-                listener.ConnectionRequestEvent += request =>
-                {
-                    if (netManager.PeersCount < 10 /* max connections */)
-                        request.AcceptIfKey("SomeConnectionKey");
-                    else
-                        request.Reject();
-                };
-
-                 SendDataOverEvent(testPacket, DeliveryMethod.ReliableOrdered);
+               // SendEvent(testPacket, DeliveryMethod.ReliableOrdered);
             }
 
-            SubscribeDataType<ExamplePacket>(ExamplePacket.PrintPacket);
-
-            ExecuteEvent();
-
+            SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
         }
+
+
+        private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+        {
+            while(reader.AvailableBytes > 0)
+            {
+                PacketType type = (PacketType)reader.GetInt();
+                switch (type)
+                {
+                    case PacketType.DATA:
+                        {
+                            foreach (NetworkID id in networkIDObjects.Values)
+                                id.Read(reader);
+                            
+                        }
+                        break;
+                    case PacketType.EVENT:
+                        netPacketProcessor.ReadPacket(reader);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void Listener_ConnectionRequestEvent(ConnectionRequest request)
+        {
+            if (netManager.PeersCount < 10 /* max connections */)
+                request.AcceptIfKey("SomeConnectionKey");
+            else
+                request.Reject();
+        }
+
         public override void Update()
         {
             netManager.PollEvents();
+            if (isServer)
+                WriteData(DeliveryMethod.ReliableOrdered);
         }
         public override void Destroy()
         {
@@ -85,22 +129,46 @@ namespace ThomasEngine.Network
             return iD;
         }
 
-        public void ExecuteEvent()
-        {
-            listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) => netPacketProcessor.ReadAllPackets(dataReader, fromPeer);
-        }
 
-        public void SendDataOverEvent<T>(T Data, DeliveryMethod Order) where T : class, new()
-        {
-            listener.PeerConnectedEvent += peer => netPacketProcessor.Send<T>(peer, Data, Order);
-        }
-
-
-        public void SubscribeDataType<T>(Action<T, NetPeer> onReceive) where T : class, new()
+        public void SubscribeToEvent<T>(Action<T, NetPeer> onReceive) where T : class, new()
         {
             netPacketProcessor.SubscribeReusable<T, NetPeer>(onReceive);
         }
 
-        
+
+        public void SendEvent<T>(NetDataWriter writer, T data) where T : class, new()
+        {
+            writer.Put((int)PacketType.EVENT);
+            netPacketProcessor.Write<T>(writer, data);
+        }
+
+        public void SendEvent<T>(T data, DeliveryMethod method) where T : class, new()
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((int)PacketType.EVENT);
+
+            netPacketProcessor.Write<T>(writer, data);
+            netManager.SendToAll(writer, method);
+        }
+
+
+        public void WriteData(NetDataWriter writer)
+        {
+            writer.Put((int)PacketType.DATA);
+            foreach (NetworkID id in networkIDObjects.Values)
+                id.Write(writer);
+        }
+
+        public void WriteData(DeliveryMethod method)
+        {
+            NetDataWriter writer = new NetDataWriter();
+
+            writer.Put((int)PacketType.DATA);
+            foreach (NetworkID id in networkIDObjects.Values)
+                id.Write(writer);
+
+            netManager.SendToAll(writer, method);
+        }
+
     }
 }
