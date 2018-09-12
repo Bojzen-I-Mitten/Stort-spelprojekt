@@ -140,17 +140,33 @@ namespace ThomasEditor.utils
                     return true;
                 building = true;
                 MainWindow._instance.showBusyIndicator("Compiling scripts...");
-                projectEval = new Microsoft.Build.Evaluation.Project(projectPath, null, null, new ProjectCollection());
-                GC.Collect();
+                BuildResult result = null;
 
 #if DEBUG
-                projectEval.SetGlobalProperty("Configuration", "Debug");
+                string configuration = "Debug";
 #else
-            projectEval.SetGlobalProperty("Configuration", "Release");
+                string configuration = "Release";
 #endif
 
+                using (var pc = new ProjectCollection())
+                    result = BuildManager.DefaultBuildManager.Build(
+                        new BuildParameters(pc) { Loggers = new[] { new ThomasBuildLogger() } },
+                        // Change this path to your .sln file instead of the .csproj.
+                        // (It won't work with the .csproj.)
+                        new BuildRequestData(assemblyPath,
+                            // Change the parameters as you need them,
+                            // e.g. if you want to just Build the Debug (not Rebuild the Release).
+                            new Dictionary<string, string>
+                            {
+                { "Configuration", configuration },
+                { "Platform", "Any CPU" }
+                            }, null, new[] { "Build" }, null));
 
-                projectEval.Build(logger);
+                if (result.OverallResult == BuildResultCode.Success)
+                {
+                    Debug.Log("Build succeded");
+                }
+
                 MainWindow._instance.hideBusyIndicator();
                 building = false;
                 return true;
@@ -216,7 +232,7 @@ namespace ThomasEditor.utils
 
         private void EventSource_BuildFinished(object sender, BuildFinishedEventArgs e)
         {
-            Debug.Log("Build succeded");
+            //Debug.Log("Build succeded");
         }
 
         private void EventSource_WarningRaised(object sender, BuildWarningEventArgs e)
