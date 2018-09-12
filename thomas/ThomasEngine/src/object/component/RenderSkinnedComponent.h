@@ -1,6 +1,6 @@
 #pragma once
 #pragma unmanaged
-#include <thomas\object\component\RenderComponent.h>
+#include <thomas\object\component\RenderSkinnedComponent.h>
 #pragma managed
 
 #include "../Component.h"
@@ -11,13 +11,14 @@ namespace ThomasEngine
 {
 	[DisallowMultipleComponent]
 	[ExecuteInEditor]
-	public ref class RenderComponent : public Component
+	public ref class RenderSkinnedComponent : public Component
 	{
 	private:
 		Model^ m_model;
 
 	public:
-		RenderComponent();
+		RenderSkinnedComponent();
+
 		property Model^ model {
 			Model^ get();
 			void set(Model^ value);

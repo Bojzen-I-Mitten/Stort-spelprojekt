@@ -15,7 +15,7 @@ namespace thomas
 				bool initialized = false;
 				GameObject* m_gameObject;
 				virtual void Awake() {};
-				virtual void OnEnable() { };
+				virtual void OnEnable() {};
 				virtual void OnDisable() {};
 				virtual void Update() {};
 				virtual void FixedUpdate() {};

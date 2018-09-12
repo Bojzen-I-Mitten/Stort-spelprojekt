@@ -168,6 +168,7 @@
     <ClInclude Include="src\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\object\component\physics\Rigidbody.h" />
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
+    <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Model.h" />
     <ClInclude Include="src\resource\Resource.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="src\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
+    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
     <ClCompile Include="src\object\Component.cpp" />
     <ClCompile Include="src\object\component\Camera.cpp" />
