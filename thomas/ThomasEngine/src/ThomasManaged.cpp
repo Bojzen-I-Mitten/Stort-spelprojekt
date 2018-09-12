@@ -10,6 +10,7 @@ namespace ThomasEngine {
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
 		{
+			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);

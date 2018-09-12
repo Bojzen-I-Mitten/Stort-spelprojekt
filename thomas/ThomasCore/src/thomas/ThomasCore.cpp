@@ -39,7 +39,6 @@ namespace thomas
 		Physics::Init();
 		editor::EditorCamera::Init();
 		editor::Gizmos::Init();
-		utils::Primitives::Init();
 
 		s_initialized = true;
 		return s_initialized;
