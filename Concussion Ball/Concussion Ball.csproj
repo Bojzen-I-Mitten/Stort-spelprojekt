@@ -44,6 +44,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\haha.cs" />
+    <Compile Include="Assets\coolComponent.cs" />
+    <Compile Include="Assets\superDuper.cs" />
+    <Compile Include="Assets\veryCoolComponent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
