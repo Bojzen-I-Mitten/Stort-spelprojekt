@@ -12,7 +12,6 @@ namespace thomas
 			class Camera;
 			class THOMAS_API RenderComponent : public Component
 			{
-			private:
 			public:
 				RenderComponent();
 				virtual void SetModel(resource::Model* model);
@@ -30,6 +29,8 @@ namespace thomas
 			public:
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;
+			private:
+				virtual void SubmitPart(Camera* camera, unsigned int i);
 			private:
 				std::vector<resource::Material*> m_materials;
 				static std::vector<RenderComponent*> s_renderComponents;

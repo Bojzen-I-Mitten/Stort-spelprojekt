@@ -7,7 +7,7 @@ namespace thomas {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref)
-				: _ref(ref), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
+				: _ref(ref), _root(), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
 			{
 				updateSkeleton();
 			}
@@ -41,6 +41,11 @@ namespace thomas {
 			void AnimatedSkeleton::stopAnimation()
 			{
 				_root = NULL;
+			}
+
+			void AnimatedSkeleton::setBlendTree(std::unique_ptr<AnimationNode> &blendTree)
+			{
+				_root = std::move(blendTree);
 			}
 
 

@@ -156,8 +156,8 @@ namespace thomas {
 			{
 				m_channel = channel;
 				assert(eT >= 0.f);
-				m_keyIndex = 0;
 				for (unsigned int i = 0; i < N; i++) {
+					m_keyIndex[i] = 0;
 					if (m_channel->numKeys(i) == 0) {
 						// Default initiation...
 						assert(false);
@@ -206,8 +206,8 @@ namespace thomas {
 			template<unsigned int N>
 			void  KeyFrame<N>::newKey(unsigned int chnlInd, float startAT)
 			{
-				if (m_channel->getNext(eT, type, m_keyIndex[type]))	//If key is found, set it
-					m_to[chnlInd] = m_channel->getKey(m_keyIndex[type], chnlInd);
+				if (m_channel->getNext(startAT, chnlInd, m_keyIndex[chnlInd]))	//If key is found, set it
+					m_to[chnlInd] = m_channel->getKey(m_keyIndex[chnlInd], chnlInd);
 				else {												//There is no key in the animation channel, set the current value to continue to the endtimes.
 					m_to[chnlInd] = m_from[chnlInd];
 					m_to[chnlInd]._time = FLT_MAX;

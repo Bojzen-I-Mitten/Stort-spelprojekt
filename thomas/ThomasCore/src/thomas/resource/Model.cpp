@@ -2,6 +2,7 @@
 
 #include "../graphics/Mesh.h"
 #include "../utils/AssimpLoader.h"
+#include "../graphics/animation/data/Skeleton.h"
 namespace thomas {
 	namespace resource {
 
@@ -27,7 +28,7 @@ namespace thomas {
 
 		Model::Model(std::string path) : Resource(path)
 		{
-			m_data = utils::AssimpLoader::LoadModel(path);
+			m_data = std::move(utils::AssimpLoader::LoadModel(path));
 			m_bounds = GenerateBounds();
 		}
 		std::vector<std::shared_ptr<graphics::Mesh>> Model::GetMeshes()
@@ -50,6 +51,10 @@ namespace thomas {
 		{
 			m_data.meshes.clear();
 		}
+
+
+		Model::ModelData::ModelData() { }
+		Model::ModelData::~ModelData() { }
 
 	}
 }

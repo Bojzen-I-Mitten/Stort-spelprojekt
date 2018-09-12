@@ -83,13 +83,7 @@ namespace thomas {
 				{
 					for (int i = 0; i < m_model->GetMeshes().size(); i++)
 					{
-						resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
-						if (material == nullptr)
-							material = resource::Material::GetStandardMaterial();
-
-						std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
-
-						thomas::graphics::Renderer::SubmitCommand(thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh, material, camera));
+						SubmitPart(Camera* camera, i);
 					}
 				}
 			}
@@ -109,6 +103,17 @@ namespace thomas {
 			std::vector<RenderComponent*> RenderComponent::GetAllRenderComponents()
 			{
 				return s_renderComponents;
+			}
+
+			void RenderComponent::SubmitPart(Camera* camera, unsigned int i)
+			{
+				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
+				if (material == nullptr)
+					material = resource::Material::GetStandardMaterial();
+
+				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
+
+				thomas::graphics::Renderer::SubmitCommand(thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh, material, camera));
 			}
 
 			void RenderComponent::OnDrawGizmos()

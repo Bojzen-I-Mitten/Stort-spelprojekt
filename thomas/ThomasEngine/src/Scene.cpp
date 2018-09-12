@@ -89,9 +89,9 @@ namespace ThomasEngine
 		catch (Exception^ e) {
 			try {
 				LOG("Loading scene: ");
-				LOG(msclr::interop::marshal_as<std::string>(fullPath));
+				LOG(Utility::ConvertString(fullPath));
 				LOG("with error:")
-				LOG(msclr::interop::marshal_as<std::string>(e->Message));
+				LOG(Utility::ConvertString(e->Message));
 				return nullptr;
 			}
 			finally{

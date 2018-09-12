@@ -31,7 +31,7 @@ namespace thomas
 					LOG("Warning! Model set to RenderSkinnedComponent has no skinning information.");
 				}
 				else
-					m_skeleton = std::make_unique<graphics::animation::AnimatedSkeleton>(model->GetSkeleton());
+					m_skeleton = std::make_unique<graphics::animation::AnimatedSkeleton>(*model->GetSkeleton());
 			}
 		}
 	}

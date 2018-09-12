@@ -28,10 +28,13 @@ namespace thomas {
 			};
 			struct ModelData
 			{
+			public:
+				ModelData();
+				~ModelData();
 				std::map<std::string, unsigned int> boneMapping;
 				std::vector<BoneInfo> boneInfo;
 				std::vector<std::shared_ptr<graphics::Mesh>> meshes;
-				std::unique_ptr<graphics::animation::Skeleton> m_skeleton;
+				std::shared_ptr<graphics::animation::Skeleton> m_skeleton;
 			};
 			Model(std::string path);
 

@@ -23,6 +23,8 @@ namespace thomas {
 
 			public:
 
+				void setBlendTree(std::unique_ptr<AnimationNode> &blendTree);
+
 				/* Get skin matrixes
 				*/
 				const std::vector<math::Matrix>& getSkin() const;
@@ -35,7 +37,7 @@ namespace thomas {
 
 			private:
 				Skeleton& _ref;								// Reference to the mesh skeleton
-				AnimationNode *_root;						// Root in the blend tree
+				std::unique_ptr<AnimationNode> _root;						// Root in the blend tree
 				std::vector<math::Matrix> _pose;			// Bone transform in model space
 				std::vector<math::Matrix> _skinTransform;	// Skin Transforms in model space
 			private:
