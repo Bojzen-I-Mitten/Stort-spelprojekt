@@ -10,6 +10,8 @@
 namespace thomas {
 	namespace animation {
 
+		class AnimationNode;
+
 		class AnimatedSkeleton
 		{
 		public:
@@ -21,14 +23,8 @@ namespace thomas {
 			};
 		private:
 			Skeleton& _ref;
-			Animation *_animation;
-			/* Current keys active in the animation for each channel
-			 */
-			std::vector<BoneFrame> _channel;
-			/* Time elapsed time of the running animation */
-			float _elapAnimTime;
-			/* Local animation duration */
-			float _animDuration;
+			AnimationNode *_root;
+
 			PlayType _endState;
 
 			/* Bone transform in model space
@@ -38,19 +34,15 @@ namespace thomas {
 			*/
 			std::vector<math::Matrix> _skinTransform;
 
-			/* Recalculates the end time when animation is looped */
-			void loopRefit();
 		public:
 			AnimatedSkeleton(Skeleton& ref);
 			~AnimatedSkeleton();
-
+			
 			void update(float dT);
+
 			void updateSkeleton();
-			/* Set the animation from the name, returns true if animation found */
-			bool setAnim(const std::string& name, PlayType runType);
-			/* Pose the skeleton at the specific point of animation. Blends into the pose over the animation time specified. */
-			bool setAnimPose(const std::string& name, float poseAt, float animTime);
-			/* Freeze the current animation. */
+			/* Remove the current animation. 
+			*/
 			void stopAnimation();
 			/* Get skin matrixes
 			*/

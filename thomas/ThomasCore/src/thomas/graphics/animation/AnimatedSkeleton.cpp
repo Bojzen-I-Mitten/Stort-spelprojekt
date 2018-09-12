@@ -1,15 +1,12 @@
 #include "AnimatedSkeleton.h"
-
+#include "AnimationNode.h"
 
 namespace thomas {
 	namespace animation {
 
 		AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref)
-			: _ref(ref), _channel(ref.getNumBones()), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
+			: _ref(ref), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
 		{
-			//Each channel needs to be initiated so it can generate it's own frames.
-			for (unsigned int i = 0; i < ref.getNumBones(); i++)
-				_channel[i].init(ref.getBone(i)._bindPose);
 			updateSkeleton();
 		}
 
@@ -18,99 +15,32 @@ namespace thomas {
 		{
 		}
 
+
 		void AnimatedSkeleton::update(float dT) {
-			if (_animation) //If animation running
-			{
-				_elapAnimTime += dT;
-				//Check if animation is complete, currently it will only loop
-				if (_elapAnimTime > _animDuration)
-				{
-					//Check what state 
-					switch (_endState)
-					{
-					case AnimatedSkeleton::Loop:
-						loopRefit();
-						break;
-						//Stop animation
-					case AnimatedSkeleton::Once:
-						/* Special case for (pose) animations of 0 or < dT duration. Updates the skeleton.
-						 * Check could be performed when setting animation but this includes dT verification.
-						*/
-						if (_animDuration < dT)
-						{
-							_elapAnimTime = _animDuration * 0.5f;
-							updateSkeleton();
-						}
-					default:
-						stopAnimation();
-						return;
-					}
-				}
-				//Update
+			if (_root) {
+				_root->update(dT);
 				updateSkeleton();
 			}
 		}
 		void AnimatedSkeleton::updateSkeleton()
 		{
-			//Update skeleton
-			_pose[0] = _channel[0].lerp(_elapAnimTime);
+			//Update animation tree
+			// Update skin transforms
+			_pose[0] = _root->calcLocalTransform(0);
 			_skinTransform[0] = _pose[0] * _ref.getBone(0)._invBindPose;
 			for (unsigned int i = 1; i < boneCount(); i++)
 			{
 				const Bone& bone = _ref.getBone(i);
-				_pose[i] = _pose[bone._parentIndex] * _channel[i].lerp(_elapAnimTime);
+				_pose[i] = _pose[bone._parentIndex] * _root->calcLocalTransform(i);
 				_skinTransform[i] = _pose[i] * bone._invBindPose;
 			}
-		}
-
-		bool AnimatedSkeleton::setAnim(const std::string& name, PlayType runType) {
-			//Change animation, it can be null
-			_animation = _ref.getAnimation(name);
-			if (_animation)
-			{
-				_animDuration = _animation->_duration;
-				for (unsigned int i = 0; i < _channel.size(); i++)
-					_channel[i].newAnimation(_elapAnimTime, &_animation->operator[](i), 0.f);
-				_elapAnimTime = 0.f;
-				_endState = runType;
-				return true;
-			}
-			//No animation found, set current to null.
-			stopAnimation();
-			return false;
-		}
-
-		/* Pose the skeleton at the specific point of animation. Blends into the pose over the animation time specified. */
-		bool AnimatedSkeleton::setAnimPose(const std::string& name, float poseAt, float animTime)
-		{
-			//Change animation, it may fail
-			_animation = _ref.getAnimation(name);
-			if (_animation)
-			{
-				for (unsigned int i = 0; i < _channel.size(); i++)
-					_channel[i].poseAnimation(_elapAnimTime, &_animation->operator[](i), poseAt, animTime);
-				_elapAnimTime = 0.f;
-				_animDuration = animTime;
-				_endState = Once;
-				return true;
-			}
-			//No animation found, set current to null.
-			stopAnimation();
-			return false;
 		}
 		/* Freeze the current animation */
 		void AnimatedSkeleton::stopAnimation()
 		{
-			_animation = nullptr;
-			_endState = None;
+			_root = NULL;
 		}
 
-		/* Recalculates the end time when animation is looped */
-		void AnimatedSkeleton::loopRefit() {
-			_elapAnimTime = (float)fmod((double)_elapAnimTime, (double)_animation->_duration); //loop
-			for (unsigned int i = 0; i < boneCount(); i++)
-				_channel[i].loop(_elapAnimTime, _animation->_duration);
-		}
 
 
 		const std::vector<math::Matrix>& AnimatedSkeleton::getSkin() const {

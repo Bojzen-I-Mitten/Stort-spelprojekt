@@ -14,7 +14,7 @@ namespace thomas {
 
 			/* Animation time the key value influences it's channel */
 			float _time;
-			/* Referenced key value (if not an memory key) */
+			/* Referenced key value (if not a memory key) */
 			float* _value;
 
 			ChannelKey();
@@ -34,7 +34,7 @@ namespace thomas {
 		};
 		/* Channel key owning it's memory pointer. Note that keys need to match when use and size is determined by the larger structure.
 		*/
-		class ChannelMemoryKey
+		class ChannelKeyMemory
 			: public ChannelKey {
 		public:
 
@@ -42,15 +42,15 @@ namespace thomas {
 			*/
 			unsigned int _size;
 
-			ChannelMemoryKey();
-			ChannelMemoryKey(unsigned int size);
-			ChannelMemoryKey(float time, math::Vector3 data);
-			ChannelMemoryKey(const ChannelKey &key, unsigned int size);
-			ChannelMemoryKey(const ChannelMemoryKey &key);
-			~ChannelMemoryKey();
+			ChannelKeyMemory();
+			ChannelKeyMemory(unsigned int size);
+			ChannelKeyMemory(float time, math::Vector3 data);
+			ChannelKeyMemory(const ChannelKey &key, unsigned int size);
+			ChannelKeyMemory(const ChannelKeyMemory &key);
+			~ChannelKeyMemory();
 
-			ChannelMemoryKey& operator= (const ChannelKey &key);
-			ChannelMemoryKey& operator= (const ChannelMemoryKey &key);
+			ChannelKeyMemory& operator= (const ChannelKey &key);
+			ChannelKeyMemory& operator= (const ChannelKeyMemory &key);
 
 			/* Overwrite a number of values from the specific key.
 			*/

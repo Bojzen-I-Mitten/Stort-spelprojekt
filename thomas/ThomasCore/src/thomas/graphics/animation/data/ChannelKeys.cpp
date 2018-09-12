@@ -55,41 +55,41 @@ namespace thomas {
 
 #pragma region Memory Key
 
-		ChannelMemoryKey::ChannelMemoryKey()
+		ChannelKeyMemory::ChannelKeyMemory()
 			: ChannelKey()
 		{
 		}
-		ChannelMemoryKey::ChannelMemoryKey(unsigned int size)
+		ChannelKeyMemory::ChannelKeyMemory(unsigned int size)
 			: ChannelKey(0.f, new float[size]), _size(size)
 		{
 
 		}
-		ChannelMemoryKey::ChannelMemoryKey(float time, math::Vector3 data)
+		ChannelKeyMemory::ChannelKeyMemory(float time, math::Vector3 data)
 			: ChannelKey(time, new float[3]), _size(3)
 		{
 			ChannelKey::set(time, data);
 		}
-		ChannelMemoryKey::ChannelMemoryKey(const ChannelKey &key, unsigned int size)
+		ChannelKeyMemory::ChannelKeyMemory(const ChannelKey &key, unsigned int size)
 			: ChannelKey(0.f, new float[size]), _size(size)
 		{
 			//Set the values of the key
 			set(key, _size);
 		}
-		ChannelMemoryKey::ChannelMemoryKey(const ChannelMemoryKey &key)
+		ChannelKeyMemory::ChannelKeyMemory(const ChannelKeyMemory &key)
 			: ChannelKey(0.f, new float[key._size]), _size(key._size)
 		{
 			set(key, _size);
 		}
 
-		ChannelMemoryKey::~ChannelMemoryKey()
+		ChannelKeyMemory::~ChannelKeyMemory()
 		{
 			delete[] _value;
 		}
-		ChannelMemoryKey& ChannelMemoryKey::operator = (const ChannelKey &key) {
+		ChannelKeyMemory& ChannelKeyMemory::operator = (const ChannelKey &key) {
 			set(key, _size);
 			return *this;
 		}
-		ChannelMemoryKey& ChannelMemoryKey::operator= (const ChannelMemoryKey &key) {
+		ChannelKeyMemory& ChannelKeyMemory::operator= (const ChannelKeyMemory &key) {
 			if (this == &key)
 				return *this;
 			float* tmp = _value;
@@ -101,7 +101,7 @@ namespace thomas {
 		}
 		/* Overwrite a number of values from the specific key.
 		*/
-		void ChannelMemoryKey::set(const ChannelKey& key, unsigned int copyCount) {
+		void ChannelKeyMemory::set(const ChannelKey& key, unsigned int copyCount) {
 			_time = key._time;
 			//Copy value
 			for (unsigned int i = 0; i < copyCount; i++)

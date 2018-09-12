@@ -4,49 +4,67 @@
 namespace thomas {
 	namespace animation {
 
-		BoneChannel::BoneChannel()
+		ObjectChannel::ObjectChannel()
 		{
 		}
-		BoneChannel::BoneChannel(std::vector<std::vector<ChannelKey>> &channelKeys)
-			: _channelKeys(std::move(channelKeys))
-		{
-		}
-
-
-		BoneChannel::~BoneChannel()
+		ObjectChannel::ObjectChannel(std::vector<Channel> &anim_keys)
+			: m_channels(std::move(anim_keys))
 		{
 		}
 
-		int BoneChannel::getNext(float elapsedTime, unsigned int chInd) const
+
+		ObjectChannel::~ObjectChannel()
 		{
-			for (unsigned int i = 0; i < _channelKeys[chInd].size(); i++)
+		}
+
+		int ObjectChannel::getNext(float elapsedTime, unsigned int chInd) const
+		{
+			for (unsigned int i = 0; i < m_channels[chInd].m_keys.size(); i++)
 			{
-				if (elapsedTime < _channelKeys[chInd][i]._time)
+				if (elapsedTime < m_channels[chInd].m_keys[i]._time)
 					return i;
 			}
 			return -1;
 		}
-		int BoneChannel::getPrevious(float elapsedTime, unsigned int chInd) const
+		bool ObjectChannel::getNext(float elapsedTime, unsigned int chInd, unsigned int &keyInd) const
 		{
-			for (unsigned int i = 0; i < _channelKeys[chInd].size(); i++)
+			for (; keyInd < m_channels[chInd].m_keys.size(); keyInd++)
 			{
-				if (elapsedTime < _channelKeys[chInd][i]._time)
+				if (elapsedTime < m_channels[chInd].m_keys[keyInd]._time)
+					return true;
+			}
+			return false;
+		}
+		int ObjectChannel::getPrevious(float elapsedTime, unsigned int chInd) const
+		{
+			for (unsigned int i = 0; i < m_channels[chInd].m_keys.size(); i++)
+			{
+				if (elapsedTime < m_channels[chInd].m_keys[i]._time)
 					return i > 0 ? i - 1 : 0; //If no key before the time return the first key.
 			}
 			return -1;
 		}
+		bool ObjectChannel::getPrevious(float elapsedTime, unsigned int chInd, unsigned int &keyInd) const
+		{
+			for (; keyInd > 0; keyInd--)
+			{
+				if (elapsedTime > m_channels[chInd].m_keys[keyInd-1]._time)
+					return true;
+			}
+			return false;
+		}
 
 		/* Get a specific key from a channel */
-		ChannelKey BoneChannel::getKey(unsigned int index, unsigned int chInd) const {
-			return _channelKeys[chInd][index];
+		ChannelKey ObjectChannel::getKey(unsigned int index, unsigned int chInd) const {
+			return m_channels[chInd].m_keys[index];
 		}
 
 
-		unsigned int BoneChannel::numKeys(unsigned int chInd) const {
-			return chInd < _channelKeys.size() ? _channelKeys[chInd].size() : 0;
+		unsigned int ObjectChannel::numKeys(unsigned int chInd) const {
+			return chInd < m_channels.size() ? m_channels[chInd].m_keys.size() : 0;
 		}
-		unsigned int BoneChannel::numNodeChannels() const {
-			return _channelKeys.size();
+		unsigned int ObjectChannel::numNodeChannels() const {
+			return m_channels.size();
 		}
 	}
 }

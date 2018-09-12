@@ -24,19 +24,18 @@ namespace thomas {
 		class KeyFrame
 		{
 		private:
-			/* Keep tracks on when the newest key needs an update */
-			float _nextUpdate;
+			unsigned int m_keyIndex[N];	// Tracks current keyframe index for every channel
 		protected:
 			/* Currently active channel */
-			const BoneChannel *_channel;
+			const ObjectChannel *m_channel;
 			/* Determines if the to keys belong to a custom channel animation and should persist over loop/change */
 			bool _custom[N];
 			/* The last key frames.
 			*/
-			ChannelMemoryKey _from[N];
+			ChannelKeyMemory m_from[N];
 			/* The next key frames.
 			*/
-			ChannelMemoryKey _to[N];
+			ChannelKeyMemory m_to[N];
 		private:
 			/* Find and set the next to key */
 			void nextKey(unsigned int type, float eT);
@@ -44,13 +43,9 @@ namespace thomas {
 			void previousKey(unsigned int chnlInd, float eT);
 			/* Find and set a the first key of the animation */
 			void newKey(unsigned int chnlInd, float startAT);
-			/* Update each key necesary */
-			void updateFrame(float eT);
 			/* Adjusts a custom frame over a animation change */
 			void keepCustom(unsigned int chnlInd, float eT);
 		protected:
-			/* Update frame if necesary */
-			void checkUpdate(float eT);
 			/* Get the lerp amount for a specific node channel */
 			float lerpAmount(unsigned int type, float eT);
 			/* Store the current animation state in the specific node channel
@@ -64,11 +59,17 @@ namespace thomas {
 			/* Deactivate the channel, */
 			void deactivate();
 			/* Set new animation in the frame. Specify the animation time to start from */
-			void newAnimation(float oldET, const BoneChannel *channel, float startAt);
+			void newAnimation(float oldET, const ObjectChannel *channel, float startAt);
+			/* Initiate to initial timeframe. */
+			void newAnimation(const ObjectChannel *channel, float eT);
 			/* Pose the animation at a specified frame. Blend between the current anim pose over the animation time param.*/
-			void poseAnimation(float oldET, const BoneChannel *channel, float poseAt, float animTime);
+			void poseAnimation(float oldET, const ObjectChannel *channel, float poseAt, float animTime);
 			/* Loop the animation */
 			void loop(float eT, float animDuration);
+			/* Update related key frame if necesary */
+			void updateFrame(unsigned int key, float eT);
+			/* Update each key necesary */
+			void updateFrame(float eT);
 		};
 
 
@@ -80,12 +81,12 @@ namespace thomas {
 		}
 		template<unsigned int N>
 		KeyFrame<N>::KeyFrame(const unsigned int* nodeChannelSize)
-			: _to(), _from()
+			: m_to(), m_from()
 		{
 			for (unsigned int i = 0; i < N; i++)
 			{
-				_to[i] = ChannelMemoryKey(nodeChannelSize[i]);
-				_from[i] = ChannelMemoryKey(nodeChannelSize[i]);
+				m_to[i] = ChannelKeyMemory(nodeChannelSize[i]);
+				m_from[i] = ChannelKeyMemory(nodeChannelSize[i]);
 				_custom[i] = false;
 			}
 		}
@@ -97,111 +98,118 @@ namespace thomas {
 
 		template<unsigned int N>
 		float KeyFrame<N>::lerpAmount(unsigned int type, float eT) {
-			float delta = (_to[type]._time - _from[type]._time);
-			return delta <= 0 ? 1.f : (eT - _from[type]._time) / delta;
+			float delta = (m_to[type]._time - m_from[type]._time);
+			return delta <= 0 ? 1.f : (eT - m_from[type]._time) / delta;
 		}
 		template<unsigned int N>
 		void KeyFrame<N>::deactivate() {
-			_channel = nullptr;
+			m_channel = nullptr;
 		}
 		template<unsigned int N>
 		bool  KeyFrame<N>::isActive() {
-			return _channel;
+			return m_channel;
 		}
 		template<unsigned int N>
-		void KeyFrame<N>::newAnimation(float oldET, const BoneChannel *channel, float startAt) {
-			_channel = channel;
-			if (_channel) {
+		void KeyFrame<N>::newAnimation(float oldET, const ObjectChannel *channel, float startAt) {
+			m_channel = channel;
+			if (m_channel) {
 				for (unsigned int i = 0; i < N; i++) {
 					//Store current anim pose
 					storeState(i, oldET);
-					_from[i]._time = startAt;
+					m_from[i]._time = startAt;
 					//Fetch the first key of the animation
 					if (_custom[i])
 						keepCustom(i, oldET);
 					else
 						newKey(i, startAt);
-					//First frame to update keys
-					_nextUpdate = std::fmin(_nextUpdate, _to[i]._time);
 				}
 			}
 		}
 
 		/* Pose the animation at a specified frame. Blend between the current anim pose over the animation time param.*/
 		template<unsigned int N>
-		void KeyFrame<N>::poseAnimation(float oldET, const BoneChannel *channel, float poseAt, float animTime)
+		void KeyFrame<N>::poseAnimation(float oldET, const ObjectChannel *channel, float poseAt, float animTime)
 		{
-			_channel = channel;
-			if (_channel) {
+			m_channel = channel;
+			if (m_channel) {
 				for (unsigned int i = 0; i < N; i++) {
 					//Store current anim pose
 					storeState(i, oldET);
 					//Temporarily store state
-					ChannelMemoryKey tmpCpy(_from[i]);
+					ChannelKeyMemory tmpCpy(m_from[i]);
 					//Fetch and create pose keys
 					newKey(i, poseAt);
 					previousKey(i, poseAt);
 					storeState(i, poseAt);
 					//Setup the animation, note that this is not a 'custom' animation as it affects all channels.
-					_to[i] = _from[i];
-					_from[i] = tmpCpy;
-					_from[i]._time = 0.f;
-					_to[i]._time = animTime;
+					m_to[i] = m_from[i];
+					m_from[i] = tmpCpy;
+					m_from[i]._time = 0.f;
+					m_to[i]._time = animTime;
 				}
-				_nextUpdate = FLT_MAX;
-				_channel = nullptr;
+				m_channel = nullptr;
 			}
 		}
 		template<unsigned int N>
-		void  KeyFrame<N>::checkUpdate(float eT) {
+		inline void KeyFrame<N>::init(const ObjectChannel *channel, float eT)
+		{
+			m_channel = channel;
+			assert(eT >= 0.f);
+			m_keyIndex = 0;
+			for (unsigned int i = 0; i < N; i++) {
+				if (m_channel->numKeys(i) == 0) {
+					// Default initiation...
+					assert(false);
+				}
+				else {
+					previousKey(i, eT);
+					newKey(i, eT);
+				}
+			}
+		}
+		template<unsigned int N>
+		void  KeyFrame<N>::updateFrame(unsigned int index, float eT) {
 			//Update keys if necesary
-			if (_nextUpdate < eT)
-				updateFrame(eT);
+			if (eT < m_to[index]._time)
+				nextKey(key, eT);
+			else if (m_from[index - 1]._time < eT)
+				previousKey(key, eT);
 		}
 
 		template<unsigned int N>
 		void  KeyFrame<N>::updateFrame(float eT) {
-			float time = FLT_MAX;
-			for (unsigned int i = 0; i < N; i++) {
-				if (_to[i]._time < eT)
-				{
-					_from[i] = _to[i]; //Copy next -> last
-					nextKey(i, eT);
-				}
-				//Update
-				time = std::fmin(time, _to[i]._time);
-			}
+			for (unsigned int i = 0; i < N; i++)
+				updateFrame(i, eT);
 		}
 		template<unsigned int N>
-		void  KeyFrame<N>::nextKey(unsigned int type, float eT) {
-			int key = _channel->getNext(eT, type);
-			if (key != -1) //If key is found, set it
-				_to[type] = _channel->getKey(key, type);
+		void  KeyFrame<N>::nextKey(unsigned int type, float eT) 
+		{
+			if (m_channel->getNext(eT, type, m_keyIndex[type]))	//If key is found, set it
+				m_to[type] = m_channel->getKey(m_keyIndex[type], type);
 			else {
-				_to[type]._time = FLT_MAX; //Let the frame elapse until the animation end
-				_custom[type] = false; //This is not a custom key.
+				m_to[type]._time = FLT_MAX;						//Let the frame elapse until the animation end
+				_custom[type] = false;							//This is not a custom key.
 			}
 		}
 		template<unsigned int N>
 		void  KeyFrame<N>::previousKey(unsigned int chnlInd, float eT)
 		{
-			int key = _channel->getPrevious(eT, chnlInd);
-			if (key != -1) //If key is found, set it
-				_from[chnlInd] = _channel->getKey(key, chnlInd);
-			else
-				_from[chnlInd]._time = eT; //Animate from current value (and time)
+			if (m_channel->getPrevious(eT, m_keyIndex[type]))		// If key is found, set it
+				m_from[chnlInd] = m_channel->getKey(m_keyIndex[type] - 1, chnlInd);
+			else {
+				m_from[chnlInd]._time = eT;						// Animate from current value (and time)
+				_custom[type] = false;							// This is not a custom key.
+			}
 		}
 		/* Find and set a the first key of the animation */
 		template<unsigned int N>
 		void  KeyFrame<N>::newKey(unsigned int chnlInd, float startAT)
 		{
-			int key = _channel->getNext(startAT, chnlInd);
-			if (key != -1) //If key is found, set it
-				_to[chnlInd] = _channel->getKey(key, chnlInd);
-			else {
-				//There is no key in the animation channel's , set the current value to continue to the endtimes.
-				_to[chnlInd] = _from[chnlInd];
-				_to[chnlInd]._time = FLT_MAX;
+			if (m_channel->getNext(eT, type, m_keyIndex[type]))	//If key is found, set it
+				m_to[chnlInd] = m_channel->getKey(m_keyIndex[type], chnlInd);
+			else {												//There is no key in the animation channel, set the current value to continue to the endtimes.
+				m_to[chnlInd] = m_from[chnlInd];
+				m_to[chnlInd]._time = FLT_MAX;
 				_custom[chnlInd] = false;
 			}
 		}
@@ -211,8 +219,8 @@ namespace thomas {
 		void  KeyFrame<N>::keepCustom(unsigned int chnlInd, float eT)
 		{
 			//Let custom frame persist, adjusting the time relation
-			_from[chnlInd]._time -= eT;
-			_to[chnlInd]._time -= eT;
+			m_from[chnlInd]._time -= eT;
+			m_to[chnlInd]._time -= eT;
 		}
 
 		template<unsigned int N>
@@ -223,8 +231,8 @@ namespace thomas {
 					keepCustom(i, animDuration);
 				else {
 					//Animate from last frame to first
-					_from[i] = _to[i];
-					_from[i]._time = 0.f;
+					m_from[i] = m_to[i];
+					m_from[i]._time = 0.f;
 					nextKey(i, eT);
 				}
 			}

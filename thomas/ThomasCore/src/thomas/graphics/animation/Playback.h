@@ -11,12 +11,13 @@ namespace thomas {
 			Playback();
 			~Playback();
 
-			virtual float update(float dT);
+			virtual void timeStep(float dT) = 0;	// Step elapsed time
+			virtual float getTime() = 0;			// Get the playback time
 
 		private:
 
-			float _elapTime;
-			float _duration;
+			float m_elapTime;
+			float m_duration;
 		};
 
 	}
