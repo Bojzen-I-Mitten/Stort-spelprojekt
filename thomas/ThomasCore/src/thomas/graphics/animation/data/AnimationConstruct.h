@@ -7,27 +7,29 @@
 
 
 namespace thomas {
-	namespace animation {
+	namespace graphics {
+		namespace animation {
 
-		struct AnimSize {
-			size_t _numFloats;
-			size_t _numChannels;
-			size_t _numNodeChannels;
-			size_t _numBones;
-		};
-		struct AnimationConstruct {
-			size_t _dataInd;
-			float* _data;
-			std::vector<std::vector<std::vector<ChannelKey>>> _keys;
-		public:
+			struct AnimSize {
+				size_t _numFloats;
+				size_t _numChannels;
+				size_t _numNodeChannels;
+				size_t _numBones;
+			};
+			struct AnimationConstruct {
+				size_t _dataInd;
+				float* m_data;
+				std::vector<std::vector<Channel>> _keys;
+			public:
 
-			AnimationConstruct(AnimSize size);
-			~AnimationConstruct();
+				AnimationConstruct(AnimSize size);
+				~AnimationConstruct();
 
-			std::shared_ptr<Animation> generateAnim(const char* name, float duration);
+				std::shared_ptr<Animation> generateAnim(const char* name, float duration);
 
-			void insertQuat(int ch, int nodeCh, float time, const float quat[4]);
-			void insertVector(int ch, int nodeCh, float time, const float vector[3]);
-		};
+				void insertQuat(int ch, int nodeCh, float time, const float quat[4]);
+				void insertVector(int ch, int nodeCh, float time, const float vector[3]);
+			};
+		}
 	}
 }

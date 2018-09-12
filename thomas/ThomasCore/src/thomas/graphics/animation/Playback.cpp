@@ -3,14 +3,16 @@
 
 
 namespace thomas {
-	namespace animation {
+	namespace graphics {
+		namespace animation {
 
-		Playback::Playback()
-		{
-		}
+			Playback::Playback()
+			{
+			}
 
-		Playback::~Playback()
-		{
+			Playback::~Playback()
+			{
+			}
 		}
 	}
 }

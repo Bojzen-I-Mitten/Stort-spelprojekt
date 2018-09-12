@@ -4,20 +4,21 @@
 #include <memory>
 
 namespace thomas {
-	namespace animation {
+	namespace graphics {
+		namespace animation {
 
-		class BlendNode :	public AnimationNode
-		{
-		public:
-			BlendNode();
-			virtual ~BlendNode();
+			class BlendNode : public AnimationNode
+			{
+			public:
+				BlendNode();
+				virtual ~BlendNode();
 
 
 
-		private:
+			private:
 
-			std::unique_ptr<Playback> time;
-		};
-
+				std::unique_ptr<Playback> time;
+			};
+		}
 	}
 }

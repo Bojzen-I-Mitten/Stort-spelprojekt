@@ -2,21 +2,23 @@
 
 
 namespace thomas {
-	namespace animation {
+	namespace graphics {
+		namespace animation {
 
-		Animation::Animation(const std::string &name, float duration, std::vector<BoneChannel> &channels, std::unique_ptr<float>& data)
-			: _channels(std::move(channels)), _data(std::move(data)), _name(name), _duration(duration)
-		{
-		}
-
-
-		Animation::~Animation()
-		{
-		}
+			Animation::Animation(const std::string &name, float duration, std::vector<ObjectChannel> &channels, std::unique_ptr<float>& data)
+				: m_channels(std::move(channels)), m_data(std::move(data)), m_name(name), m_duration(duration)
+			{
+			}
 
 
-		const BoneChannel& Animation::operator[](unsigned int bone) {
-			return _channels[bone];
+			Animation::~Animation()
+			{
+			}
+
+
+			const ObjectChannel& Animation::operator[](unsigned int bone) {
+				return m_channels[bone];
+			}
 		}
 	}
 }

@@ -2,50 +2,51 @@
 
 
 namespace thomas {
-	namespace animation {
+	namespace graphics {
+		namespace animation {
 
-		Skeleton::Skeleton(std::vector<Bone> &bones)
-			: _bones(bones)
-		{
-		}
-
-
-		Skeleton::~Skeleton()
-		{
-		}
-
-		Animation* Skeleton::getAnimation(const std::string &name) {
-			std::map<std::string, std::shared_ptr<Animation>>::iterator it = _animation.find(name);
-			if (it != _animation.end()) //Check that value existed
-				return it->second.get();
-			return nullptr;
-		}
-		const Bone& Skeleton::getBone(unsigned int i) const {
-			return _bones[i];
-		}
-		const std::vector<Bone>& Skeleton::getBones() const {
-			return _bones;
-		}
-
-		bool Skeleton::findBoneIndex(const std::string &boneName, unsigned int &boneID) const
-		{
-			for (unsigned int i = 0; i < _bones.size(); i++)
+			Skeleton::Skeleton(std::vector<Bone> &bones)
+				: _bones(bones)
 			{
-				if (_bones[i]._boneName == boneName)
-				{
-					boneID = i;
-					return true;
-				}
 			}
-			return false;
-		}
-		unsigned int Skeleton::getNumBones() const {
-			return _bones.size();
-		}
-		/* Add an animation to the skeleton, if animation with the same name exists it will be removed. */
-		void Skeleton::addAnimation(std::shared_ptr<Animation> &anim) {
-			_animation[anim->_name] = anim;
-		}
 
+
+			Skeleton::~Skeleton()
+			{
+			}
+
+			Animation* Skeleton::getAnimation(const std::string &name) {
+				std::map<std::string, std::shared_ptr<Animation>>::iterator it = _animation.find(name);
+				if (it != _animation.end()) //Check that value existed
+					return it->second.get();
+				return nullptr;
+			}
+			const Bone& Skeleton::getBone(unsigned int i) const {
+				return _bones[i];
+			}
+			const std::vector<Bone>& Skeleton::getBones() const {
+				return _bones;
+			}
+
+			bool Skeleton::findBoneIndex(const std::string &boneName, unsigned int &boneID) const
+			{
+				for (unsigned int i = 0; i < _bones.size(); i++)
+				{
+					if (_bones[i]._boneName == boneName)
+					{
+						boneID = i;
+						return true;
+					}
+				}
+				return false;
+			}
+			unsigned int Skeleton::getNumBones() const {
+				return _bones.size();
+			}
+			/* Add an animation to the skeleton, if animation with the same name exists it will be removed. */
+			void Skeleton::addAnimation(std::shared_ptr<Animation> &anim) {
+				_animation[anim->m_name] = anim;
+			}
+		}
 	}
 }

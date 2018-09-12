@@ -40,10 +40,12 @@
     <ClCompile Include="src\thomas\graphics\animation\data\ChannelKeys.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\KeyFrame.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\Skeleton.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\BaseAnimationTime.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\BoxCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\SphereCollider.cpp" />
+    <ClCompile Include="src\thomas\object\component\SkeletonComponent.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\utils\Buffers.cpp" />
@@ -79,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
+    <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
     <ClInclude Include="src\thomas\graphics\animation\BlendNode.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
@@ -106,6 +109,7 @@
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
+    <ClInclude Include="src\thomas\object\component\SkeletonComponent.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyColor.h" />

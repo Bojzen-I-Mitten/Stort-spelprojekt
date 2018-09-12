@@ -2,16 +2,17 @@
 
 
 namespace thomas {
-	namespace animation {
+	namespace graphics {
+		namespace animation {
 
-		BlendNode::BlendNode()
-		{
+			BlendNode::BlendNode()
+			{
+			}
+
+
+			BlendNode::~BlendNode()
+			{
+			}
 		}
-
-
-		BlendNode::~BlendNode()
-		{
-		}
-
 	}
 }
