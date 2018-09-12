@@ -7,7 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TreeView AllowDrop="True" x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged" DragOver="hierarchy_DragOver" Drop="hierarchy_Drop" MouseMove="hierarchy_MouseMove" MouseDown="hierarchy_MouseDown">
+        <TreeView AllowDrop="True" x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged"
+                  DragOver="hierarchy_DragOver" Drop="hierarchy_Drop" MouseMove="hierarchy_MouseMove" MouseUp="hierarchy_MouseUp"
+                  PreviewMouseDown="hierarchy_PreviewMouseDown">
             <TreeView.ContextMenu>
                 <ContextMenu x:Name="hiearchyContextMenu">
                     <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>

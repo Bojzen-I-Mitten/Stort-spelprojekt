@@ -291,23 +291,24 @@ namespace ThomasEditor
 
         private void hierarchy_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!_isDragging && e.LeftButton == MouseButtonState.Pressed && hierarchy.SelectedValue != null)
+            if (!_isDragging && e.LeftButton == MouseButtonState.Pressed)
             {
-                _isDragging = true;
-                DragDrop.DoDragDrop(hierarchy, hierarchy.SelectedValue,
-                    DragDropEffects.Move);
+                TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
+                if(target != null)
+                {
+                    _isDragging = true;
+                    DragDrop.DoDragDrop(hierarchy, target,
+                        DragDropEffects.Move);
+                }
+                
             }
             else if(e.LeftButton != MouseButtonState.Pressed)
             {
                 _isDragging = false;
-                
             }
 
         }
 
-        private void hierarchy_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-        }
 
         private void MenuItem_DeleteGameObject(object sender, RoutedEventArgs e)
         {
@@ -325,9 +326,23 @@ namespace ThomasEditor
                 GameObject gObj = (GameObject)item.DataContext;
                 if (gObj)
                     ThomasEngine.Resources.SavePrefab(gObj, gObj.Name + ".prefab");
+
             }
             e.Handled = true;
         }
 
+        private void hierarchy_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void hierarchy_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isDragging)
+                return;
+            TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
+            if(item != null)
+                item.IsSelected = true;
+        }
     }
 }

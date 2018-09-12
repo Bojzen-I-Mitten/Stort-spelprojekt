@@ -70,16 +70,6 @@ namespace ThomasEngine
 	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
 	{
 		path = Application::currentProject->assetPath + "\\" + path;
-		String^ extension = IO::Path::GetExtension(path);
-		String^ modifier = "";
-		path = path->Remove(path->Length - extension->Length, extension->Length);
-		int i = 0;
-		while (IO::File::Exists(path + modifier + extension))
-		{
-			i++;
-			modifier = "(" + i + ")";
-		}
-		path = path + modifier + extension;
 
 		GameObject::SerializeGameObject(path, gameObject);
 

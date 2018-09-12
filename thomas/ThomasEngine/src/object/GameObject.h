@@ -302,6 +302,23 @@ namespace ThomasEngine
 		//}
 		//
 
+		static List<GameObject^>^ GetAllGameObjects(bool includePrefabs) {
+			List<GameObject^>^ gObjs = Object::GetObjectsOfType<GameObject^>();
+			if (includePrefabs)
+				return gObjs;
+			else
+			{
+				for (int i = 0; i < gObjs->Count; i++) {
+					if (!gObjs[i]->inScene) {
+						gObjs->RemoveAt(i);
+						i--;
+					}
+						
+				}
+			}
+
+		}
+
 		static GameObject^ Find(String^ name) 
 		{
 			for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
