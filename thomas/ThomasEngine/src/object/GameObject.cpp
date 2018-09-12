@@ -4,6 +4,7 @@
 
 #include "component\physics\BoxCollider.h"
 #include "component\physics\SphereCollider.h"
+#include "..\Debug.h"
 
 namespace ThomasEngine {
 
@@ -105,19 +106,26 @@ namespace ThomasEngine {
 
 	GameObject ^ GameObject::DeSerializeGameObject(System::IO::Stream ^ stream)
 	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew Scene::SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
+		try {
+			using namespace System::Runtime::Serialization;
+			DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
+			auto list = Component::GetAllComponentTypes();
+			list->Add(SceneResource::typeid);
+			serializerSettings->KnownTypes = list;
+			serializerSettings->PreserveObjectReferences = true;
+			serializerSettings->DataContractSurrogate = gcnew Scene::SceneSurrogate();
+			DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
 
-		stream->Seek(0, SeekOrigin::Begin);
-		GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
-		gObj->PostLoad(nullptr);
-		return gObj;
+			stream->Seek(0, SeekOrigin::Begin);
+			GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
+			gObj->PostLoad(nullptr);
+			return gObj;
+		}
+		catch (Exception^ e) {
+			Debug::Log("Failed to load gameObject");
+			return nullptr;
+		}
+		
 
 	}
 

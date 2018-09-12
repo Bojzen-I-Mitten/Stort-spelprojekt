@@ -24,6 +24,8 @@ namespace ThomasEditor
             // m.GenerateBones(gameObject);
             GameObject.Instantiate(coolPrefab, new Vector3(10, 10, 10), new Quaternion());
             //otherObjectsRender.Destroy();
+
+            List<Component> c = ThomasEngine.Object.GetObjectsOfType<Component>();
         }
 
         public override void Update()

@@ -140,6 +140,12 @@ namespace ThomasEditor
                         Resource resource = foundItem.DataContext as Resource;
                         resource.Reload();
                     }
+                   if(foundItem.DataContext is GameObject)
+                    {
+                        GameObject gameObject = foundItem.DataContext as GameObject;
+                        gameObject.Destroy();
+                        foundItem.DataContext = ThomasEngine.Resources.LoadPrefab(p);
+                    }
                 }
 
             }), e.FullPath);
@@ -166,6 +172,12 @@ namespace ThomasEditor
                     {
                         ThomasEngine.Resources.Unload(foundItem.DataContext as Resource);
                     }
+                    if (foundItem.DataContext is GameObject)
+                    {
+                        GameObject gameObject = foundItem.DataContext as GameObject;
+                        gameObject.Destroy();
+                    }
+               
 
                     ThomasEngine.Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(p);
                     if (type == ThomasEngine.Resources.AssetTypes.SCRIPT)
