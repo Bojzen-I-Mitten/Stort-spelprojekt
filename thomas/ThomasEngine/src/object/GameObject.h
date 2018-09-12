@@ -37,13 +37,18 @@ namespace ThomasEngine
 			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
 		}
 
+
 	internal:
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
-		void PostLoad()
+		static void SerializeGameObject(String^ path, GameObject^ gObj);
+		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
+		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
+
+		void PostLoad(Scene^ scene)
 		{
-			scene = Scene::CurrentScene;
+			this->scene = scene;
 			m_transform = GetComponent<Transform^>();
 			
 			List<Component^>^ editorComponents = gcnew List<Component^>;
@@ -58,6 +63,14 @@ namespace ThomasEngine
 			}
 			
 			initComponents(editorComponents);	
+		}
+
+		void PostInstantiate(Scene^ scene) {
+			PostLoad(scene);
+			scene->GameObjects->Add(this);
+			for (int i = 0; i < m_transform->children->Count; i++) {
+				m_transform->children[i]->gameObject->PostInstantiate(scene);
+			}
 		}
 
 		void initComponents(List<Component^>^ components)
@@ -136,6 +149,7 @@ namespace ThomasEngine
 			Monitor::Exit(m_componentsLock);
 		}
 
+		
 	public:
 		static GameObject^ s_lastObject;
 
@@ -153,6 +167,21 @@ namespace ThomasEngine
 			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
 			
 			Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		}
+		
+		static GameObject^ CreatePrefab() {
+			GameObject^ newGobj = gcnew GameObject();
+			s_lastObject = nullptr;
+			Transform^ t = newGobj->AddComponent<Transform^>();
+			((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
+			return newGobj;
+		}
+
+
+		property bool inScene {
+			bool get() {
+				return scene != nullptr;
+			}
 		}
 
 		virtual void Destroy() override;
@@ -291,5 +320,10 @@ namespace ThomasEngine
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		}
+
+		static GameObject^ Instantiate(GameObject^ original);
+		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
 	};
 }

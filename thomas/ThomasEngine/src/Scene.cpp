@@ -116,11 +116,9 @@ namespace ThomasEngine
 	{
 		for each(GameObject^ gObj in m_gameObjects)
 		{
-			gObj->PostLoad();
+			gObj->PostLoad(this);
 		}
 	}
-
-
 
 	System::Type ^ Scene::SceneSurrogate::GetDataContractType(System::Type ^ type)
 	{
