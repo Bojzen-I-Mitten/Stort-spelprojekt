@@ -83,6 +83,10 @@ namespace ThomasEditor
                 resources.Insert(0, Texture2D.blackTexture);
                 resources.Insert(0, Texture2D.whiteTexture);
             }
+            else if ((typeof(ThomasEngine.GameObject).IsAssignableFrom(resourceType)))
+            {
+                resources.AddRange(ThomasEngine.GameObject.GetAllGameObjects(true));
+            }
             else if ((typeof(ThomasEngine.Object).IsAssignableFrom(resourceType)))
             {
                 resources.AddRange(ThomasEngine.Object.GetObjectsOfType(resourceType));
