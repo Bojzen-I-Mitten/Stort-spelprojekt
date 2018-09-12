@@ -40,6 +40,11 @@ namespace thomas {
 			return m_data.boneInfo;
 		}
 
+		graphics::animation::Skeleton * Model::GetSkeleton()
+		{
+			return m_data.m_skeleton.get();
+		}
+
 
 		Model::~Model()
 		{

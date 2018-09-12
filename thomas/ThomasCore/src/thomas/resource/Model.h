@@ -9,6 +9,9 @@ namespace thomas {
 	namespace graphics
 	{
 		class Mesh;
+		namespace animation {
+			class Skeleton;
+		}
 	}
 	namespace resource {
 		
@@ -28,11 +31,14 @@ namespace thomas {
 				std::map<std::string, unsigned int> boneMapping;
 				std::vector<BoneInfo> boneInfo;
 				std::vector<std::shared_ptr<graphics::Mesh>> meshes;
+				std::unique_ptr<graphics::animation::Skeleton> m_skeleton;
 			};
 			Model(std::string path);
 
 			std::vector<std::shared_ptr<graphics::Mesh>> GetMeshes();
 			std::vector<BoneInfo> GetBones();
+			graphics::animation::Skeleton* GetSkeleton();
+
 			~Model();
 			
 		public:

@@ -13,7 +13,7 @@ namespace thomas {
 			class AnimatedSkeleton
 			{
 			public:
-				AnimatedSkeleton();
+				AnimatedSkeleton(Skeleton& ref);
 				~AnimatedSkeleton();
 
 				void update(float dT);
@@ -34,7 +34,7 @@ namespace thomas {
 				const math::Matrix& getBoneMatrix(unsigned int bone) const;
 
 			private:
-				Skeleton* _ref;								// Reference to the mesh skeleton
+				Skeleton& _ref;								// Reference to the mesh skeleton
 				AnimationNode *_root;						// Root in the blend tree
 				std::vector<math::Matrix> _pose;			// Bone transform in model space
 				std::vector<math::Matrix> _skinTransform;	// Skin Transforms in model space

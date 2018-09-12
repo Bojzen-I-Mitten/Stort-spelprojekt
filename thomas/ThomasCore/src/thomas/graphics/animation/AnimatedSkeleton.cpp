@@ -29,10 +29,10 @@ namespace thomas {
 				//Update animation tree
 				// Update skin transforms
 				_pose[0] = _root->calcLocalTransform(0);
-				_skinTransform[0] = _pose[0] * _ref->getBone(0)._invBindPose;
+				_skinTransform[0] = _pose[0] * _ref.getBone(0)._invBindPose;
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
-					const Bone& bone = _ref->getBone(i);
+					const Bone& bone = _ref.getBone(i);
 					_pose[i] = _pose[bone._parentIndex] * _root->calcLocalTransform(i);
 					_skinTransform[i] = _pose[i] * bone._invBindPose;
 				}
