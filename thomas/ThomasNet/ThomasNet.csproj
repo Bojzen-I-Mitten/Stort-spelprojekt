@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NetworkComponent.cs" />
-    <Compile Include="NetworkComponentTransform.cs" />
+    <Compile Include="NetworkTransform.cs" />
     <Compile Include="LiteNetLib\BaseChannel.cs" />
     <Compile Include="LiteNetLib\ConnectionRequest.cs" />
     <Compile Include="LiteNetLib\INetEventListener.cs" />
