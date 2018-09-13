@@ -17,23 +17,33 @@ namespace thomas
 
 		struct SkeletonConstruct {
 
-			std::map<std::string, unsigned int> mapping;
-			std::vector<graphics::animation::Bone> boneInfo;
+			std::map<std::string, unsigned int> m_mapping;
+			std::vector<graphics::animation::Bone> m_boneInfo;
+			std::vector < std::shared_ptr< graphics::animation::Animation> > m_animList;
 			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
 			graphics::animation::Skeleton* generateSkeleton() {
-				if (boneInfo.size() == 0)
+				if (m_boneInfo.size() == 0)
 					return nullptr;
-				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(boneInfo);
+				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(m_boneInfo);
 				//for (unsigned int i = 0; i < _animations.size(); i++)
 				//	skel->addAnimation(_animations[i]);
 				return skel;
 			}
 			bool hasSkeleton() {
-				return boneInfo.size() != 0;
+				return m_boneInfo.size() != 0;
+			}
+
+			/*	Get a bone index from string. -1 if nothing found */
+			int getBoneIndex(const char* name) {
+				auto itr = m_mapping.find(name);
+				if (itr != m_mapping.end())
+					return itr->second;
+				return -1;
 			}
 		};
 		void ProcessSkeleton(aiNode * node, resource::Model::ModelData & modelData, SkeletonConstruct &boneMap, int parentBone, math::Matrix globalInverseTransform, math::Matrix parentTransform);
 		void ProcessNode(aiNode* node, const aiScene* scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap);
+		void ProcessAnimations(const aiScene* scene, SkeletonConstruct& construct);
 
 #pragma endregion
 
@@ -83,14 +93,17 @@ namespace thomas
 
 			// Process ASSIMP's root node recursively
 			ProcessNode(scene->mRootNode, scene, modelData, skelConstruct);
-			
+
 			math::Matrix globalInverseTransform = math::Matrix((float*)&scene->mRootNode->mTransformation.Inverse());
 			ProcessSkeleton(scene->mRootNode, modelData, skelConstruct, -1, globalInverseTransform, math::Matrix::Identity);
+			ProcessAnimations(scene, skelConstruct);
 
 			if (skelConstruct.hasSkeleton())
 				modelData.m_skeleton = std::shared_ptr<graphics::animation::Skeleton>(skelConstruct.generateSkeleton());
 			return;
 		}
+
+#pragma region Material
 
 		std::string AssimpLoader::GetMaterialName(aiMaterial * material)
 		{
@@ -144,40 +157,40 @@ namespace thomas
 			std::vector<TextureInfo> textureInfos;
 */
 
-			//Get all textures information
+//Get all textures information
 
 
-			//TextureInfo texInfo;
-			//if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
-			//{
-			//	texInfo.textureType = graphics::Texture::TextureType::DIFFUSE;
-			//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_DIFFUSE, 0, texInfo.mappingMode);
-			//	textureInfos.push_back(texInfo);
-			//}
-			//	
-			//if (material->GetTexture(aiTextureType_SPECULAR, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
-			//{
-			//	texInfo.textureType = graphics::Texture::TextureType::SPECULAR;
-			//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_SPECULAR, 0, texInfo.mappingMode);
-			//	textureInfos.push_back(texInfo);
-			//}
-			//	
-			//if (material->GetTexture(aiTextureType_NORMALS, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
-			//{
-			//	texInfo.textureType = graphics::Texture::TextureType::NORMAL;
-			//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_NORMALS, 0, texInfo.mappingMode);
-			//	textureInfos.push_back(texInfo);
-			//}
-			//else if (material->GetTexture(aiTextureType_HEIGHT, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
-			//{
-			//	texInfo.textureType = graphics::Texture::TextureType::NORMAL;
-			//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_NORMALS, 0, texInfo.mappingMode);
-			//	textureInfos.push_back(texInfo);
-			//}
+//TextureInfo texInfo;
+//if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
+//{
+//	texInfo.textureType = graphics::Texture::TextureType::DIFFUSE;
+//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_DIFFUSE, 0, texInfo.mappingMode);
+//	textureInfos.push_back(texInfo);
+//}
+//	
+//if (material->GetTexture(aiTextureType_SPECULAR, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
+//{
+//	texInfo.textureType = graphics::Texture::TextureType::SPECULAR;
+//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_SPECULAR, 0, texInfo.mappingMode);
+//	textureInfos.push_back(texInfo);
+//}
+//	
+//if (material->GetTexture(aiTextureType_NORMALS, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
+//{
+//	texInfo.textureType = graphics::Texture::TextureType::NORMAL;
+//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_NORMALS, 0, texInfo.mappingMode);
+//	textureInfos.push_back(texInfo);
+//}
+//else if (material->GetTexture(aiTextureType_HEIGHT, 0, &texInfo.textureNameAiString) == AI_SUCCESS)
+//{
+//	texInfo.textureType = graphics::Texture::TextureType::NORMAL;
+//	material->Get(_AI_MATKEY_MAPPING_BASE, aiTextureType_NORMALS, 0, texInfo.mappingMode);
+//	textureInfos.push_back(texInfo);
+//}
 
-				
 
-			//Create a texture object for every texture found.
+
+//Create a texture object for every texture found.
 			std::vector<graphics::Texture*> textures;
 			//for (unsigned int i = 0; i < textureInfos.size(); i++)
 			//{
@@ -192,7 +205,7 @@ namespace thomas
 			//		textures.push_back(texture);
 			//}
 			return textures;
-			
+
 		}
 
 		float AssimpLoader::GetMaterialOpacity(aiMaterial * material)
@@ -201,6 +214,7 @@ namespace thomas
 			material->Get(AI_MATKEY_OPACITY, opacity);
 			return opacity;
 		}
+#pragma endregion
 
 		void ProcessMesh(aiMesh * mesh, const aiScene* scene,
 			std::string meshName, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap, aiMatrix4x4& transform)
@@ -216,13 +230,13 @@ namespace thomas
 
 			if (mesh->mTextureCoords[0])
 				vertices.texCoord0.resize(mesh->mNumVertices);
-			
+
 			if (mesh->HasTangentsAndBitangents())
 			{
 				vertices.tangents.resize(mesh->mNumVertices);
 				vertices.bitangents.resize(mesh->mNumVertices);
 			}
-				
+
 
 			if (mesh->HasBones())
 				vertices.boneWeights.resize(mesh->mNumVertices);
@@ -230,7 +244,7 @@ namespace thomas
 			// Walk through each of the mesh's vertices
 			for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 			{
-				
+
 
 				// Positions
 				math::Vector3 v3 = math::Vector3((float*)&(transform * mesh->mVertices[i]));
@@ -242,8 +256,8 @@ namespace thomas
 				// Tangents
 				if (mesh->HasTangentsAndBitangents())
 				{
-					
-					
+
+
 
 					vertices.tangents[i] = math::Vector3((float*)&mesh->mTangents[i]);
 
@@ -251,12 +265,12 @@ namespace thomas
 					vertices.bitangents[i] = math::Vector3((float*)&mesh->mBitangents[i]);
 
 				}
-				
+
 
 				// Texture Coordinates
 				if (mesh->mTextureCoords[0])
 				{
-					
+
 					math::Vector2 vec;
 
 					// A vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
@@ -269,7 +283,7 @@ namespace thomas
 			for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 			{
 				aiFace face = mesh->mFaces[i];
-			
+
 				for (unsigned int j = 0; j < face.mNumIndices; j++)
 					indices.push_back(face.mIndices[j]);
 			}
@@ -278,26 +292,26 @@ namespace thomas
 			{
 				for (unsigned i = 0; i < mesh->mNumBones; i++)
 				{
-					
+
 					unsigned int boneIndex = 0;
 					aiBone* meshBone = mesh->mBones[i];
 					aiNode *boneNode = scene->mRootNode->FindNode(meshBone->mName);
 					std::string boneName = meshBone->mName.C_Str();
-					if (boneMap.mapping.find(boneName) == boneMap.mapping.end()) //bone does not exist
+					if (boneMap.m_mapping.find(boneName) == boneMap.m_mapping.end()) //bone does not exist
 					{
-						boneIndex = boneMap.boneInfo.size();
+						boneIndex = boneMap.m_boneInfo.size();
 						graphics::animation::Bone bi;
-						boneMap.boneInfo.push_back(bi);
-						
+						boneMap.m_boneInfo.push_back(bi);
+
 					}
 					else //Bone already exists
-						boneIndex = boneMap.mapping[boneName];
+						boneIndex = boneMap.m_mapping[boneName];
 
-					boneMap.mapping[boneName] = boneIndex;
-					boneMap.boneInfo[boneIndex]._boneIndex = boneIndex;
-					boneMap.boneInfo[boneIndex]._boneName = boneName;
-					boneMap.boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix);
-					boneMap.boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
+					boneMap.m_mapping[boneName] = boneIndex;
+					boneMap.m_boneInfo[boneIndex]._boneIndex = boneIndex;
+					boneMap.m_boneInfo[boneIndex]._boneName = boneName;
+					boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix);
+					boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
 
 					for (int j = 0; j < meshBone->mNumWeights; j++)
 					{
@@ -326,15 +340,15 @@ namespace thomas
 			math::Matrix nodeTransform = math::Matrix((float*)&node->mTransformation);
 			math::Matrix globalTransform = nodeTransform * parentTransform;
 
-			if (boneMap.mapping.find(node->mName.C_Str()) != boneMap.mapping.end())
+			if (boneMap.m_mapping.find(node->mName.C_Str()) != boneMap.m_mapping.end())
 			{
-				unsigned int BoneIndex = boneMap.mapping[boneName];
+				unsigned int BoneIndex = boneMap.m_mapping[boneName];
 				if (parentBone != -1)
-					boneMap.boneInfo[BoneIndex]._parentIndex = parentBone;
+					boneMap.m_boneInfo[BoneIndex]._parentIndex = parentBone;
 				else
-					boneMap.boneInfo[BoneIndex]._parentIndex = BoneIndex;
+					boneMap.m_boneInfo[BoneIndex]._parentIndex = BoneIndex;
 				parentBone = BoneIndex;
-				
+
 				//boneMap.bones[BoneIndex].offsetMatrix =
 				//	(globalInverseTransform * globalTransform * boneMap.bones[BoneIndex].offsetMatrix).Transpose();
 			}
@@ -360,15 +374,128 @@ namespace thomas
 				// The node object only contains indices to index the actual objects in the scene. 
 				// The scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-				
+
 				ProcessMesh(mesh, scene, modelName + "-" + nodeName + "-" + std::to_string(i), modelData, boneMap, node->mTransformation);
 			}
-			
+
 			// After we've processed all of the meshes (if any) we then recursively process each of the children nodes
 			for (unsigned int i = 0; i < node->mNumChildren; i++)
 			{
 				ProcessNode(node->mChildren[i], scene, modelData, boneMap);
 			}
 		}
+
+
+#pragma region Animation
+
+		using namespace graphics::animation;
+		struct AnimSize {
+			size_t _numFloats;
+			size_t _numChannels;
+			size_t _numNodeChannels;
+			size_t _numBones;
+		};
+		struct AnimationConstruct {
+			size_t _dataInd;
+			float* m_data;
+			std::vector<std::vector<graphics::animation::Channel>> _keys;
+		public:
+
+			AnimationConstruct(AnimSize size)
+				: _dataInd(0), m_data(new float[size._numFloats]), _keys(size._numBones)
+			{
+				for (unsigned int i = 0; i < size._numBones; i++)
+				{
+					_keys[i] = std::vector<Channel>(size._numNodeChannels);
+				}
+			}
+			~AnimationConstruct()
+			{
+				delete[] m_data;
+			}
+
+			std::shared_ptr<graphics::animation::Animation> generateAnim(const char* name, float duration) {
+				using namespace graphics::animation;
+				std::unique_ptr<float> ptr(m_data);
+				m_data = nullptr;
+				std::vector<ObjectChannel> channels(_keys.size());
+				for (unsigned int i = 0; i < _keys.size(); i++)
+					channels[i] = ObjectChannel(_keys[i]);
+				return std::shared_ptr<Animation>(new Animation(name, duration, channels, ptr));
+			}
+
+			void insert(int ch, int nodeCh, float time, const float value[4]) {
+				_keys[ch][nodeCh].m_keys.push_back(ChannelKey(time, m_data + _dataInd));
+				m_data[_dataInd] = value[0];
+				m_data[_dataInd + 1] = value[1];
+				m_data[_dataInd + 2] = value[2];
+				m_data[_dataInd + 3] = value[3];
+				_dataInd += 4;
+			}
+			void insert(int ch, int nodeCh, float time, const float value[3]) {
+				_keys[ch][nodeCh].m_keys.push_back(ChannelKey(time, m_data + _dataInd));
+				m_data[_dataInd] = value[0];
+				m_data[_dataInd + 1] = value[1];
+				m_data[_dataInd + 2] = value[2];
+				_dataInd += 3;
+			}
+		};
+
+		AnimSize ReadAnimData(aiAnimation *anim, SkeletonConstruct& construct) {
+			AnimSize size;
+			size._numChannels = 0;
+			size._numFloats = 0;
+			size._numNodeChannels = 3;
+			size._numBones = construct.m_boneInfo.size();
+			for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
+				aiNodeAnim *channel = anim->mChannels[ch];
+				int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
+				if (bone < 0)
+					return size; //This channel does not animate a bone.
+				size._numChannels++;
+				size._numFloats += 3 * channel->mNumPositionKeys;
+				size._numFloats += 3 * channel->mNumScalingKeys;
+				size._numFloats += 4 * channel->mNumRotationKeys;
+			}
+			return size;
+		}
+		void ProcessChannel(aiNodeAnim *channel, SkeletonConstruct& construct, AnimationConstruct& anim) {
+
+			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
+			if (bone < 0)
+				return; //This channel does not animate a bone.
+
+			for (unsigned int i = 0; i < channel->mNumPositionKeys; i++) {
+				aiVectorKey key = channel->mPositionKeys[i];
+				anim.insert(bone, 0, (float)key.mTime, &key.mValue.x);
+			}
+			for (unsigned int i = 0; i < channel->mNumScalingKeys; i++) {
+				aiVectorKey key = channel->mScalingKeys[i];
+				anim.insert(bone, 1, (float)key.mTime, &key.mValue.x);
+			}
+			for (unsigned int i = 0; i < channel->mNumRotationKeys; i++) {
+				aiQuatKey key = channel->mRotationKeys[i];
+				math::Quaternion q(key.mValue.w, key.mValue.x, key.mValue.y, key.mValue.z);
+				anim.insert(bone, 2, (float)key.mTime, &q.x);
+			}
+		}
+
+		void ProcessAnimations(const aiScene* scene, SkeletonConstruct& construct) {
+
+			for (unsigned int i = 0; i < scene->mNumAnimations; i++) {
+				aiAnimation *anim = scene->mAnimations[i];
+				AnimSize size = ReadAnimData(anim, construct);
+				AnimationConstruct animConst(size);
+
+				float duration = (float)(anim->mDuration * anim->mTicksPerSecond);
+				for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
+					aiNodeAnim *channel = anim->mChannels[ch];
+					ProcessChannel(channel, construct, animConst);
+				}
+				construct.m_animList.push_back(animConst.generateAnim(anim->mName.C_Str(), duration));
+			}
+		}
+
+#pragma endregion
 	}
 }
