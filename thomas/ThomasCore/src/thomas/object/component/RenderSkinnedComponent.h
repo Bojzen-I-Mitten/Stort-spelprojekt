@@ -17,7 +17,6 @@ namespace thomas
 				virtual ~RenderSkinnedComponent();
 				virtual void Update();
 			protected:
-				virtual void SubmitPart(Camera* camera, unsigned int i);
 			public:
 				virtual void SetModel(resource::Model* model);
 

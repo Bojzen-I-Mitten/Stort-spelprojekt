@@ -35,7 +35,7 @@ namespace thomas
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;
 			protected:
-				virtual void SubmitPart(Camera* camera, unsigned int i);
+				void SubmitPart(Camera* camera, unsigned int i);
 			protected:
 				std::vector<resource::Material*> m_materials;
 				/*	Insert a shader property for rendering component
