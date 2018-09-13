@@ -17,18 +17,10 @@ namespace ThomasEditor
         {
         }
 
-        //public override void OnCollisionEnter()
-        //{
-        //    if (gameObject.GetComponent<Rigidbody>().HasCollided(collider))
-        //    {
-        //        //Debug.Log(collider.Name);
-
-        //        //if (collider.Name == "Ball")
-        //        //{
-        //        //    Debug.Log("Collided with ball");
-        //        //}
-        //    }
-        //}
+        public override void OnCollisionEnter(GameObject collider)
+        {
+            Debug.Log(collider.Name);     
+        }
     }
 }
 

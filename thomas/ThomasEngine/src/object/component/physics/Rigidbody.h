@@ -29,7 +29,19 @@ namespace ThomasEngine
 			thomas::math::Vector3(relPos.x, relPos.y, relPos.z));
 		}
 
+		GameObject^ GetTargetCollider()
+		{
+			msclr::interop::marshal_context context;
+			auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
 
+			if (collider != nullptr)
+			{
+				String^ name = gcnew String(collider->GetName().c_str());
+				return GameObject::Find("Ball");
+			}
+
+			return nullptr;
+		}
 
 		property bool IsKinematic 
 		{

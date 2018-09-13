@@ -105,22 +105,3 @@ namespace ThomasEngine {
 
 	};
 }
-
-//namespace msclr 
-//{
-//	namespace interop 
-//	{
-//		template<>
-//		inline ThomasEngine::GameObject^ marshal_as<ThomasEngine::GameObject^, thomas::object::GameObject>(const thomas::object::GameObject& from)
-//		{
-//			marshal_context context;
-//			String^ temp = gcnew String("");
-//			temp = context.marshal_as<String^>(from.GetName().c_str());
-//			//std::string temp = from.GetName();
-//			//String^ name = gcnew(from;
-//
-//			marshal_context context;
-//			return ThomasEngine::GameObject::Find(context.marshal_as<String^, std::string>(from.GetName()));
-//		}
-//	}
-//}
