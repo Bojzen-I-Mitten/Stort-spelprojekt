@@ -15,27 +15,24 @@ namespace ThomasEngine.Network
         Vector3 scale;
         Quaternion rot;
 
-        public int interpolateAmount { get; set; } = 15;
 
         public override void Start()
         {
             pos = new Vector3(0.0f);
-            scale = new Vector3(0.0f);
-            rot = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+            scale = Vector3.One;
+            rot = new Quaternion();
             
         }
         public override void Update()
         {
             if (NetworkManager.instance.isClient)
             {
-                transform.position = Vector3.Lerp(transform.position, pos, Time.DeltaTime * interpolateAmount);
+                transform.position = Vector3.Lerp(transform.position, pos, Time.DeltaTime * 15);
+                transform.scale = Vector3.Lerp(transform.scale, scale, Time.DeltaTime * 15);
+                transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.DeltaTime * 30);
             }
-           
-            //temp = transform.scale;
-            //transform.scale = Vector3.Lerp(temp, scale, 1);
 
-            //Quaternion temp1 = transform.rotation;
-            //transform.rotation = Quaternion.Lerp(temp1, rot, 1);
+            
         }
 
         public override void Read(NetPacketReader reader)
@@ -44,14 +41,14 @@ namespace ThomasEngine.Network
             pos.y = reader.GetFloat();
             pos.z = reader.GetFloat();
 
-            //rot.x = reader.GetFloat();
-            //rot.y = reader.GetFloat();
-            //rot.z = reader.GetFloat();
-            //rot.w = reader.GetFloat();
+            rot.x = reader.GetFloat();
+            rot.y = reader.GetFloat();
+            rot.z = reader.GetFloat();
+            rot.w = reader.GetFloat();
 
-            //scale.x = reader.GetFloat();
-            //scale.y = reader.GetFloat();
-            //scale.z = reader.GetFloat();
+            scale.x = reader.GetFloat();
+            scale.y = reader.GetFloat();
+            scale.z = reader.GetFloat();
         }
 
         public override void Write(NetDataWriter writer)
@@ -60,14 +57,14 @@ namespace ThomasEngine.Network
             writer.Put(transform.position.y);
             writer.Put(transform.position.z);
 
-            //writer.Put(transform.rotation.x);
-            //writer.Put(transform.rotation.y);
-            //writer.Put(transform.rotation.z);
-            //writer.Put(transform.rotation.w);
+            writer.Put(transform.rotation.x);
+            writer.Put(transform.rotation.y);
+            writer.Put(transform.rotation.z);
+            writer.Put(transform.rotation.w);
 
-            //writer.Put(transform.scale.x);
-            //writer.Put(transform.scale.y);
-            //writer.Put(transform.scale.z);
+            writer.Put(transform.scale.x);
+            writer.Put(transform.scale.y);
+            writer.Put(transform.scale.z);
         }
      
     }
