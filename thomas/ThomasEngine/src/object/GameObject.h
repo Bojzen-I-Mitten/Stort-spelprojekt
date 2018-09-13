@@ -70,7 +70,7 @@ namespace ThomasEngine
 
 			for each(Component^ component in components)
 			{
-				component->OnEnable();
+				component->enabled = true;
 			}
 
 			for each(Component^ component in components)
@@ -167,6 +167,11 @@ namespace ThomasEngine
 			void set(bool value)
 			{
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+				for (int i = 0; i < m_components.Count; i++)
+				{
+					Component^ component = m_components[i];
+					component->enabled = value;
+				}
 			}
 		}	
 
@@ -224,7 +229,8 @@ namespace ThomasEngine
 			{
 				component->Awake();
 				component->initialized = true;
-				component->OnEnable();
+				component->enabled = true;
+				component->OnEnable(); //<---- MORGAN, DEN FLIPPADE INTE ÖVER TROTTS ATT m_enable VAR FALSE TILL ATT BÖRJA MED
 				component->Start();
 			}
 
@@ -290,6 +296,8 @@ namespace ThomasEngine
 		void SetActive(bool active)
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
+			activeSelf = active;
+
 		}
 	};
 }

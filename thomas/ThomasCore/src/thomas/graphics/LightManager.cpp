@@ -24,10 +24,11 @@ namespace thomas
 			m_lightsCounts.nrOfSpotLights = 0;
 			m_lightsCounts.nrOfPointLights = 0;
 		}
+
 		void LightManager::Reset()
 		{
-			
 		}
+		
 		void LightManager::Destroy()
 		{
 			
@@ -50,6 +51,7 @@ namespace thomas
 			}
 			s_lights.push_back(light);
 			std::sort(s_lights.begin(), s_lights.end(), SortLights);
+			int stoppper = 0;
 		}
 		
 		void LightManager::RemoveLight(object::component::LightComponent * light)
@@ -88,7 +90,7 @@ namespace thomas
 
 			for (object::component::LightComponent* light : s_lights)
 			{
-				m_allLights.push_back(light->m_lightComponentData);
+				m_allLights.push_back(light->GetData());
 			}
 			
 			m_lightBuffer->SetData(m_allLights);
@@ -104,9 +106,9 @@ namespace thomas
 		{
 			if (light1->GetType() == light2->GetType())
 			{
-				return light1 > light2;
+				return light1 < light2;
 			}
-			return light1->GetType() > light2->GetType();
+			return light1->GetType() < light2->GetType();
 		}
 	}
 }

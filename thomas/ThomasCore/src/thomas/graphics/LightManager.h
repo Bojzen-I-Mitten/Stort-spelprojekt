@@ -46,7 +46,7 @@ namespace thomas
 
 		public:
 			static void Initialize();
-			static void Reset();//call at the beginning of a frame, before the scripts update
+			static void Reset();
 			static void Destroy();
 			static void AddLight(object::component::LightComponent* light);
 			static void RemoveLight(object::component::LightComponent* light);

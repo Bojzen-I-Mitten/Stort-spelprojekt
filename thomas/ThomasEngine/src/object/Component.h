@@ -20,7 +20,8 @@ namespace ThomasEngine
 	public ref class Component : public Object
 	{
 		Component();
-
+	private:
+		bool m_enabled = true;
 	internal:
 		Component(thomas::object::component::Component* ptr);
 		
@@ -42,9 +43,24 @@ namespace ThomasEngine
 			void set(bool value) { ((thomas::object::component::Component*)nativePtr)->initialized = value; }
 		}
 
+
 	public:
 		static System::Reflection::Assembly^ editorAssembly;
-		bool enabled = true;
+		
+
+		[BrowsableAttribute(false)]
+		property bool enabled {
+			bool get() { return m_enabled; }
+			void set(bool value) {
+				if (m_enabled != value) {
+					m_enabled = value;
+					if (value == true)
+						OnEnable();
+					else
+						OnDisable();
+				}
+			}
+		}
 
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject

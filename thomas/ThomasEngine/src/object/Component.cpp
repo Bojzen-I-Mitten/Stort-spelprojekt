@@ -30,7 +30,7 @@ void ThomasEngine::Component::setGameObject(GameObject ^ gObj)
 void ThomasEngine::Component::Destroy()
 {
 	Monitor::Enter(m_gameObject->m_componentsLock);
-	OnDestroy();
+	this->enabled = false;
 	for (int i = 0; i < ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.size(); i++)
 	{
 		auto component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
@@ -44,7 +44,7 @@ void ThomasEngine::Component::Destroy()
 	
 
 	m_gameObject->Components->Remove(this);
-	thomas::object::Object::Destroy(nativePtr);
+	Object::Destroy();
 	Monitor::Exit(m_gameObject->m_componentsLock);
 }
 

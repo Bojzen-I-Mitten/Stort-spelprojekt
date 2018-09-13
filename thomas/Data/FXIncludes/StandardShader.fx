@@ -80,25 +80,13 @@ v2f vert(appdata_thomas v)
 	return o;
 }
 
-/*struct Light
-{
-    float4  color;
-    float4  position;
-    float4  direction;
-    float   intensity;
-    float   smoothness; //specularIntensity
-    float   spotInnerAngle;
-    float   spotOuterAngle;
-    float3  attenuation;
-    uint    type;
-};*/
+
 
 cbuffer LightCountsStruct
 {
+	uint nrOfDirectionalLights;
     uint nrOfPointLights;
     uint nrOfSpotLights;
-    uint nrOfDirectionalLights;
-
 };
 
 struct LightStruct
@@ -165,7 +153,7 @@ float4 frag(v2f input) : SV_TARGET
 	int roof = nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
-        lightDir = -lights[i].direction;
+        lightDir = lights[i].direction;
         lightMultiplyer = lights[i].color * lights[i].intensity;
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
@@ -186,7 +174,7 @@ float4 frag(v2f input) : SV_TARGET
         float lightDistance = length(lightDir);
         lightDir = normalize(lightDir);
 
-        float angle = degrees(acos(dot(-lights[i].direction, lightDir)));
+        float angle = degrees(acos(dot(lights[i].direction, lightDir)));
         float spotFactor = 0.0f;
         if (angle < lights[i].spotInnerAngle)
         {

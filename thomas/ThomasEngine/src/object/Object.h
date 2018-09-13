@@ -76,6 +76,7 @@ namespace ThomasEngine {
 
 		virtual void Destroy()
 		{
+			OnDestroy();
 			thomas::object::Object::Destroy(nativePtr);
 			s_objects.Remove(this);
 		}

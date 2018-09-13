@@ -20,7 +20,9 @@ namespace thomas
 			{
 			public:
 			private:
-				
+				graphics::LightManager::LightStruct m_lightComponentData;
+
+				graphics::LightManager::LIGHT_TYPES m_type;
 				
 			public:
 				void Update();
@@ -29,9 +31,7 @@ namespace thomas
 				LightComponent();
 				~LightComponent();
 
-				graphics::LightManager::LightStruct m_lightComponentData;
-				
-				graphics::LightManager::LIGHT_TYPES m_type;
+				graphics::LightManager::LightStruct GetData();
 
 				graphics::LightManager::LIGHT_TYPES GetType();
 				void SetType(graphics::LightManager::LIGHT_TYPES other);

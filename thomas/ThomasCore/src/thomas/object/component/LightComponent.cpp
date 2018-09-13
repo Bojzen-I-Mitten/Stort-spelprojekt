@@ -28,6 +28,11 @@ namespace thomas
 			LightComponent::~LightComponent()
 			{
 			}
+
+			graphics::LightManager::LightStruct LightComponent::GetData()
+			{
+				return m_lightComponentData;
+			}
 			
 
 			void LightComponent::Update()
