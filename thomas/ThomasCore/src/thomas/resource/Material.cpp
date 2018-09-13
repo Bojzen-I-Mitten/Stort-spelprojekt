@@ -20,7 +20,6 @@ namespace thomas
 					m_properties[prop] = m_shader->GetProperty(prop);
 				}
 			}
-
 		}
 
 		void Material::OnChanged()
@@ -365,7 +364,7 @@ namespace thomas
 			ThomasCore::GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
-		void Material::Draw(std::shared_ptr<graphics::Mesh> mesh)
+		void Material::Draw(graphics::Mesh* mesh)
 		{
 			Lock();
 			for (Pass p : m_passes)

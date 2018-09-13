@@ -29,10 +29,9 @@ namespace thomas
 				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
 				if (material == nullptr)
 					material = resource::Material::GetStandardMaterial();
-
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
-				thomas::graphics::Renderer::SubmitCommand(thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh, material, camera));
+				thomas::graphics::Renderer::SubmitCommand(thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera));
 			}
 			void RenderSkinnedComponent::SetModel(resource::Model * model)
 			{

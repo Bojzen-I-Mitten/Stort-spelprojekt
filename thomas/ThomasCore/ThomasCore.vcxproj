@@ -47,6 +47,7 @@
     <ClCompile Include="src\thomas\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\thomas\resource\Animation.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderProperty.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyMatrix.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
