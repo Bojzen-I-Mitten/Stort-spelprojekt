@@ -40,10 +40,10 @@ namespace thomas
 				std::vector<resource::Material*> m_materials;
 				/*	Insert a shader property for rendering component
 				*/
-				void insertProperty(resource::shaderproperty::ShaderProperty* prop);
+				void insertProperty(const resource::shaderproperty::ShaderProperty* prop);
 			private:
 				static std::vector<RenderComponent*> s_renderComponents;
-				std::vector< resource::shaderproperty::ShaderProperty*> m_properties;
+				std::vector< resource::shaderproperty::ShaderProperty const*> m_properties;
 				//graphics::Geometry* m_geometry;
 			};
 		}

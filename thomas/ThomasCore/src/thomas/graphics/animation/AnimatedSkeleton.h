@@ -30,7 +30,7 @@ namespace thomas {
 
 				/* Get skin matrixes
 				*/
-				const std::vector<math::Matrix>& getSkin() const;
+				const math::Matrix* getSkin() const;
 				/* Get the number of bones
 				*/
 				unsigned int boneCount() const;

@@ -59,8 +59,8 @@ namespace thomas {
 			}
 
 
-			const std::vector<math::Matrix>& AnimatedSkeleton::getSkin() const {
-				return _skinTransform;
+			const math::Matrix* AnimatedSkeleton::getSkin() const {
+				return m_value.get();
 			}
 			unsigned int AnimatedSkeleton::boneCount() const {
 				return _pose.size();

@@ -44,8 +44,10 @@ namespace thomas
 				else if (model->GetSkeleton() == NULL) {
 					LOG("Warning! Attempt to set model with no skinning information in RenderSkinnedComponent.");
 				}
-				else
+				else{
 					m_skeleton = std::make_unique<graphics::animation::AnimatedSkeleton>(*model->GetSkeleton());
+					insertProperty(m_skeleton->getShaderProperty());
+				}
 			}
 		}
 	}

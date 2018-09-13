@@ -111,12 +111,12 @@ namespace thomas {
 					material = resource::Material::GetStandardMaterial();
 
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
-
+				
 				thomas::graphics::Renderer::SubmitCommand(
 					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
 			}
 
-			void RenderComponent::insertProperty(resource::shaderproperty::ShaderProperty * prop)
+			void RenderComponent::insertProperty(const resource::shaderproperty::ShaderProperty * prop)
 			{
 				assert(prop);
 				for (unsigned int i = 0; i < m_properties.size(); i++) {
