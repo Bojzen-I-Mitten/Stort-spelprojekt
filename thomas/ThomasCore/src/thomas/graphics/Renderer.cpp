@@ -54,7 +54,6 @@ namespace thomas
 
 		void Renderer::SubmitCommand(RenderCommand command)
 		{
-			
 			s_renderCommands[command.camera][command.material].push_back(command);
 		}
 

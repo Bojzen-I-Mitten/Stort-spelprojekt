@@ -12,15 +12,10 @@ namespace thomas
 			{
 			public:
 
-				ShaderPropertyMatrix(math::Matrix value) : ShaderProperty(Type::MATRIX), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
-				{
-
-					shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrix(*m_value.m);
-					
-				}
-				static ShaderProperty* GetDefault() { return new ShaderPropertyMatrix(math::Matrix()); }
-				math::Matrix GetValue() { return m_value; }
+				ShaderPropertyMatrix(math::Matrix value);
+				void Apply(std::string name, Shader* shader);
+				static ShaderProperty* GetDefault();
+				math::Matrix GetValue();
 			private:
 				math::Matrix m_value;
 			};
