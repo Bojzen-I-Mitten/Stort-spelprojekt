@@ -12,11 +12,11 @@ namespace ThomasEngine.Network
     { 
         public int ID { set; get; }
         List<NetworkComponent> networkComponents;
-        public override void Start()
+        public override void OnEnable()
         {
             ID = NetworkManager.instance.Register(this);
             networkComponents = gameObject.GetComponents<NetworkComponent>();
-            
+
         }
 
         public override void Read(NetPacketReader reader)

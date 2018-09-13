@@ -10,6 +10,8 @@ namespace ThomasEngine.Network
     [HideInInspector]
     public class NetworkComponent : ScriptComponent
     {
+
+
         virtual public void Read(NetPacketReader reader)
         {
 
