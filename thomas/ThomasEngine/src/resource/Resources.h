@@ -87,7 +87,7 @@ namespace ThomasEngine
 			Monitor::Exit(resourceLock);
 		}
 
-		static void CreateResource(Resource^ resource, String^ path)
+		static bool CreateResource(Resource^ resource, String^ path)
 		{
 			path = Application::currentProject->assetPath + "\\" + path;
 			String^ extension = IO::Path::GetExtension(path);
@@ -107,42 +107,41 @@ namespace ThomasEngine
 
 			Xml::XmlWriter^ file;
 			try {
-				System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
-				fi->Directory->Create();
 				// Create xml writer
 				Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
 				settings->Indent = true;
+				// Create file
+				System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
+				fi->Directory->Create();
 				file = Xml::XmlWriter::Create(path, settings);
+				try {
+					// Serialization Settings
+					DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+					serializserSettings->PreserveObjectReferences = true;
+					serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
+					// Write File
+					DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+					serializer->WriteObject(file, resource);
+					// Success: Append resource
+					resources[System::IO::Path::GetFullPath(path)] = resource;
+				}
+				catch (Exception^ e) {
+					std::string err("Failed to serialize resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+					LOG(err);
+					return false;
+				}
 			}
 			catch (Exception^ e) {
 				std::string err("Failed to create resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
 				LOG(err);
-				return;
+				return false;
 			}
-			try {
-				// Serialization Settings
-				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-				serializserSettings->PreserveObjectReferences = true;
-				serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-				// Spawn serializer
-				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-				serializer->WriteObject(file, resource);
-			}
-			catch (Exception^ e) {
-				std::string err("Failed to serialize resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-				LOG(err);
-				return;
-			}
-
-			try {
+			finally{
+				// Close file stream
 				file->Close();
+				Monitor::Exit(resourceLock);
 			}
-			catch (Exception^ e) {
-				std::string err("Failed to write resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-				return;
-			}
-			resources[System::IO::Path::GetFullPath(path)] = resource;
-			Monitor::Exit(resourceLock);
+			return true;
 		}
 
 		static AssetTypes GetResourceAssetType(Type^ type);
