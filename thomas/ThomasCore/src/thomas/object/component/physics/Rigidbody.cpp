@@ -110,7 +110,6 @@ namespace thomas
 
 			void Rigidbody::SetTargetCollider(GameObject* collider)
 			{
-				// Remove the need to allocate?
 				if (m_targetCollider == nullptr)
 				{
 					m_targetCollider = std::make_unique<GameObject>("");					
@@ -128,24 +127,6 @@ namespace thomas
 			{
 				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
-
-			//bool Rigidbody::HasCollided(GameObject* collider)
-			//{
-			//	// Temp solution for now
-			//	if (m_targetCollider != nullptr)
-			//	{
-			//		if (this->hasContactResponse() && m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
-			//		{
-			//			if (!collider)
-			//				collider = std::make_unique<GameObject>("").get();
-
-			//			*collider = *m_targetCollider;						
-			//			return true;
-			//		}
-			//	}
-			//	
-			//	return false;
-			//}
 
 			GameObject * Rigidbody::GetTargetCollider()
 			{
