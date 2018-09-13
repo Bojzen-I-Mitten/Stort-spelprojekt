@@ -87,62 +87,7 @@ namespace ThomasEngine
 			Monitor::Exit(resourceLock);
 		}
 
-		static bool CreateResource(Resource^ resource, String^ path)
-		{
-			path = Application::currentProject->assetPath + "\\" + path;
-			String^ extension = IO::Path::GetExtension(path);
-			String^ modifier = "";
-			path = path->Remove(path->Length - extension->Length, extension->Length);
-			int i = 0;
-			while (IO::File::Exists(path + modifier + extension))
-			{
-				i++;
-				modifier = "(" + i + ")";
-			}
-			path = path + modifier + extension;
-			Monitor::Enter(resourceLock);
-			using namespace System::Runtime::Serialization;
-
-			resource->Rename(path);	// Set file name
-
-			Xml::XmlWriter^ file;
-			try {
-				// Create xml writer
-				Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-				settings->Indent = true;
-				// Create file
-				System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
-				fi->Directory->Create();
-				file = Xml::XmlWriter::Create(path, settings);
-				try {
-					// Serialization Settings
-					DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-					serializserSettings->PreserveObjectReferences = true;
-					serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-					// Write File
-					DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-					serializer->WriteObject(file, resource);
-					// Success: Append resource
-					resources[System::IO::Path::GetFullPath(path)] = resource;
-				}
-				catch (Exception^ e) {
-					std::string err("Failed to serialize resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-					LOG(err);
-					return false;
-				}
-			}
-			catch (Exception^ e) {
-				std::string err("Failed to create resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-				LOG(err);
-				return false;
-			}
-			finally{
-				// Close file stream
-				file->Close();
-				Monitor::Exit(resourceLock);
-			}
-			return true;
-		}
+		static bool CreateResource(Resource^ resource, String^ path);
 
 		static AssetTypes GetResourceAssetType(Type^ type);
 
