@@ -93,12 +93,12 @@ v2f vert(appdata_thomas v)
     uint    type;
 };*/
 
-cbuffer LightCounts
+cbuffer LightCountsStruct
 {
     uint nrOfPointLights;
     uint nrOfSpotLights;
     uint nrOfDirectionalLights;
-    uint pad;
+
 };
 
 struct LightStruct
@@ -171,49 +171,49 @@ float4 frag(v2f input) : SV_TARGET
     testCBuffer.nrOfSpotLights = 0;*/
     
     
-    float4 finalColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 finalColor = float4(0.0f, 0.0f, 0.0f, 1.0f);
     
     float3 viewDir = normalize(_WorldSpaceCameraPos - input.worldPos.xyz);
 	float3 lightDir = float3(0, 0, 0);
     float3 lightMultiplyer = float3(0.0f, 0.0f, 0.0f);
     
     int i = 0;
-	int roof = 1;// nrOfDirectionalLights;
+	int roof = nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
         lightDir = -lights[i].direction;
-        lightMultiplyer = lights[i].color * lights[i].intensity;
+        lightMultiplyer = tempLight.color * lights[i].intensity;
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
     roof += nrOfPointLights;
     for (; i < roof; ++i) //point
     {
-        lightDir = tempLight.position - input.worldPos.xyz;
+        lightDir = lights[i].position - input.worldPos.xyz;
         float lightDistance = length(lightDir);
         lightDir = normalize(lightDir);
 
-        lightMultiplyer = tempLight.color * tempLight.intensity / (tempLight.attenuation.x + tempLight.attenuation.y * lightDistance + tempLight.attenuation.z * lightDistance * lightDistance);
+        lightMultiplyer = tempLight.color * lights[i].intensity / (lights[i].attenuation.x + lights[i].attenuation.y * lightDistance + lights[i].attenuation.z * lightDistance * lightDistance);
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
     roof += nrOfSpotLights;
     for (; i < roof; ++i) //spot
     {
-        lightDir = tempLight.position - input.worldPos.xyz;
+        lightDir = lights[i].position - input.worldPos.xyz;
         float lightDistance = length(lightDir);
         lightDir = normalize(lightDir);
 
-        float angle = degrees(acos(dot(-tempLight.direction, lightDir)));
+        float angle = degrees(acos(dot(-lights[i].direction, lightDir)));
         float spotFactor = 0.0f;
-        if (angle < tempLight.spotInnerAngle)
+        if (angle < lights[i].spotInnerAngle)
         {
             spotFactor = 1.0f;
         }
-        else if (angle < tempLight.spotOuterAngle)
+        else if (angle < lights[i].spotOuterAngle)
         {
-            spotFactor = 1.0f - smoothstep(tempLight.spotInnerAngle, tempLight.spotOuterAngle, angle);
+            spotFactor = 1.0f - smoothstep(lights[i].spotInnerAngle, lights[i].spotOuterAngle, angle);
         }
 
-        lightMultiplyer = spotFactor * tempLight.color * tempLight.intensity / (tempLight.attenuation.x + tempLight.attenuation.y * lightDistance + tempLight.attenuation.z * lightDistance * lightDistance);
+        lightMultiplyer = spotFactor * tempLight.color * lights[i].intensity / (lights[i].attenuation.x + lights[i].attenuation.y * lightDistance + lights[i].attenuation.z * lightDistance * lightDistance);
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
 

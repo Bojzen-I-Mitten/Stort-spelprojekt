@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "..\utils\Buffers.h"
+#include "..\resource\Shader.h"
 //namespace thomas { namespace utils { namespace buffers { class StructuredBuffer; } } }
 namespace thomas
 {
@@ -18,7 +19,6 @@ namespace thomas
 				unsigned nrOfPointLights;
 				unsigned nrOfSpotLights;
 				unsigned nrOfDirectionalLights;
-				unsigned pad;
 			};
 
 			struct LightStruct
@@ -34,26 +34,26 @@ namespace thomas
 			};
 
 		public:
-			void Initialize();
-			void Reset();//call at the beginning of a frame, before the scripts update
-			void Destroy();
-			void AddPointLight(const LightStruct &light);
-			void AddSpotLight(const LightStruct &light);
-			void AddDirectionalLight(const LightStruct &light);
+			static void Initialize();
+			static void Reset();//call at the beginning of a frame, before the scripts update
+			static void Destroy();
+			static void AddPointLight(const LightStruct &light);
+			static void AddSpotLight(const LightStruct &light);
+			static void AddDirectionalLight(const LightStruct &light);
 
-			void Update();
+			static void Update();
 
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
-			std::unique_ptr<utils::buffers::Buffer> m_lightsCountsBuffer;
+			static void Bind();
 		private:
 
-			LightCountsStruct m_lightsCounts;
-			std::vector<LightStruct> m_pointLights;
-			std::vector<LightStruct> m_spotLights;
-			std::vector<LightStruct> m_directionalLights;
-			std::vector<LightStruct> m_allLights;
+			static std::vector<LightStruct> m_pointLights;
+			static std::vector<LightStruct> m_spotLights;
+			static std::vector<LightStruct> m_directionalLights;
+			static std::vector<LightStruct> m_allLights;
 
-			
+			static std::shared_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
+
+			static LightCountsStruct m_lightsCounts;
 		};
 	}
 }

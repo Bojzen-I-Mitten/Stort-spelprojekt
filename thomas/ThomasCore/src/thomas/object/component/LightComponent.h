@@ -18,13 +18,12 @@ namespace thomas
 			
 			class THOMAS_API LightComponent : public Component
 			{
-
+			public:
 			private:
 				
 
 				graphics::LightManager::LightStruct m_lightComponentData;
 			public:
-				static graphics::LightManager s_lightManager;
 				void Update();
 
 				LightComponent();

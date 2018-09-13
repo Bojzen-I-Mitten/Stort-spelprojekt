@@ -23,7 +23,7 @@ namespace thomas
 				void SetData(void* data, size_t size);
 
 				template <typename T>
-				void SetData(std::vector<T>& data) {SetData(data.data(), data.size() * sizeof(data[0]));}
+				void SetData(std::vector<T>& data) {SetData(data.data(), data.size() * sizeof(T));}
 
 				size_t GetSize();
 				ID3D11Buffer* GetBuffer();

@@ -44,11 +44,13 @@ namespace thomas
 			}
 			void Buffer::SetData(void * data, size_t size)
 			{
+				if (size == 0) return;
 				if (size > m_size)
 				{
 					LOG("Cannot set buffer data. the data size is bigger than the buffer.");
 					return;
 				}
+
 				D3D11_MAPPED_SUBRESOURCE resource;
 				ThomasCore::GetDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 				memcpy(resource.pData, data, size);
@@ -85,7 +87,7 @@ namespace thomas
 				desc.Format = DXGI_FORMAT_UNKNOWN;
 				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 				
-				HRESULT HR = ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+				ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
 				
 			}
 

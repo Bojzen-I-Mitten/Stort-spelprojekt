@@ -43,7 +43,7 @@ namespace thomas
 		editor::Gizmos::Init();
 		utils::Primitives::Init();
 
-		thomas::object::component::LightComponent::s_lightManager.Initialize();
+		graphics::LightManager::Initialize();
 
 		s_initialized = true;
 		return s_initialized;
@@ -62,17 +62,11 @@ namespace thomas
 		resource::Shader::Update();
 		Input::Update();		
 		Sound::Update();
-		thomas::object::component::LightComponent::s_lightManager.Reset();
 	}
 
 	void ThomasCore::Exit()
 	{
 		s_initialized = false;
-	}
-
-	void ThomasCore::TEST()
-	{
-		thomas::object::component::LightComponent::s_lightManager.Update();
 	}
 
 	bool ThomasCore::Initialized()

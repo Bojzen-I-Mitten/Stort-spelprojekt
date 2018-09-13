@@ -6,15 +6,23 @@ namespace thomas
 {
 	namespace graphics
 	{
+		std::vector<LightManager::LightStruct> LightManager::m_pointLights;
+		std::vector<LightManager::LightStruct> LightManager::m_spotLights;
+		std::vector<LightManager::LightStruct> LightManager::m_directionalLights;
+		std::vector<LightManager::LightStruct> LightManager::m_allLights;
+
+		std::shared_ptr<utils::buffers::StructuredBuffer> LightManager::m_lightBuffer;
+
+		LightManager::LightCountsStruct LightManager::m_lightsCounts;
+
+
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;
 			m_lightsCounts.nrOfPointLights = 0;
-			m_lightsCounts.pad = 0;
-			m_lightsCountsBuffer = std::make_unique<utils::buffers::Buffer>(&m_lightsCounts, sizeof(LightCountsStruct), D3D11_BIND_CONSTANT_BUFFER, DYNAMIC_BUFFER);
 		}
 		void LightManager::Reset()
 		{
@@ -29,7 +37,7 @@ namespace thomas
 		}
 		void LightManager::Destroy()
 		{
-			m_lightBuffer.release();
+			
 		}
 		void LightManager::AddPointLight(const LightStruct & light)
 		{
@@ -48,12 +56,21 @@ namespace thomas
 		}
 		void LightManager::Update()
 		{
-			m_allLights.insert(m_allLights.end(), m_pointLights.begin(), m_pointLights.end());
-			m_allLights.insert(m_allLights.end(), m_spotLights.begin(), m_spotLights.end());
-			m_allLights.insert(m_allLights.end(), m_directionalLights.begin(), m_directionalLights.end());
-
+			if (m_directionalLights.size() > 0)
+				m_allLights.insert(m_allLights.end(), m_directionalLights.begin(), m_directionalLights.end());
+			if (m_pointLights.size() > 0)
+				m_allLights.insert(m_allLights.end(), m_pointLights.begin(), m_pointLights.end());
+			if (m_spotLights.size() > 0)
+				m_allLights.insert(m_allLights.end(), m_spotLights.begin(), m_spotLights.end());
+			
 			m_lightBuffer->SetData(m_allLights);
-			m_lightsCountsBuffer->SetData(&m_lightsCounts, sizeof(LightCountsStruct));
+		}
+		void LightManager::Bind()
+		{
+			resource::Shader::SetGlobalInt("nrOfPointLights", m_lightsCounts.nrOfPointLights);
+			resource::Shader::SetGlobalInt("nrOfDirectionalLights", m_lightsCounts.nrOfDirectionalLights);
+			resource::Shader::SetGlobalInt("nrOfSpotLights", m_lightsCounts.nrOfSpotLights);
+			resource::Shader::SetGlobalResource("lights", m_lightBuffer->GetSRV());
 		}
 	}
 }

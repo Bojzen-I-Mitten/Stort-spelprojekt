@@ -3,7 +3,6 @@
 #pragma unmanaged
 #include <thomas\object\component\LightComponent.h>
 
-#include <thomas\graphics\LightManager.h>
 #pragma managed
 #include "../Component.h"
 #include "../../math/Math.h"

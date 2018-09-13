@@ -5,7 +5,6 @@
 
 
 
-thomas::graphics::LightManager thomas::object::component::LightComponent::s_lightManager;
 
 
 namespace thomas
@@ -14,9 +13,6 @@ namespace thomas
 	{
 		namespace component
 		{
-
-			
-
 			LightComponent::LightComponent()
 			{
 				m_type = LIGHT_TYPES::POINT;
@@ -35,17 +31,19 @@ namespace thomas
 			
 			void LightComponent::Update()
 			{
+				m_lightComponentData.position = m_gameObject->m_transform->GetPosition();
+				m_lightComponentData.direction = m_gameObject->m_transform->Forward();
 				if (m_type == LIGHT_TYPES::POINT)
 				{
-					s_lightManager.AddPointLight(m_lightComponentData);
+					graphics::LightManager::AddPointLight(m_lightComponentData);
 				}
 				else if (m_type == LIGHT_TYPES::DIRECTIONAL)
 				{
-					s_lightManager.AddDirectionalLight(m_lightComponentData);
+					graphics::LightManager::AddDirectionalLight(m_lightComponentData);
 				}
 				else if (m_type == LIGHT_TYPES::SPOT)
 				{
-					s_lightManager.AddSpotLight(m_lightComponentData);
+					graphics::LightManager::AddSpotLight(m_lightComponentData);
 				}
 			}
 			
@@ -62,7 +60,7 @@ namespace thomas
 
 			thomas::math::Color LightComponent::GetColor()
 			{
-				return m_lightComponentData.color;
+				return thomas::math::Color(m_lightComponentData.color.x, m_lightComponentData.color.y, m_lightComponentData.color.z, 1.0f);
 			}
 
 			void LightComponent::SetColor(thomas::math::Color other)
