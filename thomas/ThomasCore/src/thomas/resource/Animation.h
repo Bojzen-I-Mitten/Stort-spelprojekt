@@ -9,23 +9,23 @@ namespace thomas {
 		class Mesh;
 		namespace animation {
 			class Skeleton;
-			class Animation;
+			class AnimationData;
 		}
 	}
 	namespace resource {
 
-		class THOMAS_API Animation : public Resource {
+		class THOMAS_API AnimationData : public Resource {
 		private:
 		public:
-			Animation(std::string path);
+			AnimationData(std::string path);
 
-			graphics::animation::Animation* GetAnimation();
+			graphics::animation::AnimationData* GetAnimation();
 
-			~Animation();
+			~AnimationData();
 
 		public:
 		private:
-			std::shared_ptr<graphics::animation::Animation> m_data;
+			std::shared_ptr<graphics::animation::AnimationData> m_data;
 		};
 	}
 }

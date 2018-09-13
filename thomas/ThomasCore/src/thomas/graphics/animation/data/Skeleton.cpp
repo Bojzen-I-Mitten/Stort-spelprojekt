@@ -15,8 +15,8 @@ namespace thomas {
 			{
 			}
 
-			Animation* Skeleton::getAnimation(const std::string &name) {
-				std::map<std::string, std::shared_ptr<Animation>>::iterator it = _animation.find(name);
+			AnimationData* Skeleton::getAnimation(const std::string &name) {
+				std::map<std::string, std::shared_ptr<AnimationData>>::iterator it = _animation.find(name);
 				if (it != _animation.end()) //Check that value existed
 					return it->second.get();
 				return nullptr;
@@ -44,7 +44,7 @@ namespace thomas {
 				return _bones.size();
 			}
 			/* Add an animation to the skeleton, if animation with the same name exists it will be removed. */
-			void Skeleton::addAnimation(std::shared_ptr<Animation> &anim) {
+			void Skeleton::addAnimation(std::shared_ptr<AnimationData> &anim) {
 				_animation[anim->m_name] = anim;
 			}
 		}

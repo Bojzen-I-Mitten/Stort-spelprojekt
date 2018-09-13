@@ -4,8 +4,12 @@
 namespace thomas {
 	namespace resource {
 
-		thomas::resource::Animation::Animation(std::string path)
+		AnimationData::AnimationData(std::string path) : Resource(path)
 		{
+		}
+		graphics::animation::AnimationData * AnimationData::GetAnimation()
+		{
+			return m_data.get();
 		}
 	}
 }

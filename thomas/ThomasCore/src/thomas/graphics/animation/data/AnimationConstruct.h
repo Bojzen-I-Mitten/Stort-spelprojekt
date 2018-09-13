@@ -25,7 +25,7 @@ namespace thomas {
 				AnimationConstruct(AnimSize size);
 				~AnimationConstruct();
 
-				std::shared_ptr<Animation> generateAnim(const char* name, float duration);
+				std::shared_ptr<AnimationData> generateAnim(const char* name, float duration);
 
 				void insertQuat(int ch, int nodeCh, float time, const float quat[4]);
 				void insertVector(int ch, int nodeCh, float time, const float vector[3]);

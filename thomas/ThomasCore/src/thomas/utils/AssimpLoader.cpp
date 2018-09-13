@@ -19,7 +19,7 @@ namespace thomas
 
 			std::map<std::string, unsigned int> m_mapping;
 			std::vector<graphics::animation::Bone> m_boneInfo;
-			std::vector < std::shared_ptr< graphics::animation::Animation> > m_animList;
+			std::vector < std::shared_ptr< graphics::animation::AnimationData> > m_animList;
 			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
 			graphics::animation::Skeleton* generateSkeleton() {
 				if (m_boneInfo.size() == 0)
@@ -114,7 +114,7 @@ namespace thomas
 			}
 			return;
 		}
-		std::vector<std::shared_ptr<graphics::animation::Animation>> AssimpLoader::LoadAnimation(std::string path)
+		std::vector<std::shared_ptr<graphics::animation::AnimationData>> AssimpLoader::LoadAnimation(std::string path)
 		{
 			SkeletonConstruct skelConstruct;
 			return skelConstruct.m_animList;
@@ -403,7 +403,7 @@ namespace thomas
 		}
 
 
-#pragma region Animation
+#pragma region AnimationData
 
 		using namespace graphics::animation;
 		struct AnimSize {
@@ -431,14 +431,14 @@ namespace thomas
 				delete[] m_data;
 			}
 
-			std::shared_ptr<graphics::animation::Animation> generateAnim(const char* name, float duration) {
+			std::shared_ptr<graphics::animation::AnimationData> generateAnim(const char* name, float duration) {
 				using namespace graphics::animation;
 				std::unique_ptr<float> ptr(m_data);
 				m_data = nullptr;
 				std::vector<ObjectChannel> channels(_keys.size());
 				for (unsigned int i = 0; i < _keys.size(); i++)
 					channels[i] = ObjectChannel(_keys[i]);
-				return std::shared_ptr<Animation>(new Animation(name, duration, channels, ptr));
+				return std::shared_ptr<AnimationData>(new AnimationData(name, duration, channels, ptr));
 			}
 
 			void insert4(int ch, int nodeCh, float time, const float value[4]) {

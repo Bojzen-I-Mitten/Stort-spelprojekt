@@ -18,7 +18,7 @@ namespace thomas {
 			}
 			/* Generate an animation player
 			*/
-			AnimPlayback::AnimPlayback(Skeleton &ref, std::unique_ptr<Playback> &playback, Animation &anim)
+			AnimPlayback::AnimPlayback(Skeleton &ref, std::unique_ptr<Playback> &playback, AnimationData &anim)
 				: m_playback(std::move(playback)), m_anim(&anim), m_channel(ref.getNumBones())
 			{
 				//Each channel needs to be initiated so it can generate it's own frames.

@@ -34,7 +34,7 @@
     <ClCompile Include="src\thomas\editor\EditorGrid.cpp" />
     <ClCompile Include="src\thomas\editor\gizmos\Gizmos.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
-    <ClCompile Include="src\thomas\graphics\animation\data\Animation.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\AnimationData.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\AnimationConstruct.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\Channel.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\ChannelKeys.cpp" />
@@ -46,6 +46,7 @@
     <ClCompile Include="src\thomas\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\thomas\resource\Animation.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\utils\Buffers.cpp" />
@@ -97,7 +98,7 @@
     <ClInclude Include="src\thomas\editor\EditorGrid.h" />
     <ClInclude Include="src\thomas\editor\gizmos\Gizmos.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimatedSkeleton.h" />
-    <ClInclude Include="src\thomas\graphics\animation\data\Animation.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\AnimationData.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\AnimationConstruct.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\Bone.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\BoneFrame.h" />
@@ -110,6 +111,7 @@
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyColor.h" />

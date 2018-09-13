@@ -18,13 +18,13 @@ namespace thomas {
 				delete[] m_data;
 			}
 
-			std::shared_ptr<Animation> AnimationConstruct::generateAnim(const char* name, float duration) {
+			std::shared_ptr<AnimationData> AnimationConstruct::generateAnim(const char* name, float duration) {
 				std::unique_ptr<float> ptr(m_data);
 				m_data = nullptr;
 				std::vector<ObjectChannel> channels(_keys.size());
 				for (unsigned int i = 0; i < _keys.size(); i++)
 					channels[i] = ObjectChannel(_keys[i]);
-				return std::shared_ptr<Animation>(new Animation(name, duration, channels, ptr));
+				return std::shared_ptr<AnimationData>(new AnimationData(name, duration, channels, ptr));
 			}
 
 			void AnimationConstruct::insertQuat(int ch, int nodeCh, float time, const float value[4]) {

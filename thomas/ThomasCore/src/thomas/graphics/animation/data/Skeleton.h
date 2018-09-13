@@ -19,13 +19,13 @@ namespace thomas {
 				/* Animations related to the skeleton.
 				 * The animations is owned by the skeleton however it can be shared over multiple instances.
 				*/
-				std::map<std::string, std::shared_ptr<Animation>> _animation;
+				std::map<std::string, std::shared_ptr<AnimationData>> _animation;
 
 			public:
 				Skeleton(std::vector<Bone> &m_boneInfo);
 				~Skeleton();
 
-				Animation* getAnimation(const std::string &name);
+				AnimationData* getAnimation(const std::string &name);
 				const std::vector<Bone>& getBones() const;
 				const Bone& getBone(unsigned int i) const;
 				/* Access a bone from name. Returns if bone name exists.
@@ -37,7 +37,7 @@ namespace thomas {
 				/* Get the number of bones in the skeleton */
 				unsigned int getNumBones() const;
 				/* Add an animation to the skeleton */
-				void addAnimation(std::shared_ptr<Animation> &anim);
+				void addAnimation(std::shared_ptr<AnimationData> &anim);
 			};
 		}
 	}

@@ -9,7 +9,7 @@ namespace thomas {
 		namespace animation {
 
 			class Playback;
-			class Animation;
+			class AnimationData;
 			class Skeleton;
 
 			class AnimPlayback : public AnimationNode
@@ -18,14 +18,14 @@ namespace thomas {
 
 
 				AnimPlayback(Skeleton &skel);	// Pose
-				AnimPlayback(Skeleton &skel, std::unique_ptr<Playback>& playback, Animation &anim);
+				AnimPlayback(Skeleton &skel, std::unique_ptr<Playback>& playback, AnimationData &anim);
 				virtual ~AnimPlayback();
 
 				virtual void update(float dT);
 
 			private:
 
-				Animation *m_anim;
+				AnimationData *m_anim;
 				std::unique_ptr<Playback> m_playback;
 				std::vector<BoneFrame> m_channel;		// Current keys active in the animation for each channel
 
