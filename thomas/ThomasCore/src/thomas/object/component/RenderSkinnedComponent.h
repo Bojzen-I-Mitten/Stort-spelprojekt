@@ -4,7 +4,6 @@
 namespace thomas
 {
 	namespace graphics { namespace animation { class AnimatedSkeleton; } }
-
 	namespace object
 	{
 		class Camera;
@@ -16,7 +15,6 @@ namespace thomas
 			public:
 				RenderSkinnedComponent();
 				virtual ~RenderSkinnedComponent();
-
 				virtual void Update();
 			protected:
 				virtual void SubmitPart(Camera* camera, unsigned int i);

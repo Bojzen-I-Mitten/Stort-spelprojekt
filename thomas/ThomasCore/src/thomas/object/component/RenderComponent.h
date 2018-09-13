@@ -4,7 +4,12 @@
 namespace thomas
 {
 	namespace graphics {struct RenderPair; }
-	namespace resource { class Model; class Material; }
+	namespace resource {
+		class Model; class Material;
+		namespace shaderproperty {
+			class ShaderProperty;
+		}
+	}
 	namespace object
 	{
 		namespace component
@@ -33,8 +38,10 @@ namespace thomas
 				virtual void SubmitPart(Camera* camera, unsigned int i);
 			protected:
 				std::vector<resource::Material*> m_materials;
+				
 			private:
 				static std::vector<RenderComponent*> s_renderComponents;
+				std::vector< resource::shaderproperty::ShaderProperty*> m_properties;
 				//graphics::Geometry* m_geometry;
 			};
 		}

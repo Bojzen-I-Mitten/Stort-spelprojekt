@@ -40,11 +40,13 @@ namespace thomas
 			math::Matrix worldMatrix;										// World matrix, make local?
 			Mesh* mesh;														// Rendered mesh
 			resource::Material* material;									// Material used for rendering
-			unsigned int num_local_prop;									// Number of local properties
-			const resource::shaderproperty::ShaderProperty ** local_prop;	// Properties local to rendered object
+			size_t num_local_prop;									// Number of local properties
+			const resource::shaderproperty::ShaderProperty *const* local_prop;	// Properties local to rendered object
 
 			RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam) :
 				camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(0), local_prop(NULL) {};
+			RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam, size_t num_local_prop, resource::shaderproperty::ShaderProperty *const* local_prop) :
+				camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(num_local_prop), local_prop(local_prop) {};
 		};
 
 		struct MaterialSorter
