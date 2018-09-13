@@ -40,6 +40,8 @@ namespace ThomasEngine {
 		static bool playing = false;	
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
+
+
 	public:
 		delegate void UpdateEditor();
 		static event UpdateEditor^ OnEditorUpdate;

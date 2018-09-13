@@ -26,8 +26,6 @@ namespace thomas
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
 			resource::Shader::SetGlobalVector("thomas_DeltaTime", thomas_DeltaTime);
 
-			//bind lights
-			//LightManager::Update();
 			LightManager::Bind();
 		}
 

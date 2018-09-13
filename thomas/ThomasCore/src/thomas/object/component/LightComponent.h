@@ -21,24 +21,20 @@ namespace thomas
 			public:
 			private:
 				
-
-				graphics::LightManager::LightStruct m_lightComponentData;
+				
 			public:
 				void Update();
-
+				void OnEnable();
+				void OnDisable();
 				LightComponent();
 				~LightComponent();
 
-				enum LIGHT_TYPES
-				{
-					DIRECTIONAL = 0,
-					POINT = 1,
-					SPOT = 2
-				};
-				LIGHT_TYPES m_type;
+				graphics::LightManager::LightStruct m_lightComponentData;
+				
+				graphics::LightManager::LIGHT_TYPES m_type;
 
-				LIGHT_TYPES GetType();
-				void SetType(LIGHT_TYPES other);
+				graphics::LightManager::LIGHT_TYPES GetType();
+				void SetType(graphics::LightManager::LIGHT_TYPES other);
 
 				thomas::math::Color GetColor();
 				void SetColor(thomas::math::Color other);
@@ -63,6 +59,8 @@ namespace thomas
 				void SetQuadraticAttenuation(float value);
 
 				
+
+
 			};
 
 		}

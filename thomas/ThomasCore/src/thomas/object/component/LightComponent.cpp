@@ -15,7 +15,7 @@ namespace thomas
 		{
 			LightComponent::LightComponent()
 			{
-				m_type = LIGHT_TYPES::POINT;
+				m_type = graphics::LightManager::DIRECTIONAL;
 
 				m_lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
 				m_lightComponentData.color = math::Vector3(1.0f, 1.0f, 1.0f);
@@ -29,33 +29,37 @@ namespace thomas
 			{
 			}
 			
+
 			void LightComponent::Update()
 			{
 				m_lightComponentData.position = m_gameObject->m_transform->GetPosition();
 				m_lightComponentData.direction = m_gameObject->m_transform->Forward();
-				if (m_type == LIGHT_TYPES::POINT)
-				{
-					graphics::LightManager::AddPointLight(m_lightComponentData);
-				}
-				else if (m_type == LIGHT_TYPES::DIRECTIONAL)
-				{
-					graphics::LightManager::AddDirectionalLight(m_lightComponentData);
-				}
-				else if (m_type == LIGHT_TYPES::SPOT)
-				{
-					graphics::LightManager::AddSpotLight(m_lightComponentData);
-				}
+				
 			}
+
+			void LightComponent::OnEnable()
+			{
+				graphics::LightManager::AddLight(this);
+			}
+
+			void LightComponent::OnDisable()
+			{
+				graphics::LightManager::RemoveLight(this);
+			}
+
+			
 			
 
-			LightComponent::LIGHT_TYPES LightComponent::GetType()
+			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
 			{
 				return m_type;
 			}
 
-			void LightComponent::SetType(LIGHT_TYPES other)
+			void LightComponent::SetType(graphics::LightManager::LIGHT_TYPES other)
 			{
+				graphics::LightManager::RemoveLight(this);
 				m_type = other;
+				graphics::LightManager::AddLight(this);
 			}
 
 			thomas::math::Color LightComponent::GetColor()

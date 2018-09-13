@@ -86,7 +86,7 @@ namespace ThomasEngine
 				return LIGHT_TYPES(((thomas::object::component::LightComponent*)nativePtr)->GetType());
 			}
 			void set(LIGHT_TYPES value) {
-				((thomas::object::component::LightComponent*)nativePtr)->SetType((thomas::object::component::LightComponent::LIGHT_TYPES)value);
+				((thomas::object::component::LightComponent*)nativePtr)->SetType((thomas::graphics::LightManager::LIGHT_TYPES)value);
 			}
 		}
 
