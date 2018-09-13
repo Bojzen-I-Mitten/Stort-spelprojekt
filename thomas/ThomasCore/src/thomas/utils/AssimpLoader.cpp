@@ -58,13 +58,11 @@ namespace thomas
 			m[3][0] = matrix.a4; m[3][1] = matrix.b4;  m[3][2] = matrix.c4;  m[3][3] = matrix.d4;
 			return m;
 		}
-		void AssimpLoader::LoadModel(std::string path, resource::Model::ModelData &modelData)
+
+		const aiScene* LoadScene(Assimp::Importer &importer, const std::string &path)
 		{
-			modelData = resource::Model::ModelData();
-			std::vector<std::shared_ptr<graphics::Mesh>> meshes;
 			std::string dir = path.substr(0, path.find_last_of("\\/"));
 			// Read file via ASSIMP
-			Assimp::Importer importer;
 			const aiScene* scene = importer.ReadFile
 			(
 				path,
@@ -86,21 +84,40 @@ namespace thomas
 			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 			{
 				LOG("ERROR::ASSIMP " << importer.GetErrorString());
-				return;
+				return NULL;
 			}
+			return scene;
+		}
 
-			SkeletonConstruct skelConstruct;
-
+		void Process(const aiScene* scene, resource::Model::ModelData &modelData, SkeletonConstruct &skelConstruct)
+		{
+			std::vector<std::shared_ptr<graphics::Mesh>> meshes;
+			
 			// Process ASSIMP's root node recursively
 			ProcessNode(scene->mRootNode, scene, modelData, skelConstruct);
 
 			math::Matrix globalInverseTransform = math::Matrix((float*)&scene->mRootNode->mTransformation.Inverse());
 			ProcessSkeleton(scene->mRootNode, modelData, skelConstruct, -1, globalInverseTransform, math::Matrix::Identity);
-			ProcessAnimations(scene, skelConstruct);
+		}
 
-			if (skelConstruct.hasSkeleton())
+		void AssimpLoader::LoadModel(std::string path, resource::Model::ModelData &modelData)
+		{
+			Assimp::Importer importer;
+			const aiScene* scene = LoadScene(importer, path);
+			if (!scene) return;
+			modelData = resource::Model::ModelData();
+			SkeletonConstruct skelConstruct;
+			Process(scene, modelData, skelConstruct);
+			if (skelConstruct.hasSkeleton()) {
+				ProcessAnimations(scene, skelConstruct);
 				modelData.m_skeleton = std::shared_ptr<graphics::animation::Skeleton>(skelConstruct.generateSkeleton());
+			}
 			return;
+		}
+		std::vector<std::shared_ptr<graphics::animation::Animation>> AssimpLoader::LoadAnimation(std::string path)
+		{
+			SkeletonConstruct skelConstruct;
+			return skelConstruct.m_animList;
 		}
 
 #pragma region Material

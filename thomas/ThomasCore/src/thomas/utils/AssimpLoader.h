@@ -18,6 +18,7 @@ namespace thomas
 		class Texture;
 		namespace animation {
 			class Skeleton;
+			class Animation;
 		}
 	}
 	namespace utils
@@ -28,6 +29,7 @@ namespace thomas
 		public:
 
 			static void LoadModel(std::string path, resource::Model::ModelData &modelData);
+			static std::vector<std::shared_ptr<graphics::animation::Animation>> LoadAnimation(std::string path);
 			
 			static std::string GetMaterialName(aiMaterial* material);
 			static int GetMaterialShadingModel(aiMaterial* material);
