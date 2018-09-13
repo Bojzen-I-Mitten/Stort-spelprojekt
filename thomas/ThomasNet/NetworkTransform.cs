@@ -50,6 +50,15 @@ namespace ThomasEngine.Network
             writer.Put(transform.position.x);
             writer.Put(transform.position.y);
             writer.Put(transform.position.z);
+
+            writer.Put(transform.rotation.x);
+            writer.Put(transform.rotation.y);
+            writer.Put(transform.rotation.z);
+            writer.Put(transform.rotation.w);
+
+            writer.Put(transform.scale.x);
+            writer.Put(transform.scale.y);
+            writer.Put(transform.scale.z);
         }
      
     }
