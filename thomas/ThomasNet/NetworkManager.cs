@@ -97,7 +97,7 @@ namespace ThomasEngine.Network
                         while (reader.AvailableBytes > 0)
                         {
                         
-                            if(networkIDObjects.Count() >= (validationID = reader.GetInt()))
+                            if(networkIDObjects.Count()-1 >= (validationID = reader.GetInt()))
                             networkIDObjects[validationID].Read(reader);
                             else
                             reader.Clear();
