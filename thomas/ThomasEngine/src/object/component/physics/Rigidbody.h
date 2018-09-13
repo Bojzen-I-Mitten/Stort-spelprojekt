@@ -31,9 +31,7 @@ namespace ThomasEngine
 
 		bool HasCollided(GameObject^ collider)
 		{
-			msclr::interop::marshal_context context;
-			return ((thomas::object::component::Rigidbody*)nativePtr)->
-					HasCollided(context.marshal_as<thomas::object::GameObject*>(collider));
+			return ((thomas::object::component::Rigidbody*)nativePtr)->HasCollided(((thomas::object::GameObject*)collider->nativePtr));
 		}
 
 		property bool IsKinematic 

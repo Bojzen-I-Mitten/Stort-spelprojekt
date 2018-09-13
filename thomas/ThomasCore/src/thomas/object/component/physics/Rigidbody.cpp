@@ -3,6 +3,7 @@
 #include "../../../utils/Math.h"
 #include "../Transform.h"
 #include "Collider.h"
+#include <memory>
 
 namespace thomas
 {
@@ -10,7 +11,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL)
+			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL), m_targetCollider(nullptr)
 			{
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
@@ -109,7 +110,12 @@ namespace thomas
 
 			void Rigidbody::SetTargetCollider(GameObject* collider)
 			{
-				m_targetCollider = collider;
+				if (m_targetCollider == nullptr)
+				{
+					m_targetCollider = std::make_unique<GameObject>("");					
+				}
+
+				*m_targetCollider = *collider;
 			}
 
 			void Rigidbody::ApplyCentralForce(const math::Vector3 & force)
@@ -127,10 +133,12 @@ namespace thomas
 				// Temp solution for now
 				if (m_targetCollider != nullptr)
 				{
-					if (this->hasContactResponse() && 
-						m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
+					if (this->hasContactResponse() && m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
 					{
-						collider = m_targetCollider;
+						if (!collider)
+							collider = std::make_unique<GameObject>("").get();
+
+						*collider = *m_targetCollider;
 						return true;
 					}
 				}

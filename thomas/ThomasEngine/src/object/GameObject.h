@@ -94,7 +94,6 @@ namespace ThomasEngine
 				initComponents(uninitializedComponents);
 			}
 
-
 			for (int i = 0; i < m_components.Count; i++)
 			{
 				Component^ component = m_components[i];
@@ -132,6 +131,30 @@ namespace ThomasEngine
 			for each(Component^ component in m_components)
 			{
 				component->OnDrawGizmosSelected();
+			}
+			Monitor::Exit(m_componentsLock);
+		}
+
+		void OnCollisionEnter()
+		{
+			Monitor::Enter(m_componentsLock);
+			if (Scene::CurrentScene->IsPlaying())
+			{
+				List<Component^>^ uninitializedComponents = gcnew List<Component^>;
+				for each(Component^ component in m_components)
+				{
+					if (!component->initialized)
+						uninitializedComponents->Add(component);
+
+				}
+				initComponents(uninitializedComponents);
+			}
+
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->initialized && component->enabled)
+					component->OnCollisionEnter();
 			}
 			Monitor::Exit(m_componentsLock);
 		}

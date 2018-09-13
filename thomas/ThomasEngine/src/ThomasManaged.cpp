@@ -93,7 +93,10 @@ namespace ThomasEngine {
 			{
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
+				{
+					gameObject->OnCollisionEnter();
 					gameObject->Update();
+				}
 			}
 
 

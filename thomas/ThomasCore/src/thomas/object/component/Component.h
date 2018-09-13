@@ -19,7 +19,7 @@ namespace thomas
 				virtual void FixedUpdate() {};
 				virtual void OnDrawGizmos() {};
 				virtual void OnDrawGizmosSelected() {};
-				virtual void OnCollisionEnter() {}; // TODO: add param
+				virtual void OnCollisionEnter() {};
 
 			public:
 				bool initialized = false;

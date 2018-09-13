@@ -4,7 +4,7 @@ public class PickUpBall : ScriptComponent
 {
     public override void Start()
     {
-
+       
     }
 
     public override void Update()

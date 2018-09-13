@@ -33,7 +33,7 @@ namespace ThomasEngine
 		virtual void FixedUpdate() {((thomas::object::component::Component*)nativePtr)->FixedUpdate();}
 		virtual void OnDrawGizmosSelected() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmosSelected(); }
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
-		virtual void OnCollisionEnter() { ((thomas::object::component::Component*)nativePtr)->OnCollisionEnter(); } // TODO: add param
+		virtual void OnCollisionEnter() { ((thomas::object::component::Component*)nativePtr)->OnCollisionEnter(); };
 
 		GameObject^ m_gameObject;
 		

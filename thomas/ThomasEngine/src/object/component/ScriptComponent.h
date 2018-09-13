@@ -17,6 +17,7 @@ namespace ThomasEngine
 		virtual void Update()override {};
 		virtual void OnDrawGizmosSelected() override {};
 		virtual void OnDrawGizmos() override {};
+		virtual void OnCollisionEnter() override {};
 
 		ScriptComponent() : Component(new thomas::object::component::ScriptComponent())
 		{

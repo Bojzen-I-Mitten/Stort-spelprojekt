@@ -43,7 +43,7 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
-				GameObject* m_targetCollider; // Temp
+				std::unique_ptr<GameObject> m_targetCollider; // Temp
 			};
 		}
 	}
