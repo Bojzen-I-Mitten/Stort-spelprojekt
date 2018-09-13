@@ -41,6 +41,7 @@ namespace ThomasEngine
 		enum class AssetTypes
 		{
 			MODEL,
+			ANIMATION,
 			TEXTURE2D,
 			TEXTURE3D,
 			SCENE,
@@ -145,6 +146,10 @@ namespace ThomasEngine
 			else if (extension == "obj" || extension == "fbx")
 			{
 				return AssetTypes::MODEL;
+			}
+			else if (extension == "anim")
+			{
+				return AssetTypes::ANIMATION;
 			}
 			else if (extension == "mat")
 			{

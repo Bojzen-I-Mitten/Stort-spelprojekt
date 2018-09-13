@@ -14,16 +14,16 @@ namespace thomas {
 	}
 	namespace resource {
 
-		class THOMAS_API AnimationData : public Resource {
+		class THOMAS_API Animation : public Resource {
 		private:
 		public:
-			AnimationData(std::string path);
+			Animation(std::string path);
 
 			graphics::animation::AnimationData* GetAnimation();
 
 			virtual void OnChanged();
 
-			virtual ~AnimationData();
+			virtual ~Animation();
 
 		public:
 		private:

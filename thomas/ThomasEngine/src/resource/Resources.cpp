@@ -34,6 +34,9 @@ namespace ThomasEngine
 				case AssetTypes::SHADER:
 					obj = gcnew Shader(path);
 					break;
+				case AssetTypes::ANIMATION:
+					obj = gcnew Animation(path);
+					break;
 				case AssetTypes::MATERIAL:
 					obj = Deserialize<Material^>(path);
 					break;
@@ -76,6 +79,10 @@ namespace ThomasEngine
 		else if (type == Model::typeid)
 		{
 			return AssetTypes::MODEL;
+		}
+		else if (type == Animation::typeid)
+		{
+			return AssetTypes::ANIMATION;
 		}
 		else if (type == Material::typeid)
 		{

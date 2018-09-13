@@ -6,15 +6,15 @@
 namespace thomas {
 	namespace resource {
 
-		AnimationData::AnimationData(std::string path) : Resource(path)
+		Animation::Animation(std::string path) : Resource(path)
 		{
 			OnChanged();	// Load
 		}
-		graphics::animation::AnimationData * AnimationData::GetAnimation()
+		graphics::animation::AnimationData * Animation::GetAnimation()
 		{
 			return m_data.get();
 		}
-		void AnimationData::OnChanged()
+		void Animation::OnChanged()
 		{
 			// Load on change & construction
 			std::vector<std::shared_ptr<graphics::animation::AnimationData>> anims = utils::AssimpLoader::LoadAnimation(m_path);

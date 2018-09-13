@@ -117,7 +117,7 @@ namespace thomas
 			SkeletonConstruct skelConstruct;
 			resource::Model::ModelData tmpData;
 			const aiScene* scene = LoadScene(importer, path);
-			if (!scene) return;
+			if (!scene) return std::vector<std::shared_ptr<graphics::animation::AnimationData>>();
 			Process(scene, tmpData, skelConstruct);
 			if (skelConstruct.hasSkeleton())
 				ProcessAnimations(scene, skelConstruct);
