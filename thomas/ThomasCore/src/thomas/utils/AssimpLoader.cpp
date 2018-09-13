@@ -424,7 +424,7 @@ namespace thomas
 				return std::shared_ptr<Animation>(new Animation(name, duration, channels, ptr));
 			}
 
-			void insert(int ch, int nodeCh, float time, const float value[4]) {
+			void insert4(int ch, int nodeCh, float time, const float value[4]) {
 				_keys[ch][nodeCh].m_keys.push_back(ChannelKey(time, m_data + _dataInd));
 				m_data[_dataInd] = value[0];
 				m_data[_dataInd + 1] = value[1];
@@ -432,7 +432,7 @@ namespace thomas
 				m_data[_dataInd + 3] = value[3];
 				_dataInd += 4;
 			}
-			void insert(int ch, int nodeCh, float time, const float value[3]) {
+			void insert3(int ch, int nodeCh, float time, const float value[3]) {
 				_keys[ch][nodeCh].m_keys.push_back(ChannelKey(time, m_data + _dataInd));
 				m_data[_dataInd] = value[0];
 				m_data[_dataInd + 1] = value[1];
@@ -467,16 +467,16 @@ namespace thomas
 
 			for (unsigned int i = 0; i < channel->mNumPositionKeys; i++) {
 				aiVectorKey key = channel->mPositionKeys[i];
-				anim.insert(bone, 0, (float)key.mTime, &key.mValue.x);
+				anim.insert3(bone, 0, (float)key.mTime, &key.mValue.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumScalingKeys; i++) {
 				aiVectorKey key = channel->mScalingKeys[i];
-				anim.insert(bone, 1, (float)key.mTime, &key.mValue.x);
+				anim.insert3(bone, 1, (float)key.mTime, &key.mValue.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumRotationKeys; i++) {
 				aiQuatKey key = channel->mRotationKeys[i];
 				math::Quaternion q(key.mValue.w, key.mValue.x, key.mValue.y, key.mValue.z);
-				anim.insert(bone, 2, (float)key.mTime, &q.x);
+				anim.insert4(bone, 2, (float)key.mTime, &q.x);
 			}
 		}
 
