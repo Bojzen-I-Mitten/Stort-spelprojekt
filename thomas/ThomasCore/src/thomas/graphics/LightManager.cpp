@@ -24,10 +24,6 @@ namespace thomas
 			m_lightsCounts.nrOfSpotLights = 0;
 			m_lightsCounts.nrOfPointLights = 0;
 		}
-
-		void LightManager::Reset()
-		{
-		}
 		
 		void LightManager::Destroy()
 		{

@@ -135,7 +135,6 @@ namespace ThomasEngine {
 				}
 
 				//Logic
-				thomas::graphics::LightManager::Reset();
 				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 				{
 					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];

@@ -4,7 +4,7 @@
 #include <memory>
 #include "..\utils\Buffers.h"
 #include "..\resource\Shader.h"
-//namespace thomas { namespace utils { namespace buffers { class StructuredBuffer; } } }
+
 namespace thomas
 {
 	namespace object {
@@ -20,9 +20,9 @@ namespace thomas
 			/*MATCH ON GPU*/
 			struct LightCountsStruct
 			{
+				unsigned nrOfDirectionalLights;
 				unsigned nrOfPointLights;
 				unsigned nrOfSpotLights;
-				unsigned nrOfDirectionalLights;
 			};
 
 			enum LIGHT_TYPES
@@ -46,7 +46,6 @@ namespace thomas
 
 		public:
 			static void Initialize();
-			static void Reset();
 			static void Destroy();
 			static void AddLight(object::component::LightComponent* light);
 			static void RemoveLight(object::component::LightComponent* light);

@@ -25,6 +25,15 @@ namespace ThomasEngine
 		
 		LightComponent() : Component(new thomas::object::component::LightComponent()) {}
 
+		property LIGHT_TYPES Type {
+			LIGHT_TYPES get() {
+				return LIGHT_TYPES(((thomas::object::component::LightComponent*)nativePtr)->GetType());
+			}
+			void set(LIGHT_TYPES value) {
+				((thomas::object::component::LightComponent*)nativePtr)->SetType((thomas::graphics::LightManager::LIGHT_TYPES)value);
+			}
+		}
+
 		property Color color {
 			Color get() {
 				return Color(((thomas::object::component::LightComponent*)nativePtr)->GetColor());
@@ -81,14 +90,7 @@ namespace ThomasEngine
 				((thomas::object::component::LightComponent*)nativePtr)->SetQuadraticAttenuation(value);
 			}
 		}
-		property LIGHT_TYPES Type {
-			LIGHT_TYPES get() {
-				return LIGHT_TYPES(((thomas::object::component::LightComponent*)nativePtr)->GetType());
-			}
-			void set(LIGHT_TYPES value) {
-				((thomas::object::component::LightComponent*)nativePtr)->SetType((thomas::graphics::LightManager::LIGHT_TYPES)value);
-			}
-		}
+		
 
 
 		void Update() override

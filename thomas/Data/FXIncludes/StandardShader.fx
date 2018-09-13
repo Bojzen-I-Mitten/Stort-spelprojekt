@@ -81,7 +81,6 @@ v2f vert(appdata_thomas v)
 }
 
 
-
 cbuffer LightCountsStruct
 {
 	uint nrOfDirectionalLights;
@@ -101,28 +100,12 @@ struct LightStruct
     float   pad;
 };
 
-
 StructuredBuffer<LightStruct> lights;
 
 float CalculatePointLightContribution(float4 lightColor, float lightIntensity, float lightDistance, float3 lightAttenuation)
 {
 	return lightColor * lightIntensity / (lightAttenuation.x + lightAttenuation.y * lightDistance + lightAttenuation.z * lightDistance * lightDistance);
 }
-
-/*float CalculateSpotLightFactor()
-{
-	float angle = degrees(acos(dot(-tempLight.direction, lightDir)));
-	float spotFactor = 0.0f;
-	if (angle < tempLight.spotInnerAngle)
-	{
-		spotFactor = 1.0f;
-	}
-	else if (angle < tempLight.spotOuterAngle)
-	{
-		spotFactor = 1.0f - smoothstep(tempLight.spotInnerAngle, tempLight.spotOuterAngle, angle);
-	}
-	return spotFactor;
-}*/
 
 void Apply(inout float4 colorAcculmulator, float3 lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir)//should take material properties later
 {
