@@ -24,6 +24,7 @@ namespace thomas {
 			public:
 
 				void setBlendTree(std::unique_ptr<AnimationNode> &blendTree);
+				void clearBlendTree();
 
 				/* Get skin matrixes
 				*/

@@ -8,8 +8,9 @@ namespace thomas {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref)
-				: _ref(ref), _root(new AnimPlayback(ref)), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
+				: _ref(ref), _root(), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
 			{
+				clearBlendTree();
 				updateSkeleton();
 			}
 
@@ -20,10 +21,8 @@ namespace thomas {
 
 
 			void AnimatedSkeleton::update(float dT) {
-				if (_root) {
-					_root->update(dT);
-					updateSkeleton();
-				}
+				_root->update(dT);
+				updateSkeleton();
 			}
 			void AnimatedSkeleton::updateSkeleton()
 			{
@@ -46,9 +45,15 @@ namespace thomas {
 
 			void AnimatedSkeleton::setBlendTree(std::unique_ptr<AnimationNode> &blendTree)
 			{
-				_root = std::move(blendTree);
+				if (!blendTree)
+					clearBlendTree();
+				else
+					_root = std::move(blendTree);
 			}
 
+			void AnimatedSkeleton::clearBlendTree() {
+				_root = std::unique_ptr<AnimationNode>(new AnimPlayback(_ref));
+			}
 
 
 			const std::vector<math::Matrix>& AnimatedSkeleton::getSkin() const {
