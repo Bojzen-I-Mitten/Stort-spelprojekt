@@ -91,7 +91,7 @@ namespace thomas
 
 		void Process(const aiScene* scene, resource::Model::ModelData &modelData, SkeletonConstruct &skelConstruct)
 		{
-			std::vector<std::shared_ptr<graphics::Mesh>> meshes;
+			std::vector<std::shared_ptr<graphics::Mesh>> m_meshes;
 			
 			// Process ASSIMP's root node recursively
 			ProcessNode(scene->mRootNode, scene, modelData, skelConstruct);
@@ -103,20 +103,24 @@ namespace thomas
 		void AssimpLoader::LoadModel(std::string path, resource::Model::ModelData &modelData)
 		{
 			Assimp::Importer importer;
+			SkeletonConstruct skelConstruct;
 			const aiScene* scene = LoadScene(importer, path);
 			if (!scene) return;
-			modelData = resource::Model::ModelData();
-			SkeletonConstruct skelConstruct;
 			Process(scene, modelData, skelConstruct);
-			if (skelConstruct.hasSkeleton()) {
-				ProcessAnimations(scene, skelConstruct);
+			if (skelConstruct.hasSkeleton())
 				modelData.m_skeleton = std::shared_ptr<graphics::animation::Skeleton>(skelConstruct.generateSkeleton());
-			}
 			return;
 		}
 		std::vector<std::shared_ptr<graphics::animation::AnimationData>> AssimpLoader::LoadAnimation(std::string path)
 		{
+			Assimp::Importer importer;
 			SkeletonConstruct skelConstruct;
+			resource::Model::ModelData tmpData;
+			const aiScene* scene = LoadScene(importer, path);
+			if (!scene) return;
+			Process(scene, tmpData, skelConstruct);
+			if (skelConstruct.hasSkeleton())
+				ProcessAnimations(scene, skelConstruct);
 			return skelConstruct.m_animList;
 		}
 
@@ -346,7 +350,7 @@ namespace thomas
 
 
 			std::shared_ptr<graphics::Mesh> m(new graphics::Mesh(vertices, indices, name));
-			modelData.meshes.push_back(m);
+			modelData.m_meshes.push_back(m);
 
 		}
 

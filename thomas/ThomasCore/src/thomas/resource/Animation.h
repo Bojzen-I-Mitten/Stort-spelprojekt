@@ -21,7 +21,9 @@ namespace thomas {
 
 			graphics::animation::AnimationData* GetAnimation();
 
-			~AnimationData();
+			virtual void OnChanged();
+
+			virtual ~AnimationData();
 
 		public:
 		private:
