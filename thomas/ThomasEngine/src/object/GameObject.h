@@ -314,8 +314,8 @@ namespace ThomasEngine
 					}
 						
 				}
+				return gObjs;
 			}
-
 		}
 
 		static GameObject^ Find(String^ name) 
