@@ -3,6 +3,7 @@
 #include "AudioClip.h"
 #include "Material.h"
 #include "Shader.h"
+#include "Animation.h"
 #include "texture\Texture2D.h"
 #include "Resources.h"
 #include "../Scene.h"

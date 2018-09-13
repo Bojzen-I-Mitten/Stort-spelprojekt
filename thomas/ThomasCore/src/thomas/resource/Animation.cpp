@@ -10,10 +10,15 @@ namespace thomas {
 		{
 			OnChanged();	// Load
 		}
+
+		Animation::~Animation()
+		{}
+
 		graphics::animation::AnimationData * Animation::GetAnimation()
 		{
 			return m_data.get();
 		}
+		
 		void Animation::OnChanged()
 		{
 			// Load on change & construction
