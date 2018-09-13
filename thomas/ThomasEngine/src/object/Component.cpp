@@ -9,29 +9,6 @@ ThomasEngine::Component::Component() : Object(new thomas::object::component::Com
 
 }
 
-void ThomasEngine::Component::LoadExternalComponents()
-{
-	array<String^>^ dlls = Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly);
-
-	List<System::Type^>^ types = gcnew List<System::Type^>();
-	for (int i = 0; i < dlls->Length; i++) {
-		Assembly^ assembly = Assembly::LoadFrom(dlls[i]);
-		List<System::Type^>^ exportedTypes = gcnew List<System::Type^>(assembly->GetExportedTypes());
-		types->AddRange(exportedTypes);
-	}
-	
-	for (int i = 0; i < types->Count; i++)
-	{
-		if (!Component::typeid->IsAssignableFrom(types[i]))
-		{
-			types->RemoveAt(i);
-			i--;
-		}
-	}
-
-	externalTypes = types;
-
-}
 
 void ThomasEngine::Component::LoadExternalComponents()
 {
