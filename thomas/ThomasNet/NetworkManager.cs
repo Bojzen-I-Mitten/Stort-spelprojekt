@@ -89,25 +89,23 @@ namespace ThomasEngine.Network
         }
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            while(reader.AvailableBytes > 0)
-            {
+            
                 PacketType type = (PacketType)reader.GetInt();
                 switch (type)
                 {
                     case PacketType.DATA:
+                        while (reader.AvailableBytes > 0)
                         {
-                            // foreach (NetworkID id in networkIDObjects.Values)
-                            //     id.Read(reader);
                             networkIDObjects[reader.GetInt()].Read(reader);
                         }
                         break;
                     case PacketType.EVENT:
-                        netPacketProcessor.ReadPacket(reader);
+                        netPacketProcessor.ReadAllPackets(reader);
                         break;
                     default:
                         break;
+                
                 }
-            }
         }
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
@@ -151,10 +149,10 @@ namespace ThomasEngine.Network
         }
         public void WriteData(NetDataWriter writer)
         {
-           // writer.Put((int)PacketType.DATA);
+            writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
             {
-                writer.Put((int)PacketType.DATA);
+
                 writer.Put(id.ID);
                 id.Write(writer);
             }
@@ -162,11 +160,10 @@ namespace ThomasEngine.Network
         public void WriteData(DeliveryMethod method)
         {
             NetDataWriter writer = new NetDataWriter();
-
-           // writer.Put((int)PacketType.DATA);
+            writer.Put((int)PacketType.DATA);
+            // writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
             {
-                writer.Put((int)PacketType.DATA);
                 writer.Put(id.ID);
                 id.Write(writer);
             }
