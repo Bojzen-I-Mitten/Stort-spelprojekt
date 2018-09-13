@@ -10,7 +10,6 @@ namespace ThomasEngine.Network
     {
         public int ID { get; set; } = 0;
         public Vector3 transformPos = new Vector3(0.0F, 0.0F, 0.0F);
-
         static public void PrintPacket(ExamplePacket packet, NetPeer peer)
         {
             
@@ -35,7 +34,7 @@ namespace ThomasEngine.Network
     {
         Dictionary<int, NetworkID> networkIDObjects;
         int iD = -1;
-
+        int validationID = -5;
         private NetPacketProcessor netPacketProcessor;
 
         private EventBasedNetListener listener;
@@ -74,9 +73,8 @@ namespace ThomasEngine.Network
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
             listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-            listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-            SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
+            //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
         }
 
@@ -92,48 +90,49 @@ namespace ThomasEngine.Network
             {
                 InitServerNTP();
                 netManager.Start(9050 /* port */);
-                
-                // SendEvent(testPacket, DeliveryMethod.ReliableOrdered);
+               // SendEvent(testPacket, DeliveryMethod.ReliableOrdered);
             }
-        }
 
-        private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
-        {
-            throw new NotImplementedException();
+            
         }
-
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+            if (isServer)
+                ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+            else
+                ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
         }
         private void Listener_PeerConnectedEvent(NetPeer peer)
         {
-            //SendEvent(new TimeSyncEvent(serverTime), DeliveryMethod.ReliableOrdered);
-            ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
+            if(isServer)
+                ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
+            else
+                ThomasEngine.Debug.Log("You are now connected with the server" + peer.EndPoint.ToString());
         }
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-
-            float ping = peer.Ping * 0.001f;
-
-            PacketType type = (PacketType)reader.GetInt();
-            switch (type)
-            {
-                case PacketType.DATA:
-                    while (reader.AvailableBytes > 0)
-                    {
-                    foreach (NetworkID id in networkIDObjects.Values)
-                            id.Read(reader);
-                            
-                    }
-                    break;
-                case PacketType.EVENT:
-                    netPacketProcessor.ReadPacket(reader);
-                    break;
-                default:
-                    break;
-            }
             
+                PacketType type = (PacketType)reader.GetInt();
+                switch (type)
+                {
+                    case PacketType.DATA:
+                        while (reader.AvailableBytes > 0)
+                        {
+
+                            validationID = reader.GetInt();
+                            if (validationID < networkIDObjects.Count)
+                                networkIDObjects[validationID].Read(reader);
+                            else
+                                reader.Clear();
+                        }
+                        break;
+                    case PacketType.EVENT:
+                        netPacketProcessor.ReadAllPackets(reader);
+                        break;
+                    default:
+                        break;
+                
+                }
         }
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
@@ -144,7 +143,7 @@ namespace ThomasEngine.Network
         }
         public override void Update()
         {
-            netManager.UpdateTime = (TICK_RATE/1000);
+            netManager.UpdateTime = (1000/ TICK_RATE);
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
 
@@ -186,27 +185,27 @@ namespace ThomasEngine.Network
             netPacketProcessor.Write<T>(writer, data);
             netManager.SendToAll(writer, method);
         }
+
         public void WriteData(NetDataWriter writer)
         {
             writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
+            {
+
+                writer.Put(id.ID);
                 id.Write(writer);
+            }
         }
         public void WriteData(DeliveryMethod method)
         {
             NetDataWriter writer = new NetDataWriter();
-
             writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
+            {
+                writer.Put(id.ID);
                 id.Write(writer);
-
+            }
             netManager.SendToAll(writer, method);
-        }
-
-
-        private void HandleTimeSyncEvent(TimeSyncEvent timeSync, NetPeer peer)
-        {
-            serverTime = timeSync.serverTime;
         }
 
         private void InitServerNTP()
