@@ -8,7 +8,7 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			class Animation
+			class AnimationData
 			{
 			private:
 				/* The animated channels, one for each node. */
@@ -21,8 +21,8 @@ namespace thomas {
 				/* The duration of the animation */
 				const float m_duration;
 
-				Animation(const std::string &name, float duration, std::vector<ObjectChannel> &channels, std::unique_ptr<float>& data);
-				~Animation();
+				AnimationData(const std::string &name, float duration, std::vector<ObjectChannel> &channels, std::unique_ptr<float>& data);
+				~AnimationData();
 				/* Get the channel related to a bone */
 				const ObjectChannel& operator[](unsigned int bone);
 			};
