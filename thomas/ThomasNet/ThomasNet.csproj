@@ -42,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NetworkComponent.cs" />
-    <Compile Include="NetworkComponentTransform.cs" />
     <Compile Include="LiteNetLib\BaseChannel.cs" />
     <Compile Include="LiteNetLib\ConnectionRequest.cs" />
     <Compile Include="LiteNetLib\INetEventListener.cs" />
@@ -70,6 +69,7 @@
     <Compile Include="LiteNetLib\Utils\NetSerializerExceptions.cs" />
     <Compile Include="NetworkID.cs" />
     <Compile Include="NetworkManager.cs" />
+    <Compile Include="NetworkTransform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
