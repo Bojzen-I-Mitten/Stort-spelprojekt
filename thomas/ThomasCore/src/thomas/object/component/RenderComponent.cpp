@@ -82,9 +82,7 @@ namespace thomas {
 				if (m_model)
 				{
 					for (int i = 0; i < m_model->GetMeshes().size(); i++)
-					{
 						SubmitPart(camera, i);
-					}
 				}
 			}
 

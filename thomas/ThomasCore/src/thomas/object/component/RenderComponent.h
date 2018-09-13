@@ -29,10 +29,11 @@ namespace thomas
 			public:
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;
-			private:
+			protected:
 				virtual void SubmitPart(Camera* camera, unsigned int i);
-			private:
+			protected:
 				std::vector<resource::Material*> m_materials;
+			private:
 				static std::vector<RenderComponent*> s_renderComponents;
 				//graphics::Geometry* m_geometry;
 			};

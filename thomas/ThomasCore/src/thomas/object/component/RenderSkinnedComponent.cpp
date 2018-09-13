@@ -2,6 +2,9 @@
 #include "../../graphics/animation/AnimatedSkeleton.h"
 #include "../../ThomasTime.h"
 #include "../../resource/Model.h"
+#include "../../graphics/Renderer.h"
+#include "../../resource/Material.h"
+#include "../GameObject.h"
 namespace thomas
 {
 	namespace object
@@ -20,6 +23,16 @@ namespace thomas
 				RenderComponent::Update();
 				if (m_skeleton)
 					m_skeleton->update(ThomasTime::GetDeltaTime());
+			}
+			void RenderSkinnedComponent::SubmitPart(Camera* camera, unsigned int i)
+			{
+				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
+				if (material == nullptr)
+					material = resource::Material::GetStandardMaterial();
+
+				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
+
+				thomas::graphics::Renderer::SubmitCommand(thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh, material, camera));
 			}
 			void RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
