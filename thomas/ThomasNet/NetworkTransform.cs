@@ -11,38 +11,43 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
+        Vector3 pos;
+        Vector3 scale;
+        Quaternion rot;
+
         public override void Start()
         {
-
+            pos = new Vector3(0.0f);
+            scale = new Vector3(0.0f);
+            rot = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+            
         }
         public override void Update()
         {
+            Vector3 temp = transform.position;
+            transform.position = Vector3.Lerp(temp, pos, Time.DeltaTime);
 
+            temp = transform.scale;
+            transform.scale = Vector3.Lerp(temp, scale, Time.DeltaTime);
+
+            Quaternion temp1 = transform.rotation;
+            transform.rotation = Quaternion.Lerp(temp1, rot, Time.DeltaTime);
         }
        
         public override void Read(NetPacketReader reader)
         {
-            Vector3 pos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-            pos.x += (reader.GetFloat() - transform.position.x);
-            pos.y += (reader.GetFloat() - transform.position.y);
-            pos.z += (reader.GetFloat() - transform.position.z);
+            pos.x = reader.GetFloat();
+            pos.y = reader.GetFloat();
+            pos.z = reader.GetFloat();
 
-            transform.position = pos;
+            rot.x = reader.GetFloat();
+            rot.y = reader.GetFloat();
+            rot.z = reader.GetFloat();
+            rot.w = reader.GetFloat();
 
-            Quaternion rot = new Quaternion(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
-            rot.x += (reader.GetFloat() - transform.rotation.x);
-            rot.y += (reader.GetFloat() - transform.rotation.y);
-            rot.z += (reader.GetFloat() - transform.rotation.z);
-            rot.w += (reader.GetFloat() - transform.rotation.w);
-
-            transform.rotation = rot;
-
-            Vector3 scale = new Vector3(transform.scale.x, transform.scale.y, transform.scale.z);
-            scale.x += (reader.GetFloat() - transform.scale.x);
-            scale.y += (reader.GetFloat() - transform.scale.y);
-            scale.z += (reader.GetFloat() - transform.scale.z);
-
-            transform.scale = scale;
+            scale.x = reader.GetFloat();
+            scale.y = reader.GetFloat();
+            scale.z = reader.GetFloat();
         }
 
         public override void Write(NetDataWriter writer)
