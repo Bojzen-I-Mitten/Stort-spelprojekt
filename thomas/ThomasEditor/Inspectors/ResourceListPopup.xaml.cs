@@ -91,7 +91,7 @@ namespace ThomasEditor
             {
                 resources.AddRange(ThomasEngine.Object.GetObjectsOfType(resourceType));
             }
-
+            resources.Insert(0, "None");
             ResourceList.ItemsSource = resources;
             CollectionViewSource.GetDefaultView(ResourceList.ItemsSource).Filter = ResourcesFilter;
             ResourceFilter.Focus();
