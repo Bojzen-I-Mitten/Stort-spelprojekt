@@ -31,7 +31,6 @@ namespace ThomasEngine
 
 		GameObject^ GetTargetCollider()
 		{
-			msclr::interop::marshal_context context;
 			auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
 
 			if (collider != nullptr)

@@ -19,7 +19,7 @@ namespace ThomasEditor
 
         public override void OnCollisionEnter(GameObject collider)
         {
-            Debug.Log(collider.Name);     
+            //Debug.Log(collider.Name);     
         }
     }
 }

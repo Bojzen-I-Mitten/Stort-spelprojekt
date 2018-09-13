@@ -149,7 +149,13 @@ namespace thomas
 
 			GameObject * Rigidbody::GetTargetCollider()
 			{
-				return m_targetCollider.get();
+				if (m_targetCollider != nullptr)
+				{
+					if (this->hasContactResponse() && m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
+						return m_targetCollider.get();
+				}
+
+				return nullptr;
 			}
 
 			float Rigidbody::GetMass()
