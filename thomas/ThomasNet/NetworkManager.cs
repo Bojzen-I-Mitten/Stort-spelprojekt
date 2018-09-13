@@ -90,9 +90,9 @@ namespace ThomasEngine.Network
                 {
                     case PacketType.DATA:
                         {
-                            foreach (NetworkID id in networkIDObjects.Values)
-                                id.Read(reader);
-                            
+                            // foreach (NetworkID id in networkIDObjects.Values)
+                            //     id.Read(reader);
+                            networkIDObjects[reader.GetInt()].Read(reader);
                         }
                         break;
                     case PacketType.EVENT:
@@ -154,9 +154,14 @@ namespace ThomasEngine.Network
         {
             NetDataWriter writer = new NetDataWriter();
 
-            writer.Put((int)PacketType.DATA);
+           // writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
+            {
+                writer.Put((int)PacketType.DATA);
+                writer.Put(id.ID);
                 id.Write(writer);
+            }
+
 
             netManager.SendToAll(writer, method);
         }
