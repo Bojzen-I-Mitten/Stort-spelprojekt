@@ -42,6 +42,10 @@ namespace ThomasEditor
                     }
                     return AssetBrowser.assetImages[type].UriSource.LocalPath;
                 }
+                else if(value is ThomasEngine.Object)
+                {
+                    return "../icons/assets/prefab.png";
+                }
                 else
                     return "../icons/null.png";
             }
@@ -57,14 +61,16 @@ namespace ThomasEditor
     {
 
         static public ResourceListPopup instance;
-
+        public Type resourceType;
         private PropertyItem _property;
         public ResourceListPopup(PropertyItem property, Type resourceType)
         {
+            this.resourceType = resourceType;
             InitializeComponent();
             _property = property;
             Title = "Select " + resourceType.Name;
-            
+           
+                       
             List<object> resources = ThomasEngine.Resources.GetResourcesOfType(resourceType).Cast<object>().ToList();
            
 
@@ -77,8 +83,15 @@ namespace ThomasEditor
                 resources.Insert(0, Texture2D.blackTexture);
                 resources.Insert(0, Texture2D.whiteTexture);
             }
+            else if ((typeof(ThomasEngine.GameObject).IsAssignableFrom(resourceType)))
+            {
+                resources.AddRange(ThomasEngine.GameObject.GetAllGameObjects(true));
+            }
+            else if ((typeof(ThomasEngine.Object).IsAssignableFrom(resourceType)))
+            {
+                resources.AddRange(ThomasEngine.Object.GetObjectsOfType(resourceType));
+            }
             resources.Insert(0, "None");
-
             ResourceList.ItemsSource = resources;
             CollectionViewSource.GetDefaultView(ResourceList.ItemsSource).Filter = ResourcesFilter;
             ResourceFilter.Focus();
@@ -98,6 +111,11 @@ namespace ThomasEditor
                 {
                     _property.Value = null;
                 }
+                else if (ResourceList.SelectedItem is ThomasEngine.Object)
+                {
+                    _property.Value = ResourceList.SelectedItem;
+                }
+                    
             }
             Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
 

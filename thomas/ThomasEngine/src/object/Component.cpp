@@ -6,7 +6,9 @@
 ThomasEngine::Component::Component() : Object(new thomas::object::component::Component())
 {
 	setGameObject(GameObject::s_lastObject);
+
 }
+
 
 void ThomasEngine::Component::LoadExternalComponents()
 {
@@ -80,6 +82,9 @@ List<Type^>^ ThomasEngine::Component::GetAllComponentTypes()
 	if (scriptAssembly)
 		types->AddRange(scriptAssembly->GetExportedTypes());
 
+	if (editorAssembly)
+		types->AddRange(editorAssembly->GetExportedTypes());
+
 	for (int i = 0; i < types->Count; i++)
 	{
 		if (!Component::typeid->IsAssignableFrom(types[i]))
@@ -89,6 +94,10 @@ List<Type^>^ ThomasEngine::Component::GetAllComponentTypes()
 		}
 	}
 	return types;
+}
+
+String^ ThomasEngine::Component::Name::get() {
+	return gameObject->Name + " (" + this->GetType()->Name + ")";
 }
 
 List<Type^>^ ThomasEngine::Component::GetAllAddableComponentTypes()

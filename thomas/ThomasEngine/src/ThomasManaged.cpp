@@ -1,7 +1,7 @@
 // This is the main DLL file.
 
 #include "ThomasManaged.h"
-
+#include "ScriptingManager.h"
 
 namespace ThomasEngine {
 
@@ -10,6 +10,7 @@ namespace ThomasEngine {
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
 		{
+			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
 			Component::LoadExternalComponents();
 
@@ -124,6 +125,7 @@ namespace ThomasEngine {
 				{
 					camera->Render();
 				}
+				thomas::object::component::RenderComponent::ClearList();
 				RenderFinished->WaitOne();
 				CopyCommandList();
 				RenderFinished->Reset();
@@ -134,6 +136,8 @@ namespace ThomasEngine {
 			if (updateEditor)
 				OnEditorUpdate();
 			updateEditor = false;
+
+			ScriptingManger::ReloadIfNeeded();
 		}
 		Resources::UnloadAll();
 		ThomasCore::Destroy();

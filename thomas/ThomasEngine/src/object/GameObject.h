@@ -34,16 +34,24 @@ namespace ThomasEngine
 			s_lastObject = this;
 			m_name = "gameobject";
 
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 		}
+
 
 	internal:
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
-		void PostLoad()
+		static void SerializeGameObject(String^ path, GameObject^ gObj);
+		void SyncComponents() {
+			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+		}
+		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
+		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
+
+		void PostLoad(Scene^ scene)
 		{
-			scene = Scene::CurrentScene;
+			this->scene = scene;
 			m_transform = GetComponent<Transform^>();
 			
 			List<Component^>^ editorComponents = gcnew List<Component^>;
@@ -58,6 +66,14 @@ namespace ThomasEngine
 			}
 			
 			initComponents(editorComponents);	
+		}
+
+		void PostInstantiate(Scene^ scene) {
+			PostLoad(scene);
+			scene->GameObjects->Add(this);
+			for (int i = 0; i < m_transform->children->Count; i++) {
+				m_transform->children[i]->gameObject->PostInstantiate(scene);
+			}
 		}
 
 		void initComponents(List<Component^>^ components)
@@ -136,6 +152,7 @@ namespace ThomasEngine
 			Monitor::Exit(m_componentsLock);
 		}
 
+		
 	public:
 		static GameObject^ s_lastObject;
 
@@ -150,9 +167,24 @@ namespace ThomasEngine
 
 			Scene::CurrentScene->GameObjects->Add(this);
 			scene = Scene::CurrentScene;
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 			
 			Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		}
+		
+		static GameObject^ CreatePrefab() {
+			GameObject^ newGobj = gcnew GameObject();
+			s_lastObject = nullptr;
+			Transform^ t = newGobj->AddComponent<Transform^>();
+			((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
+			return newGobj;
+		}
+
+
+		property bool inScene {
+			bool get() {
+				return scene != nullptr;
+			}
 		}
 
 		virtual void Destroy() override;
@@ -236,9 +268,8 @@ namespace ThomasEngine
 		where T : Component
 		T GetComponent()
 		{
-
-			List<T> tComponents = Enumerable::OfType<T>(%m_components);
-			if (tComponents.Count > 0)
+			List<T>^ tComponents = gcnew List<T>(Enumerable::OfType<T>(%m_components));
+			if (tComponents->Count > 0)
 				return tComponents[0];
 			else
 				return T();
@@ -270,6 +301,23 @@ namespace ThomasEngine
 		//}
 		//
 
+		static List<GameObject^>^ GetAllGameObjects(bool includePrefabs) {
+			List<GameObject^>^ gObjs = Object::GetObjectsOfType<GameObject^>();
+			if (includePrefabs)
+				return gObjs;
+			else
+			{
+				for (int i = 0; i < gObjs->Count; i++) {
+					if (!gObjs[i]->inScene) {
+						gObjs->RemoveAt(i);
+						i--;
+					}
+						
+				}
+				return gObjs;
+			}
+		}
+
 		static GameObject^ Find(String^ name) 
 		{
 			for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
@@ -291,5 +339,10 @@ namespace ThomasEngine
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		}
+
+		static GameObject^ Instantiate(GameObject^ original);
+		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
 	};
 }
