@@ -65,7 +65,8 @@ namespace ThomasEngine
 			return m_path;
 		}
 
-		virtual property String^ Name
+		virtual property String^ Name;
+
 		String^ GetAssetRelativePath()
 		{
 			if (m_path->Contains(Application::editorAssets)) return m_path->Replace(Application::editorAssets, "%THOMAS_DATA%");

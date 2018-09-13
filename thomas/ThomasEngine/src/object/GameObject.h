@@ -268,9 +268,8 @@ namespace ThomasEngine
 		where T : Component
 		T GetComponent()
 		{
-
-			List<T> tComponents = Enumerable::OfType<T>(%m_components);
-			if (tComponents.Count > 0)
+			List<T>^ tComponents = gcnew List<T>(Enumerable::OfType<T>(%m_components));
+			if (tComponents->Count > 0)
 				return tComponents[0];
 			else
 				return T();
