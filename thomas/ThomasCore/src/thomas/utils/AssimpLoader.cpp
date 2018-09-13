@@ -6,15 +6,51 @@
 #include <assimp\Importer.hpp>
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
-
+#include "../graphics/animation/data/Skeleton.h"
+#include "Math.h"
 
 namespace thomas
 {
 	namespace utils
 	{
-		resource::Model::ModelData AssimpLoader::LoadModel(std::string path)
+#pragma region Declares
+
+		struct SkeletonConstruct {
+
+			std::map<std::string, unsigned int> mapping;
+			std::vector<graphics::animation::Bone> boneInfo;
+			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
+			graphics::animation::Skeleton* getSkeleton() {
+				if (boneInfo.size() == 0)
+					return nullptr;
+				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(boneInfo);
+				//for (unsigned int i = 0; i < _animations.size(); i++)
+				//	skel->addAnimation(_animations[i]);
+				return skel;
+			}
+			bool hasSkeleton() {
+				return boneInfo.size() != 0;
+			}
+		};
+		void ProcessSkeleton(aiNode * node, resource::Model::ModelData & modelData, SkeletonConstruct &boneMap, int parentBone, math::Matrix globalInverseTransform, math::Matrix parentTransform);
+		void ProcessNode(aiNode* node, const aiScene* scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap);
+
+#pragma endregion
+
+
+		/* Converts assimp 4x4 matrix to glm::mat4x4
+		*/
+		math::Matrix convertAssimpMatrix(aiMatrix4x4 matrix) {
+			math::Matrix m;
+			m[0][0] = matrix.a1; m[0][1] = matrix.b1;  m[0][2] = matrix.c1;  m[0][3] = matrix.d1;
+			m[1][0] = matrix.a2; m[1][1] = matrix.b2;  m[1][2] = matrix.c2;  m[1][3] = matrix.d2;
+			m[2][0] = matrix.a3; m[2][1] = matrix.b3;  m[2][2] = matrix.c3;  m[2][3] = matrix.d3;
+			m[3][0] = matrix.a4; m[3][1] = matrix.b4;  m[3][2] = matrix.c4;  m[3][3] = matrix.d4;
+			return m;
+		}
+		void AssimpLoader::LoadModel(std::string path, resource::Model::ModelData &modelData)
 		{
-			resource::Model::ModelData modelData;
+			modelData = resource::Model::ModelData();
 			std::vector<std::shared_ptr<graphics::Mesh>> meshes;
 			std::string dir = path.substr(0, path.find_last_of("\\/"));
 			// Read file via ASSIMP
@@ -40,16 +76,17 @@ namespace thomas
 			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 			{
 				LOG("ERROR::ASSIMP " << importer.GetErrorString());
-				return modelData;
+				return;
 			}
 
+			SkeletonConstruct skelConstruct;
 
 			// Process ASSIMP's root node recursively
-			ProcessNode(scene->mRootNode, scene, modelData);
+			ProcessNode(scene->mRootNode, scene, modelData, skelConstruct);
 			
 			math::Matrix globalInverseTransform = math::Matrix((float*)&scene->mRootNode->mTransformation.Inverse());
-			ProcessSkeleton(scene->mRootNode, modelData, -1, globalInverseTransform, math::Matrix::Identity);
-			return modelData;
+			ProcessSkeleton(scene->mRootNode, modelData, skelConstruct, -1, globalInverseTransform, math::Matrix::Identity);
+			return;
 		}
 
 		std::string AssimpLoader::GetMaterialName(aiMaterial * material)
@@ -162,8 +199,8 @@ namespace thomas
 			return opacity;
 		}
 
-		void AssimpLoader::ProcessMesh(aiMesh * mesh, const aiScene* scene,
-			std::string meshName, resource::Model::ModelData& modelData, aiMatrix4x4& transform)
+		void ProcessMesh(aiMesh * mesh, const aiScene* scene,
+			std::string meshName, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap, aiMatrix4x4& transform)
 		{
 			graphics::Vertices vertices;
 			std::vector <unsigned int> indices;
@@ -241,20 +278,22 @@ namespace thomas
 					
 					unsigned int boneIndex = 0;
 					aiBone* meshBone = mesh->mBones[i];
+					aiNode *boneNode = scene->mRootNode->FindNode(meshBone->mName);
 					std::string boneName = meshBone->mName.C_Str();
-					if (modelData.boneMapping.find(boneName) == modelData.boneMapping.end()) //bone does not exist
+					if (boneMap.mapping.find(boneName) == boneMap.mapping.end()) //bone does not exist
 					{
-						boneIndex = modelData.boneInfo.size();
-						resource::Model::BoneInfo bi;
-						modelData.boneInfo.push_back(bi);
+						boneIndex = boneMap.boneInfo.size();
+						graphics::animation::Bone bi;
+						boneMap.boneInfo.push_back(bi);
 						
 					}
 					else //Bone already exists
-						boneIndex = modelData.boneMapping[boneName];
+						boneIndex = boneMap.mapping[boneName];
 
-					modelData.boneMapping[boneName] = boneIndex;
-					modelData.boneInfo[boneIndex].name = boneName;
-					modelData.boneInfo[boneIndex].offsetMatrix = math::Matrix((float*)&meshBone->mOffsetMatrix);
+					boneMap.mapping[boneName] = boneIndex;
+					boneMap.boneInfo[boneIndex]._boneName = boneName;
+					boneMap.boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix);
+					boneMap.boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
 
 					for (int j = 0; j < meshBone->mNumWeights; j++)
 					{
@@ -276,24 +315,24 @@ namespace thomas
 
 		}
 
-		void AssimpLoader::ProcessSkeleton(aiNode * node, resource::Model::ModelData & modelData, int parentBone, math::Matrix globalInverseTransform, math::Matrix parentTransform)
+		void ProcessSkeleton(aiNode * node, resource::Model::ModelData & modelData, SkeletonConstruct &boneMap, int parentBone, math::Matrix globalInverseTransform, math::Matrix parentTransform)
 		{
 			std::string boneName = node->mName.C_Str();
 
 			math::Matrix nodeTransform = math::Matrix((float*)&node->mTransformation);
 			math::Matrix globalTransform = nodeTransform * parentTransform;
 
-			if (modelData.boneMapping.find(node->mName.C_Str()) != modelData.boneMapping.end())
+			if (boneMap.mapping.find(node->mName.C_Str()) != boneMap.mapping.end())
 			{
-				unsigned int BoneIndex = modelData.boneMapping[boneName];
+				unsigned int BoneIndex = boneMap.mapping[boneName];
 				if (parentBone != -1)
-					modelData.boneInfo[BoneIndex].parentBone = parentBone;
+					boneMap.boneInfo[BoneIndex]._parentIndex = parentBone;
 				else
-					modelData.boneInfo[BoneIndex].parentBone = BoneIndex;
+					boneMap.boneInfo[BoneIndex]._parentIndex = BoneIndex;
 				parentBone = BoneIndex;
 				
-				modelData.boneInfo[BoneIndex].offsetMatrix =
-					(globalInverseTransform * globalTransform * modelData.boneInfo[BoneIndex].offsetMatrix).Transpose();
+				//boneMap.bones[BoneIndex].offsetMatrix =
+				//	(globalInverseTransform * globalTransform * boneMap.bones[BoneIndex].offsetMatrix).Transpose();
 			}
 			else
 			{
@@ -301,11 +340,11 @@ namespace thomas
 			}
 			for (unsigned int i = 0; i < node->mNumChildren; i++)
 			{
-				ProcessSkeleton(node->mChildren[i], modelData, parentBone, globalInverseTransform, globalTransform);
+				ProcessSkeleton(node->mChildren[i], modelData, boneMap, parentBone, globalInverseTransform, globalTransform);
 			}
 		}
 
-		void AssimpLoader::ProcessNode(aiNode * node, const aiScene * scene, resource::Model::ModelData& modelData)
+		void ProcessNode(aiNode * node, const aiScene * scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap)
 		{
 			std::string modelName(scene->mRootNode->mName.C_Str());
 			std::string nodeName(node->mName.C_Str());
@@ -318,13 +357,13 @@ namespace thomas
 				// The scene contains all the data, node is just to keep stuff organized (like relations between nodes).
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 				
-				ProcessMesh(mesh, scene, modelName + "-" + nodeName + "-" + std::to_string(i), modelData, node->mTransformation);
+				ProcessMesh(mesh, scene, modelName + "-" + nodeName + "-" + std::to_string(i), modelData, boneMap, node->mTransformation);
 			}
 			
 			// After we've processed all of the meshes (if any) we then recursively process each of the children nodes
 			for (unsigned int i = 0; i < node->mNumChildren; i++)
 			{
-				ProcessNode(node->mChildren[i], scene, modelData);
+				ProcessNode(node->mChildren[i], scene, modelData, boneMap);
 			}
 		}
 	}

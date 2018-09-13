@@ -5,8 +5,8 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			Skeleton::Skeleton(std::vector<Bone> &bones)
-				: _bones(bones)
+			Skeleton::Skeleton(std::vector<Bone> &boneInfo)
+				: _bones(boneInfo)
 			{
 			}
 

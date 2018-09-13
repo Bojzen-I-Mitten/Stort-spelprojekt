@@ -22,7 +22,7 @@ namespace thomas {
 				std::map<std::string, std::shared_ptr<Animation>> _animation;
 
 			public:
-				Skeleton(std::vector<Bone> &bones);
+				Skeleton(std::vector<Bone> &boneInfo);
 				~Skeleton();
 
 				Animation* getAnimation(const std::string &name);

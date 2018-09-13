@@ -16,19 +16,19 @@ namespace thomas
 	{
 		class Mesh;
 		class Texture;
+		namespace animation {
+			class Skeleton;
+			class Bone;
+		}
 	}
 	namespace utils
 	{
 
 		class AssimpLoader
 		{
-		private:
-			static void ProcessMesh(aiMesh* mesh, const aiScene* scene, std::string meshName, resource::Model::ModelData& modelData, aiMatrix4x4& transform);
-			static void ProcessSkeleton(aiNode* node, resource::Model::ModelData& modelData, int parentBone, math::Matrix globalInverseTransform, math::Matrix parentTransform);
-			static void ProcessNode(aiNode* node, const aiScene* scene, resource::Model::ModelData& modelData);
 		public:
 
-			static resource::Model::ModelData LoadModel(std::string path);
+			static void LoadModel(std::string path, resource::Model::ModelData &modelData);
 			
 			static std::string GetMaterialName(aiMaterial* material);
 			static int GetMaterialShadingModel(aiMaterial* material);

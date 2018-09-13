@@ -28,19 +28,14 @@ namespace thomas {
 
 		Model::Model(std::string path) : Resource(path)
 		{
-			m_data = std::move(utils::AssimpLoader::LoadModel(path));
+			utils::AssimpLoader::LoadModel(path, m_data);
 			m_bounds = GenerateBounds();
 		}
 		std::vector<std::shared_ptr<graphics::Mesh>> Model::GetMeshes()
 		{
 			return m_data.meshes;
 		}
-
-		std::vector<Model::BoneInfo> Model::GetBones()
-		{
-			return m_data.boneInfo;
-		}
-
+		
 		graphics::animation::Skeleton * Model::GetSkeleton()
 		{
 			return m_data.m_skeleton.get();
