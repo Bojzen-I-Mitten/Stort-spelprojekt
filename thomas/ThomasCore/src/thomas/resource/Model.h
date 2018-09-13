@@ -25,8 +25,10 @@ namespace thomas {
 			public:
 				ModelData();
 				~ModelData();
-				std::vector<std::shared_ptr<graphics::Mesh>> meshes;
+				std::vector<std::shared_ptr<graphics::Mesh>> m_meshes;
 				std::shared_ptr<graphics::animation::Skeleton> m_skeleton;
+
+				void clear();
 			};
 			Model(std::string path);
 
