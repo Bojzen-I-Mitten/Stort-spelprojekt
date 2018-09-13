@@ -2,7 +2,7 @@
 #include <vector>
 #include <map>
 #include "Bone.h"
-#include "Animation.h"
+#include "AnimationData.h"
 #include <memory>
 
 namespace thomas {

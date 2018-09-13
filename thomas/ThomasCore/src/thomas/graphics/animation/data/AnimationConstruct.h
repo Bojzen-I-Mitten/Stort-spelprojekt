@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "Bone.h"
-#include "Animation.h"
+#include "AnimationData.h"
 #include "ChannelKeys.h"
 
 

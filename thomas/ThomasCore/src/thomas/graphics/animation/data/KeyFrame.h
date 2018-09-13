@@ -6,7 +6,7 @@
 #include <cfloat>
 #include "ChannelKeys.h"
 #include "Channel.h"
-#include "Animation.h"
+#include "AnimationData.h"
 #include "../../../utils/Math.h"
 
 namespace thomas {
