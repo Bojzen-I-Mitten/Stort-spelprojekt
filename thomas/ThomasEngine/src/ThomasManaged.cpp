@@ -94,12 +94,19 @@ namespace ThomasEngine {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
 				{
-					gameObject->OnCollisionEnter();
+					
+
+					//if (gameObject->GetComponent<>(((thomas::object::component::Rigidbody*)nativePtr)).GetTargetCollider() != nullptr)
+					//{
+					//	/*msclr::interop::marshal_context context;
+					//	auto collider = gameObject->GetComponent<object::component::Rigidbody*>()->GetTargetCollider();
+					//	String^ name = gcnew String(collider->GetName().c_str());
+					//	gameObject->OnCollisionEnter(GameObject::Find(name));*/
+					//}
+					
 					gameObject->Update();
 				}
 			}
-
-
 
 			//Rendering
 

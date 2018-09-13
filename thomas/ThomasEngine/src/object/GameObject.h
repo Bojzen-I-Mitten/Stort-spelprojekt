@@ -135,7 +135,7 @@ namespace ThomasEngine
 			Monitor::Exit(m_componentsLock);
 		}
 
-		void OnCollisionEnter()
+		void OnCollisionEnter(GameObject^ collider)
 		{
 			Monitor::Enter(m_componentsLock);
 			if (Scene::CurrentScene->IsPlaying())
@@ -154,7 +154,7 @@ namespace ThomasEngine
 			{
 				Component^ component = m_components[i];
 				if (component->initialized && component->enabled)
-					component->OnCollisionEnter();
+					component->OnCollisionEnter(collider);
 			}
 			Monitor::Exit(m_componentsLock);
 		}

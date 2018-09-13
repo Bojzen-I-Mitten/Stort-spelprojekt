@@ -29,10 +29,7 @@ namespace ThomasEngine
 			thomas::math::Vector3(relPos.x, relPos.y, relPos.z));
 		}
 
-		bool HasCollided(GameObject^ collider)
-		{
-			return ((thomas::object::component::Rigidbody*)nativePtr)->HasCollided(((thomas::object::GameObject*)collider->nativePtr));
-		}
+
 
 		property bool IsKinematic 
 		{

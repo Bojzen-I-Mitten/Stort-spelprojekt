@@ -24,7 +24,6 @@ namespace thomas
 				void UpdateTransformToRigidBody();
 				void ApplyCentralForce(const math::Vector3 & force);
 				void ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos);
-				bool HasCollided(GameObject* collider);
 
 			public:
 				void SetKinematic(bool kinematic);
@@ -33,6 +32,7 @@ namespace thomas
 				void SetTargetCollider(GameObject* collider);
 
 			public:
+				GameObject* GetTargetCollider();
 				float GetMass();
 				bool IsKinematic();
 

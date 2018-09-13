@@ -19,7 +19,7 @@ namespace thomas
 				virtual void FixedUpdate() {};
 				virtual void OnDrawGizmos() {};
 				virtual void OnDrawGizmosSelected() {};
-				virtual void OnCollisionEnter() {};
+				virtual void OnCollisionEnter(GameObject* collider) {};
 
 			public:
 				bool initialized = false;
