@@ -1,5 +1,6 @@
 #include "AnimatedSkeleton.h"
 #include "AnimationNode.h"
+#include "AnimPlayback.h"
 #include "data/Skeleton.h"
 
 namespace thomas {
@@ -7,7 +8,7 @@ namespace thomas {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref)
-				: _ref(ref), _root(), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
+				: _ref(ref), _root(new AnimPlayback(ref)), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
 			{
 				updateSkeleton();
 			}

@@ -171,9 +171,9 @@ namespace thomas {
 			template<unsigned int N>
 			void  KeyFrame<N>::updateFrame(unsigned int chInd, float eT) {
 				//Update keys if necesary
-				if (eT < m_to[chInd]._time)
+				if (eT > m_to[chInd]._time)
 					nextKey(chInd, eT);
-				else if (m_from[chInd - 1]._time < eT)
+				else if (eT < m_from[chInd]._time)
 					previousKey(chInd, eT);
 			}
 
