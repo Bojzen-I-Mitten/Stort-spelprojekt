@@ -43,9 +43,7 @@ cbuffer ThomasPerObject
 {
 	float4x4 thomas_ObjectToWorld;
 	float4x4 thomas_WorldToObject;
-#ifdef SKINNED
 	float4x4 thomas_Bone_Array[120];
-#endif
 };
 
 

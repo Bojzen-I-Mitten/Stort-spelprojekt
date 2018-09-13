@@ -102,19 +102,45 @@ namespace ThomasEngine
 			path = path + modifier + extension;
 			Monitor::Enter(resourceLock);
 			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-			serializserSettings->PreserveObjectReferences = true;
-			serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
 
-			fi->Directory->Create();
-			Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-			settings->Indent = true;
-			Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
-			resource->Rename(path);
-			serializer->WriteObject(file, resource);
-			file->Close();
+			resource->Rename(path);	// Set file name
+
+			Xml::XmlWriter^ file;
+			try {
+				System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
+				fi->Directory->Create();
+				// Create xml writer
+				Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+				settings->Indent = true;
+				file = Xml::XmlWriter::Create(path, settings);
+			}
+			catch (Exception^ e) {
+				std::string err("Failed to create resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+				LOG(err);
+				return;
+			}
+			try {
+				// Serialization Settings
+				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+				serializserSettings->PreserveObjectReferences = true;
+				serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
+				// Spawn serializer
+				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+				serializer->WriteObject(file, resource);
+			}
+			catch (Exception^ e) {
+				std::string err("Failed to serialize resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+				LOG(err);
+				return;
+			}
+
+			try {
+				file->Close();
+			}
+			catch (Exception^ e) {
+				std::string err("Failed to write resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+				return;
+			}
 			resources[System::IO::Path::GetFullPath(path)] = resource;
 			Monitor::Exit(resourceLock);
 		}

@@ -227,8 +227,10 @@ namespace thomas
 
 			ID3DX11Effect* effect = NULL;
 			
-			if (!Compile(path, &effect))
-				Compile(s_failedShader->m_path, &effect);
+			if (!Compile(path, &effect)) {
+				if (!Compile(s_failedShader->m_path, &effect))
+					throw std::exception("Fallback shader failed to compile...!");
+			}
 
 			Shader* shader = new Shader(effect, path);
 			s_loadedShaders.push_back(shader);

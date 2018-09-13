@@ -211,13 +211,12 @@ inline float4 ThomasObjectToWorldNormal(in float4 norm)
 	return float4(ThomasObjectToWorldDir(norm.xyz), 0);
 }
 
-inline float4 ThomasSkinVertex(in out float4 position, in out float3 normal, in float4 weight, int4 boneInd)
+inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in float4 weight, int4 boneInd)
 {
-#ifdef SKINNING
-	float4 coord = weight.x * (thomas_Bone_Array[boneInd.x] * position);
-    coord += weight.y * (thomas_Bone_Array[boneInd.y] * position);
-    coord += weight.z * (thomas_Bone_Array[boneInd.z] * position);
-    coord += weight.w * (thomas_Bone_Array[boneInd.w] * position);
+	float4 coord = weight.x * mul(thomas_Bone_Array[boneInd.x], position);
+    coord += weight.y * mul(thomas_Bone_Array[boneInd.y], position);
+    coord += weight.z * mul(thomas_Bone_Array[boneInd.z], position);
+    coord += weight.w * mul(thomas_Bone_Array[boneInd.w], position);
 	position = coord;
 	
     float3 norm =	weight.x * (mul((float3x3) thomas_Bone_Array[boneInd.x], normal));
@@ -225,7 +224,6 @@ inline float4 ThomasSkinVertex(in out float4 position, in out float3 normal, in 
     norm		+=	weight.z * (mul((float3x3) thomas_Bone_Array[boneInd.z], normal));
     norm		+=	weight.w * (mul((float3x3) thomas_Bone_Array[boneInd.w], normal));
     normal = norm;
-#endif
 }
 
 
