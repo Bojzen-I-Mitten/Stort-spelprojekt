@@ -27,7 +27,7 @@ namespace ThomasEngine
 				m_currentProject = value;
 				Scene^ currentScene;
 				if (m_currentProject->currentScenePath)
-					currentScene = Scene::LoadScene(m_currentProject->currentScenePath);
+					currentScene = Scene::LoadScene(m_currentProject->assetPath + "\\" + m_currentProject->currentScenePath);
 				
 				if (currentScene)
 					Scene::CurrentScene = currentScene;

@@ -25,7 +25,7 @@ namespace ThomasEngine
 	{
 		ThomasWrapper::Selection->UnselectGameObjects();
 		s_currentScene = value;
-		if(Application::currentProject)
+		if(Application::currentProject && !ScriptingManger::reloading)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
 	}
 
@@ -49,7 +49,7 @@ namespace ThomasEngine
 		serializer->WriteObject(file, scene);
 		file->Close();
 		
-		if (Application::currentProject && scene->RelativeSavePath != path) {
+		if (Application::currentProject && scene->RelativeSavePath != path && !ScriptingManger::reloading) {
 			scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
 			Application::currentProject->currentScenePath = scene->RelativeSavePath;
 		}
@@ -58,8 +58,8 @@ namespace ThomasEngine
 
 	void Scene::SaveScene(Scene ^ scene)
 	{
-		if(scene->RelativeSavePath)
-			SaveSceneAs(scene, scene->RelativeSavePath);
+		if(Application::currentProject && scene->RelativeSavePath)
+			SaveSceneAs(scene, Application::currentProject->assetPath + "\\" + scene->RelativeSavePath);
 	}
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath)

@@ -3,15 +3,15 @@
 
 String^ ThomasEngine::Project::currentScenePath::get()
 {
-	if (m_relativeCurrentScenePath) 
-		return Resources::ConvertToThomasPath(m_path + "\\" + m_relativeCurrentScenePath); 
+	if (m_relativeCurrentScenePath)
+		return m_relativeCurrentScenePath;
 	else 
 		return nullptr;
 }
 
 void ThomasEngine::Project::currentScenePath::set(String^ value)
 {
-	if(value)
-		m_relativeCurrentScenePath = Resources::ConvertToRealPath(value);
+	if (value)
+		m_relativeCurrentScenePath = value;
 	Save();
 }
