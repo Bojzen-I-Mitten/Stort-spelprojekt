@@ -19,6 +19,7 @@ namespace thomas
 					VECTOR,
 					COLOR,
 					MATRIX,
+					MATRIX_ARRAY,
 					SHADER_RESOURCE,
 					CONSTANT_BUFFER,
 					TEXTURE2D
