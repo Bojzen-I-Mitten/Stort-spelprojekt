@@ -11,6 +11,7 @@
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
 #include "..\Window.h"
+#include "RenderConstants.h"
 
 namespace thomas
 {
@@ -25,7 +26,7 @@ namespace thomas
 			float realDeltaTime = ThomasTime::GetActualDeltaTime();
 			float dt = ThomasTime::GetDeltaTime();
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
-			resource::Shader::SetGlobalVector("thomas_DeltaTime", thomas_DeltaTime);
+			resource::Shader::SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
 		}
 
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
@@ -41,11 +42,11 @@ namespace thomas
 			ThomasCore::GetDeviceContext()->RSSetViewports(1, camera->GetViewport().Get11());
 
 			//Set global camera properties
-			resource::Shader::SetGlobalMatrix("thomas_MatrixP", camera->GetProjMatrix().Transpose());
-			resource::Shader::SetGlobalMatrix("thomas_MatrixV", camera->GetViewMatrix().Transpose());
-			resource::Shader::SetGlobalMatrix("thomas_MatrixInvV", camera->GetViewMatrix().Invert());
-			resource::Shader::SetGlobalMatrix("thomas_MatrixVP", camera->GetViewProjMatrix().Transpose());	
-			resource::Shader::SetGlobalVector("_WorldSpaceCameraPos", (math::Vector4)camera->GetPosition());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, camera->GetProjMatrix().Transpose());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW, camera->GetViewMatrix().Transpose());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, camera->GetViewMatrix().Invert());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, camera->GetViewProjMatrix().Transpose());
+			resource::Shader::SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, (math::Vector4)camera->GetPosition());
 		}
 
 		void Renderer::ClearCommands()
@@ -66,11 +67,11 @@ namespace thomas
 		void Renderer::BindObject(RenderCommand &rC)
 		{
 			thomas::resource::shaderproperty::ShaderProperty* prop;
-			rC.material->SetMatrix("thomas_ObjectToWorld", rC.worldMatrix.Transpose());
-			rC.material->ApplyProperty("thomas_ObjectToWorld");
+			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, rC.worldMatrix.Transpose());
+			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
 
-			rC.material->SetMatrix("thomas_WorldToObject", rC.worldMatrix.Invert());
-			rC.material->ApplyProperty("thomas_WorldToObject");
+			rC.material->SetMatrix(THOMAS_MATRIX_WORLD_INV, rC.worldMatrix.Invert());
+			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
 				rC.local_prop[i]->Apply(rC.material->GetShader());

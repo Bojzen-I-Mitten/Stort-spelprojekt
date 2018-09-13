@@ -2,14 +2,17 @@
 #include "AnimationNode.h"
 #include "AnimPlayback.h"
 #include "data/Skeleton.h"
+#include "../RenderConstants.h"
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref)
-				: _ref(ref), _root(), _pose(ref.getNumBones()), _skinTransform(ref.getNumBones())
+			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) : 
+				resource::shaderproperty::ShaderPropertyMatrixArray(ref.getNumBones()),
+				_ref(ref), _root(), _pose(ref.getNumBones())
 			{
+				SetName(THOMAS_MATRIX_SKIN_ARRAY);
 				clearBlendTree();
 				updateSkeleton();
 			}
@@ -28,13 +31,13 @@ namespace thomas {
 			{
 				//Update animation tree
 				// Update skin transforms
-				_pose[0] = _root->calcLocalTransform(0);
-				_skinTransform[0] = _pose[0] * _ref.getBone(0)._invBindPose;
+				_pose[0] = _root->calcLocalTransform(0);								//	Update root pose
+				Matrix(0) = _pose[0] * _ref.getBone(0)._invBindPose;					//	Update root skin
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
-					_pose[i] = _pose[bone._parentIndex] * _root->calcLocalTransform(i);
-					_skinTransform[i] = _pose[i] * bone._invBindPose;
+					_pose[i] = _pose[bone._parentIndex] * _root->calcLocalTransform(i);	//	Update root pose
+					Matrix(i) = _pose[i] * bone._invBindPose;							//	Update root skin
 				}
 			}
 			/* Freeze the current animation */
@@ -69,6 +72,10 @@ namespace thomas {
 			{
 				assert(bone < _pose.size());
 				return _pose[bone];
+			}
+			const resource::shaderproperty::ShaderPropertyMatrixArray * AnimatedSkeleton::getShaderProperty()
+			{
+				return this;
 			}
 		}
 	}

@@ -11,9 +11,11 @@ namespace thomas
 	{
 		namespace component
 		{
-			RenderSkinnedComponent::RenderSkinnedComponent()
-				: m_skeleton() {
 
+
+			RenderSkinnedComponent::RenderSkinnedComponent()
+				: m_skeleton() 
+			{
 			}
 			RenderSkinnedComponent::~RenderSkinnedComponent() {
 

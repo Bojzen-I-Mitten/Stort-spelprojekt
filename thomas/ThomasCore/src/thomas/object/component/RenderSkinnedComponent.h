@@ -23,6 +23,7 @@ namespace thomas
 
 			public:
 				std::unique_ptr<graphics::animation::AnimatedSkeleton> m_skeleton;
+				std::unique_ptr<resource::shaderproperty::ShaderProperty> m_skinArray;
 			private:
 			};
 		}

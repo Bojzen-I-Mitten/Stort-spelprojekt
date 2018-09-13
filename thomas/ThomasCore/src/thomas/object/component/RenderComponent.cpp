@@ -5,6 +5,7 @@
 #include "../GameObject.h"
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
+#include "../../resource/ShaderProperty/ShaderProperty.h"
 
 namespace thomas {
 	namespace object {
@@ -113,6 +114,18 @@ namespace thomas {
 
 				thomas::graphics::Renderer::SubmitCommand(
 					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
+			}
+
+			void RenderComponent::insertProperty(resource::shaderproperty::ShaderProperty * prop)
+			{
+				assert(prop);
+				for (unsigned int i = 0; i < m_properties.size(); i++) {
+					if (m_properties[i]->equals(*prop)) {	// If equals ->
+						m_properties[i] = prop;				// Insert
+						return;
+					}
+				}
+				m_properties.push_back(prop);				// Otherwise: append
 			}
 
 			void RenderComponent::OnDrawGizmos()

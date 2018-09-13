@@ -38,7 +38,9 @@ namespace thomas
 				virtual void SubmitPart(Camera* camera, unsigned int i);
 			protected:
 				std::vector<resource::Material*> m_materials;
-				
+				/*	Insert a shader property for rendering component
+				*/
+				void insertProperty(resource::shaderproperty::ShaderProperty* prop);
 			private:
 				static std::vector<RenderComponent*> s_renderComponents;
 				std::vector< resource::shaderproperty::ShaderProperty*> m_properties;

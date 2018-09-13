@@ -2,6 +2,7 @@
 #include <vector>
 #include <math.h>
 #include "../../utils/Math.h"
+#include "../../resource/ShaderProperty/ShaderPropertyMatrix.h"
 
 namespace thomas {
 	namespace graphics {
@@ -10,7 +11,8 @@ namespace thomas {
 			class Skeleton;
 			class AnimationNode;
 
-			class AnimatedSkeleton
+			class AnimatedSkeleton :
+				protected resource::shaderproperty::ShaderPropertyMatrixArray	// Skin Transforms in model space
 			{
 			public:
 				AnimatedSkeleton(Skeleton& ref);
@@ -36,11 +38,12 @@ namespace thomas {
 				*/
 				const math::Matrix& getBoneMatrix(unsigned int bone) const;
 
+				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
+
 			private:
 				Skeleton& _ref;								// Reference to the mesh skeleton
-				std::unique_ptr<AnimationNode> _root;						// Root in the blend tree
+				std::unique_ptr<AnimationNode> _root;		// Root in the blend tree
 				std::vector<math::Matrix> _pose;			// Bone transform in model space
-				std::vector<math::Matrix> _skinTransform;	// Skin Transforms in model space
 			private:
 				void updateSkeleton();
 			};

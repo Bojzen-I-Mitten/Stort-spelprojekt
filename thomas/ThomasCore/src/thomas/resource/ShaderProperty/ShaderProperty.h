@@ -29,11 +29,13 @@ namespace thomas
 
 				virtual void Apply(std::string name, Shader* shader) const = 0;
 				void Apply(Shader* shader) const;
+				bool equals(const ShaderProperty &other) const;
 
 			public:
 				Type GetType() const;
 				std::string GetName() const;
 				void SetName(std::string name);
+
 			private:
 				std::string m_name;
 				Type m_type;
