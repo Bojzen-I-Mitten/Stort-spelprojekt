@@ -6,7 +6,7 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderProperty
 			{
@@ -27,12 +27,12 @@ namespace thomas
 
 				ShaderProperty(Type type);
 
-				virtual void Apply(std::string name, Shader* shader) = 0;
-				void Apply(Shader* shader);
+				virtual void Apply(std::string name, Shader* shader) const = 0;
+				void Apply(Shader* shader) const;
 
 			public:
-				Type GetType();
-				std::string GetName();
+				Type GetType() const;
+				std::string GetName() const;
 				void SetName(std::string name);
 			private:
 				std::string m_name;

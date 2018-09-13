@@ -6,14 +6,14 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyTexture2D : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyTexture2D(Texture2D* value) : ShaderProperty(Type::TEXTURE2D), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
+				void Apply(std::string name, Shader* shader) const
 				{
 					if (m_value)
 					{

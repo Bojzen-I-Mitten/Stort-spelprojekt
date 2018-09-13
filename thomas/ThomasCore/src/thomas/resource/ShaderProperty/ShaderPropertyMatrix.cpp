@@ -5,14 +5,14 @@ namespace thomas
 {
 	namespace resource
 	{
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 #pragma region MatrixProperty
 
 			ShaderPropertyMatrix::ShaderPropertyMatrix(math::Matrix value) 
 				: ShaderProperty(Type::MATRIX), m_value(value) 
 			{}
-			void ShaderPropertyMatrix::Apply(std::string name, Shader* shader)
+			void ShaderPropertyMatrix::Apply(std::string name, Shader* shader) const
 			{
 
 				shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrix(*m_value.m);
@@ -39,7 +39,8 @@ namespace thomas
 			{
 				std::memcpy(m_value.get(), value, num_matrix * sizeof(math::Matrix));
 			}
-			void ShaderPropertyMatrixArray::Apply(std::string name, Shader* shader) {
+			void ShaderPropertyMatrixArray::Apply(std::string name, Shader* shader) const
+			{
 
 				shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrixArray(reinterpret_cast<const float*>(m_value.get()[0][0]), m_offset, m_num_matrix);
 			}

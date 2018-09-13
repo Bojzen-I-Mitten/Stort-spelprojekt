@@ -6,14 +6,14 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyMatrix : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyMatrix(math::Matrix value);
-				void Apply(std::string name, Shader* shader);
+				void Apply(std::string name, Shader* shader) const;
 				static ShaderProperty* GetDefault();
 				math::Matrix GetValue();
 			private:
@@ -28,7 +28,7 @@ namespace thomas
 			public:
 				ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int num_matrix);
 				ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int offset, unsigned int num_matrix);
-				void Apply(std::string name, Shader* shader);
+				void Apply(std::string name, Shader* shader) const;
 				static ShaderProperty* GetDefault();
 				math::Matrix* GetValue();
 			private:

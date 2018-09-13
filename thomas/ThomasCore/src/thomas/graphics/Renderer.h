@@ -41,7 +41,7 @@ namespace thomas
 			Mesh* mesh;														// Rendered mesh
 			resource::Material* material;									// Material used for rendering
 			unsigned int num_local_prop;									// Number of local properties
-			const resource::shaderproperty::ShaderProperty * local_prop;	// Properties local to rendered object
+			const resource::shaderproperty::ShaderProperty ** local_prop;	// Properties local to rendered object
 
 			RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam) :
 				camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(0), local_prop(NULL) {};
@@ -58,7 +58,7 @@ namespace thomas
 		private:
 
 			static void BindFrame();
-			static void BindObject(thomas::resource::Material* material, const thomas::math::Matrix& worldMatrix);
+			static void BindObject(RenderCommand & rC);
 						
 		public:
 			static void BindCamera(thomas::object::component::Camera* camera);

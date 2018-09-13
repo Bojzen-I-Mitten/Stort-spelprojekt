@@ -7,6 +7,7 @@
 #include "..\ThomasTime.h"
 #include "..\resource\Material.h"
 #include "..\resource\Shader.h"
+#include "..\resource\ShaderProperty\ShaderProperty.h"
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
 #include "..\Window.h"
@@ -62,16 +63,17 @@ namespace thomas
 			s_lastFramesCommands = s_renderCommands;
 		}
 
-		void Renderer::BindObject(thomas::resource::Material * material, const thomas::math::Matrix& worldMatrix)
+		void Renderer::BindObject(RenderCommand &rC)
 		{
-			thomas::resource::shaderProperty::ShaderProperty* prop;
-			material->SetMatrix("thomas_ObjectToWorld", worldMatrix.Transpose());
-			material->ApplyProperty("thomas_ObjectToWorld");
+			thomas::resource::shaderproperty::ShaderProperty* prop;
+			rC.material->SetMatrix("thomas_ObjectToWorld", rC.worldMatrix.Transpose());
+			rC.material->ApplyProperty("thomas_ObjectToWorld");
 
-			material->SetMatrix("thomas_WorldToObject", worldMatrix.Invert());
-			material->ApplyProperty("thomas_WorldToObject");
+			rC.material->SetMatrix("thomas_WorldToObject", rC.worldMatrix.Invert());
+			rC.material->ApplyProperty("thomas_WorldToObject");
 
-			material->SetMatrix
+			for (unsigned int i = 0; i < rC.num_local_prop; i++)
+				rC.local_prop[i]->Apply(rC.material->GetShader());
 		}
 
 		void Renderer::ProcessCommands()
@@ -88,7 +90,7 @@ namespace thomas
 					material->Bind();
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
-						BindObject(material, perMeshCommand.worldMatrix);
+						BindObject(perMeshCommand);
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
