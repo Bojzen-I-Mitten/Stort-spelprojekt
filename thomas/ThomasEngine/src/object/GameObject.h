@@ -225,12 +225,11 @@ namespace ThomasEngine
 			((Component^)component)->setGameObject(this);
 			m_components.Add((Component^)component);
 			
-			if ((typ->IsDefined(ExecuteInEditor::typeid, false) || scene->IsPlaying()) && !component->initialized && component->enabled)
+			if ((typ->IsDefined(ExecuteInEditor::typeid, false) || scene->IsPlaying()) && !component->initialized)
 			{
 				component->Awake();
 				component->initialized = true;
 				component->enabled = true;
-				component->OnEnable(); //<---- MORGAN, DEN FLIPPADE INTE ÖVER TROTTS ATT m_enable VAR FALSE TILL ATT BÖRJA MED
 				component->Start();
 			}
 

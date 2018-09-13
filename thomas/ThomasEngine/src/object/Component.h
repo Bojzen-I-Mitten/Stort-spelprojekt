@@ -21,7 +21,7 @@ namespace ThomasEngine
 	{
 		Component();
 	private:
-		bool m_enabled = true;
+		bool m_enabled = false;
 	internal:
 		Component(thomas::object::component::Component* ptr);
 		
