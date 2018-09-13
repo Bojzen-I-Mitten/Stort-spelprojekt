@@ -106,7 +106,7 @@ namespace ThomasEngine
 
 		static void CreateResource(Resource^ resource, String^ path)
 		{
-			path = GetUniqueName(path);
+			path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
 			Monitor::Enter(resourceLock);
 			using namespace System::Runtime::Serialization;
 			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
