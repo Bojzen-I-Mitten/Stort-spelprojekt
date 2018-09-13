@@ -15,9 +15,6 @@ namespace ThomasEngine
 		static String^ objPath;
 		static Assembly^ assembly;
 		static bool shouldReload = false;
-		
-	internal:
-		static bool reloading = false;
 	public:
 		
 		delegate void ScriptReloadBegin();

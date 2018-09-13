@@ -8,6 +8,7 @@ namespace ThomasEngine
 	void Scene::Play()
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
+		savingEnabled = false;
 		SaveSceneAs(this, tempFile);
 		m_playing = true;
 		//for each(GameObject^ gObj in m_gameObjects)
@@ -25,7 +26,7 @@ namespace ThomasEngine
 	{
 		ThomasWrapper::Selection->UnselectGameObjects();
 		s_currentScene = value;
-		if(Application::currentProject && !ScriptingManger::reloading)
+		if(Application::currentProject && savingEnabled)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
 	}
 
@@ -49,7 +50,7 @@ namespace ThomasEngine
 		serializer->WriteObject(file, scene);
 		file->Close();
 		
-		if (Application::currentProject && scene->RelativeSavePath != path && !ScriptingManger::reloading) {
+		if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
 			scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
 			Application::currentProject->currentScenePath = scene->RelativeSavePath;
 		}
@@ -81,7 +82,7 @@ namespace ThomasEngine
 
 			scene->PostLoad();
 			s_loading = false;
-			if(Application::currentProject)
+			if(Application::currentProject && savingEnabled)
 				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
 			return scene;
 		}
@@ -100,6 +101,7 @@ namespace ThomasEngine
 		Scene::CurrentScene = Scene::LoadScene(tempFile);
 		System::IO::File::Delete(tempFile);
 		Monitor::Exit(lock);
+		savingEnabled = true;
 	}
 
 	void Scene::UnLoad()
