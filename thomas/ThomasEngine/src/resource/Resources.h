@@ -67,6 +67,9 @@ namespace ThomasEngine
 			}
 		}
 
+		static void Resources::SavePrefab(GameObject ^ gameObject, String ^ path);
+		static GameObject ^ Resources::LoadPrefab(String^ path);
+
 		static void SaveResource(Resource^ resource)
 		{
 			
