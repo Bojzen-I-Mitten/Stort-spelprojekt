@@ -75,11 +75,17 @@ namespace ThomasEngine.Network
         }
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+            if (isServer)
+                ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+            else
+                ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
         }
         private void Listener_PeerConnectedEvent(NetPeer peer)
         {
+            if(isServer)
             ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
+            else
+                ThomasEngine.Debug.Log("You are now connected with the server" + peer.EndPoint.ToString());
         }
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
@@ -140,15 +146,18 @@ namespace ThomasEngine.Network
         {
             NetDataWriter writer = new NetDataWriter();
             writer.Put((int)PacketType.EVENT);
-
             netPacketProcessor.Write<T>(writer, data);
             netManager.SendToAll(writer, method);
         }
         public void WriteData(NetDataWriter writer)
         {
-            writer.Put((int)PacketType.DATA);
+           // writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
+            {
+                writer.Put((int)PacketType.DATA);
+                writer.Put(id.ID);
                 id.Write(writer);
+            }
         }
         public void WriteData(DeliveryMethod method)
         {
