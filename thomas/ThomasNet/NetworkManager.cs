@@ -126,7 +126,10 @@ namespace ThomasEngine.Network
         }
         public override void Destroy()
         {
-            netManager.Stop();
+            if (netManager != null)
+            {
+                netManager.Stop();
+            }
             base.Destroy();
         }
         public int Register(NetworkID netID)

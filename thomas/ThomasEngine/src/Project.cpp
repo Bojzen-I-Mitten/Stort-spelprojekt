@@ -4,7 +4,7 @@
 String^ ThomasEngine::Project::currentScenePath::get()
 {
 	if (m_relativeCurrentScenePath) 
-		return Resources::ConvertToThomasPath(m_path + "\\" + m_relativeCurrentScenePath); 
+		return Resources::ConvertToThomasPath(/*m_path + "\\" + */m_relativeCurrentScenePath); 
 	else 
 		return nullptr;
 }
