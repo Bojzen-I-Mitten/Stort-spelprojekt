@@ -18,7 +18,6 @@ namespace thomas
 		class Texture;
 		namespace animation {
 			class Skeleton;
-			class Bone;
 		}
 	}
 	namespace utils

@@ -20,7 +20,7 @@ namespace thomas
 			std::map<std::string, unsigned int> mapping;
 			std::vector<graphics::animation::Bone> boneInfo;
 			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
-			graphics::animation::Skeleton* getSkeleton() {
+			graphics::animation::Skeleton* generateSkeleton() {
 				if (boneInfo.size() == 0)
 					return nullptr;
 				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(boneInfo);
@@ -86,6 +86,9 @@ namespace thomas
 			
 			math::Matrix globalInverseTransform = math::Matrix((float*)&scene->mRootNode->mTransformation.Inverse());
 			ProcessSkeleton(scene->mRootNode, modelData, skelConstruct, -1, globalInverseTransform, math::Matrix::Identity);
+
+			if (skelConstruct.hasSkeleton())
+				modelData.m_skeleton = std::shared_ptr<graphics::animation::Skeleton>(skelConstruct.generateSkeleton());
 			return;
 		}
 
@@ -291,6 +294,7 @@ namespace thomas
 						boneIndex = boneMap.mapping[boneName];
 
 					boneMap.mapping[boneName] = boneIndex;
+					boneMap.boneInfo[boneIndex]._boneIndex = boneIndex;
 					boneMap.boneInfo[boneIndex]._boneName = boneName;
 					boneMap.boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix);
 					boneMap.boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
