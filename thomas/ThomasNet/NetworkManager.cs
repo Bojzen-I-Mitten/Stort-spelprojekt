@@ -30,7 +30,7 @@ namespace ThomasEngine.Network
     {
         Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
         int iD = -1;
-
+        int validationID = -5;
         private readonly NetPacketProcessor netPacketProcessor = new NetPacketProcessor();
         private EventBasedNetListener listener;
         private NetManager netManager;
@@ -96,8 +96,12 @@ namespace ThomasEngine.Network
                     case PacketType.DATA:
                         while (reader.AvailableBytes > 0)
                         {
-                            networkIDObjects[reader.GetInt()].Read(reader);
-                        }
+                        
+                            if(networkIDObjects.Count() >= (validationID = reader.GetInt()))
+                            networkIDObjects[validationID].Read(reader);
+                            else
+                            reader.Clear();
+                    }
                         break;
                     case PacketType.EVENT:
                         netPacketProcessor.ReadAllPackets(reader);
