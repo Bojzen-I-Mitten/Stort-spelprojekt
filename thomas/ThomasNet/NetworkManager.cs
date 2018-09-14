@@ -55,8 +55,10 @@ namespace ThomasEngine.Network
         public bool isServer { get; set; } = false;
         public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject player { get; set; }
+        public static int ping = 2;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
+        public List<NetPeer> netPeers;
 
         private float serverTime;
 
@@ -79,6 +81,9 @@ namespace ThomasEngine.Network
             netPacketProcessor = new NetPacketProcessor();
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
+            netPeers = new List<NetPeer>();
+             writer = new NetDataWriter();
+                        
 
             writer = new NetDataWriter();
             spawnablePrefabs = new List<GameObject>();
@@ -136,13 +141,14 @@ namespace ThomasEngine.Network
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-
-            PacketType type = (PacketType)reader.GetInt();
-            switch (type)
-            {
-                case PacketType.DATA:
-                    while (reader.AvailableBytes > 0)
-                    {
+            if (isClient)
+                GetPing();
+                PacketType type = (PacketType)reader.GetInt();
+                switch (type)
+                {
+                    case PacketType.DATA:
+                        while (reader.AvailableBytes > 0)
+                        {
 
                         validationID = reader.GetInt();
                         if (networkIDObjects.ContainsKey(validationID))
@@ -261,31 +267,17 @@ namespace ThomasEngine.Network
             });
         }
 
-        public void SpawnObject(Spawner spawner, NetPeer peer)
+        public void GetPing()
         {
-            //Debug.Log("Test");
-            if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
+           
+            netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
+
+            for(int i=0;i<netPeers.Count;i++)
             {
-                GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
+               
+                ping = netPeers[i].Ping;
+                
             }
-            else if(spawner.prefabID == -1)
-            {
-                GameObject.Instantiate(player, spawner.position, spawner.rotation);
-            }
-            else
-            {
-                Debug.Log("Tried spawning object not in NetworkManager prefab list");
-            }
-        }
-        
-        public void SpawnPlayerCharacter()
-        {
-            GameObject gObj = GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
-            Spawner spawner = new Spawner
-            {
-                netID = gObj.GetComponent<NetworkID>().ID
-            };
-            SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
         }
     }
 }
