@@ -1,16 +1,12 @@
 #pragma once
 
 #pragma managed
-#include <string>
-#include <msclr\marshal_cppstd.h>
 
 #using "PresentationFramework.dll"
 
 
 namespace ThomasEngine {
 	ref class GameObject;
-
-	
 	public ref class Scene
 	{
 		bool m_playing;
@@ -26,6 +22,10 @@ namespace ThomasEngine {
 			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
 			m_gameObjects.CollectionChanged += sceneChanged;
 		}
+
+	internal:
+		static bool savingEnabled = true;
+
 	public:
 
 		static System::Collections::Specialized::NotifyCollectionChangedEventHandler^ sceneChanged;

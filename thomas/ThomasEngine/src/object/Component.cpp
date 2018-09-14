@@ -6,6 +6,32 @@
 ThomasEngine::Component::Component() : Object(new thomas::object::component::Component())
 {
 	setGameObject(GameObject::s_lastObject);
+
+}
+
+
+void ThomasEngine::Component::LoadExternalComponents()
+{
+	array<String^>^ dlls = Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly);
+
+	List<System::Type^>^ types = gcnew List<System::Type^>();
+	for (int i = 0; i < dlls->Length; i++) {
+		Assembly^ assembly = Assembly::LoadFrom(dlls[i]);
+		List<System::Type^>^ exportedTypes = gcnew List<System::Type^>(assembly->GetExportedTypes());
+		types->AddRange(exportedTypes);
+	}
+	
+	for (int i = 0; i < types->Count; i++)
+	{
+		if (!Component::typeid->IsAssignableFrom(types[i]))
+		{
+			types->RemoveAt(i);
+			i--;
+		}
+	}
+
+	externalTypes = types;
+
 }
 
 ThomasEngine::Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
@@ -35,7 +61,7 @@ void ThomasEngine::Component::OnCollisionEnter(GameObject ^ collider)
 void ThomasEngine::Component::Destroy()
 {
 	Monitor::Enter(m_gameObject->m_componentsLock);
-	OnDestroy();
+	this->enabled = false;
 	for (int i = 0; i < ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.size(); i++)
 	{
 		auto component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
@@ -49,14 +75,13 @@ void ThomasEngine::Component::Destroy()
 	
 
 	m_gameObject->Components->Remove(this);
-	thomas::object::Object::Destroy(nativePtr);
+	Object::Destroy();
 	Monitor::Exit(m_gameObject->m_componentsLock);
 }
 
 List<Type^>^ ThomasEngine::Component::GetAllComponentTypes()
 {
-	List<System::Type^>^ types = gcnew List<System::Type^>(System::Reflection::Assembly::GetAssembly(Scene::typeid)->GetExportedTypes());
-	
+	List<System::Type^>^ types = gcnew List<System::Type^>(externalTypes);
 
 	Assembly^ scriptAssembly = ScriptingManger::GetAssembly();
 	if (scriptAssembly)
@@ -74,6 +99,10 @@ List<Type^>^ ThomasEngine::Component::GetAllComponentTypes()
 		}
 	}
 	return types;
+}
+
+String^ ThomasEngine::Component::Name::get() {
+	return gameObject->Name + " (" + this->GetType()->Name + ")";
 }
 
 List<Type^>^ ThomasEngine::Component::GetAllAddableComponentTypes()

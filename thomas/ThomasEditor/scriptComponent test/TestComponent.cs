@@ -14,22 +14,26 @@ namespace ThomasEditor
         public AudioClip audioClip { get; set; }
         public Material mat { get; set; }
         public Model m { get; set; }
+        public GameObject coolPrefab { get; set; }
+        public RenderComponent otherObjectsRender { get; set; }
 
         float t = 0;
 
         public override void Start()
         {
-           // m.GenerateBones(gameObject);
+            // m.GenerateBones(gameObject);
+            GameObject.Instantiate(coolPrefab, new Vector3(10, 10, 10), new Quaternion());
+            //otherObjectsRender.Destroy();
+
+            List<Component> c = ThomasEngine.Object.GetObjectsOfType<Component>();
         }
 
         public override void Update()
         {
-            //t += Time.DeltaTime;
-            //gameObject.transform.position = new Vector3(0, (float)posCurve.GetYFromX((t*6.5) % 5), 0);
-            //gameObject.transform.scale = new Vector3((float)scaleCurve.GetYFromX((t*6.5) % 5), 1, (float)scaleCurve.GetYFromX((t*6.5) % 5));
-
+            
+            t += Time.DeltaTime;
+            gameObject.transform.position = new Vector3(0, (float)posCurve.GetYFromX((t*6.5) % 5), 0);
+            gameObject.transform.scale = new Vector3((float)scaleCurve.GetYFromX((t*6.5) % 5), 1, (float)scaleCurve.GetYFromX((t*6.5) % 5));
         }
     }
 }
-
-

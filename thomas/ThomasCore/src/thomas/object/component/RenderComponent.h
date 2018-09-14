@@ -19,6 +19,7 @@ namespace thomas
 				
 				resource::Model * GetModel();
 				void Update();
+				
 
 				void SetMaterial(int meshIndex, resource::Material* material);
 				resource::Material* GetMaterial(int meshIndex);
@@ -27,6 +28,7 @@ namespace thomas
 				void SubmitToRenderer(Camera* camera);
 				void OnDestroy();
 				static std::vector<RenderComponent*> GetAllRenderComponents();
+				static void ClearList();
 			public:
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;

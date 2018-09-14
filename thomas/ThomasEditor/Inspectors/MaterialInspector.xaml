@@ -26,7 +26,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Image Height="45" Grid.Column="0" Source="../icons/assets/material.png"/>
-                    <Label VerticalAlignment="Top" Height="25" Content="{Binding ElementName=materialInspector, Path=Material.name}" Margin="5" Grid.Column="1"/>
+                    <Label VerticalAlignment="Top" Height="25" Content="{Binding ElementName=materialInspector, Path=Material.Name}" Margin="5" Grid.Column="1"/>
                     <Label Margin="5, 0, 0, 0" VerticalAlignment="Bottom" Height="25" Content="Shader" Grid.Column="1"/>
                     <ComboBox VerticalAlignment="Bottom" Height="20" Grid.Column="1"
                               Margin="60,0,-148,2" IsSynchronizedWithCurrentItem="False"
