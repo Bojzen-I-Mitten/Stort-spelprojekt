@@ -121,7 +121,7 @@ namespace ThomasEngine.Network
                         {
 
                             validationID = reader.GetInt();
-                            if (validationID < networkIDObjects.Count)
+                            if (networkIDObjects.ContainsKey(validationID))
                                 networkIDObjects[validationID].Read(reader);
                             else
                                 reader.Clear();
