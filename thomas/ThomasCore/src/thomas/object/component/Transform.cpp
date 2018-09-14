@@ -67,6 +67,7 @@ namespace thomas
 				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, lookAt.Forward(), lookAt.Up());
 
 				Decompose();
+				SetDirty(true);
 
 			}
 			void Transform::LookAt(math::Vector3 target)
@@ -80,7 +81,7 @@ namespace thomas
 				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, lookAt.Forward(), lookAt.Up());
 				
 				Decompose();
-
+				SetDirty(true);
 			}
 			void Transform::Rotate(math::Vector3 angles)
 			{
@@ -88,6 +89,7 @@ namespace thomas
 				math::Matrix newRot = math::Matrix::Transform(math::Matrix::CreateFromQuaternion(rot), m_localRotation);
 				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, newRot.Forward(), newRot.Up());
 				Decompose();
+				SetDirty(true);
 			}
 			void Transform::Rotate(float x, float y, float z)
 			{
@@ -99,12 +101,14 @@ namespace thomas
 				math::Matrix newRot = math::Matrix::CreateFromQuaternion(m_localRotation * rot);
 				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, newRot.Forward(), newRot.Up());
 				Decompose();
+				SetDirty(true);
 			}
 			void Transform::Translate(math::Vector3 translation)
 			{
 				math::Matrix pos = math::Matrix::CreateTranslation(translation);
 				m_localWorldMatrix *= pos;
 				Decompose();
+				SetDirty(true);
 			}
 			void Transform::Translate(float x, float y, float z)
 			{

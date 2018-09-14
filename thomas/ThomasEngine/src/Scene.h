@@ -1,16 +1,12 @@
 #pragma once
 
 #pragma managed
-#include <string>
-#include <msclr\marshal_cppstd.h>
 
 #using "PresentationFramework.dll"
 
 
 namespace ThomasEngine {
 	ref class GameObject;
-
-	
 	public ref class Scene
 	{
 		bool m_playing;
