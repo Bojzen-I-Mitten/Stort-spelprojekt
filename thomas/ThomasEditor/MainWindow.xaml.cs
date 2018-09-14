@@ -410,9 +410,10 @@ namespace ThomasEditor
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
 
-            showBusyIndicator("Creating new project...");
+
             if (saveFileDialog.ShowDialog() == true)
             {
+                showBusyIndicator("Creating new project...");
                 Thread worker = new Thread(new ThreadStart(() =>
                 {
                     string fileName = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
