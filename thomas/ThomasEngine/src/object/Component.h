@@ -38,6 +38,7 @@ namespace ThomasEngine
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 
 		GameObject^ m_gameObject;
+
 		
 		property bool initialized
 		{
@@ -53,6 +54,7 @@ namespace ThomasEngine
 		property GameObject^ gameObject
 		{
 			GameObject^ get() { return m_gameObject; }
+			void set(GameObject^ value) { setGameObject(value); }
 		}
 
 		[BrowsableAttribute(false)]
@@ -61,6 +63,12 @@ namespace ThomasEngine
 			Transform^ get();
 			
 		}
+
+		[BrowsableAttribute(false)]
+		property String^ Name
+		{
+			String^ get() override;
+		};
 
 		virtual void Destroy() override;
 

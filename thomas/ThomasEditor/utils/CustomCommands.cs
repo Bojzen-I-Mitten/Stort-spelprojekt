@@ -7,15 +7,12 @@ namespace ThomasEditor.Commands
         //Please do this if you add new bindings
         private static Key addNewEmptyObject = Key.N;
         private static Key DeleteGameObject = Key.Delete;
-        private static Key openOptionsMenu = Key.O;
         private static Key play = Key.F5;
         private static Key addComponent = Key.A;
         private static Key save = Key.S;
+        private static Key open = Key.O;
 
-
-        public static Key GetOpenOptionsMenuKey() { return openOptionsMenu; }
-        public static void SetOpenOptionsMenuKey(Key set) { openOptionsMenu = set; }
-
+     
         public static Key GetAddNewEmptyObjectKey() { return addNewEmptyObject; }
         public static void SetAddNewEmptyObjectKey(Key set) { addNewEmptyObject = set; }
 
@@ -30,6 +27,9 @@ namespace ThomasEditor.Commands
 
         public static Key GetSaveKey() { return save; }
         public static void SetSaveKey(Key set) { save = set; }
+
+        public static Key GetOpenKey() { return open; }
+        public static void SetOpenKey(Key set) { open = set; }
 
 
         //Include xmlns:commands="clr-namespace:ThomasEditor.Commands" in the file you want access to the custome commands
@@ -61,16 +61,7 @@ namespace ThomasEditor.Commands
                 }
             );
 
-        public static readonly RoutedUICommand OpenOptionsWindow = new RoutedUICommand
-            (
-                "Options",
-                "OpenOptionsWindow",
-                typeof(CustomCommands),
-                new InputGestureCollection()
-                {
-                    new KeyGesture(openOptionsMenu, ModifierKeys.Control)
-                }
-            );
+
 
         public static readonly RoutedUICommand Play = new RoutedUICommand
             (
@@ -98,7 +89,7 @@ namespace ThomasEditor.Commands
         public static readonly RoutedUICommand Save = new RoutedUICommand
             (
                 "Save Scene",
-                "Save",
+                "SaveScene",
                 typeof(CustomCommands),
                 new InputGestureCollection()
                 {
@@ -106,11 +97,22 @@ namespace ThomasEditor.Commands
                 }
             );
 
+        public static readonly RoutedUICommand Open = new RoutedUICommand
+    (
+        "Open Scene",
+        "OpenScene",
+        typeof(CustomCommands),
+        new InputGestureCollection()
+        {
+                    new KeyGesture(open, ModifierKeys.Control)
+        }
+    );
+
         public static RoutedUICommand GetNewEmptyObject { get { return NewGameObjectCmd; } }
         public static RoutedUICommand GetDeleteGameObject { get { return DeleteGameObjectCmd; } }
-        public static RoutedUICommand GetOpenOptionsWindow { get { return OpenOptionsWindow; } }
         public static RoutedUICommand GetPlay { get { return Play; } }
         public static RoutedUICommand GetAddCompenent { get { return AddComponent; } }
         public static RoutedUICommand GetSave { get { return Save; } }
+        public static RoutedUICommand GetOpen { get { return Open; } }
     }
 }
