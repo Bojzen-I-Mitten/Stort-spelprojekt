@@ -79,6 +79,7 @@ namespace ThomasEngine {
 			ThomasCore::Update();
 			Monitor::Enter(lock);
 
+			GameObject::InitGameObjects(playing);
 			if (playing)
 			{
 				//Physics

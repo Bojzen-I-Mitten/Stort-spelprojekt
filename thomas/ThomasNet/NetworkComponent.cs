@@ -14,7 +14,7 @@ namespace ThomasEngine.Network
         [Browsable(false)]
         public bool isOwner
         {
-            get { return networkID.Owner; }
+            get {return networkID != null ? networkID.Owner : false; }
         }
 
         [Browsable(false)]
