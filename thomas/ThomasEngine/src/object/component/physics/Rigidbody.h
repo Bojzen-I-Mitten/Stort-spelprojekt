@@ -31,12 +31,15 @@ namespace ThomasEngine
 
 		GameObject^ GetTargetCollider()
 		{
-			auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
-
-			if (collider != nullptr)
+			if (this != nullptr)
 			{
-				String^ name = gcnew String(collider->GetName().c_str());
-				return GameObject::Find(name);
+				auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
+
+				if (collider != nullptr)
+				{
+					String^ name = gcnew String(collider->GetName().c_str());
+					return GameObject::Find(name);
+				}
 			}
 
 			return nullptr;
