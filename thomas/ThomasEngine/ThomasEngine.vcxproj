@@ -120,6 +120,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <PrecompiledHeaderFile />
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies />

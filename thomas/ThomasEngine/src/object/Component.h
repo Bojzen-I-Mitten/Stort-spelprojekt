@@ -22,6 +22,9 @@ namespace ThomasEngine
 		Component();
 
 	internal:
+		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
+		static void LoadExternalComponents();
+
 		Component(thomas::object::component::Component* ptr);
 		
 		void setGameObject(GameObject^ gObj);
@@ -43,9 +46,31 @@ namespace ThomasEngine
 			void set(bool value) { ((thomas::object::component::Component*)nativePtr)->initialized = value; }
 		}
 
+		void Initialize() {
+			if (!awakened)
+			{
+				Awake();
+				awakened = true;
+				return;
+			}
+			else if (!enabled) {
+				OnEnable();
+				enabled = true;
+				return;
+			}else{
+				Start();
+				initialized = true;
+				return;
+			}
+			
+		}
+		bool awakened = false;
+
 	public:
 		static System::Reflection::Assembly^ editorAssembly;
-		bool enabled = true;
+
+		[Xml::Serialization::XmlIgnoreAttribute]
+		bool enabled = false;
 
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject

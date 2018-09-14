@@ -42,7 +42,7 @@ namespace ThomasEngine
 #endif
 			fsw->EnableRaisingEvents = false;
 			fsw->Path = assemblyFolderPath;
-			fsw->EnableRaisingEvents = true;
+			//fsw->EnableRaisingEvents = true;
 			shouldReload = true;
 		}
 		static Assembly^ GetAssembly()
