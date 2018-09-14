@@ -13,9 +13,10 @@ namespace ThomasEngine
 
 	public ref class Resources
 	{
-	internal:
+	private:
 		static Object^ resourceLock = gcnew Object();
 		static Dictionary<String^, Resource^>^ resources = gcnew Dictionary<String^, ThomasEngine::Resource^>();
+	internal:
 
 
 		static List<Type^>^ getKnownTypes();
@@ -23,6 +24,7 @@ namespace ThomasEngine
 		generic<typename T>
 		where T : Resource
 		static T Deserialize(String^ path);
+
 	public:
 		enum class AssetTypes
 		{
@@ -46,7 +48,7 @@ namespace ThomasEngine
 		static void SavePrefab(GameObject ^ gameObject, String ^ path);
 		static GameObject ^ Resources::LoadPrefab(String^ path);
 
-		static void SaveResource(Resource^ resource);
+		static bool SaveResource(Resource^ resource);
 
 		static String^ GetUniqueName(String^ path);
 
