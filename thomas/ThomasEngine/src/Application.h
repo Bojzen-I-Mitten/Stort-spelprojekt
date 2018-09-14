@@ -10,7 +10,10 @@ namespace ThomasEngine
 		delegate void CurrentProjectChangedEvent(Project^ newProject);
 		static event CurrentProjectChangedEvent^ currentProjectChanged;
 		static Project^ m_currentProject;
-		static String^ editorAssets = "..\\Data\\";
+		static property String^ editorAssets {
+			String^ get() { return IO::Path::GetFullPath(
+				IO::Path::GetDirectoryName(Reflection::Assembly::GetExecutingAssembly()->Location) + "\\..\\Data"); }
+		}
 
 		static property Project^ currentProject
 		{
@@ -22,13 +25,14 @@ namespace ThomasEngine
 				}
 				currentProjectChanged(value);
 				m_currentProject = value;
-				if (m_currentProject->currentScenePath) {
-					Scene^ currentScene = Scene::LoadScene(m_currentProject->currentScenePath);
-					if (currentScene)
-						Scene::CurrentScene = currentScene;
-					else
-						Scene::CurrentScene = gcnew Scene("scene");
-				}
+				Scene^ currentScene;
+				if (m_currentProject->currentScenePath)
+					currentScene = Scene::LoadScene(m_currentProject->assetPath + "\\" + m_currentProject->currentScenePath);
+				
+				if (currentScene)
+					Scene::CurrentScene = currentScene;
+				else
+					Scene::CurrentScene = gcnew Scene("scene");
 			}
 		}
 	};

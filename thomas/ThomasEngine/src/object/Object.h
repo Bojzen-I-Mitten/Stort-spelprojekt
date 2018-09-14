@@ -8,10 +8,9 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::ComponentModel;
+using namespace System::Linq;
 namespace ThomasEngine {
 
-	ref class Transform;
-	ref class GameObject;
 	[SerializableAttribute]
 	public ref class Object: public INotifyPropertyChanged
 	{
@@ -39,9 +38,6 @@ namespace ThomasEngine {
 		}
 
 
-		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
-		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
-
 	public:
 		[field:NonSerializedAttribute]
 		virtual event PropertyChangedEventHandler^ PropertyChanged;
@@ -55,7 +51,7 @@ namespace ThomasEngine {
 		}
 
 		[BrowsableAttribute(false)]
-		property String^ Name
+		virtual property String^ Name
 		{
 			String^ get() { return m_name; }
 
@@ -91,16 +87,18 @@ namespace ThomasEngine {
 			return nullptr;
 		}
 
-		static GameObject^ Instantiate(GameObject^ original);
-		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
-		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
-		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
-
 
 		static List<Object^>^ GetObjects()
 		{
 			return %s_objects;
 		}
+		generic<typename T>
+		where T: Object
+		static List<T>^ GetObjectsOfType() {
+			return gcnew List<T>(Enumerable::OfType<T>(GetObjectsOfType(T::typeid)));
+			
+		}
+		static List<Object^>^ GetObjectsOfType(Type^ type);
 
 		static bool operator ==(Object^ a, Object^ b)
 		{

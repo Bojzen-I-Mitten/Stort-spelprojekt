@@ -41,7 +41,6 @@ namespace thomas
 		Physics::Init();
 		editor::EditorCamera::Init();
 		editor::Gizmos::Init();
-		utils::Primitives::Init();
 
 		graphics::LightManager::Initialize();
 

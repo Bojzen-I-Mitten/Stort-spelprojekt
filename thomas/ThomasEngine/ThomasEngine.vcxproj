@@ -180,6 +180,7 @@
     <ClInclude Include="src\object\component\Camera.h" />
     <ClInclude Include="src\object\component\SoundComponent.h" />
     <ClInclude Include="src\resource\Shader.h" />
+    <ClInclude Include="src\ThomasSelection.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\resource\Material.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="src\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
+    <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
     <ClCompile Include="src\math\Math.cpp" />
     <ClCompile Include="src\object\Component.cpp" />
@@ -223,6 +225,7 @@
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\ScriptingManager.cpp" />
     <ClCompile Include="src\resource\Shader.cpp" />
+    <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\ThomasManaged.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Utility.cpp" />

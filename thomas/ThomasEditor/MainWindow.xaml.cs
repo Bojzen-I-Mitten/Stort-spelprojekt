@@ -10,6 +10,7 @@ using System.IO;
 
 using ThomasEngine;
 using System.Threading;
+using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
 namespace ThomasEditor
 {
@@ -20,12 +21,19 @@ namespace ThomasEditor
 
     public partial class MainWindow : Window
     {
+        
         double scrollRatio = 0;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
+        Guid g;
         public MainWindow()
         {
+            
+            string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
+
             _instance = this;
             InitializeComponent();
 
@@ -39,6 +47,103 @@ namespace ThomasEditor
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CompositionTarget.Rendering += DoUpdates;
             ThomasWrapper.OutputLog.CollectionChanged += OutputLog_CollectionChanged;
+
+            if (Properties.Settings.Default.latestProjectPath != "")
+                OpenProject(Properties.Settings.Default.latestProjectPath);
+
+
+            LoadLayout();
+            Closing += MainWindow_Closing;
+
+            ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
+            ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+        }
+
+        private void ScriptingManger_scriptReloadFinished()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = false;
+                editor.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
+                ThomasWrapper.Selection.SelectGameObject(g);
+            }));
+        }
+
+        private void ScriptingManger_scriptReloadStarted()
+        {
+            g = ThomasWrapper.Selection.GetSelectedGUID();
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = "Reloading scripts...";
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
+        }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            SaveLayout();
+        }
+
+        private void SaveLayout()
+        {
+            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+            using (var sw = new StreamWriter(target))
+            {
+                using (StringWriter fs = new StringWriter())
+                {
+                    XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                    xmlLayout.Serialize(fs);
+                    sw.Write(fs.ToString());
+                }
+            }
+
+            if (WindowState == WindowState.Maximized)
+            {
+                // Use the RestoreBounds as the current values will be 0, 0 and the size of the screen
+                Properties.Settings.Default.Top = RestoreBounds.Top;
+                Properties.Settings.Default.Left = RestoreBounds.Left;
+                Properties.Settings.Default.Height = RestoreBounds.Height;
+                Properties.Settings.Default.Width = RestoreBounds.Width;
+                Properties.Settings.Default.Maximized = true;
+            }
+            else
+            {
+                Properties.Settings.Default.Top = this.Top;
+                Properties.Settings.Default.Left = this.Left;
+                Properties.Settings.Default.Height = this.Height;
+                Properties.Settings.Default.Width = this.Width;
+                Properties.Settings.Default.Maximized = false;
+            }
+
+            Properties.Settings.Default.Save();
+        }
+
+        private void LoadLayout()
+        {
+            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+            if (System.IO.File.Exists(target))
+            {
+                using (var sr = new StreamReader(target))
+                {
+                    using (StringWriter fs = new StringWriter())
+                    {
+                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                        xmlLayout.Deserialize(sr);
+                    }
+                }
+            }
+            this.Top = Properties.Settings.Default.Top;
+            this.Left = Properties.Settings.Default.Left;
+            this.Height = Properties.Settings.Default.Height;
+            this.Width = Properties.Settings.Default.Width;
+            // Very quick and dirty - but it does the job
+            if (Properties.Settings.Default.Maximized)
+            {
+                WindowState = WindowState.Maximized;
+            }
         }
 
         private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -93,7 +198,7 @@ namespace ThomasEditor
         private void AddEmptyGameObject(object sender, RoutedEventArgs e)
         {
             var x = new GameObject("gameObject");
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void OpenOptionsWindow_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -121,9 +226,9 @@ namespace ThomasEditor
 
         private void RemoveSelectedGameObjects(object sender, RoutedEventArgs e)
         {
-            for(int i=0; i < ThomasWrapper.SelectedGameObjects.Count; i++)
+            for(int i=0; i < ThomasWrapper.Selection.Count; i++)
             {
-                GameObject gObj = ThomasWrapper.SelectedGameObjects[i];
+                GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
                 gObj.Destroy();
                 //ThomasWrapper.SelectedGameObjects.RemoveAt(i);
                i--;
@@ -260,37 +365,37 @@ namespace ThomasEditor
         private void AddNewCubePrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewQuadPrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewPlanePrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCylinderPrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCapsulePrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            ThomasWrapper.SelectGameObject(x);
+            ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         #endregion
@@ -317,6 +422,7 @@ namespace ThomasEditor
                     {
                         Project proj = new Project(fileName, dir);
                         ThomasEngine.Application.currentProject = proj;
+                        utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
                     }
                     hideBusyIndicator();
                 }));
@@ -326,16 +432,54 @@ namespace ThomasEditor
             }
                       
         }
+        private void OpenProject_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
 
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            openFileDialog.RestoreDirectory = true;
 
-       private void showBusyIndicator(string message)
-       {
-            busyCator.IsBusy = true;
-            busyCator.BusyContent = message;
-            editor.Visibility = Visibility.Hidden;
-            game.Visibility = Visibility.Hidden;
+            if (openFileDialog.ShowDialog() == true)
+            {
+                OpenProject(openFileDialog.FileName);
+
+            }
+
         }
-        private void hideBusyIndicator()
+        public void OpenProject(string projectPath)
+        {
+            showBusyIndicator("Opening project...");
+
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                string fileName = System.IO.Path.GetFileNameWithoutExtension(projectPath);
+                string dir = System.IO.Path.GetDirectoryName(projectPath);
+                if (utils.ScriptAssemblyManager.OpenSolution(dir + "/" + fileName + ".sln"))
+                {
+                    ThomasEngine.Application.currentProject = Project.LoadProject(projectPath);
+                    Properties.Settings.Default.latestProjectPath = projectPath;
+                    Properties.Settings.Default.Save();
+                    utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
+                }
+                hideBusyIndicator();
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+        }
+
+
+        public void showBusyIndicator(string message)
+       {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = message;
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
+        }
+        public void hideBusyIndicator()
         {
             this.Dispatcher.Invoke((Action)(() =>
             {
@@ -345,38 +489,27 @@ namespace ThomasEditor
             }));
         }
 
-        private void OpenProject_Click(object sender, RoutedEventArgs e)
-        {
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-            openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
-            
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            openFileDialog.RestoreDirectory = true;
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                showBusyIndicator("Opening project...");
-
-                Thread worker = new Thread(new ThreadStart(() =>
-                {
-                    string fileName = System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
-                    string dir = System.IO.Path.GetDirectoryName(openFileDialog.FileName);
-                    if (utils.ScriptAssemblyManager.OpenSolution(dir + "/" + fileName + ".sln"))
-                    {
-                        ThomasEngine.Application.currentProject = Project.LoadProject(openFileDialog.FileName);
-                    }
-                    hideBusyIndicator();
-                }));
-                worker.SetApartmentState(ApartmentState.STA);
-                worker.Start();
-                
-            }
-            
-        }
 
         private void ReloadAssembly(object sender, RoutedEventArgs e)
         {
-            ScriptingManger.LoadAssembly();
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                utils.ScriptAssemblyManager.BuildSolution();
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+            
+            //ScriptingManger.LoadAssembly();
+        }
+
+        private void __layoutRoot_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+
+        }
+
+        private void SaveLayout_Click(object sender, RoutedEventArgs e)
+        {
+            SaveLayout();
         }
     }
 
