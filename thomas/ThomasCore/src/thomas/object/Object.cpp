@@ -36,6 +36,7 @@ namespace thomas
 		void Object::SetName(std::string name)
 		{
 			m_name = name;
+
 		}
 		bool Object::Destroy(Object *object)
 		{

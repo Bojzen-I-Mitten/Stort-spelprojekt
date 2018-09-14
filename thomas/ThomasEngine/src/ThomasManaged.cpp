@@ -1,6 +1,7 @@
 // This is the main DLL file.
 
 #include "ThomasManaged.h"
+#include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
 
 namespace ThomasEngine {
@@ -98,10 +99,16 @@ namespace ThomasEngine {
 			{
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
+				{
+					if (gameObject->GetComponent<Rigidbody^>()->GetTargetCollider() != nullptr)
+					{
+						auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
+						gameObject->OnCollisionEnter(collider);
+					}
+
 					gameObject->Update();
+				}
 			}
-
-
 
 			//Rendering
 
