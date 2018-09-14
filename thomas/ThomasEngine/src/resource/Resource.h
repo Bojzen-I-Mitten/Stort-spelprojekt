@@ -57,7 +57,7 @@ namespace ThomasEngine
 			return m_path;
 		}
 
-		virtual property String^ Name;
+		//virtual property String^ Name;
 
 		String^ GetAssetRelativePath();
 
