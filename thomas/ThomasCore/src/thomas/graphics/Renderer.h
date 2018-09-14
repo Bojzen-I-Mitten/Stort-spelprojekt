@@ -4,6 +4,7 @@
 
 #pragma once
 #include "..\utils\Math.h"
+#include "LightManager.h"
 #include <vector>
 #include <map>
 #include <memory>
@@ -58,7 +59,7 @@ namespace thomas
 
 		class Renderer {
 		private:
-
+			static LightManager s_lightManager;
 			static void BindFrame();
 			static void BindObject(RenderCommand & rC);
 						

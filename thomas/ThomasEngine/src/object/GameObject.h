@@ -186,6 +186,11 @@ namespace ThomasEngine
 			void set(bool value)
 			{
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+				for (int i = 0; i < m_components.Count; i++)
+				{
+					Component^ component = m_components[i];
+					component->enabled = value;
+				}
 			}
 		}	
 
@@ -239,14 +244,6 @@ namespace ThomasEngine
 			((Component^)component)->setGameObject(this);
 			m_components.Add((Component^)component);
 			
-			if ((typ->IsDefined(ExecuteInEditor::typeid, false) || scene->IsPlaying()) && !component->initialized && component->enabled)
-			{
-				component->Awake();
-				component->initialized = true;
-				component->OnEnable();
-				component->Start();
-			}
-
 			Monitor::Exit(m_componentsLock);
 			return component;
 		}
@@ -325,6 +322,8 @@ namespace ThomasEngine
 		void SetActive(bool active)
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
+			activeSelf = active;
+
 		}
 
 		static GameObject^ Instantiate(GameObject^ original);

@@ -20,7 +20,8 @@ namespace ThomasEngine
 	public ref class Component : public Object
 	{
 		Component();
-
+	private:
+		bool m_enabled = false;
 	internal:
 		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
 		static void LoadExternalComponents();
@@ -54,7 +55,6 @@ namespace ThomasEngine
 				return;
 			}
 			else if (!enabled) {
-				OnEnable();
 				enabled = true;
 				return;
 			}else{
@@ -68,9 +68,22 @@ namespace ThomasEngine
 
 	public:
 		static System::Reflection::Assembly^ editorAssembly;
+		
 
+		[BrowsableAttribute(false)]
 		[Xml::Serialization::XmlIgnoreAttribute]
-		bool enabled = false;
+		property bool enabled {
+			bool get() { return m_enabled; }
+			void set(bool value) {
+				if (m_enabled != value) {
+					m_enabled = value;
+					if (value == true)
+						OnEnable();
+					else
+						OnDisable();
+				}
+			}
+		}
 
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject
