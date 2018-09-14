@@ -29,13 +29,7 @@ namespace ThomasEngine
 
 
 
-	void Model::GenerateBones(GameObject^ parent)
-	{
-		LOG("Model::GenerateBones deprecated/TODO");
-		/*
-		thomas::resource::Model* nativeModel = ((thomas::resource::Model*)m_nativePtr);
-		auto skel = nativeModel->GetSkeleton();
-void ThomasEngine::Model::InitPrimitives()
+void Model::InitPrimitives()
 {
 	s_primitives = gcnew System::Collections::Generic::Dictionary<PrimitiveType, Model^>();
 	LoadPrimitive(PrimitiveType::Cube, "../Data/primitives/cube.obj");
@@ -45,23 +39,26 @@ void ThomasEngine::Model::InitPrimitives()
 	LoadPrimitive(PrimitiveType::Sphere, "../Data/primitives/sphere.obj");
 	LoadPrimitive(PrimitiveType::Capsule, "../Data/primitives/capsule.obj");
 }
-ThomasEngine::Model ^ ThomasEngine::Model::LoadPrimitive(PrimitiveType type, String ^ path)
+Model ^ Model::LoadPrimitive(PrimitiveType type, String ^ path)
 {
 	Model^ primitive = (Model^)Resources::Load(path);
 	thomas::utils::Primitives::SetPrimitive((thomas::utils::Primitives::Type)type, (thomas::resource::Model*)primitive->m_nativePtr);
 	s_primitives->Add(type, primitive);
 	return primitive;
 }
-
-
-ThomasEngine::Model ^ ThomasEngine::Model::GetPrimitive(PrimitiveType type)
+Model ^ Model::GetPrimitive(PrimitiveType type)
 {
 	return s_primitives[type];
 }
 
-
-void ThomasEngine::Model::GenerateBones(GameObject^ parent)
+void Model::GenerateBones(GameObject^ parent)
 {
+	/*
+	LOG("Model::GenerateBones deprecated/TODO");
+	thomas::resource::Model* nativeModel = ((thomas::resource::Model*)m_nativePtr);
+	auto skel = nativeModel->GetSkeleton();
+
+
 	thomas::resource::Model* nativeModel = ((thomas::resource::Model*)m_nativePtr);
 	auto boneInfos = nativeModel->GetBones();
 

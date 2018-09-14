@@ -105,27 +105,6 @@ namespace ThomasEngine
 			return path;
 		}
 
-		static void CreateResource(Resource^ resource, String^ path)
-		{
-			path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
-			Monitor::Enter(resourceLock);
-			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-			serializserSettings->PreserveObjectReferences = true;
-			serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
-
-			fi->Directory->Create();
-			Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-			settings->Indent = true;
-			Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
-			resource->Rename(path);
-			serializer->WriteObject(file, resource);
-			file->Close();
-			resources[System::IO::Path::GetFullPath(path)] = resource;
-			Monitor::Exit(resourceLock);
-		}
 		static bool CreateResource(Resource^ resource, String^ path);
 
 		static AssetTypes GetResourceAssetType(Type^ type);

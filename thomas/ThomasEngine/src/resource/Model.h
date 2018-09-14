@@ -23,6 +23,7 @@ namespace ThomasEngine
 	public ref class Model : public Resource
 	{
 	internal:
+		static System::Collections::Generic::Dictionary<PrimitiveType, Model^>^ s_primitives;
 		Model(thomas::resource::Model* nativePtr);
 	public:
 		Model(String^ path);
@@ -33,5 +34,7 @@ namespace ThomasEngine
 		void OnDeserialized(StreamingContext c);
 						
 		static Model^ GetPrimitive(PrimitiveType type);
+		static void InitPrimitives();
+		Model ^ LoadPrimitive(PrimitiveType type, String ^ path);
 	};
 }
