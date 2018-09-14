@@ -1,5 +1,4 @@
 #include "Project.h"
-#include "resource/Resources.h"
 
 String^ ThomasEngine::Project::currentScenePath::get()
 {

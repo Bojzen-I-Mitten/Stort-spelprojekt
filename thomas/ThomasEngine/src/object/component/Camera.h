@@ -2,11 +2,10 @@
 #pragma unmanaged
 #include <thomas\object\component\Camera.h>
 #pragma managed
-
+#include "../../Utility.h"
 #include "../Component.h"
 #include <string>
 #include <msclr\marshal_cppstd.h>
-#include "../../math/Math.h"
 
 namespace ThomasEngine
 {
@@ -16,21 +15,21 @@ namespace ThomasEngine
 		Camera() : Component(new thomas::object::component::Camera()) {};
 
 		[BrowsableAttribute(false)]
-		property Matrix4x4 viewMatrix
+		property Matrix viewMatrix
 		{
-			Matrix4x4 get() { return Matrix4x4(((thomas::object::component::Camera*)nativePtr)->GetViewMatrix()); }
+			Matrix get() { return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->GetViewMatrix()); }
 		}
 
 		[BrowsableAttribute(false)]
-		property Matrix4x4 projectionMatrix
+		property Matrix projectionMatrix
 		{
-			Matrix4x4 get() { return Matrix4x4(((thomas::object::component::Camera*)nativePtr)->GetProjMatrix()); }
+			Matrix get() { return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->GetProjMatrix()); }
 		}
 
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Camera*)nativePtr)->GetPosition()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->GetPosition()); }
 		}
 
 		[DisplayNameAttribute("Field Of View")]

@@ -22,6 +22,10 @@ namespace ThomasEngine
 		delegate void ScriptReloadEnded();
 		static event ScriptReloadEnded^ scriptReloadFinished;
 
+		static void ForceReload() {
+			shouldReload = true;
+		}
+
 		static void Init() {
 			
 			fsw = gcnew FileSystemWatcher();
@@ -42,7 +46,7 @@ namespace ThomasEngine
 #endif
 			fsw->EnableRaisingEvents = false;
 			fsw->Path = assemblyFolderPath;
-			fsw->EnableRaisingEvents = true;
+			//fsw->EnableRaisingEvents = true;
 			shouldReload = true;
 		}
 		static Assembly^ GetAssembly()

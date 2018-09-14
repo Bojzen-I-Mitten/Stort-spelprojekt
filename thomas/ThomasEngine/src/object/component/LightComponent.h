@@ -5,8 +5,7 @@
 
 #pragma managed
 #include "../Component.h"
-#include "../../math/Math.h"
-
+#include "../../Utility.h"
 namespace ThomasEngine
 {
 	[ExecuteInEditor]
@@ -36,7 +35,7 @@ namespace ThomasEngine
 
 		property Color color {
 			Color get() {
-				return Color(((thomas::object::component::LightComponent*)nativePtr)->GetColor());
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColor());
 			}
 			void set(Color value) {
 				((thomas::object::component::LightComponent*)nativePtr)->SetColor(thomas::math::Color(value.r, value.g, value.b));
