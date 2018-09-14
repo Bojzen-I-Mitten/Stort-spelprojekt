@@ -20,15 +20,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\BaseAnimationTime.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\BlendNode.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
     <ClCompile Include="include\imgui\ImGuizmo.cpp" />
     <ClCompile Include="include\imgui\imgui_demo.cpp" />
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\AnimationData.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\BoneFrame.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\Channel.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\ChannelKeys.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\KeyFrame.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\Skeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\Playback.cpp" />
     <ClCompile Include="src\thomas\editor\EditorCamera.cpp" />
     <ClCompile Include="src\thomas\editor\EditorGrid.cpp" />
@@ -94,7 +101,6 @@
     <ClInclude Include="src\thomas\editor\gizmos\Gizmos.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimatedSkeleton.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\AnimationData.h" />
-    <ClInclude Include="src\thomas\graphics\animation\data\AnimationConstruct.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\Bone.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\BoneFrame.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\Channel.h" />
