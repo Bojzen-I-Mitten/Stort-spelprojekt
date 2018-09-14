@@ -68,7 +68,7 @@ v2f vert(appdata_thomas_skin v)
     float4 posL = float4(v.vertex, 1.f);
     float3 normalL = v.normal;
 #ifdef SKINNING
-   // ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
+    ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
 #endif
 	
 
