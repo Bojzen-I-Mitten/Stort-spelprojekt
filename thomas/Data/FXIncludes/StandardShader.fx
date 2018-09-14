@@ -136,7 +136,7 @@ float4 frag(v2f input) : SV_TARGET
 	int roof = nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
-        lightDir = lights[i].direction;
+        lightDir = normalize(lights[i].direction);
         lightMultiplyer = lights[i].color * lights[i].intensity;
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
@@ -157,7 +157,7 @@ float4 frag(v2f input) : SV_TARGET
         float lightDistance = length(lightDir);
         lightDir = normalize(lightDir);
 
-        float angle = degrees(acos(dot(lights[i].direction, lightDir)));
+        float angle = degrees(acos(dot(normalize(lights[i].direction), lightDir)));
         float spotFactor = 0.0f;
         if (angle < lights[i].spotInnerAngle)
         {
