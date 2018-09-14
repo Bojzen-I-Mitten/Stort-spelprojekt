@@ -20,9 +20,9 @@
     <Window.CommandBindings>
         <CommandBinding Command="commands:CustomCommands.GetNewEmptyObject" CanExecute="NewEmptyObject_CanExecute" Executed="AddEmptyGameObject"/>
         <CommandBinding Command="commands:CustomCommands.GetDeleteGameObject" CanExecute="RemoveSelectedGameObjects_CanExecute" Executed="RemoveSelectedGameObjects"/>
-        <CommandBinding Command="commands:CustomCommands.GetOpenOptionsWindow" CanExecute="OpenOptionsWindow_CanExecute" Executed="OpenOptionsWindow"/>
         <CommandBinding Command="commands:CustomCommands.GetPlay" CanExecute="Play_CanExecute" Executed="PlayPauseButton_Click" />
         <CommandBinding Command="commands:CustomCommands.Save" Executed="SaveScene_Click" />
+        <CommandBinding Command="commands:CustomCommands.Open" Executed="LoadScene_Click"/>
     </Window.CommandBindings>
 
     <Window.Resources>
@@ -51,7 +51,7 @@
             <Menu DockPanel.Dock="Top" Grid.Row="0">
                 <MenuItem Header="_File">
                     <MenuItem Header="_New Scene" Click="NewScene_Click"/>
-                    <MenuItem Header="_Open Scene..." Click="LoadScene_Click"/>
+                    <MenuItem Command="{x:Static commands:CustomCommands.GetOpen}"/>
                     <Separator/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetSave}"/>
                     <MenuItem Header="_Save Scene As..." Click="SaveSceneAs_Click"/>
@@ -81,7 +81,7 @@
                     <MenuItem Header="_Recompile Shader" Click="Recompile_Shader_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Tools">
-                    <MenuItem Command="{x:Static commands:CustomCommands.GetOpenOptionsWindow}"/>
+                    <MenuItem Header="_Options" Click="OpenOptionsWindow"/>
                     <MenuItem Header="_Reload Assembly" Click="ReloadAssembly"/>
                 </MenuItem>
             </Menu>

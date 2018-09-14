@@ -26,7 +26,7 @@ namespace ThomasEngine
 		}
 
 
-		Material(Shader^ shader) : Resource(shader->name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
+		Material(Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
 		{
 			m_loaded = true;
 		}
@@ -50,7 +50,7 @@ namespace ThomasEngine
 			m_propertiesBeforePlay = nullptr;
 		}
 
-		property String^ name
+		property String^ Name
 		{
 			String^ get() override { 
 				if (m_path->Length > 0)

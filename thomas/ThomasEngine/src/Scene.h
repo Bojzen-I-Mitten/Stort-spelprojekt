@@ -26,6 +26,10 @@ namespace ThomasEngine {
 			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
 			m_gameObjects.CollectionChanged += sceneChanged;
 		}
+
+	internal:
+		static bool savingEnabled = true;
+
 	public:
 
 		static System::Collections::Specialized::NotifyCollectionChangedEventHandler^ sceneChanged;

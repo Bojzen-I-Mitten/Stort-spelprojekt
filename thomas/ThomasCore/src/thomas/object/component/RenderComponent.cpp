@@ -19,7 +19,6 @@ namespace thomas {
 				m_bounds.Extents.x = 0;
 				m_bounds.Extents.y = 0;
 				m_bounds.Extents.z = 0;
-				s_renderComponents.push_back(this);
 			}
 
 			void RenderComponent::SetModel(resource::Model* model)
@@ -50,6 +49,8 @@ namespace thomas {
 
 					while (m_model->GetMeshes().size() > m_materials.size())
 						m_materials.push_back(resource::Material::GetStandardMaterial());
+
+					s_renderComponents.push_back(this);
 				
 				}		
 			}
@@ -97,6 +98,11 @@ namespace thomas {
 						return;
 					}
 				}
+			}
+
+			void RenderComponent::ClearList()
+			{
+				s_renderComponents.clear();
 			}
 
 			std::vector<RenderComponent*> RenderComponent::GetAllRenderComponents()

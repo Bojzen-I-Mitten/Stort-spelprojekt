@@ -209,6 +209,7 @@
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
+    <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
     <ClCompile Include="src\object\Component.cpp" />
     <ClCompile Include="src\object\component\Camera.cpp" />

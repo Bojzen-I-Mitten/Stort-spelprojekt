@@ -173,7 +173,8 @@ namespace thomas
 			{
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
-					renderComponent->SubmitToRenderer(this);
+					if(renderComponent->m_gameObject->GetActive())
+						renderComponent->SubmitToRenderer(this);
 				}
 			}
 

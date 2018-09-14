@@ -9,6 +9,7 @@ namespace ThomasEngine
 	void Scene::Play()
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
+		savingEnabled = false;
 		SaveSceneAs(this, tempFile);
 		m_playing = true;
 		//for each(GameObject^ gObj in m_gameObjects)
@@ -26,7 +27,7 @@ namespace ThomasEngine
 	{
 		ThomasWrapper::Selection->UnselectGameObjects();
 		s_currentScene = value;
-		if(Application::currentProject)
+		if(Application::currentProject && savingEnabled)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
 	}
 
@@ -50,7 +51,7 @@ namespace ThomasEngine
 		serializer->WriteObject(file, scene);
 		file->Close();
 		
-		if (Application::currentProject && scene->RelativeSavePath != path) {
+		if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
 			scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
 			Application::currentProject->currentScenePath = scene->RelativeSavePath;
 		}
@@ -59,8 +60,8 @@ namespace ThomasEngine
 
 	void Scene::SaveScene(Scene ^ scene)
 	{
-		if(scene->RelativeSavePath)
-			SaveSceneAs(scene, scene->RelativeSavePath);
+		if(Application::currentProject && scene->RelativeSavePath)
+			SaveSceneAs(scene, Application::currentProject->assetPath + "\\" + scene->RelativeSavePath);
 	}
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath)
@@ -82,7 +83,7 @@ namespace ThomasEngine
 
 			scene->PostLoad();
 			s_loading = false;
-			if(Application::currentProject)
+			if(Application::currentProject && savingEnabled)
 				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
 			return scene;
 		}
@@ -110,6 +111,7 @@ namespace ThomasEngine
 		Scene::CurrentScene = Scene::LoadScene(tempFile);
 		System::IO::File::Delete(tempFile);
 		Monitor::Exit(lock);
+		savingEnabled = true;
 	}
 
 	void Scene::UnLoad()
@@ -126,11 +128,9 @@ namespace ThomasEngine
 	{
 		for each(GameObject^ gObj in m_gameObjects)
 		{
-			gObj->PostLoad();
+			gObj->PostLoad(this);
 		}
 	}
-
-
 
 	System::Type ^ Scene::SceneSurrogate::GetDataContractType(System::Type ^ type)
 	{
@@ -149,7 +149,7 @@ namespace ThomasEngine
 		if (obj->GetType()->BaseType == Resource::typeid)
 		{
 			Resource^ resource = (Resource^)obj;
-			return gcnew SceneResource(resource->GetPath());
+			return gcnew SceneResource(resource->GetAssetRelativePath());
 		}
 		return obj;
 	}
