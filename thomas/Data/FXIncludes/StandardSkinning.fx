@@ -61,21 +61,14 @@ struct v2f {
     float2	texcoord	: TEXCOORD0;
 };
 
-v2f vert(appdata_thomas v)
+v2f vert(appdata_thomas_skin v)
 {
 	v2f o;
-
-    //float3x3 boneTransform = v.boneWeight.boneIndex0 * v.boneWeight.weight0;
-    //boneTransform += v.boneWeight.boneIndex1 * v.boneWeight.weight1;
-    //boneTransform += v.boneWeight.boneIndex2 * v.boneWeight.weight2;
-    //boneTransform += v.boneWeight.boneIndex3 * v.boneWeight.weight3;
-    //float3 posL = mul(boneTransform, v.vertex);
-    //float3 normalL = mul(boneTransform, v.normal);
 
     float4 posL = float4(v.vertex, 1.f);
     float3 normalL = v.normal;
 #ifdef SKINNING
-    ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
+   // ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
 #endif
 	
 

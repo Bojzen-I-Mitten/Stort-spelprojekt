@@ -164,8 +164,9 @@ namespace ThomasEngine
 				if (targetType == Material::typeid)
 					return Material::StandardMaterial;
 			}
-			else
-				return Resources::Load(sceneResource->path);
+			else {
+				return Resources::LoadThomasPath(sceneResource->path);
+			}
 		}
 		return obj;
 	}

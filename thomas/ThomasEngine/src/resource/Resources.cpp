@@ -128,7 +128,6 @@ namespace ThomasEngine
 				Monitor::Enter(resourceLock);
 				using namespace System::Runtime::Serialization;
 
-				resource->Rename(path);	// Set file name
 
 				Xml::XmlWriter^ file;
 				std::string err;
@@ -150,6 +149,7 @@ namespace ThomasEngine
 						serializer->WriteObject(file, resource);
 						// Success: Append resource
 						resources[System::IO::Path::GetFullPath(path)] = resource;
+						resource->Rename(path);	// Set file name
 					}
 					catch (Exception^ e) {
 						err = std::string("Failed to serialize resource file, at path:" + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
@@ -279,9 +279,18 @@ namespace ThomasEngine
 
 #pragma region Load/Unload/Fetch
 
-			Resource^ Resources::Load(String^ path)
+			Resource^ Resources::LoadThomasPath(String^ thomasPath)
 			{
-				String^ thomasPath = ConvertToThomasPath(path);
+				String^ sysPath = ConvertToRealPath(thomasPath);
+				return Load(sysPath, thomasPath);
+			}
+			Resource^ Resources::LoadSysPath(String^ sysPath)
+			{
+				String^ thomasPath = ConvertToThomasPath(sysPath);
+				return Load(sysPath, thomasPath);
+			}
+			Resource^ Resources::Load(String^ path, String^ thomasPath)
+			{
 				if (resources->ContainsKey(thomasPath))
 				{
 					Resource^ obj = resources[thomasPath];
@@ -382,7 +391,7 @@ namespace ThomasEngine
 				}
 				for each(String^ file in files)
 				{
-					Load(file);
+					LoadSysPath(file);
 				}
 			}
 

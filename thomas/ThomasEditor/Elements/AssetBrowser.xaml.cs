@@ -317,7 +317,7 @@ namespace ThomasEditor
                 if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
                     return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefab(filePath) };
                 else
-                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.Load(filePath) };
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadSysPath(filePath) };
             }
             return null;
         }

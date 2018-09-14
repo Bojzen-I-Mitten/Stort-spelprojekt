@@ -532,10 +532,6 @@ namespace thomas
 			{
 				return Semantics::BITANGENT;
 			}
-			else if (semanticName.find("BONEWEIGHT") != std::string::npos)
-			{
-				return Semantics::BONEWEIGHT;
-			}
 			else
 			{
 				return Semantics::UNKNOWN;

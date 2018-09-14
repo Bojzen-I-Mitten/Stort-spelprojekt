@@ -70,8 +70,13 @@ namespace ThomasEngine
 		static List<Resource^>^ GetResourcesOfType(Type^ type);
 
 		static Resource^ FindResourceFromNativePtr(thomas::resource::Resource* nativePtr);
+		/* Load resource using converted file path to thomas internal representation
+		*/
+		static Resource ^ LoadThomasPath(String ^ path);
 
-		static Resource^ Load(String^ path);
+		/* Load resource using absolute/relative file path
+		*/
+		static Resource ^ LoadSysPath(String ^ system_path);
 		
 		static Resource^ Find(String^ path);
 
@@ -83,5 +88,8 @@ namespace ThomasEngine
 		static void LoadAll(String^ path);
 
 		static void UnloadAll();
+
+	private:
+		static	Resource ^ Load(String^ sysPath, String^ thomasPath);
 	};
 }

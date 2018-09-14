@@ -40,7 +40,7 @@ namespace ThomasEngine
 	}
 	Model ^ Model::LoadPrimitive(PrimitiveType type, String ^ path)
 	{
-		Model^ primitive = (Model^)Resources::Load(path);
+		Model^ primitive = (Model^)Resources::LoadSysPath(path);
 		thomas::utils::Primitives::SetPrimitive((thomas::utils::Primitives::Type)type, (thomas::resource::Model*)primitive->m_nativePtr);
 		return primitive;
 	}

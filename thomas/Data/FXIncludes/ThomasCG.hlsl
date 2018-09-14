@@ -64,10 +64,16 @@ struct appdata_thomas {
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
-#ifdef SKINNING
-    uint4 boneWeight : BLENDWEIGHT;
-    float4 boneIndex : BLENDINDICES;
-#endif
+};
+struct appdata_thomas_skin
+{
+    float3 vertex : POSITION;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float3 bitangent : BITANGENT;
+    uint4 boneIndex : BLENDINDICES;
+    float4 boneWeight : BLENDWEIGHT;
 };
 
 
