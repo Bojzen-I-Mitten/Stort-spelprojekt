@@ -115,7 +115,9 @@ namespace thomas
 					m_targetCollider = std::make_unique<GameObject>("");					
 				}
 
-				*m_targetCollider = *collider;
+				// Don't change the pointer if target collider has not been updated
+				if(m_targetCollider.get() != collider)
+					*m_targetCollider = *collider;
 			}
 
 			void Rigidbody::ApplyCentralForce(const math::Vector3 & force)

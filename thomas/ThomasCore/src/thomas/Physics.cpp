@@ -65,7 +65,6 @@ namespace thomas
 	//Update physics collision
 	void Physics::Simulate()
 	{
-		static bool oneTime = false;
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
 		
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
@@ -91,12 +90,8 @@ namespace thomas
 			object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
 			object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
 
-			if (oneTime == false)
-			{
-				LOG("Collision");
-				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
-				oneTime = true;
-			}
+			// Set the collider object to the target collider
+			rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
 		}
 
 		for (object::component::Rigidbody* rb : s_rigidBodies)

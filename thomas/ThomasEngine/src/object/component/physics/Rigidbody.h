@@ -36,7 +36,7 @@ namespace ThomasEngine
 			if (collider != nullptr)
 			{
 				String^ name = gcnew String(collider->GetName().c_str());
-				return GameObject::Find(name); // name is always gameObject...
+				return GameObject::Find(name);
 			}
 
 			return nullptr;
