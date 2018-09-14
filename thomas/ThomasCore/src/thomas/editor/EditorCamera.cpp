@@ -33,7 +33,7 @@ namespace thomas
 			m_cameraComponent = std::make_unique<object::component::Camera>(true);
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
-			m_grid = std::make_unique<EditorGrid>(100, 1, 10);
+			m_grid = std::make_unique<EditorGrid>(100, 1.f, 10);
 			m_sensitivity = 50.0f;
 			m_speed = 2.0f;
 			m_hasSelectionChanged = false;

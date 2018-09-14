@@ -259,9 +259,10 @@ namespace thomas
 			}
 
 
-			if (mesh->HasBones())
+			if (mesh->HasBones()) {
+				vertices.boneIndices.resize(mesh->mNumVertices);
 				vertices.boneWeights.resize(mesh->mNumVertices);
-
+			}
 			// Walk through each of the mesh's vertices
 			for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 			{
@@ -336,7 +337,7 @@ namespace thomas
 
 					for (int j = 0; j < meshBone->mNumWeights; j++)
 					{
-						vertices.boneWeights[meshBone->mWeights[j].mVertexId].AddBoneData(boneIndex, meshBone->mWeights[j].mWeight);
+						vertices.AddBoneData(meshBone->mWeights[j].mVertexId, boneIndex, meshBone->mWeights[j].mWeight);
 					}
 				}
 			}

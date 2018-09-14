@@ -104,7 +104,7 @@ namespace thomas
 			{
 				BindCamera(editor::EditorCamera::GetEditorCamera()->GetCamera());
 				editor::Gizmos::RenderGizmos();
-			}		
+			}
 		}
 		bool MaterialSorter::operator()(resource::Material * mat1, resource::Material * mat2) const
 		{

@@ -30,7 +30,7 @@ namespace thomas
 			{			
 			}
 			ShaderPropertyMatrixArray::ShaderPropertyMatrixArray(unsigned int num_matrix)
-				: ShaderProperty(Type::MATRIX_ARRAY), m_value(new math::Matrix[num_matrix]), m_offset(0), m_num_matrix(num_matrix)
+				: ShaderProperty(Type::MATRIX_ARRAY), m_value(num_matrix == 0 ? NULL : new math::Matrix[num_matrix]), m_offset(0), m_num_matrix(num_matrix)
 			{
 			}
 			ShaderPropertyMatrixArray::ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int num_matrix)
@@ -53,6 +53,13 @@ namespace thomas
 			math::Matrix* ShaderPropertyMatrixArray::GetValue()
 			{
 				return m_value.get();
+			}
+
+			void ShaderPropertyMatrixArray::resize(unsigned int num_matrix)
+			{
+				m_value = std::unique_ptr<math::Matrix>(new math::Matrix[num_matrix]);
+				m_offset = 0;
+				m_num_matrix = num_matrix;
 			}
 
 			math::Matrix& ShaderPropertyMatrixArray::Matrix(unsigned int index)

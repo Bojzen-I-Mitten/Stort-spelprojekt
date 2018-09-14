@@ -11,11 +11,10 @@ namespace thomas {
 			class Skeleton;
 			class AnimationNode;
 
-			class AnimatedSkeleton :
-				protected resource::shaderproperty::ShaderPropertyMatrixArray	// Skin Transforms in model space
+			class AnimatedSkeleton
 			{
 			public:
-				AnimatedSkeleton(Skeleton& ref);
+				AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref);
 				~AnimatedSkeleton();
 
 				void update(float dT);
@@ -41,9 +40,10 @@ namespace thomas {
 				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
 
 			private:
-				Skeleton& _ref;								// Reference to the mesh skeleton
-				std::unique_ptr<AnimationNode> _root;		// Root in the blend tree
-				std::vector<math::Matrix> _pose;			// Bone transform in model space
+				Skeleton& _ref;												// Reference to the mesh skeleton
+				std::unique_ptr<AnimationNode> _root;						// Root in the blend tree
+				std::vector<math::Matrix> _pose;							// Bone transform in model space
+				resource::shaderproperty::ShaderPropertyMatrixArray* _skin;	// Skin Transforms in model space, stored in a property ready for the GPU
 			private:
 				void updateSkeleton();
 			};

@@ -40,7 +40,8 @@ namespace thomas
 				void SubmitPart(Camera* camera, unsigned int i);
 			protected:
 				std::vector<resource::Material*> m_materials;
-				/*	Insert a shader property for rendering component
+				/*	Insert a shader property for rendering component.
+				 * WARNING!: Append only on initialization (or make safe with parameters passed to Renderer) 
 				*/
 				void insertProperty(const resource::shaderproperty::ShaderProperty* prop);
 			private:

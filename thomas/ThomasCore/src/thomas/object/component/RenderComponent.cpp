@@ -110,6 +110,13 @@ namespace thomas {
 				return s_renderComponents;
 			}
 
+			bool verifyPropertyList(const resource::shaderproperty::ShaderProperty ** arr, size_t count) {
+				bool correct = true;
+				for (size_t i = 0; i < count; i++)
+					correct &= arr[i] != nullptr;
+				return correct;
+			}
+
 			void RenderComponent::SubmitPart(Camera* camera, unsigned int i)
 			{
 				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
@@ -117,7 +124,8 @@ namespace thomas {
 					material = resource::Material::GetStandardMaterial();
 
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
-				
+
+				assert(verifyPropertyList(m_properties.data(), m_properties.size()));
 				thomas::graphics::Renderer::SubmitCommand(
 					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
 			}

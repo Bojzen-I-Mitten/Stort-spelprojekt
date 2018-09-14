@@ -26,13 +26,14 @@ namespace thomas
 			private:
 				ShaderPropertyMatrixArray();
 			protected:
-				ShaderPropertyMatrixArray(unsigned int num_matrix);
 			public:
+				ShaderPropertyMatrixArray(unsigned int num_matrix);
 				ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int num_matrix);
 				ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int offset, unsigned int num_matrix);
 				void Apply(std::string name, Shader* shader) const;
 				static ShaderProperty* GetDefault();
 				math::Matrix* GetValue();
+				void resize(unsigned int num_matrix);
 			protected:
 				std::unique_ptr<math::Matrix> m_value;
 				unsigned int m_offset;

@@ -25,52 +25,57 @@ namespace thomas
 
 	namespace graphics 
 	{
-		struct BoneWeight
-		{
+		struct BoneIndex {
 			int boneIndex0 = 0;
 			int boneIndex1 = 0;
 			int boneIndex2 = 0;
 			int boneIndex3 = 0;
-
+		};
+		struct BoneWeight
+		{
 			float weight0 = 0.0f;
 			float weight1 = 0.0f;
 			float weight2 = 0.0f;
 			float weight3 = 0.0f;
-
-			void AddBoneData(int boneIndex, float weight)
-			{
-				if (weight0 == 0.0f)
-				{
-					boneIndex0 = boneIndex;
-					weight0 = weight;
-				}
-				else if (weight1 == 0.0f)
-				{
-					boneIndex1 = boneIndex;
-					weight1 = weight;
-				}
-				else if (weight2 == 0.0f)
-				{
-					boneIndex2 = boneIndex;
-					weight2 = weight;
-				}
-				else if (weight3 == 0.0f)
-				{
-					boneIndex3 = boneIndex;
-					weight3 = weight;
-				}
-			}
-			
 		};
 		struct Vertices 
 		{
-			std::vector<math::Vector4> positions;
-			std::vector<math::Vector4> colors;
-			std::vector<math::Vector2> texCoord0;
-			std::vector<math::Vector3> normals;
-			std::vector<math::Vector3> tangents;
-			std::vector<math::Vector3> bitangents;
-			std::vector<BoneWeight> boneWeights;
+			std::vector<math::Vector4>	positions;
+			std::vector<math::Vector4>	colors;
+			std::vector<math::Vector2>	texCoord0;
+			std::vector<math::Vector3>	normals;
+			std::vector<math::Vector3>	tangents;
+			std::vector<math::Vector3>	bitangents;
+			std::vector<BoneIndex>		boneIndices;
+			std::vector<BoneWeight>		boneWeights;
+
+
+			void AddBoneData(int vertIndex, int boneIndex, float weight)
+			{
+				BoneWeight &w = boneWeights[vertIndex];
+				BoneIndex &i = boneIndices[vertIndex];
+				if (w.weight0 == 0.0f)
+				{
+					i.boneIndex0 = boneIndex;
+					w.weight0 = weight;
+				}
+				else if (w.weight1 == 0.0f)
+				{
+					i.boneIndex1 = boneIndex;
+					w.weight1 = weight;
+				}
+				else if (w.weight2 == 0.0f)
+				{
+					i.boneIndex2 = boneIndex;
+					w.weight2 = weight;
+				}
+				else if (w.weight3 == 0.0f)
+				{
+					i.boneIndex3 = boneIndex;
+					w.weight3 = weight;
+				}
+			}
+
 		};
 
 		struct MeshData

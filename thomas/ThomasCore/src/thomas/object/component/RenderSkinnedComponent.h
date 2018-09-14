@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderComponent.h"
+#include "../../resource/ShaderProperty/ShaderPropertyMatrix.h"
 #include "../../utils/Math.h"
 namespace thomas
 {
@@ -21,9 +22,9 @@ namespace thomas
 				virtual void SetModel(resource::Model* model);
 
 			public:
-				std::unique_ptr<graphics::animation::AnimatedSkeleton> m_skeleton;
-				std::unique_ptr<resource::shaderproperty::ShaderProperty> m_skinArray;
 			private:
+				resource::shaderproperty::ShaderPropertyMatrixArray m_skinArray;
+				std::unique_ptr<graphics::animation::AnimatedSkeleton> m_skeleton;
 			};
 		}
 	}

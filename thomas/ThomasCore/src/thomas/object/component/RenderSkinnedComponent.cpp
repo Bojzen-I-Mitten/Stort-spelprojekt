@@ -3,6 +3,7 @@
 #include "../../ThomasTime.h"
 #include "../../resource/Model.h"
 #include "../../graphics/Renderer.h"
+#include "../../graphics/RenderConstants.h"
 #include "../../resource/Material.h"
 #include "../GameObject.h"
 namespace thomas
@@ -14,8 +15,9 @@ namespace thomas
 
 
 			RenderSkinnedComponent::RenderSkinnedComponent()
-				: m_skeleton() 
+				: m_skinArray(0), m_skeleton()
 			{
+				m_skinArray.SetName(graphics::THOMAS_MATRIX_SKIN_ARRAY);
 			}
 			RenderSkinnedComponent::~RenderSkinnedComponent() {
 
@@ -36,7 +38,8 @@ namespace thomas
 					LOG("Warning! Attempt to set model with no skinning information in RenderSkinnedComponent.");
 				}
 				else{
-					m_skeleton = std::make_unique<graphics::animation::AnimatedSkeleton>(*model->GetSkeleton());
+					m_skeleton = std::unique_ptr<graphics::animation::AnimatedSkeleton>(
+						new graphics::animation::AnimatedSkeleton(*model->GetSkeleton(), m_skinArray));
 					insertProperty(m_skeleton->getShaderProperty());
 				}
 			}
