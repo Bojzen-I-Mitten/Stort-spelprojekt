@@ -4,7 +4,6 @@
 #include <thomas\resource\ShaderProperty\shaderProperties.h>
 #pragma managed
 #include "Shader.h"
-#include "../math/Math.h"
 #include "Resources.h"
 #include "texture\Texture2D.h"
 using namespace System::Collections::Generic;
@@ -27,7 +26,7 @@ namespace ThomasEngine
 		}
 
 
-		Material(Shader^ shader) : Resource(shader->name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
+		Material(Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
 		{
 			m_loaded = true;
 		}
@@ -51,7 +50,7 @@ namespace ThomasEngine
 			m_propertiesBeforePlay = nullptr;
 		}
 
-		property String^ name
+		property String^ Name
 		{
 			String^ get() override { 
 				if (m_path->Length > 0)
@@ -71,7 +70,7 @@ namespace ThomasEngine
 		void SetShaderPassEnabled(int index, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(index, enabled); }
 		void SetShaderPassEnabled(std::string name, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(name, enabled); }
 
-		Color GetColor(String^ name) { return Color(((thomas::resource::Material*)m_nativePtr)->GetColor(Utility::ConvertString(name))); }
+		Color GetColor(String^ name) { return Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetColor(Utility::ConvertString(name))); }
 		void SetColor(String^ name, Color value) { ((thomas::resource::Material*)m_nativePtr)->SetColor(Utility::ConvertString(name), thomas::math::Color(value.r, value.g, value.b, value.a)); }
 
 		float GetFloat(String^ name) { return ((thomas::resource::Material*)m_nativePtr)->GetFloat(Utility::ConvertString(name)); }
@@ -80,10 +79,10 @@ namespace ThomasEngine
 		int GetInt(String^ name) { return ((thomas::resource::Material*)m_nativePtr)->GetInt(Utility::ConvertString(name)); };
 		void SetInt(String^ name, int& value) { ((thomas::resource::Material*)m_nativePtr)->SetInt(Utility::ConvertString(name),value); }
 
-		Matrix4x4 GetMatrix(String^ name) { return Matrix4x4(((thomas::resource::Material*)m_nativePtr)->GetMatrix(Utility::ConvertString(name))); }
-		void SetMatrix(String^ name, Matrix4x4 value) { ((thomas::resource::Material*)m_nativePtr)->SetMatrix(Utility::ConvertString(name), value.ToThomas()); }
+		Matrix GetMatrix(String^ name) { return  Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetMatrix(Utility::ConvertString(name))); }
+		void SetMatrix(String^ name, Matrix value) { ((thomas::resource::Material*)m_nativePtr)->SetMatrix(Utility::ConvertString(name), Utility::Convert(value)); }
 
-		Vector4 GetVector(String^ name) { return Vector4(((thomas::resource::Material*)m_nativePtr)->GetVector(Utility::ConvertString(name))); }
+		Vector4 GetVector(String^ name) { return Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetVector(Utility::ConvertString(name))); }
 		void SetVector(String^ name, Vector4 value) { ((thomas::resource::Material*)m_nativePtr)->SetVector(Utility::ConvertString(name), thomas::math::Vector4(value.x, value.y, value.z, value.w)); }
 
 		Texture2D^ GetTexture2D(String^ name) 

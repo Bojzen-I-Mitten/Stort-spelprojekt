@@ -10,6 +10,7 @@ using namespace System::Linq;
 using namespace System::Threading;
 namespace ThomasEngine
 {
+
 	public ref class Resources
 	{
 	internal:
@@ -48,6 +49,7 @@ namespace ThomasEngine
 			MATERIAL,
 			SCRIPT,
 			AUDIO_CLIP,
+			PREFAB,
 			UNKNOWN
 		};
 
@@ -65,6 +67,9 @@ namespace ThomasEngine
 				resource->OnStop();
 			}
 		}
+
+		static void Resources::SavePrefab(GameObject ^ gameObject, String ^ path);
+		static GameObject ^ Resources::LoadPrefab(String^ path);
 
 		static void SaveResource(Resource^ resource)
 		{
@@ -86,12 +91,10 @@ namespace ThomasEngine
 			Monitor::Exit(resourceLock);
 		}
 
-		static void CreateResource(Resource^ resource, String^ path)
-		{
-			path = Application::currentProject->assetPath + "\\" + path;
+		static String^ GetUniqueName(String^ path) {
 			String^ extension = IO::Path::GetExtension(path);
 			String^ modifier = "";
-			path = path->Remove(path->Length - extension->Length, extension->Length);
+			path = IO::Path::GetDirectoryName(path) + "\\" + IO::Path::GetFileNameWithoutExtension(path);
 			int i = 0;
 			while (IO::File::Exists(path + modifier + extension))
 			{
@@ -99,6 +102,12 @@ namespace ThomasEngine
 				modifier = "(" + i + ")";
 			}
 			path = path + modifier + extension;
+			return path;
+		}
+
+		static void CreateResource(Resource^ resource, String^ path)
+		{
+			path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
 			Monitor::Enter(resourceLock);
 			using namespace System::Runtime::Serialization;
 			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
@@ -154,19 +163,33 @@ namespace ThomasEngine
 			{
 				return AssetTypes::TEXTURE2D;
 			}
+			else if (extension == "prefab")
+				return AssetTypes::PREFAB;
 			else
 			{
 				return AssetTypes::UNKNOWN;
 			}
 		}
 
+		static String^ ConvertToThomasPath(String^ value) {
+			value = System::IO::Path::GetFullPath(value);
+			if (value->Contains(Application::editorAssets)) return value->Replace(Application::editorAssets, "%THOMAS_DATA%");
+			else return value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
+		}
+		static String^ ConvertToRealPath(String^ value) {
+			value = value->Replace("%THOMAS_DATA%", Application::editorAssets);
+			value = value->Replace("%THOMAS_ASSETS%", Application::currentProject->assetPath);
+			return value;
+		}
+
 		generic<typename T>
 		where T : Resource
 		static T Load(String^ path) 
 		{
-			if (resources->ContainsKey(System::IO::Path::GetFullPath(path)))
+			String^ thomasPath = ConvertToThomasPath(path);
+			if (resources->ContainsKey(thomasPath))
 			{
-				Resource^ obj = resources[System::IO::Path::GetFullPath(path)];
+				Resource^ obj = resources[thomasPath];
 				if (obj->GetType() == T::typeid)
 					return (T)obj;
 				else
@@ -178,7 +201,7 @@ namespace ThomasEngine
 			else
 			{
 				T resource = (T)Activator::CreateInstance(T::typeid, path);
-				resources[System::IO::Path::GetFullPath(path)] = resource;
+				resources[thomasPath] = resource;
 				return resource;
 			}
 		}

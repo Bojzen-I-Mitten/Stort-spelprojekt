@@ -24,6 +24,9 @@ namespace ThomasEngine
 	{
 	internal:
 		Model(thomas::resource::Model* nativePtr) : Resource(Utility::ConvertString(nativePtr->GetPath()), nativePtr){}
+		static System::Collections::Generic::Dictionary<PrimitiveType, Model^>^ s_primitives;
+		static void InitPrimitives();
+		static Model^ LoadPrimitive(PrimitiveType type, String^ path);
 	public:
 		Model(String^ path) : Resource(path, new thomas::resource::Model(Utility::ConvertString(path))) {};
 
@@ -39,6 +42,6 @@ namespace ThomasEngine
 			m_nativePtr = new thomas::resource::Model(Utility::ConvertString(m_path));
 		}
 						
-		static Model^ GetPrimitive(PrimitiveType type) { return gcnew Model(thomas::utils::Primitives::GetPrimitive((thomas::utils::Primitives::Type)type)); }
+		static Model^ GetPrimitive(PrimitiveType type);
 	};
 }

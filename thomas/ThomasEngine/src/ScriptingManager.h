@@ -6,16 +6,24 @@
 using namespace System;
 using namespace System::IO;
 using namespace System::Reflection;
-
 namespace ThomasEngine
 {
 	public ref class ScriptingManger
 	{
 	private:
 		static FileSystemWatcher^ fsw;
+		static String^ objPath;
 		static Assembly^ assembly;
+		static bool shouldReload = false;
 	public:
+		
+		delegate void ScriptReloadBegin();
+		static event ScriptReloadBegin^ scriptReloadStarted;
+		delegate void ScriptReloadEnded();
+		static event ScriptReloadEnded^ scriptReloadFinished;
+
 		static void Init() {
+			
 			fsw = gcnew FileSystemWatcher();
 			fsw->Filter = "Assembly.dll";
 			fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManger::OnChanged);
@@ -24,15 +32,18 @@ namespace ThomasEngine
 
 		static void OnCurrentProjectChanged(Project^ newProject) {
 			String^ assemblyFolderPath = newProject->assembly;
+			objPath = newProject->path + "/obj";
 #ifdef _DEBUG
 			assemblyFolderPath += "/Debug";
+			objPath += "/Debug";
 #else
 			assemblyFolderPath += "/Release";
+			objPath += "/Release";
 #endif
 			fsw->EnableRaisingEvents = false;
 			fsw->Path = assemblyFolderPath;
-			fsw->EnableRaisingEvents = true;
-			LoadAssembly();
+			//fsw->EnableRaisingEvents = true;
+			shouldReload = true;
 		}
 		static Assembly^ GetAssembly()
 		{
@@ -58,42 +69,12 @@ namespace ThomasEngine
 			return false;
 		}
 
-		static void LoadAssembly() {
-
-			String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
-			if (File::Exists(fsw->Path + "/Assembly.dll"))
-			{
-				String^ currentSavePath;
-				if (Scene::CurrentScene)
-				{
-					currentSavePath = Scene::CurrentScene->RelativeSavePath;
-					Scene::SaveSceneAs(Scene::CurrentScene, tempFile);
-				}
-				
-
-				array<Byte>^ bytes = File::ReadAllBytes(fsw->Path + "/Assembly.dll");
-				array<Byte>^ symbolBytes = File::ReadAllBytes(fsw->Path + "/Assembly.pdb");
-				assembly = Assembly::Load(bytes, symbolBytes);
-				
-
-				if (Scene::CurrentScene)
-				{
-					Scene^ oldScene = Scene::CurrentScene;
-
-					Scene::CurrentScene = Scene::LoadScene(tempFile);
-					oldScene->UnLoad();
-					File::Delete(tempFile);
-					Scene::CurrentScene->RelativeSavePath = currentSavePath;
-					if(Application::currentProject)
-						Application::currentProject->currentScenePath = currentSavePath;
-				}
-
-				
-			}
-			fsw->EnableRaisingEvents = true;
-
-			
+		static void ReloadIfNeeded() {
+			if (shouldReload)
+				LoadAssembly();
 		}
+
+		static void LoadAssembly();
 		static void OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e);
 	};
 }

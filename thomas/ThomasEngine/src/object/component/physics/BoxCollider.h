@@ -14,13 +14,13 @@ namespace ThomasEngine
 		
 		property Vector3 center
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::BoxCollider*)nativePtr)->getCenter()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::BoxCollider*)nativePtr)->getCenter()); }
 			void set(Vector3 value) { ((thomas::object::component::BoxCollider*)nativePtr)->SetCenter(thomas::math::Vector3(value.x, value.y, value.z)); }
 		}
 
 		property Vector3 size
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::BoxCollider*)nativePtr)->getSize()); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::BoxCollider*)nativePtr)->getSize()); }
 			void set(Vector3 value) { ((thomas::object::component::BoxCollider*)nativePtr)->SetSize(thomas::math::Vector3(value.x, value.y, value.z)); }
 		}
 	};
