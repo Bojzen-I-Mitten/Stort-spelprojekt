@@ -9,33 +9,43 @@ using LiteNetLib.Utils;
 namespace ThomasEngine.Network
 {
     public class NetworkID : NetworkComponent
-    { 
+    {
+
+        public bool Owner { get; set; } = false;
         public int ID { set; get; }
         List<NetworkComponent> networkComponents;
         public override void OnEnable()
         {
             ID = NetworkManager.instance.Register(this);
             networkComponents = gameObject.GetComponents<NetworkComponent>();
-
+            networkComponents.ForEach((comp) => { comp.networkID = this; });
         }
 
         public override void Read(NetPacketReader reader)
         {
             foreach (NetworkComponent comp in networkComponents)
             {
-                if (comp != this)
+                if (!Owner)
                 {
-                    comp.Read(reader);
+                    if (comp != this)
+                    {
+                        comp.Read(reader);
+                    }
                 }
             }
         }
         public override void Write(NetDataWriter writer)
         {
-            foreach (NetworkComponent comp in networkComponents)
+            if (Owner)
             {
-                if (comp != this)
-                    comp.Write(writer);
+                writer.Put(ID);
+                foreach (NetworkComponent comp in networkComponents)
+                {
+                    if (comp != this)
+                        comp.Write(writer);
+                }
             }
+
         }
     }
 }

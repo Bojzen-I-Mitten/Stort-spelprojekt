@@ -25,14 +25,22 @@ namespace ThomasEngine.Network
         }
         public override void Update()
         {
-            if (NetworkManager.instance.isClient)
+            if (!isOwner)
             {
                 transform.position = Vector3.Lerp(transform.position, pos, Time.DeltaTime * 15);
                 transform.scale = Vector3.Lerp(transform.scale, scale, Time.DeltaTime * 15);
                 transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.DeltaTime * 30);
             }
-
+            else
+            {
+                pos = transform.position;
+                scale = transform.scale;
+                rot = transform.rotation;
+            }
             
+
+
+
         }
 
         public override void Read(NetPacketReader reader)
@@ -53,18 +61,18 @@ namespace ThomasEngine.Network
 
         public override void Write(NetDataWriter writer)
         {
-            writer.Put(transform.position.x);
-            writer.Put(transform.position.y);
-            writer.Put(transform.position.z);
+            writer.Put(pos.x);
+            writer.Put(pos.y);
+            writer.Put(pos.z);
 
-            writer.Put(transform.rotation.x);
-            writer.Put(transform.rotation.y);
-            writer.Put(transform.rotation.z);
-            writer.Put(transform.rotation.w);
+            writer.Put(rot.x);
+            writer.Put(rot.y);
+            writer.Put(rot.z);
+            writer.Put(rot.w);
 
-            writer.Put(transform.scale.x);
-            writer.Put(transform.scale.y);
-            writer.Put(transform.scale.z);
+            writer.Put(scale.x);
+            writer.Put(scale.y);
+            writer.Put(scale.z);
         }
      
     }

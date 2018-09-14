@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -52,7 +53,7 @@ namespace ThomasEngine.Network
 
         public int TICK_RATE { get; set; } = 24;
 
-        [HideInInspector]
+        [Browsable(false)]
         public bool isClient
         {
             get { return !isServer; }
@@ -66,8 +67,7 @@ namespace ThomasEngine.Network
             netManager = new NetManager(listener);
             instance = this;
             writer = new NetDataWriter();
-
-
+                        
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
@@ -90,6 +90,7 @@ namespace ThomasEngine.Network
             {
                 InitServerNTP();
                 netManager.Start(9050 /* port */);
+                
                // SendEvent(testPacket, DeliveryMethod.ReliableOrdered);
             }
 
@@ -147,10 +148,8 @@ namespace ThomasEngine.Network
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
 
-            if (isServer)
-            {
-                WriteData(DeliveryMethod.ReliableOrdered);
-            }
+            //Write full world state of owned objects.
+            WriteData(DeliveryMethod.Unreliable);
                 
         }
 
@@ -191,8 +190,6 @@ namespace ThomasEngine.Network
             writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
             {
-
-                writer.Put(id.ID);
                 id.Write(writer);
             }
         }
@@ -202,7 +199,6 @@ namespace ThomasEngine.Network
             writer.Put((int)PacketType.DATA);
             foreach (NetworkID id in networkIDObjects.Values)
             {
-                writer.Put(id.ID);
                 id.Write(writer);
             }
             netManager.SendToAll(writer, method);

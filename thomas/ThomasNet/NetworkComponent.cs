@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
 namespace ThomasEngine.Network
@@ -11,6 +8,20 @@ namespace ThomasEngine.Network
     public class NetworkComponent : ScriptComponent
     {
 
+        
+        internal NetworkID networkID;
+
+        [Browsable(false)]
+        public bool isOwner
+        {
+            get { return networkID.Owner; }
+        }
+
+        [Browsable(false)]
+        public bool isClient
+        {
+            get { return NetworkManager.instance.isClient; }
+        }
 
         virtual public void Read(NetPacketReader reader)
         {
