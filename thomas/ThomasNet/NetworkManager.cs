@@ -44,10 +44,10 @@ namespace ThomasEngine.Network
         public string IP { get; set; } = "localhost";
         public int port { get; set; } = 9050;
         public bool isServer { get; set; } = false;
-        
+        public static int ping = 2;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
-
+        public List<NetPeer> netPeers;
 
         private float serverTime;
 
@@ -70,8 +70,8 @@ namespace ThomasEngine.Network
             netPacketProcessor = new NetPacketProcessor();
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
-           
-            writer = new NetDataWriter();
+            netPeers = new List<NetPeer>();
+             writer = new NetDataWriter();
                         
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
@@ -117,7 +117,8 @@ namespace ThomasEngine.Network
         }
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            
+            if (isClient)
+                GetPing();
                 PacketType type = (PacketType)reader.GetInt();
                 switch (type)
                 {
@@ -218,6 +219,19 @@ namespace ThomasEngine.Network
                     serverTime = dateTime.Value.Millisecond * 0.001f;
                 }
             });
+        }
+
+        public void GetPing()
+        {
+           
+            netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
+
+            for(int i=0;i<netPeers.Count;i++)
+            {
+               
+                ping = netPeers[i].Ping;
+                
+            }
         }
     }
 }
