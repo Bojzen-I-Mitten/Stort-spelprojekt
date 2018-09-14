@@ -36,11 +36,16 @@ namespace ThomasEngine {
 
 	GameObject ^ GameObject::Instantiate(GameObject ^ original)
 	{
+		if(!original){
+			Debug::Log("Object to instantiate is null");
+			return nullptr;
+		}
 		System::IO::Stream^ serialized = SerializeGameObject(original);
 
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = DeSerializeGameObject(serialized);
-		clone->PostInstantiate(Scene::CurrentScene);
+		if(clone)
+			clone->PostInstantiate(Scene::CurrentScene);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
@@ -48,23 +53,28 @@ namespace ThomasEngine {
 	GameObject ^ GameObject::Instantiate(GameObject ^ original, Transform^ parent)
 	{
 		GameObject^ clone = Instantiate(original);
-		clone->transform->parent = parent;
+		if(clone)
+			clone->transform->parent = parent;
 		return clone;
 	}
 
 	GameObject ^ GameObject::Instantiate(GameObject ^ original, Vector3 position, Quaternion rotation)
 	{
 		GameObject^ clone = Instantiate(original);
-		clone->transform->position = position;
-		clone->transform->rotation = rotation;
+		if(clone){
+			clone->transform->position = position;
+			clone->transform->rotation = rotation;
+		}
 		return clone;
 	}
 
 	GameObject ^ GameObject::Instantiate(GameObject ^ original, Vector3 position, Quaternion rotation, Transform^ parent)
 	{
 		GameObject^ clone = Instantiate(original, parent);
-		clone->transform->position = position;
-		clone->transform->rotation = rotation;
+		if (clone) {
+			clone->transform->position = position;
+			clone->transform->rotation = rotation;
+		}
 		return clone;
 	}
 

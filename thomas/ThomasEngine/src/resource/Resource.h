@@ -3,9 +3,7 @@
 #include "thomas\resource\Resource.h"
 #include <memory>
 #pragma managed
-#include "../Application.h"
 #include "../Utility.h"
-#include "../Scene.h"
 
 using namespace System;
 using namespace System::Runtime::Serialization;
@@ -13,6 +11,7 @@ using namespace System::ComponentModel;
 
 namespace ThomasEngine
 {
+	ref class GameObject;
 	[DataContractAttribute]
 	public ref class Resource : public INotifyPropertyChanged
 	{
@@ -22,10 +21,7 @@ namespace ThomasEngine
 		[DataMemberAttribute(Order = 0)]
 		property String^ asset_path {
 			String^ get() { return GetAssetRelativePath(); }
-			void set(String^ value) {
-				m_path = value->Replace("%THOMAS_DATA%", Application::editorAssets);
-				m_path = m_path->Replace("%THOMAS_ASSETS%", Application::currentProject->assetPath);
-			}
+			void set(String^ value);
 		}
 		String^ m_path;
 
@@ -54,11 +50,7 @@ namespace ThomasEngine
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
 
-		virtual void Reload() {
-			System::Threading::Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-			m_nativePtr->Reload();
-			System::Threading::Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
-		};
+		virtual void Reload();
 
 		String ^ GetPath()
 		{
@@ -67,11 +59,7 @@ namespace ThomasEngine
 
 		virtual property String^ Name;
 
-		String^ GetAssetRelativePath()
-		{
-			if (m_path->Contains(Application::editorAssets)) return m_path->Replace(Application::editorAssets, "%THOMAS_DATA%");
-			else return m_path->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
-		}
+		String^ GetAssetRelativePath();
 
 		virtual property String^ name
 		{

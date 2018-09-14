@@ -4,7 +4,6 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
-    <ClCompile Include="src\math\Math.cpp" />
     <ClCompile Include="src\object\Component.cpp" />
     <ClCompile Include="src\object\component\RenderComponent.cpp" />
     <ClCompile Include="src\object\component\ScriptComponent.cpp" />
@@ -54,7 +53,6 @@
     <ClInclude Include="src\resource\Shader.h" />
     <ClInclude Include="src\Utility.h" />
     <ClInclude Include="src\resource\Material.h" />
-    <ClInclude Include="src\math\Math.h" />
     <ClInclude Include="src\object\Component.h" />
     <ClInclude Include="src\object\component\RenderComponent.h" />
     <ClInclude Include="src\object\component\ScriptComponent.h" />

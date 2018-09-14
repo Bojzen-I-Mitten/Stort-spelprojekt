@@ -9,6 +9,7 @@ ThomasEngine::Component::Component() : Object(new thomas::object::component::Com
 
 }
 
+
 void ThomasEngine::Component::LoadExternalComponents()
 {
 	array<String^>^ dlls = Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly);
@@ -80,6 +81,9 @@ List<Type^>^ ThomasEngine::Component::GetAllComponentTypes()
 	Assembly^ scriptAssembly = ScriptingManger::GetAssembly();
 	if (scriptAssembly)
 		types->AddRange(scriptAssembly->GetExportedTypes());
+
+	if (editorAssembly)
+		types->AddRange(editorAssembly->GetExportedTypes());
 
 	for (int i = 0; i < types->Count; i++)
 	{
