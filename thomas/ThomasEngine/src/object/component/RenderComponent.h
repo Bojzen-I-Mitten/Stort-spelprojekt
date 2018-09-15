@@ -6,7 +6,7 @@
 #include "../Component.h"
 #include "../../resource/Model.h"
 #include "../../resource/Material.h"
-
+#include "../../resource/Resources.h"
 namespace ThomasEngine
 {
 	[DisallowMultipleComponent]

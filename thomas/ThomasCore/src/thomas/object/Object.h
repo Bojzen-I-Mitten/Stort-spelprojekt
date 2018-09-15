@@ -1,5 +1,4 @@
 #pragma once
-#include "../Common.h"
 #include <string>
 #include <vector>
 namespace thomas
@@ -7,7 +6,7 @@ namespace thomas
 	class Scene;
 	namespace object
 	{
-		class THOMAS_API Object
+		class Object
 		{
 		private:
 		public:

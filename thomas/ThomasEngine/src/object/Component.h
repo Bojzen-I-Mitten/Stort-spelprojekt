@@ -1,16 +1,9 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\component\Component.h>
-#pragma managed
 
 #include "../attributes/CustomAttributes.h"
-#include <string>
-#include <msclr\marshal_cppstd.h>
 #include "Object.h"
 
-using namespace System;
-using namespace System::Collections::Generic;
-using namespace System::ComponentModel;
+namespace thomas { namespace object { namespace component { class Component; } } }
 
 namespace ThomasEngine 
 {
@@ -31,41 +24,25 @@ namespace ThomasEngine
 		Component(thomas::object::component::Component* ptr);
 		
 		void setGameObject(GameObject^ gObj);
-		virtual void Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
-		virtual void Start() {};
-		virtual void OnEnable() { ((thomas::object::component::Component*)nativePtr)->OnEnable(); }
-		virtual void OnDisable() { ((thomas::object::component::Component*)nativePtr)->OnDisable(); };
-		virtual void Update() { ((thomas::object::component::Component*)nativePtr)->Update(); }
-		virtual void FixedUpdate() {((thomas::object::component::Component*)nativePtr)->FixedUpdate();}
-		virtual void OnDrawGizmosSelected() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmosSelected(); }
-		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
+		virtual void Awake();
+		virtual void Start();
+		virtual void OnEnable();
+		virtual void OnDisable();
+		virtual void Update();
+		virtual void FixedUpdate();
+		virtual void OnDrawGizmosSelected();
+		virtual void OnDrawGizmos();
 
 		GameObject^ m_gameObject;
 
 		
 		property bool initialized
 		{
-			bool get() { return ((thomas::object::component::Component*)nativePtr)->initialized; }
-			void set(bool value) { ((thomas::object::component::Component*)nativePtr)->initialized = value; }
+			bool get();
+			void set(bool value);
 		}
 
-		void Initialize() {
-			if (!awakened)
-			{
-				Awake();
-				awakened = true;
-				return;
-			}
-			else if (!enabled) {
-				enabled = true;
-				return;
-			}else{
-				Start();
-				initialized = true;
-				return;
-			}
-			
-		}
+		void Initialize();
 		[NonSerializedAttribute]
 		bool awakened = false;
 

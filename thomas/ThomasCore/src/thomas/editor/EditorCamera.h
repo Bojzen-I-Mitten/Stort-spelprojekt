@@ -3,17 +3,20 @@
  */
 
 #pragma once
-#include "..\Common.h"
-#include "..\object\GameObject.h"
 #include <imgui\ImGuizmo.h>
 #include <vector>
 #include <memory>
-
+#include "..\object\GameObject.h"
 namespace thomas
 {
 	namespace resource
 	{
 		class Material;
+	}
+	namespace object {
+		namespace component {
+			class Camera;
+		}
 	}
 
 	namespace editor

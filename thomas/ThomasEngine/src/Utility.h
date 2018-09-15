@@ -3,24 +3,22 @@
 #pragma unmanaged
 #include <thomas/utils/Math.h>
 #pragma managed
-
 #include <string>
 #include <msclr\marshal_cppstd.h>
-using namespace System;
 
 namespace ThomasEngine
 {
 	class Utility
 	{
 	public:
-		static std::string ConvertString(String^ string)
+		static std::string ConvertString(System::String^ string)
 		{
 			return msclr::interop::marshal_as<std::string>(string);
 		}
 
-		static String^ ConvertString(std::string string)
+		static System::String^ ConvertString(std::string string)
 		{
-			return gcnew String(string.c_str());
+			return gcnew System::String(string.c_str());
 		}
 
 		static thomas::math::Color Convert(Color% value)

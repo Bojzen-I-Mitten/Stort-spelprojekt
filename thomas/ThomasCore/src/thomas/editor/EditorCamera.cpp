@@ -7,6 +7,8 @@
 #include "..\resource\Material.h"
 #include "..\graphics\Renderer.h"
 #include "..\resource\Model.h"
+#include "..\Common.h"
+#include "..\object\component\Camera.h"
 
 namespace thomas
 {

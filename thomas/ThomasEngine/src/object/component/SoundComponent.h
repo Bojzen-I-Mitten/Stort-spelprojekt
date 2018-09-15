@@ -5,9 +5,7 @@
 
 #pragma managed
 #include "../../resource/AudioClip.h"
-#include "../../Utility.h"
 #include "../Component.h"
-#include "../../Input.h"
 
 namespace ThomasEngine
 {
@@ -64,14 +62,6 @@ namespace ThomasEngine
 		void Pause() { return ((thomas::object::component::SoundComponent*)nativePtr)->Pause(); }
 		void Resume() { return ((thomas::object::component::SoundComponent*)nativePtr)->Resume(); }
 
-		void Update() override
-		{
-			if (Input::GetKeyDown(Input::Keys::P))
-			{
-				Play();
-				//((thomas::object::component::SoundComponent*)nativePtr)->Play();
-			}
-		}
 	private:
 
 	};

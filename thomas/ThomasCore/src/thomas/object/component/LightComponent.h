@@ -16,7 +16,7 @@ namespace thomas
 		namespace component
 		{
 			
-			class THOMAS_API LightComponent : public Component
+			class LightComponent : public Component
 			{
 			public:
 			private:

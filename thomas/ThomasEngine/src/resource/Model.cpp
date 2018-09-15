@@ -1,5 +1,7 @@
 #include "Model.h"
 #include "../object/GameObject.h"
+#include "../object/component/Transform.h"
+#include "Resources.h"
 void ThomasEngine::Model::InitPrimitives()
 {
 	s_primitives = gcnew System::Collections::Generic::Dictionary<PrimitiveType, Model^>();

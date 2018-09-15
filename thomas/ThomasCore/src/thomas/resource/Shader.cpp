@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "ShaderProperty\shaderProperties.h"
 #include <fstream>
+#include <comdef.h>
 namespace thomas
 {
 	namespace resource

@@ -1,7 +1,6 @@
 #include "Input.h"
 #include "ThomasTime.h"
 #include "Common.h"
-
 namespace thomas
 {
 	//Keyboard

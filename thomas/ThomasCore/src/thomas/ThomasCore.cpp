@@ -11,6 +11,7 @@
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
 #include <D3d11_4.h>
+#include <comdef.h>
 
 #include "object/component/LightComponent.h"
 

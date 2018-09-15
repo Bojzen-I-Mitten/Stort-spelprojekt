@@ -4,9 +4,6 @@
 #pragma managed
 #include "../../Utility.h"
 #include "../Component.h"
-#include <string>
-#include <msclr\marshal_cppstd.h>
-
 namespace ThomasEngine
 {
 	public ref class Camera : public Component

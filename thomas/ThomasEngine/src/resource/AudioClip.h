@@ -2,7 +2,6 @@
 #pragma unmanaged
 #include "thomas\resource\AudioClip.h"
 #pragma managed
-
 #include "Resource.h"
 
 namespace ThomasEngine
@@ -11,7 +10,7 @@ namespace ThomasEngine
 	public ref class AudioClip : public Resource
 	{
 	public:
-		AudioClip(String^ path) : Resource(path, new thomas::resource::AudioClip(Utility::ConvertString(path))) {};
+		AudioClip(System::String^ path) : Resource(path, new thomas::resource::AudioClip(Utility::ConvertString(path))) {};
 
 		[OnDeserializedAttribute]
 		void OnDeserialized(StreamingContext c)

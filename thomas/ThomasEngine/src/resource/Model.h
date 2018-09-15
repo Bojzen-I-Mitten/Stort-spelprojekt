@@ -9,6 +9,7 @@
 
 namespace ThomasEngine
 {
+	ref class GameObject;
 	public enum class PrimitiveType //could not typedef because no ToString
 	{
 		Sphere,

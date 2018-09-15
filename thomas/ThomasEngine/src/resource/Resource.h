@@ -1,31 +1,31 @@
 #pragma once
-#pragma unmanaged
-#include "thomas\resource\Resource.h"
-#include <memory>
+
 #pragma managed
 #include "../Utility.h"
-
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace System::Runtime::Serialization;
-using namespace System::ComponentModel;
-
+namespace thomas {
+	namespace resource {
+		class Resource;
+	} 
+}
 namespace ThomasEngine
 {
-	ref class GameObject;
 	[DataContractAttribute]
-	public ref class Resource : public INotifyPropertyChanged
+	public ref class Resource : public System::ComponentModel::INotifyPropertyChanged
 	{
 	internal:
 		thomas::resource::Resource* m_nativePtr;
 
 		[DataMemberAttribute(Order = 0)]
-		property String^ asset_path {
-			String^ get() { return GetAssetRelativePath(); }
-			void set(String^ value);
+		property System::String^ asset_path {
+			System::String^ get() { return GetAssetRelativePath(); }
+			void set(System::String^ value);
 		}
-		String^ m_path;
+		System::String^ m_path;
 
-		Resource(String^ path, thomas::resource::Resource* ptr)
+		Resource(System::String^ path, thomas::resource::Resource* ptr)
 		{
 			m_path = path;
 			m_nativePtr = ptr;
@@ -37,36 +37,32 @@ namespace ThomasEngine
 		virtual void OnPlay() {};
 		virtual void OnStop() {};
 
-		void Rename(String^ newPath) {
-			m_path = newPath;
-			m_nativePtr->Rename(Utility::ConvertString(newPath));
-			OnPropertyChanged("Name");
-		}
+		void Rename(System::String^ newPath);
 
 	public:
-		virtual event PropertyChangedEventHandler^ PropertyChanged;
-		void OnPropertyChanged(String^ info)
+		virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged;
+		void OnPropertyChanged(System::String^ info)
 		{
-			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
+			PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(info));
 		}
 
 		virtual void Reload();
 
-		String ^ GetPath()
+		System::String ^ GetPath()
 		{
 			return m_path;
 		}
 
-		virtual property String^ Name;
+		virtual property System::String^ Name;
 
-		String^ GetAssetRelativePath();
+		System::String^ GetAssetRelativePath();
 
-		virtual property String^ name
+		virtual property System::String^ name
 		{
-			String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
+			System::String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
 		};
 
-		virtual String^ ToString() override
+		virtual System::String^ ToString() override
 		{
 			return Name;
 		}

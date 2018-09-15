@@ -10,7 +10,7 @@ namespace thomas
 		namespace component
 		{
 			class Camera;
-			class THOMAS_API RenderComponent : public Component
+			class RenderComponent : public Component
 			{
 			private:
 			public:

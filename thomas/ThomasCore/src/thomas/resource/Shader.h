@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Common.h"
 #include <d3dx11effect.h>
 #include <vector>
 #include <map>
@@ -14,7 +13,7 @@ namespace thomas
 	{
 		namespace shaderProperty { class ShaderProperty; }
 		class Texture2D;
-		class THOMAS_API Shader : public Resource
+		class Shader : public Resource
 		{
 		public:
 			enum class Semantics

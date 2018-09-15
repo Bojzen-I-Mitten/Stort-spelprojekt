@@ -2,7 +2,6 @@
 #pragma unmanaged
 #include <thomas\resource\texture\Texture.h>
 #pragma managed
-
 #include "..\Resource.h"
 
 namespace ThomasEngine

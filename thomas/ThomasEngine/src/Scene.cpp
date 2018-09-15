@@ -1,20 +1,33 @@
 #include "Scene.h"
+#include "ThomasManaged.h"
+#include "ThomasSelection.h"
+#include "Application.h"
 #include "object\GameObject.h"
 #include "object\Component.h"
 #include "resource\Resources.h"
-#include "ThomasManaged.h"
+#include "SceneSurrogate.h"
+#using "PresentationFramework.dll"
 namespace ThomasEngine
 {
+
+	Scene::Scene() {
+		m_name = "New Scene";
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
+		m_gameObjects.CollectionChanged += sceneChanged;
+	}
+
+	Scene::Scene(System::String^ name) {
+		m_name = name;
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
+		m_gameObjects.CollectionChanged += sceneChanged;
+	}
+
 	void Scene::Play()
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
 		savingEnabled = false;
 		SaveSceneAs(this, tempFile);
 		m_playing = true;
-		//for each(GameObject^ gObj in m_gameObjects)
-		//{
-		//	gObj->Awake();
-		//}
 	}
 
 	Scene^ Scene::CurrentScene::get()
@@ -82,8 +95,8 @@ namespace ThomasEngine
 
 			scene->PostLoad();
 			s_loading = false;
-			if(Application::currentProject && savingEnabled)
-				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
+			/*if(Application::currentProject && savingEnabled)
+				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");*/
 			return scene;
 		}
 		catch (Exception^ e) {
@@ -120,84 +133,6 @@ namespace ThomasEngine
 		{
 			gObj->PostLoad(this);
 		}
-	}
-
-	System::Type ^ Scene::SceneSurrogate::GetDataContractType(System::Type ^ type)
-	{
-		if (type->BaseType == Resource::typeid)
-		{
-			return SceneResource::typeid;
-		}
-		else
-		{
-			return type;
-		}
-	}
-
-	System::Object ^ Scene::SceneSurrogate::GetObjectToSerialize(System::Object ^obj, System::Type ^targetType)
-	{
-		if (obj->GetType()->BaseType == Resource::typeid)
-		{
-			Resource^ resource = (Resource^)obj;
-			return gcnew SceneResource(resource->GetAssetRelativePath());
-		}
-		else if (obj->GetType() == GameObject::typeid) {
-			GameObject^ gameObject = (GameObject^)obj;
-			if(gameObject->prefabPath)
-				return gcnew SceneResource(Resources::ConvertToThomasPath(gameObject->prefabPath));
-		}
-		else if (Component::typeid->IsAssignableFrom(obj->GetType())) {
-			Component^ component = (Component^)obj;
-			if (component->gameObject->prefabPath)
-				return gcnew SceneResource(Resources::ConvertToThomasPath(component->gameObject->prefabPath));
-		}
-		return obj;
-	}
-
-	System::Object ^ Scene::SceneSurrogate::GetDeserializedObject(System::Object ^obj, System::Type ^targetType)
-	{
-		if (obj->GetType() == SceneResource::typeid)
-		{
-			SceneResource^ sceneResource = (SceneResource^)obj;
-			if (sceneResource->path == "")
-			{
-				if (targetType == Material::typeid)
-					return Material::StandardMaterial;
-			}
-			else if (targetType == GameObject::typeid)
-				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path));
-			else if (Component::typeid->IsAssignableFrom(targetType)) {
-				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path))->GetComponent(targetType);
-			}
-			else
-				return Resources::Load(sceneResource->path);
-		}
-		return obj;
-	}
-
-	System::Object ^ Scene::SceneSurrogate::GetCustomDataToExport(System::Reflection::MemberInfo ^memberInfo, System::Type ^dataContractType)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	System::Object ^ Scene::SceneSurrogate::GetCustomDataToExport(System::Type ^clrType, System::Type ^dataContractType)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	void Scene::SceneSurrogate::GetKnownCustomDataTypes(System::Collections::ObjectModel::Collection<System::Type ^> ^customDataTypes)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	System::Type ^ Scene::SceneSurrogate::GetReferencedTypeOnImport(System::String ^typeName, System::String ^typeNamespace, System::Object ^customData)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	System::CodeDom::CodeTypeDeclaration ^ Scene::SceneSurrogate::ProcessImportedType(System::CodeDom::CodeTypeDeclaration ^typeDeclaration, System::CodeDom::CodeCompileUnit ^compileUnit)
-	{
-		throw gcnew NotSupportedException("unused");
 	}
 
 }
