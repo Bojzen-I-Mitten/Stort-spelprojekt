@@ -1,7 +1,5 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\component\ScriptComponent.h>
-#pragma managed
+
 
 #include "../Component.h"
 
@@ -13,6 +11,7 @@ namespace ThomasEngine
 	private:
 
 	public:
+		ScriptComponent();
 		virtual void OnEnable()override {};
 		virtual void OnDisable()override {};
 		virtual void Awake()override {};
@@ -21,8 +20,5 @@ namespace ThomasEngine
 		virtual void OnDrawGizmosSelected() override {};
 		virtual void OnDrawGizmos() override {};
 
-		ScriptComponent() : Component(new thomas::object::component::ScriptComponent())
-		{
-		}
 	};
 }

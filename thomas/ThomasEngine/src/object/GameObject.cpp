@@ -12,7 +12,7 @@
 #include "component\physics\SphereCollider.h"
 #include "..\Debug.h"
 #include "../SceneSurrogate.h"
-
+#include "../resource/Model.h"
 #using "PresentationFramework.dll"
 using namespace System;
 using namespace System::Threading;

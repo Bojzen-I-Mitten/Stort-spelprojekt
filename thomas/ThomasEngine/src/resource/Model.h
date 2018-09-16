@@ -31,7 +31,7 @@ namespace ThomasEngine
 	public:
 		Model(String^ path) : Resource(path, new thomas::resource::Model(Utility::ConvertString(path))) {};
 
-		void GenerateBones(GameObject^ parent);
+
 		~Model()
 		{
 			if (m_nativePtr)
