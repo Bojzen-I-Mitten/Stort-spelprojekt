@@ -452,6 +452,12 @@ namespace thomas
 	void Window::BeginFrame()
 	{
 		ImGui_ImplDX11_NewFrame();
+
+		ImGui::SetNextWindowSize(ImVec2(300, 0));
+		ImGui::Begin("Test", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+		ImGui::Text("Hello there Dean\n");
+		ImGui::End();
 		ImGuizmo::BeginFrame();
 	}
 
