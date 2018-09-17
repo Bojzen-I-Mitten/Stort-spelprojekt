@@ -7,3 +7,7 @@
 *.jpeg
 *.tga
 *.tds
+
+Arena/
+Models/
+Sounds/
