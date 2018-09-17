@@ -250,8 +250,11 @@ namespace ThomasEngine.Network
 
         public void SpawnObject(Spawner spawner, NetPeer peer)
         {
-            Debug.Log("Test");
-            //GameObject.Instantiate(spawnablePrefabs[spawner.prefabID]);
+            //Debug.Log("Test");
+            if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
+            {
+                GameObject.Instantiate(spawnablePrefabs[spawner.prefabID]);
+            }
         }
     }
 }
