@@ -200,8 +200,10 @@ namespace ThomasEngine
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 				for (int i = 0; i < m_components.Count; i++)
 				{
+					
 					Component^ component = m_components[i];
-					component->enabled = value;
+					if(component->initialized)
+						component->enabled = value;
 				}
 			}
 		}	

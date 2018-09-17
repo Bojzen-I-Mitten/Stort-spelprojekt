@@ -53,6 +53,7 @@
     <Compile Include="Assets\MoveBall.cs" />
     <Compile Include="Assets\PickUpBall.cs" />
     <Compile Include="Assets\ThrowBall.cs" />
+    <Compile Include="Assets\MoveTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

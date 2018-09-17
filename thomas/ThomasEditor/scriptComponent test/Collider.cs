@@ -9,8 +9,10 @@ namespace ThomasEditor
 {
     public class Collider : ScriptComponent
     {
+        private bool hasCollided = false;
+
         public override void Start()
-        {
+        {           
         }
 
         public override void Update()
@@ -19,7 +21,11 @@ namespace ThomasEditor
 
         public override void OnCollisionEnter(GameObject collider)
         {
-            Debug.Log(collider.Name);     
+            if(!hasCollided)
+            {
+                Debug.Log(collider.Name);
+                hasCollided = true;
+            }
         }
     }
 }

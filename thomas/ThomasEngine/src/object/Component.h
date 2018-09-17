@@ -17,10 +17,12 @@ namespace ThomasEngine
 	ref class GameObject;
 	ref class Transform;
 	[HideInInspector]
+	[SerializableAttribute]
 	public ref class Component : public Object
 	{
 		Component();
 	private:
+		[NonSerializedAttribute]
 		bool m_enabled = false;
 	internal:
 		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
@@ -65,6 +67,7 @@ namespace ThomasEngine
 			}
 			
 		}
+		[NonSerializedAttribute]
 		bool awakened = false;
 
 	public:
