@@ -511,7 +511,7 @@ namespace thomas
 			}
 			return size;
 		}
-		void ProcessChannel(aiNodeAnim *channel, SkeletonConstruct& construct, AnimationConstruct& anim) {
+		void ProcessChannel(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 			if (bone < 0)
@@ -519,16 +519,16 @@ namespace thomas
 
 			for (unsigned int i = 0; i < channel->mNumPositionKeys; i++) {
 				aiVectorKey key = channel->mPositionKeys[i];
-				anim.insert3(bone, 0, (float)key.mTime, &key.mValue.x);
+				anim.insert3(bone, 0, (float)(key.mTime / ticksPerSecond), &key.mValue.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumScalingKeys; i++) {
 				aiVectorKey key = channel->mScalingKeys[i];
-				anim.insert3(bone, 1, (float)key.mTime, &key.mValue.x);
+				anim.insert3(bone, 1, (float)(key.mTime / ticksPerSecond), &key.mValue.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumRotationKeys; i++) {
 				aiQuatKey key = channel->mRotationKeys[i];
 				math::Quaternion q(key.mValue.w, key.mValue.x, key.mValue.y, key.mValue.z);
-				anim.insert4(bone, 2, (float)key.mTime, &q.x);
+				anim.insert4(bone, 2, (float)(key.mTime / ticksPerSecond), &q.x);
 			}
 		}
 
@@ -540,10 +540,10 @@ namespace thomas
 				if (size._numFloats > 0) {
 					AnimationConstruct animConst(size);
 
-					float duration = (float)(anim->mDuration * anim->mTicksPerSecond);
+					float duration = (float)(anim->mDuration / anim->mTicksPerSecond);
 					for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
 						aiNodeAnim *channel = anim->mChannels[ch];
-						ProcessChannel(channel, construct, animConst);
+						ProcessChannel(channel, anim->mTicksPerSecond, construct, animConst);
 					}
 					construct.m_animList.push_back(animConst.generateAnim(anim->mName.C_Str(), duration));
 				}

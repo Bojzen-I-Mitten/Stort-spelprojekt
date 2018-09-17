@@ -35,7 +35,8 @@ namespace thomas {
 				math::Matrix *skin_arr = _skin->GetValue();
 				_pose[0] = _root->calcLocalTransform(0);								//	Update root pose
 				skin_arr[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
-				
+				static float a = 0.f;
+				skin_arr[0] = skin_arr[0] * math::Matrix::CreateTranslation(math::Vector3(0, std::sinf(a+=0.1f)*0.1f, 0.f));
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);

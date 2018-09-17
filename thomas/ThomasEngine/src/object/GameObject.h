@@ -283,6 +283,7 @@ namespace ThomasEngine
 				if (m_components[i]->GetType() == type)
 					return m_components[i];
 			}
+			return nullptr;
 		}
 
 

@@ -30,11 +30,11 @@ namespace ThomasEngine
 	}
 
 	void RenderSkinnedComponent::animation::set(Animation^ value) {
+		m_anim = value;
 		if (value == nullptr)
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->clearBlendTree();
 		else
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(value->get());
-
 	}
 
 
