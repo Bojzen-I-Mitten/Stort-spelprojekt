@@ -40,6 +40,7 @@ namespace ThomasEngine
 		virtual void OnDrawGizmosSelected() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmosSelected(); }
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 
+		[NonSerializedAttribute]
 		GameObject^ m_gameObject;
 
 		
@@ -112,5 +113,7 @@ namespace ThomasEngine
 
 		static List<Type^>^ GetAllComponentTypes();
 		static List<Type^>^ GetAllAddableComponentTypes();
+
+
 	};
 }

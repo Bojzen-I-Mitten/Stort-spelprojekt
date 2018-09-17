@@ -5,7 +5,8 @@
 
 ThomasEngine::Component::Component() : Object(new thomas::object::component::Component())
 {
-	setGameObject(GameObject::s_lastObject);
+	int x = 5;
+	//setGameObject(GameObject::s_lastObject);
 
 }
 
@@ -36,8 +37,9 @@ void ThomasEngine::Component::LoadExternalComponents()
 
 ThomasEngine::Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
 {
-	if(GameObject::s_lastObject)
-		setGameObject(GameObject::s_lastObject);
+	int x = 5;
+	//if(GameObject::s_lastObject)
+	//	setGameObject(GameObject::s_lastObject);
 }
 
 ThomasEngine::Transform^ ThomasEngine::Component::transform::get()
