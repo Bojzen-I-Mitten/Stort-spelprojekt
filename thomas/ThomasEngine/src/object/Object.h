@@ -4,7 +4,6 @@
 #pragma managed
 #include <string>
 #include <msclr\marshal_cppstd.h>
-#include "../math/Math.h"
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::ComponentModel;
@@ -72,6 +71,7 @@ namespace ThomasEngine {
 
 		virtual void Destroy()
 		{
+			OnDestroy();
 			thomas::object::Object::Destroy(nativePtr);
 			s_objects.Remove(this);
 		}

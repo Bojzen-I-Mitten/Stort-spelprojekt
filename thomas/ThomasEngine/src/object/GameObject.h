@@ -38,6 +38,23 @@ namespace ThomasEngine
 		}
 
 
+		bool InitComponents(bool playing)
+		{
+			Monitor::Enter(m_componentsLock);
+			bool completed = true;
+			for each(Component^ component in m_components)
+			{
+				Type^ typ = component->GetType();
+				if ((playing || typ->IsDefined(ExecuteInEditor::typeid, false)) && !component->initialized) {
+					completed = false;
+					component->Initialize();
+				}
+			}
+			Monitor::Exit(m_componentsLock);
+			return completed;
+		}
+
+
 	internal:
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
@@ -54,18 +71,6 @@ namespace ThomasEngine
 			this->scene = scene;
 			m_transform = GetComponent<Transform^>();
 			
-			List<Component^>^ editorComponents = gcnew List<Component^>;
-			for (int i = 0; i < m_components.Count; i++)
-			{
-				Component^ component = m_components[i];
-
-				Type^ typ = component->GetType();
-				if (typ->IsDefined(ExecuteInEditor::typeid, false) && component->enabled && !component->initialized) {
-					editorComponents->Add(component);
-				}
-			}
-			
-			initComponents(editorComponents);	
 		}
 
 		void PostInstantiate(Scene^ scene) {
@@ -76,45 +81,27 @@ namespace ThomasEngine
 			}
 		}
 
-		void initComponents(List<Component^>^ components)
-		{
-			for each(Component^ component in components)
-			{
-				component->Awake();
-				component->initialized = true;
-			}
 
-			for each(Component^ component in components)
-			{
-				component->OnEnable();
-			}
-
-			for each(Component^ component in components)
-			{
-				component->Start();
-			}
+		static void InitGameObjects(bool playing) {
+			bool completed;
+			do {
+				completed = true;
+				for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects) {
+					completed = gameObject->InitComponents(playing) && completed;
+				}
+			} while (!completed);
 		}
+
 		
+				
 		void Update()
 		{
 			Monitor::Enter(m_componentsLock);
-			if (Scene::CurrentScene->IsPlaying())
-			{
-				List<Component^>^ uninitializedComponents = gcnew List<Component^>;
-				for each(Component^ component in m_components)
-				{
-					if (!component->initialized)
-						uninitializedComponents->Add(component);
-
-				}
-				initComponents(uninitializedComponents);
-			}
-
 
 			for (int i = 0; i < m_components.Count; i++)
 			{
 				Component^ component = m_components[i];
-				if (component->initialized && component->enabled)
+				if (component->enabled)
 					component->Update();
 			}
 			Monitor::Exit(m_componentsLock);
@@ -199,6 +186,11 @@ namespace ThomasEngine
 			void set(bool value)
 			{
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+				for (int i = 0; i < m_components.Count; i++)
+				{
+					Component^ component = m_components[i];
+					component->enabled = value;
+				}
 			}
 		}	
 
@@ -252,14 +244,6 @@ namespace ThomasEngine
 			((Component^)component)->setGameObject(this);
 			m_components.Add((Component^)component);
 			
-			if ((typ->IsDefined(ExecuteInEditor::typeid, false) || scene->IsPlaying()) && !component->initialized && component->enabled)
-			{
-				component->Awake();
-				component->initialized = true;
-				component->OnEnable();
-				component->Start();
-			}
-
 			Monitor::Exit(m_componentsLock);
 			return component;
 		}
@@ -338,6 +322,8 @@ namespace ThomasEngine
 		void SetActive(bool active)
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
+			activeSelf = active;
+
 		}
 
 		static GameObject^ Instantiate(GameObject^ original);

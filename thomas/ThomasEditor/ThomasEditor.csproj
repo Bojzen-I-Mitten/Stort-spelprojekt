@@ -66,6 +66,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>..\ReleaseEditorBuild64\</OutputPath>
@@ -134,6 +135,10 @@
     <Reference Include="TAlex.WPF.Controls, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TAlex.WPF.Controls.2.0.1.0\lib\net40\TAlex.WPF.Controls.dll</HintPath>
     </Reference>
+    <Reference Include="ThomasMath, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ThomasEngine\lib\ThomasMath.dll</HintPath>
+    </Reference>
     <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -170,6 +175,7 @@
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="scriptComponent test\ChadControls.cs" />
     <Compile Include="utils\CustomCommands.cs" />
     <Compile Include="utils\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Inspectors\ExtendedPropertyGrid.xaml.cs">
@@ -438,6 +444,10 @@
     <ProjectReference Include="..\ThomasEngine\ThomasEngine.vcxproj">
       <Project>{64d247ed-db4d-4ea3-b8ae-680bf66a8f2e}</Project>
       <Name>ThomasEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThomasNet\ThomasNet.csproj">
+      <Project>{545a181e-838c-4bac-b10a-f3459ad670a4}</Project>
+      <Name>ThomasNet</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,9 @@ namespace ThomasEngine {
 		{
 			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
+			Component::LoadExternalComponents();
+
+
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			ScriptingManger::Init();
@@ -76,6 +79,7 @@ namespace ThomasEngine {
 			ThomasCore::Update();
 			Monitor::Enter(lock);
 
+			GameObject::InitGameObjects(playing);
 			if (playing)
 			{
 				//Physics
@@ -124,6 +128,7 @@ namespace ThomasEngine {
 				}
 				thomas::object::component::RenderComponent::ClearList();
 				RenderFinished->WaitOne();
+				thomas::graphics::LightManager::Update();
 				CopyCommandList();
 				RenderFinished->Reset();
 				UpdateFinished->Set();

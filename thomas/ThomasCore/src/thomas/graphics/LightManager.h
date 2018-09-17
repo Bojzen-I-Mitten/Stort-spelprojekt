@@ -1,64 +1,66 @@
 #pragma once
 #include "..\utils\Math.h"
+#include <vector>
+#include <memory>
+#include "..\utils\Buffers.h"
+#include "..\resource\Shader.h"
 
 namespace thomas
 {
+	namespace object {
+		namespace component {
+			class LightComponent;
+		}
+	}
 	namespace graphics
 	{
 		class LightManager
 		{
 		public:
-			struct DirectionalLightStruct
+			/*MATCH ON GPU*/
+			struct LightCountsStruct
 			{
-				thomas::math::Vector4 lightColor;
-				thomas::math::Vector3 lightDirection;
-				float padding;
+				unsigned nrOfDirectionalLights;
+				unsigned nrOfPointLights;
+				unsigned nrOfSpotLights;
 			};
 
-			struct PointLightStruct
+			enum LIGHT_TYPES
 			{
-				float constantAttenuation;
-				float linearAttenuation;
-				float quadraticAttenuation;
-				float power;
-				thomas::math::Vector4 lightColor;
-				thomas::math::Vector3 position;
-				float padding;		
+				DIRECTIONAL = 0,
+				POINT = 1,
+				SPOT = 2
 			};
 
-			struct LightBufferStruct
+			struct LightStruct
 			{
-				int nrOfDirectionalLights;
-				int nrOfPointLights;
-				int padding1;
-				int padding2;
-				DirectionalLightStruct directionalLights[3];
-				PointLightStruct pointLights[20];
-				
-			} static s_lightstruct;
+				thomas::math::Vector3  color;
+				float   intensity;
+				thomas::math::Vector3  position;
+				float   spotOuterAngle;
+				thomas::math::Vector3  direction;
+				float   spotInnerAngle;
+				thomas::math::Vector3  attenuation;
+				float   pad;
+			};
 
-		public:	
-			LightManager();
-			~LightManager();
+		public:
+			static void Initialize();
 			static void Destroy();
+			static void AddLight(object::component::LightComponent* light);
+			static void RemoveLight(object::component::LightComponent* light);
+			static void Update();
 
-		public:
-			static int AddDirectionalLight(DirectionalLightStruct directionalLight);	
-			static int AddPointLight(PointLightStruct pointLight);
-
-		public:
-			static bool UpdateDirectionalLight(DirectionalLightStruct other, int index);
-			static bool UpdatePointLight(PointLightStruct other, int index);
-
-		public:
-			static bool BindDirectionalLight(unsigned int index);
-			static bool BindPointLight(unsigned int index);
-
+			static void Bind();
 		private:
-			static bool UpdateLightBuffer();
-			
-		private:
-			static ID3D11Buffer* s_lightBuffer;
+
+			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);
+
+			static std::vector<object::component::LightComponent*> s_lights;
+
+			static std::shared_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
+
+			static LightCountsStruct m_lightsCounts;
 		};
 	}
 }

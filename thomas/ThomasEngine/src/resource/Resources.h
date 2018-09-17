@@ -10,6 +10,7 @@ using namespace System::Linq;
 using namespace System::Threading;
 namespace ThomasEngine
 {
+
 	public ref class Resources
 	{
 	internal:

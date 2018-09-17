@@ -16,11 +16,15 @@ namespace ThomasEngine
 		static Assembly^ assembly;
 		static bool shouldReload = false;
 	public:
-
+		
 		delegate void ScriptReloadBegin();
 		static event ScriptReloadBegin^ scriptReloadStarted;
 		delegate void ScriptReloadEnded();
 		static event ScriptReloadEnded^ scriptReloadFinished;
+
+		static void ForceReload() {
+			shouldReload = true;
+		}
 
 		static void Init() {
 			
@@ -42,7 +46,7 @@ namespace ThomasEngine
 #endif
 			fsw->EnableRaisingEvents = false;
 			fsw->Path = assemblyFolderPath;
-			fsw->EnableRaisingEvents = true;
+			//fsw->EnableRaisingEvents = true;
 			shouldReload = true;
 		}
 		static Assembly^ GetAssembly()
