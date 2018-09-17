@@ -172,14 +172,14 @@ namespace ThomasEngine.Network
             WriteData(DeliveryMethod.Unreliable);
 
 
-            if (Input.GetKeyUp(Input.Keys.K))
-            {
-                Debug.Log("Test");
-                Spawner spawner = new Spawner();
-                spawner.netID = 0;
-                spawner.prefabID = 0;
-                SendEvent(spawner, DeliveryMethod.ReliableOrdered);
-            }
+            //example spawn
+            //if (Input.GetKeyUp(Input.Keys.K))
+            //{
+            //    Spawner spawner = new Spawner();
+            //    spawner.netID = 0;
+            //    spawner.prefabID = 0;
+            //    SendEvent(spawner, DeliveryMethod.ReliableOrdered);
+            //}
         }
 
 
