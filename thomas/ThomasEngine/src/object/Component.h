@@ -25,6 +25,9 @@ namespace ThomasEngine
 		[NonSerializedAttribute]
 		bool m_enabled = false;
 	internal:
+		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();
+		void UpdateCoroutines();
+
 		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
 		static void LoadExternalComponents();
 
@@ -109,9 +112,15 @@ namespace ThomasEngine
 			String^ get() override;
 		};
 
+
+		void StartCoroutine(System::Collections::IEnumerator^ routine);
+		void StopCoroutine(System::Collections::IEnumerator^ routine);
+		void StopAllCoroutines();
+
 		virtual void Destroy() override;
 
 		static List<Type^>^ GetAllComponentTypes();
 		static List<Type^>^ GetAllAddableComponentTypes();
+
 	};
 }

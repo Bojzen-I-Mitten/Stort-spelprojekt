@@ -105,7 +105,11 @@ namespace ThomasEngine
 			{
 				Component^ component = m_components[i];
 				if (component->enabled)
+				{
 					component->Update();
+					component->UpdateCoroutines();
+				}
+					
 			}
 			Monitor::Exit(m_componentsLock);
 		}
