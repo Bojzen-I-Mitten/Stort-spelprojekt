@@ -255,6 +255,10 @@ namespace ThomasEngine.Network
             {
                 GameObject.Instantiate(spawnablePrefabs[spawner.prefabID]);
             }
+            else
+            {
+                Debug.Log("Tried spawning object not in NetworkManager prefab list");
+            }
         }
     }
 }
