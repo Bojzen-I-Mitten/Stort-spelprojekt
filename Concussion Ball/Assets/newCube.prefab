@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
-  <m_guid>37c998c7-bb4d-498b-9366-540ecd9547cd</m_guid>
+  <m_guid>e6c71527-1e78-4e87-96a3-85572d901ed7</m_guid>
   <m_name z:Id="2">newCube</m_name>
-  <Components z:Size="2">
+  <Components z:Size="4">
     <Component z:Id="3" i:type="Transform">
-      <m_guid>9658e037-1af9-4a89-aa58-8bf285b7f0fc</m_guid>
+      <m_guid>a48e5c7a-c2a5-4ca5-9e86-a84b8bbd184b</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <children z:Size="0" />
@@ -47,7 +47,7 @@
       </scale>
     </Component>
     <Component z:Id="4" i:type="RenderComponent">
-      <m_guid>45c1abb2-6d21-4b25-800c-3b74f2160cbb</m_guid>
+      <m_guid>26808f0f-c429-4967-8b24-c5bceb90d170</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <material z:Id="5">
@@ -56,6 +56,18 @@
       <model z:Id="7">
         <path z:Id="8">../Data/primitives/cube.obj</path>
       </model>
+    </Component>
+    <Component z:Id="9" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkID">
+      <m_guid>904a8e03-2cd8-4c2a-ad46-dfc5319e171d</m_guid>
+      <m_name i:nil="true" />
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:ID>0</d3p1:ID>
+      <d3p1:Owner>false</d3p1:Owner>
+    </Component>
+    <Component z:Id="10" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkTransform">
+      <m_guid>b27957e3-9345-4b00-b8a5-f752c1af5370</m_guid>
+      <m_name i:nil="true" />
+      <m_gameObject z:Ref="1" i:nil="true" />
     </Component>
   </Components>
   <activeSelf>true</activeSelf>

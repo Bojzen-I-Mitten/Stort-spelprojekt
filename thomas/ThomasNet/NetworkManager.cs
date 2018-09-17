@@ -31,7 +31,7 @@ namespace ThomasEngine.Network
         public Vector3 position { get; set; }
         public Quaternion rotation { get; set; }
 
-        public Spawner() { netID = -1; prefabID = 0; position = new Vector3(); rotation = new Quaternion(); }
+        public Spawner() { netID = -1; prefabID = -1; position = new Vector3(); rotation = new Quaternion(); }
     }
 
     public enum PacketType
@@ -125,12 +125,7 @@ namespace ThomasEngine.Network
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
-                GameObject gObj = GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
-                Spawner spawner = new Spawner
-                {
-                    netID = gObj.GetComponent<NetworkID>().ID
-                };
-                SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
+                SpawnPlayerCharacter();
             }
             else
             {
@@ -273,10 +268,24 @@ namespace ThomasEngine.Network
             {
                 GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
             }
+            else if(spawner.prefabID == -1)
+            {
+                GameObject.Instantiate(player, spawner.position, spawner.rotation);
+            }
             else
             {
                 Debug.Log("Tried spawning object not in NetworkManager prefab list");
             }
+        }
+        
+        public void SpawnPlayerCharacter()
+        {
+            GameObject gObj = GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+            Spawner spawner = new Spawner
+            {
+                netID = gObj.GetComponent<NetworkID>().ID
+            };
+            SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
         }
     }
 }

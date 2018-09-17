@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
-  <m_guid>180ef974-b521-4f48-b03f-a21757273db7</m_guid>
+  <m_guid>99427707-d590-479f-b1c0-b9eac60e4374</m_guid>
   <m_name z:Id="2">newSphere</m_name>
-  <Components z:Size="2">
+  <Components z:Size="4">
     <Component z:Id="3" i:type="Transform">
-      <m_guid>27877ead-6709-43e7-a954-65c945666aa0</m_guid>
+      <m_guid>46a555de-6c09-40cb-aa10-e9721daf2b04</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <children z:Size="0" />
@@ -47,7 +47,7 @@
       </scale>
     </Component>
     <Component z:Id="4" i:type="RenderComponent">
-      <m_guid>eeca4d8f-312c-4a0e-9fbe-622fd860a699</m_guid>
+      <m_guid>006837df-174f-43a9-a475-10c7f5966afd</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <material z:Id="5">
@@ -56,6 +56,18 @@
       <model z:Id="7">
         <path z:Id="8">../Data/primitives/sphere.obj</path>
       </model>
+    </Component>
+    <Component z:Id="9" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkID">
+      <m_guid>c9b19f7d-8a23-4dcd-b735-326098dd9e74</m_guid>
+      <m_name i:nil="true" />
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:ID>0</d3p1:ID>
+      <d3p1:Owner>false</d3p1:Owner>
+    </Component>
+    <Component z:Id="10" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkTransform">
+      <m_guid>8622462b-2726-4346-9934-0adf28785d4b</m_guid>
+      <m_name i:nil="true" />
+      <m_gameObject z:Ref="1" i:nil="true" />
     </Component>
   </Components>
   <activeSelf>true</activeSelf>
