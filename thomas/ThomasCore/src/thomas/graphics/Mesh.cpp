@@ -85,9 +85,9 @@ namespace thomas
 			if (m_data.vertices.bitangents.size() > 0)
 				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.bitangents)));
 			if (m_data.vertices.boneIndices.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BLENDINDICES, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneIndices)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEINDICES, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneIndices)));
 			if (m_data.vertices.boneWeights.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BLENDWEIGHT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHTS, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
 
 			if (!m_data.indices.empty())
 				m_data.indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_data.indices);

@@ -31,13 +31,17 @@ namespace thomas {
 				// Update skin transforms
 				math::Matrix *skin_arr = _skin->GetValue();
 				_pose[0] = _root->calcLocalTransform(0);								//	Update root pose
-				skin_arr[0] = _pose[0] * _ref.getBone(0)._invBindPose;					//	Update root skin
+				skin_arr[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
-					_pose[i] = _pose[bone._parentIndex] * _root->calcLocalTransform(i);	//	Update root pose
-					skin_arr[i] = _pose[i] * bone._invBindPose;							//	Update root skin
+					_pose[i] = _root->calcLocalTransform(i) * _pose[bone._parentIndex];	//	Update root pose
+					skin_arr[i] = bone._invBindPose * _pose[i];							//	Update root skin
 				}
+
+				math::Vector4 v = math::Vector4(0, 1, 0, 1);
+				math::Vector4 s = math::Vector4::Transform(v, _ref.getBone(0)._invBindPose);
+				v = math::Vector4::Transform(v, skin_arr[0]);
 			}
 			/* Freeze the current animation */
 			void AnimatedSkeleton::stopAnimation()

@@ -276,8 +276,10 @@ namespace thomas
 		}
 		void Shader::Bind()
 		{
-			for (auto prop : m_properties)
+			for (auto prop : m_properties) {
 				prop.second->Apply(this);
+				int a = 0;
+			}
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{
@@ -531,6 +533,14 @@ namespace thomas
 			else if (semanticName.find("BITANGENT") != std::string::npos)
 			{
 				return Semantics::BITANGENT;
+			}
+			else if (semanticName.find("BONEINDICES") != std::string::npos)
+			{
+				return Semantics::BONEINDICES;
+			}
+			else if (semanticName.find("BONEWEIGHTS") != std::string::npos)
+			{
+				return Semantics::BONEWEIGHTS;
 			}
 			else
 			{

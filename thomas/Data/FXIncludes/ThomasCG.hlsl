@@ -72,8 +72,8 @@ struct appdata_thomas_skin
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
-    uint4 boneIndex : BLENDINDICES;
-    float4 boneWeight : BLENDWEIGHT;
+    float4 boneWeight : BONEWEIGHTS;
+    int4 boneIndex : BONEINDICES;
 };
 
 
@@ -217,15 +217,15 @@ inline float4 ThomasObjectToWorldNormal(in float4 norm)
 	return float4(ThomasObjectToWorldDir(norm.xyz), 0);
 }
 
-inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in float4 weight, int4 boneInd)
+inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in float4 weight, in int4 boneInd)
 {
-	float4 coord = weight.x * mul(thomas_Bone_Array[boneInd.x], position);
+    float4 coord = weight.x * mul(thomas_Bone_Array[boneInd.x], position);
     coord += weight.y * mul(thomas_Bone_Array[boneInd.y], position);
     coord += weight.z * mul(thomas_Bone_Array[boneInd.z], position);
     coord += weight.w * mul(thomas_Bone_Array[boneInd.w], position);
 	position = coord;
 	
-    float3 norm =	weight.x * (mul((float3x3) thomas_Bone_Array[boneInd.x], normal));
+    float3 norm = weight.x * (mul((float3x3) thomas_Bone_Array[boneInd.x], normal));
     norm		+=	weight.y * (mul((float3x3) thomas_Bone_Array[boneInd.y], normal));
     norm		+=	weight.z * (mul((float3x3) thomas_Bone_Array[boneInd.z], normal));
     norm		+=	weight.w * (mul((float3x3) thomas_Bone_Array[boneInd.w], normal));

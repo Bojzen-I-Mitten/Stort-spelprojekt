@@ -14,17 +14,24 @@ namespace thomas {
 			}
 
 
-			void BoneFrame::init(math::Vector3 pos, math::Vector3 scale, math::Vector3 rot) {
+			void BoneFrame::init(math::Vector3 pos, math::Vector3 scale, math::Quaternion quat) {
 				m_from[0].set(0.f, pos);
 				m_from[1].set(0.f, scale);
-				m_from[2].set(0.f, rot);
+				m_from[2].set(0.f, quat);
 				m_to[0].set(FLT_MAX, pos);
 				m_to[1].set(FLT_MAX, scale);
-				m_to[2].set(FLT_MAX, rot);
+				m_to[2].set(FLT_MAX, quat);
+
 			}
 			void BoneFrame::init(const math::Matrix& pose) {
 				DirectX::XMVECTOR s, r, t;
 				DirectX::XMMatrixDecompose(&s, &r, &t, pose);
+
+				math::Matrix m = math::Matrix::CreateScale(s);		// Test bind pose matrix							
+				m = m * math::Matrix::CreateFromQuaternion(r);
+				m.Translation(t);
+
+
 				init(t, s, r);
 			}
 

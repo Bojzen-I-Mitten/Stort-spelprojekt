@@ -5,7 +5,7 @@
 namespace thomas {
 	namespace graphics {
 
-		const static std::string THOMAS_DELTA_TIME("thomas_ObjectToWorld");
+		const static std::string THOMAS_DELTA_TIME("thomas_DeltaTime");
 
 
 		const static std::string THOMAS_MATRIX_PROJECTION("thomas_MatrixP");

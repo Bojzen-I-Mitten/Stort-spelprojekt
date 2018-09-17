@@ -14,7 +14,7 @@ namespace thomas {
 			public:
 				BoneFrame();
 				~BoneFrame();
-				void init(math::Vector3 pos, math::Vector3 scale, math::Vector3 rot);
+				void init(math::Vector3 pos, math::Vector3 scale, math::Quaternion quat);
 				/* Set an initial pose for each bone */
 				void init(const math::Matrix& pose);
 				math::Vector3 lerpCoordinate(float eT);

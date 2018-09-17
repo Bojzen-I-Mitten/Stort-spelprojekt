@@ -44,7 +44,7 @@ namespace thomas
 			void ShaderPropertyMatrixArray::Apply(std::string name, Shader* shader) const
 			{
 
-				shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrixArray(reinterpret_cast<const float*>(m_value.get()[0][0]), m_offset, m_num_matrix);
+				shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrixTransposeArray(reinterpret_cast<const float*>(m_value.get()[0][0]), m_offset, m_num_matrix);
 			}
 			ShaderProperty* ShaderPropertyMatrixArray::GetDefault()
 			{
