@@ -141,7 +141,20 @@ namespace ThomasEngine
 			}
 			Monitor::Exit(m_componentsLock);
 		}
-		
+
+		void OnCollisionEnter(GameObject^ collider)
+		{
+			Monitor::Enter(m_componentsLock);
+
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->enabled)
+					component->OnCollisionEnter(collider);
+			}
+			Monitor::Exit(m_componentsLock);
+		}
+
 	public:
 		static GameObject^ s_lastObject;
 
@@ -192,9 +205,10 @@ namespace ThomasEngine
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 				for (int i = 0; i < m_components.Count; i++)
 				{
+					
 					Component^ component = m_components[i];
 					if(component->initialized)
-						component->awakened = value;
+						component->enabled = value;
 				}
 			}
 		}	

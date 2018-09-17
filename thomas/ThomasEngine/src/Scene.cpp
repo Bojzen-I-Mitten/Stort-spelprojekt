@@ -3,6 +3,7 @@
 #include "object\Component.h"
 #include "resource\Resources.h"
 #include "ThomasManaged.h"
+
 namespace ThomasEngine
 {
 	void Scene::Play()
@@ -78,6 +79,11 @@ namespace ThomasEngine
 			DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
 			Scene^ scene = (Scene^)serializer->ReadObject(file);
+
+			msclr::interop::marshal_context context;
+			for (int i = 0; i < scene->GameObjects->Count; ++i)
+				scene->GameObjects[i]->nativePtr->SetName(context.marshal_as<std::string>(scene->GameObjects[i]->Name));
+
 			file->Close();
 
 			scene->PostLoad();
