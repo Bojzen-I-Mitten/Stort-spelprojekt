@@ -28,8 +28,10 @@ namespace ThomasEngine.Network
     {
         public int netID { get; set; }
         public int prefabID { get; set; }
+        public Vector3 position { get; set; }
+        public Quaternion rotation { get; set; }
 
-        public Spawner() { netID = -1; prefabID = -1; }
+        public Spawner() { netID = -1; prefabID = -1; position = new Vector3(); rotation = new Quaternion(); }
     }
 
     public enum PacketType
@@ -122,10 +124,14 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerConnectedEvent(NetPeer peer)
         {
-            if(isServer)
+            if (isServer)
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
             else
+            {
                 ThomasEngine.Debug.Log("You are now connected with the server" + peer.EndPoint.ToString());
+                GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+            }
+
         }
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
@@ -173,13 +179,13 @@ namespace ThomasEngine.Network
 
 
             //example spawn
-            //if (Input.GetKeyUp(Input.Keys.K))
-            //{
-            //    Spawner spawner = new Spawner();
-            //    spawner.netID = 0;
-            //    spawner.prefabID = 0;
-            //    SendEvent(spawner, DeliveryMethod.ReliableOrdered);
-            //}
+            if (Input.GetKeyUp(Input.Keys.K))
+            {
+                Spawner spawner = new Spawner();
+                spawner.netID = 0;
+                spawner.prefabID = 0;
+                SendEvent(spawner, DeliveryMethod.ReliableOrdered);
+            }
         }
 
 
