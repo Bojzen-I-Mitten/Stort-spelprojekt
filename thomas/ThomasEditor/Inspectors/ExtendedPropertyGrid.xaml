@@ -9,6 +9,7 @@
              xmlns:editor="clr-namespace:ThomasEditor"
              xmlns:managed="clr-namespace:ThomasEngine;assembly=ThomasEngine"
              xmlns:math="clr-namespace:ThomasEngine;assembly=ThomasMath"
+             xmlns:sys="clr-namespace:System.Collections;assembly=mscorlib"
              mc:Ignorable="d" 
               xmlns:p="clr-namespace:PropertyTools.Wpf;assembly=PropertyTools.Wpf"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -21,49 +22,23 @@
         <converters:Vector3Converter x:Key="convertVector3" x:Shared="False"/>
         <converters:Vector4Converter x:Key="convertVector4" x:Shared="False"/>
         <converters:ColorConverter x:Key="convertColor" x:Shared="False"/>
-        
-        
-        
+
+
+
+        <DataTemplate x:Key="ListEditor">
+            <local:ListEditor DataContext="{Binding}"/>
+        </DataTemplate>
+
         <DataTemplate x:Key="ResourceEditor">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-                <Border Background="#333333" Grid.Column="0" >
-                    <Image Height="20" Source="{Binding Value, Converter={StaticResource resourceImageConverter}, Mode=OneWay}" VerticalAlignment="Center" />
-                </Border>
-                <Label Height="20" Foreground="White" FontSize="10" Grid.Column="1" Background="#333333" AllowDrop="True" Drop="ResourceEditor_Drop" PreviewDragOver="ResourceEditor_PreviewDragOver">
-                    <Label.Style>
-                        <Style TargetType="Label">
-                            <Setter Property="Content" Value="{Binding Value.Name}"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Value.Name}" Value="{x:Null}">
-                                    <Setter Property="Content" Value="{Binding PropertyType.Name, Converter={StaticResource nullResourceConverter}, Mode=OneWay}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Label.Style>
-                </Label>
-                <Button Background="Transparent" BorderThickness="0" Height="20" Grid.Column="2" Cursor="Hand" Click="ResourceList_Open">
-                    <Image Source="../icons/resourceList.png"/>
-                </Button>
-            </Grid>
+            <local:ResourceEditor DataContext="{Binding}"/>
         </DataTemplate>
 
         <DataTemplate x:Key="CurveEditor">
             <editor:GraphEditor PropName="{Binding DisplayName}" Value="{Binding Value, Mode=TwoWay}"/>
         </DataTemplate>
-        
-        <DataTemplate x:Key="TextureEditor">
 
-            <Border Background="#333333" HorizontalAlignment="Right" Width="100" BorderBrush="Black" BorderThickness="2">
-                <Grid Height="100" HorizontalAlignment="Right" AllowDrop="True" Drop="ResourceEditor_Drop" PreviewDragOver="ResourceEditor_PreviewDragOver">
-                    <Image Width="100" Source="{Binding Value, Converter={StaticResource resourceImageConverter}, Mode=OneWay}"/>
-                    <Button  HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="50" Content="Select" Foreground="#333333" BorderBrush="#333333" Background="WhiteSmoke" Cursor="Hand" Click="ResourceList_Open"/>
-                </Grid>
-            </Border>
+        <DataTemplate x:Key="TextureEditor">
+            <local:TextureEditor DataContext="{Binding}"/>
         </DataTemplate>
 
         <DataTemplate x:Key="Vector2Editor">
@@ -168,6 +143,11 @@
             <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource CurveEditor}">
                 <xctk:EditorTemplateDefinition.TargetProperties>
                     <xctk:TargetPropertyType Type="managed:Curve"/>
+                </xctk:EditorTemplateDefinition.TargetProperties>
+            </xctk:EditorTemplateDefinition>
+            <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource ListEditor}">
+                <xctk:EditorTemplateDefinition.TargetProperties>
+                    <xctk:TargetPropertyType Type="sys:IList"/>
                 </xctk:EditorTemplateDefinition.TargetProperties>
             </xctk:EditorTemplateDefinition>
         </xctk:PropertyGrid.EditorDefinitions>
