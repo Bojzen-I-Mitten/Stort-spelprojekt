@@ -104,7 +104,4 @@ namespace ThomasEngine {
 		}
 
 	};
-
-
-
 }
