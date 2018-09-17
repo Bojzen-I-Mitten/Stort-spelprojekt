@@ -74,7 +74,7 @@ void ThomasEngine::Component::Destroy()
 		}
 	}
 	
-
+	StopAllCoroutines();
 	m_gameObject->Components->Remove(this);
 	Object::Destroy();
 	Monitor::Exit(m_gameObject->m_componentsLock);
@@ -158,5 +158,5 @@ void ThomasEngine::Component::StopCoroutine(System::Collections::IEnumerator ^ r
 
 void ThomasEngine::Component::StopAllCoroutines()
 {
-	throw gcnew System::NotImplementedException();
+	coroutines->Clear();
 }
