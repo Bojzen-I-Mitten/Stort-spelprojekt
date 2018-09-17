@@ -74,8 +74,8 @@ namespace ThomasEngine
 		static System::Reflection::Assembly^ editorAssembly;
 		
 
-		[BrowsableAttribute(false)]
 		[Xml::Serialization::XmlIgnoreAttribute]
+		[BrowsableAttribute(false)]
 		property bool enabled {
 			bool get() { return m_enabled; }
 			void set(bool value) {

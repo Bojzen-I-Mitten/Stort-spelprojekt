@@ -79,6 +79,7 @@ namespace ThomasEngine
 		IO::FileStream^ fileStream = IO::File::OpenRead(path);
 		GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
 		fileStream->Close();
+		prefab->prefabPath = path;
 		return prefab;
 	}
 	Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
