@@ -78,11 +78,12 @@ namespace ThomasEngine.Network
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
             listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-
+            listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
         }
 
+ 
 
         public override void Start()
         {
@@ -115,31 +116,46 @@ namespace ThomasEngine.Network
             else
                 ThomasEngine.Debug.Log("You are now connected with the server" + peer.EndPoint.ToString());
         }
+        private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
+        {
+            if(isServer)
+            {
+                Debug.Log("A network error has occured from client " + endPoint);
+            }
+            else
+            {
+                Debug.Log("A network error has occured from client " + endPoint);
+            }
+            
+        }
+
+
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
             if (isClient)
                 GetPing();
-                PacketType type = (PacketType)reader.GetInt();
-                switch (type)
-                {
-                    case PacketType.DATA:
-                        while (reader.AvailableBytes > 0)
-                        {
 
-                            validationID = reader.GetInt();
-                            if (networkIDObjects.ContainsKey(validationID))
-                                networkIDObjects[validationID].Read(reader);
-                            else
-                                reader.Clear();
-                        }
-                        break;
-                    case PacketType.EVENT:
-                        netPacketProcessor.ReadAllPackets(reader);
-                        break;
-                    default:
-                        break;
+            PacketType type = (PacketType)reader.GetInt();
+            switch (type)
+            {
+                case PacketType.DATA:
+                    while (reader.AvailableBytes > 0)
+                    {
+
+                        validationID = reader.GetInt();
+                        if (networkIDObjects.ContainsKey(validationID))
+                            networkIDObjects[validationID].Read(reader);
+                        else
+                            reader.Clear();
+                    }
+                    break;
+                case PacketType.EVENT:
+                    netPacketProcessor.ReadAllPackets(reader);
+                    break;
+                default:
+                    break;
                 
-                }
+            }
         }
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
@@ -223,15 +239,16 @@ namespace ThomasEngine.Network
 
         public void GetPing()
         {
-           
             netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
-
             for(int i=0;i<netPeers.Count;i++)
             {
-               
                 ping = netPeers[i].Ping;
-                
             }
+        }    
+        public void Checkpacketloss()
+        {
+            Debug.Log("A error has occured here are the amount of packetloss " + netManager.Statistics.PacketLoss + "% lost " + netManager.Statistics.PacketLossPercent);
+            Debug.Log("A total of " + netManager.Statistics.PacketsSent + "was sent and " + netManager.Statistics.PacketsReceived + "was recieved");
         }
     }
 }
