@@ -93,6 +93,7 @@ namespace ThomasEngine {
 
 		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
 		settings->Indent = true;
+				
 		Xml::XmlWriter^ writer = Xml::XmlWriter::Create(path, settings);
 		serializer->WriteObject(writer, gObj);
 		writer->Close();

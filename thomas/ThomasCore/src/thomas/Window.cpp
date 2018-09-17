@@ -21,6 +21,7 @@ namespace thomas
 		m_windowClassInfo.style = CS_HREDRAW | CS_VREDRAW;
 		m_windowClassInfo.lpfnWndProc = EventHandler; //Callback for EVENTS
 		m_windowClassInfo.hInstance = hInstance;
+		m_windowClassInfo.hInstance = hInstance;
 		m_windowClassInfo.lpszClassName = "ThomasWindow";
 		m_windowClassInfo.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(101));
 
@@ -61,8 +62,8 @@ namespace thomas
 		bool result = GetWindowRect(hWnd, &m_windowRectangle);
 		if (result)
 		{
-			m_height = m_windowRectangle.bottom;
-			m_width = m_windowRectangle.right;
+			m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
+			m_width = m_windowRectangle.right > 0 ? m_windowRectangle.right : 10;
 			m_showCursor = true; m_fullScreen = false;
 			m_windowHandler = hWnd;
 
@@ -477,6 +478,7 @@ namespace thomas
 			return true;
 
 		Window* window = GetWindow(hWnd);
+		bool isEditor = s_editorWindow == window;
 
 		//If one case is hit the code will execute everything down until a break;
 		switch (message)
@@ -489,11 +491,15 @@ namespace thomas
 		break;
 		case WM_SETFOCUS:
 		case WM_KILLFOCUS:
-			Input::ProcessGamePad(message, wParam, lParam);
+			if (window->IsFocused())
+				Input::ProcessGamePad(message, wParam, lParam);
 			break;
 		case WM_ACTIVATEAPP:
-			Input::ProcessKeyboard(message, wParam, lParam);
-			Input::ProcessMouse(message, wParam, lParam, hWnd);
+			if (window->IsFocused()) {
+				Input::ProcessKeyboard(message, wParam, lParam);
+				Input::ProcessMouse(message, wParam, lParam, hWnd);
+			}
+
 			break;
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONDOWN:
@@ -508,13 +514,15 @@ namespace thomas
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
-			Input::ProcessMouse(message, wParam, lParam, hWnd);
+			if (window->IsFocused())
+				Input::ProcessMouse(message, wParam, lParam, hWnd);
 			break;
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			Input::ProcessKeyboard(message, wParam, lParam);
+			if (window->IsFocused())
+				Input::ProcessKeyboard(message, wParam, lParam);
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);

@@ -56,6 +56,9 @@ namespace ThomasEngine
 
 
 	internal:
+
+		String^ prefabPath;
+
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
@@ -139,7 +142,19 @@ namespace ThomasEngine
 			Monitor::Exit(m_componentsLock);
 		}
 
-		
+		void OnCollisionEnter(GameObject^ collider)
+		{
+			Monitor::Enter(m_componentsLock);
+
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->enabled)
+					component->OnCollisionEnter(collider);
+			}
+			Monitor::Exit(m_componentsLock);
+		}
+
 	public:
 		static GameObject^ s_lastObject;
 
@@ -168,6 +183,8 @@ namespace ThomasEngine
 		}
 
 
+
+
 		property bool inScene {
 			bool get() {
 				return scene != nullptr;
@@ -188,8 +205,10 @@ namespace ThomasEngine
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 				for (int i = 0; i < m_components.Count; i++)
 				{
+					
 					Component^ component = m_components[i];
-					component->enabled = value;
+					if(component->initialized)
+						component->enabled = value;
 				}
 			}
 		}	
@@ -259,12 +278,30 @@ namespace ThomasEngine
 				return T();
 		}
 
+		Component^ GetComponent(Type^ type) {
+			for (int i = 0; i < m_components.Count; i++) {
+				if (m_components[i]->GetType() == type)
+					return m_components[i];
+			}
+		}
+
+
 		generic<typename T>
 		where T : Component
 		List<T>^ GetComponents()
 		{
 			List<T>^ list = gcnew List<T>(Enumerable::OfType<T>(%m_components));
 			return list;
+		}
+
+
+		List<Component^>^ GetComponents(Type^ type) {
+			List<Component^>^ tComponents = gcnew List<Component^>();
+			for (int i = 0; i < m_components.Count; i++) {
+				if (m_components[i]->GetType() == type)
+					tComponents->Add(m_components[i]);
+			}
+			return tComponents;
 		}
 
 

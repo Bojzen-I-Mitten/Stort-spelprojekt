@@ -3,7 +3,7 @@
 #include "object\Component.h"
 #include "resource\Resources.h"
 #include "ThomasManaged.h"
-#include <msclr/marshal_cppstd.h>
+#include "Debug.h"
 namespace ThomasEngine
 {
 	void Scene::Play()
@@ -79,6 +79,11 @@ namespace ThomasEngine
 			DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
 			Scene^ scene = (Scene^)serializer->ReadObject(file);
+
+			msclr::interop::marshal_context context;
+			for (int i = 0; i < scene->GameObjects->Count; ++i)
+				scene->GameObjects[i]->nativePtr->SetName(context.marshal_as<std::string>(scene->GameObjects[i]->Name));
+
 			file->Close();
 
 			scene->PostLoad();
@@ -151,6 +156,16 @@ namespace ThomasEngine
 			Resource^ resource = (Resource^)obj;
 			return gcnew SceneResource(resource->GetAssetRelativePath());
 		}
+		else if (obj->GetType() == GameObject::typeid) {
+			GameObject^ gameObject = (GameObject^)obj;
+			if(gameObject->prefabPath)
+				return gcnew SceneResource(Resources::ConvertToThomasPath(gameObject->prefabPath));
+		}
+		else if (Component::typeid->IsAssignableFrom(obj->GetType())) {
+			Component^ component = (Component^)obj;
+			if (component->gameObject->prefabPath)
+				return gcnew SceneResource(Resources::ConvertToThomasPath(component->gameObject->prefabPath));
+		}
 		return obj;
 	}
 
@@ -163,6 +178,11 @@ namespace ThomasEngine
 			{
 				if (targetType == Material::typeid)
 					return Material::StandardMaterial;
+			}
+			else if (targetType == GameObject::typeid)
+				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path));
+			else if (Component::typeid->IsAssignableFrom(targetType)) {
+				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path))->GetComponent(targetType);
 			}
 			else {
 				return Resources::LoadThomasPath(sceneResource->path);
