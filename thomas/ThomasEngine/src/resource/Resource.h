@@ -61,7 +61,7 @@ namespace ThomasEngine
 
 		String^ GetAssetRelativePath();
 
-		virtual property String^ name
+		virtual property String^ Name
 		{
 			String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
 		};
