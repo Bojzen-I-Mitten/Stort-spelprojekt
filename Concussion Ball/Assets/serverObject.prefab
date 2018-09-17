@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
+  <m_guid>0a46c513-3a26-48d7-94c7-cbbc9f334cb4</m_guid>
+  <m_name z:Id="2">gameObject</m_name>
+  <Components z:Size="2">
+    <Component z:Id="3" i:type="Transform">
+      <m_guid>8ef9163a-815f-48db-b990-f019aa088365</m_guid>
+      <m_name i:nil="true" />
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <children z:Size="0" />
+      <eulerAngles>
+        <x>-0</x>
+        <y>-0</y>
+        <z>-0</z>
+      </eulerAngles>
+      <localEulerAngles>
+        <x>-0</x>
+        <y>-0</y>
+        <z>-0</z>
+      </localEulerAngles>
+      <localPosition>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </localPosition>
+      <localScale>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </localScale>
+      <parent i:nil="true" />
+      <position>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </position>
+      <rotation>
+        <w>1</w>
+        <x>-0</x>
+        <y>0</y>
+        <z>-0</z>
+      </rotation>
+      <scale>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </scale>
+    </Component>
+    <Component z:Id="4" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkManager">
+      <m_guid>04207c43-c388-4b58-99af-3c566210ffc7</m_guid>
+      <m_name i:nil="true" />
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:IP z:Id="5">localhost</d3p1:IP>
+      <d3p1:TICK_RATE>24</d3p1:TICK_RATE>
+      <d3p1:isServer>true</d3p1:isServer>
+      <d3p1:player i:nil="true" />
+      <d3p1:port>9050</d3p1:port>
+      <d3p1:spawnablePrefabs z:Id="6" z:Size="2">
+        <GameObject z:Id="7">
+          <m_guid>560e1486-ad21-4f52-b5f7-4743b91141c4</m_guid>
+          <m_name z:Id="8">newCube</m_name>
+          <Components z:Size="2">
+            <Component z:Id="9" i:type="Transform">
+              <m_guid>c532f7fe-9373-4e4b-9f78-390db3386e36</m_guid>
+              <m_name i:nil="true" />
+              <m_gameObject z:Ref="7" i:nil="true" />
+              <children z:Size="0" />
+              <eulerAngles>
+                <x>-0</x>
+                <y>-0</y>
+                <z>-0</z>
+              </eulerAngles>
+              <localEulerAngles>
+                <x>-0</x>
+                <y>-0</y>
+                <z>-0</z>
+              </localEulerAngles>
+              <localPosition>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+              </localPosition>
+              <localScale>
+                <x>1</x>
+                <y>1</y>
+                <z>1</z>
+              </localScale>
+              <parent i:nil="true" />
+              <position>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+              </position>
+              <rotation>
+                <w>1</w>
+                <x>-0</x>
+                <y>0</y>
+                <z>-0</z>
+              </rotation>
+              <scale>
+                <x>1</x>
+                <y>1</y>
+                <z>1</z>
+              </scale>
+            </Component>
+            <Component z:Id="10" i:type="RenderComponent">
+              <m_guid>6216c6fb-c2a8-4160-b194-f454338d4a47</m_guid>
+              <m_name i:nil="true" />
+              <m_gameObject z:Ref="7" i:nil="true" />
+              <material z:Id="11">
+                <path z:Id="12"></path>
+              </material>
+              <model z:Id="13">
+                <path z:Id="14">../Data/primitives/cube.obj</path>
+              </model>
+            </Component>
+          </Components>
+          <activeSelf>true</activeSelf>
+          <transform z:Ref="9" i:nil="true" />
+        </GameObject>
+        <GameObject z:Id="15">
+          <m_guid>d48a5e9a-79ff-4365-98ae-75b43b47da78</m_guid>
+          <m_name z:Id="16">newSphere</m_name>
+          <Components z:Size="2">
+            <Component z:Id="17" i:type="Transform">
+              <m_guid>a397033f-afb0-4072-864b-3d2944fe263c</m_guid>
+              <m_name i:nil="true" />
+              <m_gameObject z:Ref="15" i:nil="true" />
+              <children z:Size="0" />
+              <eulerAngles>
+                <x>-0</x>
+                <y>-0</y>
+                <z>-0</z>
+              </eulerAngles>
+              <localEulerAngles>
+                <x>-0</x>
+                <y>-0</y>
+                <z>-0</z>
+              </localEulerAngles>
+              <localPosition>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+              </localPosition>
+              <localScale>
+                <x>1</x>
+                <y>1</y>
+                <z>1</z>
+              </localScale>
+              <parent i:nil="true" />
+              <position>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+              </position>
+              <rotation>
+                <w>1</w>
+                <x>-0</x>
+                <y>0</y>
+                <z>-0</z>
+              </rotation>
+              <scale>
+                <x>1</x>
+                <y>1</y>
+                <z>1</z>
+              </scale>
+            </Component>
+            <Component z:Id="18" i:type="RenderComponent">
+              <m_guid>a27fdaa7-79b0-45f3-8fe5-46a9a4a374e8</m_guid>
+              <m_name i:nil="true" />
+              <m_gameObject z:Ref="15" i:nil="true" />
+              <material z:Id="19">
+                <path z:Ref="12" i:nil="true" />
+              </material>
+              <model z:Id="20">
+                <path z:Id="21">../Data/primitives/sphere.obj</path>
+              </model>
+            </Component>
+          </Components>
+          <activeSelf>true</activeSelf>
+          <transform z:Ref="17" i:nil="true" />
+        </GameObject>
+      </d3p1:spawnablePrefabs>
+      <d3p1:testPacket z:Id="22">
+        <d3p1:ID>0</d3p1:ID>
+        <d3p1:transformPos>
+          <x>0</x>
+          <y>0</y>
+          <z>0</z>
+        </d3p1:transformPos>
+      </d3p1:testPacket>
+    </Component>
+  </Components>
+  <activeSelf>true</activeSelf>
+  <transform z:Ref="3" i:nil="true" />
+</GameObject>

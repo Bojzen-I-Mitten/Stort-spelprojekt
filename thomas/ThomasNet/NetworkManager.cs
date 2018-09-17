@@ -174,10 +174,11 @@ namespace ThomasEngine.Network
 
             if (Input.GetKeyUp(Input.Keys.K))
             {
+                Debug.Log("Test");
                 Spawner spawner = new Spawner();
                 spawner.netID = 0;
-                spawner.prefabID = 1;
-                SendEvent(writer, spawner);
+                spawner.prefabID = 0;
+                SendEvent(spawner, DeliveryMethod.ReliableOrdered);
             }
         }
 
