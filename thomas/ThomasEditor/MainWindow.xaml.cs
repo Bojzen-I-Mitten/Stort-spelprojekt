@@ -229,9 +229,9 @@ namespace ThomasEditor
             for(int i=0; i < ThomasWrapper.Selection.Count; i++)
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
+                ThomasWrapper.Selection.UnSelectGameObject(gObj);
                 gObj.Destroy();
-                //ThomasWrapper.SelectedGameObjects.RemoveAt(i);
-               i--;
+                //i--;
             }
         }
 
@@ -410,9 +410,10 @@ namespace ThomasEditor
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
 
-            showBusyIndicator("Creating new project...");
+
             if (saveFileDialog.ShowDialog() == true)
             {
+                showBusyIndicator("Creating new project...");
                 Thread worker = new Thread(new ThreadStart(() =>
                 {
                     string fileName = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
