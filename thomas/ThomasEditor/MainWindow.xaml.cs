@@ -362,7 +362,11 @@ namespace ThomasEditor
             if (ThomasWrapper.IsPlaying())
                 ThomasWrapper.Stop();
             else
+            {
                 ThomasWrapper.Play();
+                game.Focus();
+            }
+                
 
             playPauseButton.DataContext = ThomasWrapper.IsPlaying();
         }

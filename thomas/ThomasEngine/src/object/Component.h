@@ -39,6 +39,7 @@ namespace ThomasEngine
 		virtual void FixedUpdate() {((thomas::object::component::Component*)nativePtr)->FixedUpdate();}
 		virtual void OnDrawGizmosSelected() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmosSelected(); }
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
+		virtual void OnCollisionEnter(GameObject^ collider);
 
 		[NonSerializedAttribute]
 		GameObject^ m_gameObject;

@@ -138,15 +138,15 @@
 
                         <xcad:LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="1*">
                             <xcad:LayoutDocumentPane>
-                                <xcad:LayoutAnchorable ContentId="Hiearchy" Title="Hierarchy" >
+                                    <xcad:LayoutAnchorable ContentId="Hiearchy" Title="Hierarchy" CanHide="False" CanClose="False">
                                     <local:GameObjectHierarchy/>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                             <xcad:LayoutDocumentPane>
-                                <xcad:LayoutAnchorable ContentId="Project" Title="Project" >
+                                    <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
                                     <local:AssetBrowser/>
                                 </xcad:LayoutAnchorable>
-                                <xcad:LayoutAnchorable ContentId="Console" Title="Console">
+                                    <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
                                     <ListBox Name="console" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged">
                                     </ListBox>
                                 </xcad:LayoutAnchorable>
@@ -154,9 +154,11 @@
                         </xcad:LayoutDocumentPaneGroup>
 
                         <xcad:LayoutDocumentPane DockWidth="2*">
-                            <xcad:LayoutAnchorable ContentId="Inspector" Title="Inspector">
-                                <inspectors:Inspector x:Name="inspector" x:FieldModifier="public" Background="#444444"/>
-                            </xcad:LayoutAnchorable>
+                                <xcad:LayoutAnchorable ContentId="Inspector" Title="Inspector" CanHide="False" CanClose="False">
+                                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <inspectors:Inspector x:Name="inspector" x:FieldModifier="public" Background="#444444" />
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
                         </xcad:LayoutDocumentPane>
                     </xcad:LayoutDocumentPaneGroup>
                 </xcad:LayoutPanel>

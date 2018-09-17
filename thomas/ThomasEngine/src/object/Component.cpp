@@ -55,6 +55,11 @@ void ThomasEngine::Component::setGameObject(GameObject ^ gObj)
 	((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.push_back(((thomas::object::component::Component*)nativePtr));
 }
 
+void ThomasEngine::Component::OnCollisionEnter(GameObject ^ collider)
+{
+	((thomas::object::component::Component*)nativePtr)->OnCollisionEnter((thomas::object::GameObject*)collider->nativePtr);
+}
+
 void ThomasEngine::Component::Destroy()
 {
 	Monitor::Enter(m_gameObject->m_componentsLock);

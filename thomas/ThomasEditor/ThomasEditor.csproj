@@ -175,6 +175,8 @@
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="scriptComponent test\chadControls.cs" />
+    <Compile Include="scriptComponent test\Collider.cs" />
     <Compile Include="Inspectors\ListEditor.xaml.cs">
       <DependentUpon>ListEditor.xaml</DependentUpon>
     </Compile>
@@ -184,7 +186,6 @@
     <Compile Include="Inspectors\TextureEditor.xaml.cs">
       <DependentUpon>TextureEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="scriptComponent test\ChadControls.cs" />
     <Compile Include="utils\CustomCommands.cs" />
     <Compile Include="utils\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Inspectors\ExtendedPropertyGrid.xaml.cs">
