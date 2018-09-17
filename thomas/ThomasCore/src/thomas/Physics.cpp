@@ -40,18 +40,21 @@ namespace thomas
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
 	}
-	void Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
+	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		bool found = false;
 		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
 		{
 			object::component::Rigidbody* rb = s_rigidBodies[i];
 			if (rb == rigidBody)
 			{
 				s_rigidBodies.erase(s_rigidBodies.begin() + i);
+				found = true;
 				break;
 			}
 		}
-		s_world->removeRigidBody(rigidBody);		
+		s_world->removeRigidBody(rigidBody);
+		return found;
 	}
 
 	void Physics::UpdateRigidbodies()
