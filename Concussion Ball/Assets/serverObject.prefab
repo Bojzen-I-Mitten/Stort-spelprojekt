@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
-  <m_guid>db1fe944-2f59-4ac0-b725-1b9e3671a045</m_guid>
+  <m_guid>240d0d75-d017-4474-a84e-9226e69c4c25</m_guid>
   <m_name z:Id="2">serverObject</m_name>
   <Components z:Size="2">
     <Component z:Id="3" i:type="Transform">
-      <m_guid>fb13c4ef-1294-47e8-9ef5-442b9d013f9d</m_guid>
+      <m_guid>c986b530-9c75-4966-80af-9a5725d66d8c</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <children z:Size="0" />
@@ -47,7 +47,7 @@
       </scale>
     </Component>
     <Component z:Id="4" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkManager">
-      <m_guid>5369334d-1d37-444f-b47f-e59a604a4912</m_guid>
+      <m_guid>e7a7d2b4-7a5a-41a4-b1ec-650bf9a100a2</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <d3p1:IP z:Id="5">localhost</d3p1:IP>
