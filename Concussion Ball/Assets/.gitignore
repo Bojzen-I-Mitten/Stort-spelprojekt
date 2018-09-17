@@ -7,7 +7,7 @@
 *.jpeg
 *.tga
 *.tds
+*.mp3
+*.wav
 
-Arena/
 Models/
-Sounds/
