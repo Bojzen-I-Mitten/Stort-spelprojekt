@@ -87,11 +87,14 @@ namespace thomas
 			// Avoid self collisions
 			if (obA == obB) continue;
 
-			object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
-			object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
+			if (obA->getUserPointer() && obB->getUserPointer())
+			{
+				object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
+				object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
 
-			// Set the collider object to the target collider
-			rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
+				// Set the collider object to the target collider
+				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
+			}
 		}
 
 		for (object::component::Rigidbody* rb : s_rigidBodies)

@@ -13,6 +13,7 @@ namespace thomas
 		{
 			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL), m_targetCollider(nullptr)
 			{
+				this->setUserPointer(this);
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);
