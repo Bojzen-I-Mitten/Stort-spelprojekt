@@ -48,7 +48,7 @@ namespace thomas
 			static void Initialize();
 			static void Destroy();
 			static void AddLight(object::component::LightComponent* light);
-			static void RemoveLight(object::component::LightComponent* light);
+			static bool RemoveLight(object::component::LightComponent* light);
 			static void Update();
 
 			static void Bind();

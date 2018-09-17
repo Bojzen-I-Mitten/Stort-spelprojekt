@@ -50,7 +50,7 @@ namespace thomas
 			int stoppper = 0;
 		}
 		
-		void LightManager::RemoveLight(object::component::LightComponent * light)
+		bool LightManager::RemoveLight(object::component::LightComponent * light)//returns true if light was removed
 		{
 			auto it = s_lights.begin();
 
@@ -72,12 +72,14 @@ namespace thomas
 					default:
 						break;
 					}
-
+					
 					s_lights.erase(it);
-					break;
+					
+					return true;
 				}
 				it++;
 			}
+			return false;
 		}
 
 		void LightManager::Update()
