@@ -17,10 +17,13 @@ namespace ThomasEngine
 	ref class GameObject;
 	ref class Transform;
 	[HideInInspector]
+	[SerializableAttribute]
 	public ref class Component : public Object
 	{
 		Component();
-
+	private:
+		[NonSerializedAttribute]
+		bool m_enabled = false;
 	internal:
 		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
 		static void LoadExternalComponents();
@@ -46,9 +49,44 @@ namespace ThomasEngine
 			void set(bool value) { ((thomas::object::component::Component*)nativePtr)->initialized = value; }
 		}
 
+		void Initialize() {
+			if (!awakened)
+			{
+				Awake();
+				awakened = true;
+				return;
+			}
+			else if (!enabled) {
+				enabled = true;
+				return;
+			}else{
+				Start();
+				initialized = true;
+				return;
+			}
+			
+		}
+		[NonSerializedAttribute]
+		bool awakened = false;
+
 	public:
 		static System::Reflection::Assembly^ editorAssembly;
-		bool enabled = true;
+		
+
+		[Xml::Serialization::XmlIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property bool enabled {
+			bool get() { return m_enabled; }
+			void set(bool value) {
+				if (m_enabled != value) {
+					m_enabled = value;
+					if (value == true)
+						OnEnable();
+					else
+						OnDisable();
+				}
+			}
+		}
 
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject

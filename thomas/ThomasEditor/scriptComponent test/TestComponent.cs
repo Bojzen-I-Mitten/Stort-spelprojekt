@@ -16,7 +16,7 @@ namespace ThomasEditor
         public Model m { get; set; }
         public GameObject coolPrefab { get; set; }
         public RenderComponent otherObjectsRender { get; set; }
-
+        public List<GameObject> niceList { get; set; } = new List<GameObject> { null, null };
         float t = 0;
 
         public override void Start()

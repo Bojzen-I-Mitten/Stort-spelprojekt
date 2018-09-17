@@ -57,15 +57,20 @@ namespace ThomasEngine.Network
         public bool isClient
         {
             get { return !isServer; }
+
         }
 
+        public NetworkManager()
+        {
+            instance = this;
+        }
         public override void Awake()
         {
             networkIDObjects = new Dictionary<int, NetworkID>();
             netPacketProcessor = new NetPacketProcessor();
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
-            instance = this;
+           
             writer = new NetDataWriter();
                         
             //Here all events are defined.
