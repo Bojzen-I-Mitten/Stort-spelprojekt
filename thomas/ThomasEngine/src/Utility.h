@@ -25,7 +25,7 @@ namespace ThomasEngine
 
 		static thomas::math::Color Convert(Color% value)
 		{
-			return thomas::math::Color(value.r, value.g, value.b, value.a);
+			return thomas::math::Color(Utility::Convert(value.ToVector4()));
 		}
 		static Color Convert(thomas::math::Color& value)
 		{

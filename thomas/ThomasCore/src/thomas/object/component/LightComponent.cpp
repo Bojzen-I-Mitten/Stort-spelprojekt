@@ -68,6 +68,10 @@ namespace thomas
 					m_type = other;
 					graphics::LightManager::AddLight(this);
 				}
+				else
+					m_type = other;
+				
+				
 			}
 
 			thomas::math::Color LightComponent::GetColor()

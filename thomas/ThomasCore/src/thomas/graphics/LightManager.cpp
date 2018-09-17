@@ -18,7 +18,7 @@ namespace thomas
 
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 10, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;
@@ -84,14 +84,14 @@ namespace thomas
 
 		void LightManager::Update()
 		{
-			std::vector<LightStruct> m_allLights;
+			std::vector<LightStruct> allLights;
 
 			for (object::component::LightComponent* light : s_lights)
 			{
-				m_allLights.push_back(light->GetData());
+				allLights.push_back(light->GetData());
 			}
-			
-			m_lightBuffer->SetData(m_allLights);
+
+			m_lightBuffer->SetData(allLights);
 		}
 		void LightManager::Bind()
 		{

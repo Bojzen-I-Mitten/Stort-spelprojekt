@@ -38,7 +38,7 @@ namespace ThomasEngine
 				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColor());
 			}
 			void set(Color value) {
-				((thomas::object::component::LightComponent*)nativePtr)->SetColor(thomas::math::Color(value.r, value.g, value.b));
+				((thomas::object::component::LightComponent*)nativePtr)->SetColor(Utility::Convert(value));
 			}
 		}
 		property float Intensity {
