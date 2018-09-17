@@ -120,6 +120,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <PrecompiledHeaderFile />
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -163,6 +165,7 @@
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\math\Curve.h" />
+    <ClInclude Include="src\object\component\LightComponent.h" />
     <ClInclude Include="src\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\object\component\physics\Collider.h" />
     <ClInclude Include="src\object\component\physics\MeshCollider.h" />
@@ -201,10 +204,12 @@
     <ClCompile Include="src\Debug.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\math\Curve.cpp" />
+    <ClCompile Include="src\object\component\LightComponent.cpp" />
     <ClCompile Include="src\object\component\physics\BoxCollider.cpp" />
     <ClCompile Include="src\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
+    <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
     <ClCompile Include="src\object\Component.cpp" />
     <ClCompile Include="src\object\component\Camera.cpp" />

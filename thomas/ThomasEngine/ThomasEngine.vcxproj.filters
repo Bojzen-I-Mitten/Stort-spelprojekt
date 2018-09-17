@@ -37,7 +37,9 @@
     <ClCompile Include="src\math\Curve.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\Debug.cpp" />
+    <ClCompile Include="src\object\component\LightComponent.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
+    <ClCompile Include="src\Project.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -80,6 +82,7 @@
     <ClInclude Include="src\math\Curve.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ThomasSelection.h" />
+    <ClInclude Include="src\object\component\LightComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

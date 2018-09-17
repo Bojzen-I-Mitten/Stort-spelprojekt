@@ -12,6 +12,8 @@
 #include "utils\Primitives.h"
 #include <D3d11_4.h>
 
+#include "object/component/LightComponent.h"
+
 namespace thomas 
 {
 	ID3D11Debug* ThomasCore::s_debug;
@@ -39,7 +41,8 @@ namespace thomas
 		Physics::Init();
 		editor::EditorCamera::Init();
 		editor::Gizmos::Init();
-		utils::Primitives::Init();
+
+		graphics::LightManager::Initialize();
 
 		s_initialized = true;
 		return s_initialized;

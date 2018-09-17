@@ -3,9 +3,7 @@
 #include "thomas\resource\Resource.h"
 #include <memory>
 #pragma managed
-
 #include "../Utility.h"
-#include "../Scene.h"
 
 using namespace System;
 using namespace System::Runtime::Serialization;
@@ -13,6 +11,7 @@ using namespace System::ComponentModel;
 
 namespace ThomasEngine
 {
+	ref class GameObject;
 	[DataContractAttribute]
 	public ref class Resource : public INotifyPropertyChanged
 	{
@@ -20,6 +19,10 @@ namespace ThomasEngine
 		thomas::resource::Resource* m_nativePtr;
 
 		[DataMemberAttribute(Order = 0)]
+		property String^ asset_path {
+			String^ get() { return GetAssetRelativePath(); }
+			void set(String^ value);
+		}
 		String^ m_path;
 
 		Resource(String^ path, thomas::resource::Resource* ptr)
@@ -37,7 +40,7 @@ namespace ThomasEngine
 		void Rename(String^ newPath) {
 			m_path = newPath;
 			m_nativePtr->Rename(Utility::ConvertString(newPath));
-			OnPropertyChanged("name");
+			OnPropertyChanged("Name");
 		}
 
 	public:
@@ -47,16 +50,16 @@ namespace ThomasEngine
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
 
-		virtual void Reload() {
-			System::Threading::Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-			m_nativePtr->Reload();
-			System::Threading::Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
-		};
+		virtual void Reload();
 
 		String ^ GetPath()
 		{
 			return m_path;
 		}
+
+		virtual property String^ Name;
+
+		String^ GetAssetRelativePath();
 
 		virtual property String^ name
 		{
@@ -65,7 +68,7 @@ namespace ThomasEngine
 
 		virtual String^ ToString() override
 		{
-			return name;
+			return Name;
 		}
 
 		static bool operator ==(Resource^ a, Resource^ b)
