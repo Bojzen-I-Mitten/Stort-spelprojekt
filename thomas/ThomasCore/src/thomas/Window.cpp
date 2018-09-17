@@ -61,8 +61,8 @@ namespace thomas
 		bool result = GetWindowRect(hWnd, &m_windowRectangle);
 		if (result)
 		{
-			m_height = m_windowRectangle.bottom;
-			m_width = m_windowRectangle.right;
+			m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
+			m_width = m_windowRectangle.right > 0 ? m_windowRectangle.right : 10;
 			m_showCursor = true; m_fullScreen = false;
 			m_windowHandler = hWnd;
 

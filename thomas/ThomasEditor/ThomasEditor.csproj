@@ -184,6 +184,7 @@
     <Compile Include="Inspectors\TextureEditor.xaml.cs">
       <DependentUpon>TextureEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="scriptComponent test\ChadControls.cs" />
     <Compile Include="utils\CustomCommands.cs" />
     <Compile Include="utils\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Inspectors\ExtendedPropertyGrid.xaml.cs">
