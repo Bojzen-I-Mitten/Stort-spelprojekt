@@ -21,6 +21,7 @@ namespace thomas
 		m_windowClassInfo.style = CS_HREDRAW | CS_VREDRAW;
 		m_windowClassInfo.lpfnWndProc = EventHandler; //Callback for EVENTS
 		m_windowClassInfo.hInstance = hInstance;
+		m_windowClassInfo.hInstance = hInstance;
 		m_windowClassInfo.lpszClassName = "ThomasWindow";
 		m_windowClassInfo.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(101));
 
