@@ -3,6 +3,7 @@
 #include "object\Component.h"
 #include "resource\Resources.h"
 #include "ThomasManaged.h"
+#include "Debug.h"
 namespace ThomasEngine
 {
 	void Scene::Play()
@@ -87,6 +88,7 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
+			Debug::Log(e->ToString());
 			return nullptr;
 		}
 
