@@ -19,6 +19,8 @@ namespace thomas {
 		public:
 			Animation(std::string path);
 
+			bool HasAnimation();
+
 			graphics::animation::AnimationData* GetAnimation();
 
 			virtual void OnChanged();

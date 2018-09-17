@@ -36,6 +36,7 @@ namespace thomas {
 				bool getPrevious(float elapsedTime, unsigned int chInd, unsigned int & keyInd) const;
 				/* Get a specific key from a channel */
 				ChannelKey getKey(unsigned int index, unsigned int chInd) const;
+				ChannelKey getLast(unsigned int chInd) const;
 				/* Get the number of keys in a specific node channel */
 				unsigned int numKeys(unsigned int chType) const;
 				/* Get the number of animated channels in the channel node */

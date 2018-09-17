@@ -49,7 +49,7 @@ namespace thomas {
 			{
 				for (; keyInd > 0; keyInd--)
 				{
-					if (elapsedTime > m_channels[chInd].m_keys[keyInd - 1]._time)
+					if (elapsedTime >= m_channels[chInd].m_keys[keyInd - 1]._time)
 						return true;
 				}
 				return false;
@@ -58,6 +58,11 @@ namespace thomas {
 			/* Get a specific key from a channel */
 			ChannelKey ObjectChannel::getKey(unsigned int index, unsigned int chInd) const {
 				return m_channels[chInd].m_keys[index];
+			}
+
+			ChannelKey ObjectChannel::getLast(unsigned int chInd) const
+			{
+				return m_channels[chInd].m_keys.back();
 			}
 
 

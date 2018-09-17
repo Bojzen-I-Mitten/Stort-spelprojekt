@@ -2,6 +2,7 @@
 #include <vector>
 #include <math.h>
 #include "../../utils/Math.h"
+#include "IBlendTree.h"
 #include "../../resource/ShaderProperty/ShaderPropertyMatrix.h"
 
 namespace thomas {
@@ -11,7 +12,8 @@ namespace thomas {
 			class Skeleton;
 			class AnimationNode;
 
-			class AnimatedSkeleton
+			class AnimatedSkeleton 
+				: public IBlendTree
 			{
 			public:
 				AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref);
@@ -24,8 +26,9 @@ namespace thomas {
 
 			public:
 
-				void setBlendTree(std::unique_ptr<AnimationNode> &blendTree);
-				void clearBlendTree();
+				virtual void setBlendTree(std::unique_ptr<AnimationNode> &blendTree);
+				virtual void clearBlendTree();
+				virtual void playSingle(thomas::resource::Animation * anim);
 
 				/* Get skin matrixes
 				*/

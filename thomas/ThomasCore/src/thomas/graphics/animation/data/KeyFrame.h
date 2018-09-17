@@ -163,8 +163,9 @@ namespace thomas {
 						assert(false);
 					}
 					else {
-						previousKey(i, eT);
+						m_keyIndex[i] = 0;
 						newKey(i, eT);
+						previousKey(i, eT);
 					}
 				}
 			}
@@ -183,35 +184,35 @@ namespace thomas {
 					updateFrame(i, eT);
 			}
 			template<unsigned int N>
-			void  KeyFrame<N>::nextKey(unsigned int type, float eT)
+			void  KeyFrame<N>::nextKey(unsigned int chnlInd, float eT)
 			{
-				if (m_channel->getNext(eT, type, m_keyIndex[type]))	//If key is found, set it
-					m_to[type] = m_channel->getKey(m_keyIndex[type], type);
+				if (m_channel->getNext(eT, chnlInd, m_keyIndex[chnlInd]))			//If key is found, set it
+					m_to[chnlInd] = m_channel->getKey(m_keyIndex[chnlInd], chnlInd);
 				else {
-					m_to[type]._time = FLT_MAX;						//Let the frame elapse until the animation end
-					_custom[type] = false;							//This is not a custom key.
+					m_to[chnlInd]._time = FLT_MAX;									//Let the frame elapse until the animation end
+					_custom[chnlInd] = false;										//This is not a custom key.
 				}
 			}
 			template<unsigned int N>
-			void  KeyFrame<N>::previousKey(unsigned int chnlInd, float eT)
+			void  KeyFrame<N>::previousKey(unsigned int chInd, float eT)
 			{
-				if (m_channel->getPrevious(eT, m_keyIndex[chnlInd]))		// If key is found, set it
-					m_from[chnlInd] = m_channel->getKey(m_keyIndex[chnlInd] - 1, chnlInd);
+				if (m_channel->getPrevious(eT, chInd, m_keyIndex[chInd]))		// If key is found, set it
+					m_from[chInd] = m_channel->getKey(m_keyIndex[chInd] - 1, chInd);
 				else {
-					m_from[chnlInd]._time = eT;						// Animate from current value (and time)
-					_custom[chnlInd] = false;						// This is not a custom key.
+					m_from[chInd]._time = eT;						// Animate from current value (and time)
+					_custom[chInd] = false;						// This is not a custom key.
 				}
 			}
 			/* Find and set a the first key of the animation */
 			template<unsigned int N>
-			void  KeyFrame<N>::newKey(unsigned int chnlInd, float startAT)
+			void  KeyFrame<N>::newKey(unsigned int chInd, float startAT)
 			{
-				if (m_channel->getNext(startAT, chnlInd, m_keyIndex[chnlInd]))	//If key is found, set it
-					m_to[chnlInd] = m_channel->getKey(m_keyIndex[chnlInd], chnlInd);
-				else {												//There is no key in the animation channel, set the current value to continue to the endtimes.
-					m_to[chnlInd] = m_from[chnlInd];
-					m_to[chnlInd]._time = FLT_MAX;
-					_custom[chnlInd] = false;
+				if (m_channel->getNext(startAT, chInd, m_keyIndex[chInd]))			//	If key is found, set it
+					m_to[chInd] = m_channel->getKey(m_keyIndex[chInd], chInd);	
+				else {																	//	There is no key in the animation channel, set the current value to continue to the endtimes.
+					m_to[chInd] = m_channel->getLast(chInd);
+					m_to[chInd]._time = FLT_MAX;
+					_custom[chInd] = false;
 				}
 			}
 

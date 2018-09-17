@@ -59,6 +59,9 @@ namespace thomas
 					insertProperty(&m_skinArray);
 				}
 			}
+			graphics::animation::IBlendTree* RenderSkinnedComponent::GetBlendTree() {
+				return m_skeleton.get();
+			}
 		}
 	}
 }

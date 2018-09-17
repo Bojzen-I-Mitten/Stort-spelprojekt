@@ -107,6 +107,7 @@
     <ClInclude Include="src\thomas\graphics\animation\data\ChannelKeys.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\KeyFrame.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
+    <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />

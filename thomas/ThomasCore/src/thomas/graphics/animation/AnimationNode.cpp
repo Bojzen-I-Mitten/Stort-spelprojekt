@@ -18,7 +18,8 @@ namespace thomas {
 			{
 				math::Matrix mat;										// Interpolated transform
 				mat = math::Matrix::CreateScale(calcBoneScale(bone)) * math::Matrix::CreateFromQuaternion(calcBoneRot(bone));
-				mat.Translation(calcBonePosition(bone));
+				math::Vector3 pos = calcBonePosition(bone);
+				mat.Translation(pos);
 				return mat;
 
 			}

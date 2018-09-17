@@ -4,7 +4,12 @@
 #include "../../utils/Math.h"
 namespace thomas
 {
-	namespace graphics { namespace animation { class AnimatedSkeleton; } }
+	namespace graphics { 
+		namespace animation { 
+		class AnimatedSkeleton;
+		class IBlendTree;
+		}
+	}
 	namespace object
 	{
 		class Camera;
@@ -20,7 +25,9 @@ namespace thomas
 			protected:
 			public:
 				virtual void SetModel(resource::Model* model);
-
+				/* Access the animated blend tree.
+				*/
+				graphics::animation::IBlendTree* GetBlendTree();
 			public:
 			private:
 				resource::shaderproperty::ShaderPropertyMatrixArray m_skinArray;

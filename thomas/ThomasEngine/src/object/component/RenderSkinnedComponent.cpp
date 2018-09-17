@@ -2,6 +2,7 @@
 #pragma once
 #pragma unmanaged
 #include <thomas\object\component\RenderComponent.h>
+#include <thomas\graphics\animation\IBlendTree.h>
 #pragma managed
 
 #include "../Component.h"
@@ -28,6 +29,13 @@ namespace ThomasEngine
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetModel((thomas::resource::Model*)value->m_nativePtr);
 	}
 
+	void RenderSkinnedComponent::animation::set(Animation^ value) {
+		if (value == nullptr)
+			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->clearBlendTree();
+		else
+			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(value->get());
+
+	}
 
 
 	Material^ RenderSkinnedComponent::material::get() {

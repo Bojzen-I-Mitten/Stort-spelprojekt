@@ -503,7 +503,7 @@ namespace thomas
 				aiNodeAnim *channel = anim->mChannels[ch];
 				int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 				if (bone < 0)
-					return size; //This channel does not animate a bone.
+					continue; //This channel does not animate a bone.
 				size._numChannels++;
 				size._numFloats += 3 * channel->mNumPositionKeys;
 				size._numFloats += 3 * channel->mNumScalingKeys;
@@ -537,14 +537,16 @@ namespace thomas
 			for (unsigned int i = 0; i < scene->mNumAnimations; i++) {
 				aiAnimation *anim = scene->mAnimations[i];
 				AnimSize size = ReadAnimData(anim, construct);
-				AnimationConstruct animConst(size);
+				if (size._numFloats > 0) {
+					AnimationConstruct animConst(size);
 
-				float duration = (float)(anim->mDuration * anim->mTicksPerSecond);
-				for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
-					aiNodeAnim *channel = anim->mChannels[ch];
-					ProcessChannel(channel, construct, animConst);
+					float duration = (float)(anim->mDuration * anim->mTicksPerSecond);
+					for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
+						aiNodeAnim *channel = anim->mChannels[ch];
+						ProcessChannel(channel, construct, animConst);
+					}
+					construct.m_animList.push_back(animConst.generateAnim(anim->mName.C_Str(), duration));
 				}
-				construct.m_animList.push_back(animConst.generateAnim(anim->mName.C_Str(), duration));
 			}
 		}
 

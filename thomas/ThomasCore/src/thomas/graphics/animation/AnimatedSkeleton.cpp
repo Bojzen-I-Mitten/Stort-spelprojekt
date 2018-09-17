@@ -1,7 +1,10 @@
 #include "AnimatedSkeleton.h"
 #include "AnimationNode.h"
 #include "AnimPlayback.h"
+#include "data/AnimationData.h"
+#include "../../resource/Animation.h"
 #include "data/Skeleton.h"
+#include "BaseAnimationTime.h"
 
 namespace thomas {
 	namespace graphics {
@@ -59,6 +62,17 @@ namespace thomas {
 
 			void AnimatedSkeleton::clearBlendTree() {
 				_root = std::unique_ptr<AnimationNode>(new AnimPlayback(_ref));
+			}
+
+			void AnimatedSkeleton::playSingle(thomas::resource::Animation * anim)
+			{
+				if (!anim->HasAnimation()) {
+					clearBlendTree();
+					return;
+				}
+				AnimationData &animRef = *anim->GetAnimation();
+				std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, animRef.m_duration, PlayType::Loop));
+				_root = std::unique_ptr<AnimationNode>(new AnimPlayback(_ref, playback, animRef));
 			}
 
 

@@ -13,7 +13,11 @@ namespace thomas {
 
 		Animation::~Animation()
 		{}
-
+		
+		bool Animation::HasAnimation()
+		{
+			return m_data.operator bool();
+		}
 		graphics::animation::AnimationData * Animation::GetAnimation()
 		{
 			return m_data.get();
