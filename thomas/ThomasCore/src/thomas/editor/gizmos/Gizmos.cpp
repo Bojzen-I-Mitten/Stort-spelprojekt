@@ -24,6 +24,8 @@ namespace thomas
 		void Gizmos::DrawModel(resource::Model * model, int meshIndex, math::Vector3 position = math::Vector3::Zero, math::Quaternion rotation = math::Quaternion::Identity, math::Vector3 scale = math::Vector3::One)
 		{
 
+
+
 			/*s_gizmoMaterial->SetShaderPass((int)GizmoPasses::SOLID);
 			s_gizmoMaterial->m_topology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 			s_gizmoMaterial->SetMatrix("gizmoMatrix", math::CreateMatrix(position, rotation, scale));
@@ -323,6 +325,26 @@ namespace thomas
 		{
 			s_matrix = matrix;
 			//s_gizmoMaterial->SetMatrix("gizmoMatrix", matrix);
+		}
+
+		void Gizmos::DrawPing(std::string ping)
+		{
+			ImGui::SetNextWindowSize(ImVec2(300, 0));
+
+			ImGui::Begin("Test", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+			ImGui::Text(ping.c_str());
+			ImGui::End();
+		}
+
+		void Gizmos::ImguiStringUpdate(std::string text, math::Vector2 size, math::Vector2 pos)
+		{
+			ImGui::SetNextWindowSize(ImVec2(size.x, size.y));
+			ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y));
+			ImGui::Begin("Test", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+			ImGui::Text(text.c_str());
+			ImGui::End();
 		}
 
 	}

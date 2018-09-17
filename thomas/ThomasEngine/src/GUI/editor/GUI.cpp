@@ -97,3 +97,13 @@ void ThomasEngine::GUI::SetMatrix(DirectX::SimpleMath::Matrix matrix)
 {
 	thomas::editor::Gizmos::SetMatrix(matrix);
 }
+
+void ThomasEngine::GUI::DrawPing(String^ ping)
+{	
+	thomas::editor::Gizmos::DrawPing(Utility::ConvertString(ping));
+}
+
+void ThomasEngine::GUI::ImguiStringUpdate(String^ text, Vector2 size, Vector2 pos)
+{
+	thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(size), Utility::Convert(pos));
+}

@@ -29,6 +29,10 @@ namespace ThomasEngine
 		static void SetColor(DirectX::SimpleMath::Color color);
 		static void SetMatrix(DirectX::SimpleMath::Matrix matrix);
 
+		static void DrawPing(String^ ping);
+
+		static void  ImguiStringUpdate(String^ text, Vector2 size, Vector2 pos);
+
 	private:
 
 
