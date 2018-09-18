@@ -24,6 +24,12 @@ namespace ThomasEngine.Network
             get { return NetworkManager.instance.isClient; }
         }
 
+        [Browsable(false)]
+        public bool isServer
+        {
+            get { return !isClient; }
+        }
+
         virtual public void Read(NetPacketReader reader)
         {
 
