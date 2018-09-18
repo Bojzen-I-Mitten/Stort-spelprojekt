@@ -52,9 +52,6 @@ namespace thomas
 				graphics::LightManager::RemoveLight(this);
 			}
 
-			
-			
-
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
 			{
 				return m_type;
@@ -62,9 +59,13 @@ namespace thomas
 
 			void LightComponent::SetType(graphics::LightManager::LIGHT_TYPES other)
 			{
-				graphics::LightManager::RemoveLight(this);
-				m_type = other;
-				graphics::LightManager::AddLight(this);
+				if (graphics::LightManager::RemoveLight(this))
+				{
+					m_type = other;
+					graphics::LightManager::AddLight(this);
+				}
+				else
+					m_type = other;
 			}
 
 			thomas::math::Color LightComponent::GetColor()

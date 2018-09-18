@@ -64,7 +64,7 @@ namespace ThomasEngine {
 		while (ThomasCore::Initialized())
 		{
 
-			if (Scene::IsLoading())
+			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
 				continue;

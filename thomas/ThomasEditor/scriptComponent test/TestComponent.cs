@@ -23,7 +23,7 @@ namespace ThomasEditor
         public override void Start()
         {
             // m.GenerateBones(gameObject);
-            //GameObject.Instantiate(coolPrefab, new Vector3(10, 10, 10), new Quaternion());
+            GameObject.Instantiate(coolPrefab);
             //otherObjectsRender.Destroy();
 
             //List<Component> c = ThomasEngine.Object.GetObjectsOfType<Component>();

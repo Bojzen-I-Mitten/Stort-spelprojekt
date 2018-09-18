@@ -1,7 +1,7 @@
-﻿
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
+
 namespace ThomasEngine.Network
 {
     [HideInInspector]
