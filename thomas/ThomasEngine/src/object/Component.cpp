@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include <thomas\object\GameObject.h>
 #include "../ScriptingManager.h"
+#include "YieldInstructions.h"
 
 ThomasEngine::Component::Component() : Object(new thomas::object::component::Component())
 {
@@ -75,7 +76,7 @@ void ThomasEngine::Component::Destroy()
 		}
 	}
 	
-
+	StopAllCoroutines();
 	m_gameObject->Components->Remove(this);
 	Object::Destroy();
 	Monitor::Exit(m_gameObject->m_componentsLock);
@@ -121,4 +122,43 @@ List<Type^>^ ThomasEngine::Component::GetAllAddableComponentTypes()
 		}
 	}
 	return types;
+}
+
+
+void ThomasEngine::Component::UpdateCoroutines()
+{
+	for (int i = 0; i < coroutines->Count; i++)
+	{
+		System::Collections::IEnumerator^ iterator = coroutines[i];
+		bool isYieldInstruction = iterator->Current && YieldInstruction::typeid->IsAssignableFrom(iterator->Current->GetType());
+		if (isYieldInstruction && ((YieldInstruction^)iterator->Current)->keepWaiting)
+			continue;
+		if (!iterator->MoveNext())
+		{
+			coroutines->RemoveAt(i);
+			i--;
+		}
+	}
+}
+
+void ThomasEngine::Component::StartCoroutine(System::Collections::IEnumerator ^ routine)
+{
+	coroutines->Add(routine);
+}
+
+void ThomasEngine::Component::StopCoroutine(System::Collections::IEnumerator ^ routine)
+{
+	for (int i = 0; i < coroutines->Count; i++)
+	{
+		if (coroutines[i] == routine) {
+			coroutines->RemoveAt(i);
+			return;
+		}
+
+	}
+}
+
+void ThomasEngine::Component::StopAllCoroutines()
+{
+	coroutines->Clear();
 }
