@@ -1,6 +1,6 @@
 using ThomasEngine;
-
-public class Ball : ScriptComponent
+using ThomasEngine.Network;
+public class Ball : NetworkComponent
 {
 
     Rigidbody rb;
@@ -16,21 +16,25 @@ public class Ball : ScriptComponent
 
     public override void Update()
     {
-        if(Input.GetKey(Input.Keys.Space) && !rb.enabled)
+        if (isOwner)
         {
-            currentForce += force * Time.DeltaTime;
-            visualizer.SetStrength(currentForce);
+            if (Input.GetKey(Input.Keys.Space) && !rb.enabled)
+            {
+                currentForce += force * Time.DeltaTime;
+                visualizer.SetStrength(currentForce);
+            }
+
+            if (Input.GetKeyUp(Input.Keys.Space) && !rb.enabled)
+            {
+                transform.parent = null;
+                rb.enabled = true;
+                rb.ApplyCentralImpulseForce(playerThatHasBall.transform.forward * currentForce);
+                playerThatHasBall = null;
+                currentForce = 0.0f;
+                visualizer.SetStrength(0);
+            }
         }
 
-        if(Input.GetKeyUp(Input.Keys.Space) && !rb.enabled)
-        {
-            transform.parent = null;
-            rb.enabled = true;
-            rb.ApplyCentralImpulseForce(playerThatHasBall.transform.forward * currentForce);
-            playerThatHasBall = null;
-            currentForce = 0.0f;
-            visualizer.SetStrength(0);
-        }
     }
 
 
