@@ -10,7 +10,6 @@
 
 namespace ThomasEngine
 {
-
 	[DisallowMultipleComponent]
 	[ExecuteInEditor]
 	public ref class RenderSkinnedComponent : public Component
@@ -25,11 +24,11 @@ namespace ThomasEngine
 			Model^ get();
 			void set(Model^ value);
 		}
-
 		property Animation^ animation {
 			Animation ^get() { return m_anim; }
 			void set(Animation^ value);
 		}
+
 
 		property Material^ material {
 			Material^ get();
@@ -37,5 +36,8 @@ namespace ThomasEngine
 		}
 
 		void Update() override;
+
+	private:
+		void applyAnimation();
 	};
 }
