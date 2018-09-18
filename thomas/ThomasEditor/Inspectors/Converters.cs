@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -153,11 +154,29 @@ namespace ThomasEditor.Converters
         }
     }
 
+    public class ListToTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (value as Type).GetGenericArguments().Single();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class NullResourceConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return "None (" + (value as String) + ")";
+            Type type = value as Type;
+            if (type.GetInterface(nameof(IList)) != null)
+            {
+                type = type.GetGenericArguments().Single();
+            }
+            return "None (" + (type.Name) + ")";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

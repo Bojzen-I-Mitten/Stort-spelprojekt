@@ -166,8 +166,10 @@ namespace thomas
 			HWND focus = GetForegroundWindow();
 
 			// Make sure we are dealing with the editor window
-			if (!Window::GetEditorWindow())
+			if (!Window::GetEditorWindow() || !Window::GetEditorWindow()->IsFocused())
 				return;
+
+			Input::allowEditor = true;
 
 			// Toggle editor mode on scene camera
 			if (Input::GetMouseButtonDown(Input::MouseButtons::RIGHT))

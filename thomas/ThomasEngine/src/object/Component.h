@@ -41,6 +41,7 @@ namespace ThomasEngine
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 		virtual void OnCollisionEnter(GameObject^ collider);
 
+		[NonSerializedAttribute]
 		GameObject^ m_gameObject;
 
 		
@@ -74,8 +75,8 @@ namespace ThomasEngine
 		static System::Reflection::Assembly^ editorAssembly;
 		
 
-		[BrowsableAttribute(false)]
 		[Xml::Serialization::XmlIgnoreAttribute]
+		[BrowsableAttribute(false)]
 		property bool enabled {
 			bool get() { return m_enabled; }
 			void set(bool value) {
@@ -113,5 +114,7 @@ namespace ThomasEngine
 
 		static List<Type^>^ GetAllComponentTypes();
 		static List<Type^>^ GetAllAddableComponentTypes();
+
+
 	};
 }
