@@ -182,12 +182,6 @@ namespace ThomasEngine.Network
             if (Input.GetKeyUp(Input.Keys.K) && isServer)
             {
                 SpawnObject(spawnablePrefabs[0]);
-                //GameObject gObj = GameObject.Instantiate(spawnablePrefabs[0], new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)); //spawn object on server
-                //Spawner spawner = new Spawner
-                //{
-                //    netID = gObj.GetComponent<NetworkID>().ID
-                //};
-                //SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell all clients to spawn object
             }
         }
 
@@ -306,6 +300,8 @@ namespace ThomasEngine.Network
             if (index != -1)
             {
                 GameObject gObj = GameObject.Instantiate(prefab, position, rotation);
+                gObj.GetComponent<NetworkID>().isOwner = true; ;
+                
                 Spawner spawner = new Spawner
                 {
                     netID = gObj.GetComponent<NetworkID>().ID,
