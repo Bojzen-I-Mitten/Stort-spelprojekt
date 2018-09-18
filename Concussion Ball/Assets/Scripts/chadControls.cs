@@ -19,14 +19,23 @@ namespace ThomasEditor
         {
             if (Input.GetKeyDown(Input.Keys.Space) && transform.position.y < 1.0f)
                 gameObject.GetComponent<Rigidbody>().ApplyCentralForce(new Vector3(0.0f, 350.0f, 0.0f));
-            if (Input.GetKey(Input.Keys.W))
-                transform.position += transform.forward * speed * Time.DeltaTime;
+            
             if (Input.GetKey(Input.Keys.S))
+            {
                 transform.position -= transform.forward * speed * Time.DeltaTime;
-            if (Input.GetKey(Input.Keys.A))
-                transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
-            if (Input.GetKey(Input.Keys.D))
-                transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
+                if (Input.GetKey(Input.Keys.A))
+                    transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
+                if (Input.GetKey(Input.Keys.D))
+                    transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
+            }
+            if (Input.GetKey(Input.Keys.W))
+            {
+                transform.position += transform.forward * speed * Time.DeltaTime;
+                if (Input.GetKey(Input.Keys.A))
+                    transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
+                if (Input.GetKey(Input.Keys.D))
+                    transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
+            }
         }
     }
 }
