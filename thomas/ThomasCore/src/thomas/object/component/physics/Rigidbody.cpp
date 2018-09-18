@@ -126,9 +126,19 @@ namespace thomas
 				this->applyCentralForce(Physics::ToBullet(force));
 			}
 
+			void Rigidbody::ApplyCentralImpulseForce(const math::Vector3 & force)
+			{
+				this->applyCentralImpulse(Physics::ToBullet(force));
+			}
+
 			void Rigidbody::ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos)
 			{
 				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
+			}
+
+			void Rigidbody::ApplyImpulseForce(const math::Vector3 & force, const math::Vector3 & relPos)
+			{
+				this->applyImpulse(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
 
 			GameObject * Rigidbody::GetTargetCollider()
