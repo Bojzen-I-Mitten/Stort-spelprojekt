@@ -11,51 +11,68 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
+        Vector3 pos;
+        Vector3 scale;
+        Quaternion rot;
+
+
         public override void Start()
         {
-
+            pos = new Vector3(0.0f);
+            scale = Vector3.One;
+            rot = new Quaternion();
+            
         }
         public override void Update()
         {
+            if (!isOwner)
+            {
+                transform.position = Vector3.Lerp(transform.position, pos, Time.DeltaTime * 15);
+                transform.scale = Vector3.Lerp(transform.scale, scale, Time.DeltaTime * 15);
+                transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.DeltaTime * 30);
+            }
+            else
+            {
+                pos = transform.position;
+                scale = transform.scale;
+                rot = transform.rotation;
+            }
+            
+
+
 
         }
-       
+
         public override void Read(NetPacketReader reader)
         {
-            Vector3 position = new Vector3();
-            position.x = reader.GetFloat();
-            position.y = reader.GetFloat();
-            position.z = reader.GetFloat();
-            transform.position = position;
+            pos.x = reader.GetFloat();
+            pos.y = reader.GetFloat();
+            pos.z = reader.GetFloat();
 
-            Quaternion rotation = new Quaternion();
-            rotation.w = reader.GetFloat();
-            rotation.x = reader.GetFloat();
-            rotation.y = reader.GetFloat();
-            rotation.z = reader.GetFloat();
-            transform.rotation = rotation;
+            rot.x = reader.GetFloat();
+            rot.y = reader.GetFloat();
+            rot.z = reader.GetFloat();
+            rot.w = reader.GetFloat();
 
-            Vector3 scale = new Vector3();
             scale.x = reader.GetFloat();
             scale.y = reader.GetFloat();
             scale.z = reader.GetFloat();
-            transform.scale = scale;
         }
 
         public override void Write(NetDataWriter writer)
         {
-            writer.Put(transform.position.x);
-            writer.Put(transform.position.y);
-            writer.Put(transform.position.z);
+            writer.Put(pos.x);
+            writer.Put(pos.y);
+            writer.Put(pos.z);
 
-            writer.Put(transform.rotation.w);
-            writer.Put(transform.rotation.x);
-            writer.Put(transform.rotation.y);
-            writer.Put(transform.rotation.z);
-            
-            writer.Put(transform.scale.x);
-            writer.Put(transform.scale.y);
-            writer.Put(transform.scale.z);
+            writer.Put(rot.x);
+            writer.Put(rot.y);
+            writer.Put(rot.z);
+            writer.Put(rot.w);
+
+            writer.Put(scale.x);
+            writer.Put(scale.y);
+            writer.Put(scale.z);
         }
      
     }
