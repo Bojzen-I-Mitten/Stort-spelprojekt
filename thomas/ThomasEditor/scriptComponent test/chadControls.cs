@@ -17,6 +17,8 @@ namespace ThomasEditor
 
         public override void Update()
         {
+            if (Input.GetKeyDown(Input.Keys.Space) && transform.position.y < 1.0f)
+                gameObject.GetComponent<Rigidbody>().ApplyCentralForce(new Vector3(0.0f, 350.0f, 0.0f));
             if (Input.GetKey(Input.Keys.W))
                 transform.position += transform.forward * speed * Time.DeltaTime;
             if (Input.GetKey(Input.Keys.S))
