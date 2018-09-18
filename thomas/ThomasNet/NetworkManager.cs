@@ -30,8 +30,9 @@ namespace ThomasEngine.Network
         public int prefabID { get; set; }
         public Vector3 position { get; set; }
         public Quaternion rotation { get; set; }
+        public bool isOwner { get; set; }
 
-        public Spawner() { netID = -1; prefabID = -1; position = new Vector3(); rotation = new Quaternion(); }
+        public Spawner() { netID = -1; prefabID = -2; position = new Vector3(); rotation = new Quaternion(); isOwner = false; }
     }
 
     public enum PacketType
@@ -81,7 +82,6 @@ namespace ThomasEngine.Network
             netManager = new NetManager(listener);
 
             writer = new NetDataWriter();
-            spawnablePrefabs = new List<GameObject>();
 
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
@@ -91,7 +91,7 @@ namespace ThomasEngine.Network
 
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
-            SubscribeToEvent<Spawner>(SpawnObject);
+            SubscribeToEvent<Spawner>(SubscribeSpawnObject);
 
         }
 
@@ -125,7 +125,7 @@ namespace ThomasEngine.Network
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
-                SpawnPlayerCharacter();
+                SpawnPlayerCharacter(peer);
             }
             else
             {
@@ -178,15 +178,16 @@ namespace ThomasEngine.Network
 
 
             //example spawn
-            //if (Input.GetKeyUp(Input.Keys.K) && isServer)
-            //{
-            //    GameObject gObj = GameObject.Instantiate(spawnablePrefabs[0], new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)); //spawn object on server
-            //    Spawner spawner = new Spawner
-            //    {
-            //        netID = gObj.GetComponent<NetworkID>().ID
-            //    };
-            //    SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
-            //}
+            if (Input.GetKeyUp(Input.Keys.K) && isServer)
+            {
+                SpawnObject(spawnablePrefabs[0]);
+                //GameObject gObj = GameObject.Instantiate(spawnablePrefabs[0], new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)); //spawn object on server
+                //Spawner spawner = new Spawner
+                //{
+                //    netID = gObj.GetComponent<NetworkID>().ID
+                //};
+                //SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell all clients to spawn object
+            }
         }
 
 
@@ -231,6 +232,24 @@ namespace ThomasEngine.Network
             netManager.SendToAll(writer, method);
         }
 
+        public void SendEventToAllBut<T>(T data, DeliveryMethod method, NetPeer excluded) where T : class, new()
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((int)PacketType.EVENT);
+
+            netPacketProcessor.Write<T>(writer, data);
+            netManager.SendToAll(writer, method, excluded);
+        }
+
+        public void SendEventToPeer<T>(T data, DeliveryMethod method, NetPeer sendTo) where T : class, new()
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((int)PacketType.EVENT);
+
+            netPacketProcessor.Write<T>(writer, data);
+            sendTo.Send(writer, method);
+        }
+
         public void WriteData(NetDataWriter writer)
         {
             writer.Put((int)PacketType.DATA);
@@ -260,32 +279,64 @@ namespace ThomasEngine.Network
                 }
             });
         }
-
-        public void SpawnObject(Spawner spawner, NetPeer peer)
+        
+        internal void SubscribeSpawnObject(Spawner spawner, NetPeer peer)
         {
             //Debug.Log("Test");
             if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
             {
-                GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
+                GameObject gObj = GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
+                gObj.GetComponent<NetworkID>().Owner = spawner.isOwner;
             }
             else if(spawner.prefabID == -1)
             {
-                GameObject.Instantiate(player, spawner.position, spawner.rotation);
+                GameObject gObj = GameObject.Instantiate(player, spawner.position, spawner.rotation);
+                gObj.GetComponent<NetworkID>().Owner = spawner.isOwner;
             }
             else
             {
                 Debug.Log("Tried spawning object not in NetworkManager prefab list");
             }
         }
-        
-        public void SpawnPlayerCharacter()
+
+        public void SpawnObject(GameObject prefab, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion())
         {
-            GameObject gObj = GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+            int index = spawnablePrefabs.IndexOf(prefab);
+            if (index != -1)
+            {
+                GameObject gObj = GameObject.Instantiate(prefab, position, rotation);
+                Spawner spawner = new Spawner
+                {
+                    netID = gObj.GetComponent<NetworkID>().ID,
+                    prefabID = index,
+                    position = gObj.transform.position,
+                    rotation = gObj.transform.rotation,
+                    isOwner = false
+                };
+
+                SendEvent(spawner, DeliveryMethod.ReliableOrdered);
+            }
+            else
+            {
+                Debug.Log("Tried to spawn object not in NetworkManager list of prefabs");
+            }
+        }
+
+        public void SpawnPlayerCharacter(NetPeer connected)
+        {
+            GameObject gObj = GameObject.Instantiate(player, new Vector3(), new Quaternion());
             Spawner spawner = new Spawner
             {
-                netID = gObj.GetComponent<NetworkID>().ID
+                netID = gObj.GetComponent<NetworkID>().ID,
+                prefabID = -1,
+                position = gObj.transform.position,
+                rotation = gObj.transform.rotation,
+                isOwner = false
             };
-            SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
+
+            SendEventToAllBut(spawner, DeliveryMethod.ReliableOrdered, connected); //tell old clients to spawn object
+            spawner.isOwner = true;
+            SendEventToPeer(spawner, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
         }
     }
 }

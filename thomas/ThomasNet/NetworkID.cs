@@ -11,7 +11,7 @@ namespace ThomasEngine.Network
     public class NetworkID : NetworkComponent
     {
 
-        public bool Owner { get; set; } = false;
+        public bool Owner { set; get; } = false;
         public int ID { set; get; }
         List<NetworkComponent> networkComponents;
         public override void OnEnable()
