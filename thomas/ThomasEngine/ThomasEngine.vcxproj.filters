@@ -40,6 +40,7 @@
     <ClCompile Include="src\object\component\LightComponent.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\Project.cpp" />
+    <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -83,6 +84,7 @@
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ThomasSelection.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
+    <ClInclude Include="src\object\component\ParticleEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

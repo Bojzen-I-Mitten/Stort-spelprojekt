@@ -27,7 +27,8 @@ namespace thomas
 					ID3D11UnorderedAccessView* particleUAV2;
 					ID3D11ShaderResourceView* particleSRV2;
 					ID3D11Buffer* particleBuffer2;
-					ID3D11Buffer* particleBuffer;
+
+					ID3D11Buffer* initParticleBuffer;
 					bool swapUAVandSRV;
 
 					ID3D11UnorderedAccessView* billboardsUAV;
@@ -87,7 +88,6 @@ namespace thomas
 					float lifeTimeLeft;
 					float rotationSpeed;
 					float rotation;
-					
 
 					math::Vector4 startColor;
 
@@ -96,8 +96,12 @@ namespace thomas
 				};
 			private:
 				void CreateParticleUAVsandSRVs();
-				void CreateInitBuffer();
+				//void CreateInitBuffer();
 				void CalculateMaxNrOfParticles();
+
+				void UpdateDirection();
+
+
 			public:
 				ParticleEmitterComponent();
 				~ParticleEmitterComponent();
@@ -106,79 +110,83 @@ namespace thomas
 
 				void TogglePause();
 
-				void SetSpread(float const other);
-				void SetDirection(math::Vector3 other);
-				void SetDirection(float const x, float const y, float const z);
-				void SetSpeed(float const min, float const max);
-				void SetSpeed(float const speed);
-				void SetMaxSpeed(float const other);
-				void SetMinSpeed(float const other);
-				void SetEndSpeed(float const other);
-				void SetDelay(float const min, float const max);
-				void SetDelay(float const delay);
-				void SetMaxDelay(float const other);
-				void SetMinDelay(float const other);
-				void SetSize(float const min, float const max);
-				void SetSize(float const size);
-				void SetMaxSize(float const other);
-				void SetMinSize(float const other);
-				void SetEndSize(float const other);
-				void SetLifeTime(float const min, float const max);
-				void SetLifeTime(float lifeTime);
-				void SetMaxLifeTime(float const other);
-				void SetMinLifeTime(float const other);
-				void SetRotationSpeed(float const other);
-				void SetRotation(float const other);
-				void SetLooping(bool const other);
+				void SetSpread(float const& other);
+				void SetSpeed(float const& min, float const& max);
+				void SetSpeed(float const& speed);
+				void SetMaxSpeed(float const& other);
+				void SetMinSpeed(float const& other);
+				float GetMaxSpeed() const;
+				float GetMinSpeed() const;
+				void SetEndSpeed(float const& other);
+				float GetEndSpeed() const;
 
-				void SetGravity(float const other);
+				void SetDelay(float const& min, float const& max);
+				void SetDelay(float const& delay);
+				void SetMaxDelay(float const& other);
+				void SetMinDelay(float const& other);
 				
-				void SetStartColor(math::Vector4 const other);
-				void SetEndColor(math::Vector4 const other);
-				
-				void SetRadius(float radius);
-				void SpawnAtSphereEdge(bool other);
+				void SetSize(float const& min, float const& max);
+				void SetSize(float const& size);
+				void SetMaxSize(float const& other);
+				void SetMinSize(float const& other);
+				float GetMaxSize() const;
+				float GetMinSize() const;
+				void SetEndSize(float const& other);
+				float GetEndSize() const;
+
+				void SetLifeTime(float const& min, float const& max);
+				void SetLifeTime(float lifeTime);
+				void SetMaxLifeTime(float const& other);
+				void SetMinLifeTime(float const& other);
+				float GetMaxLifeTime() const;
+				float GetMinLifeTime() const;
+
+				void SetRotationSpeed(float const& other);
+				float GetRotationSpeed() const;
+				void SetRotation(float const& other);
+				void SetLooping(bool const& other);
+				bool IsLooping() const;
+				void SetGravity(float const& other);
+				float GetGravity() const;
+				void SetStartColor(math::Vector4 const& other);
+				math::Vector4 GetStartColor() const;
+				void SetEndColor(math::Vector4 const& other);
+				math::Vector4 GetEndColor() const;
+				void SetRadius(float const& radius);
+				float GetRadius() const;
+
+
+				void SpawnAtSphereEdge(bool const& other);
+				bool IsSpawningAtSphereEdge() const;
 				
 
 				void StartEmitting();
 				void StopEmitting(bool force=false);
-				
 				bool IsEmitting() const;
 				
-				void SetOffset(math::Vector3 offset);
-				void SetOffset(float x, float y, float z);
+				void SetOffset(math::Vector3 const& offset);
+				void SetOffset(float const &x, float const& y, float const& z);
 				
 				void SetMaterial(resource::Material* material);
 				resource::Material* GetMaterial();
 	
-				void SetEmissionRate(float emissionRate);
-				void SetEmissionDuration(float duration);
-				float GetEmissionRate();
-				unsigned int GetNrOfMaxParticles() const;
+				void SetEmissionRate(float const& emissionRate);
+				void SetEmissionDuration(float const& duration);
+				float GetEmissionRate() const;
 
 				D3DData* GetD3DData();
 
-				void AddToDebugMenu();
+				//InitParticleBufferStruct* GetInitData();
 
-				std::string GetDebugMenuName();
+				bool IsPaused() const;
+				unsigned int GetNrOfMaxParticles() const;
+				unsigned int GetSpawnedParticleCount() const;
+				//void ExportEmitter(std::string path);
+				//void ImportEmitter(std::string path);
 
-				InitParticleBufferStruct* GetInitData();
-
-				bool IsPaused();
-
-				void ExportEmitter(std::string path);
-				void ImportEmitter(std::string path);
-
-				void SetBlendState(BlendStates state);
-				BlendStates GetBlendState();
-
-				unsigned int GetSpawnedParticleCount();
-
-				float GetDrawTimer();
 			private:
-				std::string m_debugBarName;
+
 				math::Vector3 m_offset;
-				math::Vector3 m_directionVector;
 				D3DData m_d3dData;
 				resource::Material* m_material;
 

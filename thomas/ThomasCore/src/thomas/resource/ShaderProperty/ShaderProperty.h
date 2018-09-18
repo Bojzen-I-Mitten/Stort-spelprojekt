@@ -21,7 +21,8 @@ namespace thomas
 					MATRIX,
 					SHADER_RESOURCE,
 					CONSTANT_BUFFER,
-					TEXTURE2D
+					TEXTURE2D,
+					UNORDERED_ACCESS
 				};
 
 				ShaderProperty(Type type) : m_type(type) {};

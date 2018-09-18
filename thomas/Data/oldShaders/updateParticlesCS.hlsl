@@ -1,16 +1,10 @@
-cbuffer cameraBuffer : register(b0)
-{
-	float3 cameraUp;
-	float deltaTime;
-	float3 cameraRight;
-	float pad;
-};
-
+#include <..\FXIncludes\ThomasShaderVariables.hlsl>
 
 struct ParticleStruct
 {
 	float3 position;
 	float gravity;
+
 	float3 direction;
 	float speed;
 
@@ -38,61 +32,72 @@ struct BillboardStruct
 	float4 colorFactor;
 };
 
-StructuredBuffer<ParticleStruct> particlesRead : register(t0);
-RWStructuredBuffer<ParticleStruct> particlesWrite : register(u6);
-RWStructuredBuffer<BillboardStruct> billboards : register(u7);
+StructuredBuffer<ParticleStruct> particlesRead;
+RWStructuredBuffer<ParticleStruct> particlesWrite;
+RWStructuredBuffer<BillboardStruct> billboards;
 
 
 [numthreads(256, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
 	float index = (Gid.x * 256) + GTid.x;
-
+    float dt = thomas_DeltaTime;
     
 	if (particlesRead[index].delay < 0.0f)
 	{
         //ANIMATE
+        //load into registers
 		
-        
+        float particleSpeed = particlesRead[index].speed;
+		float particleTimeLeft = particlesRead[index].lifeTimeLeft;
+        float particleRotation = particlesRead[index].rotation;
+
+
 		particlesWrite[index].delay = particlesRead[index].delay;
-		particlesWrite[index].speed = particlesRead[index].speed;
+        particlesWrite[index].speed = particleSpeed;
         
 		particlesWrite[index].size = particlesRead[index].size;
         
-		particlesWrite[index].lifeTimeLeft = particlesRead[index].lifeTimeLeft;
         
-		float lerpValue = 1 - (particlesRead[index].lifeTimeLeft / particlesRead[index].lifeTime);
+        
+        float lerpValue = 1 - (particleTimeLeft / particlesRead[index].lifeTime);
 
-		float speed = lerp(particlesRead[index].speed, particlesRead[index].endSpeed, lerpValue);
+		//lerp between start and end speed
+        float speed = lerp(particleSpeed, particlesRead[index].endSpeed, lerpValue);
 
-		float3 particlePosWS = particlesRead[index].position + particlesRead[index].direction * speed * deltaTime + float3(0, 1, 0) * particlesRead[index].gravity * deltaTime;
+		//update position
+        float3 particlePosWS = particlesRead[index].position + particlesRead[index].direction * speed * dt + float3(0, 1, 0) * particlesRead[index].gravity * dt;
 		particlesWrite[index].position = particlePosWS;
 
 
-		float scale = 0;
+		float scale = 0.0f;
 
-		if (particlesRead[index].lifeTimeLeft < 0.0f)
+        if (particleTimeLeft < 0.0f)
 		{
-			scale = 0;
-			billboards[index].colorFactor = float4(0, 0, 0, 0);
-
-		}
+			scale = 0.0f;
+			billboards[index].colorFactor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+            particlesWrite[index].lifeTimeLeft = particleTimeLeft;
+        }
 		else
 		{
 			scale = lerp(particlesRead[index].size, particlesRead[index].endSize, lerpValue);
 			billboards[index].colorFactor = lerp(particlesRead[index].startColor, particlesRead[index].endColor, lerpValue);
-			particlesWrite[index].lifeTimeLeft = particlesRead[index].lifeTimeLeft - deltaTime;
+            particlesWrite[index].lifeTimeLeft = particleTimeLeft - dt;
             
 		}
         //BILLBOARD
-		float3 right = cameraRight * scale;
-		float3 up = -cameraUp * scale;
+        
+        float4x4 viewMatrix = thomas_MatrixV;
+        
+        float3 right = float3(viewMatrix[0][0], viewMatrix[0][1], viewMatrix[0][2]) * scale; //cameraRight * scale;
+        float3 up = float3(viewMatrix[2][0], viewMatrix[2][1], viewMatrix[2][2]) * scale; //-cameraUp * scale;
+		
+        particlesWrite[index].rotation = particleRotation + particlesRead[index].rotationSpeed * dt;
 
-		particlesWrite[index].rotation = particlesRead[index].rotation + particlesRead[index].rotationSpeed * deltaTime;
+		float sinangle = sin(particleRotation);
+		float cosangle = cos(particleRotation);
 
-		float sinangle = sin(particlesRead[index].rotation);
-		float cosangle = cos(particlesRead[index].rotation);
-
+		//rotate billboard
 		float3 temp = cosangle * right - sinangle * up;
 		right = sinangle * right + cosangle * up;
 		up = temp;
@@ -134,6 +139,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         billboards[index].uvs[1][0] = float2(0, 1);
         billboards[index].uvs[1][1] = float2(1, 0);
         billboards[index].uvs[1][2] = float2(0, 0);
-		particlesWrite[index].delay = particlesRead[index].delay - deltaTime;
+
+		particlesWrite[index].delay = particlesRead[index].delay - dt;
 	}
 }

@@ -1,18 +1,19 @@
 #pragma once
 #include "Material.h"
-
+#include "Shader.h"
+#include <d3dx11effect.h>
 namespace thomas
 {
 	namespace resource
 	{
-		//rework
-		class THOMAS_API ComputeShader
+		class ComputeShader : public Shader
 		{
+		private:
+
+			ComputeShader(ID3DX11Effect* effect, std::string path);
 		public:
-			ComputeShader();
-			void Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ);
-			void SetUAV(const std::string& name, ID3D11UnorderedAccessView& value);
-			ID3D11UnorderedAccessView* GetUAV(const std::string& name);
+			void Dispatch(int threadGroupX, int threadGroupY = 0, int threadGroupZ = 0);
+			static ComputeShader* CreateComputeShader();
 		};
 	}
 }

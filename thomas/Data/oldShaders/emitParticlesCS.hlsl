@@ -1,4 +1,4 @@
-cbuffer InitBuffer : register(b0)
+cbuffer InitParticlesBuffer
 {
 	float3 initPosition;
 	float initSpread;
@@ -56,13 +56,12 @@ struct ParticleStruct
 	float4 endColor;
 };
 
-RWStructuredBuffer<ParticleStruct> particlesWrite : register(u6);
-RWStructuredBuffer<ParticleStruct> particlesWrite2 : register(u7);
+RWStructuredBuffer<ParticleStruct> particlesWrite;
+RWStructuredBuffer<ParticleStruct> particlesWrite2;
 
 
 uint rand_xorshift(uint rng_state)
 {
-	// Xorshift algorithm from George Marsaglia's paper
 	rng_state ^= (rng_state << 13);
 	rng_state ^= (rng_state >> 17);
 	rng_state ^= (rng_state << 5);
@@ -70,12 +69,9 @@ uint rand_xorshift(uint rng_state)
 }
 
 
-
-
 [numthreads(1, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID)
 {
-    //INITIALIZE
 	float index = particleBlockIndex + Gid.x;
 	uint rng_state = index * rand;
 
@@ -85,7 +81,7 @@ void CSMain(uint3 Gid : SV_GroupID)
 	uint w4 = rand_xorshift(w3);
 	uint w5 = rand_xorshift(w4 * rand);
 	
-	float randClamp = (1.0 / 4294967296.0);
+	float randClamp = (1.0f / 4294967296.0f);
     
 	
 	float delay = max((w1 * randClamp * (initMaxDelay - initMinDelay)), 0) + initMinDelay;
@@ -102,16 +98,13 @@ void CSMain(uint3 Gid : SV_GroupID)
 	float3 rng = float3(x, y, z);
 	normalize(rng);
 
-	float theta = x * 3.14159265359 * 2;
-	float phi = y * ((initSpread-1) % 3.14159265359);
+	float theta = x * 3.14159265359 * 2.0f;
+	float phi = y * ((initSpread-1) % 3.14159265359f);
 	float xAngle = sin(phi) * cos(theta);
 	float yAngle = sin(phi) * sin(theta);
 	float zAngle = cos(phi);
 	float3 randDir = float3(xAngle, yAngle, zAngle);
 	normalize(randDir);
-	//float3 proj = rng - (initDirection * dot(initDirection, rng));
- //   normalize(proj);
- //   proj *= initSpread;
 
 	float3 dir = mul(randDir, (float3x3) directionMatrix);;
 	normalize(dir);

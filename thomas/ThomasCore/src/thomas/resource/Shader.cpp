@@ -392,6 +392,19 @@ namespace thomas
 			}
 		}
 
+		void Shader::SetGlobalUAV(const std::string & name, ID3D11UnorderedAccessView * value)
+		{
+			for (auto shader : s_loadedShaders)
+			{
+				if (shader->HasProperty(name))
+				{
+					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyUnorderedAccessView(value));
+					shader->m_properties[name]->SetName(name);
+				}
+			}
+			
+		}
+
 		Shader * Shader::FindByName(const std::string & name)
 		{
 			for (Shader* shader : s_loadedShaders)
