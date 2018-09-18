@@ -23,8 +23,9 @@ namespace ThomasEditor
         {
             //Jumping
             if (Input.GetKeyDown(Input.Keys.Space) && transform.position.y < 1.0f)
-                rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
-            
+            {
+                rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));   
+            }   
             //WASD movement
             if (Input.GetKey(Input.Keys.S))
             {
@@ -42,6 +43,17 @@ namespace ThomasEditor
                 if (Input.GetKey(Input.Keys.D))
                     transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
             }
+            //else
+            //{ 
+            //    if (Input.GetKey(Input.Keys.A))
+            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
+            //    if (Input.GetKey(Input.Keys.D))
+            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
+            //}
+
+            //Avoid tumbling TEST??
+            //Quaternion test = Quaternion.CreateFromYawPitchRoll(transform.rotation.y, 0.0f, 0.0f);
+            //transform.rotation = test;
         }
     }
 }
