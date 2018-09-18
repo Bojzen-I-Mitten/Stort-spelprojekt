@@ -18,7 +18,7 @@ namespace thomas
 
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 10, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;
@@ -27,7 +27,7 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
-			
+			SAFE_RELEASE(m_lightBuffer);
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{

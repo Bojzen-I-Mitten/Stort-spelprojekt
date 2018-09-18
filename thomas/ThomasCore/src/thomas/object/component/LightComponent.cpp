@@ -52,10 +52,6 @@ namespace thomas
 				graphics::LightManager::RemoveLight(this);
 			}
 
-			
-			
-			
-
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
 			{
 				return m_type;
