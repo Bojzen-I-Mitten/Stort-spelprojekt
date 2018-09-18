@@ -429,7 +429,7 @@ namespace thomas
 				boneMap.m_absoluteInv[BoneIndex].Inverse();
 
 #ifdef DEBUG
-				// Transform test (should be identity)
+				// Transform test (should be identity if not transformed)
 				math::Matrix object_m = convertAssimpMatrix(object_space);
 				math::Matrix object_inv = object_m.Invert();
 				math::Matrix m = boneMap.m_boneInfo[BoneIndex]._invBindPose * object_m;
