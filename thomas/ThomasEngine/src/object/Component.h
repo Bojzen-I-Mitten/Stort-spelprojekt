@@ -41,6 +41,7 @@ namespace ThomasEngine
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 		virtual void OnCollisionEnter(GameObject^ collider);
 
+		[NonSerializedAttribute]
 		GameObject^ m_gameObject;
 
 		
@@ -113,5 +114,7 @@ namespace ThomasEngine
 
 		static List<Type^>^ GetAllComponentTypes();
 		static List<Type^>^ GetAllAddableComponentTypes();
+
+
 	};
 }

@@ -66,6 +66,11 @@ namespace ThomasEngine
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath)
 	{
+		if (!File::Exists(fullPath))
+		{
+			Debug::Log("Unable to find scene: " + fullPath);
+			return nullptr;
+		}
 		try {
 			s_loading = true;
 
@@ -116,6 +121,7 @@ namespace ThomasEngine
 		for (int i = 0; i < m_gameObjects.Count; i++)
 		{
 			m_gameObjects[i]->Destroy();
+			i--;
 		}
 		m_gameObjects.Clear();
 		m_gameObjects.CollectionChanged -= sceneChanged;
