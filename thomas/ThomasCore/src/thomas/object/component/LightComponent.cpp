@@ -66,8 +66,6 @@ namespace thomas
 				}
 				else
 					m_type = other;
-				
-				
 			}
 
 			thomas::math::Color LightComponent::GetColor()
