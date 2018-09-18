@@ -395,7 +395,7 @@ namespace thomas
 			//TODO: material import
 			//material = graphics::Material::CreateMaterial(dir, materialType, mat);
 
-			vertices.PostProcess();
+			//vertices.PostProcess();
 
 			std::shared_ptr<graphics::Mesh> m(new graphics::Mesh(vertices, indices, name));
 			modelData.m_meshes.push_back(m);
