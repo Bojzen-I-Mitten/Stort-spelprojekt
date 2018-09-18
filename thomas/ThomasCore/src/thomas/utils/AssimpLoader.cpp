@@ -136,10 +136,6 @@ namespace thomas
 					v = math::Vector4::Transform(vert.positions[i], skelConstruct.m_boneInfo[0]._bindPose);
 					int a = 0;
 				}
-
-
-
-
 			}
 		}
 
@@ -382,8 +378,7 @@ namespace thomas
 					boneMap.m_boneInfo[boneIndex]._boneIndex = boneIndex;
 					boneMap.m_boneInfo[boneIndex]._boneName = boneName;
 					boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix * bakeInv);
-					//boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
-
+					//boneMap.m_boneInfo[boneIndex]._bindPose = boneMap.m_boneInfo[boneIndex]._invBindPose.Invert();
 
 					for (int j = 0; j < meshBone->mNumWeights; j++)
 					{
@@ -400,7 +395,7 @@ namespace thomas
 			//TODO: material import
 			//material = graphics::Material::CreateMaterial(dir, materialType, mat);
 
-			//vertices.PostProcess();
+			vertices.PostProcess();
 
 			std::shared_ptr<graphics::Mesh> m(new graphics::Mesh(vertices, indices, name));
 			modelData.m_meshes.push_back(m);
@@ -427,20 +422,19 @@ namespace thomas
 					boneMap.m_boneInfo[BoneIndex]._bindPose = convertAssimpMatrix(object_space);
 					boneMap.m_relativeParent[BoneIndex] = parentTransform;
 				}
+				parentBone = BoneIndex;
 				// Store absolute transform
 				boneMap.m_absoluteBind[BoneIndex] = object_space;
 				boneMap.m_absoluteInv[BoneIndex] = object_space;
 				boneMap.m_absoluteInv[BoneIndex].Inverse();
+
+#ifdef DEBUG
 				// Transform test (should be identity)
 				math::Matrix object_m = convertAssimpMatrix(object_space);
 				math::Matrix object_inv = object_m.Invert();
 				math::Matrix m = boneMap.m_boneInfo[BoneIndex]._invBindPose * object_m;
 				int a = 0;
-				parentBone = BoneIndex;
-				//boneMap.m_boneInfo[BoneIndex]._invBindPose = boneMap.m_boneInfo[BoneIndex]._bindPose.Invert();
-
-				//boneMap.bones[BoneIndex].offsetMatrix =
-				//	(globalInverseTransform * globalTransform * boneMap.bones[BoneIndex].offsetMatrix).Transpose();
+#endif
 			}
 
 			for (unsigned int i = 0; i < node->mNumChildren; i++)
