@@ -50,14 +50,15 @@ namespace ThomasEngine.Network
 
         private EventBasedNetListener listener;
         private NetManager netManager;
-        private NetDataWriter writer;
         public string IP { get; set; } = "localhost";
         public int port { get; set; } = 9050;
         public bool isServer { get; set; } = false;
         public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject player { get; set; }
+        public static int ping = 2;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
+        public List<NetPeer> netPeers;
 
         private float serverTime;
 
@@ -80,9 +81,8 @@ namespace ThomasEngine.Network
             netPacketProcessor = new NetPacketProcessor();
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
-
-            writer = new NetDataWriter();
-
+            netPeers = new List<NetPeer>();
+                        
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
@@ -136,13 +136,14 @@ namespace ThomasEngine.Network
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-
-            PacketType type = (PacketType)reader.GetInt();
-            switch (type)
-            {
-                case PacketType.DATA:
-                    while (reader.AvailableBytes > 0)
-                    {
+            if (isClient)
+                GetPing();
+                PacketType type = (PacketType)reader.GetInt();
+                switch (type)
+                {
+                    case PacketType.DATA:
+                        while (reader.AvailableBytes > 0)
+                        {
 
                         validationID = reader.GetInt();
                         if (networkIDObjects.ContainsKey(validationID))
@@ -337,6 +338,19 @@ namespace ThomasEngine.Network
             SendEventToAllBut(spawner, DeliveryMethod.ReliableOrdered, connected); //tell old clients to spawn object
             spawner.isOwner = true;
             SendEventToPeer(spawner, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
+        }
+
+        public void GetPing()
+        {
+
+            netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
+
+            for (int i = 0; i < netPeers.Count; i++)
+            {
+
+                ping = netPeers[i].Ping;
+
+            }
         }
     }
 }
