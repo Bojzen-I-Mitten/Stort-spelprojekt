@@ -31,7 +31,6 @@ namespace ThomasEngine
 
 		GameObject() : Object(new thomas::object::GameObject("gameobject")) 
 		{
-			s_lastObject = this;
 			m_name = "gameobject";
 
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
@@ -56,6 +55,9 @@ namespace ThomasEngine
 
 
 	internal:
+
+		String^ prefabPath;
+
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
@@ -69,8 +71,6 @@ namespace ThomasEngine
 		void PostLoad(Scene^ scene)
 		{
 			this->scene = scene;
-			m_transform = GetComponent<Transform^>();
-			
 		}
 
 		void PostInstantiate(Scene^ scene) {
@@ -86,8 +86,8 @@ namespace ThomasEngine
 			bool completed;
 			do {
 				completed = true;
-				for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects) {
-					completed = gameObject->InitComponents(playing) && completed;
+				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++) {
+					completed = Scene::CurrentScene->GameObjects[i]->InitComponents(playing) && completed;
 				}
 			} while (!completed);
 		}
@@ -153,11 +153,9 @@ namespace ThomasEngine
 		}
 
 	public:
-		static GameObject^ s_lastObject;
 
 		GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name))) 
 		{
-			s_lastObject = this;
 			m_name = name;
 			m_transform = AddComponent<Transform^>();
 			((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
@@ -173,11 +171,12 @@ namespace ThomasEngine
 		
 		static GameObject^ CreatePrefab() {
 			GameObject^ newGobj = gcnew GameObject();
-			s_lastObject = nullptr;
 			Transform^ t = newGobj->AddComponent<Transform^>();
 			((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 			return newGobj;
 		}
+
+
 
 
 		property bool inScene {
@@ -273,12 +272,30 @@ namespace ThomasEngine
 				return T();
 		}
 
+		Component^ GetComponent(Type^ type) {
+			for (int i = 0; i < m_components.Count; i++) {
+				if (m_components[i]->GetType() == type)
+					return m_components[i];
+			}
+		}
+
+
 		generic<typename T>
 		where T : Component
 		List<T>^ GetComponents()
 		{
 			List<T>^ list = gcnew List<T>(Enumerable::OfType<T>(%m_components));
 			return list;
+		}
+
+
+		List<Component^>^ GetComponents(Type^ type) {
+			List<Component^>^ tComponents = gcnew List<Component^>();
+			for (int i = 0; i < m_components.Count; i++) {
+				if (m_components[i]->GetType() == type)
+					tComponents->Add(m_components[i]);
+			}
+			return tComponents;
 		}
 
 
@@ -344,5 +361,15 @@ namespace ThomasEngine
 		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
+
+
+		[OnDeserializedAttribute]
+		void OnDeserialized(StreamingContext c)
+		{
+			for (int i = 0; i < m_components.Count; i++) {
+				m_components[i]->gameObject = this;
+			}
+			m_transform = GetComponent<Transform^>();
+		}
 	};
 }

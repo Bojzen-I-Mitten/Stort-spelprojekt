@@ -164,8 +164,14 @@ namespace ThomasEditor
 
 
             ThomasWrapper.CreateThomasWindow(Handle, IsEditor);
-
+            GotFocus += ThomasWindow_GotFocus;
             return new HandleRef(this, Handle);
+            
+        }
+
+        private void ThomasWindow_GotFocus(object sender, RoutedEventArgs e)
+        {
+            SetFocus(Handle);
         }
 
         protected override void DestroyWindowCore(HandleRef handle)
