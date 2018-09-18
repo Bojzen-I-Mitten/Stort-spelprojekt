@@ -19,6 +19,11 @@ namespace thomas
 
 			std::map<std::string, unsigned int> m_mapping;
 			std::vector<graphics::animation::Bone> m_boneInfo;
+			/* Absolute node transform
+			 * Transform relative from Node -> Parent (P*R*N : Parent*Relative*Node = Absolute)
+			 * Parent inverse
+			*/
+			std::vector<aiMatrix4x4> m_absoluteBind, m_relativeParent, m_absoluteInv;
 			std::vector < std::shared_ptr< graphics::animation::AnimationData> > m_animList;
 			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
 			graphics::animation::Skeleton* generateSkeleton() {
@@ -39,6 +44,11 @@ namespace thomas
 				if (itr != m_mapping.end())
 					return itr->second;
 				return -1;
+			}
+			void postFetch() {
+				m_absoluteBind.resize(m_boneInfo.size());
+				m_relativeParent.resize(m_boneInfo.size());
+				m_absoluteInv.resize(m_boneInfo.size());
 			}
 		};
 		void ProcessSkeleton(aiNode * node, resource::Model::ModelData & modelData, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 globalInverseTransform, aiMatrix4x4 parentTransform);
@@ -100,20 +110,36 @@ namespace thomas
 
 			// Process ASSIMP's root node recursively
 			ProcessNode(scene->mRootNode, scene, modelData, skelConstruct, globalInverseTransform);
-			// Process bone parenting
-			ProcessSkeleton(scene->mRootNode, modelData, skelConstruct, -1, globalInverseTransform, aiMatrix4x4());
+			if (skelConstruct.hasSkeleton()) {
+				skelConstruct.postFetch();
+				// Process bone parenting
+				ProcessSkeleton(scene->mRootNode, modelData, skelConstruct, -1, globalInverseTransform, aiMatrix4x4());
 
-			verifySkeleton(modelData, skelConstruct);
+				verifySkeleton(modelData, skelConstruct);
+			}
 		}
 
 		void verifySkeleton(resource::Model::ModelData &modelData, SkeletonConstruct &skelConstruct) {
 			if (skelConstruct.hasSkeleton()) {
+				std::vector<math::Matrix> m_list(skelConstruct.m_boneInfo.size());
+				m_list[0] = skelConstruct.m_boneInfo[0]._bindPose;
+				for (int i = 1; i < skelConstruct.m_boneInfo.size(); i++) {
+					m_list[i] = skelConstruct.m_boneInfo[i]._bindPose * m_list[skelConstruct.m_boneInfo[i]._parentIndex];
+
+					math::Matrix p = skelConstruct.m_boneInfo[i]._invBindPose * m_list[i];
+					int a = 0;
+				}
+
 				thomas::graphics::Vertices & vert = modelData.m_meshes[0]->GetVertices();
 				for (int i = 0; i < vert.positions.size(); i++) {
 					math::Vector4 v = math::Vector4::Transform(vert.positions[i], skelConstruct.m_boneInfo[0]._invBindPose);
 					v = math::Vector4::Transform(vert.positions[i], skelConstruct.m_boneInfo[0]._bindPose);
 					int a = 0;
 				}
+
+
+
+
 			}
 		}
 
@@ -333,6 +359,8 @@ namespace thomas
 
 			if (mesh->HasBones())
 			{
+				aiMatrix4x4 bakeInv = node_transform;
+				bakeInv.Inverse();
 				for (unsigned i = 0; i < mesh->mNumBones; i++)
 				{
 
@@ -353,16 +381,16 @@ namespace thomas
 					boneMap.m_mapping[boneName] = boneIndex;
 					boneMap.m_boneInfo[boneIndex]._boneIndex = boneIndex;
 					boneMap.m_boneInfo[boneIndex]._boneName = boneName;
-					boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix);
-					boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
+					boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix * bakeInv);
+					//boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(boneNode->mTransformation);
 
-					aiMatrix4x4 m = boneNode->mTransformation * meshBone->mOffsetMatrix;
 
 					for (int j = 0; j < meshBone->mNumWeights; j++)
 					{
 						vertices.AddBoneData(meshBone->mWeights[j].mVertexId, boneIndex, meshBone->mWeights[j].mWeight);
 					}
 				}
+
 			}
 
 			//Process materials
@@ -372,6 +400,7 @@ namespace thomas
 			//TODO: material import
 			//material = graphics::Material::CreateMaterial(dir, materialType, mat);
 
+			//vertices.PostProcess();
 
 			std::shared_ptr<graphics::Mesh> m(new graphics::Mesh(vertices, indices, name));
 			modelData.m_meshes.push_back(m);
@@ -388,18 +417,27 @@ namespace thomas
 			if (boneMap.m_mapping.find(node->mName.C_Str()) != boneMap.m_mapping.end())
 			{
 				unsigned int BoneIndex = boneMap.m_mapping[boneName];
-				if (parentBone != -1)	// Parented bone
+				if (parentBone != -1) {	// Parented bone
 					boneMap.m_boneInfo[BoneIndex]._parentIndex = parentBone;
+					boneMap.m_relativeParent[BoneIndex] = boneMap.m_absoluteInv[parentBone] * parentTransform;
+					boneMap.m_boneInfo[BoneIndex]._bindPose = convertAssimpMatrix(boneMap.m_relativeParent[BoneIndex] * nodeTransform);
+				}
 				else {					// Root bone (no parent)
 					boneMap.m_boneInfo[BoneIndex]._parentIndex = BoneIndex;
-					/*
-					// Transform root 
-					math::Matrix object_m = convertAssimpMatrix(object_space);
-					math::Matrix object_inv = object_m.Invert();
-					boneMap.m_boneInfo[BoneIndex]._bindPose =		object_m;
-					*/
+					boneMap.m_boneInfo[BoneIndex]._bindPose = convertAssimpMatrix(object_space);
+					boneMap.m_relativeParent[BoneIndex] = parentTransform;
 				}
+				// Store absolute transform
+				boneMap.m_absoluteBind[BoneIndex] = object_space;
+				boneMap.m_absoluteInv[BoneIndex] = object_space;
+				boneMap.m_absoluteInv[BoneIndex].Inverse();
+				// Transform test (should be identity)
+				math::Matrix object_m = convertAssimpMatrix(object_space);
+				math::Matrix object_inv = object_m.Invert();
+				math::Matrix m = boneMap.m_boneInfo[BoneIndex]._invBindPose * object_m;
+				int a = 0;
 				parentBone = BoneIndex;
+				//boneMap.m_boneInfo[BoneIndex]._invBindPose = boneMap.m_boneInfo[BoneIndex]._bindPose.Invert();
 
 				//boneMap.bones[BoneIndex].offsetMatrix =
 				//	(globalInverseTransform * globalTransform * boneMap.bones[BoneIndex].offsetMatrix).Transpose();
@@ -511,24 +549,37 @@ namespace thomas
 			}
 			return size;
 		}
+
+		aiVector3D mult_comp(aiVector3D v, aiVector3D v2) {
+			return aiVector3D(v.x*v2.x, v.y*v2.y, v.z*v2.z);
+		}
 		void ProcessChannel(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 			if (bone < 0)
 				return; //This channel does not animate a bone.
 
+			// Decompose parent relative bone
+			aiVector3D t, s;
+			aiQuaternion r;
+			construct.m_relativeParent[bone].Decompose(s, r, t);
 			for (unsigned int i = 0; i < channel->mNumPositionKeys; i++) {
 				aiVectorKey key = channel->mPositionKeys[i];
-				anim.insert3(bone, 0, (float)(key.mTime / ticksPerSecond), &key.mValue.x);
+				aiVector3D trans = construct.m_relativeParent[bone] * key.mValue;
+
+				anim.insert3(bone, 0, (float)(key.mTime / ticksPerSecond), &trans.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumScalingKeys; i++) {
 				aiVectorKey key = channel->mScalingKeys[i];
-				anim.insert3(bone, 1, (float)(key.mTime / ticksPerSecond), &key.mValue.x);
+				aiVector3D scale = r.Rotate(mult_comp(s, key.mValue));
+				anim.insert3(bone, 1, (float)(key.mTime / ticksPerSecond), &scale.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumRotationKeys; i++) {
 				aiQuatKey key = channel->mRotationKeys[i];
-				math::Quaternion q(key.mValue.w, key.mValue.x, key.mValue.y, key.mValue.z);
-				anim.insert4(bone, 2, (float)(key.mTime / ticksPerSecond), &q.x);
+				aiQuaternion quat = r * key.mValue;
+				
+				math::Quaternion dxQ(quat.x, quat.y, quat.z, quat.w);
+				anim.insert4(bone, 2, (float)(key.mTime / ticksPerSecond), &dxQ.x);
 			}
 		}
 

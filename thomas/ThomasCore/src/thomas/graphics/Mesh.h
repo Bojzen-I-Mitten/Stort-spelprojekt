@@ -37,6 +37,8 @@ namespace thomas
 			float weight1 = 0.0f;
 			float weight2 = 0.0f;
 			float weight3 = 0.0f;
+
+			void Normalize();
 		};
 		struct Vertices 
 		{
@@ -49,32 +51,13 @@ namespace thomas
 			std::vector<BoneIndex>		boneIndices;
 			std::vector<BoneWeight>		boneWeights;
 
+			/* Append a vertex bone weight for a bone at index
+			*/
+			void AddBoneData(int vertIndex, int boneIndex, float weight);
 
-			void AddBoneData(int vertIndex, int boneIndex, float weight)
-			{
-				BoneWeight &w = boneWeights[vertIndex];
-				BoneIndex &i = boneIndices[vertIndex];
-				if (w.weight0 == 0.0f)
-				{
-					i.boneIndex0 = boneIndex;
-					w.weight0 = weight;
-				}
-				else if (w.weight1 == 0.0f)
-				{
-					i.boneIndex1 = boneIndex;
-					w.weight1 = weight;
-				}
-				else if (w.weight2 == 0.0f)
-				{
-					i.boneIndex2 = boneIndex;
-					w.weight2 = weight;
-				}
-				else if (w.weight3 == 0.0f)
-				{
-					i.boneIndex3 = boneIndex;
-					w.weight3 = weight;
-				}
-			}
+			/* Post process vertices after all vertices are inserted
+			*/
+			void PostProcess();
 
 		};
 

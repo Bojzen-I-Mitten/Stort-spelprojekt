@@ -40,7 +40,7 @@ namespace thomas {
 			{
 				for (unsigned int i = 0; i < m_channels[chInd].m_keys.size(); i++)
 				{
-					if (elapsedTime < m_channels[chInd].m_keys[i]._time)
+					if (elapsedTime >= m_channels[chInd].m_keys[i]._time)
 						return i > 0 ? i - 1 : 0; //If no key before the time return the first key.
 				}
 				return -1;
@@ -63,6 +63,11 @@ namespace thomas {
 			ChannelKey ObjectChannel::getLast(unsigned int chInd) const
 			{
 				return m_channels[chInd].m_keys.back();
+			}
+
+			ChannelKey ObjectChannel::getFirst(unsigned int chInd) const
+			{
+				return m_channels[chInd].m_keys.front();
 			}
 
 

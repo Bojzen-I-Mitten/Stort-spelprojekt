@@ -21,7 +21,7 @@ namespace thomas {
 				m_bounds.Extents.z = 0;
 			}
 
-			void RenderComponent::SetModel(resource::Model* model)
+			bool RenderComponent::SetModel(resource::Model* model)
 			{
 				if (!model)
 				{
@@ -35,6 +35,7 @@ namespace thomas {
 				{
 					m_model = model;					
 				}
+				return true;
 			}
 
 			void RenderComponent::Update()

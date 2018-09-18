@@ -8,6 +8,9 @@
 #include "../Component.h"
 #include "../../resource/Model.h"
 #include "../../resource/Material.h"
+#include "../../Input.h"
+
+#include "../GameObject.h"
 
 namespace ThomasEngine
 {
@@ -22,12 +25,21 @@ namespace ThomasEngine
 
 	void RenderSkinnedComponent::model::set(Model^ value)
 	{
-		m_model = value;
-		if (m_model == nullptr)
+		if (value == nullptr)
+		{
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetModel(nullptr);
-		else
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetModel((thomas::resource::Model*)value->m_nativePtr);
-		applyAnimation();
+			m_model = nullptr;
+		}
+		else {
+			if (!((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetModel((thomas::resource::Model*)value->m_nativePtr))
+				m_model = nullptr;
+			else
+			{
+				// Set only if valid model
+				m_model = value;
+				applyAnimation();
+			}
+		}
 	}
 
 	void RenderSkinnedComponent::animation::set(Animation^ value) {
@@ -56,7 +68,16 @@ namespace ThomasEngine
 
 	void RenderSkinnedComponent::Update()
 	{
-		((thomas::object::component::RenderSkinnedComponent*)nativePtr)->Update();
+		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
+		ptr->Update();
+
+		if (Input::GetKeyDown(Input::Keys::Space)) {
+			thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
+			for (unsigned int i = 0; i < anim->boneCount(); i++) {
+				GameObject^ gObj = gcnew GameObject(Utility::ConvertString(anim->getBoneName(i)));
+				gObj->transform->world = Utility::Convert(anim->getBoneMatrix(i)) * m_gameObject->transform->world;
+			}
+		}
 	}
 
 	void RenderSkinnedComponent::applyAnimation()

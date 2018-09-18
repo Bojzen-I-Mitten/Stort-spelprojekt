@@ -45,11 +45,6 @@ namespace thomas
 					return m_localWorldMatrix;
 			}
 
-			math::Matrix Transform::SetWorldMatrix(math::Matrix matrix)
-			{
-				return math::Matrix();
-			}
-
 			void Transform::SetLocalMatrix(math::Matrix matrix)
 			{
 				m_localWorldMatrix = matrix;

@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "KeyFrame.h"
 #include "Channel.h"
 
 namespace thomas {

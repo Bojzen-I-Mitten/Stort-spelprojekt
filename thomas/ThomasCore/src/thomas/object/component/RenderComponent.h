@@ -19,7 +19,7 @@ namespace thomas
 			{
 			public:
 				RenderComponent();
-				virtual void SetModel(resource::Model* model);
+				virtual bool SetModel(resource::Model* model);
 				
 				resource::Model * GetModel();
 				void Update();

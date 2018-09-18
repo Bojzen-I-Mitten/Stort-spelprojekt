@@ -35,10 +35,11 @@ namespace thomas {
 				const math::Matrix* getSkin() const;
 				/* Get the number of bones
 				*/
-				unsigned int boneCount() const;
+				virtual unsigned int boneCount() const;
 				/* Get the world matrix of a bone
 				*/
-				const math::Matrix& getBoneMatrix(unsigned int bone) const;
+				virtual const math::Matrix& getBoneMatrix(unsigned int bone) const;
+				virtual const std::string& getBoneName(unsigned int bone) const;
 
 				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
 

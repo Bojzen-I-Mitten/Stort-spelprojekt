@@ -44,7 +44,7 @@ namespace thomas
 					v2 = math::Vector4::Transform(v2, world);
 				}
 			}
-			void RenderSkinnedComponent::SetModel(resource::Model * model)
+			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
 				RenderComponent::SetModel(model);
 				// Read new skeleton
@@ -57,7 +57,9 @@ namespace thomas
 					m_skeleton = std::unique_ptr<graphics::animation::AnimatedSkeleton>(
 						new graphics::animation::AnimatedSkeleton(*model->GetSkeleton(), m_skinArray));
 					insertProperty(&m_skinArray);
+					return true;	// Return true only if model is applied correctly
 				}
+				return false;
 			}
 			graphics::animation::IBlendTree* RenderSkinnedComponent::GetBlendTree() {
 				return m_skeleton.get();

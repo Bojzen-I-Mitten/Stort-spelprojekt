@@ -24,7 +24,7 @@ namespace thomas
 				virtual void Update();
 			protected:
 			public:
-				virtual void SetModel(resource::Model* model);
+				virtual bool SetModel(resource::Model* model);
 				/* Access the animated blend tree.
 				*/
 				graphics::animation::IBlendTree* GetBlendTree();

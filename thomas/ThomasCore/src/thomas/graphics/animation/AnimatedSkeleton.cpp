@@ -35,18 +35,13 @@ namespace thomas {
 				math::Matrix *skin_arr = _skin->GetValue();
 				_pose[0] = _root->calcLocalTransform(0);								//	Update root pose
 				skin_arr[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
-				static float a = 0.f;
-				skin_arr[0] = skin_arr[0] * math::Matrix::CreateTranslation(math::Vector3(0, std::sinf(a+=0.1f)*0.1f, 0.f));
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
 					_pose[i] = _root->calcLocalTransform(i) * _pose[bone._parentIndex];	//	Update root pose
+					math::Matrix m = bone._invBindPose * _pose[i];
 					skin_arr[i] = bone._invBindPose * _pose[i];							//	Update root skin
 				}
-
-				math::Vector4 v = math::Vector4(0, 1, 0, 1);
-				math::Vector4 s = math::Vector4::Transform(v, _ref.getBone(0)._invBindPose);
-				v = math::Vector4::Transform(v, skin_arr[0]);
 			}
 			/* Freeze the current animation */
 			void AnimatedSkeleton::stopAnimation()
@@ -91,6 +86,10 @@ namespace thomas {
 			{
 				assert(bone < _pose.size());
 				return _pose[bone];
+			}
+			const std::string & AnimatedSkeleton::getBoneName(unsigned int bone) const
+			{
+				return _ref.getBone(bone)._boneName;
 			}
 			const resource::shaderproperty::ShaderPropertyMatrixArray * AnimatedSkeleton::getShaderProperty()
 			{

@@ -56,6 +56,13 @@ namespace ThomasEngine
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetPosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetPosition(thomas::math::Vector3(value.x, value.y, value.z)); OnPropertyChanged("localPosition");}
 		}
+		[BrowsableAttribute(false)]
+		property Matrix world
+		{
+			Matrix get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetWorldMatrix()); }
+			void set(Matrix value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalMatrix(Utility::Convert(value)); OnPropertyChanged("localPosition"); }
+		}
+
 
 		[DisplayNameAttribute("position")]
 		property Vector3 localPosition
