@@ -16,6 +16,7 @@ namespace ThomasEngine
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
 	internal:
+		static List<Type^>^ GetKnownTypes();
 		Material(thomas::resource::Material* ptr) : Resource(Utility::ConvertString(ptr->GetPath()), ptr) {};
 		bool m_loaded = false;
 	public:

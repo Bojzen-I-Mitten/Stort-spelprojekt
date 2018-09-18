@@ -67,6 +67,69 @@ namespace ThomasEngine
 		}
 		
 	}
+
+
+	generic<typename T>
+	where T : Resource
+	T Resources::Deserialize(String^ path)
+	{
+		Monitor::Enter(resourceLock);
+		using namespace System::Runtime::Serialization;
+		DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+		serializserSettings->PreserveObjectReferences = true;
+		serializserSettings->KnownTypes = Material::GetKnownTypes();
+		DataContractSerializer^ serializer = gcnew DataContractSerializer(T::typeid, serializserSettings);
+
+		Xml::XmlReader^ file = Xml::XmlReader::Create(path);
+		T resource = (T)serializer->ReadObject(file);
+		file->Close();
+		resource->Rename(path);
+		Monitor::Exit(resourceLock);
+		return resource;
+	}
+
+	void Resources::SaveResource(Resource^ resource)
+	{
+
+		Monitor::Enter(resourceLock);
+		using namespace System::Runtime::Serialization;
+		DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+		serializserSettings->PreserveObjectReferences = true;
+		serializserSettings->KnownTypes = Material::GetKnownTypes();
+		DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+		System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
+
+		fi->Directory->Create();
+		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+		settings->Indent = true;
+		Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
+		serializer->WriteObject(file, resource);
+		file->Close();
+		Monitor::Exit(resourceLock);
+	}
+
+	void Resources::CreateResource(Resource^ resource, String^ path)
+	{
+		path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
+		Monitor::Enter(resourceLock);
+		using namespace System::Runtime::Serialization;
+		DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+		serializserSettings->PreserveObjectReferences = true;
+		serializserSettings->KnownTypes = Material::GetKnownTypes();
+		DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+		System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
+
+		fi->Directory->Create();
+		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+		settings->Indent = true;
+		Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
+		resource->Rename(path);
+		serializer->WriteObject(file, resource);
+		file->Close();
+		resources[System::IO::Path::GetFullPath(path)] = resource;
+		Monitor::Exit(resourceLock);
+	}
+
 	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
 	{
 		path = Application::currentProject->assetPath + "\\" + path;

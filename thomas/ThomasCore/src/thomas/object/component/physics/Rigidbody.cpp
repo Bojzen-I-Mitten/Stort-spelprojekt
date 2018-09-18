@@ -42,6 +42,7 @@ namespace thomas
 
 			void Rigidbody::OnDisable()
 			{
+				clearForces();
 				Physics::RemoveRigidBody(this);				
 			}
 
@@ -162,6 +163,11 @@ namespace thomas
 				}
 
 				return nullptr;
+			}
+
+			void Rigidbody::ClearTargetCollider()
+			{
+				m_targetCollider.reset();
 			}
 
 			float Rigidbody::GetMass()

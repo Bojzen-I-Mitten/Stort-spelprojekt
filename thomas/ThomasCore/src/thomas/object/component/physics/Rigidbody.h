@@ -35,6 +35,7 @@ namespace thomas
 
 			public:
 				GameObject* GetTargetCollider();
+				void ClearTargetCollider();
 				float GetMass();
 				bool IsKinematic();
 

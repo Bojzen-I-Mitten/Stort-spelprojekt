@@ -30,7 +30,7 @@
                     <Label Margin="5, 0, 0, 0" VerticalAlignment="Bottom" Height="25" Content="Shader" Grid.Column="1"/>
                     <ComboBox VerticalAlignment="Bottom" Height="20" Grid.Column="1"
                               Margin="60,0,-148,2" IsSynchronizedWithCurrentItem="False"
-                              ItemsSource="{Binding ElementName=materialInspector, Path=AvailableShaders}" DisplayMemberPath="name" SelectedItem="{Binding ElementName=materialInspector, Path=SelectedShader}"/>
+                              ItemsSource="{Binding ElementName=materialInspector, Path=AvailableShaders}" DisplayMemberPath="Name" SelectedItem="{Binding ElementName=materialInspector, Path=SelectedShader}"/>
                 </Grid>
                 <local:ExtendedPropertyGrid Grid.Row="1" DataContext="{Binding ElementName=materialInspector, Path=MaterialProperties}" x:Name="editorGrid"/>
             </Grid>

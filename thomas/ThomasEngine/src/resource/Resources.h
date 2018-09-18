@@ -19,25 +19,7 @@ namespace ThomasEngine
 
 		generic<typename T>
 		where T : Resource
-		static T Deserialize(String^ path)
-		{
-			
-			Monitor::Enter(resourceLock);
-			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-			serializserSettings->PreserveObjectReferences = true;
-			serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(T::typeid, serializserSettings);
-
-			Xml::XmlReader^ file = Xml::XmlReader::Create(path);
-			T resource = (T)serializer->ReadObject(file);
-			file->Close();
-			resource->Rename(path);
-			Monitor::Exit(resourceLock);
-			return resource;
-			
-			
-		}
+		static T Deserialize(String^ path);
 	public:
 		enum class AssetTypes
 		{
@@ -71,25 +53,7 @@ namespace ThomasEngine
 		static void Resources::SavePrefab(GameObject ^ gameObject, String ^ path);
 		static GameObject ^ Resources::LoadPrefab(String^ path);
 
-		static void SaveResource(Resource^ resource)
-		{
-			
-			Monitor::Enter(resourceLock);
-			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-			serializserSettings->PreserveObjectReferences = true;
-			serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
-
-			fi->Directory->Create();
-			Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-			settings->Indent = true;
-			Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
-			serializer->WriteObject(file, resource);
-			file->Close();
-			Monitor::Exit(resourceLock);
-		}
+		static void SaveResource(Resource^ resource);
 
 		static String^ GetUniqueName(String^ path) {
 			String^ extension = IO::Path::GetExtension(path);
@@ -105,27 +69,7 @@ namespace ThomasEngine
 			return path;
 		}
 
-		static void CreateResource(Resource^ resource, String^ path)
-		{
-			path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
-			Monitor::Enter(resourceLock);
-			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
-			serializserSettings->PreserveObjectReferences = true;
-			serializserSettings->KnownTypes = System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes;
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
-
-			fi->Directory->Create();
-			Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-			settings->Indent = true;
-			Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
-			resource->Rename(path);
-			serializer->WriteObject(file, resource);
-			file->Close();
-			resources[System::IO::Path::GetFullPath(path)] = resource;
-			Monitor::Exit(resourceLock);
-		}
+		static void CreateResource(Resource^ resource, String^ path);
 
 		static AssetTypes GetResourceAssetType(Type^ type);
 
@@ -172,9 +116,10 @@ namespace ThomasEngine
 		}
 
 		static String^ ConvertToThomasPath(String^ value) {
+			if (value->Contains(Application::editorAssets)) value = value->Replace(Application::editorAssets, "%THOMAS_DATA%");
+			else if(Application::currentProject) value = value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
 			value = System::IO::Path::GetFullPath(value);
-			if (value->Contains(Application::editorAssets)) return value->Replace(Application::editorAssets, "%THOMAS_DATA%");
-			else return value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
+			return value;
 		}
 		static String^ ConvertToRealPath(String^ value) {
 			value = value->Replace("%THOMAS_DATA%", Application::editorAssets);

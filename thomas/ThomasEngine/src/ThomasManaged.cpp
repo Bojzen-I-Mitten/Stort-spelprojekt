@@ -100,9 +100,9 @@ namespace ThomasEngine {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
 				{
-					if (gameObject->GetComponent<Rigidbody^>()->GetTargetCollider() != nullptr)
+					auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
+					if (collider != nullptr)
 					{
-						auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
 						gameObject->OnCollisionEnter(collider);
 					}
 

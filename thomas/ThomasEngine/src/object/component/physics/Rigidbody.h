@@ -49,7 +49,9 @@ namespace ThomasEngine
 
 				if (collider != nullptr)
 				{
-					return (GameObject^)Object::Find(Utility::Convert(collider->m_guid));
+					GameObject^ target = (GameObject^)Object::Find(Utility::Convert(collider->m_guid));
+					((thomas::object::component::Rigidbody*)nativePtr)->ClearTargetCollider();
+					return target;
 				}
 			}
 
