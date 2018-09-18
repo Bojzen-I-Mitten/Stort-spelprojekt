@@ -34,19 +34,13 @@ namespace thomas
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
 			m_grid = std::make_unique<EditorGrid>(100, 1, 10);
-			m_sensitivity = 50.0f;
-			m_speed = 2.0f;
-			m_hasSelectionChanged = false;
-			m_objectHighlighter = nullptr;
 			resource::Shader* outliner = resource::Shader::CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
+
 			if (outliner)
 			{
 				m_objectHighlighter = std::make_unique<resource::Material>(outliner);
 				m_objectHighlighter->m_renderQueue = 100;
 			}
-			
-			m_manipulatorMode = ImGuizmo::MODE::LOCAL;
-			m_manipulatorOperation = ImGuizmo::OPERATION::TRANSLATE;
 		}
 
 		EditorCamera::~EditorCamera()
@@ -276,6 +270,44 @@ namespace thomas
 					closestGameObject = renderComponent->m_gameObject;
 				}
 			}
+
+			if (closestGameObject != nullptr)
+			{
+				if (m_selectedObject == nullptr)
+					m_selectedObject = std::make_unique<GameObject>("");
+
+				// Don't change the pointer if the selected gameobject hasn't changed
+				if (m_selectedObject.get() != closestGameObject)
+				{
+					*m_selectedObject = *closestGameObject;
+					 
+					// Temp change of the direction of the camera here
+					/*math::Vector3 pointOnside = m_selectedObject->m_transform->GetPosition() +
+					math::Vector3(m_selectedObject->m_transform->GetScale().x * 0.5f, 0.f, m_selectedObject->m_transform->GetScale().z);
+					float aspect = Window::GetEditorWindow()->GetRealAspectRatio();
+					float maxDistance = (m_selectedObject->m_transform->GetScale().y * 0.5f) / tanf(math::DegreesToRadians())
+
+
+
+					this->m_transform->LookAt(m_selectedObject->m_transform->GetPosition());
+					this->m_transform->SetPosition(m_selectedObject->m_transform->GetPosition() + 
+												   (m_selectedObject->GetComponent<object::component::RenderComponent>()->m_bounds.Extents.) *
+													math::Vector3(3.f));*/
+				}
+			}
+
+			/*public Transform target;
+
+			void CameraFocus() {
+
+				Vector3 pointOnside = target.position + new Vector3(target.localScale.x * 0.5f, 0.0f, target.localScale.z * 0.5f);
+				float aspect = (float)Screen.width / (float)Screen.height;
+				float maxDistance = (target.localScale.y * 0.5f) / Mathf.Tan(Mathf.Deg2Rad * (Camera.main.fieldOfView / aspect));
+				Camera.main.transform.position = Vector3.MoveTowards(pointOnside, target.position, -maxDistance);
+				Camera.main.transform.LookAt(target.position);
+
+			}*/
+
 			return closestGameObject;
 		}
 

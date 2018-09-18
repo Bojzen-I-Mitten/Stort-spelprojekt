@@ -70,6 +70,7 @@ namespace thomas
 			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
+			std::unique_ptr<object::GameObject> m_selectedObject;
 
 		private:
 			static EditorCamera* s_editorCamera;
