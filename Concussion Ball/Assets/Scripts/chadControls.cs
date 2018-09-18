@@ -12,16 +12,20 @@ namespace ThomasEditor
         public int speed { get; set; } = 5;
         public float force { get; set; } = 5;
 
+        Rigidbody rBody;
+
         public override void Start()
         {
+            rBody = gameObject.GetComponent<Rigidbody>();
         }
 
         public override void Update()
         {
             //Jumping
             if (Input.GetKeyDown(Input.Keys.Space) && transform.position.y < 1.0f)
-                gameObject.GetComponent<Rigidbody>().ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
+                rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
             
+            //WASD movement
             if (Input.GetKey(Input.Keys.S))
             {
                 transform.position -= transform.forward * speed * Time.DeltaTime;
