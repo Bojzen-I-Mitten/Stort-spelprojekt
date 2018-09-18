@@ -10,6 +10,7 @@ namespace ThomasEditor
     public class ChadControls : ScriptComponent
     {
         public int speed { get; set; } = 5;
+        public float force { get; set; } = 5;
 
         public override void Start()
         {
@@ -17,8 +18,9 @@ namespace ThomasEditor
 
         public override void Update()
         {
+            //Jumping
             if (Input.GetKeyDown(Input.Keys.Space) && transform.position.y < 1.0f)
-                gameObject.GetComponent<Rigidbody>().ApplyCentralForce(new Vector3(0.0f, 350.0f, 0.0f));
+                gameObject.GetComponent<Rigidbody>().ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
             
             if (Input.GetKey(Input.Keys.S))
             {
