@@ -282,9 +282,9 @@ namespace thomas
 		void EditorCamera::MoveAndRotateCamera()
 		{
 			float speed = m_speed;
-			auto move = [](const math::Vector3 & direction, object::component::Transform* transform, float speed)
+			auto move = [this, speed](const math::Vector3 & direction)
 			{
-				transform->Translate(direction * ThomasTime::GetActualDeltaTime() * speed);
+				m_transform->Translate(direction * ThomasTime::GetActualDeltaTime() * speed);
 			};
 
 			// Increase camera speed
@@ -293,17 +293,17 @@ namespace thomas
 
 			// Allow the camera to move freely in the scene
 			if (Input::GetKey(Input::Keys::A))
-				move(-m_transform->Right(), m_transform, speed);
+				move(-m_transform->Right());
 			if (Input::GetKey(Input::Keys::D))
-				move(m_transform->Right(), m_transform, speed);
+				move(m_transform->Right());
 			if (Input::GetKey(Input::Keys::W))
-				move(m_transform->Forward(), m_transform, speed);
+				move(m_transform->Forward());
 			if (Input::GetKey(Input::Keys::S))
-				move(-m_transform->Forward(), m_transform, speed);
+				move(-m_transform->Forward());
 			if (Input::GetKey(Input::Keys::Q))
-				move(-m_transform->Up(), m_transform, speed);
+				move(-m_transform->Up());
 			if (Input::GetKey(Input::Keys::E))
-				move(m_transform->Up(), m_transform, speed);
+				move(m_transform->Up());
 
 			// Rotate camera
 			m_rotationX += Input::GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
