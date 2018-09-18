@@ -66,6 +66,11 @@ namespace ThomasEngine
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath)
 	{
+		if (!File::Exists(fullPath))
+		{
+			Debug::Log("Unable to find scene: " + fullPath);
+			return nullptr;
+		}
 		try {
 			s_loading = true;
 

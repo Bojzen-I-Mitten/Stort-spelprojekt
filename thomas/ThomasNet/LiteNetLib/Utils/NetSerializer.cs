@@ -344,6 +344,20 @@ namespace LiteNetLib.Utils
                     info.ReadDelegate[i] = reader => setDelegate((T)info.Reference, reader.GetChar());
                     info.WriteDelegate[i] = writer => writer.Put(getDelegate((T)info.Reference));
                 }
+                else if (propertyType == typeof(ThomasEngine.Vector3))
+                {
+                    var setDelegate = ExtractSetDelegate<T, ThomasEngine.Vector3>(setMethod);
+                    var getDelegate = ExtractGetDelegate<T, ThomasEngine.Vector3>(getMethod);
+                    info.ReadDelegate[i] = reader => setDelegate((T)info.Reference, reader.GetVector3());
+                    info.WriteDelegate[i] = writer => writer.Put(getDelegate((T)info.Reference));
+                }
+                else if (propertyType == typeof(ThomasEngine.Quaternion))
+                {
+                    var setDelegate = ExtractSetDelegate<T, ThomasEngine.Quaternion>(setMethod);
+                    var getDelegate = ExtractGetDelegate<T, ThomasEngine.Quaternion>(getMethod);
+                    info.ReadDelegate[i] = reader => setDelegate((T)info.Reference, reader.GetQuaternion());
+                    info.WriteDelegate[i] = writer => writer.Put(getDelegate((T)info.Reference));
+                }
                 // Array types
                 else if (propertyType == typeof(string[]))
                 {
