@@ -118,7 +118,11 @@ namespace ThomasEngine
 		static String^ ConvertToThomasPath(String^ value) {
 			if (value->Contains(Application::editorAssets)) value = value->Replace(Application::editorAssets, "%THOMAS_DATA%");
 			else if(Application::currentProject) value = value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
-			value = System::IO::Path::GetFullPath(value);
+			else {
+				value = System::IO::Path::GetFullPath(value);
+				value = ConvertToThomasPath(value);
+			}
+				
 			return value;
 		}
 		static String^ ConvertToRealPath(String^ value) {
@@ -184,6 +188,8 @@ namespace ThomasEngine
 		static Resource^ Load(String^ path);
 		
 		static Resource^ Find(String^ path);
+
+		static Resource^ LoadErrorResource(AssetTypes type);
 
 		static void RenameResource(String^ oldPath, String^ newPath);
 

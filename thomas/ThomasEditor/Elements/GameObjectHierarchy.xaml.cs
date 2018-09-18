@@ -27,13 +27,38 @@ namespace ThomasEditor
             Scene.sceneChanged = SceneGameObjectsChanged;
             Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
             ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
-            ThomasWrapper.OnEditorUpdate += ThomasWrapper_OnEditorUpdate;
+            ThomasEngine.Transform.OnParentChanged += Transform_OnParentChanged;
             instance = this;
         }
 
-        private void ThomasWrapper_OnEditorUpdate()
+        private void Transform_OnParentChanged(ThomasEngine.Transform child, ThomasEngine.Transform oldParent, ThomasEngine.Transform newParent)
         {
-            ResetTreeView();
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                if (oldParent == newParent)
+                    return;
+                var childNode = FindNode(hierarchy.Items, child.gameObject);
+                var oldParentNode = oldParent ? FindNode(hierarchy.Items, oldParent.gameObject).Items : hierarchy.Items;
+                var newParentNode = newParent ? FindNode(hierarchy.Items, newParent.gameObject).Items : hierarchy.Items;
+
+                oldParentNode.Remove(childNode);
+                newParentNode.Add(childNode);
+            }));
+        }
+
+        private TreeViewItem FindNode(ItemCollection nodes, GameObject gameObject)
+        {
+            foreach (TreeViewItem node in nodes)
+            {
+                if ((node.DataContext as GameObject) == gameObject)
+                {
+                    return node;
+                }
+                TreeViewItem child = FindNode(node.Items, gameObject);
+                if (child != null) return child;
+            }
+            return null;
+            
         }
 
         private void BuildTree(ThomasEngine.Transform parent, TreeViewItem parentTree)
@@ -53,27 +78,6 @@ namespace ThomasEditor
             }
         }
 
-
-        private void ResetTreeView()
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                hierarchy.Items.Clear();
-                foreach (GameObject gObj in Scene.CurrentScene.GameObjects)
-                {
-                    if (gObj.transform.parent == null)
-                    {
-                        TreeViewItem node = new TreeViewItem { DataContext = gObj };
-                        //node.MouseRightButtonUp += Node_MouseRightButtonUp;
-                        node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
-                        node.Padding = new Thickness(0, 0, 0, 2);
-                        BuildTree(gObj.transform, node);
-                        hierarchy.Items.Add(node);
-                    }
-                }
-            }));
-        }
-
         public void Unselect()
         {
             if(hierarchy.SelectedItem != null)
@@ -86,7 +90,7 @@ namespace ThomasEditor
 
         private void SceneGameObjectsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() => 
+            this.Dispatcher.BeginInvoke((Action)(() => 
             {
                 if (e.NewItems != null)
                 {
@@ -99,7 +103,6 @@ namespace ThomasEditor
                             //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                             node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
                             node.Padding = new Thickness(0, 0, 0, 2);
-
 
                             BuildTree(newItem.transform, node);
                             hierarchy.Items.Add(node);
@@ -190,7 +193,8 @@ namespace ThomasEditor
 
         private void SelectedGameObjectChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if(!wasUnselected)
+            ThomasWrapper.Selection.Ref.CollectionChanged -= SceneSelectedGameObjectChanged;
+            if (!wasUnselected)
                 AssetBrowser.instance.UnselectItem();
             wasUnselected = false;
             ItemContainerGenerator gen = hierarchy.ItemContainerGenerator;
@@ -211,6 +215,7 @@ namespace ThomasEditor
             {
                 Inspector.instance.SelectedObject = null;
             }
+            ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
         }
 
         private void hierarchy_DragOver(object sender, DragEventArgs e)
@@ -265,7 +270,6 @@ namespace ThomasEditor
                         if (!parent.transform.IsChildOf(child.transform))
                         {
                             child.transform.parent = parent.transform;
-                            ResetTreeView();
                         }
                     }
                     else if (source != null && target == null)
@@ -274,7 +278,6 @@ namespace ThomasEditor
                         if(gameObject.inScene)
                         {
                             gameObject.transform.parent = null;
-                            ResetTreeView();
                         }
                         else
                         {

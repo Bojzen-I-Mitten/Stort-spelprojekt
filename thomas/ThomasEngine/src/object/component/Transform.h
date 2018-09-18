@@ -20,6 +20,9 @@ namespace ThomasEngine
 		{
 		}
 
+		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
+		static event ParentChanged^ OnParentChanged;
+
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{

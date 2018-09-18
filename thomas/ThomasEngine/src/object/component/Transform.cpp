@@ -17,10 +17,11 @@ void ThomasEngine::Transform::OnDestroy()
 
 void ThomasEngine::Transform::parent::set(ThomasEngine::Transform^ value)
 {
+	Transform^ oldParent = parent;
 	if (value)
 		((thomas::object::component::Transform*)nativePtr)->SetParent((thomas::object::component::Transform*)value->nativePtr);
 	else
 		((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr);
 
-	ThomasWrapper::UpdateEditor();
+	OnParentChanged(this, oldParent, value);
 }

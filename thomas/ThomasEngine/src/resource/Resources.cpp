@@ -51,11 +51,13 @@ namespace ThomasEngine
 			}
 			catch (SerializationException^ e) {
 				std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: Serialization failed";
+				obj = LoadErrorResource(type);
 				LOG(error);
 			}
 			catch (Exception^ e) {
 				std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: " + Utility::ConvertString(e->Message);
 				LOG(error);
+				obj = LoadErrorResource(type);
 				//Debug::Log("Failed to create resource from file. Filename: " + path + " \nError: " + e->Message);
 			}
 			
@@ -188,6 +190,36 @@ namespace ThomasEngine
 			return resources[thomasPath];
 		}
 		return nullptr;
+	}
+	Resource ^ Resources::LoadErrorResource(AssetTypes type)
+	{
+		Resource^ obj = nullptr;
+		switch (type)
+		{
+		case AssetTypes::MODEL:
+			//obj = gcnew Model(path); Error model
+			break;
+		case AssetTypes::TEXTURE2D:
+			//obj = gcnew Texture2D(path); Error texture
+			break;
+		case AssetTypes::SCENE:
+			break;
+		case AssetTypes::SHADER:
+			//obj = Shader::Find() Failed shader
+			break;
+		case AssetTypes::MATERIAL:
+			// obj = Deserialize<Material^>(path); Failed material
+			break;
+		case AssetTypes::SCRIPT:
+			break;
+		case AssetTypes::AUDIO_CLIP:
+			// obj = gcnew AudioClip(path); Failed audio?
+			break;
+		case AssetTypes::UNKNOWN:
+		default:
+			break;
+		}
+		return obj;
 	}
 	void Resources::RenameResource(String ^ oldPath, String ^ newPath)
 	{

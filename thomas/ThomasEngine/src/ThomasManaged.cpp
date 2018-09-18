@@ -32,10 +32,6 @@ namespace ThomasEngine {
 
 	}
 
-	void ThomasWrapper::UpdateEditor()
-	{
-		updateEditor = true;
-	}
 
 	void ThomasWrapper::StartRenderer()
 	{
@@ -141,10 +137,6 @@ namespace ThomasEngine {
 				UpdateFinished->Set();
 			}
 			Monitor::Exit(lock);
-
-			if (updateEditor)
-				OnEditorUpdate();
-			updateEditor = false;
 
 			ScriptingManger::ReloadIfNeeded();
 		}
