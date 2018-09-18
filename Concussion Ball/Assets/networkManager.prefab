@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
-  <m_guid>c450fc00-c80a-46ad-9b87-32b9311e3335</m_guid>
-  <m_name z:Id="2">networkObject</m_name>
+  <m_guid>435b6fbd-2146-4b25-a4a5-5855c417efd7</m_guid>
+  <m_name z:Id="2">networkManager</m_name>
   <Components z:Size="2">
     <Component z:Id="3" i:type="Transform">
-      <m_guid>466d9581-f005-4e5b-afbf-3463ef937069</m_guid>
+      <m_guid>eb621977-c890-4b65-ab6a-fee9d686e8b9</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <children z:Size="0" />
@@ -47,23 +47,19 @@
       </scale>
     </Component>
     <Component z:Id="4" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkManager">
-      <m_guid>9a88830d-8412-4f9a-bc36-9f5cff838632</m_guid>
+      <m_guid>45cad168-df9e-4203-ab09-9d0d34863b5c</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
       <d3p1:IP z:Id="5">localhost</d3p1:IP>
       <d3p1:TICK_RATE>24</d3p1:TICK_RATE>
       <d3p1:isServer>true</d3p1:isServer>
-      <d3p1:player z:Id="6" i:type="SceneResource">
+      <d3p1:netPeers xmlns:d4p1="http://schemas.datacontract.org/2004/07/LiteNetLib" i:nil="true" />
+      <d3p1:playerPrefab z:Id="6" i:type="SceneResource">
         <path z:Id="7">%THOMAS_ASSETS%\newCube.prefab</path>
-      </d3p1:player>
+      </d3p1:playerPrefab>
       <d3p1:port>9050</d3p1:port>
-      <d3p1:spawnablePrefabs z:Id="8" z:Size="2">
-        <GameObject z:Ref="6" i:nil="true" />
-        <GameObject z:Id="9" i:type="SceneResource">
-          <path z:Id="10">%THOMAS_ASSETS%\newSphere.prefab</path>
-        </GameObject>
-      </d3p1:spawnablePrefabs>
-      <d3p1:testPacket z:Id="11">
+      <d3p1:spawnablePrefabs z:Id="8" z:Size="0" />
+      <d3p1:testPacket z:Id="9">
         <d3p1:ID>0</d3p1:ID>
         <d3p1:transformPos>
           <x>0</x>

@@ -7,7 +7,7 @@ namespace ThomasEngine.Network
     [HideInInspector]
     public class NetworkComponent : ScriptComponent
     {
-
+        internal int prefabID;
         
         internal NetworkID networkID;
 

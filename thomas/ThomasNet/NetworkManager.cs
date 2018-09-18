@@ -43,7 +43,8 @@ namespace ThomasEngine.Network
 
     public class NetworkManager : ScriptComponent
     {
-        Dictionary<int, NetworkID> networkIDObjects;
+        private Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
+        private Dictionary<NetworkID, NetPeer> players = new Dictionary<NetworkID, NetPeer>();
         int iD = -1;
         int validationID = -5;
         private NetPacketProcessor netPacketProcessor;
@@ -54,7 +55,7 @@ namespace ThomasEngine.Network
         public int port { get; set; } = 9050;
         public bool isServer { get; set; } = false;
         public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
-        public GameObject player { get; set; }
+        public GameObject playerPrefab { get; set; }
         public static int ping = 2;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
@@ -77,12 +78,11 @@ namespace ThomasEngine.Network
         }
         public override void Awake()
         {
-            networkIDObjects = new Dictionary<int, NetworkID>();
             netPacketProcessor = new NetPacketProcessor();
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
             netPeers = new List<NetPeer>();
-                        
+
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
@@ -125,6 +125,11 @@ namespace ThomasEngine.Network
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
+                List<GameObject> spawnObjects = new List<GameObject>();
+                foreach (var player in players)
+                {
+                    SpawnObject(player.Key.prefabID, player.Value);
+                }
                 SpawnPlayerCharacter(peer);
             }
             else
@@ -138,12 +143,12 @@ namespace ThomasEngine.Network
         {
             if (isClient)
                 GetPing();
-                PacketType type = (PacketType)reader.GetInt();
-                switch (type)
-                {
-                    case PacketType.DATA:
-                        while (reader.AvailableBytes > 0)
-                        {
+            PacketType type = (PacketType)reader.GetInt();
+            switch (type)
+            {
+                case PacketType.DATA:
+                    while (reader.AvailableBytes > 0)
+                    {
 
                         validationID = reader.GetInt();
                         if (networkIDObjects.ContainsKey(validationID))
@@ -176,13 +181,6 @@ namespace ThomasEngine.Network
 
             //Write full world state of owned objects.
             WriteData(DeliveryMethod.Unreliable);
-
-
-            //example spawn
-            if (Input.GetKeyUp(Input.Keys.K) && isServer)
-            {
-                SpawnObject(spawnablePrefabs[0]);
-            }
         }
 
 
@@ -274,19 +272,20 @@ namespace ThomasEngine.Network
                 }
             });
         }
-        
+
         internal void SubscribeSpawnObject(Spawner spawner, NetPeer peer)
         {
-            //Debug.Log("Test");
             if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
             {
                 GameObject gObj = GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
                 gObj.GetComponent<NetworkID>().Owner = spawner.isOwner;
+                gObj.GetComponent<NetworkID>().ID = spawner.netID;
             }
-            else if(spawner.prefabID == -1)
+            else if (spawner.prefabID == -1)
             {
-                GameObject gObj = GameObject.Instantiate(player, spawner.position, spawner.rotation);
+                GameObject gObj = GameObject.Instantiate(playerPrefab, spawner.position, spawner.rotation);
                 gObj.GetComponent<NetworkID>().Owner = spawner.isOwner;
+                gObj.GetComponent<NetworkID>().ID = spawner.netID;
             }
             else
             {
@@ -294,37 +293,83 @@ namespace ThomasEngine.Network
             }
         }
 
-        public void SpawnObject(GameObject prefab, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion())
+        public void SpawnObject(int index, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion())
         {
-            int index = spawnablePrefabs.IndexOf(prefab);
-            if (index != -1)
+            GameObject gObj;
+            if (index >= 0 && index < spawnablePrefabs.Count)
             {
-                GameObject gObj = GameObject.Instantiate(prefab, position, rotation);
-                gObj.GetComponent<NetworkID>().isOwner = true; ;
+                gObj = GameObject.Instantiate(spawnablePrefabs[index], position, rotation);
+            }
+            else if(index == -1)
+            {
+                gObj = GameObject.Instantiate(playerPrefab, position, rotation);
                 
-                Spawner spawner = new Spawner
-                {
-                    netID = gObj.GetComponent<NetworkID>().ID,
-                    prefabID = index,
-                    position = gObj.transform.position,
-                    rotation = gObj.transform.rotation,
-                    isOwner = false
-                };
-
-                SendEvent(spawner, DeliveryMethod.ReliableOrdered);
             }
             else
             {
                 Debug.Log("Tried to spawn object not in NetworkManager list of prefabs");
+                return;
             }
+
+            int ID = Register(gObj.GetComponent<NetworkID>());
+            gObj.GetComponent<NetworkID>().ID = ID;
+
+            Spawner spawner = new Spawner
+            {
+                netID = ID,
+                prefabID = index,
+                position = gObj.transform.position,
+                rotation = gObj.transform.rotation,
+                isOwner = false
+            };
+
+            SendEvent(spawner, DeliveryMethod.ReliableOrdered);
+        }
+
+        public void SpawnObject(int index, NetPeer sendTo, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion())
+        {
+            GameObject gObj;
+            if (index >= 0 && index < spawnablePrefabs.Count)
+            {
+                gObj = GameObject.Instantiate(spawnablePrefabs[index], position, rotation);
+                
+            }
+            else if (index == -1)
+            {
+                gObj = GameObject.Instantiate(playerPrefab, position, rotation);
+            }
+            else
+            {
+                Debug.Log("Tried to spawn object not in NetworkManager list of prefabs");
+                return;
+            }
+
+            int ID = Register(gObj.GetComponent<NetworkID>());
+            gObj.GetComponent<NetworkID>().ID = ID;
+
+            Spawner spawner = new Spawner
+            {
+                netID = ID,
+                prefabID = index,
+                position = gObj.transform.position,
+                rotation = gObj.transform.rotation,
+                isOwner = false
+            };
+
+            SendEventToPeer(spawner, DeliveryMethod.ReliableOrdered, sendTo);
         }
 
         public void SpawnPlayerCharacter(NetPeer connected)
         {
-            GameObject gObj = GameObject.Instantiate(player, new Vector3(), new Quaternion());
+            GameObject gObj = GameObject.Instantiate(playerPrefab, new Vector3(), new Quaternion());
+            //int ID = Register(gObj.GetComponent<NetworkID>());
+            int ID = gObj.GetComponent<NetworkID>().ID;
+
+            players.Add(gObj.GetComponent<NetworkID>(), connected);
+
             Spawner spawner = new Spawner
             {
-                netID = gObj.GetComponent<NetworkID>().ID,
+                netID = ID,
                 prefabID = -1,
                 position = gObj.transform.position,
                 rotation = gObj.transform.rotation,
