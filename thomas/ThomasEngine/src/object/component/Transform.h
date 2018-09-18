@@ -50,6 +50,7 @@ namespace ThomasEngine
 			}
 		}
 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
@@ -64,6 +65,7 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalPosition(value.x, value.y, value.z); }
 		}
 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Quaternion rotation
 		{
@@ -71,6 +73,7 @@ namespace ThomasEngine
 			void set(Quaternion value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(thomas::math::Quaternion(value.x, value.y, value.z, value.w)); OnPropertyChanged("localEulerAngles");}
 		}
 	
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 eulerAngles
 		{
@@ -78,6 +81,7 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(value.y, value.x, value.z); OnPropertyChanged("localEulerAngles");}
 		}
 
+		
 		[DisplayNameAttribute("rotation")]
 		property Vector3 localEulerAngles
 		{
@@ -85,6 +89,7 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalRotation(value.y, value.x, value.z); }
 		}
 		
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 scale
 		{

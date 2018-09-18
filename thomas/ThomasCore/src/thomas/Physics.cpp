@@ -97,6 +97,7 @@ namespace thomas
 
 				// Set the collider object to the target collider
 				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
+				rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbA->m_gameObject);
 			}
 		}
 

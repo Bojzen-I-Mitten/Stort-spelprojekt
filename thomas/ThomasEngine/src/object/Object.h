@@ -2,8 +2,7 @@
 #pragma unmanaged
 #include <thomas\object\Object.h>
 #pragma managed
-#include <string>
-#include <msclr\marshal_cppstd.h>
+#include "../Utility.h"
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::ComponentModel;
@@ -67,6 +66,7 @@ namespace ThomasEngine {
 			s_objects.Add(this);
 			thomas::object::Object::Add(ptr);
 			m_guid = Guid::NewGuid();
+			nativePtr->m_guid = Utility::Convert(m_guid);
 		}
 
 		virtual void Destroy()
@@ -126,6 +126,12 @@ namespace ThomasEngine {
 		static operator bool(Object^ object)
 		{
 			return object != nullptr;
+		}
+
+		[System::Runtime::Serialization::OnDeserializedAttribute]
+		void OnDeserializedObject(System::Runtime::Serialization::StreamingContext c)
+		{
+			nativePtr->m_guid = Utility::Convert(m_guid);
 		}
 	};
 }

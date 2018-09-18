@@ -258,10 +258,15 @@ namespace thomas
 			{
 				if (m_parent != parent)
 				{
+					math::Matrix m = GetWorldMatrix();
 					RemoveParent();
 					m_parent = parent;
 					if(m_parent)
 						m_parent->m_children.push_back(this);
+					else
+					{
+						SetLocalMatrix(m);
+					}
 				}
 			}
 			Transform * Transform::GetParent()

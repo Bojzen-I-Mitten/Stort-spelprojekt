@@ -13,7 +13,7 @@ namespace ThomasEngine {
 		if (m_isDestroyed)
 			return;
 		m_isDestroyed = true;
-		Monitor::Enter(this->scene->CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++) {
 			m_components[i]->Destroy();
@@ -23,8 +23,8 @@ namespace ThomasEngine {
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
 		ThomasWrapper::Selection->UnSelectGameObject(this);
-		this->scene->GameObjects->Remove(this);
-		Monitor::Exit(this->scene->CurrentScene->GetGameObjectsLock());
+		Scene::CurrentScene->GameObjects->Remove(this);
+		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
@@ -44,8 +44,11 @@ namespace ThomasEngine {
 
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = DeSerializeGameObject(serialized);
-		if(clone)
+		if (clone) {
 			clone->PostInstantiate(Scene::CurrentScene);
+			clone->prefabPath = nullptr;
+		}
+			
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
