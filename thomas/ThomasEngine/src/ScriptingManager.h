@@ -22,6 +22,10 @@ namespace ThomasEngine
 		delegate void ScriptReloadEnded();
 		static event ScriptReloadEnded^ scriptReloadFinished;
 
+		static void ForceReload() {
+			shouldReload = true;
+		}
+
 		static void Init() {
 			
 			fsw = gcnew FileSystemWatcher();
