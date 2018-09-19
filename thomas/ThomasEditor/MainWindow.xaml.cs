@@ -163,7 +163,7 @@ namespace ThomasEditor
 
         private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 if (e.NewItems != null)
                 {

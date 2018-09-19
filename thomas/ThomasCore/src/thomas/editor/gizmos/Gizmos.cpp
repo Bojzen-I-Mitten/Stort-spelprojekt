@@ -66,6 +66,33 @@ namespace thomas
 		}
 
 
+		void Gizmos::DrawBoundingCapsule(math::Vector3 center, float radius, float height)
+		{
+			
+			math::Vector3 xAxis = math::Vector3::UnitX * radius;
+			math::Vector3 yAxis = math::Vector3::UnitY * radius;
+			math::Vector3 zAxis = math::Vector3::UnitZ * radius;
+						
+			math::Vector3 offset = math::Vector3(0, (height / 2.0f), 0);
+			math::Vector3 top = center + offset;
+			math::Vector3 bottom = center - offset;
+
+			DrawRing(top, xAxis, zAxis);
+			DrawArc(top, xAxis, yAxis);
+			DrawArc(top, zAxis, yAxis);
+
+			DrawRing(bottom, xAxis, zAxis);
+			DrawArc(bottom, xAxis, -yAxis);
+			DrawArc(bottom, zAxis, -yAxis);
+			
+			DrawLine(top + xAxis, bottom + xAxis);
+			DrawLine(top - xAxis, bottom - xAxis);
+
+			DrawLine(top + zAxis, bottom + zAxis);
+			DrawLine(top - zAxis, bottom - zAxis);
+
+		}
+
 		void Gizmos::DrawCube(math::Vector3 center, math::Vector3 size)
 		{
 			/*s_gizmoMaterial->SetShaderPass((int)GizmoPasses::SOLID);
@@ -130,7 +157,7 @@ namespace thomas
 
 			DrawRing(origin, xAxis, zAxis);
 			DrawRing(origin, xAxis, yAxis);
-			DrawRing(origin, yAxis, zAxis);
+			DrawRing(origin, zAxis, yAxis);
 		}
 
 		void Gizmos::DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
@@ -161,6 +188,34 @@ namespace thomas
 
 			DrawLines(lines, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
+		}
+
+		void Gizmos::DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
+		{
+			static const size_t ringSegments = 16;
+
+			float angleDelta = math::PI / float(ringSegments);
+
+			std::vector<math::Vector3> lines(ringSegments + 1);
+
+			math::Vector3 cosDelta = math::Vector3(cosf(angleDelta));
+			math::Vector3 sinDelta = math::Vector3(sinf(angleDelta));
+			math::Vector3 incrementalSin = math::Vector3::Zero;
+			math::Vector3 incrementalCos = math::Vector3::One;
+			for (size_t i = 0; i <= ringSegments; i++)
+			{
+				math::Vector3 pos = majorAxis * incrementalCos + origin;
+				pos = minorAxis * incrementalSin + pos;
+				lines[i] = pos;
+				// Standard formula to rotate a vector.
+				math::Vector3 newCos = incrementalCos * cosDelta - incrementalSin * sinDelta;
+				math::Vector3 newSin = incrementalCos * sinDelta + incrementalSin * cosDelta;
+				incrementalCos = newCos;
+				incrementalSin = newSin;
+			}
+
+
+			DrawLines(lines, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 		}
 
 		void Gizmos::DrawLine(math::Vector3 from, math::Vector3 to)

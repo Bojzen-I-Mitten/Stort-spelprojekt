@@ -8,6 +8,7 @@ namespace thomas
 		{
 			Collider::Collider(btCollisionShape * collisionShape)
 			{
+				m_center = math::Vector3(0, 0, 0);
 				m_collisionShape = collisionShape;
 				m_collisionShape->setMargin(0);
 			}
@@ -15,6 +16,15 @@ namespace thomas
 			Collider::~Collider()
 			{
 				
+			}
+			void Collider::SetCenter(math::Vector3 center)
+			{
+				m_center = center;
+			}
+
+			math::Vector3 Collider::getCenter()
+			{
+				return m_center;
 			}
 
 			Rigidbody * Collider::GetAttachedRigidbody()
@@ -74,7 +84,7 @@ namespace thomas
 				if (m_collisionObject)
 				{
 					btTransform trans;
-					trans.setOrigin((btVector3&)m_gameObject->m_transform->GetPosition());
+					trans.setOrigin((btVector3&)(m_gameObject->m_transform->GetPosition() + m_center));
 					trans.setRotation((btQuaternion&)m_gameObject->m_transform->GetRotation());
 					m_collisionObject->setWorldTransform(trans);
 					Physics::s_world->updateSingleAabb(m_collisionObject);

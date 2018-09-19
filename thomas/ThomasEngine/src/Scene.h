@@ -20,20 +20,21 @@ namespace ThomasEngine {
 		Scene() {
 			m_name = "New Scene";
 			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
-			m_gameObjects.CollectionChanged += sceneChanged;
+			
 		}
 
 	internal:
 		static bool savingEnabled = true;
 
 	public:
+		
+		delegate void CurrentSceneChanged(Scene^ newScene);
+		static event CurrentSceneChanged^ OnCurrentSceneChanged;
 
-		static System::Collections::Specialized::NotifyCollectionChangedEventHandler^ sceneChanged;
 
 		Scene(System::String^ name) {
 			m_name = name;
 			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
-			m_gameObjects.CollectionChanged += sceneChanged;
 		}
 		void Play();
 		void Stop() { m_playing = false; }

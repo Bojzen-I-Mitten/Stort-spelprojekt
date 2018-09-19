@@ -42,6 +42,7 @@ namespace thomas
 
 			void Rigidbody::OnDisable()
 			{
+				clearForces();
 				Physics::RemoveRigidBody(this);				
 			}
 
@@ -54,8 +55,13 @@ namespace thomas
 			{			
 				btTransform trans;
 				getMotionState()->getWorldTransform(trans);
-				m_gameObject->m_transform->SetPosition((math::Vector3)trans.getOrigin());
-				m_gameObject->m_transform->SetRotation((math::Quaternion)trans.getRotation());
+
+				math::Quaternion rotation = (math::Quaternion)trans.getRotation();
+				math::Vector3 pos = (math::Vector3)trans.getOrigin();
+				if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
+
+				m_gameObject->m_transform->SetPosition(pos);
+				m_gameObject->m_transform->SetRotation(rotation);
 				m_gameObject->m_transform->SetDirty(true);
 
 				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
@@ -66,8 +72,13 @@ namespace thomas
 				if (m_prevMatrix != m_gameObject->m_transform->GetWorldMatrix())
 				{
 					btTransform trans;
-					trans.setOrigin((btVector3&)m_gameObject->m_transform->GetPosition());
-					trans.setRotation((btQuaternion&)m_gameObject->m_transform->GetRotation());
+
+					math::Vector3 pos = m_gameObject->m_transform->GetPosition();
+					math::Quaternion rot = m_gameObject->m_transform->GetRotation();
+					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
+
+					trans.setOrigin((btVector3&)pos);
+					trans.setRotation((btQuaternion&)rot);
 					getMotionState()->setWorldTransform(trans);
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
@@ -89,13 +100,15 @@ namespace thomas
 				}	
 			}
 	
-			void Rigidbody::SetCollider(btCollisionShape * collider)
+			void Rigidbody::SetCollider(Collider * collider)
 			{
-				Physics::RemoveRigidBody(this);
+				m_collider = collider;
+				bool removed = Physics::RemoveRigidBody(this);
 				delete getCollisionShape();
-				setCollisionShape(collider);
+				setCollisionShape(collider->GetCollisionShape());
 				UpdateRigidbodyMass();
-				Physics::AddRigidBody(this);
+				if(removed)
+					Physics::AddRigidBody(this);
 			}
 
 			void Rigidbody::SetMass(float mass)
@@ -150,6 +163,11 @@ namespace thomas
 				}
 
 				return nullptr;
+			}
+
+			void Rigidbody::ClearTargetCollider()
+			{
+				m_targetCollider.reset();
 			}
 
 			float Rigidbody::GetMass()

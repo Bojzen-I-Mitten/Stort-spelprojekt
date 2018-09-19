@@ -41,6 +41,7 @@
     <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\GUI\editor\GUI.cpp" />
+    <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +86,7 @@
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ThomasSelection.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
+    <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
   </ItemGroup>
