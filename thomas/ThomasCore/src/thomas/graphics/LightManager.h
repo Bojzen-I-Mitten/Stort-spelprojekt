@@ -23,14 +23,17 @@ namespace thomas
 				unsigned nrOfDirectionalLights;
 				unsigned nrOfPointLights;
 				unsigned nrOfSpotLights;
+				unsigned nrOfAreaLights;
 			};
 
 			enum LIGHT_TYPES
 			{
 				DIRECTIONAL = 0,
 				POINT = 1,
-				SPOT = 2
+				SPOT = 2,
+				AREA = 3
 			};
+
 
 			struct LightStruct
 			{
@@ -42,6 +45,13 @@ namespace thomas
 				float   spotInnerAngle;
 				thomas::math::Vector3  attenuation;
 				float   pad;
+				//for area lights
+				thomas::math::Vector3 right;
+				float pad1;
+				thomas::math::Vector3 up;
+				float pad2;
+				thomas::math::Vector2 rectangleDimensions;
+				thomas::math::Vector2 pad3;
 			};
 
 		public:
@@ -58,9 +68,9 @@ namespace thomas
 
 			static std::vector<object::component::LightComponent*> s_lights;
 
-			static std::shared_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
+			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
 
-			static LightCountsStruct m_lightsCounts;
+			static LightCountsStruct s_lightCounts;
 		};
 	}
 }
