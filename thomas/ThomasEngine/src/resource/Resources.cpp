@@ -259,7 +259,7 @@ namespace ThomasEngine
 		{
 			return AssetTypes::MODEL;
 		}
-		else if (extension == "anim")
+		else if (extension == "anim" || extension == "dae")
 		{
 			return AssetTypes::ANIMATION;
 		}

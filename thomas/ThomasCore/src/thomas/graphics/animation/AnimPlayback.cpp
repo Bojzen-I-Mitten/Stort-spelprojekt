@@ -21,8 +21,9 @@ namespace thomas {
 			*/
 			AnimPlayback::AnimPlayback(Skeleton &ref, std::unique_ptr<Playback> &playback, AnimationData &anim)
 				: AnimationNode(ref),
-				m_playback(std::move(playback)), m_anim(&anim), m_channel(ref.getNumBones())
+				m_playback(std::move(playback)), m_anim(&anim), m_channel()
 			{
+				m_channel.reserve(ref.getNumBones());
 				//Each channel needs to be initiated so it can generate it's own frames.
 
 				for (size_t i = 0; i < anim.numChannel(); i++) {
@@ -31,8 +32,11 @@ namespace thomas {
 					if(ch.numNodeChannels() == 0 ||
 						!ref.findBoneIndex(ch.getHash(), boneInd))
 						continue; // Empty or culled
-					else
-						m_channel[i].newAnimation(&anim[i], m_playback->getTime());
+					else {
+						m_boneMapping[boneInd] = m_channel.size();
+						m_channel.push_back(BoneFrame());
+						m_channel.back().newAnimation(&anim[i], m_playback->getTime());
+					}
 				}
 			}
 
@@ -44,25 +48,24 @@ namespace thomas {
 			{
 				m_playback->timeStep(dT);
 			}
-
 			math::Vector3 AnimPlayback::calcBonePosition(unsigned int bone)
 			{
-				return m_channel[bone].lerpCoordinate(m_playback->getTime());
+				return m_channel[m_boneMapping[bone]].lerpCoordinate(m_playback->getTime());
 			}
 
 			math::Vector3 AnimPlayback::calcBoneScale(unsigned int bone)
 			{
-				return m_channel[bone].lerpScale(m_playback->getTime());
+				return m_channel[m_boneMapping[bone]].lerpScale(m_playback->getTime());
 			}
 
 			math::Quaternion AnimPlayback::calcBoneRot(unsigned int bone)
 			{
-				return m_channel[bone].lerpRotation(m_playback->getTime());
+				return m_channel[m_boneMapping[bone]].lerpRotation(m_playback->getTime());
 			}
 
 			void AnimPlayback::calcFrame(unsigned int bone, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
 				float eT = m_playback->getTime();
-				m_channel[bone].lerpFrame(eT, trans, scale, rot);
+				m_channel[m_boneMapping[bone]].lerpFrame(eT, trans, scale, rot);
 			}
 			/*
 			bool AnimatedSkeleton::setAnim(const std::string& name, PlayType runType) {

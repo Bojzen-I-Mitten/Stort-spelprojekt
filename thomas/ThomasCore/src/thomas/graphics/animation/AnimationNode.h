@@ -26,6 +26,8 @@ namespace thomas {
 				virtual void calcFrame(unsigned int bone, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) = 0;
 				math::Matrix calcLocalTransform(unsigned int bone);
 
+
+				int map(int bone) { return m_boneMapping[bone]; }
 			};
 
 			class BindPoseNode : public AnimationNode {
