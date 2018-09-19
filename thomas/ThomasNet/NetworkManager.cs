@@ -188,8 +188,6 @@ namespace ThomasEngine.Network
         {
             if (reader.EndOfData)
                 return;
-            if (isClient)
-                GetPing();
             PacketType type = (PacketType)reader.GetInt();
             switch (type)
             {
@@ -226,22 +224,17 @@ namespace ThomasEngine.Network
             netManager.UpdateTime = (1000 / TICK_RATE);
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
-            GUI.ImguiStringUpdate(ping.ToString(), new Vector2(0, 0));
+           
             //Write full world state of owned objects.
             WriteData(DeliveryMethod.Unreliable);
-            if(Input.GetKey(Input.Keys.P))
+
+
+            if (isClient && netManager.GetFirstPeer() != null)
+                GUI.ImguiStringUpdate(netManager.GetFirstPeer().Ping.ToString(), new Vector2(0, 0));
+            if (Input.GetKey(Input.Keys.P))
                 Diagnostics();
 
-            //example spawn
-            //if (Input.GetKeyUp(Input.Keys.K) && isServer)
-            //{
-            //    GameObject gObj = GameObject.Instantiate(spawnablePrefabs[0], new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)); //spawn object on server
-            //    Spawner spawner = new Spawner
-            //    {
-            //        netID = gObj.GetComponent<NetworkID>().ID
-            //    };
-            //    SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
-            //}
+          
         }
 
         public override void OnDestroy()
@@ -458,16 +451,7 @@ namespace ThomasEngine.Network
             Unregister(networkID);
         }
 
-
-
-        public void GetPing()
-        {
-            netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
-            for(int i=0;i<netPeers.Count;i++)
-            {
-                ping = netPeers[i].Ping;
-            }
-        }    
+   
         public void Checkpacketloss()
         {
             Debug.Log("A error has occured here are the amount of packetloss " + netManager.Statistics.PacketLoss + "% lost " + netManager.Statistics.PacketLossPercent);
