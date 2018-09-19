@@ -5,8 +5,8 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			Skeleton::Skeleton(std::vector<Bone> &m_boneInfo)
-				: _bones(m_boneInfo)
+			Skeleton::Skeleton(std::vector<Bone> &m_boneInfo, math::Matrix root)
+				: m_bones(m_boneInfo), m_root(root)
 			{
 			}
 
@@ -15,24 +15,18 @@ namespace thomas {
 			{
 			}
 
-			AnimationData* Skeleton::getAnimation(const std::string &name) {
-				std::map<std::string, std::shared_ptr<AnimationData>>::iterator it = _animation.find(name);
-				if (it != _animation.end()) //Check that value existed
-					return it->second.get();
-				return nullptr;
-			}
 			const Bone& Skeleton::getBone(unsigned int i) const {
-				return _bones[i];
+				return m_bones[i];
 			}
 			const std::vector<Bone>& Skeleton::getBones() const {
-				return _bones;
+				return m_bones;
 			}
 
 			bool Skeleton::findBoneIndex(const std::string &boneName, unsigned int &boneID) const
 			{
-				for (unsigned int i = 0; i < _bones.size(); i++)
+				for (unsigned int i = 0; i < m_bones.size(); i++)
 				{
-					if (_bones[i]._boneName == boneName)
+					if (m_bones[i]._boneName == boneName)
 					{
 						boneID = i;
 						return true;
@@ -41,11 +35,11 @@ namespace thomas {
 				return false;
 			}
 			unsigned int Skeleton::getNumBones() const {
-				return _bones.size();
+				return m_bones.size();
 			}
-			/* Add an animation to the skeleton, if animation with the same name exists it will be removed. */
-			void Skeleton::addAnimation(std::shared_ptr<AnimationData> &anim) {
-				_animation[anim->m_name] = anim;
+			math::Matrix Skeleton::getRoot()
+			{
+				return m_root;
 			}
 		}
 	}

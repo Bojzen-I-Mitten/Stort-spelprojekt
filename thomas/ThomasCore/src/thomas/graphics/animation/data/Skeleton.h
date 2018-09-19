@@ -15,17 +15,13 @@ namespace thomas {
 			{
 				/* Bone structure of the skeleton.
 				*/
-				std::vector<Bone> _bones;
-				/* Animations related to the skeleton.
-				 * The animations is owned by the skeleton however it can be shared over multiple instances.
-				*/
-				std::map<std::string, std::shared_ptr<AnimationData>> _animation;
+				std::vector<Bone> m_bones;
+				math::Matrix m_root;
 
 			public:
-				Skeleton(std::vector<Bone> &m_boneInfo);
+				Skeleton(std::vector<Bone> &m_boneInfo, math::Matrix root);
 				~Skeleton();
 
-				AnimationData* getAnimation(const std::string &name);
 				const std::vector<Bone>& getBones() const;
 				const Bone& getBone(unsigned int i) const;
 				/* Access a bone from name. Returns if bone name exists.
@@ -36,8 +32,9 @@ namespace thomas {
 				bool findBoneIndex(const std::string &boneName, unsigned int &boneID) const;
 				/* Get the number of bones in the skeleton */
 				unsigned int getNumBones() const;
-				/* Add an animation to the skeleton */
-				void addAnimation(std::shared_ptr<AnimationData> &anim);
+				/* Get root transform
+				*/
+				math::Matrix getRoot();
 			};
 		}
 	}

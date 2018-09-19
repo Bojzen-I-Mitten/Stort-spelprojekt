@@ -19,17 +19,18 @@ namespace thomas
 
 			std::map<std::string, unsigned int> m_mapping;
 			std::vector<graphics::animation::Bone> m_boneInfo;
+			math::Matrix m_skeletonRoot;
 			/* Absolute node transform
 			 * Transform relative from Node -> Parent (P*R*N : Parent*Relative*Node = Absolute)
 			 * Parent inverse
 			*/
-			std::vector<aiMatrix4x4> m_absoluteBind, m_relativeParent, m_absoluteInv;
+			std::vector<aiMatrix4x4> m_absoluteBind, m_relativeParent;
 			std::vector < std::shared_ptr< graphics::animation::AnimationData> > m_animList;
 			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
 			graphics::animation::Skeleton* generateSkeleton() {
 				if (m_boneInfo.size() == 0)
 					return nullptr;
-				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(m_boneInfo);
+				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(m_boneInfo, m_skeletonRoot);
 				//for (unsigned int i = 0; i < _animations.size(); i++)
 				//	skel->addAnimation(_animations[i]);
 				return skel;
@@ -101,7 +102,6 @@ namespace thomas
 			return scene;
 		}
 
-		void verifySkeleton(resource::Model::ModelData &modelData, SkeletonConstruct &skelConstruct);
 		void Process(const aiScene* scene, resource::Model::ModelData &modelData, SkeletonConstruct &skelConstruct)
 		{
 			std::vector<std::shared_ptr<graphics::Mesh>> m_meshes;
@@ -112,31 +112,8 @@ namespace thomas
 			FindSkeleton(scene->mRootNode, skelConstruct, globalInverseTransform);
 			// Process ASSIMP's root node recursively
 			ProcessMesh(scene->mRootNode, scene, modelData, skelConstruct, globalInverseTransform);
-			if (skelConstruct.hasSkeleton()) {
-
-				verifySkeleton(modelData, skelConstruct);
-			}
 		}
 
-		void verifySkeleton(resource::Model::ModelData &modelData, SkeletonConstruct &skelConstruct) {
-			if (skelConstruct.hasSkeleton()) {
-				std::vector<math::Matrix> m_list(skelConstruct.m_boneInfo.size());
-				m_list[0] = skelConstruct.m_boneInfo[0]._bindPose;
-				for (int i = 1; i < skelConstruct.m_boneInfo.size(); i++) {
-					m_list[i] = skelConstruct.m_boneInfo[i]._bindPose * m_list[skelConstruct.m_boneInfo[i]._parentIndex];
-
-					math::Matrix p = skelConstruct.m_boneInfo[i]._invBindPose * m_list[i];
-					int a = 0;
-				}
-
-				thomas::graphics::Vertices & vert = modelData.m_meshes[0]->GetVertices();
-				for (int i = 0; i < vert.positions.size(); i++) {
-					math::Vector4 v = math::Vector4::Transform(vert.positions[i], skelConstruct.m_boneInfo[0]._invBindPose);
-					v = math::Vector4::Transform(vert.positions[i], skelConstruct.m_boneInfo[0]._bindPose);
-					int a = 0;
-				}
-			}
-		}
 
 		void AssimpLoader::LoadModel(std::string path, resource::Model::ModelData &modelData)
 		{
@@ -405,12 +382,14 @@ namespace thomas
 			aiMatrix4x4 object_space = parentTransform * node->mTransformation;
 
 			if (boneName.find("armature") != std::string::npos) {
+				boneMap.m_skeletonRoot = convertAssimpMatrix(object_space);
 				for (unsigned int i = 0; i < node->mNumChildren; i++)
 				{
 					ProcessSkeleton(node->mChildren[i], boneMap, -1, object_space);
 				}
 			}
 			else if (boneName.find("hips") != std::string::npos) {
+				boneMap.m_skeletonRoot = convertAssimpMatrix(parentTransform);
 				ProcessSkeleton(node, boneMap, -1, parentTransform);
 			}
 			else {
@@ -433,19 +412,15 @@ namespace thomas
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
 			bi._parentIndex = parentBone;
-
 			if (parentBone != -1) {	// Parented bone
-				boneMap.m_relativeParent.push_back(boneMap.m_absoluteInv[parentBone] * parentTransform);
-				bi._bindPose = convertAssimpMatrix(boneMap.m_relativeParent[BoneIndex] * nodeTransform);
+				boneMap.m_relativeParent.push_back(aiMatrix4x4());
 			}
 			else {					// Root bone (no parent)
-				bi._bindPose = convertAssimpMatrix(object_space);
 				boneMap.m_relativeParent.push_back(parentTransform);
 			}
+			bi._bindPose = convertAssimpMatrix(nodeTransform);
 			// Store absolute transform
 			boneMap.m_absoluteBind.push_back(object_space);
-			boneMap.m_absoluteInv.push_back(object_space);
-			boneMap.m_absoluteInv.back().Inverse();
 
 			boneMap.m_boneInfo.push_back(bi);
 			boneMap.m_mapping[boneName] = BoneIndex;
@@ -562,6 +537,12 @@ namespace thomas
 			const float *ptr = &m.a1;
 			return aiVector3D(ptr[i], ptr[i + 4], ptr[i + 8]);
 		}
+		void SetColumn(unsigned int i, aiMatrix4x4 &m, aiVector3D v) {
+			float *ptr = &m.a1;
+			ptr[i] = v.x;
+			ptr[i+4] = v.x;
+			ptr[i+8] = v.x;
+		}
 		bool checkSingleComponent(aiVector3D vec) {
 			return std::abs(vec.x) < EPSILON && std::abs(vec.y) < EPSILON && std::abs(vec.z) < EPSILON;
 		}
@@ -624,6 +605,7 @@ namespace thomas
 				aiVector3D scale, t;
 				aiMatrix4x4 m = construct.m_relativeParent[bone] * aiMatrix4x4(key.mValue, r, t_0);
 				m.Decompose(scale, r, t);
+				scale = rs * key.mValue;
 				anim.insert3(bone, 1, (float)(key.mTime / ticksPerSecond), &scale.x);
 			}
 			for (unsigned int i = 0; i < channel->mNumRotationKeys; i++) {
@@ -633,6 +615,8 @@ namespace thomas
 				aiMatrix4x4 m = construct.m_relativeParent[bone] * aiMatrix4x4(scale, key.mValue, t_0);
 				m.Decompose(scale, r, t);
 				
+				r = aiQuaternion(rs * key.mValue.GetMatrix());
+
 				math::Quaternion dxQ(r.x, r.y, r.z, r.w);
 				anim.insert4(bone, 2, (float)(key.mTime / ticksPerSecond), &dxQ.x);
 			}
@@ -661,10 +645,7 @@ namespace thomas
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 			if (bone < 0)
 				return; //This channel does not animate a bone.
-			if (construct.m_boneInfo[bone]._parentIndex == -1) 
-				ProcessRelativeChannel(bone, channel, ticksPerSecond, construct, anim);
-			else
-				ProcessChannel(bone, channel, ticksPerSecond, construct, anim);
+			ProcessChannel(bone, channel, ticksPerSecond, construct, anim);
 		}
 
 		void ProcessAnimations(const aiScene* scene, SkeletonConstruct& construct) {
