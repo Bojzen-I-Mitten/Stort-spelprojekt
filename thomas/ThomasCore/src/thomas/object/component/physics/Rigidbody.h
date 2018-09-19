@@ -8,6 +8,12 @@ namespace thomas
 	{
 		namespace component
 		{
+			enum class ForceMode
+			{
+				Force,
+				Impulse, 
+			};
+
 			class Collider;
 
 			class THOMAS_API Rigidbody : public Component, public btRigidBody
@@ -22,12 +28,12 @@ namespace thomas
 				void OnDestroy();
 				void UpdateRigidbodyToTransform();
 				void UpdateTransformToRigidBody();
-				void ApplyCentralForce(const math::Vector3 & force);
-				void ApplyCentralImpulseForce(const math::Vector3 & force);
-				void ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos);
-				void ApplyImpulseForce(const math::Vector3 & force, const math::Vector3 & relPos);
+				void AddTorque(const math::Vector3 & torque, ForceMode mode = ForceMode::Force);
+				void AddForce(const math::Vector3 & force, ForceMode mode = ForceMode::Force);
+				void AddRelativeForce(const math::Vector3 & force, const math::Vector3 & relPos, ForceMode mode = ForceMode::Force);
 
 			public:
+				void SetGravity(bool gravity);
 				void SetKinematic(bool kinematic);
 				void SetCollider(btCollisionShape* collider);
 				void SetMass(float mass);
@@ -35,8 +41,9 @@ namespace thomas
 
 			public:
 				GameObject* GetTargetCollider();
-				float GetMass();
-				bool IsKinematic();
+				float GetMass() const;
+				bool HasGravity() const;
+				bool IsKinematic() const;
 
 			private:
 				void UpdateRigidbodyMass();
@@ -45,6 +52,7 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
+				bool m_hasGravity;
 				std::unique_ptr<GameObject> m_targetCollider; // Temp
 			};
 		}
