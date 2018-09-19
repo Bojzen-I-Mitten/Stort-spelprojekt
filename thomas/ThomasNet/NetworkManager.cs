@@ -49,7 +49,6 @@ namespace ThomasEngine.Network
 
         private EventBasedNetListener listener;
         private NetManager netManager;
-        private NetDataWriter writer;
         public string IP { get; set; } = "localhost";
         public int port { get; set; } = 9050;
         public bool isServer { get; set; } = false;
@@ -82,11 +81,6 @@ namespace ThomasEngine.Network
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
             netPeers = new List<NetPeer>();
-             writer = new NetDataWriter();
-                        
-
-            writer = new NetDataWriter();
-            spawnablePrefabs = new List<GameObject>();
 
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
@@ -96,7 +90,7 @@ namespace ThomasEngine.Network
 
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
-            SubscribeToEvent<Spawner>(SpawnObject);
+            //SubscribeToEvent<Spawner>(SpawnObject);
 
         }
 
@@ -130,7 +124,7 @@ namespace ThomasEngine.Network
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
-                SpawnPlayerCharacter();
+                //SpawnPlayerCharacter();
             }
             else
             {
@@ -143,25 +137,25 @@ namespace ThomasEngine.Network
         {
             if (isClient)
                 GetPing();
-                PacketType type = (PacketType)reader.GetInt();
-                switch (type)
-                {
-                    case PacketType.DATA:
-                        while (reader.AvailableBytes > 0)
-                        {
+            PacketType type = (PacketType)reader.GetInt();
+            switch (type)
+            {
+                case PacketType.DATA:
+                    while (reader.AvailableBytes > 0)
+                    {
 
-                        validationID = reader.GetInt();
-                        if (networkIDObjects.ContainsKey(validationID))
-                            networkIDObjects[validationID].Read(reader);
-                        else
-                            reader.Clear();
-                    }
-                    break;
-                case PacketType.EVENT:
-                    netPacketProcessor.ReadAllPackets(reader);
-                    break;
-                default:
-                    break;
+                    validationID = reader.GetInt();
+                    if (networkIDObjects.ContainsKey(validationID))
+                        networkIDObjects[validationID].Read(reader);
+                    else
+                        reader.Clear();
+                }
+                break;
+            case PacketType.EVENT:
+                netPacketProcessor.ReadAllPackets(reader);
+                break;
+            default:
+                break;
             }
         }
 
