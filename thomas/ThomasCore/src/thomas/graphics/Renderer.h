@@ -36,7 +36,7 @@ namespace thomas
 		{
 			object::component::Camera* camera;
 			math::Matrix worldMatrix;
-			std::shared_ptr<Mesh> mesh; //This doesn't have to be a shared ptr? More process overhead!
+			std::weak_ptr<Mesh> mesh;
 			resource::Material* material;
 
 			RenderCommand(math::Matrix world, std::shared_ptr<Mesh> m, resource::Material* mat, object::component::Camera* cam) :

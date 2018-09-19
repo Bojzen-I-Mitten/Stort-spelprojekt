@@ -18,7 +18,7 @@ namespace thomas
 
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>("LightBuffer", nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;

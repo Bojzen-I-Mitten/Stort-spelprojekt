@@ -26,7 +26,7 @@ namespace thomas
 
 		void Texture2D::LoadTextureFromFile(std::string path)
 		{
-			if (utils::D3d::LoadTextureFromFile(path, m_resource, m_srv))
+			if (utils::D3D::LoadTextureFromFile(path, m_resource, m_srv))
 			{
 				ID3D11Texture2D *textureInterface;
 
@@ -59,7 +59,7 @@ namespace thomas
 			m_linear = linear;
 
 			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3d::CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+			utils::D3D::CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 		}

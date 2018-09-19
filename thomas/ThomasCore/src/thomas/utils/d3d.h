@@ -1,6 +1,7 @@
 #pragma once
-#include <d3d11.h>
+#include <d3d11_4.h>
 #include <string>
+#include <dxgi.h>
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -11,17 +12,16 @@ namespace thomas
 	class Window;
 	namespace utils
 	{	
-		class D3d
+		class D3D
 		{
 		public:					
-			static bool CreateBackBuffer(ID3D11Device* device, IDXGISwapChain* swapchain, ID3D11RenderTargetView*& backBuffer, ID3D11ShaderResourceView*& backBufferSRV);
+			static bool CreateBackBuffer(IDXGISwapChain* swapchain, ID3D11RenderTargetView*& backBuffer, ID3D11ShaderResourceView*& backBufferSRV);
 			static bool CreateDepthStencilView(ID3D11Device* device, LONG width, LONG height, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
-			static bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain*& swapchain, ID3D11Device* device);
+			static bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain*& swapchain);
 			static bool CreateRenderTargetView(LONG width, LONG height, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
 			static bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			
 		public:
-			static ID3D11InfoQueue* CreateDebugInfoQueue();
 			static ID3D11DepthStencilState* CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth);
 			static ID3D11RasterizerState* CreateRasterizer(D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode);
 			

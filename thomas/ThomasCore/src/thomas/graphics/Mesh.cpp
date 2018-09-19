@@ -73,22 +73,22 @@ namespace thomas
 		{
 			//Insert data if the property exist
 			if (m_data.vertices.positions.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::POSITION, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.positions)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::POSITION, std::make_unique<utils::buffers::VertexBuffer>("MeshPos", m_data.vertices.positions)));
 			if (m_data.vertices.colors.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::COLOR, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.colors)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::COLOR, std::make_unique<utils::buffers::VertexBuffer>("MeshCol", m_data.vertices.colors)));
 			if (m_data.vertices.texCoord0.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.texCoord0)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD, std::make_unique<utils::buffers::VertexBuffer>("MeshTex", m_data.vertices.texCoord0)));
 			if (m_data.vertices.normals.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.normals)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::VertexBuffer>("MeshNor", m_data.vertices.normals)));
 			if (m_data.vertices.tangents.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.tangents)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TANGENT, std::make_unique<utils::buffers::VertexBuffer>("MeshTan", m_data.vertices.tangents)));
 			if (m_data.vertices.bitangents.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.bitangents)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::VertexBuffer>("MeshBitan", m_data.vertices.bitangents)));
 			if (m_data.vertices.boneWeights.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHT, std::make_unique<utils::buffers::VertexBuffer>("MeshBoneWeight", m_data.vertices.boneWeights)));
 
 			if (!m_data.indices.empty())
-				m_data.indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_data.indices);
+				m_data.indexBuffer = std::make_unique<utils::buffers::IndexBuffer>("MeshIndexBuffer", m_data.indices);
 		}
 
 		math::BoundingBox Mesh::GenerateBounds()

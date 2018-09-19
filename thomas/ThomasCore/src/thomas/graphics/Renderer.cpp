@@ -90,7 +90,7 @@ namespace thomas
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
 						BindObject(material, perMeshCommand.worldMatrix);
-						material->Draw(perMeshCommand.mesh);
+						material->Draw(perMeshCommand.mesh.lock());
 					}
 				}
 			}
