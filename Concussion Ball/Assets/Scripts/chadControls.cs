@@ -30,19 +30,17 @@ namespace ThomasEditor
             rBody = gameObject.GetComponent<Rigidbody>();
         }
 
-        //Coroutine for jumping delay
+        //Coroutine for jumping delay, also used for tackling delay
         IEnumerator JumpingCoroutine()
         {
             jumpDelay = false;
             rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
-            Debug.Log("Started jumping.");
             yield return new WaitForSeconds(1.0f);
             jumpDelay = true;
             movingForward = false;
             movingBackward = false;
             tackling = false;
             jumping = false;
-            Debug.Log("Coroutine has waited for 1 second.. Ready to jump again.");
         }
 
         public override void Update()
@@ -50,6 +48,7 @@ namespace ThomasEditor
             //Jumping
             if (Input.GetKeyDown(Input.Keys.Space) && jumpDelay)
             {
+                //Set bools to avoid direction changes mid air or tackling mid air
                 jumping = true;
                 if (Input.GetKey(Input.Keys.W))
                     movingForward = true;
@@ -62,10 +61,10 @@ namespace ThomasEditor
             if (Input.GetKeyDown(Input.Keys.LeftShift) && !tackling && !jumping)
             {
                 tackling = true;
-                //transform.position += transform.forward * speed * 2 * Time.DeltaTime;
                 StartCoroutine(JumpingCoroutine());
             }
 
+            //Set double speed for tackling
             if (tackling)
                 transform.position += transform.forward * speed * 2 * Time.DeltaTime;
 
