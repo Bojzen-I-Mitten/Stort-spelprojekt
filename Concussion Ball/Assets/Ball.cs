@@ -16,7 +16,7 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
-        if (isOwner)
+        if (true)
         {
             if (Input.GetKey(Input.Keys.Space) && !rb.enabled)
             {
