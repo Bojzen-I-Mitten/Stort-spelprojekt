@@ -132,7 +132,7 @@ float4 frag(v2f input) : SV_TARGET
 	int roof = nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
-        lightDir = normalize(lights[i].direction); //should be normalized already
+        lightDir = lights[i].direction; //should be normalized already
         lightMultiplyer = lights[i].color * lights[i].intensity;
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
