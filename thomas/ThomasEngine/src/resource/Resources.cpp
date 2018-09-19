@@ -75,6 +75,7 @@ namespace ThomasEngine
 	where T : Resource
 	T Resources::Deserialize(String^ path)
 	{
+		path = ConvertToRealPath(path);
 		Monitor::Enter(resourceLock);
 		using namespace System::Runtime::Serialization;
 		DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();

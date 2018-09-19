@@ -51,6 +51,7 @@ namespace ThomasEngine
 			m_propertiesBeforePlay = nullptr;
 		}
 
+
 		property String^ Name
 		{
 			String^ get() override { 
@@ -60,6 +61,9 @@ namespace ThomasEngine
 				{
 					return "Default Material";
 				}
+			}
+			void set(String^ Name) {
+				//Nothing here :)
 			}
 		};
 		

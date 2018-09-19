@@ -24,25 +24,62 @@ namespace ThomasEditor
         public GameObjectHierarchy()
         {
             InitializeComponent();
-            Scene.sceneChanged = SceneGameObjectsChanged;
+
             Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
             ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
             ThomasEngine.Transform.OnParentChanged += Transform_OnParentChanged;
+            Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
             instance = this;
+        }
+
+        private void Scene_OnCurrentSceneChanged(Scene newScene)
+        {
+            if(newScene != null)
+                ResetTreeView();
+        }
+
+        private void ResetTreeView()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                hierarchy.Items.Clear();
+                foreach (GameObject gObj in Scene.CurrentScene.GameObjects)
+                {
+                    if (gObj.transform.parent == null)
+                    {
+                        TreeViewItem node = new TreeViewItem { DataContext = gObj };
+                        //node.MouseRightButtonUp += Node_MouseRightButtonUp;
+                        node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
+                        node.Padding = new Thickness(0, 0, 0, 2);
+                        BuildTree(gObj.transform, node);
+                        hierarchy.Items.Add(node);
+                    }
+                }
+                Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+            }));
         }
 
         private void Transform_OnParentChanged(ThomasEngine.Transform child, ThomasEngine.Transform oldParent, ThomasEngine.Transform newParent)
         {
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
-                if (oldParent == newParent)
+                if (oldParent == newParent  || !child.gameObject)
                     return;
-                var childNode = FindNode(hierarchy.Items, child.gameObject);
-                var oldParentNode = oldParent ? FindNode(hierarchy.Items, oldParent.gameObject).Items : hierarchy.Items;
-                var newParentNode = newParent ? FindNode(hierarchy.Items, newParent.gameObject).Items : hierarchy.Items;
+                //var childNode = FindNode(hierarchy.Items, child.gameObject);
+                //var oldParentNode = oldParent && oldParent.gameObject ? FindNode(hierarchy.Items, oldParent.gameObject) : null;
+                //var newParentNode = newParent && newParent.gameObject ? FindNode(hierarchy.Items, newParent.gameObject) : null;
 
-                oldParentNode.Remove(childNode);
-                newParentNode.Add(childNode);
+                //var oldParentNodeItems = oldParentNode != null ? oldParentNode.Items : hierarchy.Items;
+                //var newParentNodeItems = newParentNode != null ? newParentNode.Items : hierarchy.Items;
+
+                var childNode = FindNode(hierarchy.Items, child.gameObject);
+
+                //if (childNode != null)
+                //{
+                //    if (childNode.Parent != null)
+                //        int x = 5;
+                //}
+
             }));
         }
 
@@ -213,7 +250,8 @@ namespace ThomasEditor
 
             }else
             {
-                Inspector.instance.SelectedObject = null;
+                if(Inspector.instance.SelectedObject is GameObject)
+                    Inspector.instance.SelectedObject = null;
             }
             ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
         }

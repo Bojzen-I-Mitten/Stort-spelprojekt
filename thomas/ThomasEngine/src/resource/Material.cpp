@@ -13,7 +13,7 @@ void ThomasEngine::Material::Shader::set(ThomasEngine::Shader^ value)
 		((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 	}
 
-	if (m_loaded && !ThomasWrapper::IsPlaying())
+	if (m_loaded && !ThomasWrapper::IsPlaying() && this->Shader != value)
 	{
 		ThomasEngine::Resources::SaveResource(this);
 	}

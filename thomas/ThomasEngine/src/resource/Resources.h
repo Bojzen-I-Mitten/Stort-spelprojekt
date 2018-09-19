@@ -116,6 +116,8 @@ namespace ThomasEngine
 		}
 
 		static String^ ConvertToThomasPath(String^ value) {
+			if (value->Contains("%THOMAS_ASSETS%") || value->Contains("%THOMAS_DATA%"))
+				return value;
 			if (value->Contains(Application::editorAssets)) value = value->Replace(Application::editorAssets, "%THOMAS_DATA%");
 			else if(Application::currentProject) value = value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
 			else {

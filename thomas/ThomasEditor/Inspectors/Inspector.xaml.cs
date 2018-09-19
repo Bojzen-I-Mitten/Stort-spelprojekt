@@ -13,7 +13,7 @@ namespace ThomasEditor.Inspectors
 
         public object SelectedObject
         {
-            get { return (Type)GetValue(SelectedObjectProperty); }
+            get { return GetValue(SelectedObjectProperty); }
             set { SetValue(SelectedObjectProperty, value); SelectedObjectType = value != null ? value.GetType() : null; }
         }
 

@@ -29,6 +29,8 @@ namespace ThomasEngine
 		s_currentScene = value;
 		if(Application::currentProject && savingEnabled)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
+
+		OnCurrentSceneChanged(value);
 	}
 
 
@@ -136,7 +138,7 @@ namespace ThomasEngine
 			i--;
 		}
 		m_gameObjects.Clear();
-		m_gameObjects.CollectionChanged -= sceneChanged;
+
 	}
 
 	void Scene::PostLoad()

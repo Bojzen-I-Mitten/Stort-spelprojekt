@@ -78,10 +78,10 @@ namespace ThomasEngine {
 
 		static Object^ GetObject(thomas::object::Object* ptr)
 		{
-			for each(Object^ object in s_objects)
+			for(int i=0; i < s_objects.Count; i++)
 			{
-				if (object->nativePtr == ptr)
-					return object;
+				if (s_objects[i]->nativePtr == ptr)
+					return s_objects[i];
 			}
 			return nullptr;
 		}
