@@ -169,7 +169,7 @@ namespace ThomasEngine.Network
             netManager.UpdateTime = (1000/ TICK_RATE);
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
-
+            GUI.ImguiStringUpdate(ping.ToString(), new Vector2(100, 0), new Vector2(0, 0));
             //Write full world state of owned objects.
             WriteData(DeliveryMethod.Unreliable);
                 
