@@ -12,6 +12,7 @@ namespace thomas {
 				math::Matrix _invBindPose;
 				math::Matrix _bindPose;
 				int _boneIndex;
+				unsigned long _boneHash;
 				/* Parent bone */
 				int _parentIndex;
 				Bone()

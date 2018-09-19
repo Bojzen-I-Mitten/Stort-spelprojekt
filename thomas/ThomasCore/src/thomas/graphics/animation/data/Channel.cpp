@@ -8,7 +8,7 @@ namespace thomas {
 			ObjectChannel::ObjectChannel()
 			{
 			}
-			ObjectChannel::ObjectChannel(std::vector<Channel> &anim_keys)
+			ObjectChannel::ObjectChannel(unsigned long m_nodeHash, std::vector<Channel> &anim_keys)
 				: m_channels(std::move(anim_keys))
 			{
 			}
@@ -76,6 +76,11 @@ namespace thomas {
 			}
 			unsigned int ObjectChannel::numNodeChannels() const {
 				return m_channels.size();
+			}
+
+			unsigned long ObjectChannel::getHash() const
+			{
+				return m_nodeHash;
 			}
 
 		}

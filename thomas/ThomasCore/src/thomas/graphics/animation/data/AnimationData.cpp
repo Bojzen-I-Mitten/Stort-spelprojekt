@@ -1,5 +1,5 @@
 #include "AnimationData.h"
-
+#include "Skeleton.h"
 
 namespace thomas {
 	namespace graphics {
@@ -15,8 +15,13 @@ namespace thomas {
 			{
 			}
 
+			size_t AnimationData::numChannel() const
+			{
+				return m_channels.size();
+			}
 
-			const ObjectChannel& AnimationData::operator[](unsigned int bone) {
+
+			const ObjectChannel& AnimationData::operator[](unsigned int bone) const {
 				return m_channels[bone];
 			}
 		}

@@ -10,7 +10,7 @@ namespace thomas {
 			class BlendNode : public AnimationNode
 			{
 			public:
-				BlendNode();
+				BlendNode(Skeleton &ref);
 				virtual ~BlendNode();
 
 

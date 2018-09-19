@@ -97,7 +97,7 @@ namespace thomas {
 			template<unsigned int N>
 			float KeyFrame<N>::lerpAmount(unsigned int type, float eT) {
 				float delta = (m_to[type]._time - m_from[type]._time);
-				return delta <= 0 ? 1.f : (eT - m_from[type]._time) / delta;
+				return std::fmax(0.f, (eT - m_from[type]._time) / delta);
 			}
 			template<unsigned int N>
 			void KeyFrame<N>::deactivate() {
@@ -153,7 +153,7 @@ namespace thomas {
 					m_keyIndex[i] = 0;
 					if (m_channel->numKeys(i) == 0) {
 						// Default initiation...
-						assert(false);
+						storeState(i, 0.f);
 					}
 					else {
 						m_keyIndex[i] = 0;

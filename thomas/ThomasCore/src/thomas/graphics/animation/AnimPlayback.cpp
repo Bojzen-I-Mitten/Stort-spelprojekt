@@ -10,7 +10,8 @@ namespace thomas {
 			/* Generate an animation pose
 			*/
 			AnimPlayback::AnimPlayback(Skeleton &ref)
-				: m_playback(new BaseAnimationTime(0.f,0.f, graphics::animation::PlayType::None)), m_anim(NULL), m_channel(ref.getNumBones())
+				: AnimationNode(ref),
+				m_playback(new BaseAnimationTime(0.f,0.f, graphics::animation::PlayType::None)), m_anim(NULL), m_channel(ref.getNumBones())
 			{
 				//Each channel needs to be initiated so it can generate it's own frames.
 				for (unsigned int i = 0; i < ref.getNumBones(); i++)
@@ -19,11 +20,20 @@ namespace thomas {
 			/* Generate an animation player
 			*/
 			AnimPlayback::AnimPlayback(Skeleton &ref, std::unique_ptr<Playback> &playback, AnimationData &anim)
-				: m_playback(std::move(playback)), m_anim(&anim), m_channel(ref.getNumBones())
+				: AnimationNode(ref),
+				m_playback(std::move(playback)), m_anim(&anim), m_channel(ref.getNumBones())
 			{
 				//Each channel needs to be initiated so it can generate it's own frames.
-				for (unsigned int i = 0; i < ref.getNumBones(); i++)
-					m_channel[i].newAnimation(&anim[i], m_playback->getTime());
+
+				for (size_t i = 0; i < anim.numChannel(); i++) {
+					const ObjectChannel& ch = anim[i];
+					unsigned int boneInd;
+					if(ch.numNodeChannels() == 0 ||
+						!ref.findBoneIndex(ch.getHash(), boneInd))
+						continue; // Empty or culled
+					else
+						m_channel[i].newAnimation(&anim[i], m_playback->getTime());
+				}
 			}
 
 			AnimPlayback::~AnimPlayback()
@@ -50,6 +60,10 @@ namespace thomas {
 				return m_channel[bone].lerpRotation(m_playback->getTime());
 			}
 
+			void AnimPlayback::calcFrame(unsigned int bone, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
+				float eT = m_playback->getTime();
+				m_channel[bone].lerpFrame(eT, trans, scale, rot);
+			}
 			/*
 			bool AnimatedSkeleton::setAnim(const std::string& name, PlayType runType) {
 				//Change animation, it can be null

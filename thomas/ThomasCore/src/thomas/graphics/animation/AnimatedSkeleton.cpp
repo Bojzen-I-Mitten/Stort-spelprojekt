@@ -58,7 +58,7 @@ namespace thomas {
 			}
 
 			void AnimatedSkeleton::clearBlendTree() {
-				_root = std::unique_ptr<AnimationNode>(new AnimPlayback(_ref));
+				_root = std::unique_ptr<AnimationNode>(new BindPoseNode(_ref));
 			}
 
 			void AnimatedSkeleton::playSingle(thomas::resource::Animation * anim)

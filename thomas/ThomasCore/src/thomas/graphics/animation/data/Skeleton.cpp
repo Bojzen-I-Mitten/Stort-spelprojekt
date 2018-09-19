@@ -34,6 +34,17 @@ namespace thomas {
 				}
 				return false;
 			}
+				bool Skeleton::findBoneIndex(unsigned long boneHash, unsigned int &boneID) const
+			{
+				for (unsigned int i = 0; i < m_bones.size(); i++)
+				{
+					if (m_bones[i]._boneHash == boneHash) {
+						boneID = i;
+						return true;
+					}
+				}
+				return false;
+			}
 			unsigned int Skeleton::getNumBones() const {
 				return m_bones.size();
 			}

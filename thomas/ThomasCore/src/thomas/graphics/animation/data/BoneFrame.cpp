@@ -56,6 +56,16 @@ namespace thomas {
 				updateFrame(2, eT);										// Step keyframes
 				return slerp(m_from[2], m_to[2], lerpAmount(2, eT));   // Interpolate
 			}
+
+			void BoneFrame::lerpFrame(float eT, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
+				// Step keyframes
+				updateFrame(0, eT);
+				updateFrame(1, eT);				
+				updateFrame(2, eT);					
+				trans = lerpVec3(m_from[0], m_to[0], lerpAmount(0, eT));	// Interpolate
+				scale = lerpVec3(m_from[1], m_to[1], lerpAmount(1, eT));	// Interpolate
+				rot = slerp(m_from[2], m_to[2], lerpAmount(2, eT));			// Interpolate
+			}
 			math::Matrix BoneFrame::lerp(float eT) {
 				updateFrame(eT);										// Step keyframes
 				math::Matrix mat;										// Interpolated transform

@@ -69,6 +69,16 @@ namespace thomas
 			return m;
 		}
 
+		unsigned long	hash_djb2(const char *str)
+		{
+			unsigned long hash = 5381;
+			int c;
+
+			while (c = *str++)
+				hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+			return hash;
+		}
 #pragma endregion
 
 		const aiScene* LoadScene(Assimp::Importer &importer, const std::string &path)
@@ -348,6 +358,15 @@ namespace thomas
 					else { //Bone already exists
 						boneIndex = boneMap.m_mapping[boneName];
 						boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix * bakeInv);
+						/*
+						int parent = boneMap.m_boneInfo[boneIndex]._parentIndex;
+						if (parent != -1)
+							boneMap.m_boneInfo[boneIndex]._bindPose =
+							convertAssimpMatrix(meshBone->mOffsetMatrix).Invert()
+							* boneMap.m_boneInfo[parent]._bindPose.Invert();
+						else
+							boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(meshBone->mOffsetMatrix).Invert();
+						*/
 					}
 
 					for (int j = 0; j < meshBone->mNumWeights; j++)
@@ -411,6 +430,7 @@ namespace thomas
 			graphics::animation::Bone bi;
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
+			bi._boneHash = hash_djb2(boneName.c_str());
 			bi._parentIndex = parentBone;
 			if (parentBone != -1) {	// Parented bone
 				boneMap.m_relativeParent.push_back(aiMatrix4x4());
@@ -470,11 +490,12 @@ namespace thomas
 		struct AnimationConstruct {
 			size_t _dataInd;
 			float* m_data;
+			std::vector<unsigned long> _boneHash;
 			std::vector<std::vector<graphics::animation::Channel>> _keys;
 		public:
 
 			AnimationConstruct(AnimSize size)
-				: _dataInd(0), m_data(new float[size._numFloats]), _keys(size._numBones)
+				: _dataInd(0), m_data(new float[size._numFloats]), _boneHash(size._numBones), _keys(size._numBones)
 			{
 				for (unsigned int i = 0; i < size._numBones; i++)
 				{
@@ -492,7 +513,7 @@ namespace thomas
 				m_data = nullptr;
 				std::vector<ObjectChannel> channels(_keys.size());
 				for (unsigned int i = 0; i < _keys.size(); i++)
-					channels[i] = ObjectChannel(_keys[i]);
+					channels[i] = ObjectChannel(_boneHash[i], _keys[i]);
 				return std::shared_ptr<AnimationData>(new AnimationData(name, duration, channels, ptr));
 			}
 
@@ -621,7 +642,7 @@ namespace thomas
 				anim.insert4(bone, 2, (float)(key.mTime / ticksPerSecond), &dxQ.x);
 			}
 		}
-		void ProcessChannel(int bone, aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
+		void ProcessChannelData(int bone, aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 			
 			// Verify Identity
 			//if (determineNonAxisRotation(construct.m_relativeParent[bone]))
@@ -630,7 +651,6 @@ namespace thomas
 				aiVectorKey key = channel->mPositionKeys[i];
 				anim.insert3(bone, 0, (float)(key.mTime / ticksPerSecond), &key.mValue.x);
 			}
-			const aiVector3D t_0;
 			for (unsigned int i = 0; i < channel->mNumScalingKeys; i++) {
 				aiVectorKey key = channel->mScalingKeys[i];
 				anim.insert3(bone, 1, (float)(key.mTime / ticksPerSecond), &key.mValue.x);
@@ -641,11 +661,12 @@ namespace thomas
 				anim.insert4(bone, 2, (float)(key.mTime / ticksPerSecond), &dxQ.x);
 			}
 		}
-		void ProcessChannel(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
+		void ProcessChannelData(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 			if (bone < 0)
 				return; //This channel does not animate a bone.
-			ProcessChannel(bone, channel, ticksPerSecond, construct, anim);
+			anim._boneHash[bone] = hash_djb2(construct.m_boneInfo[bone]._boneName.c_str());
+			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}
 
 		void ProcessAnimations(const aiScene* scene, SkeletonConstruct& construct) {
@@ -659,7 +680,7 @@ namespace thomas
 					float duration = (float)(anim->mDuration / anim->mTicksPerSecond);
 					for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
 						aiNodeAnim *channel = anim->mChannels[ch];
-						ProcessChannel(channel, anim->mTicksPerSecond, construct, animConst);
+						ProcessChannelData(channel, anim->mTicksPerSecond, construct, animConst);
 					}
 					construct.m_animList.push_back(animConst.generateAnim(anim->mName.C_Str(), duration));
 				}

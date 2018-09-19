@@ -30,6 +30,12 @@ namespace thomas {
 				return		>>	Returns true if bone was found.
 				*/
 				bool findBoneIndex(const std::string &boneName, unsigned int &boneID) const;
+				/* Access a bone from hash. Returns if bone exists.
+				boneHash	<<	Hashed bone name.
+				boneID		>>	Returned bone index if found.
+				return		>>	Returns true if bone was found.
+				*/
+				bool findBoneIndex(unsigned long boneHash, unsigned int &boneID) const;
 				/* Get the number of bones in the skeleton */
 				unsigned int getNumBones() const;
 				/* Get root transform

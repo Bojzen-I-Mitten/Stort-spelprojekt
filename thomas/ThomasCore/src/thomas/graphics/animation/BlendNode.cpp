@@ -5,7 +5,8 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			BlendNode::BlendNode()
+			BlendNode::BlendNode(Skeleton &ref)
+				: AnimationNode(ref)
 			{
 			}
 

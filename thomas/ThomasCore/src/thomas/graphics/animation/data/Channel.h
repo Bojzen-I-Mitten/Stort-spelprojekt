@@ -18,13 +18,15 @@ namespace thomas {
 			class ObjectChannel
 			{
 			private:
+				/* Hash of the bone name associated with the channel. */
+				unsigned long m_nodeHash;
 				/* Set of different keys included in the channel.
 				 * Each set holds the set of animated keys for a value channel over the duration of the animation.
 				 */
 				std::vector<Channel> m_channels;
 			public:
 				ObjectChannel();
-				ObjectChannel(std::vector<Channel> &anim_keys);
+				ObjectChannel(unsigned long boneHash, std::vector<Channel> &anim_keys);
 				~ObjectChannel();
 				/* Get next keyframe for the specific animation time. If there is no more -1 is returned
 				*/
@@ -42,6 +44,7 @@ namespace thomas {
 				unsigned int numKeys(unsigned int chType) const;
 				/* Get the number of animated channels in the channel node */
 				unsigned int numNodeChannels() const;
+				unsigned long getHash() const;
 			};
 		}
 	}

@@ -28,11 +28,14 @@ namespace thomas {
 				AnimationData *m_anim;
 				std::unique_ptr<Playback> m_playback;
 				std::vector<BoneFrame> m_channel;		// Current keys active in the animation for each channel
+				std::vector<unsigned int> m_boneMap;
 
 
 				virtual math::Vector3 calcBonePosition(unsigned int bone);
 				virtual math::Vector3 calcBoneScale(unsigned int bone);
 				virtual math::Quaternion calcBoneRot(unsigned int bone);
+
+				virtual void calcFrame(unsigned int bone, math::Vector3 & trans, math::Vector3 & scale, math::Quaternion & rot);
 
 
 

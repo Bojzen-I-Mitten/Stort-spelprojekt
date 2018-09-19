@@ -22,6 +22,7 @@ namespace thomas {
 				math::Quaternion lerpRotation(float eT);
 				/* Lerps from the keyframe to the next one. Updating the active keys.
 				*/
+				void lerpFrame(float eT, math::Vector3 & trans, math::Vector3 & scale, math::Quaternion & quat);
 				math::Matrix lerp(float eT);
 
 

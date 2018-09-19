@@ -22,8 +22,11 @@ namespace thomas {
 
 				AnimationData(const std::string &name, float duration, std::vector<ObjectChannel> &channels, std::unique_ptr<float>& data);
 				~AnimationData();
+
+
+				size_t numChannel() const;
 				/* Get the channel related to a bone */
-				const ObjectChannel& operator[](unsigned int bone);
+				const ObjectChannel& operator[](unsigned int bone) const;
 			};
 		}
 	}

@@ -26,7 +26,7 @@ namespace thomas {
 			virtual void OnChanged();
 
 			virtual ~Animation();
-
+			
 		public:
 		private:
 			std::shared_ptr<graphics::animation::AnimationData> m_data;
