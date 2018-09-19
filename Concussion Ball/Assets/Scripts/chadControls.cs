@@ -35,8 +35,8 @@ namespace ThomasEditor
         IEnumerator JumpingCoroutine()
         {
             jumpDelay = false;
-
-            rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
+            rBody.AddForce(new Vector3(0.0f, force, 0.0f), Rigidbody.ForceMode.Impulse);
+            //rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
             yield return new WaitForSeconds(1.0f);
 
             if (tackling)
