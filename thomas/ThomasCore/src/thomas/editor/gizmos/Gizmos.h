@@ -59,6 +59,10 @@ namespace thomas
 
 			static void SetColor(math::Color color);
 			static void SetMatrix(math::Matrix matrix);
+
+			static void DrawPing(std::string ping);
+			static void ImguiStringUpdate(std::string text, math::Vector2 size, math::Vector2 pos);
+			static void ImguiStringUpdate(std::string text, math::Vector2 pos);
 		private:
 			static std::vector<GizmoRenderCommand> s_gizmoCommands;
 			static std::vector<GizmoRenderCommand> s_prevGizmoCommands;
@@ -66,6 +70,9 @@ namespace thomas
 			static utils::buffers::VertexBuffer* s_vertexBuffer;
 			static math::Matrix s_matrix;
 			static math::Color s_color;
+			static int s_imguiNumber;
+
+
 		};
 	}
 }

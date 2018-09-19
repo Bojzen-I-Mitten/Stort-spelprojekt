@@ -54,7 +54,8 @@ namespace ThomasEngine.Network
         public bool isServer { get; set; } = false;
         public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject player { get; set; }
-        public static int ping = 2;
+        public static int ping = 0;
+        public NetDataWriter writer;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
         public List<NetPeer> netPeers;
@@ -81,19 +82,21 @@ namespace ThomasEngine.Network
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
             netPeers = new List<NetPeer>();
-
+            writer = new NetDataWriter();
+            spawnablePrefabs = new List<GameObject>();
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
             listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-
+            listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
             //SubscribeToEvent<Spawner>(SpawnObject);
 
         }
 
+ 
 
         public override void Start()
         {
@@ -124,7 +127,6 @@ namespace ThomasEngine.Network
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
-                //SpawnPlayerCharacter();
             }
             else
             {
@@ -132,6 +134,19 @@ namespace ThomasEngine.Network
             }
 
         }
+        private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
+        {
+            if(isServer)
+            {
+                Debug.Log("A network error has occured from client " + endPoint);
+            }
+            else
+            {
+                Debug.Log("A network error has occured from client " + endPoint);
+            }
+            
+        }
+
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
@@ -144,19 +159,21 @@ namespace ThomasEngine.Network
                     while (reader.AvailableBytes > 0)
                     {
 
-                    validationID = reader.GetInt();
-                    if (networkIDObjects.ContainsKey(validationID))
-                        networkIDObjects[validationID].Read(reader);
-                    else
-                        reader.Clear();
-                }
-                break;
-            case PacketType.EVENT:
-                netPacketProcessor.ReadAllPackets(reader);
-                break;
-            default:
-                break;
+                        validationID = reader.GetInt();
+                        if (networkIDObjects.ContainsKey(validationID))
+                            networkIDObjects[validationID].Read(reader);
+                        else
+                            reader.Clear();
+                    }
+                    break;
+                case PacketType.EVENT:
+                    netPacketProcessor.ReadAllPackets(reader);
+                    break;
+                default:
+                    break;
+
             }
+          
         }
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
@@ -172,10 +189,11 @@ namespace ThomasEngine.Network
             netManager.UpdateTime = (1000 / TICK_RATE);
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
-
+            GUI.ImguiStringUpdate(ping.ToString(), new Vector2(0, 0));
             //Write full world state of owned objects.
             WriteData(DeliveryMethod.Unreliable);
-
+            if(Input.GetKey(Input.Keys.P))
+                Diagnostics();
 
             //example spawn
             //if (Input.GetKeyUp(Input.Keys.K) && isServer)
@@ -261,17 +279,52 @@ namespace ThomasEngine.Network
             });
         }
 
+        public void SpawnObject(Spawner spawner, NetPeer peer)
+        {
+            //Debug.Log("Test");
+            if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
+            {
+                GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
+            }
+            else if(spawner.prefabID == -1)
+            {
+                GameObject.Instantiate(player, spawner.position, spawner.rotation);
+            }
+            else
+            {
+                Debug.Log("Tried spawning object not in NetworkManager prefab list");
+            }
+        }
+        
+        public void SpawnPlayerCharacter()
+        {
+            GameObject gObj = GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+            Spawner spawner = new Spawner
+            {
+                netID = gObj.GetComponent<NetworkID>().ID
+            };
+            SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
+        }
+
         public void GetPing()
         {
-           
             netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
-
             for(int i=0;i<netPeers.Count;i++)
             {
-               
                 ping = netPeers[i].Ping;
-                
             }
+        }    
+        public void Checkpacketloss()
+        {
+            Debug.Log("A error has occured here are the amount of packetloss " + netManager.Statistics.PacketLoss + "% lost " + netManager.Statistics.PacketLossPercent);
+            Debug.Log("A total of " + netManager.Statistics.PacketsSent + "was sent and " + netManager.Statistics.PacketsReceived + "was recieved");
+        }
+
+        public void Diagnostics()
+        {
+            GUI.ImguiStringUpdate("Packetsloss = " + netManager.Statistics.PacketLossPercent, new Vector2(0, 10));
+            GUI.ImguiStringUpdate("Total package sent = " + netManager.Statistics.PacketsSent, new Vector2(0, 20));
+            GUI.ImguiStringUpdate("Total package recieved = " + netManager.Statistics.PacketsReceived, new Vector2(0, 30));
         }
     }
 }
