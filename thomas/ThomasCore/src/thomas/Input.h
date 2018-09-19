@@ -16,6 +16,7 @@ namespace thomas
 	class Input
 	{
 	public:
+		static bool allowEditor;
 		enum class MouseButtons
 		{
 			LEFT,

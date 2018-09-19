@@ -8,6 +8,7 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 	String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
 	if (File::Exists(fsw->Path + "/Assembly.dll"))
 	{
+		
 		Scene::savingEnabled = false;
 		scriptReloadStarted();
 		String^ currentSavePath;
@@ -36,9 +37,9 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 		}
 	}
 	//fsw->EnableRaisingEvents = true;
-	shouldReload = false;
 	Scene::savingEnabled = true;
 	scriptReloadFinished();
+	shouldReload = false;
 	
 }
 

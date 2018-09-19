@@ -31,7 +31,6 @@ namespace ThomasEngine
 
 		GameObject() : Object(new thomas::object::GameObject("gameobject")) 
 		{
-			s_lastObject = this;
 			m_name = "gameobject";
 
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
@@ -72,8 +71,6 @@ namespace ThomasEngine
 		void PostLoad(Scene^ scene)
 		{
 			this->scene = scene;
-			m_transform = GetComponent<Transform^>();
-			
 		}
 
 		void PostInstantiate(Scene^ scene) {
@@ -105,7 +102,11 @@ namespace ThomasEngine
 			{
 				Component^ component = m_components[i];
 				if (component->enabled)
+				{
 					component->Update();
+					component->UpdateCoroutines();
+				}
+					
 			}
 			Monitor::Exit(m_componentsLock);
 		}
@@ -141,13 +142,24 @@ namespace ThomasEngine
 			}
 			Monitor::Exit(m_componentsLock);
 		}
-		
+
+		void OnCollisionEnter(GameObject^ collider)
+		{
+			Monitor::Enter(m_componentsLock);
+
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->enabled)
+					component->OnCollisionEnter(collider);
+			}
+			Monitor::Exit(m_componentsLock);
+		}
+
 	public:
-		static GameObject^ s_lastObject;
 
 		GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name))) 
 		{
-			s_lastObject = this;
 			m_name = name;
 			m_transform = AddComponent<Transform^>();
 			((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
@@ -163,7 +175,6 @@ namespace ThomasEngine
 		
 		static GameObject^ CreatePrefab() {
 			GameObject^ newGobj = gcnew GameObject();
-			s_lastObject = nullptr;
 			Transform^ t = newGobj->AddComponent<Transform^>();
 			((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 			return newGobj;
@@ -192,9 +203,10 @@ namespace ThomasEngine
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 				for (int i = 0; i < m_components.Count; i++)
 				{
+					
 					Component^ component = m_components[i];
 					if(component->initialized)
-						component->awakened = value;
+						component->enabled = value;
 				}
 			}
 		}	
@@ -353,5 +365,15 @@ namespace ThomasEngine
 		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
+
+
+		[OnDeserializedAttribute]
+		void OnDeserialized(StreamingContext c)
+		{
+			for (int i = 0; i < m_components.Count; i++) {
+				m_components[i]->gameObject = this;
+			}
+			m_transform = GetComponent<Transform^>();
+		}
 	};
 }

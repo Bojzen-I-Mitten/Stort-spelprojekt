@@ -89,16 +89,24 @@ namespace ThomasEditor
 
         private void SaveLayout()
         {
-            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
-            using (var sw = new StreamWriter(target))
+            try
             {
-                using (StringWriter fs = new StringWriter())
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas"));
+                string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+                using (var sw = new StreamWriter(target))
                 {
-                    XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
-                    xmlLayout.Serialize(fs);
-                    sw.Write(fs.ToString());
+                    using (StringWriter fs = new StringWriter())
+                    {
+                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                        xmlLayout.Serialize(fs);
+                        sw.Write(fs.ToString());
+                    }
                 }
+            }catch(Exception e)
+            {
+                Debug.Log("Failed to save layout.dock. Error: " + e.Message);
             }
+
 
             if (WindowState == WindowState.Maximized)
             {
@@ -362,7 +370,11 @@ namespace ThomasEditor
             if (ThomasWrapper.IsPlaying())
                 ThomasWrapper.Stop();
             else
+            {
                 ThomasWrapper.Play();
+                game.Focus();
+            }
+                
 
             playPauseButton.DataContext = ThomasWrapper.IsPlaying();
         }
