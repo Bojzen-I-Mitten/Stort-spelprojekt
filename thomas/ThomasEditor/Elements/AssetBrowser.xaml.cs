@@ -394,12 +394,19 @@ namespace ThomasEditor
             String oldName = Path.GetFileNameWithoutExtension(fullPath);
             String newFullPath = fullPath.Replace(oldName, lbl.Text);
 
-            //Rename if file/dir does not exist
-
-            if(File.Exists(fullPath) && !File.Exists(newFullPath))
-                File.Move(fullPath, newFullPath);
-            else if(Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
-                Directory.Move(fullPath, newFullPath);
+            //Check if file name is not empty string
+            if (lbl.Text != "")
+            {
+                //Rename if file/dir does not exist
+                if (File.Exists(fullPath) && !File.Exists(newFullPath))
+                    File.Move(fullPath, newFullPath);
+                else if (Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
+                    Directory.Move(fullPath, newFullPath);
+                else
+                {
+                    lbl.Text = oldName;
+                }
+            }
             else
             {
                 lbl.Text = oldName;
