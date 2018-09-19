@@ -19,6 +19,8 @@ namespace ThomasEditor
         public int rotationSpeed { get; set; } = 1;
 
         Rigidbody rBody;
+        public GameObject camPrefab { get; set; }
+        Camera test;
 
         bool jumpDelay = true;
         bool movingForward = false;
@@ -29,6 +31,7 @@ namespace ThomasEditor
         public override void Start()
         {
             rBody = gameObject.GetComponent<Rigidbody>();
+            test = camPrefab.GetComponent<Camera>();
         }
 
         //Coroutine for jumping delay, also used for tackling delay
@@ -37,13 +40,15 @@ namespace ThomasEditor
             jumpDelay = false;
             rBody.AddForce(new Vector3(0.0f, force, 0.0f), Rigidbody.ForceMode.Impulse);
             //rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.8f);
 
             if (tackling)
             {
-                //transform.RotateByAxis(new Vector3(1.0f, 0.0f, 0.0f), -45.0f);
+                transform.Rotate(0.0f, 0.5f, 0.0f);
                 tackling = false;
+                test.fieldOfView = 70;
             }
+            yield return new WaitForSeconds(1.0f);
             jumpDelay = true;
             jumping = false;
             movingForward = false;
@@ -51,7 +56,7 @@ namespace ThomasEditor
         }
 
         public override void Update()
-        {  
+        {
             //Jumping
             if (Input.GetKeyDown(Input.Keys.Space) && jumpDelay)
             {
@@ -70,6 +75,7 @@ namespace ThomasEditor
                 tackling = true;
                 StartCoroutine(JumpingCoroutine());
                 transform.Rotate(0.0f, -0.5f, 0.0f);
+                test.fieldOfView = 100;
             }
 
             //TESTING KEY
