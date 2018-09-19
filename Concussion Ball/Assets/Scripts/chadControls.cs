@@ -40,23 +40,24 @@ namespace ThomasEditor
             Debug.Log("Started jumping.");
             yield return new WaitForSeconds(1.0f);
             jumpDelay = true;
+            movingForward = false;
+            movingBackward = false;
             Debug.Log("Coroutine has waited for 1 second.. Ready to jump again.");
         }
 
         public override void Update()
-        {
-            movingForward = false;
-            movingBackward = false;
+        {  
             //Jumping, change to time based.
             if (Input.GetKeyDown(Input.Keys.Space) && jumpDelay)
             {
-                StartCoroutine(JumpingCoroutine());
                 if (Input.GetKey(Input.Keys.W))
                     movingForward = true;
                 if (Input.GetKey(Input.Keys.S))
                     movingBackward = true;
+                StartCoroutine(JumpingCoroutine());
             }   
             //WASD movement
+            //if (movingForward)
             if (Input.GetKey(Input.Keys.S) && !movingForward)
             {
                 transform.position -= transform.forward * speed * Time.DeltaTime;
