@@ -47,7 +47,7 @@ namespace ThomasEngine
 			fsw->EnableRaisingEvents = false;
 			fsw->Path = assemblyFolderPath;
 			//fsw->EnableRaisingEvents = true;
-			shouldReload = true;
+			LoadAssembly();
 		}
 		static Assembly^ GetAssembly()
 		{
@@ -74,7 +74,7 @@ namespace ThomasEngine
 		}
 
 		static void ReloadIfNeeded() {
-			if (shouldReload)
+			if (shouldReload && !Scene::CurrentScene->IsLoading())
 				LoadAssembly();
 		}
 

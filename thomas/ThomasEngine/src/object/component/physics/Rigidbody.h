@@ -15,8 +15,47 @@ namespace ThomasEngine
 
 		void Awake() override;
 
-
 		void OnDestroy() override;
+
+		void ApplyCentralForce(Vector3 force) 
+		{ 
+			((thomas::object::component::Rigidbody*)nativePtr)->ApplyCentralForce(thomas::math::Vector3(force.x, force.y, force.z)); 
+		}
+
+		void ApplyCentralImpulseForce(Vector3 force)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->ApplyCentralImpulseForce(thomas::math::Vector3(force.x, force.y, force.z));
+		}
+
+		void ApplyForce(Vector3 force, Vector3 relPos)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->ApplyForce(
+			thomas::math::Vector3(force.x, force.y, force.z),
+			thomas::math::Vector3(relPos.x, relPos.y, relPos.z));
+		}
+
+		void ApplyImpulseForce(Vector3 force, Vector3 relPos)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->ApplyImpulseForce(
+				thomas::math::Vector3(force.x, force.y, force.z),
+				thomas::math::Vector3(relPos.x, relPos.y, relPos.z));
+		}
+
+		GameObject^ GetTargetCollider()
+		{
+			if (this != nullptr)
+			{
+				auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
+
+				if (collider != nullptr)
+				{
+					String^ name = gcnew String(collider->GetName().c_str());
+					return GameObject::Find(name);
+				}
+			}
+
+			return nullptr;
+		}
 
 		property bool IsKinematic 
 		{

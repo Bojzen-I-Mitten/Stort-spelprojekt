@@ -155,8 +155,10 @@
 
                         <xcad:LayoutDocumentPane DockWidth="2*">
                                 <xcad:LayoutAnchorable ContentId="Inspector" Title="Inspector" CanHide="False" CanClose="False">
-                                <inspectors:Inspector x:Name="inspector" x:FieldModifier="public" Background="#444444"/>
-                            </xcad:LayoutAnchorable>
+                                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <inspectors:Inspector x:Name="inspector" x:FieldModifier="public" Background="#444444" />
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
                         </xcad:LayoutDocumentPane>
                     </xcad:LayoutDocumentPaneGroup>
                 </xcad:LayoutPanel>

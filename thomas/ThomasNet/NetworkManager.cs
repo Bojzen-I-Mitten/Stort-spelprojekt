@@ -13,7 +13,6 @@ namespace ThomasEngine.Network
         public Vector3 transformPos = new Vector3(0.0F, 0.0F, 0.0F);
         static public void PrintPacket(ExamplePacket packet, NetPeer peer)
         {
-            
             ThomasEngine.Debug.Log(System.String.Format("Received: \n {0}\n {1}\n {2}\t{3}\t", packet.ID, packet.transformPos.x, packet.transformPos.y, packet.transformPos.z));
         }
     }
@@ -23,6 +22,16 @@ namespace ThomasEngine.Network
         public float serverTime { get; set; }
         public TimeSyncEvent() { }
         public TimeSyncEvent(float time) { serverTime = time; }
+    }
+
+    public class Spawner
+    {
+        public int netID { get; set; }
+        public int prefabID { get; set; }
+        public Vector3 position { get; set; }
+        public Quaternion rotation { get; set; }
+
+        public Spawner() { netID = -1; prefabID = -1; position = new Vector3(); rotation = new Quaternion(); }
     }
 
     public enum PacketType
@@ -44,6 +53,8 @@ namespace ThomasEngine.Network
         public string IP { get; set; } = "localhost";
         public int port { get; set; } = 9050;
         public bool isServer { get; set; } = false;
+        public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
+        public GameObject player { get; set; }
         public static int ping = 2;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
@@ -71,8 +82,8 @@ namespace ThomasEngine.Network
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
             netPeers = new List<NetPeer>();
-             writer = new NetDataWriter();
-                        
+            writer = new NetDataWriter();
+            spawnablePrefabs = new List<GameObject>();
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
@@ -81,6 +92,8 @@ namespace ThomasEngine.Network
             listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
+            SubscribeToEvent<Spawner>(SpawnObject);
+
         }
 
  
@@ -96,12 +109,11 @@ namespace ThomasEngine.Network
             {
                 InitServerNTP();
                 netManager.Start(9050 /* port */);
-                
-               // SendEvent(testPacket, DeliveryMethod.ReliableOrdered);
             }
 
-            
+
         }
+
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             if (isServer)
@@ -109,12 +121,19 @@ namespace ThomasEngine.Network
             else
                 ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
         }
+
         private void Listener_PeerConnectedEvent(NetPeer peer)
         {
-            if(isServer)
+            if (isServer)
+            {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
+                SpawnPlayerCharacter();
+            }
             else
+            {
                 ThomasEngine.Debug.Log("You are now connected with the server" + peer.EndPoint.ToString());
+            }
+
         }
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
         {
@@ -157,6 +176,7 @@ namespace ThomasEngine.Network
                 
             }
         }
+
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
             if (netManager.PeersCount < 10 /* max connections */)
@@ -164,15 +184,27 @@ namespace ThomasEngine.Network
             else
                 request.Reject();
         }
+
         public override void Update()
         {
-            netManager.UpdateTime = (1000/ TICK_RATE);
+            netManager.UpdateTime = (1000 / TICK_RATE);
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
             GUI.ImguiStringUpdate(ping.ToString(), new Vector2(100, 0), new Vector2(0, 0));
             //Write full world state of owned objects.
             WriteData(DeliveryMethod.Unreliable);
-                
+
+
+            //example spawn
+            //if (Input.GetKeyUp(Input.Keys.K) && isServer)
+            //{
+            //    GameObject gObj = GameObject.Instantiate(spawnablePrefabs[0], new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0)); //spawn object on server
+            //    Spawner spawner = new Spawner
+            //    {
+            //        netID = gObj.GetComponent<NetworkID>().ID
+            //    };
+            //    SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
+            //}
         }
 
 
@@ -183,21 +215,31 @@ namespace ThomasEngine.Network
 
             base.Destroy();
         }
+
         public int Register(NetworkID netID)
         {
             iD++;
             networkIDObjects.Add(iD, netID);
             return iD;
         }
+
+        public void OverwriteNetID(NetworkID netID, int new_id)
+        {
+            networkIDObjects.Remove(netID.ID);
+            networkIDObjects.Add(new_id, netID);
+        }
+
         public void SubscribeToEvent<T>(Action<T, NetPeer> onReceive) where T : class, new()
         {
             netPacketProcessor.SubscribeReusable<T, NetPeer>(onReceive);
         }
+
         public void SendEvent<T>(NetDataWriter writer, T data) where T : class, new()
         {
             writer.Put((int)PacketType.EVENT);
             netPacketProcessor.Write<T>(writer, data);
         }
+
         public void SendEvent<T>(T data, DeliveryMethod method) where T : class, new()
         {
             NetDataWriter writer = new NetDataWriter();
@@ -235,6 +277,33 @@ namespace ThomasEngine.Network
                     serverTime = dateTime.Value.Millisecond * 0.001f;
                 }
             });
+        }
+
+        public void SpawnObject(Spawner spawner, NetPeer peer)
+        {
+            //Debug.Log("Test");
+            if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
+            {
+                GameObject.Instantiate(spawnablePrefabs[spawner.prefabID], spawner.position, spawner.rotation);
+            }
+            else if(spawner.prefabID == -1)
+            {
+                GameObject.Instantiate(player, spawner.position, spawner.rotation);
+            }
+            else
+            {
+                Debug.Log("Tried spawning object not in NetworkManager prefab list");
+            }
+        }
+        
+        public void SpawnPlayerCharacter()
+        {
+            GameObject gObj = GameObject.Instantiate(player, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0));
+            Spawner spawner = new Spawner
+            {
+                netID = gObj.GetComponent<NetworkID>().ID
+            };
+            SendEvent(spawner, DeliveryMethod.ReliableOrdered); //tell client to spawn object
         }
 
         public void GetPing()
