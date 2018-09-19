@@ -57,7 +57,10 @@ namespace ThomasEditor
                 StartCoroutine(JumpingCoroutine());
             }   
             //WASD movement
-            //if (movingForward)
+            if (movingForward && !Input.GetKey(Input.Keys.W))
+                transform.position += transform.forward * speed * Time.DeltaTime;
+            if (movingBackward && !Input.GetKey(Input.Keys.S))
+                transform.position -= transform.forward * speed * Time.DeltaTime;
             if (Input.GetKey(Input.Keys.S) && !movingForward)
             {
                 transform.position -= transform.forward * speed * Time.DeltaTime;
