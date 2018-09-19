@@ -128,6 +128,7 @@ namespace ThomasEngine {
 				}
 				thomas::object::component::RenderComponent::ClearList();
 				RenderFinished->WaitOne();
+				thomas::graphics::LightManager::Update();
 				CopyCommandList();
 				RenderFinished->Reset();
 				UpdateFinished->Set();

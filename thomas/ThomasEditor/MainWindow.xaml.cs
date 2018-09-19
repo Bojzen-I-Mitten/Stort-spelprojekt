@@ -123,18 +123,25 @@ namespace ThomasEditor
 
         private void LoadLayout()
         {
-            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
-            if (System.IO.File.Exists(target))
+            try
             {
-                using (var sr = new StreamReader(target))
+                string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+                if (System.IO.File.Exists(target))
                 {
-                    using (StringWriter fs = new StringWriter())
+                    using (var sr = new StreamReader(target))
                     {
-                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
-                        xmlLayout.Deserialize(sr);
+                        using (StringWriter fs = new StringWriter())
+                        {
+                            XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                            xmlLayout.Deserialize(sr);
+                        }
                     }
                 }
+            }catch(Exception e)
+            {
+                Debug.Log("Failed to load editor layout. Error: " + e.Message);
             }
+
             this.Top = Properties.Settings.Default.Top;
             this.Left = Properties.Settings.Default.Left;
             this.Height = Properties.Settings.Default.Height;
@@ -229,9 +236,9 @@ namespace ThomasEditor
             for(int i=0; i < ThomasWrapper.Selection.Count; i++)
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
+                ThomasWrapper.Selection.UnSelectGameObject(gObj);
                 gObj.Destroy();
-                //ThomasWrapper.SelectedGameObjects.RemoveAt(i);
-               i--;
+                //i--;
             }
         }
 
@@ -410,9 +417,10 @@ namespace ThomasEditor
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
 
-            showBusyIndicator("Creating new project...");
+
             if (saveFileDialog.ShowDialog() == true)
             {
+                showBusyIndicator("Creating new project...");
                 Thread worker = new Thread(new ThreadStart(() =>
                 {
                     string fileName = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);

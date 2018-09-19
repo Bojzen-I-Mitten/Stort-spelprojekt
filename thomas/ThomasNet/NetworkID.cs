@@ -19,6 +19,7 @@ namespace ThomasEngine.Network
             ID = NetworkManager.instance.Register(this);
             networkComponents = gameObject.GetComponents<NetworkComponent>();
             networkComponents.ForEach((comp) => { comp.networkID = this; });
+            networkComponents.Remove(this);
         }
 
         public override void Read(NetPacketReader reader)
@@ -27,10 +28,7 @@ namespace ThomasEngine.Network
             {
                 if (!Owner)
                 {
-                    if (comp != this)
-                    {
-                        comp.Read(reader);
-                    }
+                    comp.Read(reader);
                 }
             }
         }
@@ -41,8 +39,7 @@ namespace ThomasEngine.Network
                 writer.Put(ID);
                 foreach (NetworkComponent comp in networkComponents)
                 {
-                    if (comp != this)
-                        comp.Write(writer);
+                    comp.Write(writer);
                 }
             }
 

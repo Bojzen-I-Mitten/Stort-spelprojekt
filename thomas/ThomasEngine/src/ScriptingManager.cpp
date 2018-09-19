@@ -35,7 +35,7 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 			Scene::CurrentScene->RelativeSavePath = currentSavePath;			
 		}
 	}
-	fsw->EnableRaisingEvents = true;
+	//fsw->EnableRaisingEvents = true;
 	shouldReload = false;
 	Scene::savingEnabled = true;
 	scriptReloadFinished();
