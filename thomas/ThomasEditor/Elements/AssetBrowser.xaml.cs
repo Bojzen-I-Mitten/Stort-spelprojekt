@@ -109,9 +109,7 @@ namespace ThomasEditor
                     if (newType == ThomasEngine.Resources.AssetTypes.SCRIPT)
                     {
                         string capitalized = visibleName.Substring(0, 1).ToUpper() + visibleName.Substring(1);
-                        string text = File.ReadAllText(newPath);
-                        text = text.Replace("$itemname$", capitalized);
-                        File.WriteAllText(newPath, text);
+                        ReplaceClassNameOfScript(newPath, capitalized);
                     }
                 }
                 else
@@ -504,6 +502,10 @@ namespace ThomasEditor
             utils.ScriptAssemblyManager.AddScript(uniquePath);
             renameNextAddedItem = true;
             utils.ScriptAssemblyManager.fsw.EnableRaisingEvents = true;
+
+            string text = File.ReadAllText(uniquePath);
+            text = text.Replace("$itemname$", "NewComponent");
+            File.WriteAllText(uniquePath, text);
         }
 
         private void Menu_CreateShader(object sender, RoutedEventArgs e)
@@ -638,6 +640,22 @@ namespace ThomasEditor
                 Inspector.instance.SelectedObject = item.DataContext;
             }
            
+        }
+
+        /*
+         * path: The path to the new file.
+         * newName: The new className of the new file.
+         */
+        private void ReplaceClassNameOfScript(string path, string newName)
+        {
+            string text = File.ReadAllText(path);
+            int start = text.IndexOf("public class ") + 13;
+            string oldClassName = text.Substring(start, text.IndexOf(" : ScriptComponent") - start);
+            string leftOf = text.Substring(0, start);
+            string newClassName = text.Substring(start, text.IndexOf(" : ScriptComponent") - start).Replace(oldClassName, newName);
+            string rightOf = text.Substring(text.IndexOf(" : ScriptComponent"));
+            string newText = leftOf + newClassName + rightOf;
+            File.WriteAllText(path, newText);
         }
     }
 
