@@ -1,5 +1,12 @@
-﻿using System;
+﻿/* TODO: 
+ * Turn standing still
+ * Can't press S while going forward in air, can't press W while going backward in air
+ * Freeze rotation x and z axes 
+ */
+
+using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,20 +21,43 @@ namespace ThomasEditor
 
         Rigidbody rBody;
 
+        bool jumpDelay = true;
+        bool movingForward = false;
+        bool movingBackward = false;
+
         public override void Start()
         {
             rBody = gameObject.GetComponent<Rigidbody>();
+
+            //Changes nothing
+            rBody.Mass = 1.0f;
+        }
+
+        IEnumerator JumpingCoroutine()
+        {
+            jumpDelay = false;
+            rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
+            Debug.Log("Started jumping.");
+            yield return new WaitForSeconds(1.0f);
+            jumpDelay = true;
+            Debug.Log("Coroutine has waited for 1 second.. Ready to jump again.");
         }
 
         public override void Update()
         {
-            //Jumping
-            if (Input.GetKeyDown(Input.Keys.Space) && transform.position.y < 1.0f)
+            movingForward = false;
+            movingBackward = false;
+            //Jumping, change to time based.
+            if (Input.GetKeyDown(Input.Keys.Space) && jumpDelay)
             {
-                rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));   
+                StartCoroutine(JumpingCoroutine());
+                if (Input.GetKey(Input.Keys.W))
+                    movingForward = true;
+                if (Input.GetKey(Input.Keys.S))
+                    movingBackward = true;
             }   
             //WASD movement
-            if (Input.GetKey(Input.Keys.S))
+            if (Input.GetKey(Input.Keys.S) && !movingForward)
             {
                 transform.position -= transform.forward * speed * Time.DeltaTime;
                 if (Input.GetKey(Input.Keys.A))
@@ -35,7 +65,7 @@ namespace ThomasEditor
                 if (Input.GetKey(Input.Keys.D))
                     transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
             }
-            if (Input.GetKey(Input.Keys.W))
+            if (Input.GetKey(Input.Keys.W) && !movingBackward)
             {
                 transform.position += transform.forward * speed * Time.DeltaTime;
                 if (Input.GetKey(Input.Keys.A))
@@ -43,13 +73,13 @@ namespace ThomasEditor
                 if (Input.GetKey(Input.Keys.D))
                     transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
             }
-            //else
-            //{ 
-            //    if (Input.GetKey(Input.Keys.A))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
-            //    if (Input.GetKey(Input.Keys.D))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
-            //}
+            if(!Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S))
+            {
+                if (Input.GetKey(Input.Keys.A))
+                    transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), 0.5f * Time.DeltaTime);
+                if (Input.GetKey(Input.Keys.D))
+                    transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -0.5f * Time.DeltaTime);
+            }
 
             //Avoid tumbling TEST??
             //Quaternion test = Quaternion.CreateFromYawPitchRoll(transform.rotation.y, 0.0f, 0.0f);
