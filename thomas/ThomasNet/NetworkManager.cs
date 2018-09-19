@@ -55,7 +55,7 @@ namespace ThomasEngine.Network
         public bool isServer { get; set; } = false;
         public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject player { get; set; }
-        public static int ping = 2;
+        public static int ping = 0;
         public static NetworkManager instance;
         public ExamplePacket testPacket = new ExamplePacket();
         public List<NetPeer> netPeers;
@@ -127,7 +127,6 @@ namespace ThomasEngine.Network
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
-                SpawnPlayerCharacter();
             }
             else
             {
@@ -190,10 +189,11 @@ namespace ThomasEngine.Network
             netManager.UpdateTime = (1000 / TICK_RATE);
             serverTime += Time.ActualDeltaTime;
             netManager.PollEvents();
-            GUI.ImguiStringUpdate(ping.ToString(), new Vector2(100, 0), new Vector2(0, 0));
+            GUI.ImguiStringUpdate(ping.ToString(), new Vector2(0, 0));
             //Write full world state of owned objects.
             WriteData(DeliveryMethod.Unreliable);
-
+            if(Input.GetKey(Input.Keys.P))
+                Diagnostics();
 
             //example spawn
             //if (Input.GetKeyUp(Input.Keys.K) && isServer)
@@ -318,6 +318,13 @@ namespace ThomasEngine.Network
         {
             Debug.Log("A error has occured here are the amount of packetloss " + netManager.Statistics.PacketLoss + "% lost " + netManager.Statistics.PacketLossPercent);
             Debug.Log("A total of " + netManager.Statistics.PacketsSent + "was sent and " + netManager.Statistics.PacketsReceived + "was recieved");
+        }
+
+        public void Diagnostics()
+        {
+            GUI.ImguiStringUpdate("Packetsloss = " + netManager.Statistics.PacketLossPercent, new Vector2(0, 10));
+            GUI.ImguiStringUpdate("Total package sent = " + netManager.Statistics.PacketsSent, new Vector2(0, 20));
+            GUI.ImguiStringUpdate("Total package recieved = " + netManager.Statistics.PacketsReceived, new Vector2(0, 30));
         }
     }
 }

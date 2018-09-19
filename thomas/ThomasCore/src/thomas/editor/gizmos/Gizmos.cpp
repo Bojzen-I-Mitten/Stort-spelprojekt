@@ -330,8 +330,7 @@ namespace thomas
 		void Gizmos::DrawPing(std::string ping)
 		{
 			ImGui::SetNextWindowSize(ImVec2(300, 0));
-
-			ImGui::Begin("Test", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+			ImGui::Begin("ping", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
 				ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
 			ImGui::Text(ping.c_str());
 			ImGui::End();
@@ -341,10 +340,18 @@ namespace thomas
 		{
 			ImGui::SetNextWindowSize(ImVec2(size.x, size.y));
 			ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y));
-			ImGui::Begin("Test", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+			std::string ImguiName = std::to_string(pos.x)+","+std::to_string(pos.y);
+
+			ImGui::Begin(ImguiName.c_str(), nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
 				ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
 			ImGui::Text(text.c_str());
 			ImGui::End();
+		}
+
+		void Gizmos::ImguiStringUpdate(std::string text, math::Vector2 pos)
+		{
+
+			ImguiStringUpdate(text, math::Vector2(text.size() * 8 + 5, 0), pos);
 		}
 
 	}
