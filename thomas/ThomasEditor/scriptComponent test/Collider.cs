@@ -17,7 +17,7 @@ namespace ThomasEditor
 
         public override void Update()
         {
-            gameObject.GetComponent<Rigidbody>().AddTorque(torque, Rigidbody.ForceMode.Impulse);
+            gameObject.GetComponent<Rigidbody>().AddTorque(torque);
         }
     }
 }

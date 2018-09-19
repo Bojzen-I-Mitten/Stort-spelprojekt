@@ -51,9 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\chadControls.cs" />
-    <Compile Include="Assets\Scripts\MoveBall.cs" />
-    <Compile Include="Assets\Scripts\PickUpBall.cs" />
-    <Compile Include="Assets\Scripts\ThrowBall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

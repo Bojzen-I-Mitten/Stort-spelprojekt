@@ -33,6 +33,8 @@ namespace thomas
 				void AddRelativeForce(const math::Vector3 & force, const math::Vector3 & relPos, ForceMode mode = ForceMode::Force);
 
 			public:
+				void SetFreezePosition(const math::Vector3 & freezePosition);
+				void SetFreezeRotation(const math::Vector3 & freezeRotation);
 				void SetGravity(bool gravity);
 				void SetKinematic(bool kinematic);
 				void SetCollider(btCollisionShape* collider);
@@ -44,11 +46,15 @@ namespace thomas
 				float GetMass() const;
 				bool HasGravity() const;
 				bool IsKinematic() const;
+				math::Vector3 GetFreezePosition() const;
+				math::Vector3 GetFreezeRotation() const;
 
 			private:
 				void UpdateRigidbodyMass();
 
 			private:
+				math::Vector3 m_freezePosition;
+				math::Vector3 m_freezeRotation;
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;

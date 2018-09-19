@@ -86,10 +86,39 @@ namespace ThomasEngine
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetMass(value); }
 		}
 
-		property bool UseGravity
+		/*property bool UseGravity
 		{
 			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->HasGravity(); }
 			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetGravity(value); }
+		}*/
+
+		property Vector3 FrzPos
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezePosition()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezePosition(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
+		}
+
+		property Vector3 FrzRot
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezeRotation()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezeRotation(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
+		}
+
+	private:
+		thomas::math::Vector3 ClampVec3(thomas::math::Vector3 & value, const float & min, const float & max)
+		{
+			ClampFloat(value.x, min, max);
+			ClampFloat(value.y, min, max);
+			ClampFloat(value.z, min, max);
+			return value;
+		}
+
+		void ClampFloat(float & value, const float & lo, const float & ho)
+		{
+			if (value < lo)
+				value = lo;
+			if (value > ho)
+				value = ho;
 		}
 	};
 }

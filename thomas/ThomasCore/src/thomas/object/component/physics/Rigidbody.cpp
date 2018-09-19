@@ -15,7 +15,9 @@ namespace thomas
 			btRigidBody(1, NULL, NULL), 
 			m_targetCollider(nullptr), m_hasGravity(true), 
 			m_kinematic(false), 
-			m_mass(1.f)
+			m_mass(1.f),
+			m_freezePosition(1.f),
+			m_freezeRotation(1.f)
 			{
 				this->setUserPointer(this);
 				Physics::RemoveRigidBody(this);
@@ -75,6 +77,18 @@ namespace thomas
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 				}			
+			}
+
+			void Rigidbody::SetFreezePosition(const math::Vector3 & freezePosition)
+			{
+				m_freezePosition = freezePosition;
+				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
+			}
+
+			void Rigidbody::SetFreezeRotation(const math::Vector3 & freezeRotation)
+			{
+				m_freezeRotation = freezeRotation;
+				this->setAngularFactor(Physics::ToBullet(m_freezePosition));
 			}
 
 			void Rigidbody::SetGravity(bool gravity)
@@ -185,6 +199,16 @@ namespace thomas
 			bool Rigidbody::IsKinematic() const
 			{
 				return m_kinematic;
+			}
+
+			math::Vector3 Rigidbody::GetFreezePosition() const
+			{
+				return m_freezePosition;
+			}
+
+			math::Vector3 Rigidbody::GetFreezeRotation() const
+			{
+				return m_freezeRotation;
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()
