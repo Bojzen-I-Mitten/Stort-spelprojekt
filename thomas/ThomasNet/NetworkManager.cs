@@ -24,7 +24,7 @@ namespace ThomasEngine.Network
         public TimeSyncEvent(float time) { serverTime = time; }
     }
 
-    public class Spawner
+    public class SpawnPrefabEvent
     {
         public int netID { get; set; }
         public int prefabID { get; set; }
@@ -32,7 +32,14 @@ namespace ThomasEngine.Network
         public Quaternion rotation { get; set; }
         public bool isOwner { get; set; }
 
-        public Spawner() { netID = -1; prefabID = -2; position = new Vector3(); rotation = new Quaternion(); isOwner = false; }
+        public SpawnPrefabEvent() { netID = -1; prefabID = -2; position = new Vector3(); rotation = new Quaternion(); isOwner = false; }
+    }
+
+    public class DeletePrefabEvent
+    {
+        public int netID { get; set; }
+
+        public DeletePrefabEvent() { netID = -1; }
     }
 
     public enum PacketType
@@ -44,7 +51,7 @@ namespace ThomasEngine.Network
     public class NetworkManager : ScriptComponent
     {
         private Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
-        private Dictionary<NetworkID, NetPeer> players = new Dictionary<NetworkID, NetPeer>();
+        private Dictionary<NetPeer, NetworkID> players = new Dictionary<NetPeer, NetworkID>();
         int iD = -1;
         int validationID = -5;
         private NetPacketProcessor netPacketProcessor;
@@ -62,6 +69,8 @@ namespace ThomasEngine.Network
         public List<NetPeer> netPeers;
 
         private float serverTime;
+
+        private NetPeer serverPeer = null;
 
         public int TICK_RATE { get; set; } = 24;
 
@@ -91,9 +100,10 @@ namespace ThomasEngine.Network
 
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
-            SubscribeToEvent<Spawner>(SpawnerHandler);
-            
-            
+            SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
+            SubscribeToEvent<DeletePrefabEvent>(DeletePrefabEventHandler);
+
+
             //Stäng av alla nätverksobjekt som finns i scenen.
 
         }
@@ -110,7 +120,8 @@ namespace ThomasEngine.Network
             {
                 InitServerNTP();
                 netManager.Start(9050 /* port */);
-                SpawnPlayerCharacter(null);
+                serverPeer = new NetPeer(netManager, null);
+                SpawnPlayerCharacter(serverPeer);
                 //Starta nätverksobjekten som finns i scenen och registera dem.
             }
 
@@ -120,9 +131,23 @@ namespace ThomasEngine.Network
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             if (isServer)
+            {
                 ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+                RemovePlayerCharacter(peer);
+            }
             else
+            {
                 ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
+
+
+                List<int> keys = new List<int>(networkIDObjects.Keys);
+                foreach(int key in keys)
+                {
+                    DeleteAndUnregister(key);
+                }
+                
+            }
+                
         }
 
         private void Listener_PeerConnectedEvent(NetPeer peer)
@@ -192,13 +217,19 @@ namespace ThomasEngine.Network
             WriteData(DeliveryMethod.Unreliable);
         }
 
-
-        public override void Destroy()
+        public override void OnDestroy()
         {
             if (netManager != null)
+            {
+                netManager.DisconnectAll();
                 netManager.Stop();
+            }
+            
+        }
 
-            base.Destroy();
+        private void Unregister(int NetworkID)
+        {
+            networkIDObjects.Remove(NetworkID);
         }
 
         private int Register(NetworkID netID)
@@ -290,14 +321,14 @@ namespace ThomasEngine.Network
             });
         }
 
-        internal void SpawnerHandler(Spawner spawner, NetPeer peer)
+        internal void SpawnPrefabEventHandler(SpawnPrefabEvent spawnEvent, NetPeer peer)
         {
             GameObject prefab;
-            if (spawner.prefabID >= 0 && spawner.prefabID < spawnablePrefabs.Count)
+            if (spawnEvent.prefabID >= 0 && spawnEvent.prefabID < spawnablePrefabs.Count)
             {
-                prefab = spawnablePrefabs[spawner.prefabID];
+                prefab = spawnablePrefabs[spawnEvent.prefabID];
             }
-            else if (spawner.prefabID == -1)
+            else if (spawnEvent.prefabID == -1)
             {
                 prefab = playerPrefab;
             }
@@ -306,9 +337,9 @@ namespace ThomasEngine.Network
                 Debug.Log("Tried spawning object not in NetworkManager prefab list");
                 return;
             }
-            GameObject gObj = InstantiateAndRegister(prefab, spawner.netID, spawner.position, spawner.rotation);
-            gObj.Name += spawner.isOwner ? "(My player)" : "";
-            gObj.GetComponent<NetworkID>().Owner = spawner.isOwner;
+            GameObject gObj = InstantiateAndRegister(prefab, spawnEvent.netID, spawnEvent.position, spawnEvent.rotation);
+            gObj.Name += spawnEvent.isOwner ? "(My player)" : "";
+            gObj.GetComponent<NetworkID>().Owner = spawnEvent.isOwner;
         }
 
         private void SpawnPlayerCharacter(NetPeer connected)
@@ -317,9 +348,9 @@ namespace ThomasEngine.Network
             GameObject player = InstantiateAndRegister(playerPrefab);
             int ID = player.GetComponent<NetworkID>().ID;
 
-            players.Add(player.GetComponent<NetworkID>(), connected);
+            players.Add(connected, player.GetComponent<NetworkID>());
 
-            Spawner spawner = new Spawner
+            SpawnPrefabEvent spawnEvent = new SpawnPrefabEvent
             {
                 netID = ID,
                 prefabID = -1,
@@ -327,20 +358,43 @@ namespace ThomasEngine.Network
                 rotation = player.transform.rotation,
                 isOwner = false
             };
-            if (connected != null) //Server is null
+            if (connected != serverPeer)
             {
-                SendEventToAllBut(spawner, DeliveryMethod.ReliableOrdered, connected); //tell old clients to spawn object
-                spawner.isOwner = true;
-                SendEventToPeer(spawner, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
+                SendEventToAllBut(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell old clients to spawn object
+                spawnEvent.isOwner = true;
+                SendEventToPeer(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
             }
             else
             {
                 player.GetComponent<NetworkID>().Owner = true;
                 player.Name += "(My player)";
             }
-                
-
         }
+
+
+        private void DeletePrefabEventHandler(DeletePrefabEvent deleteEvent, NetPeer peer)
+        {
+            DeleteAndUnregister(deleteEvent.netID);
+        }
+
+        private void RemovePlayerCharacter(NetPeer disconnectedPeer)
+        {
+
+            NetworkID netID = players[disconnectedPeer];
+            int ID = netID.ID;
+
+            DeleteAndUnregister(ID);
+
+            players.Remove(disconnectedPeer);
+
+            DeletePrefabEvent deleteEvent = new DeletePrefabEvent
+            {
+                netID = ID,
+
+            };
+            SendEventToAllBut(deleteEvent, DeliveryMethod.ReliableOrdered, disconnectedPeer); //tell old clients to spawn object
+        }
+
 
         private void SpawnExistingPlayers(NetPeer newPlayer)
         {
@@ -348,15 +402,15 @@ namespace ThomasEngine.Network
             writer.Put((int)PacketType.EVENT);
             foreach (var existingPlayer in players)
             {
-                Spawner spawner = new Spawner
+                SpawnPrefabEvent spawnEvent = new SpawnPrefabEvent
                 {
-                    netID = existingPlayer.Key.ID,
+                    netID = existingPlayer.Value.ID,
                     prefabID = -1,
-                    position = existingPlayer.Key.transform.position,
-                    rotation = existingPlayer.Key.transform.rotation,
+                    position = existingPlayer.Value.transform.position,
+                    rotation = existingPlayer.Value.transform.rotation,
                     isOwner = false
                 };
-                SendEvent<Spawner>(writer, spawner);
+                SendEvent<SpawnPrefabEvent>(writer, spawnEvent);
             }
             newPlayer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
@@ -369,6 +423,12 @@ namespace ThomasEngine.Network
             else
                 Register(gObj.GetComponent<NetworkID>());
             return gObj;
+        }
+
+        private void DeleteAndUnregister(int networkID)
+        {
+            networkIDObjects[networkID].gameObject.Destroy();
+            Unregister(networkID);
         }
 
         public void GetPing()
