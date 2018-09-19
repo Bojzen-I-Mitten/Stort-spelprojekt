@@ -29,12 +29,13 @@ namespace thomas
 
 			public:
 				void SetKinematic(bool kinematic);
-				void SetCollider(btCollisionShape* collider);
+				void SetCollider(Collider* collider);
 				void SetMass(float mass);
 				void SetTargetCollider(GameObject* collider);
 
 			public:
 				GameObject* GetTargetCollider();
+				void ClearTargetCollider();
 				float GetMass();
 				bool IsKinematic();
 
@@ -42,6 +43,7 @@ namespace thomas
 				void UpdateRigidbodyMass();
 
 			private:
+				Collider * m_collider = nullptr;
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;

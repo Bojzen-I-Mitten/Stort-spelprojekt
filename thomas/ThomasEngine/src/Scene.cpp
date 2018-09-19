@@ -29,32 +29,40 @@ namespace ThomasEngine
 		s_currentScene = value;
 		if(Application::currentProject && savingEnabled)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
+
+		OnCurrentSceneChanged(value);
 	}
 
 
 	void Scene::SaveSceneAs(Scene ^ scene, System::String ^ path)
 	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+		try {
+			using namespace System::Runtime::Serialization;
+			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializserSettings->KnownTypes = list->ToArray();
-		serializserSettings->PreserveObjectReferences = true;
-		serializserSettings->DataContractSurrogate = gcnew SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
-		System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
-		fi->Directory->Create();
-		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-		settings->Indent = true;
-		Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
-		serializer->WriteObject(file, scene);
-		file->Close();
-		
-		if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
-			scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
-			Application::currentProject->currentScenePath = scene->RelativeSavePath;
+			auto list = Component::GetAllComponentTypes();
+			list->Add(SceneResource::typeid);
+			serializserSettings->KnownTypes = list->ToArray();
+			serializserSettings->PreserveObjectReferences = true;
+			serializserSettings->DataContractSurrogate = gcnew SceneSurrogate();
+			DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
+			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
+			fi->Directory->Create();
+			Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+			settings->Indent = true;
+			Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
+			serializer->WriteObject(file, scene);
+			file->Close();
+
+			if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
+				scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
+				Application::currentProject->currentScenePath = scene->RelativeSavePath;
+			}
 		}
+		catch (Exception^ e) {
+			Debug::Log("Failed to save scene: Error: " + e->Message);
+		}
+
 			
 	}
 
@@ -111,7 +119,13 @@ namespace ThomasEngine
 		Monitor::Enter(lock);
 		Scene::CurrentScene->UnLoad();
 		Scene::CurrentScene = Scene::LoadScene(tempFile);
-		System::IO::File::Delete(tempFile);
+		try {
+			System::IO::File::Delete(tempFile);
+		}
+		catch (Exception^ E)
+		{
+
+		}
 		Monitor::Exit(lock);
 		savingEnabled = true;
 	}
@@ -124,7 +138,7 @@ namespace ThomasEngine
 			i--;
 		}
 		m_gameObjects.Clear();
-		m_gameObjects.CollectionChanged -= sceneChanged;
+
 	}
 
 	void Scene::PostLoad()

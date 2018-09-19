@@ -6,7 +6,7 @@ void ThomasEngine::Rigidbody::Awake()
 	if (collider)
 	{
 		collider->attachedRigidbody = this;
-		((thomas::object::component::Rigidbody*)nativePtr)->setCollisionShape(((thomas::object::component::Collider*)collider->nativePtr)->GetCollisionShape());
+		((thomas::object::component::Rigidbody*)nativePtr)->SetCollider((thomas::object::component::Collider*)collider->nativePtr);
 	}
 }
 

@@ -30,6 +30,7 @@
     <ClCompile Include="src\thomas\editor\gizmos\Gizmos.cpp" />
     <ClCompile Include="src\thomas\graphics\LightManager.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\BoxCollider.cpp" />
+    <ClCompile Include="src\thomas\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\SphereCollider.cpp" />
@@ -80,6 +81,7 @@
     <ClInclude Include="src\thomas\editor\gizmos\Gizmos.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
+    <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
