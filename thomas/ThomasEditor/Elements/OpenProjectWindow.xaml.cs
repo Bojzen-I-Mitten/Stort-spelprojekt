@@ -23,5 +23,7 @@ namespace ThomasEditor.Elements
         {
             InitializeComponent();
         }
+
+        public
     }
 }

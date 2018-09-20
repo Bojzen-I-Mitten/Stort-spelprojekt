@@ -171,6 +171,9 @@
     <Compile Include="Elements\AssetBrowser.xaml.cs">
       <DependentUpon>AssetBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\OpenProjectWindow.xaml.cs">
+      <DependentUpon>OpenProjectWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Inspectors\Converters.cs" />
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
@@ -226,6 +229,10 @@
       <DependentUpon>TransformGizmo.xaml</DependentUpon>
     </Compile>
     <Page Include="Elements\AssetBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Elements\OpenProjectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
