@@ -8,6 +8,7 @@
 #include <imgui\ImGuizmo.h>
 #include <vector>
 #include <memory>
+#include <functional>
 
 namespace thomas
 {
@@ -51,6 +52,8 @@ namespace thomas
 			void RenderSelectedObjects();
 			void RenderGizmos();
 			void MoveAndRotateCamera();
+			void SetSelectedGameObject(object::GameObject* selected);
+			void SnapCameraToFocus();
 			object::GameObject* FindClickedGameObject();
 			EditorCamera();
 			~EditorCamera();
@@ -70,7 +73,7 @@ namespace thomas
 			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
-			std::unique_ptr<object::GameObject> m_selectedObject;
+			object::GameObject* m_selectedObject;
 
 		private:
 			static EditorCamera* s_editorCamera;

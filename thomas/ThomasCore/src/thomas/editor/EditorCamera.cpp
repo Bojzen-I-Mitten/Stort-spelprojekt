@@ -17,9 +17,17 @@ namespace thomas
 		EditorCamera* EditorCamera::s_editorCamera;
 		std::vector<object::GameObject*> EditorCamera::s_selectedObjects;
 
-		EditorCamera::EditorCamera() : object::GameObject("editorCamera"), m_sensitivity(50.f), m_speed(2.f), m_manipulatorScale(2.f), m_hasSelectionChanged(false),
-																		   m_manipulatorSnapping(false), m_objectHighlighter(nullptr), 
-																		   m_manipulatorMode(ImGuizmo::MODE::LOCAL), m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
+		EditorCamera::EditorCamera() : 
+		object::GameObject("editorCamera"), 
+		m_sensitivity(50.f), 
+		m_speed(2.f), 
+		m_manipulatorScale(2.f), 
+		m_hasSelectionChanged(false),
+		m_manipulatorSnapping(false), 
+		m_objectHighlighter(nullptr),
+		m_selectedObject(nullptr),
+		m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
+		m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
 		{
 			// Transform component
 			m_transform = new object::component::Transform();
@@ -273,31 +281,7 @@ namespace thomas
 				}
 			}
 
-			if (closestGameObject != nullptr)
-			{
-				if (m_selectedObject == nullptr)
-					m_selectedObject = std::make_unique<GameObject>("");
-
-				// Don't change the pointer if the selected gameobject hasn't changed
-				if (m_selectedObject.get() != closestGameObject)
-				{
-					*m_selectedObject = *closestGameObject;
-	
-					float cameraDistance = 2.f; // Constant factor
-					math::Vector3 center = m_selectedObject->GetComponent<object::component::RenderComponent>()->m_bounds.Center;
-					math::Vector3 bounds = m_selectedObject->GetComponent<object::component::RenderComponent>()->m_bounds.Extents;
-					math::Vector3 volume = bounds * 2.f;
-
-					std::array<float, 3> v = { volume.x, volume.y, volume.z };
-					auto objectSize = std::max_element(v.begin(), v.end());
-					float cameraView = 2.0f * tanf(0.5f * math::DegreesToRadians(70.f));
-					float distance = cameraDistance * *objectSize / cameraView;
-					distance += 0.5f * *objectSize;
-
-					m_transform->SetPosition(center - math::Vector3(distance) * m_transform->Forward());
-				}
-			}
-
+			SetSelectedGameObject(closestGameObject);
 			return closestGameObject;
 		}
 
@@ -326,11 +310,34 @@ namespace thomas
 				move(-m_transform->Up());
 			if (Input::GetKey(Input::Keys::E))
 				move(m_transform->Up());
+			if (Input::GetKey(Input::Keys::F))
+				SnapCameraToFocus();
 
 			// Rotate camera
 			m_rotationX += Input::GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
 			m_rotationY += Input::GetMouseY() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
 			m_transform->SetRotation(-m_rotationX, -m_rotationY, 0.f);
+		}
+
+		void EditorCamera::SetSelectedGameObject(object::GameObject * selected)
+		{
+			//TODO: Create a vector3 position to store / set to 0.f if nullptr...
+
+			/*if(selected != nullptr)
+			m_selectedObject = *&selected;*/
+		}
+
+		void EditorCamera::SnapCameraToFocus()
+		{
+			if (m_selectedObject != nullptr)
+			{
+				LOG(m_selectedObject->m_transform->GetPosition().y);
+				/*math::Vector3 dir = m_transform->GetPosition() - m_selectedObject->m_transform->GetPosition();
+				dir.Normalize();
+
+				m_transform->LookAt(m_selectedObject->m_transform->GetPosition());
+				m_transform->SetPosition(m_selectedObject->m_transform->GetPosition() + math::Vector3(2.f) * dir);*/
+			}
 		}
 	}
 }
