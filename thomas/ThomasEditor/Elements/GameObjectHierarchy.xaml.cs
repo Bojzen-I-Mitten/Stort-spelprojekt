@@ -61,26 +61,44 @@ namespace ThomasEditor
 
         private void Transform_OnParentChanged(ThomasEngine.Transform child, ThomasEngine.Transform oldParent, ThomasEngine.Transform newParent)
         {
-            this.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                if (oldParent == newParent  || !child.gameObject)
-                    return;
-                //var childNode = FindNode(hierarchy.Items, child.gameObject);
-                //var oldParentNode = oldParent && oldParent.gameObject ? FindNode(hierarchy.Items, oldParent.gameObject) : null;
-                //var newParentNode = newParent && newParent.gameObject ? FindNode(hierarchy.Items, newParent.gameObject) : null;
+            if (oldParent == newParent || !child.gameObject)
+                return;
 
-                //var oldParentNodeItems = oldParentNode != null ? oldParentNode.Items : hierarchy.Items;
-                //var newParentNodeItems = newParentNode != null ? newParentNode.Items : hierarchy.Items;
+            ResetTreeView();
+            //this.Dispatcher.BeginInvoke((Action)(() =>
+            //{
+            //    if (oldParent == newParent  || !child.gameObject)
+            //        return;
 
-                var childNode = FindNode(hierarchy.Items, child.gameObject);
+            //    var newParentNode = newParent && newParent.gameObject ? FindNode(hierarchy.Items, newParent.gameObject) as ItemsControl : hierarchy as ItemsControl;
 
-                //if (childNode != null)
-                //{
-                //    if (childNode.Parent != null)
-                //        int x = 5;
-                //}
+            //    var childNode = FindNode(hierarchy.Items, child.gameObject);
 
-            }));
+            //    if (childNode != null)
+            //    {
+            //        Thickness newPadding = childNode.Padding;
+            //        if (childNode.Parent != null)
+            //        {
+            //            ItemsControl oldParentItems = childNode.Parent as ItemsControl;
+            //            oldParentItems.Items.Remove(childNode);
+
+
+            //        }
+            //        if (newParentNode != null)
+            //        {
+            //            ItemsControl newParentItems = newParentNode as ItemsControl;
+            //            newParentItems.Items.Add(childNode);
+            //            if (newParentNode == hierarchy)
+            //                newPadding.Left = 0;
+            //            else
+            //                newPadding.Left = newParentNode.Padding.Left + 2;
+
+            //        }
+            //         childNode.Padding = newPadding;
+            //       // childNode.Padding = new Thickness(0, 0, 0, 2);
+            //    }
+
+        //}));
         }
 
         private TreeViewItem FindNode(ItemCollection nodes, GameObject gameObject)
@@ -109,7 +127,7 @@ namespace ThomasEditor
                 TreeViewItem node = new TreeViewItem { DataContext = child.gameObject };
                // node.MouseRightButtonUp += Node_MouseRightButtonUp;
                 node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
-                node.Padding = new Thickness(0, 0, 0, 2);
+                //node.Padding = new Thickness(0, 0, 0, 2);
                 BuildTree(child, node);
                 parentTree.Items.Add(node);
             }
@@ -139,7 +157,7 @@ namespace ThomasEditor
                             TreeViewItem node = new TreeViewItem { DataContext = newItem };
                             //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                             node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
-                            node.Padding = new Thickness(0, 0, 0, 2);
+                            //node.Padding = new Thickness(0, 0, 0, 2);
 
                             BuildTree(newItem.transform, node);
                             hierarchy.Items.Add(node);

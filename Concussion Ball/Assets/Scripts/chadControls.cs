@@ -14,7 +14,7 @@ namespace ThomasEditor
 
         public override void Update()
         {
-            if (isOwner)
+            if (true)
             {
                 if (Input.GetKey(Input.Keys.W))
                     transform.position += transform.forward * speed * Time.DeltaTime;
