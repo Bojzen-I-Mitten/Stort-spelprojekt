@@ -18,7 +18,8 @@ namespace ThomasEngine
 		{
 			DIRECTIONAL = 0,
 			POINT = 1,
-			SPOT = 2
+			SPOT = 2,
+			AREA = 3
 		};
 		
 		
@@ -90,8 +91,15 @@ namespace ThomasEngine
 			}
 		}
 		
-
-
+		property Vector2 AreaRectangle {
+			Vector2 get() {
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetRectangleDimensions());
+			}
+			void set(Vector2 value) {
+				((thomas::object::component::LightComponent*)nativePtr)->SetRectangleDimensions(Utility::Convert(value));
+			} 
+		}
+		
 		void Update() override
 		{
 			((thomas::object::component::LightComponent*)nativePtr)->Update();
