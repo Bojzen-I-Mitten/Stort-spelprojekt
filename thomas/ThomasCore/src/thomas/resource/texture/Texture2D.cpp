@@ -28,18 +28,25 @@ namespace thomas
 		{
 			if (utils::D3D::LoadTextureFromFile(path, m_resource, m_srv))
 			{
-				ID3D11Texture2D *textureInterface;
+				ThomasCore::SetDebugObjectName(m_srv, "SRV");
+				ThomasCore::SetDebugObjectName(m_resource, "Resource");
+
+				ID3D11Texture2D* textureInterface = nullptr;
 
 				m_resource->QueryInterface<ID3D11Texture2D>(&textureInterface);
 
-				D3D11_TEXTURE2D_DESC desc;
+				const char c[] = "Texture";
+				textureInterface->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c) - 1, c);
 
+				D3D11_TEXTURE2D_DESC desc;
 				textureInterface->GetDesc(&desc);
 				m_mipmapCount = desc.MipLevels;
 				m_width = desc.Width;
 				m_height = desc.Height;
 
+				ULONG ref = m_resource->Release();
 				textureInterface->Release();
+
 				data = new DirectX::ScratchImage();
 			}
 		}
@@ -58,8 +65,9 @@ namespace thomas
 			m_mipMap = mipMap;
 			m_linear = linear;
 
-			ID3D11Texture2D *textureInterface = nullptr;
+			ID3D11Texture2D* textureInterface = nullptr;
 			utils::D3D::CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 		}
@@ -67,6 +75,10 @@ namespace thomas
 		Texture2D::Texture2D(std::string path) : Texture(path)
 		{
 			LoadTextureFromFile(path);
+		}
+
+		Texture2D::~Texture2D()
+		{
 		}
 
 		void Texture2D::OnChanged()

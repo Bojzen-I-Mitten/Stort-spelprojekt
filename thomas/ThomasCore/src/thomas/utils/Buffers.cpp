@@ -37,12 +37,9 @@ namespace thomas
 			}
 			Buffer::~Buffer()
 			{
-				Release();
-			}
-			void Buffer::Release()
-			{
 				SAFE_RELEASE(m_buffer);
 			}
+
 			void Buffer::SetData(void * data, size_t size)
 			{
 				if (size == 0) return;
@@ -88,6 +85,12 @@ namespace thomas
 				
 				ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
 				
+				ThomasCore::SetDebugObjectName(m_resource, "BufferResource");
+			}
+
+			StructuredBuffer::~StructuredBuffer()
+			{
+				m_resource->Release();
 			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()

@@ -32,9 +32,11 @@ namespace thomas
 
 	public:
 		template<UINT TNameLength>
-		static void SetDebugObjectName(ID3D11DeviceChild* ComObject, const char (&name)[TNameLength]);
+		static void SetDebugObjectName(ID3D11DeviceChild* ComObject, const char(&name)[TNameLength]);
 		template<UINT TNameLength>
 		static void SetDebugObjectName(IDXGIObject* ComObject, const char(&name)[TNameLength]);
+		template<UINT TNameLength>
+		static void SetDebugObjectName(ID3D11Resource* ComObject, const char(&name)[TNameLength]);
 
 	private:
 		static bool InitDirectX();
@@ -63,6 +65,13 @@ namespace thomas
 	}
 	template<UINT TNameLength>
 	inline void ThomasCore::SetDebugObjectName(IDXGIObject* ComObject, const char(&name)[TNameLength])
+	{
+#if defined(_DEBUG_DX)
+		ComObject->SetPrivateData(WKPDID_D3DDebugObjectName, TNameLength - 1, name);
+#endif
+	}
+	template<UINT TNameLength>
+	inline void ThomasCore::SetDebugObjectName(ID3D11Resource* ComObject, const char(&name)[TNameLength])
 	{
 #if defined(_DEBUG_DX)
 		ComObject->SetPrivateData(WKPDID_D3DDebugObjectName, TNameLength - 1, name);

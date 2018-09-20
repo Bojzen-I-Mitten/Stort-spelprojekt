@@ -17,6 +17,7 @@ namespace thomas
 			Texture2D(int width, int height, bool mipMap, bool linear);
 			Texture2D(void* initData, int width, int height, bool mipMap, bool linear);
 			Texture2D(std::string path);
+			~Texture2D();
 
 			void OnChanged();
 			std::vector<math::Color> GetPixels();

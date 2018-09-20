@@ -1,5 +1,5 @@
 #pragma once
-#include "..\utils/d3d.h"
+#include "D3D.h"
 #include "..\Common.h"
 
 namespace thomas
@@ -19,7 +19,6 @@ namespace thomas
 				template <typename T>
 				Buffer(const char* name, std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(name, data.data(), sizeof(data[0])*data.size(), bindFlag, usageFlag) {};
 				virtual ~Buffer();
-				void Release();
 				void SetData(void* data, size_t size);
 
 				template <typename T>
@@ -73,6 +72,7 @@ namespace thomas
 				StructuredBuffer(const char* name, void* data, size_t stride, size_t count, D3D11_USAGE usageFlag);
 				template <typename T>
 				StructuredBuffer(const char* name, std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(name, data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				~StructuredBuffer();
 
 				ID3D11ShaderResourceView* GetSRV();
 			private:

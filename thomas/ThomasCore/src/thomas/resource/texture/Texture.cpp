@@ -9,8 +9,8 @@ namespace thomas
 		}
 		Texture::~Texture()
 		{
-			SAFE_RELEASE(m_srv);
-			SAFE_RELEASE(m_resource);
+			m_resource->Release();
+			ULONG ref = m_srv->Release();
 		}
 		Texture::WrapMode Texture::GetWrapMode()
 		{
