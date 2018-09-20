@@ -94,16 +94,16 @@ struct LightStruct
 	float   spotInnerAngle;
 
 	float3  attenuation;
-    float   pad;
+    
     //For area lights
     float3 right;
-    float pad1;
+    
 
     float3 up;
-    float pad2;
+    
 
     float2 rectangleDimension;
-    float2 pad3;
+    float pad;
 };
 
 StructuredBuffer<LightStruct> lights;
@@ -122,7 +122,7 @@ void Apply(inout float4 colorAcculmulator, float3 lightMultiplyer, float3 normal
         specularIntensity = pow(saturate(dot(normal, GetHalfwayVec(viewDir, lightDir))), smoothness); //blinn-phong
     }
     
-    colorAcculmulator += ambient + (diffuse * lambertian) + (specular * specularIntensity) * float4(lightMultiplyer, 1);
+    colorAcculmulator += ambient + (diffuse * lambertian + specular * specularIntensity) * float4(lightMultiplyer, 1);
 }
 
 float4 frag(v2f input) : SV_TARGET
@@ -148,8 +148,8 @@ float4 frag(v2f input) : SV_TARGET
         float lightDistance = length(lightDir);
         lightDir /= lightDistance;
 
-        float3 attenuation = lights[i].attenuation;
-        lightMultiplyer = lights[i].color * lights[i].intensity / (attenuation.x + attenuation.y * lightDistance + attenuation.z * lightDistance * lightDistance);
+        float3 atten = lights[i].attenuation;
+        lightMultiplyer = lights[i].color * lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
     roof += nrOfSpotLights;
@@ -173,9 +173,9 @@ float4 frag(v2f input) : SV_TARGET
             if (angle < outerAngle)
             spotFactor = 1.0f - smoothstep(innerAngle, outerAngle, angle);
         }
-
-        float3 attenuation = lights[i].attenuation;
-        lightMultiplyer = spotFactor * lights[i].color * lights[i].intensity / (attenuation.x + attenuation.y * lightDistance + attenuation.z * lightDistance * lightDistance);
+        
+        float3 atten = lights[i].attenuation;
+        lightMultiplyer = spotFactor * lights[i].color * lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
     roof += nrOfAreaLights;
@@ -188,65 +188,25 @@ float4 frag(v2f input) : SV_TARGET
         //project the pixelpoint in the direction of the normal until it hits the area light plane
         float distanceForProjection = dot(worldNormal, worldPos - lightPos);
         float3 projectionPos = worldPos - distanceForProjection * worldNormal;
-        float3 lightToPointDir = projectionPos - lightPos;
+        float3 lightToPoint = projectionPos - lightPos;
 
         //clamp light boundaries
-        float3 lightRight = lights[i].right;
-        float3 lightUp = lights[i].up;
+        float3 lightRight = -lights[i].right;
+        float3 lightUp = -lights[i].up;
         float2 rectDimension = lights[i].rectangleDimension;
-        float2 rectInLightPlane = float2(dot(lightToPointDir, lightRight), dot(lightToPointDir, lightUp));
+        float2 rectInLightPlane = float2(dot(lightToPoint, lightRight), dot(lightToPoint, lightUp));
         float2 clampedRect = float2(clamp(rectInLightPlane.x, -rectDimension.x, rectDimension.x), clamp(rectInLightPlane.y, -rectDimension.y, rectDimension.y));
         float3 nearestPoint = lightPos + lightRight * clampedRect.x + lightUp * clampedRect.y;
     
-        lightDir = nearestPoint - lightPos;
+        lightDir = normalize(nearestPoint - worldPos);
         float lightDistance = length(lightDir);
         lightDir /= lightDistance;
 
-        float3 attenuation = lights[i].attenuation;
-        lightMultiplyer = lights[i].color; // * lights[i].intensity / (attenuation.x + attenuation.y * lightDistance + attenuation.z * lightDistance * lightDistance);
+        float3 atten = lights[i].attenuation;
+        lightMultiplyer = lights[i].color * lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
         Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
     }
-    
-    //float3 pnormal = lights[i].direction;
-/*
-    float2 dim = float2(0.35f, 2.67f);
 
-    float3 right = float3(1.0, 0, 0);
-    float3 up = float3(0, 0, -1);
-    float3 ldir = float3(0, -1, 0);
-    
-    float3 pos = input.worldPos.xyz;
-    float3 nor = input.normal;
-    
-
-    
-    float distance = dot(nor, input.worldPos.xyz - lights[i].position);
-    float3 projection = input.worldPos.xyz - distance * nor;
-    float3 directionLightToPoint = projection - lights[i].position;
-
-    float2 diagonal = float2(dot(directionLightToPoint, right), dot(directionLightToPoint, up));
-    float2 nearest2D = float2(clamp(diagonal.x, -dim.x, dim.x), clamp(diagonal.y, -dim.y, dim.y));
-    float3 nearestPointInside = lights[i].position + right * nearest2D.x + up * nearest2D.y;
-
-    //if (i > 0)
-    {
-    
-        float lightDistance = 10;
-//        length(nearestPointInside - input.worldPos.xyz);
-        lightDir = normalize(nearestPointInside - input.worldPos.xyz);
-        float3 attenuation = lights[i].attenuation;
-        lightMultiplyer = lights[i].color * 0.5f;
-//        lights[i].intensity / (attenuation.x + attenuation.y * lightDistance + attenuation.z * lightDistance * lightDistance);
-        //finalColor = float4(1.0f, 0.0f, 0.0f, 1.0f);
-        Apply(finalColor, lightMultiplyer, input.normal, lightDir, viewDir);
-    }
-    float det = dot(-nor, planeNor);
-    float t = dot(planeNor, input.worldPos.xyz - testAreaLight.p0) / det;
-
-    float3 pa = input.worldPos.xyz + nor * t;
-
-    if (det > 0.0f)
-        return float4(1.0f, 0.0f, 0.0f, 1.0f);*/
     return saturate(finalColor);
 
 }

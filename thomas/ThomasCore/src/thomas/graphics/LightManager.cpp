@@ -11,14 +11,14 @@ namespace thomas
 	{
 	
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
-		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
+		std::shared_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
 
 
 		void LightManager::Initialize()
 		{
-			s_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
+			s_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
 
 			s_lightCounts.nrOfDirectionalLights = 0;
 			s_lightCounts.nrOfSpotLights = 0;

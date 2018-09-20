@@ -44,14 +44,11 @@ namespace thomas
 				thomas::math::Vector3  direction;
 				float   spotInnerAngle;
 				thomas::math::Vector3  attenuation;
-				float   pad;
 				//for area lights
 				thomas::math::Vector3 right;
-				float pad1;
 				thomas::math::Vector3 up;
-				float pad2;
 				thomas::math::Vector2 rectangleDimensions;
-				thomas::math::Vector2 pad3;
+				float pad;
 			};
 
 		public:
@@ -68,7 +65,7 @@ namespace thomas
 
 			static std::vector<object::component::LightComponent*> s_lights;
 
-			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
+			static std::shared_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
 
 			static LightCountsStruct s_lightCounts;
 		};
