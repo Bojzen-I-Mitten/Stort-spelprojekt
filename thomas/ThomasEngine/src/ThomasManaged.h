@@ -34,8 +34,6 @@ namespace ThomasEngine {
 	{
 	private:
 
-		static bool updateEditor = false;
-
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
@@ -44,9 +42,6 @@ namespace ThomasEngine {
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection = gcnew ThomasSelection();
 	public:
-		delegate void UpdateEditor();
-		static event UpdateEditor^ OnEditorUpdate;
-
 		enum class ManipulatorOperation {
 			TRANSLATE,
 			ROTATE,
@@ -55,7 +50,6 @@ namespace ThomasEngine {
 
 		static void Start();
 
-		static void UpdateEditor();
 
 		static void StartRenderer();
 
@@ -104,7 +98,4 @@ namespace ThomasEngine {
 		}
 
 	};
-
-
-
 }

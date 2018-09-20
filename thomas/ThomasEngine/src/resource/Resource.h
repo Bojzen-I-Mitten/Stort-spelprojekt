@@ -37,6 +37,8 @@ namespace ThomasEngine
 		virtual void OnPlay() {};
 		virtual void OnStop() {};
 
+		/* Update file path of the resource
+		*/
 		void Rename(String^ newPath) {
 			m_path = newPath;
 			m_nativePtr->Rename(Utility::ConvertString(newPath));
@@ -57,11 +59,11 @@ namespace ThomasEngine
 			return m_path;
 		}
 
-		virtual property String^ Name;
+		//virtual property String^ Name;
 
 		String^ GetAssetRelativePath();
 
-		virtual property String^ name
+		virtual property String^ Name
 		{
 			String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
 		};

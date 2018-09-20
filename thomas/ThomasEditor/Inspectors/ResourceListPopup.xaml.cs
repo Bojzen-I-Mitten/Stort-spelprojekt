@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 using ThomasEngine;
+using System.Collections;
 
 namespace ThomasEditor
 {
@@ -63,6 +64,16 @@ namespace ThomasEditor
         static public ResourceListPopup instance;
         public Type resourceType;
         private PropertyItem _property;
+        private int index = -1;
+
+        public delegate void PropertyChanged();
+        public new event PropertyChanged OnPropertyChanged;
+
+        public ResourceListPopup(PropertyItem property, Type resourceType, int elementIndex) : this(property, resourceType)
+        {
+            index = elementIndex;
+        }
+
         public ResourceListPopup(PropertyItem property, Type resourceType)
         {
             this.resourceType = resourceType;
@@ -100,43 +111,46 @@ namespace ThomasEditor
 
         private void ResourceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
-            if (ResourceList.SelectedItem != null)
-            {
-                if (ResourceList.SelectedItem is Resource)
-                {
-                    _property.Value = ResourceList.SelectedItem as Resource;
-                }
-                else if (ResourceList.SelectedItem is String)
-                {
-                    _property.Value = null;
-                }
-                else if (ResourceList.SelectedItem is ThomasEngine.Object)
-                {
-                    _property.Value = ResourceList.SelectedItem;
-                }
-                    
-            }
-            Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+            SetPropertyToSelection();
 
         }
 
-        private void ResourceList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void SetPropertyToSelection()
         {
             Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
             if (ResourceList.SelectedItem != null)
             {
                 if (ResourceList.SelectedItem is Resource)
                 {
-                    _property.Value = ResourceList.SelectedItem as Resource;
+                    if (index >= 0)
+                        (_property.Value as IList)[index] = ResourceList.SelectedItem as Resource;
+                    else
+                        _property.Value = ResourceList.SelectedItem as Resource;
                 }
                 else if (ResourceList.SelectedItem is String)
                 {
-                    _property.Value = null;
+                    if (index >= 0)
+                        (_property.Value as IList)[index] = null;
+                    else
+                        _property.Value = null;
                 }
+                else if (ResourceList.SelectedItem is ThomasEngine.Object)
+                {
+                    if (index >= 0)
+                        (_property.Value as IList)[index] = ResourceList.SelectedItem;
+                    else
+                        _property.Value = ResourceList.SelectedItem;
+                }
+
             }
             Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+            if(OnPropertyChanged != null)
+                OnPropertyChanged();
+        }
 
+        private void ResourceList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            SetPropertyToSelection();
             Close();
         }
 

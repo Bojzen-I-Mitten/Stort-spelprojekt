@@ -3,6 +3,7 @@
 #include "object\Component.h"
 #include "resource\Resources.h"
 #include "ThomasManaged.h"
+#include "Debug.h"
 namespace ThomasEngine
 {
 	void Scene::Play()
@@ -28,32 +29,40 @@ namespace ThomasEngine
 		s_currentScene = value;
 		if(Application::currentProject && savingEnabled)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
+
+		OnCurrentSceneChanged(value);
 	}
 
 
 	void Scene::SaveSceneAs(Scene ^ scene, System::String ^ path)
 	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+		try {
+			using namespace System::Runtime::Serialization;
+			DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializserSettings->KnownTypes = list->ToArray();
-		serializserSettings->PreserveObjectReferences = true;
-		serializserSettings->DataContractSurrogate = gcnew SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
-		System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
-		fi->Directory->Create();
-		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-		settings->Indent = true;
-		Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
-		serializer->WriteObject(file, scene);
-		file->Close();
-		
-		if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
-			scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
-			Application::currentProject->currentScenePath = scene->RelativeSavePath;
+			auto list = Component::GetAllComponentTypes();
+			list->Add(SceneResource::typeid);
+			serializserSettings->KnownTypes = list->ToArray();
+			serializserSettings->PreserveObjectReferences = true;
+			serializserSettings->DataContractSurrogate = gcnew SceneSurrogate();
+			DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
+			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
+			fi->Directory->Create();
+			Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+			settings->Indent = true;
+			Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
+			serializer->WriteObject(file, scene);
+			file->Close();
+
+			if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
+				scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
+				Application::currentProject->currentScenePath = scene->RelativeSavePath;
+			}
 		}
+		catch (Exception^ e) {
+			Debug::Log("Failed to save scene: Error: " + e->Message);
+		}
+
 			
 	}
 
@@ -65,6 +74,11 @@ namespace ThomasEngine
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath)
 	{
+		if (!File::Exists(fullPath))
+		{
+			Debug::Log("Unable to find scene: " + fullPath);
+			return nullptr;
+		}
 		try {
 			s_loading = true;
 
@@ -78,6 +92,11 @@ namespace ThomasEngine
 			DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
 			Scene^ scene = (Scene^)serializer->ReadObject(file);
+
+			msclr::interop::marshal_context context;
+			for (int i = 0; i < scene->GameObjects->Count; ++i)
+				scene->GameObjects[i]->nativePtr->SetName(context.marshal_as<std::string>(scene->GameObjects[i]->Name));
+
 			file->Close();
 
 			scene->PostLoad();
@@ -87,7 +106,16 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
-			return nullptr;
+			try {
+				LOG("Loading scene: ");
+				LOG(Utility::ConvertString(fullPath));
+				LOG("with error:")
+				LOG(Utility::ConvertString(e->Message));
+				return nullptr;
+			}
+			finally{
+
+			}
 		}
 
 	}
@@ -99,7 +127,13 @@ namespace ThomasEngine
 		Monitor::Enter(lock);
 		Scene::CurrentScene->UnLoad();
 		Scene::CurrentScene = Scene::LoadScene(tempFile);
-		System::IO::File::Delete(tempFile);
+		try {
+			System::IO::File::Delete(tempFile);
+		}
+		catch (Exception^ E)
+		{
+
+		}
 		Monitor::Exit(lock);
 		savingEnabled = true;
 	}
@@ -109,9 +143,10 @@ namespace ThomasEngine
 		for (int i = 0; i < m_gameObjects.Count; i++)
 		{
 			m_gameObjects[i]->Destroy();
+			i--;
 		}
 		m_gameObjects.Clear();
-		m_gameObjects.CollectionChanged -= sceneChanged;
+
 	}
 
 	void Scene::PostLoad()
@@ -141,6 +176,16 @@ namespace ThomasEngine
 			Resource^ resource = (Resource^)obj;
 			return gcnew SceneResource(resource->GetAssetRelativePath());
 		}
+		else if (obj->GetType() == GameObject::typeid) {
+			GameObject^ gameObject = (GameObject^)obj;
+			if(gameObject->prefabPath)
+				return gcnew SceneResource(Resources::ConvertToThomasPath(gameObject->prefabPath));
+		}
+		else if (Component::typeid->IsAssignableFrom(obj->GetType())) {
+			Component^ component = (Component^)obj;
+			if (component->gameObject->prefabPath)
+				return gcnew SceneResource(Resources::ConvertToThomasPath(component->gameObject->prefabPath));
+		}
 		return obj;
 	}
 
@@ -154,8 +199,14 @@ namespace ThomasEngine
 				if (targetType == Material::typeid)
 					return Material::StandardMaterial;
 			}
-			else
-				return Resources::Load(sceneResource->path);
+			else if (targetType == GameObject::typeid)
+				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path));
+			else if (Component::typeid->IsAssignableFrom(targetType)) {
+				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path))->GetComponent(targetType);
+			}
+			else {
+				return Resources::LoadThomasPath(sceneResource->path);
+			}
 		}
 		return obj;
 	}

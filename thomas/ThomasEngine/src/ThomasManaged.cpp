@@ -1,6 +1,7 @@
 // This is the main DLL file.
 
 #include "ThomasManaged.h"
+#include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
 
 namespace ThomasEngine {
@@ -28,13 +29,8 @@ namespace ThomasEngine {
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
 		}
-
 	}
 
-	void ThomasWrapper::UpdateEditor()
-	{
-		updateEditor = true;
-	}
 
 	void ThomasWrapper::StartRenderer()
 	{
@@ -63,7 +59,7 @@ namespace ThomasEngine {
 		while (ThomasCore::Initialized())
 		{
 
-			if (Scene::IsLoading())
+			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
 				continue;
@@ -98,10 +94,16 @@ namespace ThomasEngine {
 			{
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
+				{
+					auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
+					if (collider != nullptr)
+					{
+						gameObject->OnCollisionEnter(collider);
+					}
+
 					gameObject->Update();
+				}
 			}
-
-
 
 			//Rendering
 
@@ -134,10 +136,6 @@ namespace ThomasEngine {
 				UpdateFinished->Set();
 			}
 			Monitor::Exit(lock);
-
-			if (updateEditor)
-				OnEditorUpdate();
-			updateEditor = false;
 
 			ScriptingManger::ReloadIfNeeded();
 		}

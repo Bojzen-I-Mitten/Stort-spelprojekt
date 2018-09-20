@@ -89,16 +89,24 @@ namespace ThomasEditor
 
         private void SaveLayout()
         {
-            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
-            using (var sw = new StreamWriter(target))
+            try
             {
-                using (StringWriter fs = new StringWriter())
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas"));
+                string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+                using (var sw = new StreamWriter(target))
                 {
-                    XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
-                    xmlLayout.Serialize(fs);
-                    sw.Write(fs.ToString());
+                    using (StringWriter fs = new StringWriter())
+                    {
+                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                        xmlLayout.Serialize(fs);
+                        sw.Write(fs.ToString());
+                    }
                 }
+            }catch(Exception e)
+            {
+                Debug.Log("Failed to save layout.dock. Error: " + e.Message);
             }
+
 
             if (WindowState == WindowState.Maximized)
             {
@@ -123,18 +131,25 @@ namespace ThomasEditor
 
         private void LoadLayout()
         {
-            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
-            if (System.IO.File.Exists(target))
+            try
             {
-                using (var sr = new StreamReader(target))
+                string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+                if (System.IO.File.Exists(target))
                 {
-                    using (StringWriter fs = new StringWriter())
+                    using (var sr = new StreamReader(target))
                     {
-                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
-                        xmlLayout.Deserialize(sr);
+                        using (StringWriter fs = new StringWriter())
+                        {
+                            XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                            xmlLayout.Deserialize(sr);
+                        }
                     }
                 }
+            }catch(Exception e)
+            {
+                Debug.Log("Failed to load editor layout. Error: " + e.Message);
             }
+
             this.Top = Properties.Settings.Default.Top;
             this.Left = Properties.Settings.Default.Left;
             this.Height = Properties.Settings.Default.Height;
@@ -148,7 +163,7 @@ namespace ThomasEditor
 
         private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 if (e.NewItems != null)
                 {
@@ -355,7 +370,11 @@ namespace ThomasEditor
             if (ThomasWrapper.IsPlaying())
                 ThomasWrapper.Stop();
             else
+            {
                 ThomasWrapper.Play();
+                game.Focus();
+            }
+                
 
             playPauseButton.DataContext = ThomasWrapper.IsPlaying();
         }

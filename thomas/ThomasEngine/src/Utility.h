@@ -25,7 +25,7 @@ namespace ThomasEngine
 
 		static thomas::math::Color Convert(Color% value)
 		{
-			return thomas::math::Color(value.r, value.g, value.b, value.a);
+			return thomas::math::Color(Utility::Convert(value.ToVector4()));
 		}
 		static Color Convert(thomas::math::Color& value)
 		{
@@ -64,7 +64,32 @@ namespace ThomasEngine
 			return Quaternion(value.x, value.y, value.z, value.w);
 		}
 
+		static _GUID Convert(System::Guid% value)
+		{
+			array<Byte>^ guidData = value.ToByteArray();
+			pin_ptr<Byte> data = &(guidData[0]);
+			return *(_GUID*)data;
+		}
+
+		static System::Guid Convert(_GUID& value)
+		{
+			return System::Guid(value.Data1, value.Data2, value.Data3,
+				value.Data4[0], value.Data4[1],
+				value.Data4[2], value.Data4[3],
+				value.Data4[4], value.Data4[5],
+				value.Data4[6], value.Data4[7]);
+		}
+
 		static thomas::math::Matrix Convert(Matrix% value)
+		{
+			return thomas::math::Matrix(
+				value.M11, value.M12, value.M13, value.M14,
+				value.M21, value.M22, value.M23, value.M24,
+				value.M31, value.M32, value.M33, value.M34,
+				value.M41, value.M42, value.M43, value.M44
+			);
+		}
+		static thomas::math::Matrix Convert(const Matrix% value)
 		{
 			return thomas::math::Matrix(
 				value.M11, value.M12, value.M13, value.M14,
@@ -82,6 +107,15 @@ namespace ThomasEngine
 				value.m[2][0], value.m[2][1], value.m[2][2], value.m[2][3],
 				value.m[3][0], value.m[3][1], value.m[3][2], value.m[3][3]
 				);
+		}
+		static Matrix Convert(const thomas::math::Matrix& value)
+		{
+			return Matrix(
+				value.m[0][0], value.m[0][1], value.m[0][2], value.m[0][3],
+				value.m[1][0], value.m[1][1], value.m[1][2], value.m[1][3],
+				value.m[2][0], value.m[2][1], value.m[2][2], value.m[2][3],
+				value.m[3][0], value.m[3][1], value.m[3][2], value.m[3][3]
+			);
 		}
 	};
 
