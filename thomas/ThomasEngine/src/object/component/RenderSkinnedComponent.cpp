@@ -70,7 +70,7 @@ namespace ThomasEngine
 	{
 		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
 		ptr->Update();
-
+		/*
 		if (Input::GetKeyDown(Input::Keys::Space)) {
 			thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
 			for (unsigned int i = 0; i < anim->boneCount(); i++) {
@@ -78,6 +78,7 @@ namespace ThomasEngine
 				gObj->transform->world = Utility::Convert(anim->getBoneMatrix(i)) * m_gameObject->transform->world;
 			}
 		}
+		*/
 	}
 
 	void RenderSkinnedComponent::applyAnimation()

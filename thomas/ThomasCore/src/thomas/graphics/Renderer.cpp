@@ -12,6 +12,7 @@
 #include "..\editor\EditorCamera.h"
 #include "..\Window.h"
 #include "RenderConstants.h"
+#include "render/Frame.h"
 
 namespace thomas
 {
@@ -51,17 +52,17 @@ namespace thomas
 
 		void Renderer::ClearCommands()
 		{
-			s_renderCommands.clear();
+			m_renderCommands.clear();
 		}
 
-		void Renderer::SubmitCommand(RenderCommand command)
+		void Renderer::SubmitCommand(RenderCommand& command)
 		{
-			s_renderCommands[command.camera][command.material].push_back(command);
+			m_renderCommands[command.camera][command.material].push_back(command);
 		}
 
 		void Renderer::TransferCommandList()
 		{
-			s_lastFramesCommands = s_renderCommands;
+			m_lastFramesCommands = m_renderCommands;
 		}
 
 		void Renderer::BindObject(RenderCommand &rC)
@@ -81,7 +82,7 @@ namespace thomas
 		{
 			//Process commands
 			BindFrame();
-			for (auto & perCameraQueue : s_lastFramesCommands)
+			for (auto & perCameraQueue : m_lastFramesCommands)
 			{
 				auto camera = perCameraQueue.first;
 				BindCamera(camera);

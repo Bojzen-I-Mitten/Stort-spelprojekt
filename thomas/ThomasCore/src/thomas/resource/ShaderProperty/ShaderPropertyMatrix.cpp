@@ -29,6 +29,9 @@ namespace thomas
 				: ShaderProperty(Type::MATRIX_ARRAY), m_value(), m_offset(0), m_num_matrix(0)
 			{			
 			}
+			ShaderPropertyMatrixArray::~ShaderPropertyMatrixArray()
+			{
+			}
 			ShaderPropertyMatrixArray::ShaderPropertyMatrixArray(unsigned int num_matrix)
 				: ShaderProperty(Type::MATRIX_ARRAY), m_value(num_matrix == 0 ? NULL : new math::Matrix[num_matrix]), m_offset(0), m_num_matrix(num_matrix)
 			{

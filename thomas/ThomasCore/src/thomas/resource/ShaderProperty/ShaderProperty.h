@@ -26,6 +26,7 @@ namespace thomas
 				};
 
 				ShaderProperty(Type type);
+				virtual ~ShaderProperty() {}
 
 				virtual void Apply(std::string name, Shader* shader) const = 0;
 				void Apply(Shader* shader) const;

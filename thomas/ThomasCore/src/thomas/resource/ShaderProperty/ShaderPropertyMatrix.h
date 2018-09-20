@@ -25,6 +25,7 @@ namespace thomas
 			{
 			private:
 				ShaderPropertyMatrixArray();
+				virtual ~ShaderPropertyMatrixArray();
 			protected:
 			public:
 				ShaderPropertyMatrixArray(unsigned int num_matrix);
