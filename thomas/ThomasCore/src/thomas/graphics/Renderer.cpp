@@ -30,6 +30,11 @@ namespace thomas
 			LightManager::Bind();
 		}
 
+		Renderer::Renderer()
+			: m_frame(new render::Frame(100)), m_prevFrame(new render::Frame(100))
+		{
+		}
+
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
 		{
 			//Get the current active window
@@ -52,20 +57,30 @@ namespace thomas
 
 		void Renderer::ClearCommands()
 		{
-			m_renderCommands.clear();
+			m_frame->m_queue.clear();
 		}
 
-		void Renderer::SubmitCommand(RenderCommand& command)
+		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			m_renderCommands[command.camera][command.material].push_back(command);
+			if (command.num_local_prop) {
+				resource::shaderproperty::ShaderProperty** alloc;
+				if (m_frame->m_alloc.reserve(command.num_local_prop, alloc))
+					return;
+				for (unsigned int i = 0; i < command.num_local_prop; i++)
+					alloc[i] = command.local_prop[i]->copy();
+				command.local_prop = const_cast<const resource::shaderproperty::ShaderProperty**>(alloc);
+			}
+			m_frame->m_queue[command.camera][command.material].push_back(command);
 		}
 
 		void Renderer::TransferCommandList()
 		{
-			m_lastFramesCommands = m_renderCommands;
+			// Swap frames and clear old frame data
+			std::swap(m_frame, m_prevFrame);
+			m_frame->clear();
 		}
 
-		void Renderer::BindObject(RenderCommand &rC)
+		void Renderer::BindObject(render::RenderCommand &rC)
 		{
 			thomas::resource::shaderproperty::ShaderProperty* prop;
 			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, rC.worldMatrix.Transpose());
@@ -82,7 +97,7 @@ namespace thomas
 		{
 			//Process commands
 			BindFrame();
-			for (auto & perCameraQueue : m_lastFramesCommands)
+			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
 				BindCamera(camera);
@@ -104,13 +119,6 @@ namespace thomas
 				BindCamera(editor::EditorCamera::GetEditorCamera()->GetCamera());
 				editor::Gizmos::RenderGizmos();
 			}
-		}
-		bool MaterialSorter::operator()(resource::Material * mat1, resource::Material * mat2) const
-		{
-			if (mat1->m_renderQueue == mat2->m_renderQueue)
-				return mat1->GetId() < mat2->GetId();
-			else
-				return mat1->m_renderQueue < mat2->m_renderQueue;
 		}
 
 	}

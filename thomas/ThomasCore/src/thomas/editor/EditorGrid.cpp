@@ -5,6 +5,7 @@
 #include "../resource/Shader.h"
 #include "../object/component/Camera.h"
 #include "../graphics/Renderer.h"
+#include "../graphics/render/Frame.h"
 #include "../System.h"
 namespace thomas
 {
@@ -79,7 +80,8 @@ namespace thomas
 				m_material->SetVector("cameraPos", math::Vector4(cameraScaleMatrix));
 				m_material->SetInt("gridScale", scale);
 
-				System::S_RENDERER.SubmitCommand(graphics::RenderCommand(worldMatrix, m_mesh.get(), m_material, camera));
+				graphics::render::RenderCommand cmd(worldMatrix, m_mesh.get(), m_material, camera);
+				System::S_RENDERER.SubmitCommand(cmd);
 			}
 
 		}

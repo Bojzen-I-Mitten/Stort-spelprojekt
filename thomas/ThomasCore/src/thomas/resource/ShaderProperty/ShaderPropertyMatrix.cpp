@@ -44,6 +44,11 @@ namespace thomas
 			{
 				std::memcpy(m_value.get(), value, num_matrix * sizeof(math::Matrix));
 			}
+			ShaderPropertyMatrixArray::ShaderPropertyMatrixArray(const std::string &name, const math::Matrix * value, unsigned int offset, unsigned int num_matrix)
+				: ShaderProperty(Type::MATRIX_ARRAY, name), m_value(new math::Matrix[num_matrix]), m_offset(offset), m_num_matrix(num_matrix)
+			{
+				std::memcpy(m_value.get(), value, num_matrix * sizeof(math::Matrix));
+			}
 			void ShaderPropertyMatrixArray::Apply(std::string name, Shader* shader) const
 			{
 
@@ -63,6 +68,11 @@ namespace thomas
 				m_value = std::unique_ptr<math::Matrix>(new math::Matrix[num_matrix]);
 				m_offset = 0;
 				m_num_matrix = num_matrix;
+			}
+
+			ShaderProperty * ShaderPropertyMatrixArray::copy() const
+			{
+				return new ShaderPropertyMatrixArray(GetName(), m_value.get(), m_offset, m_num_matrix);
 			}
 
 			math::Matrix& ShaderPropertyMatrixArray::Matrix(unsigned int index)

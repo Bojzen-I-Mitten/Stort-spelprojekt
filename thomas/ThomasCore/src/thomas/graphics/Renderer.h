@@ -37,23 +37,24 @@ namespace thomas
 
 		namespace render {
 			class Frame;
-			class RenderCommand;
+			struct RenderCommand;
 		}
 		
 		class Renderer {
 		private:
 			static LightManager s_lightManager;
 			void BindFrame();
-			void BindObject(RenderCommand & rC);
+			void BindObject(render::RenderCommand & rC);
 
 		public:
 
+			Renderer();
 
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
 			void ClearCommands();
-			void SubmitCommand(RenderCommand& command);
-			void allocate(resource::shaderproperty::ShaderProperty *prop);
+			void SubmitCommand(render::RenderCommand& command);
+
 
 
 			void TransferCommandList();
