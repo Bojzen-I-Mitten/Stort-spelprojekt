@@ -30,6 +30,7 @@ namespace thomas
 			int m_mipmapCount;
 			bool m_linear;
 			bool m_mipMap;
+
 			static Texture2D* s_blackTexture;
 			static Texture2D* s_whiteTexture;
 		};

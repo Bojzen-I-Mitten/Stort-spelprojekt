@@ -15,9 +15,9 @@ namespace thomas
 			{
 			public:
 				//Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag);
-				Buffer(const char* name, void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0, size_t structureByteStride = 0);
+				Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0, size_t structureByteStride = 0);
 				template <typename T>
-				Buffer(const char* name, std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(name, data.data(), sizeof(data[0])*data.size(), bindFlag, usageFlag) {};
+				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(name, data.data(), sizeof(data[0])*data.size(), bindFlag, usageFlag) {};
 				virtual ~Buffer();
 				void SetData(void* data, size_t size);
 
@@ -36,9 +36,9 @@ namespace thomas
 			class VertexBuffer : public Buffer
 			{
 			public:
-				VertexBuffer(const char* name, void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER);
+				VertexBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER);
 				template <typename T>
-				VertexBuffer(const char* name, std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : VertexBuffer(name, data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				VertexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : VertexBuffer(data.data(), sizeof(data[0]), data.size(), usageFlag) {};
 
 				template <typename T>
 				void SetData(std::vector<T>& data) 
@@ -61,17 +61,17 @@ namespace thomas
 			class IndexBuffer : public Buffer
 			{
 			public:
-				IndexBuffer(const char* name, void* data, size_t count, D3D11_USAGE usageFlag);
+				IndexBuffer(void* data, size_t count, D3D11_USAGE usageFlag);
 				template <typename T>
-				IndexBuffer(const char* name, std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : IndexBuffer(name, data.data(), data.size(), usageFlag) {};
+				IndexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : IndexBuffer(data.data(), data.size(), usageFlag) {};
 			};
 
 			class StructuredBuffer : public Buffer
 			{
 			public:
-				StructuredBuffer(const char* name, void* data, size_t stride, size_t count, D3D11_USAGE usageFlag);
+				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag);
 				template <typename T>
-				StructuredBuffer(const char* name, std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(name, data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(name, data.data(), sizeof(data[0]), data.size(), usageFlag) {};
 				~StructuredBuffer();
 
 				ID3D11ShaderResourceView* GetSRV();

@@ -94,15 +94,15 @@ namespace thomas
 		//Release
 		s_context->ClearState();
 		s_context->Flush();
-		
-		s_context->Release();
-		s_device->Release();
+
+		SAFE_RELEASE(s_context);
+		SAFE_RELEASE(s_device);
 
 		if (s_debug)
 			s_debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
 
-		s_debug->Release();
-		s_infoQueue->Release();
+		SAFE_RELEASE(s_infoQueue);
+		SAFE_RELEASE(s_debug);
 
 		return true;
 	}

@@ -17,8 +17,8 @@ namespace thomas
 			if (shader != nullptr)
 			{
 				m_material = std::make_unique<resource::Material>(shader);
-				m_vertexBufferPos = std::make_unique<utils::buffers::VertexBuffer>("BulletDebugDraw", nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
-				m_vertexBufferColor = std::make_unique<utils::buffers::VertexBuffer>("BulletDebugDraw", nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
+				m_vertexBufferPos = std::make_unique<utils::buffers::VertexBuffer>(nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
+				m_vertexBufferColor = std::make_unique<utils::buffers::VertexBuffer>(nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
 			}
 		}
 

@@ -32,7 +32,6 @@ namespace ThomasEngine
 		}
 		virtual ~Resource()
 		{
-			
 		}
 
 		virtual void OnPlay() {};

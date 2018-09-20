@@ -302,7 +302,7 @@ namespace thomas
 				SetMatrix(math::Matrix::Identity);
 			}
 
-			s_vertexBuffer = new utils::buffers::VertexBuffer("Gizmo", nullptr, sizeof(math::Vector3), 500, DYNAMIC_BUFFER); //500 hardcoded here :/
+			s_vertexBuffer = new utils::buffers::VertexBuffer(nullptr, sizeof(math::Vector3), 500, DYNAMIC_BUFFER); //500 hardcoded here :/
 
 		}
 

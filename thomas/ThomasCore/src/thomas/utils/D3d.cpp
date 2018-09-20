@@ -94,18 +94,12 @@ namespace thomas
 			{
 				IDXGIAdapter* dxgiAdapter = nullptr;
 				hr = dxgiDevice->GetAdapter(&dxgiAdapter);
-				dxgiDevice->Release();
 				if (SUCCEEDED(hr))
 				{
-					ThomasCore::SetDebugObjectName(dxgiAdapter, "D3DAdapter");
-
 					IDXGIFactory* dxgiFactory = nullptr;
 					hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)& dxgiFactory);
-					dxgiAdapter->Release();
 					if (SUCCEEDED(hr))
 					{
-						ThomasCore::SetDebugObjectName(dxgiFactory, "D3DFactory");
-
 						DXGI_SWAP_CHAIN_DESC scd;
 						ZeroMemory(&scd, sizeof(scd));
 
@@ -130,6 +124,7 @@ namespace thomas
 							dxgiFactory->Release();
 							dxgiAdapter->Release();
 							dxgiDevice->Release();
+					
 							return true;
 						}
 						dxgiFactory->Release();

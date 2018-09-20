@@ -1,5 +1,5 @@
 #include "Texture2D.h"
-#include "../../utils/d3d.h"
+#include "../../utils/D3D.h"
 namespace thomas
 {
 	namespace resource
@@ -20,23 +20,16 @@ namespace thomas
 		}
 		void Texture2D::Destroy()
 		{
-			delete s_blackTexture;
-			delete s_whiteTexture;
+			SAFE_DELETE(s_whiteTexture);
+			SAFE_DELETE(s_blackTexture);
 		}
 
 		void Texture2D::LoadTextureFromFile(std::string path)
 		{
 			if (utils::D3D::LoadTextureFromFile(path, m_resource, m_srv))
 			{
-				ThomasCore::SetDebugObjectName(m_srv, "SRV");
-				ThomasCore::SetDebugObjectName(m_resource, "Resource");
-
 				ID3D11Texture2D* textureInterface = nullptr;
-
 				m_resource->QueryInterface<ID3D11Texture2D>(&textureInterface);
-
-				const char c[] = "Texture";
-				textureInterface->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c) - 1, c);
 
 				D3D11_TEXTURE2D_DESC desc;
 				textureInterface->GetDesc(&desc);
@@ -44,9 +37,7 @@ namespace thomas
 				m_width = desc.Width;
 				m_height = desc.Height;
 
-				ULONG ref = m_resource->Release();
 				textureInterface->Release();
-
 				data = new DirectX::ScratchImage();
 			}
 		}
@@ -79,6 +70,7 @@ namespace thomas
 
 		Texture2D::~Texture2D()
 		{
+			SAFE_DELETE(data);
 		}
 
 		void Texture2D::OnChanged()

@@ -68,5 +68,11 @@ namespace thomas
 			ID3D11Resource* m_resource = nullptr;
 			ID3D11ShaderResourceView* m_srv = nullptr;
 		};
+
+		class TextureContainer
+		{
+		
+		
+		};
 	}
 }

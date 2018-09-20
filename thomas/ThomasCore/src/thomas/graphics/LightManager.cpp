@@ -9,16 +9,14 @@ namespace thomas
 {
 	namespace graphics
 	{
-	
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
-		std::shared_ptr<utils::buffers::StructuredBuffer> LightManager::m_lightBuffer;
+		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::m_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::m_lightsCounts;
 
-
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;
@@ -27,8 +25,9 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
-			SAFE_RELEASE(m_lightBuffer);
+			m_lightBuffer.reset();
 		}
+
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
 			switch (light->GetType())

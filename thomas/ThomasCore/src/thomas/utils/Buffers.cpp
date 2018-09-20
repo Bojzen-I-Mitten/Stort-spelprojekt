@@ -7,7 +7,7 @@ namespace thomas
 	{
 		namespace buffers
 		{
-			Buffer::Buffer(const char* name, void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_RESOURCE_MISC_FLAG miscFlag, size_t structureByteStride) : m_size(size), m_bindFlag(bindFlag)
+			Buffer::Buffer(void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_RESOURCE_MISC_FLAG miscFlag, size_t structureByteStride) : m_size(size), m_bindFlag(bindFlag)
 			{
 				D3D11_BUFFER_DESC bufferDesc;
 				bufferDesc.ByteWidth = size;
@@ -17,8 +17,6 @@ namespace thomas
 				bufferDesc.MiscFlags = miscFlag;
 				bufferDesc.StructureByteStride = structureByteStride;
 				
-					
-
 				D3D11_SUBRESOURCE_DATA InitData;
 				InitData.pSysMem = data;
 				InitData.SysMemPitch = 0;
@@ -29,8 +27,6 @@ namespace thomas
 					result = ThomasCore::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
 				else
 					result = ThomasCore::GetDevice()->CreateBuffer(&bufferDesc, &InitData, &m_buffer);
-
-				m_buffer->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(name) - 1, name);
 
 				if (result != S_OK)
 					LOG(result);
@@ -62,17 +58,17 @@ namespace thomas
 			{
 				return m_buffer;
 			}
-			VertexBuffer::VertexBuffer(const char* name, void * data, size_t stride, size_t count, D3D11_USAGE usageFlag): Buffer(name, data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride(stride)
+			VertexBuffer::VertexBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag): Buffer(data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride(stride)
 			{
 			}
 			size_t VertexBuffer::GetStride()
 			{
 				return m_stride;
 			}
-			IndexBuffer::IndexBuffer(const char* name, void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(name, data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
+			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
 			{
 			}
-			StructuredBuffer::StructuredBuffer(const char* name, void * data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(name, data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
 				D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 				
@@ -84,13 +80,11 @@ namespace thomas
 				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 				
 				ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
-				
-				ThomasCore::SetDebugObjectName(m_resource, "BufferResource");
 			}
 
 			StructuredBuffer::~StructuredBuffer()
 			{
-				m_resource->Release();
+				SAFE_RELEASE(m_resource);
 			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()
