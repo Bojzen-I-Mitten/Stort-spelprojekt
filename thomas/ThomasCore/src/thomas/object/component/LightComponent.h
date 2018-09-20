@@ -36,8 +36,10 @@ namespace thomas
 				graphics::LightManager::LIGHT_TYPES GetType();
 				void SetType(graphics::LightManager::LIGHT_TYPES other);
 
-				thomas::math::Color GetColor();
-				void SetColor(thomas::math::Color other);
+				thomas::math::Color GetColorDiffuse();
+				void SetColorDiffuse(thomas::math::Color other);
+				thomas::math::Color GetColorSpecular();
+				void SetColorSpecular(thomas::math::Color other);
 				
 
 				float GetIntensity() const;

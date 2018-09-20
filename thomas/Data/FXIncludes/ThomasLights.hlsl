@@ -13,7 +13,8 @@ cbuffer LightCountsStruct
 
 struct LightStruct
 {
-    float3 color;
+    float3 colorDiffuse;
+    float3 colorSpecular;
     float intensity;
 
     float3 position;
@@ -26,13 +27,9 @@ struct LightStruct
     
     //For area lights
     float3 right;
-    
-
     float3 up;
-    
-
     float2 rectangleDimension;
-    float pad;
+    float2 pad;
 };
 
 
@@ -43,10 +40,9 @@ inline float3 GetHalfwayVec(float3 lightDir, float3 viewDir)
     return normalize(viewDir + lightDir);
 }
 
-inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse)//should take material properties later
+inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular)//should take material properties later
 {
     float3 ambient = float3(0.1f, 0.1f, 0.1f);
-    float3 specular = float3(1.0f, 1.0f, 1.0f);
     float smoothness = 16.0f;
 
     float lambertian = saturate(dot(normal, lightDir));
@@ -72,7 +68,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
     {
         lightDir = lights[i].direction; //should be normalized already
         lightMultiplyer = lights[i].intensity;
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].color);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
     }
     roof += nrOfPointLights;
     for (; i < roof; ++i) //point
@@ -83,7 +79,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
 
         float3 atten = lights[i].attenuation;
         lightMultiplyer = lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].color);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
     }
     roof += nrOfSpotLights;
     for (; i < roof; ++i) //spot
@@ -109,7 +105,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
         
         float3 atten = lights[i].attenuation;
         lightMultiplyer = spotFactor * lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].color);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
     }
     roof += nrOfAreaLights;
     for (; i < roof; ++i)
@@ -135,7 +131,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
 
         float3 atten = lights[i].attenuation;
         lightMultiplyer = lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].color);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
     }
     return colorAcculmulator;
 }
