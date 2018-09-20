@@ -14,11 +14,11 @@ namespace ThomasEngine {
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		}
 
-		if (m_loaded && !ThomasWrapper::IsPlaying())
-		{
-			ThomasEngine::Resources::SaveResource(this);
-		}
+	if (m_loaded && !ThomasWrapper::IsPlaying() && this->Shader != value)
+	{
+		ThomasEngine::Resources::SaveResource(this);
 	}
+}
 
 	void Material::EditorProperties::set(Dictionary<String^, System::Object^>^ value)
 	{
@@ -90,5 +90,19 @@ namespace ThomasEngine {
 			properties->Add(name, value);
 		}
 		return properties;
+	}
+	List<Type^>^ ThomasEngine::Material::GetKnownTypes()
+	{
+		List<Type^>^ types = gcnew List<Type^>();
+
+		types->Add(Vector2::typeid);
+		types->Add(Vector3::typeid);
+		types->Add(Vector4::typeid);
+		types->Add(Color::typeid);
+		types->Add(Material::typeid);
+		types->Add(Texture::typeid);
+		types->Add(Texture2D::typeid);
+		types->Add(ThomasEngine::Shader::typeid);
+		return types;
 	}
 }

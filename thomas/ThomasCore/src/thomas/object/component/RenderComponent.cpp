@@ -33,7 +33,12 @@ namespace thomas {
 				}
 				else
 				{
-					m_model = model;					
+					m_model = model;
+					if (m_model->GetMeshes().size() < m_materials.size())
+						m_materials.resize(m_model->GetMeshes().size());
+
+					while (m_model->GetMeshes().size() > m_materials.size())
+						m_materials.push_back(resource::Material::GetStandardMaterial());
 				}
 				return true;
 			}
@@ -45,15 +50,14 @@ namespace thomas {
 					math::BoundingOrientedBox::CreateFromBoundingBox(m_bounds, m_model->m_bounds);
 					m_bounds.Transform(m_bounds, m_gameObject->m_transform->GetWorldMatrix());
 
-					if (m_model->GetMeshes().size() < m_materials.size())
-						m_materials.resize(m_model->GetMeshes().size());
-
-					while (m_model->GetMeshes().size() > m_materials.size())
-						m_materials.push_back(resource::Material::GetStandardMaterial());
-
 					s_renderComponents.push_back(this);
 				
 				}		
+			}
+			void RenderComponent::SetMaterial(resource::Material * material)
+			{
+				for (unsigned int i = 0; i < m_materials.size(); i++)
+					SetMaterial(i, material);
 			}
 			void RenderComponent::SetMaterial(int meshIndex, resource::Material * material)
 			{

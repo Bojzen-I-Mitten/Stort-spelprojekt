@@ -27,21 +27,6 @@ namespace thomas
 				RenderComponent::Update();
 				if (m_skeleton) {
 					m_skeleton->update(ThomasTime::GetDeltaTime());
-
-					math::Matrix world = m_gameObject->m_transform->GetWorldMatrix();
-
-					math::Vector4 v0 = math::Vector4(-0.5f, 0.5f, 0.f, 1);
-					math::Vector4 v1 = math::Vector4(0.f, -0.5f, 0.f, 1);
-					math::Vector4 v2 = math::Vector4(0.5f, 0.5f, 0.f, 1);
-					//math::Vector4 s = math::Vector4::Transform(v, _ref.getBone(0)._invBindPose);
-					//v = math::Vector4::Transform(v, m_skinArray.GetValue()[0]);
-					v0 = math::Vector4::Transform(v0, m_skinArray.GetValue()[0]);
-					v1 = math::Vector4::Transform(v1, m_skinArray.GetValue()[0]);
-					v2 = math::Vector4::Transform(v2, m_skinArray.GetValue()[0]);
-					world = m_skinArray.GetValue()[0] * world;
-					v0 = math::Vector4::Transform(v0, world);
-					v1 = math::Vector4::Transform(v1, world);
-					v2 = math::Vector4::Transform(v2, world);
 				}
 			}
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)

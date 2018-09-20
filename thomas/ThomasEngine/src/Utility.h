@@ -64,6 +64,22 @@ namespace ThomasEngine
 			return Quaternion(value.x, value.y, value.z, value.w);
 		}
 
+		static _GUID Convert(System::Guid% value)
+		{
+			array<Byte>^ guidData = value.ToByteArray();
+			pin_ptr<Byte> data = &(guidData[0]);
+			return *(_GUID*)data;
+		}
+
+		static System::Guid Convert(_GUID& value)
+		{
+			return System::Guid(value.Data1, value.Data2, value.Data3,
+				value.Data4[0], value.Data4[1],
+				value.Data4[2], value.Data4[3],
+				value.Data4[4], value.Data4[5],
+				value.Data4[6], value.Data4[7]);
+		}
+
 		static thomas::math::Matrix Convert(Matrix% value)
 		{
 			return thomas::math::Matrix(

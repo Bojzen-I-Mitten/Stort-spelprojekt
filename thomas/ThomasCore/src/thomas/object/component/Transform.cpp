@@ -51,6 +51,18 @@ namespace thomas
 					return m_localWorldMatrix;
 			}
 
+			void Transform::SetWorldMatrix(math::Matrix matrix)
+			{
+				if (m_parent) {
+					m_localWorldMatrix = m_localWorldMatrix * m_parent->GetWorldMatrix().Invert();
+				}
+				else
+				{
+					m_localWorldMatrix = matrix;
+				}
+				Decompose();
+			}
+
 			void Transform::SetLocalMatrix(math::Matrix matrix)
 			{
 				m_localWorldMatrix = matrix;
@@ -253,10 +265,17 @@ namespace thomas
 			{
 				if (m_parent != parent)
 				{
+					math::Matrix m = GetWorldMatrix();
 					RemoveParent();
 					m_parent = parent;
-					if(m_parent)
+					if (m_parent) {
 						m_parent->m_children.push_back(this);
+						SetWorldMatrix(m);
+					}
+					else
+					{
+						SetLocalMatrix(m);
+					}
 				}
 			}
 			Transform * Transform::GetParent()

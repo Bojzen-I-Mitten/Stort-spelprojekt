@@ -23,6 +23,8 @@ namespace thomas
 				
 				resource::Model * GetModel();
 				void Update();
+
+				void SetMaterial(resource::Material * material);
 				
 
 				void SetMaterial(int meshIndex, resource::Material* material);

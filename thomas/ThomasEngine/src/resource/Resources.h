@@ -42,11 +42,10 @@ namespace ThomasEngine
 		};
 
 		static void OnPlay();
-
 		static void OnStop();
-
 		static void SavePrefab(GameObject ^ gameObject, String ^ path);
-		static GameObject ^ Resources::LoadPrefab(String^ path);
+		static GameObject ^ LoadPrefab(String^ path);
+		static GameObject ^ LoadPrefab(String^ path, bool forceInstantiate);
 
 		static bool SaveResource(Resource^ resource);
 
@@ -81,6 +80,8 @@ namespace ThomasEngine
 		static Resource ^ LoadSysPath(String ^ system_path);
 		
 		static Resource^ Find(String^ path);
+
+		static Resource^ LoadErrorResource(AssetTypes type);
 
 		static void RenameResource(String^ oldPath, String^ newPath);
 

@@ -16,6 +16,7 @@ namespace ThomasEngine
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
 	internal:
+		static List<Type^>^ GetKnownTypes();
 		Material(thomas::resource::Material* ptr) : Resource(Utility::ConvertString(ptr->GetPath()), ptr) {};
 		bool m_loaded = false;
 	public:
@@ -50,6 +51,7 @@ namespace ThomasEngine
 			m_propertiesBeforePlay = nullptr;
 		}
 
+
 		property String^ Name
 		{
 			String^ get() override { 
@@ -59,6 +61,9 @@ namespace ThomasEngine
 				{
 					return "Default Material";
 				}
+			}
+			void set(String^ Name) {
+				//Nothing here :)
 			}
 		};
 		
