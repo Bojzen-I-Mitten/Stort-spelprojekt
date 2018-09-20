@@ -651,12 +651,26 @@ namespace ThomasEditor
         {
             string text = File.ReadAllText(path);
             int start = text.IndexOf("public class ") + 13;
-            string oldClassName = text.Substring(start, text.IndexOf(" : ScriptComponent") - start);
+            string typeOfScript = GetTypeOfScript(text);
+            string oldClassName = text.Substring(start, text.IndexOf(typeOfScript) - start);
             string leftOf = text.Substring(0, start);
-            string newClassName = text.Substring(start, text.IndexOf(" : ScriptComponent") - start).Replace(oldClassName, newName);
-            string rightOf = text.Substring(text.IndexOf(" : ScriptComponent"));
+            string newClassName = text.Substring(start, text.IndexOf(typeOfScript) - start).Replace(oldClassName, newName);
+            string rightOf = text.Substring(text.IndexOf(typeOfScript));
             string newText = leftOf + newClassName + rightOf;
             File.WriteAllText(path, newText);
+        }
+
+        /*
+         * Will determine if the script is NetworkComponent or ScriptComponent
+         */
+        private string GetTypeOfScript(string fileText)
+        {
+            if(fileText.Contains(" : ScriptComponent"))
+                return " : ScriptComponent";
+            else if(fileText.Contains(" : NetworkComponent"))
+                return " : NetworkComponent";
+            else
+                return "";
         }
     }
 

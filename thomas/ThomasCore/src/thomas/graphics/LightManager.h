@@ -37,7 +37,8 @@ namespace thomas
 
 			struct LightStruct
 			{
-				thomas::math::Vector3  color;
+				thomas::math::Vector3  colorDiffuse;
+				thomas::math::Vector3  colorSpecular;
 				float   intensity;
 				thomas::math::Vector3  position;
 				float   spotOuterAngle;
@@ -48,7 +49,7 @@ namespace thomas
 				thomas::math::Vector3 right;
 				thomas::math::Vector3 up;
 				thomas::math::Vector2 rectangleDimensions;
-				float pad;
+				thomas::math::Vector2 pad;
 			};
 
 		public:
@@ -65,7 +66,7 @@ namespace thomas
 
 			static std::vector<object::component::LightComponent*> s_lights;
 
-			static std::shared_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
+			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
 
 			static LightCountsStruct s_lightCounts;
 		};

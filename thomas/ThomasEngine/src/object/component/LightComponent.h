@@ -34,12 +34,21 @@ namespace ThomasEngine
 			}
 		}
 
-		property Color color {
+		property Color DiffuseColor {
 			Color get() {
-				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColor());
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColorDiffuse());
 			}
 			void set(Color value) {
-				((thomas::object::component::LightComponent*)nativePtr)->SetColor(Utility::Convert(value));
+				((thomas::object::component::LightComponent*)nativePtr)->SetColorDiffuse(Utility::Convert(value));
+			}
+		}
+
+		property Color SpecularColor {
+			Color get() {
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColorSpecular());
+			}
+			void set(Color value) {
+				((thomas::object::component::LightComponent*)nativePtr)->SetColorSpecular(Utility::Convert(value));
 			}
 		}
 		property float Intensity {
