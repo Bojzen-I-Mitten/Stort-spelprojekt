@@ -97,7 +97,7 @@ namespace thomas
 				allLights.push_back(light->GetData());
 			}
 
-			s_lightBuffer->SetData(allLights);
+			m_lightBuffer->SetData(allLights);
 		}
 		void LightManager::Bind()
 		{
@@ -105,7 +105,7 @@ namespace thomas
 			resource::Shader::SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
 			resource::Shader::SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
 			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
-			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
+			resource::Shader::SetGlobalResource("lights", m_lightBuffer->GetSRV());
 		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{
