@@ -32,22 +32,25 @@ namespace thomas
 
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
 		{
+			object::component::Camera::CAMERA_FRAME_DATA& frameData = camera->GetFrameData();
 			//Get the current active window
-			int displayIndex = camera->GetTargetDisplayIndex();
-			auto window = Window::GetWindow(displayIndex);
+
+			auto window = Window::GetWindow(frameData.targetDisplay);
 
 			if (!window || !window->Initialized())
 				return;
 
 			window->Bind();
-			ThomasCore::GetDeviceContext()->RSSetViewports(1, camera->GetViewport().Get11());
+			ThomasCore::GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+
+			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
 			//Set global camera properties
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, camera->GetProjMatrix().Transpose());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW, camera->GetViewMatrix().Transpose());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, camera->GetViewMatrix().Invert());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, camera->GetViewProjMatrix().Transpose());
-			resource::Shader::SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, (math::Vector4)camera->GetPosition());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, frameData.projectionMatrix.Transpose());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW, frameData.viewMatrix.Transpose());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
+			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
+			resource::Shader::SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
 		}
 
 		void Renderer::ClearCommands()

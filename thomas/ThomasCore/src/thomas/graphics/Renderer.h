@@ -35,6 +35,7 @@ namespace thomas
 	{				
 		class Mesh;
 
+		
 		struct RenderCommand
 		{
 			object::component::Camera* camera;								// Camera rendered from

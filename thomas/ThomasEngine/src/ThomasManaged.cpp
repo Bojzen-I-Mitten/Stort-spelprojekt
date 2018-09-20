@@ -43,7 +43,6 @@ namespace ThomasEngine {
 			graphics::Renderer::S_RENDERER.ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
-			thomas::ThomasTime::Update();
 		}
 	}
 
@@ -52,6 +51,12 @@ namespace ThomasEngine {
 		thomas::Window::EndFrame(true);
 		graphics::Renderer::S_RENDERER.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
+
+		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
+		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
+		{
+			camera->CopyFrameData();
+		}
 	}
 
 	void ThomasWrapper::StartEngine()
@@ -64,7 +69,7 @@ namespace ThomasEngine {
 				Thread::Sleep(1000);
 				continue;
 			}
-
+			thomas::ThomasTime::Update();
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 
 			if (Window::WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
