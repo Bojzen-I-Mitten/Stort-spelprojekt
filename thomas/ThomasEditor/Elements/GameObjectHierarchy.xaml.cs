@@ -61,40 +61,44 @@ namespace ThomasEditor
 
         private void Transform_OnParentChanged(ThomasEngine.Transform child, ThomasEngine.Transform oldParent, ThomasEngine.Transform newParent)
         {
-            this.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                if (oldParent == newParent  || !child.gameObject)
-                    return;
+            if (oldParent == newParent || !child.gameObject)
+                return;
 
-                var newParentNode = newParent && newParent.gameObject ? FindNode(hierarchy.Items, newParent.gameObject) as ItemsControl : hierarchy as ItemsControl;
-                
-                var childNode = FindNode(hierarchy.Items, child.gameObject);
+            ResetTreeView();
+            //this.Dispatcher.BeginInvoke((Action)(() =>
+            //{
+            //    if (oldParent == newParent  || !child.gameObject)
+            //        return;
 
-                if (childNode != null)
-                {
-                    Thickness newPadding = childNode.Padding;
-                    if (childNode.Parent != null)
-                    {
-                        ItemsControl oldParentItems = childNode.Parent as ItemsControl;
-                        oldParentItems.Items.Remove(childNode);
-                        
+            //    var newParentNode = newParent && newParent.gameObject ? FindNode(hierarchy.Items, newParent.gameObject) as ItemsControl : hierarchy as ItemsControl;
 
-                    }
-                    if (newParentNode != null)
-                    {
-                        ItemsControl newParentItems = newParentNode as ItemsControl;
-                        newParentItems.Items.Add(childNode);
-                        if (newParentNode == hierarchy)
-                            newPadding.Left = 0;
-                        else
-                            newPadding.Left = newParentNode.Padding.Left + 2;
+            //    var childNode = FindNode(hierarchy.Items, child.gameObject);
 
-                    }
-                     childNode.Padding = newPadding;
-                   // childNode.Padding = new Thickness(0, 0, 0, 2);
-                }
+            //    if (childNode != null)
+            //    {
+            //        Thickness newPadding = childNode.Padding;
+            //        if (childNode.Parent != null)
+            //        {
+            //            ItemsControl oldParentItems = childNode.Parent as ItemsControl;
+            //            oldParentItems.Items.Remove(childNode);
 
-            }));
+
+            //        }
+            //        if (newParentNode != null)
+            //        {
+            //            ItemsControl newParentItems = newParentNode as ItemsControl;
+            //            newParentItems.Items.Add(childNode);
+            //            if (newParentNode == hierarchy)
+            //                newPadding.Left = 0;
+            //            else
+            //                newPadding.Left = newParentNode.Padding.Left + 2;
+
+            //        }
+            //         childNode.Padding = newPadding;
+            //       // childNode.Padding = new Thickness(0, 0, 0, 2);
+            //    }
+
+        //}));
         }
 
         private TreeViewItem FindNode(ItemCollection nodes, GameObject gameObject)
