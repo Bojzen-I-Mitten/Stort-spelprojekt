@@ -25,6 +25,8 @@ namespace ThomasEngine
 
 	void Scene::CurrentScene::set(Scene^ value)
 	{
+		if(value == nullptr)	// If clear scene
+			value = gcnew Scene("test");
 		ThomasWrapper::Selection->UnselectGameObjects();
 		s_currentScene = value;
 		if(Application::currentProject && savingEnabled)
@@ -79,6 +81,7 @@ namespace ThomasEngine
 			Debug::Log("Unable to find scene: " + fullPath);
 			return nullptr;
 		}
+		Scene^ scene;
 		try {
 			s_loading = true;
 
@@ -91,7 +94,7 @@ namespace ThomasEngine
 			serializserSettings->DataContractSurrogate = gcnew SceneSurrogate();
 			DataContractSerializer^ serializer = gcnew DataContractSerializer(Scene::typeid, serializserSettings);
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
-			Scene^ scene = (Scene^)serializer->ReadObject(file);
+			scene = (Scene^)serializer->ReadObject(file);
 
 			msclr::interop::marshal_context context;
 			for (int i = 0; i < scene->GameObjects->Count; ++i)
@@ -100,24 +103,21 @@ namespace ThomasEngine
 			file->Close();
 
 			scene->PostLoad();
-			s_loading = false;
-			if(Application::currentProject && savingEnabled)
+			if (Application::currentProject && savingEnabled)
 				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
 			return scene;
 		}
 		catch (Exception^ e) {
-			try {
-				LOG("Loading scene: ");
-				LOG(Utility::ConvertString(fullPath));
-				LOG("with error:")
-				LOG(Utility::ConvertString(e->Message));
-				return nullptr;
-			}
-			finally{
-
-			}
+			LOG("Loading scene: ");
+			LOG(Utility::ConvertString(fullPath));
+			LOG("with error:")
+			LOG(Utility::ConvertString(e->Message));
+			scene = nullptr;
 		}
-
+		finally{
+			s_loading = false;
+		}
+		return scene;
 	}
 
 	void Scene::RestartCurrentScene()

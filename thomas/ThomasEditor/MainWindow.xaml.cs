@@ -354,9 +354,18 @@ namespace ThomasEditor
             worker.DoWork += (o, ea) =>
             {
                 Scene newScene = Scene.LoadScene(path);
-                Scene.CurrentScene.UnLoad();
-                Scene.CurrentScene = newScene;
-                Scene.CurrentScene.PostLoad();
+                if (newScene != null)
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = newScene;
+                    Scene.CurrentScene.PostLoad();
+                }
+                else
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = null;
+                    Debug.Log("Scene failed to load...");
+                }
             };
             worker.RunWorkerCompleted += (o, ea) =>
             {
