@@ -463,6 +463,18 @@ namespace ThomasEngine.Network
             GUI.ImguiStringUpdate("Packetsloss = " + netManager.Statistics.PacketLossPercent, new Vector2(0, 10));
             GUI.ImguiStringUpdate("Total package sent = " + netManager.Statistics.PacketsSent, new Vector2(0, 20));
             GUI.ImguiStringUpdate("Total package recieved = " + netManager.Statistics.PacketsReceived, new Vector2(0, 30));
+            if (!isClient)
+                PingToAllClients();
+        }
+
+        public void PingToAllClients()
+        {
+            netManager.GetPeersNonAlloc(netPeers, ConnectionState.Connected);
+            for(int i = 0;i<netPeers.Count;i++)
+            {
+                GUI.ImguiStringUpdate("Ping to client " + netPeers[i].EndPoint.ToString() + "  " + netPeers[i].Ping,new Vector2(0,40+10*i));
+            }
+
         }
     }
 }
