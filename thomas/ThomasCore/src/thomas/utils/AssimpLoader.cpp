@@ -408,10 +408,13 @@ namespace thomas
 				}
 			}
 			else if (boneName.find("hips") != std::string::npos) {
-				aiMatrix4x4 mat;
-				aiVector3D scale(0.01f);
-				aiMatrix4x4::Scaling(scale, mat);
-				boneMap.m_skeletonRoot = convertAssimpMatrix(mat * parentTransform);
+				/*
+					aiMatrix4x4 mat;
+					aiVector3D scale(0.01f);
+					aiMatrix4x4::Scaling(scale, mat);
+					mat = mat * parentTransform;
+				*/
+				boneMap.m_skeletonRoot = convertAssimpMatrix(parentTransform);
 				ProcessSkeleton(node, boneMap, -1, parentTransform);
 			}
 			else {
