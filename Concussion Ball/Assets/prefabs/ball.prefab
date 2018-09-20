@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
+  <m_guid>28ad7710-97ec-48a7-876e-cbe293620c8b</m_guid>
+  <m_name z:Id="2">ball</m_name>
+  <Components z:Size="5">
+    <Component z:Id="3" i:type="Transform">
+      <m_guid>40ade4fa-9c83-4f87-9440-ee05ab8f80c1</m_guid>
+      <m_name i:nil="true" />
+      <children z:Size="0" />
+      <eulerAngles>
+        <x>0.01754</x>
+        <y>-0</y>
+        <z>0.02759</z>
+      </eulerAngles>
+      <localEulerAngles>
+        <x>0.01754</x>
+        <y>-0</y>
+        <z>0.02759</z>
+      </localEulerAngles>
+      <localPosition>
+        <x>-0.000240781577</x>
+        <y>0.5999999</y>
+        <z>0.000307830662</z>
+      </localPosition>
+      <localScale>
+        <x>0.9999998</x>
+        <y>1.00000012</y>
+        <z>1</z>
+      </localScale>
+      <parent i:nil="true" />
+      <position>
+        <x>-0.000240781577</x>
+        <y>0.5999999</y>
+        <z>0.000307830662</z>
+      </position>
+      <rotation>
+        <w>1</w>
+        <x>0.000153073939</x>
+        <y>-2.58836885E-09</y>
+        <z>0.000240789275</z>
+      </rotation>
+      <scale>
+        <x>0.9999998</x>
+        <y>1.00000012</y>
+        <z>1</z>
+      </scale>
+    </Component>
+    <Component z:Id="4" i:type="RenderComponent">
+      <m_guid>804b0f81-e49b-433f-9cbd-4cde24490354</m_guid>
+      <m_name i:nil="true" />
+      <material z:Id="5">
+        <path z:Id="6"></path>
+      </material>
+      <model z:Id="7">
+        <path z:Id="8">../Data/primitives/sphere.obj</path>
+      </model>
+    </Component>
+    <Component z:Id="9" i:type="SphereCollider">
+      <m_guid>48b9d6d2-de11-45f3-870a-c7c253c715df</m_guid>
+      <m_name i:nil="true" />
+      <attachedRigidbody z:Id="10">
+        <m_guid>021155aa-0d99-4617-bbca-798b58207bf5</m_guid>
+        <m_name i:nil="true" />
+        <IsKinematic>false</IsKinematic>
+        <Mass>1</Mass>
+      </attachedRigidbody>
+      <isTrigger>false</isTrigger>
+      <center>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </center>
+      <radius>0.5</radius>
+    </Component>
+    <Component z:Ref="10" i:nil="true" />
+    <Component z:Id="11" xmlns:d3p1="http://schemas.datacontract.org/2004/07/" i:type="d3p1:Ball">
+      <m_guid>a824c550-2766-4477-ac6c-0723df81611c</m_guid>
+      <m_name i:nil="true" />
+    </Component>
+  </Components>
+  <activeSelf>true</activeSelf>
+  <transform z:Ref="3" i:nil="true" />
+</GameObject>

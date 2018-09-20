@@ -8,3 +8,4 @@
 #include "ParticleEmitterComponent.h"
 #include "physics/Rigidbody.h"
 #include "physics/BoxCollider.h"
+#include "RenderSkinnedComponent.h"

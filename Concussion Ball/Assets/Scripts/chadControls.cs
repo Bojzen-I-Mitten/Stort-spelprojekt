@@ -9,10 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
+using ThomasEngine.Network;
 
 namespace ThomasEditor
 {
-    public class ChadControls : ScriptComponent
+    public class ChadControls : NetworkComponent
     {
         public int speed { get; set; } = 5;
         public float force { get; set; } = 5;
@@ -20,7 +21,7 @@ namespace ThomasEditor
 
         Rigidbody rBody;
         public GameObject camPrefab { get; set; }
-        Camera test;
+        //Camera test;
 
         bool jumpDelay = true;
         bool movingForward = false;
@@ -31,7 +32,7 @@ namespace ThomasEditor
         public override void Start()
         {
             rBody = gameObject.GetComponent<Rigidbody>();
-            test = camPrefab.GetComponent<Camera>();
+            //test = camPrefab.GetComponent<Camera>();
         }
 
         //Coroutine for jumping delay, also used for tackling delay
@@ -46,7 +47,7 @@ namespace ThomasEditor
             {
                 transform.Rotate(0.0f, 0.5f, 0.0f);
                 tackling = false;
-                test.fieldOfView = 70;
+                //test.fieldOfView = 70;
             }
             yield return new WaitForSeconds(0.2f);
             jumpDelay = true;
@@ -75,7 +76,7 @@ namespace ThomasEditor
                 tackling = true;
                 StartCoroutine(JumpingCoroutine());
                 transform.Rotate(0.0f, -0.5f, 0.0f);
-                test.fieldOfView = 100;
+                //test.fieldOfView = 100;
             }
 
             //TESTING KEY

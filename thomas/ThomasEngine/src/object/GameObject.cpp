@@ -5,7 +5,7 @@
 #include "component\physics\BoxCollider.h"
 #include "component\physics\SphereCollider.h"
 #include "..\Debug.h"
-
+#include "../Utility.h"
 namespace ThomasEngine {
 
 	void GameObject::Destroy()
@@ -13,7 +13,7 @@ namespace ThomasEngine {
 		if (m_isDestroyed)
 			return;
 		m_isDestroyed = true;
-		Monitor::Enter(this->scene->CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++) {
 			m_components[i]->Destroy();
@@ -23,8 +23,8 @@ namespace ThomasEngine {
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
 		ThomasWrapper::Selection->UnSelectGameObject(this);
-		this->scene->GameObjects->Remove(this);
-		Monitor::Exit(this->scene->CurrentScene->GetGameObjectsLock());
+		Scene::CurrentScene->GameObjects->Remove(this);
+		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
@@ -40,12 +40,22 @@ namespace ThomasEngine {
 			Debug::Log("Object to instantiate is null");
 			return nullptr;
 		}
-		System::IO::Stream^ serialized = SerializeGameObject(original);
-
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		GameObject^ clone = DeSerializeGameObject(serialized);
-		if(clone)
+		GameObject^ clone;
+		if (original->prefabPath != nullptr) {
+			clone = Resources::LoadPrefab(original->prefabPath, true);
+		}
+		else
+		{
+			System::IO::Stream^ serialized = SerializeGameObject(original);
+			clone = DeSerializeGameObject(serialized);
+		}
+		
+		if (clone) {
 			clone->PostInstantiate(Scene::CurrentScene);
+			clone->prefabPath = nullptr;
+		}
+			
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
@@ -133,7 +143,8 @@ namespace ThomasEngine {
 			return gObj;
 		}
 		catch (Exception^ e) {
-			Debug::Log("Failed to load gameObject");
+			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
+			LOG(msg);
 			return nullptr;
 		}
 		

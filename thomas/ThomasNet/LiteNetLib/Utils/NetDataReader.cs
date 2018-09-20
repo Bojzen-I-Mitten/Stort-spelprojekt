@@ -318,27 +318,20 @@ namespace LiteNetLib.Utils
 
         public ThomasEngine.Vector3 GetVector3()
         {
-            ThomasEngine.Vector3 result = new ThomasEngine.Vector3(); //TODO: cleanup
-            result.x = BitConverter.ToSingle(_data, _position);
-            _position += 4;
-            result.y = BitConverter.ToSingle(_data, _position);
-            _position += 4;
-            result.z = BitConverter.ToSingle(_data, _position);
-            _position += 4;
+            ThomasEngine.Vector3 result = new ThomasEngine.Vector3();
+            result.x = GetFloat();
+            result.y = GetFloat();
+            result.z = GetFloat();
             return result;
         }
 
         public ThomasEngine.Quaternion GetQuaternion()
         {
-            ThomasEngine.Quaternion result = new ThomasEngine.Quaternion(); //TODO: cleanup
-            result.x = BitConverter.ToSingle(_data, _position);
-            _position += 4;
-            result.y = BitConverter.ToSingle(_data, _position);
-            _position += 4;
-            result.z = BitConverter.ToSingle(_data, _position);
-            _position += 4;
-            result.w = BitConverter.ToSingle(_data, _position);
-            _position += 4;
+            ThomasEngine.Quaternion result = new ThomasEngine.Quaternion();
+            result.x = GetFloat();
+            result.y = GetFloat();
+            result.z = GetFloat();
+            result.w = GetFloat();
             return result;
         }
 

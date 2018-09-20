@@ -37,6 +37,8 @@ namespace ThomasEngine
 		virtual void OnPlay() {};
 		virtual void OnStop() {};
 
+		/* Update file path of the resource
+		*/
 		void Rename(String^ newPath) {
 			m_path = newPath;
 			m_nativePtr->Rename(Utility::ConvertString(newPath));
