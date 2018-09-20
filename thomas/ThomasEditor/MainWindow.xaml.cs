@@ -29,7 +29,6 @@ namespace ThomasEditor
         Guid g;
         public MainWindow()
         {
-            
             string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
@@ -530,6 +529,11 @@ namespace ThomasEditor
         private void SaveLayout_Click(object sender, RoutedEventArgs e)
         {
             SaveLayout();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 

@@ -116,6 +116,10 @@ namespace ThomasEngine {
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{
+				if (ThomasEngine::Application::currentProject == nullptr)
+				{
+
+				}
 
 				editor::EditorCamera::Render();
 				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
