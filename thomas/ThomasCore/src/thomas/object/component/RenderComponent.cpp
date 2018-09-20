@@ -6,6 +6,7 @@
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/ShaderProperty/ShaderProperty.h"
+#include "../../System.h"
 
 namespace thomas {
 	namespace object {
@@ -131,7 +132,7 @@ namespace thomas {
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
 				assert(verifyPropertyList(m_properties.data(), m_properties.size()));
-				graphics::Renderer::S_RENDERER.SubmitCommand(
+				System::S_RENDERER.SubmitCommand(
 					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
 			}
 

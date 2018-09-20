@@ -65,7 +65,6 @@ namespace thomas
 
 		public:
 
-			static Renderer S_RENDERER;
 
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();

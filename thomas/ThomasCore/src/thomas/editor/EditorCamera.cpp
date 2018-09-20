@@ -7,6 +7,7 @@
 #include "..\resource\Material.h"
 #include "..\graphics\Renderer.h"
 #include "..\resource\Model.h"
+#include "..\System.h"
 
 namespace thomas
 {
@@ -229,7 +230,7 @@ namespace thomas
 					if (model)
 					{
 						for (auto mesh : model->GetMeshes())
-							graphics::Renderer::S_RENDERER.SubmitCommand(graphics::RenderCommand(gameObject->m_transform->GetWorldMatrix(), mesh.get(), m_objectHighlighter.get(), m_cameraComponent.get()));
+							System::S_RENDERER.SubmitCommand(graphics::RenderCommand(gameObject->m_transform->GetWorldMatrix(), mesh.get(), m_objectHighlighter.get(), m_cameraComponent.get()));
 					}
 				}
 			}
