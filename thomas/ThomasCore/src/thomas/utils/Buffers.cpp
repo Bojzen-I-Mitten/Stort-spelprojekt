@@ -17,15 +17,12 @@ namespace thomas
 				bufferDesc.MiscFlags = miscFlag;
 				bufferDesc.StructureByteStride = structureByteStride;
 				
-					
-
 				D3D11_SUBRESOURCE_DATA InitData;
 				InitData.pSysMem = data;
 				InitData.SysMemPitch = 0;
 				InitData.SysMemSlicePitch = 0;
 
 				HRESULT result;
-
 				if (data == nullptr)
 					result = ThomasCore::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
 				else
@@ -36,12 +33,9 @@ namespace thomas
 			}
 			Buffer::~Buffer()
 			{
-				Release();
-			}
-			void Buffer::Release()
-			{
 				SAFE_RELEASE(m_buffer);
 			}
+
 			void Buffer::SetData(void * data, size_t size)
 			{
 				if (size == 0) return;
@@ -74,8 +68,6 @@ namespace thomas
 			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
 			{
 			}
-			
-			
 			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
 				D3D11_SHADER_RESOURCE_VIEW_DESC desc;
@@ -88,7 +80,11 @@ namespace thomas
 				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 				
 				ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
-				
+			}
+
+			StructuredBuffer::~StructuredBuffer()
+			{
+				SAFE_RELEASE(m_resource);
 			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()

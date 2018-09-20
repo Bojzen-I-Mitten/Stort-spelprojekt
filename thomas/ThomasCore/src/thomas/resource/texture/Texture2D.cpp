@@ -1,5 +1,5 @@
 #include "Texture2D.h"
-#include "../../utils/d3d.h"
+#include "../../utils/D3D.h"
 namespace thomas
 {
 	namespace resource
@@ -20,20 +20,18 @@ namespace thomas
 		}
 		void Texture2D::Destroy()
 		{
-			delete s_blackTexture;
-			delete s_whiteTexture;
+			SAFE_DELETE(s_whiteTexture);
+			SAFE_DELETE(s_blackTexture);
 		}
 
 		void Texture2D::LoadTextureFromFile(std::string path)
 		{
-			if (utils::D3d::LoadTextureFromFile(path, m_resource, m_srv))
+			if (utils::D3D::LoadTextureFromFile(path, m_resource, m_srv))
 			{
-				ID3D11Texture2D *textureInterface;
-
+				ID3D11Texture2D* textureInterface = nullptr;
 				m_resource->QueryInterface<ID3D11Texture2D>(&textureInterface);
 
 				D3D11_TEXTURE2D_DESC desc;
-
 				textureInterface->GetDesc(&desc);
 				m_mipmapCount = desc.MipLevels;
 				m_width = desc.Width;
@@ -58,8 +56,9 @@ namespace thomas
 			m_mipMap = mipMap;
 			m_linear = linear;
 
-			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3d::CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+			ID3D11Texture2D* textureInterface = nullptr;
+			utils::D3D::CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 		}
@@ -67,6 +66,11 @@ namespace thomas
 		Texture2D::Texture2D(std::string path) : Texture(path)
 		{
 			LoadTextureFromFile(path);
+		}
+
+		Texture2D::~Texture2D()
+		{
+			SAFE_DELETE(data);
 		}
 
 		void Texture2D::OnChanged()

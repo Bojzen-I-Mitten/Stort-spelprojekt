@@ -52,6 +52,9 @@ namespace thomas
 			};
 
 		public:
+			LightManager() = default;
+			~LightManager() = default;
+
 			static void Initialize();
 			static void Destroy();
 			static void AddLight(object::component::LightComponent* light);
@@ -65,7 +68,7 @@ namespace thomas
 
 			static std::vector<object::component::LightComponent*> s_lights;
 
-			static std::shared_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
+			static std::unique_ptr<utils::buffers::StructuredBuffer> m_lightBuffer;
 
 			static LightCountsStruct s_lightCounts;
 		};

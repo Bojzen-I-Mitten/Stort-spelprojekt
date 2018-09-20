@@ -9,16 +9,14 @@ namespace thomas
 {
 	namespace graphics
 	{
-	
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
-		std::shared_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
+		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::m_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
 
-
 		void LightManager::Initialize()
 		{
-			s_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
 
 			s_lightCounts.nrOfDirectionalLights = 0;
 			s_lightCounts.nrOfSpotLights = 0;
@@ -28,8 +26,9 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
-			SAFE_RELEASE(s_lightBuffer);
+			m_lightBuffer.reset();
 		}
+
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
 			switch (light->GetType())
@@ -98,7 +97,7 @@ namespace thomas
 				allLights.push_back(light->GetData());
 			}
 
-			s_lightBuffer->SetData(allLights);
+			m_lightBuffer->SetData(allLights);
 		}
 		void LightManager::Bind()
 		{
@@ -106,7 +105,7 @@ namespace thomas
 			resource::Shader::SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
 			resource::Shader::SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
 			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
-			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
+			resource::Shader::SetGlobalResource("lights", m_lightBuffer->GetSRV());
 		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{

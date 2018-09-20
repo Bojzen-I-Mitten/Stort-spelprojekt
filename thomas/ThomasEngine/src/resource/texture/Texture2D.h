@@ -16,6 +16,11 @@ namespace ThomasEngine
 		Texture2D(int width, int height, bool mipMap, bool linear) : Texture("", new thomas::resource::Texture2D(width, height, mipMap, linear)) {};
 		Texture2D(thomas::resource::Texture2D* nativePtr) : Texture(Utility::ConvertString(nativePtr->GetPath()), nativePtr) {};
 	public:
+		~Texture2D()
+		{
+			if (m_nativePtr)
+				delete m_nativePtr;
+		};
 
 		static property Texture2D^ blackTexture
 		{
