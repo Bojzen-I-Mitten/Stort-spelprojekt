@@ -34,71 +34,74 @@ namespace ThomasEngine
 			s_lastObject = this;
 			m_name = "gameobject";
 
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 		}
+
+
+		bool InitComponents(bool playing)
+		{
+			Monitor::Enter(m_componentsLock);
+			bool completed = true;
+			for each(Component^ component in m_components)
+			{
+				Type^ typ = component->GetType();
+				if ((playing || typ->IsDefined(ExecuteInEditor::typeid, false)) && !component->initialized) {
+					completed = false;
+					component->Initialize();
+				}
+			}
+			Monitor::Exit(m_componentsLock);
+			return completed;
+		}
+
 
 	internal:
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
-		void PostLoad()
+		static void SerializeGameObject(String^ path, GameObject^ gObj);
+		void SyncComponents() {
+			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+		}
+		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
+		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
+
+		void PostLoad(Scene^ scene)
 		{
-			scene = Scene::CurrentScene;
+			this->scene = scene;
 			m_transform = GetComponent<Transform^>();
 			
-			List<Component^>^ editorComponents = gcnew List<Component^>;
-			for (int i = 0; i < m_components.Count; i++)
-			{
-				Component^ component = m_components[i];
+		}
 
-				Type^ typ = component->GetType();
-				if (typ->IsDefined(ExecuteInEditor::typeid, false) && component->enabled && !component->initialized) {
-					editorComponents->Add(component);
+		void PostInstantiate(Scene^ scene) {
+			PostLoad(scene);
+			scene->GameObjects->Add(this);
+			for (int i = 0; i < m_transform->children->Count; i++) {
+				m_transform->children[i]->gameObject->PostInstantiate(scene);
+			}
+		}
+
+
+		static void InitGameObjects(bool playing) {
+			bool completed;
+			do {
+				completed = true;
+				for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects) {
+					completed = gameObject->InitComponents(playing) && completed;
 				}
-			}
-			
-			initComponents(editorComponents);	
+			} while (!completed);
 		}
 
-		void initComponents(List<Component^>^ components)
-		{
-			for each(Component^ component in components)
-			{
-				component->Awake();
-				component->initialized = true;
-			}
-
-			for each(Component^ component in components)
-			{
-				component->OnEnable();
-			}
-
-			for each(Component^ component in components)
-			{
-				component->Start();
-			}
-		}
 		
+				
 		void Update()
 		{
 			Monitor::Enter(m_componentsLock);
-			if (Scene::CurrentScene->IsPlaying())
-			{
-				List<Component^>^ uninitializedComponents = gcnew List<Component^>;
-				for each(Component^ component in m_components)
-				{
-					if (!component->initialized)
-						uninitializedComponents->Add(component);
-
-				}
-				initComponents(uninitializedComponents);
-			}
-
 
 			for (int i = 0; i < m_components.Count; i++)
 			{
 				Component^ component = m_components[i];
-				if (component->initialized && component->enabled)
+				if (component->enabled)
 					component->Update();
 			}
 			Monitor::Exit(m_componentsLock);
@@ -136,6 +139,7 @@ namespace ThomasEngine
 			Monitor::Exit(m_componentsLock);
 		}
 
+		
 	public:
 		static GameObject^ s_lastObject;
 
@@ -150,9 +154,24 @@ namespace ThomasEngine
 
 			Scene::CurrentScene->GameObjects->Add(this);
 			scene = Scene::CurrentScene;
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 			
 			Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		}
+		
+		static GameObject^ CreatePrefab() {
+			GameObject^ newGobj = gcnew GameObject();
+			s_lastObject = nullptr;
+			Transform^ t = newGobj->AddComponent<Transform^>();
+			((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
+			return newGobj;
+		}
+
+
+		property bool inScene {
+			bool get() {
+				return scene != nullptr;
+			}
 		}
 
 		virtual void Destroy() override;
@@ -167,6 +186,11 @@ namespace ThomasEngine
 			void set(bool value)
 			{
 				((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+				for (int i = 0; i < m_components.Count; i++)
+				{
+					Component^ component = m_components[i];
+					component->enabled = value;
+				}
 			}
 		}	
 
@@ -220,14 +244,6 @@ namespace ThomasEngine
 			((Component^)component)->setGameObject(this);
 			m_components.Add((Component^)component);
 			
-			if ((typ->IsDefined(ExecuteInEditor::typeid, false) || scene->IsPlaying()) && !component->initialized && component->enabled)
-			{
-				component->Awake();
-				component->initialized = true;
-				component->OnEnable();
-				component->Start();
-			}
-
 			Monitor::Exit(m_componentsLock);
 			return component;
 		}
@@ -236,9 +252,8 @@ namespace ThomasEngine
 		where T : Component
 		T GetComponent()
 		{
-
-			List<T> tComponents = Enumerable::OfType<T>(%m_components);
-			if (tComponents.Count > 0)
+			List<T>^ tComponents = gcnew List<T>(Enumerable::OfType<T>(%m_components));
+			if (tComponents->Count > 0)
 				return tComponents[0];
 			else
 				return T();
@@ -270,6 +285,23 @@ namespace ThomasEngine
 		//}
 		//
 
+		static List<GameObject^>^ GetAllGameObjects(bool includePrefabs) {
+			List<GameObject^>^ gObjs = Object::GetObjectsOfType<GameObject^>();
+			if (includePrefabs)
+				return gObjs;
+			else
+			{
+				for (int i = 0; i < gObjs->Count; i++) {
+					if (!gObjs[i]->inScene) {
+						gObjs->RemoveAt(i);
+						i--;
+					}
+						
+				}
+				return gObjs;
+			}
+		}
+
 		static GameObject^ Find(String^ name) 
 		{
 			for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
@@ -290,6 +322,13 @@ namespace ThomasEngine
 		void SetActive(bool active)
 		{
 			((thomas::object::GameObject*)nativePtr)->SetActive(active);
+			activeSelf = active;
+
 		}
+
+		static GameObject^ Instantiate(GameObject^ original);
+		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
+		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
 	};
 }

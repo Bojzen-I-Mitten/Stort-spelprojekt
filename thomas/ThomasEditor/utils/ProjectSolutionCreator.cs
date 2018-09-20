@@ -1,17 +1,85 @@
 ﻿using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
+using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using ThomasEngine;
 namespace ThomasEditor.utils
 {
 
     class ScriptAssemblyManager
     {
-       public static string assemblyPath = "";
-                
-        [STAThread]
+        public static string assemblyPath = "";
+        public static string projectPath = "";
+        private static Microsoft.Build.Evaluation.Project projectEval;
+        public static FileSystemWatcher fsw;
+        private static bool building = false;
+        private static ILogger logger = new ThomasBuildLogger();
+        public static void SetWatcher(string path)
+        {
+            if(fsw != null)
+                fsw.EnableRaisingEvents = false;
+            fsw = new FileSystemWatcher();
+            fsw.Changed += Fsw_Changed;
+            fsw.Renamed += Fsw_Renamed;
+            fsw.Path = path;
+            fsw.IncludeSubdirectories = true;
+            fsw.Filter = "*.cs";
+            fsw.EnableRaisingEvents = true;
+        }
+
+        private static void Fsw_Renamed(object sender, RenamedEventArgs e)
+        {
+            if (Path.GetExtension(e.Name) != ".cs" || Path.GetExtension(e.OldName) != ".cs")
+            {
+                if(Path.GetExtension(e.Name) == ".cs")
+                {
+                    FileChanged();
+                }
+                return;
+            }
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                var includePath = e.OldFullPath.Substring(projectEval.DirectoryPath.Length + 1);
+                var projectItem = projectEval.GetItems("Compile").FirstOrDefault(item => item.EvaluatedInclude.Equals(includePath));
+                if (projectItem != null)
+                {
+                    var newIncludePath = e.FullPath.Substring(projectEval.DirectoryPath.Length + 1);
+                    projectItem.Rename(newIncludePath);
+                    projectEval.Save();
+                }
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+        }
+
+        private static void FileChanged()
+        {
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                BuildSolution();
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+        }
+
+        private static void Fsw_Changed(object sender, FileSystemEventArgs e)
+        {
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                fsw.EnableRaisingEvents = false;
+                BuildSolution();
+                fsw.EnableRaisingEvents = true;
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+            
+        }
+
         public static bool CreateSolution(string path, string name)
         {
             Type type = Type.GetTypeFromProgID("VisualStudio.DTE");
@@ -28,7 +96,9 @@ namespace ThomasEditor.utils
                 //create a new solution
                 dte.Solution.Create(path, name + ".sln");
                 var solution = dte.Solution;
-                EnvDTE.Project project = solution.AddFromFile(path + "\\" + name + ".csproj");
+                projectPath = path + "\\" + name + ".csproj";
+                EnvDTE.Project project = solution.AddFromFile(projectPath);
+                
 
                 // create a C# class library
                 System.IO.Directory.CreateDirectory(path + "\\Assets");
@@ -41,6 +111,8 @@ namespace ThomasEditor.utils
                 dte.ExecuteCommand("File.SaveAll");
                 dte.Quit();
                 MessageFilter.Revoke();
+
+                projectEval = new Microsoft.Build.Evaluation.Project(projectPath, null, null, new ProjectCollection());
                 return true;
 
             }
@@ -55,71 +127,131 @@ namespace ThomasEditor.utils
         public static bool OpenSolution(string path)
         {
             assemblyPath = path;
+            projectPath = path.Replace(".sln", ".csproj");
+            projectEval = new Microsoft.Build.Evaluation.Project(projectPath, null, null, new ProjectCollection());
             return BuildSolution();
         }
 
         public static bool BuildSolution()
         {
-
-            var properties = new Dictionary<string, string>();
-            properties["Configuration"] = "Debug";
-            properties["Platform"] = "Any CPU";
-            var request = new BuildRequestData(assemblyPath, properties, null, new string[] { "Build" }, null);
-            ProjectCollection pc = new ProjectCollection();
-            BuildParameters bp = new BuildParameters(pc);
-            var result = BuildManager.DefaultBuildManager.Build(bp, request);
-            if (result.OverallResult == BuildResultCode.Success)
-                return true;
-            else
+            try
             {
-                Debug.Log("Failed to build project assembly.... :(");
+                if (building)
+                    return true;
+                building = true;
+                MainWindow._instance.showBusyIndicator("Compiling scripts...");
+                BuildResult result = null;
+
+#if DEBUG
+                string configuration = "Debug";
+#else
+                string configuration = "Release";
+#endif
+
+                using (var pc = new ProjectCollection())
+                    result = BuildManager.DefaultBuildManager.Build(
+                        new BuildParameters(pc) { Loggers = new[] { new ThomasBuildLogger() } },
+                        // Change this path to your .sln file instead of the .csproj.
+                        // (It won't work with the .csproj.)
+                        new BuildRequestData(assemblyPath,
+                            // Change the parameters as you need them,
+                            // e.g. if you want to just Build the Debug (not Rebuild the Release).
+                            new Dictionary<string, string>
+                            {
+                { "Configuration", configuration },
+                { "Platform", "Any CPU" }
+                            }, null, new[] { "Build" }, null));
+
+                if (result.OverallResult == BuildResultCode.Success)
+                {
+                    Debug.Log("Build succeded");
+                }
+                ScriptingManger.ForceReload();
+                MainWindow._instance.hideBusyIndicator();
+                building = false;
+                return true;
+            }catch(Exception e)
+            {
+                Debug.Log("Something went wrong building scripts. Try to close project solution.");
+                MainWindow._instance.hideBusyIndicator();
                 return true;
             }
-            //Type type = Type.GetTypeFromProgID("VisualStudio.DTE");
-            //object obj = Activator.CreateInstance(type, true);
-            //EnvDTE.DTE dte = (EnvDTE.DTE)obj;
-            //MessageFilter.Register();
-            //try
-            //{
-            //    dte.MainWindow.Visible = false; // optional if you want to See VS doing its thing
-            //    dte.Solution.Open(assemblyPath);
-            //    var solution = dte.Solution;
-            //    solution.SolutionBuild.Build(true);
-            //    dte.Quit();
-            //    MessageFilter.Revoke();
-            //    return true;
-            //}catch(Exception e)
-            //{
-            //    Debug.Log("Failed to open/build project: " + e.Message);
-            //    dte.Quit();
-            //    MessageFilter.Revoke();
-            //    return false;
-            //}
+           
         }
 
         public static void AddScript(string script)
         {
-            Type type = Type.GetTypeFromProgID("VisualStudio.DTE");
-            object obj = Activator.CreateInstance(type, true);
-            EnvDTE.DTE dte = (EnvDTE.DTE)obj;
-            MessageFilter.Register();
-            try
+            Thread worker = new Thread(new ThreadStart(() =>
             {
-                dte.MainWindow.Visible = false; // optional if you want to See VS doing its thing
-                dte.Solution.Open(assemblyPath);
-                var solution = dte.Solution;
-                solution.Projects.Item(1).ProjectItems.AddFromFile(script);
-                dte.ExecuteCommand("File.SaveAll");
-                solution.SolutionBuild.Build(true);
-            }catch(Exception e)
-            {
-                Debug.Log("Failed to add file to solution: " + e.Message);
-            }
-
-            dte.Quit();
-            MessageFilter.Revoke();
+                var includePath = script.Substring(projectEval.DirectoryPath.Length + 1);
+                var projectItem = projectEval.GetItems("Compile").FirstOrDefault(item => item.EvaluatedInclude.Equals(includePath));
+                if(projectItem == null)
+                {
+                    projectEval.AddItem("Compile", includePath);
+                    projectEval.Save();
+                }
+                
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
         }
 
+        public static void RemoveScript(string script)
+        {
+            Thread worker = new Thread(new ThreadStart(() =>
+            {   try
+                {
+
+                    var includePath = script.Substring(projectEval.DirectoryPath.Length + 1);
+                    var projectItem = projectEval.GetItems("Compile").FirstOrDefault(item => item.EvaluatedInclude.Equals(includePath));
+                    projectEval.RemoveItem(projectItem);
+                    projectEval.Save();
+                }catch(Exception e)
+                {
+
+                }
+                
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+        }
+
+    }
+
+    public class ThomasBuildLogger : Microsoft.Build.Framework.ILogger
+    {
+        public LoggerVerbosity Verbosity { get => LoggerVerbosity.Normal; set => throw new NotImplementedException(); }
+        public string Parameters { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public void Initialize(IEventSource eventSource)
+        {
+            eventSource.ErrorRaised += EventSource_ErrorRaised;
+            eventSource.WarningRaised += EventSource_WarningRaised;
+            eventSource.BuildFinished += EventSource_BuildFinished;
+        }
+
+        private void EventSource_BuildFinished(object sender, BuildFinishedEventArgs e)
+        {
+            //Debug.Log("Build succeded");
+        }
+
+        private void EventSource_WarningRaised(object sender, BuildWarningEventArgs e)
+        {
+            //string line = String.Format("Warning {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
+            //Debug.Log(line);
+        }
+
+        private void EventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
+        {
+            string line = String.Format("ERROR {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
+            Debug.Log(line);
+        }
+
+
+
+        public void Shutdown()
+        {
+        }
     }
 
     public class MessageFilter : IOleMessageFilter

@@ -67,6 +67,27 @@ namespace ThomasEditor
                         }
 
                     }
+                    else if(item.DataContext is ThomasEngine.Object)
+                    {
+                        ThomasEngine.Object obj = item.DataContext as ThomasEngine.Object;
+                        ContentControl label = sender as ContentControl;
+                        PropertyItem pi = label.DataContext as PropertyItem;
+                        if (obj.GetType() == pi.PropertyType)
+                        {
+                            Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
+                            pi.Value = obj;
+
+                            Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+                        }else if(obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
+                        {
+                            var method = typeof(GameObject).GetMethod("GetComponent").MakeGenericMethod(pi.PropertyType);
+                            var component = method.Invoke(obj, null);
+                            if(component != null && component.GetType() == pi.PropertyType)
+                            {
+                                pi.Value = component;
+                            }
+                        }
+                    }
                 }
             }
 
