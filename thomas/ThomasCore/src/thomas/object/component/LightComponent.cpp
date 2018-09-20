@@ -18,7 +18,8 @@ namespace thomas
 				m_type = graphics::LightManager::DIRECTIONAL;
 
 				m_lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
-				m_lightComponentData.color = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.colorDiffuse = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.colorSpecular = math::Vector3(1.0f, 1.0f, 1.0f);
 				m_lightComponentData.position = math::Vector3(1.0f, 1.0f, 1.0f);
 				m_lightComponentData.direction = math::Vector3(0.0f, 0.0f, -1.0f);
 				m_lightComponentData.right = math::Vector3(1.0f, 0.0f, 0.0f);
@@ -72,14 +73,24 @@ namespace thomas
 					m_type = other;
 			}
 
-			thomas::math::Color LightComponent::GetColor()
+			thomas::math::Color LightComponent::GetColorDiffuse()
 			{
-				return thomas::math::Color(m_lightComponentData.color.x, m_lightComponentData.color.y, m_lightComponentData.color.z, 1.0f);
+				return thomas::math::Color(m_lightComponentData.colorDiffuse.x, m_lightComponentData.colorDiffuse.y, m_lightComponentData.colorDiffuse.z, 1.0f);
 			}
 
-			void LightComponent::SetColor(thomas::math::Color other)
+			void LightComponent::SetColorDiffuse(thomas::math::Color other)
 			{
-				m_lightComponentData.color = other.ToVector3();
+				m_lightComponentData.colorDiffuse = other.ToVector3();
+			}
+
+			thomas::math::Color LightComponent::GetColorSpecular()
+			{
+				return thomas::math::Color(m_lightComponentData.colorSpecular.x, m_lightComponentData.colorSpecular.y, m_lightComponentData.colorSpecular.z, 1.0f);
+			}
+
+			void LightComponent::SetColorSpecular(thomas::math::Color other)
+			{
+				m_lightComponentData.colorSpecular = other.ToVector3();
 			}
 
 			float LightComponent::GetIntensity() const
