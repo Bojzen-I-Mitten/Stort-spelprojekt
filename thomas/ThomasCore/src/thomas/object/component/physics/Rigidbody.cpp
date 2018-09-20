@@ -11,14 +11,18 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : btRigidBody(1, NULL, NULL), m_targetCollider(nullptr)
+			Rigidbody::Rigidbody() : 
+			btRigidBody(1, NULL, NULL), 
+			m_targetCollider(nullptr), m_hasGravity(true), 
+			m_kinematic(false), 
+			m_mass(1.f),
+			m_freezePosition(1.f),
+			m_freezeRotation(1.f)
 			{
 				this->setUserPointer(this);
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);
-				m_kinematic = false;
-				m_mass = 1;
 			}
 			
 			Rigidbody::~Rigidbody()
@@ -75,6 +79,32 @@ namespace thomas
 				}			
 			}
 
+			void Rigidbody::SetFreezePosition(const math::Vector3 & freezePosition)
+			{
+				m_freezePosition = freezePosition;
+				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
+			}
+
+			void Rigidbody::SetFreezeRotation(const math::Vector3 & freezeRotation)
+			{
+				m_freezeRotation = freezeRotation;
+				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));
+			}
+
+			void Rigidbody::SetGravity(bool gravity)
+			{
+				if (gravity != m_hasGravity)
+				{
+					m_hasGravity = gravity;
+					if (initialized)
+					{
+						Physics::RemoveRigidBody(this);
+						return m_hasGravity == true ? this->setGravity(Physics::s_world->getGravity()) : this->setGravity(btVector3(0, 0, 0));
+						Physics::AddRigidBody(this);
+					}
+				}
+			}
+
 			void Rigidbody::SetKinematic(bool kinematic)
 			{	
 				if (kinematic != m_kinematic)
@@ -121,14 +151,28 @@ namespace thomas
 					*m_targetCollider = *collider;
 			}
 
-			void Rigidbody::ApplyCentralForce(const math::Vector3 & force)
+			void Rigidbody::AddTorque(const math::Vector3 & torque, ForceMode mode)
 			{
-				this->applyCentralForce(Physics::ToBullet(force));
+				if (mode == ForceMode::Force)
+					this->applyTorque(Physics::ToBullet(torque));
+				else if (mode == ForceMode::Impulse)
+					this->applyTorqueImpulse(Physics::ToBullet(torque));
 			}
 
-			void Rigidbody::ApplyForce(const math::Vector3 & force, const math::Vector3 & relPos)
+			void Rigidbody::AddForce(const math::Vector3 & force, ForceMode mode)
 			{
-				this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
+				if(mode == ForceMode::Force)
+					this->applyCentralForce(Physics::ToBullet(force));
+				else if(mode == ForceMode::Impulse)
+					this->applyCentralImpulse(Physics::ToBullet(force));
+			}
+
+			void Rigidbody::AddRelativeForce(const math::Vector3 & force, const math::Vector3 & relPos, ForceMode mode)
+			{
+				if (mode == ForceMode::Force)
+					this->applyForce(Physics::ToBullet(force), Physics::ToBullet(relPos));
+				else if (mode == ForceMode::Impulse)
+					this->applyImpulse(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
 
 			GameObject * Rigidbody::GetTargetCollider()
@@ -142,14 +186,29 @@ namespace thomas
 				return nullptr;
 			}
 
-			float Rigidbody::GetMass()
+			float Rigidbody::GetMass() const
 			{
 				return m_mass;
 			}
 
-			bool Rigidbody::IsKinematic()
+			bool Rigidbody::HasGravity() const
+			{
+				return m_hasGravity;
+			}
+
+			bool Rigidbody::IsKinematic() const
 			{
 				return m_kinematic;
+			}
+
+			math::Vector3 Rigidbody::GetFreezePosition() const
+			{
+				return m_freezePosition;
+			}
+
+			math::Vector3 Rigidbody::GetFreezeRotation() const
+			{
+				return m_freezeRotation;
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()

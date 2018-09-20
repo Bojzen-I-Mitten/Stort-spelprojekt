@@ -172,6 +172,7 @@
     <ClInclude Include="src\object\component\physics\Rigidbody.h" />
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\resource\Model.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
+    <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
     <ClCompile Include="src\object\Component.cpp" />

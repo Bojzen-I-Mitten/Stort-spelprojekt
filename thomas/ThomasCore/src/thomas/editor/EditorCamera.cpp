@@ -169,6 +169,8 @@ namespace thomas
 			if (!Window::GetEditorWindow() || !Window::GetEditorWindow()->IsFocused())
 				return;
 
+			Input::allowEditor = true;
+
 			// Toggle editor mode on scene camera
 			if (Input::GetMouseButtonDown(Input::MouseButtons::RIGHT))
 				Input::SetMouseMode(Input::MouseMode::POSITION_RELATIVE);

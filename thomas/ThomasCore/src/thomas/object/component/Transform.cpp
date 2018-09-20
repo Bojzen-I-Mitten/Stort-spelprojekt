@@ -20,15 +20,21 @@ namespace thomas
 			}
 			math::Vector3 Transform::Forward()
 			{
-				return GetWorldMatrix().Forward();
+				math::Vector3 temp = GetWorldMatrix().Forward();
+				temp.Normalize();
+				return temp;
 			}
 			math::Vector3 Transform::Up()
 			{
-				return GetWorldMatrix().Up();
+				math::Vector3 temp = GetWorldMatrix().Up();
+				temp.Normalize();
+				return temp;
 			}
 			math::Vector3 Transform::Right()
 			{
-				return GetWorldMatrix().Right();
+				math::Vector3 temp = GetWorldMatrix().Right();
+				temp.Normalize();
+				return temp;
 			}
 
 			math::Matrix Transform::GetLocalWorldMatrix()

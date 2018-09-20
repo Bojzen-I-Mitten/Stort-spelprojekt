@@ -386,6 +386,38 @@ namespace ThomasEngine
 		}
 
 	}
+	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
+	{
+		path = Application::currentProject->assetPath + "\\" + path;
+
+		GameObject::SerializeGameObject(path, gameObject);
+
+	}
+	GameObject ^ Resources::LoadPrefab(String^ path)
+	{
+		for each(GameObject^ gObj in GameObject::GetAllGameObjects(true))
+		{
+			if (gObj->prefabPath == path)
+				return gObj;
+		}
+		
+		IO::FileStream^ fileStream = IO::File::OpenRead(path);
+		GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
+		fileStream->Close();
+		if(prefab)
+			prefab->prefabPath = path;
+		return prefab;
+	}
+	Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
+	{
+		
+		if (type == AudioClip::typeid)
+		{
+			return AssetTypes::AUDIO_CLIP;
+		}
+		else if (type == Model::typeid)
+		{
+			return AssetTypes::MODEL;
 
 	generic<typename T>
 		where T : Resource
