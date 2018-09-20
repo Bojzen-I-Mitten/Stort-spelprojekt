@@ -1,0 +1,18 @@
+﻿<Window x:Class="ThomasEditor.Elements.OpenProjectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ThomasEditor.Elements"
+        mc:Ignorable="d"
+        Title="Information" Height="100" Width="400"
+        ResizeMode="NoResize"
+        >
+    <Grid Margin="0,0,-6,0">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Please chose a project before continuing." FontSize="15" Margin="0,0,0,20">
+        </TextBlock>
+        <Button Height="20" Width="100" Margin="30,41,272,10" Content="Load Project" Click="Load_Project"/>
+        <Button Height="20" Width="100" Margin="150,41,150,10" Content="New Project" Click="New_Project"/>
+        <Button Height="20" Width="100" Margin="270,41,30,10" Content="Cancel" Click="Cancel"/>
+    </Grid>
+</Window>
