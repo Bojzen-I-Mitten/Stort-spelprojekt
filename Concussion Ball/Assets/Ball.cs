@@ -28,7 +28,7 @@ public class Ball : NetworkComponent
             {
                 transform.parent = null;
                 rb.enabled = true;
-                rb.ApplyCentralImpulseForce(playerThatHasBall.transform.forward * currentForce);
+                rb.AddForce(playerThatHasBall.transform.forward * currentForce, Rigidbody.ForceMode.Impulse);
                 playerThatHasBall = null;
                 currentForce = 0.0f;
                 visualizer.SetStrength(0);
