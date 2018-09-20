@@ -6,6 +6,7 @@ void ThomasEngine::Application::currentProject::set(ThomasEngine::Project^ value
 	if (Scene::CurrentScene) {
 		Scene::CurrentScene->UnLoad();
 	}
+	Scene::CurrentScene = nullptr;
 	currentProjectChanged(value);
 	m_currentProject = value;
 	Scene^ currentScene;

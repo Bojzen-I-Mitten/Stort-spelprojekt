@@ -18,7 +18,7 @@ namespace thomas
 
 		void LightManager::Initialize()
 		{
-			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>("LightBuffer", nullptr, sizeof(LightStruct), 24, DYNAMIC_BUFFER);
+			m_lightBuffer = std::make_shared<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
 
 			m_lightsCounts.nrOfDirectionalLights = 0;
 			m_lightsCounts.nrOfSpotLights = 0;
@@ -27,7 +27,7 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
-			
+			SAFE_RELEASE(m_lightBuffer);
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
@@ -50,7 +50,7 @@ namespace thomas
 			int stoppper = 0;
 		}
 		
-		void LightManager::RemoveLight(object::component::LightComponent * light)
+		bool LightManager::RemoveLight(object::component::LightComponent * light)//returns true if light was removed
 		{
 			auto it = s_lights.begin();
 
@@ -72,24 +72,26 @@ namespace thomas
 					default:
 						break;
 					}
-
+					
 					s_lights.erase(it);
-					break;
+					
+					return true;
 				}
 				it++;
 			}
+			return false;
 		}
 
 		void LightManager::Update()
 		{
-			std::vector<LightStruct> m_allLights;
+			std::vector<LightStruct> allLights;
 
 			for (object::component::LightComponent* light : s_lights)
 			{
-				m_allLights.push_back(light->GetData());
+				allLights.push_back(light->GetData());
 			}
-			
-			m_lightBuffer->SetData(m_allLights);
+
+			m_lightBuffer->SetData(allLights);
 		}
 		void LightManager::Bind()
 		{
