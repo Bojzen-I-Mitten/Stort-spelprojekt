@@ -3,7 +3,7 @@
 #include "ThomasManaged.h"
 #include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
-
+#include "GUI\editor\GUI.h"
 namespace ThomasEngine {
 
 	void ThomasWrapper::Start() {
@@ -116,17 +116,20 @@ namespace ThomasEngine {
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{
-
-				editor::EditorCamera::Render();
-				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+				if (renderingEditor)
 				{
-					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
-						gameObject->RenderGizmos();
+					editor::EditorCamera::Render();
+					//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
+					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					{
+						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+						if (gameObject->GetActive())
+							gameObject->RenderGizmos();
+					}
+
+					s_Selection->render();
 				}
-
-				s_Selection->render();
-
+				
 				//end editor rendering
 
 				for (object::component::Camera* camera : object::component::Camera::s_allCameras)
@@ -245,5 +248,9 @@ namespace ThomasEngine {
 			}
 		}
 		thomas::ThomasCore::ClearLogOutput();
+	}
+	void ThomasWrapper::ToggleEditorRendering()
+	{
+		renderingEditor = !renderingEditor;
 	}
 }
