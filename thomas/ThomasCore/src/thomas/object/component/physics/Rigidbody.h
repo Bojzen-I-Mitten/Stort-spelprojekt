@@ -37,7 +37,7 @@ namespace thomas
 				void SetFreezeRotation(const math::Vector3 & freezeRotation);
 				void SetGravity(bool gravity);
 				void SetKinematic(bool kinematic);
-				void SetCollider(btCollisionShape* collider);
+				void SetCollider(Collider* collider);
 				void SetMass(float mass);
 				void SetTargetCollider(GameObject* collider);
 
@@ -48,11 +48,13 @@ namespace thomas
 				bool IsKinematic() const;
 				math::Vector3 GetFreezePosition() const;
 				math::Vector3 GetFreezeRotation() const;
+				void ClearTargetCollider();
 
 			private:
 				void UpdateRigidbodyMass();
 
 			private:
+				Collider * m_collider = nullptr;
 				math::Vector3 m_freezePosition;
 				math::Vector3 m_freezeRotation;
 				math::Matrix m_prevMatrix;

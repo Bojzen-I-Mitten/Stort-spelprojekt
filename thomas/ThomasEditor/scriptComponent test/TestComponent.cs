@@ -22,6 +22,7 @@ namespace ThomasEditor
 
         public override void Start()
         {
+            
             // m.GenerateBones(gameObject);
             GameObject.Instantiate(coolPrefab);
             //otherObjectsRender.Destroy();
@@ -39,10 +40,11 @@ namespace ThomasEditor
 
         public override void Update()
         {
-            
+         //   GUI.ImguiStringUpdate(t.ToString(),new Vector2(100,0),new Vector2(0,0));
             t += Time.DeltaTime;
-            gameObject.transform.position = new Vector3(0, (float)posCurve.GetYFromX((t*6.5) % 5), 0);
-            gameObject.transform.scale = new Vector3((float)scaleCurve.GetYFromX((t*6.5) % 5), 1, (float)scaleCurve.GetYFromX((t*6.5) % 5));
+            //  gameObject.transform.position = new Vector3(0, (float)posCurve.GetYFromX((t*6.5) % 5), 0);
+            //  gameObject.transform.scale = new Vector3((float)scaleCurve.GetYFromX((t*6.5) % 5), 1, (float)scaleCurve.GetYFromX((t*6.5) % 5));
+            gameObject.transform.position = gameObject.transform.position + new Vector3(0.1f, 0.0f, 0.0f);
         }
     }
 }

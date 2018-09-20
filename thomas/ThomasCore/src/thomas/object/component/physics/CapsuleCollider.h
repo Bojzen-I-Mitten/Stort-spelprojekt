@@ -7,17 +7,21 @@ namespace thomas
 	{
 		namespace component
 		{
-			class SphereCollider : public Collider
+			class CapsuleCollider : public Collider
 			{
 			public:
-				SphereCollider();
+				CapsuleCollider();
 
 				void SetRadius(float size);
 				float GetRadius();
+				void SetHeight(float height);
+				float GetHeight();
+				void Update();
 
 				void OnDrawGizmosSelected();
 			private:
 				float m_radius;
+				float m_height;
 			};
 		}
 	}

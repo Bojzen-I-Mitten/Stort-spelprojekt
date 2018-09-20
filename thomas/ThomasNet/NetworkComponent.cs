@@ -7,7 +7,7 @@ namespace ThomasEngine.Network
     [HideInInspector]
     public class NetworkComponent : ScriptComponent
     {
-
+        internal int prefabID;
         
         internal NetworkID networkID;
 
@@ -15,12 +15,19 @@ namespace ThomasEngine.Network
         public bool isOwner
         {
             get {return networkID != null ? networkID.Owner : false; }
+            set { if (networkID != null) { networkID.Owner = value; } }
         }
 
         [Browsable(false)]
         public bool isClient
         {
             get { return NetworkManager.instance.isClient; }
+        }
+
+        [Browsable(false)]
+        public bool isServer
+        {
+            get { return !isClient; }
         }
 
         virtual public void Read(NetPacketReader reader)

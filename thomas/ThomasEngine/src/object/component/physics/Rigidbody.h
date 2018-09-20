@@ -66,8 +66,9 @@ namespace ThomasEngine
 
 				if (collider != nullptr)
 				{
-					String^ name = gcnew String(collider->GetName().c_str());
-					return GameObject::Find(name);
+					GameObject^ target = (GameObject^)Object::Find(Utility::Convert(collider->m_guid));
+					((thomas::object::component::Rigidbody*)nativePtr)->ClearTargetCollider();
+					return target;
 				}
 			}
 
