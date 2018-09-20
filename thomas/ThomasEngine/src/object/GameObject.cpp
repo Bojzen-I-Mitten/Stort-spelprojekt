@@ -5,7 +5,7 @@
 #include "component\physics\BoxCollider.h"
 #include "component\physics\SphereCollider.h"
 #include "..\Debug.h"
-
+#include "../Utility.h"
 namespace ThomasEngine {
 
 	void GameObject::Destroy()
@@ -143,7 +143,8 @@ namespace ThomasEngine {
 			return gObj;
 		}
 		catch (Exception^ e) {
-			Debug::Log("Failed to load gameObject");
+			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
+			LOG(msg);
 			return nullptr;
 		}
 		

@@ -6,7 +6,7 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderProperty
 			{
@@ -19,18 +19,23 @@ namespace thomas
 					VECTOR,
 					COLOR,
 					MATRIX,
+					MATRIX_ARRAY,
 					SHADER_RESOURCE,
 					CONSTANT_BUFFER,
 					TEXTURE2D
 				};
 
-				ShaderProperty(Type type) : m_type(type) {};
+				ShaderProperty(Type type);
 
-				virtual void Apply(std::string name, Shader* shader) = 0;
-				void Apply(Shader* shader) { Apply(m_name, shader); }
-				Type GetType() { return m_type; }
-				std::string GetName() { return m_name; }
-				void SetName(std::string name) {m_name = name;}
+				virtual void Apply(std::string name, Shader* shader) const = 0;
+				void Apply(Shader* shader) const;
+				bool equals(const ShaderProperty &other) const;
+
+			public:
+				Type GetType() const;
+				std::string GetName() const;
+				void SetName(std::string name);
+
 			private:
 				std::string m_name;
 				Type m_type;

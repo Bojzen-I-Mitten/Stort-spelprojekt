@@ -89,6 +89,15 @@ namespace ThomasEngine
 				value.M41, value.M42, value.M43, value.M44
 			);
 		}
+		static thomas::math::Matrix Convert(const Matrix% value)
+		{
+			return thomas::math::Matrix(
+				value.M11, value.M12, value.M13, value.M14,
+				value.M21, value.M22, value.M23, value.M24,
+				value.M31, value.M32, value.M33, value.M34,
+				value.M41, value.M42, value.M43, value.M44
+			);
+		}
 
 		static Matrix Convert(thomas::math::Matrix& value)
 		{
@@ -98,6 +107,15 @@ namespace ThomasEngine
 				value.m[2][0], value.m[2][1], value.m[2][2], value.m[2][3],
 				value.m[3][0], value.m[3][1], value.m[3][2], value.m[3][3]
 				);
+		}
+		static Matrix Convert(const thomas::math::Matrix& value)
+		{
+			return Matrix(
+				value.m[0][0], value.m[0][1], value.m[0][2], value.m[0][3],
+				value.m[1][0], value.m[1][1], value.m[1][2], value.m[1][3],
+				value.m[2][0], value.m[2][1], value.m[2][2], value.m[2][3],
+				value.m[3][0], value.m[3][1], value.m[3][2], value.m[3][3]
+			);
 		}
 	};
 

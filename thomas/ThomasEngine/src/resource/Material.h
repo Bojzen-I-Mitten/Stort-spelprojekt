@@ -128,43 +128,7 @@ namespace ThomasEngine
 			void set(Dictionary<String^, System::Object^>^ value);
 		}
 	private:
-		Dictionary<String^, System::Object^>^ GetEditorProperties()
-		{
-			Dictionary<String^, System::Object^>^ properties = gcnew Dictionary<String^, System::Object^>();
-			for (auto& prop : ((thomas::resource::Material*)m_nativePtr)->GetEditorProperties())
-			{
-				String^ name = Utility::ConvertString(prop.first);
-				System::Object^ value;
-				switch (prop.second->GetType())
-				{
-				case thomas::resource::shaderProperty::ShaderProperty::Type::SCALAR_BOOL:
-
-					break;
-				case thomas::resource::shaderProperty::ShaderProperty::Type::SCALAR_FLOAT:
-					value = GetFloat(name);
-					break;
-				case thomas::resource::shaderProperty::ShaderProperty::Type::SCALAR_INT:
-					value = GetInt(name);
-					break;
-				case thomas::resource::shaderProperty::ShaderProperty::Type::VECTOR:
-					value = GetVector(name);
-					break;
-				case thomas::resource::shaderProperty::ShaderProperty::Type::COLOR:
-					value = GetColor(name);
-					break;
-				case thomas::resource::shaderProperty::ShaderProperty::Type::MATRIX:
-					value = GetMatrix(name);
-					break;
-				case thomas::resource::shaderProperty::ShaderProperty::Type::TEXTURE2D:
-					value = GetTexture2D(name);
-					break;
-				default:
-					break;
-				}
-				properties->Add(name, value);
-			}
-			return properties;
-		}
+		Dictionary<String^, System::Object^>^ GetEditorProperties();
 
 		
 

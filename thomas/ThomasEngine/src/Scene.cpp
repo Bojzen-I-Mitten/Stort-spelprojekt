@@ -106,8 +106,16 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
-			Debug::Log(e->ToString());
-			return nullptr;
+			try {
+				LOG("Loading scene: ");
+				LOG(Utility::ConvertString(fullPath));
+				LOG("with error:")
+				LOG(Utility::ConvertString(e->Message));
+				return nullptr;
+			}
+			finally{
+
+			}
 		}
 
 	}
@@ -196,8 +204,9 @@ namespace ThomasEngine
 			else if (Component::typeid->IsAssignableFrom(targetType)) {
 				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path))->GetComponent(targetType);
 			}
-			else
-				return Resources::Load(sceneResource->path);
+			else {
+				return Resources::LoadThomasPath(sceneResource->path);
+			}
 		}
 		return obj;
 	}
