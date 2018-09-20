@@ -22,10 +22,11 @@ namespace thomas
 		m_sensitivity(50.f), 
 		m_speed(2.f), 
 		m_manipulatorScale(2.f), 
+		m_selectedObjPosition(0.f),
 		m_hasSelectionChanged(false),
-		m_manipulatorSnapping(false), 
+		m_manipulatorSnapping(false),
+		m_selectedObject(false),
 		m_objectHighlighter(nullptr),
-		m_selectedObject(nullptr),
 		m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
 		m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
 		{
@@ -93,8 +94,13 @@ namespace thomas
 			// Select single gameobject
 			s_selectedObjects.clear();
 			if (gameObject)
+			{
+				s_editorCamera->m_selectedObjPosition = gameObject->m_transform->GetPosition();
 				s_selectedObjects.push_back(gameObject);
-			GetEditorCamera()->m_hasSelectionChanged = true;
+			}
+
+			s_editorCamera->m_hasSelectionChanged = true;
+			s_editorCamera->m_selectedObject = true;
 		}
 
 		void EditorCamera::UnselectObject(GameObject * gameObject)
@@ -108,13 +114,16 @@ namespace thomas
 					--i;
 				}
 			}
+
+			s_editorCamera->m_selectedObject = false;
 		}
 
 		void EditorCamera::UnselectObjects()
 		{
 			// Unselect all objects in the scene
 			s_selectedObjects.clear();
-			GetEditorCamera()->m_hasSelectionChanged = true;
+			s_editorCamera->m_hasSelectionChanged = true;
+			s_editorCamera->m_selectedObject = false;
 		}
 
 		std::vector<object::GameObject*> EditorCamera::GetSelectedObjects()
@@ -124,12 +133,12 @@ namespace thomas
 
 		void EditorCamera::SetHasSelectionChanged(const bool & selectionChanged)
 		{
-			GetEditorCamera()->m_hasSelectionChanged = selectionChanged;
+			s_editorCamera->m_hasSelectionChanged = selectionChanged;
 		}
 
 		bool EditorCamera::HasSelectionChanged()
 		{
-			return GetEditorCamera()->m_hasSelectionChanged;
+			return s_editorCamera->m_hasSelectionChanged;
 		}
 
 		object::component::Camera * EditorCamera::GetCamera() const
@@ -179,6 +188,9 @@ namespace thomas
 
 			if (Input::GetMouseButtonUp(Input::MouseButtons::RIGHT))
 				Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
+
+			if (Input::GetKey(Input::Keys::F))
+				SnapCameraToFocus();
 
 			// Scroll doesn't work for some reason... Commented out for now
 			/*if (Input::GetMouseScrollWheel() > 0)
@@ -281,7 +293,6 @@ namespace thomas
 				}
 			}
 
-			SetSelectedGameObject(closestGameObject);
 			return closestGameObject;
 		}
 
@@ -310,8 +321,6 @@ namespace thomas
 				move(-m_transform->Up());
 			if (Input::GetKey(Input::Keys::E))
 				move(m_transform->Up());
-			if (Input::GetKey(Input::Keys::F))
-				SnapCameraToFocus();
 
 			// Rotate camera
 			m_rotationX += Input::GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
@@ -319,24 +328,15 @@ namespace thomas
 			m_transform->SetRotation(-m_rotationX, -m_rotationY, 0.f);
 		}
 
-		void EditorCamera::SetSelectedGameObject(object::GameObject * selected)
-		{
-			//TODO: Create a vector3 position to store / set to 0.f if nullptr...
-
-			/*if(selected != nullptr)
-			m_selectedObject = *&selected;*/
-		}
-
 		void EditorCamera::SnapCameraToFocus()
 		{
-			if (m_selectedObject != nullptr)
-			{
-				LOG(m_selectedObject->m_transform->GetPosition().y);
-				/*math::Vector3 dir = m_transform->GetPosition() - m_selectedObject->m_transform->GetPosition();
+			if (m_selectedObject)
+			{		
+				math::Vector3 dir = m_transform->GetPosition() - m_selectedObjPosition;
 				dir.Normalize();
 
-				m_transform->LookAt(m_selectedObject->m_transform->GetPosition());
-				m_transform->SetPosition(m_selectedObject->m_transform->GetPosition() + math::Vector3(2.f) * dir);*/
+				m_transform->LookAt(m_selectedObjPosition);
+				m_transform->SetPosition(m_selectedObjPosition + math::Vector3(2.f) * dir);
 			}
 		}
 	}

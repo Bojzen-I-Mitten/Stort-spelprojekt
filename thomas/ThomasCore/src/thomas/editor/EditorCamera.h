@@ -52,7 +52,6 @@ namespace thomas
 			void RenderSelectedObjects();
 			void RenderGizmos();
 			void MoveAndRotateCamera();
-			void SetSelectedGameObject(object::GameObject* selected);
 			void SnapCameraToFocus();
 			object::GameObject* FindClickedGameObject();
 			EditorCamera();
@@ -73,7 +72,8 @@ namespace thomas
 			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
-			object::GameObject* m_selectedObject;
+			bool m_selectedObject;
+			math::Vector3 m_selectedObjPosition;
 
 		private:
 			static EditorCamera* s_editorCamera;
