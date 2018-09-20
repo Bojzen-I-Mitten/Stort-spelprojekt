@@ -26,7 +26,7 @@ namespace thomas
 				math::Matrix GetLocalWorldMatrix();
 				void SetLocalMatrix(math::Matrix matrix);
 				math::Matrix GetWorldMatrix();
-				math::Matrix SetWorldMatrix(math::Matrix matrix);
+				void SetWorldMatrix(math::Matrix matrix);
 
 				void LookAt(Transform* target);
 				void LookAt(math::Vector3 target);

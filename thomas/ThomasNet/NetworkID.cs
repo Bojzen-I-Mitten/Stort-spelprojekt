@@ -11,12 +11,12 @@ namespace ThomasEngine.Network
     public class NetworkID : NetworkComponent
     {
 
-        public bool Owner { get; set; } = false;
+        public bool Owner { set; get; } = false;
         public int ID { set; get; }
         List<NetworkComponent> networkComponents;
         public override void OnEnable()
         {
-            ID = NetworkManager.instance.Register(this);
+            //ID = NetworkManager.instance.Register(this);
             networkComponents = gameObject.GetComponents<NetworkComponent>();
             networkComponents.ForEach((comp) => { comp.networkID = this; });
             networkComponents.Remove(this);
@@ -26,15 +26,15 @@ namespace ThomasEngine.Network
         {
             foreach (NetworkComponent comp in networkComponents)
             {
-                if (!Owner)
-                {
+                //if (!Owner)
+                //{
                     comp.Read(reader);
-                }
+                //}
             }
         }
         public override void Write(NetDataWriter writer)
         {
-            if (Owner)
+            if ((Owner || isServer) && enabled)
             {
                 writer.Put(ID);
                 foreach (NetworkComponent comp in networkComponents)
