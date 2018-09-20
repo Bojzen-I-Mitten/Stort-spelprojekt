@@ -4,7 +4,12 @@
 namespace thomas
 {
 	namespace graphics {struct RenderPair; }
-	namespace resource { class Model; class Material; }
+	namespace resource {
+		class Model; class Material;
+		namespace shaderproperty {
+			class ShaderProperty;
+		}
+	}
 	namespace object
 	{
 		namespace component
@@ -12,13 +17,14 @@ namespace thomas
 			class Camera;
 			class THOMAS_API RenderComponent : public Component
 			{
-			private:
 			public:
 				RenderComponent();
-				void SetModel(resource::Model* model);
+				virtual bool SetModel(resource::Model* model);
 				
 				resource::Model * GetModel();
 				void Update();
+
+				void SetMaterial(resource::Material * material);
 				
 
 				void SetMaterial(int meshIndex, resource::Material* material);
@@ -32,9 +38,17 @@ namespace thomas
 			public:
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;
-			private:
+			protected:
+				void SubmitPart(Camera* camera, unsigned int i);
+			protected:
 				std::vector<resource::Material*> m_materials;
+				/*	Insert a shader property for rendering component.
+				 * WARNING!: Append only on initialization (or make safe with parameters passed to Renderer) 
+				*/
+				void insertProperty(const resource::shaderproperty::ShaderProperty* prop);
+			private:
 				static std::vector<RenderComponent*> s_renderComponents;
+				std::vector< resource::shaderproperty::ShaderProperty const*> m_properties;
 				//graphics::Geometry* m_geometry;
 			};
 		}

@@ -13,7 +13,7 @@ namespace thomas
 	public:
 		static bool Init();
 		static void AddRigidBody(object::component::Rigidbody* rigidBody);
-		static void RemoveRigidBody(object::component::Rigidbody* rigidBody);
+		static bool RemoveRigidBody(object::component::Rigidbody* rigidBody);
 		static void UpdateRigidbodies();
 		static void Simulate();
 		static void DrawDebug(object::component::Camera* camera);

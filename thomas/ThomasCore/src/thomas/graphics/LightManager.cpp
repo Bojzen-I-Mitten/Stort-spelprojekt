@@ -12,15 +12,16 @@ namespace thomas
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::m_lightBuffer;
 
-		LightManager::LightCountsStruct LightManager::m_lightsCounts;
+		LightManager::LightCountsStruct LightManager::s_lightCounts;
 
 		void LightManager::Initialize()
 		{
 			m_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
 
-			m_lightsCounts.nrOfDirectionalLights = 0;
-			m_lightsCounts.nrOfSpotLights = 0;
-			m_lightsCounts.nrOfPointLights = 0;
+			s_lightCounts.nrOfDirectionalLights = 0;
+			s_lightCounts.nrOfSpotLights = 0;
+			s_lightCounts.nrOfPointLights = 0;
+			s_lightCounts.nrOfAreaLights = 0;
 		}
 		
 		void LightManager::Destroy()
@@ -33,13 +34,16 @@ namespace thomas
 			switch (light->GetType())
 			{
 			case DIRECTIONAL:
-				m_lightsCounts.nrOfDirectionalLights++;
+				s_lightCounts.nrOfDirectionalLights++;
 				break;
 			case POINT:
-				m_lightsCounts.nrOfPointLights++;
+				s_lightCounts.nrOfPointLights++;
 				break;
 			case SPOT:
-				m_lightsCounts.nrOfSpotLights++;
+				s_lightCounts.nrOfSpotLights++;
+				break;
+			case AREA:
+				s_lightCounts.nrOfAreaLights++;
 				break;
 			default:
 				break;
@@ -60,13 +64,16 @@ namespace thomas
 					switch (light->GetType())
 					{
 					case DIRECTIONAL:
-						m_lightsCounts.nrOfDirectionalLights--;
+						s_lightCounts.nrOfDirectionalLights--;
 						break;
 					case POINT:
-						m_lightsCounts.nrOfPointLights--;
+						s_lightCounts.nrOfPointLights--;
 						break;
 					case SPOT:
-						m_lightsCounts.nrOfSpotLights--;
+						s_lightCounts.nrOfSpotLights--;
+						break;
+					case AREA:
+						s_lightCounts.nrOfAreaLights--;
 						break;
 					default:
 						break;
@@ -90,14 +97,15 @@ namespace thomas
 				allLights.push_back(light->GetData());
 			}
 
-			m_lightBuffer->SetData(allLights);
+			s_lightBuffer->SetData(allLights);
 		}
 		void LightManager::Bind()
 		{
-			resource::Shader::SetGlobalInt("nrOfPointLights", m_lightsCounts.nrOfPointLights);
-			resource::Shader::SetGlobalInt("nrOfDirectionalLights", m_lightsCounts.nrOfDirectionalLights);
-			resource::Shader::SetGlobalInt("nrOfSpotLights", m_lightsCounts.nrOfSpotLights);
-			resource::Shader::SetGlobalResource("lights", m_lightBuffer->GetSRV());
+			resource::Shader::SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
+			resource::Shader::SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
+			resource::Shader::SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
+			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
+			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{
