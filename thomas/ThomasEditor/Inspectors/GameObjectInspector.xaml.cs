@@ -89,6 +89,8 @@ namespace ThomasEditor
 
             private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             {
+                if ((DataContext is GameObject) == false)
+                    return;
                 this.Dispatcher.Invoke((Action)(() => {
                     GameObject SelectedGameObject = DataContext as GameObject;
                     RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();

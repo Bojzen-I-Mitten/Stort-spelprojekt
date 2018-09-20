@@ -341,8 +341,7 @@ namespace ThomasEditor
                         }
                         
                     }
-                }
-               
+                }              
 
                 // Code to move the item in the model is placed here...
             }
