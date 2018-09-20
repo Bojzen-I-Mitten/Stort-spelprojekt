@@ -61,7 +61,6 @@ namespace ThomasEngine
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetMaterial((thomas::resource::Material*)value->m_nativePtr);
 		else
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetMaterial(nullptr);
-
 		OnPropertyChanged("material");
 	}
 
@@ -85,8 +84,9 @@ namespace ThomasEngine
 	{
 		if (m_anim == nullptr)
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->clearBlendTree();
-		else if (m_model != nullptr)
+		else if (m_model != nullptr) {
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(m_anim->get());
+		}
 	}
 
 }

@@ -2,6 +2,7 @@
 #include "Playback.h"
 #include "BaseAnimationTime.h"
 #include "data/Skeleton.h"
+#include "../../Common.h"
 
 namespace thomas {
 	namespace graphics {
@@ -35,7 +36,7 @@ namespace thomas {
 					else {
 						m_boneMapping[boneInd] = m_channel.size();
 						m_channel.push_back(BoneFrame());
-						m_channel.back().newAnimation(&anim[i], m_playback->getTime());
+						m_channel.back().newAnimation(&anim[i], m_playback->m_elapsed);
 					}
 				}
 			}
@@ -50,21 +51,24 @@ namespace thomas {
 			}
 			math::Vector3 AnimPlayback::calcBonePosition(unsigned int bone)
 			{
-				return m_channel[m_boneMapping[bone]].lerpCoordinate(m_playback->getTime());
+				return m_channel[m_boneMapping[bone]].lerpCoordinate(m_playback->m_elapsed);
 			}
 
 			math::Vector3 AnimPlayback::calcBoneScale(unsigned int bone)
 			{
-				return m_channel[m_boneMapping[bone]].lerpScale(m_playback->getTime());
+				return m_channel[m_boneMapping[bone]].lerpScale(m_playback->m_elapsed);
 			}
 
 			math::Quaternion AnimPlayback::calcBoneRot(unsigned int bone)
 			{
-				return m_channel[m_boneMapping[bone]].lerpRotation(m_playback->getTime());
+				return m_channel[m_boneMapping[bone]].lerpRotation(m_playback->m_elapsed);
 			}
 
+			static std::vector<float> TIME;
+
 			void AnimPlayback::calcFrame(unsigned int bone, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
-				float eT = m_playback->getTime();
+				float eT = m_playback->m_elapsed;
+				TIME.push_back(eT);
 				m_channel[m_boneMapping[bone]].lerpFrame(eT, trans, scale, rot);
 			}
 			/*
