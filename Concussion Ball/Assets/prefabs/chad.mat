@@ -14,7 +14,10 @@
     <d2p1:KeyValueOfstringanyType>
       <d2p1:Key z:Id="9">wow</d2p1:Key>
       <d2p1:Value z:Id="10" i:type="Color">
-        <packedValue>4294967295</packedValue>
+        <a>255</a>
+        <b>255</b>
+        <g>255</g>
+        <r>255</r>
       </d2p1:Value>
     </d2p1:KeyValueOfstringanyType>
   </EditorProperties>

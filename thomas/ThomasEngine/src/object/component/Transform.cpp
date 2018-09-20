@@ -1,6 +1,17 @@
 #include "Transform.h"
 #include "../GameObject.h"
 #include "../../ThomasManaged.h"
+void ThomasEngine::Transform::SetParent(Transform ^ value)
+{
+	SetParent(value, true);
+}
+void ThomasEngine::Transform::SetParent(Transform ^ value, bool worldPositionStays)
+{
+	if (value)
+		((thomas::object::component::Transform*)nativePtr)->SetParent((thomas::object::component::Transform*)value->nativePtr, worldPositionStays);
+	else
+		((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
+}
 void ThomasEngine::Transform::OnDestroy()
 {
 	if (parent)
@@ -18,10 +29,6 @@ void ThomasEngine::Transform::OnDestroy()
 void ThomasEngine::Transform::parent::set(ThomasEngine::Transform^ value)
 {
 	Transform^ oldParent = parent;
-	if (value)
-		((thomas::object::component::Transform*)nativePtr)->SetParent((thomas::object::component::Transform*)value->nativePtr);
-	else
-		((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr);
-
+	SetParent(value);
 	OnParentChanged(this, oldParent, value);
 }

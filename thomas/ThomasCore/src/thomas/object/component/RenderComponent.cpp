@@ -131,7 +131,7 @@ namespace thomas {
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
 				assert(verifyPropertyList(m_properties.data(), m_properties.size()));
-				thomas::graphics::Renderer::SubmitCommand(
+				graphics::Renderer::S_RENDERER.SubmitCommand(
 					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
 			}
 

@@ -229,7 +229,7 @@ namespace thomas
 					if (model)
 					{
 						for (auto mesh : model->GetMeshes())
-							graphics::Renderer::SubmitCommand(graphics::RenderCommand(gameObject->m_transform->GetWorldMatrix(), mesh.get(), m_objectHighlighter.get(), m_cameraComponent.get()));
+							graphics::Renderer::S_RENDERER.SubmitCommand(graphics::RenderCommand(gameObject->m_transform->GetWorldMatrix(), mesh.get(), m_objectHighlighter.get(), m_cameraComponent.get()));
 					}
 				}
 			}

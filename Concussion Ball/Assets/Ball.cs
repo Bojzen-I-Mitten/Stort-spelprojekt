@@ -18,13 +18,13 @@ public class Ball : NetworkComponent
     {
         if (true)
         {
-            if (Input.GetKey(Input.Keys.Space) && !rb.enabled)
+            if (Input.GetKey(Input.Keys.LeftControl) && !rb.enabled)
             {
                 currentForce += force * Time.DeltaTime;
                 visualizer.SetStrength(currentForce);
             }
 
-            if (Input.GetKeyUp(Input.Keys.Space) && !rb.enabled)
+            if (Input.GetKeyUp(Input.Keys.LeftControl) && !rb.enabled)
             {
                 transform.parent = null;
                 rb.enabled = true;

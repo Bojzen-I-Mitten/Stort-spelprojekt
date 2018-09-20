@@ -17,8 +17,7 @@ namespace thomas
 {
 	namespace graphics
 	{
-		CommandQueue Renderer::s_renderCommands;
-		CommandQueue Renderer::s_lastFramesCommands;
+		Renderer Renderer::S_RENDERER;
 
 		void Renderer::BindFrame()
 		{
