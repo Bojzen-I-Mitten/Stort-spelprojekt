@@ -44,8 +44,8 @@ public class Ball : NetworkComponent
         {
             playerThatHasBall = collider;
             rb.enabled = false;
-            transform.localPosition = new Vector3(0, 2, 0);
             transform.parent = collider.transform;
+            transform.localPosition = new Vector3(0, 2, 0);
         }
 
     }
