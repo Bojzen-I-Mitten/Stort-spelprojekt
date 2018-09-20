@@ -38,9 +38,9 @@ namespace ThomasEditor
         IEnumerator JumpingCoroutine()
         {
             jumpDelay = false;
+            Debug.Log("Started jumping.");
             rBody.AddForce(new Vector3(0.0f, force, 0.0f), Rigidbody.ForceMode.Impulse);
-            //rBody.ApplyCentralImpulseForce(new Vector3(0.0f, force, 0.0f));
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(1.0f);
 
             if (tackling)
             {
@@ -48,7 +48,7 @@ namespace ThomasEditor
                 tackling = false;
                 test.fieldOfView = 70;
             }
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.2f);
             jumpDelay = true;
             jumping = false;
             movingForward = false;
@@ -58,7 +58,7 @@ namespace ThomasEditor
         public override void Update()
         {
             //Jumping
-            if (Input.GetKeyDown(Input.Keys.Space) && jumpDelay)
+            if (Input.GetKey(Input.Keys.Space) && jumpDelay)
             {
                 //Set bools to avoid direction changes mid air or tackling mid air
                 jumping = true;
