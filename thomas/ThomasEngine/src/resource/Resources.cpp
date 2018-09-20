@@ -45,25 +45,6 @@ namespace ThomasEngine
 		}
 	}
 
-#pragma region PreFab
-
-	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
-	{
-		path = Application::currentProject->assetPath + "\\" + path;
-
-		GameObject::SerializeGameObject(path, gameObject);
-
-	}
-
-	GameObject ^ Resources::LoadPrefab(String^ path)
-	{
-		IO::FileStream^ fileStream = IO::File::OpenRead(path);
-		GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
-		fileStream->Close();
-		return prefab;
-	}
-
-#pragma endregion
 
 #pragma region Path
 
@@ -386,6 +367,8 @@ namespace ThomasEngine
 		}
 
 	}
+#pragma region PreFab
+
 	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
 	{
 		path = Application::currentProject->assetPath + "\\" + path;
@@ -408,17 +391,8 @@ namespace ThomasEngine
 			prefab->prefabPath = path;
 		return prefab;
 	}
-	Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
-	{
-		
-		if (type == AudioClip::typeid)
-		{
-			return AssetTypes::AUDIO_CLIP;
-		}
-		else if (type == Model::typeid)
-		{
-			return AssetTypes::MODEL;
 
+#pragma endregion
 	generic<typename T>
 		where T : Resource
 		T Resources::Load(String^ path)
