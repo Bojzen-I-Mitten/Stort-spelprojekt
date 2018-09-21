@@ -52,7 +52,6 @@ namespace thomas
 		static ID3D11Device* s_device;
 		static ID3D11DeviceContext* s_context;
 		static IDXGIDebug* s_debug;
-		static IDXGIInfoQueue* s_infoQueue;
 		static ImGuiContext* s_imGuiContext;
 	};
 

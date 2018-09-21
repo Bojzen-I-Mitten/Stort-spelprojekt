@@ -17,7 +17,6 @@ namespace thomas
 	ID3D11Device* ThomasCore::s_device;
 	ID3D11DeviceContext* ThomasCore::s_context;
 	IDXGIDebug* ThomasCore::s_debug;
-	IDXGIInfoQueue* ThomasCore::s_infoQueue;
 
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
@@ -99,10 +98,10 @@ namespace thomas
 		SAFE_RELEASE(s_device);
 
 		if (s_debug)
+		{
 			s_debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
-
-		SAFE_RELEASE(s_infoQueue);
-		SAFE_RELEASE(s_debug);
+			s_debug->Release();
+		}
 
 		return true;
 	}
@@ -191,27 +190,6 @@ namespace thomas
 				reinterpret_cast<void*>(GetProcAddress(dxgidebug, "DXGIGetDebugInterface")));
 
 			dxgiGetDebugInterface(IID_PPV_ARGS(&s_debug));
-			HRESULT hr = dxgiGetDebugInterface(IID_PPV_ARGS(&s_infoQueue));
-
-			if (SUCCEEDED(hr))
-			{
-				s_infoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_ERROR, true);
-				s_infoQueue->SetBreakOnSeverity(DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_CORRUPTION, true);
-
-				for (int i = 0; i < s_infoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL); i++)
-				{
-					//Get the size of the message.
-					SIZE_T messageLength;
-					s_infoQueue->GetMessage(DXGI_DEBUG_ALL, 0, NULL, &messageLength);
-
-					//Allocate space and get the message.
-					DXGI_INFO_QUEUE_MESSAGE * pMessage = (DXGI_INFO_QUEUE_MESSAGE*)malloc(messageLength);
-					s_infoQueue->GetMessage(DXGI_DEBUG_ALL, 0, pMessage, &messageLength);
-					LOG(pMessage->pDescription);
-				}
-
-				s_infoQueue->ClearStoredMessages(DXGI_DEBUG_ALL);
-			}
 		}
 	}
 }
