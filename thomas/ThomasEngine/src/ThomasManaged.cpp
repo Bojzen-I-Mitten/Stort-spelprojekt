@@ -1,5 +1,6 @@
 // This is the main DLL file.
 
+#include <thomas/System.h>
 #include "ThomasManaged.h"
 #include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
@@ -40,7 +41,7 @@ namespace ThomasEngine {
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
 			Window::ClearAllWindows();
-			graphics::Renderer::S_RENDERER.ProcessCommands();
+			thomas::System::S_RENDERER.ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
 		}
@@ -49,7 +50,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		thomas::Window::EndFrame(true);
-		graphics::Renderer::S_RENDERER.TransferCommandList();
+		thomas::System::S_RENDERER.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
 		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
@@ -112,7 +113,7 @@ namespace ThomasEngine {
 
 			//Rendering
 
-			graphics::Renderer::S_RENDERER.ClearCommands();
+			thomas::System::S_RENDERER.ClearCommands();
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{

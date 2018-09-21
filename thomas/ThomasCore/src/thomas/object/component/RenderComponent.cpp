@@ -6,6 +6,8 @@
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/ShaderProperty/ShaderProperty.h"
+#include "../../System.h"
+#include "../../graphics/render/Frame.h"
 
 namespace thomas {
 	namespace object {
@@ -133,8 +135,16 @@ namespace thomas {
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
 				assert(verifyPropertyList(m_properties.data(), m_properties.size()));
-				graphics::Renderer::S_RENDERER.SubmitCommand(
-					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
+
+				thomas::graphics::render::RenderCommand cmd(
+					m_gameObject->m_transform->GetWorldMatrix(), 
+					mesh.get(), 
+					material, 
+					camera, 
+					m_properties.size(), 
+					m_properties.data());
+
+				System::S_RENDERER.SubmitCommand(cmd);
 			}
 
 			void RenderComponent::insertProperty(const resource::shaderproperty::ShaderProperty * prop)

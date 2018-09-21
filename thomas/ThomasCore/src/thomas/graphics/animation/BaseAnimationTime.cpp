@@ -5,7 +5,7 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 			BaseAnimationTime::BaseAnimationTime(float startAt, float duration, PlayType playType)
-				: m_elapsed(startAt), m_duration(duration), m_speedUp(1.f), m_playType(playType)
+				: Playback(startAt), m_duration(duration), m_speedUp(1.f), m_playType(playType)
 			{
 			}
 			BaseAnimationTime::~BaseAnimationTime()
@@ -26,10 +26,6 @@ namespace thomas {
 						break;
 					}
 				}
-			}
-			float BaseAnimationTime::getTime()
-			{
-				return m_elapsed;
 			}
 		}
 	}
