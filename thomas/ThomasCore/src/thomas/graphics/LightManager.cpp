@@ -26,7 +26,7 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
-			m_lightBuffer.reset();
+			s_lightBuffer.reset();
 		}
 
 		void LightManager::AddLight(object::component::LightComponent* light)
