@@ -25,17 +25,20 @@ namespace ThomasEditor
         {
             InitializeComponent();
 
-            Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
             ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
             ThomasEngine.Transform.OnParentChanged += Transform_OnParentChanged;
-            Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
             instance = this;
+            Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
         }
 
         private void Scene_OnCurrentSceneChanged(Scene newScene)
         {
             if(newScene != null)
+            {
                 ResetTreeView();
+                newScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+            }
+                
         }
 
         private void ResetTreeView()
@@ -55,7 +58,6 @@ namespace ThomasEditor
                         hierarchy.Items.Add(node);
                     }
                 }
-                Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
             }));
         }
 
@@ -149,7 +151,6 @@ namespace ThomasEditor
             {
                 if (e.NewItems != null)
                 {
-
                     foreach (GameObject newItem in e.NewItems)
                     {
                         if (newItem.transform.parent == null)
@@ -314,7 +315,6 @@ namespace ThomasEditor
         {
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
-                
                 TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
                 if(source.DataContext is GameObject)
@@ -341,8 +341,7 @@ namespace ThomasEditor
                         }
                         
                     }
-                }
-               
+                }              
 
                 // Code to move the item in the model is placed here...
             }

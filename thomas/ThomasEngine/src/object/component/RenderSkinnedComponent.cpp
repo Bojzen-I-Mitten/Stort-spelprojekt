@@ -55,6 +55,7 @@ namespace ThomasEngine
 			return (Material^)mat;
 		else
 			return gcnew Material(nptr);
+		applyAnimation();
 	}
 	void RenderSkinnedComponent::material::set(Material^ value) {
 		if (value)
@@ -87,6 +88,7 @@ namespace ThomasEngine
 		else if (m_model != nullptr) {
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(m_anim->get());
 		}
+			
 	}
 
 }

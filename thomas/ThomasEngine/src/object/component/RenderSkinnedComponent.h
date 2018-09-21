@@ -20,19 +20,15 @@ namespace ThomasEngine
 	public:
 		RenderSkinnedComponent();
 
-		[DataMember(Order = 2)]
 		property Model^ model {
 			Model^ get();
 			void set(Model^ value);
 		}
-		[DataMember(Order = 3)]
 		property Animation^ animation {
 			Animation ^get() { return m_anim; }
 			void set(Animation^ value);
 		}
 
-
-		[DataMember(Order = 4)]
 		property Material^ material {
 			Material^ get();
 			void set(Material^ value);

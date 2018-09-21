@@ -4,7 +4,7 @@
 #include "ThomasManaged.h"
 #include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
-
+#include "GUI\editor\GUI.h"
 namespace ThomasEngine {
 
 	void ThomasWrapper::Start() {
@@ -44,7 +44,6 @@ namespace ThomasEngine {
 			thomas::System::S_RENDERER.ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
-			thomas::ThomasTime::Update();
 		}
 	}
 
@@ -53,6 +52,12 @@ namespace ThomasEngine {
 		thomas::Window::EndFrame(true);
 		thomas::System::S_RENDERER.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
+
+		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
+		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
+		{
+			camera->CopyFrameData();
+		}
 	}
 
 	void ThomasWrapper::StartEngine()
@@ -65,7 +70,7 @@ namespace ThomasEngine {
 				Thread::Sleep(1000);
 				continue;
 			}
-
+			thomas::ThomasTime::Update();
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 
 			if (Window::WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
@@ -112,17 +117,20 @@ namespace ThomasEngine {
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{
-
-				editor::EditorCamera::Render();
-				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+				if (renderingEditor)
 				{
-					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
-						gameObject->RenderGizmos();
+					editor::EditorCamera::Render();
+					//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
+					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					{
+						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+						if (gameObject->GetActive())
+							gameObject->RenderGizmos();
+					}
+
+					s_Selection->render();
 				}
-
-				s_Selection->render();
-
+				
 				//end editor rendering
 
 				for (object::component::Camera* camera : object::component::Camera::s_allCameras)
@@ -241,5 +249,9 @@ namespace ThomasEngine {
 			}
 		}
 		thomas::ThomasCore::ClearLogOutput();
+	}
+	void ThomasWrapper::ToggleEditorRendering()
+	{
+		renderingEditor = !renderingEditor;
 	}
 }

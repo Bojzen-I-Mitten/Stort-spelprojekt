@@ -253,7 +253,7 @@ namespace thomas
 				object::GameObject* gameObject = s_selectedObjects[i];
 				ImGuiIO& io = ImGui::GetIO();
 				ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
-				math::Matrix worldMatrix = gameObject->m_transform->GetLocalWorldMatrix();
+				math::Matrix worldMatrix = gameObject->m_transform->GetWorldMatrix();
 
 				if (m_manipulatorOperation == ImGuizmo::OPERATION::ROTATE)
 					snap[0] = 15.f;
@@ -263,9 +263,9 @@ namespace thomas
 					*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(m_manipulatorScale)).m, *m_cameraComponent->GetProjMatrix().m,
 					m_manipulatorOperation, m_manipulatorMode, *worldMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
 
-				if (worldMatrix != gameObject->m_transform->GetLocalWorldMatrix())
+				if (worldMatrix != gameObject->m_transform->GetWorldMatrix())
 				{
-					gameObject->m_transform->SetLocalMatrix(worldMatrix);
+					gameObject->m_transform->SetWorldMatrix(worldMatrix);
 					gameObject->m_transform->SetDirty(true);
 				}
 			}
