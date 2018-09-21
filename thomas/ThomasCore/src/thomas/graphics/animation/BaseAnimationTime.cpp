@@ -1,5 +1,5 @@
 #include "BaseAnimationTime.h"
-
+#include <algorithm>
 
 namespace thomas {
 	namespace graphics {
@@ -18,7 +18,7 @@ namespace thomas {
 					switch (m_playType)
 					{
 					case PlayType::Loop:
-						m_elapsed = m_elapsed - m_duration;	// Loop time
+						m_elapsed = std::fmodf(m_elapsed, m_duration);	// Loop time
 						break;
 					case PlayType::Once:
 					default:

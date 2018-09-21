@@ -33,6 +33,8 @@ namespace ThomasEditor
         {
             rBody = gameObject.GetComponent<Rigidbody>();
             //test = camPrefab.GetComponent<Camera>();
+            if (isOwner)
+                camPrefab.AddComponent<Camera>();
         }
 
         //Coroutine for jumping delay, also used for tackling delay
@@ -58,6 +60,8 @@ namespace ThomasEditor
 
         public override void Update()
         {
+            if (!isOwner)
+                return;
             //Jumping
             if (Input.GetKey(Input.Keys.Space) && jumpDelay)
             {
