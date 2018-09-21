@@ -45,7 +45,6 @@ namespace ThomasEngine
 		virtual void OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 		virtual void OnCollisionEnter(GameObject^ collider);
 
-		[NonSerializedAttribute]
 		GameObject^ m_gameObject;
 
 		
@@ -93,6 +92,8 @@ namespace ThomasEngine
 				}
 			}
 		}
+
+
 
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject

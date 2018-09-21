@@ -540,6 +540,11 @@ namespace ThomasEditor
         {
             SaveLayout();
         }
+
+        private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
+        {
+            ThomasWrapper.ToggleEditorRendering();
+        }
     }
 
     public static class Extensions

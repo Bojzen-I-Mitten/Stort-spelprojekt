@@ -19,6 +19,7 @@ namespace thomas {
 				m_bounds.Extents.x = 0;
 				m_bounds.Extents.y = 0;
 				m_bounds.Extents.z = 0;
+				m_materials.push_back(resource::Material::GetStandardMaterial());
 			}
 
 			bool RenderComponent::SetModel(resource::Model* model)
@@ -30,15 +31,16 @@ namespace thomas {
 					m_bounds.Extents.x = 0;
 					m_bounds.Extents.y = 0;
 					m_bounds.Extents.z = 0;
+					m_materials.resize(1);
 				}
 				else
 				{
 					m_model = model;
-					if (m_model->GetMeshes().size() < m_materials.size())
+					if (m_model->GetMeshes().size() < m_materials.size()){
 						m_materials.resize(m_model->GetMeshes().size());
-
+					}
 					while (m_model->GetMeshes().size() > m_materials.size())
-						m_materials.push_back(resource::Material::GetStandardMaterial());
+						m_materials.push_back(m_materials[0]);
 				}
 				return true;
 			}

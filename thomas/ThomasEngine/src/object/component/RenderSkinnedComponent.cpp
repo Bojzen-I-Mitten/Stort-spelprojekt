@@ -55,6 +55,7 @@ namespace ThomasEngine
 			return (Material^)mat;
 		else
 			return gcnew Material(nptr);
+		applyAnimation();
 	}
 	void RenderSkinnedComponent::material::set(Material^ value) {
 		if (value)
@@ -70,7 +71,7 @@ namespace ThomasEngine
 	{
 		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
 		ptr->Update();
-
+		/*
 		if (Input::GetKeyDown(Input::Keys::Space)) {
 			thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
 			for (unsigned int i = 0; i < anim->boneCount(); i++) {
@@ -78,14 +79,17 @@ namespace ThomasEngine
 				gObj->transform->world = Utility::Convert(anim->getBoneMatrix(i)) * m_gameObject->transform->world;
 			}
 		}
+		*/
 	}
 
 	void RenderSkinnedComponent::applyAnimation()
 	{
 		if (m_anim == nullptr)
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->clearBlendTree();
-		else if (m_model != nullptr)
+		else if (m_model != nullptr) {
 			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(m_anim->get());
+		}
+			
 	}
 
 }

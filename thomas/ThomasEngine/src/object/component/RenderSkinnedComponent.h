@@ -29,7 +29,6 @@ namespace ThomasEngine
 			void set(Animation^ value);
 		}
 
-
 		property Material^ material {
 			Material^ get();
 			void set(Material^ value);

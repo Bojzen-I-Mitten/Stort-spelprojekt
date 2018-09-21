@@ -28,12 +28,12 @@ namespace ThomasEngine
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
 		Scene^ scene;
-
 		GameObject() : Object(new thomas::object::GameObject("gameobject")) 
 		{
 			m_name = "gameobject";
 
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+			m_loading = true;
 		}
 
 

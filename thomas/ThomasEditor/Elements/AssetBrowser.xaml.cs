@@ -246,7 +246,7 @@ namespace ThomasEditor
         {
             Dispatcher.BeginInvoke(new Action<String>((String p) =>
             {
-
+                
                 AddNode(p);
                 ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(p);
             }), e.FullPath);
