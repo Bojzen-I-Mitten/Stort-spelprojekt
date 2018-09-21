@@ -67,7 +67,7 @@ namespace thomas
 
 
 				//void UpdateChildren();
-				void SetParent(Transform* parent);
+				void SetParent(Transform* parent, bool worldPositionStays);
 				Transform* GetParent();
 				std::vector<Transform*> GetChildren();
 				void RemoveParent();
