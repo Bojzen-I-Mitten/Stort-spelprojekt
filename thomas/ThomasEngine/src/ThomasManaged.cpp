@@ -29,13 +29,8 @@ namespace ThomasEngine {
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
 		}
-
 	}
 
-	void ThomasWrapper::UpdateEditor()
-	{
-		updateEditor = true;
-	}
 
 	void ThomasWrapper::StartRenderer()
 	{
@@ -45,7 +40,7 @@ namespace ThomasEngine {
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
 			Window::ClearAllWindows();
-			thomas::graphics::Renderer::ProcessCommands();
+			graphics::Renderer::S_RENDERER.ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
 			thomas::ThomasTime::Update();
@@ -55,7 +50,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		thomas::Window::EndFrame(true);
-		thomas::graphics::Renderer::TransferCommandList();
+		graphics::Renderer::S_RENDERER.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 	}
 
@@ -100,9 +95,9 @@ namespace ThomasEngine {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
 				{
-					if (gameObject->GetComponent<Rigidbody^>()->GetTargetCollider() != nullptr)
+					auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
+					if (collider != nullptr)
 					{
-						auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
 						gameObject->OnCollisionEnter(collider);
 					}
 
@@ -112,7 +107,7 @@ namespace ThomasEngine {
 
 			//Rendering
 
-			graphics::Renderer::ClearCommands();
+			graphics::Renderer::S_RENDERER.ClearCommands();
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{
@@ -141,10 +136,6 @@ namespace ThomasEngine {
 				UpdateFinished->Set();
 			}
 			Monitor::Exit(lock);
-
-			if (updateEditor)
-				OnEditorUpdate();
-			updateEditor = false;
 
 			ScriptingManger::ReloadIfNeeded();
 		}

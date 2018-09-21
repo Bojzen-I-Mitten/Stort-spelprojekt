@@ -20,6 +20,11 @@ namespace ThomasEngine
 		{
 		}
 
+		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
+		static event ParentChanged^ OnParentChanged;
+
+		
+		
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{
@@ -50,12 +55,27 @@ namespace ThomasEngine
 			}
 		}
 
+		 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetPosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetPosition(thomas::math::Vector3(value.x, value.y, value.z)); OnPropertyChanged("localPosition");}
 		}
+
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Matrix world
+		{
+			Matrix get() { return Utility::Convert(((thomas::object::component::Transform*)nativePtr)->GetWorldMatrix()); }
+			void set(Matrix value) { ((thomas::object::component::Transform*)nativePtr)->SetWorldMatrix(Utility::Convert(value));
+			OnPropertyChanged("localPosition");
+			OnPropertyChanged("localEulerAngles");
+			OnPropertyChanged("localScale");
+			}
+		}
+
 
 		[DisplayNameAttribute("position")]
 		property Vector3 localPosition
@@ -64,6 +84,7 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalPosition(value.x, value.y, value.z); }
 		}
 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Quaternion rotation
 		{
@@ -71,6 +92,7 @@ namespace ThomasEngine
 			void set(Quaternion value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(thomas::math::Quaternion(value.x, value.y, value.z, value.w)); OnPropertyChanged("localEulerAngles");}
 		}
 	
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 eulerAngles
 		{
@@ -85,6 +107,7 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalRotation(value.y, value.x, value.z); }
 		}
 		
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 scale
 		{
@@ -150,6 +173,9 @@ namespace ThomasEngine
 			else
 				return false;
 		}
+
+		void SetParent(Transform^ value);
+		void SetParent(Transform^ value, bool worldPositionStays);
 
 		void OnDestroy() override;
 		void Update() override

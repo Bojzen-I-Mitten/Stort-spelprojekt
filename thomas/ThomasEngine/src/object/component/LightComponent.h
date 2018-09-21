@@ -18,7 +18,8 @@ namespace ThomasEngine
 		{
 			DIRECTIONAL = 0,
 			POINT = 1,
-			SPOT = 2
+			SPOT = 2,
+			AREA = 3
 		};
 		
 		
@@ -33,12 +34,21 @@ namespace ThomasEngine
 			}
 		}
 
-		property Color color {
+		property Color DiffuseColor {
 			Color get() {
-				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColor());
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColorDiffuse());
 			}
 			void set(Color value) {
-				((thomas::object::component::LightComponent*)nativePtr)->SetColor(Utility::Convert(value));
+				((thomas::object::component::LightComponent*)nativePtr)->SetColorDiffuse(Utility::Convert(value));
+			}
+		}
+
+		property Color SpecularColor {
+			Color get() {
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetColorSpecular());
+			}
+			void set(Color value) {
+				((thomas::object::component::LightComponent*)nativePtr)->SetColorSpecular(Utility::Convert(value));
 			}
 		}
 		property float Intensity {
@@ -90,8 +100,15 @@ namespace ThomasEngine
 			}
 		}
 		
-
-
+		property Vector2 AreaRectangle {
+			Vector2 get() {
+				return Utility::Convert(((thomas::object::component::LightComponent*)nativePtr)->GetRectangleDimensions());
+			}
+			void set(Vector2 value) {
+				((thomas::object::component::LightComponent*)nativePtr)->SetRectangleDimensions(Utility::Convert(value));
+			} 
+		}
+		
 		void Update() override
 		{
 			((thomas::object::component::LightComponent*)nativePtr)->Update();

@@ -78,7 +78,7 @@ namespace thomas
 				m_material->SetVector("cameraPos", math::Vector4(cameraScaleMatrix));
 				m_material->SetInt("gridScale", scale);
 
-				graphics::Renderer::SubmitCommand(graphics::RenderCommand(worldMatrix, m_mesh, m_material, camera));
+				graphics::Renderer::S_RENDERER.SubmitCommand(graphics::RenderCommand(worldMatrix, m_mesh.get(), m_material, camera));
 			}
 
 		}

@@ -5,7 +5,7 @@
 #include "component\physics\BoxCollider.h"
 #include "component\physics\SphereCollider.h"
 #include "..\Debug.h"
-
+#include "../Utility.h"
 namespace ThomasEngine {
 
 	void GameObject::Destroy()
@@ -40,12 +40,22 @@ namespace ThomasEngine {
 			Debug::Log("Object to instantiate is null");
 			return nullptr;
 		}
-		System::IO::Stream^ serialized = SerializeGameObject(original);
-
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		GameObject^ clone = DeSerializeGameObject(serialized);
-		if(clone)
+		GameObject^ clone;
+		if (original->prefabPath != nullptr) {
+			clone = Resources::LoadPrefab(original->prefabPath, true);
+		}
+		else
+		{
+			System::IO::Stream^ serialized = SerializeGameObject(original);
+			clone = DeSerializeGameObject(serialized);
+		}
+		
+		if (clone) {
 			clone->PostInstantiate(Scene::CurrentScene);
+			clone->prefabPath = nullptr;
+		}
+			
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
@@ -133,7 +143,8 @@ namespace ThomasEngine {
 			return gObj;
 		}
 		catch (Exception^ e) {
-			Debug::Log("Failed to load gameObject");
+			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
+			LOG(msg);
 			return nullptr;
 		}
 		

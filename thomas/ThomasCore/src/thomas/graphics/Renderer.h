@@ -26,6 +26,9 @@ namespace thomas
 	namespace resource
 	{
 		class Material;
+		namespace shaderproperty {
+			class ShaderProperty;
+		}
 	}
 
 	namespace graphics
@@ -34,13 +37,17 @@ namespace thomas
 
 		struct RenderCommand
 		{
-			object::component::Camera* camera;
-			math::Matrix worldMatrix;
-			std::shared_ptr<Mesh> mesh; //This doesn't have to be a shared ptr? More process overhead!
-			resource::Material* material;
+			object::component::Camera* camera;								// Camera rendered from
+			math::Matrix worldMatrix;										// World matrix, make local?
+			Mesh* mesh;														// Rendered mesh
+			resource::Material* material;									// Material used for rendering
+			size_t num_local_prop;									// Number of local properties
+			const resource::shaderproperty::ShaderProperty ** local_prop;	// Properties local to rendered object
 
-			RenderCommand(math::Matrix world, std::shared_ptr<Mesh> m, resource::Material* mat, object::component::Camera* cam) :
-				worldMatrix(world), mesh(m), material(mat), camera(cam) {};
+			RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam) :
+				camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(0), local_prop(NULL) {};
+			RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam, size_t num_local_prop, const resource::shaderproperty::ShaderProperty ** local_prop) :
+				camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(num_local_prop), local_prop(local_prop) {};
 		};
 
 		struct MaterialSorter
@@ -53,20 +60,23 @@ namespace thomas
 		class Renderer {
 		private:
 			static LightManager s_lightManager;
-			static void BindFrame();
-			static void BindObject(thomas::resource::Material* material, const thomas::math::Matrix& worldMatrix);
-						
+			void BindFrame();
+			void BindObject(RenderCommand & rC);
+
 		public:
-			static void BindCamera(thomas::object::component::Camera* camera);
-			static void ProcessCommands();
-			static void ClearCommands();
-			static void SubmitCommand(RenderCommand command);
-			static void TransferCommandList();
+
+			static Renderer S_RENDERER;
+
+			void BindCamera(thomas::object::component::Camera* camera);
+			void ProcessCommands();
+			void ClearCommands();
+			void SubmitCommand(RenderCommand command);
+			void TransferCommandList();
 
 
 		private:
-			static CommandQueue s_renderCommands;
-			static CommandQueue s_lastFramesCommands;
+			CommandQueue s_renderCommands;
+			CommandQueue s_lastFramesCommands;
 		};
 	}
 }

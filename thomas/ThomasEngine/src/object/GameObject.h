@@ -102,7 +102,11 @@ namespace ThomasEngine
 			{
 				Component^ component = m_components[i];
 				if (component->enabled)
+				{
 					component->Update();
+					component->UpdateCoroutines();
+				}
+					
 			}
 			Monitor::Exit(m_componentsLock);
 		}
@@ -277,6 +281,7 @@ namespace ThomasEngine
 				if (m_components[i]->GetType() == type)
 					return m_components[i];
 			}
+			return nullptr;
 		}
 
 

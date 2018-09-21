@@ -20,20 +20,37 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\BaseAnimationTime.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\BlendNode.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
     <ClCompile Include="include\imgui\ImGuizmo.cpp" />
     <ClCompile Include="include\imgui\imgui_demo.cpp" />
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\AnimationData.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\BoneFrame.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\Channel.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\ChannelKeys.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\KeyFrame.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\data\Skeleton.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\Playback.cpp" />
     <ClCompile Include="src\thomas\editor\EditorCamera.cpp" />
     <ClCompile Include="src\thomas\editor\EditorGrid.cpp" />
     <ClCompile Include="src\thomas\editor\gizmos\Gizmos.cpp" />
     <ClCompile Include="src\thomas\graphics\LightManager.cpp" />
     <ClCompile Include="src\thomas\graphics\ParticleSystem.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\BoxCollider.cpp" />
+    <ClCompile Include="src\thomas\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\SphereCollider.cpp" />
+    <ClCompile Include="src\thomas\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\thomas\resource\Animation.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderProperty.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyMatrix.cpp" />
     <ClCompile Include="src\thomas\resource\ComputeShader.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
@@ -67,6 +84,10 @@
     <ClCompile Include="src\thomas\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
+    <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
+    <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
+    <ClInclude Include="src\thomas\graphics\animation\BlendNode.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
     <ClInclude Include="include\imgui\ImGuizmo.h" />
@@ -75,16 +96,30 @@
     <ClInclude Include="include\imgui\stb_rect_pack.h" />
     <ClInclude Include="include\imgui\stb_textedit.h" />
     <ClInclude Include="include\imgui\stb_truetype.h" />
+    <ClInclude Include="src\thomas\graphics\animation\Playback.h" />
     <ClInclude Include="src\thomas\Common.h" />
     <ClInclude Include="src\thomas\editor\EditorCamera.h" />
     <ClInclude Include="src\thomas\editor\EditorGrid.h" />
     <ClInclude Include="src\thomas\editor\gizmos\Gizmos.h" />
+    <ClInclude Include="src\thomas\graphics\animation\AnimatedSkeleton.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\AnimationData.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\Bone.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\BoneFrame.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\Channel.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\ChannelKeys.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\KeyFrame.h" />
+    <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
+    <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
+    <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
+    <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
+    <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ComputeShader.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />

@@ -3,144 +3,541 @@
 #include "AudioClip.h"
 #include "Material.h"
 #include "Shader.h"
+#include "Animation.h"
 #include "texture\Texture2D.h"
 #include "Resources.h"
 #include "../Scene.h"
 #include "..\object\GameObject.h"
 namespace ThomasEngine
 {
-	Resource^ Resources::Load(String^ path)
+
+	void Resources::OnPlay()
 	{
-		String^ thomasPath = ConvertToThomasPath(path);
-		if (resources->ContainsKey(thomasPath))
+		for each (Resource^ resource in resources->Values)
 		{
-			Resource^ obj = resources[thomasPath];
-			return obj;
+			resource->OnPlay();
 		}
-		else
+	}
+	void Resources::OnStop()
+	{
+		for each (Resource^ resource in resources->Values)
 		{
-			Resource^ obj;
-			AssetTypes type = GetResourceAssetType(path);
+			resource->OnStop();
+		}
+	}
+
+
+
+#pragma region Path
+
+	String^ Resources::ConvertToThomasPath(String^ value) {
+		if (value->Contains("%THOMAS_ASSETS%") || value->Contains("%THOMAS_DATA%"))
+			return value;
+		if (value->Contains(Application::editorAssets)) value = value->Replace(Application::editorAssets, "%THOMAS_DATA%");
+		else if (Application::currentProject) value = value->Replace(Application::currentProject->assetPath, "%THOMAS_ASSETS%");
+		else {
+			value = System::IO::Path::GetFullPath(value);
+			value = ConvertToThomasPath(value);
+		}
+
+		return value;
+	}
+	String^ Resources::ConvertToRealPath(String^ value) {
+		value = value->Replace("%THOMAS_DATA%", Application::editorAssets);
+		value = value->Replace("%THOMAS_ASSETS%", Application::currentProject->assetPath);
+		return value;
+	}
+	String^ Resources::GetUniqueName(String^ path)
+	{
+		String^ extension = IO::Path::GetExtension(path);
+		String^ modifier = "";
+		path = IO::Path::GetDirectoryName(path) + "\\" + IO::Path::GetFileNameWithoutExtension(path);
+		int i = 0;
+		while (IO::File::Exists(path + modifier + extension))
+		{
+			i++;
+			modifier = "(" + i + ")";
+		}
+		path = path + modifier + extension;
+		return path;
+	}
+#pragma endregion
+
+#pragma region Serialization (Create/Store)
+
+	List<Type^>^ Resources::getKnownTypes() {
+		return Material::GetKnownTypes();
+		/*List<Type^>^ knownTypes = gcnew List<Type^>();
+		knownTypes->AddRange(System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes);
+		knownTypes->AddRange(System::Reflection::Assembly::GetAssembly(Color::typeid)->ExportedTypes);
+		return knownTypes;*/
+	}
+
+	generic<typename T>
+		where T : Resource
+		T Resources::Deserialize(String^ path)
+		{
+			Monitor::Enter(resourceLock);
+			std::string err;
+			T resource;
+			try
+			{
+				// Create serialization contract
+				using namespace System::Runtime::Serialization;
+				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+				serializserSettings->PreserveObjectReferences = true;
+				serializserSettings->KnownTypes = getKnownTypes();
+				DataContractSerializer^ serializer = gcnew DataContractSerializer(T::typeid, serializserSettings);
+				try {
+					// Read file
+					Xml::XmlReader^ file = Xml::XmlReader::Create(path);
+					resource = (T)serializer->ReadObject(file);
+					file->Close();
+					resource->Rename(path);
+				}
+				catch (Exception^ e) {
+					err = std::string("Warning! Deserialization failed to open file: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+					LOG(err);
+				}
+			}
+			catch (Exception^ e)
+			{
+				err = std::string("Warning! Deserialization failed, at path: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+				LOG(err);
+			}
+			finally{
+				// Leave
+				Monitor::Exit(resourceLock);
+			}
+			return resource;
+		}
+
+
+		bool Resources::CreateResource(Resource^ resource, String^ path)
+		{
+			path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
+			Monitor::Enter(resourceLock);
+			using namespace System::Runtime::Serialization;
+
+
+			std::string err;
 			try {
+				// Serialization Settings
+				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+				serializserSettings->PreserveObjectReferences = true;
+				serializserSettings->KnownTypes = getKnownTypes();
+				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+				try {
+					// XML Settings
+					Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+					settings->Indent = true;
+					// Create file
+					System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
+					fi->Directory->Create();
+					Xml::XmlWriter^ file = Xml::XmlWriter::Create(path, settings);
+					serializer->WriteObject(file, resource);
+					// Close file stream
+					file->Close();
+					// Success: Append resource
+					resources[System::IO::Path::GetFullPath(path)] = resource;
+					resource->Rename(path);	// Set file name
+				}
+				catch (Exception^ e) {
+					err = std::string("Warning! Creating resource failed creating file: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+					LOG(err);
+					return false;
+				}
+			}
+			catch (Exception^ e) {
+				err = std::string("Warning! Creating resource failed serializer contract, at path: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
+				LOG(err);
+				return false;
+			}
+			finally{
+				Monitor::Exit(resourceLock);
+			}
+			return true;
+		}
+		bool Resources::SaveResource(Resource^ resource)
+		{
+			Monitor::Enter(resourceLock);
+			// Begin write
+			std::string err;
+			try {
+				using namespace System::Runtime::Serialization;
+				// Serializer Setting
+				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
+				serializserSettings->PreserveObjectReferences = true;
+				serializserSettings->KnownTypes = getKnownTypes();
+
+				try {
+					// XML Settings
+					Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+					settings->Indent = true;
+					// Create file
+					System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
+					fi->Directory->Create();
+					Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
+					// Write file
+					DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+					serializer->WriteObject(file, resource);
+					// Close file stream
+					file->Close();
+				}
+				catch (Exception^ e) {
+					err = std::string("Warning! Storing resource failed creating file: " + Utility::ConvertString(resource->m_path) + ". With message:\n" + Utility::ConvertString(e->Message));
+					LOG(err);
+					return false;
+				}
+			}
+			catch (Exception^ e) {
+				err = std::string("Warning! Storing resource failed serializer contract, at path: " + Utility::ConvertString(resource->m_path) + ". With message:\n" + Utility::ConvertString(e->Message));
+				LOG(err);
+				return false;
+			}
+			finally{
+				// Release
+				Monitor::Exit(resourceLock);
+			}
+			return true;
+		}
+
+#pragma endregion
+
+#pragma region Type
+
+		Resources::AssetTypes Resources::GetResourceAssetType(String^ path)
+		{
+			String^ extension = System::IO::Path::GetExtension(path);
+			if (extension->Length == 0)
+				return AssetTypes::UNKNOWN;
+			extension = extension->Remove(0, 1)->ToLower();
+			if (extension == "fx")
+			{
+				return AssetTypes::SHADER;
+			}
+			else if (extension == "cs")
+			{
+				return AssetTypes::SCRIPT;
+			}
+			else if (extension == "tds")
+			{
+				return AssetTypes::SCENE;
+			}
+			else if (extension == "wav")
+			{
+				return AssetTypes::AUDIO_CLIP;
+			}
+			else if (extension == "obj" || extension == "fbx")
+			{
+				return AssetTypes::MODEL;
+			}
+			else if (extension == "anim" || extension == "dae")
+			{
+				return AssetTypes::ANIMATION;
+			}
+			else if (extension == "mat")
+			{
+				return AssetTypes::MATERIAL;
+			}
+			else if (extension == "bmp" || extension == "jpg" || extension == "png" || extension == "gif" || extension == "tif")
+			{
+				return AssetTypes::TEXTURE2D;
+			}
+			else if (extension == "prefab")
+				return AssetTypes::PREFAB;
+			else
+			{
+				return AssetTypes::UNKNOWN;
+			}
+		}
+
+		Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
+		{
+
+			if (type == AudioClip::typeid)
+			{
+				return AssetTypes::AUDIO_CLIP;
+			}
+			else if (type == Model::typeid)
+			{
+				return AssetTypes::MODEL;
+			}
+			else if (type == Animation::typeid)
+			{
+				return AssetTypes::ANIMATION;
+			}
+			else if (type == Material::typeid)
+			{
+				return AssetTypes::MATERIAL;
+			}
+			else if (type == Shader::typeid)
+			{
+				return AssetTypes::SHADER;
+			}
+			else if (type == Texture2D::typeid)
+			{
+				return AssetTypes::TEXTURE2D;
+			}
+			else
+			{
+				return AssetTypes::UNKNOWN;
+			}
+		}
+
+#pragma endregion
+
+#pragma region Load/Unload/Fetch
+
+		Resource^ Resources::LoadThomasPath(String^ thomasPath)
+		{
+			String^ sysPath = ConvertToRealPath(thomasPath);
+			return Load(sysPath, thomasPath);
+		}
+		Resource^ Resources::LoadSysPath(String^ sysPath)
+		{
+			String^ thomasPath = ConvertToThomasPath(sysPath);
+			return Load(sysPath, thomasPath);
+		}
+		Resource^ Resources::Load(String^ path, String^ thomasPath)
+		{
+			if (resources->ContainsKey(thomasPath))
+			{
+				Resource^ obj = resources[thomasPath];
+				return obj;
+			}
+			else
+			{
+				Resource^ obj;
+				AssetTypes type = GetResourceAssetType(path);
+				try {
+					switch (type)
+					{
+					case AssetTypes::MODEL:
+						obj = gcnew Model(path);
+						break;
+					case AssetTypes::TEXTURE2D:
+						obj = gcnew Texture2D(path);
+						break;
+					case AssetTypes::SCENE:
+						break;
+					case AssetTypes::SHADER:
+						obj = gcnew Shader(path);
+						break;
+					case AssetTypes::ANIMATION:
+						obj = gcnew Animation(path);
+						break;
+					case AssetTypes::MATERIAL:
+						obj = Deserialize<Material^>(path);
+						break;
+					case AssetTypes::SCRIPT:
+						break;
+					case AssetTypes::AUDIO_CLIP:
+						obj = gcnew AudioClip(path);
+						break;
+					case AssetTypes::UNKNOWN:
+						break;
+					default:
+						break;
+					}
+				}
+				catch (SerializationException^ e) {
+					std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: Serialization failed " + Utility::ConvertString(e->Message);
+					obj = LoadErrorResource(type);
+					LOG(error);
+				}
+				catch (Exception^ e) {
+					std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: " + Utility::ConvertString(e->Message);
+					LOG(error);
+					obj = LoadErrorResource(type);
+					//Debug::Log("Failed to create resource from file. Filename: " + path + " \nError: " + e->Message);
+				}
+
+				if (obj != nullptr)
+				{
+					resources[thomasPath] = obj;
+				}
+				return obj;
+			}
+
+		}
+#pragma region PreFab
+
+		void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
+		{
+			path = Application::currentProject->assetPath + "\\" + path;
+
+			GameObject::SerializeGameObject(path, gameObject);
+
+		}
+
+		GameObject ^ Resources::LoadPrefab(String^ path) {
+			return LoadPrefab(path, false);
+		}
+
+		GameObject ^ Resources::LoadPrefab(String^ path, bool forceInstantiate)
+		{
+			if (!forceInstantiate) {
+				for each(GameObject^ gObj in GameObject::GetAllGameObjects(true))
+				{
+					if (gObj->prefabPath == path)
+						return gObj;
+				}
+			}
+
+
+			IO::FileStream^ fileStream = IO::File::OpenRead(path);
+			GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
+			fileStream->Close();
+			if (prefab)
+				prefab->prefabPath = path;
+			return prefab;
+		}
+
+#pragma endregion
+		generic<typename T>
+			where T : Resource
+			T Resources::Load(String^ path)
+			{
+				String^ thomasPath = ConvertToThomasPath(path);
+				if (resources->ContainsKey(thomasPath))
+				{
+					Resource^ obj = resources[thomasPath];
+					if (obj->GetType() == T::typeid)
+						return (T)obj;
+					else
+					{
+						return T();
+						//error blablablabla.
+					}
+				}
+				else
+				{
+					T resource = (T)Activator::CreateInstance(T::typeid, path);
+					resources[thomasPath] = resource;
+					return resource;
+				}
+			}
+
+			void Resources::Unload(Resource^ resource) {
+				if (Find(resource->m_path))
+				{
+					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
+				}
+			}
+
+			void Resources::LoadAll(String^ path)
+			{
+				array<String^>^ directories = IO::Directory::GetDirectories(path);
+				array<String^>^ files = IO::Directory::GetFiles(path);
+				for each(String^ dir in directories)
+				{
+					LoadAll(dir);
+				}
+				for each(String^ file in files)
+				{
+					LoadSysPath(file);
+				}
+			}
+
+			void Resources::UnloadAll()
+			{
+				for each(String^ resource in resources->Keys)
+				{
+					resources[resource]->~Resource();
+				}
+			}
+#pragma endregion
+
+#pragma region Find/Set/Get
+
+			Resource^ Resources::FindResourceFromNativePtr(thomas::resource::Resource* nativePtr)
+			{
+				if (nativePtr == nullptr)
+					return nullptr;
+				for each(Resource^ resource in resources->Values)
+				{
+					if (resource->m_nativePtr == nativePtr)
+						return resource;
+				}
+				return nullptr;
+			}
+
+			Resource ^ Resources::Find(String ^ path)
+			{
+				String^ thomasPath = ConvertToThomasPath(path);
+				if (resources->ContainsKey(thomasPath))
+				{
+					return resources[thomasPath];
+				}
+				return nullptr;
+			}
+
+			List<Resource^>^ Resources::GetResourcesOfType(Type^ type)
+			{
+				List<Resource^>^ list = gcnew List<Resource^>();
+				for each (Resource^ resource in resources->Values)
+				{
+					if (resource->GetType() == type)
+						list->Add(resource);
+				}
+				return list;
+			}
+			Resource ^ Resources::LoadErrorResource(AssetTypes type)
+			{
+				Resource^ obj = nullptr;
 				switch (type)
 				{
 				case AssetTypes::MODEL:
-					obj = gcnew Model(path);
+					//obj = gcnew Model(path); Error model
 					break;
 				case AssetTypes::TEXTURE2D:
-					obj = gcnew Texture2D(path);
+					//obj = gcnew Texture2D(path); Error texture
 					break;
 				case AssetTypes::SCENE:
 					break;
 				case AssetTypes::SHADER:
-					obj = gcnew Shader(path);
+					//obj = Shader::Find() Failed shader
 					break;
 				case AssetTypes::MATERIAL:
-					obj = Deserialize<Material^>(path);
+					// obj = Deserialize<Material^>(path); Failed material
 					break;
 				case AssetTypes::SCRIPT:
 					break;
 				case AssetTypes::AUDIO_CLIP:
-					obj = gcnew AudioClip(path);
+					// obj = gcnew AudioClip(path); Failed audio?
 					break;
 				case AssetTypes::UNKNOWN:
-					break;
 				default:
 					break;
 				}
+				return obj;
 			}
-			catch (SerializationException^ e) {
-				std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: Serialization failed";
-				LOG(error);
-			}
-			catch (Exception^ e) {
-				std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: " + Utility::ConvertString(e->Message);
-				LOG(error);
-				//Debug::Log("Failed to create resource from file. Filename: " + path + " \nError: " + e->Message);
-			}
-			
-			if (obj != nullptr)
+			void Resources::RenameResource(String ^ oldPath, String ^ newPath)
 			{
-				resources[thomasPath] = obj;
+				String^ thomasPathOld = ConvertToThomasPath(oldPath);
+				String^ thomasPathNew = ConvertToThomasPath(oldPath);
+				if (resources->ContainsKey(thomasPathOld))
+				{
+					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
+
+					System::Threading::Monitor::Enter(lock);
+					Resource^ resource = resources[thomasPathOld];
+					resources->Remove(thomasPathOld);
+					resources[thomasPathNew] = resource;
+					if (resource)
+						resource->Rename(newPath);
+
+					System::Threading::Monitor::Exit(lock);
+				}
 			}
-			return obj;
-		}
-		
-	}
-	void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
-	{
-		path = Application::currentProject->assetPath + "\\" + path;
+			generic<typename T>
+				where T : Resource
+			List<T>^ Resources::GetResourcesOfType()
+			{
+				return (List<T>^)Enumerable::OfType<T>(resources->Values);
+			}
+#pragma endregion
 
-		GameObject::SerializeGameObject(path, gameObject);
 
-	}
-	GameObject ^ Resources::LoadPrefab(String^ path)
-	{
-		for each(GameObject^ gObj in GameObject::GetAllGameObjects(true))
-		{
-			if (gObj->prefabPath == path)
-				return gObj;
-		}
-		
-		IO::FileStream^ fileStream = IO::File::OpenRead(path);
-		GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
-		fileStream->Close();
-		prefab->prefabPath = path;
-		return prefab;
-	}
-	Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
-	{
-		
-		if (type == AudioClip::typeid)
-		{
-			return AssetTypes::AUDIO_CLIP;
-		}
-		else if (type == Model::typeid)
-		{
-			return AssetTypes::MODEL;
-		}
-		else if (type == Material::typeid)
-		{
-			return AssetTypes::MATERIAL;
-		}
-		else if (type == Shader::typeid)
-		{
-			return AssetTypes::SHADER;
-		}
-		else if (type == Texture2D::typeid)
-		{
-			return AssetTypes::TEXTURE2D;
-		}
-		else
-		{
-			return AssetTypes::UNKNOWN;
-		}
-	}
-	Resource ^ Resources::Find(String ^ path)
-	{
-		String^ thomasPath = ConvertToThomasPath(path);
-		if (resources->ContainsKey(thomasPath))
-		{
-			return resources[thomasPath];
-		}
-		return nullptr;
-	}
-	void Resources::RenameResource(String ^ oldPath, String ^ newPath)
-	{
-		String^ thomasPathOld = ConvertToThomasPath(oldPath);
-		String^ thomasPathNew = ConvertToThomasPath(oldPath);
-		if (resources->ContainsKey(thomasPathOld))
-		{
-			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
-
-			System::Threading::Monitor::Enter(lock);
-			Resource^ resource = resources[thomasPathOld];
-			resources->Remove(thomasPathOld);
-			resources[thomasPathNew] = resource;
-			if (resource)
-				resource->Rename(newPath);
-
-			System::Threading::Monitor::Exit(lock);
-		}
-	}
 }

@@ -13,7 +13,7 @@ namespace thomas
 			public:
 				virtual ~Component();	
 				virtual void Awake() {};
-				virtual void OnEnable() { };
+				virtual void OnEnable() {};
 				virtual void OnDisable() {};
 				virtual void Update() {};
 				virtual void FixedUpdate() {};

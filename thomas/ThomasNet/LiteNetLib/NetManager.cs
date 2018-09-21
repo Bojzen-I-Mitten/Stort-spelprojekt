@@ -258,6 +258,11 @@ namespace LiteNetLib
             return result;
         }
 
+        public void SendToPeer(NetDataWriter writer, DeliveryMethod options, NetPeer peer)
+        {
+            SendRaw(writer.Data, 0, writer.Length, peer.EndPoint);
+        }
+
         internal bool SendRaw(NetPacket packet, IPEndPoint remoteEndPoint)
         {
             return SendRaw(packet.RawData, 0, packet.Size, remoteEndPoint);

@@ -3,7 +3,7 @@
 #include "../object/component/Transform.h"
 #include "../object/component/Camera.h"
 #include "../object/GameObject.h"
-//#include "../resource/ComputeShader.h"
+#include "../resource/ComputeShader.h"
 #include "Renderer.h"
 #include "../utils/d3d.h"
 #include "../ThomasCore.h"
@@ -15,12 +15,6 @@ namespace thomas
 {
 	namespace graphics
 	{
-
-		resource::ComputeShader* ParticleSystem::s_updateParticlesCS;
-		resource::ComputeShader* ParticleSystem::s_emitParticlesCS;
-
-		ID3D11UnorderedAccessView* ParticleSystem::s_activeParticleUAV; //ping
-		ID3D11ShaderResourceView* ParticleSystem::s_activeParticleSRV; //pong
 
 		ParticleSystem::ParticleSystem()
 		{
@@ -97,31 +91,25 @@ namespace thomas
 		{
 		}
 
-
-		void ParticleSystem::SwapUAVsandSRVs(object::component::ParticleEmitterComponent * emitter)
+		void ParticleSystem::AddEmitterToInit(object::component::ParticleEmitterComponent * emitter)
 		{
-			object::component::ParticleEmitterComponent::D3DData* emitterD3D = emitter->GetD3DData();
-
-			emitterD3D->swapUAVandSRV = !emitterD3D->swapUAVandSRV;
-			
-			if (emitterD3D->swapUAVandSRV)
-			{
-				s_activeParticleUAV = emitterD3D->particleUAV1;
-				s_activeParticleSRV = emitterD3D->particleSRV2;
-			}
-			else
-			{
-				s_activeParticleUAV = emitterD3D->particleUAV2;
-				s_activeParticleSRV = emitterD3D->particleSRV1;
-			}
-
+			m_initEmitters.push_back(emitter);
 		}
 
-		void ParticleSystem::SpawnParticles(object::component::ParticleEmitterComponent * emitter, int amountOfParticles)
+		void ParticleSystem::AddEmitterToUpdate(object::component::ParticleEmitterComponent * emitter)
 		{
-			object::component::ParticleEmitterComponent::D3DData* emitterD3D = emitter->GetD3DData();
+			m_updateEmitters.push_back(emitter);
+		}
+
+
+		void ParticleSystem::SpawnParticles()
+		{
+
+
+			m_emitParticlesCS->
+			//object::component::ParticleEmitterComponent::D3DData* emitterD3D = emitter->GetD3DData();
 			
-			s_emitParticlesCS//SetBuffer("InitBuffer", *emitterD3D->particleBuffer);
+			//m_emitParticlesCS//SetBuffer("InitBuffer", *emitterD3D->particleBuffer);
 			//s_emitParticlesCS->SetGlobalResource("particlesWrite", *emitterD3D->particleUAV2);
 			//s_emitParticlesCS->SetUAV("particlesWrite2", *emitterD3D->particleUAV1);
 
@@ -129,10 +117,9 @@ namespace thomas
 
 		}
 
-		void ParticleSystem::UpdateParticles(object::component::ParticleEmitterComponent * emitter)
+		void ParticleSystem::UpdateParticles()
 		{
 
-			SwapUAVsandSRVs(emitter);
 
 			//bind CS
 			//s_updateParticlesCS->SetUAV("particlesWrite", *s_activeParticleUAV);
@@ -143,10 +130,10 @@ namespace thomas
 
 		}
 
-		void ParticleSystem::DrawParticles(object::component::ParticleEmitterComponent* emitter)
+		void ParticleSystem::DrawParticles()
 		{
 
-			UpdateParticles(emitter);
+			//UpdateParticles(emitter);
 
 			
 			//emitter->GetMaterial()->m_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -159,14 +146,7 @@ namespace thomas
 
 		}
 
-		void ParticleSystem::CreateBillboardUAVandSRV(int maxAmountOfParticles, ID3D11Buffer*& buffer, ID3D11UnorderedAccessView*& uav, ID3D11ShaderResourceView*& srv)
-		{
-			UINT bytewidth = sizeof(BillboardStruct) * maxAmountOfParticles;
-
-			UINT structurebytestride = sizeof(BillboardStruct);
-			thomas::utils::D3d::CreateBufferAndUAV(NULL, bytewidth, structurebytestride, buffer, uav, srv);
-
-		}
+		
 	}
 }
 

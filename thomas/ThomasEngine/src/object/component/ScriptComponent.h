@@ -10,8 +10,7 @@ namespace ThomasEngine
 	[HideInInspector]
 	public ref class ScriptComponent : public Component
 	{
-	private:
-
+	
 	public:
 		virtual void Awake() override {};
 		virtual void OnEnable() override {};
@@ -21,7 +20,7 @@ namespace ThomasEngine
 		virtual void OnDrawGizmosSelected() override {};
 		virtual void OnDrawGizmos() override {};
 		virtual void OnCollisionEnter(GameObject^ collider) override {};
-
+				
 		ScriptComponent() : Component(new thomas::object::component::ScriptComponent())
 		{
 		}

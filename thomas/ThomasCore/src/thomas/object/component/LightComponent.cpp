@@ -18,12 +18,16 @@ namespace thomas
 				m_type = graphics::LightManager::DIRECTIONAL;
 
 				m_lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
-				m_lightComponentData.color = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.colorDiffuse = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.colorSpecular = math::Vector3(1.0f, 1.0f, 1.0f);
 				m_lightComponentData.position = math::Vector3(1.0f, 1.0f, 1.0f);
-				m_lightComponentData.direction = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.direction = math::Vector3(0.0f, 0.0f, -1.0f);
+				m_lightComponentData.right = math::Vector3(1.0f, 0.0f, 0.0f);
+				m_lightComponentData.up = math::Vector3(0.0f, 1.0f, 0.0f);
 				m_lightComponentData.intensity = 1.0f;
 				m_lightComponentData.spotInnerAngle = 0.0f;
 				m_lightComponentData.spotOuterAngle = 20.0f;
+				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
 			}
 			LightComponent::~LightComponent()
 			{
@@ -39,7 +43,8 @@ namespace thomas
 			{
 				m_lightComponentData.position = m_gameObject->m_transform->GetPosition();
 				m_lightComponentData.direction = m_gameObject->m_transform->Forward();
-				
+				m_lightComponentData.right = m_gameObject->m_transform->Right();
+				m_lightComponentData.up = m_gameObject->m_transform->Up();
 			}
 
 			void LightComponent::OnEnable()
@@ -68,76 +73,96 @@ namespace thomas
 					m_type = other;
 			}
 
-			thomas::math::Color LightComponent::GetColor()
+			thomas::math::Color LightComponent::GetColorDiffuse()
 			{
-				return thomas::math::Color(m_lightComponentData.color.x, m_lightComponentData.color.y, m_lightComponentData.color.z, 1.0f);
+				return thomas::math::Color(m_lightComponentData.colorDiffuse.x, m_lightComponentData.colorDiffuse.y, m_lightComponentData.colorDiffuse.z, 1.0f);
 			}
 
-			void LightComponent::SetColor(thomas::math::Color other)
+			void LightComponent::SetColorDiffuse(thomas::math::Color other)
 			{
-				m_lightComponentData.color = other.ToVector3();
+				m_lightComponentData.colorDiffuse = other.ToVector3();
 			}
 
-			float LightComponent::GetIntensity()
+			thomas::math::Color LightComponent::GetColorSpecular()
+			{
+				return thomas::math::Color(m_lightComponentData.colorSpecular.x, m_lightComponentData.colorSpecular.y, m_lightComponentData.colorSpecular.z, 1.0f);
+			}
+
+			void LightComponent::SetColorSpecular(thomas::math::Color other)
+			{
+				m_lightComponentData.colorSpecular = other.ToVector3();
+			}
+
+			float LightComponent::GetIntensity() const
 			{
 				return m_lightComponentData.intensity;
 			}
 
-			void LightComponent::SetIntensity(float value)
+			void LightComponent::SetIntensity(float const& value)
 			{
 				m_lightComponentData.intensity = value;
 			}
 
-			float LightComponent::GetSpotInnerAngle()
+			float LightComponent::GetSpotInnerAngle() const
 			{
 				return m_lightComponentData.spotInnerAngle;
 			}
 
-			void LightComponent::SetSpotInnerAngle(float value)
+			void LightComponent::SetSpotInnerAngle(float const& value)
 			{
 				m_lightComponentData.spotInnerAngle = value;
 			}
 
-			float LightComponent::GetSpotOuterAngle()
+			float LightComponent::GetSpotOuterAngle() const
 			{
 				return m_lightComponentData.spotOuterAngle;
 			}
 
-			void LightComponent::SetSpotOuterAngle(float value)
+			void LightComponent::SetSpotOuterAngle(float const& value)
 			{
 				m_lightComponentData.spotOuterAngle = value;
 			}
 
-			float LightComponent::GetConstantAttenuation()
+			float LightComponent::GetConstantAttenuation() const
 			{
 				return m_lightComponentData.attenuation.x;
 			}
 
-			void LightComponent::SetConstantAttenuation(float value)
+			void LightComponent::SetConstantAttenuation(float const& value)
 			{
 				m_lightComponentData.attenuation.x = value;
 			}
 
-			float LightComponent::GetLinearAttenuation()
+			float LightComponent::GetLinearAttenuation() const
 			{
 				return m_lightComponentData.attenuation.y;
 			}
 
-			void LightComponent::SetLinearAttenuation(float value)
+			void LightComponent::SetLinearAttenuation(float const& value)
 			{
 				m_lightComponentData.attenuation.y = value;
 			}
 
-			float LightComponent::GetQuadraticAttenuation()
+			float LightComponent::GetQuadraticAttenuation() const
 			{
 				return m_lightComponentData.attenuation.z;
 			}
 
-			void LightComponent::SetQuadraticAttenuation(float value)
+			void LightComponent::SetQuadraticAttenuation(float const& value)
 			{
 				m_lightComponentData.attenuation.z = value;
 			}
 
-		}
+			math::Vector2 LightComponent::GetRectangleDimensions() const
+			{
+				return m_lightComponentData.rectangleDimensions;
+			}
+
+			void LightComponent::SetRectangleDimensions(math::Vector2 const& value)
+			{
+				m_lightComponentData.rectangleDimensions = value;
+			}
+
+}
 	}
 }

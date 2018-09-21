@@ -6,14 +6,14 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyUnorderedAccessView : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyUnorderedAccessView(ID3D11UnorderedAccessView* value) : ShaderProperty(Type::UNORDERED_ACCESS), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
+				void Apply(std::string name, Shader* shader) const
 				{
 					shader->GetEffect()->GetVariableByName(name.c_str())->AsUnorderedAccessView()->SetUnorderedAccessView(m_value);
 				}

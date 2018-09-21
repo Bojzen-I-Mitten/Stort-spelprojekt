@@ -29,7 +29,6 @@ namespace thomas
 					ID3D11Buffer* particleBuffer2;
 
 					ID3D11Buffer* initParticleBuffer;
-					bool swapUAVandSRV;
 
 					ID3D11UnorderedAccessView* billboardsUAV;
 					ID3D11ShaderResourceView* billboardsSRV;
@@ -48,8 +47,6 @@ namespace thomas
 
 					float minSpeed;
 					float endSpeed;
-					float maxDelay;
-					float minDelay;
 
 					float maxSize;
 					float minSize;
@@ -61,9 +58,6 @@ namespace thomas
 					float rotationSpeed;
 					float rotation;
 
-					math::Color startColor;
-
-					math::Color endColor;
 					math::Matrix directionMatrix;
 
 					float gravity;
@@ -80,7 +74,6 @@ namespace thomas
 					float speed;
 
 					float endSpeed;
-					float delay;
 					float size;
 					float endSize;
 
@@ -89,16 +82,23 @@ namespace thomas
 					float rotationSpeed;
 					float rotation;
 
-					math::Vector4 startColor;
-
-					math::Vector4 endColor;
 					
+				};
+
+				struct BillboardStruct
+				{
+					math::Vector3 positions[2][3];
+					math::Vector2 pad2;
+					math::Vector2 uvs[2][3];
+					math::Vector4 colorFactor;
 				};
 			private:
 				void CreateParticleUAVsandSRVs();
 				//void CreateInitBuffer();
 				void CalculateMaxNrOfParticles();
 
+				
+				void SwapUAVsAndSRVs();
 				void UpdateDirection();
 
 
@@ -119,11 +119,6 @@ namespace thomas
 				float GetMinSpeed() const;
 				void SetEndSpeed(float const& other);
 				float GetEndSpeed() const;
-
-				void SetDelay(float const& min, float const& max);
-				void SetDelay(float const& delay);
-				void SetMaxDelay(float const& other);
-				void SetMinDelay(float const& other);
 				
 				void SetSize(float const& min, float const& max);
 				void SetSize(float const& size);
@@ -148,10 +143,6 @@ namespace thomas
 				bool IsLooping() const;
 				void SetGravity(float const& other);
 				float GetGravity() const;
-				void SetStartColor(math::Vector4 const& other);
-				math::Vector4 GetStartColor() const;
-				void SetEndColor(math::Vector4 const& other);
-				math::Vector4 GetEndColor() const;
 				void SetRadius(float const& radius);
 				float GetRadius() const;
 
@@ -163,9 +154,6 @@ namespace thomas
 				void StartEmitting();
 				void StopEmitting(bool force=false);
 				bool IsEmitting() const;
-				
-				void SetOffset(math::Vector3 const& offset);
-				void SetOffset(float const &x, float const& y, float const& z);
 				
 				void SetMaterial(resource::Material* material);
 				resource::Material* GetMaterial();
@@ -188,12 +176,12 @@ namespace thomas
 
 				math::Vector3 m_offset;
 				D3DData m_d3dData;
+				bool m_swapUAVsAndSRVs;
 				resource::Material* m_material;
 
 				InitParticleBufferStruct m_particleBufferStruct;
 
 				bool m_paused;
-				float m_tempMaxDelay;
 				float m_tempMaxLifeTime;
 				float m_tempEmissionRate;
 
@@ -208,6 +196,11 @@ namespace thomas
 				float m_emissionTimeLeft;
 
 				float m_drawTimer;
+
+
+				ID3D11UnorderedAccessView* m_activeParticleUAV;
+				ID3D11ShaderResourceView* m_activeParticleSRV;
+				
 
 				BlendStates m_blendState;
 
