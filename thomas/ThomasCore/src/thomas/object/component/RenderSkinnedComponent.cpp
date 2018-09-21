@@ -17,7 +17,6 @@ namespace thomas
 			RenderSkinnedComponent::RenderSkinnedComponent()
 				: m_skinArray(0), m_skeleton()
 			{
-				m_skinArray.SetName(graphics::THOMAS_MATRIX_SKIN_ARRAY);
 			}
 			RenderSkinnedComponent::~RenderSkinnedComponent() {
 
@@ -28,6 +27,14 @@ namespace thomas
 				if (m_skeleton) {
 					m_skeleton->update(ThomasTime::GetDeltaTime());
 				}
+			}
+
+			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
+				RenderComponent::SetMaterial(meshIndex, material);
+				if (material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, m_skinInfo.m_effect_id))
+					LOG("Warning! Material applied to skinned render component does not use any bone information.");
+				applySkin();
+				m_skinInfo.m_apply = resource::shaderproperty::ApplyEffectMatrixDynamic;
 			}
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
@@ -40,7 +47,7 @@ namespace thomas
 				}
 				else{
 					m_skeleton = std::unique_ptr<graphics::animation::AnimatedSkeleton>(
-						new graphics::animation::AnimatedSkeleton(*model->GetSkeleton(), m_skinArray));
+						new graphics::animation::AnimatedSkeleton(*model->GetSkeleton()));
 					insertProperty(&m_skinArray);
 					return true;	// Return true only if model is applied correctly
 				}
@@ -48,6 +55,17 @@ namespace thomas
 			}
 			graphics::animation::IBlendTree* RenderSkinnedComponent::GetBlendTree() {
 				return m_skeleton.get();
+			}
+			void RenderSkinnedComponent::applySkin()
+			{
+				if (m_skeleton) {
+					m_skinInfo.m_dataSize = m_skeleton->boneCount() * 64;
+					m_skinInfo.m_data = m_skeleton->;
+				}
+				else {
+					m_skinInfo.m_dataSize = m_skeleton->boneCount() * 64;
+					m_skinInfo.m_data = NULL;
+				}
 			}
 		}
 	}

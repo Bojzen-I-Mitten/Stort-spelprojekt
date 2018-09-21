@@ -4,6 +4,7 @@
 #include <d3dcompiler.h>
 #include "Shader.h"
 #include "ShaderProperty\shaderProperties.h"
+#include "../utils/Utility.h"
 #include <fstream>
 namespace thomas
 {
@@ -35,12 +36,12 @@ namespace thomas
 				return;
 			}
 
-			for (int i = 0; i < effectDesc.GlobalVariables; i++)
+			for (uint32_t i = 0; i < effectDesc.GlobalVariables; i++)
 			{
 				ID3DX11EffectVariable* variable = m_effect->GetVariableByIndex(i);
 				if (variable->IsValid())
 				{
-					AddProperty(variable);
+					AddProperty(variable, i);
 				}
 				
 
@@ -430,6 +431,13 @@ namespace thomas
 		{
 			return m_properties.find(name) != m_properties.end();
 		}
+		bool Shader::GetPropertyIndex(uint32_t hash, uint32_t & effectIndex)
+		{
+			auto itr = m_property_indices.find(hash);
+			if (itr == m_property_indices.end())	return true;
+			effectIndex = itr->second;
+			return false;
+		}
 		std::shared_ptr<shaderproperty::ShaderProperty> Shader::GetProperty(const std::string & name)
 		{
 			for (auto& prop : m_properties)
@@ -548,7 +556,7 @@ namespace thomas
 			}
 			
 		}
-		void Shader::AddProperty(ID3DX11EffectVariable * prop)
+		void Shader::AddProperty(ID3DX11EffectVariable * prop, uint32_t propIndex)
 		{
 			D3DX11_EFFECT_TYPE_DESC typeDesc;
 			D3DX11_EFFECT_VARIABLE_DESC variableDesc;
@@ -556,7 +564,7 @@ namespace thomas
 			prop->GetType()->GetDesc(&typeDesc);
 			prop->GetDesc(&variableDesc);
 			ID3DX11EffectConstantBuffer* cBuffer = prop->GetParentConstantBuffer();
-			
+
 			bool isMaterialProperty = false;
 			shaderproperty::ShaderProperty* newProperty = nullptr;
 			std::string semantic;
@@ -637,8 +645,17 @@ namespace thomas
 			if (newProperty != nullptr)
 			{
 				newProperty->SetName(name);
-				if(!HasProperty(name))
+				uint32_t hash = utility::hash(name.c_str(), name.length());
+#ifdef _DEBUG
+				if (m_property_indices.find(hash) != m_property_indices.end()) {
+					std::string err("Warning in ThomasCore::resource::Shader::AddProperty!! Multiple effect properties with identical name hash: " + name);
+					LOG(err);
+				}
+#endif
+				if (!HasProperty(name)) {
+					m_property_indices[hash] = propIndex;
 					m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(newProperty);
+				}
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}

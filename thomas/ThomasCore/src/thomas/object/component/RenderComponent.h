@@ -27,7 +27,7 @@ namespace thomas
 				void SetMaterial(resource::Material * material);
 				
 
-				void SetMaterial(int meshIndex, resource::Material* material);
+				virtual void SetMaterial(int meshIndex, resource::Material* material);
 				resource::Material* GetMaterial(int meshIndex);
 
 				void OnDrawGizmos();

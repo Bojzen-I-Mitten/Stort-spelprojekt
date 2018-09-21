@@ -11,7 +11,7 @@ namespace thomas {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref) :
-				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(&skin_ref)
+				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(ref.getNumBones())
 			{
 				_skin->resize(ref.getNumBones());
 				clearBlendTree();
@@ -32,15 +32,14 @@ namespace thomas {
 			{
 				//Update animation tree
 				// Update skin transforms
-				math::Matrix *skin_arr = _skin->GetValue();
 				_pose[0] = _root->calcLocalTransform(0) * _ref.getRoot();				//	Update root pose
-				skin_arr[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
+				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
 					_pose[i] = _root->calcLocalTransform(i) * _pose[bone._parentIndex];	//	Update root pose
 					math::Matrix m = bone._invBindPose * _pose[i];
-					skin_arr[i] = bone._invBindPose * _pose[i];							//	Update root skin
+					_skin[i] = bone._invBindPose * _pose[i];							//	Update root skin
 				}
 			}
 			/* Freeze the current animation */
@@ -75,7 +74,7 @@ namespace thomas {
 
 
 			const math::Matrix* AnimatedSkeleton::getSkin() const {
-				return _skin->GetValue();
+				return _skin.data();
 			}
 			unsigned int AnimatedSkeleton::boneCount() const {
 				return _pose.size();
