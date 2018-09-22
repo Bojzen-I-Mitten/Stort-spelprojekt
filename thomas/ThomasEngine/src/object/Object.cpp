@@ -1,9 +1,10 @@
 #pragma unmanaged
 #include <thomas\object\Object.h>
 #pragma managed
+#include "../Utility.h"
 #include "Object.h"
-#include "Component.h"
 #include "GameObject.h"
+#include "Component.h"
 namespace ThomasEngine
 {
 	Object::Object(thomas::object::Object* ptr)
@@ -12,6 +13,7 @@ namespace ThomasEngine
 		s_objects.Add(this);
 		thomas::object::Object::Add(ptr);
 		m_guid = Guid::NewGuid();
+		nativePtr->m_guid = Utility::Convert(m_guid);
 	}
 
 	void Object::OnDestroy() { nativePtr->OnDestroy(); }
@@ -98,5 +100,10 @@ namespace ThomasEngine
 	Object::operator bool(Object ^ object)
 	{
 		return object != nullptr;
+	}
+
+	void Object::OnDeserializedObject(System::Runtime::Serialization::StreamingContext c)
+	{
+		nativePtr->m_guid = Utility::Convert(m_guid);
 	}
 }

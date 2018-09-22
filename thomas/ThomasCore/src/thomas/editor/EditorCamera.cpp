@@ -6,9 +6,12 @@
 #include "..\resource\Shader.h"
 #include "..\resource\Material.h"
 #include "..\graphics\Renderer.h"
+#include "..\graphics\render\Frame.h"
 #include "..\resource\Model.h"
 #include "..\Common.h"
 #include "..\object\component\Camera.h"
+#include "..\System.h"
+
 
 namespace thomas
 {
@@ -35,7 +38,7 @@ namespace thomas
 			m_cameraComponent = std::make_unique<object::component::Camera>(true);
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
-			m_grid = std::make_unique<EditorGrid>(100, 1, 10);
+			m_grid = std::make_unique<EditorGrid>(100, 1.f, 10);
 			m_sensitivity = 50.0f;
 			m_speed = 2.0f;
 			m_hasSelectionChanged = false;
@@ -168,8 +171,10 @@ namespace thomas
 			HWND focus = GetForegroundWindow();
 
 			// Make sure we are dealing with the editor window
-			if (!Window::GetEditorWindow())
+			if (!Window::GetEditorWindow() || !Window::GetEditorWindow()->IsFocused())
 				return;
+
+			Input::allowEditor = true;
 
 			// Toggle editor mode on scene camera
 			if (Input::GetMouseButtonDown(Input::MouseButtons::RIGHT))
@@ -228,8 +233,14 @@ namespace thomas
 					auto model = gameObject->GetComponent<object::component::RenderComponent>()->GetModel();
 					if (model)
 					{
-						for (auto mesh : model->GetMeshes())
-							graphics::Renderer::SubmitCommand(graphics::RenderCommand(gameObject->m_transform->GetWorldMatrix(), mesh, m_objectHighlighter.get(), m_cameraComponent.get()));
+						for (auto mesh : model->GetMeshes()) {
+							graphics::render::RenderCommand cmd(
+								gameObject->m_transform->GetWorldMatrix(),
+								mesh.get(),
+								m_objectHighlighter.get(),
+								m_cameraComponent.get());
+							System::S_RENDERER.SubmitCommand(cmd);
+						}
 					}
 				}
 			}
@@ -244,7 +255,7 @@ namespace thomas
 				object::GameObject* gameObject = s_selectedObjects[i];
 				ImGuiIO& io = ImGui::GetIO();
 				ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
-				math::Matrix worldMatrix = gameObject->m_transform->GetLocalWorldMatrix();
+				math::Matrix worldMatrix = gameObject->m_transform->GetWorldMatrix();
 
 				if (m_manipulatorOperation == ImGuizmo::OPERATION::ROTATE)
 					snap[0] = 15.f;
@@ -254,9 +265,9 @@ namespace thomas
 					*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(m_manipulatorScale)).m, *m_cameraComponent->GetProjMatrix().m,
 					m_manipulatorOperation, m_manipulatorMode, *worldMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
 
-				if (worldMatrix != gameObject->m_transform->GetLocalWorldMatrix())
+				if (worldMatrix != gameObject->m_transform->GetWorldMatrix())
 				{
-					gameObject->m_transform->SetLocalMatrix(worldMatrix);
+					gameObject->m_transform->SetWorldMatrix(worldMatrix);
 					gameObject->m_transform->SetDirty(true);
 				}
 			}

@@ -24,6 +24,8 @@ namespace thomas
 		void Gizmos::DrawModel(resource::Model * model, int meshIndex, math::Vector3 position = math::Vector3::Zero, math::Quaternion rotation = math::Quaternion::Identity, math::Vector3 scale = math::Vector3::One)
 		{
 
+
+
 			/*s_gizmoMaterial->SetShaderPass((int)GizmoPasses::SOLID);
 			s_gizmoMaterial->m_topology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 			s_gizmoMaterial->SetMatrix("gizmoMatrix", math::CreateMatrix(position, rotation, scale));
@@ -63,6 +65,33 @@ namespace thomas
 			}*/
 		}
 
+
+		void Gizmos::DrawBoundingCapsule(math::Vector3 center, float radius, float height)
+		{
+			
+			math::Vector3 xAxis = math::Vector3::UnitX * radius;
+			math::Vector3 yAxis = math::Vector3::UnitY * radius;
+			math::Vector3 zAxis = math::Vector3::UnitZ * radius;
+						
+			math::Vector3 offset = math::Vector3(0, (height / 2.0f), 0);
+			math::Vector3 top = center + offset;
+			math::Vector3 bottom = center - offset;
+
+			DrawRing(top, xAxis, zAxis);
+			DrawArc(top, xAxis, yAxis);
+			DrawArc(top, zAxis, yAxis);
+
+			DrawRing(bottom, xAxis, zAxis);
+			DrawArc(bottom, xAxis, -yAxis);
+			DrawArc(bottom, zAxis, -yAxis);
+			
+			DrawLine(top + xAxis, bottom + xAxis);
+			DrawLine(top - xAxis, bottom - xAxis);
+
+			DrawLine(top + zAxis, bottom + zAxis);
+			DrawLine(top - zAxis, bottom - zAxis);
+
+		}
 
 		void Gizmos::DrawCube(math::Vector3 center, math::Vector3 size)
 		{
@@ -128,7 +157,7 @@ namespace thomas
 
 			DrawRing(origin, xAxis, zAxis);
 			DrawRing(origin, xAxis, yAxis);
-			DrawRing(origin, yAxis, zAxis);
+			DrawRing(origin, zAxis, yAxis);
 		}
 
 		void Gizmos::DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
@@ -159,6 +188,34 @@ namespace thomas
 
 			DrawLines(lines, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
+		}
+
+		void Gizmos::DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
+		{
+			static const size_t ringSegments = 16;
+
+			float angleDelta = math::PI / float(ringSegments);
+
+			std::vector<math::Vector3> lines(ringSegments + 1);
+
+			math::Vector3 cosDelta = math::Vector3(cosf(angleDelta));
+			math::Vector3 sinDelta = math::Vector3(sinf(angleDelta));
+			math::Vector3 incrementalSin = math::Vector3::Zero;
+			math::Vector3 incrementalCos = math::Vector3::One;
+			for (size_t i = 0; i <= ringSegments; i++)
+			{
+				math::Vector3 pos = majorAxis * incrementalCos + origin;
+				pos = minorAxis * incrementalSin + pos;
+				lines[i] = pos;
+				// Standard formula to rotate a vector.
+				math::Vector3 newCos = incrementalCos * cosDelta - incrementalSin * sinDelta;
+				math::Vector3 newSin = incrementalCos * sinDelta + incrementalSin * cosDelta;
+				incrementalCos = newCos;
+				incrementalSin = newSin;
+			}
+
+
+			DrawLines(lines, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 		}
 
 		void Gizmos::DrawLine(math::Vector3 from, math::Vector3 to)
@@ -323,6 +380,33 @@ namespace thomas
 		{
 			s_matrix = matrix;
 			//s_gizmoMaterial->SetMatrix("gizmoMatrix", matrix);
+		}
+
+		void Gizmos::DrawPing(std::string ping)
+		{
+			ImGui::SetNextWindowSize(ImVec2(300, 0));
+			ImGui::Begin("ping", nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+			ImGui::Text(ping.c_str());
+			ImGui::End();
+		}
+
+		void Gizmos::ImguiStringUpdate(std::string text, math::Vector2 size, math::Vector2 pos)
+		{
+			ImGui::SetNextWindowSize(ImVec2(size.x, size.y));
+			ImGui::SetNextWindowPos(ImVec2(pos.x, pos.y));
+			std::string ImguiName = std::to_string(pos.x)+","+std::to_string(pos.y);
+
+			ImGui::Begin(ImguiName.c_str(), nullptr, ImVec2(0, 0), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+			ImGui::Text(text.c_str());
+			ImGui::End();
+		}
+
+		void Gizmos::ImguiStringUpdate(std::string text, math::Vector2 pos)
+		{
+
+			ImguiStringUpdate(text, math::Vector2(text.size() * 8 + 5, 0), pos);
 		}
 
 	}

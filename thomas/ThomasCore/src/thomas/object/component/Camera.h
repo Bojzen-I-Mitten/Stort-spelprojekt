@@ -14,6 +14,15 @@ namespace thomas
 		{
 			class Camera : public Component
 			{
+			public:
+				struct CAMERA_FRAME_DATA
+				{
+					int targetDisplay;
+					math::Viewport viewport;
+					math::Matrix projectionMatrix;
+					math::Matrix viewMatrix;
+					math::Vector4 position;
+				};
 			private:
 				void UpdateProjMatrix();
 
@@ -54,8 +63,11 @@ namespace thomas
 				int GetTargetDisplayIndex();
 
 				math::BoundingFrustum GetFrustrum();
-				
+
+				void CopyFrameData();
+				CAMERA_FRAME_DATA& GetFrameData();
 			private:
+				CAMERA_FRAME_DATA m_frameData;
 				math::Matrix m_projMatrix;
 				float m_fov;
 				float m_near;

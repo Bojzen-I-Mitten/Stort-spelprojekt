@@ -7,13 +7,18 @@
 #include "GameObject.h"
 #include "../ScriptingManager.h"
 using namespace System::Threading;
+#include "YieldInstructions.h"
 
-namespace ThomasEngine {
+namespace ThomasEngine 
+{
 	Component::Component() : Object(new thomas::object::component::Component())
 	{
-		setGameObject(GameObject::s_lastObject);
 
 	}
+	Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
+	{
+	}
+
 	void Component::Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
 	void Component::Start() {}
 	void Component::OnEnable() { ((thomas::object::component::Component*)nativePtr)->OnEnable(); }
@@ -69,12 +74,7 @@ namespace ThomasEngine {
 
 	}
 
-	Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
-	{
-		if (GameObject::s_lastObject)
-			setGameObject(GameObject::s_lastObject);
-	}
-
+	
 	Transform^ ThomasEngine::Component::transform::get()
 	{
 		return gameObject->transform;
@@ -86,6 +86,11 @@ namespace ThomasEngine {
 
 		((thomas::object::component::Component*)nativePtr)->m_gameObject = (thomas::object::GameObject*)gObj->nativePtr;
 		((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.push_back(((thomas::object::component::Component*)nativePtr));
+	}
+
+	void Component::OnCollisionEnter(GameObject ^ collider)
+	{
+		((thomas::object::component::Component*)nativePtr)->OnCollisionEnter((thomas::object::GameObject*)collider->nativePtr);
 	}
 
 	void Component::Destroy()
@@ -102,8 +107,7 @@ namespace ThomasEngine {
 				break;
 			}
 		}
-
-
+		StopAllCoroutines();
 		m_gameObject->Components->Remove(this);
 		Object::Destroy();
 		Monitor::Exit(m_gameObject->m_componentsLock);
@@ -131,7 +135,7 @@ namespace ThomasEngine {
 		return types;
 	}
 
-	String^ ThomasEngine::Component::Name::get() {
+	String^ Component::Name::get() {
 		return gameObject->Name + " (" + this->GetType()->Name + ")";
 	}
 
@@ -151,4 +155,42 @@ namespace ThomasEngine {
 		return types;
 	}
 
+
+	void Component::UpdateCoroutines()
+	{
+		for (int i = 0; i < coroutines->Count; i++)
+		{
+			System::Collections::IEnumerator^ iterator = coroutines[i];
+			bool isYieldInstruction = iterator->Current && YieldInstruction::typeid->IsAssignableFrom(iterator->Current->GetType());
+			if (isYieldInstruction && ((YieldInstruction^)iterator->Current)->keepWaiting)
+				continue;
+			if (!iterator->MoveNext())
+			{
+				coroutines->RemoveAt(i);
+				i--;
+			}
+		}
+	}
+
+	void Component::StartCoroutine(System::Collections::IEnumerator ^ routine)
+	{
+		coroutines->Add(routine);
+	}
+
+	void Component::StopCoroutine(System::Collections::IEnumerator ^ routine)
+	{
+		for (int i = 0; i < coroutines->Count; i++)
+		{
+			if (coroutines[i] == routine) {
+				coroutines->RemoveAt(i);
+				return;
+			}
+
+		}
+	}
+
+	void Component::StopAllCoroutines()
+	{
+		coroutines->Clear();
+	}
 }

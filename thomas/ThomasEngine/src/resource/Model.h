@@ -1,12 +1,7 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\resource\Model.h>
-#include <thomas\utils\Primitives.h>
-#include <thomas\graphics\Mesh.h>
-#include <memory>
-#pragma managed
 #include "Resource.h"
 
+namespace thomas { namespace resource { class Model; } }
 namespace ThomasEngine
 {
 	ref class GameObject;
@@ -24,25 +19,17 @@ namespace ThomasEngine
 	public ref class Model : public Resource
 	{
 	internal:
-		Model(thomas::resource::Model* nativePtr) : Resource(Utility::ConvertString(nativePtr->GetPath()), nativePtr){}
-		static System::Collections::Generic::Dictionary<PrimitiveType, Model^>^ s_primitives;
-		static void InitPrimitives();
-		static Model^ LoadPrimitive(PrimitiveType type, String^ path);
+		Model(thomas::resource::Model* nativePtr);
 	public:
-		Model(String^ path) : Resource(path, new thomas::resource::Model(Utility::ConvertString(path))) {};
+		Model(String^ path);
 
-
-		~Model()
-		{
-			if (m_nativePtr)
-				delete m_nativePtr;
-		}
+		void GenerateBones(GameObject^ parent);
+		~Model();
 		[OnDeserializedAttribute]
-		void OnDeserialized(StreamingContext c)
-		{						
-			m_nativePtr = new thomas::resource::Model(Utility::ConvertString(m_path));
-		}
+		void OnDeserialized(StreamingContext c);
 						
 		static Model^ GetPrimitive(PrimitiveType type);
+		static void InitPrimitives();
+		static Model ^ LoadPrimitive(PrimitiveType type, String ^ path);
 	};
 }

@@ -26,47 +26,43 @@ namespace thomas
 	namespace resource
 	{
 		class Material;
+		namespace shaderproperty {
+			class ShaderProperty;
+		}
 	}
 
 	namespace graphics
 	{				
 		class Mesh;
 
-		struct RenderCommand
-		{
-			object::component::Camera* camera;
-			math::Matrix worldMatrix;
-			std::shared_ptr<Mesh> mesh; //This doesn't have to be a shared ptr? More process overhead!
-			resource::Material* material;
-
-			RenderCommand(math::Matrix world, std::shared_ptr<Mesh> m, resource::Material* mat, object::component::Camera* cam) :
-				worldMatrix(world), mesh(m), material(mat), camera(cam) {};
-		};
-
-		struct MaterialSorter
-		{
-			bool operator() (resource::Material* mat1, resource::Material* mat2) const;
-		};
-
-		typedef std::map<object::component::Camera*, std::map<resource::Material*, std::vector<RenderCommand>, MaterialSorter>> CommandQueue;
-
+		namespace render {
+			class Frame;
+			struct RenderCommand;
+		}
+		
 		class Renderer {
 		private:
 			static LightManager s_lightManager;
-			static void BindFrame();
-			static void BindObject(thomas::resource::Material* material, const thomas::math::Matrix& worldMatrix);
-						
+			void BindFrame();
+			void BindObject(render::RenderCommand & rC);
+
 		public:
-			static void BindCamera(thomas::object::component::Camera* camera);
-			static void ProcessCommands();
-			static void ClearCommands();
-			static void SubmitCommand(RenderCommand command);
-			static void TransferCommandList();
+
+			Renderer();
+
+			void BindCamera(thomas::object::component::Camera* camera);
+			void ProcessCommands();
+			void ClearCommands();
+			void SubmitCommand(render::RenderCommand& command);
+
+
+
+			void TransferCommandList();
 
 
 		private:
-			static CommandQueue s_renderCommands;
-			static CommandQueue s_lastFramesCommands;
+			std::unique_ptr<render::Frame> m_frame;
+			std::unique_ptr<render::Frame> m_prevFrame;
 		};
 	}
 }

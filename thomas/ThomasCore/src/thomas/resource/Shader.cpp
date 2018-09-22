@@ -228,8 +228,10 @@ namespace thomas
 
 			ID3DX11Effect* effect = NULL;
 			
-			if (!Compile(path, &effect))
-				Compile(s_failedShader->m_path, &effect);
+			if (!Compile(path, &effect)) {
+				if (!Compile(s_failedShader->m_path, &effect))
+					throw std::exception("Fallback shader failed to compile...!");
+			}
 
 			Shader* shader = new Shader(effect, path);
 			s_loadedShaders.push_back(shader);
@@ -275,8 +277,10 @@ namespace thomas
 		}
 		void Shader::Bind()
 		{
-			for (auto prop : m_properties)
+			for (auto prop : m_properties) {
 				prop.second->Apply(this);
+				int a = 0;
+			}
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{
@@ -309,7 +313,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyColor(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyColor(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -320,7 +324,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyScalarFloat(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyScalarFloat(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -331,7 +335,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyScalarInt(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyScalarInt(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -342,7 +346,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyMatrix(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyMatrix(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -353,7 +357,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyTexture2D(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyTexture2D(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -364,7 +368,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyShaderResource(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyShaderResource(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -375,7 +379,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyConstantBuffer(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyConstantBuffer(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -387,7 +391,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyVector(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyVector(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}
@@ -427,7 +431,7 @@ namespace thomas
 		{
 			return m_properties.find(name) != m_properties.end();
 		}
-		std::shared_ptr<shaderProperty::ShaderProperty> Shader::GetProperty(const std::string & name)
+		std::shared_ptr<shaderproperty::ShaderProperty> Shader::GetProperty(const std::string & name)
 		{
 			for (auto& prop : m_properties)
 			{
@@ -437,7 +441,7 @@ namespace thomas
 			return nullptr;
 		}
 
-		std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> Shader::GetProperties()
+		std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> Shader::GetProperties()
 		{
 			return m_properties;
 		}
@@ -531,9 +535,13 @@ namespace thomas
 			{
 				return Semantics::BITANGENT;
 			}
-			else if (semanticName.find("BONEWEIGHT") != std::string::npos)
+			else if (semanticName.find("BONEINDICES") != std::string::npos)
 			{
-				return Semantics::BONEWEIGHT;
+				return Semantics::BONEINDICES;
+			}
+			else if (semanticName.find("BONEWEIGHTS") != std::string::npos)
+			{
+				return Semantics::BONEWEIGHTS;
 			}
 			else
 			{
@@ -551,7 +559,7 @@ namespace thomas
 			ID3DX11EffectConstantBuffer* cBuffer = prop->GetParentConstantBuffer();
 			
 			bool isMaterialProperty = false;
-			shaderProperty::ShaderProperty* newProperty = nullptr;
+			shaderproperty::ShaderProperty* newProperty = nullptr;
 			std::string semantic;
 			if (variableDesc.Semantic != NULL)
 				semantic = variableDesc.Semantic;
@@ -562,14 +570,14 @@ namespace thomas
 				switch (typeDesc.Type)
 				{
 				case D3D_SVT_BOOL:
-					newProperty = shaderProperty::ShaderPropertyScalarBool::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyScalarBool::GetDefault();
 					break;
 				case D3D_SVT_INT:
 				case D3D_SVT_UINT:
-					newProperty = shaderProperty::ShaderPropertyScalarInt::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 					break;
 				case D3D_SVT_FLOAT:
-					newProperty = shaderProperty::ShaderPropertyScalarFloat::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyScalarFloat::GetDefault();
 					break;
 				default:
 					break;
@@ -578,20 +586,20 @@ namespace thomas
 			}
 			case D3D_SVC_VECTOR:
 				if(semantic == "COLOR")
-					newProperty = shaderProperty::ShaderPropertyColor::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyColor::GetDefault();
 				else
-					newProperty = shaderProperty::ShaderPropertyVector::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyVector::GetDefault();
 				break;
 			case D3D_SVC_MATRIX_COLUMNS:
 			case D3D_SVC_MATRIX_ROWS:
-				newProperty = shaderProperty::ShaderPropertyMatrix::GetDefault();
+				newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
 				break;
 			case D3D_SVC_OBJECT:
 			{
 				switch (typeDesc.Type)
 				{
 				case D3D_SVT_CBUFFER:
-					newProperty = shaderProperty::ShaderPropertyConstantBuffer::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyConstantBuffer::GetDefault();
 					break;
 				//case D3D_SVT_TEXTURE:
 				//case D3D_SVT_TEXTURE1D:
@@ -603,13 +611,13 @@ namespace thomas
 				//case D3D_SVT_TEXTURE3D:
 				//case D3D_SVT_TEXTURECUBE:
 					isMaterialProperty = true;
-					newProperty = shaderProperty::ShaderPropertyTexture2D::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
 				case D3D_SVT_RWSTRUCTURED_BUFFER:
 				case D3D_SVT_APPEND_STRUCTURED_BUFFER:
 				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
-					newProperty = shaderProperty::ShaderPropertyShaderResource::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
 				}
 				break;
 			}
@@ -631,7 +639,7 @@ namespace thomas
 			{
 				newProperty->SetName(name);
 				if(!HasProperty(name))
-					m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(newProperty);
+					m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(newProperty);
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}

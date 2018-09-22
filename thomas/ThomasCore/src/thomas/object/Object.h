@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <windows.h>
 namespace thomas
 {
 	class Scene;
@@ -10,9 +11,7 @@ namespace thomas
 		{
 		private:
 		public:
-
 			
-
 			virtual ~Object();
 			virtual void OnDestroy() {}
 			std::string GetName();
@@ -29,6 +28,7 @@ namespace thomas
 
 			static void Clean();
 
+			_GUID m_guid;
 		private:
 			bool m_destroyed = false;
 			static std::vector<Object*> s_objects;

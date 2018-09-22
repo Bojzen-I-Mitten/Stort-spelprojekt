@@ -175,6 +175,7 @@
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
     </Compile>
+    <Compile Include="scriptComponent test\Collider.cs" />
     <Compile Include="Inspectors\ListEditor.xaml.cs">
       <DependentUpon>ListEditor.xaml</DependentUpon>
     </Compile>

@@ -3,7 +3,6 @@
 #pragma managed
 #include "../../resource/AudioClip.h"
 #include "SoundComponent.h"
-
 namespace ThomasEngine
 {
 	SoundComponent::SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}

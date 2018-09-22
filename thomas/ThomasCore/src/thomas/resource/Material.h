@@ -13,7 +13,7 @@ namespace thomas
 	}
 	namespace resource
 	{
-		namespace shaderProperty { class ShaderProperty; }
+		namespace shaderproperty { class ShaderProperty; }
 		class Texture2D;
 		class Shader;
 		class Material : public Resource
@@ -36,7 +36,7 @@ namespace thomas
 			~Material();
 
 			void Bind();
-			std::shared_ptr<shaderProperty::ShaderProperty> GetProperty(const std::string& name);
+			std::shared_ptr<shaderproperty::ShaderProperty> GetProperty(const std::string& name);
 			void SetShader(resource::Shader* shader);
 			resource::Shader* GetShader();
 
@@ -71,11 +71,11 @@ namespace thomas
 			void SetShaderPass(int index);
 			void SetShaderPass(std::string name);
 
-			void Draw(std::shared_ptr<graphics::Mesh> mesh);
+			void Draw(graphics::Mesh* mesh);
 			void Draw(UINT vertexCount, UINT startVertexLocation);
 
-			std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> GetEditorProperties();
-			std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> GetAllProperties();
+			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> GetEditorProperties();
+			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> GetAllProperties();
 
 			UINT GetId();
 			friend bool operator<(const Material& mat1, const Material& mat2);
@@ -97,7 +97,7 @@ namespace thomas
 			Material* m_baseMaterial;
 			UINT m_id;
 			resource::Shader* m_shader;
-			std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> m_properties;
+			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> m_properties;
 			std::vector<Pass> m_passes;
 			static Material* s_standardMaterial;
 

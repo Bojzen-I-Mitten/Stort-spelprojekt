@@ -5,11 +5,14 @@
 #include "../GameObject.h"
 #include "../../Utility.h"
 #include "../../ThomasManaged.h"
+
 namespace ThomasEngine
 {
 	Transform::Transform() : Component(new thomas::object::component::Transform()){}
 
 	thomas::object::component::Transform* Transform::trans::get() { return (thomas::object::component::Transform*)nativePtr; }
+
+
 
 	Transform^ Transform::parent::get()
 	{
@@ -18,15 +21,11 @@ namespace ThomasEngine
 		else
 			return nullptr;
 	}
-
 	void Transform::parent::set(ThomasEngine::Transform^ value)
 	{
-		if (value)
-			trans->SetParent(value->trans);
-		else
-			trans->SetParent(nullptr);
-
-		ThomasWrapper::UpdateEditor();
+		Transform^ oldParent = parent;
+		SetParent(value);
+		OnParentChanged(this, oldParent, value);
 	}
 
 	List<Transform^>^ Transform::children::get()
@@ -38,6 +37,15 @@ namespace ThomasEngine
 			managedChildren->Add((Transform^)GetObject(nativeChild));
 
 		return managedChildren;
+	}
+
+	Matrix Transform::world::get(){ return Utility::Convert(trans->GetWorldMatrix());}
+	void Transform::world::set(Matrix value)
+	{
+		trans->SetWorldMatrix(Utility::Convert(value));
+		OnPropertyChanged("localPosition");
+		OnPropertyChanged("localEulerAngles");
+		OnPropertyChanged("localScale");
 	}
 
 	Vector3 Transform::position::get() { return Utility::Convert(trans->GetPosition()); }
@@ -64,6 +72,19 @@ namespace ThomasEngine
 	Vector3 Transform::forward::get() { return Utility::Convert(trans->Forward()); }
 	Vector3 Transform::up::get() { return Utility::Convert(trans->Up()); }
 	Vector3 Transform::right::get() { return Utility::Convert(trans->Right()); }
+
+
+	void Transform::SetParent(Transform ^ value)
+	{
+		SetParent(value, true);
+	}
+	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
+	{
+		if (value)
+			((thomas::object::component::Transform*)nativePtr)->SetParent((thomas::object::component::Transform*)value->nativePtr, worldPositionStays);
+		else
+			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
+	}
 
 	void Transform::LookAt(Transform^ target) {
 		trans->LookAt((thomas::object::component::Transform*)nativePtr);

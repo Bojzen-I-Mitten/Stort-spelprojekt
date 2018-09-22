@@ -45,11 +45,12 @@
     <Reference Include="ThomasMath">
       <HintPath>$(THOMAS_ENGINE)\ThomasMath.dll</HintPath>
     </Reference>
-        <Reference Include="ThomasNet">
+    <Reference Include="ThomasNet">
       <HintPath>$(THOMAS_ENGINE)\ThomasNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\throwStrengthVisualizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

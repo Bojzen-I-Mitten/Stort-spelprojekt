@@ -2,18 +2,20 @@
 #include <thomas\object\component\RenderComponent.h>
 #pragma managed
 #include "RenderComponent.h"
-
 #include "../../resource/Model.h"
 #include "../../resource/Material.h"
 #include "../../resource/Resources.h"
 
 namespace ThomasEngine
 {
-	RenderComponent::RenderComponent() : Component(new thomas::object::component::RenderComponent()) {}
+	RenderComponent::RenderComponent()
+		: Component(new thomas::object::component::RenderComponent())
+	{}
 
 	thomas::object::component::RenderComponent* RenderComponent::render::get() { return (thomas::object::component::RenderComponent*)nativePtr; }
 
 	Model^ RenderComponent::model::get() { return m_model; }
+
 	void RenderComponent::model::set(Model^ value) {
 		m_model = value;
 		if (m_model == nullptr)
@@ -21,6 +23,8 @@ namespace ThomasEngine
 		else
 			render->SetModel((thomas::resource::Model*)value->m_nativePtr);
 	}
+
+
 
 	Material^ RenderComponent::material::get()
 	{
@@ -41,5 +45,7 @@ namespace ThomasEngine
 
 		OnPropertyChanged("material");
 	}
+
+
 
 }

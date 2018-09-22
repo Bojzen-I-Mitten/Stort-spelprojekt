@@ -13,6 +13,7 @@
 #include "..\Debug.h"
 #include "../SceneSurrogate.h"
 #include "../resource/Model.h"
+#include "../resource/Resources.h"
 #using "PresentationFramework.dll"
 using namespace System;
 using namespace System::Threading;
@@ -21,7 +22,6 @@ namespace ThomasEngine {
 
 	GameObject::GameObject() : Object(new thomas::object::GameObject("gameobject"))
 	{
-		s_lastObject = this;
 		m_name = "gameobject";
 
 		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
@@ -29,7 +29,6 @@ namespace ThomasEngine {
 
 	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))
 	{
-		s_lastObject = this;
 		m_name = name;
 		m_transform = AddComponent<Transform^>();
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
@@ -62,7 +61,6 @@ namespace ThomasEngine {
 	void GameObject::PostLoad(Scene^ scene)
 	{
 		this->scene = scene;
-		m_transform = GetComponent<Transform^>();
 
 	}
 
@@ -90,8 +88,11 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->enabled)
+			if (component->enabled) {
 				component->Update();
+				component->UpdateCoroutines();
+			}
+				
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -104,6 +105,19 @@ namespace ThomasEngine {
 			Component^ component = m_components[i];
 			if (component->initialized && component->enabled)
 				component->FixedUpdate();
+		}
+		Monitor::Exit(m_componentsLock);
+	}
+
+	void GameObject::OnCollisionEnter(GameObject^ collider)
+	{
+		Monitor::Enter(m_componentsLock);
+
+		for (int i = 0; i < m_components.Count; i++)
+		{
+			Component^ component = m_components[i];
+			if (component->enabled)
+				component->OnCollisionEnter(collider);
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -160,12 +174,22 @@ namespace ThomasEngine {
 			Debug::Log("Object to instantiate is null");
 			return nullptr;
 		}
-		System::IO::Stream^ serialized = SerializeGameObject(original);
-
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		GameObject^ clone = DeSerializeGameObject(serialized);
-		if(clone)
+		GameObject^ clone;
+		if (original->prefabPath != nullptr) {
+			clone = Resources::LoadPrefab(original->prefabPath, true);
+		}
+		else
+		{
+			System::IO::Stream^ serialized = SerializeGameObject(original);
+			clone = DeSerializeGameObject(serialized);
+		}
+		
+		if (clone) {
 			clone->PostInstantiate(Scene::CurrentScene);
+			clone->prefabPath = nullptr;
+		}
+			
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
@@ -200,7 +224,6 @@ namespace ThomasEngine {
 
 	GameObject^ GameObject::CreatePrefab() {
 		GameObject^ newGobj = gcnew GameObject();
-		s_lastObject = nullptr;
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
@@ -259,7 +282,8 @@ namespace ThomasEngine {
 			return gObj;
 		}
 		catch (Exception^ e) {
-			Debug::Log("Failed to load gameObject");
+			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
+			LOG(msg);
 			return nullptr;
 		}
 		
@@ -335,7 +359,7 @@ namespace ThomasEngine {
 	}
 
 	List<GameObject^>^ GameObject::GetAllGameObjects(bool includePrefabs) {
-		/*List<GameObject^>^ gObjs = Object::GetObjectsOfType<GameObject^>();
+		List<GameObject^>^ gObjs = ThomasEngine::Object::GetObjectsOfType<GameObject^>();
 		if (includePrefabs)
 			return gObjs;
 		else
@@ -348,7 +372,7 @@ namespace ThomasEngine {
 
 			}
 			return gObjs;
-		}*/
+		}
 		return nullptr;
 	}
 
@@ -384,9 +408,10 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 		for (int i = 0; i < m_components.Count; i++)
 		{
+
 			Component^ component = m_components[i];
 			if (component->initialized)
-				component->awakened = value;
+				component->enabled = value;
 		}
 	}
 
@@ -406,6 +431,15 @@ namespace ThomasEngine {
 
 	void GameObject::SyncComponents() {
 		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
+	}
+
+	void GameObject::OnDeserialized(System::Runtime::Serialization::StreamingContext c)
+	{
+		for (int i = 0; i < m_components.Count; i++) {
+			m_components[i]->gameObject = this;
+		}
+		m_transform = GetComponent<Transform^>();
+		nativePtr->SetName(Utility::ConvertString(m_name));
 	}
 
 }

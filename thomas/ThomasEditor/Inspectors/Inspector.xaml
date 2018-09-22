@@ -13,10 +13,10 @@
         <converters:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
 
         <DataTemplate x:Key="GameObjectInspector">
-            <local:GameObjectInspector SelectedGameObject="{Binding ElementName=inspector, Path=SelectedObject}"/>
+            <local:GameObjectInspector DataContext="{Binding ElementName=inspector, Path=SelectedObject, Mode=OneWay}"/>
         </DataTemplate>
         <DataTemplate x:Key="MaterialInspector">
-            <local:MaterialInspector Material="{Binding ElementName=inspector, Path=SelectedObject}"/>
+            <local:MaterialInspector DataContext="{Binding ElementName=inspector, Path=SelectedObject, Mode=OneWay}"/>
         </DataTemplate>
 
         <Style TargetType="{x:Type local:Inspector}">

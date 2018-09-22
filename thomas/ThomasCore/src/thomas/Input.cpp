@@ -1,6 +1,7 @@
 #include "Input.h"
 #include "ThomasTime.h"
 #include "Common.h"
+#include "Window.h"
 namespace thomas
 {
 	//Keyboard
@@ -24,6 +25,8 @@ namespace thomas
 	bool Input::s_initialized = false;
 	float Input::s_vibrateTimeLeft = 0.f;
 
+	bool Input::allowEditor = false;
+
 	bool Input::Init()
 	{
 		//Init objects
@@ -41,6 +44,7 @@ namespace thomas
 	{
 		if (s_initialized)
 		{
+			allowEditor = false;
 			s_keyboardState = s_keyboard->GetState();
 			s_gamePadState = s_gamePad->GetState(0);	
 			s_mouseState = s_mouse->GetState();
@@ -133,6 +137,8 @@ namespace thomas
 
 	void Input::SetMouseMode(MouseMode mode)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return;
 		if (s_mouseMode == mode)
 			return;
 
@@ -142,6 +148,8 @@ namespace thomas
 
 	math::Vector2 Input::GetMousePosition()
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return math::Vector2(0.f, 0.f);
 		if (s_recordPosition)
 			return s_mousePosition;
 		else
@@ -150,16 +158,22 @@ namespace thomas
 
 	float Input::GetMouseX()
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return 0;
 		return GetMousePosition().x;
 	}
 
 	float Input::GetMouseY()
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return 0;
 		return GetMousePosition().y;
 	}
 
 	bool Input::GetMouseButtonDown(MouseButtons button)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		switch (button)
 		{
 		case MouseButtons::LEFT:
@@ -174,6 +188,8 @@ namespace thomas
 
 	bool Input::GetMouseButtonUp(MouseButtons button)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		switch (button)
 		{
 		case MouseButtons::LEFT:
@@ -188,6 +204,8 @@ namespace thomas
 
 	bool Input::GetMouseButton(MouseButtons button)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		switch (button)
 		{
 		case MouseButtons::LEFT:
@@ -208,6 +226,8 @@ namespace thomas
 	//Gamepad
 	bool Input::GetButtonDown(Buttons button)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		if (!s_gamePadState.IsConnected()) //Always false if no gamePad.
 			return false;
 
@@ -251,6 +271,8 @@ namespace thomas
 
 	bool Input::GetButtonUp(Buttons button)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		if (!s_gamePadState.IsConnected()) //Always false if no gamePad.
 			return false;
 
@@ -294,6 +316,8 @@ namespace thomas
 
 	bool Input::GetButton(Buttons button)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		if (!s_gamePadState.IsConnected()) //Always false if no gamePad.
 			return false;
 
@@ -348,16 +372,22 @@ namespace thomas
 	//Keyboard
 	bool Input::GetKeyDown(Keys key)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		return s_keyboardTracker.IsKeyPressed((Keyboard::Keys)key);
 	}	
 
 	bool Input::GetKeyUp(Keys key)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		return s_keyboardTracker.IsKeyReleased((Keyboard::Keys)key);
 	}
 
 	bool Input::GetKey(Keys key)
 	{
+		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+			return false;
 		return s_keyboardState.IsKeyDown((Keyboard::Keys)key);
 	}
 }

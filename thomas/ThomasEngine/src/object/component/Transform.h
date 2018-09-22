@@ -13,6 +13,12 @@ namespace ThomasEngine
 		property thomas::object::component::Transform* trans { thomas::object::component::Transform* get(); }
 	public:
 		Transform();
+
+		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
+		static event ParentChanged^ OnParentChanged;
+
+		
+		
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{
@@ -27,12 +33,23 @@ namespace ThomasEngine
 			List<Transform^>^ get();
 		}
 
+		 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
 			Vector3 get();
 			void set(Vector3 value);
 		}
+
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Matrix world
+		{
+			Matrix get();
+			void set(Matrix value);
+		}
+
 
 		[DisplayNameAttribute("position")]
 		property Vector3 localPosition
@@ -41,6 +58,7 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Quaternion rotation
 		{
@@ -48,6 +66,7 @@ namespace ThomasEngine
 			void set(Quaternion value);
 		}
 	
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 eulerAngles
 		{
@@ -62,6 +81,7 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 		
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 scale
 		{
@@ -105,6 +125,9 @@ namespace ThomasEngine
 		void Translate(float x, float y, float z);
 
 		bool IsChildOf(Transform^ _parent);
+
+		void SetParent(Transform^ value);
+		void SetParent(Transform^ value, bool worldPositionStays);
 
 		void OnDestroy() override;
 		void Update() override;

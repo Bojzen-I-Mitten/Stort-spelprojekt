@@ -50,9 +50,9 @@ namespace ThomasEngine
 		void RenderGizmos();
 
 		void RenderSelectedGizmos();
+		void OnCollisionEnter(GameObject^ collider);
 		
 	public:
-		static GameObject^ s_lastObject;
 
 		GameObject(String^ name);
 		
@@ -129,5 +129,9 @@ namespace ThomasEngine
 		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
+
+
+		[System::Runtime::Serialization::OnDeserializedAttribute]
+		void OnDeserialized(System::Runtime::Serialization::StreamingContext c);
 	};
 }

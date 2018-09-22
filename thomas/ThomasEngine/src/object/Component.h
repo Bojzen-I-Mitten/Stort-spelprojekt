@@ -18,6 +18,10 @@ namespace ThomasEngine
 		[NonSerializedAttribute]
 		bool m_enabled = false;
 	internal:
+		[NonSerializedAttribute]
+		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();
+		void UpdateCoroutines();
+
 		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
 		static void LoadExternalComponents();
 
@@ -32,6 +36,7 @@ namespace ThomasEngine
 		virtual void FixedUpdate();
 		virtual void OnDrawGizmosSelected();
 		virtual void OnDrawGizmos();
+		virtual void OnCollisionEnter(GameObject^ collider);
 
 		GameObject^ m_gameObject;
 
@@ -65,6 +70,8 @@ namespace ThomasEngine
 			}
 		}
 
+
+
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject
 		{
@@ -89,5 +96,10 @@ namespace ThomasEngine
 
 		static List<Type^>^ GetAllComponentTypes();
 		static List<Type^>^ GetAllAddableComponentTypes();
+
+		void StartCoroutine(System::Collections::IEnumerator^ routine);
+		void StopCoroutine(System::Collections::IEnumerator^ routine);
+		void StopAllCoroutines();
+
 	};
 }

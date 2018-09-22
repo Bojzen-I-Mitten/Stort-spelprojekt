@@ -24,8 +24,8 @@ namespace ThomasEngine
 	{
 		if (obj->GetType()->BaseType == Resource::typeid)
 		{
-		Resource^ resource = (Resource^)obj;
-		return gcnew SceneResource(resource->GetAssetRelativePath());
+			Resource^ resource = (Resource^)obj;
+			return gcnew SceneResource(resource->GetAssetRelativePath());
 		}
 		else if (obj->GetType() == GameObject::typeid) {
 			GameObject^ gameObject = (GameObject^)obj;
@@ -55,8 +55,9 @@ namespace ThomasEngine
 			else if (Component::typeid->IsAssignableFrom(targetType)) {
 				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path))->GetComponent(targetType);
 			}
-			else
-				return Resources::Load(sceneResource->path);
+			else {
+				return Resources::LoadThomasPath(sceneResource->path);
+			}
 		}
 		return obj;
 	}

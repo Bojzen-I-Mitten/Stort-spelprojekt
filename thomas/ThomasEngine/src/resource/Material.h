@@ -14,6 +14,7 @@ namespace ThomasEngine
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
 	internal:
+		static List<Type^>^ GetKnownTypes();
 		Material(thomas::resource::Material* ptr) : Resource(Utility::ConvertString(ptr->GetPath()), ptr) {};
 		bool m_loaded = false;
 	public:
@@ -26,10 +27,7 @@ namespace ThomasEngine
 
 		Material(Shader^ shader);
 
-		Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
-		{
-			m_loaded = true;
-		}
+		Material(Material^ original);
 
 
 		void OnPlay() override
@@ -46,6 +44,7 @@ namespace ThomasEngine
 			m_propertiesBeforePlay = nullptr;
 		}
 
+
 		property String^ Name
 		{
 			String^ get() override { 
@@ -55,6 +54,9 @@ namespace ThomasEngine
 				{
 					return "Default Material";
 				}
+			}
+			void set(String^ Name) {
+				//Nothing here :)
 			}
 		};
 		
@@ -90,9 +92,7 @@ namespace ThomasEngine
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
 		}
-
-
-
+				
 		[DataMemberAttribute(Order = 1)]
 		property Dictionary<String^, System::Object^>^ EditorProperties
 		{

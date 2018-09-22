@@ -84,8 +84,10 @@ namespace thomas
 				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.tangents)));
 			if (m_data.vertices.bitangents.size() > 0)
 				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.bitangents)));
+			if (m_data.vertices.boneIndices.size() > 0)
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEINDICES, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneIndices)));
 			if (m_data.vertices.boneWeights.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHTS, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
 
 			if (!m_data.indices.empty())
 				m_data.indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_data.indices);
@@ -102,5 +104,48 @@ namespace thomas
 			math::BoundingBox::CreateFromPoints(bounds, points.size(), points.data(), sizeof(math::Vector3));
 			return bounds;
 		}
+
+#pragma region Vertex Structs
+
+		float square(float x) { return x * x; }
+		void BoneWeight::Normalize() {
+			float len_inv = 1.f / std::sqrtf(square(weight0) + square(weight1) + square(weight2) + square(weight3));
+			weight0 *= len_inv;
+			weight1 *= len_inv;
+			weight2 *= len_inv;
+			weight3 *= len_inv;
+		}
+		void Vertices::AddBoneData(int vertIndex, int boneIndex, float weight)
+		{
+			BoneWeight &w = boneWeights[vertIndex];
+			BoneIndex &i = boneIndices[vertIndex];
+			if (w.weight0 == 0.0f)
+			{
+				i.boneIndex0 = boneIndex;
+				w.weight0 = weight;
+			}
+			else if (w.weight1 == 0.0f)
+			{
+				i.boneIndex1 = boneIndex;
+				w.weight1 = weight;
+			}
+			else if (w.weight2 == 0.0f)
+			{
+				i.boneIndex2 = boneIndex;
+				w.weight2 = weight;
+			}
+			else if (w.weight3 == 0.0f)
+			{
+				i.boneIndex3 = boneIndex;
+				w.weight3 = weight;
+			}
+		}
+			/* Post process vertices after all vertices are inserted
+			*/
+		void Vertices::PostProcess() {
+		for (unsigned int i = 0; i < boneWeights.size(); i++)
+			boneWeights[i].Normalize();
+		}
+#pragma endregion
 	}
 }

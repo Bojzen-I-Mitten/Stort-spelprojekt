@@ -577,7 +577,7 @@
     </Style>
 
     <Style TargetType="{x:Type xceed:PropertyGridEditorComboBox}">
-        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+        <Setter Property="Foreground" Value="Black"/>
     </Style>
 
     <Style TargetType="{x:Type xceed:PropertyGridEditorTextBlock}">

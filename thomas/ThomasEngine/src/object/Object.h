@@ -31,7 +31,7 @@ namespace ThomasEngine {
 
 		[field:NonSerializedAttribute]
 		virtual event PropertyChangedEventHandler^ PropertyChanged;
-		void OnPropertyChanged(String^ info)
+		void OnPropertyChanged(System::String^ info)
 		{
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
@@ -71,5 +71,8 @@ namespace ThomasEngine {
 		static bool operator !=(Object^ a, Object^ b);
 
 		static operator bool(Object^ object);
+
+		[System::Runtime::Serialization::OnDeserializedAttribute]
+		void OnDeserializedObject(System::Runtime::Serialization::StreamingContext c);
 	};
 }

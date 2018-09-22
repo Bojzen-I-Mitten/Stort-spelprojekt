@@ -1,23 +1,27 @@
 #pragma once
 
 namespace thomas { namespace resource { class Resource; } }
+using namespace System;
 namespace ThomasEngine
 {
 	ref class GameObject;
 	ref class Resource;
 	public ref class Resources
 	{
-	internal:
+	private:
 		static Object^ resourceLock = gcnew Object();
 		static System::Collections::Generic::Dictionary<String^, Resource^>^ resources = gcnew System::Collections::Generic::Dictionary<String^, ThomasEngine::Resource^>();
+	internal:
 
 		generic<typename T>
 		where T : Resource
 		static T Deserialize(String^ path);
+
 	public:
 		enum class AssetTypes
 		{
 			MODEL,
+			ANIMATION,
 			TEXTURE2D,
 			TEXTURE3D,
 			SCENE,
@@ -31,15 +35,15 @@ namespace ThomasEngine
 
 		static void OnPlay();
 		static void OnStop();
+		static void SavePrefab(GameObject ^ gameObject, String ^ path);
+		static GameObject ^ LoadPrefab(String^ path);
+		static GameObject ^ LoadPrefab(String^ path, bool forceInstantiate);
 
-		static void Resources::SavePrefab(GameObject ^ gameObject, String ^ path);
-		static GameObject ^ Resources::LoadPrefab(String^ path);
-
-		static void SaveResource(Resource^ resource);
+		static bool SaveResource(Resource^ resource);
 
 		static String^ GetUniqueName(String^ path);
 
-		static void CreateResource(Resource^ resource, String^ path);
+		static bool CreateResource(Resource^ resource, String^ path);
 
 		static AssetTypes GetResourceAssetType(Type^ type);
 
@@ -59,10 +63,17 @@ namespace ThomasEngine
 		static System::Collections::Generic::List<Resource^>^ GetResourcesOfType(Type^ type);
 
 		static Resource^ FindResourceFromNativePtr(thomas::resource::Resource* nativePtr);
+		/* Load resource using converted file path to thomas internal representation
+		*/
+		static Resource ^ LoadThomasPath(String ^ path);
 
-		static Resource^ Load(String^ path);
+		/* Load resource using absolute/relative file path
+		*/
+		static Resource ^ LoadSysPath(String ^ system_path);
 		
 		static Resource^ Find(String^ path);
+
+		static Resource^ LoadErrorResource(AssetTypes type);
 
 		static void RenameResource(String^ oldPath, String^ newPath);
 
@@ -72,5 +83,8 @@ namespace ThomasEngine
 		static void LoadAll(String^ path);
 
 		static void UnloadAll();
+
+	private:
+		static	Resource ^ Load(String^ sysPath, String^ thomasPath);
 	};
 }

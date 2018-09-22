@@ -18,7 +18,8 @@ namespace ThomasEngine
 		{
 			DIRECTIONAL = 0,
 			POINT = 1,
-			SPOT = 2
+			SPOT = 2,
+			AREA = 3
 		};
 		
 		LightComponent();
@@ -28,7 +29,12 @@ namespace ThomasEngine
 			void set(LIGHT_TYPES value);
 		}
 
-		property Color color {
+		property Color DiffuseColor {
+			Color get();
+			void set(Color value);
+		}
+
+		property Color SpecularColor {
 			Color get();
 			void set(Color value);
 		}
@@ -55,6 +61,11 @@ namespace ThomasEngine
 		property float QuadraticAttenuation {
 			float get();
 			void set(float value);
+		}
+		
+		property Vector2 AreaRectangle {
+			Vector2 get();
+			void set(Vector2 value);
 		}
 	};
 }

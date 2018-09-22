@@ -14,7 +14,6 @@ namespace ThomasEngine
 		property thomas::object::component::RenderComponent* render {thomas::object::component::RenderComponent* get(); }
 	public:
 		RenderComponent();
-
 		property Model^ model {
 			Model^ get();
 			void set(Model^ value);

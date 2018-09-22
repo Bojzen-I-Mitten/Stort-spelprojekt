@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "object\GameObject.h"
 #include "Application.h"
+#include "Project.h"
 using namespace System;
 using namespace System::IO;
 using namespace System::Reflection;
@@ -47,7 +48,7 @@ namespace ThomasEngine
 			fsw->EnableRaisingEvents = false;
 			fsw->Path = assemblyFolderPath;
 			//fsw->EnableRaisingEvents = true;
-			shouldReload = true;
+			LoadAssembly();
 		}
 		static Assembly^ GetAssembly()
 		{
@@ -74,7 +75,7 @@ namespace ThomasEngine
 		}
 
 		static void ReloadIfNeeded() {
-			if (shouldReload)
+			if (shouldReload && !Scene::CurrentScene->IsLoading())
 				LoadAssembly();
 		}
 

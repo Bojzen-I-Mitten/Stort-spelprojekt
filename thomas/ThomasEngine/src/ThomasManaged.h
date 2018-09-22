@@ -13,9 +13,7 @@ namespace ThomasEngine {
 	public ref class ThomasWrapper
 	{
 	private:
-
-		static bool updateEditor = false;
-
+		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
@@ -24,9 +22,6 @@ namespace ThomasEngine {
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 	public:
-		delegate void UpdateEditor();
-		static event UpdateEditor^ OnEditorUpdate;
-
 		enum class ManipulatorOperation {
 			TRANSLATE,
 			ROTATE,
@@ -35,7 +30,6 @@ namespace ThomasEngine {
 
 		static void Start();
 
-		static void UpdateEditor();
 
 		static void StartRenderer();
 
@@ -68,6 +62,7 @@ namespace ThomasEngine {
 
 		static void UpdateLog();
 
+		static void ToggleEditorRendering();
 	public:
 
 		static property float FrameRate
@@ -84,7 +79,4 @@ namespace ThomasEngine {
 		}
 
 	};
-
-
-
 }

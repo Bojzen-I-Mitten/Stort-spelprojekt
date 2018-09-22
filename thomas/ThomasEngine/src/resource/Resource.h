@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../Utility.h"
 using namespace System;
 using namespace System::Collections::Generic;
@@ -36,7 +35,9 @@ namespace ThomasEngine
 		virtual void OnPlay() {};
 		virtual void OnStop() {};
 
-		void Rename(System::String^ newPath);
+		/* Update file path of the resource
+		*/
+		void Rename(String^ newPath);
 
 	public:
 		virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged;
@@ -52,11 +53,10 @@ namespace ThomasEngine
 			return m_path;
 		}
 
-		virtual property System::String^ Name;
 
 		System::String^ GetAssetRelativePath();
 
-		virtual property System::String^ name
+		virtual property String^ Name
 		{
 			System::String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
 		};
@@ -66,29 +66,8 @@ namespace ThomasEngine
 			return Name;
 		}
 
-		static bool operator ==(Resource^ a, Resource^ b)
-		{
-			if (Object::ReferenceEquals(nullptr, a))
-				return Object::ReferenceEquals(nullptr, b);
+		static bool operator ==(Resource^ a, Resource^ b);
 
-			if (Object::ReferenceEquals(nullptr, b))
-				return false;
-
-			return a->m_nativePtr == b->m_nativePtr;
-		}
-
-		static bool operator !=(Resource^ a, Resource^ b)
-		{
-
-			if (Object::ReferenceEquals(nullptr, a))
-				return !Object::ReferenceEquals(nullptr, b);
-
-			if (Object::ReferenceEquals(nullptr, b))
-				return true;
-
-			return a->m_nativePtr != b->m_nativePtr;
-
-			
-		}
+		static bool operator !=(Resource^ a, Resource^ b);
 	};
 }

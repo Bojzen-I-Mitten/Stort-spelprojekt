@@ -7,3 +7,8 @@
 *.jpeg
 *.tga
 *.tds
+*.mp3
+*.wav
+*.anim
+
+Models/

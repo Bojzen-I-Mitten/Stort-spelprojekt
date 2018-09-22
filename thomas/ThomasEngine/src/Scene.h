@@ -19,8 +19,10 @@ namespace ThomasEngine {
 		static bool savingEnabled = true;
 
 	public:
+		
+		delegate void CurrentSceneChanged(Scene^ newScene);
+		static event CurrentSceneChanged^ OnCurrentSceneChanged;
 
-		static System::Collections::Specialized::NotifyCollectionChangedEventHandler^ sceneChanged;
 
 		Scene(System::String^ name);
 		void Play();
