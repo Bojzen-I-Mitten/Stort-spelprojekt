@@ -10,7 +10,6 @@ namespace thomas
 
 			void Transform::Decompose() {
 				m_localWorldMatrix.Decompose(m_localScale, m_localRotation, m_localPosition);
-				m_localEulerAngles = math::ToEuler(m_localRotation);
 			}
 
 			Transform::Transform()
@@ -145,9 +144,9 @@ namespace thomas
 			math::Vector3 Transform::GetEulerAngles()
 			{
 				if (m_parent)
-					return m_localEulerAngles * m_parent->GetEulerAngles();
+					return GetLocalEulerAngles() * m_parent->GetEulerAngles();
 				else
-					return m_localEulerAngles;
+					return GetLocalEulerAngles();
 			}
 			math::Vector3 Transform::GetScale()
 			{
@@ -222,7 +221,6 @@ namespace thomas
 			void Transform::SetLocalRotation(float yaw, float pitch, float roll)
 			{
 				SetLocalRotation(math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll)));
-				m_localEulerAngles = math::Vector3(pitch, yaw, roll);
 			}
 			void Transform::SetLocalScale(math::Vector3 scale)
 			{
@@ -252,7 +250,7 @@ namespace thomas
 
 			math::Vector3 Transform::GetLocalEulerAngles()
 			{
-				return m_localEulerAngles;
+				return math::ToEuler(m_localRotation);
 			}
 
 			math::Vector3 Transform::GetLocalScale()

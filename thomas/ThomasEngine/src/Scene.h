@@ -64,7 +64,7 @@ namespace ThomasEngine {
 			Vector3 get();
 			void set(Vector3);
 		}
-		/* DataContract serialization access to game objects
+		/* DataContract serialization access to game object list
 		*/
 		[DataMember(Order = 5)]
 		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjectData {
