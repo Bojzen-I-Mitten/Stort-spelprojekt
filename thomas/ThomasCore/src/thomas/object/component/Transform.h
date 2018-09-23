@@ -58,6 +58,8 @@ namespace thomas
 				void SetLocalScale(math::Vector3 scale);
 				void SetLocalScale(float x, float y, float z);
 				void SetLocalScale(float scale);
+				/* Recreate the matrix from current S*R*T */
+				void ReCreateMatrix();			
 
 
 				math::Vector3 GetLocalPosition();

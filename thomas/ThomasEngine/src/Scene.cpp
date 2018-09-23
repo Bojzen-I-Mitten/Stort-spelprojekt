@@ -278,7 +278,7 @@ namespace ThomasEngine
 
 	void Scene::CameraEuler::set(Vector3 euler) {
 
-		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalRotation(euler.x, euler.y, euler.z);
+		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
 	}
 
 }

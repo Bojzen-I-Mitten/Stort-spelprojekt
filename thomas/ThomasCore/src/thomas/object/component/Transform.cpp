@@ -202,8 +202,8 @@ namespace thomas
 
 			void Transform::SetLocalPosition(math::Vector3 position)
 			{
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(position, m_localWorldMatrix.Forward(), m_localWorldMatrix.Up());
-				Decompose();
+				m_localPosition = position;
+				m_localWorldMatrix.Translation(position);
 			}
 			void Transform::SetLocalPosition(float x, float y, float z)
 			{
@@ -211,12 +211,8 @@ namespace thomas
 			}
 			void Transform::SetLocalRotation(math::Quaternion rotation)
 			{
-
-				math::Matrix rotMatrix = math::Matrix::CreateFromQuaternion(rotation);
-
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, rotMatrix.Forward(), rotMatrix.Up());
-				Decompose();
-				
+				m_localRotation = rotation;
+				ReCreateMatrix();
 			}
 			void Transform::SetLocalRotation(float yaw, float pitch, float roll)
 			{
@@ -224,10 +220,8 @@ namespace thomas
 			}
 			void Transform::SetLocalScale(math::Vector3 scale)
 			{
-				//Bug here
-				m_localWorldMatrix = math::Matrix::CreateScale(scale) * math::Matrix::CreateWorld(m_localPosition, m_localWorldMatrix.Forward(), m_localWorldMatrix.Up());
-				Decompose();
 				m_localScale = scale;
+				ReCreateMatrix();
 			}
 			void Transform::SetLocalScale(float x, float y, float z)
 			{
@@ -236,6 +230,13 @@ namespace thomas
 			void Transform::SetLocalScale(float scale)
 			{
 				return SetLocalScale(math::Vector3(scale, scale, scale));
+			}
+
+			void Transform::ReCreateMatrix()
+			{
+				math::Matrix rotMatrix = math::Matrix::CreateFromQuaternion(m_localRotation);
+				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * rotMatrix;
+				m_localWorldMatrix.Translation(m_localPosition);
 			}
 
 			math::Vector3 Transform::GetLocalPosition()
