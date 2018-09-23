@@ -30,8 +30,14 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 
 			Scene^ oldScene = Scene::CurrentScene;
 			oldScene->UnLoad();
-			Scene::CurrentScene = Scene::LoadScene(tempFile);
-			File::Delete(tempFile);
+			try {
+				Scene::CurrentScene = Scene::LoadScene(tempFile);
+				File::Delete(tempFile);
+			}
+			catch (Exception^ e) {
+				std::string err("Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + Utility::ConvertString(e->Message));
+				LOG(err);
+			}
 			Scene::CurrentScene->RelativeSavePath = currentSavePath;			
 		}
 	}

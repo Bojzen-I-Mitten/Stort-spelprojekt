@@ -14,13 +14,30 @@ namespace ThomasEditor.Inspectors
         public object SelectedObject
         {
             get { return GetValue(SelectedObjectProperty); }
-            set { SetValue(SelectedObjectProperty, value); SelectedObjectType = value != null ? value.GetType() : null; }
+            set
+            {
+                try
+                {
+                    SetValue(SelectedObjectProperty, value);
+                    SelectedObjectType = value != null ? value.GetType() : null;
+                }
+                catch (Exception e)
+                {
+                    // Could occur after file were renamed.
+                    Debug.Log("Selection failed with message: " + e.Message);
+                    SetValue(SelectedObjectProperty, null);
+                    SelectedObjectType = null;
+                }
+            }
         }
 
-        public Type SelectedObjectType
+        internal Type SelectedObjectType
         {
             get { return (Type)GetValue(SelectedObjectTypeProperty); }
-            set { SetValue(SelectedObjectTypeProperty, value); }
+            set
+            {
+                    SetValue(SelectedObjectTypeProperty, value);
+            }
         }
         public static Inspector instance;
         public Inspector()
