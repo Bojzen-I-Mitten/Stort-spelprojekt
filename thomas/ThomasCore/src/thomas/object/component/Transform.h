@@ -79,7 +79,6 @@ namespace thomas
 				bool m_dirty;
 				Transform* m_parent;
 
-				math::Vector3 m_localEulerAngles;
 				math::Quaternion m_localRotation;
 				math::Vector3 m_localPosition;
 				math::Vector3 m_localScale;
