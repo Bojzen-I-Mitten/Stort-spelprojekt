@@ -155,6 +155,10 @@ namespace thomas
 		else
 			return math::Vector2(0.f, 0.f);
 	}
+	math::Vector2 Input::GetAbsolutePosition()
+	{
+		return s_mousePosition;
+	}
 
 	float Input::GetMouseX()
 	{

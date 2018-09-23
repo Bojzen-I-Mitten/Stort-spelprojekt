@@ -41,6 +41,7 @@ namespace thomas
 		static void EndFrame(bool copyGui);
 		static void Update();
 		static void UpdateFocus();
+		bool IntersectBounds(int x, int y) const;
 
 	public:
 		bool SetHeight(const LONG & height);
@@ -64,6 +65,7 @@ namespace thomas
 	public:
 		LONG GetHeight() const;
 		LONG GetWidth() const;
+		RECT GetBounds() const;
 		LONG GetHorizontalResolution() const;
 		LONG GetVerticalResolution() const;
 		IDXGISwapChain* GetSwapChain() const;

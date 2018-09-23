@@ -232,6 +232,7 @@ namespace thomas
 		static bool GetMouseButtonUp(MouseButtons button);
 		static bool GetMouseButton(MouseButtons button);
 		static int GetMouseScrollWheel();
+		static math::Vector2 GetAbsolutePosition();
 		static math::Vector2 GetMousePosition();
 		
 		//Keyboard

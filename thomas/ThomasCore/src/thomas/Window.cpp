@@ -29,7 +29,6 @@ namespace thomas
 			LOG("Failed to create window")
 
 		m_windowRectangle = { 0, 0, m_width, m_height };
-
 		//Properties for window
 		AdjustWindowRect(&m_windowRectangle, WS_OVERLAPPEDWINDOW, FALSE);
 		m_windowHandler = CreateWindow(
@@ -246,11 +245,31 @@ namespace thomas
 
 	void Window::UpdateFocus()
 	{
-		if (s_editorWindow)
-			s_editorWindow->m_focused = s_editorWindow->GetWindowHandler() == GetFocus();
 
-		for (Window* window : s_windows)
+		bool appHasFocus = false;
+		if (s_editorWindow) {
+			s_editorWindow->m_focused = s_editorWindow->GetWindowHandler() == GetFocus();
+			appHasFocus |= s_editorWindow->m_focused;
+		}
+
+		for (Window* window : s_windows) {
 			window->m_focused = window->GetWindowHandler() == GetFocus();
+			appHasFocus |= window->m_focused;
+		}
+		/*
+		// If applicatin has a focused window and mouse is howering over editor -> is focused.
+		math::Vector2 mouse = Input::GetAbsolutePosition();
+		if (appHasFocus && s_editorWindow->IntersectBounds(mouse.x, mouse.y)) {
+			s_editorWindow->m_focused = true;
+			LOG("Editor focus");
+		}
+		*/
+	}
+
+	bool Window::IntersectBounds(int x, int y) const
+	{
+		return m_windowRectangle.left <= x && x <= m_windowRectangle.right &&
+			m_windowRectangle.top <= y && y <= m_windowRectangle.bottom;
 	}
 
 	void Window::Bind()
@@ -387,6 +406,11 @@ namespace thomas
 	LONG Window::GetWidth() const
 	{
 		return m_width;
+	}
+
+	RECT Window::GetBounds() const
+	{
+		return m_windowRectangle;
 	}
 
 	float Window::GetRealAspectRatio() const

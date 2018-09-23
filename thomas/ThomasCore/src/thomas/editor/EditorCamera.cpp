@@ -163,7 +163,8 @@ namespace thomas
 			HWND focus = GetForegroundWindow();
 
 			// Make sure we are dealing with the editor window
-			if (!Window::GetEditorWindow() || !Window::GetEditorWindow()->IsFocused())
+			thomas::Window *window = Window::GetEditorWindow();
+			if (!window || !window->IsFocused())
 				return;
 
 			Input::allowEditor = true;
