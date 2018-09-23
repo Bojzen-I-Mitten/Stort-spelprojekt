@@ -669,8 +669,12 @@ namespace thomas
 		}
 		void ProcessChannelData(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
-			if (bone < 0)
+			if (bone < 0) {
+				std::string err("Warning, animated bone not included in skeleton: ");
+				err.append(channel->mNodeName.C_Str());
+				LOG(err);
 				return; //This channel does not animate a bone.
+			}
 			anim._boneHash[bone] = hash_djb2(construct.m_boneInfo[bone]._boneName.c_str());
 			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}
