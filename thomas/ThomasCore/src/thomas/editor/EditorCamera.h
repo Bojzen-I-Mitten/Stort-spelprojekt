@@ -64,8 +64,6 @@ namespace thomas
 
 		private:
 			float m_sensitivity;
-			float m_rotationX;
-			float m_rotationY;
 			float m_speed;
 			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
