@@ -164,7 +164,7 @@ namespace thomas
 
 				D3DData* GetD3DData();
 
-				//InitParticleBufferStruct* GetInitData();
+				InitParticleBufferStruct& GetInitData();
 
 				bool IsPaused() const;
 				unsigned int GetNrOfMaxParticles() const;

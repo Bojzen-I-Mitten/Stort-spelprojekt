@@ -1,6 +1,7 @@
 #pragma once
-#include "../utils/Math.h"
-#include <d3d11.h>
+#include <vector>
+#include <memory>
+#include "..\utils\Buffers.h"
 
 
 namespace thomas
@@ -10,9 +11,6 @@ namespace thomas
 		namespace component
 		{
 			class ParticleEmitterComponent;
-			class Transform;
-			class Camera;
-			
 		}
 	}
 	namespace resource
@@ -21,11 +19,10 @@ namespace thomas
 	}
 	namespace graphics
 	{
-		
-		class Mesh;
 		class ParticleSystem
 		{
 		private:
+			
 			
 
 			
@@ -36,19 +33,24 @@ namespace thomas
 			void Initialize();
 			void Destroy();
 
-			void AddEmitterToInit(object::component::ParticleEmitterComponent* emitter);
-			void AddEmitterToUpdate(object::component::ParticleEmitterComponent* emitter);
+			bool AddEmitterToSpawn(object::component::ParticleEmitterComponent* emitter);
+			bool AddEmitterToUpdate(object::component::ParticleEmitterComponent* emitter);
 
 			void SpawnParticles();
 			void UpdateParticles();
 			void DrawParticles();
 
 		private:
-			resource::Shader m_updateParticlesCS;
-			resource::Shader m_emitParticlesCS;
+			resource::ComputeShader* m_emitParticlesCS;
+			resource::ComputeShader* m_updateParticlesCS;
 
-			std::vector<object::component::ParticleEmitterComponent*> m_initEmitters; 
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnNewParticlesSRV;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateParticlesSRV;
+
+
+			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;
 			std::vector<object::component::ParticleEmitterComponent*> m_updateEmitters; 
+			
 		public:
 
 		};

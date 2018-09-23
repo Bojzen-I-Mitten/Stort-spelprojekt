@@ -12,7 +12,7 @@
 #include "utils\Primitives.h"
 #include <D3d11_4.h>
 
-#include "object/component/LightComponent.h"
+#include "graphics\ParticleSystem.h"
 
 namespace thomas 
 {
@@ -43,6 +43,10 @@ namespace thomas
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
+
+		graphics::ParticleSystem p;
+		p.Initialize();
+
 
 		s_initialized = true;
 		return s_initialized;

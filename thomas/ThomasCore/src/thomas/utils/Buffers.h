@@ -17,7 +17,7 @@ namespace thomas
 				//Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag);
 				Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0, size_t structureByteStride = 0);
 				template <typename T>
-				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(data.data(), sizeof(data[0])*data.size(), bindFlag, usageFlag) {};
+				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(data.data(), sizeof(T)*data.size(), bindFlag, usageFlag) {};
 				virtual ~Buffer();
 				void Release();
 				void SetData(void* data, size_t size);
@@ -39,7 +39,7 @@ namespace thomas
 			public:
 				VertexBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER);
 				template <typename T>
-				VertexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : VertexBuffer(data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				VertexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : VertexBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
 
 				template <typename T>
 				void SetData(std::vector<T>& data) 
@@ -50,7 +50,7 @@ namespace thomas
 						return;
 					}
 
-					Buffer::SetData(data.data(), data.size() * sizeof(data[0]));
+					Buffer::SetData(data.data(), data.size() * sizeof(T));
 				}
 
 				size_t GetStride();
@@ -72,7 +72,7 @@ namespace thomas
 			public:
 				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag);
 				template <typename T>
-				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
 
 				ID3D11ShaderResourceView* GetSRV();
 			private:

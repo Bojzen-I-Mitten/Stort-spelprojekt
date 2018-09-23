@@ -87,9 +87,9 @@ namespace thomas
 
 					m_particleBufferStruct.currentParticleStartIndex = 0;
 					
-					graphics::ParticleSystem::SpawnParticles(this, m_maxNrOfParticles);
+					//graphics::ParticleSystem::SpawnParticles(this, m_maxNrOfParticles);
 					m_spawnedParticleCount = m_maxNrOfParticles;
-					graphics::ParticleSystem::UpdateParticles(this);
+					//graphics::ParticleSystem::UpdateParticles(this);
 				}
 
 
@@ -109,7 +109,7 @@ namespace thomas
 						
 						m_particleBufferStruct.rand = (std::rand() % 1000) / 1000.f;
 
-						graphics::ParticleSystem::SpawnParticles(this, numberOfParticlesToEmit);
+						//graphics::ParticleSystem::SpawnParticles(this, numberOfParticlesToEmit);
 						m_particleBufferStruct.currentParticleStartIndex = (m_particleBufferStruct.currentParticleStartIndex + numberOfParticlesToEmit) % m_maxNrOfParticles;
 						m_spawnedParticleCount += numberOfParticlesToEmit;
 						m_spawnedParticleCount = min(m_spawnedParticleCount, m_maxNrOfParticles);
@@ -296,7 +296,7 @@ namespace thomas
 
 			void ParticleEmitterComponent::StartEmitting()
 			{
-				m_drawTimer = m_particleBufferStruct.maxLifeTime + m_particleBufferStruct.maxDelay;
+				//m_drawTimer = m_particleBufferStruct.maxLifeTime + m_particleBufferStruct.maxDelay;
 				if (!m_isEmitting)
 				{
 					m_isEmitting = true;
@@ -311,7 +311,7 @@ namespace thomas
 				{
 					m_particleBufferStruct.currentParticleStartIndex = 0;
 
-					graphics::ParticleSystem::SpawnParticles(this, m_maxNrOfParticles);
+					//graphics::ParticleSystem::SpawnParticles(this, m_maxNrOfParticles);
 
 				}
 			}
@@ -342,8 +342,8 @@ namespace thomas
 				utils::D3d::CreateBufferAndUAV(NULL, bytewidth, structurebytestride, m_d3dData.particleBuffer2, m_d3dData.particleUAV2, m_d3dData.particleSRV2);
 
 
-				UINT bytewidth = sizeof(BillboardStruct) * m_maxNrOfParticles;
-				UINT structurebytestride = sizeof(BillboardStruct);
+				bytewidth = sizeof(BillboardStruct) * m_maxNrOfParticles;
+				structurebytestride = sizeof(BillboardStruct);
 				thomas::utils::D3d::CreateBufferAndUAV(NULL, bytewidth, structurebytestride, m_d3dData.billboardBuffer, m_d3dData.billboardsUAV, m_d3dData.billboardsSRV);
 
 			}
@@ -354,7 +354,7 @@ namespace thomas
 			{
 				m_particleBufferStruct.maxLifeTime = m_tempMaxLifeTime;
 				m_emissionRate = m_tempEmissionRate;
-				m_maxNrOfParticles = unsigned((m_particleBufferStruct.maxLifeTime + m_particleBufferStruct.maxDelay)*m_emissionRate);
+				//m_maxNrOfParticles = unsigned((m_particleBufferStruct.maxLifeTime + m_particleBufferStruct.maxDelay)*m_emissionRate);
 				m_shouldUpdateResources = true;
 
 			}
@@ -382,6 +382,11 @@ namespace thomas
 			ParticleEmitterComponent::D3DData * ParticleEmitterComponent::GetD3DData() 
 			{
 				return &m_d3dData;
+			}
+
+			ParticleEmitterComponent::InitParticleBufferStruct& ParticleEmitterComponent::GetInitData()
+			{
+				return m_particleBufferStruct;
 			}
 
 			bool ParticleEmitterComponent::IsPaused() const

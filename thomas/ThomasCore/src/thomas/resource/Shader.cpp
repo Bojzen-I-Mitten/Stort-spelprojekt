@@ -402,7 +402,7 @@ namespace thomas
 			{
 				if (shader->HasProperty(name))
 				{
-					shader->m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyUnorderedAccessView(value));
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyUnorderedAccessView(value));
 					shader->m_properties[name]->SetName(name);
 				}
 			}

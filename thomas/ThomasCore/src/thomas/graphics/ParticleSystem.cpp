@@ -1,15 +1,6 @@
 #include "ParticleSystem.h"
 #include "../object/component/ParticleEmitterComponent.h"
-#include "../object/component/Transform.h"
-#include "../object/component/Camera.h"
-#include "../object/GameObject.h"
 #include "../resource/ComputeShader.h"
-#include "Renderer.h"
-#include "../utils/d3d.h"
-#include "../ThomasCore.h"
-#include "../resource/texture/Texture.h"
-#include "../ThomasTime.h"
-#include "Mesh.h"
 
 namespace thomas
 {
@@ -29,9 +20,15 @@ namespace thomas
 
 		void ParticleSystem::Initialize()
 		{
+			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl");//"../Data/FXIncludes/StandardShader.fx"
+			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/updateParticlesCS.hlsl");
+
+			m_spawnNewParticlesSRV = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 25, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_updateParticlesSRV = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), 25000, DYNAMIC_BUFFER);//ammount of particles supported for entire system
 			
-			//s_emitParticlesCS = new resource::ComputeShader(resource::Shader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl"));
-			//s_updateParticlesCS = new resource::ComputeShader(resource::Shader::CreateShader("../Data/oldShaders/updateParticlesCS.hlsl"));
+
+
+
 			/*
 
 			D3D11_BLEND_DESC blendDesc;
@@ -91,22 +88,44 @@ namespace thomas
 		{
 		}
 
-		void ParticleSystem::AddEmitterToInit(object::component::ParticleEmitterComponent * emitter)
+		bool ParticleSystem::AddEmitterToSpawn(object::component::ParticleEmitterComponent* emitter)
 		{
-			m_initEmitters.push_back(emitter);
+			for (object::component::ParticleEmitterComponent* e : m_spawningEmitters)
+			{
+				if (emitter == e)//emitter already added
+					return false;
+			}
+			
+			m_spawningEmitters.push_back(emitter);
+			return true;
 		}
 
-		void ParticleSystem::AddEmitterToUpdate(object::component::ParticleEmitterComponent * emitter)
+		bool ParticleSystem::AddEmitterToUpdate(object::component::ParticleEmitterComponent* emitter)
 		{
+			for (object::component::ParticleEmitterComponent* e : m_spawningEmitters)
+			{
+				if (emitter == e)//emitter already added
+					return false;
+			}
+
 			m_updateEmitters.push_back(emitter);
+			return true;
 		}
 
 
 		void ParticleSystem::SpawnParticles()
 		{
+			std::vector<object::component::ParticleEmitterComponent::InitParticleBufferStruct> dataVec;
 
+			for (object::component::ParticleEmitterComponent* e : m_spawningEmitters)
+			{
+				dataVec.push_back(e->GetInitData());
+			}
+			//object::component::ParticleEmitterComponent::InitParticleBufferStruct data[m_spawningEmitters.size()];
 
-			m_emitParticlesCS->
+			m_emitParticlesCS->Bind();
+			
+			//m_emitParticlesCS->
 			//object::component::ParticleEmitterComponent::D3DData* emitterD3D = emitter->GetD3DData();
 			
 			//m_emitParticlesCS//SetBuffer("InitBuffer", *emitterD3D->particleBuffer);
@@ -142,7 +161,7 @@ namespace thomas
 			//emitter->GetMaterial()->Draw(emitter->GetNrOfMaxParticles() * 6, 0);
 						
 
-			ThomasCore::GetDeviceContext()->OMSetBlendState(NULL, NULL, 0xffffffff);
+//			ThomasCore::GetDeviceContext()->OMSetBlendState(NULL, NULL, 0xffffffff);
 
 		}
 

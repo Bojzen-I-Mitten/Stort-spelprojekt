@@ -10,10 +10,11 @@ namespace thomas
 		{
 		private:
 
-			ComputeShader(ID3DX11Effect* effect, std::string path);
+			ComputeShader();
+			~ComputeShader();
 		public:
-			void Dispatch(int threadGroupX, int threadGroupY = 0, int threadGroupZ = 0);
-			static ComputeShader* CreateComputeShader();
+			void Dispatch(int threadGroupX, int threadGroupY = 1, int threadGroupZ = 1);
+			
 		};
 	}
 }
