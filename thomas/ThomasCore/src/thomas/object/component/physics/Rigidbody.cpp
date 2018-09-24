@@ -128,7 +128,7 @@ namespace thomas
 					if (initialized)
 					{
 						Physics::RemoveRigidBody(this);
-						return m_hasGravity == true ? this->setGravity(Physics::s_world->getGravity()) : this->setGravity(btVector3(0, 0, 0));
+						m_hasGravity ? this->setGravity(Physics::s_world->getGravity()) : this->setGravity(btVector3(0, 0, 0));
 						Physics::AddRigidBody(this);
 					}
 				}
