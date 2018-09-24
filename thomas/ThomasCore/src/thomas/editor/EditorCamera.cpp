@@ -189,7 +189,7 @@ namespace thomas
 			if (Input::GetMouseButtonUp(Input::MouseButtons::RIGHT))
 				Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
 
-			if (Input::GetKey(Input::Keys::F))
+			if (Input::GetKeyDown(Input::Keys::F))
 				SnapCameraToFocus();
 
 			// Scroll doesn't work for some reason... Commented out for now
