@@ -74,6 +74,13 @@
                         <MenuItem Header="_Cylinder" Click="AddNewCylinderPrimitive"/>
                         <MenuItem Header="_Plane" Click="AddNewPlanePrimitive"/>
                         <MenuItem Header="_Quad" Click="AddNewQuadPrimitive"/>
+                        </MenuItem>
+                    <MenuItem Header="_Assisting Objects">
+                        <MenuItem Header="_Camera" Click="AddNewCameraPrimitive"/>
+                        <MenuItem Header="_POINT Light" Click="AddNewPointLightPrimitive"/>
+                        <MenuItem Header="_SPOT Light" Click="AddNewSpotLightPrimitive"/>
+                        <MenuItem Header="_DIRECTIONAL Light" Click="AddNewDirectionalLightPrimitive"/>
+                        <MenuItem Header="_AREA Light" Click="AddNewAreaLightPrimitive"/>
                     </MenuItem>
                 </MenuItem>
 
