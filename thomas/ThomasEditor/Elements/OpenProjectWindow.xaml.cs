@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Windows.Threading;
 using System.Threading;
 using ThomasEngine;
 
@@ -22,64 +23,44 @@ namespace ThomasEditor
     /// </summary>
     public partial class OpenProjectWindow : Window
     {
-        OpenProjectWindow()
+        public OpenProjectWindow()
         {
-            MainWindow._instance.IsEnabled = false;
-            //InitializeComponent();
+            Thread.Sleep(2000);
+            InitializeComponent();
+            IsEnabled = true;
+            Focusable = true;
+            Focus();
+
+            Closed += OpenProjectWindow_Closed;
         }
 
-        ~OpenProjectWindow()
+        private void OpenProjectWindow_Closed(object sender, EventArgs e)
         {
-            MainWindow._instance.IsEnabled = true;
+            MainWindow._instance.Dispatcher.Invoke(() =>
+            {
+                MainWindow._instance.IsEnabled = true;
+            });
         }
 
         private void NewProject_Click(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-            saveFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
-
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
-            saveFileDialog.FileName = "New Project";
-
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                MainWindow._instance.showBusyIndicator("Creating new project...");
-                Thread worker = new Thread(new ThreadStart(() =>
-                {
-                    string fileName = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                    string dir = System.IO.Path.GetDirectoryName(saveFileDialog.FileName);
-
-                    if (utils.ScriptAssemblyManager.CreateSolution(dir + "\\" + fileName, fileName))
-                    {
-                        ThomasEngine.Project proj = new ThomasEngine.Project(fileName, dir);
-                        ThomasEngine.Application.currentProject = proj;
-                        utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
-                    }
-                    MainWindow._instance.hideBusyIndicator();
-                }));
-                worker.SetApartmentState(ApartmentState.STA);
-                worker.Start();
-            }
+            MainWindow._instance.NewProject_Click(sender, e);
+            Close();
         }
         
         private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow._instance.Close();
+        {   
+            if (MainWindow._instance.Dispatcher.CheckAccess())
+                MainWindow._instance.Close();
+            else
+                MainWindow._instance.Dispatcher.Invoke(DispatcherPriority.Normal, new ThreadStart(MainWindow._instance.Close));
+            Close();
         }
 
-        private void LoadProject_Click(object sender, RoutedEventArgs e)
+        private void OpenProject_Click(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-            openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-            openFileDialog.RestoreDirectory = true;
-            if (openFileDialog.ShowDialog() == true)
-            {
-                MainWindow._instance.OpenProject(openFileDialog.FileName);
-            }
+            MainWindow._instance.OpenProject_Click(sender, e);
+            Close();
         }
     }
 }
