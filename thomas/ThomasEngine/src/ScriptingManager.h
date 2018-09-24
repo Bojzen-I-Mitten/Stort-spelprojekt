@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "object\GameObject.h"
 #include "Application.h"
+#include "Project.h"
 using namespace System;
 using namespace System::IO;
 using namespace System::Reflection;

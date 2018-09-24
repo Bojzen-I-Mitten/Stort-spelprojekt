@@ -8,6 +8,8 @@
 #include "..\graphics\Renderer.h"
 #include "..\graphics\render\Frame.h"
 #include "..\resource\Model.h"
+#include "..\Common.h"
+#include "..\object\component\Camera.h"
 #include "..\System.h"
 
 

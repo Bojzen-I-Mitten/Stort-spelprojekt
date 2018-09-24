@@ -6,7 +6,7 @@ namespace thomas
 	namespace resource
 	{
 		//rework
-		class THOMAS_API ComputeShader
+		class ComputeShader
 		{
 		public:
 			ComputeShader();

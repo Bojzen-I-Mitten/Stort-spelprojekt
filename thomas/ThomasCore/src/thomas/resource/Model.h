@@ -1,5 +1,4 @@
 #pragma once
-#include "../Common.h"
 #include "../utils/Math.h"
 #include "Resource.h"
 #include <vector>
@@ -15,7 +14,7 @@ namespace thomas {
 	}
 	namespace resource {
 		
-		class THOMAS_API Model : public Resource {
+		class Model : public Resource {
 		private:
 			math::BoundingBox GenerateBounds();
 			void OnChanged();

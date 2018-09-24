@@ -15,8 +15,7 @@ namespace thomas
 			};
 
 			class Collider;
-
-			class THOMAS_API Rigidbody : public Component, public btRigidBody
+			class Rigidbody : public Component, public btRigidBody
 			{
 			public:
 				Rigidbody();

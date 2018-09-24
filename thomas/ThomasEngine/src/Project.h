@@ -9,6 +9,7 @@ namespace ThomasEngine
 	public ref class Project
 	{
 	private:
+
 		String ^ m_path;
 		[DataMemberAttribute]
 		String ^ m_name;

@@ -1,21 +1,32 @@
 #include "Scene.h"
+#include "ThomasSelection.h"
 #include "object\GameObject.h"
 #include "object\Component.h"
 #include "resource\Resources.h"
-#include "ThomasManaged.h"
+#include "SceneSurrogate.h"
 #include "Debug.h"
+#include "Application.h"
+#include "Project.h"
+#using "PresentationFramework.dll"
 namespace ThomasEngine
 {
+
+	Scene::Scene() {
+		m_name = "New Scene";
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
+	}
+
+	Scene::Scene(System::String^ name) {
+		m_name = name;
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
+	}
+
 	void Scene::Play()
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
 		savingEnabled = false;
 		SaveSceneAs(this, tempFile);
 		m_playing = true;
-		//for each(GameObject^ gObj in m_gameObjects)
-		//{
-		//	gObj->Awake();
-		//}
 	}
 
 	Scene^ Scene::CurrentScene::get()
@@ -76,7 +87,7 @@ namespace ThomasEngine
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath)
 	{
-		if (!File::Exists(fullPath))
+		if (!IO::File::Exists(fullPath))
 		{
 			Debug::Log("Unable to find scene: " + fullPath);
 			return nullptr;
@@ -96,10 +107,6 @@ namespace ThomasEngine
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
 			scene = (Scene^)serializer->ReadObject(file);
 
-			msclr::interop::marshal_context context;
-			for (int i = 0; i < scene->GameObjects->Count; ++i)
-				scene->GameObjects[i]->nativePtr->SetName(context.marshal_as<std::string>(scene->GameObjects[i]->Name));
-
 			file->Close();
 
 			scene->PostLoad();
@@ -108,10 +115,10 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
-			LOG("Loading scene: ");
-			LOG(Utility::ConvertString(fullPath));
-			LOG("with error:")
-			LOG(Utility::ConvertString(e->Message));
+			Debug::Log("Loading scene: ");
+			Debug::Log(fullPath);
+			Debug::Log("with error:");
+			Debug::Log(e->Message);
 			scene = nullptr;
 		}
 		finally{
@@ -157,84 +164,9 @@ namespace ThomasEngine
 		}
 	}
 
-	System::Type ^ Scene::SceneSurrogate::GetDataContractType(System::Type ^ type)
-	{
-		if (type->BaseType == Resource::typeid)
-		{
-			return SceneResource::typeid;
-		}
-		else
-		{
-			return type;
-		}
-	}
 
-	System::Object ^ Scene::SceneSurrogate::GetObjectToSerialize(System::Object ^obj, System::Type ^targetType)
-	{
-		if (obj->GetType()->BaseType == Resource::typeid)
-		{
-			Resource^ resource = (Resource^)obj;
-			return gcnew SceneResource(resource->GetAssetRelativePath());
-		}
-		else if (obj->GetType() == GameObject::typeid) {
-			GameObject^ gameObject = (GameObject^)obj;
-			if(gameObject->prefabPath)
-				return gcnew SceneResource(Resources::ConvertToThomasPath(gameObject->prefabPath));
-		}
-		else if (Component::typeid->IsAssignableFrom(obj->GetType())) {
-			Component^ component = (Component^)obj;
-			if (component->gameObject->prefabPath)
-				return gcnew SceneResource(Resources::ConvertToThomasPath(component->gameObject->prefabPath));
-		}
-		return obj;
-	}
 
-	System::Object ^ Scene::SceneSurrogate::GetDeserializedObject(System::Object ^obj, System::Type ^targetType)
-	{
-		if (obj->GetType() == SceneResource::typeid)
-		{
-			SceneResource^ sceneResource = (SceneResource^)obj;
-			if (sceneResource->path == "")
-			{
-				if (targetType == Material::typeid)
-					return Material::StandardMaterial;
-			}
-			else if (targetType == GameObject::typeid)
-				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path));
-			else if (Component::typeid->IsAssignableFrom(targetType)) {
-				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path))->GetComponent(targetType);
-			}
-			else {
-				return Resources::LoadThomasPath(sceneResource->path);
-			}
-		}
-		return obj;
-	}
 
-	System::Object ^ Scene::SceneSurrogate::GetCustomDataToExport(System::Reflection::MemberInfo ^memberInfo, System::Type ^dataContractType)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	System::Object ^ Scene::SceneSurrogate::GetCustomDataToExport(System::Type ^clrType, System::Type ^dataContractType)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	void Scene::SceneSurrogate::GetKnownCustomDataTypes(System::Collections::ObjectModel::Collection<System::Type ^> ^customDataTypes)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	System::Type ^ Scene::SceneSurrogate::GetReferencedTypeOnImport(System::String ^typeName, System::String ^typeNamespace, System::Object ^customData)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
-
-	System::CodeDom::CodeTypeDeclaration ^ Scene::SceneSurrogate::ProcessImportedType(System::CodeDom::CodeTypeDeclaration ^typeDeclaration, System::CodeDom::CodeCompileUnit ^compileUnit)
-	{
-		throw gcnew NotSupportedException("unused");
-	}
 
 }
 
