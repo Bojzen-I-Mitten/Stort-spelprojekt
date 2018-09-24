@@ -24,29 +24,59 @@ namespace ThomasEngine
 	void Collider::OnCollision(component::Collider* otherCollider, COLLISION_TYPE collisionType)
 	{
 		Collider^ collider = (Collider^)Object::Find(Utility::Convert(otherCollider->m_guid));
-		switch (collisionType)
+		if (collider->isTrigger || isTrigger) //If one of the colliders is a trigger we do OnColliderX instead.
 		{
-		case COLLISION_TYPE::STARTED:
-			for (int i = 0; i < gameObject->Components->Count; i++)
+			switch (collisionType)
 			{
-				gameObject->Components[i]->OnCollisionEnter(collider);
+			case COLLISION_TYPE::STARTED:
+				for (int i = 0; i < gameObject->Components->Count; i++)
+				{
+					gameObject->Components[i]->OnTriggerEnter(collider);
+				}
+				break;
+			case COLLISION_TYPE::STAY:
+				for (int i = 0; i < gameObject->Components->Count; i++)
+				{
+					gameObject->Components[i]->OnTriggerStay(collider);
+				}
+				break;
+			case COLLISION_TYPE::ENDED:
+				for (int i = 0; i < gameObject->Components->Count; i++)
+				{
+					gameObject->Components[i]->OnTriggerExit(collider);
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case COLLISION_TYPE::STAY:
-			for (int i = 0; i < gameObject->Components->Count; i++)
-			{
-				gameObject->Components[i]->OnCollisionStay(collider);
-			}
-			break;
-		case COLLISION_TYPE::ENDED:
-			for (int i = 0; i < gameObject->Components->Count; i++)
-			{
-				gameObject->Components[i]->OnCollisionExit(collider);
-			}
-			break;
-		default:
-			break;
 		}
+		else
+		{
+			switch (collisionType)
+			{
+			case COLLISION_TYPE::STARTED:
+				for (int i = 0; i < gameObject->Components->Count; i++)
+				{
+					gameObject->Components[i]->OnCollisionEnter(collider);
+				}
+				break;
+			case COLLISION_TYPE::STAY:
+				for (int i = 0; i < gameObject->Components->Count; i++)
+				{
+					gameObject->Components[i]->OnCollisionStay(collider);
+				}
+				break;
+			case COLLISION_TYPE::ENDED:
+				for (int i = 0; i < gameObject->Components->Count; i++)
+				{
+					gameObject->Components[i]->OnCollisionExit(collider);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		
 	}
 
 	void Collider::attachedRigidbody::set(Rigidbody^ value)

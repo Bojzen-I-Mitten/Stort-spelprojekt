@@ -77,31 +77,6 @@ namespace thomas
 
 		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
 
-		// Solve collision between two rigidbodies
-		//int numManifolds = s_world->getDispatcher()->getNumManifolds();
-
-		//for (unsigned i = 0; i < numManifolds; ++i)
-		//{
-		//	if (numManifolds > s_world->getDispatcher()->getNumManifolds())
-		//		break;
-		//		
-		//	btPersistentManifold* contactManifold = s_world->getDispatcher()->getManifoldByIndexInternal(i);
-		//	btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
-		//	btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
-
-		//	// Avoid self collisions
-		//	if (obA == obB) continue;
-
-		//	if (obA->getUserPointer() && obB->getUserPointer())
-		//	{
-		//		object::component::Collider* colliderA = static_cast<object::component::Collider*>(obA->getUserPointer());
-		//		object::component::Collider* colliderB = static_cast<object::component::Collider*>(obB->getUserPointer());
-
-		//		colliderA->OnCollision(colliderB);
-		//		colliderB->OnCollision(colliderA);
-		//	}
-		//}
-
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateRigidbodyToTransform();

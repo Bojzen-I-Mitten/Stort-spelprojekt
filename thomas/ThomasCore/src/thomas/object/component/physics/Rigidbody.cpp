@@ -136,6 +136,8 @@ namespace thomas
 				delete getCollisionShape();
 				setCollisionShape(collider->GetCollisionShape());
 				this->setUserPointer(collider);
+				collider->SetAttachedRigidbody(this);
+				collider->SetTrigger(collider->IsTrigger());
 				UpdateRigidbodyMass();
 				if(removed)
 					Physics::AddRigidBody(this);
