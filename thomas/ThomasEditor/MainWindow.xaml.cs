@@ -75,8 +75,8 @@ namespace ThomasEditor
 
         private void Tick_OpenProjWindow(object sender, EventArgs e)
         {
-            timer.Stop();
             new OpenProjectWindow().Show();
+            timer.Stop();
         }
 
         private void ScriptingManger_scriptReloadFinished()
@@ -458,7 +458,6 @@ namespace ThomasEditor
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
 
-
             if (saveFileDialog.ShowDialog() == true)
             {
                 showBusyIndicator("Creating new project...");
@@ -477,9 +476,11 @@ namespace ThomasEditor
                 }));
                 worker.SetApartmentState(ApartmentState.STA);
                 worker.Start();
-
+                if (timer != null)
+                {
+                    OpenProjectWindow._instance.Close();
+                }
             }
-                      
         }
         public void OpenProject_Click(object sender, RoutedEventArgs e)
         {
@@ -492,9 +493,11 @@ namespace ThomasEditor
             if (openFileDialog.ShowDialog() == true)
             {
                 OpenProject(openFileDialog.FileName);
-
+                if (timer != null)
+                {
+                    OpenProjectWindow._instance.Close();
+                }
             }
-
         }
         public void OpenProject(string projectPath)
         {

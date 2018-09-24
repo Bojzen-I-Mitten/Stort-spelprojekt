@@ -23,6 +23,7 @@ namespace ThomasEditor
     /// </summary>
     public partial class OpenProjectWindow : Window
     {
+        public static OpenProjectWindow _instance;
         public OpenProjectWindow()
         {
             Thread.Sleep(2000);
@@ -32,6 +33,8 @@ namespace ThomasEditor
             Focus();
 
             Closed += OpenProjectWindow_Closed;
+
+            _instance = this;
         }
 
         private void OpenProjectWindow_Closed(object sender, EventArgs e)
@@ -44,8 +47,10 @@ namespace ThomasEditor
 
         private void NewProject_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow._instance.NewProject_Click(sender, e);
-            Close();
+            MainWindow._instance.Dispatcher.Invoke(() =>
+            {
+                MainWindow._instance.NewProject_Click(sender, e);
+            });
         }
         
         private void Cancel_Click(object sender, RoutedEventArgs e)
@@ -59,8 +64,10 @@ namespace ThomasEditor
 
         private void OpenProject_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow._instance.OpenProject_Click(sender, e);
-            Close();
+            MainWindow._instance.Dispatcher.Invoke(() =>
+            {
+                MainWindow._instance.OpenProject_Click(sender, e);
+            });
         }
     }
 }
