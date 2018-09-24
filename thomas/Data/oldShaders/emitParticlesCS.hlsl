@@ -1,4 +1,4 @@
-cbuffer InitParticlesBuffer
+struct InitParticlesBuffer
 {
 	float3 initPosition;
 	float initSpread;
@@ -47,6 +47,7 @@ struct ParticleStruct
     
 };
 
+StructuredBuffer<InitParticlesBuffer> initParticles;
 RWStructuredBuffer<ParticleStruct> particlesWrite;
 RWStructuredBuffer<ParticleStruct> particlesWrite2;
 

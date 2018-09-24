@@ -20,13 +20,14 @@ namespace thomas
 
 		void ParticleSystem::Initialize()
 		{
-			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl");//"../Data/FXIncludes/StandardShader.fx"
+			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl");
 			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/updateParticlesCS.hlsl");
 
-			m_spawnNewParticlesSRV = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 25, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
-			m_updateParticlesSRV = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), 25000, DYNAMIC_BUFFER);//ammount of particles supported for entire system
-			
-
+			unsigned maxNrOfParticles = 25000;
+			m_spawnNewParticles = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_updateParticlesPing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, DYNAMIC_BUFFER);//ammount of particles supported for entire system
+			m_updateParticlesPong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, DYNAMIC_BUFFER);//ammount of particles supported for entire system
+			m_pingpong = true;
 
 
 			/*
@@ -121,6 +122,9 @@ namespace thomas
 			{
 				dataVec.push_back(e->GetInitData());
 			}
+
+
+
 			//object::component::ParticleEmitterComponent::InitParticleBufferStruct data[m_spawningEmitters.size()];
 
 			m_emitParticlesCS->Bind();
@@ -138,8 +142,18 @@ namespace thomas
 
 		void ParticleSystem::UpdateParticles()
 		{
+			m_pingpong = !m_pingpong;
 
-
+			if (m_pingpong)
+			{
+				m_updateParticlesCS->SetGlobalUAV("particlesWrite", m_updateParticlesPing->GetUAV());
+				m_updateParticlesCS->SetGlobalResource("particlesRead", m_updateParticlesPong->GetSRV());
+			}
+			else
+			{
+				m_updateParticlesCS->SetGlobalUAV("particlesWrite", m_updateParticlesPong->GetUAV());
+				m_updateParticlesCS->SetGlobalResource("particlesRead", m_updateParticlesPing->GetSRV());
+			}
 			//bind CS
 			//s_updateParticlesCS->SetUAV("particlesWrite", *s_activeParticleUAV);
 			//s_updateParticlesCS->SetUAV("billboards", *emitter->GetD3DData()->billboardsUAV);

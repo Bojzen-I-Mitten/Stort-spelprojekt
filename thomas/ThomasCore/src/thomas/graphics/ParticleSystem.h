@@ -41,11 +41,18 @@ namespace thomas
 			void DrawParticles();
 
 		private:
+			unsigned m_currentNrOfParticles;
+			
+
+
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
 
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnNewParticlesSRV;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateParticlesSRV;
+			
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnNewParticles;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateParticlesPing;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateParticlesPong;
+			bool m_pingpong;
 
 
 			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;
