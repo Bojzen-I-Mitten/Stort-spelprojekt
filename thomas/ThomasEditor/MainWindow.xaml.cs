@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.IO;
 
 using ThomasEngine;
+using ThomasEditor;
 using System.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
@@ -57,6 +58,13 @@ namespace ThomasEditor
 
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+
+
+            if (ThomasEditor.App.args.Args.Length == 1)
+            {
+                string test = ThomasEditor.App.args.Args[0];
+                OpenProject(test);
+            }
         }
 
         private void ScriptingManger_scriptReloadFinished()
