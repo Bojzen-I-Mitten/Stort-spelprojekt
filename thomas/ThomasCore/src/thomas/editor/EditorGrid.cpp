@@ -55,7 +55,7 @@ namespace thomas
 				m_material = new resource::Material(shader);
 				m_material->m_renderQueue = 1;
 				m_material->m_topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-				m_mesh = std::shared_ptr<graphics::Mesh>(new graphics::Mesh(m_lines, {}, "grid"));
+				m_mesh = std::unique_ptr<graphics::Mesh>(new graphics::Mesh(m_lines, {}, "grid"));
 				m_lines.positions.clear();
 				m_lines.colors.clear();
 			}

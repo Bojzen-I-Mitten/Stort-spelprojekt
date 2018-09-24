@@ -17,6 +17,7 @@ namespace thomas
 				{
 					if (m_value)
 					{
+						
 						shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
 					}
 				}

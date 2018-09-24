@@ -53,6 +53,9 @@ namespace thomas
 			};
 
 		public:
+			LightManager() = default;
+			~LightManager() = default;
+
 			static void Initialize();
 			static void Destroy();
 			static void AddLight(object::component::LightComponent* light);

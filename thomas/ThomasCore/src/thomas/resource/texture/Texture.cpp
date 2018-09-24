@@ -9,8 +9,8 @@ namespace thomas
 		}
 		Texture::~Texture()
 		{
-			SAFE_RELEASE(m_srv);
 			SAFE_RELEASE(m_resource);
+			SAFE_RELEASE(m_srv);
 		}
 		Texture::WrapMode Texture::GetWrapMode()
 		{

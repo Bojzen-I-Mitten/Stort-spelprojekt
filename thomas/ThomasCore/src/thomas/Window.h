@@ -7,6 +7,7 @@
 #include <vector>
 #include <d3d11.h>
 #include <imgui\imgui.h>
+#include <dxgi.h>
 
 namespace thomas 
 {
@@ -21,6 +22,7 @@ namespace thomas
 			ID3D11DepthStencilView* depthStencilView = nullptr;
 			ID3D11DepthStencilView* depthStencilViewReadOnly = nullptr;
 			ID3D11ShaderResourceView* depthBufferSRV = nullptr;
+
 		}m_dxBuffers;
 
 	public:

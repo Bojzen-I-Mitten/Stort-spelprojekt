@@ -4,8 +4,6 @@
 #include "..\Window.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
-#include <dxgi.h>
-#include <D3d11_4.h>
 #include <AtlBase.h>
 #include <atlconv.h>
 
@@ -13,7 +11,7 @@ namespace thomas
 {
 	namespace utils
 	{
-		bool D3d::CreateRenderTargetView(LONG width, LONG height, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv)
+		bool D3D::CreateRenderTargetView(LONG width, LONG height, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv)
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
 			ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -46,7 +44,7 @@ namespace thomas
 			return true;
 		}
 
-		bool D3d::CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels=1)
+		bool D3D::CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels=1)
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
 			ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -88,30 +86,31 @@ namespace thomas
 			return hr == S_OK;
 		}
 	
-		bool D3d::CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain*& swapchain, ID3D11Device* device)
+		bool D3D::CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain*& swapchain)
 		{
-			IDXGIDevice * dxgiDevice = 0;
+			IDXGIDevice* dxgiDevice = nullptr;
 			HRESULT hr = ThomasCore::GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)& dxgiDevice);
 			if (SUCCEEDED(hr))
 			{
-				IDXGIAdapter * dxgiAdapter = 0;
-				hr = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void **)& dxgiAdapter);
+				IDXGIAdapter* dxgiAdapter = nullptr;
+				hr = dxgiDevice->GetAdapter(&dxgiAdapter);
 				if (SUCCEEDED(hr))
 				{
-					IDXGIFactory * dxgiFactory = 0;
+					IDXGIFactory* dxgiFactory = nullptr;
 					hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)& dxgiFactory);
 					if (SUCCEEDED(hr))
 					{
 						DXGI_SWAP_CHAIN_DESC scd;
 						ZeroMemory(&scd, sizeof(scd));
 
-						scd.BufferCount = 1;
+						scd.BufferCount = 2;
 						scd.BufferDesc.Height = height;
 						scd.BufferDesc.Width = width;
 						scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 						scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 						scd.OutputWindow = handle;
 						scd.Flags = 0;
+						scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 						scd.SampleDesc.Count = THOMAS_AA_COUNT; //Make this costomizable!!!
 						scd.SampleDesc.Quality = THOMAS_AA_QUALITY;
@@ -119,17 +118,13 @@ namespace thomas
 						scd.BufferDesc.RefreshRate.Numerator = 0; // change 0 to numerator for vsync
 						scd.BufferDesc.RefreshRate.Denominator = 1; // change 1 to denominator for vynsc
 						
-						hr = dxgiFactory->CreateSwapChain(
-							device,
-							&scd,
-							&swapchain
-						);
-
+						hr = dxgiFactory->CreateSwapChain(ThomasCore::GetDevice(), &scd, &swapchain);
 						if (SUCCEEDED(hr))
 						{
 							dxgiFactory->Release();
 							dxgiAdapter->Release();
 							dxgiDevice->Release();
+					
 							return true;
 						}
 						dxgiFactory->Release();
@@ -142,25 +137,20 @@ namespace thomas
 			return false;
 		}
 
-		bool D3d::CreateBackBuffer(ID3D11Device * device, IDXGISwapChain * swapchain, ID3D11RenderTargetView*& backBuffer, ID3D11ShaderResourceView*& backbufferSRV)
+		bool D3D::CreateBackBuffer(IDXGISwapChain* swapchain, ID3D11RenderTargetView*& backBuffer, ID3D11ShaderResourceView*& backbufferSRV)
 		{
 			HRESULT hr;
 			ID3D11Texture2D* pbackBuffer;
-			hr = swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pbackBuffer);
-
-
-			D3D11_TEXTURE2D_DESC backBufferDesc;
-			pbackBuffer->GetDesc(&backBufferDesc);
-
-
+			hr = swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pbackBuffer);
 			if (FAILED(hr))
 			{
 				LOG_HR(hr);
 				return false;
 			}
 
-			hr = device->CreateRenderTargetView(pbackBuffer, NULL, &backBuffer);
-
+			D3D11_TEXTURE2D_DESC backBufferDesc;
+			pbackBuffer->GetDesc(&backBufferDesc);
+			hr = ThomasCore::GetDevice()->CreateRenderTargetView(pbackBuffer, NULL, &backBuffer);
 			if (FAILED(hr))
 			{
 				LOG_HR(hr);
@@ -173,19 +163,19 @@ namespace thomas
 			srvDesc.Texture2D.MostDetailedMip = 0;
 			srvDesc.Texture2D.MipLevels = backBufferDesc.MipLevels;
 
-			hr = device->CreateShaderResourceView(pbackBuffer, NULL, &backbufferSRV);
+			hr = ThomasCore::GetDevice()->CreateShaderResourceView(pbackBuffer, NULL, &backbufferSRV);
 
 			if (FAILED(hr))
 			{
 				LOG_HR(hr);
 				return false;
 			}
+
 			pbackBuffer->Release();
 			return true;
 		}
-
 	
-		ID3D11DepthStencilState* D3d::CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth)
+		ID3D11DepthStencilState* D3D::CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth)
 		{
 			ID3D11DepthStencilState* stencilState;
 			CD3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -216,10 +206,11 @@ namespace thomas
 				LOG_HR(hr);
 				return NULL;
 			}
+
 			return stencilState;
 		}
 		
-		bool D3d::CreateDepthStencilView(ID3D11Device * device, LONG width, LONG height, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly,
+		bool D3D::CreateDepthStencilView(ID3D11Device * device, LONG width, LONG height, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly,
 			ID3D11ShaderResourceView *& depthBufferSRV)
 		{
 			D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -258,9 +249,6 @@ namespace thomas
 			#endif
 			depthViewDesc.Texture2D.MipSlice = 0;
 			depthViewDesc.Flags = 0;
-
-			
-
 
 			hr = device->CreateDepthStencilView(depthStencilBuffer, &depthViewDesc, &stencilView);
 			if (FAILED(hr))
@@ -301,28 +289,7 @@ namespace thomas
 			
 		}
 
-		ID3D11InfoQueue* D3d::CreateDebugInfoQueue() 
-		{
-			ID3D11InfoQueue* infoQueue;
-			HRESULT hr = ThomasCore::GetDevice()->QueryInterface(IID_PPV_ARGS(&infoQueue));
-			if (FAILED(hr))
-			{
-				LOG_HR(hr);
-				return nullptr;
-			}
-			for (int i = 0; i < infoQueue->GetNumStoredMessages(); i++) {
-				SIZE_T messageLength;	
-
-				infoQueue->GetMessageA(i, NULL, &messageLength);
-				D3D11_MESSAGE * message = (D3D11_MESSAGE*)malloc(messageLength);
-				infoQueue->GetMessageA(i, message, &messageLength);
-				LOG(message->pDescription);
-			}
-			infoQueue->ClearStoredMessages();
-			return infoQueue;
-		}
-
-		bool D3d::LoadTextureFromFile(std::string fileName, 
+		bool D3D::LoadTextureFromFile(std::string fileName, 
 			ID3D11Resource*& texture, ID3D11ShaderResourceView*& textureView)
 		{
 			// Convert from string to char in order to split by token
@@ -357,7 +324,7 @@ namespace thomas
 			return true;
 		}
 
-		bool D3d::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
+		bool D3D::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{
 			char* filename_c = new char[fileName.length() + 1];
 			std::strcpy(filename_c, fileName.c_str());
@@ -371,7 +338,7 @@ namespace thomas
 			if (extension_string == ".dds")
 			{
 				hr = DirectX::CreateDDSTextureFromFileEx(ThomasCore::GetDevice(), CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
-					D3D11_RESOURCE_MISC_TEXTURECUBE, false, (ID3D11Resource**)&texture, &textureView, nullptr);
+					D3D11_RESOURCE_MISC_TEXTURECUBE, false, &texture, &textureView, nullptr);
 			}
 	
 			if (FAILED(hr))
@@ -384,7 +351,7 @@ namespace thomas
 			return true;
 		}
 
-		ID3D11RasterizerState * D3d::CreateRasterizer(D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode)
+		ID3D11RasterizerState * D3D::CreateRasterizer(D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode)
 		{
 			ID3D11RasterizerState* rasterState;
 			D3D11_RASTERIZER_DESC rasterDesc;
@@ -405,7 +372,7 @@ namespace thomas
 			return rasterState;
 		}
 		
-		void D3d::CreateTextureAndViews(UINT width, UINT height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)
+		void D3D::CreateTextureAndViews(UINT width, UINT height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)
 		{
 			// Create 2D texture
 			D3D11_TEXTURE2D_DESC tex_desc;
@@ -448,7 +415,7 @@ namespace thomas
 			}
 		}
 
-		void D3d::CreateBufferAndUAV(void * data, UINT byte_width, UINT byte_stride, ID3D11Buffer *& buffer, ID3D11UnorderedAccessView *& UAV, ID3D11ShaderResourceView *& SRV)
+		void D3D::CreateBufferAndUAV(void * data, UINT byte_width, UINT byte_stride, ID3D11Buffer *& buffer, ID3D11UnorderedAccessView *& UAV, ID3D11ShaderResourceView *& SRV)
 		{
 
 			HRESULT result;
@@ -497,7 +464,7 @@ namespace thomas
 			}
 		}
 
-		void D3d::CreateCPUReadBufferAndUAV(void * data, UINT byte_width, UINT byte_stride, ID3D11Buffer *& buffer, ID3D11UnorderedAccessView *& UAV)
+		void D3D::CreateCPUReadBufferAndUAV(void * data, UINT byte_width, UINT byte_stride, ID3D11Buffer *& buffer, ID3D11UnorderedAccessView *& UAV)
 		{
 			HRESULT result;
 			// Create buffer
@@ -532,7 +499,7 @@ namespace thomas
 			}
 		}
 
-		ID3D11Buffer * D3d::CreateStagingBuffer(UINT byte_width, UINT byte_stride)
+		ID3D11Buffer * D3D::CreateStagingBuffer(UINT byte_width, UINT byte_stride)
 		{
 			HRESULT result;
 			// Create buffer

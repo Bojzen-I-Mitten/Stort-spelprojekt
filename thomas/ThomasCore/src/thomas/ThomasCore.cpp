@@ -3,22 +3,21 @@
 #include "Input.h"
 #include "Window.h"
 #include "ThomasTime.h"
-#include "object\Object.h"
-#include "resource\texture\Texture2D.h"
-#include "resource\Shader.h"
-#include "resource\Material.h"
-#include "editor\EditorCamera.h"
-#include "editor\gizmos\Gizmos.h"
-#include "utils\Primitives.h"
-#include <D3d11_4.h>
-
+#include "object/Object.h"
+#include "resource/texture\Texture2D.h"
+#include "resource/Shader.h"
+#include "resource/Material.h"
+#include "editor/EditorCamera.h"
+#include "editor/gizmos\Gizmos.h"
+#include "utils/Primitives.h"
 #include "object/component/LightComponent.h"
 
 namespace thomas 
 {
-	ID3D11Debug* ThomasCore::s_debug;
 	ID3D11Device* ThomasCore::s_device;
 	ID3D11DeviceContext* ThomasCore::s_context;
+	IDXGIDebug* ThomasCore::s_debug;
+
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
 	bool ThomasCore::s_initialized;
@@ -30,7 +29,9 @@ namespace thomas
 		s_logOutput.reserve(10);
 
 		//Init all required classes
-		InitDirectX();
+		if (!InitDirectX())
+			s_initialized = false;
+
 		Input::Init();
 		resource::Texture2D::Init();
 		ThomasTime::Init();
@@ -75,9 +76,6 @@ namespace thomas
 
 	bool ThomasCore::Destroy()
 	{	
-		s_context->ClearState();
-		s_context->Flush();
-
 		//Destroy all objects
 		Window::Destroy();
 		graphics::LightManager::Destroy();
@@ -95,13 +93,15 @@ namespace thomas
 		//Release
 		s_context->ClearState();
 		s_context->Flush();
+
 		SAFE_RELEASE(s_context);
 		SAFE_RELEASE(s_device);
 
-		#ifdef _DEBUG_DX
-			s_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-			SAFE_RELEASE(s_debug);
-		#endif
+		if (s_debug)
+		{
+			s_debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
+			s_debug->Release();
+		}
 
 		return true;
 	}
@@ -138,34 +138,28 @@ namespace thomas
 		if (!s_device)
 		{
 			CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-			CreateDeviceAndContext();
-#ifdef _DEBUG_DX
-			assert(!ThomasCore::GetDevice()->QueryInterface(IID_PPV_ARGS(&s_debug)));
-#endif
-			return true;
+			if (!CreateDeviceAndContext())
+				return false;
 		}
+
+#ifdef  _DEBUG_DX
+		CreateDebugInterface();
+#endif
+
 		return true;
 	}
 
 	bool ThomasCore::CreateDeviceAndContext()
 	{
-		HRESULT hr = D3D11CreateDevice(
-			NULL,
-			D3D_DRIVER_TYPE_HARDWARE,
-			NULL,
-#ifdef _DEBUG_DX
-			D3D11_CREATE_DEVICE_DEBUG,
-#else
-			NULL,
-#endif
-			NULL,
-			NULL,
-			D3D11_SDK_VERSION,
-			&s_device,
-			NULL,
-			&s_context
-		);
+		const D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+		UINT createDeviceFlags = 0;
+		D3D_FEATURE_LEVEL fl;
 
+#ifdef _DEBUG_DX
+		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+		HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &s_device, &fl, &s_context);
 		if (FAILED(hr))
 		{
 			LOG(hr);
@@ -181,7 +175,22 @@ namespace thomas
 		}
 		else
 			LOG_HR(hr);
+
 		return true;
+	}
+
+	void ThomasCore::CreateDebugInterface()
+	{
+		typedef HRESULT(WINAPI * LPDXGIGETDEBUGINTERFACE)(REFIID, void **);
+
+		HMODULE dxgidebug = LoadLibraryEx(_T("DXGIdebug.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+		if (dxgidebug)
+		{
+			auto dxgiGetDebugInterface = reinterpret_cast<LPDXGIGETDEBUGINTERFACE>(
+				reinterpret_cast<void*>(GetProcAddress(dxgidebug, "DXGIGetDebugInterface")));
+
+			dxgiGetDebugInterface(IID_PPV_ARGS(&s_debug));
+		}
 	}
 }
 

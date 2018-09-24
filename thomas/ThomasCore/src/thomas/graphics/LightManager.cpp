@@ -9,12 +9,10 @@ namespace thomas
 {
 	namespace graphics
 	{
-	
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
-
 
 		void LightManager::Initialize()
 		{
@@ -28,8 +26,9 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
-			SAFE_RELEASE(s_lightBuffer);
+			s_lightBuffer.reset();
 		}
+
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
 			switch (light->GetType())
