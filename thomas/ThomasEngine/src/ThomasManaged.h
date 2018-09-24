@@ -33,7 +33,7 @@ namespace ThomasEngine {
 	public ref class ThomasWrapper
 	{
 	private:
-
+		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
@@ -82,6 +82,7 @@ namespace ThomasEngine {
 
 		static void UpdateLog();
 
+		static void ToggleEditorRendering();
 	public:
 
 		static property float FrameRate

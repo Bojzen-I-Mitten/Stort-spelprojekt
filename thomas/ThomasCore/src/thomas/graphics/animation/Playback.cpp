@@ -7,6 +7,7 @@ namespace thomas {
 		namespace animation {
 
 			Playback::Playback()
+				: m_elapsed(0.f)
 			{
 			}
 

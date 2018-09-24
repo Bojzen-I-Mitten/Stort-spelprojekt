@@ -37,6 +37,10 @@ namespace ThomasEngine {
 
 
 	public:
+
+		[NonSerializedAttribute]
+		bool m_loading = false;
+
 		[field:NonSerializedAttribute]
 		virtual event PropertyChangedEventHandler^ PropertyChanged;
 		virtual void OnDestroy() {nativePtr->OnDestroy(); }
@@ -132,6 +136,7 @@ namespace ThomasEngine {
 		void OnDeserializedObject(System::Runtime::Serialization::StreamingContext c)
 		{
 			nativePtr->m_guid = Utility::Convert(m_guid);
+			m_loading = false;
 		}
 	};
 }
