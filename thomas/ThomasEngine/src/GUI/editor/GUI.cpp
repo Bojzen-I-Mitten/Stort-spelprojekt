@@ -2,8 +2,8 @@
 #pragma unmanaged
 #include <thomas/editor/gizmos/Gizmos.h>
 #pragma managed
+#include "..\..\resource\Model.h"
 
-#include "../../Utility.h"
 
 void ThomasEngine::GUI::DrawModel(Model^ model, int meshIndex,Vector3 position, Quaternion rotation, Vector3 scale)
 {
@@ -87,15 +87,15 @@ void ThomasEngine::GUI::DrawFrustum(DirectX::BoundingFrustum % frustrum)
 	thomas::editor::Gizmos::DrawFrustum(frustrum);
 }
 
-void ThomasEngine::GUI::SetColor(DirectX::SimpleMath::Color color)
+void ThomasEngine::GUI::SetColor(Color color)
 {
 	
-	thomas::editor::Gizmos::SetColor(color);
+	thomas::editor::Gizmos::SetColor(Utility::Convert(color));
 }
 
-void ThomasEngine::GUI::SetMatrix(DirectX::SimpleMath::Matrix matrix)
+void ThomasEngine::GUI::SetMatrix(Matrix matrix)
 {
-	thomas::editor::Gizmos::SetMatrix(matrix);
+	thomas::editor::Gizmos::SetMatrix(Utility::Convert(matrix));
 }
 
 void ThomasEngine::GUI::DrawPing(String^ ping)

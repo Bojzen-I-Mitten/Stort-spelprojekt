@@ -16,7 +16,7 @@ namespace thomas
 		namespace shaderproperty { class ShaderProperty; }
 		class Texture2D;
 		class Shader;
-		class THOMAS_API Material : public Resource
+		class Material : public Resource
 		{
 		protected:
 			

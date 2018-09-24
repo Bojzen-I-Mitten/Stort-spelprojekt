@@ -181,6 +181,7 @@
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\texture\Texture.h" />
     <ClInclude Include="src\resource\texture\Texture2D.h" />
+    <ClInclude Include="src\SceneSurrogate.h" />
     <ClInclude Include="src\ScriptingManager.h" />
     <ClInclude Include="src\resource\AudioClip.h" />
     <ClInclude Include="src\resource\Resources.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="src\resource\Resources.cpp" />
     <ClCompile Include="src\resource\texture\Texture.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SceneSurrogate.cpp" />
     <ClCompile Include="src\ScriptingManager.cpp" />
     <ClCompile Include="src\resource\Shader.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />

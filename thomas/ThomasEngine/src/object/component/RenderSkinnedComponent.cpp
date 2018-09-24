@@ -9,7 +9,7 @@
 #include "../../resource/Model.h"
 #include "../../resource/Material.h"
 #include "../../Input.h"
-
+#include "../../resource/Resources.h"
 #include "../GameObject.h"
 
 namespace ThomasEngine

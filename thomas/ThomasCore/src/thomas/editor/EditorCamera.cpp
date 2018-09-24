@@ -8,6 +8,8 @@
 #include "..\graphics\Renderer.h"
 #include "..\graphics\render\Frame.h"
 #include "..\resource\Model.h"
+#include "..\Common.h"
+#include "..\object\component\Camera.h"
 #include "..\System.h"
 
 
@@ -18,9 +20,18 @@ namespace thomas
 		EditorCamera* EditorCamera::s_editorCamera;
 		std::vector<object::GameObject*> EditorCamera::s_selectedObjects;
 
-		EditorCamera::EditorCamera() : object::GameObject("editorCamera"), m_sensitivity(3.f), m_speed(2.f), m_manipulatorScale(2.f), m_hasSelectionChanged(false),
-																		   m_manipulatorSnapping(false), m_objectHighlighter(nullptr), 
-																		   m_manipulatorMode(ImGuizmo::MODE::LOCAL), m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
+		EditorCamera::EditorCamera() : 
+			object::GameObject("editorCamera"), 
+			m_sensitivity(50.f), 
+			m_speed(2.f), 
+			m_manipulatorScale(2.f), 
+			m_selectedObjPosition(0.f),
+			m_hasSelectionChanged(false),
+			m_manipulatorSnapping(false),
+			m_selectedObject(false),
+			m_objectHighlighter(nullptr),
+			m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
+			m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
 		{
 			// Transform component
 			m_transform = new object::component::Transform();
@@ -32,18 +43,14 @@ namespace thomas
 			m_cameraComponent = std::make_unique<object::component::Camera>(true);
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
-			m_grid = std::make_unique<EditorGrid>(100, 1.f, 10);
-			m_hasSelectionChanged = false;
-			m_objectHighlighter = nullptr;
+			m_grid = std::make_unique<EditorGrid>(100, 1, 10);
 			resource::Shader* outliner = resource::Shader::CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
+
 			if (outliner)
 			{
 				m_objectHighlighter = std::make_unique<resource::Material>(outliner);
 				m_objectHighlighter->m_renderQueue = 100;
 			}
-			
-			m_manipulatorMode = ImGuizmo::MODE::LOCAL;
-			m_manipulatorOperation = ImGuizmo::OPERATION::TRANSLATE;
 		}
 
 		EditorCamera::~EditorCamera()
@@ -86,8 +93,13 @@ namespace thomas
 			// Select single gameobject
 			s_selectedObjects.clear();
 			if (gameObject)
+			{
+				s_editorCamera->m_selectedObjPosition = gameObject->m_transform->GetPosition();
 				s_selectedObjects.push_back(gameObject);
-			GetEditorCamera()->m_hasSelectionChanged = true;
+			}
+
+			s_editorCamera->m_hasSelectionChanged = true;
+			s_editorCamera->m_selectedObject = true;
 		}
 
 		void EditorCamera::UnselectObject(GameObject * gameObject)
@@ -101,13 +113,16 @@ namespace thomas
 					--i;
 				}
 			}
+
+			s_editorCamera->m_selectedObject = false;
 		}
 
 		void EditorCamera::UnselectObjects()
 		{
 			// Unselect all objects in the scene
 			s_selectedObjects.clear();
-			GetEditorCamera()->m_hasSelectionChanged = true;
+			s_editorCamera->m_hasSelectionChanged = true;
+			s_editorCamera->m_selectedObject = false;
 		}
 
 		std::vector<object::GameObject*> EditorCamera::GetSelectedObjects()
@@ -117,12 +132,12 @@ namespace thomas
 
 		void EditorCamera::SetHasSelectionChanged(const bool & selectionChanged)
 		{
-			GetEditorCamera()->m_hasSelectionChanged = selectionChanged;
+			s_editorCamera->m_hasSelectionChanged = selectionChanged;
 		}
 
 		bool EditorCamera::HasSelectionChanged()
 		{
-			return GetEditorCamera()->m_hasSelectionChanged;
+			return s_editorCamera->m_hasSelectionChanged;
 		}
 
 		object::component::Camera * EditorCamera::GetCamera() const
@@ -173,6 +188,9 @@ namespace thomas
 				Input::SetMouseMode(Input::MouseMode::POSITION_RELATIVE);
 			else
 				Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
+
+			if (Input::GetKeyDown(Input::Keys::F))
+				SnapCameraToFocus();
 
 
 			if (active)
@@ -272,6 +290,7 @@ namespace thomas
 					closestGameObject = renderComponent->m_gameObject;
 				}
 			}
+
 			return closestGameObject;
 		}
 
@@ -318,6 +337,18 @@ namespace thomas
 			math::Quaternion rot = math::Quaternion::CreateFromAxisAngle(right, -yStep);
 			rot *= math::Quaternion::CreateFromAxisAngle(math::Vector3::UnitY, -xStep);
 			m_transform->Rotate(rot);
+		}
+
+		void EditorCamera::SnapCameraToFocus()
+		{
+			if (m_selectedObject)
+			{		
+				math::Vector3 dir = m_transform->GetPosition() - m_selectedObjPosition;
+				dir.Normalize();
+
+				m_transform->LookAt(m_selectedObjPosition);
+				m_transform->SetPosition(m_selectedObjPosition + math::Vector3(2.f) * dir);
+			}
 		}
 	}
 }

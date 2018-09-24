@@ -1,7 +1,6 @@
 #include "Animation.h"
 #include "../object/GameObject.h"
 
-
 namespace ThomasEngine
 {
 	Animation::Animation(thomas::resource::Animation* nativePtr)

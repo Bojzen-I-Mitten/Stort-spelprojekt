@@ -1,7 +1,9 @@
-#include "..\..\resource\Model.h"
+#include "../../Utility.h"
 #pragma once
+using namespace System;
 namespace ThomasEngine
 {
+	ref class Model;
 	public ref class GUI
 	{
 	public:
@@ -26,8 +28,8 @@ namespace ThomasEngine
 		static void DrawFrustum(Vector3 center, float fov, float maxRange, float minRange, float aspect);
 		static void DrawFrustum(DirectX::BoundingFrustum% frustrum);
 
-		static void SetColor(DirectX::SimpleMath::Color color);
-		static void SetMatrix(DirectX::SimpleMath::Matrix matrix);
+		static void SetColor(Color color);
+		static void SetMatrix(Matrix matrix);
 
 		static void DrawPing(String^ ping);
 

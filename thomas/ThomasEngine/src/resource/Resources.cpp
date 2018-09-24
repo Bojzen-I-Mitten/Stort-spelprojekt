@@ -1,13 +1,20 @@
-
+#pragma unmanaged
+#include <thomas\resource\Resource.h>
+#pragma managed
 #include "Model.h"
-#include "AudioClip.h"
 #include "Material.h"
+#include "AudioClip.h"
 #include "Shader.h"
 #include "Animation.h"
 #include "texture\Texture2D.h"
 #include "Resources.h"
 #include "../Scene.h"
 #include "..\object\GameObject.h"
+
+#include "../Application.h"
+#include "../Project.h"
+#include "../Debug.h"
+using namespace System::Threading;
 namespace ThomasEngine
 {
 
@@ -65,20 +72,13 @@ namespace ThomasEngine
 
 #pragma region Serialization (Create/Store)
 
-	List<Type^>^ Resources::getKnownTypes() {
-		return Material::GetKnownTypes();
-		/*List<Type^>^ knownTypes = gcnew List<Type^>();
-		knownTypes->AddRange(System::Reflection::Assembly::GetAssembly(Resource::typeid)->ExportedTypes);
-		knownTypes->AddRange(System::Reflection::Assembly::GetAssembly(Color::typeid)->ExportedTypes);
-		return knownTypes;*/
-	}
 
 	generic<typename T>
 		where T : Resource
 		T Resources::Deserialize(String^ path)
 		{
 			Monitor::Enter(resourceLock);
-			std::string err;
+			String^ err;
 			T resource;
 			try
 			{
@@ -86,7 +86,7 @@ namespace ThomasEngine
 				using namespace System::Runtime::Serialization;
 				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 				serializserSettings->PreserveObjectReferences = true;
-				serializserSettings->KnownTypes = getKnownTypes();
+				serializserSettings->KnownTypes = Material::GetKnownTypes();
 				DataContractSerializer^ serializer = gcnew DataContractSerializer(T::typeid, serializserSettings);
 				try {
 					// Read file
@@ -96,14 +96,14 @@ namespace ThomasEngine
 					resource->Rename(path);
 				}
 				catch (Exception^ e) {
-					err = std::string("Warning! Deserialization failed to open file: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-					LOG(err);
+					err = "Warning! Deserialization failed to open file: " + path + ". With message:\n" + e->Message;
+					Debug::Log(err);
 				}
 			}
 			catch (Exception^ e)
 			{
-				err = std::string("Warning! Deserialization failed, at path: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-				LOG(err);
+				err = "Warning! Deserialization failed, at path: " + path + ". With message:\n" + e->Message;
+				Debug::Log(err);
 			}
 			finally{
 				// Leave
@@ -120,12 +120,12 @@ namespace ThomasEngine
 			using namespace System::Runtime::Serialization;
 
 
-			std::string err;
+			String^ err;
 			try {
 				// Serialization Settings
 				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 				serializserSettings->PreserveObjectReferences = true;
-				serializserSettings->KnownTypes = getKnownTypes();
+				serializserSettings->KnownTypes = Material::GetKnownTypes();
 				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
 				try {
 					// XML Settings
@@ -143,14 +143,14 @@ namespace ThomasEngine
 					resource->Rename(path);	// Set file name
 				}
 				catch (Exception^ e) {
-					err = std::string("Warning! Creating resource failed creating file: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-					LOG(err);
+					err = "Warning! Creating resource failed creating file: " + path + ". With message:\n" + e->Message;
+					Debug::Log(err);
 					return false;
 				}
 			}
 			catch (Exception^ e) {
-				err = std::string("Warning! Creating resource failed serializer contract, at path: " + Utility::ConvertString(path) + ". With message:\n" + Utility::ConvertString(e->Message));
-				LOG(err);
+				err = "Warning! Creating resource failed serializer contract, at path: " + path + ". With message:\n" + e->Message;
+				Debug::Log(err);
 				return false;
 			}
 			finally{
@@ -162,13 +162,13 @@ namespace ThomasEngine
 		{
 			Monitor::Enter(resourceLock);
 			// Begin write
-			std::string err;
+			String^ err;
 			try {
 				using namespace System::Runtime::Serialization;
 				// Serializer Setting
 				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 				serializserSettings->PreserveObjectReferences = true;
-				serializserSettings->KnownTypes = getKnownTypes();
+				serializserSettings->KnownTypes = Material::GetKnownTypes();
 
 				try {
 					// XML Settings
@@ -185,14 +185,14 @@ namespace ThomasEngine
 					file->Close();
 				}
 				catch (Exception^ e) {
-					err = std::string("Warning! Storing resource failed creating file: " + Utility::ConvertString(resource->m_path) + ". With message:\n" + Utility::ConvertString(e->Message));
-					LOG(err);
+					err = "Warning! Storing resource failed creating file: " + resource->m_path + ". With message:\n" + e->Message;
+					Debug::Log(err);
 					return false;
 				}
 			}
 			catch (Exception^ e) {
-				err = std::string("Warning! Storing resource failed serializer contract, at path: " + Utility::ConvertString(resource->m_path) + ". With message:\n" + Utility::ConvertString(e->Message));
-				LOG(err);
+				err = "Warning! Storing resource failed serializer contract, at path: " + resource->m_path + ". With message:\n" + e->Message;
+				Debug::Log(err);
 				return false;
 			}
 			finally{
@@ -342,13 +342,13 @@ namespace ThomasEngine
 					}
 				}
 				catch (SerializationException^ e) {
-					std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: Serialization failed " + Utility::ConvertString(e->Message);
+					String^ error = "Error creating resource from file: " + path + " \nError: Serialization failed " + e->Message;
 					obj = LoadErrorResource(type);
-					LOG(error);
+					Debug::Log(error);
 				}
 				catch (Exception^ e) {
-					std::string error = "Error creating resource from file: " + Utility::ConvertString(path) + " \nError: " + Utility::ConvertString(e->Message);
-					LOG(error);
+					String^ error = "Error creating resource from file: " + path + " \nError: " + e->Message;
+					Debug::Log(error);
 					obj = LoadErrorResource(type);
 					//Debug::Log("Failed to create resource from file. Filename: " + path + " \nError: " + e->Message);
 				}
@@ -535,7 +535,7 @@ namespace ThomasEngine
 				where T : Resource
 			List<T>^ Resources::GetResourcesOfType()
 			{
-				return (List<T>^)Enumerable::OfType<T>(resources->Values);
+					return (List<T>^)System::Linq::Enumerable::OfType<T>(resources->Values);
 			}
 #pragma endregion
 

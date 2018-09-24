@@ -7,7 +7,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			class THOMAS_API Transform: public Component
+			class Transform: public Component
 			{
 			private:
 				void Decompose();
