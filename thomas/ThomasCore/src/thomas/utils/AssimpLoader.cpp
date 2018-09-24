@@ -426,6 +426,14 @@ namespace thomas
 			}
 		}
 
+		uint32_t verifyBonehash(uint32_t hash, SkeletonConstruct &boneMap) {
+			for (uint32_t i = 0; i < boneMap.m_boneInfo.size(); i++) {
+				if (boneMap.m_boneInfo[i]._boneHash == hash)
+					return i;
+			}
+			return UINT32_MAX;
+		}
+
 		void ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform)
 		{
 			std::string boneName = node->mName.C_Str();
@@ -448,6 +456,14 @@ namespace thomas
 			bi._bindPose = convertAssimpMatrix(nodeTransform);
 			// Store absolute transform
 			boneMap.m_absoluteBind.push_back(object_space);
+
+			uint32_t conflictInd = verifyBonehash(bi._boneHash, boneMap);
+			if (conflictInd != UINT32_MAX) {
+				std::string err("Warning. Multiple bones shares the same hash value, try renaming a bone to solve the conflict. Name conflict between:");
+				LOG(err);
+				LOG(bi._boneName);
+				LOG(boneMap.m_boneInfo[conflictInd]._boneName);
+			}
 
 			boneMap.m_boneInfo.push_back(bi);
 			boneMap.m_mapping[boneName] = BoneIndex;
@@ -670,8 +686,14 @@ namespace thomas
 		}
 		void ProcessChannelData(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
-			if (bone < 0)
+			if (bone < 0) {
+				std::string err("Warning, animated bone not included in skeleton: ");
+				err.append(channel->mNodeName.C_Str());
+				err.append("\nNumber of keyframes in channel: ");
+				err.append(std::to_string(channel->mNumPositionKeys + channel->mNumRotationKeys + channel->mNumScalingKeys));
+				LOG(err);
 				return; //This channel does not animate a bone.
+			}
 			anim._boneHash[bone] = hash_djb2(construct.m_boneInfo[bone]._boneName.c_str());
 			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}

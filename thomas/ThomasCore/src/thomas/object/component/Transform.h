@@ -11,6 +11,7 @@ namespace thomas
 			{
 			private:
 				void Decompose();
+				/* Recreate the matrix from current S*R*T */
 				void UpdateLocalMatrix();
 			public:
 				
@@ -31,6 +32,7 @@ namespace thomas
 				void LookAt(Transform* target);
 				void LookAt(math::Vector3 target);
 				void Rotate(math::Vector3 angles);
+				void Rotate(math::Quaternion rot);
 				void Rotate(float x, float y, float z);
 				void RotateByAxis(math::Vector3 axis, float angle);
 				void Translate(math::Vector3 translation);
