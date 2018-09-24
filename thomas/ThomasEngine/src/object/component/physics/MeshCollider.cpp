@@ -16,7 +16,7 @@ namespace ThomasEngine
 
 	void MeshCollider::Start()
 	{
-		if (gameObject) 
+		if (!mesh && gameObject) 
 		{
 			RenderComponent^ renderComp = gameObject->GetComponent<RenderComponent^>();
 			if (renderComp && renderComp->model)
