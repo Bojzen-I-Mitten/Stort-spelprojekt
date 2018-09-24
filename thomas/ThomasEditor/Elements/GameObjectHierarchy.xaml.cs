@@ -20,6 +20,7 @@ namespace ThomasEditor
 
         bool _isDragging;
         bool wasUnselected = false;
+        GameObject m_copiedObject; //??correct code convention?
         public static GameObjectHierarchy instance;
         public GameObjectHierarchy()
         {
@@ -401,6 +402,41 @@ namespace ThomasEditor
             TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
             if(item != null)
                 item.IsSelected = true;
+        }
+
+        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                Debug.Log("Ready to copy..");
+                m_copiedObject = (GameObject)item.DataContext;
+
+                if(m_copiedObject)
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+            }
+
+            //Is this needed?
+            //e.Handled = true;
+        }
+        private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
+        {
+            if(m_copiedObject)
+            {
+                GameObject.Instantiate(m_copiedObject);
+
+                Debug.Log("Pasted object");
+
+                return;
+            }
+
+            Debug.Log("No copied object to paste");
+
+            //Is this needed?
+            //e.Handled = true;
         }
     }
 }
