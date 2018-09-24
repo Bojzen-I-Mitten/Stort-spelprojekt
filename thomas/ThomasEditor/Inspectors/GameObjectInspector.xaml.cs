@@ -40,13 +40,7 @@ namespace ThomasEditor
         
         public partial class GameObjectInspector : UserControl
         {
-            public static readonly DependencyProperty SelectedGameObjectProperty =
-               DependencyProperty.Register(
-               "SelectedGameObject",
-               typeof(GameObject),
-               typeof(GameObjectInspector),
-               new PropertyMetadata(null));
-
+           
             GameObject prevGameObject;
             //For selecting the firt element in the components list
            // int selectedComponent = 0;
@@ -56,9 +50,32 @@ namespace ThomasEditor
             {
 
                 InitializeComponent();
-                Loaded += GameObjectInspector_Loaded;
+                DataContextChanged += GameObjectInspector_DataContextChanged;
                 Unloaded += GameObjectInspector_Unloaded;
                 // propertyGrid.Editors.Add(editor);
+
+            }
+
+            private void GameObjectInspector_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+            {
+                if (DataContext is GameObject)
+                {
+                    gameObjectGrid.Visibility = Visibility.Visible;
+                    GameObject SelectedGameObject = DataContext as GameObject;
+                    SelectedGameObject.Components.CollectionChanged += Components_CollectionChanged;
+                    prevGameObject = SelectedGameObject;
+                    RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();
+                    if (rc && rc.material != null)
+                    {
+                        Binding materialBinding = new Binding("material");
+                        materialBinding.Source = rc;
+                        MaterialEditor.SetBinding(MaterialInspector.DataContextProperty, materialBinding);
+                    }
+                }
+                else
+                    gameObjectGrid.Visibility = Visibility.Hidden;
+
+
 
             }
 
@@ -70,62 +87,34 @@ namespace ThomasEditor
                 }
             }
 
-            private void GameObjectInspector_Loaded(object sender, RoutedEventArgs e)
+            private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             {
-                gameObjectGrid.Visibility = Visibility.Hidden;
-                if (SelectedGameObject != null)
-                {
-                    gameObjectGrid.DataContext = SelectedGameObject;
-                    gameObjectGrid.Visibility = Visibility.Visible;
-                    //Expand();
-                    //CreatePropertyGrids();
-                    SelectedGameObject.Components.CollectionChanged += Components_CollectionChanged;
-                    prevGameObject = SelectedGameObject;
+            
+                this.Dispatcher.Invoke((Action)(() => {
+                    if ((DataContext is GameObject) == false)
+                    {
+                        BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
+                        MaterialEditor.DataContext = null;
+                        return;
+                    }
+                    GameObject SelectedGameObject = DataContext as GameObject;
                     RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();
-                    if (rc && rc.material != null)
+                    if (rc != null)
                     {
                         Binding materialBinding = new Binding("material");
                         materialBinding.Source = rc;
-                        MaterialEditor.SetBinding(MaterialInspector.MaterialProperty, materialBinding);
+                        MaterialEditor.SetBinding(MaterialInspector.DataContextProperty, materialBinding);
                     }
-                }
-            }
-
-            private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-            {
-                this.Dispatcher.Invoke((Action)(() => {
-                    if (SelectedGameObject != null)
+                    else
                     {
-                        RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();
-                        if (rc != null)
-                        {
-                            Binding materialBinding = new Binding("material");
-                            materialBinding.Source = rc;
-                            MaterialEditor.SetBinding(MaterialInspector.MaterialProperty, materialBinding);
-                        }
-                        else
-                        {
-                            BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.MaterialProperty);
-                        }
+                        BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
+                        MaterialEditor.DataContext = null;
                     }
                 }));
                 
               
                     
             }
-
-            public GameObject SelectedGameObject
-            {
-                get
-                {
-                    return (GameObject)GetValue(SelectedGameObjectProperty);
-                }
-                set
-                {
-                    SetValue(SelectedGameObjectProperty, value);               
-                }
-            }
-
 
 
             private bool ComponentsFilter(object item)
@@ -176,11 +165,12 @@ namespace ThomasEditor
             {
                 if (addComponentList.SelectedItem != null && Mouse.LeftButton == MouseButtonState.Pressed && addComponentList.IsMouseOver)
                 {
-                    lock (SelectedGameObject)
+
+                    lock (DataContext)
                     {
                         Type component = addComponentList.SelectedItem as Type;
                         var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(component);
-                        method.Invoke(SelectedGameObject, null);
+                        method.Invoke(DataContext, null);
                     }
 
                 }
@@ -224,11 +214,11 @@ namespace ThomasEditor
                 var n = sender.GetType().GetCustomAttributesData();
                 if (addComponentList.SelectedItem != null)
                 {
-                    lock (SelectedGameObject)
+                    lock (DataContext)
                     {
                         Type component = addComponentList.SelectedItem as Type;
                         var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(component);
-                        method.Invoke(SelectedGameObject, null);
+                        method.Invoke(DataContext, null);
                         addComponentsListPopup.IsOpen = false;
                     }
                 }

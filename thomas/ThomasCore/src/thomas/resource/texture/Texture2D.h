@@ -7,7 +7,7 @@ namespace thomas
 {
 	namespace resource
 	{
-		class THOMAS_API Texture2D : public Texture
+		class Texture2D : public Texture
 		{
 		private:
 			void LoadTextureFromFile(std::string path);

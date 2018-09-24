@@ -39,8 +39,13 @@
     <ClCompile Include="src\Debug.cpp" />
     <ClCompile Include="src\object\component\LightComponent.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
+    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\Project.cpp" />
+    <ClCompile Include="src\GUI\editor\GUI.cpp" />
+    <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
+    <ClCompile Include="src\SceneSurrogate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -83,7 +88,12 @@
     <ClInclude Include="src\math\Curve.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\ThomasSelection.h" />
+    <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
+    <ClInclude Include="src\SceneSurrogate.h" />
+    <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
+    <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
   </ItemGroup>
   <ItemGroup>

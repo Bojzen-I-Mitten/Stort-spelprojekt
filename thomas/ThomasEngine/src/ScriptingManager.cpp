@@ -29,9 +29,8 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 		{
 
 			Scene^ oldScene = Scene::CurrentScene;
-			Scene::CurrentScene = Scene::LoadScene(tempFile);
 			oldScene->UnLoad();
-
+			Scene::CurrentScene = Scene::LoadScene(tempFile);
 			File::Delete(tempFile);
 			Scene::CurrentScene->RelativeSavePath = currentSavePath;			
 		}

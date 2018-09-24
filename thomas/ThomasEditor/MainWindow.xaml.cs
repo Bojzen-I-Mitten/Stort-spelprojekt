@@ -183,7 +183,7 @@ namespace ThomasEditor
 
         private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 if (e.NewItems != null)
                 {
@@ -374,9 +374,18 @@ namespace ThomasEditor
             worker.DoWork += (o, ea) =>
             {
                 Scene newScene = Scene.LoadScene(path);
-                Scene.CurrentScene.UnLoad();
-                Scene.CurrentScene = newScene;
-                Scene.CurrentScene.PostLoad();
+                if (newScene != null)
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = newScene;
+                    Scene.CurrentScene.PostLoad();
+                }
+                else
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = null;
+                    Debug.Log("Scene failed to load...");
+                }
             };
             worker.RunWorkerCompleted += (o, ea) =>
             {
@@ -552,9 +561,9 @@ namespace ThomasEditor
             SaveLayout();
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
         {
-
+            ThomasWrapper.ToggleEditorRendering();
         }
     }
 

@@ -6,14 +6,14 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyConstantBuffer : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyConstantBuffer(ID3D11Buffer* value) : ShaderProperty(Type::CONSTANT_BUFFER), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
+				void Apply(std::string name, Shader* shader) const
 				{
 					shader->GetEffect()->GetVariableByName(name.c_str())->AsConstantBuffer()->SetConstantBuffer(m_value);
 				}

@@ -5,14 +5,14 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyScalarFloat : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyScalarFloat(float value) : ShaderProperty(Type::SCALAR_FLOAT), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
+				void Apply(std::string name, Shader* shader) const
 				{
 			
 					shader->GetEffect()->GetVariableByName(name.c_str())->AsScalar()->SetFloat(m_value);

@@ -43,11 +43,13 @@ namespace thomas
 			static void DrawWireModel(resource::Model* model, int meshIndex, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
 			static void DrawWireModel(resource::Model* model, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
 
+			static void DrawBoundingCapsule(math::Vector3 center, float radius, float height);
 			static void DrawCube(math::Vector3 center, math::Vector3 size);
 			static void DrawWireCube(math::Vector3 center, math::Vector3 size);
 			static void DrawBoundingOrientedBox(const math::BoundingOrientedBox& obb);
 			static void DrawBoundingSphere(const math::BoundingSphere& sphere);
 			static void DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
+			static void DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
 			static void DrawLine(math::Vector3 from, math::Vector3 to);
 			static void DrawSphere(math::Vector3 center, float radius);
 			static void DrawWireSphere(math::Vector3 center, float radius);
@@ -59,6 +61,10 @@ namespace thomas
 
 			static void SetColor(math::Color color);
 			static void SetMatrix(math::Matrix matrix);
+
+			static void DrawPing(std::string ping);
+			static void ImguiStringUpdate(std::string text, math::Vector2 size, math::Vector2 pos);
+			static void ImguiStringUpdate(std::string text, math::Vector2 pos);
 		private:
 			static std::vector<GizmoRenderCommand> s_gizmoCommands;
 			static std::vector<GizmoRenderCommand> s_prevGizmoCommands;
@@ -66,6 +72,9 @@ namespace thomas
 			static utils::buffers::VertexBuffer* s_vertexBuffer;
 			static math::Matrix s_matrix;
 			static math::Color s_color;
+			static int s_imguiNumber;
+
+
 		};
 	}
 }

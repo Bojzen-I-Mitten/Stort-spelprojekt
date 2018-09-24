@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Scene.h"
+#include "Project.h"
 void ThomasEngine::Application::currentProject::set(ThomasEngine::Project^ value)
 {
 	m_currentProject = nullptr;

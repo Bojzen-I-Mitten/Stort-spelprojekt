@@ -13,16 +13,6 @@ namespace thomas
 				m_size = math::Vector3(0.5f, 0.5f, 0.5f);
 			}
 
-			void BoxCollider::SetCenter(math::Vector3 center)
-			{
-				m_center = center;
-			}
-
-			math::Vector3 BoxCollider::getCenter()
-			{
-				return m_center;
-			}
-
 			void BoxCollider::SetSize(math::Vector3 size)
 			{
 				m_size = size;
@@ -40,6 +30,7 @@ namespace thomas
 				editor::Gizmos::SetColor(math::Color(0, 1, 0));
 				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 				editor::Gizmos::DrawBoundingOrientedBox(DirectX::BoundingOrientedBox(m_center, m_size, math::Quaternion::Identity));
+				//editor::Gizmos::DrawBoundingCapsule(m_center, 0.5f, 5);
 			}
 
 		}

@@ -42,7 +42,7 @@ namespace ThomasEditor
                 if (Parent is MaterialInspector)
                 {
                     MaterialInspector matEditor = Parent as MaterialInspector;
-                    grid.IsReadOnly = matEditor.Material == Material.StandardMaterial;
+                    grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
                 grid.ExpandAllProperties();
             }
@@ -142,7 +142,7 @@ namespace ThomasEditor
                 if (Parent is MaterialInspector)
                 {
                     MaterialInspector matEditor = Parent as MaterialInspector;
-                    grid.IsReadOnly = matEditor.Material == Material.StandardMaterial;
+                    grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
                 grid.ExpandAllProperties();
             }

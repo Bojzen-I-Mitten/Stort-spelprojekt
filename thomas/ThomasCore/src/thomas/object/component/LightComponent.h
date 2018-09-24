@@ -16,7 +16,7 @@ namespace thomas
 		namespace component
 		{
 			
-			class THOMAS_API LightComponent : public Component
+			class LightComponent : public Component
 			{
 			public:
 			private:
@@ -36,29 +36,32 @@ namespace thomas
 				graphics::LightManager::LIGHT_TYPES GetType();
 				void SetType(graphics::LightManager::LIGHT_TYPES other);
 
-				thomas::math::Color GetColor();
-				void SetColor(thomas::math::Color other);
+				thomas::math::Color GetColorDiffuse();
+				void SetColorDiffuse(thomas::math::Color other);
+				thomas::math::Color GetColorSpecular();
+				void SetColorSpecular(thomas::math::Color other);
 				
 
-				float GetIntensity();
-				void SetIntensity(float value);
+				float GetIntensity() const;
+				void SetIntensity(float const& value);
 				
-				float GetSpotInnerAngle();
-				void SetSpotInnerAngle(float value);
+				float GetSpotInnerAngle() const;
+				void SetSpotInnerAngle(float const& value);
 
-				float GetSpotOuterAngle();
-				void SetSpotOuterAngle(float value);
+				float GetSpotOuterAngle() const;
+				void SetSpotOuterAngle(float const& value);
 
-				float GetConstantAttenuation();
-				void SetConstantAttenuation(float value);
+				float GetConstantAttenuation() const;
+				void SetConstantAttenuation(float const& value);
 
-				float GetLinearAttenuation();
-				void SetLinearAttenuation(float value);
+				float GetLinearAttenuation() const;
+				void SetLinearAttenuation(float const& value);
 
-				float GetQuadraticAttenuation();
-				void SetQuadraticAttenuation(float value);
+				float GetQuadraticAttenuation() const;
+				void SetQuadraticAttenuation(float const& value);
 
-				
+				math::Vector2 GetRectangleDimensions() const;
+				void SetRectangleDimensions(math::Vector2 const& value);
 
 
 			};

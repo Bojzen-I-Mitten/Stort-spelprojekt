@@ -9,7 +9,7 @@ namespace ThomasEditor
 {
     public class Collider : ScriptComponent
     {
-        private bool hasCollided = false;
+        public Vector3 torque { get; set; }
 
         public override void Start()
         {           
@@ -17,15 +17,7 @@ namespace ThomasEditor
 
         public override void Update()
         {
-        }
-
-        public override void OnCollisionEnter(GameObject collider)
-        {
-            if(!hasCollided)
-            {
-                Debug.Log(collider.Name);
-                hasCollided = true;
-            }
+            gameObject.GetComponent<Rigidbody>().AddTorque(torque);
         }
     }
 }

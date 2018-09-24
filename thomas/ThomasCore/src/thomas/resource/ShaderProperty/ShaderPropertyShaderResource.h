@@ -6,14 +6,14 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyShaderResource : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyShaderResource(ID3D11ShaderResourceView* value) : ShaderProperty(Type::SHADER_RESOURCE), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
+				void Apply(std::string name, Shader* shader) const
 				{
 					shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value);
 				}
