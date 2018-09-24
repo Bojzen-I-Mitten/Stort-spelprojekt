@@ -4,8 +4,21 @@
 #include "resource\Resources.h"
 #include "ThomasManaged.h"
 #include "Debug.h"
+#include <thomas/editor/EditorCamera.h>
+
 namespace ThomasEngine
 {
+	Scene::Scene(System::String^ name) 
+	:	m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
+		m_name = name;;
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+	}
+	Scene::Scene()
+		: m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
+		m_name = "New Scene";
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+	}
+
 	void Scene::Play()
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
@@ -96,6 +109,8 @@ namespace ThomasEngine
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
 			scene = (Scene^)serializer->ReadObject(file);
 
+			scene->EnsureLoad();
+
 			msclr::interop::marshal_context context;
 			for (int i = 0; i < scene->GameObjects->Count; ++i)
 				scene->GameObjects[i]->nativePtr->SetName(context.marshal_as<std::string>(scene->GameObjects[i]->Name));
@@ -140,12 +155,24 @@ namespace ThomasEngine
 
 	void Scene::UnLoad()
 	{
-		for (int i = 0; i < m_gameObjects.Count; i++)
+		for (int i = 0; i < m_gameObjects->Count; i++)
 		{
 			m_gameObjects[i]->Destroy();
 			i--;
 		}
-		m_gameObjects.Clear();
+		m_gameObjects->Clear();
+
+	}
+
+	void Scene::EnsureLoad()
+	{
+
+		if (m_gameObjects == nullptr) { // Scene is empty
+			LOG("Warning, no objects in scene.");
+			m_gameObjectsLock = gcnew Object();
+			m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
+			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+		}
 
 	}
 
@@ -234,6 +261,24 @@ namespace ThomasEngine
 	System::CodeDom::CodeTypeDeclaration ^ Scene::SceneSurrogate::ProcessImportedType(System::CodeDom::CodeTypeDeclaration ^typeDeclaration, System::CodeDom::CodeCompileUnit ^compileUnit)
 	{
 		throw gcnew NotSupportedException("unused");
+	}
+
+	Vector3 Scene::CameraPosition::get() {
+		return Utility::Convert(thomas::editor::EditorCamera::GetEditorCamera()->m_transform->GetLocalPosition());
+	}
+
+	void Scene::CameraPosition::set(Vector3 pos) {
+
+		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalPosition(Utility::Convert(pos));
+	}
+
+	Vector3 Scene::CameraEuler::get() {
+		return Utility::Convert(thomas::editor::EditorCamera::GetEditorCamera()->m_transform->GetLocalEulerAngles());
+	}
+
+	void Scene::CameraEuler::set(Vector3 euler) {
+
+		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalRotation(euler.x, euler.y, euler.z);
 	}
 
 }
