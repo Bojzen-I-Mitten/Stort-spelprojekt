@@ -12,7 +12,7 @@ using ThomasEngine;
 using ThomasEditor;
 using System.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
-
+using ThomasEditor.Testing;
 namespace ThomasEditor
 {
     /// <summary>
@@ -22,7 +22,9 @@ namespace ThomasEditor
 
     public partial class MainWindow : Window
     {
-        
+
+        private Tester tester;
+
         double scrollRatio = 0;
         TimeSpan lastRender;
         public static MainWindow _instance;
@@ -59,12 +61,14 @@ namespace ThomasEditor
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
-
+            tester = new Tester(200000);
             if (ThomasEditor.App.args.Args.Length == 1)
             {
+                // all code should be dispatched to tester for interp
                 string test = ThomasEditor.App.args.Args[0];
                 OpenProject(test);
             }
+
         }
 
         private void ScriptingManger_scriptReloadFinished()
@@ -206,6 +210,7 @@ namespace ThomasEditor
             if(this.lastRender != args.RenderingTime)
             {
                 ThomasWrapper.Update();
+                tester.Update();
                 editorWindow.Title = ThomasWrapper.FrameRate.ToString();
                 lastRender = args.RenderingTime;
                 transformGizmo.UpdateTransformGizmo();
