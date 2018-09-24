@@ -1,7 +1,7 @@
 #pragma once
 #include "../Component.h"
 #include "../../../Physics.h"
-
+#include "CapsuleCollider.h"
 namespace thomas
 {
 	namespace object

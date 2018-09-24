@@ -22,6 +22,7 @@
   <ItemGroup>
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
+    <ClCompile Include="src\thomas\object\component\physics\Ragdoll.cpp" />
     <ClCompile Include="src\thomas\System.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
+    <ClInclude Include="src\thomas\object\component\physics\Ragdoll.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
