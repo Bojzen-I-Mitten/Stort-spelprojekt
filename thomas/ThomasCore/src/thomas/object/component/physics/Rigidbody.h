@@ -38,16 +38,13 @@ namespace thomas
 				void SetKinematic(bool kinematic);
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
-				void SetTargetCollider(GameObject* collider);
 
 			public:
-				GameObject* GetTargetCollider();
 				float GetMass() const;
 				bool HasGravity() const;
 				bool IsKinematic() const;
 				math::Vector3 GetFreezePosition() const;
 				math::Vector3 GetFreezeRotation() const;
-				void ClearTargetCollider();
 
 			private:
 				void UpdateRigidbodyMass();
@@ -60,7 +57,6 @@ namespace thomas
 				float m_mass;
 				bool m_kinematic;
 				bool m_hasGravity;
-				std::unique_ptr<GameObject> m_targetCollider; // Temp
 			};
 		}
 	}

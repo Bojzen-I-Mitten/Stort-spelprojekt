@@ -32,6 +32,9 @@ namespace thomas
 		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 		s_world->setDebugDrawer(s_debugDraw.get());
 
+		gContactStartedCallback = Physics::CollisionStarted;
+		gContactProcessedCallback = Physics::CollisionProcessed;
+		gContactEndedCallback = Physics::CollisionEnded;
 		return true;
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
@@ -75,30 +78,29 @@ namespace thomas
 		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
 
 		// Solve collision between two rigidbodies
-		int numManifolds = s_world->getDispatcher()->getNumManifolds();
+		//int numManifolds = s_world->getDispatcher()->getNumManifolds();
 
-		for (unsigned i = 0; i < numManifolds; ++i)
-		{
-			if (numManifolds > s_world->getDispatcher()->getNumManifolds())
-				break;
-				
-			btPersistentManifold* contactManifold = s_world->getDispatcher()->getManifoldByIndexInternal(i);
-			btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
-			btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
+		//for (unsigned i = 0; i < numManifolds; ++i)
+		//{
+		//	if (numManifolds > s_world->getDispatcher()->getNumManifolds())
+		//		break;
+		//		
+		//	btPersistentManifold* contactManifold = s_world->getDispatcher()->getManifoldByIndexInternal(i);
+		//	btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
+		//	btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
 
-			// Avoid self collisions
-			if (obA == obB) continue;
+		//	// Avoid self collisions
+		//	if (obA == obB) continue;
 
-			if (obA->getUserPointer() && obB->getUserPointer())
-			{
-				object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
-				object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
+		//	if (obA->getUserPointer() && obB->getUserPointer())
+		//	{
+		//		object::component::Collider* colliderA = static_cast<object::component::Collider*>(obA->getUserPointer());
+		//		object::component::Collider* colliderB = static_cast<object::component::Collider*>(obB->getUserPointer());
 
-				// Set the collider object to the target collider
-				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
-				rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbA->m_gameObject);
-			}
-		}
+		//		colliderA->OnCollision(colliderB);
+		//		colliderB->OnCollision(colliderA);
+		//	}
+		//}
 
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
@@ -125,6 +127,43 @@ namespace thomas
 		s_dispatcher.reset();
 		s_solver.reset();
 		s_world.reset();		
+	}
+
+	void Physics::CollisionStarted(btPersistentManifold * const & manifold)
+	{		
+		HandleCollision(manifold->getBody0(), manifold->getBody1(), COLLISION_TYPE::STARTED);
+	}
+
+	bool Physics::CollisionProcessed(btManifoldPoint & cp, void * body0, void * body1)
+	{
+		btCollisionObject* obA = reinterpret_cast<btCollisionObject*>(body0);
+		btCollisionObject* obB = reinterpret_cast<btCollisionObject*>(body1);
+
+		HandleCollision(obA, obB, COLLISION_TYPE::STAY);
+		return false;
+	}
+
+	void Physics::CollisionEnded(btPersistentManifold * const & manifold)
+	{
+		btCollisionObject* obA = (btCollisionObject*)manifold->getBody0();
+		btCollisionObject* obB = (btCollisionObject*)manifold->getBody1();
+
+		HandleCollision(manifold->getBody0(), manifold->getBody1(), COLLISION_TYPE::ENDED);
+	}
+
+	void Physics::HandleCollision(const btCollisionObject* body0, const btCollisionObject* body1, COLLISION_TYPE collisionType)
+	{
+		// Avoid self collisions
+		if (body0 == body1) return;
+
+		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
+		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
+
+		if(colliderA && colliderB)
+		{
+			colliderA->OnCollision(colliderB, collisionType);
+			colliderB->OnCollision(colliderA, collisionType);
+		}
 	}
 
 	graphics::BulletDebugDraw * Physics::getDebugDraw()

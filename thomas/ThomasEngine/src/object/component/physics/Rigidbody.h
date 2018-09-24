@@ -57,8 +57,6 @@ namespace ThomasEngine
 																(thomas::object::component::ForceMode)mode);
 		}
 
-		GameObject^ GetTargetCollider();
-
 		property bool IsKinematic 
 		{
 			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->IsKinematic(); }

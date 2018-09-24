@@ -47,6 +47,17 @@ namespace thomas
 				m_trigger = trigger;
 			}
 
+			void Collider::SetOnCollisionEvent(OnCollisionEvent value)
+			{
+				m_onCollisionEvent = value;
+			}
+
+			void Collider::OnCollision(Collider * otherCollider, Physics::COLLISION_TYPE collisionType)
+			{
+				if (m_onCollisionEvent)
+					m_onCollisionEvent(otherCollider, collisionType);
+			}
+
 			void Collider::Awake()
 			{
 			}
@@ -57,6 +68,7 @@ namespace thomas
 				{
 					m_collisionObject = new btCollisionObject();
 					m_collisionObject->setCollisionShape(m_collisionShape);
+					m_collisionObject->setUserPointer(this);
 					Physics::s_world->addCollisionObject(m_collisionObject);
 				}
 			}
