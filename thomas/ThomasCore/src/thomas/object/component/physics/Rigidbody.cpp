@@ -13,9 +13,8 @@ namespace thomas
 		{
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
-			m_targetCollider(nullptr), m_hasGravity(true), 
+			m_targetCollider(nullptr),
 			m_kinematic(false),
-			m_interpolating(false),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f)
@@ -105,33 +104,17 @@ namespace thomas
 
 			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
 			{
-				m_interpolating ? this->setInterpolationLinearVelocity(Physics::ToBullet(linearVel)) :
-								  this->setLinearVelocity(Physics::ToBullet(linearVel));
+				this->setLinearVelocity(Physics::ToBullet(linearVel));
 			}
 
 			void Rigidbody::SetAngularVelocity(const math::Vector3 & angularVel)
 			{
-				m_interpolating ? this->setInterpolationAngularVelocity(Physics::ToBullet(angularVel)) : 
-								  this->setAngularVelocity(Physics::ToBullet(angularVel));
+				this->setAngularVelocity(Physics::ToBullet(angularVel));
 			}
 
 			void Rigidbody::SetActivationState(ActivationState state)
 			{
 				this->setActivationState(state);
-			}
-
-			void Rigidbody::SetGravity(bool gravity)
-			{
-				if (gravity != m_hasGravity)
-				{
-					m_hasGravity = gravity;
-					if (initialized)
-					{
-						Physics::RemoveRigidBody(this);
-						m_hasGravity ? this->setGravity(Physics::s_world->getGravity()) : this->setGravity(btVector3(0, 0, 0));
-						Physics::AddRigidBody(this);
-					}
-				}
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
@@ -148,11 +131,6 @@ namespace thomas
 				}	
 			}
 
-			void Rigidbody::SetInterpolation(bool interpolate)
-			{
-				m_interpolating = interpolate;
-			}
-	
 			void Rigidbody::SetCollider(Collider * collider)
 			{
 				m_collider = collider;
@@ -232,19 +210,9 @@ namespace thomas
 				return m_mass;
 			}
 
-			bool Rigidbody::HasGravity() const
-			{
-				return m_hasGravity;
-			}
-
 			bool Rigidbody::IsKinematic() const
 			{
 				return m_kinematic;
-			}
-
-			bool Rigidbody::IsInterpolating() const
-			{
-				return m_interpolating;
 			}
 
 			math::Vector3 Rigidbody::GetFreezePosition() const
@@ -259,17 +227,11 @@ namespace thomas
 
 			math::Vector3 Rigidbody::GetLinearVelocity() const
 			{
-				if (m_interpolating)
-					return Physics::ToSimple(this->getInterpolationLinearVelocity());
-
 				return Physics::ToSimple(this->getLinearVelocity());
 			}
 
 			math::Vector3 Rigidbody::GetAngularVelocity() const
 			{
-				if (m_interpolating)
-					return Physics::ToSimple(this->getInterpolationAngularVelocity());
-
 				return Physics::ToSimple(this->getAngularVelocity());
 			}
 

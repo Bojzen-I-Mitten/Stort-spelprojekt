@@ -97,18 +97,6 @@ namespace ThomasEngine
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetMass(value); }
 		}
 
-		property bool Interpolate
-		{
-			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->IsInterpolating(); }
-			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetInterpolation(value); }
-		}
-
-		/*property bool UseGravity
-		{
-			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->HasGravity(); }
-			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetGravity(value); }
-		}*/
-
 		property Vector3 FrzPos
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezePosition()); }

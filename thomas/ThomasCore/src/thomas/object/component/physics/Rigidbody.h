@@ -46,9 +46,7 @@ namespace thomas
 				void SetLinearVelocity(const math::Vector3& linearVel);
 				void SetAngularVelocity(const math::Vector3& angularVel);
 				void SetActivationState(ActivationState state);
-				void SetGravity(bool gravity);
 				void SetKinematic(bool kinematic);
-				void SetInterpolation(bool interpolate);
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
 				void SetTargetCollider(GameObject* collider);
@@ -56,9 +54,7 @@ namespace thomas
 			public:
 				GameObject* GetTargetCollider();
 				float GetMass() const;
-				bool HasGravity() const;
 				bool IsKinematic() const;
-				bool IsInterpolating() const;
 				math::Vector3 GetFreezePosition() const;
 				math::Vector3 GetFreezeRotation() const;
 				math::Vector3 GetLinearVelocity() const;
@@ -75,8 +71,6 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
-				bool m_hasGravity;
-				bool m_interpolating;
 				std::unique_ptr<GameObject> m_targetCollider;
 			};
 		}
