@@ -85,6 +85,9 @@ namespace thomas
 				Transform* m_parent;
 
 				math::Quaternion m_localRotation;
+#ifdef _EDITOR
+				math::Vector3 m_euler;
+#endif
 				math::Vector3 m_localPosition;
 				math::Vector3 m_localScale;
 				math::Matrix m_localWorldMatrix;

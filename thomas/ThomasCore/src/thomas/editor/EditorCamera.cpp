@@ -41,7 +41,7 @@ namespace thomas
 			m_cameraComponent = std::make_unique<object::component::Camera>(true);
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
-			m_grid = std::make_unique<EditorGrid>(100, 1, 10);
+			m_grid = std::unique_ptr<EditorGrid>(new EditorGrid(100, 1.f, 10));
 			resource::Shader* outliner = resource::Shader::CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
 
 			if (outliner)

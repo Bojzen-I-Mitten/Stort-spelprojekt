@@ -58,10 +58,10 @@ namespace ThomasEngine
 	void Transform::rotation::set(Quaternion value) { trans->SetRotation(Utility::Convert(value));}
 
 	Vector3 Transform::eulerAngles::get() { return Utility::Convert(trans->GetEulerAngles()); }
-	void Transform::eulerAngles::set(Vector3 value) { trans->SetRotation(value.x, value.y, value.z); OnPropertyChanged("localEulerAngles");}
+	void Transform::eulerAngles::set(Vector3 value) { trans->SetRotation(value.y, value.x,  value.z); OnPropertyChanged("localEulerAngles");}
 
 	Vector3 Transform::localEulerAngles::get() { return Utility::Convert(trans->GetLocalEulerAngles()); }
-	void Transform::localEulerAngles::set(Vector3 value) { trans->SetLocalRotation(value.x, value.y, value.z); }
+	void Transform::localEulerAngles::set(Vector3 value) { trans->SetLocalRotation(value.y, value.x,  value.z); }
 
 	Vector3 Transform::scale::get() { return Utility::Convert(trans->GetScale()); }
 	void Transform::scale::set(Vector3 value) { trans->SetScale(Utility::Convert(value));  OnPropertyChanged("localScale");}
