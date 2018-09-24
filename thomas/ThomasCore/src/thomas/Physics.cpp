@@ -27,7 +27,6 @@ namespace thomas
 		s_solver = std::make_unique<btSequentialImpulseConstraintSolver>();
 		s_world = std::make_unique<btDiscreteDynamicsWorld>(s_dispatcher.get(), s_broadPhase.get(), s_solver.get(), s_collisionConfiguration.get());
 		s_debugDraw = std::make_unique<graphics::BulletDebugDraw>();
-
 		//Set states
 		s_world->setGravity(btVector3(0, -9.82f, 0));
 		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
@@ -40,18 +39,21 @@ namespace thomas
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
 	}
-	void Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
+	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		bool found = false;
 		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
 		{
 			object::component::Rigidbody* rb = s_rigidBodies[i];
 			if (rb == rigidBody)
 			{
 				s_rigidBodies.erase(s_rigidBodies.begin() + i);
+				found = true;
 				break;
 			}
 		}
-		s_world->removeRigidBody(rigidBody);		
+		s_world->removeRigidBody(rigidBody);
+		return found;
 	}
 
 	void Physics::UpdateRigidbodies()
@@ -94,6 +96,7 @@ namespace thomas
 
 				// Set the collider object to the target collider
 				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
+				rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbA->m_gameObject);
 			}
 		}
 

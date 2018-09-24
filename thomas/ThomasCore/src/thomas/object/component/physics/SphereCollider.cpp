@@ -9,19 +9,9 @@ namespace thomas
 		{
 			SphereCollider::SphereCollider() : Collider(new btSphereShape(0.5f))
 			{
-				m_center = math::Vector3(0, 0, 0);
 				m_radius = 0.5f;
 			}
 
-			void SphereCollider::SetCenter(math::Vector3 center)
-			{
-				m_center = center;
-			}
-
-			math::Vector3 SphereCollider::getCenter()
-			{
-				return m_center;
-			}
 
 			void SphereCollider::SetRadius(float size)
 			{

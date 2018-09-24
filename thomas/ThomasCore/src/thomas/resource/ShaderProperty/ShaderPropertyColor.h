@@ -5,14 +5,14 @@ namespace thomas
 {
 	namespace resource
 	{
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyColor : public ShaderProperty
 			{
 			public:
 
 				ShaderPropertyColor(math::Color value) : ShaderProperty(Type::COLOR), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
+				void Apply(std::string name, Shader* shader) const
 				{
 					HRESULT result = shader->GetEffect()->GetVariableByName(name.c_str())->AsVector()->SetFloatVector((float*)&m_value);
 				}

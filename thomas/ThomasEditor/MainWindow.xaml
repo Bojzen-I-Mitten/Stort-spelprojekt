@@ -83,7 +83,8 @@
                 <MenuItem Header="_Tools">
                     <MenuItem Header="_Options" Click="OpenOptionsWindow"/>
                     <MenuItem Header="_Reload Assembly" Click="ReloadAssembly"/>
-                </MenuItem>
+                        <MenuItem Header="_Toggle Editor Rendering" IsCheckable="True" IsChecked="True" Click="MenuItem_ToggleEditorRendering"/>
+                    </MenuItem>
             </Menu>
             <WrapPanel Grid.Row="1" Height="40">
                 <local:TransformGizmo x:Name="transformGizmo"/>
@@ -155,8 +156,10 @@
 
                         <xcad:LayoutDocumentPane DockWidth="2*">
                                 <xcad:LayoutAnchorable ContentId="Inspector" Title="Inspector" CanHide="False" CanClose="False">
-                                <inspectors:Inspector x:Name="inspector" x:FieldModifier="public" Background="#444444"/>
-                            </xcad:LayoutAnchorable>
+                                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <inspectors:Inspector x:Name="inspector" x:FieldModifier="public" Background="#444444" />
+                                    </ScrollViewer>
+                                </xcad:LayoutAnchorable>
                         </xcad:LayoutDocumentPane>
                     </xcad:LayoutDocumentPaneGroup>
                 </xcad:LayoutPanel>

@@ -1,12 +1,30 @@
 // This is the main DLL file.
 
+#pragma unmanaged
+
+#include <thomas\ThomasCore.h>
+#include <thomas\Window.h>
+#include <thomas\ThomasTime.h>
+#include <thomas\graphics\Renderer.h>
+#include <thomas\editor\gizmos\Gizmos.h>
+#include <thomas\Physics.h>
+#include <thomas\editor\EditorCamera.h>
+#include <thomas\System.h>
+#pragma managed
 #include "ThomasManaged.h"
+#include "resource\Model.h"
+#include "resource\Resources.h"
+#include "object\Component.h"
 #include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
+#include "ThomasSelection.h"
+#include "GUI\editor\GUI.h"
+using namespace thomas;
 
 namespace ThomasEngine {
 
 	void ThomasWrapper::Start() {
+		s_Selection = gcnew ThomasSelection();
 		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
@@ -29,13 +47,8 @@ namespace ThomasEngine {
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
 		}
-
 	}
 
-	void ThomasWrapper::UpdateEditor()
-	{
-		updateEditor = true;
-	}
 
 	void ThomasWrapper::StartRenderer()
 	{
@@ -45,18 +58,23 @@ namespace ThomasEngine {
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
 			Window::ClearAllWindows();
-			thomas::graphics::Renderer::ProcessCommands();
+			thomas::System::S_RENDERER.ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
-			thomas::ThomasTime::Update();
 		}
 	}
 
 	void ThomasWrapper::CopyCommandList()
 	{
 		thomas::Window::EndFrame(true);
-		thomas::graphics::Renderer::TransferCommandList();
+		thomas::System::S_RENDERER.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
+
+		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
+		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
+		{
+			camera->CopyFrameData();
+		}
 	}
 
 	void ThomasWrapper::StartEngine()
@@ -64,12 +82,12 @@ namespace ThomasEngine {
 		while (ThomasCore::Initialized())
 		{
 
-			if (Scene::IsLoading())
+			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
 				continue;
 			}
-
+			thomas::ThomasTime::Update();
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 
 			if (Window::WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
@@ -100,9 +118,9 @@ namespace ThomasEngine {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
 				{
-					if (gameObject->GetComponent<Rigidbody^>()->GetTargetCollider() != nullptr)
+					auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
+					if (collider != nullptr)
 					{
-						auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
 						gameObject->OnCollisionEnter(collider);
 					}
 
@@ -112,21 +130,24 @@ namespace ThomasEngine {
 
 			//Rendering
 
-			graphics::Renderer::ClearCommands();
+			thomas::System::S_RENDERER.ClearCommands();
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{
-
-				editor::EditorCamera::Render();
-				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+				if (renderingEditor)
 				{
-					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
-						gameObject->RenderGizmos();
+					editor::EditorCamera::Render();
+					//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
+					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					{
+						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+						if (gameObject->GetActive())
+							gameObject->RenderGizmos();
+					}
+
+					s_Selection->render();
 				}
-
-				s_Selection->render();
-
+				
 				//end editor rendering
 
 				for (object::component::Camera* camera : object::component::Camera::s_allCameras)
@@ -141,10 +162,6 @@ namespace ThomasEngine {
 				UpdateFinished->Set();
 			}
 			Monitor::Exit(lock);
-
-			if (updateEditor)
-				OnEditorUpdate();
-			updateEditor = false;
 
 			ScriptingManger::ReloadIfNeeded();
 		}
@@ -221,6 +238,8 @@ namespace ThomasEngine {
 
 	}
 
+	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
+
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)
 	{
 		thomas::editor::EditorCamera::SetManipulatorOperation((ImGuizmo::OPERATION)op);
@@ -249,5 +268,9 @@ namespace ThomasEngine {
 			}
 		}
 		thomas::ThomasCore::ClearLogOutput();
+	}
+	void ThomasWrapper::ToggleEditorRendering()
+	{
+		renderingEditor = !renderingEditor;
 	}
 }

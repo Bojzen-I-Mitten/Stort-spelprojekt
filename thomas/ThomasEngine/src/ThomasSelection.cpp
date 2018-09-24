@@ -1,5 +1,10 @@
+#pragma unmanaged
+#include <thomas\editor\EditorCamera.h>
+#pragma managed
 #include "ThomasSelection.h"
+#include "object\GameObject.h"
 
+using namespace System::Threading;
 namespace ThomasEngine {
 
 	ThomasSelection::ThomasSelection()
@@ -28,7 +33,7 @@ namespace ThomasEngine {
 		}
 	}
 
-	void ThomasSelection::SelectGameObject(Guid guid)
+	void ThomasSelection::SelectGameObject(System::Guid guid)
 	{
 		if (guid != Guid::Empty)
 		{
@@ -123,12 +128,12 @@ namespace ThomasEngine {
 		thomas::editor::EditorCamera::SetHasSelectionChanged(false);
 	}
 
-	Guid ThomasSelection::GetSelectedGUID()
+	System::Guid ThomasSelection::GetSelectedGUID()
 	{
 		if (m_SelectedGameObjects->Count > 0)
 			return m_SelectedGameObjects[0]->m_guid;
 		else
-			return Guid::Empty;
+			return System::Guid::Empty;
 	}
 
 	bool ThomasSelection::Contain(GameObject ^ gObj)

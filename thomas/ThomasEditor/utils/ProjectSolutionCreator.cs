@@ -164,7 +164,7 @@ namespace ThomasEditor.utils
 
                 if (result.OverallResult == BuildResultCode.Success)
                 {
-                    Debug.Log("Build succeded");
+                    Debug.Log("Build succeeded.");
                 }
                 ScriptingManger.ForceReload();
                 MainWindow._instance.hideBusyIndicator();

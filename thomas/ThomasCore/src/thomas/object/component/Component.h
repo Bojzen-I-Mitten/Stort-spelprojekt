@@ -1,5 +1,4 @@
 #pragma once
-#include "../../Common.h"
 #include "../Object.h"
 namespace thomas
 {
@@ -8,12 +7,12 @@ namespace thomas
 		class GameObject;
 		namespace component
 		{
-			class THOMAS_API Component : public Object
+			class Component : public Object
 			{
 			public:
 				virtual ~Component();	
 				virtual void Awake() {};
-				virtual void OnEnable() { };
+				virtual void OnEnable() {};
 				virtual void OnDisable() {};
 				virtual void Update() {};
 				virtual void FixedUpdate() {};

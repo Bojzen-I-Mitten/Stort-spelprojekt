@@ -3,50 +3,25 @@
 #pragma once
 
 
-#pragma unmanaged
-
-#include <thomas\ThomasCore.h>
-#include <thomas\Window.h>
-#include <thomas\ThomasTime.h>
-#include <thomas\Input.h>
-#include <thomas\resource\Shader.h>
-#include <thomas\graphics\Renderer.h>
-#include <thomas\editor\gizmos\Gizmos.h>
-#pragma managed
-//#include <Sound.h>
-#include "resource\Resources.h"
-#include "object\GameObject.h"
-#include "object\component\Transform.h"
-#include "Scene.h"
-#include "ScriptingManager.h"
-#include "ThomasSelection.h"
-
 using namespace System;
 using namespace System::Collections::Generic;
+using namespace System::Collections::ObjectModel;
 using namespace System::Threading;
-using namespace thomas;
-
 
 namespace ThomasEngine {
-
-
+	ref class ThomasSelection;
 	public ref class ThomasWrapper
 	{
 	private:
-
-		static bool updateEditor = false;
-
+		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
-		static ThomasSelection^ s_Selection = gcnew ThomasSelection();
+		static ThomasSelection^ s_Selection;
 	public:
-		delegate void UpdateEditor();
-		static event UpdateEditor^ OnEditorUpdate;
-
 		enum class ManipulatorOperation {
 			TRANSLATE,
 			ROTATE,
@@ -55,7 +30,6 @@ namespace ThomasEngine {
 
 		static void Start();
 
-		static void UpdateEditor();
 
 		static void StartRenderer();
 
@@ -88,11 +62,12 @@ namespace ThomasEngine {
 
 		static void UpdateLog();
 
+		static void ToggleEditorRendering();
 	public:
 
 		static property float FrameRate
 		{
-			float get() { return float(thomas::ThomasTime::GetFPS()); }
+			float get();
 		}
 		static property ObservableCollection<String^>^ OutputLog
 		{

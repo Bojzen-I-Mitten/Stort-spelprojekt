@@ -20,15 +20,21 @@ namespace thomas
 			}
 			math::Vector3 Transform::Forward()
 			{
-				return GetWorldMatrix().Forward();
+				math::Vector3 temp = GetWorldMatrix().Forward();
+				temp.Normalize();
+				return temp;
 			}
 			math::Vector3 Transform::Up()
 			{
-				return GetWorldMatrix().Up();
+				math::Vector3 temp = GetWorldMatrix().Up();
+				temp.Normalize();
+				return temp;
 			}
 			math::Vector3 Transform::Right()
 			{
-				return GetWorldMatrix().Right();
+				math::Vector3 temp = GetWorldMatrix().Right();
+				temp.Normalize();
+				return temp;
 			}
 
 			math::Matrix Transform::GetLocalWorldMatrix()
@@ -45,9 +51,16 @@ namespace thomas
 					return m_localWorldMatrix;
 			}
 
-			math::Matrix Transform::SetWorldMatrix(math::Matrix matrix)
+			void Transform::SetWorldMatrix(math::Matrix matrix)
 			{
-				return math::Matrix();
+				if (m_parent) {
+					m_localWorldMatrix = matrix * m_parent->GetWorldMatrix().Invert();
+				}
+				else
+				{
+					m_localWorldMatrix = matrix;
+				}
+				Decompose();
 			}
 
 			void Transform::SetLocalMatrix(math::Matrix matrix)
@@ -248,14 +261,23 @@ namespace thomas
 			}
 
 		
-			void Transform::SetParent(Transform * parent)
+			void Transform::SetParent(Transform * parent, bool worldPositionStays)
 			{
 				if (m_parent != parent)
 				{
+					math::Matrix m = GetWorldMatrix();
 					RemoveParent();
 					m_parent = parent;
-					if(m_parent)
+					if (m_parent) {
 						m_parent->m_children.push_back(this);
+						if(worldPositionStays)
+							SetWorldMatrix(m);
+					}
+					else
+					{
+						if(worldPositionStays)
+							SetLocalMatrix(m);
+					}
 				}
 			}
 			Transform * Transform::GetParent()
