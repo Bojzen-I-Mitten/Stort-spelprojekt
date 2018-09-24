@@ -32,20 +32,20 @@ namespace thomas
 			static void Update();
 
 		public:
-			static bool HasSelectionChanged();
-			static void ToggleManipulatorMode();
-			static void SelectObject(GameObject* gameObject);
-			static void UnselectObject(GameObject* gameObject);
-			static void UnselectObjects();
+			bool HasSelectionChanged();
+			void ToggleManipulatorMode();
+			void SelectObject(GameObject* gameObject);
+			void UnselectObject(GameObject* gameObject);
+			void UnselectObjects();
 
 		public:
-			static void SetHasSelectionChanged(const bool & selectionChanged);
-			static void SetManipulatorOperation(ImGuizmo::OPERATION operation);
+			void SetHasSelectionChanged(const bool & selectionChanged);
+			void SetManipulatorOperation(ImGuizmo::OPERATION operation);
 
 		public:
 			static EditorCamera* GetEditorCamera();
 			static ImGuizmo::OPERATION GetManipulatorOperation();
-			static std::vector<object::GameObject*> GetSelectedObjects();
+			const std::vector<object::GameObject*>& GetSelectedObjects();
 			object::component::Camera* GetCamera() const;
 
 		private:
@@ -72,12 +72,11 @@ namespace thomas
 			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
-			bool m_selectedObject;
-			math::Vector3 m_selectedObjPosition;
+			object::GameObject* m_selectedObject;
+			std::vector<object::GameObject*> m_selectedObjects;
 
 		private:
-			static EditorCamera* s_editorCamera;
-			static std::vector<object::GameObject*> s_selectedObjects;
+			static EditorCamera* m_editorCamera;
 		};
 	}
 }

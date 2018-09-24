@@ -31,6 +31,9 @@ namespace thomas
 
 				void LookAt(Transform* target);
 				void LookAt(math::Vector3 target);
+				void LookAt(math::Vector3 eye, math::Vector3 target);
+				void LookAt(math::Vector3 eye, math::Vector3 target, math::Vector3 up);
+				void Orient(math::Vector3 forward, math::Vector3 up);
 				void Rotate(math::Vector3 angles);
 				void Rotate(math::Quaternion rot);
 				void Rotate(float x, float y, float z);

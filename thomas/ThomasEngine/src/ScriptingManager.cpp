@@ -1,5 +1,7 @@
+#include "Utility.h"
 #include "ScriptingManager.h"
 #include "ThomasManaged.h"
+#include "Debug.h"
 
 void ThomasEngine::ScriptingManger::LoadAssembly()
 {
@@ -35,8 +37,8 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 				File::Delete(tempFile);
 			}
 			catch (Exception^ e) {
-				std::string err("Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + Utility::ConvertString(e->Message));
-				LOG(err);
+				String^ err = "Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + e->Message;
+				Debug::Log(err);
 			}
 			Scene::CurrentScene->RelativeSavePath = currentSavePath;			
 		}

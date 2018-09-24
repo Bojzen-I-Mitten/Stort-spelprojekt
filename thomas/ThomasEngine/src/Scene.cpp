@@ -1,3 +1,9 @@
+
+#pragma unmanaged
+#include <thomas/editor/EditorCamera.h>
+
+#pragma managed
+#include "Utility.h"
 #include "Scene.h"
 #include "ThomasSelection.h"
 #include "object\GameObject.h"
@@ -5,7 +11,8 @@
 #include "resource\Resources.h"
 #include "SceneSurrogate.h"
 #include "Debug.h"
-#include <thomas/editor/EditorCamera.h>
+#include "Application.h"
+#include "Project.h"
 
 namespace ThomasEngine
 {
@@ -108,9 +115,8 @@ namespace ThomasEngine
 
 			scene->EnsureLoad();
 
-			msclr::interop::marshal_context context;
 			for (int i = 0; i < scene->GameObjects->Count; ++i)
-				scene->GameObjects[i]->nativePtr->SetName(context.marshal_as<std::string>(scene->GameObjects[i]->Name));
+				scene->GameObjects[i]->nativePtr->SetName(Utility::ConvertString(scene->GameObjects[i]->Name));
 
 			file->Close();
 

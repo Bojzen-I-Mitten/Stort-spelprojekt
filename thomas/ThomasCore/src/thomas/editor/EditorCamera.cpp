@@ -17,18 +17,16 @@ namespace thomas
 {
 	namespace editor
 	{
-		EditorCamera* EditorCamera::s_editorCamera;
-		std::vector<object::GameObject*> EditorCamera::s_selectedObjects;
+		EditorCamera* EditorCamera::m_editorCamera;
 
 		EditorCamera::EditorCamera() : 
 			object::GameObject("editorCamera"), 
-			m_sensitivity(50.f), 
+			m_sensitivity(1.f), 
 			m_speed(2.f), 
 			m_manipulatorScale(2.f), 
-			m_selectedObjPosition(0.f),
 			m_hasSelectionChanged(false),
 			m_manipulatorSnapping(false),
-			m_selectedObject(false),
+			m_selectedObject(nullptr),
 			m_objectHighlighter(nullptr),
 			m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
 			m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
@@ -62,82 +60,81 @@ namespace thomas
 
 		void EditorCamera::Destroy()
 		{
-			if (s_editorCamera)
-				delete s_editorCamera;
+			if (m_editorCamera)
+				delete m_editorCamera;
 		}
 
 		void EditorCamera::Init()
 		{
-			s_editorCamera = new EditorCamera();
+			m_editorCamera = new EditorCamera();
 		}
 
 		EditorCamera * EditorCamera::GetEditorCamera()
 		{
-			return s_editorCamera;
+			return m_editorCamera;
 		}
 
 		void EditorCamera::Render()
 		{
-			if (s_editorCamera)
-				s_editorCamera->RenderCamera();
+			if (m_editorCamera)
+				m_editorCamera->RenderCamera();
 		}
 
 		void EditorCamera::Update()
 		{
-			if (s_editorCamera)
-				s_editorCamera->UpdateCamera();
+			if (m_editorCamera)
+				m_editorCamera->UpdateCamera();
 		}
 
 		void EditorCamera::SelectObject(object::GameObject * gameObject)
 		{
 			// Select single gameobject
-			s_selectedObjects.clear();
+			m_selectedObjects.clear();
 			if (gameObject)
 			{
-				s_editorCamera->m_selectedObjPosition = gameObject->m_transform->GetPosition();
-				s_selectedObjects.push_back(gameObject);
+				m_selectedObjects.push_back(gameObject);
 			}
 
-			s_editorCamera->m_hasSelectionChanged = true;
-			s_editorCamera->m_selectedObject = true;
+			m_editorCamera->m_hasSelectionChanged = true;
+			m_editorCamera->m_selectedObject = gameObject;
 		}
 
 		void EditorCamera::UnselectObject(GameObject * gameObject)
 		{
 			// Unselect only a specific gameobject
-			for (int i = 0; i < (int)s_selectedObjects.size(); ++i)
+			for (int i = 0; i < (int)m_selectedObjects.size(); ++i)
 			{
-				if (s_selectedObjects[i] == gameObject)
+				if (m_selectedObjects[i] == gameObject)
 				{
-					s_selectedObjects.erase(s_selectedObjects.begin() + i);
+					m_selectedObjects.erase(m_selectedObjects.begin() + i);
 					--i;
 				}
 			}
 
-			s_editorCamera->m_selectedObject = false;
+			m_editorCamera->m_selectedObject = nullptr;
 		}
 
 		void EditorCamera::UnselectObjects()
 		{
 			// Unselect all objects in the scene
-			s_selectedObjects.clear();
-			s_editorCamera->m_hasSelectionChanged = true;
-			s_editorCamera->m_selectedObject = false;
+			m_selectedObjects.clear();
+			m_editorCamera->m_hasSelectionChanged = true;
+			m_editorCamera->m_selectedObject = nullptr;
 		}
 
-		std::vector<object::GameObject*> EditorCamera::GetSelectedObjects()
+		const std::vector<object::GameObject*>& EditorCamera::GetSelectedObjects()
 		{
-			return s_selectedObjects;
+			return m_selectedObjects;
 		}
 
 		void EditorCamera::SetHasSelectionChanged(const bool & selectionChanged)
 		{
-			s_editorCamera->m_hasSelectionChanged = selectionChanged;
+			m_editorCamera->m_hasSelectionChanged = selectionChanged;
 		}
 
 		bool EditorCamera::HasSelectionChanged()
 		{
-			return s_editorCamera->m_hasSelectionChanged;
+			return m_editorCamera->m_hasSelectionChanged;
 		}
 
 		object::component::Camera * EditorCamera::GetCamera() const
@@ -147,17 +144,17 @@ namespace thomas
 
 		void EditorCamera::SetManipulatorOperation(ImGuizmo::OPERATION operation)
 		{
-			s_editorCamera->m_manipulatorOperation = operation;
+			m_editorCamera->m_manipulatorOperation = operation;
 		}
 
 		ImGuizmo::OPERATION EditorCamera::GetManipulatorOperation()
 		{
-			return s_editorCamera->m_manipulatorOperation;
+			return m_editorCamera->m_manipulatorOperation;
 		}
 
 		void EditorCamera::ToggleManipulatorMode()
 		{
-			s_editorCamera->m_manipulatorMode = s_editorCamera->m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
+			m_editorCamera->m_manipulatorMode = m_editorCamera->m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
 		}
 
 		void EditorCamera::RenderCamera()
@@ -223,7 +220,7 @@ namespace thomas
 			if (!m_objectHighlighter)
 				return;
 
-			for (object::GameObject* gameObject : s_selectedObjects)
+			for (object::GameObject* gameObject : m_selectedObjects)
 			{
 				if (!gameObject->GetActive())
 					continue;
@@ -251,9 +248,9 @@ namespace thomas
 		{
 			float snap[] = { 1.f, 1.f, 1.f };
 
-			for (unsigned i = 0; i < s_selectedObjects.size(); ++i)
+			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
-				object::GameObject* gameObject = s_selectedObjects[i];
+				object::GameObject* gameObject = m_selectedObjects[i];
 				ImGuiIO& io = ImGui::GetIO();
 				ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
 				math::Matrix worldMatrix = gameObject->m_transform->GetWorldMatrix();
@@ -327,27 +324,26 @@ namespace thomas
 			
 			float xStep = Input::GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
 			float yStep = Input::GetMouseY() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
-			if (yStep > 10.f)
-				int a = 0;
-			if (xStep > 10.f)
-				int a = 0;
-			xStep = Input::GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
-			yStep = Input::GetMouseY() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
 			// Rotate camera
 			math::Quaternion rot = math::Quaternion::CreateFromAxisAngle(right, -yStep);
 			rot *= math::Quaternion::CreateFromAxisAngle(math::Vector3::UnitY, -xStep);
-			m_transform->Rotate(rot);
+
+			// Recreate matrix to prevent it from accumulating error
+			up = math::Vector3::Transform(up, rot);
+			forward = math::Vector3::Transform(forward, rot);
+			m_transform->Orient(forward, up);
 		}
 
 		void EditorCamera::SnapCameraToFocus()
 		{
-			if (m_selectedObject)
+			object::GameObject *gObj = m_selectedObject;
+			if (gObj)
 			{		
-				math::Vector3 dir = m_transform->GetPosition() - m_selectedObjPosition;
+				math::Vector3 gPos = gObj->m_transform->GetPosition();
+				math::Vector3 dir = m_transform->GetPosition() - gPos;
 				dir.Normalize();
 
-				m_transform->LookAt(m_selectedObjPosition);
-				m_transform->SetPosition(m_selectedObjPosition + math::Vector3(2.f) * dir);
+				m_transform->LookAt(gPos + math::Vector3(2.f) * dir, gPos, math::Vector3::Up);
 			}
 		}
 	}

@@ -76,28 +76,33 @@ namespace thomas
 
 			void Transform::LookAt(Transform * target)
 			{
-				if (target->GetPosition() == GetPosition())
-					return;
-				math::Matrix lookAt = math::Matrix::CreateLookAt(GetPosition(), target->GetPosition(), m_localWorldMatrix.Up());
-
-				lookAt = lookAt.Invert();
-
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, lookAt.Forward(), lookAt.Up());
-
-				Decompose();
-				SetDirty(true);
-
+				LookAt(target->GetPosition());
 			}
 			void Transform::LookAt(math::Vector3 target)
 			{
+				LookAt(m_localPosition, target);
+			}
+			void Transform::LookAt(math::Vector3 eye, math::Vector3 target)
+			{
 				if (target == GetPosition())
 					return;
-				math::Matrix lookAt = math::Matrix::CreateLookAt(GetPosition(), target, m_localWorldMatrix.Up());
-
-				lookAt = lookAt.Invert();
-
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, lookAt.Forward(), lookAt.Up());
+				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, m_localWorldMatrix.Up());
 				
+				Decompose();
+				SetDirty(true);
+			}
+			void Transform::LookAt(math::Vector3 eye, math::Vector3 target, math::Vector3 up)
+			{
+				if (target == GetPosition())
+					return;
+				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, up);
+
+				Decompose();
+				SetDirty(true);
+			}
+			void Transform::Orient(math::Vector3 forward, math::Vector3 up)
+			{
+				m_localWorldMatrix = math::Matrix::CreateWorld(m_localPosition, forward, up);
 				Decompose();
 				SetDirty(true);
 			}

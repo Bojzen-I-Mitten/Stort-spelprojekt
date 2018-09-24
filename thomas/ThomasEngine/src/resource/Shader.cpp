@@ -1,6 +1,6 @@
 
 #include "Shader.h"
-
+#include "Resources.h"
 namespace ThomasEngine
 {
 	Shader::Shader(thomas::resource::Shader* ptr) 

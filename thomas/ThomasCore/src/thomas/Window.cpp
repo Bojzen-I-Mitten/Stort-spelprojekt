@@ -255,7 +255,6 @@ namespace thomas
 					s_focused->m_focused = false;
 				s_focused = window;
 				if (s_focused != NULL) {
-					SetFocus(hWnd);
 					s_focused->m_focused = true;
 					Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
 				}
@@ -524,6 +523,7 @@ namespace thomas
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 		case WM_MBUTTONDOWN:
+			SetFocus(hWnd);	// Set system focus on click (not to be confused with window hower focus)
 		case WM_INPUT:
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONUP:
@@ -539,7 +539,7 @@ namespace thomas
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			if (window->IsFocused())
+			if (window->IsFocused() && isEditor)
 				Input::ProcessKeyboard(message, wParam, lParam);
 			break;
 		case WM_DESTROY:
