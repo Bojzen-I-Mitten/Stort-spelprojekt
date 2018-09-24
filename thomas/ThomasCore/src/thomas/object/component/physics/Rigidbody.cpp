@@ -99,7 +99,7 @@ namespace thomas
 			void Rigidbody::SetFreezeRotation(const math::Vector3 & freezeRotation)
 			{
 				m_freezeRotation = freezeRotation;
-				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));
+				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 			}
 
 			void Rigidbody::SetGravity(bool gravity)
