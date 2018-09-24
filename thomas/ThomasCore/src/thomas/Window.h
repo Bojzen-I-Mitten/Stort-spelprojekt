@@ -106,6 +106,7 @@ namespace thomas
 		static std::vector<Window*> s_windows;
 		static Window* s_editorWindow;
 		static Window* s_current;
+		static Window* s_focused;					// Window currently in focus
 	};
 }
 

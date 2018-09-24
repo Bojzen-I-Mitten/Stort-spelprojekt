@@ -16,7 +16,6 @@ namespace thomas
 	class Input
 	{
 	public:
-		static bool allowEditor;
 		enum class MouseButtons
 		{
 			LEFT,
@@ -269,9 +268,7 @@ namespace thomas
 
 	private:
 		static bool s_initialized;
-		static bool s_recordPosition;
-		static MouseMode s_mouseMode;
-		static math::Vector2 s_mousePosition;
+		static math::Vector2 s_mousePosition, s_absolutePosition;
 		static float s_vibrateTimeLeft;
 	};
 }

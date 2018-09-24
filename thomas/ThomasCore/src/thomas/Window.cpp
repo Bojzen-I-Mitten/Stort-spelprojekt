@@ -12,6 +12,7 @@ namespace thomas
 	std::vector<Window*> Window::s_windows;
 	Window* Window::s_editorWindow = nullptr;
 	Window* Window::s_current = nullptr;
+	Window* Window::s_focused = nullptr;
 
 	Window::Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title) : m_focused(false), m_created(false), 
 		m_shouldResize(false), m_width(width), m_height(height), m_title(std::string(title)), m_showCursor(false), m_fullScreen(false)
@@ -245,25 +246,21 @@ namespace thomas
 
 	void Window::UpdateFocus()
 	{
-
-		bool appHasFocus = false;
-		if (s_editorWindow) {
-			s_editorWindow->m_focused = s_editorWindow->GetWindowHandler() == GetFocus();
-			appHasFocus |= s_editorWindow->m_focused;
+		POINT p;
+		if (GetCursorPos(&p)) {
+			HWND hWnd = WindowFromPoint(p);
+			Window* window = GetWindow(hWnd);
+			if (window != s_focused) {
+				if(s_focused)
+					s_focused->m_focused = false;
+				s_focused = window;
+				if (s_focused != NULL) {
+					SetFocus(hWnd);
+					s_focused->m_focused = true;
+					Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
+				}
+			}
 		}
-
-		for (Window* window : s_windows) {
-			window->m_focused = window->GetWindowHandler() == GetFocus();
-			appHasFocus |= window->m_focused;
-		}
-		/*
-		// If applicatin has a focused window and mouse is howering over editor -> is focused.
-		math::Vector2 mouse = Input::GetAbsolutePosition();
-		if (appHasFocus && s_editorWindow->IntersectBounds(mouse.x, mouse.y)) {
-			s_editorWindow->m_focused = true;
-			LOG("Editor focus");
-		}
-		*/
 	}
 
 	bool Window::IntersectBounds(int x, int y) const
@@ -514,9 +511,8 @@ namespace thomas
 		}
 		break;
 		case WM_SETFOCUS:
+			break;
 		case WM_KILLFOCUS:
-			if (window->IsFocused())
-				Input::ProcessGamePad(message, wParam, lParam);
 			break;
 		case WM_ACTIVATEAPP:
 			if (window->IsFocused()) {
@@ -528,7 +524,6 @@ namespace thomas
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 		case WM_MBUTTONDOWN:
-			SetFocus(hWnd);
 		case WM_INPUT:
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONUP:
@@ -538,9 +533,8 @@ namespace thomas
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
-			if (window->IsFocused())
+			if(window->m_focused)
 				Input::ProcessMouse(message, wParam, lParam, hWnd);
-			break;
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:

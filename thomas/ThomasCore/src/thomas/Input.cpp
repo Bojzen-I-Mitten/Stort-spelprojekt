@@ -19,13 +19,10 @@ namespace thomas
 	GamePad::State Input::s_gamePadState;
 	GamePad::ButtonStateTracker Input::s_gamePadTracker;
 
-	math::Vector2 Input::s_mousePosition;
-	Input::MouseMode Input::s_mouseMode;
-	bool Input::s_recordPosition = true;
+	math::Vector2 Input::s_mousePosition, Input::s_absolutePosition;
 	bool Input::s_initialized = false;
 	float Input::s_vibrateTimeLeft = 0.f;
 
-	bool Input::allowEditor = false;
 
 	bool Input::Init()
 	{
@@ -34,7 +31,6 @@ namespace thomas
 		s_mouse = std::make_unique<Mouse>();
 		s_gamePad = std::make_unique<GamePad>();
 			
-		s_mouseMode = MouseMode::POSITION_ABSOLUTE;
 		s_initialized = true;
 		LOG("Initiating Input");
 		return s_initialized;
@@ -44,7 +40,6 @@ namespace thomas
 	{
 		if (s_initialized)
 		{
-			allowEditor = false;
 			s_keyboardState = s_keyboard->GetState();
 			s_gamePadState = s_gamePad->GetState(0);	
 			s_mouseState = s_mouse->GetState();
@@ -56,10 +51,12 @@ namespace thomas
 			s_keyboardTracker.Update(s_keyboardState);
 			s_mouseTracker.Update(s_mouseState);
 			s_gamePadTracker.Update(s_gamePadState);
+			// Set mouse mode position
 			s_mousePosition = math::Vector2((float)s_mouseState.x, (float)s_mouseState.y);
-						
-			if (s_mousePosition == math::Vector2(0.f, 0.f))
-				s_recordPosition = true;
+			// Update absolute position (if not in relative mode)
+			if (s_mouseState.positionMode == Mouse::Mode::MODE_ABSOLUTE)
+				s_absolutePosition = s_mousePosition;
+
 		}
 	}
 
@@ -137,47 +134,37 @@ namespace thomas
 
 	void Input::SetMouseMode(MouseMode mode)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
+		if (s_mouseState.positionMode  == (Mouse::Mode)mode)
 			return;
-		if (s_mouseMode == mode)
-			return;
-
-		s_mouse->SetMode((Mouse::Mode)mode); s_mouseMode = mode;
-		mode == MouseMode::POSITION_RELATIVE ? s_recordPosition = false : s_recordPosition = true;
+		s_mouse->SetMode((Mouse::Mode)mode);
+		// Reset mouse pos
+		if (mode == MouseMode::POSITION_RELATIVE)
+			s_mousePosition = math::Vector2(); 
+		else
+			s_mousePosition = s_absolutePosition;
 	}
 
 	math::Vector2 Input::GetMousePosition()
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return math::Vector2(0.f, 0.f);
-		if (s_recordPosition)
-			return s_mousePosition;
-		else
-			return math::Vector2(0.f, 0.f);
+		return s_mousePosition;
 	}
 	math::Vector2 Input::GetAbsolutePosition()
 	{
-		return s_mousePosition;
+		return s_absolutePosition;
 	}
 
 	float Input::GetMouseX()
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return 0;
 		return GetMousePosition().x;
 	}
 
 	float Input::GetMouseY()
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return 0;
 		return GetMousePosition().y;
 	}
 
 	bool Input::GetMouseButtonDown(MouseButtons button)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		switch (button)
 		{
 		case MouseButtons::LEFT:
@@ -192,8 +179,6 @@ namespace thomas
 
 	bool Input::GetMouseButtonUp(MouseButtons button)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		switch (button)
 		{
 		case MouseButtons::LEFT:
@@ -208,8 +193,6 @@ namespace thomas
 
 	bool Input::GetMouseButton(MouseButtons button)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		switch (button)
 		{
 		case MouseButtons::LEFT:
@@ -230,8 +213,6 @@ namespace thomas
 	//Gamepad
 	bool Input::GetButtonDown(Buttons button)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		if (!s_gamePadState.IsConnected()) //Always false if no gamePad.
 			return false;
 
@@ -275,8 +256,6 @@ namespace thomas
 
 	bool Input::GetButtonUp(Buttons button)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		if (!s_gamePadState.IsConnected()) //Always false if no gamePad.
 			return false;
 
@@ -320,8 +299,6 @@ namespace thomas
 
 	bool Input::GetButton(Buttons button)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		if (!s_gamePadState.IsConnected()) //Always false if no gamePad.
 			return false;
 
@@ -376,22 +353,16 @@ namespace thomas
 	//Keyboard
 	bool Input::GetKeyDown(Keys key)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		return s_keyboardTracker.IsKeyPressed((Keyboard::Keys)key);
 	}	
 
 	bool Input::GetKeyUp(Keys key)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		return s_keyboardTracker.IsKeyReleased((Keyboard::Keys)key);
 	}
 
 	bool Input::GetKey(Keys key)
 	{
-		if (Window::GetEditorWindow() && Window::GetEditorWindow()->IsFocused() && !allowEditor)
-			return false;
 		return s_keyboardState.IsKeyDown((Keyboard::Keys)key);
 	}
 }
