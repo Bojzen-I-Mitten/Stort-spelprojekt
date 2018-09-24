@@ -14,7 +14,8 @@ namespace thomas
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
 			m_targetCollider(nullptr), m_hasGravity(true), 
-			m_kinematic(false), 
+			m_kinematic(false),
+			m_interpolating(false),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f)
@@ -31,7 +32,7 @@ namespace thomas
 				delete getMotionState();
 				
 				Physics::s_world->removeCollisionObject(this);
-				delete getCollisionShape();				
+				delete getCollisionShape();		
 			}
 
 			void Rigidbody::OnEnable()
@@ -90,16 +91,33 @@ namespace thomas
 				}			
 			}
 
-			void Rigidbody::SetFreezePosition(const math::Vector3 & freezePosition)
+			void Rigidbody::SetFreezePosition(const math::Vector3& freezePosition)
 			{
 				m_freezePosition = freezePosition;
 				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
 			}
 
-			void Rigidbody::SetFreezeRotation(const math::Vector3 & freezeRotation)
+			void Rigidbody::SetFreezeRotation(const math::Vector3& freezeRotation)
 			{
 				m_freezeRotation = freezeRotation;
 				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
+			}
+
+			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
+			{
+				m_interpolating ? this->setInterpolationLinearVelocity(Physics::ToBullet(linearVel)) :
+								  this->setLinearVelocity(Physics::ToBullet(linearVel));
+			}
+
+			void Rigidbody::SetAngularVelocity(const math::Vector3 & angularVel)
+			{
+				m_interpolating ? this->setInterpolationAngularVelocity(Physics::ToBullet(angularVel)) : 
+								  this->setAngularVelocity(Physics::ToBullet(angularVel));
+			}
+
+			void Rigidbody::SetActivationState(ActivationState state)
+			{
+				this->setActivationState(state);
 			}
 
 			void Rigidbody::SetGravity(bool gravity)
@@ -128,6 +146,11 @@ namespace thomas
 						Physics::AddRigidBody(this);
 					}		
 				}	
+			}
+
+			void Rigidbody::SetInterpolation(bool interpolate)
+			{
+				m_interpolating = interpolate;
 			}
 	
 			void Rigidbody::SetCollider(Collider * collider)
@@ -219,6 +242,11 @@ namespace thomas
 				return m_kinematic;
 			}
 
+			bool Rigidbody::IsInterpolating() const
+			{
+				return m_interpolating;
+			}
+
 			math::Vector3 Rigidbody::GetFreezePosition() const
 			{
 				return m_freezePosition;
@@ -227,6 +255,22 @@ namespace thomas
 			math::Vector3 Rigidbody::GetFreezeRotation() const
 			{
 				return m_freezeRotation;
+			}
+
+			math::Vector3 Rigidbody::GetLinearVelocity() const
+			{
+				if (m_interpolating)
+					return Physics::ToSimple(this->getInterpolationLinearVelocity());
+
+				return Physics::ToSimple(this->getLinearVelocity());
+			}
+
+			math::Vector3 Rigidbody::GetAngularVelocity() const
+			{
+				if (m_interpolating)
+					return Physics::ToSimple(this->getInterpolationAngularVelocity());
+
+				return Physics::ToSimple(this->getAngularVelocity());
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()
