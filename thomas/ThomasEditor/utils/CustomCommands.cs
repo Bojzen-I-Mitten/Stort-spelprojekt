@@ -13,6 +13,7 @@ namespace ThomasEditor.Commands
         private static Key open = Key.O;
         private static Key copyObject = Key.C;
         private static Key pasteObject = Key.V;
+        private static Key duplicateObject = Key.D;
 
 
         public static Key GetAddNewEmptyObjectKey() { return addNewEmptyObject; }
@@ -38,6 +39,9 @@ namespace ThomasEditor.Commands
 
         public static Key GetPasteKey() { return pasteObject; }
         public static void SetPasteKey(Key set) { pasteObject = set; }
+
+        public static Key GetDuplicateKey() { return duplicateObject; }
+        public static void SetDuplicateKey(Key set) { duplicateObject = set; }
 
 
         //Include xmlns:commands="clr-namespace:ThomasEditor.Commands" in the file you want access to the custome commands
@@ -142,6 +146,19 @@ namespace ThomasEditor.Commands
                 }
             );
 
+        public static readonly RoutedUICommand DuplicateObjectCmd = new RoutedUICommand
+            (
+                "Duplicate",     //The text that will show on the item that the command is bound to.
+                "DuplicateObject",       //Name of the command
+                typeof(CustomCommands), //Owner of command
+                new InputGestureCollection()
+                {
+                    new KeyGesture(             //Specify what keys need to be pressed.
+                        duplicateObject,      //The key
+                        ModifierKeys.Control)   //Ctrl
+                }
+            );
+
         public static RoutedUICommand GetNewEmptyObject { get { return NewGameObjectCmd; } }
         public static RoutedUICommand GetDeleteGameObject { get { return DeleteGameObjectCmd; } }
         public static RoutedUICommand GetPlay { get { return Play; } }
@@ -150,5 +167,6 @@ namespace ThomasEditor.Commands
         public static RoutedUICommand GetOpen { get { return Open; } }
         public static RoutedUICommand GetCopyObject { get { return CopyObjectCmd; } }
         public static RoutedUICommand GetPasteObject { get { return PasteObjectCmd; } }
+        public static RoutedUICommand GetDuplicateObject { get { return DuplicateObjectCmd; } }
     }
 }

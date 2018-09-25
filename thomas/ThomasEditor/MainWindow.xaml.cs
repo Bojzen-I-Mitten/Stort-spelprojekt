@@ -496,6 +496,12 @@ namespace ThomasEditor
             }
         }
 
+        private void MW_DuplicateObject(object sender, RoutedEventArgs e)
+        {
+            MW_CopyObject(sender, e);
+            MW_PasteObject(sender, e);
+        }
+
         //Can only be copied if item is selected
         private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -520,6 +526,19 @@ namespace ThomasEditor
                 return;
             }
             Debug.Log("No copied object to paste.");
+        }
+
+        private void MW_DuplicateObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+            Debug.Log("No object selected __ MW.");
         }
 
         #endregion
