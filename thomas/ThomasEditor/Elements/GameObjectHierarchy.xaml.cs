@@ -406,12 +406,7 @@ namespace ThomasEditor
                 item.IsSelected = true;
         }
 
-        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        private void MenuItem_CopyGameObject(object sender, ExecutedRoutedEventArgs e)
         {
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
 
@@ -425,17 +420,9 @@ namespace ThomasEditor
                     Debug.Log("GameObject successfully copied.");
                 }
             }
-
-            //Is this needed?
-            //e.Handled = true;
         }
 
-        //private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = true;
-        //}
-
-        private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
+        private void MenuItem_PasteGameObject(object sender, ExecutedRoutedEventArgs e)
         {
             if(m_copiedObject)
             {
@@ -447,9 +434,11 @@ namespace ThomasEditor
             }
 
             Debug.Log("No copied object to paste");
+        }
 
-            //Is this needed?
-            //e.Handled = true;
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
         }
     }
 }

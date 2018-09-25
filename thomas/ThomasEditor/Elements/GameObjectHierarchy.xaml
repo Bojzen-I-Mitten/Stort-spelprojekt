@@ -8,9 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <UserControl.CommandBindings>
-        <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_CopyGameObject"/>
-    </UserControl.CommandBindings>
+    
 
     <Grid>
         <TreeView AllowDrop="True" x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged"
@@ -18,14 +16,15 @@
                   PreviewMouseDown="hierarchy_PreviewMouseDown">
             <TreeView.ContextMenu>
                 <ContextMenu x:Name="hiearchyContextMenu">
+                    <ContextMenu.CommandBindings>
+                        <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="CommandBinding_CanExecute" Executed="MenuItem_CopyGameObject"/>
+                        <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="CommandBinding_CanExecute" Executed="MenuItem_PasteGameObject"/>
+                    </ContextMenu.CommandBindings>
+                    
                     <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>
                     <MenuItem Header="Rename" Click="MenuItem_RenameGameObject" IsEnabled="False"/>
                     <Separator/>
-                    <MenuItem Command="{x:Static commands:CustomCommands.GetCopyObject}">
-                        <MenuItem.Icon>
-                            <Image Source="http://icons.iconarchive.com/icons/icons8/ios7/256/Very-Basic-Copy-icon.png"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
+                    <MenuItem Command="{x:Static commands:CustomCommands.GetCopyObject}"/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetPasteObject}"/>
                     <Separator/>
                     <MenuItem Header="Save as prefab" IsEnabled="{Binding}" Click="MenuItem_SaveAsPrefab"/>

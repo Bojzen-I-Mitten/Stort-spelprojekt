@@ -303,7 +303,6 @@ namespace ThomasEditor
             }
         }
 
-
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
             Scene.CurrentScene.UnLoad();
