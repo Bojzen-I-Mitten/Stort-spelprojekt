@@ -406,7 +406,7 @@ namespace ThomasEditor
                 item.IsSelected = true;
         }
 
-        private void MenuItem_CopyGameObject(object sender, ExecutedRoutedEventArgs e)
+        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
         {
             Debug.Log("Entered copy function..");
 
@@ -421,21 +421,23 @@ namespace ThomasEditor
                 {
                     Debug.Log("GameObject successfully copied.");
                 }
+                return;
             }
+            Debug.Log("No object selected __ GOH.");
         }
 
-        private void MenuItem_PasteGameObject(object sender, ExecutedRoutedEventArgs e)
+        private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
         {
             if(m_copiedObject)
             {
                 GameObject.Instantiate(m_copiedObject);
 
-                Debug.Log("Pasted object");
+                Debug.Log("Pasted object.");
 
                 return;
             }
 
-            Debug.Log("No copied object to paste");
+            Debug.Log("No copied object to paste.");
         }
 
         //Can only click copy when an object is selected
@@ -446,6 +448,7 @@ namespace ThomasEditor
             if (item != null)
             {
                 e.CanExecute = true;
+                return;
             }
         }
 
@@ -456,6 +459,21 @@ namespace ThomasEditor
             {
                 e.CanExecute = true;
             }
+        }
+
+        public GameObject GetCopy()
+        {
+            return m_copiedObject;
+        }
+
+        public void SetCopy(GameObject copiedObject)
+        {
+            m_copiedObject = copiedObject;
+        }
+
+        public TreeViewItem GetSelection()
+        {
+            return hierarchy.SelectedItem as TreeViewItem;
         }
     }
 }

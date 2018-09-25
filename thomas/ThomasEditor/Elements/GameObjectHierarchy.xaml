@@ -7,8 +7,6 @@
              xmlns:commands="clr-namespace:ThomasEditor.Commands"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    
-    
 
     <Grid>
         <TreeView AllowDrop="True" x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged"

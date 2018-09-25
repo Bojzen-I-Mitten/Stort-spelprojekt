@@ -461,6 +461,68 @@ namespace ThomasEditor
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
+        //Main window CTRL + C
+        private void MW_CopyObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Entered copy function..");
+
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                Debug.Log("Copying object..");
+                hierarchy.SetCopy((GameObject)item.DataContext);
+
+                if (hierarchy.GetCopy())
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+            Debug.Log("No object selected __ MW.");
+        }
+
+        //Main window CTRL + V
+        private void MW_PasteObject(object sender, RoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+
+            if (hierarchy.GetCopy())
+            {
+                GameObject.Instantiate(hierarchy.GetCopy());
+
+                Debug.Log("Pasted object.");
+
+                return;
+            }
+
+            Debug.Log("No copied object to paste.");
+        }
+
+        //Can only be copied if item is selected
+        private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void MW_PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            if (hierarchy.GetCopy())
+            {
+                e.CanExecute = true;
+            }
+        }
+
         #endregion
 
         private void NewProject_Click(object sender, RoutedEventArgs e)

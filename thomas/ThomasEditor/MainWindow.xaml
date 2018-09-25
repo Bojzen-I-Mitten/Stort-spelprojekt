@@ -21,9 +21,10 @@
         <CommandBinding Command="commands:CustomCommands.GetNewEmptyObject" CanExecute="NewEmptyObject_CanExecute" Executed="AddEmptyGameObject"/>
         <CommandBinding Command="commands:CustomCommands.GetDeleteGameObject" CanExecute="RemoveSelectedGameObjects_CanExecute" Executed="RemoveSelectedGameObjects"/>
         <CommandBinding Command="commands:CustomCommands.GetPlay" CanExecute="Play_CanExecute" Executed="PlayPauseButton_Click" />
+        <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="MW_CopyObject_CanExecute" Executed="MW_CopyObject" />
+        <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="MW_PasteObject_CanExecute" Executed="MW_PasteObject" />
         <CommandBinding Command="commands:CustomCommands.Save" Executed="SaveScene_Click" />
         <CommandBinding Command="commands:CustomCommands.Open" Executed="LoadScene_Click"/>
-        <CommandBinding <!--="commands:CustomCommands.GetCopyObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_CopyGameObject" />-->
     </Window.CommandBindings>
 
     <Window.Resources>
