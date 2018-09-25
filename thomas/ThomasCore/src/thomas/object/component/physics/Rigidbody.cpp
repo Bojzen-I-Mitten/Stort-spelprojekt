@@ -13,8 +13,7 @@ namespace thomas
 		{
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
-			m_hasGravity(true), 
-			m_kinematic(false), 
+			m_kinematic(false),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f)
@@ -30,7 +29,7 @@ namespace thomas
 				delete getMotionState();
 				
 				Physics::s_world->removeCollisionObject(this);
-				delete getCollisionShape();				
+				delete getCollisionShape();		
 			}
 
 			void Rigidbody::OnEnable()
@@ -91,30 +90,31 @@ namespace thomas
 				}			
 			}
 
-			void Rigidbody::SetFreezePosition(const math::Vector3 & freezePosition)
+			void Rigidbody::SetFreezePosition(const math::Vector3& freezePosition)
 			{
 				m_freezePosition = freezePosition;
 				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
 			}
 
-			void Rigidbody::SetFreezeRotation(const math::Vector3 & freezeRotation)
+			void Rigidbody::SetFreezeRotation(const math::Vector3& freezeRotation)
 			{
 				m_freezeRotation = freezeRotation;
-				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));
+				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 			}
 
-			void Rigidbody::SetGravity(bool gravity)
+			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
 			{
-				if (gravity != m_hasGravity)
-				{
-					m_hasGravity = gravity;
-					if (initialized)
-					{
-						Physics::RemoveRigidBody(this);
-						return m_hasGravity == true ? this->setGravity(Physics::s_world->getGravity()) : this->setGravity(btVector3(0, 0, 0));
-						Physics::AddRigidBody(this);
-					}
-				}
+				this->setLinearVelocity(Physics::ToBullet(linearVel));
+			}
+
+			void Rigidbody::SetAngularVelocity(const math::Vector3 & angularVel)
+			{
+				this->setAngularVelocity(Physics::ToBullet(angularVel));
+			}
+
+			void Rigidbody::SetActivationState(ActivationState state)
+			{
+				this->setActivationState(state);
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
@@ -130,7 +130,7 @@ namespace thomas
 					}		
 				}	
 			}
-	
+
 			void Rigidbody::SetCollider(Collider * collider)
 			{
 				m_collider = collider;
@@ -187,11 +187,6 @@ namespace thomas
 				return m_mass;
 			}
 
-			bool Rigidbody::HasGravity() const
-			{
-				return m_hasGravity;
-			}
-
 			bool Rigidbody::IsKinematic() const
 			{
 				return m_kinematic;
@@ -205,6 +200,16 @@ namespace thomas
 			math::Vector3 Rigidbody::GetFreezeRotation() const
 			{
 				return m_freezeRotation;
+			}
+
+			math::Vector3 Rigidbody::GetLinearVelocity() const
+			{
+				return Physics::ToSimple(this->getLinearVelocity());
+			}
+
+			math::Vector3 Rigidbody::GetAngularVelocity() const
+			{
+				return Physics::ToSimple(this->getAngularVelocity());
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()
