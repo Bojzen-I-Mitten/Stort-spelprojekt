@@ -14,6 +14,9 @@ namespace thomas
 			std::fill(std::begin(colors), std::end(colors), math::Color(0, 0, 0, 1).RGBA());
 			s_blackTexture = new Texture2D((void*)&colors, 4, 4, false, true);
 			s_blackTexture->m_path = "Black Texture";
+			std::fill(std::begin(colors), std::end(colors), math::Color(0, 0, 1, 1).RGBA());
+			s_blackTexture = new Texture2D((void*)&colors, 4, 4, false, true);
+			s_blackTexture->m_path = "Blue Texture";
 			std::fill(std::begin(colors), std::end(colors), math::Color(1, 1, 1, 1).RGBA());
 			s_whiteTexture = new Texture2D((void*)&colors, 4, 4, false, true);
 			s_whiteTexture->m_path = "White Texture";
