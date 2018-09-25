@@ -15,7 +15,7 @@ namespace thomas
 			class Ragdoll : public Component
 			{
 
-				
+			public:
 				enum BodyParts
 				{
 				
@@ -48,17 +48,25 @@ namespace thomas
 					Joint_Right_Leg,
 					Joint_Amount
 				};
+			private:
 				btCollisionShape* m_shapes[BodyParts_Amount];
 				btRigidBody* m_bodies[BodyParts_Amount];
 				btTypedConstraint* m_joints[Joint_Amount];
 				
 
 				btRigidBody* localCreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
-			public:
-				Ragdoll( btScalar scale_ragdoll = btScalar(1.0)); // tar emot objectets position och en scale på figuren. 
-				~Ragdoll();
-				void Update();
 
+//				thomas::graphics::animation::IBlendTree* m_tree;
+				std::vector<uint32_t> m_boneIndex;
+
+				void init();
+				void initSkeleton();
+
+			public:
+				Ragdoll(); // tar emot objectets position och en scale på figuren. 
+				~Ragdoll();
+				virtual void Update() override;
+				virtual void Awake() override;
 			};
 
 		}

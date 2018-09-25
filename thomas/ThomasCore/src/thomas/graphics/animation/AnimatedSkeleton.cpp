@@ -10,6 +10,8 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
+
+
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref) :
 				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(&skin_ref)
 			{
@@ -88,6 +90,12 @@ namespace thomas {
 				assert(bone < _pose.size());
 				return _pose[bone];
 			}
+
+			bool AnimatedSkeleton::getBoneIndex(uint32_t boneNameHash, unsigned int &boneIndex) const
+			{
+				return _ref.findBoneIndex(boneNameHash, boneIndex);
+			}
+
 			const std::string & AnimatedSkeleton::getBoneName(unsigned int bone) const
 			{
 				return _ref.getBone(bone)._boneName;
