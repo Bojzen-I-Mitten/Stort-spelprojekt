@@ -426,7 +426,7 @@ namespace ThomasEngine.Network
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
             string address = connectEvent.IP.Substring(0, connectEvent.IP.IndexOf(":"));
-            string sPort = connectEvent.IP.Substring(connectEvent.IP.IndexOf(":"));
+            string sPort = connectEvent.IP.Substring(connectEvent.IP.IndexOf(":") + 1);
             int iPort = int.Parse(sPort);
 
             netManager.Connect(address, iPort, "SomeConnectionKey");
