@@ -49,17 +49,14 @@ namespace thomas
 				void SetKinematic(bool kinematic);
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
-				void SetTargetCollider(GameObject* collider);
 
 			public:
-				GameObject* GetTargetCollider();
 				float GetMass() const;
 				bool IsKinematic() const;
 				math::Vector3 GetFreezePosition() const;
 				math::Vector3 GetFreezeRotation() const;
 				math::Vector3 GetLinearVelocity() const;
 				math::Vector3 GetAngularVelocity() const;
-				void ClearTargetCollider();
 
 			private:
 				void UpdateRigidbodyMass();
@@ -71,7 +68,6 @@ namespace thomas
 				math::Matrix m_prevMatrix;
 				float m_mass;
 				bool m_kinematic;
-				std::unique_ptr<GameObject> m_targetCollider;
 			};
 		}
 	}

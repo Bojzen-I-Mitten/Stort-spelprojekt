@@ -71,7 +71,6 @@ namespace ThomasEngine
 			((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state);
 		}
 
-		GameObject^ GetTargetCollider();
 
 		property Vector3 LinearVelocity
 		{

@@ -13,13 +13,11 @@ namespace thomas
 		{
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
-			m_targetCollider(nullptr),
 			m_kinematic(false),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f)
 			{
-				this->setUserPointer(this);
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);
@@ -84,6 +82,8 @@ namespace thomas
 					trans.setOrigin((btVector3&)pos);
 					trans.setRotation((btQuaternion&)rot);
 					getMotionState()->setWorldTransform(trans);
+					this->setLinearVelocity(btVector3(0, 0, 0));
+					this->setAngularVelocity(btVector3(0, 0, 0));
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
@@ -137,6 +137,9 @@ namespace thomas
 				bool removed = Physics::RemoveRigidBody(this);
 				delete getCollisionShape();
 				setCollisionShape(collider->GetCollisionShape());
+				this->setUserPointer(collider);
+				collider->SetAttachedRigidbody(this);
+				collider->SetTrigger(collider->IsTrigger());
 				UpdateRigidbodyMass();
 				if(removed)
 					Physics::AddRigidBody(this);
@@ -153,17 +156,7 @@ namespace thomas
 				}
 			}
 
-			void Rigidbody::SetTargetCollider(GameObject* collider)
-			{
-				if (m_targetCollider == nullptr)
-				{
-					m_targetCollider = std::make_unique<GameObject>("");					
-				}
-
-				// Don't change the pointer if target collider has not been updated
-				if(m_targetCollider.get() != collider)
-					*m_targetCollider = *collider;
-			}
+			
 
 			void Rigidbody::AddTorque(const math::Vector3 & torque, ForceMode mode)
 			{
@@ -188,23 +181,7 @@ namespace thomas
 				else if (mode == ForceMode::Impulse)
 					this->applyImpulse(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
-
-			GameObject * Rigidbody::GetTargetCollider()
-			{
-				if (m_targetCollider != nullptr)
-				{
-					if (this->hasContactResponse() && m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
-						return m_targetCollider.get();
-				}
-
-				return nullptr;
-			}
-
-			void Rigidbody::ClearTargetCollider()
-			{
-				m_targetCollider.reset();
-			}
-
+						
 			float Rigidbody::GetMass() const
 			{
 				return m_mass;
