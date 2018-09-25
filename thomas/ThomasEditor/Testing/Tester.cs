@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using CommandLine;
 using ThomasEditor;
+using ThomasEngine;
 
 namespace ThomasEditor.Testing
 {
@@ -49,6 +50,16 @@ namespace ThomasEditor.Testing
             });
             stopwatch = new Stopwatch();
             stopwatch.Start();
+            //Application.currentProjectChanged += SceneDone;
+            Scene.OnCurrentSceneChanged += SceneDone;
+        }
+
+        public void SceneDone(Scene newScene)
+        {
+            if (newScene != null)
+            {
+                ThomasWrapper.Play();
+            }
         }
 
         public void Update()
