@@ -212,6 +212,7 @@ namespace ThomasEngine {
 		ThomasEngine::Resources::OnPlay();
 		Scene::CurrentScene->Play();
 		playing = true;
+		OnStartPlaying();
 
 	}
 
@@ -235,6 +236,7 @@ namespace ThomasEngine {
 			if (gObj)
 				s_Selection->SelectGameObject(gObj);
 		}
+		OnStopPlaying();
 
 	}
 

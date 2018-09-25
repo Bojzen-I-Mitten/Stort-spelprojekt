@@ -22,7 +22,6 @@ namespace ThomasEditor
     public partial class MainWindow : Window
     {
         
-        double scrollRatio = 0;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
@@ -163,24 +162,24 @@ namespace ThomasEditor
 
         private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                if (e.NewItems != null)
-                {
-                    foreach (String output in e.NewItems)
-                    {
-                        TextBlock block = new TextBlock
-                        {
-                            Text = output,
-                            TextWrapping = TextWrapping.Wrap
-                        };
-                        console.Items.Add(block);
-                        console.Items.Add(new Separator());
-                        if (console.Items.Count > 10)
-                            console.Items.RemoveAt(0);
-                    }
-                } 
-            }));
+            //this.Dispatcher.BeginInvoke((Action)(() =>
+            //{
+            //    if (e.NewItems != null)
+            //    {
+            //        foreach (String output in e.NewItems)
+            //        {
+            //            TextBlock block = new TextBlock
+            //            {
+            //                Text = output,
+            //                TextWrapping = TextWrapping.Wrap
+            //            };
+            //            console.Items.Add(block);
+            //            console.Items.Add(new Separator());
+            //            if (console.Items.Count > 10)
+            //                console.Items.RemoveAt(0);
+            //        }
+            //    } 
+            //}));
             
         }
 
@@ -251,33 +250,7 @@ namespace ThomasEditor
         }
 
 
-        private void Console_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-
-            ScrollViewer scrollViewer = Extensions.GetDescendantByType<ScrollViewer>(sender as ListBox);
-
-            if (e.ExtentWidthChange != 0 || e.ExtentHeightChange != 0)
-            {
-                //calculate and set accordingly
-                double offset = scrollRatio * e.ExtentHeight - 0.5 * e.ViewportHeight;
-                //see if it is negative because of initial values
-                if (offset < 0)
-                {
-                    //center the content
-                    //this can be set to 0 if center by default is not needed
-                    offset = 0.5 * scrollViewer.ScrollableHeight;
-                }
-                scrollViewer.ScrollToVerticalOffset(offset);
-            }
-            else
-            {
-                //store the relative values if normal scroll
-                if(e.ExtentHeight > 0)
-                    scrollRatio = (e.VerticalOffset + 0.5 * e.ViewportHeight) / e.ExtentHeight;
-            }
-
-
-        }
+        
 
         private void Recompile_Shader_Click(object sender, RoutedEventArgs e)
         {

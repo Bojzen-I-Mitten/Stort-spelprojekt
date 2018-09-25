@@ -22,6 +22,12 @@ namespace ThomasEngine {
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 	public:
+		delegate void StartPlayEvent();
+		delegate void StopPlayingEvent();
+		delegate void PausePlayEvent();
+		static event StartPlayEvent^ OnStartPlaying;
+		static event StopPlayingEvent^ OnStopPlaying;
+
 		enum class ManipulatorOperation {
 			TRANSLATE,
 			ROTATE,

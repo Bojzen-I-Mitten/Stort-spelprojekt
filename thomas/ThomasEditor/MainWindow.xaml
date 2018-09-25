@@ -155,8 +155,7 @@
                                     <local:AssetBrowser/>
                                 </xcad:LayoutAnchorable>
                                     <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
-                                    <ListBox Name="console" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged">
-                                    </ListBox>
+                                    <local:Console/>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>
