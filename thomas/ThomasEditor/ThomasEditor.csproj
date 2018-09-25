@@ -171,6 +171,7 @@
     <Compile Include="Elements\AssetBrowser.xaml.cs">
       <DependentUpon>AssetBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\MultiSelectTreeView.cs" />
     <Compile Include="Inspectors\Converters.cs" />
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
@@ -185,6 +186,7 @@
     <Compile Include="Inspectors\TextureEditor.xaml.cs">
       <DependentUpon>TextureEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TreeItemViewModel.cs" />
     <Compile Include="utils\CustomCommands.cs" />
     <Compile Include="utils\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Inspectors\ExtendedPropertyGrid.xaml.cs">

@@ -7,9 +7,13 @@ using System.Windows.Data;
 
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 using ThomasEditor.Inspectors;
 using ThomasEngine;
+using HierarchyTreeView;
+
 namespace ThomasEditor
 {
     /// <summary>
@@ -21,6 +25,7 @@ namespace ThomasEditor
         bool _isDragging;
         bool wasUnselected = false;
         public static GameObjectHierarchy instance;
+        private List<TreeViewItem> selectedHierarchyItems = new List<TreeViewItem>();
         public GameObjectHierarchy()
         {
             InitializeComponent();
@@ -33,23 +38,42 @@ namespace ThomasEditor
 
         private void Scene_OnCurrentSceneChanged(Scene newScene)
         {
-            if(newScene != null)
+            if (newScene != null)
             {
                 ResetTreeView();
                 newScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
             }
-                
+
         }
+
+        public List<TreeItemViewModel> RootNodes { get; set; }
+
+        public ObservableCollection<TreeItemViewModel> SelectedNodes { get; set; }
 
         private void ResetTreeView()
         {
+
+
             this.Dispatcher.Invoke((Action)(() =>
             {
                 hierarchy.Items.Clear();
+
+                List<TreeItemViewModel> newHierarchy = new List<TreeItemViewModel>();
+
                 foreach (GameObject gObj in Scene.CurrentScene.GameObjects)
                 {
                     if (gObj.transform.parent == null)
                     {
+                        TreeItemViewModel item = new TreeItemViewModel(gObj.Name)
+                        {
+                            IsExpanded = true,
+                            Children = BuildTree(gObj.transform)
+                        };
+                        newHierarchy.Add(item);
+
+
+
+
                         TreeViewItem node = new TreeViewItem { DataContext = gObj };
                         //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                         node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
@@ -58,6 +82,8 @@ namespace ThomasEditor
                         hierarchy.Items.Add(node);
                     }
                 }
+
+                RootNodes = newHierarchy;
             }));
         }
 
@@ -100,7 +126,7 @@ namespace ThomasEditor
             //       // childNode.Padding = new Thickness(0, 0, 0, 2);
             //    }
 
-        //}));
+            //}));
         }
 
         private TreeViewItem FindNode(ItemCollection nodes, GameObject gameObject)
@@ -115,7 +141,23 @@ namespace ThomasEditor
                 if (child != null) return child;
             }
             return null;
-            
+
+        }
+
+        private List<TreeItemViewModel> BuildTree(ThomasEngine.Transform parent)
+        {
+            List<TreeItemViewModel> children = new List<TreeItemViewModel>();
+
+            foreach (ThomasEngine.Transform child in parent.children)
+            {
+                TreeItemViewModel item = new TreeItemViewModel(child.Name)
+                {
+                    IsExpanded = true,
+                    Children = BuildTree(child.transform)
+                };
+                children.Add(item);
+            }
+            return children;
         }
 
         private void BuildTree(ThomasEngine.Transform parent, TreeViewItem parentTree)
@@ -261,15 +303,16 @@ namespace ThomasEditor
                 if (item != null)
                 {
                     Inspector.instance.SelectedObject = (GameObject)item.DataContext;
-                    
+
                     if (!ThomasWrapper.Selection.Contain((GameObject)item.DataContext))
                         ThomasWrapper.Selection.SelectGameObject((GameObject)item.DataContext);
                     hiearchyContextMenu.DataContext = true;
                 }
 
-            }else
+            }
+            else
             {
-                if(Inspector.instance.SelectedObject is GameObject)
+                if (Inspector.instance.SelectedObject is GameObject)
                     Inspector.instance.SelectedObject = null;
             }
             ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
@@ -396,10 +439,22 @@ namespace ThomasEditor
 
         private void hierarchy_MouseUp(object sender, MouseButtonEventArgs e)
         {
+
             if (_isDragging)
                 return;
+            //if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            //{
+            //    TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
+            //    if (item != null)
+            //    {
+            //        item.IsSelected = true;
+            //        selectedHierarchyItems.Add(item);
+            //    }
+            //}
+            //else
+            //    selectedHierarchyItems.Clear();
             TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
-            if(item != null)
+            if (item != null)
                 item.IsSelected = true;
         }
     }
