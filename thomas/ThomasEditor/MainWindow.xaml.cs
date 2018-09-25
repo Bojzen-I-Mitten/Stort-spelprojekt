@@ -464,8 +464,6 @@ namespace ThomasEditor
         //Main window CTRL + C
         private void MW_CopyObject(object sender, RoutedEventArgs e)
         {
-            Debug.Log("Entered copy function..");
-
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
             TreeViewItem item = hierarchy.GetSelection();
 
@@ -480,12 +478,12 @@ namespace ThomasEditor
                 }
                 return;
             }
-            Debug.Log("No object selected __ MW.");
         }
 
         //Main window CTRL + V
         private void MW_PasteObject(object sender, RoutedEventArgs e)
         {
+            Debug.Log("Pasting object..");
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
 
             if (hierarchy.GetCopy())
@@ -496,8 +494,6 @@ namespace ThomasEditor
 
                 return;
             }
-
-            Debug.Log("No copied object to paste.");
         }
 
         //Can only be copied if item is selected
@@ -511,6 +507,7 @@ namespace ThomasEditor
                 e.CanExecute = true;
                 return;
             }
+            Debug.Log("No object selected __ MW.");
         }
 
         //Can only paste when an object has been copied
@@ -520,7 +517,9 @@ namespace ThomasEditor
             if (hierarchy.GetCopy())
             {
                 e.CanExecute = true;
+                return;
             }
+            Debug.Log("No copied object to paste.");
         }
 
         #endregion

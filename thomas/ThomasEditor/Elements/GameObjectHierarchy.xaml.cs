@@ -159,6 +159,7 @@ namespace ThomasEditor
                         if (newItem.transform.parent == null)
                         {
                             TreeViewItem node = new TreeViewItem { DataContext = newItem };
+                            node.IsSelected = true;
                             //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                             node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
                             //node.Padding = new Thickness(0, 0, 0, 2);
@@ -423,7 +424,6 @@ namespace ThomasEditor
                 }
                 return;
             }
-            Debug.Log("No object selected __ GOH.");
         }
 
         private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
@@ -433,11 +433,8 @@ namespace ThomasEditor
                 GameObject.Instantiate(m_copiedObject);
 
                 Debug.Log("Pasted object.");
-
                 return;
             }
-
-            Debug.Log("No copied object to paste.");
         }
 
         //Can only click copy when an object is selected
