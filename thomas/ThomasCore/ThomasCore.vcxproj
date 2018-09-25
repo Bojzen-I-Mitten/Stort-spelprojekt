@@ -22,7 +22,7 @@
   <ItemGroup>
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
-    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyFunction.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
     <ClCompile Include="src\thomas\System.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
@@ -129,12 +129,12 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyColor.h" />
-    <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyFunction.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyMatrix.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarBool.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarFloat.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarInt.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyShaderResource.h" />
+    <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />

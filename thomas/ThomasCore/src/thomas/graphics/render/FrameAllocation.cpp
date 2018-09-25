@@ -65,8 +65,9 @@ namespace thomas{
 			}
 
 			void* FrameAllocation::allocData(uint32_t off) {
+				void *ptr = reinterpret_cast<char*>(m_dataAlloc) + m_allocatedBytes;
 				m_allocatedBytes += off;
-				return reinterpret_cast<char*>(m_dataAlloc) + off;
+				return ptr;
 			}
 
 			void FrameAllocation::copy(resource::shaderproperty::ShaderPropertyStruct & info)

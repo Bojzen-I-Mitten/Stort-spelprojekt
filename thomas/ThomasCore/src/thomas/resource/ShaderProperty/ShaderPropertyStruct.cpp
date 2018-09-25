@@ -1,4 +1,4 @@
-#include "ShaderPropertyFunction.h"
+#include "ShaderPropertyStruct.h"
 
 namespace thomas
 {
@@ -20,14 +20,14 @@ namespace thomas
 			}
 			void ApplyEffectMatrix(const ShaderPropertyStruct& info, Shader* shader)
 			{
-				shader->GetEffect()->GetVariableByIndex(info.m_effect_id)->AsMatrix()->SetMatrix(reinterpret_cast<const float*>(info.m_data));
+				shader->GetEffect()->GetVariableByIndex(info.m_effect_id)->AsMatrix()->SetMatrixTranspose(reinterpret_cast<const float*>(info.m_data));
 			}
 			void ApplyEffectMatrixDynamic(const ShaderPropertyStruct& info, Shader* shader)
 			{
 				uint32_t index;
 				if (shader->GetPropertyIndex(info.m_effect_id, index)) 
 					return;
-				shader->GetEffect()->GetVariableByIndex(index)->AsMatrix()->SetMatrix(reinterpret_cast<const float*>(info.m_data));
+				shader->GetEffect()->GetVariableByIndex(index)->AsMatrix()->SetMatrixTranspose(reinterpret_cast<const float*>(info.m_data));
 			}
 
 
@@ -35,14 +35,14 @@ namespace thomas
 			{
 				if (info.m_dataSize == 0)
 					return;
-				shader->GetEffect()->GetVariableByIndex(info.m_effect_id)->AsMatrix()->SetMatrixArray(reinterpret_cast<const float*>(info.m_data), 0, info.m_dataSize / 64);
+				shader->GetEffect()->GetVariableByIndex(info.m_effect_id)->AsMatrix()->SetMatrixTransposeArray(reinterpret_cast<const float*>(info.m_data), 0, info.m_dataSize / 64);
 			}
 			void ApplyEffectMatrixDynamicArray(const ShaderPropertyStruct& info, Shader* shader)
 			{
 				uint32_t index;
 				if (shader->GetPropertyIndex(info.m_effect_id, index) || info.m_dataSize == 0)
 					return;
-				shader->GetEffect()->GetVariableByIndex(index)->AsMatrix()->SetMatrixArray(reinterpret_cast<const float*>(info.m_data), 0, info.m_dataSize / 64);
+				shader->GetEffect()->GetVariableByIndex(index)->AsMatrix()->SetMatrixTransposeArray(reinterpret_cast<const float*>(info.m_data), 0, info.m_dataSize / 64);
 			}
 
 		}

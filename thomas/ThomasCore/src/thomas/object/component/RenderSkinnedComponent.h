@@ -1,6 +1,5 @@
 #pragma once
 #include "RenderComponent.h"
-#include "../../resource/ShaderProperty/ShaderPropertyFunction.h"
 #include "../../utils/Math.h"
 namespace thomas
 {

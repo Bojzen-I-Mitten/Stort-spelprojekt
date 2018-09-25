@@ -65,7 +65,7 @@ namespace thomas
 			void RenderSkinnedComponent::applySkin()
 			{
 				if (m_skeleton) {
-					m_skinInfo->m_dataSize = m_skeleton->boneCount() * 64;
+					m_skinInfo->m_dataSize = m_skeleton->boneCount() * sizeof(math::Matrix);
 					m_skinInfo->m_data = m_skeleton->getSkin();
 				}
 				else {

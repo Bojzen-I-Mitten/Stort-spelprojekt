@@ -1,5 +1,5 @@
 #pragma once
-#include "../../resource/ShaderProperty/ShaderPropertyFunction.h"
+#include "../../resource/ShaderProperty/ShaderPropertyStruct.h"
 
 #include<vector>
 

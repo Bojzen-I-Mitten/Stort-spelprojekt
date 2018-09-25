@@ -684,6 +684,7 @@ namespace thomas
 				err.append(std::to_string(channel->mNumPositionKeys + channel->mNumRotationKeys + channel->mNumScalingKeys));
 				LOG(err);
 				return; //This channel does not animate a bone.
+			}
 			anim._boneHash[bone] = utility::hash(construct.m_boneInfo[bone]._boneName.c_str());
 			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}

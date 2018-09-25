@@ -1,7 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "../../utils/Math.h"
-#include "../../resource/ShaderProperty/ShaderPropertyFunction.h"
+#include "../../resource/ShaderProperty/ShaderPropertyStruct.h"
 namespace thomas
 {
 	namespace graphics {struct RenderPair; }

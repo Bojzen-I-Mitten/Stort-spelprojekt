@@ -4,7 +4,7 @@
 #include <vector>
 #include "../../utils/Math.h"
 #include "FrameAllocation.h"
-#include "../../resource/ShaderProperty/ShaderPropertyFunction.h"
+#include "../../resource/ShaderProperty/ShaderPropertyStruct.h"
 
 namespace thomas {
 
