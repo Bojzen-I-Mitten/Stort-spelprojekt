@@ -16,7 +16,7 @@ namespace thomas {
 				: public IBlendTree
 			{
 			public:
-				AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref);
+				AnimatedSkeleton(Skeleton& ref);
 				~AnimatedSkeleton();
 
 				void update(float dT);
@@ -40,8 +40,6 @@ namespace thomas {
 				*/
 				virtual const math::Matrix& getBoneMatrix(unsigned int bone) const;
 				virtual const std::string& getBoneName(unsigned int bone) const;
-
-				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
 
 			private:
 				Skeleton& _ref;									// Reference to the mesh skeleton

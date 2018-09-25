@@ -427,7 +427,7 @@ namespace thomas
 			graphics::animation::Bone bi;
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
-			bi._boneHash = hash(boneName.c_str());
+			bi._boneHash = utility::hash(boneName.c_str());
 			bi._parentIndex = parentBone;
 			if (parentBone != -1) {	// Parented bone
 				boneMap.m_relativeParent.push_back(aiMatrix4x4());
@@ -662,7 +662,7 @@ namespace thomas
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 			if (bone < 0)
 				return; //This channel does not animate a bone.
-			anim._boneHash[bone] = hash(construct.m_boneInfo[bone]._boneName.c_str());
+			anim._boneHash[bone] = utility::hash(construct.m_boneInfo[bone]._boneName.c_str());
 			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}
 

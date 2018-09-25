@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "../../utils/Math.h"
+#include "../../resource/ShaderProperty/ShaderPropertyFunction.h"
 namespace thomas
 {
 	namespace graphics {struct RenderPair; }
@@ -45,10 +46,10 @@ namespace thomas
 				/*	Insert a shader property for rendering component.
 				 * WARNING!: Append only on initialization (or make safe with parameters passed to Renderer) 
 				*/
-				void insertProperty(const resource::shaderproperty::ShaderProperty* prop);
+				resource::shaderproperty::ShaderPropertyStatic& insertProperty(resource::shaderproperty::ShaderPropertyStatic prop);
 			private:
 				static std::vector<RenderComponent*> s_renderComponents;
-				std::vector< resource::shaderproperty::ShaderProperty const*> m_properties;
+				std::vector<resource::shaderproperty::ShaderPropertyStatic> m_properties;
 				//graphics::Geometry* m_geometry;
 			};
 		}

@@ -406,7 +406,7 @@ namespace thomas
 		void Gizmos::ImguiStringUpdate(std::string text, math::Vector2 pos)
 		{
 
-			ImguiStringUpdate(text, math::Vector2(text.size() * 8 + 5, 0), pos);
+			ImguiStringUpdate(text, math::Vector2(text.size() * 8.f + 5.f, 0.f), pos);
 		}
 
 	}

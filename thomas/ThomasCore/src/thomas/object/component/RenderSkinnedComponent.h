@@ -31,7 +31,7 @@ namespace thomas
 				graphics::animation::IBlendTree* GetBlendTree();
 			public:
 			private:
-				resource::shaderproperty::ShaderPropertyStruct& m_skinInfo;
+				resource::shaderproperty::ShaderPropertyStatic* m_skinInfo;
 				std::unique_ptr<graphics::animation::AnimatedSkeleton> m_skeleton;
 
 				void applySkin();

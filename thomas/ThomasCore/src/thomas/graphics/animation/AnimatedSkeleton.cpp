@@ -10,10 +10,9 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref) :
+			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) :
 				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(ref.getNumBones())
 			{
-				_skin->resize(ref.getNumBones());
 				clearBlendTree();
 				updateSkeleton();
 			}
@@ -90,10 +89,6 @@ namespace thomas {
 			const std::string & AnimatedSkeleton::getBoneName(unsigned int bone) const
 			{
 				return _ref.getBone(bone)._boneName;
-			}
-			const resource::shaderproperty::ShaderPropertyMatrixArray * AnimatedSkeleton::getShaderProperty()
-			{
-				return _skin;
 			}
 		}
 	}

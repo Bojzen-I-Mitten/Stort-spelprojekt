@@ -6,11 +6,23 @@ namespace thomas
 	{
 		namespace shaderproperty
 		{
-			void ApplyEffectMatrix(ShaderPropertyStruct& info, Shader* shader)
+			bool ShaderPropertyStruct::operator==(const ShaderPropertyStruct& other) const
+			{
+#ifdef _DEBUG
+				if (m_effect_id == other.m_effect_id) {
+					assert(m_type == m_type && m_effectName == other.m_effectName);	// Verify everything is correct.
+					return true;
+				}
+				return false;
+#else
+				return  m_effect_id == other.m_effect_id;
+#endif
+			}
+			void ApplyEffectMatrix(const ShaderPropertyStruct& info, Shader* shader)
 			{
 				shader->GetEffect()->GetVariableByIndex(info.m_effect_id)->AsMatrix()->SetMatrix(reinterpret_cast<const float*>(info.m_data));
 			}
-			void ApplyEffectMatrixDynamic(ShaderPropertyStruct& info, Shader* shader)
+			void ApplyEffectMatrixDynamic(const ShaderPropertyStruct& info, Shader* shader)
 			{
 				uint32_t index;
 				if (shader->GetPropertyIndex(info.m_effect_id, index)) 
@@ -19,13 +31,13 @@ namespace thomas
 			}
 
 
-			void ApplyEffectMatrixArray(ShaderPropertyStruct& info, Shader* shader)
+			void ApplyEffectMatrixArray(const ShaderPropertyStruct& info, Shader* shader)
 			{
 				if (info.m_dataSize == 0)
 					return;
 				shader->GetEffect()->GetVariableByIndex(info.m_effect_id)->AsMatrix()->SetMatrixArray(reinterpret_cast<const float*>(info.m_data), 0, info.m_dataSize / 64);
 			}
-			void ApplyEffectMatrixDynamicArray(ShaderPropertyStruct& info, Shader* shader)
+			void ApplyEffectMatrixDynamicArray(const ShaderPropertyStruct& info, Shader* shader)
 			{
 				uint32_t index;
 				if (shader->GetPropertyIndex(info.m_effect_id, index) || info.m_dataSize == 0)
