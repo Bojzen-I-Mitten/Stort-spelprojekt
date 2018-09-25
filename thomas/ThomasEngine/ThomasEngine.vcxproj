@@ -163,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\AutoProfile.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\math\Curve.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
+    <ClInclude Include="src\ProfileManager.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\resource\Model.h" />
@@ -207,6 +209,7 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\AutoProfile.cpp" />
     <ClCompile Include="src\Debug.cpp" />
     <ClCompile Include="src\GUI\editor\GUI.cpp" />
     <ClCompile Include="src\Input.cpp" />
@@ -218,6 +221,7 @@
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\ProfileManager.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />

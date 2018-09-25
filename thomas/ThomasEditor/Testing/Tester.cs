@@ -69,7 +69,6 @@ namespace ThomasEditor.Testing
         {
             if (stopwatch.ElapsedMilliseconds > sessionDuration)
             {
-                
                 // Session should terminate, as we have exceed the 
                 // time the session should run
                 System.Windows.Application.Current.Shutdown();
