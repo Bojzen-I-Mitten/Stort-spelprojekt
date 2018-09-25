@@ -42,12 +42,12 @@ namespace ThomasEngine.Network
         public DeletePrefabEvent() { netID = -1; }
     }
 
-    public class ConnectToAllEvent
+    public class ConnectToPeerEvent
     {
         public long IP { get; set; }
         public int port { get; set; }
 
-        public ConnectToAllEvent() { IP = -1; port = -1; }
+        public ConnectToPeerEvent() { IP = -1; port = -1; }
     }
 
     public enum PacketType
@@ -103,14 +103,14 @@ namespace ThomasEngine.Network
             //Here all events are defined.
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
-            listener.PeerConnectedEvent += New_Listener_PeerConnectedEvent;
-            listener.PeerDisconnectedEvent += New_Listener_PeerDisconnectedEvent;
+            listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+            listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
             SubscribeToEvent<ExamplePacket>(ExamplePacket.PrintPacket);
             SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
             SubscribeToEvent<DeletePrefabEvent>(DeletePrefabEventHandler);
-            SubscribeToEvent<ConnectToAllEvent>(ConnectToAllEventHandler);
+            SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
 
             //Stäng av alla nätverksobjekt som finns i scenen.
 
@@ -123,14 +123,14 @@ namespace ThomasEngine.Network
         //    if (isClient) //client
         //    {
         //        netManager.Start();
-        //        netManager.Connect(IP /* host ip or name */, 9050 /* port */, "SomeConnectionKey" /* text key or NetDataWriter */); //Do this second if IP is not empty
+        //        netManager.Connect(IP /* host ip or name */, 9050 /* port */, "SomeConnectionKey" /* text key or NetDataWriter */);
         //    }
         //    else //server
         //    {
         //        InitServerNTP();
-        //        netManager.Start(9050 /* port */); //Do this first.
+        //        netManager.Start(9050 /* port */);
         //        serverPeer = new NetPeer(netManager, null);
-        //        SpawnPlayerCharacter(serverPeer);
+        //        //SpawnPlayerCharacter(serverPeer);
         //        //Starta nätverksobjekten som finns i scenen och registera dem.
         //    }
 
@@ -139,87 +139,61 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
-            netManager.Start();
-            if (IP != "")
-            {
-                //Check format of IP.
-                netManager.Connect(IP, port, "SomeConnectionkey");
-                //SpawnPlayerCharacter(serverPeer);
-            }
-
-            Debug.Log("Server started on port " + netManager.LocalPort.ToString());
+            InitServerNTP();
+            netManager.Start(port);
+            serverPeer = new NetPeer(netManager, null);
         }
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-
             if (isServer)
             {
                 ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
-                RemovePlayerCharacter(peer);
+                //RemovePlayerCharacter(peer);
             }
             else
             {
                 ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
+
 
                 List<int> keys = new List<int>(networkIDObjects.Keys);
                 foreach (int key in keys)
                 {
                     DeleteAndUnregister(key);
                 }
-            }
-        }
 
-        private void Listener_PeerConnectedEvent(NetPeer peer)
-        {
-            if (isServer)
-            {
-                ThomasEngine.Debug.Log("A client has connected with the IP" + peer.EndPoint.ToString());
-
-                //Skicka över vilka Idn objekten ska ha i scenen
-                //Send all other players to the new player
-                SpawnExistingPlayers(peer);
-                //Create and share new player
-                SpawnPlayerCharacter(peer);
-            }
-            else
-            {
-                //Ta emot objekt i scenen eller nått :)
-                ThomasEngine.Debug.Log("You are now connected with the server" + peer.EndPoint.ToString());
             }
 
         }
 
-        private void New_Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
+        private void Listener_PeerConnectedEvent(NetPeer _peer)
         {
-            ThomasEngine.Debug.Log("The peer you were connected to has disconnected with the IP" + peer.EndPoint.ToString());
-            //RemovePlayerCharacter(peer);
-
-            //List<int> keys = new List<int>(networkIDObjects.Keys);
-            //foreach (int key in keys)
+            //if (isServer)
             //{
-            //    DeleteAndUnregister(key);
+            //    ThomasEngine.Debug.Log("A client has connected with the IP" + _peer.EndPoint.ToString());
+
+            //    //Skicka över vilka Idn objekten ska ha i scenen
+            //    //Send all other players to the new player
+            //    //SpawnExistingPlayers(peer);
+            //    //Create and share new player
+            //    //SpawnPlayerCharacter(peer);
             //}
-        }
-
-        private void New_Listener_PeerConnectedEvent(NetPeer _peer)
-        {
-            //Ta emot objekt i scenen eller nått :)
-            ThomasEngine.Debug.Log("You are now connected with the peer" + _peer.EndPoint.ToString());
-
+            //else
+            //{
+            //    //Ta emot objekt i scenen eller nått :)
+            //    ThomasEngine.Debug.Log("You are now connected with the server" + _peer.EndPoint.ToString());
+            //}
+            ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
             foreach (NetPeer peer in netPeers)
             {
-                ConnectToAllEvent connectTo = new ConnectToAllEvent
+                ConnectToPeerEvent connectEvent = new ConnectToPeerEvent
                 {
                     IP = BitConverter.ToInt64(peer.EndPoint.Address.GetAddressBytes(), 0),
                     port = peer.EndPoint.Port
                 };
-
-                SendEvent(connectTo, DeliveryMethod.ReliableOrdered);
+                SendEvent(connectEvent, DeliveryMethod.ReliableOrdered);
             }
-
         }
-
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
         {
             if (isServer)
@@ -283,6 +257,8 @@ namespace ThomasEngine.Network
                 GUI.ImguiStringUpdate(netManager.GetFirstPeer().Ping.ToString(), new Vector2(0, 0));
             if (Input.GetKey(Input.Keys.P))
                 Diagnostics();
+            if (Input.GetKey(Input.Keys.K))
+                netManager.Connect(IP, port, "SomeConnectionKey");
 
 
         }
@@ -447,6 +423,15 @@ namespace ThomasEngine.Network
             DeleteAndUnregister(deleteEvent.netID);
         }
 
+        public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
+        {
+            long address = connectEvent.IP;
+            int port = connectEvent.port;
+
+            System.Net.IPEndPoint ipep = new System.Net.IPEndPoint(address, port);
+            netManager.Connect(ipep, "SomeConnectionKey");
+        }
+
         private void RemovePlayerCharacter(NetPeer disconnectedPeer)
         {
 
@@ -464,7 +449,6 @@ namespace ThomasEngine.Network
             };
             SendEventToAllBut(deleteEvent, DeliveryMethod.ReliableOrdered, disconnectedPeer); //tell old clients to spawn object
         }
-
 
         private void SpawnExistingPlayers(NetPeer newPlayer)
         {
@@ -527,30 +511,5 @@ namespace ThomasEngine.Network
 
         }
 
-        public void ConnectToAllEventHandler(ConnectToAllEvent connectEvent, NetPeer peer)
-        {
-            long newIP = connectEvent.IP;
-            int port = connectEvent.port;
-
-            System.Net.IPEndPoint ipep = new System.Net.IPEndPoint(newIP, port);
-            NetPeer newPeer = new NetPeer(netManager, ipep);
-
-            bool add = true;
-
-            foreach (NetPeer existingPeer in netPeers)
-            {
-                if (existingPeer.EndPoint.Address.GetAddressBytes() == newPeer.EndPoint.Address.GetAddressBytes())
-                {
-                    add = false;
-                    break;
-                }
-            }
-
-            if (add)
-            {
-                netPeers.Add(newPeer);
-                netManager.Connect(newPeer.EndPoint.Address.ToString(), newPeer.EndPoint.Port, "SomeConnectionKey");
-            }
-        }
     }
 }
