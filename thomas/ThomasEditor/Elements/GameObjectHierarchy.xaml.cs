@@ -408,11 +408,13 @@ namespace ThomasEditor
 
         private void MenuItem_CopyGameObject(object sender, ExecutedRoutedEventArgs e)
         {
+            Debug.Log("Entered copy function..");
+
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
 
             if (item != null)
             {
-                Debug.Log("Ready to copy..");
+                Debug.Log("Copying object..");
                 m_copiedObject = (GameObject)item.DataContext;
 
                 if(m_copiedObject)

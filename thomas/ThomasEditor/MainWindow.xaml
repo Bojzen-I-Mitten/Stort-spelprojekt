@@ -23,6 +23,7 @@
         <CommandBinding Command="commands:CustomCommands.GetPlay" CanExecute="Play_CanExecute" Executed="PlayPauseButton_Click" />
         <CommandBinding Command="commands:CustomCommands.Save" Executed="SaveScene_Click" />
         <CommandBinding Command="commands:CustomCommands.Open" Executed="LoadScene_Click"/>
+        <CommandBinding <!--="commands:CustomCommands.GetCopyObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_CopyGameObject" />-->
     </Window.CommandBindings>
 
     <Window.Resources>
