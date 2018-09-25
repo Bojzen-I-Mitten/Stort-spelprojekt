@@ -26,11 +26,18 @@ namespace ThomasEditor.Testing
         private MainWindow editor;
         private Stopwatch stopwatch;
         private string tempStringProjectPath;
-        public Tester(MainWindow editor, string[] args)
+        public Tester(MainWindow editor)
         {
             
             this.editor = editor;
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            //Application.currentProjectChanged += SceneDone;
+            Scene.OnCurrentSceneChanged += SceneDone;
+        }
 
+        public void Parse(string[] args)
+        {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
                 if (o.Filename.Length > 0)
@@ -48,17 +55,13 @@ namespace ThomasEditor.Testing
                     sessionDuration = 11000000;
                 }
             });
-            stopwatch = new Stopwatch();
-            stopwatch.Start();
-            //Application.currentProjectChanged += SceneDone;
-            Scene.OnCurrentSceneChanged += SceneDone;
         }
 
         public void SceneDone(Scene newScene)
         {
             if (newScene != null)
             {
-                ThomasWrapper.Play();
+                //ThomasWrapper.Play();
             }
         }
 
@@ -66,6 +69,7 @@ namespace ThomasEditor.Testing
         {
             if (stopwatch.ElapsedMilliseconds > sessionDuration)
             {
+                
                 // Session should terminate, as we have exceed the 
                 // time the session should run
                 System.Windows.Application.Current.Shutdown();

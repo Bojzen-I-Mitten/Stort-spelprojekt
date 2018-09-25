@@ -51,9 +51,18 @@ namespace ThomasEditor
             CompositionTarget.Rendering += DoUpdates;
             ThomasWrapper.OutputLog.CollectionChanged += OutputLog_CollectionChanged;
 
-            if (Properties.Settings.Default.latestProjectPath != "")
-                OpenProject(Properties.Settings.Default.latestProjectPath);
 
+            tester = new Tester(this);
+            // Hi there, jag hörde att du gillade fin kod, 
+            // Så jag skrev det här för att pigga upp dig.
+            if (ThomasEditor.App.args.Args.Length > 0)
+            {
+                tester.Parse(ThomasEditor.App.args.Args);
+            }
+            else if (Properties.Settings.Default.latestProjectPath != "")
+            {
+                OpenProject(Properties.Settings.Default.latestProjectPath);
+            }
 
             LoadLayout();
             Closing += MainWindow_Closing;
@@ -61,7 +70,7 @@ namespace ThomasEditor
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
-            tester = new Tester(this, ThomasEditor.App.args.Args);
+
 
         }
 
