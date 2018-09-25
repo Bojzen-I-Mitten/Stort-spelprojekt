@@ -9,8 +9,10 @@ Texture2D specularTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
+    float4 color : COLOR;
     float smoothness;
 };
+
 
 SamplerState StandardWrapSampler
 {
@@ -33,7 +35,6 @@ RasterizerState TestRasterizer
     FrontCounterClockWise = TRUE;
     DepthClipEnable = FALSE;
 };
-
 
 BlendState AlphaBlendingOn
 {
@@ -82,16 +83,15 @@ float4 frag(v2f input) : SV_TARGET
 {
     float4 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
     float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
-    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord).x;
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
 
     normal = normalize(normal * 2.0f - 1.0f);
     normal = normalize(mul(normal, input.TBN));
 
-    diffuse.xyz = pow(diffuse.xyz + AddLights(input.worldPos.xyz, normal, specularMapFactor, 16), 0.4545454545f); //gamma correction
+    diffuse.xyz = pow(diffuse.xyz * color.xyz / 255.0f + AddLights(input.worldPos.xyz, normal, specularMapFactor, smoothness + 1), 0.4545454545f); //gamma correction
 
     return saturate(diffuse);
 }
-
 
 technique11 Standard
 {

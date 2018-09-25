@@ -88,7 +88,8 @@ namespace ThomasEngine {
 			}
 			else if (t == System::Single::typeid)
 			{
-				//SetRaw(key, &prop);
+				float v = (float)prop;
+				SetFloat(key, v);
 			}
 		}
 		if (m_loaded && !ThomasWrapper::IsPlaying())

@@ -11,11 +11,6 @@ cbuffer LightCountsStruct
     uint nrOfAreaLights;
 };
 
-cbuffer MaterialProperties
-{
-    float shininess;
-};
-
 struct LightStruct
 {
     float3 colorDiffuse;
