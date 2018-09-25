@@ -11,24 +11,42 @@ namespace ThomasEditor.Testing
 {
     public class Options
     {
-        [Option('f', "filename", Required = false)]
-        public bool Filename { get; set; }
+        [Option]
+        public string Filename { get; set; }
+
+        [Option]
+        public int Duration { get; set; }
     }
+
 
     class Tester
     {
+        private int sessionDuration;
+        private MainWindow editor;
         private Stopwatch stopwatch;
-        private long sessionDuration;
-        public Tester(long sessionDuration, string[] args)
+        private string tempStringProjectPath;
+        public Tester(MainWindow editor, string[] args)
         {
+            
+            this.editor = editor;
+
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                if (o.Filename)
+                if (o.Filename.Length > 0)
                 {
-                    o.Filename.ToString();
+                    editor.OpenProject(o.Filename);
+                    tempStringProjectPath = o.Filename;
+                }
+
+                if (o.Duration > 0)
+                {
+                    sessionDuration = o.Duration;
+                }
+                else
+                {
+                    sessionDuration = 11000000;
                 }
             });
-            this.sessionDuration = sessionDuration;
             stopwatch = new Stopwatch();
             stopwatch.Start();
         }

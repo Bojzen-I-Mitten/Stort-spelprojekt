@@ -61,12 +61,7 @@ namespace ThomasEditor
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
-            tester = new Tester(200000, ThomasEditor.App.args.Args);
-            if (ThomasEditor.App.args.Args.Length == 1)
-            {
-                // all code should be dispatched to tester for interp
-                OpenProject(ThomasEditor.App.args.Args[0]);
-            }
+            tester = new Tester(this, ThomasEditor.App.args.Args);
 
         }
 
