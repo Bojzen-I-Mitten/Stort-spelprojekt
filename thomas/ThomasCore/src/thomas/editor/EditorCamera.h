@@ -71,7 +71,6 @@ namespace thomas
 			float m_rotationX;
 			float m_rotationY;
 			float m_speed;
-			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
 			bool m_selectedObject;
