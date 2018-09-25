@@ -102,7 +102,7 @@ namespace thomas
 				aiProcess_CalcTangentSpace |
 				aiProcess_FlipUVs |
 				aiProcess_ConvertToLeftHanded |
-				aiProcess_LimitBoneWeights
+				aiProcess_LimitBoneWeights			// Bone weight limit (4 by default)
 			);
 
 			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
