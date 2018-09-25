@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -404,6 +406,11 @@ namespace ThomasEditor
                 item.IsSelected = true;
         }
 
+        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
         private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
@@ -422,6 +429,12 @@ namespace ThomasEditor
             //Is this needed?
             //e.Handled = true;
         }
+
+        //private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //{
+        //    e.CanExecute = true;
+        //}
+
         private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
         {
             if(m_copiedObject)

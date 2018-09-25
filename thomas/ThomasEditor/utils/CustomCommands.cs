@@ -11,8 +11,10 @@ namespace ThomasEditor.Commands
         private static Key addComponent = Key.A;
         private static Key save = Key.S;
         private static Key open = Key.O;
+        private static Key copyObject = Key.C;
+        private static Key pasteObject = Key.V;
 
-     
+
         public static Key GetAddNewEmptyObjectKey() { return addNewEmptyObject; }
         public static void SetAddNewEmptyObjectKey(Key set) { addNewEmptyObject = set; }
 
@@ -30,6 +32,12 @@ namespace ThomasEditor.Commands
 
         public static Key GetOpenKey() { return open; }
         public static void SetOpenKey(Key set) { open = set; }
+
+        public static Key GetCopyKey() { return copyObject; }
+        public static void SetCopyKey(Key set) { copyObject = set; }
+
+        public static Key GetPasteKey() { return pasteObject; }
+        public static void SetPasteKey(Key set) { pasteObject = set; }
 
 
         //Include xmlns:commands="clr-namespace:ThomasEditor.Commands" in the file you want access to the custome commands
@@ -98,15 +106,41 @@ namespace ThomasEditor.Commands
             );
 
         public static readonly RoutedUICommand Open = new RoutedUICommand
-    (
-        "Open Scene",
-        "OpenScene",
-        typeof(CustomCommands),
-        new InputGestureCollection()
-        {
-                    new KeyGesture(open, ModifierKeys.Control)
-        }
-    );
+            (
+                "Open Scene",
+                "OpenScene",
+                typeof(CustomCommands),
+                new InputGestureCollection()
+                {
+                            new KeyGesture(open, ModifierKeys.Control)
+                }
+            );
+
+        public static readonly RoutedUICommand CopyObjectCmd = new RoutedUICommand
+            (
+                "Copy",     //The text that will show on the item that the command is bound to.
+                "CopyObject",       //Name of the command
+                typeof(CustomCommands), //Owner of command
+                new InputGestureCollection()
+                {
+                    new KeyGesture(             //Specify what keys need to be pressed.
+                        copyObject,      //The key
+                        ModifierKeys.Control)   //Ctrl
+                }
+            );
+
+        public static readonly RoutedUICommand PasteObjectCmd = new RoutedUICommand
+            (
+                "Paste",     //The text that will show on the item that the command is bound to.
+                "PasteObject",       //Name of the command
+                typeof(CustomCommands), //Owner of command
+                new InputGestureCollection()
+                {
+                    new KeyGesture(             //Specify what keys need to be pressed.
+                        pasteObject,      //The key
+                        ModifierKeys.Control)   //Ctrl
+                }
+            );
 
         public static RoutedUICommand GetNewEmptyObject { get { return NewGameObjectCmd; } }
         public static RoutedUICommand GetDeleteGameObject { get { return DeleteGameObjectCmd; } }
@@ -114,5 +148,7 @@ namespace ThomasEditor.Commands
         public static RoutedUICommand GetAddCompenent { get { return AddComponent; } }
         public static RoutedUICommand GetSave { get { return Save; } }
         public static RoutedUICommand GetOpen { get { return Open; } }
+        public static RoutedUICommand GetCopyObject { get { return CopyObjectCmd; } }
+        public static RoutedUICommand GetPasteObject { get { return PasteObjectCmd; } }
     }
 }
