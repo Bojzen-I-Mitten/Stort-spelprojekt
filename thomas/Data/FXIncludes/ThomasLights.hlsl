@@ -11,6 +11,11 @@ cbuffer LightCountsStruct
     uint nrOfAreaLights;
 };
 
+cbuffer MaterialProperties
+{
+    float shininess;
+};
+
 struct LightStruct
 {
     float3 colorDiffuse;
@@ -40,10 +45,9 @@ inline float3 GetHalfwayVec(float3 lightDir, float3 viewDir)
     return normalize(viewDir + lightDir);
 }
 
-inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular)//should take material properties later
+inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float specularMapFactor, float smoothness)//should take material properties later
 {
-    float3 ambient = float3(0.1f, 0.1f, 0.1f);
-    float smoothness = 16.0f;
+    float3 ambient = float3(0.05f, 0.05f, 0.05f);
 
     float lambertian = saturate(dot(normal, lightDir));
     float specularIntensity = 0.0f;
@@ -52,10 +56,10 @@ inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 
         specularIntensity = pow(saturate(dot(normal, GetHalfwayVec(viewDir, lightDir))), smoothness); //blinn-phong
     }
     
-    colorAcculmulator += (ambient + diffuse * lambertian + specular * specularIntensity) * lightMultiplyer;
+    colorAcculmulator += (ambient + diffuse * lambertian + specular * specularIntensity * specularMapFactor) * lightMultiplyer;
 }
 
-inline float3 AddLights(float3 worldPos, float3 worldNormal)
+inline float3 AddLights(float3 worldPos, float3 worldNormal, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
     float3 colorAcculmulator = float3(0.0f, 0.0f, 0.0f);
@@ -68,7 +72,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
     {
         lightDir = lights[i].direction; //should be normalized already
         lightMultiplyer = lights[i].intensity;
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular, specularMapFactor, smoothness);
     }
     roof += nrOfPointLights;
     for (; i < roof; ++i) //point
@@ -79,7 +83,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
 
         float3 atten = lights[i].attenuation;
         lightMultiplyer = lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular, specularMapFactor, smoothness);
     }
     roof += nrOfSpotLights;
     for (; i < roof; ++i) //spot
@@ -105,7 +109,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
         
         float3 atten = lights[i].attenuation;
         lightMultiplyer = spotFactor * lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular, specularMapFactor, smoothness);
     }
     roof += nrOfAreaLights;
     for (; i < roof; ++i)
@@ -131,7 +135,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal)
 
         float3 atten = lights[i].attenuation;
         lightMultiplyer = lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, lights[i].colorDiffuse, lights[i].colorSpecular, specularMapFactor, smoothness);
     }
     return colorAcculmulator;
 }
