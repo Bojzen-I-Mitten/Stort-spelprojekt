@@ -44,10 +44,10 @@ namespace ThomasEngine.Network
 
     public class ConnectToPeerEvent
     {
-        public long IP { get; set; }
+        public string IP { get; set; }
         public int port { get; set; }
 
-        public ConnectToPeerEvent() { IP = -1; port = -1; }
+        public ConnectToPeerEvent() { IP = ""; port = -1; }
     }
 
     public enum PacketType
@@ -188,11 +188,13 @@ namespace ThomasEngine.Network
             {
                 ConnectToPeerEvent connectEvent = new ConnectToPeerEvent
                 {
-                    IP = BitConverter.ToInt64(peer.EndPoint.Address.GetAddressBytes(), 0),
+                    IP = peer.EndPoint.ToString(),
                     port = peer.EndPoint.Port
                 };
                 SendEvent(connectEvent, DeliveryMethod.ReliableOrdered);
             }
+
+            netPeers.Add(_peer);
         }
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
         {
@@ -425,11 +427,10 @@ namespace ThomasEngine.Network
 
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
-            long address = connectEvent.IP;
+            string address = connectEvent.IP;
             int port = connectEvent.port;
-
-            System.Net.IPEndPoint ipep = new System.Net.IPEndPoint(address, port);
-            netManager.Connect(ipep, "SomeConnectionKey");
+            
+            netManager.Connect(address, port, "SomeConnectionKey");
         }
 
         private void RemovePlayerCharacter(NetPeer disconnectedPeer)
