@@ -17,8 +17,8 @@
             <TreeView.ContextMenu>
                 <ContextMenu x:Name="hiearchyContextMenu">
                     <ContextMenu.CommandBindings>
-                        <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="CommandBinding_CanExecute" Executed="MenuItem_CopyGameObject"/>
-                        <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="CommandBinding_CanExecute" Executed="MenuItem_PasteGameObject"/>
+                        <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_CopyGameObject"/>
+                        <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="PasteObject_CanExecute" Executed="MenuItem_PasteGameObject"/>
                     </ContextMenu.CommandBindings>
                     
                     <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>

@@ -436,9 +436,24 @@ namespace ThomasEditor
             Debug.Log("No copied object to paste");
         }
 
-        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //Can only click copy when an object is selected
+        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (m_copiedObject)
+            {
+                e.CanExecute = true;
+            }
         }
     }
 }
