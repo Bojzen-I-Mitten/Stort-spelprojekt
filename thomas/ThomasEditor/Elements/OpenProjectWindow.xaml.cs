@@ -24,6 +24,7 @@ namespace ThomasEditor
     public partial class OpenProjectWindow : Window
     {
         public static OpenProjectWindow _instance;
+        private bool xClose = true;
         public OpenProjectWindow()
         {
             Thread.Sleep(2000);
@@ -37,12 +38,25 @@ namespace ThomasEditor
             _instance = this;
         }
 
+        public void ProjectLoadedClose()
+        {
+            xClose = false;
+
+            Close();
+        }
+
         private void OpenProjectWindow_Closed(object sender, EventArgs e)
         {
-            MainWindow._instance.Dispatcher.Invoke(() =>
+            if (xClose)
+                MainWindow._instance.Close();
+            else
             {
-                MainWindow._instance.IsEnabled = true;
-            });
+                MainWindow._instance.Dispatcher.Invoke(() =>
+                {
+                    MainWindow._instance.IsEnabled = true;
+                });
+            }
+            
         }
 
         private void NewProject_Click(object sender, RoutedEventArgs e)

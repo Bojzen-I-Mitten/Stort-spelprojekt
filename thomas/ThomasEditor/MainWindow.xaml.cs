@@ -514,7 +514,7 @@ namespace ThomasEditor
                 worker.Start();
                 if (timer != null)
                 {
-                    OpenProjectWindow._instance.Close();
+                    OpenProjectWindow._instance.ProjectLoadedClose();
                 }
             }
         }
@@ -531,7 +531,7 @@ namespace ThomasEditor
                 OpenProject(openFileDialog.FileName);
                 if (timer != null)
                 {
-                    OpenProjectWindow._instance.Close();
+                    OpenProjectWindow._instance.ProjectLoadedClose();
                 }
             }
         }
