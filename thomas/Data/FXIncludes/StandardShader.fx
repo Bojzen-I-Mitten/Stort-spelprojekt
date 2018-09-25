@@ -4,13 +4,13 @@
 #include <ThomasLights.hlsl>
 
 Texture2D diffuseTex;
-Texture2D normalTex;
+Texture2D normalTex : NORMALTEXTURE;
 Texture2D specularTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
     float4 color : COLOR;
-    float smoothness;
+    float smoothness : MATERIALSMOOTHNESSFACTOR;
 };
 
 
