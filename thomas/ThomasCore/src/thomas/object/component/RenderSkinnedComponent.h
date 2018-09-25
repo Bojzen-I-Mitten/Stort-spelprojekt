@@ -15,7 +15,7 @@ namespace thomas
 		class Camera;
 		namespace component
 		{
-			class THOMAS_API RenderSkinnedComponent : public RenderComponent
+			class RenderSkinnedComponent : public RenderComponent
 			{
 			private:
 			public:

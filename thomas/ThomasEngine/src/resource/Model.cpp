@@ -1,8 +1,12 @@
+#pragma unmanaged
+#include <thomas\resource\Model.h>
+#include <thomas\utils\Primitives.h>
+#include <thomas\graphics\Mesh.h>
+#include <thomas/graphics/animation/data/Skeleton.h>
+#pragma managed
 #include "Model.h"
 #include "../object/GameObject.h"
-#include <thomas/graphics/animation/data/Skeleton.h>
-
-
+#include "Resources.h"
 namespace ThomasEngine
 {
 	Model::Model(thomas::resource::Model* nativePtr)

@@ -4,8 +4,7 @@
 
 #pragma managed
 #include "../../Component.h"
-#include "../../GameObject.h"
-
+#include "../../../Utility.h"
 namespace ThomasEngine
 {
 	[DisallowMultipleComponent]
@@ -58,22 +57,7 @@ namespace ThomasEngine
 																(thomas::object::component::ForceMode)mode);
 		}
 
-		GameObject^ GetTargetCollider()
-		{
-			if (this != nullptr)
-			{
-				auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
-
-				if (collider != nullptr)
-				{
-					GameObject^ target = (GameObject^)Object::Find(Utility::Convert(collider->m_guid));
-					((thomas::object::component::Rigidbody*)nativePtr)->ClearTargetCollider();
-					return target;
-				}
-			}
-
-			return nullptr;
-		}
+		GameObject^ GetTargetCollider();
 
 		property bool IsKinematic 
 		{

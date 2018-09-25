@@ -12,7 +12,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			class THOMAS_API Camera : public Component
+			class Camera : public Component
 			{
 			public:
 				struct CAMERA_FRAME_DATA

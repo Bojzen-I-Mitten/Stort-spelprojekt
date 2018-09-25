@@ -2,9 +2,7 @@
 #pragma unmanaged
 #include <thomas\resource\Shader.h>
 #pragma managed
-#include "../Utility.h"
 #include "resource.h"
-#include "Resources.h"
 namespace ThomasEngine
 {
 	[DataContractAttribute]

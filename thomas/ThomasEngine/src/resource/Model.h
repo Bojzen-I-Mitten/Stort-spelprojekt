@@ -1,14 +1,10 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\resource\Model.h>
-#include <thomas\utils\Primitives.h>
-#include <thomas\graphics\Mesh.h>
-#include <memory>
-#pragma managed
 #include "Resource.h"
 
+namespace thomas { namespace resource { class Model; } }
 namespace ThomasEngine
 {
+	ref class GameObject;
 	public enum class PrimitiveType //could not typedef because no ToString
 	{
 		Sphere,

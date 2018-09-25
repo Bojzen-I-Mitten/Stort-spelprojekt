@@ -9,7 +9,7 @@ namespace thomas
 	class Scene;
 	namespace object
 	{
-		class THOMAS_API GameObject : public Object
+		class GameObject : public Object
 		{
 		private:
 			

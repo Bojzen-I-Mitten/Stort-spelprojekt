@@ -3,6 +3,7 @@
 #include <thomas\object\component\physics\BoxCollider.h>
 #pragma managed
 #include "Collider.h"
+#include "../../../Utility.h"
 namespace ThomasEngine
 {
 	public ref class BoxCollider : public Collider

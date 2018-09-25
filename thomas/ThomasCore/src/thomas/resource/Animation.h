@@ -14,7 +14,7 @@ namespace thomas {
 	}
 	namespace resource {
 
-		class THOMAS_API Animation : public Resource {
+		class Animation : public Resource {
 		private:
 		public:
 			Animation(std::string path);

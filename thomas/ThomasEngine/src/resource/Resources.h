@@ -1,25 +1,17 @@
 #pragma once
-#pragma unmanaged
-#include "thomas\resource\Resource.h"
-#pragma managed
-#include "Resource.h"
-#include "../Application.h"
 
-using namespace System::Collections::Generic;
-using namespace System::Linq;
-using namespace System::Threading;
+namespace thomas { namespace resource { class Resource; } }
+using namespace System;
 namespace ThomasEngine
 {
-
+	ref class GameObject;
+	ref class Resource;
 	public ref class Resources
 	{
 	private:
 		static Object^ resourceLock = gcnew Object();
-		static Dictionary<String^, Resource^>^ resources = gcnew Dictionary<String^, ThomasEngine::Resource^>();
+		static System::Collections::Generic::Dictionary<String^, Resource^>^ resources = gcnew System::Collections::Generic::Dictionary<String^, ThomasEngine::Resource^>();
 	internal:
-
-
-		static List<Type^>^ getKnownTypes();
 
 		generic<typename T>
 		where T : Resource
@@ -66,9 +58,9 @@ namespace ThomasEngine
 
 		generic<typename T>
 		where T : Resource
-		static List<T>^ GetResourcesOfType();
+		static System::Collections::Generic::List<T>^ GetResourcesOfType();
 
-		static List<Resource^>^ GetResourcesOfType(Type^ type);
+		static System::Collections::Generic::List<Resource^>^ GetResourcesOfType(Type^ type);
 
 		static Resource^ FindResourceFromNativePtr(thomas::resource::Resource* nativePtr);
 		/* Load resource using converted file path to thomas internal representation

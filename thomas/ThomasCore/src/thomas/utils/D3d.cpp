@@ -8,6 +8,7 @@
 #include <D3d11_4.h>
 #include <AtlBase.h>
 #include <atlconv.h>
+#include <comdef.h>
 
 namespace thomas
 {

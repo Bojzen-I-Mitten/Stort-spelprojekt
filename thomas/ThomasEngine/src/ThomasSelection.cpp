@@ -1,5 +1,10 @@
+#pragma unmanaged
+#include <thomas\editor\EditorCamera.h>
+#pragma managed
 #include "ThomasSelection.h"
+#include "object\GameObject.h"
 
+using namespace System::Threading;
 namespace ThomasEngine {
 
 	ThomasSelection::ThomasSelection()
@@ -21,14 +26,14 @@ namespace ThomasEngine {
 		try {
 			m_SelectedGameObjects->Clear();
 			m_SelectedGameObjects->Add(gObj);
-			thomas::editor::EditorCamera::SelectObject((thomas::object::GameObject*)gObj->nativePtr);
+			thomas::editor::EditorCamera::GetEditorCamera()->SelectObject((thomas::object::GameObject*)gObj->nativePtr);
 		}
 		finally	{
 			Monitor::Exit(m_lock);
 		}
 	}
 
-	void ThomasSelection::SelectGameObject(Guid guid)
+	void ThomasSelection::SelectGameObject(System::Guid guid)
 	{
 		if (guid != Guid::Empty)
 		{
@@ -46,7 +51,7 @@ namespace ThomasEngine {
 #endif
 		try {
 		m_SelectedGameObjects->Remove(gObj);
-		thomas::editor::EditorCamera::UnselectObject((thomas::object::GameObject*)gObj->nativePtr);
+		thomas::editor::EditorCamera::GetEditorCamera()->UnselectObject((thomas::object::GameObject*)gObj->nativePtr);
 		}	
 		finally	{
 			Monitor::Exit(m_lock);
@@ -61,7 +66,7 @@ namespace ThomasEngine {
 #endif
 		try {
 		m_SelectedGameObjects->Clear();
-		thomas::editor::EditorCamera::SelectObject(nullptr);
+		thomas::editor::EditorCamera::GetEditorCamera()->SelectObject(nullptr);
 		}	
 		finally	{
 			Monitor::Exit(m_lock);
@@ -94,7 +99,7 @@ namespace ThomasEngine {
 		lockOwner = Thread::CurrentThread->Name;
 #endif
 		try {
-			for (thomas::object::GameObject* gameObject : thomas::editor::EditorCamera::GetSelectedObjects())
+			for (thomas::object::GameObject* gameObject : thomas::editor::EditorCamera::GetEditorCamera()->GetSelectedObjects())
 			{
 				GameObject^ gObj = (GameObject^)ThomasEngine::Object::GetObject(gameObject);
 				if (gObj)
@@ -120,15 +125,15 @@ namespace ThomasEngine {
 		finally {
 			Monitor::Exit(m_lock);
 		}
-		thomas::editor::EditorCamera::SetHasSelectionChanged(false);
+		thomas::editor::EditorCamera::GetEditorCamera()->SetHasSelectionChanged(false);
 	}
 
-	Guid ThomasSelection::GetSelectedGUID()
+	System::Guid ThomasSelection::GetSelectedGUID()
 	{
 		if (m_SelectedGameObjects->Count > 0)
 			return m_SelectedGameObjects[0]->m_guid;
 		else
-			return Guid::Empty;
+			return System::Guid::Empty;
 	}
 
 	bool ThomasSelection::Contain(GameObject ^ gObj)

@@ -1,13 +1,30 @@
 // This is the main DLL file.
 
-#include <thomas/System.h>
+#pragma unmanaged
+
+#include <thomas\ThomasCore.h>
+#include <thomas\Window.h>
+#include <thomas\ThomasTime.h>
+#include <thomas\graphics\Renderer.h>
+#include <thomas\editor\gizmos\Gizmos.h>
+#include <thomas\Physics.h>
+#include <thomas\editor\EditorCamera.h>
+#include <thomas\System.h>
+#pragma managed
 #include "ThomasManaged.h"
+#include "resource\Model.h"
+#include "resource\Resources.h"
+#include "object\Component.h"
 #include "object/component/physics/Rigidbody.h"
 #include "ScriptingManager.h"
+#include "ThomasSelection.h"
 #include "GUI\editor\GUI.h"
+using namespace thomas;
+
 namespace ThomasEngine {
 
 	void ThomasWrapper::Start() {
+		s_Selection = gcnew ThomasSelection();
 		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
@@ -185,7 +202,7 @@ namespace ThomasEngine {
 	{
 		Window::UpdateFocus();
 		UpdateLog();
-		if (thomas::editor::EditorCamera::HasSelectionChanged())
+		if (thomas::editor::EditorCamera::GetEditorCamera()->HasSelectionChanged())
 			s_Selection->UpdateSelectedObjects();
 	}
 
@@ -221,9 +238,11 @@ namespace ThomasEngine {
 
 	}
 
+	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
+
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)
 	{
-		thomas::editor::EditorCamera::SetManipulatorOperation((ImGuizmo::OPERATION)op);
+		thomas::editor::EditorCamera::GetEditorCamera()->SetManipulatorOperation((ImGuizmo::OPERATION)op);
 	}
 
 	ThomasWrapper::ManipulatorOperation ThomasWrapper::GetEditorGizmoManipulatorOperation()
@@ -233,7 +252,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::ToggleEditorGizmoManipulatorMode()
 	{
-		thomas::editor::EditorCamera::ToggleManipulatorMode();
+		thomas::editor::EditorCamera::GetEditorCamera()->ToggleManipulatorMode();
 	}
 
 	void ThomasWrapper::UpdateLog() {
