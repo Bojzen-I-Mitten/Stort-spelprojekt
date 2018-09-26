@@ -17,7 +17,7 @@ namespace thomas
 #pragma region Declares
 
 		struct SkeletonConstruct {
-
+			
 			std::map<std::string, unsigned int> m_mapping;
 			std::vector<graphics::animation::Bone> m_boneInfo;
 			math::Matrix m_skeletonRoot;
@@ -25,7 +25,7 @@ namespace thomas
 			 * Transform relative from Node -> Parent (P*R*N : Parent*Relative*Node = Absolute)
 			 * Parent inverse
 			*/
-			std::vector<aiMatrix4x4> m_absoluteBind, m_relativeParent;
+			std::vector<aiMatrix4x4> m_absoluteBind, m_relativeParent, m_invBind;
 			std::vector < std::shared_ptr< graphics::animation::AnimationData> > m_animList;
 			/* Generate the skeleton from the gathered data. Null if no skeleton data is avaiable */
 			graphics::animation::Skeleton* generateSkeleton() {
@@ -334,36 +334,27 @@ namespace thomas
 			{
 				aiMatrix4x4 bakeInv = node_transform;
 				bakeInv.Inverse();
+				boneMap.m_invBind.resize(mesh->mNumBones);
 				for (unsigned i = 0; i < mesh->mNumBones; i++)
 				{
 
 					unsigned int boneIndex = 0;
 					aiBone* meshBone = mesh->mBones[i];
-					aiNode *boneNode = scene->mRootNode->FindNode(meshBone->mName);
 					std::string boneName = meshBone->mName.C_Str();
-					if (boneMap.m_mapping.find(boneName) == boneMap.m_mapping.end()) //bone does not exist
-					{
+					if (boneMap.m_mapping.find(boneName) == boneMap.m_mapping.end())
+					{	// Bone does not exist
 						boneIndex = 0;
 						LOG("Warning! Mesh could not find skinning bone")
 					}
-					else { //Bone already exists
+					else  // Bone already exists
+					{
 						boneIndex = boneMap.m_mapping[boneName];
-						boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix * bakeInv);
-						/*
-						int parent = boneMap.m_boneInfo[boneIndex]._parentIndex;
-						if (parent != -1)
-							boneMap.m_boneInfo[boneIndex]._bindPose =
-							convertAssimpMatrix(meshBone->mOffsetMatrix).Invert()
-							* boneMap.m_boneInfo[parent]._bindPose.Invert();
-						else
-							boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(meshBone->mOffsetMatrix).Invert();
-						*/
+						boneMap.m_invBind[boneIndex] = meshBone->mOffsetMatrix;
+						boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(meshBone->mOffsetMatrix).Invert();
 					}
 
 					for (unsigned int j = 0; j < meshBone->mNumWeights; j++)
-					{
 						vertices.AddBoneData(meshBone->mWeights[j].mVertexId, boneIndex, meshBone->mWeights[j].mWeight);
-					}
 				}
 
 			}
