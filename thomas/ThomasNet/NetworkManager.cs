@@ -378,27 +378,27 @@ namespace ThomasEngine.Network
         private void SpawnPlayerCharacter(NetPeer connected)
         {
 
-            GameObject player = InstantiateAndRegister(playerPrefab);
-            int ID = player.GetComponent<NetworkID>().ID;
-
-            players.Add(connected, player.GetComponent<NetworkID>());
-
             if (connected != serverPeer)
             {
                 SpawnPrefabEvent spawnEvent = new SpawnPrefabEvent
                 {
-                    netID = ID,
+                    netID = players.[serverPeer].ID,
                     prefabID = -1,
-                    position = player.transform.position,
-                    rotation = player.transform.rotation,
+                    position = playerPrefab.transform.position,
+                    rotation = playerPrefab.transform.rotation,
                     isOwner = false
                 };
                 //SendEventToAllBut(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell old clients to spawn object
                 //spawnEvent.isOwner = true;
-                //SendEventToPeer(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
+                SendEventToPeer(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
             }
             else
             {
+                GameObject player = InstantiateAndRegister(playerPrefab);
+                int ID = player.GetComponent<NetworkID>().ID;
+
+                players.Add(connected, player.GetComponent<NetworkID>());
+
                 player.GetComponent<NetworkID>().Owner = true;
                 player.Name += "(My player)";
             }
