@@ -12,8 +12,7 @@
                   PreviewMouseDown="hierarchy_PreviewMouseDown">
             <TreeView.ContextMenu>
                 <ContextMenu x:Name="hiearchyContextMenu">
-                    <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject"/>
-                    <!--<MenuItem Header="Rename" Click="MenuItem_RenameGameObject"/>-->
+                    <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="{Binding Delete_CanExecute}"/>
                     <MenuItem Header="Save as prefab" Click="MenuItem_SaveAsPrefab" IsEnabled="{Binding}"/>
                 </ContextMenu>
             </TreeView.ContextMenu>

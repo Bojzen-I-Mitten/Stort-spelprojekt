@@ -386,6 +386,17 @@ namespace ThomasEditor
             }
         }
 
+        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }   
+        }
+
         //private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
         //{
         //    if (hierarchy.SelectedItem != null)
