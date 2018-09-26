@@ -121,7 +121,6 @@ namespace ThomasEngine.Network
             InitServerNTP();
             netManager.Start(port);
             serverPeer = new NetPeer(netManager, null);
-            
             SpawnPlayerCharacter(serverPeer);
         }
 
@@ -245,12 +244,16 @@ namespace ThomasEngine.Network
 
         private int Register(NetworkID netID, int targetID)
         {
-
             if (!networkIDObjects.ContainsKey(targetID))
             {
                 iD = targetID + 1;
                 networkIDObjects.Add(targetID, netID);
                 netID.ID = targetID;
+                
+            }
+            else
+            {
+                Debug.Log("Tried registering already existing ID");
             }
             return iD;
         }
@@ -364,10 +367,9 @@ namespace ThomasEngine.Network
             else
             {
                 player.GetComponent<NetworkID>().Owner = false;
-                player.Name += "(" + connected.ToString() + ")";
+                player.Name += "(" + connected.EndPoint.ToString() + ")";
             }
         }
-
 
         private void DeletePrefabEventHandler(DeletePrefabEvent deleteEvent, NetPeer peer)
         {
@@ -427,8 +429,6 @@ namespace ThomasEngine.Network
             {
                 GUI.ImguiStringUpdate("Ping to client " + netPeers[i].EndPoint.ToString() + "  " + netPeers[i].Ping, new Vector2(0, 40 + 10 * i));
             }
-
         }
-
     }
 }
