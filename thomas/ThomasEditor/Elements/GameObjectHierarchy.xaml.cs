@@ -370,8 +370,19 @@ namespace ThomasEditor
 
         private void MenuItem_DeleteGameObject(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
+            //Loop through selected objects
+            for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
+            {
+                GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
+
+                //Unselect selected object
+                ThomasWrapper.Selection.UnSelectGameObject(gObj);
+
+                //Destroy
+                gObj.Destroy();
+            }
         }
+
         private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
