@@ -21,9 +21,11 @@ namespace thomas
 				prop.m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixArray;
 				prop.m_dataSize = 0;
 				prop.m_data = NULL;
-				prop.m_effectName = graphics::THOMAS_MATRIX_SKIN_ARRAY;
 				prop.m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
+#ifdef _DEBUG
+				prop.m_effectName = graphics::THOMAS_MATRIX_SKIN_ARRAY;
 				prop.m_type = thomas::resource::shaderproperty::ShaderProperty::Type::MATRIX_ARRAY;
+#endif
 				m_skinInfo = &insertProperty(prop);
 			}
 			RenderSkinnedComponent::~RenderSkinnedComponent() {
