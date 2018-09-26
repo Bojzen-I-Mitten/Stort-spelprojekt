@@ -11,14 +11,14 @@ namespace HierarchyTreeView
         public TreeItemViewModel(string displayName, object dataContext)
         {
             DisplayName = displayName;
-            data = dataContext;
+            Data = dataContext;
         }
 
         private bool _isExpanded;
         private bool _isSelected;
-        public object data;
 
         public string DisplayName { get; set; }
+        public object Data { get; set; }
 
         public bool IsExpanded
         {
