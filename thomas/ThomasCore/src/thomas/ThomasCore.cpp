@@ -12,6 +12,7 @@
 #include "utils\Primitives.h"
 #include <D3d11_4.h>
 #include <comdef.h>
+#include "AutoProfile.h"
 
 #include "object/component/LightComponent.h"
 
@@ -27,6 +28,7 @@ namespace thomas
 
 	bool ThomasCore::Init()
 	{
+		
 		s_imGuiContext = ImGui::CreateContext();
 		s_logOutput.reserve(10);
 
@@ -51,6 +53,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
+		AutoProfile stamp = AutoProfile("ThomasCore::Update", ProfileManager::operationType::miscLogic);
 		if (s_clearLog)
 		{
 			s_logOutput.clear();

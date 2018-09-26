@@ -2,7 +2,9 @@
 #include <chrono>
 #include "ProfileManager.h"
 
-namespace Thomas
+
+
+namespace thomas
 {
 	class AutoProfile
 	{
@@ -16,3 +18,9 @@ namespace Thomas
 
 	};
 }
+
+#ifdef BENCHMARK
+#define PROFILE(name, type) AutoProfile temp = AutoProfile(name, type);
+#else
+#define PROFILE(name, type) 
+#endif

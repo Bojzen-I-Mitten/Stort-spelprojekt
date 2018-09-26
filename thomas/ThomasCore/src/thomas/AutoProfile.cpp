@@ -1,6 +1,6 @@
 #include "AutoProfile.h"
 
-namespace Thomas
+namespace thomas
 {
 	// std::chrono could be a bit slow for our needs, needs more investigation.
 	AutoProfile::AutoProfile(const char* name, ProfileManager::operationType type)

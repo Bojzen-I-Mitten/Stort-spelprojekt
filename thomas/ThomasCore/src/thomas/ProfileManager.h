@@ -4,7 +4,9 @@
 #include <map>
 #include <algorithm>
 
-namespace Thomas
+#define BENCHMARK
+
+namespace thomas
 {
 	class ProfileManager
 	{
@@ -24,3 +26,11 @@ namespace Thomas
 		static std::map<const char, Sample> s_samples;
 	};
 }
+
+
+
+#ifdef BENCHMARK
+#define NEW_FRAME() thomas::ProfileManager::newFrame();
+#else
+#define NEW_FRAME() 
+#endif

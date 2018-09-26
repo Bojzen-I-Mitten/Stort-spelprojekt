@@ -10,6 +10,7 @@
 #include <thomas\Physics.h>
 #include <thomas\editor\EditorCamera.h>
 #include <thomas\System.h>
+#include <thomas\AutoProfile.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -81,7 +82,10 @@ namespace ThomasEngine {
 	{
 		while (ThomasCore::Initialized())
 		{
-
+			// Macro that resets profilemanagers
+			// if BENCHMARK is not defined, compiler does nothing
+			NEW_FRAME();
+			PROFILE("ThomasCore::Initialized", thomas::ProfileManager::operationType::miscLogic)
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);

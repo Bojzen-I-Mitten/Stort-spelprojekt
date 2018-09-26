@@ -2,7 +2,7 @@
 
 
 
-namespace Thomas 
+namespace thomas 
 {
 	std::map<const char, ProfileManager::Sample> ProfileManager::s_samples;
 

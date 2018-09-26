@@ -46,8 +46,6 @@
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\SceneSurrogate.cpp" />
-    <ClCompile Include="src\ProfileManager.cpp" />
-    <ClCompile Include="src\AutoProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -97,8 +95,6 @@
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
-    <ClInclude Include="src\ProfileManager.h" />
-    <ClInclude Include="src\AutoProfile.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

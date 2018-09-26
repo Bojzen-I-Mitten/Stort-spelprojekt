@@ -4,6 +4,7 @@
 #include "object\GameObject.h"
 #include "object\component\Camera.h"
 #include "graphics\BulletDebugDraw.h"
+#include "AutoProfile.h"
 
 namespace thomas
 {
@@ -67,6 +68,7 @@ namespace thomas
 	//Update physics collision
 	void Physics::Simulate()
 	{
+
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
 		
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
