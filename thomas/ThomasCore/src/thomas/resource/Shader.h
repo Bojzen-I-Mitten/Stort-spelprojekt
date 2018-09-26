@@ -47,7 +47,11 @@ namespace thomas
 			void OnChanged();
 
 			Semantics GetSemanticFromName(std::string semanticName);
-			void AddProperty(ID3DX11EffectVariable* prop);
+			/* Add the effect variable property.
+			prop		<<	Effect variable read from shader
+			propIndex	<<	Index of the effect variable
+			*/
+			void AddProperty(ID3DX11EffectVariable* prop, uint32_t propIndex);
 		public:
 			struct ShaderPass
 			{
@@ -91,6 +95,9 @@ namespace thomas
 			std::vector<std::string> GetMaterialProperties();
 			ID3DX11Effect* GetEffect();
 			bool HasProperty(const std::string& name);
+			/* Get a property from a hash, returns 0 if everything OK, 1 if effect not found!!!!!!!!!!!
+			*/
+			bool GetPropertyIndex(uint32_t hash, uint32_t &effectIndex);
 			std::shared_ptr<shaderproperty::ShaderProperty> GetProperty(const std::string& name);
 			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> GetProperties();
 			static void Update();
@@ -99,6 +106,7 @@ namespace thomas
 		private:
 			ID3DX11Effect* m_effect;
 			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> m_properties;
+			std::map<uint32_t, uint32_t> m_property_indices;
 			std::vector<ShaderPass> m_passes;
 			ShaderPass* m_currentPass;
 			std::vector<std::string> m_materialProperties;

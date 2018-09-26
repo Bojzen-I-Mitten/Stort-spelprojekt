@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "../utils/Utility.h"
 
 namespace thomas {
 	namespace graphics {
@@ -19,5 +20,6 @@ namespace thomas {
 		const static std::string THOMAS_MATRIX_WORLD("thomas_ObjectToWorld");
 		const static std::string THOMAS_MATRIX_WORLD_INV("thomas_WorldToObject");
 		const static std::string THOMAS_MATRIX_SKIN_ARRAY("thomas_Bone_Array");
+		const static uint32_t THOMAS_MATRIX_SKIN_ARRAY_HASH = utility::hash(THOMAS_MATRIX_SKIN_ARRAY);
 	}
 }
