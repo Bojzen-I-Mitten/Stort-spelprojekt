@@ -509,15 +509,15 @@ namespace ThomasEditor
             File.WriteAllText(uniquePath, text);
         }
 
-        private void Menu_CreateShader(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_CreateShader(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
-        private void Menu_CreateScene(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_CreateScene(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
         private void Menu_CreatePrefab(object sender, RoutedEventArgs e)
         {
@@ -532,15 +532,15 @@ namespace ThomasEditor
             renameNextAddedItem = true;
         }
 
-        private void Menu_CreateCurve(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_CreateCurve(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
-        private void Menu_ShowInExplorer(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_ShowInExplorer(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
         private void Menu_OpenAsset(object sender, RoutedEventArgs e)
         {
@@ -575,25 +575,25 @@ namespace ThomasEditor
             e.Handled = true;
         }
 
-        private void Menu_ImportAsset(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_ImportAsset(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
-        private void Menu_Refresh(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_Refresh(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
-        private void Menu_Reimport(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_Reimport(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
-        private void Menu_ReimportAll(object sender, RoutedEventArgs e)
-        {
+        //private void Menu_ReimportAll(object sender, RoutedEventArgs e)
+        //{
 
-        }
+        //}
 
         private void Menu_OpenCSharpProject(object sender, RoutedEventArgs e)
         {

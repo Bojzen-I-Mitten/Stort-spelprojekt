@@ -8,7 +8,10 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
+using System.IO;
+
 using ThomasEditor.Inspectors;
+using ThomasEditor.utils;
 using ThomasEngine;
 namespace ThomasEditor
 {
@@ -383,11 +386,49 @@ namespace ThomasEditor
             }
         }
 
-        private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
-        {
-            //Debug.Log(e.ToString());
-            e.Handled = true;
-        }
+        //private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
+        //{
+        //    if (hierarchy.SelectedItem != null)
+        //    {
+        //        TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+        //        StackPanel stack = item.Header as StackPanel;
+        //        EditableTextBlock lbl = stack.Children[1] as EditableTextBlock;
+        //        item.IsSelected = false;
+        //        lbl.IsInEditMode = true;
+        //        lbl.OnTextChanged += Lbl_OnTextChanged;
+        //    }
+        //}
+
+        //private void Lbl_OnTextChanged(object sender)
+        //{
+        //    EditableTextBlock lbl = sender as EditableTextBlock;
+        //    lbl.OnTextChanged -= Lbl_OnTextChanged;
+        //    StackPanel stack = lbl.Parent as StackPanel;
+        //    String fullPath = stack.DataContext as String;
+        //    String oldName = Path.GetFileNameWithoutExtension(fullPath);
+        //    String newFullPath = fullPath.Replace(oldName, lbl.Text);
+
+        //    //Check if file name is not empty string
+        //    if (lbl.Text != "")
+        //    {
+        //        //Rename if file/dir does not exist
+        //        if (File.Exists(fullPath) && !File.Exists(newFullPath))
+        //            File.Move(fullPath, newFullPath);
+        //        else if (Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
+        //            Directory.Move(fullPath, newFullPath);
+        //        else
+        //        {
+        //            lbl.Text = oldName;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        lbl.Text = oldName;
+        //    }
+        //    TreeViewItem item = stack.Parent as TreeViewItem;
+        //    item.Focus();
+        //}
+
         private void MenuItem_SaveAsPrefab(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
