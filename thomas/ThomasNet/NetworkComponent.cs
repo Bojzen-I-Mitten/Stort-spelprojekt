@@ -7,38 +7,55 @@ namespace ThomasEngine.Network
     [HideInInspector]
     public class NetworkComponent : ScriptComponent
     {
-        internal int prefabID;
-        
-        internal NetworkID networkID;
+        protected bool isDirty = false;
+        private int prefabID;
+        private NetworkID m_networkID;
+
+
+
+        protected int NetID
+        {
+            get { return NetworkID.ID; }
+        }
+
+        protected NetworkID NetworkID
+        {
+            get
+            {
+                if(m_networkID == null)
+                {
+                    m_networkID = gameObject.GetComponent<NetworkID>();
+                    if(m_networkID == null)
+                    {
+                        Debug.Log("There is no networkID on this object.");
+                    }
+                }
+                return m_networkID;
+            }
+        }
 
         [Browsable(false)]
         public bool isOwner
         {
-            get {return networkID != null ? networkID.Owner : false; }
-            set { if (networkID != null) { networkID.Owner = value; } }
+            get { return NetworkID.Owner; } 
         }
 
-        [Browsable(false)]
-        public bool isClient
+        virtual public void OnRead(NetPacketReader reader, bool initialState)
         {
-            get { return NetworkManager.instance.isClient; }
+            if (!initialState)
+                reader.GetInt();
+            
         }
 
-        [Browsable(false)]
-        public bool isServer
+        virtual public bool OnWrite(NetDataWriter writer, bool initialState)
         {
-            get { return !isClient; }
+            if (!initialState)
+                writer.Put(0);
+            return false;
         }
 
-        virtual public void Read(NetPacketReader reader)
-        {
-
-        }
-
-        virtual public void Write(NetDataWriter writer)
-        {
-
-        }
+        virtual public void OnGotOwnership() { }
+        virtual public void OnLostOwnership() { }
     }
 
 

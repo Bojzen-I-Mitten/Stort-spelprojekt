@@ -8,41 +8,46 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-    public class NetworkID : NetworkComponent
+    public class NetworkID : ScriptComponent
     {
 
         public bool Owner { set; get; } = false;
         public int ID { set; get; }
-        List<NetworkComponent> networkComponents;
+        List<NetworkComponent> networkComponentsCache;
         public override void OnEnable()
         {
             //ID = NetworkManager.instance.Register(this);
-            networkComponents = gameObject.GetComponents<NetworkComponent>();
-            networkComponents.ForEach((comp) => { comp.networkID = this; });
-            networkComponents.Remove(this);
+            networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
 
-        public override void Read(NetPacketReader reader)
+
+
+        public void WriteAllVars(NetDataWriter writer)
         {
-            foreach (NetworkComponent comp in networkComponents)
+            foreach (NetworkComponent comp in networkComponentsCache)
             {
-                //if (!Owner)
-                //{
-                    comp.Read(reader);
-                //}
+                comp.OnWrite(writer, true);
             }
         }
-        public override void Write(NetDataWriter writer)
-        {
-            if ((Owner || isServer) && enabled)
-            {
-                writer.Put(ID);
-                foreach (NetworkComponent comp in networkComponents)
-                {
-                    comp.Write(writer);
-                }
-            }
 
+        public void NetworkUpdate(NetDataWriter writer)
+        {
+            foreach (NetworkComponent comp in networkComponentsCache)
+            {
+                comp.OnWrite(writer, false);
+            }
+        }
+
+        public void OnUpdateVars(NetPacketReader reader, bool initialState)
+        {
+            if(initialState && networkComponentsCache == null)
+            {
+                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+            }
+            foreach (NetworkComponent comp in networkComponentsCache)
+            {
+                comp.OnRead(reader, initialState);
+            }
         }
     }
 }
