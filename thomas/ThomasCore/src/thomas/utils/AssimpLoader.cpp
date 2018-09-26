@@ -125,6 +125,7 @@ namespace thomas
 			aiMatrix4x4 globalInverseTransform = scene->mRootNode->mTransformation.Inverse();
 
 			// Process bone parenting
+			IdentifyAnimatedNodes(scene, skelConstruct);
 			FindSkeleton(scene->mRootNode, skelConstruct, globalInverseTransform);
 			// Process ASSIMP's root node recursively
 			ProcessMesh(scene->mRootNode, scene, modelData, skelConstruct, globalInverseTransform);
@@ -138,7 +139,7 @@ namespace thomas
 			
 			// Define skeleton roots
 			skelConstruct.m_processFromAnimationRoots = false;
-			//skelConstruct.m_rootID.insert("mixamorig:Hips");
+			skelConstruct.m_rootID.insert("mixamorig:hips");
 
 
 			const aiScene* scene = LoadScene(importer, path);
@@ -155,7 +156,7 @@ namespace thomas
 
 			// Define skeleton roots
 			skelConstruct.m_processFromAnimationRoots = true;
-			skelConstruct.m_rootID.insert("mixamorig:Hips");
+			skelConstruct.m_rootID.insert("mixamorig:hips");
 
 			resource::Model::ModelData tmpData;
 			const aiScene* scene = LoadScene(importer, path);
@@ -359,7 +360,7 @@ namespace thomas
 			{
 				aiMatrix4x4 bakeInv = node_transform;
 				bakeInv.Inverse();
-				boneMap.m_invBind.resize(mesh->mNumBones);
+				boneMap.m_invBind.resize(boneMap.m_boneInfo.size());
 				for (unsigned i = 0; i < mesh->mNumBones; i++)
 				{
 
@@ -374,8 +375,9 @@ namespace thomas
 					else  // Bone already exists
 					{
 						boneIndex = boneMap.m_mapping[boneName];
-						boneMap.m_invBind[boneIndex] = meshBone->mOffsetMatrix;
-						boneMap.m_boneInfo[boneIndex]._bindPose = convertAssimpMatrix(meshBone->mOffsetMatrix).Invert();
+						boneMap.m_invBind[boneIndex] = meshBone->mOffsetMatrix;                        
+						boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix * bakeInv);
+
 					}
 
 					for (unsigned int j = 0; j < meshBone->mNumWeights; j++)
