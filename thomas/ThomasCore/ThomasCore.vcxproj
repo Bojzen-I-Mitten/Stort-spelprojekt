@@ -20,6 +20,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
@@ -89,6 +90,7 @@
     <ClCompile Include="src\thomas\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
