@@ -539,7 +539,7 @@ namespace thomas
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			if (window->IsFocused() && isEditor)
+			if (window->IsFocused())
 				Input::ProcessKeyboard(message, wParam, lParam);
 			break;
 		case WM_DESTROY:
