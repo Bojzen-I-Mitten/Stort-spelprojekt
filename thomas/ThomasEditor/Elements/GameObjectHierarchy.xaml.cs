@@ -32,8 +32,10 @@ namespace ThomasEditor
             ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
             ThomasEngine.Transform.OnParentChanged += Transform_OnParentChanged;
             instance = this;
+
             RootNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = RootNodes;
+
             Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
         }
 
@@ -62,7 +64,7 @@ namespace ThomasEditor
                 {
                     if (gObj.transform.parent == null)
                     {
-                        TreeItemViewModel item = new TreeItemViewModel(gObj.Name)
+                        TreeItemViewModel item = new TreeItemViewModel(gObj.Name, gObj)
                         {
                             IsExpanded = true,
                             Children = BuildTree(gObj.transform),
@@ -145,7 +147,7 @@ namespace ThomasEditor
 
             foreach (ThomasEngine.Transform child in parent.children)
             {
-                TreeItemViewModel item = new TreeItemViewModel(child.gameObject.Name)
+                TreeItemViewModel item = new TreeItemViewModel(child.gameObject.Name, child.gameObject)
                 {
                     IsExpanded = true,
                     Children = BuildTree(child.transform)
@@ -291,16 +293,15 @@ namespace ThomasEditor
                 AssetBrowser.instance.UnselectItem();
             wasUnselected = false;
             ItemContainerGenerator gen = hierarchy.ItemContainerGenerator;
-
             if (hierarchy.SelectedItem != null)
             {
-                TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+                TreeItemViewModel item = hierarchy.SelectedItem as TreeItemViewModel;
                 if (item != null)
                 {
-                    Inspector.instance.SelectedObject = (GameObject)item.DataContext;
+                    Inspector.instance.SelectedObject = (GameObject)item.data;
 
-                    if (!ThomasWrapper.Selection.Contain((GameObject)item.DataContext))
-                        ThomasWrapper.Selection.SelectGameObject((GameObject)item.DataContext);
+                    if (!ThomasWrapper.Selection.Contain((GameObject)item.data))
+                        ThomasWrapper.Selection.SelectGameObject((GameObject)item.data);
                     hiearchyContextMenu.DataContext = true;
                 }
 

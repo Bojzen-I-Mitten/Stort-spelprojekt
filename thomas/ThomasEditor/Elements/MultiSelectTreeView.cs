@@ -100,7 +100,6 @@ namespace HierarchyTreeView
                 _selectTreeViewItemOnMouseUp = treeViewItem;
                 return;
             }
-
             SelectItems(treeViewItem, sender as TreeView);
         }
 
