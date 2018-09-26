@@ -40,7 +40,7 @@ namespace thomas
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;
 			protected:
-				void SubmitPart(Camera* camera, unsigned int i);
+				void SubmitPart(Camera* camera,  unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic* property_data, uint32_t num_prop);
 			protected:
 				std::vector<resource::Material*> m_materials;
 				/*	Insert a shader property for rendering component.

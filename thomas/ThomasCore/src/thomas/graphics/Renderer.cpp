@@ -67,10 +67,12 @@ namespace thomas
 
 		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			// Copy data to frame
-			if (command.num_local_prop)
-				command.local_prop = m_frame->m_alloc.allocate(command.local_prop, command.num_local_prop);
 			m_frame->m_queue[command.camera][command.material].push_back(command);
+		}
+
+		render::Frame & Renderer::getAllocator()
+		{
+			return *m_frame;
 		}
 
 		void Renderer::TransferCommandList()

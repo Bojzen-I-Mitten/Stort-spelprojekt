@@ -92,8 +92,16 @@ namespace thomas {
 			{
 				if (m_model)
 				{
+					// Copy data to frame
+					uint32_t num_prop = uint32_t(m_properties.size());
+					const thomas::resource::shaderproperty::ShaderPropertyStatic* local_prop;
+					if (m_properties.size())
+						local_prop = System::S_RENDERER.getAllocator().m_alloc.allocate(m_properties.data(), num_prop);
+					else
+						local_prop = nullptr;
+					// Submit
 					for (int i = 0; i < m_model->GetMeshes().size(); i++)
-						SubmitPart(camera, i);
+						SubmitPart(camera, i, local_prop, num_prop);
 				}
 			}
 
@@ -119,7 +127,7 @@ namespace thomas {
 				return s_renderComponents;
 			}
 
-			void RenderComponent::SubmitPart(Camera* camera, unsigned int i)
+			void RenderComponent::SubmitPart(Camera* camera, unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic* property_data, uint32_t num_prop)
 			{
 				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
 				if (material == nullptr)
@@ -128,14 +136,14 @@ namespace thomas {
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
 				//assert(verifyPropertyList(m_properties.data(), m_properties.size()));
-
+				
 				thomas::graphics::render::RenderCommand cmd(
 					m_gameObject->m_transform->GetWorldMatrix(), 
 					mesh.get(), 
 					material, 
 					camera, 
-					m_properties.size(), 
-					m_properties.data());
+					num_prop,
+					property_data);
 
 				System::S_RENDERER.SubmitCommand(cmd);
 			}
