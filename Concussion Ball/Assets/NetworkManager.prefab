@@ -33,10 +33,12 @@
       <d3p1:TICK_RATE>24</d3p1:TICK_RATE>
       <d3p1:isServer>false</d3p1:isServer>
       <d3p1:netPeers xmlns:d4p1="http://schemas.datacontract.org/2004/07/LiteNetLib" i:nil="true" />
-      <d3p1:playerPrefab i:nil="true" />
+      <d3p1:playerPrefab z:Id="6" i:type="SceneResource">
+        <path z:Id="7">%THOMAS_ASSETS%\Chad.prefab</path>
+      </d3p1:playerPrefab>
       <d3p1:port>9050</d3p1:port>
-      <d3p1:spawnablePrefabs z:Id="6" z:Size="0" />
-      <d3p1:testPacket z:Id="7">
+      <d3p1:spawnablePrefabs z:Id="8" z:Size="0" />
+      <d3p1:testPacket z:Id="9">
         <d3p1:ID>0</d3p1:ID>
         <d3p1:transformPos>
           <x>0</x>
