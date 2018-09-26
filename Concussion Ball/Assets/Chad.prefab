@@ -22,9 +22,9 @@
           </m_gameObject>
           <children z:Size="0" />
           <localEulerAngles>
-            <x>-5.08785</x>
-            <y>-0</y>
-            <z>-0</z>
+            <x>0</x>
+            <y>-5.08785</y>
+            <z>0</z>
           </localEulerAngles>
           <localPosition>
             <x>0</x>
@@ -54,7 +54,7 @@
                   <path z:Id="12">%THOMAS_ASSETS%\anim\Running_animation.anim</path>
                 </animation>
                 <material z:Id="13">
-                  <path z:Id="14">%THOMAS_ASSETS%\SkinningMat.mat</path>
+                  <path z:Id="14"></path>
                 </material>
                 <model z:Id="15">
                   <path z:Id="16">%THOMAS_ASSETS%\anim\Running_model.fbx</path>
@@ -90,7 +90,7 @@
       </localEulerAngles>
       <localPosition>
         <x>0</x>
-        <y>0.159546554</y>
+        <y>2</y>
         <z>0</z>
       </localPosition>
       <localScale>

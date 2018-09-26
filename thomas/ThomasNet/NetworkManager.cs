@@ -391,7 +391,7 @@ namespace ThomasEngine.Network
                 };
                 //SendEventToAllBut(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell old clients to spawn object
                 //spawnEvent.isOwner = true;
-                SendEventToPeer(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
+                //SendEventToPeer(spawnEvent, DeliveryMethod.ReliableOrdered, connected); //tell new client to spawn object
             }
             else
             {
