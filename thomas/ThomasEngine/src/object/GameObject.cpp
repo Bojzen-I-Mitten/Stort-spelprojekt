@@ -1,5 +1,6 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
+#include <thomas\AutoProfile.h>
 #pragma managed
 #include "GameObject.h"
 #include "Component.h"
@@ -83,12 +84,14 @@ namespace ThomasEngine {
 
 	void GameObject::Update()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->enabled) {
+			if (component->enabled) 
+			{
 				component->Update();
 				component->UpdateCoroutines();
 			}
@@ -99,6 +102,7 @@ namespace ThomasEngine {
 
 	void GameObject::FixedUpdate()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
@@ -111,6 +115,7 @@ namespace ThomasEngine {
 
 	void GameObject::OnCollisionEnter(GameObject^ collider)
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 
 		for (int i = 0; i < m_components.Count; i++)
@@ -124,6 +129,7 @@ namespace ThomasEngine {
 
 	void GameObject::RenderGizmos()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
@@ -163,6 +169,7 @@ namespace ThomasEngine {
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 		return gameObject;
@@ -295,6 +302,7 @@ namespace ThomasEngine {
 	where T : Component
 	T GameObject::AddComponent()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::allocation)
 		Monitor::Enter(m_componentsLock);
 		Type^ typ = T::typeid;
 
@@ -326,6 +334,7 @@ namespace ThomasEngine {
 
 
 	Component^ GameObject::GetComponent(Type^ type) {
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		for (int i = 0; i < m_components.Count; i++) {
 			if (m_components[i]->GetType() == type)
 				return m_components[i];

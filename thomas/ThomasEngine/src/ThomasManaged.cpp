@@ -85,19 +85,19 @@ namespace ThomasEngine {
 			// Macro that resets profilemanagers
 			// if BENCHMARK is not defined, compiler does nothing
 			NEW_FRAME();
-			PROFILE("ThomasCore::Initialized", thomas::ProfileManager::operationType::miscLogic)
+			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
 				continue;
 			}
 			thomas::ThomasTime::Update();
+
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 
 			if (Window::WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
 				RenderFinished->WaitOne();
 			Window::Update();
-
 
 			ThomasCore::Update();
 			Monitor::Enter(lock);

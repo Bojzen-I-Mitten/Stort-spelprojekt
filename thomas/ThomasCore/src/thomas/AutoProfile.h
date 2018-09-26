@@ -20,7 +20,7 @@ namespace thomas
 }
 
 #ifdef BENCHMARK
-#define PROFILE(name, type) AutoProfile temp = AutoProfile(name, type);
+#define PROFILE(name, type) thomas::AutoProfile temp = thomas::AutoProfile(name, type);
 #else
 #define PROFILE(name, type) 
 #endif

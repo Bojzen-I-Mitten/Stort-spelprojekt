@@ -12,7 +12,7 @@ namespace thomas
 	AutoProfile::~AutoProfile()
 	{
 		std::chrono::steady_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-		std::chrono::milliseconds stamp = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_startTime);
+		std::chrono::microseconds stamp = std::chrono::duration_cast<std::chrono::microseconds>(endTime - m_startTime);
 
 		ProfileManager::storeSample(m_name, stamp.count(), m_type);
 	}

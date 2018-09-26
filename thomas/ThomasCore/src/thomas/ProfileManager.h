@@ -12,18 +12,20 @@ namespace thomas
 	{
 
 	public:
-		enum class operationType { rendering, miscLogic, gameObjects, physics, animation };
+		enum class operationType { rendering, miscLogic, gameObjects, physics, animation, allocation };
 		struct Sample
 		{
+			const char* name;
 			operationType type;
 			std::vector<long> stamps;
 		};
 
 		static void storeSample(const char* string, long elapsedTime, operationType);
 		static void newFrame();
-		
+
 	private:
 		static std::map<const char, Sample> s_samples;
+		static int nrOfFrames;
 	};
 }
 
