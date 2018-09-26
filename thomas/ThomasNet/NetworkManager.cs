@@ -200,7 +200,7 @@ namespace ThomasEngine.Network
                     break;
                 case PacketType.EVENT:
                     Debug.Log("recived events!");
-                    netPacketProcessor.ReadAllPackets(reader);
+                    netPacketProcessor.ReadAllPackets(reader, peer);
 
                     break;
                 default:
