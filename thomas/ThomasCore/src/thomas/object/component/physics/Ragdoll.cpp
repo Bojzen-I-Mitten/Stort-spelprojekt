@@ -100,6 +100,16 @@ namespace thomas
 				}
 			}
 
+			void Ragdoll::SetBoneCapsuls(math::Vector2 boneCapsule, int whichCapsule)
+			{
+				boneCapsuls[whichCapsule] = boneCapsule;
+			}
+
+			math::Vector2 Ragdoll::GetBoneCapsuls(int whichCapsule)
+			{
+				return boneCapsuls[whichCapsule];
+			}
+
 			btRigidBody * Ragdoll::LocalCreateRigidBody(btScalar mass, const btTransform & startTransform, btCollisionShape * shape)
 			{
 				bool isDynamic = (mass != 0.f);

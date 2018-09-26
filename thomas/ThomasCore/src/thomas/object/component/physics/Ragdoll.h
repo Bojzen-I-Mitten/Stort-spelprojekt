@@ -53,7 +53,8 @@ namespace thomas
 				virtual void Update() override;
 				virtual void Awake() override;
 				virtual void OnDrawGizmos() override;
-
+				void SetBoneCapsuls(math::Vector2 boneCapsule, int whichCapsule);
+				math::Vector2 GetBoneCapsuls( int whichCapsule);
 			private:
 				void Init();
 				void InitSkeleton();
@@ -71,6 +72,7 @@ namespace thomas
 				std::vector<float> m_lengths;
 				math::Vector2 boneCapsuls[Ragdoll::BodyParts::BodyParts_Amount];
 				std::pair<uint32_t, uint32_t> boneConnections[Ragdoll::BodyParts::BodyParts_Amount];
+				
 			};
 
 		}
