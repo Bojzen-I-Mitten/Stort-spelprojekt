@@ -125,24 +125,26 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            if (isServer)
-            {
-                ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
-                //RemovePlayerCharacter(peer);
-            }
-            else
-            {
-                ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
+            //if (isServer)
+            //{
+            //    ThomasEngine.Debug.Log("A client has disconnected with the IP" + peer.EndPoint.ToString());
+            //    //RemovePlayerCharacter(peer);
+            //}
+            //else
+            //{
+            //    ThomasEngine.Debug.Log("The server you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
 
 
-                List<int> keys = new List<int>(networkIDObjects.Keys);
-                foreach (int key in keys)
-                {
-                    DeleteAndUnregister(key);
-                }
+            //    List<int> keys = new List<int>(networkIDObjects.Keys);
+            //    foreach (int key in keys)
+            //    {
+            //        DeleteAndUnregister(key);
+            //    }
 
-            }
+            //}
 
+            RemovePlayerCharacter(peer);
+            ThomasEngine.Debug.Log("The peer you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
         }
 
         private void Listener_PeerConnectedEvent(NetPeer _peer)
@@ -247,9 +249,9 @@ namespace ThomasEngine.Network
 
         }
 
-        private void Unregister(int NetworkID)
+        private void Unregister(int networkID)
         {
-            networkIDObjects.Remove(NetworkID);
+            networkIDObjects.Remove(networkID);
         }
 
         private int Register(NetworkID netID)
@@ -492,7 +494,6 @@ namespace ThomasEngine.Network
             networkIDObjects[networkID].gameObject.Destroy();
             Unregister(networkID);
         }
-
 
         public void Checkpacketloss()
         {
