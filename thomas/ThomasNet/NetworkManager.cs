@@ -355,24 +355,27 @@ namespace ThomasEngine.Network
             else if (spawnEvent.prefabID == -1)
             {
                 prefab = playerPrefab;
+                int maxPlayerID = spawnEvent.netID;
+                foreach (var player in players)
+                {
+                    if (maxPlayerID > player.Value.ID)
+                        maxPlayerID = player.Value.ID;
+                }
+                maxPlayerID++;
+                spawnEvent.netID = maxPlayerID;
             }
             else
             {
                 Debug.Log("Tried spawning object not in NetworkManager prefab list");
                 return;
             }
-
-            int maxPlayerID = spawnEvent.netID;
-            foreach(var player in players)
-            {
-                if (maxPlayerID > player.Value.ID)
-                    maxPlayerID = player.Value.ID;
-            }
-            maxPlayerID++;
-
-            GameObject gObj = InstantiateAndRegister(prefab, maxPlayerID, spawnEvent.position, spawnEvent.rotation);
+            
+            GameObject gObj = InstantiateAndRegister(prefab, spawnEvent.netID, spawnEvent.position, spawnEvent.rotation);
             gObj.Name += spawnEvent.isOwner ? "(My player)" : "";
             gObj.GetComponent<NetworkID>().Owner = spawnEvent.isOwner;
+
+            if (spawnEvent.prefabID == -1)
+                players.Add(peer, gObj.GetComponent<NetworkID>());
         }
 
         private void SpawnPlayerCharacter(NetPeer connected)
