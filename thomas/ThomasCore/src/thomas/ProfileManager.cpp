@@ -1,6 +1,6 @@
 #include "ProfileManager.h"
 #include "ProfileManager.h"
-
+#include <fstream>
 
 namespace thomas 
 {
@@ -25,11 +25,33 @@ namespace thomas
 			s_samples[*name].type;
 		}
 	}
+
 	void ProfileManager::newFrame()
 	{
 		nrOfFrames++;
 
 		//for (auto& element : s_samples)
 		//	element.second.stamps.clear();
+	}
+
+	void ProfileManager::dumpDataToFile(const char * filename)
+	{
+		const char* delimiter = ",";
+		std::fstream file;
+		file.open(filename, std::ios::out);
+
+		if (file.is_open())
+		{
+			for (const auto& keyValuePair : s_samples)
+			{
+				file << keyValuePair.second.name << delimiter;
+				for (const auto& sample : keyValuePair.second.stamps)
+				{
+					file << sample << delimiter;
+				}
+				file << "\n";
+			}
+			file.close();
+		}
 	}
 }

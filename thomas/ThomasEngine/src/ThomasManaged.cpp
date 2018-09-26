@@ -175,6 +175,7 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
+		ProfileManager::dumpDataToFile("test.csv");
 		thomas::ThomasCore::Exit();
 	}
 
