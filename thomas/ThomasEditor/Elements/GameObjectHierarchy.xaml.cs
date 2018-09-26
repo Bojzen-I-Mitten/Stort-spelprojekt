@@ -385,6 +385,7 @@ namespace ThomasEditor
 
         private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
         {
+            //Debug.Log(e.ToString());
             e.Handled = true;
         }
         private void MenuItem_SaveAsPrefab(object sender, RoutedEventArgs e)
