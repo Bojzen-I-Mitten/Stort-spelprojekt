@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,6 +22,7 @@ namespace ThomasEditor
 
         bool _isDragging;
         bool wasUnselected = false;
+        GameObject m_copiedObject; //??correct code convention?
         public static GameObjectHierarchy instance;
         public GameObjectHierarchy()
         {
@@ -156,6 +159,7 @@ namespace ThomasEditor
                         if (newItem.transform.parent == null)
                         {
                             TreeViewItem node = new TreeViewItem { DataContext = newItem };
+                            node.IsSelected = true;
                             //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                             node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
                             //node.Padding = new Thickness(0, 0, 0, 2);
@@ -401,6 +405,78 @@ namespace ThomasEditor
             TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
             if(item != null)
                 item.IsSelected = true;
+        }
+
+        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Entered copy function..");
+
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                Debug.Log("Copying object..");
+                m_copiedObject = (GameObject)item.DataContext;
+
+                if(m_copiedObject)
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+        }
+
+        private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
+        {
+            if(m_copiedObject)
+            {
+                GameObject.Instantiate(m_copiedObject);
+
+                Debug.Log("Pasted object.");
+                return;
+            }
+        }
+
+        private void MenuItem_DuplicateGameObject(object sender, RoutedEventArgs e)
+        {
+            MenuItem_CopyGameObject(sender, e);
+            MenuItem_PasteGameObject(sender, e);
+        }
+
+        //Can only click copy when an object is selected
+        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (m_copiedObject)
+            {
+                e.CanExecute = true;
+            }
+        }
+
+        public GameObject GetCopy()
+        {
+            return m_copiedObject;
+        }
+
+        public void SetCopy(GameObject copiedObject)
+        {
+            m_copiedObject = copiedObject;
+        }
+
+        public TreeViewItem GetSelection()
+        {
+            return hierarchy.SelectedItem as TreeViewItem;
         }
     }
 }

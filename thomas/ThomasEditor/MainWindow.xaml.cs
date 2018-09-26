@@ -10,6 +10,7 @@ using System.IO;
 
 using ThomasEngine;
 using System.Threading;
+using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
 namespace ThomasEditor
@@ -29,7 +30,6 @@ namespace ThomasEditor
         Guid g;
         public MainWindow()
         {
-            
             string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
@@ -50,13 +50,33 @@ namespace ThomasEditor
 
             if (Properties.Settings.Default.latestProjectPath != "")
                 OpenProject(Properties.Settings.Default.latestProjectPath);
-
+            else
+            {
+                this.IsEnabled = false;
+                Loaded += new RoutedEventHandler(Timer_OpenProjWindow);
+            }
 
             LoadLayout();
             Closing += MainWindow_Closing;
 
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+        }
+
+        private DispatcherTimer timer;
+
+        private void Timer_OpenProjWindow(object sender, RoutedEventArgs e)
+        {
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += Tick_OpenProjWindow;
+            timer.Start();
+        }
+
+        private void Tick_OpenProjWindow(object sender, EventArgs e)
+        {
+            new OpenProjectWindow().Show();
+            timer.Stop();
         }
 
         private void ScriptingManger_scriptReloadFinished()
@@ -303,7 +323,6 @@ namespace ThomasEditor
             }
         }
 
-
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
             Scene.CurrentScene.UnLoad();
@@ -462,9 +481,76 @@ namespace ThomasEditor
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
+        //Main window CTRL + C
+        private void MW_CopyObject(object sender, RoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                Debug.Log("Copying object..");
+                hierarchy.SetCopy((GameObject)item.DataContext);
+
+                if (hierarchy.GetCopy())
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+        }
+
+        //Main window CTRL + V
+        private void MW_PasteObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Pasting object..");
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+
+            if (hierarchy.GetCopy())
+            {
+                GameObject.Instantiate(hierarchy.GetCopy());
+
+                Debug.Log("Pasted object.");
+
+                return;
+            }
+        }
+
+        private void MW_DuplicateObject(object sender, RoutedEventArgs e)
+        {
+            MW_CopyObject(sender, e);
+            MW_PasteObject(sender, e);
+        }
+
+        //Can only be copied if item is selected
+        private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+            Debug.Log("No object selected __ MW.");
+        }
+
+        //Can only paste when an object has been copied
+        private void MW_PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            if (hierarchy.GetCopy())
+            {
+                e.CanExecute = true;
+                return;
+            }
+            Debug.Log("No copied object to paste.");
+        }
+
         #endregion
 
-        private void NewProject_Click(object sender, RoutedEventArgs e)
+        public void NewProject_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
@@ -473,7 +559,6 @@ namespace ThomasEditor
             saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
-
 
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -493,11 +578,13 @@ namespace ThomasEditor
                 }));
                 worker.SetApartmentState(ApartmentState.STA);
                 worker.Start();
-
+                if (timer != null)
+                {
+                    OpenProjectWindow._instance.ProjectLoadedClose();
+                }
             }
-                      
         }
-        private void OpenProject_Click(object sender, RoutedEventArgs e)
+        public void OpenProject_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
@@ -508,9 +595,11 @@ namespace ThomasEditor
             if (openFileDialog.ShowDialog() == true)
             {
                 OpenProject(openFileDialog.FileName);
-
+                if (timer != null)
+                {
+                    OpenProjectWindow._instance.ProjectLoadedClose();
+                }
             }
-
         }
         public void OpenProject(string projectPath)
         {

@@ -539,7 +539,8 @@ namespace thomas
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			if (window->IsFocused() && isEditor)
+			// To prevent keylock: Always process keyboard, system focus takes care of sending info to correct window.
+			if (window->m_focused)
 				Input::ProcessKeyboard(message, wParam, lParam);
 			break;
 		case WM_DESTROY:
