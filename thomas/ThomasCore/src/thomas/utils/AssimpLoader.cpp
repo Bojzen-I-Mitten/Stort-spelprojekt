@@ -269,7 +269,6 @@ namespace thomas
 			graphics::Vertices vertices;
 			std::vector <unsigned int> indices;
 			std::string name = meshName + "-" + std::string(mesh->mName.C_Str());
-			resource::Material* material;
 
 			//vector<Texture> textures;
 			vertices.positions.resize(mesh->mNumVertices);
@@ -370,7 +369,7 @@ namespace thomas
 						*/
 					}
 
-					for (int j = 0; j < meshBone->mNumWeights; j++)
+					for (unsigned int j = 0; j < meshBone->mNumWeights; j++)
 					{
 						vertices.AddBoneData(meshBone->mWeights[j].mVertexId, boneIndex, meshBone->mWeights[j].mWeight);
 					}
@@ -441,7 +440,7 @@ namespace thomas
 			aiMatrix4x4 nodeTransform = node->mTransformation;
 			aiMatrix4x4 object_space = parentTransform * nodeTransform;
 
-			unsigned int BoneIndex = boneMap.m_boneInfo.size();
+			size_t BoneIndex = boneMap.m_boneInfo.size();
 			graphics::animation::Bone bi;
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
