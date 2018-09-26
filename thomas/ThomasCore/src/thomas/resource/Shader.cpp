@@ -620,7 +620,7 @@ namespace thomas
 					isMaterialProperty = true;
 					if (semantic == "NORMALTEXTURE")
 					{
-						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetBlueTexture());
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
 					}
 					else
 					{

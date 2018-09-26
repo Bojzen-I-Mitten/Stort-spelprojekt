@@ -7,7 +7,7 @@ namespace thomas
 	{
 		Texture2D* Texture2D::s_blackTexture;
 		Texture2D* Texture2D::s_whiteTexture;
-		Texture2D* Texture2D::s_blueTexture;
+		Texture2D* Texture2D::s_normalTexture;
 
 		void Texture2D::Init()
 		{
@@ -15,9 +15,9 @@ namespace thomas
 			std::fill(std::begin(colors), std::end(colors), math::Color(0, 0, 0, 1).RGBA());
 			s_blackTexture = new Texture2D((void*)&colors, 4, 4, false, true);
 			s_blackTexture->m_path = "Black Texture";
-			std::fill(std::begin(colors), std::end(colors), math::Color(0, 0, 1, 1).RGBA());
-			s_blueTexture = new Texture2D((void*)&colors, 4, 4, false, true);
-			s_blueTexture->m_path = "Blue Texture";
+			std::fill(std::begin(colors), std::end(colors), math::Color(0.5f, 0.5f, 1, 1).RGBA());
+			s_normalTexture = new Texture2D((void*)&colors, 4, 4, false, true);
+			s_normalTexture->m_path = "Normal Texture";
 			std::fill(std::begin(colors), std::end(colors), math::Color(1, 1, 1, 1).RGBA());
 			s_whiteTexture = new Texture2D((void*)&colors, 4, 4, false, true);
 			s_whiteTexture->m_path = "White Texture";
@@ -116,9 +116,9 @@ namespace thomas
 			return s_whiteTexture;
 		}
 
-		Texture2D * Texture2D::GetBlueTexture()
+		Texture2D * Texture2D::GetNormalTexture()
 		{
-			return s_blueTexture;
+			return s_normalTexture;
 		}
 
 

@@ -106,6 +106,8 @@ namespace ThomasEngine {
 		for (auto& prop : ((thomas::resource::Material*)m_nativePtr)->GetEditorProperties())
 		{
 			String^ name = Utility::ConvertString(prop.first);
+			if (prop.second == nullptr)
+				continue;
 			System::Object^ value;
 			switch (prop.second->GetType())
 			{
