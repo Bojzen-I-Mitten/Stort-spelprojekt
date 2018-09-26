@@ -75,7 +75,8 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects) {
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
+				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
