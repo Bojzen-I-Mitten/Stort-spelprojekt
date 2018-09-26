@@ -18,7 +18,8 @@ namespace thomas
 				enum BodyParts
 				{	
 					BodyPart_Chest,
-		
+					BodyPart_Head,
+
 					BodyPart_Left_UpperArm,
 					BodyPart_Left_LowerArm,
 
@@ -57,16 +58,19 @@ namespace thomas
 				void Init();
 				void InitSkeleton();
 				unsigned int Hash(const char *str);
+				btCapsuleShape * PrepareCapsulTransform(const math::Matrix & fromWorld, const math::Matrix & toWorld, float lengthScale, float radius, btTransform & outTrans);
 				btRigidBody* LocalCreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
-				btCapsuleShape* PrepareCapsulTransform(const math::Matrix& fromWorld, const math::Matrix& toWorld, float radius, btTransform &outTrans);
-
+				void initvectors();
 			private:
+				math::Matrix boneArr[15];
 				btCollisionShape* m_shapes[BodyParts_Amount];
 				btRigidBody* m_bodies[BodyParts_Amount];
 				btTypedConstraint* m_joints[Joint_Amount];
 				thomas::graphics::animation::IBlendTree* m_tree;
 				std::vector<uint32_t> m_boneIndex;
 				std::vector<float> m_lengths;
+				math::Vector2 boneCapsuls[Ragdoll::BodyParts::BodyParts_Amount];
+				std::pair<uint32_t, uint32_t> boneConnections[Ragdoll::BodyParts::BodyParts_Amount];
 			};
 
 		}

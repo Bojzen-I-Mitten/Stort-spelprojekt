@@ -5,6 +5,7 @@
 #include "../../../Common.h"
 #include <stdint.h>
 #include "../../../editor/gizmos/Gizmos.h"
+#include <utility>
 
 namespace thomas 
 {
@@ -12,12 +13,11 @@ namespace thomas
 	{
 		namespace component 
 		{
-			const float RADIUS = 30.f;
 
 			Ragdoll::Ragdoll()
 			{
 				m_bodies[0] = nullptr;
-
+				initvectors();
 				//init();
 			}
 
@@ -27,6 +27,10 @@ namespace thomas
 
 			void Ragdoll::Update()
 			{
+				math::Matrix world = m_gameObject->m_transform->GetWorldMatrix();
+
+
+
 		/*		btTransform trans;
 				m_bodies[0]->getMotionState()->getWorldTransform(trans);
 
@@ -40,6 +44,7 @@ namespace thomas
 
 			void Ragdoll::Awake()
 			{
+				
 				Init();
 				//			m_shapes[BodyPart_Chest] = new btCapsuleShape(btScalar(0.15), btScalar(0.20));
 				//				btTransform trans;
@@ -51,17 +56,47 @@ namespace thomas
 				//			m_bodies[BodyPart_Chest] = localCreateRigidBody(btScalar(1.), trans, m_shapes[BodyPart_Chest]);
 
 			}
+
+			// Capsul settings. Order: Length (scaler), Radius
+			
+			const static std::string boneNames[15]
+			{
+				"mixamorig:Spine",
+				"mixamorig:Head",
+				"mixamorig:HeadTop_End",
+
+				"mixamorig:LeftShoulder",
+				"mixamorig:LeftForeArm",
+				"mixamorig:LeftHandMiddle1",
+
+				"mixamorig:RightShoulder",
+				"mixamorig:RightForeArm",
+				"mixamorig:RightHandMiddle1",
+
+				"mixamorig:RightUpLeg",
+				"mixamorig:RightLeg",
+				"mixamorig:RightFoot",
+
+				"mixamorig:LeftUpLeg",
+				"mixamorig:LeftLeg",
+				"mixamorig:LeftFoot"
+			};
+
+
 			void Ragdoll::OnDrawGizmos()
 			{
 				if (m_bodies[BodyParts::BodyPart_Chest] != nullptr)
 				{
-					btTransform t;
-					m_bodies[BodyPart_Chest]->getMotionState()->getWorldTransform(t);
-					math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
 
-					editor::Gizmos::SetColor(math::Color(0, 1, 0));
-					editor::Gizmos::SetMatrix(m);
-					editor::Gizmos::DrawBoundingCapsule(DirectX::SimpleMath::Vector3(0, 0, 0), RADIUS, m_lengths[0]);
+					btTransform t;
+					for(int i = 0; i < Ragdoll::BodyParts::BodyParts_Amount; i++)
+					{
+						m_bodies[i]->getMotionState()->getWorldTransform(t);
+						math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
+						editor::Gizmos::SetColor(math::Color(0, 1, 0));
+						editor::Gizmos::SetMatrix(m);
+						editor::Gizmos::DrawBoundingCapsule(math::Vector3(0,0,0), boneCapsuls[i].y, m_lengths[i]);
+					}
 				}
 			}
 
@@ -83,6 +118,24 @@ namespace thomas
 				return body;
 			}
 
+			void Ragdoll::initvectors()
+			{
+				for(int i= 0;i< Ragdoll::BodyParts::BodyParts_Amount;i++)
+				boneCapsuls[i] = math::Vector2(1.f, 0.1f);
+								
+				boneConnections[0] = std::pair<uint32_t, uint32_t>(0, 1);
+				boneConnections[1] = std::pair<uint32_t, uint32_t>(1, 2);
+				boneConnections[2] = std::pair<uint32_t, uint32_t>(3, 4);
+				boneConnections[3] = std::pair<uint32_t, uint32_t>(4, 5);
+				boneConnections[4] = std::pair<uint32_t, uint32_t>(6, 7);
+				boneConnections[5] = std::pair<uint32_t, uint32_t>(7, 8);
+				boneConnections[6] = std::pair<uint32_t, uint32_t>(9, 10);
+				boneConnections[7] = std::pair<uint32_t, uint32_t>(10, 11);
+				boneConnections[8] = std::pair<uint32_t, uint32_t>(12, 13);
+				boneConnections[9] = std::pair<uint32_t, uint32_t>(13, 14);
+				
+			}
+
 			unsigned int Ragdoll::Hash(const char *str)
 			{
 				unsigned long hash = 5381;
@@ -94,28 +147,32 @@ namespace thomas
 				return hash;
 			}
 
-			btCapsuleShape* Ragdoll::PrepareCapsulTransform(const math::Matrix& fromWorld, const math::Matrix& toWorld, float radius, btTransform &outTrans)
+			
+
+			btCapsuleShape* Ragdoll::PrepareCapsulTransform(const math::Matrix& fromWorld, const math::Matrix& toWorld, float lengthScale, float radius, btTransform &outTrans)
 			{
-				math::Vector3 m_bone_pos = fromWorld.Translation();
-				math::Vector3 m_boneNext_pos = toWorld.Translation();
-				math::Vector3 m_up = m_boneNext_pos - m_bone_pos;
+				math::Vector3 bone_pos = fromWorld.Translation();
+				math::Vector3 boneNext_pos = toWorld.Translation();
+				math::Vector3 up = boneNext_pos - bone_pos;
 
-				float length = m_up.Length();
-				math::Vector3 m_pos = m_bone_pos + m_up * (length * 0.5f);
+				float length = up.Length();
+				if(length != 0)
+				up /= length; // Normalize
+				math::Vector3 pos = bone_pos + up * (length * 0.5f);
 
-				math::Quaternion q(m_up, 0.f);
-				outTrans.setOrigin(reinterpret_cast<btVector3&>(m_pos));
+				math::Quaternion q = math::getRotationTo(math::Vector3::Up, up);
+			//	q.Normalize();
+				outTrans.setOrigin(reinterpret_cast<btVector3&>(pos));
 				outTrans.setRotation(reinterpret_cast<btQuaternion&>(q));
-				
+
+				length *= lengthScale;
 				m_lengths.push_back(length);
 				return new btCapsuleShape(radius, length);
 			}
 
-			const static std::string boneNames[Ragdoll::BodyParts::BodyParts_Amount]
-			{
-				"mixamorig:Hips",
-				"mixamorig:Head"
-			};
+
+
+
 
 			/* Identifies all skeleton bone indices
 			*/	
@@ -136,7 +193,7 @@ namespace thomas
 				bool foundBones = true;
 				m_boneIndex = std::vector<uint32_t>(m_tree->boneCount());
 				uint32_t i = 0;
-				for (; i < BodyParts::BodyParts_Amount; i++)
+				for (; i < 15; i++)
 				{
 					bool found = m_tree->getBoneIndex(Hash(boneNames[i].c_str()), m_boneIndex[i]);
 					foundBones &= found;
@@ -153,6 +210,8 @@ namespace thomas
 				}
 			}
 				
+
+
 			void Ragdoll::Init()
 			{
 				InitSkeleton();
@@ -166,16 +225,24 @@ namespace thomas
 
 				// Fetch bone transform in object space
 
-				math::Matrix boneArr[BodyParts::BodyParts_Amount];
-				for (unsigned int i = 0; i < BodyParts::BodyParts_Amount; i++)
+				for (unsigned int i = 0; i < 15; i++)
 					boneArr[i] = m_tree->getBoneMatrix(m_boneIndex[i]) * world;
 
 				
-			//	constexpr float chestRad = 5;
-
 				btTransform transform;
-				m_shapes[BodyPart_Chest] = PrepareCapsulTransform(boneArr[0], boneArr[1], RADIUS, transform);
-				m_bodies[BodyPart_Chest] = LocalCreateRigidBody(btScalar(0), transform, m_shapes[BodyPart_Chest]);
+				for (uint32_t i = 0; i < Ragdoll::BodyParts::BodyParts_Amount; i++) {
+					m_shapes[i] = PrepareCapsulTransform(boneArr[boneConnections[i].first], boneArr[boneConnections[i].second], boneCapsuls[i].x, boneCapsuls[i].y, transform);
+					m_bodies[i] = LocalCreateRigidBody(btScalar(0), transform, m_shapes[i]);
+				}
+
+				/*
+				m_shapes[BodyPart_Head] = PrepareCapsulTransform(boneArr[2], boneArr[1], RADIUS, transform);
+				m_bodies[BodyPart_Head] = LocalCreateRigidBody(btScalar(0), transform, m_shapes[BodyPart_Head]);
+
+				m_shapes[BodyPart_Left_UpperArm] = PrepareCapsulTransform(boneArr[3], boneArr[4], RADIUS, transform);
+				m_bodies[BodyPart_Left_UpperArm] = LocalCreateRigidBody(btScalar(0), transform, m_shapes[BodyPart_Left_UpperArm]);
+				*/
+
 
 				//	thomas::Physics::s_world;
 				//	m_shapes[]

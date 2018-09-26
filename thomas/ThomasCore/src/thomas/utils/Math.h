@@ -18,6 +18,9 @@ namespace DirectX
 		using DirectX::BoundingFrustum;
 		using DirectX::BoundingOrientedBox;
 
+
+		Quaternion getRotationTo(Vector3 from, Vector3 dest);
+
 		inline float DegreesToRadians(const float & degree)
 		{
 			return std::fmodf(degree, 360.f) * (PI / 180.f);

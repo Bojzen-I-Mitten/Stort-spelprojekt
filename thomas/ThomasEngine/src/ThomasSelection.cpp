@@ -3,6 +3,7 @@
 #pragma managed
 #include "ThomasSelection.h"
 #include "object\GameObject.h"
+#include "Debug.h"
 
 using namespace System::Threading;
 namespace ThomasEngine {
@@ -27,6 +28,10 @@ namespace ThomasEngine {
 			m_SelectedGameObjects->Clear();
 			m_SelectedGameObjects->Add(gObj);
 			thomas::editor::EditorCamera::SelectObject((thomas::object::GameObject*)gObj->nativePtr);
+		}
+		catch (Exception^ e) {
+			m_SelectedGameObjects->Clear();
+			Debug::Log("Warning! Selection failed object corrupt with error: " + e->Message);
 		}
 		finally	{
 			Monitor::Exit(m_lock);

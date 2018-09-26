@@ -9,7 +9,7 @@ namespace ThomasEngine
 	internal:
 	public:
 		Ragdoll();
-	//	void Update() override;
+	//	void Update() override
 
 	};
 }
