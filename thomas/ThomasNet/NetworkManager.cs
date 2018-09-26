@@ -382,7 +382,7 @@ namespace ThomasEngine.Network
             {
                 SpawnPrefabEvent spawnEvent = new SpawnPrefabEvent
                 {
-                    netID = players.[serverPeer].ID,
+                    netID = players[serverPeer].ID,
                     prefabID = -1,
                     position = playerPrefab.transform.position,
                     rotation = playerPrefab.transform.rotation,
