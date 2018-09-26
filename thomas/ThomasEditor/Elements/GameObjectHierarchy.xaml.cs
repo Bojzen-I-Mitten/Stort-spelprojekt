@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +25,7 @@ namespace ThomasEditor
 
         bool _isDragging;
         bool wasUnselected = false;
+        GameObject m_copiedObject; //??correct code convention?
         public static GameObjectHierarchy instance;
         public GameObjectHierarchy()
         {
@@ -159,6 +162,7 @@ namespace ThomasEditor
                         if (newItem.transform.parent == null)
                         {
                             TreeViewItem node = new TreeViewItem { DataContext = newItem };
+                            node.IsSelected = true;
                             //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                             node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
                             //node.Padding = new Thickness(0, 0, 0, 2);
@@ -373,17 +377,19 @@ namespace ThomasEditor
 
         private void MenuItem_DeleteGameObject(object sender, RoutedEventArgs e)
         {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+            if(item != null)
             //Loop through selected objects
-            for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
-            {
-                GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
+                for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
+                {
+                    GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
 
-                //Unselect selected object
-                ThomasWrapper.Selection.UnSelectGameObject(gObj);
+                    //Unselect selected object
+                    ThomasWrapper.Selection.UnSelectGameObject(gObj);
 
-                //Destroy
-                gObj.Destroy();
-            }
+                    //Destroy
+                    gObj.Destroy();
+                }
         }
 
         private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -397,48 +403,24 @@ namespace ThomasEditor
             }   
         }
 
-        //private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
-        //{
-        //    if (hierarchy.SelectedItem != null)
-        //    {
-        //        TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
-        //        StackPanel stack = item.Header as StackPanel;
-        //        EditableTextBlock lbl = stack.Children[1] as EditableTextBlock;
-        //        item.IsSelected = false;
-        //        lbl.IsInEditMode = true;
-        //        lbl.OnTextChanged += Lbl_OnTextChanged;
-        //    }
-        //}
+        private void Hierarchy_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = hierarchy.SelectedItem as TreeViewItem;
 
-        //private void Lbl_OnTextChanged(object sender)
-        //{
-        //    EditableTextBlock lbl = sender as EditableTextBlock;
-        //    lbl.OnTextChanged -= Lbl_OnTextChanged;
-        //    StackPanel stack = lbl.Parent as StackPanel;
-        //    String fullPath = stack.DataContext as String;
-        //    String oldName = Path.GetFileNameWithoutExtension(fullPath);
-        //    String newFullPath = fullPath.Replace(oldName, lbl.Text);
-
-        //    //Check if file name is not empty string
-        //    if (lbl.Text != "")
-        //    {
-        //        //Rename if file/dir does not exist
-        //        if (File.Exists(fullPath) && !File.Exists(newFullPath))
-        //            File.Move(fullPath, newFullPath);
-        //        else if (Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
-        //            Directory.Move(fullPath, newFullPath);
-        //        else
-        //        {
-        //            lbl.Text = oldName;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        lbl.Text = oldName;
-        //    }
-        //    TreeViewItem item = stack.Parent as TreeViewItem;
-        //    item.Focus();
-        //}
+            if (treeViewItem != null)
+            {
+                treeViewItem.Focus();
+                hiearchyContextMenu.DataContext = true;
+                //e.Handled = true;
+            }
+            else
+            {
+                TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+                if (item != null)
+                    item.IsSelected = false;
+                hiearchyContextMenu.DataContext = false;
+            }
+        }
 
         private void MenuItem_SaveAsPrefab(object sender, RoutedEventArgs e)
         {
@@ -465,6 +447,78 @@ namespace ThomasEditor
             TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
             if(item != null)
                 item.IsSelected = true;
+        }
+
+        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Entered copy function..");
+
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                Debug.Log("Copying object..");
+                m_copiedObject = (GameObject)item.DataContext;
+
+                if(m_copiedObject)
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+        }
+
+        private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
+        {
+            if(m_copiedObject)
+            {
+                GameObject.Instantiate(m_copiedObject);
+
+                Debug.Log("Pasted object.");
+                return;
+            }
+        }
+
+        private void MenuItem_DuplicateGameObject(object sender, RoutedEventArgs e)
+        {
+            MenuItem_CopyGameObject(sender, e);
+            MenuItem_PasteGameObject(sender, e);
+        }
+
+        //Can only click copy when an object is selected
+        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (m_copiedObject)
+            {
+                e.CanExecute = true;
+            }
+        }
+
+        public GameObject GetCopy()
+        {
+            return m_copiedObject;
+        }
+
+        public void SetCopy(GameObject copiedObject)
+        {
+            m_copiedObject = copiedObject;
+        }
+
+        public TreeViewItem GetSelection()
+        {
+            return hierarchy.SelectedItem as TreeViewItem;
         }
     }
 }
