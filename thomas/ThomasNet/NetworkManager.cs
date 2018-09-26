@@ -262,9 +262,13 @@ namespace ThomasEngine.Network
 
         private int Register(NetworkID netID, int targetID)
         {
-            iD = targetID + 1;
-            networkIDObjects.Add(targetID, netID);
-            netID.ID = targetID;
+
+            if (!networkIDObjects.ContainsKey(targetID))
+            {
+                iD = targetID + 1;
+                networkIDObjects.Add(targetID, netID);
+                netID.ID = targetID;
+            }
             return iD;
         }
 
