@@ -29,7 +29,8 @@ namespace thomas {
 
 		EditorCamera * Editor::Camera()
 		{
-			return Editor::Camera();
+			// Editor should own the camera instance
+			return EditorCamera::GetEditorCamera();
 		}
 
 		void Editor::ClearEditorState()
