@@ -20,12 +20,14 @@ namespace thomas
 			std::vector<long> stamps;
 		};
 
+
 		static void storeSample(const char* functionName, long elapsedTime, operationType);
 		static void newFrame();
 		static void dumpDataToFile(const char* filename);
 
 	private:
 		static std::map<const char, Sample> s_samples;
+		static std::vector<std::map<const char, Sample>> s_frames;
 		static int nrOfFrames;
 	};
 }

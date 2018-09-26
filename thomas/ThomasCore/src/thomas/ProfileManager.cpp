@@ -6,14 +6,13 @@ namespace thomas
 {
 	int ProfileManager::nrOfFrames;
 	std::map<const char, ProfileManager::Sample> ProfileManager::s_samples;
-
+	std::vector<std::map<const char, ProfileManager::Sample>> ProfileManager::s_frames;
 
 	void ProfileManager::storeSample(const char* name, long elapsedTime, operationType type)
 	{
 		// Object exists
 		if (s_samples.find(*name) != s_samples.end())
 		{
-
 			s_samples[*name].stamps.push_back(elapsedTime);
 			s_samples[*name].type = type;
 		}
@@ -29,7 +28,8 @@ namespace thomas
 	void ProfileManager::newFrame()
 	{
 		nrOfFrames++;
-
+		s_frames.push_back(s_samples);
+		s_samples.clear();
 		//for (auto& element : s_samples)
 		//	element.second.stamps.clear();
 	}
@@ -42,16 +42,19 @@ namespace thomas
 
 		if (file.is_open())
 		{
-			for (const auto& keyValuePair : s_samples)
+			for (const auto& frame : s_frames)
 			{
-				file << keyValuePair.second.name << delimiter;
-				for (const auto& sample : keyValuePair.second.stamps)
+				for (const auto& keyValuePair : frame)
 				{
-					file << sample << delimiter;
+					file << keyValuePair.second.name << delimiter;
+					for (const auto& sample : keyValuePair.second.stamps)
+					{
+						file << sample << delimiter;
+					}
+					file << "\n";
 				}
-				file << "\n";
+				file.close();
 			}
-			file.close();
 		}
 	}
 }
