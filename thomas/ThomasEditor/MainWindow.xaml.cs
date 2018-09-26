@@ -528,19 +528,6 @@ namespace ThomasEditor
             Debug.Log("No copied object to paste.");
         }
 
-        private void MW_DuplicateObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            TreeViewItem item = hierarchy.GetSelection();
-
-            if (item != null)
-            {
-                e.CanExecute = true;
-                return;
-            }
-            Debug.Log("No object selected __ MW.");
-        }
-
         #endregion
 
         private void NewProject_Click(object sender, RoutedEventArgs e)

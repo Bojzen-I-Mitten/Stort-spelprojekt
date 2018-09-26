@@ -17,6 +17,7 @@
                     <ContextMenu.CommandBindings>
                         <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_CopyGameObject"/>
                         <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="PasteObject_CanExecute" Executed="MenuItem_PasteGameObject"/>
+                        <CommandBinding Command="commands:CustomCommands.GetDuplicateObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_DuplicateGameObject"/>
                     </ContextMenu.CommandBindings>
                     
                     <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>
@@ -24,6 +25,7 @@
                     <Separator/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetCopyObject}"/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetPasteObject}"/>
+                    <MenuItem Command="{x:Static commands:CustomCommands.GetDuplicateObject}"/>
                     <Separator/>
                     <MenuItem Header="Save as prefab" IsEnabled="{Binding}" Click="MenuItem_SaveAsPrefab"/>
                 </ContextMenu>

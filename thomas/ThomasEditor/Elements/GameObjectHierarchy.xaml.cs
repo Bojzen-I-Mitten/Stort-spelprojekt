@@ -437,6 +437,12 @@ namespace ThomasEditor
             }
         }
 
+        private void MenuItem_DuplicateGameObject(object sender, RoutedEventArgs e)
+        {
+            MenuItem_CopyGameObject(sender, e);
+            MenuItem_PasteGameObject(sender, e);
+        }
+
         //Can only click copy when an object is selected
         private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
