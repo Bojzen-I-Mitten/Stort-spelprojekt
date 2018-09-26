@@ -6,6 +6,8 @@
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/ShaderProperty/ShaderProperty.h"
+#include "../../System.h"
+#include "../../graphics/render/Frame.h"
 
 namespace thomas {
 	namespace object {
@@ -19,6 +21,7 @@ namespace thomas {
 				m_bounds.Extents.x = 0;
 				m_bounds.Extents.y = 0;
 				m_bounds.Extents.z = 0;
+				m_materials.push_back(resource::Material::GetStandardMaterial());
 			}
 
 			bool RenderComponent::SetModel(resource::Model* model)
@@ -30,15 +33,16 @@ namespace thomas {
 					m_bounds.Extents.x = 0;
 					m_bounds.Extents.y = 0;
 					m_bounds.Extents.z = 0;
+					m_materials.resize(1);
 				}
 				else
 				{
 					m_model = model;
-					if (m_model->GetMeshes().size() < m_materials.size())
+					if (m_model->GetMeshes().size() < m_materials.size()){
 						m_materials.resize(m_model->GetMeshes().size());
-
+					}
 					while (m_model->GetMeshes().size() > m_materials.size())
-						m_materials.push_back(resource::Material::GetStandardMaterial());
+						m_materials.push_back(m_materials[0]);
 				}
 				return true;
 			}
@@ -131,8 +135,16 @@ namespace thomas {
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
 				assert(verifyPropertyList(m_properties.data(), m_properties.size()));
-				graphics::Renderer::S_RENDERER.SubmitCommand(
-					thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh.get(), material, camera, m_properties.size(), m_properties.data()));
+
+				thomas::graphics::render::RenderCommand cmd(
+					m_gameObject->m_transform->GetWorldMatrix(), 
+					mesh.get(), 
+					material, 
+					camera, 
+					m_properties.size(), 
+					m_properties.data());
+
+				System::S_RENDERER.SubmitCommand(cmd);
 			}
 
 			void RenderComponent::insertProperty(const resource::shaderproperty::ShaderProperty * prop)

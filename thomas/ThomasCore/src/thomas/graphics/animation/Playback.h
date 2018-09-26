@@ -10,15 +10,14 @@ namespace thomas {
 			{
 			public:
 				Playback();
+				Playback(float startAt) : m_elapsed(startAt){}
 				virtual ~Playback();
 
-				virtual void timeStep(float dT) = 0;	// Step elapsed time
-				virtual float getTime()			= 0;	// Get the playback time
+				virtual void timeStep(float dT) {};	// Step elapsed time
 
-			private:
+			public:
 
-				float m_elapTime;
-				float m_duration;
+				float m_elapsed;
 			};
 		}
 	}

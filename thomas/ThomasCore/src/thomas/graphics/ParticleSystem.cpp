@@ -24,9 +24,10 @@ namespace thomas
 			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/updateParticlesCS.hlsl");
 
 			unsigned maxNrOfParticles = 25000;
-			m_spawnNewParticles = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
-			m_updateParticlesPing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, DYNAMIC_BUFFER);//ammount of particles supported for entire system
-			m_updateParticlesPong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, DYNAMIC_BUFFER);//ammount of particles supported for entire system
+			m_particleSpawn = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_particleUpdatePing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, true);//ammount of particles supported for entire system
+			m_particleUpdatePong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, true);//ammount of particles supported for entire system
+			m_particleDeadList = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned), maxNrOfParticles * 2, D3D11_BUFFER_UAV_FLAG_APPEND);//appendconsumebuffer
 			m_pingpong = true;
 
 
@@ -124,7 +125,7 @@ namespace thomas
 			}
 
 
-
+			m_emitParticlesCS->SetGlobalUAV("deadlist", m_particleDeadList->GetUAV());
 			//object::component::ParticleEmitterComponent::InitParticleBufferStruct data[m_spawningEmitters.size()];
 
 			m_emitParticlesCS->Bind();
@@ -146,14 +147,18 @@ namespace thomas
 
 			if (m_pingpong)
 			{
-				m_updateParticlesCS->SetGlobalUAV("particlesWrite", m_updateParticlesPing->GetUAV());
-				m_updateParticlesCS->SetGlobalResource("particlesRead", m_updateParticlesPong->GetSRV());
+				m_updateParticlesCS->SetGlobalUAV("particlesWrite", m_particleUpdatePing->GetUAV());
+				m_updateParticlesCS->SetGlobalResource("particlesRead", m_particleUpdatePong->GetSRV());
+				
 			}
 			else
 			{
-				m_updateParticlesCS->SetGlobalUAV("particlesWrite", m_updateParticlesPong->GetUAV());
-				m_updateParticlesCS->SetGlobalResource("particlesRead", m_updateParticlesPing->GetSRV());
+				m_updateParticlesCS->SetGlobalUAV("particlesWrite", m_particleUpdatePong->GetUAV());
+				m_updateParticlesCS->SetGlobalResource("particlesRead", m_particleUpdatePing->GetSRV());
 			}
+
+			m_updateParticlesCS->SetGlobalUAV("deadlist", m_particleDeadList->GetUAV());
+
 			//bind CS
 			//s_updateParticlesCS->SetUAV("particlesWrite", *s_activeParticleUAV);
 			//s_updateParticlesCS->SetUAV("billboards", *emitter->GetD3DData()->billboardsUAV);

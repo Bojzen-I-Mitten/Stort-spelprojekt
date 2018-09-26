@@ -1,13 +1,13 @@
 #pragma once
-#include "../Common.h"
 #include <string>
 #include <vector>
+#include <windows.h>
 namespace thomas
 {
 	class Scene;
 	namespace object
 	{
-		class THOMAS_API Object
+		class Object
 		{
 		private:
 		public:

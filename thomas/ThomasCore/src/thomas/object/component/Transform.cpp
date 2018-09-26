@@ -54,7 +54,7 @@ namespace thomas
 			void Transform::SetWorldMatrix(math::Matrix matrix)
 			{
 				if (m_parent) {
-					m_localWorldMatrix = m_localWorldMatrix * m_parent->GetWorldMatrix().Invert();
+					m_localWorldMatrix = matrix * m_parent->GetWorldMatrix().Invert();
 				}
 				else
 				{

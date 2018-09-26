@@ -46,6 +46,7 @@
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
+    <ClCompile Include="src\SceneSurrogate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
     <ClInclude Include="src\object\component\ParticleEmitter.h" />
+    <ClInclude Include="src\SceneSurrogate.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />

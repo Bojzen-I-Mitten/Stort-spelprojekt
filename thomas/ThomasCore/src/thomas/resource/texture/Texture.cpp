@@ -1,5 +1,5 @@
 #include "Texture.h"
-
+#include "../../Common.h"
 namespace thomas
 {
 	namespace resource

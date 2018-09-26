@@ -27,14 +27,18 @@ namespace thomas
 				};
 
 				ShaderProperty(Type type);
+				ShaderProperty(Type type, const std::string & name);
+				virtual ~ShaderProperty() {}
 
 				virtual void Apply(std::string name, Shader* shader) const = 0;
 				void Apply(Shader* shader) const;
 				bool equals(const ShaderProperty &other) const;
 
+				virtual ShaderProperty* copy() const;
+
 			public:
 				Type GetType() const;
-				std::string GetName() const;
+				const std::string& GetName() const;
 				void SetName(std::string name);
 
 			private:

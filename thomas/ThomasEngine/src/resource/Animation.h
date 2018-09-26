@@ -1,7 +1,6 @@
 #pragma once
 #pragma unmanaged
 #include <thomas\resource\Animation.h>
-#include <memory>
 #pragma managed
 #include "Resource.h"
 

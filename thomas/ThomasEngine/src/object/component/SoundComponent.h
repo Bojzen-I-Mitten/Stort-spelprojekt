@@ -1,78 +1,42 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\component\SoundComponent.h>
-#include <thomas\object\component\Component.h>
-
-#pragma managed
-#include "../../resource/AudioClip.h"
-#include "../../Utility.h"
 #include "../Component.h"
-#include "../../Input.h"
-
+namespace thomas { namespace object { namespace component { class SoundComponent; } } }
 namespace ThomasEngine
 {
+	ref class AudioClip;
 	public ref class SoundComponent : public Component
 	{
 	private:
 		AudioClip ^ m_clip;
-
+		property thomas::object::component::SoundComponent* sound { thomas::object::component::SoundComponent* get(); }
 	public:
-		SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}
-		
-		property AudioClip^ clip 
-		{
-			AudioClip^ get() 
-			{
-				return m_clip;
-			}
+		SoundComponent();
 
-			void set(AudioClip^ value)
-			{
-				m_clip = value;
-				((thomas::object::component::SoundComponent*)nativePtr)->SetClip((thomas::resource::AudioClip*)value->m_nativePtr);
-			}
+		property AudioClip^ clip
+		{
+		AudioClip^ get();
+
+		void set(AudioClip^ value);
 		}
 
-		property float Volume 
+		property float Volume
 		{
-			float get() 
-			{
-				return ((thomas::object::component::SoundComponent*)nativePtr)->GetVolume();
-			}
+			float get();
 
-			void set(float value)
-			{
-				((thomas::object::component::SoundComponent*)nativePtr)->SetVolume(value);
-			}
-		}
-		
-		property bool Looping 
-		{
-			bool get() 
-			{
-				return ((thomas::object::component::SoundComponent*)nativePtr)->IsLooping();
-			}
-
-			void set(bool value) 
-			{
-				return ((thomas::object::component::SoundComponent*)nativePtr)->SetLooping(value);
-			}
+			void set(float value);
 		}
 
-		bool Play() { return ((thomas::object::component::SoundComponent*)nativePtr)->Play(); }
-		bool PlayOneShot(String^ name, float volume) { return ((thomas::object::component::SoundComponent*)nativePtr)->PlayOneShot(Utility::ConvertString(name), volume); }
-		void Pause() { return ((thomas::object::component::SoundComponent*)nativePtr)->Pause(); }
-		void Resume() { return ((thomas::object::component::SoundComponent*)nativePtr)->Resume(); }
-
-		void Update() override
+		property bool Looping
 		{
-			if (Input::GetKeyDown(Input::Keys::P))
-			{
-				Play();
-				//((thomas::object::component::SoundComponent*)nativePtr)->Play();
-			}
+			bool get();
+
+			void set(bool value);
 		}
-	private:
+
+		bool Play();
+		bool PlayOneShot(String^ name, float volume);
+		void Pause();
+		void Resume();
 
 	};
 }

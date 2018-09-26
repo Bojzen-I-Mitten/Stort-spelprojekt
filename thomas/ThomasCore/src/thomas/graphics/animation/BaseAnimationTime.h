@@ -19,11 +19,9 @@ namespace thomas {
 
 
 				virtual void timeStep(float dT);	// Step elapsed time
-				virtual float getTime();			// Get the playback time
 
 			private:
 				float m_duration;
-				float m_elapsed;
 				float m_speedUp;
 				PlayType m_playType;
 			};

@@ -89,7 +89,14 @@ namespace ThomasEditor
 
             private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             {
+            
                 this.Dispatcher.Invoke((Action)(() => {
+                    if ((DataContext is GameObject) == false)
+                    {
+                        BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
+                        MaterialEditor.DataContext = null;
+                        return;
+                    }
                     GameObject SelectedGameObject = DataContext as GameObject;
                     RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();
                     if (rc != null)
@@ -101,6 +108,7 @@ namespace ThomasEditor
                     else
                     {
                         BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
+                        MaterialEditor.DataContext = null;
                     }
                 }));
                 

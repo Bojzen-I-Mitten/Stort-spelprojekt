@@ -34,6 +34,7 @@ struct BillboardStruct
 StructuredBuffer<ParticleStruct> particlesRead;
 RWStructuredBuffer<ParticleStruct> particlesWrite;
 RWStructuredBuffer<BillboardStruct> billboards;
+AppendStructuredBuffer<uint> deadList;
 
 
 [numthreads(256, 1, 1)]

@@ -27,7 +27,6 @@ namespace thomas
 		s_solver = std::make_unique<btSequentialImpulseConstraintSolver>();
 		s_world = std::make_unique<btDiscreteDynamicsWorld>(s_dispatcher.get(), s_broadPhase.get(), s_solver.get(), s_collisionConfiguration.get());
 		s_debugDraw = std::make_unique<graphics::BulletDebugDraw>();
-
 		//Set states
 		s_world->setGravity(btVector3(0, -9.82f, 0));
 		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);

@@ -1,14 +1,12 @@
 #pragma once
 #pragma unmanaged
 #include <thomas\resource\Material.h>
-#include <thomas\resource\ShaderProperty\shaderProperties.h>
 #pragma managed
-#include "Shader.h"
-#include "Resources.h"
-#include "texture\Texture2D.h"
-using namespace System::Collections::Generic;
+#include "Resource.h"
 namespace ThomasEngine
 {
+	ref class Shader;
+	ref class Texture2D;
 	[DataContractAttribute]
 	public ref class Material : public Resource
 	{
@@ -27,14 +25,9 @@ namespace ThomasEngine
 		}
 
 
-		Material(Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
-		{
-			m_loaded = true;
-		}
-		Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
-		{
-			m_loaded = true;
-		}
+		Material(Shader^ shader);
+
+		Material(Material^ original);
 
 
 		void OnPlay() override
@@ -69,7 +62,7 @@ namespace ThomasEngine
 		
 		static property Material^ StandardMaterial
 		{
-			Material^ get() { return gcnew Material(thomas::resource::Material::GetStandardMaterial()); }
+			Material^ get();
 		}
 		
 		void SetShaderPassEnabled(int index, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(index, enabled); }
@@ -90,34 +83,16 @@ namespace ThomasEngine
 		Vector4 GetVector(String^ name) { return Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetVector(Utility::ConvertString(name))); }
 		void SetVector(String^ name, Vector4 value) { ((thomas::resource::Material*)m_nativePtr)->SetVector(Utility::ConvertString(name), thomas::math::Vector4(value.x, value.y, value.z, value.w)); }
 
-		Texture2D^ GetTexture2D(String^ name) 
-		{
-			thomas::resource::Texture2D* nativePtr = ((thomas::resource::Material*)m_nativePtr)->GetTexture2D(Utility::ConvertString(name));
-			ThomasEngine::Resource^ texture = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
-			if (texture)
-				return (ThomasEngine::Texture2D^)texture;
-			else
-				return gcnew ThomasEngine::Texture2D(nativePtr);
-		}
-		void SetTexture2D(String^ name, Texture2D^ value) { ((thomas::resource::Material*)m_nativePtr)->SetTexture2D(Utility::ConvertString(name), (thomas::resource::Texture2D*)value->m_nativePtr); }
-		
+		Texture2D^ GetTexture2D(String^ name);
+		void SetTexture2D(String^ name, Texture2D^ value);
+
 		[DataMemberAttribute(Order=0)]
 		property Shader^ Shader
 		{
-			ThomasEngine::Shader^ get() {
-				thomas::resource::Shader* nativePtr = ((thomas::resource::Material*)m_nativePtr)->GetShader();
-				ThomasEngine::Resource^ shader = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
-				if (shader)
-					return (ThomasEngine::Shader^)shader;
-				else
-					return gcnew ThomasEngine::Shader(nativePtr);
-
-			}
+			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
 		}
-
-
-
+				
 		[DataMemberAttribute(Order = 1)]
 		property Dictionary<String^, System::Object^>^ EditorProperties
 		{
@@ -138,9 +113,5 @@ namespace ThomasEngine
 		{
 			m_loaded = true;
 		}
-				
-	/*	Texture* GetTexture(String^ name);
-		void SetTexture(String^ name, Texture& value);*/
-
 	};
 }

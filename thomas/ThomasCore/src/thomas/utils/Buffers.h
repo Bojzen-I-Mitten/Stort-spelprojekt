@@ -70,7 +70,8 @@ namespace thomas
 			class StructuredBuffer : public Buffer
 			{
 			public:
-				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag, bool createUAV = false);
+				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER, bool createUAV = false);
+				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_BUFFER_UAV_FLAG uavFlag, D3D11_USAGE usageFlag = STATIC_BUFFER);
 				template <typename T>
 				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
 

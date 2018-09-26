@@ -1,11 +1,11 @@
 #include "BaseAnimationTime.h"
-
+#include <algorithm>
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 			BaseAnimationTime::BaseAnimationTime(float startAt, float duration, PlayType playType)
-				: m_elapsed(startAt), m_duration(duration), m_speedUp(1.f), m_playType(playType)
+				: Playback(startAt), m_duration(duration), m_speedUp(1.f), m_playType(playType)
 			{
 			}
 			BaseAnimationTime::~BaseAnimationTime()
@@ -18,7 +18,7 @@ namespace thomas {
 					switch (m_playType)
 					{
 					case PlayType::Loop:
-						m_elapsed = m_elapsed - m_duration;	// Loop time
+						m_elapsed = std::fmodf(m_elapsed, m_duration);	// Loop time
 						break;
 					case PlayType::Once:
 					default:
@@ -26,10 +26,6 @@ namespace thomas {
 						break;
 					}
 				}
-			}
-			float BaseAnimationTime::getTime()
-			{
-				return m_elapsed;
 			}
 		}
 	}

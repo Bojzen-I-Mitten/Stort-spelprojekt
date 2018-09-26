@@ -50,7 +50,7 @@ struct ParticleStruct
 StructuredBuffer<InitParticlesBuffer> initParticles;
 RWStructuredBuffer<ParticleStruct> particlesWrite;
 RWStructuredBuffer<ParticleStruct> particlesWrite2;
-
+ConsumeStructuredBuffer<uint> deadList;
 
 uint rand_xorshift(uint rng_state)
 {

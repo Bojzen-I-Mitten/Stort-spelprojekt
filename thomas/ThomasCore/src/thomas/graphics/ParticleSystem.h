@@ -49,9 +49,10 @@ namespace thomas
 			resource::ComputeShader* m_updateParticlesCS;
 
 			
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnNewParticles;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateParticlesPing;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateParticlesPong;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleSpawn;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePing;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePong;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleDeadList;
 			bool m_pingpong;
 
 
