@@ -16,15 +16,34 @@ namespace thomas
 	namespace utils
 	{
 #pragma region Declares
-
+		struct ProcessCommands {
+			/* False: use m_rootID to find all roots to process. */
+			bool m_processFromAnimationRoots;
+			/* Include all channels containing keyframes, if not set the processor ignores animations with no more then keyframe per channel. */
+			bool m_IncludeAllKeyframedChannels;
+			/* Process all children of a processed node, if it has no keyframes at all. */
+			bool m_IncludeAllChildren;
+			/* If no child remains marked for processing ignore if not marked. */
+			bool m_IgnoreLeafChains;
+		};
+		struct NodeInfo {
+			uint32_t NumChannel;
+			bool MarkedAnim;
+			NodeInfo()
+				: NumChannel(0), MarkedAnim(false)
+			{}
+			NodeInfo(uint32_t NumChannel, bool MarkedAnim)
+				: NumChannel(NumChannel), MarkedAnim(MarkedAnim)
+			{}
+		};
 		struct SkeletonConstruct {
+
+			ProcessCommands m_Commands;
 			
 			/* Stores animated nodes with n keyframes. */
 
-			std::set<aiNode*> m_animatedNodes;
+			std::map<aiNode*, NodeInfo> m_animatedNodes;
 			std::set<std::string> m_rootID;
-			/* False: use m_rootID to find all roots to process. */
-			bool m_processFromAnimationRoots;
 
 			std::map<std::string, unsigned int> m_mapping;
 			std::vector<graphics::animation::Bone> m_boneInfo;
@@ -43,7 +62,11 @@ namespace thomas
 			graphics::animation::Skeleton* generateSkeleton() {
 				if (m_boneInfo.size() == 0)
 					return nullptr;
-				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(m_boneInfo, m_skeletonRoot);
+				std::vector<graphics::animation::TransformComponents> bindComponents(m_boneInfo.size());
+				for (unsigned int i = 0; i < bindComponents.size(); i++) {
+					bindComponents[i].Decompose(m_boneInfo[i]._bindPose);
+				}
+				graphics::animation::Skeleton* skel = new graphics::animation::Skeleton(m_boneInfo, bindComponents, m_skeletonRoot);
 				//for (unsigned int i = 0; i < _animations.size(); i++)
 				//	skel->addAnimation(_animations[i]);
 				return skel;
@@ -63,7 +86,7 @@ namespace thomas
 
 		void IdentifyAnimatedNodes(const aiScene* scene, SkeletonConstruct& construct);
 		void FindSkeleton(aiNode * node, SkeletonConstruct &boneMap, aiMatrix4x4 parentTransform);
-		void ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform);
+		bool ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform);
 		void ProcessMesh(aiNode* node, const aiScene* scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap, aiMatrix4x4 parentTransform);
 		void ProcessAnimations(const aiScene* scene, SkeletonConstruct& construct);
 
@@ -138,7 +161,11 @@ namespace thomas
 			SkeletonConstruct skelConstruct;
 			
 			// Define skeleton roots
-			skelConstruct.m_processFromAnimationRoots = false;
+			skelConstruct.m_Commands.m_processFromAnimationRoots = false;
+			skelConstruct.m_Commands.m_IncludeAllChildren = true;
+			skelConstruct.m_Commands.m_IncludeAllKeyframedChannels = false;
+			skelConstruct.m_Commands.m_IgnoreLeafChains = false;
+
 			skelConstruct.m_rootID.insert("mixamorig:hips");
 
 
@@ -155,8 +182,10 @@ namespace thomas
 			SkeletonConstruct skelConstruct;
 
 			// Define skeleton roots
-			skelConstruct.m_processFromAnimationRoots = true;
-			skelConstruct.m_rootID.insert("mixamorig:hips");
+			skelConstruct.m_Commands.m_processFromAnimationRoots = true;
+			skelConstruct.m_Commands.m_IncludeAllChildren = false;
+			skelConstruct.m_Commands.m_IncludeAllKeyframedChannels = false;
+			skelConstruct.m_Commands.m_IgnoreLeafChains = false;
 
 			resource::Model::ModelData tmpData;
 			const aiScene* scene = LoadScene(importer, path);
@@ -410,13 +439,19 @@ namespace thomas
 			aiMatrix4x4 object_space = parentTransform * node->mTransformation;
 
 
-			bool exist;
-			if(boneMap.m_processFromAnimationRoots)
-				exist = boneMap.m_animatedNodes.find(node) != boneMap.m_animatedNodes.end();
-			else
-				exist = boneMap.m_rootID.find(boneName) != boneMap.m_rootID.end();
+			bool marked;
+			// Find first bone node marked for processing
+			if (boneMap.m_Commands.m_processFromAnimationRoots) {
+				auto itr = boneMap.m_animatedNodes.find(node);
+				if (boneMap.m_animatedNodes.find(node) != boneMap.m_animatedNodes.end())
+					marked = itr->second.MarkedAnim;
+				else
+					marked = false;
+			}
+			else // Find if node matches a name id
+				marked = boneMap.m_rootID.find(boneName) != boneMap.m_rootID.end();
 			
-			if (exist) {
+			if (marked) {
 				boneMap.m_skeletonRoot = convertAssimpMatrix(parentTransform);
 				ProcessSkeleton(node, boneMap, -1, parentTransform);
 			}
@@ -436,14 +471,33 @@ namespace thomas
 			return UINT32_MAX;
 		}
 
-		void ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform)
+		bool ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform)
 		{
 			std::string boneName = node->mName.C_Str();
 
 			aiMatrix4x4 nodeTransform = node->mTransformation;
 			aiMatrix4x4 object_space = parentTransform * nodeTransform;
-
 			size_t BoneIndex = boneMap.m_boneInfo.size();
+			boneMap.m_boneInfo.push_back(graphics::animation::Bone()); // Reserve empty slot, allocate at end
+
+			bool marked = false;
+			auto itr = boneMap.m_animatedNodes.find(node);
+			if (boneMap.m_animatedNodes.find(node) != boneMap.m_animatedNodes.end())
+				marked = itr->second.MarkedAnim;
+
+			bool process = marked || boneMap.m_Commands.m_IncludeAllChildren;
+			// Process children
+			for (unsigned int i = 0; i < node->mNumChildren; i++)
+			{
+				bool processedChild = ProcessSkeleton(node->mChildren[i], boneMap, BoneIndex, object_space);
+				if (boneMap.m_Commands.m_IgnoreLeafChains && processedChild)
+					process |= bool(itr->second.NumChannel);
+			}
+			
+			if (!process) return false;
+
+			// Process Skeleton
+
 			graphics::animation::Bone bi;
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
@@ -456,6 +510,7 @@ namespace thomas
 				boneMap.m_relativeParent.push_back(parentTransform);
 			}
 			bi._bindPose = convertAssimpMatrix(nodeTransform);
+
 			// Store absolute transform
 			boneMap.m_absoluteBind.push_back(object_space);
 
@@ -467,13 +522,9 @@ namespace thomas
 				LOG(boneMap.m_boneInfo[conflictInd]._boneName);
 			}
 
-			boneMap.m_boneInfo.push_back(bi);
+			boneMap.m_boneInfo[BoneIndex] = bi;
 			boneMap.m_mapping[boneName] = BoneIndex;
-
-			for (unsigned int i = 0; i < node->mNumChildren; i++)
-			{
-				ProcessSkeleton(node->mChildren[i], boneMap, BoneIndex, object_space);
-			}
+			return marked;
 		}
 
 		void ProcessMesh(aiNode * node, const aiScene * scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap, aiMatrix4x4 parentTransform)
@@ -599,7 +650,8 @@ namespace thomas
 				return true;
 			return false;
 		}
-
+		/* Traverses channel to find the scale at the time instance
+		*/
 		aiVector3D findScaling(aiNodeAnim* channel, double time) {
 			unsigned int i = 0;
 			for (; i < channel->mNumScalingKeys; i++) {
@@ -615,6 +667,8 @@ namespace thomas
 			float diff = float((time - from.mTime) / (to.mTime - from.mTime));
 			return  (1.f - diff) * from.mValue + diff * to.mValue;
 		}
+		/* Traverses channel to find the rotation at the time instance
+		*/
 		aiQuaternion findRotation(aiNodeAnim* channel, double time) {
 			unsigned int i = 0;
 			for (; i < channel->mNumRotationKeys; i++) {
@@ -632,6 +686,8 @@ namespace thomas
 			aiQuaternion::Interpolate(out, from.mValue, to.mValue, diff);
 			return  out;
 		}
+		/* Used for baking excluded bone transformations in to the animated channel
+		*/
 		void ProcessRelativeChannel(int bone, aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 
 			// Put animation in parent basis
@@ -711,10 +767,13 @@ namespace thomas
 				aiAnimation *anim = scene->mAnimations[i];
 				for (unsigned int ch = 0; ch < anim->mNumChannels; ch++) {
 					aiNodeAnim *channel = anim->mChannels[ch];
-					if (NumKeys(channel) > 3) {
-						aiNode* n = scene->mRootNode->FindNode(channel->mNodeName);
-						construct.m_animatedNodes.insert(n);
-					}
+					aiNode* n = scene->mRootNode->FindNode(channel->mNodeName);
+					NodeInfo info;
+					info.NumChannel = NumKeys(channel);
+					info.MarkedAnim = construct.m_Commands.m_IncludeAllKeyframedChannels ?								// Process command:
+						info.NumChannel :																				// If it has any channel
+						channel->mNumPositionKeys > 1 || channel->mNumRotationKeys > 1 || channel->mNumScalingKeys > 1;	// If any channel has more then one keyframe
+					construct.m_animatedNodes[n] = info;
 				}
 			}
 		}

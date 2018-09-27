@@ -6,10 +6,13 @@ namespace thomas {
 		namespace animation {
 
 			AnimationNode::AnimationNode(Skeleton &ref)
-				: m_ref(ref), m_boneMapping(ref.getNumBones())
+				: m_ref(ref), m_numChannel(0), m_boneMapping()
 			{
+				/*
+				// Set all bones to 'inactive' initially.
 				for (size_t i = 0; i < m_boneMapping.size(); i++)
 					m_boneMapping[i] = -1;
+				*/
 			}
 
 
@@ -55,6 +58,7 @@ namespace thomas {
 			}
 			void BindPoseNode::calcFrame(unsigned int bone, math::Vector3 & trans, math::Vector3 & scale, math::Quaternion & rot)
 			{
+
 			}
 		}
 	}
