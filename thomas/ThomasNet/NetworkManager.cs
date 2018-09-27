@@ -50,6 +50,13 @@ namespace ThomasEngine.Network
         public ConnectToPeerEvent() { IP = ""; netID = -1; }
     }
 
+    public class TransferOwnerEvent
+    {
+        public int netID { get; set; }
+
+        public TransferOwnerEvent() { netID = -1; }
+    }
+
     public enum PacketType
     {
         EVENT,
@@ -111,6 +118,7 @@ namespace ThomasEngine.Network
             SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
             SubscribeToEvent<DeletePrefabEvent>(DeletePrefabEventHandler);
             SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
+            SubscribeToEvent<TransferOwnerEvent>(TransferOwnereventHandler);
 
             //Stäng av alla nätverksobjekt som finns i scenen.
 
@@ -175,8 +183,8 @@ namespace ThomasEngine.Network
                     while (reader.AvailableBytes > 0)
                     {
                         validationID = reader.GetInt();
-                        if (networkIDObjects.ContainsKey(validationID) && networkIDObjects[validationID].enabled)
-                            networkIDObjects[validationID].Read(reader);
+                        if (networkIDObjects.ContainsKey(validationID) && networkIDObjects[validationID].enabled) { }
+                            //networkIDObjects[validationID].Read(reader);
                         else
                             reader.Clear();
                     }
@@ -206,7 +214,7 @@ namespace ThomasEngine.Network
             netManager.PollEvents();
 
             //Write full world state of owned objects.
-            WriteData(DeliveryMethod.Unreliable);
+            //WriteData(DeliveryMethod.Unreliable);
 
 
             if (isClient && netManager.GetFirstPeer() != null)
@@ -301,24 +309,24 @@ namespace ThomasEngine.Network
             sendTo.Send(writer, method);
         }
 
-        public void WriteData(NetDataWriter writer)
-        {
-            writer.Put((int)PacketType.DATA);
-            foreach (NetworkID id in networkIDObjects.Values)
-            {
-                id.Write(writer);
-            }
-        }
-        public void WriteData(DeliveryMethod method)
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put((int)PacketType.DATA);
-            foreach (NetworkID id in networkIDObjects.Values)
-            {
-                id.Write(writer);
-            }
-            netManager.SendToAll(writer, method);
-        }
+        //public void WriteData(NetDataWriter writer)
+        //{
+        //    writer.Put((int)PacketType.DATA);
+        //    foreach (NetworkID id in networkIDObjects.Values)
+        //    {
+        //        id.Write(writer);
+        //    }
+        //}
+        //public void WriteData(DeliveryMethod method)
+        //{
+        //    NetDataWriter writer = new NetDataWriter();
+        //    writer.Put((int)PacketType.DATA);
+        //    foreach (NetworkID id in networkIDObjects.Values)
+        //    {
+        //        id.Write(writer);
+        //    }
+        //    netManager.SendToAll(writer, method);
+        //}
 
         private void InitServerNTP()
         {
@@ -428,6 +436,20 @@ namespace ThomasEngine.Network
             for (int i = 0; i < netPeers.Count; i++)
             {
                 GUI.ImguiStringUpdate("Ping to client " + netPeers[i].EndPoint.ToString() + "  " + netPeers[i].Ping, new Vector2(0, 40 + 10 * i));
+            }
+        }
+
+        public void TransferOwnereventHandler(TransferOwnerEvent transEvent, NetPeer peer)
+        {
+            List<NetworkID> netObjectIDs = GetObjectsOfType<NetworkID>();
+            foreach (var netObjectID in netObjectIDs)
+            {
+                if (netObjectID.ID == transEvent.netID)
+                {
+                    netObjectID.Owner = true;
+                    netObjectID.gameObject.transform.parent = players[serverPeer].transform;
+                    break;
+                }
             }
         }
     }

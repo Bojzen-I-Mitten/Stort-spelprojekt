@@ -20,8 +20,6 @@ namespace ThomasEngine.Network
             networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
 
-
-
         public void WriteAllVars(NetDataWriter writer)
         {
             foreach (NetworkComponent comp in networkComponentsCache)
