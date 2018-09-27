@@ -50,11 +50,14 @@ public class Ball : ScriptComponent
             foreach (var player in NetworkManager.instance.players)
                 if (player.Value == playerThatHasBall)
                 {
-                    TransferOwnerEvent transEvent = new TransferOwnerEvent
+                    if (player.Key.EndPoint != null) //is self
                     {
-                        netID = gameObject.GetComponent<NetworkID>().ID
-                    };
-                    NetworkManager.instance.SendEventToPeer<TransferOwnerEvent>(transEvent, LiteNetLib.DeliveryMethod.ReliableOrdered, player.Key);
+                        TransferOwnerEvent transEvent = new TransferOwnerEvent
+                        {
+                            netID = gameObject.GetComponent<NetworkID>().ID
+                        };
+                        NetworkManager.instance.SendEventToPeer(transEvent, LiteNetLib.DeliveryMethod.ReliableOrdered, player.Key);
+                    }
                     break;
                 }
         }
