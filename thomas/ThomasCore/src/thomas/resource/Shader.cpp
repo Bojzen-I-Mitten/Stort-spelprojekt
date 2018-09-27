@@ -36,7 +36,7 @@ namespace thomas
 				return;
 			}
 
-			for (int i = 0; i < effectDesc.GlobalVariables; i++)
+			for (uint32_t i = 0; i < effectDesc.GlobalVariables; i++)
 			{
 				ID3DX11EffectVariable* variable = m_effect->GetVariableByIndex(i);
 				if (variable->IsValid())
@@ -52,7 +52,7 @@ namespace thomas
 			if (tech->IsValid())
 			{
 				tech->GetDesc(&techniqueDesc);
-				for (int j = 0; j < techniqueDesc.Passes; j++)
+				for (uint32_t j = 0; j < techniqueDesc.Passes; j++)
 				{
 					ShaderPass pass;
 					D3DX11_PASS_SHADER_DESC vsPassDesc;
@@ -73,7 +73,7 @@ namespace thomas
 
 						std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
 						std::vector<Semantics> inputSemantics;
-						for (int iInput = 0; iInput < vsDesc.NumInputSignatureEntries; iInput++)
+						for (uint32_t iInput = 0; iInput < vsDesc.NumInputSignatureEntries; iInput++)
 						{
 							D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 							vs->GetInputSignatureElementDesc(vsPassDesc.ShaderIndex, iInput, &paramDesc);
