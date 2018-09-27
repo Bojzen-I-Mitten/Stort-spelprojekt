@@ -37,13 +37,18 @@ namespace thomas
 				enum Joint
 				{
 					Joint_Neck,
-					Joint_pelvis,
 
 					Joint_Left_Arm,
 					Joint_Right_Arm,
 
+					Joint_Lower_Left_Arm,
+					Joint_Lower_Right_Arm,
+
 					Joint_Left_Leg,
 					Joint_Right_Leg,
+
+					Joint_Lower_Left_Leg,
+					Joint_Lower_Right_Leg,
 					Joint_Amount
 				};
 				
@@ -53,15 +58,16 @@ namespace thomas
 				virtual void Update() override;
 				virtual void Awake() override;
 				virtual void OnDrawGizmos() override;
-				void SetBoneCapsuls(math::Vector2 boneCapsule, int whichCapsule);
-				math::Vector2 GetBoneCapsuls( int whichCapsule);
+				void SetBoneCapsuls(math::Vector3 boneCapsule, int whichCapsule);
+				math::Vector3 GetBoneCapsuls( int whichCapsule);
 			private:
 				void Init();
 				void InitSkeleton();
 				unsigned int Hash(const char *str);
-				btCapsuleShape * PrepareCapsulTransform(const math::Matrix & fromWorld, const math::Matrix & toWorld, float lengthScale, float radius, btTransform & outTrans);
+				btCapsuleShape * PrepareCapsulTransform(const math::Matrix & fromWorld, const math::Matrix & toWorld, float lengthScale, float radius, btTransform & outTrans, float extralength);
 				btRigidBody* LocalCreateRigidBody(btScalar mass, const btTransform& startTransform, btCollisionShape* shape);
 				void initvectors();
+				btConeTwistConstraint* CreateConstraints(btRigidBody * firstbody, btRigidBody * secondbody, btTransform & firstTransform, btTransform & secondTransform, btScalar Swing1, btScalar Swing2, btScalar twist);
 			private:
 				math::Matrix boneArr[15];
 				btCollisionShape* m_shapes[BodyParts_Amount];
@@ -70,8 +76,10 @@ namespace thomas
 				thomas::graphics::animation::IBlendTree* m_tree;
 				std::vector<uint32_t> m_boneIndex;
 				std::vector<float> m_lengths;
-				math::Vector2 boneCapsuls[Ragdoll::BodyParts::BodyParts_Amount];
+				math::Vector3 boneCapsuls[Ragdoll::BodyParts::BodyParts_Amount];
 				std::pair<uint32_t, uint32_t> boneConnections[Ragdoll::BodyParts::BodyParts_Amount];
+
+
 				
 			};
 

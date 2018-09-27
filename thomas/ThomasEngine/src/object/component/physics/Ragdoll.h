@@ -11,57 +11,58 @@ namespace ThomasEngine
 	public:
 		Ragdoll();
 	//	void Update() override
+/*
+		property Vector3 ChangeCapsule0
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(0)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 0); };
+		}
+		property Vector3 ChangeCapsule1
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(1)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 1); };
+		}
+		property Vector3 ChangeCapsule2
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(2)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 2); };
+		}
+		property Vector3 ChangeCapsule3
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(3)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 3); };
+		}
+		property Vector3 ChangeCapsule4
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(4)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 4); };
+		}
+		property Vector3 ChangeCapsule5
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(5)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 5); };
+		}
 
-		property Vector2 ChangeCapsule0
+		property Vector3 ChangeCapsule6
 		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(0)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 0); };
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(6)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 6); };
 		}
-		property Vector2 ChangeCapsule1
+		property Vector3 ChangeCapsule7
 		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(1)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 1); };
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(7)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 7); };
 		}
-		property Vector2 ChangeCapsule2
+		property Vector3 ChangeCapsule8
 		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(2)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 2); };
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(8)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 8); };
 		}
-		property Vector2 ChangeCapsule3
+		property Vector3 ChangeCapsule9
 		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(3)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 3); };
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(9)); }
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector3(value.x, value.y, value.z), 9); };
 		}
-		property Vector2 ChangeCapsule4
-		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(4)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 4); };
-		}
-		property Vector2 ChangeCapsule5
-		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(5)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 5); };
-		}
-
-		property Vector2 ChangeCapsule6
-		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(6)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 6); };
-		}
-		property Vector2 ChangeCapsule7
-		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(7)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 7); };
-		}
-		property Vector2 ChangeCapsule8
-		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(8)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 8); };
-		}
-		property Vector2 ChangeCapsule9
-		{
-			Vector2 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetBoneCapsuls(9)); }
-			void set(Vector2 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetBoneCapsuls(thomas::math::Vector2(value.x, value.y), 9); };
-		}
+		*/
 	};
 }
