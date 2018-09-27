@@ -4,7 +4,6 @@
 
 #pragma once
 #include "..\utils\Math.h"
-#include "LightManager.h"
 #include <vector>
 #include <map>
 #include <memory>
@@ -42,7 +41,6 @@ namespace thomas
 		
 		class Renderer {
 		private:
-			static LightManager s_lightManager;
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 
@@ -63,6 +61,7 @@ namespace thomas
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
+			
 		};
 	}
 }

@@ -16,6 +16,7 @@ namespace thomas
 	namespace resource
 	{
 		class ComputeShader;
+		class Shader;
 	}
 	namespace graphics
 	{
@@ -41,7 +42,7 @@ namespace thomas
 			void DrawParticles();
 
 		private:
-			unsigned m_maxNrOfParticles;//maxNrOfPraticles
+			unsigned m_maxNrOfParticles;
 			unsigned m_emittedParticles; 
 
 			resource::ComputeShader* m_emitParticlesCS;
@@ -55,13 +56,14 @@ namespace thomas
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePong;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleDeadList;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleAliveList;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleBillboards;
 			bool m_pingpong;
 
 			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;
 			std::vector<unsigned> m_spawningEmitterEmissionRate;
 			std::vector<object::component::ParticleEmitterComponent*> m_updateEmitters; 
 			
-			
+			resource::Shader* m_particleShader;
 		public:
 
 		};

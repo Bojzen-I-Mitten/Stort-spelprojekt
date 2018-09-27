@@ -146,11 +146,11 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         uint writeindex = deadList.Consume();
         aliveList.Append(writeindex);
         
+        
 
         particlesWrite[writeindex] = fillBuffer;
         particlesWrite2[writeindex] = fillBuffer;
-        
-        
+       
 
         
 

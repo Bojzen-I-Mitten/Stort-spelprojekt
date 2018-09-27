@@ -45,9 +45,6 @@ namespace thomas
 
 		graphics::LightManager::Initialize();
 
-		graphics::ParticleSystem p;
-		p.Initialize();
-
 
 		s_initialized = true;
 		return s_initialized;

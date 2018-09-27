@@ -14,6 +14,7 @@ namespace thomas
 	}
 	namespace graphics
 	{
+		class ParticleSystem;
 		class LightManager
 		{
 		public:
@@ -69,6 +70,8 @@ namespace thomas
 			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
 
 			static LightCountsStruct s_lightCounts;
+
+			static ParticleSystem test;
 		};
 	}
 }

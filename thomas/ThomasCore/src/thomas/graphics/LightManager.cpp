@@ -3,18 +3,19 @@
 #include "..\resource\Shader.h"
 #include "..\object\Object.h"
 #include "..\object\component\LightComponent.h"
+#include "ParticleSystem.h"
 
 #include <algorithm>
 namespace thomas
 {
 	namespace graphics
 	{
-	
+		
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
-
+		ParticleSystem LightManager::test;
 
 		void LightManager::Initialize()
 		{
@@ -24,6 +25,8 @@ namespace thomas
 			s_lightCounts.nrOfSpotLights = 0;
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
+
+			test.Initialize();
 		}
 		
 		void LightManager::Destroy()
@@ -91,6 +94,10 @@ namespace thomas
 
 		void LightManager::Update()
 		{
+			test.SpawnParticles();
+
+
+
 			std::vector<LightStruct> allLights;
 
 			for (object::component::LightComponent* light : s_lights)

@@ -30,9 +30,9 @@ namespace thomas
 			LightManager::Bind();
 		}
 
-		Renderer::Renderer()
-			: m_frame(new render::Frame(100)), m_prevFrame(new render::Frame(100))
+		Renderer::Renderer() : m_frame(new render::Frame(100)), m_prevFrame(new render::Frame(100))
 		{
+			
 		}
 
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
@@ -114,6 +114,8 @@ namespace thomas
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
+
+
 			}
 
 			//Take care of the editor camera and render gizmos
