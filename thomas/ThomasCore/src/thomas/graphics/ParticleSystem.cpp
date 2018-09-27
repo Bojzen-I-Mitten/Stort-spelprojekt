@@ -120,6 +120,8 @@ namespace thomas
 			m_updateParticlesCS->SetGlobalUAV("aliveList", m_particleDeadList->GetUAV());
 			m_updateParticlesCS->SetGlobalUAV("billboards", m_particleBillboards->GetUAV());
 
+			
+
 			m_updateParticlesCS->Dispatch(25000);
 
 		}

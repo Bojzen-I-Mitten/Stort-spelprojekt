@@ -61,6 +61,7 @@ namespace thomas
 			static void Update();
 
 			static void Bind();
+			static void DANK();
 		private:
 
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);

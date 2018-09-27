@@ -115,6 +115,11 @@ namespace thomas
 			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
 			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
+		void LightManager::DANK()
+		{
+			test.UpdateParticles();
+			test.DrawParticles();
+		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{
 			if (light1->GetType() == light2->GetType())

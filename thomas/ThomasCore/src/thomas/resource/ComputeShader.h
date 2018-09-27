@@ -14,7 +14,7 @@ namespace thomas
 			~ComputeShader();
 		public:
 			void Dispatch(int threadGroupX, int threadGroupY = 1, int threadGroupZ = 1);
-			
+			void DispatchIndirect();
 		};
 	}
 }
