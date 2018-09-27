@@ -66,7 +66,7 @@ namespace ThomasEngine.Network
     public class NetworkManager : ScriptComponent
     {
         private Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
-        private Dictionary<NetPeer, GameObject> players = new Dictionary<NetPeer, GameObject>();
+        public Dictionary<NetPeer, GameObject> players = new Dictionary<NetPeer, GameObject>();
         int iD = -1;
         int validationID = -5;
         private NetPacketProcessor netPacketProcessor;

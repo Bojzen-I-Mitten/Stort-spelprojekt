@@ -21,7 +21,7 @@ public class Ball : ScriptComponent
             if (Input.GetKey(Input.Keys.LeftControl) && !rb.enabled)
             {
                 currentForce += force * Time.DeltaTime;
-               // visualizer.SetStrength(currentForce);
+                // visualizer.SetStrength(currentForce);
             }
 
             if (Input.GetKeyUp(Input.Keys.LeftControl) && !rb.enabled)
@@ -31,7 +31,7 @@ public class Ball : ScriptComponent
                 rb.AddForce(playerThatHasBall.transform.forward * currentForce, Rigidbody.ForceMode.Impulse);
                 playerThatHasBall = null;
                 currentForce = 0.0f;
-               // visualizer.SetStrength(0);
+                // visualizer.SetStrength(0);
             }
         }
 
@@ -46,6 +46,17 @@ public class Ball : ScriptComponent
             rb.enabled = false;
             transform.parent = collider.transform;
             transform.localPosition = new Vector3(0, 2, 0);
+
+            foreach (var player in NetworkManager.instance.players)
+                if (player.Value == playerThatHasBall)
+                {
+                    TransferOwnerEvent transEvent = new TransferOwnerEvent
+                    {
+                        netID = gameObject.GetComponent<NetworkID>().ID
+                    };
+                    NetworkManager.instance.SendEventToPeer<TransferOwnerEvent>(transEvent, LiteNetLib.DeliveryMethod.ReliableOrdered, player.Key);
+                    break;
+                }
         }
 
     }
