@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Common.h"
 #include <d3dx11effect.h>
 #include <vector>
 #include <map>
@@ -12,9 +11,9 @@ namespace thomas
 {
 	namespace resource
 	{
-		namespace shaderProperty { class ShaderProperty; }
+		namespace shaderproperty { class ShaderProperty; }
 		class Texture2D;
-		class THOMAS_API Shader : public Resource
+		class Shader : public Resource
 		{
 		public:
 			enum class Semantics
@@ -30,8 +29,9 @@ namespace thomas
 				COLOR = 8,
 				POSITIONT = 9,
 				PSIZE = 10,
-				UNKNOWN = 11,
-				BONEWEIGHT = 12
+				BONEINDICES = 11,
+				BONEWEIGHTS = 12,
+				UNKNOWN = 13
 			};
 		private:
 			static bool Compile(std::string path, ID3DX11Effect** effect);
@@ -91,14 +91,14 @@ namespace thomas
 			std::vector<std::string> GetMaterialProperties();
 			ID3DX11Effect* GetEffect();
 			bool HasProperty(const std::string& name);
-			std::shared_ptr<shaderProperty::ShaderProperty> GetProperty(const std::string& name);
-			std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> GetProperties();
+			std::shared_ptr<shaderproperty::ShaderProperty> GetProperty(const std::string& name);
+			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> GetProperties();
 			static void Update();
 			void Recompile();
 			static void QueueRecompile();
 		private:
 			ID3DX11Effect* m_effect;
-			std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> m_properties;
+			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> m_properties;
 			std::vector<ShaderPass> m_passes;
 			ShaderPass* m_currentPass;
 			std::vector<std::string> m_materialProperties;

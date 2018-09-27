@@ -6,23 +6,47 @@ namespace thomas
 	namespace resource
 	{
 		class Shader;
-		namespace shaderProperty
+		namespace shaderproperty
 		{
 			class ShaderPropertyMatrix : public ShaderProperty
 			{
 			public:
 
-				ShaderPropertyMatrix(math::Matrix value) : ShaderProperty(Type::MATRIX), m_value(value) {};
-				void Apply(std::string name, Shader* shader)
-				{
-
-					shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrix(*m_value.m);
-					
-				}
-				static ShaderProperty* GetDefault() { return new ShaderPropertyMatrix(math::Matrix()); }
-				math::Matrix GetValue() { return m_value; }
+				ShaderPropertyMatrix(math::Matrix value);
+				void Apply(std::string name, Shader* shader) const;
+				static ShaderProperty* GetDefault();
+				math::Matrix GetValue();
 			private:
 				math::Matrix m_value;
+			};
+
+
+			class ShaderPropertyMatrixArray : public ShaderProperty
+			{
+			private:
+				ShaderPropertyMatrixArray();
+			protected:
+			public:
+				ShaderPropertyMatrixArray(unsigned int num_matrix);
+				ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int num_matrix);
+				ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int offset, unsigned int num_matrix);
+				ShaderPropertyMatrixArray(const std::string & name, const math::Matrix * value, unsigned int offset, unsigned int num_matrix);
+				virtual ~ShaderPropertyMatrixArray();
+				void Apply(std::string name, Shader* shader) const;
+				static ShaderProperty* GetDefault();
+				math::Matrix* GetValue();
+				void resize(unsigned int num_matrix);
+
+
+				virtual ShaderProperty* copy() const;
+
+			protected:
+				std::unique_ptr<math::Matrix> m_value;
+				unsigned int m_offset;
+				unsigned int m_num_matrix;
+
+
+				math::Matrix& Matrix(unsigned int index);
 			};
 		}
 	}

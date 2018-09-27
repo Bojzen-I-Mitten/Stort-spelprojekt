@@ -7,7 +7,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			class THOMAS_API ScriptComponent : public Component
+			class ScriptComponent : public Component
 			{
 			public:
 				ScriptComponent() {};

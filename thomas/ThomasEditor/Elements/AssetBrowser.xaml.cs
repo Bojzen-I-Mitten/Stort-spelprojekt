@@ -246,7 +246,7 @@ namespace ThomasEditor
         {
             Dispatcher.BeginInvoke(new Action<String>((String p) =>
             {
-
+                
                 AddNode(p);
                 ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(p);
             }), e.FullPath);
@@ -261,6 +261,7 @@ namespace ThomasEditor
             assetImages[ThomasEngine.Resources.AssetTypes.SHADER] = new BitmapImage(new Uri("pack://application:,,/icons/assets/shader.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.AUDIO_CLIP] = new BitmapImage(new Uri("pack://application:,,/icons/assets/audio.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.MODEL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.ANIMATION] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.MATERIAL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/material.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT] = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.PREFAB] = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
@@ -315,7 +316,7 @@ namespace ThomasEditor
                 if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
                     return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefab(filePath) };
                 else
-                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.Load(filePath) };
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadSysPath(filePath) };
             }
             return null;
         }
@@ -650,12 +651,26 @@ namespace ThomasEditor
         {
             string text = File.ReadAllText(path);
             int start = text.IndexOf("public class ") + 13;
-            string oldClassName = text.Substring(start, text.IndexOf(" : ScriptComponent") - start);
+            string typeOfScript = GetTypeOfScript(text);
+            string oldClassName = text.Substring(start, text.IndexOf(typeOfScript) - start);
             string leftOf = text.Substring(0, start);
-            string newClassName = text.Substring(start, text.IndexOf(" : ScriptComponent") - start).Replace(oldClassName, newName);
-            string rightOf = text.Substring(text.IndexOf(" : ScriptComponent"));
+            string newClassName = text.Substring(start, text.IndexOf(typeOfScript) - start).Replace(oldClassName, newName);
+            string rightOf = text.Substring(text.IndexOf(typeOfScript));
             string newText = leftOf + newClassName + rightOf;
             File.WriteAllText(path, newText);
+        }
+
+        /*
+         * Will determine if the script is NetworkComponent or ScriptComponent
+         */
+        private string GetTypeOfScript(string fileText)
+        {
+            if(fileText.Contains(" : ScriptComponent"))
+                return " : ScriptComponent";
+            else if(fileText.Contains(" : NetworkComponent"))
+                return " : NetworkComponent";
+            else
+                return "";
         }
     }
 

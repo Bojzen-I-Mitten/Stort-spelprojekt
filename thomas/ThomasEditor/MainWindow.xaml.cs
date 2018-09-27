@@ -354,9 +354,18 @@ namespace ThomasEditor
             worker.DoWork += (o, ea) =>
             {
                 Scene newScene = Scene.LoadScene(path);
-                Scene.CurrentScene.UnLoad();
-                Scene.CurrentScene = newScene;
-                Scene.CurrentScene.PostLoad();
+                if (newScene != null)
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = newScene;
+                    Scene.CurrentScene.PostLoad();
+                }
+                else
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = null;
+                    Debug.Log("Scene failed to load...");
+                }
             };
             worker.RunWorkerCompleted += (o, ea) =>
             {
@@ -414,6 +423,42 @@ namespace ThomasEditor
         private void AddNewCapsulePrimitive(object sender, RoutedEventArgs e)
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Camera");
+            x.AddComponent<Camera>();
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewPointLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.POINT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewSpotLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.SPOT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewDirectionalLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.DIRECTIONAL;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewAreaLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.AREA;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
@@ -530,6 +575,11 @@ namespace ThomasEditor
         private void SaveLayout_Click(object sender, RoutedEventArgs e)
         {
             SaveLayout();
+        }
+
+        private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
+        {
+            ThomasWrapper.ToggleEditorRendering();
         }
     }
 

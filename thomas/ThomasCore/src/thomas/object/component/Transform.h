@@ -7,7 +7,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			class THOMAS_API Transform: public Component
+			class Transform: public Component
 			{
 			private:
 				void Decompose();
@@ -67,7 +67,7 @@ namespace thomas
 
 
 				//void UpdateChildren();
-				void SetParent(Transform* parent);
+				void SetParent(Transform* parent, bool worldPositionStays);
 				Transform* GetParent();
 				std::vector<Transform*> GetChildren();
 				void RemoveParent();

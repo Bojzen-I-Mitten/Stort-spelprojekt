@@ -3,10 +3,6 @@
 #include <thomas\Input.h>
 #pragma managed
 #include "Utility.h"
-#include <string>
-#include <msclr\marshal_cppstd.h>
-
-
 namespace ThomasEngine
 {
 	public ref class Input

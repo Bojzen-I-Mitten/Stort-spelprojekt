@@ -54,7 +54,7 @@ namespace thomas
 			void Transform::SetWorldMatrix(math::Matrix matrix)
 			{
 				if (m_parent) {
-					m_localWorldMatrix = m_localWorldMatrix * m_parent->GetWorldMatrix().Invert();
+					m_localWorldMatrix = matrix * m_parent->GetWorldMatrix().Invert();
 				}
 				else
 				{
@@ -261,7 +261,7 @@ namespace thomas
 			}
 
 		
-			void Transform::SetParent(Transform * parent)
+			void Transform::SetParent(Transform * parent, bool worldPositionStays)
 			{
 				if (m_parent != parent)
 				{
@@ -270,11 +270,13 @@ namespace thomas
 					m_parent = parent;
 					if (m_parent) {
 						m_parent->m_children.push_back(this);
-						SetWorldMatrix(m);
+						if(worldPositionStays)
+							SetWorldMatrix(m);
 					}
 					else
 					{
-						SetLocalMatrix(m);
+						if(worldPositionStays)
+							SetLocalMatrix(m);
 					}
 				}
 			}

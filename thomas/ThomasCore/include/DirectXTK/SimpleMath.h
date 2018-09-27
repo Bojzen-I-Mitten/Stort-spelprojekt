@@ -500,14 +500,15 @@ namespace DirectX
             Matrix& operator*= (const Matrix& M);
             Matrix& operator*= (float S);
             Matrix& operator/= (float S);
-
+			
             Matrix& operator/= (const Matrix& M);
                 // Element-wise divide
 
             // Unary operators
             Matrix operator+ () const { return *this; }
             Matrix operator- () const;
-
+			/* Access the column as a raw float pointer. */
+			float* operator[](unsigned int column) { return m[column]; }
             // Properties
             Vector3 Up() const { return Vector3(_21, _22, _23); }
             void Up(const Vector3& v) { _21 = v.x; _22 = v.y; _23 = v.z; }

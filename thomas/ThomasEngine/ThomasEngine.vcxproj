@@ -173,12 +173,15 @@
     <ClInclude Include="src\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\object\component\physics\Rigidbody.h" />
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
+    <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\Project.h" />
+    <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\resource\Model.h" />
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\texture\Texture.h" />
     <ClInclude Include="src\resource\texture\Texture2D.h" />
+    <ClInclude Include="src\SceneSurrogate.h" />
     <ClInclude Include="src\ScriptingManager.h" />
     <ClInclude Include="src\resource\AudioClip.h" />
     <ClInclude Include="src\resource\Resources.h" />
@@ -214,6 +217,8 @@
     <ClCompile Include="src\object\component\physics\Collider.cpp" />
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
+    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
@@ -232,6 +237,7 @@
     <ClCompile Include="src\resource\Resources.cpp" />
     <ClCompile Include="src\resource\texture\Texture.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SceneSurrogate.cpp" />
     <ClCompile Include="src\ScriptingManager.cpp" />
     <ClCompile Include="src\resource\Shader.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />

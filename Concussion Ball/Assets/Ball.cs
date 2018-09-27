@@ -1,6 +1,6 @@
 using ThomasEngine;
 using ThomasEngine.Network;
-public class Ball : NetworkComponent
+public class Ball : ScriptComponent
 {
 
     Rigidbody rb;
@@ -11,27 +11,27 @@ public class Ball : NetworkComponent
     public override void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
-        visualizer = Object.GetObjectsOfType<ThrowStrengthVisualizer>()[0];
+        //visualizer = Object.GetObjectsOfType<ThrowStrengthVisualizer>()[0];
     }
 
     public override void Update()
     {
         if (true)
         {
-            if (Input.GetKey(Input.Keys.Space) && !rb.enabled)
+            if (Input.GetKey(Input.Keys.LeftControl) && !rb.enabled)
             {
                 currentForce += force * Time.DeltaTime;
-                visualizer.SetStrength(currentForce);
+               // visualizer.SetStrength(currentForce);
             }
 
-            if (Input.GetKeyUp(Input.Keys.Space) && !rb.enabled)
+            if (Input.GetKeyUp(Input.Keys.LeftControl) && !rb.enabled)
             {
                 transform.parent = null;
                 rb.enabled = true;
                 rb.AddForce(playerThatHasBall.transform.forward * currentForce, Rigidbody.ForceMode.Impulse);
                 playerThatHasBall = null;
                 currentForce = 0.0f;
-                visualizer.SetStrength(0);
+               // visualizer.SetStrength(0);
             }
         }
 
