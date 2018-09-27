@@ -60,6 +60,13 @@ namespace thomas
 				virtual void OnDrawGizmos() override;
 				void SetBoneCapsuls(math::Vector3 boneCapsule, int whichCapsule);
 				math::Vector3 GetBoneCapsuls( int whichCapsule);
+
+				void setFirstorSecond(math::Vector3 first,int value,bool Secondbool);
+				math::Vector3 getFirstorSecond(int value, bool SecondBool);
+
+				void SetTwistSpin(math::Vector3 Twist, int whichtwist);
+				math::Vector3 GetTwistSpin(int whichtwist);
+
 			private:
 				void Init();
 				void InitSkeleton();
@@ -78,7 +85,9 @@ namespace thomas
 				std::vector<float> m_lengths;
 				math::Vector3 boneCapsuls[Ragdoll::BodyParts::BodyParts_Amount];
 				std::pair<uint32_t, uint32_t> boneConnections[Ragdoll::BodyParts::BodyParts_Amount];
-
+				btTransform First[9];
+				btTransform Second[9];
+				math::Vector3 Twistspin[9];
 
 				
 			};

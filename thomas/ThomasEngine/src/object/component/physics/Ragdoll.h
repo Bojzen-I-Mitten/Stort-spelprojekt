@@ -10,6 +10,60 @@ namespace ThomasEngine
 	internal:
 	public:
 		Ragdoll();
+		// Body Head
+		property Vector3 BodyHeadtwist
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetTwistSpin(0)); };
+			void set(Vector3 value) {((thomas::object::component::Ragdoll*)nativePtr)->SetTwistSpin(thomas::math::Vector3(value.x, value.y, value.z),0); };
+		}
+		property Vector3 BodyHeadFirst
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(0,false)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), 0,false); };
+		}
+		property Vector3 BodyHeadSecond
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(0, true)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), 0, true); };
+		}
+		// Left Arm
+		property Vector3 Bodyleftarmtwist
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetTwistSpin(1)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetTwistSpin(thomas::math::Vector3(value.x, value.y, value.z), 1); };
+		}
+		property Vector3 BodyleftarmFirst
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(1, false)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), 1, false); };
+		}
+		property Vector3 BodyleftarmSecond
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(1, true)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), 1, true); };
+		}
+
+		// left upper and left lower arm
+		property Vector3 leftarmlowerarmtwist
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetTwistSpin(1)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetTwistSpin(thomas::math::Vector3(value.x, value.y, value.z), 1); };
+		}
+		property Vector3 leftarmlowerarmFirst
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(1, false)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), 1, false); };
+		}
+		property Vector3 leftarmlowerarmSecond
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(1, true)); };
+			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), 1, true); };
+		}
+
+
+
+		
+
 	//	void Update() override
 /*
 		property Vector3 ChangeCapsule0

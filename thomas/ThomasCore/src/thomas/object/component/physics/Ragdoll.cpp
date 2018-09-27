@@ -86,9 +86,9 @@ namespace thomas
 			{
 				if (m_bodies[BodyParts::BodyPart_Chest] != nullptr)
 				{
-
+					//Ragdoll::BodyParts::BodyParts_Amount
 					btTransform t;
-					for(int i = 0; i < Ragdoll::BodyParts::BodyParts_Amount; i++)
+					for(int i = 0; i < 4; i++)
 					{
 						m_bodies[i]->getMotionState()->getWorldTransform(t);
 						math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
@@ -108,6 +108,38 @@ namespace thomas
 			{
 				return boneCapsuls[whichCapsule];
 			}
+
+			void Ragdoll::setFirstorSecond(math::Vector3 first, int value,bool Secondbool)
+			{
+				btTransform NewValue;
+				NewValue.setOrigin(btVector3(first.x, first.y, first.z));
+					if (Secondbool)
+						Second[value] = NewValue;
+					else
+						First[value] = NewValue;
+
+			}
+
+			math::Vector3 Ragdoll::getFirstorSecond(int value, bool SecondBool)
+			{
+			
+				if (SecondBool)
+					return Physics::ToSimple(Second[value].getOrigin());
+				else
+					return Physics::ToSimple(First[value].getOrigin());
+			}
+
+			void Ragdoll::SetTwistSpin(math::Vector3 Twist, int whichtwist)
+			{
+				Twistspin[whichtwist] = Twist;
+			}
+
+			math::Vector3 Ragdoll::GetTwistSpin(int whichtwist)
+			{
+				return Twistspin[whichtwist];
+			}
+
+	
 
 			btRigidBody * Ragdoll::LocalCreateRigidBody(btScalar mass, const btTransform & startTransform, btCollisionShape * shape)
 			{
@@ -153,12 +185,23 @@ namespace thomas
 				boneConnections[8] = std::pair<uint32_t, uint32_t>(12, 13);
 				boneConnections[9] = std::pair<uint32_t, uint32_t>(13, 14);
 				
+
+				for (int i = 0; i < 9; i++)
+				{
+					First[i].setOrigin(btVector3(0, 0, 0));
+					Second[i].setOrigin(btVector3(0.15, 0.15, 0.15));
+					Twistspin[i]= math::Vector3(60, 30, 120);
+				}
+
+
+
+
 			}
 
 			btConeTwistConstraint * Ragdoll::CreateConstraints(btRigidBody * firstbody, btRigidBody * secondbody, btTransform & firstTransform, btTransform & secondTransform,btScalar Swing1,btScalar Swing2,btScalar twist)
 			{
 				btConeTwistConstraint* newConeTwist =  new btConeTwistConstraint(*firstbody, *secondbody, firstTransform, secondTransform);
-				newConeTwist->setLimit(Swing1, Swing2, twist);
+				newConeTwist->setLimit(Swing1, Swing2, twist,1,0.3,1);
 				return newConeTwist;
 			}
 
@@ -253,68 +296,45 @@ namespace thomas
 				btTransform transform;
 				for (uint32_t i = 0; i < Ragdoll::BodyParts::BodyParts_Amount; i++) {
 					m_shapes[i] = PrepareCapsulTransform(boneArr[boneConnections[i].first], boneArr[boneConnections[i].second], boneCapsuls[i].x, boneCapsuls[i].y, transform,boneCapsuls[i].z);
-					m_bodies[i] = LocalCreateRigidBody(btScalar(1), transform, m_shapes[i]);
+					m_bodies[i] = LocalCreateRigidBody(btScalar(0.001), transform, m_shapes[i]);
 				}
-				btTransform First;
-				btTransform Second;
-				First.setOrigin(btVector3(0, 0, 0));
-				Second.setOrigin(btVector3(0.15, 0.15, 0.15));
-	//			m_bodies[BodyPart_Chest]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Head]->getMotionState()->getWorldTransform(Second);
-		//		First.setRotation(
-				// Swing 1 Angle of the cone opening in first direction, Swing 2 Angle of the cone opening in second direction, Twist Maximum twist angle (twist)
-				
+			
+			
 				//body head
-				m_joints[Joint_Neck] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Head], First, Second,60,30,120); 
+				m_joints[Joint_Neck] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Head], First[0], Second[0], Twistspin[0].x, Twistspin[0].y, Twistspin[0].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Neck], false);
 			
 				//body leftarm
-	//			m_bodies[BodyPart_Chest]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Left_UpperArm]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Left_Arm] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperArm], First, Second, 60, 30, 120);
+				m_joints[Joint_Left_Arm] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperArm], First[1], Second[1], Twistspin[1].x, Twistspin[1].y, Twistspin[1].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Left_Arm], false);
 					
 				//left upper and left lower arm
-	//			m_bodies[BodyPart_Left_UpperArm]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Left_LowerArm]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Lower_Left_Arm] = CreateConstraints(m_bodies[BodyPart_Left_UpperArm], m_bodies[BodyPart_Left_LowerArm], First, Second, 60, 30, 120);
+				m_joints[Joint_Lower_Left_Arm] = CreateConstraints(m_bodies[BodyPart_Left_UpperArm], m_bodies[BodyPart_Left_LowerArm], First[2], Second[2], Twistspin[2].x, Twistspin[2].y, Twistspin[2].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Left_Arm], false);
 
 				//body right arm
-	//			m_bodies[BodyPart_Chest]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Right_UpperArm]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Right_Arm] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Right_UpperArm], First, Second, 60, 30, 120);
+				m_joints[Joint_Right_Arm] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Right_UpperArm], First[3], Second[3], Twistspin[3].x, Twistspin[3].y, Twistspin[3].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Right_Arm], false);
 
 				//uper right arm and lower right arm
-	//			m_bodies[BodyPart_Right_UpperArm]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Right_LowerArm]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Lower_Right_Arm] = CreateConstraints(m_bodies[BodyPart_Right_UpperArm], m_bodies[BodyPart_Right_LowerArm], First, Second, 60, 30, 120);
+				m_joints[Joint_Lower_Right_Arm] = CreateConstraints(m_bodies[BodyPart_Right_UpperArm], m_bodies[BodyPart_Right_LowerArm], First[4], Second[4], Twistspin[4].x, Twistspin[4].y, Twistspin[4].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Right_Arm], false);
 
 				//body rightleg
-	//			m_bodies[BodyPart_Chest]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Right_UpperLeg]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Right_UpperLeg], First, Second, 60, 30, 120);
+				m_joints[Joint_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Right_UpperLeg], First[5], Second[5], Twistspin[5].x, Twistspin[5].y, Twistspin[5].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Right_Leg], false);
 
 				//body leftleg
-	//			m_bodies[BodyPart_Chest]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Left_UpperLeg]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperLeg], First, Second, 60, 30, 120);
+				m_joints[Joint_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperLeg], First[6], Second[6], Twistspin[6].x, Twistspin[6].y, Twistspin[6].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Left_Leg], false);
 
 				//lower leftleg
-	//			m_bodies[BodyPart_Left_UpperLeg]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Left_LowerLeg]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Lower_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Left_UpperLeg], m_bodies[BodyPart_Left_LowerLeg], First, Second, 60, 30, 120);
+				m_joints[Joint_Lower_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Left_UpperLeg], m_bodies[BodyPart_Left_LowerLeg], First[7], Second[7], Twistspin[7].x, Twistspin[7].y, Twistspin[7].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Left_Leg], false);
 
 
 				//lower rightleg
-	//			m_bodies[BodyPart_Right_UpperLeg]->getMotionState()->getWorldTransform(First);
-	//			m_bodies[BodyPart_Right_LowerLeg]->getMotionState()->getWorldTransform(Second);
-				m_joints[Joint_Lower_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Right_UpperLeg], m_bodies[BodyPart_Right_LowerLeg], First, Second, 60, 30, 120);
+				m_joints[Joint_Lower_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Right_UpperLeg], m_bodies[BodyPart_Right_LowerLeg], First[8], Second[8], Twistspin[8].x, Twistspin[8].y, Twistspin[8].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Right_Leg], false);
 			}
 		}
