@@ -63,11 +63,17 @@ namespace ThomasEngine.Network
 
         private EventBasedNatPunchListener natPunchListener;
 
-        public string IP { get; set; } = "localhost";
-        public int port { get; set; } = 9050;
+        public int LocalPort { get; set; } = 9050;
+
+        public string TargetIP { get; set; } = "localhost";
+        public int TargetPort { get; set; } = 9050;
+
+        public bool UseLobby { get; set; } = false;
+
+
         public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject playerPrefab { get; set; }
-
+        
         private float serverTime;
 
         private NetPeer localPeer = null;
@@ -91,6 +97,8 @@ namespace ThomasEngine.Network
             natPunchListener = new EventBasedNatPunchListener();
 
             //Here all events are defined.
+            natPunchListener.NatIntroductionSuccess += NatPunchListener_NatIntroductionSuccess;
+
             listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
             listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
@@ -102,10 +110,7 @@ namespace ThomasEngine.Network
             SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
 
             //Stäng av alla nätverksobjekt som finns i scenen.
-
-
-
-            natPunchListener.NatIntroductionSuccess += NatPunchListener_NatIntroductionSuccess;
+                                              
 
         }
 
@@ -118,10 +123,14 @@ namespace ThomasEngine.Network
         {
 
             InitServerNTP();
-            netManager.NatPunchEnabled = true;
-            netManager.NatPunchModule.Init(natPunchListener);
-            netManager.Start();
-            Debug.Log("Started match on " + IP + ":" + netManager.LocalPort);
+            if (UseLobby)
+            {
+                netManager.NatPunchEnabled = true;
+                netManager.NatPunchModule.Init(natPunchListener);
+            }
+            
+            netManager.Start(LocalPort);
+            Debug.Log("NetManager started on port" + ":" + netManager.LocalPort);
             localPeer = new NetPeer(netManager, null);
             SpawnPlayerCharacter(localPeer);
 
@@ -202,10 +211,12 @@ namespace ThomasEngine.Network
             //    GUI.ImguiStringUpdate(netManager.GetFirstPeer().Ping.ToString(), new Vector2(0, 0));
             //if (Input.GetKey(Input.Keys.P))
             //    Diagnostics();
-            if (Input.GetKey(Input.Keys.K))
+            if (Input.GetKeyDown(Input.Keys.K))
             {
-                netManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(IP, port), "natTest");
-               // netManager.Connect(IP, port, "SomeConnectionKey");
+                if(UseLobby)
+                    netManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
+                else
+                    netManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
             }
         }
 

@@ -214,7 +214,8 @@ namespace LiteNetLib
                     Console.ForegroundColor = color;
                     Console.WriteLine(str, args);
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    ThomasEngine.Debug.Log(str);
+                    
+                    ThomasEngine.Debug.Log(String.Format(str, args));
 #endif              
                 }
                 else
