@@ -16,8 +16,6 @@ namespace thomas {
 
 				std::vector<AnimationNode*> m_nodes;
 				WeightMixer * m_weights;
-				
-				std::vector<uint32_t> m_remaining;
 
 			public:
 				AnimBlender(Skeleton &skel);

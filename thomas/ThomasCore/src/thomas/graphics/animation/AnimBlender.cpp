@@ -41,7 +41,7 @@ namespace thomas {
 				AnimationNode * node = m_nodes[0];
 				node->calcFrame(tmp_arr.get());
 
-				// Initiate data with bind pose (if initial channel does not write to all channels).
+				// Initiate data with bind pose (if initial anim node does not write to all channels).
 				if(node->m_numChannel < this->m_numChannel)
 					std::memcpy(tmp_arr.get(), m_ref.getBindComponents(), sizeof(TransformComponents) * m_ref.getNumBones());
 
