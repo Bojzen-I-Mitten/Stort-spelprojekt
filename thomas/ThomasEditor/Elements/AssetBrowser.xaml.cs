@@ -414,6 +414,7 @@ namespace ThomasEditor
             item.Focus();
         }
 
+
         private bool CheckSceneFile()
         {
             TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
@@ -435,7 +436,9 @@ namespace ThomasEditor
             if (treeViewItem != null)
             {
                 treeViewItem.Focus();
+                
                 assetBrowserContextMenu.DataContext = true;
+                contextMenuOpenItem.IsEnabled = CheckSceneFile();
                 //e.Handled = true;
             }
             else
