@@ -138,8 +138,29 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            RemovePlayerCharacter(peer);
-            ThomasEngine.Debug.Log("The peer you where connected to has disconnected with the IP" + peer.EndPoint.ToString());
+            switch (disconnectInfo.Reason)
+            {
+                case DisconnectReason.RemoteConnectionClose:
+                case DisconnectReason.DisconnectPeerCalled:
+                    RemovePlayerCharacter(peer);
+                    Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
+                    break;
+                case DisconnectReason.Timeout:
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
+                    break;
+                case DisconnectReason.ConnectionRejected:
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " rejected");
+                    break;
+                case DisconnectReason.ConnectionFailed:
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed");
+                    break;
+                case DisconnectReason.SocketReceiveError:
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, peer socket closed"); //Could be the other way around
+                    break;
+                case DisconnectReason.SocketSendError:
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, lcoal socket closed"); //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    break;
+            }
         }
 
         private void Listener_PeerConnectedEvent(NetPeer _peer)
@@ -250,7 +271,7 @@ namespace ThomasEngine.Network
                 iD = targetID + 1;
                 networkIDObjects.Add(targetID, netID);
                 netID.ID = targetID;
-                
+
             }
             else
             {
