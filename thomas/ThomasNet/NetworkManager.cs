@@ -1,9 +1,9 @@
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
-
 
 namespace ThomasEngine.Network
 {
@@ -111,16 +111,16 @@ namespace ThomasEngine.Network
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
         {
-            throw new NotImplementedException();
+            netManager.Connect(targetEndPoint, "SomeConnectionKey");
         }
 
         public override void Start()
         {
 
             InitServerNTP();
-            netManager.Start();
             netManager.NatPunchEnabled = true;
             netManager.NatPunchModule.Init(natPunchListener);
+            netManager.Start();
             Debug.Log("Started match on " + IP + ":" + netManager.LocalPort);
             localPeer = new NetPeer(netManager, null);
             SpawnPlayerCharacter(localPeer);
@@ -195,6 +195,8 @@ namespace ThomasEngine.Network
         {
             netManager.UpdateTime = (1000 / TICK_RATE);
             serverTime += Time.ActualDeltaTime;
+            if(netManager.NatPunchEnabled)
+                netManager.NatPunchModule.PollEvents();
             netManager.PollEvents(); 
             //if (netManager.GetFirstPeer() != null)
             //    GUI.ImguiStringUpdate(netManager.GetFirstPeer().Ping.ToString(), new Vector2(0, 0));
