@@ -49,7 +49,8 @@ namespace ThomasEngine {
 		for each(Component^ component in m_components)
 		{
 			Type^ typ = component->GetType();
-			if ((playing || typ->IsDefined(ExecuteInEditor::typeid, false)) && !component->initialized) {
+			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
+			if ((playing || executeInEditor) && !component->initialized) {
 				completed = false;
 				component->Initialize();
 			}

@@ -267,4 +267,8 @@ namespace ThomasEngine {
 	{
 		renderingEditor = !renderingEditor;
 	}
+	void ThomasWrapper::TogglePhysicsDebug()
+	{
+		Physics::s_drawDebug = !Physics::s_drawDebug;
+	}
 }

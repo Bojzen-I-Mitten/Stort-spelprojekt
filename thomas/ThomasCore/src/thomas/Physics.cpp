@@ -17,6 +17,7 @@ namespace thomas
 	float Physics::s_timeSinceLastPhysicsStep = 0.0f;
 	std::vector<object::component::Rigidbody*> Physics::s_rigidBodies;
 	float Physics::s_accumulator;
+	bool Physics::s_drawDebug = true;
 
 	bool Physics::Init()
 	{
@@ -88,9 +89,9 @@ namespace thomas
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
-		s_debugDraw->Update(camera);
+		if (!s_drawDebug)
+			return;
 		s_world->debugDrawWorld();
-		s_debugDraw->drawLineFinal();
 	}
 
 	void Physics::Destroy()
