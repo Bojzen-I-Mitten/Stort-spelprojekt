@@ -1014,6 +1014,7 @@ namespace LiteNetLib
                 throw new InvalidOperationException("Client is not running");
 
             NetPeer peer;
+            
             if (_peers.TryGetValue(target, out peer))
             {
                 switch (peer.ConnectionState)

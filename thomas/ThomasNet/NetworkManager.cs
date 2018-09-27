@@ -122,6 +122,8 @@ namespace ThomasEngine.Network
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
         {
+            if (targetEndPoint.Address.ToString() == "::1")
+                return;
             netManager.Connect(targetEndPoint, "SomeConnectionKey");
         }
 
@@ -449,7 +451,7 @@ namespace ThomasEngine.Network
         public void PingToAllClients()
         {
             int i = 0;
-            foreach(var player in Players)
+            foreach(var player in netManager.GetPeers(ConnectionState.Connected))
             {
                 GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;
