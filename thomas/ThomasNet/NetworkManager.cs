@@ -35,10 +35,10 @@ namespace ThomasEngine.Network
 
     public class ConnectToPeerEvent
     {
-        public string IP { get; set; } //also holds port
-        public int netID { get; set; }
+        public string IP { get; set; } 
+        public int Port { get; set; }
 
-        public ConnectToPeerEvent() { IP = ""; netID = -1; }
+        public ConnectToPeerEvent() { IP = ""; Port = -1; ; }
     }
 
     public enum PacketType
@@ -167,13 +167,17 @@ namespace ThomasEngine.Network
         {
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
 
-            foreach (var player in players)
+            foreach (NetPeer peer in netManager.GetPeers(ConnectionState.Connected))
             {
-                NetPeer peer = player.Key;
+                if (peer == _peer)
+                    continue;
                 ConnectToPeerEvent connectEvent = new ConnectToPeerEvent
                 {
-                    IP = peer.EndPoint.ToString()
+                    IP = peer.EndPoint.Address.ToString(),
+                    Port = peer.EndPoint.Port
                 };
+
+
                 NetDataWriter writer = new NetDataWriter();
                 writer.Put((int)PacketType.EVENT);
                 WriteEvent(writer, connectEvent);
@@ -381,11 +385,9 @@ namespace ThomasEngine.Network
 
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
-            string address = connectEvent.IP.Substring(0, connectEvent.IP.IndexOf(":"));
-            string sPort = connectEvent.IP.Substring(connectEvent.IP.IndexOf(":") + 1);
-            int iPort = int.Parse(sPort);
 
-            netManager.Connect(address, iPort, "SomeConnectionKey");
+            
+            netManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
         }
 
         private void RemovePlayerCharacter(NetPeer disconnectedPeer)
