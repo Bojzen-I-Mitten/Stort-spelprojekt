@@ -1,6 +1,5 @@
 #pragma once
 #include "RenderComponent.h"
-#include "../../resource/ShaderProperty/ShaderPropertyMatrix.h"
 #include "../../utils/Math.h"
 namespace thomas
 {
@@ -25,13 +24,16 @@ namespace thomas
 			protected:
 			public:
 				virtual bool SetModel(resource::Model* model);
+				virtual void SetMaterial(int meshIndex, resource::Material* material);
 				/* Access the animated blend tree.
 				*/
 				graphics::animation::IBlendTree* GetBlendTree();
 			public:
 			private:
-				resource::shaderproperty::ShaderPropertyMatrixArray m_skinArray;
+				resource::shaderproperty::ShaderPropertyStatic* m_skinInfo;
 				std::unique_ptr<graphics::animation::AnimatedSkeleton> m_skeleton;
+
+				void applySkin();
 			};
 		}
 	}

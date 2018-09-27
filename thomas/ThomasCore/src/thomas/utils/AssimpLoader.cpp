@@ -8,6 +8,7 @@
 #include <assimp\postprocess.h>
 #include "../graphics/animation/data/Skeleton.h"
 #include "Math.h"
+#include "../utils/Utility.h"
 
 namespace thomas
 {
@@ -69,16 +70,6 @@ namespace thomas
 			return m;
 		}
 
-		unsigned long	hash_djb2(const char *str)
-		{
-			unsigned long hash = 5381;
-			int c;
-
-			while (c = *str++)
-				hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-			return hash;
-		}
 #pragma endregion
 
 		const aiScene* LoadScene(Assimp::Importer &importer, const std::string &path)
@@ -444,7 +435,7 @@ namespace thomas
 			graphics::animation::Bone bi;
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
-			bi._boneHash = hash_djb2(boneName.c_str());
+			bi._boneHash = utility::hash(boneName.c_str());
 			bi._parentIndex = parentBone;
 			if (parentBone != -1) {	// Parented bone
 				boneMap.m_relativeParent.push_back(aiMatrix4x4());
@@ -693,7 +684,7 @@ namespace thomas
 				LOG(err);
 				return; //This channel does not animate a bone.
 			}
-			anim._boneHash[bone] = hash_djb2(construct.m_boneInfo[bone]._boneName.c_str());
+			anim._boneHash[bone] = utility::hash(construct.m_boneInfo[bone]._boneName.c_str());
 			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}
 

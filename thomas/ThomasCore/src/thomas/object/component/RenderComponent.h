@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "../../utils/Math.h"
+#include "../../resource/ShaderProperty/ShaderPropertyStruct.h"
 namespace thomas
 {
 	namespace graphics {struct RenderPair; }
@@ -27,7 +28,7 @@ namespace thomas
 				void SetMaterial(resource::Material * material);
 				
 
-				void SetMaterial(int meshIndex, resource::Material* material);
+				virtual void SetMaterial(int meshIndex, resource::Material* material);
 				resource::Material* GetMaterial(int meshIndex);
 
 				void OnDrawGizmos();
@@ -39,16 +40,16 @@ namespace thomas
 				resource::Model* m_model;
 				math::BoundingOrientedBox m_bounds;
 			protected:
-				void SubmitPart(Camera* camera, unsigned int i);
+				void SubmitPart(Camera* camera,  unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic* property_data, uint32_t num_prop);
 			protected:
 				std::vector<resource::Material*> m_materials;
 				/*	Insert a shader property for rendering component.
 				 * WARNING!: Append only on initialization (or make safe with parameters passed to Renderer) 
 				*/
-				void insertProperty(const resource::shaderproperty::ShaderProperty* prop);
+				resource::shaderproperty::ShaderPropertyStatic& insertProperty(resource::shaderproperty::ShaderPropertyStatic prop);
 			private:
 				static std::vector<RenderComponent*> s_renderComponents;
-				std::vector< resource::shaderproperty::ShaderProperty const*> m_properties;
+				std::vector<resource::shaderproperty::ShaderPropertyStatic> m_properties;
 				//graphics::Geometry* m_geometry;
 			};
 		}
