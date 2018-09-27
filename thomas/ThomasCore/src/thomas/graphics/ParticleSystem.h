@@ -30,7 +30,7 @@ namespace thomas
 			ParticleSystem();
 			~ParticleSystem();
 
-			void Initialize();
+			void Initialize(unsigned maxNrOfParticles = 25000);
 			void Destroy();
 
 			bool AddEmitterToSpawn(object::component::ParticleEmitterComponent* emitter);
@@ -41,23 +41,26 @@ namespace thomas
 			void DrawParticles();
 
 		private:
-			unsigned m_currentNrOfParticles;
-			
-
+			unsigned m_maxNrOfParticles;//maxNrOfPraticles
+			unsigned m_emittedParticles; 
 
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
 
 			
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleSpawn;
+		
+
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePing;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePong;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleDeadList;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleAliveList;
 			bool m_pingpong;
 
-
 			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;
+			std::vector<unsigned> m_spawningEmitterEmissionRate;
 			std::vector<object::component::ParticleEmitterComponent*> m_updateEmitters; 
+			
 			
 		public:
 

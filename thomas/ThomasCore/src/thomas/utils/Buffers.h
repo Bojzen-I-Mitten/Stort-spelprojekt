@@ -79,6 +79,7 @@ namespace thomas
 				ID3D11UnorderedAccessView* GetUAV();
 			private:
 				ID3D11ShaderResourceView* m_resource;
+				bool m_hasSRV;
 				ID3D11UnorderedAccessView* m_uav;
 				bool m_hasUAV;
 			};

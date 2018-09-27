@@ -73,11 +73,15 @@ namespace thomas
 			}
 			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
 			{
+
 			}
+
 			
-			
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER, bool createUAV) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, bool createUAV) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
+				m_hasSRV = false;
+				m_hasUAV = false;
+
 				D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 				
 				desc.Buffer.ElementWidth = stride;
@@ -87,8 +91,10 @@ namespace thomas
 				desc.Format = DXGI_FORMAT_UNKNOWN;
 				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 				
-				ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+				HRESULT hr =ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
 
+				if (hr != E_FAIL)
+					m_hasSRV = true;
 				
 				if (createUAV)
 				{
@@ -99,12 +105,19 @@ namespace thomas
 					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
 					ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+
+					if (hr != E_FAIL)
+						m_hasSRV = true;
 				}
-				m_hasUAV = createUAV;
+				
 			}
+			
 
 			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_BUFFER_UAV_FLAG uavFlag, D3D11_USAGE usageFlag) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
+				m_hasUAV = false;
+				m_hasSRV = false;
+
 				D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 				uavDesc.Buffer.FirstElement = 0;
 				uavDesc.Buffer.Flags = uavFlag;
@@ -112,13 +125,18 @@ namespace thomas
 				uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 				uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
-				ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
-				m_hasUAV = true;
+				HRESULT hr = ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+				if (hr != E_FAIL)
+					m_hasSRV = true;
 			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()
 			{
-				return m_resource;
+				if (m_hasSRV)
+					return m_resource;
+
+				LOG("No availible srv");
+				return nullptr;
 			}
 
 			ID3D11UnorderedAccessView * StructuredBuffer::GetUAV()
@@ -126,6 +144,7 @@ namespace thomas
 				if (m_hasUAV)
 					return m_uav;
 				
+				LOG("No availible uav");
 				return nullptr;
 			}
 
