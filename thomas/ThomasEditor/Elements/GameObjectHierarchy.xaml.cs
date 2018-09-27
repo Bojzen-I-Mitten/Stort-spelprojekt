@@ -82,40 +82,40 @@ namespace ThomasEditor
                 return;
 
             ResetTreeView();
-            this.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                if (oldParent == newParent || !child.gameObject)
-                    return;
+            //this.Dispatcher.BeginInvoke((Action)(() =>
+            //{
+            //    if (oldParent == newParent || !child.gameObject)
+            //        return;
 
-                var newParentNode = newParent && newParent.gameObject ? FindNode(RootNodes.ToList(), newParent.gameObject) as ItemsControl : hierarchy as ItemsControl;
+            //    var newParentNode = newParent && newParent.gameObject ? FindNode(RootNodes.ToList(), newParent.gameObject) as ItemsControl : hierarchy as ItemsControl;
 
-                var childNode = FindNode(RootNodes.ToList(), child.gameObject);
+            //    var childNode = FindNode(RootNodes.ToList(), child.gameObject);
 
-                if (childNode != null)
-                {
-                    Thickness newPadding = childNode.Padding;
-                    if (childNode.Parent != null)
-                    {
-                        ItemsControl oldParentItems = childNode.Parent as ItemsControl;
-                        oldParentItems.Items.Remove(childNode);
+            //    if (childNode != null)
+            //    {
+            //        Thickness newPadding = childNode.Padding;
+            //        if (childNode.Parent != null)
+            //        {
+            //            ItemsControl oldParentItems = childNode.Parent as ItemsControl;
+            //            oldParentItems.Items.Remove(childNode);
 
 
-                    }
-                    if (newParentNode != null)
-                    {
-                        ItemsControl newParentItems = newParentNode as ItemsControl;
-                        newParentItems.Items.Add(childNode);
-                        if (newParentNode == hierarchy)
-                            newPadding.Left = 0;
-                        else
-                            newPadding.Left = newParentNode.Padding.Left + 2;
+            //        }
+            //        if (newParentNode != null)
+            //        {
+            //            ItemsControl newParentItems = newParentNode as ItemsControl;
+            //            newParentItems.Items.Add(childNode);
+            //            if (newParentNode == hierarchy)
+            //                newPadding.Left = 0;
+            //            else
+            //                newPadding.Left = newParentNode.Padding.Left + 2;
 
-                    }
-                    childNode.Padding = newPadding;
-                    // childNode.Padding = new Thickness(0, 0, 0, 2);
-                }
+            //        }
+            //        childNode.Padding = newPadding;
+            //        // childNode.Padding = new Thickness(0, 0, 0, 2);
+            //    }
 
-            }));
+            //}));
         }
 
         private TreeItemViewModel FindNode(List<TreeItemViewModel> nodes, GameObject gameObject)
@@ -342,6 +342,11 @@ namespace ThomasEditor
             while ((container == null) && (element != null))
             {
                 element = VisualTreeHelper.GetParent(element) as UIElement;
+                //No parent
+                if (element.GetType() == typeof(MultiSelectTreeView))
+                {
+                    return null;
+                }
                 container = element as TreeViewItem;
             }
             return container;
@@ -359,38 +364,69 @@ namespace ThomasEditor
             return foundItem;
         }
 
+        private void ChangeHierarchy()
+        {
+
+        }
+
         private void hierarchy_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
                 TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
-                TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
-                if (source.DataContext is GameObject)
+                //Check if object from hierarchy
+                if (source.DataContext.GetType() == typeof(TreeItemViewModel))
                 {
-                    if (target != null && source != null && target != source)
+                    GameObject sourceData = (GameObject)(source.DataContext as TreeItemViewModel).Data;     //Reads the context as a TreeItemViewModel and retrieves the Data.
+                    TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
+                    
+                    if (target != null && sourceData != null && (GameObject)((TreeItemViewModel)target.DataContext).Data != sourceData)
                     {
-                        GameObject parent = target.DataContext as GameObject;
-                        GameObject child = source.DataContext as GameObject;
-                        if (!parent.transform.IsChildOf(child.transform))
+                        
+                        GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
+                        if (!parent.transform.IsChildOf(sourceData.transform))
                         {
-                            child.transform.parent = parent.transform;
+                            sourceData.transform.parent = parent.transform;
                         }
                     }
-                    else if (source != null && target == null)
+                    else if (sourceData != null && target == null)
                     {
-                        GameObject gameObject = source.DataContext as GameObject;
-                        if (gameObject.inScene)
+                        if (sourceData.inScene)
                         {
-                            gameObject.transform.parent = null;
+                            sourceData.transform.parent = null;
                         }
                         else
                         {
-                            GameObject.Instantiate(gameObject);
-                        }
-
+                            GameObject.Instantiate(sourceData);
+                        }   
                     }
                 }
+                //Check if brefab. (From outside hierarchy)
+                else if (source.DataContext.GetType() == typeof(GameObject))
+                {
+                    GameObject sourceData = (GameObject)source.DataContext;
+                    TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
 
+                    if (target != null && sourceData != null && (GameObject)target.DataContext != sourceData)
+                    {
+                        GameObject parent = target.DataContext as GameObject;
+                        if (!parent.transform.IsChildOf(sourceData.transform))
+                        {
+                            sourceData.transform.parent = parent.transform;
+                        }
+                    }
+                    else if (sourceData != null && target == null)
+                    {
+                        if (sourceData.inScene)
+                        {
+                            sourceData.transform.parent = null;
+                        }
+                        else
+                        {
+                            GameObject.Instantiate(sourceData);
+                        }
+                    }
+                }
                 // Code to move the item in the model is placed here...
             }
         }
