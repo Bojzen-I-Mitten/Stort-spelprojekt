@@ -585,7 +585,14 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 					break;
 				case D3D_SVT_FLOAT:
-					newProperty = shaderproperty::ShaderPropertyScalarFloat::GetDefault();
+					if (semantic == "MATERIALSMOOTHNESSFACTOR")
+					{
+						newProperty = new shaderproperty::ShaderPropertyScalarFloat(16);
+					}
+					else
+					{
+						newProperty = shaderproperty::ShaderPropertyScalarFloat::GetDefault();
+					}
 					break;
 				default:
 					break;
@@ -619,7 +626,14 @@ namespace thomas
 				//case D3D_SVT_TEXTURE3D:
 				//case D3D_SVT_TEXTURECUBE:
 					isMaterialProperty = true;
-					newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+					if (semantic == "NORMALTEXTURE")
+					{
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
+					}
+					else
+					{
+						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
 				case D3D_SVT_RWSTRUCTURED_BUFFER:

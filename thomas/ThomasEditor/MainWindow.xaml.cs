@@ -232,7 +232,7 @@ namespace ThomasEditor
 
         private void AddEmptyGameObject(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("gameObject");
+            var x = new GameObject("newEmptyGameObject");
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
@@ -447,35 +447,35 @@ namespace ThomasEditor
 
         private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Camera");
+            var x = new GameObject("newCamera");
             x.AddComponent<Camera>();
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewPointLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newPointLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.POINT;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         private void AddNewSpotLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newSpotLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.SPOT;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         private void AddNewDirectionalLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newDirectionalLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.DIRECTIONAL;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         private void AddNewAreaLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newAreaLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.AREA;
             ThomasWrapper.Selection.SelectGameObject(x);
@@ -533,7 +533,6 @@ namespace ThomasEditor
                 e.CanExecute = true;
                 return;
             }
-            Debug.Log("No object selected __ MW.");
         }
 
         //Can only paste when an object has been copied
@@ -545,7 +544,6 @@ namespace ThomasEditor
                 e.CanExecute = true;
                 return;
             }
-            Debug.Log("No copied object to paste.");
         }
 
         #endregion

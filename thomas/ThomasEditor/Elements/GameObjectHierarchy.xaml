@@ -11,7 +11,7 @@
     <Grid>
         <TreeView AllowDrop="True" x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged"
                   DragOver="hierarchy_DragOver" Drop="hierarchy_Drop" MouseMove="hierarchy_MouseMove" MouseUp="hierarchy_MouseUp"
-                  PreviewMouseDown="hierarchy_PreviewMouseDown">
+                  PreviewMouseDown="hierarchy_PreviewMouseDown" PreviewMouseRightButtonDown="Hierarchy_PreviewMouseRightButtonDown">
             <TreeView.ContextMenu>
                 <ContextMenu x:Name="hiearchyContextMenu">
                     <ContextMenu.CommandBindings>
@@ -20,8 +20,7 @@
                         <CommandBinding Command="commands:CustomCommands.GetDuplicateObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_DuplicateGameObject"/>
                     </ContextMenu.CommandBindings>
                     
-                    <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>
-                    <MenuItem Header="Rename" Click="MenuItem_RenameGameObject" IsEnabled="False"/>
+                    <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="{Binding}"/>
                     <Separator/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetCopyObject}"/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetPasteObject}"/>
