@@ -125,14 +125,14 @@ namespace ThomasEditor
                     return ((item as Type).Name.IndexOf(AddComponentsFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
             }
 
-            private void AddComponentButton_Click(object sender, RoutedEventArgs e)
-            {
-                addComponentList.SelectedItem = null;
-                addComponentsListPopup.IsOpen = true;
-                AddComponentsFilter.Focus();
-                addComponentList.ItemsSource = Component.GetAllAddableComponentTypes();
-                CollectionViewSource.GetDefaultView(addComponentList.ItemsSource).Filter = ComponentsFilter;
-            }
+            //private void AddComponentButton_Click(object sender, RoutedEventArgs e)
+            //{
+            //    addComponentList.SelectedItem = null;
+            //    addComponentsListPopup.IsOpen = true;
+            //    AddComponentsFilter.Focus();
+            //    addComponentList.ItemsSource = Component.GetAllAddableComponentTypes();
+            //    CollectionViewSource.GetDefaultView(addComponentList.ItemsSource).Filter = ComponentsFilter;
+            //}
 
             private void AddComponent_CanExecute(object sender, CanExecuteRoutedEventArgs e)
             {
