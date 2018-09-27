@@ -9,6 +9,7 @@
 #include <AtlBase.h>
 #include <atlconv.h>
 #include <comdef.h>
+#include <string.h>  
 
 namespace thomas
 {
@@ -330,11 +331,9 @@ namespace thomas
 			// convert back from char, since its easier to compare strings than chars
 			// Fuck you, thats why.
 			char* filename_c = new char[fileName.length() + 1];
-			std::strcpy(filename_c, fileName.c_str());
-
+			strcpy_s(filename_c, fileName.length() + 1, fileName.c_str());
 			char * extension_char = PathFindExtensionA(filename_c);
 			std::string extension_string(extension_char);
-
 			
 			delete[] filename_c;
 
@@ -361,7 +360,7 @@ namespace thomas
 		bool D3d::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{
 			char* filename_c = new char[fileName.length() + 1];
-			std::strcpy(filename_c, fileName.c_str());
+			strcpy_s(filename_c, fileName.length() + 1, fileName.c_str());
 
 			char * extension_char = PathFindExtensionA(filename_c);
 			std::string extension_string(extension_char);

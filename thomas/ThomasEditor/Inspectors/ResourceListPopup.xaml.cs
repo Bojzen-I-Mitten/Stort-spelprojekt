@@ -30,25 +30,33 @@ namespace ThomasEditor
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                if (value is Resource)
+                try
                 {
-                    Resource res = value as Resource;
-                    Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(res.GetType());
-                    if (type == Resources.AssetTypes.TEXTURE2D)
+                    if (value is Resource)
                     {
-                        Texture2D tex = res as Texture2D;
-                        BitmapSource bitmapSource = BitmapSource.Create(tex.width, tex.height, 300, 300, PixelFormats.Bgra32, BitmapPalettes.WebPaletteTransparent, tex.GetRawPixelData(), tex.width*tex.height*4,  4*tex.width);
+                        Resource res = value as Resource;
+                        Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(res.GetType());
+                        if (type == Resources.AssetTypes.TEXTURE2D)
+                        {
+                            Texture2D tex = res as Texture2D;
+                            BitmapSource bitmapSource = BitmapSource.Create(tex.width, tex.height, 300, 300, PixelFormats.Bgra32, BitmapPalettes.WebPaletteTransparent, tex.GetRawPixelData(), tex.width * tex.height * 4, 4 * tex.width);
 
-                        return bitmapSource;
+                            return bitmapSource;
+                        }
+                        return AssetBrowser.assetImages[type].UriSource.LocalPath;
                     }
-                    return AssetBrowser.assetImages[type].UriSource.LocalPath;
+                    else if (value is ThomasEngine.Object)
+                    {
+                        return "../icons/assets/prefab.png";
+                    }
+                    else
+                        return "../icons/null.png";
                 }
-                else if(value is ThomasEngine.Object)
+                catch (Exception e)
                 {
-                    return "../icons/assets/prefab.png";
+                    Debug.Log("Error! ThomasEditor::ResourceImageConverter::Convert with msg: " + e.Message);
                 }
-                else
-                    return "../icons/null.png";
+                return "../icons/null.png";
             }
 
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
