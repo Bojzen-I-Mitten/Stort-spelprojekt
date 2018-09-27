@@ -9,11 +9,11 @@ namespace thomas {
 
 			struct Bone {
 
-				std::string _boneName;
-				math::Matrix _invBindPose;
-				math::Matrix _bindPose;
 				int _boneIndex;
 				uint32_t _boneHash;
+				math::Matrix _invBindPose;
+				math::Matrix _bindPose;
+				std::string _boneName;
 				/* Parent bone */
 				int _parentIndex;
 				Bone()

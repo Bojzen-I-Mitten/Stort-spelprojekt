@@ -20,8 +20,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
     <ClCompile Include="src\thomas\System.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
@@ -84,9 +86,11 @@
     <ClCompile Include="src\thomas\utils\D3d.cpp" />
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
+    <ClCompile Include="src\thomas\utils\Utility.cpp" />
     <ClCompile Include="src\thomas\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
@@ -132,6 +136,7 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarFloat.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarInt.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyShaderResource.h" />
+    <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
@@ -169,6 +174,7 @@
     <ClInclude Include="src\thomas\utils\D3D.h" />
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />
+    <ClInclude Include="src\thomas\utils\Utility.h" />
     <ClInclude Include="src\thomas\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
