@@ -77,7 +77,7 @@ namespace thomas
 			}
 
 			
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, bool createUAV) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, bool createUAV, D3D11_BIND_FLAG bindFlag) : Buffer(data, count * stride, bindFlag, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;
@@ -113,7 +113,7 @@ namespace thomas
 			}
 			
 
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_BUFFER_UAV_FLAG uavFlag, D3D11_USAGE usageFlag) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_BUFFER_UAV_FLAG uavFlag, D3D11_USAGE usageFlag) : Buffer(data, count * stride, D3D11_BIND_UNORDERED_ACCESS, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
 				m_hasUAV = false;
 				m_hasSRV = false;

@@ -26,8 +26,8 @@ namespace thomas
 
 			
 			m_particleSpawn = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
-			m_particleUpdatePing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, true);//ammount of particles supported for entire system
-			m_particleUpdatePong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, true);//ammount of particles supported for entire system
+			m_particleUpdatePing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, true, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system
+			m_particleUpdatePong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, true, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system
 			
 			int vals[25000] = {};
 			m_particleAliveList = std::make_unique<utils::buffers::StructuredBuffer>(&vals, sizeof(unsigned), maxNrOfParticles, D3D11_BUFFER_UAV_FLAG_APPEND);
@@ -43,6 +43,14 @@ namespace thomas
 
 		void ParticleSystem::Destroy()
 		{
+			SAFE_RELEASE(m_particleAliveList);
+			SAFE_RELEASE(m_particleDeadList);
+			SAFE_RELEASE(m_particleUpdatePong);
+			SAFE_RELEASE(m_particleUpdatePing);
+			SAFE_RELEASE(m_particleSpawn);
+
+			//m_updateParticlesCS 
+			//m_emitParticlesCS
 		}
 
 		bool ParticleSystem::AddEmitterToSpawn(object::component::ParticleEmitterComponent* emitter)
@@ -86,7 +94,8 @@ namespace thomas
 			m_emitParticlesCS->SetGlobalUAV("particlesWrite", m_particleUpdatePing->GetUAV());
 			m_emitParticlesCS->SetGlobalUAV("particlesWrite2", m_particleUpdatePong->GetUAV());
 			m_emitParticlesCS->SetGlobalUAV("deadlist", m_particleDeadList->GetUAV());
-			
+			m_emitParticlesCS->SetGlobalUAV("alivelist", m_particleAliveList->GetUAV());
+
 			m_emitParticlesCS->Dispatch(m_spawningEmitterEmissionRate[0] * 128);
 
 		}
