@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
-
+using System.Linq;
 namespace ThomasEngine.Network
 {
 
@@ -53,14 +53,17 @@ namespace ThomasEngine.Network
         public static NetworkManager instance;
 
         private Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
-        private Dictionary<NetPeer, GameObject> players = new Dictionary<NetPeer, GameObject>();
+
+        //private Dictionary<NetPeer, GameObject> players = new Dictionary<NetPeer, GameObject>();
+        private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
+
         int iD = -1;
         int validationID = -5;
 
         private NetPacketProcessor netPacketProcessor;
         private EventBasedNetListener listener;
         private NetManager netManager;
-
+        private bool conectee = false;
         private EventBasedNatPunchListener natPunchListener;
 
         public int LocalPort { get; set; } = 9050;
@@ -83,6 +86,9 @@ namespace ThomasEngine.Network
 
         [Browsable(false)]
         public NetManager InternalManager { get { return netManager; } }
+
+
+        public List<NetPeer> Players { get { return ownedObjects.Keys.ToList(); } }
 
         public NetworkManager()
         {
@@ -132,7 +138,7 @@ namespace ThomasEngine.Network
             netManager.Start(LocalPort);
             Debug.Log("NetManager started on port" + ":" + netManager.LocalPort);
             localPeer = new NetPeer(netManager, null);
-            SpawnPlayerCharacter(localPeer);
+            SpawnPlayerCharacter(localPeer, 0);
 
         }
 
@@ -166,7 +172,7 @@ namespace ThomasEngine.Network
         private void Listener_PeerConnectedEvent(NetPeer _peer)
         {
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
-
+            
             foreach (NetPeer peer in netManager.GetPeers(ConnectionState.Connected))
             {
                 if (peer == _peer)
@@ -184,7 +190,7 @@ namespace ThomasEngine.Network
                 _peer.Send(writer, DeliveryMethod.ReliableOrdered);
             }
 
-            SpawnPlayerCharacter(_peer);
+            SpawnPlayerCharacter(_peer, 0);
         }
 
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
@@ -232,17 +238,19 @@ namespace ThomasEngine.Network
             if(netManager.NatPunchEnabled)
                 netManager.NatPunchModule.PollEvents();
             netManager.PollEvents(); 
-            //if (netManager.GetFirstPeer() != null)
-            //    GUI.ImguiStringUpdate(netManager.GetFirstPeer().Ping.ToString(), new Vector2(0, 0));
-            //if (Input.GetKey(Input.Keys.P))
-            //    Diagnostics();
+
             if (Input.GetKeyDown(Input.Keys.K))
             {
+                conectee = true;
                 if(UseLobby)
                     netManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
                 else
+                {
                     netManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
+                }
+                    
             }
+            Diagnostics();
         }
 
         public override void OnDestroy()
@@ -360,11 +368,12 @@ namespace ThomasEngine.Network
             gObj.GetComponent<NetworkID>().Owner = spawnEvent.isOwner;
         }
 
-        private void SpawnPlayerCharacter(NetPeer connected)
+        private void SpawnPlayerCharacter(NetPeer connected, int targetID)
         {
             GameObject player = InstantiateAndRegister(playerPrefab);
 
-            players.Add(connected, player);
+            ownedObjects.Add(connected, new List<GameObject>());
+            ownedObjects[connected].Add(player);
 
             if (connected == localPeer)
             {
@@ -392,8 +401,19 @@ namespace ThomasEngine.Network
 
         private void RemovePlayerCharacter(NetPeer disconnectedPeer)
         {
-            players[disconnectedPeer].Destroy();
-            players.Remove(disconnectedPeer);
+            foreach(GameObject ownedObject in ownedObjects[disconnectedPeer])
+            {
+                ownedObject.Destroy();
+            }
+            ownedObjects.Remove(disconnectedPeer);
+        }
+
+        public GameObject GetPlayerObject(NetPeer player)
+        {
+            if (ownedObjects.ContainsKey(player))
+                return ownedObjects[player][0];
+            else
+                return null;
         }
 
         private GameObject InstantiateAndRegister(GameObject prefab, int networkID = -1, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion())
@@ -429,9 +449,9 @@ namespace ThomasEngine.Network
         public void PingToAllClients()
         {
             int i = 0;
-            foreach(var player in players)
+            foreach(var player in Players)
             {
-                GUI.ImguiStringUpdate("Ping to client " + player.Key.EndPoint.ToString() + "  " + player.Key.Ping, new Vector2(0, 40 + 10 * i));
+                GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;
             }
         }
