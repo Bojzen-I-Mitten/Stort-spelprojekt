@@ -13,28 +13,49 @@ namespace ThomasEngine.Network
 
         public bool Owner { set; get; } = false;
         public int ID { set; get; }
+
+        NetDataWriter m_dataWriter = new NetDataWriter();
+        float timeLeftUntilUpdate = 0;
+
+        NetworkManager Manager
+        {
+            get{return NetworkManager.instance;}
+        }
+
         List<NetworkComponent> networkComponentsCache;
         public override void OnEnable()
         {
-            //ID = NetworkManager.instance.Register(this);
             networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
+        
+        public override void Update()
+        {
+            if(Owner && Manager.InternalManager.IsRunning)
+            {
+                timeLeftUntilUpdate -= Time.ActualDeltaTime;
+                if(timeLeftUntilUpdate <= 0)
+                {
+                    timeLeftUntilUpdate = Manager.InternalManager.UpdateTime;
+                    WriteFrameData();
+                }
+            }
+        }
 
-
+        public void WriteFrameData()
+        {
+            m_dataWriter.Reset();
+            foreach (NetworkComponent comp in networkComponentsCache)
+            {
+                comp.OnWrite(m_dataWriter, false);
+            }
+            Manager.InternalManager.SendToAll(m_dataWriter, DeliveryMethod.Sequenced);
+        }
 
         public void WriteAllVars(NetDataWriter writer)
         {
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 comp.OnWrite(writer, true);
-            }
-        }
-
-        public void NetworkUpdate(NetDataWriter writer)
-        {
-            foreach (NetworkComponent comp in networkComponentsCache)
-            {
-                comp.OnWrite(writer, false);
             }
         }
 

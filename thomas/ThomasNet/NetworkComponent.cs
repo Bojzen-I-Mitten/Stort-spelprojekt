@@ -12,7 +12,6 @@ namespace ThomasEngine.Network
         private NetworkID m_networkID;
 
 
-
         protected int NetID
         {
             get { return NetworkID.ID; }
