@@ -101,7 +101,7 @@
                                 <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -121,7 +121,7 @@
         </Style>
 
         <HierarchicalDataTemplate DataType="{x:Type hierarchyTreeView:TreeItemViewModel}" ItemsSource="{Binding Children}">
-            <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" Foreground="White"/>
         </HierarchicalDataTemplate>
 
     </UserControl.Resources>
@@ -132,28 +132,29 @@
 
 
     <Grid>
-        <hierarchyTreeView:MultiSelectTreeView x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged" 
-                                               DragOver="hierarchy_DragOver" Drop="hierarchy_Drop" MouseMove="hierarchy_MouseMove" AllowDrop="True">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource MyTreeViewItemStyle}">
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                    <Setter Property="hierarchyTreeView:MultiSelectTreeView.IsItemSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                    <Style.Triggers>
-                        <Trigger Property="hierarchyTreeView:MultiSelectTreeView.IsItemSelected" Value="True">
-                            <Setter Property="Background" Value="White"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            <TreeView.ContextMenu>
-                <ContextMenu x:Name="hiearchyContextMenu">
-                    <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>
-                    <MenuItem Header="Rename" Click="MenuItem_RenameGameObject" IsEnabled="False"/>
-                    <MenuItem Header="Save as prefab" IsEnabled="{Binding}" Click="MenuItem_SaveAsPrefab"/>
-                </ContextMenu>
-            </TreeView.ContextMenu>
-        </hierarchyTreeView:MultiSelectTreeView>
+        <DockPanel>
+            <hierarchyTreeView:MultiSelectTreeView x:Name="hierarchy" Focusable="True" Background="#444444" SelectedItemChanged="SelectedGameObjectChanged" 
+                                                   DragOver="hierarchy_DragOver" Drop="hierarchy_Drop" MouseMove="hierarchy_MouseMove" AllowDrop="True">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}" >
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        <Setter Property="hierarchyTreeView:MultiSelectTreeView.IsItemSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                        <Style.Triggers>
+                            <Trigger Property="hierarchyTreeView:MultiSelectTreeView.IsItemSelected" Value="True">
+                                <Setter Property="Background" Value="Gray"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ContextMenu>
+                    <ContextMenu x:Name="hiearchyContextMenu">
+                        <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="False"/>
+                        <MenuItem Header="Rename" Click="MenuItem_RenameGameObject" IsEnabled="False"/>
+                        <MenuItem Header="Save as prefab" IsEnabled="{Binding}" Click="MenuItem_SaveAsPrefab"/>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
+            </hierarchyTreeView:MultiSelectTreeView>
 
-
+        </DockPanel>
     </Grid>
 </UserControl>
