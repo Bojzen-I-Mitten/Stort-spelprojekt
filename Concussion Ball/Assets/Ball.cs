@@ -4,10 +4,8 @@ public class Ball : NetworkComponent
 {
 
     Rigidbody rb;
-    public float force { get; set; } = 5.0f;
-    GameObject playerThatHasBall;
-    public float currentForce = 0;
-    private ThrowStrengthVisualizer visualizer;
+    bool pickedUp = false;
+
     public override void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
@@ -16,39 +14,35 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
-        if (true)
-        {
-            if (Input.GetKey(Input.Keys.LeftControl) && !rb.enabled)
-            {
-                currentForce += force * Time.DeltaTime;
-                // visualizer.SetStrength(currentForce);
-            }
-
-            if (Input.GetKeyUp(Input.Keys.LeftControl) && !rb.enabled)
-            {
-                transform.parent = null;
-                rb.enabled = true;
-                rb.AddForce(playerThatHasBall.transform.forward * currentForce, Rigidbody.ForceMode.Impulse);
-                playerThatHasBall = null;
-                currentForce = 0.0f;
-                // visualizer.SetStrength(0);
-            }
-        }
-
+        
     }
 
+    public void Drop()
+    {
+        if (pickedUp)
+        {
+            rb.enabled = true;
+            transform.parent = null;
+            pickedUp = false;
+        }
+        
+    }
 
-    //public override void OnCollisionEnter(Collider collider)
-    //{
-    //    if (rb.enabled)
-    //    {
-    //        playerThatHasBall = collider.gameObject;
-    //        rb.enabled = false;
-    //        transform.parent = collider.transform;
-    //        transform.localPosition = new Vector3(0, 2, 0);
+    public void Throw(Vector3 force)
+    {
+        if (pickedUp)
+        {
+            Drop();
+            rb.AddForce(force, Rigidbody.ForceMode.Impulse);
+        }
+    }
+    
+    public void Pickup(GameObject chad)
+    {
 
-    //        if(isOwner)
-    //            TakeOwnership(collider.gameObject);
-    //        }
-    //}
+        rb.enabled = false;
+        transform.parent = chad.transform;
+        transform.localPosition = new Vector3(0, 3, 3);
+        pickedUp = true;
+    }
 }

@@ -9,7 +9,7 @@ namespace ThomasEngine.Network
     {
         protected bool isDirty = false;
         private int prefabID;
-        private NetworkIdentiy networkIdentiy;
+        private NetworkIdentity networkIdentiy;
 
 
         protected int ID
@@ -17,13 +17,13 @@ namespace ThomasEngine.Network
             get { return Identity.ID; }
         }
 
-        protected NetworkIdentiy Identity
+        protected NetworkIdentity Identity
         {
             get
             {
                 if(networkIdentiy == null)
                 {
-                    networkIdentiy = gameObject.GetComponent<NetworkIdentiy>();
+                    networkIdentiy = gameObject.GetComponent<NetworkIdentity>();
                     if(networkIdentiy == null)
                     {
                         Debug.Log("There is no networkID on this object.");
@@ -58,7 +58,7 @@ namespace ThomasEngine.Network
         
         protected void TakeOwnership(GameObject obj)
         {
-            NetworkIdentiy networkIdentiy = obj.GetComponent<NetworkIdentiy>();
+            NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
             if(networkIdentiy != null)
             {
                 networkIdentiy.Owner = true;

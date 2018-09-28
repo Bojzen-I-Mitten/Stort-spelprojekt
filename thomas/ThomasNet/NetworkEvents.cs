@@ -64,7 +64,7 @@ namespace ThomasEngine.Network
 
         public class TransferOwnerEvent
         {
-            public int NetID;
+            public int NetID { get; set; }
 
             public TransferOwnerEvent() { NetID = -1;}
         }
@@ -80,7 +80,7 @@ namespace ThomasEngine.Network
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)
         {
 
-            NetworkIdentiy networkIdentiy = NetScene.FindNetworkObject(transEvent.NetID);
+            NetworkIdentity networkIdentiy = NetScene.FindNetworkObject(transEvent.NetID);
 
             NetPeer previousOwner = NetScene.FindOwnerOf(networkIdentiy);
 

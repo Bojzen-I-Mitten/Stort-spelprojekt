@@ -9,7 +9,7 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-    public class NetworkIdentiy : ScriptComponent
+    public class NetworkIdentity : ScriptComponent
     {
         private bool _Owner = false;
         public bool Owner {

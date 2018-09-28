@@ -13,16 +13,16 @@ namespace ThomasEngine.Network
         {
 
         }
-
-        public Dictionary<NetPeer, NetworkIdentiy> Players = new Dictionary<NetPeer, NetworkIdentiy>();
-        public Dictionary<int, NetworkIdentiy> NetworkObjects = new Dictionary<int, NetworkIdentiy>();
-        public Dictionary<NetPeer, List<NetworkIdentiy>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentiy>>();
+        int nextAssignableID = 0;
+        public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
+        public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
+        public Dictionary<NetPeer, List<NetworkIdentity>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentity>>();
 
        public void ReadPlayerData(NetPeer peer, NetPacketReader reader)
        {
             if (Players.ContainsKey(peer))
             {
-                NetworkIdentiy playerID = Players[peer];
+                NetworkIdentity playerID = Players[peer];
                 bool initialState = reader.GetBool();
                 playerID.ReadData(reader, initialState);
             }
@@ -40,7 +40,7 @@ namespace ThomasEngine.Network
             }
             
             GameObject obj = GameObject.Instantiate(playerPrefab);
-            NetworkIdentiy networkIdentiy = obj.GetComponent<NetworkIdentiy>();
+            NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
             networkIdentiy.Owner = myPlayer;
             networkIdentiy.IsPlayer = true;
             Players[peer] = networkIdentiy;
@@ -51,15 +51,28 @@ namespace ThomasEngine.Network
         {
             if (Players.ContainsKey(peer))
             {
-                NetworkIdentiy id = Players[peer];
+                NetworkIdentity id = Players[peer];
                 if (id != null)
                     id.gameObject.Destroy();
                 Players.Remove(peer);
             }
         }
 
+        public void ActivateAndAssignSceneObjects()
+        {
+            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
+            {
+                if(!identity.gameObject.GetActive())
+                {
+                    NetworkObjects.Add(nextAssignableID++, identity);
+                    identity.gameObject.SetActive(true);
+                }
+               
+            });
+        }
 
-        public NetworkIdentiy FindNetworkObject(int netID)
+
+        public NetworkIdentity FindNetworkObject(int netID)
         {
             if (NetworkObjects.ContainsKey(netID))
             {
@@ -68,7 +81,7 @@ namespace ThomasEngine.Network
             return null;
         }
 
-        public NetPeer FindOwnerOf(NetworkIdentiy networkIdentiy)
+        public NetPeer FindOwnerOf(NetworkIdentity networkIdentiy)
         {
             foreach(var peer in ObjectOwners)
             {

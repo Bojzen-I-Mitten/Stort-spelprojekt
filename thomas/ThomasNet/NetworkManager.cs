@@ -1,5 +1,4 @@
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using LiteNetLib;
@@ -83,6 +82,11 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
+
+            //Disable all networked gameObjects in scene.
+            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) => {
+                identity.gameObject.SetActive(false);
+                });
 
             //InitServerNTP();
             if (UseLobby)
@@ -223,8 +227,8 @@ namespace ThomasEngine.Network
             if(Input.GetKeyDown(Input.Keys.H)) //HOST
             {
 
+                NetScene.ActivateAndAssignSceneObjects();
                 NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
-
             }
 
             Diagnostics();
@@ -242,7 +246,7 @@ namespace ThomasEngine.Network
 
 
 
-        public void TakeOwnership(NetworkIdentiy networkIdentiy)
+        public void TakeOwnership(NetworkIdentity networkIdentiy)
         {
 
             NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent{
