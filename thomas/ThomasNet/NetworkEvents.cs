@@ -34,7 +34,6 @@ namespace ThomasEngine.Network
             SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
         }
 
-
         #region Events
         public class TimeSyncEvent
         {
