@@ -8,7 +8,16 @@ namespace thomas {
 			/* Per channel weights
 			*/
 			struct WeightTripple {
+				// Weight values
 				float m_scale, m_rot, m_translation;
+
+				WeightTripple() {}
+				WeightTripple(float weight)
+					: m_scale(weight), m_rot(weight), m_translation(weight)
+				{}
+				WeightTripple(float scaleWeight, float rotationWeight, float translationWeight)
+					: m_scale(scaleWeight), m_rot(rotationWeight), m_translation(translationWeight)
+				{}
 			};
 			/* Transformation components. 
 			*/
