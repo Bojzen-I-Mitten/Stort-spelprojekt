@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include<stdint.h>
 #include "../../../utils/Math.h"
 
 namespace thomas {
@@ -12,7 +13,7 @@ namespace thomas {
 				math::Matrix _invBindPose;
 				math::Matrix _bindPose;
 				int _boneIndex;
-				unsigned long _boneHash;
+				uint32_t _boneHash;
 				/* Parent bone */
 				int _parentIndex;
 				Bone()
