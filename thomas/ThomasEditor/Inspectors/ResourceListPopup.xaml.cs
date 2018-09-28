@@ -126,32 +126,40 @@ namespace ThomasEditor
         private void SetPropertyToSelection()
         {
             Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
-            if (ResourceList.SelectedItem != null)
-            {
-                if (ResourceList.SelectedItem is Resource)
+            try {
+                if (ResourceList.SelectedItem != null)
                 {
-                    if (index >= 0)
-                        (_property.Value as IList)[index] = ResourceList.SelectedItem as Resource;
-                    else
-                        _property.Value = ResourceList.SelectedItem as Resource;
-                }
-                else if (ResourceList.SelectedItem is String)
-                {
-                    if (index >= 0)
-                        (_property.Value as IList)[index] = null;
-                    else
-                        _property.Value = null;
-                }
-                else if (ResourceList.SelectedItem is ThomasEngine.Object)
-                {
-                    if (index >= 0)
-                        (_property.Value as IList)[index] = ResourceList.SelectedItem;
-                    else
-                        _property.Value = ResourceList.SelectedItem;
-                }
+                    if (ResourceList.SelectedItem is Resource)
+                    {
+                        if (index >= 0)
+                            (_property.Value as IList)[index] = ResourceList.SelectedItem as Resource;
+                        else
+                            _property.Value = ResourceList.SelectedItem as Resource;
+                    }
+                    else if (ResourceList.SelectedItem is String)
+                    {
+                        if (index >= 0)
+                            (_property.Value as IList)[index] = null;
+                        else
+                            _property.Value = null;
+                    }
+                    else if (ResourceList.SelectedItem is ThomasEngine.Object)
+                    {
+                        if (index >= 0)
+                            (_property.Value as IList)[index] = ResourceList.SelectedItem;
+                        else
+                            _property.Value = ResourceList.SelectedItem;
+                    }
 
+                }
             }
-            Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+            catch (System.Exception e)
+            {
+                Debug.Log("Error at: ThomasEngine::ResourceListPopup with message: " + e.Message);
+            }
+            finally {
+                Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+            }
             if(OnPropertyChanged != null)
                 OnPropertyChanged();
         }

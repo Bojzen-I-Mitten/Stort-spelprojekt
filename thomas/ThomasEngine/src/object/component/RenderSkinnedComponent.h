@@ -8,6 +8,7 @@
 #include "../../resource/Model.h"
 #include "../../resource/Material.h"
 #include "../../resource/Animation.h"
+#include "../../script/animation/BlendNode.h"
 
 namespace ThomasEngine
 {
@@ -39,6 +40,8 @@ namespace ThomasEngine
 		}
 
 		void setBlendTreeNode(thomas::graphics::animation::AnimationNode * node);
+
+		void setBlendTreeNode(Script::BlendNode^ node);
 
 		void Update() override;
 

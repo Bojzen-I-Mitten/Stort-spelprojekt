@@ -22,7 +22,7 @@ namespace ThomasEngine
 
 			void generateLinearMixer(float durationPerNode);
 
-
+			thomas::graphics::animation::AnimationNode* getNativeNode();
 		private:
 
 			thomas::graphics::animation::AnimBlender* m_node;

@@ -18,6 +18,10 @@ namespace thomas {
 				WeightTripple(float scaleWeight, float rotationWeight, float translationWeight)
 					: m_scale(scaleWeight), m_rot(rotationWeight), m_translation(translationWeight)
 				{}
+
+				bool isWeighted() const {
+					return m_scale + m_rot + m_translation > 0.f; // All weights should be > 0
+				}
 			};
 			/* Transformation components. 
 			*/

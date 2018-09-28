@@ -87,6 +87,12 @@ namespace ThomasEngine
 
 	}
 
+	void RenderSkinnedComponent::setBlendTreeNode(Script::BlendNode ^ node)
+	{
+		if (!node) return;
+		setBlendTreeNode(node->getNativeNode());
+	}
+
 	void RenderSkinnedComponent::Update()
 	{
 		get()->Update();

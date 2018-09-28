@@ -58,5 +58,10 @@ namespace ThomasEngine
 			m_node->generateLinearMixer(durationPerNode);
 		}
 
+		thomas::graphics::animation::AnimationNode * BlendNode::getNativeNode()
+		{
+			return m_node;
+		}
+
 	}
 }

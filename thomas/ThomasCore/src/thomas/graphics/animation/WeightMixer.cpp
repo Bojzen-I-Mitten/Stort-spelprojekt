@@ -40,7 +40,9 @@ namespace thomas {
 					   
 			WeightLinearPerChannel::WeightLinearPerChannel(uint32_t NumweightedNodes, float timePerNode)
 				: WeightMixer(NumweightedNodes, NumweightedNodes), m_duration(timePerNode), m_elapsed(0.f), m_index(0), m_weightedNodes(NumweightedNodes)
-			{			}
+			{
+				std::memset(m_mode, 0, sizeof(Mode) * NumweightedNodes);
+			}
 
 			void WeightLinearPerChannel::update(float dT)
 			{
@@ -50,10 +52,16 @@ namespace thomas {
 				m_elapsed += dT;
 				float norm = m_elapsed / m_duration;
 				int floor = int(norm);
-				if (floor)
+				if (floor) {
 					clearWeights(m_index, floor);
-				m_index += floor;
-				norm -= float(floor);
+					m_index += floor;
+					norm -= float(floor);
+					// If last blend target
+					if (m_index == m_weightedNodes) {
+						m_weights[m_index - 1] = WeightTripple(1.f);
+						return;
+					}
+				}
 
 				// Update weights
 				m_weights[m_index] = WeightTripple(1.f - norm);

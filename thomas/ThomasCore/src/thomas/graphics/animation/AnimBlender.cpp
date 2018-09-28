@@ -6,7 +6,7 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 			AnimBlender::AnimBlender(Skeleton & skel)
-				: AnimationNode(skel)
+				: AnimationNode(skel), m_NumNode(0), m_weights()
 			{
 			}
 			AnimBlender::~AnimBlender()
@@ -80,19 +80,21 @@ namespace thomas {
 				// Blend remaining nodes
 				for (unsigned int i = 1; i < m_NumNode; i++)
 				{
-					node = m_nodes[i];
-					node->calcFrame(tmp_arr.get());
 					if (mode[i] == WeightMixer::PerChannel) 
 					{
+						node = m_nodes[i];
+						node->calcFrame(tmp_arr.get());
 						// Blend bones (and map each to skeleton index) 
 						for (unsigned int b = 0; b < node->m_numChannel; b++)
 							result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights++);
 					}
 					else 
 					{
-						// Blend bones (and map each to skeleton index) 
-						for (unsigned int b = 0; b < node->m_numChannel; b++)
-							result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights);
+						if (weights->isWeighted()) {
+							// Blend bones (and map each to skeleton index) 
+							for (unsigned int b = 0; b < node->m_numChannel; b++)
+								result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights);
+						}
 						weights++; // Step next node weight
 					}
 				}

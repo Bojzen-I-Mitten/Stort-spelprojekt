@@ -9,12 +9,14 @@ namespace thomas {
 			class AnimationData;
 			class Skeleton;
 			class WeightMixer;
-
+			/* Max number of animation nodes possible in a blend node. */
+			constexpr uint32_t MAX_ANIMATION_BLEND_NODE = 10;
 			class AnimBlender : public AnimationNode 
 			{
+			public:
 			private:
 
-				AnimationNode* m_nodes[10];
+				AnimationNode* m_nodes[MAX_ANIMATION_BLEND_NODE];
 				uint32_t m_NumNode;
 				std::unique_ptr<WeightMixer> m_weights;
 
