@@ -39,12 +39,9 @@ namespace thomas
 				{
 					math::Vector3 position;
 					float spread;
-					
-					unsigned int currentParticleStartIndex;
-					float maxSpeed;
-					float radius;
-					bool spawnAtSphereEdge;
 
+					float radius;
+					float maxSpeed;
 					float minSpeed;
 					float endSpeed;
 
@@ -58,10 +55,16 @@ namespace thomas
 					float rotationSpeed;
 					float rotation;
 
-					math::Matrix directionMatrix;
+					DirectX::XMFLOAT3X3 directionMatrix;
 
 					float gravity;
-					math::Vector3 padding;
+					float pad1;
+					float pad2;
+
+					unsigned nrOfParticlesToEmit;
+					unsigned spawnAtSphereEdge;
+					unsigned pad3;
+					unsigned pad4;
 
 				};
 
@@ -76,13 +79,12 @@ namespace thomas
 					float endSpeed;
 					float size;
 					float endSize;
-
 					float lifeTime;
+
 					float lifeTimeLeft;
 					float rotationSpeed;
 					float rotation;
-
-					
+					float pad;
 				};
 
 				struct BillboardStruct
@@ -90,7 +92,7 @@ namespace thomas
 					math::Vector3 positions[2][3];
 					math::Vector2 pad2;
 					math::Vector2 uvs[2][3];
-					math::Vector4 colorFactor;
+					//math::Vector4 colorFactor;
 				};
 			private:
 				void CreateParticleUAVsandSRVs();

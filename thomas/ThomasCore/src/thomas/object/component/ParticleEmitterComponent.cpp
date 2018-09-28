@@ -29,7 +29,7 @@ namespace thomas
 				m_isEmitting = false;
 				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
 				m_particleBufferStruct.spread = 1.0f;
-				m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), math::Vector3(1, 0, 0), math::Vector3::Up).Transpose();
+				//m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), math::Vector3(1, 0, 0), math::Vector3::Up).Transpose();
 				m_particleBufferStruct.maxSpeed = 0.0f;
 				m_particleBufferStruct.minSpeed = 0.0f;
 				m_particleBufferStruct.endSpeed = 0.0f;
@@ -41,7 +41,7 @@ namespace thomas
 				m_tempMaxLifeTime = 1.0f;
 				m_particleBufferStruct.rotationSpeed = 0.0f;
 				m_particleBufferStruct.rotation = 0;
-				m_particleBufferStruct.currentParticleStartIndex = 0;
+				//m_particleBufferStruct.currentParticleStartIndex = 0;
 				m_particleBufferStruct.spawnAtSphereEdge = false;
 				m_particleBufferStruct.radius = 0;
 				m_particleBufferStruct.rand = (std::rand() % 1000) / 1000.f;
@@ -85,7 +85,7 @@ namespace thomas
 					m_shouldUpdateResources = false;
 					CreateParticleUAVsandSRVs();
 
-					m_particleBufferStruct.currentParticleStartIndex = 0;
+					//m_particleBufferStruct.currentParticleStartIndex = 0;
 					
 					//graphics::ParticleSystem::SpawnParticles(this, m_maxNrOfParticles);
 					m_spawnedParticleCount = m_maxNrOfParticles;
@@ -110,7 +110,7 @@ namespace thomas
 						m_particleBufferStruct.rand = (std::rand() % 1000) / 1000.f;
 
 						//graphics::ParticleSystem::SpawnParticles(this, numberOfParticlesToEmit);
-						m_particleBufferStruct.currentParticleStartIndex = (m_particleBufferStruct.currentParticleStartIndex + numberOfParticlesToEmit) % m_maxNrOfParticles;
+						//m_particleBufferStruct.currentParticleStartIndex = (m_particleBufferStruct.currentParticleStartIndex + numberOfParticlesToEmit) % m_maxNrOfParticles;
 						m_spawnedParticleCount += numberOfParticlesToEmit;
 						m_spawnedParticleCount = min(m_spawnedParticleCount, m_maxNrOfParticles);
 					}
@@ -145,7 +145,7 @@ namespace thomas
 			{
 				math::Vector3 temp = math::Vector3::TransformNormal(this->m_gameObject->m_transform->Forward(), this->m_gameObject->m_transform->GetWorldMatrix());
 				
-				m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), -temp, math::Vector3::Up).Invert().Transpose();
+				//m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), -temp, math::Vector3::Up).Invert().Transpose();
 			}
 
 			void ParticleEmitterComponent::SetSpeed(float const& min, float const& max)
@@ -309,7 +309,7 @@ namespace thomas
 				m_isEmitting = false;
 				if (force)
 				{
-					m_particleBufferStruct.currentParticleStartIndex = 0;
+					//m_particleBufferStruct.currentParticleStartIndex = 0;
 
 					//graphics::ParticleSystem::SpawnParticles(this, m_maxNrOfParticles);
 

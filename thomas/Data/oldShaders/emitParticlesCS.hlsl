@@ -3,11 +3,8 @@ struct InitParticlesBuffer
 	float3 initPosition;
 	float initSpread;
 	
-	uint nrOfParticlesToEmit;
+    float radius;
 	float initMaxSpeed;
-	float radius;
-	bool spawnAtSphereEdge;
-
 	float initMinSpeed;
 	float initEndSpeed;
 
@@ -21,11 +18,14 @@ struct InitParticlesBuffer
 	float initRotationSpeed;
 	float initRotation;
 
-	matrix directionMatrix;
+	float3x3 directionMatrix;
 
 	float initGravity;
-	float3 padding;
+	float2 padding;
 
+    uint nrOfParticlesToEmit;
+    uint spawnAtSphereEdge;
+    uint2 pad2;
 };
 
 struct ParticleStruct
@@ -39,24 +39,17 @@ struct ParticleStruct
 	float endSpeed;
 	float size;
 	float endSize;
-
 	float lifeTime;
+
 	float lifeTimeLeft;
 	float rotationSpeed;
 	float rotation;
-    
+    float pad;
 };
-
-struct CounterStruct
-{
-    uint deadCount;
-    uint aliveCount;
-};
-
 
 StructuredBuffer<InitParticlesBuffer> initParticles;
 RWStructuredBuffer<ParticleStruct> particlesWrite;
-RWStructuredBuffer<ParticleStruct> particlesWrite2;
+
 ConsumeStructuredBuffer<uint> deadList;
 AppendStructuredBuffer<uint> aliveList;
 
@@ -117,7 +110,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         normalize(dir);
 
         float3 position = newParticle.initPosition + dir * newParticle.radius;
-        if (newParticle.spawnAtSphereEdge)
+        if ((bool) newParticle.spawnAtSphereEdge)
         {
             dir *= -1; //make the particles go inward;
         }
@@ -149,7 +142,6 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         
 
         particlesWrite[writeindex] = fillBuffer;
-        particlesWrite2[writeindex] = fillBuffer;
        
 
         

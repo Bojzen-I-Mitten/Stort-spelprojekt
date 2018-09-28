@@ -81,21 +81,24 @@ namespace thomas
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;
+				HRESULT hr;
 
-				D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-				
-				desc.Buffer.ElementWidth = stride;
-				desc.Buffer.ElementOffset = 0;
-				desc.Buffer.FirstElement = 0;
-				desc.Buffer.NumElements = count;
-				desc.Format = DXGI_FORMAT_UNKNOWN;
-				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-				
-				HRESULT hr =ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+				if (bindFlag & D3D11_BIND_SHADER_RESOURCE)
+				{
+					D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 
-				if (hr == S_OK)
-					m_hasSRV = true;
+					desc.Buffer.ElementWidth = stride;
+					desc.Buffer.ElementOffset = 0;
+					desc.Buffer.FirstElement = 0;
+					desc.Buffer.NumElements = count;
+					desc.Format = DXGI_FORMAT_UNKNOWN;
+					desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 
+					hr = ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+
+					if (hr == S_OK)
+						m_hasSRV = true;
+				}
 				if (bindFlag & D3D11_BIND_UNORDERED_ACCESS)
 				{
 					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};

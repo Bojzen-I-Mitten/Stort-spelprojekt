@@ -94,10 +94,6 @@ namespace thomas
 
 		void LightManager::Update()
 		{
-			test.SpawnParticles();
-
-
-
 			std::vector<LightStruct> allLights;
 
 			for (object::component::LightComponent* light : s_lights)
@@ -117,6 +113,7 @@ namespace thomas
 		}
 		void LightManager::DANK()
 		{
+			test.SpawnParticles();
 			test.UpdateParticles();
 			test.DrawParticles();
 		}

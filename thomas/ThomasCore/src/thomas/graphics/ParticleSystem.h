@@ -49,14 +49,12 @@ namespace thomas
 			resource::ComputeShader* m_updateParticlesCS;
 
 			
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleSpawn;
-		
-
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePing;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleUpdatePong;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleDeadList;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleAliveList;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_particleBillboards;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnBuffer;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateBuffer;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_deadList;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_aliveListPing;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_aliveListPong;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_billboardBuffer;
 			bool m_pingpong;
 
 			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;
