@@ -55,7 +55,9 @@ namespace thomas {
 				if (floor) {
 					clearWeights(m_index, floor);
 					m_index += floor;
+					float cycles = float(floor);
 					norm -= float(floor);
+					m_elapsed = norm * m_duration;
 					// If last blend target
 					if (m_index == m_weightedNodes) {
 						m_weights[m_index - 1] = WeightTripple(1.f);
