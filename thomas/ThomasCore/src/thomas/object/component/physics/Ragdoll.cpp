@@ -88,7 +88,7 @@ namespace thomas
 				{
 					//Ragdoll::BodyParts::BodyParts_Amount
 					btTransform t;
-					for(int i = 0; i < 4; i++)
+					for(int i = 0; i < 2; i++)
 					{
 						m_bodies[i]->getMotionState()->getWorldTransform(t);
 						math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
@@ -97,6 +97,26 @@ namespace thomas
 						editor::Gizmos::DrawBoundingCapsule(math::Vector3(0,0,0), boneCapsuls[i].y, m_lengths[i]);
 					}
 				}
+			}
+
+			void Ragdoll::OnDisable()
+			{
+				for (int i = 0; i < 1; ++i)
+				{
+					thomas::Physics::s_world->removeConstraint(m_joints[i]);
+					delete m_joints[i]; m_joints[i] = 0;
+				}
+				for (int i = 0; i < 2; ++i)
+				{
+					thomas::Physics::s_world->removeRigidBody(m_bodies[i]);
+
+					delete m_bodies[i]->getMotionState();
+
+					delete m_bodies[i]; m_bodies[i] = 0;
+					delete m_shapes[i]; m_shapes[i] = 0;
+				}
+
+
 			}
 
 			void Ragdoll::SetBoneCapsuls(math::Vector3 boneCapsule, int whichCapsule)
@@ -190,7 +210,7 @@ namespace thomas
 				{
 					First[i].setOrigin(btVector3(0, 0, 0));
 					Second[i].setOrigin(btVector3(0.15, 0.15, 0.15));
-					Twistspin[i]= math::Vector3(60, 30, 120);
+					Twistspin[i]= math::Vector3(0.2, 0.2, 0.2);
 				}
 
 
@@ -294,7 +314,11 @@ namespace thomas
 
 				
 				btTransform transform;
-				for (uint32_t i = 0; i < Ragdoll::BodyParts::BodyParts_Amount; i++) {
+
+				m_shapes[0] = PrepareCapsulTransform(boneArr[boneConnections[0].first], boneArr[boneConnections[0].second], boneCapsuls[0].x, boneCapsuls[0].y, transform, boneCapsuls[0].z);
+				m_bodies[0] = LocalCreateRigidBody(btScalar(0.001), transform, m_shapes[0]);
+
+				for (uint32_t i = 1; i < 2; i++) {
 					m_shapes[i] = PrepareCapsulTransform(boneArr[boneConnections[i].first], boneArr[boneConnections[i].second], boneCapsuls[i].x, boneCapsuls[i].y, transform,boneCapsuls[i].z);
 					m_bodies[i] = LocalCreateRigidBody(btScalar(0.001), transform, m_shapes[i]);
 				}
@@ -303,7 +327,7 @@ namespace thomas
 				//body head
 				m_joints[Joint_Neck] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Head], First[0], Second[0], Twistspin[0].x, Twistspin[0].y, Twistspin[0].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Neck], false);
-			
+	/*
 				//body leftarm
 				m_joints[Joint_Left_Arm] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperArm], First[1], Second[1], Twistspin[1].x, Twistspin[1].y, Twistspin[1].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Left_Arm], false);
@@ -336,6 +360,7 @@ namespace thomas
 				//lower rightleg
 				m_joints[Joint_Lower_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Right_UpperLeg], m_bodies[BodyPart_Right_LowerLeg], First[8], Second[8], Twistspin[8].x, Twistspin[8].y, Twistspin[8].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Right_Leg], false);
+			*/
 			}
 		}
 	}

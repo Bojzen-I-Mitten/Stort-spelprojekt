@@ -58,6 +58,7 @@ namespace thomas
 				virtual void Update() override;
 				virtual void Awake() override;
 				virtual void OnDrawGizmos() override;
+				virtual void OnDisable() override;
 				void SetBoneCapsuls(math::Vector3 boneCapsule, int whichCapsule);
 				math::Vector3 GetBoneCapsuls( int whichCapsule);
 
@@ -79,7 +80,7 @@ namespace thomas
 				math::Matrix boneArr[15];
 				btCollisionShape* m_shapes[BodyParts_Amount];
 				btRigidBody* m_bodies[BodyParts_Amount];
-				btTypedConstraint* m_joints[Joint_Amount];
+				btConeTwistConstraint* m_joints[Joint_Amount];
 				thomas::graphics::animation::IBlendTree* m_tree;
 				std::vector<uint32_t> m_boneIndex;
 				std::vector<float> m_lengths;

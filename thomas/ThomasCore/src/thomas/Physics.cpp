@@ -36,6 +36,8 @@ namespace thomas
 		gContactStartedCallback = Physics::CollisionStarted;
 		gContactProcessedCallback = Physics::CollisionProcessed;
 		gContactEndedCallback = Physics::CollisionEnded;
+		
+		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 		return true;
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
