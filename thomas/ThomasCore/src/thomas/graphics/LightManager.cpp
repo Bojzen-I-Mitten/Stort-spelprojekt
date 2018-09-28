@@ -113,6 +113,7 @@ namespace thomas
 		}
 		void LightManager::DANK()
 		{
+			
 			test.SpawnParticles();
 			test.UpdateParticles();
 			test.DrawParticles();

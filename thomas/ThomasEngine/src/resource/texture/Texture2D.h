@@ -25,6 +25,10 @@ namespace ThomasEngine
 		{
 			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetWhiteTexture()); }
 		}
+		static property Texture2D^ normalTexture
+		{
+			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetNormalTexture()); }
+		}
 
 		IntPtr GetRawPixelData()
 		{
@@ -50,6 +54,8 @@ namespace ThomasEngine
 				m_nativePtr = thomas::resource::Texture2D::GetWhiteTexture();
 			else if (m_path == "Black Texture")
 				m_nativePtr = thomas::resource::Texture2D::GetBlackTexture();
+			else if (m_path == "Normal Texture")
+				m_nativePtr = thomas::resource::Texture2D::GetNormalTexture();
 			else
 				m_nativePtr = new thomas::resource::Texture2D(Utility::ConvertString(m_path));
 		}

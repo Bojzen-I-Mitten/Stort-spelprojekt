@@ -62,6 +62,8 @@ namespace thomas
 			std::vector<object::component::ParticleEmitterComponent*> m_updateEmitters; 
 			
 			resource::Shader* m_particleShader;
+
+			
 		public:
 
 		};

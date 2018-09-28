@@ -132,6 +132,8 @@ namespace ThomasEngine {
 
 			thomas::System::S_RENDERER.ClearCommands();
 			editor::Gizmos::ClearGizmos();
+			
+
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{
 				if (renderingEditor)
@@ -155,7 +157,7 @@ namespace ThomasEngine {
 					camera->Render();
 				}
 
-				thomas::graphics::LightManager::DANK();
+				
 
 				thomas::object::component::RenderComponent::ClearList();
 				RenderFinished->WaitOne();

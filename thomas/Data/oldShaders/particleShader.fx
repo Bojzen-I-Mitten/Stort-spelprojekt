@@ -40,24 +40,14 @@ BlendState AlphaBlendingOn
 
 };
 
-struct VS_OUT
-{
-    float4 pos : SV_POSITION;
-    float2 uvs : TEXCOORD0;
-    float2 paddddd : padding;
-    float4 colorFactor : COLOR0;
-};
-
 struct BillboardStruct
 {
     float3 quad[2][3];
     float2 pad2;
     float2 uvs[2][3];
-    float4 colorFactor;
 };
 
 StructuredBuffer<BillboardStruct> billboards;
-
 
 struct v2f
 {
@@ -65,20 +55,27 @@ struct v2f
     float2 texcoord : TEXCOORD0;
 };
 
-v2f vert(uint id : SV_VERTEXID)
+v2f vert(uint id : SV_VertexID)
 {
-    v2f o = (v2f) 0;
+    v2f output;
 
     uint particleIndex = (uint) (id / 6);
     uint triangleIndex = (uint) ((id % 6) / 3);
     uint vertexIndex = id % 3;
 
-    o.vertex = mul(float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0), thomas_MatrixVP);
+    output.vertex = mul(float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0), thomas_MatrixVP);
 	
-    o.texcoord = billboards[particleIndex].uvs[triangleIndex][vertexIndex];
-    //output.colorFactor = billboards[particleIndex].colorFactor;
-
-    return o;
+    output.texcoord = billboards[particleIndex].uvs[triangleIndex][vertexIndex];
+    /*
+    if (id == 0)
+        output.vertex = mul(float4(0.0, 0.5, 0.5, 1.0), thomas_MatrixVP);
+    else if (id == 2)
+        output.vertex = mul(float4(0.5, -0.5, 0.5, 1.0), thomas_MatrixVP);
+    else if (id == 1)
+        output.vertex = mul(float4(-0.5, -0.5, 0.5, 1.0), thomas_MatrixVP);*/
+    
+    
+    return output;
 }
 
 
@@ -88,7 +85,7 @@ float4 frag(v2f input) : SV_Target
 
     //outputColor *= input.colorFactor;
     
-    return float4(0.5f, 0.0f, 0.5f, 1.0f);
+    return float4(1.0f, 0.0f, 0.0f, 1.0f);
 
 }
 

@@ -115,7 +115,7 @@ namespace thomas
 					}
 				}
 
-
+				thomas::graphics::LightManager::DANK();
 			}
 
 			//Take care of the editor camera and render gizmos

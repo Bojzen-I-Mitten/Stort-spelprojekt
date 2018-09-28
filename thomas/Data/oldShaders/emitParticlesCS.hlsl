@@ -1,26 +1,26 @@
 struct InitParticlesBuffer
 {
-	float3 initPosition;
-	float initSpread;
+	float3 position;
+	float spread;
 	
     float radius;
-	float initMaxSpeed;
-	float initMinSpeed;
-	float initEndSpeed;
+	float maxSpeed;
+	float minSpeed;
+	float endSpeed;
 
-	float initMaxSize;
-	float initMinSize;
-	float initEndSize;
-	float initMaxLifeTime;
+	float maxSize;
+	float minSize;
+	float endSize;
+	float maxLifeTime;
 
-	float initMinLifeTime;
+	float minLifeTime;
 	float rand;
-	float initRotationSpeed;
-	float initRotation;
+	float rotationSpeed;
+	float rotation;
 
 	float3x3 directionMatrix;
 
-	float initGravity;
+	float gravity;
 	float2 padding;
 
     uint nrOfParticlesToEmit;
@@ -32,7 +32,7 @@ struct ParticleStruct
 {
 	float3 position;
 	float gravity;
-
+/*
 	float3 direction;
 	float speed;
 
@@ -44,7 +44,7 @@ struct ParticleStruct
 	float lifeTimeLeft;
 	float rotationSpeed;
 	float rotation;
-    float pad;
+    float pad;*/
 };
 
 StructuredBuffer<InitParticlesBuffer> initParticles;
@@ -63,17 +63,18 @@ uint rand_xorshift(uint rng_state)
 }
 
 
-[numthreads(32, 1, 1)]
+[numthreads(1, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    int x = (Gid.x * 32) + GTid.x;
+    int x = 0;
+//    (Gid.x * 32) + GTid.x;
     int y = Gid.y;
 
     InitParticlesBuffer newParticle = initParticles[y];
 
     if (x < newParticle.nrOfParticlesToEmit)
     {
-        uint rng_state = x * newParticle.rand; //seed
+      /*  uint rng_state = x * newParticle.rand; //seed
 
         uint w1 = rand_xorshift(rng_state);
         uint w2 = rand_xorshift(w1);
@@ -110,6 +111,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         normalize(dir);
 
         float3 position = newParticle.initPosition + dir * newParticle.radius;
+
         if ((bool) newParticle.spawnAtSphereEdge)
         {
             dir *= -1; //make the particles go inward;
@@ -120,11 +122,11 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         float endSize = newParticle.initEndSize;
         float rotationSpeed = newParticle.initRotationSpeed;
         float rotation = newParticle.initRotation;
-
+        */
         ParticleStruct fillBuffer;
 
-        fillBuffer.position = position;
-        fillBuffer.gravity = gravity;
+        fillBuffer.position = newParticle.position;
+        /*fillBuffer.gravity = gravity;
         fillBuffer.direction = dir;
         fillBuffer.speed = speed;
         fillBuffer.endSpeed = endSpeed;
@@ -135,12 +137,10 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.rotationSpeed = rotationSpeed;
         fillBuffer.rotation = rotation;
 
-        
+        */
         uint writeindex = deadList.Consume();
         aliveList.Append(writeindex);
         
-        
-
         particlesWrite[writeindex] = fillBuffer;
        
 

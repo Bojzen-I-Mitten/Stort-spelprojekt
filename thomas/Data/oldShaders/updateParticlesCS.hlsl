@@ -5,7 +5,7 @@ struct ParticleStruct
     float3 position;
     float gravity;
 
-    float3 direction;
+    /*float3 direction;
     float speed;
 
     float endSpeed;
@@ -16,7 +16,7 @@ struct ParticleStruct
     float lifeTimeLeft;
     float rotationSpeed;
     float rotation;
-    float pad;
+    float pad;*/
 };
 
 struct BillboardStruct
@@ -34,10 +34,11 @@ AppendStructuredBuffer<uint> appendAliveList;
 ConsumeStructuredBuffer<uint> consumeAliveList;
 
 
-[numthreads(256, 1, 1)]
+[numthreads(1, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    uint Tid = (Gid.x * 256) + GTid.x;
+    uint Tid = 0; // (Gid.x * 256) + GTid.x;
+    
     uint index = consumeAliveList.Consume();
     float3x3 viewMatrix = thomas_MatrixV;
     float dt = thomas_DeltaTime;
@@ -45,7 +46,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     
     ParticleStruct particle = particles[index];
     
-        
+   /*     
     float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
 
 	//lerp between start and end speed
@@ -72,15 +73,16 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         
         appendAliveList.Append(index);
 
-    }
+    }*/
+    appendAliveList.Append(index);
     //BILLBOARD
-    float3 right = float3(viewMatrix[0][0], viewMatrix[0][1], viewMatrix[0][2]) * scale; //cameraRight * scale;
-    float3 up = float3(viewMatrix[2][0], viewMatrix[2][1], viewMatrix[2][2]) * scale; //-cameraUp * scale;
+    float3 right = float3(viewMatrix[0][0], viewMatrix[0][1], viewMatrix[0][2]); // * scale; //cameraRight * scale;
+    float3 up = float3(viewMatrix[2][0], viewMatrix[2][1], viewMatrix[2][2]); // * scale; //-cameraUp * scale;
 		
-    particle.rotation = particle.rotation + particle.rotationSpeed * dt;
+    //particle.rotation = particle.rotation + particle.rotationSpeed * dt;
 
-    float sinangle = sin(particle.rotation);
-    float cosangle = cos(particle.rotation);
+    float sinangle = 0; //sin(particle.rotation);
+    float cosangle = 1; //cos(particle.rotation);
 
 	//rotate billboard
 	float3 temp = cosangle * right - sinangle * up;
@@ -90,6 +92,8 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     particles[index] = particle;
 
     BillboardStruct billboard;
+
+    float3 particlePosWS = particle.position;
 
     //tri 1
 	billboard.quad[0][0] = particlePosWS + up + right;

@@ -36,6 +36,9 @@ namespace thomas
 			m_pingpong = true;
 
 			m_particleShader = resource::Shader::CreateShader("../Data/oldShaders/particleShader.fx");
+
+			m_emittedParticles = 0;
+			
 		}
 
 		void ParticleSystem::Destroy()
@@ -78,12 +81,9 @@ namespace thomas
 
 		void ParticleSystem::SpawnParticles()
 		{
-			if (m_emittedParticles < 512)
+			if (m_emittedParticles < 1)
 			{
 				std::vector<object::component::ParticleEmitterComponent::InitParticleBufferStruct> dataVec;
-
-				unsigned test = (unsigned)false;
-				test = (unsigned)true;
 
 				object::component::ParticleEmitterComponent::InitParticleBufferStruct testInitData = {};
 				testInitData.nrOfParticlesToEmit = 20;
@@ -114,6 +114,7 @@ namespace thomas
 
 				m_spawnBuffer->SetData(dataVec);
 
+
 				m_emitParticlesCS->SetGlobalResource("initParticles", m_spawnBuffer->GetSRV());
 				m_emitParticlesCS->SetGlobalUAV("particlesWrite", m_updateBuffer->GetUAV());
 				m_emitParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());
@@ -130,8 +131,8 @@ namespace thomas
 
 				//m_spawningEmitterEmissionRate[0] * 
 
-				m_emitParticlesCS->Dispatch(32);
-				m_emittedParticles += 32;
+				m_emitParticlesCS->Dispatch(1);
+				m_emittedParticles += 1;
 			}
 		}
 
@@ -154,7 +155,7 @@ namespace thomas
 
 
 
-			m_updateParticlesCS->Dispatch(m_emittedParticles / 256.0f);
+			m_updateParticlesCS->Dispatch(1);//m_emittedParticles / 256u);
 
 		}
 
@@ -163,8 +164,13 @@ namespace thomas
 			//m_particleShader->Bind();
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); //TODO: refactor to triangle strip?
 			m_particleShader->SetGlobalResource("billboards", m_billboardBuffer->GetSRV());
+			m_particleShader->SetPass(0);
 			m_particleShader->Bind();
-			ThomasCore::GetDeviceContext()->Draw(m_emittedParticles * 6, 0);
+			
+			
+			//m_emittedParticles * 
+
+			ThomasCore::GetDeviceContext()->Draw(6, 0);
 
 
 		}
