@@ -9,10 +9,10 @@ namespace ThomasEngine.Network
     {
         protected bool isDirty = false;
         private int prefabID;
-        private NetworkID m_networkID;
+        private NetworkID NetID;
 
 
-        protected int NetID
+        protected int ID
         {
             get { return NetworkID.ID; }
         }
@@ -21,15 +21,15 @@ namespace ThomasEngine.Network
         {
             get
             {
-                if(m_networkID == null)
+                if(NetID == null)
                 {
-                    m_networkID = gameObject.GetComponent<NetworkID>();
-                    if(m_networkID == null)
+                    NetID = gameObject.GetComponent<NetworkID>();
+                    if(NetID == null)
                     {
                         Debug.Log("There is no networkID on this object.");
                     }
                 }
-                return m_networkID;
+                return NetID;
             }
         }
 

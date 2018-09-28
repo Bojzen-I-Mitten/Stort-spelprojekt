@@ -7,40 +7,6 @@ using LiteNetLib.Utils;
 using System.Linq;
 namespace ThomasEngine.Network
 {
-
-    public class TimeSyncEvent
-    {
-        public float serverTime { get; set; }
-        public TimeSyncEvent() { }
-        public TimeSyncEvent(float time) { serverTime = time; }
-    }
-
-    public class SpawnPrefabEvent
-    {
-        public int netID { get; set; }
-        public int prefabID { get; set; }
-        public Vector3 position { get; set; }
-        public Quaternion rotation { get; set; }
-        public bool isOwner { get; set; }
-
-        public SpawnPrefabEvent() { netID = -1; prefabID = -2; position = new Vector3(); rotation = new Quaternion(); isOwner = false; }
-    }
-
-    public class DeletePrefabEvent
-    {
-        public int netID { get; set; }
-
-        public DeletePrefabEvent() { netID = -1; }
-    }
-
-    public class ConnectToPeerEvent
-    {
-        public string IP { get; set; } 
-        public int Port { get; set; }
-
-        public ConnectToPeerEvent() { IP = ""; Port = -1; ; }
-    }
-
     public enum PacketType
     {
         EVENT,
@@ -56,14 +22,12 @@ namespace ThomasEngine.Network
         
         //private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
 
-        int iD = -1;
-        int validationID = -5;
+        internal NetPacketProcessor NetPacketProcessor;
 
-        private NetPacketProcessor netPacketProcessor;
-        private EventBasedNetListener listener;
-        private NetManager netManager;
-        private bool conectee = false;
-        private EventBasedNatPunchListener natPunchListener;
+        private EventBasedNetListener Listener;
+        private NetManager NetManager;
+        private EventBasedNatPunchListener NatPunchListener;
+        private NetworkEvents Events;
 
         public int LocalPort { get; set; } = 9050;
 
@@ -73,19 +37,19 @@ namespace ThomasEngine.Network
         public bool UseLobby { get; set; } = false;
 
 
-        public List<GameObject> spawnablePrefabs { get; set; } = new List<GameObject>();
-        public GameObject playerPrefab { get; set; }
+        public List<GameObject> SpawnablePrefabs { get; set; } = new List<GameObject>();
+        public GameObject PlayerPrefab { get; set; }
         
-        private float serverTime;
+        private float ServerTime;
 
-        private NetPeer localPeer = null;
+        private NetPeer LocalPeer = null;
 
         public int TICK_RATE { get; set; } = 24;
 
-        NetworkScene NetScene;
+        internal NetworkScene NetScene;
 
         [Browsable(false)]
-        public NetManager InternalManager { get { return netManager; } }
+        public NetManager InternalManager { get { return NetManager; } }
 
         public NetworkManager()
         {
@@ -94,26 +58,21 @@ namespace ThomasEngine.Network
         public override void Awake()
         {
             NetScene = new NetworkScene();
-            netPacketProcessor = new NetPacketProcessor();
-            listener = new EventBasedNetListener();
-            netManager = new NetManager(listener);
+            NetPacketProcessor = new NetPacketProcessor();
+            Listener = new EventBasedNetListener();
+            NetManager = new NetManager(Listener);
+            Events = new NetworkEvents();
+            NatPunchListener = new EventBasedNatPunchListener();
 
-            natPunchListener = new EventBasedNatPunchListener();
+            NatPunchListener.NatIntroductionSuccess += NatPunchListener_NatIntroductionSuccess;
 
-            //Here all events are defined.
-            natPunchListener.NatIntroductionSuccess += NatPunchListener_NatIntroductionSuccess;
 
-            listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
-            listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
-            listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
-            listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-            listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
-            //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
+            Listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
+            Listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
+            Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+            Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
+            Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-            SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
-
-            //Stäng av alla nätverksobjekt som finns i scenen.
-                                              
 
         }
 
@@ -121,24 +80,26 @@ namespace ThomasEngine.Network
         {
             if (targetEndPoint.Address.ToString() == "::1")
                 return;
-            netManager.Connect(targetEndPoint, "SomeConnectionKey");
+            NetManager.Connect(targetEndPoint, "SomeConnectionKey");
         }
 
         public override void Start()
         {
 
-            InitServerNTP();
+            //InitServerNTP();
             if (UseLobby)
             {
-                netManager.NatPunchEnabled = true;
-                netManager.NatPunchModule.Init(natPunchListener);
+                NetManager.NatPunchEnabled = true;
+                NetManager.NatPunchModule.Init(NatPunchListener);
             }
-            
-            netManager.Start(LocalPort);
-            Debug.Log("NetManager started on port" + ":" + netManager.LocalPort);
-            localPeer = new NetPeer(netManager, null);
+
+            NetManager.Start(LocalPort);
+            Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
+            LocalPeer = new NetPeer(NetManager, null);
 
         }
+
+        #region Listners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
@@ -172,31 +133,28 @@ namespace ThomasEngine.Network
         {
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
             
-            foreach (NetPeer peer in netManager.GetPeers(ConnectionState.Connected))
+            foreach (NetPeer peer in NetManager.GetPeers(ConnectionState.Connected))
             {
                 if (peer == _peer)
                     continue;
-                ConnectToPeerEvent connectEvent = new ConnectToPeerEvent
+                NetworkEvents.ConnectToPeerEvent connectEvent = new NetworkEvents.ConnectToPeerEvent
                 {
                     IP = peer.EndPoint.Address.ToString(),
                     Port = peer.EndPoint.Port
                 };
 
+                Events.SendEventToPeer(connectEvent, DeliveryMethod.ReliableOrdered, _peer);
 
-                NetDataWriter writer = new NetDataWriter();
-                writer.Put((int)PacketType.EVENT);
-                WriteEvent(writer, connectEvent);
-                _peer.Send(writer, DeliveryMethod.ReliableOrdered);
             }
 
-            if(NetScene.players.Count == 0) // We are new player.
+            if(NetScene.Players.Count == 0) // We are new player.
             {
-                NetScene.SpawnPlayer(playerPrefab, localPeer, true);
-                NetScene.SpawnPlayer(playerPrefab, _peer, false);
+                NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
+                NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
             }
             else //Someone is joining us.
             {
-                NetScene.SpawnPlayer(playerPrefab, _peer, false);
+                NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
             }
         }
 
@@ -227,7 +185,7 @@ namespace ThomasEngine.Network
                     break;
                 case PacketType.EVENT:
                     Debug.Log("recived events!");
-                    netPacketProcessor.ReadAllPackets(reader, peer);
+                    NetPacketProcessor.ReadAllPackets(reader, peer);
                     break;
                 default:
                     break;
@@ -237,28 +195,29 @@ namespace ThomasEngine.Network
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
-            if (netManager.PeersCount < 10 /* max connections */)
+            if (NetManager.PeersCount < 10 /* max connections */)
                 request.AcceptIfKey("SomeConnectionKey");
             else
                 request.Reject();
         }
 
+        #endregion
+
         public override void Update()
         {
-            netManager.UpdateTime = (1000 / TICK_RATE);
-            serverTime += Time.ActualDeltaTime;
-            if(netManager.NatPunchEnabled)
-                netManager.NatPunchModule.PollEvents();
-            netManager.PollEvents(); 
+            NetManager.UpdateTime = (1000 / TICK_RATE);
+            ServerTime += Time.ActualDeltaTime;
+            if(NetManager.NatPunchEnabled)
+                NetManager.NatPunchModule.PollEvents();
+            NetManager.PollEvents(); 
 
             if (Input.GetKeyDown(Input.Keys.J)) //JOIN
             {
-                conectee = true;
                 if(UseLobby)
-                    netManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
+                    NetManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
                 else
                 {
-                    netManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
+                    NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
                 }
                     
             }
@@ -266,7 +225,7 @@ namespace ThomasEngine.Network
             if(Input.GetKeyDown(Input.Keys.H)) //HOST
             {
 
-                NetScene.SpawnPlayer(playerPrefab, localPeer, true);
+                NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
 
             }
 
@@ -275,101 +234,47 @@ namespace ThomasEngine.Network
 
         public override void OnDestroy()
         {
-            if (netManager != null)
+            if (NetManager != null)
             {
-                netManager.DisconnectAll();
-                netManager.Stop();
+                NetManager.DisconnectAll();
+                NetManager.Stop();
             }
 
         }
 
       
+        
 
-       
-        public void SubscribeToEvent<T>(Action<T, NetPeer> onReceive) where T : class, new()
-        {
-            netPacketProcessor.SubscribeReusable<T, NetPeer>(onReceive);
-        }
-
-        public void WriteEvent<T>(NetDataWriter writer, T data) where T : class, new()
-        {
-            netPacketProcessor.Write<T>(writer, data);
-        }
-
-        public void SendEvent<T>(T data, DeliveryMethod method) where T : class, new()
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put((int)PacketType.EVENT);
-
-            netPacketProcessor.Write<T>(writer, data);
-            netManager.SendToAll(writer, method);
-        }
-
-        public void SendEventToAllBut<T>(T data, DeliveryMethod method, NetPeer excluded) where T : class, new()
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put((int)PacketType.EVENT);
-
-            netPacketProcessor.Write<T>(writer, data);
-            netManager.SendToAll(writer, method, excluded);
-        }
-
-        public void SendEventToPeer<T>(T data, DeliveryMethod method, NetPeer sendTo) where T : class, new()
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put((int)PacketType.EVENT);
-
-            netPacketProcessor.Write<T>(writer, data);
-            sendTo.Send(writer, method);
-        }
-
-        private void InitServerNTP()
-        {
-            NtpRequest.Make("pool.ntp.org", 123, dateTime =>
-            {
-                if (dateTime.HasValue)
-                {
-                    serverTime = dateTime.Value.Millisecond * 0.001f;
-                }
-            });
-        }
-
-
-
-
-        public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
-        {
-                        
-            netManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
-        }
-
-        //private void RemovePlayerCharacter(NetPeer disconnectedPeer)
+        //internal void InitServerNTP()
         //{
-        //    foreach(GameObject ownedObject in ownedObjects[disconnectedPeer])
-        //    {
-        //        ownedObject.Destroy();
-        //    }
-        //    ownedObjects.Remove(disconnectedPeer);
+        //    NetDataWriter writer = new NetDataWriter();
+        //    writer.Put((int)PacketType.EVENT);
+
+        //    netPacketProcessor.Write<T>(writer, data);
+        //    sendTo.Send(writer, method);
         //}
+
+
+                                    
 
         public void CheckPacketLoss()
         {
-            Debug.Log("A error has occured here are the amount of packetloss " + netManager.Statistics.PacketLoss + "% lost " + netManager.Statistics.PacketLossPercent);
-            Debug.Log("A total of " + netManager.Statistics.PacketsSent + "was sent and " + netManager.Statistics.PacketsReceived + "was recieved");
+            Debug.Log("A error has occured here are the amount of packetloss " + NetManager.Statistics.PacketLoss + "% lost " + NetManager.Statistics.PacketLossPercent);
+            Debug.Log("A total of " + NetManager.Statistics.PacketsSent + "was sent and " + NetManager.Statistics.PacketsReceived + "was recieved");
         }
 
         public void Diagnostics()
         {
-            GUI.ImguiStringUpdate("Packetsloss = " + netManager.Statistics.PacketLossPercent, new Vector2(0, 10));
-            GUI.ImguiStringUpdate("Total package sent = " + netManager.Statistics.PacketsSent, new Vector2(0, 20));
-            GUI.ImguiStringUpdate("Total package recieved = " + netManager.Statistics.PacketsReceived, new Vector2(0, 30));
+            GUI.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent, new Vector2(0, 10));
+            GUI.ImguiStringUpdate("Total package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
+            GUI.ImguiStringUpdate("Total package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
             PingToAllClients();
         }
 
         public void PingToAllClients()
         {
             int i = 0;
-            foreach(var player in netManager.GetPeers(ConnectionState.Connected))
+            foreach(var player in NetManager.GetPeers(ConnectionState.Connected))
             {
                 GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;

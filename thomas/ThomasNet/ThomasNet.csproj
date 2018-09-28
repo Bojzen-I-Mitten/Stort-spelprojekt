@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkEvents.cs" />
     <Compile Include="NetworkComponent.cs" />
     <Compile Include="NetworkScene.cs" />
     <Compile Include="NetworkTransform.cs" />

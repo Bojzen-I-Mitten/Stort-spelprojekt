@@ -11,12 +11,15 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
-        Vector3 m_prevPosition;
-        Quaternion m_prevRotation;
-        Vector3 m_prevScale;
 
-        const float m_localMovementThreshold = 0.00001f;
-        const float m_localRotationThreshold = 0.00001f;
+
+
+        Vector3 PrevPosition;
+        Quaternion PrevRotation;
+        Vector3 PrevScale;
+
+        float LocalMovementThreshold = 0.00001f;
+        float LocalRotationThreshold = 0.00001f;
 
         public enum TransformSyncMode
         {
@@ -29,10 +32,9 @@ namespace ThomasEngine.Network
 
         public override void Awake()
         {
-            m_prevPosition = transform.position;
-            m_prevRotation = transform.rotation;
-            m_prevScale = transform.scale;
-
+            PrevPosition = transform.position;
+            PrevRotation = transform.rotation;
+            PrevScale = transform.scale;
         }
         public override void Update()
         {
@@ -49,19 +51,19 @@ namespace ThomasEngine.Network
 
 
             //Check if position has changed
-            diff = (transform.position - m_prevPosition).Length();
+            diff = (transform.position - PrevPosition).Length();
 
-            if (diff > m_localMovementThreshold)
+            if (diff > LocalMovementThreshold)
                 return true;
 
             //check if rotation has changed
-            diff = Quaternion.Dot(transform.rotation, m_prevRotation) - 1.0f;
-            if (diff < -m_localRotationThreshold)
+            diff = Quaternion.Dot(transform.rotation, PrevRotation) - 1.0f;
+            if (diff < -LocalRotationThreshold)
                 return true;
 
             //Check if scale has changed (temp)
-            diff = (transform.scale - m_prevScale).Length();
-            if (diff > m_localMovementThreshold)
+            diff = (transform.scale - PrevScale).Length();
+            if (diff > LocalMovementThreshold)
                 return true;
 
             return false;
@@ -104,14 +106,12 @@ namespace ThomasEngine.Network
 
             writer.Put(transform.scale);
 
-            m_prevPosition = transform.position;
-            m_prevRotation = transform.rotation;
-            m_prevScale = transform.scale;
+            PrevPosition = transform.position;
+            PrevRotation = transform.rotation;
+            PrevScale = transform.scale;
 
         }
-
-
-
+        
         public override void OnRead(NetPacketReader reader, bool initialState)
         {
             if (!initialState && reader.GetInt() == 0)
