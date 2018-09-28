@@ -71,20 +71,19 @@ namespace ThomasEngine.Network
 
         public override bool OnWrite(NetDataWriter writer, bool initialState)
         {
-            //if (initialState)
-            //{
-            //    //Always write initial state
-            //}
-            //else if (!isDirty)
-            //{
-            //    writer.Put(0);
-            //    return false;
-            //}
-            //else
-            //{
-            //    writer.Put(1);
-            //}
-            writer.Put(1);
+            if (initialState)
+            {
+                //Always write initial state
+            }
+            else if (!isDirty)
+            {
+                writer.Put(0);
+                return false;
+            }
+            else
+            {
+                writer.Put(1);
+            }
 
             switch(SyncMode)
             {
@@ -94,13 +93,6 @@ namespace ThomasEngine.Network
                 default:
                     break;
             }
-
-            isDirty = false;
-            //Clean dirty flag
-            m_prevPosition = transform.position;
-            m_prevRotation = transform.rotation;
-            m_prevScale = transform.scale;
-
             return true;
         }
 
