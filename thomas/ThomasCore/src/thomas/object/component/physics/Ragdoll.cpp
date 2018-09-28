@@ -206,14 +206,15 @@ namespace thomas
 				boneConnections[9] = std::pair<uint32_t, uint32_t>(13, 14);
 				
 
-				for (int i = 0; i < 9; i++)
-				{
-					First[i].setOrigin(btVector3(0, 0, 0));
-					Second[i].setOrigin(btVector3(0.15, 0.15, 0.15));
-					Twistspin[i]= math::Vector3(0.2, 0.2, 0.2);
-				}
-
-
+			//	for (int i = 0; i < 9; i++)
+			//	{
+			//		First[i].setOrigin(btVector3(0, 0, 0));
+			//		Second[i].setOrigin(btVector3(0.15, 0.15, 0.15));
+			//		Twistspin[i]= math::Vector3(60, 60, 60);
+			//	}
+				First[0].setOrigin(btVector3(0, 0.35, 0));
+				Second[0].setOrigin(btVector3(0, 0, 0));
+				Twistspin[0] = math::Vector3(30, 30, 45);
 
 
 			}
@@ -315,17 +316,31 @@ namespace thomas
 				
 				btTransform transform;
 
-				m_shapes[0] = PrepareCapsulTransform(boneArr[boneConnections[0].first], boneArr[boneConnections[0].second], boneCapsuls[0].x, boneCapsuls[0].y, transform, boneCapsuls[0].z);
-				m_bodies[0] = LocalCreateRigidBody(btScalar(0.001), transform, m_shapes[0]);
+			
 
-				for (uint32_t i = 1; i < 2; i++) {
+				for (uint32_t i = 0; i < 2; i++) {
 					m_shapes[i] = PrepareCapsulTransform(boneArr[boneConnections[i].first], boneArr[boneConnections[i].second], boneCapsuls[i].x, boneCapsuls[i].y, transform,boneCapsuls[i].z);
 					m_bodies[i] = LocalCreateRigidBody(btScalar(0.001), transform, m_shapes[i]);
 				}
-			
-			
+				/*
+				for (int i = 0; i < 2; ++i)
+				{
+					m_bodies[i]->setDamping(0.05, 0.85);
+					m_bodies[i]->setDeactivationTime(3.0);
+					m_bodies[i]->setSleepingThresholds(5.6, 5.5);
+					m_bodies[i]->setContactProcessingThreshold(0.25f);
+					m_bodies[i]->setCcdMotionThreshold(0.05f);
+					m_bodies[i]->setCcdSweptSphereRadius(0.06f);
+				}
+				*/
+
+				btTransform CenterOfMass;
+				CenterOfMass = m_bodies[1]->getWorldTransform();
+				CenterOfMass.setOrigin(btVector3(boneArr[boneConnections[1].first].Translation().x, boneArr[boneConnections[1].first].Translation().y, boneArr[boneConnections[1].first].Translation().z));
+				m_bodies[1]->setCenterOfMassTransform(CenterOfMass);
+				m_bodies[1]->setGravity(btVector3(0, 1, 0));
 				//body head
-				m_joints[Joint_Neck] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Head], First[0], Second[0], Twistspin[0].x, Twistspin[0].y, Twistspin[0].z);
+				m_joints[Joint_Neck] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Head], First[0], Second[0], math::DegreesToRadians(Twistspin[0].x), math::DegreesToRadians(Twistspin[0].y), math::DegreesToRadians(Twistspin[0].z));
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Neck], false);
 	/*
 				//body leftarm
