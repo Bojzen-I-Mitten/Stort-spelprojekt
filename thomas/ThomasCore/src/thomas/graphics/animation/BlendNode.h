@@ -1,6 +1,6 @@
 #pragma once
 #include "AnimationNode.h"
-#include "Playback.h"
+#include "WeightMixer.h"
 #include <memory>
 
 namespace thomas {
@@ -12,12 +12,10 @@ namespace thomas {
 			public:
 				BlendNode(Skeleton &ref);
 				virtual ~BlendNode();
-
-
-
+				
 			private:
 
-				std::unique_ptr<Playback> time;
+				std::unique_ptr<WeightMixer> m_weights;
 			};
 		}
 	}

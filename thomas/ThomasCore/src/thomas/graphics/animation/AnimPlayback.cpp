@@ -31,7 +31,6 @@ namespace thomas {
 				m_channel.reserve(anim.numChannel());
 				m_boneMapping.reserve(anim.numChannel());
 				//Each channel needs to be initiated so it can generate it's own frames.
-
 				for (size_t i = 0; i < anim.numChannel(); i++) {
 					const ObjectChannel& ch = anim[i];
 					unsigned int boneInd;
