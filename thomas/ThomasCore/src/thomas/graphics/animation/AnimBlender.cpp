@@ -91,9 +91,11 @@ namespace thomas {
 					else 
 					{
 						if (weights->isWeighted()) {
+							node = m_nodes[i];
+							node->calcFrame(tmp_arr.get());
 							// Blend bones (and map each to skeleton index) 
 							for (unsigned int b = 0; b < node->m_numChannel; b++)
-								result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights);
+								result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[node->m_boneMapping[b]], *weights);
 						}
 						weights++; // Step next node weight
 					}

@@ -50,9 +50,9 @@ namespace thomas {
 				*/
 				void blendTo(TransformComponents & target, const WeightTripple& weight) {
 
-					m_scale += target.m_scale * weight.m_scale;
+					m_scale = m_scale * (1-weight.m_scale) + target.m_scale * weight.m_scale;
 					m_rot = math::Quaternion::Slerp(m_rot, target.m_rot, weight.m_rot);
-					m_pos += target.m_pos * weight.m_translation;
+					m_pos = m_pos * (1 - weight.m_translation) + target.m_pos * weight.m_translation;
 				}
 				/* Calc. transformation matrix from the components.
 				*/

@@ -59,8 +59,9 @@ namespace thomas {
 
 			void AnimPlayback::calcFrame(TransformComponents * result)
 			{
+				float eT = m_playback->m_elapsedTime;
 				for (uint32_t i = 0; i < m_channel.size(); i++)
-					calcFrame(i, result[m_boneMapping[i]]);
+					m_channel[i].lerpFrame(eT, result[m_boneMapping[i]].m_pos, result[m_boneMapping[i]].m_scale, result[m_boneMapping[i]].m_rot);
 			}
 			void AnimPlayback::blendFrameTo(TransformComponents * result, WeightTripple *weights)
 			{
