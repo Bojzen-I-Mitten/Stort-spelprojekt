@@ -14,12 +14,18 @@ namespace thomas {
 			{
 			private:
 
-				std::vector<AnimationNode*> m_nodes;
+				AnimationNode* m_nodes[10];
+				uint32_t m_NumNode;
 				WeightMixer * m_weights;
 
 			public:
 				AnimBlender(Skeleton &skel);
 				virtual ~AnimBlender();
+
+				void constructMapping();
+
+
+				void pushAnimation(AnimationNode* node);
 
 				// Inherited via AnimationNode
 				virtual void update(float) override;

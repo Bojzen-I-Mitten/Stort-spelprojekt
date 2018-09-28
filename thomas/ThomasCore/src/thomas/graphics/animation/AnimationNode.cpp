@@ -60,6 +60,9 @@ namespace thomas {
 			{
 
 			}
+			void BindPoseNode::calcFrame(TransformComponents * result)
+			{
+			}
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace thomas {
 
 			/* Generate an animation pose
 			*/
+
 			AnimPlayback::AnimPlayback(Skeleton &ref)
 				: AnimationNode(ref),
 				m_playback(new BaseAnimationTime(0.f,0.f, graphics::animation::PlayType::None)), m_anim(NULL), m_channel(ref.getNumBones())
@@ -55,6 +56,28 @@ namespace thomas {
 			{
 				m_playback->timeStep(dT);
 			}
+
+			void AnimPlayback::calcFrame(TransformComponents * result)
+			{
+				for (uint32_t i = 0; i < m_channel.size(); i++)
+					calcFrame(i, result[m_boneMapping[i]]);
+			}
+			void AnimPlayback::blendFrameTo(TransformComponents * result, WeightTripple *weights)
+			{
+				for (uint32_t i = 0; i < m_channel.size(); i++) {
+					TransformComponents comp;
+					calcFrame(i, comp);
+					result[m_boneMapping[i]].blendTo(comp, weights[m_boneMapping[i]]);
+				}
+			}
+			void AnimPlayback::calcFrame(unsigned int index, TransformComponents &comp) {
+				float eT = m_playback->m_elapsedTime;
+				m_channel[index].lerpFrame(eT, comp.m_pos, comp.m_scale, comp.m_rot);
+			}
+			void AnimPlayback::calcFrame(unsigned int index, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
+				float eT = m_playback->m_elapsedTime;
+				m_channel[index].lerpFrame(eT, trans, scale, rot);
+			}
 			math::Vector3 AnimPlayback::calcBonePosition(unsigned int index)
 			{
 				return m_channel[index].lerpCoordinate(m_playback->m_elapsedTime);
@@ -70,11 +93,6 @@ namespace thomas {
 				return m_channel[index].lerpRotation(m_playback->m_elapsedTime);
 			}
 
-
-			void AnimPlayback::calcFrame(unsigned int index, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
-				float eT = m_playback->m_elapsedTime;
-				m_channel[index].lerpFrame(eT, trans, scale, rot);
-			}
 			/*
 			bool AnimatedSkeleton::setAnim(const std::string& name, PlayType runType) {
 				//Change animation, it can be null

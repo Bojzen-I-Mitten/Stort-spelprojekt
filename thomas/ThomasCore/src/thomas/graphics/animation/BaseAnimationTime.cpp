@@ -13,16 +13,16 @@ namespace thomas {
 			}
 			void BaseAnimationTime::timeStep(float dT)
 			{
-				m_elapsed += dT * m_speedUp;
-				if (m_duration < m_elapsed) {
+				m_elapsedTime += dT * m_speedUp;
+				if (m_duration < m_elapsedTime) {
 					switch (m_playType)
 					{
 					case PlayType::Loop:
-						m_elapsed = std::fmodf(m_elapsed, m_duration);	// Loop time
+						m_elapsedTime = std::fmodf(m_elapsedTime, m_duration);	// Loop time
 						break;
 					case PlayType::Once:
 					default:
-						m_elapsed = m_duration;
+						m_elapsedTime = m_duration;
 						break;
 					}
 				}

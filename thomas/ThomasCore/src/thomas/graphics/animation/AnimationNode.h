@@ -45,6 +45,9 @@ namespace thomas {
 				virtual math::Quaternion calcBoneRot(unsigned int bone) override;
 
 				virtual void calcFrame(unsigned int bone, math::Vector3 & trans, math::Vector3 & scale, math::Quaternion & rot) override;
+
+				// Inherited via AnimationNode
+				virtual void calcFrame(TransformComponents * result) override;
 			};
 		}
 	}

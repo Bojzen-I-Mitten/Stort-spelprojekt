@@ -8,7 +8,7 @@ namespace thomas {
 
 
 
-			const float * WeightMixer::getWeights()
+			const WeightTripple * WeightMixer::getWeights()
 			{
 				return m_weights;
 			}

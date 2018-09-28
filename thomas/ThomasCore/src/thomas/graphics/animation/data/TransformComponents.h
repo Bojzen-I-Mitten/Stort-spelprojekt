@@ -5,6 +5,11 @@
 namespace thomas {
 	namespace graphics {
 		namespace animation {
+			/* Per channel weights
+			*/
+			struct WeightTripple {
+				float m_scale, m_rot, m_translation;
+			};
 			/* Transformation components. 
 			*/
 			struct TransformComponents {
@@ -25,6 +30,16 @@ namespace thomas {
 					m_scale += target.m_scale * weight;
 					m_rot = math::Quaternion::Slerp(m_rot, target.m_rot, weight);
 					m_pos += target.m_pos * weight;
+				}
+				/* Blend the transform components from the current state to the target, with the weight.
+				* target	<<	Target transform to blend toward
+				* weight	<<	Influence weights for each channel (3) in interval [0,1]
+				*/
+				void blendTo(TransformComponents & target, const WeightTripple& weight) {
+
+					m_scale += target.m_scale * weight.m_scale;
+					m_rot = math::Quaternion::Slerp(m_rot, target.m_rot, weight.m_rot);
+					m_pos += target.m_pos * weight.m_translation;
 				}
 
 				/* Construct a component by decomposing the matrix
