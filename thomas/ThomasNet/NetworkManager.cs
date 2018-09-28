@@ -44,18 +44,17 @@ namespace ThomasEngine.Network
     public enum PacketType
     {
         EVENT,
-        OBJECT_FRAME_DATA
+        OBJECT_DATA,
+        PLAYER_DATA,
     }
 
     public class NetworkManager : ScriptComponent
     {
 
         public static NetworkManager instance;
-
-        private Dictionary<int, NetworkID> networkIDObjects = new Dictionary<int, NetworkID>();
-
-        //private Dictionary<NetPeer, GameObject> players = new Dictionary<NetPeer, GameObject>();
-        private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
+        
+        
+        //private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
 
         int iD = -1;
         int validationID = -5;
@@ -83,12 +82,10 @@ namespace ThomasEngine.Network
 
         public int TICK_RATE { get; set; } = 24;
 
+        NetworkScene NetScene;
 
         [Browsable(false)]
         public NetManager InternalManager { get { return netManager; } }
-
-
-        public List<NetPeer> Players { get { return ownedObjects.Keys.ToList(); } }
 
         public NetworkManager()
         {
@@ -96,6 +93,7 @@ namespace ThomasEngine.Network
         }
         public override void Awake()
         {
+            NetScene = new NetworkScene();
             netPacketProcessor = new NetPacketProcessor();
             listener = new EventBasedNetListener();
             netManager = new NetManager(listener);
@@ -111,8 +109,7 @@ namespace ThomasEngine.Network
             listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
             //SubscribeToEvent<TimeSyncEvent>(HandleTimeSyncEvent);
-            SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
-            SubscribeToEvent<DeletePrefabEvent>(DeletePrefabEventHandler);
+
             SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
 
             //Stäng av alla nätverksobjekt som finns i scenen.
@@ -140,7 +137,6 @@ namespace ThomasEngine.Network
             netManager.Start(LocalPort);
             Debug.Log("NetManager started on port" + ":" + netManager.LocalPort);
             localPeer = new NetPeer(netManager, null);
-            SpawnPlayerCharacter(localPeer, 0);
 
         }
 
@@ -150,10 +146,11 @@ namespace ThomasEngine.Network
             {
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
-                    RemovePlayerCharacter(peer);
+                    NetScene.RemovePlayer(peer);
                     Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:
+                    NetScene.RemovePlayer(peer);
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
@@ -192,7 +189,15 @@ namespace ThomasEngine.Network
                 _peer.Send(writer, DeliveryMethod.ReliableOrdered);
             }
 
-            SpawnPlayerCharacter(_peer, 0);
+            if(NetScene.players.Count == 0) // We are new player.
+            {
+                NetScene.SpawnPlayer(playerPrefab, localPeer, true);
+                NetScene.SpawnPlayer(playerPrefab, _peer, false);
+            }
+            else //Someone is joining us.
+            {
+                NetScene.SpawnPlayer(playerPrefab, _peer, false);
+            }
         }
 
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
@@ -208,11 +213,16 @@ namespace ThomasEngine.Network
             PacketType type = (PacketType)reader.GetInt();
             switch (type)
             {
-                case PacketType.OBJECT_FRAME_DATA:
+                case PacketType.PLAYER_DATA:
                     {
-                        int networkID = reader.GetInt();
-                        if (networkIDObjects.ContainsKey(networkID) && networkIDObjects[networkID].enabled)
-                            networkIDObjects[validationID].OnUpdateVars(reader, false);
+                        NetScene.ReadPlayerData(peer, reader);
+                    }
+                    break;
+                case PacketType.OBJECT_DATA:
+                    {
+                        //int networkID = reader.GetInt();
+                        //if (networkIDObjects.ContainsKey(networkID) && networkIDObjects[networkID].enabled)
+                        //    networkIDObjects[validationID].OnUpdateVars(reader, false);
                     }
                     break;
                 case PacketType.EVENT:
@@ -241,7 +251,7 @@ namespace ThomasEngine.Network
                 netManager.NatPunchModule.PollEvents();
             netManager.PollEvents(); 
 
-            if (Input.GetKeyDown(Input.Keys.K))
+            if (Input.GetKeyDown(Input.Keys.J)) //JOIN
             {
                 conectee = true;
                 if(UseLobby)
@@ -252,6 +262,14 @@ namespace ThomasEngine.Network
                 }
                     
             }
+
+            if(Input.GetKeyDown(Input.Keys.H)) //HOST
+            {
+
+                NetScene.SpawnPlayer(playerPrefab, localPeer, true);
+
+            }
+
             Diagnostics();
         }
 
@@ -265,41 +283,9 @@ namespace ThomasEngine.Network
 
         }
 
-        private void Unregister(int networkID)
-        {
-            networkIDObjects.Remove(networkID);
-        }
+      
 
-        private int Register(NetworkID netID)
-        {
-            iD++;
-            networkIDObjects.Add(iD, netID);
-            netID.ID = iD;
-            return iD;
-        }
-
-        private int Register(NetworkID netID, int targetID)
-        {
-            if (!networkIDObjects.ContainsKey(targetID))
-            {
-                iD = targetID + 1;
-                networkIDObjects.Add(targetID, netID);
-                netID.ID = targetID;
-
-            }
-            else
-            {
-                Debug.Log("Tried registering already existing ID");
-            }
-            return iD;
-        }
-
-        public void OverwriteNetID(NetworkID netID, int new_id)
-        {
-            networkIDObjects.Remove(netID.ID);
-            networkIDObjects.Add(new_id, netID);
-        }
-
+       
         public void SubscribeToEvent<T>(Action<T, NetPeer> onReceive) where T : class, new()
         {
             netPacketProcessor.SubscribeReusable<T, NetPeer>(onReceive);
@@ -348,91 +334,23 @@ namespace ThomasEngine.Network
             });
         }
 
-        internal void SpawnPrefabEventHandler(SpawnPrefabEvent spawnEvent, NetPeer peer)
-        {
-            GameObject prefab;
-            if (spawnEvent.prefabID >= 0 && spawnEvent.prefabID < spawnablePrefabs.Count)
-            {
-                prefab = spawnablePrefabs[spawnEvent.prefabID];
-            }
-            else if (spawnEvent.prefabID == -1)
-            {
-                prefab = playerPrefab;
-            }
-            else
-            {
-                Debug.Log("Tried spawning object not in NetworkManager prefab list");
-                return;
-            }
 
-            GameObject gObj = InstantiateAndRegister(prefab, spawnEvent.netID, spawnEvent.position, spawnEvent.rotation);
-            gObj.Name += spawnEvent.isOwner ? "(My player)" : "";
-            gObj.GetComponent<NetworkID>().Owner = spawnEvent.isOwner;
-        }
 
-        private void SpawnPlayerCharacter(NetPeer connected, int targetID)
-        {
-            GameObject player = InstantiateAndRegister(playerPrefab);
-
-            ownedObjects.Add(connected, new List<GameObject>());
-            ownedObjects[connected].Add(player);
-
-            if (connected == localPeer)
-            {
-                player.GetComponent<NetworkID>().Owner = true;
-                player.Name += "(My player)";
-            }
-            else
-            {
-                player.GetComponent<NetworkID>().Owner = false;
-                player.Name += "(" + connected.EndPoint.ToString() + ")";
-            }
-        }
-
-        private void DeletePrefabEventHandler(DeletePrefabEvent deleteEvent, NetPeer peer)
-        {
-            DeleteAndUnregister(deleteEvent.netID);
-        }
 
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
-
-            
+                        
             netManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
         }
 
-        private void RemovePlayerCharacter(NetPeer disconnectedPeer)
-        {
-            foreach(GameObject ownedObject in ownedObjects[disconnectedPeer])
-            {
-                ownedObject.Destroy();
-            }
-            ownedObjects.Remove(disconnectedPeer);
-        }
-
-        public GameObject GetPlayerObject(NetPeer player)
-        {
-            if (ownedObjects.ContainsKey(player))
-                return ownedObjects[player][0];
-            else
-                return null;
-        }
-
-        private GameObject InstantiateAndRegister(GameObject prefab, int networkID = -1, Vector3 position = new Vector3(), Quaternion rotation = new Quaternion())
-        {
-            GameObject gObj = GameObject.Instantiate(playerPrefab, new Vector3(), new Quaternion());
-            if (networkID >= 0)
-                Register(gObj.GetComponent<NetworkID>(), networkID);
-            else
-                Register(gObj.GetComponent<NetworkID>());
-            return gObj;
-        }
-
-        private void DeleteAndUnregister(int networkID)
-        {
-            networkIDObjects[networkID].gameObject.Destroy();
-            Unregister(networkID);
-        }
+        //private void RemovePlayerCharacter(NetPeer disconnectedPeer)
+        //{
+        //    foreach(GameObject ownedObject in ownedObjects[disconnectedPeer])
+        //    {
+        //        ownedObject.Destroy();
+        //    }
+        //    ownedObjects.Remove(disconnectedPeer);
+        //}
 
         public void CheckPacketLoss()
         {

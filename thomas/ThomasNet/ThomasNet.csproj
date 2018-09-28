@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NetworkComponent.cs" />
+    <Compile Include="NetworkScene.cs" />
     <Compile Include="NetworkTransform.cs" />
     <Compile Include="LiteNetLib\BaseChannel.cs" />
     <Compile Include="LiteNetLib\ConnectionRequest.cs" />

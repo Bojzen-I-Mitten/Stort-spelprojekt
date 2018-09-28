@@ -204,28 +204,18 @@ namespace LiteNetLib.Utils
 
         public void Put(ThomasEngine.Vector3 value)
         {
-            if (_autoResize)
-                ResizeIfNeed(_position + 12);
-            _data[_position] = (byte)value.x;
-            _position += 4;
-            _data[_position] = (byte)value.y;
-            _position += 4;
-            _data[_position] = (byte)value.z;
-            _position += 4;
+            Put(value.x);
+            Put(value.y);
+            Put(value.z);
         }
 
         public void Put(ThomasEngine.Quaternion value)
         {
-            if (_autoResize)
-                ResizeIfNeed(_position + 16);
-            _data[_position] = (byte)value.x;
-            _position += 4;
-            _data[_position] = (byte)value.y;
-            _position += 4;
-            _data[_position] = (byte)value.z;
-            _position += 4;
-            _data[_position] = (byte)value.w;
-            _position += 4;
+            Put(value.x);
+            Put(value.y);
+            Put(value.z);
+            Put(value.w);
+            
         }
 
         public void Put(byte[] data, int offset, int length)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace ThomasEngine.Network
     {
 
         public bool Owner { set; get; } = false;
+        [Browsable(false)]
+        public bool IsPlayer { get; set; } = false;
         public int ID { set; get; }
 
         NetDataWriter m_dataWriter = new NetDataWriter();
@@ -35,7 +38,7 @@ namespace ThomasEngine.Network
                 timeLeftUntilUpdate -= Time.ActualDeltaTime;
                 if(timeLeftUntilUpdate <= 0)
                 {
-                    timeLeftUntilUpdate = Manager.InternalManager.UpdateTime;
+                    timeLeftUntilUpdate = Manager.InternalManager.UpdateTime/1000.0f;
                     WriteFrameData();
                 }
             }
@@ -43,23 +46,28 @@ namespace ThomasEngine.Network
 
         public void WriteFrameData()
         {
+            WriteData(false);
+        }
+
+        public void WriteInitialData()
+        {
+            WriteData(true);
+        }
+
+        private void WriteData(bool initalState=false)
+        {
             m_dataWriter.Reset();
+            PacketType packetType = IsPlayer ? PacketType.PLAYER_DATA : PacketType.OBJECT_DATA;
+            m_dataWriter.Put((int)packetType);
+            m_dataWriter.Put(initalState);
             foreach (NetworkComponent comp in networkComponentsCache)
             {
-                comp.OnWrite(m_dataWriter, false);
+                comp.OnWrite(m_dataWriter, initalState);
             }
             Manager.InternalManager.SendToAll(m_dataWriter, DeliveryMethod.Sequenced);
         }
 
-        public void WriteAllVars(NetDataWriter writer)
-        {
-            foreach (NetworkComponent comp in networkComponentsCache)
-            {
-                comp.OnWrite(writer, true);
-            }
-        }
-
-        public void OnUpdateVars(NetPacketReader reader, bool initialState)
+        public void ReadData(NetPacketReader reader, bool initialState)
         {
             if(initialState && networkComponentsCache == null)
             {
