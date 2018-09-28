@@ -65,9 +65,8 @@ namespace ThomasEngine.Network
         public class TransferOwnerEvent
         {
             public int NetID;
-            public NetPeer NewOwner;
 
-            public TransferOwnerEvent() { NetID = -1; NewOwner = null; }
+            public TransferOwnerEvent() { NetID = -1;}
         }
         #endregion
         
@@ -78,22 +77,28 @@ namespace ThomasEngine.Network
             Manager.InternalManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
         }
 
-        public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer peer)
+        public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)
         {
-            List<NetworkID> netObjectIDs = NetScene.NetworkObjects[peer];
-            foreach (var netObjectID in netObjectIDs)
+
+            NetworkIdentiy networkIdentiy = NetScene.FindNetworkObject(transEvent.NetID);
+
+            NetPeer previousOwner = NetScene.FindOwnerOf(networkIdentiy);
+
+            if(previousOwner == newOwner)
             {
-                if (netObjectID.ID == transEvent.NetID) //Object found
-                {
-                    if (transEvent.NewOwner == Manager.LocalPeer) //If I'm the owner
-                        netObjectID.Owner = true;
-
-                    netObjectIDs.Remove(netObjectID); //Remove from old player's list
-                    NetScene.NetworkObjects[transEvent.NewOwner].Add(netObjectID); //Add to new player's list
-
-                    break;
-                }
+                Debug.Log("Peer is already owner of object: " + networkIdentiy.gameObject.Name);
+                return;
             }
+
+            //Remove previous owner
+            NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
+
+            NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
+
+
+            //Make sure we do not own the object.
+            networkIdentiy.Owner = false;
+
         }
         #endregion
 

@@ -9,13 +9,22 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-    public class NetworkID : ScriptComponent
+    public class NetworkIdentiy : ScriptComponent
     {
+        private bool _Owner = false;
+        public bool Owner {
+            set {if(value == true) TakeOwnership();  _Owner = value; }
+            get { return _Owner; }
+        }
 
-        public bool Owner { set; get; } = false;
+        public int ID {
+            get {
+                return Manager ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : -1; // One line master race.
+            }
+        } 
+
         [Browsable(false)]
         public bool IsPlayer { get; set; } = false;
-        public int ID { set; get; }
 
         NetDataWriter DataWriter = new NetDataWriter();
         float TimeLeftUntilUpdate = 0;
@@ -77,6 +86,13 @@ namespace ThomasEngine.Network
             {
                 comp.OnRead(reader, initialState);
             }
+        }
+
+        private void TakeOwnership()
+        {
+            if(Manager != null)
+                if(!_Owner)
+                    Manager.TakeOwnership(this);
         }
     }
 }

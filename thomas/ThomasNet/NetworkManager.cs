@@ -240,8 +240,18 @@ namespace ThomasEngine.Network
 
         }
 
-      
-        
+
+
+        public void TakeOwnership(NetworkIdentiy networkIdentiy)
+        {
+
+            NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent{
+                NetID = networkIdentiy.ID
+            };
+
+            Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
+        }
+
 
         //internal void InitServerNTP()
         //{
@@ -253,7 +263,7 @@ namespace ThomasEngine.Network
         //}
 
 
-                                    
+
 
         public void CheckPacketLoss()
         {

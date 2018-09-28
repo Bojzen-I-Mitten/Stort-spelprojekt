@@ -1,6 +1,6 @@
 using ThomasEngine;
 using ThomasEngine.Network;
-public class Ball : ScriptComponent
+public class Ball : NetworkComponent
 {
 
     Rigidbody rb;
@@ -38,29 +38,17 @@ public class Ball : ScriptComponent
     }
 
 
-    public override void OnCollisionEnter(Collider collider)
-    {
-        if (rb.enabled)
-        {
-            playerThatHasBall = collider.gameObject;
-            rb.enabled = false;
-            transform.parent = collider.transform;
-            transform.localPosition = new Vector3(0, 2, 0);
+    //public override void OnCollisionEnter(Collider collider)
+    //{
+    //    if (rb.enabled)
+    //    {
+    //        playerThatHasBall = collider.gameObject;
+    //        rb.enabled = false;
+    //        transform.parent = collider.transform;
+    //        transform.localPosition = new Vector3(0, 2, 0);
 
-            foreach (var player in NetworkManager.instance.players)
-                if (player.Value == playerThatHasBall)
-                {
-                    if (player.Key.EndPoint != null) //is self
-                    {
-                        TransferOwnerEvent transEvent = new TransferOwnerEvent
-                        {
-                            netID = gameObject.GetComponent<NetworkID>().ID
-                        };
-                        NetworkManager.instance.SendEventToPeer(transEvent, LiteNetLib.DeliveryMethod.ReliableOrdered, player.Key);
-                    }
-                    break;
-                }
-        }
-
-    }
+    //        if(isOwner)
+    //            TakeOwnership(collider.gameObject);
+    //        }
+    //}
 }

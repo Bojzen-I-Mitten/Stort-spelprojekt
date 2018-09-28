@@ -96,7 +96,7 @@
     <Compile Include="LiteNetLib\Utils\NetPacketProcessor.cs" />
     <Compile Include="LiteNetLib\Utils\NetSerializer.cs" />
     <Compile Include="LiteNetLib\Utils\NetSerializerExceptions.cs" />
-    <Compile Include="NetworkID.cs" />
+    <Compile Include="NetworkIdentity.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

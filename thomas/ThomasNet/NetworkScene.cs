@@ -14,14 +14,15 @@ namespace ThomasEngine.Network
 
         }
 
-        public Dictionary<NetPeer, NetworkID> Players = new Dictionary<NetPeer, NetworkID>();
-        public Dictionary<NetPeer, List<NetworkID>> NetworkObjects = new Dictionary<NetPeer, List<NetworkID>>();
-        
+        public Dictionary<NetPeer, NetworkIdentiy> Players = new Dictionary<NetPeer, NetworkIdentiy>();
+        public Dictionary<int, NetworkIdentiy> NetworkObjects = new Dictionary<int, NetworkIdentiy>();
+        public Dictionary<NetPeer, List<NetworkIdentiy>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentiy>>();
+
        public void ReadPlayerData(NetPeer peer, NetPacketReader reader)
        {
             if (Players.ContainsKey(peer))
             {
-                NetworkID playerID = Players[peer];
+                NetworkIdentiy playerID = Players[peer];
                 bool initialState = reader.GetBool();
                 playerID.ReadData(reader, initialState);
             }
@@ -39,10 +40,10 @@ namespace ThomasEngine.Network
             }
             
             GameObject obj = GameObject.Instantiate(playerPrefab);
-            NetworkID netID = obj.GetComponent<NetworkID>();
-            netID.Owner = myPlayer;
-            netID.IsPlayer = true;
-            Players[peer] = netID;
+            NetworkIdentiy networkIdentiy = obj.GetComponent<NetworkIdentiy>();
+            networkIdentiy.Owner = myPlayer;
+            networkIdentiy.IsPlayer = true;
+            Players[peer] = networkIdentiy;
         }
 
 
@@ -50,11 +51,31 @@ namespace ThomasEngine.Network
         {
             if (Players.ContainsKey(peer))
             {
-                NetworkID id = Players[peer];
+                NetworkIdentiy id = Players[peer];
                 if (id != null)
                     id.gameObject.Destroy();
                 Players.Remove(peer);
             }
+        }
+
+
+        public NetworkIdentiy FindNetworkObject(int netID)
+        {
+            if (NetworkObjects.ContainsKey(netID))
+            {
+                return NetworkObjects[netID];
+            }
+            return null;
+        }
+
+        public NetPeer FindOwnerOf(NetworkIdentiy networkIdentiy)
+        {
+            foreach(var peer in ObjectOwners)
+            {
+                if (peer.Value.Contains(networkIdentiy))
+                    return peer.Key;
+            }
+            return null;
         }
 
     }
