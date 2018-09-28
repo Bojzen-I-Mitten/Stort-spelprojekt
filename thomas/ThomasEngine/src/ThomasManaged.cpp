@@ -118,12 +118,6 @@ namespace ThomasEngine {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
 				{
-					auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
-					if (collider != nullptr)
-					{
-						gameObject->OnCollisionEnter(collider);
-					}
-
 					gameObject->Update();
 				}
 			}
@@ -272,5 +266,9 @@ namespace ThomasEngine {
 	void ThomasWrapper::ToggleEditorRendering()
 	{
 		renderingEditor = !renderingEditor;
+	}
+	void ThomasWrapper::TogglePhysicsDebug()
+	{
+		Physics::s_drawDebug = !Physics::s_drawDebug;
 	}
 }

@@ -18,7 +18,14 @@ namespace ThomasEngine
 		virtual void Update()override {};
 		virtual void OnDrawGizmosSelected() override {};
 		virtual void OnDrawGizmos() override {};
-		virtual void OnCollisionEnter(GameObject^ collider) override {};
+
+		virtual void OnCollisionEnter(Collider^ collider) override {};
+		virtual void OnCollisionStay(Collider^ collider) override {};
+		virtual void OnCollisionExit(Collider^ collider) override {};
+
+		virtual void OnTriggerEnter(Collider^ collider) override {};
+		virtual void OnTriggerStay(Collider^ collider) override {};
+		virtual void OnTriggerExit(Collider^ collider) override {};
 
 	};
 }

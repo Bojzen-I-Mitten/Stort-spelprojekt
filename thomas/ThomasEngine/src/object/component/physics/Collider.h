@@ -1,9 +1,7 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\component\physics\Collider.h>
-#pragma managed
 #include "../../Component.h"
-#include "Rigidbody.h"
+using namespace System::Runtime::InteropServices;
+using namespace thomas::object;
 namespace ThomasEngine
 {
 	ref class Rigidbody;
@@ -13,11 +11,24 @@ namespace ThomasEngine
 	{
 	internal:
 		Collider() : Component(nullptr){}
+		enum class COLLISION_TYPE
+		{
+			STARTED,
+			STAY,
+			ENDED
+		};
+
+		virtual void OnGameObjectSet() override {};
 	private:
 		Rigidbody^ m_attachedRigidbody;
+		delegate void OnCollisionDelegate(component::Collider* otherCollider, COLLISION_TYPE collisionType);
+		GCHandle gch;
+		void OnCollision(component::Collider* otherCollider, COLLISION_TYPE collisionType);
 	public:
-		Collider(thomas::object::component::Collider* nativePtr) : Component(nativePtr) {}
+		Collider(component::Collider* nativePtr);
+		~Collider();
 		
+
 		[BrowsableAttribute(false)]
 		property Rigidbody^ attachedRigidbody {
 			Rigidbody^ get() { return m_attachedRigidbody; }
@@ -25,10 +36,11 @@ namespace ThomasEngine
 			
 		}
 
+
 		property bool isTrigger
 		{
-			bool get() { return ((thomas::object::component::Collider*)nativePtr)->IsTrigger(); }
-			void set(bool value) { ((thomas::object::component::Collider*)nativePtr)->SetTrigger(value); }
+			bool get();
+			void set(bool value);
 		}
 	};
 }

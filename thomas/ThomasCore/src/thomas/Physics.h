@@ -11,6 +11,12 @@ namespace thomas
 	class Physics
 	{
 	public:
+		enum class COLLISION_TYPE {
+			STARTED,
+			STAY,
+			ENDED
+		};
+	public:
 		static bool Init();
 		static void AddRigidBody(object::component::Rigidbody* rigidBody);
 		static bool RemoveRigidBody(object::component::Rigidbody* rigidBody);
@@ -18,7 +24,11 @@ namespace thomas
 		static void Simulate();
 		static void DrawDebug(object::component::Camera* camera);
 		static void Destroy();
-
+	private:
+		static void CollisionStarted(btPersistentManifold* const& manifold);
+		static bool CollisionProcessed(btManifoldPoint& cp, void* body0, void* body1);
+		static void CollisionEnded(btPersistentManifold* const& manifold);
+		static void HandleCollision(const btCollisionObject* body0, const btCollisionObject* body1, COLLISION_TYPE collisionType);
 	public:
 		static graphics::BulletDebugDraw* getDebugDraw();
 
@@ -29,6 +39,7 @@ namespace thomas
 		static math::Quaternion ToSimple(const btQuaternion& quaternion);
 
 	public:
+		static bool s_drawDebug;
 		static std::unique_ptr<btDiscreteDynamicsWorld> s_world;
 
 	private:

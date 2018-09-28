@@ -1,40 +1,26 @@
 #include "BulletDebugDraw.h"
-#include "DirectXTK\CommonStates.h"
-#include "..\ThomasCore.h"
-#include "..\resource\Material.h"
-#include "..\utils\D3D.h"
-#include "..\object\component\Camera.h"
-#include "..\resource\Shader.h"
-
+#include "../utils/Math.h"
+#include "../Physics.h"
+#include "../editor/gizmos/Gizmos.h"
 namespace thomas
 {
 	namespace graphics
 	{
 		BulletDebugDraw::BulletDebugDraw()
 		{
-			resource::Shader* shader = resource::Shader::CreateShader("../Data/FXIncludes/lineShader.fx"); // Hardcoded line shader for debug draw
-
-			if (shader != nullptr)
-			{
-				m_material = std::make_unique<resource::Material>(shader);
-				m_vertexBufferPos = std::make_unique<utils::buffers::VertexBuffer>(nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
-				m_vertexBufferColor = std::make_unique<utils::buffers::VertexBuffer>(nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
-			}
+			
 		}
 
 		BulletDebugDraw::~BulletDebugDraw()
 		{
-			m_material.reset();
-			m_vertexBufferPos.reset();
-			m_vertexBufferColor.reset();
+
 		}
 
 		void BulletDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const btVector3 & fromColor, const btVector3 & toColor)
 		{
-			m_linePositions.push_back(math::Vector3(from.x(), from.y(), from.z()));
-			m_linePositions.push_back(math::Vector3(to.x(), to.y(), to.z()));
-			m_lineColors.push_back(math::Vector3(fromColor.x(), fromColor.y(), fromColor.z()));
-			m_lineColors.push_back(math::Vector3(toColor.x(), toColor.y(), toColor.z()));
+			editor::Gizmos::SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::SetColor(math::Color(Physics::ToSimple(fromColor)));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(from), thomas::Physics::ToSimple(to));
 		}
 
 		void BulletDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const btVector3 & color)
@@ -42,9 +28,29 @@ namespace thomas
 			drawLine(from, to, color, color);
 		}
 
-		void BulletDebugDraw::Update(object::component::Camera * camera)
+		void BulletDebugDraw::drawSphere(const btVector3 & p, btScalar radius, const btVector3 & color)
 		{
-			m_viewProjection = camera->GetViewProjMatrix().Transpose();
+			editor::Gizmos::SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::SetColor(math::Color(Physics::ToSimple(color)));
+			editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(thomas::Physics::ToSimple(p), radius));
+		}
+
+		void BulletDebugDraw::drawTriangle(const btVector3 & a, const btVector3 & b, const btVector3 & c, const btVector3 & color, btScalar alpha)
+		{
+			editor::Gizmos::SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::SetColor(math::Color(Physics::ToSimple(color)));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(a), thomas::Physics::ToSimple(b));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(b), thomas::Physics::ToSimple(c));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(c), thomas::Physics::ToSimple(a));
+		}
+
+		void BulletDebugDraw::drawContactPoint(const btVector3 & PointOnB, const btVector3 & normalOnB, btScalar distance, int lifeTime, const btVector3 & color)
+		{
+		}
+
+		void BulletDebugDraw::reportErrorWarning(const char * warningString)
+		{
+			LOG("BULLET: " << warningString);
 		}
 
 		void BulletDebugDraw::setDebugMode(int debugMode)
@@ -52,29 +58,6 @@ namespace thomas
 			m_debugMode = debugMode;
 		}
 
-		void BulletDebugDraw::drawLineFinal()
-		{
-			if (m_linePositions.empty())
-				return;
-
-			// Set necessary states
-			DirectX::CommonStates states(ThomasCore::GetDevice());
-			ThomasCore::GetDeviceContext()->OMSetBlendState(states.Opaque(), nullptr, 0xFFFFFFFF);
-			ThomasCore::GetDeviceContext()->OMSetDepthStencilState(states.DepthNone(), 0);
-			ThomasCore::GetDeviceContext()->RSSetState(states.CullNone());
-
-			// Set the data and send to GPU
-			m_vertexBufferPos->SetData(m_linePositions);
-			m_vertexBufferColor->SetData(m_lineColors);
-			m_material->m_topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-			m_material->GetShader()->BindVertexBuffers({ m_vertexBufferPos.get(), m_vertexBufferColor.get() });
-			m_material->SetMatrix("viewProjection", m_viewProjection);
-			m_material->Bind();
-			m_material->Draw(m_linePositions.size(), 0);
-
-			// Clear the memory
-			m_linePositions.clear();
-			m_lineColors.clear();
-		}
+		
 	}
 }
