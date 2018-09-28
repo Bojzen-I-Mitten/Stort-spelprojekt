@@ -39,9 +39,9 @@ namespace thomas
 					Joint_Neck,
 
 					Joint_Left_Arm,
-					Joint_Right_Arm,
-
 					Joint_Lower_Left_Arm,
+
+					Joint_Right_Arm,
 					Joint_Lower_Right_Arm,
 
 					Joint_Left_Leg,
@@ -77,6 +77,7 @@ namespace thomas
 				void initvectors();
 				btConeTwistConstraint* CreateConstraints(btRigidBody * firstbody, btRigidBody * secondbody, btTransform & firstTransform, btTransform & secondTransform, btScalar Swing1, btScalar Swing2, btScalar twist);
 			private:
+				btTransform prevTrans[9];
 				math::Matrix boneArr[15];
 				btCollisionShape* m_shapes[BodyParts_Amount];
 				btRigidBody* m_bodies[BodyParts_Amount];
