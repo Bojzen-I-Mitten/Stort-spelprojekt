@@ -88,7 +88,8 @@ namespace ThomasEngine {
 			}
 			else if (t == System::Single::typeid)
 			{
-				//SetRaw(key, &prop);
+				float v = (float)prop;
+				SetFloat(key, v);
 			}
 		}
 		if (m_loaded && !ThomasWrapper::IsPlaying())
@@ -105,6 +106,8 @@ namespace ThomasEngine {
 		for (auto& prop : ((thomas::resource::Material*)m_nativePtr)->GetEditorProperties())
 		{
 			String^ name = Utility::ConvertString(prop.first);
+			if (prop.second == nullptr)
+				continue;
 			System::Object^ value;
 			switch (prop.second->GetType())
 			{

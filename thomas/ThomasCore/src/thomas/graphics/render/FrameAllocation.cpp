@@ -28,7 +28,7 @@ namespace thomas{
 			{
 				if (m_alloc.size() + num  >= m_alloc.capacity())
 					return  &m_alloc.front();			// Should be dummy
-				unsigned int index = m_alloc.size();
+				size_t index = m_alloc.size();
 				for(unsigned int i = 0; i < num; i++)	// Make own struct for memcpy
 					m_alloc.push_back(alloc[i]);
 				return &m_alloc[index];
