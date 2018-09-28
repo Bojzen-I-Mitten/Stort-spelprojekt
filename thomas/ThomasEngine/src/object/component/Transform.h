@@ -1,14 +1,7 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\component\Transform.h>
-#pragma managed
-
-#include "../../math/Math.h"
 #include "../Component.h"
-#include <string>
-#include <msclr\marshal_cppstd.h>
 
-using namespace System::ComponentModel;
+namespace thomas { namespace object { namespace component { class Transform; } } }
 namespace ThomasEngine
 {
 	[DisallowMultipleComponent]
@@ -16,22 +9,20 @@ namespace ThomasEngine
 	[HideInInspector]
 	public ref class Transform : public Component
 	{
+	private:
+		property thomas::object::component::Transform* trans { thomas::object::component::Transform* get(); }
 	public:
-		Transform() : Component(new thomas::object::component::Transform()) 
-		{
-		}
+		Transform();
 
+		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
+		static event ParentChanged^ OnParentChanged;
+
+		
+		
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{
-			Transform^ get() 
-			{
-				if (((thomas::object::component::Transform*)nativePtr)->GetParent())
-					return (Transform^)GetObject(((thomas::object::component::Transform*)nativePtr)->GetParent());
-				else
-					return nullptr;
-				
-			}
+			Transform^ get();
 
 			void set(Transform^ value);
 		}
@@ -39,87 +30,106 @@ namespace ThomasEngine
 		[BrowsableAttribute(false)]
 		property List<Transform^>^ children 
 		{
-			List<Transform^>^ get() 
-			{
-				std::vector<thomas::object::component::Transform*> nativeChildren = ((thomas::object::component::Transform*)nativePtr)->GetChildren();
-				List<Transform^>^ managedChildren = gcnew List<Transform^>(int(nativeChildren.size()));
-
-				for (thomas::object::component::Transform* nativeChild : nativeChildren)
-					managedChildren->Add((Transform^)GetObject(nativeChild));
-
-				return managedChildren;
-			}
+			List<Transform^>^ get();
 		}
 
+		 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetPosition()); }
-			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetPosition(thomas::math::Vector3(value.x, value.y, value.z)); OnPropertyChanged("localPosition");}
+			Vector3 get();
+			void set(Vector3 value);
 		}
+
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Matrix world
+		{
+			Matrix get();
+			void set(Matrix value);
+		}
+
 
 		[DisplayNameAttribute("position")]
 		property Vector3 localPosition
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetLocalPosition()); }
-			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalPosition(value.x, value.y, value.z); }
+			Vector3 get();
+			void set(Vector3 value);
 		}
 
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Quaternion rotation
 		{
-			Quaternion get() { return Quaternion(((thomas::object::component::Transform*)nativePtr)->GetRotation()); }
-			void set(Quaternion value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(thomas::math::Quaternion(value.x, value.y, value.z, value.w)); OnPropertyChanged("localEulerAngles");}
+			Quaternion get();
+			void set(Quaternion value);
 		}
 	
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 eulerAngles
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetEulerAngles()); }
-			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetRotation(value.y, value.x, value.z); OnPropertyChanged("localEulerAngles");}
+			Vector3 get();
+			void set(Vector3 value);
 		}
 
 		[DisplayNameAttribute("rotation")]
 		property Vector3 localEulerAngles
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetLocalEulerAngles()); }
-			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalRotation(value.y, value.x, value.z); }
+			Vector3 get();
+			void set(Vector3 value);
 		}
 		
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 scale
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetScale()); }
-			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetScale(thomas::math::Vector3(value.x, value.y, value.z)); OnPropertyChanged("localScale");}
+			Vector3 get();
+			void set(Vector3 value);
 		}
 
 		[DisplayNameAttribute("scale")]
 		property Vector3 localScale
 		{
-			Vector3 get() { return Vector3(((thomas::object::component::Transform*)nativePtr)->GetLocalScale()); }
-			void set(Vector3 value) { ((thomas::object::component::Transform*)nativePtr)->SetLocalScale(thomas::math::Vector3(value.x, value.y, value.z)); }
+			Vector3 get();
+			void set(Vector3 value);
+		}
+		[BrowsableAttribute(false)]
+		property Vector3 forward
+		{
+			Vector3 get();
+		}
+		[BrowsableAttribute(false)]
+		property Vector3 up
+		{
+			Vector3 get();
+		}
+		[BrowsableAttribute(false)]
+		property Vector3 right
+		{
+			Vector3 get();
 		}
 
-		bool IsChildOf(Transform^ _parent)
-		{
-			if (this->nativePtr == _parent->nativePtr)
-				return true;
-			else if (parent != nullptr)
-				return parent->IsChildOf(_parent);
-			else
-				return false;
-		}
+		void LookAt(Transform^ target);
+
+		void LookAt(Vector3 target);
+
+		void Rotate(Vector3 angles);
+
+		void Rotate(float x, float y, float z);
+
+		void RotateByAxis(Vector3 axis, float angle);
+
+		void Translate(Vector3 translation);
+		void Translate(float x, float y, float z);
+
+		bool IsChildOf(Transform^ _parent);
+
+		void SetParent(Transform^ value);
+		void SetParent(Transform^ value, bool worldPositionStays);
 
 		void OnDestroy() override;
-		void Update() override
-		{
-			if (((thomas::object::component::Transform*)nativePtr)->IsDirty())
-			{
-				((thomas::object::component::Transform*)nativePtr)->SetDirty(false);
-				OnPropertyChanged("localPosition");
-				OnPropertyChanged("localEulerAngles");
-				OnPropertyChanged("localScale");
-			}
-		}	
+		void Update() override;
 	};
 }

@@ -10,6 +10,7 @@ using System.IO;
 using ThomasEditor.utils;
 using ThomasEditor.Inspectors;
 using ThomasEngine;
+using System.Threading;
 
 namespace ThomasEditor
 {
@@ -108,9 +109,7 @@ namespace ThomasEditor
                     if (newType == ThomasEngine.Resources.AssetTypes.SCRIPT)
                     {
                         string capitalized = visibleName.Substring(0, 1).ToUpper() + visibleName.Substring(1);
-                        string text = File.ReadAllText(newPath);
-                        text = text.Replace("$itemname$", capitalized);
-                        File.WriteAllText(newPath, text);
+                        ReplaceClassNameOfScript(newPath, capitalized);
                     }
                 }
                 else
@@ -139,6 +138,12 @@ namespace ThomasEditor
                         Resource resource = foundItem.DataContext as Resource;
                         resource.Reload();
                     }
+                   if(foundItem.DataContext is GameObject)
+                    {
+                        GameObject gameObject = foundItem.DataContext as GameObject;
+                        gameObject.Destroy();
+                        foundItem.DataContext = ThomasEngine.Resources.LoadPrefab(p);
+                    }
                 }
 
             }), e.FullPath);
@@ -164,6 +169,18 @@ namespace ThomasEditor
                     if(foundItem.DataContext is Resource)
                     {
                         ThomasEngine.Resources.Unload(foundItem.DataContext as Resource);
+                    }
+                    if (foundItem.DataContext is GameObject)
+                    {
+                        GameObject gameObject = foundItem.DataContext as GameObject;
+                        gameObject.Destroy();
+                    }
+               
+
+                    ThomasEngine.Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(p);
+                    if (type == ThomasEngine.Resources.AssetTypes.SCRIPT)
+                    {
+                        utils.ScriptAssemblyManager.RemoveScript(p);
                     }
                 }
               
@@ -229,16 +246,12 @@ namespace ThomasEditor
         {
             Dispatcher.BeginInvoke(new Action<String>((String p) =>
             {
-
+                
                 AddNode(p);
                 ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(p);
-                if(assetType == ThomasEngine.Resources.AssetTypes.SCRIPT)
-                {
-                    //utils.ScriptAssemblyManager.AddScript(p);
-                }
-
             }), e.FullPath);
         }
+
 
         private void LoadAssetImages()
         {
@@ -248,8 +261,10 @@ namespace ThomasEditor
             assetImages[ThomasEngine.Resources.AssetTypes.SHADER] = new BitmapImage(new Uri("pack://application:,,/icons/assets/shader.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.AUDIO_CLIP] = new BitmapImage(new Uri("pack://application:,,/icons/assets/audio.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.MODEL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.ANIMATION] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.MATERIAL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/material.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT] = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.PREFAB] = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
         }
 
 
@@ -298,7 +313,10 @@ namespace ThomasEditor
                 stack.Children.Add(lbl);
                 stack.DataContext = filePath;
 
-                return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.Load(filePath) };
+                if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefab(filePath) };
+                else
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadSysPath(filePath) };
             }
             return null;
         }
@@ -375,12 +393,19 @@ namespace ThomasEditor
             String oldName = Path.GetFileNameWithoutExtension(fullPath);
             String newFullPath = fullPath.Replace(oldName, lbl.Text);
 
-            //Rename if file/dir does not exist
-
-            if(File.Exists(fullPath) && !File.Exists(newFullPath))
-                File.Move(fullPath, newFullPath);
-            else if(Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
-                Directory.Move(fullPath, newFullPath);
+            //Check if file name is not empty string
+            if (lbl.Text != "")
+            {
+                //Rename if file/dir does not exist
+                if (File.Exists(fullPath) && !File.Exists(newFullPath))
+                    File.Move(fullPath, newFullPath);
+                else if (Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
+                    Directory.Move(fullPath, newFullPath);
+                else
+                {
+                    lbl.Text = oldName;
+                }
+            }
             else
             {
                 lbl.Text = oldName;
@@ -470,21 +495,18 @@ namespace ThomasEditor
 
         private void Menu_CreateCSharpScript(object sender, RoutedEventArgs e)
         {
+            utils.ScriptAssemblyManager.fsw.EnableRaisingEvents = false;
             string selectedDir = ThomasEngine.Application.currentProject.assetPath;
-            //Här väntar vi på bättre tider...
-            //if (fileTree.SelectedItem != null)
-            //{
-            //    TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
-            //    StackPanel stack = item.Header as StackPanel;
-            //    String fullPath = stack.DataContext as String;
-            //    if (System.IO.Directory.Exists(fullPath))
-            //        selectedDir = fullPath;
-            //    else
-            //        selectedDir = System.IO.Path.GetDirectoryName(fullPath);
-            //}
-            System.IO.File.Copy(ThomasEngine.Application.editorAssets + "\\assemblyFiles\\newComponent.cs", selectedDir + "\\newComponent.cs");
+
+            String uniquePath = ThomasEngine.Resources.GetUniqueName(selectedDir + "\\newComponent.cs");
+            System.IO.File.Copy(ThomasEngine.Application.editorAssets + "\\assemblyFiles\\newComponent.cs", uniquePath);
+            utils.ScriptAssemblyManager.AddScript(uniquePath);
             renameNextAddedItem = true;
-            
+            utils.ScriptAssemblyManager.fsw.EnableRaisingEvents = true;
+
+            string text = File.ReadAllText(uniquePath);
+            text = text.Replace("$itemname$", "NewComponent");
+            File.WriteAllText(uniquePath, text);
         }
 
         private void Menu_CreateShader(object sender, RoutedEventArgs e)
@@ -499,7 +521,8 @@ namespace ThomasEditor
 
         private void Menu_CreatePrefab(object sender, RoutedEventArgs e)
         {
-
+            GameObject prefab = GameObject.CreatePrefab();
+            ThomasEngine.Resources.SavePrefab(prefab, prefab.Name + ".prefab");
         }
 
         private void Menu_CreateMaterial(object sender, RoutedEventArgs e)
@@ -530,7 +553,20 @@ namespace ThomasEditor
 
         private void Menu_DeleteAsset(object sender, RoutedEventArgs e)
         {
-
+            if (fileTree.SelectedItem != null)
+            {
+                try
+                {
+                    TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
+                    StackPanel stack = item.Header as StackPanel;
+                    String file = stack.DataContext as String;
+                    File.Delete(file);
+                }catch(Exception error)
+                {
+                    Debug.Log("Failed to delete file: " + error.Message);
+                }
+                
+            }
         }
 
         private void MenuItem_Rename(object sender, RoutedEventArgs e)
@@ -605,6 +641,36 @@ namespace ThomasEditor
                 Inspector.instance.SelectedObject = item.DataContext;
             }
            
+        }
+
+        /*
+         * path: The path to the new file.
+         * newName: The new className of the new file.
+         */
+        private void ReplaceClassNameOfScript(string path, string newName)
+        {
+            string text = File.ReadAllText(path);
+            int start = text.IndexOf("public class ") + 13;
+            string typeOfScript = GetTypeOfScript(text);
+            string oldClassName = text.Substring(start, text.IndexOf(typeOfScript) - start);
+            string leftOf = text.Substring(0, start);
+            string newClassName = text.Substring(start, text.IndexOf(typeOfScript) - start).Replace(oldClassName, newName);
+            string rightOf = text.Substring(text.IndexOf(typeOfScript));
+            string newText = leftOf + newClassName + rightOf;
+            File.WriteAllText(path, newText);
+        }
+
+        /*
+         * Will determine if the script is NetworkComponent or ScriptComponent
+         */
+        private string GetTypeOfScript(string fileText)
+        {
+            if(fileText.Contains(" : ScriptComponent"))
+                return " : ScriptComponent";
+            else if(fileText.Contains(" : NetworkComponent"))
+                return " : NetworkComponent";
+            else
+                return "";
         }
     }
 

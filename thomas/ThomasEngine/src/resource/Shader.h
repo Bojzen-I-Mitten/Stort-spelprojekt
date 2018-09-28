@@ -3,8 +3,6 @@
 #include <thomas\resource\Shader.h>
 #pragma managed
 #include "resource.h"
-#include "Resources.h"
-#include "../math/Math.h"
 namespace ThomasEngine
 {
 	[DataContractAttribute]
@@ -17,24 +15,12 @@ namespace ThomasEngine
 	public:
 		
 
-		static Shader^ Find(String^ name) { 
-			thomas::resource::Shader* nativePtr = thomas::resource::Shader::FindByName(Utility::ConvertString(name));
-			if (nativePtr)
-			{
-				ThomasEngine::Resource^ shader = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
-				if (shader)
-					return (ThomasEngine::Shader^)shader;
-				else
-					return gcnew ThomasEngine::Shader(nativePtr);
-			}
-			else
-				return nullptr;
-		}
+		static Shader^ Find(String^ name);
 
 		static void SetGlobalColor(String^ name, Color value) { thomas::resource::Shader::SetGlobalColor(Utility::ConvertString(name), thomas::math::Color(value.r, value.g, value.b, value.a)); };
 		static void SetGlobalFloat(String^ name, float value) { thomas::resource::Shader::SetGlobalFloat(Utility::ConvertString(name), value); };;
 		static void SetGlobalInt(String^ name, int value) { thomas::resource::Shader::SetGlobalInt(Utility::ConvertString(name), value); };;
-		static void SetGlobalMatrix(String^ name, Matrix4x4 value) { thomas::resource::Shader::SetGlobalMatrix(Utility::ConvertString(name), value.ToThomas()); };;
+		static void SetGlobalMatrix(String^ name, Matrix value) { thomas::resource::Shader::SetGlobalMatrix(Utility::ConvertString(name), Utility::Convert(value)); };;
 		static void SetGlobalVector(String^ name, Vector4 value) { thomas::resource::Shader::SetGlobalVector(Utility::ConvertString(name), thomas::math::Vector4(value.x, value.y, value.z, value.w)); };;
 
 		//static void SetGlobalTexture(String^ name, Texture& value);

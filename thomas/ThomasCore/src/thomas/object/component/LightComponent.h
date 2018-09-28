@@ -4,7 +4,6 @@
 
 #include "../../utils/Math.h"
 #include "../../graphics/LightManager.h"
-
 /**
 LightComponent class
 */
@@ -16,62 +15,58 @@ namespace thomas
 	{
 		namespace component
 		{
-			class THOMAS_API LightComponent : public Component
+			
+			class LightComponent : public Component
 			{
-
+			public:
 			private:
+				graphics::LightManager::LightStruct m_lightComponentData;
+
+				graphics::LightManager::LIGHT_TYPES m_type;
 				
 			public:
-				virtual bool SetLightColor(thomas::math::Vector4 other) = 0;
-
-				virtual bool Bind() = 0;
-			protected:
+				void Update();
+				void OnEnable();
+				void OnDisable();
 				LightComponent();
 				~LightComponent();
-				
-			};
 
+				graphics::LightManager::LightStruct GetData();
 
-			class THOMAS_API DirectionalLight : public LightComponent
-			{
-			public:
-				DirectionalLight();
-				~DirectionalLight();
+				graphics::LightManager::LIGHT_TYPES GetType();
+				void SetType(graphics::LightManager::LIGHT_TYPES other);
 
-				bool SetLightColor(thomas::math::Vector4 other);
-
-				bool Bind();
-
-				void Update();
-			private:
-				int m_index;
-				graphics::LightManager::DirectionalLightStruct m_thisLight;
-			};
-
-			class THOMAS_API PointLight : public LightComponent
-			{
-			public:
-				PointLight();
-				~PointLight();
-
-				bool SetLightColor(thomas::math::Vector4 other);
-				bool SetConstantAttenuation(float other);
-				bool SetLinearAttenuation(float other);
-				bool SetQuadraticAttenuation(float other);
-				bool SetPower(float other);
-
-				bool Bind();
-
-				void Update();
+				thomas::math::Color GetColorDiffuse();
+				void SetColorDiffuse(thomas::math::Color other);
+				thomas::math::Color GetColorSpecular();
+				void SetColorSpecular(thomas::math::Color other);
 				
 
-			private:
-				int m_index;
-				graphics::LightManager::PointLightStruct m_thisLight;
+				float GetIntensity() const;
+				void SetIntensity(float const& value);
+				
+				float GetSpotInnerAngle() const;
+				void SetSpotInnerAngle(float const& value);
+
+				float GetSpotOuterAngle() const;
+				void SetSpotOuterAngle(float const& value);
+
+				float GetConstantAttenuation() const;
+				void SetConstantAttenuation(float const& value);
+
+				float GetLinearAttenuation() const;
+				void SetLinearAttenuation(float const& value);
+
+				float GetQuadraticAttenuation() const;
+				void SetQuadraticAttenuation(float const& value);
+
+				math::Vector2 GetRectangleDimensions() const;
+				void SetRectangleDimensions(math::Vector2 const& value);
+
+
 			};
-			
+
 		}
 	}
-
 
 }

@@ -173,7 +173,8 @@ namespace thomas
 			{
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
-					renderComponent->SubmitToRenderer(this);
+					if(renderComponent->m_gameObject->GetActive())
+						renderComponent->SubmitToRenderer(this);
 				}
 			}
 
@@ -211,6 +212,22 @@ namespace thomas
 				math::BoundingFrustum frustrum;
 				m_frustrum.Transform(frustrum, m_gameObject->m_transform->GetWorldMatrix());
 				return frustrum;
+			}
+
+			void Camera::CopyFrameData()
+			{
+				m_frameData.targetDisplay = GetTargetDisplayIndex();
+				m_frameData.viewport = GetViewport();
+				m_frameData.viewMatrix = GetViewMatrix();
+				m_frameData.projectionMatrix = GetProjMatrix();
+
+				m_frameData.position = (math::Vector4)GetPosition();
+
+			}
+
+			Camera::CAMERA_FRAME_DATA & Camera::GetFrameData()
+			{
+				return m_frameData;
 			}
 
 		}

@@ -27,7 +27,6 @@ namespace thomas
 		s_solver = std::make_unique<btSequentialImpulseConstraintSolver>();
 		s_world = std::make_unique<btDiscreteDynamicsWorld>(s_dispatcher.get(), s_broadPhase.get(), s_solver.get(), s_collisionConfiguration.get());
 		s_debugDraw = std::make_unique<graphics::BulletDebugDraw>();
-
 		//Set states
 		s_world->setGravity(btVector3(0, -9.82f, 0));
 		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
@@ -40,18 +39,21 @@ namespace thomas
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
 	}
-	void Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
+	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		bool found = false;
 		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
 		{
 			object::component::Rigidbody* rb = s_rigidBodies[i];
 			if (rb == rigidBody)
 			{
 				s_rigidBodies.erase(s_rigidBodies.begin() + i);
+				found = true;
 				break;
 			}
 		}
-		s_world->removeRigidBody(rigidBody);		
+		s_world->removeRigidBody(rigidBody);
+		return found;
 	}
 
 	void Physics::UpdateRigidbodies()
@@ -66,11 +68,13 @@ namespace thomas
 	void Physics::Simulate()
 	{
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
-
+		
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
 			return;
 
 		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
+
+		// Solve collision between two rigidbodies
 		int numManifolds = s_world->getDispatcher()->getNumManifolds();
 
 		for (unsigned i = 0; i < numManifolds; ++i)
@@ -81,22 +85,21 @@ namespace thomas
 			btPersistentManifold* contactManifold = s_world->getDispatcher()->getManifoldByIndexInternal(i);
 			btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
 			btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
-			object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
-			object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
 
-			if (rbA->isActive() && rbB->isActive())
+			// Avoid self collisions
+			if (obA == obB) continue;
+
+			if (obA->getUserPointer() && obB->getUserPointer())
 			{
-				object::component::Rigidbody::Collision colA;
-				object::component::Rigidbody::Collision colB;
-				colA.thisRigidbody = rbA;
-				colA.otherRigidbody = rbB;
-				colB.thisRigidbody = rbB;
-				colB.otherRigidbody = rbA;
-				/*rbA->m_gameObject->OnCollision(colA);
-				rbB->m_gameObject->OnCollision(colB);*/
+				object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
+				object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
+
+				// Set the collider object to the target collider
+				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
+				rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbA->m_gameObject);
 			}
-				
 		}
+
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateRigidbodyToTransform();

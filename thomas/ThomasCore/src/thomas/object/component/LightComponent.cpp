@@ -3,128 +3,166 @@
 #include "../GameObject.h"
 #include "Transform.h"
 
+
+
+
+
 namespace thomas
 {
 	namespace object
 	{
 		namespace component
 		{
-
 			LightComponent::LightComponent()
 			{
+				m_type = graphics::LightManager::DIRECTIONAL;
+
+				m_lightComponentData.attenuation = math::Vector3(1.0f, 0.2f, 0.0f);
+				m_lightComponentData.colorDiffuse = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.colorSpecular = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.position = math::Vector3(1.0f, 1.0f, 1.0f);
+				m_lightComponentData.direction = math::Vector3(0.0f, 0.0f, -1.0f);
+				m_lightComponentData.right = math::Vector3(1.0f, 0.0f, 0.0f);
+				m_lightComponentData.up = math::Vector3(0.0f, 1.0f, 0.0f);
+				m_lightComponentData.intensity = 1.0f;
+				m_lightComponentData.spotInnerAngle = 0.0f;
+				m_lightComponentData.spotOuterAngle = 20.0f;
+				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
 			}
 			LightComponent::~LightComponent()
 			{
 			}
-			
-			/**
-			DIRECTIONAL LIGHT
-			The light look down its forward transformation
-			*/
-			DirectionalLight::DirectionalLight() : LightComponent()
+
+			graphics::LightManager::LightStruct LightComponent::GetData()
 			{
-				//standard init of light
-				
-				m_thisLight.lightColor = thomas::math::Vector4(1, 1, 1, 1);
+				return m_lightComponentData;
+			}
+			
 
-				m_index = graphics::LightManager::AddDirectionalLight(m_thisLight);
+			void LightComponent::Update()
+			{
+				m_lightComponentData.position = m_gameObject->m_transform->GetPosition();
+				m_lightComponentData.direction = m_gameObject->m_transform->Forward();
+				m_lightComponentData.right = m_gameObject->m_transform->Right();
+				m_lightComponentData.up = m_gameObject->m_transform->Up();
+			}
 
-				/*if ((m_index = graphics::LightManager::AddDirectionalLight(m_thisLight)) < 0)
+			void LightComponent::OnEnable()
+			{
+				graphics::LightManager::AddLight(this);
+			}
+
+			void LightComponent::OnDisable()
+			{
+				graphics::LightManager::RemoveLight(this);
+			}
+
+			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
+			{
+				return m_type;
+			}
+
+			void LightComponent::SetType(graphics::LightManager::LIGHT_TYPES other)
+			{
+				if (graphics::LightManager::RemoveLight(this))
 				{
-					LOG("Cant add light")
-					Destroy(this);
-				}*/
-				
-				
+					m_type = other;
+					graphics::LightManager::AddLight(this);
+				}
+				else
+					m_type = other;
 			}
 
-			DirectionalLight::~DirectionalLight()
+			thomas::math::Color LightComponent::GetColorDiffuse()
 			{
+				return thomas::math::Color(m_lightComponentData.colorDiffuse.x, m_lightComponentData.colorDiffuse.y, m_lightComponentData.colorDiffuse.z, 1.0f);
 			}
 
-			bool DirectionalLight::Bind()
+			void LightComponent::SetColorDiffuse(thomas::math::Color other)
 			{
-				return true;
+				m_lightComponentData.colorDiffuse = other.ToVector3();
 			}
 
-			bool DirectionalLight::SetLightColor(thomas::math::Vector4 other)
+			thomas::math::Color LightComponent::GetColorSpecular()
 			{
-				m_thisLight.lightColor = other;
-				return thomas::graphics::LightManager::UpdateDirectionalLight(m_thisLight, m_index);
-				
-			}
-			
-			
-			void DirectionalLight::Update()
-			{
-				
-				m_thisLight.lightDirection = m_gameObject->m_transform->Forward();
-				thomas::graphics::LightManager::UpdateDirectionalLight(m_thisLight, m_index);
-				return;
-			}
-			
-
-			/**
-			POINT LIGHT
-			*/
-			PointLight::PointLight() : LightComponent()
-			{
-				//standard init of light
-				m_thisLight.constantAttenuation = 0.6f;
-				m_thisLight.linearAttenuation = 0.3f;
-				m_thisLight.quadraticAttenuation = 0.1f;
-				m_thisLight.power = 5;
-				
-				m_thisLight.position = thomas::math::Vector3(0, 0, 0);
-				m_thisLight.lightColor = thomas::math::Vector4(1, 1, 1, 1);
-
-				m_index = graphics::LightManager::AddPointLight(m_thisLight);
-			}
-			PointLight::~PointLight()
-			{
+				return thomas::math::Color(m_lightComponentData.colorSpecular.x, m_lightComponentData.colorSpecular.y, m_lightComponentData.colorSpecular.z, 1.0f);
 			}
 
-			bool PointLight::Bind()
+			void LightComponent::SetColorSpecular(thomas::math::Color other)
 			{
-				return true;
+				m_lightComponentData.colorSpecular = other.ToVector3();
 			}
 
-			bool PointLight::SetLightColor(thomas::math::Vector4 other)
+			float LightComponent::GetIntensity() const
 			{
-				m_thisLight.lightColor = other;
-				return thomas::graphics::LightManager::UpdatePointLight(m_thisLight, m_index);
-			}
-			
-
-			bool PointLight::SetConstantAttenuation(float other)
-			{
-				m_thisLight.constantAttenuation = other;
-				return thomas::graphics::LightManager::UpdatePointLight(m_thisLight, m_index);
-			}
-			bool PointLight::SetLinearAttenuation(float other)
-			{
-				m_thisLight.constantAttenuation = other;
-				return thomas::graphics::LightManager::UpdatePointLight(m_thisLight, m_index);
-			}
-			bool PointLight::SetQuadraticAttenuation(float other)
-			{
-				m_thisLight.constantAttenuation = other;
-				return thomas::graphics::LightManager::UpdatePointLight(m_thisLight, m_index);
+				return m_lightComponentData.intensity;
 			}
 
-			
-			bool PointLight::SetPower(float other)
+			void LightComponent::SetIntensity(float const& value)
 			{
-				m_thisLight.power = other;
-				return thomas::graphics::LightManager::UpdatePointLight(m_thisLight, m_index);
+				m_lightComponentData.intensity = value;
 			}
-			void PointLight::Update()
+
+			float LightComponent::GetSpotInnerAngle() const
 			{
-				m_thisLight.position = m_gameObject->m_transform->GetPosition();
-				
-				thomas::graphics::LightManager::UpdatePointLight(m_thisLight, m_index);
-				return;
+				return m_lightComponentData.spotInnerAngle;
 			}
-		}
+
+			void LightComponent::SetSpotInnerAngle(float const& value)
+			{
+				m_lightComponentData.spotInnerAngle = value;
+			}
+
+			float LightComponent::GetSpotOuterAngle() const
+			{
+				return m_lightComponentData.spotOuterAngle;
+			}
+
+			void LightComponent::SetSpotOuterAngle(float const& value)
+			{
+				m_lightComponentData.spotOuterAngle = value;
+			}
+
+			float LightComponent::GetConstantAttenuation() const
+			{
+				return m_lightComponentData.attenuation.x;
+			}
+
+			void LightComponent::SetConstantAttenuation(float const& value)
+			{
+				m_lightComponentData.attenuation.x = value;
+			}
+
+			float LightComponent::GetLinearAttenuation() const
+			{
+				return m_lightComponentData.attenuation.y;
+			}
+
+			void LightComponent::SetLinearAttenuation(float const& value)
+			{
+				m_lightComponentData.attenuation.y = value;
+			}
+
+			float LightComponent::GetQuadraticAttenuation() const
+			{
+				return m_lightComponentData.attenuation.z;
+			}
+
+			void LightComponent::SetQuadraticAttenuation(float const& value)
+			{
+				m_lightComponentData.attenuation.z = value;
+			}
+
+			math::Vector2 LightComponent::GetRectangleDimensions() const
+			{
+				return m_lightComponentData.rectangleDimensions;
+			}
+
+			void LightComponent::SetRectangleDimensions(math::Vector2 const& value)
+			{
+				m_lightComponentData.rectangleDimensions = value;
+			}
+
+}
 	}
 }

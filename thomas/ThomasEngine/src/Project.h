@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Scene.h"
 using namespace System;
 using namespace System::Runtime::Serialization;
 using namespace System::ComponentModel;
@@ -10,6 +9,7 @@ namespace ThomasEngine
 	public ref class Project
 	{
 	private:
+
 		String ^ m_path;
 		[DataMemberAttribute]
 		String ^ m_name;
@@ -81,8 +81,8 @@ namespace ThomasEngine
 
 		property String^ currentScenePath
 		{
-			String^ get() { if (m_relativeCurrentScenePath) return assetPath + "\\" + m_relativeCurrentScenePath; else return nullptr; }
-			void set(String^ scene) { m_relativeCurrentScenePath = scene; Save(); }
+			String^ get();
+			void set(String^ scene);
 		}
 	};
 }

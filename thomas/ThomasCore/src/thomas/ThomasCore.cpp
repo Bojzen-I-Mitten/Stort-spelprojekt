@@ -11,6 +11,9 @@
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
 #include <D3d11_4.h>
+#include <comdef.h>
+
+#include "object/component/LightComponent.h"
 
 namespace thomas 
 {
@@ -39,7 +42,8 @@ namespace thomas
 		Physics::Init();
 		editor::EditorCamera::Init();
 		editor::Gizmos::Init();
-		utils::Primitives::Init();
+
+		graphics::LightManager::Initialize();
 
 		s_initialized = true;
 		return s_initialized;
@@ -77,7 +81,7 @@ namespace thomas
 
 		//Destroy all objects
 		Window::Destroy();
-		//graphics::LightManager::Destroy();
+		graphics::LightManager::Destroy();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();

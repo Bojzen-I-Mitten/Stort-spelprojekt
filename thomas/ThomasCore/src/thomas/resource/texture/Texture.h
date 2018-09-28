@@ -1,14 +1,13 @@
 #pragma once
 
 #include <string>
-#include "../../Common.h"
 #include <d3d11.h>
 #include "../Resource.h"
 namespace thomas
 {
 	namespace resource
 	{
-		class THOMAS_API Texture : public Resource
+		class Texture : public Resource
 		{
 
 		public:

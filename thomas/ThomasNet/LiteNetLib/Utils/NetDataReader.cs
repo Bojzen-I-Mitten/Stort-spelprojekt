@@ -316,6 +316,25 @@ namespace LiteNetLib.Utils
             return result;
         }
 
+        public ThomasEngine.Vector3 GetVector3()
+        {
+            ThomasEngine.Vector3 result = new ThomasEngine.Vector3();
+            result.x = GetFloat();
+            result.y = GetFloat();
+            result.z = GetFloat();
+            return result;
+        }
+
+        public ThomasEngine.Quaternion GetQuaternion()
+        {
+            ThomasEngine.Quaternion result = new ThomasEngine.Quaternion();
+            result.x = GetFloat();
+            result.y = GetFloat();
+            result.z = GetFloat();
+            result.w = GetFloat();
+            return result;
+        }
+
         public string GetString(int maxLength)
         {
             int bytesCount = GetInt();

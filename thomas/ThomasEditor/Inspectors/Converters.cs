@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -121,8 +122,8 @@ namespace ThomasEditor.Converters
 
             if (value == null)
                 return System.Drawing.Color.Black;
-            Color color = (Color)value;
-            return System.Windows.Media.Color.FromScRgb(color.a, color.r, color.g, color.b);
+            Vector4 color = ((Color)value).ToVector4();
+            return System.Windows.Media.Color.FromScRgb(color.w, color.x, color.y, color.z);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -131,12 +132,10 @@ namespace ThomasEditor.Converters
             {
                 return new Color(0, 0, 0, 1);
             }
-            new Color(0, 0, 0, 1);
-            System.Windows.Media.Color mediaColor = (System.Windows.Media.Color)value;
             
-            //System.Drawing.Color color = System.Drawing.ColorTranslator.FromHtml(mediaColor.ToString());
-            //System.Drawing.Color color = System.Drawing.ColorTranslator.FromHtml(value as string);
-            return new Color(mediaColor.ScR, mediaColor.ScG, mediaColor.ScB, mediaColor.ScA);
+            System.Windows.Media.Color mediaColor = (System.Windows.Media.Color)value;
+
+            return new Color(mediaColor.ScR, mediaColor.ScG, mediaColor.ScB, mediaColor.ScA); 
 
         }
     }
@@ -155,11 +154,29 @@ namespace ThomasEditor.Converters
         }
     }
 
+    public class ListToTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (value as Type).GetGenericArguments().Single();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class NullResourceConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return "None (" + (value as String) + ")";
+            Type type = value as Type;
+            if (type.GetInterface(nameof(IList)) != null)
+            {
+                type = type.GetGenericArguments().Single();
+            }
+            return "None (" + (type.Name) + ")";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

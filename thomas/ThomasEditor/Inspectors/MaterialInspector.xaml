@@ -15,7 +15,7 @@
 
 
         <DataTemplate x:Key="materialEditor">
-            <Grid  IsEnabled="{Binding ElementName=materialInspector,Path=Material, Converter={StaticResource isEditableMaterial}}">
+            <Grid  IsEnabled="{Binding ElementName=materialInspector, Path=DataContext, Converter={StaticResource isEditableMaterial}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="*"/>
@@ -26,11 +26,11 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Image Height="45" Grid.Column="0" Source="../icons/assets/material.png"/>
-                    <Label VerticalAlignment="Top" Height="25" Content="{Binding ElementName=materialInspector, Path=Material.name}" Margin="5" Grid.Column="1"/>
+                    <Label VerticalAlignment="Top" Height="25" Content="{Binding Name, Mode=OneWay}" Margin="5" Grid.Column="1"/>
                     <Label Margin="5, 0, 0, 0" VerticalAlignment="Bottom" Height="25" Content="Shader" Grid.Column="1"/>
                     <ComboBox VerticalAlignment="Bottom" Height="20" Grid.Column="1"
                               Margin="60,0,-148,2" IsSynchronizedWithCurrentItem="False"
-                              ItemsSource="{Binding ElementName=materialInspector, Path=AvailableShaders}" DisplayMemberPath="name" SelectedItem="{Binding ElementName=materialInspector, Path=SelectedShader}"/>
+                              ItemsSource="{Binding ElementName=materialInspector, Path=AvailableShaders}" DisplayMemberPath="Name" SelectedItem="{Binding ElementName=materialInspector, Path=SelectedShader}"/>
                 </Grid>
                 <local:ExtendedPropertyGrid Grid.Row="1" DataContext="{Binding ElementName=materialInspector, Path=MaterialProperties}" x:Name="editorGrid"/>
             </Grid>
@@ -41,7 +41,7 @@
 
         <Style TargetType="{x:Type local:MaterialInspector}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding ElementName=materialInspector, Path=Material, Converter={StaticResource isNullConverter}}" Value="False">
+                <DataTrigger Binding="{Binding Converter={StaticResource isNullConverter}}" Value="False">
                     <Setter Property="ContentTemplate" Value="{StaticResource materialEditor}">
                     </Setter>
                 </DataTrigger>

@@ -21,12 +21,15 @@ namespace ThomasEditor
 
     public partial class MainWindow : Window
     {
+        
         double scrollRatio = 0;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
+        Guid g;
         public MainWindow()
         {
+            
             string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
@@ -51,6 +54,32 @@ namespace ThomasEditor
 
             LoadLayout();
             Closing += MainWindow_Closing;
+
+            ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
+            ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+        }
+
+        private void ScriptingManger_scriptReloadFinished()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = false;
+                editor.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
+                ThomasWrapper.Selection.SelectGameObject(g);
+            }));
+        }
+
+        private void ScriptingManger_scriptReloadStarted()
+        {
+            g = ThomasWrapper.Selection.GetSelectedGUID();
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = "Reloading scripts...";
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
         }
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
@@ -60,16 +89,24 @@ namespace ThomasEditor
 
         private void SaveLayout()
         {
-            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
-            using (var sw = new StreamWriter(target))
+            try
             {
-                using (StringWriter fs = new StringWriter())
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas"));
+                string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+                using (var sw = new StreamWriter(target))
                 {
-                    XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
-                    xmlLayout.Serialize(fs);
-                    sw.Write(fs.ToString());
+                    using (StringWriter fs = new StringWriter())
+                    {
+                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                        xmlLayout.Serialize(fs);
+                        sw.Write(fs.ToString());
+                    }
                 }
+            }catch(Exception e)
+            {
+                Debug.Log("Failed to save layout.dock. Error: " + e.Message);
             }
+
 
             if (WindowState == WindowState.Maximized)
             {
@@ -94,18 +131,25 @@ namespace ThomasEditor
 
         private void LoadLayout()
         {
-            string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
-            if (System.IO.File.Exists(target))
+            try
             {
-                using (var sr = new StreamReader(target))
+                string target = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "thomas/layout.dock");
+                if (System.IO.File.Exists(target))
                 {
-                    using (StringWriter fs = new StringWriter())
+                    using (var sr = new StreamReader(target))
                     {
-                        XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
-                        xmlLayout.Deserialize(sr);
+                        using (StringWriter fs = new StringWriter())
+                        {
+                            XmlLayoutSerializer xmlLayout = new XmlLayoutSerializer(dockManager);
+                            xmlLayout.Deserialize(sr);
+                        }
                     }
                 }
+            }catch(Exception e)
+            {
+                Debug.Log("Failed to load editor layout. Error: " + e.Message);
             }
+
             this.Top = Properties.Settings.Default.Top;
             this.Left = Properties.Settings.Default.Left;
             this.Height = Properties.Settings.Default.Height;
@@ -119,7 +163,7 @@ namespace ThomasEditor
 
         private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 if (e.NewItems != null)
                 {
@@ -200,9 +244,9 @@ namespace ThomasEditor
             for(int i=0; i < ThomasWrapper.Selection.Count; i++)
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
+                ThomasWrapper.Selection.UnSelectGameObject(gObj);
                 gObj.Destroy();
-                //ThomasWrapper.SelectedGameObjects.RemoveAt(i);
-               i--;
+                //i--;
             }
         }
 
@@ -310,9 +354,18 @@ namespace ThomasEditor
             worker.DoWork += (o, ea) =>
             {
                 Scene newScene = Scene.LoadScene(path);
-                Scene.CurrentScene.UnLoad();
-                Scene.CurrentScene = newScene;
-                Scene.CurrentScene.PostLoad();
+                if (newScene != null)
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = newScene;
+                    Scene.CurrentScene.PostLoad();
+                }
+                else
+                {
+                    Scene.CurrentScene.UnLoad();
+                    Scene.CurrentScene = null;
+                    Debug.Log("Scene failed to load...");
+                }
             };
             worker.RunWorkerCompleted += (o, ea) =>
             {
@@ -326,7 +379,11 @@ namespace ThomasEditor
             if (ThomasWrapper.IsPlaying())
                 ThomasWrapper.Stop();
             else
+            {
                 ThomasWrapper.Play();
+                game.Focus();
+            }
+                
 
             playPauseButton.DataContext = ThomasWrapper.IsPlaying();
         }
@@ -369,6 +426,42 @@ namespace ThomasEditor
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
+        private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Camera");
+            x.AddComponent<Camera>();
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewPointLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.POINT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewSpotLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.SPOT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewDirectionalLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.DIRECTIONAL;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewAreaLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.AREA;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
         #endregion
 
         private void NewProject_Click(object sender, RoutedEventArgs e)
@@ -381,9 +474,10 @@ namespace ThomasEditor
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
 
-            showBusyIndicator("Creating new project...");
+
             if (saveFileDialog.ShowDialog() == true)
             {
+                showBusyIndicator("Creating new project...");
                 Thread worker = new Thread(new ThreadStart(() =>
                 {
                     string fileName = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
@@ -393,6 +487,7 @@ namespace ThomasEditor
                     {
                         Project proj = new Project(fileName, dir);
                         ThomasEngine.Application.currentProject = proj;
+                        utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
                     }
                     hideBusyIndicator();
                 }));
@@ -402,39 +497,20 @@ namespace ThomasEditor
             }
                       
         }
-
-
-       private void showBusyIndicator(string message)
-       {
-            busyCator.IsBusy = true;
-            busyCator.BusyContent = message;
-            editor.Visibility = Visibility.Hidden;
-            game.Visibility = Visibility.Hidden;
-        }
-        private void hideBusyIndicator()
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                busyCator.IsBusy = false;
-                editor.Visibility = Visibility.Visible;
-                game.Visibility = Visibility.Visible;
-            }));
-        }
-
         private void OpenProject_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
-            
+
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() == true)
             {
                 OpenProject(openFileDialog.FileName);
-                
+
             }
-            
+
         }
         public void OpenProject(string projectPath)
         {
@@ -449,6 +525,7 @@ namespace ThomasEditor
                     ThomasEngine.Application.currentProject = Project.LoadProject(projectPath);
                     Properties.Settings.Default.latestProjectPath = projectPath;
                     Properties.Settings.Default.Save();
+                    utils.ScriptAssemblyManager.SetWatcher(ThomasEngine.Application.currentProject.assetPath);
                 }
                 hideBusyIndicator();
             }));
@@ -456,9 +533,38 @@ namespace ThomasEditor
             worker.Start();
         }
 
+
+        public void showBusyIndicator(string message)
+       {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = message;
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
+        }
+        public void hideBusyIndicator()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = false;
+                editor.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
+            }));
+        }
+
+
         private void ReloadAssembly(object sender, RoutedEventArgs e)
         {
-            ScriptingManger.LoadAssembly();
+            Thread worker = new Thread(new ThreadStart(() =>
+            {
+                utils.ScriptAssemblyManager.BuildSolution();
+            }));
+            worker.SetApartmentState(ApartmentState.STA);
+            worker.Start();
+            
+            //ScriptingManger.LoadAssembly();
         }
 
         private void __layoutRoot_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -469,6 +575,11 @@ namespace ThomasEditor
         private void SaveLayout_Click(object sender, RoutedEventArgs e)
         {
             SaveLayout();
+        }
+
+        private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
+        {
+            ThomasWrapper.ToggleEditorRendering();
         }
     }
 

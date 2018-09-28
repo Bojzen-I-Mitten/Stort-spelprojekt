@@ -1,133 +1,78 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\Object.h>
-#pragma managed
-#include <string>
-#include <msclr\marshal_cppstd.h>
-#include "../math/Math.h"
+
 using namespace System;
-using namespace System::Collections::Generic;
 using namespace System::ComponentModel;
+using namespace System::Collections::Generic;
+namespace thomas{ namespace object { class Object; } }
 namespace ThomasEngine {
 
-	ref class Transform;
-	ref class GameObject;
-	[SerializableAttribute]
-	public ref class Object: public INotifyPropertyChanged
+	[System::SerializableAttribute]
+	public ref class Object: public System::ComponentModel::INotifyPropertyChanged
 	{
 		static List<Object^> s_objects;
 	private:
 		
 	protected:
 		
-		String^ m_name;
+		System::String^ m_name;
 	internal:
 		[System::Runtime::Serialization::DataMemberAttribute]
-		Guid m_guid;
+		System::Guid m_guid;
 
-		[NonSerializedAttribute]
+		[System::NonSerializedAttribute]
 		thomas::object::Object* nativePtr;
 
-		static Object^ Find(Guid guid)
-		{
-			for each(Object^ o in s_objects)
-			{
-				if (o->m_guid == guid)
-					return o;
-			}
-			return nullptr;
-		}
+		static Object^ Find(System::Guid guid);
 
-
-		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
-		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
 
 	public:
+
+		Object(thomas::object::Object* ptr);
+
 		[field:NonSerializedAttribute]
 		virtual event PropertyChangedEventHandler^ PropertyChanged;
-		virtual void OnDestroy() {nativePtr->OnDestroy(); }
-
-		static void Destroy(Object^ object) { object->Destroy(); }
-		
-		void OnPropertyChanged(String^ info)
+		void OnPropertyChanged(System::String^ info)
 		{
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
 
-		[BrowsableAttribute(false)]
-		property String^ Name
-		{
-			String^ get() { return m_name; }
+		virtual void OnDestroy();
 
-			void set(String^ value)
+		static void Destroy(Object^ object) { object->Destroy(); }
+		
+		virtual void Destroy();
+
+		static Object^ GetObject(thomas::object::Object* ptr);
+
+
+		static List<Object^>^ GetObjects();
+		static List<Object^>^ GetObjectsOfType(System::Type^ type);
+
+		generic<typename T>
+		where T: Object
+		static List<T>^ GetObjectsOfType() {
+			return gcnew List<T>(System::Linq::Enumerable::OfType<T>(GetObjectsOfType(T::typeid)));
+		}
+
+
+		[BrowsableAttribute(false)]
+		virtual property System::String^ Name
+		{
+			System::String^ get() { return m_name; }
+
+			void set(System::String^ value)
 			{
 				m_name = value;
 				OnPropertyChanged("Name");
 			}
 		}
+		static bool operator ==(Object^ a, Object^ b);
 
-		Object(thomas::object::Object* ptr)
-		{
-			nativePtr = ptr;
-			s_objects.Add(this);
-			thomas::object::Object::Add(ptr);
-			m_guid = Guid::NewGuid();
-		}
+		static bool operator !=(Object^ a, Object^ b);
 
-		virtual void Destroy()
-		{
-			thomas::object::Object::Destroy(nativePtr);
-			s_objects.Remove(this);
-		}
+		static operator bool(Object^ object);
 
-		static Object^ GetObject(thomas::object::Object* ptr)
-		{
-			for each(Object^ object in s_objects)
-			{
-				if (object->nativePtr == ptr)
-					return object;
-			}
-			return nullptr;
-		}
-
-		static GameObject^ Instantiate(GameObject^ original);
-		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
-		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
-		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
-
-
-		static List<Object^>^ GetObjects()
-		{
-			return %s_objects;
-		}
-
-		static bool operator ==(Object^ a, Object^ b)
-		{
-			if (Object::ReferenceEquals(nullptr, a))
-				return Object::ReferenceEquals(nullptr, b);
-
-			if (Object::ReferenceEquals(nullptr, b))
-				return false;
-
-			return a->nativePtr == b->nativePtr;
-		}
-
-		static bool operator !=(Object^ a, Object^ b)
-		{
-
-			if (Object::ReferenceEquals(nullptr, a))
-				return !Object::ReferenceEquals(nullptr, b);
-
-			if (Object::ReferenceEquals(nullptr, b))
-				return true;
-
-			return a->nativePtr != b->nativePtr;
-			
-		}
-
-		static operator bool(Object^ object)
-		{
-			return object != nullptr;
-		}
+		[System::Runtime::Serialization::OnDeserializedAttribute]
+		void OnDeserializedObject(System::Runtime::Serialization::StreamingContext c);
 	};
 }

@@ -424,7 +424,8 @@ namespace LiteNetLib
 
             //Else just send
             NetPacket packet = _packetPool.GetWithData(property, data, start, length);
-            channel.AddToQueue(packet);
+            if(channel != null)
+                channel.AddToQueue(packet);
         }
 
         public void Disconnect(byte[] data)

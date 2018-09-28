@@ -20,7 +20,6 @@ namespace thomas
 					m_properties[prop] = m_shader->GetProperty(prop);
 				}
 			}
-
 		}
 
 		void Material::OnChanged()
@@ -155,7 +154,7 @@ namespace thomas
 			
 		}
 
-		std::shared_ptr<shaderProperty::ShaderProperty> Material::GetProperty(const std::string & name)
+		std::shared_ptr<shaderproperty::ShaderProperty> Material::GetProperty(const std::string & name)
 		{
 			Lock();
 			if (HasProperty(name))
@@ -167,10 +166,10 @@ namespace thomas
 		}
 		math::Color Material::GetColor(const std::string& name)
 		{
-			if (HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::COLOR)
+			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::COLOR)
 			{
 				
-				return ((shaderProperty::ShaderPropertyColor*)m_properties[name].get())->GetValue();
+				return ((shaderproperty::ShaderPropertyColor*)m_properties[name].get())->GetValue();
 				
 			}
 			else
@@ -182,16 +181,16 @@ namespace thomas
 		void Material::SetColor(const std::string& name, const math::Color& value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyColor(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyColor(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 
 		}
 		float Material::GetFloat(const std::string& name)
 		{
-			if (HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::SCALAR_FLOAT)
+			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::SCALAR_FLOAT)
 			{
-				return ((shaderProperty::ShaderPropertyScalarFloat*)m_properties[name].get())->GetValue();
+				return ((shaderproperty::ShaderPropertyScalarFloat*)m_properties[name].get())->GetValue();
 			}
 			else
 			{
@@ -202,16 +201,16 @@ namespace thomas
 		void Material::SetFloat(const std::string& name, float& value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyScalarFloat(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyScalarFloat(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 			
 		}
 		int Material::GetInt(const std::string& name)
 		{
-			if (HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::SCALAR_INT)
+			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::SCALAR_INT)
 			{
-				return ((shaderProperty::ShaderPropertyScalarInt*)m_properties[name].get())->GetValue();
+				return ((shaderproperty::ShaderPropertyScalarInt*)m_properties[name].get())->GetValue();
 			}
 			else
 			{
@@ -222,16 +221,16 @@ namespace thomas
 		void Material::SetInt(const std::string& name, int& value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyScalarInt(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyScalarInt(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 			
 		}
 		math::Matrix Material::GetMatrix(const std::string& name)
 		{
-			if (HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::MATRIX)
+			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::MATRIX)
 			{
-				((shaderProperty::ShaderPropertyMatrix*)m_properties[name].get())->GetValue();
+				return ((shaderproperty::ShaderPropertyMatrix*)m_properties[name].get())->GetValue();
 			}
 			else
 			{
@@ -242,16 +241,16 @@ namespace thomas
 		void Material::SetMatrix(const std::string& name, math::Matrix& value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyMatrix(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyMatrix(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 			
 		}
 		resource::Texture2D * Material::GetTexture2D(const std::string & name)
 		{
-			if (HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::TEXTURE2D)
+			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::TEXTURE2D)
 			{
-				return ((shaderProperty::ShaderPropertyTexture2D*)m_properties[name].get())->GetValue();
+				return ((shaderproperty::ShaderPropertyTexture2D*)m_properties[name].get())->GetValue();
 			}
 			else
 			{
@@ -263,7 +262,7 @@ namespace thomas
 			Lock();
 			if (value)
 			{
-				m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyTexture2D(value));
+				m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyTexture2D(value));
 				m_properties[name]->SetName(name);
 			}
 			Unlock();
@@ -271,9 +270,9 @@ namespace thomas
 
 		math::Vector4 Material::GetVector(const std::string& name)
 		{
-			if(HasProperty(name) && m_properties[name]->GetType() == shaderProperty::ShaderProperty::Type::VECTOR)
+			if(HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::VECTOR)
 			{
-				return ((shaderProperty::ShaderPropertyVector*)m_properties[name].get())->GetValue();
+				return ((shaderproperty::ShaderPropertyVector*)m_properties[name].get())->GetValue();
 			}
 			else
 			{
@@ -284,7 +283,7 @@ namespace thomas
 		void Material::SetVector(const std::string& name, math::Vector4& value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyVector(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyVector(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 			
@@ -292,14 +291,14 @@ namespace thomas
 		void Material::SetResource(const std::string & name, ID3D11ShaderResourceView* value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyShaderResource(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyShaderResource(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 		}
 		void Material::SetConstantBuffer(const std::string & name, ID3D11Buffer* value)
 		{
 			Lock();
-			m_properties[name] = std::shared_ptr<shaderProperty::ShaderProperty>(new shaderProperty::ShaderPropertyConstantBuffer(value));
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyConstantBuffer(value));
 			m_properties[name]->SetName(name);
 			Unlock();
 		}
@@ -365,7 +364,7 @@ namespace thomas
 			ThomasCore::GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
-		void Material::Draw(std::shared_ptr<graphics::Mesh> mesh)
+		void Material::Draw(graphics::Mesh* mesh)
 		{
 			Lock();
 			for (Pass p : m_passes)
@@ -391,10 +390,10 @@ namespace thomas
 			}
 			Unlock();
 		}
-		std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> Material::GetEditorProperties()
+		std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> Material::GetEditorProperties()
 		{
 			Lock();
-			std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> editorProperties;
+			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> editorProperties;
 			for (std::string prop : m_shader->GetMaterialProperties())
 			{
 				editorProperties[prop] = m_properties[prop];
@@ -403,7 +402,7 @@ namespace thomas
 			Unlock();
 			return editorProperties;
 		}
-		std::map<std::string, std::shared_ptr<shaderProperty::ShaderProperty>> Material::GetAllProperties()
+		std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> Material::GetAllProperties()
 		{
 			return m_properties;
 		}

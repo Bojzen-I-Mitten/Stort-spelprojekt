@@ -1,28 +1,29 @@
 #pragma once
-#pragma unmanaged
-#include "thomas\resource\Resource.h"
-#include <memory>
-#pragma managed
-
 #include "../Utility.h"
-#include "../Scene.h"
-
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace System::Runtime::Serialization;
-using namespace System::ComponentModel;
-
+namespace thomas {
+	namespace resource {
+		class Resource;
+	} 
+}
 namespace ThomasEngine
 {
 	[DataContractAttribute]
-	public ref class Resource : public INotifyPropertyChanged
+	public ref class Resource : public System::ComponentModel::INotifyPropertyChanged
 	{
 	internal:
 		thomas::resource::Resource* m_nativePtr;
 
 		[DataMemberAttribute(Order = 0)]
-		String^ m_path;
+		property System::String^ asset_path {
+			System::String^ get() { return GetAssetRelativePath(); }
+			void set(System::String^ value);
+		}
+		System::String^ m_path;
 
-		Resource(String^ path, thomas::resource::Resource* ptr)
+		Resource(System::String^ path, thomas::resource::Resource* ptr)
 		{
 			m_path = path;
 			m_nativePtr = ptr;
@@ -34,63 +35,39 @@ namespace ThomasEngine
 		virtual void OnPlay() {};
 		virtual void OnStop() {};
 
-		void Rename(String^ newPath) {
-			m_path = newPath;
-			m_nativePtr->Rename(Utility::ConvertString(newPath));
-			OnPropertyChanged("name");
-		}
+		/* Update file path of the resource
+		*/
+		void Rename(String^ newPath);
 
 	public:
-		virtual event PropertyChangedEventHandler^ PropertyChanged;
-		void OnPropertyChanged(String^ info)
+		virtual event System::ComponentModel::PropertyChangedEventHandler^ PropertyChanged;
+		void OnPropertyChanged(System::String^ info)
 		{
-			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
+			PropertyChanged(this, gcnew System::ComponentModel::PropertyChangedEventArgs(info));
 		}
 
-		virtual void Reload() {
-			System::Threading::Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-			m_nativePtr->Reload();
-			System::Threading::Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
-		};
+		virtual void Reload();
 
-		String ^ GetPath()
+		System::String ^ GetPath()
 		{
 			return m_path;
 		}
 
-		virtual property String^ name
+
+		System::String^ GetAssetRelativePath();
+
+		virtual property String^ Name
 		{
-			String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
+			System::String^ get() { return System::IO::Path::GetFileNameWithoutExtension(m_path); }
 		};
 
-		virtual String^ ToString() override
+		virtual System::String^ ToString() override
 		{
-			return name;
+			return Name;
 		}
 
-		static bool operator ==(Resource^ a, Resource^ b)
-		{
-			if (Object::ReferenceEquals(nullptr, a))
-				return Object::ReferenceEquals(nullptr, b);
+		static bool operator ==(Resource^ a, Resource^ b);
 
-			if (Object::ReferenceEquals(nullptr, b))
-				return false;
-
-			return a->m_nativePtr == b->m_nativePtr;
-		}
-
-		static bool operator !=(Resource^ a, Resource^ b)
-		{
-
-			if (Object::ReferenceEquals(nullptr, a))
-				return !Object::ReferenceEquals(nullptr, b);
-
-			if (Object::ReferenceEquals(nullptr, b))
-				return true;
-
-			return a->m_nativePtr != b->m_nativePtr;
-
-			
-		}
+		static bool operator !=(Resource^ a, Resource^ b);
 	};
 }

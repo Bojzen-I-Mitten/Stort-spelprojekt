@@ -1,63 +1,52 @@
 #pragma once
-#pragma unmanaged
-#include <thomas\object\component\Camera.h>
-#pragma managed
-
 #include "../Component.h"
-#include <string>
-#include <msclr\marshal_cppstd.h>
-#include "../../math/Math.h"
-
+namespace thomas { namespace object { namespace component { class Camera; } } }
 namespace ThomasEngine
 {
 	public ref class Camera : public Component
 	{
+	private:
+		[Xml::Serialization::XmlIgnoreAttribute]
+		property thomas::object::component::Camera* camera {
+			thomas::object::component::Camera* get();
+		}
 	public:
-		Camera() : Component(new thomas::object::component::Camera()) {};
+		Camera();
 
 		[BrowsableAttribute(false)]
-		property Matrix4x4 viewMatrix
-		{
-			Matrix4x4 get() { return Matrix4x4(((thomas::object::component::Camera*)nativePtr)->GetViewMatrix()); }
-		}
+		property Matrix viewMatrix {Matrix get();}
 
 		[BrowsableAttribute(false)]
-		property Matrix4x4 projectionMatrix
-		{
-			Matrix4x4 get() { return Matrix4x4(((thomas::object::component::Camera*)nativePtr)->GetProjMatrix()); }
-		}
+		property Matrix projectionMatrix{Matrix get();}
 
 		[BrowsableAttribute(false)]
-		property Vector3 position
-		{
-			Vector3 get() { return Vector3(((thomas::object::component::Camera*)nativePtr)->GetPosition()); }
-		}
+		property Vector3 position{Vector3 get();}
 
 		[DisplayNameAttribute("Field Of View")]
 		property float fieldOfView
 		{
-			float get() { return ((thomas::object::component::Camera*)nativePtr)->GetFov(); }
-			void set(float value) { ((thomas::object::component::Camera*)nativePtr)->SetFov(value); }
+			float get();
+			void set(float value);
 		}
 
 		[DisplayNameAttribute("Near Plane")]
 		property float nearPlane
 		{
-			float get() { return ((thomas::object::component::Camera*)nativePtr)->GetNear(); }
-			void set(float value) { ((thomas::object::component::Camera*)nativePtr)->SetNear(value); }
+			float get();
+			void set(float value);
 		}
 
 		[DisplayNameAttribute("Far Plane")]
 		property float farPlane
 		{
-			float get() { return ((thomas::object::component::Camera*)nativePtr)->GetFar(); }
-			void set(float value) { ((thomas::object::component::Camera*)nativePtr)->SetFar(value); }
+			float get();
+			void set(float value);
 		}
 
 		property int targetDisplay
 		{
-			int get() { return ((thomas::object::component::Camera*)nativePtr)->GetTargetDisplayIndex(); }
-			void set(int value) { ((thomas::object::component::Camera*)nativePtr)->SetTargetDisplay(value); }
+			int get();
+			void set(int value);
 		}
 	};
 }

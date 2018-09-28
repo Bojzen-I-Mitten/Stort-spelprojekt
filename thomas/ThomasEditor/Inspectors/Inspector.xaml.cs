@@ -10,11 +10,11 @@ namespace ThomasEditor.Inspectors
     /// </summary>
     public partial class Inspector : UserControl
     {
-        private object _SelectedObject = null;
+
         public object SelectedObject
         {
-            get { return _SelectedObject; }
-            set { _SelectedObject = value; SelectedObjectType = value != null ? value.GetType() : null; }
+            get { return GetValue(SelectedObjectProperty); }
+            set { SetValue(SelectedObjectProperty, value); SelectedObjectType = value != null ? value.GetType() : null; }
         }
 
         public Type SelectedObjectType
@@ -28,6 +28,13 @@ namespace ThomasEditor.Inspectors
             InitializeComponent();
             instance = this;
         }
+
+        public static readonly DependencyProperty SelectedObjectProperty =
+           DependencyProperty.Register(
+           "SelectedObject",
+           typeof(object),
+           typeof(Inspector),
+           new PropertyMetadata(null));
 
         public static readonly DependencyProperty SelectedObjectTypeProperty =
            DependencyProperty.Register(

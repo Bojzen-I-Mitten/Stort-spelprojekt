@@ -1,77 +1,109 @@
+#pragma unmanaged
+#include <thomas\object\Object.h>
+#pragma managed
+#include "../Utility.h"
 #include "Object.h"
 #include "GameObject.h"
-#include "component\Transform.h"
-#include "../Scene.h"
+#include "Component.h"
 namespace ThomasEngine
 {
-	GameObject ^ Object::Instantiate(GameObject ^ original)
+	Object::Object(thomas::object::Object* ptr)
 	{
-		System::IO::Stream^ serialized = SerializeGameObject(original);
-		GameObject^ clone = DeSerializeGameObject(serialized);
-		Scene::CurrentScene->GameObjects->Add(clone);
-		return clone;
+		nativePtr = ptr;
+		s_objects.Add(this);
+		thomas::object::Object::Add(ptr);
+		m_guid = Guid::NewGuid();
+		nativePtr->m_guid = Utility::Convert(m_guid);
 	}
 
-	GameObject ^ Object::Instantiate(GameObject ^ original, Transform^ parent)
+	void Object::OnDestroy() { nativePtr->OnDestroy(); }
+
+	void Object::Destroy()
 	{
-		GameObject^ clone = Instantiate(original);
-		clone->transform->parent = parent;
-		return clone;
+		OnDestroy();
+		thomas::object::Object::Destroy(nativePtr);
+		s_objects.Remove(this);
 	}
 
-	GameObject ^ Object::Instantiate(GameObject ^ original, Vector3 position, Quaternion rotation)
+	Object^ Object::Find(Guid guid)
 	{
-		GameObject^ clone = Instantiate(original);
-		clone->transform->position = position;
-		clone->transform->rotation = rotation;
-		return clone;
+		for each(Object^ o in s_objects)
+		{
+			if (o->m_guid == guid)
+				return o;
+		}
+		return nullptr;
 	}
 
-	GameObject ^ Object::Instantiate(GameObject ^ original, Vector3 position, Quaternion rotation, Transform^ parent)
+	List<Object^>^ Object::GetObjects()
 	{
-		GameObject^ clone = Instantiate(original, parent);
-		clone->transform->position = position;
-		clone->transform->rotation = rotation;
-		return clone;
+		return %s_objects;
 	}
 
-	System::IO::Stream^ Object::SerializeGameObject(GameObject ^ gObj)
+	Object^ Object::GetObject(thomas::object::Object* ptr)
 	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew Scene::SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-		
-		System::IO::Stream^ stream = gcnew System::IO::MemoryStream();
-
-		Xml::XmlWriter^ writer = Xml::XmlWriter::Create(stream);
-
-		serializer->WriteObject(writer, gObj);
-
-		Xml::XmlReader^ file = Xml::XmlReader::Create(stream);
-		return stream;
+		for each(Object^ object in s_objects)
+		{
+			if (object->nativePtr == ptr)
+				return object;
+		}
+		return nullptr;
 	}
 
-	GameObject ^ Object::DeSerializeGameObject(System::IO::Stream ^ stream)
+
+
+	List<Object^>^ Object::GetObjectsOfType(Type^ type)
 	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew Scene::SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
+		List<Object^>^ list = gcnew List<Object^>();
+		for (int i = 0; i < s_objects.Count; i++) {
+			if (s_objects[i]->GetType() == type) {
+				if ((Component::typeid)->IsAssignableFrom(type)) {
+					ThomasEngine::Component^ component = (Component^)s_objects[i];
+					if (component->gameObject->inScene)
+						list->Add((Object^)component);
+				}
+				else {
+					list->Add((Object^)s_objects[i]);
+				}
+			}
 
-		Xml::XmlReader^ reader = Xml::XmlReader::Create(stream);
+		}
+		return list;
+	}
 
-		GameObject^ gObj = (GameObject^)serializer->ReadObject(reader);
-		return gObj;
+
+
+	bool Object::operator ==(Object^ a, Object^ b)
+	{
+		if (Object::ReferenceEquals(nullptr, a))
+			return Object::ReferenceEquals(nullptr, b);
+
+		if (Object::ReferenceEquals(nullptr, b))
+			return false;
+
+		return a->nativePtr == b->nativePtr;
+	}
+
+	bool Object::operator !=(Object^ a, Object^ b)
+	{
+
+		if (Object::ReferenceEquals(nullptr, a))
+			return !Object::ReferenceEquals(nullptr, b);
+
+		if (Object::ReferenceEquals(nullptr, b))
+			return true;
+
+		return a->nativePtr != b->nativePtr;
 
 	}
 
+	Object::operator bool(Object ^ object)
+	{
+		return object != nullptr;
+	}
+
+	void Object::OnDeserializedObject(System::Runtime::Serialization::StreamingContext c)
+	{
+		nativePtr->m_guid = Utility::Convert(m_guid);
+	}
 }

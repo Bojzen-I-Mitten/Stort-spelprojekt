@@ -15,6 +15,9 @@ namespace thomas
 				Collider(btCollisionShape* collisionShape);
 				~Collider();
 				
+				void SetCenter(math::Vector3 center);
+				math::Vector3 getCenter();
+
 				Rigidbody* GetAttachedRigidbody();
 				void SetAttachedRigidbody(Rigidbody* rb);
 				bool IsTrigger();
@@ -25,11 +28,12 @@ namespace thomas
 				void OnDisable();
 				void OnDestroy();
 
-				void Update();
+				virtual void Update();
 
 				btCollisionShape* GetCollisionShape();
 				
 			protected:
+				math::Vector3 m_center;
 				bool m_trigger = false;
 				btCollisionShape* m_collisionShape = nullptr;
 				btCollisionObject* m_collisionObject = nullptr;

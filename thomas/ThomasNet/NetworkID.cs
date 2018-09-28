@@ -8,33 +8,45 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-    public class NetworkID : NetworkComponent
-    { 
+    public class NetworkID : ScriptComponent
+    {
+
+        public bool Owner { set; get; } = false;
         public int ID { set; get; }
-        List<NetworkComponent> networkComponents;
-        public override void Start()
+        List<NetworkComponent> networkComponentsCache;
+        public override void OnEnable()
         {
-            ID = NetworkManager.instance.Register(this);
-            networkComponents = gameObject.GetComponents<NetworkComponent>();
-            
+            //ID = NetworkManager.instance.Register(this);
+            networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
 
-        public override void Read(NetPacketReader reader)
+
+
+        public void WriteAllVars(NetDataWriter writer)
         {
-            foreach (NetworkComponent comp in networkComponents)
+            foreach (NetworkComponent comp in networkComponentsCache)
             {
-                if (comp != this)
-                {
-                    comp.Read(reader);
-                }
+                comp.OnWrite(writer, true);
             }
         }
-        public override void Write(NetDataWriter writer)
+
+        public void NetworkUpdate(NetDataWriter writer)
         {
-            foreach (NetworkComponent comp in networkComponents)
+            foreach (NetworkComponent comp in networkComponentsCache)
             {
-                if (comp != this)
-                    comp.Write(writer);
+                comp.OnWrite(writer, false);
+            }
+        }
+
+        public void OnUpdateVars(NetPacketReader reader, bool initialState)
+        {
+            if(initialState && networkComponentsCache == null)
+            {
+                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+            }
+            foreach (NetworkComponent comp in networkComponentsCache)
+            {
+                comp.OnRead(reader, initialState);
             }
         }
     }

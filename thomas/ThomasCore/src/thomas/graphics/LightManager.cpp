@@ -1,93 +1,120 @@
 #include "LightManager.h"
 #include "..\utils\D3D.h"
 #include "..\resource\Shader.h"
+#include "..\object\Object.h"
+#include "..\object\component\LightComponent.h"
 
+#include <algorithm>
 namespace thomas
 {
 	namespace graphics
 	{
-		LightManager::LightBufferStruct LightManager::s_lightstruct;
-		ID3D11Buffer* LightManager::s_lightBuffer;
+	
+		std::vector<object::component::LightComponent*> LightManager::s_lights;
+		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 
-		LightManager::LightManager()
+		LightManager::LightCountsStruct LightManager::s_lightCounts;
+
+
+		void LightManager::Initialize()
 		{
+			s_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
+
+			s_lightCounts.nrOfDirectionalLights = 0;
+			s_lightCounts.nrOfSpotLights = 0;
+			s_lightCounts.nrOfPointLights = 0;
+			s_lightCounts.nrOfAreaLights = 0;
 		}
-
-		LightManager::~LightManager()
-		{
-			SAFE_RELEASE(s_lightBuffer);
-			s_lightBuffer = NULL;
-		}
-
-		bool LightManager::UpdateLightBuffer()
-		{
-			if (!s_lightBuffer)
-			{
-				//s_lightBuffer = thomas::utils::D3d::CreateBufferFromStruct(s_lightstruct, D3D11_BIND_CONSTANT_BUFFER);
-				return true;
-			}
-			else
-				//return thomas::utils::D3d::FillBuffer(s_lightBuffer, s_lightstruct);
-				return true;
-		}
-
-		int LightManager::AddDirectionalLight(DirectionalLightStruct directionalLight)
-		{
-			int maxlength = sizeof(s_lightstruct.directionalLights) / sizeof(DirectionalLightStruct);
-
-			if (maxlength > s_lightstruct.nrOfDirectionalLights)
-			{
-				s_lightstruct.directionalLights[s_lightstruct.nrOfDirectionalLights] = directionalLight;
-				s_lightstruct.nrOfDirectionalLights++;
-				UpdateLightBuffer();
-				return s_lightstruct.nrOfDirectionalLights - 1;
-			}
-			else //TODO: log to many lights
-				return -1;
-		}
-
-		bool LightManager::UpdateDirectionalLight(DirectionalLightStruct other, int index)
-		{
-			s_lightstruct.directionalLights[index] = other;		
-			return UpdateLightBuffer();
-		}
-
-		bool LightManager::UpdatePointLight(PointLightStruct other, int index)
-		{
-			s_lightstruct.pointLights[index] = other;
-			return UpdateLightBuffer();
-		}
-
-		int LightManager::AddPointLight(PointLightStruct pointLight)
-		{
-			int maxlength = sizeof(s_lightstruct.pointLights) / sizeof(PointLightStruct);
-			if (maxlength > s_lightstruct.nrOfPointLights)
-			{
-				s_lightstruct.pointLights[s_lightstruct.nrOfPointLights] = pointLight;
-				s_lightstruct.nrOfPointLights++;
-				UpdateLightBuffer();
-				return s_lightstruct.nrOfPointLights - 1;
-			}
-			else //TODO: log to many lights
-				return -1;
-		}
-
-		bool LightManager::BindDirectionalLight(unsigned int index)
-		{
-			return false;
-		}
-
-		bool LightManager::BindPointLight(unsigned int index)
-		{
-			return false;
-		}
-
+		
 		void LightManager::Destroy()
 		{
 			SAFE_RELEASE(s_lightBuffer);
-			s_lightBuffer = NULL;
-			s_lightstruct.nrOfDirectionalLights = 0;
-			s_lightstruct.nrOfPointLights = 0;
+		}
+		void LightManager::AddLight(object::component::LightComponent* light)
+		{
+			switch (light->GetType())
+			{
+			case DIRECTIONAL:
+				s_lightCounts.nrOfDirectionalLights++;
+				break;
+			case POINT:
+				s_lightCounts.nrOfPointLights++;
+				break;
+			case SPOT:
+				s_lightCounts.nrOfSpotLights++;
+				break;
+			case AREA:
+				s_lightCounts.nrOfAreaLights++;
+				break;
+			default:
+				break;
+			}
+			s_lights.push_back(light);
+			std::sort(s_lights.begin(), s_lights.end(), SortLights);
+			int stoppper = 0;
+		}
+		
+		bool LightManager::RemoveLight(object::component::LightComponent * light)//returns true if light was removed
+		{
+			auto it = s_lights.begin();
+
+			while (it != s_lights.end())
+			{
+				if (*it._Ptr == light)
+				{
+					switch (light->GetType())
+					{
+					case DIRECTIONAL:
+						s_lightCounts.nrOfDirectionalLights--;
+						break;
+					case POINT:
+						s_lightCounts.nrOfPointLights--;
+						break;
+					case SPOT:
+						s_lightCounts.nrOfSpotLights--;
+						break;
+					case AREA:
+						s_lightCounts.nrOfAreaLights--;
+						break;
+					default:
+						break;
+					}
+					
+					s_lights.erase(it);
+					
+					return true;
+				}
+				it++;
+			}
+			return false;
+		}
+
+		void LightManager::Update()
+		{
+			std::vector<LightStruct> allLights;
+
+			for (object::component::LightComponent* light : s_lights)
+			{
+				allLights.push_back(light->GetData());
+			}
+
+			s_lightBuffer->SetData(allLights);
+		}
+		void LightManager::Bind()
+		{
+			resource::Shader::SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
+			resource::Shader::SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
+			resource::Shader::SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
+			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
+			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
+		}
+		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
+		{
+			if (light1->GetType() == light2->GetType())
+			{
+				return light1 < light2;
+			}
+			return light1->GetType() < light2->GetType();
 		}
 	}
 }

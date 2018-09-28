@@ -12,7 +12,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			class THOMAS_API ParticleEmitterComponent : public Component
+			class ParticleEmitterComponent : public Component
 			{
 			public:
 				enum class BlendStates {

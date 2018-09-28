@@ -5,6 +5,9 @@
 #include "../GameObject.h"
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
+#include "../../resource/ShaderProperty/ShaderProperty.h"
+#include "../../System.h"
+#include "../../graphics/render/Frame.h"
 
 namespace thomas {
 	namespace object {
@@ -18,10 +21,10 @@ namespace thomas {
 				m_bounds.Extents.x = 0;
 				m_bounds.Extents.y = 0;
 				m_bounds.Extents.z = 0;
-				s_renderComponents.push_back(this);
+				m_materials.push_back(resource::Material::GetStandardMaterial());
 			}
 
-			void RenderComponent::SetModel(resource::Model* model)
+			bool RenderComponent::SetModel(resource::Model* model)
 			{
 				if (!model)
 				{
@@ -30,11 +33,18 @@ namespace thomas {
 					m_bounds.Extents.x = 0;
 					m_bounds.Extents.y = 0;
 					m_bounds.Extents.z = 0;
+					m_materials.resize(1);
 				}
 				else
 				{
-					m_model = model;					
+					m_model = model;
+					if (m_model->GetMeshes().size() < m_materials.size()){
+						m_materials.resize(m_model->GetMeshes().size());
+					}
+					while (m_model->GetMeshes().size() > m_materials.size())
+						m_materials.push_back(m_materials[0]);
 				}
+				return true;
 			}
 
 			void RenderComponent::Update()
@@ -44,13 +54,14 @@ namespace thomas {
 					math::BoundingOrientedBox::CreateFromBoundingBox(m_bounds, m_model->m_bounds);
 					m_bounds.Transform(m_bounds, m_gameObject->m_transform->GetWorldMatrix());
 
-					if (m_model->GetMeshes().size() < m_materials.size())
-						m_materials.resize(m_model->GetMeshes().size());
-
-					while (m_model->GetMeshes().size() > m_materials.size())
-						m_materials.push_back(resource::Material::GetStandardMaterial());
+					s_renderComponents.push_back(this);
 				
 				}		
+			}
+			void RenderComponent::SetMaterial(resource::Material * material)
+			{
+				for (unsigned int i = 0; i < m_materials.size(); i++)
+					SetMaterial(i, material);
 			}
 			void RenderComponent::SetMaterial(int meshIndex, resource::Material * material)
 			{
@@ -82,15 +93,7 @@ namespace thomas {
 				if (m_model)
 				{
 					for (int i = 0; i < m_model->GetMeshes().size(); i++)
-					{
-						resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
-						if (material == nullptr)
-							material = resource::Material::GetStandardMaterial();
-
-						std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
-
-						thomas::graphics::Renderer::SubmitCommand(thomas::graphics::RenderCommand(m_gameObject->m_transform->GetWorldMatrix(), mesh, material, camera));
-					}
+						SubmitPart(camera, i);
 				}
 			}
 
@@ -106,9 +109,54 @@ namespace thomas {
 				}
 			}
 
+			void RenderComponent::ClearList()
+			{
+				s_renderComponents.clear();
+			}
+
 			std::vector<RenderComponent*> RenderComponent::GetAllRenderComponents()
 			{
 				return s_renderComponents;
+			}
+
+			bool verifyPropertyList(const resource::shaderproperty::ShaderProperty ** arr, size_t count) {
+				bool correct = true;
+				for (size_t i = 0; i < count; i++)
+					correct &= arr[i] != nullptr;
+				return correct;
+			}
+
+			void RenderComponent::SubmitPart(Camera* camera, unsigned int i)
+			{
+				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
+				if (material == nullptr)
+					material = resource::Material::GetStandardMaterial();
+
+				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
+
+				assert(verifyPropertyList(m_properties.data(), m_properties.size()));
+
+				thomas::graphics::render::RenderCommand cmd(
+					m_gameObject->m_transform->GetWorldMatrix(), 
+					mesh.get(), 
+					material, 
+					camera, 
+					m_properties.size(), 
+					m_properties.data());
+
+				System::S_RENDERER.SubmitCommand(cmd);
+			}
+
+			void RenderComponent::insertProperty(const resource::shaderproperty::ShaderProperty * prop)
+			{
+				assert(prop);
+				for (unsigned int i = 0; i < m_properties.size(); i++) {
+					if (m_properties[i]->equals(*prop)) {	// If equals ->
+						m_properties[i] = prop;				// Insert
+						return;
+					}
+				}
+				m_properties.push_back(prop);				// Otherwise: append
 			}
 
 			void RenderComponent::OnDrawGizmos()
