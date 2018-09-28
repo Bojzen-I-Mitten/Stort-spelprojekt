@@ -77,32 +77,6 @@ namespace thomas
 
 		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
 
-		// Solve collision between two rigidbodies
-		unsigned int numManifolds = s_world->getDispatcher()->getNumManifolds();
-
-		for (unsigned i = 0; i < numManifolds; ++i)
-		{
-			if (numManifolds > s_world->getDispatcher()->getNumManifolds())
-				break;
-				
-			btPersistentManifold* contactManifold = s_world->getDispatcher()->getManifoldByIndexInternal(i);
-			btCollisionObject* obA = (btCollisionObject*)contactManifold->getBody0();
-			btCollisionObject* obB = (btCollisionObject*)contactManifold->getBody1();
-
-			// Avoid self collisions
-			if (obA == obB) continue;
-
-			if (obA->getUserPointer() && obB->getUserPointer())
-			{
-				object::component::Rigidbody* rbA = static_cast<object::component::Rigidbody*>(obA);
-				object::component::Rigidbody* rbB = static_cast<object::component::Rigidbody*>(obB);
-
-				// Set the collider object to the target collider
-				rbA->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbB->m_gameObject);
-				rbB->m_gameObject->GetComponent<object::component::Rigidbody>()->SetTargetCollider(rbA->m_gameObject);
-			}
-		}
-
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateRigidbodyToTransform();

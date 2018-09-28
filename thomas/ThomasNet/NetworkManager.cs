@@ -18,8 +18,6 @@ namespace ThomasEngine.Network
     {
 
         public static NetworkManager instance;
-        
-        
         //private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
 
         internal NetPacketProcessor NetPacketProcessor;
@@ -42,7 +40,7 @@ namespace ThomasEngine.Network
         
         private float ServerTime;
 
-        private NetPeer LocalPeer = null;
+        internal NetPeer LocalPeer = null;
 
         public int TICK_RATE { get; set; } = 24;
 
@@ -278,20 +276,6 @@ namespace ThomasEngine.Network
             {
                 GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;
-            }
-        }
-
-        public void TransferOwnereventHandler(TransferOwnerEvent transEvent, NetPeer peer)
-        {
-            List<NetworkID> netObjectIDs = GetObjectsOfType<NetworkID>();
-            foreach (var netObjectID in netObjectIDs)
-            {
-                if (netObjectID.ID == transEvent.netID)
-                {
-                    netObjectID.Owner = true;
-                    netObjectID.gameObject.transform.parent = players[serverPeer].transform;
-                    break;
-                }
             }
         }
     }

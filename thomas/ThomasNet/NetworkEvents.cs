@@ -23,8 +23,8 @@ namespace ThomasEngine.Network
 
         public NetworkEvents()
         {
-
             SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
+            SubscribeToEvent<TransferOwnerEvent>(TransferOwnerEventHandler);
         }
 
         #region Events
@@ -61,16 +61,39 @@ namespace ThomasEngine.Network
 
             public ConnectToPeerEvent() { IP = ""; Port = -1; }
         }
+
+        public class TransferOwnerEvent
+        {
+            public int NetID;
+            public NetPeer NewOwner;
+
+            public TransferOwnerEvent() { NetID = -1; NewOwner = null; }
+        }
         #endregion
-
-       
-
+        
         #region Event Handlers
-
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
 
             Manager.InternalManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
+        }
+
+        public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer peer)
+        {
+            List<NetworkID> netObjectIDs = NetScene.NetworkObjects[peer];
+            foreach (var netObjectID in netObjectIDs)
+            {
+                if (netObjectID.ID == transEvent.NetID) //Object found
+                {
+                    if (transEvent.NewOwner == Manager.LocalPeer) //If I'm the owner
+                        netObjectID.Owner = true;
+
+                    netObjectIDs.Remove(netObjectID); //Remove from old player's list
+                    NetScene.NetworkObjects[transEvent.NewOwner].Add(netObjectID); //Add to new player's list
+
+                    break;
+                }
+            }
         }
         #endregion
 

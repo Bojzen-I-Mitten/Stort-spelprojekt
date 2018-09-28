@@ -148,7 +148,7 @@ namespace ThomasEngine
 		try {
 			System::IO::File::Delete(tempFile);
 		}
-		catch (Exception^ E)
+		catch (Exception^ e)
 		{
 
 		}

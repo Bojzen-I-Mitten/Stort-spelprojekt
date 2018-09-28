@@ -14,8 +14,8 @@ namespace ThomasEngine.Network
 
         }
 
-        public  Dictionary<NetPeer, NetworkID> Players = new Dictionary<NetPeer, NetworkID>();
-        //Dictionary<int, NetworkID> localObjects = new Dictionary<int, NetworkID>();
+        public Dictionary<NetPeer, NetworkID> Players = new Dictionary<NetPeer, NetworkID>();
+        public Dictionary<NetPeer, List<NetworkID>> NetworkObjects = new Dictionary<NetPeer, List<NetworkID>>();
         
        public void ReadPlayerData(NetPeer peer, NetPacketReader reader)
        {
