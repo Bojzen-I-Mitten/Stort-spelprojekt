@@ -27,6 +27,8 @@ namespace ThomasEngine
 		~Model();
 		[OnDeserializedAttribute]
 		void OnDeserialized(StreamingContext c);
+
+		thomas::resource::Model* get();
 						
 		static Model^ GetPrimitive(PrimitiveType type);
 		static void InitPrimitives();

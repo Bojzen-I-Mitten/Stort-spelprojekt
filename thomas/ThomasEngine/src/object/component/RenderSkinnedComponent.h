@@ -1,6 +1,7 @@
 #pragma once
 #pragma unmanaged
 #include <thomas\object\component\RenderSkinnedComponent.h>
+#include <thomas/graphics/animation/AnimationNode.h>
 #pragma managed
 
 #include "../Component.h"
@@ -20,6 +21,9 @@ namespace ThomasEngine
 	public:
 		RenderSkinnedComponent();
 
+		thomas::object::component::RenderSkinnedComponent* get();
+		thomas::object::component::RenderComponent* getNativeRenderComp();
+
 		property Model^ model {
 			Model^ get();
 			void set(Model^ value);
@@ -33,6 +37,8 @@ namespace ThomasEngine
 			Material^ get();
 			void set(Material^ value);
 		}
+
+		void setBlendTreeNode(thomas::graphics::animation::AnimationNode * node);
 
 		void Update() override;
 

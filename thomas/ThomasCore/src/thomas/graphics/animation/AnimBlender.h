@@ -16,14 +16,16 @@ namespace thomas {
 
 				AnimationNode* m_nodes[10];
 				uint32_t m_NumNode;
-				WeightMixer * m_weights;
+				std::unique_ptr<WeightMixer> m_weights;
+
+				void constructMapping();
 
 			public:
 				AnimBlender(Skeleton &skel);
 				virtual ~AnimBlender();
 
-				void constructMapping();
-
+				void setWeightMixer(WeightMixer* mixer);
+				void generateLinearMixer(float durationPerNode);
 
 				void pushAnimation(AnimationNode* node);
 

@@ -150,7 +150,7 @@ namespace ThomasEngine
 		}
 		catch (Exception^ E)
 		{
-
+			Debug::Log("Error in ThomasEngine::Scene. Msg: " + E->Message);
 		}
 		Monitor::Exit(lock);
 		savingEnabled = true;

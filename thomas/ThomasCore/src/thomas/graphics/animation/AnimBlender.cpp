@@ -13,6 +13,17 @@ namespace thomas {
 			{
 			}
 
+			void AnimBlender::setWeightMixer(WeightMixer * mixer)
+			{
+				m_weights = std::unique_ptr<WeightMixer>(mixer);
+				constructMapping();
+			}
+
+			void AnimBlender::generateLinearMixer(float durationPerNode)
+			{
+				setWeightMixer(new WeightLinearPerChannel(m_NumNode, durationPerNode));
+			}
+
 			void AnimBlender::constructMapping() 
 			{
 				// Construct a (temporary) list of enabled bones
@@ -52,10 +63,10 @@ namespace thomas {
 			{
 				std::unique_ptr<TransformComponents> tmp_arr(new TransformComponents[m_ref.getNumBones()]);
 
-				assert(m_weights->numWeights() >= m_NumNode);
+				//assert(m_weights->numWeights() >= m_NumNode);
 				const WeightTripple *weights = m_weights->getWeights();
+				const WeightMixer::Mode *mode = m_weights->getMode();
 				
-				WeightTripple weight = weights[0];
 				AnimationNode * node = m_nodes[0];
 
 				// Initiate data with bind pose (if initial anim node does not write to all channels).
@@ -64,17 +75,26 @@ namespace thomas {
 
 				// Overwrite pose with data from the first animation node
 				node->calcFrame(result);
+				weights += (mode[0] == WeightMixer::PerChannel ? node->m_numChannel : 1u);
 
 				// Blend remaining nodes
 				for (unsigned int i = 1; i < m_NumNode; i++)
 				{
-					weight = weights[i];
 					node = m_nodes[i];
 					node->calcFrame(tmp_arr.get());
-
-					// Blend bones (and map each to skeleton index) 
-					for (unsigned int b = 0; b < node->m_numChannel; b++)
-						result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], weight);
+					if (mode[i] == WeightMixer::PerChannel) 
+					{
+						// Blend bones (and map each to skeleton index) 
+						for (unsigned int b = 0; b < node->m_numChannel; b++)
+							result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights++);
+					}
+					else 
+					{
+						// Blend bones (and map each to skeleton index) 
+						for (unsigned int b = 0; b < node->m_numChannel; b++)
+							result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights);
+						weights++; // Step next node weight
+					}
 				}
 			}
 

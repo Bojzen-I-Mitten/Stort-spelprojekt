@@ -13,7 +13,6 @@ namespace ThomasEngine
 	{
 		return (thomas::resource::Animation*)m_nativePtr;
 	}
-	;
 
 	Animation::~Animation()
 	{

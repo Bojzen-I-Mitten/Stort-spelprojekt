@@ -11,9 +11,6 @@ namespace thomas {
 			}
 
 
-			BlendNode::~BlendNode()
-			{
-			}
 		}
 	}
 }

@@ -26,6 +26,11 @@ namespace ThomasEngine
 		m_nativePtr = new thomas::resource::Model(Utility::ConvertString(m_path));
 	}
 
+	thomas::resource::Model * Model::get()
+	{
+		return (thomas::resource::Model*)m_nativePtr;
+	}
+
 	Model^ Model::GetPrimitive(PrimitiveType type)
 	{ 
 		return gcnew Model(thomas::utils::Primitives::GetPrimitive((thomas::utils::Primitives::Type)type)); 
