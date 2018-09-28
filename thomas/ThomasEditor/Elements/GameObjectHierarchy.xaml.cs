@@ -323,13 +323,15 @@ namespace ThomasEditor
             return foundItem;
         }
 
-        private void ChangeParent(ThomasEngine.Transform parentTransform, List<TreeItemViewModel> nodes)
+        private void ChangeParent(ThomasEngine.Transform parentTransform, List<TreeItemViewModel> allNodes)
         {
-            foreach(TreeItemViewModel node in nodes)
+            foreach (TreeItemViewModel node in allNodes)
             {
                 if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform)
-                    ((GameObject)node.Data).transform.parent = parentTransform;
-                ChangeParent(parentTransform, node.Children);
+                {
+                    ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
+                }
+                    ChangeParent(parentTransform, node.Children);
             }
         }
 
@@ -348,19 +350,12 @@ namespace ThomasEditor
                     {
                         GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
                         ChangeParent(parent.transform, RootNodes.ToList());
-                        
-                        
-                        //GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
-                        //if (!parent.transform.IsChildOf(sourceData.transform))
-                        //{
-                        //    sourceData.transform.parent = parent.transform;
-                        //}
                     }
                     else if (sourceData != null && target == null)
                     {
                         if (sourceData.inScene)
                         {
-                            sourceData.transform.parent = null;
+                            ChangeParent(null, RootNodes.ToList());
                         }
                         else
                         {
