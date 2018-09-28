@@ -62,6 +62,7 @@ namespace thomas {
 			}
 			void BindPoseNode::calcFrame(TransformComponents * result)
 			{
+				std::memcpy(result, m_ref.getBindComponents(), sizeof(TransformComponents) * m_ref.getNumBones());
 			}
 		}
 	}

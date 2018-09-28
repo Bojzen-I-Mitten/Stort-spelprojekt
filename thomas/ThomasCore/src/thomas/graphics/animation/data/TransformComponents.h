@@ -50,6 +50,14 @@ namespace thomas {
 					m_rot = math::Quaternion::Slerp(m_rot, target.m_rot, weight.m_rot);
 					m_pos += target.m_pos * weight.m_translation;
 				}
+				/* Calc. transformation matrix from the components.
+				*/
+				math::Matrix createTransform() {
+					math::Matrix mat = math::Matrix::CreateScale(m_scale);
+					mat = mat * math::Matrix::CreateFromQuaternion(m_rot);
+					mat.Translation(m_pos);
+					return mat;
+				}
 
 				/* Construct a component by decomposing the matrix
 				*/

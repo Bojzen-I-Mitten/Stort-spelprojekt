@@ -11,7 +11,7 @@ namespace thomas {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) :
-				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(ref.getNumBones())
+				_ref(ref), _root(), _frame_tmp(new TransformComponents[ref.getNumBones()]), _pose(ref.getNumBones()), _skin(ref.getNumBones())
 			{
 				clearBlendTree();
 				updateSkeleton();
@@ -30,13 +30,15 @@ namespace thomas {
 			void AnimatedSkeleton::updateSkeleton()
 			{
 				//Update animation tree
+
+				_root->calcFrame(_frame_tmp.get());
 				// Update skin transforms
-				_pose[0] = _root->calcLocalTransform(0) * _ref.getRoot();				//	Update root pose
+				_pose[0] = (_frame_tmp.get())[0].createTransform() * _ref.getRoot();				//	Update root pose
 				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
-					_pose[i] = _root->calcLocalTransform(i) * _pose[bone._parentIndex];	//	Update root pose
+					_pose[i] = (_frame_tmp.get())[i].createTransform() * _pose[bone._parentIndex];	//	Update root pose
 					math::Matrix m = bone._invBindPose * _pose[i];
 					_skin[i] = bone._invBindPose * _pose[i];							//	Update root skin
 				}
