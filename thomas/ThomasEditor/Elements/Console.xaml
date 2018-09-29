@@ -6,13 +6,20 @@
              xmlns:local="clr-namespace:ThomasEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+
+    <UserControl.Resources>
+        <local:DebugMessageCollapsedConverter x:Key="collapsedConverter"/>
+        <local:SeverityToImageConverter x:Key="severityImageConverter"/>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="150"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" Background="#3D3D3D">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -24,40 +31,40 @@
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Click="ClearConsole_Click">Clear</Button>
-            <ToggleButton Grid.Column="1">Collapse</ToggleButton>
+            <ToggleButton Grid.Column="1" x:Name="collapsed" Click="CollapseMessages_Click">Collapse</ToggleButton>
             <ToggleButton Grid.Column="2" x:Name="clearOnPlay">Clear on Play</ToggleButton>
-            <ToggleButton Grid.Column="3" x:Name="pauseOnError">Error Pause</ToggleButton>
-            <TextBox Grid.Column="4" x:Name="messageFilter" TextAlignment="Left" Background="White" BorderThickness="5" BorderBrush="#3D3D3D" CaretBrush="White"/>
+            <ToggleButton Grid.Column="3" x:Name="pauseOnError" IsEnabled="False">Error Pause</ToggleButton>
+            <TextBox Grid.Column="4" x:Name="messageFilter" TextChanged="messageFilter_TextChanged" TextAlignment="Left" Background="White" BorderThickness="5" BorderBrush="#3D3D3D" CaretBrush="White"/>
             
-            <ToggleButton Grid.Column="5"  IsEnabled="false">
+            <ToggleButton Grid.Column="5" x:Name="showInfoMessages" Click="FilterButton_Click" IsChecked="true">
                 <DockPanel>
                     <Image Source="../icons/console/console-log.ico"/>
                     <Label x:Name="numberOfLogs"/>
                 </DockPanel>
             </ToggleButton>
-            <ToggleButton Grid.Column="6" IsEnabled="false">
+            <ToggleButton Grid.Column="6" x:Name="showWarningMessages" Click="FilterButton_Click" IsChecked="true">
                 <DockPanel>
                     <Image Source="../icons/console/console-warning.ico"/>
                     <Label x:Name="numberOfWarnings"/>
                 </DockPanel>
             </ToggleButton>
-            <ToggleButton Grid.Column="7"  IsEnabled="false">
+            <ToggleButton Grid.Column="7" x:Name="showErrorMessages" Click="FilterButton_Click" IsChecked="true">
                 <DockPanel>
                     <Image Source="../icons/console/console-error.ico"/>
                     <Label x:Name="numberOfErrors"/>
                 </DockPanel>
             </ToggleButton>
         </Grid>
-        <ListBox Grid.Row="1" Name="messages" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged" SelectionChanged="messages_SelectionChanged">
+        <ListBox Grid.Row="1" Name="messages" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged" SelectionChanged="messages_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel Height="30" HorizontalAlignment="Stretch">
-                        <Image DockPanel.Dock="Left"  Source="../icons/console/console-log.ico"/>
+                        <Image DockPanel.Dock="Left" Source="{Binding Converter={StaticResource severityImageConverter}}"/>
                         <TextBlock DockPanel.Dock="Top" Height="15" LineHeight="15" Padding="10 0" Text="{Binding Path=Message}" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock DockPanel.Dock="Bottom" Height="15" LineHeight="15" Padding="10 0" Foreground="gray" Text="{Binding Path=MethodInfo}"  TextTrimming="CharacterEllipsis"/>
-                        <Canvas DockPanel.Dock="Left" Visibility="{Binding Collapsed}">
-                            <Ellipse Canvas.Right="10" Canvas.Top="-10" Canvas.Left="-20" Width="20" Height="20" Fill="White" />
-                            <Label Canvas.Right="10" Canvas.Top="-12" Canvas.Left="-20" Width="20" Foreground="Black"
+                        <TextBlock DockPanel.Dock="Bottom" Height="15" LineHeight="15" Padding="10 0" Foreground="gray" Text="{Binding StackTrace[0]}"  TextTrimming="CharacterEllipsis"/>
+                        <Canvas HorizontalAlignment="Right" Visibility="{Binding Converter={StaticResource collapsedConverter}}">
+                            <Ellipse Canvas.Right="0" Canvas.Top="-10" Width="50" Height="20" Fill="White" />
+                            <Label Canvas.Right="0" Canvas.Top="-12" Width="50" Foreground="Black"
                                     BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="{Binding Count}"></Label>
                         </Canvas>
                     </DockPanel>
@@ -65,8 +72,9 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <DockPanel x:Name="selectedMessage" Grid.Row="2" Background="#FF3E3E40">
-            <TextBlock DockPanel.Dock="Top" Text="{Binding Message}"/>
-            <TextBlock DockPanel.Dock="Top" Text="{Binding MethodInfo}"/>
+            <Separator DockPanel.Dock="Top" Height="5" HorizontalContentAlignment="Stretch" BorderThickness="5" Foreground="Black"  Background="Black"/>
+            <TextBox IsReadOnly="True" DockPanel.Dock="Top" MaxLines="10" TextWrapping="Wrap"  Foreground="LightGray" Text="{Binding Message}"/>
+            <ListView DockPanel.Dock="Top" ItemsSource="{Binding StackTrace}"></ListView>
         </DockPanel>
     </Grid>
 </UserControl>

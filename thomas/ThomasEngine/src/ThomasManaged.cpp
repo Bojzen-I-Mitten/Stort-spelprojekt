@@ -19,6 +19,8 @@
 #include "ScriptingManager.h"
 #include "ThomasSelection.h"
 #include "GUI\editor\GUI.h"
+
+#include "Debug.h"
 using namespace thomas;
 
 namespace ThomasEngine {
@@ -201,7 +203,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::Update()
 	{
 		Window::UpdateFocus();
-		UpdateLog();
+		Debug::UpdateCoreLog();
 		if (thomas::editor::EditorCamera::HasSelectionChanged())
 			s_Selection->UpdateSelectedObjects();
 	}
@@ -257,20 +259,7 @@ namespace ThomasEngine {
 		thomas::editor::EditorCamera::ToggleManipulatorMode();
 	}
 
-	void ThomasWrapper::UpdateLog() {
-		std::vector<std::string> nativeOutputs = thomas::ThomasCore::GetLogOutput();
-
-		for (int i = 0; i < nativeOutputs.size(); i++) {
-			String^ output = gcnew String(nativeOutputs.at(i).c_str());
-			if (OutputLog->Count == 0 || OutputLog[OutputLog->Count - 1] != output)
-			{
-				OutputLog->Add(output);
-				if (OutputLog->Count > 10)
-					OutputLog->RemoveAt(0);
-			}
-		}
-		thomas::ThomasCore::ClearLogOutput();
-	}
+	
 	void ThomasWrapper::ToggleEditorRendering()
 	{
 		renderingEditor = !renderingEditor;

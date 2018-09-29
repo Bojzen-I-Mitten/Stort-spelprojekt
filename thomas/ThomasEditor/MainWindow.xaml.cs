@@ -45,7 +45,6 @@ namespace ThomasEditor
 
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CompositionTarget.Rendering += DoUpdates;
-            ThomasWrapper.OutputLog.CollectionChanged += OutputLog_CollectionChanged;
 
             if (Properties.Settings.Default.latestProjectPath != "")
                 OpenProject(Properties.Settings.Default.latestProjectPath);
@@ -159,30 +158,7 @@ namespace ThomasEditor
                 WindowState = WindowState.Maximized;
             }
         }
-
-        private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            //this.Dispatcher.BeginInvoke((Action)(() =>
-            //{
-            //    if (e.NewItems != null)
-            //    {
-            //        foreach (String output in e.NewItems)
-            //        {
-            //            TextBlock block = new TextBlock
-            //            {
-            //                Text = output,
-            //                TextWrapping = TextWrapping.Wrap
-            //            };
-            //            console.Items.Add(block);
-            //            console.Items.Add(new Separator());
-            //            if (console.Items.Count > 10)
-            //                console.Items.RemoveAt(0);
-            //        }
-            //    } 
-            //}));
-            
-        }
-
+                
         private void Node_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ContextMenu cm = this.FindResource("gameObjectContext") as ContextMenu;

@@ -66,7 +66,7 @@ namespace ThomasEngine {
 
 		static void ToggleEditorGizmoManipulatorMode();
 
-		static void UpdateLog();
+	
 
 		static void ToggleEditorRendering();
 	public:
@@ -74,10 +74,6 @@ namespace ThomasEngine {
 		static property float FrameRate
 		{
 			float get();
-		}
-		static property ObservableCollection<String^>^ OutputLog
-		{
-			ObservableCollection<String^>^ get() { return s_OutputLog; }
 		}
 		static ThomasSelection^ getSelection() { return s_Selection; }
 		static property ThomasSelection^ Selection {
