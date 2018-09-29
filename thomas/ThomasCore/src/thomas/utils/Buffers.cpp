@@ -27,9 +27,9 @@ namespace thomas
 				HRESULT result;
 
 				if (data == nullptr)
-					result = utils::D3D::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
+					result = utils::D3D::Instance()->GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
 				else
-					result = utils::D3D::GetDevice()->CreateBuffer(&bufferDesc, &InitData, &m_buffer);
+					result = utils::D3D::Instance()->GetDevice()->CreateBuffer(&bufferDesc, &InitData, &m_buffer);
 
 				if (result != S_OK)
 					LOG(result);
@@ -52,9 +52,9 @@ namespace thomas
 				}
 
 				D3D11_MAPPED_SUBRESOURCE resource;
-				utils::D3D::GetDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+				utils::D3D::Instance()->GetDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 				memcpy(resource.pData, data, size);
-				utils::D3D::GetDeviceContext()->Unmap(m_buffer, 0);
+				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_buffer, 0);
 			}
 			size_t Buffer::GetSize()
 			{
@@ -87,7 +87,7 @@ namespace thomas
 				desc.Format = DXGI_FORMAT_UNKNOWN;
 				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 				
-				utils::D3D::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+				utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
 			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()

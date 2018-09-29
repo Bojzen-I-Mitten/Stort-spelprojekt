@@ -48,7 +48,7 @@ namespace thomas
 		m_initialized = false;
 		if (m_windowHandler)
 		{
-			bool hr = utils::D3D::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
+			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 			if (hr)
 			{
 				m_created = true;
@@ -67,7 +67,7 @@ namespace thomas
 			m_showCursor = true; m_fullScreen = false;
 			m_windowHandler = hWnd;
 
-			if (utils::D3D::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain))
+			if (utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain))
 				m_created = true;
 		}
 		else
@@ -96,7 +96,7 @@ namespace thomas
 		if (window->m_created)
 		{
 			s_editorWindow = window;
-			ImGui_ImplDX11_Init(hWnd, utils::D3D::GetDevice(), utils::D3D::GetDeviceContext());
+			ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
 		}		
 	}
 
@@ -124,8 +124,8 @@ namespace thomas
 			m_height = newHeight;
 			m_width = newWidth;
 
-			utils::D3D::GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
-			utils::D3D::GetDeviceContext()->OMSetDepthStencilState(NULL, 1);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(NULL, 1);
 			SAFE_RELEASE(m_dxBuffers.backBuffer);
 			SAFE_RELEASE(m_dxBuffers.backBufferSRV);
 			SAFE_RELEASE(m_dxBuffers.depthStencilState);
@@ -272,8 +272,8 @@ namespace thomas
 	{
 		if (s_current != this)
 		{
-			utils::D3D::GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
-			utils::D3D::GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
 			s_current = this;
 		}
 	}
@@ -290,13 +290,13 @@ namespace thomas
 
 	bool Window::InitDxBuffers()
 	{
-		bool hr = utils::D3D::CreateBackBuffer(m_swapChain, m_dxBuffers.backBuffer, m_dxBuffers.backBufferSRV);
+		bool hr = utils::D3D::Instance()->CreateBackBuffer(m_swapChain, m_dxBuffers.backBuffer, m_dxBuffers.backBufferSRV);
 		if (hr)
 		{
-			hr = utils::D3D::CreateDepthStencilView(m_width, m_height, m_dxBuffers.depthStencilView, m_dxBuffers.depthStencilViewReadOnly, m_dxBuffers.depthBufferSRV);
+			hr = utils::D3D::Instance()->CreateDepthStencilView(m_width, m_height, m_dxBuffers.depthStencilView, m_dxBuffers.depthStencilViewReadOnly, m_dxBuffers.depthBufferSRV);
 			if (hr)
 			{
-				hr = m_dxBuffers.depthStencilState = utils::D3D::CreateDepthStencilState(D3D11_COMPARISON_LESS, true);
+				hr = m_dxBuffers.depthStencilState = utils::D3D::Instance()->CreateDepthStencilState(D3D11_COMPARISON_LESS, true);
 				if (hr)
 					return true;
 			}
@@ -313,8 +313,8 @@ namespace thomas
 	void Window::Clear()
 	{
 		float clearColor[] = { 0.34375f, 0.34375f, 0.34375f, 1.0f };
-		utils::D3D::GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.backBuffer, clearColor);
-		utils::D3D::GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView, D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.backBuffer, clearColor);
+		utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView, D3D11_CLEAR_DEPTH, 1, 0);
 	}
 
 	void Window::SetCursor(const bool & visible)

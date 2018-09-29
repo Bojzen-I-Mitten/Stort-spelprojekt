@@ -15,9 +15,7 @@ namespace thomas
 {
 	namespace utils
 	{
-		ID3D11Device* D3D::m_device;
-		ID3D11DeviceContext* D3D::m_deviceContext;
-		ID3D11Debug* D3D::m_debug;
+		D3D D3D::s_D3D;
 
 		bool D3D::CreateRenderTargetView(LONG width, LONG height, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv)
 		{
@@ -146,6 +144,11 @@ namespace thomas
 				return false;
 
 			return true;
+		}
+
+		D3D* D3D::Instance()
+		{
+			return &s_D3D;
 		}
 
 		bool D3D::Init()

@@ -12,7 +12,7 @@ namespace thomas
 		void ComputeShader::Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ)
 		{
 			//Bind();
-			utils::D3D::GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
+			utils::D3D::Instance()->GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
 		}
 		void ComputeShader::SetUAV(const std::string & name, ID3D11UnorderedAccessView& value)
 		{

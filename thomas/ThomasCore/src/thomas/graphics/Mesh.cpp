@@ -28,10 +28,10 @@ namespace thomas
 			if (m_data.indexBuffer)
 			{
 				shader->BindIndexBuffer(m_data.indexBuffer.get());
-				thomas::utils::D3D::GetDeviceContext()->DrawIndexed(GetIndexCount(), 0, 0);
+				thomas::utils::D3D::Instance()->GetDeviceContext()->DrawIndexed(GetIndexCount(), 0, 0);
 			}
 			else
-				thomas::utils::D3D::GetDeviceContext()->Draw(m_data.vertices.positions.size(), 0);
+				thomas::utils::D3D::Instance()->GetDeviceContext()->Draw(m_data.vertices.positions.size(), 0);
 		}
 
 		void Mesh::SetName(const std::string & name)

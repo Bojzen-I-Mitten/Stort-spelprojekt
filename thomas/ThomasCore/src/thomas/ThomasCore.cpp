@@ -25,11 +25,14 @@ namespace thomas
 
 	bool ThomasCore::Init()
 	{
+		s_initialized = false;
 		s_imGuiContext = ImGui::CreateContext();
 		s_logOutput.reserve(10);
 
 		//Init all required classes
-		InitDirectX();
+		if (!utils::D3D::Instance()->Init())
+			return false;
+
 		Input::Init();
 		resource::Texture2D::Init();
 		ThomasTime::Init();
@@ -87,9 +90,7 @@ namespace thomas
 		Physics::Destroy();
 		Sound::Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
-
-		//Release
-		utils::D3D::Destroy();
+		utils::D3D::Instance()->Destroy();
 
 		return true;
 	}
@@ -109,14 +110,6 @@ namespace thomas
 	void ThomasCore::ClearLogOutput()
 	{
 		s_clearLog = true;
-	}
-
-	bool ThomasCore::InitDirectX()
-	{
-		if (utils::D3D::Init())
-			return true;
-
-		return false;
 	}
 }
 

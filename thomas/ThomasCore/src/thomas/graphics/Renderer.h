@@ -39,11 +39,12 @@ namespace thomas
 		class Renderer 
 		{
 		private:
+			Renderer();
+
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 
 		public:
-			Renderer();
 			~Renderer() = default;
 
 			static Renderer* Instance();

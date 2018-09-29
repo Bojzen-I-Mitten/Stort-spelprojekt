@@ -52,7 +52,7 @@ namespace thomas
 				return;
 
 			window->Bind();
-			utils::D3D::GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 

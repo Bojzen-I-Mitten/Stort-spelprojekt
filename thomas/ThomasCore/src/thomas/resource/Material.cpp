@@ -361,7 +361,7 @@ namespace thomas
 			{
 				prop.second->Apply(m_shader);
 			}
-			utils::D3D::GetDeviceContext()->IASetPrimitiveTopology(m_topology);
+			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
 		void Material::Draw(graphics::Mesh* mesh)
@@ -385,7 +385,7 @@ namespace thomas
 				if (p.enabled)
 				{
 					m_shader->SetPass(p.index);
-					utils::D3D::GetDeviceContext()->Draw(vertexCount, startVertexLocation);
+					utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
 				}
 			}
 			Unlock();
