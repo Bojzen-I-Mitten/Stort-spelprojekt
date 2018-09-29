@@ -347,17 +347,16 @@ namespace ThomasEngine
 					}
 				}
 				catch (SerializationException^ e) {
-					String^ error = "Error creating resource from file: " + path + " \nError: Serialization failed " + e->Message;
+					String^ error = "Error creating " + type.ToString() + " resource from: " + path + " Error: Serialization failed " + e->Message;
 					obj = LoadErrorResource(type);
 					Debug::LogError(error);
 				}
 				catch (Exception^ e) {
 
-					String^ error = "Error creating resource from file: " + path + " \nError: " + e->Message;
+					String^ error = "Error creating " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
 
 					Debug::LogError(error);
 					obj = LoadErrorResource(type);
-					//Debug::Log("Failed to create resource from file. Filename: " + path + " \nError: " + e->Message);
 				}
 
 				if (obj != nullptr)
