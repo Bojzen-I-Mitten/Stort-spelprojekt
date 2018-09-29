@@ -10,8 +10,6 @@
 #include "..\resource\Model.h"
 #include "..\Common.h"
 #include "..\object\component\Camera.h"
-#include "..\System.h"
-
 
 namespace thomas
 {
@@ -237,7 +235,7 @@ namespace thomas
 								mesh.get(),
 								m_objectHighlighter.get(),
 								m_cameraComponent.get());
-							System::S_RENDERER.SubmitCommand(cmd);
+							graphics::Renderer::s_renderer.SubmitCommand(cmd);
 						}
 					}
 				}

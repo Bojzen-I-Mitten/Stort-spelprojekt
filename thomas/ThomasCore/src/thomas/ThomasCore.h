@@ -31,7 +31,6 @@ namespace thomas
 
 	private:
 		static bool InitDirectX();
-		static bool CreateDeviceAndContext();
 
 	private:
 		static bool s_initialized;
@@ -39,9 +38,6 @@ namespace thomas
 		static bool s_clearLog;
 
 	private:
-		static ID3D11Device* s_device;
-		static ID3D11DeviceContext* s_context;
-		static ID3D11Debug* s_debug;
 		static ImGuiContext* s_imGuiContext;
 	};
 }

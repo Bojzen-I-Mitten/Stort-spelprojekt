@@ -10,16 +10,14 @@
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
-#include <D3d11_4.h>
+#include "utils\d3d.h"
+#include <d3d11_4.h>
 #include <comdef.h>
 
 #include "object/component/LightComponent.h"
 
 namespace thomas 
 {
-	ID3D11Debug* ThomasCore::s_debug;
-	ID3D11Device* ThomasCore::s_device;
-	ID3D11DeviceContext* ThomasCore::s_context;
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
 	bool ThomasCore::s_initialized;
@@ -76,9 +74,6 @@ namespace thomas
 
 	bool ThomasCore::Destroy()
 	{	
-		s_context->ClearState();
-		s_context->Flush();
-
 		//Destroy all objects
 		Window::Destroy();
 		graphics::LightManager::Destroy();
@@ -94,27 +89,19 @@ namespace thomas
 		ImGui::DestroyContext(s_imGuiContext);
 
 		//Release
-		s_context->ClearState();
-		s_context->Flush();
-		SAFE_RELEASE(s_context);
-		SAFE_RELEASE(s_device);
-
-		#ifdef _DEBUG_DX
-			s_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-			SAFE_RELEASE(s_debug);
-		#endif
+		utils::D3D::Destroy();
 
 		return true;
 	}
 
 	ID3D11Device * ThomasCore::GetDevice()
 	{
-		return s_device;
+		return utils::D3D::GetDevice();
 	}
 
 	ID3D11DeviceContext* ThomasCore::GetDeviceContext()
 	{
-		return s_context;
+		return utils::D3D::GetDeviceContext();
 	}
 
 	std::vector<std::string> ThomasCore::GetLogOutput()
@@ -136,52 +123,7 @@ namespace thomas
 
 	bool ThomasCore::InitDirectX()
 	{
-		if (!s_device)
-		{
-			CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-			CreateDeviceAndContext();
-#ifdef _DEBUG_DX
-			assert(!ThomasCore::GetDevice()->QueryInterface(IID_PPV_ARGS(&s_debug)));
-#endif
-			return true;
-		}
-		return true;
-	}
-
-	bool ThomasCore::CreateDeviceAndContext()
-	{
-		HRESULT hr = D3D11CreateDevice(
-			NULL,
-			D3D_DRIVER_TYPE_HARDWARE,
-			NULL,
-#ifdef _DEBUG_DX
-			D3D11_CREATE_DEVICE_DEBUG,
-#else
-			NULL,
-#endif
-			NULL,
-			NULL,
-			D3D11_SDK_VERSION,
-			&s_device,
-			NULL,
-			&s_context
-		);
-
-		if (FAILED(hr))
-		{
-			LOG(hr);
-			return false;
-		}
-
-		ID3D11Multithread* multi;
-		hr = s_device->QueryInterface(IID_PPV_ARGS(&multi));
-		if (SUCCEEDED(hr) && multi != NULL)
-		{
-			multi->SetMultithreadProtected(TRUE);
-			SAFE_RELEASE(multi);
-		}
-		else
-			LOG_HR(hr);
+		utils::D3D::Init();
 		return true;
 	}
 }

@@ -18,6 +18,7 @@ namespace thomas
 {
 	namespace graphics
 	{
+		Renderer Renderer::s_renderer;
 
 		void Renderer::BindFrame()
 		{

@@ -48,7 +48,7 @@ namespace thomas
 		m_initialized = false;
 		if (m_windowHandler)
 		{
-			bool hr = utils::D3d::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain, ThomasCore::GetDevice());
+			bool hr = utils::D3D::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 			if (hr)
 			{
 				m_created = true;
@@ -67,7 +67,7 @@ namespace thomas
 			m_showCursor = true; m_fullScreen = false;
 			m_windowHandler = hWnd;
 
-			if (utils::D3d::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain, ThomasCore::GetDevice()))
+			if (utils::D3D::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain))
 				m_created = true;
 		}
 		else
@@ -290,13 +290,13 @@ namespace thomas
 
 	bool Window::InitDxBuffers()
 	{
-		bool hr = utils::D3d::CreateBackBuffer(ThomasCore::GetDevice(), m_swapChain, m_dxBuffers.backBuffer, m_dxBuffers.backBufferSRV);
+		bool hr = utils::D3D::CreateBackBuffer(m_swapChain, m_dxBuffers.backBuffer, m_dxBuffers.backBufferSRV);
 		if (hr)
 		{
-			hr = utils::D3d::CreateDepthStencilView(ThomasCore::GetDevice(), m_width, m_height, m_dxBuffers.depthStencilView, m_dxBuffers.depthStencilViewReadOnly, m_dxBuffers.depthBufferSRV);
+			hr = utils::D3D::CreateDepthStencilView(m_width, m_height, m_dxBuffers.depthStencilView, m_dxBuffers.depthStencilViewReadOnly, m_dxBuffers.depthBufferSRV);
 			if (hr)
 			{
-				hr = m_dxBuffers.depthStencilState = utils::D3d::CreateDepthStencilState(D3D11_COMPARISON_LESS, true);
+				hr = m_dxBuffers.depthStencilState = utils::D3D::CreateDepthStencilState(D3D11_COMPARISON_LESS, true);
 				if (hr)
 					return true;
 			}

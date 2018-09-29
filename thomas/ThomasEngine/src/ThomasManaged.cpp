@@ -9,7 +9,7 @@
 #include <thomas\editor\gizmos\Gizmos.h>
 #include <thomas\Physics.h>
 #include <thomas\editor\EditorCamera.h>
-#include <thomas\System.h>
+
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -58,7 +58,7 @@ namespace ThomasEngine {
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
 			Window::ClearAllWindows();
-			thomas::System::S_RENDERER.ProcessCommands();
+			thomas::graphics::Renderer::s_renderer.ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
 		}
@@ -67,7 +67,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		thomas::Window::EndFrame(true);
-		thomas::System::S_RENDERER.TransferCommandList();
+		thomas::graphics::Renderer::s_renderer.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
 		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
@@ -129,8 +129,7 @@ namespace ThomasEngine {
 			}
 
 			//Rendering
-
-			thomas::System::S_RENDERER.ClearCommands();
+			thomas::graphics::Renderer::s_renderer.ClearCommands();
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{

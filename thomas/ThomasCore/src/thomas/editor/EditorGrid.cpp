@@ -6,7 +6,6 @@
 #include "../object/component/Camera.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/render/Frame.h"
-#include "../System.h"
 namespace thomas
 {
 	namespace editor
@@ -81,7 +80,7 @@ namespace thomas
 				m_material->SetInt("gridScale", scale);
 
 				graphics::render::RenderCommand cmd(worldMatrix, m_mesh.get(), m_material, camera);
-				System::S_RENDERER.SubmitCommand(cmd);
+				graphics::Renderer::s_renderer.SubmitCommand(cmd);
 			}
 
 		}

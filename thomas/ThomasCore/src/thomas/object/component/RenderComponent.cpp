@@ -6,7 +6,6 @@
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/ShaderProperty/ShaderProperty.h"
-#include "../../System.h"
 #include "../../graphics/render/Frame.h"
 
 namespace thomas {
@@ -144,7 +143,7 @@ namespace thomas {
 					m_properties.size(), 
 					m_properties.data());
 
-				System::S_RENDERER.SubmitCommand(cmd);
+				graphics::Renderer::s_renderer.s_renderer.SubmitCommand(cmd);
 			}
 
 			void RenderComponent::insertProperty(const resource::shaderproperty::ShaderProperty * prop)
