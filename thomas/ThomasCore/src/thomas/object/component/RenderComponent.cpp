@@ -143,7 +143,7 @@ namespace thomas {
 					m_properties.size(), 
 					m_properties.data());
 
-				graphics::Renderer::s_renderer.s_renderer.SubmitCommand(cmd);
+				graphics::Renderer::Instance()->SubmitCommand(cmd);
 			}
 
 			void RenderComponent::insertProperty(const resource::shaderproperty::ShaderProperty * prop)

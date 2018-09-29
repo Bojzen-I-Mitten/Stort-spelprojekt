@@ -58,7 +58,7 @@ namespace ThomasEngine {
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
 			Window::ClearAllWindows();
-			thomas::graphics::Renderer::s_renderer.ProcessCommands();
+			thomas::graphics::Renderer::Instance()->ProcessCommands();
 			thomas::Window::PresentAllWindows();
 			RenderFinished->Set();
 		}
@@ -67,7 +67,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		thomas::Window::EndFrame(true);
-		thomas::graphics::Renderer::s_renderer.TransferCommandList();
+		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
 		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
@@ -129,7 +129,7 @@ namespace ThomasEngine {
 			}
 
 			//Rendering
-			thomas::graphics::Renderer::s_renderer.ClearCommands();
+			thomas::graphics::Renderer::Instance()->ClearCommands();
 			editor::Gizmos::ClearGizmos();
 			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
 			{

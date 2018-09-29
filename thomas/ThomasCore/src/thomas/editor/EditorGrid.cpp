@@ -80,7 +80,7 @@ namespace thomas
 				m_material->SetInt("gridScale", scale);
 
 				graphics::render::RenderCommand cmd(worldMatrix, m_mesh.get(), m_material, camera);
-				graphics::Renderer::s_renderer.SubmitCommand(cmd);
+				graphics::Renderer::Instance()->SubmitCommand(cmd);
 			}
 
 		}

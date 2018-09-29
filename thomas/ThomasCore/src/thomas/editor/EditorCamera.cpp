@@ -235,7 +235,7 @@ namespace thomas
 								mesh.get(),
 								m_objectHighlighter.get(),
 								m_cameraComponent.get());
-							graphics::Renderer::s_renderer.SubmitCommand(cmd);
+							graphics::Renderer::Instance()->SubmitCommand(cmd);
 						}
 					}
 				}

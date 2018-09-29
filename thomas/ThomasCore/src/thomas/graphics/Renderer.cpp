@@ -36,6 +36,11 @@ namespace thomas
 		{
 		}
 
+		Renderer* Renderer::Instance()
+		{
+			return &s_renderer;
+		}
+
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
 		{
 			object::component::Camera::CAMERA_FRAME_DATA& frameData = camera->GetFrameData();

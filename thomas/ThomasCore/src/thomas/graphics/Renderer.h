@@ -39,20 +39,21 @@ namespace thomas
 		class Renderer 
 		{
 		private:
-			static LightManager s_lightManager;
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 
 		public:
 			Renderer();
+			~Renderer() = default;
 
+			static Renderer* Instance();
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
 			void ClearCommands();
 			void SubmitCommand(render::RenderCommand& command);
 			void TransferCommandList();
 
-		public:
+		private:
 			static Renderer s_renderer;
 
 		private:
