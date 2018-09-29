@@ -1,5 +1,4 @@
 #pragma once
-
 #include <d3dx11effect.h>
 #include <vector>
 #include <map>
@@ -7,6 +6,7 @@
 #include "Resource.h"
 #include "../utils/Buffers.h"
 #include <memory>
+
 namespace thomas
 {
 	namespace resource

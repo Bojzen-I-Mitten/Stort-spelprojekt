@@ -94,16 +94,6 @@ namespace thomas
 		return true;
 	}
 
-	ID3D11Device * ThomasCore::GetDevice()
-	{
-		return utils::D3D::GetDevice();
-	}
-
-	ID3D11DeviceContext* ThomasCore::GetDeviceContext()
-	{
-		return utils::D3D::GetDeviceContext();
-	}
-
 	std::vector<std::string> ThomasCore::GetLogOutput()
 	{
 		return s_logOutput;
@@ -123,8 +113,10 @@ namespace thomas
 
 	bool ThomasCore::InitDirectX()
 	{
-		utils::D3D::Init();
-		return true;
+		if (utils::D3D::Init())
+			return true;
+
+		return false;
 	}
 }
 

@@ -96,7 +96,7 @@ namespace thomas
 		if (window->m_created)
 		{
 			s_editorWindow = window;
-			ImGui_ImplDX11_Init(hWnd, ThomasCore::GetDevice(), ThomasCore::GetDeviceContext());
+			ImGui_ImplDX11_Init(hWnd, utils::D3D::GetDevice(), utils::D3D::GetDeviceContext());
 		}		
 	}
 
@@ -124,8 +124,8 @@ namespace thomas
 			m_height = newHeight;
 			m_width = newWidth;
 
-			ThomasCore::GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
-			ThomasCore::GetDeviceContext()->OMSetDepthStencilState(NULL, 1);
+			utils::D3D::GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
+			utils::D3D::GetDeviceContext()->OMSetDepthStencilState(NULL, 1);
 			SAFE_RELEASE(m_dxBuffers.backBuffer);
 			SAFE_RELEASE(m_dxBuffers.backBufferSRV);
 			SAFE_RELEASE(m_dxBuffers.depthStencilState);
@@ -272,8 +272,8 @@ namespace thomas
 	{
 		if (s_current != this)
 		{
-			ThomasCore::GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
-			ThomasCore::GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
+			utils::D3D::GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
+			utils::D3D::GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
 			s_current = this;
 		}
 	}
@@ -313,8 +313,8 @@ namespace thomas
 	void Window::Clear()
 	{
 		float clearColor[] = { 0.34375f, 0.34375f, 0.34375f, 1.0f };
-		ThomasCore::GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.backBuffer, clearColor);
-		ThomasCore::GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView, D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.backBuffer, clearColor);
+		utils::D3D::GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView, D3D11_CLEAR_DEPTH, 1, 0);
 	}
 
 	void Window::SetCursor(const bool & visible)
