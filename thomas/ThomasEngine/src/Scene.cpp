@@ -73,7 +73,7 @@ namespace ThomasEngine
 			}
 		}
 		catch (Exception^ e) {
-			Debug::Log("Failed to save scene: Error: " + e->Message);
+			Debug::LogError("Failed to save scene. Error: " + e->Message);
 		}
 
 			
@@ -89,7 +89,7 @@ namespace ThomasEngine
 	{
 		if (!IO::File::Exists(fullPath))
 		{
-			Debug::Log("Unable to find scene: " + fullPath);
+			Debug::LogError("Unable to find scene: " + fullPath);
 			return nullptr;
 		}
 		Scene^ scene;
@@ -115,10 +115,7 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
-			Debug::Log("Loading scene: ");
-			Debug::Log(fullPath);
-			Debug::Log("with error:");
-			Debug::Log(e->Message);
+			Debug::LogError("Failed loading scene: " + fullPath + "\nError: " + e->Message);
 			scene = nullptr;
 		}
 		finally{

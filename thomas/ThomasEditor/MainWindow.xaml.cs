@@ -102,7 +102,7 @@ namespace ThomasEditor
                 }
             }catch(Exception e)
             {
-                Debug.Log("Failed to save layout.dock. Error: " + e.Message);
+                Debug.LogError("Failed to save layout.dock. Error: " + e.Message);
             }
 
 
@@ -145,7 +145,7 @@ namespace ThomasEditor
                 }
             }catch(Exception e)
             {
-                Debug.Log("Failed to load editor layout. Error: " + e.Message);
+                Debug.LogError("Failed to load editor layout. Error: " + e.Message);
             }
 
             this.Top = Properties.Settings.Default.Top;
@@ -313,7 +313,7 @@ namespace ThomasEditor
                 {
                     Scene.CurrentScene.UnLoad();
                     Scene.CurrentScene = null;
-                    Debug.Log("Scene failed to load...");
+                    Debug.LogError("Scene failed to load...");
                 }
             };
             worker.RunWorkerCompleted += (o, ea) =>
