@@ -2,7 +2,16 @@
 
 #include <ThomasCG.hlsl>
 #include <ThomasLights.hlsl>
-Texture2D ambientTex;
+
+Texture2D diffuseTex;
+Texture2D normalTex : NORMALTEXTURE;
+Texture2D specularTex;
+
+cbuffer MATERIAL_PROPERTIES
+{
+    float4 color : COLOR;
+    float smoothness : MATERIALSMOOTHNESSFACTOR;
+};
 
 
 SamplerState StandardWrapSampler
@@ -11,13 +20,6 @@ SamplerState StandardWrapSampler
     AddressU = Wrap;
     AddressV = Wrap;
 };
-
-cbuffer MATERIAL_PROPERTIES
-{
-    
-    float4 wow : COLOR;
-};
-
 
 DepthStencilState EnableDepth
 {
@@ -33,7 +35,6 @@ RasterizerState TestRasterizer
     FrontCounterClockWise = TRUE;
     DepthClipEnable = FALSE;
 };
-
 
 BlendState AlphaBlendingOn
 {
@@ -52,7 +53,7 @@ struct v2f
 {
     float4 vertex : SV_POSITION;
     float4 worldPos : POSITIONWS;
-    float3 normal : NORMAL;
+    float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
 };
 
@@ -61,21 +62,37 @@ v2f vert(appdata_thomas v)
     v2f o;
 
     float3 posL = v.vertex;
-    float3 normalL = v.normal;
 
     o.vertex = ThomasObjectToClipPos(posL);
     o.worldPos = ThomasObjectToWorldPos(posL);
-    o.normal = ThomasWorldToObjectDir(normalL);
+    
+    
+    float3 tangent = ThomasObjectToWorldDir(v.tangent);
+    float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
+    float3 normal = ThomasObjectToWorldDir(v.normal);
+
+    o.TBN = float3x3(tangent, bitangent, normal);
+    
     o.texcoord = v.texcoord;
     return o;
 }
 
-
 float4 frag(v2f input) : SV_TARGET
 {
-    return saturate(wow / 255.0f + float4(AddLights(input.worldPos.xyz, input.normal), 1.0f));
-}
+    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
+    diffuse *= (color.xyz / 255.0f);
+    float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
+    
+    normal.xy = normal.xy * 2.0f - 1.0f;
+    normal = normalize(normal);
+    normal = normalize(mul(normal, input.TBN));
 
+    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light
+    diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
+
+    return saturate(float4(diffuse, 1.0f));
+}
 
 technique11 Standard
 {

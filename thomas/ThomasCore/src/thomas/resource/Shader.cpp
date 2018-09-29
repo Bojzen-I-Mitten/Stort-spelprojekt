@@ -36,7 +36,7 @@ namespace thomas
 				return;
 			}
 
-			for (int i = 0; i < effectDesc.GlobalVariables; i++)
+			for (uint32_t i = 0; i < effectDesc.GlobalVariables; i++)
 			{
 				ID3DX11EffectVariable* variable = m_effect->GetVariableByIndex(i);
 				if (variable->IsValid())
@@ -52,7 +52,7 @@ namespace thomas
 			if (tech->IsValid())
 			{
 				tech->GetDesc(&techniqueDesc);
-				for (int j = 0; j < techniqueDesc.Passes; j++)
+				for (uint32_t j = 0; j < techniqueDesc.Passes; j++)
 				{
 					ShaderPass pass;
 					D3DX11_PASS_SHADER_DESC vsPassDesc;
@@ -73,7 +73,7 @@ namespace thomas
 
 						std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
 						std::vector<Semantics> inputSemantics;
-						for (int iInput = 0; iInput < vsDesc.NumInputSignatureEntries; iInput++)
+						for (uint32_t iInput = 0; iInput < vsDesc.NumInputSignatureEntries; iInput++)
 						{
 							D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 							vs->GetInputSignatureElementDesc(vsPassDesc.ShaderIndex, iInput, &paramDesc);
@@ -577,7 +577,14 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 					break;
 				case D3D_SVT_FLOAT:
-					newProperty = shaderproperty::ShaderPropertyScalarFloat::GetDefault();
+					if (semantic == "MATERIALSMOOTHNESSFACTOR")
+					{
+						newProperty = new shaderproperty::ShaderPropertyScalarFloat(16);
+					}
+					else
+					{
+						newProperty = shaderproperty::ShaderPropertyScalarFloat::GetDefault();
+					}
 					break;
 				default:
 					break;
@@ -611,7 +618,14 @@ namespace thomas
 				//case D3D_SVT_TEXTURE3D:
 				//case D3D_SVT_TEXTURECUBE:
 					isMaterialProperty = true;
-					newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+					if (semantic == "NORMALTEXTURE")
+					{
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
+					}
+					else
+					{
+						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
 				case D3D_SVT_RWSTRUCTURED_BUFFER:

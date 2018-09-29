@@ -204,7 +204,7 @@ namespace ThomasEngine {
 	{
 		Window::UpdateFocus();
 		Debug::UpdateCoreLog();
-		if (thomas::editor::EditorCamera::HasSelectionChanged())
+		if (thomas::editor::EditorCamera::GetEditorCamera()->HasSelectionChanged())
 			s_Selection->UpdateSelectedObjects();
 	}
 
@@ -246,7 +246,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)
 	{
-		thomas::editor::EditorCamera::SetManipulatorOperation((ImGuizmo::OPERATION)op);
+		thomas::editor::EditorCamera::GetEditorCamera()->SetManipulatorOperation((ImGuizmo::OPERATION)op);
 	}
 
 	ThomasWrapper::ManipulatorOperation ThomasWrapper::GetEditorGizmoManipulatorOperation()
@@ -256,7 +256,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::ToggleEditorGizmoManipulatorMode()
 	{
-		thomas::editor::EditorCamera::ToggleManipulatorMode();
+		thomas::editor::EditorCamera::GetEditorCamera()->ToggleManipulatorMode();
 	}
 
 	

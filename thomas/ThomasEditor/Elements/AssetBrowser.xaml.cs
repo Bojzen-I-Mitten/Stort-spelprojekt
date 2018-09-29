@@ -509,16 +509,6 @@ namespace ThomasEditor
             File.WriteAllText(uniquePath, text);
         }
 
-        private void Menu_CreateShader(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Menu_CreateScene(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void Menu_CreatePrefab(object sender, RoutedEventArgs e)
         {
             GameObject prefab = GameObject.CreatePrefab();
@@ -530,16 +520,6 @@ namespace ThomasEditor
             Material newMat = new Material(Shader.Find("StandardShader"));
             ThomasEngine.Resources.CreateResource(newMat, "New Material.mat");
             renameNextAddedItem = true;
-        }
-
-        private void Menu_CreateCurve(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Menu_ShowInExplorer(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void Menu_OpenAsset(object sender, RoutedEventArgs e)
@@ -573,26 +553,6 @@ namespace ThomasEditor
         {
             StartRename();
             e.Handled = true;
-        }
-
-        private void Menu_ImportAsset(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Menu_Refresh(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Menu_Reimport(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Menu_ReimportAll(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void Menu_OpenCSharpProject(object sender, RoutedEventArgs e)
