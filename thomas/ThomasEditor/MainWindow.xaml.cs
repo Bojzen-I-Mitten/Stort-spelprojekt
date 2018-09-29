@@ -173,7 +173,6 @@ namespace ThomasEditor
             if(this.lastRender != args.RenderingTime)
             {
                 ThomasWrapper.Update();
-                editorWindow.Title = ThomasWrapper.FrameRate.ToString();
                 lastRender = args.RenderingTime;
                 transformGizmo.UpdateTransformGizmo();
              }

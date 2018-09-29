@@ -173,28 +173,21 @@ namespace ThomasEngine
 				serializserSettings->DataContractSurrogate = gcnew SceneSurrogate(resource->GetType());
 				serializserSettings->KnownTypes = Material::GetKnownTypes();
 
-				try {
-					// XML Settings
-					Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-					settings->Indent = true;
-					// Create file
-					System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
-					fi->Directory->Create();
-					Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
-					// Write file
-					DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-					serializer->WriteObject(file, resource);
-					// Close file stream
-					file->Close();
-				}
-				catch (Exception^ e) {
-					err = "Storing resource failed creating file: " + resource->m_path + ". With message:\n" + e->Message;
-					Debug::LogError(err);
-					return false;
-				}
+				// XML Settings
+				Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+				settings->Indent = true;
+				// Create file
+				System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
+				fi->Directory->Create();
+				Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
+				// Write file
+				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+				serializer->WriteObject(file, resource);
+				// Close file stream
+				file->Close();
 			}
 			catch (Exception^ e) {
-				err = "Storing resource failed serializer contract, at path: " + resource->m_path + ". With message:\n" + e->Message;
+				err = "Failed to save " + resource->GetType()->Name + " resource at path: " + resource->m_path + ". Error: " + e->Message;
 				Debug::LogError(err);
 				return false;
 			}
@@ -347,13 +340,13 @@ namespace ThomasEngine
 					}
 				}
 				catch (SerializationException^ e) {
-					String^ error = "Error creating " + type.ToString() + " resource from: " + path + " Error: Serialization failed " + e->Message;
+					String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: Serialization failed " + e->Message;
 					obj = LoadErrorResource(type);
 					Debug::LogError(error);
 				}
 				catch (Exception^ e) {
 
-					String^ error = "Error creating " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
+					String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
 
 					Debug::LogError(error);
 					obj = LoadErrorResource(type);
