@@ -4,6 +4,7 @@
 
 #include <thomas\ThomasCore.h>
 #include <thomas\Window.h>
+#include <thomas\EditorWindow.h>
 #include <thomas\ThomasTime.h>
 #include <thomas\graphics\Renderer.h>
 #include <thomas\editor\gizmos\Gizmos.h>
@@ -66,7 +67,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::CopyCommandList()
 	{
-		thomas::Window::EndFrame(true);
+		thomas::EditorWindow::EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
@@ -131,7 +132,7 @@ namespace ThomasEngine {
 			//Rendering
 			thomas::graphics::Renderer::Instance()->ClearCommands();
 			editor::Gizmos::ClearGizmos();
-			if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
+			if (EditorWindow::GetWindow() && EditorWindow::GetWindow()->Initialized())
 			{
 				if (renderingEditor)
 				{
@@ -177,7 +178,7 @@ namespace ThomasEngine {
 	{
 		if (thomas::ThomasCore::Initialized()) {
 			if (isEditor)
-				thomas::Window::InitEditor((HWND)hWnd.ToPointer());
+				thomas::EditorWindow::Create((HWND)hWnd.ToPointer());
 			else
 				thomas::Window::Create((HWND)hWnd.ToPointer());
 

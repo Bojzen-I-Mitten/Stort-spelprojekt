@@ -10,7 +10,6 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 namespace thomas 
 {
 	std::vector<Window*> Window::s_windows;
-	Window* Window::s_editorWindow = nullptr;
 	Window* Window::s_current = nullptr;
 	Window* Window::s_focused = nullptr;
 
@@ -84,21 +83,8 @@ namespace thomas
 		SAFE_RELEASE(m_dxBuffers.depthBufferSRV);
 		SAFE_RELEASE(m_swapChain);
 
-		if (s_editorWindow = this)
-			ImGui_ImplDX11_Shutdown();
-
 		DestroyWindow(m_windowHandler);
-	}
-
-	void Window::InitEditor(HWND hWnd)
-	{
-		Window* window = new Window(hWnd);
-		if (window->m_created)
-		{
-			s_editorWindow = window;
-			ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
-		}		
-	}
+	}	
 
 	Window* Window::Create(HWND hWnd)
 	{
@@ -143,9 +129,18 @@ namespace thomas
 	}
 
 
-	bool Window::UpdateWindow()
+	void Window::UpdateWindow()
 	{
-		return false;
+		if (!m_initialized)
+		{
+			InitDxBuffers();
+			m_initialized = true;
+		}
+		if (m_shouldResize)
+		{
+			Resize();
+			m_shouldResize = false;
+		}
 	}
 
 	bool Window::Initialized()
@@ -155,9 +150,6 @@ namespace thomas
 
 	void Window::Destroy()
 	{
-		if (s_editorWindow)
-			delete s_editorWindow;
-
 		for (Window* window : s_windows)
 			delete window;
 
@@ -166,9 +158,6 @@ namespace thomas
 
 	void Window::ClearAllWindows()
 	{
-		if (s_editorWindow && s_editorWindow->Initialized())
-			s_editorWindow->Clear();
-
 		for (Window* window : s_windows)
 			if (window->Initialized())
 				window->Clear();
@@ -176,14 +165,6 @@ namespace thomas
 
 	void Window::PresentAllWindows()
 	{
-		if (s_editorWindow && s_editorWindow->Initialized())
-		{
-			s_editorWindow->Bind();
-			if (ImGui_ImplDx11_Valid() && s_editorWindow->m_guiData)
-				ImGui_ImplDX11_RenderDrawData(s_editorWindow->m_guiData);
-			s_editorWindow->Present();
-		}
-
 		for (Window* window : s_windows)
 			if (window->Initialized())
 				window->Present();
@@ -198,9 +179,6 @@ namespace thomas
 
 	bool Window::WaitingForUpdate()
 	{
-		if (s_editorWindow && s_editorWindow->m_shouldResize)
-			return true;
-
 		for (Window* window : s_windows)
 			if (window->m_shouldResize)
 				return true;
@@ -210,38 +188,8 @@ namespace thomas
 
 	void Window::Update()
 	{
-		if (s_editorWindow)
-		{
-			if (!s_editorWindow->m_initialized)
-			{
-				s_editorWindow->InitDxBuffers();
-				s_editorWindow->m_initialized = true;
-			}
-			if (s_editorWindow->m_shouldResize)
-			{
-				ImGui_ImplDX11_InvalidateDeviceObjects();
-				s_editorWindow->m_initialized = false;
-				s_editorWindow->Resize();
-				s_editorWindow->m_initialized = true; //Hmm...?
-				s_editorWindow->m_shouldResize = false;
-				ImGui_ImplDX11_CreateDeviceObjects();
-			}
-			BeginFrame();
-		}
-
 		for (Window* window : s_windows)
-		{
-			if (!window->m_initialized)
-			{
-				window->InitDxBuffers();
-				window->m_initialized = true;
-			}
-			if (window->m_shouldResize)
-			{
-				window->Resize();
-				window->m_shouldResize = false;
-			}
-		}
+			window->UpdateWindow();
 	}
 
 	void Window::UpdateFocus()
@@ -331,7 +279,7 @@ namespace thomas
 		if (height > 0 && height <= GetVerticalResolution())
 		{
 			m_height = height;
-			return UpdateWindow();
+			return true;
 		}
 
 		return false;
@@ -342,7 +290,7 @@ namespace thomas
 		if (width > 0 && width <= GetHorizontalResolution())
 		{
 			m_width = width;
-			return UpdateWindow();
+			return true;
 		}
 
 		return false;
@@ -356,16 +304,9 @@ namespace thomas
 		return false;
 	}
 
-	Window * Window::GetEditorWindow()
-	{
-		return s_editorWindow;
-	}
-
 	Window * Window::GetWindow(int index)
 	{
-		if (index == -1 && s_editorWindow)
-			return s_editorWindow;
-		else if (index < s_windows.size())
+		if (index < s_windows.size())
 			return s_windows[index];
 
 		return nullptr;
@@ -373,10 +314,6 @@ namespace thomas
 
 	Window * Window::GetWindow(HWND hWnd)
 	{
-		//Maybe define editor or something?
-		if (s_editorWindow && s_editorWindow->GetWindowHandler() == hWnd)
-			return s_editorWindow;
-
 		for (auto window : s_windows)
 			if (window->GetWindowHandler() == hWnd)
 				return window;
@@ -440,57 +377,6 @@ namespace thomas
 		return s_current;
 	}	
 
-	//Imgui related functionality for Gizmos
-	void Window::CloneGUIData()
-	{
-		ImDrawData* data = ImGui::GetDrawData();
-		ImDrawData* dst = new ImDrawData();
-		dst->Valid = data->Valid;
-		dst->CmdListsCount = data->CmdListsCount;
-		dst->TotalIdxCount = data->TotalIdxCount;
-		dst->TotalVtxCount = data->TotalVtxCount;
-
-		dst->CmdLists = (ImDrawList**)malloc(data->CmdListsCount * sizeof(ImDrawList*));
-		for (int i = 0; i < data->CmdListsCount; ++i)
-			dst->CmdLists[i] = data->CmdLists[i]->CloneOutput();
-
-		m_guiData = dst;
-	}
-
-	void Window::DeleteGUIData()
-	{
-		if (m_guiData)
-		{
-			for (int i = 0; i < m_guiData->CmdListsCount; ++i)
-				delete m_guiData->CmdLists[i];
-
-			m_guiData->Clear();
-			delete m_guiData;
-			m_guiData = nullptr;
-		}
-	}
-
-	void Window::BeginFrame()
-	{
-		ImGui_ImplDX11_NewFrame();
-		ImGuizmo::BeginFrame();
-	}
-
-	void Window::EndFrame(bool copyGui)
-	{
-		if (s_editorWindow)
-		{
-			if (copyGui)
-			{
-				ImGui::Render();
-				s_editorWindow->DeleteGUIData();
-				s_editorWindow->CloneGUIData();
-			}
-			else
-				ImGui::EndFrame();	
-		}
-	}
-
 	//Windows window events function
 	LRESULT CALLBACK Window::EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
@@ -498,7 +384,6 @@ namespace thomas
 			return true;
 
 		Window* window = GetWindow(hWnd);
-		bool isEditor = s_editorWindow == window;
 
 		//If one case is hit the code will execute everything down until a break;
 		switch (message)

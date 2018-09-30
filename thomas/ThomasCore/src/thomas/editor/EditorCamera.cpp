@@ -3,6 +3,7 @@
 #include "..\Input.h"
 #include "..\ThomasTime.h"
 #include "..\Window.h"
+#include "..\EditorWindow.h"
 #include "..\resource\Shader.h"
 #include "..\resource\Material.h"
 #include "..\graphics\Renderer.h"
@@ -173,7 +174,7 @@ namespace thomas
 			HWND focus = GetForegroundWindow();
 
 			// Make sure we are dealing with the editor window
-			thomas::Window *window = Window::GetEditorWindow();
+			thomas::EditorWindow *window = EditorWindow::GetWindow();
 			if (!window || !window->IsFocused())
 				return;
 			

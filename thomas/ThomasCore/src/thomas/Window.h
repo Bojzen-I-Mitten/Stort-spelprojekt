@@ -6,13 +6,12 @@
 #include <Windows.h>
 #include <vector>
 #include <d3d11.h>
-#include <imgui\imgui.h>
 
 namespace thomas 
 {
 	class Window
 	{
-	public:
+	protected:
 		struct DXBuffers
 		{
 			ID3D11RenderTargetView* backBuffer = nullptr;
@@ -24,10 +23,10 @@ namespace thomas
 		}m_dxBuffers;
 
 	public:
-		~Window();
+		virtual ~Window();
 		void QueueResize();
 		void Bind();
-		void Present();
+		virtual void Present();
 		void Clear();
 		bool IsFocused();
 		bool Initialized();
@@ -37,8 +36,6 @@ namespace thomas
 		static void Destroy();
 		static void ClearAllWindows();
 		static void PresentAllWindows();
-		static void BeginFrame();
-		static void EndFrame(bool copyGui);
 		static void Update();
 		static void UpdateFocus();
 		bool IntersectBounds(int x, int y) const;
@@ -52,11 +49,9 @@ namespace thomas
 	public:
 		static bool WaitingForUpdate();
 		static LRESULT CALLBACK EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-		static void InitEditor(HWND hWnd);
 		static Window* Create(HWND hWnd);
 
 	public:
-		static Window* GetEditorWindow();
 		static Window* GetWindow(int index);
 		static Window* GetWindow(HWND hWnd);
 		static Window* GetCurrentBound();
@@ -72,18 +67,16 @@ namespace thomas
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
 
-	private:
+	protected:
 		Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title);
-		Window(HWND hWnd);
+	 	Window(HWND hWnd);
 
-	private:
-		void CloneGUIData();
-		void DeleteGUIData();
-		bool UpdateWindow();
+	protected:
+		virtual void UpdateWindow();
 		bool InitDxBuffers();
 		bool Resize();
 
-	private:
+	protected:
 		LONG m_width;
 		LONG m_height;
 		bool m_showCursor;
@@ -95,16 +88,14 @@ namespace thomas
 		float m_aspectRatio;
 		std::string m_title;
 
-	private:
+	protected:
 		WNDCLASSEX m_windowClassInfo;
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
 		IDXGISwapChain* m_swapChain;
-		ImDrawData* m_guiData = nullptr;
 
-	private:
+	protected:
 		static std::vector<Window*> s_windows;
-		static Window* s_editorWindow;
 		static Window* s_current;
 		static Window* s_focused;					// Window currently in focus
 	};
