@@ -55,7 +55,7 @@
                 </DockPanel>
             </ToggleButton>
         </Grid>
-        <ListBox Grid.Row="1" Name="messages" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged" SelectionChanged="messages_SelectionChanged">
+        <ListBox Grid.Row="1" Name="messages" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="messages_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel Height="30" HorizontalAlignment="Stretch">

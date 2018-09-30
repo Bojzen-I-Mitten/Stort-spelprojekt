@@ -57,8 +57,19 @@ namespace ThomasEditor
             LoadLayout();
             Closing += MainWindow_Closing;
 
+            ThomasWrapper.OnStopPlaying += ThomasWrapper_OnStopPlaying;
+
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+        }
+
+        private void ThomasWrapper_OnStopPlaying()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                playPauseButton.DataContext = ThomasWrapper.IsPlaying();
+            }));
+            
         }
 
         private DispatcherTimer timer;

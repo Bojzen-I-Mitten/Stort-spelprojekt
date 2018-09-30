@@ -16,22 +16,30 @@ namespace ThomasEngine {
 		property int Count;
 		MessageSeverity Severity;
 		property array<String^>^ StackTrace;
-		DebugMessage(String^ msg, MessageSeverity severity) {
+		DebugMessage(String^ msg, MessageSeverity severity, String^ stack)
+		{
 			this->Count = 1;
 			this->Message = msg;
 			this->Severity = severity;
-			if (this->Severity == MessageSeverity::ThomasCore)
+			if (severity == MessageSeverity::ThomasCore)
 				this->StackTrace = gcnew array<String^>{"ThomasCore"};
 			else
-				this->StackTrace = GetStack(6);
+				this->StackTrace = stack == "" ? GetStack(6, stack) : GetStack(0, stack);
 		}
 
 	private:
-		array<String^>^ GetStack(int removeLines)
+		array<String^>^ GetStack(int removeLines, String^ stackString)
 		{
-			array<String^>^ stack = Environment::StackTrace->Split(
+			array<String^>^ stack;
+			
+			if(stackString == "")
+				stack = Environment::StackTrace->Split(
 				gcnew array<String^>{ Environment::NewLine },
 				StringSplitOptions::RemoveEmptyEntries);
+			else
+				stack = stackString->Split(
+					gcnew array<String^>{ Environment::NewLine },
+					StringSplitOptions::RemoveEmptyEntries);
 
 			if (stack->Length <= removeLines)
 				return gcnew array<String^>(0);
@@ -58,7 +66,7 @@ namespace ThomasEngine {
 	private:
 		static void Log(String^ message, MessageSeverity severity)
 		{
-			DebugMessage^ newMessage = gcnew DebugMessage(message, severity);
+			DebugMessage^ newMessage = gcnew DebugMessage(message, severity, "");
 			OnDebugMessage(newMessage);
 		}
 		static void LogCore(String^ message)
@@ -80,7 +88,9 @@ namespace ThomasEngine {
 			Log(message->ToString(), MessageSeverity::Error);
 		}
 		static void LogException(Exception^ exception) {
-			Log(exception->Message, MessageSeverity::Error);
+			
+			DebugMessage^ newMessage = gcnew DebugMessage(exception->Message, MessageSeverity::Error, exception->StackTrace);
+			OnDebugMessage(newMessage);
 		}
 
 		

@@ -111,34 +111,7 @@ namespace ThomasEditor
         }
 
         
-        private void Console_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-
-            ScrollViewer scrollViewer = Extensions.GetDescendantByType<ScrollViewer>(sender as ListBox);
-
-            if (e.ExtentWidthChange != 0 || e.ExtentHeightChange != 0)
-            {
-                //calculate and set accordingly
-                double offset = scrollRatio * e.ExtentHeight - 0.5 * e.ViewportHeight;
-                //see if it is negative because of initial values
-                if (offset < 0)
-                {
-                    //center the content
-                    //this can be set to 0 if center by default is not needed
-                    offset = 0.5 * scrollViewer.ScrollableHeight;
-                }
-                scrollViewer.ScrollToVerticalOffset(offset);
-            }
-            else
-            {
-                //store the relative values if normal scroll
-                if (e.ExtentHeight > 0)
-                    scrollRatio = (e.VerticalOffset + 0.5 * e.ViewportHeight) / e.ExtentHeight;
-            }
-
-
-        }
-
+       
         private void messages_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedMessage.DataContext = (DebugMessage)messages.SelectedItem;
