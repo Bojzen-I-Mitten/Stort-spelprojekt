@@ -342,8 +342,8 @@ namespace thomas
 				utils::D3d::CreateBufferAndUAV(NULL, bytewidth, structurebytestride, m_d3dData.particleBuffer2, m_d3dData.particleUAV2, m_d3dData.particleSRV2);
 
 
-				bytewidth = sizeof(BillboardStruct) * m_maxNrOfParticles;
-				structurebytestride = sizeof(BillboardStruct);
+//				bytewidth = sizeof(BillboardStruct) * m_maxNrOfParticles;
+//				structurebytestride = sizeof(BillboardStruct);
 				thomas::utils::D3d::CreateBufferAndUAV(NULL, bytewidth, structurebytestride, m_d3dData.billboardBuffer, m_d3dData.billboardsUAV, m_d3dData.billboardsSRV);
 
 			}

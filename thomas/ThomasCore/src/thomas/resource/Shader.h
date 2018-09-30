@@ -91,6 +91,11 @@ namespace thomas
 			static Shader* FindByPath(const std::string& path);
 
 			static void SetGlobalUAV(const std::string & name, ID3D11UnorderedAccessView* value);
+			static void UnbindGlobalUAV(const std::string & name);
+			static void UnbindGlobalSRV(const std::string & name);
+
+			static ID3D11UnorderedAccessView* const s_nullUAV[1];
+			static ID3D11ShaderResourceView* const s_nullSRV[1];
 
 			std::vector<std::string> GetMaterialProperties();
 			ID3DX11Effect* GetEffect();

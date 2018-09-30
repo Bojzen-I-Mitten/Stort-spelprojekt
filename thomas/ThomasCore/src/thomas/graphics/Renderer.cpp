@@ -100,6 +100,7 @@ namespace thomas
 		{
 			//Process commands
 			BindFrame();
+			thomas::graphics::LightManager::DANK();
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -115,7 +116,7 @@ namespace thomas
 					}
 				}
 
-				thomas::graphics::LightManager::DANK();
+				thomas::graphics::LightManager::DANK2();
 			}
 
 			//Take care of the editor camera and render gizmos

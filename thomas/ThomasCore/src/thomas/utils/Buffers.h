@@ -70,18 +70,25 @@ namespace thomas
 			class StructuredBuffer : public Buffer
 			{
 			public:
-				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_BIND_FLAG bindFlag = D3D11_BIND_SHADER_RESOURCE);
-				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_BUFFER_UAV_FLAG uavFlag, D3D11_USAGE usageFlag = STATIC_BUFFER);
+				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_BIND_FLAG bindFlag = D3D11_BIND_SHADER_RESOURCE, D3D11_BUFFER_UAV_FLAG uavFlag = (D3D11_BUFFER_UAV_FLAG)0);
 				template <typename T>
 				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
 
 				ID3D11ShaderResourceView* GetSRV();
 				ID3D11UnorderedAccessView* GetUAV();
+
 			private:
 				ID3D11ShaderResourceView* m_resource;
 				bool m_hasSRV;
 				ID3D11UnorderedAccessView* m_uav;
 				bool m_hasUAV;
+			};
+
+			class AppendConsumeBuffer : public StructuredBuffer
+			{
+			public:
+				AppendConsumeBuffer(size_t stride, size_t count);
+
 			};
 		}
 	}

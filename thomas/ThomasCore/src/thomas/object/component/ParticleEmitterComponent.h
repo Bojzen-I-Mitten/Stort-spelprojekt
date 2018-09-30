@@ -87,13 +87,7 @@ namespace thomas
 					float pad;
 				};
 
-				struct BillboardStruct
-				{
-					math::Vector3 positions[2][3];
-					math::Vector2 pad2;
-					math::Vector2 uvs[2][3];
-					//math::Vector4 colorFactor;
-				};
+				
 			private:
 				void CreateParticleUAVsandSRVs();
 				//void CreateInitBuffer();

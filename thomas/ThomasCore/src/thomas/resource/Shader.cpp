@@ -14,6 +14,10 @@ namespace thomas
 		Shader* Shader::s_standardShader;
 		Shader* Shader::s_failedShader;
 		bool Shader::s_shouldRecompile = false;
+
+		ID3D11UnorderedAccessView* const Shader::s_nullUAV[1] = { NULL };
+		ID3D11ShaderResourceView* const Shader::s_nullSRV[1] = { NULL };
+
 		Shader::Shader(ID3DX11Effect* effect, std::string path) : Resource(path)
 		{
 			m_currentPass = nullptr;
@@ -33,6 +37,7 @@ namespace thomas
 
 			if (effectDesc.Techniques == 0)
 			{
+				LOG("Cannot set up reflection as shader has no techniques");
 				return;
 			}
 
@@ -62,6 +67,8 @@ namespace thomas
 
 					tech->GetPassByIndex(j)->GetDesc(&passDesc);
 					tech->GetPassByIndex(j)->GetVertexShaderDesc(&vsPassDesc);
+
+					//GetComputeShaderDesc
 
 					pass.name = passDesc.Name;
 					pass.inputLayout = NULL;
@@ -182,6 +189,9 @@ namespace thomas
 					if (errorBlob->GetBufferSize())
 					{
 						std::string error((char*)errorBlob->GetBufferPointer());
+						std::string test = "asdf" + error;
+
+						std::cout << test;
 						LOG("Error compiling shader: " << filePath << ". errorBlob: " << error);
 						errorBlob->Release();
 					}
@@ -212,6 +222,7 @@ namespace thomas
 		{
 			s_failedShader = CreateShader("../Data/FXIncludes/FailedShader.fx");
 			s_standardShader = CreateShader("../Data/FXIncludes/StandardShader.fx");
+
 			return true;
 		}
 
@@ -277,9 +288,9 @@ namespace thomas
 		}
 		void Shader::Bind()
 		{
+			int test = 0;
 			for (auto prop : m_properties) {
 				prop.second->Apply(this);
-				int a = 0;
 			}
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
@@ -409,6 +420,31 @@ namespace thomas
 			}
 			
 		}
+
+
+		void Shader::UnbindGlobalUAV(const std::string & name)
+		{
+			for (auto shader : s_loadedShaders)
+			{
+				if (shader->HasProperty(name))
+				{
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyUnorderedAccessView(*s_nullUAV));
+					shader->m_properties[name]->SetName(name);
+				}
+			}
+		}
+		void Shader::UnbindGlobalSRV(const std::string & name)
+		{
+			for (auto shader : s_loadedShaders)
+			{
+				if (shader->HasProperty(name))
+				{
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyShaderResource(*s_nullSRV));
+					shader->m_properties[name]->SetName(name);
+				}
+			}
+		}
+
 
 		Shader * Shader::FindByName(const std::string & name)
 		{
@@ -641,10 +677,17 @@ namespace thomas
 					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
-				case D3D_SVT_RWSTRUCTURED_BUFFER:
-				case D3D_SVT_APPEND_STRUCTURED_BUFFER:
-				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
 					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
+					break;
+				case D3D_SVT_RWSTRUCTURED_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
+				case D3D_SVT_APPEND_STRUCTURED_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
+				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
 				}
 				break;
 			}

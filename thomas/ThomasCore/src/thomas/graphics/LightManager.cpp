@@ -114,8 +114,15 @@ namespace thomas
 		void LightManager::DANK()
 		{
 			
-			test.SpawnParticles();
+			//test.SpawnParticles();
 			test.UpdateParticles();
+			//test.DrawParticles();
+		}
+
+		void LightManager::DANK2()
+		{
+
+			//test.SpawnParticles();
 			test.DrawParticles();
 		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)

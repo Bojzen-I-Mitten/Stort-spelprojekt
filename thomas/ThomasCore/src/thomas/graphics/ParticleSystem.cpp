@@ -22,20 +22,21 @@ namespace thomas
 		{
 			m_maxNrOfParticles = maxNrOfParticles;
 			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl");
-			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/updateParticlesCS.hlsl");
+			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/updateParticlesCS.fx");
 
 			
 			m_spawnBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
 			m_updateBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
-			m_billboardBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
+			m_billboardBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), 1/*maxNrOfParticles*/, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
 
-			m_aliveListPing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned), 1, D3D11_BUFFER_UAV_FLAG_APPEND);
-			m_aliveListPong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned), 1, D3D11_BUFFER_UAV_FLAG_APPEND);
-			m_deadList = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned), maxNrOfParticles, D3D11_BUFFER_UAV_FLAG_APPEND);
+
+			m_aliveListPing = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
+			m_aliveListPong = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
+			m_deadList = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
 			
 			m_pingpong = true;
 
-			m_particleShader = resource::Shader::CreateShader("../Data/oldShaders/particleShader.fx");
+			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
 
 			m_emittedParticles = 0;
 			
@@ -138,6 +139,7 @@ namespace thomas
 
 		void ParticleSystem::UpdateParticles()
 		{
+			/*
 			if (m_pingpong)
 			{
 				m_updateParticlesCS->SetGlobalUAV("appendAliveList", m_aliveListPing->GetUAV());
@@ -149,13 +151,24 @@ namespace thomas
 				m_updateParticlesCS->SetGlobalUAV("appendAliveList", m_aliveListPong->GetUAV());
 			}
 
-			m_updateParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());*/
 			m_updateParticlesCS->SetGlobalUAV("billboards", m_billboardBuffer->GetUAV());
 			m_updateParticlesCS->SetGlobalUAV("particles", m_updateBuffer->GetUAV());
 
+			ID3D11DeviceContext* pDC = ThomasCore::GetDeviceContext();
+			//ID3D11UnorderedAccessView* pUAV = m_billboardBuffer->GetUAV();
+			ID3D11UnorderedAccessView* const s_nullUAV[1] = { NULL };
+			
 
+
+
+			m_updateParticlesCS->SetPass(0);
+			m_updateParticlesCS->Bind();
 
 			m_updateParticlesCS->Dispatch(1);//m_emittedParticles / 256u);
+
+			
+			pDC->CSSetUnorderedAccessViews(0, 1, s_nullUAV, nullptr);
 
 		}
 
@@ -163,6 +176,7 @@ namespace thomas
 		{
 			//m_particleShader->Bind();
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); //TODO: refactor to triangle strip?
+			
 			m_particleShader->SetGlobalResource("billboards", m_billboardBuffer->GetSRV());
 			m_particleShader->SetPass(0);
 			m_particleShader->Bind();
@@ -172,7 +186,9 @@ namespace thomas
 
 			ThomasCore::GetDeviceContext()->Draw(6, 0);
 
-
+			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
+			ThomasCore::GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
+			//m_particleShader->UnbindGlobalSRV("billboards");
 		}
 
 		

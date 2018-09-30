@@ -77,7 +77,7 @@ namespace thomas
 			}
 
 			
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag) : Buffer(data, count * stride, bindFlag, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag, D3D11_BUFFER_UAV_FLAG uavFlag) : Buffer(data, count * stride, bindFlag, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;
@@ -103,35 +103,19 @@ namespace thomas
 				{
 					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 					uavDesc.Buffer.FirstElement = 0;
+					uavDesc.Buffer.Flags = uavFlag;
 					uavDesc.Buffer.NumElements = count;
 					uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
-					ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+					hr = ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
 
 					if (hr == S_OK)
-						m_hasSRV = true;
+						m_hasUAV = true;
 				}
 				
 			}
 			
-
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_BUFFER_UAV_FLAG uavFlag, D3D11_USAGE usageFlag) : Buffer(data, count * stride, D3D11_BIND_UNORDERED_ACCESS, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
-			{
-				m_hasUAV = false;
-				m_hasSRV = false;
-
-				D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-				uavDesc.Buffer.FirstElement = 0;
-				uavDesc.Buffer.Flags = uavFlag;
-				uavDesc.Buffer.NumElements = count;
-				uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-				uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-
-				HRESULT hr = ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
-				if (hr == S_OK)
-					m_hasSRV = true;
-			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()
 			{
@@ -151,6 +135,11 @@ namespace thomas
 				return nullptr;
 			}
 
-		}
+			AppendConsumeBuffer::AppendConsumeBuffer(size_t stride, size_t count) : StructuredBuffer(nullptr, stride, count, STATIC_BUFFER, D3D11_BIND_UNORDERED_ACCESS, D3D11_BUFFER_UAV_FLAG_APPEND)
+			{
+
+			}
+
+		}		
 	}
 }

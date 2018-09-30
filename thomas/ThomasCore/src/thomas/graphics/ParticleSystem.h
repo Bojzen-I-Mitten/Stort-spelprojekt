@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include "..\utils\Buffers.h"
+#include "../utils/Math.h"
 
 
 namespace thomas
@@ -23,7 +24,13 @@ namespace thomas
 		class ParticleSystem
 		{
 		private:
-			
+			struct BillboardStruct
+			{
+				math::Vector3 positions[2][3];
+				math::Vector2 pad2;
+				math::Vector2 uvs[2][3];
+				//math::Vector4 colorFactor;
+			};
 			
 
 			

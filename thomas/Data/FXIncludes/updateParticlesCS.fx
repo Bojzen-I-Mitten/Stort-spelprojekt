@@ -1,4 +1,9 @@
+#pragma warning(disable: 4717) // removes effect deprecation warning.
+
 #include <..\FXIncludes\ThomasShaderVariables.hlsl>
+#include <..\FXIncludes\ThomasCG.hlsl>
+
+
 
 struct ParticleStruct
 {
@@ -21,19 +26,19 @@ struct ParticleStruct
 
 struct BillboardStruct
 {
-	float3 quad[2][3];
-	float2 pad2;
-	float2 uvs[2][3];
+    float3 quad[2][3];
+    float2 pad2;
+    float2 uvs[2][3];
 };
 
-StructuredBuffer<uint> test;
+//StructuredBuffer<uint> test;
 
-RWStructuredBuffer<ParticleStruct> particles;
+//RWStructuredBuffer<ParticleStruct> particles;
 RWStructuredBuffer<BillboardStruct> billboards;
-
+/*
 AppendStructuredBuffer<uint> deadList;
 AppendStructuredBuffer<uint> appendAliveList;
-ConsumeStructuredBuffer<uint> consumeAliveList;
+ConsumeStructuredBuffer<uint> consumeAliveList;*/
 
 
 [numthreads(1, 1, 1)]
@@ -97,26 +102,28 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     float3 right = float3(1.0f, 0.0f, 0.0f);
 
     BillboardStruct billboard;
+    billboard.pad2 = float2(0, 0);
 
     float3 particlePosWS = float3(0.0, 0.0, 0.0); // particle.position;
 
     //tri 1
-	billboard.quad[0][0] = particlePosWS + up + right;
-	billboard.quad[0][1] = particlePosWS + up - right;
-	billboard.quad[0][2] = particlePosWS - up + right;
+    billboard.quad[0][0] = particlePosWS + up + right;
+    billboard.quad[0][1] = particlePosWS + up - right;
+    billboard.quad[0][2] = particlePosWS - up + right;
     billboard.uvs[0][0] = float2(1, 1);
     billboard.uvs[0][1] = float2(1, 0);
     billboard.uvs[0][2] = float2(0, 1);
     //tri 2
-	billboard.quad[1][0] = particlePosWS - up + right;
-	billboard.quad[1][1] = particlePosWS + up - right;
-	billboard.quad[1][2] = particlePosWS - up - right;
+    billboard.quad[1][0] = particlePosWS - up + right;
+    billboard.quad[1][1] = particlePosWS + up - right;
+    billboard.quad[1][2] = particlePosWS - up - right;
     billboard.uvs[1][0] = float2(0, 1);
     billboard.uvs[1][1] = float2(1, 0);
     billboard.uvs[1][2] = float2(0, 0);
 
+
     
-    billboards[/*Tid*/0] = billboard;
+    billboards[ /*Tid*/0] = billboard;
 }
 
 
