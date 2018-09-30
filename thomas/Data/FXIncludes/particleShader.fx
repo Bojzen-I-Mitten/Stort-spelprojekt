@@ -57,14 +57,15 @@ struct v2f
 
 v2f vert(uint id : SV_VertexID)
 {
-    v2f output;
+    v2f output = (v2f) 0;
 
     uint particleIndex = (uint) (id / 6);
     uint triangleIndex = (uint) ((id % 6) / 3);
     uint vertexIndex = id % 3;
 
-    //output.vertex = mul(float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0), thomas_MatrixVP);
     output.vertex = float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0);
+    //output.vertex /= output.vertex.w; 
+    //output.vertex = float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0);
 	
     output.texcoord = billboards[particleIndex].uvs[triangleIndex][vertexIndex];
     

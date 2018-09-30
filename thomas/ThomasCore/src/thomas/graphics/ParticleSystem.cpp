@@ -139,7 +139,7 @@ namespace thomas
 
 		void ParticleSystem::UpdateParticles()
 		{
-			/*
+			
 			if (m_pingpong)
 			{
 				m_updateParticlesCS->SetGlobalUAV("appendAliveList", m_aliveListPing->GetUAV());
@@ -151,30 +151,26 @@ namespace thomas
 				m_updateParticlesCS->SetGlobalUAV("appendAliveList", m_aliveListPong->GetUAV());
 			}
 
-			m_updateParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());*/
+			m_updateParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());
 			m_updateParticlesCS->SetGlobalUAV("billboards", m_billboardBuffer->GetUAV());
 			m_updateParticlesCS->SetGlobalUAV("particles", m_updateBuffer->GetUAV());
 
-			ID3D11DeviceContext* pDC = ThomasCore::GetDeviceContext();
-			//ID3D11UnorderedAccessView* pUAV = m_billboardBuffer->GetUAV();
-			ID3D11UnorderedAccessView* const s_nullUAV[1] = { NULL };
 			
-
-
+			
 
 			m_updateParticlesCS->SetPass(0);
 			m_updateParticlesCS->Bind();
 
 			m_updateParticlesCS->Dispatch(1);//m_emittedParticles / 256u);
 
-			
-			pDC->CSSetUnorderedAccessViews(0, 1, s_nullUAV, nullptr);
+
+			ID3D11UnorderedAccessView* const s_nullUAV[4] = { NULL };
+			ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 4, s_nullUAV, nullptr);
 
 		}
 
 		void ParticleSystem::DrawParticles()
 		{
-			//m_particleShader->Bind();
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); //TODO: refactor to triangle strip?
 			
 			m_particleShader->SetGlobalResource("billboards", m_billboardBuffer->GetSRV());

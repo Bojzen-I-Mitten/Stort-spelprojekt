@@ -1,16 +1,13 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
 #include <..\FXIncludes\ThomasShaderVariables.hlsl>
-#include <..\FXIncludes\ThomasCG.hlsl>
-
-
 
 struct ParticleStruct
 {
     float3 position;
     float gravity;
 
-    /*float3 direction;
+    float3 direction;
     float speed;
 
     float endSpeed;
@@ -21,7 +18,7 @@ struct ParticleStruct
     float lifeTimeLeft;
     float rotationSpeed;
     float rotation;
-    float pad;*/
+    float pad;
 };
 
 struct BillboardStruct
@@ -31,24 +28,23 @@ struct BillboardStruct
     float2 uvs[2][3];
 };
 
-//StructuredBuffer<uint> test;
 
-//RWStructuredBuffer<ParticleStruct> particles;
+RWStructuredBuffer<ParticleStruct> particles;
 RWStructuredBuffer<BillboardStruct> billboards;
-/*
+
 AppendStructuredBuffer<uint> deadList;
 AppendStructuredBuffer<uint> appendAliveList;
-ConsumeStructuredBuffer<uint> consumeAliveList;*/
+ConsumeStructuredBuffer<uint> consumeAliveList;
 
 
 [numthreads(1, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    /*uint Tid = 0; // (Gid.x * 256) + GTid.x;
+    uint Tid = 0; // (Gid.x * 256) + GTid.x;
     
-    uint index = consumeAliveList.Consume();
+    uint index = 0; //consumeAliveList.Consume();
     float3x3 viewMatrix = thomas_MatrixV;
-    float dt = thomas_DeltaTime;
+    //float dt = thomas_DeltaTime;
 
     
     ParticleStruct particle = particles[index];
@@ -82,29 +78,40 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 
     }
     appendAliveList.Append(index);
+*/
     //BILLBOARD
-    float3 right = float3(viewMatrix[0][0], viewMatrix[0][1], viewMatrix[0][2]); // * scale; //cameraRight * scale;
-    float3 up = float3(viewMatrix[2][0], viewMatrix[2][1], viewMatrix[2][2]); // * scale; //-cameraUp * scale;
+    //viewMatrix =transpose(viewMatrix);
+
+    float scale = 0.1f;
+
+    float3 right = float3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]) * scale; //cameraRight * scale;
+    float3 up = float3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * scale; //-cameraUp * scale;
+    //float3 forward = float3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]); 
 		
+    //up = float3(0.0f, 1.0f, 0.0f);
+    //right = float3(1.0f, 0.0f, 0.0f);
+
+
+
     //particle.rotation = particle.rotation + particle.rotationSpeed * dt;
 
     float sinangle = 0; //sin(particle.rotation);
     float cosangle = 1; //cos(particle.rotation);
 
 	//rotate billboard
-	float3 temp = cosangle * right - sinangle * up;
+    /*float3 temp = cosangle * right - sinangle * up;
 	right = sinangle * right + cosangle * up;
-	up = temp;
+	up = temp;*/
 
-    particles[index] = particle;*/
+    particles[index] = particle;
 
-    float3 up = float3(0.0f, 1.0f, 0.0f);
-    float3 right = float3(1.0f, 0.0f, 0.0f);
+   
 
     BillboardStruct billboard;
     billboard.pad2 = float2(0, 0);
 
-    float3 particlePosWS = float3(0.0, 0.0, 0.0); // particle.position;
+    float3 particlePosWS = float3(0.0f, 0.0f, 0.0f);
+//    particle.position;
 
     //tri 1
     billboard.quad[0][0] = particlePosWS + up + right;
@@ -123,7 +130,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 
 
     
-    billboards[ /*Tid*/0] = billboard;
+    billboards[Tid] = billboard;
 }
 
 
