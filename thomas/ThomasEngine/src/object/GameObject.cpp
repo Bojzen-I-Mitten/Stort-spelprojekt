@@ -173,18 +173,26 @@ namespace ThomasEngine {
 	GameObject ^ GameObject::Instantiate(GameObject ^ original)
 	{
 		if(!original){
-			Debug::Log("Object to instantiate is null");
+			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		GameObject^ clone;
+		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
 		}
 		else
 		{
-			System::IO::Stream^ serialized = SerializeGameObject(original);
-			clone = DeSerializeGameObject(serialized);
+			try {
+				System::IO::Stream^ serialized = SerializeGameObject(original);
+				clone = DeSerializeGameObject(serialized);
+			}
+			catch (Exception^ e)
+			{
+				String^ msg = "Failed to instantiate gameObject: " + original->Name + " error: " + e->Message;
+				Debug::LogError(msg);
+			}
+
 		}
 		
 		if (clone) {
@@ -268,7 +276,6 @@ namespace ThomasEngine {
 
 	GameObject ^ GameObject::DeSerializeGameObject(System::IO::Stream ^ stream)
 	{
-		try {
 			using namespace System::Runtime::Serialization;
 			DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
 			auto list = Component::GetAllComponentTypes();
@@ -282,14 +289,6 @@ namespace ThomasEngine {
 			GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
 			gObj->PostLoad(nullptr);
 			return gObj;
-		}
-		catch (Exception^ e) {
-			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
-			LOG(msg);
-			return nullptr;
-		}
-		
-
 	}
 
 

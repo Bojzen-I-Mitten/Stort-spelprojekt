@@ -4,7 +4,13 @@ namespace ThomasEngine
 {
 	public ref class SceneSurrogate : System::Runtime::Serialization::IDataContractSurrogate
 	{
+	private:
+		System::Type^ rootType = nullptr;
 	public:
+
+		SceneSurrogate(){}
+		SceneSurrogate(System::Type^ root) { this->rootType = root; }
+
 		virtual System::Type ^ GetDataContractType(System::Type ^type);
 		virtual System::Object ^ GetObjectToSerialize(System::Object ^obj, System::Type ^targetType);
 		virtual System::Object ^ GetDeserializedObject(System::Object ^obj, System::Type ^targetType);
@@ -22,4 +28,5 @@ namespace ThomasEngine
 		System::String^ path;
 		SceneResource(System::String^ resourcePath) { path = resourcePath; }
 	};
+
 }

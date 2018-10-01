@@ -543,7 +543,7 @@ namespace ThomasEditor
                     File.Delete(file);
                 }catch(Exception error)
                 {
-                    Debug.Log("Failed to delete file: " + error.Message);
+                    Debug.LogWarning("Failed to delete file: " + error.Message);
                 }
                 
             }
