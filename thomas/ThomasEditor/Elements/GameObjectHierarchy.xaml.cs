@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +27,7 @@ namespace ThomasEditor
 
         bool _isDragging;
         bool wasUnselected = false;
+        List<GameObject> m_copiedObjects = new List<GameObject>(); //??correct code convention?
         public static GameObjectHierarchy instance;
         public GameObjectHierarchy()
         {
@@ -175,7 +178,7 @@ namespace ThomasEditor
                             {
                                 IsExpanded = true,
                                 Children = BuildTree(newItem.transform),
-
+                            
                             };
                             RootNodes.Add(item);
                         }
@@ -434,6 +437,127 @@ namespace ThomasEditor
 
             }
             e.Handled = true;
+        }
+
+        private void hierarchy_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isDragging)
+                return;
+            TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
+            if(item != null)
+                item.IsSelected = true;
+        }
+
+        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Entered copy function..");
+
+            List<TreeItemViewModel> items = GetSelectedRootNodes(RootNodes.ToList());
+            ClearCopies();
+            Debug.Log("Copying object..");
+
+            foreach (TreeItemViewModel item in items)
+                SetCopies((GameObject)item.Data);
+            return;
+        }
+
+        public void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
+        {
+            if(m_copiedObjects.Count > 0)
+            {
+                DetachParent();
+                foreach (GameObject copiedObject in m_copiedObjects)
+                {
+                    GameObject.Instantiate(copiedObject);
+                    Debug.Log("Pasted object.");
+                }
+                
+                return;
+            }
+        }
+
+        private void MenuItem_DuplicateGameObject(object sender, RoutedEventArgs e)
+        {
+            MenuItem_CopyGameObject(sender, e);
+            MenuItem_PasteGameObject(sender, e);
+        }
+
+        //Can only click copy when an object is selected
+        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            List<TreeItemViewModel> nodes = new List<TreeItemViewModel>();
+            if (RootNodes != null)
+            {
+                nodes = GetSelectedRootNodes(RootNodes.ToList());
+
+                if (nodes.Count > 0)
+                {
+                    e.CanExecute = true;
+                    return;
+                }
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (m_copiedObjects.Count > 0)
+            {
+                e.CanExecute = true;
+            }
+        }
+
+        public List<GameObject> GetCopies()
+        {
+            return m_copiedObjects;
+        }
+
+        public void SetCopies(GameObject copiedObject)
+        {
+            m_copiedObjects.Add(copiedObject);
+        }
+
+        public void ClearCopies()
+        {
+            m_copiedObjects.Clear();
+        }
+
+        public List<TreeItemViewModel> GetSelection()
+        {
+            return GetSelectedRootNodes(RootNodes.ToList());
+        }
+
+        private List<TreeItemViewModel>GetSelectedRootNodes(List<TreeItemViewModel> nodes)
+        {
+            List<TreeItemViewModel> selected = new List<TreeItemViewModel>();
+            foreach (TreeItemViewModel node in nodes)
+            {
+                if (node.IsSelected)
+                    selected.Add(node);
+                selected.AddRange(GetSelectedRootNodes(node.Children));
+            }
+            return selected;
+        }
+
+        /// <summary>
+        /// Will remove parent from child if Parent is not selected to copy. When copy is executed.
+        /// </summary>
+        private void DetachParent()
+        {
+            for (int i = 0; i < m_copiedObjects.Count; i++)
+            {
+                if (m_copiedObjects[i].transform.parent != null)
+                {
+                    //if (!m_copiedObjects.Contains(gObj.transform.parent.gameObject))
+                    //{
+                    //    gObj.transform.parent = null;
+                    //}
+                    if (m_copiedObjects.Contains(m_copiedObjects[i].transform.parent.gameObject))
+                    {
+                        m_copiedObjects[i] = null;
+                    }
+                }
+            }
         }
     }
 }

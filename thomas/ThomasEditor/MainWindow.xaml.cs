@@ -5,12 +5,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Reflection;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 using System.IO;
 
 using ThomasEngine;
 using System.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
+
+using HierarchyTreeView;
 
 namespace ThomasEditor
 {
@@ -303,7 +306,6 @@ namespace ThomasEditor
             }
         }
 
-
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
             Scene.CurrentScene.UnLoad();
@@ -424,6 +426,114 @@ namespace ThomasEditor
         {
             var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Camera");
+            x.AddComponent<Camera>();
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewPointLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.POINT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewSpotLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.SPOT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewDirectionalLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.DIRECTIONAL;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewAreaLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("Light");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.AREA;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        //Main window CTRL + C
+        private void MW_CopyObject(object sender, RoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            List<TreeItemViewModel> items = hierarchy.GetSelection();
+
+            if (items != null)
+            {
+                hierarchy.ClearCopies();
+                Debug.Log("Copying object..");
+                foreach (TreeItemViewModel item in items)
+                    hierarchy.SetCopies((GameObject)item.Data);
+
+                if (hierarchy.GetCopies().Count > 0)
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+        }
+
+        //Main window CTRL + V
+        private void MW_PasteObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Pasting object..");
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            hierarchy.MenuItem_PasteGameObject(sender, e);
+            //List<GameObject> copiedObjects = hierarchy.GetCopies();
+
+            //if (copiedObjects.Count > 0)
+            //{
+            //    foreach (GameObject gObj in copiedObjects)
+            //        GameObject.Instantiate(gObj);
+
+            //    Debug.Log("Pasted object.");
+
+            //    return;
+            //}
+        }
+
+        private void MW_DuplicateObject(object sender, RoutedEventArgs e)
+        {
+            MW_CopyObject(sender, e);
+            MW_PasteObject(sender, e);
+        }
+
+        //Can only be copied if item is selected
+        private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            List<TreeItemViewModel> items = hierarchy.GetSelection();
+
+            if (items != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+            Debug.Log("No object selected __ MW.");
+        }
+
+        //Can only paste when an object has been copied
+        private void MW_PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            if (hierarchy.GetCopies().Count > 0)
+            {
+                e.CanExecute = true;
+                return;
+            }
+            Debug.Log("No copied object to paste.");
         }
 
         #endregion
