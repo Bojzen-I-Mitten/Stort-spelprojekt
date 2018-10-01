@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../utils/Math.h"
+#include "../../../Constants.h"
 
 namespace thomas {
 	namespace graphics {
@@ -20,7 +21,7 @@ namespace thomas {
 				{}
 
 				bool isWeighted() const {
-					return m_scale + m_rot + m_translation > 0.f; // All weights should be > 0
+					return m_scale + m_rot + m_translation > EPSILON; // All weights should be > 0
 				}
 			};
 			/* Transformation components. 
