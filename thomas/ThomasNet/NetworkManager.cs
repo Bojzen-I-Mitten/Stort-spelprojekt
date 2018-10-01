@@ -158,6 +158,8 @@ namespace ThomasEngine.Network
             {
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
             }
+
+            NetScene.ObjectOwners.Add(_peer, new List<NetworkIdentity>());
         }
 
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
