@@ -37,31 +37,33 @@ AppendStructuredBuffer<uint> appendAliveList;
 ConsumeStructuredBuffer<uint> consumeAliveList;
 
 
-[numthreads(1, 1, 1)]
+[numthreads(256, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    uint Tid = 0; // (Gid.x * 256) + GTid.x;
+    uint Tid = (Gid.x * 256) + GTid.x;
+    if (Tid < 32)
+    {
     
-    uint index = 0; //consumeAliveList.Consume();
-    float3x3 viewMatrix = thomas_MatrixV;
-    //float dt = thomas_DeltaTime;
+        uint index = consumeAliveList.Consume();
+        float3x3 viewMatrix = thomas_MatrixV;
+        float dt = thomas_DeltaTime;
 
     
-    ParticleStruct particle = particles[index];
+        ParticleStruct particle = particles.Load(index);
     
-   /*     
-    float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
+       
+        float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
 
 	//lerp between start and end speed
-    float speed = lerp(particle.speed, particle.endSpeed, lerpValue);
+        float speed = lerp(particle.speed, particle.endSpeed, lerpValue);
 
 	//update position
-    float3 particlePosWS = particle.position + particle.direction * speed * dt + float3(0, 1, 0) * particle.gravity * dt;
-    particle.position = particlePosWS;
+        float3 particlePosWS = particle.position + particle.direction * speed * dt - float3(0, 1, 0) * particle.gravity * dt;
+        particle.position = particlePosWS;
 
-
-	float scale = 0.0f;
-
+    
+        float scale = particle.size;
+    /*
     if (particle.lifeTimeLeft < 0.0f)
 	{
 		scale = 0.0f;
@@ -76,60 +78,55 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         
         appendAliveList.Append(index);
 
-    }
-    appendAliveList.Append(index);
-*/
+    }*/
+        appendAliveList.Append(index);
+
     //BILLBOARD
-    //viewMatrix =transpose(viewMatrix);
 
-    float scale = 0.1f;
-
-    float3 right = float3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]) * scale; //cameraRight * scale;
-    float3 up = float3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * scale; //-cameraUp * scale;
-    //float3 forward = float3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]); 
-		
-    right = float3(viewMatrix[0].xyz) * scale; //cameraRight * scale;
-    up = float3(viewMatrix[1].xyz) * scale;
-
-
-    //particle.rotation = particle.rotation + particle.rotationSpeed * dt;
-
-    float sinangle = 0; //sin(particle.rotation);
-    float cosangle = 1; //cos(particle.rotation);
+        float3 right = float3(viewMatrix[0].xyz) * scale;
+        float3 up = float3(viewMatrix[1].xyz) * scale;
+    
+        particle.rotation = particle.rotation + particle.rotationSpeed * dt;
+    
+        float sinangle = sin(particle.rotation);
+        float cosangle = cos(particle.rotation);
 
 	//rotate billboard
-    /*float3 temp = cosangle * right - sinangle * up;
-	right = sinangle * right + cosangle * up;
-	up = temp;*/
+        float3 temp = cosangle * right + sinangle * up;
+        right = sinangle * right - cosangle * up;
+        up = temp;
+    
+    
+    
+   
+    
+        particles[index] = particle;
+        BillboardStruct billboard = (BillboardStruct) 0;
+    //billboard.pad2 = float2(0, 0);
 
-    particles[index] = particle;
+    //particle.position = float3(0.0f, 2.0f, 0.0f);
 
-    //-_WorldSpaceCameraPos;
-
-    BillboardStruct billboard;
-    billboard.pad2 = float2(0, 0);
-
-    float3 particlePosWS = float3(3.0f, 1.0f, 2.0f);
-//    particle.position;
+    //float3 particlePosWS = particles[index].position;
 
     //tri 1
-    billboard.quad[0][0] = particlePosWS + up + right;
-    billboard.quad[0][1] = particlePosWS + up - right;
-    billboard.quad[0][2] = particlePosWS - up + right;
-    billboard.uvs[0][0] = float2(1, 1);
-    billboard.uvs[0][1] = float2(1, 0);
-    billboard.uvs[0][2] = float2(0, 1);
+        billboard.quad[0][0] = particlePosWS + up + right;
+        billboard.quad[0][1] = particlePosWS + up - right;
+        billboard.quad[0][2] = particlePosWS - up + right;
+        billboard.uvs[0][0] = float2(1, 1);
+        billboard.uvs[0][1] = float2(1, 0);
+        billboard.uvs[0][2] = float2(0, 1);
     //tri 2
-    billboard.quad[1][0] = particlePosWS - up + right;
-    billboard.quad[1][1] = particlePosWS + up - right;
-    billboard.quad[1][2] = particlePosWS - up - right;
-    billboard.uvs[1][0] = float2(0, 1);
-    billboard.uvs[1][1] = float2(1, 0);
-    billboard.uvs[1][2] = float2(0, 0);
+        billboard.quad[1][0] = particlePosWS - up + right;
+        billboard.quad[1][1] = particlePosWS + up - right;
+        billboard.quad[1][2] = particlePosWS - up - right;
+        billboard.uvs[1][0] = float2(0, 1);
+        billboard.uvs[1][1] = float2(1, 0);
+        billboard.uvs[1][2] = float2(0, 0);
 
 
     
-    billboards[Tid] = billboard;
+        billboards[Tid] = billboard;
+    }
 }
 
 

@@ -39,8 +39,8 @@ namespace thomas
 				m_particleBufferStruct.maxLifeTime = 1.0f;
 				m_particleBufferStruct.minLifeTime = 1.0f;
 				m_tempMaxLifeTime = 1.0f;
-				m_particleBufferStruct.rotationSpeed = 0.0f;
-				m_particleBufferStruct.rotation = 0;
+				//m_particleBufferStruct.rotationSpeed = 0.0f;
+				//m_particleBufferStruct.rotation = 0;
 				//m_particleBufferStruct.currentParticleStartIndex = 0;
 				m_particleBufferStruct.spawnAtSphereEdge = false;
 				m_particleBufferStruct.radius = 0;
@@ -247,15 +247,16 @@ namespace thomas
 			}
 			void ParticleEmitterComponent::SetRotationSpeed(float const& other)
 			{
-				m_particleBufferStruct.rotationSpeed = other;
+				//m_particleBufferStruct.rotationSpeed = other;
 			}
 			float ParticleEmitterComponent::GetRotationSpeed() const
 			{
-				return m_particleBufferStruct.rotationSpeed;
+				return 0.0f;
+				//return m_particleBufferStruct.rotationSpeed;
 			}
 			void ParticleEmitterComponent::SetRotation(float const& other)
 			{
-				m_particleBufferStruct.rotation = other;
+			//	m_particleBufferStruct.rotation = other;
 			}
 			void ParticleEmitterComponent::SetLooping(bool const& other)
 			{

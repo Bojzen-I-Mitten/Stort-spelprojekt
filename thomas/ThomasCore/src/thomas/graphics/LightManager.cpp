@@ -111,11 +111,15 @@ namespace thomas
 			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
 			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
+		int asdfasdf = 0;
 		void LightManager::DANK()
 		{
+			asdfasdf++;
+			if (asdfasdf > 1000 && asdfasdf < 1010)
+				test.SpawnParticles();
 			
-			//test.SpawnParticles();
-			test.UpdateParticles();
+			if (asdfasdf > 1000)
+				test.UpdateParticles();
 			//test.DrawParticles();
 		}
 
@@ -123,6 +127,7 @@ namespace thomas
 		{
 
 			//test.SpawnParticles();
+			if (asdfasdf > 1000)
 			test.DrawParticles();
 		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)

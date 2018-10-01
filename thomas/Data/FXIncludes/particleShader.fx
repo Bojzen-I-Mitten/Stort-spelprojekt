@@ -53,6 +53,7 @@ struct v2f
 {
     float4 vertex : SV_POSITION;
     float2 texcoord : TEXCOORD0;
+    float3 color : asdf;
 };
 
 v2f vert(uint id : SV_VertexID)
@@ -76,6 +77,11 @@ v2f vert(uint id : SV_VertexID)
     else if (id == 1)
         output.vertex = mul(float4(-0.5, -0.5, 0.5, 1.0), thomas_MatrixVP);*/
     
+    if (particleIndex % 2 == 0)
+        output.color = float3(1.0f, 0.0f, 0.0f);
+    else
+        output.color = float3(0.0f, 1.0f, 0.0f);
+
     return output;
 }
 
@@ -86,7 +92,7 @@ float4 frag(v2f input) : SV_Target
 
     //outputColor *= input.colorFactor;
     
-    return float4(1.0f, 0.0f, 0.0f, 1.0f);
+    return float4(input.color, 1.0f);
 
 }
 

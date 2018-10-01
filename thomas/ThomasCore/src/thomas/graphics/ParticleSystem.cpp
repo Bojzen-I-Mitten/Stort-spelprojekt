@@ -1,7 +1,8 @@
 #include "ParticleSystem.h"
 #include "../object/component/ParticleEmitterComponent.h"
 #include "../resource/ComputeShader.h"
-
+#include <random>
+#include <time.h>
 namespace thomas
 {
 	namespace graphics
@@ -21,13 +22,13 @@ namespace thomas
 		void ParticleSystem::Initialize(unsigned maxNrOfParticles)
 		{
 			m_maxNrOfParticles = maxNrOfParticles;
-			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl");
+			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/emitParticlesCS.fx");
 			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/updateParticlesCS.fx");
 
 			
-			m_spawnBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_spawnBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 1, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
 			m_updateBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
-			m_billboardBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), 1/*maxNrOfParticles*/, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
+			m_billboardBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
 
 
 			m_aliveListPing = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
@@ -82,28 +83,31 @@ namespace thomas
 
 		void ParticleSystem::SpawnParticles()
 		{
-			if (m_emittedParticles < 1)
+			//if (m_emittedParticles < 1000)
 			{
 				std::vector<object::component::ParticleEmitterComponent::InitParticleBufferStruct> dataVec;
 
 				object::component::ParticleEmitterComponent::InitParticleBufferStruct testInitData = {};
-				testInitData.nrOfParticlesToEmit = 20;
-				testInitData.rand = 1.0f;
-				testInitData.spawnAtSphereEdge = (unsigned)false;
+				testInitData.nrOfParticlesToEmit = 32;
+				std::srand(time(NULL));
+				testInitData.rand = std::rand();
+				
+				testInitData.spawnAtSphereEdge = (unsigned)true;
 				testInitData.endSize = 3.0f;
 				testInitData.endSpeed = 10.0f;
-				testInitData.gravity = 10.0f;
+				testInitData.gravity = 0.0f;
 				testInitData.maxLifeTime = 20.0f;
 				testInitData.maxSize = 1.0f;
-				testInitData.maxSpeed = 2.0f;
+				testInitData.maxSpeed = 1.4f;
 				testInitData.minLifeTime = 20.0f;
-				testInitData.minSize = 1.0f;
-				testInitData.minSpeed = 10.0f;
+				testInitData.minSize = 0.5f;
+				testInitData.minSpeed = 0.5f;
+				testInitData.radius = 10.0f;
 				testInitData.position = math::Vector3(0.0f, 2.0f, 0.0f);
-				testInitData.rotation = 0.0f;
-				testInitData.rotationSpeed = 1.0f;
-				testInitData.spread = 1.0f;
-				XMStoreFloat3x3(&testInitData.directionMatrix, DirectX::XMMatrixLookAtRH(math::Vector3(0, 0, 0), math::Vector3(0.0f, 1.0f, 0.0f), math::Vector3::Up));
+				testInitData.maxRotationSpeed = 3.0f;
+				testInitData.minRotationSpeed = 0.3f;
+				testInitData.spread = 0.7f;
+				XMStoreFloat3x3(&testInitData.directionMatrix, DirectX::XMMatrixLookAtRH(math::Vector3(0, 2, 0), math::Vector3(1.0f, 2.0f, 0.0f), math::Vector3::Up));
 
 				/*for (object::component::ParticleEmitterComponent* e : m_spawningEmitters)
 				{
@@ -115,9 +119,9 @@ namespace thomas
 
 				m_spawnBuffer->SetData(dataVec);
 
-
 				m_emitParticlesCS->SetGlobalResource("initParticles", m_spawnBuffer->GetSRV());
-				m_emitParticlesCS->SetGlobalUAV("particlesWrite", m_updateBuffer->GetUAV());
+				m_emitParticlesCS->SetGlobalUAV("particles", m_updateBuffer->GetUAV());
+
 				m_emitParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());
 
 				m_pingpong = !m_pingpong;
@@ -129,11 +133,18 @@ namespace thomas
 				{
 					m_emitParticlesCS->SetGlobalUAV("aliveList", m_aliveListPong->GetUAV());
 				}
-
+				
 				//m_spawningEmitterEmissionRate[0] * 
 
-				m_emitParticlesCS->Dispatch(1);
-				m_emittedParticles += 1;
+				m_emitParticlesCS->SetPass(0);
+				m_emitParticlesCS->Bind();
+
+
+				m_emitParticlesCS->Dispatch((testInitData.nrOfParticlesToEmit - 1) / 128 + 1);
+				m_emittedParticles += testInitData.nrOfParticlesToEmit;
+
+				ID3D11UnorderedAccessView* const s_nullUAV[4] = { NULL };
+				ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 4, s_nullUAV, nullptr);
 			}
 		}
 
@@ -161,7 +172,7 @@ namespace thomas
 			m_updateParticlesCS->SetPass(0);
 			m_updateParticlesCS->Bind();
 
-			m_updateParticlesCS->Dispatch(1);//m_emittedParticles / 256u);
+			m_updateParticlesCS->Dispatch((m_emittedParticles - 1)/ 256u + 1);//m_emittedParticles / 256u);
 
 
 			ID3D11UnorderedAccessView* const s_nullUAV[4] = { NULL };
@@ -180,11 +191,11 @@ namespace thomas
 			
 			//m_emittedParticles * 
 
-			ThomasCore::GetDeviceContext()->Draw(6, 0);
+			ThomasCore::GetDeviceContext()->Draw(6 * m_emittedParticles, 0);
 
 			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
 			ThomasCore::GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
-			//m_particleShader->UnbindGlobalSRV("billboards");
+
 		}
 
 		

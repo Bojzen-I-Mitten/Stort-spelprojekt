@@ -51,19 +51,18 @@ namespace thomas
 					float maxLifeTime;
 
 					float minLifeTime;
-					float rand;
-					float rotationSpeed;
-					float rotation;
+					float gravity;
+					float minRotationSpeed;
+					float maxRotationSpeed;
 
 					DirectX::XMFLOAT3X3 directionMatrix;
-
-					float gravity;
-					float pad1;
+					float endRotationSpeed;
 					float pad2;
+					float pad3;
 
 					unsigned nrOfParticlesToEmit;
 					unsigned spawnAtSphereEdge;
-					unsigned pad3;
+					unsigned rand;
 					unsigned pad4;
 
 				};
