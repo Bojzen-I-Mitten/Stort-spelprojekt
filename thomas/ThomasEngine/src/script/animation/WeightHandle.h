@@ -11,6 +11,8 @@ namespace ThomasEngine
 	namespace Script
 	{
 
+		/* Contains weights for each transform component (scale, rot, translation)
+		*/
 		public value struct WeightTripple {
 			float m_scale, m_rot, m_translation;
 
