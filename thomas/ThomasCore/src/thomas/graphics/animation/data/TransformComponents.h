@@ -40,9 +40,9 @@ namespace thomas {
 				*/
 				void blendTo(TransformComponents & target, float weight) {
 
-					m_scale += target.m_scale * weight;
+					m_scale = m_scale * (1 - weight) + target.m_scale * weight;
 					m_rot = math::Quaternion::Slerp(m_rot, target.m_rot, weight);
-					m_pos += target.m_pos * weight;
+					m_pos = m_pos * (1 - weight) + target.m_pos * weight;
 				}
 				/* Blend the transform components from the current state to the target, with the weight.
 				* target	<<	Target transform to blend toward
@@ -53,6 +53,16 @@ namespace thomas {
 					m_scale = m_scale * (1-weight.m_scale) + target.m_scale * weight.m_scale;
 					m_rot = math::Quaternion::Slerp(m_rot, target.m_rot, weight.m_rot);
 					m_pos = m_pos * (1 - weight.m_translation) + target.m_pos * weight.m_translation;
+				}
+				/* Blend the transform components from the current state to the target, with the weight.
+				* from		<<	Weighted transform added to the component.
+				* weight	<<	Influence weight in interval [0,1]
+				*/
+				void addFrom(TransformComponents & from, const WeightTripple& weight) {
+
+					m_scale += from.m_scale * weight.m_scale;
+					m_rot *= math::Quaternion::Slerp(math::Quaternion::Identity, from.m_rot, weight.m_rot);
+					m_pos += from.m_pos * weight.m_translation;
 				}
 				/* Calc. transformation matrix from the components.
 				*/

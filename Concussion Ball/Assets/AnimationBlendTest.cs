@@ -15,10 +15,6 @@ public class AnimationBlendTest : ScriptComponent
         root = new BlendNode(skinn.model);
         root.appendNode(fromAnim, false);
         root.appendNode(toAnim, false);
-        root.appendNode(fromAnim, false);
-        root.appendNode(toAnim, false);
-        root.appendNode(fromAnim, false);
-        root.appendNode(toAnim, false);
         root.generateLinearMixer(2.0f);
         skinn.setBlendTreeNode(root);
     }

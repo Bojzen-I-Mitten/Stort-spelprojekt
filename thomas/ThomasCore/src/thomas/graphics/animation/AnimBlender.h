@@ -1,6 +1,8 @@
 #pragma once
 #include "AnimationNode.h"
 #include <utility>
+#include "../../Constants.h"
+
 namespace thomas {
 	namespace graphics {
 		namespace animation {
@@ -9,8 +11,8 @@ namespace thomas {
 			class AnimationData;
 			class Skeleton;
 			class WeightMixer;
-			/* Max number of animation nodes possible in a blend node. */
-			constexpr uint32_t MAX_ANIMATION_BLEND_NODE = 10;
+			/* Flexible blending node
+			*/
 			class AnimBlender : public AnimationNode 
 			{
 			public:
@@ -20,7 +22,6 @@ namespace thomas {
 				uint32_t m_NumNode;
 				std::unique_ptr<WeightMixer> m_weights;
 
-				void constructMapping();
 
 			public:
 				AnimBlender(Skeleton &skel);
@@ -30,6 +31,7 @@ namespace thomas {
 				void generateLinearMixer(float durationPerNode);
 
 				void pushAnimation(AnimationNode* node);
+				void constructMapping();
 
 				// Inherited via AnimationNode
 				virtual void update(float) override;

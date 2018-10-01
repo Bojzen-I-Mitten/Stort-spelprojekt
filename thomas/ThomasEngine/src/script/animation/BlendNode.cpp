@@ -58,6 +58,13 @@ namespace ThomasEngine
 			m_node->generateLinearMixer(durationPerNode);
 		}
 
+		WeightHandle ^ BlendNode::generateWeightHandle()
+		{
+			WeightHandle^ handle = gcnew WeightHandle(m_node->m_numChannel);
+			m_node->setWeightMixer(handle->Mixer());
+			return handle;
+		}
+
 		thomas::graphics::animation::AnimationNode * BlendNode::getNativeNode()
 		{
 			return m_node;

@@ -11,21 +11,28 @@ namespace thomas {
 			public:
 				enum Mode 
 				{
-					PerNode,		// Weighted per node
-					PerChannel		// Weighted per node channel
+					PerNode = 0,		// Weighted per node
+					PerChannel = 1,		// Weighted per node channel
+					Additive = 2
 				};
 				WeightTripple *m_weights;
 				Mode * m_mode;
+				uint32_t m_numChannel;
 			public:
 
 				WeightMixer(uint32_t numWeight, uint32_t numChannel);
 				virtual ~WeightMixer();
 
-				virtual void update(float dT) = 0;
+				virtual void update(float dT) {};
+
 
 			public:
-				virtual const WeightTripple* getWeights();
-				virtual const Mode* getMode();
+				const WeightTripple* getWeights();
+				const Mode* getMode();
+
+				void setSingleWeightMode();
+				void setMode(Mode m);
+				
 			protected:
 				void clearWeights(uint32_t at, uint32_t num);
 			};
@@ -34,7 +41,7 @@ namespace thomas {
 			class WeightLinearPerChannel : public WeightMixer {
 			private:
 				float m_duration, m_elapsed;
-				uint32_t m_index, m_weightedNodes;
+				uint32_t m_index;
 			public:
 
 				WeightLinearPerChannel(uint32_t NumweightedNodes, float timePerNode);

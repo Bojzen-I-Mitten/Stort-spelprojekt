@@ -9,7 +9,7 @@ namespace thomas {
 
 			
 			WeightMixer::WeightMixer(uint32_t numWeight, uint32_t numChannel)
-				: m_weights(new WeightTripple[numWeight]), m_mode(new Mode[numChannel])
+				: m_weights(new WeightTripple[numWeight]), m_mode(new Mode[numChannel]), m_numChannel(numChannel)
 			{
 			}
 
@@ -29,6 +29,18 @@ namespace thomas {
 				return m_mode;
 			}
 
+			void WeightMixer::setSingleWeightMode()
+			{
+				std::memset(m_mode, 0, sizeof(Mode) * m_numChannel);
+			}
+
+			void WeightMixer::setMode(Mode m)
+			{
+				Mode *ptr = m_mode;
+				while (++ptr != m_mode + m_numChannel)
+					*ptr = m;
+			}
+
 			void WeightMixer::clearWeights(uint32_t at, uint32_t num)
 			{
 				// Need ifdef ~ SYS_SUPPORT_FLOAT_MEMSET
@@ -39,14 +51,14 @@ namespace thomas {
 
 					   
 			WeightLinearPerChannel::WeightLinearPerChannel(uint32_t NumweightedNodes, float timePerNode)
-				: WeightMixer(NumweightedNodes, NumweightedNodes), m_duration(timePerNode), m_elapsed(0.f), m_index(0), m_weightedNodes(NumweightedNodes)
+				: WeightMixer(NumweightedNodes, NumweightedNodes), m_duration(timePerNode), m_elapsed(0.f), m_index(0)
 			{
-				std::memset(m_mode, 0, sizeof(Mode) * NumweightedNodes);
+				setSingleWeightMode();
 			}
 
 			void WeightLinearPerChannel::update(float dT)
 			{
-				if (m_index == m_weightedNodes) return;
+				if (m_index == m_numChannel) return;
 
 				// Step index
 				m_elapsed += dT;
@@ -59,9 +71,9 @@ namespace thomas {
 					norm -= float(floor);
 					m_elapsed = norm * m_duration;
 					// If last blend target
-					if (m_index >= m_weightedNodes) {
-						m_index = m_weightedNodes; // In case of overstep
-						m_weights[m_weightedNodes - 1] = WeightTripple(1.f);
+					if (m_index >= m_numChannel) {
+						m_index = m_numChannel; // In case of overstep
+						m_weights[m_numChannel - 1] = WeightTripple(1.f);
 						return;
 					}
 				}

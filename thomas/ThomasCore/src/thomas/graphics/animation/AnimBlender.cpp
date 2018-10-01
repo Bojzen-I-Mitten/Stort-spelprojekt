@@ -80,7 +80,7 @@ namespace thomas {
 				// Blend remaining nodes
 				for (unsigned int i = 1; i < m_NumNode; i++)
 				{
-					if (mode[i] == WeightMixer::PerChannel) 
+					if (*mode == WeightMixer::PerChannel)
 					{
 						node = m_nodes[i];
 						node->calcFrame(tmp_arr.get());
@@ -88,8 +88,20 @@ namespace thomas {
 						for (unsigned int b = 0; b < node->m_numChannel; b++)
 							result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights++);
 					}
+					else if (*mode == WeightMixer::Additive) {
+						// Additive blending
+						if (weights->isWeighted()) {
+							node = m_nodes[i];
+							node->calcFrame(tmp_arr.get());
+							// Blend bones (and map each to skeleton index) 
+							for (unsigned int b = 0; b < node->m_numChannel; b++)
+								result[node->m_boneMapping[b]].addFrom(tmp_arr.get()[node->m_boneMapping[b]], *weights);
+						}
+						weights++; // Step next node weight
+					}
 					else 
 					{
+						// Blend with 
 						if (weights->isWeighted()) {
 							node = m_nodes[i];
 							node->calcFrame(tmp_arr.get());
@@ -99,6 +111,7 @@ namespace thomas {
 						}
 						weights++; // Step next node weight
 					}
+					mode++;
 				}
 			}
 
