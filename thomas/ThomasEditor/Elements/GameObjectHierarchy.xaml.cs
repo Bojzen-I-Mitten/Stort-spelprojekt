@@ -448,7 +448,7 @@ namespace ThomasEditor
                 item.IsSelected = true;
         }
 
-        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        public void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
         {
             Debug.Log("Entered copy function..");
 
@@ -466,12 +466,14 @@ namespace ThomasEditor
             if(m_copiedObjects.Count > 0)
             {
                 DetachParent();
+                Scene.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
                     GameObject.Instantiate(copiedObject);
                     Debug.Log("Pasted object.");
                 }
-                
+                Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+                ResetTreeView();
                 return;
             }
         }
@@ -483,7 +485,7 @@ namespace ThomasEditor
         }
 
         //Can only click copy when an object is selected
-        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        public void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             List<TreeItemViewModel> nodes = new List<TreeItemViewModel>();
             if (RootNodes != null)
@@ -499,7 +501,7 @@ namespace ThomasEditor
         }
 
         //Can only paste when an object has been copied
-        private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        public void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if (m_copiedObjects.Count > 0)
             {

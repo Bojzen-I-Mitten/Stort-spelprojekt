@@ -468,21 +468,7 @@ namespace ThomasEditor
         private void MW_CopyObject(object sender, RoutedEventArgs e)
         {
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            List<TreeItemViewModel> items = hierarchy.GetSelection();
-
-            if (items != null)
-            {
-                hierarchy.ClearCopies();
-                Debug.Log("Copying object..");
-                foreach (TreeItemViewModel item in items)
-                    hierarchy.SetCopies((GameObject)item.Data);
-
-                if (hierarchy.GetCopies().Count > 0)
-                {
-                    Debug.Log("GameObject successfully copied.");
-                }
-                return;
-            }
+            hierarchy.MenuItem_CopyGameObject(sender, e);
         }
 
         //Main window CTRL + V
@@ -491,17 +477,6 @@ namespace ThomasEditor
             Debug.Log("Pasting object..");
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
             hierarchy.MenuItem_PasteGameObject(sender, e);
-            //List<GameObject> copiedObjects = hierarchy.GetCopies();
-
-            //if (copiedObjects.Count > 0)
-            //{
-            //    foreach (GameObject gObj in copiedObjects)
-            //        GameObject.Instantiate(gObj);
-
-            //    Debug.Log("Pasted object.");
-
-            //    return;
-            //}
         }
 
         private void MW_DuplicateObject(object sender, RoutedEventArgs e)
@@ -514,26 +489,14 @@ namespace ThomasEditor
         private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            List<TreeItemViewModel> items = hierarchy.GetSelection();
-
-            if (items != null)
-            {
-                e.CanExecute = true;
-                return;
-            }
-            Debug.Log("No object selected __ MW.");
+            hierarchy.CopyObject_CanExecute(sender, e);
         }
 
         //Can only paste when an object has been copied
         private void MW_PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            if (hierarchy.GetCopies().Count > 0)
-            {
-                e.CanExecute = true;
-                return;
-            }
-            Debug.Log("No copied object to paste.");
+            hierarchy.PasteObject_CanExecute(sender, e);
         }
 
         #endregion
