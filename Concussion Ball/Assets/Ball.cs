@@ -37,12 +37,12 @@ public class Ball : NetworkComponent
         }
     }
     
-    public void Pickup(GameObject chad)
+    public void Pickup(GameObject chad, Transform hand)
     {
 
         rb.enabled = false;
-        transform.parent = chad.transform;
-        transform.localPosition = new Vector3(0, 3, 3);
+        transform.parent = hand;
+        transform.localPosition = Vector3.Zero;
         pickedUp = true;
     }
 }

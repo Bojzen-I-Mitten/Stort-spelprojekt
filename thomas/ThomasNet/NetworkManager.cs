@@ -48,12 +48,10 @@ namespace ThomasEngine.Network
         [Browsable(false)]
         public NetManager InternalManager { get { return NetManager; } }
 
-        public NetworkManager()
-        {
-            instance = this;
-        }
         public override void Awake()
         {
+            instance = this;
+
             NetScene = new NetworkScene();
             NetPacketProcessor = new NetPacketProcessor();
             Listener = new EventBasedNetListener();

@@ -247,14 +247,21 @@ namespace thomas
 	void Window::UpdateFocus()
 	{
 		POINT p;
-		if (GetCursorPos(&p)) {
+		if (GetCursorPos(&p)) 
+		{
 			HWND hWnd = WindowFromPoint(p);
 			Window* window = GetWindow(hWnd);
-			if (window != s_focused) {
-				if(s_focused)
+			if (window != s_focused) 
+			{
+				if (s_focused) 
+				{
 					s_focused->m_focused = false;
+					Input::Clear();
+				}
+					
 				s_focused = window;
-				if (s_focused != NULL) {
+				if (s_focused != NULL) 
+				{
 					s_focused->m_focused = true;
 					Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
 				}
@@ -512,9 +519,11 @@ namespace thomas
 		case WM_SETFOCUS:
 			break;
 		case WM_KILLFOCUS:
+			LOG("lost focus");
 			break;
 		case WM_ACTIVATEAPP:
 			if (window->IsFocused()) {
+				LOG("active!");
 				Input::ProcessKeyboard(message, wParam, lParam);
 				Input::ProcessMouse(message, wParam, lParam, hWnd);
 			}

@@ -40,11 +40,15 @@ namespace thomas
 				getMotionState()->setWorldTransform(trans);
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
+				this->setLinearVelocity(btVector3(0, 0, 0));
+				this->setAngularVelocity(btVector3(0, 0, 0));
 				Physics::AddRigidBody(this);
 			}
 
 			void Rigidbody::OnDisable()
 			{
+				this->setLinearVelocity(btVector3(0, 0, 0));
+				this->setAngularVelocity(btVector3(0, 0, 0));
 				clearForces();
 				Physics::RemoveRigidBody(this);				
 			}

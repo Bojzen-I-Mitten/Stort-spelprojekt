@@ -297,8 +297,7 @@ namespace thomas
 					}
 					else
 					{
-						if(worldPositionStays)
-							SetLocalMatrix(m);
+						SetLocalMatrix(m);
 					}
 				}
 			}

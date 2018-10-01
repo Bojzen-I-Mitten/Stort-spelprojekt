@@ -20,6 +20,8 @@ namespace ThomasEditor
 
         public float throwForce { get; set; }
 
+        public Transform hand { get; set; }
+
         Rigidbody rBody;
  
         //Camera test;
@@ -140,7 +142,8 @@ namespace ThomasEditor
         {
             if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
             {
-                ball.Throw(transform.forward * throwForce);
+                if(hand)
+                    ball.Throw(hand.forward * throwForce);
             }
         }
 
@@ -151,7 +154,7 @@ namespace ThomasEditor
                 if (collider.gameObject == ball.gameObject)
                 {
                     TakeOwnership(collider.gameObject);
-                    ball.Pickup(gameObject);
+                    ball.Pickup(gameObject, hand ? hand : transform);
                     hasBall = true;
                 }
             }
