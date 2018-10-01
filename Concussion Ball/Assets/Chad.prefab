@@ -85,13 +85,13 @@
       </children>
       <localEulerAngles>
         <x>0</x>
-        <y>113.815018</y>
+        <y>-8.599189E-06</y>
         <z>0</z>
       </localEulerAngles>
       <localPosition>
-        <x>4.461963</x>
-        <y>0.272248149</y>
-        <z>2.71827364</z>
+        <x>0.00016882192</x>
+        <y>0.274542451</y>
+        <z>-0.00107977993</z>
       </localPosition>
       <localScale>
         <x>1</x>
@@ -160,7 +160,7 @@
       <m_gameObject z:Ref="1" i:nil="true" />
       <d3p1:force>5</d3p1:force>
       <d3p1:hand z:Ref="14" i:nil="true" />
-      <d3p1:rotationSpeed>5</d3p1:rotationSpeed>
+      <d3p1:rotationSpeed>3</d3p1:rotationSpeed>
       <d3p1:speed>5</d3p1:speed>
       <d3p1:throwForce>10</d3p1:throwForce>
     </Component>
