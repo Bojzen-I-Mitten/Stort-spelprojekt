@@ -128,6 +128,11 @@ namespace thomas
 		return core;
 	}
 
+	resource::MemoryAllocation * ThomasCore::Memory()
+	{
+		return  m_memAlloc;
+	}
+
 	void ThomasCore::LogOutput(const std::string & message)
 	{
 		s_logOutput.push_back(message);

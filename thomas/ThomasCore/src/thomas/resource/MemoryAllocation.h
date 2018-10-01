@@ -10,12 +10,17 @@ namespace thomas {
 		constexpr uint32_t NUM_THREAD = 3;
 
 		class MemoryAllocation {
-
-			utility::allocator::LinearAllocator m_constant_memory;
-			utility::allocator::StackAllocator m_stack_allocation[NUM_THREAD];
+		public:
 
 			MemoryAllocation();
 			~MemoryAllocation();
+
+			/* Fetch a stack by index. */
+			utility::allocator::StackAllocator& stack(uint32_t index);
+
+		private:
+			utility::allocator::LinearAllocator m_constant_memory;
+			utility::allocator::StackAllocator m_stack_allocation[NUM_THREAD];
 		};
 	}
 }

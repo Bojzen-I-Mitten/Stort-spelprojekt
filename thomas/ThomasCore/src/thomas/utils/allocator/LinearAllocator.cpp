@@ -12,6 +12,7 @@ namespace thomas {
 				assert(size > 0); 
 			}
 
+
 			LinearAllocator::~LinearAllocator() { _current_pos = nullptr; }
 
 			void* LinearAllocator::allocate(size_t size, uint8_t alignment)

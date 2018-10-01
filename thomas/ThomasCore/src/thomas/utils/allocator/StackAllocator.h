@@ -15,9 +15,11 @@ namespace thomas {
 				void* allocate(size_t size, uint8_t alignment) override;
 				void deallocate(void* p) override;
 
+				StackAllocator(StackAllocator&&);
+
 			private:
 
-				StackAllocator(const StackAllocator&);
+				StackAllocator(const StackAllocator&) = delete;
 
 				//Prevent copies because it might cause errors 
 				StackAllocator& operator=(const StackAllocator&) = delete;

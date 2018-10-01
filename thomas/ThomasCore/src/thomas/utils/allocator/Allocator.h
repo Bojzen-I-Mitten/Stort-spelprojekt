@@ -14,13 +14,8 @@ namespace thomas {
 			{
 			public:
 
-				Allocator(size_t size, void* start)
-				{
-					_start = start;
-					_size = size;
-					_used_memory = 0;
-					_num_allocations = 0;
-				}
+				Allocator(size_t size, void* start);
+				Allocator(Allocator && move);
 
 				virtual ~Allocator()
 				{
@@ -63,7 +58,7 @@ namespace thomas {
 
 				template <class T> T* allocateArray(Allocator& allocator, size_t length)
 				{
-					ASSERT(length != 0);
+					assert(length != 0);
 					u8 headerSize = sizeof(size_t) / sizeof(T);
 
 					if (sizeof(size_t) % sizeof(T) > 0) headerSize += 1;
@@ -80,7 +75,7 @@ namespace thomas {
 
 				template <class T> void deallocateArray(Allocator& allocator, T* array)
 				{
-					ASSERT(array != nullptr);
+					assert(array != nullptr);
 					size_t length = *(((size_t*)array) - 1);
 
 					for (size_t i = 0; i < length; i++) array.~T();

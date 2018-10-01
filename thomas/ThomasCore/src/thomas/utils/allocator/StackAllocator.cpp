@@ -5,12 +5,22 @@ namespace thomas {
 	namespace utility {
 		namespace allocator {
 
-			StackAllocator::StackAllocator(size_t size, void* start) : Allocator(size, start), _current_pos(start)
+			StackAllocator::StackAllocator(size_t size, void* start) 
+				: Allocator(size, start), _current_pos(start)
 			{
 				assert(size > 0);
 #if _DEBUG 
 				_prev_position = nullptr;
 #endif 
+			}
+
+
+			StackAllocator::StackAllocator(StackAllocator&& move)
+				: Allocator(std::move(move)), _current_pos(move._current_pos)
+#if _DEBUG 
+				,_prev_position(move._prev_position)
+#endif 
+			{
 			}
 
 			StackAllocator::~StackAllocator()

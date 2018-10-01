@@ -31,7 +31,10 @@ namespace thomas
 		static ID3D11DeviceContext* GetDeviceContext();
 		static std::vector<std::string> GetLogOutput();
 
-		ThomasCore& Core();
+		static ThomasCore& Core();
+
+
+		resource::MemoryAllocation* Memory();
 
 	public:
 		static void LogOutput(const std::string & message);

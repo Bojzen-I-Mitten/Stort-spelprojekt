@@ -1,6 +1,8 @@
 #include "AnimBlender.h"
 #include "data/Skeleton.h"
 #include "WeightMixer.h"
+#include "../../ThomasCore.h"
+#include "../../resource/MemoryAllocation.h"
 
 namespace thomas {
 	namespace graphics {
@@ -63,8 +65,8 @@ namespace thomas {
 			}
 			void AnimBlender::calcFrame(TransformComponents* result) 
 			{
-				std::unique_ptr<TransformComponents> tmp_arr(new TransformComponents[m_ref.getNumBones()]);
 
+				TransformComponents *tmp_arr = (TransformComponents*)ThomasCore::Core().Memory()->stack(0).allocate(sizeof(TransformComponents) * m_ref.getNumBones(), sizeof(float));
 				//assert(m_weights->numWeights() >= m_NumNode);
 				const WeightTripple *weights = m_weights->getWeights();
 				const WeightMixer::Mode *mode = m_weights->getMode();
@@ -85,19 +87,19 @@ namespace thomas {
 					if (*mode == WeightMixer::PerChannel)
 					{
 						node = m_nodes[i];
-						node->calcFrame(tmp_arr.get());
+						node->calcFrame(tmp_arr);
 						// Blend bones (and map each to skeleton index) 
 						for (unsigned int b = 0; b < node->m_numChannel; b++)
-							result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[b], *weights++);
+							result[node->m_boneMapping[b]].blendTo(tmp_arr[b], *weights++);
 					}
 					else if (*mode == WeightMixer::Additive) {
 						// Additive blending
 						if (weights->isWeighted()) {
 							node = m_nodes[i];
-							node->calcFrame(tmp_arr.get());
+							node->calcFrame(tmp_arr);
 							// Blend bones (and map each to skeleton index) 
 							for (unsigned int b = 0; b < node->m_numChannel; b++)
-								result[node->m_boneMapping[b]].addFrom(tmp_arr.get()[node->m_boneMapping[b]], *weights);
+								result[node->m_boneMapping[b]].addFrom(tmp_arr[node->m_boneMapping[b]], *weights);
 						}
 						weights++; // Step next node weight
 					}
@@ -106,15 +108,16 @@ namespace thomas {
 						// Blend with 
 						if (weights->isWeighted()) {
 							node = m_nodes[i];
-							node->calcFrame(tmp_arr.get());
+							node->calcFrame(tmp_arr);
 							// Blend bones (and map each to skeleton index) 
 							for (unsigned int b = 0; b < node->m_numChannel; b++)
-								result[node->m_boneMapping[b]].blendTo(tmp_arr.get()[node->m_boneMapping[b]], *weights);
+								result[node->m_boneMapping[b]].blendTo(tmp_arr[node->m_boneMapping[b]], *weights);
 						}
 						weights++; // Step next node weight
 					}
 					mode++;
 				}
+				ThomasCore::Core().Memory()->stack(0).deallocate(tmp_arr);
 			}
 
 
