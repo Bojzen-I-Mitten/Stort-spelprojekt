@@ -21,6 +21,9 @@
         <CommandBinding Command="commands:CustomCommands.GetNewEmptyObject" CanExecute="NewEmptyObject_CanExecute" Executed="AddEmptyGameObject"/>
         <CommandBinding Command="commands:CustomCommands.GetDeleteGameObject" CanExecute="RemoveSelectedGameObjects_CanExecute" Executed="RemoveSelectedGameObjects"/>
         <CommandBinding Command="commands:CustomCommands.GetPlay" CanExecute="Play_CanExecute" Executed="PlayPauseButton_Click" />
+        <CommandBinding Command="commands:CustomCommands.GetCopyObject" CanExecute="MW_CopyObject_CanExecute" Executed="MW_CopyObject" />
+        <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="MW_PasteObject_CanExecute" Executed="MW_PasteObject" />
+        <CommandBinding Command="commands:CustomCommands.GetDuplicateObject" CanExecute="MW_CopyObject_CanExecute" Executed="MW_DuplicateObject" />
         <CommandBinding Command="commands:CustomCommands.Save" Executed="SaveScene_Click" />
         <CommandBinding Command="commands:CustomCommands.Open" Executed="LoadScene_Click"/>
     </Window.CommandBindings>
@@ -41,7 +44,6 @@
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
-            
         </Grid.RowDefinitions>
 
         
@@ -151,12 +153,11 @@
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                             <xcad:LayoutDocumentPane>
-                                    <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
+                                <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
                                     <local:AssetBrowser/>
                                 </xcad:LayoutAnchorable>
-                                    <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
-                                    <ListBox Name="console" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged">
-                                    </ListBox>
+                                <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
+                                    <local:Console/>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>

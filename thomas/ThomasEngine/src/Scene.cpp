@@ -1,3 +1,9 @@
+
+#pragma unmanaged
+#include <thomas/editor/EditorCamera.h>
+
+#pragma managed
+#include "Utility.h"
 #include "Scene.h"
 #include "ThomasSelection.h"
 #include "object\GameObject.h"
@@ -7,18 +13,18 @@
 #include "Debug.h"
 #include "Application.h"
 #include "Project.h"
-#using "PresentationFramework.dll"
+
 namespace ThomasEngine
 {
-
-	Scene::Scene() {
-		m_name = "New Scene";
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
+	Scene::Scene(System::String^ name) 
+	:	m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
+		m_name = name;;
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
-
-	Scene::Scene(System::String^ name) {
-		m_name = name;
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_gameObjects, m_gameObjectsLock);
+	Scene::Scene()
+		: m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
+		m_name = "New Scene";
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
 
 	void Scene::Play()
@@ -73,7 +79,7 @@ namespace ThomasEngine
 			}
 		}
 		catch (Exception^ e) {
-			Debug::Log("Failed to save scene: Error: " + e->Message);
+			Debug::LogError("Failed to save scene. Error: " + e->Message);
 		}
 
 			
@@ -89,7 +95,7 @@ namespace ThomasEngine
 	{
 		if (!IO::File::Exists(fullPath))
 		{
-			Debug::Log("Unable to find scene: " + fullPath);
+			Debug::LogError("Unable to find scene: " + fullPath);
 			return nullptr;
 		}
 		Scene^ scene;
@@ -107,6 +113,11 @@ namespace ThomasEngine
 			Xml::XmlReader^ file = Xml::XmlReader::Create(fullPath);
 			scene = (Scene^)serializer->ReadObject(file);
 
+			scene->EnsureLoad();
+
+			for (int i = 0; i < scene->GameObjects->Count; ++i)
+				scene->GameObjects[i]->nativePtr->SetName(Utility::ConvertString(scene->GameObjects[i]->Name));
+
 			file->Close();
 
 			scene->PostLoad();
@@ -115,10 +126,7 @@ namespace ThomasEngine
 			return scene;
 		}
 		catch (Exception^ e) {
-			Debug::Log("Loading scene: ");
-			Debug::Log(fullPath);
-			Debug::Log("with error:");
-			Debug::Log(e->Message);
+			Debug::LogError("Failed loading scene: " + fullPath + "\nError: " + e->Message);
 			scene = nullptr;
 		}
 		finally{
@@ -147,12 +155,24 @@ namespace ThomasEngine
 
 	void Scene::UnLoad()
 	{
-		for (int i = 0; i < m_gameObjects.Count; i++)
+		for (int i = 0; i < m_gameObjects->Count; i++)
 		{
 			m_gameObjects[i]->Destroy();
 			i--;
 		}
-		m_gameObjects.Clear();
+		m_gameObjects->Clear();
+
+	}
+
+	void Scene::EnsureLoad()
+	{
+
+		if (m_gameObjects == nullptr) { // Scene is empty
+			LOG("Warning, no objects in scene.");
+			m_gameObjectsLock = gcnew Object();
+			m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
+			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+		}
 
 	}
 
@@ -167,6 +187,24 @@ namespace ThomasEngine
 
 
 
+
+	Vector3 Scene::CameraPosition::get() {
+		return Utility::Convert(thomas::editor::EditorCamera::GetEditorCamera()->m_transform->GetLocalPosition());
+	}
+
+	void Scene::CameraPosition::set(Vector3 pos) {
+
+		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalPosition(Utility::Convert(pos));
+	}
+
+	Vector3 Scene::CameraEuler::get() {
+		return Utility::Convert(thomas::editor::EditorCamera::GetEditorCamera()->m_transform->GetLocalEulerAngles());
+	}
+
+	void Scene::CameraEuler::set(Vector3 euler) {
+
+		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
+	}
 
 }
 

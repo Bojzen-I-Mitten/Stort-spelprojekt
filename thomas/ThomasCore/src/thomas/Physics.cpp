@@ -75,7 +75,7 @@ namespace thomas
 		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
 
 		// Solve collision between two rigidbodies
-		int numManifolds = s_world->getDispatcher()->getNumManifolds();
+		unsigned int numManifolds = s_world->getDispatcher()->getNumManifolds();
 
 		for (unsigned i = 0; i < numManifolds; ++i)
 		{

@@ -10,6 +10,7 @@ using System.IO;
 
 using ThomasEngine;
 using System.Threading;
+using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
 namespace ThomasEditor
@@ -22,14 +23,12 @@ namespace ThomasEditor
     public partial class MainWindow : Window
     {
         
-        double scrollRatio = 0;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
         Guid g;
         public MainWindow()
         {
-            
             string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
@@ -46,17 +45,47 @@ namespace ThomasEditor
 
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CompositionTarget.Rendering += DoUpdates;
-            ThomasWrapper.OutputLog.CollectionChanged += OutputLog_CollectionChanged;
 
             if (Properties.Settings.Default.latestProjectPath != "")
                 OpenProject(Properties.Settings.Default.latestProjectPath);
-
+            else
+            {
+                this.IsEnabled = false;
+                Loaded += new RoutedEventHandler(Timer_OpenProjWindow);
+            }
 
             LoadLayout();
             Closing += MainWindow_Closing;
 
+            ThomasWrapper.OnStopPlaying += ThomasWrapper_OnStopPlaying;
+
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+        }
+
+        private void ThomasWrapper_OnStopPlaying()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                playPauseButton.DataContext = ThomasWrapper.IsPlaying();
+            }));
+            
+        }
+
+        private DispatcherTimer timer;
+
+        private void Timer_OpenProjWindow(object sender, RoutedEventArgs e)
+        {
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += Tick_OpenProjWindow;
+            timer.Start();
+        }
+
+        private void Tick_OpenProjWindow(object sender, EventArgs e)
+        {
+            new OpenProjectWindow().Show();
+            timer.Stop();
         }
 
         private void ScriptingManger_scriptReloadFinished()
@@ -104,7 +133,7 @@ namespace ThomasEditor
                 }
             }catch(Exception e)
             {
-                Debug.Log("Failed to save layout.dock. Error: " + e.Message);
+                Debug.LogError("Failed to save layout.dock. Error: " + e.Message);
             }
 
 
@@ -147,7 +176,7 @@ namespace ThomasEditor
                 }
             }catch(Exception e)
             {
-                Debug.Log("Failed to load editor layout. Error: " + e.Message);
+                Debug.LogError("Failed to load editor layout. Error: " + e.Message);
             }
 
             this.Top = Properties.Settings.Default.Top;
@@ -160,30 +189,7 @@ namespace ThomasEditor
                 WindowState = WindowState.Maximized;
             }
         }
-
-        private void OutputLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            this.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                if (e.NewItems != null)
-                {
-                    foreach (String output in e.NewItems)
-                    {
-                        TextBlock block = new TextBlock
-                        {
-                            Text = output,
-                            TextWrapping = TextWrapping.Wrap
-                        };
-                        console.Items.Add(block);
-                        console.Items.Add(new Separator());
-                        if (console.Items.Count > 10)
-                            console.Items.RemoveAt(0);
-                    }
-                } 
-            }));
-            
-        }
-
+                
         private void Node_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ContextMenu cm = this.FindResource("gameObjectContext") as ContextMenu;
@@ -198,7 +204,6 @@ namespace ThomasEditor
             if(this.lastRender != args.RenderingTime)
             {
                 ThomasWrapper.Update();
-                editorWindow.Title = ThomasWrapper.FrameRate.ToString();
                 lastRender = args.RenderingTime;
                 transformGizmo.UpdateTransformGizmo();
              }
@@ -212,7 +217,7 @@ namespace ThomasEditor
 
         private void AddEmptyGameObject(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("gameObject");
+            var x = new GameObject("newEmptyGameObject");
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
@@ -251,33 +256,7 @@ namespace ThomasEditor
         }
 
 
-        private void Console_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-
-            ScrollViewer scrollViewer = Extensions.GetDescendantByType<ScrollViewer>(sender as ListBox);
-
-            if (e.ExtentWidthChange != 0 || e.ExtentHeightChange != 0)
-            {
-                //calculate and set accordingly
-                double offset = scrollRatio * e.ExtentHeight - 0.5 * e.ViewportHeight;
-                //see if it is negative because of initial values
-                if (offset < 0)
-                {
-                    //center the content
-                    //this can be set to 0 if center by default is not needed
-                    offset = 0.5 * scrollViewer.ScrollableHeight;
-                }
-                scrollViewer.ScrollToVerticalOffset(offset);
-            }
-            else
-            {
-                //store the relative values if normal scroll
-                if(e.ExtentHeight > 0)
-                    scrollRatio = (e.VerticalOffset + 0.5 * e.ViewportHeight) / e.ExtentHeight;
-            }
-
-
-        }
+        
 
         private void Recompile_Shader_Click(object sender, RoutedEventArgs e)
         {
@@ -302,7 +281,6 @@ namespace ThomasEditor
                 SaveSceneAs_Click(sender, e);
             }
         }
-
 
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
@@ -364,7 +342,7 @@ namespace ThomasEditor
                 {
                     Scene.CurrentScene.UnLoad();
                     Scene.CurrentScene = null;
-                    Debug.Log("Scene failed to load...");
+                    Debug.LogError("Scene failed to load...");
                 }
             };
             worker.RunWorkerCompleted += (o, ea) =>
@@ -428,43 +406,108 @@ namespace ThomasEditor
 
         private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Camera");
+            var x = new GameObject("newCamera");
             x.AddComponent<Camera>();
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewPointLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newPointLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.POINT;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         private void AddNewSpotLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newSpotLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.SPOT;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         private void AddNewDirectionalLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newDirectionalLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.DIRECTIONAL;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         private void AddNewAreaLightPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = new GameObject("Light");
+            var x = new GameObject("newAreaLight");
             x.AddComponent<LightComponent>();
             x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.AREA;
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
+        //Main window CTRL + C
+        private void MW_CopyObject(object sender, RoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                Debug.Log("Copying object..");
+                hierarchy.SetCopy((GameObject)item.DataContext);
+
+                if (hierarchy.GetCopy())
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+        }
+
+        //Main window CTRL + V
+        private void MW_PasteObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Pasting object..");
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+
+            if (hierarchy.GetCopy())
+            {
+                GameObject.Instantiate(hierarchy.GetCopy());
+
+                Debug.Log("Pasted object.");
+
+                return;
+            }
+        }
+
+        private void MW_DuplicateObject(object sender, RoutedEventArgs e)
+        {
+            MW_CopyObject(sender, e);
+            MW_PasteObject(sender, e);
+        }
+
+        //Can only be copied if item is selected
+        private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            TreeViewItem item = hierarchy.GetSelection();
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void MW_PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
+            if (hierarchy.GetCopy())
+            {
+                e.CanExecute = true;
+                return;
+            }
+        }
+
         #endregion
 
-        private void NewProject_Click(object sender, RoutedEventArgs e)
+        public void NewProject_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
@@ -473,7 +516,6 @@ namespace ThomasEditor
             saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             saveFileDialog.RestoreDirectory = true;
             saveFileDialog.FileName = "New Project";
-
 
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -493,11 +535,13 @@ namespace ThomasEditor
                 }));
                 worker.SetApartmentState(ApartmentState.STA);
                 worker.Start();
-
+                if (timer != null)
+                {
+                    OpenProjectWindow._instance.ProjectLoadedClose();
+                }
             }
-                      
         }
-        private void OpenProject_Click(object sender, RoutedEventArgs e)
+        public void OpenProject_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "Thomas Project (*.thomas) |*.thomas";
@@ -508,9 +552,11 @@ namespace ThomasEditor
             if (openFileDialog.ShowDialog() == true)
             {
                 OpenProject(openFileDialog.FileName);
-
+                if (timer != null)
+                {
+                    OpenProjectWindow._instance.ProjectLoadedClose();
+                }
             }
-
         }
         public void OpenProject(string projectPath)
         {

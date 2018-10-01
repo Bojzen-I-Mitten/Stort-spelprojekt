@@ -10,5 +10,12 @@
 *.mp3
 *.wav
 *.anim
+*.blend*
 
 Models/
+
+
+
+# Other stuff
+
+*.ini

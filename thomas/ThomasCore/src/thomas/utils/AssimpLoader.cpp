@@ -1,5 +1,6 @@
 #include "AssimpLoader.h"
 #include <algorithm>
+#include <exception>
 #include "../resource/texture/Texture.h"
 #include "../graphics/Mesh.h"
 #include "../resource/Material.h"
@@ -8,6 +9,7 @@
 #include <assimp\postprocess.h>
 #include "../graphics/animation/data/Skeleton.h"
 #include "Math.h"
+
 
 namespace thomas
 {
@@ -100,13 +102,15 @@ namespace thomas
 				aiProcess_ValidateDataStructure |
 				aiProcess_GenSmoothNormals |
 				aiProcess_CalcTangentSpace |
-				aiProcess_FlipUVs 
-				| aiProcess_ConvertToLeftHanded
+				aiProcess_FlipUVs |
+				aiProcess_ConvertToLeftHanded |
+				aiProcess_LimitBoneWeights
 			);
 
 			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 			{
-				LOG("ERROR::ASSIMP " << importer.GetErrorString());
+				throw std::exception(importer.GetErrorString());
+				//LOG("ERROR::ASSIMP " << importer.GetErrorString());
 				return NULL;
 			}
 			return scene;
@@ -268,7 +272,6 @@ namespace thomas
 			graphics::Vertices vertices;
 			std::vector <unsigned int> indices;
 			std::string name = meshName + "-" + std::string(mesh->mName.C_Str());
-			resource::Material* material;
 
 			//vector<Texture> textures;
 			vertices.positions.resize(mesh->mNumVertices);
@@ -369,7 +372,7 @@ namespace thomas
 						*/
 					}
 
-					for (int j = 0; j < meshBone->mNumWeights; j++)
+					for (unsigned int j = 0; j < meshBone->mNumWeights; j++)
 					{
 						vertices.AddBoneData(meshBone->mWeights[j].mVertexId, boneIndex, meshBone->mWeights[j].mWeight);
 					}
@@ -425,6 +428,14 @@ namespace thomas
 			}
 		}
 
+		uint32_t verifyBonehash(uint32_t hash, SkeletonConstruct &boneMap) {
+			for (uint32_t i = 0; i < boneMap.m_boneInfo.size(); i++) {
+				if (boneMap.m_boneInfo[i]._boneHash == hash)
+					return i;
+			}
+			return UINT32_MAX;
+		}
+
 		void ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform)
 		{
 			std::string boneName = node->mName.C_Str();
@@ -432,7 +443,7 @@ namespace thomas
 			aiMatrix4x4 nodeTransform = node->mTransformation;
 			aiMatrix4x4 object_space = parentTransform * nodeTransform;
 
-			unsigned int BoneIndex = boneMap.m_boneInfo.size();
+			size_t BoneIndex = boneMap.m_boneInfo.size();
 			graphics::animation::Bone bi;
 			bi._boneIndex = BoneIndex;
 			bi._boneName = boneName;
@@ -447,6 +458,14 @@ namespace thomas
 			bi._bindPose = convertAssimpMatrix(nodeTransform);
 			// Store absolute transform
 			boneMap.m_absoluteBind.push_back(object_space);
+
+			uint32_t conflictInd = verifyBonehash(bi._boneHash, boneMap);
+			if (conflictInd != UINT32_MAX) {
+				std::string err("Warning. Multiple bones shares the same hash value, try renaming a bone to solve the conflict. Name conflict between:");
+				LOG(err);
+				LOG(bi._boneName);
+				LOG(boneMap.m_boneInfo[conflictInd]._boneName);
+			}
 
 			boneMap.m_boneInfo.push_back(bi);
 			boneMap.m_mapping[boneName] = BoneIndex;
@@ -669,8 +688,14 @@ namespace thomas
 		}
 		void ProcessChannelData(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
-			if (bone < 0)
+			if (bone < 0) {
+				std::string err("Warning, animated bone not included in skeleton: ");
+				err.append(channel->mNodeName.C_Str());
+				err.append("\nNumber of keyframes in channel: ");
+				err.append(std::to_string(channel->mNumPositionKeys + channel->mNumRotationKeys + channel->mNumScalingKeys));
+				LOG(err);
 				return; //This channel does not animate a bone.
+			}
 			anim._boneHash[bone] = hash_djb2(construct.m_boneInfo[bone]._boneName.c_str());
 			ProcessChannelData(bone, channel, ticksPerSecond, construct, anim);
 		}

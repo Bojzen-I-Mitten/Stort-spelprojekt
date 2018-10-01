@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "texture\Texture2D.h"
 #include "Resources.h"
+#include "..\SceneSurrogate.h"
 namespace ThomasEngine {
 
 	Material::Material(ThomasEngine::Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
@@ -88,7 +89,8 @@ namespace ThomasEngine {
 			}
 			else if (t == System::Single::typeid)
 			{
-				//SetRaw(key, &prop);
+				float v = (float)prop;
+				SetFloat(key, v);
 			}
 		}
 		if (m_loaded && !ThomasWrapper::IsPlaying())
@@ -105,6 +107,8 @@ namespace ThomasEngine {
 		for (auto& prop : ((thomas::resource::Material*)m_nativePtr)->GetEditorProperties())
 		{
 			String^ name = Utility::ConvertString(prop.first);
+			if (prop.second == nullptr)
+				continue;
 			System::Object^ value;
 			switch (prop.second->GetType())
 			{
@@ -148,6 +152,7 @@ namespace ThomasEngine {
 		types->Add(Texture::typeid);
 		types->Add(Texture2D::typeid);
 		types->Add(ThomasEngine::Shader::typeid);
+		types->Add(SceneResource::typeid);
 		return types;
 	}
 }
