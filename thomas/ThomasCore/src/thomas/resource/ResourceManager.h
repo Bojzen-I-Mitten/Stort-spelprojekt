@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/allocator/LinearAllocator.h"
+#include "../utils/allocator/StackAllocator.h"
 
 namespace thomas {
 
@@ -8,7 +9,8 @@ namespace thomas {
 
 		class ResourceManager {
 
-			utility::allocator::LinearAllocator m_alloc;
+			utility::allocator::LinearAllocator constant_memory;
+			utility::allocator::StackAllocator stack_allocation;
 
 			ResourceManager();
 			~ResourceManager();

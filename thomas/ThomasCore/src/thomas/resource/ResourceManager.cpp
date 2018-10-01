@@ -7,5 +7,14 @@ namespace thomas {
 
 
 
+		ResourceManager::ResourceManager()
+			: constant_memory(4096, NULL)
+		{
+		}
+
+		ResourceManager::~ResourceManager()
+		{
+		}
+
 	}
 }
