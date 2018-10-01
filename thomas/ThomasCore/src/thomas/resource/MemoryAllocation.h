@@ -19,6 +19,9 @@ namespace thomas {
 			utility::allocator::StackAllocator& stack(uint32_t index);
 
 		private:
+
+			uint8_t * m_allocation;
+
 			utility::allocator::LinearAllocator m_constant_memory;
 			utility::allocator::StackAllocator m_stack_allocation[NUM_THREAD];
 		};

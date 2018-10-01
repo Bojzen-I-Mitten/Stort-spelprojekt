@@ -7,6 +7,7 @@
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
+#include "resource/MemoryAllocation.h"
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
@@ -67,6 +68,11 @@ namespace thomas
 	void ThomasCore::Exit()
 	{
 		s_initialized = false;
+	}
+
+	ThomasCore::ThomasCore()
+		: m_memAlloc(new resource::MemoryAllocation())
+	{
 	}
 
 	bool ThomasCore::Initialized()

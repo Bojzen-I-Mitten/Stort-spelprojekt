@@ -14,7 +14,7 @@ namespace thomas {
 			public:
 
 				Skeleton &m_ref;
-				uint32_t m_numChannel;
+				uint32_t NumChannel() { return m_boneMapping.size(); }
 				std::vector<int> m_boneMapping;
 
 				AnimationNode(Skeleton &ref);

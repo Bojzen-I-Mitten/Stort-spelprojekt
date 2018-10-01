@@ -8,10 +8,13 @@ namespace thomas {
 
 
 		MemoryAllocation::MemoryAllocation()
-			: m_constant_memory(4096, NULL), m_stack_allocation{
-		utility::allocator::StackAllocator(4096, NULL),
-		utility::allocator::StackAllocator(4096, NULL),
-		utility::allocator::StackAllocator(4096, NULL)
+			: 
+			m_allocation(new uint8_t[4096*4]),
+			m_constant_memory(4096, m_allocation),
+			m_stack_allocation{
+		utility::allocator::StackAllocator(4096, m_allocation + 4096),
+		utility::allocator::StackAllocator(4096, m_allocation + 4096 * 2),
+		utility::allocator::StackAllocator(4096, m_allocation + 4096 * 3)
 		}
 		{	}
 

@@ -35,7 +35,7 @@ namespace thomas {
 				for (uint32_t i = 0; i < m_NumNode; i++)
 				{
 					AnimationNode * node = m_nodes[i];
-					for (unsigned int b = 0; b < node->m_numChannel; b++) {
+					for (unsigned int b = 0; b < node->NumChannel(); b++) {
 						int bone = node->m_boneMapping[b];
 						mapping[bone] = bone;	// Currently mapping 1->1 in Blender node(s), ignoring unsused.
 					}
@@ -74,12 +74,12 @@ namespace thomas {
 				AnimationNode * node = m_nodes[0];
 
 				// Initiate data with bind pose (if initial anim node does not write to all channels).
-				if(node->m_numChannel < this->m_numChannel)
+				if(node->NumChannel() < this->NumChannel())
 					std::memcpy(result, m_ref.getBindComponents(), sizeof(TransformComponents) * m_ref.getNumBones());
 
 				// Overwrite pose with data from the first animation node
 				node->calcFrame(result);
-				weights += (mode[0] == WeightMixer::PerChannel ? node->m_numChannel : 1u);
+				weights += (mode[0] == WeightMixer::PerChannel ? node->NumChannel() : 1u);
 
 				// Blend remaining nodes
 				for (unsigned int i = 1; i < m_NumNode; i++)
@@ -89,7 +89,7 @@ namespace thomas {
 						node = m_nodes[i];
 						node->calcFrame(tmp_arr);
 						// Blend bones (and map each to skeleton index) 
-						for (unsigned int b = 0; b < node->m_numChannel; b++)
+						for (unsigned int b = 0; b < node->NumChannel(); b++)
 							result[node->m_boneMapping[b]].blendTo(tmp_arr[b], *weights++);
 					}
 					else if (*mode == WeightMixer::Additive) {
@@ -98,7 +98,7 @@ namespace thomas {
 							node = m_nodes[i];
 							node->calcFrame(tmp_arr);
 							// Blend bones (and map each to skeleton index) 
-							for (unsigned int b = 0; b < node->m_numChannel; b++)
+							for (unsigned int b = 0; b < node->NumChannel(); b++)
 								result[node->m_boneMapping[b]].addFrom(tmp_arr[node->m_boneMapping[b]], *weights);
 						}
 						weights++; // Step next node weight
@@ -110,7 +110,7 @@ namespace thomas {
 							node = m_nodes[i];
 							node->calcFrame(tmp_arr);
 							// Blend bones (and map each to skeleton index) 
-							for (unsigned int b = 0; b < node->m_numChannel; b++)
+							for (unsigned int b = 0; b < node->NumChannel(); b++)
 								result[node->m_boneMapping[b]].blendTo(tmp_arr[node->m_boneMapping[b]], *weights);
 						}
 						weights++; // Step next node weight

@@ -24,7 +24,7 @@ namespace thomas
 		static bool Destroy();
 		static void Exit();
 
-		 
+		ThomasCore();
 
 	public:
 		static ID3D11Device* GetDevice();

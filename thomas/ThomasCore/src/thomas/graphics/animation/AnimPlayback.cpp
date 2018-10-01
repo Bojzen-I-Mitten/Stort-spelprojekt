@@ -21,7 +21,6 @@ namespace thomas {
 					m_channel[i].init(ref.getBone(i)._bindPose);
 					m_boneMapping[i] = i;
 				}
-				m_numChannel = ref.getNumBones();
 			}
 			/* Generate an animation player
 			*/
@@ -45,7 +44,6 @@ namespace thomas {
 						m_channel.back().newAnimation(&anim[i], m_playback->m_elapsedTime);
 					}
 				}
-				m_numChannel = m_channel.size();
 			}
 
 			AnimPlayback::~AnimPlayback()

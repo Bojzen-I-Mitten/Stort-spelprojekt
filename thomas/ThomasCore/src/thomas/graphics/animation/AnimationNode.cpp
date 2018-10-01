@@ -6,7 +6,7 @@ namespace thomas {
 		namespace animation {
 
 			AnimationNode::AnimationNode(Skeleton &ref)
-				: m_ref(ref), m_numChannel(0), m_boneMapping()
+				: m_ref(ref), m_boneMapping()
 			{
 				/*
 				// Set all bones to 'inactive' initially.

@@ -61,7 +61,7 @@ namespace ThomasEngine
 
 		WeightHandle ^ BlendNode::generateWeightHandle()
 		{
-			WeightHandle^ handle = gcnew WeightHandle(m_node->m_numChannel);
+			WeightHandle^ handle = gcnew WeightHandle(m_node->NumChannel());
 			m_node->setWeightMixer(handle->Mixer());
 			return handle;
 		}
