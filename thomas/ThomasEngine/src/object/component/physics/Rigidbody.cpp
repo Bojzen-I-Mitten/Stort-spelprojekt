@@ -25,20 +25,3 @@ void ThomasEngine::Rigidbody::OnDestroy()
 	}
 	Component::OnDestroy();
 }
-
-ThomasEngine::GameObject^ ThomasEngine::Rigidbody::GetTargetCollider()
-{
-	if (this != nullptr)
-	{
-		auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
-
-		if (collider != nullptr)
-		{
-			GameObject^ target = (GameObject^)Object::Find(Utility::Convert(collider->m_guid));
-			((thomas::object::component::Rigidbody*)nativePtr)->ClearTargetCollider();
-			return target;
-		}
-	}
-
-	return nullptr;
-}

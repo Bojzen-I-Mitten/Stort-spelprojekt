@@ -8,6 +8,7 @@ namespace thomas { namespace object { namespace component { class Component; } }
 namespace ThomasEngine 
 {
 	ref class GameObject;
+	ref class Collider;
 	ref class Transform;
 	[HideInInspector]
 	[SerializableAttribute]
@@ -36,7 +37,14 @@ namespace ThomasEngine
 		virtual void FixedUpdate();
 		virtual void OnDrawGizmosSelected();
 		virtual void OnDrawGizmos();
-		virtual void OnCollisionEnter(GameObject^ collider);
+
+		virtual void OnCollisionEnter(Collider^ collider) {};
+		virtual void OnCollisionStay(Collider^ collider) {};
+		virtual void OnCollisionExit(Collider^ collider) {};
+
+		virtual void OnTriggerEnter(Collider^ collider) {};
+		virtual void OnTriggerStay(Collider^ collider) {};
+		virtual void OnTriggerExit(Collider^ collider) {};
 
 		GameObject^ m_gameObject;
 

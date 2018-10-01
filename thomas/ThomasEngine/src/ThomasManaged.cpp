@@ -118,12 +118,6 @@ namespace ThomasEngine {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				if (gameObject->GetActive())
 				{
-					auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
-					if (collider != nullptr)
-					{
-						gameObject->OnCollisionEnter(collider);
-					}
-
 					gameObject->Update();
 				}
 			}

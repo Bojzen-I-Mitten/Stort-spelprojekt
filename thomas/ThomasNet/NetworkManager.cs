@@ -1,5 +1,4 @@
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using LiteNetLib;
@@ -18,8 +17,6 @@ namespace ThomasEngine.Network
     {
 
         public static NetworkManager instance;
-        
-        
         //private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
 
         internal NetPacketProcessor NetPacketProcessor;
@@ -42,7 +39,7 @@ namespace ThomasEngine.Network
         
         private float ServerTime;
 
-        private NetPeer LocalPeer = null;
+        internal NetPeer LocalPeer = null;
 
         public int TICK_RATE { get; set; } = 24;
 
@@ -85,6 +82,11 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
+
+            //Disable all networked gameObjects in scene.
+            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) => {
+                identity.gameObject.SetActive(false);
+                });
 
             //InitServerNTP();
             if (UseLobby)
@@ -156,6 +158,8 @@ namespace ThomasEngine.Network
             {
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
             }
+
+            NetScene.ObjectOwners.Add(_peer, new List<NetworkIdentity>());
         }
 
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
@@ -225,8 +229,8 @@ namespace ThomasEngine.Network
             if(Input.GetKeyDown(Input.Keys.H)) //HOST
             {
 
+                NetScene.ActivateAndAssignSceneObjects();
                 NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
-
             }
 
             Diagnostics();
@@ -242,8 +246,18 @@ namespace ThomasEngine.Network
 
         }
 
-      
-        
+
+
+        public void TakeOwnership(NetworkIdentity networkIdentiy)
+        {
+
+            NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent{
+                NetID = networkIdentiy.ID
+            };
+
+            Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
+        }
+
 
         //internal void InitServerNTP()
         //{
@@ -255,7 +269,7 @@ namespace ThomasEngine.Network
         //}
 
 
-                                    
+
 
         public void CheckPacketLoss()
         {

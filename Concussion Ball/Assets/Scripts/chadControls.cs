@@ -2,7 +2,6 @@
  * Freeze rotation x and z axes 
  */
 
-using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
@@ -19,9 +18,14 @@ namespace ThomasEditor
         public float force { get; set; } = 5;
         public int rotationSpeed { get; set; } = 1;
 
+        public float throwForce { get; set; }
+
         Rigidbody rBody;
-        public GameObject camPrefab { get; set; }
+ 
         //Camera test;
+
+        private Ball ball = null;
+        private bool hasBall = false;
 
         bool jumpDelay = true;
         bool movingForward = false;
@@ -33,8 +37,10 @@ namespace ThomasEditor
         {
             rBody = gameObject.GetComponent<Rigidbody>();
             //test = camPrefab.GetComponent<Camera>();
-            if (isOwner)
-                camPrefab.AddComponent<Camera>();
+            //if (isOwner)
+            //    camPrefab.AddComponent<Camera>();
+
+            ball = Object.GetObjectsOfType<Ball>().FirstOrDefault();
         }
 
         //Coroutine for jumping delay, also used for tackling delay
@@ -125,6 +131,31 @@ namespace ThomasEditor
                 if (Input.GetKey(Input.Keys.D))
                     transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -rotationSpeed * Time.DeltaTime);
             }
+
+            if(hasBall) FondleBall();
+        }
+
+
+        public void FondleBall()
+        {
+            if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+            {
+                ball.Throw(transform.forward * throwForce);
+            }
+        }
+
+        public override void OnCollisionEnter(Collider collider)
+        {
+            if (ball)
+            {
+                if (collider.gameObject == ball.gameObject)
+                {
+                    TakeOwnership(collider.gameObject);
+                    ball.Pickup(gameObject);
+                    hasBall = true;
+                }
+            }
+            
         }
     }
 }

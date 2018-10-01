@@ -3,6 +3,7 @@
 #include "../../../utils/Math.h"
 #include "../Transform.h"
 #include "Collider.h"
+#include <imgui/ImGuizmo.h>
 #include <memory>
 
 namespace thomas
@@ -13,13 +14,11 @@ namespace thomas
 		{
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
-			m_targetCollider(nullptr), m_hasGravity(true), 
-			m_kinematic(false), 
+			m_kinematic(false),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f)
 			{
-				this->setUserPointer(this);
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);
@@ -31,7 +30,7 @@ namespace thomas
 				delete getMotionState();
 				
 				Physics::s_world->removeCollisionObject(this);
-				delete getCollisionShape();				
+				delete getCollisionShape();		
 			}
 
 			void Rigidbody::OnEnable()
@@ -84,36 +83,42 @@ namespace thomas
 					trans.setOrigin((btVector3&)pos);
 					trans.setRotation((btQuaternion&)rot);
 					getMotionState()->setWorldTransform(trans);
+
+					if (ImGuizmo::IsUsing()) {
+						this->setLinearVelocity(btVector3(0, 0, 0));
+						this->setAngularVelocity(btVector3(0, 0, 0));
+					}
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 				}			
 			}
 
-			void Rigidbody::SetFreezePosition(const math::Vector3 & freezePosition)
+			void Rigidbody::SetFreezePosition(const math::Vector3& freezePosition)
 			{
 				m_freezePosition = freezePosition;
 				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
 			}
 
-			void Rigidbody::SetFreezeRotation(const math::Vector3 & freezeRotation)
+			void Rigidbody::SetFreezeRotation(const math::Vector3& freezeRotation)
 			{
 				m_freezeRotation = freezeRotation;
-				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));
+				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 			}
 
-			void Rigidbody::SetGravity(bool gravity)
+			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
 			{
-				if (gravity != m_hasGravity)
-				{
-					m_hasGravity = gravity;
-					if (initialized)
-					{
-						Physics::RemoveRigidBody(this);
-						return m_hasGravity == true ? this->setGravity(Physics::s_world->getGravity()) : this->setGravity(btVector3(0, 0, 0));
-						Physics::AddRigidBody(this);
-					}
-				}
+				this->setLinearVelocity(Physics::ToBullet(linearVel));
+			}
+
+			void Rigidbody::SetAngularVelocity(const math::Vector3 & angularVel)
+			{
+				this->setAngularVelocity(Physics::ToBullet(angularVel));
+			}
+
+			void Rigidbody::SetActivationState(ActivationState state)
+			{
+				this->setActivationState(state);
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
@@ -129,13 +134,16 @@ namespace thomas
 					}		
 				}	
 			}
-	
+
 			void Rigidbody::SetCollider(Collider * collider)
 			{
 				m_collider = collider;
 				bool removed = Physics::RemoveRigidBody(this);
 				delete getCollisionShape();
 				setCollisionShape(collider->GetCollisionShape());
+				this->setUserPointer(collider);
+				collider->SetAttachedRigidbody(this);
+				collider->SetTrigger(collider->IsTrigger());
 				UpdateRigidbodyMass();
 				if(removed)
 					Physics::AddRigidBody(this);
@@ -152,17 +160,7 @@ namespace thomas
 				}
 			}
 
-			void Rigidbody::SetTargetCollider(GameObject* collider)
-			{
-				if (m_targetCollider == nullptr)
-				{
-					m_targetCollider = std::make_unique<GameObject>("");					
-				}
-
-				// Don't change the pointer if target collider has not been updated
-				if(m_targetCollider.get() != collider)
-					*m_targetCollider = *collider;
-			}
+			
 
 			void Rigidbody::AddTorque(const math::Vector3 & torque, ForceMode mode)
 			{
@@ -187,31 +185,10 @@ namespace thomas
 				else if (mode == ForceMode::Impulse)
 					this->applyImpulse(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
-
-			GameObject * Rigidbody::GetTargetCollider()
-			{
-				if (m_targetCollider != nullptr)
-				{
-					if (this->hasContactResponse() && m_targetCollider->GetComponent<object::component::Rigidbody>()->hasContactResponse())
-						return m_targetCollider.get();
-				}
-
-				return nullptr;
-			}
-
-			void Rigidbody::ClearTargetCollider()
-			{
-				m_targetCollider.reset();
-			}
-
+						
 			float Rigidbody::GetMass() const
 			{
 				return m_mass;
-			}
-
-			bool Rigidbody::HasGravity() const
-			{
-				return m_hasGravity;
 			}
 
 			bool Rigidbody::IsKinematic() const
@@ -227,6 +204,16 @@ namespace thomas
 			math::Vector3 Rigidbody::GetFreezeRotation() const
 			{
 				return m_freezeRotation;
+			}
+
+			math::Vector3 Rigidbody::GetLinearVelocity() const
+			{
+				return Physics::ToSimple(this->getLinearVelocity());
+			}
+
+			math::Vector3 Rigidbody::GetAngularVelocity() const
+			{
+				return Physics::ToSimple(this->getAngularVelocity());
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()
