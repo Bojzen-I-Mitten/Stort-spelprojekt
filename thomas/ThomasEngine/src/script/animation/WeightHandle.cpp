@@ -44,5 +44,21 @@ namespace ThomasEngine
 		WeightTripple::WeightTripple(float scaleWeight, float rotationWeight, float translationWeight)
 			: m_scale(scaleWeight), m_rot(rotationWeight), m_translation(translationWeight)
 		{}
+		WeightTripple WeightTripple::fromWeight(float weight)
+		{
+			WeightTripple w;
+			w.m_scale = weight;
+			w.m_rot = weight;
+			w.m_translation = weight;
+			return w;
+		}
+		WeightTripple WeightTripple::fromWeight(float scale, float rot, float trans)
+		{
+			WeightTripple w;
+			w.m_scale = scale;
+			w.m_rot = rot;
+			w.m_translation = trans;
+			return w;
+		}
 	}
 }

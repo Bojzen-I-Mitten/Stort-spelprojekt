@@ -29,17 +29,10 @@ public class AnimationBlendTest : ScriptComponent
             //weight.m_WeightData[0] = 
             timer += Time.DeltaTime;
             float t = (float)(0.5 * Math.Sin(timer) + 0.5);
-            WeightTripple w;
-            w.m_scale = t;
-            w.m_rot = t;
-            w.m_translation = t;
+            WeightTripple w = WeightTripple.fromWeight(t);
+            WeightTripple w2 = WeightTripple.fromWeight(1 - t);
             weight.setWeight(0, w);
-
-            t = 1 - t;
-            w.m_scale = t;
-            w.m_rot = t;
-            w.m_translation = t;
-            weight.setWeight(1, w);
+            weight.setWeight(1, w2);
         }
     }
 }

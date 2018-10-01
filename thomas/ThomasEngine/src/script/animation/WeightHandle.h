@@ -17,6 +17,9 @@ namespace ThomasEngine
 			WeightTripple(float weight);
 			WeightTripple(float scale, float rot, float trans);
 
+			static WeightTripple fromWeight(float weight);
+			static WeightTripple fromWeight(float scale, float rot, float trans);
+
 			thomas::graphics::animation::WeightTripple convert();
 		};
 
