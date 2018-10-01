@@ -85,7 +85,6 @@ namespace ThomasEngine {
 			// Macro that resets profilemanagers
 			// if BENCHMARK is not defined, compiler does nothing
 			NEW_FRAME();
-			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
@@ -175,7 +174,7 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
-		ProfileManager::dumpDataToFile("test.csv");
+		ProfileManager::dumpDataToFile("data.csv");
 		thomas::ThomasCore::Exit();
 	}
 
@@ -205,6 +204,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::Update()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Window::UpdateFocus();
 		UpdateLog();
 		if (thomas::editor::EditorCamera::HasSelectionChanged())

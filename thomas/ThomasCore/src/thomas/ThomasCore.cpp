@@ -53,7 +53,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
-		AutoProfile stamp = AutoProfile("ThomasCore::Update", ProfileManager::operationType::miscLogic);
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();

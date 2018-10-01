@@ -45,6 +45,7 @@ namespace ThomasEngine {
 
 	bool GameObject::InitComponents(bool playing)
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 		bool completed = true;
 		for each(Component^ component in m_components)
@@ -66,6 +67,7 @@ namespace ThomasEngine {
 	}
 
 	void GameObject::PostInstantiate(Scene^ scene) {
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		PostLoad(scene);
 		scene->GameObjects->Add(this);
 		for (int i = 0; i < m_transform->children->Count; i++) {
@@ -73,6 +75,7 @@ namespace ThomasEngine {
 		}
 	}
 	void GameObject::InitGameObjects(bool playing) {
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		bool completed;
 		do {
 			completed = true;
@@ -150,6 +153,7 @@ namespace ThomasEngine {
 
 	void GameObject::Destroy()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (m_isDestroyed)
 			return;
 		m_isDestroyed = true;
@@ -230,6 +234,7 @@ namespace ThomasEngine {
 	}
 
 	GameObject^ GameObject::CreatePrefab() {
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		GameObject^ newGobj = gcnew GameObject();
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
@@ -325,6 +330,7 @@ namespace ThomasEngine {
 	where T : Component
 	T GameObject::GetComponent()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		List<T>^ tComponents = gcnew List<T>(System::Linq::Enumerable::OfType<T>(%m_components));
 		if (tComponents->Count > 0)
 			return tComponents[0];
@@ -346,6 +352,7 @@ namespace ThomasEngine {
 	where T : Component
 	List<T>^ GameObject::GetComponents()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		List<T>^ list = gcnew List<T>(System::Linq::Enumerable::OfType<T>(%m_components));
 		return list;
 	}
@@ -387,6 +394,7 @@ namespace ThomasEngine {
 
 	GameObject^ GameObject::Find(String^ name)
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
 		{
 			if (gameObject->Name == name)
@@ -397,6 +405,7 @@ namespace ThomasEngine {
 
 	bool GameObject::GetActive()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		return ((thomas::object::GameObject*)nativePtr)->GetActive();
 	}
 

@@ -4,7 +4,9 @@
 #include <map>
 #include <algorithm>
 
+
 #define BENCHMARK
+
 
 namespace thomas
 {
@@ -13,11 +15,30 @@ namespace thomas
 
 	public:
 		enum class operationType { rendering, miscLogic, gameObjects, physics, animation, allocation };
+
+
+		struct Stamp
+		{
+			long timestamp;
+			unsigned int frame;
+			Stamp(long timestamp, unsigned int frame) : timestamp(timestamp), frame(frame)
+			{
+
+			};
+		};
 		struct Sample
 		{
 			const char* name;
 			operationType type;
-			std::vector<long> stamps;
+			std::vector<Stamp> stamps;
+
+			Sample(const char* name, operationType type, long timestamp, unsigned frame) :
+				name(name), type(type)
+			{
+				stamps.push_back(std::move(Stamp(timestamp, frame)));
+			}
+
+			Sample() {};
 		};
 
 
@@ -26,8 +47,7 @@ namespace thomas
 		static void dumpDataToFile(const char* filename);
 
 	private:
-		static std::map<const char, Sample> s_samples;
-		static std::vector<std::map<const char, Sample>> s_frames;
+		static std::map<const char*, Sample> s_samples;
 		static int nrOfFrames;
 	};
 }

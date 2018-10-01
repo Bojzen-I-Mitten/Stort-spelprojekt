@@ -55,6 +55,8 @@ namespace ThomasEditor.Testing
                     sessionDuration = 11000000;
                 }
             });
+
+      
         }
 
         public void SceneDone(Scene newScene)
