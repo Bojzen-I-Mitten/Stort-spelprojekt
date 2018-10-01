@@ -58,6 +58,8 @@ namespace thomas {
 			void AnimBlender::update(float dT)
 			{
 				m_weights->update(dT);
+				for (unsigned int i = 0; i < m_NumNode; i++)
+					m_nodes[i]->update(dT);
 			}
 			void AnimBlender::calcFrame(TransformComponents* result) 
 			{
