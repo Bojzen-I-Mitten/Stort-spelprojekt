@@ -23,9 +23,7 @@ namespace ThomasEngine
 	}
 	void Transform::parent::set(ThomasEngine::Transform^ value)
 	{
-		Transform^ oldParent = parent;
 		SetParent(value);
-		OnParentChanged(this, oldParent, value);
 	}
 
 	List<Transform^>^ Transform::children::get()
@@ -76,14 +74,17 @@ namespace ThomasEngine
 
 	void Transform::SetParent(Transform ^ value)
 	{
-		SetParent(value, true);
+		SetParent(value, false);
 	}
 	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
 	{
+		Transform^ oldParent = parent;
 		if (value)
 			((thomas::object::component::Transform*)nativePtr)->SetParent((thomas::object::component::Transform*)value->nativePtr, worldPositionStays);
 		else
 			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
+
+		OnParentChanged(this, oldParent, value);
 	}
 
 	void Transform::LookAt(Transform^ target) {
