@@ -90,8 +90,9 @@ namespace ThomasEngine.Network
                 return;
             }
 
-            //Remove previous owner
-            NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
+            //Remove previous owne
+            if(previousOwner != null)
+                NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
 
             NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
 
