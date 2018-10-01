@@ -9,35 +9,34 @@ namespace ThomasEngine.Network
     {
         protected bool isDirty = false;
         private int prefabID;
-        private NetworkID m_networkID;
+        private NetworkIdentity networkIdentiy;
 
 
-
-        protected int NetID
+        protected int ID
         {
-            get { return NetworkID.ID; }
+            get { return Identity.ID; }
         }
 
-        protected NetworkID NetworkID
+        protected NetworkIdentity Identity
         {
             get
             {
-                if(m_networkID == null)
+                if(networkIdentiy == null)
                 {
-                    m_networkID = gameObject.GetComponent<NetworkID>();
-                    if(m_networkID == null)
+                    networkIdentiy = gameObject.GetComponent<NetworkIdentity>();
+                    if(networkIdentiy == null)
                     {
                         Debug.Log("There is no networkID on this object.");
                     }
                 }
-                return m_networkID;
+                return networkIdentiy;
             }
         }
 
         [Browsable(false)]
         public bool isOwner
         {
-            get { return NetworkID.Owner; } 
+            get { return Identity.Owner; } 
         }
 
         virtual public void OnRead(NetPacketReader reader, bool initialState)
@@ -56,6 +55,16 @@ namespace ThomasEngine.Network
 
         virtual public void OnGotOwnership() { }
         virtual public void OnLostOwnership() { }
+        
+        protected void TakeOwnership(GameObject obj)
+        {
+            NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
+            if(networkIdentiy != null)
+            {
+                networkIdentiy.Owner = true;
+            }
+        }
+
     }
 
 
