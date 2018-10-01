@@ -60,7 +60,6 @@ namespace thomas {
 
 			return adjustment;
 		}
-		/*
 		inline uint8_t alignForwardAdjustmentWithHeader(const void* address, uint8_t alignment, uint8_t header_size)
 		{
 			uint8_t adjustment = alignForwardAdjustment(address, alignment);
@@ -75,7 +74,7 @@ namespace thomas {
 			}
 			return adjustment;
 		}
-		*/
+		
 		template<typename T>
 		inline uint8_t alignForwardAdjustmentWithHeader(const void* address, uint8_t alignment)
 		{
@@ -95,6 +94,25 @@ namespace thomas {
 				return 0; //already aligned
 
 			return adjustment;
+		}
+		inline void* add(void* p, size_t x)
+		{
+			return (void*)(reinterpret_cast<uintptr_t>(p) + x);
+		}
+
+		inline const void* add(const void* p, size_t x)
+		{
+			return (const void*)(reinterpret_cast<uintptr_t>(p) + x);
+		}
+
+		inline void* subtract(void* p, size_t x)
+		{
+			return (void*)(reinterpret_cast<uintptr_t>(p) - x);
+		}
+
+		inline const void* subtract(const void* p, size_t x)
+		{
+			return (const void*)(reinterpret_cast<uintptr_t>(p) - x);
 		}
 	}
 }
