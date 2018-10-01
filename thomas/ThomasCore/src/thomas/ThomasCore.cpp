@@ -122,6 +122,12 @@ namespace thomas
 		return s_logOutput;
 	}
 
+	ThomasCore & ThomasCore::Core()
+	{
+		static ThomasCore core;
+		return core;
+	}
+
 	void ThomasCore::LogOutput(const std::string & message)
 	{
 		s_logOutput.push_back(message);
