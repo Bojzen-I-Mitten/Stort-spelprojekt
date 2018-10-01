@@ -320,11 +320,14 @@ namespace ThomasEditor
 
         private void hierarchy_Drop(object sender, DragEventArgs e)
         {
+            
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
                 TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
-                if(source.DataContext is GameObject)
+                StackPanel sourceHeader = source.Header as StackPanel;
+
+                if (source.DataContext is GameObject)
                 {
                     if (target != null && source != null && target != source)
                     {
@@ -348,7 +351,17 @@ namespace ThomasEditor
                         }
                         
                     }
-                }              
+                }
+                else if (source.DataContext is ScriptComponent || ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
+                {
+                    Debug.Log("Big memes dragging big components.");
+                    if (target != null && source != null && target != source)
+                    {
+                        Debug.Log("Who's a good component??!!");
+                        GameObject targetObject = target.DataContext as GameObject;
+                        targetObject.AddComponent<ScriptComponent>().Name = (string)sourceHeader.DataContext;
+                    }
+                }
 
                 // Code to move the item in the model is placed here...
             }
