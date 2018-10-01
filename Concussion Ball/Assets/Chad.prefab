@@ -85,13 +85,13 @@
       </children>
       <localEulerAngles>
         <x>0</x>
-        <y>0</y>
+        <y>113.815018</y>
         <z>0</z>
       </localEulerAngles>
       <localPosition>
-        <x>0</x>
-        <y>0.259851038</y>
-        <z>0</z>
+        <x>4.461963</x>
+        <y>0.272248149</y>
+        <z>2.71827364</z>
       </localPosition>
       <localScale>
         <x>1</x>
@@ -104,7 +104,33 @@
       <m_guid>d1835f12-bd8e-48ae-abce-447be4c6a0e8</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
-      <attachedRigidbody i:nil="true" />
+      <attachedRigidbody z:Id="18">
+        <m_guid>08a575a5-bbd9-4abd-b801-7041238ace53</m_guid>
+        <m_name i:nil="true" />
+        <m_gameObject z:Ref="1" i:nil="true" />
+        <AngularVelocity>
+          <x>0</x>
+          <y>0</y>
+          <z>0</z>
+        </AngularVelocity>
+        <FrzPos>
+          <x>1</x>
+          <y>1</y>
+          <z>1</z>
+        </FrzPos>
+        <FrzRot>
+          <x>0</x>
+          <y>1</y>
+          <z>0</z>
+        </FrzRot>
+        <IsKinematic>false</IsKinematic>
+        <LinearVelocity>
+          <x>0</x>
+          <y>0</y>
+          <z>0</z>
+        </LinearVelocity>
+        <Mass>1</Mass>
+      </attachedRigidbody>
       <isTrigger>false</isTrigger>
       <center>
         <x>0</x>
@@ -114,39 +140,13 @@
       <height>1</height>
       <radius>0.5</radius>
     </Component>
-    <Component z:Id="18" i:type="Rigidbody">
-      <m_guid>08a575a5-bbd9-4abd-b801-7041238ace53</m_guid>
-      <m_name i:nil="true" />
-      <m_gameObject z:Ref="1" i:nil="true" />
-      <AngularVelocity>
-        <x>0</x>
-        <y>0</y>
-        <z>0</z>
-      </AngularVelocity>
-      <FrzPos>
-        <x>1</x>
-        <y>1</y>
-        <z>1</z>
-      </FrzPos>
-      <FrzRot>
-        <x>0</x>
-        <y>1</y>
-        <z>0</z>
-      </FrzRot>
-      <IsKinematic>false</IsKinematic>
-      <LinearVelocity>
-        <x>0</x>
-        <y>0</y>
-        <z>0</z>
-      </LinearVelocity>
-      <Mass>1</Mass>
-    </Component>
+    <Component z:Ref="18" i:nil="true" />
     <Component z:Id="19" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkIdentity">
       <m_guid>09d84f70-1e17-469b-9af1-1d334bfa79b2</m_guid>
       <m_name i:nil="true" />
       <m_gameObject z:Ref="1" i:nil="true" />
-      <d3p1:IsPlayer>false</d3p1:IsPlayer>
-      <d3p1:Owner>false</d3p1:Owner>
+      <d3p1:IsPlayer>true</d3p1:IsPlayer>
+      <d3p1:Owner>true</d3p1:Owner>
     </Component>
     <Component z:Id="20" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkTransform">
       <m_guid>2d81f50a-7b60-4bca-9317-fc2e3b2b45d3</m_guid>
@@ -160,7 +160,7 @@
       <m_gameObject z:Ref="1" i:nil="true" />
       <d3p1:force>5</d3p1:force>
       <d3p1:hand z:Ref="14" i:nil="true" />
-      <d3p1:rotationSpeed>1</d3p1:rotationSpeed>
+      <d3p1:rotationSpeed>5</d3p1:rotationSpeed>
       <d3p1:speed>5</d3p1:speed>
       <d3p1:throwForce>10</d3p1:throwForce>
     </Component>
