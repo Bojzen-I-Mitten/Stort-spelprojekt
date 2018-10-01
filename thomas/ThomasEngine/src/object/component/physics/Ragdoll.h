@@ -12,6 +12,7 @@ namespace ThomasEngine
 	internal:
 	public:
 		Ragdoll();
+
 		// Body Head
 		property Vector3 twistleg
 		{
@@ -29,17 +30,17 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), whatbodytochange, true); };
 		}
 	
-		property Vector3 twistlegother
+		property Vector3 twistlowerleg
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->GetTwistSpin(OtherBody)); };
 			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->SetTwistSpin(thomas::math::Vector3(value.x, value.y, value.z), OtherBody); };
 		}
-		property Vector3 Firstlegother
+		property Vector3 Firstlowerleg
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(OtherBody, false)); };
 			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), OtherBody, false); };
 		}
-		property Vector3 Secondlegother
+		property Vector3 Secondlowerleg
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Ragdoll*)nativePtr)->getFirstorSecond(OtherBody, true)); };
 			void set(Vector3 value) { ((thomas::object::component::Ragdoll*)nativePtr)->setFirstorSecond(thomas::math::Vector3(value.x, value.y, value.z), OtherBody, true); };

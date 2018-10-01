@@ -26,11 +26,14 @@ namespace thomas
 					BodyPart_Right_UpperArm,
 					BodyPart_Right_LowerArm,
 
-					BodyPart_Left_UpperLeg,
-					BodyPart_Left_LowerLeg,
 
 					BodyPart_Right_UpperLeg,
 					BodyPart_Right_LowerLeg,
+
+					BodyPart_Left_UpperLeg,
+					BodyPart_Left_LowerLeg,
+
+
 					BodyParts_Amount		
 				};
 
@@ -45,10 +48,11 @@ namespace thomas
 					Joint_Lower_Right_Arm,
 
 					Joint_Left_Leg,
-					Joint_Right_Leg,
-
 					Joint_Lower_Left_Leg,
+
+					Joint_Right_Leg,
 					Joint_Lower_Right_Leg,
+
 					Joint_Amount
 				};
 				

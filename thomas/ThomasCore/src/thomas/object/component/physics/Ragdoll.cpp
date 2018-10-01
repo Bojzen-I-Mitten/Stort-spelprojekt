@@ -110,7 +110,6 @@ namespace thomas
 				"mixamorig:LeftLeg",
 				"mixamorig:LeftFoot"
 			};
-			
 			const static std::string SortedBones[52]
 			{
 				//Body
@@ -159,7 +158,7 @@ namespace thomas
 				{
 					//Ragdoll::BodyParts::BodyParts_Amount
 					btTransform t;
-					for(int i = 0; i < 10; i++)
+					for(int i = 0; i < 6; i++)
 					{
 						m_bodies[i]->getMotionState()->getWorldTransform(t);
 						math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
@@ -172,12 +171,13 @@ namespace thomas
 
 			void Ragdoll::OnDisable()
 			{
-				for (int i = 0; i < 9; ++i)
+				for (int i = 0; i < 4; ++i)
 				{
 					thomas::Physics::s_world->removeConstraint(m_joints[i]);
 					delete m_joints[i]; m_joints[i] = 0;
 				}
-				for (int i = 0; i < 10; ++i)
+
+				for (int i = 0; i < 5; ++i)
 				{
 					thomas::Physics::s_world->removeRigidBody(m_bodies[i]);
 
@@ -186,8 +186,6 @@ namespace thomas
 					delete m_bodies[i]; m_bodies[i] = 0;
 					delete m_shapes[i]; m_shapes[i] = 0;
 				}
-
-
 			}
 
 			void Ragdoll::SetBoneCapsuls(math::Vector3 boneCapsule, int whichCapsule)
@@ -283,35 +281,57 @@ namespace thomas
 			//		Second[i].setOrigin(btVector3(0.15, 0.15, 0.15));
 			//		Twistspin[i]= math::Vector3(60, 60, 60);
 			//	}
-				First[0].setOrigin(btVector3(0, 0.35, 0));
-				Second[0].setOrigin(btVector3(0, 0, 0));
-				Twistspin[0] = math::Vector3(10, 10, 45);
-				First[1].setOrigin(btVector3(0.2, 0, 0));
-				Second[1].setOrigin(btVector3(0, 0, 0));
-				Twistspin[1] = math::Vector3(10, 30, 45);
-				First[2].setOrigin(btVector3(0, -0.27, 0));
-				Second[2].setOrigin(btVector3(0.0, 0, 0));
-				Twistspin[2] = math::Vector3(50, 50, 90);
-				First[3].setOrigin(btVector3(0, 0, 0));
-				Second[3].setOrigin(btVector3(0.3, 0, 0));
-				Twistspin[3] = math::Vector3(10, 30, 45);
-				First[4].setOrigin(btVector3(0, -0.27, 0));
-				Second[4].setOrigin(btVector3(0.0, 0, 0));
-				Twistspin[4] = math::Vector3(50, 50, 90);
 
-				First[5].setOrigin(btVector3(0, 0, 0));
-				Second[5].setOrigin(btVector3(0.3, 0, 0));
-				Twistspin[5] = math::Vector3(10, 30, 45);
-				First[6].setOrigin(btVector3(0, 0, 0));
-				Second[6].setOrigin(btVector3(0.0, 0, 0));
-				Twistspin[6] = math::Vector3(50, 50, 90);
+				// Chest
+				First[BodyPart_Chest].setOrigin(btVector3(0, 0.35, 0));
+				Second[BodyPart_Chest].setOrigin(btVector3(0, 0, 0));
+				Twistspin[BodyPart_Chest] = math::Vector3(10, 10, 45);
 
-				First[7].setOrigin(btVector3(0, 0, 0));
-				Second[7].setOrigin(btVector3(1, 0, 0));
-				Twistspin[7] = math::Vector3(10, 30, 45);
-				First[8].setOrigin(btVector3(0, 0, 0));
-				Second[8].setOrigin(btVector3(1, 0, 0));
-				Twistspin[8] = math::Vector3(50, 50, 90);
+				// Head
+				First[BodyPart_Head].setOrigin(btVector3(0.2, 0, 0));
+				Second[BodyPart_Head].setOrigin(btVector3(0, 0, 0));
+				Twistspin[BodyPart_Head] = math::Vector3(10, 30, 45);
+
+				// Left upperarm
+				First[BodyPart_Left_UpperArm].setOrigin(btVector3(0, -0.27, 0));
+				Second[BodyPart_Left_UpperArm].setOrigin(btVector3(0.0, 0, 0));
+				Twistspin[BodyPart_Left_UpperArm] = math::Vector3(50, 50, 90);
+
+				// Left lowerarm
+				First[BodyPart_Left_LowerArm].setOrigin(btVector3(-0.2, 0, 0));
+				Second[BodyPart_Left_LowerArm].setOrigin(btVector3(0, 0, 0));
+				Twistspin[BodyPart_Left_LowerArm] = math::Vector3(10, 30, 45);
+
+				// Right upperarm
+				First[BodyPart_Right_UpperArm].setOrigin(btVector3(0, -0.27, 0));
+				Second[BodyPart_Right_UpperArm].setOrigin(btVector3(0.0, 0, 0));
+				Twistspin[BodyPart_Right_UpperArm] = math::Vector3(50, 50, 90);
+
+				// Right lowerarm
+				First[BodyPart_Right_LowerArm].setOrigin(btVector3(0, 0, 0));
+				Second[BodyPart_Right_LowerArm].setOrigin(btVector3(0.3, 0, 0));
+				Twistspin[BodyPart_Right_LowerArm] = math::Vector3(10, 30, 45);
+/*
+				// Right upperleg
+				First[BodyPart_Right_UpperLeg].setOrigin(btVector3(0, -0.3, 0));
+				Second[BodyPart_Right_UpperLeg].setOrigin(btVector3(0, 0, 0));
+				Twistspin[BodyPart_Right_UpperLeg] = math::Vector3(50, 50, 90);
+
+				// Right lowerleg
+				First[BodyPart_Right_LowerLeg].setOrigin(btVector3(0, 0, 0));
+				Second[BodyPart_Right_LowerLeg].setOrigin(btVector3(1, 0, 0));
+				Twistspin[BodyPart_Right_LowerLeg] = math::Vector3(50, 50, 90);
+
+				// Left upperleg
+				First[BodyPart_Left_UpperLeg].setOrigin(btVector3(0, -0.3, 0));
+				Second[BodyPart_Left_UpperLeg].setOrigin(btVector3(0, 0, 0));
+				Twistspin[BodyPart_Left_UpperLeg] = math::Vector3(50, 50, 90);
+/*
+				// Left lowerleg
+				First[BodyPart_Left_LowerLeg].setOrigin(btVector3(0, 0, 0));
+				Second[BodyPart_Left_LowerLeg].setOrigin(btVector3(0, 0, 0));
+				Twistspin[BodyPart_Left_LowerLeg] = math::Vector3(10, 30, 45);
+				*/
 
 			}
 
@@ -332,8 +352,6 @@ namespace thomas
 
 				return hash;
 			}
-
-			
 
 			btCapsuleShape* Ragdoll::PrepareCapsulTransform(const math::Matrix& fromWorld, const math::Matrix& toWorld, float lengthScale, float radius, btTransform &outTrans,float extralength)
 			{
@@ -391,8 +409,6 @@ namespace thomas
 				}
 			}
 				
-
-
 			void Ragdoll::Init()
 			{
 				InitSkeleton();
@@ -419,38 +435,75 @@ namespace thomas
 					m_bodies[i] = LocalCreateRigidBody(btScalar(0.001), transform, m_shapes[i]);
 					 m_bodies[i]->getMotionState()->getWorldTransform(prevTrans[i]);
 				}
-				/*
-				for (int i = 0; i < 2; ++i)
-				{
-					m_bodies[i]->setDamping(0.05, 0.85);
-					m_bodies[i]->setDeactivationTime(3.0);
-					m_bodies[i]->setSleepingThresholds(5.6, 5.5);
-					m_bodies[i]->setContactProcessingThreshold(0.25f);
-					m_bodies[i]->setCcdMotionThreshold(0.05f);
-					m_bodies[i]->setCcdSweptSphereRadius(0.06f);
-				}
-				*/
-
-				btTransform CenterOfMass;
-				for(int i=1;i<9;i++)
-				{
-					CenterOfMass = m_bodies[i]->getWorldTransform();
-					CenterOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
-					m_bodies[i]->setCenterOfMassTransform(CenterOfMass);
-
-				}
-			/*	CenterOfMass = m_bodies[1]->getWorldTransform();
-				CenterOfMass.setOrigin(btVector3(boneArr[boneConnections[1].first].Translation().x, boneArr[boneConnections[1].first].Translation().y, boneArr[boneConnections[1].first].Translation().z));
-				m_bodies[1]->setCenterOfMassTransform(CenterOfMass);
 				
-				CenterOfMass = m_bodies[2]->getWorldTransform();
-				CenterOfMass.setOrigin(btVector3(boneArr[boneConnections[2].first].Translation().x, boneArr[boneConnections[2].first].Translation().y, boneArr[boneConnections[2].first].Translation().z));
-				m_bodies[2]->setCenterOfMassTransform(CenterOfMass);
-					
-				CenterOfMass = m_bodies[3]->getWorldTransform();
-				CenterOfMass.setOrigin(btVector3(boneArr[boneConnections[3].first].Translation().x, boneArr[boneConnections[3].first].Translation().y, boneArr[boneConnections[3].first].Translation().z));
-				m_bodies[3]->setCenterOfMassTransform(CenterOfMass);
-				*/
+				
+				
+				//	boneConnections[5] = RightForarm
+				//	boneConnections[6] = RightUpleg
+				//	boneConnections[7] = RightLeg
+				//	boneConnections[8] = LeftUpleg
+				//	boneConnections[9] = leftleg
+			
+				int i = 1;
+				float constantFactor = 0.2f;
+
+				//	boneConnections[1] = first head;
+				
+				btTransform centerOfMass;
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				i++;
+
+				//	boneConnections[2] = first leftshoulder
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				i++;
+
+				//	boneConnections[3] = leftforarm
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				i++;
+			
+				//	boneConnections[4] = RightShoulder
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				i++;
+
+				//	boneConnections[5] = RightForarm
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				i++;
+
+				//	boneConnections[6] = RightUpleg
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				i++;
+
+				//	boneConnections[7] = RightLeg
+				centerOfMass = m_bodies[i]->getWorldTransform();
+				centerOfMass.setOrigin(btVector3(boneArr[boneConnections[i].first].Translation().x, 
+										boneArr[boneConnections[i].first].Translation().y, boneArr[boneConnections[i].first].Translation().z));
+				m_bodies[i]->setCenterOfMassTransform(centerOfMass);
+				
+
+				//	boneConnections[8] = LeftUpleg
+
+
+				//	boneConnections[9] = leftleg
+
+				m_bodies[1]->setGravity(btVector3(0, 30, 0));
 
 				//body head
 				m_joints[Joint_Neck] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Head], First[0], Second[0],Twistspin[0].x,Twistspin[0].y,Twistspin[0].z);
@@ -471,23 +524,27 @@ namespace thomas
 				//uper right arm and lower right arm
 				m_joints[Joint_Lower_Right_Arm] = CreateConstraints(m_bodies[BodyPart_Right_UpperArm], m_bodies[BodyPart_Right_LowerArm], First[4], Second[4], Twistspin[4].x, Twistspin[4].y, Twistspin[4].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Right_Arm], false);
-				
+/*
 				//body rightleg
 				m_joints[Joint_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Right_UpperLeg], First[5], Second[5], Twistspin[5].x, Twistspin[5].y, Twistspin[5].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Right_Leg], false);
 
+				//lower rightleg
+				m_joints[Joint_Lower_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Right_UpperLeg], m_bodies[BodyPart_Right_LowerLeg], First[6], Second[6], Twistspin[6].x, Twistspin[6].y, Twistspin[6].z);
+				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Right_Leg], false);
+
 				//body leftleg
-				m_joints[Joint_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperLeg], First[6], Second[6], Twistspin[6].x, Twistspin[6].y, Twistspin[6].z);
+				m_joints[Joint_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Chest], m_bodies[BodyPart_Left_UpperLeg], First[7], Second[7], Twistspin[7].x, Twistspin[7].y, Twistspin[7].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Left_Leg], false);
-				
+
 				//lower leftleg
-				m_joints[Joint_Lower_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Left_UpperLeg], m_bodies[BodyPart_Left_LowerLeg], First[7], Second[7], Twistspin[7].x, Twistspin[7].y, Twistspin[7].z);
+				m_joints[Joint_Lower_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Left_UpperLeg], m_bodies[BodyPart_Left_LowerLeg], First[8], Second[8], Twistspin[8].x, Twistspin[8].y, Twistspin[8].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Left_Leg], false);
 
+				*/
 
-				//lower rightleg
-				m_joints[Joint_Lower_Right_Leg] = CreateConstraints(m_bodies[BodyPart_Right_UpperLeg], m_bodies[BodyPart_Right_LowerLeg], First[8], Second[8], Twistspin[8].x, Twistspin[8].y, Twistspin[8].z);
-				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Right_Leg], false);
+	
+
 			
 			}
 		}

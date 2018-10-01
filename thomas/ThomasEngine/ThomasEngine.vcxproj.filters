@@ -47,6 +47,7 @@
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\SceneSurrogate.cpp" />
     <ClCompile Include="src\object\component\physics\Ragdoll.cpp" />
+    <ClCompile Include="src\object\component\physics\Joint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -97,6 +98,7 @@
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\object\component\physics\Ragdoll.h" />
+    <ClInclude Include="src\object\component\physics\Joint.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />
