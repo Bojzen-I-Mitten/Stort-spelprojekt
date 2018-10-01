@@ -88,9 +88,8 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     float3 up = float3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * scale; //-cameraUp * scale;
     //float3 forward = float3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]); 
 		
-    //up = float3(0.0f, 1.0f, 0.0f);
-    //right = float3(1.0f, 0.0f, 0.0f);
-
+    right = float3(viewMatrix[0].xyz) * scale; //cameraRight * scale;
+    up = float3(viewMatrix[1].xyz) * scale;
 
 
     //particle.rotation = particle.rotation + particle.rotationSpeed * dt;
@@ -105,12 +104,12 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 
     particles[index] = particle;
 
-   
+    //-_WorldSpaceCameraPos;
 
     BillboardStruct billboard;
     billboard.pad2 = float2(0, 0);
 
-    float3 particlePosWS = float3(0.0f, 0.0f, 0.0f);
+    float3 particlePosWS = float3(3.0f, 1.0f, 2.0f);
 //    particle.position;
 
     //tri 1

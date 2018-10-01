@@ -63,7 +63,7 @@ v2f vert(uint id : SV_VertexID)
     uint triangleIndex = (uint) ((id % 6) / 3);
     uint vertexIndex = id % 3;
 
-    output.vertex = float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0);
+    output.vertex = mul(thomas_MatrixVP, float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0f));
     //output.vertex /= output.vertex.w; 
     //output.vertex = float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0);
 	
