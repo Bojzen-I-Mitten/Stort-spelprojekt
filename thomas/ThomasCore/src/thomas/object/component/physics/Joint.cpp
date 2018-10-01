@@ -22,11 +22,13 @@ btConeTwistConstraint * thomas::object::component::Joint::CreateConstraints( btR
 
 void thomas::object::component::Joint::Update()
 {
+	m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_twistSpin.x), math::DegreesToRadians(m_twistSpin.y), math::DegreesToRadians(m_twistSpin.z), 1, 0.3, 1);
+	m_coneTwistConstraint->setFrames(m_first, m_second);
 }
 
 void thomas::object::component::Joint::Awake()
 {
-	if (nullptr != m_gameObject->GetComponent<Rigidbody>())
+	if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 	{
 		thomas::Physics::s_world->addConstraint(CreateConstraints( m_secondBody, m_first,
 															m_second, m_twistSpin), false);
@@ -35,9 +37,12 @@ void thomas::object::component::Joint::Awake()
 
 void thomas::object::component::Joint::OnDisable()
 {
-	thomas::Physics::s_world->removeConstraint(m_coneTwistConstraint);
-	delete m_coneTwistConstraint;
-	m_coneTwistConstraint = nullptr;
+	if (m_coneTwistConstraint != nullptr)
+	{
+		thomas::Physics::s_world->removeConstraint(m_coneTwistConstraint);
+		delete m_coneTwistConstraint;
+		m_coneTwistConstraint = nullptr;
+	}
 }
 
 void thomas::object::component::Joint::SetRigidBody(btRigidBody * secondbody)

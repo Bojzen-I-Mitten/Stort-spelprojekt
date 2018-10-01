@@ -46,7 +46,6 @@
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\SceneSurrogate.cpp" />
-    <ClCompile Include="src\object\component\physics\Ragdoll.cpp" />
     <ClCompile Include="src\object\component\physics\Joint.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -97,8 +96,8 @@
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
-    <ClInclude Include="src\object\component\physics\Ragdoll.h" />
     <ClInclude Include="src\object\component\physics\Joint.h" />
+    <ClInclude Include="src\object\component\physics\.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />
