@@ -3,6 +3,7 @@
 #pragma unmanaged
 #include <thomas/resource/Model.h>
 #include <thomas/graphics/animation/data/AnimationData.h>
+#include <thomas/graphics/animation/data/Skeleton.h>
 #include <thomas/graphics/animation/AnimPlayback.h>
 #include <thomas/graphics/animation/BaseAnimationTime.h>
 
