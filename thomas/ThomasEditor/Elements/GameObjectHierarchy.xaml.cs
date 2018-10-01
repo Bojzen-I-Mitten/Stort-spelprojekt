@@ -332,7 +332,7 @@ namespace ThomasEditor
                         GameObject child = source.DataContext as GameObject;
                         if (!parent.transform.IsChildOf(child.transform))
                         {
-                            child.transform.parent = parent.transform;
+                            child.transform.SetParent(parent.transform, true);
                         }
                     }
                     else if (source != null && target == null)
@@ -340,7 +340,7 @@ namespace ThomasEditor
                         GameObject gameObject = source.DataContext as GameObject;
                         if(gameObject.inScene)
                         {
-                            gameObject.transform.parent = null;
+                            gameObject.transform.SetParent(null, true);
                         }
                         else
                         {
