@@ -2,8 +2,7 @@
 #include "EditorGrid.h"
 #include "..\Input.h"
 #include "..\ThomasTime.h"
-#include "..\Window.h"
-#include "..\EditorWindow.h"
+#include "..\WindowManager.h"
 #include "..\resource\Shader.h"
 #include "..\resource\Material.h"
 #include "..\graphics\Renderer.h"
@@ -171,10 +170,9 @@ namespace thomas
 		{
 			Input::ResetScrollWheelValue();
 			m_manipulatorSnapping = false;
-			HWND focus = GetForegroundWindow();
 
 			// Make sure we are dealing with the editor window
-			thomas::EditorWindow *window = EditorWindow::GetWindow();
+			thomas::Window* window = WindowManager::Instance()->GetEditorWindow();
 			if (!window || !window->IsFocused())
 				return;
 			

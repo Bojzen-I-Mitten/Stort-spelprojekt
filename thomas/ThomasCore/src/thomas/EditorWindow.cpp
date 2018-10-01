@@ -7,8 +7,6 @@
 
 namespace thomas
 {
-	EditorWindow* EditorWindow::s_editorWindow = nullptr;
-
 	EditorWindow::EditorWindow(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title) : 
 		Window(hInstance, nCmdShow, width, height, title)
 	{
@@ -17,8 +15,9 @@ namespace thomas
 
 	EditorWindow::EditorWindow(HWND hWnd) : Window(hWnd)
 	{
-
+		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
 	}
+
 	EditorWindow::~EditorWindow()
 	{
 		ImGui_ImplDX11_Shutdown();
@@ -26,9 +25,9 @@ namespace thomas
 
 	void EditorWindow::Present()
 	{
-		s_editorWindow->Bind();
-		if (ImGui_ImplDx11_Valid() && s_editorWindow->m_guiData)
-			ImGui_ImplDX11_RenderDrawData(s_editorWindow->m_guiData);
+		this->Bind();
+		if (ImGui_ImplDx11_Valid() && this->m_guiData)
+			ImGui_ImplDX11_RenderDrawData(this->m_guiData);
 
 		m_swapChain->Present(0, 0);
 	}
@@ -44,31 +43,13 @@ namespace thomas
 		if (copyGui)
 		{
 			ImGui::Render();
-			s_editorWindow->DeleteGUIData();
-			s_editorWindow->CloneGUIData();
+			DeleteGUIData();
+			CloneGUIData();
 		}
 		else
 			ImGui::EndFrame();
 	}
-
-	EditorWindow* EditorWindow::Create(HWND hWnd)
-	{
-		EditorWindow* window = new EditorWindow(hWnd);
-		if (window->m_created)
-		{
-			s_editorWindow = window;
-			ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
-
-			s_windows.push_back(window);
-			return window;
-		}
-
-		return nullptr;
-	}
-	EditorWindow* EditorWindow::GetWindow()
-	{
-		return s_editorWindow;
-	}
+	
 	void EditorWindow::UpdateWindow()
 	{
 		if (!m_initialized)

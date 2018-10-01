@@ -1,11 +1,8 @@
-/*
-	Singleton window management class
-*/
-
 #pragma once
 #include <Windows.h>
 #include <vector>
 #include <d3d11.h>
+#include "Input.h"
 
 namespace thomas 
 {
@@ -20,24 +17,29 @@ namespace thomas
 			ID3D11DepthStencilView* depthStencilView = nullptr;
 			ID3D11DepthStencilView* depthStencilViewReadOnly = nullptr;
 			ID3D11ShaderResourceView* depthBufferSRV = nullptr;
+
 		}m_dxBuffers;
 
 	public:
+		Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title);
+		Window(HWND hWnd);
 		virtual ~Window();
-		void QueueResize();
-		void Bind();
-		virtual void Present();
-		void Clear();
-		bool IsFocused();
-		bool Initialized();
-		bool ChangeWindowShowState(int nCmdShow);
+
 
 	public:
-		static void Destroy();
-		static void ClearAllWindows();
-		static void PresentAllWindows();
-		static void Update();
-		static void UpdateFocus();
+		virtual void UpdateWindow();
+		virtual void Present();
+		bool IsFocused();
+		void QueueResize();
+		void UpdateFocus();
+		void Bind();
+		void UnBind();
+		void Clear();
+
+	public:
+		bool ShouldResize();
+		bool Initialized();
+		bool ChangeWindowShowState(int nCmdShow);
 		bool IntersectBounds(int x, int y) const;
 
 	public:
@@ -47,15 +49,7 @@ namespace thomas
 		void SetCursor(const bool & visible);
 
 	public:
-		static bool WaitingForUpdate();
 		static LRESULT CALLBACK EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-		static Window* Create(HWND hWnd);
-
-	public:
-		static Window* GetWindow(int index);
-		static Window* GetWindow(HWND hWnd);
-		static Window* GetCurrentBound();
-		static std::vector<Window*> GetWindows();
 
 	public:
 		LONG GetHeight() const;
@@ -63,16 +57,12 @@ namespace thomas
 		RECT GetBounds() const;
 		LONG GetHorizontalResolution() const;
 		LONG GetVerticalResolution() const;
+		Window* GetCurrentBound();
 		IDXGISwapChain* GetSwapChain() const;
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
 
 	protected:
-		Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title);
-	 	Window(HWND hWnd);
-
-	protected:
-		virtual void UpdateWindow();
 		bool InitDxBuffers();
 		bool Resize();
 
@@ -83,7 +73,7 @@ namespace thomas
 		bool m_fullScreen;
 		bool m_initialized;
 		bool m_shouldResize;
-		bool m_created;
+		bool m_current;
 		bool m_focused;
 		float m_aspectRatio;
 		std::string m_title;
@@ -93,11 +83,6 @@ namespace thomas
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
 		IDXGISwapChain* m_swapChain;
-
-	protected:
-		static std::vector<Window*> s_windows;
-		static Window* s_current;
-		static Window* s_focused;					// Window currently in focus
 	};
 }
 

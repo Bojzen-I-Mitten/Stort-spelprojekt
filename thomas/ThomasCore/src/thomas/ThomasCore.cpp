@@ -1,7 +1,7 @@
 #include "ThomasCore.h"
 #include "Sound.h"
 #include "Input.h"
-#include "Window.h"
+#include "WindowManager.h"
 #include "ThomasTime.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
@@ -78,7 +78,7 @@ namespace thomas
 	bool ThomasCore::Destroy()
 	{	
 		//Destroy all objects
-		Window::Destroy();
+		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();

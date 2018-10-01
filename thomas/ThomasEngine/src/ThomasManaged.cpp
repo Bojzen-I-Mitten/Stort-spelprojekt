@@ -3,8 +3,7 @@
 #pragma unmanaged
 
 #include <thomas\ThomasCore.h>
-#include <thomas\Window.h>
-#include <thomas\EditorWindow.h>
+#include <thomas\WindowManager.h>
 #include <thomas\ThomasTime.h>
 #include <thomas\graphics\Renderer.h>
 #include <thomas\editor\gizmos\Gizmos.h>
@@ -58,16 +57,16 @@ namespace ThomasEngine {
 		{
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
-			Window::ClearAllWindows();
-			thomas::graphics::Renderer::Instance()->ProcessCommands();
-			thomas::Window::PresentAllWindows();
+			WindowManager::Instance()->ClearAllWindows();
+			graphics::Renderer::Instance()->ProcessCommands();
+			WindowManager::Instance()->PresentAllWindows();
 			RenderFinished->Set();
 		}
 	}
 
 	void ThomasWrapper::CopyCommandList()
 	{
-		thomas::EditorWindow::EndFrame(true);
+		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
@@ -91,9 +90,9 @@ namespace ThomasEngine {
 			thomas::ThomasTime::Update();
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 
-			if (Window::WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
+			if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
 				RenderFinished->WaitOne();
-			Window::Update();
+			WindowManager::Instance()->Update();
 
 
 			ThomasCore::Update();
@@ -132,7 +131,7 @@ namespace ThomasEngine {
 			//Rendering
 			thomas::graphics::Renderer::Instance()->ClearCommands();
 			editor::Gizmos::ClearGizmos();
-			if (EditorWindow::GetWindow() && EditorWindow::GetWindow()->Initialized())
+			if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 			{
 				if (renderingEditor)
 				{
@@ -176,14 +175,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::CreateThomasWindow(IntPtr hWnd, bool isEditor)
 	{
-		if (thomas::ThomasCore::Initialized()) {
-			if (isEditor)
-				thomas::EditorWindow::Create((HWND)hWnd.ToPointer());
-			else
-				thomas::Window::Create((HWND)hWnd.ToPointer());
-
-		}
-
+		if (thomas::ThomasCore::Initialized())
+			WindowManager::Instance()->Create((HWND)hWnd.ToPointer(), isEditor);
 	}
 
 
@@ -193,16 +186,15 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::Resize(IntPtr hWnd, double width, double height)
 	{
-		Window* window = thomas::Window::GetWindow((HWND)hWnd.ToPointer());
+		Window* window = WindowManager::Instance()->GetWindow((HWND)hWnd.ToPointer());
 		if (window)
 			window->QueueResize();
 	}
 
 	void ThomasWrapper::Update()
 	{
-		Window::UpdateFocus();
 		UpdateLog();
-		if (thomas::editor::EditorCamera::GetEditorCamera()->HasSelectionChanged())
+		if (editor::EditorCamera::GetEditorCamera()->HasSelectionChanged())
 			s_Selection->UpdateSelectedObjects();
 	}
 
