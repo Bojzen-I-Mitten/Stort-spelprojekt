@@ -158,15 +158,8 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
-					//thomas::object::component::RenderComponent::ClearList();
-					//RenderFinished->WaitOne();
-					//thomas::graphics::LightManager::Update();
-					//CopyCommandList();
-					//RenderFinished->Reset();
-					//UpdateFinished->Set();
 				}
-				//Monitor::Exit(lock);
-				//ScriptingManger::ReloadIfNeeded();
+
 				
 			}
 			catch (Exception^ e) {
