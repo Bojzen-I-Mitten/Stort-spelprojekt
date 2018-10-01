@@ -21,11 +21,11 @@ namespace ThomasEngine
 		{
 		}
 
-		void WeightHandle::setWeight(unsigned int index, WeightTripple^ weight)
+		void WeightHandle::setWeight(unsigned int index, WeightTripple weight)
 		{
-			m_mixer->m_weights[index].m_scale = weight->m_scale;
-			m_mixer->m_weights[index].m_rot = weight->m_rot;
-			m_mixer->m_weights[index].m_translation = weight->m_translation;
+			m_mixer->m_weights[index].m_scale = weight.m_scale;
+			m_mixer->m_weights[index].m_rot = weight.m_rot;
+			m_mixer->m_weights[index].m_translation = weight.m_translation;
 		}
 
 		thomas::graphics::animation::WeightMixer * WeightHandle::Mixer()
@@ -38,11 +38,6 @@ namespace ThomasEngine
 			return thomas::graphics::animation::WeightTripple(m_scale, m_rot, m_translation);
 		}
 
-
-
-		WeightTripple::WeightTripple()
-			: m_scale(0.f), m_rot(0.f), m_translation(0.f)
-		{}
 		WeightTripple::WeightTripple(float weight)
 			: m_scale(weight), m_rot(weight), m_translation(weight)
 		{}

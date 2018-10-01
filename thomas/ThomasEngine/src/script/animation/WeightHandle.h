@@ -11,10 +11,9 @@ namespace ThomasEngine
 	namespace Script
 	{
 
-		public ref struct WeightTripple {
+		public value struct WeightTripple {
 			float m_scale, m_rot, m_translation;
 
-			WeightTripple();
 			WeightTripple(float weight);
 			WeightTripple(float scale, float rot, float trans);
 
@@ -36,7 +35,7 @@ namespace ThomasEngine
 
 			thomas::graphics::animation::WeightTripple* m_WeightData;
 
-			void setWeight(unsigned int index, WeightTripple^ weight);
+			void setWeight(unsigned int index, WeightTripple weight);
 
 			thomas::graphics::animation::WeightMixer * Mixer();
 
