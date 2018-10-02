@@ -36,10 +36,10 @@ namespace ThomasEngine.Network
             NetworkIdentity identity = NetworkObjects[networkID];
             if (identity)
             {
-                if (identity.enabled || initialState)
+                if (identity.gameObject.GetActive() || initialState)
                 {
                     if (initialState)
-                        identity.enabled = true;
+                        identity.gameObject.SetActive(true);
                     identity.ReadData(reader, initialState);
                 }
             }else
