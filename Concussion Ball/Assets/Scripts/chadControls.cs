@@ -98,41 +98,6 @@ namespace ThomasEditor
             //    StartCoroutine(JumpingCoroutine());
             //}
 
-            ////If character is in air and player not pressing W, should still move forward, can't stop mid air
-            //if (movingForward && !Input.GetKey(Input.Keys.W) && !tackling)
-            //    transform.position += transform.forward * speed * Time.DeltaTime;
-            
-            ////Same, but for backward
-            //if (movingBackward && !Input.GetKey(Input.Keys.S))
-            //    transform.position -= transform.forward * speed * Time.DeltaTime;
-
-            ////If player is pressing S and is not moving forward in air.
-            //if (Input.GetKey(Input.Keys.S) && !movingForward && !tackling)
-            //{
-            //    transform.position -= transform.forward * speed * Time.DeltaTime;
-            //    if (Input.GetKey(Input.Keys.A))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -rotationSpeed * Time.DeltaTime);
-            //    if (Input.GetKey(Input.Keys.D))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), rotationSpeed * Time.DeltaTime);
-            //}
-            ////Same, but for forward
-            //if (Input.GetKey(Input.Keys.W) && !movingBackward && !tackling)
-            //{
-            //    transform.position += transform.forward * speed * Time.DeltaTime;
-            //    if (Input.GetKey(Input.Keys.A))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), rotationSpeed * Time.DeltaTime);
-            //    if (Input.GetKey(Input.Keys.D))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -rotationSpeed * Time.DeltaTime);
-            //}
-            ////If character is standing still
-            //if(!Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S))
-            //{
-            //    if (Input.GetKey(Input.Keys.A))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), rotationSpeed * Time.DeltaTime);
-            //    if (Input.GetKey(Input.Keys.D))
-            //        transform.RotateByAxis(new Vector3(0.0f, 1.0f, 0.0f), -rotationSpeed * Time.DeltaTime);
-            //}
-
             HandleMovement();
 
             if(hasBall) FondleBall();
@@ -161,7 +126,9 @@ namespace ThomasEditor
 
             if (Input.GetKey(Input.Keys.W))
                 transform.position += transform.forward * speed * Time.DeltaTime;
-            
+            else if (Input.GetKey(Input.Keys.S))
+                transform.position -= transform.forward * speed * Time.DeltaTime;
+
             else if (Input.GetKey(Input.Keys.D))
                 transform.position += transform.right * speed * Time.DeltaTime;
             else if (Input.GetKey(Input.Keys.A))
@@ -175,7 +142,7 @@ namespace ThomasEditor
                 if(hand && camera)
                 {
                     hasBall = false;
-                    ball.transform.position = transform.position + transform.forward*2;
+                    
                     ball.Throw(camera.transform.forward * throwForce);
                     
                 }
@@ -185,7 +152,7 @@ namespace ThomasEditor
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (ball && canPickupBall && isOwner)
+            if (ball && isOwner)
             {
                 if (collider.gameObject == ball.gameObject)
                 {
@@ -196,16 +163,6 @@ namespace ThomasEditor
                 }
             }
             
-        }
-        public override void OnCollisionExit(Collider collider)
-        {
-            if (ball && !hasBall)
-            {
-                if (collider.gameObject == ball.gameObject)
-                {
-                    canPickupBall = true;
-                }
-            }
         }
     }
 }
