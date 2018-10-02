@@ -75,7 +75,9 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects) {
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) 
+			{
+				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
@@ -88,7 +90,7 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->enabled) {
+			if (component->initialized && component->enabled) {
 				component->Update();
 				component->UpdateCoroutines();
 			}
@@ -116,7 +118,7 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->enabled)
+			if (component->initialized && component->enabled)
 				component->OnCollisionEnter(collider);
 		}
 		Monitor::Exit(m_componentsLock);
@@ -127,7 +129,8 @@ namespace ThomasEngine {
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
-			m_components[i]->OnDrawGizmos();
+			if(m_components[i]->enabled)
+				m_components[i]->OnDrawGizmos();
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -170,24 +173,32 @@ namespace ThomasEngine {
 
 	GameObject ^ GameObject::Instantiate(GameObject ^ original)
 	{
-		if (!original) {
-			Debug::Log("Object to instantiate is null");
+		if(!original){
+			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
 		if (original->m_isDestroyed)
 		{
-			Debug::Log("Trying to instantiate destroyed object.");
+			Debug::LogError("Trying to instantiate destroyed object.");
 			return nullptr;
 		}
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		GameObject^ clone;
+		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
 		}
 		else
 		{
-			System::IO::Stream^ serialized = SerializeGameObject(original);
-			clone = DeSerializeGameObject(serialized);
+			try {
+				System::IO::Stream^ serialized = SerializeGameObject(original);
+				clone = DeSerializeGameObject(serialized);
+			}
+			catch (Exception^ e)
+			{
+				String^ msg = "Failed to instantiate gameObject: " + original->Name + " error: " + e->Message;
+				Debug::LogError(msg);
+			}
+
 		}
 		
 		if (clone) {
@@ -272,7 +283,6 @@ namespace ThomasEngine {
 
 	GameObject ^ GameObject::DeSerializeGameObject(System::IO::Stream ^ stream)
 	{
-		try {
 			using namespace System::Runtime::Serialization;
 			DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
 			auto list = Component::GetAllComponentTypes();
@@ -286,14 +296,6 @@ namespace ThomasEngine {
 			GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
 			gObj->PostLoad(nullptr);
 			return gObj;
-		}
-		catch (Exception^ e) {
-			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
-			LOG(msg);
-			return nullptr;
-		}
-		
-
 	}
 
 
@@ -411,14 +413,20 @@ namespace ThomasEngine {
 
 	void GameObject::activeSelf::set(bool value)
 	{
-		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		if (value == activeSelf)
+			return;
 		for (int i = 0; i < m_components.Count; i++)
 		{
-
 			Component^ component = m_components[i];
-			if (component->initialized)
-				component->enabled = value;
+			if (component->m_firstEnable && component->enabled) {
+				if (value)
+					component->OnEnable();
+				else
+					component->OnDisable();
+			}
+				
 		}
+		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 	}
 
 	Transform^ GameObject::transform::get()

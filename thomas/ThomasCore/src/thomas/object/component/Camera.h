@@ -32,6 +32,10 @@ namespace thomas
 				Camera();
 				Camera(bool dontAddTolist);
 				~Camera();
+
+				void OnEnable() override;
+				void OnDisable() override;
+
 				math::Matrix GetViewMatrix();
 				math::Matrix GetProjMatrix();
 				math::Matrix GetViewProjMatrix();

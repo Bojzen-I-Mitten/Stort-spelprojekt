@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>ThomasEditor</RootNamespace>
     <AssemblyName>ThomasEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -28,6 +28,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -171,6 +172,12 @@
     <Compile Include="Elements\AssetBrowser.xaml.cs">
       <DependentUpon>AssetBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\OpenProjectWindow.xaml.cs">
+      <DependentUpon>OpenProjectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Elements\Console.xaml.cs">
+      <DependentUpon>Console.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Elements\MultiSelectTreeView.cs" />
     <Compile Include="Inspectors\Converters.cs" />
     <Compile Include="Inspectors\Inspector.xaml.cs">
@@ -228,6 +235,14 @@
       <DependentUpon>TransformGizmo.xaml</DependentUpon>
     </Compile>
     <Page Include="Elements\AssetBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Elements\Console.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Elements\OpenProjectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -479,6 +494,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\assets\prefab.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\console\console-error.ico" />
+    <Resource Include="icons\console\console-log.ico" />
+    <Resource Include="icons\console\console-warning.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
