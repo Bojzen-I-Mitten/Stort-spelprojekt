@@ -120,7 +120,7 @@ namespace ThomasEngine
 			Monitor::Enter(resourceLock);
 			using namespace System::Runtime::Serialization;
 
-
+			String^ thomasPath = ConvertToThomasPath(path);
 			String^ err;
 			try {
 				// Serialization Settings
@@ -141,8 +141,9 @@ namespace ThomasEngine
 					// Close file stream
 					file->Close();
 					// Success: Append resource
-					resources[System::IO::Path::GetFullPath(path)] = resource;
-					resource->Rename(path);	// Set file name
+					
+					resources[thomasPath] = resource;
+					resource->Rename(thomasPath);	// Set file name
 				}
 				catch (Exception^ e) {
 					err = "Creating resource failed creating file: " + path + ". With message:\n" + e->Message;
@@ -522,7 +523,7 @@ namespace ThomasEngine
 			void Resources::RenameResource(String ^ oldPath, String ^ newPath)
 			{
 				String^ thomasPathOld = ConvertToThomasPath(oldPath);
-				String^ thomasPathNew = ConvertToThomasPath(oldPath);
+				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
 					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();

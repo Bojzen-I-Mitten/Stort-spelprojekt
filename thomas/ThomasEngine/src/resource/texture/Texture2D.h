@@ -25,6 +25,10 @@ namespace ThomasEngine
 		{
 			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetWhiteTexture()); }
 		}
+		static property Texture2D^ normalTexture
+		{
+			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetNormalTexture()); }
+		}
 
 		IntPtr GetRawPixelData()
 		{
