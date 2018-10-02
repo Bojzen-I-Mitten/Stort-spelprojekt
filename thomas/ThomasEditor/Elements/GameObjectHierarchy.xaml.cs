@@ -339,7 +339,7 @@ namespace ThomasEditor
         {
             foreach (TreeItemViewModel node in allNodes)
             {
-                if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform)
+                if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform && !CheckIfChild(node, parentTransform))
                 {
                     ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
                 }
@@ -347,11 +347,24 @@ namespace ThomasEditor
             }
         }
 
+        private bool CheckIfChild(TreeItemViewModel source, ThomasEngine.Transform target)
+        {
+            foreach (TreeItemViewModel child in source.Children)
+            {
+                if ((GameObject)child.Data == target.gameObject)
+                    return true;
+                if (CheckIfChild(child, target))
+                    return true;
+            }
+            return false;
+        }
+
         private void hierarchy_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
                 TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
+
                 //Check if object from hierarchy
                 if (source.DataContext.GetType() == typeof(TreeItemViewModel))
                 {
@@ -373,6 +386,10 @@ namespace ThomasEditor
                         {
                             GameObject.Instantiate(sourceData);
                         }   
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Invalid parenting, can't set the selected object as a child if the specified object.");
                     }
                 }
                 //Check if brefab. (From outside hierarchy)
