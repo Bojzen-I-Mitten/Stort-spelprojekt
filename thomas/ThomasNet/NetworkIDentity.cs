@@ -90,7 +90,7 @@ namespace ThomasEngine.Network
 
         private void TakeOwnership()
         {
-            if(Manager != null)
+            if(Manager != null && gameObject != IsPlayer)
                 if(!_Owner)
                     Manager.TakeOwnership(this);
         }

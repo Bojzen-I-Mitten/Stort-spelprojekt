@@ -51,9 +51,6 @@ namespace ThomasEngine.Network
             {
                 Debug.LogError("Failed to spawn player. Prefab does not contain a networkIdentity component");
             }
-
-
-
         }
         
         public void RemovePlayer(NetPeer peer)

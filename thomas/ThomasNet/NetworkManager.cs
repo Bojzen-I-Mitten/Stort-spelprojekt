@@ -244,8 +244,6 @@ namespace ThomasEngine.Network
 
         }
 
-
-
         public void TakeOwnership(NetworkIdentity networkIdentiy)
         {
 
