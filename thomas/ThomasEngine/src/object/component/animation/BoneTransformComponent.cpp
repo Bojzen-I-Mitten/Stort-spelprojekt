@@ -31,11 +31,11 @@ namespace ThomasEngine
 
 		GameObject^ BoneTransformComponent::AnimatedObject::get()
 		{
-			return m_gameObject;
+			return m_skeletonSrc;
 		}
 		void BoneTransformComponent::AnimatedObject::set(GameObject^ value)
 		{
-			m_gameObject = value;
+			m_skeletonSrc = value;
 
 			thomas::object::component::RenderSkinnedComponent* comp = value->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
 			if (comp == NULL)

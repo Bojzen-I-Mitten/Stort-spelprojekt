@@ -57,8 +57,10 @@ namespace thomas {
 			void AnimatedSkeleton::applyConstraint(uint32_t index)
 			{
 				BoneConstraint** ptr = (m_constraint.get() + index)->m_list;
-				while (*ptr++ != NULL)
+				while (*ptr != NULL) {
 					(*ptr)->execute(_ref, _pose.data(), index);
+					ptr++;
+				}
 			}
 			/* Freeze the current animation */
 			void AnimatedSkeleton::stopAnimation()
