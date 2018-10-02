@@ -10,6 +10,9 @@ namespace ThomasEngine
 	class Utility
 	{
 	public:
+
+		static uint32_t hash(System::String^ string);
+
 		static std::string ConvertString(System::String^ string);
 
 		static System::String^ ConvertString(std::string string);

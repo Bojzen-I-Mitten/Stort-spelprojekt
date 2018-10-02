@@ -20,8 +20,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\graphics\animation\BoneChildTransformConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
+    <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Joint.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Ragdoll.cpp" />
     <ClCompile Include="src\thomas\System.cpp" />
@@ -101,6 +103,8 @@
     <ClInclude Include="include\imgui\stb_rect_pack.h" />
     <ClInclude Include="include\imgui\stb_textedit.h" />
     <ClInclude Include="include\imgui\stb_truetype.h" />
+    <ClInclude Include="src\thomas\graphics\animation\BoneChildTransformConstraint.h" />
+    <ClInclude Include="src\thomas\graphics\animation\BoneConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\Playback.h" />
     <ClInclude Include="src\thomas\Common.h" />
     <ClInclude Include="src\thomas\editor\EditorCamera.h" />
@@ -119,6 +123,7 @@
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\graphics\render\Frame.h" />
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
+    <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />

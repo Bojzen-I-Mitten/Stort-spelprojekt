@@ -58,6 +58,9 @@ namespace ThomasEngine {
 		Monitor::Exit(m_componentsLock);
 		return completed;
 	}
+	thomas::object::GameObject* GameObject::Native::get() {
+		return (thomas::object::GameObject*)nativePtr;
+	}
 
 	void GameObject::PostLoad(Scene^ scene)
 	{

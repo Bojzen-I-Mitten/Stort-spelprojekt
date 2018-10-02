@@ -47,6 +47,7 @@
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\SceneSurrogate.cpp" />
     <ClCompile Include="src\object\component\physics\Joint.cpp" />
+    <ClCompile Include="src\object\component\animation\BoneTransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\object\component\physics\Joint.h" />
     <ClInclude Include="src\object\component\physics\.h" />
+    <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />
