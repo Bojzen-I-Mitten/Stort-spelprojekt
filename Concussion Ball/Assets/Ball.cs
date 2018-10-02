@@ -45,4 +45,10 @@ public class Ball : NetworkComponent
         transform.localPosition = Vector3.Zero;
         pickedUp = true;
     }
+
+    public override void OnLostOwnership()
+    {
+        base.OnLostOwnership();
+        gameObject.GetComponent<Rigidbody>().enabled = false;
+    }
 }
