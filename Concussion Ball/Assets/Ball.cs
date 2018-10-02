@@ -1,8 +1,9 @@
+using LiteNetLib;
+using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
 public class Ball : NetworkComponent
 {
-
     Rigidbody rb;
     bool pickedUp = false;
 
@@ -37,9 +38,8 @@ public class Ball : NetworkComponent
         }
     }
     
-    public void Pickup(GameObject chad, Transform hand)
+    public void Pickup(GameObject gobj, Transform hand)
     {
-
         rb.enabled = false;
         transform.parent = hand;
         transform.localPosition = Vector3.Zero;
@@ -48,7 +48,17 @@ public class Ball : NetworkComponent
 
     public override void OnLostOwnership()
     {
-        base.OnLostOwnership();
-        gameObject.GetComponent<Rigidbody>().enabled = false;
+        rb.enabled = false;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        rb.enabled = reader.GetBool();
+    }
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        writer.Put(rb.enabled);
+        return true;
     }
 }
