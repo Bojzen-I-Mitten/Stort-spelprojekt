@@ -72,6 +72,10 @@ namespace ThomasEngine.Network
                 DataWriter.Put(ID);
 
             DataWriter.Put(initalState);
+            if (networkComponentsCache == null)
+            {
+                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+            }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 comp.OnWrite(DataWriter, initalState);
