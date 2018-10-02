@@ -522,7 +522,7 @@ namespace ThomasEngine
 			void Resources::RenameResource(String ^ oldPath, String ^ newPath)
 			{
 				String^ thomasPathOld = ConvertToThomasPath(oldPath);
-				String^ thomasPathNew = ConvertToThomasPath(oldPath);
+				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
 					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
