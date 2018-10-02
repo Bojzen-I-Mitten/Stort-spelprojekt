@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
+  <m_guid>4ae63773-8044-42b7-af21-bcd38a7457e5</m_guid>
+  <m_name z:Id="2">Chad</m_name>
+  <Components z:Size="6">
+    <Component z:Id="3" i:type="Transform">
+      <m_guid>1ffa81c7-585b-4aaa-9c1a-bade3619518d</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <children z:Size="3">
+        <Transform z:Id="4">
+          <m_guid>8135091f-bd28-44c4-afaf-3c4d82c2bb1b</m_guid>
+          <m_name i:nil="true" />
+          <m_enabled>true</m_enabled>
+          <m_gameObject z:Id="5">
+            <m_guid>caf00d2d-08a0-4147-8d43-5ac8216069fa</m_guid>
+            <m_name z:Id="6">ChadModel</m_name>
+            <Components z:Size="2">
+              <Component z:Ref="4" i:nil="true" />
+              <Component z:Id="7" i:type="RenderSkinnedComponent">
+                <m_guid>ffadd8d5-f19b-4793-8187-3faf1b4ae2fd</m_guid>
+                <m_name i:nil="true" />
+                <m_enabled>true</m_enabled>
+                <m_gameObject z:Ref="5" i:nil="true" />
+                <animation z:Id="8">
+                  <path z:Id="9">%THOMAS_ASSETS%\anim\Running_animation.anim</path>
+                </animation>
+                <material z:Id="10">
+                  <path z:Id="11">%THOMAS_ASSETS%\skinnedChad.mat</path>
+                </material>
+                <model z:Id="12">
+                  <path z:Id="13">%THOMAS_ASSETS%\anim\Running_model.fbx</path>
+                </model>
+              </Component>
+            </Components>
+            <activeSelf>true</activeSelf>
+            <transform z:Ref="4" i:nil="true" />
+          </m_gameObject>
+          <children z:Size="0" />
+          <localEulerAngles>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+          </localEulerAngles>
+          <localPosition>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+          </localPosition>
+          <localScale>
+            <x>1</x>
+            <y>1</y>
+            <z>1</z>
+          </localScale>
+          <parent z:Ref="3" i:nil="true" />
+        </Transform>
+        <Transform z:Id="14">
+          <m_guid>3c4008e0-de67-44d6-9246-8af1be1426d1</m_guid>
+          <m_name i:nil="true" />
+          <m_enabled>true</m_enabled>
+          <m_gameObject z:Id="15">
+            <m_guid>8bcc044e-b5dc-436c-b833-2a78f7402652</m_guid>
+            <m_name z:Id="16">camera</m_name>
+            <Components z:Size="2">
+              <Component z:Ref="14" i:nil="true" />
+              <Component z:Id="17" i:type="Camera">
+                <m_guid>5e4b2e01-0fb6-4677-8b93-18dd41ceda0d</m_guid>
+                <m_name i:nil="true" />
+                <m_enabled>true</m_enabled>
+                <m_gameObject z:Ref="15" i:nil="true" />
+                <farPlane>10000</farPlane>
+                <fieldOfView>70</fieldOfView>
+                <nearPlane>0.5</nearPlane>
+                <targetDisplay>0</targetDisplay>
+              </Component>
+            </Components>
+            <activeSelf>true</activeSelf>
+            <transform z:Ref="14" i:nil="true" />
+          </m_gameObject>
+          <children z:Size="0" />
+          <localEulerAngles>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+          </localEulerAngles>
+          <localPosition>
+            <x>0</x>
+            <y>1.01711643</y>
+            <z>2.3985858</z>
+          </localPosition>
+          <localScale>
+            <x>1</x>
+            <y>1</y>
+            <z>1</z>
+          </localScale>
+          <parent z:Ref="3" i:nil="true" />
+        </Transform>
+        <Transform z:Id="18">
+          <m_guid>d337cb66-7763-4943-850a-a127f21706a5</m_guid>
+          <m_name i:nil="true" />
+          <m_enabled>true</m_enabled>
+          <m_gameObject z:Id="19">
+            <m_guid>b5b98962-1500-4c3d-9cd2-bee54bce7f67</m_guid>
+            <m_name z:Id="20">Hand</m_name>
+            <Components z:Size="2">
+              <Component z:Ref="18" i:nil="true" />
+              <Component z:Id="21" xmlns:d8p1="http://schemas.datacontract.org/2004/07/" i:type="d8p1:SkeletonSyncer">
+                <m_guid>fa2aed12-d1c5-4c59-84fe-4347dd8fcc10</m_guid>
+                <m_name i:nil="true" />
+                <m_enabled>true</m_enabled>
+                <m_gameObject z:Ref="19" i:nil="true" />
+                <d8p1:bone>13</d8p1:bone>
+                <d8p1:skeleton z:Ref="7" i:nil="true" />
+              </Component>
+            </Components>
+            <activeSelf>true</activeSelf>
+            <transform z:Ref="18" i:nil="true" />
+          </m_gameObject>
+          <children z:Size="0" />
+          <localEulerAngles>
+            <x>0</x>
+            <y>0</y>
+            <z>0</z>
+          </localEulerAngles>
+          <localPosition>
+            <x>0.8689463</x>
+            <y>0.335291862</y>
+            <z>0</z>
+          </localPosition>
+          <localScale>
+            <x>1</x>
+            <y>1</y>
+            <z>1</z>
+          </localScale>
+          <parent z:Ref="3" i:nil="true" />
+        </Transform>
+      </children>
+      <localEulerAngles>
+        <x>0</x>
+        <y>0</y>
+        <z>-0</z>
+      </localEulerAngles>
+      <localPosition>
+        <x>-0.05815077</x>
+        <y>0.0825772</y>
+        <z>-0.0378992558</z>
+      </localPosition>
+      <localScale>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </localScale>
+      <parent i:nil="true" />
+    </Component>
+    <Component z:Id="22" i:type="Rigidbody">
+      <m_guid>2cd0a7b4-75ae-48bc-832a-6c2326624b6f</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <AngularVelocity>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </AngularVelocity>
+      <FrzPos>
+        <x>1</x>
+        <y>1</y>
+        <z>1</z>
+      </FrzPos>
+      <FrzRot>
+        <x>0</x>
+        <y>1</y>
+        <z>0</z>
+      </FrzRot>
+      <IsKinematic>false</IsKinematic>
+      <LinearVelocity>
+        <x>0</x>
+        <y>0</y>
+        <z>0</z>
+      </LinearVelocity>
+      <Mass>1</Mass>
+    </Component>
+    <Component z:Id="23" i:type="CapsuleCollider">
+      <m_guid>4baf1135-540e-4c54-ad0f-aebe4387be9e</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <attachedRigidbody i:nil="true" />
+      <isTrigger>false</isTrigger>
+      <center>
+        <x>0</x>
+        <y>1</y>
+        <z>0</z>
+      </center>
+      <height>1</height>
+      <radius>0.4</radius>
+    </Component>
+    <Component z:Id="24" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEditor" i:type="d3p1:ChadControls">
+      <m_guid>20b88f85-815d-4df8-8b7d-94ef8bfae597</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:camera z:Ref="17" i:nil="true" />
+      <d3p1:cameraDistance>2</d3p1:cameraDistance>
+      <d3p1:cameraSensitivity>1</d3p1:cameraSensitivity>
+      <d3p1:force>5</d3p1:force>
+      <d3p1:hand z:Ref="18" i:nil="true" />
+      <d3p1:speed>5</d3p1:speed>
+      <d3p1:throwForce>10</d3p1:throwForce>
+    </Component>
+    <Component z:Id="25" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkIdentity">
+      <m_guid>d8901bcb-c5fd-4e92-87f1-82c23631c16a</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:IsPlayer>false</d3p1:IsPlayer>
+      <d3p1:Owner>false</d3p1:Owner>
+    </Component>
+    <Component z:Id="26" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkTransform">
+      <m_guid>b0f0b105-20d9-42a8-a47f-4c98c57a51bc</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:SyncMode>SyncTransform</d3p1:SyncMode>
+    </Component>
+  </Components>
+  <activeSelf>true</activeSelf>
+  <transform z:Ref="3" i:nil="true" />
+</GameObject>

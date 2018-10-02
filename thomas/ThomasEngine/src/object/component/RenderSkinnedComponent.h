@@ -36,6 +36,8 @@ namespace ThomasEngine
 
 		void Update() override;
 
+		Matrix GetBoneMatrix(int boneIndex);
+
 	private:
 		void applyAnimation();
 	};

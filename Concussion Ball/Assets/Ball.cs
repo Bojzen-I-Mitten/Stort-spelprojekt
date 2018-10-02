@@ -33,6 +33,7 @@ public class Ball : NetworkComponent
         if (pickedUp)
         {
             Drop();
+           
             rb.AddForce(force, Rigidbody.ForceMode.Impulse);
         }
     }
