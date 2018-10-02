@@ -86,6 +86,12 @@ namespace ThomasEngine.Network
                     id.gameObject.Destroy();
                 Players.Remove(peer);
             }
+
+            if(ObjectOwners.ContainsKey(peer))
+            {
+                ObjectOwners[peer].RemoveRange(0, ObjectOwners.Count);
+                ObjectOwners.Remove(peer);
+            }
         }
 
         public void InititateScene()
