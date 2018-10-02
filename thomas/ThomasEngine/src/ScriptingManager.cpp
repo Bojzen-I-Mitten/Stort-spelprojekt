@@ -1,5 +1,7 @@
+#include "Utility.h"
 #include "ScriptingManager.h"
 #include "ThomasManaged.h"
+#include "Debug.h"
 
 void ThomasEngine::ScriptingManger::LoadAssembly()
 {
@@ -30,8 +32,14 @@ void ThomasEngine::ScriptingManger::LoadAssembly()
 
 			Scene^ oldScene = Scene::CurrentScene;
 			oldScene->UnLoad();
-			Scene::CurrentScene = Scene::LoadScene(tempFile);
-			File::Delete(tempFile);
+			try {
+				Scene::CurrentScene = Scene::LoadScene(tempFile);
+				File::Delete(tempFile);
+			}
+			catch (Exception^ e) {
+				String^ err = "Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + e->Message;
+				Debug::Log(err);
+			}
 			Scene::CurrentScene->RelativeSavePath = currentSavePath;			
 		}
 	}

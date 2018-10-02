@@ -22,6 +22,7 @@
   <ItemGroup>
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
+    <ClCompile Include="src\thomas\object\component\physics\Joint.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Ragdoll.cpp" />
     <ClCompile Include="src\thomas\System.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="src\thomas\ThomasTime.cpp" />
     <ClCompile Include="src\thomas\utils\AssimpLoader.cpp" />
     <ClCompile Include="src\thomas\utils\D3d.cpp" />
+    <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
     <ClCompile Include="src\thomas\Window.cpp" />
   </ItemGroup>
@@ -120,6 +122,7 @@
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
+    <ClInclude Include="src\thomas\object\component\physics\Joint.h" />
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Ragdoll.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
@@ -271,7 +274,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_DEBUG;_LIB;THOMAS_EXPORT;_DEBUG_DX;%(PreprocessorDefinitions)%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_EDITOR;_DEBUG;_DEBUG;_LIB;THOMAS_EXPORT;_DEBUG_DX;%(PreprocessorDefinitions)%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
@@ -318,7 +321,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_LIB;THOMAS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_EDITOR;NDEBUG;_LIB;THOMAS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
