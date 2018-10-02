@@ -40,7 +40,6 @@ namespace thomas
 			void SetShader(resource::Shader* shader);
 			resource::Shader* GetShader();
 
-
 			void ApplyProperty(const std::string& name);
 			bool HasProperty(const std::string& name);
 			math::Color GetColor(const std::string& name);

@@ -17,7 +17,12 @@ namespace ThomasEngine
 		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
 		static event ParentChanged^ OnParentChanged;
 
-		
+		[Xml::Serialization::XmlIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		virtual property bool canDisable
+		{
+			virtual bool get() override { return false; }
+		}
 		
 		[BrowsableAttribute(false)]
 		property Transform^ parent 

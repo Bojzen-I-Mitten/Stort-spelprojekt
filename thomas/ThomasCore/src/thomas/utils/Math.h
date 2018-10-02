@@ -36,28 +36,16 @@ namespace DirectX
 			return from + (to - from) * amount;
 		}
 
-		inline Vector3 ToEuler(const Quaternion & rotation)
-		{
-			float yaw = asin(-2.f * (rotation.x * rotation.z - rotation.w * rotation.y));
-			yaw = RadiansToDegrees(yaw);
-			yaw = roundf(yaw * 100000.f) / 100000.f;
-
-			float pitch = atan2f(2.0f * (rotation.y * rotation.z + rotation.w * rotation.x), 
-						   rotation.w * rotation.w - rotation.x * rotation.x - rotation.y * rotation.y + rotation.z * rotation.z);
-			pitch = RadiansToDegrees(pitch);
-			pitch = roundf(pitch * 100000.f) / 100000.f;
-
-			float roll = atan2f(2.f * (rotation.x * rotation.y + rotation.w * rotation.z), 
-								rotation.w * rotation.w + rotation.w * rotation.x - rotation.y * rotation.y - rotation.z * rotation.z);
-			roll = RadiansToDegrees(roll);
-			roll = roundf(roll * 100000.f) / 100000.f;
-			return Vector3(pitch, yaw, roll);
+		inline float square(float x) {
+			return x * x;
 		}
 
-		inline Quaternion FromEuler(const Vector3 & rotation)
-		{
-			return Quaternion::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
-		}
+		/* Convert rotation quatenion to pitch/yaw/roll vector
+		*/
+		Vector3 ToEuler(const Quaternion & q);
+		/* Convert pitch/yaw/roll vector to rotation quaternion
+		*/
+		inline Quaternion FromEuler(const Vector3 & rotation);
 
 		inline std::string ToString(const Vector3 & v)
 		{

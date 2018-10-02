@@ -10,7 +10,15 @@ namespace thomas
 
 			void Transform::Decompose() {
 				m_localWorldMatrix.Decompose(m_localScale, m_localRotation, m_localPosition);
-				m_localEulerAngles = math::ToEuler(m_localRotation);
+#ifdef _EDITOR
+				m_euler = math::ToEuler(m_localRotation);
+#endif
+			}
+			void Transform::UpdateLocalMatrix()
+			{
+				math::Matrix rotMatrix = math::Matrix::CreateFromQuaternion(m_localRotation);
+				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * rotMatrix;
+				m_localWorldMatrix.Translation(m_localPosition);
 			}
 
 			Transform::Transform()
@@ -71,37 +79,47 @@ namespace thomas
 
 			void Transform::LookAt(Transform * target)
 			{
-				if (target->GetPosition() == GetPosition())
-					return;
-				math::Matrix lookAt = math::Matrix::CreateLookAt(GetPosition(), target->GetPosition(), m_localWorldMatrix.Up());
-
-				lookAt = lookAt.Invert();
-
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, lookAt.Forward(), lookAt.Up());
-
-				Decompose();
-				SetDirty(true);
-
+				LookAt(target->GetPosition());
 			}
 			void Transform::LookAt(math::Vector3 target)
 			{
+				LookAt(m_localPosition, target);
+			}
+			void Transform::LookAt(math::Vector3 eye, math::Vector3 target)
+			{
 				if (target == GetPosition())
 					return;
-				math::Matrix lookAt = math::Matrix::CreateLookAt(GetPosition(), target, m_localWorldMatrix.Up());
-
-				lookAt = lookAt.Invert();
-
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, lookAt.Forward(), lookAt.Up());
+				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, m_localWorldMatrix.Up());
 				
+				Decompose();
+				SetDirty(true);
+			}
+			void Transform::LookAt(math::Vector3 eye, math::Vector3 target, math::Vector3 up)
+			{
+				if (target == GetPosition())
+					return;
+				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, up);
+
+				Decompose();
+				SetDirty(true);
+			}
+			void Transform::Orient(math::Vector3 forward, math::Vector3 up)
+			{
+				m_localWorldMatrix = math::Matrix::CreateWorld(m_localPosition, forward, up);
 				Decompose();
 				SetDirty(true);
 			}
 			void Transform::Rotate(math::Vector3 angles)
 			{
-				math::Quaternion rot = math::Quaternion::CreateFromYawPitchRoll(angles.x, angles.y, angles.z);
-				math::Matrix newRot = math::Matrix::Transform(math::Matrix::CreateFromQuaternion(rot), m_localRotation);
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, newRot.Forward(), newRot.Up());
-				Decompose();
+				Rotate(math::Quaternion::CreateFromYawPitchRoll(angles.x, angles.y, angles.z));
+			}
+			void Transform::Rotate(math::Quaternion rot)
+			{
+				m_localRotation = m_localRotation * rot;
+#ifdef _EDITOR
+				m_euler = math::ToEuler(m_localRotation);
+#endif
+				UpdateLocalMatrix();
 				SetDirty(true);
 			}
 			void Transform::Rotate(float x, float y, float z)
@@ -110,17 +128,13 @@ namespace thomas
 			}
 			void Transform::RotateByAxis(math::Vector3 axis, float angle)
 			{
-				math::Quaternion rot = math::Quaternion::CreateFromAxisAngle(axis, angle);
-				math::Matrix newRot = math::Matrix::CreateFromQuaternion(m_localRotation * rot);
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, newRot.Forward(), newRot.Up());
-				Decompose();
-				SetDirty(true);
+				m_localRotation = m_localRotation * math::Quaternion::CreateFromAxisAngle(axis, angle);
+				UpdateLocalMatrix();
 			}
 			void Transform::Translate(math::Vector3 translation)
 			{
-				math::Matrix pos = math::Matrix::CreateTranslation(translation);
-				m_localWorldMatrix *= pos;
-				Decompose();
+				m_localPosition += translation;
+				m_localWorldMatrix.Translation(m_localPosition);
 				SetDirty(true);
 			}
 			void Transform::Translate(float x, float y, float z)
@@ -145,9 +159,9 @@ namespace thomas
 			math::Vector3 Transform::GetEulerAngles()
 			{
 				if (m_parent)
-					return m_localEulerAngles * m_parent->GetEulerAngles();
+					return GetLocalEulerAngles() * m_parent->GetEulerAngles();
 				else
-					return m_localEulerAngles;
+					return GetLocalEulerAngles();
 			}
 			math::Vector3 Transform::GetScale()
 			{
@@ -179,6 +193,9 @@ namespace thomas
 			}
 			void Transform::SetRotation(float yaw, float pitch, float roll)
 			{
+#ifdef _EDITOR
+				m_euler = math::Vector3(pitch, yaw, roll);
+#endif
 				SetRotation(math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll)));
 			}
 			void Transform::SetScale(math::Vector3 scale)
@@ -203,8 +220,8 @@ namespace thomas
 
 			void Transform::SetLocalPosition(math::Vector3 position)
 			{
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(position, m_localWorldMatrix.Forward(), m_localWorldMatrix.Up());
-				Decompose();
+				m_localPosition = position;
+				m_localWorldMatrix.Translation(position);
 			}
 			void Transform::SetLocalPosition(float x, float y, float z)
 			{
@@ -212,24 +229,24 @@ namespace thomas
 			}
 			void Transform::SetLocalRotation(math::Quaternion rotation)
 			{
-
-				math::Matrix rotMatrix = math::Matrix::CreateFromQuaternion(rotation);
-
-				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, rotMatrix.Forward(), rotMatrix.Up());
-				Decompose();
-				
+				m_localRotation = rotation;
+				UpdateLocalMatrix();
+#ifdef _EDITOR
+				m_euler = math::ToEuler(m_localRotation);
+#endif
 			}
 			void Transform::SetLocalRotation(float yaw, float pitch, float roll)
 			{
-				SetLocalRotation(math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll)));
-				m_localEulerAngles = math::Vector3(pitch, yaw, roll);
+#ifdef _EDITOR
+				m_euler = math::Vector3(pitch, yaw, roll);
+#endif
+				m_localRotation = math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll));
+				UpdateLocalMatrix();
 			}
 			void Transform::SetLocalScale(math::Vector3 scale)
 			{
-				//Bug here
-				m_localWorldMatrix = math::Matrix::CreateScale(scale) * math::Matrix::CreateWorld(m_localPosition, m_localWorldMatrix.Forward(), m_localWorldMatrix.Up());
-				Decompose();
 				m_localScale = scale;
+				UpdateLocalMatrix();
 			}
 			void Transform::SetLocalScale(float x, float y, float z)
 			{
@@ -239,6 +256,7 @@ namespace thomas
 			{
 				return SetLocalScale(math::Vector3(scale, scale, scale));
 			}
+
 
 			math::Vector3 Transform::GetLocalPosition()
 			{
@@ -252,7 +270,11 @@ namespace thomas
 
 			math::Vector3 Transform::GetLocalEulerAngles()
 			{
-				return m_localEulerAngles;
+#ifdef _EDITOR
+				return m_euler;
+#else
+				return math::ToEuler(m_localRotation);
+#endif
 			}
 
 			math::Vector3 Transform::GetLocalScale()

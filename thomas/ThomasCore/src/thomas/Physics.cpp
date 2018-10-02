@@ -74,7 +74,7 @@ namespace thomas
 	void Physics::Simulate()
 	{
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
-		
+
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
 			return;
 

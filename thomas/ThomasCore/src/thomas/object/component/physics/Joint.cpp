@@ -3,7 +3,10 @@
 
 thomas::object::component::Joint::Joint()
 {
-
+	m_current.setOrigin(btVector3(0.f, 0.f, 0.f));
+	m_other.setOrigin(btVector3(0.f, 0.f, 0.f));
+	m_current.setRotation(btQuaternion(0.f, 0.f, 0.f, 1.f));
+	m_other.setRotation(btQuaternion(0.f, 0.f, 0.f, 1.f));
 }
 
 thomas::object::component::Joint::~Joint()
@@ -23,15 +26,15 @@ btConeTwistConstraint * thomas::object::component::Joint::CreateConstraints( btR
 void thomas::object::component::Joint::Update()
 {
 	m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_twistSpin.x), math::DegreesToRadians(m_twistSpin.y), math::DegreesToRadians(m_twistSpin.z), 1, 0.3, 1);
-	m_coneTwistConstraint->setFrames(m_first, m_second);
+	m_coneTwistConstraint->setFrames(m_current, m_other);
 }
 
 void thomas::object::component::Joint::Awake()
 {
 	if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 	{
-		thomas::Physics::s_world->addConstraint(CreateConstraints( m_secondBody, m_first,
-															m_second, m_twistSpin), false);
+		thomas::Physics::s_world->addConstraint(CreateConstraints( m_secondBody, m_current,
+															m_other, m_twistSpin), false);
 	}															 
 }
 
@@ -58,12 +61,12 @@ void thomas::object::component::Joint::SetTransformTwistSpin(math::Vector3 twist
 void thomas::object::component::Joint::SetTransformOrigin(math::Vector3 Origin, bool firstBody)
 {
 	if (firstBody)
-		this->m_first.setOrigin(btVector3(Origin.x, Origin.y, Origin.z));
-
-	this->m_second.setOrigin(btVector3(Origin.x, Origin.y, Origin.z));
+		this->m_current.setOrigin(btVector3(Origin.x, Origin.y, Origin.z));
+	else
+		this->m_other.setOrigin(btVector3(Origin.x, Origin.y, Origin.z));
 }
 
-void thomas::object::component::Joint::SetTransformRotation(math::Vector4 Rotation, bool firstBody)
+void thomas::object::component::Joint::SetTransformRotation(math::Vector3 Rotation, bool firstBody)
 {
 	if (firstBody)
 		Savedrotation[0] = Rotation;
@@ -71,26 +74,26 @@ void thomas::object::component::Joint::SetTransformRotation(math::Vector4 Rotati
 		Savedrotation[1] = Rotation;
 
 	if (firstBody)
-		this->m_first.getBasis().setEulerZYX(Rotation.z, Rotation.y, Rotation.x);//m_first.setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));
-
-	this->m_second.getBasis().setEulerZYX(Rotation.z, Rotation.y, Rotation.x);//setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));	
+		this->m_current.getBasis().setEulerZYX(Rotation.z, Rotation.y, Rotation.x);//m_first.setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));
+	else
+		this->m_other.getBasis().setEulerZYX(Rotation.z, Rotation.y, Rotation.x);//setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));	
 }
 
 thomas::math::Vector3 thomas::object::component::Joint::GetTransformOrigin(bool firstBody)
 {
 	
 	if (firstBody)
-		return Physics::ToSimple(m_first.getOrigin());
+		return Physics::ToSimple(m_current.getOrigin());
 
-	return Physics::ToSimple(m_second.getOrigin());
+	return Physics::ToSimple(m_other.getOrigin());
 }
 
-thomas::math::Vector4 thomas::object::component::Joint::GetTransformRotation(bool firstBody)
+thomas::math::Vector3 thomas::object::component::Joint::GetTransformRotation(bool firstBody)
 {
 	/*
 	if (firstBody)
-		return math::Vector4((math::Vector4)m_first.getRotation());
-	return math::Vector4((math::Vector4)m_second.getRotation());
+		return math::Vector3((math::Vector3)m_first.getRotation());
+	return math::Vector3((math::Vector3)m_second.getRotation());
 	*/
 	if (firstBody)
 		return Savedrotation[0];

@@ -30,28 +30,28 @@ namespace ThomasEngine
 			}
 		}
 
-		property Vector3 OriginFirst
+		property Vector3 OriginCurrent
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformOrigin(true)); }
 			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformOrigin(Utility::Convert(origin), true); }
 		}
 
-		property Vector3 OriginSecond
+		property Vector3 OriginOther
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformOrigin(false)); }
 			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformOrigin(Utility::Convert(origin), false); }
 		}
 
-		property Vector4 RotationFirst
+		property Vector3 RotationCurrent
 		{
-			Vector4 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(true)); }
-			void set(Vector4 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), true); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(true)); }
+			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), true); }
 		}
 
-		property Vector4 RotationSecond
+		property Vector3 RotationOther
 		{
-			Vector4 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(false)); }
-			void set(Vector4 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), false); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(false)); }
+			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), false); }
 		}
 
 		property Vector3 TwistSpin

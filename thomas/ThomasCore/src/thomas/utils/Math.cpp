@@ -1,49 +1,36 @@
-
 #include "Math.h"
+
 
 namespace DirectX
 {
 	namespace SimpleMath
 	{
-
-		/** Gets the shortest arc quaternion to rotate this vector to the destination
-			vector.
-		@remarks
-			If you call this with a dest vector that is close to the inverse
-			of this vector, we will rotate 180 degrees around the 'fallbackAxis'
-			(if specified, or a generated axis if not) since in this case
-			ANY axis of rotation is valid.
-		*/
-
-		Quaternion getRotationTo(Vector3 from, Vector3 dest)
+		Vector3 ToEuler(const Quaternion & q)
 		{
-			// Based on Stan Melax's article in Game Programming Gems
-			Quaternion q;
-			// Copy, since cannot modify local
-			from.Normalize();
-			dest.Normalize();
+			float yaw, pitch, roll;
 
-			float d = from.Dot(dest);
-			// If dot == 1, vectors are the same
-			if (d >= 1.0f || d < (1e-6f - 1.0f))
+			yaw = (float)std::atan2f(2.f * q.y * q.w - 2.f * q.x * q.z,1.f - 2.f * square(q.y) - 2.f * square(q.z));
+
+			roll = std::asinf(2.f * q.x * q.y + 2.f * q.z * q.w);
+
+			pitch = std::atan2f(2.f * q.x * q.w - 2.f * q.y * q.z, 1.f - 2.f * square(q.x) - 2.f * square(q.z));
+
+			if (q.x * q.y + q.z * q.w == 0.5f)
 			{
-				return Quaternion::Identity;
+				yaw = (float)(2.f * std::atan2f(q.x, q.w));
+				pitch = 0.f;
 			}
-			else
+
+			else if (q.x * q.y + q.z * q.w == -0.5f)
 			{
-				float s = std::sqrtf((1 + d) * 2);
-				float invs = 1 / s;
-
-				Vector3 c = from.Cross(dest);
-
-				q.x = c.x * invs;
-				q.y = c.y * invs;
-				q.z = c.z * invs;
-				q.w = s * 0.5f;
-				q.Normalize();
+				yaw = (float)(-2.f * std::atan2f(q.x, q.w));
+				pitch = 0.f;
 			}
-			return q;
+			return Vector3(RadiansToDegrees(pitch), RadiansToDegrees(yaw), RadiansToDegrees(roll));
 		}
-
+		Quaternion FromEuler(const Vector3 & rotation)
+		{
+			return Quaternion::CreateFromYawPitchRoll(rotation.y, rotation.x, rotation.z);
+		}
 	}
 }

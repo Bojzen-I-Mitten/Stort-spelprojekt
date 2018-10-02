@@ -31,7 +31,9 @@ namespace thomas
 				PSIZE = 10,
 				BONEINDICES = 11,
 				BONEWEIGHTS = 12,
-				UNKNOWN = 13
+				NORMALTEXTURE = 13,//Temporary hack
+				MATERIALSMOOTHNESSFACTOR = 14,//Temporary hack
+				UNKNOWN = 15
 			};
 		private:
 			static bool Compile(std::string path, ID3DX11Effect** effect);
