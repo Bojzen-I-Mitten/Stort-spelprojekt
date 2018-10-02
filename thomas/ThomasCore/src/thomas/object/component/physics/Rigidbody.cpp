@@ -80,14 +80,17 @@ namespace thomas
 					math::Quaternion rot = m_gameObject->m_transform->GetRotation();
 					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
 
-					trans.setOrigin((btVector3&)pos);
 					trans.setRotation((btQuaternion&)rot);
+					trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
+					if (m_LocalCenterOfMassChange.y >= 1)
+						int m = 0;
+
+					setCenterOfMassTransform(trans);
+					trans.setOrigin((btVector3&)pos);
 					getMotionState()->setWorldTransform(trans);
 					this->setLinearVelocity(btVector3(0, 0, 0));
 					this->setAngularVelocity(btVector3(0, 0, 0));
-					trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
-					
-					setCenterOfMassTransform(trans);
+
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 				}			
