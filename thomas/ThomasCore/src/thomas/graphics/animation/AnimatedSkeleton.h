@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 #include <math.h>
+#include <memory>
 #include "../../utils/Math.h"
 #include "IBlendTree.h"
 #include "../../resource/ShaderProperty/ShaderPropertyMatrix.h"
+
 
 namespace thomas {
 	namespace graphics {
@@ -11,6 +13,16 @@ namespace thomas {
 
 			class Skeleton;
 			class AnimationNode;
+			class BoneConstraint;
+
+
+			constexpr uint32_t MAX_CONSTRAIN_COUNT = 3;
+			struct ConstraintList {
+				BoneConstraint* m_list[MAX_CONSTRAIN_COUNT + 1]; // Last is NULL
+
+				void add(BoneConstraint* bC);
+				void rmv(BoneConstraint* bC);
+			};
 
 			class AnimatedSkeleton 
 				: public IBlendTree
@@ -44,13 +56,19 @@ namespace thomas {
 
 				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
 
+				void addConstraint(BoneConstraint * bC, uint32_t boneIndex);
+				void rmvConstraint(BoneConstraint * bC, uint32_t boneIndex);
+
 			private:
 				Skeleton& _ref;												// Reference to the mesh skeleton
 				std::unique_ptr<AnimationNode> _root;						// Root in the blend tree
 				std::vector<math::Matrix> _pose;							// Bone transform in model space
 				resource::shaderproperty::ShaderPropertyMatrixArray* _skin;	// Skin Transforms in model space, stored in a property ready for the GPU
+				std::unique_ptr<ConstraintList> m_constraint;
 			private:
 				void updateSkeleton();
+				void clearConstraints();
+				void applyConstraint(uint32_t index);
 			};
 		}
 	}

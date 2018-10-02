@@ -5,6 +5,7 @@
 #include "../../resource/Animation.h"
 #include "data/Skeleton.h"
 #include "BaseAnimationTime.h"
+#include "BoneConstraint.h"
 
 namespace thomas {
 	namespace graphics {
@@ -13,8 +14,9 @@ namespace thomas {
 
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref) :
-				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(&skin_ref)
+				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(&skin_ref), m_constraint(new ConstraintList[ref.getNumBones()])
 			{
+				clearConstraints();
 				_skin->resize(ref.getNumBones());
 				clearBlendTree();
 				updateSkeleton();
@@ -23,6 +25,11 @@ namespace thomas {
 
 			AnimatedSkeleton::~AnimatedSkeleton()
 			{
+			}
+
+			void AnimatedSkeleton::clearConstraints() 
+			{
+				std::memset(m_constraint.get(), 0, sizeof(ConstraintList) * _ref.getNumBones());
 			}
 
 
@@ -36,6 +43,7 @@ namespace thomas {
 				// Update skin transforms
 				math::Matrix *skin_arr = _skin->GetValue();
 				_pose[0] = _root->calcLocalTransform(0) * _ref.getRoot();				//	Update root pose
+
 				skin_arr[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
@@ -44,6 +52,12 @@ namespace thomas {
 					math::Matrix m = bone._invBindPose * _pose[i];
 					skin_arr[i] = bone._invBindPose * _pose[i];							//	Update root skin
 				}
+			}
+			void AnimatedSkeleton::applyConstraint(uint32_t index)
+			{
+				BoneConstraint** ptr = (m_constraint.get() + index)->m_list;
+				while (ptr++ != NULL)
+					(*ptr)->execute(_ref, _pose.data(), index);
 			}
 			/* Freeze the current animation */
 			void AnimatedSkeleton::stopAnimation()
@@ -104,6 +118,41 @@ namespace thomas {
 			{
 				return _skin;
 			}
-		}
+			void AnimatedSkeleton::addConstraint(BoneConstraint * bC, uint32_t boneIndex)
+			{
+				m_constraint.get()[boneIndex].add(bC);
+			}
+			void AnimatedSkeleton::rmvConstraint(BoneConstraint * bC, uint32_t boneIndex)
+			{
+				m_constraint.get()[boneIndex].rmv(bC);
+			}
+			void ConstraintList::add(BoneConstraint * bC)
+			{
+				for (uint32_t i = 0; i < MAX_CONSTRAIN_COUNT; i++) {
+					if (m_list[i] == NULL) {
+						m_list[i] = bC;
+						return;
+					}
+				}
+				// No remaining slot.
+			}
+			void ConstraintList::rmv(BoneConstraint * bC)
+			{
+				for (uint32_t i = 0; i < MAX_CONSTRAIN_COUNT; i++) {
+					if (m_list[i] == bC) {
+						m_list[i] = NULL;
+						// Find last slot:
+						BoneConstraint** last = m_list + i;
+						while (++last != NULL) {}
+						last--; // Step back to non-empty
+						// Swap
+						m_list[i] = *last;
+						*last = NULL;
+						return;
+					}
+				}
+				// Not found.
+			}
+}
 	}
 }
