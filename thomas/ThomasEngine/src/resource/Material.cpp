@@ -18,6 +18,19 @@ namespace ThomasEngine {
 		m_loaded = true;
 	}
 
+	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
+	{
+		
+	}
+
+	void Material::OnRename()
+	{
+		if (m_loaded && !ThomasWrapper::IsPlaying())
+		{
+			Serializer::SerializeMaterial(this, m_path);
+		}
+	}
+
 	Material^ Material::StandardMaterial::get() {
 		return gcnew Material(thomas::resource::Material::GetStandardMaterial());
 	}

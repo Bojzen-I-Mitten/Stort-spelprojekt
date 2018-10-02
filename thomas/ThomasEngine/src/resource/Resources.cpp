@@ -52,6 +52,7 @@ namespace ThomasEngine
 	String^ Resources::ConvertToRealPath(String^ value) {
 		value = value->Replace("%THOMAS_DATA%", Application::editorAssets);
 		value = value->Replace("%THOMAS_ASSETS%", Application::currentProject->assetPath);
+		value = System::IO::Path::GetFullPath(value);
 		return value;
 	}
 	String^ Resources::GetUniqueName(String^ path)
@@ -75,13 +76,11 @@ namespace ThomasEngine
 
 		bool Resources::CreateResource(Resource^ resource, String^ path)
 		{
-
+			path = GetUniqueName(Application::currentProject->assetPath + "\\" + path);
 			if (resource->GetType() == Material::typeid)
 			{
-				String^ thomasPath = ConvertToThomasPath(path);
+				resource->Rename(path);
 				Serializer::SerializeMaterial((Material^)resource, path);
-				RenameResource(resource->m_path, path);
-				resource->Rename(thomasPath);
 				return true;
 			}
 			return false;

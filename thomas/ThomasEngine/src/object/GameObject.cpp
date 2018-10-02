@@ -173,7 +173,7 @@ namespace ThomasEngine {
 		else
 		{
 			try {
-				System::IO::Stream^ serialized = Serializer::SerializeGameObject(original);
+				Newtonsoft::Json::Linq::JObject^ serialized = Serializer::SerializeGameObject(original);
 				clone = Serializer::DeserializeGameObject(serialized);
 			}
 			catch (Exception^ e)

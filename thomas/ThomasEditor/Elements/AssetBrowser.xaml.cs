@@ -397,23 +397,35 @@ namespace ThomasEditor
             String oldName = Path.GetFileNameWithoutExtension(fullPath);
             String newFullPath = fullPath.Replace(oldName, lbl.Text);
 
-            //Check if file name is not empty string
-            if (lbl.Text != "")
+            try
             {
-                //Rename if file/dir does not exist
-                if (File.Exists(fullPath) && !File.Exists(newFullPath))
-                    File.Move(fullPath, newFullPath);
-                else if (Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
-                    Directory.Move(fullPath, newFullPath);
+                //Check if file name is not empty string
+                if (lbl.Text != "")
+                {
+                    //Rename if file/dir does not exist
+                    if (File.Exists(fullPath) && !File.Exists(newFullPath))
+                    {
+                        Serializer.WaitForFile(fullPath, 15);
+                        File.Move(fullPath, newFullPath);
+                    }
+
+                    else if (Directory.Exists(fullPath) && !Directory.Exists(newFullPath))
+                        Directory.Move(fullPath, newFullPath);
+                    else
+                    {
+                        lbl.Text = oldName;
+                    }
+                }
                 else
                 {
                     lbl.Text = oldName;
                 }
-            }
-            else
+            }catch(Exception e)
             {
+                Debug.LogError("Failed to rename asset: " + oldName + " error:" + e.Message);
                 lbl.Text = oldName;
             }
+           
             TreeViewItem item = stack.Parent as TreeViewItem;
             item.Focus();
         }
@@ -537,8 +549,7 @@ namespace ThomasEditor
 
         private void Menu_CreateMaterial(object sender, RoutedEventArgs e)
         {
-            Material newMat = new Material(Shader.Find("StandardShader"));
-            ThomasEngine.Resources.CreateResource(newMat, "New Material.mat");
+            ThomasEngine.Resources.CreateResource(new Material(), "New Material.mat");
             renameNextAddedItem = true;
         }
 

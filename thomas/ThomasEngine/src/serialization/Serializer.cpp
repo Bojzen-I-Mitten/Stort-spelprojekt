@@ -51,6 +51,7 @@ namespace ThomasEngine
 			Thread::Sleep(100);
 			retries++;
 		}
+		return;
 	}
 
 	void Serializer::SerializeScene(Scene ^ scene, System::String^ path)
@@ -58,7 +59,6 @@ namespace ThomasEngine
 		StringWriter^ writer;
 		try
 		{
-			rootType = Scene::typeid;
 			writer = gcnew StringWriter();
 			serializer->Serialize(writer, scene);
 			File::WriteAllText(path, writer->ToString());
@@ -76,10 +76,12 @@ namespace ThomasEngine
 	Scene^ Serializer::DeserializeScene(System::String ^ path)
 	{
 		try {
-			rootType = Scene::typeid;
+
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
-			return (Scene^)serializer->Deserialize(file, Scene::typeid);
+			Scene^ scene = (Scene^)serializer->Deserialize(file, Scene::typeid);
+			file->Close();
+			return scene;
 		}
 		catch (Exception^ e) {
 			Debug::LogError("Failed to deserialize scene: " + path + " Error: " + e->Message);
@@ -93,7 +95,7 @@ namespace ThomasEngine
 		StringWriter^ writer;
 		try
 		{
-			rootType = GameObject::typeid;
+
 			writer = gcnew StringWriter();
 			serializer->Serialize(writer, gameObject);
 			File::WriteAllText(path, writer->ToString());
@@ -107,14 +109,11 @@ namespace ThomasEngine
 		}
 	}
 
-	System::IO::Stream ^ Serializer::SerializeGameObject(GameObject ^ gameObject)
+	JObject^ Serializer::SerializeGameObject(GameObject ^ gameObject)
 	{
 		try
 		{
-			rootType = GameObject::typeid;
-			System::IO::Stream^ stream = gcnew System::IO::MemoryStream();
-			serializer->Serialize(gcnew StreamWriter(stream), gameObject);
-			return stream;
+			return JObject::FromObject(gameObject, serializer);
 		}
 		catch (System::Exception^ e)
 		{
@@ -126,9 +125,12 @@ namespace ThomasEngine
 	GameObject ^ Serializer::DeserializeGameObject(System::String ^ path)
 	{
 		try {
-			rootType = GameObject::typeid;
+
 			WaitForFile(path, 10);
-			return DeserializeGameObject(File::Open(path, FileMode::Open));
+			StreamReader^ file = File::OpenText(path);
+			GameObject^ gameObject = (GameObject^)serializer->Deserialize(file, GameObject::typeid);
+			file->Close();
+			return gameObject;
 		}
 		catch (Exception^ e)
 		{
@@ -137,17 +139,15 @@ namespace ThomasEngine
 		}
 	}
 
-	GameObject ^ Serializer::DeserializeGameObject(System::IO::Stream ^ stream)
+	GameObject^ Serializer::DeserializeGameObject(Newtonsoft::Json::Linq::JObject^ jo)
 	{
 		try {
-			rootType = GameObject::typeid;
-			return (GameObject^)serializer->Deserialize(gcnew StreamReader(stream), GameObject::typeid);
-			stream->Close();
+
+			return jo->ToObject<GameObject^>(serializer);
 		}
 		catch (Exception^ e)
 		{
 			Debug::LogError("Failed to deserialize gameObject" + " Error: " + e->Message);
-			stream->Close();
 			return nullptr;
 		}
 	}
@@ -157,10 +157,10 @@ namespace ThomasEngine
 		StringWriter^ writer;
 		try
 		{
-
 			rootType = Material::typeid;
 			writer = gcnew StringWriter();
 			serializer->Serialize(writer, material);
+			rootType = nullptr;
 			File::WriteAllText(path, writer->ToString());
 		}
 		catch (System::Exception^ e)
@@ -179,7 +179,10 @@ namespace ThomasEngine
 			rootType = Material::typeid;
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
-			return (Material^)serializer->Deserialize(file, Material::typeid);
+			Material^ material = (Material^)serializer->Deserialize(file, Material::typeid);
+			rootType = nullptr;
+			file->Close();
+			return material;
 		}
 		catch (Exception^ e) {
 			Debug::LogError("Failed to deserialize material: " + path + " Error: " + e->Message);
