@@ -175,6 +175,9 @@
     <Compile Include="Elements\OpenProjectWindow.xaml.cs">
       <DependentUpon>OpenProjectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\Console.xaml.cs">
+      <DependentUpon>Console.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Inspectors\Converters.cs" />
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
@@ -230,6 +233,10 @@
       <DependentUpon>TransformGizmo.xaml</DependentUpon>
     </Compile>
     <Page Include="Elements\AssetBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Elements\Console.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -485,6 +492,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\assets\prefab.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\console\console-error.ico" />
+    <Resource Include="icons\console\console-log.ico" />
+    <Resource Include="icons\console\console-warning.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

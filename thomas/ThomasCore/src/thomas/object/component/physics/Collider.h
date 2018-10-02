@@ -12,6 +12,8 @@ namespace thomas
 			class Collider : public Component
 			{
 			public:
+				typedef void(*OnCollisionEvent)(Collider* otherCollider, Physics::COLLISION_TYPE collisionType);
+			public:
 				Collider(btCollisionShape* collisionShape);
 				~Collider();
 				
@@ -22,7 +24,8 @@ namespace thomas
 				void SetAttachedRigidbody(Rigidbody* rb);
 				bool IsTrigger();
 				void SetTrigger(bool trigger);
-
+				void SetOnCollisionEvent(OnCollisionEvent value);
+				void OnCollision(Collider* otherCollider, Physics::COLLISION_TYPE collisionType);
 				void Awake();
 				void OnEnable();
 				void OnDisable();
@@ -38,6 +41,7 @@ namespace thomas
 				btCollisionShape* m_collisionShape = nullptr;
 				btCollisionObject* m_collisionObject = nullptr;
 				Rigidbody* m_attachedRigidbody = nullptr;
+				OnCollisionEvent m_onCollisionEvent = NULL;
 			};
 		}
 	}

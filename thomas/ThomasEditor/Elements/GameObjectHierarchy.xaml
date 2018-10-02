@@ -19,7 +19,24 @@
                         <CommandBinding Command="commands:CustomCommands.GetPasteObject" CanExecute="PasteObject_CanExecute" Executed="MenuItem_PasteGameObject"/>
                         <CommandBinding Command="commands:CustomCommands.GetDuplicateObject" CanExecute="CopyObject_CanExecute" Executed="MenuItem_DuplicateGameObject"/>
                     </ContextMenu.CommandBindings>
-                    
+                    <MenuItem Header="Create">
+                        <MenuItem Header="Empty Object" Click="AddEmptyGameObject"/>
+                        <MenuItem Header="3D Objects">
+                            <MenuItem Header="Cube" Click="AddNewCubePrimitive"/>
+                            <MenuItem Header="Sphere" Click="AddNewSpherePrimitive"/>
+                            <MenuItem Header="Capsule" Click="AddNewCapsulePrimitive"/>
+                            <MenuItem Header="Cylinder" Click="AddNewCylinderPrimitive"/>
+                            <MenuItem Header="Plane" Click="AddNewPlanePrimitive"/>
+                            <MenuItem Header="Quad" Click="AddNewQuadPrimitive"/>
+                        </MenuItem>
+                        <MenuItem Header="Assisting Objects">
+                            <MenuItem Header="Camera" Click="AddNewCameraPrimitive"/>
+                            <MenuItem Header="POINT Light" Click="AddNewPointLightPrimitive"/>
+                            <MenuItem Header="SPOT Light" Click="AddNewSpotLightPrimitive"/>
+                            <MenuItem Header="DIRECTIONAL Light" Click="AddNewDirectionalLightPrimitive"/>
+                            <MenuItem Header="AREA Light" Click="AddNewAreaLightPrimitive"/>
+                        </MenuItem>
+                    </MenuItem>
                     <MenuItem Header="Delete" Click="MenuItem_DeleteGameObject" IsEnabled="{Binding}"/>
                     <Separator/>
                     <MenuItem Command="{x:Static commands:CustomCommands.GetCopyObject}"/>

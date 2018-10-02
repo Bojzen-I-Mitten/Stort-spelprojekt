@@ -50,14 +50,7 @@ namespace ThomasEngine
 		[OnDeserializedAttribute]
 		void OnDeserialized(StreamingContext c)
 		{
-			if (m_path == "White Texture")
-				m_nativePtr = thomas::resource::Texture2D::GetWhiteTexture();
-			else if (m_path == "Black Texture")
-				m_nativePtr = thomas::resource::Texture2D::GetBlackTexture();
-			else if (m_path == "Normal Texture")
-				m_nativePtr = thomas::resource::Texture2D::GetNormalTexture();
-			else
-				m_nativePtr = new thomas::resource::Texture2D(Utility::ConvertString(m_path));
+			
 		}
 	};
 }
