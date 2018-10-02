@@ -41,6 +41,7 @@ namespace ThomasEditor
             //test = camPrefab.GetComponent<Camera>();
             //if (isOwner)
             //    camPrefab.AddComponent<Camera>();
+            rBody.IsKinematic = !isOwner;
 
             ball = Object.GetObjectsOfType<Ball>().FirstOrDefault();
         }

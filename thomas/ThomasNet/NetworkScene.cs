@@ -64,6 +64,7 @@ namespace ThomasEngine.Network
                 NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
                 networkIdentiy.IsPlayer = true;
                 networkIdentiy.Owner = myPlayer;
+                
 
                 Players[peer] = networkIdentiy;
             }else
