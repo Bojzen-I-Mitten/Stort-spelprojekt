@@ -476,10 +476,10 @@ namespace ThomasEditor
 
         private void MenuItem_SaveAsPrefab(object sender, RoutedEventArgs e)
         {
-            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+            TreeItemViewModel item = hierarchy.SelectedItem as TreeItemViewModel;
             if (item != null)
             {
-                GameObject gObj = (GameObject)item.DataContext;
+                GameObject gObj = (GameObject)item.Data;
                 if (gObj)
                     ThomasEngine.Resources.SavePrefab(gObj, gObj.Name + ".prefab");
 
