@@ -267,6 +267,7 @@ namespace ThomasEngine.Network
             {
                 identity.WriteInitialData();
             }
+            NetScene.Players[LocalPeer].WriteInitialData();
         }
 
         //internal void InitServerNTP()
