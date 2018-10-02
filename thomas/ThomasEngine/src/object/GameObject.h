@@ -29,10 +29,7 @@ namespace ThomasEngine
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
-		static void SerializeGameObject(String^ path, GameObject^ gObj);
 		void SyncComponents();
-		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
-		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
 
 		void PostLoad(Scene^ scene);
 
@@ -78,7 +75,7 @@ namespace ThomasEngine
 		}
 
 		[BrowsableAttribute(false)]
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property Transform^ transform 
 		{
 			Transform^ get();

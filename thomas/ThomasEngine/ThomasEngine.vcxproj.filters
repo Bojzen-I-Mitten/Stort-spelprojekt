@@ -45,7 +45,8 @@
     <ClCompile Include="src\GUI\editor\GUI.cpp" />
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
-    <ClCompile Include="src\SceneSurrogate.cpp" />
+    <ClCompile Include="src\serialization\Converters.cpp" />
+    <ClCompile Include="src\serialization\Serializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -91,10 +92,11 @@
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
-    <ClInclude Include="src\SceneSurrogate.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
+    <ClInclude Include="src\serialization\Converters.h" />
+    <ClInclude Include="src\serialization\Serializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

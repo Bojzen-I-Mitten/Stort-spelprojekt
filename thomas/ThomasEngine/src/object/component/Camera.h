@@ -6,7 +6,7 @@ namespace ThomasEngine
 	public ref class Camera : public Component
 	{
 	private:
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property thomas::object::component::Camera* camera {
 			thomas::object::component::Camera* get();
 		}

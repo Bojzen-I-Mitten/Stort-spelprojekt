@@ -127,7 +127,8 @@ namespace ThomasEditor
 
         private void ResourceChanged(object sender, FileSystemEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action<String>((String p) =>
+            watcher.EnableRaisingEvents = false;
+            Dispatcher.Invoke(new Action<String>((String p) =>
             {
 
                 TreeViewItem foundItem = FindNode(p);
@@ -147,6 +148,7 @@ namespace ThomasEditor
                 }
 
             }), e.FullPath);
+            watcher.EnableRaisingEvents = true;
         }
 
         private void ResourceDeleted(object sender, FileSystemEventArgs e)
@@ -244,12 +246,14 @@ namespace ThomasEditor
 
         private void ResourceCreated(object sender, FileSystemEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action<String>((String p) =>
+            watcher.EnableRaisingEvents = false;
+            Dispatcher.Invoke(new Action<String>((String p) =>
             {
                 
                 AddNode(p);
                 ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(p);
             }), e.FullPath);
+            watcher.EnableRaisingEvents = true;
         }
 
 

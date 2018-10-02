@@ -55,7 +55,7 @@ namespace ThomasEngine
 		static System::Reflection::Assembly^ editorAssembly;
 		
 
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property bool enabled {
 			bool get() { return m_enabled; }
@@ -72,6 +72,7 @@ namespace ThomasEngine
 
 
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property GameObject^ gameObject
 		{
@@ -79,6 +80,7 @@ namespace ThomasEngine
 			void set(GameObject^ value) { setGameObject(value); }
 		}
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Transform^ transform
 		{

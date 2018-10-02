@@ -11,9 +11,9 @@
 #include "component\physics\BoxCollider.h"
 #include "component\physics\SphereCollider.h"
 #include "..\Debug.h"
-#include "../SceneSurrogate.h"
 #include "../resource/Model.h"
 #include "../resource/Resources.h"
+#include "../serialization/Serializer.h"
 #using "PresentationFramework.dll"
 using namespace System;
 using namespace System::Threading;
@@ -184,8 +184,8 @@ namespace ThomasEngine {
 		else
 		{
 			try {
-				System::IO::Stream^ serialized = SerializeGameObject(original);
-				clone = DeSerializeGameObject(serialized);
+				System::IO::Stream^ serialized = Serializer::SerializeGameObject(original);
+				clone = Serializer::DeserializeGameObject(serialized);
 			}
 			catch (Exception^ e)
 			{
@@ -237,58 +237,6 @@ namespace ThomasEngine {
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
-	}
-
-	void GameObject::SerializeGameObject(String ^ path, GameObject ^ gObj)
-	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-
-		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-		settings->Indent = true;
-				
-		Xml::XmlWriter^ writer = Xml::XmlWriter::Create(path, settings);
-		serializer->WriteObject(writer, gObj);
-		writer->Close();
-	}
-
-	System::IO::Stream^ GameObject::SerializeGameObject(GameObject ^ gObj)
-	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-
-		System::IO::Stream^ stream = gcnew System::IO::MemoryStream();
-		serializer->WriteObject(stream, gObj);
-		return stream;
-	}
-
-	GameObject ^ GameObject::DeSerializeGameObject(System::IO::Stream ^ stream)
-	{
-			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-			auto list = Component::GetAllComponentTypes();
-			list->Add(SceneResource::typeid);
-			serializerSettings->KnownTypes = list;
-			serializerSettings->PreserveObjectReferences = true;
-			serializerSettings->DataContractSurrogate = gcnew SceneSurrogate();
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-
-			stream->Seek(0, System::IO::SeekOrigin::Begin);
-			GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
-			gObj->PostLoad(nullptr);
-			return gObj;
 	}
 
 
@@ -439,7 +387,7 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++) {
 			m_components[i]->gameObject = this;
 		}
-		m_transform = GetComponent<Transform^>();
+		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));
 	}
 
