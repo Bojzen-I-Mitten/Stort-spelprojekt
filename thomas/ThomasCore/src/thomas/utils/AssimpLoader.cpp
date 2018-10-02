@@ -1,5 +1,6 @@
 #include "AssimpLoader.h"
 #include <algorithm>
+#include <exception>
 #include "../resource/texture/Texture.h"
 #include "../graphics/Mesh.h"
 #include "../resource/Material.h"
@@ -9,6 +10,7 @@
 #include "../graphics/animation/data/Skeleton.h"
 #include "Math.h"
 #include "../utils/Utility.h"
+
 
 namespace thomas
 {
@@ -98,7 +100,8 @@ namespace thomas
 
 			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 			{
-				LOG("ERROR::ASSIMP " << importer.GetErrorString());
+				throw std::exception(importer.GetErrorString());
+				//LOG("ERROR::ASSIMP " << importer.GetErrorString());
 				return NULL;
 			}
 			return scene;
