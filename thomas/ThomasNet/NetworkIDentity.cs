@@ -68,6 +68,9 @@ namespace ThomasEngine.Network
             DataWriter.Reset();
             PacketType packetType = IsPlayer ? PacketType.PLAYER_DATA : PacketType.OBJECT_DATA;
             DataWriter.Put((int)packetType);
+            if (packetType == PacketType.OBJECT_DATA)
+                DataWriter.Put(ID);
+
             DataWriter.Put(initalState);
             foreach (NetworkComponent comp in networkComponentsCache)
             {

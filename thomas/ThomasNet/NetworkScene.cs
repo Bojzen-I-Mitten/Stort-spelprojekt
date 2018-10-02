@@ -11,7 +11,6 @@ namespace ThomasEngine.Network
 
         public NetworkScene()
         {
-
         }
         int nextAssignableID = 0;
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
@@ -30,6 +29,25 @@ namespace ThomasEngine.Network
 
         }
 
+        public void ReadObjectData(NetPacketReader reader)
+        {
+            int networkID = reader.GetInt();
+            bool initialState = reader.GetBool();
+            NetworkIdentity identity = NetworkObjects[networkID];
+            if (identity)
+            {
+                if (identity.enabled || initialState)
+                {
+                    if (initialState)
+                        identity.enabled = true;
+                    identity.ReadData(reader, initialState);
+                }
+            }else
+            {
+                Debug.LogError("network ID: " + networkID + " does not exist in scene");
+            }
+        }
+
         public void SpawnPlayer(GameObject playerPrefab, NetPeer peer, bool myPlayer)
         {
             if (Players.ContainsKey(peer))
@@ -38,6 +56,7 @@ namespace ThomasEngine.Network
                 return;
             }
 
+            ObjectOwners[peer] = new List<NetworkIdentity>();
 
             if(playerPrefab.GetComponent<NetworkIdentity>())
             {
@@ -58,6 +77,9 @@ namespace ThomasEngine.Network
         
         public void RemovePlayer(NetPeer peer)
         {
+
+            //Transfer that players objects to someone else.
+
             if (Players.ContainsKey(peer))
             {
                 NetworkIdentity id = Players[peer];
@@ -67,13 +89,23 @@ namespace ThomasEngine.Network
             }
         }
 
-        public void ActivateAndAssignSceneObjects()
+        public void InititateScene()
+        {
+            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
+            {
+                    NetworkObjects.Add(nextAssignableID++, identity);
+                    identity.gameObject.SetActive(false);
+
+            });
+        }
+
+        public void ActivateSceneObjects()
         {
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
             {
                 if (!identity.gameObject.GetActive())
                 {
-                    NetworkObjects.Add(nextAssignableID++, identity);
+                    identity.Owner = true;
                     identity.gameObject.SetActive(true);
                 }
 

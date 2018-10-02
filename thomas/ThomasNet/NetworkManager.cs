@@ -80,12 +80,6 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
-
-            //Disable all networked gameObjects in scene.
-            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) => {
-                identity.gameObject.SetActive(false);
-                });
-
             //InitServerNTP();
             if (UseLobby)
             {
@@ -96,6 +90,8 @@ namespace ThomasEngine.Network
             NetManager.Start(LocalPort);
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
+
+            NetScene.InititateScene();
 
         }
 
@@ -155,6 +151,7 @@ namespace ThomasEngine.Network
             else //Someone is joining us.
             {
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
+                TransferOwnedObjects();
             }
 
             NetScene.ObjectOwners.Add(_peer, new List<NetworkIdentity>());
@@ -180,9 +177,7 @@ namespace ThomasEngine.Network
                     break;
                 case PacketType.OBJECT_DATA:
                     {
-                        //int networkID = reader.GetInt();
-                        //if (networkIDObjects.ContainsKey(networkID) && networkIDObjects[networkID].enabled)
-                        //    networkIDObjects[validationID].OnUpdateVars(reader, false);
+                        NetScene.ReadObjectData(reader);
                     }
                     break;
                 case PacketType.EVENT:
@@ -215,20 +210,33 @@ namespace ThomasEngine.Network
 
             if (Input.GetKeyDown(Input.Keys.J)) //JOIN
             {
-                if(UseLobby)
-                    NetManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
-                else
+                if (NetScene.Players.ContainsKey(LocalPeer))
                 {
-                    NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
+                    Debug.LogWarning("You are already connected to a match!");
+                }else
+                {
+                    if (UseLobby)
+                        NetManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
+                    else
+                    {
+                        NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
+                    }
                 }
-                    
+
             }
 
             if(Input.GetKeyDown(Input.Keys.H)) //HOST
             {
-
-                NetScene.ActivateAndAssignSceneObjects();
-                NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
+                if (NetScene.Players.ContainsKey(LocalPeer))
+                {
+                    Debug.LogWarning("You are already connected to a match!");
+                }
+                else
+                {
+                    NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
+                    NetScene.ActivateSceneObjects();
+                }
+              
             }
 
             Diagnostics();
@@ -252,10 +260,18 @@ namespace ThomasEngine.Network
             NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent{
                 NetID = networkIdentiy.ID
             };
-
+            NetScene.ObjectOwners[LocalPeer].Add(networkIdentiy);
             Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
         }
 
+
+        public void TransferOwnedObjects()
+        {
+            foreach(NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
+            {
+                identity.WriteInitialData();
+            }
+        }
 
         //internal void InitServerNTP()
         //{
