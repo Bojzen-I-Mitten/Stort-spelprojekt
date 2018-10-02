@@ -111,18 +111,6 @@ namespace ThomasEngine {
 		Monitor::Exit(m_componentsLock);
 	}
 
-	void GameObject::OnCollisionEnter(GameObject^ collider)
-	{
-		Monitor::Enter(m_componentsLock);
-
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->initialized && component->enabled)
-				component->OnCollisionEnter(collider);
-		}
-		Monitor::Exit(m_componentsLock);
-	}
 
 	void GameObject::RenderGizmos()
 	{
