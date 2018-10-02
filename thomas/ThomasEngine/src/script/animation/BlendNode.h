@@ -12,6 +12,8 @@ namespace ThomasEngine
 	namespace Script
 	{
 
+		ref class PlaybackNode;
+
 		public ref class BlendNode {
 		private:
 		public:
@@ -20,12 +22,13 @@ namespace ThomasEngine
 
 			void appendNode(Animation^ anim, bool loop);
 			void appendNode(BlendNode^ action);
+			void appendNode(PlaybackNode^ action);
 
 			void generateLinearMixer(float durationPerNode);
 			/* Finalize blending node by generating a weight handle. */
 			WeightHandle^ generateWeightHandle();
 
-			thomas::graphics::animation::AnimationNode* getNativeNode();
+			thomas::graphics::animation::AnimationNode* Native();
 		private:
 
 			thomas::graphics::animation::AnimBlender* m_node;
