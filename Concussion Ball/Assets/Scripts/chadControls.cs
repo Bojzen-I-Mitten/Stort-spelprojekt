@@ -56,6 +56,8 @@ namespace ThomasEditor
             if (!camera)
                 Debug.LogWarning("Camera not set for player");
 
+            rBody.IsKinematic = !isOwner;
+
             ball = Object.GetObjectsOfType<Ball>().FirstOrDefault();
         }
 
@@ -183,7 +185,7 @@ namespace ThomasEditor
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (ball && canPickupBall)
+            if (ball && canPickupBall && isOwner)
             {
                 if (collider.gameObject == ball.gameObject)
                 {

@@ -153,8 +153,6 @@ namespace ThomasEngine.Network
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
                 TransferOwnedObjects();
             }
-
-            NetScene.ObjectOwners.Add(_peer, new List<NetworkIdentity>());
         }
 
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
@@ -252,8 +250,6 @@ namespace ThomasEngine.Network
 
         }
 
-
-
         public void TakeOwnership(NetworkIdentity networkIdentiy)
         {
 
@@ -271,6 +267,7 @@ namespace ThomasEngine.Network
             {
                 identity.WriteInitialData();
             }
+            NetScene.Players[LocalPeer].WriteInitialData();
         }
 
         //internal void InitServerNTP()

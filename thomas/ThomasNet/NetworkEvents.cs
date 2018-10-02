@@ -73,7 +73,6 @@ namespace ThomasEngine.Network
         #region Event Handlers
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
-
             Manager.InternalManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
         }
 
@@ -81,24 +80,33 @@ namespace ThomasEngine.Network
         {
 
             NetworkIdentity networkIdentiy = NetScene.FindNetworkObject(transEvent.NetID);
-
-            NetPeer previousOwner = NetScene.FindOwnerOf(networkIdentiy);
-
-            if(previousOwner == newOwner)
+            if (networkIdentiy != null)
             {
-                Debug.Log("Peer is already owner of object: " + networkIdentiy.gameObject.Name);
-                return;
+                NetPeer previousOwner = NetScene.FindOwnerOf(networkIdentiy);
+
+                if (previousOwner == newOwner)
+                {
+                    Debug.Log("Peer is already owner of object: " + networkIdentiy.gameObject.Name);
+                    return;
+                }
+
+                //Remove previous owner
+                if (previousOwner != null)
+                    NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
+
+                NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
+                foreach (var comp in networkIdentiy.gameObject.GetComponents<NetworkComponent>())
+                {
+                    comp.OnLostOwnership();
+                }
+
+                //Make sure we do not own the object.
+                networkIdentiy.Owner = false;
             }
-
-            //Remove previous owne
-            if(previousOwner != null)
-                NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
-
-            NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
-
-
-            //Make sure we do not own the object.
-            networkIdentiy.Owner = false;
+            else
+            {
+                Debug.LogError("Could not find the network object");
+            }
 
         }
         #endregion

@@ -36,10 +36,10 @@ namespace ThomasEngine.Network
             NetworkIdentity identity = NetworkObjects[networkID];
             if (identity)
             {
-                if (identity.enabled || initialState)
+                if (identity.gameObject.GetActive() || initialState)
                 {
                     if (initialState)
-                        identity.enabled = true;
+                        identity.gameObject.SetActive(true);
                     identity.ReadData(reader, initialState);
                 }
             }else
@@ -64,15 +64,13 @@ namespace ThomasEngine.Network
                 NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
                 networkIdentiy.IsPlayer = true;
                 networkIdentiy.Owner = myPlayer;
+                
 
                 Players[peer] = networkIdentiy;
             }else
             {
                 Debug.LogError("Failed to spawn player. Prefab does not contain a networkIdentity component");
             }
-
-
-
         }
         
         public void RemovePlayer(NetPeer peer)
@@ -93,8 +91,8 @@ namespace ThomasEngine.Network
         {
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
             {
-                    NetworkObjects.Add(nextAssignableID++, identity);
-                    identity.gameObject.SetActive(false);
+                NetworkObjects.Add(nextAssignableID++, identity);
+                identity.gameObject.SetActive(false);
 
             });
         }
