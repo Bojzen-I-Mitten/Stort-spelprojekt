@@ -13,7 +13,7 @@ namespace ThomasEngine.Network
     {
         private bool _Owner = false;
         public bool Owner {
-            set {if(value == true) TakeOwnership();  _Owner = value; }
+            set {if(value == true && IsPlayer == false) TakeOwnership();  _Owner = value; }
             get { return _Owner; }
         }
 

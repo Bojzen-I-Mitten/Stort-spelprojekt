@@ -382,8 +382,9 @@ namespace ThomasEngine {
 
 	void GameObject::SetActive(bool active)
 	{
-		((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		activeSelf = active;
+		((thomas::object::GameObject*)nativePtr)->SetActive(active);
+		
 
 	}
 
@@ -408,6 +409,7 @@ namespace ThomasEngine {
 				
 		}
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		OnPropertyChanged("activeSelf");
 	}
 
 	Transform^ GameObject::transform::get()

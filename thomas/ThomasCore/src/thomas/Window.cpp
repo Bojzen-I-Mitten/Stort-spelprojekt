@@ -519,11 +519,9 @@ namespace thomas
 		case WM_SETFOCUS:
 			break;
 		case WM_KILLFOCUS:
-			LOG("lost focus");
 			break;
 		case WM_ACTIVATEAPP:
 			if (window->IsFocused()) {
-				LOG("active!");
 				Input::ProcessKeyboard(message, wParam, lParam);
 				Input::ProcessMouse(message, wParam, lParam, hWnd);
 			}
