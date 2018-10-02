@@ -136,6 +136,7 @@ namespace ThomasEngine {
 	{
 		if (m_isDestroyed)
 			return;
+		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
@@ -146,7 +147,6 @@ namespace ThomasEngine {
 		Object::Destroy();
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
-		ThomasWrapper::Selection->UnSelectGameObject(this);
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
