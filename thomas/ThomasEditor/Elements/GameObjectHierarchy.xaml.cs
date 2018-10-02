@@ -9,12 +9,12 @@ using System.Windows.Data;
 
 using System.Windows.Input;
 using System.Windows.Media;
-
-using System.IO;
+using System.Collections.Generic;
 
 using ThomasEditor.Inspectors;
 using ThomasEditor.utils;
 using ThomasEngine;
+
 namespace ThomasEditor
 {
     /// <summary>
@@ -354,12 +354,36 @@ namespace ThomasEditor
                 }
                 else if (source.DataContext is ScriptComponent || ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
                 {
-                    Debug.Log("Big memes dragging big components.");
                     if (target != null && source != null && target != source)
                     {
-                        Debug.Log("Who's a good component??!!");
                         GameObject targetObject = target.DataContext as GameObject;
-                        targetObject.AddComponent<ScriptComponent>().Name = (string)sourceHeader.DataContext;
+                        List<Type> componentList = ThomasEngine.Component.GetAllAddableComponentTypes();
+                        
+                        //Loop through all existing components
+                        for (int i = 0; i < componentList.Count; ++i)
+                        {
+                            string dragObject = (string)sourceHeader.DataContext;
+                            int scriptNameLength = componentList[i].Name.Length + 3;
+
+                            Debug.Log("Original path before substring: " + dragObject);
+                            dragObject = dragObject.Substring(dragObject.Length - scriptNameLength);
+                            Debug.Log("Path after removing directory part: " + dragObject);
+                            dragObject = dragObject.Substring(0, scriptNameLength);
+                            Debug.Log("Path after removing '.cs': " + dragObject);
+
+                            Debug.Log("Checking if: " + dragObject + " contains: " + componentList[i].Name);
+                            //Check if dragged component matches an existing component
+                            if (dragObject.Contains(componentList[i].Name))
+                            {
+                                Debug.Log("Yes it does.");
+
+                                Type componentToAdd = componentList[i] as Type;
+                                Debug.Log(componentToAdd);
+
+                                var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
+                                method.Invoke(target.DataContext, null);
+                            }
+                        }
                     }
                 }
 
