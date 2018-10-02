@@ -382,7 +382,9 @@ namespace ThomasEngine {
 
 	bool GameObject::GetActive()
 	{
+		if((thomas::object::GameObject*)nativePtr != nullptr)
 		return ((thomas::object::GameObject*)nativePtr)->GetActive();
+		return false;
 	}
 
 	void GameObject::SetActive(bool active)

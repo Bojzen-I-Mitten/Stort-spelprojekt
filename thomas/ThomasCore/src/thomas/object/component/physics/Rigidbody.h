@@ -58,6 +58,8 @@ namespace thomas
 				void SetKinematic(bool kinematic);
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
+				void SetCenterOfmass(math::Vector3 Centerofmass);
+				math::Vector3 GetCenterOfmass();
 
 			public:
 				float GetMass() const;
@@ -75,6 +77,7 @@ namespace thomas
 				math::Vector3 m_freezePosition;
 				math::Vector3 m_freezeRotation;
 				math::Matrix m_prevMatrix;
+				math::Vector3 m_LocalCenterOfMassChange;
 				float m_mass;
 				bool m_kinematic;
 			};
