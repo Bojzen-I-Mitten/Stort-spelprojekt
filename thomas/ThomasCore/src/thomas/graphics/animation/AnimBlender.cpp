@@ -3,6 +3,7 @@
 #include "WeightMixer.h"
 #include "../../ThomasCore.h"
 #include "../../resource/MemoryAllocation.h"
+#include "../../utils/Utility.h"
 
 namespace thomas {
 	namespace graphics {
@@ -59,9 +60,17 @@ namespace thomas {
 
 			void AnimBlender::update(float dT)
 			{
+				if (isUpdated()) return;
 				m_weights->update(dT);
 				for (unsigned int i = 0; i < m_NumNode; i++)
 					m_nodes[i]->update(dT);
+			}
+			void AnimBlender::resetUpdate()
+			{
+				if (utility::noFlag(m_flag, ANIM_UPDATED_FLAG)) return;
+				AnimationNode::resetUpdate();
+				for (unsigned int i = 0; i < m_NumNode; i++)
+					m_nodes[i]->resetUpdate();
 			}
 			void AnimBlender::calcFrame(TransformComponents* result) 
 			{

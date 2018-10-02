@@ -31,8 +31,9 @@ namespace thomas {
 
 
 			void AnimatedSkeleton::update(float dT) {
-				_root->update(dT);
-				updateSkeleton();
+				_root->update(dT);		// Update each node ONCE.
+				updateSkeleton();		// Apply skeleton.
+				_root->resetUpdate();	// Clear dirty update flags.
 			}
 			void AnimatedSkeleton::updateSkeleton()
 			{

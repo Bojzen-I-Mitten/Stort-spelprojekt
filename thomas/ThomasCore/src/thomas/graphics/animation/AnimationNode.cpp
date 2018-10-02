@@ -1,5 +1,6 @@
 #include "AnimationNode.h"
 #include "data/Skeleton.h"
+#include "../../utils/Utility.h"
 
 namespace thomas {
 	namespace graphics {
@@ -33,6 +34,18 @@ namespace thomas {
 					return mat;
 				}
 				return m_ref.getBone(bone)._bindPose;
+			}
+			void AnimationNode::markUpdated()
+			{
+				utility::setFlag(m_flag, ANIM_UPDATED_FLAG);
+			}
+			uint32_t AnimationNode::isUpdated()
+			{
+				return utility::hasFlag(m_flag, ANIM_UPDATED_FLAG);
+			}
+			void AnimationNode::resetUpdate()
+			{
+				utility::rmvFlag(m_flag, ANIM_UPDATED_FLAG);
 			}
 			BindPoseNode::BindPoseNode(Skeleton & ref)
 				: AnimationNode(ref)

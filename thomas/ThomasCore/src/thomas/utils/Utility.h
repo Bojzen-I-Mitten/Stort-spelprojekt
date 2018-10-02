@@ -27,6 +27,9 @@ namespace thomas {
 		inline bool hasFlag(uint32_t value, uint32_t flag) {
 			return value & flag;
 		}
+		inline bool noFlag(uint32_t value, uint32_t flag) {
+			return !(value & flag);
+		}
 		/* Check if value has ALL set all flags specified */
 		inline bool matchFlags(uint32_t value, uint32_t flags) {
 			return (value & flags) == flags;

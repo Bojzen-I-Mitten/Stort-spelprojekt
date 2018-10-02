@@ -9,11 +9,17 @@ namespace thomas {
 		namespace animation {
 			class Skeleton;
 
+			constexpr uint32_t ANIM_UPDATED_FLAG = 1;
+			//constexpr uint32_t ANIM_APPLIED_FLAG = 2;
 			class AnimationNode
 			{
 			public:
+			public:
 
 				Skeleton &m_ref;
+				uint32_t m_flag;
+
+
 				uint32_t NumChannel() { return m_boneMapping.size(); }
 				std::vector<int> m_boneMapping;
 
@@ -21,6 +27,7 @@ namespace thomas {
 				virtual ~AnimationNode();
 
 				virtual void update(float) = 0;
+				virtual void resetUpdate();
 
 				virtual math::Vector3 calcBonePosition(unsigned int bone) = 0;
 				virtual math::Vector3 calcBoneScale(unsigned int bone) = 0;
@@ -29,7 +36,8 @@ namespace thomas {
 				virtual void calcFrame(TransformComponents * result) = 0;
 				math::Matrix calcLocalTransform(unsigned int bone);
 
-
+				void markUpdated();
+				uint32_t isUpdated();
 				//int map(int bone) { return m_boneMapping[bone]; }
 			};
 

@@ -35,6 +35,8 @@ namespace thomas {
 
 				// Inherited via AnimationNode
 				virtual void update(float) override;
+				virtual void resetUpdate() override;
+
 				virtual math::Vector3 calcBonePosition(unsigned int bone) override;
 				virtual math::Vector3 calcBoneScale(unsigned int bone) override;
 				virtual math::Quaternion calcBoneRot(unsigned int bone) override;

@@ -3,7 +3,7 @@
 #include "BaseAnimationTime.h"
 #include "data/Skeleton.h"
 #include "../../Common.h"
-
+#include "../../utils/Utility.h"
 namespace thomas {
 	namespace graphics {
 		namespace animation {
@@ -52,7 +52,9 @@ namespace thomas {
 
 			void AnimPlayback::update(float dT)
 			{
+				if (isUpdated()) return;
 				m_playback->timeStep(dT);
+				markUpdated();
 			}
 
 			void AnimPlayback::calcFrame(TransformComponents * result)
