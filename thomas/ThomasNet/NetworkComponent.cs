@@ -43,7 +43,6 @@ namespace ThomasEngine.Network
         {
             if (!initialState)
                 reader.GetInt();
-            
         }
 
         virtual public bool OnWrite(NetDataWriter writer, bool initialState)

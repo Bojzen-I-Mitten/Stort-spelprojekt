@@ -53,14 +53,17 @@ public class Ball : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
-        if(!initialState)
-            rb.enabled = reader.GetBool();
+        if(isOwner)
+        {
+            reader.GetBool();
+            return;
+        }
+        rb.enabled = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if(!initialState)
-            writer.Put(rb.enabled);
-        return false;
+        writer.Put(rb.enabled);
+        return true;
     }
 }

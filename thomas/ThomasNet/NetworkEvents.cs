@@ -95,7 +95,10 @@ namespace ThomasEngine.Network
                     NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
 
                 NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
-                networkIdentiy.gameObject.GetComponent<NetworkComponent>().OnLostOwnership();
+                foreach (var comp in networkIdentiy.gameObject.GetComponents<NetworkComponent>())
+                {
+                    comp.OnLostOwnership();
+                }
 
                 //Make sure we do not own the object.
                 networkIdentiy.Owner = false;
