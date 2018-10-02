@@ -21,8 +21,7 @@
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
     </UserControl.Resources>
 
-    <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible"
-          PreviewDragOver="GameObjectInspector_PreviewDragOver" PreviewDrop="GameObjectInspector_Drop">
+    <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -62,10 +61,11 @@
                 HorizontalAlignment="Center" HorizontalContentAlignment="Center" 
                 x:Name="addComponentButton" Command="{x:Static commands:CustomCommands.GetAddCompenent}" 
                 />
-        <Button Grid.Row="3" Content="WHERE WE DROPPIN', BOYS?" 
+        <Button AllowDrop="True" Grid.Row="3" Content="WHERE WE DROPPIN', BOYS?" 
                 HorizontalAlignment="Center" HorizontalContentAlignment="Center"
-                Width="auto" Height="50" Background="#333333"
+                Height="50" Background="#333333"
                 PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"
+                
                 />
         <Popup x:Name="addComponentsListPopup" IsOpen="False" StaysOpen="False" Width="200" Height="300" PlacementTarget="{Binding ElementName=addComponentButton}" Placement="Bottom">
             <DockPanel LostFocus="AddComponentsListContainer_LostFocus">
