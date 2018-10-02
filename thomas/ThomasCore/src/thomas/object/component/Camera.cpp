@@ -38,7 +38,7 @@ namespace thomas
 				m_viewport = math::Viewport(0, 0, 1,1);
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
-				s_allCameras.push_back(this);
+				
 				std::sort(s_allCameras.begin(), s_allCameras.end(), [](Camera* a, Camera* b) 
 				{
 					return a->GetTargetDisplayIndex() < b->GetTargetDisplayIndex();
@@ -52,6 +52,22 @@ namespace thomas
 					{
 						s_allCameras.erase(s_allCameras.begin() + i);
 						break;
+					}
+						
+				}
+			}
+
+			void Camera::OnEnable()
+			{
+				s_allCameras.push_back(this);
+			}
+
+			void Camera::OnDisable()
+			{
+				for (int i = 0; i < s_allCameras.size(); i++) {
+					if (s_allCameras[i] == this) {
+						s_allCameras.erase(s_allCameras.begin() + i);
+						return;
 					}
 						
 				}

@@ -65,7 +65,7 @@ namespace thomas
 				Pass pass;
 				pass.name = p.name;
 				pass.enabled = true;
-				pass.index = m_passes.size();
+				pass.index = int(m_passes.size());
 				m_passes.push_back(pass);
 			}
 			FetchPropertiesFromShader();
@@ -116,7 +116,7 @@ namespace thomas
 				Pass pass;
 				pass.name = p.name;
 				pass.enabled = true;
-				pass.index = m_passes.size();
+				pass.index = int(m_passes.size());
 				m_passes.push_back(pass);
 			}
 			FetchPropertiesFromShader();

@@ -10,7 +10,7 @@
 #include "Resources.h"
 #include "../Scene.h"
 #include "..\object\GameObject.h"
-
+#include "..\SceneSurrogate.h"
 #include "../Application.h"
 #include "../Project.h"
 #include "../Debug.h"
@@ -86,6 +86,7 @@ namespace ThomasEngine
 				using namespace System::Runtime::Serialization;
 				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 				serializserSettings->PreserveObjectReferences = true;
+				serializserSettings->DataContractSurrogate = gcnew SceneSurrogate(T::typeid);
 				serializserSettings->KnownTypes = Material::GetKnownTypes();
 				DataContractSerializer^ serializer = gcnew DataContractSerializer(T::typeid, serializserSettings);
 				try {
@@ -96,14 +97,14 @@ namespace ThomasEngine
 					resource->Rename(path);
 				}
 				catch (Exception^ e) {
-					err = "Warning! Deserialization failed to open file: " + path + ". With message:\n" + e->Message;
-					Debug::Log(err);
+					err = "Deserialization failed to open file: " + path + ". With message:\n" + e->Message;
+					Debug::LogError(err);
 				}
 			}
 			catch (Exception^ e)
 			{
-				err = "Warning! Deserialization failed, at path: " + path + ". With message:\n" + e->Message;
-				Debug::Log(err);
+				err = "Deserialization failed, at path: " + path + ". With message:\n" + e->Message;
+				Debug::LogError(err);
 			}
 			finally{
 				// Leave
@@ -126,6 +127,7 @@ namespace ThomasEngine
 				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 				serializserSettings->PreserveObjectReferences = true;
 				serializserSettings->KnownTypes = Material::GetKnownTypes();
+				serializserSettings->DataContractSurrogate = gcnew SceneSurrogate(resource->GetType());
 				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
 				try {
 					// XML Settings
@@ -143,14 +145,14 @@ namespace ThomasEngine
 					resource->Rename(path);	// Set file name
 				}
 				catch (Exception^ e) {
-					err = "Warning! Creating resource failed creating file: " + path + ". With message:\n" + e->Message;
-					Debug::Log(err);
+					err = "Creating resource failed creating file: " + path + ". With message:\n" + e->Message;
+					Debug::LogError(err);
 					return false;
 				}
 			}
 			catch (Exception^ e) {
-				err = "Warning! Creating resource failed serializer contract, at path: " + path + ". With message:\n" + e->Message;
-				Debug::Log(err);
+				err = "Creating resource failed serializer contract, at path: " + path + ". With message:\n" + e->Message;
+				Debug::LogError(err);
 				return false;
 			}
 			finally{
@@ -168,31 +170,25 @@ namespace ThomasEngine
 				// Serializer Setting
 				DataContractSerializerSettings^ serializserSettings = gcnew DataContractSerializerSettings();
 				serializserSettings->PreserveObjectReferences = true;
+				serializserSettings->DataContractSurrogate = gcnew SceneSurrogate(resource->GetType());
 				serializserSettings->KnownTypes = Material::GetKnownTypes();
 
-				try {
-					// XML Settings
-					Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-					settings->Indent = true;
-					// Create file
-					System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
-					fi->Directory->Create();
-					Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
-					// Write file
-					DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
-					serializer->WriteObject(file, resource);
-					// Close file stream
-					file->Close();
-				}
-				catch (Exception^ e) {
-					err = "Warning! Storing resource failed creating file: " + resource->m_path + ". With message:\n" + e->Message;
-					Debug::Log(err);
-					return false;
-				}
+				// XML Settings
+				Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
+				settings->Indent = true;
+				// Create file
+				System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(resource->m_path);
+				fi->Directory->Create();
+				Xml::XmlWriter^ file = Xml::XmlWriter::Create(resource->m_path, settings);
+				// Write file
+				DataContractSerializer^ serializer = gcnew DataContractSerializer(resource->GetType(), serializserSettings);
+				serializer->WriteObject(file, resource);
+				// Close file stream
+				file->Close();
 			}
 			catch (Exception^ e) {
-				err = "Warning! Storing resource failed serializer contract, at path: " + resource->m_path + ". With message:\n" + e->Message;
-				Debug::Log(err);
+				err = "Failed to save " + resource->GetType()->Name + " resource at path: " + resource->m_path + ". Error: " + e->Message;
+				Debug::LogError(err);
 				return false;
 			}
 			finally{
@@ -311,6 +307,8 @@ namespace ThomasEngine
 				Resource^ obj;
 				AssetTypes type = GetResourceAssetType(path);
 				try {
+					if (!System::IO::File::Exists(path))
+						throw gcnew System::IO::FileNotFoundException("File not found");
 					switch (type)
 					{
 					case AssetTypes::MODEL:
@@ -342,15 +340,16 @@ namespace ThomasEngine
 					}
 				}
 				catch (SerializationException^ e) {
-					String^ error = "Error creating resource from file: " + path + " \nError: Serialization failed " + e->Message;
+					String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: Serialization failed " + e->Message;
 					obj = LoadErrorResource(type);
-					Debug::Log(error);
+					Debug::LogError(error);
 				}
 				catch (Exception^ e) {
-					String^ error = "Error creating resource from file: " + path + " \nError: " + e->Message;
-					Debug::Log(error);
+
+					String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
+
+					Debug::LogError(error);
 					obj = LoadErrorResource(type);
-					//Debug::Log("Failed to create resource from file. Filename: " + path + " \nError: " + e->Message);
 				}
 
 				if (obj != nullptr)
@@ -385,13 +384,20 @@ namespace ThomasEngine
 				}
 			}
 
+			try {
+				IO::FileStream^ fileStream = IO::File::OpenRead(path);
+				GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
+				fileStream->Close();
+				if (prefab)
+					prefab->prefabPath = path;
+				return prefab;
+			}
+			catch (Exception^ e) {
+				String^ msg = "Failed to load prefab: " + path + " error: " + e->Message;
+				Debug::LogError(msg);
+				return nullptr;
+			}
 
-			IO::FileStream^ fileStream = IO::File::OpenRead(path);
-			GameObject^ prefab = GameObject::DeSerializeGameObject(fileStream);
-			fileStream->Close();
-			if (prefab)
-				prefab->prefabPath = path;
-			return prefab;
 		}
 
 #pragma endregion

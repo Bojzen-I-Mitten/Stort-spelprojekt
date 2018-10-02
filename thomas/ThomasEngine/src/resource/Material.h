@@ -92,7 +92,7 @@ namespace ThomasEngine
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
 		}
-				
+		
 		[DataMemberAttribute(Order = 1)]
 		property Dictionary<String^, System::Object^>^ EditorProperties
 		{
