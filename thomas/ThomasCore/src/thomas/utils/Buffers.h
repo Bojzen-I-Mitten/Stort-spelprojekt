@@ -87,7 +87,7 @@ namespace thomas
 			class AppendConsumeBuffer : public StructuredBuffer
 			{
 			public:
-				AppendConsumeBuffer(size_t stride, size_t count);
+				AppendConsumeBuffer(void* data, size_t stride, size_t count);
 
 			};
 		}

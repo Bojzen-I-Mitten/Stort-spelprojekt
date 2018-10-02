@@ -31,10 +31,21 @@ namespace thomas
 			m_billboardBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
 
 
-			m_aliveListPing = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
-			m_aliveListPong = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
-			m_deadList = std::make_unique<utils::buffers::AppendConsumeBuffer>(sizeof(unsigned), maxNrOfParticles);
+			m_aliveListPing = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned), maxNrOfParticles);
+			m_aliveListPong = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned), maxNrOfParticles);
+
+			unsigned int* initData = new unsigned[maxNrOfParticles];
+			for (unsigned i = 0; i < maxNrOfParticles; ++i)
+			{
+				initData[i] = i;
+			}
 			
+			m_deadList = std::make_unique<utils::buffers::AppendConsumeBuffer>(initData, sizeof(unsigned), maxNrOfParticles);
+			
+			unsigned test = initData[4];
+
+			delete initData;
+
 			m_pingpong = true;
 
 			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
@@ -124,8 +135,8 @@ namespace thomas
 
 				m_emitParticlesCS->SetGlobalUAV("deadList", m_deadList->GetUAV());
 
-				m_pingpong = !m_pingpong;
-				if (m_pingpong)
+				
+				if (!m_pingpong)
 				{
 					m_emitParticlesCS->SetGlobalUAV("aliveList", m_aliveListPing->GetUAV());
 				}
@@ -150,7 +161,7 @@ namespace thomas
 
 		void ParticleSystem::UpdateParticles()
 		{
-			
+			m_pingpong = !m_pingpong;
 			if (m_pingpong)
 			{
 				m_updateParticlesCS->SetGlobalUAV("appendAliveList", m_aliveListPing->GetUAV());
@@ -184,6 +195,7 @@ namespace thomas
 		{
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); //TODO: refactor to triangle strip?
 			
+
 			m_particleShader->SetGlobalResource("billboards", m_billboardBuffer->GetSRV());
 			m_particleShader->SetPass(0);
 			m_particleShader->Bind();
@@ -191,7 +203,7 @@ namespace thomas
 			
 			//m_emittedParticles * 
 
-			ThomasCore::GetDeviceContext()->Draw(6 * m_emittedParticles, 0);
+			ThomasCore::GetDeviceContext()->Draw(6 * 32, 0);
 
 			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
 			ThomasCore::GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);

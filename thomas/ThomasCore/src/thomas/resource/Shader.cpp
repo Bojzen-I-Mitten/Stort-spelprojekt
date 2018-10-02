@@ -421,31 +421,6 @@ namespace thomas
 			
 		}
 
-
-		void Shader::UnbindGlobalUAV(const std::string & name)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyUnorderedAccessView(*s_nullUAV));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::UnbindGlobalSRV(const std::string & name)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyShaderResource(*s_nullSRV));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-
-
 		Shader * Shader::FindByName(const std::string & name)
 		{
 			for (Shader* shader : s_loadedShaders)

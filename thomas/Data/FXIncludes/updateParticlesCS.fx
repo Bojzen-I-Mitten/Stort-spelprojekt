@@ -1,6 +1,6 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
-#include <..\FXIncludes\ThomasShaderVariables.hlsl>
+#include <ThomasShaderVariables.hlsl>
 
 struct ParticleStruct
 {

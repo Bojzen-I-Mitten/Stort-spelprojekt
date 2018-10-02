@@ -135,7 +135,7 @@ namespace thomas
 				return nullptr;
 			}
 
-			AppendConsumeBuffer::AppendConsumeBuffer(size_t stride, size_t count) : StructuredBuffer(nullptr, stride, count, STATIC_BUFFER, D3D11_BIND_UNORDERED_ACCESS, D3D11_BUFFER_UAV_FLAG_APPEND)
+			AppendConsumeBuffer::AppendConsumeBuffer(void* data, size_t stride, size_t count) : StructuredBuffer(data, stride, count, STATIC_BUFFER, D3D11_BIND_UNORDERED_ACCESS, D3D11_BUFFER_UAV_FLAG_APPEND)
 			{
 
 			}
