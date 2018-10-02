@@ -149,7 +149,7 @@ namespace ThomasEditor
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (ball)
+            if (ball && isOwner)
             {
                 if (collider.gameObject == ball.gameObject)
                 {

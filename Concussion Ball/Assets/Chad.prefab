@@ -26,7 +26,7 @@
           <localEulerAngles>
             <x>0</x>
             <y>0</y>
-            <z>-0</z>
+            <z>0</z>
           </localEulerAngles>
           <localPosition>
             <x>0.893483162</x>
@@ -156,7 +156,7 @@
       <d3p1:hand z:Ref="4" i:nil="true" />
       <d3p1:rotationSpeed>3</d3p1:rotationSpeed>
       <d3p1:speed>5</d3p1:speed>
-      <d3p1:throwForce>0</d3p1:throwForce>
+      <d3p1:throwForce>5</d3p1:throwForce>
     </Component>
     <Component z:Id="20" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkIdentity">
       <m_guid>d8901bcb-c5fd-4e92-87f1-82c23631c16a</m_guid>
