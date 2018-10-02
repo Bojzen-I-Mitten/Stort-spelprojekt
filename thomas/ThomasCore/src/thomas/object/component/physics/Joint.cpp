@@ -33,6 +33,7 @@ void thomas::object::component::Joint::Awake()
 {
 	if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 	{
+		m_current.setRotation(thomas::Physics::ToBullet(m_gameObject->m_transform->GetLocalRotation()));
 		thomas::Physics::s_world->addConstraint(CreateConstraints( m_secondBody, m_current,
 															m_other, m_twistSpin), false);
 	}															 
@@ -74,9 +75,9 @@ void thomas::object::component::Joint::SetTransformRotation(math::Vector3 Rotati
 		Savedrotation[1] = Rotation;
 
 	if (firstBody)
-		this->m_current.getBasis().setEulerZYX(Rotation.z, Rotation.y, Rotation.x);//m_first.setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));
+		this->m_current.getBasis().setEulerZYX(math::DegreesToRadians(Rotation.z), math::DegreesToRadians(Rotation.y), math::DegreesToRadians(Rotation.x));//m_first.setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));
 	else
-		this->m_other.getBasis().setEulerZYX(Rotation.z, Rotation.y, Rotation.x);//setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));	
+		this->m_other.getBasis().setEulerZYX(math::DegreesToRadians(Rotation.z), math::DegreesToRadians(Rotation.y), math::DegreesToRadians(Rotation.x));//setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));	
 }
 
 thomas::math::Vector3 thomas::object::component::Joint::GetTransformOrigin(bool firstBody)

@@ -108,6 +108,13 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezeRotation(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
 		}
 
+		property Vector3 CenterOfMass
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetCenterOfmass()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCenterOfmass(Utility::Convert(value)); }
+		}
+
+
 	private:
 		thomas::math::Vector3 ClampVec3(thomas::math::Vector3 & value, const float & min, const float & max)
 		{

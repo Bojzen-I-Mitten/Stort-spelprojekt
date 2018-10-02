@@ -11,12 +11,13 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : 
-			btRigidBody(1, NULL, NULL), 
-			m_kinematic(false),
-			m_mass(1.f),
-			m_freezePosition(1.f),
-			m_freezeRotation(1.f)
+			Rigidbody::Rigidbody() :
+				btRigidBody(1, NULL, NULL),
+				m_kinematic(false),
+				m_mass(1.f),
+				m_freezePosition(1.f),
+				m_freezeRotation(1.f),
+				m_LocalCenterOfMassChange(0.f)
 			{
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
@@ -84,6 +85,8 @@ namespace thomas
 					getMotionState()->setWorldTransform(trans);
 					this->setLinearVelocity(btVector3(0, 0, 0));
 					this->setAngularVelocity(btVector3(0, 0, 0));
+					trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
+					
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
@@ -154,6 +157,18 @@ namespace thomas
 					UpdateRigidbodyMass();
 					Physics::AddRigidBody(this);				
 				}
+			}
+
+			void Rigidbody::SetCenterOfmass(math::Vector3 Centerofmass)
+			{
+				
+				m_LocalCenterOfMassChange = Centerofmass;
+			}
+
+			math::Vector3 Rigidbody::GetCenterOfmass()
+			{
+				
+				return m_LocalCenterOfMassChange;
 			}
 
 			
