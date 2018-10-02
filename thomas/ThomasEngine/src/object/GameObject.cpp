@@ -89,7 +89,7 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->enabled) {
+			if (component->initialized && component->enabled) {
 				component->Update();
 				component->UpdateCoroutines();
 			}
@@ -116,7 +116,8 @@ namespace ThomasEngine {
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
-			m_components[i]->OnDrawGizmos();
+			if(m_components[i]->enabled)
+				m_components[i]->OnDrawGizmos();
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -393,14 +394,20 @@ namespace ThomasEngine {
 
 	void GameObject::activeSelf::set(bool value)
 	{
-		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		if (value == activeSelf)
+			return;
 		for (int i = 0; i < m_components.Count; i++)
 		{
-
 			Component^ component = m_components[i];
-			if (component->initialized)
-				component->enabled = value;
+			if (component->m_firstEnable && component->enabled) {
+				if (value)
+					component->OnEnable();
+				else
+					component->OnDisable();
+			}
+				
 		}
+		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 	}
 
 	Transform^ GameObject::transform::get()
