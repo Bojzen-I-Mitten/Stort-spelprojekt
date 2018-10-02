@@ -165,21 +165,10 @@ namespace ThomasEditor
 
             ThomasWrapper.CreateThomasWindow(Handle, IsEditor);
             GotFocus += ThomasWindow_GotFocus;
-            LostKeyboardFocus += ThomasWindow_LostKeyboardFocus;
-            LostFocus += ThomasWindow_LostFocus;
             return new HandleRef(this, Handle);
             
         }
 
-        private void ThomasWindow_LostFocus(object sender, RoutedEventArgs e)
-        {
-            Debug.LogWarning("lost focus");
-        }
-
-        private void ThomasWindow_LostKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
-        {
-            Debug.LogWarning("lost keyboard focus");
-        }
 
         private void ThomasWindow_GotFocus(object sender, RoutedEventArgs e)
         {

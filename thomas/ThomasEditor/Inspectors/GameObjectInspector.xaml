@@ -6,7 +6,6 @@
                 xmlns:local="clr-namespace:ThomasEditor.Inspectors"
                 xmlns:converters="clr-namespace:ThomasEditor.Converters"
                 xmlns:commands="clr-namespace:ThomasEditor.Commands"
-               
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 mc:Ignorable="d" 
                 d:DesignHeight="300" d:DesignWidth="300"
@@ -19,6 +18,7 @@
 
 
     <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConveter"/>
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
     </UserControl.Resources>
 
@@ -46,11 +46,13 @@
         <ItemsControl ItemsSource="{Binding Components}" Grid.Row="1" Background="#333333">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Expander IsExpanded="True">
+                    <Expander IsExpanded="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Expander.Header>
                             <DockPanel HorizontalAlignment="Stretch" LastChildFill="False">
+                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding enabled}"
+                                          VerticalContentAlignment="Center" VerticalAlignment="Center" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
                                 <Label DockPanel.Dock="Left" Content="{Binding Converter={StaticResource componentToNameConverter}}"/>
-                                <Button DockPanel.Dock="Right" Content="X" Click="RemoveComponentButton_Click"/>
+                                <Button DockPanel.Dock="Right" Content=" X " Click="RemoveComponentButton_Click" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
                             </DockPanel>
                         </Expander.Header>
                         <local:ExtendedPropertyGrid DataContext="{Binding}"/>

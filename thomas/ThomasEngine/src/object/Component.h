@@ -16,9 +16,13 @@ namespace ThomasEngine
 	{
 		Component();
 	private:
+		bool m_enabled = true;
 		[NonSerializedAttribute]
-		bool m_enabled = false;
+		bool m_started = false;
 	internal:
+		[NonSerializedAttribute]
+		bool m_firstEnable = false;
+
 		[NonSerializedAttribute]
 		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();
 		void UpdateCoroutines();
@@ -62,22 +66,19 @@ namespace ThomasEngine
 	public:
 		static System::Reflection::Assembly^ editorAssembly;
 		
-
 		[Xml::Serialization::XmlIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property bool enabled {
-			bool get() { return m_enabled; }
-			void set(bool value) {
-				if (m_enabled != value) {
-					m_enabled = value;
-					if (value == true)
-						OnEnable();
-					else
-						OnDisable();
-				}
-			}
+			bool get();
+			void set(bool value);
 		}
 
+		[Xml::Serialization::XmlIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		virtual property bool canDisable
+		{
+			virtual bool get() { return true; }
+		}
 
 
 		[BrowsableAttribute(false)]

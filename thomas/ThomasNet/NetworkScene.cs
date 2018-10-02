@@ -38,11 +38,22 @@ namespace ThomasEngine.Network
                 return;
             }
 
-            GameObject obj = GameObject.Instantiate(playerPrefab);
-            NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
-            networkIdentiy.Owner = myPlayer;
-            networkIdentiy.IsPlayer = true;
-            Players[peer] = networkIdentiy;
+
+            if(playerPrefab.GetComponent<NetworkIdentity>())
+            {
+                GameObject obj = GameObject.Instantiate(playerPrefab);
+                NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
+                networkIdentiy.IsPlayer = true;
+                networkIdentiy.Owner = myPlayer;
+
+                Players[peer] = networkIdentiy;
+            }else
+            {
+                Debug.LogError("Failed to spawn player. Prefab does not contain a networkIdentity component");
+            }
+
+
+
         }
         
         public void RemovePlayer(NetPeer peer)
