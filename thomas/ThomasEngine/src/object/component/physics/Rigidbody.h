@@ -17,6 +17,15 @@ namespace ThomasEngine
 			Impulse
 		};
 
+		enum class ActivationState
+		{
+			Default = WANTS_DEACTIVATION,
+			Sleeping = ISLAND_SLEEPING,
+			Disabled = DISABLE_SIMULATION,
+			Active_Tag = ACTIVE_TAG,
+			Always_Active = DISABLE_DEACTIVATION
+		};
+
 	public:
 		Rigidbody() : Component(new thomas::object::component::Rigidbody()) {}
 		void Awake() override;
@@ -57,7 +66,23 @@ namespace ThomasEngine
 																(thomas::object::component::ForceMode)mode);
 		}
 
-		GameObject^ GetTargetCollider();
+		void SetActivationState(ActivationState state)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state);
+		}
+
+
+		property Vector3 LinearVelocity
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetLinearVelocity()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetLinearVelocity(Utility::Convert(value)); }
+		}
+
+		property Vector3 AngularVelocity
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetAngularVelocity()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetAngularVelocity(Utility::Convert(value)); }
+		}
 
 		property bool IsKinematic 
 		{
@@ -71,12 +96,6 @@ namespace ThomasEngine
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetMass(value); }
 		}
 
-		/*property bool UseGravity
-		{
-			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->HasGravity(); }
-			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetGravity(value); }
-		}*/
-
 		property Vector3 FrzPos
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezePosition()); }
@@ -88,6 +107,13 @@ namespace ThomasEngine
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezeRotation()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezeRotation(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
 		}
+
+		property Vector3 CenterOfMass
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetCenterOfmass()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCenterOfmass(Utility::Convert(value)); }
+		}
+
 
 	private:
 		thomas::math::Vector3 ClampVec3(thomas::math::Vector3 & value, const float & min, const float & max)

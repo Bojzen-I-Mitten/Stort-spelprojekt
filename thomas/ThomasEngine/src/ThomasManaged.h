@@ -22,6 +22,12 @@ namespace ThomasEngine {
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 	public:
+		delegate void StartPlayEvent();
+		delegate void StopPlayingEvent();
+		delegate void PausePlayEvent();
+		static event StartPlayEvent^ OnStartPlaying;
+		static event StopPlayingEvent^ OnStopPlaying;
+
 		enum class ManipulatorOperation {
 			TRANSLATE,
 			ROTATE,
@@ -60,18 +66,15 @@ namespace ThomasEngine {
 
 		static void ToggleEditorGizmoManipulatorMode();
 
-		static void UpdateLog();
+	
 
 		static void ToggleEditorRendering();
+		static void TogglePhysicsDebug();
 	public:
 
 		static property float FrameRate
 		{
 			float get();
-		}
-		static property ObservableCollection<String^>^ OutputLog
-		{
-			ObservableCollection<String^>^ get() { return s_OutputLog; }
 		}
 		static ThomasSelection^ getSelection() { return s_Selection; }
 		static property ThomasSelection^ Selection {

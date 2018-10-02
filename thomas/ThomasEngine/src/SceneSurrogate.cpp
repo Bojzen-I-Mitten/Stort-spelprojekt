@@ -1,5 +1,6 @@
 #include "SceneSurrogate.h"
 #include "resource\Material.h"
+#include "resource\texture\Texture2D.h"
 #include "object\GameObject.h"
 #include "object\Component.h"
 #include "resource\Resources.h"
@@ -9,7 +10,7 @@ namespace ThomasEngine
 
 	System::Type ^ SceneSurrogate::GetDataContractType(System::Type ^ type)
 	{
-		if (type->BaseType == Resource::typeid)
+		if (Resource::typeid->IsAssignableFrom(type) && rootType != type)
 		{
 			return SceneResource::typeid;
 		}
@@ -22,7 +23,7 @@ namespace ThomasEngine
 
 	System::Object ^ SceneSurrogate::GetObjectToSerialize(System::Object ^obj, System::Type ^targetType)
 	{
-		if (obj->GetType()->BaseType == Resource::typeid)
+		if (Resource::typeid->IsAssignableFrom(obj->GetType()) && rootType != obj->GetType())
 		{
 			Resource^ resource = (Resource^)obj;
 			return gcnew SceneResource(resource->GetAssetRelativePath());
@@ -50,6 +51,13 @@ namespace ThomasEngine
 				if (targetType == Material::typeid)
 					return Material::StandardMaterial;
 			}
+			else if (sceneResource->path == "White Texture")
+				return Texture2D::whiteTexture;
+			else if (sceneResource->path == "Black Texture")
+				return Texture2D::whiteTexture;
+			else if (sceneResource->path == "Normal Texture")
+				return Texture2D::normalTexture;
+
 			else if (targetType == GameObject::typeid)
 				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path));
 			else if (Component::typeid->IsAssignableFrom(targetType)) {

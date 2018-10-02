@@ -1,4 +1,7 @@
 #pragma once
+#pragma unmanaged 
+
+#include <thomas/object/GameObject.h>
 #pragma managed
 #include "../attributes/CustomAttributes.h"
 #include "Object.h"
@@ -20,7 +23,6 @@ namespace ThomasEngine
 		GameObject();
 
 		bool InitComponents(bool playing);
-
 
 	internal:
 
@@ -50,7 +52,6 @@ namespace ThomasEngine
 		void RenderGizmos();
 
 		void RenderSelectedGizmos();
-		void OnCollisionEnter(GameObject^ collider);
 		
 	public:
 
@@ -76,6 +77,11 @@ namespace ThomasEngine
 		{
 			return Name;
 		}
+
+		property thomas::object::GameObject* Native {
+			thomas::object::GameObject* get();
+		}
+
 
 		[BrowsableAttribute(false)]
 		[Xml::Serialization::XmlIgnoreAttribute]

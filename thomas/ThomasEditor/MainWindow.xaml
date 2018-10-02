@@ -92,7 +92,8 @@
                 <MenuItem Header="_Tools">
                     <MenuItem Header="_Options" Click="OpenOptionsWindow"/>
                     <MenuItem Header="_Reload Assembly" Click="ReloadAssembly"/>
-                        <MenuItem Header="_Toggle Editor Rendering" IsCheckable="True" IsChecked="True" Click="MenuItem_ToggleEditorRendering"/>
+                    <MenuItem Header="_Toggle Editor Rendering" IsCheckable="True" IsChecked="True" Click="MenuItem_ToggleEditorRendering"/>
+                        <MenuItem Header="_Toggle Physics Debug" IsCheckable="True" IsChecked="True" Click="MenuItem_TogglePhysicsDebug"/>
                     </MenuItem>
             </Menu>
             <WrapPanel Grid.Row="1" Height="40">
@@ -153,12 +154,11 @@
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                             <xcad:LayoutDocumentPane>
-                                    <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
+                                <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
                                     <local:AssetBrowser/>
                                 </xcad:LayoutAnchorable>
-                                    <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
-                                    <ListBox Name="console" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged">
-                                    </ListBox>
+                                <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
+                                    <local:Console/>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>

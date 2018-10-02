@@ -304,7 +304,10 @@ namespace thomas
 			}
 			Transform * Transform::GetParent()
 			{
-				return m_parent;
+				if (m_parent)
+					return m_parent;
+
+				return nullptr;
 			}
 			std::vector<Transform*> Transform::GetChildren()
 			{
