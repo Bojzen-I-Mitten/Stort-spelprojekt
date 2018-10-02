@@ -34,7 +34,7 @@ public class Ball : NetworkComponent
         if (pickedUp)
         {
             Drop();
-           
+            transform.position = transform.position + Vector3.Normalize(force) * 2;
             rb.AddForce(force, Rigidbody.ForceMode.Impulse);
         }
     }
