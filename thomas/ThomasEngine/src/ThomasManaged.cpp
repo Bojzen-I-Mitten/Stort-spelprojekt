@@ -116,21 +116,15 @@ namespace ThomasEngine {
 					thomas::Physics::Simulate();
 				}
 
-				//Logic
-				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+			//Logic
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+			{
+				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+				if (gameObject->GetActive())
 				{
-					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
-					{
-						auto collider = gameObject->GetComponent<Rigidbody^>()->GetTargetCollider();
-						if (collider != nullptr)
-						{
-							gameObject->OnCollisionEnter(collider);
-						}
-
-						gameObject->Update();
-					}
+					gameObject->Update();
 				}
+			}
 
 				//Rendering
 
@@ -158,15 +152,8 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
-					//thomas::object::component::RenderComponent::ClearList();
-					//RenderFinished->WaitOne();
-					//thomas::graphics::LightManager::Update();
-					//CopyCommandList();
-					//RenderFinished->Reset();
-					//UpdateFinished->Set();
 				}
-				//Monitor::Exit(lock);
-				//ScriptingManger::ReloadIfNeeded();
+
 				
 			}
 			catch (Exception^ e) {

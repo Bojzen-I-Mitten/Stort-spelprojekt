@@ -3,6 +3,7 @@
 namespace thomas { namespace object { namespace component { class Camera; } } }
 namespace ThomasEngine
 {
+	[ExecuteInEditor]
 	public ref class Camera : public Component
 	{
 	private:

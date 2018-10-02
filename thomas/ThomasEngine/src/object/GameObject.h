@@ -47,7 +47,6 @@ namespace ThomasEngine
 		void RenderGizmos();
 
 		void RenderSelectedGizmos();
-		void OnCollisionEnter(GameObject^ collider);
 		
 	public:
 

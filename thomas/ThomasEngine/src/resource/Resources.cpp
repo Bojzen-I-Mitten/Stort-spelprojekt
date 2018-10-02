@@ -78,7 +78,10 @@ namespace ThomasEngine
 
 			if (resource->GetType() == Material::typeid)
 			{
+				String^ thomasPath = ConvertToThomasPath(path);
 				Serializer::SerializeMaterial((Material^)resource, path);
+				RenameResource(resource->m_path, path);
+				resource->Rename(thomasPath);
 				return true;
 			}
 			return false;
@@ -413,7 +416,7 @@ namespace ThomasEngine
 			void Resources::RenameResource(String ^ oldPath, String ^ newPath)
 			{
 				String^ thomasPathOld = ConvertToThomasPath(oldPath);
-				String^ thomasPathNew = ConvertToThomasPath(oldPath);
+				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
 					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();

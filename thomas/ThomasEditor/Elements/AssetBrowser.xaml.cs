@@ -418,6 +418,21 @@ namespace ThomasEditor
             item.Focus();
         }
 
+
+        private bool CheckSceneFile()
+        {
+            TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
+            StackPanel stack = item.Header as StackPanel;
+
+            String file = stack.DataContext as String;
+            ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(file);
+            if (assetType == ThomasEngine.Resources.AssetTypes.SCENE)
+            {
+                return true;
+            }
+            return false;
+        }
+
         private void AssetBrowser_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
@@ -425,12 +440,15 @@ namespace ThomasEditor
             if (treeViewItem != null)
             {
                 treeViewItem.Focus();
+                
                 assetBrowserContextMenu.DataContext = true;
+                contextMenuOpenItem.IsEnabled = CheckSceneFile();
                 //e.Handled = true;
             }
             else
             {
                 TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
+                
                 if(item != null)
                     item.IsSelected = false;
                 assetBrowserContextMenu.DataContext = false;
@@ -463,10 +481,8 @@ namespace ThomasEditor
             if (fileTree.SelectedItem == null)
                 return;
             TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
-            if (e.ClickCount == 2)
-            {
-                OpenItem(item);
-            }
+
+            OpenItem(item);
         }
 
         private void StartRename()

@@ -29,6 +29,8 @@ namespace ThomasEngine
 			return Texture2D::whiteTexture;
 		else if (path == "Black Texture")
 			return Texture2D::whiteTexture;
+		else if (path == "Normal Texture")
+			return Texture2D::normalTexture;
 		else
 			return Resources::LoadThomasPath(path);
 	}
