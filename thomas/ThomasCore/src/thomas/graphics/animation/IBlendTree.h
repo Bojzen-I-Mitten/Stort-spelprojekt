@@ -12,6 +12,7 @@ namespace thomas {
 
 			class Skeleton;
 			class AnimationNode;
+			class BoneConstraint;
 
 			/* Accessible interface for the animation blend tree
 			*/
@@ -20,6 +21,14 @@ namespace thomas {
 				virtual void setBlendTree(std::unique_ptr<AnimationNode> &blendTree) = 0;
 				virtual void clearBlendTree() = 0;
 				virtual void playSingle(thomas::resource::Animation * anim) = 0;
+
+				/* Constraints
+				*/
+
+				// Add a single constraint to a specific bone (at index)
+				virtual void addConstraint(BoneConstraint * bC, uint32_t boneIndex) = 0;
+				// Remove a single constraint from a specific bone (at index)
+				virtual void rmvConstraint(BoneConstraint * bC, uint32_t boneIndex) = 0;
 
 				/* Get the number of bones
 				*/

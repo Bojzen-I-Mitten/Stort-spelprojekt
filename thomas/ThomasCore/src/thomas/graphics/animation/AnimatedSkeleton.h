@@ -56,8 +56,8 @@ namespace thomas {
 
 				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
 
-				void addConstraint(BoneConstraint * bC, uint32_t boneIndex);
-				void rmvConstraint(BoneConstraint * bC, uint32_t boneIndex);
+				virtual void addConstraint(BoneConstraint * bC, uint32_t boneIndex);
+				virtual void rmvConstraint(BoneConstraint * bC, uint32_t boneIndex);
 
 			private:
 				Skeleton& _ref;												// Reference to the mesh skeleton

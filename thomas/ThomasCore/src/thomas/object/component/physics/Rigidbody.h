@@ -4,10 +4,19 @@
 #include "CapsuleCollider.h"
 namespace thomas
 {
+	namespace graphics
+	{
+		namespace animation
+		{
+			class BoneConstraint;
+		}
+	}
 	namespace object
 	{
 		namespace component
 		{
+
+
 			enum ActivationState
 			{
 				Default = WANTS_DEACTIVATION,
