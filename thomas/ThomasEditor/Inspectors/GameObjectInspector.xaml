@@ -17,13 +17,12 @@
         <CommandBinding Command="commands:CustomCommands.GetAddCompenent" CanExecute="AddComponent_CanExecute" Executed="AddComponent"/>
     </UserControl.CommandBindings>
 
-
     <UserControl.Resources>
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
     </UserControl.Resources>
 
-    
-    <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible">
+    <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible"
+          PreviewDragOver="GameObjectInspector_PreviewDragOver" PreviewDrop="GameObjectInspector_Drop">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -58,9 +57,15 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
         <Button Grid.Row="2" Panel.ZIndex="0" ClickMode="Press" Content="Add Component" 
                 HorizontalAlignment="Center" HorizontalContentAlignment="Center" 
                 x:Name="addComponentButton" Command="{x:Static commands:CustomCommands.GetAddCompenent}" 
+                />
+        <Button Grid.Row="3" Content="WHERE WE DROPPIN', BOYS?" 
+                HorizontalAlignment="Center" HorizontalContentAlignment="Center"
+                Width="auto" Height="50" Background="#333333"
+                PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"
                 />
         <Popup x:Name="addComponentsListPopup" IsOpen="False" StaysOpen="False" Width="200" Height="300" PlacementTarget="{Binding ElementName=addComponentButton}" Placement="Bottom">
             <DockPanel LostFocus="AddComponentsListContainer_LostFocus">

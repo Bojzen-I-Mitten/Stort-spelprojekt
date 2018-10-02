@@ -22,7 +22,7 @@ namespace ThomasEditor
     /// </summary>
     public partial class GameObjectHierarchy : UserControl
     {
-
+        int m_inspector = 0;
         bool _isDragging;
         bool wasUnselected = false;
         GameObject m_copiedObject; //??correct code convention?
@@ -318,13 +318,18 @@ namespace ThomasEditor
             return foundItem;
         }
 
-        private void hierarchy_Drop(object sender, DragEventArgs e)
+        public void hierarchy_Drop(object sender, DragEventArgs e)
         {
             
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
                 TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
+
+                //If drop function is called from Inspector
+                if (m_inspector == 1)
+                    target = hierarchy.SelectedItem as TreeViewItem;
+
                 StackPanel sourceHeader = source.Header as StackPanel;
 
                 if (source.DataContext is GameObject)
@@ -357,7 +362,6 @@ namespace ThomasEditor
                 {
                     if (target != null && source != null && target != source)
                     {
-                        GameObject targetObject = target.DataContext as GameObject;
                         List<Type> componentList = ThomasEngine.Component.GetAllAddableComponentTypes();
                         
                         //Loop through all existing components
@@ -373,13 +377,12 @@ namespace ThomasEditor
                                 //Remove '.cs' from dragged scripts.
                                 dragObject = dragObject.Substring(0, dragObject.Length - 3);
                             }
-                            Debug.Log("Checking if: " + dragObject.ToLower() + " contains: " + componentList[i].Name.ToLower());
+                            //Debug.Log("Checking if: " + dragObject.ToLower() + " contains: " + componentList[i].Name.ToLower());
                             
                             //Check if dragged component matches an existing component
                             if (dragObject.ToLower().Contains(componentList[i].Name.ToLower()))
                             {
                                 Type componentToAdd = componentList[i] as Type;
-                                Debug.Log(componentToAdd);
 
                                 var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
                                 method.Invoke(target.DataContext, null);
@@ -638,6 +641,10 @@ namespace ThomasEditor
             var x = new GameObject("newEmptyGameObject");
             ThomasWrapper.Selection.SelectGameObject(x);
         }
-
+        
+        public void SetInspector(int value)
+        {
+            m_inspector = value;
+        }
     }
 }
