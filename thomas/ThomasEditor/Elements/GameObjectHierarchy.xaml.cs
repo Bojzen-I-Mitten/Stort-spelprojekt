@@ -352,6 +352,7 @@ namespace ThomasEditor
                         
                     }
                 }
+                //Check if dragged item is a script
                 else if (source.DataContext is ScriptComponent || ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
                 {
                     if (target != null && source != null && target != source)
@@ -363,25 +364,27 @@ namespace ThomasEditor
                         for (int i = 0; i < componentList.Count; ++i)
                         {
                             string dragObject = (string)sourceHeader.DataContext;
-                            int scriptNameLength = componentList[i].Name.Length + 3;
+                            int scriptNameLength = componentList[i].Name.Length;
 
-                            Debug.Log("Original path before substring: " + dragObject);
-                            dragObject = dragObject.Substring(dragObject.Length - scriptNameLength);
-                            Debug.Log("Path after removing directory part: " + dragObject);
-                            dragObject = dragObject.Substring(0, scriptNameLength);
-                            Debug.Log("Path after removing '.cs': " + dragObject);
-
-                            Debug.Log("Checking if: " + dragObject + " contains: " + componentList[i].Name);
-                            //Check if dragged component matches an existing component
-                            if (dragObject.Contains(componentList[i].Name))
+                            //Remove directory path of dragged item
+                            dragObject = dragObject.Substring(dragObject.Length - (scriptNameLength+3));
+                            if (dragObject.Length > 3)
                             {
-                                Debug.Log("Yes it does.");
-
+                                //Remove '.cs' from dragged scripts.
+                                dragObject = dragObject.Substring(0, dragObject.Length - 3);
+                            }
+                            Debug.Log("Checking if: " + dragObject.ToLower() + " contains: " + componentList[i].Name.ToLower());
+                            
+                            //Check if dragged component matches an existing component
+                            if (dragObject.ToLower().Contains(componentList[i].Name.ToLower()))
+                            {
                                 Type componentToAdd = componentList[i] as Type;
                                 Debug.Log(componentToAdd);
 
                                 var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
                                 method.Invoke(target.DataContext, null);
+
+                                Debug.Log("Script found and added.");
                             }
                         }
                     }
