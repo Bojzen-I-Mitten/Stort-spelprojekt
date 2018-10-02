@@ -73,7 +73,6 @@ namespace ThomasEngine.Network
         #region Event Handlers
         public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
         {
-
             Manager.InternalManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
         }
 

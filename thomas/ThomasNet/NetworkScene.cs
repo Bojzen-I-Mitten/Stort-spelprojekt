@@ -90,8 +90,8 @@ namespace ThomasEngine.Network
         {
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
             {
-                    NetworkObjects.Add(nextAssignableID++, identity);
-                    identity.gameObject.SetActive(false);
+                NetworkObjects.Add(nextAssignableID++, identity);
+                identity.gameObject.SetActive(false);
 
             });
         }

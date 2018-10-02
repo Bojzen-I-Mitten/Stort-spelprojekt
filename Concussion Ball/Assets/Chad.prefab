@@ -1,38 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <GameObject xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
-  <m_guid>30da10e7-b404-4969-b142-14ee1c6fa0a1</m_guid>
+  <m_guid>4ae63773-8044-42b7-af21-bcd38a7457e5</m_guid>
   <m_name z:Id="2">Chad</m_name>
   <Components z:Size="6">
     <Component z:Id="3" i:type="Transform">
-      <m_guid>6469d733-73da-4ec2-9d15-83626c1d4116</m_guid>
+      <m_guid>1ffa81c7-585b-4aaa-9c1a-bade3619518d</m_guid>
       <m_name i:nil="true" />
       <m_enabled>true</m_enabled>
       <m_gameObject z:Ref="1" i:nil="true" />
       <children z:Size="2">
         <Transform z:Id="4">
-          <m_guid>aa63e452-75ad-4a25-87b4-b81f074e867b</m_guid>
+          <m_guid>d337cb66-7763-4943-850a-a127f21706a5</m_guid>
           <m_name i:nil="true" />
           <m_enabled>true</m_enabled>
           <m_gameObject z:Id="5">
-            <m_guid>7fbf8e76-7b8a-48d5-b1ee-c79077759ec7</m_guid>
-            <m_name z:Id="6">ChadModel</m_name>
-            <Components z:Size="2">
+            <m_guid>b5b98962-1500-4c3d-9cd2-bee54bce7f67</m_guid>
+            <m_name z:Id="6">Hand</m_name>
+            <Components z:Size="1">
               <Component z:Ref="4" i:nil="true" />
-              <Component z:Id="7" i:type="RenderSkinnedComponent">
-                <m_guid>de2c39fa-f03d-475a-8fc3-41557efefd87</m_guid>
-                <m_name i:nil="true" />
-                <m_enabled>true</m_enabled>
-                <m_gameObject z:Ref="5" i:nil="true" />
-                <animation z:Id="8">
-                  <path z:Id="9">%THOMAS_ASSETS%\anim\Running_animation.anim</path>
-                </animation>
-                <material z:Id="10">
-                  <path z:Id="11"></path>
-                </material>
-                <model z:Id="12">
-                  <path z:Id="13">%THOMAS_ASSETS%\anim\Running_model.fbx</path>
-                </model>
-              </Component>
             </Components>
             <activeSelf>true</activeSelf>
             <transform z:Ref="4" i:nil="true" />
@@ -41,32 +26,47 @@
           <localEulerAngles>
             <x>0</x>
             <y>0</y>
-            <z>0</z>
+            <z>-0</z>
           </localEulerAngles>
           <localPosition>
-            <x>0</x>
-            <y>-1</y>
-            <z>0</z>
+            <x>0.893483162</x>
+            <y>0.322681546</y>
+            <z>0.08755025</z>
           </localPosition>
           <localScale>
-            <x>0.01</x>
-            <y>0.01</y>
-            <z>0.01</z>
+            <x>1</x>
+            <y>1</y>
+            <z>1</z>
           </localScale>
           <parent z:Ref="3" i:nil="true" />
         </Transform>
-        <Transform z:Id="14">
-          <m_guid>4a27d5d6-a963-4735-82db-142dbe9b95b6</m_guid>
+        <Transform z:Id="7">
+          <m_guid>8135091f-bd28-44c4-afaf-3c4d82c2bb1b</m_guid>
           <m_name i:nil="true" />
           <m_enabled>true</m_enabled>
-          <m_gameObject z:Id="15">
-            <m_guid>bc7bc938-a177-416f-9bef-7c94dc09225d</m_guid>
-            <m_name z:Id="16">Hand</m_name>
-            <Components z:Size="1">
-              <Component z:Ref="14" i:nil="true" />
+          <m_gameObject z:Id="8">
+            <m_guid>caf00d2d-08a0-4147-8d43-5ac8216069fa</m_guid>
+            <m_name z:Id="9">ChadModel</m_name>
+            <Components z:Size="2">
+              <Component z:Ref="7" i:nil="true" />
+              <Component z:Id="10" i:type="RenderSkinnedComponent">
+                <m_guid>ffadd8d5-f19b-4793-8187-3faf1b4ae2fd</m_guid>
+                <m_name i:nil="true" />
+                <m_enabled>true</m_enabled>
+                <m_gameObject z:Ref="8" i:nil="true" />
+                <animation z:Id="11">
+                  <path z:Id="12">%THOMAS_ASSETS%\anim\Running_animation.anim</path>
+                </animation>
+                <material z:Id="13">
+                  <path z:Id="14"></path>
+                </material>
+                <model z:Id="15">
+                  <path z:Id="16">%THOMAS_ASSETS%\anim\Running_model.fbx</path>
+                </model>
+              </Component>
             </Components>
             <activeSelf>true</activeSelf>
-            <transform z:Ref="14" i:nil="true" />
+            <transform z:Ref="7" i:nil="true" />
           </m_gameObject>
           <children z:Size="0" />
           <localEulerAngles>
@@ -75,14 +75,14 @@
             <z>0</z>
           </localEulerAngles>
           <localPosition>
-            <x>0.9306309</x>
-            <y>0.422501326</y>
-            <z>0.07054239</z>
+            <x>0</x>
+            <y>-1.1</y>
+            <z>0</z>
           </localPosition>
           <localScale>
-            <x>1</x>
-            <y>1</y>
-            <z>1</z>
+            <x>0.01</x>
+            <y>0.01</y>
+            <z>0.01</z>
           </localScale>
           <parent z:Ref="3" i:nil="true" />
         </Transform>
@@ -94,7 +94,7 @@
       </localEulerAngles>
       <localPosition>
         <x>0</x>
-        <y>1.2</y>
+        <y>1.1</y>
         <z>0</z>
       </localPosition>
       <localScale>
@@ -104,34 +104,8 @@
       </localScale>
       <parent i:nil="true" />
     </Component>
-    <Component z:Id="17" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEditor" i:type="d3p1:ChadControls">
-      <m_guid>2ab387f3-97af-4aea-a373-67a9ff7702a0</m_guid>
-      <m_name i:nil="true" />
-      <m_enabled>true</m_enabled>
-      <m_gameObject z:Ref="1" i:nil="true" />
-      <d3p1:force>5</d3p1:force>
-      <d3p1:hand i:nil="true" />
-      <d3p1:rotationSpeed>3</d3p1:rotationSpeed>
-      <d3p1:speed>5</d3p1:speed>
-      <d3p1:throwForce>0</d3p1:throwForce>
-    </Component>
-    <Component z:Id="18" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkTransform">
-      <m_guid>f74f50df-f7d5-475f-92b5-004ec6a60b91</m_guid>
-      <m_name i:nil="true" />
-      <m_enabled>true</m_enabled>
-      <m_gameObject z:Ref="1" i:nil="true" />
-      <d3p1:SyncMode>SyncTransform</d3p1:SyncMode>
-    </Component>
-    <Component z:Id="19" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkIdentity">
-      <m_guid>122f9d93-678c-4e1b-81e1-121d7e58e977</m_guid>
-      <m_name i:nil="true" />
-      <m_enabled>true</m_enabled>
-      <m_gameObject z:Ref="1" i:nil="true" />
-      <d3p1:IsPlayer>false</d3p1:IsPlayer>
-      <d3p1:Owner>false</d3p1:Owner>
-    </Component>
-    <Component z:Id="20" i:type="Rigidbody">
-      <m_guid>2ccd41be-4b08-4256-bb1d-d2b3829c4176</m_guid>
+    <Component z:Id="17" i:type="Rigidbody">
+      <m_guid>2cd0a7b4-75ae-48bc-832a-6c2326624b6f</m_guid>
       <m_name i:nil="true" />
       <m_enabled>true</m_enabled>
       <m_gameObject z:Ref="1" i:nil="true" />
@@ -158,8 +132,8 @@
       </LinearVelocity>
       <Mass>1</Mass>
     </Component>
-    <Component z:Id="21" i:type="CapsuleCollider">
-      <m_guid>a1a60a04-e613-4c0e-8089-9eb09216880a</m_guid>
+    <Component z:Id="18" i:type="CapsuleCollider">
+      <m_guid>4baf1135-540e-4c54-ad0f-aebe4387be9e</m_guid>
       <m_name i:nil="true" />
       <m_enabled>true</m_enabled>
       <m_gameObject z:Ref="1" i:nil="true" />
@@ -172,6 +146,32 @@
       </center>
       <height>1</height>
       <radius>0.5</radius>
+    </Component>
+    <Component z:Id="19" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEditor" i:type="d3p1:ChadControls">
+      <m_guid>20b88f85-815d-4df8-8b7d-94ef8bfae597</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:force>5</d3p1:force>
+      <d3p1:hand z:Ref="4" i:nil="true" />
+      <d3p1:rotationSpeed>3</d3p1:rotationSpeed>
+      <d3p1:speed>5</d3p1:speed>
+      <d3p1:throwForce>0</d3p1:throwForce>
+    </Component>
+    <Component z:Id="20" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkIdentity">
+      <m_guid>d8901bcb-c5fd-4e92-87f1-82c23631c16a</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:IsPlayer>false</d3p1:IsPlayer>
+      <d3p1:Owner>false</d3p1:Owner>
+    </Component>
+    <Component z:Id="21" xmlns:d3p1="http://schemas.datacontract.org/2004/07/ThomasEngine.Network" i:type="d3p1:NetworkTransform">
+      <m_guid>b0f0b105-20d9-42a8-a47f-4c98c57a51bc</m_guid>
+      <m_name i:nil="true" />
+      <m_enabled>true</m_enabled>
+      <m_gameObject z:Ref="1" i:nil="true" />
+      <d3p1:SyncMode>SyncTransform</d3p1:SyncMode>
     </Component>
   </Components>
   <activeSelf>true</activeSelf>

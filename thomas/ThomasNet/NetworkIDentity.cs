@@ -81,7 +81,7 @@ namespace ThomasEngine.Network
 
         public void ReadData(NetPacketReader reader, bool initialState)
         {
-            if(initialState && networkComponentsCache == null)
+            if(networkComponentsCache == null)
             {
                 networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
             }
