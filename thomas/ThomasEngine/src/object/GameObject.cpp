@@ -1,6 +1,5 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
-#include <thomas\AutoProfile.h>
 #pragma managed
 #include "GameObject.h"
 #include "Component.h"
@@ -45,7 +44,6 @@ namespace ThomasEngine {
 
 	bool GameObject::InitComponents(bool playing)
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 		bool completed = true;
 		for each(Component^ component in m_components)
@@ -67,7 +65,6 @@ namespace ThomasEngine {
 	}
 
 	void GameObject::PostInstantiate(Scene^ scene) {
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		PostLoad(scene);
 		scene->GameObjects->Add(this);
 		for (int i = 0; i < m_transform->children->Count; i++) {
@@ -75,11 +72,12 @@ namespace ThomasEngine {
 		}
 	}
 	void GameObject::InitGameObjects(bool playing) {
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		bool completed;
 		do {
 			completed = true;
-			for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects) {
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) 
+			{
+				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
@@ -87,14 +85,12 @@ namespace ThomasEngine {
 
 	void GameObject::Update()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->enabled) 
-			{
+			if (component->initialized && component->enabled) {
 				component->Update();
 				component->UpdateCoroutines();
 			}
@@ -105,7 +101,6 @@ namespace ThomasEngine {
 
 	void GameObject::FixedUpdate()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
@@ -116,27 +111,14 @@ namespace ThomasEngine {
 		Monitor::Exit(m_componentsLock);
 	}
 
-	void GameObject::OnCollisionEnter(GameObject^ collider)
-	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
-		Monitor::Enter(m_componentsLock);
-
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->enabled)
-				component->OnCollisionEnter(collider);
-		}
-		Monitor::Exit(m_componentsLock);
-	}
 
 	void GameObject::RenderGizmos()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
-			m_components[i]->OnDrawGizmos();
+			if(m_components[i]->enabled)
+				m_components[i]->OnDrawGizmos();
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -153,7 +135,6 @@ namespace ThomasEngine {
 
 	void GameObject::Destroy()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (m_isDestroyed)
 			return;
 		m_isDestroyed = true;
@@ -173,7 +154,6 @@ namespace ThomasEngine {
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 		return gameObject;
@@ -182,18 +162,26 @@ namespace ThomasEngine {
 	GameObject ^ GameObject::Instantiate(GameObject ^ original)
 	{
 		if(!original){
-			Debug::Log("Object to instantiate is null");
+			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		GameObject^ clone;
+		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
 		}
 		else
 		{
-			System::IO::Stream^ serialized = SerializeGameObject(original);
-			clone = DeSerializeGameObject(serialized);
+			try {
+				System::IO::Stream^ serialized = SerializeGameObject(original);
+				clone = DeSerializeGameObject(serialized);
+			}
+			catch (Exception^ e)
+			{
+				String^ msg = "Failed to instantiate gameObject: " + original->Name + " error: " + e->Message;
+				Debug::LogError(msg);
+			}
+
 		}
 		
 		if (clone) {
@@ -234,7 +222,6 @@ namespace ThomasEngine {
 	}
 
 	GameObject^ GameObject::CreatePrefab() {
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		GameObject^ newGobj = gcnew GameObject();
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
@@ -278,7 +265,6 @@ namespace ThomasEngine {
 
 	GameObject ^ GameObject::DeSerializeGameObject(System::IO::Stream ^ stream)
 	{
-		try {
 			using namespace System::Runtime::Serialization;
 			DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
 			auto list = Component::GetAllComponentTypes();
@@ -292,14 +278,6 @@ namespace ThomasEngine {
 			GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
 			gObj->PostLoad(nullptr);
 			return gObj;
-		}
-		catch (Exception^ e) {
-			std::string msg("Failed to load gameObject, msg: " + Utility::ConvertString(e->Message));
-			LOG(msg);
-			return nullptr;
-		}
-		
-
 	}
 
 
@@ -307,7 +285,6 @@ namespace ThomasEngine {
 	where T : Component
 	T GameObject::AddComponent()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::allocation)
 		Monitor::Enter(m_componentsLock);
 		Type^ typ = T::typeid;
 
@@ -330,7 +307,6 @@ namespace ThomasEngine {
 	where T : Component
 	T GameObject::GetComponent()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		List<T>^ tComponents = gcnew List<T>(System::Linq::Enumerable::OfType<T>(%m_components));
 		if (tComponents->Count > 0)
 			return tComponents[0];
@@ -340,7 +316,6 @@ namespace ThomasEngine {
 
 
 	Component^ GameObject::GetComponent(Type^ type) {
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		for (int i = 0; i < m_components.Count; i++) {
 			if (m_components[i]->GetType() == type)
 				return m_components[i];
@@ -352,7 +327,6 @@ namespace ThomasEngine {
 	where T : Component
 	List<T>^ GameObject::GetComponents()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		List<T>^ list = gcnew List<T>(System::Linq::Enumerable::OfType<T>(%m_components));
 		return list;
 	}
@@ -394,7 +368,6 @@ namespace ThomasEngine {
 
 	GameObject^ GameObject::Find(String^ name)
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
 		{
 			if (gameObject->Name == name)
@@ -405,7 +378,6 @@ namespace ThomasEngine {
 
 	bool GameObject::GetActive()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		return ((thomas::object::GameObject*)nativePtr)->GetActive();
 	}
 
@@ -423,14 +395,20 @@ namespace ThomasEngine {
 
 	void GameObject::activeSelf::set(bool value)
 	{
-		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		if (value == activeSelf)
+			return;
 		for (int i = 0; i < m_components.Count; i++)
 		{
-
 			Component^ component = m_components[i];
-			if (component->initialized)
-				component->enabled = value;
+			if (component->m_firstEnable && component->enabled) {
+				if (value)
+					component->OnEnable();
+				else
+					component->OnDisable();
+			}
+				
 		}
+		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
 	}
 
 	Transform^ GameObject::transform::get()

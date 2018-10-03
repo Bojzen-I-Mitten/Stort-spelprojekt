@@ -65,7 +65,7 @@ namespace thomas
 				Pass pass;
 				pass.name = p.name;
 				pass.enabled = true;
-				pass.index = m_passes.size();
+				pass.index = int(m_passes.size());
 				m_passes.push_back(pass);
 			}
 			FetchPropertiesFromShader();
@@ -116,7 +116,7 @@ namespace thomas
 				Pass pass;
 				pass.name = p.name;
 				pass.enabled = true;
-				pass.index = m_passes.size();
+				pass.index = int(m_passes.size());
 				m_passes.push_back(pass);
 			}
 			FetchPropertiesFromShader();
@@ -361,7 +361,7 @@ namespace thomas
 			{
 				prop.second->Apply(m_shader);
 			}
-			ThomasCore::GetDeviceContext()->IASetPrimitiveTopology(m_topology);
+			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
 		void Material::Draw(graphics::Mesh* mesh)
@@ -385,7 +385,7 @@ namespace thomas
 				if (p.enabled)
 				{
 					m_shader->SetPass(p.index);
-					ThomasCore::GetDeviceContext()->Draw(vertexCount, startVertexLocation);
+					utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
 				}
 			}
 			Unlock();

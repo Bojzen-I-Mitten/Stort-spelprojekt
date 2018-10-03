@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "../../Window.h"
+#include "..\..\WindowManager.h"
 #include "../GameObject.h"
 #include "../../graphics/Skybox.h"
 #include "Transform.h"
@@ -39,7 +39,7 @@ namespace thomas
 				m_viewport = math::Viewport(0, 0, 1,1);
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
-				s_allCameras.push_back(this);
+				
 				std::sort(s_allCameras.begin(), s_allCameras.end(), [](Camera* a, Camera* b) 
 				{
 					return a->GetTargetDisplayIndex() < b->GetTargetDisplayIndex();
@@ -53,6 +53,22 @@ namespace thomas
 					{
 						s_allCameras.erase(s_allCameras.begin() + i);
 						break;
+					}
+						
+				}
+			}
+
+			void Camera::OnEnable()
+			{
+				s_allCameras.push_back(this);
+			}
+
+			void Camera::OnDisable()
+			{
+				for (int i = 0; i < s_allCameras.size(); i++) {
+					if (s_allCameras[i] == this) {
+						s_allCameras.erase(s_allCameras.begin() + i);
+						return;
 					}
 						
 				}
@@ -89,7 +105,8 @@ namespace thomas
 			{
 				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				// Move the mouse cursor coordinates into the -1 to +1 range.
-				Window* window = Window::GetWindow(m_targetDisplay);
+				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
+
 				float pointX = ((2.0f * (float)point.x) / (float)window->GetWidth()) - 1.0f;
 				float pointY = (((2.0f * (float)point.y) / (float)window->GetHeight()) - 1.0f) * -1.0f;
 				// Adjust the points using the projection matrix to account for the aspect ratio of the viewport.
@@ -148,7 +165,8 @@ namespace thomas
 
 			math::Viewport Camera::GetViewport()
 			{
-				Window* window = Window::GetWindow(m_targetDisplay);
+				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
+
 				if (window)
 					return math::Viewport(m_viewport.x, m_viewport.y, m_viewport.width * window->GetWidth(), m_viewport.height * window->GetHeight());
 				else
@@ -196,7 +214,7 @@ namespace thomas
 
 			void Camera::SetTargetDisplay(int index)
 			{
-				if (Window::GetWindows().size() < index)
+				if (WindowManager::Instance()->GetNumOfWindows() < index)
 				{
 					m_targetDisplay = index;
 					UpdateProjMatrix();

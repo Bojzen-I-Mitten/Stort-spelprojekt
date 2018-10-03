@@ -1,4 +1,5 @@
 #include "ComputeShader.h"
+#include "ShaderProperty\shaderProperties.h"
 
 namespace thomas
 {
@@ -11,7 +12,7 @@ namespace thomas
 		void ComputeShader::Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ)
 		{
 			//Bind();
-			ThomasCore::GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
+			utils::D3D::Instance()->GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
 		}
 		void ComputeShader::SetUAV(const std::string & name, ID3D11UnorderedAccessView& value)
 		{

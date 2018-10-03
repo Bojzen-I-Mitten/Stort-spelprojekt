@@ -118,7 +118,7 @@ namespace ThomasEditor.utils
             }
             catch(Exception e)
             {
-                Debug.Log("Error creating project: " + e.Message);
+                Debug.LogError("Error creating project: " + e.Message);
                 MessageFilter.Revoke();
                 return false;
             }
@@ -172,11 +172,10 @@ namespace ThomasEditor.utils
                 return true;
             }catch(Exception e)
             {
-                Debug.Log("Something went wrong building scripts. Try to close project solution.");
+                Debug.LogError("Something went wrong building scripts. Try to close project solution.");
                 MainWindow._instance.hideBusyIndicator();
                 return true;
             }
-           
         }
 
         public static void AddScript(string script)
@@ -208,7 +207,7 @@ namespace ThomasEditor.utils
                     projectEval.Save();
                 }catch(Exception e)
                 {
-
+                    Debug.Log(e);
                 }
                 
             }));
@@ -237,14 +236,14 @@ namespace ThomasEditor.utils
 
         private void EventSource_WarningRaised(object sender, BuildWarningEventArgs e)
         {
-            //string line = String.Format("Warning {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
-            //Debug.Log(line);
+            string line = String.Format("Warning {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
+            Debug.LogWarning(line);
         }
 
         private void EventSource_ErrorRaised(object sender, BuildErrorEventArgs e)
         {
-            string line = String.Format("ERROR {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
-            Debug.Log(line);
+            string line = String.Format("Error {0}({1},{2}): {3}", e.File, e.LineNumber, e.ColumnNumber, e.Message);
+            Debug.LogError(line);
         }
 
 

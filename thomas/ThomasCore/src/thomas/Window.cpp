@@ -1,7 +1,7 @@
 #include "Window.h"
-#include "Input.h"
 #include "Common.h"
 #include "utils\D3D.h"
+#include "WindowManager.h"
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -9,11 +9,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam
 
 namespace thomas 
 {
-	std::vector<Window*> Window::s_windows;
-	Window* Window::s_editorWindow = nullptr;
-	Window* Window::s_current = nullptr;
-
-	Window::Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title) : m_focused(false), m_created(false), 
+	Window::Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title) :
 		m_shouldResize(false), m_width(width), m_height(height), m_title(std::string(title)), m_showCursor(false), m_fullScreen(false)
 	{
 		m_windowClassInfo = { 0 };
@@ -29,7 +25,6 @@ namespace thomas
 			LOG("Failed to create window")
 
 		m_windowRectangle = { 0, 0, m_width, m_height };
-
 		//Properties for window
 		AdjustWindowRect(&m_windowRectangle, WS_OVERLAPPEDWINDOW, FALSE);
 		m_windowHandler = CreateWindow(
@@ -48,17 +43,18 @@ namespace thomas
 		m_initialized = false;
 		if (m_windowHandler)
 		{
-			bool hr = utils::D3d::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain, ThomasCore::GetDevice());
+			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 			if (hr)
 			{
-				m_created = true;
 				ChangeWindowShowState(nCmdShow);
 			}
 		}
 	}
 
-	Window::Window(HWND hWnd) : m_focused(false), m_created(false), m_shouldResize(false), m_initialized(false)
+	Window::Window(HWND hWnd) : m_shouldResize(false), m_initialized(false), m_input(Input())
 	{
+		m_input.Init();
+
 		bool result = GetWindowRect(hWnd, &m_windowRectangle);
 		if (result)
 		{
@@ -67,8 +63,7 @@ namespace thomas
 			m_showCursor = true; m_fullScreen = false;
 			m_windowHandler = hWnd;
 
-			if (utils::D3d::CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain, ThomasCore::GetDevice()))
-				m_created = true;
+			utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 		}
 		else
 			LOG("Failed to create window");
@@ -84,32 +79,8 @@ namespace thomas
 		SAFE_RELEASE(m_dxBuffers.depthBufferSRV);
 		SAFE_RELEASE(m_swapChain);
 
-		if (s_editorWindow = this)
-			ImGui_ImplDX11_Shutdown();
-
 		DestroyWindow(m_windowHandler);
-	}
-
-	void Window::InitEditor(HWND hWnd)
-	{
-		Window* window = new Window(hWnd);
-		if (window->m_created)
-		{
-			s_editorWindow = window;
-			ImGui_ImplDX11_Init(hWnd, ThomasCore::GetDevice(), ThomasCore::GetDeviceContext());
-		}		
-	}
-
-	Window* Window::Create(HWND hWnd)
-	{
-		Window* window = new Window(hWnd);
-		if (window->m_created)
-		{
-			s_windows.push_back(window);
-			return window;
-		}
-		return nullptr;
-	}
+	}	
 
 	bool Window::Resize()
 	{
@@ -124,8 +95,8 @@ namespace thomas
 			m_height = newHeight;
 			m_width = newWidth;
 
-			ThomasCore::GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
-			ThomasCore::GetDeviceContext()->OMSetDepthStencilState(NULL, 1);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(NULL, 1);
 			SAFE_RELEASE(m_dxBuffers.backBuffer);
 			SAFE_RELEASE(m_dxBuffers.backBufferSRV);
 			SAFE_RELEASE(m_dxBuffers.depthStencilState);
@@ -134,18 +105,24 @@ namespace thomas
 			SAFE_RELEASE(m_dxBuffers.depthBufferSRV);
 
 			m_swapChain->ResizeBuffers(0, m_width, m_height, DXGI_FORMAT_UNKNOWN, 0);
-			if (s_current == this)
-				s_current = nullptr;
 			return InitDxBuffers();
 		}
 		else
 			return false;
 	}
 
-
-	bool Window::UpdateWindow()
+	void Window::UpdateWindow()
 	{
-		return false;
+		if (!m_initialized)
+		{
+			InitDxBuffers();
+			m_initialized = true;
+		}
+		if (m_shouldResize)
+		{
+			Resize();
+			m_shouldResize = false;
+		}
 	}
 
 	bool Window::Initialized()
@@ -153,114 +130,30 @@ namespace thomas
 		return m_initialized;
 	}
 
-	void Window::Destroy()
-	{
-		if (s_editorWindow)
-			delete s_editorWindow;
-
-		for (Window* window : s_windows)
-			delete window;
-
-		s_windows.clear();
-	}
-
-	void Window::ClearAllWindows()
-	{
-		if (s_editorWindow && s_editorWindow->Initialized())
-			s_editorWindow->Clear();
-
-		for (Window* window : s_windows)
-			if (window->Initialized())
-				window->Clear();
-	}
-
-	void Window::PresentAllWindows()
-	{
-		if (s_editorWindow && s_editorWindow->Initialized())
-		{
-			s_editorWindow->Bind();
-			if (ImGui_ImplDx11_Valid() && s_editorWindow->m_guiData)
-				ImGui_ImplDX11_RenderDrawData(s_editorWindow->m_guiData);
-			s_editorWindow->Present();
-		}
-
-		for (Window* window : s_windows)
-			if (window->Initialized())
-				window->Present();
-
-		s_current = nullptr;
-	}
-
 	void Window::QueueResize()
 	{
 		m_shouldResize = true;
 	}
 
-	bool Window::WaitingForUpdate()
+	bool Window::IntersectBounds(int x, int y) const
 	{
-		if (s_editorWindow && s_editorWindow->m_shouldResize)
-			return true;
-
-		for (Window* window : s_windows)
-			if (window->m_shouldResize)
-				return true;
-
-		return false;
-	}
-
-	void Window::Update()
-	{
-		if (s_editorWindow)
-		{
-			if (!s_editorWindow->m_initialized)
-			{
-				s_editorWindow->InitDxBuffers();
-				s_editorWindow->m_initialized = true;
-			}
-			if (s_editorWindow->m_shouldResize)
-			{
-				ImGui_ImplDX11_InvalidateDeviceObjects();
-				s_editorWindow->m_initialized = false;
-				s_editorWindow->Resize();
-				s_editorWindow->m_initialized = true; //Hmm...?
-				s_editorWindow->m_shouldResize = false;
-				ImGui_ImplDX11_CreateDeviceObjects();
-			}
-			BeginFrame();
-		}
-
-		for (Window* window : s_windows)
-		{
-			if (!window->m_initialized)
-			{
-				window->InitDxBuffers();
-				window->m_initialized = true;
-			}
-			if (window->m_shouldResize)
-			{
-				window->Resize();
-				window->m_shouldResize = false;
-			}
-		}
-	}
-
-	void Window::UpdateFocus()
-	{
-		if (s_editorWindow)
-			s_editorWindow->m_focused = s_editorWindow->GetWindowHandler() == GetFocus();
-
-		for (Window* window : s_windows)
-			window->m_focused = window->GetWindowHandler() == GetFocus();
+		return m_windowRectangle.left <= x && x <= m_windowRectangle.right &&
+			m_windowRectangle.top <= y && y <= m_windowRectangle.bottom;
 	}
 
 	void Window::Bind()
 	{
-		if (s_current != this)
+		if (!m_bound)
 		{
-			ThomasCore::GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
-			ThomasCore::GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
-			s_current = this;
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
+			m_bound = true;
 		}
+	}
+
+	void Window::UnBind()
+	{
+		m_bound = false;
 	}
 
 	bool Window::ChangeWindowShowState(int nCmdShow)
@@ -275,13 +168,13 @@ namespace thomas
 
 	bool Window::InitDxBuffers()
 	{
-		bool hr = utils::D3d::CreateBackBuffer(ThomasCore::GetDevice(), m_swapChain, m_dxBuffers.backBuffer, m_dxBuffers.backBufferSRV);
+		bool hr = utils::D3D::Instance()->CreateBackBuffer(m_swapChain, m_dxBuffers.backBuffer, m_dxBuffers.backBufferSRV);
 		if (hr)
 		{
-			hr = utils::D3d::CreateDepthStencilView(ThomasCore::GetDevice(), m_width, m_height, m_dxBuffers.depthStencilView, m_dxBuffers.depthStencilViewReadOnly, m_dxBuffers.depthBufferSRV);
+			hr = utils::D3D::Instance()->CreateDepthStencilView(m_width, m_height, m_dxBuffers.depthStencilView, m_dxBuffers.depthStencilViewReadOnly, m_dxBuffers.depthBufferSRV);
 			if (hr)
 			{
-				hr = m_dxBuffers.depthStencilState = utils::D3d::CreateDepthStencilState(D3D11_COMPARISON_LESS, true);
+				hr = m_dxBuffers.depthStencilState = utils::D3D::Instance()->CreateDepthStencilState(D3D11_COMPARISON_LESS, true);
 				if (hr)
 					return true;
 			}
@@ -290,16 +183,16 @@ namespace thomas
 		return false;	
 	}
 
-	bool Window::IsFocused()
+	bool Window::ShouldResize()
 	{
-		return m_focused;
+		return m_shouldResize;
 	}
 
 	void Window::Clear()
 	{
 		float clearColor[] = { 0.34375f, 0.34375f, 0.34375f, 1.0f };
-		ThomasCore::GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.backBuffer, clearColor);
-		ThomasCore::GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView, D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.backBuffer, clearColor);
+		utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView, D3D11_CLEAR_DEPTH, 1, 0);
 	}
 
 	void Window::SetCursor(const bool & visible)
@@ -316,7 +209,7 @@ namespace thomas
 		if (height > 0 && height <= GetVerticalResolution())
 		{
 			m_height = height;
-			return UpdateWindow();
+			return true;
 		}
 
 		return false;
@@ -327,7 +220,7 @@ namespace thomas
 		if (width > 0 && width <= GetHorizontalResolution())
 		{
 			m_width = width;
-			return UpdateWindow();
+			return true;
 		}
 
 		return false;
@@ -341,42 +234,14 @@ namespace thomas
 		return false;
 	}
 
-	Window * Window::GetEditorWindow()
-	{
-		return s_editorWindow;
-	}
-
-	Window * Window::GetWindow(int index)
-	{
-		if (index == -1 && s_editorWindow)
-			return s_editorWindow;
-		else if (index < s_windows.size())
-			return s_windows[index];
-
-		return nullptr;
-	}
-
-	Window * Window::GetWindow(HWND hWnd)
-	{
-		//Maybe define editor or something?
-		if (s_editorWindow && s_editorWindow->GetWindowHandler() == hWnd)
-			return s_editorWindow;
-
-		for (auto window : s_windows)
-			if (window->GetWindowHandler() == hWnd)
-				return window;
-
-		return nullptr;
-	}
-
-	std::vector<Window*> Window::GetWindows()
-	{
-		return s_windows;
-	}
-
 	IDXGISwapChain * Window::GetSwapChain() const
 	{
 		return m_swapChain;
+	}
+
+	Input* Window::GetInput()
+	{
+		return &m_input;
 	}
 
 	LONG Window::GetHeight() const
@@ -387,6 +252,11 @@ namespace thomas
 	LONG Window::GetWidth() const
 	{
 		return m_width;
+	}
+
+	RECT Window::GetBounds() const
+	{
+		return m_windowRectangle;
 	}
 
 	float Window::GetRealAspectRatio() const
@@ -415,61 +285,13 @@ namespace thomas
 		return desktop.bottom;
 	}
 
-	Window * Window::GetCurrentBound()
+	Window* Window::GetCurrentBound()
 	{
-		return s_current;
+		if (m_bound)
+			return this;
+
+		return nullptr;
 	}	
-
-	//Imgui related functionality for Gizmos
-	void Window::CloneGUIData()
-	{
-		ImDrawData* data = ImGui::GetDrawData();
-		ImDrawData* dst = new ImDrawData();
-		dst->Valid = data->Valid;
-		dst->CmdListsCount = data->CmdListsCount;
-		dst->TotalIdxCount = data->TotalIdxCount;
-		dst->TotalVtxCount = data->TotalVtxCount;
-
-		dst->CmdLists = (ImDrawList**)malloc(data->CmdListsCount * sizeof(ImDrawList*));
-		for (int i = 0; i < data->CmdListsCount; ++i)
-			dst->CmdLists[i] = data->CmdLists[i]->CloneOutput();
-
-		m_guiData = dst;
-	}
-
-	void Window::DeleteGUIData()
-	{
-		if (m_guiData)
-		{
-			for (int i = 0; i < m_guiData->CmdListsCount; ++i)
-				delete m_guiData->CmdLists[i];
-
-			m_guiData->Clear();
-			delete m_guiData;
-			m_guiData = nullptr;
-		}
-	}
-
-	void Window::BeginFrame()
-	{
-		ImGui_ImplDX11_NewFrame();
-		ImGuizmo::BeginFrame();
-	}
-
-	void Window::EndFrame(bool copyGui)
-	{
-		if (s_editorWindow)
-		{
-			if (copyGui)
-			{
-				ImGui::Render();
-				s_editorWindow->DeleteGUIData();
-				s_editorWindow->CloneGUIData();
-			}
-			else
-				ImGui::EndFrame();	
-		}
-	}
 
 	//Windows window events function
 	LRESULT CALLBACK Window::EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -477,8 +299,7 @@ namespace thomas
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
 			return true;
 
-		Window* window = GetWindow(hWnd);
-		bool isEditor = s_editorWindow == window;
+		Window* window = WindowManager::Instance()->GetWindow(hWnd);
 
 		//If one case is hit the code will execute everything down until a break;
 		switch (message)
@@ -490,21 +311,18 @@ namespace thomas
 		}
 		break;
 		case WM_SETFOCUS:
+			break;
 		case WM_KILLFOCUS:
-			if (window->IsFocused())
-				Input::ProcessGamePad(message, wParam, lParam);
 			break;
 		case WM_ACTIVATEAPP:
-			if (window->IsFocused()) {
-				Input::ProcessKeyboard(message, wParam, lParam);
-				Input::ProcessMouse(message, wParam, lParam, hWnd);
-			}
+				window->m_input.ProcessKeyboard(message, wParam, lParam);
+				window->m_input.ProcessMouse(message, wParam, lParam, hWnd);
 
 			break;
 		case WM_RBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 		case WM_MBUTTONDOWN:
-			SetFocus(hWnd);
+			SetFocus(hWnd);	// Set system focus on click (not to be confused with window hower focus)
 		case WM_INPUT:
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONUP:
@@ -514,15 +332,12 @@ namespace thomas
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
-			if (window->IsFocused())
-				Input::ProcessMouse(message, wParam, lParam, hWnd);
-			break;
+			window->m_input.ProcessMouse(message, wParam, lParam, hWnd);
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			if (window->IsFocused())
-				Input::ProcessKeyboard(message, wParam, lParam);
+			window->m_input.ProcessKeyboard(message, wParam, lParam);
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);

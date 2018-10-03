@@ -1,6 +1,5 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
-#include <thomas/AutoProfile.h>
 #pragma managed
 
 
@@ -9,7 +8,6 @@
 #include "../../GameObject.h"
 void ThomasEngine::Rigidbody::Awake()
 {
-	PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 	Collider^ collider = gameObject->GetComponent<Collider^>();
 	if (collider)
 	{
@@ -26,22 +24,4 @@ void ThomasEngine::Rigidbody::OnDestroy()
 		c->attachedRigidbody = nullptr;
 	}
 	Component::OnDestroy();
-}
-
-ThomasEngine::GameObject^ ThomasEngine::Rigidbody::GetTargetCollider()
-{
-	PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
-	if (this != nullptr)
-	{
-		auto collider = ((thomas::object::component::Rigidbody*)nativePtr)->GetTargetCollider();
-
-		if (collider != nullptr)
-		{
-			GameObject^ target = (GameObject^)Object::Find(Utility::Convert(collider->m_guid));
-			((thomas::object::component::Rigidbody*)nativePtr)->ClearTargetCollider();
-			return target;
-		}
-	}
-
-	return nullptr;
 }

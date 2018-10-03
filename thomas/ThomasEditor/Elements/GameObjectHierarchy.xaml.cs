@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using ThomasEditor.Inspectors;
+using ThomasEditor.utils;
 using ThomasEditor.Testing;
 using ThomasEngine;
 namespace ThomasEditor
@@ -21,6 +24,7 @@ namespace ThomasEditor
 
         bool _isDragging;
         bool wasUnselected = false;
+        GameObject m_copiedObject; //??correct code convention?
         public static GameObjectHierarchy instance;
         public GameObjectHierarchy()
         {
@@ -158,6 +162,7 @@ namespace ThomasEditor
                         if (newItem.transform.parent == null)
                         {
                             TreeViewItem node = new TreeViewItem { DataContext = newItem };
+                            node.IsSelected = true;
                             //node.MouseRightButtonUp += Node_MouseRightButtonUp;
                             node.SetBinding(TreeViewItem.HeaderProperty, new Binding("Name"));
                             //node.Padding = new Thickness(0, 0, 0, 2);
@@ -195,7 +200,7 @@ namespace ThomasEditor
         {
             foreach (TreeViewItem node in nodes)
             {
-                if (node.DataContext == item)
+                if ((ThomasEngine.Object)node.DataContext == item)
                 {
                     nodes.Remove(node);
                     break;
@@ -372,12 +377,51 @@ namespace ThomasEditor
 
         private void MenuItem_DeleteGameObject(object sender, RoutedEventArgs e)
         {
-            e.Handled = true;
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+            if(item != null)
+            //Loop through selected objects
+                for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
+                {
+                    GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
+
+                    //Unselect selected object
+                    ThomasWrapper.Selection.UnSelectGameObject(gObj);
+
+                    //Destroy
+                    gObj.Destroy();
+                }
         }
-        private void MenuItem_RenameGameObject(object sender, RoutedEventArgs e)
+
+        private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.Handled = true;
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }   
         }
+
+        private void Hierarchy_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = hierarchy.SelectedItem as TreeViewItem;
+
+            if (treeViewItem != null)
+            {
+                treeViewItem.Focus();
+                hiearchyContextMenu.DataContext = true;
+                //e.Handled = true;
+            }
+            else
+            {
+                TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+                if (item != null)
+                    item.IsSelected = false;
+                hiearchyContextMenu.DataContext = false;
+            }
+        }
+
         private void MenuItem_SaveAsPrefab(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
@@ -404,5 +448,156 @@ namespace ThomasEditor
             if(item != null)
                 item.IsSelected = true;
         }
+
+        private void MenuItem_CopyGameObject(object sender, RoutedEventArgs e)
+        {
+            Debug.Log("Entered copy function..");
+
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                Debug.Log("Copying object..");
+                m_copiedObject = (GameObject)item.DataContext;
+
+                if(m_copiedObject)
+                {
+                    Debug.Log("GameObject successfully copied.");
+                }
+                return;
+            }
+        }
+
+        private void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
+        {
+            if(m_copiedObject)
+            {
+                GameObject.Instantiate(m_copiedObject);
+
+                Debug.Log("Pasted object.");
+                return;
+            }
+        }
+
+        private void MenuItem_DuplicateGameObject(object sender, RoutedEventArgs e)
+        {
+            MenuItem_CopyGameObject(sender, e);
+            MenuItem_PasteGameObject(sender, e);
+        }
+
+        //Can only click copy when an object is selected
+        private void CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+
+            if (item != null)
+            {
+                e.CanExecute = true;
+                return;
+            }
+        }
+
+        //Can only paste when an object has been copied
+        private void PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (m_copiedObject)
+            {
+                e.CanExecute = true;
+            }
+        }
+
+        public GameObject GetCopy()
+        {
+            return m_copiedObject;
+        }
+
+        public void SetCopy(GameObject copiedObject)
+        {
+            m_copiedObject = copiedObject;
+        }
+
+        public TreeViewItem GetSelection()
+        {
+            return hierarchy.SelectedItem as TreeViewItem;
+        }
+
+        private void AddNewCubePrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewQuadPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewPlanePrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewCylinderPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewCapsulePrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("newCamera");
+            x.AddComponent<Camera>();
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewPointLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("newPointLight");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.POINT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewSpotLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("newSpotLight");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.SPOT;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewDirectionalLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("newDirectionalLight");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.DIRECTIONAL;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewAreaLightPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("newAreaLight");
+            x.AddComponent<LightComponent>();
+            x.GetComponent<LightComponent>().Type = LightComponent.LIGHT_TYPES.AREA;
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddEmptyGameObject(object sender, RoutedEventArgs e)
+        {
+            var x = new GameObject("newEmptyGameObject");
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
     }
 }

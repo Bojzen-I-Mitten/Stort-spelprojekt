@@ -38,18 +38,40 @@ namespace ThomasEngine
 			awakened = true;
 			return;
 		}
-		else if (!enabled) {
-			enabled = true;
+		else if (!enabled) {	
+			initialized = true;
 			return;
 		}
-		else {
+		else if (!m_firstEnable && enabled)
+		{
+			m_firstEnable = true;
+			OnEnable();
+			return;
+		}
+		else if(!m_started) {
+			m_started = true;
 			Start();
 			initialized = true;
 			return;
 		}
-
+		initialized = true;
 	}
 
+	bool Component::enabled::get() { return m_enabled; }
+	void Component::enabled::set(bool value) {
+		if (m_enabled != value) {
+			m_enabled = value;
+			if (m_firstEnable && m_gameObject->GetActive()) {
+				if (value == true) {
+					OnEnable();
+					initialized = false;
+				}
+				else
+					OnDisable();
+			}else
+				initialized = false;
+		}
+	}
 	void Component::LoadExternalComponents()
 	{
 		array<String^>^ dlls = Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly);
@@ -88,10 +110,6 @@ namespace ThomasEngine
 		((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.push_back(((thomas::object::component::Component*)nativePtr));
 	}
 
-	void Component::OnCollisionEnter(GameObject ^ collider)
-	{
-		((thomas::object::component::Component*)nativePtr)->OnCollisionEnter((thomas::object::GameObject*)collider->nativePtr);
-	}
 
 	void Component::Destroy()
 	{

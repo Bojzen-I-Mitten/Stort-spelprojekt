@@ -38,11 +38,11 @@ public class Ball : ScriptComponent
     }
 
 
-    public override void OnCollisionEnter(GameObject collider)
+    public override void OnCollisionEnter(Collider collider)
     {
         if (rb.enabled)
         {
-            playerThatHasBall = collider;
+            playerThatHasBall = collider.gameObject;
             rb.enabled = false;
             transform.parent = collider.transform;
             transform.localPosition = new Vector3(0, 2, 0);

@@ -17,7 +17,9 @@ namespace thomas
 		GameObject::~GameObject()
 		{
 			this->m_components.clear();
-			editor::EditorCamera::UnselectObject(this);
+#ifdef _EDITOR
+			editor::EditorCamera::Instance()->UnselectObject(this);
+#endif
 			Object::Destroy(this);
 		}
 

@@ -19,25 +19,14 @@
                             <MenuItem Header="Folder" Click="Menu_CreateFolder"/>
                             <Separator/>
                             <MenuItem Header="C# Script" Click="Menu_CreateCSharpScript"/>
-                            <MenuItem Header="Shader" Click="Menu_CreateShader"/>
                             <Separator/>
-                            <MenuItem Header="Scene" Click="Menu_CreateScene"/>
                             <MenuItem Header="Prefab" Click="Menu_CreatePrefab"/>
                             <Separator/>
                             <MenuItem Header="Material" Click="Menu_CreateMaterial"/>
-                            <Separator/>
-                            <MenuItem Header="Curve" Click="Menu_CreateCurve"/>
                         </MenuItem>
-                        <MenuItem Header="Show in Explorer" Click="Menu_ShowInExplorer" IsEnabled="false"/>
-                        <MenuItem Header="Open" IsEnabled="{Binding}" Click="Menu_OpenAsset" />
+                        <MenuItem Header="Open" x:Name="contextMenuOpenItem" IsEnabled="{Binding}" Click="Menu_OpenAsset" />
                         <MenuItem Header="Delete" IsEnabled="{Binding}"  Click="Menu_DeleteAsset"/>
                         <MenuItem Header="Rename" IsEnabled="{Binding}" Click="MenuItem_Rename"/>
-                        <Separator/>
-                        <MenuItem Header="Import New Asset..."  Click="Menu_ImportAsset" IsEnabled="false"/>
-                        <Separator/>
-                        <MenuItem Header="Refresh" IsEnabled="{Binding}" Click="Menu_Refresh" />
-                        <MenuItem Header="Reimport" IsEnabled="{Binding}" Click="Menu_Reimport"/>
-                        <MenuItem Header="Reimport All" Click="Menu_ReimportAll" IsEnabled="false"/>
                         <Separator/>
                         <MenuItem Header="Open C# Project" Click="Menu_OpenCSharpProject" IsEnabled="true"/>
                     </ContextMenu>
