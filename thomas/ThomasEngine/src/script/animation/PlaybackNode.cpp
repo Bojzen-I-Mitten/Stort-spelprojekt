@@ -15,6 +15,9 @@ namespace ThomasEngine
 	namespace Script
 	{
 		PlaybackNode::PlaybackNode(Model ^ model, Animation^ anim)
+		 :	PlaybackNode(model, anim, false)
+		{		}
+		PlaybackNode::PlaybackNode(Model ^ model, Animation^ anim, bool loop)
 		{
 			using namespace thomas::graphics::animation;
 
@@ -28,7 +31,7 @@ namespace ThomasEngine
 
 			AnimationData * data = anim->Native()->GetAnimation();
 
-			std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, data->m_duration, PlayType::Once));
+			std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once));
 			m_node = new AnimPlayback(*skel, playback, *data);
 		}
 		PlaybackNode::~PlaybackNode()

@@ -80,7 +80,7 @@ namespace ThomasEngine
 	}
 	thomas::graphics::animation::IBlendTree* RenderSkinnedComponent::BlendTree::get()
 	{
-		return (thomas::graphics::animation::IBlendTree*)nativePtr;
+		return Native->GetBlendTree();
 	}
 
 
@@ -109,7 +109,7 @@ namespace ThomasEngine
 
 	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, [Out] uint32_t%  boneIndex)
 	{
-		uint32_t ind;
+		unsigned int ind;
 		bool result =  BlendTree->getBoneIndex(boneHash, ind);
 		boneIndex = ind;
 		return result;

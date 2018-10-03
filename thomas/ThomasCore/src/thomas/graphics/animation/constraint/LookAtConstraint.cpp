@@ -1,5 +1,5 @@
 #include "LookAtConstraint.h"
-
+#include "../data/Skeleton.h"
 
 namespace thomas {
 	namespace graphics {
@@ -61,8 +61,9 @@ namespace thomas {
 						rotation = math::getRotationTo(forward, dir);
 						break;
 				}
+				math::Matrix relative = objectPose[boneInd] * objectPose[skel.getBone(boneInd)._parentIndex].Invert();
 				// Apply
-				objectPose[boneInd] *= math::Matrix::CreateFromQuaternion(rotation);
+				objectPose[boneInd] = relative * math::Matrix::CreateFromQuaternion(rotation) * objectPose[skel.getBone(boneInd)._parentIndex];
 			}
 		}
 	}

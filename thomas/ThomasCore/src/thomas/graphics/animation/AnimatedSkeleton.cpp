@@ -41,6 +41,7 @@ namespace thomas {
 				_root->calcFrame(_frame_tmp.get());
 				// Update skin transforms
 				_pose[0] = (_frame_tmp.get())[0].createTransform() * _ref.getRoot();				//	Update root pose
+				applyConstraint(0);
 				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];									//	Update root skin
 				for (uint32_t i = 1; i < boneCount(); i++)
 				{
@@ -53,8 +54,10 @@ namespace thomas {
 			void AnimatedSkeleton::applyConstraint(uint32_t index)
 			{
 				BoneConstraint** ptr = (m_constraint.get() + index)->m_list;
-				while (*ptr++ != NULL)
+				while (*ptr != NULL) {
 					(*ptr)->execute(_ref, _pose.data(), index);
+					ptr++;
+				}
 			}
 			/* Freeze the current animation */
 			void AnimatedSkeleton::stopAnimation()

@@ -20,6 +20,7 @@ namespace ThomasEngine
 		public:
 
 			PlaybackNode(Model ^ model, Animation^ anim);
+			PlaybackNode(Model ^ model, Animation ^ anim, bool loop);
 			~PlaybackNode();
 
 

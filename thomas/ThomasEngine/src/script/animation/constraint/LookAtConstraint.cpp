@@ -41,9 +41,9 @@ namespace ThomasEngine
 		}
 		void LookAtConstraint::apply(RenderSkinnedComponent ^ skinn, uint32_t boneIndex)
 		{
-			if(!skinn)
+			if (!skinn)
 				Debug::LogWarning("Warning! Skinn parameter was null");
-			else if (skinn->get()->GetBlendTree()->boneCount() >= boneIndex)
+			else if (skinn->get()->GetBlendTree()->boneCount() < boneIndex)
 				Debug::LogWarning("Warning! Bone does not exist (out of bounds) - LookAtConstraint can't be applied to object: " + skinn->gameObject->Name);
 			else
 				apply(skinn->get(), boneIndex);

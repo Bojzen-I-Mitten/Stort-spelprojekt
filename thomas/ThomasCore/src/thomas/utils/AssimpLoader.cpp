@@ -137,8 +137,7 @@ namespace thomas
 
 			if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 			{
-				throw std::exception(importer.GetErrorString());
-				//LOG("ERROR::ASSIMP " << importer.GetErrorString());
+				LOG("ERROR::ASSIMP " << importer.GetErrorString());
 				return NULL;
 			}
 			return scene;

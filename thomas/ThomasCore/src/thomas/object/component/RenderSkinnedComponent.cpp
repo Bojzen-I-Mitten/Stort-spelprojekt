@@ -18,7 +18,7 @@ namespace thomas
 				: m_skeleton()
 			{
 				thomas::resource::shaderproperty::ShaderPropertyStatic prop;
-				prop.m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixArray;
+				prop.m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
 				prop.m_dataSize = 0;
 				prop.m_data = NULL;
 				prop.m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
@@ -41,8 +41,16 @@ namespace thomas
 
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
 				RenderComponent::SetMaterial(meshIndex, material);
-				if (material && material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, m_skinInfo->m_effect_id))
+				uint32_t effectIndex;
+				if (material && material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, effectIndex)) {
+					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
+					m_skinInfo->m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
 					LOG("Warning! Material applied to skinned render component does not use any bone information.");
+				}
+				else {
+					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixArray;
+					m_skinInfo->m_effect_id = effectIndex;
+				}
 			}
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
