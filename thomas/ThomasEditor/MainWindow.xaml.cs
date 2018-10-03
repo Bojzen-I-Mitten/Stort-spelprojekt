@@ -59,6 +59,7 @@ namespace ThomasEditor
             else if (Properties.Settings.Default.latestProjectPath != "")
             {
                 OpenProject(Properties.Settings.Default.latestProjectPath);
+            }
             else
             {
                 this.IsEnabled = false;

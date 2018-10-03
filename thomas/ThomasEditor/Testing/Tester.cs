@@ -25,7 +25,6 @@ namespace ThomasEditor.Testing
         private int sessionDuration;
         private MainWindow editor;
         private Stopwatch stopwatch;
-        private string tempStringProjectPath;
         public Tester(MainWindow editor)
         {
             sessionDuration = -1;
@@ -44,8 +43,8 @@ namespace ThomasEditor.Testing
                 {
                     if (o.Filename.Length > 0)
                     {
+
                         editor.OpenProject(o.Filename);
-                        tempStringProjectPath = o.Filename;
                     }
                 }
 

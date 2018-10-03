@@ -18,7 +18,6 @@ namespace thomas
 
 	};
 }
-
 #ifdef BENCHMARK
 #define PROFILE(name, type) thomas::AutoProfile temp = thomas::AutoProfile(name, type);
 #else
