@@ -1,16 +1,14 @@
 #include "Editor.h"
 #include "EditorCamera.h"
 
-namespace thomas {
-	namespace editor {
-
-
-
-		Editor & Editor::GetEditor()
+namespace thomas 
+{
+	namespace editor 
+	{
+		Editor& Editor::GetEditor()
 		{
-			/* Singleton*/
-			static Editor SYS_EDITOR;
-			return SYS_EDITOR;
+			static Editor editor;
+			return editor;
 		}
 
 		void Editor::Init()
@@ -27,15 +25,15 @@ namespace thomas {
 		{
 		}
 
-		EditorCamera * Editor::Camera()
+		EditorCamera* Editor::Camera()
 		{
 			// Editor should own the camera instance
-			return EditorCamera::GetEditorCamera();
+			return EditorCamera::Instance();
 		}
 
 		void Editor::ClearEditorState()
 		{
-			EditorCamera::GetEditorCamera()->UnselectObjects();
+			EditorCamera::Instance()->UnselectObjects();
 		}
 
 	}

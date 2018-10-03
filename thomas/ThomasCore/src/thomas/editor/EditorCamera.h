@@ -13,8 +13,10 @@ namespace thomas
 	{
 		class Material;
 	}
-	namespace object {
-		namespace component {
+	namespace object 
+	{
+		namespace component 
+		{
 			class Camera;
 		}
 	}

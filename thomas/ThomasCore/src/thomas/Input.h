@@ -214,7 +214,6 @@ namespace thomas
 	public:
 		bool Init();
 		void Update();
-		void Reset();
 		void ProcessKeyboard(UINT message, WPARAM wParam, LPARAM lParam);
 		void ProcessMouse(UINT message, WPARAM wParam, LPARAM lParam, HWND handle);
 		void ProcessGamePad(UINT message, WPARAM wParam, LPARAM lParam);
