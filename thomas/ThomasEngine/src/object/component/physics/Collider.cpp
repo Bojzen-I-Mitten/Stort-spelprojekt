@@ -18,6 +18,11 @@ namespace ThomasEngine
 	}
 	Collider::~Collider() 
 	{
+		
+	}
+
+	void Collider::OnDestroy()
+	{
 		gch.Free();
 	}
 

@@ -219,6 +219,7 @@ namespace thomas
 		static void ProcessGamePad(UINT message, WPARAM wParam, LPARAM lParam);
 		static void ResetScrollWheelValue();
 		static void Vibrate(float left, float right, float time = 0.f);
+		static void Clear();
 
 	public:
 		static void SetMouseMode(MouseMode mode);

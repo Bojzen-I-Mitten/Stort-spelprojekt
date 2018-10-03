@@ -49,11 +49,12 @@ namespace ThomasEditor
 
         private void ResetTreeView()
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 hierarchy.Items.Clear();
-                foreach (GameObject gObj in Scene.CurrentScene.GameObjects)
+                for (int i = 0; i < Scene.CurrentScene.GameObjects.Count; i++)
                 {
+                    GameObject gObj = Scene.CurrentScene.GameObjects[i];
                     if (gObj.transform.parent == null)
                     {
                         TreeViewItem node = new TreeViewItem { DataContext = gObj };
@@ -69,6 +70,7 @@ namespace ThomasEditor
 
         private void Transform_OnParentChanged(ThomasEngine.Transform child, ThomasEngine.Transform oldParent, ThomasEngine.Transform newParent)
         {
+
             if (oldParent == newParent || !child.gameObject)
                 return;
 
@@ -256,30 +258,35 @@ namespace ThomasEditor
 
         private void SelectedGameObjectChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            ThomasWrapper.Selection.Ref.CollectionChanged -= SceneSelectedGameObjectChanged;
-            if (!wasUnselected)
-                AssetBrowser.instance.UnselectItem();
-            wasUnselected = false;
-            ItemContainerGenerator gen = hierarchy.ItemContainerGenerator;
-
-            if (hierarchy.SelectedItem != null)
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
-                TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
-                if (item != null)
+                ThomasWrapper.Selection.Ref.CollectionChanged -= SceneSelectedGameObjectChanged;
+                if (!wasUnselected)
+                    AssetBrowser.instance.UnselectItem();
+                wasUnselected = false;
+                ItemContainerGenerator gen = hierarchy.ItemContainerGenerator;
+
+                if (hierarchy.SelectedItem != null)
                 {
-                    Inspector.instance.SelectedObject = (GameObject)item.DataContext;
-                    
-                    if (!ThomasWrapper.Selection.Contain((GameObject)item.DataContext))
-                        ThomasWrapper.Selection.SelectGameObject((GameObject)item.DataContext);
-                    hiearchyContextMenu.DataContext = true;
-                }
+                    TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
+                    if (item != null)
+                    {
+                        Inspector.instance.SelectedObject = (GameObject)item.DataContext;
 
-            }else
-            {
-                if(Inspector.instance.SelectedObject is GameObject)
-                    Inspector.instance.SelectedObject = null;
-            }
-            ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
+                        if (!ThomasWrapper.Selection.Contain((GameObject)item.DataContext))
+                            ThomasWrapper.Selection.SelectGameObject((GameObject)item.DataContext);
+                        hiearchyContextMenu.DataContext = true;
+                    }
+
+                }
+                else
+                {
+                    if (Inspector.instance.SelectedObject is GameObject)
+                        Inspector.instance.SelectedObject = null;
+                }
+                ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
+            }));
+            
         }
 
         private void hierarchy_DragOver(object sender, DragEventArgs e)
@@ -332,7 +339,7 @@ namespace ThomasEditor
                         GameObject child = source.DataContext as GameObject;
                         if (!parent.transform.IsChildOf(child.transform))
                         {
-                            child.transform.parent = parent.transform;
+                            child.transform.SetParent(parent.transform, true);
                         }
                     }
                     else if (source != null && target == null)
@@ -340,7 +347,7 @@ namespace ThomasEditor
                         GameObject gameObject = source.DataContext as GameObject;
                         if(gameObject.inScene)
                         {
-                            gameObject.transform.parent = null;
+                            gameObject.transform.SetParent(null, true);
                         }
                         else
                         {

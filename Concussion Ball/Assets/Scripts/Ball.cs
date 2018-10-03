@@ -1,13 +1,12 @@
+using LiteNetLib;
+using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
-public class Ball : ScriptComponent
+public class Ball : NetworkComponent
 {
-
     Rigidbody rb;
-    public float force { get; set; } = 5.0f;
-    GameObject playerThatHasBall;
-    public float currentForce = 0;
-    private ThrowStrengthVisualizer visualizer;
+    bool pickedUp = false;
+
     public override void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
@@ -16,37 +15,61 @@ public class Ball : ScriptComponent
 
     public override void Update()
     {
-        if (true)
+        if (transform.parent == null)
         {
-            if (Input.GetKey(Input.Keys.LeftControl) && !rb.enabled)
-            {
-                currentForce += force * Time.DeltaTime;
-               // visualizer.SetStrength(currentForce);
-            }
-
-            if (Input.GetKeyUp(Input.Keys.LeftControl) && !rb.enabled)
-            {
-                transform.parent = null;
-                rb.enabled = true;
-                rb.AddForce(playerThatHasBall.transform.forward * currentForce, Rigidbody.ForceMode.Impulse);
-                playerThatHasBall = null;
-                currentForce = 0.0f;
-               // visualizer.SetStrength(0);
-            }
+            Drop();
         }
-
+            
     }
 
-
-    public override void OnCollisionEnter(Collider collider)
+    public void Drop()
     {
-        if (rb.enabled)
+        if (pickedUp)
         {
-            playerThatHasBall = collider.gameObject;
-            rb.enabled = false;
-            transform.parent = collider.transform;
-            transform.localPosition = new Vector3(0, 2, 0);
+            rb.enabled = true;
+            transform.parent = null;
+            pickedUp = false;
         }
+        
+    }
 
+    public void Throw(Vector3 force)
+    {
+        if (pickedUp)
+        {
+            Drop();
+            transform.position = transform.position + Vector3.Normalize(force) * 2;
+            rb.AddForce(force, Rigidbody.ForceMode.Impulse);
+        }
+    }
+    
+    public void Pickup(GameObject gobj, Transform hand)
+    {
+        rb.enabled = false;
+        transform.parent = hand;
+        transform.localPosition = Vector3.Zero;
+        pickedUp = true;
+    }
+
+    public override void OnLostOwnership()
+    {
+        rb.enabled = false;
+        pickedUp = true;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        if(isOwner)
+        {
+            reader.GetBool();
+            return;
+        }
+        rb.enabled = reader.GetBool();
+    }
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        writer.Put(rb.enabled);
+        return true;
     }
 }

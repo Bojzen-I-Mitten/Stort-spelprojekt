@@ -350,6 +350,12 @@ namespace thomas
 		}		
 	}
 
+	void Input::Clear()
+	{
+		s_keyboard->Reset();
+	
+	}
+
 	//Keyboard
 	bool Input::GetKeyDown(Keys key)
 	{
