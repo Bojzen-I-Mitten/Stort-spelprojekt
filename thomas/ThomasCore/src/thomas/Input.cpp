@@ -59,20 +59,6 @@ namespace thomas
 		}
 	}
 
-	void Input::Reset()
-	{
-		m_keyboardTracker.Reset();
-		m_mouseTracker.Reset();
-		m_gamePadTracker.Reset();
-
-		//Set mouse mode position
-		m_mousePosition = math::Vector2((float)m_mouseState.x, (float)m_mouseState.y);
-		
-		// Update absolute position (if not in relative mode)
-		if (m_mouseState.positionMode == Mouse::Mode::MODE_ABSOLUTE)
-			m_absolutePosition = m_mousePosition;
-	}
-
 	void Input::ProcessKeyboard(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if (m_initialized)

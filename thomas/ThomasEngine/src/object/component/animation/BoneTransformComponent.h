@@ -36,6 +36,9 @@ namespace ThomasEngine
 				System::String^ get();
 				void set(System::String^ value);
 			}
+
+			void Awake() override;
+
 		private:
 			property thomas::object::component::BoneTransformComponent* Native
 			{

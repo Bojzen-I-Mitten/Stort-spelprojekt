@@ -15,49 +15,55 @@ namespace ThomasEngine
 	public:
 		Joint() : Component(new thomas::object::component::Joint()) {}
 	private:
-		Rigidbody^ m_attachedRigidbody;
+		Rigidbody^ m_connectedRigidbody;
 	public:
-		property Rigidbody^ AttachedRigidbody
+		property Rigidbody^ ConnectedRigidbody
 		{
-			Rigidbody^ get() { return m_attachedRigidbody; }
+			Rigidbody^ get() { return m_connectedRigidbody; }
 			void set(Rigidbody^ body) 
 			{
-				m_attachedRigidbody = body;
+				m_connectedRigidbody = body;
 				if (body)
-					((thomas::object::component::Joint*)nativePtr)->SetRigidBody((thomas::object::component::Rigidbody*)body->nativePtr);
+					((thomas::object::component::Joint*)nativePtr)->SetConnectedBody((thomas::object::component::Rigidbody*)body->nativePtr);
 				else
-					((thomas::object::component::Joint*)nativePtr)->SetRigidBody(nullptr);
+					((thomas::object::component::Joint*)nativePtr)->SetConnectedBody(nullptr);
 			}
 		}
 
 		property Vector3 Anchor
 		{
-			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformOrigin(true)); }
-			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformOrigin(Utility::Convert(origin), true); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetFrameAAnchor()); }
+			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetFrameAAnchor(Utility::Convert(origin)); }
 		}
 
 		property Vector3 ConnectedAnchor
 		{
-			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformOrigin(false)); }
-			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformOrigin(Utility::Convert(origin), false); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetFrameBAnchor()); }
+			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetFrameBAnchor(Utility::Convert(origin)); }
 		}
 
 		property Vector3 Axis
 		{
-			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(true)); }
-			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), true); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetFrameAAxis()); }
+			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetFrameAAxis(Utility::Convert(rotation)); }
 		}
 
 		property Vector3 SwingAxis
 		{
-			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(false)); }
-			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), false); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetFrameBAxis()); }
+			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetFrameBAxis(Utility::Convert(rotation)); }
 		}
 
-		property Vector3 TwistSpin
+		property float TwistAngle
 		{
-			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformTwistSpin()); }
-			void set(Vector3 twistSpin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformTwistSpin(Utility::Convert(twistSpin)); }
+			float get(){ return ((thomas::object::component::Joint*)nativePtr)->GetTwist();}
+			void set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetTwist(value); }
+		}
+
+		property float SwingAngle
+		{
+			float get() { return ((thomas::object::component::Joint*)nativePtr)->GetSwing(); }
+			void set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetSwing(value); }
 		}
 	};
 

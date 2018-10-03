@@ -83,10 +83,13 @@ namespace ThomasEngine
 
 	void RenderSkinnedComponent::applyAnimation()
 	{
+		auto blendTree = ((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree();
+		if (!blendTree)
+			return;
 		if (m_anim == nullptr)
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->clearBlendTree();
+			blendTree->clearBlendTree();
 		else if (m_model != nullptr) {
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(m_anim->get());
+			blendTree->playSingle(m_anim->get());
 		}
 			
 	}

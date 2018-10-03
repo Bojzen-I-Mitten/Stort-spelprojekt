@@ -29,7 +29,6 @@
     <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Joint.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Ragdoll.cpp" />
-    <ClCompile Include="src\thomas\System.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />

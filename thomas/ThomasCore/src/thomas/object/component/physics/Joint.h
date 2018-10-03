@@ -1,8 +1,6 @@
 #pragma once
 #include "../Component.h"
 #include "../../../Physics.h"
-#include "Rigidbody.h"
-#include "../../GameObject.h"
 #include "../../../utils/Math.h"
 
 namespace thomas
@@ -11,6 +9,7 @@ namespace thomas
 	{
 		namespace component
 		{
+			class Rigidbody;
 			class Joint : public Component
 			{
 			public:
@@ -18,16 +17,28 @@ namespace thomas
 				~Joint();
 
 			public:
-				void SetRigidBody(btRigidBody * secondbody);
-				void SetTransformOrigin(math::Vector3 Origin, bool firstBody);
-				void SetTransformRotation(math::Vector3 Rotation, bool firstBody);
-				void SetTransformTwistSpin(math::Vector3 twistSpin);
+				void SetConnectedBody(Rigidbody* target);
+
+				void SetFrameAAnchor(math::Vector3 value);
+				void SetFrameAAxis(math::Vector3 value);
+
+				void SetFrameBAnchor(math::Vector3 value);
+				void SetFrameBAxis(math::Vector3 value);
+				void SetSwing(float value);
+				void SetTwist(float value);
 
 			public:
-				btRigidBody * GetRigidBody();
-				math::Vector3 GetTransformOrigin(bool firstBody);
-				math::Vector3 GetTransformRotation(bool firstBody);
-				math::Vector3 GetTransformTwistSpin();
+				Rigidbody* GetConnectedBody();
+
+				math::Vector3 GetFrameAAnchor();
+				math::Vector3 GetFrameAAxis();
+				
+				math::Vector3 GetFrameBAnchor();
+				math::Vector3 GetFrameBAxis();
+				float GetSwing();
+				float GetTwist();
+				
+			
 
 			public:
 				virtual void Update() override;
@@ -35,16 +46,17 @@ namespace thomas
 				virtual void OnDisable() override;
 
 			private:
-				btConeTwistConstraint* CreateConstraints(btRigidBody * secondbody, btTransform & firstTransform, 
-														 btTransform & secondTransform, math::Vector3 swingtwist);
-			
+				btConeTwistConstraint* CreateConstraints();
+				void UpdateLimits();
 			private:
-				math::Vector3 Savedrotation[2];
-				btConeTwistConstraint* m_coneTwistConstraint;
-				btRigidBody * m_secondBody;
-				btTransform m_current;
-				btTransform m_other;
-				math::Vector3 m_twistSpin;
+				btConeTwistConstraint* m_coneTwistConstraint = nullptr;
+				Rigidbody* m_connectedBody;
+				btTransform m_frameA;
+				btTransform m_frameB;
+				math::Vector3 m_frameAAxis;
+				math::Vector3 m_frameBAxis;
+				float m_swing;
+				float m_twist;
 			};
 		}
 	}

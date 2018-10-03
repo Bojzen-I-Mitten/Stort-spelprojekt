@@ -172,7 +172,7 @@ namespace ThomasEngine {
 					
 			}finally
 			{
-				if (Window::GetEditorWindow() && Window::GetEditorWindow()->Initialized())
+				if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 				{
 					thomas::object::component::RenderComponent::ClearList();
 					RenderFinished->WaitOne();
@@ -216,7 +216,6 @@ namespace ThomasEngine {
 	{
 		Debug::UpdateCoreLog();
 		if (editor::EditorCamera::Instance()->HasSelectionChanged())
-		/*if (thomas::editor::EditorCamera::GetEditorCamera()->HasSelectionChanged())*/
 			s_Selection->UpdateSelectedObjects();
 	}
 

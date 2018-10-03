@@ -173,7 +173,6 @@
     <ClInclude Include="src\object\component\physics\Collider.h" />
     <ClInclude Include="src\object\component\physics\Joint.h" />
     <ClInclude Include="src\object\component\physics\MeshCollider.h" />
-    <ClInclude Include="src\object\component\physics\.h" />
     <ClInclude Include="src\object\component\physics\Rigidbody.h" />
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />

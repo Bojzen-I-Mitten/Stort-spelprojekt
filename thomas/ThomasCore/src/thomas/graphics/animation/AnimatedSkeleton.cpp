@@ -39,8 +39,8 @@ namespace thomas {
 				//Update animation tree
 				// Update skin transforms
 				_pose[0] = _root->calcLocalTransform(0) * _ref.getRoot();				//	Update root pose
-				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
 				applyConstraint(0);
+				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
 				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
