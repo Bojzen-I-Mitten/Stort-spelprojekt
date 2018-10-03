@@ -1,6 +1,6 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
+#include <ParticleDataHeader.hlsl>
 
-#define UINT_MAX_AS_FLOAT 4294967296.0f
 
 struct InitParticlesBuffer
 {
@@ -33,24 +33,6 @@ struct InitParticlesBuffer
 	uint pad4;
 };
 
-struct ParticleStruct
-{
-    float3 position;
-    float gravity;
-
-    float3 direction;
-    float speed;
-
-    float endSpeed;
-    float size;
-    float endSize;
-    float lifeTime;
-
-    float lifeTimeLeft;
-    float rotationSpeed;
-    float rotation;
-    float pad;
-};
 
 StructuredBuffer<InitParticlesBuffer> initparticles;
 
@@ -60,18 +42,6 @@ ConsumeStructuredBuffer<uint> deadlist;
 AppendStructuredBuffer<uint> alivelist;
 
 
-uint RandMarsaglia(uint rng_state)
-{
-	rng_state ^= (rng_state << 13);
-	rng_state ^= (rng_state >> 17);
-	rng_state ^= (rng_state << 5);
-	return rng_state;
-}
-
-float RandClamp(uint s)//returns a value between 0 and 1
-{
-    return s / UINT_MAX_AS_FLOAT;
-}
 
 [numthreads(128, 1, 1)]
 void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)

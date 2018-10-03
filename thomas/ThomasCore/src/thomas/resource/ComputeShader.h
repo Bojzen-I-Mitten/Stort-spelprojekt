@@ -9,10 +9,10 @@ namespace thomas
 		class ComputeShader : public Shader
 		{
 		private:
-
+			
 		public:
 			void Dispatch(int threadGroupX, int threadGroupY = 1, int threadGroupZ = 1);
-			void DispatchIndirect();
+			void DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs = 0);
 		};
 	}
 }

@@ -1,6 +1,7 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
-#include <..\FXIncludes\ThomasCG.hlsl>
+#include <ThomasCG.hlsl>
+#include <ParticleDataHeader.hlsl>
 
 //Texture2D diffuseTexture;
 //SamplerState diffuseSampler : register(s0);
@@ -38,13 +39,6 @@ BlendState AlphaBlendingOn
     BlendOpAlpha = ADD;
     RenderTargetWriteMask[0] = 0x0F;
 
-};
-
-struct BillboardStruct
-{
-    float3 quad[2][3];
-    float2 pad2;
-    float2 uvs[2][3];
 };
 
 StructuredBuffer<BillboardStruct> billboards;

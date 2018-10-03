@@ -1,32 +1,6 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
-
+#include <ParticleDataHeader.hlsl>
 #include <ThomasShaderVariables.hlsl>
-
-struct ParticleStruct
-{
-    float3 position;
-    float gravity;
-
-    float3 direction;
-    float speed;
-
-    float endSpeed;
-    float size;
-    float endSize;
-    float lifeTime;
-
-    float lifeTimeLeft;
-    float rotationSpeed;
-    float rotation;
-    float pad;
-};
-
-struct BillboardStruct
-{
-    float3 quad[2][3];
-    float2 pad2;
-    float2 uvs[2][3];
-};
 
 
 RWStructuredBuffer<ParticleStruct> particles;

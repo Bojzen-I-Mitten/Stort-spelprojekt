@@ -32,6 +32,10 @@ namespace thomas
 				//math::Vector4 colorFactor;
 			};
 			
+			struct IndirectBufferArgsStruct
+			{
+				unsigned args[3];
+			};
 
 			
 		public:
@@ -54,6 +58,7 @@ namespace thomas
 
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
+			std::unique_ptr<utils::buffers::Buffer> m_updateIndirectBuffer;
 
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnBuffer;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateBuffer;

@@ -29,8 +29,11 @@ namespace thomas
 			m_spawnBuffer =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 1, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
 			m_updateBuffer =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
 			m_billboardBuffer =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
+			m_updateIndirectBuffer = std::make_unique<utils::buffers::Buffer>(nullptr, 16, D3D11_BIND_CONSTANT_BUFFER, STATIC_BUFFER, 4, D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS);
 
 			m_deadList = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
+
+			ThomasCore::GetDeviceContext()->CopyStructureCount(m_updateIndirectBuffer->GetBuffer(), 0, m_deadList->GetUAV());
 
 			pShittyComputeShader->SetGlobalInt("maxNrOfParticles", maxNrOfParticles);
 			pShittyComputeShader->SetGlobalUAV("deadlist", m_deadList->GetUAV());
@@ -185,9 +188,10 @@ namespace thomas
 			m_updateParticlesCS->Bind();
 			m_updateParticlesCS->SetPass(0);
 
-			int test = (m_emittedParticles - 1) / 32u + 1;
+			int test = (m_emittedParticles + 31u) / 32u;
 			m_updateParticlesCS->Dispatch(test);
 
+			m_updateParticlesCS->DispatchIndirect();
 
 			ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
 			ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);

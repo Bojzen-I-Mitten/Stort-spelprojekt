@@ -10,9 +10,9 @@ namespace thomas
 			ThomasCore::GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
 		}
 
-		void ComputeShader::DispatchIndirect()
+		void ComputeShader::DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs = 0)
 		{
-//			ThomasCore::GetDeviceContext()->DispatchIndirect()
+			ThomasCore::GetDeviceContext()->DispatchIndirect(indirectBuffer, alignedByteOffsetForArgs);
 		}
 
 	}

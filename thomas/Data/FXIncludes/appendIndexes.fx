@@ -12,7 +12,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
     int index = (Gid.x * 512) + GTid.x;
     if (index < maxNrOfParticles)
-    deadlist.Append(index);
+        deadlist.Append(index);
 }
 
 
