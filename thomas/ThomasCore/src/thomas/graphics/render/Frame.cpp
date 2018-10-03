@@ -16,8 +16,8 @@ namespace thomas {
 				else
 					return mat1->m_renderQueue < mat2->m_renderQueue;
 			}
-			Frame::Frame(unsigned int allocSize)
-				: m_queue(), m_alloc(allocSize)
+			Frame::Frame(unsigned int numStruct, unsigned int constantDataAlloc)
+				: m_queue(), m_alloc(numStruct, constantDataAlloc)
 			{
 			}
 			void Frame::clear()

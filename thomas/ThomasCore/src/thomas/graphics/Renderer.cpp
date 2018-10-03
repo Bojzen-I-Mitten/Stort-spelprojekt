@@ -31,8 +31,10 @@ namespace thomas
 			LightManager::Bind();
 		}
 
+		constexpr uint32_t NUM_STRUCT = 200;
+		constexpr uint32_t NUM_MATRIX = 5000;
 		Renderer::Renderer()
-			: m_frame(new render::Frame(100)), m_prevFrame(new render::Frame(100))
+			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
 		{
 		}
 
@@ -71,15 +73,12 @@ namespace thomas
 
 		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			if (command.num_local_prop) {
-				resource::shaderproperty::ShaderProperty** alloc;
-				if (m_frame->m_alloc.reserve(command.num_local_prop, alloc))
-					return;
-				for (unsigned int i = 0; i < command.num_local_prop; i++)
-					alloc[i] = command.local_prop[i]->copy();
-				command.local_prop = const_cast<const resource::shaderproperty::ShaderProperty**>(alloc);
-			}
 			m_frame->m_queue[command.camera][command.material].push_back(command);
+		}
+
+		render::Frame & Renderer::getAllocator()
+		{
+			return *m_frame;
 		}
 
 		void Renderer::TransferCommandList()
@@ -99,7 +98,7 @@ namespace thomas
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
-				rC.local_prop[i]->Apply(rC.material->GetShader());
+				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
 		}
 
 		void Renderer::ProcessCommands()

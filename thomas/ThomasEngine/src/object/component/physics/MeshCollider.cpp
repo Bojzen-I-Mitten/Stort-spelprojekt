@@ -6,10 +6,23 @@
 #include "MeshCollider.h"
 #include "../../../resource/Model.h"
 #include "../../../resource/Resources.h"
-
+#include "../../GameObject.h"
+#include "../RenderComponent.h"
 namespace ThomasEngine
 {
-	MeshCollider::MeshCollider() : Collider(new thomas::object::component::MeshCollider()) {}
+	MeshCollider::MeshCollider() : Collider(new thomas::object::component::MeshCollider()) {
+		
+	}
+
+	void MeshCollider::Start()
+	{
+		if (!mesh && gameObject) 
+		{
+			RenderComponent^ renderComp = gameObject->GetComponent<RenderComponent^>();
+			if (renderComp && renderComp->model)
+				mesh = renderComp->model;
+		}
+	}
 
 	Model^ MeshCollider::mesh::get() 
 	{
