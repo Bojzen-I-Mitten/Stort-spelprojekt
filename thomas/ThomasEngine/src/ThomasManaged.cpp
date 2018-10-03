@@ -8,6 +8,7 @@
 #include <thomas\graphics\Renderer.h>
 #include <thomas\editor\gizmos\Gizmos.h>
 #include <thomas\Physics.h>
+#include <thomas\editor\Editor.h>
 #include <thomas\editor\EditorCamera.h>
 #include <thomas\System.h>
 #pragma managed
@@ -72,7 +73,9 @@ namespace ThomasEngine {
 		thomas::System::S_RENDERER.TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
-		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
+#ifdef _EDITOR
+		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
+#endif
 		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
 		{
 			camera->CopyFrameData();
@@ -227,11 +230,15 @@ namespace ThomasEngine {
 	Guid selectedGUID;
 	void ThomasWrapper::Play()
 	{
+#ifdef _EDITOR
+		thomas::editor::Editor::GetEditor().OnEditorPlay();
+#endif
 		ThomasEngine::Resources::OnPlay();
 		Scene::CurrentScene->Play();
 		playing = true;
 		OnStartPlaying();
 
+		Debug::Log("Running...");
 	}
 
 	bool ThomasWrapper::IsPlaying()
@@ -241,6 +248,9 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::Stop()
 	{
+#ifdef _EDITOR
+		thomas::editor::Editor::GetEditor().OnEditorStop();
+#endif
 		if (s_Selection->Count > 0)
 			selectedGUID = s_Selection[0]->m_guid;
 		else
@@ -256,6 +266,7 @@ namespace ThomasEngine {
 		}
 		OnStopPlaying();
 
+		Debug::Log("Stopped...");
 	}
 
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }

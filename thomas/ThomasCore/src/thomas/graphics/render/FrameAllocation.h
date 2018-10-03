@@ -1,5 +1,5 @@
 #pragma once
-#include "../../resource/ShaderProperty/ShaderProperty.h"
+#include "../../resource/ShaderProperty/ShaderPropertyStruct.h"
 
 #include<vector>
 
@@ -21,13 +21,12 @@ namespace thomas {
 
 			class FrameAllocation {
 			public:
-				FrameAllocation(unsigned int size);
+				FrameAllocation(unsigned int numStruct, unsigned int numDataBytes);
 				~FrameAllocation();
 				/*	Give ownership of the pointer to the allocation
 				*/ 
-				resource::shaderproperty::ShaderProperty** allocate(resource::shaderproperty::ShaderProperty* alloc);
-				resource::shaderproperty::ShaderProperty** allocate(resource::shaderproperty::ShaderProperty** alloc, unsigned int num);
-				bool reserve(unsigned int num, resource::shaderproperty::ShaderProperty **& ptr);
+				const resource::shaderproperty::ShaderPropertyStatic* allocate(const resource::shaderproperty::ShaderPropertyStatic* alloc);
+				const resource::shaderproperty::ShaderPropertyStatic* allocate(const resource::shaderproperty::ShaderPropertyStatic* alloc, unsigned int num);
 				void clear();
 
 				FrameAllocation(const FrameAllocation& copy) = delete;
@@ -36,7 +35,19 @@ namespace thomas {
 				FrameAllocation& operator=(FrameAllocation&& move);
 
 			private:
-				std::vector< resource::shaderproperty::ShaderProperty*> m_alloc;
+				bool canAllocate(uint32_t bytes);
+				void * allocData(uint32_t off);
+				/* Create a frame copy of the data in the struct. 
+				*/
+				void copy(resource::shaderproperty::ShaderPropertyStruct& info);
+			private:
+				/* Raw Data allocation
+				*/
+				void * m_dataAlloc;
+				uint32_t m_allocatedBytes, m_dataTotalBytes;
+				/* Struct allocation
+				*/
+				std::vector< resource::shaderproperty::ShaderPropertyStruct> m_alloc;
 			};
 
 		}
