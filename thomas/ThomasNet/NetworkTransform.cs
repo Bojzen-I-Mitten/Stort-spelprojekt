@@ -46,9 +46,10 @@ namespace ThomasEngine.Network
 
         float LocalMovementThreshold = 0.00001f; //Distance required to count as movement
         float LocalRotationThreshold = 0.00001f; //Rotation required to count as movement
-        float SnapThresholdDistance = 0.5F; //Distance before we snap to the recieved positon
+        float SnapThresholdDistance = 2F; //Distance before we snap to the recieved positon
 
         List<LerpState> PositionStates = new List<LerpState>();
+        public int PositionStatesCount { get { return PositionStates.Count; } }
         List<LerpState> RotationStates = new List<LerpState>();
         List<LerpState> ScalingStates = new List<LerpState>();
 
@@ -207,14 +208,14 @@ namespace ThomasEngine.Network
                 else
                 {
                     transform.position = Vector3.Lerp((Vector3)leftState.state, (Vector3)rightState.state, lerpPercent);
-                    Debug.Log("Lerp between: " + (Vector3)leftState.state + " and " + (Vector3)rightState.state);
                 }
+                Debug.Log("Lerp between: " + (Vector3)leftState.state + " and " + (Vector3)rightState.state + " with amount " + lerpPercent);
 
                 //If we should lerp more
                 float leftOver = CurrentPositionDuration - rightState.duration;
-                if (leftOver >= 0)
+                RemoveFirstLerpState(PositionStates, ref CurrentPositionDuration);
+                if (PositionStates.Count > 1)
                 {
-                    RemoveFirstLerpState(PositionStates, ref CurrentPositionDuration);
                     CurrentPositionDuration = leftOver;
                     InterpolatePosition();
                 }
