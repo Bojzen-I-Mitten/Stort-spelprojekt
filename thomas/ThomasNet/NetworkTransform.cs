@@ -79,8 +79,9 @@ namespace ThomasEngine.Network
             if (isOwner)
             {
                 isDirty = HasMoved();
-                InterpolateTransform();
             }
+            else
+                InterpolateTransform();
 
             PrevPosition = transform.position;
             PrevRotation = transform.rotation;
