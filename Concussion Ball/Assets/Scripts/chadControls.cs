@@ -141,7 +141,9 @@ namespace ThomasEditor
             if(Input.GetMouseButton(Input.MouseButtons.LEFT) && throwForce < maxThrowForce)
             {
                 throwForce += 5.0f * Time.DeltaTime;
-                Debug.Log("Current throw force: " + throwForce);
+                if (throwForce > 19)
+                    Debug.Log("Current throw force: " + (int)throwForce);
+                ball.ChargeColor(throwForce);
             }
             if (hand && camera && Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {

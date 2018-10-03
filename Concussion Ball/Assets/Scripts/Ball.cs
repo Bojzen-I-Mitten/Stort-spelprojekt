@@ -5,11 +5,22 @@ using ThomasEngine.Network;
 public class Ball : NetworkComponent
 {
     Rigidbody rb;
+    RenderComponent rc;
     bool pickedUp { get { return !rb.enabled; } set { rb.enabled = !value; } }
+    private float accumulator;
+    private float chargeupTime;
+
+    private float interp = 0;
 
     public override void Start()
     {
+        chargeupTime = 4.0f;
+        accumulator = 0.0f;
         rb = gameObject.GetComponent<Rigidbody>();
+        rc = gameObject.GetComponent<RenderComponent>();
+        
+
+        rc.material.SetColor("color", new Color(0, 0, 255));
         //visualizer = Object.GetObjectsOfType<ThrowStrengthVisualizer>()[0];
     }
 
@@ -19,7 +30,6 @@ public class Ball : NetworkComponent
         {
             Drop();
         }
-            
     }
 
     public void Drop()
@@ -32,6 +42,21 @@ public class Ball : NetworkComponent
         
     }
 
+    public void ChargeColor(float throwForce)
+    {
+        Debug.Log("Red: " + rc.material.GetColor("color").r);
+
+        accumulator += Time.DeltaTime;
+        interp = accumulator / chargeupTime;
+
+        float value = interp;
+
+        Color newColor = new Color(value, 0.0f, (1.0f-interp));
+        
+        rc.material.SetColor("color", newColor);
+
+    }
+
     public void Throw(Vector3 force)
     {
         if (pickedUp)
@@ -39,6 +64,12 @@ public class Ball : NetworkComponent
             Drop();
             transform.position = transform.position + Vector3.Normalize(force) * 2;
             rb.AddForce(force, Rigidbody.ForceMode.Impulse);
+
+            rc.material.SetColor("color", new Color(0, 0, 255));
+
+            // Reset values
+            accumulator = 0;
+            interp = 0.0f;
         }
     }
     
