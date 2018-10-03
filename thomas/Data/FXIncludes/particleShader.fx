@@ -77,10 +77,10 @@ v2f vert(uint id : SV_VertexID)
     else if (id == 1)
         output.vertex = mul(float4(-0.5, -0.5, 0.5, 1.0), thomas_MatrixVP);*/
     
-    if (particleIndex % 2 == 0)
+    //if (particleIndex % 2 == 0)
         output.color = float3(1.0f, 0.0f, 0.0f);
-    else
-        output.color = float3(0.0f, 1.0f, 0.0f);
+    //else
+      //  output.color = float3(0.0f, 1.0f, 0.0f);
 
     return output;
 }

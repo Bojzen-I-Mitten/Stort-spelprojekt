@@ -7,22 +7,22 @@ namespace thomas
 	{
 		namespace buffers
 		{
-			Buffer::Buffer(void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_RESOURCE_MISC_FLAG miscFlag, size_t structureByteStride) : m_size(size), m_bindFlag(bindFlag)
+			Buffer::Buffer(void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag = STATIC_BUFFER, size_t structureByteStride, D3D11_RESOURCE_MISC_FLAG miscFlag) : m_size(size), m_bindFlag(bindFlag)
 			{
 				D3D11_BUFFER_DESC bufferDesc;
 				bufferDesc.ByteWidth = size;
-				bufferDesc.Usage = usageFlag; //TODO: Maybe dynamic for map/unmap
+				bufferDesc.Usage = usageFlag; 
 				bufferDesc.BindFlags = bindFlag;
 				bufferDesc.CPUAccessFlags = usageFlag == DYNAMIC_BUFFER ? D3D11_CPU_ACCESS_WRITE : 0; //CPU if dynamic
 				bufferDesc.MiscFlags = miscFlag;
 				bufferDesc.StructureByteStride = structureByteStride;
 				
-					
-
 				D3D11_SUBRESOURCE_DATA InitData;
 				InitData.pSysMem = data;
 				InitData.SysMemPitch = 0;
 				InitData.SysMemSlicePitch = 0;
+
+				m_usageFlag = usageFlag;
 
 				HRESULT result;
 
@@ -47,7 +47,12 @@ namespace thomas
 				if (size == 0) return;
 				if (size > m_size)
 				{
-					LOG("Cannot set buffer data. the data size is bigger than the buffer.");
+					LOG("Cannot set buffer data. The data size is bigger than the buffer.");
+					return;
+				}
+				if (m_usageFlag != DYNAMIC_BUFFER)
+				{
+					LOG("Cannot uppload data at runtime. Usage flag is DYNAMIC_BUFFER.");
 					return;
 				}
 
@@ -77,7 +82,7 @@ namespace thomas
 			}
 
 			
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag, D3D11_BUFFER_UAV_FLAG uavFlag) : Buffer(data, count * stride, bindFlag, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag, D3D11_BUFFER_UAV_FLAG uavFlag) : Buffer(data, count * stride, bindFlag, usageFlag, stride, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED)
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;
@@ -135,9 +140,9 @@ namespace thomas
 				return nullptr;
 			}
 
-			AppendConsumeBuffer::AppendConsumeBuffer(void* data, size_t stride, size_t count) : StructuredBuffer(data, stride, count, STATIC_BUFFER, D3D11_BIND_UNORDERED_ACCESS, D3D11_BUFFER_UAV_FLAG_APPEND)
+			AppendConsumeBuffer::AppendConsumeBuffer(void* data, size_t stride, size_t count) : StructuredBuffer(data, stride, count, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE), D3D11_BUFFER_UAV_FLAG_APPEND)
 			{
-
+				
 			}
 
 		}		

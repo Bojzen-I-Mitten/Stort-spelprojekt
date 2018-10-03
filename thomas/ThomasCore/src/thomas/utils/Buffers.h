@@ -15,7 +15,7 @@ namespace thomas
 			{
 			public:
 				//Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag);
-				Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0, size_t structureByteStride = 0);
+				Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, size_t structureByteStride = 0, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0);
 				template <typename T>
 				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(data.data(), sizeof(T)*data.size(), bindFlag, usageFlag) {};
 				virtual ~Buffer();
@@ -29,6 +29,7 @@ namespace thomas
 				ID3D11Buffer* GetBuffer();
 			protected:
 				D3D11_BIND_FLAG m_bindFlag;
+				D3D11_USAGE m_usageFlag;
 				size_t m_size;
 				ID3D11Buffer * m_buffer;
 			};
@@ -88,6 +89,8 @@ namespace thomas
 			{
 			public:
 				AppendConsumeBuffer(void* data, size_t stride, size_t count);
+				template <typename T>
+				AppendConsumeBuffer(std::vector<T>& data) : AppendConsumeBuffer(data.data(), sizeof(T), data.size()) {};
 
 			};
 		}

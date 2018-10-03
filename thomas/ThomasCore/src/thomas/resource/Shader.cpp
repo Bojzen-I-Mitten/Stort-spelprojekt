@@ -661,7 +661,7 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
 					break;
 				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
-					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
 					break;
 				}
 				break;

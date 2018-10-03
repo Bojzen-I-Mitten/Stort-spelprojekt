@@ -26,7 +26,7 @@ namespace thomas
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
 
-			test.Initialize();
+			test.Initialize(32);
 		}
 		
 		void LightManager::Destroy()

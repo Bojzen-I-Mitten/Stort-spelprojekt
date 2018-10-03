@@ -52,12 +52,12 @@ struct ParticleStruct
     float pad;
 };
 
-StructuredBuffer<InitParticlesBuffer> initParticles;
+StructuredBuffer<InitParticlesBuffer> initparticles;
 
 RWStructuredBuffer<ParticleStruct> particles;
 
-//ConsumeStructuredBuffer<uint> deadList;
-//AppendStructuredBuffer<uint> aliveList;
+ConsumeStructuredBuffer<uint> deadlist;
+AppendStructuredBuffer<uint> alivelist;
 
 
 uint RandMarsaglia(uint rng_state)
@@ -79,9 +79,10 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     int ix = (Gid.x * 128) + GTid.x;
     int iy = Gid.y;
 
-    InitParticlesBuffer newParticle = initParticles[iy];
+    InitParticlesBuffer newParticle = initparticles[iy];
 
-    if (ix < newParticle.nrOfParticlesToEmit)
+   // if (ix < newParticle.nrOfParticlesToEmit)
+    if (ix < 16)
     {
         uint rng_state = (ix + 1) * newParticle.rand; //seed
 
@@ -137,7 +138,7 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         float3 dir = randDir; //mul(randDir, (float3x3) newParticle.directionMatrix);
         normalize(dir);
 
-        float3 position = newParticle.position + dir * newParticle.radius;
+        float3 position = newParticle.position; // + dir * newParticle.radius;
 
         if ((bool) newParticle.spawnAtSphereEdge)
         {
@@ -149,10 +150,11 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         float endSize = newParticle.endSize;
         float rotation = 0;
         
-    
+        uint writeindex = deadlist.Consume();
         ParticleStruct fillBuffer = (ParticleStruct) 0;
 
-        fillBuffer.position = position;
+        fillBuffer.position = position;//
+        //+float3(writeindex * 2.5f, 0.0f, 0.0f);
         fillBuffer.rotation = rotation;
         fillBuffer.gravity = gravity;
         fillBuffer.direction = dir;
@@ -162,16 +164,17 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.endSize = endSize;
         fillBuffer.lifeTimeLeft = lifeTime;
         fillBuffer.lifeTime = lifeTime;
-        fillBuffer.rotationSpeed = rotationSpeed;
+        fillBuffer.rotationSpeed = ix;
 
         
-       // uint writeindex = deadList.Consume();
-       // aliveList.Append(writeindex);
         
-       // particles[writeindex] = fillBuffer;
-        particles[ix] = fillBuffer;
+        alivelist.Append(writeindex);
+        
+        particles[writeindex] = fillBuffer;
+       // particles[ix] = fillBuffer;
        
     }
+    
 }
 
 technique11 EmitCS

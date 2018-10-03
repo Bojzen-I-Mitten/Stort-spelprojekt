@@ -31,25 +31,26 @@ struct BillboardStruct
 
 RWStructuredBuffer<ParticleStruct> particles;
 RWStructuredBuffer<BillboardStruct> billboards;
-/*
-AppendStructuredBuffer<uint> deadList;
-AppendStructuredBuffer<uint> appendAliveList;
-ConsumeStructuredBuffer<uint> consumeAliveList;
-*/
+
+AppendStructuredBuffer<uint> deadlist;
+AppendStructuredBuffer<uint> appendalivelist;
+ConsumeStructuredBuffer<uint> consumealivelist;
+
 
 [numthreads(256, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
     uint Tid = (Gid.x * 256) + GTid.x;
-    if (Tid < 32)
+    
+    if (Tid < 16)
     {
     
-        //uint index = //consumeAliveList.Consume();
+        uint index = consumealivelist.Consume();
         float3x3 viewMatrix = thomas_MatrixV;
         float dt = thomas_DeltaTime;
 
     
-        ParticleStruct particle = particles.Load(Tid); //index);
+        ParticleStruct particle = particles.Load(index);
     
        
         float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
@@ -63,13 +64,16 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 
     
         float scale = particle.size;
+
+    
+        
     /*
     if (particle.lifeTimeLeft < 0.0f)
 	{
 		scale = 0.0f;
         particle.lifeTimeLeft = particle.lifeTimeLeft;
 
-        deadList.Append(index);
+        deadlist.Append(index);
     }
 	else
 	{
@@ -79,7 +83,8 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         appendAliveList.Append(index);
 
     }*/
-       // appendAliveList.Append(index);
+        appendalivelist.Append(index);
+//        index);
 
     //BILLBOARD
 
@@ -100,8 +105,8 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     
    
     
-        //particles[index] = particle;
-        particles[Tid] = particle;
+        particles[index] = particle;
+        //particles[Tid] = particle;
         BillboardStruct billboard = (BillboardStruct) 0;
     //billboard.pad2 = float2(0, 0);
 
