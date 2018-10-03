@@ -165,6 +165,11 @@ namespace ThomasEngine {
 			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
+		if (original->m_isDestroyed)
+		{
+			Debug::LogError("Trying to instantiate destroyed object.");
+			return nullptr;
+		}
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
@@ -185,6 +190,7 @@ namespace ThomasEngine {
 		}
 		
 		if (clone) {
+			clone->transform->SetParent(nullptr, true);
 			clone->PostInstantiate(Scene::CurrentScene);
 			clone->prefabPath = nullptr;
 		}
@@ -197,7 +203,7 @@ namespace ThomasEngine {
 	{
 		GameObject^ clone = Instantiate(original);
 		if(clone)
-			clone->transform->parent = parent;
+			clone->transform->SetParent(parent, true);
 		return clone;
 	}
 

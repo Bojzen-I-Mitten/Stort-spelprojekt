@@ -10,7 +10,7 @@
 #include "..\resource\ShaderProperty\ShaderProperty.h"
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
-#include "..\Window.h"
+#include "..\WindowManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 
@@ -18,6 +18,7 @@ namespace thomas
 {
 	namespace graphics
 	{
+		Renderer Renderer::s_renderer;
 
 		void Renderer::BindFrame()
 		{
@@ -30,9 +31,16 @@ namespace thomas
 			LightManager::Bind();
 		}
 
+		constexpr uint32_t NUM_STRUCT = 200;
+		constexpr uint32_t NUM_MATRIX = 5000;
 		Renderer::Renderer()
-			: m_frame(new render::Frame(100)), m_prevFrame(new render::Frame(100))
+			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
 		{
+		}
+
+		Renderer* Renderer::Instance()
+		{
+			return &s_renderer;
 		}
 
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
@@ -40,13 +48,13 @@ namespace thomas
 			object::component::Camera::CAMERA_FRAME_DATA& frameData = camera->GetFrameData();
 			//Get the current active window
 
-			auto window = Window::GetWindow(frameData.targetDisplay);
+			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
 			if (!window || !window->Initialized())
 				return;
 
 			window->Bind();
-			ThomasCore::GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -65,15 +73,12 @@ namespace thomas
 
 		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			if (command.num_local_prop) {
-				resource::shaderproperty::ShaderProperty** alloc;
-				if (m_frame->m_alloc.reserve(command.num_local_prop, alloc))
-					return;
-				for (unsigned int i = 0; i < command.num_local_prop; i++)
-					alloc[i] = command.local_prop[i]->copy();
-				command.local_prop = const_cast<const resource::shaderproperty::ShaderProperty**>(alloc);
-			}
 			m_frame->m_queue[command.camera][command.material].push_back(command);
+		}
+
+		render::Frame & Renderer::getAllocator()
+		{
+			return *m_frame;
 		}
 
 		void Renderer::TransferCommandList()
@@ -93,7 +98,7 @@ namespace thomas
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
-				rC.local_prop[i]->Apply(rC.material->GetShader());
+				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
 		}
 
 		void Renderer::ProcessCommands()
@@ -117,9 +122,9 @@ namespace thomas
 			}
 
 			//Take care of the editor camera and render gizmos
-			if (editor::EditorCamera::GetEditorCamera())
+			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::GetEditorCamera()->GetCamera());
+				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::RenderGizmos();
 			}
 		}

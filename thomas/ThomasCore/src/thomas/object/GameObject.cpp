@@ -18,7 +18,7 @@ namespace thomas
 		{
 			this->m_components.clear();
 #ifdef _EDITOR
-			editor::EditorCamera::GetEditorCamera()->UnselectObject(this);
+			editor::EditorCamera::Instance()->UnselectObject(this);
 #endif
 			Object::Destroy(this);
 		}

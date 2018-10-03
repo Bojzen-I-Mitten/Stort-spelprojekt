@@ -2,10 +2,11 @@
 #include <AtlBase.h>
 #include <atlconv.h>
 #include <d3dcompiler.h>
-#include "Shader.h"
 #include "ShaderProperty\shaderProperties.h"
+#include "../utils/Utility.h"
 #include <fstream>
 #include <comdef.h>
+
 namespace thomas
 {
 	namespace resource
@@ -41,7 +42,7 @@ namespace thomas
 				ID3DX11EffectVariable* variable = m_effect->GetVariableByIndex(i);
 				if (variable->IsValid())
 				{
-					AddProperty(variable);
+					AddProperty(variable, i);
 				}
 				
 
@@ -95,7 +96,7 @@ namespace thomas
 							inputSemantics.push_back(semantic);
 						}
 
-						HRESULT result = ThomasCore::GetDevice()->CreateInputLayout(&inputLayoutDesc[0], inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
+						HRESULT result = utils::D3D::Instance()->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
 						pass.inputSemantics = inputSemantics;
 						if (result != S_OK)
 						{
@@ -171,7 +172,7 @@ namespace thomas
 				&include,
 				D3DCOMPILE_DEBUG,
 				0,
-				ThomasCore::GetDevice(),
+				utils::D3D::Instance()->GetDevice(),
 				&tempEffect,
 				&errorBlob);
 
@@ -244,14 +245,14 @@ namespace thomas
 		}
 		void Shader::BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type)
 		{
-			ThomasCore::GetDeviceContext()->IASetPrimitiveTopology(type);
+			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(type);
 		}
 		void Shader::BindVertexBuffer(utils::buffers::VertexBuffer* buffer)
 		{
 			UINT stride = buffer->GetStride();
 			ID3D11Buffer* buff = buffer->GetBuffer();
 			UINT offset = 0;
-			ThomasCore::GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
 		}
 
 		void Shader::BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers)
@@ -267,13 +268,13 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			ThomasCore::GetDeviceContext()->IASetVertexBuffers(0, buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 
 		void Shader::BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer)
 		{
-			ThomasCore::GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
 		void Shader::Bind()
 		{
@@ -289,9 +290,9 @@ namespace thomas
 		
 		void Shader::SetPass(int passIndex)
 		{
-			ThomasCore::GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);
+			utils::D3D::Instance()->GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);
 			ID3DX11EffectPass* pass = m_effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex);
-			pass->Apply(0, ThomasCore::GetDeviceContext());
+			pass->Apply(0, utils::D3D::Instance()->GetDeviceContext());
 			m_currentPass = &m_passes[passIndex];
 		}
 		Shader::ShaderPass & Shader::GetCurrentPass()
@@ -431,6 +432,13 @@ namespace thomas
 		{
 			return m_properties.find(name) != m_properties.end();
 		}
+		bool Shader::GetPropertyIndex(uint32_t hash, uint32_t & effectIndex)
+		{
+			auto itr = m_property_indices.find(hash);
+			if (itr == m_property_indices.end())	return true;
+			effectIndex = itr->second;
+			return false;
+		}
 		std::shared_ptr<shaderproperty::ShaderProperty> Shader::GetProperty(const std::string & name)
 		{
 			for (auto& prop : m_properties)
@@ -549,7 +557,7 @@ namespace thomas
 			}
 			
 		}
-		void Shader::AddProperty(ID3DX11EffectVariable * prop)
+		void Shader::AddProperty(ID3DX11EffectVariable * prop, uint32_t propIndex)
 		{
 			D3DX11_EFFECT_TYPE_DESC typeDesc;
 			D3DX11_EFFECT_VARIABLE_DESC variableDesc;
@@ -557,7 +565,7 @@ namespace thomas
 			prop->GetType()->GetDesc(&typeDesc);
 			prop->GetDesc(&variableDesc);
 			ID3DX11EffectConstantBuffer* cBuffer = prop->GetParentConstantBuffer();
-			
+
 			bool isMaterialProperty = false;
 			shaderproperty::ShaderProperty* newProperty = nullptr;
 			std::string semantic;
@@ -652,8 +660,17 @@ namespace thomas
 			if (newProperty != nullptr)
 			{
 				newProperty->SetName(name);
-				if(!HasProperty(name))
+				uint32_t hash = utility::hash(name.c_str(), name.length());
+#ifdef _DEBUG
+				if (m_property_indices.find(hash) == m_property_indices.end()) {
+					std::string err("Warning in ThomasCore::resource::Shader::AddProperty!! Multiple effect properties with identical name hash: " + name);
+					LOG(err);
+				}
+#endif
+				if (!HasProperty(name)) {
+					m_property_indices[hash] = propIndex;
 					m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(newProperty);
+				}
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}
