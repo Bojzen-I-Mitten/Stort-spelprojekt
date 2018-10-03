@@ -197,7 +197,11 @@ namespace ThomasEngine.Network
 
         private void InterpolatePosition()
         {
-            transform.position = Vector3.Lerp(transform.position, TargetPosition, SendInterval);
+            CurrentPositionDuration += Time.DeltaTime;
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, CurrentPositionDuration / SendInterval);
+
+            if (CurrentPositionDuration >= SendInterval)
+                CurrentPositionDuration = 0;
         }
 
         private void InterpolateTransform()
