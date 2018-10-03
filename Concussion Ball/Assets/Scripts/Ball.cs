@@ -44,7 +44,7 @@ public class Ball : NetworkComponent
 
     public void ChargeColor(float throwForce)
     {
-        Debug.Log("Red: " + rc.material.GetColor("color").r);
+        //Debug.Log("Red: " + rc.material.GetColor("color").r);
 
         accumulator += Time.DeltaTime;
         interp = accumulator / chargeupTime;
