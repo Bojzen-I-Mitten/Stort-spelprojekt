@@ -33,7 +33,7 @@ void thomas::object::component::Joint::Awake()
 {
 	if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 	{
-		m_current.setRotation(thomas::Physics::ToBullet(m_gameObject->m_transform->GetLocalRotation()));
+		m_gameObject->GetComponent<Rigidbody>()->SetActivationState(thomas::object::component::ActivationState::Always_Active);
 		thomas::Physics::s_world->addConstraint(CreateConstraints( m_secondBody, m_current,
 															m_other, m_twistSpin), false);
 	}															 

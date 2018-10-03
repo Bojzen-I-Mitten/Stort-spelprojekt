@@ -19,6 +19,12 @@ namespace thomas
 				m_freezeRotation(1.f),
 				m_LocalCenterOfMassChange(0.f)
 			{
+		/*		setDamping(0.05, 0.85);
+				setDeactivationTime(3.0);
+				setSleepingThresholds(5.6, 5.5);
+				setContactProcessingThreshold(0.25f);
+				setCcdMotionThreshold(0.05f);
+				setCcdSweptSphereRadius(0.06f);*/
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);

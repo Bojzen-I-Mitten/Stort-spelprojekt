@@ -9,7 +9,7 @@
 
 namespace ThomasEngine
 {
-	[DisallowMultipleComponent]
+	//[DisallowMultipleComponent]
 	public ref class Joint : public Component
 	{
 	public:
@@ -30,25 +30,25 @@ namespace ThomasEngine
 			}
 		}
 
-		property Vector3 OriginCurrent
+		property Vector3 Anchor
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformOrigin(true)); }
 			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformOrigin(Utility::Convert(origin), true); }
 		}
 
-		property Vector3 OriginOther
+		property Vector3 ConnectedAnchor
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformOrigin(false)); }
 			void set(Vector3 origin) { ((thomas::object::component::Joint*)nativePtr)->SetTransformOrigin(Utility::Convert(origin), false); }
 		}
 
-		property Vector3 RotationCurrent
+		property Vector3 Axis
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(true)); }
 			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), true); }
 		}
 
-		property Vector3 RotationOther
+		property Vector3 SwingAxis
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetTransformRotation(false)); }
 			void set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetTransformRotation(Utility::Convert(rotation), false); }
