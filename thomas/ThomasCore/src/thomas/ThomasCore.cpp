@@ -1,7 +1,7 @@
 #include "ThomasCore.h"
 #include "Sound.h"
 #include "Input.h"
-#include "Window.h"
+#include "WindowManager.h"
 #include "ThomasTime.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
@@ -33,7 +33,6 @@ namespace thomas
 		if (!utils::D3D::Instance()->Init())
 			return false;
 
-		Input::Init();
 		resource::Texture2D::Init();
 		ThomasTime::Init();
 		Sound::Init();
@@ -60,8 +59,7 @@ namespace thomas
 
 		object::Object::Clean();
 		editor::EditorCamera::Update();
-		resource::Shader::Update();
-		Input::Update();		
+		resource::Shader::Update();	
 		Sound::Update();
 	}
 
@@ -78,7 +76,7 @@ namespace thomas
 	bool ThomasCore::Destroy()
 	{	
 		//Destroy all objects
-		Window::Destroy();
+		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();

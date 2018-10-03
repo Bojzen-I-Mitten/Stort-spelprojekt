@@ -10,7 +10,7 @@
 #include "..\resource\ShaderProperty\ShaderProperty.h"
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
-#include "..\Window.h"
+#include "..\WindowManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 
@@ -46,7 +46,7 @@ namespace thomas
 			object::component::Camera::CAMERA_FRAME_DATA& frameData = camera->GetFrameData();
 			//Get the current active window
 
-			auto window = Window::GetWindow(frameData.targetDisplay);
+			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
 			if (!window || !window->Initialized())
 				return;

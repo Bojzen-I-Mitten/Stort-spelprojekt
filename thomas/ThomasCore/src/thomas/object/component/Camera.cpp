@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "../../Window.h"
+#include "..\..\WindowManager.h"
 #include "../GameObject.h"
 #include "../../graphics/Skybox.h"
 #include "Transform.h"
@@ -87,7 +87,8 @@ namespace thomas
 			math::Ray Camera::ScreenPointToRay(math::Vector2 point)
 			{
 				// Move the mouse cursor coordinates into the -1 to +1 range.
-				Window* window = Window::GetWindow(m_targetDisplay);
+				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
+
 				float pointX = ((2.0f * (float)point.x) / (float)window->GetWidth()) - 1.0f;
 				float pointY = (((2.0f * (float)point.y) / (float)window->GetHeight()) - 1.0f) * -1.0f;
 				// Adjust the points using the projection matrix to account for the aspect ratio of the viewport.
@@ -146,7 +147,8 @@ namespace thomas
 
 			math::Viewport Camera::GetViewport()
 			{
-				Window* window = Window::GetWindow(m_targetDisplay);
+				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
+
 				if (window)
 					return math::Viewport(m_viewport.x, m_viewport.y, m_viewport.width * window->GetWidth(), m_viewport.height * window->GetHeight());
 				else
@@ -193,7 +195,7 @@ namespace thomas
 
 			void Camera::SetTargetDisplay(int index)
 			{
-				if (Window::GetWindows().size() < index)
+				if (WindowManager::Instance()->GetNumOfWindows() < index)
 				{
 					m_targetDisplay = index;
 					UpdateProjMatrix();

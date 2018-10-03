@@ -20,6 +20,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\EditorWindow.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
@@ -84,8 +85,10 @@
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
     <ClCompile Include="src\thomas\Window.cpp" />
+    <ClCompile Include="src\thomas\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\thomas\EditorWindow.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
@@ -168,6 +171,7 @@
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />
     <ClInclude Include="src\thomas\Window.h" />
+    <ClInclude Include="src\thomas\WindowManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ED0D8681-B384-43D1-8F56-B4145588E20C}</ProjectGuid>
