@@ -15,14 +15,15 @@ namespace ThomasEditor
     public class ChadControls : NetworkComponent
     {
 
-
+        public float baseThrowForce { get; set; } = 5.0f;
+        public float maxThrowForce { get; set; } = 20.0f;
        
         public int speed { get; set; } = 5;
         public float force { get; set; } = 5;
         public float cameraSensitivity { get; set; } = 1;
         public float cameraDistance { get; set; } = 2;
 
-        public float throwForce { get; set; }
+        private float throwForce;
 
         public Transform hand { get; set; }
 
@@ -57,7 +58,7 @@ namespace ThomasEditor
                 Debug.LogWarning("Camera not set for player");
 
             rBody.IsKinematic = !isOwner;
-
+            throwForce = baseThrowForce;
             ball = Object.GetObjectsOfType<Ball>().FirstOrDefault();
         }
 
@@ -137,16 +138,17 @@ namespace ThomasEditor
 
         public void FondleBall()
         {
-            if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+            if(Input.GetMouseButton(Input.MouseButtons.LEFT) && throwForce < maxThrowForce)
             {
-                if(hand && camera)
-                {
-                    hasBall = false;
-                    
-                    ball.Throw(camera.transform.forward * throwForce);
-                    
-                }
-                    
+                throwForce += 5.0f * Time.DeltaTime;
+                Debug.Log("Current throw force: " + throwForce);
+            }
+            if (hand && camera && Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+            {
+                hasBall = false;
+
+                ball.Throw(camera.transform.forward * throwForce);
+                throwForce = baseThrowForce;
             }
         }
 
