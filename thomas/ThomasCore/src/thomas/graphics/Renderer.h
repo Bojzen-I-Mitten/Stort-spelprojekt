@@ -1,7 +1,3 @@
-/*
-	Render class for the gameobjects and material assembly
-*/
-
 #pragma once
 #include "..\utils\Math.h"
 #include "LightManager.h"
@@ -40,16 +36,18 @@ namespace thomas
 			struct RenderCommand;
 		}
 		
-		class Renderer {
+		class Renderer 
+		{
 		private:
-			static LightManager s_lightManager;
+			Renderer();
+
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 
 		public:
+			~Renderer() = default;
 
-			Renderer();
-
+			static Renderer* Instance();
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
 			void ClearCommands();
@@ -59,6 +57,8 @@ namespace thomas
 
 			void TransferCommandList();
 
+		private:
+			static Renderer s_renderer;
 
 		private:
 			std::unique_ptr<render::Frame> m_frame;

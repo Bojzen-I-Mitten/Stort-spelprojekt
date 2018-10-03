@@ -177,7 +177,6 @@ namespace ThomasEditor.utils
                 MainWindow._instance.hideBusyIndicator();
                 return true;
             }
-           
         }
 
         public static void AddScript(string script)

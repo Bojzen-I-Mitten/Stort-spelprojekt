@@ -6,7 +6,6 @@
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/ShaderProperty/ShaderProperty.h"
-#include "../../System.h"
 #include "../../graphics/render/Frame.h"
 
 namespace thomas {
@@ -101,7 +100,7 @@ namespace thomas {
 					uint32_t num_prop = uint32_t(m_properties.size());
 					const thomas::resource::shaderproperty::ShaderPropertyStatic* local_prop;
 					if (m_properties.size())
-						local_prop = System::S_RENDERER.getAllocator().m_alloc.allocate(m_properties.data(), num_prop);
+						local_prop = graphics::Renderer::Instance()->getAllocator().m_alloc.allocate(m_properties.data(), num_prop);
 					else
 						local_prop = nullptr;
 					// Submit
@@ -150,7 +149,7 @@ namespace thomas {
 					num_prop,
 					property_data);
 
-				System::S_RENDERER.SubmitCommand(cmd);
+				graphics::Renderer::Instance()->SubmitCommand(cmd);
 			}
 
 			resource::shaderproperty::ShaderPropertyStatic & RenderComponent::insertProperty(resource::shaderproperty::ShaderPropertyStatic prop)

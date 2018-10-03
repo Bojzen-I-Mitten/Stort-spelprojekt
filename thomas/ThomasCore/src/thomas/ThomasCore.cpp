@@ -1,7 +1,7 @@
 #include "ThomasCore.h"
 #include "Sound.h"
 #include "Input.h"
-#include "Window.h"
+#include "WindowManager.h"
 #include "ThomasTime.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
@@ -11,16 +11,15 @@
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
-#include <D3d11_4.h>
+#include "utils\d3d.h"
+#include <d3d11_4.h>
 #include <comdef.h>
+#include "AutoProfile.h"
 
 #include "object/component/LightComponent.h"
 
 namespace thomas 
 {
-	ID3D11Debug* ThomasCore::s_debug;
-	ID3D11Device* ThomasCore::s_device;
-	ID3D11DeviceContext* ThomasCore::s_context;
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
 	bool ThomasCore::s_initialized;
@@ -28,20 +27,22 @@ namespace thomas
 
 	bool ThomasCore::Init()
 	{
+		s_initialized = false;
 		s_imGuiContext = ImGui::CreateContext();
 		s_logOutput.reserve(10);
 
 		//Init all required classes
-		InitDirectX();
-		Input::Init();
+		if (!utils::D3D::Instance()->Init())
+			return false;
+
 		resource::Texture2D::Init();
 		ThomasTime::Init();
-		Sound::Init();
+		Sound::Instance()->Init();
 		resource::Shader::Init();
 
 		resource::Material::Init();
 		Physics::Init();
-		editor::EditorCamera::Init();
+		editor::EditorCamera::Instance()->Init();
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
@@ -52,6 +53,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();
@@ -59,10 +61,9 @@ namespace thomas
 		}
 
 		object::Object::Clean();
-		editor::EditorCamera::Update();
-		resource::Shader::Update();
-		Input::Update();		
-		Sound::Update();
+		editor::EditorCamera::Instance()->Update();
+		resource::Shader::Update();	
+		Sound::Instance()->Update();
 	}
 
 	void ThomasCore::Exit()
@@ -82,45 +83,22 @@ namespace thomas
 
 	bool ThomasCore::Destroy()
 	{	
-		s_context->ClearState();
-		s_context->Flush();
-
 		//Destroy all objects
-		Window::Destroy();
+		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
 		object::Object::Destroy();
-		editor::EditorCamera::Destroy();
+		editor::EditorCamera::Instance()->Destroy();
 		editor::Gizmos::Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
-		Sound::Destroy();
+		Sound::Instance()->Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
-
-		//Release
-		s_context->ClearState();
-		s_context->Flush();
-		SAFE_RELEASE(s_context);
-		SAFE_RELEASE(s_device);
-
-		#ifdef _DEBUG_DX
-			s_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-			SAFE_RELEASE(s_debug);
-		#endif
+		utils::D3D::Instance()->Destroy();
 
 		return true;
-	}
-
-	ID3D11Device * ThomasCore::GetDevice()
-	{
-		return s_device;
-	}
-
-	ID3D11DeviceContext* ThomasCore::GetDeviceContext()
-	{
-		return s_context;
 	}
 
 	std::vector<std::string> ThomasCore::GetLogOutput()
@@ -149,57 +127,6 @@ namespace thomas
 	void ThomasCore::ClearLogOutput()
 	{
 		s_clearLog = true;
-	}
-
-	bool ThomasCore::InitDirectX()
-	{
-		if (!s_device)
-		{
-			CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-			CreateDeviceAndContext();
-#ifdef _DEBUG_DX
-			assert(!ThomasCore::GetDevice()->QueryInterface(IID_PPV_ARGS(&s_debug)));
-#endif
-			return true;
-		}
-		return true;
-	}
-
-	bool ThomasCore::CreateDeviceAndContext()
-	{
-		HRESULT hr = D3D11CreateDevice(
-			NULL,
-			D3D_DRIVER_TYPE_HARDWARE,
-			NULL,
-#ifdef _DEBUG_DX
-			D3D11_CREATE_DEVICE_DEBUG,
-#else
-			NULL,
-#endif
-			NULL,
-			NULL,
-			D3D11_SDK_VERSION,
-			&s_device,
-			NULL,
-			&s_context
-		);
-
-		if (FAILED(hr))
-		{
-			LOG(hr);
-			return false;
-		}
-
-		ID3D11Multithread* multi;
-		hr = s_device->QueryInterface(IID_PPV_ARGS(&multi));
-		if (SUCCEEDED(hr) && multi != NULL)
-		{
-			multi->SetMultithreadProtected(TRUE);
-			SAFE_RELEASE(multi);
-		}
-		else
-			LOG_HR(hr);
-		return true;
 	}
 }
 

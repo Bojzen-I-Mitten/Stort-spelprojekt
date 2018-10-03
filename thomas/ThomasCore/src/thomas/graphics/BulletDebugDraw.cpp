@@ -58,6 +58,18 @@ namespace thomas
 			m_debugMode = debugMode;
 		}
 
-		
+			// Set the data and send to GPU
+			m_vertexBufferPos->SetData(m_linePositions);
+			m_vertexBufferColor->SetData(m_lineColors);
+			m_material->m_topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+			m_material->GetShader()->BindVertexBuffers({ m_vertexBufferPos.get(), m_vertexBufferColor.get() });
+			m_material->SetMatrix("viewProjection", m_viewProjection);
+			m_material->Bind();
+			m_material->Draw(m_linePositions.size(), 0);
+
+			// Clear the memory
+			m_linePositions.clear();
+			m_lineColors.clear();
+		}
 	}
 }
