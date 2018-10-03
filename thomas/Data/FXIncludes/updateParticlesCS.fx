@@ -37,12 +37,12 @@ AppendStructuredBuffer<uint> appendalivelist;
 ConsumeStructuredBuffer<uint> consumealivelist;
 
 
-[numthreads(256, 1, 1)]
+[numthreads(32, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    uint Tid = (Gid.x * 256) + GTid.x;
+    uint Tid = (Gid.x * 32) + GTid.x;
     
-    if (Tid < 16)
+    //if (Tid < 32)
     {
     
         uint index = consumealivelist.Consume();
@@ -54,7 +54,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     
        
         float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
-
+        particle.lifeTimeLeft = particle.lifeTimeLeft - dt;
 	//lerp between start and end speed
         float speed = lerp(particle.speed, particle.endSpeed, lerpValue);
 
@@ -63,29 +63,25 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         particle.position = particlePosWS;
 
     
-        float scale = particle.size;
+        float scale = lerp(particle.size, particle.endSize, lerpValue);
 
-    
         
-    /*
+        
+    
     if (particle.lifeTimeLeft < 0.0f)
 	{
-		scale = 0.0f;
-        particle.lifeTimeLeft = particle.lifeTimeLeft;
+        scale = 0.0f;
 
         deadlist.Append(index);
     }
 	else
 	{
-        scale = lerp(particle.size, particle.endSize, lerpValue);
-        particle.lifeTimeLeft = particle.lifeTimeLeft - dt;
         
-        appendAliveList.Append(index);
-
-    }*/
+        
+        
         appendalivelist.Append(index);
-//        index);
-
+    }
+        
     //BILLBOARD
 
         float3 right = float3(viewMatrix[0].xyz) * scale;
@@ -108,11 +104,6 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         particles[index] = particle;
         //particles[Tid] = particle;
         BillboardStruct billboard = (BillboardStruct) 0;
-    //billboard.pad2 = float2(0, 0);
-
-    //particle.position = float3(0.0f, 2.0f, 0.0f);
-
-    //float3 particlePosWS = particles[index].position;
 
     //tri 1
         billboard.quad[0][0] = particlePosWS + up + right;

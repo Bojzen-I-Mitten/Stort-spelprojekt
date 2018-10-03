@@ -108,10 +108,10 @@ namespace thomas
 				testInitData.endSize = 3.0f;
 				testInitData.endSpeed = 10.0f;
 				testInitData.gravity = 0.0f;
-				testInitData.maxLifeTime = 20.0f;
+				testInitData.maxLifeTime = 10.0f;
 				testInitData.maxSize = 1.0f;
 				testInitData.maxSpeed = 1.4f;
-				testInitData.minLifeTime = 20.0f;
+				testInitData.minLifeTime = 5.0f;
 				testInitData.minSize = 0.5f;
 				testInitData.minSpeed = 0.5f;
 				testInitData.radius = 10.0f;
@@ -130,15 +130,11 @@ namespace thomas
 				dataVec.push_back(testInitData);
 
 				m_spawnBuffer->SetData(dataVec);
-				dank = true;
-				
+			
 
 				m_emitParticlesCS->SetGlobalResource("initparticles", m_spawnBuffer->GetSRV());
 				m_emitParticlesCS->SetGlobalUAV("particles", m_updateBuffer->GetUAV());
-					
-
 				m_emitParticlesCS->SetGlobalUAV("deadlist", m_deadList->GetUAV());
-
 					
 				if (m_pingpong)
 				{
@@ -154,7 +150,7 @@ namespace thomas
 				m_emitParticlesCS->SetPass(0);
 					
 				m_emitParticlesCS->Dispatch(1);
-				//m_emittedParticles += testInitData.nrOfParticlesToEmit;
+				m_emittedParticles += testInitData.nrOfParticlesToEmit;
 
 				ID3D11UnorderedAccessView* const s_nullUAV[4] = { NULL };
 				ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 4, s_nullUAV, nullptr);
@@ -183,13 +179,14 @@ namespace thomas
 			
 			m_updateParticlesCS->SetGlobalUAV("deadlist", m_deadList->GetUAV());
 			
-			m_emitParticlesCS->SetGlobalUAV("particles", m_updateBuffer->GetUAV());
-			m_emitParticlesCS->SetGlobalUAV("billboards", m_billboardBuffer->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("particles", m_updateBuffer->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("billboards", m_billboardBuffer->GetUAV());
 
 			m_updateParticlesCS->Bind();
 			m_updateParticlesCS->SetPass(0);
 
-			m_updateParticlesCS->Dispatch(1);//m_emittedParticles / 256u);
+			int test = (m_emittedParticles - 1) / 32u + 1;
+			m_updateParticlesCS->Dispatch(test);
 
 
 			ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
@@ -210,9 +207,7 @@ namespace thomas
 			m_particleShader->Bind();
 			m_particleShader->SetPass(0);
 			
-			//m_emittedParticles * 
-
-			ThomasCore::GetDeviceContext()->Draw(6 * 32, 0);
+			ThomasCore::GetDeviceContext()->Draw(6 * m_emittedParticles, 0);
 
 			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
 			ThomasCore::GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);

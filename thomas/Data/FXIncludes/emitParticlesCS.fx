@@ -81,8 +81,7 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 
     InitParticlesBuffer newParticle = initparticles[iy];
 
-   // if (ix < newParticle.nrOfParticlesToEmit)
-    if (ix < 16)
+    if (ix < newParticle.nrOfParticlesToEmit)
     {
         uint rng_state = (ix + 1) * newParticle.rand; //seed
 
@@ -150,11 +149,10 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         float endSize = newParticle.endSize;
         float rotation = 0;
         
-        uint writeindex = deadlist.Consume();
+        
         ParticleStruct fillBuffer = (ParticleStruct) 0;
 
-        fillBuffer.position = position;//
-        //+float3(writeindex * 2.5f, 0.0f, 0.0f);
+        fillBuffer.position = position;
         fillBuffer.rotation = rotation;
         fillBuffer.gravity = gravity;
         fillBuffer.direction = dir;
@@ -164,15 +162,11 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.endSize = endSize;
         fillBuffer.lifeTimeLeft = lifeTime;
         fillBuffer.lifeTime = lifeTime;
-        fillBuffer.rotationSpeed = ix;
-
+        fillBuffer.rotationSpeed = rotationSpeed;
         
-        
+        uint writeindex = deadlist.Consume();
         alivelist.Append(writeindex);
-        
         particles[writeindex] = fillBuffer;
-       // particles[ix] = fillBuffer;
-       
     }
     
 }

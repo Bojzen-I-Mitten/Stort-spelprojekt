@@ -26,7 +26,7 @@ namespace thomas
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
 
-			test.Initialize(32);
+			test.Initialize(32 * 3);
 		}
 		
 		void LightManager::Destroy()
@@ -117,7 +117,11 @@ namespace thomas
 			asdfasdf++;
 			if (asdfasdf == 1000)
 				test.SpawnParticles();
-			
+			if (asdfasdf == 2500)
+				test.SpawnParticles();
+			if (asdfasdf == 5000)
+				test.SpawnParticles();
+
 
 			if (asdfasdf > 1010)
 				test.UpdateParticles();
