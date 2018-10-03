@@ -21,16 +21,21 @@ namespace ThomasEngine.Network
         {
             get
             {
-                if(networkIdentity == null)
+                if (networkIdentity == null)
                 {
                     networkIdentity = gameObject.GetComponent<NetworkIdentity>();
-                    if(networkIdentity == null)
+                    if (networkIdentity == null)
                     {
                         Debug.Log("There is no networkIdentity on this object.");
                     }
                 }
                 return networkIdentity;
             }
+        }
+
+        protected float SendInterval
+        {
+            get{return 1.0f/NetworkManager.instance.TICK_RATE;}
         }
 
         [Browsable(false)]
