@@ -5,7 +5,7 @@ using ThomasEngine.Network;
 public class Ball : NetworkComponent
 {
     Rigidbody rb;
-    bool pickedUp = false;
+    bool pickedUp { get { return !rb.enabled;  } set { rb.enabled = !value; } }
 
     public override void Start()
     {
@@ -15,7 +15,10 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
-        
+        if (transform.parent == null)
+        {
+            Drop();
+        }
     }
 
     public void Drop()
@@ -24,7 +27,6 @@ public class Ball : NetworkComponent
         {
             rb.enabled = true;
             transform.parent = null;
-            pickedUp = false;
         }
         
     }
@@ -43,7 +45,6 @@ public class Ball : NetworkComponent
         rb.enabled = false;
         transform.parent = hand;
         transform.localPosition = Vector3.Zero;
-        pickedUp = true;
     }
 
     public override void OnLostOwnership()
