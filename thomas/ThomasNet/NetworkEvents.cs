@@ -97,7 +97,6 @@ namespace ThomasEngine.Network
                 NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
                 foreach (var comp in networkIdentiy.gameObject.GetComponents<NetworkComponent>())
                 {
-                    Debug.Log(comp.gameObject.Name + " ownership transfered to " + newOwner.EndPoint.ToString());
                     comp.OnLostOwnership();
                 }
 

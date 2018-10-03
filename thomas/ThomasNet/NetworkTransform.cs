@@ -45,6 +45,7 @@ namespace ThomasEngine.Network
         float SnapThresholdDistance = 0.5F; //Distance before we snap to the recieved positon
 
         List<LerpState> PositionStates = new List<LerpState>();
+        public int PositionStatesCount { get { return PositionStates.Count; } }
         List<LerpState> RotationStates = new List<LerpState>();
         List<LerpState> ScalingStates = new List<LerpState>();
 
@@ -69,16 +70,16 @@ namespace ThomasEngine.Network
         }
         public override void Update()
         {
-            PrevPosition = transform.position;
-            PrevRotation = transform.rotation;
-            PrevScale = transform.scale;
             if (isOwner)
             {
                 isDirty = HasMoved();
             }
 
-            UpdateCurrentDurations();
+            PrevPosition = transform.position;
+            PrevRotation = transform.rotation;
+            PrevScale = transform.scale;
 
+            UpdateCurrentDurations();
             InterpolateTransform();
         }
 
@@ -177,7 +178,7 @@ namespace ThomasEngine.Network
                 reader.GetVector3();
                 return;
             }
-            if(PositionStates.Count >= NetworkManager.instance.maxNumStoredStates)
+            if (PositionStates.Count >= NetworkManager.instance.maxNumStoredStates)
                 PositionStates.RemoveAt(0);
             PositionStates.Add(new LerpState(reader.GetVector3(), Time.DeltaTime));
             //RotationStates.Add(new LerpState(reader.GetQuaternion(), Time.DeltaTime));
