@@ -1,16 +1,16 @@
 #pragma once
 
-
-namespace thomas {
-	namespace editor {
-
+namespace thomas 
+{
+	namespace editor 
+	{
 		class EditorCamera;
 		
-		class Editor {
+		class Editor 
+		{
 		public:
 			static Editor& GetEditor();
 		public:
-
 			void Init();
 
 			void OnEditorPlay();

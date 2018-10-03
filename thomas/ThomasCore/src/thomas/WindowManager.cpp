@@ -64,10 +64,7 @@ namespace thomas
 		for (Window* window : m_windows)
 		{
 			window->UpdateWindow();
-			if (window == s_current)
-				window->GetInput()->Update();
-			else
-				window->GetInput()->Reset();
+			window->GetInput()->Update();
 		}
 	}
 

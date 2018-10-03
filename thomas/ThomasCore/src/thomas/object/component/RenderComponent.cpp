@@ -95,7 +95,7 @@ namespace thomas {
 					uint32_t num_prop = uint32_t(m_properties.size());
 					const thomas::resource::shaderproperty::ShaderPropertyStatic* local_prop;
 					if (m_properties.size())
-						local_prop = System::S_RENDERER.getAllocator().m_alloc.allocate(m_properties.data(), num_prop);
+						local_prop = graphics::Renderer::Instance()->getAllocator().m_alloc.allocate(m_properties.data(), num_prop);
 					else
 						local_prop = nullptr;
 					// Submit
