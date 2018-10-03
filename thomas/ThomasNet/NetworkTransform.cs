@@ -59,6 +59,9 @@ namespace ThomasEngine.Network
             {
                 TargetSyncLinearVelocity = attachedRigidbody.LinearVelocity;
                 TargetSyncAngularVelocity = attachedRigidbody.AngularVelocity;
+            }else
+            {
+                Debug.LogError("No rigidbody");
             }
         }
 
