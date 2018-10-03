@@ -62,10 +62,16 @@ namespace ThomasEngine.Network
             PrevPosition = transform.position;
             PrevRotation = transform.rotation;
             PrevScale = transform.scale;
+
+            CurrentRotationDuration = 0;
+            CurrentPositionDuration = 0;
+            CurrentScalingDuration = 0;
         }
         public override void Update()
         {
             PrevPosition = transform.position;
+            PrevRotation = transform.rotation;
+            PrevScale = transform.scale;
             if (isOwner)
             {
                 isDirty = HasMoved();
@@ -137,9 +143,9 @@ namespace ThomasEngine.Network
 
             writer.Put(transform.scale);
 
-            PrevPosition = transform.position;
-            PrevRotation = transform.rotation;
-            PrevScale = transform.scale;
+            //PrevPosition = transform.position;
+            //PrevRotation = transform.rotation;
+            //PrevScale = transform.scale;
 
         }
 
