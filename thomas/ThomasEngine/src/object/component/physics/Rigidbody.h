@@ -108,6 +108,42 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezeRotation(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
 		}
 
+		property Vector2 Damping
+		{
+			Vector2 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetDamping()); }
+			void set(Vector2 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetDamping(Utility::Convert(value)); }
+		}
+
+		property Vector2 SleepingThresholds
+		{
+			Vector2 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetSleepingThresholds()); }
+			void set(Vector2 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetSleepingThresholds(Utility::Convert(value)); }
+		}
+
+		property float DeactivationTime
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetDeactivationTime(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetDeactivationTime(value); }
+		}
+
+		property float ContactProcessingThresholds
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetContactProcessingThreshold(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetContactProcessingThreshold(value); }
+		}
+
+		property float CcdMotionThreshold
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdMotionThreshold(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCcdMotionThreshold(value); }
+		}
+
+		property float CcdSweptSphereRadius
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdSweptSphereRadius(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCcdSweptSphereRadius(value); }
+		}
+
 	private:
 		thomas::math::Vector3 ClampVec3(thomas::math::Vector3 & value, const float & min, const float & max)
 		{
