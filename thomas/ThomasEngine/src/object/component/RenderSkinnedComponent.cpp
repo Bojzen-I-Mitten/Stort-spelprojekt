@@ -41,7 +41,7 @@ namespace ThomasEngine
 			m_model = nullptr;
 		}
 		else {
-			if (!(getNativeRenderComp())->SetModel(value->get()))
+			if (!(getNativeRenderComp())->SetModel(value->Native()))
 				m_model = nullptr;
 			else
 			{

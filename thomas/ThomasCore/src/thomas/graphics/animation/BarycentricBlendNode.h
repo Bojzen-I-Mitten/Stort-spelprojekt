@@ -7,11 +7,11 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			class BlendNode : public AnimationNode
+			class BarycentricBlendNode : public AnimationNode
 			{
 			public:
-				BlendNode(Skeleton &ref);
-				virtual ~BlendNode();
+				BarycentricBlendNode(Skeleton &ref);
+				virtual ~BarycentricBlendNode();
 				
 			private:
 

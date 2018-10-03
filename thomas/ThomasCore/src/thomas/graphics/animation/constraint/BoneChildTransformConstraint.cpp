@@ -1,5 +1,5 @@
 #include "BoneChildTransformConstraint.h"
-#include "data/Skeleton.h"
+#include "../data/Skeleton.h"
 
 namespace thomas {
 	namespace graphics {

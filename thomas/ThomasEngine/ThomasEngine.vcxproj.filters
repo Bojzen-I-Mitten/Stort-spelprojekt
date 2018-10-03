@@ -51,6 +51,7 @@
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
+    <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="src\script\animation\BlendNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
+    <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

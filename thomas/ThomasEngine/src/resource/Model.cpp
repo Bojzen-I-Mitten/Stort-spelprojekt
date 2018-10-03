@@ -26,7 +26,7 @@ namespace ThomasEngine
 		m_nativePtr = new thomas::resource::Model(Utility::ConvertString(m_path));
 	}
 
-	thomas::resource::Model * Model::get()
+	thomas::resource::Model * Model::Native()
 	{
 		return (thomas::resource::Model*)m_nativePtr;
 	}
