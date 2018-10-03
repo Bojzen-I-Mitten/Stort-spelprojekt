@@ -56,8 +56,8 @@ StructuredBuffer<InitParticlesBuffer> initParticles;
 
 RWStructuredBuffer<ParticleStruct> particles;
 
-ConsumeStructuredBuffer<uint> deadList;
-AppendStructuredBuffer<uint> aliveList;
+//ConsumeStructuredBuffer<uint> deadList;
+//AppendStructuredBuffer<uint> aliveList;
 
 
 uint RandMarsaglia(uint rng_state)
@@ -165,10 +165,11 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.rotationSpeed = rotationSpeed;
 
         
-        uint writeindex = deadList.Consume();
-        aliveList.Append(writeindex);
+       // uint writeindex = deadList.Consume();
+       // aliveList.Append(writeindex);
         
-        particles[writeindex] = fillBuffer;
+       // particles[writeindex] = fillBuffer;
+        particles[ix] = fillBuffer;
        
     }
 }

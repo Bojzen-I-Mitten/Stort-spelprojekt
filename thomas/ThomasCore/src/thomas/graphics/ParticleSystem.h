@@ -70,6 +70,7 @@ namespace thomas
 			
 			resource::Shader* m_particleShader;
 
+			bool dank;
 			
 		public:
 

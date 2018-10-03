@@ -115,10 +115,11 @@ namespace thomas
 		void LightManager::DANK()
 		{
 			asdfasdf++;
-			if (asdfasdf > 1000 && asdfasdf < 1010)
+			if (asdfasdf == 1000)
 				test.SpawnParticles();
 			
-			if (asdfasdf > 1000)
+
+			if (asdfasdf > 1010)
 				test.UpdateParticles();
 			//test.DrawParticles();
 		}
@@ -127,7 +128,7 @@ namespace thomas
 		{
 
 			//test.SpawnParticles();
-			if (asdfasdf > 1000)
+			if (asdfasdf > 1010)
 			test.DrawParticles();
 		}
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)

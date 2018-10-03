@@ -31,11 +31,11 @@ struct BillboardStruct
 
 RWStructuredBuffer<ParticleStruct> particles;
 RWStructuredBuffer<BillboardStruct> billboards;
-
+/*
 AppendStructuredBuffer<uint> deadList;
 AppendStructuredBuffer<uint> appendAliveList;
 ConsumeStructuredBuffer<uint> consumeAliveList;
-
+*/
 
 [numthreads(256, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
@@ -44,12 +44,12 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     if (Tid < 32)
     {
     
-        uint index = consumeAliveList.Consume();
+        //uint index = //consumeAliveList.Consume();
         float3x3 viewMatrix = thomas_MatrixV;
         float dt = thomas_DeltaTime;
 
     
-        ParticleStruct particle = particles.Load(index);
+        ParticleStruct particle = particles.Load(Tid); //index);
     
        
         float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
@@ -79,7 +79,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         appendAliveList.Append(index);
 
     }*/
-        appendAliveList.Append(index);
+       // appendAliveList.Append(index);
 
     //BILLBOARD
 
@@ -100,7 +100,8 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     
    
     
-        particles[index] = particle;
+        //particles[index] = particle;
+        particles[Tid] = particle;
         BillboardStruct billboard = (BillboardStruct) 0;
     //billboard.pad2 = float2(0, 0);
 
