@@ -176,7 +176,6 @@ namespace ThomasEditor.utils
                 MainWindow._instance.hideBusyIndicator();
                 return true;
             }
-           
         }
 
         public static void AddScript(string script)
@@ -208,7 +207,7 @@ namespace ThomasEditor.utils
                     projectEval.Save();
                 }catch(Exception e)
                 {
-
+                    Debug.Log(e);
                 }
                 
             }));

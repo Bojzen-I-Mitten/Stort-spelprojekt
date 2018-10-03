@@ -6,7 +6,6 @@
 #include "../../graphics/Renderer.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/ShaderProperty/ShaderProperty.h"
-#include "../../System.h"
 #include "../../graphics/render/Frame.h"
 
 namespace thomas {
@@ -145,7 +144,7 @@ namespace thomas {
 					num_prop,
 					property_data);
 
-				System::S_RENDERER.SubmitCommand(cmd);
+				graphics::Renderer::Instance()->SubmitCommand(cmd);
 			}
 
 			resource::shaderproperty::ShaderPropertyStatic & RenderComponent::insertProperty(resource::shaderproperty::ShaderPropertyStatic prop)

@@ -2,11 +2,11 @@
 #include <AtlBase.h>
 #include <atlconv.h>
 #include <d3dcompiler.h>
-#include "Shader.h"
 #include "ShaderProperty\shaderProperties.h"
 #include "../utils/Utility.h"
 #include <fstream>
 #include <comdef.h>
+
 namespace thomas
 {
 	namespace resource
@@ -96,7 +96,7 @@ namespace thomas
 							inputSemantics.push_back(semantic);
 						}
 
-						HRESULT result = ThomasCore::GetDevice()->CreateInputLayout(&inputLayoutDesc[0], inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
+						HRESULT result = utils::D3D::Instance()->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
 						pass.inputSemantics = inputSemantics;
 						if (result != S_OK)
 						{
@@ -172,7 +172,7 @@ namespace thomas
 				&include,
 				D3DCOMPILE_DEBUG,
 				0,
-				ThomasCore::GetDevice(),
+				utils::D3D::Instance()->GetDevice(),
 				&tempEffect,
 				&errorBlob);
 
@@ -245,14 +245,14 @@ namespace thomas
 		}
 		void Shader::BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type)
 		{
-			ThomasCore::GetDeviceContext()->IASetPrimitiveTopology(type);
+			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(type);
 		}
 		void Shader::BindVertexBuffer(utils::buffers::VertexBuffer* buffer)
 		{
 			UINT stride = buffer->GetStride();
 			ID3D11Buffer* buff = buffer->GetBuffer();
 			UINT offset = 0;
-			ThomasCore::GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
 		}
 
 		void Shader::BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers)
@@ -268,13 +268,13 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			ThomasCore::GetDeviceContext()->IASetVertexBuffers(0, buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 
 		void Shader::BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer)
 		{
-			ThomasCore::GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
 		void Shader::Bind()
 		{
@@ -290,9 +290,9 @@ namespace thomas
 		
 		void Shader::SetPass(int passIndex)
 		{
-			ThomasCore::GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);
+			utils::D3D::Instance()->GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);
 			ID3DX11EffectPass* pass = m_effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex);
-			pass->Apply(0, ThomasCore::GetDeviceContext());
+			pass->Apply(0, utils::D3D::Instance()->GetDeviceContext());
 			m_currentPass = &m_passes[passIndex];
 		}
 		Shader::ShaderPass & Shader::GetCurrentPass()

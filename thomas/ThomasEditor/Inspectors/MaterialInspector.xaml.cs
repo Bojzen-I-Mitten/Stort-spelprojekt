@@ -83,9 +83,6 @@ namespace ThomasEditor
 
             }
 
-
-            DictionaryPropertyGridAdapter adapter;
-
             private void Adapter_OnPropertyChanged()
             {
                 (DataContext as Material).EditorProperties = MaterialProperties._dictionary as Dictionary<String, object>;

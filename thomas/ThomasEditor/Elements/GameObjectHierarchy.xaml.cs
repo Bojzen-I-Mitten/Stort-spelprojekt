@@ -10,8 +10,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
-using System.IO;
-
 using ThomasEditor.Inspectors;
 using ThomasEditor.utils;
 using ThomasEngine;
@@ -200,7 +198,7 @@ namespace ThomasEditor
         {
             foreach (TreeViewItem node in nodes)
             {
-                if (node.DataContext == item)
+                if ((ThomasEngine.Object)node.DataContext == item)
                 {
                     nodes.Remove(node);
                     break;
