@@ -25,13 +25,10 @@ namespace thomas
 		Window(HWND hWnd);
 		virtual ~Window();
 
-
 	public:
 		virtual void UpdateWindow();
 		virtual void Present();
-		bool IsFocused();
 		void QueueResize();
-		void UpdateFocus();
 		void Bind();
 		void UnBind();
 		void Clear();
@@ -52,6 +49,7 @@ namespace thomas
 		static LRESULT CALLBACK EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	public:
+		Input* GetInput();
 		LONG GetHeight() const;
 		LONG GetWidth() const;
 		RECT GetBounds() const;
@@ -73,12 +71,12 @@ namespace thomas
 		bool m_fullScreen;
 		bool m_initialized;
 		bool m_shouldResize;
-		bool m_current;
-		bool m_focused;
+		bool m_bound;
 		float m_aspectRatio;
 		std::string m_title;
 
 	protected:
+		Input m_input;
 		WNDCLASSEX m_windowClassInfo;
 		HWND m_windowHandler;
 		RECT m_windowRectangle;

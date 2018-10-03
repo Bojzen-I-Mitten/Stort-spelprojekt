@@ -9,11 +9,13 @@ namespace thomas
 		if (isEditor)
 		{
 			m_editorWindow = new EditorWindow(hWnd);
+			s_current = m_editorWindow;
 			m_windows.push_back(m_editorWindow);
 		}
 		else
 		{
 			Window* window = new Window(hWnd);
+			s_current = window;
 			m_windows.push_back(window);
 		}
 	}
@@ -60,12 +62,23 @@ namespace thomas
 	void WindowManager::Update()
 	{
 		for (Window* window : m_windows)
+		{
 			window->UpdateWindow();
+			if (window == s_current)
+				window->GetInput()->Update();
+			else
+				window->GetInput()->Reset();
+		}
 	}
 
 	int WindowManager::GetNumOfWindows()
 	{
 		return m_windows.size();
+	}
+
+	Window* WindowManager::GetCurrentBound()
+	{
+		return s_current;
 	}
 
 	EditorWindow * WindowManager::GetEditorWindow()
@@ -76,8 +89,11 @@ namespace thomas
 	Window * WindowManager::GetWindow(int index)
 	{
 		if ((index + 1) < m_windows.size())
+		{
+			s_current = m_windows[index + 1];
 			return m_windows[index + 1];
-
+		}
+			
 		return nullptr;
 	}
 
@@ -85,7 +101,10 @@ namespace thomas
 	{
 		for (auto window : m_windows)
 			if (window->GetWindowHandler() == hWnd)
+			{
+				s_current = window;
 				return window;
+			}
 
 		return nullptr;
 	}

@@ -67,6 +67,7 @@ namespace thomas
 			ImGui_ImplDX11_CreateDeviceObjects();
 		}
 		BeginFrame();
+
 	}
 	void EditorWindow::CloneGUIData()
 	{

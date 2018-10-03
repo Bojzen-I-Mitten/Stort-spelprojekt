@@ -19,12 +19,12 @@ namespace thomas
 
 	public:
 		int GetNumOfWindows();
+		Window* GetCurrentBound();
 		EditorWindow* GetEditorWindow();
 		Window* GetWindow(int index);
 		Window* GetWindow(HWND hWnd);
 
 	public:
-		Window* s_focused;
 		static WindowManager* Instance();
 
 	private:
@@ -33,6 +33,7 @@ namespace thomas
 	private:
 		std::vector<Window*> m_windows;
 		EditorWindow* m_editorWindow;
+		Window* s_current;
 
 	private:
 		static WindowManager s_windowManager;

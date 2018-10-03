@@ -33,7 +33,6 @@ namespace thomas
 		if (!utils::D3D::Instance()->Init())
 			return false;
 
-		Input::Init();
 		resource::Texture2D::Init();
 		ThomasTime::Init();
 		Sound::Init();
@@ -60,8 +59,7 @@ namespace thomas
 
 		object::Object::Clean();
 		editor::EditorCamera::Update();
-		resource::Shader::Update();
-		Input::Update();		
+		resource::Shader::Update();	
 		Sound::Update();
 	}
 

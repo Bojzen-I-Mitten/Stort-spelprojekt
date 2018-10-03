@@ -51,8 +51,10 @@ namespace thomas
 		}
 	}
 
-	Window::Window(HWND hWnd) : m_shouldResize(false), m_initialized(false)
+	Window::Window(HWND hWnd) : m_shouldResize(false), m_initialized(false), m_input(Input())
 	{
+		m_input.Init();
+
 		bool result = GetWindowRect(hWnd, &m_windowRectangle);
 		if (result)
 		{
@@ -103,8 +105,6 @@ namespace thomas
 			SAFE_RELEASE(m_dxBuffers.depthBufferSRV);
 
 			m_swapChain->ResizeBuffers(0, m_width, m_height, DXGI_FORMAT_UNKNOWN, 0);
-			if (m_current)
-				m_current = false;
 			return InitDxBuffers();
 		}
 		else
@@ -135,25 +135,6 @@ namespace thomas
 		m_shouldResize = true;
 	}
 
-	void Window::UpdateFocus()
-	{
-		POINT p;
-		if (GetCursorPos(&p)) 
-		{
-			HWND hWnd = WindowFromPoint(p);
-			Window* window = WindowManager::Instance()->GetWindow(hWnd);
-			if (window != WindowManager::Instance()->s_focused) {
-				if (WindowManager::Instance()->s_focused)
-					WindowManager::Instance()->s_focused->m_focused = false;
-				WindowManager::Instance()->s_focused = window;
-				if (WindowManager::Instance()->s_focused != NULL) {
-					WindowManager::Instance()->s_focused->m_focused = true;
-					Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
-				}
-			}
-		}
-	}
-
 	bool Window::IntersectBounds(int x, int y) const
 	{
 		return m_windowRectangle.left <= x && x <= m_windowRectangle.right &&
@@ -162,17 +143,17 @@ namespace thomas
 
 	void Window::Bind()
 	{
-		if (!m_current)
+		if (!m_bound)
 		{
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
 			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
-			m_current = true;
+			m_bound = true;
 		}
 	}
 
 	void Window::UnBind()
 	{
-		m_current = false;
+		m_bound = false;
 	}
 
 	bool Window::ChangeWindowShowState(int nCmdShow)
@@ -183,11 +164,6 @@ namespace thomas
 	void Window::Present()
 	{
 		m_swapChain->Present(0, 0);
-	}
-
-	bool Window::IsFocused()
-	{
-		return m_focused;
 	}
 
 	bool Window::InitDxBuffers()
@@ -263,6 +239,11 @@ namespace thomas
 		return m_swapChain;
 	}
 
+	Input* Window::GetInput()
+	{
+		return &m_input;
+	}
+
 	LONG Window::GetHeight() const
 	{
 		return m_height;
@@ -306,7 +287,7 @@ namespace thomas
 
 	Window* Window::GetCurrentBound()
 	{
-		if (m_current)
+		if (m_bound)
 			return this;
 
 		return nullptr;
@@ -334,11 +315,8 @@ namespace thomas
 		case WM_KILLFOCUS:
 			break;
 		case WM_ACTIVATEAPP:
-			if (window->IsFocused())
-			{
-				Input::ProcessKeyboard(message, wParam, lParam);
-				Input::ProcessMouse(message, wParam, lParam, hWnd);
-			}
+				window->m_input.ProcessKeyboard(message, wParam, lParam);
+				window->m_input.ProcessMouse(message, wParam, lParam, hWnd);
 
 			break;
 		case WM_RBUTTONDOWN:
@@ -354,14 +332,12 @@ namespace thomas
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
 		case WM_MOUSEHOVER:
-			if (window->m_focused)
-				Input::ProcessMouse(message, wParam, lParam, hWnd);
+			window->m_input.ProcessMouse(message, wParam, lParam, hWnd);
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			if (window->m_focused)
-				Input::ProcessKeyboard(message, wParam, lParam);
+			window->m_input.ProcessKeyboard(message, wParam, lParam);
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
