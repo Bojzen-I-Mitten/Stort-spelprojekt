@@ -16,7 +16,10 @@ public class Ball : NetworkComponent
     public override void Update()
     {
         if (transform.parent == null)
+        {
             Drop();
+        }
+            
     }
 
     public void Drop()
@@ -51,6 +54,7 @@ public class Ball : NetworkComponent
     public override void OnLostOwnership()
     {
         rb.enabled = false;
+        pickedUp = true;
     }
 
     public override void OnRead(NetPacketReader reader, bool initialState)
