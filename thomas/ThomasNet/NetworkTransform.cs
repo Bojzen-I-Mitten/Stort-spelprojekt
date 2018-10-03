@@ -79,14 +79,13 @@ namespace ThomasEngine.Network
             if (isOwner)
             {
                 isDirty = HasMoved();
+                InterpolateTransform();
             }
 
             PrevPosition = transform.position;
             PrevRotation = transform.rotation;
             PrevScale = transform.scale;
 
-            UpdateCurrentDurations();
-            InterpolateTransform();
         }
 
         private bool HasMoved()
@@ -197,7 +196,7 @@ namespace ThomasEngine.Network
 
         private void InterpolatePosition()
         {
-            transform.position = Vector3.Lerp(transform.position, TargetPosition, SendInterval * Time.DeltaTime);
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, SendInterval);
         }
 
         private void InterpolateTransform()
