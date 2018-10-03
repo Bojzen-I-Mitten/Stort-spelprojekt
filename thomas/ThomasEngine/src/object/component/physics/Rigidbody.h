@@ -66,11 +66,11 @@ namespace ThomasEngine
 																(thomas::object::component::ForceMode)mode);
 		}
 
-		void SetActivationState(ActivationState state)
+		property ActivationState ActiveState
 		{
-			((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state);
+			ActivationState get() { return (ActivationState)((thomas::object::component::Rigidbody*)nativePtr)->GetActivationState(); };
+			void set(ActivationState state) { ((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state); }
 		}
-
 
 		property Vector3 LinearVelocity
 		{
@@ -96,13 +96,13 @@ namespace ThomasEngine
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetMass(value); }
 		}
 
-		property Vector3 FrzPos
+		property Vector3 FreezePosition
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezePosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezePosition(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
 		}
 
-		property Vector3 FrzRot
+		property Vector3 FreezRotation
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezeRotation()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezeRotation(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }

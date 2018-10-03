@@ -16,7 +16,8 @@ namespace thomas
 			m_kinematic(false),
 			m_mass(1.f),
 			m_freezePosition(1.f),
-			m_freezeRotation(1.f)
+			m_freezeRotation(1.f),
+			m_activationState(ActivationState::Default)
 			{
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
@@ -114,7 +115,8 @@ namespace thomas
 
 			void Rigidbody::SetActivationState(ActivationState state)
 			{
-				this->setActivationState(state);
+				m_activationState = state;
+				this->setActivationState(m_activationState);
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
@@ -155,8 +157,6 @@ namespace thomas
 					Physics::AddRigidBody(this);				
 				}
 			}
-
-			
 
 			void Rigidbody::AddTorque(const math::Vector3 & torque, ForceMode mode)
 			{
@@ -210,6 +210,11 @@ namespace thomas
 			math::Vector3 Rigidbody::GetAngularVelocity() const
 			{
 				return Physics::ToSimple(this->getAngularVelocity());
+			}
+
+			ActivationState Rigidbody::GetActivationState() const
+			{
+				return m_activationState;
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()

@@ -57,6 +57,7 @@ namespace thomas
 				math::Vector3 GetFreezeRotation() const;
 				math::Vector3 GetLinearVelocity() const;
 				math::Vector3 GetAngularVelocity() const;
+				ActivationState GetActivationState() const;
 
 			private:
 				void UpdateRigidbodyMass();
@@ -66,6 +67,7 @@ namespace thomas
 				math::Vector3 m_freezePosition;
 				math::Vector3 m_freezeRotation;
 				math::Matrix m_prevMatrix;
+				ActivationState m_activationState;
 				float m_mass;
 				bool m_kinematic;
 			};
