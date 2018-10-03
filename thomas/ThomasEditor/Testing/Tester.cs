@@ -28,7 +28,7 @@ namespace ThomasEditor.Testing
         private string tempStringProjectPath;
         public Tester(MainWindow editor)
         {
-            
+            sessionDuration = -1;
             this.editor = editor;
             stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -40,20 +40,21 @@ namespace ThomasEditor.Testing
         {
             Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
             {
-                if (o.Filename.Length > 0)
+                if (o.Filename != null)
                 {
-                    editor.OpenProject(o.Filename);
-                    tempStringProjectPath = o.Filename;
+                    if (o.Filename.Length > 0)
+                    {
+                        editor.OpenProject(o.Filename);
+                        tempStringProjectPath = o.Filename;
+                    }
                 }
 
+        
                 if (o.Duration > 0)
                 {
                     sessionDuration = o.Duration;
                 }
-                else
-                {
-                    sessionDuration = 11000000;
-                }
+      
             });
 
       
@@ -69,7 +70,7 @@ namespace ThomasEditor.Testing
 
         public void Update()
         {
-            if (stopwatch.ElapsedMilliseconds > sessionDuration)
+            if (stopwatch.ElapsedMilliseconds > sessionDuration && sessionDuration != -1)
             {
                 // Session should terminate, as we have exceed the 
                 // time the session should run
