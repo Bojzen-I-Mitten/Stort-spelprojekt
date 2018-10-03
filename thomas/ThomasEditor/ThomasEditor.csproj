@@ -188,6 +188,7 @@
     <Compile Include="Elements\Console.xaml.cs">
       <DependentUpon>Console.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Elements\MultiSelectTreeView.cs" />
     <Compile Include="Inspectors\Converters.cs" />
     <Compile Include="Inspectors\Inspector.xaml.cs">
       <DependentUpon>Inspector.xaml</DependentUpon>
@@ -203,6 +204,7 @@
       <DependentUpon>TextureEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Testing\Tester.cs" />
+    <Compile Include="TreeItemViewModel.cs" />
     <Compile Include="utils\CustomCommands.cs" />
     <Compile Include="utils\DictionaryPropertyGridAdapter.cs" />
     <Compile Include="Inspectors\ExtendedPropertyGrid.xaml.cs">
