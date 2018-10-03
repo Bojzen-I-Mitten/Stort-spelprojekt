@@ -17,7 +17,7 @@ namespace ThomasEngine
 
 			serializer->Formatting = Formatting::Indented;
 			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;
-			serializer->PreserveReferencesHandling = PreserveReferencesHandling::All;
+			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;
 			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
 
@@ -95,9 +95,10 @@ namespace ThomasEngine
 		StringWriter^ writer;
 		try
 		{
-
+			List<GameObject^>^ flatGameObjects = gcnew List<GameObject^>();
+			GameObject::FlattenGameObjectTree(flatGameObjects, gameObject);
 			writer = gcnew StringWriter();
-			serializer->Serialize(writer, gameObject);
+			serializer->Serialize(writer, flatGameObjects);
 			File::WriteAllText(path, writer->ToString());
 		}
 		catch (System::Exception^ e)
@@ -113,7 +114,9 @@ namespace ThomasEngine
 	{
 		try
 		{
-			return JObject::FromObject(gameObject, serializer);
+			List<GameObject^>^ flatGameObjects = gcnew List<GameObject^>();
+			GameObject::FlattenGameObjectTree(flatGameObjects, gameObject);
+			return JObject::FromObject(flatGameObjects, serializer);
 		}
 		catch (System::Exception^ e)
 		{
@@ -125,12 +128,11 @@ namespace ThomasEngine
 	GameObject ^ Serializer::DeserializeGameObject(System::String ^ path)
 	{
 		try {
-
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
-			GameObject^ gameObject = (GameObject^)serializer->Deserialize(file, GameObject::typeid);
+			List<GameObject^>^ gameObject = (List<GameObject^>^)serializer->Deserialize(file, List<GameObject^>::typeid);
 			file->Close();
-			return gameObject;
+			return gameObject[0];
 		}
 		catch (Exception^ e)
 		{
@@ -143,7 +145,8 @@ namespace ThomasEngine
 	{
 		try {
 
-			return jo->ToObject<GameObject^>(serializer);
+			List<GameObject^>^ gameObject = jo->ToObject<List<GameObject^>^>(serializer);
+			return gameObject[0];
 		}
 		catch (Exception^ e)
 		{

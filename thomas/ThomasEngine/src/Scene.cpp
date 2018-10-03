@@ -42,6 +42,7 @@ namespace ThomasEngine
 
 	void Scene::CurrentScene::set(Scene^ value)
 	{
+		Scene^ oldScene = s_currentScene;
 		if(value == nullptr)	// If clear scene
 			value = gcnew Scene("test");
 		ThomasWrapper::Selection->UnselectGameObjects();
@@ -49,7 +50,7 @@ namespace ThomasEngine
 		if(Application::currentProject && savingEnabled)
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
 
-		OnCurrentSceneChanged(value);
+		OnCurrentSceneChanged(oldScene, value);
 	}
 
 

@@ -29,7 +29,7 @@ namespace ThomasEngine {
 
 	public:
 		
-		delegate void CurrentSceneChanged(Scene^ newScene);
+		delegate void CurrentSceneChanged(Scene^ oldScene, Scene^ newScene);
 		static event CurrentSceneChanged^ OnCurrentSceneChanged;
 
 

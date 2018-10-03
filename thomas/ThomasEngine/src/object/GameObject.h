@@ -24,6 +24,8 @@ namespace ThomasEngine
 
 	internal:
 
+		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
+
 		System::String^ prefabPath;
 
 		bool m_isDestroyed = false;
@@ -67,6 +69,15 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}	
+
+		[BrowsableAttribute(false)]
+		property String^ Name
+		{
+			String^ get() override;
+			void set(String^) override;
+		};
+
+		
 
 		String^ ToString() override
 		{

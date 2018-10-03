@@ -58,6 +58,15 @@ namespace ThomasEngine {
 		return completed;
 	}
 
+	void GameObject::FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root)
+	{
+		list->Add(root);
+		for each(Transform^ child in root->transform->children)
+		{
+			GameObject::FlattenGameObjectTree(list, child->gameObject);
+		}
+	}
+
 	void GameObject::PostLoad(Scene^ scene)
 	{
 		this->scene = scene;
@@ -304,20 +313,18 @@ namespace ThomasEngine {
 
 	List<GameObject^>^ GameObject::GetAllGameObjects(bool includePrefabs) {
 		List<GameObject^>^ gObjs = ThomasEngine::Object::GetObjectsOfType<GameObject^>();
-		if (includePrefabs)
-			return gObjs;
-		else
-		{
-			for (int i = 0; i < gObjs->Count; i++) {
-				if (!gObjs[i]->inScene) {
+
+		for (int i = 0; i < gObjs->Count; i++) {
+			if (!gObjs[i]->inScene) {
+				if (!includePrefabs || !gObjs[i]->prefabPath) {
 					gObjs->RemoveAt(i);
 					i--;
 				}
-
+				
 			}
-			return gObjs;
+
 		}
-		return nullptr;
+		return gObjs;
 	}
 
 	GameObject^ GameObject::Find(String^ name)
@@ -363,6 +370,18 @@ namespace ThomasEngine {
 				
 		}
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+	}
+
+	String^ GameObject::Name::get() {
+		if (inScene)
+			return m_name;
+		else
+			return m_name + " (prefab)";
+	}
+	void GameObject::Name::set(System::String^ value)
+	{
+		m_name = value;
+		OnPropertyChanged("Name");
 	}
 
 	Transform^ GameObject::transform::get()

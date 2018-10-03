@@ -72,6 +72,8 @@ namespace ThomasEngine
 
 	System::Object ^ PrefabConverter::ReadJson(Newtonsoft::Json::JsonReader ^reader, System::Type ^objectType, System::Object ^existingValue, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
+		if (reader->TokenType == JsonToken::Null)
+			return nullptr;
 		JObject^ jo = JObject::Load(reader);
 
 		if (jo->ContainsKey("prefabPath"))

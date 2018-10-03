@@ -269,7 +269,6 @@ namespace ThomasEngine
 			}
 
 			try {
-
 				GameObject^ prefab = Serializer::DeserializeGameObject(path);
 				if (prefab)
 					prefab->prefabPath = path;
