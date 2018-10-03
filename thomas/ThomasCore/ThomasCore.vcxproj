@@ -22,9 +22,11 @@
   <ItemGroup>
     <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\EditorWindow.cpp" />
+    <ClCompile Include="src\thomas\AutoProfile.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
+    <ClCompile Include="src\thomas\ProfileManager.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
@@ -93,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\EditorWindow.h" />
+    <ClInclude Include="src\thomas\AutoProfile.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
@@ -129,6 +132,7 @@
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\thomas\ProfileManager.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />

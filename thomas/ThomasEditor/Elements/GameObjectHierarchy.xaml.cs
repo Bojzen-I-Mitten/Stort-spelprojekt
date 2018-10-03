@@ -12,6 +12,7 @@ using System.Windows.Media;
 
 using ThomasEditor.Inspectors;
 using ThomasEditor.utils;
+using ThomasEditor.Testing;
 using ThomasEngine;
 namespace ThomasEditor
 {
@@ -33,6 +34,7 @@ namespace ThomasEditor
             ThomasEngine.Transform.OnParentChanged += Transform_OnParentChanged;
             instance = this;
             Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
+            
         }
 
         private void Scene_OnCurrentSceneChanged(Scene newScene)

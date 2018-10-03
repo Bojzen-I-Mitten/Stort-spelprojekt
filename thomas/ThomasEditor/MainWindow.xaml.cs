@@ -9,10 +9,11 @@ using System.ComponentModel;
 using System.IO;
 
 using ThomasEngine;
+using ThomasEditor;
 using System.Threading;
 using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
-
+using ThomasEditor.Testing;
 namespace ThomasEditor
 {
     /// <summary>
@@ -22,7 +23,8 @@ namespace ThomasEditor
 
     public partial class MainWindow : Window
     {
-        
+
+        private Tester tester;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
@@ -46,8 +48,18 @@ namespace ThomasEditor
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CompositionTarget.Rendering += DoUpdates;
 
-            if (Properties.Settings.Default.latestProjectPath != "")
+
+            tester = new Tester(this);
+            // Hi there, jag hörde att du gillade fin kod, 
+            // Så jag skrev det här för att pigga upp dig.
+            if (ThomasEditor.App.args.Args.Length > 0)
+            {
+                tester.Parse(ThomasEditor.App.args.Args);
+            }
+            else if (Properties.Settings.Default.latestProjectPath != "")
+            {
                 OpenProject(Properties.Settings.Default.latestProjectPath);
+            }
             else
             {
                 this.IsEnabled = false;
@@ -61,6 +73,9 @@ namespace ThomasEditor
 
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+
+
+
         }
 
         private void ThomasWrapper_OnStopPlaying()
@@ -204,6 +219,8 @@ namespace ThomasEditor
             if(this.lastRender != args.RenderingTime)
             {
                 ThomasWrapper.Update();
+                tester.Update();
+                editorWindow.Title = ThomasWrapper.FrameRate.ToString();
                 lastRender = args.RenderingTime;
                 transformGizmo.UpdateTransformGizmo();
              }
