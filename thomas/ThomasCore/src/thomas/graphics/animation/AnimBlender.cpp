@@ -64,6 +64,7 @@ namespace thomas {
 				m_weights->update(dT);
 				for (unsigned int i = 0; i < m_NumNode; i++)
 					m_nodes[i]->update(dT);
+				markUpdated();
 			}
 			void AnimBlender::resetUpdate()
 			{

@@ -4,11 +4,13 @@
 #include<thomas/graphics/animation/AnimPlayback.h>
 
 #pragma managed
-#include "../../resource/Animation.h"
 
 
 namespace ThomasEngine
 {
+	ref class Model;
+	ref class Animation;
+
 	namespace Script
 	{
 		/* Wrapper for AnimationNode, referencing a single animation applicable in a blend tree.
@@ -17,7 +19,7 @@ namespace ThomasEngine
 		{
 		public:
 
-			PlaybackNode(Animation^ anim);
+			PlaybackNode(Model ^ model, Animation^ anim);
 			~PlaybackNode();
 
 

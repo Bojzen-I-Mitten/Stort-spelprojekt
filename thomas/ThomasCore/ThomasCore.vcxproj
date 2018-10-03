@@ -23,6 +23,7 @@
     <ClCompile Include="src\thomas\graphics\animation\BoneChildTransformConstraint.cpp" />
     <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="src\thomas\graphics\animation\BoneChildTransformConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\BoneConstraint.h" />
+    <ClInclude Include="src\thomas\graphics\animation\constraint\LookAtConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\TransformComponents.h" />
     <ClInclude Include="src\thomas\graphics\animation\Playback.h" />
     <ClInclude Include="src\thomas\Common.h" />

@@ -195,6 +195,7 @@
     <ClInclude Include="src\object\component\SoundComponent.h" />
     <ClInclude Include="src\resource\Shader.h" />
     <ClInclude Include="src\script\animation\BlendNode.h" />
+    <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />
     <ClInclude Include="src\ThomasSelection.h" />
     <ClInclude Include="src\Time.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="src\ScriptingManager.cpp" />
     <ClCompile Include="src\resource\Shader.cpp" />
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
+    <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\ThomasManaged.cpp" />

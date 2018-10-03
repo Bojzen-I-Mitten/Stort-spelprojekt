@@ -24,8 +24,7 @@ namespace ThomasEngine
 			if(!skel)
 				throw gcnew System::NotSupportedException(
 					"Blend node can't be created: Skeleton does not exist in model " + 
-					Utility::ConvertString(m->GetName()) + 
-					", can't create blend node.");
+					Utility::ConvertString(m->GetName()));
 			// Construct wrapped node
 			this->m_node = new thomas::graphics::animation::AnimBlender(*skel);
 		}

@@ -7,19 +7,29 @@
 #include <thomas/graphics/animation/BaseAnimationTime.h>
 
 #pragma managed
+#include "../../resource/Model.h"
+#include "../../resource/Animation.h"
 
 namespace ThomasEngine
 {
 	namespace Script
 	{
-		PlaybackNode::PlaybackNode(Animation^ anim)
+		PlaybackNode::PlaybackNode(Model ^ model, Animation^ anim)
 		{
 			using namespace thomas::graphics::animation;
+
+
+			thomas::resource::Model *m = (thomas::resource::Model*)model->m_nativePtr;
+			thomas::graphics::animation::Skeleton *skel = m->GetSkeleton();
+			if (!skel)
+				throw gcnew System::NotSupportedException(
+					"Playback node can't be created: Skeleton does not exist in model " +
+					Utility::ConvertString(m->GetName()));
 
 			AnimationData * data = anim->Native()->GetAnimation();
 
 			std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, data->m_duration, PlayType::Once));
-			AnimationNode *node = new AnimPlayback(m_node->m_ref, playback, *data);
+			m_node = new AnimPlayback(*skel, playback, *data);
 		}
 		PlaybackNode::~PlaybackNode()
 		{

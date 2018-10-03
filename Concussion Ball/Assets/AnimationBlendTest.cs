@@ -5,7 +5,8 @@ using System;
 public class AnimationBlendTest : ScriptComponent
 {
     BlendNode root;
-    PlayBack
+    PlaybackNode from;
+    PlaybackNode to;
 
 
     RenderSkinnedComponent skinn;
@@ -19,8 +20,10 @@ public class AnimationBlendTest : ScriptComponent
         skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
         root = new BlendNode(skinn.model);
-        root.appendNode(fromAnim, false);
-        root.appendNode(toAnim, false);
+        from = new PlaybackNode(skinn.model, fromAnim);
+        to = new PlaybackNode(skinn.model, toAnim);
+        root.appendNode(from);
+        root.appendNode(to);
         weight = root.generateWeightHandle();
         skinn.setBlendTreeNode(root);
     }
