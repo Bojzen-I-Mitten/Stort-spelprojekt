@@ -13,6 +13,7 @@
 #include "utils\d3d.h"
 #include <d3d11_4.h>
 #include <comdef.h>
+#include "AutoProfile.h"
 
 #include "object/component/LightComponent.h"
 
@@ -51,6 +52,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();

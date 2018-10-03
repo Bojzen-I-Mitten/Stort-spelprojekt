@@ -3,7 +3,7 @@
 #include "..\resource\Shader.h"
 #include "..\object\Object.h"
 #include "..\object\component\LightComponent.h"
-
+#include "../AutoProfile.h"
 #include <algorithm>
 namespace thomas
 {
@@ -102,6 +102,7 @@ namespace thomas
 		}
 		void LightManager::Bind()
 		{
+			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 			resource::Shader::SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
 			resource::Shader::SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
 			resource::Shader::SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);

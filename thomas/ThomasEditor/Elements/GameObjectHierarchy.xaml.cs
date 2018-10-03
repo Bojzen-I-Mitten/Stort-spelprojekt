@@ -15,6 +15,7 @@ using System.Collections.ObjectModel;
 
 using ThomasEditor.Inspectors;
 using ThomasEditor.utils;
+using ThomasEditor.Testing;
 using ThomasEngine;
 using HierarchyTreeView;
 using System.Collections.Specialized;
@@ -43,6 +44,7 @@ namespace ThomasEditor
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
             Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
+            
         }
 
 
