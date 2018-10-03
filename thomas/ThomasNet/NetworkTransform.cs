@@ -26,11 +26,15 @@ namespace ThomasEngine.Network
 
             public void SetDuration(float leftStateTimestamp, float maxTimestamp)
             {
-                float unwrappedTimestep = leftStateTimestamp > timestamp ? maxTimestamp + timestamp : timestamp;
+                float unwrappedTimeStep = timestamp;
+                while (leftStateTimestamp > unwrappedTimeStep)
+                    unwrappedTimeStep += maxTimestamp;
 
-                duration = Math.Max(0f, unwrappedTimestep - leftStateTimestamp);
+                duration = unwrappedTimeStep;
             }
         }
+
+        private const int MaxTimestamp = 64;
 
         Vector3 PrevPosition;
         Quaternion PrevRotation;
@@ -45,7 +49,6 @@ namespace ThomasEngine.Network
         float SnapThresholdDistance = 0.5F; //Distance before we snap to the recieved positon
 
         List<LerpState> PositionStates = new List<LerpState>();
-        public int PositionStatesCount { get { return PositionStates.Count; } }
         List<LerpState> RotationStates = new List<LerpState>();
         List<LerpState> ScalingStates = new List<LerpState>();
 
@@ -178,9 +181,10 @@ namespace ThomasEngine.Network
                 reader.GetVector3();
                 return;
             }
-            if (PositionStates.Count >= NetworkManager.instance.maxNumStoredStates)
-                PositionStates.RemoveAt(0);
-            PositionStates.Add(new LerpState(reader.GetVector3(), Time.DeltaTime));
+            
+            LerpState positionState = new LerpState(reader.GetVector3(), Time.DeltaTime);
+            AddLerpState(PositionStates, positionState, ref CurrentPositionDuration);
+            
             //RotationStates.Add(new LerpState(reader.GetQuaternion(), Time.DeltaTime));
             //ScalingStates.Add(new LerpState(reader.GetVector3(), Time.DeltaTime));
             //transform.position = reader.GetVector3();
@@ -198,13 +202,19 @@ namespace ThomasEngine.Network
 
                 //calculate how much to lerp, and then lerp
                 float lerpPercent = CurrentPositionDuration / rightState.duration;
-                transform.position = Vector3.Lerp((Vector3)leftState.state, (Vector3)rightState.state, lerpPercent);
+                if (Vector3.Distance((Vector3)leftState.state, (Vector3)rightState.state) > SnapThresholdDistance)
+                    transform.position = (Vector3)rightState.state;
+                else
+                {
+                    transform.position = Vector3.Lerp((Vector3)leftState.state, (Vector3)rightState.state, lerpPercent);
+                    Debug.Log("Lerp between: " + (Vector3)leftState.state + " and " + (Vector3)rightState.state);
+                }
 
                 //If we should lerp more
                 float leftOver = CurrentPositionDuration - rightState.duration;
                 if (leftOver >= 0)
                 {
-                    PositionStates.RemoveAt(0);
+                    RemoveFirstLerpState(PositionStates, ref CurrentPositionDuration);
                     CurrentPositionDuration = leftOver;
                     InterpolatePosition();
                 }
@@ -213,6 +223,21 @@ namespace ThomasEngine.Network
             {
                 CurrentPositionDuration = 0;
             }
+        }
+
+        private void AddLerpState(List<LerpState> stateList, LerpState state, ref float currentDuration)
+        {
+            if (stateList.Count >= NetworkManager.instance.maxNumStoredStates)
+                RemoveFirstLerpState(stateList, ref currentDuration);
+            if (stateList.Count > 0)
+                state.SetDuration(stateList[stateList.Count - 1].timestamp, MaxTimestamp);
+            stateList.Add(state);
+        }
+
+        void RemoveFirstLerpState(List<LerpState> stateList, ref float currentDuration)
+        {
+            stateList.RemoveAt(0);
+            currentDuration = 0;
         }
 
         private void UpdateCurrentDurations()
