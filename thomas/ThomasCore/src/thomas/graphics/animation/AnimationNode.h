@@ -20,7 +20,7 @@ namespace thomas {
 				uint32_t m_flag;
 
 
-				uint32_t NumChannel() { return m_boneMapping.size(); }
+				uint32_t NumChannel() { return (uint32_t)m_boneMapping.size(); }
 				std::vector<int> m_boneMapping;
 
 				AnimationNode(Skeleton &ref);

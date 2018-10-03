@@ -9,7 +9,7 @@ namespace ThomasEngine
 	Animation::Animation(String^ path) :
 		Resource(path, new thomas::resource::Animation(Utility::ConvertString(path)))
 	{}
-	thomas::resource::Animation * Animation::get()
+	thomas::resource::Animation * Animation::Native()
 	{
 		return (thomas::resource::Animation*)m_nativePtr;
 	}

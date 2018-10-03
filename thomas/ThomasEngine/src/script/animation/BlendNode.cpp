@@ -9,6 +9,7 @@
 
 #pragma managed
 #include "../../Debug.h"
+#include "PlaybackNode.h"
 
 
 namespace ThomasEngine
@@ -56,7 +57,7 @@ namespace ThomasEngine
 		void BlendNode::appendNode(PlaybackNode ^ action)
 		{
 			// Push action
-			m_node->pushAnimation(action->m_node);
+			m_node->pushAnimation(action->Native());
 		}
 
 

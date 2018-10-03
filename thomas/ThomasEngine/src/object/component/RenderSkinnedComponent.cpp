@@ -90,7 +90,7 @@ namespace ThomasEngine
 	void RenderSkinnedComponent::setBlendTreeNode(Script::BlendNode ^ node)
 	{
 		if (!node) return;
-		setBlendTreeNode(node->getNativeNode());
+		setBlendTreeNode(node->Native());
 	}
 
 	void RenderSkinnedComponent::Update()
@@ -112,7 +112,7 @@ namespace ThomasEngine
 		if (m_anim == nullptr)
 			get()->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			get()->GetBlendTree()->playSingle(m_anim->get());
+			get()->GetBlendTree()->playSingle(m_anim->Native());
 		}
 			
 	}

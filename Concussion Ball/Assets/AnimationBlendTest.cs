@@ -5,6 +5,9 @@ using System;
 public class AnimationBlendTest : ScriptComponent
 {
     BlendNode root;
+    PlayBack
+
+
     RenderSkinnedComponent skinn;
     WeightHandle weight;
     float timer;
