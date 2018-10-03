@@ -7,30 +7,50 @@ namespace thomas
 	{
 		namespace component
 		{
-			CapsuleCollider::CapsuleCollider() : Collider(new btCapsuleShape(1.0f, 1.0f))
+			CapsuleCollider::CapsuleCollider() : Collider(), m_rotation(ColliderRotation::RotateY)
 			{
 				m_radius = 0.5f;
 				m_height = 1.0f;
 			}
 
+			void CapsuleCollider::Awake()
+			{
+				if (m_rotation == ColliderRotation::RotateX)
+					m_collisionShape = new btCapsuleShapeX(1.f, 1.f);
+				else if (m_rotation == ColliderRotation::RotateY)
+					m_collisionShape = new btCapsuleShape(1.f, 1.f);
+				else if (m_rotation == ColliderRotation::RotateZ)
+					m_collisionShape = new btCapsuleShapeZ(1.f, 1.f);
+
+				m_collisionShape->setMargin(0);
+			}
+
 			void CapsuleCollider::SetRadius(float size)
 			{
 				m_radius = size >= 0 ? size : 0;
-
-			}
-
-			float CapsuleCollider::GetRadius()
-			{
-				return m_radius;
 			}
 
 			void CapsuleCollider::SetHeight(float height)
 			{
 				m_height = height >= 0 ? height : 0;
-
 			}
 
-			float CapsuleCollider::GetHeight()
+			void CapsuleCollider::SetRotation(ColliderRotation rotation)
+			{
+				m_rotation = rotation;
+			}
+
+			float CapsuleCollider::GetRadius() const
+			{
+				return m_radius;
+			}
+
+			ColliderRotation CapsuleCollider::GetRotation() const
+			{
+				return m_rotation;
+			}
+
+			float CapsuleCollider::GetHeight() const
 			{
 				return m_height;
 			}
