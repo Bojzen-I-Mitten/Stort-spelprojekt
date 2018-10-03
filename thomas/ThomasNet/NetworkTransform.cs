@@ -48,10 +48,12 @@ namespace ThomasEngine.Network
         float LocalRotationThreshold = 0.00001f; //Rotation required to count as movement
         float SnapThresholdDistance = 2F; //Distance before we snap to the recieved positon
 
-        List<LerpState> PositionStates = new List<LerpState>();
-        public int PositionStatesCount { get { return PositionStates.Count; } }
-        List<LerpState> RotationStates = new List<LerpState>();
-        List<LerpState> ScalingStates = new List<LerpState>();
+        Vector3 TargetPosition;
+
+        private float SendInterval { get { return 1.0f / NetworkManager.instance.TICK_RATE; } }
+        //List<LerpState> PositionStates = new List<LerpState>();
+        //List<LerpState> RotationStates = new List<LerpState>();
+        //List<LerpState> ScalingStates = new List<LerpState>();
 
         public enum TransformSyncMode
         {
@@ -182,70 +184,20 @@ namespace ThomasEngine.Network
                 reader.GetVector3();
                 return;
             }
-            
-            LerpState positionState = new LerpState(reader.GetVector3(), Time.DeltaTime);
-            AddLerpState(PositionStates, positionState, ref CurrentPositionDuration);
-            
-            //RotationStates.Add(new LerpState(reader.GetQuaternion(), Time.DeltaTime));
-            //ScalingStates.Add(new LerpState(reader.GetVector3(), Time.DeltaTime));
-            //transform.position = reader.GetVector3();
+
+            TargetPosition = reader.GetVector3();
             transform.rotation = reader.GetQuaternion();
             transform.scale = reader.GetVector3();
+
+            if(Vector3.Distance(TargetPosition, transform.position) > SnapThresholdDistance)
+            {
+                transform.position = TargetPosition;
+            }
         }
 
         private void InterpolatePosition()
         {
-            if (PositionStates.Count > 1)
-            {
-                //oldest states in the list
-                LerpState leftState = PositionStates[0];
-                LerpState rightState = PositionStates[1];
-
-                //calculate how much to lerp, and then lerp
-                float lerpPercent = CurrentPositionDuration / rightState.duration;
-                if (Vector3.Distance((Vector3)leftState.state, (Vector3)rightState.state) > SnapThresholdDistance)
-                    transform.position = (Vector3)rightState.state;
-                else
-                {
-                    transform.position = Vector3.Lerp((Vector3)leftState.state, (Vector3)rightState.state, lerpPercent);
-                }
-                Debug.Log("Lerp between: " + (Vector3)leftState.state + " and " + (Vector3)rightState.state + " with amount " + lerpPercent);
-
-                //If we should lerp more
-                float leftOver = CurrentPositionDuration - rightState.duration;
-                RemoveFirstLerpState(PositionStates, ref CurrentPositionDuration);
-                if (PositionStates.Count > 1)
-                {
-                    CurrentPositionDuration = leftOver;
-                    InterpolatePosition();
-                }
-            }
-            else
-            {
-                CurrentPositionDuration = 0;
-            }
-        }
-
-        private void AddLerpState(List<LerpState> stateList, LerpState state, ref float currentDuration)
-        {
-            if (stateList.Count >= NetworkManager.instance.maxNumStoredStates)
-                RemoveFirstLerpState(stateList, ref currentDuration);
-            if (stateList.Count > 0)
-                state.SetDuration(stateList[stateList.Count - 1].timestamp, MaxTimestamp);
-            stateList.Add(state);
-        }
-
-        void RemoveFirstLerpState(List<LerpState> stateList, ref float currentDuration)
-        {
-            stateList.RemoveAt(0);
-            currentDuration = 0;
-        }
-
-        private void UpdateCurrentDurations()
-        {
-            CurrentPositionDuration += Time.DeltaTime;
-            CurrentRotationDuration += Time.DeltaTime;
-            CurrentScalingDuration += Time.DeltaTime;
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, SendInterval * Time.DeltaTime);
         }
 
         private void InterpolateTransform()
