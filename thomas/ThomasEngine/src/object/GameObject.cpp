@@ -37,7 +37,7 @@ namespace ThomasEngine {
 
 		Scene::CurrentScene->GameObjects->Add(this);
 		scene = Scene::CurrentScene;
-		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -49,13 +49,17 @@ namespace ThomasEngine {
 		for each(Component^ component in m_components)
 		{
 			Type^ typ = component->GetType();
-			if ((playing || typ->IsDefined(ExecuteInEditor::typeid, false)) && !component->initialized) {
+			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
+			if ((playing || executeInEditor) && !component->initialized) {
 				completed = false;
 				component->Initialize();
 			}
 		}
 		Monitor::Exit(m_componentsLock);
 		return completed;
+	}
+	thomas::object::GameObject* GameObject::Native::get() {
+		return (thomas::object::GameObject*)nativePtr;
 	}
 
 	void GameObject::PostLoad(Scene^ scene)
@@ -378,7 +382,9 @@ namespace ThomasEngine {
 
 	bool GameObject::GetActive()
 	{
+		if((thomas::object::GameObject*)nativePtr != nullptr)
 		return ((thomas::object::GameObject*)nativePtr)->GetActive();
+		return false;
 	}
 
 	void GameObject::SetActive(bool active)

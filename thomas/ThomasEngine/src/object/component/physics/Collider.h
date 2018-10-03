@@ -17,6 +17,8 @@ namespace ThomasEngine
 			STAY,
 			ENDED
 		};
+
+		virtual void OnGameObjectSet() override {};
 	private:
 		Rigidbody^ m_attachedRigidbody;
 		delegate void OnCollisionDelegate(component::Collider* otherCollider, COLLISION_TYPE collisionType);

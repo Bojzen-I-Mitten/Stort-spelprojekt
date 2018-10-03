@@ -17,6 +17,7 @@ namespace thomas
 	float Physics::s_timeSinceLastPhysicsStep = 0.0f;
 	std::vector<object::component::Rigidbody*> Physics::s_rigidBodies;
 	float Physics::s_accumulator;
+	bool Physics::s_drawDebug = true;
 
 	bool Physics::Init()
 	{
@@ -35,6 +36,8 @@ namespace thomas
 		gContactStartedCallback = Physics::CollisionStarted;
 		gContactProcessedCallback = Physics::CollisionProcessed;
 		gContactEndedCallback = Physics::CollisionEnded;
+		
+		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 		return true;
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
@@ -88,9 +91,9 @@ namespace thomas
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
-		s_debugDraw->Update(camera);
+		if (!s_drawDebug)
+			return;
 		s_world->debugDrawWorld();
-		s_debugDraw->drawLineFinal();
 	}
 
 	void Physics::Destroy()

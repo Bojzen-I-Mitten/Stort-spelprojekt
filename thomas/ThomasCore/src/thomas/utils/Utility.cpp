@@ -24,7 +24,7 @@ namespace thomas {
 			uint32_t hash = 5381;
 			int c;
 			int step = 0;
-			while (c = *str++ && step++ < len)
+			while (c = *str++ && step++ <= len)
 				hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
 			return hash;

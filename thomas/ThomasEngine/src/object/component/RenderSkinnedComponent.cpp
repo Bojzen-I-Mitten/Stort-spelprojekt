@@ -18,6 +18,16 @@ namespace ThomasEngine
 		: Component(new thomas::object::component::RenderSkinnedComponent())
 	{}
 
+	thomas::object::component::RenderSkinnedComponent * RenderSkinnedComponent::get()
+	{
+		return (thomas::object::component::RenderSkinnedComponent*)nativePtr;
+	}
+
+	thomas::object::component::RenderComponent * RenderSkinnedComponent::getNativeRenderComp()
+	{
+		return (thomas::object::component::RenderComponent*)nativePtr;
+	}
+
 	Model^ RenderSkinnedComponent::model::get()
 	{
 		return m_model;
@@ -27,11 +37,11 @@ namespace ThomasEngine
 	{
 		if (value == nullptr)
 		{
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetModel(nullptr);
+			getNativeRenderComp()->SetModel(nullptr);
 			m_model = nullptr;
 		}
 		else {
-			if (!((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetModel((thomas::resource::Model*)value->m_nativePtr))
+			if (!(getNativeRenderComp())->SetModel(value->Native()))
 				m_model = nullptr;
 			else
 			{
@@ -49,7 +59,7 @@ namespace ThomasEngine
 
 
 	Material^ RenderSkinnedComponent::material::get() {
-		thomas::resource::Material* nptr = ((thomas::object::component::RenderComponent*)nativePtr)->GetMaterial(0);
+		thomas::resource::Material* nptr = (getNativeRenderComp())->GetMaterial(0);
 		Resource^ mat = ThomasEngine::Resources::FindResourceFromNativePtr(nptr);
 		if (mat != nullptr)
 			return (Material^)mat;
@@ -64,12 +74,50 @@ namespace ThomasEngine
 			((thomas::object::component::RenderComponent*)nativePtr)->SetMaterial(nullptr);
 		OnPropertyChanged("material");
 	}
+	thomas::object::component::RenderSkinnedComponent* RenderSkinnedComponent::Native::get()
+	{
+		return (thomas::object::component::RenderSkinnedComponent*)nativePtr;
+	}
+	thomas::graphics::animation::IBlendTree* RenderSkinnedComponent::BlendTree::get()
+	{
+		return Native->GetBlendTree();
+	}
 
+
+
+	void RenderSkinnedComponent::setBlendTreeNode(thomas::graphics::animation::AnimationNode * node)
+	{
+		if (node == nullptr)
+			get()->GetBlendTree()->clearBlendTree();
+		else if (m_model != nullptr) {
+			std::unique_ptr< thomas::graphics::animation::AnimationNode> n(node);
+			get()->GetBlendTree()->setBlendTree(n);
+		}
+
+	}
+
+	void RenderSkinnedComponent::setBlendTreeNode(Script::BlendNode ^ node)
+	{
+		if (!node) return;
+		setBlendTreeNode(node->Native());
+	}
+
+	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, uint32_t& boneIndex)
+	{
+		return BlendTree->getBoneIndex(boneHash, boneIndex);
+	}
+
+	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, [Out] uint32_t%  boneIndex)
+	{
+		unsigned int ind;
+		bool result =  BlendTree->getBoneIndex(boneHash, ind);
+		boneIndex = ind;
+		return result;
+	}
 
 	void RenderSkinnedComponent::Update()
 	{
-		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
-		ptr->Update();
+		get()->Update();
 		/*
 		if (Input::GetKeyDown(Input::Keys::Space)) {
 			thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
@@ -84,9 +132,9 @@ namespace ThomasEngine
 	void RenderSkinnedComponent::applyAnimation()
 	{
 		if (m_anim == nullptr)
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->clearBlendTree();
+			get()->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->GetBlendTree()->playSingle(m_anim->get());
+			get()->GetBlendTree()->playSingle(m_anim->Native());
 		}
 			
 	}

@@ -41,8 +41,13 @@ namespace thomas {
 					if (m_model->GetMeshes().size() < m_materials.size()){
 						m_materials.resize(m_model->GetMeshes().size());
 					}
+					// Copy existing material to the new meshes
+					resource::Material* src_mat = m_materials.size() ? // Find suitable material
+						m_materials[0] :
+						resource::Material::GetStandardMaterial();
+					// Copy
 					while (m_model->GetMeshes().size() > m_materials.size())
-						m_materials.push_back(m_materials[0]);
+						m_materials.push_back(src_mat);
 				}
 				return true;
 			}
