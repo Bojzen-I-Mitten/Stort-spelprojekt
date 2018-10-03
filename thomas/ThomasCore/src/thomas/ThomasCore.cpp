@@ -35,12 +35,12 @@ namespace thomas
 
 		resource::Texture2D::Init();
 		ThomasTime::Init();
-		Sound::Init();
+		Sound::Instance()->Init();
 		resource::Shader::Init();
 
 		resource::Material::Init();
 		Physics::Init();
-		editor::EditorCamera::Init();
+		editor::EditorCamera::Instance()->Init();
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
@@ -58,9 +58,9 @@ namespace thomas
 		}
 
 		object::Object::Clean();
-		editor::EditorCamera::Update();
+		editor::EditorCamera::Instance()->Update();
 		resource::Shader::Update();	
-		Sound::Update();
+		Sound::Instance()->Update();
 	}
 
 	void ThomasCore::Exit()
@@ -82,11 +82,11 @@ namespace thomas
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
 		object::Object::Destroy();
-		editor::EditorCamera::Destroy();
+		editor::EditorCamera::Instance()->Destroy();
 		editor::Gizmos::Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
-		Sound::Destroy();
+		Sound::Instance()->Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
 		utils::D3D::Instance()->Destroy();
 

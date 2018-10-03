@@ -15,7 +15,7 @@ namespace thomas
 {
 	namespace editor
 	{
-		EditorCamera* EditorCamera::m_editorCamera;
+		EditorCamera EditorCamera::m_editorCamera;
 
 		EditorCamera::EditorCamera() : 
 			object::GameObject("editorCamera"), 
@@ -28,6 +28,23 @@ namespace thomas
 			m_objectHighlighter(nullptr),
 			m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
 			m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
+		{
+			
+		}
+
+		EditorCamera::~EditorCamera()
+		{
+			
+		}
+
+		void EditorCamera::Destroy()
+		{
+			SAFE_DELETE(m_transform);
+			m_cameraComponent.reset();
+			m_grid.reset();
+		}
+
+		void EditorCamera::Init()
 		{
 			// Transform component
 			m_transform = new object::component::Transform();
@@ -49,39 +66,19 @@ namespace thomas
 			}
 		}
 
-		EditorCamera::~EditorCamera()
+		EditorCamera* EditorCamera::Instance()
 		{
-			SAFE_DELETE(m_transform);
-			m_cameraComponent.reset();
-			m_grid.reset();
-		}
-
-		void EditorCamera::Destroy()
-		{
-			if (m_editorCamera)
-				delete m_editorCamera;
-		}
-
-		void EditorCamera::Init()
-		{
-			m_editorCamera = new EditorCamera();
-		}
-
-		EditorCamera * EditorCamera::GetEditorCamera()
-		{
-			return m_editorCamera;
+			return &m_editorCamera;
 		}
 
 		void EditorCamera::Render()
 		{
-			if (m_editorCamera)
-				m_editorCamera->RenderCamera();
+			RenderCamera();
 		}
 
 		void EditorCamera::Update()
 		{
-			if (m_editorCamera)
-				m_editorCamera->UpdateCamera();
+			UpdateCamera();
 		}
 
 		void EditorCamera::SelectObject(object::GameObject * gameObject)
@@ -93,8 +90,8 @@ namespace thomas
 				m_selectedObjects.push_back(gameObject);
 			}
 
-			m_editorCamera->m_hasSelectionChanged = true;
-			m_editorCamera->m_selectedObject = gameObject;
+			m_hasSelectionChanged = true;
+			m_selectedObject = gameObject;
 		}
 
 		void EditorCamera::UnselectObject(GameObject * gameObject)
@@ -109,15 +106,15 @@ namespace thomas
 				}
 			}
 
-			m_editorCamera->m_selectedObject = nullptr;
+			m_selectedObject = nullptr;
 		}
 
 		void EditorCamera::UnselectObjects()
 		{
 			// Unselect all objects in the scene
 			m_selectedObjects.clear();
-			m_editorCamera->m_hasSelectionChanged = true;
-			m_editorCamera->m_selectedObject = nullptr;
+			m_hasSelectionChanged = true;
+			m_selectedObject = nullptr;
 		}
 
 		const std::vector<object::GameObject*>& EditorCamera::GetSelectedObjects()
@@ -127,12 +124,12 @@ namespace thomas
 
 		void EditorCamera::SetHasSelectionChanged(const bool & selectionChanged)
 		{
-			m_editorCamera->m_hasSelectionChanged = selectionChanged;
+			m_hasSelectionChanged = selectionChanged;
 		}
 
 		bool EditorCamera::HasSelectionChanged()
 		{
-			return m_editorCamera->m_hasSelectionChanged;
+			return m_hasSelectionChanged;
 		}
 
 		object::component::Camera * EditorCamera::GetCamera() const
@@ -142,17 +139,17 @@ namespace thomas
 
 		void EditorCamera::SetManipulatorOperation(ImGuizmo::OPERATION operation)
 		{
-			m_editorCamera->m_manipulatorOperation = operation;
+			m_manipulatorOperation = operation;
 		}
 
 		ImGuizmo::OPERATION EditorCamera::GetManipulatorOperation()
 		{
-			return m_editorCamera->m_manipulatorOperation;
+			return m_manipulatorOperation;
 		}
 
 		void EditorCamera::ToggleManipulatorMode()
 		{
-			m_editorCamera->m_manipulatorMode = m_editorCamera->m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
+			m_manipulatorMode = m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
 		}
 
 		void EditorCamera::RenderCamera()

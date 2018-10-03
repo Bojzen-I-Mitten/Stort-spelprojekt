@@ -123,9 +123,9 @@ namespace thomas
 			}
 
 			//Take care of the editor camera and render gizmos
-			if (editor::EditorCamera::GetEditorCamera())
+			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::GetEditorCamera()->GetCamera());
+				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::RenderGizmos();
 			}
 		}

@@ -26,6 +26,7 @@ namespace thomas
 		{
 			delete s_blackTexture;
 			delete s_whiteTexture;
+			delete s_normalTexture;
 		}
 
 		void Texture2D::LoadTextureFromFile(std::string path)

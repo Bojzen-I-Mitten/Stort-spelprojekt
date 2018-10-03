@@ -70,7 +70,7 @@ namespace ThomasEngine {
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
-		editor::EditorCamera::GetEditorCamera()->GetCamera()->CopyFrameData();
+		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
 		{
 			camera->CopyFrameData();
@@ -135,7 +135,7 @@ namespace ThomasEngine {
 			{
 				if (renderingEditor)
 				{
-					editor::EditorCamera::Render();
+					editor::EditorCamera::Instance()->Render();
 					//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
 					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 					{
@@ -194,7 +194,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::Update()
 	{
 		UpdateLog();
-		if (editor::EditorCamera::GetEditorCamera()->HasSelectionChanged())
+		if (editor::EditorCamera::Instance()->HasSelectionChanged())
 			s_Selection->UpdateSelectedObjects();
 	}
 
@@ -234,20 +234,21 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)
 	{
-		thomas::editor::EditorCamera::GetEditorCamera()->SetManipulatorOperation((ImGuizmo::OPERATION)op);
+		thomas::editor::EditorCamera::Instance()->SetManipulatorOperation((ImGuizmo::OPERATION)op);
 	}
 
 	ThomasWrapper::ManipulatorOperation ThomasWrapper::GetEditorGizmoManipulatorOperation()
 	{
-		return (ManipulatorOperation)thomas::editor::EditorCamera::GetManipulatorOperation();
+		return (ManipulatorOperation)thomas::editor::EditorCamera::Instance()->GetManipulatorOperation();
 	}
 
 	void ThomasWrapper::ToggleEditorGizmoManipulatorMode()
 	{
-		thomas::editor::EditorCamera::GetEditorCamera()->ToggleManipulatorMode();
+		thomas::editor::EditorCamera::Instance()->ToggleManipulatorMode();
 	}
 
-	void ThomasWrapper::UpdateLog() {
+	void ThomasWrapper::UpdateLog() 
+	{
 		std::vector<std::string> nativeOutputs = thomas::ThomasCore::GetLogOutput();
 
 		for (int i = 0; i < nativeOutputs.size(); i++) {
