@@ -11,13 +11,13 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() :
-				btRigidBody(1, NULL, NULL),
-				m_kinematic(false),
-				m_mass(1.f),
-				m_freezePosition(1.f),
-				m_freezeRotation(1.f),
-				m_LocalCenterOfMassChange(0.f)
+			Rigidbody::Rigidbody() : 
+			btRigidBody(1, NULL, NULL), 
+			m_kinematic(false),
+			m_mass(1.f),
+			m_freezePosition(1.f),
+			m_freezeRotation(1.f),
+			m_activationState(ActivationState::Default)
 			{
 		/*		setDamping(0.05, 0.85);
 				setDeactivationTime(3.0);
@@ -119,14 +119,47 @@ namespace thomas
 				this->setLinearVelocity(Physics::ToBullet(linearVel));
 			}
 
-			void Rigidbody::SetAngularVelocity(const math::Vector3 & angularVel)
+			void Rigidbody::SetAngularVelocity(const math::Vector3& angularVel)
 			{
 				this->setAngularVelocity(Physics::ToBullet(angularVel));
 			}
 
+			void Rigidbody::SetDamping(const math::Vector2& damping)
+			{
+				m_damping = damping;
+				this->setDamping(damping.x, damping.y);
+			}
+
+			void Rigidbody::SetSleepingThresholds(const math::Vector2 & thresholds)
+			{
+				m_sleepingThresholds = thresholds;
+				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+			}
+
+			void Rigidbody::SetDeactivationTime(float deactivationTime)
+			{
+				this->setDeactivationTime(deactivationTime);
+			}
+
+			void Rigidbody::SetContactProcessingThreshold(float contactProcessingThreshold)
+			{	
+				this->setContactProcessingThreshold(contactProcessingThreshold);
+			}
+
+			void Rigidbody::SetCcdMotionThreshold(float motionThreshold)
+			{
+				this->setCcdMotionThreshold(motionThreshold);
+			}
+
+			void Rigidbody::SetCcdSweptSphereRadius(float sphereRadius)
+			{
+				this->setCcdSweptSphereRadius(sphereRadius);
+			}
+
 			void Rigidbody::SetActivationState(ActivationState state)
 			{
-				this->setActivationState(state);
+				m_activationState = state;
+				this->setActivationState(m_activationState);
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
@@ -234,6 +267,41 @@ namespace thomas
 			math::Vector3 Rigidbody::GetAngularVelocity() const
 			{
 				return Physics::ToSimple(this->getAngularVelocity());
+			}
+
+			math::Vector2 Rigidbody::GetDamping() const
+			{
+				return m_damping;
+			}
+
+			math::Vector2 Rigidbody::GetSleepingThresholds() const
+			{
+				return m_sleepingThresholds;
+			}
+
+			float Rigidbody::GetCcdSweptSphereRadius() const
+			{
+				return this->getCcdSweptSphereRadius();
+			}
+
+			float Rigidbody::GetDeactivationTime() const
+			{
+				return this->getDeactivationTime();
+			}
+
+			float Rigidbody::GetContactProcessingThreshold() const
+			{
+				return this->getContactProcessingThreshold();
+			}
+
+			float Rigidbody::GetCcdMotionThreshold() const
+			{
+				return this->getCcdMotionThreshold();
+			}
+
+			ActivationState Rigidbody::GetActivationState() const
+			{
+				return m_activationState;
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()

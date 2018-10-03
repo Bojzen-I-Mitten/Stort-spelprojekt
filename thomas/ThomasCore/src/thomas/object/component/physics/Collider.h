@@ -14,6 +14,7 @@ namespace thomas
 			public:
 				typedef void(*OnCollisionEvent)(Collider* otherCollider, Physics::COLLISION_TYPE collisionType);
 			public:
+				Collider();
 				Collider(btCollisionShape* collisionShape);
 				~Collider();
 				
