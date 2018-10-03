@@ -29,8 +29,8 @@ namespace thomas {
 			public:
 				float m_weight;
 				math::Vector3 m_target;
-			private:
 				AxisConstraint m_axis;
+			private:
 
 			};
 

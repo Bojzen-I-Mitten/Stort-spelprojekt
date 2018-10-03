@@ -7,7 +7,7 @@ public class AnimationBlendTest : ScriptComponent
     BlendNode root;
     PlaybackNode from;
     PlaybackNode to;
-
+    LookAtConstraint lookAt;
 
     RenderSkinnedComponent skinn;
     WeightHandle weight;
@@ -26,6 +26,12 @@ public class AnimationBlendTest : ScriptComponent
         root.appendNode(to);
         weight = root.generateWeightHandle();
         skinn.setBlendTreeNode(root);
+
+        // LookAt constraint
+        lookAt = new LookAtConstraint();
+        uint boneIndex;
+        if (skinn.FetchBoneIndex(Utility.hash("mixamorig:Head"), out boneIndex))
+            lookAt.apply(skinn, boneIndex);
     }
 
     public override void Update()

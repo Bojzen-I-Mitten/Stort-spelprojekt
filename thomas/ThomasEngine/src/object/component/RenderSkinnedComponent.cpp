@@ -74,6 +74,15 @@ namespace ThomasEngine
 			((thomas::object::component::RenderComponent*)nativePtr)->SetMaterial(nullptr);
 		OnPropertyChanged("material");
 	}
+	thomas::object::component::RenderSkinnedComponent* RenderSkinnedComponent::Native::get()
+	{
+		return (thomas::object::component::RenderSkinnedComponent*)nativePtr;
+	}
+	thomas::graphics::animation::IBlendTree* RenderSkinnedComponent::BlendTree::get()
+	{
+		return (thomas::graphics::animation::IBlendTree*)nativePtr;
+	}
+
 
 
 	void RenderSkinnedComponent::setBlendTreeNode(thomas::graphics::animation::AnimationNode * node)
@@ -91,6 +100,19 @@ namespace ThomasEngine
 	{
 		if (!node) return;
 		setBlendTreeNode(node->Native());
+	}
+
+	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, uint32_t& boneIndex)
+	{
+		return BlendTree->getBoneIndex(boneHash, boneIndex);
+	}
+
+	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, [Out] uint32_t%  boneIndex)
+	{
+		uint32_t ind;
+		bool result =  BlendTree->getBoneIndex(boneHash, ind);
+		boneIndex = ind;
+		return result;
 	}
 
 	void RenderSkinnedComponent::Update()

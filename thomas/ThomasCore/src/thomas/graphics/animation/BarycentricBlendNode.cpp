@@ -7,7 +7,7 @@ namespace thomas {
 		namespace animation {
 
 			BarycentricBlendNode::BarycentricBlendNode(Skeleton &ref)
-				: BarycentricBlendNode(ref)
+				: AnimationNode(ref)
 			{
 			}
 

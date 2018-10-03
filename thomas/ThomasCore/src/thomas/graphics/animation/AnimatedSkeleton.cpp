@@ -5,7 +5,7 @@
 #include "../../resource/Animation.h"
 #include "data/Skeleton.h"
 #include "BaseAnimationTime.h"
-#include "BoneConstraint.h"
+#include "constraint/BoneConstraint.h"
 
 namespace thomas {
 	namespace graphics {

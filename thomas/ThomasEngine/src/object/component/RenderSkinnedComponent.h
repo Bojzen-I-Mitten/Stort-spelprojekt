@@ -2,6 +2,7 @@
 #pragma unmanaged
 #include <thomas\object\component\RenderSkinnedComponent.h>
 #include <thomas/graphics/animation/AnimationNode.h>
+#include <thomas/graphics/animation/IBlendTree.h>
 #pragma managed
 
 #include "../Component.h"
@@ -9,6 +10,7 @@
 #include "../../resource/Material.h"
 #include "../../resource/Animation.h"
 #include "../../script/animation/BlendNode.h"
+using namespace System::Runtime::InteropServices;
 
 namespace ThomasEngine
 {
@@ -42,6 +44,16 @@ namespace ThomasEngine
 		void setBlendTreeNode(thomas::graphics::animation::AnimationNode * node);
 
 		void setBlendTreeNode(Script::BlendNode^ node);
+
+		bool FetchBoneIndex(uint32_t boneHash, uint32_t& boneIndex);
+		bool FetchBoneIndex(uint32_t boneHash, [Out] uint32_t% boneIndex);
+
+		property thomas::graphics::animation::IBlendTree* BlendTree {
+			thomas::graphics::animation::IBlendTree* get();
+		}
+		property thomas::object::component::RenderSkinnedComponent* Native {
+			thomas::object::component::RenderSkinnedComponent* get();
+		}
 
 		void Update() override;
 

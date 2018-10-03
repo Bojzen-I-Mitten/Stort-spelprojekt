@@ -1,4 +1,3 @@
-#include "..\..\..\..\..\..\ThomasEngine\src\script\animation\constraint\LookAtConstraint.h"
 #include "LookAtConstraint.h"
 
 
@@ -36,11 +35,7 @@ namespace thomas {
 			}
 			void LookAtConstraint::execute(Skeleton & skel, math::Matrix * objectPose, uint32_t boneInd)
 			{
-				math::Vector3 s, t;
-				math::Quaternion q;
-				objectPose->Decompose(s, q, t);
-
-				math::Vector3 dir = m_target - t;
+				math::Vector3 dir = m_target - objectPose[boneInd].Translation();
 				dir.Normalize();
 				math::Vector3 forward = objectPose[boneInd].Forward();
 				forward.Normalize();
@@ -49,6 +44,7 @@ namespace thomas {
 				math::Quaternion rotation;
 				switch (m_axis) {
 					case AxisConstraint::AxisX:
+					{
 						float x = forward.Dot(dir);									// Project on ZY plane
 						float y = up.Dot(dir);
 						float angle = std::atan2f(y, x);							// Angle diff on ZY plane
@@ -56,17 +52,17 @@ namespace thomas {
 						math::Vector3 r = objectPose->Right();						// X
 						r.Normalize();
 						rotation = math::Quaternion::CreateFromAxisAngle(r, angle);	// Create rotation around x
+					}
 						break;
 					case AxisConstraint::AxisY:
-						break;
 					case AxisConstraint::AxisZ:
-						break;
+						// Not implemented
 					case AxisConstraint::AxisXYZ:
-						q = math::getRotationTo(forward, dir);
+						rotation = math::getRotationTo(forward, dir);
 						break;
 				}
 				// Apply
-				objectPose[boneInd] *= math::Matrix::CreateFromQuaternion(q);
+				objectPose[boneInd] *= math::Matrix::CreateFromQuaternion(rotation);
 			}
 		}
 	}
