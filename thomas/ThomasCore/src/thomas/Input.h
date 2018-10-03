@@ -212,63 +212,64 @@ namespace thomas
 		};
 
 	public:
-		static bool Init();
-		static void Update();
-		static void ProcessKeyboard(UINT message, WPARAM wParam, LPARAM lParam);
-		static void ProcessMouse(UINT message, WPARAM wParam, LPARAM lParam, HWND handle);
-		static void ProcessGamePad(UINT message, WPARAM wParam, LPARAM lParam);
-		static void ResetScrollWheelValue();
-		static void Vibrate(float left, float right, float time = 0.f);
+		bool Init();
+		void Update();
+		void Reset();
+		void ProcessKeyboard(UINT message, WPARAM wParam, LPARAM lParam);
+		void ProcessMouse(UINT message, WPARAM wParam, LPARAM lParam, HWND handle);
+		void ProcessGamePad(UINT message, WPARAM wParam, LPARAM lParam);
+		void ResetScrollWheelValue();
+		void Vibrate(float left, float right, float time = 0.f);
 
 	public:
-		static void SetMouseMode(MouseMode mode);
+		void SetMouseMode(MouseMode mode);
 
 	public:
 		//Mouse
-		static float GetMouseY();
-		static float GetMouseX();
-		static bool GetMouseButtonDown(MouseButtons button);
-		static bool GetMouseButtonUp(MouseButtons button);
-		static bool GetMouseButton(MouseButtons button);
-		static int GetMouseScrollWheel();
-		static math::Vector2 GetAbsolutePosition();
-		static math::Vector2 GetMousePosition();
+		float GetMouseY();
+		float GetMouseX();
+		bool GetMouseButtonDown(MouseButtons button);
+		bool GetMouseButtonUp(MouseButtons button);
+		bool GetMouseButton(MouseButtons button);
+		int GetMouseScrollWheel();
+		math::Vector2 GetAbsolutePosition();
+		math::Vector2 GetMousePosition();
 		
 		//Keyboard
-		static bool GetKeyDown(Keys key);
-		static bool GetKeyUp(Keys key);
-		static bool GetKey(Keys key);
+		bool GetKeyDown(Keys key);
+		bool GetKeyUp(Keys key);
+		bool GetKey(Keys key);
 	
 		//Gamepad
-		static bool GetButtonDown(Buttons button);
-		static bool GetButtonUp(Buttons button);
-		static bool GetButton(Buttons button);
-		static float GetLeftStickY();
-		static float GetLeftStickX();
-		static float GetRightStickY();
-		static float GetRightStickX();
-		static float GetLeftTriggerDelta();
-		static float GetRightTriggerDelta();
+		bool GetButtonDown(Buttons button);
+		bool GetButtonUp(Buttons button);
+		bool GetButton(Buttons button);
+		float GetLeftStickY();
+		float GetLeftStickX();
+		float GetRightStickY();
+		float GetRightStickX();
+		float GetLeftTriggerDelta();
+		float GetRightTriggerDelta();
 		
 	private:
 		//Keyboard
 		static std::unique_ptr<Keyboard> s_keyboard;
-		static Keyboard::State s_keyboardState;
-		static Keyboard::KeyboardStateTracker s_keyboardTracker;
+		Keyboard::State m_keyboardState;
+		Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 		//Mouse
 		static std::unique_ptr<Mouse> s_mouse;
-		static Mouse::State s_mouseState;
-		static Mouse::ButtonStateTracker s_mouseTracker;
+		Mouse::State m_mouseState;
+		Mouse::ButtonStateTracker m_mouseTracker;
 
 		//Gamepad
 		static std::unique_ptr<GamePad> s_gamePad;
-		static GamePad::State s_gamePadState;
-		static GamePad::ButtonStateTracker s_gamePadTracker;
+		GamePad::State m_gamePadState;
+		GamePad::ButtonStateTracker m_gamePadTracker;
 
 	private:
-		static bool s_initialized;
-		static math::Vector2 s_mousePosition, s_absolutePosition;
-		static float s_vibrateTimeLeft;
+		bool m_initialized;
+		math::Vector2 m_mousePosition, m_absolutePosition;
+		float s_vibrateTimeLeft;
 	};
 }

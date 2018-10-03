@@ -11,13 +11,10 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-
-
-			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref) :
-				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(&skin_ref), m_constraint(new ConstraintList[ref.getNumBones()])
+			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) :
+				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(ref.getNumBones()), m_constraint(new ConstraintList[ref.getNumBones()])
 			{
 				clearConstraints();
-				_skin->resize(ref.getNumBones());
 				clearBlendTree();
 				updateSkeleton();
 			}
@@ -41,17 +38,15 @@ namespace thomas {
 			{
 				//Update animation tree
 				// Update skin transforms
-				math::Matrix *skin_arr = _skin->GetValue();
 				_pose[0] = _root->calcLocalTransform(0) * _ref.getRoot();				//	Update root pose
-				applyConstraint(0u);
-
-				skin_arr[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
-				for (uint32_t i = 1; i < boneCount(); i++)
+				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
+				applyConstraint(0);
+				for (unsigned int i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
 					_pose[i] = _root->calcLocalTransform(i) * _pose[bone._parentIndex];	//	Update root pose
 					applyConstraint(i);
-					skin_arr[i] = bone._invBindPose * _pose[i];							//	Update root skin
+					_skin[i] = bone._invBindPose * _pose[i];							//	Update root skin
 				}
 			}
 			void AnimatedSkeleton::applyConstraint(uint32_t index)
@@ -94,7 +89,7 @@ namespace thomas {
 
 
 			const math::Matrix* AnimatedSkeleton::getSkin() const {
-				return _skin->GetValue();
+				return _skin.data();
 			}
 			unsigned int AnimatedSkeleton::boneCount() const {
 				return _pose.size();
@@ -116,10 +111,6 @@ namespace thomas {
 			const std::string & AnimatedSkeleton::getBoneName(unsigned int bone) const
 			{
 				return _ref.getBone(bone)._boneName;
-			}
-			const resource::shaderproperty::ShaderPropertyMatrixArray * AnimatedSkeleton::getShaderProperty()
-			{
-				return _skin;
 			}
 			void AnimatedSkeleton::addConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{

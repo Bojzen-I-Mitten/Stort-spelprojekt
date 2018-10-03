@@ -28,7 +28,7 @@ namespace thomas {
 				: public IBlendTree
 			{
 			public:
-				AnimatedSkeleton(Skeleton& ref, resource::shaderproperty::ShaderPropertyMatrixArray& skin_ref);
+				AnimatedSkeleton(Skeleton& ref);
 				~AnimatedSkeleton();
 
 				void update(float dT);
@@ -54,16 +54,15 @@ namespace thomas {
 				bool getBoneIndex(uint32_t boneNameHash, unsigned int & boneIndex) const;
 				virtual const std::string& getBoneName(unsigned int bone) const;
 
-				const resource::shaderproperty::ShaderPropertyMatrixArray* getShaderProperty();
 
 				virtual void addConstraint(BoneConstraint * bC, uint32_t boneIndex);
 				virtual void rmvConstraint(BoneConstraint * bC, uint32_t boneIndex);
 
 			private:
-				Skeleton& _ref;												// Reference to the mesh skeleton
-				std::unique_ptr<AnimationNode> _root;						// Root in the blend tree
-				std::vector<math::Matrix> _pose;							// Bone transform in model space
-				resource::shaderproperty::ShaderPropertyMatrixArray* _skin;	// Skin Transforms in model space, stored in a property ready for the GPU
+				Skeleton& _ref;									// Reference to the mesh skeleton
+				std::unique_ptr<AnimationNode> _root;			// Root in the blend tree
+				std::vector<math::Matrix> _pose;				// Bone transform in model space
+				std::vector<math::Matrix> _skin;				// Skin Transforms in model space, stored in a property ready for the GPU
 				std::unique_ptr<ConstraintList> m_constraint;
 			private:
 				void updateSkeleton();
