@@ -48,7 +48,7 @@ namespace HierarchyTreeView
             }
         }
 
-        public ObservableCollection<TreeItemViewModel> Children { get; set; }
+        public List<TreeItemViewModel> Children { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)

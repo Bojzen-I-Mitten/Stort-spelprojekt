@@ -119,7 +119,7 @@ namespace ThomasEditor
             //}));
         }
 
-        private TreeItemViewModel FindNode(ObservableCollection<TreeItemViewModel> nodes, GameObject gameObject)
+        private TreeItemViewModel FindNode(List<TreeItemViewModel> nodes, GameObject gameObject)
         {
             foreach (TreeItemViewModel node in nodes)
             {
@@ -134,9 +134,9 @@ namespace ThomasEditor
 
         }
 
-        private ObservableCollection<TreeItemViewModel> BuildTree(ThomasEngine.Transform parent)
+        private List<TreeItemViewModel> BuildTree(ThomasEngine.Transform parent)
         {
-            ObservableCollection<TreeItemViewModel> children = new ObservableCollection<TreeItemViewModel>();
+            List<TreeItemViewModel> children = new List<TreeItemViewModel>();
 
             foreach (ThomasEngine.Transform child in parent.children)
             {
@@ -152,7 +152,7 @@ namespace ThomasEditor
 
         public void Unselect()
         {
-            Unselect(m_hierarchyNodes);
+            Unselect(m_hierarchyNodes.ToList());
             if (hierarchy.SelectedItem != null)
             {
                 wasUnselected = true;
@@ -161,7 +161,7 @@ namespace ThomasEditor
 
         }
 
-        private void Unselect(ObservableCollection<TreeItemViewModel> nodes)
+        private void Unselect(List<TreeItemViewModel> nodes)
         {
             foreach (TreeItemViewModel node in nodes)
             {
@@ -196,7 +196,7 @@ namespace ThomasEditor
                     foreach (GameObject oldItem in e.OldItems)
                     {
                         oldItem.Destroy();
-                        DeleteObjectInTree(m_hierarchyNodes, oldItem);
+                        DeleteObjectInTree(m_hierarchyNodes.ToList(), oldItem);
                     }
                 }
             }));
@@ -204,7 +204,7 @@ namespace ThomasEditor
 
         }
 
-        private void DeleteObjectInTree(ObservableCollection<TreeItemViewModel> nodes, GameObject item)
+        private void DeleteObjectInTree(List<TreeItemViewModel> nodes, GameObject item)
         {
             foreach (TreeItemViewModel node in nodes)
             {
@@ -219,7 +219,7 @@ namespace ThomasEditor
 
 
 
-        private void SelectOrDeselectInTree(ObservableCollection<TreeItemViewModel> nodes, System.Collections.IList items, bool select)
+        private void SelectOrDeselectInTree(List<TreeItemViewModel> nodes, System.Collections.IList items, bool select)
         {
             foreach (TreeItemViewModel node in nodes)
             {
@@ -231,7 +231,7 @@ namespace ThomasEditor
             }
         }
 
-        private void ResetTree(ObservableCollection<TreeItemViewModel> nodes)
+        private void ResetTree(List<TreeItemViewModel> nodes)
         {
             foreach (TreeItemViewModel node in nodes)
             {
@@ -246,17 +246,17 @@ namespace ThomasEditor
             {
                 if (e.NewItems != null)
                 {
-                    SelectOrDeselectInTree(m_hierarchyNodes, e.NewItems, true);
+                    SelectOrDeselectInTree(m_hierarchyNodes.ToList(), e.NewItems, true);
                 }
                 if (e.OldItems != null)
                 {
-                    SelectOrDeselectInTree(m_hierarchyNodes, e.OldItems, false);
+                    SelectOrDeselectInTree(m_hierarchyNodes.ToList(), e.OldItems, false);
                 }
 
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
                 {
                     if(m_hierarchyNodes.Count > 0)
-                        ResetTree(m_hierarchyNodes);
+                        ResetTree(m_hierarchyNodes.ToList());
                 }
             }));
 
@@ -331,7 +331,7 @@ namespace ThomasEditor
             return foundItem;
         }
 
-        private void ChangeParent(ThomasEngine.Transform parentTransform, ObservableCollection<TreeItemViewModel> allNodes)
+        private void ChangeParent(ThomasEngine.Transform parentTransform, List<TreeItemViewModel> allNodes)
         {
             foreach (TreeItemViewModel node in allNodes)
             {
@@ -345,13 +345,14 @@ namespace ThomasEditor
 
         private bool CheckIfChild(TreeItemViewModel source, ThomasEngine.Transform target)
         {
-            foreach (TreeItemViewModel child in source.Children)
-            {
-                if ((GameObject)child.Data == target.gameObject)
-                    return true;
-                if (CheckIfChild(child, target))
-                    return true;
-            }
+            if(target != null)
+                foreach (TreeItemViewModel child in source.Children)
+                {
+                    if ((GameObject)child.Data == target.gameObject)
+                        return true;
+                    if (CheckIfChild(child, target))
+                        return true;
+                }
             return false;
         }
 
@@ -370,13 +371,13 @@ namespace ThomasEditor
                     if (target != null && sourceData != null && (GameObject)((TreeItemViewModel)target.DataContext).Data != sourceData)
                     {
                         GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
-                        ChangeParent(parent.transform, m_hierarchyNodes);
+                        ChangeParent(parent.transform, m_hierarchyNodes.ToList());
                     }
                     else if (sourceData != null && target == null)
                     {
                         if (sourceData.inScene)
                         {
-                            ChangeParent(null, m_hierarchyNodes);
+                            ChangeParent(null, m_hierarchyNodes.ToList());
                         }
                         else
                         {
@@ -513,7 +514,7 @@ namespace ThomasEditor
         {
             Debug.Log("Entered copy function..");
 
-            List<TreeItemViewModel> items = GetSelectedRootNodes(m_hierarchyNodes);
+            List<TreeItemViewModel> items = GetSelectedRootNodes(m_hierarchyNodes.ToList());
             ClearCopies();
             Debug.Log("Copying object..");
 
@@ -551,7 +552,7 @@ namespace ThomasEditor
             List<TreeItemViewModel> nodes = new List<TreeItemViewModel>();
             if (m_hierarchyNodes != null)
             {
-                nodes = GetSelectedRootNodes(m_hierarchyNodes);
+                nodes = GetSelectedRootNodes(m_hierarchyNodes.ToList());
 
                 if (nodes.Count > 0)
                 {
@@ -587,10 +588,10 @@ namespace ThomasEditor
 
         public List<TreeItemViewModel> GetSelection()
         {
-            return GetSelectedRootNodes(m_hierarchyNodes);
+            return GetSelectedRootNodes(m_hierarchyNodes.ToList());
         }
 
-        private List<TreeItemViewModel>GetSelectedRootNodes(ObservableCollection<TreeItemViewModel> nodes)
+        private List<TreeItemViewModel>GetSelectedRootNodes(List<TreeItemViewModel> nodes)
         {
             List<TreeItemViewModel> selected = new List<TreeItemViewModel>();
             foreach (TreeItemViewModel node in nodes)
