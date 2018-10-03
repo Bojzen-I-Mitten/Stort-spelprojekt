@@ -5,12 +5,7 @@
 
 namespace thomas
 {
-	float Sound::s_masterVolume;
-	float Sound::s_fxVolume;
-	float Sound::s_musicVolume;
-	std::unique_ptr<WaveBank> Sound::s_bank;
-	std::unique_ptr<AudioEngine> Sound::s_audioEngine;
-	std::map <std::string, std::unique_ptr<SoundEffect>> Sound::s_waves;
+	Sound Sound::s_sound;
 
 	bool Sound::Init()
 	{
@@ -115,6 +110,11 @@ namespace thomas
 	void Sound::SetMusicVolume(const float & volume)
 	{
 		s_musicVolume = volume;
+	}
+
+	Sound* Sound::Instance()
+	{
+		return &s_sound;
 	}
 
 	float Sound::GetMusicVolume()

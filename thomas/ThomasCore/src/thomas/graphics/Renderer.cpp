@@ -10,7 +10,7 @@
 #include "..\resource\ShaderProperty\ShaderProperty.h"
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
-#include "..\Window.h"
+#include "..\WindowManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 
@@ -18,6 +18,7 @@ namespace thomas
 {
 	namespace graphics
 	{
+		Renderer Renderer::s_renderer;
 
 		void Renderer::BindFrame()
 		{
@@ -37,18 +38,23 @@ namespace thomas
 		{
 		}
 
+		Renderer* Renderer::Instance()
+		{
+			return &s_renderer;
+		}
+
 		void Renderer::BindCamera(thomas::object::component::Camera * camera)
 		{
 			object::component::Camera::CAMERA_FRAME_DATA& frameData = camera->GetFrameData();
 			//Get the current active window
 
-			auto window = Window::GetWindow(frameData.targetDisplay);
+			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
 			if (!window || !window->Initialized())
 				return;
 
 			window->Bind();
-			ThomasCore::GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -116,9 +122,9 @@ namespace thomas
 			}
 
 			//Take care of the editor camera and render gizmos
-			if (editor::EditorCamera::GetEditorCamera())
+			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::GetEditorCamera()->GetCamera());
+				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::RenderGizmos();
 			}
 		}

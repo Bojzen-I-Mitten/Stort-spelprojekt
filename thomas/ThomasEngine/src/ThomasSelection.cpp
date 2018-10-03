@@ -26,7 +26,7 @@ namespace ThomasEngine {
 		try {
 			m_SelectedGameObjects->Clear();
 			m_SelectedGameObjects->Add(gObj);
-			thomas::editor::EditorCamera::GetEditorCamera()->SelectObject((thomas::object::GameObject*)gObj->nativePtr);
+			thomas::editor::EditorCamera::Instance()->SelectObject((thomas::object::GameObject*)gObj->nativePtr);
 		}
 		finally	{
 			Monitor::Exit(m_lock);
@@ -51,7 +51,7 @@ namespace ThomasEngine {
 #endif
 		try {
 		m_SelectedGameObjects->Remove(gObj);
-		thomas::editor::EditorCamera::GetEditorCamera()->UnselectObject((thomas::object::GameObject*)gObj->nativePtr);
+		thomas::editor::EditorCamera::Instance()->UnselectObject((thomas::object::GameObject*)gObj->nativePtr);
 		}	
 		finally	{
 			Monitor::Exit(m_lock);
@@ -66,7 +66,7 @@ namespace ThomasEngine {
 #endif
 		try {
 		m_SelectedGameObjects->Clear();
-		thomas::editor::EditorCamera::GetEditorCamera()->SelectObject(nullptr);
+		thomas::editor::EditorCamera::Instance()->SelectObject(nullptr);
 		}	
 		finally	{
 			Monitor::Exit(m_lock);
@@ -99,7 +99,7 @@ namespace ThomasEngine {
 		lockOwner = Thread::CurrentThread->Name;
 #endif
 		try {
-			for (thomas::object::GameObject* gameObject : thomas::editor::EditorCamera::GetEditorCamera()->GetSelectedObjects())
+			for (thomas::object::GameObject* gameObject : thomas::editor::EditorCamera::Instance()->GetSelectedObjects())
 			{
 				GameObject^ gObj = (GameObject^)ThomasEngine::Object::GetObject(gameObject);
 				if (gObj)
@@ -125,7 +125,7 @@ namespace ThomasEngine {
 		finally {
 			Monitor::Exit(m_lock);
 		}
-		thomas::editor::EditorCamera::GetEditorCamera()->SetHasSelectionChanged(false);
+		thomas::editor::EditorCamera::Instance()->SetHasSelectionChanged(false);
 	}
 
 	System::Guid ThomasSelection::GetSelectedGUID()

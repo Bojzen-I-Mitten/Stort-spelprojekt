@@ -1,5 +1,6 @@
 #pragma once
 #pragma unmanaged
+#include <thomas\WindowManager.h>
 #include <thomas\Input.h>
 #pragma managed
 #include "Utility.h"
@@ -227,36 +228,36 @@ namespace ThomasEngine
 			BACK
 		};
 
-		static float GetMouseY() { return thomas::Input::GetMouseY(); }
-		static float GetMouseX() { return thomas::Input::GetMouseX(); }
-		static int GetMouseScrollWheel() { return thomas::Input::GetMouseScrollWheel(); };
-		static bool GetMouseButtonDown(MouseButtons button) { return thomas::Input::GetMouseButtonDown((thomas::Input::MouseButtons)button); }
-		static bool GetMouseButtonUp(MouseButtons button) { return thomas::Input::GetMouseButtonUp((thomas::Input::MouseButtons)button); }
-		static bool GetMouseButton(MouseButtons button) { return thomas::Input::GetMouseButton((thomas::Input::MouseButtons)button); }
+		static float GetMouseY() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMouseY(); }
+		static float GetMouseX() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMouseX(); }
+		static int GetMouseScrollWheel() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMouseScrollWheel(); };
+		static bool GetMouseButtonDown(MouseButtons button) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMouseButtonDown((thomas::Input::MouseButtons)button); }
+		static bool GetMouseButtonUp(MouseButtons button) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMouseButtonUp((thomas::Input::MouseButtons)button); }
+		static bool GetMouseButton(MouseButtons button) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMouseButton((thomas::Input::MouseButtons)button); }
 
 		//Keyboard
-		static bool GetKeyDown(Keys key) { return thomas::Input::GetKeyDown((thomas::Input::Keys)key); }
-		static bool GetKeyUp(Keys key) { return thomas::Input::GetKeyUp((thomas::Input::Keys)key); }
-		static bool GetKey(Keys key) { return thomas::Input::GetKey((thomas::Input::Keys)key); }
+		static bool GetKeyDown(Keys key) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetKeyDown((thomas::Input::Keys)key); }
+		static bool GetKeyUp(Keys key) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetKeyUp((thomas::Input::Keys)key); }
+		static bool GetKey(Keys key) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetKey((thomas::Input::Keys)key); }
 
 		//Gamepad
-		static bool GetButtonDown(Buttons button) { return thomas::Input::GetButtonDown((thomas::Input::Buttons)button); }
-		static bool GetButtonUp(Buttons button) { return thomas::Input::GetButtonUp((thomas::Input::Buttons)button); }
-		static bool GetButton(Buttons button) {	return thomas::Input::GetButton((thomas::Input::Buttons)button); }
+		static bool GetButtonDown(Buttons button) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetButtonDown((thomas::Input::Buttons)button); }
+		static bool GetButtonUp(Buttons button) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetButtonUp((thomas::Input::Buttons)button); }
+		static bool GetButton(Buttons button) {	return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetButton((thomas::Input::Buttons)button); }
 
-		static void Vibrate(float left, float right) { return thomas::Input::Vibrate(left, right); }
-		static void Vibrate(float left, float right, float time) { return thomas::Input::Vibrate(left, right, time); }
+		static void Vibrate(float left, float right) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->Vibrate(left, right); }
+		static void Vibrate(float left, float right, float time) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->Vibrate(left, right, time); }
 
-		static float GetLeftStickY() { return thomas::Input::GetLeftStickY(); }
-		static float GetLeftStickX() { return thomas::Input::GetLeftStickX(); }
-		static float GetRightStickY() { return thomas::Input::GetRightStickY(); }
-		static float GetRightStickX() { return thomas::Input::GetRightStickX(); }
-		static float GetLeftTriggerDelta() { return thomas::Input::GetLeftTriggerDelta(); }
-		static float GetRightTriggerDelta() { return thomas::Input::GetRightTriggerDelta(); }
+		static float GetLeftStickY() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetLeftStickY(); }
+		static float GetLeftStickX() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetLeftStickX(); }
+		static float GetRightStickY() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetRightStickY(); }
+		static float GetRightStickX() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetRightStickX(); }
+		static float GetLeftTriggerDelta() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetLeftTriggerDelta(); }
+		static float GetRightTriggerDelta() { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetRightTriggerDelta(); }
 
-		static Vector2 GetMousePosition() { return Utility::Convert(thomas::Input::GetMousePosition()); }
+		static Vector2 GetMousePosition() { return Utility::Convert(thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->GetMousePosition()); }
 
-		static void SetMouseMode(MouseMode mode) { return thomas::Input::SetMouseMode((thomas::Input::MouseMode)mode); }
+		static void SetMouseMode(MouseMode mode) { return thomas::WindowManager::Instance()->GetCurrentBound()->GetInput()->SetMouseMode((thomas::Input::MouseMode)mode); }
 
 	private:
 

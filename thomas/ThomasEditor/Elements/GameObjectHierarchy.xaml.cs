@@ -208,7 +208,7 @@ namespace ThomasEditor
         {
             foreach (TreeItemViewModel node in nodes)
             {
-                if((GameObject)node.Data == item)
+                if ((ThomasEngine.Object)node.Data == item)
                 {
                     m_hierarchyNodes.Remove(node);
                     break;
