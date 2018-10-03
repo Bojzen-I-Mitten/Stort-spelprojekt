@@ -17,6 +17,15 @@ namespace ThomasEngine
 			Impulse
 		};
 
+		enum class ActivationState
+		{
+			Default = WANTS_DEACTIVATION,
+			Sleeping = ISLAND_SLEEPING,
+			Disabled = DISABLE_SIMULATION,
+			Active_Tag = ACTIVE_TAG,
+			Always_Active = DISABLE_DEACTIVATION
+		};
+
 	public:
 		Rigidbody() : Component(new thomas::object::component::Rigidbody()) {}
 		void Awake() override;
@@ -57,7 +66,23 @@ namespace ThomasEngine
 																(thomas::object::component::ForceMode)mode);
 		}
 
-		GameObject^ GetTargetCollider();
+		void SetActivationState(ActivationState state)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state);
+		}
+
+
+		property Vector3 LinearVelocity
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetLinearVelocity()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetLinearVelocity(Utility::Convert(value)); }
+		}
+
+		property Vector3 AngularVelocity
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetAngularVelocity()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetAngularVelocity(Utility::Convert(value)); }
+		}
 
 		property bool IsKinematic 
 		{
@@ -70,12 +95,6 @@ namespace ThomasEngine
 			float get(){ return ((thomas::object::component::Rigidbody*)nativePtr)->GetMass(); }
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetMass(value); }
 		}
-
-		/*property bool UseGravity
-		{
-			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->HasGravity(); }
-			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetGravity(value); }
-		}*/
 
 		property Vector3 FrzPos
 		{

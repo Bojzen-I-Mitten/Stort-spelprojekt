@@ -153,12 +153,11 @@
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                             <xcad:LayoutDocumentPane>
-                                    <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
+                                <xcad:LayoutAnchorable ContentId="Project" Title="Project" CanHide="False" CanClose="False">
                                     <local:AssetBrowser/>
                                 </xcad:LayoutAnchorable>
-                                    <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
-                                    <ListBox Name="console" HorizontalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.ScrollChanged="Console_ScrollChanged">
-                                    </ListBox>
+                                <xcad:LayoutAnchorable ContentId="Console" Title="Console" CanHide="False" CanClose="False">
+                                    <local:Console/>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>
