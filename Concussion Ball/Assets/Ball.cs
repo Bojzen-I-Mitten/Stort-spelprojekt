@@ -15,7 +15,8 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
-        
+        if (transform.parent == null)
+            Drop();
     }
 
     public void Drop()

@@ -89,7 +89,7 @@ namespace ThomasEngine.Network
 
             if(ObjectOwners.ContainsKey(peer))
             {
-                ObjectOwners[peer].RemoveRange(0, ObjectOwners.Count);
+                ObjectOwners[peer].Clear();
                 ObjectOwners.Remove(peer);
             }
         }
