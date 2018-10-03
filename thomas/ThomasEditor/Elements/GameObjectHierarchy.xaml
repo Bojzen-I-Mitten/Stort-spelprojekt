@@ -123,7 +123,7 @@
         </Style>
 
         <HierarchicalDataTemplate DataType="{x:Type hierarchyTreeView:TreeItemViewModel}" ItemsSource="{Binding Children}">
-            <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" Foreground="White"/>
+            <TextBlock Text="{Binding Data.Name}" TextTrimming="CharacterEllipsis" Foreground="White"/>
         </HierarchicalDataTemplate>
 
     </UserControl.Resources>

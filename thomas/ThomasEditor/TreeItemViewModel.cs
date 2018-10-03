@@ -1,24 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using ThomasEngine;
 
 namespace HierarchyTreeView
 {
     public partial class TreeItemViewModel : INotifyPropertyChanged
     {
-        public TreeItemViewModel(string displayName, object dataContext)
+        private object _data;
+        public TreeItemViewModel(object dataContext)
         {
-            DisplayName = displayName;
-            Data = dataContext;
+            _data = dataContext;
         }
 
         private bool _isExpanded;
         private bool _isSelected;
 
-        public string DisplayName { get; set; }
-        public object Data { get; set; }
+        public string DisplayName {
+            get { return ((GameObject)_data).Name; }
+        }
+
+        public object Data {
+            get { return _data; }
+            set { _data = value; }
+        }
 
         public bool IsExpanded
         {
@@ -40,7 +48,7 @@ namespace HierarchyTreeView
             }
         }
 
-        public List<TreeItemViewModel> Children { get; set; }
+        public ObservableCollection<TreeItemViewModel> Children { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)
