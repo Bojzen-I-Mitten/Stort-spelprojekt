@@ -51,11 +51,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Ball.cs" />
-    <Compile Include="Assets\InputTest.cs" />
-    <Compile Include="Assets\collisionTest.cs" />
+    <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
-    <Compile Include="Assets\throwStrengthVisualizer.cs" />
+    <Compile Include="Assets\Scripts\collisionTest.cs" />
+    <Compile Include="Assets\Scripts\InputTest.cs" />
+    <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
