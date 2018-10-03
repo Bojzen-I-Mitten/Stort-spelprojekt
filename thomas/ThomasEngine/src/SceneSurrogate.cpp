@@ -55,6 +55,8 @@ namespace ThomasEngine
 				return Texture2D::whiteTexture;
 			else if (sceneResource->path == "Black Texture")
 				return Texture2D::whiteTexture;
+			else if (sceneResource->path == "Normal Texture")
+				return Texture2D::normalTexture;
 
 			else if (targetType == GameObject::typeid)
 				return Resources::LoadPrefab(Resources::ConvertToRealPath(sceneResource->path));

@@ -54,7 +54,7 @@ namespace thomas
 			void ProcessCommands();
 			void ClearCommands();
 			void SubmitCommand(render::RenderCommand& command);
-
+			render::Frame& getAllocator();
 
 
 			void TransferCommandList();

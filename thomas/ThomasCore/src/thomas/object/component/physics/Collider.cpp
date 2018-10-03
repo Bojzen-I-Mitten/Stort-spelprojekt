@@ -44,7 +44,35 @@ namespace thomas
 
 			void Collider::SetTrigger(bool trigger)
 			{
+				if (trigger) {
+					if (m_attachedRigidbody) {
+						m_attachedRigidbody->setCollisionFlags(m_attachedRigidbody->getCollisionFlags() | Rigidbody::CF_NO_CONTACT_RESPONSE);
+					}
+					else if (m_collisionObject) {
+						m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | Rigidbody::CF_NO_CONTACT_RESPONSE);
+					}
+				}
+				else
+				{
+					if (m_attachedRigidbody) {
+						m_attachedRigidbody->setCollisionFlags(m_attachedRigidbody->getCollisionFlags() & ~Rigidbody::CF_NO_CONTACT_RESPONSE);
+					}
+					else if (m_collisionObject) {
+						m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() & ~Rigidbody::CF_NO_CONTACT_RESPONSE);
+					}
+				}
 				m_trigger = trigger;
+			}
+
+			void Collider::SetOnCollisionEvent(OnCollisionEvent value)
+			{
+				m_onCollisionEvent = value;
+			}
+
+			void Collider::OnCollision(Collider * otherCollider, Physics::COLLISION_TYPE collisionType)
+			{
+				if (m_onCollisionEvent)
+					m_onCollisionEvent(otherCollider, collisionType);
 			}
 
 			void Collider::Awake()
@@ -57,6 +85,8 @@ namespace thomas
 				{
 					m_collisionObject = new btCollisionObject();
 					m_collisionObject->setCollisionShape(m_collisionShape);
+					m_collisionObject->setUserPointer(this);
+					SetTrigger(m_trigger); //Update trigger flags
 					Physics::s_world->addCollisionObject(m_collisionObject);
 				}
 			}
