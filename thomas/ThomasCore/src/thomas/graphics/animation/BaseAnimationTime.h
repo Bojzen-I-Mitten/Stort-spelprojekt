@@ -23,6 +23,7 @@ namespace thomas {
 				void setPlayType(PlayType type);
 				PlayType getPlayType();
 				void setSpeed(float speed);
+				float getDuration();
 
 				/* Partial state reset, state is set to a new play instance. */
 				void playOnce();

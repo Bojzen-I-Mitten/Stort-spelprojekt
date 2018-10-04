@@ -1,6 +1,5 @@
 #include "PlaybackHandle.h"
-
-
+#include <algorithm>
 
 namespace ThomasEngine
 {
@@ -35,7 +34,7 @@ namespace ThomasEngine
 		}
 		void PlaybackHandle::SetFrame(float elapsed)
 		{
-			m_handle->m_elapsedTime = elapsed;
+			m_handle->m_elapsedTime = std::fmodf(elapsed, m_handle->getDuration());
 		}
 		thomas::graphics::animation::Playback * PlaybackHandle::Native()
 		{

@@ -49,6 +49,10 @@ namespace thomas {
 			{
 				m_speedUp = speed;
 			}
+			float BaseAnimationTime::getDuration()
+			{
+				return m_duration;
+			}
 		}
 	}
 }
