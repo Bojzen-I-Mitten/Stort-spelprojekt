@@ -10,10 +10,9 @@
                 mc:Ignorable="d" 
                 d:DesignHeight="300" d:DesignWidth="300"
                 x:Name="_this"
+                AllowDrop="True"
+                PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"
                 >
-    <!--AllowDrop="True"-->
-                <!--PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"-->
-                
 
     <UserControl.CommandBindings>
         <CommandBinding Command="commands:CustomCommands.GetAddCompenent" CanExecute="AddComponent_CanExecute" Executed="AddComponent"/>

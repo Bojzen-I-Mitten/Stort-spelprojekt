@@ -143,18 +143,14 @@ namespace ThomasEditor
                 //Debug.Log("Entered preview function");
                 if (e.Data.GetDataPresent(typeof(TreeViewItem)))
                 {
+                    //e.Effects = DragDropEffects.None;
                     TreeViewItem item = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
                     StackPanel sourceHeader = item.Header as StackPanel;
-                    if (item.DataContext is Resource || ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
+
+                    if (ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
                     {
-                        Resource resource = item.DataContext as Resource;
-                        ContentControl label = sender as ContentControl;
-                        PropertyItem pi = label.DataContext as PropertyItem;
-                        if (resource.GetType() == pi.PropertyType)
-                        {
-                            e.Effects = DragDropEffects.Move;
-                            e.Handled = true;
-                        }
+                        e.Effects = DragDropEffects.Move;
+                        e.Handled = true;
                     }
                     else
                         e.Effects = DragDropEffects.None;
