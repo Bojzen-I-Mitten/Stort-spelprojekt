@@ -11,8 +11,30 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
+        struct LerpState
+        {
+            public object state; //maybe template instead? idk
+            public float timestamp;
+            public float duration;
 
+            public LerpState(object state, float timestamp)
+            {
+                this.state = state;
+                this.timestamp = timestamp;
+                duration = 0;
+            }
 
+            public void SetDuration(float leftStateTimestamp, float maxTimestamp)
+            {
+                float unwrappedTimeStep = timestamp;
+                while (leftStateTimestamp > unwrappedTimeStep)
+                    unwrappedTimeStep += maxTimestamp;
+
+                duration = unwrappedTimeStep;
+            }
+        }
+
+        private const int MaxTimestamp = 64;
 
         Vector3 PrevPosition;
         Quaternion PrevRotation;
@@ -67,6 +89,8 @@ namespace ThomasEngine.Network
 
         public override void Update()
         {
+            //CurrentPositionDuration += Time.DeltaTime;
+
             if (isOwner)
             {
                 isDirty = HasMoved();
@@ -150,7 +174,7 @@ namespace ThomasEngine.Network
                 writer.Put(1);
             }
 
-            switch(SyncMode)
+            switch (SyncMode)
             {
                 case TransformSyncMode.SyncTransform:
                     WriteTransform(writer);
@@ -172,9 +196,9 @@ namespace ThomasEngine.Network
 
             writer.Put(transform.scale);
 
-            PrevPosition = transform.position;
-            PrevRotation = transform.rotation;
-            PrevScale = transform.scale;
+            //PrevPosition = transform.position;
+            //PrevRotation = transform.rotation;
+            //PrevScale = transform.scale;
 
         }
 
@@ -211,7 +235,7 @@ namespace ThomasEngine.Network
                 default:
                     break;
             }
-            
+
         }
 
         private void ReadTransform(NetPacketReader reader)
@@ -225,9 +249,20 @@ namespace ThomasEngine.Network
                 return;
             }
 
-            transform.position = reader.GetVector3();
+            TargetSyncPosition = reader.GetVector3();
+            CurrentPositionDuration = 0;
             transform.rotation = reader.GetQuaternion();
             transform.scale = reader.GetVector3();
+
+            if(Vector3.Distance(TargetPosition, transform.position) > SnapThresholdDistance)
+            {
+                transform.position = TargetPosition;
+            }
+        }
+
+        private void InterpolatePosition()
+        {
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, Math.Min(1.0f, CurrentPositionDuration / SendInterval));
         }
 
         private void ReadRigidbody(NetPacketReader reader)
