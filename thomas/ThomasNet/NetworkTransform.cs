@@ -11,13 +11,12 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
-
-
-
         Vector3 PrevPosition;
         Quaternion PrevRotation;
         Vector3 PrevScale;
         float prevVelocity;
+
+        float CurrentPositionDuration = 0;
 
         const float LocalMovementThreshold = 0.00001f;
         const float LocalRotationThreshold = 0.00001f;
@@ -59,7 +58,8 @@ namespace ThomasEngine.Network
             {
                 TargetSyncLinearVelocity = attachedRigidbody.LinearVelocity;
                 TargetSyncAngularVelocity = attachedRigidbody.AngularVelocity;
-            }else
+            }
+            else
             {
                 Debug.LogError("No rigidbody");
             }
@@ -67,16 +67,26 @@ namespace ThomasEngine.Network
 
         public override void Update()
         {
+            CurrentPositionDuration += Time.DeltaTime;
+
             if (isOwner)
             {
                 isDirty = HasMoved();
             }
 
+            switch (SyncMode)
+            {
+                case TransformSyncMode.SyncTransform:
+                    InterpolatePosition();
+                    break;
+                default:
+                    break;
+            }
         }
 
         public override void FixedUpdate()
         {
-            switch(SyncMode)
+            switch (SyncMode)
             {
                 case TransformSyncMode.SyncRigidbody:
                     InterpolateRigidbody();
@@ -88,7 +98,7 @@ namespace ThomasEngine.Network
 
         void InterpolateRigidbody()
         {
-            if(!isOwner && attachedRigidbody)
+            if (!isOwner && attachedRigidbody)
             {
                 Vector3 newVelocity = (TargetSyncPosition - transform.position) * InterpolateMovement / SendInterval;
                 attachedRigidbody.LinearVelocity = newVelocity;
@@ -118,14 +128,14 @@ namespace ThomasEngine.Network
                 return true;
 
 
-            if(attachedRigidbody)
+            if (attachedRigidbody)
             {
                 diff = attachedRigidbody.LinearVelocity.LengthSquared() - prevVelocity;
                 if (diff > LocalVelocityThreshold)
                     return true;
             }
-           
-           
+
+
 
             return false;
 
@@ -150,7 +160,7 @@ namespace ThomasEngine.Network
                 writer.Put(1);
             }
 
-            switch(SyncMode)
+            switch (SyncMode)
             {
                 case TransformSyncMode.SyncTransform:
                     WriteTransform(writer);
@@ -172,9 +182,9 @@ namespace ThomasEngine.Network
 
             writer.Put(transform.scale);
 
-            PrevPosition = transform.position;
-            PrevRotation = transform.rotation;
-            PrevScale = transform.scale;
+            //PrevPosition = transform.position;
+            //PrevRotation = transform.rotation;
+            //PrevScale = transform.scale;
 
         }
 
@@ -211,11 +221,12 @@ namespace ThomasEngine.Network
                 default:
                     break;
             }
-            
+
         }
 
         private void ReadTransform(NetPacketReader reader)
         {
+            CurrentPositionDuration = 0;
             if (isOwner)
             {
                 //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
@@ -225,9 +236,23 @@ namespace ThomasEngine.Network
                 return;
             }
 
-            transform.position = reader.GetVector3();
+            TargetSyncPosition = reader.GetVector3();
             transform.rotation = reader.GetQuaternion();
             transform.scale = reader.GetVector3();
+
+            if (Vector3.Distance(TargetSyncPosition, transform.position) > SnapThreshhold)
+            {
+                transform.position = TargetSyncPosition;
+            }
+        }
+
+        private void InterpolatePosition()
+        {
+
+            if (!isOwner)
+            {
+                transform.position = Vector3.Lerp(transform.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
+            }
         }
 
         private void ReadRigidbody(NetPacketReader reader)
@@ -255,7 +280,7 @@ namespace ThomasEngine.Network
             TargetSyncAngularVelocity = reader.GetVector3();
 
             float dist = Vector3.Distance(transform.position, TargetSyncPosition);
-            if(dist > SnapThreshhold || !attachedRigidbody.enabled)
+            if (dist > SnapThreshhold || !attachedRigidbody.enabled)
             {
                 transform.position = TargetSyncPosition;
                 attachedRigidbody.LinearVelocity = TargetSyncLinearVelocity;
