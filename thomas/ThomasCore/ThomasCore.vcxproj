@@ -20,9 +20,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\editor\Editor.cpp" />
+    <ClCompile Include="src\thomas\EditorWindow.cpp" />
+    <ClCompile Include="src\thomas\AutoProfile.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
-    <ClCompile Include="src\thomas\System.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
+    <ClCompile Include="src\thomas\ProfileManager.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
@@ -81,12 +85,17 @@
     <ClCompile Include="src\thomas\ThomasCore.cpp" />
     <ClCompile Include="src\thomas\ThomasTime.cpp" />
     <ClCompile Include="src\thomas\utils\AssimpLoader.cpp" />
-    <ClCompile Include="src\thomas\utils\D3d.cpp" />
+    <ClCompile Include="src\thomas\utils\D3D.cpp" />
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
+    <ClCompile Include="src\thomas\utils\Utility.cpp" />
     <ClCompile Include="src\thomas\Window.cpp" />
+    <ClCompile Include="src\thomas\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\thomas\editor\Editor.h" />
+    <ClInclude Include="src\thomas\EditorWindow.h" />
+    <ClInclude Include="src\thomas\AutoProfile.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
@@ -123,6 +132,7 @@
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\thomas\ProfileManager.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />
@@ -132,11 +142,11 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarFloat.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyScalarInt.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyShaderResource.h" />
+    <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
-    <ClInclude Include="src\thomas\System.h" />
     <ClInclude Include="src\thomas\utils\Buffers.h" />
     <ClInclude Include="src\thomas\graphics\BulletDebugDraw.h" />
     <ClInclude Include="src\thomas\resource\ComputeShader.h" />
@@ -169,7 +179,9 @@
     <ClInclude Include="src\thomas\utils\D3D.h" />
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />
+    <ClInclude Include="src\thomas\utils\Utility.h" />
     <ClInclude Include="src\thomas\Window.h" />
+    <ClInclude Include="src\thomas\WindowManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ED0D8681-B384-43D1-8F56-B4145588E20C}</ProjectGuid>

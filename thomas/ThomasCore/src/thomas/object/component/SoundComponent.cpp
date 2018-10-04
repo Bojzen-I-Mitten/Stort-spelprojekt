@@ -54,7 +54,7 @@ namespace thomas
 				m_volume = volume;
 				if (m_instance)
 				{
-					m_instance->SetVolume(volume*Sound::GetMusicVolume());
+					m_instance->SetVolume(volume*Sound::Instance()->GetMusicVolume());
 					
 				}
 				return true;
@@ -80,7 +80,7 @@ namespace thomas
 			bool SoundComponent::PlayOneShot(std::string name, float volume)
 			{
 				return true;
-				return Sound::Play(name, volume);
+				return Sound::Instance()->Play(name, volume);
 			}
 
 			void SoundComponent::Pause()
