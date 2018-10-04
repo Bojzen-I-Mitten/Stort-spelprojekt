@@ -3,6 +3,7 @@
 
 #define UINT_MAX_AS_FLOAT 4294967296.0f
 //#define INVERS_UINT_MAX_AS_FLOAT 2.32830644e-10
+#define UPDATE_THREAD_DIM_X 256
 
 uint RandMarsaglia(uint rng_state)
 {

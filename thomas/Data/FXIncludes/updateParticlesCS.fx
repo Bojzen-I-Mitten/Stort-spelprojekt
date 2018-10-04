@@ -12,12 +12,13 @@ ConsumeStructuredBuffer<uint> consumealivelist;
 
 RWByteAddressBuffer counterbuffer;
 
-[numthreads(32, 1, 1)]
+[numthreads(UPDATE_THREAD_DIM_X, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    uint Tid = (Gid.x * 32) + GTid.x;
-    
-    //if (Tid < 32)
+    uint Tid = (Gid.x * UPDATE_THREAD_DIM_X) + GTid.x;
+    uint nrOfAliveParticles = counterbuffer.Load(4);
+
+    if (Tid < nrOfAliveParticles)
     {
     
         uint index = consumealivelist.Consume();
@@ -29,7 +30,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     
        
         float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
-        particle.lifeTimeLeft = particle.lifeTimeLeft; // - dt;
+        particle.lifeTimeLeft = particle.lifeTimeLeft - dt;
 	//lerp between start and end speed
         float speed = lerp(particle.speed, particle.endSpeed, lerpValue);
 
@@ -43,19 +44,19 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         
         
     
-    if (particle.lifeTimeLeft < 0.0f)
-	{
-        scale = 0.0f;
+        if (particle.lifeTimeLeft < 0.0f)
+        {
+            scale = 0.0f;
 
-        deadlist.Append(index);
-    }
-	else
-	{
+            deadlist.Append(index);
+        }
+        else
+        {
         
         
         
-        appendalivelist.Append(index);
-    }
+            appendalivelist.Append(index);
+        }
         
     //BILLBOARD
 
