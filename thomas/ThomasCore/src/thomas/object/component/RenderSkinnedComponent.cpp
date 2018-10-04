@@ -42,7 +42,7 @@ namespace thomas
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
 				RenderComponent::SetMaterial(meshIndex, material);
 				uint32_t effectIndex;
-				if (material && material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, effectIndex)) {
+				if (!material || material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, effectIndex)) {
 					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
 					m_skinInfo->m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
 					LOG("Warning! Material applied to skinned render component does not use any bone information.");
