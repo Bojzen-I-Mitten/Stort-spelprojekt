@@ -102,7 +102,7 @@ namespace ThomasEngine.Network
             float diff = 0;
 
             //Check if position has changed
-            diff = (transform.position - PrevPosition).Length();
+            diff = Vector3.Distance(transform.position, PrevPosition);
 
             if (diff > LocalMovementThreshold)
                 return true;
@@ -113,7 +113,7 @@ namespace ThomasEngine.Network
                 return true;
 
             //Check if scale has changed (temp)
-            diff = (transform.scale - PrevScale).Length();
+            diff = Vector3.Distance(transform.scale, PrevScale);
             if (diff > LocalMovementThreshold)
                 return true;
 
@@ -254,7 +254,7 @@ namespace ThomasEngine.Network
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
 
-            float dist = (transform.position - TargetSyncPosition).Length();
+            float dist = Vector3.Distance(transform.position, TargetSyncPosition);
             if(dist > SnapThreshhold || !attachedRigidbody.enabled)
             {
                 transform.position = TargetSyncPosition;
