@@ -27,7 +27,7 @@
                   <path z:Id="9">%THOMAS_ASSETS%\anim\Running_animation.anim</path>
                 </animation>
                 <material z:Id="10">
-                  <path z:Id="11">%THOMAS_ASSETS%\skinnedChad.mat</path>
+                  <path z:Id="11">%THOMAS_ASSETS%\chad.mat</path>
                 </material>
                 <model z:Id="12">
                   <path z:Id="13">%THOMAS_ASSETS%\anim\Running_model.fbx</path>
@@ -223,6 +223,7 @@
       <m_enabled>true</m_enabled>
       <m_gameObject z:Ref="1" i:nil="true" />
       <d3p1:SyncMode>SyncTransform</d3p1:SyncMode>
+      <d3p1:SyncParent>true</d3p1:SyncParent>
     </Component>
   </Components>
   <activeSelf>true</activeSelf>

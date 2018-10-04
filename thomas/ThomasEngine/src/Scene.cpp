@@ -188,22 +188,26 @@ namespace ThomasEngine
 
 
 
-	Vector3 Scene::CameraPosition::get() {
-		return Utility::Convert(thomas::editor::EditorCamera::GetEditorCamera()->m_transform->GetLocalPosition());
+	Vector3 Scene::CameraPosition::get() 
+	{
+		return Utility::Convert(thomas::editor::EditorCamera::Instance()->m_transform->GetLocalPosition());
 	}
 
-	void Scene::CameraPosition::set(Vector3 pos) {
+	void Scene::CameraPosition::set(Vector3 pos) 
+	{
 
-		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalPosition(Utility::Convert(pos));
+		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalPosition(Utility::Convert(pos));
 	}
 
-	Vector3 Scene::CameraEuler::get() {
-		return Utility::Convert(thomas::editor::EditorCamera::GetEditorCamera()->m_transform->GetLocalEulerAngles());
+	Vector3 Scene::CameraEuler::get() 
+	{
+		return Utility::Convert(thomas::editor::EditorCamera::Instance()->m_transform->GetLocalEulerAngles());
 	}
 
-	void Scene::CameraEuler::set(Vector3 euler) {
+	void Scene::CameraEuler::set(Vector3 euler) 
+	{
 
-		thomas::editor::EditorCamera::GetEditorCamera()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
+		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
 	}
 
 }

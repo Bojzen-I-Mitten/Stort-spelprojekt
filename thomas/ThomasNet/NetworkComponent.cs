@@ -10,6 +10,7 @@ namespace ThomasEngine.Network
         protected bool isDirty = false;
         private int prefabID;
         private NetworkIdentity networkIdentity;
+        protected float SmoothingFactor = 1.0f / 3;
 
 
         protected int ID
@@ -21,16 +22,21 @@ namespace ThomasEngine.Network
         {
             get
             {
-                if(networkIdentity == null)
+                if (networkIdentity == null)
                 {
                     networkIdentity = gameObject.GetComponent<NetworkIdentity>();
-                    if(networkIdentity == null)
+                    if (networkIdentity == null)
                     {
                         Debug.Log("There is no networkIdentity on this object.");
                     }
                 }
                 return networkIdentity;
             }
+        }
+
+        protected float SendInterval
+        {
+            get{return 1.0f/NetworkManager.instance.TICK_RATE;}
         }
 
         [Browsable(false)]

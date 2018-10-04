@@ -29,6 +29,8 @@ namespace ThomasEngine
 	void Collider::OnCollision(component::Collider* otherCollider, COLLISION_TYPE collisionType)
 	{
 		Collider^ collider = (Collider^)Object::Find(Utility::Convert(otherCollider->m_guid));
+		if (!collider)
+			return;
 		if (collider->isTrigger || isTrigger) //If one of the colliders is a trigger we do OnColliderX instead.
 		{
 			switch (collisionType)

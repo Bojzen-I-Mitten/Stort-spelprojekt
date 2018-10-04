@@ -2,7 +2,7 @@
 #include "EditorGrid.h"
 #include "..\Input.h"
 #include "..\ThomasTime.h"
-#include "..\Window.h"
+#include "..\WindowManager.h"
 #include "..\resource\Shader.h"
 #include "..\resource\Material.h"
 #include "..\graphics\Renderer.h"
@@ -10,14 +10,12 @@
 #include "..\resource\Model.h"
 #include "..\Common.h"
 #include "..\object\component\Camera.h"
-#include "..\System.h"
-
 
 namespace thomas
 {
 	namespace editor
 	{
-		EditorCamera* EditorCamera::m_editorCamera;
+		EditorCamera EditorCamera::m_editorCamera;
 
 		EditorCamera::EditorCamera() : 
 			object::GameObject("editorCamera"), 
@@ -30,6 +28,23 @@ namespace thomas
 			m_objectHighlighter(nullptr),
 			m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
 			m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
+		{
+			
+		}
+
+		EditorCamera::~EditorCamera()
+		{
+			
+		}
+
+		void EditorCamera::Destroy()
+		{
+			SAFE_DELETE(m_transform);
+			m_cameraComponent.reset();
+			m_grid.reset();
+		}
+
+		void EditorCamera::Init()
 		{
 			// Transform component
 			m_transform = new object::component::Transform();
@@ -51,39 +66,19 @@ namespace thomas
 			}
 		}
 
-		EditorCamera::~EditorCamera()
+		EditorCamera* EditorCamera::Instance()
 		{
-			SAFE_DELETE(m_transform);
-			m_cameraComponent.reset();
-			m_grid.reset();
-		}
-
-		void EditorCamera::Destroy()
-		{
-			if (m_editorCamera)
-				delete m_editorCamera;
-		}
-
-		void EditorCamera::Init()
-		{
-			m_editorCamera = new EditorCamera();
-		}
-
-		EditorCamera * EditorCamera::GetEditorCamera()
-		{
-			return m_editorCamera;
+			return &m_editorCamera;
 		}
 
 		void EditorCamera::Render()
 		{
-			if (m_editorCamera)
-				m_editorCamera->RenderCamera();
+			RenderCamera();
 		}
 
 		void EditorCamera::Update()
 		{
-			if (m_editorCamera)
-				m_editorCamera->UpdateCamera();
+			UpdateCamera();
 		}
 
 		void EditorCamera::SelectObject(object::GameObject * gameObject)
@@ -95,8 +90,8 @@ namespace thomas
 				m_selectedObjects.push_back(gameObject);
 			}
 
-			m_editorCamera->m_hasSelectionChanged = true;
-			m_editorCamera->m_selectedObject = gameObject;
+			m_hasSelectionChanged = true;
+			m_selectedObject = gameObject;
 		}
 
 		void EditorCamera::UnselectObject(GameObject * gameObject)
@@ -111,15 +106,15 @@ namespace thomas
 				}
 			}
 
-			m_editorCamera->m_selectedObject = nullptr;
+			m_selectedObject = nullptr;
 		}
 
 		void EditorCamera::UnselectObjects()
 		{
 			// Unselect all objects in the scene
 			m_selectedObjects.clear();
-			m_editorCamera->m_hasSelectionChanged = true;
-			m_editorCamera->m_selectedObject = nullptr;
+			m_hasSelectionChanged = true;
+			m_selectedObject = nullptr;
 		}
 
 		const std::vector<object::GameObject*>& EditorCamera::GetSelectedObjects()
@@ -129,12 +124,12 @@ namespace thomas
 
 		void EditorCamera::SetHasSelectionChanged(const bool & selectionChanged)
 		{
-			m_editorCamera->m_hasSelectionChanged = selectionChanged;
+			m_hasSelectionChanged = selectionChanged;
 		}
 
 		bool EditorCamera::HasSelectionChanged()
 		{
-			return m_editorCamera->m_hasSelectionChanged;
+			return m_hasSelectionChanged;
 		}
 
 		object::component::Camera * EditorCamera::GetCamera() const
@@ -144,17 +139,17 @@ namespace thomas
 
 		void EditorCamera::SetManipulatorOperation(ImGuizmo::OPERATION operation)
 		{
-			m_editorCamera->m_manipulatorOperation = operation;
+			m_manipulatorOperation = operation;
 		}
 
 		ImGuizmo::OPERATION EditorCamera::GetManipulatorOperation()
 		{
-			return m_editorCamera->m_manipulatorOperation;
+			return m_manipulatorOperation;
 		}
 
 		void EditorCamera::ToggleManipulatorMode()
 		{
-			m_editorCamera->m_manipulatorMode = m_editorCamera->m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
+			m_manipulatorMode = m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
 		}
 
 		void EditorCamera::RenderCamera()
@@ -170,29 +165,28 @@ namespace thomas
 
 		void EditorCamera::UpdateCamera()
 		{
-			Input::ResetScrollWheelValue();
-			m_manipulatorSnapping = false;
-			HWND focus = GetForegroundWindow();
-
 			// Make sure we are dealing with the editor window
-			thomas::Window *window = Window::GetEditorWindow();
-			if (!window || !window->IsFocused())
+			thomas::Window* window = WindowManager::Instance()->GetEditorWindow();
+			if (!window || WindowManager::Instance()->GetCurrentBound() != window)
 				return;
+
+			window->GetInput()->ResetScrollWheelValue();
+			m_manipulatorSnapping = false;
 			
 			// Toggle editor mode on scene camera
-			bool active = Input::GetMouseButton(Input::MouseButtons::RIGHT);
+			bool active = window->GetInput()->GetMouseButton(Input::MouseButtons::RIGHT);
 			if (active)
-				Input::SetMouseMode(Input::MouseMode::POSITION_RELATIVE);
+				window->GetInput()->SetMouseMode(Input::MouseMode::POSITION_RELATIVE);
 			else
-				Input::SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
+				window->GetInput()->SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
 
-			if (Input::GetKeyDown(Input::Keys::F))
+			if (window->GetInput()->GetKeyDown(Input::Keys::F))
 				SnapCameraToFocus();
 
 
 			if (active)
 				MoveAndRotateCamera();
-			else if (Input::GetMouseButtonDown(Input::MouseButtons::LEFT))
+			else if (window->GetInput()->GetMouseButtonDown(Input::MouseButtons::LEFT))
 			{
 				if (!ImGuizmo::IsOver())
 				{
@@ -203,13 +197,13 @@ namespace thomas
 			else
 			{
 				// Allow manipulation of the gizmo if the game object is focused
-				if (Input::GetKeyDown(Input::Keys::W))
+				if (window->GetInput()->GetKeyDown(Input::Keys::W))
 					m_manipulatorOperation = ImGuizmo::OPERATION::TRANSLATE;
-				if (Input::GetKeyDown(Input::Keys::R))
+				if (window->GetInput()->GetKeyDown(Input::Keys::R))
 					m_manipulatorOperation = ImGuizmo::OPERATION::ROTATE;
-				if (Input::GetKeyDown(Input::Keys::E))
+				if (window->GetInput()->GetKeyDown(Input::Keys::E))
 					m_manipulatorOperation = ImGuizmo::OPERATION::SCALE;
-				if (Input::GetKey(Input::Keys::LeftShift))
+				if (window->GetInput()->GetKey(Input::Keys::LeftShift))
 					m_manipulatorSnapping = true;
 			}
 		}
@@ -237,7 +231,7 @@ namespace thomas
 								mesh.get(),
 								m_objectHighlighter.get(),
 								m_cameraComponent.get());
-							System::S_RENDERER.SubmitCommand(cmd);
+							graphics::Renderer::Instance()->SubmitCommand(cmd);
 						}
 					}
 				}
@@ -273,7 +267,7 @@ namespace thomas
 
 		object::GameObject* EditorCamera::FindClickedGameObject()
 		{
-			math::Ray ray = m_cameraComponent->ScreenPointToRay(Input::GetMousePosition());
+			math::Ray ray = m_cameraComponent->ScreenPointToRay(WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition());
 			auto renderComponents = object::Object::FindObjectsOfType<object::component::RenderComponent>();
 
 			object::GameObject* closestGameObject = nullptr;
@@ -293,9 +287,13 @@ namespace thomas
 
 		void EditorCamera::MoveAndRotateCamera()
 		{
+			thomas::Window* window = WindowManager::Instance()->GetEditorWindow();
+			if (!window)
+				return;
+
 			float speed = m_speed;
 			// Increase camera speed
-			if (Input::GetKey(Input::Keys::LeftShift))
+			if (window->GetInput()->GetKey(Input::Keys::LeftShift))
 				speed *= 4.0f;
 
 			// Allow the camera to move freely in the scene
@@ -305,25 +303,25 @@ namespace thomas
 
 			math::Vector3 translation;
 			// Key input
-			if (Input::GetKey(Input::Keys::A))
+			if (window->GetInput()->GetKey(Input::Keys::A))
 				translation -= right * ThomasTime::GetActualDeltaTime() * speed;
-			if (Input::GetKey(Input::Keys::D))
+			if (window->GetInput()->GetKey(Input::Keys::D))
 				translation += right * ThomasTime::GetActualDeltaTime() * speed;
-			if (Input::GetKey(Input::Keys::W))
+			if (window->GetInput()->GetKey(Input::Keys::W))
 				translation += forward * ThomasTime::GetActualDeltaTime() * speed;
-			if (Input::GetKey(Input::Keys::S))
+			if (window->GetInput()->GetKey(Input::Keys::S))
 				translation -= forward * ThomasTime::GetActualDeltaTime() * speed;
-			if (Input::GetKey(Input::Keys::Q))
+			if (window->GetInput()->GetKey(Input::Keys::Q))
 				translation -= up * ThomasTime::GetActualDeltaTime() * speed;
-			if (Input::GetKey(Input::Keys::E))
+			if (window->GetInput()->GetKey(Input::Keys::E))
 				translation += up * ThomasTime::GetActualDeltaTime() * speed;
 			// Scroll
-			m_transform->Translate(forward * ThomasTime::GetActualDeltaTime() * float(Input::GetMouseScrollWheel()) * speed);
+			m_transform->Translate(forward * ThomasTime::GetActualDeltaTime() * float(window->GetInput()->GetMouseScrollWheel()) * speed);
 			// Apply translation
 			m_transform->Translate(translation);
 			
-			float xStep = Input::GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
-			float yStep = Input::GetMouseY() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
+			float xStep = window->GetInput()->GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
+			float yStep = window->GetInput()->GetMouseY() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
 			// Rotate camera
 			math::Quaternion rot = math::Quaternion::CreateFromAxisAngle(right, -yStep);
 			rot *= math::Quaternion::CreateFromAxisAngle(math::Vector3::UnitY, -xStep);

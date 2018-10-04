@@ -111,10 +111,10 @@ namespace ThomasEditor
             float yStep = Input.GetMouseY() * Time.ActualDeltaTime * cameraSensitivity * 20.0f;
 
             Quaternion rot = Quaternion.CreateFromAxisAngle(transform.right, -yStep);
-            //rot *= Quaternion.CreateFromAxisAngle(transform.up, -xStep);
+            rot *= Quaternion.CreateFromAxisAngle(transform.up, -xStep);
 
-            //Vector3 up = Vector3.Transform(transform.up, rot);
-            //Vector3 forward = Vector3.Transform(transform.forward, rot);
+            Vector3 up = Vector3.Transform(transform.up, rot);
+            Vector3 forward = Vector3.Transform(transform.forward, rot);
             if (camera)
             {
                 camera.transform.localEulerAngles += new Vector3(-yStep, 0, 0);
@@ -122,7 +122,7 @@ namespace ThomasEditor
                 camera.transform.position = Vector3.Transform(new Vector3(0.0f, 1.7f, cameraDistance), camera.transform.localRotation)
                     + transform.position;
             }
-                
+
             transform.RotateByAxis(transform.up, -xStep);
 
             if (Input.GetKey(Input.Keys.W))

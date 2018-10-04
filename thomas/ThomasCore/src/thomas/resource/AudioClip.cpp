@@ -8,12 +8,12 @@ namespace thomas
 		void AudioClip::OnChanged()
 		{
 			m_data.release();
-			m_data = std::unique_ptr<DirectX::SoundEffect>(Sound::LoadWave(m_path));
+			m_data = std::unique_ptr<DirectX::SoundEffect>(Sound::Instance()->LoadWave(m_path));
 		}
 		AudioClip::AudioClip(std::string path) : Resource(path)
 		{
 
-			m_data = std::unique_ptr<DirectX::SoundEffect>(Sound::LoadWave(path));
+			m_data = std::unique_ptr<DirectX::SoundEffect>(Sound::Instance()->LoadWave(path));
 		}
 		std::unique_ptr<DirectX::SoundEffectInstance> AudioClip::CreateInstance()
 		{
