@@ -27,7 +27,7 @@ namespace ThomasEditor
     /// </summary>
     public partial class GameObjectHierarchy : UserControl
     {
-        int m_inspector = 0;
+        bool m_inspector = false;
         bool _isDragging;
         bool wasUnselected = false;
         public ObservableCollection<TreeItemViewModel> m_hierarchyNodes { get; set; }
@@ -360,112 +360,122 @@ namespace ThomasEditor
 
         public void hierarchy_Drop(object sender, DragEventArgs e)
         {
+            TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
             
-            if (e.Data.GetDataPresent(typeof(TreeViewItem)))
+            if (e.Data.GetDataPresent(typeof(TreeViewItem)) || source.DataContext != null)
             {
-                TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
-                StackPanel sourceHeader = source.Header as StackPanel;
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
-                //Check if dragged item is a script
-                if (source.DataContext is ScriptComponent || ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
+                GameObject targetModel = null;
+                //If drop function is called from Inspector
+                if (m_inspector)
                 {
-                    TreeItemViewModel targetModel = null;
-                    //If drop function is called from Inspector
-                    if (m_inspector == 1)
-                    {
-                        targetModel = hierarchy.SelectedItem as TreeItemViewModel;
-                        m_inspector = 0;
-                    }
-                    if (targetModel != null && source != null && targetModel.Data != source.DataContext)
-                    {
-                        List<Type> componentList = ThomasEngine.Component.GetAllAddableComponentTypes();
+                    targetModel = (GameObject)(hierarchy.SelectedItem as TreeItemViewModel).Data;
+                    m_inspector = false;
+                }
+                else if (target != null)
+                {
+                    targetModel = (GameObject)((TreeItemViewModel)(target.DataContext)).Data;
+                }
 
-                        //Loop through all existing components
-                        for (int i = 0; i < componentList.Count; ++i)
+                StackPanel sourceHeader = source.Header as StackPanel;
+
+                if (sourceHeader != null)
+                {
+                    //Check if dragged item is a script
+                    if ((source.DataContext is ScriptComponent || ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT))
+                    {
+
+                        if (targetModel != null && source != null && targetModel != (GameObject)source.DataContext)
                         {
-                            string dragObject = (string)sourceHeader.DataContext;
-                            int scriptNameLength = componentList[i].Name.Length;
+                            List<Type> componentList = ThomasEngine.Component.GetAllAddableComponentTypes();
 
-                            //Remove directory path of dragged item
-                            dragObject = dragObject.Substring(dragObject.Length - (scriptNameLength + 3));
-                            if (dragObject.Length > 3)
+                            //Loop through all existing components
+                            for (int i = 0; i < componentList.Count; ++i)
                             {
-                                //Remove '.cs' from dragged scripts.
-                                dragObject = dragObject.Substring(0, dragObject.Length - 3);
-                            }
-                            //Debug.Log("Checking if: " + dragObject.ToLower() + " contains: " + componentList[i].Name.ToLower());
+                                string dragObject = (string)sourceHeader.DataContext;
+                                int scriptNameLength = componentList[i].Name.Length;
 
-                            //Check if dragged component matches an existing component
-                            if (dragObject.ToLower().Contains(componentList[i].Name.ToLower()))
-                            {
-                                Type componentToAdd = componentList[i] as Type;
+                                //Remove directory path of dragged item
+                                dragObject = dragObject.Substring(dragObject.Length - (scriptNameLength + 3));
+                                if (dragObject.Length > 3)
+                                {
+                                    //Remove '.cs' from dragged scripts.
+                                    dragObject = dragObject.Substring(0, dragObject.Length - 3);
+                                }
+                                //Debug.Log("Checking if: " + dragObject.ToLower() + " contains: " + componentList[i].Name.ToLower());
 
-                                var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
-                                method.Invoke(targetModel.Data, null);
+                                //Check if dragged component matches an existing component
+                                if (dragObject.ToLower().Contains(componentList[i].Name.ToLower()))
+                                {
+                                    Type componentToAdd = componentList[i] as Type;
 
-                                Debug.Log("Script found and added.");
+                                    var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
+                                    method.Invoke(targetModel, null);
+
+                                    Debug.Log("Script found and added.");
+                                }
                             }
                         }
                     }
                 }
-                //Check if object from hierarchy
-                else if (source.DataContext.GetType() == typeof(TreeItemViewModel))
+                if (source.DataContext != null)
                 {
-                    GameObject sourceData = (GameObject)(source.DataContext as TreeItemViewModel).Data;     //Reads the context as a TreeItemViewModel and retrieves the Data.
-                    
+                    //Check if object from hierarchy
+                    if (source.DataContext.GetType() == typeof(TreeItemViewModel))
+                    {
+                        GameObject sourceData = (GameObject)(source.DataContext as TreeItemViewModel).Data;     //Reads the context as a TreeItemViewModel and retrieves the Data.
 
-                    
-                    if (target != null && sourceData != null && (GameObject)((TreeItemViewModel)target.DataContext).Data != sourceData)
-                    {
-                        GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
-                        ChangeParent(parent.transform, m_hierarchyNodes.ToList());
-                    }
-                    else if (sourceData != null && target == null)
-                    {
-                        if (sourceData.inScene)
+
+
+                        if (target != null && sourceData != null && (GameObject)((TreeItemViewModel)target.DataContext).Data != sourceData)
                         {
-                            ChangeParent(null, m_hierarchyNodes.ToList());
+                            GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
+                            ChangeParent(parent.transform, m_hierarchyNodes.ToList());
+                        }
+                        else if (sourceData != null && target == null)
+                        {
+                            if (sourceData.inScene)
+                            {
+                                ChangeParent(null, m_hierarchyNodes.ToList());
+                            }
+                            else
+                            {
+                                GameObject.Instantiate(sourceData);
+                            }
                         }
                         else
                         {
-                            GameObject.Instantiate(sourceData);
-                        }   
+                            Debug.LogWarning("Invalid parenting, can't set the selected object as a child if the specified object.");
+                        }
                     }
-                    else
+                    //Check if brefab. (From outside hierarchy)
+                    else if (source.DataContext.GetType() == typeof(GameObject))
                     {
-                        Debug.LogWarning("Invalid parenting, can't set the selected object as a child if the specified object.");
+                        GameObject sourceData = (GameObject)source.DataContext;
+
+                        if (target != null && sourceData != null && (GameObject)target.DataContext != sourceData)
+                        {
+
+                            GameObject parent = target.DataContext as GameObject;
+                            if (!parent.transform.IsChildOf(sourceData.transform))
+                            {
+                                sourceData.transform.parent = parent.transform;
+                            }
+                        }
+                        else if (sourceData != null && target == null)
+                        {
+                            if (sourceData.inScene)
+                            {
+                                sourceData.transform.parent = null;
+                            }
+                            else
+                            {
+                                GameObject.Instantiate(sourceData);
+                            }
+
+                        }
                     }
                 }
-                //Check if brefab. (From outside hierarchy)
-                else if (source.DataContext.GetType() == typeof(GameObject))
-                {
-                    GameObject sourceData = (GameObject)source.DataContext;
-
-                    if (target != null && sourceData != null && (GameObject)target.DataContext != sourceData)
-                    {
-
-                        GameObject parent = target.DataContext as GameObject;
-                        if (!parent.transform.IsChildOf(sourceData.transform))
-                        {
-                            sourceData.transform.parent = parent.transform;
-                        }
-                    }
-                    else if (sourceData != null && target == null)
-                    {
-                        if (sourceData.inScene)
-                        {
-                            sourceData.transform.parent = null;
-                        }
-                        else
-                        {
-                            GameObject.Instantiate(sourceData);
-                        }
-                        
-                    }
-                }
-                
-
-                // Code to move the item in the model is placed here...
             }
         }
 
@@ -751,7 +761,7 @@ namespace ThomasEditor
             ThomasWrapper.Selection.SelectGameObject(x);
         }
         
-        public void SetInspector(int value)
+        public void SetInspector(bool value)
         {
             m_inspector = value;
         }

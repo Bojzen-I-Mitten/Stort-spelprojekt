@@ -159,7 +159,7 @@ namespace ThomasEditor
             }
             private void GameObjectInspector_Drop(object sender, DragEventArgs e)
             {
-                GameObjectHierarchy.instance.SetInspector(1);
+                GameObjectHierarchy.instance.SetInspector(true);
                 GameObjectHierarchy.instance.hierarchy_Drop(sender, e);
             }
 
