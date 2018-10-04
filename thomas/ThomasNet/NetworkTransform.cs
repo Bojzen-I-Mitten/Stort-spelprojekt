@@ -41,6 +41,8 @@ namespace ThomasEngine.Network
         Vector3 PrevScale;
         float prevVelocity;
 
+        float CurrentPositionDuration = 0;
+
         const float LocalMovementThreshold = 0.00001f;
         const float LocalRotationThreshold = 0.00001f;
         const float LocalVelocityThreshold = 0.00001f;
@@ -89,13 +91,21 @@ namespace ThomasEngine.Network
 
         public override void Update()
         {
-            //CurrentPositionDuration += Time.DeltaTime;
+            CurrentPositionDuration += Time.DeltaTime;
 
             if (isOwner)
             {
                 isDirty = HasMoved();
             }
 
+            switch(SyncMode)
+            {
+                case TransformSyncMode.SyncTransform:
+                    InterpolatePosition();
+                    break;
+                default:
+                    break;
+            }
         }
 
         public override void FixedUpdate()
@@ -254,15 +264,15 @@ namespace ThomasEngine.Network
             transform.rotation = reader.GetQuaternion();
             transform.scale = reader.GetVector3();
 
-            if(Vector3.Distance(TargetPosition, transform.position) > SnapThresholdDistance)
+            if(Vector3.Distance(TargetSyncPosition, transform.position) > SnapThreshhold)
             {
-                transform.position = TargetPosition;
+                transform.position = TargetSyncPosition;
             }
         }
 
         private void InterpolatePosition()
         {
-            transform.position = Vector3.Lerp(transform.position, TargetPosition, Math.Min(1.0f, CurrentPositionDuration / SendInterval));
+            transform.position = Vector3.Lerp(transform.position, TargetSyncPosition, Math.Min(1.0f, CurrentPositionDuration / SendInterval));
         }
 
         private void ReadRigidbody(NetPacketReader reader)
