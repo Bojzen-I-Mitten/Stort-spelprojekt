@@ -660,8 +660,9 @@ namespace thomas
 			if (newProperty != nullptr)
 			{
 				newProperty->SetName(name);
-				uint32_t hash = utility::hash(name.c_str(), name.length());
+				uint32_t hash = utility::hash(name);
 #ifdef _DEBUG
+				// Verify hash doesn't exist
 				if (m_property_indices.find(hash) != m_property_indices.end()) {
 					std::string err("Warning in ThomasCore::resource::Shader::AddProperty!! Multiple effect properties with identical name hash: " + name);
 					LOG(err);

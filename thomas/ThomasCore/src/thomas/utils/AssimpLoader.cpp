@@ -751,11 +751,13 @@ namespace thomas
 		void ProcessChannelData(aiNodeAnim *channel, double ticksPerSecond, SkeletonConstruct& construct, AnimationConstruct& anim) {
 			int bone = construct.getBoneIndex(channel->mNodeName.C_Str());
 			if (bone < 0) {
+				/* Animated channels are now culled when identified
 				std::string err("Warning, animated bone not included in skeleton: ");
 				err.append(channel->mNodeName.C_Str());
 				err.append("\nNumber of keyframes in channel: ");
 				err.append(std::to_string(NumKeys(channel)));
 				LOG(err);
+				*/
 				return; //This channel does not animate a bone.
 			}
 			anim._boneHash[bone] = utility::hash(construct.m_boneInfo[bone]._boneName.c_str());
