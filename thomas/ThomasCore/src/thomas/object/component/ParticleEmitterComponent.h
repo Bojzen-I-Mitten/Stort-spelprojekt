@@ -86,7 +86,7 @@ namespace thomas
 					float pad;
 				};
 
-				
+				/*
 			private:
 				void CreateParticleUAVsandSRVs();
 				//void CreateInitBuffer();
@@ -198,7 +198,7 @@ namespace thomas
 				
 
 				BlendStates m_blendState;
-
+				*/
 			};
 		}
 	}

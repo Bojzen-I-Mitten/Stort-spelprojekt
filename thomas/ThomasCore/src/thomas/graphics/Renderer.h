@@ -1,7 +1,3 @@
-/*
-	Render class for the gameobjects and material assembly
-*/
-
 #pragma once
 #include "..\utils\Math.h"
 #include <vector>
@@ -39,29 +35,33 @@ namespace thomas
 			struct RenderCommand;
 		}
 		
-		class Renderer {
+		class Renderer 
+		{
 		private:
+			Renderer();
+
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 
 		public:
+			~Renderer() = default;
 
-			Renderer();
-
+			static Renderer* Instance();
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
 			void ClearCommands();
 			void SubmitCommand(render::RenderCommand& command);
-
+			render::Frame& getAllocator();
 
 
 			void TransferCommandList();
 
+		private:
+			static Renderer s_renderer;
 
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
-			
 		};
 	}
 }

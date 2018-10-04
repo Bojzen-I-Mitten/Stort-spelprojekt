@@ -46,17 +46,16 @@ struct BillboardStruct
 
 struct ParticleCounters
 {
-    uint aliveCount;
     uint deadCount;
+    uint aliveCount;
     uint realEmitCount;
-    uint aliveCount_afterSimulation;
+    uint aliveCountAfterSimulation;
 };
 
-RWByteAddressBuffer counterbuffer;
 
-static const uint PARTICLECOUNTER_OFFSET_ALIVECOUNT = 0;
-static const uint PARTICLECOUNTER_OFFSET_DEADCOUNT = PARTICLECOUNTER_OFFSET_ALIVECOUNT + 4;
-static const uint PARTICLECOUNTER_OFFSET_REALEMITCOUNT = PARTICLECOUNTER_OFFSET_DEADCOUNT + 4;
+static const uint PARTICLECOUNTER_OFFSET_DEADCOUNT = 0;
+static const uint PARTICLECOUNTER_OFFSET_ALIVECOUNT = PARTICLECOUNTER_OFFSET_DEADCOUNT + 4;
+static const uint PARTICLECOUNTER_OFFSET_REALEMITCOUNT = PARTICLECOUNTER_OFFSET_ALIVECOUNT + 4;
 static const uint PARTICLECOUNTER_OFFSET_ALIVECOUNT_AFTERSIMULATION = PARTICLECOUNTER_OFFSET_REALEMITCOUNT + 4;
 
 #endif // PARTICLE_DATA_HEADER

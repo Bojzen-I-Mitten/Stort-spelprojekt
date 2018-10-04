@@ -27,9 +27,9 @@ namespace thomas
 				HRESULT result;
 
 				if (data == nullptr)
-					result = ThomasCore::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
+					result = utils::D3D::Instance()->GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
 				else
-					result = ThomasCore::GetDevice()->CreateBuffer(&bufferDesc, &InitData, &m_buffer);
+					result = utils::D3D::Instance()->GetDevice()->CreateBuffer(&bufferDesc, &InitData, &m_buffer);
 
 				if (result != S_OK)
 					LOG(result);
@@ -57,9 +57,9 @@ namespace thomas
 				}
 
 				D3D11_MAPPED_SUBRESOURCE resource;
-				ThomasCore::GetDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+				utils::D3D::Instance()->GetDeviceContext()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 				memcpy(resource.pData, data, size);
-				ThomasCore::GetDeviceContext()->Unmap(m_buffer, 0);
+				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_buffer, 0);
 			}
 			size_t Buffer::GetSize()
 			{
@@ -99,7 +99,7 @@ namespace thomas
 					desc.Format = DXGI_FORMAT_UNKNOWN;
 					desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 
-					hr = ThomasCore::GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+					hr = utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
 
 					if (hr == S_OK)
 						m_hasSRV = true;
@@ -113,7 +113,7 @@ namespace thomas
 					uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
-					hr = ThomasCore::GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+					hr = utils::D3D::Instance()->GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
 
 					if (hr == S_OK)
 						m_hasUAV = true;
@@ -145,6 +145,32 @@ namespace thomas
 				
 			}
 
-		}		
+			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data) : Buffer(data, count * stride, D3D11_BIND_UNORDERED_ACCESS, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS)
+			{
+				HRESULT hr;
+				D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+				uavDesc.Buffer.FirstElement = 0;
+				uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+				uavDesc.Buffer.NumElements = count;
+				uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+				uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+
+				hr = utils::D3D::Instance()->GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+
+				if (hr == S_OK)
+					m_hasUAV = true;
+
+			}
+
+			ID3D11UnorderedAccessView * ByteAddressBuffer::GetUAV()
+			{
+				if (m_hasUAV)
+					return m_uav;
+
+				LOG("No availible uav");
+				return nullptr;
+			}
+
+}
 	}
 }

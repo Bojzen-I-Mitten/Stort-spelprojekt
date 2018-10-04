@@ -94,6 +94,17 @@ namespace thomas
 				AppendConsumeBuffer(std::vector<T>& data) : AppendConsumeBuffer(data.data(), sizeof(T), data.size()) {};
 
 			};
+
+			class ByteAddressBuffer : public Buffer
+			{
+			public:
+				ByteAddressBuffer(size_t stride, size_t count, void* data = nullptr);
+
+				ID3D11UnorderedAccessView* GetUAV();
+			private:
+				ID3D11UnorderedAccessView* m_uav;
+				bool m_hasUAV;
+			};
 		}
 	}
 }

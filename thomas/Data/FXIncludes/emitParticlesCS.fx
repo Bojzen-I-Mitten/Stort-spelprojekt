@@ -41,7 +41,7 @@ RWStructuredBuffer<ParticleStruct> particles;
 ConsumeStructuredBuffer<uint> deadlist;
 AppendStructuredBuffer<uint> alivelist;
 
-
+RWByteAddressBuffer counterbuffer;
 
 [numthreads(128, 1, 1)]
 void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)

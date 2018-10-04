@@ -63,11 +63,11 @@ namespace thomas
 			unsigned m_maxNrOfParticles;
 			unsigned m_emittedParticles; 
 
-			std::unique_ptr<utils::buffers::Buffer> m_bufferCounters;
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;
 
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
-			std::unique_ptr<utils::buffers::Buffer> m_updateIndirectBuffer;
+			std::unique_ptr<utils::buffers::Buffer> m_bufferIndirectUpdateArgs;
 
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferSpawn;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferUpdate;

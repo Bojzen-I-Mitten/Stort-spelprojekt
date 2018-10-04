@@ -31,30 +31,35 @@ namespace thomas
 			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::InitParticleBufferStruct), 1, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
 			m_bufferUpdate =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(object::component::ParticleEmitterComponent::ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
 			m_bufferBillboard =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
-			//m_updateIndirectBuffer = std::make_unique<utils::buffers::Buffer>(nullptr, 16, D3D11_BIND_CONSTANT_BUFFER, STATIC_BUFFER, 4, D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS);
 
 			//INDEXING APPEND CONSUME BUFFERS
 			m_bufferDeadList = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
-
-			//ThomasCore::GetDeviceContext()->CopyStructureCount(m_updateIndirectBuffer->GetBuffer(), 0, m_deadList->GetUAV()); 
+			m_bufferAliveListPing = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
+			m_bufferAliveListPong = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
+			
 
 			pShittyComputeShader->SetGlobalInt("maxNrOfParticles", maxNrOfParticles);
 			pShittyComputeShader->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
+
 			pShittyComputeShader->Bind();
 			pShittyComputeShader->SetPass(0);
 			pShittyComputeShader->Dispatch((maxNrOfParticles - 1) / 512 + 1);
 			
 
 			ID3D11UnorderedAccessView* const s_nullUAV[1] = { NULL };
-			ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, s_nullUAV, nullptr); //TODO: unload shitty init shader
+			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, s_nullUAV, nullptr); //TODO: unload shitty init shader
 
 
-			m_bufferAliveListPing =	std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
-			m_bufferAliveListPong =	std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
-
+			/*
 			//COUNTER BUFFER
-			//m_bufferCounters = std::make_unique<utils::buffers::StructuredBuffer>
+			m_bufferCounters = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 4);
+			
+			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
+			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+			*/
+			unsigned indirectArgs[3] = { 1, 1, 1 };
 
+			m_bufferIndirectUpdateArgs = std::make_unique<utils::buffers::Buffer>(indirectArgs, sizeof(indirectArgs), (D3D11_BIND_FLAG)0, STATIC_BUFFER, sizeof(unsigned), D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS);
 
 			m_pingpong = true;
 
@@ -86,7 +91,7 @@ namespace thomas
 					return false;
 			}
 			
-			m_spawningEmitterEmissionRate.push_back(emitter->GetEmissionRate() + 0.5f);
+			//m_spawningEmitterEmissionRate.push_back(emitter->GetEmissionRate() + 0.5f);
 			m_spawningEmitters.push_back(emitter);
 			return true;
 		}
@@ -163,11 +168,11 @@ namespace thomas
 				m_emittedParticles += testInitData.nrOfParticlesToEmit;
 
 				ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
-				ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
+				utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
 
 
 				ID3D11ShaderResourceView* const s_nullSRV[2] = { NULL };
-				ThomasCore::GetDeviceContext()->CSSetShaderResources(0, 2, s_nullSRV);
+				utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 2, s_nullSRV);
 				
 			}
 		}
@@ -197,12 +202,12 @@ namespace thomas
 
 			int test = (m_emittedParticles + 31u) / 32u;
 			if (test > 0)
-				m_updateParticlesCS->Dispatch(test);
+				//m_updateParticlesCS->Dispatch(test);
 
-			//m_updateParticlesCS->DispatchIndirect();
+			m_updateParticlesCS->DispatchIndirect(m_bufferIndirectUpdateArgs->GetBuffer(), 0);
 
 			ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
-			ThomasCore::GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
+			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
 
 
 		}
@@ -217,10 +222,10 @@ namespace thomas
 			m_particleShader->Bind();
 			m_particleShader->SetPass(0);
 			
-			ThomasCore::GetDeviceContext()->Draw(6 * m_emittedParticles, 0);
+			utils::D3D::Instance()->GetDeviceContext()->Draw(6 * m_emittedParticles, 0);
 
 			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
-			ThomasCore::GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
+			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
 
 		}
 

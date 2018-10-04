@@ -1,4 +1,5 @@
 #include "ComputeShader.h"
+#include "ShaderProperty\shaderProperties.h"
 
 namespace thomas
 {
@@ -7,12 +8,13 @@ namespace thomas
 		
 		void ComputeShader::Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ)
 		{
-			ThomasCore::GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
+			//Bind();
+			utils::D3D::Instance()->GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
 		}
 
 		void ComputeShader::DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs)
 		{
-			ThomasCore::GetDeviceContext()->DispatchIndirect(indirectBuffer, alignedByteOffsetForArgs);
+			utils::D3D::Instance()->GetDeviceContext()->DispatchIndirect(indirectBuffer, alignedByteOffsetForArgs);
 		}
 
 	}

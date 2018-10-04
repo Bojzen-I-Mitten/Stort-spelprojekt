@@ -10,6 +10,7 @@ AppendStructuredBuffer<uint> deadlist;
 AppendStructuredBuffer<uint> appendalivelist;
 ConsumeStructuredBuffer<uint> consumealivelist;
 
+RWByteAddressBuffer counterbuffer;
 
 [numthreads(32, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
