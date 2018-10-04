@@ -13,6 +13,12 @@ namespace thomas
 	//Gamepad
 	std::unique_ptr<GamePad> Input::s_gamePad;	
 
+	Input::Input()
+	{
+		m_mouseMode = MouseMode::POSITION_ABSOLUTE;
+		Reset();
+	}
+
 	bool Input::Init()
 	{
 		//Init objects
@@ -37,9 +43,13 @@ namespace thomas
 	{
 		if (m_initialized)
 		{
+			
+			s_mouse->SetMode((Mouse::Mode)m_mouseMode);
+
 			m_keyboardState = s_keyboard->GetState();
 			m_gamePadState = s_gamePad->GetState(0);	
 			m_mouseState = s_mouse->GetState();
+			
 			s_vibrateTimeLeft -= ThomasTime::GetDeltaTime();
 
 			if(s_vibrateTimeLeft < 0.f)
@@ -52,6 +62,8 @@ namespace thomas
 			// Set mouse mode position
 			m_mousePosition = math::Vector2((float)m_mouseState.x, (float)m_mouseState.y);
 			
+			
+
 			// Update absolute position (if not in relative mode)
 			if (m_mouseState.positionMode == Mouse::Mode::MODE_ABSOLUTE)
 				m_absolutePosition = m_mousePosition;
@@ -133,12 +145,13 @@ namespace thomas
 
 	void Input::SetMouseMode(MouseMode mode)
 	{
-		if (m_mouseState.positionMode  == (Mouse::Mode)mode)
+		m_mouseMode = mode;
+		if (m_mouseState.positionMode == (Mouse::Mode)mode)
 			return;
-		s_mouse->SetMode((Mouse::Mode)mode);
+
 		// Reset mouse pos
 		if (mode == MouseMode::POSITION_RELATIVE)
-			m_mousePosition = math::Vector2(); 
+			m_mousePosition = math::Vector2();
 		else
 			m_mousePosition = m_absolutePosition;
 	}
@@ -347,6 +360,17 @@ namespace thomas
 			s_gamePad->SetVibration(0, left, right);
 			s_vibrateTimeLeft = time;
 		}		
+	}
+
+	void Input::Reset()
+	{
+		m_keyboardTracker.Reset();
+		m_mouseTracker.Reset();
+		m_gamePadTracker.Reset();
+		m_keyboardState = Keyboard::State();
+		m_gamePadState = GamePad::State();
+		m_mouseState = Mouse::State();
+		m_mouseMode = MouseMode::POSITION_ABSOLUTE;
 	}
 
 	//Keyboard

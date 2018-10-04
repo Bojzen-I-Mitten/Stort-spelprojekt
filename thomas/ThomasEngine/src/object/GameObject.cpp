@@ -79,8 +79,7 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) 
-			{
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
@@ -141,6 +140,7 @@ namespace ThomasEngine {
 	{
 		if (m_isDestroyed)
 			return;
+		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
@@ -151,7 +151,6 @@ namespace ThomasEngine {
 		Object::Destroy();
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
-		ThomasWrapper::Selection->UnSelectGameObject(this);
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -395,8 +394,9 @@ namespace ThomasEngine {
 
 	void GameObject::SetActive(bool active)
 	{
-		((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		activeSelf = active;
+		((thomas::object::GameObject*)nativePtr)->SetActive(active);
+		
 
 	}
 
@@ -421,6 +421,7 @@ namespace ThomasEngine {
 				
 		}
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		OnPropertyChanged("activeSelf");
 	}
 
 	Transform^ GameObject::transform::get()

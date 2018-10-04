@@ -44,7 +44,7 @@ namespace ThomasEditor
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
             Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
-            
+
         }
 
 
@@ -61,11 +61,12 @@ namespace ThomasEditor
 
         private void ResetTreeView()
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 m_hierarchyNodes.Clear();
-                foreach (GameObject gObj in Scene.CurrentScene.GameObjects)
+                for (int i = 0; i < Scene.CurrentScene.GameObjects.Count; i++)
                 {
+                    GameObject gObj = Scene.CurrentScene.GameObjects[i];
                     if (gObj.transform.parent == null)
                     {
                         TreeItemViewModel item = new TreeItemViewModel(gObj)
@@ -81,6 +82,7 @@ namespace ThomasEditor
 
         private void Transform_OnParentChanged(ThomasEngine.Transform child, ThomasEngine.Transform oldParent, ThomasEngine.Transform newParent)
         {
+
             if (oldParent == newParent || !child.gameObject)
                 return;
 
@@ -174,7 +176,7 @@ namespace ThomasEditor
 
         private void SceneGameObjectsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            this.Dispatcher.BeginInvoke((Action)(() => 
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 if (e.NewItems != null)
                 {
@@ -186,7 +188,7 @@ namespace ThomasEditor
                             {
                                 IsExpanded = true,
                                 Children = BuildTree(newItem.transform),
-                            
+
                             };
                             m_hierarchyNodes.Add(item);
                         }
@@ -202,7 +204,7 @@ namespace ThomasEditor
                     }
                 }
             }));
-            
+
 
         }
 
@@ -225,7 +227,7 @@ namespace ThomasEditor
         {
             foreach (TreeItemViewModel node in nodes)
             {
-                if(items.Contains(node.Data))
+                if (items.Contains(node.Data))
                 {
                     node.IsSelected = select;
                 }
@@ -257,7 +259,7 @@ namespace ThomasEditor
 
                 if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
                 {
-                    if(m_hierarchyNodes.Count > 0)
+                    if (m_hierarchyNodes.Count > 0)
                         ResetTree(m_hierarchyNodes.ToList());
                 }
             }));
@@ -267,29 +269,32 @@ namespace ThomasEditor
 
         private void SelectedGameObjectChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            ThomasWrapper.Selection.Ref.CollectionChanged -= SceneSelectedGameObjectChanged;
-            if (!wasUnselected)
-                AssetBrowser.instance.UnselectItem();
-            wasUnselected = false;
-            ItemContainerGenerator gen = hierarchy.ItemContainerGenerator;
-            if (hierarchy.SelectedItem != null)
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
-                TreeItemViewModel item = hierarchy.SelectedItem as TreeItemViewModel;
-                if (item != null)
+                ThomasWrapper.Selection.Ref.CollectionChanged -= SceneSelectedGameObjectChanged;
+                if (!wasUnselected)
+                    AssetBrowser.instance.UnselectItem();
+                wasUnselected = false;
+                ItemContainerGenerator gen = hierarchy.ItemContainerGenerator;
+                if (hierarchy.SelectedItem != null)
                 {
-                    Inspector.instance.SelectedObject = (GameObject)item.Data;
+                    TreeItemViewModel item = hierarchy.SelectedItem as TreeItemViewModel;
+                    if (item != null)
+                    {
+                        Inspector.instance.SelectedObject = (GameObject)item.Data;
 
-                    if (!ThomasWrapper.Selection.Contain((GameObject)item.Data))
-                        ThomasWrapper.Selection.SelectGameObject((GameObject)item.Data);
-                    hiearchyContextMenu.DataContext = true;
+                        if (!ThomasWrapper.Selection.Contain((GameObject)item.Data))
+                            ThomasWrapper.Selection.SelectGameObject((GameObject)item.Data);
+                        hiearchyContextMenu.DataContext = true;
+                    }
                 }
-            }
-            else
-            {
-                if (Inspector.instance.SelectedObject is GameObject)
-                    Inspector.instance.SelectedObject = null;
-            }
-            ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
+                else
+                {
+                    if (Inspector.instance.SelectedObject is GameObject)
+                        Inspector.instance.SelectedObject = null;
+                }
+                ThomasWrapper.Selection.Ref.CollectionChanged += SceneSelectedGameObjectChanged;
+            }));
         }
 
         private void hierarchy_DragOver(object sender, DragEventArgs e)
@@ -341,13 +346,13 @@ namespace ThomasEditor
                 {
                     ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
                 }
-                    ChangeParent(parentTransform, node.Children);
+                ChangeParent(parentTransform, node.Children);
             }
         }
 
         private bool CheckIfChild(TreeItemViewModel source, ThomasEngine.Transform target)
         {
-            if(target != null)
+            if (target != null)
                 foreach (TreeItemViewModel child in source.Children)
                 {
                     if ((GameObject)child.Data == target.gameObject)
@@ -369,7 +374,7 @@ namespace ThomasEditor
                 {
                     GameObject sourceData = (GameObject)(source.DataContext as TreeItemViewModel).Data;     //Reads the context as a TreeItemViewModel and retrieves the Data.
                     TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
-                    
+
                     if (target != null && sourceData != null && (GameObject)((TreeItemViewModel)target.DataContext).Data != sourceData)
                     {
                         GameObject parent = ((TreeItemViewModel)target.DataContext).Data as GameObject;
@@ -384,14 +389,14 @@ namespace ThomasEditor
                         else
                         {
                             GameObject.Instantiate(sourceData);
-                        }   
+                        }
                     }
                     else
                     {
                         Debug.LogWarning("Invalid parenting, can't set the selected object as a child if the specified object.");
                     }
                 }
-                //Check if brefab. (From outside hierarchy)
+                //Check if prefab. (From outside hierarchy)
                 else if (source.DataContext.GetType() == typeof(GameObject))
                 {
                     GameObject sourceData = (GameObject)source.DataContext;
@@ -403,14 +408,14 @@ namespace ThomasEditor
                         GameObject parent = target.DataContext as GameObject;
                         if (!parent.transform.IsChildOf(sourceData.transform))
                         {
-                            sourceData.transform.parent = parent.transform;
+                            sourceData.transform.SetParent(parent.transform, true);
                         }
                     }
                     else if (sourceData != null && target == null)
                     {
                         if (sourceData.inScene)
                         {
-                            sourceData.transform.parent = null;
+                            sourceData.transform.SetParent(null, true);
                         }
                         else
                         {
@@ -446,8 +451,8 @@ namespace ThomasEditor
         private void MenuItem_DeleteGameObject(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
-            if(item != null)
-            //Loop through selected objects
+            if (item != null)
+                //Loop through selected objects
                 for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
                 {
                     GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
@@ -468,7 +473,7 @@ namespace ThomasEditor
             {
                 e.CanExecute = true;
                 return;
-            }   
+            }
         }
 
         private void Hierarchy_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -508,7 +513,7 @@ namespace ThomasEditor
             if (_isDragging)
                 return;
             TreeViewItem item = GetItemAtLocation(e.GetPosition(hierarchy));
-            if(item != null)
+            if (item != null)
                 item.IsSelected = true;
         }
 
@@ -527,7 +532,7 @@ namespace ThomasEditor
 
         public void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
         {
-            if(m_copiedObjects.Count > 0)
+            if (m_copiedObjects.Count > 0)
             {
                 DetachParent();
                 Scene.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
@@ -593,7 +598,7 @@ namespace ThomasEditor
             return GetSelectedRootNodes(m_hierarchyNodes.ToList());
         }
 
-        private List<TreeItemViewModel>GetSelectedRootNodes(List<TreeItemViewModel> nodes)
+        private List<TreeItemViewModel> GetSelectedRootNodes(List<TreeItemViewModel> nodes)
         {
             List<TreeItemViewModel> selected = new List<TreeItemViewModel>();
             foreach (TreeItemViewModel node in nodes)

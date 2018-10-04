@@ -11,6 +11,7 @@
 #include "../../Input.h"
 #include "../../resource/Resources.h"
 #include "../GameObject.h"
+#include "Transform.h"
 
 namespace ThomasEngine
 {
@@ -127,6 +128,15 @@ namespace ThomasEngine
 			}
 		}
 		*/
+	}
+
+	Matrix RenderSkinnedComponent::GetBoneMatrix(int boneIndex)
+	{
+		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
+		thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
+		if(boneIndex < anim->boneCount())
+			return Utility::Convert(anim->getBoneMatrix(boneIndex)) * gameObject->transform->world;
+		else return Matrix::Identity;
 	}
 
 	void RenderSkinnedComponent::applyAnimation()
