@@ -9,8 +9,11 @@
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 mc:Ignorable="d" 
                 d:DesignHeight="300" d:DesignWidth="300"
-                x:Name="_this">
-
+                x:Name="_this"
+                >
+    <!--AllowDrop="True"-->
+                <!--PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"-->
+                
 
     <UserControl.CommandBindings>
         <CommandBinding Command="commands:CustomCommands.GetAddCompenent" CanExecute="AddComponent_CanExecute" Executed="AddComponent"/>
@@ -63,12 +66,7 @@
                 HorizontalAlignment="Center" HorizontalContentAlignment="Center" 
                 x:Name="addComponentButton" Command="{x:Static commands:CustomCommands.GetAddCompenent}" 
                 />
-        <Button AllowDrop="True" Grid.Row="3" Content="WHERE WE DROPPIN', BOYS?" 
-                HorizontalAlignment="Center" HorizontalContentAlignment="Center"
-                Height="50" Background="#333333"
-                PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"
-                
-                />
+        
         <Popup x:Name="addComponentsListPopup" IsOpen="False" StaysOpen="False" Width="200" Height="300" PlacementTarget="{Binding ElementName=addComponentButton}" Placement="Bottom">
             <DockPanel LostFocus="AddComponentsListContainer_LostFocus">
                 <TextBox x:Name="AddComponentsFilter" DockPanel.Dock="Top" TextChanged="AddComponentsFilter_TextChanged"/>

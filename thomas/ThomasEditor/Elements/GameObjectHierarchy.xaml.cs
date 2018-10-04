@@ -328,7 +328,10 @@ namespace ThomasEditor
 
                 //If drop function is called from Inspector
                 if (m_inspector == 1)
+                {
                     target = hierarchy.SelectedItem as TreeViewItem;
+                    m_inspector = 0;
+                }
 
                 StackPanel sourceHeader = source.Header as StackPanel;
 
