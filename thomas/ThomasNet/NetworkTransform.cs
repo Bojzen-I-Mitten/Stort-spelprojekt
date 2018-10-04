@@ -76,6 +76,8 @@ namespace ThomasEngine.Network
         }
         public override void Update()
         {
+            CurrentPositionDuration += Time.DeltaTime;
+
             if (isOwner)
             {
                 isDirty = HasMoved();
@@ -186,6 +188,7 @@ namespace ThomasEngine.Network
             }
 
             TargetPosition = reader.GetVector3();
+            CurrentPositionDuration = 0;
             transform.rotation = reader.GetQuaternion();
             transform.scale = reader.GetVector3();
 
@@ -197,11 +200,7 @@ namespace ThomasEngine.Network
 
         private void InterpolatePosition()
         {
-            CurrentPositionDuration += Time.DeltaTime;
-            transform.position = Vector3.Lerp(transform.position, TargetPosition, CurrentPositionDuration / SendInterval);
-
-            if (CurrentPositionDuration >= SendInterval)
-                CurrentPositionDuration = 0;
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, Math.Min(1.0f, CurrentPositionDuration / SendInterval));
         }
 
         private void InterpolateTransform()
