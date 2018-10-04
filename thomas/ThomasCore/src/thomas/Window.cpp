@@ -143,18 +143,10 @@ namespace thomas
 
 	void Window::Bind()
 	{
-		if (!m_bound)
-		{
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(1, &m_dxBuffers.backBuffer, m_dxBuffers.depthStencilView);
 			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
-			m_bound = true;
-		}
 	}
 
-	void Window::UnBind()
-	{
-		m_bound = false;
-	}
 
 	bool Window::ChangeWindowShowState(int nCmdShow)
 	{
@@ -285,13 +277,6 @@ namespace thomas
 		return desktop.bottom;
 	}
 
-	Window* Window::GetCurrentBound()
-	{
-		if (m_bound)
-			return this;
-
-		return nullptr;
-	}	
 
 	//Windows window events function
 	LRESULT CALLBACK Window::EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

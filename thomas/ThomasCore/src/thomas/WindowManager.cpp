@@ -58,7 +58,6 @@ namespace thomas
 			if (window->Initialized())
 			{
 				window->Present();
-				window->UnBind();
 			}
 	}
 
@@ -77,10 +76,11 @@ namespace thomas
 		for (Window* window : m_windows)
 		{
 			window->UpdateWindow();
-			window->GetInput()->Reset();
-		}
-		if(m_current)
-			m_current->GetInput()->Update();
+			if (m_current == window) {
+				m_current->GetInput()->Update();
+			}else
+				window->GetInput()->Reset();
+		}		
 	}
 
 	int WindowManager::GetNumOfWindows()

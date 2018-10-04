@@ -370,6 +370,7 @@ namespace thomas
 		m_keyboardState = Keyboard::State();
 		m_gamePadState = GamePad::State();
 		m_mouseState = Mouse::State();
+		m_mouseMode = MouseMode::POSITION_ABSOLUTE;
 	}
 
 	//Keyboard

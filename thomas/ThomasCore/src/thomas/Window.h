@@ -30,7 +30,6 @@ namespace thomas
 		virtual void Present();
 		void QueueResize();
 		void Bind();
-		void UnBind();
 		void Clear();
 
 	public:
@@ -55,7 +54,6 @@ namespace thomas
 		RECT GetBounds() const;
 		LONG GetHorizontalResolution() const;
 		LONG GetVerticalResolution() const;
-		Window* GetCurrentBound();
 		IDXGISwapChain* GetSwapChain() const;
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
@@ -73,7 +71,6 @@ namespace thomas
 		bool m_fullScreen;
 		bool m_initialized;
 		bool m_shouldResize;
-		bool m_bound;
 		float m_aspectRatio;
 		std::string m_title;
 
