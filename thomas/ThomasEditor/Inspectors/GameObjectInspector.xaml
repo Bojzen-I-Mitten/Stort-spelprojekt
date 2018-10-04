@@ -9,20 +9,21 @@
                 xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                 mc:Ignorable="d" 
                 d:DesignHeight="300" d:DesignWidth="300"
-                x:Name="_this" Focusable="False">
-
+                x:Name="_this"
+                AllowDrop="True"
+                PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"
+                Focusable="False"
+                >
 
     <UserControl.CommandBindings>
         <CommandBinding Command="commands:CustomCommands.GetAddCompenent" CanExecute="AddComponent_CanExecute" Executed="AddComponent"/>
     </UserControl.CommandBindings>
-
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConveter"/>
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
     </UserControl.Resources>
 
-    
     <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -60,10 +61,12 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
         <Button Grid.Row="2" Panel.ZIndex="0" ClickMode="Press" Content="Add Component" 
                 HorizontalAlignment="Center" HorizontalContentAlignment="Center" 
                 x:Name="addComponentButton" Command="{x:Static commands:CustomCommands.GetAddCompenent}" 
                 />
+        
         <Popup x:Name="addComponentsListPopup" IsOpen="False" StaysOpen="False" Width="200" Height="300" PlacementTarget="{Binding ElementName=addComponentButton}" Placement="Bottom">
             <DockPanel LostFocus="AddComponentsListContainer_LostFocus">
                 <TextBox x:Name="AddComponentsFilter" DockPanel.Dock="Top" TextChanged="AddComponentsFilter_TextChanged"/>

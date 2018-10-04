@@ -70,6 +70,7 @@ namespace ThomasEditor.Inspectors
         {
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
+                //e.Effects = DragDropEffects.None;
                 TreeViewItem item = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
                 if (item.DataContext is Resource)
                 {
@@ -77,7 +78,12 @@ namespace ThomasEditor.Inspectors
                     ContentControl label = sender as ContentControl;
                     PropertyItem pi = label.DataContext as PropertyItem;
                     if (resource.GetType() == pi.PropertyType)
+                    {
+                        e.Effects = DragDropEffects.Move;
                         e.Handled = true;
+                    }
+                    else
+                        e.Effects = DragDropEffects.None;
                 }
             }
 
