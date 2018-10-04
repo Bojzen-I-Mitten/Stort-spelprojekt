@@ -31,7 +31,7 @@ namespace thomas
 
 		void Texture2D::LoadTextureFromFile(std::string path)
 		{
-			if (utils::D3d::LoadTextureFromFile(path, m_resource, m_srv))
+			if (utils::D3D::Instance()->LoadTextureFromFile(path, m_resource, m_srv))
 			{
 				ID3D11Texture2D *textureInterface;
 
@@ -64,7 +64,7 @@ namespace thomas
 			m_linear = linear;
 
 			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3d::CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+			utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 		}
@@ -84,7 +84,7 @@ namespace thomas
 		std::vector<math::Color> Texture2D::GetPixels()
 		{
 			
-			HRESULT hr = DirectX::CaptureTexture(ThomasCore::GetDevice(), ThomasCore::GetDeviceContext(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, *data);
 
 			std::vector<math::Color> pixels;
 			DirectX::PackedVector::XMUBYTEN4* rawPixels = (DirectX::PackedVector::XMUBYTEN4*)data->GetPixels();
@@ -100,7 +100,7 @@ namespace thomas
 		byte * Texture2D::GetRawBGRAPixels()
 		{
 			DirectX::ScratchImage firstData;
-			HRESULT hr = DirectX::CaptureTexture(ThomasCore::GetDevice(), ThomasCore::GetDeviceContext(), m_resource, firstData);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, firstData);
 			hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), DXGI_FORMAT_B8G8R8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, *data);
 			firstData.Release();
 

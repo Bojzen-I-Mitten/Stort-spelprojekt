@@ -60,9 +60,9 @@ namespace ThomasEngine
 	}
 	void RenderSkinnedComponent::material::set(Material^ value) {
 		if (value)
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetMaterial((thomas::resource::Material*)value->m_nativePtr);
+			((thomas::object::component::RenderComponent*)nativePtr)->SetMaterial((thomas::resource::Material*)value->m_nativePtr);
 		else
-			((thomas::object::component::RenderSkinnedComponent*)nativePtr)->SetMaterial(nullptr);
+			((thomas::object::component::RenderComponent*)nativePtr)->SetMaterial(nullptr);
 		OnPropertyChanged("material");
 	}
 
