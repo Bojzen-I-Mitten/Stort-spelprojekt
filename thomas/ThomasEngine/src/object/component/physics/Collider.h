@@ -25,7 +25,7 @@ namespace ThomasEngine
 	public:
 		Collider(component::Collider* nativePtr);
 		~Collider();
-		
+		virtual void OnDestroy() override;
 
 		[BrowsableAttribute(false)]
 		property Rigidbody^ attachedRigidbody {

@@ -15,7 +15,7 @@ namespace thomas
 		void Present();
 		void BeginFrame();
 		void EndFrame(bool copyGui);
-
+		virtual bool IsEditor() { return true; }
 	private:
 		void UpdateWindow();
 		void CloneGUIData();

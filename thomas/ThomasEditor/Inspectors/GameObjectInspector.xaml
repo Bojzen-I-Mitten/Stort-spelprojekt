@@ -12,6 +12,7 @@
                 x:Name="_this"
                 AllowDrop="True"
                 PreviewDrop="GameObjectInspector_Drop" PreviewDragOver="GameObjectInspector_PreviewDragOver"
+                Focusable="False"
                 >
 
     <UserControl.CommandBindings>

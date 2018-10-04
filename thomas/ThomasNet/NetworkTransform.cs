@@ -11,69 +11,282 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
-        Vector3 pos;
-        Vector3 scale;
-        Quaternion rot;
+        Vector3 PrevPosition;
+        Quaternion PrevRotation;
+        Vector3 PrevScale;
+        float prevVelocity;
 
+        float CurrentPositionDuration = 0;
 
-        public override void Start()
+        const float LocalMovementThreshold = 0.00001f;
+        const float LocalRotationThreshold = 0.00001f;
+        const float LocalVelocityThreshold = 0.00001f;
+        const float MoveAheadRatio = 0.1f;
+
+        const float SnapThreshhold = 5.0f;
+
+        const float InterpolateRotation = 1.0f;
+        const float InterpolateMovement = 1.0f;
+
+        Vector3 TargetSyncPosition;
+        Quaternion TargetSyncRotation;
+        Vector3 TargetSyncLinearVelocity;
+        Vector3 TargetSyncAngularVelocity;
+
+        Rigidbody attachedRigidbody;
+
+        public enum TransformSyncMode
         {
-            pos = new Vector3(0.0f);
-            scale = Vector3.One;
-            rot = new Quaternion();
-            
+            SyncNone = 0,
+            SyncTransform = 1,
+            SyncRigidbody = 2
         }
-        public override void Update()
+
+        public TransformSyncMode SyncMode { get; set; } = TransformSyncMode.SyncTransform;
+
+        public bool SyncParent { get; set; } = true;
+
+        public override void Awake()
         {
-            if (!isOwner)
+            PrevPosition = transform.position;
+            PrevRotation = transform.rotation;
+            PrevScale = transform.scale;
+            TargetSyncPosition = transform.position;
+
+            attachedRigidbody = gameObject.GetComponent<Rigidbody>();
+            if (attachedRigidbody)
             {
-                transform.position = Vector3.Lerp(transform.position, pos, Time.DeltaTime * 15);
-                transform.scale = Vector3.Lerp(transform.scale, scale, Time.DeltaTime * 15);
-                transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.DeltaTime * 30);
+                TargetSyncLinearVelocity = attachedRigidbody.LinearVelocity;
+                TargetSyncAngularVelocity = attachedRigidbody.AngularVelocity;
             }
             else
             {
-                pos = transform.position;
-                scale = transform.scale;
-                rot = transform.rotation;
+                Debug.LogError("No rigidbody");
             }
-            
-
-
-
         }
 
-        public override void Read(NetPacketReader reader)
+        public override void Update()
         {
-            pos.x = reader.GetFloat();
-            pos.y = reader.GetFloat();
-            pos.z = reader.GetFloat();
+            CurrentPositionDuration += Time.DeltaTime;
 
-            rot.x = reader.GetFloat();
-            rot.y = reader.GetFloat();
-            rot.z = reader.GetFloat();
-            rot.w = reader.GetFloat();
+            if (isOwner)
+            {
+                isDirty = HasMoved();
+            }
 
-            scale.x = reader.GetFloat();
-            scale.y = reader.GetFloat();
-            scale.z = reader.GetFloat();
+            switch (SyncMode)
+            {
+                case TransformSyncMode.SyncTransform:
+                    InterpolatePosition();
+                    break;
+                default:
+                    break;
+            }
         }
 
-        public override void Write(NetDataWriter writer)
+        public override void FixedUpdate()
         {
-            writer.Put(pos.x);
-            writer.Put(pos.y);
-            writer.Put(pos.z);
-
-            writer.Put(rot.x);
-            writer.Put(rot.y);
-            writer.Put(rot.z);
-            writer.Put(rot.w);
-
-            writer.Put(scale.x);
-            writer.Put(scale.y);
-            writer.Put(scale.z);
+            switch (SyncMode)
+            {
+                case TransformSyncMode.SyncRigidbody:
+                    InterpolateRigidbody();
+                    break;
+                default:
+                    break;
+            }
         }
-     
+
+        void InterpolateRigidbody()
+        {
+            if (!isOwner && attachedRigidbody)
+            {
+                Vector3 newVelocity = (TargetSyncPosition - transform.position) * InterpolateMovement / SendInterval;
+                attachedRigidbody.LinearVelocity = newVelocity;
+
+                TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
+            }
+        }
+
+        private bool HasMoved()
+        {
+            float diff = 0;
+
+            //Check if position has changed
+            diff = Vector3.Distance(transform.position, PrevPosition);
+
+            if (diff > LocalMovementThreshold)
+                return true;
+
+            //check if rotation has changed
+            diff = Quaternion.Dot(transform.rotation, PrevRotation) - 1.0f;
+            if (diff < -LocalRotationThreshold)
+                return true;
+
+            //Check if scale has changed (temp)
+            diff = Vector3.Distance(transform.scale, PrevScale);
+            if (diff > LocalMovementThreshold)
+                return true;
+
+
+            if (attachedRigidbody)
+            {
+                diff = attachedRigidbody.LinearVelocity.LengthSquared() - prevVelocity;
+                if (diff > LocalVelocityThreshold)
+                    return true;
+            }
+
+
+
+            return false;
+
+        }
+
+
+        #region Write
+
+        public override bool OnWrite(NetDataWriter writer, bool initialState)
+        {
+            if (initialState)
+            {
+                //Always write initial state
+            }
+            else if (!isDirty)
+            {
+                writer.Put(0);
+                return false;
+            }
+            else
+            {
+                writer.Put(1);
+            }
+
+            switch (SyncMode)
+            {
+                case TransformSyncMode.SyncTransform:
+                    WriteTransform(writer);
+                    break;
+                case TransformSyncMode.SyncRigidbody:
+                    WriteRigidbody(writer);
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+
+        private void WriteTransform(NetDataWriter writer)
+        {
+            writer.Put(transform.position);
+
+            writer.Put(transform.rotation);
+
+            writer.Put(transform.scale);
+
+            //PrevPosition = transform.position;
+            //PrevRotation = transform.rotation;
+            //PrevScale = transform.scale;
+
+        }
+
+        private void WriteRigidbody(NetDataWriter writer)
+        {
+            WriteTransform(writer);
+
+            if (attachedRigidbody)
+            {
+                writer.Put(attachedRigidbody.LinearVelocity);
+                writer.Put(attachedRigidbody.AngularVelocity);
+
+                prevVelocity = attachedRigidbody.LinearVelocity.LengthSquared();
+            }
+        }
+
+        #endregion
+        #region Read
+        public override void OnRead(NetPacketReader reader, bool initialState)
+        {
+            if (!initialState && reader.GetInt() == 0)
+            {
+                return; //No dirty bit or initial state. Lets get the fuck out of here!
+            }
+
+            switch (SyncMode)
+            {
+                case TransformSyncMode.SyncTransform:
+                    ReadTransform(reader);
+                    break;
+                case TransformSyncMode.SyncRigidbody:
+                    ReadRigidbody(reader);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        private void ReadTransform(NetPacketReader reader)
+        {
+            CurrentPositionDuration = 0;
+            if (isOwner)
+            {
+                //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
+                reader.GetVector3();
+                reader.GetQuaternion();
+                reader.GetVector3();
+                return;
+            }
+
+            TargetSyncPosition = reader.GetVector3();
+            transform.rotation = reader.GetQuaternion();
+            transform.scale = reader.GetVector3();
+
+            if (Vector3.Distance(TargetSyncPosition, transform.position) > SnapThreshhold)
+            {
+                transform.position = TargetSyncPosition;
+            }
+        }
+
+        private void InterpolatePosition()
+        {
+
+            if (!isOwner)
+            {
+                transform.position = Vector3.Lerp(transform.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
+            }
+        }
+
+        private void ReadRigidbody(NetPacketReader reader)
+        {
+
+
+            if (isOwner || !attachedRigidbody)
+            {
+                //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
+                reader.GetVector3();
+                reader.GetQuaternion();
+                reader.GetVector3();
+
+                reader.GetVector3();
+                reader.GetVector3();
+
+                return;
+            }
+
+            TargetSyncPosition = reader.GetVector3();
+            transform.rotation = reader.GetQuaternion();
+            transform.scale = reader.GetVector3();
+
+            TargetSyncLinearVelocity = reader.GetVector3();
+            TargetSyncAngularVelocity = reader.GetVector3();
+
+            float dist = Vector3.Distance(transform.position, TargetSyncPosition);
+            if (dist > SnapThreshhold || !attachedRigidbody.enabled)
+            {
+                transform.position = TargetSyncPosition;
+                attachedRigidbody.LinearVelocity = TargetSyncLinearVelocity;
+                attachedRigidbody.AngularVelocity = TargetSyncAngularVelocity;
+            }
+        }
+        #endregion
     }
 }
