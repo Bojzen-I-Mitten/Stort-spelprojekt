@@ -20,10 +20,18 @@ namespace thomas {
 
 				virtual void timeStep(float dT);	// Step elapsed time
 
+				void setPlayType(PlayType type);
+				PlayType getPlayType();
+				void setSpeed(float speed);
+				float getDuration();
+
+				/* Partial state reset, state is set to a new play instance. */
+				void playOnce();
+
 			private:
+				PlayType m_playType;
 				float m_duration;
 				float m_speedUp;
-				PlayType m_playType;
 			};
 		}
 	}

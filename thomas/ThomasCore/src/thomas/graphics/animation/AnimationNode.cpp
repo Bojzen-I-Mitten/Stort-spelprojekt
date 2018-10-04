@@ -1,15 +1,19 @@
 #include "AnimationNode.h"
 #include "data/Skeleton.h"
+#include "../../utils/Utility.h"
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 
 			AnimationNode::AnimationNode(Skeleton &ref)
-				: m_ref(ref), m_boneMapping(ref.getNumBones())
+				: m_ref(ref), m_flag(0), m_boneMapping()
 			{
+				/*
+				// Set all bones to 'inactive' initially.
 				for (size_t i = 0; i < m_boneMapping.size(); i++)
 					m_boneMapping[i] = -1;
+				*/
 			}
 
 
@@ -30,6 +34,18 @@ namespace thomas {
 					return mat;
 				}
 				return m_ref.getBone(bone)._bindPose;
+			}
+			void AnimationNode::markUpdated()
+			{
+				utility::setFlag(m_flag, ANIM_UPDATED_FLAG);
+			}
+			uint32_t AnimationNode::isUpdated()
+			{
+				return utility::hasFlag(m_flag, ANIM_UPDATED_FLAG);
+			}
+			void AnimationNode::resetUpdate()
+			{
+				utility::rmvFlag(m_flag, ANIM_UPDATED_FLAG);
 			}
 			BindPoseNode::BindPoseNode(Skeleton & ref)
 				: AnimationNode(ref)
@@ -55,6 +71,11 @@ namespace thomas {
 			}
 			void BindPoseNode::calcFrame(unsigned int bone, math::Vector3 & trans, math::Vector3 & scale, math::Quaternion & rot)
 			{
+
+			}
+			void BindPoseNode::calcFrame(TransformComponents * result)
+			{
+				std::memcpy(result, m_ref.getBindComponents(), sizeof(TransformComponents) * m_ref.getNumBones());
 			}
 		}
 	}

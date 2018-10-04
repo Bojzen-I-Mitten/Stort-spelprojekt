@@ -3,10 +3,16 @@
 #include <stdio.h>
 #include <string>
 #include <msclr\marshal_cppstd.h>
+#include <thomas/utils/Utility.h>
 
 namespace ThomasEngine
 {
 
+	uint32_t Utility::hash(System::String ^ string)
+	{
+		std::string str = Utility::ConvertString(string);
+		return thomas::utility::hash(str);
+	}
 	std::string Utility::ConvertString(System::String^ string)
 	{
 		return msclr::interop::marshal_as<std::string>(string);
