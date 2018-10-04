@@ -99,7 +99,7 @@ namespace thomas
 					desc.Format = DXGI_FORMAT_UNKNOWN;
 					desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 
-					hr = utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+					hr = utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_srv);
 
 					if (hr == S_OK)
 						m_hasSRV = true;
@@ -125,7 +125,7 @@ namespace thomas
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()
 			{
 				if (m_hasSRV)
-					return m_resource;
+					return m_srv;
 
 				LOG("No availible srv");
 				return nullptr;
@@ -140,27 +140,52 @@ namespace thomas
 				return nullptr;
 			}
 
-			AppendConsumeBuffer::AppendConsumeBuffer(void* data, size_t stride, size_t count) : StructuredBuffer(data, stride, count, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE), D3D11_BUFFER_UAV_FLAG_APPEND)
+			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data, D3D11_BIND_FLAG bindFlags) : Buffer(data, count * stride, bindFlags, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_FLAG(D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS))
 			{
-				
-			}
-
-			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data) : Buffer(data, count * stride, D3D11_BIND_UNORDERED_ACCESS, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS)
-			{
+				m_hasSRV = false;
+				m_hasUAV = false;
 				HRESULT hr;
-				D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-				uavDesc.Buffer.FirstElement = 0;
-				uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-				uavDesc.Buffer.NumElements = count;
-				uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-				uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
-				hr = utils::D3D::Instance()->GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+				if (bindFlags & D3D11_BIND_SHADER_RESOURCE)
+				{
+					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+					srvDesc.BufferEx.FirstElement = 0;
+					srvDesc.BufferEx.NumElements = count;
+					srvDesc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
+					srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
 
-				if (hr == S_OK)
-					m_hasUAV = true;
+					hr = utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &srvDesc, &m_srv);
+
+					if (hr == S_OK)
+						m_hasSRV = true;
+				}
+				if (bindFlags & D3D11_BIND_UNORDERED_ACCESS)
+				{
+					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+					uavDesc.Buffer.FirstElement = 0;
+					uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+					uavDesc.Buffer.NumElements = count;
+					uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+
+					hr = utils::D3D::Instance()->GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+
+					if (hr == S_OK)
+						m_hasUAV = true;
+				}
+				
 
 			}
+			ID3D11ShaderResourceView * ByteAddressBuffer::GetSRV()
+			{
+				if (m_hasSRV)
+					return m_srv;
+
+				LOG("No availible srv");
+				return nullptr;
+			}
+
 
 			ID3D11UnorderedAccessView * ByteAddressBuffer::GetUAV()
 			{

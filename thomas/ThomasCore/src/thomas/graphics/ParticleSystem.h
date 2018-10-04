@@ -67,7 +67,8 @@ namespace thomas
 
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
-			std::unique_ptr<utils::buffers::Buffer> m_bufferIndirectUpdateArgs;
+			resource::ComputeShader* m_calculateEmitCountCS;
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferIndirectUpdateArgs;
 
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferSpawn;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferUpdate;

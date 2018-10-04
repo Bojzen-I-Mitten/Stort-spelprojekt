@@ -80,28 +80,22 @@ namespace thomas
 				ID3D11UnorderedAccessView* GetUAV();
 
 			private:
-				ID3D11ShaderResourceView* m_resource;
+				ID3D11ShaderResourceView* m_srv;
 				bool m_hasSRV;
 				ID3D11UnorderedAccessView* m_uav;
 				bool m_hasUAV;
 			};
 
-			class AppendConsumeBuffer : public StructuredBuffer
-			{
-			public:
-				AppendConsumeBuffer(void* data, size_t stride, size_t count);
-				template <typename T>
-				AppendConsumeBuffer(std::vector<T>& data) : AppendConsumeBuffer(data.data(), sizeof(T), data.size()) {};
-
-			};
-
 			class ByteAddressBuffer : public Buffer
 			{
 			public:
-				ByteAddressBuffer(size_t stride, size_t count, void* data = nullptr);
+				ByteAddressBuffer(size_t stride, size_t count, void* data = nullptr, D3D11_BIND_FLAG bindFlags = D3D11_BIND_UNORDERED_ACCESS);
 
+				ID3D11ShaderResourceView* GetSRV();
 				ID3D11UnorderedAccessView* GetUAV();
 			private:
+				ID3D11ShaderResourceView* m_srv;
+				bool m_hasSRV;
 				ID3D11UnorderedAccessView* m_uav;
 				bool m_hasUAV;
 			};

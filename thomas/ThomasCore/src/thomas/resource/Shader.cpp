@@ -692,7 +692,7 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
 					break;
 				case D3D_SVT_BYTEADDRESS_BUFFER:
-					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();//should be srv?
+					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
 					break;
 				case D3D_SVT_RWBYTEADDRESS_BUFFER:
 					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();

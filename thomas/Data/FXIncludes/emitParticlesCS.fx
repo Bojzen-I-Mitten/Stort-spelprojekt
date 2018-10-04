@@ -44,7 +44,7 @@ AppendStructuredBuffer<uint> alivelist;
 RWByteAddressBuffer counterbuffer;
 
 [numthreads(128, 1, 1)]
-void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
+void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
     int ix = (Gid.x * 128) + GTid.x;
     int iy = Gid.y;
@@ -146,6 +146,6 @@ technique11 EmitCS
     pass P0
     {
 
-        SetComputeShader(CompileShader(cs_5_0, Cmain()));
+        SetComputeShader(CompileShader(cs_5_0, CSmain()));
     }
 }
