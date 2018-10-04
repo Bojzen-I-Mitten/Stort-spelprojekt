@@ -7,7 +7,7 @@
 
 namespace ThomasEngine
 {
-	class Utility
+	public ref class Utility
 	{
 	public:
 

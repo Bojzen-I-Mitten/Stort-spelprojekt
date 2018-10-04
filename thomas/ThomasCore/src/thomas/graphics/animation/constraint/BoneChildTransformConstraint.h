@@ -1,7 +1,5 @@
 #pragma once
-
 #include "BoneConstraint.h"
-#include "../../object/component/Transform.h"
 
 namespace thomas {
 	namespace object {

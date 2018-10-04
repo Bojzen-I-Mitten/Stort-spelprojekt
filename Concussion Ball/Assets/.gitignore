@@ -11,6 +11,8 @@
 *.wav
 *.anim
 *.blend*
+*.prefab
+*.mat
 
 Models/
 

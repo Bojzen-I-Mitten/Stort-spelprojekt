@@ -3,27 +3,15 @@
 #include <stdio.h>
 #include <string>
 #include <msclr\marshal_cppstd.h>
-
+#include <thomas/utils/Utility.h>
 
 namespace ThomasEngine
 {
 
-	unsigned long	hash_djb2(const char *str)
-	{
-		unsigned long hash = 5381;
-		int c;
-
-		while (c = *str++)
-			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
-		return hash;
-	}
-
-
 	uint32_t Utility::hash(System::String ^ string)
 	{
 		std::string str = Utility::ConvertString(string);
-		return hash_djb2(str.c_str());
+		return thomas::utility::hash(str);
 	}
 	std::string Utility::ConvertString(System::String^ string)
 	{

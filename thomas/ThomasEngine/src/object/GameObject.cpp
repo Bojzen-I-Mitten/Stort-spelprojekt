@@ -37,7 +37,7 @@ namespace ThomasEngine {
 
 		Scene::CurrentScene->GameObjects->Add(this);
 		scene = Scene::CurrentScene;
-		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}

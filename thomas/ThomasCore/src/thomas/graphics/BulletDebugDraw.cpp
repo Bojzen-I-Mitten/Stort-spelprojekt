@@ -57,7 +57,29 @@ namespace thomas
 		{
 			m_debugMode = debugMode;
 		}
+		/*
+		void BulletDebugDraw::drawLineFinal()
+		{
+			if (m_lines.positions.empty())
+				if (m_linePositions.empty())
+					return;
+			DirectX::CommonStates states(utils::D3D::Instance()->GetDevice());
+			utils::D3D::Instance()->GetDeviceContext()->OMSetBlendState(states.Opaque(), nullptr, 0xFFFFFFFF);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(states.DepthNone(), 0);
+			utils::D3D::Instance()->GetDeviceContext()->RSSetState(states.CullNone());
+			// Set the data and send to GPU
+			m_vertexBufferPos->SetData(m_linePositions);
+			m_vertexBufferColor->SetData(m_lineColors);
+			m_material->m_topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+			m_material->GetShader()->BindVertexBuffers({ m_vertexBufferPos.get(), m_vertexBufferColor.get() });
+			m_material->SetMatrix("viewProjection", m_viewProjection);
+			m_material->Bind();
+			m_material->Draw(m_linePositions.size(), 0);
 
-		
+			// Clear the memory
+			m_linePositions.clear();
+			m_lineColors.clear();
+		}
+		*/
 	}
 }

@@ -4,7 +4,7 @@
 #include <memory>
 #include "../../utils/Math.h"
 #include "IBlendTree.h"
-#include "../../resource/ShaderProperty/ShaderPropertyMatrix.h"
+#include "data/TransformComponents.h"
 
 
 namespace thomas {
@@ -61,9 +61,10 @@ namespace thomas {
 			private:
 				Skeleton& _ref;									// Reference to the mesh skeleton
 				std::unique_ptr<AnimationNode> _root;			// Root in the blend tree
+				std::unique_ptr<TransformComponents> _frame_tmp;
 				std::vector<math::Matrix> _pose;				// Bone transform in model space
 				std::vector<math::Matrix> _skin;				// Skin Transforms in model space, stored in a property ready for the GPU
-				std::unique_ptr<ConstraintList> m_constraint;
+				std::unique_ptr<ConstraintList> m_constraint;	// Constraints applied in world space.
 			private:
 				void updateSkeleton();
 				void clearConstraints();

@@ -5,14 +5,14 @@
 #include "../../resource/Animation.h"
 #include "data/Skeleton.h"
 #include "BaseAnimationTime.h"
-#include "BoneConstraint.h"
+#include "constraint/BoneConstraint.h"
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) :
-				_ref(ref), _root(), _pose(ref.getNumBones()), _skin(ref.getNumBones()), m_constraint(new ConstraintList[ref.getNumBones()])
+				_ref(ref), _root(), _frame_tmp(new TransformComponents[ref.getNumBones()]), _pose(ref.getNumBones()), _skin(ref.getNumBones()), m_constraint(new ConstraintList[ref.getNumBones()])
 			{
 				clearConstraints();
 				clearBlendTree();
@@ -31,22 +31,24 @@ namespace thomas {
 
 
 			void AnimatedSkeleton::update(float dT) {
-				_root->update(dT);
-				updateSkeleton();
+				_root->update(dT);		// Update each node ONCE.
+				updateSkeleton();		// Apply skeleton.
+				_root->resetUpdate();	// Clear dirty update flags.
 			}
 			void AnimatedSkeleton::updateSkeleton()
 			{
 				//Update animation tree
+				_root->calcFrame(_frame_tmp.get());
 				// Update skin transforms
-				_pose[0] = _root->calcLocalTransform(0) * _ref.getRoot();				//	Update root pose
+				_pose[0] = (_frame_tmp.get())[0].createTransform() * _ref.getRoot();				//	Update root pose
 				applyConstraint(0);
-				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];					//	Update root skin
-				for (unsigned int i = 1; i < boneCount(); i++)
+				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];									//	Update root skin
+				for (uint32_t i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
-					_pose[i] = _root->calcLocalTransform(i) * _pose[bone._parentIndex];	//	Update root pose
+					_pose[i] = (_frame_tmp.get())[i].createTransform() * _pose[bone._parentIndex];	//	Update root pose
 					applyConstraint(i);
-					_skin[i] = bone._invBindPose * _pose[i];							//	Update root skin
+					_skin[i] = bone._invBindPose * _pose[i];										//	Update root skin
 				}
 			}
 			void AnimatedSkeleton::applyConstraint(uint32_t index)
