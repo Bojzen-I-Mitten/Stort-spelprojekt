@@ -31,17 +31,11 @@ namespace ThomasEngine
 
 		GameObject^ BoneTransformComponent::AnimatedObject::get()
 		{
-			return m_gameObject;
+			return m_skeletonSrc;
 		}
 		void BoneTransformComponent::AnimatedObject::set(GameObject^ value)
 		{
-			m_gameObject = value;
-
-			thomas::object::component::RenderSkinnedComponent* comp = value->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
-			if (comp == NULL)
-				Native->SetReference(NULL);
-			else
-				Native->SetReference(comp->GetBlendTree());
+			m_skeletonSrc = value;
 		}
 
 
@@ -55,5 +49,17 @@ namespace ThomasEngine
 			m_boneName = value;
 			uint32_t hash = Utility::hash(value);
 			Native->SetBoneHash(hash);
+		}
+
+		void BoneTransformComponent::Awake() 
+		{
+			if (m_skeletonSrc) {
+				thomas::object::component::RenderSkinnedComponent* comp = m_skeletonSrc->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
+				if (comp == NULL)
+					Native->SetReference(NULL);
+				else
+					Native->SetReference(comp->GetBlendTree());
+			}
+			
 		}
 }

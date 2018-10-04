@@ -103,7 +103,6 @@
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\object\component\physics\Joint.h" />
-    <ClInclude Include="src\object\component\physics\.h" />
     <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
     <ClInclude Include="src\script\animation\BlendNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />

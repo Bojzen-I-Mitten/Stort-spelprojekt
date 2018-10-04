@@ -20,6 +20,14 @@ namespace thomas
 			}
 			void BoneTransformComponent::OnEnable()
 			{
+				if (!m_skeleton) 
+				{ 
+					std::string err("WARNING, Core::BoneTransformComponent. No skeleton/object specified in object: ");
+					err.append(m_gameObject->GetName());
+					LOG(err); 
+					return; 
+				}
+				// Execute
 				m_constraint = std::unique_ptr<graphics::animation::BoneConstraint>(
 					new  graphics::animation::BoneChildTransformConstraint(*m_gameObject->m_transform));
 				if(m_skeleton->getBoneIndex(m_boneHash, m_boneIndex))

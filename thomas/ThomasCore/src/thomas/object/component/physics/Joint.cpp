@@ -1,113 +1,163 @@
 #include "Joint.h"
-#include "../../../utils/Math.h"
-
-thomas::object::component::Joint::Joint()
+#include "../../GameObject.h"
+#include "Rigidbody.h"
+namespace thomas
 {
-	m_current.setOrigin(btVector3(0.f, 0.f, 0.f));
-	m_other.setOrigin(btVector3(0.f, 0.f, 0.f));
-	m_current.setRotation(btQuaternion(0.f, 0.f, 0.f, 1.f));
-	m_other.setRotation(btQuaternion(0.f, 0.f, 0.f, 1.f));
-}
-
-thomas::object::component::Joint::~Joint()
-{
-
-}
-
-btConeTwistConstraint * thomas::object::component::Joint::CreateConstraints( btRigidBody * secondbody, btTransform & firstTransform, btTransform & secondTransform, math::Vector3 swingtwist)
-{
-
-
-	m_coneTwistConstraint = new btConeTwistConstraint(*m_gameObject->GetComponent<Rigidbody>(), *secondbody, firstTransform, secondTransform);
-	m_coneTwistConstraint->setLimit(math::DegreesToRadians(swingtwist.x), math::DegreesToRadians(swingtwist.y), math::DegreesToRadians(swingtwist.z), 1, 0.3, 1);
-	return m_coneTwistConstraint;	
-}
-
-void thomas::object::component::Joint::Update()
-{
-	m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_twistSpin.x), math::DegreesToRadians(m_twistSpin.y), math::DegreesToRadians(m_twistSpin.z), 1, 0.3, 1);
-	m_coneTwistConstraint->setFrames(m_current, m_other);
-}
-
-void thomas::object::component::Joint::Awake()
-{
-	if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
+	namespace object
 	{
-		m_current.setRotation(thomas::Physics::ToBullet(m_gameObject->m_transform->GetLocalRotation()));
-		thomas::Physics::s_world->addConstraint(CreateConstraints( m_secondBody, m_current,
-															m_other, m_twistSpin), false);
-	}															 
-}
+		namespace component
+		{
 
-void thomas::object::component::Joint::OnDisable()
-{
-	if (m_coneTwistConstraint != nullptr)
-	{
-		thomas::Physics::s_world->removeConstraint(m_coneTwistConstraint);
-		delete m_coneTwistConstraint;
-		m_coneTwistConstraint = nullptr;
+			Joint::Joint()
+			{
+				m_frameA.setOrigin(btVector3(0, 0, 0));
+				m_frameA.setRotation(btQuaternion::getIdentity());
+				m_frameB.setOrigin(btVector3(0, 0, 0));
+				m_frameB.setRotation(btQuaternion::getIdentity());
+
+				m_connectedBody = nullptr;
+				m_frameAAxis = math::Vector3::Zero;
+				m_frameBAxis = math::Vector3::Zero;
+				m_twist = 0.0f;
+				m_swing = 0.0f;
+			}
+
+			Joint::~Joint()
+			{
+
+			}
+
+			void Joint::SetConnectedBody(Rigidbody * target)
+			{
+				m_connectedBody = target;
+			}
+
+			void Joint::SetFrameAAnchor(math::Vector3 value)
+			{
+				m_frameA.setOrigin(Physics::ToBullet(value));
+				UpdateLimits();
+			}
+
+			void Joint::SetFrameAAxis(math::Vector3 value)
+			{
+				m_frameAAxis = value;
+				UpdateLimits();
+			}
+
+			void Joint::SetFrameBAnchor(math::Vector3 value)
+			{
+				m_frameB.setOrigin(Physics::ToBullet(value));
+				UpdateLimits();
+			}
+
+			void Joint::SetFrameBAxis(math::Vector3 value)
+			{
+				m_frameBAxis = value;
+				UpdateLimits();
+			}
+
+			void Joint::SetSwing(float value)
+			{
+				m_swing = value;
+				UpdateLimits();
+			}
+
+			void Joint::SetTwist(float value)
+			{
+				m_twist = value;
+				UpdateLimits();
+			}
+
+			Rigidbody * Joint::GetConnectedBody()
+			{
+				return m_connectedBody;
+			}
+
+			math::Vector3 Joint::GetFrameAAnchor()
+			{
+				return Physics::ToSimple(m_frameA.getOrigin());
+			}
+
+			math::Vector3 Joint::GetFrameAAxis()
+			{
+				return m_frameAAxis;
+			}
+
+			math::Vector3 Joint::GetFrameBAnchor()
+			{
+				return Physics::ToSimple(m_frameB.getOrigin());
+			}
+
+			math::Vector3 Joint::GetFrameBAxis()
+			{
+				return m_frameBAxis;
+			}
+
+			float Joint::GetSwing()
+			{
+				return m_swing;
+			}
+
+			float Joint::GetTwist()
+			{
+				return m_twist;
+			}
+
+			btConeTwistConstraint * Joint::CreateConstraints()
+			{
+				btRigidBody* rbA = m_gameObject->GetComponent<Rigidbody>();
+				btRigidBody* rbB = m_connectedBody;
+
+				m_coneTwistConstraint = new btConeTwistConstraint(*rbA, *rbB, m_frameA, m_frameB);
+				return m_coneTwistConstraint;
+			}
+
+			void Joint::UpdateLimits()
+			{
+				if (m_coneTwistConstraint) {
+					
+					math::Vector3 swingA = m_frameAAxis;
+					math::Vector3 swingB = m_frameBAxis;
+					btQuaternion frameASwing = btQuaternion(math::DegreesToRadians(swingA.y), math::DegreesToRadians(swingA.x), math::DegreesToRadians(swingA.z));
+					btQuaternion frameBSwing = btQuaternion(math::DegreesToRadians(swingB.y), math::DegreesToRadians(swingB.x), math::DegreesToRadians(swingB.z));
+
+					m_frameA.setRotation(frameASwing);
+					m_frameB.setRotation(frameBSwing);
+					m_coneTwistConstraint->setFrames(m_frameA, m_frameB);
+
+					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing), math::DegreesToRadians(m_swing), math::DegreesToRadians(m_twist));
+				}
+
+			}
+
+			void Joint::Update()
+			{
+				
+				
+			}
+
+			void Joint::Awake()
+			{
+				if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
+				{
+					m_gameObject->GetComponent<Rigidbody>()->SetActivationState(ActivationState::Always_Active);
+					thomas::Physics::s_world->addConstraint(CreateConstraints());
+					UpdateLimits();
+				}
+			}
+
+			void Joint::OnDisable()
+			{
+				if (m_coneTwistConstraint != nullptr)
+				{
+					thomas::Physics::s_world->removeConstraint(m_coneTwistConstraint);
+					delete m_coneTwistConstraint;
+					m_coneTwistConstraint = nullptr;
+				}
+			}
+
+			
+		}
 	}
 }
 
-void thomas::object::component::Joint::SetRigidBody(btRigidBody * secondbody)
-{
-	m_secondBody = secondbody;
-}
-
-void thomas::object::component::Joint::SetTransformTwistSpin(math::Vector3 twistSpin)
-{
-	m_twistSpin = twistSpin;
-}
-
-void thomas::object::component::Joint::SetTransformOrigin(math::Vector3 Origin, bool firstBody)
-{
-	if (firstBody)
-		this->m_current.setOrigin(btVector3(Origin.x, Origin.y, Origin.z));
-	else
-		this->m_other.setOrigin(btVector3(Origin.x, Origin.y, Origin.z));
-}
-
-void thomas::object::component::Joint::SetTransformRotation(math::Vector3 Rotation, bool firstBody)
-{
-	if (firstBody)
-		Savedrotation[0] = Rotation;
-	else
-		Savedrotation[1] = Rotation;
-
-	if (firstBody)
-		this->m_current.getBasis().setEulerZYX(math::DegreesToRadians(Rotation.z), math::DegreesToRadians(Rotation.y), math::DegreesToRadians(Rotation.x));//m_first.setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));
-	else
-		this->m_other.getBasis().setEulerZYX(math::DegreesToRadians(Rotation.z), math::DegreesToRadians(Rotation.y), math::DegreesToRadians(Rotation.x));//setRotation(btQuaternion(Rotation.x, Rotation.y, Rotation.z, Rotation.w));	
-}
-
-thomas::math::Vector3 thomas::object::component::Joint::GetTransformOrigin(bool firstBody)
-{
-	
-	if (firstBody)
-		return Physics::ToSimple(m_current.getOrigin());
-
-	return Physics::ToSimple(m_other.getOrigin());
-}
-
-thomas::math::Vector3 thomas::object::component::Joint::GetTransformRotation(bool firstBody)
-{
-	/*
-	if (firstBody)
-		return math::Vector3((math::Vector3)m_first.getRotation());
-	return math::Vector3((math::Vector3)m_second.getRotation());
-	*/
-	if (firstBody)
-		return Savedrotation[0];
-	return Savedrotation[1];
-
-}
-
-thomas::math::Vector3 thomas::object::component::Joint::GetTransformTwistSpin()
-{
-	return m_twistSpin;
-}
-
-btRigidBody * thomas::object::component::Joint::GetRigidBody()
-{
-	return m_secondBody;
-}

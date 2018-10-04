@@ -70,7 +70,10 @@ namespace thomas
 				return false;
 			}
 			graphics::animation::IBlendTree* RenderSkinnedComponent::GetBlendTree() {
-				return m_skeleton.get();
+				if (m_skeleton)
+					return m_skeleton.get();
+				else
+					return nullptr;
 			}
 			void RenderSkinnedComponent::applySkin()
 			{
