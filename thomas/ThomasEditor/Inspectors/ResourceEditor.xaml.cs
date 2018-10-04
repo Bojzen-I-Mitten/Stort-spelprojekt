@@ -54,9 +54,10 @@ namespace ThomasEditor.Inspectors
                     }
                     else if (obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                     {
-                        var method = typeof(GameObject).GetMethod("GetComponent").MakeGenericMethod(pi.PropertyType);
-                        var component = method.Invoke(obj, null);
-                        if (component != null && component.GetType() == pi.PropertyType)
+
+
+                        var component = (obj as GameObject).GetComponent(pi.PropertyType);
+                        if (component != null)
                         {
                             pi.Value = component;
                         }

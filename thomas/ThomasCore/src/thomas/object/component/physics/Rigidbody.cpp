@@ -3,6 +3,7 @@
 #include "../../../utils/Math.h"
 #include "../Transform.h"
 #include "Collider.h"
+#include <imgui/ImGuizmo.h>
 #include <memory>
 
 namespace thomas
@@ -46,11 +47,15 @@ namespace thomas
 				getMotionState()->setWorldTransform(trans);
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
+				this->setLinearVelocity(btVector3(0, 0, 0));
+				this->setAngularVelocity(btVector3(0, 0, 0));
 				Physics::AddRigidBody(this);
 			}
 
 			void Rigidbody::OnDisable()
 			{
+				this->setLinearVelocity(btVector3(0, 0, 0));
+				this->setAngularVelocity(btVector3(0, 0, 0));
 				clearForces();
 				Physics::RemoveRigidBody(this);				
 			}
@@ -94,9 +99,12 @@ namespace thomas
 					setCenterOfMassTransform(trans);
 					trans.setOrigin((btVector3&)pos);
 					getMotionState()->setWorldTransform(trans);
-					this->setLinearVelocity(btVector3(0, 0, 0));
-					this->setAngularVelocity(btVector3(0, 0, 0));
 
+					if (ImGuizmo::IsUsing()) {
+						this->setLinearVelocity(btVector3(0, 0, 0));
+						this->setAngularVelocity(btVector3(0, 0, 0));
+					}
+					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 				}			

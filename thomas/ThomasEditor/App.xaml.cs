@@ -13,8 +13,11 @@ namespace ThomasEditor
     /// </summary>
     public partial class App : System.Windows.Application
     {
+        public static StartupEventArgs args;
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Couldn't think of a better way, no init constructors in this crap language.
+            args = e;
             ThomasWrapper.Start();
         }
 

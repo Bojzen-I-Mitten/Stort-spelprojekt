@@ -10,6 +10,8 @@
 #include <thomas\Physics.h>
 #include <thomas\editor\Editor.h>
 #include <thomas\editor\EditorCamera.h>
+#include <thomas\AutoProfile.h>
+#include <thomas\ProfileManager.h>
 
 #pragma managed
 #include "ThomasManaged.h"
@@ -92,6 +94,9 @@ namespace ThomasEngine {
 				Thread::Sleep(1000);
 				continue;
 			}
+			NEW_FRAME();
+
+			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 			try {
 
@@ -191,6 +196,8 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
+		ProfileManager::dumpDataToFile("data.csv");
+	
 		thomas::ThomasCore::Exit();
 	}
 

@@ -79,8 +79,7 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) 
-			{
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
@@ -141,6 +140,7 @@ namespace ThomasEngine {
 	{
 		if (m_isDestroyed)
 			return;
+		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
@@ -151,7 +151,6 @@ namespace ThomasEngine {
 		Object::Destroy();
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
-		ThomasWrapper::Selection->UnSelectGameObject(this);
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -167,6 +166,11 @@ namespace ThomasEngine {
 	{
 		if(!original){
 			Debug::LogError("Object to instantiate is null");
+			return nullptr;
+		}
+		if (original->m_isDestroyed)
+		{
+			Debug::LogError("Trying to instantiate destroyed object.");
 			return nullptr;
 		}
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
@@ -189,6 +193,7 @@ namespace ThomasEngine {
 		}
 		
 		if (clone) {
+			clone->transform->SetParent(nullptr, true);
 			clone->PostInstantiate(Scene::CurrentScene);
 			clone->prefabPath = nullptr;
 		}
@@ -201,7 +206,7 @@ namespace ThomasEngine {
 	{
 		GameObject^ clone = Instantiate(original);
 		if(clone)
-			clone->transform->parent = parent;
+			clone->transform->SetParent(parent, true);
 		return clone;
 	}
 
@@ -389,8 +394,9 @@ namespace ThomasEngine {
 
 	void GameObject::SetActive(bool active)
 	{
-		((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		activeSelf = active;
+		((thomas::object::GameObject*)nativePtr)->SetActive(active);
+		
 
 	}
 
@@ -415,6 +421,7 @@ namespace ThomasEngine {
 				
 		}
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		OnPropertyChanged("activeSelf");
 	}
 
 	Transform^ GameObject::transform::get()

@@ -167,7 +167,7 @@ namespace thomas
 		{
 			// Make sure we are dealing with the editor window
 			thomas::Window* window = WindowManager::Instance()->GetEditorWindow();
-			if (!window)
+			if (!window || WindowManager::Instance()->GetCurrentBound() != window)
 				return;
 
 			window->GetInput()->ResetScrollWheelValue();
