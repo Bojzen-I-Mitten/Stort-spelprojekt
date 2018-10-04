@@ -70,6 +70,14 @@ namespace ThomasEngine
 			Quaternion get();
 			void set(Quaternion value);
 		}
+
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Quaternion localRotation
+		{
+			Quaternion get();
+			void set(Quaternion value);
+		}
 	
 		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]

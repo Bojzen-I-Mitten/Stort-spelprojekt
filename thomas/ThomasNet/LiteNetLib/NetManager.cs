@@ -558,11 +558,11 @@ namespace LiteNetLib
             NetConnectRequestPacket connRequest)
         {
             byte connectionNumber = connRequest.ConnectionNumber;
-            NetUtils.DebugWrite("ConnectRequest LastId: {0}, NewId: {1}, EP: {2}", netPeer.ConnectId, connRequest.ConnectionId, remoteEndPoint);
-
+            
             //if we have peer
             if (netPeer != null)
             {
+                NetUtils.DebugWrite("ConnectRequest LastId: {0}, NewId: {1}, EP: {2}", netPeer.ConnectId, connRequest.ConnectionId, remoteEndPoint);
                 var processResult = netPeer.ProcessConnectRequest(connRequest);
                 switch (processResult)
                 {
@@ -1014,6 +1014,7 @@ namespace LiteNetLib
                 throw new InvalidOperationException("Client is not running");
 
             NetPeer peer;
+            
             if (_peers.TryGetValue(target, out peer))
             {
                 switch (peer.ConnectionState)

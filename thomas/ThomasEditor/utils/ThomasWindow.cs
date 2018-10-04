@@ -169,10 +169,12 @@ namespace ThomasEditor
             
         }
 
+
         private void ThomasWindow_GotFocus(object sender, RoutedEventArgs e)
         {
             SetFocus(Handle);
         }
+
 
         protected override void DestroyWindowCore(HandleRef handle)
         {

@@ -16,10 +16,13 @@ namespace thomas
 		void PresentAllWindows();
 		void Update();
 		void Create(HWND hWnd, bool isEditor);
-
+		void UpdateFocus();
 	public:
 		int GetNumOfWindows();
 		Window* GetCurrentBound();
+		Input* GetCurrentInput();
+		Input* GetGameInput();
+		void SetCurrentBound(Window* value);
 		EditorWindow* GetEditorWindow();
 		Window* GetWindow(int index);
 		Window* GetWindow(HWND hWnd);
@@ -28,14 +31,16 @@ namespace thomas
 		static WindowManager* Instance();
 
 	private:
-		WindowManager() = default;
+		WindowManager() {m_dummyInput = Input();}
 
 	private:
 		std::vector<Window*> m_windows;
 		EditorWindow* m_editorWindow;
-		Window* s_current;
-
+		Window* m_current;
+		Input m_dummyInput;
+		
 	private:
 		static WindowManager s_windowManager;
+		
 	};
 }

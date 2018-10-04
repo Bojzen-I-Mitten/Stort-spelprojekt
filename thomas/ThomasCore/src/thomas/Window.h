@@ -30,7 +30,6 @@ namespace thomas
 		virtual void Present();
 		void QueueResize();
 		void Bind();
-		void UnBind();
 		void Clear();
 
 	public:
@@ -44,7 +43,7 @@ namespace thomas
 		bool SetWidth(const LONG & width);
 		bool SetSize(const LONG & height, const LONG & width);
 		void SetCursor(const bool & visible);
-
+		
 	public:
 		static LRESULT CALLBACK EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -55,11 +54,12 @@ namespace thomas
 		RECT GetBounds() const;
 		LONG GetHorizontalResolution() const;
 		LONG GetVerticalResolution() const;
-		Window* GetCurrentBound();
 		IDXGISwapChain* GetSwapChain() const;
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
 
+
+		virtual bool IsEditor() { return false; }
 	protected:
 		bool InitDxBuffers();
 		bool Resize();
@@ -71,7 +71,6 @@ namespace thomas
 		bool m_fullScreen;
 		bool m_initialized;
 		bool m_shouldResize;
-		bool m_bound;
 		float m_aspectRatio;
 		std::string m_title;
 

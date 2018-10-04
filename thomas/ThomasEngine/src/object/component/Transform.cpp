@@ -23,9 +23,7 @@ namespace ThomasEngine
 	}
 	void Transform::parent::set(ThomasEngine::Transform^ value)
 	{
-
 		SetParent(value);
-
 	}
 
 	List<Transform^>^ Transform::children::get()
@@ -56,6 +54,9 @@ namespace ThomasEngine
 
 	Quaternion Transform::rotation::get() { return Utility::Convert(trans->GetRotation()); }
 	void Transform::rotation::set(Quaternion value) { trans->SetRotation(Utility::Convert(value));}
+
+	Quaternion Transform::localRotation::get() { return Utility::Convert(trans->GetLocalRotation()); }
+	void Transform::localRotation::set(Quaternion value) { trans->SetLocalRotation(Utility::Convert(value)); }
 
 	Vector3 Transform::eulerAngles::get() { return Utility::Convert(trans->GetEulerAngles()); }
 	void Transform::eulerAngles::set(Vector3 value) { trans->SetRotation(value.y, value.x,  value.z); OnPropertyChanged("localEulerAngles");}
