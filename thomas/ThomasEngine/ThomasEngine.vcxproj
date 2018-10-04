@@ -195,6 +195,7 @@
     <ClInclude Include="src\object\component\SoundComponent.h" />
     <ClInclude Include="src\resource\Shader.h" />
     <ClInclude Include="src\script\animation\BlendNode.h" />
+    <ClInclude Include="src\script\animation\PlaybackHandle.h" />
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />
     <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
@@ -251,6 +252,7 @@
     <ClCompile Include="src\resource\Shader.cpp" />
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\script\animation\PlaybackHandle.cpp" />
     <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />

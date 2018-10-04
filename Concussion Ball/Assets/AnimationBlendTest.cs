@@ -7,6 +7,7 @@ public class AnimationBlendTest : ScriptComponent
     BlendNode root;
     PlaybackNode from;
     PlaybackNode to;
+    PlaybackHandle toTime;
     LookAtConstraint lookAt;
 
     RenderSkinnedComponent skinn;
@@ -22,6 +23,7 @@ public class AnimationBlendTest : ScriptComponent
         root = new BlendNode(skinn.model);
         from = new PlaybackNode(skinn.model, fromAnim, true);
         to = new PlaybackNode(skinn.model, toAnim, true);
+        toTime = to.getTimeHandle();
         root.appendNode(from);
         root.appendNode(to);
         weight = root.generateWeightHandle();
@@ -41,13 +43,17 @@ public class AnimationBlendTest : ScriptComponent
         {
             //weight.m_WeightData[0] = 
             timer += Time.DeltaTime;
-            float curve = (float)Math.Sin(timer);
+            float curve = (float)Math.Sin(timer*0.5f);
             float t = 0.5f * curve + 0.5f;
             WeightTripple w = WeightTripple.fromWeight(1);
-            WeightTripple w2 = WeightTripple.fromWeight(1);
+            WeightTripple w2 = WeightTripple.fromWeight(t);
             weight.setWeight(0, w);
             weight.setWeight(1, w2);
             lookAt.Target =  new Vector3(curve, 1.5f, -1f);
+            if (curve < 0)
+                toTime.Pause();
+            else
+                toTime.Continue();
         }
     }
 }

@@ -57,6 +57,10 @@ namespace thomas {
 				markUpdated();
 			}
 
+			Playback* AnimPlayback::getPlayback() {
+				return m_playback.get();
+			}
+
 			void AnimPlayback::calcFrame(TransformComponents * result)
 			{
 				float eT = m_playback->m_elapsedTime;

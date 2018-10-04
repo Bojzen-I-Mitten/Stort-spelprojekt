@@ -23,6 +23,8 @@ namespace thomas {
 
 				virtual void update(float dT);
 
+				Playback* getPlayback();
+
 			private:
 
 				AnimationData *m_anim;

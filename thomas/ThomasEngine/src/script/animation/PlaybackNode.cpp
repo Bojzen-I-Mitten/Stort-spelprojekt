@@ -4,11 +4,11 @@
 #include <thomas/resource/Model.h>
 #include <thomas/graphics/animation/data/AnimationData.h>
 #include <thomas/graphics/animation/data/Skeleton.h>
-#include <thomas/graphics/animation/BaseAnimationTime.h>
 
 #pragma managed
 #include "../../resource/Model.h"
 #include "../../resource/Animation.h"
+#include "PlaybackHandle.h"
 
 namespace ThomasEngine
 {
@@ -31,11 +31,16 @@ namespace ThomasEngine
 
 			AnimationData * data = anim->Native()->GetAnimation();
 
-			std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once));
+			m_playController = new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once);
+			std::unique_ptr<Playback> playback(m_playController);
 			m_node = new AnimPlayback(*skel, playback, *data);
 		}
 		PlaybackNode::~PlaybackNode()
 		{
+		}
+		PlaybackHandle ^ PlaybackNode::getTimeHandle()
+		{
+			return gcnew PlaybackHandle(m_playController);
 		}
 		thomas::graphics::animation::AnimationNode * PlaybackNode::Native()
 		{

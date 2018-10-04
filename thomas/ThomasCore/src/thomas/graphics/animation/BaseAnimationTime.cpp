@@ -13,8 +13,12 @@ namespace thomas {
 			}
 			void BaseAnimationTime::timeStep(float dT)
 			{
+				if (m_playType == PlayType::None) return;
+				
 				m_elapsedTime += dT * m_speedUp;
-				if (m_duration < m_elapsedTime) {
+				
+				if (m_duration < m_elapsedTime) 
+				{
 					switch (m_playType)
 					{
 					case PlayType::Loop:
@@ -26,6 +30,24 @@ namespace thomas {
 						break;
 					}
 				}
+			}
+
+			void BaseAnimationTime::playOnce()
+			{
+				m_playType = PlayType::Once;
+				m_elapsedTime = 0.f;
+			}
+			void BaseAnimationTime::setPlayType(PlayType type)
+			{
+				m_playType = type;
+			}
+			PlayType BaseAnimationTime::getPlayType() 
+			{
+				return m_playType;
+			}
+			void BaseAnimationTime::setSpeed(float speed)
+			{
+				m_speedUp = speed;
 			}
 		}
 	}
