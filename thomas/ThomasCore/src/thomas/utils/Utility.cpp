@@ -22,7 +22,7 @@ namespace thomas {
 		{
 			assert(len < UCHAR_MAX);	// Use for readable strings..!
 #ifdef _DEBUG
-			uint32_t h_ver = hash(str);
+			uint32_t h_ver = hash(str);	// Hash verification, should always be performed so no corrupt strings are passed and generate different result
 #endif
 			uint32_t value = 5381;
 			int c;
@@ -31,7 +31,7 @@ namespace thomas {
 				value = ((value << 5) + value) + c; /* hash * 33 + c */
 
 #ifdef _DEBUG
-			assert(h_ver = value);
+			assert(h_ver == value);
 #endif
 			return value;
 		}
