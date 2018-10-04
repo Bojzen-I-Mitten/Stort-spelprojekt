@@ -37,7 +37,7 @@ namespace thomas
 			m_bufferAliveListPing = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
 			m_bufferAliveListPong = std::make_unique<utils::buffers::AppendConsumeBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles);
 			
-
+			//INIT DEAD LIST
 			pShittyComputeShader->SetGlobalInt("maxNrOfParticles", maxNrOfParticles);
 			pShittyComputeShader->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
 
@@ -45,18 +45,19 @@ namespace thomas
 			pShittyComputeShader->SetPass(0);
 			pShittyComputeShader->Dispatch((maxNrOfParticles - 1) / 512 + 1);
 			
-
 			ID3D11UnorderedAccessView* const s_nullUAV[1] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, s_nullUAV, nullptr); //TODO: unload shitty init shader
+			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, s_nullUAV, nullptr); 
 
-
-			/*
+			resource::Shader::DestroyShader(pShittyComputeShader);
+			
 			//COUNTER BUFFER
 			m_bufferCounters = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 4);
 			
 			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
 			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
-			*/
+			
+
+			//INDIRECT ARGS BUFFER
 			unsigned indirectArgs[3] = { 1, 1, 1 };
 
 			m_bufferIndirectUpdateArgs = std::make_unique<utils::buffers::Buffer>(indirectArgs, sizeof(indirectArgs), (D3D11_BIND_FLAG)0, STATIC_BUFFER, sizeof(unsigned), D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS);
@@ -165,6 +166,7 @@ namespace thomas
 				m_emitParticlesCS->SetPass(0);
 					
 				m_emitParticlesCS->Dispatch(1);
+
 				m_emittedParticles += testInitData.nrOfParticlesToEmit;
 
 				ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
@@ -184,16 +186,24 @@ namespace thomas
 			{
 				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPing->GetUAV());
 				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPong->GetUAV());
+
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
 			}
 			else
 			{
 				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPong->GetUAV());
 				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPing->GetUAV());
-				
+
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 			}
 			
 			m_updateParticlesCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
-			
+			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
+
+
+
+			m_updateParticlesCS->SetGlobalUAV("counterbuffer", m_bufferCounters->GetUAV());
+
 			m_updateParticlesCS->SetGlobalUAV("particles", m_bufferUpdate->GetUAV());
 			m_updateParticlesCS->SetGlobalUAV("billboards", m_bufferBillboard->GetUAV());
 
@@ -203,6 +213,9 @@ namespace thomas
 			int test = (m_emittedParticles + 31u) / 32u;
 			if (test > 0)
 				//m_updateParticlesCS->Dispatch(test);
+
+
+
 
 			m_updateParticlesCS->DispatchIndirect(m_bufferIndirectUpdateArgs->GetBuffer(), 0);
 

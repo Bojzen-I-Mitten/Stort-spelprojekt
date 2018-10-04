@@ -39,10 +39,10 @@ namespace thomas
 
 			struct ParticleCounters
 			{
-				unsigned aliveCount;
 				unsigned deadCount;
+				unsigned aliveCount;
 				unsigned realEmitCount;
-				unsigned aliveCount_afterSimulation;
+				unsigned aliveCountAfterSimulation;
 			};
 			
 		public:

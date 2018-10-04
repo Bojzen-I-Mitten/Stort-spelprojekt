@@ -318,6 +318,27 @@ namespace thomas
 			s_loadedShaders.clear();
 		}
 
+		bool Shader::DestroyShader(Shader * shader)
+		{
+			auto it = s_loadedShaders.begin();
+
+			while (it != s_loadedShaders.end())
+			{
+				if (*it._Ptr == shader)
+				{
+					
+					s_loadedShaders.erase(it);
+					delete shader;
+					return true;
+				}
+				it++;
+			}
+
+			LOG("FAILED TO DESTROY SHADER, SHADER NOT LOADED?");
+
+			return false;
+		}
+
 		void Shader::SetGlobalColor(const std::string & name, math::Color value)
 		{
 			for (auto shader : s_loadedShaders)
@@ -669,6 +690,12 @@ namespace thomas
 					break;
 				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
 					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
+					break;
+				case D3D_SVT_BYTEADDRESS_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();//should be srv?
+					break;
+				case D3D_SVT_RWBYTEADDRESS_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
 					break;
 				}
 				break;

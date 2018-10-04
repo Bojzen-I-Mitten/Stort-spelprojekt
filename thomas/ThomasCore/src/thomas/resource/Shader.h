@@ -76,6 +76,7 @@ namespace thomas
 			void SetPass(int passIndex);
 			ShaderPass& GetCurrentPass();
 			static void DestroyAllShaders();
+			static bool DestroyShader(Shader* shader);
 
 			static void SetGlobalColor(const std::string& name, math::Color value);
 
