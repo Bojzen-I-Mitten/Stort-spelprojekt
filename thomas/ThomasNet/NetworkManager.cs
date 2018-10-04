@@ -42,8 +42,6 @@ namespace ThomasEngine.Network
         internal NetPeer LocalPeer = null;
 
         public int TICK_RATE { get; set; } = 24;
-        public float maxInterpolationCount = 2; //How long we interpolate for, in mulitples of TICK_RATE
-        public int maxNumStoredStates { get { return (int)maxInterpolationCount + 1; } }
 
         internal NetworkScene NetScene;
 

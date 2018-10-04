@@ -10,6 +10,7 @@ namespace ThomasEngine.Network
         protected bool isDirty = false;
         private int prefabID;
         private NetworkIdentity networkIdentity;
+        protected float SmoothingFactor = 1.0f / 3;
 
 
         protected int ID
