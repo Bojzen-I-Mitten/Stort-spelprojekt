@@ -108,6 +108,7 @@ namespace ThomasEngine
 
 		((thomas::object::component::Component*)nativePtr)->m_gameObject = (thomas::object::GameObject*)gObj->nativePtr;
 		((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.push_back(((thomas::object::component::Component*)nativePtr));
+		OnGameObjectSet();
 	}
 
 
@@ -117,7 +118,7 @@ namespace ThomasEngine
 		this->enabled = false;
 		for (int i = 0; i < ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.size(); i++)
 		{
-			auto component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
+			thomas::object::component::Component* component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
 			if (component == nativePtr)
 			{
 				((thomas::object::GameObject*)m_gameObject->nativePtr)->

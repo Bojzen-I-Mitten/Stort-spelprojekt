@@ -169,7 +169,8 @@ namespace ThomasEngine {
 					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 					{
 						GameObject^ g = Scene::CurrentScene->GameObjects[i];
-						Monitor::Exit(g->m_componentsLock);
+						if(Monitor::IsEntered(g->m_componentsLock))
+							Monitor::Exit(g->m_componentsLock);
 					}
 					Stop();
 				}
@@ -289,5 +290,9 @@ namespace ThomasEngine {
 	void ThomasWrapper::ToggleEditorRendering()
 	{
 		renderingEditor = !renderingEditor;
+	}
+	void ThomasWrapper::TogglePhysicsDebug()
+	{
+		Physics::s_drawDebug = !Physics::s_drawDebug;
 	}
 }

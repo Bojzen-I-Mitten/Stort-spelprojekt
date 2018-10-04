@@ -10,6 +10,11 @@
 
 namespace thomas
 {
+
+	namespace resource {
+		class MemoryAllocation;
+	}
+
 	class ThomasCore
 	{
 	public:	
@@ -19,9 +24,15 @@ namespace thomas
 		static bool Destroy();
 		static void Exit();
 
+		ThomasCore();
 
 	public:
 		static std::vector<std::string> GetLogOutput();
+
+		static ThomasCore& Core();
+
+
+		resource::MemoryAllocation* Memory();
 
 	public:
 		static void LogOutput(const std::string & message);
@@ -31,6 +42,9 @@ namespace thomas
 		static bool InitDirectX();
 
 	private:
+		
+		resource::MemoryAllocation* m_memAlloc;
+
 		static bool s_initialized;
 		static std::vector<std::string> s_logOutput;
 		static bool s_clearLog;

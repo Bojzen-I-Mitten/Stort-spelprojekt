@@ -6,6 +6,11 @@ namespace thomas
 	{
 		namespace component
 		{
+			Collider::Collider()
+			{
+				m_center = math::Vector3(0, 0, 0);
+			}
+
 			Collider::Collider(btCollisionShape * collisionShape)
 			{
 				m_center = math::Vector3(0, 0, 0);

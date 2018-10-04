@@ -7,19 +7,33 @@ namespace thomas
 	{
 		namespace component
 		{
+			enum class ColliderRotation
+			{
+				RotateX,
+				RotateY,
+				RotateZ
+			};
+
 			class CapsuleCollider : public Collider
 			{
 			public:
 				CapsuleCollider();
-
-				void SetRadius(float size);
-				float GetRadius();
-				void SetHeight(float height);
-				float GetHeight();
+				void Awake();
 				void Update();
-
 				void OnDrawGizmosSelected();
+
+			public:
+				void SetRadius(float size);
+				void SetHeight(float height);
+				void SetRotation(ColliderRotation rotation);
+
+			public:
+				float GetRadius() const;	
+				float GetHeight() const;
+				ColliderRotation GetRotation() const;
+
 			private:
+				ColliderRotation m_rotation;
 				float m_radius;
 				float m_height;
 			};
