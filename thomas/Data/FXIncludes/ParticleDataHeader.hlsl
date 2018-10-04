@@ -52,6 +52,8 @@ struct ParticleCounters
     uint aliveCount_afterSimulation;
 };
 
+RWByteAddressBuffer counterbuffer;
+
 static const uint PARTICLECOUNTER_OFFSET_ALIVECOUNT = 0;
 static const uint PARTICLECOUNTER_OFFSET_DEADCOUNT = PARTICLECOUNTER_OFFSET_ALIVECOUNT + 4;
 static const uint PARTICLECOUNTER_OFFSET_REALEMITCOUNT = PARTICLECOUNTER_OFFSET_DEADCOUNT + 4;

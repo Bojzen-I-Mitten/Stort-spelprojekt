@@ -115,8 +115,8 @@ namespace thomas
 		void LightManager::DANK()
 		{
 			asdfasdf++;
-			if (asdfasdf == 1000)
-				test.SpawnParticles();
+			//if (asdfasdf == 1000)
+				//test.SpawnParticles();
 			if (asdfasdf == 2500)
 				test.SpawnParticles();
 			if (asdfasdf == 5000)

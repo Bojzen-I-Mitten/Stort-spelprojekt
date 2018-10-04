@@ -37,6 +37,13 @@ namespace thomas
 				unsigned args[3];
 			};
 
+			struct ParticleCounters
+			{
+				unsigned aliveCount;
+				unsigned deadCount;
+				unsigned realEmitCount;
+				unsigned aliveCount_afterSimulation;
+			};
 			
 		public:
 			ParticleSystem();
@@ -56,16 +63,18 @@ namespace thomas
 			unsigned m_maxNrOfParticles;
 			unsigned m_emittedParticles; 
 
+			std::unique_ptr<utils::buffers::Buffer> m_bufferCounters;
+
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
 			std::unique_ptr<utils::buffers::Buffer> m_updateIndirectBuffer;
 
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_spawnBuffer;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_updateBuffer;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_deadList;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_aliveListPing;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_aliveListPong;
-			std::unique_ptr<utils::buffers::StructuredBuffer> m_billboardBuffer;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferSpawn;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferUpdate;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferDeadList;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferAliveListPing;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferAliveListPong;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferBillboard;
 			bool m_pingpong;
 
 			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;

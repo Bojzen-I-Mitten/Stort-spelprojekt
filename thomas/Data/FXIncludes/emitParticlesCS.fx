@@ -65,7 +65,7 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         //float randClamp = (1.0f / UINT_MAX_AS_FLOAT);
 
     
-        float speed =           (RandClamp(w1) * (newParticle.maxSpeed - newParticle.minSize)) + newParticle.minSize;
+        float speed =           (RandClamp(w1) * (newParticle.maxSpeed - newParticle.minSpeed)) + newParticle.minSpeed;
         float size =            (RandClamp(w2) * (newParticle.maxSize - newParticle.minSize)) + newParticle.minSize;
         float lifeTime =        (RandClamp(w3) * (newParticle.maxLifeTime - newParticle.minLifeTime)) + newParticle.minLifeTime;
         float rotationSpeed =   (RandClamp(w4) * (newParticle.maxRotationSpeed - newParticle.minRotationSpeed)) + newParticle.minRotationSpeed;
@@ -130,8 +130,8 @@ void Cmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.endSpeed = endSpeed;
         fillBuffer.size = size;
         fillBuffer.endSize = endSize;
-        fillBuffer.lifeTimeLeft = lifeTime;
-        fillBuffer.lifeTime = lifeTime;
+        fillBuffer.lifeTimeLeft = 1000.0f;// //lifeTime;
+        fillBuffer.lifeTime = 1000.0f;//lifeTime;
         fillBuffer.rotationSpeed = rotationSpeed;
         
         uint writeindex = deadlist.Consume();
