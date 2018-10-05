@@ -39,29 +39,26 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         particle.position = particlePosWS;
 
     
-        float scale = lerp(particle.size, particle.endSize, lerpValue);
+        float size = lerp(particle.size, particle.endSize, lerpValue);
 
         
         
     
         if (particle.lifeTimeLeft < 0.0f)
         {
-            scale = 0.0f;
+            size = 0.0f;
 
             deadlist.Append(index);
         }
         else
         {
-        
-        
-        
             appendalivelist.Append(index);
         }
         
     //BILLBOARD
 
-        float3 right = float3(viewMatrix[0].xyz) * scale;
-        float3 up = float3(viewMatrix[1].xyz) * scale;
+        float3 right = float3(viewMatrix[0].xyz) * size;
+        float3 up = float3(viewMatrix[1].xyz) * size;
     
         particle.rotation = particle.rotation + particle.rotationSpeed * dt;
     

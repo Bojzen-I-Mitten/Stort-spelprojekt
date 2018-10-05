@@ -32,19 +32,7 @@ namespace thomas
 				//math::Vector4 colorFactor;
 			};
 			
-			struct IndirectBufferArgsStruct
-			{
-				unsigned args[3];
-			};
 
-			struct ParticleCounters
-			{
-				unsigned deadCount;
-				unsigned aliveCount;
-				unsigned realEmitCount;
-				unsigned aliveCountAfterSimulation;
-			};
-			
 		public:
 			ParticleSystem();
 			~ParticleSystem();
@@ -61,14 +49,14 @@ namespace thomas
 
 		private:
 			unsigned m_maxNrOfParticles;
-			unsigned m_emittedParticles; 
 
-			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;//struct{uint deadcount, uint alivecount , - , -}
+			
 
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
 			resource::ComputeShader* m_calculateEmitCountCS;
-			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferIndirectUpdateArgs;
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferIndirectArgs;//updateDispatchIndirect[3] + drawIndirectArgs[4]
 
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferSpawn;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferUpdate;

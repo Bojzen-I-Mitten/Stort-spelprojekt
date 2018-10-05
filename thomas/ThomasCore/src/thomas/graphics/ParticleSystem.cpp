@@ -57,16 +57,13 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 			
 			//INDIRECT ARGS BUFFER
-			unsigned indirectArgs[3] = { 0, 0, 0 };
+			unsigned indirectArgs[7] = { 0, 1, 1, 0, 1, 0, 0 };
 
-			m_bufferIndirectUpdateArgs = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 3, indirectArgs);
+			m_bufferIndirectArgs = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 7, indirectArgs);
 
 			m_pingpong = true;
 
 			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
-
-			m_emittedParticles = 0;
-
 
 
 		}
@@ -108,7 +105,7 @@ namespace thomas
 			return true;
 		}
 
-
+		
 		void ParticleSystem::SpawnParticles()
 		{
 			//if (m_emittedParticles < 1000)
@@ -120,14 +117,14 @@ namespace thomas
 				testInitData.rand = std::rand();
 
 				testInitData.spawnAtSphereEdge = (unsigned)false;
-				testInitData.endSize = 3.0f;
+				testInitData.endSize = 1.5f;
 				testInitData.endSpeed = 10.0f;
 				testInitData.gravity = 0.0f;
-				testInitData.maxLifeTime = 100.0f;
+				testInitData.maxLifeTime = 10.0f;
 				testInitData.maxSize = 1.0f;
 				testInitData.maxSpeed = 1.4f;
-				testInitData.minLifeTime = 99.0f;
-				testInitData.minSize = 0.5f;
+				testInitData.minLifeTime = 5.0f;
+				testInitData.minSize = 0.1f;
 				testInitData.minSpeed = 0.5f;
 				testInitData.radius = 10.0f;
 				testInitData.position = math::Vector3(0.0f, 2.0f, 0.0f);
@@ -165,22 +162,80 @@ namespace thomas
 				m_emitParticlesCS->SetPass(0);
 					
 				m_emitParticlesCS->Dispatch(1);
-
-				m_emittedParticles += testInitData.nrOfParticlesToEmit;
-
-				ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
-				utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
+				ID3D11UnorderedAccessView* const s_nullUAV[3] = { NULL };
+				utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 3, s_nullUAV, nullptr);
 
 
-				ID3D11ShaderResourceView* const s_nullSRV[2] = { NULL };
-				utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 2, s_nullSRV);
+				ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
+				utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 1, s_nullSRV);
+
+				//UPDATE EMITCOUNT
+				if (m_pingpong)
+				{
+					utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
+				}
+				else
+				{
+					utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+				}
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
+
+				m_calculateEmitCountCS->SetGlobalUAV("indirectargs", m_bufferIndirectArgs->GetUAV());
+				m_calculateEmitCountCS->SetGlobalResource("counterbuffer", m_bufferCounters->GetSRV());
+				m_calculateEmitCountCS->Bind();
+				m_calculateEmitCountCS->SetPass(0);
+
+				m_calculateEmitCountCS->Dispatch(1);
+
+				ID3D11UnorderedAccessView* const s_nullUAVa[1] = { NULL };
+				utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, s_nullUAVa, nullptr);
+				ID3D11ShaderResourceView* const s_nullSRVa[1] = { NULL };
+				utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 1, s_nullSRVa);
 				
 			}
 		}
 
 		void ParticleSystem::UpdateParticles()
 		{
-			m_calculateEmitCountCS->SetGlobalUAV("indirectargsforupdate", m_bufferIndirectUpdateArgs->GetUAV());
+			m_pingpong = !m_pingpong;
+
+			if (m_pingpong)
+			{
+				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPing->GetUAV());
+				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPong->GetUAV());
+			}
+			else
+			{
+				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPong->GetUAV());
+				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPing->GetUAV());
+			}
+			m_updateParticlesCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
+
+			m_updateParticlesCS->SetGlobalUAV("counterbuffer", m_bufferCounters->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("particles", m_bufferUpdate->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("billboards", m_bufferBillboard->GetUAV());
+
+			m_updateParticlesCS->Bind();
+			m_updateParticlesCS->SetPass(0);
+
+			m_updateParticlesCS->DispatchIndirect(m_bufferIndirectArgs->GetBuffer(), 0);
+
+			ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
+			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
+
+
+			//UPDATE EMIT COUNT BEFORE DRAW
+			if (!m_pingpong)//flip after dispatch
+			{
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
+			}
+			else
+			{
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+			}
+			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
+
+			m_calculateEmitCountCS->SetGlobalUAV("indirectargs", m_bufferIndirectArgs->GetUAV());
 			m_calculateEmitCountCS->SetGlobalResource("counterbuffer", m_bufferCounters->GetSRV());
 			m_calculateEmitCountCS->Bind();
 			m_calculateEmitCountCS->SetPass(0);
@@ -189,48 +244,8 @@ namespace thomas
 
 			ID3D11UnorderedAccessView* const s_nullUAVaaa[1] = { NULL };
 			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 1, s_nullUAVaaa, nullptr);
-
-
 			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
 			utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 1, s_nullSRV);
-
-			m_pingpong = !m_pingpong;
-			if (m_pingpong)
-			{
-				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPing->GetUAV());
-				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPong->GetUAV());
-
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
-			}
-			else
-			{
-				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPong->GetUAV());
-				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPing->GetUAV());
-
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
-			}
-			
-			m_updateParticlesCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
-			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
-
-
-
-			m_updateParticlesCS->SetGlobalUAV("counterbuffer", m_bufferCounters->GetUAV());
-
-			m_updateParticlesCS->SetGlobalUAV("particles", m_bufferUpdate->GetUAV());
-			m_updateParticlesCS->SetGlobalUAV("billboards", m_bufferBillboard->GetUAV());
-
-			m_updateParticlesCS->Bind();
-			m_updateParticlesCS->SetPass(0);
-
-			int test = (m_emittedParticles + 31u) / 32u;
-			if (test > 0)
-				m_updateParticlesCS->DispatchIndirect(m_bufferIndirectUpdateArgs->GetBuffer(), 0);
-
-			ID3D11UnorderedAccessView* const s_nullUAV[8] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAV, nullptr);
-
-
 		}
 
 		void ParticleSystem::DrawParticles()
@@ -243,7 +258,7 @@ namespace thomas
 			m_particleShader->Bind();
 			m_particleShader->SetPass(0);
 			
-			utils::D3D::Instance()->GetDeviceContext()->Draw(6 * m_emittedParticles, 0);
+			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
 
 			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
 			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);

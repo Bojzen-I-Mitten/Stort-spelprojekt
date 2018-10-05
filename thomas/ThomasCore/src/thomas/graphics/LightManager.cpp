@@ -121,7 +121,7 @@ namespace thomas
 				//test.SpawnParticles();
 			if (asdfasdf == 2500)
 				test.SpawnParticles();
-			if (asdfasdf == 5000)
+			if (asdfasdf == 3500)
 				test.SpawnParticles();
 
 

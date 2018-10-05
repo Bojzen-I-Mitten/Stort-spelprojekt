@@ -44,7 +44,7 @@ struct BillboardStruct
     float2 pad2;
     float2 uvs[2][3];
 };
-
+/*
 struct ParticleCounters
 {
     uint deadCount;
@@ -52,5 +52,5 @@ struct ParticleCounters
     uint realEmitCount;
     uint aliveCountAfterSimulation;
 };
-
+*/
 #endif // PARTICLE_DATA_HEADER

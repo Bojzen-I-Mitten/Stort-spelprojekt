@@ -41,7 +41,6 @@ RWStructuredBuffer<ParticleStruct> particles;
 ConsumeStructuredBuffer<uint> deadlist;
 AppendStructuredBuffer<uint> alivelist;
 
-RWByteAddressBuffer counterbuffer;
 
 [numthreads(128, 1, 1)]
 void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
@@ -130,8 +129,8 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.endSpeed = endSpeed;
         fillBuffer.size = size;
         fillBuffer.endSize = endSize;
-        fillBuffer.lifeTimeLeft = 1000.0f;// //lifeTime;
-        fillBuffer.lifeTime = 1000.0f;//lifeTime;
+        fillBuffer.lifeTimeLeft = lifeTime;
+        fillBuffer.lifeTime = lifeTime;
         fillBuffer.rotationSpeed = rotationSpeed;
         
         uint writeindex = deadlist.Consume();
