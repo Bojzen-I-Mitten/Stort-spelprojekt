@@ -122,6 +122,14 @@ namespace thomas
 			}
 			
 
+			void StructuredBuffer::Release()
+			{
+				if (m_hasSRV)
+					SAFE_RELEASE(m_srv);
+				if (m_hasUAV)
+					SAFE_RELEASE(m_uav);
+			}
+
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()
 			{
 				if (m_hasSRV)
@@ -176,6 +184,13 @@ namespace thomas
 				}
 				
 
+			}
+			void ByteAddressBuffer::Release()
+			{
+				if (m_hasSRV)
+					SAFE_RELEASE(m_srv);
+				if (m_hasUAV)
+					SAFE_RELEASE(m_uav);
 			}
 			ID3D11ShaderResourceView * ByteAddressBuffer::GetSRV()
 			{

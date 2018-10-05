@@ -70,11 +70,16 @@ namespace thomas
 
 		void ParticleSystem::Destroy()
 		{
+			
 			SAFE_RELEASE(m_bufferAliveListPing);
 			SAFE_RELEASE(m_bufferAliveListPong);
 			SAFE_RELEASE(m_bufferDeadList);
 			SAFE_RELEASE(m_bufferUpdate);
 			SAFE_RELEASE(m_bufferSpawn);
+			SAFE_RELEASE(m_bufferBillboard);
+			SAFE_RELEASE(m_bufferIndirectArgs);
+			SAFE_RELEASE(m_bufferCounters);
+			
 
 			//m_updateParticlesCS 
 			//m_emitParticlesCS

@@ -33,6 +33,7 @@ namespace thomas
 		void LightManager::Destroy()
 		{
 			SAFE_RELEASE(s_lightBuffer);
+			test.Destroy();
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{

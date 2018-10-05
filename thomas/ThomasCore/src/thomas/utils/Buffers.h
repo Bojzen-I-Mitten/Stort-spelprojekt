@@ -20,7 +20,7 @@ namespace thomas
 				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(data.data(), sizeof(T)*data.size(), bindFlag, usageFlag) {}
 
 				virtual ~Buffer();
-				void Release();
+				virtual void Release();
 				void SetData(void* data, size_t size);
 
 				template <typename T>
@@ -76,6 +76,9 @@ namespace thomas
 				template <typename T>
 				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
 
+				void Release();
+
+
 				ID3D11ShaderResourceView* GetSRV();
 				ID3D11UnorderedAccessView* GetUAV();
 
@@ -90,6 +93,9 @@ namespace thomas
 			{
 			public:
 				ByteAddressBuffer(size_t stride, size_t count, void* data = nullptr, D3D11_BIND_FLAG bindFlags = D3D11_BIND_UNORDERED_ACCESS);
+
+				void Release();
+
 
 				ID3D11ShaderResourceView* GetSRV();
 				ID3D11UnorderedAccessView* GetUAV();
