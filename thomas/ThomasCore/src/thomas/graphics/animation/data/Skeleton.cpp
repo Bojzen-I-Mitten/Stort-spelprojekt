@@ -5,8 +5,8 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
-			Skeleton::Skeleton(std::vector<Bone> &m_boneInfo, math::Matrix root)
-				: m_bones(m_boneInfo), m_root(root)
+			Skeleton::Skeleton(std::vector<Bone> &m_boneInfo, std::vector<TransformComponents> &bindPose, math::Matrix root)
+				: m_bones(m_boneInfo), m_components(std::move(bindPose)), m_root(root)
 			{
 			}
 
@@ -17,6 +17,10 @@ namespace thomas {
 
 			const Bone& Skeleton::getBone(unsigned int i) const {
 				return m_bones[i];
+			}
+			const TransformComponents * Skeleton::getBindComponents()
+			{
+				return m_components.data();
 			}
 			const std::vector<Bone>& Skeleton::getBones() const {
 				return m_bones;

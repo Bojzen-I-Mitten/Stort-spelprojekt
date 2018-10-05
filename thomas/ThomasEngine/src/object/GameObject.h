@@ -1,4 +1,7 @@
 #pragma once
+#pragma unmanaged 
+
+#include <thomas/object/GameObject.h>
 #pragma managed
 #include "../attributes/CustomAttributes.h"
 #include "Object.h"
@@ -20,7 +23,6 @@ namespace ThomasEngine
 		GameObject();
 
 		bool InitComponents(bool playing);
-
 
 	internal:
 
@@ -50,6 +52,12 @@ namespace ThomasEngine
 
 		void RenderSelectedGizmos();
 		
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property thomas::object::GameObject* Native {
+			thomas::object::GameObject* get();
+		}
+
 	public:
 
 		GameObject(String^ name);
@@ -83,6 +91,7 @@ namespace ThomasEngine
 		{
 			return Name;
 		}
+
 
 		[BrowsableAttribute(false)]
 		[Newtonsoft::Json::JsonIgnoreAttribute]

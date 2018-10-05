@@ -33,6 +33,7 @@ namespace ThomasEngine
 		Component(thomas::object::component::Component* ptr);
 		
 		void setGameObject(GameObject^ gObj);
+		virtual void OnGameObjectSet() {};
 		virtual void Awake();
 		virtual void Start();
 		virtual void OnEnable();

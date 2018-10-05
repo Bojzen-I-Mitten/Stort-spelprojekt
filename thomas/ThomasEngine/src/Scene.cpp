@@ -107,9 +107,9 @@ namespace ThomasEngine
 		try {
 			System::IO::File::Delete(tempFile);
 		}
-		catch (Exception^ E)
+		catch (Exception^ e)
 		{
-
+			Debug::LogError("Error in ThomasEngine::Scene. Msg: " + e->Message);
 		}
 		Monitor::Exit(lock);
 		savingEnabled = true;

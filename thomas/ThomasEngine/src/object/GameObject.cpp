@@ -37,7 +37,7 @@ namespace ThomasEngine {
 
 		Scene::CurrentScene->GameObjects->Add(this);
 		scene = Scene::CurrentScene;
-		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -49,13 +49,17 @@ namespace ThomasEngine {
 		for each(Component^ component in m_components)
 		{
 			Type^ typ = component->GetType();
-			if ((playing || typ->IsDefined(ExecuteInEditor::typeid, false)) && !component->initialized) {
+			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
+			if ((playing || executeInEditor) && !component->initialized) {
 				completed = false;
 				component->Initialize();
 			}
 		}
 		Monitor::Exit(m_componentsLock);
 		return completed;
+	}
+	thomas::object::GameObject* GameObject::Native::get() {
+		return (thomas::object::GameObject*)nativePtr;
 	}
 
 	void GameObject::FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root)
@@ -84,8 +88,7 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) 
-			{
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
@@ -146,6 +149,7 @@ namespace ThomasEngine {
 	{
 		if (m_isDestroyed)
 			return;
+		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
@@ -156,7 +160,6 @@ namespace ThomasEngine {
 		Object::Destroy();
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
-		ThomasWrapper::Selection->UnSelectGameObject(this);
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -339,13 +342,16 @@ namespace ThomasEngine {
 
 	bool GameObject::GetActive()
 	{
+		if((thomas::object::GameObject*)nativePtr != nullptr)
 		return ((thomas::object::GameObject*)nativePtr)->GetActive();
+		return false;
 	}
 
 	void GameObject::SetActive(bool active)
 	{
-		((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		activeSelf = active;
+		((thomas::object::GameObject*)nativePtr)->SetActive(active);
+		
 
 	}
 
@@ -370,6 +376,7 @@ namespace ThomasEngine {
 				
 		}
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		OnPropertyChanged("activeSelf");
 	}
 
 	String^ GameObject::Name::get() {

@@ -158,7 +158,7 @@ namespace thomas
 			RenderSelectedObjects();
 			m_cameraComponent->Render();
 			RenderGizmos();
-			//Physics::DrawDebug(m_cameraComponent);
+			Physics::DrawDebug(m_cameraComponent.get());
 			m_grid->Draw(m_cameraComponent.get());
 
 		}
@@ -167,7 +167,7 @@ namespace thomas
 		{
 			// Make sure we are dealing with the editor window
 			thomas::Window* window = WindowManager::Instance()->GetEditorWindow();
-			if (!window)
+			if (!window || WindowManager::Instance()->GetCurrentBound() != window)
 				return;
 
 			window->GetInput()->ResetScrollWheelValue();

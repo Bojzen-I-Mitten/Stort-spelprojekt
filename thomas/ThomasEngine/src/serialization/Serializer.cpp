@@ -1,7 +1,8 @@
 #include "Serializer.h"
 #include "Converters.h"
-#include "../Debug.h"
 #include "../object/GameObject.h"
+#include "../Debug.h"
+
 
 using namespace System::IO;
 namespace ThomasEngine
@@ -20,6 +21,7 @@ namespace ThomasEngine
 			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;
 			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
+			serializer->NullValueHandling = NullValueHandling::Ignore;
 
 			serializer->Converters->Add(gcnew ResourceConverter());
 			serializer->Converters->Add(gcnew PrefabConverter());

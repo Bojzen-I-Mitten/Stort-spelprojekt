@@ -69,6 +69,7 @@ namespace ThomasEngine {
 	
 
 		static void ToggleEditorRendering();
+		static void TogglePhysicsDebug();
 	public:
 
 		static property float FrameRate

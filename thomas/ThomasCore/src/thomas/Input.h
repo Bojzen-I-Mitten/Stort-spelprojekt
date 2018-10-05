@@ -212,6 +212,7 @@ namespace thomas
 		};
 
 	public:
+		Input();
 		bool Init();
 		void Update();
 		void ProcessKeyboard(UINT message, WPARAM wParam, LPARAM lParam);
@@ -219,10 +220,10 @@ namespace thomas
 		void ProcessGamePad(UINT message, WPARAM wParam, LPARAM lParam);
 		void ResetScrollWheelValue();
 		void Vibrate(float left, float right, float time = 0.f);
-
+		void Reset();
 	public:
 		void SetMouseMode(MouseMode mode);
-
+	
 	public:
 		//Mouse
 		float GetMouseY();
@@ -260,6 +261,7 @@ namespace thomas
 		static std::unique_ptr<Mouse> s_mouse;
 		Mouse::State m_mouseState;
 		Mouse::ButtonStateTracker m_mouseTracker;
+		MouseMode m_mouseMode;
 
 		//Gamepad
 		static std::unique_ptr<GamePad> s_gamePad;

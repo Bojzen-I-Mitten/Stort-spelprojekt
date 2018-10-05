@@ -14,12 +14,15 @@ namespace ThomasEngine
 	public:
 		Camera();
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Matrix viewMatrix {Matrix get();}
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Matrix projectionMatrix{Matrix get();}
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position{Vector3 get();}
 
