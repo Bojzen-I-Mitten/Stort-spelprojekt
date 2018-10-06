@@ -12,7 +12,7 @@
 #include <thomas\editor\EditorCamera.h>
 #include <thomas\AutoProfile.h>
 #include <thomas\ProfileManager.h>
-
+#include <thomas\utils\GpuProfiler.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -62,15 +62,25 @@ namespace ThomasEngine {
 		{
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
-			WindowManager::Instance()->ClearAllWindows();
-			graphics::Renderer::Instance()->ProcessCommands();
-			WindowManager::Instance()->PresentAllWindows();
+			ThomasCore::Render();
 			RenderFinished->Set();
 		}
 	}
 
 	void ThomasWrapper::CopyCommandList()
 	{
+		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		bool open = true;
+		ImGui::Begin("Diagnostics", &open, ImVec2(100, 50));
+		ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
+		ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
+		ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
+		ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
+		ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+		ImGui::Text("GPU frame time: %0.2f ms", profiler->GetFrameTime()*1000.0f);
+		ImGui::Text("CPU frame time: %0.2f ms", cpuTime*1000.0f);
+		ImGui::End();
+
 		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
@@ -95,7 +105,7 @@ namespace ThomasEngine {
 				continue;
 			}
 			NEW_FRAME();
-
+			float timeStart = ThomasTime::GetElapsedTime();
 			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 			try {
@@ -176,8 +186,10 @@ namespace ThomasEngine {
 				}
 					
 					
-			}finally
+			}
+			finally
 			{
+				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
 				if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 				{
 					thomas::object::component::RenderComponent::ClearList();

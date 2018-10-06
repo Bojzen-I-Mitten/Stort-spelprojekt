@@ -13,6 +13,7 @@ namespace ThomasEngine {
 	public ref class ThomasWrapper
 	{
 	private:
+		static float cpuTime = 0.0f;
 		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
