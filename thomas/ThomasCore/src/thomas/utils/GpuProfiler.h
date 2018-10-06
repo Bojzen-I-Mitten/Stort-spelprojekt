@@ -1,5 +1,6 @@
 #pragma once
 #include "D3D.h"
+#include <dxgi1_6.h>
 namespace thomas
 {
 	namespace profiling
@@ -34,6 +35,8 @@ namespace thomas
 			float GetAverageTiming(GTS gts);
 			float GetDrawTotal();
 			float GetFrameTime();
+			float GetMemoryUsage();
+			float GetTotalMemory();
 			int GetNumberOfDrawCalls();
 			int GetVertexCount();
 		private:
@@ -41,6 +44,8 @@ namespace thomas
 			int m_frameCollect;								// Which of the two did we last collect?
 			ID3D11Query * m_queryDisjoint[2];				// "Timestamp disjoint" query; records whether timestamps are valid
 			ID3D11Query * m_queryTimestamp[GTS_MAX][2];		// Individual timestamp queries for each relevant point in the frame
+
+			IDXGIAdapter4* m_dxgiAdapter4 = NULL;			// Adapter for checking VRAM
 
 			float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
 			float m_avgTimings[GTS_MAX];					// Timings averaged over 0.5 second
@@ -51,6 +56,9 @@ namespace thomas
 
 			int m_totalVertexCount;
 			int m_drawCalls;
+			
+			float m_memoryUsage;
+			float m_totalMemory;
 		};
 	}
 }

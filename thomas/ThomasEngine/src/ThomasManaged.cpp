@@ -69,18 +69,21 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::CopyCommandList()
 	{
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		bool open = true;
-		ImGui::Begin("Diagnostics", &open, ImVec2(100, 50));
+		ImGui::Begin("Statistics", &open, ImVec2(100, 100));
 		ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
 		ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
 		ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
+		ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+		ImGui::Text("RAM Usage: %.2f MB", ramUsage);
 		ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 		ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
 		ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
 		ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
 		ImGui::End();
-
+		
 		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();

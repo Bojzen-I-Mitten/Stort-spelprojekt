@@ -6,7 +6,8 @@ namespace thomas
 	namespace profiling
 	{
 		GpuProfiler::GpuProfiler()
-			: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0), m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0)
+			: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0),
+			m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
 		{
 			memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 			memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -45,11 +46,40 @@ namespace thomas
 					return false;
 				}
 			}
+
+			IDXGIDevice* dxgiDevice = nullptr;
+			HRESULT hr = device->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)& dxgiDevice);
+			if (FAILED(hr))
+			{
+				LOG("Could not query DXGIDevice");
+				return false;
+			}
+			IDXGIAdapter* dxgiAdapter = nullptr;
+			hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+			if (FAILED(hr))
+			{
+
+				SAFE_RELEASE(dxgiDevice);
+				LOG("Could not query DXGIAdapter");
+				return false;
+			}
+			hr = dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&m_dxgiAdapter4);
+			if (FAILED(hr))
+			{
+				SAFE_RELEASE(dxgiDevice);
+				SAFE_RELEASE(dxgiAdapter);
+				LOG("Could not query DXGIAdapter4");
+				return false;
+			}
+			SAFE_RELEASE(dxgiDevice);
+			SAFE_RELEASE(dxgiAdapter);
+
 			return true;
 		}
 
 		void GpuProfiler::Destroy()
 		{
+			SAFE_RELEASE(m_dxgiAdapter4);
 			SAFE_RELEASE(m_queryDisjoint[0]);
 			SAFE_RELEASE(m_queryDisjoint[1])
 
@@ -155,6 +185,15 @@ namespace thomas
 				m_frameCountAvg = 0;
 				m_beginAvg = ThomasTime::GetElapsedTime();
 			}
+
+			//Update VRAM
+			DXGI_QUERY_VIDEO_MEMORY_INFO info;
+
+			if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+			{
+				m_memoryUsage = float(info.CurrentUsage / 1024.0 / 1024.0); //MiB
+				m_totalMemory = float(info.Budget / 1024.0 / 1024.0);
+			};
 		}
 
 		float profiling::GpuProfiler::GetAverageTiming(GTS gts)
@@ -173,6 +212,15 @@ namespace thomas
 		float profiling::GpuProfiler::GetFrameTime()
 		{
 			return GetDrawTotal() + GetAverageTiming(GTS_END_FRAME);
+		}
+
+		float profiling::GpuProfiler::GetMemoryUsage()
+		{
+			return m_memoryUsage;
+		}
+		float profiling::GpuProfiler::GetTotalMemory()
+		{
+			return m_totalMemory;
 		}
 
 		int profiling::GpuProfiler::GetNumberOfDrawCalls()
