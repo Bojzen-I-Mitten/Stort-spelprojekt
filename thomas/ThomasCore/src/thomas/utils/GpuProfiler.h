@@ -25,6 +25,7 @@ namespace thomas
 			void BeginFrame();
 			void Timestamp(GTS gts);
 			void EndFrame();
+			void AddDrawCall(int vertexCount);
 
 			// Wait on GPU for last frame's data (not this frame's) to be available
 			void WaitForDataAndUpdate();
@@ -33,6 +34,8 @@ namespace thomas
 			float GetAverageTiming(GTS gts);
 			float GetDrawTotal();
 			float GetFrameTime();
+			int GetNumberOfDrawCalls();
+			int GetVertexCount();
 		private:
 			int m_frameQuery;								// Which of the two sets of queries are we currently issuing?
 			int m_frameCollect;								// Which of the two did we last collect?
@@ -45,6 +48,9 @@ namespace thomas
 			float m_avgTimingsTotal[GTS_MAX];				// Total timings thus far within this averaging period
 			int m_frameCountAvg;							// Frames rendered in current averaging period
 			float m_beginAvg;								// Time at which current averaging period started
+
+			int m_totalVertexCount;
+			int m_drawCalls;
 		};
 	}
 }

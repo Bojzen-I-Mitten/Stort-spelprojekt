@@ -71,6 +71,8 @@ namespace thomas
 			void BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers);
 			void BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer);
 			void Bind();
+			void Draw(UINT vertexCount, UINT startVertexLocation);
+			void DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation);
 			std::vector<ShaderPass>* GetPasses();
 			void SetPass(int passIndex);
 			ShaderPass& GetCurrentPass();

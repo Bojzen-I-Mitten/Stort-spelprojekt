@@ -73,12 +73,12 @@ namespace ThomasEngine {
 		bool open = true;
 		ImGui::Begin("Diagnostics", &open, ImVec2(100, 50));
 		ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
+		ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
+		ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
 		ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 		ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
 		ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
 		ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
-		ImGui::Text("GPU frame time: %0.2f ms", profiler->GetFrameTime()*1000.0f);
-		ImGui::Text("CPU frame time: %0.2f ms", cpuTime*1000.0f);
 		ImGui::End();
 
 		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
