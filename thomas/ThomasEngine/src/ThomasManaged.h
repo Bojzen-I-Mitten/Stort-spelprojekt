@@ -14,6 +14,7 @@ namespace ThomasEngine {
 	{
 	private:
 		static float cpuTime = 0.0f;
+		static bool showStatistics = false;
 		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
