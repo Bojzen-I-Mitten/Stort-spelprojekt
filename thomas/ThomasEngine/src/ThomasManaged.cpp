@@ -73,6 +73,7 @@ namespace ThomasEngine {
 
 		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(showStatistics);
 		if (showStatistics) {
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
