@@ -1,7 +1,7 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
 #include <ThomasCG.hlsl>
-#include <ParticleDataHeader.hlsl>
+#include <ParticleHeader.h>
 
 //Texture2D diffuseTexture;
 //SamplerState diffuseSampler : register(s0);

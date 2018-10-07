@@ -31,13 +31,31 @@ namespace thomas
 				math::Vector2 uvs[2][3];
 				//math::Vector4 colorFactor;
 			};
-			
+			struct ParticleStruct
+			{
+				math::Vector3 position;
+				float gravity;
+
+				math::Vector3 direction;
+				float speed;
+
+				float endSpeed;
+				float size;
+				float endSize;
+				float lifeTime;
+
+				float lifeTimeLeft;
+				float rotationSpeed;
+				float rotation;
+				float pad;
+			};
+
 
 		public:
 			ParticleSystem();
 			~ParticleSystem();
 
-			void Initialize(unsigned maxNrOfParticles = 25000);
+			void Initialize(unsigned maxNrOfParticles);
 			void Destroy();
 
 			bool AddEmitterToSpawn(object::component::ParticleEmitterComponent* emitter);
@@ -50,7 +68,7 @@ namespace thomas
 		private:
 			unsigned m_maxNrOfParticles;
 
-			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;//struct{uint deadcount, uint alivecount , - , -}
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;//struct{uint deadcount, uint alivecount , uint maxcount, -}
 			
 
 			resource::ComputeShader* m_emitParticlesCS;

@@ -16,9 +16,6 @@ namespace thomas
 		Shader* Shader::s_failedShader;
 		bool Shader::s_shouldRecompile = false;
 
-		ID3D11UnorderedAccessView* const Shader::s_nullUAV[1] = { NULL };
-		ID3D11ShaderResourceView* const Shader::s_nullSRV[1] = { NULL };
-
 		Shader::Shader(ID3DX11Effect* effect, std::string path) : Resource(path)
 		{
 			m_currentPass = nullptr;

@@ -1,5 +1,5 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
-#include <ParticleDataHeader.hlsl>
+#include <ParticleHeader.h>
 #include <ThomasShaderVariables.hlsl>
 
 
@@ -16,7 +16,7 @@ RWByteAddressBuffer counterbuffer;
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
     uint Tid = (Gid.x * UPDATE_THREAD_DIM_X) + GTid.x;
-    uint nrOfAliveParticles = counterbuffer.Load(4);
+    uint nrOfAliveParticles = counterbuffer.Load(ALIVE_COUNT_OFFSET);
 
     if (Tid < nrOfAliveParticles)
     {
@@ -31,10 +31,10 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
        
         float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
         particle.lifeTimeLeft = particle.lifeTimeLeft - dt;
-	//lerp between start and end speed
+	    //lerp between start and end speed
         float speed = lerp(particle.speed, particle.endSpeed, lerpValue);
 
-	//update position
+	    //update position
         float3 particlePosWS = particle.position + particle.direction * speed * dt - float3(0, 1, 0) * particle.gravity * dt;
         particle.position = particlePosWS;
 
@@ -55,7 +55,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
             appendalivelist.Append(index);
         }
         
-    //BILLBOARD
+        //BILLBOARD
 
         float3 right = float3(viewMatrix[0].xyz) * size;
         float3 up = float3(viewMatrix[1].xyz) * size;
@@ -65,17 +65,14 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         float sinangle = sin(particle.rotation);
         float cosangle = cos(particle.rotation);
 
-	//rotate billboard
+	    //rotate billboard
         float3 temp = cosangle * right + sinangle * up;
         right = sinangle * right - cosangle * up;
         up = temp;
-    
-    
-    
-   
+
     
         particles[index] = particle;
-        //particles[Tid] = particle;
+
         BillboardStruct billboard = (BillboardStruct) 0;
 
     //tri 1

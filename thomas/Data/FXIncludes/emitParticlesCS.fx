@@ -1,5 +1,5 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
-#include <ParticleDataHeader.hlsl>
+#include <ParticleHeader.h>
 
 
 struct InitParticlesBuffer
@@ -41,16 +41,24 @@ RWStructuredBuffer<ParticleStruct> particles;
 ConsumeStructuredBuffer<uint> deadlist;
 AppendStructuredBuffer<uint> alivelist;
 
+RWByteAddressBuffer counterbuffer;
 
-[numthreads(128, 1, 1)]
+[numthreads(EMIT_THREAD_DIM_X, 1, 1)]
 void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    int ix = (Gid.x * 128) + GTid.x;
+    int ix = (Gid.x * EMIT_THREAD_DIM_X) + GTid.x;
     int iy = Gid.y;
 
     InitParticlesBuffer newParticle = initparticles[iy];
 
-    if (ix < newParticle.nrOfParticlesToEmit)
+    uint2 aliveAndMaxCount = counterbuffer.Load2(ALIVE_COUNT_OFFSET);
+    uint aliveCount = aliveAndMaxCount.x;
+    uint maxCount = aliveAndMaxCount.y;
+    uint capacityLeft = maxCount - aliveCount;
+
+    int threshold = min(newParticle.nrOfParticlesToEmit, max(capacityLeft - EMIT_THREAD_DIM_X * iy, 0)); //Presume that emitter with lower iy want to emit an ammount of EMIT_THREAD_DIM_X particles
+
+    if (ix < threshold)
     {
         uint rng_state = (ix + 1) * newParticle.rand; //seed
 
@@ -61,8 +69,6 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         uint w5 = RandMarsaglia(w4);
         uint w6 = RandMarsaglia(w5);
 	
-        //float randClamp = (1.0f / UINT_MAX_AS_FLOAT);
-
     
         float speed =           (RandClamp(w1) * (newParticle.maxSpeed - newParticle.minSpeed)) + newParticle.minSpeed;
         float size =            (RandClamp(w2) * (newParticle.maxSize - newParticle.minSize)) + newParticle.minSize;
