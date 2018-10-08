@@ -4,6 +4,7 @@
 #include <d3dcompiler.h>
 #include "ShaderProperty\shaderProperties.h"
 #include "../utils/Utility.h"
+#include "../utils/GpuProfiler.h"
 #include <fstream>
 #include <comdef.h>
 
@@ -289,6 +290,16 @@ namespace thomas
 			for (auto prop : m_properties) {
 				prop.second->Apply(this);
 			}
+		}
+		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
+		{
+			thomas::utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount);
+		}
+		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
+		{
+			thomas::utils::D3D::Instance()->GetDeviceContext()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{

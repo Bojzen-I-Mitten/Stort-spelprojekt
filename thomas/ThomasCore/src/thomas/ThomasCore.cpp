@@ -15,6 +15,8 @@
 #include <d3d11_4.h>
 #include <comdef.h>
 #include "AutoProfile.h"
+#include "utils/GpuProfiler.h"
+#include "graphics/Renderer.h"
 
 #include "graphics\ParticleSystem.h"
 
@@ -65,6 +67,22 @@ namespace thomas
 		editor::EditorCamera::Instance()->Update();
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
+	}
+
+	void ThomasCore::Render()
+	{
+		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->BeginFrame();
+		WindowManager::Instance()->ClearAllWindows();
+		profiler->Timestamp(profiling::GTS_MAIN_CLEAR);
+		graphics::Renderer::Instance()->ProcessCommands();
+
+		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
+		//  (whose data we're getting) will have finished on the GPU by now.
+
+		profiler->WaitForDataAndUpdate();
+		WindowManager::Instance()->PresentAllWindows();
+		utils::D3D::Instance()->GetProfiler()->EndFrame();
 	}
 
 	void ThomasCore::Exit()

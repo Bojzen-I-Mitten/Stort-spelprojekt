@@ -13,6 +13,7 @@
 #include "..\WindowManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
+#include "../utils/GpuProfiler.h"
 
 namespace thomas
 {
@@ -104,6 +105,8 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
+			profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+			
 			//Process commands
 			BindFrame();
 			thomas::graphics::LightManager::DANK();
@@ -124,13 +127,14 @@ namespace thomas
 
 				thomas::graphics::LightManager::DANK2();
 			}
-
+			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::RenderGizmos();
 			}
+			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 
 	}
