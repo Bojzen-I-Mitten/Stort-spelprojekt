@@ -7,7 +7,8 @@ namespace thomas
 	{
 		GpuProfiler::GpuProfiler()
 			: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0),
-			m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f), m_active(false)
+			m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f), m_active(false),
+			m_currentFrame(0), m_maxFrames(5)
 		{
 			memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 			memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -93,6 +94,10 @@ namespace thomas
 
 		void GpuProfiler::BeginFrame()
 		{
+			m_currentFrame = (m_currentFrame + 1) % 5;
+			if (m_currentFrame > 0)
+				return;
+
 			m_drawCalls = 0;
 			m_totalVertexCount = 0;
 			if (!m_active)
@@ -103,14 +108,14 @@ namespace thomas
 
 		void GpuProfiler::Timestamp(GTS gts)
 		{
-			if (!m_active)
+			if (m_currentFrame > 0 || !m_active)
 				return;
 			utils::D3D::Instance()->GetDeviceContext()->End(m_queryTimestamp[gts][m_frameQuery]);
 		}
 
 		void GpuProfiler::EndFrame()
 		{
-			if (!m_active)
+			if (m_currentFrame > 0 || !m_active)
 				return;
 			Timestamp(GTS_END_FRAME);
 			utils::D3D::Instance()->GetDeviceContext()->End(m_queryDisjoint[m_frameQuery]);
@@ -119,13 +124,15 @@ namespace thomas
 
 		void profiling::GpuProfiler::AddDrawCall(int vertexCount)
 		{
+			if (m_currentFrame > 0)
+				return;
 			m_totalVertexCount += vertexCount;
 			m_drawCalls++;
 		}
 
 		void GpuProfiler::WaitForDataAndUpdate()
 		{
-			if (!m_active)
+			if (m_currentFrame || !m_active)
 				return;
 			ID3D11DeviceContext* context = utils::D3D::Instance()->GetDeviceContext();
 			if (m_frameCollect < 0)

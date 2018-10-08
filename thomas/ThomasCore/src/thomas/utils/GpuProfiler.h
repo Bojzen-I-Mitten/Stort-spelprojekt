@@ -61,6 +61,9 @@ namespace thomas
 			float m_totalMemory;
 
 			bool m_active;
+			
+			int m_currentFrame;
+			int m_maxFrames;
 		};
 	}
 }
