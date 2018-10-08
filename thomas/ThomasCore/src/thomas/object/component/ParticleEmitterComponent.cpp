@@ -97,6 +97,21 @@ namespace thomas
 				m_particleBufferStruct.endSpeed = other;
 			}
 
+			float ParticleEmitterComponent::GetMaxSpeed() const
+			{
+				return m_particleBufferStruct.maxSpeed;
+			}
+
+			float ParticleEmitterComponent::GetMinSpeed() const
+			{
+				return m_particleBufferStruct.minSpeed;
+			}
+
+			float ParticleEmitterComponent::GetEndSpeed() const
+			{
+				return m_particleBufferStruct.endSpeed;
+			}
+
 			
 			void ParticleEmitterComponent::SetSize(float const& size)
 			{
@@ -117,6 +132,21 @@ namespace thomas
 				m_particleBufferStruct.endSize = other;
 			}
 
+			float ParticleEmitterComponent::GetMaxSize() const
+			{
+				return m_particleBufferStruct.maxSize;
+			}
+
+			float ParticleEmitterComponent::GetMinSize() const
+			{
+				return m_particleBufferStruct.minSize;
+			}
+
+			float ParticleEmitterComponent::GetEndSize() const
+			{
+				return m_particleBufferStruct.endSize;
+			}
+
 
 			void ParticleEmitterComponent::SetLifeTime(float const& lifeTime)
 			{
@@ -126,6 +156,14 @@ namespace thomas
 			void ParticleEmitterComponent::SetMinLifeTime(float const& other)
 			{
 				m_particleBufferStruct.minLifeTime = other;
+			}
+			float ParticleEmitterComponent::GetMaxLifeTime() const
+			{
+				return m_particleBufferStruct.maxLifeTime;
+			}
+			float ParticleEmitterComponent::GetMinLifeTime() const
+			{
+				return m_particleBufferStruct.minLifeTime;
 			}
 			void ParticleEmitterComponent::SetMaxLifeTime(float const& other)
 			{
@@ -147,6 +185,16 @@ namespace thomas
 			{
 				m_particleBufferStruct.maxRotationSpeed = other;
 			}
+
+			float ParticleEmitterComponent::GetMinRotationSpeed() const
+			{
+				return m_particleBufferStruct.minRotationSpeed;
+			}
+
+			float ParticleEmitterComponent::GetMaxRotationSpeed() const
+			{
+				return m_particleBufferStruct.maxRotationSpeed;
+			}
 			
 
 			void ParticleEmitterComponent::SetLooping(bool const& other)
@@ -154,9 +202,19 @@ namespace thomas
 				m_looping = other;
 			}
 
+			bool ParticleEmitterComponent::IsLooping() const
+			{
+				return m_looping;
+			}
+
 			void ParticleEmitterComponent::SetGravity(float const& other)
 			{
 				m_particleBufferStruct.gravity = other;
+			}
+
+			float ParticleEmitterComponent::GetGravity() const
+			{
+				return m_particleBufferStruct.gravity;
 			}
 
 			void ParticleEmitterComponent::SetRadius(float const& radius)
@@ -164,11 +222,29 @@ namespace thomas
 				m_particleBufferStruct.radius = radius;
 			}
 
+			float ParticleEmitterComponent::GetRadius() const
+			{
+				return m_particleBufferStruct.radius;
+			}
+
 			void ParticleEmitterComponent::SpawnAtSphereEdge(bool const& other)
 			{
 				m_particleBufferStruct.spawnAtSphereEdge = other;
 			}
 
+			bool ParticleEmitterComponent::IsSpawningAtSphereEdge() const
+			{
+				return false;
+			}
+
+
+			void ParticleEmitterComponent::StartEmitting()
+			{
+			}
+
+			void ParticleEmitterComponent::StopEmitting(bool force)
+			{
+			}
 
 			bool ParticleEmitterComponent::IsEmitting() const
 			{
@@ -198,6 +274,7 @@ namespace thomas
 				return m_emissionRate;
 			}
 
+		
 			
 		}
 	}
