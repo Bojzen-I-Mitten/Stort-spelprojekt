@@ -28,6 +28,7 @@ namespace thomas
 				void SetSwing2(float value);
 				void SetTwist(float value);
 				void SetCollision(bool value);
+				void SetDamping(float value);
 
 			public:
 				Rigidbody* GetConnectedBody();
@@ -41,7 +42,7 @@ namespace thomas
 				float GetSwing2();
 				float GetTwist();
 				bool GetCollision();
-			
+				float GetDamping();
 
 			public:
 				virtual void Update() override;
@@ -61,8 +62,9 @@ namespace thomas
 				float m_swing1;
 				float m_swing2;
 				float m_twist;
-
-				bool Collision;
+				
+				float m_damping;
+				bool m_collision;
 
 			};
 		}

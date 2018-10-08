@@ -21,7 +21,8 @@ namespace thomas
 				m_twist = 0.0f;
 				m_swing1 = 0.0f;
 				m_swing2 = 0.0f;
-				Collision = false;
+				m_collision = false;
+				m_damping = 0;
 			}
 
 			Joint::~Joint()
@@ -80,8 +81,14 @@ namespace thomas
 
 			void Joint::SetCollision(bool value)
 			{
-				Collision = value;
-				
+				m_collision = value;
+				UpdateLimits();
+			}
+
+			void Joint::SetDamping(float value)
+			{
+				m_damping = value;
+				UpdateLimits();
 			}
 
 			Rigidbody * Joint::GetConnectedBody()
@@ -126,7 +133,12 @@ namespace thomas
 
 			bool Joint::GetCollision()
 			{
-				return Collision;
+				return m_collision;
+			}
+
+			float Joint::GetDamping()
+			{
+				return m_damping;
 			}
 
 			btConeTwistConstraint * Joint::CreateConstraints()
@@ -151,7 +163,7 @@ namespace thomas
 					m_frameB.setRotation(frameBSwing);
 					m_coneTwistConstraint->setFrames(m_frameA, m_frameB);
 					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_swing2), math::DegreesToRadians(m_twist));
-
+					m_coneTwistConstraint->setDamping(m_damping);
 				}
 
 			}
@@ -167,7 +179,7 @@ namespace thomas
 				if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 				{
 					m_gameObject->GetComponent<Rigidbody>()->SetActivationState(ActivationState::Always_Active);
-					thomas::Physics::s_world->addConstraint(CreateConstraints(), Collision);
+					thomas::Physics::s_world->addConstraint(CreateConstraints(), m_collision);
 					UpdateLimits();
 				}
 			}
