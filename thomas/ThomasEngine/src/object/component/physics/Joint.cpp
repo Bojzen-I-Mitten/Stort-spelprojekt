@@ -28,11 +28,19 @@ namespace ThomasEngine
 	Vector3 Joint::SwingAxis::get() { return Utility::Convert(((thomas::object::component::Joint*)nativePtr)->GetFrameBAxis()); }
 	void Joint::SwingAxis::set(Vector3 rotation) { ((thomas::object::component::Joint*)nativePtr)->SetFrameBAxis(Utility::Convert(rotation)); }
 
-	//SwingAngle
-	float Joint::SwingAngle::get() { return ((thomas::object::component::Joint*)nativePtr)->GetTwist(); }
-	void Joint::SwingAngle::set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetTwist(value); }
-
 	//twistAngle
-	float Joint::TwistAngle::get() { return ((thomas::object::component::Joint*)nativePtr)->GetSwing1(); }
-	void Joint::TwistAngle::set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetSwing1(value); }
+	float Joint::TwistAngle::get() { return ((thomas::object::component::Joint*)nativePtr)->GetTwist(); }
+	void Joint::TwistAngle::set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetTwist(value); }
+
+	//SwingAngle1
+	float Joint::SwingAngle1::get() { return ((thomas::object::component::Joint*)nativePtr)->GetSwing1(); }
+	void Joint::SwingAngle1::set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetSwing1(value); }
+
+	//SwingAngle2
+	float Joint::SwingAngle2::get() { return ((thomas::object::component::Joint*)nativePtr)->GetSwing2(); }
+	void Joint::SwingAngle2::set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetSwing2(value); }
+
+	//Collision
+	bool Joint::NoCollision::get() { return ((thomas::object::component::Joint*)nativePtr)->GetCollision(); }
+	void Joint::NoCollision::set(bool value) { return ((thomas::object::component::Joint*)nativePtr)->SetCollision(value); }
 }

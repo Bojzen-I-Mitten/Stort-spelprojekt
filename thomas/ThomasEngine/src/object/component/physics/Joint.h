@@ -54,11 +54,22 @@ namespace ThomasEngine
 			void set(float value);
 		}
 
-		property float SwingAngle
+		property float SwingAngle1
 		{
 			float get();
 			void set(float value);
 		}
+		property float SwingAngle2
+		{
+			float get();
+			void set(float value);
+		}
+		property bool NoCollision
+		{
+			bool get();
+			void set(bool value);
+		}
+
 	};
 
 }

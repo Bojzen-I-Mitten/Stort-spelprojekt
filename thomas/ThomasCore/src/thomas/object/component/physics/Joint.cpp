@@ -20,6 +20,8 @@ namespace thomas
 				m_frameBAxis = math::Vector3::Zero;
 				m_twist = 0.0f;
 				m_swing1 = 0.0f;
+				m_swing2 = 0.0f;
+				Collision = false;
 			}
 
 			Joint::~Joint()
@@ -62,10 +64,24 @@ namespace thomas
 				UpdateLimits();
 			}
 
+			void Joint::SetSwing2(float value)
+			{
+			
+				m_swing2 = value;
+				UpdateLimits();
+		
+			}
+
 			void Joint::SetTwist(float value)
 			{
 				m_twist = value;
 				UpdateLimits();
+			}
+
+			void Joint::SetCollision(bool value)
+			{
+				Collision = value;
+				
 			}
 
 			Rigidbody * Joint::GetConnectedBody()
@@ -98,9 +114,19 @@ namespace thomas
 				return m_swing1;
 			}
 
+			float Joint::GetSwing2()
+			{
+				return m_swing2;
+			}
+
 			float Joint::GetTwist()
 			{
 				return m_twist;
+			}
+
+			bool Joint::GetCollision()
+			{
+				return Collision;
 			}
 
 			btConeTwistConstraint * Joint::CreateConstraints()
@@ -124,8 +150,8 @@ namespace thomas
 					m_frameA.setRotation(frameASwing);
 					m_frameB.setRotation(frameBSwing);
 					m_coneTwistConstraint->setFrames(m_frameA, m_frameB);
+					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_swing2), math::DegreesToRadians(m_twist));
 
-					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_twist));
 				}
 
 			}
@@ -141,7 +167,7 @@ namespace thomas
 				if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 				{
 					m_gameObject->GetComponent<Rigidbody>()->SetActivationState(ActivationState::Always_Active);
-					thomas::Physics::s_world->addConstraint(CreateConstraints());
+					thomas::Physics::s_world->addConstraint(CreateConstraints(), Collision);
 					UpdateLimits();
 				}
 			}

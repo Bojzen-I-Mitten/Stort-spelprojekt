@@ -25,7 +25,9 @@ namespace thomas
 				void SetFrameBAnchor(math::Vector3 value);
 				void SetFrameBAxis(math::Vector3 value);
 				void SetSwing1(float value);
+				void SetSwing2(float value);
 				void SetTwist(float value);
+				void SetCollision(bool value);
 
 			public:
 				Rigidbody* GetConnectedBody();
@@ -36,8 +38,9 @@ namespace thomas
 				math::Vector3 GetFrameBAnchor();
 				math::Vector3 GetFrameBAxis();
 				float GetSwing1();
+				float GetSwing2();
 				float GetTwist();
-				
+				bool GetCollision();
 			
 
 			public:
@@ -56,7 +59,11 @@ namespace thomas
 				math::Vector3 m_frameAAxis;
 				math::Vector3 m_frameBAxis;
 				float m_swing1;
+				float m_swing2;
 				float m_twist;
+
+				bool Collision;
+
 			};
 		}
 	}
