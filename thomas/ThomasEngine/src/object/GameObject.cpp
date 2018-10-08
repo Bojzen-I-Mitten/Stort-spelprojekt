@@ -24,7 +24,8 @@ namespace ThomasEngine {
 	{
 		m_name = "gameobject";
 
-		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		if(ThomasWrapper::InEditor())
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 	}
 
 	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))

@@ -25,6 +25,7 @@ namespace thomas
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
 	bool ThomasCore::s_initialized;
+	bool ThomasCore::s_isEditor = false;
 	ImGuiContext* ThomasCore::s_imGuiContext;
 
 	bool ThomasCore::Init()
@@ -145,6 +146,14 @@ namespace thomas
 	void ThomasCore::ClearLogOutput()
 	{
 		s_clearLog = true;
+	}
+	bool ThomasCore::IsEditor()
+	{
+		return s_isEditor;
+	}
+	void ThomasCore::SetEditor(bool value)
+	{
+		s_isEditor = value;
 	}
 }
 
