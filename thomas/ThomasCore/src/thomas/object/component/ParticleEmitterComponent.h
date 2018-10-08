@@ -118,9 +118,6 @@ namespace thomas
 				float GetEmissionRate() const;
 
 
-				bool IsPaused() const;
-				unsigned int GetNrOfMaxParticles() const;
-				unsigned int GetSpawnedParticleCount() const;
 				//void ExportEmitter(std::string path);
 				//void ImportEmitter(std::string path);
 

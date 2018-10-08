@@ -1,115 +1,80 @@
 #pragma once
-
-#pragma unmanaged
-#include <thomas\object\component\ParticleEmitterComponent.h>
-
-#pragma managed
 #include "../Component.h"
+
+namespace thomas { namespace object { namespace component { class ParticleEmitterComponent; } } }
 namespace ThomasEngine
 {
 	[ExecuteInEditor]
 	public ref class ParticleEmitter : public Component
 	{
 	private:
-
+		[Xml::Serialization::XmlIgnoreAttribute]
+		property thomas::object::component::ParticleEmitterComponent* particleEmitter {
+			thomas::object::component::ParticleEmitterComponent* get();
+		}
 	public:
-		ParticleEmitter() : Component(new thomas::object::component::ParticleEmitterComponent()) {}
-		property Vector2 MinMaxSpeed {
-			Vector2 get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return Vector2(0, 1);// minMaxSpeed;
-			}
-			void set(Vector2 value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		ParticleEmitter();
+
+		property float MinSpeed {
+			float get();
+			void set(float value);
+		}
+		property float MaxSpeed {
+			float get();
+			void set(float value);
 		}
 		property float EndSpeed {
-			float get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return 0.0f;// minMaxSpeed;
-			}
-			void set(float value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+			float get();
+			void set(float value);
 		}
-		property Vector2 MinMaxSize {
-			Vector2 get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return Vector2(0, 1);// minMaxSpeed;
-			}
-			void set(Vector2 value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		property float MinSize {
+			float get();
+			void set(float value);
+		}
+		property float MaxSize {
+			float get();
+			void set(float value);
 		}
 		property float EndSize {
-			float get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return 0.0f;// minMaxSpeed;
-			}
-			void set(float value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+			float get();
+			void set(float value);
 		}
-		property Vector2 MinMaxLifeTime {
-			Vector2 get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return Vector2(0, 1);// minMaxSpeed;
-			}
-			void set(Vector2 value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		property float MinLifeTime {
+			float get();
+			void set(float value);
 		}
-		property float RotationSpeed {
-			float get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return 0.0f;// minMaxSpeed;
-			}
-			void set(float value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		property float MaxLifeTime {
+			float get();
+			void set(float value);
+		}
+		property float MinRotationSpeed {
+			float get();
+			void set(float value);
+		}
+		property float MaxRotationSpeed {
+			float get();
+			void set(float value);
+		}
+		property float Radius {
+			float get();
+			void set(float value);
 		}
 		property float Gravity {
-			float get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return 0.0f;// minMaxSpeed;
-			}
-			void set(float value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+			float get();
+			void set(float value);
 		}
-		property bool Looping{
-			bool get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return 0.0f;// minMaxSpeed;
-			}
-			void set(bool value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		property bool Looping {
+			bool get();
+			void set(bool value);
 		}
-
-		property Color StartColor {
-			Color get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return Color(0.0f, 0.0f, 0.0f, 0.0f);// minMaxSpeed;
-			}
-			void set(Color value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		property bool SpawnAtEdge {
+			bool get();
+			void set(bool value);
 		}
-
-		property Color EndColor {
-			Color get() {
-				//Vector2 minMaxSpeed(((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMinSpeed(), ((thomas::object::component::ParticleEmitterComponent*)nativePtr)->GetMaxSpeed());
-				return Color(0.0f, 0.0f, 0.0f, 0.0f);// minMaxSpeed;
-			}
-			void set(Color value) {
-				//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->SetSpeed(value.x, value.y);
-			}
+		property float EmissionRate {
+			float get();
+			void set(float value);
 		}
-
-		void Update() override
-		{
-			//((thomas::object::component::ParticleEmitterComponent*)nativePtr)->Update();
-		}
+		
 	};
 }
