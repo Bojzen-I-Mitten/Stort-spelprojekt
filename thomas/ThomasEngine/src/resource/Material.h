@@ -29,6 +29,10 @@ namespace ThomasEngine
 
 		Material(Material^ original);
 
+		Material();
+
+
+		void OnRename() override;
 
 		void OnPlay() override
 		{
