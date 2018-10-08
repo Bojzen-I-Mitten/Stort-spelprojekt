@@ -12,7 +12,7 @@
 #include <thomas\editor\EditorCamera.h>
 #include <thomas\AutoProfile.h>
 #include <thomas\ProfileManager.h>
-
+#include <thomas\utils\GpuProfiler.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -27,6 +27,7 @@
 using namespace thomas;
 
 namespace ThomasEngine {
+
 
 	void ThomasWrapper::Start() {
 		s_Selection = gcnew ThomasSelection();
@@ -62,15 +63,32 @@ namespace ThomasEngine {
 		{
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
-			WindowManager::Instance()->ClearAllWindows();
-			graphics::Renderer::Instance()->ProcessCommands();
-			WindowManager::Instance()->PresentAllWindows();
+			ThomasCore::Render();
 			RenderFinished->Set();
 		}
 	}
 
 	void ThomasWrapper::CopyCommandList()
 	{
+
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(showStatistics);
+		if (showStatistics) {
+			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
+			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
+			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
+			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
+			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+			ImGui::Text("RAM Usage: %.2f MB", ramUsage);
+			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
+			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
+			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			ImGui::End();
+		}
+
+		
 		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
@@ -95,7 +113,7 @@ namespace ThomasEngine {
 				continue;
 			}
 			NEW_FRAME();
-
+			float timeStart = ThomasTime::GetElapsedTime();
 			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 			try {
@@ -159,7 +177,13 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
+					if (WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
+						showStatistics = !showStatistics;
+					}
+						
 				}
+
+			
 
 				
 			}
@@ -176,8 +200,10 @@ namespace ThomasEngine {
 				}
 					
 					
-			}finally
+			}
+			finally
 			{
+				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
 				if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 				{
 					thomas::object::component::RenderComponent::ClearList();

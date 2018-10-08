@@ -8,6 +8,7 @@ namespace thomas
 	double ThomasTime::s_initTime;
 	double ThomasTime::s_startTime;
 	double ThomasTime::s_timeFreq;
+	double ThomasTime::s_lastDeltaTime;
 	double ThomasTime::s_DeltaTime;
 	float ThomasTime::s_FPS;
 	float ThomasTime::s_FrameTime;
@@ -29,6 +30,7 @@ namespace thomas
 		QueryPerformanceCounter(&currentTime);
 		s_initTime = double(currentTime.QuadPart);
 		s_startTime = double(currentTime.QuadPart);
+		s_lastDeltaTime = s_startTime;
 		s_FPS = 0.f;
 		s_timescale = 1.f;
 		s_FpsUpdateFreq = 0.7f;
@@ -39,7 +41,7 @@ namespace thomas
 	//Updates the timestep
 	void ThomasTime::Update()
 	{
-		s_DeltaTime = GetElapsedTime();
+		s_DeltaTime = UpdateDeltaTime();
 		s_TimeLeftToUpdateFPS -= (float)s_DeltaTime;
 
 		//Reset
@@ -84,6 +86,14 @@ namespace thomas
 		return (int)s_FPS;
 	}
 
+	float ThomasTime::GetElapsedTime()
+	{
+		LARGE_INTEGER newTime;
+		QueryPerformanceCounter(&newTime);
+		double elapsed = double(newTime.QuadPart - s_startTime) / s_timeFreq;
+		return (float)elapsed;
+	}
+
 	float ThomasTime::GetFrameTime()
 	{
 		return 1000.f / s_FPS;
@@ -94,12 +104,12 @@ namespace thomas
 		return s_timescale;
 	}
 
-	double ThomasTime::GetElapsedTime()
+	double ThomasTime::UpdateDeltaTime()
 	{
 		LARGE_INTEGER newTime;
 		QueryPerformanceCounter(&newTime);
-		double elapsed = double(newTime.QuadPart - s_startTime) / s_timeFreq;
-		s_startTime = (double)newTime.QuadPart;
+		double elapsed = double(newTime.QuadPart - s_lastDeltaTime) / s_timeFreq;
+		s_lastDeltaTime = (double)newTime.QuadPart;
 		return elapsed;
 	}
 }

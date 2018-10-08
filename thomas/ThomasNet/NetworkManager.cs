@@ -61,7 +61,7 @@ namespace ThomasEngine.Network
 
             NatPunchListener.NatIntroductionSuccess += NatPunchListener_NatIntroductionSuccess;
 
-
+            
             Listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             Listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
