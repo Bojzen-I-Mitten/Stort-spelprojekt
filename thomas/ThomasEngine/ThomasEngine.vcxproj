@@ -149,6 +149,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -183,7 +186,6 @@
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\texture\Texture.h" />
     <ClInclude Include="src\resource\texture\Texture2D.h" />
-    <ClInclude Include="src\SceneSurrogate.h" />
     <ClInclude Include="src\ScriptingManager.h" />
     <ClInclude Include="src\resource\AudioClip.h" />
     <ClInclude Include="src\resource\Resources.h" />
@@ -193,8 +195,10 @@
     <ClInclude Include="src\object\component\Camera.h" />
     <ClInclude Include="src\object\component\SoundComponent.h" />
     <ClInclude Include="src\resource\Shader.h" />
-    <ClInclude Include="src\script\animation\BlendNode.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
+    <ClInclude Include="src\serialization\Converters.h" />
+    <ClInclude Include="src\serialization\Serializer.h" />
+    <ClInclude Include="src\script\animation\BlendNode.h" />
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />
     <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
@@ -246,7 +250,6 @@
     <ClCompile Include="src\resource\Resources.cpp" />
     <ClCompile Include="src\resource\texture\Texture.cpp" />
     <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\SceneSurrogate.cpp" />
     <ClCompile Include="src\ScriptingManager.cpp" />
     <ClCompile Include="src\resource\Shader.cpp" />
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
@@ -254,6 +257,8 @@
     <ClCompile Include="src\script\animation\PlaybackHandle.cpp" />
     <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
+    <ClCompile Include="src\serialization\Converters.cpp" />
+    <ClCompile Include="src\serialization\Serializer.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\ThomasManaged.cpp" />
     <ClCompile Include="src\Time.cpp" />

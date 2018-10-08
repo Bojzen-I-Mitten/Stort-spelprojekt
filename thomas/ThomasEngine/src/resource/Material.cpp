@@ -6,7 +6,7 @@
 #include "Shader.h"
 #include "texture\Texture2D.h"
 #include "Resources.h"
-#include "..\SceneSurrogate.h"
+#include "../serialization/Serializer.h"
 namespace ThomasEngine {
 
 	Material::Material(ThomasEngine::Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
@@ -16,6 +16,19 @@ namespace ThomasEngine {
 	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
 		m_loaded = true;
+	}
+
+	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
+	{
+		
+	}
+
+	void Material::OnRename()
+	{
+		if (m_loaded && !ThomasWrapper::IsPlaying())
+		{
+			Serializer::SerializeMaterial(this, m_path);
+		}
 	}
 
 	Material^ Material::StandardMaterial::get() {
@@ -44,7 +57,7 @@ namespace ThomasEngine {
 
 		if (m_loaded && !ThomasWrapper::IsPlaying())
 		{
-			ThomasEngine::Resources::SaveResource(this);
+			Serializer::SerializeMaterial(this, m_path);
 		}
 	}
 
@@ -152,7 +165,6 @@ namespace ThomasEngine {
 		types->Add(Texture::typeid);
 		types->Add(Texture2D::typeid);
 		types->Add(ThomasEngine::Shader::typeid);
-		types->Add(SceneResource::typeid);
 		return types;
 	}
 }

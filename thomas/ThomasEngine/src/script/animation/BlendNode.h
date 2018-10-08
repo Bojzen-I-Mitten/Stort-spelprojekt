@@ -16,6 +16,8 @@ namespace ThomasEngine
 
 		public ref class BlendNode {
 		private:
+		internal:
+			thomas::graphics::animation::AnimationNode* Native();
 		public:
 			BlendNode(Model^model);
 			~BlendNode();
@@ -28,7 +30,7 @@ namespace ThomasEngine
 			/* Finalize blending node by generating a weight handle. */
 			WeightHandle^ generateWeightHandle();
 
-			thomas::graphics::animation::AnimationNode* Native();
+			
 		private:
 
 			thomas::graphics::animation::AnimBlender* m_node;

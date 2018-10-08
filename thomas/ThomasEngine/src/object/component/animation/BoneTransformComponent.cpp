@@ -46,6 +46,8 @@ namespace ThomasEngine
 
 		void BoneTransformComponent::BoneName::set(System::String^ value)
 		{
+			if (!value)
+				return;
 			m_boneName = value;
 			uint32_t hash = Utility::hash(value);
 			Native->SetBoneHash(hash);
