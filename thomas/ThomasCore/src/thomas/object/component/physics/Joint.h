@@ -24,7 +24,7 @@ namespace thomas
 
 				void SetFrameBAnchor(math::Vector3 value);
 				void SetFrameBAxis(math::Vector3 value);
-				void SetSwing(float value);
+				void SetSwing1(float value);
 				void SetTwist(float value);
 
 			public:
@@ -35,7 +35,7 @@ namespace thomas
 				
 				math::Vector3 GetFrameBAnchor();
 				math::Vector3 GetFrameBAxis();
-				float GetSwing();
+				float GetSwing1();
 				float GetTwist();
 				
 			
@@ -55,7 +55,7 @@ namespace thomas
 				btTransform m_frameB;
 				math::Vector3 m_frameAAxis;
 				math::Vector3 m_frameBAxis;
-				float m_swing;
+				float m_swing1;
 				float m_twist;
 			};
 		}

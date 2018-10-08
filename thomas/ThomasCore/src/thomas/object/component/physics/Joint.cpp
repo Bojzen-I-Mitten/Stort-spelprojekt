@@ -19,7 +19,7 @@ namespace thomas
 				m_frameAAxis = math::Vector3::Zero;
 				m_frameBAxis = math::Vector3::Zero;
 				m_twist = 0.0f;
-				m_swing = 0.0f;
+				m_swing1 = 0.0f;
 			}
 
 			Joint::~Joint()
@@ -56,9 +56,9 @@ namespace thomas
 				UpdateLimits();
 			}
 
-			void Joint::SetSwing(float value)
+			void Joint::SetSwing1(float value)
 			{
-				m_swing = value;
+				m_swing1 = value;
 				UpdateLimits();
 			}
 
@@ -93,9 +93,9 @@ namespace thomas
 				return m_frameBAxis;
 			}
 
-			float Joint::GetSwing()
+			float Joint::GetSwing1()
 			{
-				return m_swing;
+				return m_swing1;
 			}
 
 			float Joint::GetTwist()
@@ -125,7 +125,7 @@ namespace thomas
 					m_frameB.setRotation(frameBSwing);
 					m_coneTwistConstraint->setFrames(m_frameA, m_frameB);
 
-					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing), math::DegreesToRadians(m_swing), math::DegreesToRadians(m_twist));
+					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_twist));
 				}
 
 			}
