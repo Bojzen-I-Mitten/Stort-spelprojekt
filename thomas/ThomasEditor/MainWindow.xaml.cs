@@ -617,6 +617,11 @@ namespace ThomasEditor
         {
             ThomasWrapper.ToggleEditorRendering();
         }
+
+        private void MenuItem_TogglePhysicsDebug(object sender, RoutedEventArgs e)
+        {
+            ThomasWrapper.TogglePhysicsDebug();
+        }
     }
 
     public static class Extensions

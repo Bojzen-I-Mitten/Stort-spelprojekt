@@ -1,4 +1,7 @@
 #pragma once
+#pragma unmanaged 
+
+#include <thomas/object/GameObject.h>
 #pragma managed
 #include "../attributes/CustomAttributes.h"
 #include "Object.h"
@@ -21,18 +24,16 @@ namespace ThomasEngine
 
 		bool InitComponents(bool playing);
 
-
 	internal:
+
+		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 
 		System::String^ prefabPath;
 
 		bool m_isDestroyed = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
-		static void SerializeGameObject(String^ path, GameObject^ gObj);
 		void SyncComponents();
-		static System::IO::Stream^ SerializeGameObject(GameObject^ gObj);
-		static GameObject^ DeSerializeGameObject(System::IO::Stream^ stream);
 
 		void PostLoad(Scene^ scene);
 
@@ -51,6 +52,12 @@ namespace ThomasEngine
 
 		void RenderSelectedGizmos();
 		
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property thomas::object::GameObject* Native {
+			thomas::object::GameObject* get();
+		}
+
 	public:
 
 		GameObject(String^ name);
@@ -71,13 +78,23 @@ namespace ThomasEngine
 			void set(bool value);
 		}	
 
+		[BrowsableAttribute(false)]
+		property String^ Name
+		{
+			String^ get() override;
+			void set(String^) override;
+		};
+
+		
+
 		String^ ToString() override
 		{
 			return Name;
 		}
 
+
 		[BrowsableAttribute(false)]
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property Transform^ transform 
 		{
 			Transform^ get();

@@ -9,6 +9,10 @@ using System.Globalization;
 
 using System.Windows.Input;
 
+using Xceed.Wpf.Toolkit.PropertyGrid;
+
+using System.Collections.Generic;
+
 using ThomasEngine;
 
 namespace ThomasEditor
@@ -133,6 +137,31 @@ namespace ThomasEditor
             //    addComponentList.ItemsSource = Component.GetAllAddableComponentTypes();
             //    CollectionViewSource.GetDefaultView(addComponentList.ItemsSource).Filter = ComponentsFilter;
             //}
+
+            private void GameObjectInspector_PreviewDragOver(object sender, DragEventArgs e)
+            {
+                //Debug.Log("Entered preview function");
+                if (e.Data.GetDataPresent(typeof(TreeViewItem)))
+                {
+                    //e.Effects = DragDropEffects.None;
+                    TreeViewItem item = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
+                    StackPanel sourceHeader = item.Header as StackPanel;
+
+                    if (ThomasEngine.Resources.GetResourceAssetType((string)sourceHeader.DataContext) == ThomasEngine.Resources.AssetTypes.SCRIPT)
+                    {
+                        e.Effects = DragDropEffects.Move;
+                        e.Handled = true;
+                    }
+                    else
+                        e.Effects = DragDropEffects.None;
+                }
+
+            }
+            private void GameObjectInspector_Drop(object sender, DragEventArgs e)
+            {
+                GameObjectHierarchy.instance.SetInspector(true);
+                GameObjectHierarchy.instance.hierarchy_Drop(sender, e);
+            }
 
             private void AddComponent_CanExecute(object sender, CanExecuteRoutedEventArgs e)
             {

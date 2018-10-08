@@ -45,8 +45,16 @@
     <ClCompile Include="src\GUI\editor\GUI.cpp" />
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
+    <ClCompile Include="src\serialization\Converters.cpp" />
+    <ClCompile Include="src\serialization\Serializer.cpp" />
+    <ClCompile Include="src\object\component\physics\Joint.cpp" />
+    <ClCompile Include="src\object\component\animation\BoneTransformComponent.cpp" />
+    <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
+    <ClCompile Include="src\script\animation\PlaybackHandle.cpp" />
+    <ClCompile Include="src\script\animation\BlendNode.cpp" />
+    <ClCompile Include="src\script\animation\WeightHandle.cpp" />
+    <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
-    <ClCompile Include="src\SceneSurrogate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -93,10 +101,18 @@
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
     <ClInclude Include="src\object\component\ParticleEmitter.h" />
-    <ClInclude Include="src\SceneSurrogate.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
+    <ClInclude Include="src\serialization\Converters.h" />
+    <ClInclude Include="src\serialization\Serializer.h" />
+    <ClInclude Include="src\object\component\physics\Joint.h" />
+    <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
+    <ClInclude Include="src\script\animation\BlendNode.h" />
+    <ClInclude Include="src\script\animation\WeightHandle.h" />
+    <ClInclude Include="src\script\animation\PlaybackNode.h" />
+    <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
+    <ClInclude Include="src\script\animation\PlaybackHandle.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

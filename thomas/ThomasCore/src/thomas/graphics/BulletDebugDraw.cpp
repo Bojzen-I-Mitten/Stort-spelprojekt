@@ -1,40 +1,26 @@
 #include "BulletDebugDraw.h"
-#include "DirectXTK\CommonStates.h"
-#include "..\ThomasCore.h"
-#include "..\resource\Material.h"
-#include "..\utils\D3D.h"
-#include "..\object\component\Camera.h"
-#include "..\resource\Shader.h"
-
+#include "../utils/Math.h"
+#include "../Physics.h"
+#include "../editor/gizmos/Gizmos.h"
 namespace thomas
 {
 	namespace graphics
 	{
 		BulletDebugDraw::BulletDebugDraw()
 		{
-			resource::Shader* shader = resource::Shader::CreateShader("../Data/FXIncludes/lineShader.fx"); // Hardcoded line shader for debug draw
-
-			if (shader != nullptr)
-			{
-				m_material = std::make_unique<resource::Material>(shader);
-				m_vertexBufferPos = std::make_unique<utils::buffers::VertexBuffer>(nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
-				m_vertexBufferColor = std::make_unique<utils::buffers::VertexBuffer>(nullptr, sizeof(math::Vector3), 1000, DYNAMIC_BUFFER);
-			}
+			
 		}
 
 		BulletDebugDraw::~BulletDebugDraw()
 		{
-			m_material.reset();
-			m_vertexBufferPos.reset();
-			m_vertexBufferColor.reset();
+
 		}
 
 		void BulletDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const btVector3 & fromColor, const btVector3 & toColor)
 		{
-			m_linePositions.push_back(math::Vector3(from.x(), from.y(), from.z()));
-			m_linePositions.push_back(math::Vector3(to.x(), to.y(), to.z()));
-			m_lineColors.push_back(math::Vector3(fromColor.x(), fromColor.y(), fromColor.z()));
-			m_lineColors.push_back(math::Vector3(toColor.x(), toColor.y(), toColor.z()));
+			editor::Gizmos::SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::SetColor(math::Color(1, 1, 0));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(from), thomas::Physics::ToSimple(to));
 		}
 
 		void BulletDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const btVector3 & color)
@@ -42,27 +28,45 @@ namespace thomas
 			drawLine(from, to, color, color);
 		}
 
-		void BulletDebugDraw::Update(object::component::Camera * camera)
+		void BulletDebugDraw::drawSphere(const btVector3 & p, btScalar radius, const btVector3 & color)
 		{
-			m_viewProjection = camera->GetViewProjMatrix().Transpose();
+			editor::Gizmos::SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::SetColor(math::Color(1, 1, 0));
+			editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(thomas::Physics::ToSimple(p), radius));
+		}
+
+		void BulletDebugDraw::drawTriangle(const btVector3 & a, const btVector3 & b, const btVector3 & c, const btVector3 & color, btScalar alpha)
+		{
+			editor::Gizmos::SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::SetColor(math::Color(1, 1, 0));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(a), thomas::Physics::ToSimple(b));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(b), thomas::Physics::ToSimple(c));
+			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(c), thomas::Physics::ToSimple(a));
+		}
+
+		void BulletDebugDraw::drawContactPoint(const btVector3 & PointOnB, const btVector3 & normalOnB, btScalar distance, int lifeTime, const btVector3 & color)
+		{
+		}
+
+		void BulletDebugDraw::reportErrorWarning(const char * warningString)
+		{
+			LOG("BULLET: " << warningString);
 		}
 
 		void BulletDebugDraw::setDebugMode(int debugMode)
 		{
 			m_debugMode = debugMode;
 		}
-
+		/*
 		void BulletDebugDraw::drawLineFinal()
 		{
-			if (m_linePositions.empty())
-				return;
-
-			// Set necessary states
+			if (m_lines.positions.empty())
+				if (m_linePositions.empty())
+					return;
 			DirectX::CommonStates states(utils::D3D::Instance()->GetDevice());
 			utils::D3D::Instance()->GetDeviceContext()->OMSetBlendState(states.Opaque(), nullptr, 0xFFFFFFFF);
 			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(states.DepthNone(), 0);
 			utils::D3D::Instance()->GetDeviceContext()->RSSetState(states.CullNone());
-
 			// Set the data and send to GPU
 			m_vertexBufferPos->SetData(m_linePositions);
 			m_vertexBufferColor->SetData(m_lineColors);
@@ -76,5 +80,6 @@ namespace thomas
 			m_linePositions.clear();
 			m_lineColors.clear();
 		}
+		*/
 	}
 }

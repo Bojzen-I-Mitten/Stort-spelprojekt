@@ -10,13 +10,14 @@
 #include "../RenderComponent.h"
 namespace ThomasEngine
 {
+
 	MeshCollider::MeshCollider() : Collider(new thomas::object::component::MeshCollider()) {
 		
 	}
 
-	void MeshCollider::Start()
+	void MeshCollider::OnGameObjectSet()
 	{
-		if (!mesh && gameObject) 
+		if (!mesh && gameObject)
 		{
 			RenderComponent^ renderComp = gameObject->GetComponent<RenderComponent^>();
 			if (renderComp && renderComp->model)

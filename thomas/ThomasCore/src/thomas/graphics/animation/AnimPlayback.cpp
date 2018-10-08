@@ -3,20 +3,24 @@
 #include "BaseAnimationTime.h"
 #include "data/Skeleton.h"
 #include "../../Common.h"
-
+#include "../../utils/Utility.h"
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 
 			/* Generate an animation pose
 			*/
+
 			AnimPlayback::AnimPlayback(Skeleton &ref)
 				: AnimationNode(ref),
 				m_playback(new BaseAnimationTime(0.f,0.f, graphics::animation::PlayType::None)), m_anim(NULL), m_channel(ref.getNumBones())
 			{
+				m_boneMapping.reserve(ref.getNumBones());
 				//Each channel needs to be initiated so it can generate it's own frames.
-				for (unsigned int i = 0; i < ref.getNumBones(); i++)
+				for (unsigned int i = 0; i < ref.getNumBones(); i++) {
 					m_channel[i].init(ref.getBone(i)._bindPose);
+					m_boneMapping[i] = i;
+				}
 			}
 			/* Generate an animation player
 			*/
@@ -24,9 +28,9 @@ namespace thomas {
 				: AnimationNode(ref),
 				m_playback(std::move(playback)), m_anim(&anim), m_channel()
 			{
-				m_channel.reserve(ref.getNumBones());
+				m_channel.reserve(anim.numChannel());
+				m_boneMapping.reserve(anim.numChannel());
 				//Each channel needs to be initiated so it can generate it's own frames.
-
 				for (size_t i = 0; i < anim.numChannel(); i++) {
 					const ObjectChannel& ch = anim[i];
 					unsigned int boneInd;
@@ -34,9 +38,10 @@ namespace thomas {
 						!ref.findBoneIndex(ch.getHash(), boneInd))
 						continue; // Empty or culled
 					else {
-						m_boneMapping[boneInd] = m_channel.size();
+						//m_boneMapping[boneInd] = m_channel.size();
+						m_boneMapping.push_back(boneInd);
 						m_channel.push_back(BoneFrame());
-						m_channel.back().newAnimation(&anim[i], m_playback->m_elapsed);
+						m_channel.back().newAnimation(&anim[i], m_playback->m_elapsedTime);
 					}
 				}
 			}
@@ -47,30 +52,52 @@ namespace thomas {
 
 			void AnimPlayback::update(float dT)
 			{
+				if (isUpdated()) return;
 				m_playback->timeStep(dT);
+				markUpdated();
 			}
-			math::Vector3 AnimPlayback::calcBonePosition(unsigned int bone)
+
+			Playback* AnimPlayback::getPlayback() {
+				return m_playback.get();
+			}
+
+			void AnimPlayback::calcFrame(TransformComponents * result)
 			{
-				return m_channel[m_boneMapping[bone]].lerpCoordinate(m_playback->m_elapsed);
+				float eT = m_playback->m_elapsedTime;
+				for (uint32_t i = 0; i < m_channel.size(); i++)
+					m_channel[i].lerpFrame(eT, result[m_boneMapping[i]].m_pos, result[m_boneMapping[i]].m_scale, result[m_boneMapping[i]].m_rot);
 			}
-
-			math::Vector3 AnimPlayback::calcBoneScale(unsigned int bone)
+			void AnimPlayback::blendFrameTo(TransformComponents * result, WeightTripple *weights)
 			{
-				return m_channel[m_boneMapping[bone]].lerpScale(m_playback->m_elapsed);
+				for (uint32_t i = 0; i < m_channel.size(); i++) {
+					TransformComponents comp;
+					calcFrame(i, comp);
+					result[m_boneMapping[i]].blendTo(comp, weights[m_boneMapping[i]]);
+				}
 			}
-
-			math::Quaternion AnimPlayback::calcBoneRot(unsigned int bone)
+			void AnimPlayback::calcFrame(unsigned int index, TransformComponents &comp) {
+				float eT = m_playback->m_elapsedTime;
+				m_channel[index].lerpFrame(eT, comp.m_pos, comp.m_scale, comp.m_rot);
+			}
+			void AnimPlayback::calcFrame(unsigned int index, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
+				float eT = m_playback->m_elapsedTime;
+				m_channel[index].lerpFrame(eT, trans, scale, rot);
+			}
+			math::Vector3 AnimPlayback::calcBonePosition(unsigned int index)
 			{
-				return m_channel[m_boneMapping[bone]].lerpRotation(m_playback->m_elapsed);
+				return m_channel[index].lerpCoordinate(m_playback->m_elapsedTime);
 			}
 
-			static std::vector<float> TIME;
-
-			void AnimPlayback::calcFrame(unsigned int bone, math::Vector3& trans, math::Vector3 &scale, math::Quaternion &rot) {
-				float eT = m_playback->m_elapsed;
-				TIME.push_back(eT);
-				m_channel[m_boneMapping[bone]].lerpFrame(eT, trans, scale, rot);
+			math::Vector3 AnimPlayback::calcBoneScale(unsigned int index)
+			{
+				return m_channel[index].lerpScale(m_playback->m_elapsedTime);
 			}
+
+			math::Quaternion AnimPlayback::calcBoneRot(unsigned int index)
+			{
+				return m_channel[index].lerpRotation(m_playback->m_elapsedTime);
+			}
+
 			/*
 			bool AnimatedSkeleton::setAnim(const std::string& name, PlayType runType) {
 				//Change animation, it can be null

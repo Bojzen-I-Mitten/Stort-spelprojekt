@@ -7,6 +7,7 @@
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
+#include "resource/MemoryAllocation.h"
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
@@ -71,6 +72,11 @@ namespace thomas
 		s_initialized = false;
 	}
 
+	ThomasCore::ThomasCore()
+		: m_memAlloc(new resource::MemoryAllocation())
+	{
+	}
+
 	bool ThomasCore::Initialized()
 	{
 		return s_initialized;
@@ -99,6 +105,17 @@ namespace thomas
 	std::vector<std::string> ThomasCore::GetLogOutput()
 	{
 		return s_logOutput;
+	}
+
+	ThomasCore & ThomasCore::Core()
+	{
+		static ThomasCore core;
+		return core;
+	}
+
+	resource::MemoryAllocation * ThomasCore::Memory()
+	{
+		return  m_memAlloc;
 	}
 
 	void ThomasCore::LogOutput(const std::string & message)

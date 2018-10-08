@@ -9,7 +9,7 @@ namespace ThomasEngine
 	public ref class LightComponent : public Component
 	{
 	private:
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property thomas::object::component::LightComponent* light {
 			thomas::object::component::LightComponent* get();
 		}

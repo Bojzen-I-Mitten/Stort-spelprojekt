@@ -7,19 +7,22 @@ namespace ThomasEngine
 	public ref class Camera : public Component
 	{
 	private:
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property thomas::object::component::Camera* camera {
 			thomas::object::component::Camera* get();
 		}
 	public:
 		Camera();
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Matrix viewMatrix {Matrix get();}
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Matrix projectionMatrix{Matrix get();}
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position{Vector3 get();}
 

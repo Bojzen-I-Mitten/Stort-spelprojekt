@@ -17,6 +17,8 @@ namespace ThomasEngine
 			STAY,
 			ENDED
 		};
+
+		virtual void OnGameObjectSet() override {};
 	private:
 		Rigidbody^ m_attachedRigidbody;
 		delegate void OnCollisionDelegate(component::Collider* otherCollider, COLLISION_TYPE collisionType);
@@ -25,7 +27,7 @@ namespace ThomasEngine
 	public:
 		Collider(component::Collider* nativePtr);
 		~Collider();
-		
+		virtual void OnDestroy() override;
 
 		[BrowsableAttribute(false)]
 		property Rigidbody^ attachedRigidbody {

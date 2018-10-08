@@ -10,9 +10,6 @@ namespace ThomasEditor
 {
     public class Collider : ScriptComponent
     {
-        [Description("Test description")]
-        public Vector3 torque { get; set; }
-
         public override void Start()
         {
         }
