@@ -1,13 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Interop;
 using ThomasEngine;
 namespace ThomasStandalone
 {
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Debug.OnDebugMessage += Debug_OnDebugMessage;
+
+            ThomasWrapper.Start(false);
+            Application.currentProject = Project.LoadProject("..\\Data\\project.thomas");
+            ThomasWrapper.Play();
+            new Win32Window().create("Thomas standalone", 800, 600);
+            ThomasWrapper.Exit();
+        }
+
+        private static void Debug_OnDebugMessage(DebugMessage newMessage)
+        {
+            switch(newMessage.Severity)
+            {
+                case MessageSeverity.Info:
+                    System.Console.BackgroundColor = System.ConsoleColor.Black;
+                    break;
+                case MessageSeverity.Warning:
+                    System.Console.BackgroundColor = System.ConsoleColor.DarkYellow;
+                    break;
+                case MessageSeverity.Error:
+                    System.Console.BackgroundColor = System.ConsoleColor.Red;
+                    break;
+                case MessageSeverity.ThomasCore:
+                    System.Console.BackgroundColor = System.ConsoleColor.Cyan;
+                    break;
+            }
+            //System.Console.ForegroundColor = System.ConsoleColor.Black;
+            System.Console.Out.WriteLine(newMessage.Message);
+            System.Console.ResetColor();
+        }
+    }
+
     delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     class Win32Window
@@ -105,13 +137,13 @@ namespace ThomasStandalone
             WNDCLASSEX wind_class = new WNDCLASSEX();
             wind_class.cbSize = Marshal.SizeOf(typeof(WNDCLASSEX));
             //wind_class.style = (int)(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS); //Doubleclicks are active
-           // wind_class.hbrBackground = (IntPtr)COLOR_BACKGROUND + 1; //Black background, +1 is necessary
+            // wind_class.hbrBackground = (IntPtr)COLOR_BACKGROUND + 1; //Black background, +1 is necessary
             wind_class.cbClsExtra = 0;
             wind_class.cbWndExtra = 0;
-           
+
             wind_class.hInstance = Marshal.GetHINSTANCE(this.GetType().Module); ;// alternative: Process.GetCurrentProcess().Handle;
             wind_class.hIcon = IntPtr.Zero;
-           // wind_class.hCursor = LoadCursor(IntPtr.Zero, (int)IDC_CROSS);// Crosshair cursor;
+            // wind_class.hCursor = LoadCursor(IntPtr.Zero, (int)IDC_CROSS);// Crosshair cursor;
             wind_class.lpszMenuName = null;
             wind_class.lpszClassName = "myClass";
             wind_class.lpfnWndProc = Marshal.GetFunctionPointerForDelegate(delegWndProc);
@@ -131,7 +163,7 @@ namespace ThomasStandalone
 
             //This version worked and resulted in a non-zero hWnd
             IntPtr hWnd = CreateWindowEx(0,
-                regResult, 
+                regResult,
                 "Thomas standalone",
                 WS_OVERLAPPEDWINDOW,
                 0,
@@ -139,7 +171,7 @@ namespace ThomasStandalone
                 width,
                 height,
                 IntPtr.Zero,
-                IntPtr.Zero, 
+                IntPtr.Zero,
                 wind_class.hInstance,
                 IntPtr.Zero);
 
@@ -148,7 +180,7 @@ namespace ThomasStandalone
                 uint error = GetLastError();
                 return false;
             }
-            
+
             ShowWindow(hWnd, 1);
 
             UpdateWindow(hWnd);
@@ -156,7 +188,7 @@ namespace ThomasStandalone
             ThomasWrapper.CreateThomasWindow(hWnd, false);
 
             MSG msg;
-            while(GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
             {
                 Console.Out.WriteLine(ThomasWrapper.FrameRate);
                 DispatchMessage(ref msg);
