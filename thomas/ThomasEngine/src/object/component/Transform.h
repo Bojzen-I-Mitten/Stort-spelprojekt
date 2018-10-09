@@ -70,6 +70,14 @@ namespace ThomasEngine
 			Quaternion get();
 			void set(Quaternion value);
 		}
+
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Quaternion localRotation
+		{
+			Quaternion get();
+			void set(Quaternion value);
+		}
 	
 		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
@@ -100,16 +108,19 @@ namespace ThomasEngine
 			Vector3 get();
 			void set(Vector3 value);
 		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 forward
 		{
 			Vector3 get();
 		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 up
 		{
 			Vector3 get();
 		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 right
 		{

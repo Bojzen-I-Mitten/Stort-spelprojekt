@@ -15,9 +15,18 @@ namespace thomas
 
 
 			RenderSkinnedComponent::RenderSkinnedComponent()
-				: m_skinArray(0), m_skeleton()
+				: m_skeleton()
 			{
-				m_skinArray.SetName(graphics::THOMAS_MATRIX_SKIN_ARRAY);
+				thomas::resource::shaderproperty::ShaderPropertyStatic prop;
+				prop.m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
+				prop.m_dataSize = 0;
+				prop.m_data = NULL;
+				prop.m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
+#ifdef _DEBUG
+				prop.m_effectName = graphics::THOMAS_MATRIX_SKIN_ARRAY;
+				prop.m_type = thomas::resource::shaderproperty::ShaderProperty::Type::MATRIX_ARRAY;
+#endif
+				m_skinInfo = &insertProperty(prop);
 			}
 			RenderSkinnedComponent::~RenderSkinnedComponent() {
 
@@ -27,6 +36,20 @@ namespace thomas
 				RenderComponent::Update();
 				if (m_skeleton) {
 					m_skeleton->update(ThomasTime::GetDeltaTime());
+				}
+			}
+
+			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
+				RenderComponent::SetMaterial(meshIndex, material);
+				uint32_t effectIndex;
+				if (!material || material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, effectIndex)) {
+					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
+					m_skinInfo->m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
+					LOG("Warning! Material applied to skinned render component does not use any bone information.");
+				}
+				else {
+					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixArray;
+					m_skinInfo->m_effect_id = effectIndex;
 				}
 			}
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
@@ -40,14 +63,28 @@ namespace thomas
 				}
 				else{
 					m_skeleton = std::unique_ptr<graphics::animation::AnimatedSkeleton>(
-						new graphics::animation::AnimatedSkeleton(*model->GetSkeleton(), m_skinArray));
-					insertProperty(&m_skinArray);
+						new graphics::animation::AnimatedSkeleton(*model->GetSkeleton()));
+					applySkin();
 					return true;	// Return true only if model is applied correctly
 				}
 				return false;
 			}
 			graphics::animation::IBlendTree* RenderSkinnedComponent::GetBlendTree() {
-				return m_skeleton.get();
+				if (m_skeleton)
+					return m_skeleton.get();
+				else
+					return nullptr;
+			}
+			void RenderSkinnedComponent::applySkin()
+			{
+				if (m_skeleton) {
+					m_skinInfo->m_dataSize = m_skeleton->boneCount() * sizeof(math::Matrix);
+					m_skinInfo->m_data = m_skeleton->getSkin();
+				}
+				else {
+					m_skinInfo->m_dataSize = 0;
+					m_skinInfo->m_data = NULL;
+				}
 			}
 		}
 	}

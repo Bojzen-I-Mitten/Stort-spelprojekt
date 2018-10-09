@@ -66,11 +66,11 @@ namespace ThomasEngine
 																(thomas::object::component::ForceMode)mode);
 		}
 
-		void SetActivationState(ActivationState state)
+		property ActivationState ActiveState
 		{
-			((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state);
+			ActivationState get() { return (ActivationState)((thomas::object::component::Rigidbody*)nativePtr)->GetActivationState(); };
+			void set(ActivationState state) { ((thomas::object::component::Rigidbody*)nativePtr)->SetActivationState((thomas::object::component::ActivationState)state); }
 		}
-
 
 		property Vector3 LinearVelocity
 		{
@@ -96,16 +96,59 @@ namespace ThomasEngine
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetMass(value); }
 		}
 
-		property Vector3 FrzPos
+		property Vector3 FreezePosition
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezePosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezePosition(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
 		}
 
-		property Vector3 FrzRot
+		property Vector3 FreezRotation
 		{
 			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetFreezeRotation()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetFreezeRotation(ClampVec3(Utility::Convert(value), 0.f, 1.f)); }
+		}
+
+		property Vector3 CenterOfMass
+		{
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetCenterOfmass()); }
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCenterOfmass(Utility::Convert(value)); }
+		}
+
+
+		property Vector2 Damping
+		{
+			Vector2 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetDamping()); }
+			void set(Vector2 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetDamping(Utility::Convert(value)); }
+		}
+
+		property Vector2 SleepingThresholds
+		{
+			Vector2 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetSleepingThresholds()); }
+			void set(Vector2 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetSleepingThresholds(Utility::Convert(value)); }
+		}
+
+		property float DeactivationTime
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetDeactivationTime(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetDeactivationTime(value); }
+		}
+
+		property float ContactProcessingThresholds
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetContactProcessingThreshold(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetContactProcessingThreshold(value); }
+		}
+
+		property float CcdMotionThreshold
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdMotionThreshold(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCcdMotionThreshold(value); }
+		}
+
+		property float CcdSweptSphereRadius
+		{
+			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdSweptSphereRadius(); }
+			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCcdSweptSphereRadius(value); }
 		}
 
 	private:

@@ -8,7 +8,13 @@ namespace ThomasEngine
 {
 	public ref class CapsuleCollider : public Collider
 	{
-	internal:
+	public:
+		enum class ColliderRotation
+		{
+			RotateX,
+			RotateY,
+			RotateZ
+		};
 
 	public:
 		CapsuleCollider() : Collider(new thomas::object::component::CapsuleCollider()) {}
@@ -29,6 +35,12 @@ namespace ThomasEngine
 		{
 			float get() { return ((thomas::object::component::CapsuleCollider*)nativePtr)->GetHeight(); }
 			void set(float value) { ((thomas::object::component::CapsuleCollider*)nativePtr)->SetHeight(value); }
+		}
+
+		property ColliderRotation rotation
+		{
+			ColliderRotation get() { return (ColliderRotation)((thomas::object::component::CapsuleCollider*)nativePtr)->GetRotation(); }
+			void set(ColliderRotation value) { ((thomas::object::component::CapsuleCollider*)nativePtr)->SetRotation((thomas::object::component::ColliderRotation)value); }
 		}
 	};
 }

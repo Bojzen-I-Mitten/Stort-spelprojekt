@@ -13,8 +13,10 @@ namespace thomas
 	{
 		class Material;
 	}
-	namespace object {
-		namespace component {
+	namespace object 
+	{
+		namespace component 
+		{
 			class Camera;
 		}
 	}
@@ -26,10 +28,10 @@ namespace thomas
 		class EditorCamera : public object::GameObject
 		{
 		public:		
-			static void Init();
-			static void Destroy();
-			static void Render();
-			static void Update();
+			void Init();
+			void Destroy();
+			void Render();
+			void Update();
 
 		public:
 			bool HasSelectionChanged();
@@ -43,8 +45,8 @@ namespace thomas
 			void SetManipulatorOperation(ImGuizmo::OPERATION operation);
 
 		public:
-			static EditorCamera* GetEditorCamera();
-			static ImGuizmo::OPERATION GetManipulatorOperation();
+			static EditorCamera* Instance();
+			ImGuizmo::OPERATION GetManipulatorOperation();
 			const std::vector<object::GameObject*>& GetSelectedObjects();
 			object::component::Camera* GetCamera() const;
 
@@ -76,7 +78,7 @@ namespace thomas
 			std::vector<object::GameObject*> m_selectedObjects;
 
 		private:
-			static EditorCamera* m_editorCamera;
+			static EditorCamera m_editorCamera;
 		};
 	}
 }

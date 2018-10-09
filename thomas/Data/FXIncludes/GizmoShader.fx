@@ -11,7 +11,7 @@ cbuffer GizmoBuffer
 
 DepthStencilState EnableDepth
 {
-	DepthEnable = TRUE;
+	DepthEnable = FALSE;
 	DepthWriteMask = ALL;
 	DepthFunc = LESS_EQUAL;
 };

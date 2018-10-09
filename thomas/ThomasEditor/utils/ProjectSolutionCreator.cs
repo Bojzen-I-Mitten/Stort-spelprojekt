@@ -172,11 +172,11 @@ namespace ThomasEditor.utils
                 return true;
             }catch(Exception e)
             {
-                Debug.LogError("Something went wrong building scripts. Try to close project solution.");
+                Debug.Log("Something went wrong building scripts. Try to close project solution. With error:");
+                Debug.Log(e.Message);
                 MainWindow._instance.hideBusyIndicator();
                 return true;
             }
-           
         }
 
         public static void AddScript(string script)
@@ -208,7 +208,8 @@ namespace ThomasEditor.utils
                     projectEval.Save();
                 }catch(Exception e)
                 {
-
+                    Debug.Log("Error in: ThomasEditor::ProjectSolutionCreator::RemoveScript(..). With Error:");
+                    Debug.Log(e.Message);
                 }
                 
             }));

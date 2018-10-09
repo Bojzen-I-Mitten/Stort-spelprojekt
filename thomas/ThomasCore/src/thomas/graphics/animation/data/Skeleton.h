@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
 #include <map>
+#include <memory>
 #include "Bone.h"
 #include "AnimationData.h"
-#include <memory>
+#include "TransformComponents.h"
 
 namespace thomas {
 	namespace graphics {
@@ -16,14 +17,17 @@ namespace thomas {
 				/* Bone structure of the skeleton.
 				*/
 				std::vector<Bone> m_bones;
+				std::vector<TransformComponents> m_components;
 				math::Matrix m_root;
 
 			public:
-				Skeleton(std::vector<Bone> &m_boneInfo, math::Matrix root);
+				Skeleton(std::vector<Bone> &m_boneInfo, std::vector<TransformComponents> &bindPose, math::Matrix root);
 				~Skeleton();
 
 				const std::vector<Bone>& getBones() const;
 				const Bone& getBone(unsigned int i) const;
+
+				const TransformComponents* getBindComponents();
 				/* Access a bone from name. Returns if bone name exists.
 				boneName	<<	Name matched with the bones.
 				boneID		>>	Returned bone index if found.

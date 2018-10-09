@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Material xmlns:i="http://www.w3.org/2001/XMLSchema-instance" z:Id="1" xmlns:z="http://schemas.microsoft.com/2003/10/Serialization/" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
+  <asset_path z:Id="2">%THOMAS_ASSETS%\chad.mat</asset_path>
+  <Shader z:Id="3">
+    <path z:Id="4">%THOMAS_DATA%\FXIncludes\StandardSkinning.fx</path>
+  </Shader>
+  <EditorProperties xmlns:d2p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" z:Id="5" z:Size="5">
+    <d2p1:KeyValueOfstringanyType>
+      <d2p1:Key z:Id="6">color</d2p1:Key>
+      <d2p1:Value z:Id="7" i:type="Color">
+        <a>255</a>
+        <b>255</b>
+        <g>255</g>
+        <r>255</r>
+      </d2p1:Value>
+    </d2p1:KeyValueOfstringanyType>
+    <d2p1:KeyValueOfstringanyType>
+      <d2p1:Key z:Id="8">diffuseTex</d2p1:Key>
+      <d2p1:Value z:Id="9" i:type="SceneResource">
+        <path z:Id="10">White Texture</path>
+      </d2p1:Value>
+    </d2p1:KeyValueOfstringanyType>
+    <d2p1:KeyValueOfstringanyType>
+      <d2p1:Key z:Id="11">normalTex</d2p1:Key>
+      <d2p1:Value z:Id="12" i:type="SceneResource">
+        <path z:Id="13">Normal Texture</path>
+      </d2p1:Value>
+    </d2p1:KeyValueOfstringanyType>
+    <d2p1:KeyValueOfstringanyType>
+      <d2p1:Key z:Id="14">smoothness</d2p1:Key>
+      <d2p1:Value z:Id="15" xmlns:d4p1="http://www.w3.org/2001/XMLSchema" i:type="d4p1:float">16</d2p1:Value>
+    </d2p1:KeyValueOfstringanyType>
+    <d2p1:KeyValueOfstringanyType>
+      <d2p1:Key z:Id="16">specularTex</d2p1:Key>
+      <d2p1:Value z:Id="17" i:type="SceneResource">
+        <path z:Id="18">White Texture</path>
+      </d2p1:Value>
+    </d2p1:KeyValueOfstringanyType>
+  </EditorProperties>
+</Material>

@@ -10,6 +10,11 @@
 
 namespace thomas
 {
+
+	namespace resource {
+		class MemoryAllocation;
+	}
+
 	class ThomasCore
 	{
 	public:	
@@ -19,11 +24,15 @@ namespace thomas
 		static bool Destroy();
 		static void Exit();
 
+		ThomasCore();
 
 	public:
-		static ID3D11Device* GetDevice();
-		static ID3D11DeviceContext* GetDeviceContext();
 		static std::vector<std::string> GetLogOutput();
+
+		static ThomasCore& Core();
+
+
+		resource::MemoryAllocation* Memory();
 
 	public:
 		static void LogOutput(const std::string & message);
@@ -31,17 +40,16 @@ namespace thomas
 
 	private:
 		static bool InitDirectX();
-		static bool CreateDeviceAndContext();
 
 	private:
+		
+		resource::MemoryAllocation* m_memAlloc;
+
 		static bool s_initialized;
 		static std::vector<std::string> s_logOutput;
 		static bool s_clearLog;
 
 	private:
-		static ID3D11Device* s_device;
-		static ID3D11DeviceContext* s_context;
-		static ID3D11Debug* s_debug;
 		static ImGuiContext* s_imGuiContext;
 	};
 }

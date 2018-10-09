@@ -5,13 +5,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Reflection;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 using System.IO;
 
 using ThomasEngine;
+using ThomasEditor;
 using System.Threading;
 using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
+using ThomasEditor.Testing;
+using HierarchyTreeView;
 
 namespace ThomasEditor
 {
@@ -22,7 +26,8 @@ namespace ThomasEditor
 
     public partial class MainWindow : Window
     {
-        
+
+        private Tester tester;
         TimeSpan lastRender;
         public static MainWindow _instance;
 
@@ -46,8 +51,18 @@ namespace ThomasEditor
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
             CompositionTarget.Rendering += DoUpdates;
 
-            if (Properties.Settings.Default.latestProjectPath != "")
+
+            tester = new Tester(this);
+            // Hi there, jag hörde att du gillade fin kod, 
+            // Så jag skrev det här för att pigga upp dig.
+            if (ThomasEditor.App.args.Args.Length > 0)
+            {
+                tester.Parse(ThomasEditor.App.args.Args);
+            }
+            else if (Properties.Settings.Default.latestProjectPath != "")
+            {
                 OpenProject(Properties.Settings.Default.latestProjectPath);
+            }
             else
             {
                 this.IsEnabled = false;
@@ -61,6 +76,9 @@ namespace ThomasEditor
 
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+
+
+
         }
 
         private void ThomasWrapper_OnStopPlaying()
@@ -204,6 +222,8 @@ namespace ThomasEditor
             if(this.lastRender != args.RenderingTime)
             {
                 ThomasWrapper.Update();
+                tester.Update();
+                editorWindow.Title = ThomasWrapper.FrameRate.ToString();
                 lastRender = args.RenderingTime;
                 transformGizmo.UpdateTransformGizmo();
              }
@@ -444,19 +464,7 @@ namespace ThomasEditor
         private void MW_CopyObject(object sender, RoutedEventArgs e)
         {
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            TreeViewItem item = hierarchy.GetSelection();
-
-            if (item != null)
-            {
-                Debug.Log("Copying object..");
-                hierarchy.SetCopy((GameObject)item.DataContext);
-
-                if (hierarchy.GetCopy())
-                {
-                    Debug.Log("GameObject successfully copied.");
-                }
-                return;
-            }
+            hierarchy.MenuItem_CopyGameObject(sender, e);
         }
 
         //Main window CTRL + V
@@ -464,15 +472,7 @@ namespace ThomasEditor
         {
             Debug.Log("Pasting object..");
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-
-            if (hierarchy.GetCopy())
-            {
-                GameObject.Instantiate(hierarchy.GetCopy());
-
-                Debug.Log("Pasted object.");
-
-                return;
-            }
+            hierarchy.MenuItem_PasteGameObject(sender, e);
         }
 
         private void MW_DuplicateObject(object sender, RoutedEventArgs e)
@@ -485,24 +485,14 @@ namespace ThomasEditor
         private void MW_CopyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            TreeViewItem item = hierarchy.GetSelection();
-
-            if (item != null)
-            {
-                e.CanExecute = true;
-                return;
-            }
+            hierarchy.CopyObject_CanExecute(sender, e);
         }
 
         //Can only paste when an object has been copied
         private void MW_PasteObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             GameObjectHierarchy hierarchy = GameObjectHierarchy.instance;
-            if (hierarchy.GetCopy())
-            {
-                e.CanExecute = true;
-                return;
-            }
+            hierarchy.PasteObject_CanExecute(sender, e);
         }
 
         #endregion
@@ -626,6 +616,11 @@ namespace ThomasEditor
         private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
         {
             ThomasWrapper.ToggleEditorRendering();
+        }
+
+        private void MenuItem_TogglePhysicsDebug(object sender, RoutedEventArgs e)
+        {
+            ThomasWrapper.TogglePhysicsDebug();
         }
     }
 

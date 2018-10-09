@@ -15,7 +15,7 @@ namespace thomas
 			
 		public:
 			std::vector<component::Component*> m_components;
-			component::Transform* m_transform;
+			component::Transform* m_transform = nullptr;
 			bool m_activeSelf;
 
 			GameObject(std::string type);
