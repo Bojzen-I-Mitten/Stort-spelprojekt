@@ -46,8 +46,9 @@ namespace ThomasEngine {
 	{
 		Monitor::Enter(m_componentsLock);
 		bool completed = true;
-		for each(Component^ component in m_components)
+		for(int i=0; i < m_components.Count; i++)
 		{
+			Component^ component = m_components[i];
 			Type^ typ = component->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
 			if ((playing || executeInEditor) && !component->initialized) {
@@ -190,7 +191,7 @@ namespace ThomasEngine {
 		else
 		{
 			try {
-				Newtonsoft::Json::Linq::JObject^ serialized = Serializer::SerializeGameObject(original);
+				Newtonsoft::Json::Linq::JArray^ serialized = Serializer::SerializeGameObject(original);
 				clone = Serializer::DeserializeGameObject(serialized);
 			}
 			catch (Exception^ e)

@@ -42,7 +42,7 @@ namespace ThomasEngine.Network
         [Browsable(false)]
         public bool isOwner
         {
-            get { return Identity.Owner; } 
+            get { return Identity ? Identity.Owner : false; } 
         }
 
         virtual public void OnRead(NetPacketReader reader, bool initialState)
