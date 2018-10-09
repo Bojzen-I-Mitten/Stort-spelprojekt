@@ -46,7 +46,7 @@ namespace ThomasStandalone
         }
 
 
-        private WndProc delegWndProc = myWndProc;
+        private static WndProc delegWndProc = myWndProc;
 
         [DllImport("user32.dll")]
         static extern bool UpdateWindow(IntPtr hWnd);

@@ -84,7 +84,7 @@ namespace thomas
 
 			private:
 				void UpdateRigidbodyMass();
-
+				void UpdateProperties();
 			private:
 				Collider * m_collider = nullptr;
 				math::Vector3 m_freezePosition;
@@ -96,6 +96,7 @@ namespace thomas
 				math::Vector3 m_LocalCenterOfMassChange;
 				float m_mass;
 				bool m_kinematic;
+				bool m_dirty;
 			};
 		}
 	}
