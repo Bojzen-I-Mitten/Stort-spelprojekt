@@ -20,9 +20,14 @@ namespace thomas {
 
 		private:
 
+			/* Allocated system memory.
+			*/
 			uint8_t * m_allocation;
-
+			/* Constant memory (ish, not determined use case).
+			*/
 			utility::allocator::LinearAllocator m_constant_memory;
+			/* Thread stack allocations
+			*/
 			utility::allocator::StackAllocator m_stack_allocation[NUM_THREAD];
 		};
 	}
