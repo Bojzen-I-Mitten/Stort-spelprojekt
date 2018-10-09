@@ -14,7 +14,6 @@ namespace thomas
 	}
 	namespace graphics
 	{
-		class ParticleSystem;
 		class LightManager
 		{
 		public:
@@ -61,8 +60,6 @@ namespace thomas
 			static void Update();
 
 			static void Bind();
-			static void DANK();
-			static void DANK2();
 		private:
 
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);
@@ -72,8 +69,6 @@ namespace thomas
 			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
 
 			static LightCountsStruct s_lightCounts;
-
-			static ParticleSystem test;
 		};
 	}
 }

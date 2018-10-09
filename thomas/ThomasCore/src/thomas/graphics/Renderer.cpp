@@ -109,7 +109,8 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
-			thomas::graphics::LightManager::DANK();
+
+			//m_particleSystem->UpdateParticleSystem();
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -125,7 +126,7 @@ namespace thomas
 					}
 				}
 
-				thomas::graphics::LightManager::DANK2();
+				//m_particleSystem->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 			//Take care of the editor camera and render gizmos

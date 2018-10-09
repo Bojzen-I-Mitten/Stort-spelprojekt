@@ -47,6 +47,6 @@ namespace ThomasEngine
 	bool ParticleEmitter::SpawnAtEdge::get() { return particleEmitter->IsSpawningAtSphereEdge(); }
 	void ParticleEmitter::SpawnAtEdge::set(bool value) { particleEmitter->SpawnAtSphereEdge(value); }
 
-	float ParticleEmitter::EmissionRate::get() { return particleEmitter->GetEmissionRate(); }
-	void ParticleEmitter::EmissionRate::set(float value) { particleEmitter->SetEmissionRate(value); }
+	unsigned ParticleEmitter::EmissionRate::get() { return particleEmitter->GetEmissionRate(); }
+	void ParticleEmitter::EmissionRate::set(unsigned value) { particleEmitter->SetEmissionRate(value); }
 }

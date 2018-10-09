@@ -22,34 +22,7 @@ namespace thomas
 				m_looping = false;
 				m_isEmitting = false;
 
-				m_particleBufferStruct = {};
-				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
-				m_particleBufferStruct.spread = 0.0f;
-
-				//m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), math::Vector3(1, 0, 0), math::Vector3::Up).Transpose();
-				
-				m_particleBufferStruct.radius = 0;
-				m_particleBufferStruct.maxSpeed = 0.0f;
-				m_particleBufferStruct.minSpeed = 0.0f;
-				m_particleBufferStruct.endSpeed = 0.0f;
-
-				m_particleBufferStruct.maxSize = 1.0f;
-				m_particleBufferStruct.minSize = 1.0f;
-				m_particleBufferStruct.endSize = 1.0f;
-				m_particleBufferStruct.gravity = 0.0f;
-
-				m_particleBufferStruct.maxLifeTime = 1.0f;
-				m_particleBufferStruct.minLifeTime = 1.0f;
-				m_particleBufferStruct.minRotationSpeed = 0.0f;
-				m_particleBufferStruct.maxRotationSpeed = 0.0f;
-
-				XMStoreFloat3x3(&m_particleBufferStruct.directionMatrix, DirectX::XMMatrixLookAtRH(math::Vector3(0, 2, 0), math::Vector3(1.0f, 2.0f, 0.0f), math::Vector3::Up));
-				m_particleBufferStruct.endRotationSpeed = 0.0f;
-
-				m_particleBufferStruct.nrOfParticlesToEmit = 0;
-				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
-				m_particleBufferStruct.rand = std::rand();
-				
+				m_particleBufferStruct = m_particleSystem->AddEmitterToSystem();
 				
 			}
 
@@ -58,8 +31,30 @@ namespace thomas
 				
 			}
 
+			void ParticleEmitterComponent::SetParticleSystem(std::shared_ptr<graphics::ParticleSystem> particleSystem)
+			{
+				m_particleSystem = particleSystem;
+			}
+
+			unsigned ParticleEmitterComponent::NrOfParticlesToEmitThisFrame()
+			{
+				return m_emissionRate * ThomasTime::GetDeltaTime();
+			}
+
 			void ParticleEmitterComponent::Update()
 			{
+				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
+
+				unsigned nrOfParticlesToEmit = NrOfParticlesToEmitThisFrame();
+				if (m_isEmitting)
+				{
+					if (nrOfParticlesToEmit > 0)
+					{
+						m_particleBufferStruct.nrOfParticlesToEmit = nrOfParticlesToEmit;
+						//m_particleSystem->AddEmitterToSpawn(this);
+					}
+				
+				}
 				
 			}
 
@@ -234,17 +229,20 @@ namespace thomas
 
 			bool ParticleEmitterComponent::IsSpawningAtSphereEdge() const
 			{
-				return false;
+				return m_particleBufferStruct.spawnAtSphereEdge;
 			}
 
 
 			void ParticleEmitterComponent::StartEmitting()
 			{
+				m_isEmitting = true;
 			}
 
-			void ParticleEmitterComponent::StopEmitting(bool force)
+			void ParticleEmitterComponent::StopEmitting()
 			{
+				m_isEmitting = false;
 			}
+
 
 			bool ParticleEmitterComponent::IsEmitting() const
 			{
@@ -257,19 +255,19 @@ namespace thomas
 				m_material = material;
 			}
 
-			resource::Material * ParticleEmitterComponent::GetMaterial()
+			resource::Material * ParticleEmitterComponent::GetMaterial() const
 			{
 				return m_material;
 			}
 
 
-			void ParticleEmitterComponent::SetEmissionRate(float const& other)
+			void ParticleEmitterComponent::SetEmissionRate(unsigned const& other)
 			{
 				m_emissionRate = other;
 			}
 
 
-			float ParticleEmitterComponent::GetEmissionRate() const
+			unsigned ParticleEmitterComponent::GetEmissionRate() const
 			{
 				return m_emissionRate;
 			}

@@ -7,13 +7,7 @@
 
 namespace thomas
 {
-	namespace object
-	{
-		namespace component
-		{
-			class ParticleEmitterComponent;
-		}
-	}
+	
 	namespace resource
 	{
 		class ComputeShader;
@@ -23,6 +17,40 @@ namespace thomas
 	{
 		class ParticleSystem
 		{
+		public:
+			struct InitParticleBufferStruct
+			{
+				math::Vector3 position;
+				float spread;
+
+				float radius;
+				float maxSpeed;
+				float minSpeed;
+				float endSpeed;
+
+				float maxSize;
+				float minSize;
+				float endSize;
+				float maxLifeTime;
+
+				float minLifeTime;
+				float gravity;
+				float minRotationSpeed;
+				float maxRotationSpeed;
+
+				DirectX::XMFLOAT3X3 directionMatrix;
+				float endRotationSpeed;
+				float pad;
+				float pad2;
+
+				unsigned nrOfParticlesToEmit;
+				unsigned spawnAtSphereEdge;
+				unsigned rand;
+				unsigned isEmitting;
+
+			};
+
+
 		private:
 			struct BillboardStruct
 			{
@@ -50,19 +78,20 @@ namespace thomas
 				float pad;
 			};
 
+			
 
+			void SpawnParticles();
 		public:
 			ParticleSystem();
 			~ParticleSystem();
 
 			void Initialize(unsigned maxNrOfParticles);
 			void Destroy();
-
-			bool AddEmitterToSpawn(object::component::ParticleEmitterComponent* emitter);
-			bool AddEmitterToUpdate(object::component::ParticleEmitterComponent* emitter);
-
-			void SpawnParticles();
-			void UpdateParticles();
+			
+			InitParticleBufferStruct& AddEmitterToSystem();
+			void PopEmitterFromSystem();
+			
+			void UpdateParticleSystem();
 			void DrawParticles();
 
 		private:
@@ -84,9 +113,7 @@ namespace thomas
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferBillboard;
 			bool m_pingpong;
 
-			std::vector<object::component::ParticleEmitterComponent*> m_spawningEmitters;
-			std::vector<unsigned> m_spawningEmitterEmissionRate;
-			std::vector<object::component::ParticleEmitterComponent*> m_updateEmitters; 
+			std::vector<InitParticleBufferStruct> m_emitters;
 			
 			resource::Shader* m_particleShader;
 

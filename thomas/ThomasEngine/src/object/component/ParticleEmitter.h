@@ -71,9 +71,9 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
-		property float EmissionRate {
-			float get();
-			void set(float value);
+		property unsigned EmissionRate {
+			unsigned get();
+			void set(unsigned value);
 		}
 		
 	};

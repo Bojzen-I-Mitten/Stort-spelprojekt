@@ -2,12 +2,14 @@
 #include "Component.h"
 #include "..\..\utils\math.h"
 #include <d3d11.h>
+#include "../../graphics/ParticleSystem.h"
 
 namespace thomas
 {
 	namespace resource {
 		class Material;
 	}
+	
 	namespace object
 	{
 		namespace component
@@ -20,48 +22,17 @@ namespace thomas
 					ALPHA_BLEND
 				};
 
-				struct InitParticleBufferStruct
-				{
-					math::Vector3 position;
-					float spread;
-
-					float radius;
-					float maxSpeed;
-					float minSpeed;
-					float endSpeed;
-
-					float maxSize;
-					float minSize;
-					float endSize;
-					float maxLifeTime;
-
-					float minLifeTime;
-					float gravity;
-					float minRotationSpeed;
-					float maxRotationSpeed;
-
-					DirectX::XMFLOAT3X3 directionMatrix;
-					float endRotationSpeed;
-					float pad2;
-					float pad3;
-
-					unsigned nrOfParticlesToEmit;
-					unsigned spawnAtSphereEdge;
-					unsigned rand;
-					unsigned pad4;
-
-				};
-
-				
 				
 			private:
-				
+				unsigned NrOfParticlesToEmitThisFrame();
 			public:
 				void Update();
 				void OnEnable();
 				void OnDisable();
 				ParticleEmitterComponent();
 				~ParticleEmitterComponent();
+
+				void SetParticleSystem(std::shared_ptr<graphics::ParticleSystem> particleSystem);
 
 
 				void SetSpread(float const& other);
@@ -108,29 +79,30 @@ namespace thomas
 				
 
 				void StartEmitting();
-				void StopEmitting(bool force=false);
+				void StopEmitting();
 				bool IsEmitting() const;
 				
 				void SetMaterial(resource::Material* material);
-				resource::Material* GetMaterial();
+				resource::Material* GetMaterial() const;
 	
-				void SetEmissionRate(float const& other);
-				float GetEmissionRate() const;
+				void SetEmissionRate(unsigned const& other);
+				unsigned GetEmissionRate() const;
 
 
 				//void ExportEmitter(std::string path);
 				//void ImportEmitter(std::string path);
-
+				
 			private:
-
 				resource::Material* m_material;
+				std::shared_ptr<graphics::ParticleSystem> m_particleSystem;
 
-				InitParticleBufferStruct m_particleBufferStruct;
+				graphics::ParticleSystem::InitParticleBufferStruct m_particleBufferStruct;
 
 				bool m_isEmitting;
+
 				bool m_looping;
 
-				float m_emissionRate;
+				unsigned m_emissionRate; //Particles per second
 
 				
 			};

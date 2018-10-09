@@ -4,7 +4,6 @@
 #include "..\object\Object.h"
 #include "..\object\component\LightComponent.h"
 #include "../AutoProfile.h"
-#include "ParticleSystem.h"
 
 #include <algorithm>
 namespace thomas
@@ -16,7 +15,7 @@ namespace thomas
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
-		ParticleSystem LightManager::test;
+		
 
 		void LightManager::Initialize()
 		{
@@ -27,13 +26,11 @@ namespace thomas
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
 
-			test.Initialize(10000);
 		}
 		
 		void LightManager::Destroy()
 		{
 			SAFE_RELEASE(s_lightBuffer);
-			test.Destroy();
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
@@ -56,7 +53,6 @@ namespace thomas
 			}
 			s_lights.push_back(light);
 			std::sort(s_lights.begin(), s_lights.end(), SortLights);
-			int stoppper = 0;
 		}
 		
 		bool LightManager::RemoveLight(object::component::LightComponent * light)//returns true if light was removed
@@ -114,30 +110,7 @@ namespace thomas
 			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
 			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
-		int asdfasdf = 0;
-		void LightManager::DANK()
-		{
-			asdfasdf++;
-			//if (asdfasdf == 1000)
-				//test.SpawnParticles();
-			if (asdfasdf == 2500)
-				test.SpawnParticles();
-			if (asdfasdf == 3500)
-				test.SpawnParticles();
-
-
-			if (asdfasdf > 1010)
-				test.UpdateParticles();
-			//test.DrawParticles();
-		}
-
-		void LightManager::DANK2()
-		{
-
-			//test.SpawnParticles();
-			if (asdfasdf > 1010)
-			test.DrawParticles();
-		}
+		
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{
 			if (light1->GetType() == light2->GetType())
