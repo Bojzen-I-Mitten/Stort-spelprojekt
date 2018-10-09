@@ -56,7 +56,7 @@ namespace ThomasEngine
 		{
 			for each(System::Reflection::PropertyInfo^ prop in value->GetType()->GetProperties())
 			{
-				if (prop->CanRead)
+				if (prop->CanRead && prop->CanWrite && prop->SetMethod)
 				{
 					Object^ propVal = prop->GetValue(value, nullptr);
 					if (propVal != nullptr)
@@ -96,5 +96,43 @@ namespace ThomasEngine
 	}
 
 
+
+	System::Object ^ ComponentConverter::ReadJson(Newtonsoft::Json::JsonReader ^ reader, System::Type ^ objectType, System::Object ^ existingValue, Newtonsoft::Json::JsonSerializer ^ serializer)
+	{
+
+		JObject^ jo = JObject::Load(reader);
+		Type^ correctType = objectType;
+	
+		if (jo->ContainsKey("$ref"))
+		{
+			System::Object^ o = serializer->ReferenceResolver->ResolveReference(serializer, jo->Value<String^>("$ref"));
+			return o;
+		}
+		if (jo->ContainsKey("$type")) {
+			String^ typeName = jo->Value<String^>("$type")->Split(',')[0];
+
+			for each(Type^ type in Component::GetAllComponentTypes())
+			{
+				if (typeName == type->FullName)
+				{
+					correctType = type;
+				}
+			}
+		}
+
+		existingValue = existingValue ? existingValue : serializer->ContractResolver->ResolveContract(correctType)->DefaultCreator();
+		serializer->Populate(jo->CreateReader(), existingValue);
+		return existingValue;
+	}
+
+	bool ComponentConverter::CanConvert(System::Type ^ objectType)
+	{
+		return ThomasEngine::Component::typeid->IsAssignableFrom(objectType);
+	}
+
+	void ComponentConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
+	{
+		throw gcnew System::NotImplementedException();
+	}
 
 }

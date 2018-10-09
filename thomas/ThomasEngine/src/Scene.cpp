@@ -57,6 +57,11 @@ namespace ThomasEngine
 	void Scene::SaveSceneAs(Scene ^ scene, System::String ^ path)
 	{
 		Serializer::SerializeScene(scene, path);
+
+		if (Application::currentProject && scene->RelativeSavePath != path && savingEnabled) {
+			scene->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
+			Application::currentProject->currentScenePath = scene->RelativeSavePath;
+		}
 			
 	}
 
