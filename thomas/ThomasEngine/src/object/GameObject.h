@@ -108,6 +108,12 @@ namespace ThomasEngine
 			{
 				return %m_components;
 			}
+			void set(ObservableCollection<Component^>^ value)
+			{
+				m_components.Clear();
+				for each(Component^ c in value)
+					m_components.Add(c);
+			}
 		}
 
 		generic<typename T>
