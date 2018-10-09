@@ -84,6 +84,7 @@ namespace ThomasEditor
 
         public override void Update()
         {
+            //Debug.Log("test");
             if (!isOwner)
                 return;
             ////Jumping

@@ -16,7 +16,7 @@ namespace ThomasEditor
         TURNING = 3,    // turning has to call different functions depending on if previous state was idle or walking/running
         THROWING = 4,   // player throws ball / power-up, not all power-ups activate this state
         RAGDOLL = 5,    // user got tackled / hit by a power-up
-        JUMPING = 6,
+        JUMPING = 6,    // user pressed Space to jump tackle
     };
 
     public class ChadStateMachine : ScriptComponent
@@ -41,7 +41,9 @@ namespace ThomasEditor
             {
                 case State.IDLE:
                     // stop all animations
-                    // check if W or SPACE or LMB is pressed or collision check
+                    // stop all actions
+                    //Debug.Log("State: " + m_state);
+
                     if (Input.GetMouseButton(Input.MouseButtons.LEFT))
                     {
                         Debug.Log("Changed state to THROWING");
