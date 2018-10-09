@@ -12,6 +12,7 @@ namespace thomas
 		{
 			s_globalSystem = std::make_shared<ParticleSystem>();
 			s_globalSystem->Initialize(65536);
+			std::srand(time(NULL));
 		}
 		std::shared_ptr<ParticleSystem> ParticleSystem::GetGlobalSystem()
 		{
@@ -108,17 +109,17 @@ namespace thomas
 
 			InitParticleBufferStruct testInitData = {};
 			testInitData.nrOfParticlesToEmit = 5;
-			std::srand(time(NULL));
+			
 			testInitData.rand = std::rand();
 
 			testInitData.spawnAtSphereEdge = (unsigned)false;
 			testInitData.endSize = 1.5f;
 			testInitData.endSpeed = 10.0f;
 			testInitData.gravity = 0.0f;
-			testInitData.maxLifeTime = 10.0f;
+			testInitData.maxLifeTime = 8.0f;
 			testInitData.maxSize = 1.0f;
 			testInitData.maxSpeed = 1.4f;
-			testInitData.minLifeTime = 5.0f;
+			testInitData.minLifeTime = 2.0f;
 			testInitData.minSize = 0.1f;
 			testInitData.minSpeed = 0.5f;
 			testInitData.radius = 10.0f;
@@ -143,7 +144,7 @@ namespace thomas
 			if (m_emitters.size() > 1)
 				int stopper = 0;*/
 asdf++;
-			if (asdf != 3000 && asdf != 3400 && asdf != 3401)
+			if (asdf != 3000 && asdf != 3400 && asdf != 3402)
 				return;
 			
 			m_bufferSpawn->SetData(dataVec);
@@ -172,7 +173,14 @@ asdf++;
 			resource::ComputeShader::UnbindAllUAVs();
 			resource::ComputeShader::UnbindOneSRV(0);
 
-															//UPDATE EMITCOUNT
+			
+		}
+
+		void ParticleSystem::UpdateParticleSystem()
+		{
+			
+			SpawnParticles();
+			//UPDATE EMITCOUNT
 			if (m_pingpong)
 			{
 				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
@@ -193,14 +201,8 @@ asdf++;
 
 			resource::ComputeShader::UnbindOneUAV(0);
 			resource::ComputeShader::UnbindOneSRV(0);
-				
-			m_emitters.clear();
-		}
 
-		void ParticleSystem::UpdateParticleSystem()
-		{
-			
-			SpawnParticles();
+			m_emitters.clear();
 
 			m_pingpong = !m_pingpong;
 
@@ -228,7 +230,7 @@ asdf++;
 			resource::ComputeShader::UnbindAllUAVs();
 
 			//UPDATE EMIT COUNT BEFORE DRAW
-			if (m_pingpong)
+			/*if (m_pingpong)
 			{
 				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 12, m_bufferAliveListPong->GetUAV());
@@ -250,7 +252,7 @@ asdf++;
 			m_calculateEmitCountCS->Dispatch(1);
 
 			resource::ComputeShader::UnbindOneUAV(0);
-			resource::ComputeShader::UnbindOneSRV(0);
+			resource::ComputeShader::UnbindOneSRV(0);*/
 
 		}
 
