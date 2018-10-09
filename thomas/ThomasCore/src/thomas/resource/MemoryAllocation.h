@@ -15,7 +15,8 @@ namespace thomas {
 			MemoryAllocation();
 			~MemoryAllocation();
 
-			/* Fetch a stack by index. */
+			/* Fetch a stack by index. 
+			*/
 			utility::allocator::StackAllocator& stack(uint32_t index);
 
 		private:

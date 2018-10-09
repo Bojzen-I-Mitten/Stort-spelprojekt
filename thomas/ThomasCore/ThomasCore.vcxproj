@@ -25,6 +25,7 @@
     <ClCompile Include="src\thomas\EditorWindow.cpp" />
     <ClCompile Include="src\thomas\AutoProfile.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneConstraint.h" />
+    <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\LookAtConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\TransformComponents.h" />
     <ClInclude Include="src\thomas\graphics\animation\Playback.h" />
@@ -140,6 +142,7 @@
     <ClInclude Include="src\thomas\graphics\animation\data\KeyFrame.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
     <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
+    <ClInclude Include="src\thomas\graphics\animation\playback\BinaryBlendNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
