@@ -7,7 +7,6 @@ namespace thomas
 	{
 		namespace component
 		{
-
 			Joint::Joint()
 			{
 				m_frameA.setOrigin(btVector3(0, 0, 0));
@@ -24,12 +23,11 @@ namespace thomas
 				m_collision = false;
 				m_damping = 0;
 			}
-
 			Joint::~Joint()
 			{
 
 			}
-
+			#pragma region  SetFunctions
 			void Joint::SetConnectedBody(Rigidbody * target)
 			{
 				m_connectedBody = target;
@@ -90,7 +88,8 @@ namespace thomas
 				m_damping = value;
 				UpdateDamping();
 			}
-
+#pragma endregion
+			#pragma region GetFunctions
 			Rigidbody * Joint::GetConnectedBody()
 			{
 				return m_connectedBody;
@@ -140,7 +139,7 @@ namespace thomas
 			{
 				return m_damping;
 			}
-
+#pragma endregion
 			btConeTwistConstraint * Joint::CreateConstraints()
 			{
 				btRigidBody* rbA = m_gameObject->GetComponent<Rigidbody>();
@@ -149,7 +148,7 @@ namespace thomas
 				m_coneTwistConstraint = new btConeTwistConstraint(*rbA, *rbB, m_frameA, m_frameB);
 				return m_coneTwistConstraint;
 			}
-
+			#pragma region UpdateFunctions
 			void Joint::UpdateLimits()
 			{
 				if (m_coneTwistConstraint) 
@@ -193,7 +192,7 @@ namespace thomas
 				
 				
 			}
-
+			#pragma endregion
 			void Joint::Awake()
 			{
 				if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
@@ -203,7 +202,6 @@ namespace thomas
 					UpdateLimitsFramesDamping();
 				}
 			}
-
 			void Joint::OnDisable()
 			{
 				if (m_coneTwistConstraint != nullptr)
@@ -213,8 +211,6 @@ namespace thomas
 					m_coneTwistConstraint = nullptr;
 				}
 			}
-
-			
 		}
 	}
 }
