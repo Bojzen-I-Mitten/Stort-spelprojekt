@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
+using System;
 using ThomasEngine.Network;
 
 namespace ThomasEditor
@@ -21,7 +22,20 @@ namespace ThomasEditor
        
         public int speed { get; set; } = 5;
         public float force { get; set; } = 5;
-        public float cameraSensitivity { get; set; } = 1;
+        public float cameraSensitivity_x { get; set; } = 1;
+        public float cameraSensitivity_y { get; set; } = 2.0f;
+        //The turn ratio that is used for the calculations
+        public float maxTurnRatio { get; set; } = 1;
+
+        #region Turn Ratios
+        //A turn ratio for each (most?) of the states, which maxTurnRatio is set to as Chad enters a state
+        public float maxTurnRatioRunning { get; set; } = 0.05f;
+        public float maxTurnRatioIdle { get; set; } = 0.5f;
+        public float maxTurnRatioWalking { get; set; } = 0.5f;
+        public float maxTurnRatioThrowing { get; set; } = 1;
+        public float maxTurnRatioTackling { get; set; } = 0.01f;
+        #endregion
+
         public float cameraDistance { get; set; } = 2;
 
         private float throwForce;
@@ -48,11 +62,11 @@ namespace ThomasEditor
         {
             rBody = gameObject.GetComponent<Rigidbody>();
             //test = camPrefab.GetComponent<Camera>();
-            if (/*!isOwner && */camera)
-            {
-                camera.enabled = false;
-                initalCameraPos = camera.transform.localPosition;
-            }
+            //if (!isOwner && camera)
+            //{
+            //    camera.enabled = false;
+            //    initalCameraPos = camera.transform.localPosition;
+            //}
                 
 
             if (!camera)
@@ -60,7 +74,7 @@ namespace ThomasEditor
 
             //rBody.IsKinematic = !isOwner;
             throwForce = baseThrowForce;
-            ball = Object.GetObjectsOfType<Ball>().FirstOrDefault();
+            ball = GetObjectsOfType<Ball>().FirstOrDefault();
         }
 
         //Coroutine for jumping delay, also used for tackling delay
@@ -108,8 +122,8 @@ namespace ThomasEditor
         public void HandleMovement()
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-            float xStep = Input.GetMouseX() * Time.ActualDeltaTime * cameraSensitivity;
-            float yStep = Input.GetMouseY() * Time.ActualDeltaTime * cameraSensitivity * 20.0f;
+            float xStep = Input.GetMouseX() * Time.ActualDeltaTime * cameraSensitivity_x;
+            float yStep = Input.GetMouseY() * Time.ActualDeltaTime * cameraSensitivity_y;
 
             Quaternion rot = Quaternion.CreateFromAxisAngle(transform.right, -yStep);
             rot *= Quaternion.CreateFromAxisAngle(transform.up, -xStep);
@@ -123,6 +137,10 @@ namespace ThomasEditor
                 camera.transform.position = Vector3.Transform(new Vector3(0.0f, 1.7f, cameraDistance), camera.transform.localRotation)
                     + transform.position;
             }
+
+            float xStepSign = Math.Sign(xStep);
+            xStep = Math.Min(Math.Abs(xStep), maxTurnRatio);
+            xStep *= xStepSign;
 
             transform.RotateByAxis(transform.up, -xStep);
 
