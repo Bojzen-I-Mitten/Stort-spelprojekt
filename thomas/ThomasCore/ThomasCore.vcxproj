@@ -20,6 +20,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\ImGuizmo.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.cpp" />
     <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\EditorWindow.cpp" />
@@ -40,11 +45,6 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\BaseAnimationTime.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\BarycentricBlendNode.cpp" />
-    <ClCompile Include="include\imgui\imgui.cpp" />
-    <ClCompile Include="include\imgui\ImGuizmo.cpp" />
-    <ClCompile Include="include\imgui\imgui_demo.cpp" />
-    <ClCompile Include="include\imgui\imgui_draw.cpp" />
-    <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\AnimationData.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\BoneFrame.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\Channel.cpp" />
@@ -105,6 +105,18 @@
     <ClCompile Include="src\thomas\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\imgui\imconfig.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
+    <ClInclude Include="include\imgui\ImGuizmo.h" />
+    <ClInclude Include="include\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="include\imgui\imgui_internal.h" />
+    <ClInclude Include="include\imgui\stb_rect_pack.h" />
+    <ClInclude Include="include\imgui\stb_textedit.h" />
+    <ClInclude Include="include\imgui\stb_truetype.h" />
+    <ClInclude Include="include\nuklear\nuklear.h" />
+    <ClInclude Include="include\nuklear\nuklear_d3d11.h" />
+    <ClInclude Include="include\nuklear\nuklear_d3d11_pixel_shader.h" />
+    <ClInclude Include="include\nuklear\nuklear_d3d11_vertex_shader.h" />
     <ClInclude Include="src\thomas\Constants.h" />
     <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\EditorWindow.h" />
@@ -114,14 +126,6 @@
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
     <ClInclude Include="src\thomas\graphics\animation\BarycentricBlendNode.h" />
-    <ClInclude Include="include\imgui\imconfig.h" />
-    <ClInclude Include="include\imgui\imgui.h" />
-    <ClInclude Include="include\imgui\ImGuizmo.h" />
-    <ClInclude Include="include\imgui\imgui_impl_dx11.h" />
-    <ClInclude Include="include\imgui\imgui_internal.h" />
-    <ClInclude Include="include\imgui\stb_rect_pack.h" />
-    <ClInclude Include="include\imgui\stb_textedit.h" />
-    <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\LookAtConstraint.h" />
