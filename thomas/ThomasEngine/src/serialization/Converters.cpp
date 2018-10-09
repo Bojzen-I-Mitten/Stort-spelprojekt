@@ -99,18 +99,27 @@ namespace ThomasEngine
 
 	System::Object ^ ComponentConverter::ReadJson(Newtonsoft::Json::JsonReader ^ reader, System::Type ^ objectType, System::Object ^ existingValue, Newtonsoft::Json::JsonSerializer ^ serializer)
 	{
+
 		JObject^ jo = JObject::Load(reader);
-		String^ typeName = jo->Value<String^>("$type")->Split(',')[0];
-		Type^ correctType = nullptr;
-		for each(Type^ type in Component::GetAllComponentTypes())
+		Type^ correctType = objectType;
+	
+		if (jo->ContainsKey("$ref"))
 		{
-			if (typeName == type->FullName)
+			System::Object^ o = serializer->ReferenceResolver->ResolveReference(serializer, jo->Value<String^>("$ref"));
+			return o;
+		}
+		if (jo->ContainsKey("$type")) {
+			String^ typeName = jo->Value<String^>("$type")->Split(',')[0];
+
+			for each(Type^ type in Component::GetAllComponentTypes())
 			{
-				correctType = type;
+				if (typeName == type->FullName)
+				{
+					correctType = type;
+				}
 			}
 		}
-		
-		
+
 		existingValue = existingValue ? existingValue : serializer->ContractResolver->ResolveContract(correctType)->DefaultCreator();
 		serializer->Populate(jo->CreateReader(), existingValue);
 		return existingValue;
