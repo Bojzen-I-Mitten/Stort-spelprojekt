@@ -82,12 +82,16 @@ namespace thomas
 			return;
 
 		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
-
-		for (object::component::Rigidbody* rb : s_rigidBodies)
+		try
 		{
-			rb->UpdateRigidbodyToTransform();
+			for (object::component::Rigidbody* rb : s_rigidBodies)
+			{
+				rb->UpdateRigidbodyToTransform();
+			}
 		}
-
+		catch (int e)
+		{
+		}
 		s_timeSinceLastPhysicsStep = 0.f;
 	}
 

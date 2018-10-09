@@ -52,6 +52,10 @@ namespace thomas
 			private:
 				btConeTwistConstraint* CreateConstraints();
 				void UpdateLimits();
+				void UpdateFrames();
+				void UpdateDamping();
+				void UpdateLimitsFramesDamping();
+
 			private:
 				btConeTwistConstraint* m_coneTwistConstraint = nullptr;
 				Rigidbody* m_connectedBody;

@@ -38,25 +38,25 @@ namespace thomas
 			void Joint::SetFrameAAnchor(math::Vector3 value)
 			{
 				m_frameA.setOrigin(Physics::ToBullet(value));
-				UpdateLimits();
+				UpdateFrames();
 			}
 
 			void Joint::SetFrameAAxis(math::Vector3 value)
 			{
 				m_frameAAxis = value;
-				UpdateLimits();
+				UpdateFrames();
 			}
 
 			void Joint::SetFrameBAnchor(math::Vector3 value)
 			{
 				m_frameB.setOrigin(Physics::ToBullet(value));
-				UpdateLimits();
+				UpdateFrames();
 			}
 
 			void Joint::SetFrameBAxis(math::Vector3 value)
 			{
 				m_frameBAxis = value;
-				UpdateLimits();
+				UpdateFrames();
 			}
 
 			void Joint::SetSwing1(float value)
@@ -82,13 +82,13 @@ namespace thomas
 			void Joint::SetCollision(bool value)
 			{
 				m_collision = value;
-				UpdateLimits();
+				
 			}
 
 			void Joint::SetDamping(float value)
 			{
 				m_damping = value;
-				UpdateLimits();
+				UpdateDamping();
 			}
 
 			Rigidbody * Joint::GetConnectedBody()
@@ -152,8 +152,16 @@ namespace thomas
 
 			void Joint::UpdateLimits()
 			{
-				if (m_coneTwistConstraint) {
-					
+				if (m_coneTwistConstraint) 
+				{
+					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_swing2), math::DegreesToRadians(m_twist));
+				}
+			}
+
+			void Joint::UpdateFrames()
+			{
+				if (m_coneTwistConstraint) 
+				{
 					math::Vector3 swingA = m_frameAAxis;
 					math::Vector3 swingB = m_frameBAxis;
 					btQuaternion frameASwing = btQuaternion(math::DegreesToRadians(swingA.y), math::DegreesToRadians(swingA.x), math::DegreesToRadians(swingA.z));
@@ -162,10 +170,22 @@ namespace thomas
 					m_frameA.setRotation(frameASwing);
 					m_frameB.setRotation(frameBSwing);
 					m_coneTwistConstraint->setFrames(m_frameA, m_frameB);
-					m_coneTwistConstraint->setLimit(math::DegreesToRadians(m_swing1), math::DegreesToRadians(m_swing2), math::DegreesToRadians(m_twist));
+				}
+			}
+
+			void Joint::UpdateDamping()
+			{
+				if (m_coneTwistConstraint)
+				{
 					m_coneTwistConstraint->setDamping(m_damping);
 				}
+			}
 
+			void Joint::UpdateLimitsFramesDamping()
+			{	
+				UpdateFrames();
+				UpdateLimits();
+				UpdateDamping();
 			}
 
 			void Joint::Update()
@@ -180,7 +200,7 @@ namespace thomas
 				{
 					m_gameObject->GetComponent<Rigidbody>()->SetActivationState(ActivationState::Always_Active);
 					thomas::Physics::s_world->addConstraint(CreateConstraints(), m_collision);
-					UpdateLimits();
+					UpdateLimitsFramesDamping();
 				}
 			}
 

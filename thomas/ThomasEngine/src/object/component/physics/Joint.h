@@ -69,6 +69,11 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
+		property float Damping
+		{
+			float get();
+			void set(float value);
+		}
 
 	};
 

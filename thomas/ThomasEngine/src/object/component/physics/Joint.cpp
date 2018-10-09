@@ -43,4 +43,8 @@ namespace ThomasEngine
 	//Collision
 	bool Joint::NoCollision::get() { return ((thomas::object::component::Joint*)nativePtr)->GetCollision(); }
 	void Joint::NoCollision::set(bool value) { return ((thomas::object::component::Joint*)nativePtr)->SetCollision(value); }
+
+	//damping
+	float Joint::Damping::get() { return ((thomas::object::component::Joint*)nativePtr)->GetDamping(); }
+	void Joint::Damping::set(float value) { return ((thomas::object::component::Joint*)nativePtr)->SetDamping(value); }
 }
