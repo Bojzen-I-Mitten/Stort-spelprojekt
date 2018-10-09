@@ -103,36 +103,66 @@ namespace ThomasEditor
                     }
                     else
                     {
+                        // m_velocity = ett värde, ingen acceleration
+
+                        // Throwing and pressing W, checking if also ASD pressed
                         if (Input.GetKey(Input.Keys.W))
                         {
-                            // blend walking and throwing anim (if S also pressed, only throw anim)
+                            if (Input.GetKey(Input.Keys.A))
+                            {
+                                // blend anim walking forward and throwing
+                                // chadMovement.Move(m_velocity*0.66f, -m_velocity*0.66f);
+                            }
+                            else if (Input.GetKey(Input.Keys.D))
+                            {
+                                //blend anim walking forward and throwing
+                                // chadMovement.Move(m_velocity*0.66f, m_velocity*0.66f);
+                            }
+                            else if (!Input.GetKey(Input.Keys.S))
+                            {
+                                // blend anim walking forward and throwing
+                                // chadMovement.Move(m_velocity, 0);
+                            }
 
-                            // m_velocity = ett värde, ingen acceleration
-                            // chadMovement.Move(m_velocity,0);
                             Debug.Log("Charging ball and walking");
                         }
-                        if (Input.GetKey(Input.Keys.S))
+                        // Throwing and pressed S, checkingif also AWD pressed
+                        else if (Input.GetKey(Input.Keys.S))
                         {
-                            // blend reversing and throwing anim (if W also pressed, only throw anim)
-
-                            // m_velocity = ett värde, ingen acceleration
-                            // chadMovement.Move(-m_velocity,0);
+                            if (Input.GetKey(Input.Keys.A))
+                            {
+                                // blend anim backing and throwing
+                                // chadMovement.Move(-m_velocity*0.66f, -m_velocity*0.66f);
+                            }
+                            else if (Input.GetKey(Input.Keys.D))
+                            {
+                                //blend anim backing and throwing
+                                // chadMovement.Move(-m_velocity*0.66f, m_velocity*0.66f);
+                            }
+                            else if (!Input.GetKey(Input.Keys.W))
+                            {
+                                // blend anim backing and throwing
+                                // chadMovement.Move(-m_velocity, 0);
+                            }
                             Debug.Log("Charging ball and backing");
                         }
-                        if (Input.GetKey(Input.Keys.A))
+                        // Throwing and pressing A, checking if also D pressed
+                        else if (Input.GetKey(Input.Keys.A))
                         {
-                            // blend strafing and throwing anim (if W also pressed walk anim blend, if S also pressed back anim blend)
-
-                            // m_velocity = ett värde, ingen acceleration
-                            // chadMovement.Move(0,-m_velocity);
+                            if(!Input.GetKey(Input.Keys.D))
+                            {
+                                // blend anim strafing and throwing
+                                // chadMovement.Move(0,-m_velocity);
+                            }
                             Debug.Log("Charging ball and strafing left");
                         }
-                        if (Input.GetKey(Input.Keys.D))
+                        else if (Input.GetKey(Input.Keys.D))
                         {
-                            // blend strafing and throwing anim (if W also pressed walk anim blend, if S also pressed back anim blend)
-
-                            // m_velocity = ett värde, ingen acceleration
-                            // chadMovement.Move(0, m_velocity);
+                            if (!Input.GetKey(Input.Keys.A))
+                            {
+                                // blend anim strafing and throwing
+                                // chadMovement.Move(0,m_velocity);
+                            }
                             Debug.Log("Charging ball and strafing right");
                         }
 
