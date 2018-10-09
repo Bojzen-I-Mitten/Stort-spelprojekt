@@ -96,6 +96,7 @@ namespace thomas
 		private:
 
 			void SpawnParticles();
+			void UpdateAliveCount();
 		
 
 		private:

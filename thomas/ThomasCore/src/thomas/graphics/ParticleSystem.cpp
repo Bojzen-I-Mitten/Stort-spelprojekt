@@ -105,7 +105,7 @@ namespace thomas
 		void ParticleSystem::SpawnParticles()
 		{
 			
-			std::vector<InitParticleBufferStruct> dataVec;
+			/*std::vector<InitParticleBufferStruct> dataVec;
 
 			InitParticleBufferStruct testInitData = {};
 			testInitData.nrOfParticlesToEmit = 5;
@@ -132,7 +132,7 @@ namespace thomas
 			/*for (object::component::ParticleEmitterComponent* e : m_spawningEmitters)
 			{
 				dataVec.push_back(e->GetInitData());
-			}*/
+			}
 			
 
 
@@ -142,12 +142,12 @@ namespace thomas
 				return;
 
 			if (m_emitters.size() > 1)
-				int stopper = 0;*/
+				int stopper = 0;
 asdf++;
 			if (asdf != 3000 && asdf != 3400 && asdf != 3402)
 				return;
-			
-			m_bufferSpawn->SetData(dataVec);
+			*/
+			m_bufferSpawn->SetData(m_emitters);
 			
 
 			m_emitParticlesCS->SetGlobalResource("initparticles", m_bufferSpawn->GetSRV());
@@ -176,10 +176,8 @@ asdf++;
 			
 		}
 
-		void ParticleSystem::UpdateParticleSystem()
+		void ParticleSystem::UpdateAliveCount()
 		{
-			
-			SpawnParticles();
 			//UPDATE EMITCOUNT
 			if (m_pingpong)
 			{
@@ -203,6 +201,12 @@ asdf++;
 			resource::ComputeShader::UnbindOneSRV(0);
 
 			m_emitters.clear();
+		}
+
+		void ParticleSystem::UpdateParticleSystem()
+		{
+			SpawnParticles();
+			UpdateAliveCount();
 
 			m_pingpong = !m_pingpong;
 
@@ -228,32 +232,6 @@ asdf++;
 			m_updateParticlesCS->DispatchIndirect(m_bufferIndirectArgs->GetBuffer(), 0);
 
 			resource::ComputeShader::UnbindAllUAVs();
-
-			//UPDATE EMIT COUNT BEFORE DRAW
-			/*if (m_pingpong)
-			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 12, m_bufferAliveListPong->GetUAV());
-			}
-			else
-			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
-
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 12, m_bufferAliveListPing->GetUAV());
-			}
-
-			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
-
-			m_calculateEmitCountCS->SetGlobalUAV("indirectargs", m_bufferIndirectArgs->GetUAV());
-			m_calculateEmitCountCS->SetGlobalResource("counterbuffer", m_bufferCounters->GetSRV());
-			m_calculateEmitCountCS->Bind();
-			m_calculateEmitCountCS->SetPass(0);
-
-			m_calculateEmitCountCS->Dispatch(1);
-
-			resource::ComputeShader::UnbindOneUAV(0);
-			resource::ComputeShader::UnbindOneSRV(0);*/
-
 		}
 
 		void ParticleSystem::DrawParticles()
