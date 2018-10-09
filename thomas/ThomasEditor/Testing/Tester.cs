@@ -59,7 +59,7 @@ namespace ThomasEditor.Testing
       
         }
 
-        public void SceneDone(Scene newScene)
+        public void SceneDone(Scene oldScene, Scene newScene)
         {
             if (newScene != null)
             {

@@ -134,7 +134,7 @@ namespace ThomasEngine
 	{
 		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
 		thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
-		if(boneIndex < anim->boneCount())
+		if((uint32_t)boneIndex < anim->boneCount())
 			return Utility::Convert(anim->getBoneMatrix(boneIndex)) * gameObject->transform->world;
 		else return Matrix::Identity;
 	}

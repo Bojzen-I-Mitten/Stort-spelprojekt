@@ -49,8 +49,11 @@ namespace ThomasEditor
 
 
 
-        private void Scene_OnCurrentSceneChanged(Scene newScene)
+        private void Scene_OnCurrentSceneChanged(Scene oldScene, Scene newScene)
         {
+            if(oldScene != null)
+                oldScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
+
             if (newScene != null)
             {
                 ResetTreeView();

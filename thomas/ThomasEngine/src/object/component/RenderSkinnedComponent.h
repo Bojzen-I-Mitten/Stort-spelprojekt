@@ -21,12 +21,18 @@ namespace ThomasEngine
 	private:
 		Model^ m_model;
 		Animation^ m_anim;
-	public:
-		RenderSkinnedComponent();
-
+	internal:
 		thomas::object::component::RenderSkinnedComponent* get();
 		thomas::object::component::RenderComponent* getNativeRenderComp();
 
+		property thomas::graphics::animation::IBlendTree* BlendTree {
+			thomas::graphics::animation::IBlendTree* get();
+		}
+		property thomas::object::component::RenderSkinnedComponent* Native {
+			thomas::object::component::RenderSkinnedComponent* get();
+		}
+	public:
+		RenderSkinnedComponent();
 		property Model^ model {
 			Model^ get();
 			void set(Model^ value);
@@ -48,12 +54,7 @@ namespace ThomasEngine
 		bool FetchBoneIndex(uint32_t boneHash, uint32_t& boneIndex);
 		bool FetchBoneIndex(uint32_t boneHash, [Out] uint32_t% boneIndex);
 
-		property thomas::graphics::animation::IBlendTree* BlendTree {
-			thomas::graphics::animation::IBlendTree* get();
-		}
-		property thomas::object::component::RenderSkinnedComponent* Native {
-			thomas::object::component::RenderSkinnedComponent* get();
-		}
+
 
 		void Update() override;
 

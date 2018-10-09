@@ -9,7 +9,7 @@ namespace thomas
 		namespace component
 		{
 			BoneTransformComponent::BoneTransformComponent()
-				: m_boneIndex(-1)
+				: m_boneIndex(-1), m_skeleton(nullptr)
 			{
 			}
 			BoneTransformComponent::~BoneTransformComponent()

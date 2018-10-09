@@ -53,14 +53,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Ball.cs" />
-    <Compile Include="Assets\InputTest.cs" />
-    <Compile Include="Assets\AnimationBlendTest.cs" />
-    <Compile Include="Assets\collisionTest.cs" />
-    <Compile Include="Assets\DankLight.cs" />
-    <Compile Include="Assets\skeletonSyncer.cs" />
+    <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
-    <Compile Include="Assets\throwStrengthVisualizer.cs" />
+    <Compile Include="Assets\Scripts\collisionTest.cs" />
+    <Compile Include="Assets\Scripts\DankLight.cs" />
+    <Compile Include="Assets\Scripts\InputTest.cs" />
+    <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
+    <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
+    <Compile Include="Assets\test\AnimationBlendTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

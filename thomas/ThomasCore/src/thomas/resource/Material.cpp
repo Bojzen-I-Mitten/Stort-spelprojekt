@@ -3,6 +3,7 @@
 #include "../resource/texture/Texture.h"
 #include "../graphics/Mesh.h"
 #include "ShaderProperty\shaderProperties.h"
+
 #include <mutex>
 namespace thomas
 {
@@ -385,7 +386,8 @@ namespace thomas
 				if (p.enabled)
 				{
 					m_shader->SetPass(p.index);
-					utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
+					m_shader->Draw(vertexCount, startVertexLocation);
+					
 				}
 			}
 			Unlock();
