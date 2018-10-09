@@ -75,22 +75,13 @@ namespace thomas
 	//Update physics collision
 	void Physics::Simulate()
 	{
-
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
-
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
 			return;
-
-		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
-		try
+		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);	
+		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
-			for (object::component::Rigidbody* rb : s_rigidBodies)
-			{
-				rb->UpdateRigidbodyToTransform();
-			}
-		}
-		catch (int e)
-		{
+			rb->UpdateRigidbodyToTransform();
 		}
 		s_timeSinceLastPhysicsStep = 0.f;
 	}

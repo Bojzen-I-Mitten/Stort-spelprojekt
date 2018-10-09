@@ -18,9 +18,9 @@ namespace thomas
 				m_connectedBody = nullptr;
 				m_frameAAxis = math::Vector3::Zero;
 				m_frameBAxis = math::Vector3::Zero;
-				m_twist = 0.0f;
-				m_swing1 = 0.0f;
-				m_swing2 = 0.0f;
+				m_twist = 1.0f;
+				m_swing1 = 10.0f;
+				m_swing2 = 10.0f;
 				m_collision = false;
 				m_damping = 0;
 			}
