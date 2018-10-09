@@ -17,7 +17,6 @@
 #include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
-
 #include "graphics\ParticleSystem.h"
 
 namespace thomas 
@@ -48,7 +47,7 @@ namespace thomas
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
-
+		graphics::ParticleSystem::InitializeGlobalSystem();
 
 		s_initialized = true;
 		return s_initialized;

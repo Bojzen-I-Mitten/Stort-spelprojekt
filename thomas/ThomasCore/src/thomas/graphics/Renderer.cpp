@@ -14,6 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "ParticleSystem.h"
 
 namespace thomas
 {
@@ -110,6 +111,7 @@ namespace thomas
 			//Process commands
 			BindFrame();
 
+			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
 			//m_particleSystem->UpdateParticleSystem();
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
@@ -126,6 +128,7 @@ namespace thomas
 					}
 				}
 
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
 				//m_particleSystem->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);

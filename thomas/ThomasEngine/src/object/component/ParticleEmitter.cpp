@@ -49,4 +49,7 @@ namespace ThomasEngine
 
 	unsigned ParticleEmitter::EmissionRate::get() { return particleEmitter->GetEmissionRate(); }
 	void ParticleEmitter::EmissionRate::set(unsigned value) { particleEmitter->SetEmissionRate(value); }
+
+	bool ParticleEmitter::Emit::get() { return particleEmitter->IsEmitting(); }
+	void ParticleEmitter::Emit::set(bool value) { particleEmitter->StartEmitting(); }
 }

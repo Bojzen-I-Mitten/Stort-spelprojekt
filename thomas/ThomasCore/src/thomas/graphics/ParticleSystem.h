@@ -46,7 +46,7 @@ namespace thomas
 				unsigned nrOfParticlesToEmit;
 				unsigned spawnAtSphereEdge;
 				unsigned rand;
-				unsigned isEmitting;
+				unsigned pad3;
 
 			};
 
@@ -80,21 +80,27 @@ namespace thomas
 
 			
 
-			void SpawnParticles();
 		public:
+			static void InitializeGlobalSystem();
+			static std::shared_ptr<ParticleSystem> GetGlobalSystem();
 			ParticleSystem();
 			~ParticleSystem();
 
 			void Initialize(unsigned maxNrOfParticles);
 			void Destroy();
 			
-			InitParticleBufferStruct& AddEmitterToSystem();
-			void PopEmitterFromSystem();
+			void AddEmitterToSpawn(InitParticleBufferStruct& emitterInitData);
 			
 			void UpdateParticleSystem();
 			void DrawParticles();
+		private:
+
+			void SpawnParticles();
+		
 
 		private:
+			static std::shared_ptr<ParticleSystem> s_globalSystem;
+
 			unsigned m_maxNrOfParticles;
 
 			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;//struct{uint deadcount, uint alivecount , uint maxcount, -}
@@ -117,7 +123,6 @@ namespace thomas
 			
 			resource::Shader* m_particleShader;
 
-		public:
 
 		};
 

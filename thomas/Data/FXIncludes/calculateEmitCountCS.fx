@@ -7,8 +7,9 @@ ByteAddressBuffer counterbuffer;
 [numthreads(1, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
-    indirectargs.Store(UPDATE_DISPATCH_INDIRECT_OFFSET, ((counterbuffer.Load(ALIVE_COUNT_OFFSET) + UPDATE_THREAD_DIM_X - 1) / UPDATE_THREAD_DIM_X));
-    indirectargs.Store(DRAW_INDIRECT_OFFSET, counterbuffer.Load(ALIVE_COUNT_OFFSET) * 6);
+    uint aliveCount = counterbuffer.Load(ALIVE_COUNT_OFFSET);
+    indirectargs.Store(UPDATE_DISPATCH_INDIRECT_OFFSET, ((aliveCount + UPDATE_THREAD_DIM_X - 1) / UPDATE_THREAD_DIM_X));
+    indirectargs.Store(DRAW_INDIRECT_OFFSET, aliveCount * 6);
 }
 
 

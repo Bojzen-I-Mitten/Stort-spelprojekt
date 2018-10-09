@@ -75,6 +75,9 @@ namespace ThomasEngine
 			unsigned get();
 			void set(unsigned value);
 		}
-		
+		property bool Emit {
+			bool get();
+			void set(bool value);
+		}
 	};
 }

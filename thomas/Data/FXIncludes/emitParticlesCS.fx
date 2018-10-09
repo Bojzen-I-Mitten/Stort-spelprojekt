@@ -49,14 +49,14 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     int ix = (Gid.x * EMIT_THREAD_DIM_X) + GTid.x;
     int iy = Gid.y;
 
-    InitParticlesBuffer newParticle = initparticles[iy];
+    InitParticlesBuffer newParticle = initparticles[0];
 
     uint2 aliveAndMaxCount = counterbuffer.Load2(ALIVE_COUNT_OFFSET);
     uint aliveCount = aliveAndMaxCount.x;
     uint maxCount = aliveAndMaxCount.y;
     uint capacityLeft = maxCount - aliveCount;
 
-    int threshold = min(newParticle.nrOfParticlesToEmit, max(capacityLeft - EMIT_THREAD_DIM_X * iy, 0)); //Presume that emitter with lower iy want to emit an ammount of EMIT_THREAD_DIM_X particles
+    int threshold = newParticle.nrOfParticlesToEmit; //min(newParticle.nrOfParticlesToEmit, max(capacityLeft - EMIT_THREAD_DIM_X * 0, 0)); //Presume that emitter with lower iy want to emit an ammount of EMIT_THREAD_DIM_X particles
 
     if (ix < threshold)
     {

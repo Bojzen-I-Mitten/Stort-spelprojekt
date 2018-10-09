@@ -6,6 +6,17 @@ namespace thomas
 {
 	namespace graphics
 	{
+		std::shared_ptr<ParticleSystem> ParticleSystem::s_globalSystem;
+
+		void ParticleSystem::InitializeGlobalSystem()
+		{
+			s_globalSystem = std::make_shared<ParticleSystem>();
+			s_globalSystem->Initialize(65536);
+		}
+		std::shared_ptr<ParticleSystem> ParticleSystem::GetGlobalSystem()
+		{
+			return s_globalSystem;
+		}
 		ParticleSystem::ParticleSystem()
 		{
 
@@ -84,55 +95,19 @@ namespace thomas
 			//m_emitParticlesCS
 		}
 
-		ParticleSystem::InitParticleBufferStruct& ParticleSystem::AddEmitterToSystem()
+		void ParticleSystem::AddEmitterToSpawn(InitParticleBufferStruct & emitterInitData)
 		{
-			InitParticleBufferStruct m_particleBufferStruct = {};
-			
-			m_particleBufferStruct.position = math::Vector3(0, 0, 0);
-			m_particleBufferStruct.spread = 0.0f;
-
-			//m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), math::Vector3(1, 0, 0), math::Vector3::Up).Transpose();
-
-			m_particleBufferStruct.radius = 0;
-			m_particleBufferStruct.maxSpeed = 0.0f;
-			m_particleBufferStruct.minSpeed = 0.0f;
-			m_particleBufferStruct.endSpeed = 0.0f;
-
-			m_particleBufferStruct.maxSize = 1.0f;
-			m_particleBufferStruct.minSize = 1.0f;
-			m_particleBufferStruct.endSize = 1.0f;
-			m_particleBufferStruct.gravity = 0.0f;
-
-			m_particleBufferStruct.maxLifeTime = 1.0f;
-			m_particleBufferStruct.minLifeTime = 1.0f;
-			m_particleBufferStruct.minRotationSpeed = 0.0f;
-			m_particleBufferStruct.maxRotationSpeed = 0.0f;
-
-			XMStoreFloat3x3(&m_particleBufferStruct.directionMatrix, DirectX::XMMatrixLookAtRH(math::Vector3(0, 2, 0), math::Vector3(1.0f, 2.0f, 0.0f), math::Vector3::Up));
-			m_particleBufferStruct.endRotationSpeed = 0.0f;
-
-			m_particleBufferStruct.nrOfParticlesToEmit = 0;
-			m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
-			m_particleBufferStruct.rand = std::rand();
-			m_particleBufferStruct.isEmitting = (unsigned)false;
-
-			m_emitters.push_back(m_particleBufferStruct);
-
-			return m_particleBufferStruct;
+			m_emitters.push_back(emitterInitData);
 		}
 
-		void ParticleSystem::PopEmitterFromSystem()
-		{
-			
-		}
-
+		int asdf = 0;
 		void ParticleSystem::SpawnParticles()
 		{
 			
 			std::vector<InitParticleBufferStruct> dataVec;
 
 			InitParticleBufferStruct testInitData = {};
-			testInitData.nrOfParticlesToEmit = 32;
+			testInitData.nrOfParticlesToEmit = 5;
 			std::srand(time(NULL));
 			testInitData.rand = std::rand();
 
@@ -156,15 +131,21 @@ namespace thomas
 			/*for (object::component::ParticleEmitterComponent* e : m_spawningEmitters)
 			{
 				dataVec.push_back(e->GetInitData());
-			}
-			*/
+			}*/
+			
 
 
 			dataVec.push_back(testInitData);
-
-			if (dataVec.size() == 0)
+			/*
+			if (m_emitters.size() == 0)
 				return;
 
+			if (m_emitters.size() > 1)
+				int stopper = 0;*/
+asdf++;
+			if (asdf != 3000 && asdf != 3400 && asdf != 3401)
+				return;
+			
 			m_bufferSpawn->SetData(dataVec);
 			
 
@@ -194,12 +175,13 @@ namespace thomas
 															//UPDATE EMITCOUNT
 			if (m_pingpong)
 			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 			}
 			else
 			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
 			}
+
 			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
 
 			m_calculateEmitCountCS->SetGlobalUAV("indirectargs", m_bufferIndirectArgs->GetUAV());
@@ -212,11 +194,12 @@ namespace thomas
 			resource::ComputeShader::UnbindOneUAV(0);
 			resource::ComputeShader::UnbindOneSRV(0);
 				
-			
+			m_emitters.clear();
 		}
 
 		void ParticleSystem::UpdateParticleSystem()
 		{
+			
 			SpawnParticles();
 
 			m_pingpong = !m_pingpong;
@@ -245,14 +228,18 @@ namespace thomas
 			resource::ComputeShader::UnbindAllUAVs();
 
 			//UPDATE EMIT COUNT BEFORE DRAW
-			if (!m_pingpong) //structurecount of particles have changed
+			if (m_pingpong)
 			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 12, m_bufferAliveListPong->GetUAV());
 			}
 			else
 			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
+
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 12, m_bufferAliveListPing->GetUAV());
 			}
+
 			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
 
 			m_calculateEmitCountCS->SetGlobalUAV("indirectargs", m_bufferIndirectArgs->GetUAV());

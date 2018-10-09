@@ -17,12 +17,37 @@ namespace thomas
 		{
 			thomas::object::component::ParticleEmitterComponent::ParticleEmitterComponent()
 			{
-
+				m_particleSystem = graphics::ParticleSystem::GetGlobalSystem();
 				m_emissionRate = 1.0;
 				m_looping = false;
 				m_isEmitting = false;
 
-				m_particleBufferStruct = m_particleSystem->AddEmitterToSystem();
+				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
+				m_particleBufferStruct.spread = 0.0f;
+
+				//m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), math::Vector3(1, 0, 0), math::Vector3::Up).Transpose();
+
+				m_particleBufferStruct.radius = 0;
+				m_particleBufferStruct.maxSpeed = 0.0f;
+				m_particleBufferStruct.minSpeed = 0.0f;
+				m_particleBufferStruct.endSpeed = 0.0f;
+
+				m_particleBufferStruct.maxSize = 1.0f;
+				m_particleBufferStruct.minSize = 1.0f;
+				m_particleBufferStruct.endSize = 1.0f;
+				m_particleBufferStruct.gravity = 0.0f;
+
+				m_particleBufferStruct.maxLifeTime = 1.0f;
+				m_particleBufferStruct.minLifeTime = 1.0f;
+				m_particleBufferStruct.minRotationSpeed = 0.0f;
+				m_particleBufferStruct.maxRotationSpeed = 0.0f;
+
+				XMStoreFloat3x3(&m_particleBufferStruct.directionMatrix, DirectX::XMMatrixLookAtRH(math::Vector3(0, 2, 0), math::Vector3(1.0f, 2.0f, 0.0f), math::Vector3::Up));
+				m_particleBufferStruct.endRotationSpeed = 0.0f;
+
+				m_particleBufferStruct.nrOfParticlesToEmit = 0;
+				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
+				m_particleBufferStruct.rand = std::rand();
 				
 			}
 
@@ -45,13 +70,14 @@ namespace thomas
 			{
 				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
 
-				unsigned nrOfParticlesToEmit = NrOfParticlesToEmitThisFrame();
 				if (m_isEmitting)
 				{
+					unsigned nrOfParticlesToEmit = NrOfParticlesToEmitThisFrame();
 					if (nrOfParticlesToEmit > 0)
 					{
 						m_particleBufferStruct.nrOfParticlesToEmit = nrOfParticlesToEmit;
-						//m_particleSystem->AddEmitterToSpawn(this);
+
+						m_particleSystem->AddEmitterToSpawn(m_particleBufferStruct);
 					}
 				
 				}
