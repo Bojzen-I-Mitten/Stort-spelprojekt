@@ -16,14 +16,12 @@ namespace ThomasEngine
 	internal:
 		static List<Type^>^ GetKnownTypes();
 		Material(thomas::resource::Material* ptr) : Resource(Utility::ConvertString(ptr->GetPath()), ptr) {};
-		bool m_loaded = false;
 	public:
 
 		~Material()
 		{
 			delete m_nativePtr;
 		}
-
 
 		Material(Shader^ shader);
 
@@ -36,16 +34,20 @@ namespace ThomasEngine
 
 		void OnPlay() override
 		{
+#ifdef _EDITOR
 			m_shaderBeforePlay = this->Shader;
 			m_propertiesBeforePlay = this->EditorProperties;
+#endif
 		}
 
 		void OnStop() override
 		{
+#ifdef _EDITOR
 			this->Shader = m_shaderBeforePlay;
 			this->EditorProperties = m_propertiesBeforePlay;
 			m_shaderBeforePlay = nullptr;
 			m_propertiesBeforePlay = nullptr;
+#endif
 		}
 
 
@@ -73,7 +75,7 @@ namespace ThomasEngine
 		void SetShaderPassEnabled(std::string name, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(name, enabled); }
 
 		Color GetColor(String^ name) { return Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetColor(Utility::ConvertString(name))); }
-		void SetColor(String^ name, Color value) { ((thomas::resource::Material*)m_nativePtr)->SetColor(Utility::ConvertString(name), thomas::math::Color(value.r, value.g, value.b, value.a)); }
+		void SetColor(String^ name, Color value) { ((thomas::resource::Material*)m_nativePtr)->SetColor(Utility::ConvertString(name), thomas::math::Color(value.r, value.g, value.b, value.a));  }
 
 		float GetFloat(String^ name) { return ((thomas::resource::Material*)m_nativePtr)->GetFloat(Utility::ConvertString(name)); }
 		void SetFloat(String^ name, float& value) { ((thomas::resource::Material*)m_nativePtr)->SetFloat(Utility::ConvertString(name), value); };
@@ -90,32 +92,45 @@ namespace ThomasEngine
 		Texture2D^ GetTexture2D(String^ name);
 		void SetTexture2D(String^ name, Texture2D^ value);
 
-		[DataMemberAttribute(Order=0)]
+		[IgnoreDataMemberAttribute]
 		property Shader^ Shader
 		{
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
 		}
-		
-		[DataMemberAttribute(Order = 1)]
+#ifdef _EDITOR
+		[IgnoreDataMemberAttribute]
 		property Dictionary<String^, System::Object^>^ EditorProperties
 		{
-			Dictionary<String^, System::Object^>^ get() {
-				return GetEditorProperties();
-			}
-				
+			Dictionary<String^, System::Object^>^ get();
 			void set(Dictionary<String^, System::Object^>^ value);
 		}
+#endif
 	private:
 		Dictionary<String^, System::Object^>^ GetEditorProperties();
 
-		
+		/* Function called when material info is changed.
+		*/
+		void OnChange();
+
+		/* Serialization
+		*/
+		[DataMemberAttribute(Order=0)]
+		property ThomasEngine::Shader^ shader {
+			ThomasEngine::Shader^ get();
+			void set(ThomasEngine::Shader^ value);
+		}
+		[DataMemberAttribute(Order = 1)]
+		property Dictionary<String^, System::Object^>^ properties
+		{
+			Dictionary<String^, System::Object^>^ get();
+			void set(Dictionary<String^, System::Object^>^ value);
+		}
 
 	internal:
 		[OnDeserializedAttribute]
 		void OnDeserialized(StreamingContext c)
 		{
-			m_loaded = true;
 		}
 	};
 }

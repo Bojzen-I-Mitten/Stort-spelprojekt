@@ -282,16 +282,6 @@ namespace ThomasEngine
 
 		}
 
-		bool Resources::SaveResource(Resource ^ resource)
-		{
-			if (resource->GetType() == Material::typeid)
-			{
-				Serializer::SerializeMaterial((Material^)resource, resource->m_path);
-				return true;
-			}
-			return false;
-		}
-
 #pragma endregion
 		generic<typename T>
 			where T : Resource
