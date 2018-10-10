@@ -34,9 +34,8 @@ namespace thomas
 			void RenderSkinnedComponent::Update()
 			{
 				RenderComponent::Update();
-				if (m_skeleton) {
+				if (m_skeleton) 
 					m_skeleton->update(ThomasTime::GetDeltaTime());
-				}
 			}
 
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {

@@ -39,7 +39,7 @@ namespace thomas {
 				for (uint32_t i = 0; i < num_link - 1; i++) {
 					float r = math::Vector3::Distance(p[i], target);
 					float lambda = d[i] / r;
-					p[i] = lerp(p[i], target, lambda);
+					p[i+1] = lerp(p[i], target, lambda);
 				}
 			}
 			/* FABRIK backward/forward iteration
@@ -50,27 +50,24 @@ namespace thomas {
 				math::Vector3 b = p[0];
 				float dif = math::Vector3::Distance(p[num_link - 1], target);
 				// Iterate until a error tolerance is reached (or max. iterations)
-				for (uint32_t iter = 0; dif < FABRIK_TOLERANCE || iter < MAX_FABRIK_ITER; iter++) {
+				for (uint32_t iter = 0; dif > FABRIK_TOLERANCE && iter < MAX_FABRIK_ITER; iter++) {
 					// Stage 1: Forward reaching
 					uint32_t i = num_link - 1;
-					math::Vector3 *p_i = &p[i];
-					*p_i = target;
-					while (--p_i >= p) {										// Forward loop
+					p[i] = target;
+					for(; i > 0;){												// Forward reaching loop
 						i--;
-						float r = math::Vector3::Distance(*p, *(p + 1));		// Distance to next joint
+						float r = math::Vector3::Distance(p[i], p[i+1]);		// Distance to next joint
 						float lambda = d[i] / r;
-						*p_i = lerp(*(p_i + 1), *p_i, lambda);					// Next iter. position
+						p[i] = lerp(p[i+1], p[i], lambda);						// Next iter. position
 					}
 					// Stage 2: Backward reaching
-					p_i = p;
-					*p_i = b;													// Reset root
-					for (; i < num_link - 1; i++) {								// Backward loop
-						float r = math::Vector3::Distance(*p_i, *(p_i + 1));	// Distance to next joint
+					*p = b;														// Reset root
+					for (; i < num_link - 1; i++) {								// Backward reaching loop
+						float r = math::Vector3::Distance(p[i], p[i + 1]);		// Distance to next joint
 						float lambda = d[i] / r;
-						*(p_i + 1) = lerp(*p_i, *(p_i + 1), lambda);			// Next iter. position
-						p_i++;
+						p[i+1] = lerp(p[i], p[i + 1], lambda);					// Next iter. position
 					}
-					dif = math::Vector3::Distance(*p_i, target);
+					dif = math::Vector3::Distance(p[num_link-1], target);
 				}
 			}
 
@@ -85,12 +82,14 @@ namespace thomas {
 				// Calc. distance of each bone/link
 				LinkParameter* chain = m_chain.get();
 				float link_sum = 0.f;
-				for (uint32_t i = 0; i < m_num_link - 1; i++) {
+				uint32_t i = 0;
+				for (; i < m_num_link - 1; i++) {										// Find position of each bone
 					p[i] = objectPose[chain[i].m_index].Translation();
 					d[i] = math::Vector3::Distance(
 						p[i], objectPose[chain[i+1].m_index].Translation());
 					link_sum += d[i];
 				}
+				p[i] = objectPose[chain[i].m_index].Translation();						// End case
 				// Distance from root to target
 				float targetDist = math::Vector3::Distance(
 					objectPose[m_chain.get()[0].m_index].Translation(), m_target);
@@ -100,7 +99,7 @@ namespace thomas {
 					FABRIK_iteration(m_target, d, p, m_num_link);
 
 				// Apply solution to chain
-				for (uint32_t i = 0; i < m_num_link - 1; i++) {
+				for (i = 0; i < m_num_link - 1; i++) {
 					math::Matrix pose = objectPose[(chain+i)->m_index];
 					math::Quaternion q = math::getRotationTo(pose.Up(), p[i+1] - p[i]);	// Rotation difference from current pose to target
 					pose.Translation(math::Vector3::Zero);								// Remove translation
@@ -108,6 +107,7 @@ namespace thomas {
 					pose.Translation(p[i]);												// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;								// Set
 				}
+				objectPose[(chain + m_num_link - 1)->m_index].Translation(p[m_num_link-1]);
 				// Clean stack
 				ThomasCore::Core().Memory()->stack(0).deallocate(d);
 			}

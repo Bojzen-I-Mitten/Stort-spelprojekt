@@ -42,14 +42,15 @@ namespace thomas {
 				// Update skin transforms
 				_pose[0] = (_frame_tmp.get())[0].createTransform() * _ref.getRoot();				//	Update root pose
 				applyConstraint(0);
-				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];									//	Update root skin
 				for (uint32_t i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
 					_pose[i] = (_frame_tmp.get())[i].createTransform() * _pose[bone._parentIndex];	//	Update root pose
 					applyConstraint(i);
-					_skin[i] = bone._invBindPose * _pose[i];										//	Update root skin
 				}
+
+				for (uint32_t i = 0; i < boneCount(); i++)
+					_skin[i] = _ref.getBone(i)._invBindPose * _pose[i];								//	Update skin
 			}
 			void AnimatedSkeleton::applyConstraint(uint32_t index)
 			{
