@@ -24,16 +24,17 @@ namespace ThomasEditor
         public float force { get; set; } = 5;
         public float cameraSensitivity_x { get; set; } = 1;
         public float cameraSensitivity_y { get; set; } = 2.0f;
-        //The turn ratio that is used for the calculations
-        public float maxTurnRatio { get; set; } = 1;
+
+        //The turn ratio that is used for calculations, set to one of the turn ratios below.
+        public float TurnRatio { get; set; } = 1;
 
         #region Turn Ratios
-        //A turn ratio for each (most?) of the states, which maxTurnRatio is set to as Chad enters a state
-        public float maxTurnRatioRunning { get; set; } = 0.05f;
-        public float maxTurnRatioIdle { get; set; } = 0.5f;
-        public float maxTurnRatioWalking { get; set; } = 0.5f;
-        public float maxTurnRatioThrowing { get; set; } = 1;
-        public float maxTurnRatioTackling { get; set; } = 0.01f;
+        //Different turn ratios used for different movement patterns
+        public float RunningTurnRatio { get; set; } = 0.05f;
+        public float IdleTurnRatio { get; set; } = 0.5f;
+        public float WalkingTurnRatio { get; set; } = 0.5f;
+        public float ThrowingTurnRatio { get; set; } = 1;
+        public float TacklingTurnRatio { get; set; } = 0.01f;
         #endregion
 
         public float cameraDistance { get; set; } = 2;
@@ -138,10 +139,11 @@ namespace ThomasEditor
                     + transform.position;
             }
 
+            //Limit turn speed------------------------------
             float xStepSign = Math.Sign(xStep);
-            xStep = Math.Min(Math.Abs(xStep), maxTurnRatio);
+            xStep = Math.Min(Math.Abs(xStep), TurnRatio);
             xStep *= xStepSign;
-
+            //----------------------------------------------
             transform.RotateByAxis(transform.up, -xStep);
 
             if (Input.GetKey(Input.Keys.W))

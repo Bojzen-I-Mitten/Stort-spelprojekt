@@ -21,6 +21,7 @@ namespace thomas
 		static bool Init();
 		static bool Initialized();
 		static void Update();
+		static void Render();
 		static bool Destroy();
 		static void Exit();
 
