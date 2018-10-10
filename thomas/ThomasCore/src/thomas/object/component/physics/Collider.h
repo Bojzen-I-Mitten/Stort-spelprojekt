@@ -38,6 +38,7 @@ namespace thomas
 				
 			protected:
 				math::Vector3 m_center;
+				math::Vector3 m_scaling;
 				bool m_trigger = false;
 				btCollisionShape* m_collisionShape = nullptr;
 				btCollisionObject* m_collisionObject = nullptr;

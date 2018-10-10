@@ -121,10 +121,12 @@ namespace thomas
 
 	Window * WindowManager::GetWindow(int index)
 	{
-		if ((index + 1) < m_windows.size())
+		if (m_editorWindow)
+			index += 1; //offset to make -1 editor window.
+		if ((index) < m_windows.size())
 		{
 			//s_current = m_windows[index + 1];
-			return m_windows[index + 1];
+			return m_windows[index];
 		}
 			
 		return nullptr;
