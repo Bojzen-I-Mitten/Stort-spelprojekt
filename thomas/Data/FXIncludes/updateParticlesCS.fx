@@ -31,6 +31,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
        
         float lerpValue = 1 - (particle.lifeTimeLeft / particle.lifeTime);
         particle.lifeTimeLeft = particle.lifeTimeLeft - dt;
+
 	    //lerp between start and end speed
         float speed = lerp(particle.speed, particle.endSpeed, lerpValue);
 

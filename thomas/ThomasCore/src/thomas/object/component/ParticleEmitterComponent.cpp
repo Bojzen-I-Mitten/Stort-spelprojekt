@@ -22,6 +22,7 @@ namespace thomas
 				m_emissionThreshold = 0.0;
 				m_looping = false;
 				m_isEmitting = false;
+				m_particleBufferStruct = {};
 
 				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
 				m_particleBufferStruct.spread = 0.0f;
@@ -73,7 +74,7 @@ namespace thomas
 				}
 				return 0;
 			}
-
+			
 			void ParticleEmitterComponent::Update()
 			{
 				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();

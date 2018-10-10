@@ -2,7 +2,7 @@
 #include <ParticleHeader.h>
 
 
-struct InitParticlesBuffer
+struct InitParticleBufferStruct
 {
     float3 position;
     float spread;
@@ -24,13 +24,14 @@ struct InitParticlesBuffer
 
     float3x3 directionMatrix;
     float endRotationSpeed;
+    float pad;
     float pad2;
-    float pad3;
 
     uint nrOfParticlesToEmit;
-	uint spawnAtSphereEdge;
-	uint rand;
-	uint pad4;
+    uint spawnAtSphereEdge;
+    uint rand;
+    uint pad3;
+
 };
 
 cbuffer indexForParticleEmitter
@@ -38,7 +39,7 @@ cbuffer indexForParticleEmitter
     int initindex;
 };
 
-StructuredBuffer<InitParticlesBuffer> initparticles;
+StructuredBuffer<InitParticleBufferStruct> initparticles;
 
 RWStructuredBuffer<ParticleStruct> particles;
 
@@ -53,7 +54,7 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     int ix = (Gid.x * EMIT_THREAD_DIM_X) + GTid.x;
     int iy = Gid.y;
 
-    InitParticlesBuffer newParticle = initparticles[iy];
+    InitParticleBufferStruct newParticle = initparticles[iy];
 
     uint2 aliveAndMaxCount = counterbuffer.Load2(ALIVE_COUNT_OFFSET);
     uint aliveCount = aliveAndMaxCount.x;
