@@ -71,7 +71,6 @@ namespace thomas
 		private:
 			float m_sensitivity;
 			float m_speed;
-			float m_manipulatorScale;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
 			object::GameObject* m_selectedObject;

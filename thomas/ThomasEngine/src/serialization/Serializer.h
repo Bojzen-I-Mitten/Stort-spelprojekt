@@ -20,10 +20,10 @@ namespace ThomasEngine
 		static Scene^ DeserializeScene(System::String^ path);
 
 		static void SerializeGameObject(GameObject^ gameObject, System::String^ path);
-		static Newtonsoft::Json::Linq::JObject^ SerializeGameObject(GameObject^ gameObject);
+		static Newtonsoft::Json::Linq::JArray^ SerializeGameObject(GameObject^ gameObject);
 
 		static GameObject^ DeserializeGameObject(System::String^ path);
-		static GameObject^ DeserializeGameObject(Newtonsoft::Json::Linq::JObject^ jo);
+		static GameObject^ DeserializeGameObject(Newtonsoft::Json::Linq::JArray^ ja);
 
 		static void SerializeMaterial(Material^ material, System::String^ path);
 		static Material^ DeserializeMaterial(System::String^ path);

@@ -25,6 +25,7 @@ namespace ThomasEngine
 
 			serializer->Converters->Add(gcnew ResourceConverter());
 			serializer->Converters->Add(gcnew PrefabConverter());
+			serializer->Converters->Add(gcnew ComponentConverter());
 			s_serializer = serializer;
 			return s_serializer;
 		}
@@ -112,13 +113,14 @@ namespace ThomasEngine
 		}
 	}
 
-	JObject^ Serializer::SerializeGameObject(GameObject ^ gameObject)
+	JArray^ Serializer::SerializeGameObject(GameObject ^ gameObject)
 	{
 		try
 		{
 			List<GameObject^>^ flatGameObjects = gcnew List<GameObject^>();
 			GameObject::FlattenGameObjectTree(flatGameObjects, gameObject);
-			return JObject::FromObject(flatGameObjects, serializer);
+			JArray^ ja = JArray::FromObject(flatGameObjects, serializer);
+			return ja;
 		}
 		catch (System::Exception^ e)
 		{
@@ -143,11 +145,11 @@ namespace ThomasEngine
 		}
 	}
 
-	GameObject^ Serializer::DeserializeGameObject(Newtonsoft::Json::Linq::JObject^ jo)
+	GameObject^ Serializer::DeserializeGameObject(Newtonsoft::Json::Linq::JArray^ ja)
 	{
 		try {
 
-			List<GameObject^>^ gameObject = jo->ToObject<List<GameObject^>^>(serializer);
+			List<GameObject^>^ gameObject = ja->ToObject<List<GameObject^>^>(serializer);
 			return gameObject[0];
 		}
 		catch (Exception^ e)

@@ -34,10 +34,7 @@ namespace ThomasEditor
         Guid g;
         public MainWindow()
         {
-            string enginePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            Environment.SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget.User);
-
+          
             _instance = this;
             InitializeComponent();
 
