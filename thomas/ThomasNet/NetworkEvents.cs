@@ -9,7 +9,7 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-    class NetworkEvents
+    public class NetworkEvents
     {
         private NetworkManager Manager
         {

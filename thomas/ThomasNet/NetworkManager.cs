@@ -24,7 +24,7 @@ namespace ThomasEngine.Network
         private EventBasedNetListener Listener;
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
-        private NetworkEvents Events;
+        protected NetworkEvents Events;
 
         public int LocalPort { get; set; } = 9050;
 
@@ -39,7 +39,7 @@ namespace ThomasEngine.Network
         
         private float ServerTime;
 
-        internal NetPeer LocalPeer = null;
+        protected NetPeer LocalPeer = null;
 
         public int TICK_RATE { get; set; } = 24;
 
@@ -47,6 +47,9 @@ namespace ThomasEngine.Network
 
         [Browsable(false)]
         public NetManager InternalManager { get { return NetManager; } }
+
+        [Browsable(false)]
+        public NetworkScene Scene { get { return NetScene; } }
 
         public override void Awake()
         {
@@ -95,6 +98,7 @@ namespace ThomasEngine.Network
 
         }
 
+
         #region Listners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -104,10 +108,12 @@ namespace ThomasEngine.Network
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
                     NetScene.RemovePlayer(peer);
+                    OnPeerLeave(peer);
                     Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:
                     NetScene.RemovePlayer(peer);
+                    OnPeerLeave(peer);
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
@@ -127,6 +133,7 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerConnectedEvent(NetPeer _peer)
         {
+            
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
             
             foreach (NetPeer peer in NetManager.GetPeers(ConnectionState.Connected))
@@ -147,12 +154,23 @@ namespace ThomasEngine.Network
             {
                 NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
+                OnPeerJoin(LocalPeer);
             }
             else //Someone is joining us.
             {
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
                 TransferOwnedObjects();
             }
+            OnPeerJoin(_peer);
+        }
+
+        virtual protected void OnPeerJoin(NetPeer peer)
+        {
+
+        }
+        virtual protected void OnPeerLeave(NetPeer peer)
+        {
+
         }
 
         private void Listener_NetworkErrorEvent(System.Net.IPEndPoint endPoint, System.Net.Sockets.SocketError socketError)
@@ -217,6 +235,7 @@ namespace ThomasEngine.Network
                         NetManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
                     else
                     {
+                        
                         NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
                     }
                 }
@@ -233,6 +252,7 @@ namespace ThomasEngine.Network
                 {
                     NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
                     NetScene.ActivateSceneObjects();
+                    OnPeerJoin(LocalPeer);
                 }
               
             }
