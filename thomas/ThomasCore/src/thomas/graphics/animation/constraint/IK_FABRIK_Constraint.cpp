@@ -1,8 +1,7 @@
 #include "IK_FABRIK_Constraint.h"
 #include "../../../ThomasCore.h"
 #include "../../../resource/MemoryAllocation.h"
-
-
+#include "../../../editor/gizmos/Gizmos.h"
 
 namespace thomas {
 	namespace graphics {
@@ -108,6 +107,16 @@ namespace thomas {
 					objectPose[(chain+i)->m_index] = pose;								// Set
 				}
 				objectPose[(chain + m_num_link - 1)->m_index].Translation(p[m_num_link-1]);
+#ifdef _EDITOR
+				for (i = 0; i < m_num_link; i++) {
+					editor::Gizmos::SetColor(math::Color(0, 1.f, 0.f));
+					editor::Gizmos::DrawRay(math::Ray(p[i], objectPose[(chain + i)->m_index].Up()));
+					editor::Gizmos::SetColor(math::Color(1.f, 0.f, 0.f));
+					editor::Gizmos::DrawRay(math::Ray(p[i], objectPose[(chain + i)->m_index].Right()));
+					editor::Gizmos::SetColor(math::Color(0.f, 0.f, 1.f));
+					editor::Gizmos::DrawRay(math::Ray(p[i], objectPose[(chain + i)->m_index].Forward()));
+				}
+#endif
 				// Clean stack
 				ThomasCore::Core().Memory()->stack(0).deallocate(d);
 			}

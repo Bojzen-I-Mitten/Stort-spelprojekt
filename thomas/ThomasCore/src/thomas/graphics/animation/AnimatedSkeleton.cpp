@@ -129,7 +129,7 @@ namespace thomas {
 			}
 			void ConstraintList::add(BoneConstraint * bC)
 			{
-				for (uint32_t i = 0; i < MAX_CONSTRAIN_COUNT; i++) {
+				for (uint32_t i = 0; i < MAX_CONSTRAINT_COUNT; i++) {
 					if (m_list[i] == NULL) {
 						m_list[i] = bC;
 						return;
@@ -139,7 +139,7 @@ namespace thomas {
 			}
 			void ConstraintList::rmv(BoneConstraint * bC)
 			{
-				for (uint32_t i = 0; i < MAX_CONSTRAIN_COUNT; i++) {
+				for (uint32_t i = 0; i < MAX_CONSTRAINT_COUNT; i++) {
 					if (m_list[i] == bC) {
 						m_list[i] = NULL;
 						// Find last slot:

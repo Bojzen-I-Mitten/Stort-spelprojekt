@@ -6,6 +6,7 @@
 #include "../../graphics/RenderConstants.h"
 #include "../../resource/Material.h"
 #include "../GameObject.h"
+#include "../../editor/gizmos/Gizmos.h"
 namespace thomas
 {
 	namespace object
@@ -34,7 +35,10 @@ namespace thomas
 			void RenderSkinnedComponent::Update()
 			{
 				RenderComponent::Update();
-				if (m_skeleton) 
+#ifdef _EDITOR
+				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+#endif
+				if (m_skeleton)
 					m_skeleton->update(ThomasTime::GetDeltaTime());
 			}
 
