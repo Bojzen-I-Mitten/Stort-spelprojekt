@@ -54,6 +54,7 @@
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\script\animation\constraint\IK_FABRIK_Constraint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
+    <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

@@ -59,7 +59,7 @@ namespace thomas {
 
 			void StackAllocator::deallocate(void* p)
 			{
-				assert(p == _prev_position);
+				assert(p == _prev_position);	// Non-deleted stack data.
 
 				//Access the AllocationHeader in the bytes before p 
 				AllocationHeader* header = (AllocationHeader*)(subtract(p, sizeof(AllocationHeader)));

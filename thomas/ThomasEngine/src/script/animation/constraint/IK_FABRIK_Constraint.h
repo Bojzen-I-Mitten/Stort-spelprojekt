@@ -8,19 +8,16 @@ namespace ThomasEngine
 {
 	ref class GameObject;
 	ref class RenderSkinnedComponent;
+	ref class Model;
 
 	namespace Script
 	{
 		public ref class IK_FABRIK_Constraint
 		{
 		public:
-			IK_FABRIK_Constraint();
+			IK_FABRIK_Constraint(uint32_t num_link);
 			~IK_FABRIK_Constraint();
 
-			property float Weight {
-				float get();
-				void set(float w);
-			}
 			property Vector3 Target {
 				Vector3 get();
 				void set(Vector3 mode);
@@ -32,7 +29,7 @@ namespace ThomasEngine
 
 			thomas::graphics::animation::IK_FABRIK_Constraint* Native();
 		private:
-
+			uint32_t m_num_link;
 			thomas::graphics::animation::IK_FABRIK_Constraint* m_ptr;
 		};
 	}

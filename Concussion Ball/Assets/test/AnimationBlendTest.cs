@@ -9,6 +9,7 @@ public class AnimationBlendTest : ScriptComponent
     PlaybackNode to;
     PlaybackHandle toTime;
     LookAtConstraint lookAt;
+    IK_FABRIK_Constraint ik;
 
     RenderSkinnedComponent skinn;
     WeightHandle weight;
@@ -40,6 +41,15 @@ public class AnimationBlendTest : ScriptComponent
 
         // Set default 
         weight.setWeight(0, 1);
+
+
+        // IK test
+
+        ik = new IK_FABRIK_Constraint(3);
+        boneIndex = 0;
+        if (skinn.FetchBoneIndex(Utility.hash("mixamorig:RightHand"), out boneIndex))
+            ik.apply(skinn, boneIndex);
+
     }
 
     public override void Update()
@@ -50,7 +60,9 @@ public class AnimationBlendTest : ScriptComponent
             timer += Time.DeltaTime;
             float curve = (float)Math.Sin(timer*0.5f);
             //float t = 0.5f * curve + 0.5f;
-            lookAt.Target = target ? target.transform.position : new Vector3(curve, 1.5f, -1f);
+            Vector3 t = target ? target.transform.position : new Vector3(curve, 1.5f, -1f);
+            lookAt.Target = t;
+            ik.Target = t;
             if (Input.GetKeyDown(Input.Keys.Space))
             {
                 // Throw

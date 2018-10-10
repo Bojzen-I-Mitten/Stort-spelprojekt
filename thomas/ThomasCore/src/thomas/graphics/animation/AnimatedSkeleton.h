@@ -45,14 +45,17 @@ namespace thomas {
 				/* Get skin matrixes
 				*/
 				const math::Matrix* getSkin() const;
-				/* Get the number of bones
-				*/
-				virtual unsigned int boneCount() const;
 				/* Get the world matrix of a bone
 				*/
 				virtual const math::Matrix& getBoneMatrix(unsigned int bone) const;
 				bool getBoneIndex(uint32_t boneNameHash, unsigned int & boneIndex) const;
+				
 				virtual const std::string& getBoneName(unsigned int bone) const;
+				/* Access skeleton info. */
+				virtual const Bone& getBoneInfo(unsigned int bone);
+				/* Get the number of bones
+				*/
+				virtual unsigned int boneCount() const;
 
 
 				virtual void addConstraint(BoneConstraint * bC, uint32_t boneIndex);

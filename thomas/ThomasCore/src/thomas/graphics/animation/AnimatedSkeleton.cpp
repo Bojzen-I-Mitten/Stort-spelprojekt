@@ -114,6 +114,10 @@ namespace thomas {
 			{
 				return _ref.getBone(bone)._boneName;
 			}
+			const Bone & AnimatedSkeleton::getBoneInfo(unsigned int bone)
+			{
+				return _ref.getBone(bone);
+			}
 			void AnimatedSkeleton::addConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{
 				m_constraint.get()[boneIndex].add(bC);

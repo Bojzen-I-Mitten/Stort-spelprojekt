@@ -1,4 +1,3 @@
-#include "..\..\..\..\..\..\ThomasEngine\src\script\animation\constraint\IK_FABRIK_Constraint.h"
 #include "IK_FABRIK_Constraint.h"
 #include "../../../ThomasCore.h"
 #include "../../../resource/MemoryAllocation.h"
@@ -9,8 +8,12 @@ namespace thomas {
 	namespace graphics {
 		namespace animation {
 
+			IK_FABRIK_Constraint::IK_FABRIK_Constraint(uint32_t num_link)
+				: m_chain(new LinkParameter[num_link]), m_num_link(num_link)
+			{
+			}
 			IK_FABRIK_Constraint::IK_FABRIK_Constraint(const std::vector<LinkParameter>& link_chain)
-				: m_chain(new LinkParameter[link_chain.size()]), m_num_link(link_chain.size())
+				: IK_FABRIK_Constraint(link_chain.size())
 			{
 				std::memcpy(m_chain.get(), link_chain.data(), sizeof(LinkParameter) * m_num_link);
 			}
@@ -19,6 +22,10 @@ namespace thomas {
 			{
 			}
 
+			void IK_FABRIK_Constraint::setLinkIndex(uint32_t chainIndex, uint32_t boneIndex) {
+				assert(chainIndex < m_num_link);
+				m_chain.get()[chainIndex].m_index = boneIndex;
+			}
 			math::Vector3 lerp(const math::Vector3& from, const math::Vector3& to, float amount)
 			{
 				return from * (1.f - amount) + to * amount;
@@ -101,6 +108,8 @@ namespace thomas {
 					pose.Translation(p[i]);												// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;								// Set
 				}
+				// Clean stack
+				ThomasCore::Core().Memory()->stack(0).deallocate(d);
 			}
 
 		}
