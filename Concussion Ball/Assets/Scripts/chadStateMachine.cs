@@ -11,14 +11,10 @@ namespace ThomasEditor
     enum State
     {
         IDLE = 0,
-        WALKING = 1,    // running without enough velocity to tackle someone
-        RUNNING = 2,    // running with enough velocity to tackle someone
-        STRAFING = 3,
-        BACKING = 4,
-        TURNING = 5,    // turning has to call different functions depending on if previous state was idle or walking/running
-        THROWING = 6,   // player throws ball / power-up, not all power-ups activate this state
-        JUMPING = 7,    // user got tackled / hit by a power-up
-        RAGDOLL = 8,    // user pressed Space to jump tackle
+        MOVING = 1,    // running without enough velocity to tackle someone
+        THROWING = 2,   // player throws ball / power-up, not all power-ups activate this state
+        JUMPING = 3,    // user got tackled / hit by a power-up
+        RAGDOLL = 4,    // user pressed Space to jump tackle
     };
 
     public class ChadStateMachine : ScriptComponent
@@ -30,6 +26,8 @@ namespace ThomasEditor
         private float m_xStep = 0.0f;
         private float m_velocity = 0.0f;
         private float m_chargeForce = 0.0f;
+
+        private float m_runningSpeed = 5.0f;
 
         public override void Start()
         {
@@ -46,35 +44,20 @@ namespace ThomasEditor
             {
                 case State.IDLE:
                     // __SIMULTAENOUS__ IDLE and: nothing
-                    // __CAN_ENTER__  WALKING/STRAFING/BACKING/TURNING/THROWING/JUMPING/RAGDOLL
+                    // __CAN_ENTER__  MOVING/THROWING/JUMPING/RAGDOLL
 
-                    Debug.Log("State: " + m_state);
-                    if (false /*m_rBody.isCollidingWithPowerUpOrChad()*/)
+                    //Debug.Log("State: " + m_state);
+                    if (false /*m_rBody.isCollidingWithPowerUpOrChad(), compare velocity, check if velocity big enough*/)
                     {
                         Debug.Log("Changed state from IDLE to RAGDOLL");
                         m_state = State.RAGDOLL;
                     }
                     else
                     {
-                        if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
+                        if (Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.W))
                         {
-                            m_state = State.TURNING;
-                            Debug.Log("Changed state from IDLE to TURNING");
-                        }
-                        else if (Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
-                        {
-                            m_state = State.STRAFING;
-                            Debug.Log("Changed state from IDLE to STRAFING");
-                        }
-                        else if (Input.GetKey(Input.Keys.S))
-                        {
-                            m_state = State.BACKING;
-                            Debug.Log("Changed state from IDLE to BACKING");
-                        }
-                        else if (Input.GetKey(Input.Keys.W))
-                        {
-                            m_state = State.WALKING;
-                            Debug.Log("Changed state from IDLE to WALKING");
+                            m_state = State.MOVING;
+                            Debug.Log("Changed state from IDLE to MOVING");
                         }
                         else if (Input.GetMouseButton(Input.MouseButtons.LEFT) /* && character is actually holding something to throw*/)
                         {
@@ -87,19 +70,29 @@ namespace ThomasEditor
                             m_state = State.JUMPING;
                         }
                     }
+                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
+                    {
+                        //ChadControls.Turn(idle, m_xStep);
+                        Debug.Log("Turning..");
+                    }
                     break;
                 case State.THROWING:
-                    // __SIMULTAENOUS__ THROW and: WALK/BACKWARDS/STRAFING/TURN
-                    // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/RUNNING
+                    // __SIMULTAENOUS__ THROW and: MOVING
+                    // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
 
                     // m_chargeForce += en faktor för charge
                     // chadBall.charge(m_chargeForce) ändrar utseende osv beroende på force
 
                     Debug.Log("Charging ball..");
-                    if (false /*m_rBody.isCollidingWithPowerUpOrChad()*/)
+                    if (false /*m_rBody.isCollidingWithPowerUpOrChad(), compare velocity, check if velocity big enough*/)
                     {
                         m_state = State.RAGDOLL;
                         Debug.Log("Changed state from IDLE to RAGDOLL");
+                    }
+                    else if(Input.GetKey(Input.Keys.Space))
+                    {
+                        Debug.Log("Was charging ball, but decided to jump instead");
+                        m_state = State.JUMPING;
                     }
                     else
                     {
@@ -110,17 +103,17 @@ namespace ThomasEditor
                         {
                             if (Input.GetKey(Input.Keys.A))
                             {
-                                // blend anim walking forward and throwing
+                                // blend anim strafing and throwing
                                 // chadMovement.Move(m_velocity*0.66f, -m_velocity*0.66f);
                             }
                             else if (Input.GetKey(Input.Keys.D))
                             {
-                                //blend anim walking forward and throwing
+                                //blend anim strafing and throwing
                                 // chadMovement.Move(m_velocity*0.66f, m_velocity*0.66f);
                             }
                             else if (!Input.GetKey(Input.Keys.S))
                             {
-                                // blend anim walking forward and throwing
+                                // blend anim walking backwards and throwing
                                 // chadMovement.Move(m_velocity, 0);
                             }
 
@@ -166,6 +159,13 @@ namespace ThomasEditor
                             Debug.Log("Charging ball and strafing right");
                         }
 
+                        if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
+                        {
+                            Debug.Log("Charging ball and rotating");
+
+                            //ChadControls.Turn(walking, m_xStep);
+                        }
+
                         // can enter following after releasing ball: walking/backing/strafing/turning/idle
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
@@ -176,25 +176,10 @@ namespace ThomasEditor
 
                             Debug.Log("Releasing ball charge to throw");
                             // check what mode to enter
-                            if (Input.GetKey(Input.Keys.W))
+                            if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
                             {
                                 Debug.Log("Changed from THROWING to WALKING");
-                                m_state = State.WALKING;
-                            }
-                            else if (Input.GetKey(Input.Keys.S))
-                            {
-                                Debug.Log("Changed from THROWING to BACKING");
-                                m_state = State.BACKING;
-                            }
-                            else if (Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
-                            {
-                                Debug.Log("Changed from THROWING to STRAFING");
-                                m_state = State.STRAFING;
-                            }
-                            else if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
-                            {
-                                m_state = State.TURNING;
-                                Debug.Log("Changed state from THROWING to TURNING");
+                                m_state = State.MOVING;
                             }
                             else
                             {
@@ -204,32 +189,128 @@ namespace ThomasEditor
                         }
                     }
                     break;
-                case State.WALKING:
-                    // __SIMULTAENOUS__ WALK and: THROW/TURN
-                    // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/RUNNING
+                case State.MOVING:
+                    // __SIMULTAENOUS__ MOVE and: nothing
+                    // __CAN_ENTER__  IDLE/THROWING/RAGDOLL/JUMP
 
-                    // m_velocity += en faktor för acceleration
-                    // chadMovement.Move(m_velocity);
+                    Debug.Log("Moving");
+                    if (false /*m_rBody.isCollidingWithPowerUpOrChad(), compare velocity, if won comparison check if velocity big enough*/)
+                    {
+                        Debug.Log("Changed state from IDLE to RAGDOLL");
+                        m_state = State.RAGDOLL;
+                    }
+                    else if (Input.GetKey(Input.Keys.Space))
+                    {
+                        m_state = State.JUMPING;
+                        Debug.Log("Player was walking and decided to jump");
+                    }
+                    else
+                    {
+                        //if m_velocity > m_runningSpeed && anim != running {anim = running}
+                        //elif m_velocity < m_runningSpeed && anim != walking {anim = walking}
+                        if (Input.GetMouseButton(Input.MouseButtons.LEFT) /*&& actually holding something to throw*/)
+                        {
+                            m_state = State.THROWING;
+                            Debug.Log("Walking and wanting to throw, change state to THROWING");
+                        }
+                        else if (Input.GetKey(Input.Keys.W))
+                        {
+                            if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.S))
+                            {
+                                // uppdatera inte m_velocity då ingen acceleration because also strafing
+                                // chadMovement.Move(m_velocity * 0.66f, -m_velocity * 0.66f);
 
-                    //play walking anim
-                    Debug.Log("Walking");
-                    if(Input.GetMouseButton(Input.MouseButtons.LEFT) /*&& character is actually holding something to throw*/)
-                    {
-                        Debug.Log("WALKING and THROWING");
-                        m_state = State.THROWING;
+                                Debug.Log("Walking and strafing together");
+                            }
+                            else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.S))
+                            {
+                                // uppdatera inte m_velocity då ingen acceleration because also strafing
+                                // chadMovement.Move(m_velocity *0.66f, m_velocity * 0.66f);
+
+                                Debug.Log("Walking and strafing together");
+                            }
+                            else if (!Input.GetKey(Input.Keys.S))
+                            {
+                                // m_velocity += en faktor för acceleration, if m_velocity < maxVelocity
+                                // chadMovement.Move(m_velocity, 0);
+                                Debug.Log("Accelerating");
+                            }
+                        }
+                        else if (Input.GetKey(Input.Keys.S))
+                        {
+                            //m_velocity = en faktor, ingen acceleration because backing
+                            if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.W))
+                            {
+                                // backing anim
+                                // chadMovement.Move(-m_velocity * 0.66f, -m_velocity * 0.66f);
+
+                                Debug.Log("Walking backwards and strafing together");
+                            }
+                            else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.W))
+                            {
+                                // backing anim
+                                // chadMovement.Move(-m_velocity *0.66f, m_velocity * 0.66f);
+
+                                Debug.Log("Walking backwards and strafing together");
+                            }
+                            else if (!Input.GetKey(Input.Keys.W))
+                            {
+                                //backing anim
+                                // chadMovement.Move(m_velocity, 0);
+                                Debug.Log("Walking backwards");
+                            }
+                        }
+                        else if (Input.GetKey(Input.Keys.A))
+                        {
+                            //strafing left anim
+                            if (!Input.GetKey(Input.Keys.D))
+                            {
+                                //chadMovement.Move(0, -m_velocity);
+                                Debug.Log("Strafing left");
+                            }
+                        }
+                        else if (Input.GetKey(Input.Keys.D))
+                        {
+                            //strafing right anim
+                            if (!Input.GetKey(Input.Keys.A))
+                            {
+                                //chadMovement.Move(0, m_velocity);
+                                Debug.Log("Strafing right");
+                            }
+                        }
+                        else if (!Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S) && !Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
+                        {
+                            m_velocity = 0;
+                            m_state = State.IDLE;
+                            Debug.Log("User stopped moving, changing state to IDLE");
+                        }
                     }
-                    //Check if user stopped accelerating and has reached 0 velocity, only check velocity == 0 if we have deacceleration
-                    else if(!Input.GetKey(Input.Keys.W)/* && m_velocity == 0*/)
+
+                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
                     {
-                        m_velocity = 0; //rewrite if deacceleration
-                        m_state = State.IDLE;
-                        Debug.Log("Changed state to IDLE");
+                        //if(m_velocity > m_runningSpeed)
+                        //    ChadControls.Turn(running, m_xStep);
+                        //else
+                        //    ChadControls.Turn(walking, m_xStep);
+                        Debug.Log("Turning..");
                     }
+
                     break;
-                
+
+                case State.JUMPING:
+                    // chadMovement.JUMP() // gets player camera forward and launches him in that direction
+
+                    // do we want to this to also set state to ragdoll?
+
+                    break;
+
                 case State.RAGDOLL: //  last state, cancels sets state to IDLE after RAGDOLL animation is finished
-                    Debug.Log("Throwing");
+                    Debug.Log("Ragdolling..");
+                    // chadMovement.Ragdoll(posPlayer, posEnemy) // calculates direction to launch player in and calls ragdoll function
+
                     break;
+
+
             }
         }
     }
