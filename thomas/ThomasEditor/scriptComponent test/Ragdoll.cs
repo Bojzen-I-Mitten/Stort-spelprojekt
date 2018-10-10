@@ -29,22 +29,40 @@ namespace ThomasEditor
 
 
             //Spine
-        //    Matrix test = gameObject.GetComponent<RenderSkinnedComponent>().GetBoneMatrix(2);
-       /*     Vector3 test1;
-            Quaternion test2;
-            Vector3 test3;
-            test.Decompose(out test1, out test2, out test3);
-            displaydata = test3;
 
-            Vector3 bone1 =  B_Hips.transform.localPosition;
-            Vector3 bone2 = displaydata;
+
+
+            RenderSkinnedComponent renderskinnedcomponent =  gameObject.GetComponent<RenderSkinnedComponent>();
+            uint boneindex=0;
+            renderskinnedcomponent.FetchBoneIndex(Utility.hash(Spine),out boneindex);
+            Vector3 bone1 = B_Hips.transform.localPosition;
+            Vector3 bone2 = renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
             Vector3 up = bone2 - bone1;
             float length = up.Length();
             if (length != 0)
                 up /= length; // Normalize
             Vector3 Pos = bone1 + up * (length * 0.5f);
 
-    */
+            G_Hips.transform.position = Pos;
+            G_Hips.AddComponent<BoxCollider>();
+            G_Hips.AddComponent<Rigidbody>();
+
+            //    Matrix test = gameObject.GetComponent<RenderSkinnedComponent>().GetBoneMatrix(2);
+            /*     Vector3 test1;
+                 Quaternion test2;
+                 Vector3 test3;
+                 test.Decompose(out test1, out test2, out test3);
+                 displaydata = test3;
+
+                 Vector3 bone1 =  B_Hips.transform.localPosition;
+                 Vector3 bone2 = displaydata;
+                 Vector3 up = bone2 - bone1;
+                 float length = up.Length();
+                 if (length != 0)
+                     up /= length; // Normalize
+                 Vector3 Pos = bone1 + up * (length * 0.5f);
+
+         */
 
         }
 
@@ -55,33 +73,23 @@ namespace ThomasEditor
         {
          
         }
-        int hash(string data)
-        {
-            int hashcode = 5381;
-
-            for(int i= 0;i<data.Length;i++)
-            {
-                hashcode = ((hashcode << 5) + hashcode) + (int)data[i];
-            }
-
-
-            return hashcode;
-        }
+ 
         public override void Update()
         {
         }
         public override void OnEnable()
         {
-           
+
         }
         public override void Awake()
         {
-            //
+        
         }
         public override void OnDisable()
         {
            
         }
+    
 
     }
 }
