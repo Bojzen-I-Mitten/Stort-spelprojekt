@@ -18,7 +18,8 @@ namespace thomas
 			thomas::object::component::ParticleEmitterComponent::ParticleEmitterComponent()
 			{
 				m_particleSystem = graphics::ParticleSystem::GetGlobalSystem();
-				m_emissionRate = 1.0;
+				m_emissionRate = 32;
+				m_emissionThreshold = 0.0;
 				m_looping = false;
 				m_isEmitting = false;
 
@@ -63,7 +64,14 @@ namespace thomas
 
 			unsigned ParticleEmitterComponent::NrOfParticlesToEmitThisFrame()
 			{
-				return m_emissionRate * ThomasTime::GetDeltaTime();
+				m_emissionThreshold += ThomasTime::GetDeltaTime() * (double)m_emissionRate;
+				if (m_emissionThreshold > 1.0)
+				{
+					unsigned temp = (unsigned)m_emissionThreshold;
+					m_emissionThreshold = 0.0;
+					return temp;
+				}
+				return 0;
 			}
 
 			void ParticleEmitterComponent::Update()
@@ -76,7 +84,7 @@ namespace thomas
 					if (nrOfParticlesToEmit > 0)
 					{
 						m_particleBufferStruct.nrOfParticlesToEmit = nrOfParticlesToEmit;
-
+						m_particleBufferStruct.rand = std::rand();
 						m_particleSystem->AddEmitterToSpawn(m_particleBufferStruct);
 					}
 				

@@ -103,6 +103,7 @@ namespace thomas
 				bool m_looping;
 
 				unsigned m_emissionRate; //Particles per second
+				double m_emissionThreshold; //Only emitt when the rate*dt is above one particle
 
 				
 			};
