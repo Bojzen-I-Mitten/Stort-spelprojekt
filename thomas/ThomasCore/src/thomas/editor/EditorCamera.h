@@ -36,6 +36,7 @@ namespace thomas
 		public:
 			bool HasSelectionChanged();
 			void ToggleManipulatorMode();
+			void ToggleObjectSelection(GameObject* gameObject);
 			void SelectObject(GameObject* gameObject);
 			void UnselectObject(GameObject* gameObject);
 			void UnselectObjects();

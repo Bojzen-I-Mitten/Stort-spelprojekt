@@ -142,6 +142,17 @@ namespace thomas
 				return Translate(math::Vector3(x, y, z));
 			}
 
+			void Transform::Scale(math::Vector3 scale)
+			{
+				SetLocalScale(m_localScale + scale);
+				SetDirty(true);
+			}
+
+			void Transform::Scale(float x, float y, float z)
+			{
+				Scale(math::Vector3(x, y, z));
+			}
+
 			math::Vector3 Transform::GetPosition()
 			{
 				if (m_parent)

@@ -25,9 +25,8 @@ namespace ThomasEngine {
 		lockOwner = Thread::CurrentThread->Name;
 #endif
 		try {
-			m_SelectedGameObjects->Clear();
 			m_SelectedGameObjects->Add(gObj);
-			thomas::editor::EditorCamera::Instance()->SelectObject((thomas::object::GameObject*)gObj->nativePtr);
+			thomas::editor::EditorCamera::Instance()->ToggleObjectSelection((thomas::object::GameObject*)gObj->nativePtr);
 		}
 		catch (Exception^ e) {
 			m_SelectedGameObjects->Clear();

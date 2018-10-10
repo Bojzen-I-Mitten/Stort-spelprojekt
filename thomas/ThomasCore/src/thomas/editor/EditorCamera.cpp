@@ -28,7 +28,7 @@ namespace thomas
 			m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
 			m_manipulatorOperation(ImGuizmo::OPERATION::TRANSLATE)
 		{
-			
+
 		}
 
 		EditorCamera::~EditorCamera()
@@ -86,8 +86,9 @@ namespace thomas
 			m_selectedObjects.clear();
 			if (gameObject)
 			{
+				UnselectObject(gameObject);
 				m_selectedObjects.push_back(gameObject);
-			}
+			}				
 
 			m_hasSelectionChanged = true;
 			m_selectedObject = gameObject;
@@ -151,6 +152,25 @@ namespace thomas
 			m_manipulatorMode = m_manipulatorMode == ImGuizmo::MODE::WORLD ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
 		}
 
+		void EditorCamera::ToggleObjectSelection(GameObject * gameObject)
+		{
+			if (!gameObject)
+				return;
+			//Deselect if already selected
+			for (int i = 0; i < (int)m_selectedObjects.size(); ++i)
+			{
+				if (m_selectedObjects[i] == gameObject)
+				{
+					m_selectedObjects.erase(m_selectedObjects.begin() + i);
+					return;
+				}
+			}
+			
+			m_selectedObjects.push_back(gameObject);
+			m_hasSelectionChanged = true;
+			m_selectedObject = gameObject;
+		}
+
 		void EditorCamera::RenderCamera()
 		{
 			// Render camera related work
@@ -190,7 +210,10 @@ namespace thomas
 				if (!ImGuizmo::IsOver())
 				{
 					object::GameObject* gObj = FindClickedGameObject();
-					SelectObject(gObj);
+					if (window->GetInput()->GetKey(Input::Keys::LeftControl))
+						ToggleObjectSelection(gObj);
+					else
+						SelectObject(gObj);
 				}
 			}
 			else
@@ -239,9 +262,71 @@ namespace thomas
 
 		void EditorCamera::RenderGizmos()
 		{
+			if (m_selectedObjects.empty())
+				return;
 			float snap[] = { 1.f, 1.f, 1.f };
 
+			math::Vector3 averagePosition = math::Vector3::Zero;
+			math::Vector3 averageScale = math::Vector3::Zero;
+			math::Quaternion averageRot = math::Quaternion::Identity;
+			std::vector<math::Matrix> offsetMatrixes = std::vector<math::Matrix>(m_selectedObjects.size());
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
+			{
+				object::GameObject* gameObject = m_selectedObjects[i];
+				averagePosition += gameObject->m_transform->GetPosition();
+				averageScale += gameObject->m_transform->GetScale();
+				averageRot += gameObject->m_transform->GetRotation();
+
+
+			}
+			averagePosition /= m_selectedObjects.size();
+			averageScale /= m_selectedObjects.size();
+			//averageRot.Normalize();
+
+
+			math::Matrix parentMatrix = math::Matrix::CreateScale(averageScale) * /* math::Matrix::CreateFromQuaternion(averageRot) * */
+				math::Matrix::CreateTranslation(averagePosition);
+
+			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
+			{
+				object::GameObject* gameObject = m_selectedObjects[i];
+				offsetMatrixes[i] = gameObject->m_transform->GetWorldMatrix() * parentMatrix.Invert();
+			}
+
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
+
+			if (m_manipulatorOperation == ImGuizmo::OPERATION::ROTATE)
+				snap[0] = 15.f;
+
+			float scale = 1080.0f / io.DisplaySize.x;
+			math::Matrix deltaMatrix;
+			ImGuizmo::Manipulate(
+				*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(scale)).m, *m_cameraComponent->GetProjMatrix().m,
+				m_manipulatorOperation, m_manipulatorMode, *parentMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
+
+			//if (worldMatrix != gameObject->m_transform->GetWorldMatrix())
+			//{
+			//	gameObject->m_transform->SetWorldMatrix(worldMatrix);
+			//	gameObject->m_transform->SetDirty(true);
+			//}
+			if (true)
+			{
+				for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
+				{
+					object::GameObject* gameObject = m_selectedObjects[i];
+
+					gameObject->m_transform->SetWorldMatrix(offsetMatrixes[i] * parentMatrix);
+
+					/*gameObject->m_transform->Rotate(deltaRot);
+					gameObject->m_transform->Translate(deltaTrans);*/
+										
+					int x = 5;
+				}
+			}
+
+			
+			/*for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
 				object::GameObject* gameObject = m_selectedObjects[i];
 				ImGuiIO& io = ImGui::GetIO();
@@ -263,7 +348,7 @@ namespace thomas
 					gameObject->m_transform->SetWorldMatrix(worldMatrix);
 					gameObject->m_transform->SetDirty(true);
 				}
-			}
+			}*/
 		}
 
 		object::GameObject* EditorCamera::FindClickedGameObject()
