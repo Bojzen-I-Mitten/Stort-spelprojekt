@@ -76,7 +76,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		float ramUsage = 0.0f;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->SetActive(showStatistics);
 		if (showStatistics) {
