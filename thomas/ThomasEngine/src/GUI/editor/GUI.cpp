@@ -3,7 +3,7 @@
 #include <thomas/editor/gizmos/Gizmos.h>
 #pragma managed
 #include "..\..\resource\Model.h"
-
+#include "..\..\ThomasManaged.h"
 
 void ThomasEngine::GUI::DrawModel(Model^ model, int meshIndex,Vector3 position, Quaternion rotation, Vector3 scale)
 {
@@ -105,9 +105,11 @@ void ThomasEngine::GUI::DrawPing(String^ ping)
 
 void ThomasEngine::GUI::ImguiStringUpdate(String^ text, Vector2 size, Vector2 pos)
 {
-	thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(size), Utility::Convert(pos));
+	if (ThomasEngine::ThomasWrapper::InEditor())
+		thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(size), Utility::Convert(pos));
 }
 void ThomasEngine::GUI::ImguiStringUpdate(String ^ text, Vector2 pos)
 {
-	thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
+	if(ThomasEngine::ThomasWrapper::InEditor())
+		thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
 }
