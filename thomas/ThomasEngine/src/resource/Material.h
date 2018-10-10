@@ -3,6 +3,8 @@
 #include <thomas\resource\Material.h>
 #pragma managed
 #include "Resource.h"
+using namespace Newtonsoft::Json;
+
 namespace ThomasEngine
 {
 	ref class Shader;
@@ -121,6 +123,7 @@ namespace ThomasEngine
 			void set(ThomasEngine::Shader^ value);
 		}
 		[DataMemberAttribute(Order = 1)]
+		[JsonPropertyAttribute(ObjectCreationHandling = ObjectCreationHandling::Replace)]
 		property Dictionary<String^, System::Object^>^ properties
 		{
 			Dictionary<String^, System::Object^>^ get();
