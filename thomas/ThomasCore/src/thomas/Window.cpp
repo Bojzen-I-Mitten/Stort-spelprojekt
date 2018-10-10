@@ -281,8 +281,8 @@ namespace thomas
 	//Windows window events function
 	LRESULT CALLBACK Window::EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
-			return true;
+		/*if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+			return true;*/
 
 		Window* window = WindowManager::Instance()->GetWindow(hWnd);
 
@@ -293,6 +293,13 @@ namespace thomas
 		{
 			if (window)
 				window->QueueResize();
+
+			/*if (WindowManager::Instance()->GetEditorWindow())
+			{
+				WindowManager::Instance()->GetEditorWindow()->ResizeNK(WindowManager::Instance()->GetEditorWindow()->GetWidth(),
+																	   WindowManager::Instance()->GetEditorWindow()->GetHeight());
+			}*/
+				
 		}
 		break;
 		case WM_SETFOCUS:
@@ -327,6 +334,13 @@ namespace thomas
 			PostQuitMessage(0);
 			break;
 		}
+
+		/*if (WindowManager::Instance()->GetEditorWindow())
+		{
+			if (WindowManager::Instance()->GetEditorWindow()->HandleEvent(hWnd, message, wParam, lParam))
+				return 0;
+		}*/
+
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 }

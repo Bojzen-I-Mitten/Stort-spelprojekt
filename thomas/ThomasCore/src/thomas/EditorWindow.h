@@ -15,7 +15,10 @@ namespace thomas
 		void Present();
 		void BeginFrame();
 		void EndFrame(bool copyGui);
+		void ResizeNK(int width, int height);
+		int HandleEvent(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 		virtual bool IsEditor() { return true; }
+
 	private:
 		void UpdateWindow();
 		void CloneGUIData();

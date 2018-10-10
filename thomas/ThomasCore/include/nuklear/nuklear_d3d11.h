@@ -78,8 +78,7 @@ static struct
     ID3D11SamplerState *sampler_state;
 } d3d11;
 
-NK_API void
-nk_d3d11_render(enum nk_anti_aliasing AA)
+NK_API void nk_d3d11_render(enum nk_anti_aliasing AA)
 {
     const float blend_factor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     const UINT stride = sizeof(struct nk_d3d11_vertex);
@@ -163,8 +162,7 @@ nk_d3d11_render(enum nk_anti_aliasing AA)
     nk_clear(&d3d11.ctx);}
 }
 
-static void
-nk_d3d11_get_projection_matrix(int width, int height, float *result)
+static void nk_d3d11_get_projection_matrix(int width, int height, float *result)
 {
     const float L = 0.0f;
     const float R = (float)width;
@@ -180,22 +178,20 @@ nk_d3d11_get_projection_matrix(int width, int height, float *result)
     memcpy(result, matrix, sizeof(matrix));
 }
 
-NK_API void
-nk_d3d11_resize(ID3D11DeviceContext *context, int width, int height)
+NK_API void nk_d3d11_resize(int width, int height)
 {
     D3D11_MAPPED_SUBRESOURCE mapped;
     if (SUCCEEDED( g_context->Map((ID3D11Resource *)d3d11.const_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
     {
         nk_d3d11_get_projection_matrix(width, height, (float *)mapped.pData);
-         g_context->Unmap((ID3D11Resource *)d3d11.const_buffer, 0);
+        g_context->Unmap((ID3D11Resource *)d3d11.const_buffer, 0);
 
         d3d11.viewport.Width = (float)width;
         d3d11.viewport.Height = (float)height;
     }
 }
 
-NK_API int
-nk_d3d11_handle_event(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
+NK_API int nk_d3d11_handle_event(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     switch (msg)
     {
@@ -356,8 +352,7 @@ nk_d3d11_handle_event(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
     return 0;
 }
 
-static void
-nk_d3d11_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
+static void nk_d3d11_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
 {
     (void)usr;
     if (IsClipboardFormatAvailable(CF_UNICODETEXT) && OpenClipboard(NULL))
@@ -390,8 +385,7 @@ nk_d3d11_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
     }
 }
 
-static void
-nk_d3d11_clipboard_copy(nk_handle usr, const char *text, int len)
+static void nk_d3d11_clipboard_copy(nk_handle usr, const char *text, int len)
 {
     (void)usr;
     if (OpenClipboard(NULL))
@@ -416,8 +410,7 @@ nk_d3d11_clipboard_copy(nk_handle usr, const char *text, int len)
     }
 }
 
-NK_API struct nk_context*
-nk_d3d11_init(ID3D11Device *device, ID3D11DeviceContext* context, int width, int height, unsigned int max_vertex_buffer, unsigned int max_index_buffer)
+NK_API struct nk_context* nk_d3d11_init(ID3D11Device *device, ID3D11DeviceContext* context, int width, int height, unsigned int max_vertex_buffer, unsigned int max_index_buffer)
 {
     HRESULT hr;
     d3d11.max_vertex_buffer = max_vertex_buffer;
@@ -544,16 +537,14 @@ nk_d3d11_init(ID3D11Device *device, ID3D11DeviceContext* context, int width, int
     return &d3d11.ctx;
 }
 
-NK_API void
-nk_d3d11_font_stash_begin(struct nk_font_atlas **atlas)
+NK_API void nk_d3d11_font_stash_begin(struct nk_font_atlas **atlas)
 {
     nk_font_atlas_init_default(&d3d11.atlas);
     nk_font_atlas_begin(&d3d11.atlas);
     *atlas = &d3d11.atlas;
 }
 
-NK_API void
-nk_d3d11_font_stash_end(void)
+NK_API void nk_d3d11_font_stash_end(void)
 {
     const void *image; int w, h;
     image = nk_font_atlas_bake(&d3d11.atlas, &w, &h, NK_FONT_ATLAS_RGBA32);
@@ -597,8 +588,7 @@ nk_d3d11_font_stash_end(void)
         nk_style_set_font(&d3d11.ctx, &d3d11.atlas.default_font->handle);
 }
 
-NK_API
-void nk_d3d11_shutdown(void)
+NK_API void nk_d3d11_shutdown(void)
 {
     nk_font_atlas_clear(&d3d11.atlas);
     nk_buffer_free(&d3d11.cmds);

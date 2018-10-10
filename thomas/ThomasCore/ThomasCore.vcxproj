@@ -215,6 +215,12 @@
     <ClInclude Include="src\thomas\Window.h" />
     <ClInclude Include="src\thomas\WindowManager.h" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="include\nuklear\nuklear_d3d11.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vs</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{ED0D8681-B384-43D1-8F56-B4145588E20C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
