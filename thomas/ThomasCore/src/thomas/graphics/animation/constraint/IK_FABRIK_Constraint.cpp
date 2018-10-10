@@ -1,3 +1,4 @@
+#include "..\..\..\..\..\..\ThomasEngine\src\script\animation\constraint\IK_FABRIK_Constraint.h"
 #include "IK_FABRIK_Constraint.h"
 #include "../../../ThomasCore.h"
 #include "../../../resource/MemoryAllocation.h"
