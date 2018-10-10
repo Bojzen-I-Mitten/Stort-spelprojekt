@@ -301,7 +301,9 @@ namespace ThomasEditor
                     // chadMovement.JUMP() // gets player camera forward and launches him in that direction
 
                     // do we want to this to also set state to ragdoll?
-
+                    Debug.Log("WHERE WE JUMPIN', BOIS?!");
+                    // if !chadMovement.is_jumping 
+                    //      m_state = State.IDLE;
                     break;
 
                 case State.RAGDOLL: //  last state, cancels sets state to IDLE after RAGDOLL animation is finished
