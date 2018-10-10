@@ -24,6 +24,7 @@ namespace ThomasEditor
 
         //State checks
         private float m_xStep = 0.0f;
+        private float m_yStep = 0.0f;
         private float m_velocity = 0.0f;
         private float m_chargeForce = 0.0f;
 
@@ -33,6 +34,7 @@ namespace ThomasEditor
         {
             m_state = State.IDLE;
             m_xStep = Input.GetMouseX() * Time.ActualDeltaTime;
+            m_yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
             m_rBody = gameObject.GetComponent<Rigidbody>();
         }
@@ -70,10 +72,11 @@ namespace ThomasEditor
                             m_state = State.JUMPING;
                         }
                     }
-                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
+                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
-                        //ChadControls.Turn(idle, m_xStep);
-                        Debug.Log("Turning..");
+                        Debug.Log("Idle and turning");
+
+                        //ChadControls.Turn(m_velocity, m_xStep, m_yStep);
                     }
                     break;
                 case State.THROWING:
@@ -159,11 +162,11 @@ namespace ThomasEditor
                             Debug.Log("Charging ball and strafing right");
                         }
 
-                        if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
+                        if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                         {
-                            Debug.Log("Charging ball and rotating");
+                            Debug.Log("Charging ball and turning");
 
-                            //ChadControls.Turn(walking, m_xStep);
+                            //ChadControls.Turn(m_velocity, m_xStep, m_yStep);
                         }
 
                         // can enter following after releasing ball: walking/backing/strafing/turning/idle
@@ -286,13 +289,11 @@ namespace ThomasEditor
                         }
                     }
 
-                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep)
+                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
-                        //if(m_velocity > m_runningSpeed)
-                        //    ChadControls.Turn(running, m_xStep);
-                        //else
-                        //    ChadControls.Turn(walking, m_xStep);
-                        Debug.Log("Turning..");
+                        Debug.Log("Moving and turning..");
+
+                        //ChadControls.Turn(m_velocity, m_xStep, m_yStep);
                     }
 
                     break;
