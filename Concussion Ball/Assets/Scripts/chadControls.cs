@@ -11,7 +11,8 @@ using ThomasEngine.Network;
 
 namespace ThomasEditor
 {
-    public class ChadControls : NetworkComponent
+    public class ChadControls : ScriptComponent
+    //public class ChadControls : NetworkComponent
     {
 
         public float baseThrowForce { get; set; } = 5.0f;
@@ -46,7 +47,7 @@ namespace ThomasEditor
         {
             rBody = gameObject.GetComponent<Rigidbody>();
             //test = camPrefab.GetComponent<Camera>();
-            if (!isOwner && camera)
+            if (/*!isOwner && */camera)
             {
                 camera.enabled = false;
                 initalCameraPos = camera.transform.localPosition;
@@ -56,7 +57,7 @@ namespace ThomasEditor
             if (!camera)
                 Debug.LogWarning("Camera not set for player");
 
-            rBody.IsKinematic = !isOwner;
+            //rBody.IsKinematic = !isOwner;
             throwForce = baseThrowForce;
             ball = Object.GetObjectsOfType<Ball>().FirstOrDefault();
         }
@@ -84,9 +85,8 @@ namespace ThomasEditor
 
         public override void Update()
         {
-            //Debug.Log("test");
-            if (!isOwner)
-                return;
+            //if (!isOwner)
+            //    return;
             ////Jumping
             //if (Input.GetKey(Input.Keys.Space) && jumpDelay)
             //{
@@ -156,11 +156,11 @@ namespace ThomasEditor
 
         public override void OnCollisionEnter(Collider collider)
         {
-            if (ball && isOwner)
+            if (ball /*&& isOwner*/)
             {
                 if (collider.gameObject == ball.gameObject)
                 {
-                    TakeOwnership(collider.gameObject);
+                    //TakeOwnership(collider.gameObject);
                     ball.Pickup(gameObject, hand ? hand : transform);
                     hasBall = true;
                     canPickupBall = false;

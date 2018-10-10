@@ -2,6 +2,7 @@
 #include "D3D.h"
 #include "../Common.h"
 #include "../Window.h"
+#include "GpuProfiler.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
 #include <dxgi.h>
@@ -184,8 +185,8 @@ namespace thomas
 #ifdef  _DEBUG_DX
 			CreateDebugInterface();
 #endif
-
-			return true;
+			m_profiler = new profiling::GpuProfiler();
+			return m_profiler->Init();
 		}
 
 		void D3D::CreateDebugInterface()
@@ -195,8 +196,21 @@ namespace thomas
 				LOG_HR(hr);
 		}
 
+		bool D3D::CreateQuery(D3D11_QUERY type, ID3D11Query *& query)
+		{
+			D3D11_QUERY_DESC desc;
+			desc.Query = type;
+			desc.MiscFlags = 0;
+
+			HRESULT hr = m_device->CreateQuery(&desc, &query);
+			return SUCCEEDED(hr);
+		}
+
 		void D3D::Destroy()
 		{
+			m_profiler->Destroy();
+			delete m_profiler;
+
 			m_deviceContext->ClearState();
 			m_deviceContext->Flush();
 
@@ -434,6 +448,11 @@ namespace thomas
 		ID3D11DeviceContext * D3D::GetDeviceContext()
 		{
 			return m_deviceContext;
+		}
+
+		profiling::GpuProfiler* D3D::GetProfiler()
+		{
+			return m_profiler;
 		}
 
 		void D3D::CreateTextureAndViews(UINT width, UINT height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)
