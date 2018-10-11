@@ -20,6 +20,9 @@ namespace thomas {
 				struct LinkParameter 
 				{
 					uint32_t m_index;
+
+					LinkParameter(){}
+					LinkParameter(uint32_t index) : m_index(index) {}
 				};
 
 			public:
@@ -29,7 +32,7 @@ namespace thomas {
 				IK_FABRIK_Constraint(const std::vector<LinkParameter>& link_chain);
 				~IK_FABRIK_Constraint();
 
-				void setLinkIndex(uint32_t chainIndex, uint32_t boneIndex);
+				void setLinkAtIndex(uint32_t chainIndex, LinkParameter boneIndex);
 
 				// Replaces the bone transform from a separate object.
 				virtual void execute(Skeleton& skel, math::Matrix* objectPose, uint32_t boneInd) override;

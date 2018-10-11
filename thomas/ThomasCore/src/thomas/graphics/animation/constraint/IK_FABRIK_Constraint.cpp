@@ -21,10 +21,11 @@ namespace thomas {
 			{
 			}
 
-			void IK_FABRIK_Constraint::setLinkIndex(uint32_t chainIndex, uint32_t boneIndex) {
+			void IK_FABRIK_Constraint::setLinkAtIndex(uint32_t chainIndex, LinkParameter param) {
 				assert(chainIndex < m_num_link);
-				m_chain.get()[chainIndex].m_index = boneIndex;
+				m_chain.get()[chainIndex] = param;
 			}
+
 			math::Vector3 lerp(const math::Vector3& from, const math::Vector3& to, float amount)
 			{
 				return from * (1.f - amount) + to * amount;
@@ -100,21 +101,21 @@ namespace thomas {
 				// Apply solution to chain
 				for (i = 0; i < m_num_link - 1; i++) {
 					math::Matrix pose = objectPose[(chain+i)->m_index];
-					math::Quaternion q = math::getRotationTo(pose.Up(), p[i+1] - p[i]);	// Rotation difference from current pose to target
-					pose.Translation(math::Vector3::Zero);								// Remove translation
-					pose = pose * math::Matrix::CreateFromQuaternion(q);				// Rotate
-					pose.Translation(p[i]);												// Apply new translation
-					objectPose[(chain+i)->m_index] = pose;								// Set
+					pose.Translation(math::Vector3::Zero);										// Remove translation
+					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate
+					pose.Translation(p[i]);														// Apply new translation
+					objectPose[(chain+i)->m_index] = pose;										// Set
 				}
 				objectPose[(chain + m_num_link - 1)->m_index].Translation(p[m_num_link-1]);
+
 #ifdef _EDITOR
 				for (i = 0; i < m_num_link; i++) {
 					editor::Gizmos::SetColor(math::Color(0, 1.f, 0.f));
-					editor::Gizmos::DrawRay(math::Ray(p[i], objectPose[(chain + i)->m_index].Up()));
+					editor::Gizmos::DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Up());
 					editor::Gizmos::SetColor(math::Color(1.f, 0.f, 0.f));
-					editor::Gizmos::DrawRay(math::Ray(p[i], objectPose[(chain + i)->m_index].Right()));
+					editor::Gizmos::DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Right());
 					editor::Gizmos::SetColor(math::Color(0.f, 0.f, 1.f));
-					editor::Gizmos::DrawRay(math::Ray(p[i], objectPose[(chain + i)->m_index].Forward()));
+					editor::Gizmos::DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Forward());
 				}
 #endif
 				// Clean stack
