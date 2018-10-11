@@ -129,6 +129,9 @@ namespace thomas
 			m_emitParticlesCS->Bind();
 			m_emitParticlesCS->SetPass(0);
 
+			ID3D11Buffer* cBuffer[1] = { m_bufferSpawnIndex->GetBuffer() };
+			utils::D3D::Instance()->GetDeviceContext()->CSSetConstantBuffers(7, 1, cBuffer);
+
 			for (unsigned i = 0; i < m_emitters.size(); ++i)
 			{
 				D3D11_MAPPED_SUBRESOURCE mappedResource = {};
