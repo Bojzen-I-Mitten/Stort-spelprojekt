@@ -22,6 +22,7 @@ namespace ThomasEngine
 			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
 			serializer->NullValueHandling = NullValueHandling::Ignore;
+			serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;
 
 			serializer->Converters->Add(gcnew ResourceConverter());
 			serializer->Converters->Add(gcnew PrefabConverter());

@@ -84,7 +84,7 @@ v2f vert(appdata_thomas_skin v)
 float4 frag(v2f input) : SV_TARGET
 {
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
-    diffuse *= (color.xyz / 255.0f);
+    diffuse *= color.xyz;
     float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
     float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
 
