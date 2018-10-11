@@ -89,7 +89,7 @@ namespace thomas
 			{
 				if (target == GetPosition())
 					return;
-				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, m_localWorldMatrix.Up());
+				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, math::Vector3::Up);
 				
 				Decompose();
 				SetDirty(true);

@@ -268,23 +268,20 @@ namespace thomas
 
 			math::Vector3 averagePosition = math::Vector3::Zero;
 			math::Vector3 averageScale = math::Vector3::Zero;
-			math::Quaternion averageRot = math::Quaternion::Identity;
+			math::Quaternion rot = m_selectedObjects[0]->m_transform->GetRotation();
 			std::vector<math::Matrix> offsetMatrixes = std::vector<math::Matrix>(m_selectedObjects.size());
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
 				object::GameObject* gameObject = m_selectedObjects[i];
 				averagePosition += gameObject->m_transform->GetPosition();
 				averageScale += gameObject->m_transform->GetScale();
-				averageRot += gameObject->m_transform->GetRotation();
-
-
 			}
 			averagePosition /= m_selectedObjects.size();
 			averageScale /= m_selectedObjects.size();
-			//averageRot.Normalize();
+			
 
 
-			math::Matrix parentMatrix = math::Matrix::CreateScale(averageScale) * /* math::Matrix::CreateFromQuaternion(averageRot) * */
+			math::Matrix parentMatrix = math::Matrix::CreateScale(averageScale) * math::Matrix::CreateFromQuaternion(rot) *
 				math::Matrix::CreateTranslation(averagePosition);
 
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
@@ -305,11 +302,6 @@ namespace thomas
 				*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(scale)).m, *m_cameraComponent->GetProjMatrix().m,
 				m_manipulatorOperation, m_manipulatorMode, *parentMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
 
-			//if (worldMatrix != gameObject->m_transform->GetWorldMatrix())
-			//{
-			//	gameObject->m_transform->SetWorldMatrix(worldMatrix);
-			//	gameObject->m_transform->SetDirty(true);
-			//}
 			if (true)
 			{
 				for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
@@ -317,38 +309,11 @@ namespace thomas
 					object::GameObject* gameObject = m_selectedObjects[i];
 
 					gameObject->m_transform->SetWorldMatrix(offsetMatrixes[i] * parentMatrix);
-
-					/*gameObject->m_transform->Rotate(deltaRot);
-					gameObject->m_transform->Translate(deltaTrans);*/
-										
+					gameObject->m_transform->SetDirty(true);
 					int x = 5;
 				}
 			}
 
-			
-			/*for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
-			{
-				object::GameObject* gameObject = m_selectedObjects[i];
-				ImGuiIO& io = ImGui::GetIO();
-				ImGuizmo::SetRect(0.f, 0.f, io.DisplaySize.x, io.DisplaySize.y);
-				math::Matrix worldMatrix = gameObject->m_transform->GetWorldMatrix();
-
-				if (m_manipulatorOperation == ImGuizmo::OPERATION::ROTATE)
-					snap[0] = 15.f;
-
-				float scale = 1080.0f / io.DisplaySize.x;
-
-				math::Matrix deltaMatrix;
-				ImGuizmo::Manipulate(
-					*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(scale)).m, *m_cameraComponent->GetProjMatrix().m,
-					m_manipulatorOperation, m_manipulatorMode, *worldMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
-
-				if (worldMatrix != gameObject->m_transform->GetWorldMatrix())
-				{
-					gameObject->m_transform->SetWorldMatrix(worldMatrix);
-					gameObject->m_transform->SetDirty(true);
-				}
-			}*/
 		}
 
 		object::GameObject* EditorCamera::FindClickedGameObject()
@@ -420,15 +385,29 @@ namespace thomas
 
 		void EditorCamera::SnapCameraToFocus()
 		{
-			object::GameObject *gObj = m_selectedObject;
-			if (gObj)
-			{		
-				math::Vector3 gPos = gObj->m_transform->GetPosition();
-				math::Vector3 dir = m_transform->GetPosition() - gPos;
-				dir.Normalize();
+			if (m_selectedObjects.empty())
+				return;
 
-				m_transform->LookAt(gPos + math::Vector3(2.f) * dir, gPos, math::Vector3::Up);
+			math::BoundingBox combinedBox = math::BoundingBox(m_selectedObjects[0]->m_transform->GetPosition(), math::Vector3::Zero);
+			for each(GameObject* gameObject in m_selectedObjects)
+			{
+				auto renderComponent = gameObject->GetComponent<object::component::RenderComponent>();
+				math::BoundingBox boundingBox;
+				if (renderComponent)
+				{
+					boundingBox = math::BoundingBox(renderComponent->m_bounds.Center, renderComponent->m_bounds.Extents);
+				}
+				else
+				{
+					boundingBox = math::BoundingBox(gameObject->m_transform->GetPosition(), math::Vector3::Zero);
+				}
+
+				math::BoundingBox::CreateMerged(combinedBox, boundingBox, combinedBox);
 			}
+
+			m_transform->LookAt(combinedBox.Center);
+			m_transform->SetPosition(combinedBox.Center);
+			m_transform->Translate(-m_transform->Forward()*combinedBox.Extents*5.0f);
 		}
 	}
 }
