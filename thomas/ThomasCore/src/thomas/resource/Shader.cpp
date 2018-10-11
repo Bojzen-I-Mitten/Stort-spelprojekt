@@ -633,6 +633,7 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyScalarBool::GetDefault();
 					break;
 				case D3D_SVT_INT:
+					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 				case D3D_SVT_UINT:
 					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 					break;
@@ -697,7 +698,7 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
 					break;
 				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
-					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
 					break;
 				case D3D_SVT_BYTEADDRESS_BUFFER:
 					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();

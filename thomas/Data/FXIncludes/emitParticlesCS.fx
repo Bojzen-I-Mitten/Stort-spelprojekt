@@ -34,9 +34,10 @@ struct InitParticleBufferStruct
 
 };
 
-cbuffer indexForParticleEmitter
+cbuffer indexForParticleEmitter : register(b7)
 {
     int initindex;
+    int3 pad;
 };
 
 StructuredBuffer<InitParticleBufferStruct> initparticles;
@@ -52,9 +53,8 @@ RWByteAddressBuffer counterbuffer;
 void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
     int ix = (Gid.x * EMIT_THREAD_DIM_X) + GTid.x;
-    int iy = Gid.y;
 
-    InitParticleBufferStruct newParticle = initparticles[iy];
+    InitParticleBufferStruct newParticle = initparticles[initindex];
 
     uint2 aliveAndMaxCount = counterbuffer.Load2(ALIVE_COUNT_OFFSET);
     uint aliveCount = aliveAndMaxCount.x;

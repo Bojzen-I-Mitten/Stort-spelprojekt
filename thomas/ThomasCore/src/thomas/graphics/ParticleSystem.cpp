@@ -2,6 +2,7 @@
 #include "../resource/ComputeShader.h"
 #include <random>
 #include <time.h>
+
 namespace thomas
 {
 	namespace graphics
@@ -38,6 +39,8 @@ namespace thomas
 
 			//PARTICLE BUFFERS
 			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_bufferSpawnIndex =	std::make_unique<utils::buffers::Buffer>(nullptr, sizeof(int) * 4, D3D11_BIND_CONSTANT_BUFFER, DYNAMIC_BUFFER);
+
 			m_bufferUpdate =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
 			m_bufferBillboard =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
 
@@ -91,7 +94,6 @@ namespace thomas
 			SAFE_RELEASE(m_bufferIndirectArgs);
 			SAFE_RELEASE(m_bufferCounters);
 			
-
 			//m_updateParticlesCS 
 			//m_emitParticlesCS
 		}
@@ -100,7 +102,7 @@ namespace thomas
 		{
 			m_emitters.push_back(emitterInitData);
 		}
-
+		
 		void ParticleSystem::SpawnParticles()
 		{
 			if (m_emitters.size() == 0)
@@ -108,8 +110,8 @@ namespace thomas
 
 			m_bufferSpawn->SetData(m_emitters);
 			
-
 			m_emitParticlesCS->SetGlobalResource("initparticles", m_bufferSpawn->GetSRV());
+
 			m_emitParticlesCS->SetGlobalUAV("particles", m_bufferUpdate->GetUAV());
 			m_emitParticlesCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
 			m_emitParticlesCS->SetGlobalUAV("counterbuffer", m_bufferCounters->GetUAV());
@@ -127,8 +129,15 @@ namespace thomas
 			m_emitParticlesCS->Bind();
 			m_emitParticlesCS->SetPass(0);
 
-			m_emitParticlesCS->Dispatch(1, m_emitters.size());					//EMIT
-			
+			for (unsigned i = 0; i < m_emitters.size(); ++i)
+			{
+				D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+				HRESULT ttttt = utils::D3D::Instance()->GetDeviceContext()->Map(m_bufferSpawnIndex->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				memcpy(mappedResource.pData, &i, sizeof(int));
+				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_bufferSpawnIndex->GetBuffer(), 0);
+
+				m_emitParticlesCS->Dispatch((m_emitters[i].nrOfParticlesToEmit + EMIT_THREAD_DIM_X - 1) / EMIT_THREAD_DIM_X);					//EMIT
+			}
 			resource::ComputeShader::UnbindAllUAVs();
 			resource::ComputeShader::UnbindOneSRV(0);
 

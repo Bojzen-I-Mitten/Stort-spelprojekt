@@ -5,6 +5,7 @@
 #include "../utils/Math.h"
 
 
+
 namespace thomas
 {
 	
@@ -113,6 +114,7 @@ namespace thomas
 			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferIndirectArgs;//updateDispatchIndirect[3] + drawIndirectArgs[4]
 
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferSpawn;
+			std::unique_ptr<utils::buffers::Buffer>			  m_bufferSpawnIndex;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferUpdate;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferDeadList;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferAliveListPing;
@@ -124,7 +126,8 @@ namespace thomas
 			
 			resource::Shader* m_particleShader;
 
-
+			static const unsigned int UPDATE_THREAD_DIM_X = 256;
+			static const unsigned int EMIT_THREAD_DIM_X = 128;
 		};
 
 	
