@@ -12,29 +12,18 @@ using ThomasEngine.Network;
 
 namespace ThomasEditor
 {
-    public class ChadControls : ScriptComponent
-    //public class ChadControls : NetworkComponent
+    public class ChadControls : NetworkComponent
     {
-
         public float baseThrowForce { get; set; } = 5.0f;
         public float maxThrowForce { get; set; } = 20.0f;
        
         public int speed { get; set; } = 5;
         public float force { get; set; } = 5;
-        public float cameraSensitivity_x { get; set; } = 1;
-        public float cameraSensitivity_y { get; set; } = 2.0f;
-
-        //The turn ratio that is used for calculations, set to one of the turn ratios below.
-        public float TurnRatio { get; set; } = 1;
-
-        #region Turn Ratios
-        //Different turn ratios used for different movement patterns
-        public float RunningTurnRatio { get; set; } = 0.05f;
-        public float IdleTurnRatio { get; set; } = 0.5f;
-        public float WalkingTurnRatio { get; set; } = 0.5f;
-        public float ThrowingTurnRatio { get; set; } = 1;
-        public float TacklingTurnRatio { get; set; } = 0.01f;
-        #endregion
+        public float cameraSensitivity_x { get; set; } = 10;
+        public float cameraSensitivity_y { get; set; } = 20;
+        public float cameraHeight { get; set; } = 1;
+        public float cameraVertAngle { get; set; } = 60;
+        private float camVertRadians { get { return ThomasEngine.MathHelper.ToRadians(cameraVertAngle); } }
 
         public float cameraDistance { get; set; } = 2;
 
@@ -43,7 +32,7 @@ namespace ThomasEditor
         public Transform hand { get; set; }
 
         public Camera camera { get; set; }
-        private Vector3 initalCameraPos;
+        private Quaternion FreeLookDirection;
         Rigidbody rBody;
  
         //Camera test;
@@ -114,37 +103,13 @@ namespace ThomasEditor
             //    StartCoroutine(JumpingCoroutine());
             //}
 
-            HandleMovement();
+            //HandleMovement();
 
             if(hasBall) FondleBall();
         }
 
         public void HandleMovement()
         {
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-            float xStep = Input.GetMouseX() * Time.ActualDeltaTime * cameraSensitivity_x;
-            float yStep = Input.GetMouseY() * Time.ActualDeltaTime * cameraSensitivity_y;
-
-            Quaternion rot = Quaternion.CreateFromAxisAngle(transform.right, -yStep);
-            rot *= Quaternion.CreateFromAxisAngle(transform.up, -xStep);
-
-            Vector3 up = Vector3.Transform(transform.up, rot);
-            Vector3 forward = Vector3.Transform(transform.forward, rot);
-            if (camera)
-            {
-                camera.transform.localEulerAngles += new Vector3(-yStep, 0, 0);
-
-                camera.transform.position = Vector3.Transform(new Vector3(0.0f, 1.7f, cameraDistance), camera.transform.localRotation)
-                    + transform.position;
-            }
-
-            //Limit turn speed------------------------------
-            float xStepSign = Math.Sign(xStep);
-            xStep = Math.Min(Math.Abs(xStep), TurnRatio);
-            xStep *= xStepSign;
-            //----------------------------------------------
-            transform.RotateByAxis(transform.up, -xStep);
-
             if (Input.GetKey(Input.Keys.W))
                 transform.position += transform.forward * speed * Time.DeltaTime;
             else if (Input.GetKey(Input.Keys.S))
@@ -154,6 +119,78 @@ namespace ThomasEditor
                 transform.position += transform.right * speed * Time.DeltaTime;
             else if (Input.GetKey(Input.Keys.A))
                 transform.position -= transform.right * speed * Time.DeltaTime;
+        }
+
+        public void FondleCamera(float velocity, float xStep, float yStep)
+        {
+            float _xStep = xStep;
+            //Limit turn speed------------------------------
+            float xStepSign = Math.Sign(xStep);
+            float TurnRatio = 1;
+            if (velocity != 0)
+                TurnRatio = 1 / velocity;
+            _xStep = Math.Min(Math.Abs(xStep), TurnRatio);
+            _xStep *= xStepSign;
+            //----------------------------------------------
+
+            transform.RotateByAxis(transform.up, ThomasEngine.MathHelper.ToRadians(-_xStep * cameraSensitivity_x));
+
+            if (camera)
+            {
+                //camera.transform.localEulerAngles += new Vector3(-yStep * cameraSensitivity_y, 0, 0);
+                camera.transform.RotateByAxis(new Vector3(1, 0, 0), ThomasEngine.MathHelper.ToRadians(-yStep * cameraSensitivity_y));
+                Vector3 camForwardXZ = new Vector3(camera.transform.forward.x, 0, camera.transform.forward.z);
+                camForwardXZ.Normalize();
+                Debug.Log(camForwardXZ);
+                float forwardAngle = (float)Math.Acos(Vector3.Dot(camForwardXZ, camera.transform.forward));
+                //float forwardSign = Math.Sign(Vector3.Cross(tempForward, camera.transform.forward).y);
+                if (camVertRadians < forwardAngle || forwardAngle < 0)
+                {
+                    Debug.Log("Angle: " + forwardAngle);
+                    camera.transform.rotation = Quaternion.CreateFromYawPitchRoll(camera.transform.eulerAngles.x, camVertRadians, camera.transform.eulerAngles.z);
+                }
+
+                camera.transform.position = Vector3.Transform(new Vector3(0, cameraHeight, cameraDistance), camera.transform.localRotation) + transform.position;
+            }
+        }
+
+        public void FreeLookCamera(float velocity, float xStep, float yStep)
+        {
+            if (camera)
+            {
+                camera.transform.localEulerAngles += new Vector3(-yStep * cameraSensitivity_y, -xStep * cameraSensitivity_x, 0);
+
+                Vector3 camForwardXZ = new Vector3(camera.transform.forward.x, 0, camera.transform.forward.z);
+                camForwardXZ.Normalize();
+                Debug.Log(camForwardXZ);
+                float forwardAngle = (float)Math.Acos(Vector3.Dot(camForwardXZ, camera.transform.forward));
+                if (camVertRadians < forwardAngle || forwardAngle < 0)
+                {
+                    Debug.Log("Angle: " + forwardAngle);
+                    camera.transform.rotation = Quaternion.CreateFromYawPitchRoll(camera.transform.eulerAngles.x, camVertRadians, camera.transform.eulerAngles.z);
+                }
+
+                camera.transform.position = Vector3.Transform(new Vector3(0, cameraHeight, cameraDistance), camera.transform.localRotation) + transform.position;
+            }
+        }
+
+        public void ResetCamera()
+        {
+            if (camera)
+            {
+                //Find the angle to reset the camera behind the player
+                Vector3 camForwardXZ = new Vector3(camera.transform.forward.x, 0, camera.transform.forward.z);
+                camForwardXZ.Normalize();
+                float angle = (float)Math.Acos(Vector3.Dot(camForwardXZ, transform.forward));
+                float sign = Math.Sign(Vector3.Cross(camForwardXZ, transform.forward).y);
+                angle *= sign;
+                //--------------------------------------------------
+
+                //Rotate by found angle, and shift position behind player, and up a little
+                camera.transform.RotateByAxis(transform.up, angle);
+                camera.transform.position = transform.position + new Vector3(0, cameraHeight, cameraDistance);
+                camera.transform.localEulerAngles = new Vector3(0, 0, 0);
+            }
         }
 
         public void FondleBall()
@@ -186,7 +223,6 @@ namespace ThomasEditor
                     canPickupBall = false;
                 }
             }
-            
         }
     }
 }

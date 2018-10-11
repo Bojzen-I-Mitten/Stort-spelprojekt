@@ -117,6 +117,7 @@ namespace ThomasEngine
 		Translate(Vector3(x, y, z));
 	}
 
+
 	bool Transform::IsChildOf(Transform^ _parent)
 	{
 		if (this->nativePtr == _parent->nativePtr)
