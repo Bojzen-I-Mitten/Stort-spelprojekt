@@ -32,6 +32,8 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
+    <ClCompile Include="src\thomas\graphics\gui\Batch.cpp" />
+    <ClCompile Include="src\thomas\graphics\gui\Sprite.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\resource\MemoryAllocation.cpp" />
@@ -141,6 +143,8 @@
     <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
     <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
+    <ClInclude Include="src\thomas\graphics\gui\Batch.h" />
+    <ClInclude Include="src\thomas\graphics\gui\Sprite.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\graphics\render\Frame.h" />

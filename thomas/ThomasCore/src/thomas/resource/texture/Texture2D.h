@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "../../utils/Math.h"
 #include <DirectXTex.h>
+
 namespace thomas
 {
 	namespace resource
@@ -11,6 +12,7 @@ namespace thomas
 		{
 		private:
 			void LoadTextureFromFile(std::string path);
+		
 		public:
 			static void Init();
 			static void Destroy();
@@ -25,6 +27,7 @@ namespace thomas
 			static Texture2D* GetBlackTexture();
 			static Texture2D* GetWhiteTexture();
 			static Texture2D* GetNormalTexture();
+
 		private:
 			DirectX::ScratchImage* data = nullptr;
 			int m_mipmapCount;

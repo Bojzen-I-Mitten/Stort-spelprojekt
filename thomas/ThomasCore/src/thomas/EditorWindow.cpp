@@ -15,35 +15,31 @@ namespace thomas
 
 	EditorWindow::EditorWindow(HWND hWnd) : Window(hWnd)
 	{
-		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
-
+		//
 		ID3D11Resource* resource;
-		HRESULT hr;
+		ID3D11Texture2D* catTexture;
 
-		CoInitialize(NULL);
-		hr= DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), 
-				L"../Data/cat.png", &resource, &m_texture);
-		CoUninitialize();
-		
-		ID3D11Texture2D* cat;
-		cat = (ID3D11Texture2D*)resource;
+		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+		DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), L"../Data/cat.png", &resource, &m_texture);
 
+		catTexture = (ID3D11Texture2D*)resource;
 		CD3D11_TEXTURE2D_DESC catDesc;
-		cat->GetDesc(&catDesc);
+		catTexture->GetDesc(&catDesc);
 
 		m_origin.x = float(catDesc.Width / 2);
 		m_origin.y = float(catDesc.Height / 2);
 		m_screenPos.x = 300 / 2.f;
 		m_screenPos.y = 300 / 2.f;
 
-		//cat->Release();
-		//resource->Release();
+		resource->Release();
+		//
 
 		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
 	}
 
 	EditorWindow::~EditorWindow()
 	{
+		m_texture->Release();
 		m_spriteBatch.reset();
 		ImGui_ImplDX11_Shutdown();
 	}
@@ -57,11 +53,10 @@ namespace thomas
 
 		m_spriteBatch->Begin();
 
-		m_spriteBatch->Draw(m_texture, m_screenPos, nullptr, Colors::White,
-			0.f, m_origin);
+		m_spriteBatch->Draw(m_texture, m_screenPos, nullptr, Colors::White, 0.f, m_origin);
 
 		m_spriteBatch->Draw(m_texture, Vector2(m_screenPos.x + 50.f, m_screenPos.y), nullptr, Colors::White,
-			0.f, m_origin);
+							0.f, m_origin);
 
 		m_spriteBatch->End();
 	
