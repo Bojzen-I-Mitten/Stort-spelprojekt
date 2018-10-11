@@ -1,6 +1,9 @@
 #pragma once
 #include "Window.h"
-#include <imgui\imgui.h>
+#include <imgui/imgui.h>
+#include <DirectXTK/SpriteBatch.h>
+
+using namespace DirectX::SimpleMath;
 
 namespace thomas
 {
@@ -23,6 +26,10 @@ namespace thomas
 		void DeleteGUIData();
 
 	private:
+		ID3D11ShaderResourceView* m_texture;
+		std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+		Vector2 m_screenPos;
+		Vector2 m_origin;
 		ImDrawData* m_guiData = nullptr;
 	};
 }
