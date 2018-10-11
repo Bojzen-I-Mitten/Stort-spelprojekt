@@ -93,7 +93,7 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         float3 position = newParticle.position;
         
         //Adding a distance from the sphere makes a cone shape
-        float3 direction = positionInSphereEdge - newParticle.direction * newParticle.distanceFromSphereCenter - position;
+        float3 direction = positionInSphereEdge + newParticle.direction * newParticle.distanceFromSphereCenter - position;
         direction = normalize(direction);
 
         position += direction * newParticle.radius * newParticle.spawnAtSphereEdge;

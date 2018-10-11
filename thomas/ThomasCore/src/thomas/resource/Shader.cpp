@@ -669,15 +669,12 @@ namespace thomas
 				case D3D_SVT_CBUFFER:
 					newProperty = shaderproperty::ShaderPropertyConstantBuffer::GetDefault();
 					break;
-				//case D3D_SVT_TEXTURE:
-				//case D3D_SVT_TEXTURE1D:
-				//case D3D_SVT_RWTEXTURE1D:
+
 				case D3D_SVT_TEXTURE2DMS:
 				case D3D_SVT_RWTEXTURE2D:
+				case D3D_SVT_TEXTURE2DARRAY:
+					newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
 				case D3D_SVT_TEXTURE2D:
-				//case D3D_SVT_RWTEXTURE3D:
-				//case D3D_SVT_TEXTURE3D:
-				//case D3D_SVT_TEXTURECUBE:
 					isMaterialProperty = true;
 					if (semantic == "NORMALTEXTURE")
 					{

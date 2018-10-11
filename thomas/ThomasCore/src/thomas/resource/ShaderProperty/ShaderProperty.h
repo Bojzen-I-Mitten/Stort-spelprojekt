@@ -23,6 +23,7 @@ namespace thomas
 					SHADER_RESOURCE,
 					CONSTANT_BUFFER,
 					TEXTURE2D,
+					TEXTURE2DARRAY,
 					UNORDERED_ACCESS
 				};
 

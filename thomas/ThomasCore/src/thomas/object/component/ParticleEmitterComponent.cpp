@@ -9,6 +9,8 @@
 #include "..\..\graphics\ParticleSystem.h"
 #include "Transform.h"
 #include "../../ThomasTime.h"
+
+#include "../../editor/gizmos/Gizmos.h"
 namespace thomas
 {
 	namespace object
@@ -51,6 +53,33 @@ namespace thomas
 
 			ParticleEmitterComponent::~ParticleEmitterComponent()
 			{
+				
+			}
+
+			math::Vector3 SphericalCoordinate(float phi, float theta)
+			{
+				float xAngle = sin(theta) * cos(phi);
+				float yAngle = sin(theta) * sin(phi);
+				float zAngle = cos(theta);
+				return math::Vector3(xAngle, yAngle, zAngle);
+			}
+
+			void ParticleEmitterComponent::OnDrawGizmosSelected()
+			{
+				editor::Gizmos::SetColor(math::Color(1, 1, 0));
+				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				
+				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
+				editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
+
+				
+				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(90), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(270), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				//editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(math::Vector3(0.0f, 0.0f, 0.0f), m_particleBufferStruct.radius));
 				
 			}
 

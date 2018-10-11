@@ -32,10 +32,11 @@ namespace thomas
 				ParticleEmitterComponent();
 				~ParticleEmitterComponent();
 
+				void OnDrawGizmosSelected();
+
+
 				void SetParticleSystem(std::shared_ptr<graphics::ParticleSystem> particleSystem);
 
-
-				void SetSpread(float const& other);
 
 				void SetSpeed(float const& speed);
 				void SetMinSpeed(float const& other);

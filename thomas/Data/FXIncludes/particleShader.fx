@@ -3,6 +3,7 @@
 #include <ThomasCG.hlsl>
 #include <ParticleHeader.h>
 
+Texture2DArray texArr;
 //Texture2D diffuseTexture;
 //SamplerState diffuseSampler : register(s0);
 SamplerState StandardWrapSampler
