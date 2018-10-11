@@ -38,7 +38,8 @@ namespace thomas
 	public:
 		static void LogOutput(const std::string & message);
 		static void ClearLogOutput();
-
+		static bool IsEditor();
+		static void SetEditor(bool value);
 	private:
 		static bool InitDirectX();
 
@@ -49,6 +50,7 @@ namespace thomas
 		static bool s_initialized;
 		static std::vector<std::string> s_logOutput;
 		static bool s_clearLog;
+		static bool s_isEditor;
 
 	private:
 		static ImGuiContext* s_imGuiContext;

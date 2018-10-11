@@ -35,7 +35,7 @@ namespace thomas
 
 	private:
 		std::vector<Window*> m_windows;
-		EditorWindow* m_editorWindow;
+		EditorWindow* m_editorWindow = nullptr;
 		Window* m_current;
 		Input m_dummyInput;
 		
