@@ -33,6 +33,18 @@ namespace ThomasEngine
 		void IK_FABRIK_Constraint::Target::set(Vector3 w) {
 			m_ptr->m_target = Utility::Convert(w);
 		}
+		Quaternion IK_FABRIK_Constraint::Orienation::get() {
+			return Utility::Convert(m_ptr->m_targetOrient);
+		}
+		void IK_FABRIK_Constraint::Orienation::set(Quaternion rot) {
+			m_ptr->m_targetOrient = Utility::Convert(rot);
+		}
+		float IK_FABRIK_Constraint::Weight::get() {
+			return m_ptr->m_weight;
+		}
+		void IK_FABRIK_Constraint::Weight::set(float w) {
+			m_ptr->m_weight = w;
+		}
 		thomas::graphics::animation::IK_FABRIK_Constraint* IK_FABRIK_Constraint::Native()
 		{
 			return m_ptr;

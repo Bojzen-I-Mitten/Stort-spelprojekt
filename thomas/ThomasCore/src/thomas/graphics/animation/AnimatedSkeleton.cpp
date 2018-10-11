@@ -38,12 +38,12 @@ namespace thomas {
 			void AnimatedSkeleton::updateSkeleton()
 			{
 				TransformComponents *frame_tmp = reinterpret_cast<TransformComponents*>(
-					resource::MemoryAllocation::MemoryAllocation().stack(0).allocate(sizeof(TransformComponents)* _ref.getNumBones(), 4));
+					ThomasCore::Core().Memory()->stack(0).allocate(sizeof(TransformComponents)* _ref.getNumBones(), 4));
 				//Update animation tree
 				_root->calcFrame(frame_tmp);
 				// Update skin transforms
 				_pose[0] = frame_tmp[0].createTransform() * _ref.getRoot();						//	Update root pose
-				applyConstraint(0);
+				applyConstraint(0, frame_tmp);
 				for (uint32_t i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
@@ -52,7 +52,7 @@ namespace thomas {
 				}
 				for (uint32_t i = 0; i < boneCount(); i++)
 					_skin[i] = _ref.getBone(i)._invBindPose * _pose[i];							//	Update skin
-				resource::MemoryAllocation::MemoryAllocation().stack(0).deallocate(frame_tmp);
+				ThomasCore::Core().Memory()->stack(0).deallocate(frame_tmp);
 			}
 			void AnimatedSkeleton::applyConstraint(uint32_t index, TransformComponents *transformInfo)
 			{

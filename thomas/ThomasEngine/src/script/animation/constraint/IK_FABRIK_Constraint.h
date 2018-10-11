@@ -22,6 +22,18 @@ namespace ThomasEngine
 				Vector3 get();
 				void set(Vector3 mode);
 			}
+			/* Targeted orientation
+			*/
+			property Quaternion Orienation {
+				Quaternion get();
+				void set(Quaternion rot);
+			}
+			/* Weight applied
+			*/
+			property float Weight {
+				float get();
+				void set(float w);
+			}
 
 			void apply(GameObject^ obj, uint32_t boneIndex);
 			void apply(RenderSkinnedComponent^ skinn, uint32_t boneIndex);

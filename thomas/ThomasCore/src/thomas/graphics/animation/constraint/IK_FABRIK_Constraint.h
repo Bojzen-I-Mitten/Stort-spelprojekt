@@ -38,6 +38,8 @@ namespace thomas {
 				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd) override;
 
 				math::Vector3 m_target;					// Target in object space.
+				math::Quaternion m_targetOrient;		// Orientation at target
+				float m_weight;							// IK weight
 
 			private:
 
