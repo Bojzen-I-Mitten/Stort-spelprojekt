@@ -65,8 +65,8 @@ namespace thomas
 				float GetMinRotationSpeed() const;
 				float GetMaxRotationSpeed() const;
 
-				void SetLooping(bool const& other);
-				bool IsLooping() const;
+				void SetDistance(float const& other);
+				float GetDistance() const;
 
 				void SetGravity(float const& other);
 				float GetGravity() const;
@@ -100,7 +100,6 @@ namespace thomas
 
 				bool m_isEmitting;
 
-				bool m_looping;
 
 				unsigned m_emissionRate; //Particles per second
 				double m_emissionThreshold; //Only emitt when the rate*dt is above one particle

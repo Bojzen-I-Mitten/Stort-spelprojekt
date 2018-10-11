@@ -41,8 +41,8 @@ namespace ThomasEngine
 	float ParticleEmitter::Gravity::get() { return particleEmitter->GetGravity(); }
 	void ParticleEmitter::Gravity::set(float value) { particleEmitter->SetGravity(value); }
 
-	bool ParticleEmitter::Looping::get() { return particleEmitter->IsLooping(); }
-	void ParticleEmitter::Looping::set(bool value) { particleEmitter->SetLooping(value); }
+	float ParticleEmitter::Distance::get() { return particleEmitter->GetDistance(); }
+	void ParticleEmitter::Distance::set(float value) { particleEmitter->SetDistance(value); }
 
 	bool ParticleEmitter::SpawnAtEdge::get() { return particleEmitter->IsSpawningAtSphereEdge(); }
 	void ParticleEmitter::SpawnAtEdge::set(bool value) { particleEmitter->SpawnAtSphereEdge(value); }

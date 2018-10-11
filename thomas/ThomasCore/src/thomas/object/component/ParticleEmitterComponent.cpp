@@ -20,14 +20,11 @@ namespace thomas
 				m_particleSystem = graphics::ParticleSystem::GetGlobalSystem();
 				m_emissionRate = 32;
 				m_emissionThreshold = 0.0;
-				m_looping = false;
 				m_isEmitting = false;
 				m_particleBufferStruct = {};
 
 				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
 				m_particleBufferStruct.spread = 0.0f;
-
-				//m_particleBufferStruct.directionMatrix = math::Matrix::CreateLookAt(math::Vector3(0, 0, 0), math::Vector3(1, 0, 0), math::Vector3::Up).Transpose();
 
 				m_particleBufferStruct.radius = 0;
 				m_particleBufferStruct.maxSpeed = 0.0f;
@@ -44,11 +41,11 @@ namespace thomas
 				m_particleBufferStruct.minRotationSpeed = 0.0f;
 				m_particleBufferStruct.maxRotationSpeed = 0.0f;
 
-				XMStoreFloat3x3(&m_particleBufferStruct.directionMatrix, DirectX::XMMatrixLookAtRH(math::Vector3(0, 2, 0), math::Vector3(1.0f, 2.0f, 0.0f), math::Vector3::Up));
-				m_particleBufferStruct.endRotationSpeed = 0.0f;
+				m_particleBufferStruct.direction = math::Vector3(0, 0, 0);
+				m_particleBufferStruct.distance = 0.0f;
 
 				m_particleBufferStruct.nrOfParticlesToEmit = 0;
-				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
+				m_particleBufferStruct.spawnAtSphereEdge = 1;
 				m_particleBufferStruct.rand = std::rand();
 				
 			}
@@ -78,6 +75,7 @@ namespace thomas
 			void ParticleEmitterComponent::Update()
 			{
 				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
+				m_particleBufferStruct.direction = m_gameObject->m_transform->Forward();
 
 				if (m_isEmitting)
 				{
@@ -225,17 +223,17 @@ namespace thomas
 			{
 				return m_particleBufferStruct.maxRotationSpeed;
 			}
+
+			void ParticleEmitterComponent::SetDistance(float const & other)
+			{
+				m_particleBufferStruct.distance = other;
+			}
+
+			float ParticleEmitterComponent::GetDistance() const
+			{
+				return m_particleBufferStruct.distance;
+			}
 			
-
-			void ParticleEmitterComponent::SetLooping(bool const& other)
-			{
-				m_looping = other;
-			}
-
-			bool ParticleEmitterComponent::IsLooping() const
-			{
-				return m_looping;
-			}
 
 			void ParticleEmitterComponent::SetGravity(float const& other)
 			{
@@ -259,12 +257,13 @@ namespace thomas
 
 			void ParticleEmitterComponent::SpawnAtSphereEdge(bool const& other)
 			{
-				m_particleBufferStruct.spawnAtSphereEdge = other;
+				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)other;
+				
 			}
 
 			bool ParticleEmitterComponent::IsSpawningAtSphereEdge() const
 			{
-				return m_particleBufferStruct.spawnAtSphereEdge;
+				return (bool)m_particleBufferStruct.spawnAtSphereEdge;
 			}
 
 

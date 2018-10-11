@@ -39,16 +39,13 @@ namespace thomas
 				float minRotationSpeed;
 				float maxRotationSpeed;
 
-				DirectX::XMFLOAT3X3 directionMatrix;
-				float endRotationSpeed;
-				float pad;
-				float pad2;
+				math::Vector3 direction;
+				float distance;
 
 				unsigned nrOfParticlesToEmit;
 				unsigned spawnAtSphereEdge;
 				unsigned rand;
 				unsigned pad3;
-
 			};
 
 
@@ -84,6 +81,7 @@ namespace thomas
 		public:
 			static void InitializeGlobalSystem();
 			static std::shared_ptr<ParticleSystem> GetGlobalSystem();
+			static void DestroyGlobalSystem();
 			ParticleSystem();
 			~ParticleSystem();
 

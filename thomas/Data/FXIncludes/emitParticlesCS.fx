@@ -22,11 +22,9 @@ struct InitParticleBufferStruct
     float minRotationSpeed;
     float maxRotationSpeed;
 
-    float3x3 directionMatrix;
-    float endRotationSpeed;
-    float pad;
-    float pad2;
-
+    float3 direction;
+    float distance;
+    
     uint nrOfParticlesToEmit;
     uint spawnAtSphereEdge;
     uint rand;
@@ -67,67 +65,44 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     {
         uint rng_state = (ix + 1) * newParticle.rand; //seed
 
-        uint w1 = RandMarsaglia(rng_state);
-        uint w2 = RandMarsaglia(w1);
-        uint w3 = RandMarsaglia(w2);
-        uint w4 = RandMarsaglia(w3);
-        uint w5 = RandMarsaglia(w4);
-        uint w6 = RandMarsaglia(w5);
+        uint r1 = RandMarsaglia(rng_state);
+        uint r2 = RandMarsaglia(r1);
+        uint r3 = RandMarsaglia(r2);
+        uint r4 = RandMarsaglia(r3);
+        uint r5 = RandMarsaglia(r4);
+        uint r6 = RandMarsaglia(r5);
 	
-    
-        float speed =           (RandClamp(w1) * (newParticle.maxSpeed - newParticle.minSpeed)) + newParticle.minSpeed;
-        float size =            (RandClamp(w2) * (newParticle.maxSize - newParticle.minSize)) + newParticle.minSize;
-        float lifeTime =        (RandClamp(w3) * (newParticle.maxLifeTime - newParticle.minLifeTime)) + newParticle.minLifeTime;
-        float rotationSpeed =   (RandClamp(w4) * (newParticle.maxRotationSpeed - newParticle.minRotationSpeed)) + newParticle.minRotationSpeed;
+        float speed =           (RandClamp(r1) * (newParticle.maxSpeed - newParticle.minSpeed)) + newParticle.minSpeed;
+        float size =            (RandClamp(r2) * (newParticle.maxSize - newParticle.minSize)) + newParticle.minSize;
+        float lifeTime =        (RandClamp(r3) * (newParticle.maxLifeTime - newParticle.minLifeTime)) + newParticle.minLifeTime;
+        float rotationSpeed =   (RandClamp(r4) * (newParticle.maxRotationSpeed - newParticle.minRotationSpeed)) + newParticle.minRotationSpeed;
         
-       /* float3 defaultUP = float3(0.0f, 1.0f, 0.0f);
-        float3 defaultForward = float3(0.0f, 0.0f, 1.0f);
-        float3 defaultRight = float3(1.0f, 0.0f, 0.0f);
-
-        float3 test = normalize(float3(1.0f, 1.0f, 1.0f));
-
-        
-        
-        float phi = RandClamp(w5) * 3.14159265359f * 2.0f;
-        float theta = RandClamp(w6) * 3.14159265359f;
-        float xAngle = sin(theta) * cos(phi);
-        float yAngle = sin(theta) * sin(phi);
-        float zAngle = cos(theta);
-*/
-
-
         //spread
-        float phi = RandClamp(w5) * 3.14159265359f * 2.0f;
-        float theta = RandClamp(w6) * 3.14159265359f;
+        float phi = RandClamp(r5) * 3.14159265359f * 2.0f;
+        float theta = RandClamp(r6) * 3.14159265359f;
         float xAngle = sin(theta) * cos(phi);
         float yAngle = sin(theta) * sin(phi);
         float zAngle = cos(theta);
+        
+        float3 randDir = float3(xAngle, yAngle, zAngle);//dir from center to sphere edge
+        
+        float3 direction = randDir;
+        normalize(direction);
 
-        /*theta = atan(test.y / test.x);
-        phi = atan(sqrt(test.x * test.x + test.y * test.y * test.z * test.z) / test.z);
+        float3 positionOnSphere = newParticle.position + direction * newParticle.radius;
+        float3 position = newParticle.position;
+        
+        //Adding a distance makes a cone shape
+        direction = positionOnSphere - newParticle.direction * newParticle.distance - position;
+        normalize(direction);
 
-        xAngle = sin(theta) * cos(phi);
-        yAngle = sin(theta) * sin(phi);
-        zAngle = cos(theta);
-        */
-
-        float3 randDir = float3(xAngle, yAngle, zAngle);
-        normalize(randDir);
-
-        float3 dir = randDir; //mul(randDir, (float3x3) newParticle.directionMatrix);
-        normalize(dir);
-
-        float3 position = newParticle.position; // + dir * newParticle.radius;
-
-        if ((bool) newParticle.spawnAtSphereEdge)
-        {
-            dir *= -1; //make the particles go inward;
-        }
+        position += direction * newParticle.radius * newParticle.spawnAtSphereEdge;
+        
 
         float gravity = newParticle.gravity;
         float endSpeed = newParticle.endSpeed;
         float endSize = newParticle.endSize;
-        float rotation = 0;
+        float rotation = phi * rotationSpeed; //0;
         
         
         ParticleStruct fillBuffer = (ParticleStruct) 0;
@@ -135,7 +110,7 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.position = position;
         fillBuffer.rotation = rotation;
         fillBuffer.gravity = gravity;
-        fillBuffer.direction = dir;
+        fillBuffer.direction = direction;
         fillBuffer.speed = speed;
         fillBuffer.endSpeed = endSpeed;
         fillBuffer.size = size;

@@ -19,6 +19,10 @@ namespace thomas
 		{
 			return s_globalSystem;
 		}
+		void ParticleSystem::DestroyGlobalSystem()
+		{
+			s_globalSystem->Destroy();
+		}
 		ParticleSystem::ParticleSystem()
 		{
 
@@ -93,7 +97,8 @@ namespace thomas
 			SAFE_RELEASE(m_bufferBillboard);
 			SAFE_RELEASE(m_bufferIndirectArgs);
 			SAFE_RELEASE(m_bufferCounters);
-			
+			SAFE_RELEASE(m_bufferSpawnIndex);
+
 			//m_updateParticlesCS 
 			//m_emitParticlesCS
 		}

@@ -63,9 +63,9 @@ namespace ThomasEngine
 			float get();
 			void set(float value);
 		}
-		property bool Looping {
-			bool get();
-			void set(bool value);
+		property float Distance {
+			float get();
+			void set(float value);
 		}
 		property bool SpawnAtEdge {
 			bool get();
