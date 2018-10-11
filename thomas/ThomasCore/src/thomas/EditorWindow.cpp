@@ -22,7 +22,7 @@ namespace thomas
 
 		CoInitialize(NULL);
 		hr= DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), 
-				L"C:/Users/Jakob/Documents/Stort-spelprojekt/thomas/ThomasCore/src/thomas/cat.png", &resource, &m_texture);
+				L"../Data/cat.png", &resource, &m_texture);
 		CoUninitialize();
 		
 		ID3D11Texture2D* cat;
