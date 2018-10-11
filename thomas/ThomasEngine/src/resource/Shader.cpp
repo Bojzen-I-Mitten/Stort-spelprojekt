@@ -25,7 +25,7 @@ namespace ThomasEngine
 			return nullptr;
 	}
 
-	void Shader::SetGlobalColor(String^ name, Color value) { thomas::resource::Shader::SetGlobalColor(Utility::ConvertString(name), thomas::math::Color(value.r, value.g, value.b, value.a)); };
+	void Shader::SetGlobalColor(String^ name, Color value) { thomas::resource::Shader::SetGlobalColor(Utility::ConvertString(name), Utility::Convert(value)); };
 	void Shader::SetGlobalFloat(String^ name, float value) { thomas::resource::Shader::SetGlobalFloat(Utility::ConvertString(name), value); };;
 	void Shader::SetGlobalInt(String^ name, int value) { thomas::resource::Shader::SetGlobalInt(Utility::ConvertString(name), value); };;
 	void Shader::SetGlobalMatrix(String^ name, Matrix value) { thomas::resource::Shader::SetGlobalMatrix(Utility::ConvertString(name), Utility::Convert(value)); };;

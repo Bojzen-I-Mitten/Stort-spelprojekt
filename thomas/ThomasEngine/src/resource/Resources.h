@@ -35,7 +35,6 @@ namespace ThomasEngine
 		static GameObject ^ LoadPrefab(String^ path);
 		static GameObject ^ LoadPrefab(String^ path, bool forceInstantiate);
 
-		static bool SaveResource(Resource^ resource);
 
 		static String^ GetUniqueName(String^ path);
 
