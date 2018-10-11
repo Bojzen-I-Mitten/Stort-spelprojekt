@@ -77,7 +77,7 @@ namespace ThomasEngine
 		void SetShaderPassEnabled(std::string name, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(name, enabled); }
 
 		Color GetColor(String^ name) { return Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetColor(Utility::ConvertString(name))); }
-		void SetColor(String^ name, Color value) { ((thomas::resource::Material*)m_nativePtr)->SetColor(Utility::ConvertString(name), thomas::math::Color(value.r, value.g, value.b, value.a));  }
+		void SetColor(String^ name, Color value) { ((thomas::resource::Material*)m_nativePtr)->SetColor(Utility::ConvertString(name), Utility::Convert(value));  }
 
 		float GetFloat(String^ name) { return ((thomas::resource::Material*)m_nativePtr)->GetFloat(Utility::ConvertString(name)); }
 		void SetFloat(String^ name, float& value) { ((thomas::resource::Material*)m_nativePtr)->SetFloat(Utility::ConvertString(name), value); };
@@ -117,13 +117,12 @@ namespace ThomasEngine
 
 		/* Serialization
 		*/
-		[DataMemberAttribute(Order=0)]
+		[JsonPropertyAttribute(Order = 1)]
 		property ThomasEngine::Shader^ shader {
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
 		}
-		[DataMemberAttribute(Order = 1)]
-		[JsonPropertyAttribute(ObjectCreationHandling = ObjectCreationHandling::Replace)]
+		[JsonPropertyAttribute(ObjectCreationHandling = ObjectCreationHandling::Replace, Order=2)]
 		property Dictionary<String^, System::Object^>^ properties
 		{
 			Dictionary<String^, System::Object^>^ get();
