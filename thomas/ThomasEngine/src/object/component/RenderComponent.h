@@ -1,5 +1,9 @@
 #pragma once
 #include "../Component.h"
+
+#pragma managed
+
+
 namespace thomas { namespace object { namespace component { class RenderComponent; } } }
 namespace ThomasEngine
 {
@@ -18,7 +22,6 @@ namespace ThomasEngine
 			Model^ get();
 			void set(Model^ value);
 		}
-
 		property Material^ material {
 			Material^ get();
 			void set(Material^ value);

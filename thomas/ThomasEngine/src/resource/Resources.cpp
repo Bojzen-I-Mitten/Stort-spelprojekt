@@ -234,6 +234,9 @@ namespace ThomasEngine
 
 					Debug::LogError(error);
 					obj = LoadErrorResource(type);
+					if(obj == nullptr)
+						Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
+
 				}
 
 				if (obj != nullptr)
@@ -280,16 +283,6 @@ namespace ThomasEngine
 				return nullptr;
 			}
 
-		}
-
-		bool Resources::SaveResource(Resource ^ resource)
-		{
-			if (resource->GetType() == Material::typeid)
-			{
-				Serializer::SerializeMaterial((Material^)resource, resource->m_path);
-				return true;
-			}
-			return false;
 		}
 
 #pragma endregion
@@ -398,6 +391,7 @@ namespace ThomasEngine
 					//obj = Shader::Find() Failed shader
 					break;
 				case AssetTypes::MATERIAL:
+					return Material::StandardMaterial;
 					// obj = Deserialize<Material^>(path); Failed material
 					break;
 				case AssetTypes::SCRIPT:
