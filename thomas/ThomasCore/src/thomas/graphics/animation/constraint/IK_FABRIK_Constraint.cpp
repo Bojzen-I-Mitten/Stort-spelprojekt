@@ -72,7 +72,7 @@ namespace thomas {
 
 			/* FABRIK IK solver
 			*/
-			void IK_FABRIK_Constraint::execute(Skeleton & skel, math::Matrix * objectPose, uint32_t boneInd)
+			void IK_FABRIK_Constraint::execute(Skeleton & skel, math::Matrix * objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
 				// Stack alloc.
 				float * d = reinterpret_cast<float*>(

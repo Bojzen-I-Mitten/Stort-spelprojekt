@@ -17,7 +17,7 @@ namespace thomas {
 			{
 			}
 
-			void BoneChildTransformConstraint::execute(Skeleton& skel, math::Matrix* objectPose, uint32_t boneInd)
+			void BoneChildTransformConstraint::execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
 				// If (transform is childTransform)
 				objectPose[boneInd] = math::Matrix::CreateScale(0.01f) * m_ref->GetLocalWorldMatrix();
