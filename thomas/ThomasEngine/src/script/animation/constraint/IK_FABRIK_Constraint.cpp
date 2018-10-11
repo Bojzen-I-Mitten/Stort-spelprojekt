@@ -65,10 +65,12 @@ namespace ThomasEngine
 			assert(m_num_link != 0);
 			thomas::graphics::animation::IBlendTree* tree = skinn->GetBlendTree();
 			uint32_t joint_index = boneIndex;
-			m_ptr->setLinkIndex(m_num_link-1, joint_index);
+			m_ptr->setLinkAtIndex(m_num_link - 1, thomas::graphics::animation::IK_FABRIK_Constraint::LinkParameter(
+				joint_index));
 			for (uint32_t i = m_num_link - 1; i-- > 0;) {
 				joint_index = tree->getBoneInfo(joint_index)._parentIndex;
-				m_ptr->setLinkIndex(i, joint_index);
+				m_ptr->setLinkAtIndex(i, thomas::graphics::animation::IK_FABRIK_Constraint::LinkParameter(
+					joint_index));
 			}
 			skinn->GetBlendTree()->addConstraint(m_ptr, boneIndex);
 		}

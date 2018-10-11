@@ -69,5 +69,44 @@ namespace DirectX
 			}
 			return q;
 		}
+
+		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest)
+		{
+			from.Normalize();
+			dest.Normalize();
+
+			float c = from.Dot(dest);
+			if (c >= 1.0f) // Vectors are parallel	(identical)
+				return Matrix::Identity;
+			if (c < (1e-6f - 1.0f)) // Vectors are parallel (opposite)
+			{
+				// Generate an axis
+				Vector3 axis = Vector3::UnitX.Cross(from);
+				if (axis.LengthSquared() < 0.0001f) // Pick another if colinear
+					axis = Vector3::UnitY.Cross(from);
+				axis.Normalize();
+				return Matrix::CreateFromAxisAngle(axis, PI);
+			}
+			else {
+
+				// Credit goes to: Jur Van den Berg 
+				// https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/476311#476311
+				Vector3 v = from.Cross(dest);
+				float s = 1.f / (1.f + c);
+
+				Matrix vx(
+					0.f, v.z, -v.y, 0.f,
+					-v.z, 0.f, v.x, 0.f,
+					v.y, -v.x, 0.f, 0.f,
+					0.f, 0.f, 0.f, 0.f);
+				vx = vx + (vx * vx) * s; // Simplify square calc? ...
+				// Add identity
+				vx._11 += 1.f;
+				vx._22 += 1.f;
+				vx._33 += 1.f;
+				vx._44 += 1.f;
+				return vx;
+			}
+		}
 	}
 }

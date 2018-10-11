@@ -21,7 +21,6 @@ namespace thomas
 			object::GameObject("editorCamera"), 
 			m_sensitivity(1.f), 
 			m_speed(2.f), 
-			m_manipulatorScale(2.f), 
 			m_hasSelectionChanged(false),
 			m_manipulatorSnapping(false),
 			m_selectedObject(nullptr),
@@ -252,9 +251,11 @@ namespace thomas
 				if (m_manipulatorOperation == ImGuizmo::OPERATION::ROTATE)
 					snap[0] = 15.f;
 
+				float scale = 1080.0f / io.DisplaySize.x;
+
 				math::Matrix deltaMatrix;
 				ImGuizmo::Manipulate(
-					*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(m_manipulatorScale)).m, *m_cameraComponent->GetProjMatrix().m,
+					*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(scale)).m, *m_cameraComponent->GetProjMatrix().m,
 					m_manipulatorOperation, m_manipulatorMode, *worldMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
 
 				if (worldMatrix != gameObject->m_transform->GetWorldMatrix())
