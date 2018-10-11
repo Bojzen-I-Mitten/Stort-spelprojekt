@@ -1,5 +1,4 @@
 ﻿/* TODO: 
- * Freeze rotation x and z axes 
  */
 
 using System.Collections.Generic;
