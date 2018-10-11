@@ -27,6 +27,7 @@ namespace thomas
 				math::Matrix GetLocalWorldMatrix();
 				void SetLocalMatrix(math::Matrix matrix);
 				math::Matrix GetWorldMatrix();
+				math::Matrix GetWorldInverse();
 				void SetWorldMatrix(math::Matrix matrix);
 
 				void LookAt(Transform* target);

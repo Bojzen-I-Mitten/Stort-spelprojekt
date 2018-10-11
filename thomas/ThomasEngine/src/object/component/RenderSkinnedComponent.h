@@ -59,6 +59,7 @@ namespace ThomasEngine
 		void Update() override;
 
 		Matrix GetBoneMatrix(int boneIndex);
+		Matrix GetLocalBoneMatrix(int boneIndex);
 
 	private:
 		void applyAnimation();

@@ -17,12 +17,17 @@ namespace ThomasEditor
         public bool AllobjectKinectic { get; set; }
         GameObject G_Hips;
         GameObject G_Spine;
+        GameObject KeepsThebody;
 
         public override void Start()
         {
             RenderSkinnedComponent renderskinnedcomponent = gameObject.GetComponent<RenderSkinnedComponent>();
             uint boneindex = 0;
-        //    gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll((float)7.219, (float)-19.757, (float)51.817);
+
+
+            KeepsThebody = new GameObject("rotateandmoveallothergameobjects");
+
+
             //Hips
             G_Hips = new GameObject("Hips");
             G_Hips.transform.SetParent(gameObject.transform,true);
@@ -30,29 +35,30 @@ namespace ThomasEditor
             B_Hips.BoneName = Hips;
             B_Hips.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(Hips), out boneindex);
- //           G_Hips.transform.position = gameObject.transform.position;
-            G_Hips.transform.position = renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
+             G_Hips.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
             SphereCollider spherecolliderhips = G_Hips.AddComponent<SphereCollider>();
             spherecolliderhips.radius = 0.2f;
             Rigidbody rigidbodyhips = G_Hips.AddComponent<Rigidbody>();
             rigidbodyhips.IsKinematic = AllobjectKinectic;
-            G_Hips.transform.rotation = gameObject.transform.localRotation;
-        //    G_Hips.transform.rotation = Quaternion.CreateFromYawPitchRoll((float)7.219, (float)-19.757, (float)51.817);
+            calculatePosbetweenTwoSkeletonschanges(Hips, Spine, renderskinnedcomponent, G_Hips);
+        //    G_Hips.transform.rotation = rotateandmoveallothergameobjects.transform.rotation;
+
             //Spine
             G_Spine = new GameObject("Spine");
-            G_Spine.transform.SetParent(gameObject.transform, true);
+            G_Spine.transform.SetParent(gameObject.transform,true);
             BoneTransformComponent B_Spine = G_Spine.AddComponent<BoneTransformComponent>();
             B_Spine.BoneName = Spine;
             B_Spine.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(Spine), out boneindex);
             BoxCollider boxcolliderSpine = G_Spine.AddComponent<BoxCollider>();
-            G_Spine.transform.position = gameObject.transform.position;
-            // G_Spine.transform.position = renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
-            boxcolliderSpine.center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck,renderskinnedcomponent); //renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
+            G_Spine.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+           boxcolliderSpine.center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck,renderskinnedcomponent,G_Spine); //renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
             boxcolliderSpine.size = new Vector3(0.2f,0.2f,0.2f);
             Rigidbody rigidbodySpine = G_Spine.AddComponent<Rigidbody>();
             rigidbodySpine.IsKinematic = AllobjectKinectic;
-            G_Spine.transform.rotation = gameObject.transform.localRotation;
+
+        //    G_Spine.transform.rotation = rotateandmoveallothergameobjects.transform.rotation;
+
             //       B_Spine.transform.rotation = Quaternion.CreateFromYawPitchRoll((float)7.219, (float)-19.757, (float)51.817);
             /*
             //Joint from hips to Spine
@@ -67,7 +73,7 @@ namespace ThomasEditor
         */
         }
 
-       Vector3 calculatePosbetweenTwoSkeletonschanges(string BoneName1,string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
+       Vector3 calculatePosbetweenTwoSkeletonschanges(string BoneName1,string BoneName2, RenderSkinnedComponent renderskinnedcomponent, GameObject gameObjectt)
         {
             uint boneindex = 0;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName1), out boneindex);
@@ -78,6 +84,8 @@ namespace ThomasEditor
             float length = up.Length();
             if (length != 0)
                 up /= length; // Normalize
+     //       gameObjectt.transform.rotation = getRotationTo(Vector3.Up, up);
+
             Vector3 Pos =  up * (length * 0.5f);
             return Pos;
         }
