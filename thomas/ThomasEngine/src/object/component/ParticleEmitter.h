@@ -63,7 +63,7 @@ namespace ThomasEngine
 			float get();
 			void set(float value);
 		}
-		property float Distance {
+		property float DistanceFromSphereCenter {
 			float get();
 			void set(float value);
 		}

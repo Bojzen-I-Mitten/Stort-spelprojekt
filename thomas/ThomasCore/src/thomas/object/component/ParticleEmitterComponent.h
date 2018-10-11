@@ -65,8 +65,8 @@ namespace thomas
 				float GetMinRotationSpeed() const;
 				float GetMaxRotationSpeed() const;
 
-				void SetDistance(float const& other);
-				float GetDistance() const;
+				void SetDistanceFromSphereCenter(float const& other);
+				float GetDistanceFromSphereCenter() const;
 
 				void SetGravity(float const& other);
 				float GetGravity() const;

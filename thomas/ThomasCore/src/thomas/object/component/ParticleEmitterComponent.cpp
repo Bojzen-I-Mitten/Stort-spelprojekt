@@ -24,12 +24,12 @@ namespace thomas
 				m_particleBufferStruct = {};
 
 				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
-				m_particleBufferStruct.spread = 0.0f;
+				m_particleBufferStruct.distanceFromSphereCenter = 0.0f;
 
-				m_particleBufferStruct.radius = 0;
-				m_particleBufferStruct.maxSpeed = 0.0f;
-				m_particleBufferStruct.minSpeed = 0.0f;
-				m_particleBufferStruct.endSpeed = 0.0f;
+				m_particleBufferStruct.radius = 1;
+				m_particleBufferStruct.maxSpeed = 1.0f;
+				m_particleBufferStruct.minSpeed = 1.0f;
+				m_particleBufferStruct.endSpeed = 1.0f;
 
 				m_particleBufferStruct.maxSize = 1.0f;
 				m_particleBufferStruct.minSize = 1.0f;
@@ -42,10 +42,9 @@ namespace thomas
 				m_particleBufferStruct.maxRotationSpeed = 0.0f;
 
 				m_particleBufferStruct.direction = math::Vector3(0, 0, 0);
-				m_particleBufferStruct.distance = 0.0f;
 
 				m_particleBufferStruct.nrOfParticlesToEmit = 0;
-				m_particleBufferStruct.spawnAtSphereEdge = 1;
+				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
 				m_particleBufferStruct.rand = std::rand();
 				
 			}
@@ -97,12 +96,6 @@ namespace thomas
 
 			void ParticleEmitterComponent::OnDisable()
 			{
-			}
-
-
-			void ParticleEmitterComponent::SetSpread(float const& other)
-			{
-				m_particleBufferStruct.spread = other;
 			}
 
 			
@@ -224,14 +217,14 @@ namespace thomas
 				return m_particleBufferStruct.maxRotationSpeed;
 			}
 
-			void ParticleEmitterComponent::SetDistance(float const & other)
+			void ParticleEmitterComponent::SetDistanceFromSphereCenter(float const & other)
 			{
-				m_particleBufferStruct.distance = other;
+				m_particleBufferStruct.distanceFromSphereCenter = other;
 			}
 
-			float ParticleEmitterComponent::GetDistance() const
+			float ParticleEmitterComponent::GetDistanceFromSphereCenter() const
 			{
-				return m_particleBufferStruct.distance;
+				return m_particleBufferStruct.distanceFromSphereCenter;
 			}
 			
 

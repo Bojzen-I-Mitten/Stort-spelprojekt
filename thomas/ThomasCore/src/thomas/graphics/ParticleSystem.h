@@ -22,7 +22,7 @@ namespace thomas
 			struct InitParticleBufferStruct
 			{
 				math::Vector3 position;
-				float spread;
+				float distanceFromSphereCenter;
 
 				float radius;
 				float maxSpeed;
@@ -40,13 +40,15 @@ namespace thomas
 				float maxRotationSpeed;
 
 				math::Vector3 direction;
-				float distance;
+				float pad;
 
 				unsigned nrOfParticlesToEmit;
 				unsigned spawnAtSphereEdge;
 				unsigned rand;
-				unsigned pad3;
+				unsigned pad2;
+
 			};
+
 
 
 		private:

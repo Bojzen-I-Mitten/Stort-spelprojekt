@@ -5,7 +5,7 @@
 struct InitParticleBufferStruct
 {
     float3 position;
-    float spread;
+    float distanceFromSphereCenter;
 
     float radius;
     float maxSpeed;
@@ -23,12 +23,12 @@ struct InitParticleBufferStruct
     float maxRotationSpeed;
 
     float3 direction;
-    float distance;
+    float pad;
     
     uint nrOfParticlesToEmit;
     uint spawnAtSphereEdge;
     uint rand;
-    uint pad3;
+    uint pad2;
 
 };
 
@@ -59,7 +59,7 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
     uint maxCount = aliveAndMaxCount.y;
     uint capacityLeft = maxCount - aliveCount;
 
-    int threshold = newParticle.nrOfParticlesToEmit; //min(newParticle.nrOfParticlesToEmit, max(capacityLeft - EMIT_THREAD_DIM_X * 0, 0)); //Presume that emitter with lower iy want to emit an ammount of EMIT_THREAD_DIM_X particles
+    int threshold = min(newParticle.nrOfParticlesToEmit, capacityLeft); 
 
     if (ix < threshold)
     {
@@ -86,15 +86,15 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         
         float3 randDir = float3(xAngle, yAngle, zAngle);//dir from center to sphere edge
         
-        float3 direction = randDir;
-        normalize(direction);
+        float3 directionToSphereEdge = randDir;
+        //direction = normalize(direction);//is this already normalized?
 
-        float3 positionOnSphere = newParticle.position + direction * newParticle.radius;
+        float3 positionInSphereEdge = newParticle.position + directionToSphereEdge * newParticle.radius;
         float3 position = newParticle.position;
         
-        //Adding a distance makes a cone shape
-        direction = positionOnSphere - newParticle.direction * newParticle.distance - position;
-        normalize(direction);
+        //Adding a distance from the sphere makes a cone shape
+        float3 direction = positionInSphereEdge - newParticle.direction * newParticle.distanceFromSphereCenter - position;
+        direction = normalize(direction);
 
         position += direction * newParticle.radius * newParticle.spawnAtSphereEdge;
         
