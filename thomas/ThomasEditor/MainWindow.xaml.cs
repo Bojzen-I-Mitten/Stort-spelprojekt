@@ -387,7 +387,8 @@ namespace ThomasEditor
 
         private void AddNewCubePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            // Let's add a indirection to GameObjectManager here
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cube);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 

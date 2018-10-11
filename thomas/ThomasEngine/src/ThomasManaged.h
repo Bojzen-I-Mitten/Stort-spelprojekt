@@ -10,9 +10,13 @@ using namespace System::Threading;
 
 namespace ThomasEngine {
 	ref class ThomasSelection;
+	ref class GameObjectManager;
 	public ref class ThomasWrapper
 	{
 	private:
+
+		static GameObjectManager^ s_GameObjectManager;
+
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
@@ -24,6 +28,7 @@ namespace ThomasEngine {
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
+		
 	public:
 		delegate void StartPlayEvent();
 		delegate void StopPlayingEvent();

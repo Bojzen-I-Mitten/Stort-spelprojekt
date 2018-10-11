@@ -168,6 +168,7 @@ namespace ThomasEngine {
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
+		// This function has been hooked by GameObject manager, this does nothng
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 		return gameObject;

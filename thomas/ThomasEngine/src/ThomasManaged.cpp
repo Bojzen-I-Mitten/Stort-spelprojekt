@@ -2,6 +2,7 @@
 
 #pragma unmanaged
 
+#include "object/GameObjectManager.h"
 #include <thomas\ThomasCore.h>
 #include <thomas\WindowManager.h>
 #include <thomas\ThomasTime.h>
@@ -18,11 +19,11 @@
 #include "resource\Model.h"
 #include "resource\Resources.h"
 #include "object\Component.h"
-#include "object/component/physics/Rigidbody.h"
+#include "object\component\physics\Rigidbody.h"
 #include "ScriptingManager.h"
 #include "ThomasSelection.h"
 #include "GUI\editor\GUI.h"
-#include "object/GameObject.h"
+#include "object\GameObject.h"
 #include "Debug.h"
 using namespace thomas;
 
@@ -35,7 +36,9 @@ namespace ThomasEngine {
 
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
 
+		s_GameObjectManager = gcnew GameObjectManager();
 		s_Selection = gcnew ThomasSelection();
+
 		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
