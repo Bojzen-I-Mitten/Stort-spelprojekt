@@ -71,7 +71,6 @@ namespace thomas
 				
 				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
 				editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
-
 				
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(90), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
@@ -79,7 +78,7 @@ namespace thomas
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(270), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0)) * m_particleBufferStruct.radius, math::Vector3::Zero);
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180)) * m_particleBufferStruct.radius, math::Vector3::Zero);
-				//editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(math::Vector3(0.0f, 0.0f, 0.0f), m_particleBufferStruct.radius));
+				
 				
 			}
 

@@ -54,12 +54,9 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 
     InitParticleBufferStruct newParticle = initparticles[initindex];
 
-    uint2 aliveAndMaxCount = counterbuffer.Load2(ALIVE_COUNT_OFFSET);
-    uint aliveCount = aliveAndMaxCount.x;
-    uint maxCount = aliveAndMaxCount.y;
-    uint capacityLeft = maxCount - aliveCount;
-
-    int threshold = min(newParticle.nrOfParticlesToEmit, capacityLeft); 
+    uint deadCount = counterbuffer.Load(DEAD_COUNT_OFFSET);//capacity left
+    
+    int threshold = min(newParticle.nrOfParticlesToEmit, deadCount);
 
     if (ix < threshold)
     {
