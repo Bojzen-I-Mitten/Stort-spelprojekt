@@ -95,6 +95,10 @@ namespace ThomasEditor
                             m_chadControls.FreeLookCamera(m_velocity, m_xStep, m_yStep);
 
                     }
+                    if(Input.GetKeyDown(Input.Keys.LeftShift))
+                    {
+                        m_chadControls.InitFreeLookCamera();
+                    }
                     break;
                 case State.THROWING:
                     // __SIMULTAENOUS__ THROW and: MOVING

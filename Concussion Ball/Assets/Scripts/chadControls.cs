@@ -28,7 +28,6 @@ namespace ThomasEditor
         private float TotalYStep = 0;
         private float TotalXStep = 0;
         private Vector3 CameraStartPos;
-        private bool InitFreeLook = true;
 
         private float throwForce;
 
@@ -126,23 +125,16 @@ namespace ThomasEditor
 
         public void FondleCamera(float velocity, float xStep, float yStep)
         {
-            float _xStep = xStep;
-            //Limit turn speed------------------------------
-            float xStepSign = Math.Sign(xStep);
-            float TurnRatio = 1;
-            if (velocity != 0)
-                TurnRatio = 1 / velocity;
-            _xStep = Math.Min(Math.Abs(xStep), TurnRatio);
-            _xStep *= xStepSign;
-            //----------------------------------------------
-            float yaw = ThomasEngine.MathHelper.ToRadians(-_xStep * CameraSensitivity_x);
-            transform.RotateByAxis(transform.up, yaw);
-
             if (camera)
             {
-                TotalXStep -= yaw;
+                float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
+                if(velocity != 0)
+                    yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
+                transform.RotateByAxis(transform.up, yaw);
+
+                TotalXStep -= yaw; //for of freelook
                 TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
-                TotalYStep = ClampCameraRadians(TotalYStep);
+                TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
                 camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
                 camera.transform.localPosition = Vector3.Transform(new Vector3(0, CameraHeight, CameraDistance), camera.transform.localRotation);
 
@@ -154,7 +146,7 @@ namespace ThomasEditor
             camera.transform.localPosition = new Vector3(0, CameraHeight, -CameraDistance);
             camera.transform.LookAt(transform.position + new Vector3(0, CameraHeight, 0));
 
-            camera.transform.localEulerAngles = new Vector3(0, 0, 0);
+            camera.transform.localEulerAngles = new Vector3(0, 180, 0);
             TotalXStep = ThomasEngine.MathHelper.Pi;
             TotalYStep = 0;
         }
@@ -163,14 +155,9 @@ namespace ThomasEditor
         {
             if (camera)
             {
-                if (InitFreeLook)
-                {
-                    InitFreeLook = false;
-                    InitFreeLookCamera();
-                }
                 TotalXStep -= ThomasEngine.MathHelper.ToRadians(xStep * CameraSensitivity_x);
                 TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
-                TotalYStep = ClampCameraRadians(TotalYStep);
+                TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
 
                 Quaternion rot = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
                 camera.transform.localRotation = rot;
@@ -189,18 +176,16 @@ namespace ThomasEditor
                 camera.transform.localEulerAngles = new Vector3(0, 0, 0);
                 TotalXStep = 0;
                 TotalYStep = 0;
-
-                InitFreeLook = true;
             }
         }
 
-        private float ClampCameraRadians(float angle)
+        private float ClampCameraRadians(float angle, float min, float max)
         {
             if (angle < -2 * ThomasEngine.MathHelper.Pi)
                 angle += 2 * ThomasEngine.MathHelper.Pi;
             if (angle > 2 * ThomasEngine.MathHelper.Pi)
                 angle -= 2 * ThomasEngine.MathHelper.Pi;
-            return Math.Min(Math.Max(angle, -CameraMaxVertRadians), CameraMaxVertRadians);
+            return Math.Min(Math.Max(angle, min), max);
         }
         public void FondleBall()
         {
