@@ -4,6 +4,7 @@ using ThomasEngine;
 using ThomasEngine.Network;
 using LiteNetLib;
 using System.ComponentModel;
+using System.Collections;
 
 public enum TEAM_TYPE
 {
@@ -15,32 +16,55 @@ public enum TEAM_TYPE
 
 public class MatchSystem : NetworkManager
 {
+    public Dictionary<TEAM_TYPE, Team> Teams { get; set; }
 
-    [Category("test")]
-    public int Test { get; set; }
+    public Team Spectator { get; set; }
 
-    private Dictionary<TEAM_TYPE, Team> Teams;
+    public GameObject BallPrefab;
+    private GameObject Ball;
 
     public static new MatchSystem instance
     {
         get { return NetworkManager.instance as MatchSystem; }
     }
 
+    MatchSystem() : base()
+    {
+        Teams = new Dictionary<TEAM_TYPE, Team>();
+
+        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.White);
+
+        Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
+        Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
+    }
+
     public override void Start()
     {
         base.Start();
-        Teams = new Dictionary<TEAM_TYPE, Team>();
+        foreach (var team in Teams)
+            team.Value.Start();
 
-        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", null);
 
-        Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", null);
-        Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", null);
-        
+        StartCoroutine(ResetCoroutine(10));
+    }
+
+    IEnumerator ResetCoroutine(int seconds)
+    {
+        int secondsRemaining = seconds;
+        while(secondsRemaining > 0)
+        {
+            yield return new WaitForSecondsRealtime(1.0f);
+            secondsRemaining -= 1;
+            Debug.Log(secondsRemaining);
+        }
+        OnRoundStart();
     }
 
     void OnMatchStart()
     {
         //Spawn ball or something
+
+        OnRoundStart();
     }
 
     void OnMatchEnd()
@@ -51,9 +75,21 @@ public class MatchSystem : NetworkManager
 
     void OnRoundStart()
     {
-        foreach(var team in Teams)
+        ResetPlayers();
+        ResetBall();
+    }
+
+    void ResetBall()
+    {
+        Ball.SetActive(true);
+        Ball.transform.position = new Vector3(0, 10, 0);
+    }
+
+    void ResetPlayers()
+    {
+        foreach (var team in Teams)
         {
-            switch(team.Key)
+            switch (team.Key)
             {
                 case TEAM_TYPE.UNASSIGNED:
                 case TEAM_TYPE.TEAM_SPECTATOR:
@@ -67,6 +103,7 @@ public class MatchSystem : NetworkManager
                     team.Value.Players.ForEach((player) =>
                     {
                         player.gameObject.SetActive(true);
+                        player.gameObject.transform.position = team.Value.GetSpawnPosition();
                     });
                     break;
             }
@@ -81,7 +118,6 @@ public class MatchSystem : NetworkManager
     public override void Update()
     {
         base.Update();
-        OnRoundStart();
         if (Scene.Players.ContainsKey(LocalPeer))
         {
             NetworkPlayer localPlayer = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();

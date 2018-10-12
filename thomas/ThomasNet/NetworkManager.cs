@@ -41,6 +41,8 @@ namespace ThomasEngine.Network
 
         protected NetPeer LocalPeer = null;
 
+        private NetPeer ResponsiblePeer = null;
+
         public int TICK_RATE { get; set; } = 24;
 
         internal NetworkScene NetScene;
@@ -98,7 +100,6 @@ namespace ThomasEngine.Network
 
         }
 
-
         #region Listners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -136,6 +137,7 @@ namespace ThomasEngine.Network
             
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
             
+
             foreach (NetPeer peer in NetManager.GetPeers(ConnectionState.Connected))
             {
                 if (peer == _peer)
@@ -147,7 +149,6 @@ namespace ThomasEngine.Network
                 };
 
                 Events.SendEventToPeer(connectEvent, DeliveryMethod.ReliableOrdered, _peer);
-
             }
 
             if(NetScene.Players.Count == 0) // We are new player.
@@ -253,6 +254,7 @@ namespace ThomasEngine.Network
                     NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
                     NetScene.ActivateSceneObjects();
                     OnPeerJoin(LocalPeer);
+                    ResponsiblePeer = LocalPeer;
                 }
               
             }

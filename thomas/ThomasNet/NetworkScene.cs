@@ -23,8 +23,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity playerID = Players[peer];
                 bool initialState = reader.GetBool();
-                if(playerID.enabled)
-                    playerID.ReadData(reader, initialState);
+                playerID.ReadData(reader, initialState);
             }
 
         }

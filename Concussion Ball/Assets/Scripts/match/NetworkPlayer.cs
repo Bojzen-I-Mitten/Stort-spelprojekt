@@ -12,7 +12,12 @@ public class NetworkPlayer : NetworkComponent
     {
         get { return _Team; }
     }
-
+    Material mat;
+    public override void Start()
+    {
+        mat = gameObject.GetComponent<RenderComponent>()?.material;
+        
+    }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
@@ -33,10 +38,6 @@ public class NetworkPlayer : NetworkComponent
             JoinTeam(newTeam);
     }
 
-    public override void Update()
-    {
-     
-    }
 
 
     public void JoinTeam(TEAM_TYPE teamType)
@@ -50,7 +51,13 @@ public class NetworkPlayer : NetworkComponent
         if (this._Team != null)
             this._Team.RemovePlayer(this);
         if (team != null)
+        {
             team.AddPlayer(this);
+            mat?.SetColor("color", team.Color);
+        }
+            
         this._Team = team;
+
+
     }
 }

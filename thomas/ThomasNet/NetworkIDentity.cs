@@ -78,6 +78,7 @@ namespace ThomasEngine.Network
             }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
+                
                 comp.OnWrite(DataWriter, initalState);
             }
             Manager.InternalManager.SendToAll(DataWriter, DeliveryMethod.Sequenced);
