@@ -187,7 +187,7 @@ namespace ThomasEditor
                         {
                             //Debug.Log("Charging ball and turning");
 
-                            m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
+                            //m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep); TODO: make a throwing camera func.
                         }
 
                         // can enter following after releasing ball: walking/backing/strafing/turning/idle
@@ -314,7 +314,15 @@ namespace ThomasEditor
                     {
                         //Debug.Log("Moving and turning..");
 
-                        m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
+                        if (!Input.GetKey(Input.Keys.LeftShift)) //normal controls
+                            m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
+                        else //free look
+                            m_chadControls.FreeLookCamera(m_velocity, m_xStep, m_yStep);
+                    }
+
+                    if (Input.GetKeyDown(Input.Keys.LeftShift))
+                    {
+                        m_chadControls.InitFreeLookCamera();
                     }
 
                     break;
