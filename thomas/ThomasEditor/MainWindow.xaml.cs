@@ -388,37 +388,37 @@ namespace ThomasEditor
         private void AddNewCubePrimitive(object sender, RoutedEventArgs e)
         {
             // Let's add a indirection to GameObjectManager here
-            var x = GameObjectManager.addPrimitive(PrimitiveType.Cube);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cube, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Sphere, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewQuadPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Quad, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewPlanePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Plane, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCylinderPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cylinder, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCapsulePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Capsule, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 

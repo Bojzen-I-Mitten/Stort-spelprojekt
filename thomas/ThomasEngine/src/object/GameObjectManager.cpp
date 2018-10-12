@@ -8,15 +8,21 @@ namespace ThomasEngine
 	GameObjectManager::GameObjectManager()
 	{
 		m_staticObjects = gcnew array<GameObject^>(100);
+		m_inActiveObjects = gcnew array<GameObject^>(100);
+		m_activeObjects = gcnew array<GameObject^>(100);
 	}
 
-	GameObject^ GameObjectManager::addPrimitive(PrimitiveType type)
+	GameObject^ GameObjectManager::addPrimitive(PrimitiveType type, bool isStatic)
 	{
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 	
 	
-		m_staticObjects[m_nrStatic++] = gameObject;
+		if (isStatic)
+			m_staticObjects[m_nrStatic++] = gameObject;
+		else
+			m_activeObjects[m_nrActive++] = gameObject;
+		
 		return gameObject;
 	}
 
