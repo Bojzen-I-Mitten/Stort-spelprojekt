@@ -89,6 +89,7 @@ namespace thomas
 			static void SetGlobalMatrix(const std::string& name, math::Matrix value);
 			
 			static void SetGlobalTexture2D(const std::string& name, resource::Texture2D* value);
+			static void SetGlobalTexture2DArray(const std::string & name, resource::Texture2D** value, unsigned nrOfTextures);
 			static void SetGlobalResource(const std::string& name, ID3D11ShaderResourceView* value);
 			static void SetGlobalConstantBuffer(const std::string& name, ID3D11Buffer* value);
 

@@ -1,14 +1,12 @@
 #include "ParticleEmitterComponent.h"
-#include <cstdlib>
-#include <ctime>
 #include "../GameObject.h"
-#include <fstream>
 #include "../../utils/d3d.h"
 
 #include "..\..\resource\Material.h"
 #include "..\..\graphics\ParticleSystem.h"
 #include "Transform.h"
 #include "../../ThomasTime.h"
+#include "../../resource/texture/Texture2D.h"
 
 #include "../../editor/gizmos/Gizmos.h"
 namespace thomas
@@ -25,7 +23,7 @@ namespace thomas
 				m_isEmitting = false;
 				m_particleBufferStruct = {};
 
-				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
+				m_particleBufferStruct.position = math::Vector3::Zero;
 				m_particleBufferStruct.distanceFromSphereCenter = 0.0f;
 
 				m_particleBufferStruct.radius = 1;
@@ -43,12 +41,13 @@ namespace thomas
 				m_particleBufferStruct.minRotationSpeed = 0.0f;
 				m_particleBufferStruct.maxRotationSpeed = 0.0f;
 
-				m_particleBufferStruct.direction = math::Vector3(0, 0, 0);
+				m_particleBufferStruct.direction = math::Vector3::Forward;
 
 				m_particleBufferStruct.nrOfParticlesToEmit = 0;
 				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
 				m_particleBufferStruct.rand = std::rand();
 				
+				SetTexture(resource::Texture2D::GetWhiteTexture());
 			}
 
 			ParticleEmitterComponent::~ParticleEmitterComponent()
@@ -304,17 +303,16 @@ namespace thomas
 				return m_isEmitting;
 			}
 
-
-			void ParticleEmitterComponent::SetMaterial(resource::Material * material)
+			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)
 			{
-				m_material = material;
+				m_particleSystem->AddTexture(other);
+				m_texture = other;
 			}
 
-			resource::Material * ParticleEmitterComponent::GetMaterial() const
+			resource::Texture2D * ParticleEmitterComponent::GetTexture() const
 			{
-				return m_material;
+				return m_texture;
 			}
-
 
 			void ParticleEmitterComponent::SetEmissionRate(unsigned const& other)
 			{

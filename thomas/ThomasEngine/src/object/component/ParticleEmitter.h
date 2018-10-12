@@ -4,6 +4,7 @@
 namespace thomas { namespace object { namespace component { class ParticleEmitterComponent; } } }
 namespace ThomasEngine
 {
+	ref class Texture2D;
 	[ExecuteInEditor]
 	public ref class ParticleEmitter : public Component
 	{
@@ -75,9 +76,14 @@ namespace ThomasEngine
 			unsigned get();
 			void set(unsigned value);
 		}
+		property Texture2D^ Texture {
+			Texture2D^ get();
+			void set(Texture2D^ value);
+		}
 		property bool Emit {
 			bool get();
 			void set(bool value);
 		}
+		
 	};
 }

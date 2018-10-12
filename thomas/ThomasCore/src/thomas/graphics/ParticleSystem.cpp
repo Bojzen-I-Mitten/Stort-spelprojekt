@@ -2,6 +2,7 @@
 #include "../resource/ComputeShader.h"
 #include <random>
 #include <time.h>
+#include "../resource/texture/Texture2D.h"
 
 namespace thomas
 {
@@ -83,7 +84,7 @@ namespace thomas
 
 			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
 
-
+			
 		}
 
 		void ParticleSystem::Destroy()
@@ -106,6 +107,19 @@ namespace thomas
 		void ParticleSystem::AddEmitterToSpawn(InitParticleBufferStruct & emitterInitData)
 		{
 			m_emitters.push_back(emitterInitData);
+		}
+
+		unsigned ParticleSystem::AddTexture(resource::Texture2D * tex)
+		{
+			for (unsigned i = 0; i < m_textures.size(); ++i)
+			{
+				if (m_textures[i] == tex)//resource manager makes sure the address is unique per texture
+					return i;
+			}
+
+			m_textures.push_back(tex);
+
+			return m_textures.size();
 		}
 		
 		void ParticleSystem::SpawnParticles()
@@ -214,16 +228,17 @@ namespace thomas
 		{
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
-
+			m_particleShader->SetGlobalTexture2DArray("textures", m_textures.data(), m_textures.size());
 			m_particleShader->SetGlobalResource("billboards", m_bufferBillboard->GetSRV());
 			
 			m_particleShader->Bind();
 			m_particleShader->SetPass(0);
 			
+			
 			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
 
-			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
+			ID3D11ShaderResourceView* const s_nullSRV[2] = { NULL };
+			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 2, s_nullSRV);
 
 		}
 

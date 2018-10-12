@@ -18,17 +18,20 @@ namespace thomas
 			private:
 				Texture2D* m_value;
 			};
-			/*
+			
 			class ShaderPropertyTexture2DArray : public ShaderProperty
 			{
 			public:
-				ShaderPropertyTexture2D(Texture2D* value);
+				ShaderPropertyTexture2DArray(Texture2D** value, unsigned nrOfTextures);
 				void Apply(std::string name, Shader* shader) const;
 				static ShaderProperty* GetDefault();
-				Texture2D* GetValue();
+				Texture2D** GetValue();
+
 			private:
-				Texture2D* m_value;
-			};*/
+				Texture2D** m_value;
+				unsigned m_nrOfTextures;
+				std::vector<ID3D11ShaderResourceView*> m_srvs;
+			};
 
 		}
 	}

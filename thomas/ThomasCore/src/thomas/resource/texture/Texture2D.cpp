@@ -37,6 +37,7 @@ namespace thomas
 
 				m_resource->QueryInterface<ID3D11Texture2D>(&textureInterface);
 
+
 				D3D11_TEXTURE2D_DESC desc;
 
 				textureInterface->GetDesc(&desc);

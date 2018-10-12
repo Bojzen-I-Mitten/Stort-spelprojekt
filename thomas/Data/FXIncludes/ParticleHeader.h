@@ -47,7 +47,8 @@ struct ParticleStruct
 struct BillboardStruct
 {
     float3 quad[2][3];
-    float2 pad2;
+	float texIndex;
+	float pad;
     float2 uvs[2][3];
 };
 

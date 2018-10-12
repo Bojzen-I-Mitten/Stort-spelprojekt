@@ -13,6 +13,7 @@ namespace thomas
 	{
 		class ComputeShader;
 		class Shader;
+		class Texture2D;
 	}
 	namespace graphics
 	{
@@ -54,10 +55,10 @@ namespace thomas
 		private:
 			struct BillboardStruct
 			{
-				math::Vector3 positions[2][3];
-				math::Vector2 pad2;
+				math::Vector3 quad[2][3];
+				float texIndex;
+				float pad;
 				math::Vector2 uvs[2][3];
-				//math::Vector4 colorFactor;
 			};
 			struct ParticleStruct
 			{
@@ -78,8 +79,6 @@ namespace thomas
 				float pad;
 			};
 
-			
-
 		public:
 			static void InitializeGlobalSystem();
 			static std::shared_ptr<ParticleSystem> GetGlobalSystem();
@@ -91,9 +90,11 @@ namespace thomas
 			void Destroy();
 			
 			void AddEmitterToSpawn(InitParticleBufferStruct& emitterInitData);
+			unsigned AddTexture(resource::Texture2D* tex);
 			
 			void UpdateParticleSystem();
 			void DrawParticles();
+			
 		private:
 
 			void SpawnParticles();
@@ -125,6 +126,7 @@ namespace thomas
 			std::vector<InitParticleBufferStruct> m_emitters;
 			
 			resource::Shader* m_particleShader;
+			std::vector<resource::Texture2D*> m_textures;
 
 			static const unsigned int UPDATE_THREAD_DIM_X = 256;
 			static const unsigned int EMIT_THREAD_DIM_X = 128;

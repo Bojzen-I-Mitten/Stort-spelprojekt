@@ -33,6 +33,7 @@ namespace thomas
 			static Texture2D* s_blackTexture;
 			static Texture2D* s_whiteTexture;
 			static Texture2D* s_normalTexture;
+
 		};
 	}
 }
