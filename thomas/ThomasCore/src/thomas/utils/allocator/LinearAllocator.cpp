@@ -20,7 +20,7 @@ namespace thomas {
 
 			LinearAllocator & LinearAllocator::operator=(LinearAllocator && move)
 			{
-				if (this == &move) return;
+				if (this == &move) return *this;
 
 				Allocator::moveOp(std::move(move));
 				_current_pos = move._current_pos;

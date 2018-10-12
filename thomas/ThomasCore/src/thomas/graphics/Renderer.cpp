@@ -128,7 +128,7 @@ namespace thomas
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
-				editor::Gizmos::RenderGizmos();
+				editor::Gizmos::Gizmo().RenderGizmos();
 			}
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}

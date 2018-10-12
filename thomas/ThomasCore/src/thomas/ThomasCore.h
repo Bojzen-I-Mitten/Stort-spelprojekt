@@ -3,6 +3,7 @@
 */
 
 #pragma once
+#pragma unmanaged	// Require for: std::thread
 #include <d3d11.h>
 #include <vector>
 #include <string>

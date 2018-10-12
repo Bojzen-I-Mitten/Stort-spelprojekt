@@ -36,7 +36,7 @@ namespace thomas
 			{
 				RenderComponent::Update();
 #ifdef _EDITOR
-				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 #endif
 				if (m_skeleton)
 					m_skeleton->update(ThomasTime::GetDeltaTime());

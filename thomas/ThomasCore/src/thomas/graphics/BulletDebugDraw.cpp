@@ -18,9 +18,9 @@ namespace thomas
 
 		void BulletDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const btVector3 & fromColor, const btVector3 & toColor)
 		{
-			editor::Gizmos::SetMatrix(math::Matrix::Identity);
-			editor::Gizmos::SetColor(math::Color(1, 1, 0));
-			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(from), thomas::Physics::ToSimple(to));
+			editor::Gizmos::Gizmo().SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
+			editor::Gizmos::Gizmo().DrawLine(thomas::Physics::ToSimple(from), thomas::Physics::ToSimple(to));
 		}
 
 		void BulletDebugDraw::drawLine(const btVector3 & from, const btVector3 & to, const btVector3 & color)
@@ -30,18 +30,18 @@ namespace thomas
 
 		void BulletDebugDraw::drawSphere(const btVector3 & p, btScalar radius, const btVector3 & color)
 		{
-			editor::Gizmos::SetMatrix(math::Matrix::Identity);
-			editor::Gizmos::SetColor(math::Color(1, 1, 0));
-			editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(thomas::Physics::ToSimple(p), radius));
+			editor::Gizmos::Gizmo().SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
+			editor::Gizmos::Gizmo().DrawBoundingSphere(math::BoundingSphere(thomas::Physics::ToSimple(p), radius));
 		}
 
 		void BulletDebugDraw::drawTriangle(const btVector3 & a, const btVector3 & b, const btVector3 & c, const btVector3 & color, btScalar alpha)
 		{
-			editor::Gizmos::SetMatrix(math::Matrix::Identity);
-			editor::Gizmos::SetColor(math::Color(1, 1, 0));
-			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(a), thomas::Physics::ToSimple(b));
-			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(b), thomas::Physics::ToSimple(c));
-			editor::Gizmos::DrawLine(thomas::Physics::ToSimple(c), thomas::Physics::ToSimple(a));
+			editor::Gizmos::Gizmo().SetMatrix(math::Matrix::Identity);
+			editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
+			editor::Gizmos::Gizmo().DrawLine(thomas::Physics::ToSimple(a), thomas::Physics::ToSimple(b));
+			editor::Gizmos::Gizmo().DrawLine(thomas::Physics::ToSimple(b), thomas::Physics::ToSimple(c));
+			editor::Gizmos::Gizmo().DrawLine(thomas::Physics::ToSimple(c), thomas::Physics::ToSimple(a));
 		}
 
 		void BulletDebugDraw::drawContactPoint(const btVector3 & PointOnB, const btVector3 & normalOnB, btScalar distance, int lifeTime, const btVector3 & color)

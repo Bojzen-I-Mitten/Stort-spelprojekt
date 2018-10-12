@@ -164,12 +164,12 @@ namespace thomas {
 
 #ifdef _EDITOR
 				for (i = 0; i < m_num_link; i++) {
-					editor::Gizmos::SetColor(math::Color(0, 1.f, 0.f));
-					editor::Gizmos::DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Up());
-					editor::Gizmos::SetColor(math::Color(1.f, 0.f, 0.f));
-					editor::Gizmos::DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Right());
-					editor::Gizmos::SetColor(math::Color(0.f, 0.f, 1.f));
-					editor::Gizmos::DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Forward());
+					editor::Gizmos::Gizmo().SetColor(math::Color(0, 1.f, 0.f));
+					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Up());
+					editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 0.f, 0.f));
+					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Right());
+					editor::Gizmos::Gizmo().SetColor(math::Color(0.f, 0.f, 1.f));
+					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Forward());
 				}
 #endif
 				// Clean stack
