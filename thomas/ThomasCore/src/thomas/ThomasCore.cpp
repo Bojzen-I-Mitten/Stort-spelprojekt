@@ -31,6 +31,7 @@ namespace thomas
 
 	Texture2D* texture;
 
+
 	bool ThomasCore::Init()
 	{
 		s_initialized = false;
@@ -74,7 +75,8 @@ namespace thomas
 		object::Object::Clean();
 		editor::EditorCamera::Instance()->Update();
 		GUI::ThomasGUI::Update(); // This need to be after the update of scripts
-		GUI::ThomasGUI::AddImage(texture, Vector2(100.f, 100.f));
+		/*GUI::ThomasGUI::AddImage(texture, Vector2(300.f, 300.0f));
+		GUI::ThomasGUI::AddText(L"Hello World!", L"CourierNew", Vector2(300.f, 300.f));*/
 		
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
