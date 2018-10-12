@@ -1,14 +1,17 @@
 #pragma once
 #include "Object.h"
-#include "component\Components.h"
+#include "component\Component.h"
 #include <vector>
 #include <memory>
+#include "component/Transform.h"
 
 namespace thomas
 {
 	class Scene;
 	namespace object
 	{
+		namespace component {
+		}
 		class GameObject : public Object
 		{
 		private:

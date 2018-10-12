@@ -95,7 +95,10 @@
     <ClCompile Include="src\thomas\resource\AudioClip.cpp" />
     <ClCompile Include="src\thomas\resource\Resource.cpp" />
     <ClCompile Include="src\thomas\Sound.cpp" />
-    <ClCompile Include="src\thomas\ThomasCore.cpp" />
+    <ClCompile Include="src\thomas\ThomasCore.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+    </ClCompile>
     <ClCompile Include="src\thomas\ThomasTime.cpp" />
     <ClCompile Include="src\thomas\utils\AssimpLoader.cpp" />
     <ClCompile Include="src\thomas\utils\D3D.cpp" />

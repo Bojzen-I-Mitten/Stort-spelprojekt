@@ -3,13 +3,13 @@
 */
 
 #pragma once
-#pragma unmanaged	// Require for: std::thread
 #include <d3d11.h>
 #include <vector>
 #include <string>
 #include <imgui\imgui.h>
 #include <thread>
 
+#pragma unmanaged	// Require for: std::thread
 namespace thomas
 {
 

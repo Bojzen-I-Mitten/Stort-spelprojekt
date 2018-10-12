@@ -2,6 +2,7 @@
 #include "../../graphics/animation/AnimatedSkeleton.h"
 #include "../../graphics/animation/constraint/BoneChildTransformConstraint.h"
 #include "../GameObject.h"
+#include "../../Common.h"
 namespace thomas
 {
 	namespace object

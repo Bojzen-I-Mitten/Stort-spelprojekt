@@ -10,6 +10,8 @@
 #include "..\resource\Model.h"
 #include "..\Common.h"
 #include "..\object\component\Camera.h"
+#include "..\object\component\RenderComponent.h"
+#include "..\Physics.h"
 
 namespace thomas
 {

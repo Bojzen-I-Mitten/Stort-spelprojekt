@@ -8,6 +8,7 @@
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../AutoProfile.h"
+#include "RenderComponent.h"
 namespace thomas
 {
 	namespace object
