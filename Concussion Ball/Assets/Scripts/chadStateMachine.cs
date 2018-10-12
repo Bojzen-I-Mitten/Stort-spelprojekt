@@ -89,9 +89,6 @@ namespace ThomasEditor
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
                         //Debug.Log("Idle and turning");
-
-                        if (Input.GetKeyDown(Input.Keys.LeftShift))
-                            m_chadControls.InitFreeLookCamera();
                         if (!Input.GetKey(Input.Keys.LeftShift)) //normal controls
                             m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
                         else //free look
