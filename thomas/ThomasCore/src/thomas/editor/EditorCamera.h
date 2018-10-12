@@ -59,6 +59,7 @@ namespace thomas
 			void MoveAndRotateCamera();
 			void SnapCameraToFocus();
 			object::GameObject* FindClickedGameObject();
+			void BoxSelect();
 			EditorCamera();
 			~EditorCamera();
 
@@ -74,6 +75,8 @@ namespace thomas
 			float m_speed;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
+			bool m_isBoxSelecting;
+			math::Rectangle m_boxSelectRect;
 			object::GameObject* m_selectedObject;
 			std::vector<object::GameObject*> m_selectedObjects;
 

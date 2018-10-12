@@ -23,6 +23,7 @@ namespace thomas
 			m_speed(2.f), 
 			m_hasSelectionChanged(false),
 			m_manipulatorSnapping(false),
+			m_isBoxSelecting(false),
 			m_selectedObject(nullptr),
 			m_objectHighlighter(nullptr),
 			m_manipulatorMode(ImGuizmo::MODE::LOCAL), 
@@ -205,8 +206,9 @@ namespace thomas
 
 			if (active)
 				MoveAndRotateCamera();
-			else if (window->GetInput()->GetMouseButtonDown(Input::MouseButtons::LEFT))
+			else if (window->GetInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
 			{
+				m_isBoxSelecting = false;
 				if (!ImGuizmo::IsOver())
 				{
 					object::GameObject* gObj = FindClickedGameObject();
@@ -214,6 +216,13 @@ namespace thomas
 						ToggleObjectSelection(gObj);
 					else
 						SelectObject(gObj);
+				}
+			}
+			else if (window->GetInput()->GetMouseButton(Input::MouseButtons::LEFT))
+			{
+				if (!ImGuizmo::IsOver())
+				{
+					BoxSelect();
 				}
 			}
 			else
@@ -302,7 +311,7 @@ namespace thomas
 				*(m_cameraComponent->GetViewMatrix() * math::Matrix::CreateScale(scale)).m, *m_cameraComponent->GetProjMatrix().m,
 				m_manipulatorOperation, m_manipulatorMode, *parentMatrix.m, *deltaMatrix.m, m_manipulatorSnapping ? snap : 0);
 
-			if (true)
+			if (ImGuizmo::IsUsing())
 			{
 				for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 				{
@@ -310,7 +319,6 @@ namespace thomas
 
 					gameObject->m_transform->SetWorldMatrix(offsetMatrixes[i] * parentMatrix);
 					gameObject->m_transform->SetDirty(true);
-					int x = 5;
 				}
 			}
 
@@ -319,7 +327,7 @@ namespace thomas
 		object::GameObject* EditorCamera::FindClickedGameObject()
 		{
 			math::Ray ray = m_cameraComponent->ScreenPointToRay(WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition());
-			auto renderComponents = object::Object::FindObjectsOfType<object::component::RenderComponent>();
+			auto renderComponents = object::component::RenderComponent::GetAllRenderComponents();
 
 			object::GameObject* closestGameObject = nullptr;
 			float closestDistance = m_cameraComponent->GetFar();
@@ -332,8 +340,46 @@ namespace thomas
 					closestGameObject = renderComponent->m_gameObject;
 				}
 			}
-
 			return closestGameObject;
+		}
+
+		void EditorCamera::BoxSelect()
+		{
+			math::Vector2 mousePos = WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition();
+			if(!m_isBoxSelecting)
+			{
+				m_isBoxSelecting = true;
+				m_boxSelectRect = math::Rectangle(mousePos.x, mousePos.y, 0, 0);
+			}
+			m_boxSelectRect.width = mousePos.x - m_boxSelectRect.x;
+			m_boxSelectRect.height = mousePos.y - m_boxSelectRect.y;
+			ImGui::GetOverlayDrawList()->AddRectFilled(
+				ImVec2(m_boxSelectRect.x, m_boxSelectRect.y),
+				ImVec2(m_boxSelectRect.x + m_boxSelectRect.width, m_boxSelectRect.y + m_boxSelectRect.height),
+				ImColor(1.0f, 1.0f, 1.0f, 0.3f));
+
+			ImGui::GetOverlayDrawList()->AddRect(
+				ImVec2(m_boxSelectRect.x, m_boxSelectRect.y),
+				ImVec2(m_boxSelectRect.x + m_boxSelectRect.width, m_boxSelectRect.y + m_boxSelectRect.height),
+				ImColor(1.0f, 1.0f, 1.0f, 1.0f));
+
+			math::BoundingFrustum frustrum = m_cameraComponent->GetSubFrustrum(m_boxSelectRect);
+			
+			m_selectedObjects.clear();
+			auto renderComponents = object::component::RenderComponent::GetAllRenderComponents();
+			for (auto renderComponent : renderComponents)
+			{
+				if (frustrum.Contains(renderComponent->m_bounds))
+				{
+					m_selectedObjects.push_back(renderComponent->m_gameObject);
+					
+					m_selectedObject = renderComponent->m_gameObject;
+				}
+			}
+			m_hasSelectionChanged = true;
+			
+
+
 		}
 
 		void EditorCamera::MoveAndRotateCamera()

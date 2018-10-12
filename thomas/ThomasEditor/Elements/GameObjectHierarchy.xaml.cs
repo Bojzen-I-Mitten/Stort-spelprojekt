@@ -295,11 +295,13 @@ namespace ThomasEditor
                     {
                         Inspector.instance.SelectedObject = (GameObject)item.Data;
                         ThomasWrapper.Selection.UnselectGameObjects();
+
+                        
                         foreach (var selectedObject in GetSelection())
                         {
                             GameObject selectedGObject = selectedObject.Data as GameObject;
                             if (!ThomasWrapper.Selection.Contain(selectedGObject))
-                                ThomasWrapper.Selection.SelectGameObject(selectedGObject);
+                                ThomasWrapper.Selection.SelectGameObject(selectedGObject, false);
 
 
                         }

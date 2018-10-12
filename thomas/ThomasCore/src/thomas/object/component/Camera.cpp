@@ -18,7 +18,7 @@ namespace thomas
 			void Camera::UpdateProjMatrix()
 			{
 				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
-				m_frustrum = math::BoundingFrustum(m_projMatrix);
+				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
 			Camera::Camera(bool dontAddTolist)
@@ -233,6 +233,29 @@ namespace thomas
 				math::BoundingFrustum frustrum;
 				m_frustrum.Transform(frustrum, m_gameObject->m_transform->GetWorldMatrix());
 				return frustrum;
+			}
+
+			math::BoundingFrustum Camera::GetSubFrustrum(math::Rectangle rect)
+			{
+				
+				math::BoundingFrustum subFrustrum(GetFrustrum());
+
+				math::Rectangle window = math::Rectangle(GetViewport().x, GetViewport().y, GetViewport().width, GetViewport().height);
+				math::Vector2 center = window.Center();
+				window.Offset(-center.x, -center.y);
+				rect.Offset(-center.x, -center.y);
+
+				float left = (float)rect.x / (float)window.x;
+				float right = (float)(rect.x + rect.width) / (float)(window.x + window.width);
+				float top = (float)rect.y / (float)window.y;
+				float bottom = (float)(rect.y + rect.width) / (float)(window.y + window.height);
+
+				subFrustrum.LeftSlope *= left;
+				subFrustrum.RightSlope *= right;
+				subFrustrum.TopSlope *= top;
+				subFrustrum.BottomSlope *= bottom;
+				
+				return subFrustrum;
 			}
 
 			void Camera::CopyFrameData()

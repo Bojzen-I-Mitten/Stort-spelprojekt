@@ -17,14 +17,21 @@ namespace ThomasEngine {
 	{
 	}
 
-
-	void ThomasSelection::SelectGameObject(GameObject^ gObj)
+	void ThomasSelection::SelectGameObject(GameObject^ gObj) 
+	{
+		SelectGameObject(gObj, true);
+	}
+	void ThomasSelection::SelectGameObject(GameObject^ gObj, bool clearSelection)
 	{
 		Monitor::Enter(m_lock);
 #if _DEBUG
 		lockOwner = Thread::CurrentThread->Name;
 #endif
 		try {
+			if (clearSelection) {
+				m_SelectedGameObjects->Clear();
+				thomas::editor::EditorCamera::Instance()->UnselectObjects();
+			}
 			m_SelectedGameObjects->Add(gObj);
 			thomas::editor::EditorCamera::Instance()->ToggleObjectSelection((thomas::object::GameObject*)gObj->nativePtr);
 		}
