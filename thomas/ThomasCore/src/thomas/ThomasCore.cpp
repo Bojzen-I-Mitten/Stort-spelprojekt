@@ -126,33 +126,10 @@ namespace thomas
 	{
 		return s_logOutput;
 	}
-
 	ThomasCore & ThomasCore::Core()
 	{
 		static ThomasCore core;
 		return core;
-	}
-
-	void ThomasCore::registerThread()
-	{
-		std::thread::id id = std::this_thread::get_id();
-		for (size_t i = 0; i < m_thread_tracker.size(); i++) {
-			if (id == m_thread_tracker[i])
-				return; // Exists..!
-		}
-		// Simple registering func. meant for 'few' threads.
-		m_thread_tracker.push_back(id);
-	}
-
-	uint32_t ThomasCore::Thread_Index()
-	{
-		std::thread::id id = std::this_thread::get_id();
-		for (size_t i = 0; i < m_thread_tracker.size(); i++) {
-			if (id == m_thread_tracker[i])
-				return i;
-		}
-		assert(false);	// Ops.. Register thread first!
-		return 0;
 	}
 
 	resource::MemoryAllocation * ThomasCore::Memory()

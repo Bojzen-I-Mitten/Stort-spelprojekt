@@ -220,8 +220,8 @@
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Debug.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
     </ClCompile>
     <ClCompile Include="src\GUI\editor\GUI.cpp" />
     <ClCompile Include="src\Input.cpp" />

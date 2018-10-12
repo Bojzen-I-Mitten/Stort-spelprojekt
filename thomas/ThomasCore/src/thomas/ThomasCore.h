@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 #include <imgui\imgui.h>
-#include <thread>
+
 
 #pragma unmanaged	// Require for: std::thread
 namespace thomas
@@ -16,7 +16,9 @@ namespace thomas
 	namespace resource {
 		class MemoryAllocation;
 	}
-
+	namespace utils {
+		class ThreadMap;
+	}
 	class ThomasCore
 	{
 	public:	
@@ -53,8 +55,7 @@ namespace thomas
 
 	private:
 
-		
-		std::vector<std::thread::id> m_thread_tracker;
+		std::unique_ptr<utils::ThreadMap> threadMap;
 		resource::MemoryAllocation* m_memAlloc;
 
 		static bool s_initialized;
