@@ -11,25 +11,7 @@ namespace thomas
 		{
 
 		private:
-
-			enum class GizmoPasses
-			{
-				SOLID = 0,
-				WIREFRAME = 1,
-			};
-
-			struct GizmoRenderCommand
-			{
-				math::Matrix matrix;
-				std::vector<math::Vector3> vertexData;
-				math::Color color;
-				D3D_PRIMITIVE_TOPOLOGY topology;
-				GizmoPasses pass;
-
-				GizmoRenderCommand(std::vector<math::Vector3> v, math::Matrix m, math::Color c, D3D_PRIMITIVE_TOPOLOGY t, GizmoPasses p) :
-					vertexData(v), matrix(m), color(c), topology(t), pass(p) {};
-			};
-
+						
 		public:
 			static void DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 			static void TransferGizmoCommands();

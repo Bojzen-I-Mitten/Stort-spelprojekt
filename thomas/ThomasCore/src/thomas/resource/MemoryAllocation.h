@@ -19,6 +19,8 @@ namespace thomas {
 			*/
 			utility::allocator::StackAllocator& stack(uint32_t index);
 
+			void* allocSystemMemory(uint32_t bytes, uint32_t alignment);
+
 		private:
 
 			/* Allocated system memory.

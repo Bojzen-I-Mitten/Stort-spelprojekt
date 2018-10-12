@@ -5,7 +5,7 @@ namespace thomas {
 
 	namespace resource {
 
-		constexpr uint32_t CONSTANT_MEM = 4096;
+		constexpr uint32_t CONSTANT_MEM = 4096*10;
 		constexpr uint32_t STACK_ALLOC = 4096*2;
 
 		MemoryAllocation::MemoryAllocation()
@@ -27,6 +27,11 @@ namespace thomas {
 		{
 			assert(index < NUM_THREAD);
 			return m_stack_allocation[index];
+		}
+
+		void * MemoryAllocation::allocSystemMemory(uint32_t bytes, uint32_t alignment)
+		{
+			return m_constant_memory.allocate(bytes, alignment);
 		}
 
 	}
