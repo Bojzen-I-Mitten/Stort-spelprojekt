@@ -33,7 +33,7 @@ namespace thomas
 
 		static ThomasCore& Core();
 
-		/* Register executing thread.
+		/* Register executing thread (should be called by all threads using core functions).
 		*/
 		void registerThread();
 		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.

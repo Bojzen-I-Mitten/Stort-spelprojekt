@@ -6,6 +6,8 @@
 #include "../../utils/d3d.h"
 #include "../../utils/Buffers.h"
 #include "GizmoRenderCommand.h"
+#include "GizmoRenderBuffer.h"
+#include "../../ThomasCore.h"
 namespace thomas
 {
 	namespace editor
@@ -322,35 +324,45 @@ namespace thomas
 		
 		void Gizmos::DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology)
 		{
-			s_gizmoCommands.push_back(gizmo::GizmoRenderCommand(lines.data(), lines.size(), m_matrix, s_color, topology, gizmo::GizmoPasses::SOLID));
+			// Submit to thread buffer:
+			m_render_buffers[ThomasCore::Core().Thread_Index()]->submitCmd(
+				gizmo::GizmoRenderCommand(
+					lines.data(), lines.size(),				// Vertex info
+					m_matrix, s_color,						// Transform, color (Transform 'should'/could be applied to the vertex data).
+					topology, gizmo::GizmoPasses::SOLID));	// 
 		}
 
 		void Gizmos::TransferGizmoCommands()
 		{
-
-			s_prevGizmoCommands = s_gizmoCommands;
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++) 
+				std::swap(m_render_buffers[i], m_update_buffers[i]);
 		}
 
 		void Gizmos::RenderGizmos()
 		{
-			for (gizmo::GizmoRenderCommand& command : s_prevGizmoCommands)
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
 			{
+				gizmo::GizmoRenderBuffer & buf = *m_render_buffers[i];
+				for (gizmo::GizmoRenderCommand& command : buf)
+				{
 
-				m_gizmoMaterial->SetShaderPass((int)command.pass);
-				m_gizmoMaterial->SetMatrix("gizmoMatrix", command.matrix);
-				m_gizmoMaterial->SetColor("gizmoColor", command.color);
-				m_gizmoMaterial->m_topology = command.topology;
+					m_gizmoMaterial->SetShaderPass((int)command.pass);
+					m_gizmoMaterial->SetMatrix("gizmoMatrix", command.matrix);
+					m_gizmoMaterial->SetColor("gizmoColor", command.color);
+					m_gizmoMaterial->m_topology = command.topology;
 
-				m_vertexBuffer->SetData(command.vertexData);
-				m_gizmoMaterial->GetShader()->BindVertexBuffer(m_vertexBuffer);
-				m_gizmoMaterial->Bind();
-				m_gizmoMaterial->Draw(command.numVertex, 0);
+					m_vertexBuffer->SetData(command.vertexData, command.numVertex);
+					m_gizmoMaterial->GetShader()->BindVertexBuffer(m_vertexBuffer);
+					m_gizmoMaterial->Bind();
+					m_gizmoMaterial->Draw(command.numVertex, 0);
+				}
 			}
 		}
 
 		void Gizmos::ClearGizmos()
 		{
-			s_gizmoCommands.clear();
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
+				m_update_buffers[i]->clear();
 		}
 
 		void Gizmos::Init()

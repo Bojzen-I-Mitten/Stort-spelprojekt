@@ -12,6 +12,23 @@ namespace thomas {
 				assert(size > 0); 
 			}
 
+			LinearAllocator::LinearAllocator(LinearAllocator && move)
+				: Allocator(std::move(move)), _current_pos(move._current_pos)
+			{
+				move._current_pos = NULL;
+			}
+
+			LinearAllocator & LinearAllocator::operator=(LinearAllocator && move)
+			{
+				if (this == &move) return;
+
+				Allocator::moveOp(std::move(move));
+				_current_pos = move._current_pos;
+				move._current_pos = NULL;
+
+				return *this;
+			}
+
 
 			LinearAllocator::~LinearAllocator() { _current_pos = nullptr; }
 

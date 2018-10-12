@@ -139,7 +139,7 @@ namespace thomas
 			if (id == m_thread_tracker[i])
 				return; // Exists..!
 		}
-		// Simple registering func.
+		// Simple registering func. meant for 'few' threads.
 		m_thread_tracker.push_back(id);
 	}
 

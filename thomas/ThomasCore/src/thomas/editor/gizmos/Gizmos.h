@@ -58,7 +58,8 @@ namespace thomas
 			void ImguiStringUpdate(std::string text, math::Vector2 pos);
 		private:
 
-			std::unique_ptr<gizmo::GizmoRenderBuffer> m_render_buffers[MAX_NUM_THREAD];
+			gizmo::GizmoRenderBuffer* m_update_buffers[MAX_NUM_THREAD];
+			gizmo::GizmoRenderBuffer* m_render_buffers[MAX_NUM_THREAD];
 
 			resource::Material* m_gizmoMaterial;
 			utils::buffers::VertexBuffer* m_vertexBuffer;

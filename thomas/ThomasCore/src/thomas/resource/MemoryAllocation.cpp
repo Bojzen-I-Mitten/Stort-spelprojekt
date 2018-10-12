@@ -25,7 +25,7 @@ namespace thomas {
 
 		utility::allocator::StackAllocator & MemoryAllocation::stack(uint32_t index)
 		{
-			assert(index < NUM_THREAD);
+			assert(index < MAX_NUM_THREAD);
 			return m_stack_allocation[index];
 		}
 
