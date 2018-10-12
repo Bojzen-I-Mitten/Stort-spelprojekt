@@ -23,7 +23,8 @@ namespace ThomasEngine {
 	public:
 		GameObjectManager();
 		static GameObject^ addPrimitive(PrimitiveType type, bool isStatic);
-
+		static void isStatic(GameObject^ gameObject);
+		static void createGameObjectCore(std::string name);
 	private:
 
 
