@@ -76,7 +76,7 @@ namespace ThomasEditor
                     {
                         Debug.Log("Idle and turning");
 
-                        //ChadControls.Turn(m_velocity, m_xStep, m_yStep);
+                        //m_chadControls.fondleCamera(m_velocity, m_xStep, m_yStep);
                     }
                     break;
                 case State.THROWING:
