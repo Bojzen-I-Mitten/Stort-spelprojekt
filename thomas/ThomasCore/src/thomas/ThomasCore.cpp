@@ -29,8 +29,6 @@ namespace thomas
 	bool ThomasCore::s_isEditor = false;
 	ImGuiContext* ThomasCore::s_imGuiContext;
 
-	Texture2D* texture;
-
 	bool ThomasCore::Init()
 	{
 		s_initialized = false;
@@ -43,10 +41,6 @@ namespace thomas
 
 		GUI::ThomasGUI::Init();
 		resource::Texture2D::Init();
-
-		// Load default image
-		texture = new Texture2D("../Data/cat.png");
-
 		ThomasTime::Init();
 		Sound::Instance()->Init();
 		resource::Shader::Init();
@@ -74,7 +68,6 @@ namespace thomas
 		object::Object::Clean();
 		editor::EditorCamera::Instance()->Update();
 		GUI::ThomasGUI::Update(); // This need to be after the update of scripts
-		GUI::ThomasGUI::AddImage(texture, Vector2(100.f, 100.f));
 		
 		resource::Shader::Update();	
 		Sound::Instance()->Update();

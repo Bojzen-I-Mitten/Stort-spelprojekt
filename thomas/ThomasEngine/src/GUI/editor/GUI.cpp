@@ -1,10 +1,14 @@
 #include "GUI.h"
+
 #pragma unmanaged
 #include <thomas/editor/gizmos/Gizmos.h>
-#pragma managed
-#include "..\..\resource\Model.h"
-#include "..\..\ThomasManaged.h"
+#include <thomas/graphics/gui/ThomasGUI.h>
 
+#pragma managed
+#include "../../resource/Model.h"
+#include "../../ThomasManaged.h"
+
+// OLD
 void ThomasEngine::GUI::DrawModel(Model^ model, int meshIndex,Vector3 position, Quaternion rotation, Vector3 scale)
 {
 	thomas::editor::Gizmos::DrawModel((thomas::resource::Model*)model->m_nativePtr, meshIndex, Utility::Convert(position), Utility::Convert(rotation), Utility::Convert(scale));
@@ -24,7 +28,6 @@ void ThomasEngine::GUI::DrawWireModel(Model ^ model, Vector3 position, Quaternio
 {
 	thomas::editor::Gizmos::DrawWireModel((thomas::resource::Model*)model->m_nativePtr, Utility::Convert(position), Utility::Convert(rotation), Utility::Convert(scale));
 }
-
 
 void ThomasEngine::GUI::DrawCube(Vector3 center, Vector3 size)
 {
@@ -88,8 +91,7 @@ void ThomasEngine::GUI::DrawFrustum(DirectX::BoundingFrustum % frustrum)
 }
 
 void ThomasEngine::GUI::SetColor(Color color)
-{
-	
+{	
 	thomas::editor::Gizmos::SetColor(Utility::Convert(color));
 }
 
@@ -112,4 +114,35 @@ void ThomasEngine::GUI::ImguiStringUpdate(String ^ text, Vector2 pos)
 {
 	if(ThomasEngine::ThomasWrapper::InEditor())
 		thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
+}
+//
+
+// Images
+void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position)
+{
+	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position));
+}
+
+void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector4 color)
+{
+	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
+								     Utility::Convert(color));
+}
+
+void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector2 scale)
+{
+	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
+									 Utility::Convert(Vector4(1.f)), Utility::Convert(scale));
+}
+
+void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector2 scale, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
+									 Utility::Convert(Vector4(1.f)), Utility::Convert(scale), rotation);
+}
+
+void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color)
+{
+	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
+									  Utility::Convert(color), Utility::Convert(scale), rotation);
 }

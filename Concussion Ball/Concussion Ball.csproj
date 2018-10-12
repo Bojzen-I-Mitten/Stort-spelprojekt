@@ -57,6 +57,7 @@
     <Compile Include="Assets\Scripts\chadControls.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
+    <Compile Include="Assets\Scripts\GUITest.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />

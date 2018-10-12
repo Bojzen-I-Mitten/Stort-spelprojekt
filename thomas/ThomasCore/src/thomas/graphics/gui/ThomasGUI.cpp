@@ -40,10 +40,13 @@ namespace thomas
 			m_images.clear();
 		}
 
-		void ThomasGUI::AddImage(Texture2D* texture, const Vector2& position, const Vector2& scale,
-								float rotation, const Vector4& color)
+		void ThomasGUI::AddImage(Texture2D* texture, const Vector2& position, const Vector4& color,
+								 const Vector2& scale, float rotation)
 		{
-			m_images.push_back({ texture, position, scale, color, rotation });
+			if (texture->GetResourceView())
+			{
+				m_images.push_back({ texture, position, scale, color, rotation });
+			}
 		}
 	}
 }

@@ -36,8 +36,8 @@ namespace thomas
 			static void Render();
 
 		public:
-			static void AddImage(Texture2D* texture, const Vector2& position, const Vector2& scale = Vector2(1.f),
-								 float rotation = 0.f, const Vector4& color = Vector4(1.f));
+			static void AddImage(Texture2D* texture, const Vector2& position, const Vector4& color = Vector4(1.f),
+								 const Vector2& scale = Vector2(1.f), float rotation = 0.f);
 
 
 		private:
