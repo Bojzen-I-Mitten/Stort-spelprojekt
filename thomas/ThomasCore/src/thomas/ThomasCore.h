@@ -8,8 +8,6 @@
 #include <string>
 #include <imgui\imgui.h>
 
-
-#pragma unmanaged	// Require for: std::thread
 namespace thomas
 {
 

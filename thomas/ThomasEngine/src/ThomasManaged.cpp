@@ -13,6 +13,8 @@
 #include <thomas\AutoProfile.h>
 #include <thomas\ProfileManager.h>
 #include <thomas\utils\GpuProfiler.h>
+#include <thomas\object\component\Camera.h>
+#include <thomas\object\component\RenderComponent.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
