@@ -90,10 +90,13 @@ namespace ThomasEditor
                     {
                         //Debug.Log("Idle and turning");
 
+                        if (Input.GetKeyDown(Input.Keys.LeftShift))
+                            m_chadControls.InitFreeLookCamera();
                         if (!Input.GetKey(Input.Keys.LeftShift)) //normal controls
                             m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
                         else //free look
                             m_chadControls.FreeLookCamera(m_velocity, m_xStep, m_yStep);
+
                     }
                     break;
                 case State.THROWING:
