@@ -116,9 +116,9 @@ namespace thomas
 			void Transform::Rotate(math::Quaternion rot)
 			{
 				m_localRotation = m_localRotation * rot;
-#ifdef _EDITOR
+//#ifdef _EDITOR
 				m_euler = math::ToEuler(m_localRotation);
-#endif
+//#endif
 				UpdateLocalMatrix();
 				SetDirty(true);
 			}
