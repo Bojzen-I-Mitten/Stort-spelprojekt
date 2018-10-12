@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <mutex>
 #include "../Constants.h"
 
 namespace thomas
@@ -21,6 +22,7 @@ namespace thomas
 		private:
 			uint32_t m_numThread, m_allocThread;
 			std::thread::id * m_thread_list;
+			std::mutex m_mtx;
 
 
 		};

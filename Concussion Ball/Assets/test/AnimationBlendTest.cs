@@ -22,7 +22,6 @@ public class AnimationBlendTest : ScriptComponent
     public override void Start()
     {
         skinn = gameObject.GetComponent<RenderSkinnedComponent>();
-
         root = new BlendNode(skinn.model);
         from = new PlaybackNode(skinn.model, fromAnim, true);
         to = new PlaybackNode(skinn.model, toAnim, true);

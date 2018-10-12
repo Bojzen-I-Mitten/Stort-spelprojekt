@@ -39,6 +39,7 @@ namespace ThomasEngine {
 
 		s_Selection = gcnew ThomasSelection();
 		Thread::CurrentThread->Name = "Main Thread";
+		thomas::ThomasCore::Core().registerThread();
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
 		{
@@ -65,7 +66,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartRenderer()
 	{
-
+		// Render thread start
+		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
 			UpdateFinished->WaitOne();
@@ -97,8 +99,12 @@ namespace ThomasEngine {
 
 		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
+
+		// Swap command lists
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::Gizmo().TransferGizmoCommands();
+		thomas::graphics::Renderer::Instance()->ClearCommands();
+		thomas::editor::Gizmos::Gizmo().ClearGizmos();
 
 		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
@@ -112,6 +118,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartEngine()
 	{
+		// Update thread start
+		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
@@ -160,8 +168,6 @@ namespace ThomasEngine {
 				}
 
 				//Rendering
-				thomas::graphics::Renderer::Instance()->ClearCommands();
-				editor::Gizmos::Gizmo().ClearGizmos();
 				if (WindowManager::Instance())
 				{
 					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
@@ -189,10 +195,6 @@ namespace ThomasEngine {
 					}
 						
 				}
-
-			
-
-				
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
@@ -204,9 +206,7 @@ namespace ThomasEngine {
 							Monitor::Exit(g->m_componentsLock);
 					}
 					Stop();
-				}
-					
-					
+				}	
 			}
 			finally
 			{

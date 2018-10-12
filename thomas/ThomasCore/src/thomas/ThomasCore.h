@@ -37,6 +37,7 @@ namespace thomas
 		/* Thread map used to register threads.
 		*/
 		utils::ThreadMap& getThreadMap();
+		void registerThread();
 		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.
 		*/
 		uint32_t Thread_Index();

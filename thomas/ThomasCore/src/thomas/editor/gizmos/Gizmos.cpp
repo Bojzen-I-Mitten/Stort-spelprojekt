@@ -12,12 +12,17 @@ namespace thomas
 {
 	namespace editor
 	{
-		Gizmos::Gizmos()
-			: m_gizmoMaterial(NULL),
+		Gizmos::Gizmos() : 
+			m_gizmoMaterial(NULL),
 			m_vertexBuffer(),
 			m_matrix(),
 			m_imguiNumber()
 		{
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
+			{
+				m_update_buffers[i] = new gizmo::GizmoRenderBuffer();
+				m_render_buffers[i] = new gizmo::GizmoRenderBuffer();
+			}
 		}
 
 		Gizmos::~Gizmos()

@@ -13,6 +13,7 @@ namespace thomas
 		}
 		void ThreadMap::registerThread()
 		{
+			std::lock_guard<std::mutex> lck(m_mtx);
 			std::thread::id id = std::this_thread::get_id();
 			size_t i = 0;
 			for (; i < m_numThread; i++) {
@@ -24,14 +25,15 @@ namespace thomas
 				LOG("Can't register more threads. Max is: 3");
 				return;
 			}
-			m_thread_list[m_numThread++] == id;
+			m_thread_list[m_numThread++] = id;
 		}
 
 		uint32_t ThreadMap::Thread_Index()
 		{
 			std::thread::id id = std::this_thread::get_id();
 			for (size_t i = 0; i < m_numThread; i++) {
-				if (id == m_thread_list[i])
+				std::thread::id cmp = m_thread_list[i];
+				if (id == cmp)
 					return i;
 			}
 			assert(false);	// Ops.. Register thread first!

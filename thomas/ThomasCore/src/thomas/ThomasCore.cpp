@@ -135,6 +135,10 @@ namespace thomas
 	{
 		return *m_threadMap;
 	}
+	void ThomasCore::registerThread()
+	{
+		m_threadMap->registerThread();
+	}
 	uint32_t ThomasCore::Thread_Index()
 	{
 		return m_threadMap->Thread_Index();
