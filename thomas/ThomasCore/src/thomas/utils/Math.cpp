@@ -5,7 +5,7 @@ namespace DirectX
 {
 	namespace SimpleMath
 	{
-		Vector3 ToEuler(const Quaternion & q)
+		Euler ToEuler(const Quaternion & q)
 		{
 			float yaw, pitch, roll;
 
@@ -27,7 +27,15 @@ namespace DirectX
 				pitch = 0.f;
 			}
 
-			return Vector3(RadiansToDegrees(pitch), RadiansToDegrees(yaw), RadiansToDegrees(roll));
+			return Euler(RadiansToDegrees(yaw), RadiansToDegrees(pitch),  RadiansToDegrees(roll));
+		}
+		Euler ToEuler(const Vector3 & v)
+		{
+			return { v.y, v.x, v.z };
+		}
+		Vector3 FromEuler(const Euler & e)
+		{
+			return Vector3(e.pitch, e.yaw, e.roll);
 		}
 		Quaternion FromEuler(const Vector3 & rotation)
 		{

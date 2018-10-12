@@ -19,6 +19,13 @@ namespace DirectX
 		using DirectX::BoundingOrientedBox;
 
 
+		struct Euler {
+			float yaw, pitch, roll;
+
+			Euler() : yaw(0.f), pitch(0.f), roll(0.f) {}
+			Euler(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
+		};
+
 		Quaternion getRotationTo(Vector3 from, Vector3 dest);
 
 		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest);
@@ -44,7 +51,10 @@ namespace DirectX
 
 		/* Convert rotation quatenion to pitch/yaw/roll vector
 		*/
-		Vector3 ToEuler(const Quaternion & q);
+		Euler ToEuler(const Quaternion & q);
+		Euler ToEuler(const Vector3 &v);
+		Vector3 FromEuler(const Euler &e);
+
 		/* Convert pitch/yaw/roll vector to rotation quaternion
 		*/
 		inline Quaternion FromEuler(const Vector3 & rotation);

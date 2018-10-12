@@ -24,7 +24,7 @@ namespace ThomasEngine
 			}
 			/* Targeted orientation
 			*/
-			property Quaternion Orienation {
+			property Quaternion Orientation {
 				Quaternion get();
 				void set(Quaternion rot);
 			}

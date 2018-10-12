@@ -117,6 +117,7 @@ namespace thomas {
 			*/
 			void IK_FABRIK_Constraint::execute(Skeleton & skel, math::Matrix * objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
+				assert(m_num_link > 1);
 				// Stack alloc.
 				float * d = reinterpret_cast<float*>(
 					ThomasCore::Core().Memory()->stack(0).allocate(sizeof(float) * m_num_link * 4, sizeof(float)));
@@ -141,20 +142,25 @@ namespace thomas {
 					FABRIK_iteration(m_target, d, p, m_num_link);
 
 				math::Vector3 trans;
+				math::Matrix pose;
 				// Apply solution to chain
 				for (i = 0; i < m_num_link - 1; i++) {
-					math::Matrix pose = objectPose[(chain+i)->m_index];
+					pose = objectPose[(chain+i)->m_index];
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
 					pose = pose * weightRotationBetween(pose.Up(), p[i + 1] - p[i], m_weight);	// Rotate
 					pose.Translation(lerp(trans, p[i], m_weight));								// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;										// Set
 				}
-				trans = objectPose[(chain + m_num_link - 1)->m_index].Translation();
-				objectPose[(chain + m_num_link - 1)->m_index] = 
-					math::Matrix::CreateScale(comp[m_num_link - 1].m_scale) * 
-					math::Matrix::CreateFromQuaternion(m_targetOrient);
-				objectPose[(chain + m_num_link - 1)->m_index].Translation(lerp(trans, m_target, m_weight));
+				math::Vector3 up = math::Vector3::Transform(math::Vector3::Up, m_targetOrient);
+				math::Vector3 right = math::Vector3::Transform(math::Vector3::Right, m_targetOrient);
+				pose = objectPose[(chain + m_num_link - 1)->m_index];
+				trans = pose.Translation();
+				pose.Translation(math::Vector3::Zero);											// Remove translation
+				pose = pose * weightRotationBetween(pose.Up(), up, m_weight);					// Rotate transform to y
+				pose = pose * weightRotationBetween(pose.Right(), right, m_weight);				// Rotate transform to x
+				pose.Translation(lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
+				objectPose[(chain + m_num_link - 1)->m_index] = pose;
 
 #ifdef _EDITOR
 				for (i = 0; i < m_num_link; i++) {

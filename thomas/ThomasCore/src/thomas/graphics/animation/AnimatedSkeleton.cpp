@@ -38,7 +38,7 @@ namespace thomas {
 			void AnimatedSkeleton::updateSkeleton()
 			{
 				TransformComponents *frame_tmp = reinterpret_cast<TransformComponents*>(
-					ThomasCore::Core().Memory()->stack(0).allocate(sizeof(TransformComponents)* _ref.getNumBones(), 4));
+					ThomasCore::Core().Memory()->stack(0).allocate(sizeof(TransformComponents)* _ref.getNumBones(), sizeof(float)));
 				//Update animation tree
 				_root->calcFrame(frame_tmp);
 				// Update skin transforms

@@ -37,7 +37,8 @@ namespace thomas {
 				assert(size != 0);
 				uint8_t adjustment = alignForwardAdjustmentWithHeader(_current_pos, alignment, sizeof(AllocationHeader));
 
-				if (_used_memory + adjustment + size > _size) return nullptr;
+				if (_used_memory + adjustment + size > _size) 
+					return nullptr;
 
 				void* aligned_address = add(_current_pos, adjustment);
 

@@ -63,6 +63,8 @@ public class AnimationBlendTest : ScriptComponent
             Vector3 t = target ? target.transform.position : new Vector3(curve, 1.5f, -1f);
             lookAt.Target = t;
             ik.Target = t;
+            ik.Orientation = target.transform.localRotation;
+            ik.Weight = 1f;
             if (Input.GetKeyDown(Input.Keys.Space))
             {
                 // Throw

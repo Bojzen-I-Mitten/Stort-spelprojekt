@@ -5,16 +5,17 @@ namespace thomas {
 
 	namespace resource {
 
-
+		constexpr uint32_t CONSTANT_MEM = 4096;
+		constexpr uint32_t STACK_ALLOC = 4096*2;
 
 		MemoryAllocation::MemoryAllocation()
 			: 
-			m_allocation(new uint8_t[4096*4]),
-			m_constant_memory(4096, m_allocation),
+			m_allocation(new uint8_t[CONSTANT_MEM + STACK_ALLOC * 3]),
+			m_constant_memory(CONSTANT_MEM, m_allocation),
 			m_stack_allocation{
-		utility::allocator::StackAllocator(4096, m_allocation + 4096),
-		utility::allocator::StackAllocator(4096, m_allocation + 4096 * 2),
-		utility::allocator::StackAllocator(4096, m_allocation + 4096 * 3)
+		utility::allocator::StackAllocator(STACK_ALLOC, m_allocation + CONSTANT_MEM),
+		utility::allocator::StackAllocator(STACK_ALLOC, m_allocation + CONSTANT_MEM + STACK_ALLOC),
+		utility::allocator::StackAllocator(STACK_ALLOC, m_allocation + CONSTANT_MEM + STACK_ALLOC * 2)
 		}
 		{	}
 
