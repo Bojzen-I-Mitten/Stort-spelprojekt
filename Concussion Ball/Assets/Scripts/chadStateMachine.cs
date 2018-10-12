@@ -218,19 +218,41 @@ namespace ThomasEditor
                         }
                         else if (Input.GetKey(Input.Keys.W))
                         {
-                            if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.S))
+                            if (Input.GetKey(Input.Keys.Q) && !Input.GetKey(Input.Keys.E) && !Input.GetKey(Input.Keys.S))
                             {
-                                // uppdatera inte m_velocity då ingen acceleration because also strafing
-                                // chadMovement.Move(m_velocity * 0.66f, -m_velocity * 0.66f);
+                                // move camera fixed in front from side, player runs straight, no strafing
 
-                                Debug.Log("Walking and strafing together");
+                                // m_velocity += en faktor för acceleration, if m_velocity < maxVelocity
+                                // chadMovement.Move(m_velocity, 0);
+
+                                Debug.Log("Walking and looking in front from side together");
+                            }
+                            else if (Input.GetKey(Input.Keys.E) && !Input.GetKey(Input.Keys.Q) && !Input.GetKey(Input.Keys.S))
+                            {
+                                // move camera fixed in front from side, player runs straight, no strafing
+
+                                // m_velocity += en faktor för acceleration, if m_velocity < maxVelocity
+                                // chadMovement.Move(m_velocity, 0);
+
+                                Debug.Log("Walking and looking in front from side together");
+                            }
+                            else if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.S))
+                            {
+                                // move camera fixed behind, player runs straight, no strafing
+
+                                // m_velocity += en faktor för acceleration, if m_velocity < maxVelocity
+                                // chadMovement.Move(m_velocity, 0);
+
+                                Debug.Log("Walking and looking behind together");
                             }
                             else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.S))
                             {
-                                // uppdatera inte m_velocity då ingen acceleration because also strafing
-                                // chadMovement.Move(m_velocity *0.66f, m_velocity * 0.66f);
+                                // move camera fixed behind, player runs straight, no strafing
 
-                                Debug.Log("Walking and strafing together");
+                                // m_velocity += en faktor för acceleration, if m_velocity < maxVelocity
+                                // chadMovement.Move(m_velocity, 0);
+
+                                Debug.Log("Walking and looking behind together");
                             }
                             else if (!Input.GetKey(Input.Keys.S))
                             {
