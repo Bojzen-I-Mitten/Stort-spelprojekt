@@ -2,6 +2,7 @@
 #include "../utils/Math.h"
 #include "../Physics.h"
 #include "../editor/gizmos/Gizmos.h"
+#include "../ThomasCore.h"
 namespace thomas
 {
 	namespace graphics

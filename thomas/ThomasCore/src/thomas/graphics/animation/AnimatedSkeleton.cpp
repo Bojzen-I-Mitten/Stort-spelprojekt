@@ -7,6 +7,7 @@
 #include "BaseAnimationTime.h"
 #include "constraint/BoneConstraint.h"
 #include "../../resource/MemoryAllocation.h"
+#include "../../ThomasCore.h"
 namespace thomas {
 	namespace graphics {
 		namespace animation {

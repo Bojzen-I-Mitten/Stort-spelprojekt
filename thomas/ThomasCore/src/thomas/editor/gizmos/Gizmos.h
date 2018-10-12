@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "../../Common.h"
 #include "../../Constants.h"
 #include "../../utils/Math.h"

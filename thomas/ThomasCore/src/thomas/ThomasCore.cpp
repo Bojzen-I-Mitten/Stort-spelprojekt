@@ -19,6 +19,7 @@
 #include "graphics/Renderer.h"
 
 #include "object/component/LightComponent.h"
+#include "Physics.h"
 
 namespace thomas 
 {

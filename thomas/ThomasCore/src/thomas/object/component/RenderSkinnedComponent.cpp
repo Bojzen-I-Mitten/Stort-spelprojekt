@@ -7,6 +7,8 @@
 #include "../../resource/Material.h"
 #include "../GameObject.h"
 #include "../../editor/gizmos/Gizmos.h"
+#include "../../resource/Shader.h"
+#include "../../ThomasCore.h"
 namespace thomas
 {
 	namespace object
@@ -18,14 +20,14 @@ namespace thomas
 			RenderSkinnedComponent::RenderSkinnedComponent()
 				: m_skeleton()
 			{
-				thomas::resource::shaderproperty::ShaderPropertyStatic prop;
-				prop.m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
+				resource::shaderproperty::ShaderPropertyStatic prop;
+				prop.m_apply = resource::shaderproperty::ApplyEffectMatrixDynamicArray;
 				prop.m_dataSize = 0;
 				prop.m_data = NULL;
 				prop.m_effect_id = graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH;
 #ifdef _DEBUG
 				prop.m_effectName = graphics::THOMAS_MATRIX_SKIN_ARRAY;
-				prop.m_type = thomas::resource::shaderproperty::ShaderProperty::Type::MATRIX_ARRAY;
+				prop.m_type = resource::shaderproperty::ShaderPropertyType::MATRIX_ARRAY;
 #endif
 				m_skinInfo = &insertProperty(prop);
 			}

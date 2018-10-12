@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "..\utils/d3d.h"
 #include "..\Common.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "ShaderProperty.h"
 #include "../../utils/d3d.h"
+#include "../Shader.h"
 namespace thomas
 {
 	namespace resource

@@ -96,7 +96,7 @@ namespace ThomasEngine {
 		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
-		thomas::editor::Gizmos::TransferGizmoCommands();
+		thomas::editor::Gizmos::Gizmo().TransferGizmoCommands();
 
 		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
@@ -159,7 +159,7 @@ namespace ThomasEngine {
 
 				//Rendering
 				thomas::graphics::Renderer::Instance()->ClearCommands();
-				editor::Gizmos::ClearGizmos();
+				editor::Gizmos::Gizmo().ClearGizmos();
 				if (WindowManager::Instance())
 				{
 					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)

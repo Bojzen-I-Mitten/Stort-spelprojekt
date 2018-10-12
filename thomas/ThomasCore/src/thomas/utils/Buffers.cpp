@@ -1,5 +1,6 @@
 #include "Buffers.h"
 #include "..\Common.h"
+#include "..\ThomasCore.h"
 
 namespace thomas
 {

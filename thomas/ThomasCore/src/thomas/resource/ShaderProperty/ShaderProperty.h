@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "../Shader.h"
 namespace thomas
 {
 	namespace resource
@@ -13,16 +12,16 @@ namespace thomas
 			public:
 				enum class Type
 				{
-					SCALAR_FLOAT,
-					SCALAR_BOOL,
-					SCALAR_INT,
-					VECTOR,
-					COLOR,
-					MATRIX,
-					MATRIX_ARRAY,
-					SHADER_RESOURCE,
-					CONSTANT_BUFFER,
-					TEXTURE2D
+					SCALAR_FLOAT = 0,
+					SCALAR_BOOL = 1,
+					SCALAR_INT = 2,
+					VECTOR = 3,
+					COLOR = 4,
+					MATRIX = 5,
+					MATRIX_ARRAY = 6,
+					SHADER_RESOURCE = 7,
+					CONSTANT_BUFFER = 8,
+					TEXTURE2D = 9
 				};
 
 				ShaderProperty(Type type);
