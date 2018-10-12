@@ -11,6 +11,7 @@
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
 #include "..\WindowManager.h"
+#include "..\graphics\gui\ThomasGUI.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
@@ -108,6 +109,7 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
+			unsigned index = 0;
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -122,8 +124,17 @@ namespace thomas
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
+
+				// Draw GUI on the main camera
+				if (index == 1)
+				{
+					GUI::ThomasGUI::Render();
+				}
+
+				index++;
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
+
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{

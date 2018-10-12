@@ -17,6 +17,7 @@
 #include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
+#include "../thomas/graphics/gui/ThomasGUI.h"
 
 #include "object/component/LightComponent.h"
 
@@ -25,7 +26,10 @@ namespace thomas
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
 	bool ThomasCore::s_initialized;
+	bool ThomasCore::s_isEditor = false;
 	ImGuiContext* ThomasCore::s_imGuiContext;
+
+	Texture2D* texture;
 
 	bool ThomasCore::Init()
 	{
@@ -37,7 +41,12 @@ namespace thomas
 		if (!utils::D3D::Instance()->Init())
 			return false;
 
+		GUI::ThomasGUI::Init();
 		resource::Texture2D::Init();
+
+		// Load default image
+		texture = new Texture2D("../Data/cat.png");
+
 		ThomasTime::Init();
 		Sound::Instance()->Init();
 		resource::Shader::Init();
@@ -64,6 +73,9 @@ namespace thomas
 
 		object::Object::Clean();
 		editor::EditorCamera::Instance()->Update();
+		GUI::ThomasGUI::Update(); // This need to be after the update of scripts
+		GUI::ThomasGUI::AddImage(texture, Vector2(100.f, 100.f));
+		
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
 	}
@@ -103,6 +115,7 @@ namespace thomas
 	{	
 		//Destroy all objects
 		WindowManager::Instance()->Destroy();
+		GUI::ThomasGUI::Destroy();
 		graphics::LightManager::Destroy();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
@@ -145,6 +158,14 @@ namespace thomas
 	void ThomasCore::ClearLogOutput()
 	{
 		s_clearLog = true;
+	}
+	bool ThomasCore::IsEditor()
+	{
+		return s_isEditor;
+	}
+	void ThomasCore::SetEditor(bool value)
+	{
+		s_isEditor = value;
 	}
 }
 

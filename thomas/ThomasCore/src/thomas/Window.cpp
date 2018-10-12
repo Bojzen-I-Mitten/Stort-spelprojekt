@@ -285,7 +285,8 @@ namespace thomas
 			return true;
 
 		Window* window = WindowManager::Instance()->GetWindow(hWnd);
-
+		if (!window)
+			return DefWindowProc(hWnd, message, wParam, lParam);
 		//If one case is hit the code will execute everything down until a break;
 		switch (message)
 		{

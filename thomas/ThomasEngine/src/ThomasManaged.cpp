@@ -30,6 +30,11 @@ namespace ThomasEngine {
 
 
 	void ThomasWrapper::Start() {
+
+		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
+
+		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
+
 		s_Selection = gcnew ThomasSelection();
 		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Init();
@@ -88,8 +93,8 @@ namespace ThomasEngine {
 			ImGui::End();
 		}
 
-		
-		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
+		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
+			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
@@ -120,9 +125,9 @@ namespace ThomasEngine {
 
 				thomas::ThomasTime::Update();
 				
-			if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
-				RenderFinished->WaitOne();
-			WindowManager::Instance()->Update();
+				if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
+					RenderFinished->WaitOne();
+				WindowManager::Instance()->Update();
 
 
 				ThomasCore::Update();
@@ -142,33 +147,33 @@ namespace ThomasEngine {
 					thomas::Physics::Simulate();
 				}
 
-			//Logic
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
-			{
-				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-				if (gameObject->GetActive())
+				//Logic
+				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 				{
-					gameObject->Update();
-				}
-			}
-
-			//Rendering
-			thomas::graphics::Renderer::Instance()->ClearCommands();
-			editor::Gizmos::ClearGizmos();
-			if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
-			{
-				if (renderingEditor)
-				{
-					editor::EditorCamera::Instance()->Render();
-					//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+					if (gameObject->GetActive())
 					{
-						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-						if (gameObject->GetActive())
-							gameObject->RenderGizmos();
+						gameObject->Update();
 					}
+				}
 
-						s_Selection->render();
+				//Rendering
+				thomas::graphics::Renderer::Instance()->ClearCommands();
+				editor::Gizmos::ClearGizmos();
+				if (WindowManager::Instance())
+				{
+					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
+					{
+						editor::EditorCamera::Instance()->Render();
+						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
+						for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+						{
+							GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+							if (gameObject->GetActive())
+								gameObject->RenderGizmos();
+						}
+
+							s_Selection->render();
 					}
 				
 					//end editor rendering
@@ -177,15 +182,11 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
-					if (WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
+					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
 						showStatistics = !showStatistics;
 					}
 						
-				}
-
-			
-
-				
+				}	
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
@@ -197,14 +198,12 @@ namespace ThomasEngine {
 							Monitor::Exit(g->m_componentsLock);
 					}
 					Stop();
-				}
-					
-					
+				}				
 			}
 			finally
 			{
 				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
-				if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
+				if (WindowManager::Instance())
 				{
 					thomas::object::component::RenderComponent::ClearList();
 					RenderFinished->WaitOne();
@@ -232,6 +231,12 @@ namespace ThomasEngine {
 	{
 		if (thomas::ThomasCore::Initialized())
 			WindowManager::Instance()->Create((HWND)hWnd.ToPointer(), isEditor);
+
+		if (isEditor) {
+			inEditor = true;
+			thomas::ThomasCore::SetEditor(true);
+		}
+			
 	}
 
 
@@ -313,6 +318,11 @@ namespace ThomasEngine {
 	}
 
 	
+	bool ThomasWrapper::InEditor()
+	{
+		return inEditor;
+	}
+
 	void ThomasWrapper::ToggleEditorRendering()
 	{
 		renderingEditor = !renderingEditor;
