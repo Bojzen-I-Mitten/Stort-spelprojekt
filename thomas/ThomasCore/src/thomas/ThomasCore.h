@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <imgui\imgui.h>
+#include <thread>
 
 namespace thomas
 {
@@ -32,6 +33,12 @@ namespace thomas
 
 		static ThomasCore& Core();
 
+		/* Register executing thread.
+		*/
+		void registerThread();
+		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.
+		*/
+		uint32_t Thread_Index();
 
 		resource::MemoryAllocation* Memory();
 
@@ -44,7 +51,9 @@ namespace thomas
 		static bool InitDirectX();
 
 	private:
+
 		
+		std::vector<std::thread::id> m_thread_tracker;
 		resource::MemoryAllocation* m_memAlloc;
 
 		static bool s_initialized;

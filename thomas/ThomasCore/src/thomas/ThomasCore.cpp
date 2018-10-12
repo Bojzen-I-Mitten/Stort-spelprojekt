@@ -46,7 +46,7 @@ namespace thomas
 		resource::Material::Init();
 		Physics::Init();
 		editor::EditorCamera::Instance()->Init();
-		editor::Gizmos::Init();
+		editor::Gizmos::Gizmo().Init();
 
 		graphics::LightManager::Initialize();
 
@@ -91,8 +91,9 @@ namespace thomas
 	}
 
 	ThomasCore::ThomasCore()
-		: m_memAlloc(new resource::MemoryAllocation())
+		: m_thread_tracker(), m_memAlloc(new resource::MemoryAllocation())
 	{
+		m_thread_tracker.resize(12);
 	}
 
 	bool ThomasCore::Initialized()
@@ -110,7 +111,7 @@ namespace thomas
 		resource::Texture2D::Destroy();
 		object::Object::Destroy();
 		editor::EditorCamera::Instance()->Destroy();
-		editor::Gizmos::Destroy();
+		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
 		Sound::Instance()->Destroy();
@@ -129,6 +130,28 @@ namespace thomas
 	{
 		static ThomasCore core;
 		return core;
+	}
+
+	void ThomasCore::registerThread()
+	{
+		std::thread::id id = std::this_thread::get_id();
+		for (size_t i = 0; i < m_thread_tracker.size(); i++) {
+			if (id == m_thread_tracker[i])
+				return; // Exists..!
+		}
+		// Simple registering func.
+		m_thread_tracker.push_back(id);
+	}
+
+	uint32_t ThomasCore::Thread_Index()
+	{
+		std::thread::id id = std::this_thread::get_id();
+		for (size_t i = 0; i < m_thread_tracker.size(); i++) {
+			if (id == m_thread_tracker[i])
+				return i;
+		}
+		assert(false);	// Ops.. Register thread first!
+		return 0;
 	}
 
 	resource::MemoryAllocation * ThomasCore::Memory()

@@ -2,13 +2,11 @@
 
 #include "../utils/allocator/LinearAllocator.h"
 #include "../utils/allocator/StackAllocator.h"
-
+#include "../Constants.h"
 namespace thomas {
 
 	namespace resource {
-
-		constexpr uint32_t NUM_THREAD = 3;
-
+		
 		class MemoryAllocation {
 		public:
 

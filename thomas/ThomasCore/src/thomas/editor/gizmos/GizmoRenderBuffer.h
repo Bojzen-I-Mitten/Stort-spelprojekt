@@ -5,6 +5,7 @@
 #include "GizmoRenderCommand.h"
 #include "../../utils/allocator/LinearAllocator.h"
 
+
 namespace thomas {
 	namespace editor {
 		namespace gizmo {
