@@ -36,9 +36,9 @@ namespace thomas
 
 		static ThomasCore& Core();
 
-		/* Register executing thread (should be called by all threads using core functions).
+		/* Thread map used to register threads.
 		*/
-		void registerThread();
+		utils::ThreadMap& getThreadMap();
 		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.
 		*/
 		uint32_t Thread_Index();
@@ -55,7 +55,7 @@ namespace thomas
 
 	private:
 
-		std::unique_ptr<utils::ThreadMap> threadMap;
+		std::unique_ptr<utils::ThreadMap> m_threadMap;
 		resource::MemoryAllocation* m_memAlloc;
 
 		static bool s_initialized;

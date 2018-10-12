@@ -17,7 +17,7 @@
 #include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
-
+#include "utils/ThreadMap.h"
 #include "object/component/LightComponent.h"
 #include "Physics.h"
 
@@ -92,9 +92,8 @@ namespace thomas
 	}
 
 	ThomasCore::ThomasCore()
-		: m_thread_tracker(), m_memAlloc(new resource::MemoryAllocation())
+		: m_threadMap(new utils::ThreadMap(MAX_NUM_THREAD)), m_memAlloc(new resource::MemoryAllocation())
 	{
-		m_thread_tracker.resize(12);
 	}
 
 	bool ThomasCore::Initialized()
@@ -130,6 +129,15 @@ namespace thomas
 	{
 		static ThomasCore core;
 		return core;
+	}
+
+	utils::ThreadMap & ThomasCore::getThreadMap()
+	{
+		return *m_threadMap;
+	}
+	uint32_t ThomasCore::Thread_Index()
+	{
+		return m_threadMap->Thread_Index();
 	}
 
 	resource::MemoryAllocation * ThomasCore::Memory()
