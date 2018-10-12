@@ -5,38 +5,51 @@ namespace thomas
 {
 	namespace resource
 	{
-		ComputeShader::ComputeShader()
-		{
-			
-		}
+		ID3D11UnorderedAccessView* const ComputeShader::s_nullUAVs[8]  = { NULL };
+		ID3D11UnorderedAccessView* const ComputeShader::s_nullUAV[1]   = { NULL };
+		ID3D11ShaderResourceView*  const ComputeShader::s_nullSRVs[8]  = { NULL };
+		ID3D11ShaderResourceView*  const ComputeShader::s_nullSRV[1]   = { NULL };
+
 		void ComputeShader::Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ)
 		{
 			//Bind();
 			utils::D3D::Instance()->GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
 		}
-		void ComputeShader::SetUAV(const std::string & name, ID3D11UnorderedAccessView& value)
+
+		void ComputeShader::DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs)
 		{
-			//if (HasProperty(name))
-			//{
-			//	GetProperty(name)->SetUAV(value);
-			//}
-			//else
-			//{
-			//	LOG("Property " << name << " does not exist for material");
-			//}
+			utils::D3D::Instance()->GetDeviceContext()->DispatchIndirect(indirectBuffer, alignedByteOffsetForArgs);
 		}
-		ID3D11UnorderedAccessView * ComputeShader::GetUAV(const std::string & name)
+
+		void ComputeShader::UnbindAllUAVs()
 		{
-		/*	if (HasProperty(name))
+			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAVs, nullptr);
+		}
+
+		void ComputeShader::UnbindOneUAV(unsigned startIndex)
+		{
+			if (startIndex > 7)
 			{
-				return GetProperty(name)->GetUAV();
+				LOG("start index is to large. early return");
+				return;
 			}
-			else
-			{
-				LOG("Property " << name << " does not exist for material");
-				return nullptr;
-			}*/
-			return nullptr;
+			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(startIndex, 1, s_nullUAV, nullptr);
 		}
+
+		void ComputeShader::UnbindAllSRVs()
+		{
+			utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 8, s_nullSRVs);
+		}
+
+		void ComputeShader::UnbindOneSRV(unsigned startIndex)
+		{
+			if (startIndex > 7)
+			{
+				LOG("start index is to large. early return");
+				return;
+			}
+			utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(startIndex, 1, s_nullSRV);
+		}
+
 	}
 }

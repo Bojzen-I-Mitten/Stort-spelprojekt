@@ -1,5 +1,7 @@
 #pragma once
 #include "Component.h"
+#include <memory>
+
 namespace thomas
 {
 	namespace graphics {

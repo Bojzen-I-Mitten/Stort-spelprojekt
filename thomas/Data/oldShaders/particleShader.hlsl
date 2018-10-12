@@ -1,10 +1,20 @@
-Texture2D diffuseTexture : register(t0);
-SamplerState diffuseSampler : register(s0);
+#pragma warning(disable: 4717) // removes effect deprecation warning.
 
-cbuffer matrixBuffer : register(b0)
+#include <..\FXIncludes\ThomasCG.hlsl>
+
+Texture2D diffuseTexture;
+//SamplerState diffuseSampler : register(s0);
+SamplerState StandardWrapSampler
 {
-	matrix viewProjMatrix;
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Wrap;
+	AddressV = Wrap;
 };
+
+//cbuffer matrixBuffer : register(b0)
+//{
+//	matrix viewProjMatrix;
+//};
 
 struct VS_OUT
 {
@@ -22,7 +32,7 @@ struct BillboardStruct
     float4 colorFactor;
 };
 
-StructuredBuffer<BillboardStruct> particle : register(t1);
+StructuredBuffer<BillboardStruct> billboards;
 
 VS_OUT  VSMain(uint id : SV_VERTEXID)
 {
@@ -32,9 +42,10 @@ VS_OUT  VSMain(uint id : SV_VERTEXID)
 	uint triangleIndex = (uint)((id % 6)/3);
 	uint vertexIndex = id % 3;
 
-	output.pos = mul(float4(particle[particleIndex].quad[triangleIndex][vertexIndex], 1.0), viewProjMatrix);
-	output.uvs = particle[particleIndex].uvs[triangleIndex][vertexIndex];
-    output.colorFactor = particle[particleIndex].colorFactor;
+    output.pos = mul(float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0), thomas_MatrixVP);
+	
+	output.uvs = billboards[particleIndex].uvs[triangleIndex][vertexIndex];
+    output.colorFactor = billboards[particleIndex].colorFactor;
 
 	return output;
 }
@@ -49,3 +60,10 @@ float4 PSMain(VS_OUT input) : SV_Target
 	return outputColor;
 
 }
+
+technique Particles
+{
+	pass P0 {
+
+	};
+};

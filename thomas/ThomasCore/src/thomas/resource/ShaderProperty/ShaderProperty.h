@@ -22,7 +22,9 @@ namespace thomas
 					MATRIX_ARRAY,
 					SHADER_RESOURCE,
 					CONSTANT_BUFFER,
-					TEXTURE2D
+					TEXTURE2D,
+					TEXTURE2DARRAY,
+					UNORDERED_ACCESS
 				};
 
 				ShaderProperty(Type type);
