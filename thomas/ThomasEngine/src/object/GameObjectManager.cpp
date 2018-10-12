@@ -1,3 +1,6 @@
+#pragma unmanaged
+#include <thomas\object\ObjectHandler.h>
+#pragma managed
 #include "GameObjectManager.h"
 #include "component/RenderComponent.h"
 #include "../resource/Model.h"

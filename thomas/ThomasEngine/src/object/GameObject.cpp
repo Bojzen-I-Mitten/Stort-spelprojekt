@@ -1,5 +1,6 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
+#include <thomas\object\ObjectHandler.h>
 #pragma managed
 #include "GameObject.h"
 #include "Component.h"
@@ -28,7 +29,7 @@ namespace ThomasEngine {
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 	}
 
-	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))
+	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
 		m_transform = AddComponent<Transform^>();

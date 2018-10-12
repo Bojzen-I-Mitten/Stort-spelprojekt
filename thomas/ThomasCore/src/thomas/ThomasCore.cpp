@@ -18,6 +18,7 @@
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 
+#include "object/ObjectHandler.h"
 #include "object/component/LightComponent.h"
 
 namespace thomas 
@@ -49,7 +50,7 @@ namespace thomas
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
-
+		ObjectHandler::Init();
 		s_initialized = true;
 		return s_initialized;
 	}

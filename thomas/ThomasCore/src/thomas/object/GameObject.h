@@ -18,6 +18,7 @@ namespace thomas
 			component::Transform* m_transform = nullptr;
 			bool m_activeSelf;
 
+			GameObject();
 			GameObject(std::string type);
 			~GameObject();
 

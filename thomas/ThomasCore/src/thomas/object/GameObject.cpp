@@ -6,6 +6,12 @@ namespace thomas
 	{
 		std::vector<GameObject*> GameObject::s_gameObjects;
 
+		GameObject::GameObject()
+		{
+			m_activeSelf = true;
+			m_name = "VoidName";
+			m_selected = false;
+		}
 
 		GameObject::GameObject(std::string name)
 		{
