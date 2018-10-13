@@ -40,10 +40,10 @@ namespace ThomasEngine
 		//
 
 		// Images
-		static void AddImage(Texture2D^ texture, Vector2 position);
-		static void AddImage(Texture2D^ texture, Vector2 position, Vector4 color);
-		static void AddImage(Texture2D^ texture, Vector2 position, Vector2 scale);
-		static void AddImage(Texture2D^ texture, Vector2 position, Vector2 scale, float rotation);
-		static void AddImage(Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color);
+		static void AddImage(String^ id, Texture2D^ texture, Vector2 position);
+		static void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector4 color);
+		static void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale);
+		static void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation);
+		static void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color);
 	};
 }

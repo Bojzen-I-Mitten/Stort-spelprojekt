@@ -118,31 +118,31 @@ void ThomasEngine::GUI::ImguiStringUpdate(String ^ text, Vector2 pos)
 //
 
 // Images
-void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position)
+void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position)
 {
-	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position));
+	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position));
 }
 
-void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector4 color)
+void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector4 color)
 {
-	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
+	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
 								     Utility::Convert(color));
 }
 
-void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector2 scale)
+void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale)
 {
-	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
+	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
 									 Utility::Convert(Vector4(1.f)), Utility::Convert(scale));
 }
 
-void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector2 scale, float rotation)
+void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation)
 {
-	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
+	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
 									 Utility::Convert(Vector4(1.f)), Utility::Convert(scale), rotation);
 }
 
-void ThomasEngine::GUI::AddImage(Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color)
+void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color)
 {
-	thomas::GUI::ThomasGUI::AddImage((thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
+	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
 									  Utility::Convert(color), Utility::Convert(scale), rotation);
 }

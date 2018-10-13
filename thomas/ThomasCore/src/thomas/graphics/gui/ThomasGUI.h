@@ -1,5 +1,8 @@
 #pragma once
 
+// C++
+#include <map>
+
 // DirectXTK
 #include <DirectXTK/SpriteBatch.h>
 
@@ -36,12 +39,12 @@ namespace thomas
 			static void Render();
 
 		public:
-			static void AddImage(Texture2D* texture, const Vector2& position, const Vector4& color = Vector4(1.f),
+			static void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, const Vector4& color = Vector4(1.f),
 								 const Vector2& scale = Vector2(1.f), float rotation = 0.f);
 
 
 		private:
-			static std::vector<Image> m_images;
+			static std::map<std::string, Image> m_images;
 			static std::unique_ptr<SpriteBatch> m_spriteBatch;
 		};
 	}

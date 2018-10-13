@@ -7,7 +7,7 @@ namespace thomas
 {
 	namespace GUI
 	{
-		std::vector<ThomasGUI::Image> ThomasGUI::m_images;
+		std::map<std::string, ThomasGUI::Image> ThomasGUI::m_images;
 		std::unique_ptr<SpriteBatch> ThomasGUI::m_spriteBatch;
 
 		void ThomasGUI::Init()
@@ -25,10 +25,10 @@ namespace thomas
 			// Begin
 			m_spriteBatch->Begin();
 
-			for (const auto& e : m_images)
+			for (const auto& image : m_images)
 			{
-				m_spriteBatch->Draw(e.texture->GetResourceView(), e.position, nullptr, e.color, e.rotation,
-									Vector2(e.texture->GetWidth() / 2.f, e.texture->GetHeight() / 2.f), e.scale);
+				m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position, nullptr, image.second.color, 
+									image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
 			}
 
 			//End
@@ -40,12 +40,13 @@ namespace thomas
 			m_images.clear();
 		}
 
-		void ThomasGUI::AddImage(Texture2D* texture, const Vector2& position, const Vector4& color,
+		void ThomasGUI::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, const Vector4& color,
 								 const Vector2& scale, float rotation)
 		{
 			if (texture->GetResourceView())
 			{
-				m_images.push_back({ texture, position, scale, color, rotation });
+				Image image = { texture, position, scale, color, rotation };
+				m_images.insert(std::make_pair(id, image));
 			}
 		}
 	}
