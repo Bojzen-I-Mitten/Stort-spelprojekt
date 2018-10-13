@@ -16,7 +16,7 @@ public class GizmoTest : ScriptComponent
         GUI.SetColor(new Color(1f, 0f, 0f));
         GUI.DrawLine(Vector3.Zero, Vector3.Right);
         GUI.SetColor(new Color(0f, 0f, 1f));
-        GUI.DrawLine(Vector3.Zero, Vector3.Forward);
+        GUI.DrawLine(Vector3.Zero, new Vector3(0, 0, 1f));
         GUI.SetColor(new Color(0f, 1f, 0f));
         GUI.DrawLine(Vector3.Zero, Vector3.Up);
 
