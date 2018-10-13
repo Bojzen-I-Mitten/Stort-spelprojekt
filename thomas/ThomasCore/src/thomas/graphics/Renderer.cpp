@@ -111,9 +111,10 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
-
+			GUI::ThomasGUI::UpdateInteraction();
 			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
 			//m_particleSystem->UpdateParticleSystem();
+
 			unsigned index = 0;
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{

@@ -148,6 +148,16 @@ void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 positio
 									 interact, Utility::Convert(color), Utility::Convert(scale), rotation);
 }
 
+bool ThomasEngine::GUI::OnImageClicked(String^ id)
+{
+	return thomas::GUI::ThomasGUI::OnImageClicked(Utility::ConvertString(id));
+}
+
+bool ThomasEngine::GUI::OnImageHovered(String^ id)
+{
+	return thomas::GUI::ThomasGUI::OnImageHovered(Utility::ConvertString(id));
+}
+
 void ThomasEngine::GUI::SetImageTexture(String^ id, Texture2D ^ texture)
 {
 	thomas::GUI::ThomasGUI::SetImageTexture(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr);

@@ -2,6 +2,7 @@
 
 // Thomas
 #include "../../utils/d3d.h"
+#include "../../WindowManager.h"
 
 namespace thomas
 {
@@ -28,22 +29,47 @@ namespace thomas
 			for (const auto& image : m_images)
 			{
 				m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position, nullptr, image.second.color, 
-									image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
+									image.second.rotation, Vector2(image.second.texture->GetWidth() / 2.f, image.second.texture->GetHeight() / 2.f), 
+									image.second.scale);
 			}
 
-			//End
+			// End
 			m_spriteBatch->End();
 		}
 
 		void ThomasGUI::Update()
 		{
-			// Check intersection for interactable images here?
-			/*if (GUI.OnClicked(""))
-			{
-
-			}*/
-
 			m_images.clear();
+		}
+
+		void ThomasGUI::UpdateInteraction()
+		{
+			thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
+			if (!window || WindowManager::Instance()->GetCurrentBound() != WindowManager::Instance()->GetEditorWindow())
+				return;
+
+			// Check intersection with interactable images
+			for (auto& image : m_images)
+			{
+				if (image.second.interact)
+				{
+					// Construct boundaries
+					Vector2 mousePos = window->GetInput()->GetMousePosition();
+					Rect rect = { image.second.position.x,
+								  image.second.position.x + image.second.texture->GetWidth() * image.second.scale.x,
+								  image.second.position.y,
+								  image.second.position.y + image.second.texture->GetHeight() * image.second.scale.y };
+
+					if ((mousePos.x >= rect.left && mousePos.x <= rect.right) && (mousePos.y <= rect.down && mousePos.y >= rect.top))
+					{
+						image.second.intersected = true;
+					}
+					else
+					{
+						image.second.intersected = false;
+					}
+				}
+			}
 		}
 
 		void ThomasGUI::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact, 
@@ -51,51 +77,73 @@ namespace thomas
 		{
 			if (texture->GetResourceView())
 			{
-				Image image = { texture, position, scale, color, rotation, interact };
+				Image image = { texture, position, scale, color, rotation, interact, false };
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
 
-		void ThomasGUI::SetImageTexture(const std::string & id, Texture2D * texture)
+		void ThomasGUI::SetImageTexture(const std::string& id, Texture2D * texture)
 		{
 			auto image = GetImage(id);
 			image.texture = texture;
 		}
 
-		void ThomasGUI::SetImagePosition(const std::string & id, const Vector2 & position)
+		void ThomasGUI::SetImagePosition(const std::string& id, const Vector2& position)
 		{
 			auto image = GetImage(id);
 			image.position = position;
 		}
 
-		void ThomasGUI::SetImageColor(const std::string & id, const Vector4 & color)
+		void ThomasGUI::SetImageColor(const std::string& id, const Vector4& color)
 		{
 			auto image = GetImage(id);
 			image.color = color;
 		}
 
-		void ThomasGUI::SetImageScale(const std::string & id, const Vector2 & scale)
+		void ThomasGUI::SetImageScale(const std::string& id, const Vector2& scale)
 		{
 			auto image = GetImage(id);
 			image.scale = scale;
 		}
 
-		void ThomasGUI::SetImageRotation(const std::string & id, float rotation)
+		void ThomasGUI::SetImageRotation(const std::string& id, float rotation)
 		{
 			auto image = GetImage(id);
 			image.rotation = rotation;
 		}
 
-		void ThomasGUI::SetImageInteract(const std::string & id, bool interact)
+		void ThomasGUI::SetImageInteract(const std::string& id, bool interact)
 		{
 			auto image = GetImage(id);
 			image.interact = interact;
 		}
 
-		ThomasGUI::Image & ThomasGUI::GetImage(const std::string & id)
+		bool ThomasGUI::OnImageClicked(const std::string& id)
+		{
+			thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
+			if (!window || WindowManager::Instance()->GetCurrentBound() != WindowManager::Instance()->GetEditorWindow())
+				return false;
+
+			if (window->GetInput()->GetMouseButtonDown(Input::MouseButtons::LEFT))
+			{
+				return GetImage(id).intersected;
+			}
+
+			return false;
+		}
+
+		bool ThomasGUI::OnImageHovered(const std::string& id)
+		{
+			return GetImage(id).intersected;
+		}
+
+		ThomasGUI::Image & ThomasGUI::GetImage(const std::string& id)
 		{
 			auto found = m_images.find(id);
+
+#ifdef _DEBUG
 			assert(found != m_images.end());
+#endif
 
 			return found->second;
 		}

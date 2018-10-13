@@ -31,14 +31,26 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interact;
+				bool intersected;
+			};
+
+			struct Rect
+			{
+				Rect() = default;
+
+				float left;
+				float right;
+				float top;
+				float down;
 			};
 
 		public:
 			static void Init();
 			static void Destroy();
 			static void Update();
+			static void UpdateInteraction();
 			static void Render();
-
+			
 		public:
 			static void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact, 
 								 const Vector4& color = Vector4(1.f), const Vector2& scale = Vector2(1.f), float rotation = 0.f);
@@ -48,8 +60,9 @@ namespace thomas
 			static void SetImageScale(const std::string& id, const Vector2& scale);
 			static void SetImageRotation(const std::string& id, float rotation);
 			static void SetImageInteract(const std::string& id, bool interact);
+			static bool OnImageClicked(const std::string& id);
+			static bool OnImageHovered(const std::string& id);
 			
-
 		private:
 			static Image& GetImage(const std::string& id);
 

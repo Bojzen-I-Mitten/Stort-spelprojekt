@@ -46,7 +46,9 @@ namespace ThomasEngine
 		static void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, bool interact);
 		static void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color, bool interact);
 
-		// Setters
+		static bool OnImageClicked(String^ id);
+		static bool OnImageHovered(String^ id);
+
 		static void SetImageTexture(String^ id, Texture2D^ texture);
 		static void SetImagePosition(String^ id, Vector2 position);
 		static void SetImageColor(String^ id, Vector4 color);
