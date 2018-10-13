@@ -37,7 +37,8 @@ namespace thomas {
 				assert(size != 0);
 				uint8_t adjustment = alignForwardAdjustment(_current_pos, alignment);
 
-				if (_used_memory + adjustment + size > _size) return nullptr;
+				if (_used_memory + adjustment + size > _size) 
+					return nullptr;
 
 				uintptr_t  aligned_address = (uintptr_t)_current_pos + adjustment;
 				_current_pos = (void*)(aligned_address + size);

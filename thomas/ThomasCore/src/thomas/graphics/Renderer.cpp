@@ -124,12 +124,14 @@ namespace thomas
 				}
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
+#ifdef _EDITOR
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::Gizmo().RenderGizmos();
 			}
+#endif
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 

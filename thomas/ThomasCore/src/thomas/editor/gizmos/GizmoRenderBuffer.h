@@ -10,7 +10,7 @@ namespace thomas {
 	namespace editor {
 		namespace gizmo {
 			constexpr uint32_t GIZMO_BUFFER_MEMORY = 4096;
-			constexpr uint32_t GIZMO_DRAW_COMMAND_INIT = 200;
+			constexpr uint32_t GIZMO_DRAW_COMMAND_INIT = 79;
 
 			class GizmoRenderBuffer
 			{
@@ -26,16 +26,16 @@ namespace thomas {
 				/* Reset allocations. */
 				void clear();
 
-				std::vector<GizmoRenderCommand>::iterator begin() { return m_cmd.begin(); }
-				std::vector<GizmoRenderCommand>::iterator end() { return m_cmd.end(); }
-				std::vector<GizmoRenderCommand>::const_iterator begin() const { return m_cmd.begin(); }
-				std::vector<GizmoRenderCommand>::const_iterator end() const { return m_cmd.end(); }
+			public:
+
+				uint32_t Count() { return m_count; }
+				GizmoRenderCommand& operator[](uint32_t index) { return m_list[index]; }
 
 			private:
 				utility::allocator::LinearAllocator m_alloc;	// Memory buffer (Vertex data)
-				std::vector<GizmoRenderCommand> m_cmd;			// Command buffer
-
-
+				GizmoRenderCommand* m_list;						// Command buffer
+				uint32_t m_count;
+				uint32_t m_capacity;
 
 			};
 		}

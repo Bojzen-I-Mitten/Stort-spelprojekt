@@ -214,9 +214,16 @@ namespace ThomasEngine {
 				if (WindowManager::Instance())
 				{
 					thomas::object::component::RenderComponent::ClearList();
+
+					// Wait for renderer
 					RenderFinished->WaitOne();
+					
+					/* Render & Update is synced.
+					*/
 					thomas::graphics::LightManager::Update();
 					CopyCommandList();
+					
+					// Enter async. state 
 					RenderFinished->Reset();
 					UpdateFinished->Set();
 				}

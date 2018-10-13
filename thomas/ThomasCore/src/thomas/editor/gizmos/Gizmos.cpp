@@ -348,9 +348,9 @@ namespace thomas
 			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
 			{
 				gizmo::GizmoRenderBuffer & buf = *m_render_buffers[i];
-				for (gizmo::GizmoRenderCommand& command : buf)
+				for (uint32_t i = 0; i < buf.Count(); i++)
 				{
-
+					gizmo::GizmoRenderCommand& command = buf[i];
 					m_gizmoMaterial->SetShaderPass((int)command.pass);
 					m_gizmoMaterial->SetMatrix("gizmoMatrix", command.matrix);
 					m_gizmoMaterial->SetColor("gizmoColor", command.color);
