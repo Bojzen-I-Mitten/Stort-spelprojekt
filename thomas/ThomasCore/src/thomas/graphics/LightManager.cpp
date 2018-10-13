@@ -6,17 +6,18 @@
 #include "..\utils\Buffers.h"
 #include "..\resource\Shader.h"
 #include "../AutoProfile.h"
+
 #include <algorithm>
 namespace thomas
 {
 	namespace graphics
 	{
-	
+		
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
-
+		
 
 		void LightManager::Initialize()
 		{
@@ -26,6 +27,7 @@ namespace thomas
 			s_lightCounts.nrOfSpotLights = 0;
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
+
 		}
 		
 		void LightManager::Destroy()
@@ -53,7 +55,6 @@ namespace thomas
 			}
 			s_lights.push_back(light);
 			std::sort(s_lights.begin(), s_lights.end(), SortLights);
-			int stoppper = 0;
 		}
 		
 		bool LightManager::RemoveLight(object::component::LightComponent * light)//returns true if light was removed
@@ -111,6 +112,7 @@ namespace thomas
 			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
 			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
+		
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{
 			if (light1->GetType() == light2->GetType())

@@ -21,7 +21,8 @@ namespace thomas
 					MATRIX_ARRAY = 6,
 					SHADER_RESOURCE = 7,
 					CONSTANT_BUFFER = 8,
-					TEXTURE2D = 9
+					TEXTURE2D = 9,
+					UNORDERED_ACCESS = 10
 				};
 
 				ShaderProperty(Type type);

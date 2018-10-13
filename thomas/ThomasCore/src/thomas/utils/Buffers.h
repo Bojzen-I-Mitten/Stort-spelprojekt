@@ -16,11 +16,12 @@ namespace thomas
 			{
 			public:
 				//Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag);
-				Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0, size_t structureByteStride = 0);
+				Buffer(void* data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag = STATIC_BUFFER, size_t structureByteStride = 0, D3D11_RESOURCE_MISC_FLAG miscFlag = (D3D11_RESOURCE_MISC_FLAG)0);
 				template <typename T>
-				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(data.data(), sizeof(data[0])*data.size(), bindFlag, usageFlag) {};
+				Buffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag) : Buffer(data.data(), sizeof(T)*data.size(), bindFlag, usageFlag) {}
+
 				virtual ~Buffer();
-				void Release();
+				virtual void Release();
 				void SetData(void* data, size_t size);
 
 				template <typename T>
@@ -30,6 +31,7 @@ namespace thomas
 				ID3D11Buffer* GetBuffer();
 			protected:
 				D3D11_BIND_FLAG m_bindFlag;
+				D3D11_USAGE m_usageFlag;
 				size_t m_size;
 				ID3D11Buffer * m_buffer;
 			};
@@ -40,7 +42,7 @@ namespace thomas
 			public:
 				VertexBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER);
 				template <typename T>
-				VertexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : VertexBuffer(data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				VertexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : VertexBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
 
 				template <typename T>
 				void SetData(std::vector<T>& data) 
@@ -82,13 +84,38 @@ namespace thomas
 			class StructuredBuffer : public Buffer
 			{
 			public:
-				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag);
+				StructuredBuffer(void* data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_BIND_FLAG bindFlag = D3D11_BIND_SHADER_RESOURCE, D3D11_BUFFER_UAV_FLAG uavFlag = (D3D11_BUFFER_UAV_FLAG)0);
 				template <typename T>
-				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(data[0]), data.size(), usageFlag) {};
+				StructuredBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : StructuredBuffer(data.data(), sizeof(T), data.size(), usageFlag) {};
+
+				void Release();
+
 
 				ID3D11ShaderResourceView* GetSRV();
+				ID3D11UnorderedAccessView* GetUAV();
+
 			private:
-				ID3D11ShaderResourceView* m_resource;
+				ID3D11ShaderResourceView* m_srv;
+				bool m_hasSRV;
+				ID3D11UnorderedAccessView* m_uav;
+				bool m_hasUAV;
+			};
+
+			class ByteAddressBuffer : public Buffer
+			{
+			public:
+				ByteAddressBuffer(size_t stride, size_t count, void* data = nullptr, D3D11_BIND_FLAG bindFlags = D3D11_BIND_UNORDERED_ACCESS);
+
+				void Release();
+
+
+				ID3D11ShaderResourceView* GetSRV();
+				ID3D11UnorderedAccessView* GetUAV();
+			private:
+				ID3D11ShaderResourceView* m_srv;
+				bool m_hasSRV;
+				ID3D11UnorderedAccessView* m_uav;
+				bool m_hasUAV;
 			};
 		}
 	}

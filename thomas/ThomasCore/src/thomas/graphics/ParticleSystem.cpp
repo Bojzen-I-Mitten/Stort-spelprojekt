@@ -1,239 +1,233 @@
 #include "ParticleSystem.h"
-#include "../object/component/ParticleEmitterComponent.h"
-#include "../object/component/Transform.h"
-#include "../object/component/Camera.h"
-#include "../object/GameObject.h"
 #include "../resource/ComputeShader.h"
-#include "Renderer.h"
-#include "../utils/d3d.h"
-#include "../ThomasCore.h"
-#include "../resource/texture/Texture.h"
-#include "../ThomasTime.h"
-#include "Mesh.h"
+#include <random>
+#include <time.h>
 
 namespace thomas
 {
 	namespace graphics
 	{
-		ParticleSystem::CameraBufferStruct ParticleSystem::s_cameraBufferStruct;
-		math::Matrix ParticleSystem::s_viewProjMatrix;
-		ID3D11Buffer* ParticleSystem::s_cameraBuffer;
+		std::shared_ptr<ParticleSystem> ParticleSystem::s_globalSystem;
 
-		resource::ComputeShader* ParticleSystem::s_updateParticlesCS;
-		resource::ComputeShader* ParticleSystem::s_emitParticlesCS;
-
-		ID3D11UnorderedAccessView* ParticleSystem::s_activeParticleUAV; //ping
-		ID3D11ShaderResourceView* ParticleSystem::s_activeParticleSRV; //pong
-
-		Mesh* ParticleSystem::s_emptyMesh;
-
-		ParticleSystem::BlendStates ParticleSystem::s_blendStates;
-		ID3D11DepthStencilState* ParticleSystem::s_depthStencilState;
-
-		unsigned int ParticleSystem::s_maxNumberOfBillboardsSupported;
-
-
+		void ParticleSystem::InitializeGlobalSystem()
+		{
+			s_globalSystem = std::make_shared<ParticleSystem>();
+			s_globalSystem->Initialize(65536);
+			std::srand(time(NULL));
+		}
+		std::shared_ptr<ParticleSystem> ParticleSystem::GetGlobalSystem()
+		{
+			return s_globalSystem;
+		}
+		void ParticleSystem::DestroyGlobalSystem()
+		{
+			s_globalSystem->Destroy();
+		}
 		ParticleSystem::ParticleSystem()
 		{
-
 
 		}
 
 		ParticleSystem::~ParticleSystem()
 		{
-			s_depthStencilState->Release();
+
 		}
 
-		void ParticleSystem::Init()
+		void ParticleSystem::Initialize(unsigned maxNrOfParticles)//, unsigned MaxNrOfEmitters)
 		{
-			s_maxNumberOfBillboardsSupported = 1000000;
-			s_cameraBuffer = nullptr;
+			m_maxNrOfParticles = maxNrOfParticles;
+			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/emitParticlesCS.fx");
+			m_updateParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/updateParticlesCS.fx");
+			resource::ComputeShader* initCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/appendIndexes.fx");
+			m_calculateEmitCountCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/calculateEmitCountCS.fx");
+
+			//PARTICLE BUFFERS
+			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_bufferSpawnIndex =	std::make_unique<utils::buffers::Buffer>(nullptr, sizeof(int) * 4, D3D11_BIND_CONSTANT_BUFFER, DYNAMIC_BUFFER);
+
+			m_bufferUpdate =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
+			m_bufferBillboard =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(BillboardStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));
+
+			//INDEXING APPEND CONSUME BUFFERS
+			m_bufferDeadList =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE), D3D11_BUFFER_UAV_FLAG_APPEND);
+			m_bufferAliveListPing = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE), D3D11_BUFFER_UAV_FLAG_APPEND);
+			m_bufferAliveListPong = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(unsigned int), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE), D3D11_BUFFER_UAV_FLAG_APPEND);
 			
-			//s_emitParticlesCS = new resource::ComputeShader(resource::Shader::CreateShader("../Data/oldShaders/emitParticlesCS.hlsl"));
-			//s_updateParticlesCS = new resource::ComputeShader(resource::Shader::CreateShader("../Data/oldShaders/updateParticlesCS.hlsl"));
+			//INIT DEAD LIST
+			initCS->SetGlobalInt("maxNrOfParticles", maxNrOfParticles);
+			initCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
+
+			initCS->Bind();
+			initCS->SetPass(0);
+			initCS->Dispatch((maxNrOfParticles + 511) / 512);
+			
+			resource::ComputeShader::UnbindOneUAV(0);
+
+			resource::Shader::DestroyShader(initCS);
+			
+
+			//COUNTER BUFFER
+			unsigned* counterInitVals = new unsigned[4] {0, maxNrOfParticles, maxNrOfParticles, 0};
+			
+			m_bufferCounters = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 4, counterInitVals, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE));
+			//utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+
+			delete counterInitVals;
+			
+			//INDIRECT ARGS BUFFER
+			unsigned indirectArgs[7] = { 0, 1, 1, 0, 1, 0, 0 };
+
+			m_bufferIndirectArgs = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 7, indirectArgs);
+
+			m_pingpong = true;
+
+			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
 
 
-			D3D11_BLEND_DESC blendDesc;
-			ZeroMemory(&blendDesc, sizeof(blendDesc));
-
-			D3D11_RENDER_TARGET_BLEND_DESC blendState;
-			ZeroMemory(&blendState, sizeof(blendState));
-
-			//Additive
-
-			blendState.BlendEnable = true;
-			blendState.SrcBlend = D3D11_BLEND_SRC_ALPHA;
-			blendState.DestBlend = D3D11_BLEND_ONE;
-			blendState.BlendOp = D3D11_BLEND_OP_ADD;
-			blendState.SrcBlendAlpha = D3D11_BLEND_ONE;
-			blendState.DestBlendAlpha = D3D11_BLEND_ZERO;
-			blendState.BlendOpAlpha = D3D11_BLEND_OP_ADD;
-			blendState.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-			blendDesc.RenderTarget[0] = blendState;
-
-			HRESULT hr = ThomasCore::GetDevice()->CreateBlendState(&blendDesc, &s_blendStates.additive);
-
-			//alpha blend
-			blendState.BlendEnable = true;
-			blendState.SrcBlend = D3D11_BLEND_SRC_ALPHA;
-			blendState.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-			blendState.BlendOp = D3D11_BLEND_OP_ADD;
-			blendState.SrcBlendAlpha = D3D11_BLEND_ONE;
-			blendState.DestBlendAlpha = D3D11_BLEND_ZERO;
-			blendState.BlendOpAlpha = D3D11_BLEND_OP_ADD;
-			blendState.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-			blendDesc.RenderTarget[0] = blendState;
-
-			hr = ThomasCore::GetDevice()->CreateBlendState(&blendDesc, &s_blendStates.alphaBlend);
-
-
-			D3D11_DEPTH_STENCIL_DESC mirrorDesc;
-			mirrorDesc.DepthEnable = true;
-			mirrorDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-			mirrorDesc.DepthFunc = D3D11_COMPARISON_LESS;
-			mirrorDesc.StencilEnable = false;
-			mirrorDesc.StencilReadMask = 0xff;
-			mirrorDesc.StencilWriteMask = 0xff;
-			mirrorDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-			mirrorDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-			mirrorDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-			mirrorDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-				
-			ThomasCore::GetDevice()->CreateDepthStencilState(&mirrorDesc, &s_depthStencilState);
-
-
-			//s_cameraBuffer = thomas::utils::D3d::CreateDynamicBufferFromStruct(s_cameraBufferStruct, D3D11_BIND_CONSTANT_BUFFER);
-			return;
 		}
 
 		void ParticleSystem::Destroy()
 		{
-			SAFE_RELEASE(s_blendStates.additive);
-			SAFE_RELEASE(s_blendStates.alphaBlend);
-			SAFE_RELEASE(s_cameraBuffer);
-			SAFE_RELEASE(s_depthStencilState);
+			
+			SAFE_RELEASE(m_bufferAliveListPing);
+			SAFE_RELEASE(m_bufferAliveListPong);
+			SAFE_RELEASE(m_bufferDeadList);
+			SAFE_RELEASE(m_bufferUpdate);
+			SAFE_RELEASE(m_bufferSpawn);
+			SAFE_RELEASE(m_bufferBillboard);
+			SAFE_RELEASE(m_bufferIndirectArgs);
+			SAFE_RELEASE(m_bufferCounters);
+			SAFE_RELEASE(m_bufferSpawnIndex);
+
+			//m_updateParticlesCS 
+			//m_emitParticlesCS
 		}
 
-		void ParticleSystem::UpdateCameraBuffers(object::component::Transform* trans, math::Matrix viewProjMatrix, bool paused)
+		void ParticleSystem::AddEmitterToSpawn(InitParticleBufferStruct & emitterInitData)
 		{
-			s_cameraBufferStruct.right = trans->Right();
-			s_cameraBufferStruct.up = trans->Up();
-			if (paused)
+			m_emitters.push_back(emitterInitData);
+		}
+		
+		void ParticleSystem::SpawnParticles()
+		{
+			if (m_emitters.size() == 0)
+				return;
+
+			m_bufferSpawn->SetData(m_emitters);
+			
+			m_emitParticlesCS->SetGlobalResource("initparticles", m_bufferSpawn->GetSRV());
+
+			m_emitParticlesCS->SetGlobalUAV("particles", m_bufferUpdate->GetUAV());
+			m_emitParticlesCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
+			m_emitParticlesCS->SetGlobalUAV("counterbuffer", m_bufferCounters->GetUAV());
+					
+			if (m_pingpong)
 			{
-				s_cameraBufferStruct.deltaTime = 0;
+				m_emitParticlesCS->SetGlobalUAV("alivelist", m_bufferAliveListPing->GetUAV());
 			}
 			else
 			{
-				s_cameraBufferStruct.deltaTime = ThomasTime::GetDeltaTime();
+				m_emitParticlesCS->SetGlobalUAV("alivelist", m_bufferAliveListPong->GetUAV());
 			}
+					
+
+			m_emitParticlesCS->Bind();
+			m_emitParticlesCS->SetPass(0);
+
+			ID3D11Buffer* cBuffer[1] = { m_bufferSpawnIndex->GetBuffer() };
+			utils::D3D::Instance()->GetDeviceContext()->CSSetConstantBuffers(7, 1, cBuffer);
+
+			for (unsigned i = 0; i < m_emitters.size(); ++i)
+			{
+				D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+				HRESULT ttttt = utils::D3D::Instance()->GetDeviceContext()->Map(m_bufferSpawnIndex->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				memcpy(mappedResource.pData, &i, sizeof(int));
+				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_bufferSpawnIndex->GetBuffer(), 0);
+
+				m_emitParticlesCS->Dispatch((m_emitters[i].nrOfParticlesToEmit + EMIT_THREAD_DIM_X - 1) / EMIT_THREAD_DIM_X);					//EMIT
+			}
+			resource::ComputeShader::UnbindAllUAVs();
+			resource::ComputeShader::UnbindOneSRV(0);
+
 			
-			s_viewProjMatrix = viewProjMatrix;
-
-			//thomas::utils::D3d::FillDynamicBufferStruct(s_cameraBuffer, s_cameraBufferStruct);
-
 		}
 
-		void ParticleSystem::SwapUAVsandSRVs(object::component::ParticleEmitterComponent * emitter)
+		void ParticleSystem::UpdateAliveCount()
 		{
-			object::component::ParticleEmitterComponent::D3DData* emitterD3D = emitter->GetD3DData();
-			if (emitterD3D->swapUAVandSRV)
+			//UPDATE EMITCOUNT
+			if (m_pingpong)
 			{
-				emitterD3D->swapUAVandSRV = false;
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 			}
 			else
 			{
-
-				emitterD3D->swapUAVandSRV = true;
+				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
 			}
 
+			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
 
-			if (emitterD3D->swapUAVandSRV)
+			m_calculateEmitCountCS->SetGlobalUAV("indirectargs", m_bufferIndirectArgs->GetUAV());
+			m_calculateEmitCountCS->SetGlobalResource("counterbuffer", m_bufferCounters->GetSRV());
+			m_calculateEmitCountCS->Bind();
+			m_calculateEmitCountCS->SetPass(0);
+
+			m_calculateEmitCountCS->Dispatch(1);
+
+			resource::ComputeShader::UnbindOneUAV(0);
+			resource::ComputeShader::UnbindOneSRV(0);
+
+			m_emitters.clear();
+		}
+
+		void ParticleSystem::UpdateParticleSystem()
+		{
+			SpawnParticles();
+			UpdateAliveCount();
+
+			m_pingpong = !m_pingpong;
+
+			if (m_pingpong)
 			{
-				s_activeParticleUAV = emitterD3D->particleUAV1;
-				s_activeParticleSRV = emitterD3D->particleSRV2;
+				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPing->GetUAV());
+				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPong->GetUAV());
 			}
 			else
 			{
-				s_activeParticleUAV = emitterD3D->particleUAV2;
-				s_activeParticleSRV = emitterD3D->particleSRV1;
+				m_updateParticlesCS->SetGlobalUAV("appendalivelist", m_bufferAliveListPong->GetUAV());
+				m_updateParticlesCS->SetGlobalUAV("consumealivelist", m_bufferAliveListPing->GetUAV());
 			}
+			m_updateParticlesCS->SetGlobalUAV("deadlist", m_bufferDeadList->GetUAV());
 
+			m_updateParticlesCS->SetGlobalUAV("counterbuffer", m_bufferCounters->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("particles", m_bufferUpdate->GetUAV());
+			m_updateParticlesCS->SetGlobalUAV("billboards", m_bufferBillboard->GetUAV());
+
+			m_updateParticlesCS->Bind();
+			m_updateParticlesCS->SetPass(0);
+
+			m_updateParticlesCS->DispatchIndirect(m_bufferIndirectArgs->GetBuffer(), 0);
+
+			resource::ComputeShader::UnbindAllUAVs();
 		}
 
-		void ParticleSystem::SpawnParticles(object::component::ParticleEmitterComponent * emitter, int amountOfParticles)
+		void ParticleSystem::DrawParticles()
 		{
-			object::component::ParticleEmitterComponent::D3DData* emitterD3D = emitter->GetD3DData();
+			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
-			//s_emitParticlesCS->SetBuffer("InitBuffer", *emitterD3D->particleBuffer);
-			s_emitParticlesCS->SetUAV("particlesWrite", *emitterD3D->particleUAV2);
-			s_emitParticlesCS->SetUAV("particlesWrite2", *emitterD3D->particleUAV1);
 
-			s_emitParticlesCS->Dispatch(amountOfParticles, 1, 1);
-
-		}
-
-		void ParticleSystem::UpdateParticles(object::component::ParticleEmitterComponent * emitter)
-		{
-
-			SwapUAVsandSRVs(emitter);
-
-			//bind CS
-			s_updateParticlesCS->SetUAV("particlesWrite", *s_activeParticleUAV);
-			s_updateParticlesCS->SetUAV("billboards", *emitter->GetD3DData()->billboardsUAV);
-		//	s_updateParticlesCS->SetResource("particlesRead", *s_activeParticleSRV);
-		//	s_updateParticlesCS->SetBuffer("cameraBuffer", *s_cameraBuffer);
-
-			s_updateParticlesCS->Dispatch(emitter->GetSpawnedParticleCount() / 256 + 1, 1, 1);
-
-		}
-
-		void ParticleSystem::DrawParticles(object::component::Camera * camera, object::component::ParticleEmitterComponent* emitter)
-		{
-			UpdateCameraBuffers(camera->m_gameObject->m_transform, camera->GetViewProjMatrix().Transpose(), emitter->IsPaused());
-			UpdateParticles(emitter);
-
-			FLOAT blendfactor[4] = { 0, 0, 0, 0 };
+			m_particleShader->SetGlobalResource("billboards", m_bufferBillboard->GetSRV());
 			
-			switch (emitter->GetBlendState())
-			{
-			case object::component::ParticleEmitterComponent::BlendStates::ADDITIVE:
-				ThomasCore::GetDeviceContext()->OMSetBlendState(s_blendStates.additive, blendfactor, 0xffffffff);
-				break;
-			case object::component::ParticleEmitterComponent::BlendStates::ALPHA_BLEND:
-				ThomasCore::GetDeviceContext()->OMSetBlendState(s_blendStates.alphaBlend, blendfactor, 0xffffffff);
-				break;
-			default:
-				ThomasCore::GetDeviceContext()->OMSetBlendState(s_blendStates.additive, blendfactor, 0xffffffff);
-				break;
-			}
+			m_particleShader->Bind();
+			m_particleShader->SetPass(0);
+			
+			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
 
-			//bind Emitter
-
-			//emitter->GetMaterial()->SetResource("particle", *emitter->GetD3DData()->billboardsSRV);
-			emitter->GetMaterial()->SetMatrix("matrixBuffer", s_viewProjMatrix);
-			emitter->GetMaterial()->m_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-			//emitter->GetMaterial()->GetShader()->BindVertexBuffer(NULL, 0, 0);
-
-			emitter->GetMaterial()->Draw(emitter->GetNrOfMaxParticles() * 6, 0);
-						
-
-			ThomasCore::GetDeviceContext()->OMSetBlendState(NULL, NULL, 0xffffffff);
+			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
+			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
 
 		}
 
-		ID3D11DepthStencilState * ParticleSystem::GetDepthStencilState()
-		{
-			return s_depthStencilState;
-		}
-
-		void ParticleSystem::CreateBillboardUAVandSRV(int maxAmountOfParticles, ID3D11Buffer*& buffer, ID3D11UnorderedAccessView*& uav, ID3D11ShaderResourceView*& srv)
-		{
-			UINT bytewidth = sizeof(BillboardStruct) * maxAmountOfParticles;
-
-			UINT structurebytestride = sizeof(BillboardStruct);
-			thomas::utils::D3d::CreateBufferAndUAV(NULL, bytewidth, structurebytestride, buffer, uav, srv);
-
-		}
+		
 	}
 }
 

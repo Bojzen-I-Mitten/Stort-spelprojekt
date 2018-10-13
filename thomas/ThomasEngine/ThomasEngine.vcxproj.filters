@@ -55,6 +55,7 @@
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\script\animation\constraint\IK_FABRIK_Constraint.cpp" />
+    <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -100,6 +101,7 @@
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
+    <ClInclude Include="src\object\component\ParticleEmitter.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
