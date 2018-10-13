@@ -57,6 +57,7 @@
     <ClCompile Include="src\thomas\editor\EditorGrid.cpp" />
     <ClCompile Include="src\thomas\editor\gizmos\Gizmos.cpp" />
     <ClCompile Include="src\thomas\graphics\LightManager.cpp" />
+    <ClCompile Include="src\thomas\graphics\ParticleSystem.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\BoxCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Collider.cpp" />
@@ -66,6 +67,8 @@
     <ClCompile Include="src\thomas\resource\Animation.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderProperty.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyMatrix.cpp" />
+    <ClCompile Include="src\thomas\resource\ComputeShader.cpp" />
+    <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
@@ -73,7 +76,6 @@
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\Buffers.cpp" />
     <ClCompile Include="src\thomas\graphics\BulletDebugDraw.cpp" />
-    <ClCompile Include="src\thomas\resource\ComputeShader.cpp" />
     <ClCompile Include="src\thomas\resource\Material.cpp" />
     <ClCompile Include="src\thomas\graphics\Mesh.cpp" />
     <ClCompile Include="src\thomas\resource\Model.cpp" />
@@ -148,6 +150,7 @@
     <ClInclude Include="src\thomas\graphics\render\Frame.h" />
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
+    <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
@@ -158,6 +161,7 @@
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\thomas\ProfileManager.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
+    <ClInclude Include="src\thomas\resource\ComputeShader.h" />
     <ClInclude Include="src\thomas\resource\MemoryAllocation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />
@@ -169,6 +173,7 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyShaderResource.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.h" />
+    <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyUnorderedAccessView.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
@@ -178,7 +183,6 @@
     <ClInclude Include="src\thomas\utils\allocator\StackAllocator.h" />
     <ClInclude Include="src\thomas\utils\Buffers.h" />
     <ClInclude Include="src\thomas\graphics\BulletDebugDraw.h" />
-    <ClInclude Include="src\thomas\resource\ComputeShader.h" />
     <ClInclude Include="src\thomas\resource\Material.h" />
     <ClInclude Include="src\thomas\graphics\Mesh.h" />
     <ClInclude Include="src\thomas\resource\Model.h" />

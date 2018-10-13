@@ -17,9 +17,8 @@
 #include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
+#include "graphics\ParticleSystem.h"
 #include "../thomas/graphics/gui/ThomasGUI.h"
-
-#include "object/component/LightComponent.h"
 
 namespace thomas 
 {
@@ -51,6 +50,7 @@ namespace thomas
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
+		graphics::ParticleSystem::InitializeGlobalSystem();
 
 		s_initialized = true;
 		return s_initialized;
@@ -110,6 +110,7 @@ namespace thomas
 		WindowManager::Instance()->Destroy();
 		GUI::ThomasGUI::Destroy();
 		graphics::LightManager::Destroy();
+		graphics::ParticleSystem::DestroyGlobalSystem();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();

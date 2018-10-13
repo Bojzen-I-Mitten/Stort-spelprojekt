@@ -15,6 +15,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "ParticleSystem.h"
 
 namespace thomas
 {
@@ -38,6 +39,7 @@ namespace thomas
 		Renderer::Renderer()
 			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
 		{
+			
 		}
 
 		Renderer* Renderer::Instance()
@@ -109,6 +111,9 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
+
+			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			//m_particleSystem->UpdateParticleSystem();
 			unsigned index = 0;
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
@@ -125,7 +130,10 @@ namespace thomas
 					}
 				}
 
-				// Draw GUI on the main camera
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				//m_particleSystem->DrawParticles();
+
+				// *Temp solution*: Draw GUI on the main game camera
 				if (index == 1)
 				{
 					GUI::ThomasGUI::Render();
@@ -133,6 +141,7 @@ namespace thomas
 
 				index++;
 			}
+	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 
 			//Take care of the editor camera and render gizmos
