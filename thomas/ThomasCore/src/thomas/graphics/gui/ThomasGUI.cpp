@@ -49,5 +49,43 @@ namespace thomas
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
+
+		void ThomasGUI::SetImageTexture(const std::string & id, Texture2D * texture)
+		{
+			auto image = GetImage(id);
+			image.texture = texture;
+		}
+
+		void ThomasGUI::SetImagePosition(const std::string & id, const Vector2 & position)
+		{
+			auto image = GetImage(id);
+			image.position = position;
+		}
+
+		void ThomasGUI::SetImageColor(const std::string & id, const Vector4 & color)
+		{
+			auto image = GetImage(id);
+			image.color = color;
+		}
+
+		void ThomasGUI::SetImageScale(const std::string & id, const Vector2 & scale)
+		{
+			auto image = GetImage(id);
+			image.scale = scale;
+		}
+
+		void ThomasGUI::SetImageRotation(const std::string & id, float rotation)
+		{
+			auto image = GetImage(id);
+			image.rotation = rotation;
+		}
+
+		ThomasGUI::Image & ThomasGUI::GetImage(const std::string & id)
+		{
+			auto found = m_images.find(id);
+			assert(found != m_images.end());
+
+			return found->second;
+		}
 	}
 }
