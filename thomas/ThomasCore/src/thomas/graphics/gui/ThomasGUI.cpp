@@ -37,15 +37,21 @@ namespace thomas
 
 		void ThomasGUI::Update()
 		{
+			// Check intersection for interactable images here?
+			/*if (GUI.OnClicked(""))
+			{
+
+			}*/
+
 			m_images.clear();
 		}
 
-		void ThomasGUI::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, const Vector4& color,
-								 const Vector2& scale, float rotation)
+		void ThomasGUI::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact, 
+								 const Vector4& color, const Vector2& scale, float rotation)
 		{
 			if (texture->GetResourceView())
 			{
-				Image image = { texture, position, scale, color, rotation };
+				Image image = { texture, position, scale, color, rotation, interact };
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
@@ -78,6 +84,12 @@ namespace thomas
 		{
 			auto image = GetImage(id);
 			image.rotation = rotation;
+		}
+
+		void ThomasGUI::SetImageInteract(const std::string & id, bool interact)
+		{
+			auto image = GetImage(id);
+			image.interact = interact;
 		}
 
 		ThomasGUI::Image & ThomasGUI::GetImage(const std::string & id)

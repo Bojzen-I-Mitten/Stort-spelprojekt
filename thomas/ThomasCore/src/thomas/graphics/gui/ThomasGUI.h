@@ -30,6 +30,7 @@ namespace thomas
 				Vector2 scale;
 				Vector4 color;
 				float rotation;
+				bool interact;
 			};
 
 		public:
@@ -39,13 +40,14 @@ namespace thomas
 			static void Render();
 
 		public:
-			static void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, const Vector4& color = Vector4(1.f),
-								 const Vector2& scale = Vector2(1.f), float rotation = 0.f);
+			static void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact, 
+								 const Vector4& color = Vector4(1.f), const Vector2& scale = Vector2(1.f), float rotation = 0.f);
 			static void SetImageTexture(const std::string& id, Texture2D* texture);
 			static void SetImagePosition(const std::string& id, const Vector2& position);
 			static void SetImageColor(const std::string& id, const Vector4& color);
 			static void SetImageScale(const std::string& id, const Vector2& scale);
 			static void SetImageRotation(const std::string& id, float rotation);
+			static void SetImageInteract(const std::string& id, bool interact);
 			
 
 		private:
