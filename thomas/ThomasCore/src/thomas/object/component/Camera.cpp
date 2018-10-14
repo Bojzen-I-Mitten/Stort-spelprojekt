@@ -245,10 +245,23 @@ namespace thomas
 				window.Offset(-center.x, -center.y);
 				rect.Offset(-center.x, -center.y);
 
+
+				if (rect.width < 0)
+				{
+					rect.x = rect.x + rect.width;
+					rect.width = abs(rect.width);
+				}
+
+				if (rect.height < 0)
+				{
+					rect.y = rect.y + rect.height;
+					rect.height = abs(rect.height);
+				}
+
 				float left = (float)rect.x / (float)window.x;
 				float right = (float)(rect.x + rect.width) / (float)(window.x + window.width);
 				float top = (float)rect.y / (float)window.y;
-				float bottom = (float)(rect.y + rect.width) / (float)(window.y + window.height);
+				float bottom = (float)(rect.y + rect.height) / (float)(window.y + window.height);
 
 				subFrustrum.LeftSlope *= left;
 				subFrustrum.RightSlope *= right;

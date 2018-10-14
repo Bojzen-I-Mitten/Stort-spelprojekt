@@ -40,6 +40,7 @@ namespace thomas
 			void SelectObject(GameObject* gameObject);
 			void UnselectObject(GameObject* gameObject);
 			void UnselectObjects();
+			bool IsObjectSelected(GameObject* gameObject);
 
 		public:
 			void SetHasSelectionChanged(const bool & selectionChanged);
@@ -60,6 +61,7 @@ namespace thomas
 			void SnapCameraToFocus();
 			object::GameObject* FindClickedGameObject();
 			void BoxSelect();
+			void BeginBoxSelect();
 			EditorCamera();
 			~EditorCamera();
 

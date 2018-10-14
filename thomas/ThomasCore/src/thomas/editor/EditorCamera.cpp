@@ -118,6 +118,18 @@ namespace thomas
 			m_selectedObject = nullptr;
 		}
 
+		bool EditorCamera::IsObjectSelected(GameObject * gameObject)
+		{
+			for (int i = 0; i < (int)m_selectedObjects.size(); ++i)
+			{
+				if (m_selectedObjects[i] == gameObject)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
 		const std::vector<object::GameObject*>& EditorCamera::GetSelectedObjects()
 		{
 			return m_selectedObjects;
@@ -208,7 +220,11 @@ namespace thomas
 				MoveAndRotateCamera();
 			else if (window->GetInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
 			{
-				m_isBoxSelecting = false;
+				if (m_isBoxSelecting)
+				{
+					m_isBoxSelecting = false;
+					return;
+				}
 				if (!ImGuizmo::IsOver())
 				{
 					object::GameObject* gObj = FindClickedGameObject();
@@ -218,9 +234,16 @@ namespace thomas
 						SelectObject(gObj);
 				}
 			}
+			else if (window->GetInput()->GetMouseButtonDown(Input::MouseButtons::LEFT))
+			{
+				if (!ImGuizmo::IsUsing())
+				{
+					BeginBoxSelect();
+				}
+			}
 			else if (window->GetInput()->GetMouseButton(Input::MouseButtons::LEFT))
 			{
-				if (!ImGuizmo::IsOver())
+				if (!ImGuizmo::IsOver() || m_isBoxSelecting)
 				{
 					BoxSelect();
 				}
@@ -346,13 +369,15 @@ namespace thomas
 		void EditorCamera::BoxSelect()
 		{
 			math::Vector2 mousePos = WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition();
-			if(!m_isBoxSelecting)
-			{
-				m_isBoxSelecting = true;
-				m_boxSelectRect = math::Rectangle(mousePos.x, mousePos.y, 0, 0);
-			}
+
 			m_boxSelectRect.width = mousePos.x - m_boxSelectRect.x;
 			m_boxSelectRect.height = mousePos.y - m_boxSelectRect.y;
+
+			if (abs(m_boxSelectRect.width) < 10 && abs(m_boxSelectRect.height) < 10)
+				return;
+
+			m_isBoxSelecting = true;
+
 			ImGui::GetOverlayDrawList()->AddRectFilled(
 				ImVec2(m_boxSelectRect.x, m_boxSelectRect.y),
 				ImVec2(m_boxSelectRect.x + m_boxSelectRect.width, m_boxSelectRect.y + m_boxSelectRect.height),
@@ -365,21 +390,36 @@ namespace thomas
 
 			math::BoundingFrustum frustrum = m_cameraComponent->GetSubFrustrum(m_boxSelectRect);
 			
-			m_selectedObjects.clear();
+			
 			auto renderComponents = object::component::RenderComponent::GetAllRenderComponents();
 			for (auto renderComponent : renderComponents)
 			{
+				bool IsAlreadySelected = IsObjectSelected(renderComponent->m_gameObject);
 				if (frustrum.Contains(renderComponent->m_bounds))
 				{
-					m_selectedObjects.push_back(renderComponent->m_gameObject);
-					
-					m_selectedObject = renderComponent->m_gameObject;
+					if (!IsAlreadySelected) {
+						m_selectedObjects.push_back(renderComponent->m_gameObject);
+						m_selectedObject = renderComponent->m_gameObject;
+						m_hasSelectionChanged = true;
+					}
+
 				}
+				else if (IsAlreadySelected) {
+					UnselectObject(renderComponent->m_gameObject);
+					m_hasSelectionChanged = true;
+				}
+
 			}
-			m_hasSelectionChanged = true;
+			
 			
 
 
+		}
+
+		void EditorCamera::BeginBoxSelect()
+		{
+			math::Vector2 mousePos = WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition();
+			m_boxSelectRect = math::Rectangle(mousePos.x, mousePos.y, 0, 0);
 		}
 
 		void EditorCamera::MoveAndRotateCamera()
