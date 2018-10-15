@@ -78,12 +78,12 @@ namespace thomas
 				m_gameObject->m_transform->SetRotation(rotation);
 				m_gameObject->m_transform->SetDirty(true);
 
-				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				m_prevMatrix = m_gameObject->m_transform->GetLocalWorldMatrix();
 			}
 
 			void Rigidbody::UpdateTransformToRigidBody()
 			{
-				if (m_prevMatrix != m_gameObject->m_transform->GetWorldMatrix())
+				if (m_prevMatrix != m_gameObject->m_transform->GetLocalWorldMatrix())
 				{
 					btTransform trans;
 
