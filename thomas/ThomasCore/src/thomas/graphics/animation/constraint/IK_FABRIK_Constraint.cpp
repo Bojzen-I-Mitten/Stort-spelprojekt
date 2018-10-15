@@ -3,6 +3,8 @@
 #include "../../../resource/MemoryAllocation.h"
 #include "../../../editor/gizmos/Gizmos.h"
 
+#define IK_DRAW
+
 namespace thomas {
 	namespace graphics {
 		namespace animation {
@@ -162,6 +164,7 @@ namespace thomas {
 
 				const float GIZMO_LEN = 0.05f;
 #ifdef _EDITOR
+#ifdef IK_DRAW
 				for (i = 0; i < m_num_link; i++) {
 					editor::Gizmos::Gizmo().SetColor(math::Color(0, 1.f, 0.f));
 					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + math::Normalize(objectPose[(chain + i)->m_index].Up()) * GIZMO_LEN);
@@ -170,6 +173,7 @@ namespace thomas {
 					editor::Gizmos::Gizmo().SetColor(math::Color(0.f, 0.f, 1.f));
 					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + math::Normalize(objectPose[(chain + i)->m_index].Forward()) * GIZMO_LEN);
 				}
+#endif
 #endif
 				// Clean stack
 				ThomasCore::Core().Memory()->stack(0).deallocate(d);
