@@ -8,6 +8,7 @@
 #include "../ScriptingManager.h"
 using namespace System::Threading;
 #include "YieldInstructions.h"
+#include "../Debug.h"
 
 namespace ThomasEngine 
 {
@@ -116,16 +117,14 @@ namespace ThomasEngine
 	{
 		Monitor::Enter(m_gameObject->m_componentsLock);
 		this->enabled = false;
-		for (int i = 0; i < ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.size(); i++)
-		{
-			thomas::object::component::Component* component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
-			if (component == nativePtr)
-			{
-				((thomas::object::GameObject*)m_gameObject->nativePtr)->
-					m_components.erase(((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.begin() + i);
-				break;
-			}
-		}
+#ifdef _DEBUG
+		// Check successfull destruction
+		if(m_gameObject->Native->DestroyComponent(this->nativePtr))
+			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
+#else
+		// Don't care
+		m_gameObject->Native->DestroyComponent(this->nativePtr);
+#endif
 		StopAllCoroutines();
 		m_gameObject->Components->Remove(this);
 		Object::Destroy();

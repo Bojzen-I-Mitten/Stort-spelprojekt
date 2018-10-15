@@ -153,17 +153,18 @@ namespace ThomasEngine {
 			return;
 		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
+		
+		// Remove object
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		Monitor::Enter(m_componentsLock);
-		for (int i = 0; i < m_components.Count; i++) {
-			m_components[i]->Destroy();
-			i--;
-		}
-		Object::Destroy();
-		m_components.Clear();
-		Monitor::Exit(m_componentsLock);
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		// Destroy
+		Monitor::Enter(m_componentsLock);
+		for (int i = 0; i < m_components.Count; i++)
+			m_components[i]->Destroy();
+		m_components.Clear();
+		Object::Destroy();
+		Monitor::Exit(m_componentsLock);
 	}
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
