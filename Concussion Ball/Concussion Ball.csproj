@@ -51,6 +51,9 @@
     <Reference Include="ThomasNet">
       <HintPath>$(THOMAS_ENGINE)\ThomasNet.dll</HintPath>
     </Reference>
+        <Reference Include="Newtonsoft.Json">
+      <HintPath>$(THOMAS_ENGINE)\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Ball.cs" />

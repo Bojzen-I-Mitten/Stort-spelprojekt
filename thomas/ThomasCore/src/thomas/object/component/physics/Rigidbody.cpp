@@ -50,7 +50,7 @@ namespace thomas
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
-				//UpdateProperties();
+				
 				Physics::AddRigidBody(this);
 			}
 
@@ -331,6 +331,7 @@ namespace thomas
 
 				setMassProps(mass, inertia);
 				updateInertiaTensor();
+				this->activate();
 			}
 
 			void Rigidbody::UpdateProperties()
@@ -340,6 +341,7 @@ namespace thomas
 				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 				this->setDamping(m_damping.x, m_damping.y);
 				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				this->activate(true);
 				m_dirty = false;
 			}
 		}

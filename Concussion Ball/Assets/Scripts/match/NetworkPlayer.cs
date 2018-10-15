@@ -15,7 +15,7 @@ public class NetworkPlayer : NetworkComponent
     Material mat;
     public override void Start()
     {
-        mat = gameObject.GetComponent<RenderComponent>()?.material;
+        //mat = (gameObject.GetComponent<RenderComponent>().material = new Material(gameObject.GetComponent<RenderComponent>().material));
         
     }
 
@@ -32,7 +32,7 @@ public class NetworkPlayer : NetworkComponent
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
-
+        Debug.Log(teamType.ToString());
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
         if(Team != newTeam)
             JoinTeam(newTeam);
@@ -53,7 +53,7 @@ public class NetworkPlayer : NetworkComponent
         if (team != null)
         {
             team.AddPlayer(this);
-            mat?.SetColor("color", team.Color);
+           // mat?.SetColor("color", team.Color);
         }
             
         this._Team = team;

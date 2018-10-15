@@ -11,6 +11,10 @@ namespace ThomasEngine.Network
 {
     public class NetworkIdentity : ScriptComponent
     {
+
+
+        public int PrefabID = -1;
+
         private bool _Owner = false;
         public bool Owner {
             set {if(value == true && IsPlayer == false) TakeOwnership();  _Owner = value; }
@@ -81,7 +85,7 @@ namespace ThomasEngine.Network
                 
                 comp.OnWrite(DataWriter, initalState);
             }
-            Manager.InternalManager.SendToAll(DataWriter, DeliveryMethod.Sequenced);
+            Manager.InternalManager.SendToAll(DataWriter, initalState ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced);
         }
 
         public void ReadData(NetPacketReader reader, bool initialState)

@@ -16,19 +16,22 @@ public enum TEAM_TYPE
 
 public class MatchSystem : NetworkManager
 {
+    [Newtonsoft.Json.JsonIgnore]
     public Dictionary<TEAM_TYPE, Team> Teams { get; set; }
 
     public Team Spectator { get; set; }
 
-    public GameObject BallPrefab;
+    public GameObject BallPrefab { get; set; }
     private GameObject Ball;
+
+    private bool MatchStarted = false;
 
     public static new MatchSystem instance
     {
         get { return NetworkManager.instance as MatchSystem; }
     }
 
-    MatchSystem() : base()
+    public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
 
@@ -44,8 +47,10 @@ public class MatchSystem : NetworkManager
         foreach (var team in Teams)
             team.Value.Start();
 
+        if(BallPrefab)
+            SpawnablePrefabs.Add(BallPrefab);
 
-        StartCoroutine(ResetCoroutine(10));
+        //StartCoroutine(ResetCoroutine(10));
     }
 
     IEnumerator ResetCoroutine(int seconds)
@@ -57,19 +62,29 @@ public class MatchSystem : NetworkManager
             secondsRemaining -= 1;
             Debug.Log(secondsRemaining);
         }
-        OnRoundStart();
+        OnMatchStart();
     }
 
     void OnMatchStart()
     {
+        if (MatchStarted)
+            return;
         //Spawn ball or something
-
-        OnRoundStart();
+        if (BallPrefab)
+        {
+            Debug.Log("spawned ball!");
+            Ball = Scene.FindNetworkObject(8008)?.gameObject;
+            if(!Ball)
+                Ball = NetworkInstantiate(BallPrefab, Vector3.Zero, Quaternion.Identity, ResponsiblePeer == LocalPeer, 8008);
+            Ball.SetActive(false);
+        }
+        MatchStarted = true;
     }
 
     void OnMatchEnd()
     {
         //Clean up
+        //MatchStarted = false;
     }
 
 
@@ -127,6 +142,11 @@ public class MatchSystem : NetworkManager
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
             if (Input.GetKeyDown(Input.Keys.S))
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+            if (Input.GetKeyDown(Input.Keys.Space))
+            {
+                OnMatchStart();
+                OnRoundStart();
+            }
         }
 
     }
@@ -154,6 +174,7 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerLeave(NetPeer peer)
     {
+        return;
         NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
         if (!np)
             Debug.LogError("Failed to find network player for peer:" + peer);

@@ -426,7 +426,7 @@ namespace ThomasEditor
                         }
                     }
                 }
-                if (source.DataContext != null)
+                if (source.DataContext != null && targetModel == null)
                 {
                     //Check if object from hierarchy
                     if (source.DataContext.GetType() == typeof(TreeItemViewModel))
@@ -456,7 +456,7 @@ namespace ThomasEditor
                             Debug.LogWarning("Invalid parenting, can't set the selected object as a child if the specified object.");
                         }
                     }
-                    //Check if brefab. (From outside hierarchy)
+                    //Check if prefab. (From outside hierarchy)
                     else if (source.DataContext.GetType() == typeof(GameObject))
                     {
                         GameObject sourceData = (GameObject)source.DataContext;

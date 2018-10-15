@@ -36,14 +36,25 @@ namespace ThomasEngine.Network
 
         public List<GameObject> SpawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject PlayerPrefab { get; set; }
-        
-        private float ServerTime;
+ 
+        public NetPeer LocalPeer = null;
 
-        protected NetPeer LocalPeer = null;
-
-        private NetPeer ResponsiblePeer = null;
+        public NetPeer ResponsiblePeer = null;
 
         public int TICK_RATE { get; set; } = 24;
+
+
+        public long ServerStartTime;
+        [Browsable(false)]
+        [Newtonsoft.Json.JsonIgnore]
+        public float TimeSinceServerStarted
+        {
+            get
+            {
+                System.TimeSpan elapsedTimespan = new System.TimeSpan(System.DateTime.UtcNow.Ticks - ServerStartTime);
+                return (float)elapsedTimespan.TotalSeconds;
+            }
+        }
 
         internal NetworkScene NetScene;
 
@@ -136,21 +147,10 @@ namespace ThomasEngine.Network
         {
             
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
+
             
-
-            foreach (NetPeer peer in NetManager.GetPeers(ConnectionState.Connected))
-            {
-                if (peer == _peer)
-                    continue;
-                NetworkEvents.ConnectToPeerEvent connectEvent = new NetworkEvents.ConnectToPeerEvent
-                {
-                    IP = peer.EndPoint.Address.ToString(),
-                    Port = peer.EndPoint.Port
-                };
-
-                Events.SendEventToPeer(connectEvent, DeliveryMethod.ReliableOrdered, _peer);
-            }
-
+            
+                       
             if(NetScene.Players.Count == 0) // We are new player.
             {
                 NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
@@ -159,8 +159,20 @@ namespace ThomasEngine.Network
             }
             else //Someone is joining us.
             {
+                //Send server info to this guy.
+                bool responsible = ResponsiblePeer == LocalPeer;
+                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible);
+                Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
+
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
                 TransferOwnedObjects();
+                NtpRequest.Make("pool.ntp.org", 123, dateTime =>
+                {
+                    if (dateTime.HasValue)
+                    {
+                        ServerStartTime = dateTime.Value.ToUniversalTime().Ticks;
+                    }
+                });
             }
             OnPeerJoin(_peer);
         }
@@ -178,7 +190,6 @@ namespace ThomasEngine.Network
         {
             NetUtils.DebugWriteError("Network error has occured on: {0} error: {1}", endPoint.Address, socketError.ToString());
         }
-
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
@@ -209,6 +220,7 @@ namespace ThomasEngine.Network
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
+
             if (NetManager.PeersCount < 10 /* max connections */)
                 request.AcceptIfKey("SomeConnectionKey");
             else
@@ -220,7 +232,6 @@ namespace ThomasEngine.Network
         public override void Update()
         {
             NetManager.UpdateTime = (1000 / TICK_RATE);
-            ServerTime += Time.ActualDeltaTime;
             if(NetManager.NatPunchEnabled)
                 NetManager.NatPunchModule.PollEvents();
             NetManager.PollEvents(); 
@@ -236,7 +247,6 @@ namespace ThomasEngine.Network
                         NetManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
                     else
                     {
-                        
                         NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
                     }
                 }
@@ -251,10 +261,10 @@ namespace ThomasEngine.Network
                 }
                 else
                 {
+                    ResponsiblePeer = LocalPeer;
                     NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
                     NetScene.ActivateSceneObjects();
                     OnPeerJoin(LocalPeer);
-                    ResponsiblePeer = LocalPeer;
                 }
               
             }
@@ -283,26 +293,66 @@ namespace ThomasEngine.Network
         }
 
 
-        public void TransferOwnedObjects()
+        private void TransferOwnedObjects()
         {
             foreach(NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
             {
-                identity.WriteInitialData();
+                if(identity.PrefabID == -1) //Scene object
+                    identity.WriteInitialData();
+                else
+                {
+                    TransferOwnedPrefab(identity);
+                }
             }
             NetScene.Players[LocalPeer].WriteInitialData();
         }
 
-        //internal void InitServerNTP()
-        //{
-        //    NetDataWriter writer = new NetDataWriter();
-        //    writer.Put((int)PacketType.EVENT);
+        private void TransferOwnedPrefab(NetworkIdentity identity)
+        {
+            Debug.Log("Transfering prefab: " + identity.Name);
+            NetworkEvents.SpawnPrefabEvent spawnPrefabEvent = new NetworkEvents.SpawnPrefabEvent
+            {
+                NetID = identity.ID,
+                Position = identity.transform.position,
+                Rotation = identity.transform.rotation,
+                PrefabID = identity.PrefabID,
+                Owner = true
+            };
+            Events.SendEvent(spawnPrefabEvent, DeliveryMethod.ReliableOrdered);
+            identity.WriteInitialData();
+        }
 
-        //    netPacketProcessor.Write<T>(writer, data);
-        //    sendTo.Send(writer, method);
-        //}
-
-
-
+        public GameObject NetworkInstantiate(GameObject prefab, Vector3 position, Quaternion rotation, bool owner = false, int targetID = -1)
+        {
+            
+            int prefabID = SpawnablePrefabs.IndexOf(prefab);
+            if(prefabID >= 0)
+            {
+                GameObject gObj = GameObject.Instantiate(prefab, position, rotation);
+                NetworkIdentity identity = gObj.GetComponent<NetworkIdentity>();
+                int netID = targetID;
+                if (targetID >= 0)
+                    NetScene.AddObject(identity, targetID);
+                else
+                    netID = NetScene.AddObject(identity);
+                NetworkEvents.SpawnPrefabEvent spawnPrefabEvent = new NetworkEvents.SpawnPrefabEvent
+                {
+                    NetID = netID,
+                    Position = position,
+                    Rotation = rotation,
+                    PrefabID = prefabID,
+                    Owner = owner
+                };
+                Events.SendEvent(spawnPrefabEvent, DeliveryMethod.ReliableOrdered);
+                identity.Owner = owner;
+                identity.WriteInitialData();
+                return gObj;
+            }else
+            {
+                Debug.LogError("Prefab is not registered");
+                return null;
+            }
+        }
 
         public void CheckPacketLoss()
         {

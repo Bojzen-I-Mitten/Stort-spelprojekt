@@ -32,7 +32,7 @@ namespace ThomasEngine.Network
         {
             int networkID = reader.GetInt();
             bool initialState = reader.GetBool();
-            NetworkIdentity identity = NetworkObjects[networkID];
+            NetworkIdentity identity = NetworkObjects.ContainsKey(networkID) ? NetworkObjects[networkID] : null;
             if (identity)
             {
                 if (identity.gameObject.GetActive() || initialState)
@@ -103,6 +103,18 @@ namespace ThomasEngine.Network
             });
         }
 
+        public int AddObject(NetworkIdentity identity)
+        {
+            NetworkObjects.Add(nextAssignableID++, identity);
+            return nextAssignableID;
+        }
+
+
+        public void AddObject(NetworkIdentity identity, int id)
+        {
+            NetworkObjects.Add(id, identity);
+        }
+
         public void ActivateSceneObjects()
         {
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
@@ -112,7 +124,6 @@ namespace ThomasEngine.Network
                     identity.Owner = true;
                     identity.gameObject.SetActive(true);
                 }
-
             });
         }
         
