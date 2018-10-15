@@ -32,6 +32,12 @@ namespace DirectX
 
 		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest);
 
+		inline Vector3 Normalize(Vector3 v)
+		{
+			v.Normalize();
+			return v;
+		}
+
 		inline float DegreesToRadians(const float & degree)
 		{
 			return std::fmodf(degree, 360.f) * (PI / 180.f);

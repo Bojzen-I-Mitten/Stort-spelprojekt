@@ -112,7 +112,6 @@ namespace thomas {
 					return vx;
 				}
 			}
-
 			/* FABRIK IK solver
 			*/
 			void IK_FABRIK_Constraint::execute(Skeleton & skel, math::Matrix * objectPose, TransformComponents* comp, uint32_t boneInd)
@@ -140,7 +139,6 @@ namespace thomas {
 					FABRIK_unreachable(m_target, d, p, m_num_link);
 				else
 					FABRIK_iteration(m_target, d, p, m_num_link);
-
 				math::Vector3 trans;
 				math::Matrix pose;
 				// Apply solution to chain
@@ -162,14 +160,15 @@ namespace thomas {
 				pose.Translation(lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
 				objectPose[(chain + m_num_link - 1)->m_index] = pose;
 
+				const float GIZMO_LEN = 0.05f;
 #ifdef _EDITOR
 				for (i = 0; i < m_num_link; i++) {
 					editor::Gizmos::Gizmo().SetColor(math::Color(0, 1.f, 0.f));
-					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Up());
+					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + math::Normalize(objectPose[(chain + i)->m_index].Up()) * GIZMO_LEN);
 					editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 0.f, 0.f));
-					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Right());
+					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + math::Normalize(objectPose[(chain + i)->m_index].Right()) * GIZMO_LEN);
 					editor::Gizmos::Gizmo().SetColor(math::Color(0.f, 0.f, 1.f));
-					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + objectPose[(chain + i)->m_index].Forward());
+					editor::Gizmos::Gizmo().DrawLine(p[i], p[i] + math::Normalize(objectPose[(chain + i)->m_index].Forward()) * GIZMO_LEN);
 				}
 #endif
 				// Clean stack
