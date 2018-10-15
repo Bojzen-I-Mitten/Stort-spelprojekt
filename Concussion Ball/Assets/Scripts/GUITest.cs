@@ -7,7 +7,7 @@ using ThomasEngine;
 
 public class GUITest : ScriptComponent
 {
-    //public Texture2D Sprite { get; set; }
+    public Texture2D Sprite { get; set; }
 
     public override void Start()
     {
@@ -16,6 +16,11 @@ public class GUITest : ScriptComponent
 
     public override void Update()
     {
-        //GUI.AddImage(Sprite, new Vector2(100, 100));
+        GUI.AddImage("Chad", Sprite, new Vector2(200, 30), new Vector2(0.5f, 0.5f), true);
+
+        if(GUI.OnImageClicked("Chad"))
+        {
+            Debug.Log("Clicked Chad");
+        }
     }
 }

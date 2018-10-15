@@ -111,7 +111,6 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
-			GUI::ThomasGUI::UpdateInteraction();
 			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
 			//m_particleSystem->UpdateParticleSystem();
 

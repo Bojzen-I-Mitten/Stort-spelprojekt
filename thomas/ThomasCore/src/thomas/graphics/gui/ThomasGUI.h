@@ -31,7 +31,6 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interact;
-				bool intersected;
 			};
 
 			struct Rect
@@ -48,7 +47,6 @@ namespace thomas
 			static void Init();
 			static void Destroy();
 			static void Update();
-			static void UpdateInteraction();
 			static void Render();
 			
 		public:
@@ -65,6 +63,7 @@ namespace thomas
 			
 		private:
 			static Image& GetImage(const std::string& id);
+			static bool CheckImageIntersection(const std::string& id);
 
 		private:
 			static std::map<std::string, Image> m_images;
