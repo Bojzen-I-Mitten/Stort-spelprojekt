@@ -13,21 +13,17 @@ public class GUITest : ScriptComponent
 
     public override void Start()
     {
+        GUI.AddImage("Chad", Sprite, new Vector2(200, 30), new Vector2(0.5f, 0.5f), true);
+
         OriginalColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
         RedColor = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
     }
 
     public override void Update()
     {
-        GUI.AddImage("Chad", Sprite, new Vector2(200, 30), new Vector2(0.5f, 0.5f), true);
-
-        if(GUI.OnImageHovered("Chad"))
+        if (GUI.OnImageClicked("Chad"))
         {
-            GUI.SetImageColor("Chad", RedColor); 
+            GUI.SetImageColor("Chad", RedColor);
         }
-        //else
-        //{
-        //    GUI.SetImageColor("Chad", OriginalColor);
-        //}
     }
 }

@@ -46,7 +46,7 @@ namespace thomas
 		public:
 			static void Init();
 			static void Destroy();
-			static void Update();
+			static void Clear();
 			static void Render();
 			
 		public:

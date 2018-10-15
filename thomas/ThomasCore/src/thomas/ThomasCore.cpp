@@ -67,7 +67,6 @@ namespace thomas
 
 		object::Object::Clean();
 		editor::EditorCamera::Instance()->Update();
-		GUI::ThomasGUI::Update();
 		
 		resource::Shader::Update();	
 		Sound::Instance()->Update();

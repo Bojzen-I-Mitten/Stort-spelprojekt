@@ -13,6 +13,8 @@
 #include <thomas\AutoProfile.h>
 #include <thomas\ProfileManager.h>
 #include <thomas\utils\GpuProfiler.h>
+#include <thomas\graphics\gui\ThomasGUI.h>
+
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -24,13 +26,14 @@
 #include "GUI\editor\GUI.h"
 #include "object/GameObject.h"
 #include "Debug.h"
+
 using namespace thomas;
 
 namespace ThomasEngine {
 
 
-	void ThomasWrapper::Start() {
-
+	void ThomasWrapper::Start() 
+	{
 		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
 
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
@@ -297,6 +300,8 @@ namespace ThomasEngine {
 		}
 		OnStopPlaying();
 
+		// Clear GUI
+		thomas::GUI::ThomasGUI::Clear();
 		Debug::Log("Stopped...");
 	}
 

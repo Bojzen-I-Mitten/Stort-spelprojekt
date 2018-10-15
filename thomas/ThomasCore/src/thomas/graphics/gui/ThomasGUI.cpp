@@ -22,6 +22,11 @@ namespace thomas
 			m_spriteBatch.reset();
 		}
 
+		void ThomasGUI::Clear()
+		{
+			m_images.clear();
+		}
+
 		void ThomasGUI::Render()
 		{
 			// Begin
@@ -35,11 +40,6 @@ namespace thomas
 
 			// End
 			m_spriteBatch->End();
-		}
-
-		void ThomasGUI::Update()
-		{
-			m_images.clear();
 		}
 
 		void ThomasGUI::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact, 
