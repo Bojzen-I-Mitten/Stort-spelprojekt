@@ -92,10 +92,11 @@ namespace ThomasEngine.Network
         {
             public int NetID { get; set; }
 
-            public TransferOwnerEvent() { NetID = -1;}
+            public TransferOwnerEvent() { NetID = -1; }
         }
+
         #endregion
-        
+
         #region Event Handlers
         public void ServerInfoEventHandler(ServerInfoEvent serverInfo, NetPeer peer)
         {
@@ -175,6 +176,7 @@ namespace ThomasEngine.Network
             }
 
         }
+
         #endregion
 
         #region Writing & reading
@@ -214,6 +216,9 @@ namespace ThomasEngine.Network
             Manager.NetPacketProcessor.Write<T>(writer, data);
             sendTo.Send(writer, method);
         }
+
+
+       
         #endregion
     }
 }

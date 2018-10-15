@@ -4,6 +4,8 @@ using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Linq;
+using System;
+
 namespace ThomasEngine.Network
 {
     public enum PacketType
@@ -11,6 +13,7 @@ namespace ThomasEngine.Network
         EVENT,
         OBJECT_DATA,
         PLAYER_DATA,
+        RPC
     }
 
     public class NetworkManager : ScriptComponent
@@ -212,6 +215,9 @@ namespace ThomasEngine.Network
                     Debug.Log("recived events!");
                     NetPacketProcessor.ReadAllPackets(reader, peer);
                     break;
+                case PacketType.RPC:
+                    HandleRPC(reader, peer);
+                    break;
                 default:
                     break;
             }
@@ -292,6 +298,56 @@ namespace ThomasEngine.Network
             Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
         }
 
+
+        public void SendRPC(int netID, string methodName, object[] parameters)
+        {
+            NetDataWriter writer = new NetDataWriter();
+
+            writer.Put((int)PacketType.RPC);
+            writer.Put(netID);
+            writer.Put(methodName);
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                object parameter = parameters[i];
+                Type parameterType = parameters[i].GetType();
+                if (parameterType == typeof(int))
+                    writer.Put((int)parameter);
+                else if (parameterType == typeof(float))
+                    writer.Put((float)parameter);
+                else if (parameterType == typeof(bool))
+                    writer.Put((bool)parameter);
+                else if (parameterType == typeof(string))
+                    writer.Put((string)parameter);
+                else if (parameterType == typeof(Quaternion))
+                    writer.Put((Quaternion)parameter);
+                else if (parameterType == typeof(Vector2))
+                    writer.Put((Vector2)parameter);
+                else if (parameterType == typeof(Vector3))
+                    writer.Put((Vector3)parameter);
+                else if (parameterType == typeof(Vector4))
+                    writer.Put((Vector4)parameter);
+                else
+                {
+                    Debug.LogError("RPC error: unsupported type.");
+                    return;
+                }
+            }
+            InternalManager.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+        }
+
+        private void HandleRPC(NetPacketReader reader, NetPeer peer)
+        {
+            int netID = reader.GetInt();
+
+            NetworkIdentity identity;
+            if (netID != -1)
+                identity = NetScene.FindNetworkObject(netID);
+            else
+                identity = NetScene.Players[peer];
+
+            identity.ReadRPC(reader);
+        }
 
         private void TransferOwnedObjects()
         {

@@ -100,6 +100,29 @@ namespace ThomasEngine.Network
             }
         }
 
+        public void ReadRPC(NetPacketReader reader)
+        {
+            NetSerializer serializer = new NetSerializer();
+            string methodName = reader.GetString();
+            System.Reflection.MethodInfo methodInfo = null;
+            foreach (NetworkComponent comp in networkComponentsCache)
+            {
+                methodInfo = comp.GetType().GetMethod(methodName);
+                if (methodInfo != null)
+                {
+                    comp.ReadRPC(methodInfo, reader);
+                    return;
+                }
+            }
+
+
+        }
+
+        internal void SendRPC(string methodName, object[] parameters)
+        {
+            Manager.SendRPC(this.ID, methodName, parameters);
+        }
+
         private void TakeOwnership()
         {
             if(Manager != null)
