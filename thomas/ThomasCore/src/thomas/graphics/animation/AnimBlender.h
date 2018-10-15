@@ -2,6 +2,7 @@
 #include "AnimationNode.h"
 #include <utility>
 #include "../../Constants.h"
+#include <memory>
 
 namespace thomas {
 	namespace graphics {

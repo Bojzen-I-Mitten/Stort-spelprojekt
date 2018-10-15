@@ -17,9 +17,8 @@
 #include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
+#include "graphics\ParticleSystem.h"
 #include "../thomas/graphics/gui/ThomasGUI.h"
-
-#include "object/component/LightComponent.h"
 
 namespace thomas 
 {
@@ -28,9 +27,6 @@ namespace thomas
 	bool ThomasCore::s_initialized;
 	bool ThomasCore::s_isEditor = false;
 	ImGuiContext* ThomasCore::s_imGuiContext;
-
-	Texture2D* texture;
-
 
 	bool ThomasCore::Init()
 	{
@@ -44,10 +40,6 @@ namespace thomas
 
 		GUI::ThomasGUI::Init();
 		resource::Texture2D::Init();
-
-		// Load default image
-		texture = new Texture2D("../Data/cat.png");
-
 		ThomasTime::Init();
 		Sound::Instance()->Init();
 		resource::Shader::Init();
@@ -58,6 +50,7 @@ namespace thomas
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
+		graphics::ParticleSystem::InitializeGlobalSystem();
 
 		s_initialized = true;
 		return s_initialized;
@@ -74,9 +67,7 @@ namespace thomas
 
 		object::Object::Clean();
 		editor::EditorCamera::Instance()->Update();
-		GUI::ThomasGUI::Update(); // This need to be after the update of scripts
-		/*GUI::ThomasGUI::AddImage(texture, Vector2(300.f, 300.0f));
-		GUI::ThomasGUI::AddText(L"Hello World!", L"CourierNew", Vector2(300.f, 300.f));*/
+		GUI::ThomasGUI::Update();
 		
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
@@ -119,6 +110,7 @@ namespace thomas
 		WindowManager::Instance()->Destroy();
 		GUI::ThomasGUI::Destroy();
 		graphics::LightManager::Destroy();
+		graphics::ParticleSystem::DestroyGlobalSystem();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
