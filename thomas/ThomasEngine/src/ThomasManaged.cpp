@@ -15,6 +15,7 @@
 #include <thomas\utils\GpuProfiler.h>
 #include <thomas\object\component\Camera.h>
 #include <thomas\object\component\RenderComponent.h>
+#include <thomas\graphics\LightManager.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"

@@ -11,6 +11,7 @@
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
 #include "..\WindowManager.h"
+#include "..\graphics\LightManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
