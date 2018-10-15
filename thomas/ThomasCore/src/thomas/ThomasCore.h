@@ -40,8 +40,6 @@ namespace thomas
 		static void ClearLogOutput();
 		static bool IsEditor();
 		static void SetEditor(bool value);
-	private:
-		static bool InitDirectX();
 
 	private:
 		

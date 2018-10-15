@@ -186,7 +186,6 @@ namespace ThomasEngine {
 					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
 						showStatistics = !showStatistics;
 					}
-						
 				}
 
 			

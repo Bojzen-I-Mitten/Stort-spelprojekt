@@ -7,6 +7,12 @@ namespace thomas
 	{
 		std::vector<Object*> Object::s_objects;
 
+
+		Object::~Object()
+		{
+
+		}
+
 		void Object::Add(Object* object)
 		{
 			s_objects.push_back(object);
@@ -24,11 +30,7 @@ namespace thomas
 				}
 			}
 		}
-
-		Object::~Object()
-		{
-		}
-
+		
 		std::string Object::GetName()
 		{
 			return m_name;

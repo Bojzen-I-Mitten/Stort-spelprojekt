@@ -18,6 +18,10 @@ namespace ThomasEngine
 	Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
 	{
 	}
+	Component::~Component()
+	{
+		Delete();
+	}
 
 	void Component::Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
 	void Component::Start() {}
@@ -115,21 +119,25 @@ namespace ThomasEngine
 	void Component::Destroy()
 	{
 		Monitor::Enter(m_gameObject->m_componentsLock);
-		this->enabled = false;
-		for (int i = 0; i < ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.size(); i++)
-		{
-			thomas::object::component::Component* component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
-			if (component == nativePtr)
-			{
-				((thomas::object::GameObject*)m_gameObject->nativePtr)->
-					m_components.erase(((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.begin() + i);
-				break;
-			}
-		}
-		StopAllCoroutines();
 		m_gameObject->Components->Remove(this);
-		Object::Destroy();
+		Delete();
 		Monitor::Exit(m_gameObject->m_componentsLock);
+		// Destroy the object
+		Object::Destroy();
+	}
+
+	void Component::Delete()
+	{
+		this->enabled = false; // Disable first, just in case...
+#ifdef _DEBUG
+		// Check successfull destruction
+		if(m_gameObject->Native->DestroyComponent(this->nativePtr))
+			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
+#else
+		// Don't care
+		m_gameObject->Native->DestroyComponent(this->nativePtr);
+#endif
+		StopAllCoroutines();
 	}
 
 	List<Type^>^ Component::GetAllComponentTypes()
