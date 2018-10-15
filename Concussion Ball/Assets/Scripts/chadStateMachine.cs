@@ -19,23 +19,33 @@ namespace ThomasEditor
 
     public class ChadStateMachine : ScriptComponent
     {
+        // camera is never used, but someone program crashes if this is removed as it was previously used and
+        // probably still rots inside the .tds file, can probably be removed when a new scene is used
+        public Camera m_camera {get; set;}
+
         private State m_state;
         private Rigidbody m_rBody;
 
-        //State checks
+        //Player information
         private float m_xStep = 0.0f;
         private float m_yStep = 0.0f;
 
         private float m_velocity = 2.0f;
-        private float m_runningSpeed = 3.0f;
-        private float m_maxSpeed = 5.0f;
-        private float m_incrementSpeed = 0.01f;
+        private float m_runningSpeed = 5.0f;
+        private float m_maxSpeedWithBall = 6.0f;
+        private float m_maxSpeed = 10.0f;
 
-        private float m_chargeForce = 0.0f;
-        
+        private float m_incrementSpeed = 4.0f;
+
+        private bool m_ragdolling = false;
+        private bool m_isTackled = false;
+        private bool m_hasBall = false;
+        private float m_chargeForce = 2.0f;
+        private float m_maxForce = 10.0f;
+
+        private Ball m_ball = null;
 
         private ChadControls _chadControls;
-
         private ChadControls m_chadControls
         {
             get
@@ -49,12 +59,38 @@ namespace ThomasEditor
 
         public override void Start()
         {
+            //if(!m_camera)
+            //{
+            //    Debug.Log("Camera not found.");
+            //}
             m_chadControls = null;
             m_state = State.IDLE;
             m_xStep = Input.GetMouseX() * Time.ActualDeltaTime;
             m_yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
             m_rBody = gameObject.GetComponent<Rigidbody>();
+
+            m_ball = GetObjectsOfType<Ball>().FirstOrDefault();
+        }
+
+        public override void OnCollisionEnter(Collider collider)
+        {
+            if (m_ball)
+            {
+                if (collider.gameObject == m_ball.gameObject)
+                {
+                    m_hasBall = true;
+                }
+            }
+            // collision with objects that have m_chadControls added, players that is
+            else if (collider.gameObject == m_chadControls.gameObject)
+            {
+                Debug.Log("Collision with player");
+
+                // velocity comparison
+                //if (m_velocity < m_chadControls.velocity && m_chadControls.velocity > m_runningSpeed)
+                    m_isTackled = true;
+            }
         }
 
         public override void Update()
@@ -66,7 +102,7 @@ namespace ThomasEditor
                     // __SIMULTAENOUS__ IDLE and: nothing
                     // __CAN_ENTER__  MOVING/THROWING/JUMPING/RAGDOLL
 
-                    if (false /*m_rBody.isCollidingWithPowerUpOrChad(), compare velocity, check if velocity big enough*/)
+                    if (m_isTackled)
                     {
                         m_state = State.RAGDOLL;
                     }
@@ -76,7 +112,7 @@ namespace ThomasEditor
                         {
                             m_state = State.MOVING;
                         }
-                        else if (Input.GetMouseButton(Input.MouseButtons.LEFT) /* && character is actually holding something to throw*/)
+                        else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && m_hasBall)
                         {
                             m_state = State.THROWING;
                         }
@@ -87,6 +123,7 @@ namespace ThomasEditor
                     }
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
+                        // play turning animation
                         if (!Input.GetKey(Input.Keys.LeftShift)) //normal controls
                             m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
                         else //free look
@@ -98,10 +135,13 @@ namespace ThomasEditor
                     // __SIMULTAENOUS__ THROW and: MOVING
                     // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
 
-                    // m_chargeForce += en faktor för charge
-                    // chadBall.charge(m_chargeForce) ändrar utseende osv beroende på force
+                    if (m_chargeForce < m_maxForce)
+                        m_chargeForce += m_incrementSpeed * Time.DeltaTime;
+                    m_chadControls.ChargeBall();
 
-                    if (false /*m_rBody.isCollidingWithPowerUpOrChad(), compare velocity, check if velocity big enough*/)
+                    //Debug.Log("Charge force: " + m_chargeForce);
+
+                    if (m_isTackled)
                     {
                         m_state = State.RAGDOLL;
                     }
@@ -111,75 +151,66 @@ namespace ThomasEditor
                     }
                     else
                     {
-                        // m_velocity = ett värde, ingen acceleration
-
                         // Throwing and pressing W, checking if also ASD pressed
                         if (Input.GetKey(Input.Keys.W))
                         {
-                            if (Input.GetKey(Input.Keys.A))
+                            if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                             {
                                 // blend anim strafing and throwing
-                                // chadMovement.Move(m_velocity*0.66f, -m_velocity*0.66f);
+                                m_chadControls.HandleMovement(m_velocity * 0.66f, -m_velocity * 0.66f);
                             }
-                            else if (Input.GetKey(Input.Keys.D))
+                            else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                             {
                                 //blend anim strafing and throwing
-                                // chadMovement.Move(m_velocity*0.66f, m_velocity*0.66f);
+                                m_chadControls.HandleMovement(m_velocity * 0.66f, m_velocity * 0.66f);
                             }
                             else if (!Input.GetKey(Input.Keys.S))
                             {
                                 // blend anim walking backwards and throwing
-                                // chadMovement.Move(m_velocity, 0);
+                                m_chadControls.HandleMovement(m_velocity, 0);
                             }
 
                         }
-                        // Throwing and pressed S, checkingif also AWD pressed
+                        // Throwing and pressed S, checking if also AWD pressed
                         else if (Input.GetKey(Input.Keys.S))
                         {
-                            if (Input.GetKey(Input.Keys.A))
+                            if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                             {
                                 // blend anim backing and throwing
-                                // chadMovement.Move(-m_velocity*0.66f, -m_velocity*0.66f);
+                                m_chadControls.HandleMovement(-m_velocity * 0.66f, -m_velocity * 0.66f);
                             }
-                            else if (Input.GetKey(Input.Keys.D))
+                            else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                             {
                                 //blend anim backing and throwing
-                                // chadMovement.Move(-m_velocity*0.66f, m_velocity*0.66f);
+                                m_chadControls.HandleMovement(-m_velocity * 0.66f, m_velocity * 0.66f);
                             }
                             else if (!Input.GetKey(Input.Keys.W))
                             {
                                 // blend anim backing and throwing
-                                // chadMovement.Move(-m_velocity, 0);
+                                m_chadControls.HandleMovement(-m_velocity, 0);
                             }
                         }
                         // Throwing and pressing A, checking if also D pressed
-                        else if (Input.GetKey(Input.Keys.A))
+                        else if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                         {
-                            if(!Input.GetKey(Input.Keys.D))
-                            {
                                 // blend anim strafing and throwing
-                                // chadMovement.Move(0,-m_velocity);
-                            }
+                                m_chadControls.HandleMovement(0, -m_velocity * 0.66f);
                         }
-                        else if (Input.GetKey(Input.Keys.D))
+                        else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                         {
-                            if (!Input.GetKey(Input.Keys.A))
-                            {
-                                // blend anim strafing and throwing
-                                // chadMovement.Move(0,m_velocity);
-                            }
+                            // blend anim strafing and throwing
+                            m_chadControls.HandleMovement(0, m_velocity);
                         }
 
                         if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                             m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
 
-                        // can enter following after releasing ball: walking/backing/strafing/turning/idle
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
-                            // player was charging and is not throwing
-
                             // play throwing anim
-                            // chadBall.Throw(m_chargeForce) // release the Kraken
+                            m_chadControls.ThrowBall(m_chargeForce);
+                            m_chargeForce = 2.0f;
+                            m_hasBall = false;
 
                             // check what mode to enter
                             if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
@@ -192,8 +223,8 @@ namespace ThomasEditor
                 case State.MOVING:
                     // __SIMULTAENOUS__ MOVE and: nothing
                     // __CAN_ENTER__  IDLE/THROWING/RAGDOLL/JUMP
-
-                    if (false /*m_rBody.isCollidingWithPowerUpOrChad(), compare velocity, if won comparison check if velocity big enough*/)
+                    // Debug.Log("Movement speed: " + m_velocity);
+                    if (m_isTackled)
                     {
                         m_state = State.RAGDOLL;
                     }
@@ -205,15 +236,18 @@ namespace ThomasEditor
                     {
                         //if m_velocity > m_runningSpeed && anim != running {anim = running}
                         //elif m_velocity < m_runningSpeed && anim != walking {anim = walking}
-                        if (Input.GetMouseButton(Input.MouseButtons.LEFT) /*&& actually holding something to throw*/)
+                        if (Input.GetMouseButton(Input.MouseButtons.LEFT) && m_hasBall)
                         {
                             m_state = State.THROWING;
                         }
                         else if (Input.GetKey(Input.Keys.W))
                         {
                             //Debug.Log("Speed: " + m_velocity);
-                            if (m_velocity < m_maxSpeed)
-                                m_velocity += m_incrementSpeed;
+                            if ((m_velocity < m_maxSpeedWithBall && m_hasBall) || (m_velocity < m_maxSpeed && !m_hasBall))
+                            {
+                                m_velocity += m_incrementSpeed * Time.DeltaTime;
+                            }
+                                
                             if (Input.GetKey(Input.Keys.Q) && !Input.GetKey(Input.Keys.E) && !Input.GetKey(Input.Keys.S))
                             {
                                 // move camera fixed in front from side, player runs straight, no strafing
@@ -306,8 +340,25 @@ namespace ThomasEditor
                     //      m_state = State.IDLE;
                     break;
 
-                case State.RAGDOLL: //  last state, cancels sets state to IDLE after RAGDOLL animation is finished
-                    // chadMovement.Ragdoll(posPlayer, posEnemy) // calculates direction to launch player in and calls ragdoll function
+                case State.RAGDOLL:
+                    if (!m_ragdolling)
+                    {
+                        Debug.Log("Entered ragdoll mode, calculating force and direction.");
+                        // toggle ragdoll on
+                        // calculate vector
+
+                        // apply force to player
+                        m_ragdolling = true;
+                    }
+                    else if (m_ragdolling/* && isOnGround*/)
+                    {
+                        Debug.Log("Landed after ragdoll, disabling ragdoll and entering IDLE state.");
+                        
+                        // toggle ragdoll off
+                        m_ragdolling = false;
+                        m_isTackled = false;
+                        m_state = State.IDLE;
+                    }
 
                     break;
 

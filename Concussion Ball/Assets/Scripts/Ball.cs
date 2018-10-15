@@ -42,7 +42,7 @@ public class Ball : NetworkComponent
         
     }
 
-    public void ChargeColor(float throwForce)
+    public void ChargeColor()
     {
         //Debug.Log("Red: " + rc.material.GetColor("color").r);
 

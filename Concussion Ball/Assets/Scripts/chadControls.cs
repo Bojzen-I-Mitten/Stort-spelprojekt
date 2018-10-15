@@ -41,8 +41,8 @@ namespace ThomasEditor
         //Camera test;
 
         private Ball ball = null;
-        private bool hasBall = false;
-        private bool canPickupBall = true;
+        // private bool hasBall = false;
+        // private bool canPickupBall = true;
 
         bool jumpDelay = true;
         bool movingForward = false;
@@ -92,23 +92,7 @@ namespace ThomasEditor
 
         public override void Update()
         {
-            //if (!isOwner)
-            //    return;
-            ////Jumping
-            //if (Input.GetKey(Input.Keys.Space) && jumpDelay)
-            //{
-            //    //Set bools to avoid direction changes mid air or tackling mid air
-            //    jumping = true;
-            //    if (Input.GetKey(Input.Keys.W))
-            //        movingForward = true;
-            //    if (Input.GetKey(Input.Keys.S))
-            //        movingBackward = true;
-            //    StartCoroutine(JumpingCoroutine());
-            //}
-
-            //HandleMovement();
-
-            if (hasBall) FondleBall();
+            
         }
 
         public void HandleMovement(float velocityForward, float velocityStrafe)
@@ -204,22 +188,15 @@ namespace ThomasEditor
             return Math.Min(Math.Max(angle, -CameraMaxVertRadians), CameraMaxVertRadians);
         }
 
-        public void FondleBall()
-        {
-            if (Input.GetMouseButton(Input.MouseButtons.LEFT) && throwForce < maxThrowForce)
-            {
-                throwForce += 5.0f * Time.DeltaTime;
-                if (throwForce > 19)
-                    Debug.Log("Current throw force: " + (int)throwForce);
-                ball.ChargeColor(throwForce);
-            }
-            if (hand && camera && Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-            {
-                hasBall = false;
 
-                ball.Throw(camera.transform.forward * throwForce);
-                throwForce = baseThrowForce;
-            }
+        public void ChargeBall()
+        {
+            ball.ChargeColor();
+        }
+
+        public void ThrowBall(float chargeForce)
+        {
+            ball.Throw(camera.transform.forward * chargeForce);
         }
 
         public override void OnCollisionEnter(Collider collider)
@@ -228,10 +205,7 @@ namespace ThomasEditor
             {
                 if (collider.gameObject == ball.gameObject)
                 {
-                    //TakeOwnership(collider.gameObject);
                     ball.Pickup(gameObject, hand ? hand : transform);
-                    hasBall = true;
-                    canPickupBall = false;
                 }
             }
         }
