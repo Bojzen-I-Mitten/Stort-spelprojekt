@@ -163,7 +163,6 @@ namespace ThomasEditor
         {
             if (camera)
             {
-                camera.transform.localPosition = new Vector3(CameraDistanceThrowing, CameraHeightThrowing, CameraDistanceThrowing);
                 float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
                 if (velocity != 0)
                     yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
@@ -173,7 +172,7 @@ namespace ThomasEditor
                 TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
                 TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
                 camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-                //camera.transform.localPosition = Vector3.Transform(new Vector3(CameraDistanceThrowing, CameraHeightThrowing, CameraDistanceThrowing), camera.transform.localRotation);
+                camera.transform.localPosition = new Vector3(CameraDistanceThrowing, CameraHeightThrowing, CameraDistanceThrowing);
             }
         }
 
