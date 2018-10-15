@@ -12,7 +12,7 @@
     <xceed:InverseBoolConverter x:Key="InverseBoolConverter" />
     <xceed:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
     <xceed:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
-
+    <xceed:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
     <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
 
     <SolidColorBrush x:Key="MouseOverBorderBrush" Color="#FFFFB700" />
@@ -99,7 +99,7 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <ToggleButton Template="{StaticResource ExpanderToggleButton}" IsChecked="{Binding Path=IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" OverridesDefaultStyle="True" />
-                                <ContentPresenter Grid.Column="1" Margin="1" RecognizesAccessKey="True" ContentSource="Header" TextElement.FontWeight="Bold" />
+                                <ContentPresenter Grid.Column="1" Margin="1" RecognizesAccessKey="True" ContentSource="Header" TextElement.FontWeight="Bold" TextElement.Foreground="White" />
                             </Grid>
                         </Border>
                         <Border Visibility="Collapsed" Grid.Row="1" x:Name="ExpandSite" Background="{DynamicResource PanelBackground}" Padding="10 0 0 0">
@@ -656,7 +656,7 @@
                                         <TextBlock Grid.Column="1" Text="{Binding DisplayName, RelativeSource={RelativeSource TemplatedParent}}" 
                                                          HorizontalAlignment="Stretch" 
                                                          VerticalAlignment="Center"
-                                                         TextTrimming="CharacterEllipsis"
+                                                         TextTrimming="CharacterEllipsis" Foreground="White"
                                                    />
                                     </Grid>
 

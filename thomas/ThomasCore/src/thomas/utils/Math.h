@@ -19,6 +19,8 @@ namespace DirectX
 		using DirectX::BoundingOrientedBox;
 
 
+		BoundingFrustum CreateFrustrumFromMatrixRH(CXMMATRIX projection);
+
 		Quaternion getRotationTo(Vector3 from, Vector3 dest);
 
 		inline float DegreesToRadians(const float & degree)

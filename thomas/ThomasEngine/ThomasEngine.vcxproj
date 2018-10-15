@@ -172,6 +172,7 @@
     <ClInclude Include="src\math\Random.h" />
     <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
+    <ClInclude Include="src\object\component\ParticleEmitter.h" />
     <ClInclude Include="src\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\object\component\physics\Collider.h" />
@@ -226,6 +227,7 @@
     <ClCompile Include="src\math\Random.cpp" />
     <ClCompile Include="src\object\component\animation\BoneTransformComponent.cpp" />
     <ClCompile Include="src\object\component\LightComponent.cpp" />
+    <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
     <ClCompile Include="src\object\component\physics\BoxCollider.cpp" />
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\component\physics\Collider.cpp" />

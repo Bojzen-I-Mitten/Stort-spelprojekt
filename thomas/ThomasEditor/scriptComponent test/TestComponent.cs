@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
+using System.ComponentModel;
+
 namespace ThomasEditor
 {
     public class TestComponent : ScriptComponent
@@ -15,6 +17,7 @@ namespace ThomasEditor
         public AudioClip audioClip { get; set; }
         public Material mat { get; set; }
         public Model m { get; set; }
+        [Category("customCategory")]
         public GameObject coolPrefab { get; set; }
         public RenderComponent otherObjectsRender { get; set; }
         public List<GameObject> niceList { get; set; } = new List<GameObject> { null, null };

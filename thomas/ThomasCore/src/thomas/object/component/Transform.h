@@ -40,7 +40,8 @@ namespace thomas
 				void RotateByAxis(math::Vector3 axis, float angle);
 				void Translate(math::Vector3 translation);
 				void Translate(float x, float y, float z);
-
+				void Scale(math::Vector3 scale);
+				void Scale(float x, float y, float z);
 
 				math::Vector3 GetPosition();
 				math::Quaternion GetRotation();
