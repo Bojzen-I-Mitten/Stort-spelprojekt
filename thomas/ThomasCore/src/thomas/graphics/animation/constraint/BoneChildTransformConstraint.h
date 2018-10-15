@@ -16,13 +16,11 @@ namespace thomas {
 				: public BoneConstraint
 			{
 			public:
-
-
 				BoneChildTransformConstraint(object::component::Transform & m_ref);
 				~BoneChildTransformConstraint();
 
 				// Replaces the bone transform from a separate object.
-				virtual void execute(Skeleton& skel, math::Matrix* objectPose, uint32_t boneInd) override;
+				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd) override;
 
 			private:
 				object::component::Transform * m_ref;

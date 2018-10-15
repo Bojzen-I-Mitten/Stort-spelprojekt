@@ -4,6 +4,7 @@
 #include "Resource.h"
 #include <memory>
 #include <map>
+#include <vector>
 namespace thomas
 {
 	namespace graphics

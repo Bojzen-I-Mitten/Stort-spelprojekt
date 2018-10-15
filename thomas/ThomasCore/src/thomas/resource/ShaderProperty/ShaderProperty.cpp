@@ -1,4 +1,5 @@
 #include "ShaderProperty.h"
+#include "../Shader.h"
 
 
 namespace thomas

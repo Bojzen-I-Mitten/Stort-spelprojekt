@@ -10,6 +10,8 @@ namespace thomas {
 			public:
 
 				LinearAllocator(size_t size, void* start);
+				LinearAllocator(LinearAllocator&& move);
+				LinearAllocator& operator=(LinearAllocator&& move);
 				~LinearAllocator();
 
 				void* allocate(size_t size, uint8_t alignment) override;
@@ -18,7 +20,7 @@ namespace thomas {
 
 			private:
 
-				LinearAllocator(const LinearAllocator&);
+				LinearAllocator(const LinearAllocator&) = delete;
 
 				//Prevent copies because it might cause errors 
 				LinearAllocator& operator=(const LinearAllocator&) = delete;

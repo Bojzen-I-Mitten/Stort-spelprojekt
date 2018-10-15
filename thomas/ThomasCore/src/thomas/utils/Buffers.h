@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "..\utils/d3d.h"
 #include "..\Common.h"
 
@@ -46,13 +47,24 @@ namespace thomas
 				template <typename T>
 				void SetData(std::vector<T>& data) 
 				{
-					if (sizeof(data[0]) != m_stride)
+					if (sizeof(T) != m_stride)
 					{
 						LOG("Cannot set vertex buffer data. new data stride differs from buffers stride");
 						return;
 					}
 
 					Buffer::SetData(data.data(), data.size() * sizeof(T));
+				}
+				template <typename T>
+				void SetData(T* data, uint32_t numVertex)
+				{
+					if (sizeof(T) != m_stride)
+					{
+						LOG("Cannot set vertex buffer data. new data stride differs from buffers stride");
+						return;
+					}
+
+					Buffer::SetData(data, numVertex * sizeof(T));
 				}
 
 				size_t GetStride();

@@ -8,6 +8,7 @@
 #include "../ScriptingManager.h"
 using namespace System::Threading;
 #include "YieldInstructions.h"
+#include "../Debug.h"
 
 namespace ThomasEngine 
 {

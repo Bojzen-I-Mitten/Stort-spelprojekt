@@ -19,9 +19,32 @@ namespace DirectX
 		using DirectX::BoundingOrientedBox;
 
 
+		struct Euler {
+			float yaw, pitch, roll;
+
+			Euler() : yaw(0.f), pitch(0.f), roll(0.f) {}
+			Euler(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
+		};
+
 		BoundingFrustum CreateFrustrumFromMatrixRH(CXMMATRIX projection);
 
 		Quaternion getRotationTo(Vector3 from, Vector3 dest);
+
+		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest);
+
+
+		/* Extract the length of each axis in the top-left 3x3 matrix.
+		*/
+		Vector3 extractAxisScale(const Matrix& m);
+		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
+		*/
+		Matrix& mult(Matrix &m, Vector3 scalars);
+
+		inline Vector3 Normalize(Vector3 v)
+		{
+			v.Normalize();
+			return v;
+		}
 
 		inline float DegreesToRadians(const float & degree)
 		{
@@ -44,7 +67,10 @@ namespace DirectX
 
 		/* Convert rotation quatenion to pitch/yaw/roll vector
 		*/
-		Vector3 ToEuler(const Quaternion & q);
+		Euler ToEuler(const Quaternion & q);
+		Euler ToEuler(const Vector3 &v);
+		Vector3 FromEuler(const Euler &e);
+
 		/* Convert pitch/yaw/roll vector to rotation quaternion
 		*/
 		inline Quaternion FromEuler(const Vector3 & rotation);

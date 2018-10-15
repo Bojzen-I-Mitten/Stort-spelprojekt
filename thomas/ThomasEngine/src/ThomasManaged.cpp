@@ -13,6 +13,9 @@
 #include <thomas\AutoProfile.h>
 #include <thomas\ProfileManager.h>
 #include <thomas\utils\GpuProfiler.h>
+#include <thomas\object\component\Camera.h>
+#include <thomas\object\component\RenderComponent.h>
+#include <thomas\graphics\LightManager.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -37,6 +40,7 @@ namespace ThomasEngine {
 
 		s_Selection = gcnew ThomasSelection();
 		Thread::CurrentThread->Name = "Main Thread";
+		thomas::ThomasCore::Core().registerThread();
 		thomas::ThomasCore::Init();
 		if (ThomasCore::Initialized())
 		{
@@ -51,7 +55,7 @@ namespace ThomasEngine {
 			Scene::CurrentScene = gcnew Scene("test");
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
-			mainThread->Name = "Thomas Engine (Main Thread)";
+			mainThread->Name = "Thomas Engine (Logic Thread)";
 			mainThread->Start();
 
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
@@ -63,7 +67,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartRenderer()
 	{
-
+		// Render thread start
+		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
 			UpdateFinished->WaitOne();
@@ -95,8 +100,12 @@ namespace ThomasEngine {
 
 		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
+
+		// Swap command lists
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
-		thomas::editor::Gizmos::TransferGizmoCommands();
+		thomas::editor::Gizmos::Gizmo().TransferGizmoCommands();
+		thomas::graphics::Renderer::Instance()->ClearCommands();
+		thomas::editor::Gizmos::Gizmo().ClearGizmos();
 
 		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
@@ -110,6 +119,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartEngine()
 	{
+		// Update thread start
+		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
@@ -159,8 +170,6 @@ namespace ThomasEngine {
 				editor::EditorCamera::Instance()->Update();
 
 				//Rendering
-				thomas::graphics::Renderer::Instance()->ClearCommands();
-				editor::Gizmos::ClearGizmos();
 				if (WindowManager::Instance())
 				{
 					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
@@ -187,10 +196,6 @@ namespace ThomasEngine {
 						showStatistics = !showStatistics;
 					}
 				}
-
-			
-
-				
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
@@ -202,8 +207,7 @@ namespace ThomasEngine {
 							Monitor::Exit(g->m_componentsLock);
 					}
 					Stop();
-				}
-					
+				}	
 			}
 			finally
 			{
@@ -211,9 +215,16 @@ namespace ThomasEngine {
 				if (WindowManager::Instance())
 				{
 					thomas::object::component::RenderComponent::ClearList();
+
+					// Wait for renderer
 					RenderFinished->WaitOne();
+					
+					/* Render & Update is synced.
+					*/
 					thomas::graphics::LightManager::Update();
 					CopyCommandList();
+					
+					// Enter async. state 
 					RenderFinished->Reset();
 					UpdateFinished->Set();
 				}
