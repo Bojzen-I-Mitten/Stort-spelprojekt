@@ -166,6 +166,7 @@ namespace ThomasEngine {
 						gameObject->Update();
 					}
 				}
+				editor::EditorCamera::Instance()->Update();
 
 				//Rendering
 				if (WindowManager::Instance())

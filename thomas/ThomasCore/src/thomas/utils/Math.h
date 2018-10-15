@@ -26,6 +26,8 @@ namespace DirectX
 			Euler(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
 		};
 
+		BoundingFrustum CreateFrustrumFromMatrixRH(CXMMATRIX projection);
+
 		Quaternion getRotationTo(Vector3 from, Vector3 dest);
 
 		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest);

@@ -89,7 +89,7 @@ namespace thomas
 			{
 				if (target == GetPosition())
 					return;
-				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, m_localWorldMatrix.Up());
+				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, math::Vector3::Up);
 				
 				Decompose();
 				SetDirty(true);
@@ -142,6 +142,17 @@ namespace thomas
 			void Transform::Translate(float x, float y, float z)
 			{
 				return Translate(math::Vector3(x, y, z));
+			}
+
+			void Transform::Scale(math::Vector3 scale)
+			{
+				SetLocalScale(m_localScale + scale);
+				SetDirty(true);
+			}
+
+			void Transform::Scale(float x, float y, float z)
+			{
+				Scale(math::Vector3(x, y, z));
 			}
 
 			math::Vector3 Transform::GetPosition()
