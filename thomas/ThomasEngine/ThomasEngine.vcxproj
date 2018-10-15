@@ -170,6 +170,7 @@
     <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\math\Curve.h" />
     <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
+    <ClInclude Include="src\object\component\GUIComponent.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
     <ClInclude Include="src\object\component\ParticleEmitter.h" />
     <ClInclude Include="src\object\component\physics\BoxCollider.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\math\Curve.cpp" />
     <ClCompile Include="src\object\component\animation\BoneTransformComponent.cpp" />
+    <ClCompile Include="src\object\component\GUIComponent.cpp" />
     <ClCompile Include="src\object\component\LightComponent.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
     <ClCompile Include="src\object\component\physics\BoxCollider.cpp" />

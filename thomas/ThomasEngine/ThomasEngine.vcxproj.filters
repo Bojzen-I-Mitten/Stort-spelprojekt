@@ -55,6 +55,7 @@
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
+    <ClCompile Include="src\object\component\GUIComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
+    <ClInclude Include="src\object\component\GUIComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

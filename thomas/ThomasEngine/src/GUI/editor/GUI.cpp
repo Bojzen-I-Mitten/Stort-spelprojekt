@@ -2,7 +2,6 @@
 
 #pragma unmanaged
 #include <thomas/editor/gizmos/Gizmos.h>
-#include <thomas/graphics/gui/ThomasGUI.h>
 
 #pragma managed
 #include "../../resource/Model.h"
@@ -115,76 +114,3 @@ void ThomasEngine::GUI::ImguiStringUpdate(String ^ text, Vector2 pos)
 	if(ThomasEngine::ThomasWrapper::InEditor())
 		thomas::editor::Gizmos::ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
 }
-//
-
-// Images
-void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact)
-{
-	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position), 
-									 interact);
-}
-
-void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector4 color, bool interact)
-{
-	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
-								     interact, Utility::Convert(color));
-}
-
-void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, bool interact)
-{
-	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
-									 interact, Utility::Convert(Vector4(1.f)), Utility::Convert(scale));
-}
-
-void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, bool interact)
-{
-	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
-									 interact, Utility::Convert(Vector4(1.f)), Utility::Convert(scale), rotation);
-}
-
-void ThomasEngine::GUI::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color, bool interact)
-{
-	thomas::GUI::ThomasGUI::AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
-									 interact, Utility::Convert(color), Utility::Convert(scale), rotation);
-}
-
-bool ThomasEngine::GUI::OnImageClicked(String^ id)
-{
-	return thomas::GUI::ThomasGUI::OnImageClicked(Utility::ConvertString(id));
-}
-
-bool ThomasEngine::GUI::OnImageHovered(String^ id)
-{
-	return thomas::GUI::ThomasGUI::OnImageHovered(Utility::ConvertString(id));
-}
-
-void ThomasEngine::GUI::SetImageTexture(String^ id, Texture2D ^ texture)
-{
-	thomas::GUI::ThomasGUI::SetImageTexture(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr);
-}
-
-void ThomasEngine::GUI::SetImagePosition(String^ id, Vector2 position)
-{
-	thomas::GUI::ThomasGUI::SetImagePosition(Utility::ConvertString(id), Utility::Convert(position));
-}
-
-void ThomasEngine::GUI::SetImageColor(String^ id, Vector4 color)
-{
-	thomas::GUI::ThomasGUI::SetImageColor(Utility::ConvertString(id), Utility::Convert(color));
-}
-
-void ThomasEngine::GUI::SetImageScale(String^ id, Vector2 scale)
-{
-	thomas::GUI::ThomasGUI::SetImageScale(Utility::ConvertString(id), Utility::Convert(scale));
-}
-
-void ThomasEngine::GUI::SetImageRotation(String^ id, float rotation)
-{
-	thomas::GUI::ThomasGUI::SetImageRotation(Utility::ConvertString(id), rotation);
-}
-
-void ThomasEngine::GUI::SetImageInteract(String^ id, bool interact)
-{
-	thomas::GUI::ThomasGUI::SetImageInteract(Utility::ConvertString(id), interact);
-}
-//

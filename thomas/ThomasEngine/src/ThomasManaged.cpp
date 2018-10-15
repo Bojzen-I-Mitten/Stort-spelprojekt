@@ -13,7 +13,6 @@
 #include <thomas\AutoProfile.h>
 #include <thomas\ProfileManager.h>
 #include <thomas\utils\GpuProfiler.h>
-#include <thomas\graphics\gui\ThomasGUI.h>
 
 #pragma managed
 #include "ThomasManaged.h"
@@ -300,8 +299,6 @@ namespace ThomasEngine {
 		}
 		OnStopPlaying();
 
-		// Clear GUI
-		thomas::GUI::ThomasGUI::Clear();
 		Debug::Log("Stopped...");
 	}
 
