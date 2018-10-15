@@ -16,6 +16,7 @@ namespace ThomasEngine
 	public ref class GameObject : public Object
 	{
 	private:
+		
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
 		Scene^ scene;
@@ -31,6 +32,7 @@ namespace ThomasEngine
 		System::String^ prefabPath;
 
 		bool m_isDestroyed = false;
+		static bool m_toBeStatic = false;
 		System::Object^ m_componentsLock = gcnew System::Object();
 
 		void SyncComponents();
@@ -42,7 +44,9 @@ namespace ThomasEngine
 
 		static void InitGameObjects(bool playing);
 
-		
+		void setStatic();
+
+		GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 				
 		void Update();
 
@@ -59,11 +63,11 @@ namespace ThomasEngine
 		}
 
 	public:
-
+		bool getToBeStatic();
 		GameObject(String^ name);
 		
 		static GameObject^ CreatePrefab();
-
+		static void toBeStatic();
 		property bool inScene {
 			bool get() {
 				return scene != nullptr;

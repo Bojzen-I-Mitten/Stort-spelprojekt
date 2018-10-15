@@ -33,10 +33,7 @@ namespace ThomasEngine
 
 	void GameObjectManager::isStatic(GameObject ^ gameObject)
 	{
-		// This doesn't happen in runtime, does not need to be fast
-
-		// Determine where gameObject resides, active or static
-
+		gameObject->toBeStatic();
 	}
 
 	void GameObjectManager::createGameObjectCore(std::string name)

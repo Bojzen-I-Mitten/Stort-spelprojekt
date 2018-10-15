@@ -16,17 +16,23 @@
 #include "../resource/Resources.h"
 #include "../serialization/Serializer.h"
 #using "PresentationFramework.dll"
+
 using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
 
 
-	GameObject::GameObject() : Object(new thomas::object::GameObject("gameobject"))
+	GameObject::GameObject() : Object(thomas::ObjectHandler::createNewGameObject("gameobject"))
 	{
 		m_name = "gameobject";
 
 		if(ThomasWrapper::InEditor())
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+	}
+
+	bool GameObject::getToBeStatic()
+	{
+		return m_toBeStatic;
 	}
 
 	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
@@ -61,6 +67,7 @@ namespace ThomasEngine {
 		Monitor::Exit(m_componentsLock);
 		return completed;
 	}
+
 	thomas::object::GameObject* GameObject::Native::get() {
 		return (thomas::object::GameObject*)nativePtr;
 	}
@@ -96,6 +103,28 @@ namespace ThomasEngine {
 				completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
+	}
+
+	void GameObject::setStatic()
+	{
+		nativePtr = static_cast<thomas::object::Object*>
+			(thomas::ObjectHandler::setStatic(
+				static_cast<thomas::object::GameObject*>(nativePtr)));	
+	}
+
+	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
+	{
+		if (nativePtr != nullptr)
+		{
+
+			for each (GameObject^ object in s_objects)
+			{
+				if (object->nativePtr == nativeptr)
+					return object;
+			}
+		}
+
+		return nullptr;
 	}
 
 	void GameObject::Update()
@@ -248,6 +277,11 @@ namespace ThomasEngine {
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
+	}
+
+	void GameObject::toBeStatic()
+	{
+		m_toBeStatic = !m_toBeStatic;
 	}
 
 

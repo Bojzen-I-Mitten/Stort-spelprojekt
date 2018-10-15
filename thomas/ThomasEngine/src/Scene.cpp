@@ -17,9 +17,11 @@
 namespace ThomasEngine
 {
 	Scene::Scene(System::String^ name) 
-	:	m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
-		m_name = name;;
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+	:	m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) 
+	{
+		m_name = name;
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects,
+																					m_gameObjectsLock);
 	}
 	Scene::Scene()
 		: m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {

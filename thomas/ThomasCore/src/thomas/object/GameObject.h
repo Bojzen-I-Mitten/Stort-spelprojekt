@@ -14,13 +14,14 @@ namespace thomas
 		private:
 			
 		public:
-			std::vector<component::Component*> m_components;
-			component::Transform* m_transform = nullptr;
-			bool m_activeSelf;
-
 			GameObject();
 			GameObject(std::string type);
 			~GameObject();
+
+			//GameObject(GameObject&& move);
+			//GameObject& operator=(GameObject&& move);
+
+		
 
 			static GameObject* Find(std::string type);
 
@@ -43,9 +44,17 @@ namespace thomas
 			template<typename T>
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, component::Transform* parent, Scene* scene);
 			bool GetActive();
+			bool GetStatic();
+			void SetStatic();
 			void SetActive(bool active);
 			void SetSelection(bool selected);
 			bool GetSelection();
+			
+		public:
+			std::vector<component::Component*> m_components;
+			component::Transform* m_transform = nullptr;
+			bool m_activeSelf;
+			bool m_staticSelf;
 
 		private:
 			bool m_selected;

@@ -223,6 +223,16 @@ namespace ThomasEngine {
 				}
 				Monitor::Exit(lock);
 				ScriptingManger::ReloadIfNeeded();
+
+				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+				{
+					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+					if (gameObject->getToBeStatic())
+					{
+						gameObject->setStatic();
+					}
+				}
+
 			}
 		}
 		Resources::UnloadAll();
