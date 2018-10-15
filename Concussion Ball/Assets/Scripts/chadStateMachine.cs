@@ -101,6 +101,7 @@ namespace ThomasEditor
                     }
                     break;
                 case State.THROWING:
+                    m_chadControls.ThrowingCamera(m_velocity, m_xStep, m_yStep);
                     // __SIMULTAENOUS__ THROW and: MOVING
                     // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
 
@@ -193,6 +194,7 @@ namespace ThomasEditor
                         // can enter following after releasing ball: walking/backing/strafing/turning/idle
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
+                            m_chadControls.ResetCamera();
                             // player was charging and is not throwing
 
                             // play throwing anim
