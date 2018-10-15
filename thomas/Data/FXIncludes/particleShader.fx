@@ -10,7 +10,6 @@ SamplerState StandardWrapSampler
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
-    ComparisonFunc = LESS;
 };
 
 DepthStencilState EnableDepth
@@ -19,9 +18,21 @@ DepthStencilState EnableDepth
     DepthWriteMask = ZERO;
     DepthFunc = LESS;
     StencilEnable = FALSE;
+    StencilReadMask = 0xff;
+    StencilWriteMask = 0xff;
+
+    FrontFaceStencilFail = KEEP;
+    FrontFaceStencilDepthFail = KEEP;
+    FrontFaceStencilPass = REPLACE;
+    FrontFaceStencilFunc = ALWAYS;
+
+    BackFaceStencilFail = KEEP;
+    BackFaceStencilDepthFail = KEEP;
+    BackFaceStencilPass = REPLACE;
+    BackFaceStencilFunc = ALWAYS;
 };
 
-RasterizerState TestRasterizer
+RasterizerState Rasterizer
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -29,15 +40,14 @@ RasterizerState TestRasterizer
     DepthClipEnable = FALSE;
 };
 
-
-BlendState AlphaBlending
+BlendState SrcAlphaBlend
 {
     BlendEnable[0] = TRUE;
     SrcBlend = SRC_ALPHA;
     DestBlend = INV_SRC_ALPHA;
     BlendOp = ADD;
     SrcBlendAlpha = ONE;
-    DestBlendAlpha = ZERO;
+    DestBlendAlpha = ONE;
     BlendOpAlpha = ADD;
     RenderTargetWriteMask[0] = 0x0F;
 };
@@ -72,9 +82,9 @@ v2f vert(uint id : SV_VertexID)
     uint vertexIndex = id % 3;
 
     output.vertex = mul(thomas_MatrixVP, float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0f));
-    //output.vertex /= output.vertex.w; 
+    output.vertex /= output.vertex.w; 
    
-    output.texcoord = float3(billboards[particleIndex].uvs[triangleIndex][vertexIndex], billboards[particleIndex].textureIndex + 0.5f);
+    output.texcoord = float3(billboards[particleIndex].uvs[triangleIndex][vertexIndex], billboards[particleIndex].textureIndex);
 
     return output;
 }
@@ -96,7 +106,7 @@ technique11 Particles
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(TestRasterizer);
-        SetBlendState(AlphaBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(Rasterizer);
+        SetBlendState(SrcAlphaBlend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
