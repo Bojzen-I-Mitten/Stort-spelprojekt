@@ -18,10 +18,11 @@ namespace thomas
 			GameObject(std::string type);
 			~GameObject();
 
-			//GameObject(GameObject&& move);
-			//GameObject& operator=(GameObject&& move);
+			GameObject(GameObject&& move);
+			GameObject& operator=(GameObject&& move);
 
-		
+			GameObject(const GameObject& move) = delete;
+			GameObject& operator=(const GameObject& move) = delete;
 
 			static GameObject* Find(std::string type);
 

@@ -30,32 +30,37 @@ namespace thomas
 			this->m_components.clear();
 		}
 
-		//GameObject::GameObject(GameObject && move)
-		//	: m_components(std::move(move.m_components)), 
-		//	m_transform(std::move(move.m_transform))
-		//{
-		//	m_activeSelf = move.m_activeSelf;
-		//	m_staticSelf = move.m_staticSelf;
-		//
-		//	move.m_transform = nullptr;
-		//	m_selected = move.m_selected;
-		//}
+		GameObject::GameObject(GameObject && move)
+			: m_components(std::move(move.m_components)), 
+			m_transform(std::move(move.m_transform))
+		{
+			m_activeSelf = move.m_activeSelf;
+			m_staticSelf = move.m_staticSelf;
+		
+			move.m_transform = nullptr;
+			m_selected = move.m_selected;
+
+			for (auto& it : m_components)
+			{
+				it->m_gameObject = this;
+			}
+		}
 
 
-		//GameObject& GameObject::operator=(GameObject && move)
-		//{
-		//	if (this != &move)
-		//	{
-		//		m_components = std::move(move.m_components);
-		//		m_transform = std::move(m_transform);
-		//		m_activeSelf = move.m_activeSelf;
-		//		m_staticSelf = move.m_staticSelf;
+		GameObject& GameObject::operator=(GameObject && move)
+		{
+			if (this != &move)
+			{
+				m_components = std::move(move.m_components);
+				m_transform = std::move(m_transform);
+				m_activeSelf = move.m_activeSelf;
+				m_staticSelf = move.m_staticSelf;
 
-		//		move.m_transform = nullptr;
-		//		m_selected = move.m_selected;
-		//	}
-		//	return *this;
-		//}
+				move.m_transform = nullptr;
+				m_selected = move.m_selected;
+			}
+			return *this;
+		}
 
 		GameObject * GameObject::Find(std::string type)
 		{
