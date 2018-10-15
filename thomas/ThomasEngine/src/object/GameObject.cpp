@@ -148,11 +148,13 @@ namespace ThomasEngine {
 
 	void GameObject::Destroy()
 	{
+		
 		if (m_isDestroyed)
 			return;
 		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		ThomasWrapper::RenderFinished->WaitOne();
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++) {
 			m_components[i]->Destroy();

@@ -78,7 +78,15 @@ namespace thomas
 		{
 			if (m_transform && m_transform->GetParent())
 			{
-				return m_activeSelf && m_transform->GetParent()->m_gameObject->m_activeSelf;
+				try {
+					return m_activeSelf && m_transform->GetParent()->m_gameObject->m_activeSelf;
+				}
+				catch (std::exception e) {
+					LOG("fail!");
+					return true;
+				}
+					
+				
 			}
 			return m_activeSelf;
 		}

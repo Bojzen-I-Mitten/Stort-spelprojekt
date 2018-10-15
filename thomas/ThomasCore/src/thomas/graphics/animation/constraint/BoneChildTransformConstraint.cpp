@@ -21,7 +21,6 @@ namespace thomas {
 			{
 				// If (transform is childTransform)
 				objectPose[boneInd] = m_ref->GetLocalWorldMatrix();
-
 				// If (Transform is World)
 				//objectPose[boneInd] = m_ref->getWorldMatrix() * /* object world inverse... */ * objectPose[skel.getBone(boneInd)._parentIndex].Invert();
 			}
