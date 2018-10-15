@@ -130,8 +130,13 @@ namespace ThomasEditor
                             m_chadControls.FreeLookCamera(m_velocity, m_xStep, m_yStep);
 
                     }
+                    if(Input.GetKeyDown(Input.Keys.LeftShift))
+                    {
+                        m_chadControls.InitFreeLookCamera();
+                    }
                     break;
                 case State.THROWING:
+                    m_chadControls.ThrowingCamera(m_velocity, m_xStep, m_yStep);
                     // __SIMULTAENOUS__ THROW and: MOVING
                     // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
 
@@ -207,6 +212,9 @@ namespace ThomasEditor
 
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
+                            m_chadControls.ResetCamera();
+                            // player was charging and is not throwing
+
                             // play throwing anim
                             m_chadControls.ThrowBall(m_chargeForce);
                             m_chargeForce = 2.0f;
@@ -327,7 +335,17 @@ namespace ThomasEditor
 
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
-                        m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
+                        //Debug.Log("Moving and turning..");
+
+                        if (!Input.GetKey(Input.Keys.LeftShift)) //normal controls
+                            m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
+                        else //free look
+                            m_chadControls.FreeLookCamera(m_velocity, m_xStep, m_yStep);
+                    }
+
+                    if (Input.GetKeyDown(Input.Keys.LeftShift))
+                    {
+                        m_chadControls.InitFreeLookCamera();
                     }
 
                     break;
