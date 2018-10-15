@@ -11,7 +11,7 @@ public class RpcTest : NetworkComponent
     {
         if (isOwner)
             if (Input.GetKeyDown(Input.Keys.Space))
-                SendRPC("RPCHelloWorld", 5, true);
+                SendRPC("RPCHelloWorld", "testString", 5, true);
     }
 
     public void RPCHelloWorld(string message, int number, bool sendMessage)
