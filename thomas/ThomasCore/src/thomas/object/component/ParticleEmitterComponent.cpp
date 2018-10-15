@@ -305,7 +305,7 @@ namespace thomas
 
 			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)
 			{
-				m_particleSystem->AddTexture(other);
+				m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(other);
 				m_texture = other;
 			}
 

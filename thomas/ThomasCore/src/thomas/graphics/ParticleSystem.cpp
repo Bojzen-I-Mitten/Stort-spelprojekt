@@ -2,7 +2,7 @@
 #include "../resource/ComputeShader.h"
 #include <random>
 #include <time.h>
-#include "../resource/texture/Texture2D.h"
+#include "../resource/texture/Texture2DArray.h"
 
 namespace thomas
 {
@@ -84,7 +84,7 @@ namespace thomas
 
 			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
 
-			
+			m_texArr = new resource::Texture2DArray(256, 256, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
 		}
 
 		void ParticleSystem::Destroy()
@@ -111,15 +111,7 @@ namespace thomas
 
 		unsigned ParticleSystem::AddTexture(resource::Texture2D * tex)
 		{
-			for (unsigned i = 0; i < m_textures.size(); ++i)
-			{
-				if (m_textures[i] == tex)//resource manager makes sure the address is unique per texture
-					return i;
-			}
-
-			m_textures.push_back(tex);
-
-			return m_textures.size();
+			return m_texArr->AddTexture(tex);
 		}
 		
 		void ParticleSystem::SpawnParticles()
@@ -228,7 +220,7 @@ namespace thomas
 		{
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
-			m_particleShader->SetGlobalTexture2DArray("textures", m_textures.data(), m_textures.size());
+			m_particleShader->SetGlobalTexture2DArray("textures", m_texArr);
 			m_particleShader->SetGlobalResource("billboards", m_bufferBillboard->GetSRV());
 			
 			m_particleShader->Bind();

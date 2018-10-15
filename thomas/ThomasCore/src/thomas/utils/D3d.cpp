@@ -12,6 +12,8 @@
 #include <comdef.h>
 #include <string.h>  
 
+#include <DirectXTex.h>
+
 namespace thomas
 {
 	namespace utils
@@ -63,7 +65,12 @@ namespace thomas
 			textureDesc.SampleDesc.Count = 1;
 			textureDesc.SampleDesc.Quality = 0;
 			textureDesc.Usage = D3D11_USAGE_DEFAULT;
-			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			if (mipMaps)
+			{
+				textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			}
+			else
+				textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 			textureDesc.CPUAccessFlags = 0;
 			textureDesc.MiscFlags = mipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
@@ -100,9 +107,10 @@ namespace thomas
 			return true;
 		}
 
-		bool D3D::CreateTextureArray(void* initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels)
+		bool D3D::CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels)
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
+
 			ZeroMemory(&textureDesc, sizeof(textureDesc));
 			textureDesc.Width = width;
 			textureDesc.Height = height;
@@ -112,7 +120,7 @@ namespace thomas
 			textureDesc.SampleDesc.Count = 1;
 			textureDesc.SampleDesc.Quality = 0;
 			textureDesc.Usage = D3D11_USAGE_DEFAULT;
-			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 			textureDesc.CPUAccessFlags = 0;
 			textureDesc.MiscFlags = mipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
@@ -120,19 +128,21 @@ namespace thomas
 			
 			if (initData)
 			{
-				std::vector<D3D11_SUBRESOURCE_DATA> texInitData(arraySize);
+				D3D11_SUBRESOURCE_DATA* texInitData = new D3D11_SUBRESOURCE_DATA[arraySize];
 				for (int i = 0; i < arraySize; ++i) {
 
 					D3D11_SUBRESOURCE_DATA sd = {};
-					sd.pSysMem = initData;
+					sd.pSysMem = initData[i];
 					sd.SysMemPitch = static_cast<UINT>(4 * width);
 					sd.SysMemSlicePitch = static_cast<UINT>(4 * width * height);
-					texInitData.push_back(sd);
+
+					texInitData[i] = sd;
 				}
-				hr = m_device->CreateTexture2D(&textureDesc, texInitData.data(), &texArray);
+				hr = m_device->CreateTexture2D(&textureDesc, texInitData, &texure2D);
+				delete[] texInitData;
 			}
 			else
-				hr = m_device->CreateTexture2D(&textureDesc, NULL, &texArray);
+				hr = m_device->CreateTexture2D(&textureDesc, NULL, &texure2D);
 
 			if (FAILED(hr))
 			{
@@ -148,7 +158,7 @@ namespace thomas
 			viewDesc.Texture2DArray.MipLevels = mipLevels;
 			viewDesc.Texture2DArray.MostDetailedMip = 0;
 
-			hr = m_device->CreateShaderResourceView(texArray, &viewDesc, &SRV);
+			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
 
@@ -446,6 +456,75 @@ namespace thomas
 
 			return true;
 		}
+		/*
+		bool D3D::LoadTextureArrayFromFiles(std::vector<std::string>& fileNames, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& textureView)
+		{
+			unsigned nrOfTextures = fileNames.size();
+			ID3D11Resource* tempTex;
+
+			DirectX::ScratchImage data;
+			byte** initData = new byte*[nrOfTextures];
+
+			for (unsigned i = 0; i < nrOfTextures; ++i)
+			{
+				char* filename_c = new char[fileNames[i].length() + 1];
+				strcpy_s(filename_c, fileNames[i].length() + 1, fileNames[i].c_str());
+				char * extension_char = PathFindExtensionA(filename_c);
+				std::string extension_string(extension_char);
+
+				delete[] filename_c;
+				HRESULT hr;
+				if (extension_string == ".dds")
+				{
+					hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContext, CA2W(fileNames[i].c_str()), &tempTex, nullptr);
+				}
+				else
+				{
+					hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContext, CA2W(fileNames[i].c_str()), &tempTex, nullptr);
+				}
+
+				if (FAILED(hr))
+				{
+					LOG("Failed to load texture " << i << ": " << fileNames[i] << " error: ");
+					LOG_HR(hr);
+
+					return false;
+				}
+
+				
+
+				DirectX::ScratchImage firstData;
+				hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), tempTex, firstData);
+				if (FAILED(hr))
+				{
+					LOG("Failed to capture texture " << i << ": " << fileNames[i] << "error: ");
+					LOG_HR(hr);
+					return false;
+				}
+				hr = DirectX::Resize(*firstData.GetImage(0,0,0), 256, 256, 0, firstData);
+				if (FAILED(hr))
+				{
+					LOG("Failed to resize texture " << i << ": " << fileNames[i] << "error: ");
+					LOG_HR(hr);
+					return false;
+				}
+				hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), DXGI_FORMAT_B8G8R8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, data);
+				if (FAILED(hr))
+				{
+					LOG("Failed to convert texture " << i << ": " << fileNames[i] << "error: ");
+					LOG_HR(hr);
+					return false;
+				}
+				firstData.Release();
+
+				initData[i] = data.GetPixels();
+				tempTex->Release(); //??
+			}
+
+			CreateTextureArray((void**)initData, 256, 256, nrOfTextures, DXGI_FORMAT_B8G8R8A8_UNORM, texure2D, textureView, false, -1);
+
+			return true;
+		}*/
 
 		bool D3D::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{

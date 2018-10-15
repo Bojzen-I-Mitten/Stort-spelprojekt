@@ -14,6 +14,7 @@ namespace thomas
 		class ComputeShader;
 		class Shader;
 		class Texture2D;
+		class Texture2DArray;
 	}
 	namespace graphics
 	{
@@ -46,7 +47,7 @@ namespace thomas
 				unsigned nrOfParticlesToEmit;
 				unsigned spawnAtSphereEdge;
 				unsigned rand;
-				unsigned pad2;
+				unsigned textureIndex;
 
 			};
 
@@ -126,7 +127,7 @@ namespace thomas
 			std::vector<InitParticleBufferStruct> m_emitters;
 			
 			resource::Shader* m_particleShader;
-			std::vector<resource::Texture2D*> m_textures;
+			resource::Texture2DArray* m_texArr;
 
 			static const unsigned int UPDATE_THREAD_DIM_X = 256;
 			static const unsigned int EMIT_THREAD_DIM_X = 128;

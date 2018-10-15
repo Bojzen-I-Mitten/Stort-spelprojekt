@@ -50,6 +50,22 @@ namespace thomas
 			}
 		}
 
+		Texture2D::Texture2D(Texture2D* other)
+		{
+			if (other == nullptr)
+				return;
+
+			m_width = other->m_width;
+			m_height = other->m_height;
+			m_mipmapCount = other->m_mipmapCount;
+			m_mipMap = other->m_mipMap;
+			m_linear = other->m_linear;
+
+			ID3D11Texture2D *textureInterface = nullptr;
+			utils::D3D::Instance()->CreateTexture(other->GetRawRGBAPixels(), m_width, m_height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, false, 1);
+			m_resource = textureInterface;
+			data = new DirectX::ScratchImage();
+		}
 
 		Texture2D::Texture2D(int width, int height, bool mipMap, bool linear) : Texture2D(nullptr, width, height, mipMap, linear)
 		{
@@ -84,7 +100,6 @@ namespace thomas
 
 		std::vector<math::Color> Texture2D::GetPixels()
 		{
-			
 			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, *data);
 
 			std::vector<math::Color> pixels;
@@ -94,8 +109,15 @@ namespace thomas
 			{
 				pixels.push_back(math::Color(rawPixels[i].v));
 			}
+			
 			return pixels;
-			data->Release();
+		}
+
+		byte * Texture2D::GetRawRGBAPixels()
+		{
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, *data);
+			
+			return data->GetPixels();
 		}
 
 		byte * Texture2D::GetRawBGRAPixels()
@@ -106,6 +128,49 @@ namespace thomas
 			firstData.Release();
 
 			return data->GetPixels();
+		}
+
+		/*bool Texture2D::ChangeFormat(DXGI_FORMAT format)
+		{
+			DirectX::ScratchImage firstData;
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, firstData);
+
+			hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), format, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, *data);
+
+
+
+			firstData.Release();
+			if (FAILED(hr))
+			{
+				LOG("Failed to convert image");
+				return false;
+			}
+			
+			return true;
+		}
+		*/
+		bool Texture2D::Resize(int width, int height)
+		{
+			DirectX::ScratchImage* resizedImage = new DirectX::ScratchImage();
+			
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, *data);
+			hr = DirectX::Resize(*data->GetImage(0, 0, 0), width, height, DirectX::TEX_FILTER_DEFAULT, *resizedImage);
+			if (FAILED(hr))
+			{
+				LOG("Failed to resize image");
+				return false;
+			}
+			
+			//replace data
+			SAFE_RELEASE(m_resource);
+			hr = DirectX::CreateTexture(utils::D3D::Instance()->GetDevice(), resizedImage->GetImage(0, 0, 0), 1, resizedImage->GetMetadata(), &m_resource);
+			
+			
+			delete data;
+
+			data = resizedImage;
+
+			return true;
 		}
 
 		Texture2D * Texture2D::GetBlackTexture()

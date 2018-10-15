@@ -4,21 +4,21 @@
 #include <ParticleHeader.h>
 
 Texture2DArray textures;
-//Texture2D diffuseTexture;
-//SamplerState diffuseSampler : register(s0);
 
 SamplerState StandardWrapSampler
 {
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
+    ComparisonFunc = LESS;
 };
 
 DepthStencilState EnableDepth
 {
     DepthEnable = TRUE;
-    DepthWriteMask = ALL;
-    DepthFunc = LESS_EQUAL;
+    DepthWriteMask = ZERO;
+    DepthFunc = LESS;
+    StencilEnable = FALSE;
 };
 
 RasterizerState TestRasterizer
@@ -30,13 +30,25 @@ RasterizerState TestRasterizer
 };
 
 
-BlendState AlphaBlendingOn
+BlendState AlphaBlending
 {
     BlendEnable[0] = TRUE;
     SrcBlend = SRC_ALPHA;
     DestBlend = INV_SRC_ALPHA;
     BlendOp = ADD;
-    SrcBlendAlpha = ZERO;
+    SrcBlendAlpha = ONE;
+    DestBlendAlpha = ZERO;
+    BlendOpAlpha = ADD;
+    RenderTargetWriteMask[0] = 0x0F;
+};
+
+BlendState AdditiveBlending
+{
+    BlendEnable[0] = TRUE;
+    SrcBlend = SRC_ALPHA;
+    DestBlend = ONE;
+    BlendOp = ADD;
+    SrcBlendAlpha = ONE;
     DestBlendAlpha = ZERO;
     BlendOpAlpha = ADD;
     RenderTargetWriteMask[0] = 0x0F;
@@ -62,7 +74,7 @@ v2f vert(uint id : SV_VertexID)
     output.vertex = mul(thomas_MatrixVP, float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0f));
     //output.vertex /= output.vertex.w; 
    
-    output.texcoord = float3(billboards[particleIndex].uvs[triangleIndex][vertexIndex], billboards[particleIndex].texIndex);
+    output.texcoord = float3(billboards[particleIndex].uvs[triangleIndex][vertexIndex], billboards[particleIndex].textureIndex + 0.5f);
 
     return output;
 }
@@ -85,6 +97,6 @@ technique11 Particles
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
         SetRasterizerState(TestRasterizer);
-        SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetBlendState(AlphaBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }

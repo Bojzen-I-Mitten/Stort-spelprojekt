@@ -2,30 +2,31 @@
 #pragma once
 
 #include "Texture2D.h"
+#include <DirectXTex.h>
+
 namespace thomas
 {
 	namespace resource
 	{
-		class Texture2DArray : Texture
+		class Texture2DArray : public Texture
 		{
 		private:
 			
 		public:
-			Texture2DArray(int width, int height, int arraySize);
+			Texture2DArray(int width, int height, DXGI_FORMAT format);
 			
-			bool AddTexture(Texture2D tex);
-
+			unsigned AddTexture(Texture2D* tex);
 
 			void OnChanged();
 
 		private:
-			DirectX::ScratchImage* data = nullptr;
 			int m_mipmapCount;
 			bool m_linear;
 			bool m_mipMap;
 
-			std::vector<Texture2D> m_textures;
+			std::vector<Texture2D*> m_textures;
 			
+			DXGI_FORMAT m_format;
 		};
 	}
 }
