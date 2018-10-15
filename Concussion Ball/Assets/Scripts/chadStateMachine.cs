@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ThomasEngine;
 using ThomasEngine.Network;
+using LiteNetLib;
+using LiteNetLib.Utils;
 
 namespace ThomasEditor
 {
@@ -17,7 +14,7 @@ namespace ThomasEditor
         RAGDOLL = 4,    // user pressed Space to jump tackle
     };
 
-    public class ChadStateMachine : ScriptComponent
+    public class ChadStateMachine : NetworkComponent
     {
         // camera is never used, but someone program crashes if this is removed as it was previously used and
         // probably still rots inside the .tds file, can probably be removed when a new scene is used
@@ -391,5 +388,23 @@ namespace ThomasEditor
                 m_chadControls.ResetCamera();
             }
         }
+
+        public override void OnRead(NetPacketReader reader, bool initialState)
+        {
+            if(isOwner)
+            {
+                reader.GetInt();
+                return;
+            }
+
+            m_state = (State)reader.GetInt();
+        }
+
+        public override bool OnWrite(NetDataWriter writer, bool initialState)
+        {
+            writer.Put((int)m_state);
+            return true;
+        }
     }
 }
+
