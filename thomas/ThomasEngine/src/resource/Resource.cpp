@@ -33,6 +33,8 @@ namespace ThomasEngine
 		m_path = newPath;
 		m_nativePtr->Rename(Utility::ConvertString(newPath));
 		OnPropertyChanged("Name");
+		OnRename();
+
 	}
 
 	bool Resource::operator ==(Resource^ a, Resource^ b)

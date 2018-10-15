@@ -14,6 +14,7 @@ namespace thomas
 			public:
 				typedef void(*OnCollisionEvent)(Collider* otherCollider, Physics::COLLISION_TYPE collisionType);
 			public:
+				Collider();
 				Collider(btCollisionShape* collisionShape);
 				~Collider();
 				
@@ -37,6 +38,7 @@ namespace thomas
 				
 			protected:
 				math::Vector3 m_center;
+				math::Vector3 m_scaling;
 				bool m_trigger = false;
 				btCollisionShape* m_collisionShape = nullptr;
 				btCollisionObject* m_collisionObject = nullptr;

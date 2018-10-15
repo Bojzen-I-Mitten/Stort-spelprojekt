@@ -7,20 +7,24 @@
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
+#include "resource/MemoryAllocation.h"
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
 #include "utils\d3d.h"
 #include <d3d11_4.h>
 #include <comdef.h>
-
-#include "object/component/LightComponent.h"
+#include "AutoProfile.h"
+#include "utils/GpuProfiler.h"
+#include "graphics/Renderer.h"
+#include "graphics\ParticleSystem.h"
 
 namespace thomas 
 {
 	std::vector<std::string> ThomasCore::s_logOutput;
 	bool ThomasCore::s_clearLog;
 	bool ThomasCore::s_initialized;
+	bool ThomasCore::s_isEditor = false;
 	ImGuiContext* ThomasCore::s_imGuiContext;
 
 	bool ThomasCore::Init()
@@ -44,6 +48,7 @@ namespace thomas
 		editor::Gizmos::Init();
 
 		graphics::LightManager::Initialize();
+		graphics::ParticleSystem::InitializeGlobalSystem();
 
 		s_initialized = true;
 		return s_initialized;
@@ -51,6 +56,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();
@@ -58,14 +64,34 @@ namespace thomas
 		}
 
 		object::Object::Clean();
-		editor::EditorCamera::Instance()->Update();
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
+	}
+
+	void ThomasCore::Render()
+	{
+		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->BeginFrame();
+		WindowManager::Instance()->ClearAllWindows();
+		profiler->Timestamp(profiling::GTS_MAIN_CLEAR);
+		graphics::Renderer::Instance()->ProcessCommands();
+
+		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
+		//  (whose data we're getting) will have finished on the GPU by now.
+
+		profiler->WaitForDataAndUpdate();
+		WindowManager::Instance()->PresentAllWindows();
+		utils::D3D::Instance()->GetProfiler()->EndFrame();
 	}
 
 	void ThomasCore::Exit()
 	{
 		s_initialized = false;
+	}
+
+	ThomasCore::ThomasCore()
+		: m_memAlloc(new resource::MemoryAllocation())
+	{
 	}
 
 	bool ThomasCore::Initialized()
@@ -78,6 +104,7 @@ namespace thomas
 		//Destroy all objects
 		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
+		graphics::ParticleSystem::DestroyGlobalSystem();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
@@ -98,6 +125,17 @@ namespace thomas
 		return s_logOutput;
 	}
 
+	ThomasCore & ThomasCore::Core()
+	{
+		static ThomasCore core;
+		return core;
+	}
+
+	resource::MemoryAllocation * ThomasCore::Memory()
+	{
+		return  m_memAlloc;
+	}
+
 	void ThomasCore::LogOutput(const std::string & message)
 	{
 		s_logOutput.push_back(message);
@@ -108,6 +146,14 @@ namespace thomas
 	void ThomasCore::ClearLogOutput()
 	{
 		s_clearLog = true;
+	}
+	bool ThomasCore::IsEditor()
+	{
+		return s_isEditor;
+	}
+	void ThomasCore::SetEditor(bool value)
+	{
+		s_isEditor = value;
 	}
 }
 

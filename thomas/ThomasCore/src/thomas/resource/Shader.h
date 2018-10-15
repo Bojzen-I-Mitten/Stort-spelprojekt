@@ -37,9 +37,10 @@ namespace thomas
 			};
 		private:
 			static bool Compile(std::string path, ID3DX11Effect** effect);
-
+		protected:
 			Shader(ID3DX11Effect* effect, std::string path);
 			~Shader();
+		private:
 			void SetupReflection();
 			DXGI_FORMAT GetDXGIFormat(BYTE mask, D3D_REGISTER_COMPONENT_TYPE componentType);
 			
@@ -71,10 +72,13 @@ namespace thomas
 			void BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers);
 			void BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer);
 			void Bind();
+			void Draw(UINT vertexCount, UINT startVertexLocation);
+			void DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation);
 			std::vector<ShaderPass>* GetPasses();
 			void SetPass(int passIndex);
 			ShaderPass& GetCurrentPass();
 			static void DestroyAllShaders();
+			static bool DestroyShader(Shader* shader);
 
 			static void SetGlobalColor(const std::string& name, math::Color value);
 
@@ -93,6 +97,7 @@ namespace thomas
 			static Shader* FindByName(const std::string& name);
 			static Shader* FindByPath(const std::string& path);
 
+			static void SetGlobalUAV(const std::string & name, ID3D11UnorderedAccessView* value);
 
 			std::vector<std::string> GetMaterialProperties();
 			ID3DX11Effect* GetEffect();

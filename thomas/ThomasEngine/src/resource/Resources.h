@@ -13,10 +13,6 @@ namespace ThomasEngine
 		static System::Collections::Generic::Dictionary<String^, Resource^>^ resources = gcnew System::Collections::Generic::Dictionary<String^, ThomasEngine::Resource^>();
 	internal:
 
-		generic<typename T>
-		where T : Resource
-		static T Deserialize(String^ path);
-
 	public:
 		enum class AssetTypes
 		{
@@ -39,7 +35,6 @@ namespace ThomasEngine
 		static GameObject ^ LoadPrefab(String^ path);
 		static GameObject ^ LoadPrefab(String^ path, bool forceInstantiate);
 
-		static bool SaveResource(Resource^ resource);
 
 		static String^ GetUniqueName(String^ path);
 

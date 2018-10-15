@@ -10,7 +10,9 @@
 #include <thomas\Physics.h>
 #include <thomas\editor\Editor.h>
 #include <thomas\editor\EditorCamera.h>
-
+#include <thomas\AutoProfile.h>
+#include <thomas\ProfileManager.h>
+#include <thomas\utils\GpuProfiler.h>
 #pragma managed
 #include "ThomasManaged.h"
 #include "resource\Model.h"
@@ -26,7 +28,13 @@ using namespace thomas;
 
 namespace ThomasEngine {
 
+
 	void ThomasWrapper::Start() {
+
+		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
+
+		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
+
 		s_Selection = gcnew ThomasSelection();
 		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Init();
@@ -60,16 +68,33 @@ namespace ThomasEngine {
 		{
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
-			WindowManager::Instance()->ClearAllWindows();
-			graphics::Renderer::Instance()->ProcessCommands();
-			WindowManager::Instance()->PresentAllWindows();
+			ThomasCore::Render();
 			RenderFinished->Set();
 		}
 	}
 
 	void ThomasWrapper::CopyCommandList()
 	{
-		WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
+
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(showStatistics);
+		if (showStatistics) {
+			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
+			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
+			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
+			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
+			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+			ImGui::Text("RAM Usage: %.2f MB", ramUsage);
+			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
+			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
+			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			ImGui::End();
+		}
+
+		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
+			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
 		thomas::editor::Gizmos::TransferGizmoCommands();
 
@@ -92,14 +117,17 @@ namespace ThomasEngine {
 				Thread::Sleep(1000);
 				continue;
 			}
+			NEW_FRAME();
+			float timeStart = ThomasTime::GetElapsedTime();
+			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 			try {
 
 				thomas::ThomasTime::Update();
 				
-			if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
-				RenderFinished->WaitOne();
-			WindowManager::Instance()->Update();
+				if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
+					RenderFinished->WaitOne();
+				WindowManager::Instance()->Update();
 
 
 				ThomasCore::Update();
@@ -119,33 +147,34 @@ namespace ThomasEngine {
 					thomas::Physics::Simulate();
 				}
 
-			//Logic
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
-			{
-				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-				if (gameObject->GetActive())
+				//Logic
+				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 				{
-					gameObject->Update();
-				}
-			}
-
-			//Rendering
-			thomas::graphics::Renderer::Instance()->ClearCommands();
-			editor::Gizmos::ClearGizmos();
-			if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
-			{
-				if (renderingEditor)
-				{
-					editor::EditorCamera::Instance()->Render();
-					//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+					if (gameObject->GetActive())
 					{
-						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-						if (gameObject->GetActive())
-							gameObject->RenderGizmos();
+						gameObject->Update();
 					}
+				}
+				editor::EditorCamera::Instance()->Update();
 
-						s_Selection->render();
+				//Rendering
+				thomas::graphics::Renderer::Instance()->ClearCommands();
+				editor::Gizmos::ClearGizmos();
+				if (WindowManager::Instance())
+				{
+					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
+					{
+						editor::EditorCamera::Instance()->Render();
+						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
+						for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+						{
+							GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+							if (gameObject->GetActive())
+								gameObject->RenderGizmos();
+						}
+
+							s_Selection->render();
 					}
 				
 					//end editor rendering
@@ -154,7 +183,13 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
+					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
+						showStatistics = !showStatistics;
+					}
+						
 				}
+
+			
 
 				
 			}
@@ -164,15 +199,17 @@ namespace ThomasEngine {
 					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 					{
 						GameObject^ g = Scene::CurrentScene->GameObjects[i];
-						Monitor::Exit(g->m_componentsLock);
+						if(Monitor::IsEntered(g->m_componentsLock))
+							Monitor::Exit(g->m_componentsLock);
 					}
 					Stop();
 				}
 					
-					
-			}finally
+			}
+			finally
 			{
-				if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
+				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
+				if (WindowManager::Instance())
 				{
 					thomas::object::component::RenderComponent::ClearList();
 					RenderFinished->WaitOne();
@@ -191,6 +228,8 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
+		ProfileManager::dumpDataToFile("data.csv");
+	
 		thomas::ThomasCore::Exit();
 	}
 
@@ -198,6 +237,12 @@ namespace ThomasEngine {
 	{
 		if (thomas::ThomasCore::Initialized())
 			WindowManager::Instance()->Create((HWND)hWnd.ToPointer(), isEditor);
+
+		if (isEditor) {
+			inEditor = true;
+			thomas::ThomasCore::SetEditor(true);
+		}
+			
 	}
 
 
@@ -279,8 +324,17 @@ namespace ThomasEngine {
 	}
 
 	
+	bool ThomasWrapper::InEditor()
+	{
+		return inEditor;
+	}
+
 	void ThomasWrapper::ToggleEditorRendering()
 	{
 		renderingEditor = !renderingEditor;
+	}
+	void ThomasWrapper::TogglePhysicsDebug()
+	{
+		Physics::s_drawDebug = !Physics::s_drawDebug;
 	}
 }

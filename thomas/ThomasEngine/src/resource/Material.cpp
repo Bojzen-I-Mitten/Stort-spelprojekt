@@ -6,16 +6,24 @@
 #include "Shader.h"
 #include "texture\Texture2D.h"
 #include "Resources.h"
-#include "..\SceneSurrogate.h"
+#include "../serialization/Serializer.h"
 namespace ThomasEngine {
 
 	Material::Material(ThomasEngine::Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
 	{
-		m_loaded = true;
 	}
 	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
-		m_loaded = true;
+	}
+
+	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
+	{
+
+	}
+
+	void Material::OnRename()
+	{
+		OnChange();
 	}
 
 	Material^ Material::StandardMaterial::get() {
@@ -31,9 +39,25 @@ namespace ThomasEngine {
 		else
 			return gcnew ThomasEngine::Shader(nativePtr);
 	}
-
 	void Material::Shader::set(ThomasEngine::Shader^ value)
 	{
+		shader = value;
+		OnChange();
+	}
+
+
+	void Material::OnChange()
+	{
+#ifdef _EDITOR
+		if (!ThomasWrapper::IsPlaying())
+			Serializer::SerializeMaterial(this, m_path);
+#endif
+	}
+
+	void Material::shader::set(ThomasEngine::Shader^ value)
+	{
+		if (!value)
+			return;
 		if (m_nativePtr)
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		else
@@ -41,11 +65,10 @@ namespace ThomasEngine {
 			m_nativePtr = new thomas::resource::Material(Utility::ConvertString(m_path));
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		}
-
-		if (m_loaded && !ThomasWrapper::IsPlaying())
-		{
-			ThomasEngine::Resources::SaveResource(this);
-		}
+	}
+	Shader^ Material::shader::get()
+	{
+		return Shader;
 	}
 
 	Texture2D^ Material::GetTexture2D(String^ name)
@@ -67,11 +90,24 @@ namespace ThomasEngine {
 
 	void Material::EditorProperties::set(Dictionary<String^, System::Object^>^ value)
 	{
-
+		properties = value;
+		OnChange();
+	}
+	Dictionary<String^, System::Object^>^ Material::EditorProperties::get() {
+		return GetEditorProperties();
+	}
+	void Material::properties::set(Dictionary<String^, System::Object^>^ value)
+	{
 		for each(String^ key in value->Keys)
 		{
 			System::Object^ prop = value[key];
 			Type^ t = prop->GetType();
+			if (t == Newtonsoft::Json::Linq::JObject::typeid)
+			{
+				Newtonsoft::Json::Linq::JObject^ jo = (Newtonsoft::Json::Linq::JObject^)prop;
+				prop = jo->ToObject<Resource^>(Serializer::serializer);
+				t = prop->GetType();
+			}
 			if (t == Vector4::typeid)
 			{
 				Vector4 v = (Vector4)prop;
@@ -93,10 +129,9 @@ namespace ThomasEngine {
 				SetFloat(key, v);
 			}
 		}
-		if (m_loaded && !ThomasWrapper::IsPlaying())
-		{
-			ThomasEngine::Resources::SaveResource(this);
-		}
+	}
+	Dictionary<String^, System::Object^>^ Material::properties::get() {
+		return GetEditorProperties();
 	}
 
 
@@ -152,7 +187,6 @@ namespace ThomasEngine {
 		types->Add(Texture::typeid);
 		types->Add(Texture2D::typeid);
 		types->Add(ThomasEngine::Shader::typeid);
-		types->Add(SceneResource::typeid);
 		return types;
 	}
 }

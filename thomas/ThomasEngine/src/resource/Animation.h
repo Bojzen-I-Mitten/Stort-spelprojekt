@@ -15,7 +15,7 @@ namespace ThomasEngine
 	public:
 		Animation(String^ path);
 
-		thomas::resource::Animation* get();
+		thomas::resource::Animation* Native();
 
 		virtual ~Animation();
 		[OnDeserializedAttribute]

@@ -22,12 +22,15 @@ namespace thomas
 		static float GetFrameTime();
 		static int GetFPS();
 
+		static float GetElapsedTime();
+
 	private:
-		static double GetElapsedTime();
+		static double UpdateDeltaTime();
 	
 	private:
 		static double s_initTime;
 		static double s_startTime;
+		static double s_lastDeltaTime;
 		static double s_timeFreq;
 		static double s_DeltaTime;
 		static float s_FPS;

@@ -11,9 +11,9 @@
 #include "component\physics\BoxCollider.h"
 #include "component\physics\SphereCollider.h"
 #include "..\Debug.h"
-#include "../SceneSurrogate.h"
 #include "../resource/Model.h"
 #include "../resource/Resources.h"
+#include "../serialization/Serializer.h"
 #using "PresentationFramework.dll"
 using namespace System;
 using namespace System::Threading;
@@ -24,7 +24,8 @@ namespace ThomasEngine {
 	{
 		m_name = "gameobject";
 
-		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		if(ThomasWrapper::InEditor())
+			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 	}
 
 	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))
@@ -37,7 +38,7 @@ namespace ThomasEngine {
 
 		Scene::CurrentScene->GameObjects->Add(this);
 		scene = Scene::CurrentScene;
-		System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -46,16 +47,30 @@ namespace ThomasEngine {
 	{
 		Monitor::Enter(m_componentsLock);
 		bool completed = true;
-		for each(Component^ component in m_components)
+		for(int i=0; i < m_components.Count; i++)
 		{
+			Component^ component = m_components[i];
 			Type^ typ = component->GetType();
-			if ((playing || typ->IsDefined(ExecuteInEditor::typeid, false)) && !component->initialized) {
+			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
+			if ((playing || executeInEditor) && !component->initialized) {
 				completed = false;
 				component->Initialize();
 			}
 		}
 		Monitor::Exit(m_componentsLock);
 		return completed;
+	}
+	thomas::object::GameObject* GameObject::Native::get() {
+		return (thomas::object::GameObject*)nativePtr;
+	}
+
+	void GameObject::FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root)
+	{
+		list->Add(root);
+		for each(Transform^ child in root->transform->children)
+		{
+			GameObject::FlattenGameObjectTree(list, child->gameObject);
+		}
 	}
 
 	void GameObject::PostLoad(Scene^ scene)
@@ -75,8 +90,7 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) 
-			{
+			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
@@ -137,6 +151,7 @@ namespace ThomasEngine {
 	{
 		if (m_isDestroyed)
 			return;
+		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		Monitor::Enter(m_componentsLock);
@@ -147,7 +162,6 @@ namespace ThomasEngine {
 		Object::Destroy();
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
-		ThomasWrapper::Selection->UnSelectGameObject(this);
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
@@ -165,6 +179,11 @@ namespace ThomasEngine {
 			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
+		if (original->m_isDestroyed)
+		{
+			Debug::LogError("Trying to instantiate destroyed object.");
+			return nullptr;
+		}
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
@@ -173,8 +192,8 @@ namespace ThomasEngine {
 		else
 		{
 			try {
-				System::IO::Stream^ serialized = SerializeGameObject(original);
-				clone = DeSerializeGameObject(serialized);
+				Newtonsoft::Json::Linq::JArray^ serialized = Serializer::SerializeGameObject(original);
+				clone = Serializer::DeserializeGameObject(serialized);
 			}
 			catch (Exception^ e)
 			{
@@ -185,6 +204,7 @@ namespace ThomasEngine {
 		}
 		
 		if (clone) {
+			clone->transform->SetParent(nullptr, true);
 			clone->PostInstantiate(Scene::CurrentScene);
 			clone->prefabPath = nullptr;
 		}
@@ -197,7 +217,7 @@ namespace ThomasEngine {
 	{
 		GameObject^ clone = Instantiate(original);
 		if(clone)
-			clone->transform->parent = parent;
+			clone->transform->SetParent(parent, true);
 		return clone;
 	}
 
@@ -226,58 +246,6 @@ namespace ThomasEngine {
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
-	}
-
-	void GameObject::SerializeGameObject(String ^ path, GameObject ^ gObj)
-	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-
-		Xml::XmlWriterSettings^ settings = gcnew Xml::XmlWriterSettings();
-		settings->Indent = true;
-				
-		Xml::XmlWriter^ writer = Xml::XmlWriter::Create(path, settings);
-		serializer->WriteObject(writer, gObj);
-		writer->Close();
-	}
-
-	System::IO::Stream^ GameObject::SerializeGameObject(GameObject ^ gObj)
-	{
-		using namespace System::Runtime::Serialization;
-		DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-		auto list = Component::GetAllComponentTypes();
-		list->Add(SceneResource::typeid);
-		serializerSettings->KnownTypes = list;
-		serializerSettings->PreserveObjectReferences = true;
-		serializerSettings->DataContractSurrogate = gcnew SceneSurrogate();
-		DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-
-		System::IO::Stream^ stream = gcnew System::IO::MemoryStream();
-		serializer->WriteObject(stream, gObj);
-		return stream;
-	}
-
-	GameObject ^ GameObject::DeSerializeGameObject(System::IO::Stream ^ stream)
-	{
-			using namespace System::Runtime::Serialization;
-			DataContractSerializerSettings^ serializerSettings = gcnew DataContractSerializerSettings();
-			auto list = Component::GetAllComponentTypes();
-			list->Add(SceneResource::typeid);
-			serializerSettings->KnownTypes = list;
-			serializerSettings->PreserveObjectReferences = true;
-			serializerSettings->DataContractSurrogate = gcnew SceneSurrogate();
-			DataContractSerializer^ serializer = gcnew DataContractSerializer(GameObject::typeid, serializerSettings);
-
-			stream->Seek(0, System::IO::SeekOrigin::Begin);
-			GameObject^ gObj = (GameObject^)serializer->ReadObject(stream);
-			gObj->PostLoad(nullptr);
-			return gObj;
 	}
 
 
@@ -350,20 +318,18 @@ namespace ThomasEngine {
 
 	List<GameObject^>^ GameObject::GetAllGameObjects(bool includePrefabs) {
 		List<GameObject^>^ gObjs = ThomasEngine::Object::GetObjectsOfType<GameObject^>();
-		if (includePrefabs)
-			return gObjs;
-		else
-		{
-			for (int i = 0; i < gObjs->Count; i++) {
-				if (!gObjs[i]->inScene) {
+
+		for (int i = 0; i < gObjs->Count; i++) {
+			if (!gObjs[i]->inScene) {
+				if (!includePrefabs || !gObjs[i]->prefabPath) {
 					gObjs->RemoveAt(i);
 					i--;
 				}
-
+				
 			}
-			return gObjs;
+
 		}
-		return nullptr;
+		return gObjs;
 	}
 
 	GameObject^ GameObject::Find(String^ name)
@@ -378,13 +344,16 @@ namespace ThomasEngine {
 
 	bool GameObject::GetActive()
 	{
+		if((thomas::object::GameObject*)nativePtr != nullptr)
 		return ((thomas::object::GameObject*)nativePtr)->GetActive();
+		return false;
 	}
 
 	void GameObject::SetActive(bool active)
 	{
-		((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		activeSelf = active;
+		((thomas::object::GameObject*)nativePtr)->SetActive(active);
+		
 
 	}
 
@@ -409,6 +378,19 @@ namespace ThomasEngine {
 				
 		}
 		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
+		OnPropertyChanged("activeSelf");
+	}
+
+	String^ GameObject::Name::get() {
+		if (inScene)
+			return m_name;
+		else
+			return m_name + " (prefab)";
+	}
+	void GameObject::Name::set(System::String^ value)
+	{
+		m_name = value;
+		OnPropertyChanged("Name");
 	}
 
 	Transform^ GameObject::transform::get()
@@ -434,7 +416,7 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++) {
 			m_components[i]->gameObject = this;
 		}
-		m_transform = GetComponent<Transform^>();
+		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));
 	}
 

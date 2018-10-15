@@ -13,6 +13,9 @@ namespace ThomasEngine {
 	public ref class ThomasWrapper
 	{
 	private:
+		static bool inEditor = false;
+		static float cpuTime = 0.0f;
+		static bool showStatistics = false;
 		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
@@ -67,8 +70,10 @@ namespace ThomasEngine {
 		static void ToggleEditorGizmoManipulatorMode();
 
 	
+		static bool InEditor();
 
 		static void ToggleEditorRendering();
+		static void TogglePhysicsDebug();
 	public:
 
 		static property float FrameRate

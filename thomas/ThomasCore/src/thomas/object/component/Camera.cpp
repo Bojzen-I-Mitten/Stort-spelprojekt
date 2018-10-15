@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
+#include "../../AutoProfile.h"
 namespace thomas
 {
 	namespace object
@@ -17,7 +18,7 @@ namespace thomas
 			void Camera::UpdateProjMatrix()
 			{
 				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
-				m_frustrum = math::BoundingFrustum(m_projMatrix);
+				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
 			Camera::Camera(bool dontAddTolist)
@@ -102,6 +103,7 @@ namespace thomas
 
 			math::Ray Camera::ScreenPointToRay(math::Vector2 point)
 			{
+				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				// Move the mouse cursor coordinates into the -1 to +1 range.
 				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
 
@@ -189,6 +191,7 @@ namespace thomas
 
 			void Camera::Render()
 			{
+				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
 					if(renderComponent->m_gameObject->GetActive())
@@ -232,8 +235,45 @@ namespace thomas
 				return frustrum;
 			}
 
+			math::BoundingFrustum Camera::GetSubFrustrum(math::Rectangle rect)
+			{
+				
+				math::BoundingFrustum subFrustrum(GetFrustrum());
+
+				math::Rectangle window = math::Rectangle(GetViewport().x, GetViewport().y, GetViewport().width, GetViewport().height);
+				math::Vector2 center = window.Center();
+				window.Offset(-center.x, -center.y);
+				rect.Offset(-center.x, -center.y);
+
+
+				if (rect.width < 0)
+				{
+					rect.x = rect.x + rect.width;
+					rect.width = abs(rect.width);
+				}
+
+				if (rect.height < 0)
+				{
+					rect.y = rect.y + rect.height;
+					rect.height = abs(rect.height);
+				}
+
+				float left = (float)rect.x / (float)window.x;
+				float right = (float)(rect.x + rect.width) / (float)(window.x + window.width);
+				float top = (float)rect.y / (float)window.y;
+				float bottom = (float)(rect.y + rect.height) / (float)(window.y + window.height);
+
+				subFrustrum.LeftSlope *= left;
+				subFrustrum.RightSlope *= right;
+				subFrustrum.TopSlope *= top;
+				subFrustrum.BottomSlope *= bottom;
+				
+				return subFrustrum;
+			}
+
 			void Camera::CopyFrameData()
 			{
+				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				m_frameData.targetDisplay = GetTargetDisplayIndex();
 				m_frameData.viewport = GetViewport();
 				m_frameData.viewMatrix = GetViewMatrix();

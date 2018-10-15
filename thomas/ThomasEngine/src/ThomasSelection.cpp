@@ -3,6 +3,7 @@
 #pragma managed
 #include "ThomasSelection.h"
 #include "object\GameObject.h"
+#include "Debug.h"
 
 using namespace System::Threading;
 namespace ThomasEngine {
@@ -16,17 +17,27 @@ namespace ThomasEngine {
 	{
 	}
 
-
-	void ThomasSelection::SelectGameObject(GameObject^ gObj)
+	void ThomasSelection::SelectGameObject(GameObject^ gObj) 
+	{
+		SelectGameObject(gObj, true);
+	}
+	void ThomasSelection::SelectGameObject(GameObject^ gObj, bool clearSelection)
 	{
 		Monitor::Enter(m_lock);
 #if _DEBUG
 		lockOwner = Thread::CurrentThread->Name;
 #endif
 		try {
-			m_SelectedGameObjects->Clear();
+			if (clearSelection) {
+				m_SelectedGameObjects->Clear();
+				thomas::editor::EditorCamera::Instance()->UnselectObjects();
+			}
 			m_SelectedGameObjects->Add(gObj);
-			thomas::editor::EditorCamera::Instance()->SelectObject((thomas::object::GameObject*)gObj->nativePtr);
+			thomas::editor::EditorCamera::Instance()->ToggleObjectSelection((thomas::object::GameObject*)gObj->nativePtr);
+		}
+		catch (Exception^ e) {
+			m_SelectedGameObjects->Clear();
+			Debug::Log("Warning! Selection failed object corrupt with error: " + e->Message);
 		}
 		finally	{
 			Monitor::Exit(m_lock);

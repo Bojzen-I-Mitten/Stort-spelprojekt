@@ -1,13 +1,22 @@
 #pragma once
 #include "../Component.h"
 #include "../../../Physics.h"
-
+#include "CapsuleCollider.h"
 namespace thomas
 {
+	namespace graphics
+	{
+		namespace animation
+		{
+			class BoneConstraint;
+		}
+	}
 	namespace object
 	{
 		namespace component
 		{
+
+
 			enum ActivationState
 			{
 				Default = WANTS_DEACTIVATION,
@@ -45,10 +54,18 @@ namespace thomas
 				void SetFreezeRotation(const math::Vector3& freezeRotation);
 				void SetLinearVelocity(const math::Vector3& linearVel);
 				void SetAngularVelocity(const math::Vector3& angularVel);
+				void SetDamping(const math::Vector2& damping);
+				void SetSleepingThresholds(const math::Vector2& thresholds);
+				void SetDeactivationTime(float deactivationTime);
+				void SetContactProcessingThreshold(float contactProcessingThreshold);
+				void SetCcdMotionThreshold(float motionThreshold);
+				void SetCcdSweptSphereRadius(float sphereRadius);
 				void SetActivationState(ActivationState state);
 				void SetKinematic(bool kinematic);
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
+				void SetCenterOfmass(math::Vector3 Centerofmass);
+				math::Vector3 GetCenterOfmass();
 
 			public:
 				float GetMass() const;
@@ -57,17 +74,29 @@ namespace thomas
 				math::Vector3 GetFreezeRotation() const;
 				math::Vector3 GetLinearVelocity() const;
 				math::Vector3 GetAngularVelocity() const;
+				math::Vector2 GetDamping() const;
+				math::Vector2 GetSleepingThresholds() const;
+				float GetDeactivationTime() const;
+				float GetContactProcessingThreshold() const;
+				float GetCcdMotionThreshold() const;
+				float GetCcdSweptSphereRadius() const;
+				ActivationState GetActivationState() const;
 
 			private:
 				void UpdateRigidbodyMass();
-
+				void UpdateProperties();
 			private:
 				Collider * m_collider = nullptr;
 				math::Vector3 m_freezePosition;
 				math::Vector3 m_freezeRotation;
+				math::Vector2 m_damping;
+				math::Vector2 m_sleepingThresholds;
 				math::Matrix m_prevMatrix;
+				ActivationState m_activationState;
+				math::Vector3 m_LocalCenterOfMassChange;
 				float m_mass;
 				bool m_kinematic;
+				bool m_dirty;
 			};
 		}
 	}

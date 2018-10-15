@@ -6,17 +6,29 @@ namespace thomas
 
 	void WindowManager::Create(HWND hWnd, bool isEditor)
 	{
+		
 		if (isEditor)
 		{
 			m_editorWindow = new EditorWindow(hWnd);
-			s_current = m_editorWindow;
+			m_current = m_editorWindow;
 			m_windows.push_back(m_editorWindow);
 		}
 		else
 		{
 			Window* window = new Window(hWnd);
-			s_current = window;
+			m_current = window;
 			m_windows.push_back(window);
+		}
+	}
+
+	void WindowManager::UpdateFocus()
+	{
+		POINT p;
+		if (GetCursorPos(&p))
+		{
+			HWND hWnd = WindowFromPoint(p);
+			Window* window = GetWindow(hWnd);
+			m_current = window;
 		}
 	}
 
@@ -46,7 +58,6 @@ namespace thomas
 			if (window->Initialized())
 			{
 				window->Present();
-				window->UnBind();
 			}
 	}
 
@@ -61,11 +72,15 @@ namespace thomas
 
 	void WindowManager::Update()
 	{
+		UpdateFocus();
 		for (Window* window : m_windows)
 		{
 			window->UpdateWindow();
-			window->GetInput()->Update();
-		}
+			if (m_current == window) {
+				m_current->GetInput()->Update();
+			}else
+				window->GetInput()->Reset();
+		}		
 	}
 
 	int WindowManager::GetNumOfWindows()
@@ -75,7 +90,28 @@ namespace thomas
 
 	Window* WindowManager::GetCurrentBound()
 	{
-		return s_current;
+		return m_current;
+	}
+
+	Input * WindowManager::GetCurrentInput()
+	{
+		if (m_current)
+			return m_current->GetInput();
+		else
+			return &m_dummyInput;
+	}
+
+	Input * WindowManager::GetGameInput()
+	{
+		if (!m_current || m_current->IsEditor())
+			return &m_dummyInput;
+		else
+			return m_current->GetInput();
+	}
+
+	void WindowManager::SetCurrentBound(Window * value)
+	{
+		m_current = value;
 	}
 
 	EditorWindow * WindowManager::GetEditorWindow()
@@ -85,10 +121,12 @@ namespace thomas
 
 	Window * WindowManager::GetWindow(int index)
 	{
-		if ((index + 1) < m_windows.size())
+		if (m_editorWindow)
+			index += 1; //offset to make -1 editor window.
+		if ((index) < m_windows.size())
 		{
-			s_current = m_windows[index + 1];
-			return m_windows[index + 1];
+			//s_current = m_windows[index + 1];
+			return m_windows[index];
 		}
 			
 		return nullptr;
@@ -99,7 +137,6 @@ namespace thomas
 		for (auto window : m_windows)
 			if (window->GetWindowHandler() == hWnd)
 			{
-				s_current = window;
 				return window;
 			}
 

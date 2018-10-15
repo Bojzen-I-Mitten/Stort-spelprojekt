@@ -6,37 +6,70 @@ namespace ThomasEngine.Network
 {
     [HideInInspector]
     public class NetworkComponent : ScriptComponent
-    {        
-        internal NetworkID networkID;
+    {
+        protected bool isDirty = false;
+        private int prefabID;
+        private NetworkIdentity networkIdentity;
+        protected float SmoothingFactor = 1.0f / 3;
+
+
+        protected int ID
+        {
+            get { return Identity.ID; }
+        }
+
+        protected NetworkIdentity Identity
+        {
+            get
+            {
+                if (networkIdentity == null)
+                {
+                    networkIdentity = gameObject.GetComponent<NetworkIdentity>();
+                    if (networkIdentity == null)
+                    {
+                        Debug.Log("There is no networkIdentity on this object.");
+                    }
+                }
+                return networkIdentity;
+            }
+        }
+
+        protected float SendInterval
+        {
+            get{return 1.0f/NetworkManager.instance.TICK_RATE;}
+        }
 
         [Browsable(false)]
         public bool isOwner
         {
-            get {return networkID != null ? networkID.Owner : false; }
-            set { if (networkID != null) { networkID.Owner = value; } }
+            get { return Identity ? Identity.Owner : false; } 
         }
 
-        [Browsable(false)]
-        public bool isClient
+        virtual public void OnRead(NetPacketReader reader, bool initialState)
         {
-            get { return NetworkManager.instance.isClient; }
+            if (!initialState)
+                reader.GetInt();
         }
 
-        [Browsable(false)]
-        public bool isServer
+        virtual public bool OnWrite(NetDataWriter writer, bool initialState)
         {
-            get { return !isClient; }
+            if (!initialState)
+                writer.Put(0);
+            return false;
         }
 
-        virtual public void Read(NetPacketReader reader)
+        virtual public void OnGotOwnership() { }
+        virtual public void OnLostOwnership() { }
+        
+        protected void TakeOwnership(GameObject obj)
         {
-
+            NetworkIdentity networkIdentity = obj.GetComponent<NetworkIdentity>();
+            if(networkIdentity != null)
+            {
+                networkIdentity.Owner = true;
+            }
         }
 
-        virtual public void Write(NetDataWriter writer)
-        {
-
-        }
     }
 
 

@@ -16,6 +16,7 @@ namespace ThomasEngine
 		virtual void Awake()override {};
 		virtual void Start()override {};
 		virtual void Update()override {};
+		virtual void FixedUpdate() override {};
 		virtual void OnDrawGizmosSelected() override {};
 		virtual void OnDrawGizmos() override {};
 

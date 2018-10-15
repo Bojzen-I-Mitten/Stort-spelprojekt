@@ -4,6 +4,7 @@
 #include <d3dcompiler.h>
 #include "ShaderProperty\shaderProperties.h"
 #include "../utils/Utility.h"
+#include "../utils/GpuProfiler.h"
 #include <fstream>
 #include <comdef.h>
 
@@ -15,6 +16,7 @@ namespace thomas
 		Shader* Shader::s_standardShader;
 		Shader* Shader::s_failedShader;
 		bool Shader::s_shouldRecompile = false;
+
 		Shader::Shader(ID3DX11Effect* effect, std::string path) : Resource(path)
 		{
 			m_currentPass = nullptr;
@@ -34,6 +36,7 @@ namespace thomas
 
 			if (effectDesc.Techniques == 0)
 			{
+				LOG("Cannot set up reflection as shader has no techniques");
 				return;
 			}
 
@@ -63,6 +66,8 @@ namespace thomas
 
 					tech->GetPassByIndex(j)->GetDesc(&passDesc);
 					tech->GetPassByIndex(j)->GetVertexShaderDesc(&vsPassDesc);
+
+					//GetComputeShaderDesc
 
 					pass.name = passDesc.Name;
 					pass.inputLayout = NULL;
@@ -183,6 +188,9 @@ namespace thomas
 					if (errorBlob->GetBufferSize())
 					{
 						std::string error((char*)errorBlob->GetBufferPointer());
+						std::string test = "asdf" + error;
+
+						std::cout << test;
 						LOG("Error compiling shader: " << filePath << ". errorBlob: " << error);
 						errorBlob->Release();
 					}
@@ -213,6 +221,7 @@ namespace thomas
 		{
 			s_failedShader = CreateShader("../Data/FXIncludes/FailedShader.fx");
 			s_standardShader = CreateShader("../Data/FXIncludes/StandardShader.fx");
+
 			return true;
 		}
 
@@ -280,8 +289,17 @@ namespace thomas
 		{
 			for (auto prop : m_properties) {
 				prop.second->Apply(this);
-				int a = 0;
 			}
+		}
+		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
+		{
+			thomas::utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount);
+		}
+		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
+		{
+			thomas::utils::D3D::Instance()->GetDeviceContext()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{
@@ -306,6 +324,27 @@ namespace thomas
 				delete s_loadedShaders[i];
 			}
 			s_loadedShaders.clear();
+		}
+
+		bool Shader::DestroyShader(Shader * shader)
+		{
+			auto it = s_loadedShaders.begin();
+
+			while (it != s_loadedShaders.end())
+			{
+				if (*it._Ptr == shader)
+				{
+					
+					s_loadedShaders.erase(it);
+					delete shader;
+					return true;
+				}
+				it++;
+			}
+
+			LOG("FAILED TO DESTROY SHADER, SHADER NOT LOADED?");
+
+			return false;
 		}
 
 		void Shader::SetGlobalColor(const std::string & name, math::Color value)
@@ -396,6 +435,19 @@ namespace thomas
 					shader->m_properties[name]->SetName(name);
 				}
 			}
+		}
+
+		void Shader::SetGlobalUAV(const std::string & name, ID3D11UnorderedAccessView * value)
+		{
+			for (auto shader : s_loadedShaders)
+			{
+				if (shader->HasProperty(name))
+				{
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyUnorderedAccessView(value));
+					shader->m_properties[name]->SetName(name);
+				}
+			}
+			
 		}
 
 		Shader * Shader::FindByName(const std::string & name)
@@ -581,6 +633,7 @@ namespace thomas
 					newProperty = shaderproperty::ShaderPropertyScalarBool::GetDefault();
 					break;
 				case D3D_SVT_INT:
+					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 				case D3D_SVT_UINT:
 					newProperty = shaderproperty::ShaderPropertyScalarInt::GetDefault();
 					break;
@@ -616,15 +669,12 @@ namespace thomas
 				case D3D_SVT_CBUFFER:
 					newProperty = shaderproperty::ShaderPropertyConstantBuffer::GetDefault();
 					break;
-				//case D3D_SVT_TEXTURE:
-				//case D3D_SVT_TEXTURE1D:
-				//case D3D_SVT_RWTEXTURE1D:
+
 				case D3D_SVT_TEXTURE2DMS:
 				case D3D_SVT_RWTEXTURE2D:
+				case D3D_SVT_TEXTURE2DARRAY:
+					newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
 				case D3D_SVT_TEXTURE2D:
-				//case D3D_SVT_RWTEXTURE3D:
-				//case D3D_SVT_TEXTURE3D:
-				//case D3D_SVT_TEXTURECUBE:
 					isMaterialProperty = true;
 					if (semantic == "NORMALTEXTURE")
 					{
@@ -636,10 +686,23 @@ namespace thomas
 					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
-				case D3D_SVT_RWSTRUCTURED_BUFFER:
-				case D3D_SVT_APPEND_STRUCTURED_BUFFER:
-				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
 					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
+					break;
+				case D3D_SVT_RWSTRUCTURED_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
+				case D3D_SVT_APPEND_STRUCTURED_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
+				case D3D_SVT_CONSUME_STRUCTURED_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
+				case D3D_SVT_BYTEADDRESS_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyShaderResource::GetDefault();
+					break;
+				case D3D_SVT_RWBYTEADDRESS_BUFFER:
+					newProperty = shaderproperty::ShaderPropertyUnorderedAccessView::GetDefault();
+					break;
 				}
 				break;
 			}
@@ -660,9 +723,10 @@ namespace thomas
 			if (newProperty != nullptr)
 			{
 				newProperty->SetName(name);
-				uint32_t hash = utility::hash(name.c_str(), name.length());
+				uint32_t hash = utility::hash(name);
 #ifdef _DEBUG
-				if (m_property_indices.find(hash) == m_property_indices.end()) {
+				// Verify hash doesn't exist
+				if (m_property_indices.find(hash) != m_property_indices.end()) {
 					std::string err("Warning in ThomasCore::resource::Shader::AddProperty!! Multiple effect properties with identical name hash: " + name);
 					LOG(err);
 				}

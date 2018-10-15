@@ -54,9 +54,10 @@ namespace ThomasEditor.Inspectors
                     }
                     else if (obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                     {
-                        var method = typeof(GameObject).GetMethod("GetComponent").MakeGenericMethod(pi.PropertyType);
-                        var component = method.Invoke(obj, null);
-                        if (component != null && component.GetType() == pi.PropertyType)
+
+
+                        var component = (obj as GameObject).GetComponent(pi.PropertyType);
+                        if (component != null)
                         {
                             pi.Value = component;
                         }
@@ -69,6 +70,7 @@ namespace ThomasEditor.Inspectors
         {
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
+                //e.Effects = DragDropEffects.None;
                 TreeViewItem item = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
                 if (item.DataContext is Resource)
                 {
@@ -76,7 +78,12 @@ namespace ThomasEditor.Inspectors
                     ContentControl label = sender as ContentControl;
                     PropertyItem pi = label.DataContext as PropertyItem;
                     if (resource.GetType() == pi.PropertyType)
+                    {
+                        e.Effects = DragDropEffects.Move;
                         e.Handled = true;
+                    }
+                    else
+                        e.Effects = DragDropEffects.None;
                 }
             }
 

@@ -13,6 +13,8 @@
 #include "..\WindowManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
+#include "../utils/GpuProfiler.h"
+#include "ParticleSystem.h"
 
 namespace thomas
 {
@@ -36,6 +38,7 @@ namespace thomas
 		Renderer::Renderer()
 			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
 		{
+			
 		}
 
 		Renderer* Renderer::Instance()
@@ -103,8 +106,13 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
+			profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+			
 			//Process commands
 			BindFrame();
+
+			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			//m_particleSystem->UpdateParticleSystem();
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -119,14 +127,18 @@ namespace thomas
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
-			}
 
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				//m_particleSystem->DrawParticles();
+			}
+			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::RenderGizmos();
 			}
+			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 
 	}

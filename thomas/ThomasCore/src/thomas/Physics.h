@@ -39,6 +39,7 @@ namespace thomas
 		static math::Quaternion ToSimple(const btQuaternion& quaternion);
 
 	public:
+		static bool s_drawDebug;
 		static std::unique_ptr<btDiscreteDynamicsWorld> s_world;
 
 	private:

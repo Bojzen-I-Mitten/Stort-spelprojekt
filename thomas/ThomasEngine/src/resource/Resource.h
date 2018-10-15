@@ -47,7 +47,7 @@ namespace ThomasEngine
 		}
 
 		virtual void Reload();
-
+		virtual void OnRename() {};
 		System::String ^ GetPath()
 		{
 			return m_path;
