@@ -55,7 +55,7 @@ namespace thomas
 			std::vector<component::Component*> m_components;
 			component::Transform* m_transform = nullptr;
 			bool m_activeSelf;
-			bool m_staticSelf;
+			static bool m_staticSelf;
 
 		private:
 			bool m_selected;

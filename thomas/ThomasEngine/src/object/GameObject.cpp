@@ -110,6 +110,8 @@ namespace ThomasEngine {
 		nativePtr = static_cast<thomas::object::Object*>
 			(thomas::ObjectHandler::setStatic(
 				static_cast<thomas::object::GameObject*>(nativePtr)));	
+		m_toBeStatic = false;
+		m_isStatic = true;
 	}
 
 	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
@@ -456,4 +458,9 @@ namespace ThomasEngine {
 		nativePtr->SetName(Utility::ConvertString(m_name));
 	}
 
+
+	bool GameObject::GetStatic()
+	{
+		return m_isStatic;
+	}
 }

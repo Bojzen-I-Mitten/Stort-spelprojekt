@@ -33,6 +33,8 @@ namespace ThomasEngine
 
 		bool m_isDestroyed = false;
 		static bool m_toBeStatic = false;
+		static bool m_isStatic = false;
+
 		System::Object^ m_componentsLock = gcnew System::Object();
 
 		void SyncComponents();
@@ -148,7 +150,7 @@ namespace ThomasEngine
 		static GameObject^ CreatePrimitive(PrimitiveType type);
 
 		bool GetActive();
-
+		static bool GetStatic();
 		void SetActive(bool active);
 
 		static GameObject^ Instantiate(GameObject^ original);

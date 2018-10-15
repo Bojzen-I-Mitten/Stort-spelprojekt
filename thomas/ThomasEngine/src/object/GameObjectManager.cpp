@@ -33,7 +33,8 @@ namespace ThomasEngine
 
 	void GameObjectManager::isStatic(GameObject ^ gameObject)
 	{
-		gameObject->toBeStatic();
+		if (!gameObject->GetStatic())
+			gameObject->toBeStatic();
 	}
 
 	void GameObjectManager::createGameObjectCore(std::string name)

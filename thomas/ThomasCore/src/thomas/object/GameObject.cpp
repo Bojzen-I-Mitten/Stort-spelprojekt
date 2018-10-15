@@ -5,7 +5,7 @@ namespace thomas
 	namespace object
 	{
 		std::vector<GameObject*> GameObject::s_gameObjects;
-
+		bool GameObject::m_staticSelf;
 		GameObject::GameObject()
 		{
 			m_activeSelf = true;
