@@ -16,8 +16,6 @@ namespace thomas {
 				: public BoneConstraint
 			{
 			public:
-
-
 				BoneChildTransformConstraint(object::component::Transform & m_ref);
 				~BoneChildTransformConstraint();
 

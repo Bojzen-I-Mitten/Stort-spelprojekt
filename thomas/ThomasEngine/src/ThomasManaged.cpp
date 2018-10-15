@@ -55,7 +55,7 @@ namespace ThomasEngine {
 			Scene::CurrentScene = gcnew Scene("test");
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
-			mainThread->Name = "Thomas Engine (Main Thread)";
+			mainThread->Name = "Thomas Engine (Logic Thread)";
 			mainThread->Start();
 
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));

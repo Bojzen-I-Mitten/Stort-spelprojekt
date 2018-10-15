@@ -167,5 +167,30 @@ namespace DirectX
 				return vx;
 			}
 		}
+
+		/* Extract the length of each axis in the top-left 3x3 matrix.
+		*/
+		Vector3 extractAxisScale(const Matrix& m)
+		{
+			return Vector3(
+				m.Right().Length(),
+				m.Up().Length(),
+				m.Forward().Length());
+		}
+		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
+		*/
+		Matrix& mult(Matrix &m, Vector3 scalars)
+		{
+			m._11 *= scalars.x;
+			m._12 *= scalars.x;
+			m._13 *= scalars.x;
+			m._21 *= scalars.y;
+			m._22 *= scalars.y;
+			m._23 *= scalars.y;
+			m._31 *= scalars.z;
+			m._32 *= scalars.z;
+			m._33 *= scalars.z;
+			return m;
+		}
 	}
 }
