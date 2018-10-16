@@ -61,6 +61,18 @@ namespace ThomasEngine
 	}
 	void ParticleEmitter::Texture::set(Texture2D^ value) { particleEmitter->SetTexture((thomas::resource::Texture2D*)value->m_nativePtr); }
 
-	bool ParticleEmitter::Emit::get() { return particleEmitter->IsEmitting(); }
-	void ParticleEmitter::Emit::set(bool value) { particleEmitter->StartEmitting(); }
+
+	bool ParticleEmitter::Emit::get() 
+	{
+		return particleEmitter->IsEmitting(); 
+	}
+	void ParticleEmitter::Emit::set(bool value) 
+	{ 
+		if (value)
+			particleEmitter->StartEmitting();
+		else
+			particleEmitter->StopEmitting();
+	}
+	
+
 }

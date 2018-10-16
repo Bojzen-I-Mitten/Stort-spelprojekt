@@ -84,6 +84,5 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
-		
 	};
 }

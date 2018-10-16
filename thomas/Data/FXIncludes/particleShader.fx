@@ -98,13 +98,13 @@ technique11 Particles
         SetRasterizerState(Rasterizer);
         SetBlendState(SrcAlphaBlend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
-    pass AdditiveBlendPass
-    {
-        VERT(vert());
-        SetGeometryShader(NULL);
-		FRAG(frag());
-        SetDepthStencilState(EnableDepth, 1);
-        SetRasterizerState(Rasterizer);
-        SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
-    }
+  //  pass AdditiveBlendPass
+  //  {
+  //      VERT(vert());
+  //      SetGeometryShader(NULL);
+		//FRAG(frag());
+  //      SetDepthStencilState(EnableDepth, 1);
+  //      SetRasterizerState(Rasterizer);
+  //      SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+  //  }
 }

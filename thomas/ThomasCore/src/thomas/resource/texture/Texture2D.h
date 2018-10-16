@@ -23,6 +23,7 @@ namespace thomas
 			std::vector<math::Color> GetPixels();
 			byte* GetRawRGBAPixels();
 			byte* GetRawBGRAPixels();
+
 			//bool ChangeFormat(DXGI_FORMAT format);
 			bool Resize(int width, int height);
 

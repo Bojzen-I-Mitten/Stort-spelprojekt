@@ -128,10 +128,25 @@ namespace thomas
 					}
 				}
 
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				
 				//m_particleSystem->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
+
+			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			if (editor::EditorCamera::Instance())
+			{
+				BindCamera(editor::EditorCamera::Instance()->GetCamera());
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+			}
+			for (object::component::Camera* cam : object::component::Camera::s_allCameras)
+			{
+				BindCamera(cam);
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+			}
+			profiler->Timestamp(profiling::GTS_PARTICLES);
+			
+
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
