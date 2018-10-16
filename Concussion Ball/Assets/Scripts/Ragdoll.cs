@@ -20,8 +20,8 @@ namespace ThomasEditor
         public string LowerRightArm { get; set; }
         public string LowerLeftHand { get; set; }
         public string LowerRightHand { get; set; }
-        public string LeftAxel { get; set; }
-        public string RightAxel { get; set; }
+        public string LeftShoulder { get; set; }
+        public string RightShoulder { get; set; }
         public bool AllobjectKinectic { get; set; }
         public string UpperRightLeg { get; set; }
         public string LowerRightLeg { get; set; }
@@ -153,8 +153,8 @@ namespace ThomasEditor
             LeftArmTorsoJoint.ConnectedRigidbody = rigidbodySpine;
             LeftArmTorsoJoint.SwingAngle1 = 90;
             LeftArmTorsoJoint.SwingAngle2 = 90;
-            LeftArmTorsoJoint.ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(LeftAxel, UpperLeftArm, renderskinnedcomponent) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperLeftArm, renderskinnedcomponent);
-            LeftArmTorsoJoint.Anchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(LeftAxel, UpperLeftArm, renderskinnedcomponent)) * 2;// * new Vector3(1,2,1);
+            LeftArmTorsoJoint.ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, renderskinnedcomponent) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperLeftArm, renderskinnedcomponent);
+            LeftArmTorsoJoint.Anchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, renderskinnedcomponent)) * 2;// * new Vector3(1,2,1);
 
 
 
@@ -227,8 +227,8 @@ namespace ThomasEditor
             RightArmTorsoJoint.ConnectedRigidbody = rigidbodySpine;
             RightArmTorsoJoint.SwingAngle1 = 90;
             RightArmTorsoJoint.SwingAngle2 = 90;
-            RightArmTorsoJoint.ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(RightAxel, UpperRightArm, renderskinnedcomponent) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperRightArm, renderskinnedcomponent);
-            RightArmTorsoJoint.Anchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(RightAxel, UpperRightArm, renderskinnedcomponent)) * 2;// * new Vector3(1,2,1);
+            RightArmTorsoJoint.ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(RightShoulder, UpperRightArm, renderskinnedcomponent) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperRightArm, renderskinnedcomponent);
+            RightArmTorsoJoint.Anchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(RightShoulder, UpperRightArm, renderskinnedcomponent)) * 2;// * new Vector3(1,2,1);
 
 
 
