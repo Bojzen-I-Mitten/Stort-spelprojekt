@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />
+    <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

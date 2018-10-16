@@ -6,13 +6,14 @@
 #include "data/Skeleton.h"
 #include "BaseAnimationTime.h"
 #include "constraint/BoneConstraint.h"
-
+#include "../../resource/MemoryAllocation.h"
+#include "../../ThomasCore.h"
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) :
-				_ref(ref), _root(), _frame_tmp(new TransformComponents[ref.getNumBones()]), _pose(ref.getNumBones()), _skin(ref.getNumBones()), m_constraint(new ConstraintList[ref.getNumBones()])
+				_ref(ref), _root(),  _pose(ref.getNumBones()), _skin(ref.getNumBones()), m_constraint(new ConstraintList[ref.getNumBones()])
 			{
 				clearConstraints();
 				clearBlendTree();
@@ -37,25 +38,28 @@ namespace thomas {
 			}
 			void AnimatedSkeleton::updateSkeleton()
 			{
+				TransformComponents *frame_tmp = reinterpret_cast<TransformComponents*>(
+					ThomasCore::Core().Memory()->stack(0).allocate(sizeof(TransformComponents)* _ref.getNumBones(), sizeof(float)));
 				//Update animation tree
-				_root->calcFrame(_frame_tmp.get());
+				_root->calcFrame(frame_tmp);
 				// Update skin transforms
-				_pose[0] = (_frame_tmp.get())[0].createTransform() * _ref.getRoot();				//	Update root pose
-				applyConstraint(0);
-				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];									//	Update root skin
+				_pose[0] = frame_tmp[0].createTransform() * _ref.getRoot();						//	Update root pose
+				applyConstraint(0, frame_tmp);
 				for (uint32_t i = 1; i < boneCount(); i++)
 				{
 					const Bone& bone = _ref.getBone(i);
-					_pose[i] = (_frame_tmp.get())[i].createTransform() * _pose[bone._parentIndex];	//	Update root pose
-					applyConstraint(i);
-					_skin[i] = bone._invBindPose * _pose[i];										//	Update root skin
+					_pose[i] = frame_tmp[i].createTransform() * _pose[bone._parentIndex];		//	Update root pose
+					applyConstraint(i, frame_tmp);
 				}
+				for (uint32_t i = 0; i < boneCount(); i++)
+					_skin[i] = _ref.getBone(i)._invBindPose * _pose[i];							//	Update skin
+				ThomasCore::Core().Memory()->stack(0).deallocate(frame_tmp);
 			}
-			void AnimatedSkeleton::applyConstraint(uint32_t index)
+			void AnimatedSkeleton::applyConstraint(uint32_t index, TransformComponents *transformInfo)
 			{
 				BoneConstraint** ptr = (m_constraint.get() + index)->m_list;
 				while (*ptr != NULL) {
-					(*ptr)->execute(_ref, _pose.data(), index);
+					(*ptr)->execute(_ref, _pose.data(), transformInfo, index);
 					ptr++;
 				}
 			}
@@ -114,6 +118,10 @@ namespace thomas {
 			{
 				return _ref.getBone(bone)._boneName;
 			}
+			const Bone & AnimatedSkeleton::getBoneInfo(unsigned int bone)
+			{
+				return _ref.getBone(bone);
+			}
 			void AnimatedSkeleton::addConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{
 				m_constraint.get()[boneIndex].add(bC);
@@ -124,7 +132,7 @@ namespace thomas {
 			}
 			void ConstraintList::add(BoneConstraint * bC)
 			{
-				for (uint32_t i = 0; i < MAX_CONSTRAIN_COUNT; i++) {
+				for (uint32_t i = 0; i < MAX_CONSTRAINT_COUNT; i++) {
 					if (m_list[i] == NULL) {
 						m_list[i] = bC;
 						return;
@@ -134,7 +142,7 @@ namespace thomas {
 			}
 			void ConstraintList::rmv(BoneConstraint * bC)
 			{
-				for (uint32_t i = 0; i < MAX_CONSTRAIN_COUNT; i++) {
+				for (uint32_t i = 0; i < MAX_CONSTRAINT_COUNT; i++) {
 					if (m_list[i] == bC) {
 						m_list[i] = NULL;
 						// Find last slot:

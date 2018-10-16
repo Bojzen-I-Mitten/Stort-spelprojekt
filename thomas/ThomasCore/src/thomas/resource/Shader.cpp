@@ -7,6 +7,7 @@
 #include "../utils/GpuProfiler.h"
 #include <fstream>
 #include <comdef.h>
+#include "..\ThomasCore.h"
 
 namespace thomas
 {

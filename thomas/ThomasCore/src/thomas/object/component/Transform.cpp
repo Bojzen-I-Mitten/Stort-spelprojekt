@@ -120,6 +120,7 @@ namespace thomas
 				m_euler = math::ToEuler(m_localRotation);
 #endif
 				UpdateLocalMatrix();
+				Decompose();
 				SetDirty(true);
 			}
 			void Transform::Rotate(float x, float y, float z)
@@ -130,6 +131,7 @@ namespace thomas
 			{
 				m_localRotation = m_localRotation * math::Quaternion::CreateFromAxisAngle(axis, angle);
 				UpdateLocalMatrix();
+				Decompose();
 			}
 			void Transform::Translate(math::Vector3 translation)
 			{
@@ -205,7 +207,7 @@ namespace thomas
 			void Transform::SetRotation(float yaw, float pitch, float roll)
 			{
 #ifdef _EDITOR
-				m_euler = math::Vector3(pitch, yaw, roll);
+				m_euler = math::Euler(yaw, pitch, roll);
 #endif
 				SetRotation(math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll)));
 			}
@@ -246,10 +248,15 @@ namespace thomas
 				m_euler = math::ToEuler(m_localRotation);
 #endif
 			}
+			void Transform::SetLocalRotation(math::Vector3 v)
+			{
+				math::Euler e = math::ToEuler(v);
+				SetLocalRotation(e.yaw, e.pitch, e.roll);
+			}
 			void Transform::SetLocalRotation(float yaw, float pitch, float roll)
 			{
 #ifdef _EDITOR
-				m_euler = math::Vector3(pitch, yaw, roll);
+				m_euler = math::Euler(yaw, pitch, roll);
 #endif
 				m_localRotation = math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll));
 				UpdateLocalMatrix();
@@ -282,7 +289,7 @@ namespace thomas
 			math::Vector3 Transform::GetLocalEulerAngles()
 			{
 #ifdef _EDITOR
-				return m_euler;
+				return math::FromEuler(m_euler);
 #else
 				return math::ToEuler(m_localRotation);
 #endif

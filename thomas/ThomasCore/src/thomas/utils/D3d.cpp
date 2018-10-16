@@ -2,6 +2,7 @@
 #include "D3D.h"
 #include "../Common.h"
 #include "../Window.h"
+#include "..\ThomasCore.h"
 #include "GpuProfiler.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"

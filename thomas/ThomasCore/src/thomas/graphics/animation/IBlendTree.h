@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "data/Bone.h"
 
 namespace thomas {
 
@@ -37,6 +38,7 @@ namespace thomas {
 				*/
 				virtual const math::Matrix& getBoneMatrix(unsigned int bone) const = 0;
 				virtual const std::string& getBoneName(unsigned int bone) const = 0;
+				virtual const Bone& getBoneInfo(unsigned int bone) = 0;
 				virtual bool getBoneIndex(uint32_t boneNameHash, unsigned int & boneIndex) const = 0;
 			};
 		}

@@ -56,6 +56,10 @@ namespace thomas
 			{
 				graphics::LightManager::RemoveLight(this);
 			}
+			void LightComponent::OnDestroy()
+			{
+				graphics::LightManager::RemoveLight(this);
+			}
 
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
 			{

@@ -1,16 +1,17 @@
 #include "AssimpLoader.h"
 #include <algorithm>
 #include <exception>
-#include "../resource/texture/Texture.h"
-#include "../graphics/Mesh.h"
-#include "../resource/Material.h"
+#include <set>
 #include <assimp\Importer.hpp>
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
-#include "../graphics/animation/data/Skeleton.h"
 #include "Math.h"
+#include "../resource/texture/Texture.h"
+#include "../graphics/Mesh.h"
+#include "../resource/Material.h"
+#include "../graphics/animation/data/Skeleton.h"
 #include "../utils/Utility.h"
-#include <set>
+#include "..\ThomasCore.h"
 
 
 namespace thomas

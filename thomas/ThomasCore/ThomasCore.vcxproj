@@ -20,11 +20,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\thomas\editor\gizmos\GizmoRenderBuffer.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.cpp" />
     <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\EditorWindow.cpp" />
     <ClCompile Include="src\thomas\AutoProfile.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
@@ -95,13 +97,17 @@
     <ClCompile Include="src\thomas\resource\AudioClip.cpp" />
     <ClCompile Include="src\thomas\resource\Resource.cpp" />
     <ClCompile Include="src\thomas\Sound.cpp" />
-    <ClCompile Include="src\thomas\ThomasCore.cpp" />
+    <ClCompile Include="src\thomas\ThomasCore.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+    </ClCompile>
     <ClCompile Include="src\thomas\ThomasTime.cpp" />
     <ClCompile Include="src\thomas\utils\AssimpLoader.cpp" />
     <ClCompile Include="src\thomas\utils\D3D.cpp" />
     <ClCompile Include="src\thomas\utils\GpuProfiler.cpp" />
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
+    <ClCompile Include="src\thomas\utils\ThreadMap.cpp" />
     <ClCompile Include="src\thomas\utils\Utility.cpp" />
     <ClCompile Include="src\thomas\Window.cpp" />
     <ClCompile Include="src\thomas\WindowManager.cpp" />
@@ -111,6 +117,8 @@
     <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\EditorWindow.h" />
     <ClInclude Include="src\thomas\AutoProfile.h" />
+    <ClInclude Include="src\thomas\editor\gizmos\GizmoRenderBuffer.h" />
+    <ClInclude Include="src\thomas\editor\gizmos\GizmoRenderCommand.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimBlender.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
@@ -126,6 +134,7 @@
     <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneConstraint.h" />
+    <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\LookAtConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\TransformComponents.h" />
     <ClInclude Include="src\thomas\graphics\animation\Playback.h" />
@@ -142,6 +151,7 @@
     <ClInclude Include="src\thomas\graphics\animation\data\KeyFrame.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
     <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
+    <ClInclude Include="src\thomas\graphics\animation\playback\BinaryBlendNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
@@ -171,6 +181,7 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyShaderResource.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.h" />
+    <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyType.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyUnorderedAccessView.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
@@ -211,6 +222,7 @@
     <ClInclude Include="src\thomas\utils\GpuProfiler.h" />
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />
+    <ClInclude Include="src\thomas\utils\ThreadMap.h" />
     <ClInclude Include="src\thomas\utils\Utility.h" />
     <ClInclude Include="src\thomas\Window.h" />
     <ClInclude Include="src\thomas\WindowManager.h" />
@@ -319,6 +331,8 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAsManaged>
+      </CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -366,6 +380,8 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
+      <CompileAsManaged>
+      </CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

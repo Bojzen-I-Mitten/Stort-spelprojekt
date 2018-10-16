@@ -1,5 +1,6 @@
 #include "ComputeShader.h"
 #include "ShaderProperty\shaderProperties.h"
+#include "../ThomasCore.h"
 
 namespace thomas
 {
