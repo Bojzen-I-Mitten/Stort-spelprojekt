@@ -12,20 +12,29 @@ public class GUITest : ScriptComponent
     private Vector4 OriginalColor;
     private Vector4 RedColor;
     Camera Camera;
-    
+
+    private String IP;
 
     public override void Start()
     {
+        IP = "";
         Camera = gameObject.GetComponent<Camera>();
         Camera.AddImage("Chad", Sprite, new Vector2(200, 30), new Vector2(0.5f, 0.5f), true);
-        Camera.AddText("Hi", "Hi, test 1 2 1 2", new Vector2(200, 100));
-
-        OriginalColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        OriginalColor = new Vector4(1.0f, 1.0f, 1.0f, 0.5f);
         RedColor = new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
     }
 
     public override void Update()
     {
+        if (Input.GetKeyDown(Input.Keys.OemPeriod))
+        {
+            IP += ".";
+        }
+        else if (Input.GetKeyDown(Input.Keys.NumPad0))
+        {
+            IP += "0";
+        }
+
         if (Camera.OnImageHovered("Chad"))
         {
             Camera.SetImageColor("Chad", RedColor);
@@ -34,5 +43,6 @@ public class GUITest : ScriptComponent
         {
             Camera.SetImageColor("Chad", OriginalColor);
         }
+        Camera.AddText("IP", IP, new Vector2(200, 100));
     }
 }
