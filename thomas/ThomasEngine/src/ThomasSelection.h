@@ -19,6 +19,7 @@ namespace ThomasEngine {
 		~ThomasSelection();
 
 		void SelectGameObject(GameObject^ gObj);
+		void SelectGameObject(GameObject^ gObj, bool clearSelection);
 		void SelectGameObject(System::Guid guid);
 		void UnSelectGameObject(GameObject^ gObj);
 

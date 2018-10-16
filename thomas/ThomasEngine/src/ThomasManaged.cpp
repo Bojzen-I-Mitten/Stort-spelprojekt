@@ -158,6 +158,7 @@ namespace ThomasEngine {
 						gameObject->Update();
 					}
 				}
+				editor::EditorCamera::Instance()->Update();
 
 				//Rendering
 				thomas::graphics::Renderer::Instance()->ClearCommands();
@@ -200,7 +201,8 @@ namespace ThomasEngine {
 							Monitor::Exit(g->m_componentsLock);
 					}
 					Stop();
-				}				
+				}
+					
 			}
 			finally
 			{
