@@ -32,10 +32,10 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
-    <ClCompile Include="src\thomas\graphics\gui\ThomasGUI.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\resource\Font.cpp" />
+    <ClCompile Include="src\thomas\graphics\GUIManager.cpp" />
     <ClCompile Include="src\thomas\resource\MemoryAllocation.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
     <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
@@ -145,13 +145,13 @@
     <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
     <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
-    <ClInclude Include="src\thomas\graphics\gui\ThomasGUI.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\graphics\render\Frame.h" />
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
+    <ClInclude Include="src\thomas\graphics\GUIManager.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />

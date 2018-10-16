@@ -18,7 +18,6 @@
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 #include "graphics\ParticleSystem.h"
-#include "../thomas/graphics/gui/ThomasGUI.h"
 
 namespace thomas 
 {
@@ -38,7 +37,6 @@ namespace thomas
 		if (!utils::D3D::Instance()->Init())
 			return false;
 
-		GUI::ThomasGUI::Init();
 		resource::Texture2D::Init();
 		ThomasTime::Init();
 		Sound::Instance()->Init();
@@ -66,9 +64,6 @@ namespace thomas
 		}
 
 		object::Object::Clean();
-		editor::EditorCamera::Instance()->Update();
-		GUI::ThomasGUI::Update();
-		
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
 	}
@@ -108,7 +103,6 @@ namespace thomas
 	{	
 		//Destroy all objects
 		WindowManager::Instance()->Destroy();
-		GUI::ThomasGUI::Destroy();
 		graphics::LightManager::Destroy();
 		graphics::ParticleSystem::DestroyGlobalSystem();
 		resource::Shader::DestroyAllShaders();
