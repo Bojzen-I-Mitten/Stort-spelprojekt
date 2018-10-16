@@ -65,9 +65,9 @@ namespace ThomasEngine
 	private:
 		/* Delete the object, does not consider GameObject reference. */
 		void Delete();
-		/* Set state to enabled. */
+		/* Set enabled state. */
 		void Enable();
-		/* Set state to disabled. */
+		/* Set disabled state. */
 		void Disable();
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
