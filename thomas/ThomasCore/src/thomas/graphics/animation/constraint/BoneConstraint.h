@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../utils/Math.h"
+#include "../data/TransformComponents.h"
 
 namespace thomas {
 	namespace graphics {
@@ -14,7 +15,7 @@ namespace thomas {
 				virtual ~BoneConstraint() {};
 
 
-				virtual void execute(Skeleton& skel, math::Matrix* objectPose, uint32_t boneInd) = 0;
+				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp,  uint32_t boneInd) = 0;
 
 			};
 		}

@@ -41,7 +41,8 @@ namespace thomas
 				void RotateByAxis(math::Vector3 axis, float angle);
 				void Translate(math::Vector3 translation);
 				void Translate(float x, float y, float z);
-
+				void Scale(math::Vector3 scale);
+				void Scale(float x, float y, float z);
 
 				math::Vector3 GetPosition();
 				math::Quaternion GetRotation();
@@ -60,6 +61,7 @@ namespace thomas
 				void SetLocalPosition(math::Vector3 position);
 				void SetLocalPosition(float x, float y, float z);
 				void SetLocalRotation(math::Quaternion rotation);
+				void SetLocalRotation(math::Vector3 pitchyawroll);
 				void SetLocalRotation(float yaw, float pitch, float roll);
 				void SetLocalScale(math::Vector3 scale);
 				void SetLocalScale(float x, float y, float z);
@@ -87,7 +89,7 @@ namespace thomas
 
 				math::Quaternion m_localRotation;
 #ifdef _EDITOR
-				math::Vector3 m_euler;
+				math::Euler m_euler;
 #endif
 				math::Vector3 m_localPosition;
 				math::Vector3 m_localScale;

@@ -1,5 +1,7 @@
 #pragma once
+#include <vector>
 #include "../../Common.h"
+#include "../../Constants.h"
 #include "../../utils/Math.h"
 namespace thomas
 {
@@ -7,72 +9,64 @@ namespace thomas
 	namespace utils { struct Ray; namespace buffers { class VertexBuffer; } }
 	namespace editor
 	{
+		namespace gizmo {
+			class GizmoRenderBuffer;
+		}
 		class Gizmos
 		{
 
-		private:
-
-			enum class GizmoPasses
-			{
-				SOLID = 0,
-				WIREFRAME = 1,
-			};
-
-			struct GizmoRenderCommand
-			{
-				math::Matrix matrix;
-				std::vector<math::Vector3> vertexData;
-				math::Color color;
-				D3D_PRIMITIVE_TOPOLOGY topology;
-				GizmoPasses pass;
-
-				GizmoRenderCommand(std::vector<math::Vector3> v, math::Matrix m, math::Color c, D3D_PRIMITIVE_TOPOLOGY t, GizmoPasses p) :
-					vertexData(v), matrix(m), color(c), topology(t), pass(p) {};
-			};
-
+		public:		
+			static Gizmos& Gizmo();
 		public:
-			static void DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-			static void TransferGizmoCommands();
-			static void RenderGizmos();
-			static void ClearGizmos();
-			static void Init();
-			static void Destroy();
-			static void DrawModel(resource::Model* model, int meshIndex, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
-			static void DrawModel(resource::Model* model, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
 
-			static void DrawWireModel(resource::Model* model, int meshIndex, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
-			static void DrawWireModel(resource::Model* model, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
+			Gizmos();
+			~Gizmos();
 
-			static void DrawBoundingCapsule(math::Vector3 center, float radius, float height);
-			static void DrawCube(math::Vector3 center, math::Vector3 size);
-			static void DrawWireCube(math::Vector3 center, math::Vector3 size);
-			static void DrawBoundingOrientedBox(const math::BoundingOrientedBox& obb);
-			static void DrawBoundingSphere(const math::BoundingSphere& sphere);
-			static void DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
-			static void DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
-			static void DrawLine(math::Vector3 from, math::Vector3 to);
-			static void DrawSphere(math::Vector3 center, float radius);
-			static void DrawWireSphere(math::Vector3 center, float radius);
-			static void DrawRay(math::Vector3 from, math::Vector3 direction);
-			static void DrawRay(math::Ray ray);
 
-			static void DrawFrustum(math::Vector3 center, float fov, float maxRange, float minRange, float aspect);
-			static void DrawFrustum(math::BoundingFrustum& frustrum);
+			void DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology = D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+			void TransferGizmoCommands();
+			void RenderGizmos();
+			void ClearGizmos();
+			void Init();
+			void Destroy();
+			void DrawModel(resource::Model* model, int meshIndex, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
+			void DrawModel(resource::Model* model, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
 
-			static void SetColor(math::Color color);
-			static void SetMatrix(math::Matrix matrix);
+			void DrawWireModel(resource::Model* model, int meshIndex, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
+			void DrawWireModel(resource::Model* model, math::Vector3 position, math::Quaternion rotation, math::Vector3 scale);
 
-			static void DrawPing(std::string ping);
-			static void ImguiStringUpdate(std::string text, math::Vector2 size, math::Vector2 pos);
-			static void ImguiStringUpdate(std::string text, math::Vector2 pos);
+			void DrawBoundingCapsule(math::Vector3 center, float radius, float height);
+			void DrawCube(math::Vector3 center, math::Vector3 size);
+			void DrawWireCube(math::Vector3 center, math::Vector3 size);
+			void DrawBoundingOrientedBox(const math::BoundingOrientedBox& obb);
+			void DrawBoundingSphere(const math::BoundingSphere& sphere);
+			void DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
+			void DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
+			void DrawLine(math::Vector3 from, math::Vector3 to);
+			void DrawSphere(math::Vector3 center, float radius);
+			void DrawWireSphere(math::Vector3 center, float radius);
+			void DrawRay(math::Vector3 from, math::Vector3 direction);
+			void DrawRay(math::Ray ray);
+
+			void DrawFrustum(math::Vector3 center, float fov, float maxRange, float minRange, float aspect);
+			void DrawFrustum(math::BoundingFrustum& frustrum);
+
+			void SetColor(math::Color color);
+			void SetMatrix(math::Matrix matrix);
+
+			void DrawPing(std::string ping);
+			void ImguiStringUpdate(std::string text, math::Vector2 size, math::Vector2 pos);
+			void ImguiStringUpdate(std::string text, math::Vector2 pos);
 		private:
-			static std::vector<GizmoRenderCommand> s_gizmoCommands;
-			static std::vector<GizmoRenderCommand> s_prevGizmoCommands;
-			static resource::Material* s_gizmoMaterial;
-			static utils::buffers::VertexBuffer* s_vertexBuffer;
-			static math::Matrix s_matrix;
-			static math::Color s_color;
-			static int s_imguiNumber;
+
+			gizmo::GizmoRenderBuffer* m_update_buffers[MAX_NUM_THREAD];
+			gizmo::GizmoRenderBuffer* m_render_buffers[MAX_NUM_THREAD];
+
+			resource::Material* m_gizmoMaterial;
+			utils::buffers::VertexBuffer* m_vertexBuffer;
+			math::Matrix m_matrix;
+			math::Color s_color;
+			int m_imguiNumber;
 
 
 		};

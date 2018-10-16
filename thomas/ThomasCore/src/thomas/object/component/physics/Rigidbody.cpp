@@ -18,6 +18,7 @@ namespace thomas
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f),
+			m_dirty(false),
 			m_activationState(ActivationState::Default)
 			{
 		/*		setDamping(0.05, 0.85);
@@ -49,6 +50,7 @@ namespace thomas
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
+				//UpdateProperties();
 				Physics::AddRigidBody(this);
 			}
 
@@ -79,6 +81,10 @@ namespace thomas
 				m_gameObject->m_transform->SetDirty(true);
 
 				m_prevMatrix = m_gameObject->m_transform->GetLocalWorldMatrix();
+				if (m_dirty)
+				{
+					UpdateProperties();
+				}
 			}
 
 			void Rigidbody::UpdateTransformToRigidBody()
@@ -112,35 +118,37 @@ namespace thomas
 			void Rigidbody::SetFreezePosition(const math::Vector3& freezePosition)
 			{
 				m_freezePosition = freezePosition;
-				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
+				m_dirty = true;
 			}
 
 			void Rigidbody::SetFreezeRotation(const math::Vector3& freezeRotation)
 			{
 				m_freezeRotation = freezeRotation;
-				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
+				m_dirty = true;
 			}
 
 			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
 			{
-				this->setLinearVelocity(Physics::ToBullet(linearVel));
+				if(initialized)
+					this->setLinearVelocity(Physics::ToBullet(linearVel));
 			}
 
 			void Rigidbody::SetAngularVelocity(const math::Vector3& angularVel)
 			{
-				this->setAngularVelocity(Physics::ToBullet(angularVel));
+				if (initialized)
+					this->setAngularVelocity(Physics::ToBullet(angularVel));
 			}
 
 			void Rigidbody::SetDamping(const math::Vector2& damping)
 			{
 				m_damping = damping;
-				this->setDamping(damping.x, damping.y);
+				m_dirty = true;
 			}
 
 			void Rigidbody::SetSleepingThresholds(const math::Vector2 & thresholds)
 			{
 				m_sleepingThresholds = thresholds;
-				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				m_dirty = true;
 			}
 
 			void Rigidbody::SetDeactivationTime(float deactivationTime)
@@ -166,7 +174,7 @@ namespace thomas
 			void Rigidbody::SetActivationState(ActivationState state)
 			{
 				m_activationState = state;
-				this->setActivationState(m_activationState);
+				m_dirty = true;
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
@@ -321,6 +329,16 @@ namespace thomas
 
 				setMassProps(mass, inertia);
 				updateInertiaTensor();
+			}
+
+			void Rigidbody::UpdateProperties()
+			{
+				this->setActivationState(m_activationState);
+				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
+				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
+				this->setDamping(m_damping.x, m_damping.y);
+				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				m_dirty = false;
 			}
 		}
 	}

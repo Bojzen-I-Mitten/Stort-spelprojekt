@@ -15,14 +15,22 @@ namespace ThomasEngine
 		m_guid = Guid::NewGuid();
 		nativePtr->m_guid = Utility::Convert(m_guid);
 	}
+	Object::~Object()
+	{
+		Delete();
+	}
+	void Object::Delete()
+	{
+		OnDestroy();
+		s_objects.Remove(this);
+	}
 
 	void Object::OnDestroy() { nativePtr->OnDestroy(); }
 
 	void Object::Destroy()
 	{
-		OnDestroy();
+		Delete();
 		thomas::object::Object::Destroy(nativePtr);
-		s_objects.Remove(this);
 	}
 
 	Object^ Object::Find(Guid guid)

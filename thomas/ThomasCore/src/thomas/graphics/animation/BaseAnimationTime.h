@@ -20,13 +20,18 @@ namespace thomas {
 
 				virtual void timeStep(float dT);	// Step elapsed time
 
-				void setPlayType(PlayType type);
-				PlayType getPlayType();
-				void setSpeed(float speed);
-				float getDuration();
-
 				/* Partial state reset, state is set to a new play instance. */
 				void playOnce();
+
+			public:
+				PlayType getPlayType();
+				void setPlayType(PlayType type);
+				float getSpeed();
+				void setSpeed(float speed);
+				float getDuration();
+				/* Check if animation is running (Looping or PlayOnce + time left) */
+				bool isRunning();
+
 
 			private:
 				PlayType m_playType;

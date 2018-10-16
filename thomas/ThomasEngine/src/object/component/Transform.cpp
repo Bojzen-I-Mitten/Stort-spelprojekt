@@ -71,7 +71,7 @@ namespace ThomasEngine
 	void Transform::eulerAngles::set(Vector3 value) { trans->SetRotation(value.y, value.x,  value.z); OnPropertyChanged("localEulerAngles");}
 
 	Vector3 Transform::localEulerAngles::get() { return Utility::Convert(trans->GetLocalEulerAngles()); }
-	void Transform::localEulerAngles::set(Vector3 value) { trans->SetLocalRotation(value.y, value.x,  value.z); }
+	void Transform::localEulerAngles::set(Vector3 value) { trans->SetLocalRotation(Utility::Convert(value)); }
 
 	Vector3 Transform::scale::get() { return Utility::Convert(trans->GetScale()); }
 	void Transform::scale::set(Vector3 value) { trans->SetScale(Utility::Convert(value));  OnPropertyChanged("localScale");}

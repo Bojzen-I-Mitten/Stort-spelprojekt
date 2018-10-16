@@ -1,6 +1,7 @@
 #include "GpuProfiler.h"
 #include "../Common.h"
 #include "../ThomasTime.h"
+#include "..\ThomasCore.h"
 namespace thomas
 {
 	namespace profiling

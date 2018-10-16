@@ -67,6 +67,7 @@ namespace thomas
 				int GetTargetDisplayIndex();
 
 				math::BoundingFrustum GetFrustrum();
+				math::BoundingFrustum GetSubFrustrum(math::Rectangle rect);
 
 				void CopyFrameData();
 				CAMERA_FRAME_DATA& GetFrameData();

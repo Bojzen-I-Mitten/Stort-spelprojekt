@@ -1,18 +1,26 @@
 #pragma once
 #include "Material.h"
-
+#include "Shader.h"
+#include <d3dx11effect.h>
 namespace thomas
 {
 	namespace resource
 	{
-		//rework
-		class ComputeShader
+		class ComputeShader : public Shader
 		{
+		private:
+			
+			static ID3D11UnorderedAccessView* const s_nullUAVs[8];
+			static ID3D11UnorderedAccessView* const s_nullUAV[1];
+			static ID3D11ShaderResourceView* const s_nullSRVs[8];
+			static ID3D11ShaderResourceView* const s_nullSRV[1];
 		public:
-			ComputeShader();
-			void Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ);
-			void SetUAV(const std::string& name, ID3D11UnorderedAccessView& value);
-			ID3D11UnorderedAccessView* GetUAV(const std::string& name);
+			void Dispatch(int threadGroupX, int threadGroupY = 1, int threadGroupZ = 1);
+			void DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs = 0);
+			static void UnbindAllUAVs();
+			static void UnbindOneUAV(unsigned startIndex);
+			static void UnbindAllSRVs();
+			static void UnbindOneSRV(unsigned startIndex);
 		};
 	}
 }

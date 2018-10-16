@@ -2,6 +2,7 @@
 #include "Common.h"
 #include <AtlBase.h>
 #include <atlconv.h>
+#include "ThomasCore.h"
 
 namespace thomas
 {

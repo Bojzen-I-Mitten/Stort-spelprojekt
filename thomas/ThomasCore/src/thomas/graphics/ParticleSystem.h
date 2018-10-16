@@ -1,91 +1,133 @@
 #pragma once
+#include <vector>
+#include <memory>
+#include "..\utils\Buffers.h"
 #include "../utils/Math.h"
-#include <d3d11.h>
+
 
 
 namespace thomas
 {
-	namespace object
-	{
-		namespace component
-		{
-			class ParticleEmitterComponent;
-			class Transform;
-			class Camera;
-			
-		}
-	}
+	
 	namespace resource
 	{
 		class ComputeShader;
+		class Shader;
 	}
 	namespace graphics
 	{
-		
-		class Mesh;
 		class ParticleSystem
 		{
-		private:
-			
-
-			static void UpdateCameraBuffers(object::component::Transform* trans, math::Matrix viewProjMatrix, bool paused);
-			static void SwapUAVsandSRVs(object::component::ParticleEmitterComponent * emitter);//ping pong
-			
 		public:
-			ParticleSystem();
-			~ParticleSystem();
+			struct InitParticleBufferStruct
+			{
+				math::Vector3 position;
+				float distanceFromSphereCenter;
 
-			static void CreateBillboardUAVandSRV(int maxAmountOfParticles, ID3D11Buffer*& buffer, ID3D11UnorderedAccessView*& uav, ID3D11ShaderResourceView*& srv);
-			static void Init();
-			static void Destroy();
-			static void SpawnParticles(object::component::ParticleEmitterComponent* emitter, int amountOfParticles);
-			static void UpdateParticles(object::component::ParticleEmitterComponent* emitter);
-			static void DrawParticles(object::component::Camera * camera, object::component::ParticleEmitterComponent* emitter);
+				float radius;
+				float maxSpeed;
+				float minSpeed;
+				float endSpeed;
 
-			static ID3D11DepthStencilState* GetDepthStencilState();
+				float maxSize;
+				float minSize;
+				float endSize;
+				float maxLifeTime;
 
-		private:
+				float minLifeTime;
+				float gravity;
+				float minRotationSpeed;
+				float maxRotationSpeed;
 
+				math::Vector3 direction;
+				float pad;
 
-			struct BlendStates {
-				ID3D11BlendState* additive;
-				ID3D11BlendState* alphaBlend;
+				unsigned nrOfParticlesToEmit;
+				unsigned spawnAtSphereEdge;
+				unsigned rand;
+				unsigned pad2;
+
 			};
 
-			static BlendStates s_blendStates;
 
+
+		private:
 			struct BillboardStruct
 			{
 				math::Vector3 positions[2][3];
 				math::Vector2 pad2;
 				math::Vector2 uvs[2][3];
-				math::Vector4 colorFactor;
+				//math::Vector4 colorFactor;
 			};
-			struct CameraBufferStruct
+			struct ParticleStruct
 			{
-				math::Vector3 up;
-				float deltaTime;
-				math::Vector3 right;
+				math::Vector3 position;
+				float gravity;
+
+				math::Vector3 direction;
+				float speed;
+
+				float endSpeed;
+				float size;
+				float endSize;
+				float lifeTime;
+
+				float lifeTimeLeft;
+				float rotationSpeed;
+				float rotation;
 				float pad;
 			};
-			
-			static CameraBufferStruct s_cameraBufferStruct;
-			static math::Matrix s_viewProjMatrix;
-			static ID3D11Buffer* s_cameraBuffer;
-			
-			static resource::ComputeShader* s_updateParticlesCS;
-			static resource::ComputeShader* s_emitParticlesCS;
 
-			static ID3D11UnorderedAccessView* s_activeParticleUAV;
-			static ID3D11ShaderResourceView* s_activeParticleSRV;
-
-			static Mesh* s_emptyMesh;
 			
-			static ID3D11DepthStencilState* s_depthStencilState;
 
-			static unsigned int s_maxNumberOfBillboardsSupported;
 		public:
+			static void InitializeGlobalSystem();
+			static std::shared_ptr<ParticleSystem> GetGlobalSystem();
+			static void DestroyGlobalSystem();
+			ParticleSystem();
+			~ParticleSystem();
 
+			void Initialize(unsigned maxNrOfParticles);
+			void Destroy();
+			
+			void AddEmitterToSpawn(InitParticleBufferStruct& emitterInitData);
+			
+			void UpdateParticleSystem();
+			void DrawParticles();
+		private:
+
+			void SpawnParticles();
+			void UpdateAliveCount();
+		
+
+		private:
+			static std::shared_ptr<ParticleSystem> s_globalSystem;
+
+			unsigned m_maxNrOfParticles;
+
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;//struct{uint deadcount, uint alivecount , uint maxcount, -}
+			
+
+			resource::ComputeShader* m_emitParticlesCS;
+			resource::ComputeShader* m_updateParticlesCS;
+			resource::ComputeShader* m_calculateEmitCountCS;
+			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferIndirectArgs;//updateDispatchIndirect[3] + drawIndirectArgs[4]
+
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferSpawn;
+			std::unique_ptr<utils::buffers::Buffer>			  m_bufferSpawnIndex;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferUpdate;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferDeadList;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferAliveListPing;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferAliveListPong;
+			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferBillboard;
+			bool m_pingpong;
+
+			std::vector<InitParticleBufferStruct> m_emitters;
+			
+			resource::Shader* m_particleShader;
+
+			static const unsigned int UPDATE_THREAD_DIM_X = 256;
+			static const unsigned int EMIT_THREAD_DIM_X = 128;
 		};
 
 	

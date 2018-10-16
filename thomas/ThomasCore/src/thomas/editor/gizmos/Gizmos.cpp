@@ -5,16 +5,36 @@
 #include "../../graphics/Mesh.h"
 #include "../../utils/d3d.h"
 #include "../../utils/Buffers.h"
+#include "GizmoRenderCommand.h"
+#include "GizmoRenderBuffer.h"
+#include "../../ThomasCore.h"
 namespace thomas
 {
 	namespace editor
 	{
-		std::vector<Gizmos::GizmoRenderCommand> Gizmos::s_gizmoCommands;
-		std::vector<Gizmos::GizmoRenderCommand> Gizmos::s_prevGizmoCommands;
-		resource::Material* Gizmos::s_gizmoMaterial;
-		utils::buffers::VertexBuffer* Gizmos::s_vertexBuffer;
-		math::Matrix Gizmos::s_matrix;
-		math::Color Gizmos::s_color;
+		Gizmos::Gizmos() : 
+			m_gizmoMaterial(NULL),
+			m_vertexBuffer(),
+			m_matrix(),
+			m_imguiNumber()
+		{
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
+			{
+				m_update_buffers[i] = new gizmo::GizmoRenderBuffer();
+				m_render_buffers[i] = new gizmo::GizmoRenderBuffer();
+			}
+		}
+
+		Gizmos::~Gizmos()
+		{
+		}
+
+		Gizmos & Gizmos::Gizmo()
+		{
+			static Gizmos gizmo;
+			return gizmo;
+		}
+
 		void Gizmos::DrawModel(resource::Model * model, math::Vector3 position = math::Vector3::Zero, math::Quaternion rotation = math::Quaternion::Identity, math::Vector3 scale = math::Vector3::One)
 		{
 			DrawModel(model, -1, position, rotation, scale);
@@ -162,7 +182,7 @@ namespace thomas
 
 		void Gizmos::DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
 		{
-			static const size_t ringSegments = 32;
+			const size_t ringSegments = 32;
 
 			float angleDelta = math::PI*2.0f / float(ringSegments);
 
@@ -192,7 +212,7 @@ namespace thomas
 
 		void Gizmos::DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
 		{
-			static const size_t ringSegments = 16;
+			const size_t ringSegments = 16;
 
 			float angleDelta = math::PI / float(ringSegments);
 
@@ -306,47 +326,48 @@ namespace thomas
 
 			DrawLines(lines);
 		}
-
+		
 		void Gizmos::DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology)
 		{
-			//s_vertexBuffer->SetData(lines);
-
-			//s_gizmoMaterial->SetShaderPass((int)GizmoPasses::SOLID);
-
-			//s_gizmoMaterial->GetShader()->BindVertexBuffer(s_vertexBuffer);
-			//s_gizmoMaterial->m_topology = D3D10_PRIMITIVE_TOPOLOGY_LINELIST;
-			//s_gizmoMaterial->Bind();
-			//s_gizmoMaterial->Draw(lines.size(), 0);
-
-			s_gizmoCommands.push_back(GizmoRenderCommand(lines, s_matrix, s_color, topology, GizmoPasses::SOLID));
+			// Submit to thread buffer:
+			m_render_buffers[ThomasCore::Core().Thread_Index()]->submitCmd(
+				gizmo::GizmoRenderCommand(
+					lines.data(), lines.size(),				// Vertex info
+					m_matrix, s_color,						// Transform, color (Transform 'should'/could be applied to the vertex data).
+					topology, gizmo::GizmoPasses::SOLID));	// 
 		}
 
 		void Gizmos::TransferGizmoCommands()
 		{
-
-			s_prevGizmoCommands = s_gizmoCommands;
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++) 
+				std::swap(m_render_buffers[i], m_update_buffers[i]);
 		}
 
 		void Gizmos::RenderGizmos()
 		{
-			for (GizmoRenderCommand& command : s_prevGizmoCommands)
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
 			{
+				gizmo::GizmoRenderBuffer & buf = *m_render_buffers[i];
+				for (uint32_t i = 0; i < buf.Count(); i++)
+				{
+					gizmo::GizmoRenderCommand& command = buf[i];
+					m_gizmoMaterial->SetShaderPass((int)command.pass);
+					m_gizmoMaterial->SetMatrix("gizmoMatrix", command.matrix);
+					m_gizmoMaterial->SetColor("gizmoColor", command.color);
+					m_gizmoMaterial->m_topology = command.topology;
 
-				s_gizmoMaterial->SetShaderPass((int)command.pass);
-				s_gizmoMaterial->SetMatrix("gizmoMatrix", command.matrix);
-				s_gizmoMaterial->SetColor("gizmoColor", command.color);
-				s_gizmoMaterial->m_topology = command.topology;
-
-				s_vertexBuffer->SetData(command.vertexData);
-				s_gizmoMaterial->GetShader()->BindVertexBuffer(s_vertexBuffer);
-				s_gizmoMaterial->Bind();
-				s_gizmoMaterial->Draw(command.vertexData.size(), 0);
+					m_vertexBuffer->SetData(command.vertexData, command.numVertex);
+					m_gizmoMaterial->GetShader()->BindVertexBuffer(m_vertexBuffer);
+					m_gizmoMaterial->Bind();
+					m_gizmoMaterial->Draw(command.numVertex, 0);
+				}
 			}
 		}
 
 		void Gizmos::ClearGizmos()
 		{
-			s_gizmoCommands.clear();
+			for (uint32_t i = 0; i < MAX_NUM_THREAD; i++)
+				m_update_buffers[i]->clear();
 		}
 
 		void Gizmos::Init()
@@ -354,19 +375,19 @@ namespace thomas
 			resource::Shader* shader = resource::Shader::CreateShader("../Data/FXIncludes/GizmoShader.fx");
 			if (shader)
 			{
-				s_gizmoMaterial = new resource::Material(shader);
+				m_gizmoMaterial = new resource::Material(shader);
 				SetColor(math::Color(1, 1, 1));
 				SetMatrix(math::Matrix::Identity);
 			}
 
-			s_vertexBuffer = new utils::buffers::VertexBuffer(nullptr, sizeof(math::Vector3), 500, DYNAMIC_BUFFER); //500 hardcoded here :/
+			m_vertexBuffer = new utils::buffers::VertexBuffer(nullptr, sizeof(math::Vector3), 500, DYNAMIC_BUFFER); //500 hardcoded here :/
 
 		}
 
 		void Gizmos::Destroy()
 		{
-			delete s_gizmoMaterial;
-			delete s_vertexBuffer;
+			delete m_gizmoMaterial;
+			delete m_vertexBuffer;
 		}
 
 
@@ -378,7 +399,7 @@ namespace thomas
 
 		void Gizmos::SetMatrix(math::Matrix matrix)
 		{
-			s_matrix = matrix;
+			m_matrix = matrix;
 			//s_gizmoMaterial->SetMatrix("gizmoMatrix", matrix);
 		}
 

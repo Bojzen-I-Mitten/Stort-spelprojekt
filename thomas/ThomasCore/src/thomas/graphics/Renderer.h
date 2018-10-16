@@ -1,6 +1,5 @@
 #pragma once
 #include "..\utils\Math.h"
-#include "LightManager.h"
 #include <vector>
 #include <map>
 #include <memory>
@@ -54,15 +53,15 @@ namespace thomas
 			void SubmitCommand(render::RenderCommand& command);
 			render::Frame& getAllocator();
 
-
 			void TransferCommandList();
 
 		private:
 			static Renderer s_renderer;
-
+			
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
+			
 		};
 	}
 }
