@@ -269,7 +269,7 @@ namespace ThomasEditor
                     if (m_hierarchyNodes.Count > 0)
                     {
                         ResetTree(m_hierarchyNodes.ToList());
-                        Inspector.instance.SelectedObject = null;
+                        //Inspector.instance.SelectedObject = null;
                     }
                         
                 }
@@ -394,7 +394,7 @@ namespace ThomasEditor
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
                 GameObject targetModel = null;
                 //If drop function is called from Inspector
-                if (m_inspector)
+                if (m_inspector && hierarchy.SelectedItem != null)
                 {
                     targetModel = (GameObject)(hierarchy.SelectedItem as TreeItemViewModel).Data;
                     m_inspector = false;
