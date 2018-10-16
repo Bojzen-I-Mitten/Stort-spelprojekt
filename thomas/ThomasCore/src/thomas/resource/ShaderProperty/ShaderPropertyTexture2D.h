@@ -2,6 +2,7 @@
 #include "ShaderProperty.h"
 #include "../texture/Texture2D.h"
 #include "../texture/Texture2DArray.h"
+#include "../Shader.h"
 namespace thomas
 {
 	namespace resource

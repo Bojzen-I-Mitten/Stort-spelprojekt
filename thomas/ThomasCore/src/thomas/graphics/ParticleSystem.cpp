@@ -34,7 +34,7 @@ namespace thomas
 
 		}
 
-		void ParticleSystem::Initialize(unsigned maxNrOfParticles)//, unsigned MaxNrOfEmitters)
+		void ParticleSystem::Initialize(unsigned maxNrOfParticles)
 		{
 			m_maxNrOfParticles = maxNrOfParticles;
 			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/emitParticlesCS.fx");
@@ -100,6 +100,7 @@ namespace thomas
 			SAFE_RELEASE(m_bufferCounters);
 			SAFE_RELEASE(m_bufferSpawnIndex);
 
+			delete m_texArr;
 			//m_updateParticlesCS 
 			//m_emitParticlesCS
 		}
@@ -112,6 +113,11 @@ namespace thomas
 		unsigned ParticleSystem::AddTexture(resource::Texture2D * tex)
 		{
 			return m_texArr->AddTexture(tex);
+		}
+
+		void ParticleSystem::DeRefTexFromTexArray(unsigned i)
+		{
+			m_texArr->DeRefTexture(i);
 		}
 		
 		void ParticleSystem::SpawnParticles()

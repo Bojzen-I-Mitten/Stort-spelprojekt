@@ -13,7 +13,7 @@ namespace ThomasEngine
 
 	internal:
 		Texture2D(String^ path) : Texture(path, new thomas::resource::Texture2D(Utility::ConvertString(path))) {};
-		Texture2D(int width, int height, bool mipMap, bool linear) : Texture("", new thomas::resource::Texture2D(width, height, mipMap, linear)) {};
+		Texture2D(int width, int height, bool mipMap) : Texture("", new thomas::resource::Texture2D(width, height, mipMap)) {};
 		Texture2D(thomas::resource::Texture2D* nativePtr) : Texture(Utility::ConvertString(nativePtr->GetPath()), nativePtr) {};
 	public:
 

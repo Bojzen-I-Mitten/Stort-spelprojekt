@@ -14,9 +14,9 @@ namespace thomas
 		public:
 			static void Init();
 			static void Destroy();
-			Texture2D(Texture2D* other);
-			Texture2D(int width, int height, bool mipMap, bool linear);
-			Texture2D(void* initData, int width, int height, bool mipMap, bool linear);
+
+			Texture2D(int width, int height, bool mipMap);
+			Texture2D(void* initData, int width, int height, bool mipMap);
 			Texture2D(std::string path);
 
 			void OnChanged();
@@ -33,7 +33,6 @@ namespace thomas
 		private:
 			DirectX::ScratchImage* data;
 			int m_mipmapCount;
-			bool m_linear;
 			bool m_mipMap;
 			static Texture2D* s_blackTexture;
 			static Texture2D* s_whiteTexture;

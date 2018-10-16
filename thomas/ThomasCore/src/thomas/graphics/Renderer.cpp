@@ -154,10 +154,11 @@ namespace thomas
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::Gizmo().RenderGizmos();
 			}
-#endif
+
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 
 	}
 }
+
 

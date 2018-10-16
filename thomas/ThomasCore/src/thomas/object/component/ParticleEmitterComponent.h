@@ -29,6 +29,7 @@ namespace thomas
 				void Update();
 				void OnEnable();
 				void OnDisable();
+				void OnDestroy();
 				ParticleEmitterComponent();
 				~ParticleEmitterComponent();
 

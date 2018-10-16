@@ -14,18 +14,20 @@ namespace thomas
 			
 		public:
 			Texture2DArray(int width, int height, DXGI_FORMAT format);
+			~Texture2DArray();
+
+			void UnloadTextures();
+			void DeRefTexture(unsigned i);
 			
 			unsigned AddTexture(Texture2D* tex);
 
 			void OnChanged();
 
 		private:
-			int m_mipmapCount;
-			bool m_linear;
-			bool m_mipMap;
 
 			std::vector<Texture2D*> m_textures;
-			
+			std::vector<unsigned> m_textureRefCount;
+
 			DXGI_FORMAT m_format;
 		};
 	}

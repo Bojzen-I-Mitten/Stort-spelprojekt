@@ -92,6 +92,7 @@ namespace thomas
 			
 			void AddEmitterToSpawn(InitParticleBufferStruct& emitterInitData);
 			unsigned AddTexture(resource::Texture2D* tex);
+			void DeRefTexFromTexArray(unsigned i);
 			
 			void UpdateParticleSystem();
 			void DrawParticles();

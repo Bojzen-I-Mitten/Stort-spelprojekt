@@ -66,12 +66,12 @@ namespace thomas
 				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
 				editor::Gizmos::Gizmo().DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
 				
-				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0), m_particleBufferStruct.radius), math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(90), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(270), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(90), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(270), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180), m_particleBufferStruct.radius), math::Vector3::Zero);
 				
 				//ImGui::SetNextWindowPos(ImVec2(5, 5));
 				
@@ -135,6 +135,11 @@ namespace thomas
 
 			void ParticleEmitterComponent::OnDisable()
 			{
+			}
+
+			void ParticleEmitterComponent::OnDestroy()
+			{
+				m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
 			}
 
 			
@@ -317,7 +322,11 @@ namespace thomas
 
 			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)
 			{
+				if (other == m_texture)
+					return;
+
 				m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(other);
+
 				m_texture = other;
 			}
 
