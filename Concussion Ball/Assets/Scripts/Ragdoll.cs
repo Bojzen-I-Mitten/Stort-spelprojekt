@@ -29,8 +29,8 @@ namespace ThomasEditor
         public string UpperLeftLeg { get; set; }
         public string LowerLeftLeg { get; set; }
         public string LeftFoot { get; set; }
-
-
+        public Vector2 AllobjectDamping { get; set; }
+        public float Totalmass { get; set; }
 
         GameObject G_Hips;
         GameObject G_Spine;
@@ -65,7 +65,8 @@ namespace ThomasEditor
             spherecolliderhips.radius = 0.2f*100;
             Rigidbody rigidbodyhips = G_Hips.AddComponent<Rigidbody>();
             rigidbodyhips.IsKinematic = AllobjectKinectic;
-
+            rigidbodyhips.Damping = AllobjectDamping;
+            rigidbodyhips.Mass = Totalmass;
             //Spine
             G_Spine = new GameObject("Spine");
             G_Spine.transform.SetParent(gameObject.transform);
@@ -80,7 +81,9 @@ namespace ThomasEditor
             G_Spine.transform.localPosition = new Vector3(G_Spine.transform.localPosition.x * 100, G_Spine.transform.localPosition.y * 100, G_Spine.transform.localPosition.z * 100);
             Rigidbody rigidbodySpine = G_Spine.AddComponent<Rigidbody>();
             rigidbodySpine.IsKinematic = AllobjectKinectic;
-           
+            rigidbodySpine.Damping = AllobjectDamping;
+            rigidbodySpine.Mass = Totalmass;
+
             //Joint from hips to Spine
             Joint HipSpineJoint=G_Hips.AddComponent<Joint>();
             HipSpineJoint.Axis = new Vector3(0, 0, -90);
@@ -105,7 +108,11 @@ namespace ThomasEditor
             spherecolliderHead.radius = 0.2f * 100;
             Rigidbody rigidbodyHead = G_Head.AddComponent<Rigidbody>();
             rigidbodyHead.IsKinematic = AllobjectKinectic;
+            rigidbodyHead.Damping = AllobjectDamping;
+            rigidbodyHead.Mass = Totalmass;
             spherecolliderHead.center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, renderskinnedcomponent);
+
+
 
             //Joint from spine to head
             Joint HeadSpineJoint = G_Head.AddComponent<Joint>();
@@ -134,6 +141,8 @@ namespace ThomasEditor
             CapsuleColliderLeftArm.radius = 0.065f * 100f;
             Rigidbody rigidbodyLeftArm = G_LeftArm.AddComponent<Rigidbody>();
             rigidbodyLeftArm.IsKinematic = AllobjectKinectic;
+            rigidbodyLeftArm.Damping = AllobjectDamping;
+            rigidbodyLeftArm.Mass = Totalmass;
             CapsuleColliderLeftArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
 
             //Joint from leftarm totorso
@@ -163,6 +172,8 @@ namespace ThomasEditor
             CapsuleColliderLeftUnderArm.radius = 0.065f * 100f;
             Rigidbody rigidbodyLeftUnderArm = G_LeftUnderArm.AddComponent<Rigidbody>();
             rigidbodyLeftUnderArm.IsKinematic = AllobjectKinectic;
+            rigidbodyLeftUnderArm.Damping = AllobjectDamping;
+            rigidbodyLeftUnderArm.Mass = Totalmass;
             CapsuleColliderLeftUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, renderskinnedcomponent));
 
 
@@ -203,6 +214,8 @@ namespace ThomasEditor
             CapsuleColliderRightArm.radius = 0.065f * 100f;
             Rigidbody rigidbodyRightArm = G_RightArm.AddComponent<Rigidbody>();
             rigidbodyRightArm.IsKinematic = AllobjectKinectic;
+            rigidbodyRightArm.Damping = AllobjectDamping;
+            rigidbodyRightArm.Mass = Totalmass;
             CapsuleColliderRightArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, renderskinnedcomponent));
 
 
@@ -235,6 +248,8 @@ namespace ThomasEditor
             CapsuleColliderRightUnderArm.radius = 0.065f * 100f;
             Rigidbody rigidbodyRightUnderArm = G_RightUnderArm.AddComponent<Rigidbody>();
             rigidbodyRightUnderArm.IsKinematic = AllobjectKinectic;
+            rigidbodyRightUnderArm.Damping = AllobjectDamping;
+            rigidbodyRightUnderArm.Mass = Totalmass;
             CapsuleColliderRightUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, renderskinnedcomponent));
 
 
@@ -265,6 +280,8 @@ namespace ThomasEditor
             CapsuleColliderRightLeg.radius = 0.065f * 100f;
             Rigidbody rigidbodyRightLeg = G_RightLeg.AddComponent<Rigidbody>();
             rigidbodyRightLeg.IsKinematic = AllobjectKinectic;
+            rigidbodyRightLeg.Damping = AllobjectDamping;
+            rigidbodyRightLeg.Mass = Totalmass;
             CapsuleColliderRightLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
 
 
@@ -294,6 +311,8 @@ namespace ThomasEditor
             CapsuleColliderRightUnderLeg.height = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, renderskinnedcomponent);
             CapsuleColliderRightUnderLeg.radius = 0.065f * 100f;
             Rigidbody rigidbodyRightUnderLeg = G_RightUnderLeg.AddComponent<Rigidbody>();
+            rigidbodyRightUnderLeg.Damping = AllobjectDamping;
+            rigidbodyRightUnderLeg.Mass = Totalmass;
             rigidbodyRightUnderLeg.IsKinematic = AllobjectKinectic;
             CapsuleColliderRightUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, renderskinnedcomponent);
 
@@ -307,9 +326,70 @@ namespace ThomasEditor
             RightUnderLegJoint.TwistAngle = 53;
             RightUnderLegJoint.ConnectedAnchor = CapsuleColliderRightUnderLeg.center;
             RightUnderLegJoint.Anchor = -CapsuleColliderRightUnderLeg.center;
-                //       RightUnderLegJoint.Anchor = -calculatePosbetweenTwoSkeletonschanges(, , renderskinnedcomponent);//new Vector3(0, calculateLengthBetweenSkeleton(UpperRightUnderLeg, LowerRightUnderLeg, renderskinnedcomponent) * 0.5f, 0);
-                //         RightUnderLegJoint.ConnectedAnchor
+            //       RightUnderLegJoint.Anchor = -calculatePosbetweenTwoSkeletonschanges(, , renderskinnedcomponent);//new Vector3(0, calculateLengthBetweenSkeleton(UpperRightUnderLeg, LowerRightUnderLeg, renderskinnedcomponent) * 0.5f, 0);
+            //         RightUnderLegJoint.ConnectedAnchor
 
+            //left leg
+
+            G_LeftLeg = new GameObject("LeftLeg");
+            G_LeftLeg.transform.SetParent(gameObject.transform);
+            BoneTransformComponent B_LeftLeg = G_LeftLeg.AddComponent<BoneTransformComponent>();
+            B_LeftLeg.BoneName = UpperLeftLeg;
+            B_LeftLeg.AnimatedObject = gameObject;
+            renderskinnedcomponent.FetchBoneIndex(Utility.hash(UpperLeftLeg), out boneindex);
+            G_LeftLeg.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_LeftLeg.transform.localPosition = new Vector3(G_LeftLeg.transform.localPosition.x * 100, G_LeftLeg.transform.localPosition.y * 100, G_LeftLeg.transform.localPosition.z * 100);
+            CapsuleCollider CapsuleColliderLeftLeg = G_LeftLeg.AddComponent<CapsuleCollider>();
+            CapsuleColliderLeftLeg.height = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
+            CapsuleColliderLeftLeg.radius = 0.065f * 100f;
+            Rigidbody rigidbodyLeftLeg = G_LeftLeg.AddComponent<Rigidbody>();
+            rigidbodyLeftLeg.IsKinematic = AllobjectKinectic;
+            rigidbodyLeftLeg.Damping = AllobjectDamping;
+            rigidbodyLeftLeg.Mass = Totalmass;
+            CapsuleColliderLeftLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
+
+
+            //Joint from LeftLegJoint
+            Joint LeftLegJoint = G_LeftLeg.AddComponent<Joint>();
+            LeftLegJoint.Axis = new Vector3(0, 0, -90);
+            LeftLegJoint.SwingAxis = new Vector3(0, 0, 0);
+            LeftLegJoint.NoCollision = true;
+            LeftLegJoint.ConnectedRigidbody = rigidbodyhips;
+            LeftLegJoint.SwingAngle1 = 90;
+            LeftLegJoint.SwingAngle2 = 90;
+            LeftLegJoint.Anchor = -calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);//new Vector3(0, calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent) * 0.5f, 0);
+            LeftLegJoint.ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperLeftLeg, renderskinnedcomponent) * 2;
+
+
+
+            //LeftUnderLeg
+            G_LeftUnderLeg = new GameObject("LeftLowerLeg");
+            G_LeftUnderLeg.transform.SetParent(gameObject.transform);
+            BoneTransformComponent B_LeftUnderLeg = G_LeftUnderLeg.AddComponent<BoneTransformComponent>();
+            B_LeftUnderLeg.BoneName = LowerLeftLeg;
+            B_LeftUnderLeg.AnimatedObject = gameObject;
+            renderskinnedcomponent.FetchBoneIndex(Utility.hash(LowerLeftLeg), out boneindex);
+            G_LeftUnderLeg.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_LeftUnderLeg.transform.localPosition = new Vector3(G_LeftUnderLeg.transform.localPosition.x * 100, G_LeftUnderLeg.transform.localPosition.y * 100, G_LeftUnderLeg.transform.localPosition.z * 100);
+            CapsuleCollider CapsuleColliderLeftUnderLeg = G_LeftUnderLeg.AddComponent<CapsuleCollider>();
+            CapsuleColliderLeftUnderLeg.height = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
+            CapsuleColliderLeftUnderLeg.radius = 0.065f * 100f;
+            Rigidbody rigidbodyLeftUnderLeg = G_LeftUnderLeg.AddComponent<Rigidbody>();
+            rigidbodyLeftUnderLeg.IsKinematic = AllobjectKinectic;
+            rigidbodyLeftUnderLeg.Damping = AllobjectDamping;
+            rigidbodyLeftUnderLeg.Mass = Totalmass;
+            CapsuleColliderLeftUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
+
+            Joint LeftUnderLegJoint = G_LeftUnderLeg.AddComponent<Joint>();
+            LeftUnderLegJoint.Axis = new Vector3(0, 0, 0);
+            LeftUnderLegJoint.SwingAxis = new Vector3(0, 0, 0);
+            LeftUnderLegJoint.NoCollision = true;
+            LeftUnderLegJoint.ConnectedRigidbody = rigidbodyLeftLeg;
+            LeftUnderLegJoint.SwingAngle1 = 90;
+            LeftUnderLegJoint.SwingAngle2 = 10;
+            LeftUnderLegJoint.TwistAngle = 53;
+            LeftUnderLegJoint.ConnectedAnchor = CapsuleColliderLeftUnderLeg.center;
+            LeftUnderLegJoint.Anchor = -CapsuleColliderLeftUnderLeg.center;
 
 
         }
