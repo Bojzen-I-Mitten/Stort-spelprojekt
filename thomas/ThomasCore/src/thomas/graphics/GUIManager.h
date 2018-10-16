@@ -67,7 +67,7 @@ namespace thomas
 
 		private:
 			std::map<std::string, Image> m_images;
-			std::unique_ptr<SpriteBatch> m_spriteBatch;
+			SpriteBatch* m_spriteBatch;
 		};
 	}
 }

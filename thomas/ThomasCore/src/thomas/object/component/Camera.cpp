@@ -64,6 +64,7 @@ namespace thomas
 						m_renderGUI = false;
 						m_GUIHandle.reset();
 						//
+
 						s_allCameras.erase(s_allCameras.begin() + i);
 						break;
 					}		

@@ -8,30 +8,36 @@ namespace thomas
 {
 	namespace graphics
 	{
-		GUIManager::GUIManager()
+		GUIManager::GUIManager() :
+		m_spriteBatch(nullptr)
 		{
-			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+			m_spriteBatch = new SpriteBatch(utils::D3D::Instance()->GetDeviceContext());
 		}
 
 		void GUIManager::Destroy()
 		{
 			m_images.clear();
-			m_spriteBatch.reset();
+
+			delete m_spriteBatch;
+			m_spriteBatch = nullptr;
 		}
 
 		void GUIManager::Render()
 		{
 			// Begin
-			m_spriteBatch->Begin();
-
-			for (const auto& image : m_images)
+			if (m_spriteBatch != nullptr)
 			{
-				m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position, nullptr, image.second.color,
-									image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
-			}
+				m_spriteBatch->Begin();
 
-			// End
-			m_spriteBatch->End();
+				for (const auto& image : m_images)
+				{
+					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position, nullptr, image.second.color,
+										image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
+				}
+
+				// End
+				m_spriteBatch->End();
+			}
 		}
 
 		void GUIManager::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
