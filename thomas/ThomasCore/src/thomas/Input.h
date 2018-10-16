@@ -221,6 +221,7 @@ namespace thomas
 		void ResetScrollWheelValue();
 		void Vibrate(float left, float right, float time = 0.f);
 		void Reset();
+
 	public:
 		void SetMouseMode(MouseMode mode);
 	
@@ -239,6 +240,9 @@ namespace thomas
 		bool GetKeyDown(Keys key);
 		bool GetKeyUp(Keys key);
 		bool GetKey(Keys key);
+
+		void SetLastKey(unsigned short key);
+		unsigned short GetLastKey() const;
 	
 		//Gamepad
 		bool GetButtonDown(Buttons button);
@@ -272,5 +276,6 @@ namespace thomas
 		bool m_initialized;
 		math::Vector2 m_mousePosition, m_absolutePosition;
 		float s_vibrateTimeLeft;
+		unsigned short m_lastKey;	
 	};
 }

@@ -26,13 +26,15 @@ public class GUITest : ScriptComponent
 
     public override void Update()
     {
-        if (Camera.OnImageHovered("Chad"))
+        if (Camera.OnImageClicked("Chad"))
         {
-            Camera.SetImageColor("Chad", RedColor);
+            Debug.Log(Input.GetLastKey());
+
+            //Camera.SetImageColor("Chad", RedColor);
         }
-        else
-        {
-            Camera.SetImageColor("Chad", OriginalColor);
-        }
+        //else
+        //{
+        //    Camera.SetImageColor("Chad", OriginalColor);
+        //}
     }
 }
