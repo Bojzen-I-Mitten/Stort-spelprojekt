@@ -14,6 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "../graphics/GUIManager.h"
 #include "ParticleSystem.h"
 
 namespace thomas
@@ -113,7 +114,6 @@ namespace thomas
 			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
 			//m_particleSystem->UpdateParticleSystem();
 
-			//unsigned index = 0;
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -130,15 +130,13 @@ namespace thomas
 				}
 
 				ParticleSystem::GetGlobalSystem()->DrawParticles();
-				//m_particleSystem->DrawParticles();
+				//m_particleSystem->DrawParticles();	
 
-				// *Temp solution*: Draw GUI on the main game camera
-				/*if (index == 1)
+				// Draw GUI for each camera that has enabled GUI rendering
+				if (perCameraQueue.first->GetGUIRendering())
 				{
-					GUI::ThomasGUI::Render();
+					perCameraQueue.first->GetGUIHandle()->Render();
 				}
-
-				index++;*/
 			}
 	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
