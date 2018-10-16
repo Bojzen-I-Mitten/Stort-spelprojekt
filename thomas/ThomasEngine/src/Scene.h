@@ -2,6 +2,7 @@
 
 #pragma unmanaged
 
+#include <stdint.h>
 
 #pragma managed
 
@@ -34,6 +35,10 @@ namespace ThomasEngine {
 
 
 		Scene(System::String^ name);
+		~Scene();
+
+		uint32_t ID() { return 1; } // 0 is reserved, unique ID's to be implemented.
+
 		void Play();
 		void Stop() { m_playing = false; }
 
@@ -118,3 +123,4 @@ namespace ThomasEngine {
 		}
 	};
 }
+

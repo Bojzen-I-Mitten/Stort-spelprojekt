@@ -11,6 +11,8 @@ namespace ThomasEngine {
 	{
 		static List<Object^> s_objects;
 	private:
+		/* Silent destruction. */
+		void Delete();
 		
 	protected:
 		
@@ -28,6 +30,8 @@ namespace ThomasEngine {
 	public:
 
 		Object(thomas::object::Object* ptr);
+		virtual ~Object();
+
 
 		[field:NonSerializedAttribute]
 		virtual event PropertyChangedEventHandler^ PropertyChanged;

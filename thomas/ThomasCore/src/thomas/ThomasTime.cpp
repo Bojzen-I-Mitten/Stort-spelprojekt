@@ -2,6 +2,7 @@
 #include "Common.h"
 #include <Windows.h>
 #include <ctime>
+#include "ThomasCore.h"
 
 namespace thomas
 {

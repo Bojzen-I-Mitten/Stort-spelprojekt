@@ -11,6 +11,7 @@
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
 #include "..\WindowManager.h"
+#include "..\graphics\LightManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
@@ -132,12 +133,14 @@ namespace thomas
 				//m_particleSystem->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
+#ifdef _EDITOR
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
-				editor::Gizmos::RenderGizmos();
+				editor::Gizmos::Gizmo().RenderGizmos();
 			}
+#endif
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 

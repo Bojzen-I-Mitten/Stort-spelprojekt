@@ -1,14 +1,17 @@
 #pragma once
 #include "Object.h"
-#include "component\Components.h"
+#include "component\Component.h"
 #include <vector>
 #include <memory>
+#include "component/Transform.h"
 
 namespace thomas
 {
 	class Scene;
 	namespace object
 	{
+		namespace component {
+		}
 		class GameObject : public Object
 		{
 		private:
@@ -41,6 +44,15 @@ namespace thomas
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, Scene* scene);
 			template<typename T>
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, component::Transform* parent, Scene* scene);
+			
+			/* Destroy the component referenced to in the pointer.
+			 comp_ptr	<<	Component to destroy
+			 return		>>	0 if component was found and removed.
+			*/
+			int DestroyComponent(void * comp_ptr);
+
+		public:
+			
 			bool GetActive();
 			void SetActive(bool active);
 			void SetSelection(bool selected);
@@ -90,7 +102,7 @@ namespace thomas
 			}
 			return components;
 		}
-
+		
 		template<typename T>
 		T * GameObject::Instantiate(component::Transform * parent, Scene * scene)
 		{
