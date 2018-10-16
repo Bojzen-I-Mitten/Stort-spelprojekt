@@ -163,6 +163,11 @@ namespace ThomasEngine
 										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
+	void Camera::SetText(String^ id, String^ newText)
+	{
+		camera->GetGUIHandle()->SetText(Utility::ConvertString(id), Utility::ConvertString(newText));
+	}
+
 	void Camera::SetTextPosition(String^ id, Vector2 position)
 	{
 		camera->GetGUIHandle()->SetTextPosition(Utility::ConvertString(id), Utility::Convert(position));

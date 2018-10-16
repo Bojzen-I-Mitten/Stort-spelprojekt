@@ -96,6 +96,7 @@ namespace ThomasEngine
 		void AddText(String^ id, String^ text, Vector2 position, Vector2 scale, Font^ font, Vector4 color);
 		void AddText(String^ id, String^ text, Vector2 position, Vector2 scale, float rotation, Font^ font, Vector4 color);
 
+		void SetText(String^ id, String^ newText);
 		void SetTextPosition(String^ id, Vector2 position);
 		void SetTextColor(String^ id, Vector4 color);
 		void SetTextScale(String^ id, Vector2 scale);

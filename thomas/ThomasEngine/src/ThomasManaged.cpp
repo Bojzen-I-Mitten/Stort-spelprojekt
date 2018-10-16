@@ -185,7 +185,7 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
-					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
+					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Keys::F1)) {
 						showStatistics = !showStatistics;
 					}
 						
