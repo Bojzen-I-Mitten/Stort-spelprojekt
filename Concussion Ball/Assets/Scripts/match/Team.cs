@@ -11,7 +11,8 @@ using System.ComponentModel;
 public class Team
 {
     private List<NetworkPlayer> _Players;
-    private BoxCollider _SpawnArea;
+    private TeamSpawn _SpawnArea;
+    private TeamGoal _GoalArea;
     private int _Score;
 
     public TEAM_TYPE TeamType;
@@ -20,7 +21,7 @@ public class Team
     [Browsable(false)]
     public int PlayerCount { get { return _Players.Count; } }
     [Browsable(false)]
-    public BoxCollider SpawnArea { get { return _SpawnArea; } }
+    public TeamSpawn SpawnArea { get { return _SpawnArea; } }
     [Browsable(false)]
     public List<NetworkPlayer> Players { get { return _Players; } }
    
@@ -33,11 +34,10 @@ public class Team
         _Players = new List<NetworkPlayer>(4);
     }
 
-    public void Start()
-    {
-        GameObject teamObject = GameObject.Find(TeamType.ToString());
-        _SpawnArea = teamObject?.GetComponent<BoxCollider>();
-    }
+    public void SetSpawnArea(TeamSpawn spawn) { _SpawnArea = spawn; }
+    public void SetGoalArea(TeamGoal goal) { _GoalArea = goal; }
+
+
 
 
     public Vector3 GetSpawnPosition()
@@ -45,10 +45,10 @@ public class Team
         Vector3 spawnPoint = Vector3.Zero;
         if (_SpawnArea)
         {
-            spawnPoint = SpawnArea.transform.position + SpawnArea.center;
+            spawnPoint = SpawnArea.transform.position;
             //Random x, z point inside the box
-            spawnPoint.x += Random.Range(-SpawnArea.size.x, SpawnArea.size.x);
-            spawnPoint.z += Random.Range(-SpawnArea.size.z, SpawnArea.size.z);
+            spawnPoint.x += Random.Range(-SpawnArea.transform.scale.x, SpawnArea.transform.scale.x);
+            spawnPoint.z += Random.Range(-SpawnArea.transform.scale.z, SpawnArea.transform.scale.z);
         }
         return spawnPoint;
     }

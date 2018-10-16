@@ -32,7 +32,6 @@ public class NetworkPlayer : NetworkComponent
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
-        Debug.Log(teamType.ToString());
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
         if(Team != newTeam)
             JoinTeam(newTeam);

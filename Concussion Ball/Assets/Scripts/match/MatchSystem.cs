@@ -144,8 +144,7 @@ public class MatchSystem : NetworkManager
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
             if (Input.GetKeyDown(Input.Keys.Space))
             {
-                OnMatchStart();
-                OnRoundStart();
+
             }
         }
 
@@ -169,7 +168,8 @@ public class MatchSystem : NetworkManager
         np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
 
         Scene.Players[peer].gameObject.SetActive(false);
-        
+        OnMatchStart();
+        OnRoundStart();
     }
 
     protected override void OnPeerLeave(NetPeer peer)
