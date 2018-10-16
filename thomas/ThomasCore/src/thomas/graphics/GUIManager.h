@@ -75,7 +75,7 @@ namespace thomas
 			bool OnImageHovered(const std::string& id);
 
 			void AddText(const std::string& id, std::string text, const Vector2& position, const Vector2& scale = Vector2(1.f),
-				float rotation = 0.f, const Vector4& color = Vector4(1.f), Font* font = nullptr);
+						float rotation = 0.f, const Vector4& color = Vector4(1.f), Font* font = nullptr);
 			void SetTextPosition(const std::string& id, const Vector2& position);
 			void SetTextColor(const std::string& id, const Vector4& color);
 			void SetTextScale(const std::string& id, const Vector2& scale);
@@ -83,14 +83,14 @@ namespace thomas
 
 		private:
 			Image& GetImage(const std::string& id);
-			bool CheckImageIntersection(const std::string& id);
 			Text& GetText(const std::string& id);
+			bool CheckImageIntersection(const std::string& id);
 
 		private:
 			std::map<std::string, Image> m_images;
-			SpriteBatch* m_spriteBatch;
-			std::unique_ptr<Font> m_defaultFont;
 			std::map<std::string, Text> m_texts;
+			SpriteBatch* m_spriteBatch;
+			Font* m_defaultFont;
 		};
 	}
 }
