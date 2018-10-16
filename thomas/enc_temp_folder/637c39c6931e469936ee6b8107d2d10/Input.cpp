@@ -376,7 +376,6 @@ namespace thomas
 	//Keyboard
 	bool Input::GetKeyDown(Keys key)
 	{
-		
 		return m_keyboardTracker.IsKeyPressed((Keyboard::Keys)key);
 	}	
 

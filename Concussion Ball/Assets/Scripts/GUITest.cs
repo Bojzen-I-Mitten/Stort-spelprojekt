@@ -4,45 +4,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
+using InputIP;
 
 public class GUITest : ScriptComponent
 {
-    public Texture2D Sprite { get; set; }
+    public Texture2D Background { get; set; }
+    public Texture2D JoinBtn { get; set; }
     public Font TextFont { get; set; }
     private Vector4 OriginalColor;
     private Vector4 RedColor;
     Camera Camera;
 
-    private String IP;
-
+    private string IP;
+    private bool TakeIP = false;
     public override void Start()
     {
         IP = "";
         Camera = gameObject.GetComponent<Camera>();
-        Camera.AddImage("Chad", Sprite, new Vector2(200, 30), new Vector2(0.5f, 0.5f), true);
+        Camera.AddText("IP", IP, new Vector2(250, 150));
+        Camera.SetTextColor("IP", new Vector4(0, 0, 0, 1));
+        Camera.AddImage("BG", Background, new Vector2(200, 30), new Vector2(1), true);
+        Camera.AddImage("Join", JoinBtn, new Vector2(700, 150), new Vector2(0.25f), true);
         OriginalColor = new Vector4(1.0f, 1.0f, 1.0f, 0.5f);
         RedColor = new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
     }
 
     public override void Update()
     {
-        if (Input.GetKeyDown(Input.Keys.OemPeriod))
-        {
-            IP += ".";
-        }
-        else if (Input.GetKeyDown(Input.Keys.NumPad0))
-        {
-            IP += "0";
-        }
-
-        if (Camera.OnImageHovered("Chad"))
-        {
-            Camera.SetImageColor("Chad", RedColor);
-        }
-        else
-        {
-            Camera.SetImageColor("Chad", OriginalColor);
-        }
-        Camera.AddText("IP", IP, new Vector2(200, 100));
+        if (TakeIP)
+            InputGUI.AppendIPString(ref IP);
+        if (Camera.OnImageClicked("BG"))
+            TakeIP = !TakeIP;
+        if (Camera.OnImageClicked("Join"))
+            Debug.Log("Join lobby");
+        Camera.SetText("IP", IP);
     }
 }

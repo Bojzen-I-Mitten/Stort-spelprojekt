@@ -202,4 +202,9 @@ namespace ThomasEngine
 	{
 		camera->GetGUIHandle()->SetTextRotation(Utility::ConvertString(id), rotation);
 	}
+
+	void Camera::SetText(String ^ id, String^ newText)
+	{
+		camera->GetGUIHandle()->SetText(Utility::ConvertString(id), Utility::ConvertString(newText));
+	}
 }

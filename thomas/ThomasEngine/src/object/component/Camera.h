@@ -106,5 +106,6 @@ namespace ThomasEngine
 		void SetTextColor(String^ id, Vector4 color);
 		void SetTextScale(String^ id, Vector2 scale);
 		void SetTextRotation(String^ id, float rotation);
+		void SetText(String^ id, String^ newText);
 	};
 }

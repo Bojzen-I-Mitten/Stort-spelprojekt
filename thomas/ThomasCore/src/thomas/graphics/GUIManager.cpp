@@ -206,5 +206,11 @@ namespace thomas
 			auto& text = GetText(id);
 			text.rotation = rotation;
 		}
+
+		void GUIManager::SetText(const std::string& id, std::string newText)
+		{
+			auto& text = GetText(id);
+			text.text = newText;
+		}
 	}
 }

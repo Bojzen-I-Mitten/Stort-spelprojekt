@@ -15,7 +15,7 @@ namespace thomas
 		{
 			std::wstring convertedText = thomas::utility::ToWChar(text);
 			const wchar_t* wchar = convertedText.c_str();
-			m_font->DrawString(spritebatch, wchar, position, color, rotation, thomas::math::Vector2(m_font->MeasureString(wchar)) / 2.f, scale);
+			m_font->DrawString(spritebatch, wchar, position, color, rotation, thomas::math::Vector2(0.f), scale);
 		}
 
 		DirectX::SpriteFont * Font::GetFont()

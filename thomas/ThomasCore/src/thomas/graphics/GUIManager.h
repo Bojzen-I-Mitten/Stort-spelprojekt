@@ -80,6 +80,7 @@ namespace thomas
 			void SetTextColor(const std::string& id, const Vector4& color);
 			void SetTextScale(const std::string& id, const Vector2& scale);
 			void SetTextRotation(const std::string& id, float rotation);
+			void SetText(const std::string& id, std::string newText);
 
 		private:
 			Image& GetImage(const std::string& id);
