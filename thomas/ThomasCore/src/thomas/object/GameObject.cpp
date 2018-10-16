@@ -32,7 +32,7 @@ namespace thomas
 
 		GameObject::GameObject(GameObject && move)
 			: m_components(std::move(move.m_components)), 
-			m_transform(std::move(move.m_transform))
+			m_transform(move.m_transform)
 		{
 			m_activeSelf = move.m_activeSelf;
 			m_staticSelf = move.m_staticSelf;
@@ -57,7 +57,7 @@ namespace thomas
 			if (this != &move)
 			{
 				m_components = std::move(move.m_components);
-				m_transform = std::move(m_transform);
+				m_transform = move.m_transform;
 				m_activeSelf = move.m_activeSelf;
 				m_staticSelf = move.m_staticSelf;
 				m_guid = std::move(move.m_guid);

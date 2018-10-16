@@ -66,6 +66,8 @@ namespace thomas
 				return &m_objectsStatic.back(); // We have moved it
 			}
 		}
+
+		return object;
 	}
-	return object;
+	
 }
