@@ -42,6 +42,8 @@ namespace thomas
 				return &m_objectsStatic.back(); // We have moved it
 			}
 		}
+
+		return object;
 	}
 
 	object::GameObject * ObjectHandler::setActive(object::GameObject * object)
@@ -65,4 +67,5 @@ namespace thomas
 			}
 		}
 	}
+	return object;
 }

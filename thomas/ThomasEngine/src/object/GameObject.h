@@ -85,6 +85,12 @@ namespace ThomasEngine
 			void set(bool value);
 		}	
 
+		property bool staticSelf
+		{
+			bool get();
+			void set(bool value);
+		}
+
 		[BrowsableAttribute(false)]
 		property String^ Name
 		{

@@ -401,6 +401,16 @@ namespace ThomasEngine {
 		return ((thomas::object::GameObject*)nativePtr)->m_activeSelf;
 	}
 
+	bool GameObject::staticSelf::get()
+	{
+		return m_toBeStatic;
+	}
+
+	void GameObject::staticSelf::set(bool value)
+	{
+		m_toBeStatic = value;
+	}
+
 	void GameObject::activeSelf::set(bool value)
 	{
 		if (value == activeSelf)
