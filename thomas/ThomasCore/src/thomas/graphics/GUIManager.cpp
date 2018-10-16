@@ -12,13 +12,15 @@ namespace thomas
 		m_spriteBatch(nullptr)
 		{
 			m_spriteBatch = new SpriteBatch(utils::D3D::Instance()->GetDeviceContext());
-			m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
+			m_defaultFont = new Font("../Data/Fonts/CourierNew.spritefont");
 		}
 
 		void GUIManager::Destroy()
 		{
 			m_images.clear();
-			m_defaultFont.reset();
+
+			delete m_defaultFont;
+			m_defaultFont = nullptr;
 
 			delete m_spriteBatch;
 			m_spriteBatch = nullptr;
@@ -37,9 +39,10 @@ namespace thomas
 										image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
 				}
 
-				for (const auto& t : m_texts)
+				for (const auto& text : m_texts)
 				{
-					t.second.font->DrawGUIText(m_spriteBatch, t.second.text, t.second.position, t.second.scale, t.second.color, t.second.rotation);
+					text.second.font->DrawGUIText(m_spriteBatch, text.second.text, text.second.position, text.second.scale, 
+												  text.second.color, text.second.rotation);
 				}
 
 				// End
@@ -47,6 +50,7 @@ namespace thomas
 			}
 		}
 
+		// Images
 		void GUIManager::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
 								  const Vector4& color, const Vector2& scale, float rotation)
 		{
@@ -157,41 +161,49 @@ namespace thomas
 			return false;
 		}
 
-		GUIManager::Text & GUIManager::GetText(const std::string & id)
+		// Text
+		GUIManager::Text & GUIManager::GetText(const std::string& id)
 		{
-			return m_texts.find(id)->second;
+			auto found = m_texts.find(id);
+
+#ifdef _DEBUG
+			assert(found != m_texts.end());
+#endif
+
+			return found->second;
 		}
 
-		void GUIManager::AddText(const std::string & id, std::string text, const Vector2 & position,
-			const Vector2 & scale, float rotation, const Vector4 & color, Font* font)
+		void GUIManager::AddText(const std::string& id, std::string text, const Vector2& position,
+								 const Vector2& scale, float rotation, const Vector4& color, Font* font)
 		{
 			if (font == nullptr)
-				font = m_defaultFont.get();
+				font = m_defaultFont;
+
 			Text newText = { font, text, position, scale, color, rotation };
 			m_texts.insert(std::make_pair(id, newText));
 		}
 
-		void GUIManager::SetTextPosition(const std::string & id, const Vector2 & position)
+		void GUIManager::SetTextPosition(const std::string& id, const Vector2& position)
 		{
-			GUIManager::Text text = GetText(id);
+			auto& text = GetText(id);
 			text.position = position;
 		}
 
-		void GUIManager::SetTextColor(const std::string & id, const Vector4 & color)
+		void GUIManager::SetTextColor(const std::string& id, const Vector4& color)
 		{
-			GUIManager::Text text = GetText(id);
+			auto& text = GetText(id);
 			text.color = color;
 		}
 
-		void GUIManager::SetTextScale(const std::string & id, const Vector2 & scale)
+		void GUIManager::SetTextScale(const std::string& id, const Vector2& scale)
 		{
-			GUIManager::Text text = GetText(id);
+			auto& text = GetText(id);
 			text.scale = scale;
 		}
 
-		void GUIManager::SetTextRotation(const std::string & id, float rotation)
+		void GUIManager::SetTextRotation(const std::string& id, float rotation)
 		{
-			GUIManager::Text text = GetText(id);
+			auto& text = GetText(id);
 			text.rotation = rotation;
 		}
 	}
