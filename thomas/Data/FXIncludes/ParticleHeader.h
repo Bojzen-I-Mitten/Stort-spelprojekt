@@ -48,7 +48,7 @@ struct BillboardStruct
 {
     float3 quad[2][3];
 	float textureIndex;
-	float pad;
+	float fade;
     float2 uvs[2][3];
 };
 

@@ -17,19 +17,6 @@ DepthStencilState EnableDepth
     DepthEnable = TRUE;
     DepthWriteMask = ZERO;
     DepthFunc = LESS;
-    StencilEnable = FALSE;
-    StencilReadMask = 0xff;
-    StencilWriteMask = 0xff;
-
-    FrontFaceStencilFail = KEEP;
-    FrontFaceStencilDepthFail = KEEP;
-    FrontFaceStencilPass = REPLACE;
-    FrontFaceStencilFunc = ALWAYS;
-
-    BackFaceStencilFail = KEEP;
-    BackFaceStencilDepthFail = KEEP;
-    BackFaceStencilPass = REPLACE;
-    BackFaceStencilFunc = ALWAYS;
 };
 
 RasterizerState Rasterizer
@@ -47,7 +34,7 @@ BlendState SrcAlphaBlend
     DestBlend = INV_SRC_ALPHA;
     BlendOp = ADD;
     SrcBlendAlpha = ONE;
-    DestBlendAlpha = ONE;
+    DestBlendAlpha = ZERO;
     BlendOpAlpha = ADD;
     RenderTargetWriteMask[0] = 0x0F;
 };
@@ -55,7 +42,7 @@ BlendState SrcAlphaBlend
 BlendState AdditiveBlending
 {
     BlendEnable[0] = TRUE;
-    SrcBlend = SRC_ALPHA;
+    SrcBlend = ONE;
     DestBlend = ONE;
     BlendOp = ADD;
     SrcBlendAlpha = ONE;
@@ -71,6 +58,7 @@ struct v2f
 {
     float4 vertex : SV_POSITION;
     float3 texcoord : TEXCOORD0;
+    float fade : FADEVAL;
 };
 
 v2f vert(uint id : SV_VertexID)
@@ -85,6 +73,7 @@ v2f vert(uint id : SV_VertexID)
     output.vertex /= output.vertex.w; 
    
     output.texcoord = float3(billboards[particleIndex].uvs[triangleIndex][vertexIndex], billboards[particleIndex].textureIndex);
+    output.fade = billboards[particleIndex].fade;
 
     return output;
 }
@@ -94,7 +83,7 @@ float4 frag(v2f input) : SV_Target
 {
     float4 outputColor = textures.Sample(StandardWrapSampler, input.texcoord);
     
-    return outputColor; //float4(0.0f,1.0f,1.0,1.0f);
+    return float4(outputColor.xyz, outputColor.w - input.fade); //float4(0.0f,1.0f,1.0,1.0f);
 
 }
 
@@ -105,8 +94,17 @@ technique11 Particles
         VERT(vert());
         SetGeometryShader(NULL);
 		FRAG(frag());
-        SetDepthStencilState(EnableDepth, 0);
+        SetDepthStencilState(EnableDepth, 1);
         SetRasterizerState(Rasterizer);
         SetBlendState(SrcAlphaBlend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+    pass AdditiveBlendPass
+    {
+        VERT(vert());
+        SetGeometryShader(NULL);
+		FRAG(frag());
+        SetDepthStencilState(EnableDepth, 1);
+        SetRasterizerState(Rasterizer);
+        SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }

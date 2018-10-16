@@ -92,6 +92,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         billboard.uvs[1][2] = float2(0, 0);
 
         billboard.textureIndex = particle.textureIndex;
+        billboard.fade = lerpValue;
     
         billboards[Tid] = billboard;
     }

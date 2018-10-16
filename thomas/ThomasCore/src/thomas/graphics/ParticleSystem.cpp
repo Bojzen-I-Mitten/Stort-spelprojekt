@@ -229,8 +229,8 @@ namespace thomas
 			
 			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
 
-			ID3D11ShaderResourceView* const s_nullSRV[2] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 2, s_nullSRV);
+			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
+			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 8, s_nullSRV);
 
 		}
 

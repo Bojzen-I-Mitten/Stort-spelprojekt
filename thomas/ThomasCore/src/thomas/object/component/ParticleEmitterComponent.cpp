@@ -78,7 +78,7 @@ namespace thomas
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0)) * m_particleBufferStruct.radius, math::Vector3::Zero);
 				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180)) * m_particleBufferStruct.radius, math::Vector3::Zero);
 				
-				
+				StartEmitting();
 			}
 
 			void ParticleEmitterComponent::SetParticleSystem(std::shared_ptr<graphics::ParticleSystem> particleSystem)
