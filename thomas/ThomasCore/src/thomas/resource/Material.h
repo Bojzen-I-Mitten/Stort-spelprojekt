@@ -70,6 +70,7 @@ namespace thomas
 			void SetShaderPass(int index);
 			void SetShaderPass(std::string name);
 
+			void DrawInstanced(graphics::Mesh* mesh, int count);
 			void Draw(graphics::Mesh* mesh);
 			void Draw(UINT vertexCount, UINT startVertexLocation);
 

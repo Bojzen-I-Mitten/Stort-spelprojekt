@@ -365,6 +365,10 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
+		void Material::DrawInstanced(graphics::Mesh* mesh, int count)
+		{
+			utils::D3D::Instance()->GetDeviceContext()->DrawIndexedInstanced(mesh->GetIndexCount(), count, 0, 0, 0);
+		}
 		void Material::Draw(graphics::Mesh* mesh)
 		{
 			Lock();

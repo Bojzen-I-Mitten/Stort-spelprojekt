@@ -119,13 +119,18 @@ namespace thomas
 				BindCamera(camera);
 				for (auto & perMaterialQueue : perCameraQueue.second)
 				{
+					int count = 0;
 					auto material = perMaterialQueue.first;
 					material->Bind();
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
 						BindObject(perMeshCommand);
-						material->Draw(perMeshCommand.mesh);
+						count++;
 					}
+
+					auto mesh = perMaterialQueue.second;
+					material->Draw(mesh[0].mesh);
+					material->DrawInstanced(mesh[0].mesh, count);
 				}
 
 				ParticleSystem::GetGlobalSystem()->DrawParticles();

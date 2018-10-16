@@ -16,7 +16,7 @@ namespace thomas
 		{
 			std::vector<utils::buffers::VertexBuffer*> vertexBuffers;
 
-			//Add vertex buffers?
+			//Add vertex buffers
 			for (auto semantic : shader->GetCurrentPass().inputSemantics)
 			{
 				if (m_data.vertexBuffers.find(semantic) != m_data.vertexBuffers.end())
@@ -25,13 +25,14 @@ namespace thomas
 
 			//Set buffers and draw mesh
 			shader->BindVertexBuffers(vertexBuffers);
+
 			if (m_data.indexBuffer)
 			{
 				shader->BindIndexBuffer(m_data.indexBuffer.get());
-				shader->DrawIndexed(GetIndexCount(), 0, 0);
+				/*shader->DrawIndexed(GetIndexCount(), 0, 0);*/
 			}
-			else
-				shader->Draw(m_data.vertices.positions.size(), 0);
+			/*else
+				shader->Draw(m_data.vertices.positions.size(), 0);*/
 		}
 
 		void Mesh::SetName(const std::string & name)
