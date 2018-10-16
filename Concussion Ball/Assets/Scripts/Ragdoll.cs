@@ -66,7 +66,7 @@ namespace ThomasEditor
             Rigidbody rigidbodyhips = G_Hips.AddComponent<Rigidbody>();
             rigidbodyhips.IsKinematic = AllobjectKinectic;
             rigidbodyhips.Damping = AllobjectDamping;
-            rigidbodyhips.Mass = Totalmass;
+            rigidbodyhips.Mass = Totalmass*0.14f;
             //Spine
             G_Spine = new GameObject("Spine");
             G_Spine.transform.SetParent(gameObject.transform);
@@ -82,7 +82,7 @@ namespace ThomasEditor
             Rigidbody rigidbodySpine = G_Spine.AddComponent<Rigidbody>();
             rigidbodySpine.IsKinematic = AllobjectKinectic;
             rigidbodySpine.Damping = AllobjectDamping;
-            rigidbodySpine.Mass = Totalmass;
+            rigidbodySpine.Mass = Totalmass*0.216f;
 
             //Joint from hips to Spine
             Joint HipSpineJoint=G_Hips.AddComponent<Joint>();
@@ -109,7 +109,7 @@ namespace ThomasEditor
             Rigidbody rigidbodyHead = G_Head.AddComponent<Rigidbody>();
             rigidbodyHead.IsKinematic = AllobjectKinectic;
             rigidbodyHead.Damping = AllobjectDamping;
-            rigidbodyHead.Mass = Totalmass;
+            rigidbodyHead.Mass = Totalmass*0.081f;
             spherecolliderHead.center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, renderskinnedcomponent);
 
 
@@ -142,7 +142,7 @@ namespace ThomasEditor
             Rigidbody rigidbodyLeftArm = G_LeftArm.AddComponent<Rigidbody>();
             rigidbodyLeftArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftArm.Damping = AllobjectDamping;
-            rigidbodyLeftArm.Mass = Totalmass;
+            rigidbodyLeftArm.Mass = Totalmass*0.028f;
             CapsuleColliderLeftArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
 
             //Joint from leftarm totorso
@@ -173,7 +173,7 @@ namespace ThomasEditor
             Rigidbody rigidbodyLeftUnderArm = G_LeftUnderArm.AddComponent<Rigidbody>();
             rigidbodyLeftUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderArm.Damping = AllobjectDamping;
-            rigidbodyLeftUnderArm.Mass = Totalmass;
+            rigidbodyLeftUnderArm.Mass = Totalmass * 0.016f;
             CapsuleColliderLeftUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, renderskinnedcomponent));
 
 
