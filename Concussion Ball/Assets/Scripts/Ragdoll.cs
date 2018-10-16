@@ -59,10 +59,10 @@ namespace ThomasEditor
             B_Hips.BoneName = Hips;
             B_Hips.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(Hips), out boneindex);
-            G_Hips.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_Hips.transform.localPosition = new Vector3(G_Hips.transform.localPosition.x * 100, G_Hips.transform.localPosition.y * 100, G_Hips.transform.localPosition.z * 100);
+            G_Hips.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_Hips.transform.localPosition = new Vector3(G_Hips.transform.localPosition.x, G_Hips.transform.localPosition.y, G_Hips.transform.localPosition.z);
             SphereCollider spherecolliderhips = G_Hips.AddComponent<SphereCollider>();
-            spherecolliderhips.radius = 0.2f*100;
+            spherecolliderhips.radius = 0.2f;
             Rigidbody rigidbodyhips = G_Hips.AddComponent<Rigidbody>();
             rigidbodyhips.IsKinematic = AllobjectKinectic;
             rigidbodyhips.Damping = AllobjectDamping;
@@ -75,10 +75,10 @@ namespace ThomasEditor
             B_Spine.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(Spine), out boneindex);
             BoxCollider boxcolliderSpine = G_Spine.AddComponent<BoxCollider>();
-            G_Spine.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_Spine.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
             boxcolliderSpine.center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck,renderskinnedcomponent); //renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
-            boxcolliderSpine.size = new Vector3(0.2f,0.2f,0.2f) * 100;
-            G_Spine.transform.localPosition = new Vector3(G_Spine.transform.localPosition.x * 100, G_Spine.transform.localPosition.y * 100, G_Spine.transform.localPosition.z * 100);
+            boxcolliderSpine.size = new Vector3(0.2f,0.2f,0.2f);
+            G_Spine.transform.localPosition = new Vector3(G_Spine.transform.localPosition.x, G_Spine.transform.localPosition.y, G_Spine.transform.localPosition.z);
             Rigidbody rigidbodySpine = G_Spine.AddComponent<Rigidbody>();
             rigidbodySpine.IsKinematic = AllobjectKinectic;
             rigidbodySpine.Damping = AllobjectDamping;
@@ -102,10 +102,10 @@ namespace ThomasEditor
             B_Head.BoneName = Head;
             B_Head.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(Head), out boneindex);
-            G_Head.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_Head.transform.localPosition = new Vector3(G_Head.transform.localPosition.x*100, G_Head.transform.localPosition.y * 100, G_Head.transform.localPosition.z * 100);
+            G_Head.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_Head.transform.localPosition = new Vector3(G_Head.transform.localPosition.x, G_Head.transform.localPosition.y, G_Head.transform.localPosition.z);
             SphereCollider spherecolliderHead = G_Head.AddComponent<SphereCollider>();
-            spherecolliderHead.radius = 0.2f * 100;
+            spherecolliderHead.radius = 0.2f;
             Rigidbody rigidbodyHead = G_Head.AddComponent<Rigidbody>();
             rigidbodyHead.IsKinematic = AllobjectKinectic;
             rigidbodyHead.Damping = AllobjectDamping;
@@ -133,12 +133,12 @@ namespace ThomasEditor
             B_LeftArm.BoneName = UpperLeftArm;
             B_LeftArm.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(UpperLeftArm), out boneindex);
-            G_LeftArm.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_LeftArm.transform.localPosition = new Vector3(G_LeftArm.transform.localPosition.x * 100, G_LeftArm.transform.localPosition.y * 100, G_LeftArm.transform.localPosition.z * 100);
+            G_LeftArm.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_LeftArm.transform.localPosition = new Vector3(G_LeftArm.transform.localPosition.x, G_LeftArm.transform.localPosition.y, G_LeftArm.transform.localPosition.z);
             CapsuleCollider CapsuleColliderLeftArm = G_LeftArm.AddComponent<CapsuleCollider>();
             CapsuleColliderLeftArm.rotation = ThomasEngine.CapsuleCollider.ColliderRotation.RotateX;
             CapsuleColliderLeftArm.height = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, renderskinnedcomponent);
-            CapsuleColliderLeftArm.radius = 0.065f * 100f;
+            CapsuleColliderLeftArm.radius = 0.065f;
             Rigidbody rigidbodyLeftArm = G_LeftArm.AddComponent<Rigidbody>();
             rigidbodyLeftArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftArm.Damping = AllobjectDamping;
@@ -164,12 +164,12 @@ namespace ThomasEditor
             B_LeftUnderArm.BoneName = LowerLeftArm;
             B_LeftUnderArm.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(LowerLeftArm), out boneindex);
-            G_LeftUnderArm.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_LeftUnderArm.transform.localPosition = new Vector3(G_LeftUnderArm.transform.localPosition.x * 100, G_LeftUnderArm.transform.localPosition.y * 100, G_LeftUnderArm.transform.localPosition.z * 100);
+            G_LeftUnderArm.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_LeftUnderArm.transform.localPosition = new Vector3(G_LeftUnderArm.transform.localPosition.x, G_LeftUnderArm.transform.localPosition.y, G_LeftUnderArm.transform.localPosition.z);
             CapsuleCollider CapsuleColliderLeftUnderArm = G_LeftUnderArm.AddComponent<CapsuleCollider>();
             CapsuleColliderLeftUnderArm.rotation = ThomasEngine.CapsuleCollider.ColliderRotation.RotateX;
             CapsuleColliderLeftUnderArm.height = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, renderskinnedcomponent);
-            CapsuleColliderLeftUnderArm.radius = 0.065f * 100f;
+            CapsuleColliderLeftUnderArm.radius = 0.065f;
             Rigidbody rigidbodyLeftUnderArm = G_LeftUnderArm.AddComponent<Rigidbody>();
             rigidbodyLeftUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderArm.Damping = AllobjectDamping;
@@ -206,16 +206,16 @@ namespace ThomasEditor
             B_RightArm.BoneName = UpperRightArm;
             B_RightArm.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(UpperRightArm), out boneindex);
-            G_RightArm.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_RightArm.transform.localPosition = new Vector3(G_RightArm.transform.localPosition.x * 100, G_RightArm.transform.localPosition.y * 100, G_RightArm.transform.localPosition.z * 100);
+            G_RightArm.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_RightArm.transform.localPosition = new Vector3(G_RightArm.transform.localPosition.x, G_RightArm.transform.localPosition.y, G_RightArm.transform.localPosition.z);
             CapsuleCollider CapsuleColliderRightArm = G_RightArm.AddComponent<CapsuleCollider>();
             CapsuleColliderRightArm.rotation = ThomasEngine.CapsuleCollider.ColliderRotation.RotateX;
             CapsuleColliderRightArm.height = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, renderskinnedcomponent);
-            CapsuleColliderRightArm.radius = 0.065f * 100f;
+            CapsuleColliderRightArm.radius = 0.065f;
             Rigidbody rigidbodyRightArm = G_RightArm.AddComponent<Rigidbody>();
             rigidbodyRightArm.IsKinematic = AllobjectKinectic;
             rigidbodyRightArm.Damping = AllobjectDamping;
-            rigidbodyRightArm.Mass = Totalmass;
+            rigidbodyRightArm.Mass = Totalmass*0.028f;
             CapsuleColliderRightArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, renderskinnedcomponent));
 
 
@@ -240,16 +240,16 @@ namespace ThomasEditor
             B_RightUnderArm.BoneName = LowerRightArm;
             B_RightUnderArm.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(LowerRightArm), out boneindex);
-            G_RightUnderArm.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_RightUnderArm.transform.localPosition = new Vector3(G_RightUnderArm.transform.localPosition.x * 100, G_RightUnderArm.transform.localPosition.y * 100, G_RightUnderArm.transform.localPosition.z * 100);
+            G_RightUnderArm.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_RightUnderArm.transform.localPosition = new Vector3(G_RightUnderArm.transform.localPosition.x, G_RightUnderArm.transform.localPosition.y, G_RightUnderArm.transform.localPosition.z);
             CapsuleCollider CapsuleColliderRightUnderArm = G_RightUnderArm.AddComponent<CapsuleCollider>();
             CapsuleColliderRightUnderArm.rotation = ThomasEngine.CapsuleCollider.ColliderRotation.RotateX;
             CapsuleColliderRightUnderArm.height = calculateLengthBetweenSkeleton(LowerRightArm, LowerRightHand, renderskinnedcomponent);
-            CapsuleColliderRightUnderArm.radius = 0.065f * 100f;
+            CapsuleColliderRightUnderArm.radius = 0.065f;
             Rigidbody rigidbodyRightUnderArm = G_RightUnderArm.AddComponent<Rigidbody>();
             rigidbodyRightUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyRightUnderArm.Damping = AllobjectDamping;
-            rigidbodyRightUnderArm.Mass = Totalmass;
+            rigidbodyRightUnderArm.Mass = Totalmass * 0.016f;
             CapsuleColliderRightUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, renderskinnedcomponent));
 
 
@@ -273,15 +273,15 @@ namespace ThomasEditor
             B_RightLeg.BoneName = UpperRightLeg;
             B_RightLeg.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(UpperRightLeg), out boneindex);
-            G_RightLeg.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_RightLeg.transform.localPosition = new Vector3(G_RightLeg.transform.localPosition.x * 100, G_RightLeg.transform.localPosition.y * 100, G_RightLeg.transform.localPosition.z * 100);
+            G_RightLeg.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_RightLeg.transform.localPosition = new Vector3(G_RightLeg.transform.localPosition.x, G_RightLeg.transform.localPosition.y, G_RightLeg.transform.localPosition.z);
             CapsuleCollider CapsuleColliderRightLeg = G_RightLeg.AddComponent<CapsuleCollider>();
             CapsuleColliderRightLeg.height = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
-            CapsuleColliderRightLeg.radius = 0.065f * 100f;
+            CapsuleColliderRightLeg.radius = 0.065f;
             Rigidbody rigidbodyRightLeg = G_RightLeg.AddComponent<Rigidbody>();
             rigidbodyRightLeg.IsKinematic = AllobjectKinectic;
             rigidbodyRightLeg.Damping = AllobjectDamping;
-            rigidbodyRightLeg.Mass = Totalmass;
+            rigidbodyRightLeg.Mass = Totalmass * 0.1f;
             CapsuleColliderRightLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
 
 
@@ -305,14 +305,14 @@ namespace ThomasEditor
             B_RightUnderLeg.BoneName = LowerRightLeg;
             B_RightUnderLeg.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(LowerRightLeg), out boneindex);
-            G_RightUnderLeg.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_RightUnderLeg.transform.localPosition = new Vector3(G_RightUnderLeg.transform.localPosition.x * 100, G_RightUnderLeg.transform.localPosition.y * 100, G_RightUnderLeg.transform.localPosition.z * 100);
+            G_RightUnderLeg.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_RightUnderLeg.transform.localPosition = new Vector3(G_RightUnderLeg.transform.localPosition.x, G_RightUnderLeg.transform.localPosition.y, G_RightUnderLeg.transform.localPosition.z);
             CapsuleCollider CapsuleColliderRightUnderLeg = G_RightUnderLeg.AddComponent<CapsuleCollider>();
             CapsuleColliderRightUnderLeg.height = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, renderskinnedcomponent);
-            CapsuleColliderRightUnderLeg.radius = 0.065f * 100f;
+            CapsuleColliderRightUnderLeg.radius = 0.065f;
             Rigidbody rigidbodyRightUnderLeg = G_RightUnderLeg.AddComponent<Rigidbody>();
             rigidbodyRightUnderLeg.Damping = AllobjectDamping;
-            rigidbodyRightUnderLeg.Mass = Totalmass;
+            rigidbodyRightUnderLeg.Mass = Totalmass*0.047f;
             rigidbodyRightUnderLeg.IsKinematic = AllobjectKinectic;
             CapsuleColliderRightUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, renderskinnedcomponent);
 
@@ -337,15 +337,15 @@ namespace ThomasEditor
             B_LeftLeg.BoneName = UpperLeftLeg;
             B_LeftLeg.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(UpperLeftLeg), out boneindex);
-            G_LeftLeg.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_LeftLeg.transform.localPosition = new Vector3(G_LeftLeg.transform.localPosition.x * 100, G_LeftLeg.transform.localPosition.y * 100, G_LeftLeg.transform.localPosition.z * 100);
+            G_LeftLeg.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_LeftLeg.transform.localPosition = new Vector3(G_LeftLeg.transform.localPosition.x, G_LeftLeg.transform.localPosition.y, G_LeftLeg.transform.localPosition.z);
             CapsuleCollider CapsuleColliderLeftLeg = G_LeftLeg.AddComponent<CapsuleCollider>();
             CapsuleColliderLeftLeg.height = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
-            CapsuleColliderLeftLeg.radius = 0.065f * 100f;
+            CapsuleColliderLeftLeg.radius = 0.065f;
             Rigidbody rigidbodyLeftLeg = G_LeftLeg.AddComponent<Rigidbody>();
             rigidbodyLeftLeg.IsKinematic = AllobjectKinectic;
             rigidbodyLeftLeg.Damping = AllobjectDamping;
-            rigidbodyLeftLeg.Mass = Totalmass;
+            rigidbodyLeftLeg.Mass = Totalmass* 0.1f;
             CapsuleColliderLeftLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
 
 
@@ -369,15 +369,15 @@ namespace ThomasEditor
             B_LeftUnderLeg.BoneName = LowerLeftLeg;
             B_LeftUnderLeg.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(LowerLeftLeg), out boneindex);
-            G_LeftUnderLeg.transform.local_world = Matrix.CreateScale(100) * renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            G_LeftUnderLeg.transform.localPosition = new Vector3(G_LeftUnderLeg.transform.localPosition.x * 100, G_LeftUnderLeg.transform.localPosition.y * 100, G_LeftUnderLeg.transform.localPosition.z * 100);
+            G_LeftUnderLeg.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
+            G_LeftUnderLeg.transform.localPosition = new Vector3(G_LeftUnderLeg.transform.localPosition.x, G_LeftUnderLeg.transform.localPosition.y, G_LeftUnderLeg.transform.localPosition.z);
             CapsuleCollider CapsuleColliderLeftUnderLeg = G_LeftUnderLeg.AddComponent<CapsuleCollider>();
             CapsuleColliderLeftUnderLeg.height = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
-            CapsuleColliderLeftUnderLeg.radius = 0.065f * 100f;
+            CapsuleColliderLeftUnderLeg.radius = 0.065f;
             Rigidbody rigidbodyLeftUnderLeg = G_LeftUnderLeg.AddComponent<Rigidbody>();
             rigidbodyLeftUnderLeg.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderLeg.Damping = AllobjectDamping;
-            rigidbodyLeftUnderLeg.Mass = Totalmass;
+            rigidbodyLeftUnderLeg.Mass = Totalmass* 0.047f;
             CapsuleColliderLeftUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
 
             Joint LeftUnderLegJoint = G_LeftUnderLeg.AddComponent<Joint>();
@@ -439,7 +439,7 @@ namespace ThomasEditor
             if (length != 0)
                 up /= length; // Normalize
             Vector3 Pos =  up * (length * 0.5f);
-            return Pos*100;//DivideComponent(Pos, G_Hips.transform.localScale);
+            return Pos;//DivideComponent(Pos, G_Hips.transform.localScale);
         }
         float calculateLengthBetweenSkeleton(string BoneName1, string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
         {
@@ -453,7 +453,7 @@ namespace ThomasEditor
             if (length != 0)
                 up /= length; // Normalize
             Vector3 Pos = up * length;
-            return length * 100;//DivideComponent(Pos, G_Hips.transform.localScale);
+            return length;//DivideComponent(Pos, G_Hips.transform.localScale);
         }
 
         void initSkeleton(RenderSkinnedComponent Model)

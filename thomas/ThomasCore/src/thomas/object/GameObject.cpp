@@ -1,5 +1,7 @@
 #include "GameObject.h"
 #include "../editor/EditorCamera.h"
+#include "../ThomasCore.h"
+#include "../Common.h"
 namespace thomas
 {
 	namespace object
@@ -96,15 +98,7 @@ namespace thomas
 		{
 			if (m_transform && m_transform->GetParent())
 			{
-				try {
-					return m_activeSelf && m_transform->GetParent()->m_gameObject->m_activeSelf;
-				}
-				catch (std::exception e) {
-					LOG("fail!");
-					return true;
-				}
-					
-				
+				return m_activeSelf && m_transform->GetParent()->m_gameObject->m_activeSelf;
 			}
 			return m_activeSelf;
 		}
