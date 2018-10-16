@@ -2,8 +2,6 @@
 #include "..\utils\Math.h"
 #include <vector>
 #include <memory>
-#include "..\utils\Buffers.h"
-#include "..\resource\Shader.h"
 
 namespace thomas
 {
@@ -12,6 +10,12 @@ namespace thomas
 			class LightComponent;
 		}
 	}
+	namespace utils {
+		namespace buffers {
+			class StructuredBuffer;
+		}
+	}
+
 	namespace graphics
 	{
 		class LightManager

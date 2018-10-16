@@ -36,9 +36,11 @@ namespace thomas
 		public:
 			bool HasSelectionChanged();
 			void ToggleManipulatorMode();
+			void ToggleObjectSelection(GameObject* gameObject);
 			void SelectObject(GameObject* gameObject);
 			void UnselectObject(GameObject* gameObject);
 			void UnselectObjects();
+			bool IsObjectSelected(GameObject* gameObject);
 
 		public:
 			void SetHasSelectionChanged(const bool & selectionChanged);
@@ -58,6 +60,8 @@ namespace thomas
 			void MoveAndRotateCamera();
 			void SnapCameraToFocus();
 			object::GameObject* FindClickedGameObject();
+			void BoxSelect();
+			void BeginBoxSelect();
 			EditorCamera();
 			~EditorCamera();
 
@@ -73,6 +77,8 @@ namespace thomas
 			float m_speed;
 			bool m_manipulatorSnapping;	
 			bool m_hasSelectionChanged;
+			bool m_isBoxSelecting;
+			math::Rectangle m_boxSelectRect;
 			object::GameObject* m_selectedObject;
 			std::vector<object::GameObject*> m_selectedObjects;
 

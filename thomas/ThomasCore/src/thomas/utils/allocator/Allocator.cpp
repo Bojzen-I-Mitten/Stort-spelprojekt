@@ -20,6 +20,12 @@ namespace thomas {
 				_num_allocations(move._num_allocations)
 			{				}
 
+			void Allocator::moveOp(Allocator && move)
+			{
+				assert(this != &move); // Checked in implementation
+
+			}
+
 		}
 	}
 }

@@ -60,11 +60,11 @@ namespace thomas
 
 			void ParticleEmitterComponent::OnDrawGizmosSelected()
 			{
-				editor::Gizmos::SetColor(math::Color(1, 1, 0));
-				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 				
 				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
-				editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
+				editor::Gizmos::Gizmo().DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
 				
 				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0), m_particleBufferStruct.radius), math::Vector3::Zero);
 				editor::Gizmos::DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);

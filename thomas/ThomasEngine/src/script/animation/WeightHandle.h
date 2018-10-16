@@ -40,7 +40,11 @@ namespace ThomasEngine
 
 			thomas::graphics::animation::WeightTripple* m_WeightData;
 
-			void setWeight(unsigned int index, WeightTripple weight);
+			/*	Set weights at the bone at index
+			*/
+			void setWeight(unsigned int boneIndex, WeightTripple weight);
+			void setWeight(unsigned int boneIndex, float weight);
+			void setWeight(unsigned int boneIndex, float scale_w, float rot_w, float trans_w);
 
 			thomas::graphics::animation::WeightMixer * Mixer();
 
