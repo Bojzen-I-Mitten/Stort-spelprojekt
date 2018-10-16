@@ -11,19 +11,21 @@ namespace thomas
 	{
 		std::map<std::string, ThomasGUI::Image> ThomasGUI::m_images;
 		std::map<std::string, ThomasGUI::Text> ThomasGUI::m_texts;
-		std::unique_ptr<SpriteBatch> ThomasGUI::m_spriteBatch;
 		std::map<std::wstring, std::unique_ptr<SpriteFont>> ThomasGUI::m_fonts;
+		std::unique_ptr<SpriteBatch> ThomasGUI::m_spriteBatch;
+		std::unique_ptr<Font> ThomasGUI::s_defaultFont;
 
 		void ThomasGUI::Init()
 		{
-			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
 			m_fonts = std::map<std::wstring, std::unique_ptr<SpriteFont>>();
-			s_defaultFont = std::make_unique<Font>(L"../Data/Fonts/CourierNew.spritefont");
+			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+			s_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
 		}
 
 		void ThomasGUI::Destroy()
 		{
 			m_spriteBatch.reset();
+			s_defaultFont.reset();
 		}
 
 		void ThomasGUI::Render()
@@ -164,11 +166,10 @@ namespace thomas
 			return m_texts.find(id)->second;
 		}
 
-		void ThomasGUI::AddText(const std::string & id, std::string text, Font* font, const Vector2 & position, 
-								const Vector2 & scale, float rotation, const Vector4 & color)
+		void ThomasGUI::AddText(const std::string & id, std::string text, const Vector2 & position,
+								const Vector2 & scale, float rotation, const Vector4 & color, Font* font)
 		{
-			auto convertedText = thomas::utility::ToWChar(text).c_str();
-			Text newText = { font, convertedText, position, scale, color, rotation };
+			Text newText = { font, text, position, scale, color, rotation };
 			m_texts.insert(std::make_pair(id, newText));
 		}
 

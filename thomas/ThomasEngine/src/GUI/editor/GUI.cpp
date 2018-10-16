@@ -187,10 +187,105 @@ void ThomasEngine::GUI::SetImageInteract(String^ id, bool interact)
 {
 	thomas::GUI::ThomasGUI::SetImageInteract(Utility::ConvertString(id), interact);
 }
-void ThomasEngine::GUI::AddText(String^ id, System::String^ text, Font^ font, Vector2 position, Vector2 scale, float rotation, Vector4 color)
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position)
 {
-	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), (thomas::resource::Font*)font->m_nativePtr,
-									Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color));
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Vector2 scale)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector2 scale)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color, Vector2 scale)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation, Utility::Convert(color));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Vector2 scale, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(Vector4(1.f)));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color, Vector2 scale)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector2 scale, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color, Vector2 scale, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color));
+}
+
+void ThomasEngine::GUI::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color, Vector2 scale, float rotation)
+{
+	thomas::GUI::ThomasGUI::AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
+}
+
+void ThomasEngine::GUI::SetTextPosition(String ^ id, Vector2 position)
+{
+	thomas::GUI::ThomasGUI::SetTextPosition(Utility::ConvertString(id), Utility::Convert(position));
+}
+
+void ThomasEngine::GUI::SetTextColor(String ^ id, Vector4 color)
+{
+	thomas::GUI::ThomasGUI::SetTextColor(Utility::ConvertString(id), Utility::Convert(color));
+}
+
+void ThomasEngine::GUI::SetTextScale(String ^ id, Vector2 scale)
+{
+	thomas::GUI::ThomasGUI::SetTextScale(Utility::ConvertString(id), Utility::Convert(scale));
+}
+
+void ThomasEngine::GUI::SetTextRotation(String ^ id, float rotation)
+{
+	thomas::GUI::ThomasGUI::SetTextRotation(Utility::ConvertString(id), rotation);
 }
 
 //

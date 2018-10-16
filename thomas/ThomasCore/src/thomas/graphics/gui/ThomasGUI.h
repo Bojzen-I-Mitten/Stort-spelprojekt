@@ -42,7 +42,7 @@ namespace thomas
 				Text() = default;
 
 				Font* font;
-				const wchar_t* text;
+				std::string text;
 				thomas::math::Vector2 position;
 				thomas::math::Vector2 scale;
 				thomas::math::Vector4 color;
@@ -78,8 +78,8 @@ namespace thomas
 			static bool OnImageClicked(const std::string& id);
 			static bool OnImageHovered(const std::string& id);
 
-			static void AddText(const std::string& id, std::string text, Font* font, const Vector2& position, const Vector2& scale = Vector2(1.f),
-									float rotation = 0.f, const Vector4& color = Vector4(1.f));
+			static void AddText(const std::string& id, std::string text, const Vector2& position, const Vector2& scale = Vector2(1.f),
+									float rotation = 0.f, const Vector4& color = Vector4(1.f), Font* font = s_defaultFont.get());
 			static void SetTextPosition(const std::string& id, const Vector2& position);
 			static void SetTextColor(const std::string& id, const Vector4& color);
 			static void SetTextScale(const std::string& id, const Vector2& scale);

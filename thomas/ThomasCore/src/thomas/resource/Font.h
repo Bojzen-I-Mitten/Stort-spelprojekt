@@ -14,7 +14,7 @@ namespace thomas
 		{
 		public:
 			Font(std::string path);
-			void DrawGUIText(DirectX::SpriteBatch* spritebatch, const wchar_t* text, thomas::math::Vector2 position, thomas::math::Vector2 scale, thomas::math::Vector4 color, float rotation);
+			void DrawGUIText(DirectX::SpriteBatch* spritebatch, std::string text, thomas::math::Vector2 position, thomas::math::Vector2 scale, thomas::math::Vector4 color, float rotation);
 			DirectX::SpriteFont* GetFont();
 
 		private:

@@ -13,7 +13,7 @@ namespace ThomasEngine
 	public ref class GUI
 	{
 	public:	
-		// OLD
+		// Gizmos, move to own class
 		static void DrawModel(Model^ model, int meshIndex, Vector3 position,Quaternion rotation, Vector3 scale);
 		static void DrawModel(Model^ model, Vector3 position, Quaternion rotation,Vector3 scale);
 		static void DrawWireModel(Model^ model, int meshIndex,Vector3 position, Quaternion rotation, Vector3 scale);
@@ -59,14 +59,28 @@ namespace ThomasEngine
 		//
 
 		//Text
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, Vector2 scale, float rotation, Vector4 color);
-		/*static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, Vector2 scale, float rotation);
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position);
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, Vector4 color);
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, float rotation);
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, Vector2 scale);
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, float rotation, Vector4 color);
-		static void AddText(String^id, System::String^ text, Font^ font, Vector2 position, Vector2 scale, Vector4 color);*/
+		static void AddText(String^ id, System::String^ text, Vector2 position);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Vector2 scale);
+		static void AddText(String^ id, System::String^ text, Vector2 position, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Vector4 color);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, Vector2 scale);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, Vector4 color);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Vector4 color, Vector2 scale);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Vector4 color, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Vector2 scale, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, Vector4 color, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, Vector4 color, Vector2 scale);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, Vector2 scale, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Vector4 color, Vector2 scale, float rotation);
+		static void AddText(String^ id, System::String^ text, Vector2 position, Font^ font, Vector4 color, Vector2 scale, float rotation);
+
+		static void SetTextPosition(String^ id, Vector2 position);
+		static void SetTextColor(String^ id, Vector4 color);
+		static void SetTextScale(String^ id, Vector2 scale);
+		static void SetTextRotation(String^ id, float rotation);
+
 		//
 	};
 }
