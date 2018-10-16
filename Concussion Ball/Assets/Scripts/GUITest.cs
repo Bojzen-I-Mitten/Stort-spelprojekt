@@ -13,12 +13,11 @@ public class GUITest : ScriptComponent
     private Vector4 RedColor;
     Camera Camera;
     
-
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();
         Camera.AddImage("Chad", Sprite, new Vector2(200, 30), new Vector2(0.5f, 0.5f), true);
-        Camera.AddText("Hi", "Hi, test 1 2 1 2", new Vector2(200, 100));
+        Camera.AddText("Test", "Text", new Vector2(200, 100));
 
         OriginalColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
         RedColor = new Vector4(0.0f, 0.0f, 1.0f, 1.0f);
@@ -26,12 +25,12 @@ public class GUITest : ScriptComponent
 
     public override void Update()
     {
-        if (Camera.OnImageClicked("Chad"))
-        {
-            Debug.Log(Input.GetLastKey());
+        //if (Camera.OnImageClicked("Chad"))
+        //{
+        //    Debug.Log(Input.GetLastKey());
 
-            //Camera.SetImageColor("Chad", RedColor);
-        }
+        //    //Camera.SetImageColor("Chad", RedColor);
+        //}
         //else
         //{
         //    Camera.SetImageColor("Chad", OriginalColor);

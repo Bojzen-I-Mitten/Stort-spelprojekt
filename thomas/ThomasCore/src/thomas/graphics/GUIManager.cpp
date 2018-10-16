@@ -28,9 +28,9 @@ namespace thomas
 
 		void GUIManager::Render()
 		{
-			// Begin
 			if (m_spriteBatch != nullptr)
 			{
+				// Begin
 				m_spriteBatch->Begin();
 
 				for (const auto& image : m_images)
@@ -140,7 +140,7 @@ namespace thomas
 				if (image.interact)
 				{
 					// Construct boundaries
-					// Note: if origin has to be changed from (0, 0) this also has to be taken into account when constructing the boundaries!
+					// Note: If origin has to be changed from (0, 0) this also has to be taken into account when constructing the boundaries!
 					Vector2 mousePos = window->GetInput()->GetMousePosition();
 					Rect rect = { image.position.x,
 								  image.position.x + image.texture->GetWidth() * image.scale.x,
@@ -162,7 +162,7 @@ namespace thomas
 		}
 
 		// Text
-		GUIManager::Text & GUIManager::GetText(const std::string& id)
+		GUIManager::Text& GUIManager::GetText(const std::string& id)
 		{
 			auto found = m_texts.find(id);
 
@@ -173,14 +173,22 @@ namespace thomas
 			return found->second;
 		}
 
-		void GUIManager::AddText(const std::string& id, std::string text, const Vector2& position,
+		void GUIManager::AddText(const std::string& id, const std::string& text, const Vector2& position,
 								 const Vector2& scale, float rotation, const Vector4& color, Font* font)
 		{
 			if (font == nullptr)
+			{
 				font = m_defaultFont;
+			}
 
 			Text newText = { font, text, position, scale, color, rotation };
 			m_texts.insert(std::make_pair(id, newText));
+		}
+
+		void GUIManager::SetText(const std::string& id, const std::string& newText)
+		{
+			auto& text = GetText(id);
+			text.text = newText;
 		}
 
 		void GUIManager::SetTextPosition(const std::string& id, const Vector2& position)

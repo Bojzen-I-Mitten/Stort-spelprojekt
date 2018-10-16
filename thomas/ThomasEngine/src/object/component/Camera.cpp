@@ -32,7 +32,7 @@ namespace ThomasEngine
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
 
-	//GUI
+	//-------------------------------------------------------------------------------------------
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact)
 	{
 		camera->GetGUIHandle()->AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
@@ -48,7 +48,7 @@ namespace ThomasEngine
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, bool interact)
 	{
 		camera->GetGUIHandle()->AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
-			interact, Utility::Convert(Vector4(1.f)), Utility::Convert(scale));
+										 interact, Utility::Convert(Vector4(1.f)), Utility::Convert(scale));
 	}
 
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, bool interact)
@@ -60,7 +60,7 @@ namespace ThomasEngine
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector2 scale, float rotation, Vector4 color, bool interact)
 	{
 		camera->GetGUIHandle()->AddImage(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr, Utility::Convert(position),
-										interact, Utility::Convert(color), Utility::Convert(scale), rotation);
+										 interact, Utility::Convert(color), Utility::Convert(scale), rotation);
 	}
 
 	bool Camera::OnImageClicked(String^ id)
@@ -73,7 +73,7 @@ namespace ThomasEngine
 		return camera->GetGUIHandle()->OnImageHovered(Utility::ConvertString(id));
 	}
 
-	void Camera::SetImageTexture(String^ id, Texture2D ^ texture)
+	void Camera::SetImageTexture(String^ id, Texture2D^ texture)
 	{
 		camera->GetGUIHandle()->SetImageTexture(Utility::ConvertString(id), (thomas::resource::Texture2D*)texture->m_nativePtr);
 	}
@@ -103,103 +103,84 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetImageInteract(Utility::ConvertString(id), interact);
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position)
+	//-------------------------------------------------------------------------------------------
+
+	void Camera::AddText(String^ id, String^ text, Vector2 position)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position));
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Font^ font)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), 
+										Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(Vector4(1.f)), 
+										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Vector2 scale)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale));
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), 
+										Utility::Convert(position), Utility::Convert(scale));
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, float rotation)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, float rotation)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation);
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), 
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation);
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector4 color)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color));
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, 
+										Utility::Convert(color));
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector2 scale)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Font^ font, Vector4 color)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), 
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color), 
+										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, float rotation)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale, float rotation, Vector4 color)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
+										Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color));
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale, Font^ font, Vector4 color)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
+										Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color), 
+										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color, Vector2 scale)
+	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale, float rotation, Font^ font, Vector4 color)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color));
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
+										Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color),
+										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color, float rotation)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation, Utility::Convert(color));
-	}
-
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Vector2 scale, float rotation)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(Vector4(1.f)));
-	}
-
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color, float rotation)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(Vector2(1.f)), rotation, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
-	}
-
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color, Vector2 scale)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
-	}
-
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector2 scale, float rotation)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(Vector4(1.f)), (thomas::resource::Font*)font->m_nativePtr);
-	}
-
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Vector4 color, Vector2 scale, float rotation)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color));
-	}
-
-	void Camera::AddText(String ^ id, System::String ^ text, Vector2 position, Font ^ font, Vector4 color, Vector2 scale, float rotation)
-	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), Utility::Convert(scale), rotation, Utility::Convert(color), (thomas::resource::Font*)font->m_nativePtr);
-	}
-
-	void Camera::SetTextPosition(String ^ id, Vector2 position)
+	void Camera::SetTextPosition(String^ id, Vector2 position)
 	{
 		camera->GetGUIHandle()->SetTextPosition(Utility::ConvertString(id), Utility::Convert(position));
 	}
 
-	void Camera::SetTextColor(String ^ id, Vector4 color)
+	void Camera::SetTextColor(String^ id, Vector4 color)
 	{
 		camera->GetGUIHandle()->SetTextColor(Utility::ConvertString(id), Utility::Convert(color));
 	}
 
-	void Camera::SetTextScale(String ^ id, Vector2 scale)
+	void Camera::SetTextScale(String^ id, Vector2 scale)
 	{
 		camera->GetGUIHandle()->SetTextScale(Utility::ConvertString(id), Utility::Convert(scale));
 	}
 
-	void Camera::SetTextRotation(String ^ id, float rotation)
+	void Camera::SetTextRotation(String^ id, float rotation)
 	{
 		camera->GetGUIHandle()->SetTextRotation(Utility::ConvertString(id), rotation);
 	}
+	//-------------------------------------------------------------------------------------------
 }

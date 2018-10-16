@@ -11,9 +11,10 @@
 #include "../utils/Math.h"
 #include "../resource/Font.h"
 
+using namespace DirectX;
+
 namespace thomas
 {
-	using namespace DirectX;
 	using namespace resource;
 	using namespace math;
 
@@ -50,9 +51,9 @@ namespace thomas
 
 				Font* font;
 				std::string text;
-				thomas::math::Vector2 position;
-				thomas::math::Vector2 scale;
-				thomas::math::Vector4 color;
+				Vector2 position;
+				Vector2 scale;
+				Vector4 color;
 				float rotation;
 			};
 
@@ -63,6 +64,7 @@ namespace thomas
 			void Render();
 
 		public:
+			// Images
 			void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
 						  const Vector4& color = Vector4(1.f), const Vector2& scale = Vector2(1.f), float rotation = 0.f);
 			void SetImageTexture(const std::string& id, Texture2D* texture);
@@ -74,8 +76,10 @@ namespace thomas
 			bool OnImageClicked(const std::string& id);
 			bool OnImageHovered(const std::string& id);
 
-			void AddText(const std::string& id, std::string text, const Vector2& position, const Vector2& scale = Vector2(1.f),
-						float rotation = 0.f, const Vector4& color = Vector4(1.f), Font* font = nullptr);
+			// Text
+			void AddText(const std::string& id, const std::string& text, const Vector2& position, const Vector2& scale = Vector2(1.f),
+						 float rotation = 0.f, const Vector4& color = Vector4(1.f), Font* font = nullptr);
+			void SetText(const std::string& id, const std::string& newText);
 			void SetTextPosition(const std::string& id, const Vector2& position);
 			void SetTextColor(const std::string& id, const Vector4& color);
 			void SetTextScale(const std::string& id, const Vector2& scale);
