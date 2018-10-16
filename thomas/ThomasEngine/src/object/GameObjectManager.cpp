@@ -22,19 +22,8 @@ namespace ThomasEngine
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 	
-	
-		if (isStatic)
-			m_staticObjects[m_nrStatic++] = gameObject;
-		else
-			m_activeObjects[m_nrActive++] = gameObject;
-		
+		m_activeObjects[m_nrActive++] = gameObject;
 		return gameObject;
-	}
-
-	void GameObjectManager::isStatic(GameObject ^ gameObject)
-	{
-		if (!gameObject->GetStatic())
-			gameObject->toBeStatic();
 	}
 
 	void GameObjectManager::createGameObjectCore(std::string name)
@@ -42,4 +31,21 @@ namespace ThomasEngine
 		
 	}
 
+	void GameObjectManager::makeStatic(GameObject^ object)
+	{
+		if (!object->m_isStatic)
+			object->setStatic();
+	}
+
+	void GameObjectManager::RemoveMarkedObjects()
+	{
+		for (int i = 0; i < m_nrActive; i++)
+		{
+			GameObject^ temp_object = m_activeObjects[i];
+			if (temp_object->m_isDestroyed)
+			{
+				temp_object->Destroy();
+			}
+		}
+	}
 }

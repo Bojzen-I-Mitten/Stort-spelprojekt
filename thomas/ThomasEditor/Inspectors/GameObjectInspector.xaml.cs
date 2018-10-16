@@ -65,7 +65,7 @@ namespace ThomasEditor
                 if (DataContext is GameObject)
                 {
                     GameObject SelectedGameObject = DataContext as GameObject;
-                    GameObjectManager.isStatic(SelectedGameObject);
+                    GameObjectManager.makeStatic(SelectedGameObject);
                     
                 }
             }

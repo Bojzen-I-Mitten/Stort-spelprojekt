@@ -18,7 +18,7 @@ namespace thomas
 			{
 				if (s_objects[i]->m_destroyed)
 				{
-					delete s_objects[i];
+					//delete s_objects[i];
 					s_objects.erase(s_objects.begin() + i);
 					--i;
 				}

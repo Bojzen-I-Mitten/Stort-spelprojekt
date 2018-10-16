@@ -109,7 +109,8 @@ namespace ThomasEngine {
 	{
 		nativePtr = static_cast<thomas::object::Object*>
 			(thomas::ObjectHandler::setStatic(
-				static_cast<thomas::object::GameObject*>(nativePtr)));	
+				static_cast<thomas::object::GameObject*>(nativePtr)));
+
 		m_toBeStatic = false;
 		m_isStatic = true;
 	}

@@ -20,6 +20,7 @@ namespace thomas
 		static void Init();
 		static object::GameObject* createNewGameObject(std::string name);
 		static object::GameObject* setStatic(object::GameObject* object);
+		static object::GameObject* setActive(object::GameObject* object);
 	private:
 
 

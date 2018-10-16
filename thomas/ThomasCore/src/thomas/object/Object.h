@@ -10,8 +10,8 @@ namespace thomas
 		class Object
 		{
 		private:
+
 		public:
-			
 			virtual ~Object();
 			virtual void OnDestroy() {}
 			std::string GetName();
@@ -28,13 +28,21 @@ namespace thomas
 
 			static void Clean();
 
-			_GUID m_guid;
+		
 		private:
 			bool m_destroyed = false;
 			static std::vector<Object*> s_objects;
+
 		protected:
 			std::string m_name;
+
+		public:
+			_GUID m_guid;
+
 		};
+
+
+
 		template<typename T>
 		inline std::vector<T*> Object::FindObjectsOfType()
 		{
@@ -47,5 +55,7 @@ namespace thomas
 			}
 			return objects;
 		}
+
+
 	}
 }

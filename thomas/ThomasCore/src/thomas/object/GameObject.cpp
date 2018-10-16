@@ -39,7 +39,12 @@ namespace thomas
 		
 			move.m_transform = nullptr;
 			m_selected = move.m_selected;
-
+			m_staticSelf = move.m_staticSelf;
+			m_guid = std::move(move.m_guid);
+			m_name = std::move(move.m_name);
+			m_selected = std::move(move.m_selected);
+			
+			object::Object::Add(this);
 			for (auto& it : m_components)
 			{
 				it->m_gameObject = this;
@@ -55,9 +60,18 @@ namespace thomas
 				m_transform = std::move(m_transform);
 				m_activeSelf = move.m_activeSelf;
 				m_staticSelf = move.m_staticSelf;
-
+				m_guid = std::move(move.m_guid);
+				m_name = std::move(move.m_name);
+				m_selected = std::move(move.m_selected);
 				move.m_transform = nullptr;
 				m_selected = move.m_selected;
+
+
+				object::Object::Add(this);
+				for (auto& it : m_components)
+				{
+					it->m_gameObject = this;
+				}
 			}
 			return *this;
 		}

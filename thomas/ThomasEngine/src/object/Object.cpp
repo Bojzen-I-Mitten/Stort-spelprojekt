@@ -11,7 +11,7 @@ namespace ThomasEngine
 	{
 		nativePtr = ptr;
 		s_objects.Add(this);
-		thomas::object::Object::Add(ptr);
+		//thomas::object::Object::Add(ptr);
 		m_guid = Guid::NewGuid();
 		nativePtr->m_guid = Utility::Convert(m_guid);
 	}

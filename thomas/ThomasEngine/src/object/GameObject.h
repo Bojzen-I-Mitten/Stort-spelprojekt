@@ -13,6 +13,7 @@ namespace ThomasEngine
 	ref class Scene;
 	ref class Transform;
 	ref class Component;
+
 	public ref class GameObject : public Object
 	{
 	private:
