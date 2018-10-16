@@ -48,6 +48,9 @@ namespace thomas {
 				/* Get the world matrix of a bone
 				*/
 				virtual const math::Matrix& getBoneMatrix(unsigned int bone) const;
+				/* Get the bone orientation matrix with normalized basis vectors
+				*/
+				virtual math::Matrix getBoneOrientation(unsigned int bone) const;
 				bool getBoneIndex(uint32_t boneNameHash, unsigned int & boneIndex) const;
 				
 				virtual const std::string& getBoneName(unsigned int bone) const;
