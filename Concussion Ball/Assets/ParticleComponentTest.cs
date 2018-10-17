@@ -3,7 +3,8 @@ using ThomasEngine;
 public class ParticleComponentTest : ScriptComponent
 {
     private ParticleEmitter emitter;
-    //public Texture2D tex;
+    public Texture2D tex { get; set; }
+    private float cooldown;
 
     public override void Start()
     {
@@ -21,7 +22,8 @@ public class ParticleComponentTest : ScriptComponent
         emitter.DistanceFromSphereCenter = 3;
         emitter.Radius = 1.5f;
 
-        //emitter.Texture = tex;
+        cooldown = -0.1f;
+        emitter.Texture = tex;
     }
 
     public override void Update()
@@ -34,5 +36,11 @@ public class ParticleComponentTest : ScriptComponent
         {
             emitter.Emit = false;
         }
+        if (Input.GetKey(Input.Keys.K) && cooldown < 0.0f)
+        {
+            emitter.EmitOneShot(100);
+            cooldown = 0.2f;
+        }
+        cooldown -= Time.DeltaTime;
     }
 }

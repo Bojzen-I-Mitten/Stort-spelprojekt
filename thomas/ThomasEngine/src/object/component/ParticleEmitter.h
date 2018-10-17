@@ -16,42 +16,52 @@ namespace ThomasEngine
 	public:
 		ParticleEmitter();
 
+		[CategoryAttribute("Speed")]
 		property float MinSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Speed")]
 		property float MaxSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Speed")]
 		property float EndSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Size")]
 		property float MinSize {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Size")]
 		property float MaxSize {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Size")]
 		property float EndSize {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("LifeTime")]
 		property float MinLifeTime {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("LifeTime")]
 		property float MaxLifeTime {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Rotation")]
 		property float MinRotationSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Rotation")]
 		property float MaxRotationSpeed {
 			float get();
 			void set(float value);
