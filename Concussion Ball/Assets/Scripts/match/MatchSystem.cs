@@ -22,7 +22,7 @@ public class MatchSystem : NetworkManager
     public Team Spectator { get; set; }
 
     public GameObject BallPrefab { get; set; }
-    private GameObject Ball;
+    public GameObject Ball;
 
     private bool MatchStarted = false;
 
@@ -31,6 +31,7 @@ public class MatchSystem : NetworkManager
         get { return NetworkManager.instance as MatchSystem; }
     }
 
+    bool hasScored = false;
 
     public MatchSystem() : base()
     {
@@ -92,13 +93,15 @@ public class MatchSystem : NetworkManager
     {
         ResetPlayers();
         ResetBall();
+        hasScored = false;
     }
 
     void ResetBall()
     {
         Ball.SetActive(false);
         Ball.SetActive(true);
-        Ball.transform.position = new Vector3(0, 10, 0);
+        if(Ball.GetComponent<NetworkIdentity>().Owner)
+            Ball.transform.position = new Vector3(0, 10, 0);
     }
 
     void ResetPlayers()
@@ -113,6 +116,22 @@ public class MatchSystem : NetworkManager
     void OnRoundEnd()
     {
 
+    }
+
+    public void RPCAddScore(int teamType)
+    {
+        TEAM_TYPE type = (TEAM_TYPE)teamType;
+        FindTeam(type)?.AddScore();
+        OnRoundStart();
+    }
+
+    public void OnGoal(TEAM_TYPE teamThatScored)
+    {
+        if (hasScored)
+            return;
+        hasScored = true;
+        SendRPC(-2, "RPCAddScore", (int)teamThatScored);
+        RPCAddScore((int)teamThatScored);
     }
 
     public override void Update()
@@ -155,7 +174,6 @@ public class MatchSystem : NetworkManager
 
         Scene.Players[peer].gameObject.SetActive(false);
         OnMatchStart();
-        OnRoundStart();
     }
 
     protected override void OnPeerLeave(NetPeer peer)
@@ -167,6 +185,21 @@ public class MatchSystem : NetworkManager
         else
         {
             np.JoinTeam(null);
+        }
+    }
+
+    public TEAM_TYPE GetOpposingTeam(TEAM_TYPE team)
+    {
+        switch (team)
+        {
+            case TEAM_TYPE.TEAM_1:
+                return TEAM_TYPE.TEAM_2;
+            case TEAM_TYPE.TEAM_2:
+                return TEAM_TYPE.TEAM_1;
+            case TEAM_TYPE.TEAM_SPECTATOR:
+                return TEAM_TYPE.TEAM_SPECTATOR;
+            default:
+                return TEAM_TYPE.UNASSIGNED;
         }
     }
 

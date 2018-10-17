@@ -54,6 +54,7 @@ public class NetworkPlayer : NetworkComponent
         mat?.SetColor("color", Team.Color);
     }
 
+
     public void JoinTeam(Team team)
     {
         if (this._Team != null)

@@ -36,6 +36,15 @@ public class Team
     public void SetSpawnArea(TeamSpawn spawn) { _SpawnArea = spawn; }
     //public void SetGoalArea(TeamGoal goal) { _GoalArea = goal; }
 
+    public void ResetScore()
+    {
+        _Score = 0;
+    }
+    public void AddScore()
+    {
+        _Score++;
+        Debug.Log(TeamType.ToString() + " Scored!");
+    }
 
     public void OnRoundStart()
     {
