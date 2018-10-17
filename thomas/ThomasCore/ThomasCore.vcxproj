@@ -28,6 +28,7 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\IBlendTree.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
@@ -72,6 +73,7 @@
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
+    <ClCompile Include="src\thomas\resource\texture\Texture2DArray.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\LinearAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
@@ -186,6 +188,7 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
+    <ClInclude Include="src\thomas\resource\texture\Texture2DArray.h" />
     <ClInclude Include="src\thomas\System.h" />
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />

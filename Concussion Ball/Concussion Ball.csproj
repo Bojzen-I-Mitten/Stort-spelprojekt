@@ -57,8 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\RpcTest.cs" />
+    <Compile Include="Assets\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
+    <Compile Include="Assets\Scripts\Chadimations.cs" />
+    <Compile Include="Assets\Scripts\chadStateMachine.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />

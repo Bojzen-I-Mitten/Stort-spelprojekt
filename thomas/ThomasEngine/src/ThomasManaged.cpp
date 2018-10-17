@@ -81,7 +81,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->SetActive(showStatistics);
 		if (showStatistics) {
@@ -94,6 +94,7 @@ namespace ThomasEngine {
 			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
+			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
 			ImGui::End();
 		}
@@ -229,7 +230,8 @@ namespace ThomasEngine {
 					UpdateFinished->Set();
 				}
 				Monitor::Exit(lock);
-				ScriptingManger::ReloadIfNeeded();
+				if(!playing)
+					ScriptingManger::ReloadIfNeeded();
 			}
 		}
 		Resources::UnloadAll();

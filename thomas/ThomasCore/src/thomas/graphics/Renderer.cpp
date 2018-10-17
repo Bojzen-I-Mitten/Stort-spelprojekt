@@ -112,7 +112,7 @@ namespace thomas
 			//Process commands
 			BindFrame();
 
-			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			//ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
 			//m_particleSystem->UpdateParticleSystem();
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
@@ -129,21 +129,36 @@ namespace thomas
 					}
 				}
 
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				
 				//m_particleSystem->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
-#ifdef _EDITOR
+
+			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			if (editor::EditorCamera::Instance())
+			{
+				BindCamera(editor::EditorCamera::Instance()->GetCamera());
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+			}
+			for (object::component::Camera* cam : object::component::Camera::s_allCameras)
+			{
+				BindCamera(cam);
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+			}
+			profiler->Timestamp(profiling::GTS_PARTICLES);
+			
+
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
 				editor::Gizmos::Gizmo().RenderGizmos();
 			}
-#endif
+
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 
 	}
 }
+
 

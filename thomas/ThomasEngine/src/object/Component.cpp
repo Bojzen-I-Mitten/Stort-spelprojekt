@@ -68,15 +68,27 @@ namespace ThomasEngine
 			m_enabled = value;
 			if (m_firstEnable && m_gameObject->GetActive()) {
 				if (value == true) {
-					OnEnable();
+					Enable();
 					initialized = false;
 				}
 				else
-					OnDisable();
+					Disable();
 			}else
 				initialized = false;
 		}
 	}
+
+	void Component::Disable()
+	{
+		m_enabled = false;
+		OnDisable();
+	}
+	void Component::Enable()
+	{
+		m_enabled = true;
+		OnEnable();
+	}
+
 	void Component::LoadExternalComponents()
 	{
 		array<String^>^ dlls = Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly);
@@ -129,14 +141,14 @@ namespace ThomasEngine
 
 	void Component::Delete()
 	{
-		this->enabled = false; // Disable first, just in case...
+		Disable();	// Disable first just in case
 #ifdef _DEBUG
 		// Check successfull destruction
-		if(m_gameObject->Native->DestroyComponent(this->nativePtr))
+		if(m_gameObject->Native->RemoveComponent(this->nativePtr))
 			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
 #else
 		// Don't care
-		m_gameObject->Native->DestroyComponent(this->nativePtr);
+		m_gameObject->Native->RemoveComponent(this->nativePtr);
 #endif
 		StopAllCoroutines();
 	}
