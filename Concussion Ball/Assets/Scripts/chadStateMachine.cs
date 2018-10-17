@@ -254,8 +254,6 @@ public class ChadStateMachine : NetworkComponent
                             Weights[Chadimations.STATE.TURNING_LEFT] = 1f / 3f;
                         else
                             Weights[Chadimations.STATE.TURNING_RIGHT] = 1f / 3f;
-
-                        m_chadControls.FondleCamera(m_velocity, m_xStep, m_yStep);
                     }
 
                     if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
