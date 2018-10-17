@@ -91,13 +91,18 @@ namespace ThomasEngine
 		if (node == nullptr)
 			get()->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			std::unique_ptr< thomas::graphics::animation::AnimationNode> n(node);
-			get()->GetBlendTree()->setBlendTree(n);
+			get()->GetBlendTree()->setBlendTree(node);
 		}
 
 	}
 
 	void RenderSkinnedComponent::setBlendTreeNode(Script::BlendNode ^ node)
+	{
+		if (!node) return;
+		setBlendTreeNode(node->Native());
+	}
+
+	void RenderSkinnedComponent::setBlendTreeNode(Script::PlaybackNode ^ node)
 	{
 		if (!node) return;
 		setBlendTreeNode(node->Native());

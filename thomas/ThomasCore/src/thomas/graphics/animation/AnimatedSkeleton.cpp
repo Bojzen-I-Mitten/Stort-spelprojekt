@@ -65,16 +65,16 @@ namespace thomas {
 				_root = NULL;
 			}
 
-			void AnimatedSkeleton::setBlendTree(std::unique_ptr<AnimationNode> &blendTree)
+			void AnimatedSkeleton::setBlendTree(AnimationNode *blendTree)
 			{
 				if (!blendTree)
 					clearBlendTree();
 				else
-					_root = std::move(blendTree);
+					_root = blendTree;
 			}
 
 			void AnimatedSkeleton::clearBlendTree() {
-				_root = std::unique_ptr<AnimationNode>(new BindPoseNode(_ref));
+				_root = new BindPoseNode(_ref);
 				update(0.1f);
 			}
 
@@ -86,7 +86,7 @@ namespace thomas {
 				}
 				AnimationData &animRef = *anim->GetAnimation();
 				std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, animRef.m_duration, PlayType::Loop));
-				_root = std::unique_ptr<AnimationNode>(new AnimPlayback(_ref, playback, animRef));
+				_root = new AnimPlayback(_ref, playback, animRef);
 			}
 
 

@@ -18,7 +18,7 @@ namespace thomas {
 			*/
 			class IBlendTree {
 			public:
-				virtual void setBlendTree(std::unique_ptr<AnimationNode> &blendTree) = 0;
+				virtual void setBlendTree(AnimationNode *blendTree) = 0;
 				virtual void clearBlendTree() = 0;
 				virtual void playSingle(thomas::resource::Animation * anim) = 0;
 
