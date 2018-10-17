@@ -22,9 +22,9 @@ namespace thomas
 			}
 
 			Transform::Transform()
+				: m_parent(NULL)
 			{
 				Decompose();
-				m_parent = NULL;
 			}
 			math::Vector3 Transform::Forward()
 			{
@@ -120,9 +120,9 @@ namespace thomas
 			void Transform::Rotate(math::Quaternion rot)
 			{
 				m_localRotation = m_localRotation * rot;
-#ifdef _EDITOR
+//#ifdef _EDITOR
 				m_euler = math::ToEuler(m_localRotation);
-#endif
+//#endif
 				UpdateLocalMatrix();
 				Decompose();
 				SetDirty(true);

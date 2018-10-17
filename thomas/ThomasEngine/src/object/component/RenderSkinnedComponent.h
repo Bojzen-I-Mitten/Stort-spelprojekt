@@ -10,6 +10,8 @@
 #include "../../resource/Material.h"
 #include "../../resource/Animation.h"
 #include "../../script/animation/BlendNode.h"
+#include "../../script/animation/PlaybackNode.h"
+
 using namespace System::Runtime::InteropServices;
 
 namespace ThomasEngine
@@ -50,6 +52,8 @@ namespace ThomasEngine
 		void setBlendTreeNode(thomas::graphics::animation::AnimationNode * node);
 
 		void setBlendTreeNode(Script::BlendNode^ node);
+
+		void setBlendTreeNode(Script::PlaybackNode ^ node);
 
 		bool FetchBoneIndex(uint32_t boneHash, uint32_t& boneIndex);
 		bool FetchBoneIndex(uint32_t boneHash, [Out] uint32_t% boneIndex);

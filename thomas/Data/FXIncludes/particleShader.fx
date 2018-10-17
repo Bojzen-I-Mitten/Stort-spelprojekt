@@ -3,9 +3,8 @@
 #include <ThomasCG.hlsl>
 #include <ParticleHeader.h>
 
-Texture2DArray texArr;
-//Texture2D diffuseTexture;
-//SamplerState diffuseSampler : register(s0);
+Texture2DArray textures;
+
 SamplerState StandardWrapSampler
 {
     Filter = MIN_MAG_MIP_LINEAR;
@@ -16,11 +15,11 @@ SamplerState StandardWrapSampler
 DepthStencilState EnableDepth
 {
     DepthEnable = TRUE;
-    DepthWriteMask = ALL;
-    DepthFunc = LESS_EQUAL;
+    DepthWriteMask = ZERO;
+    DepthFunc = LESS;
 };
 
-RasterizerState TestRasterizer
+RasterizerState Rasterizer
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -28,14 +27,25 @@ RasterizerState TestRasterizer
     DepthClipEnable = FALSE;
 };
 
-
-BlendState AlphaBlendingOn
+BlendState SrcAlphaBlend
 {
     BlendEnable[0] = TRUE;
     SrcBlend = SRC_ALPHA;
     DestBlend = INV_SRC_ALPHA;
     BlendOp = ADD;
-    SrcBlendAlpha = ZERO;
+    SrcBlendAlpha = ONE;
+    DestBlendAlpha = ZERO;
+    BlendOpAlpha = ADD;
+    RenderTargetWriteMask[0] = 0x0F;
+};
+
+BlendState AdditiveBlending
+{
+    BlendEnable[0] = TRUE;
+    SrcBlend = ONE;
+    DestBlend = ONE;
+    BlendOp = ADD;
+    SrcBlendAlpha = ONE;
     DestBlendAlpha = ZERO;
     BlendOpAlpha = ADD;
     RenderTargetWriteMask[0] = 0x0F;
@@ -47,8 +57,8 @@ StructuredBuffer<BillboardStruct> billboards;
 struct v2f
 {
     float4 vertex : SV_POSITION;
-    float2 texcoord : TEXCOORD0;
-    float3 color : asdf;
+    float3 texcoord : TEXCOORD0;
+    float fade : FADEVAL;
 };
 
 v2f vert(uint id : SV_VertexID)
@@ -60,22 +70,10 @@ v2f vert(uint id : SV_VertexID)
     uint vertexIndex = id % 3;
 
     output.vertex = mul(thomas_MatrixVP, float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0f));
-    //output.vertex /= output.vertex.w; 
-    //output.vertex = float4(billboards[particleIndex].quad[triangleIndex][vertexIndex], 1.0);
-	
-    output.texcoord = billboards[particleIndex].uvs[triangleIndex][vertexIndex];
-    
-    /*if (id == 0)
-        output.vertex = mul(float4(0.0, 0.5, 0.5, 1.0), thomas_MatrixVP);
-    else if (id == 2)
-        output.vertex = mul(float4(0.5, -0.5, 0.5, 1.0), thomas_MatrixVP);
-    else if (id == 1)
-        output.vertex = mul(float4(-0.5, -0.5, 0.5, 1.0), thomas_MatrixVP);*/
-    
-    //if (particleIndex % 2 == 0)
-        output.color = float3(1.0f, 0.0f, 0.0f);
-    //else
-      //  output.color = float3(0.0f, 1.0f, 0.0f);
+    output.vertex /= output.vertex.w; 
+   
+    output.texcoord = float3(billboards[particleIndex].uvs[triangleIndex][vertexIndex], billboards[particleIndex].textureIndex);
+    output.fade = billboards[particleIndex].fade;
 
     return output;
 }
@@ -83,11 +81,9 @@ v2f vert(uint id : SV_VertexID)
 
 float4 frag(v2f input) : SV_Target
 {
-    //float4 outputColor = diffuseTexture.Sample(diffuseSampler, input.uvs);
-
-    //outputColor *= input.colorFactor;
+    float4 outputColor = textures.Sample(StandardWrapSampler, input.texcoord);
     
-    return float4(input.color, 1.0f);
+    return float4(outputColor.xyz, outputColor.w - input.fade); //float4(0.0f,1.0f,1.0,1.0f);
 
 }
 
@@ -98,8 +94,17 @@ technique11 Particles
         VERT(vert());
         SetGeometryShader(NULL);
 		FRAG(frag());
-        SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(TestRasterizer);
-        SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetDepthStencilState(EnableDepth, 1);
+        SetRasterizerState(Rasterizer);
+        SetBlendState(SrcAlphaBlend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
+  //  pass AdditiveBlendPass
+  //  {
+  //      VERT(vert());
+  //      SetGeometryShader(NULL);
+		//FRAG(frag());
+  //      SetDepthStencilState(EnableDepth, 1);
+  //      SetRasterizerState(Rasterizer);
+  //      SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+  //  }
 }

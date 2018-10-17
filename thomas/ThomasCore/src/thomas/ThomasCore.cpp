@@ -66,7 +66,6 @@ namespace thomas
 			s_clearLog = false;
 		}
 
-		object::Object::Clean();
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
 	}
@@ -111,7 +110,6 @@ namespace thomas
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
-		object::Object::Destroy();
 		editor::EditorCamera::Instance()->Destroy();
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();

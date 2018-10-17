@@ -28,7 +28,7 @@ namespace ThomasEngine
 		void UpdateCoroutines();
 		
 		Component(thomas::object::component::Component* ptr);
-		~Component();
+		virtual ~Component();
 		
 		void setGameObject(GameObject^ gObj);
 		virtual void OnGameObjectSet() {};
@@ -65,6 +65,10 @@ namespace ThomasEngine
 	private:
 		/* Delete the object, does not consider GameObject reference. */
 		void Delete();
+		/* Set enabled state. */
+		void Enable();
+		/* Set disabled state. */
+		void Disable();
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
 		virtual void Destroy() override;

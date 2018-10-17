@@ -36,7 +36,27 @@ namespace thomas
 #pragma endregion
 
 #pragma region Texture2DArrayProperty
+			ShaderPropertyTexture2DArray::ShaderPropertyTexture2DArray(Texture2DArray* value) : ShaderProperty(Type::TEXTURE2DARRAY), m_value(value)
+			{
+				
+			};
 
+			void ShaderPropertyTexture2DArray::Apply(std::string name, Shader* shader) const
+			{
+				
+				shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
+				
+			}
+
+			ShaderProperty* ShaderPropertyTexture2DArray::GetDefault()
+			{
+				return new ShaderPropertyTexture2DArray(nullptr);
+			}
+
+			Texture2DArray* ShaderPropertyTexture2DArray::GetValue()
+			{
+				return m_value;
+			}
 #pragma endregion
 		}
 	}

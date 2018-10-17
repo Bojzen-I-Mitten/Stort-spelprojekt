@@ -44,12 +44,12 @@ namespace thomas
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, Scene* scene);
 			template<typename T>
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, component::Transform* parent, Scene* scene);
-			
-			/* Destroy the component referenced to in the pointer.
-			 comp_ptr	<<	Component to destroy
+
+			/* Remove the component referenced to in the pointer.
+			 comp_ptr	<<	Component to remove
 			 return		>>	0 if component was found and removed.
 			*/
-			int DestroyComponent(void * comp_ptr);
+			int RemoveComponent(void * comp_ptr);
 
 		public:
 			

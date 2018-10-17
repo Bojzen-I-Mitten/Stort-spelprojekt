@@ -129,6 +129,15 @@ namespace DirectX
 			return q;
 		}
 
+		Vector3 SphericalCoordinate(float phi, float theta, float radius)
+		{
+			float xAngle = sin(theta) * cos(phi);
+			float yAngle = sin(theta) * sin(phi);
+			float zAngle = cos(theta);
+
+			return Vector3(xAngle, yAngle, zAngle) * radius;
+		}
+
 		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest)
 		{
 			from.Normalize();

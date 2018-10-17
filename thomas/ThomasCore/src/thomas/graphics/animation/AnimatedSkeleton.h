@@ -38,7 +38,7 @@ namespace thomas {
 
 			public:
 
-				virtual void setBlendTree(std::unique_ptr<AnimationNode> &blendTree);
+				virtual void setBlendTree(AnimationNode *blendTree);
 				virtual void clearBlendTree();
 				virtual void playSingle(thomas::resource::Animation * anim);
 
@@ -66,7 +66,7 @@ namespace thomas {
 
 			private:
 				Skeleton& _ref;									// Reference to the mesh skeleton
-				std::unique_ptr<AnimationNode> _root;			// Root in the blend tree
+				AnimationNode* _root;			// Root in the blend tree
 				std::vector<math::Matrix> _pose;				// Bone transform in model space
 				std::vector<math::Matrix> _skin;				// Skin Transforms in model space, stored in a property ready for the GPU
 				std::unique_ptr<ConstraintList> m_constraint;	// Constraints applied in world space.

@@ -403,6 +403,17 @@ namespace thomas
 				}
 			}
 		}
+		void Shader::SetGlobalTexture2DArray(const std::string & name, resource::Texture2DArray* value)
+		{
+			for (auto shader : s_loadedShaders)
+			{
+				if (shader->HasProperty(name))
+				{
+					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyTexture2DArray(value));
+					shader->m_properties[name]->SetName(name);
+				}
+			}
+		}
 		void Shader::SetGlobalResource(const std::string & name, ID3D11ShaderResourceView * value)
 		{
 			for (auto shader : s_loadedShaders)
@@ -448,7 +459,6 @@ namespace thomas
 					shader->m_properties[name]->SetName(name);
 				}
 			}
-			
 		}
 
 		Shader * Shader::FindByName(const std::string & name)
@@ -674,7 +684,8 @@ namespace thomas
 				case D3D_SVT_TEXTURE2DMS:
 				case D3D_SVT_RWTEXTURE2D:
 				case D3D_SVT_TEXTURE2DARRAY:
-					newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+					newProperty = shaderproperty::ShaderPropertyTexture2DArray::GetDefault();
+					break;
 				case D3D_SVT_TEXTURE2D:
 					isMaterialProperty = true;
 					if (semantic == "NORMALTEXTURE")

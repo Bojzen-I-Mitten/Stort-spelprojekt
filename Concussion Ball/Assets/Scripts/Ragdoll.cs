@@ -218,15 +218,13 @@ namespace ThomasEditor
         }
         public override void Update()
         {
-            if(Input.GetKeyDown(Input.Keys.Space))
+/*            if(Input.GetKeyDown(Input.Keys.Space))
             {
                 if (RagdollEnabled)
                     DisableRagdoll();
                 else
                    EnableRagdoll();
-
-             //   RagdollEnabled = !RagdollEnabled;
-            }
+            }*/
         }
         public void EnableRagdoll()
         {

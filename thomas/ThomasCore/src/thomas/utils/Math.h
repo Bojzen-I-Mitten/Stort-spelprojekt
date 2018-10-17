@@ -49,6 +49,8 @@ namespace DirectX
 			return v;
 		}
 
+		Vector3 SphericalCoordinate(float phi, float theta, float radius = 1);
+
 		inline float DegreesToRadians(const float & degree)
 		{
 			return std::fmodf(degree, 360.f) * (PI / 180.f);
