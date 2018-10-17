@@ -59,7 +59,6 @@ public class ChadStateMachine : NetworkComponent
         set { _chadControls = value; }
     }
 
-    //Coroutine for jumping delay, also used for tackling delay
     IEnumerator DivingCoroutine()
     { 
         m_chadControls.HandleMovement(m_maxSpeed, 0);
@@ -67,23 +66,10 @@ public class ChadStateMachine : NetworkComponent
         yield return new WaitForSeconds(1.0f);
         m_velocity = BaseSpeed;
         m_state = CHAD_STATE.IDLE;
-
-        //if (tackling)
-        //{
-        //    transform.Rotate(0.0f, 0.5f, 0.0f);
-        //    tackling = false;
-        //    //test.fieldOfView = 70;
-        //}
-        //yield return new WaitForSeconds(0.2f);
-
     }
 
     public override void Start()
     {
-        //if(!m_camera)
-        //{
-        //    Debug.Log("Camera not found.");
-        //}
         m_chadControls = null;
         m_state = CHAD_STATE.IDLE;
         m_xStep = Input.GetMouseX() * Time.ActualDeltaTime;
@@ -137,12 +123,12 @@ public class ChadStateMachine : NetworkComponent
                             Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                             Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
                         }
-                        //else if (Input.GetKeyDown(Input.Keys.Space))
-                        //{
-                        //    m_state = CHAD_STATE.DIVING;
-                        //    Weights.Clear();
-                        //    Weights.Add(Chadimations.STATE.DIVING, 0);
-                        //}
+                        else if (Input.GetKeyDown(Input.Keys.Space))
+                        {
+                            m_state = CHAD_STATE.DIVING;
+                            Weights.Clear();
+                            Weights.Add(Chadimations.STATE.DIVING, 0);
+                        }
                     }
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
@@ -177,20 +163,18 @@ public class ChadStateMachine : NetworkComponent
                     m_chargeForce += m_incrementSpeed * Time.DeltaTime;
                 m_chadControls.ChargeBall();
 
-                //Debug.Log("Charge force: " + m_chargeForce);
-
                 if (m_isTackled)
                 {
                     m_state = CHAD_STATE.RAGDOLL;
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.RAGDOLL, 0);
                 }
-                //else if (Input.GetKey(Input.Keys.Space))
-                //{
-                //    m_state = CHAD_STATE.DIVING;
-                //    Weights.Clear();
-                //    Weights.Add(Chadimations.STATE.DIVING, 0);
-                //}
+                else if (Input.GetKey(Input.Keys.Space))
+                {
+                    m_state = CHAD_STATE.DIVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.DIVING, 0);
+                }
                 else
                 {
                     // Throwing and pressing W, checking if also ASD pressed
@@ -312,19 +296,18 @@ public class ChadStateMachine : NetworkComponent
             case CHAD_STATE.MOVING:
                 // __SIMULTAENOUS__ MOVE and: nothing
                 // __CAN_ENTER__  IDLE/THROWING/RAGDOLL/JUMP
-                // Debug.Log("Movement speed: " + m_velocity);
                 if (m_isTackled)
                 {
                     m_state = CHAD_STATE.RAGDOLL;
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.RAGDOLL, 0);
                 }
-                //else if (Input.GetKey(Input.Keys.Space))
-                //{
-                //    m_state = CHAD_STATE.DIVING;
-                //    Weights.Clear();
-                //    Weights.Add(Chadimations.STATE.DIVING, 0);
-                //}
+                else if (Input.GetKey(Input.Keys.Space))
+                {
+                    m_state = CHAD_STATE.DIVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.DIVING, 0);
+                }
                 else
                 {
                     //if m_velocity > m_runningSpeed && anim != running {anim = running}
@@ -342,7 +325,6 @@ public class ChadStateMachine : NetworkComponent
                     }
                     else if (Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S))
                     {
-                        //Debug.Log("Speed: " + m_velocity);
                         if ((m_velocity < m_maxSpeedWithBall && m_chadControls.HasBall) || (m_velocity < m_maxSpeed && !m_chadControls.HasBall))
                         {
                             m_velocity += m_incrementSpeed * Time.DeltaTime;
@@ -352,7 +334,7 @@ public class ChadStateMachine : NetworkComponent
                     }
                     else if (Input.GetKey(Input.Keys.S))
                     {
-                        m_velocity = 2.0f;//en faktor, ingen acceleration because backing
+                        m_velocity = BaseSpeed;
                         if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.W))
                         {
                             // backing anim
@@ -401,7 +383,6 @@ public class ChadStateMachine : NetworkComponent
 
                 if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                 {
-                    //Debug.Log("Moving and turning..");
                     if (m_velocity < m_runningSpeed)
                     {
 
