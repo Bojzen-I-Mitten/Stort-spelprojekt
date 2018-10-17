@@ -2,6 +2,7 @@
 #include "../resource/ComputeShader.h"
 #include <random>
 #include <time.h>
+#include "../resource/texture/Texture2DArray.h"
 
 namespace thomas
 {
@@ -33,7 +34,7 @@ namespace thomas
 
 		}
 
-		void ParticleSystem::Initialize(unsigned maxNrOfParticles)//, unsigned MaxNrOfEmitters)
+		void ParticleSystem::Initialize(unsigned maxNrOfParticles)
 		{
 			m_maxNrOfParticles = maxNrOfParticles;
 			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/emitParticlesCS.fx");
@@ -83,7 +84,7 @@ namespace thomas
 
 			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
 
-
+			m_texArr = new resource::Texture2DArray(256, 256, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
 		}
 
 		void ParticleSystem::Destroy()
@@ -99,6 +100,7 @@ namespace thomas
 			SAFE_RELEASE(m_bufferCounters);
 			SAFE_RELEASE(m_bufferSpawnIndex);
 
+			delete m_texArr;
 			//m_updateParticlesCS 
 			//m_emitParticlesCS
 		}
@@ -106,6 +108,16 @@ namespace thomas
 		void ParticleSystem::AddEmitterToSpawn(InitParticleBufferStruct & emitterInitData)
 		{
 			m_emitters.push_back(emitterInitData);
+		}
+
+		unsigned ParticleSystem::AddTexture(resource::Texture2D * tex)
+		{
+			return m_texArr->AddTexture(tex);
+		}
+
+		void ParticleSystem::DeRefTexFromTexArray(unsigned i)
+		{
+			m_texArr->DeRefTexture(i);
 		}
 		
 		void ParticleSystem::SpawnParticles()
@@ -214,16 +226,17 @@ namespace thomas
 		{
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
-
+			m_particleShader->SetGlobalTexture2DArray("textures", m_texArr);
 			m_particleShader->SetGlobalResource("billboards", m_bufferBillboard->GetSRV());
 			
 			m_particleShader->Bind();
 			m_particleShader->SetPass(0);
 			
+			
 			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
 
-			ID3D11ShaderResourceView* const s_nullSRV[1] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 1, s_nullSRV);
+			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
+			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 8, s_nullSRV);
 
 		}
 

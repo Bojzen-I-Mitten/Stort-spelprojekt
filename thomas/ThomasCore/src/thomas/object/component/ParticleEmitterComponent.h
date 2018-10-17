@@ -29,6 +29,7 @@ namespace thomas
 				void Update();
 				void OnEnable();
 				void OnDisable();
+				void OnDestroy();
 				ParticleEmitterComponent();
 				~ParticleEmitterComponent();
 
@@ -83,8 +84,8 @@ namespace thomas
 				void StopEmitting();
 				bool IsEmitting() const;
 				
-				void SetMaterial(resource::Material* material);
-				resource::Material* GetMaterial() const;
+				void SetTexture(resource::Texture2D* other);
+				resource::Texture2D* GetTexture() const;
 	
 				void SetEmissionRate(unsigned const& other);
 				unsigned GetEmissionRate() const;
@@ -94,7 +95,7 @@ namespace thomas
 				//void ImportEmitter(std::string path);
 				
 			private:
-				resource::Material* m_material;
+				resource::Texture2D* m_texture;
 				std::shared_ptr<graphics::ParticleSystem> m_particleSystem;
 
 				graphics::ParticleSystem::InitParticleBufferStruct m_particleBufferStruct;
