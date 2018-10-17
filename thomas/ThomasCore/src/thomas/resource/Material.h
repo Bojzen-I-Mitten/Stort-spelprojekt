@@ -54,6 +54,8 @@ namespace thomas
 			math::Matrix GetMatrix(const std::string& name);
 			void SetMatrix(const std::string& name, math::Matrix& value);
 
+			void SetMatrixArray(const std::string & name, math::Matrix* value, int num_matrix);
+
 			resource::Texture2D* GetTexture2D(const std::string& name);
 			void SetTexture2D(const std::string& name, resource::Texture2D* value);
 

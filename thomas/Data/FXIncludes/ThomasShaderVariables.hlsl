@@ -5,12 +5,12 @@
 #define THOMAS_MATRIX_V thomas_MatrixV
 #define THOMAS_MATRIX_I_V thomas_MatrixInvV
 #define THOMAS_MATRIX_VP thomas_MatrixVP
-#define THOMAS_MATRIX_M thomas_ObjectToWorld
+/*#define THOMAS_MATRIX_M thomas_ObjectToWorld[0]
 
-#define THOMAS_MATRIX_MVP mul(thomas_MatrixVP, thomas_ObjectToWorld)
-#define THOMAS_MATRIX_MV mul(thomas_MatrixV, thomas_ObjectToWorld)
+#define THOMAS_MATRIX_MVP mul(thomas_MatrixVP, thomas_ObjectToWorld[0])
+#define THOMAS_MATRIX_MV mul(thomas_MatrixV, thomas_ObjectToWorld[0])
 #define THOMAS_MATRIX_T_MV transpose(THOMAS_MATRIX_MV)
-#define THOMAS_MATRIX_IT_MV transpose(mul(thomas_WorldToObject, thomas_MatrixInvV))
+#define THOMAS_MATRIX_IT_MV transpose(mul(thomas_WorldToObject[0], thomas_MatrixInvV))*/
 
 
 // ----------------------------------------------------------------------------
@@ -41,8 +41,8 @@ cbuffer ThomasPerCamera
 
 cbuffer ThomasPerObject
 {
-	float4x4 thomas_ObjectToWorld;
-	float4x4 thomas_WorldToObject;
+	float4x4 thomas_ObjectToWorld[100];
+	float4x4 thomas_WorldToObject[100];
 	float4x4 thomas_Bone_Array[120];
 };
 

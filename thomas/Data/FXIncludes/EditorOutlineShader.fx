@@ -22,11 +22,10 @@ struct v2f {
 	
 };
 
-v2f vert(appdata_thomas v)
+v2f vert(appdata_thomas v, uint instanceID : SV_INSTANCEID)
 {
 	v2f o;
-    o.vertex = ThomasObjectToClipPos(v.vertex + v.normal * 0.2f);
-    
+    o.vertex = ThomasObjectToClipPos(v.vertex + v.normal * 0.2f, instanceID);
 
 	return o;
 }

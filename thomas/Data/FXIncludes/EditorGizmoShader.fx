@@ -31,10 +31,10 @@ struct v2f {
 	float4 vertex : SV_POSITION;
 };
 
-v2f vert(appdata_thomas v)
+v2f vert(appdata_thomas v, uint instanceID : SV_INSTANCEID)
 {
 	v2f o;
-	o.vertex = ThomasObjectToClipPos(v.vertex);
+	o.vertex = ThomasObjectToClipPos(v.vertex, instanceID);
 
 	return o;
 }

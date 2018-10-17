@@ -247,6 +247,14 @@ namespace thomas
 			Unlock();
 			
 		}
+		void Material::SetMatrixArray(const std::string& name, math::Matrix* value, int num_ofMatrix)
+		{
+			Lock();
+			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyMatrixArray(name, value, 0, num_ofMatrix));
+			m_properties[name]->SetName(name);
+			Unlock();
+		}
+
 		resource::Texture2D * Material::GetTexture2D(const std::string & name)
 		{
 			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::TEXTURE2D)
@@ -378,6 +386,7 @@ namespace thomas
 				{
 					m_shader->SetPass(p.index);
 					mesh->Draw(m_shader);
+					
 				}
 			}
 			Unlock();

@@ -150,23 +150,23 @@ inline float4 ThomasWorldToClipPos( in float3 pos )
 }
 
 // Tranforms position from object to homogenous space
-inline float4 ThomasObjectToClipPos(in float3 pos)
+inline float4 ThomasObjectToClipPos(in float3 pos, uint ID)
 {
 	// More efficient than computing M*VP matrix product
-	return mul(THOMAS_MATRIX_VP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
+	return mul(THOMAS_MATRIX_VP, mul(thomas_ObjectToWorld[ID], float4(pos, 1.0)));
 }
-inline float4 ThomasObjectToClipPos(float4 pos) // overload for float4; avoids "implicit truncation" warning
+inline float4 ThomasObjectToClipPos(float4 pos, uint ID) // overload for float4; avoids "implicit truncation" warning
 {
-	return ThomasObjectToClipPos(pos.xyz);
+	return ThomasObjectToClipPos(pos.xyz, ID);
 }
 
-inline float4 ThomasObjectToWorldPos(float4 pos) 
+inline float4 ThomasObjectToWorldPos(float4 pos, uint ID) 
 {
-	return mul(thomas_ObjectToWorld, pos);
+	return mul(thomas_ObjectToWorld[ID], pos);
 }
-inline float4 ThomasObjectToWorldPos(float3 pos) // overload for float3; 
+inline float4 ThomasObjectToWorldPos(float3 pos, uint ID) // overload for float3; 
 {
-	return ThomasObjectToWorldPos(float4(pos, 1.0f));
+	return ThomasObjectToWorldPos(float4(pos, 1.0f), ID);
 }
 
 // Tranforms position from view to homogenous space
@@ -176,13 +176,13 @@ inline float4 ThomasViewToClipPos( in float3 pos )
 }
 
 // Tranforms position from object to camera space
-inline float3 ThomasObjectToViewPos( in float3 pos )
+inline float3 ThomasObjectToViewPos( in float3 pos, uint ID )
 {
-    return mul(THOMAS_MATRIX_V, mul(thomas_ObjectToWorld, float4(pos, 1.0))).xyz;
+    return mul(THOMAS_MATRIX_V, mul(thomas_ObjectToWorld[ID], float4(pos, 1.0))).xyz;
 }
-inline float3 ThomasObjectToViewPos(float4 pos) // overload for float4; avoids "implicit truncation" warning for existing shaders
+inline float3 ThomasObjectToViewPos(float4 pos, uint ID) // overload for float4; avoids "implicit truncation" warning for existing shaders
 {
-    return ThomasObjectToViewPos(pos.xyz);
+    return ThomasObjectToViewPos(pos.xyz, ID);
 }
 
 // Tranforms position from world to camera space
@@ -192,29 +192,29 @@ inline float3 ThomasWorldToViewPos( in float3 pos )
 }
 
 // Transforms direction from object to world space
-inline float3 ThomasObjectToWorldDir( in float3 dir )
+inline float3 ThomasObjectToWorldDir( in float3 dir, uint ID )
 {
-    return normalize(mul((float3x3)thomas_ObjectToWorld, dir));
+    return normalize(mul((float3x3)thomas_ObjectToWorld[ID], dir));
 }
 
 // Transforms direction from world to object space
-inline float3 ThomasWorldToObjectDir( in float3 dir )
+inline float3 ThomasWorldToObjectDir( in float3 dir, uint ID )
 {
-    return normalize(mul((float3x3)thomas_WorldToObject, dir));
+    return normalize(mul((float3x3)thomas_WorldToObject[ID], dir));
 }
 
 inline float2 TransformViewToProjection(float2 v) { return float2(v.x*THOMAS_MATRIX_P[0][0], v.y*THOMAS_MATRIX_P[1][1]); }
 
 
 // Transforms normal from object to world space
-inline float3 ThomasObjectToWorldNormal( in float3 norm )
+inline float3 ThomasObjectToWorldNormal( in float3 norm, uint ID )
 {
-    return ThomasObjectToWorldDir(norm);
+    return ThomasObjectToWorldDir(norm, ID);
 }
 
-inline float4 ThomasObjectToWorldNormal(in float4 norm)
+inline float4 ThomasObjectToWorldNormal(in float4 norm, uint ID)
 {
-	return float4(ThomasObjectToWorldDir(norm.xyz), 0);
+	return float4(ThomasObjectToWorldDir(norm.xyz, ID), 0);
 }
 
 inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in float4 weight, in int4 boneInd)

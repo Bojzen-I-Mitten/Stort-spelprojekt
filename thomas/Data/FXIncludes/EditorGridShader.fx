@@ -50,13 +50,13 @@ RasterizerState TestRasterizer
 };
 
 
-VS_OUT VSMain(VS_IN input)
+VS_OUT VSMain(VS_IN input, uint instanceID : SV_INSTANCEID)
 {
 	float3 pos = input.PosAndDistance.xyz;
 	float3 viewDistance = input.PosAndDistance.w;
 	VS_OUT output = (VS_OUT)0;
 
-	output.Pos = ThomasObjectToClipPos(pos);
+	output.Pos = ThomasObjectToClipPos(pos, instanceID);
 	//float4 positionW = ThomasObjectToWorldPos(pos);
 	//float2 dist = distance(positionW.xz, cameraPos.xz) * 1 / viewDistance;
 	//dist -= pow(cameraPos.y + 1, 1.5f);

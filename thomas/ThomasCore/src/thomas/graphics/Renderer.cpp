@@ -91,13 +91,31 @@ namespace thomas
 			m_frame->clear();
 		}
 
-		void Renderer::BindObject(render::RenderCommand &rC)
+		void Renderer::BindObject(render::RenderCommand &rC, math::Matrix* matrix)
 		{
-			thomas::resource::shaderproperty::ShaderProperty* prop;
-			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, rC.worldMatrix.Transpose());
+			/*thomas::resource::shaderproperty::ShaderProperty* prop;*/
+			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, *matrix);
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
 
-			rC.material->SetMatrix(THOMAS_MATRIX_WORLD_INV, rC.worldMatrix.Invert());
+			rC.material->SetMatrix(THOMAS_MATRIX_WORLD_INV, *matrix);
+			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
+
+			for (unsigned int i = 0; i < rC.num_local_prop; i++)
+				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
+		}
+
+		void Renderer::BindObject(render::RenderCommand& rC, int count, math::Matrix* value)
+		{
+			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD, value, count);
+			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
+
+			for (unsigned int i = 0; i < rC.num_local_prop; i++)
+				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
+		}
+
+		void Renderer::BindObjectInverse(render::RenderCommand & rC, int count, math::Matrix * value)
+		{
+			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD_INV, value, count);
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
@@ -119,18 +137,21 @@ namespace thomas
 				BindCamera(camera);
 				for (auto & perMaterialQueue : perCameraQueue.second)
 				{
-					int count = 0;
 					auto material = perMaterialQueue.first;
 					material->Bind();
+
+					int count = 0;
+					math::Matrix matrix[100];
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
-						BindObject(perMeshCommand);
+						matrix[count] = perMeshCommand.worldMatrix.Transpose();
 						count++;
 					}
 
-					auto mesh = perMaterialQueue.second;
-					material->Draw(mesh[0].mesh);
-					material->DrawInstanced(mesh[0].mesh, count);
+					BindObject(perMaterialQueue.second[0], count, matrix);
+					//BindObjectInverse(perMaterialQueue.second[0], 1, &perMaterialQueue.second[0].worldMatrix.Invert());
+					material->Draw(perMaterialQueue.second[0].mesh);
+					material->DrawInstanced(perMaterialQueue.second[0].mesh, count);
 				}
 
 				ParticleSystem::GetGlobalSystem()->DrawParticles();
