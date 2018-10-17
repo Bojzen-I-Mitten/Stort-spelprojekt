@@ -142,16 +142,13 @@ namespace thomas
 
 					int count = 0;
 					math::Matrix matrix[50];
-					math::Matrix matrixInverse[50];
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
 						matrix[count] = perMeshCommand.worldMatrix.Transpose();
-						matrix[count] = perMeshCommand.worldMatrix.Invert();
 						count++;
 					}
 
 					BindObject(perMaterialQueue.second[0], count, matrix);
-					BindObjectInverse(perMaterialQueue.second[0], count, matrixInverse);
 					material->BindMesh(perMaterialQueue.second[0].mesh);
 					material->Draw(perMaterialQueue.second[0].mesh, count);
 				}
