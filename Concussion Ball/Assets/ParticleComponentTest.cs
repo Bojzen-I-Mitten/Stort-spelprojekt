@@ -13,10 +13,12 @@ public class ParticleComponentTest : ScriptComponent
     public Texture2D smokeTex { get; set; }
     public Texture2D fireTex { get; set; }
     private float cooldown;
+    private float intensity;
 
     public override void Start()
     {
         cooldown = -0.1f;
+        intensity = 2.0f;
 
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
@@ -26,9 +28,9 @@ public class ParticleComponentTest : ScriptComponent
         
 
         emitterElectricity1.Texture = electricityTex1;
-        emitterElectricity1.MinSize = 0.2f;
-        emitterElectricity1.MaxSize = 0.6f;
-        emitterElectricity1.EndSize = 2.0f;
+        emitterElectricity1.MinSize = 0.1f;
+        emitterElectricity1.MaxSize = 0.3f;
+        emitterElectricity1.EndSize = 1.0f;
         emitterElectricity1.MinLifeTime = 0.2f;
         emitterElectricity1.MaxLifeTime = 0.1f;
         emitterElectricity1.EmissionRate = 10;
@@ -42,24 +44,24 @@ public class ParticleComponentTest : ScriptComponent
         emitterElectricity1.SpawnAtEdge = true;
 
         emitterElectricity2.Texture = electricityTex2;
-        emitterElectricity2.MinSize = 0.5f;
-        emitterElectricity2.MaxSize = 1.0f;
-        emitterElectricity2.EndSize = 0.1f;
+        emitterElectricity2.MinSize = 0.25f;
+        emitterElectricity2.MaxSize = 0.5f;
+        emitterElectricity2.EndSize = 0.05f;
         emitterElectricity2.MinLifeTime = 0.7f;
         emitterElectricity2.MaxLifeTime = 0.3f;
         emitterElectricity2.EmissionRate = 5;
         emitterElectricity2.MinRotationSpeed = 2.1f;
         emitterElectricity2.MaxRotationSpeed = -2.0f;
-        emitterElectricity2.MinSpeed = 1.1f;
-        emitterElectricity2.MaxSpeed = 3.4f;
+        emitterElectricity2.MinSpeed = 0.8f;
+        emitterElectricity2.MaxSpeed = 2.4f;
         emitterElectricity2.EndSpeed = -2.3f;
         emitterElectricity2.DistanceFromSphereCenter = 0;
         emitterElectricity2.Radius = 1.0f;
 
         emitterElectricity3.Texture = electricityTex3;
-        emitterElectricity3.MinSize = 0.7f;
-        emitterElectricity3.MaxSize = 1.3f;
-        emitterElectricity3.EndSize = 1.0f;
+        emitterElectricity3.MinSize = 0.4f;
+        emitterElectricity3.MaxSize = 1.0f;
+        emitterElectricity3.EndSize = 0.7f;
         emitterElectricity3.MinLifeTime = 0.01f;
         emitterElectricity3.MaxLifeTime = 0.1f;
         emitterElectricity3.EmissionRate = 25;
@@ -105,24 +107,58 @@ public class ParticleComponentTest : ScriptComponent
         emitterFire.Radius = 0.7f;
     }
 
-    private void UpdateIntensity(float intentisty)
+    private void Intensify(float intentisty, ParticleEmitter emitter)
     {
-        emitterElectricity3.MinSize *= intentisty;
-        emitterElectricity3.MaxSize *= intentisty;
-        emitterElectricity3.EndSize *= intentisty;
-        emitterElectricity3.MinLifeTime *= intentisty;
-        emitterElectricity3.MaxLifeTime *= intentisty;
-        emitterElectricity3.EmissionRate = (uint)MathHelper.Max(((float) emitterElectricity3.EmissionRate * intentisty), 0.0f);
-        emitterElectricity3.MinRotationSpeed *= intentisty;
-        emitterElectricity3.MaxRotationSpeed *= intentisty;
-        emitterElectricity3.MinSpeed *= intentisty;
-        emitterElectricity3.MaxSpeed *= intentisty;
-        emitterElectricity3.EndSpeed *= intentisty;
-        emitterElectricity3.Radius *= intentisty;
+        emitter.MinSize *= intentisty;
+        emitter.MaxSize *= intentisty;
+        emitter.EndSize *= intentisty;
+        emitter.MinLifeTime *= intentisty;
+        emitter.MaxLifeTime *= intentisty;
+        emitter.EmissionRate = (uint)MathHelper.Max(((float) emitterElectricity3.EmissionRate * intentisty), 0.0f);
+        emitter.MinRotationSpeed *= intentisty;
+        emitter.MaxRotationSpeed *= intentisty;
+        emitter.MinSpeed *= intentisty;
+        emitter.MaxSpeed *= intentisty;
+        emitter.EndSpeed *= intentisty;
+        emitter.Radius *= intentisty;
+    }
+
+    private void Dampen(float intentisty, ParticleEmitter emitter)
+    {
+        emitter.MinSize /= intentisty;
+        emitter.MaxSize /= intentisty;
+        emitter.EndSize /= intentisty;
+        emitter.MinLifeTime /= intentisty;
+        emitter.MaxLifeTime /= intentisty;
+        emitter.EmissionRate = (uint)MathHelper.Max(((float)emitterElectricity3.EmissionRate / intentisty), 0.0f);
+        emitter.MinRotationSpeed /= intentisty;
+        emitter.MaxRotationSpeed /= intentisty;
+        emitter.MinSpeed /= intentisty;
+        emitter.MaxSpeed /= intentisty;
+        emitter.EndSpeed /= intentisty;
+        emitter.Radius /= intentisty;
     }
 
     public override void Update()
     {
+        if (cooldown < 0)
+        {
+            if (Input.GetKey(Input.Keys.L))
+            {
+                Intensify(intensity, emitterElectricity1);
+                Intensify(intensity, emitterElectricity2);
+                Intensify(intensity, emitterElectricity3);
+                cooldown = 2;
+            }
+            if (Input.GetKey(Input.Keys.J))
+            {
+                Dampen(intensity, emitterElectricity1);
+                Dampen(intensity, emitterElectricity2);
+                Dampen(intensity, emitterElectricity3);
+                cooldown = 2;
+                
+            }
+        }
         if (Input.GetKey(Input.Keys.I))
         {
             emitterElectricity1.Emit = true;
@@ -139,10 +175,14 @@ public class ParticleComponentTest : ScriptComponent
         }
         if (Input.GetKey(Input.Keys.K) && cooldown < 0.0f)
         {
-            emitterElectricity1.EmitOneShot(10);
-            emitterElectricity2.EmitOneShot(10);
-            emitterElectricity3.EmitOneShot(5);
+            emitterElectricity1.EmitOneShot(20);
+            emitterElectricity2.EmitOneShot(15);
+            emitterElectricity3.EmitOneShot(8);
             emitterFire.EmitOneShot(15);
+
+            emitterElectricity1.Emit = false;
+            emitterElectricity2.Emit = false;
+            emitterElectricity3.Emit = false;
             emitterSmoke.Emit = true;
             emitterFire.Emit = true;
             cooldown = 0.2f;
