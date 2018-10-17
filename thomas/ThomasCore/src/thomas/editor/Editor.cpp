@@ -23,6 +23,7 @@ namespace thomas
 
 		void Editor::OnEditorStop()
 		{
+
 		}
 
 		EditorCamera* Editor::Camera()

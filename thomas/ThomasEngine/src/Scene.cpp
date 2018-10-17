@@ -26,6 +26,10 @@ namespace ThomasEngine
 		m_name = "New Scene";
 		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
+	Scene::~Scene()
+	{
+		UnLoad();
+	}
 
 	void Scene::Play()
 	{
@@ -51,6 +55,8 @@ namespace ThomasEngine
 			Application::currentProject->currentScenePath = value->m_relativeSavePath;
 
 		OnCurrentSceneChanged(oldScene, value);
+		if(oldScene)
+			oldScene->~Scene();
 	}
 
 
@@ -123,10 +129,7 @@ namespace ThomasEngine
 	void Scene::UnLoad()
 	{
 		for (int i = 0; i < m_gameObjects->Count; i++)
-		{
-			m_gameObjects[i]->Destroy();
-			i--;
-		}
+			delete m_gameObjects[i];
 		m_gameObjects->Clear();
 
 	}

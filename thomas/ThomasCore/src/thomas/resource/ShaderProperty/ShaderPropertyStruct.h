@@ -3,8 +3,8 @@
 
 
 #include <string>
-#include "ShaderProperty.h"
 #include <stdarg.h>
+#include "ShaderPropertyType.h"
 
 namespace thomas
 {
@@ -24,7 +24,7 @@ namespace thomas
 				uint32_t m_dataSize;						// Data size in bytes
 
 #ifdef _DEBUG
-				ShaderProperty::Type m_type;				// Effect types
+				ShaderPropertyType m_type;				// Effect types
 				std::string m_effectName;					// Effect name for debug info
 #endif
 				/* Compare the property structs by ID (note dynamic and static variants will compare true)

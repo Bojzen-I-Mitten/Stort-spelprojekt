@@ -33,7 +33,7 @@ namespace thomas {
 			math::Vector3 projectOntoAxis(math::Vector3 axis, math::Vector3 vec) {
 				return axis * axis.Dot(vec);
 			}
-			void LookAtConstraint::execute(Skeleton & skel, math::Matrix * objectPose, uint32_t boneInd)
+			void LookAtConstraint::execute(Skeleton & skel, math::Matrix * objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
 				math::Vector3 dir = m_target - objectPose[boneInd].Translation();
 				dir.Normalize();

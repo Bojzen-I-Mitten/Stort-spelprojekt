@@ -14,6 +14,7 @@ namespace thomas
 				virtual void Awake() {};
 				virtual void OnEnable() {};
 				virtual void OnDisable() {};
+				virtual void OnDestroy() {};
 				virtual void Update() {};
 				virtual void FixedUpdate() {};
 				virtual void OnDrawGizmos() {};

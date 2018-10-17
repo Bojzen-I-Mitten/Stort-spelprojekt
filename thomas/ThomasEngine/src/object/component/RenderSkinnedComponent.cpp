@@ -91,13 +91,18 @@ namespace ThomasEngine
 		if (node == nullptr)
 			get()->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			std::unique_ptr< thomas::graphics::animation::AnimationNode> n(node);
-			get()->GetBlendTree()->setBlendTree(n);
+			get()->GetBlendTree()->setBlendTree(node);
 		}
 
 	}
 
 	void RenderSkinnedComponent::setBlendTreeNode(Script::BlendNode ^ node)
+	{
+		if (!node) return;
+		setBlendTreeNode(node->Native());
+	}
+
+	void RenderSkinnedComponent::setBlendTreeNode(Script::PlaybackNode ^ node)
 	{
 		if (!node) return;
 		setBlendTreeNode(node->Native());
@@ -135,7 +140,7 @@ namespace ThomasEngine
 		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
 		thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
 		if((uint32_t)boneIndex < anim->boneCount())
-			return Utility::Convert(anim->getBoneMatrix(boneIndex)) * gameObject->transform->world;
+			return Utility::Convert(anim->getBoneOrientation(boneIndex)) * gameObject->transform->world;
 		else return Matrix::Identity;
 	}
 

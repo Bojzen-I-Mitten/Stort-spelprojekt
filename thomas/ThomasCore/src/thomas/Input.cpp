@@ -2,6 +2,7 @@
 #include "ThomasTime.h"
 #include "Common.h"
 #include "Window.h"
+#include "ThomasCore.h"
 namespace thomas
 {
 	//Keyboard

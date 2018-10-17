@@ -28,7 +28,7 @@ struct InitParticleBufferStruct
     uint nrOfParticlesToEmit;
     uint spawnAtSphereEdge;
     uint rand;
-    uint pad2;
+    uint textureIndex;
 
 };
 
@@ -77,8 +77,10 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         //spread
         float phi = RandClamp(r5) * 3.14159265359f * 2.0f;
         float theta = RandClamp(r6) * 3.14159265359f;
-        float xAngle = sin(theta) * cos(phi);
-        float yAngle = sin(theta) * sin(phi);
+
+        float sinTheta = sin(theta);
+        float xAngle = sinTheta * cos(phi);
+        float yAngle = sinTheta * sin(phi);
         float zAngle = cos(theta);
         
         float3 randDir = float3(xAngle, yAngle, zAngle);//dir from center to sphere edge
@@ -115,6 +117,7 @@ void CSmain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         fillBuffer.lifeTimeLeft = lifeTime;
         fillBuffer.lifeTime = lifeTime;
         fillBuffer.rotationSpeed = rotationSpeed;
+        fillBuffer.textureIndex = newParticle.textureIndex;
         
         uint writeindex = deadlist.Consume();
         alivelist.Append(writeindex);

@@ -197,6 +197,7 @@
     <ClInclude Include="src\object\component\Camera.h" />
     <ClInclude Include="src\object\component\SoundComponent.h" />
     <ClInclude Include="src\resource\Shader.h" />
+    <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
     <ClInclude Include="src\serialization\Converters.h" />
     <ClInclude Include="src\serialization\Serializer.h" />
@@ -220,7 +221,10 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Debug.cpp" />
+    <ClCompile Include="src\Debug.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
+    </ClCompile>
     <ClCompile Include="src\GUI\editor\GUI.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\math\Curve.cpp" />
@@ -233,13 +237,19 @@
     <ClCompile Include="src\object\component\physics\Joint.cpp" />
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
-    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
+    </ClCompile>
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />
     <ClCompile Include="src\resource\Font.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
-    <ClCompile Include="src\object\Component.cpp" />
+    <ClCompile Include="src\object\Component.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
+    </ClCompile>
     <ClCompile Include="src\object\component\Camera.cpp" />
     <ClCompile Include="src\object\component\RenderComponent.cpp" />
     <ClCompile Include="src\object\component\physics\Rigidbody.cpp" />
@@ -257,6 +267,7 @@
     <ClCompile Include="src\ScriptingManager.cpp" />
     <ClCompile Include="src\resource\Shader.cpp" />
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
+    <ClCompile Include="src\script\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\script\animation\PlaybackHandle.cpp" />
     <ClCompile Include="src\script\animation\PlaybackNode.cpp" />

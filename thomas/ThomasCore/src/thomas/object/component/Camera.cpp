@@ -8,7 +8,7 @@
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../AutoProfile.h"
 #include "../../graphics/GUIManager.h"
-#include <algorithm>
+#include "RenderComponent.h"
 
 namespace thomas
 {
@@ -236,8 +236,8 @@ namespace thomas
 			void Camera::OnDrawGizmosSelected()
 			{
 				//editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix().Transpose());
-				editor::Gizmos::SetColor(math::Color(0.6f, 0.6f, 0.6f));
-				editor::Gizmos::DrawFrustum(GetFrustrum());
+				editor::Gizmos::Gizmo().SetColor(math::Color(0.6f, 0.6f, 0.6f));
+				editor::Gizmos::Gizmo().DrawFrustum(GetFrustrum());
 			
 			}
 

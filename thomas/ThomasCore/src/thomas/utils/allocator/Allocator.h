@@ -17,6 +17,7 @@ namespace thomas {
 				Allocator(size_t size, void* start);
 				Allocator(Allocator && move);
 
+
 				virtual ~Allocator()
 				{
 					assert(_num_allocations == 0 && _used_memory == 0);
@@ -31,6 +32,9 @@ namespace thomas {
 				size_t getNumAllocations() const { return _num_allocations; }
 
 			protected:
+				/* Move operation
+				*/
+				void moveOp(Allocator&& move);
 
 				void* _start;
 				size_t _size;

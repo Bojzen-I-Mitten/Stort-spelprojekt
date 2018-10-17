@@ -41,13 +41,14 @@ struct ParticleStruct
     float lifeTimeLeft;
     float rotationSpeed;
     float rotation;
-    float pad;
+    float textureIndex;
 };
 
 struct BillboardStruct
 {
     float3 quad[2][3];
-    float2 pad2;
+	float textureIndex;
+	float fade;
     float2 uvs[2][3];
 };
 

@@ -26,11 +26,9 @@ namespace ThomasEngine
 		[NonSerializedAttribute]
 		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();
 		void UpdateCoroutines();
-
-		static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
-		static void LoadExternalComponents();
-
+		
 		Component(thomas::object::component::Component* ptr);
+		virtual ~Component();
 		
 		void setGameObject(GameObject^ gObj);
 		virtual void OnGameObjectSet() {};
@@ -64,8 +62,16 @@ namespace ThomasEngine
 		[NonSerializedAttribute]
 		bool awakened = false;
 
+	private:
+		/* Delete the object, does not consider GameObject reference. */
+		void Delete();
+		/* Set enabled state. */
+		void Enable();
+		/* Set disabled state. */
+		void Disable();
 	public:
-		static System::Reflection::Assembly^ editorAssembly;
+		/* Dynamic destruction of the object callable from object handle. */
+		virtual void Destroy() override;
 		
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
@@ -105,14 +111,17 @@ namespace ThomasEngine
 			String^ get() override;
 		};
 
-		virtual void Destroy() override;
-
-		static List<Type^>^ GetAllComponentTypes();
-		static List<Type^>^ GetAllAddableComponentTypes();
-
 		void StartCoroutine(System::Collections::IEnumerator^ routine);
 		void StopCoroutine(System::Collections::IEnumerator^ routine);
 		void StopAllCoroutines();
 
+		// Static stuff...
+		internal:
+			static List<System::Type^>^ externalTypes = gcnew List<System::Type^>();
+			static void LoadExternalComponents();
+		public:
+			static System::Reflection::Assembly^ editorAssembly;
+			static List<Type^>^ GetAllComponentTypes();
+			static List<Type^>^ GetAllAddableComponentTypes();
 	};
 }

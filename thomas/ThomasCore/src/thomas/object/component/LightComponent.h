@@ -25,12 +25,15 @@ namespace thomas
 				graphics::LightManager::LIGHT_TYPES m_type;
 				
 			public:
-				void Update();
-				void OnEnable();
-				void OnDisable();
 				LightComponent();
 				~LightComponent();
 
+				virtual void Update() override;
+				virtual void OnEnable() override;
+				virtual void OnDisable() override;
+				virtual void OnDestroy() override;
+
+			public: // Get / Set
 				graphics::LightManager::LightStruct GetData();
 
 				graphics::LightManager::LIGHT_TYPES GetType();
