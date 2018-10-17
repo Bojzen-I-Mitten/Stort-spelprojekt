@@ -28,19 +28,19 @@ public class GUITest : ScriptComponent
     public override void Update()
     {
         // DNumpad characters, Numpad characters and period
-        if((Input.GetLastKey() >= 48 && Input.GetLastKey() <= 57) || (Input.GetLastKey() >= 96 && Input.GetLastKey() <= 105) || 
-            Input.GetLastKey() == 190)
-        {
-            IPText += Input.ConvertKeyToString(Input.GetLastKey());
-        }
-        else if(Input.GetLastKey() == 8)
-        {
-            if(IPText.Length > 0)
-            {
-                IPText = IPText.Remove(IPText.Length - 1);
-            }
-        }
+        //if((Input.GetLastKey() >= 48 && Input.GetLastKey() <= 57) || (Input.GetLastKey() >= 96 && Input.GetLastKey() <= 105) || 
+        //    Input.GetLastKey() == 190)
+        //{
+        //    IPText += Input.ConvertKeyToString(Input.GetLastKey());
+        //}
+        //else if(Input.GetLastKey() == 8)
+        //{
+        //    if(IPText.Length > 0)
+        //    {
+        //        IPText = IPText.Remove(IPText.Length - 1);
+        //    }
+        //}
 
-        Camera.SetText("Test", IPText);
+        //Camera.SetText("Test", IPText);
     }
 }

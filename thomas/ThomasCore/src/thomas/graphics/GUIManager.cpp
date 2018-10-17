@@ -11,19 +11,14 @@ namespace thomas
 		GUIManager::GUIManager() :
 		m_spriteBatch(nullptr)
 		{
-			m_spriteBatch = new SpriteBatch(utils::D3D::Instance()->GetDeviceContext());
-			m_defaultFont = new Font("../Data/Fonts/CourierNew.spritefont");
+			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+			m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
+			m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
 		}
 
 		void GUIManager::Destroy()
 		{
 			m_images.clear();
-
-			delete m_defaultFont;
-			m_defaultFont = nullptr;
-
-			delete m_spriteBatch;
-			m_spriteBatch = nullptr;
 		}
 
 		void GUIManager::Render()
@@ -31,7 +26,7 @@ namespace thomas
 			if (m_spriteBatch != nullptr)
 			{
 				// Begin
-				m_spriteBatch->Begin();
+				m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
 
 				for (const auto& image : m_images)
 				{
@@ -41,7 +36,7 @@ namespace thomas
 
 				for (const auto& text : m_texts)
 				{
-					text.second.font->DrawGUIText(m_spriteBatch, text.second.text, text.second.position, text.second.scale, 
+					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position, text.second.scale, 
 												  text.second.color, text.second.rotation);
 				}
 
@@ -178,7 +173,7 @@ namespace thomas
 		{
 			if (font == nullptr)
 			{
-				font = m_defaultFont;
+				font = m_defaultFont.get();
 			}
 
 			Text newText = { font, text, position, scale, color, rotation };

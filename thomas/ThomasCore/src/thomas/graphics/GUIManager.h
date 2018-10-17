@@ -5,6 +5,7 @@
 
 // DirectXTK
 #include <DirectXTK/SpriteBatch.h>
+#include <DirectXTK/CommonStates.h>
 
 // Thomas
 #include "../resource/texture/Texture2D.h"
@@ -78,7 +79,7 @@ namespace thomas
 
 			// Text
 			void AddText(const std::string& id, const std::string& text, const Vector2& position, const Vector2& scale = Vector2(1.f),
-						 float rotation = 0.f, const Vector4& color = Vector4(1.f), Font* font = nullptr);
+						 float rotation = 0.f, const Vector4& color = Vector4(0.f, 0.f, 0.f, 1.f), Font* font = nullptr);
 			void SetText(const std::string& id, const std::string& newText);
 			void SetTextPosition(const std::string& id, const Vector2& position);
 			void SetTextColor(const std::string& id, const Vector4& color);
@@ -93,8 +94,9 @@ namespace thomas
 		private:
 			std::map<std::string, Image> m_images;
 			std::map<std::string, Text> m_texts;
-			SpriteBatch* m_spriteBatch;
-			Font* m_defaultFont;
+			std::unique_ptr<CommonStates> m_spriteStates;
+			std::unique_ptr<SpriteBatch> m_spriteBatch;
+			std::unique_ptr<Font> m_defaultFont;
 		};
 	}
 }
