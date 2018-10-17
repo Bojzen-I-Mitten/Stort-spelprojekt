@@ -9,22 +9,44 @@ using namespace System::Collections::ObjectModel;
 using namespace System::Threading;
 
 namespace ThomasEngine {
+
+
+	enum RunningState
+	{
+		Editor,
+		Running,
+		Loading
+	};
+	
+	ref class SceneManager;
+	ref class Scene;
+
 	ref class ThomasSelection;
 	public ref class ThomasWrapper
 	{
 	private:
+		static ThomasWrapper^ s_SYS = gcnew ThomasWrapper();
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
 		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
-		static bool playing = false;	
+		static RunningState playing = RunningState::Loading;
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
+	private:	// Thomas System variables.
+		SceneManager^ m_scene;
 	public:
+
+		property SceneManager^ SceneManagerRef
+		{
+			SceneManager^ get();
+		}
+
+	public:	// Static sys
 		delegate void StartPlayEvent();
 		delegate void StopPlayingEvent();
 		delegate void PausePlayEvent();
@@ -36,6 +58,16 @@ namespace ThomasEngine {
 			ROTATE,
 			SCALE
 		};
+
+
+		static property ThomasWrapper^ Thomas
+		{
+			ThomasWrapper^ get();
+		}
+		static property Scene^ CurrentScene
+		{
+			Scene^ get();
+		}
 
 		static void Start();
 
@@ -60,6 +92,7 @@ namespace ThomasEngine {
 		static void Play();
 
 		static bool IsPlaying();
+		static bool IsLoading();
 
 		static void Stop();
 

@@ -2,61 +2,66 @@
 #include "ScriptingManager.h"
 #include "ThomasManaged.h"
 #include "Debug.h"
+#include "../src/system/SceneManager.h"
 
-void ThomasEngine::ScriptingManger::LoadAssembly()
+namespace ThomasEngine
 {
 
-
-	String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
-	if (File::Exists(fsw->Path + "/Assembly.dll"))
+	void ScriptingManger::LoadAssembly()
 	{
-		
-		Scene::savingEnabled = false;
-		scriptReloadStarted();
-		String^ currentSavePath;
-		if (Scene::CurrentScene)
+
+
+		String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
+		if (File::Exists(fsw->Path + "/Assembly.dll"))
 		{
-			currentSavePath = Scene::CurrentScene->RelativeSavePath;
-			Scene::SaveSceneAs(Scene::CurrentScene, tempFile);
-		}
-
-		//Delete the temp pdb file in the obj folder. Prevents the application from locking this file.
-		if (File::Exists(objPath + "/Assembly.pdb"))
-			File::Delete(objPath + "/Assembly.pdb");
-
-		array<Byte>^ bytes = File::ReadAllBytes(fsw->Path + "/Assembly.dll");
-		array<Byte>^ symbolBytes = File::ReadAllBytes(fsw->Path + "/Assembly.pdb");
-		assembly = Assembly::Load(bytes, symbolBytes);
-		if (Scene::CurrentScene)
-		{
-
-			Scene^ oldScene = Scene::CurrentScene;
-			oldScene->UnLoad();
-			try {
-				Scene::CurrentScene = Scene::LoadScene(tempFile);
-				File::Delete(tempFile);
+			scriptReloadStarted();
+			String^ currentSavePath;
+			if (ThomasWrapper::CurrentScene)
+			{
+				currentSavePath = ThomasWrapper::CurrentScene->RelativeSavePath;
+				ThomasWrapper::CurrentScene->SaveSceneAs(tempFile);
 			}
-			catch (Exception^ e) {
-				String^ err = "Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + e->Message;
-				Debug::Log(err);
+
+			//Delete the temp pdb file in the obj folder. Prevents the application from locking this file.
+			if (File::Exists(objPath + "/Assembly.pdb"))
+				File::Delete(objPath + "/Assembly.pdb");
+
+			array<Byte>^ bytes = File::ReadAllBytes(fsw->Path + "/Assembly.dll");
+			array<Byte>^ symbolBytes = File::ReadAllBytes(fsw->Path + "/Assembly.pdb");
+			assembly = Assembly::Load(bytes, symbolBytes);
+			if (ThomasWrapper::CurrentScene)
+			{
+				try
+				{
+					ThomasWrapper::Thomas->SceneManagerRef->LoadScene(tempFile);
+					File::Delete(tempFile);
+				}
+				catch (Exception^ e) {
+					String^ err = "Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + e->Message;
+					Debug::Log(err);
+				}
+				ThomasWrapper::CurrentScene->RelativeSavePath = currentSavePath;
 			}
-			Scene::CurrentScene->RelativeSavePath = currentSavePath;			
 		}
+		//fsw->EnableRaisingEvents = true;
+		scriptReloadFinished();
+		shouldReload = false;
+
 	}
-	//fsw->EnableRaisingEvents = true;
-	Scene::savingEnabled = true;
-	scriptReloadFinished();
-	shouldReload = false;
-	
-}
+	void ScriptingManger::ReloadIfNeeded() {
+		if (shouldReload && !ThomasWrapper::IsLoading())
+			LoadAssembly();
+	}
 
-void ThomasEngine::ScriptingManger::OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e)
-{
-	fsw->EnableRaisingEvents = false;
-	//FileInfo^ fInfo = gcnew FileInfo(e->FullPath);
-	//while (IsFileLocked(fInfo)) {
-	//	Thread::Sleep(500);
-	//}
-	//Thread::Sleep(1000);
-	shouldReload = true;
+	void ScriptingManger::OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e)
+	{
+		fsw->EnableRaisingEvents = false;
+		//FileInfo^ fInfo = gcnew FileInfo(e->FullPath);
+		//while (IsFileLocked(fInfo)) {
+		//	Thread::Sleep(500);
+		//}
+		//Thread::Sleep(1000);
+		shouldReload = true;
+	}
+
 }

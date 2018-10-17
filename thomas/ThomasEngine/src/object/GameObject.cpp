@@ -34,13 +34,13 @@ namespace ThomasEngine {
 		m_transform = AddComponent<Transform^>();
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
-		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		// Add to scene
-		Scene::CurrentScene->GameObjects->Add(this);
-		m_scene_id = Scene::CurrentScene->ID();
+		ThomasWrapper::CurrentScene->GameObjects->Add(this);
+		m_scene_id = ThomasWrapper::CurrentScene->ID();
 		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
-		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 	}
 	bool GameObject::InitComponents(bool playing)
 	{
@@ -75,7 +75,7 @@ namespace ThomasEngine {
 
 	void GameObject::PostLoad(Scene^ scene)
 	{
-		m_scene_id = Scene::CurrentScene->ID();
+		m_scene_id = ThomasWrapper::CurrentScene->ID();
 	}
 
 	void GameObject::PostInstantiate(Scene^ scene) {
@@ -89,8 +89,8 @@ namespace ThomasEngine {
 		bool completed;
 		do {
 			completed = true;
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
-				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+			for (int i = 0; i < ThomasWrapper::CurrentScene->GameObjects->Count; ++i) {
+				GameObject^ gameObject = ThomasWrapper::CurrentScene->GameObjects[i];
 				completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
@@ -166,9 +166,9 @@ namespace ThomasEngine {
 		m_isDestroyed = true;
 		
 		// Remove object
-		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		Scene::CurrentScene->GameObjects->Remove(this);
-		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
+		ThomasWrapper::CurrentScene->GameObjects->Remove(this);
+		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		// Destroy
 		Monitor::Enter(m_componentsLock);
 		Delete();
@@ -194,7 +194,7 @@ namespace ThomasEngine {
 			Debug::LogError("Trying to instantiate destroyed object.");
 			return nullptr;
 		}
-		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
@@ -215,11 +215,11 @@ namespace ThomasEngine {
 		
 		if (clone) {
 			clone->transform->SetParent(nullptr, true);
-			clone->PostInstantiate(Scene::CurrentScene);
+			clone->PostInstantiate(ThomasWrapper::CurrentScene);
 			clone->prefabPath = nullptr;
 		}
 			
-		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
 
@@ -344,7 +344,7 @@ namespace ThomasEngine {
 
 	GameObject^ GameObject::Find(String^ name)
 	{
-		for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
+		for each(GameObject^ gameObject in ThomasWrapper::CurrentScene->GameObjects)
 		{
 			if (gameObject->Name == name)
 				return gameObject;

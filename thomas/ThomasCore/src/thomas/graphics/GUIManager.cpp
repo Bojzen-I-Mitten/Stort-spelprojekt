@@ -25,7 +25,7 @@ namespace thomas
 
 		void GUIManager::Render()
 		{
-			if (m_spriteBatch != nullptr)
+			if (m_spriteBatch)
 			{
 
 				// Begin

@@ -58,7 +58,6 @@ public class GUITest : ScriptComponent
         if (TakePort)
             InputGUI.AppendIPString(ref PortText, 5);
 
-
         if (Camera.OnImageClicked("TextBoxIP"))
         {
             Debug.Log("Clicked");

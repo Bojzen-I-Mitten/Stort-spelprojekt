@@ -288,10 +288,9 @@ namespace ThomasEditor
         private void SaveScene_Click(object sender, RoutedEventArgs e)
         {
 
-            if(Scene.CurrentScene.RelativeSavePath != null)
+            if(ThomasWrapper.CurrentScene.RelativeSavePath != null)
             {
-                Scene sceneToSave = Scene.CurrentScene;
-                Scene.SaveScene(sceneToSave);
+                ThomasWrapper.CurrentScene.SaveScene();
             }
             else
             {
@@ -301,8 +300,7 @@ namespace ThomasEditor
 
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
-            Scene.CurrentScene.UnLoad();
-            Scene.CurrentScene = new Scene("Scene");
+            ThomasWrapper.Thomas.SceneManagerRef.LoadScene("Scene");
         }
 
         private void SaveSceneAs_Click(object sender, RoutedEventArgs e)
@@ -316,11 +314,11 @@ namespace ThomasEditor
             else
                 saveFileDialog.InitialDirectory = ThomasEngine.Application.currentProject.assetPath;
             saveFileDialog.RestoreDirectory = true;
-            saveFileDialog.FileName = Scene.CurrentScene.Name;
+            saveFileDialog.FileName = ThomasWrapper.CurrentScene.Name;
             if (saveFileDialog.ShowDialog() == true)
             {
-                Scene sceneToSave = Scene.CurrentScene;
-                Scene.SaveSceneAs(sceneToSave, saveFileDialog.FileName);
+                Scene sceneToSave = ThomasWrapper.CurrentScene;
+                sceneToSave.SaveSceneAs(saveFileDialog.FileName);
                 sceneToSave.Name = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
             }
         }
@@ -348,19 +346,7 @@ namespace ThomasEditor
             showBusyIndicator("Loading scene...");
             worker.DoWork += (o, ea) =>
             {
-                Scene newScene = Scene.LoadScene(path);
-                if (newScene != null)
-                {
-                    Scene.CurrentScene.UnLoad();
-                    Scene.CurrentScene = newScene;
-                    Scene.CurrentScene.PostLoad();
-                }
-                else
-                {
-                    Scene.CurrentScene.UnLoad();
-                    Scene.CurrentScene = null;
-                    Debug.LogError("Scene failed to load...");
-                }
+                ThomasWrapper.Thomas.SceneManagerRef.LoadScene(path);
             };
             worker.RunWorkerCompleted += (o, ea) =>
             {

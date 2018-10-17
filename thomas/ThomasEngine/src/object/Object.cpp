@@ -1,4 +1,5 @@
 #pragma unmanaged
+#include <assert.h>
 #include <thomas\object\Object.h>
 #pragma managed
 #include "../Utility.h"
@@ -21,7 +22,10 @@ namespace ThomasEngine
 	void Object::Delete()
 	{
 		OnDestroy();
-		s_objects.Remove(this);
+		bool rmvd = s_objects.Remove(this);
+		if (this->Name == "Block")
+			int a = 0;
+		//assert(rmvd);
 		nativePtr->Destroy();
 		delete nativePtr;
 	}

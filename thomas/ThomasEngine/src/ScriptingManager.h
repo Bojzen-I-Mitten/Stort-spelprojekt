@@ -74,10 +74,7 @@ namespace ThomasEngine
 			return false;
 		}
 
-		static void ReloadIfNeeded() {
-			if (shouldReload && !Scene::CurrentScene->IsLoading())
-				LoadAssembly();
-		}
+		static void ReloadIfNeeded();
 
 		static void LoadAssembly();
 		static void OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e);

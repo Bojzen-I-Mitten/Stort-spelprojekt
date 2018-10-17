@@ -205,6 +205,7 @@
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />
     <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
+    <ClInclude Include="src\system\SceneManager.h" />
     <ClInclude Include="src\ThomasSelection.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Utility.h" />
@@ -274,6 +275,7 @@
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\serialization\Converters.cpp" />
     <ClCompile Include="src\serialization\Serializer.cpp" />
+    <ClCompile Include="src\system\SceneManager.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\ThomasManaged.cpp" />
     <ClCompile Include="src\Time.cpp" />

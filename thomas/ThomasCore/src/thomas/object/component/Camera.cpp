@@ -57,6 +57,7 @@ namespace thomas
 			{
 				m_GUIHandle->Destroy();
 				m_GUIHandle.reset();
+				
 
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
@@ -75,7 +76,7 @@ namespace thomas
 
 			void Camera::OnDisable()
 			{
-				
+				m_renderGUI = false;
 				for (int i = 0; i < s_allCameras.size(); i++) 
 				{
 					if (s_allCameras[i] == this) 

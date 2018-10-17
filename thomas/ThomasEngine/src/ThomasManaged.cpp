@@ -27,22 +27,40 @@
 #include "GUI\editor\GUI.h"
 #include "object/GameObject.h"
 #include "Debug.h"
+#include "system/SceneManager.h"
 
 using namespace thomas;
 
 namespace ThomasEngine {
-
+	
+	ThomasWrapper^ ThomasWrapper::Thomas::get()
+	{
+		return s_SYS; // Access thomas runtime system.
+	}
+	Scene^ ThomasWrapper::CurrentScene::get()
+	{
+		return s_SYS->m_scene->CurrentScene;
+	}
+	SceneManager^ ThomasWrapper::SceneManagerRef::get()
+	{
+		return s_SYS->m_scene;
+	}
 
 	void ThomasWrapper::Start() 
 	{
+		// System initialization
+		Thread::CurrentThread->Name = "Main Thread";
 		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
-
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
 
+		// Thomas Initialization
+		Thomas->m_scene = gcnew SceneManager();
 		s_Selection = gcnew ThomasSelection();
-		Thread::CurrentThread->Name = "Main Thread";
 		thomas::ThomasCore::Core().registerThread();
 		thomas::ThomasCore::Init();
+
+
+
 		if (ThomasCore::Initialized())
 		{
 			Model::InitPrimitives();
@@ -53,7 +71,7 @@ namespace ThomasEngine {
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			ScriptingManger::Init();
-			Scene::CurrentScene = gcnew Scene("test");
+			Thomas->m_scene->LogicThreadClearScene();
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			mainThread->Name = "Thomas Engine (Logic Thread)";
@@ -119,21 +137,28 @@ namespace ThomasEngine {
 		}
 	}
 
+	void TriggerLoad()
+	{
+		// Called when system can replace 
+	}
+
 	void ThomasWrapper::StartEngine()
 	{
 		// Update thread start
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
-			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
+			// T
+			Thomas->m_scene->ListenToLoadProcess();
+			if (Thomas->m_scene->NoSceneExist())
 			{
-				Thread::Sleep(1000);
+				Thread::Sleep(500);
 				continue;
 			}
 			NEW_FRAME();
 			float timeStart = ThomasTime::GetElapsedTime();
 			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
-			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
+			Object^ lock = CurrentScene->GetGameObjectsLock();
 			try {
 
 				thomas::ThomasTime::Update();
@@ -146,14 +171,14 @@ namespace ThomasEngine {
 				ThomasCore::Update();
 				Monitor::Enter(lock);
 
-				GameObject::InitGameObjects(playing);
-				if (playing)
+				GameObject::InitGameObjects(IsPlaying());
+				if (IsPlaying())
 				{
 					//Physics
 					thomas::Physics::UpdateRigidbodies();
-					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
-						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+						GameObject^ gameObject = CurrentScene->GameObjects[i];
 						if (gameObject->GetActive())
 							gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
 					}
@@ -161,9 +186,9 @@ namespace ThomasEngine {
 				}
 
 				//Logic
-				for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 				{
-					GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+					GameObject^ gameObject = CurrentScene->GameObjects[i];
 					if (gameObject->GetActive())
 					{
 						gameObject->Update();
@@ -178,9 +203,9 @@ namespace ThomasEngine {
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-						for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+						for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 						{
-							GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+							GameObject^ gameObject = CurrentScene->GameObjects[i];
 							if (gameObject->GetActive())
 								gameObject->RenderGizmos();
 						}
@@ -202,9 +227,9 @@ namespace ThomasEngine {
 			catch (Exception^ e) {
 				Debug::LogException(e);
 				if (playing) {
-					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
-						GameObject^ g = Scene::CurrentScene->GameObjects[i];
+						GameObject^ g = CurrentScene->GameObjects[i];
 						if(Monitor::IsEntered(g->m_componentsLock))
 							Monitor::Exit(g->m_componentsLock);
 					}
@@ -280,10 +305,15 @@ namespace ThomasEngine {
 	Guid selectedGUID;
 	void ThomasWrapper::Play()
 	{
+		while (Thomas->SceneManagerRef->IsAsyncLoading())
+		{
+			Thomas->SceneManagerRef->ListenToLoadProcess();
+			Thread::Sleep(50);
+		}
 		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
-		Scene::CurrentScene->Play();
-		playing = true;
+		CurrentScene->OnPlay();
+		playing = RunningState::Running;
 		OnStartPlaying();
 
 		Debug::Log("Running...");
@@ -291,12 +321,18 @@ namespace ThomasEngine {
 
 	bool ThomasWrapper::IsPlaying()
 	{
-		return playing;
+		return playing == RunningState::Running;
+	}
+
+	bool ThomasWrapper::IsLoading()
+	{
+		return playing == RunningState::Loading;
 	}
 
 	void ThomasWrapper::Stop()
 	{
-		playing = false;
+		
+		playing = RunningState::Loading;
 		RenderFinished->WaitOne();
 		// Synced state
 		thomas::ThomasCore::Core().OnStop();
@@ -305,7 +341,7 @@ namespace ThomasEngine {
 			selectedGUID = s_Selection[0]->m_guid;
 		else
 			selectedGUID = Guid::Empty;
-		Scene::RestartCurrentScene();
+		Thomas->m_scene->RestartCurrentScene();		// Reload temporary scene file.
 		ThomasEngine::Resources::OnStop();
 		if (selectedGUID != Guid::Empty)
 		{
@@ -316,6 +352,7 @@ namespace ThomasEngine {
 		OnStopPlaying();
 
 		Debug::Log("Stopped...");
+		playing = RunningState::Editor;
 	}
 
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }

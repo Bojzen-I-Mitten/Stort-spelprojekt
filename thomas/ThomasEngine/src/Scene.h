@@ -10,39 +10,31 @@
 using namespace System::Runtime::Serialization;
 
 namespace ThomasEngine {
-
+	
 	ref class GameObject;
 	[DataContract]
 	public ref class Scene
 	{
-		bool m_playing;
-		static bool s_loading = false;
-		static Scene^ s_currentScene;
+	private:
+
+		uint32_t m_uniqueID;
 		System::Object^ m_gameObjectsLock = gcnew System::Object();
 		System::Collections::ObjectModel::ObservableCollection<GameObject^>^ m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
 
-		Scene();
-
-	internal:
-		static bool savingEnabled = true;
+		Scene(uint32_t unique_id);
 
 	public:
-		
-		delegate void CurrentSceneChanged(Scene^ oldScene, Scene^ newScene);
-		static event CurrentSceneChanged^ OnCurrentSceneChanged;
+		static Scene^ LoadScene(System::String^ fullPath, uint32_t unique_id);
+	public:
 
-
-		Scene(System::String^ name);
+		Scene(System::String^ name, uint32_t unique_id);
 		~Scene();
 
-		uint32_t ID() { return 1; } // 0 is reserved, unique ID's to be implemented.
+		uint32_t ID() { return m_uniqueID; } // 0 is reserved, unique ID's to be implemented.
 
-		void Play();
-		void Stop() { m_playing = false; }
-
-		bool IsPlaying() { return m_playing; }
+		void OnPlay();
 
 #pragma region Serialized properties
 
@@ -100,27 +92,16 @@ namespace ThomasEngine {
 			return m_gameObjectsLock;
 		}
 
-		static void SaveSceneAs(Scene^ scene, System::String^ fullPath);
-		static void SaveScene(Scene^ scene);
+		void SaveSceneAs(System::String^ fullPath);
+		void SaveScene();
 
-		static Scene^ LoadScene(System::String^ fullPath);
-
-		static bool IsLoading()
-		{
-			return s_loading;
-		}
-
-		static void RestartCurrentScene();
 
 
 		void UnLoad();
 		void EnsureLoad();
 		void PostLoad();
 
-		static property Scene^ CurrentScene {
-			Scene^ get();
-			void set(Scene^ value);
-		}
+	public:
 	};
 }
 
