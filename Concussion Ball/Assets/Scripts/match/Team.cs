@@ -46,7 +46,7 @@ public class Team
         Debug.Log(TeamType.ToString() + " Scored!");
     }
 
-    public void OnRoundStart()
+    public void ResetPlayers()
     {
         Players.ForEach((player) => 
         {
@@ -63,7 +63,7 @@ public class Team
                         player.gameObject.transform.position = GetSpawnPosition();
                     break;
             }
-            player.OnRoundStart();
+            player.Reset();
         });
         
     }

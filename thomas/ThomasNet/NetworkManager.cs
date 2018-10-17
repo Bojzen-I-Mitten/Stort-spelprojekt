@@ -302,6 +302,7 @@ namespace ThomasEngine.Network
 
         public void SendRPC(int netID, string methodName, params object[] parameters)
         {
+            Debug.Log("Sending RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);

@@ -98,6 +98,7 @@ public class MatchSystem : NetworkManager
 
     void ResetBall()
     {
+        Ball.GetComponent<Ball>().RPCDrop();
         Ball.SetActive(false);
         Ball.SetActive(true);
         if(Ball.GetComponent<NetworkIdentity>().Owner)
@@ -108,7 +109,7 @@ public class MatchSystem : NetworkManager
     {
         foreach (var team in Teams)
         {
-            team.Value.OnRoundStart();
+            team.Value.ResetPlayers();
             
         }
     }
@@ -144,7 +145,7 @@ public class MatchSystem : NetworkManager
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
             if (Input.GetKeyDown(Input.Keys.D2))
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
-            if (Input.GetKeyDown(Input.Keys.S))
+            if (Input.GetKeyDown(Input.Keys.D3))
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
             if (Input.GetKeyDown(Input.Keys.Space)) 
             {
@@ -152,9 +153,7 @@ public class MatchSystem : NetworkManager
                 OnRoundStart();
             }
         }
-
     }
-
     #region Team Manager
 
     public Team FindTeam(TEAM_TYPE type)

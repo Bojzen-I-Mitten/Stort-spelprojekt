@@ -105,7 +105,7 @@ public class ChadStateMachine : NetworkComponent
                             Weights.Add(Chadimations.STATE.BACKWARDS, 0);
                             //Weights.Add(Chadimations.STATE.WALKING BACKWARDS, 0);
                         }
-                        else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && m_chadControls.HasBall)
+                        else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && m_chadControls.HasBall())
                         {
                             m_state = CHAD_STATE.THROWING;
                             Weights.Clear();
@@ -308,7 +308,7 @@ public class ChadStateMachine : NetworkComponent
                 {
                     //if m_velocity > m_runningSpeed && anim != running {anim = running}
                     //elif m_velocity < m_runningSpeed && anim != walking {anim = walking}
-                    if (Input.GetMouseButton(Input.MouseButtons.LEFT) && m_chadControls.HasBall)
+                    if (Input.GetMouseButton(Input.MouseButtons.LEFT) && m_chadControls.HasBall())
                     {
                         m_state = CHAD_STATE.THROWING;
                         Weights.Clear();
@@ -322,7 +322,7 @@ public class ChadStateMachine : NetworkComponent
                     else if (Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S))
                     {
                         //Debug.Log("Speed: " + m_velocity);
-                        if ((m_velocity < m_maxSpeedWithBall && m_chadControls.HasBall) || (m_velocity < m_maxSpeed && !m_chadControls.HasBall))
+                        if ((m_velocity < m_maxSpeedWithBall && m_chadControls.HasBall()) || (m_velocity < m_maxSpeed && !m_chadControls.HasBall()))
                         {
                             m_velocity += m_incrementSpeed * Time.DeltaTime;
                         }

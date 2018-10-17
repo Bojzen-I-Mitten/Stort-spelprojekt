@@ -23,7 +23,7 @@ namespace ThomasEngine.Network
 
         public int ID {
             get {
-                return Manager ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : 0; // One line master race.
+                return Manager?.NetScene != null ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : 0; // One line master race.
             }
         } 
 
