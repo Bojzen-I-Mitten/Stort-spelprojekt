@@ -9,8 +9,14 @@ namespace ThomasEngine
 {
 	ParticleEmitter::ParticleEmitter() : Component(new thomas::object::component::ParticleEmitterComponent()) {}
 
+	
+
 	thomas::object::component::ParticleEmitterComponent* ParticleEmitter::particleEmitter::get() { return (thomas::object::component::ParticleEmitterComponent*)nativePtr; }
 
+	void ParticleEmitter::EmitOneShot(unsigned nrToEmit)
+	{
+		particleEmitter->EmitOneShot(nrToEmit);
+	}
 
 	float ParticleEmitter::MinSpeed::get() { return particleEmitter->GetMinSpeed(); }
 	void ParticleEmitter::MinSpeed::set(float value) { particleEmitter->SetMinSpeed(value); }
