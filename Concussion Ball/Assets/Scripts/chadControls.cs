@@ -36,6 +36,8 @@ public class ChadControls : NetworkComponent
 
     private Ball Ball = null;
     public bool HasBall = false;
+
+    private float timeSinceLastThrow;
     // private bool canPickupBall = true;
 
         bool jumpDelay = true;
@@ -51,11 +53,15 @@ public class ChadControls : NetworkComponent
 
         throwForce = baseThrowForce;
         Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+
+        timeSinceLastThrow = 10;
     }
 
     public override void Update()
     {
-            
+        timeSinceLastThrow += Time.DeltaTime;
+        if (!HasBall)
+            Ball.TimeSinceThrown(timeSinceLastThrow);
     }
 
     public void HandleMovement(float velocityForward, float velocityStrafe)
@@ -156,6 +162,7 @@ public class ChadControls : NetworkComponent
     public void ThrowBall(float chargeForce)
     {
         Ball.Throw(camera.transform.forward * chargeForce);
+        timeSinceLastThrow = 0;
         HasBall = false;
     }
 
