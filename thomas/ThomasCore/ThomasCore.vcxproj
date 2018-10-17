@@ -28,6 +28,7 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\IBlendTree.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />

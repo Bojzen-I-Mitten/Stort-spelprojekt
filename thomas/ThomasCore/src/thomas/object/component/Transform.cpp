@@ -22,9 +22,9 @@ namespace thomas
 			}
 
 			Transform::Transform()
+				: m_parent(NULL)
 			{
 				Decompose();
-				m_parent = NULL;
 			}
 			math::Vector3 Transform::Forward()
 			{
