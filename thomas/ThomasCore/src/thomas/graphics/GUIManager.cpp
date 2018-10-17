@@ -8,8 +8,7 @@ namespace thomas
 {
 	namespace graphics
 	{
-		GUIManager::GUIManager() :
-		m_spriteBatch(nullptr)
+		GUIManager::GUIManager()
 		{
 			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
 			m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
@@ -18,6 +17,9 @@ namespace thomas
 
 		void GUIManager::Destroy()
 		{
+			m_spriteBatch.reset();
+			m_defaultFont.reset();
+			m_spriteStates.reset();
 			m_images.clear();
 		}
 
@@ -25,6 +27,7 @@ namespace thomas
 		{
 			if (m_spriteBatch != nullptr)
 			{
+
 				// Begin
 				m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
 

@@ -75,9 +75,15 @@ namespace thomas
 			m_frame->m_queue.clear();
 		}
 
+		void Renderer::ClearAllCommands()
+		{
+			m_frame->m_queue.clear();
+			m_prevFrame->m_queue.clear();
+		}
+
 		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			m_frame->m_queue[command.camera][command.material].push_back(command);
+			m_frame->m_queue[command.camera].m_commands3D[command.material].push_back(command);
 		}
 
 		render::Frame & Renderer::getAllocator()
@@ -118,7 +124,7 @@ namespace thomas
 			{
 				auto camera = perCameraQueue.first;
 				BindCamera(camera);
-				for (auto & perMaterialQueue : perCameraQueue.second)
+				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
 					auto material = perMaterialQueue.first;
 					material->Bind();

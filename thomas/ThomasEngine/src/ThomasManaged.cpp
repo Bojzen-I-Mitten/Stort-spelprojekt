@@ -265,9 +265,7 @@ namespace ThomasEngine {
 	Guid selectedGUID;
 	void ThomasWrapper::Play()
 	{
-#ifdef _EDITOR
-		thomas::editor::Editor::GetEditor().OnEditorPlay();
-#endif
+		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
 		Scene::CurrentScene->Play();
 		playing = true;
@@ -283,14 +281,15 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::Stop()
 	{
-#ifdef _EDITOR
-		thomas::editor::Editor::GetEditor().OnEditorStop();
-#endif
+		playing = false;
+		RenderFinished->WaitOne();
+		// Synced state
+		thomas::ThomasCore::Core().OnStop();
+
 		if (s_Selection->Count > 0)
 			selectedGUID = s_Selection[0]->m_guid;
 		else
 			selectedGUID = Guid::Empty;
-		playing = false;
 		Scene::RestartCurrentScene();
 		ThomasEngine::Resources::OnStop();
 		if (selectedGUID != Guid::Empty)

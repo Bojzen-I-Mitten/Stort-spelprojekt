@@ -32,6 +32,8 @@ namespace thomas
 
 		static ThomasCore& Core();
 
+		void OnStop();
+		void OnPlay();
 
 		resource::MemoryAllocation* Memory();
 
