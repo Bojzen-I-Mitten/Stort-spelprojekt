@@ -94,6 +94,7 @@ namespace thomas
 					m_collisionObject = new btCollisionObject();
 					m_collisionObject->setCollisionShape(m_collisionShape);
 					m_collisionObject->setUserPointer(this);
+					m_collisionObject->setRestitution(1.0f);
 					SetTrigger(m_trigger); //Update trigger flags
 					Physics::s_world->addCollisionObject(m_collisionObject);
 				}

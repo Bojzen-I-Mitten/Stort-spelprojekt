@@ -498,7 +498,7 @@
                                                             <Setter.Value>
                                                                 <ControlTemplate>
                                                                     <Border >
-                                                                        <Expander Header="{Binding Name}" Style="{StaticResource ExpanderStyle}" IsExpanded="True">
+                                                                        <Expander Header="{Binding Name}" Style="{StaticResource ExpanderStyle}" IsExpanded="False">
                                                                             <ItemsPresenter />
                                                                         </Expander>
                                                                     </Border>

@@ -45,7 +45,7 @@ namespace ThomasEditor
                     MaterialInspector matEditor = Parent as MaterialInspector;
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
-                grid.ExpandAllProperties();
+                grid.CollapseAllProperties();
             }
 
             private void ResourceEditor_Drop(object sender, DragEventArgs e)
@@ -145,7 +145,7 @@ namespace ThomasEditor
                     MaterialInspector matEditor = Parent as MaterialInspector;
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
-                grid.ExpandAllProperties();
+                grid.CollapseAllProperties();
             }
         }
     }
