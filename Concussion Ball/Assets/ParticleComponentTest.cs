@@ -6,10 +6,12 @@ public class ParticleComponentTest : ScriptComponent
     private ParticleEmitter emitterElectricity2;
     private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
+    private ParticleEmitter emitterFire;
     public Texture2D electricityTex1 { get; set; }
     public Texture2D electricityTex2 { get; set; }
     public Texture2D electricityTex3 { get; set; }
     public Texture2D smokeTex { get; set; }
+    public Texture2D fireTex { get; set; }
     private float cooldown;
 
     public override void Start()
@@ -20,6 +22,8 @@ public class ParticleComponentTest : ScriptComponent
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
+        emitterFire = gameObject.AddComponent<ParticleEmitter>();
+        
 
         emitterElectricity1.Texture = electricityTex1;
         emitterElectricity1.MinSize = 0.2f;
@@ -82,6 +86,23 @@ public class ParticleComponentTest : ScriptComponent
         emitterSmoke.EndSpeed = 0.0f;
         emitterSmoke.DistanceFromSphereCenter = 0;
         emitterSmoke.Radius = 0.7f;
+
+
+        emitterFire.Texture = fireTex;
+        emitterFire.MinSize = 0.1f;
+        emitterFire.MaxSize = 0.5f;
+        emitterFire.EndSize = 0.0f;
+        emitterFire.MinLifeTime = 0.5f;
+        emitterFire.MaxLifeTime = 1.2f;
+        emitterFire.EmissionRate = 10;
+        emitterFire.MinRotationSpeed = -2.0f;
+        emitterFire.MaxRotationSpeed = 2.0f;
+        emitterFire.MinSpeed = 0.2f;
+        emitterFire.MaxSpeed = 0.5f;
+        emitterFire.EndSpeed = 0.0f;
+        emitterFire.Gravity = -1;
+        emitterFire.DistanceFromSphereCenter = 0;
+        emitterFire.Radius = 0.7f;
     }
 
     private void UpdateIntensity(float intentisty)
@@ -114,13 +135,16 @@ public class ParticleComponentTest : ScriptComponent
             emitterElectricity2.Emit = false;
             emitterElectricity3.Emit = false;
             emitterSmoke.Emit = false;
+            emitterFire.Emit = false;
         }
         if (Input.GetKey(Input.Keys.K) && cooldown < 0.0f)
         {
-            emitterElectricity1.EmitOneShot(20);
-            emitterElectricity2.EmitOneShot(20);
-            emitterElectricity3.EmitOneShot(10);
+            emitterElectricity1.EmitOneShot(10);
+            emitterElectricity2.EmitOneShot(10);
+            emitterElectricity3.EmitOneShot(5);
+            emitterFire.EmitOneShot(15);
             emitterSmoke.Emit = true;
+            emitterFire.Emit = true;
             cooldown = 0.2f;
         }
         cooldown -= Time.DeltaTime;
