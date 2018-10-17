@@ -45,8 +45,8 @@ public class GUITest : ScriptComponent
 
         Camera.AddImage("BG", Background, new Vector2(200, 30), new Vector2(1), true);
         Camera.AddImage("Join", JoinBtn, new Vector2(700, 152), new Vector2(0.25f), true);
-        Camera.AddImage("TextBoxIP", TextBox, new Vector2(250, 145), new Vector2(0.70f, 0.5f), true);
-        Camera.AddImage("TextBoxPort", TextBox, new Vector2(250, 245), new Vector2(0.70f, 0.5f), true);
+        Camera.AddImage("TextBoxIP", TextBox, new Vector2(250, 145), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
+        Camera.AddImage("TextBoxPort", TextBox, new Vector2(250, 245), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
         Camera.AddImage("Host", HostBtn, new Vector2(700, 252), new Vector2(0.25f), true);
  
     }
@@ -61,14 +61,27 @@ public class GUITest : ScriptComponent
 
         if (Camera.OnImageClicked("TextBoxIP"))
         {
+            Debug.Log("Clicked");
             TakePort = false;
-            TakeIP = !TakeIP;
+            TakeIP = true;
+            Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor("TextBoxIP", new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
         }
-        if (Camera.OnImageClicked("TextBoxPort"))
+        else if (Camera.OnImageClicked("TextBoxPort"))
         {
             TakeIP = false;
-            TakePort = !TakePort;
+            TakePort = true;
+            Camera.SetImageColor("TextBoxIP", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
         }
+        else if (Camera.OnImageClicked("BG"))
+        {
+            TakePort = false;
+            TakeIP = false;
+            Camera.SetImageColor("TextBoxIP", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+        }
+
 
 
         if (Camera.OnImageClicked("Join"))
