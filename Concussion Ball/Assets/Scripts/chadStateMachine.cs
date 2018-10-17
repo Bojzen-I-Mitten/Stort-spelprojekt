@@ -116,12 +116,12 @@ public class ChadStateMachine : NetworkComponent
                             Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                             Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
                         }
-                        else if (Input.GetKeyDown(Input.Keys.Space))
-                        {
-                            m_state = CHAD_STATE.DIVING;
-                            Weights.Clear();
-                            Weights.Add(Chadimations.STATE.DIVING, 0);
-                        }
+                        //else if (Input.GetKeyDown(Input.Keys.Space))
+                        //{
+                        //    m_state = CHAD_STATE.DIVING;
+                        //    Weights.Clear();
+                        //    Weights.Add(Chadimations.STATE.DIVING, 0);
+                        //}
                     }
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
@@ -164,12 +164,12 @@ public class ChadStateMachine : NetworkComponent
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.RAGDOLL, 0);
                 }
-                else if (Input.GetKey(Input.Keys.Space))
-                {
-                    m_state = CHAD_STATE.DIVING;
-                    Weights.Clear();
-                    Weights.Add(Chadimations.STATE.DIVING, 0);
-                }
+                //else if (Input.GetKey(Input.Keys.Space))
+                //{
+                //    m_state = CHAD_STATE.DIVING;
+                //    Weights.Clear();
+                //    Weights.Add(Chadimations.STATE.DIVING, 0);
+                //}
                 else
                 {
                     // Throwing and pressing W, checking if also ASD pressed
@@ -298,12 +298,12 @@ public class ChadStateMachine : NetworkComponent
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.RAGDOLL, 0);
                 }
-                else if (Input.GetKey(Input.Keys.Space))
-                {
-                    m_state = CHAD_STATE.DIVING;
-                    Weights.Clear();
-                    Weights.Add(Chadimations.STATE.DIVING, 0);
-                }
+                //else if (Input.GetKey(Input.Keys.Space))
+                //{
+                //    m_state = CHAD_STATE.DIVING;
+                //    Weights.Clear();
+                //    Weights.Add(Chadimations.STATE.DIVING, 0);
+                //}
                 else
                 {
                     //if m_velocity > m_runningSpeed && anim != running {anim = running}
@@ -407,8 +407,8 @@ public class ChadStateMachine : NetworkComponent
                 break;
 
             case CHAD_STATE.DIVING:
-                Weights[Chadimations.STATE.DIVING] = 1;
-                m_animations.SetAnimations(Weights);
+                //Weights[Chadimations.STATE.DIVING] = 1;
+                //m_animations.SetAnimations(Weights);
                 // chadMovement.JUMP() // gets player camera forward and launches him in that direction
 
                 // do we want to this to also set state to ragdoll?
