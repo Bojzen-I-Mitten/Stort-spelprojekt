@@ -32,6 +32,8 @@ namespace ThomasEditor
         public Vector2 AllobjectDamping { get; set; }
         public float Totalmass { get; set; }
 
+        public bool RagdollEnabled = false;
+
         GameObject G_Hips;
         GameObject G_Spine;
         GameObject G_Head;
@@ -57,11 +59,6 @@ namespace ThomasEditor
         BoneTransformComponent B_LeftLeg;
         BoneTransformComponent B_RightUnderLeg;
         BoneTransformComponent B_LeftUnderLeg;
-
-
-
-
-
 
 
         //hips
@@ -221,10 +218,20 @@ namespace ThomasEditor
         }
         public override void Update()
         {
+            //if(Input.GetKeyDown(Input.Keys.Space))
+            //{
+            //    if (RagdollEnabled)
+            //        DisableRagdoll();
+            //    else
+            //        EnableRagdoll();
 
+            //    RagdollEnabled = !RagdollEnabled;
+            //}
         }
-        public override void OnEnable()
+        public void EnableRagdoll()
         {
+            if (RagdollEnabled)
+                return;
             RenderSkinnedComponent renderskinnedcomponent = gameObject.GetComponent<RenderSkinnedComponent>();
             uint boneindex = 0;
 
@@ -551,6 +558,7 @@ namespace ThomasEditor
             G_RightUnderLeg.activeSelf = true;
             G_LeftUnderLeg.activeSelf = true;
 
+            RagdollEnabled = true;
         }
         public override void Awake()
         {
@@ -682,27 +690,12 @@ namespace ThomasEditor
             LeftUnderLegJoint.ConnectedRigidbody = rigidbodyLeftLeg;
             //
 
-
-            G_Hips.activeSelf = false;
-            G_Hips.activeSelf = false;
-             G_Spine.activeSelf = false;
-             G_Head.activeSelf = false;
-             G_LeftArm.activeSelf = false;
-             G_LeftUnderArm.activeSelf = false;
-             G_RightArm.activeSelf = false;
-             G_RightUnderArm.activeSelf = false;
-             G_RightLeg.activeSelf = false;
-             G_LeftLeg.activeSelf = false;
-             G_RightUnderLeg.activeSelf = false;
-             G_LeftUnderLeg.activeSelf = false;
-
-
-
-
-
+            DisableRagdoll();
         }
-        public override void OnDisable()
+        public void DisableRagdoll()
         {
+            if (!RagdollEnabled)
+                return;
             G_Hips.activeSelf = false;
             G_Spine.activeSelf = false;
             G_Head.activeSelf = false;
@@ -714,6 +707,8 @@ namespace ThomasEditor
             G_LeftLeg.activeSelf = false;
             G_RightUnderLeg.activeSelf = false;
             G_LeftUnderLeg.activeSelf = false;
+
+            RagdollEnabled = false;
         }
     
 

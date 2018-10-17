@@ -48,6 +48,7 @@ namespace thomas
 				virtual void Update() override;
 				virtual void Awake() override;
 				virtual void OnDisable() override;
+				virtual void OnEnable() override;
 
 			private:
 				btConeTwistConstraint* CreateConstraints();

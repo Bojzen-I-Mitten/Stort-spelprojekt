@@ -195,6 +195,10 @@ namespace thomas
 			#pragma endregion
 			void Joint::Awake()
 			{
+			
+			}
+			void Joint::OnEnable()
+			{
 				if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
 				{
 					m_gameObject->GetComponent<Rigidbody>()->SetActivationState(ActivationState::Always_Active);
@@ -202,6 +206,8 @@ namespace thomas
 					UpdateLimitsFramesDamping();
 				}
 			}
+
+
 			void Joint::OnDisable()
 			{
 				if (m_coneTwistConstraint != nullptr)

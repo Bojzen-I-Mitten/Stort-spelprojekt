@@ -43,11 +43,13 @@ namespace thomas
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
 	}
 	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		int size = s_rigidBodies.size();
 		bool found = false;
 		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
 		{
