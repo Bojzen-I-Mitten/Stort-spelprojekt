@@ -1,11 +1,12 @@
 #include "Ragdoll.h"
+#include <utility>
+#include <stdint.h>
 #include "../../GameObject.h"
 #include "../RenderSkinnedComponent.h"
 #include "../../../graphics/animation/IBlendTree.h"
 #include "../../../Common.h"
-#include <stdint.h>
 #include "../../../editor/gizmos/Gizmos.h"
-#include <utility>
+#include "../../../ThomasCore.h"
 
 namespace thomas 
 {
@@ -162,9 +163,9 @@ namespace thomas
 					{
 						m_bodies[i]->getMotionState()->getWorldTransform(t);
 						math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
-						editor::Gizmos::SetColor(math::Color(0, 1, 0));
-						editor::Gizmos::SetMatrix(m);
-						editor::Gizmos::DrawBoundingCapsule(math::Vector3(0,0,0), boneCapsuls[i].y, m_lengths[i]);
+						editor::Gizmos::Gizmo().SetColor(math::Color(0, 1, 0));
+						editor::Gizmos::Gizmo().SetMatrix(m);
+						editor::Gizmos::Gizmo().DrawBoundingCapsule(math::Vector3(0,0,0), boneCapsuls[i].y, m_lengths[i]);
 					}
 				}
 			}

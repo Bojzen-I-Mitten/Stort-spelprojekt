@@ -74,6 +74,10 @@ namespace ThomasEditor
                         Binding materialBinding = new Binding("material");
                         materialBinding.Source = rc;
                         MaterialEditor.SetBinding(MaterialInspector.DataContextProperty, materialBinding);
+                    }else
+                    {
+                        BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
+                        MaterialEditor.DataContext = null;
                     }
                 }
                 else

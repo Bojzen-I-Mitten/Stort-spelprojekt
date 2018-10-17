@@ -10,26 +10,24 @@ namespace thomas
 			BoxCollider::BoxCollider() : Collider(new btBoxShape(btVector3(.5f,.5f,.5f)))
 			{
 				m_center = math::Vector3(0, 0, 0);
-				m_size = math::Vector3(0.5f, 0.5f, 0.5f);
 			}
 
 			void BoxCollider::SetSize(math::Vector3 size)
 			{
-				m_size = size;
-				((btBoxShape*)m_collisionShape)->setImplicitShapeDimensions(Physics::ToBullet(size));
+				m_scaling = size*2.0f;
 				
 			}
 
 			math::Vector3 BoxCollider::getSize()
 			{
-				return m_size;
+				return m_scaling * 0.5f;
 			}
 
 			void BoxCollider::OnDrawGizmosSelected()
 			{
-				editor::Gizmos::SetColor(math::Color(0, 1, 0));
-				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
-				editor::Gizmos::DrawBoundingOrientedBox(DirectX::BoundingOrientedBox(m_center, m_size, math::Quaternion::Identity));
+				editor::Gizmos::Gizmo().SetColor(math::Color(0, 1, 0));
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().DrawBoundingOrientedBox(DirectX::BoundingOrientedBox(m_center, m_scaling * 0.5f, math::Quaternion::Identity));
 				//editor::Gizmos::DrawBoundingCapsule(m_center, 0.5f, 5);
 			}
 

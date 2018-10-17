@@ -28,6 +28,20 @@ namespace ThomasEngine
 			m_mixer->m_weights[index].m_translation = weight.m_translation;
 		}
 
+		void WeightHandle::setWeight(unsigned int index, float weight)
+		{
+			m_mixer->m_weights[index].m_scale = weight;
+			m_mixer->m_weights[index].m_rot = weight;
+			m_mixer->m_weights[index].m_translation = weight;
+		}
+
+		void WeightHandle::setWeight(unsigned int index, float scale_w, float rot_w, float trans_w)
+		{
+			m_mixer->m_weights[index].m_scale = scale_w;
+			m_mixer->m_weights[index].m_rot = rot_w;
+			m_mixer->m_weights[index].m_translation = trans_w;
+		}
+
 		thomas::graphics::animation::WeightMixer * WeightHandle::Mixer()
 		{
 			return m_mixer;

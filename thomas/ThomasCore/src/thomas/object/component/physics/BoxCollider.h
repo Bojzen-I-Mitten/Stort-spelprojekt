@@ -16,8 +16,6 @@ namespace thomas
 				math::Vector3 getSize();
 
 				void OnDrawGizmosSelected();
-			private:
-				math::Vector3 m_size;
 			};
 		}
 	}

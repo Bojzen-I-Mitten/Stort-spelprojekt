@@ -2,6 +2,7 @@
 
 #include "../utils/AssimpLoader.h"
 #include "../graphics/animation/data/AnimationData.h"
+#include "..\ThomasCore.h"
 
 namespace thomas {
 	namespace resource {

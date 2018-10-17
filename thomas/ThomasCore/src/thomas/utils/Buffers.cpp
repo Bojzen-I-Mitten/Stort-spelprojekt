@@ -1,5 +1,6 @@
 #include "Buffers.h"
 #include "..\Common.h"
+#include "..\ThomasCore.h"
 
 namespace thomas
 {
@@ -7,22 +8,22 @@ namespace thomas
 	{
 		namespace buffers
 		{
-			Buffer::Buffer(void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag = STATIC_BUFFER, D3D11_RESOURCE_MISC_FLAG miscFlag, size_t structureByteStride) : m_size(size), m_bindFlag(bindFlag)
+			Buffer::Buffer(void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, size_t structureByteStride, D3D11_RESOURCE_MISC_FLAG miscFlag) : m_size(size), m_bindFlag(bindFlag)
 			{
 				D3D11_BUFFER_DESC bufferDesc;
 				bufferDesc.ByteWidth = size;
-				bufferDesc.Usage = usageFlag; //TODO: Maybe dynamic for map/unmap
+				bufferDesc.Usage = usageFlag; 
 				bufferDesc.BindFlags = bindFlag;
 				bufferDesc.CPUAccessFlags = usageFlag == DYNAMIC_BUFFER ? D3D11_CPU_ACCESS_WRITE : 0; //CPU if dynamic
 				bufferDesc.MiscFlags = miscFlag;
 				bufferDesc.StructureByteStride = structureByteStride;
 				
-					
-
 				D3D11_SUBRESOURCE_DATA InitData;
 				InitData.pSysMem = data;
 				InitData.SysMemPitch = 0;
 				InitData.SysMemSlicePitch = 0;
+
+				m_usageFlag = usageFlag;
 
 				HRESULT result;
 
@@ -47,7 +48,12 @@ namespace thomas
 				if (size == 0) return;
 				if (size > m_size)
 				{
-					LOG("Cannot set buffer data. the data size is bigger than the buffer.");
+					LOG("Cannot set buffer data. The data size is bigger than the buffer.");
+					return;
+				}
+				if (m_usageFlag != DYNAMIC_BUFFER)
+				{
+					LOG("Cannot uppload data at runtime. Usage flag is DYNAMIC_BUFFER.");
 					return;
 				}
 
@@ -73,28 +79,139 @@ namespace thomas
 			}
 			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
 			{
+
+			}
+
+			
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag, D3D11_BUFFER_UAV_FLAG uavFlag) : Buffer(data, count * stride, bindFlag, usageFlag, stride, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED)
+			{
+				m_hasSRV = false;
+				m_hasUAV = false;
+				HRESULT hr;
+
+				if (bindFlag & D3D11_BIND_SHADER_RESOURCE)
+				{
+					D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+
+					desc.Buffer.ElementWidth = stride;
+					desc.Buffer.ElementOffset = 0;
+					desc.Buffer.FirstElement = 0;
+					desc.Buffer.NumElements = count;
+					desc.Format = DXGI_FORMAT_UNKNOWN;
+					desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+
+					hr = utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_srv);
+
+					if (hr == S_OK)
+						m_hasSRV = true;
+				}
+				if (bindFlag & D3D11_BIND_UNORDERED_ACCESS)
+				{
+					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+					uavDesc.Buffer.FirstElement = 0;
+					uavDesc.Buffer.Flags = uavFlag;
+					uavDesc.Buffer.NumElements = count;
+					uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+
+					hr = utils::D3D::Instance()->GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+
+					if (hr == S_OK)
+						m_hasUAV = true;
+				}
+				
 			}
 			
-			
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, count * stride, D3D11_BIND_SHADER_RESOURCE, usageFlag, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, stride)
+
+			void StructuredBuffer::Release()
 			{
-				D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-				
-				desc.Buffer.ElementWidth = stride;
-				desc.Buffer.ElementOffset = 0;
-				desc.Buffer.FirstElement = 0;
-				desc.Buffer.NumElements = count;
-				desc.Format = DXGI_FORMAT_UNKNOWN;
-				desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-				
-				utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &desc, &m_resource);
+				if (m_hasSRV)
+					SAFE_RELEASE(m_srv);
+				if (m_hasUAV)
+					SAFE_RELEASE(m_uav);
 			}
 
 			ID3D11ShaderResourceView * StructuredBuffer::GetSRV()
 			{
-				return m_resource;
+				if (m_hasSRV)
+					return m_srv;
+
+				LOG("No availible srv");
+				return nullptr;
 			}
 
-		}
+			ID3D11UnorderedAccessView * StructuredBuffer::GetUAV()
+			{
+				if (m_hasUAV)
+					return m_uav;
+				
+				LOG("No availible uav");
+				return nullptr;
+			}
+
+			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data, D3D11_BIND_FLAG bindFlags) : Buffer(data, count * stride, bindFlags, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_FLAG(D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS))
+			{
+				m_hasSRV = false;
+				m_hasUAV = false;
+				HRESULT hr;
+
+				if (bindFlags & D3D11_BIND_SHADER_RESOURCE)
+				{
+					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+					srvDesc.BufferEx.FirstElement = 0;
+					srvDesc.BufferEx.NumElements = count;
+					srvDesc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
+					srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+
+					hr = utils::D3D::Instance()->GetDevice()->CreateShaderResourceView(m_buffer, &srvDesc, &m_srv);
+
+					if (hr == S_OK)
+						m_hasSRV = true;
+				}
+				if (bindFlags & D3D11_BIND_UNORDERED_ACCESS)
+				{
+					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+					uavDesc.Buffer.FirstElement = 0;
+					uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
+					uavDesc.Buffer.NumElements = count;
+					uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+
+					hr = utils::D3D::Instance()->GetDevice()->CreateUnorderedAccessView(m_buffer, &uavDesc, &m_uav);
+
+					if (hr == S_OK)
+						m_hasUAV = true;
+				}
+				
+
+			}
+			void ByteAddressBuffer::Release()
+			{
+				if (m_hasSRV)
+					SAFE_RELEASE(m_srv);
+				if (m_hasUAV)
+					SAFE_RELEASE(m_uav);
+			}
+			ID3D11ShaderResourceView * ByteAddressBuffer::GetSRV()
+			{
+				if (m_hasSRV)
+					return m_srv;
+
+				LOG("No availible srv");
+				return nullptr;
+			}
+
+
+			ID3D11UnorderedAccessView * ByteAddressBuffer::GetUAV()
+			{
+				if (m_hasUAV)
+					return m_uav;
+
+				LOG("No availible uav");
+				return nullptr;
+			}
+
+}
 	}
 }

@@ -7,3 +7,4 @@
 #include "ShaderPropertyTexture2D.h"
 #include "ShaderPropertyConstantBuffer.h"
 #include "ShaderPropertyColor.h"
+#include "ShaderPropertyUnorderedAccessView.h"
