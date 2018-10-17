@@ -46,8 +46,6 @@ namespace ThomasEditor
         // private bool canPickupBall = true;
 
         bool jumpDelay = true;
-        bool movingForward = false;
-        bool movingBackward = false;
         bool tackling = false;
         bool jumping = false;
 
@@ -87,13 +85,18 @@ namespace ThomasEditor
             yield return new WaitForSeconds(0.2f);
             jumpDelay = true;
             jumping = false;
-            movingForward = false;
-            movingBackward = false;
         }
 
         public override void Update()
         {
             
+        }
+
+        public bool Jump()
+        {
+            //StartCoroutine(JumpingCoroutine());
+
+            return false;
         }
 
         public void HandleMovement(float velocityForward, float velocityStrafe)

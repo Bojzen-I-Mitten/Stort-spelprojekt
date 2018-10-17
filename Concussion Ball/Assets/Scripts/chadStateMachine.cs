@@ -115,6 +115,7 @@ namespace ThomasEditor
                         }
                         else if (Input.GetKeyDown(Input.Keys.Space))
                         {
+                            Debug.Log("Changing state to jumping from idle");
                             m_state = State.JUMPING;
                         }
                     }
@@ -149,6 +150,7 @@ namespace ThomasEditor
                     }
                     else if(Input.GetKey(Input.Keys.Space))
                     {
+                        Debug.Log("Changing state to jumping from throwing");
                         m_state = State.JUMPING;
                     }
                     else
@@ -235,6 +237,7 @@ namespace ThomasEditor
                     }
                     else if (Input.GetKey(Input.Keys.Space))
                     {
+                        Debug.Log("Changing state to jumping from moving");
                         m_state = State.JUMPING;
                     }
                     else
@@ -348,8 +351,10 @@ namespace ThomasEditor
                     break;
 
                 case State.JUMPING:
-                    // chadMovement.JUMP() // gets player camera forward and launches him in that direction
-
+                    //m_chadControls.Jump();
+                    Debug.Log("Jumping..");
+                    //m_rBody.AddForce(new Vector3(0.0f, 5.0f, 0.0f), Rigidbody.ForceMode.Impulse);
+                    m_state = State.IDLE;
                     // do we want to this to also set state to ragdoll?
                     // if !chadMovement.is_jumping 
                     //      m_state = State.IDLE;
