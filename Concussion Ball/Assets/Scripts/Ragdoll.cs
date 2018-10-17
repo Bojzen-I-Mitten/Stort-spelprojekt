@@ -218,15 +218,15 @@ namespace ThomasEditor
         }
         public override void Update()
         {
-            //if(Input.GetKeyDown(Input.Keys.Space))
-            //{
-            //    if (RagdollEnabled)
-            //        DisableRagdoll();
-            //    else
-            //        EnableRagdoll();
+            if(Input.GetKeyDown(Input.Keys.Space))
+            {
+                if (RagdollEnabled)
+                    DisableRagdoll();
+                else
+                   EnableRagdoll();
 
-            //    RagdollEnabled = !RagdollEnabled;
-            //}
+             //   RagdollEnabled = !RagdollEnabled;
+            }
         }
         public void EnableRagdoll()
         {
@@ -688,9 +688,21 @@ namespace ThomasEditor
 
             LeftUnderLegJoint = G_LeftUnderLeg.AddComponent<Joint>();
             LeftUnderLegJoint.ConnectedRigidbody = rigidbodyLeftLeg;
-            //
 
-            DisableRagdoll();
+
+            G_Hips.activeSelf = false;
+            G_Spine.activeSelf = false;
+            G_Head.activeSelf = false;
+            G_LeftArm.activeSelf = false;
+            G_LeftUnderArm.activeSelf = false;
+            G_RightArm.activeSelf = false;
+            G_RightUnderArm.activeSelf = false;
+            G_RightLeg.activeSelf = false;
+            G_LeftLeg.activeSelf = false;
+            G_RightUnderLeg.activeSelf = false;
+            G_LeftUnderLeg.activeSelf = false;
+
+            RagdollEnabled = false;
         }
         public void DisableRagdoll()
         {
