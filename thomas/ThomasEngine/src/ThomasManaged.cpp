@@ -230,7 +230,8 @@ namespace ThomasEngine {
 					UpdateFinished->Set();
 				}
 				Monitor::Exit(lock);
-				ScriptingManger::ReloadIfNeeded();
+				if(!playing)
+					ScriptingManger::ReloadIfNeeded();
 			}
 		}
 		Resources::UnloadAll();

@@ -73,6 +73,9 @@ namespace ThomasEngine
 	Vector3 Transform::forward::get() { return Utility::Convert(trans->Forward()); }
 	Vector3 Transform::up::get() { return Utility::Convert(trans->Up()); }
 	Vector3 Transform::right::get() { return Utility::Convert(trans->Right()); }
+	Vector3 Transform::local_forward::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Forward()); }
+	Vector3 Transform::local_up::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Up()); }
+	Vector3 Transform::local_right::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Right()); }
 
 
 	void Transform::SetParent(Transform ^ value)
@@ -125,6 +128,11 @@ namespace ThomasEngine
 			return parent->IsChildOf(_parent);
 		else
 			return false;
+	}
+
+	void Transform::Orient(Vector3 forward, Vector3 up)
+	{
+		trans->Orient(Utility::Convert(forward), Utility::Convert(up));
 	}
 
 	void Transform::OnDestroy()

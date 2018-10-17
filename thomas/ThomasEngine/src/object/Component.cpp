@@ -148,7 +148,7 @@ namespace ThomasEngine
 			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
 #else
 		// Don't care
-		m_gameObject->Native->DestroyComponent(this->nativePtr);
+		m_gameObject->Native->RemoveComponent(this->nativePtr);
 #endif
 		StopAllCoroutines();
 	}
