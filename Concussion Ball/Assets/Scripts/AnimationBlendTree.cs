@@ -19,12 +19,13 @@ public class AnimationBlendTree : ScriptComponent
 
     WeightHandle weight;
 
+    public RenderSkinnedComponent skinn { get; set; }
     public List<AnimationNode> nodes { get; set; } = new List<AnimationNode>();
     public Vector2 currentPos { get; set; }
     public override void Start()
     {
         //Blabla initial setup
-        var skinn = gameObject.GetComponent<RenderSkinnedComponent>();
+       
         BlendNode blend = new BlendNode(skinn.model);
 
         foreach (var node in nodes)
