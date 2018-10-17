@@ -22,6 +22,7 @@ public class AnimationBlendTree : ScriptComponent
     public RenderSkinnedComponent skinn { get; set; }
     public List<AnimationNode> nodes { get; set; } = new List<AnimationNode>();
     public Vector2 currentPos { get; set; }
+
     public override void Start()
     {
         //Blabla initial setup
@@ -46,7 +47,7 @@ public class AnimationBlendTree : ScriptComponent
         for(uint i=0; i < nodes.Count; i++)
         {
             AnimationNode node = nodes[(int)i];
-            weight.setWeight(i, node.GetWeight(currentPos));
+            weight.setWeight(i, new WeightTripple(node.GetWeight(currentPos)));
         }
     }
 }

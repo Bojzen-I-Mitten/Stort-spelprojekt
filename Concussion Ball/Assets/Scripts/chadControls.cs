@@ -11,13 +11,21 @@ using System;
 using ThomasEngine.Network;
 
 
-public class ChadControls : NetworkComponent
+public class ChadControls : ScriptComponent
 {
-    public float baseThrowForce { get; set; } = 5.0f;
-    public float maxThrowForce { get; set; } = 20.0f;
+    #region Throwing stuff
+    public float BaseThrowForce { get; set; } = 5.0f;
+    public float MaxThrowForce { get; set; } = 20.0f;
+    public float ChargeRate { get; set; } = 5.0f;
+    private float ThrowForce;
+    public Transform hand { get; set; }
+    #endregion
 
     //public int Speed { get; set; } = 5;
     public float Force { get; set; } = 5;
+
+    #region Camera Settings etc.
+    public Camera camera { get; set; }
     public float CameraSensitivity_x { get; set; } = 10;
     public float CameraSensitivity_y { get; set; } = 20;
     public float CameraHeight { get; set; } = 1;
@@ -26,34 +34,31 @@ public class ChadControls : NetworkComponent
     public float CameraDistance { get; set; } = 2;
     public float CameraHeightThrowing { get; set; } = 0.8f;
     public float CameraDistanceThrowing { get; set; } = 0.5f;
+    private float xStep = 0;
+    private float yStep = 0;
     private float TotalYStep = 0;
     private float TotalXStep = 0;
     private Vector3 CameraStartPos;
 
-    private float throwForce;
-
-    public Transform hand { get; set; }
-
-    public Camera camera { get; set; }
+    bool Escape = false;
+    #endregion
+    
     private Quaternion FreeLookDirection;
     Rigidbody rBody;
+    ChadStateMachine ChadSM;
+
 
     //Camera test;
 
     private Ball Ball = null;
     public bool HasBall = false;
+    private bool IsThrowing = false;
     // private bool canPickupBall = true;
-
-    bool jumpDelay = true;
-    bool movingForward = false;
-    bool movingBackward = false;
-    bool tackling = false;
-    bool jumping = false;
 
     public override void Start()
     {
         rBody = gameObject.GetComponent<Rigidbody>();
-        //test = camPrefab.GetComponent<Camera>();
+        ChadSM = gameObject.GetComponent<ChadStateMachine>();
         //if (!isOwner && camera)
         //{
         //    camera.enabled = false;
@@ -65,48 +70,124 @@ public class ChadControls : NetworkComponent
             Debug.LogWarning("Camera not set for player");
 
         //rBody.IsKinematic = !isOwner;
-        throwForce = baseThrowForce;
+        ThrowForce = BaseThrowForce;
         Ball = GetObjectsOfType<Ball>().FirstOrDefault();
     }
 
     //Coroutine for jumping delay, also used for tackling delay
-    IEnumerator JumpingCoroutine()
-    {
-        jumpDelay = false;
-        Debug.Log("Started jumping.");
-        rBody.AddForce(new Vector3(0.0f, Force, 0.0f), Rigidbody.ForceMode.Impulse);
-        yield return new WaitForSeconds(1.0f);
+    //IEnumerator JumpingCoroutine()
+    //{
+    //    jumpDelay = false;
+    //    Debug.Log("Started jumping.");
+    //    rBody.AddForce(new Vector3(0.0f, Force, 0.0f), Rigidbody.ForceMode.Impulse);
+    //    yield return new WaitForSeconds(1.0f);
 
-        if (tackling)
-        {
-            transform.Rotate(0.0f, 0.5f, 0.0f);
-            tackling = false;
-            //test.fieldOfView = 70;
-        }
-        yield return new WaitForSeconds(0.2f);
-        jumpDelay = true;
-        jumping = false;
-        movingForward = false;
-        movingBackward = false;
-    }
+    //    if (tackling)
+    //    {
+    //        transform.Rotate(0.0f, 0.5f, 0.0f);
+    //        tackling = false;
+    //        //test.fieldOfView = 70;
+    //    }
+    //    yield return new WaitForSeconds(0.2f);
+    //    jumpDelay = true;
+    //    jumping = false;
+    //    movingForward = false;
+    //    movingBackward = false;
+    //}
+
+    //public override void Update()
+    //{
+
+    //}
 
     public override void Update()
     {
+        if (Escape)
+            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+        else
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
 
+        ChadSM.Direction = new Vector3(0, 0, 0);
+
+        HandleKeyboardInput();
+        HandleMouseInput();
     }
 
-    public void HandleMovement(float velocityForward, float velocityStrafe)
+    private void HandleKeyboardInput()
     {
-        transform.position += (transform.forward * velocityForward + transform.right * velocityStrafe) * Time.DeltaTime;
-        //if (Input.GetKey(Input.Keys.W))
-        //    transform.position += transform.forward * Speed * Time.DeltaTime;
-        //else if (Input.GetKey(Input.Keys.S))
-        //    transform.position -= transform.forward * Speed * Time.DeltaTime;
+        if (Input.GetKeyUp(Input.Keys.Escape))
+            Escape = true;
 
-        //else if (Input.GetKey(Input.Keys.D))
-        //    transform.position += transform.right * Speed * Time.DeltaTime;
-        //else if (Input.GetKey(Input.Keys.A))
-        //    transform.position -= transform.right * Speed * Time.DeltaTime;
+        if (Input.GetKey(Input.Keys.W))
+            ChadSM.Direction.z += 1;
+        if (Input.GetKey(Input.Keys.S))
+            ChadSM.Direction.z -= 1;
+
+        if (Input.GetKey(Input.Keys.D))
+            ChadSM.Direction.x += 1;
+        if (Input.GetKey(Input.Keys.A))
+            ChadSM.Direction.x -= -1;
+    }
+
+    private void HandleMouseInput()
+    {
+        //Focus stuff
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && Escape)
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+
+        //Throw stuff
+        if (HasBall)
+        {
+            if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+            {
+                IsThrowing = true;
+                ChadSM.EnterThrow();
+            }
+            else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && IsThrowing)
+            {
+                IsThrowing = false;
+                ChadSM.ExitThrow();
+            }
+            else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && IsThrowing)
+                ChargeBall();
+            else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && IsThrowing)
+            {
+                IsThrowing = false;
+                ThrowBall();
+            }
+        }
+        
+        float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
+        float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
+
+        ChadSM.Direction.y = xStep;
+        //ChadSM.Direction.Normalize();
+
+        if (!Input.GetKey(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT))
+        {
+            //Regular cam
+            FondleCamera(ChadSM.m_velocity.Length(), xStep, yStep);
+        }
+        else if (Input.GetMouseButton(Input.MouseButtons.RIGHT))
+        {
+            //Throwing cam
+            ThrowingCamera(ChadSM.m_velocity.Length(), xStep, yStep);
+        }
+        else if (Input.GetKeyDown(Input.Keys.LeftShift))
+        {
+            //Free look
+            InitFreeLookCamera();
+        }
+        else
+        {
+            //Free look
+            FreeLookCamera(ChadSM.m_velocity.Length(), xStep, yStep);
+        }
+
+        if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
+        {
+            ResetCamera();
+        }
     }
 
     #region Camera Controls
@@ -197,11 +278,12 @@ public class ChadControls : NetworkComponent
     public void ChargeBall()
     {
         Ball.ChargeColor();
+        ThrowForce += ChargeRate * Time.DeltaTime;
     }
 
-    public void ThrowBall(float chargeForce)
+    public void ThrowBall()
     {
-        Ball.Throw(camera.transform.forward * chargeForce);
+        Ball.Throw(camera.transform.forward * ThrowForce);
         HasBall = false;
     }
 
