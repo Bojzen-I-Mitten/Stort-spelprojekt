@@ -17,9 +17,6 @@ public class ChadStateMachine : NetworkComponent
         RAGDOLL,    // user pressed Space to jump tackle
     };
 
-    // camera is never used, but someone program crashes if this is removed as it was previously used and
-    // probably still rots inside the .tds file, can probably be removed when a new scene is used
-    //public Camera m_camera { get; set; }
 
     private Chadimations m_animations;
     private Dictionary<Chadimations.STATE, float> Weights;
