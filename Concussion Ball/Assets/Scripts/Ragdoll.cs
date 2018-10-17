@@ -29,8 +29,8 @@ namespace ThomasEditor
         public string UpperLeftLeg { get; set; } = "mixamorig:LeftUpLeg";
         public string LowerLeftLeg { get; set; } = "mixamorig:LeftLeg";
         public string LeftFoot { get; set; } = "mixamorig:LeftFoot";
-        public Vector2 AllobjectDamping { get; set; }
-        public float Totalmass { get; set; }
+        public Vector2 AllobjectDamping { get; set; } = new Vector2(0.5f, 0.5f);
+        public float Totalmass { get; set; } = 70.0f;
 
         public bool RagdollEnabled = false;
 
@@ -581,6 +581,7 @@ namespace ThomasEditor
             //Hips
             G_Hips = new GameObject("Hips");
             G_Hips.transform.SetParent(gameObject.transform);
+            HipSpineJoint = G_Hips.AddComponent<Joint>();
             B_Hips = G_Hips.AddComponent<BoneTransformComponent>();
             spherecolliderhips = G_Hips.AddComponent<SphereCollider>();
             rigidbodyhips = G_Hips.AddComponent<Rigidbody>();
@@ -597,15 +598,16 @@ namespace ThomasEditor
             //Head
             G_Head = new GameObject("Head");
             G_Head.transform.SetParent(gameObject.transform);
+            HeadSpineJoint = G_Head.AddComponent<Joint>();
             B_Head = G_Head.AddComponent<BoneTransformComponent>();
             spherecolliderHead = G_Head.AddComponent<SphereCollider>();
             rigidbodyHead = G_Head.AddComponent<Rigidbody>();
 
-
-
+          
             //left arm
             G_LeftArm = new GameObject("LeftArm");
             G_LeftArm.transform.SetParent(gameObject.transform);
+            LeftArmTorsoJoint = G_LeftArm.AddComponent<Joint>();
             B_LeftArm = G_LeftArm.AddComponent<BoneTransformComponent>();
             CapsuleColliderLeftArm = G_LeftArm.AddComponent<CapsuleCollider>();
             rigidbodyLeftArm = G_LeftArm.AddComponent<Rigidbody>();
@@ -614,6 +616,7 @@ namespace ThomasEditor
 
             G_LeftUnderArm = new GameObject("LeftLowerArm");
             G_LeftUnderArm.transform.SetParent(gameObject.transform);
+            LowerLeftArmLeftArmJoint = G_LeftUnderArm.AddComponent<Joint>();
             B_LeftUnderArm = G_LeftUnderArm.AddComponent<BoneTransformComponent>();
             CapsuleColliderLeftUnderArm = G_LeftUnderArm.AddComponent<CapsuleCollider>();
             rigidbodyLeftUnderArm = G_LeftUnderArm.AddComponent<Rigidbody>();
@@ -621,6 +624,7 @@ namespace ThomasEditor
             
             G_RightArm = new GameObject("RightArm");
             G_RightArm.transform.SetParent(gameObject.transform);
+            RightArmTorsoJoint = G_RightArm.AddComponent<Joint>();
             B_RightArm = G_RightArm.AddComponent<BoneTransformComponent>();
             CapsuleColliderRightArm = G_RightArm.AddComponent<CapsuleCollider>();
             rigidbodyRightArm = G_RightArm.AddComponent<Rigidbody>();
@@ -630,6 +634,7 @@ namespace ThomasEditor
 
             G_RightUnderArm = new GameObject("RightLowerArm");
             G_RightUnderArm.transform.SetParent(gameObject.transform);
+            LowerRightArmRightArmJoint = G_RightUnderArm.AddComponent<Joint>();
             B_RightUnderArm = G_RightUnderArm.AddComponent<BoneTransformComponent>();
             CapsuleColliderRightUnderArm = G_RightUnderArm.AddComponent<CapsuleCollider>();
             rigidbodyRightUnderArm = G_RightUnderArm.AddComponent<Rigidbody>();
@@ -638,70 +643,47 @@ namespace ThomasEditor
             
             G_RightLeg = new GameObject("RightLeg");
             G_RightLeg.transform.SetParent(gameObject.transform);
+            RightLegJoint = G_RightLeg.AddComponent<Joint>();
             B_RightLeg = G_RightLeg.AddComponent<BoneTransformComponent>();
             CapsuleColliderRightLeg = G_RightLeg.AddComponent<CapsuleCollider>();
             rigidbodyRightLeg = G_RightLeg.AddComponent<Rigidbody>();
 
-
-
-
-
-
             //RightUnderLeg
             G_RightUnderLeg = new GameObject("RightLowerLeg");
             G_RightUnderLeg.transform.SetParent(gameObject.transform);
+            RightUnderLegJoint = G_RightUnderLeg.AddComponent<Joint>();
             B_RightUnderLeg = G_RightUnderLeg.AddComponent<BoneTransformComponent>();
             CapsuleColliderRightUnderLeg = G_RightUnderLeg.AddComponent<CapsuleCollider>();
             rigidbodyRightUnderLeg = G_RightUnderLeg.AddComponent<Rigidbody>();
 
-
-            
             //left leg
-
             G_LeftLeg = new GameObject("LeftLeg");
             G_LeftLeg.transform.SetParent(gameObject.transform);
+            LeftLegJoint = G_LeftLeg.AddComponent<Joint>();
             B_LeftLeg = G_LeftLeg.AddComponent<BoneTransformComponent>();
             CapsuleColliderLeftLeg = G_LeftLeg.AddComponent<CapsuleCollider>();
             rigidbodyLeftLeg = G_LeftLeg.AddComponent<Rigidbody>();
 
-            
             //LeftUnderLeg
             G_LeftUnderLeg = new GameObject("LeftLowerLeg");
             G_LeftUnderLeg.transform.SetParent(gameObject.transform);
+            LeftUnderLegJoint = G_LeftUnderLeg.AddComponent<Joint>();
             B_LeftUnderLeg = G_LeftUnderLeg.AddComponent<BoneTransformComponent>();
             CapsuleColliderLeftUnderLeg = G_LeftUnderLeg.AddComponent<CapsuleCollider>();
             rigidbodyLeftUnderLeg = G_LeftUnderLeg.AddComponent<Rigidbody>();
 
             //
-            HipSpineJoint = G_Hips.AddComponent<Joint>();
-            HipSpineJoint.ConnectedRigidbody = rigidbodySpine;
 
-            HeadSpineJoint = G_Head.AddComponent<Joint>();
+
             HeadSpineJoint.ConnectedRigidbody = rigidbodySpine;
-
-            LeftArmTorsoJoint = G_LeftArm.AddComponent<Joint>();
+            HipSpineJoint.ConnectedRigidbody = rigidbodySpine;
             LeftArmTorsoJoint.ConnectedRigidbody = rigidbodySpine;
-
-            LowerLeftArmLeftArmJoint = G_LeftUnderArm.AddComponent<Joint>();
             LowerLeftArmLeftArmJoint.ConnectedRigidbody = rigidbodyLeftArm;
-
-            RightArmTorsoJoint = G_RightArm.AddComponent<Joint>();
             RightArmTorsoJoint.ConnectedRigidbody = rigidbodySpine;
-
-            LowerRightArmRightArmJoint = G_RightUnderArm.AddComponent<Joint>();
             LowerRightArmRightArmJoint.ConnectedRigidbody = rigidbodyRightArm;
-
-
-            RightLegJoint = G_RightLeg.AddComponent<Joint>();
             RightLegJoint.ConnectedRigidbody = rigidbodyhips;
-
-            RightUnderLegJoint = G_RightUnderLeg.AddComponent<Joint>();
             RightUnderLegJoint.ConnectedRigidbody = rigidbodyRightLeg;
-
-            LeftLegJoint = G_LeftLeg.AddComponent<Joint>();
             LeftLegJoint.ConnectedRigidbody = rigidbodyhips;
-
-            LeftUnderLegJoint = G_LeftUnderLeg.AddComponent<Joint>();
             LeftUnderLegJoint.ConnectedRigidbody = rigidbodyLeftLeg;
 
 
