@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
@@ -16,9 +17,6 @@ public class ChadStateMachine : NetworkComponent
         RAGDOLL,    // user pressed Space to jump tackle
     };
 
-    // camera is never used, but someone program crashes if this is removed as it was previously used and
-    // probably still rots inside the .tds file, can probably be removed when a new scene is used
-    //public Camera m_camera { get; set; }
 
     private Chadimations m_animations;
     private Dictionary<Chadimations.STATE, float> Weights;
@@ -40,6 +38,7 @@ public class ChadStateMachine : NetworkComponent
 
     private bool m_ragdolling = false;
     private bool m_isTackled = false;
+    private bool m_tackling = false;
     private float m_chargeForce = 2.0f;
     private float m_maxForce = 10.0f;
 
@@ -57,12 +56,17 @@ public class ChadStateMachine : NetworkComponent
         set { _chadControls = value; }
     }
 
+    IEnumerator DivingCoroutine()
+    { 
+        m_chadControls.HandleMovement(m_maxSpeed, 0);
+
+        yield return new WaitForSeconds(1.0f);
+        m_velocity = BaseSpeed;
+        m_state = CHAD_STATE.IDLE;
+    }
+
     public override void Start()
     {
-        //if(!m_camera)
-        //{
-        //    Debug.Log("Camera not found.");
-        //}
         m_chadControls = null;
         m_state = CHAD_STATE.IDLE;
         m_xStep = Input.GetMouseX() * Time.ActualDeltaTime;
@@ -116,12 +120,12 @@ public class ChadStateMachine : NetworkComponent
                             Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                             Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
                         }
-                        //else if (Input.GetKeyDown(Input.Keys.Space))
-                        //{
-                        //    m_state = CHAD_STATE.DIVING;
-                        //    Weights.Clear();
-                        //    Weights.Add(Chadimations.STATE.DIVING, 0);
-                        //}
+                        else if (Input.GetKeyDown(Input.Keys.Space))
+                        {
+                            m_state = CHAD_STATE.DIVING;
+                            Weights.Clear();
+                            Weights.Add(Chadimations.STATE.DIVING, 0);
+                        }
                     }
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                     {
@@ -156,20 +160,18 @@ public class ChadStateMachine : NetworkComponent
                     m_chargeForce += m_incrementSpeed * Time.DeltaTime;
                 m_chadControls.ChargeBall();
 
-                //Debug.Log("Charge force: " + m_chargeForce);
-
                 if (m_isTackled)
                 {
                     m_state = CHAD_STATE.RAGDOLL;
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.RAGDOLL, 0);
                 }
-                //else if (Input.GetKey(Input.Keys.Space))
-                //{
-                //    m_state = CHAD_STATE.DIVING;
-                //    Weights.Clear();
-                //    Weights.Add(Chadimations.STATE.DIVING, 0);
-                //}
+                else if (Input.GetKey(Input.Keys.Space))
+                {
+                    m_state = CHAD_STATE.DIVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.DIVING, 0);
+                }
                 else
                 {
                     // Throwing and pressing W, checking if also ASD pressed
@@ -291,19 +293,18 @@ public class ChadStateMachine : NetworkComponent
             case CHAD_STATE.MOVING:
                 // __SIMULTAENOUS__ MOVE and: nothing
                 // __CAN_ENTER__  IDLE/THROWING/RAGDOLL/JUMP
-                // Debug.Log("Movement speed: " + m_velocity);
                 if (m_isTackled)
                 {
                     m_state = CHAD_STATE.RAGDOLL;
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.RAGDOLL, 0);
                 }
-                //else if (Input.GetKey(Input.Keys.Space))
-                //{
-                //    m_state = CHAD_STATE.DIVING;
-                //    Weights.Clear();
-                //    Weights.Add(Chadimations.STATE.DIVING, 0);
-                //}
+                else if (Input.GetKey(Input.Keys.Space))
+                {
+                    m_state = CHAD_STATE.DIVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.DIVING, 0);
+                }
                 else
                 {
                     //if m_velocity > m_runningSpeed && anim != running {anim = running}
@@ -331,7 +332,7 @@ public class ChadStateMachine : NetworkComponent
                     }
                     else if (Input.GetKey(Input.Keys.S))
                     {
-                        m_velocity = 2.0f;//en faktor, ingen acceleration because backing
+                        m_velocity = BaseSpeed;
                         if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.W))
                         {
                             // backing anim
@@ -380,7 +381,6 @@ public class ChadStateMachine : NetworkComponent
 
                 if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
                 {
-                    //Debug.Log("Moving and turning..");
                     if (m_velocity < m_runningSpeed)
                     {
 
@@ -407,13 +407,10 @@ public class ChadStateMachine : NetworkComponent
                 break;
 
             case CHAD_STATE.DIVING:
-                //Weights[Chadimations.STATE.DIVING] = 1;
-                //m_animations.SetAnimations(Weights);
-                // chadMovement.JUMP() // gets player camera forward and launches him in that direction
-
-                // do we want to this to also set state to ragdoll?
-                // if !chadMovement.is_jumping 
-                //      m_state = State.IDLE;
+                Weights[Chadimations.STATE.DIVING] = 1;
+                StartCoroutine(DivingCoroutine());
+                m_tackling = true;
+                m_animations.SetAnimations(Weights);
                 break;
 
             case CHAD_STATE.RAGDOLL:

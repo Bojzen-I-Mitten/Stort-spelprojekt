@@ -20,11 +20,13 @@ namespace ThomasEngine {
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
-		static ManualResetEvent^ RenderFinished;
+		
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 	public:
+		static ManualResetEvent^ RenderFinished;
+
 		delegate void StartPlayEvent();
 		delegate void StopPlayingEvent();
 		delegate void PausePlayEvent();

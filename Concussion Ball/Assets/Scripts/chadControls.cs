@@ -1,7 +1,4 @@
-﻿/* TODO: 
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
@@ -17,7 +14,6 @@ public class ChadControls : NetworkComponent
     public float baseThrowForce { get; set; } = 5.0f;
     public float maxThrowForce { get; set; } = 20.0f;
 
-    //public int Speed { get; set; } = 5;
     public float Force { get; set; } = 5;
     public float CameraSensitivity_x { get; set; } = 10;
     public float CameraSensitivity_y { get; set; } = 20;
@@ -50,11 +46,9 @@ public class ChadControls : NetworkComponent
     }
     // private bool canPickupBall = true;
 
-    bool jumpDelay = true;
-    bool movingForward = false;
-    bool movingBackward = false;
-    bool tackling = false;
-    bool jumping = false;
+        bool jumpDelay = true;
+        bool tackling = false;
+        bool jumping = false;
 
     public override void Start()
     {
@@ -68,48 +62,17 @@ public class ChadControls : NetworkComponent
         if (!camera)
             Debug.LogWarning("Camera not set for player");
 
-        //rBody.IsKinematic = !isOwner;
         throwForce = baseThrowForce;
-    }
-
-    //Coroutine for jumping delay, also used for tackling delay
-    IEnumerator JumpingCoroutine()
-    {
-        jumpDelay = false;
-        Debug.Log("Started jumping.");
-        rBody.AddForce(new Vector3(0.0f, Force, 0.0f), Rigidbody.ForceMode.Impulse);
-        yield return new WaitForSeconds(1.0f);
-
-        if (tackling)
-        {
-            transform.Rotate(0.0f, 0.5f, 0.0f);
-            tackling = false;
-            //test.fieldOfView = 70;
-        }
-        yield return new WaitForSeconds(0.2f);
-        jumpDelay = true;
-        jumping = false;
-        movingForward = false;
-        movingBackward = false;
     }
 
     public override void Update()
     {
-
+            
     }
 
     public void HandleMovement(float velocityForward, float velocityStrafe)
     {
         transform.position += (transform.forward * velocityForward + transform.right * velocityStrafe) * Time.DeltaTime;
-        //if (Input.GetKey(Input.Keys.W))
-        //    transform.position += transform.forward * Speed * Time.DeltaTime;
-        //else if (Input.GetKey(Input.Keys.S))
-        //    transform.position -= transform.forward * Speed * Time.DeltaTime;
-
-        //else if (Input.GetKey(Input.Keys.D))
-        //    transform.position += transform.right * Speed * Time.DeltaTime;
-        //else if (Input.GetKey(Input.Keys.A))
-        //    transform.position -= transform.right * Speed * Time.DeltaTime;
     }
 
     #region Camera Controls

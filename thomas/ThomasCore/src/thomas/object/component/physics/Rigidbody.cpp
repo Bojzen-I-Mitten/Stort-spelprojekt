@@ -186,9 +186,10 @@ namespace thomas
 					m_kinematic = kinematic;
 					if (initialized)
 					{
-						Physics::RemoveRigidBody(this);
+						bool removed = Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
-						Physics::AddRigidBody(this);
+						if (removed)
+							Physics::AddRigidBody(this);
 					}		
 				}	
 			}
@@ -212,9 +213,10 @@ namespace thomas
 				m_mass = mass;
 				if (initialized)
 				{
-					Physics::RemoveRigidBody(this);
+					bool removed = Physics::RemoveRigidBody(this);
 					UpdateRigidbodyMass();
-					Physics::AddRigidBody(this);				
+					if (removed)
+						Physics::AddRigidBody(this);
 				}
 			}
 

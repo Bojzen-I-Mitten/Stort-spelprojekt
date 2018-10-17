@@ -18,8 +18,10 @@ namespace thomas
 			void SetName(std::string name);
 
 			_GUID m_guid;
+			virtual bool isDestroyed() { return m_destroyed; }
 		protected:
 			virtual void OnDestroy() {}
+			
 		private:
 			bool m_destroyed = false;
 		protected:

@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\match\Team.cs" />
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
+    <Compile Include="Assets\Scripts\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />

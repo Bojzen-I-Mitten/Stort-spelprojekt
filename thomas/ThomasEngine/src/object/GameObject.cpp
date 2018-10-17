@@ -161,6 +161,7 @@ namespace ThomasEngine {
 
 	void GameObject::Destroy()
 	{
+		
 		if (m_isDestroyed)
 			return;
 		ThomasWrapper::Selection->UnSelectGameObject(this);
@@ -168,6 +169,7 @@ namespace ThomasEngine {
 		
 		// Remove object
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		ThomasWrapper::RenderFinished->WaitOne();
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		// Destroy

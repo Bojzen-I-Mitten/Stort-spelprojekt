@@ -58,6 +58,10 @@ namespace thomas
 				else
 					return m_localWorldMatrix;
 			}
+			math::Matrix Transform::GetWorldInverse()
+			{
+				return GetWorldMatrix().Invert();
+			}
 
 			void Transform::SetWorldMatrix(math::Matrix matrix)
 			{
@@ -188,7 +192,7 @@ namespace thomas
 			{
 				if (m_parent)
 				{
-					SetLocalPosition(position - m_parent->GetPosition());
+					SetLocalPosition(math::Vector3::Transform(position, m_parent->GetWorldInverse()));
 				}
 				else
 					SetLocalPosition(position);
@@ -199,8 +203,11 @@ namespace thomas
 			}
 			void Transform::SetRotation(math::Quaternion rotation)
 			{
-				if (m_parent)
-					SetLocalRotation(rotation / m_parent->GetRotation());
+				if (m_parent) {
+					math::Quaternion q = m_parent->GetRotation();
+					q.Inverse(q);
+					SetLocalRotation(rotation * q);
+				}
 				else
 					SetLocalRotation(rotation);
 			}
