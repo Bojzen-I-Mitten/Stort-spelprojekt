@@ -8,24 +8,9 @@ using System;
 
 public class ChadStateMachine : NetworkComponent
 {
-    public enum CHAD_STATE
-    {
-        CHADING,   // Idle/moving
-        THROWING,   // player throws ball / power-up, not all power-ups activate this state
-        DIVING,    // user got tackled / hit by a power-up
-        RAGDOLL,    // user pressed Space to jump tackle
-
-        NUM_STATES
-    };
-
-    // camera is never used, but someone program crashes if this is removed as it was previously used and
-    // probably still rots inside the .tds file, can probably be removed when a new scene is used
-    //public Camera m_camera { get; set; }
 
     private Chadimations m_animations;
     //private Dictionary<Chadimations.STATE, float> Weights;
-    private CHAD_STATE State { get; set; }
-    public CHAD_STATE _State { get { return State; } }
     private bool ChangeState;
     private Rigidbody m_rBody;
 
@@ -33,12 +18,8 @@ public class ChadStateMachine : NetworkComponent
     private float m_xStep = 0.0f;
     private float m_yStep = 0.0f;
 
-    public Vector2 m_velocity = new Vector2(2.0f, 2.0f);
     private float m_runningSpeed = 5.0f;
-    private float BaseSpeed = 2.0f;
     private float m_maxSpeedWithBall = 6.0f;
-    private float m_maxSpeed = 10.0f;
-    public float Acceleration { get; set; } = 2.0f; //2 m/s^2
 
     private float m_incrementSpeed = 4.0f;
 
@@ -46,30 +27,11 @@ public class ChadStateMachine : NetworkComponent
     private bool m_isTackled = false;
     private float m_chargeForce = 2.0f;
     private float m_maxForce = 10.0f;
-
-    //y holds roll for animation purposes
-    public Vector3 Direction;
-
+    
     private Ball m_ball = null;
-
-    private float _DiveTimer = 0f;
-    public float DiveTimer { get { return _DiveTimer; } }
-
-    //private ChadControls _chadControls;
-    //public ChadControls ChadControls
-    //{
-    //    get
-    //    {
-    //        if (_chadControls == null)
-    //            _chadControls = gameObject.GetComponent<ChadControls>();
-    //        return _chadControls;
-    //    }
-    //    set { _chadControls = value; }
-    //}
 
     public override void Start()
     {
-        State = CHAD_STATE.CHADING;
 
         m_rBody = gameObject.GetComponent<Rigidbody>();
         m_animations = gameObject.GetComponent<Chadimations>();
@@ -83,47 +45,7 @@ public class ChadStateMachine : NetworkComponent
 
     public override void Update()
     {
-        if(isOwner) //if owner, handle inputs
-        {
-            switch(State)
-            {
-                case CHAD_STATE.CHADING:
-                    if (Direction.z > 0)
-                    {
-                        Direction.x = 0;
-                        Direction.y = 0;
-                    }
-
-                    m_velocity.y += Direction.y * Acceleration * Time.DeltaTime;
-                    m_velocity.x = Direction.x * BaseSpeed;
-
-                    m_velocity.y = MathHelper.Clamp(m_velocity.y, -BaseSpeed, m_maxSpeed);
-                    transform.position += new Vector3(m_velocity.x, 0, m_velocity.x) * Time.DeltaTime;
-
-                    break;
-                case CHAD_STATE.THROWING:
-                    m_velocity.y = Direction.y * BaseSpeed;
-                    m_velocity.x = Direction.x * BaseSpeed;
-
-                    transform.position += new Vector3(m_velocity.x, 0, m_velocity.x) * Time.DeltaTime;
-                    break;
-                case CHAD_STATE.DIVING:
-                    _DiveTimer += Time.DeltaTime;
-                    break;
-                case CHAD_STATE.RAGDOLL:
-                    break;
-            }
-        }
-    }
-
-    public void EnterThrow()
-    {
-        State = CHAD_STATE.THROWING;
-    }
-
-    internal void ExitThrow()
-    {
-        State = CHAD_STATE.CHADING;
+        
     }
 
 
@@ -497,22 +419,4 @@ public class ChadStateMachine : NetworkComponent
     //        m_chadControls.ResetCamera();
     //    }
     //}
-
-
-    public override void OnRead(NetPacketReader reader, bool initialState)
-    {
-        if (isOwner)
-        {
-            reader.GetInt();
-            return;
-        }
-
-        State = (CHAD_STATE)reader.GetInt();
-    }
-
-    public override bool OnWrite(NetDataWriter writer, bool initialState)
-    {
-        writer.Put((int)State);
-        return true;
-    }
 }

@@ -13,61 +13,59 @@ public class Chadimations : NetworkComponent
 {
     public class AnimationNode
     {
-        public Animation animation { get; set; }
-        public Vector3 position { get; set; }
+        public Animation Animation { get; set; }
+        public Vector3 Position { get; set; }
 
         public float GetWeight(Vector3 target)
         {
-            float distance = Vector3.Distance(target, position);
+            float distance = Vector3.Distance(target, Position);
             return 1.0f - MathHelper.Clamp(distance, 0.0f, 1.0f);
         }
     }
 
-    private ChadStateMachine ChadSM = null;
+    private ChadControls Chad = null;
     private Vector3 Direction
     {
         get
         {
-            if (ChadSM != null)
-                return ChadSM.Direction;
+            if (Chad != null)
+                return Chad.Direction;
             return new Vector3(0, 0, 0);
         }
     }
-    private ChadStateMachine.CHAD_STATE State
+    private ChadControls.STATE State
     {
         get
         {
-            if (ChadSM != null)
-                return ChadSM._State;
+            if (Chad != null)
+                return Chad.State;
             return 0;
         }
     }
 
-    Dictionary<ChadStateMachine.CHAD_STATE, List<AnimationNode>> Animations { get; set; } = new Dictionary<ChadStateMachine.CHAD_STATE, List<AnimationNode>>();
-    Dictionary<ChadStateMachine.CHAD_STATE, BlendNode> BlendNodes = new Dictionary<ChadStateMachine.CHAD_STATE, BlendNode>();
-    Dictionary<ChadStateMachine.CHAD_STATE, WeightHandle> WeightHandles = new Dictionary<ChadStateMachine.CHAD_STATE, WeightHandle>();
+    public Dictionary<ChadControls.STATE, List<AnimationNode>> Animations { get; set; } = new Dictionary<ChadControls.STATE, List<AnimationNode>>();
+    public Dictionary<ChadControls.STATE, BlendNode> BlendNodes = new Dictionary<ChadControls.STATE, BlendNode>();
+    public Dictionary<ChadControls.STATE, WeightHandle> WeightHandles = new Dictionary<ChadControls.STATE, WeightHandle>();
 
     public RenderSkinnedComponent Skin { get; set; }
 
     public override void Start()
     {
-        ChadSM = gameObject.GetComponent<ChadStateMachine>();
+        Chad = gameObject.GetComponent<ChadControls>();
         if (Skin != null)
         {
             foreach (var state in Animations)
             {
                 BlendNode newBlendNode = new BlendNode(Skin.model);
                 foreach (var node in state.Value)
-                {
-                    newBlendNode.appendNode(node.animation, true);
-                }
+                    newBlendNode.appendNode(node.Animation, true);
                 BlendNodes.Add(state.Key, newBlendNode);
 
                 WeightHandle newWeightHandle = BlendNodes[state.Key].generateWeightHandle();
                 WeightHandles.Add(state.Key, newWeightHandle);
             }
 
-            WeightHandles[ChadStateMachine.CHAD_STATE.CHADING].setWeight(0, new WeightTripple(1f));
+            WeightHandles[ChadControls.STATE.CHADING].setWeight(0, new WeightTripple(1f));
         }
     }
 

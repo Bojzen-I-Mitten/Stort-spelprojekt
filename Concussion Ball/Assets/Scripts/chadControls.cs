@@ -1,18 +1,24 @@
-﻿/* TODO: 
- */
-
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using ThomasEngine;
 using System;
 using ThomasEngine.Network;
+using LiteNetLib;
+using LiteNetLib.Utils;
+using System.ComponentModel;
 
-
-public class ChadControls : ScriptComponent
+public class ChadControls : NetworkComponent
 {
+    public enum STATE
+    {
+        CHADING,   // Idle/moving
+        THROWING,   // player throws ball / power-up, not all power-ups activate this state
+        DIVING,    // user got tackled / hit by a power-up
+        RAGDOLL,    // user pressed Space to jump tackle
+
+        NUM_STATES
+    };
+    public STATE State { get; private set; }
+
     #region Throwing stuff
     public float BaseThrowForce { get; set; } = 5.0f;
     public float MaxThrowForce { get; set; } = 20.0f;
@@ -25,30 +31,44 @@ public class ChadControls : ScriptComponent
     public float Force { get; set; } = 5;
 
     #region Camera Settings etc.
-    public Camera camera { get; set; }
+    [Category("Camera Settings")]
+    public Camera Camera { get; set; }
+    [Category("Camera Settings")]
     public float CameraSensitivity_x { get; set; } = 10;
+    [Category("Camera Settings")]
     public float CameraSensitivity_y { get; set; } = 20;
-    public float CameraHeight { get; set; } = 1;
+    [Category("Camera Settings")]
+    public Vector3 CameraPosition { get; set; } = new Vector3(0, 2, 2);
+    [Category("Camera Settings")]
     public float CameraMaxVertDegrees { get; set; } = 60;
+    [Category("Camera Settings")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
-    public float CameraDistance { get; set; } = 2;
+    [Category("Camera Settings")]
     public float CameraHeightThrowing { get; set; } = 0.8f;
+    [Category("Camera Settings")]
     public float CameraDistanceThrowing { get; set; } = 0.5f;
-    private float xStep = 0;
-    private float yStep = 0;
-    private float TotalYStep = 0;
-    private float TotalXStep = 0;
-    private Vector3 CameraStartPos;
+    [Category("Camera Settings")]
+    public float TotalYStep { get; private set; } = 0;
+    [Category("Camera Settings")]
+    public float TotalXStep { get; private set; } = 0;
 
     bool Escape = false;
     #endregion
     
+    #region Movement stuff
+    public Vector3 Direction; //Right, roll, forward
+
+    public Vector2 CurrentVelocity = new Vector2(0, 0); //Right and forward
+    public float Acceleration { get; set; } = 2.0f; //2 m/s^2
+    private float BaseSpeed = 2.0f;
+    private float MaxSpeed = 10.0f;
+
+    public float DiveTimer { get; private set; } = 0f;
+    #endregion
+
     private Quaternion FreeLookDirection;
     Rigidbody rBody;
-    ChadStateMachine ChadSM;
-
-
-    //Camera test;
+    Chadimations Animations;
 
     private Ball Ball = null;
     public bool HasBall = false;
@@ -57,144 +77,130 @@ public class ChadControls : ScriptComponent
 
     public override void Start()
     {
-        rBody = gameObject.GetComponent<Rigidbody>();
-        ChadSM = gameObject.GetComponent<ChadStateMachine>();
-        //if (!isOwner && camera)
-        //{
-        //    camera.enabled = false;
-        //    initalCameraPos = camera.transform.localPosition;
-        //}
+        Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
 
+        State = STATE.CHADING;
 
-        if (!camera)
+        if (!isOwner && Camera)
+            Camera.enabled = false;
+        if (isOwner && !Camera)
             Debug.LogWarning("Camera not set for player");
+        if (Camera)
+            Camera.transform.localPosition = CameraPosition;
 
-        //rBody.IsKinematic = !isOwner;
+
         ThrowForce = BaseThrowForce;
+
+        rBody = gameObject.GetComponent<Rigidbody>();
+        if (rBody != null)
+            rBody.IsKinematic = !isOwner;
+        Animations = gameObject.GetComponent<Chadimations>();
         Ball = GetObjectsOfType<Ball>().FirstOrDefault();
     }
 
-    //Coroutine for jumping delay, also used for tackling delay
-    //IEnumerator JumpingCoroutine()
-    //{
-    //    jumpDelay = false;
-    //    Debug.Log("Started jumping.");
-    //    rBody.AddForce(new Vector3(0.0f, Force, 0.0f), Rigidbody.ForceMode.Impulse);
-    //    yield return new WaitForSeconds(1.0f);
-
-    //    if (tackling)
-    //    {
-    //        transform.Rotate(0.0f, 0.5f, 0.0f);
-    //        tackling = false;
-    //        //test.fieldOfView = 70;
-    //    }
-    //    yield return new WaitForSeconds(0.2f);
-    //    jumpDelay = true;
-    //    jumping = false;
-    //    movingForward = false;
-    //    movingBackward = false;
-    //}
-
-    //public override void Update()
-    //{
-
-    //}
-
     public override void Update()
     {
-        if (Escape)
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        else
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-
-        ChadSM.Direction = new Vector3(0, 0, 0);
+        Direction = new Vector3(0, 0, 0);
 
         HandleKeyboardInput();
         HandleMouseInput();
-    }
 
+        StateMachine();
+    }
+    
+    #region Input handling
     private void HandleKeyboardInput()
     {
         if (Input.GetKeyUp(Input.Keys.Escape))
+        {
+            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
             Escape = true;
+        }
 
         if (Input.GetKey(Input.Keys.W))
-            ChadSM.Direction.z += 1;
+            Direction.z += 1;
         if (Input.GetKey(Input.Keys.S))
-            ChadSM.Direction.z -= 1;
+            Direction.z -= 1;
 
         if (Input.GetKey(Input.Keys.D))
-            ChadSM.Direction.x += 1;
+            Direction.x -= 1;
         if (Input.GetKey(Input.Keys.A))
-            ChadSM.Direction.x -= -1;
+            Direction.x += 1;
     }
 
     private void HandleMouseInput()
     {
         //Focus stuff
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && Escape)
+        {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+            Escape = false;
+        }
 
-        //Throw stuff
-        if (HasBall)
+        if (!Escape)
         {
-            if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+            //Throw stuff
+            if (HasBall)
             {
-                IsThrowing = true;
-                ChadSM.EnterThrow();
+                if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+                {
+                    IsThrowing = true;
+                    State = STATE.THROWING;
+                }
+                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && IsThrowing)
+                {
+                    IsThrowing = false;
+                    State = STATE.CHADING;
+                }
+                else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && IsThrowing)
+                    ChargeBall();
+                else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && IsThrowing)
+                {
+                    IsThrowing = false;
+                    ThrowBall();
+                }
             }
-            else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && IsThrowing)
+
+            float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
+            float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
+
+            Direction.y = xStep;
+            //ChadSM.Direction.Normalize();
+
+            if (!Input.GetKey(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT))
             {
-                IsThrowing = false;
-                ChadSM.ExitThrow();
+                //Regular cam
+                FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && IsThrowing)
-                ChargeBall();
-            else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && IsThrowing)
+            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT))
             {
-                IsThrowing = false;
-                ThrowBall();
+                //Throwing cam
+                ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-        }
-        
-        float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
-        float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
+            else if (Input.GetKeyDown(Input.Keys.LeftShift))
+            {
+                //Free look
+                InitFreeLookCamera();
+            }
+            else
+            {
+                //Free look
+                FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
+            }
 
-        ChadSM.Direction.y = xStep;
-        //ChadSM.Direction.Normalize();
-
-        if (!Input.GetKey(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT))
-        {
-            //Regular cam
-            FondleCamera(ChadSM.m_velocity.Length(), xStep, yStep);
-        }
-        else if (Input.GetMouseButton(Input.MouseButtons.RIGHT))
-        {
-            //Throwing cam
-            ThrowingCamera(ChadSM.m_velocity.Length(), xStep, yStep);
-        }
-        else if (Input.GetKeyDown(Input.Keys.LeftShift))
-        {
-            //Free look
-            InitFreeLookCamera();
-        }
-        else
-        {
-            //Free look
-            FreeLookCamera(ChadSM.m_velocity.Length(), xStep, yStep);
-        }
-
-        if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
-        {
-            ResetCamera();
+            if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
+            {
+                ResetCamera();
+            }
         }
     }
-
-    #region Camera Controls
+    #endregion
+    
+    #region Camera controls
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
-        if (camera)
-        {
+        if (Camera)
+        { 
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
             if (velocity != 0)
                 yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
@@ -203,30 +209,30 @@ public class ChadControls : ScriptComponent
             TotalXStep -= yaw; //for of freelook
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-            camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            camera.transform.localPosition = Vector3.Transform(new Vector3(0, CameraHeight, CameraDistance), camera.transform.localRotation);
+            Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
+            Camera.transform.localPosition = Vector3.Transform(CameraPosition, Camera.transform.localRotation);
 
         }
     }
 
     public void FreeLookCamera(float velocity, float xStep, float yStep)
     {
-        if (camera)
+        if (Camera)
         {
             TotalXStep -= ThomasEngine.MathHelper.ToRadians(xStep * CameraSensitivity_x);
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
 
             Quaternion rot = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
-            camera.transform.localRotation = rot;
+            Camera.transform.localRotation = rot;
 
-            camera.transform.localPosition = Vector3.Transform(new Vector3(0, CameraHeight, CameraDistance), camera.transform.localRotation);
+            Camera.transform.localPosition = Vector3.Transform(CameraPosition, Camera.transform.localRotation);
         }
     }
 
     public void ThrowingCamera(float velocity, float xStep, float yStep)
     {
-        if (camera)
+        if (Camera)
         {
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
             if (velocity != 0)
@@ -236,29 +242,29 @@ public class ChadControls : ScriptComponent
             TotalXStep -= yaw; //for of freelook
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-            camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            camera.transform.localPosition = new Vector3(CameraDistanceThrowing, CameraHeightThrowing, CameraDistanceThrowing);
+            Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
+            Camera.transform.localPosition = new Vector3(CameraDistanceThrowing, CameraHeightThrowing, CameraDistanceThrowing);
         }
     }
 
     public void InitFreeLookCamera()
     {
-        camera.transform.localPosition = new Vector3(0, CameraHeight, -CameraDistance);
-        camera.transform.LookAt(transform.position + new Vector3(0, CameraHeight, 0));
+        Camera.transform.localPosition = new Vector3(CameraPosition.x, CameraPosition.y, -CameraPosition.z);
+        Camera.transform.LookAt(transform.position + new Vector3(0, CameraPosition.y, 0));
 
-        camera.transform.localEulerAngles = new Vector3(0, 180, 0);
+        Camera.transform.localEulerAngles = new Vector3(0, 180, 0);
         TotalXStep = ThomasEngine.MathHelper.Pi;
         TotalYStep = 0;
     }
 
     public void ResetCamera()
     {
-        if (camera)
+        if (Camera)
         {
-            camera.transform.localPosition = new Vector3(0, CameraHeight, CameraDistance);
-            camera.transform.LookAt(transform.position + new Vector3(0, CameraHeight, 0));
+            Camera.transform.localPosition = CameraPosition;
+            Camera.transform.LookAt(transform.position + new Vector3(0, CameraPosition.y, 0));
 
-            camera.transform.localEulerAngles = new Vector3(0, 0, 0);
+            Camera.transform.localEulerAngles = new Vector3(0, 0, 0);
             TotalXStep = 0;
             TotalYStep = 0;
         }
@@ -274,7 +280,43 @@ public class ChadControls : ScriptComponent
     }
     #endregion
 
+    private void StateMachine()
+    {
+        if (isOwner) //if owner, handle inputs
+        {
+            switch (State)
+            {
+                case STATE.CHADING:
+                    if (Direction.z > 0)
+                    {
+                        Direction.x = 0;
+                        Direction.y = 0;
+                    }
 
+                    CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
+                    if (Direction.z == 0)
+                        CurrentVelocity.y = 0;
+                    CurrentVelocity.x = Direction.x * BaseSpeed;
+
+                    CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -BaseSpeed, MaxSpeed);
+                    transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+
+                    break;
+                case STATE.THROWING:
+                    CurrentVelocity.y = Direction.z * BaseSpeed;
+                    CurrentVelocity.x = Direction.x * BaseSpeed;
+
+                    transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                    break;
+                case STATE.DIVING:
+                    DiveTimer += Time.DeltaTime;
+                    break;
+                case STATE.RAGDOLL:
+                    break;
+            }
+        }
+    }
+    
     public void ChargeBall()
     {
         Ball.ChargeColor();
@@ -283,8 +325,25 @@ public class ChadControls : ScriptComponent
 
     public void ThrowBall()
     {
-        Ball.Throw(camera.transform.forward * ThrowForce);
+        Ball.Throw(Camera.transform.forward * ThrowForce);
         HasBall = false;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        if (isOwner)
+        {
+            reader.GetInt();
+            return;
+        }
+
+        State = (STATE)reader.GetInt();
+    }
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        writer.Put((int)State);
+        return true;
     }
 
     public override void OnCollisionEnter(Collider collider)
