@@ -10,25 +10,25 @@ namespace ThomasEditor
 {
     public class Ragdoll : ScriptComponent
     {
-        public string Spine { get; set; }
-        public string Hips { get; set; }
-        public string Neck { get; set; }
-        public string Head { get; set; }
-        public string UpperLeftArm { get; set; }
-        public string LowerLeftArm { get; set; }
-        public string UpperRightArm { get; set; }
-        public string LowerRightArm { get; set; }
-        public string LowerLeftHand { get; set; }
-        public string LowerRightHand { get; set; }
-        public string LeftShoulder { get; set; }
-        public string RightShoulder { get; set; }
+        public string Spine { get; set; } = "mixamorig:Spine";
+        public string Hips { get; set; } = "mixamorig:Hips";
+        public string Neck { get; set; } = "mixamorig:Neck";
+        public string Head { get; set; } = "mixamorig:Head";
+        public string UpperLeftArm { get; set; } = "mixamorig:LeftArm";
+        public string LowerLeftArm { get; set; } = "mixamorig:LeftForeArm";
+        public string UpperRightArm { get; set; } = "mixamorig:RightArm";
+        public string LowerRightArm { get; set; } = "mixamorig:RightForeArm";
+        public string LowerLeftHand { get; set; } = "mixamorig:LeftHand";
+        public string LowerRightHand { get; set; } = "mixamorig:RightHand";
+        public string LeftShoulder { get; set; } = "mixamorig:LeftShoulder";
+        public string RightShoulder { get; set; } = "mixamorig:RightShoulder";
         public bool AllobjectKinectic { get; set; }
-        public string UpperRightLeg { get; set; }
-        public string LowerRightLeg { get; set; }
-        public string RightFoot { get; set; }
-        public string UpperLeftLeg { get; set; }
-        public string LowerLeftLeg { get; set; }
-        public string LeftFoot { get; set; }
+        public string UpperRightLeg { get; set; } = "mixamorig:RightUpLeg";
+        public string LowerRightLeg { get; set; } = "mixamorig:RightLeg";
+        public string RightFoot { get; set; } = "mixamorig:RightFoot";
+        public string UpperLeftLeg { get; set; } = "mixamorig:LeftUpLeg";
+        public string LowerLeftLeg { get; set; } = "mixamorig:LeftLeg";
+        public string LeftFoot { get; set; } = "mixamorig:LeftFoot";
         public Vector2 AllobjectDamping { get; set; }
         public float Totalmass { get; set; }
 
@@ -110,6 +110,8 @@ namespace ThomasEditor
         Joint RightUnderLegJoint;
         Joint LeftLegJoint;
         Joint LeftUnderLegJoint;
+        float[] RealBodyMass;
+
         public override void Start()
         {
             
@@ -218,19 +220,24 @@ namespace ThomasEditor
         }
         public override void Update()
         {
-/*            if(Input.GetKeyDown(Input.Keys.Space))
+            if(Input.GetKeyDown(Input.Keys.Space))
             {
                 if (RagdollEnabled)
                     DisableRagdoll();
                 else
                    EnableRagdoll();
-            }*/
+            }
         }
         public void EnableRagdoll()
         {
             if (RagdollEnabled)
                 return;
             RenderSkinnedComponent renderskinnedcomponent = gameObject.GetComponent<RenderSkinnedComponent>();
+            if (renderskinnedcomponent == null)
+            { 
+                ThomasEngine.Debug.LogError("No renderskinnedcomponent available Noragdoll will be created");
+                return;
+            }
             uint boneindex = 0;
 
             //Hips
@@ -242,7 +249,7 @@ namespace ThomasEditor
             spherecolliderhips.radius = 0.2f;
             rigidbodyhips.IsKinematic = AllobjectKinectic;
             rigidbodyhips.Damping = AllobjectDamping;
-            rigidbodyhips.Mass = Totalmass * 0.14f;
+            rigidbodyhips.Mass = Totalmass * RealBodyMass[0];
             //Spine
        
             B_Spine.BoneName = Spine;
@@ -254,7 +261,7 @@ namespace ThomasEditor
             G_Spine.transform.localPosition = new Vector3(G_Spine.transform.localPosition.x, G_Spine.transform.localPosition.y, G_Spine.transform.localPosition.z);
             rigidbodySpine.IsKinematic = AllobjectKinectic;
             rigidbodySpine.Damping = AllobjectDamping;
-            rigidbodySpine.Mass = Totalmass * 0.216f;
+            rigidbodySpine.Mass = Totalmass * RealBodyMass[1];
 
      
 
@@ -279,7 +286,7 @@ namespace ThomasEditor
             spherecolliderHead.radius = 0.2f;
             rigidbodyHead.IsKinematic = AllobjectKinectic;
             rigidbodyHead.Damping = AllobjectDamping;
-            rigidbodyHead.Mass = Totalmass * 0.081f;
+            rigidbodyHead.Mass = Totalmass * RealBodyMass[2];
             spherecolliderHead.center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, renderskinnedcomponent);
 
 
@@ -311,7 +318,7 @@ namespace ThomasEditor
  
             rigidbodyLeftArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftArm.Damping = AllobjectDamping;
-            rigidbodyLeftArm.Mass = Totalmass * 0.028f;
+            rigidbodyLeftArm.Mass = Totalmass * RealBodyMass[3];
             CapsuleColliderLeftArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
 
 
@@ -341,7 +348,7 @@ namespace ThomasEditor
        
             rigidbodyLeftUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderArm.Damping = AllobjectDamping;
-            rigidbodyLeftUnderArm.Mass = Totalmass * 0.016f;
+            rigidbodyLeftUnderArm.Mass = Totalmass * RealBodyMass[4];
             CapsuleColliderLeftUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, renderskinnedcomponent));
 
         
@@ -380,7 +387,7 @@ namespace ThomasEditor
           
             rigidbodyRightArm.IsKinematic = AllobjectKinectic;
             rigidbodyRightArm.Damping = AllobjectDamping;
-            rigidbodyRightArm.Mass = Totalmass * 0.028f;
+            rigidbodyRightArm.Mass = Totalmass * RealBodyMass[5];
             CapsuleColliderRightArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, renderskinnedcomponent));
 
 
@@ -413,7 +420,7 @@ namespace ThomasEditor
     
             rigidbodyRightUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyRightUnderArm.Damping = AllobjectDamping;
-            rigidbodyRightUnderArm.Mass = Totalmass * 0.016f;
+            rigidbodyRightUnderArm.Mass = Totalmass * RealBodyMass[6];
             CapsuleColliderRightUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, renderskinnedcomponent));
          
             //Joint from Rightudnerarmtooverarm
@@ -440,7 +447,7 @@ namespace ThomasEditor
           
             rigidbodyRightLeg.IsKinematic = AllobjectKinectic;
             rigidbodyRightLeg.Damping = AllobjectDamping;
-            rigidbodyRightLeg.Mass = Totalmass * 0.1f;
+            rigidbodyRightLeg.Mass = Totalmass * RealBodyMass[7];
             CapsuleColliderRightLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
 
 
@@ -470,7 +477,7 @@ namespace ThomasEditor
             CapsuleColliderRightUnderLeg.radius = 0.065f;
             
             rigidbodyRightUnderLeg.Damping = AllobjectDamping;
-            rigidbodyRightUnderLeg.Mass = Totalmass * 0.047f;
+            rigidbodyRightUnderLeg.Mass = Totalmass * RealBodyMass[8];
             rigidbodyRightUnderLeg.IsKinematic = AllobjectKinectic;
             CapsuleColliderRightUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, renderskinnedcomponent);
 
@@ -502,7 +509,7 @@ namespace ThomasEditor
            
             rigidbodyLeftLeg.IsKinematic = AllobjectKinectic;
             rigidbodyLeftLeg.Damping = AllobjectDamping;
-            rigidbodyLeftLeg.Mass = Totalmass * 0.1f;
+            rigidbodyLeftLeg.Mass = Totalmass * RealBodyMass[9];
             CapsuleColliderLeftLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
 
              //Joint from LeftLegJoint
@@ -529,7 +536,7 @@ namespace ThomasEditor
             
             rigidbodyLeftUnderLeg.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderLeg.Damping = AllobjectDamping;
-            rigidbodyLeftUnderLeg.Mass = Totalmass * 0.047f;
+            rigidbodyLeftUnderLeg.Mass = Totalmass * RealBodyMass[10];
             CapsuleColliderLeftUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
 
             
@@ -542,8 +549,6 @@ namespace ThomasEditor
             LeftUnderLegJoint.ConnectedAnchor = CapsuleColliderLeftUnderLeg.center;
             LeftUnderLegJoint.Anchor = -CapsuleColliderLeftUnderLeg.center;
 
-
- 
             G_Hips.activeSelf = true;
             G_Spine.activeSelf = true;
             G_Head.activeSelf = true;
@@ -560,6 +565,18 @@ namespace ThomasEditor
         }
         public override void Awake()
         {
+            RealBodyMass = new float[11];
+            RealBodyMass[0] = 0.14f;
+            RealBodyMass[1] = 0.216f;
+            RealBodyMass[2] = 0.081f;
+            RealBodyMass[3] = 0.028f; 
+            RealBodyMass[4] = 0.016f;
+            RealBodyMass[5] = 0.028f;
+            RealBodyMass[6] = 0.016f;
+            RealBodyMass[7] = 0.1f;
+            RealBodyMass[8] = 0.047f;
+            RealBodyMass[9] = 0.1f;
+            RealBodyMass[10] = 0.047f;
 
             //Hips
             G_Hips = new GameObject("Hips");
