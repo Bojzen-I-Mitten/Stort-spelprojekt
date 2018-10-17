@@ -20,7 +20,7 @@ namespace thomas
 #ifdef _EDITOR
 			editor::EditorCamera::Instance()->UnselectObject(this);
 #endif
-			Object::Destroy(this);
+			Object::Destroy();
 		}
 
 		GameObject * GameObject::Find(std::string type)
@@ -64,11 +64,11 @@ namespace thomas
 
 			return true;
 		}
-		/* Destroy the component referenced to in the pointer.
-		 comp_ptr	<<	Component to destroy
+		/* Remove the component referenced to in the pointer.
+		 comp_ptr	<<	Component to remove
 		 return		>>	0 if component was found and removed.
 		*/
-		int GameObject::DestroyComponent(void * comp_ptr)
+		int GameObject::RemoveComponent(void * comp_ptr)
 		{
 			for (int i = 0; i < m_components.size(); i++)
 			{

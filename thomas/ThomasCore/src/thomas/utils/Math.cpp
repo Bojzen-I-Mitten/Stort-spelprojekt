@@ -186,6 +186,24 @@ namespace DirectX
 				m.Up().Length(),
 				m.Forward().Length());
 		}
+		/* Normalize each row vector in the topleft 3x3 matrix
+		*/
+		Matrix normalizeBasisAxis(Matrix m)
+		{
+			float len = 1.f / std::sqrtf(m._11 * m._11 + m._12 * m._12 + m._13 * m._13);
+			m._11 *= len;
+			m._12 *= len;
+			m._13 *= len;
+			len = 1.f / std::sqrtf(m._21 * m._21 + m._22 * m._22 + m._23 * m._23);
+			m._21 *= len;
+			m._22 *= len;
+			m._23 *= len;
+			len = 1.f / std::sqrtf(m._31 * m._31 + m._32 * m._32 + m._33 * m._33);
+			m._31 *= len;
+			m._32 *= len;
+			m._33 *= len;
+			return m;
+		}
 		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
 		*/
 		Matrix& mult(Matrix &m, Vector3 scalars)

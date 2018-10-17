@@ -40,12 +40,16 @@ namespace ThomasEngine {
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
 
-		virtual void OnDestroy();
 
 		static void Destroy(Object^ object) { object->Destroy(); }
 		
 		virtual void Destroy();
 
+	protected:
+		
+		virtual void OnDestroy() {};
+
+	public:
 		static Object^ GetObject(thomas::object::Object* ptr);
 
 
