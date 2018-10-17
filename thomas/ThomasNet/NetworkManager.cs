@@ -240,7 +240,7 @@ namespace ThomasEngine.Network
             Diagnostics();
         }
 
-        public override void OnDestroy()
+        protected override void OnDestroy()
         {
             if (NetManager != null)
             {

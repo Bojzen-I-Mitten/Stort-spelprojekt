@@ -36,6 +36,9 @@ namespace DirectX
 		/* Extract the length of each axis in the top-left 3x3 matrix.
 		*/
 		Vector3 extractAxisScale(const Matrix& m);
+		/* Normalize each row vector in the topleft 3x3 matrix
+		*/
+		Matrix normalizeBasisAxis(Matrix m);
 		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
 		*/
 		Matrix& mult(Matrix &m, Vector3 scalars);
