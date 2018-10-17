@@ -112,7 +112,6 @@ public class ChadControls : NetworkComponent
     #region Camera Controls
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
-        Debug.Log("Cam");
         if (camera)
         {
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
@@ -131,7 +130,6 @@ public class ChadControls : NetworkComponent
 
     public void FreeLookCamera(float velocity, float xStep, float yStep)
     {
-        Debug.Log("Free");
         if (camera)
         {
             TotalXStep -= ThomasEngine.MathHelper.ToRadians(xStep * CameraSensitivity_x);
@@ -147,7 +145,6 @@ public class ChadControls : NetworkComponent
 
     public void ThrowingCamera(float velocity, float xStep, float yStep)
     {
-        Debug.Log("Throw");
         if (camera)
         {
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
