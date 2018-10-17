@@ -109,6 +109,12 @@ namespace thomas {
 				return _pose[bone];
 			}
 
+			math::Matrix AnimatedSkeleton::getBoneOrientation(unsigned int bone) const
+			{
+				assert(bone < _pose.size());
+				return math::normalizeBasisAxis(_pose[bone]);
+			}
+
 			bool AnimatedSkeleton::getBoneIndex(uint32_t boneNameHash, unsigned int &boneIndex) const
 			{
 				return _ref.findBoneIndex(boneNameHash, boneIndex);

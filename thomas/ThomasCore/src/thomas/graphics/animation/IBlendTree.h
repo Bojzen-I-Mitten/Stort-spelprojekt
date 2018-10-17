@@ -34,9 +34,12 @@ namespace thomas {
 				/* Get the number of bones
 				*/
 				virtual unsigned int boneCount() const = 0;
-				/* Get the pose transform of a bone
+				/* Get the unmodified pose transform of a bone
 				*/
 				virtual const math::Matrix& getBoneMatrix(unsigned int bone) const = 0;
+				/* Get the bone orientation matrix with normalized basis vectors
+				*/ 
+				virtual math::Matrix getBoneOrientation(unsigned int bone) const = 0;
 				virtual const std::string& getBoneName(unsigned int bone) const = 0;
 				virtual const Bone& getBoneInfo(unsigned int bone) = 0;
 				virtual bool getBoneIndex(uint32_t boneNameHash, unsigned int & boneIndex) const = 0;

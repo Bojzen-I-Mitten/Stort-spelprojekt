@@ -45,18 +45,6 @@ namespace thomas {
 				void blendFrameTo(TransformComponents * result, WeightTripple * weights);
 
 				void calcFrame(unsigned int index, TransformComponents & comp);
-
-
-
-
-
-				/* Recalculates the end time when animation is looped */
-				void loopRefit();
-				/* Set the animation from the name, returns true if animation found */
-				//bool setAnim(const std::string& name, PlayType runType);
-				/* Pose the skeleton at the specific point of animation. Blends into the pose over the animation time specified. */
-				bool setAnimPose(const std::string& name, float poseAt, float animTime);
-
 			};
 		}
 	}
