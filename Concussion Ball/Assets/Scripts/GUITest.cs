@@ -86,13 +86,30 @@ public class GUITest : ScriptComponent
 
         if (Camera.OnImageClicked("Join"))
         {
-            if (IPText != "")
+            if (IPText != "" && PortText != "")
+            {
                 Debug.Log("Join lobby");
+            }
+            else
+            {
+                if(IPText == "")
+                    Camera.SetImageColor("TextBoxIP", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                if(PortText == "")
+
+                    Camera.SetImageColor("TextBoxPort", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+            }
+                
         }
         if (Camera.OnImageClicked("Host"))
         {
             if (PortText != "")
+            {
                 Debug.Log("Host lobby");
+            }
+            else
+            {
+                Camera.SetImageColor("TextBoxPort", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+            }
         }
 
         Camera.SetText("IPText", IPText);
