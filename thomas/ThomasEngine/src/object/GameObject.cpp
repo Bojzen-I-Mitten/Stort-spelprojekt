@@ -91,7 +91,8 @@ namespace ThomasEngine {
 			completed = true;
 			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-				completed = gameObject->InitComponents(playing) && completed;
+				if(gameObject->GetActive())
+					completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
 	}
@@ -160,6 +161,7 @@ namespace ThomasEngine {
 
 	void GameObject::Destroy()
 	{
+		
 		if (m_isDestroyed)
 			return;
 		ThomasWrapper::Selection->UnSelectGameObject(this);
@@ -167,6 +169,7 @@ namespace ThomasEngine {
 		
 		// Remove object
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		ThomasWrapper::RenderFinished->WaitOne();
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 		// Destroy

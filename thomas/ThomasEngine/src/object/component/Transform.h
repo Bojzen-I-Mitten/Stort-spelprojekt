@@ -54,6 +54,13 @@ namespace ThomasEngine
 			Matrix get();
 			void set(Matrix value);
 		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Matrix local_world
+		{
+			Matrix get();
+			void set(Matrix value);
+		}
 
 
 		[DisplayNameAttribute("position")]

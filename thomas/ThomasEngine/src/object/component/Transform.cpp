@@ -45,6 +45,15 @@ namespace ThomasEngine
 		OnPropertyChanged("localEulerAngles");
 		OnPropertyChanged("localScale");
 	}
+	Matrix Transform::local_world::get() { return Utility::Convert(trans->GetLocalWorldMatrix()); }
+	void Transform::local_world::set(Matrix value)
+	{
+		trans->SetLocalMatrix(Utility::Convert(value));
+		OnPropertyChanged("localPosition");
+		OnPropertyChanged("localEulerAngles");
+		OnPropertyChanged("localScale");
+	}
+
 
 	Vector3 Transform::position::get() { return Utility::Convert(trans->GetPosition()); }
 	void Transform::position::set(Vector3 value) { trans->SetPosition(Utility::Convert(value)); OnPropertyChanged("localPosition"); }
@@ -80,7 +89,7 @@ namespace ThomasEngine
 
 	void Transform::SetParent(Transform ^ value)
 	{
-		SetParent(value, false);
+		SetParent(value, true);
 	}
 	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
 	{
