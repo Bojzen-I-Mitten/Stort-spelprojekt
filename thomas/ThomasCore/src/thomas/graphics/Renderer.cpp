@@ -11,9 +11,11 @@
 #include "..\editor\gizmos\Gizmos.h"
 #include "..\editor\EditorCamera.h"
 #include "..\WindowManager.h"
+#include "..\graphics\LightManager.h"
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "ParticleSystem.h"
 
 namespace thomas
 {
@@ -37,6 +39,7 @@ namespace thomas
 		Renderer::Renderer()
 			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
 		{
+			
 		}
 
 		Renderer* Renderer::Instance()
@@ -108,6 +111,9 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
+
+			//ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			//m_particleSystem->UpdateParticleSystem();
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -122,17 +128,37 @@ namespace thomas
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
+
+				
+				//m_particleSystem->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
+
+			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			if (editor::EditorCamera::Instance())
+			{
+				BindCamera(editor::EditorCamera::Instance()->GetCamera());
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+			}
+			for (object::component::Camera* cam : object::component::Camera::s_allCameras)
+			{
+				BindCamera(cam);
+				ParticleSystem::GetGlobalSystem()->DrawParticles();
+			}
+			profiler->Timestamp(profiling::GTS_PARTICLES);
+			
+
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
-				editor::Gizmos::RenderGizmos();
+				editor::Gizmos::Gizmo().RenderGizmos();
 			}
+
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
 		}
 
 	}
 }
+
 

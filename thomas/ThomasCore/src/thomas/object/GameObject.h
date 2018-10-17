@@ -50,7 +50,12 @@ namespace thomas
 			void SetActive(bool active);
 			void SetSelection(bool selected);
 			bool GetSelection();
-			
+
+			/* Remove the component referenced to in the pointer.
+			 comp_ptr	<<	Component to remove
+			 return		>>	0 if component was found and removed.
+			*/
+			int RemoveComponent(void * comp_ptr);
 		public:
 			std::vector<component::Component*> m_components;
 			component::Transform* m_transform = nullptr;

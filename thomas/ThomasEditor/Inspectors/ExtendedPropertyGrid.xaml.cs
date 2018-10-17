@@ -27,6 +27,7 @@ namespace ThomasEditor
                 InitializeComponent();
             }
 
+
             private void PropertyGrid_Loaded(object sender, RoutedEventArgs e)
             {
                 PropertyGrid grid = sender as PropertyGrid;

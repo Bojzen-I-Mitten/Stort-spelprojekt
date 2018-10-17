@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "../../GameObject.h"
+#include "Rigidbody.h"
 namespace thomas
 {
 	namespace object

@@ -23,10 +23,11 @@ namespace thomas
 
 		GameObject::~GameObject()
 		{
-			Object::Destroy(this);
+			this->m_components.clear();
 #ifdef _EDITOR
 			editor::EditorCamera::Instance()->UnselectObject(this);
 #endif
+			Object::Destroy();
 			this->m_components.clear();
 		}
 
@@ -44,7 +45,7 @@ namespace thomas
 			m_name = std::move(move.m_name);
 			m_selected = std::move(move.m_selected);
 			
-			object::Object::Add(this);
+			//object::Object::Add(this);
 			for (auto& it : m_components)
 			{
 				it->m_gameObject = this;
@@ -117,6 +118,24 @@ namespace thomas
 
 			return true;
 		}
+		/* Remove the component referenced to in the pointer.
+		 comp_ptr	<<	Component to remove
+		 return		>>	0 if component was found and removed.
+		*/
+		int GameObject::RemoveComponent(void * comp_ptr)
+		{
+			for (int i = 0; i < m_components.size(); i++)
+			{
+				if (m_components[i] == comp_ptr)
+				{
+					// Swap out element at end.
+					std::swap(m_components[i], m_components.back());
+					m_components.pop_back();
+					return 0;
+				}
+			}
+			return 1;
+		}
 
 		void GameObject::Destroy()
 		{
@@ -164,5 +183,6 @@ namespace thomas
 		{
 			return m_selected;
 		}
+
 	}
 }

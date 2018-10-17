@@ -126,6 +126,25 @@ namespace ThomasEngine
 		{
 			Vector3 get();
 		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Vector3 local_forward
+		{
+			Vector3 get();
+		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Vector3 local_up
+		{
+			Vector3 get();
+		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Vector3 local_right
+		{
+			Vector3 get();
+		}
+
 
 		void LookAt(Transform^ target);
 
@@ -144,6 +163,8 @@ namespace ThomasEngine
 
 		void SetParent(Transform^ value);
 		void SetParent(Transform^ value, bool worldPositionStays);
+
+		void Orient(Vector3 forward, Vector3 up);
 
 		void OnDestroy() override;
 		void Update() override;

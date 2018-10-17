@@ -17,10 +17,11 @@ namespace thomas {
 			{
 			}
 
-			void BoneChildTransformConstraint::execute(Skeleton& skel, math::Matrix* objectPose, uint32_t boneInd)
+			void BoneChildTransformConstraint::execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
+				math::Vector3 s = math::extractAxisScale(objectPose[boneInd]);
 				// If (transform is childTransform)
-				objectPose[boneInd] = math::Matrix::CreateScale(0.01f) * m_ref->GetLocalWorldMatrix();
+				objectPose[boneInd] = math::mult(m_ref->GetLocalWorldMatrix(), s);
 
 				// If (Transform is World)
 				//objectPose[boneInd] = m_ref->getWorldMatrix() * /* object world inverse... */ * objectPose[skel.getBone(boneInd)._parentIndex].Invert();

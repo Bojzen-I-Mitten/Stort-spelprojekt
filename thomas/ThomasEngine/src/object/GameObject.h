@@ -20,9 +20,12 @@ namespace ThomasEngine
 		
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
-		Scene^ scene;
+		uint32_t m_scene_id;
 
 		GameObject();
+		virtual ~GameObject();
+
+		void Delete();
 
 		bool InitComponents(bool playing);
 
@@ -73,7 +76,7 @@ namespace ThomasEngine
 		static void toBeStatic();
 		property bool inScene {
 			bool get() {
-				return scene != nullptr;
+				return m_scene_id; // != 0
 			}
 		}
 
