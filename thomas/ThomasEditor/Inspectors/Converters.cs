@@ -136,7 +136,7 @@ namespace ThomasEditor.Converters
             
             System.Windows.Media.Color mediaColor = (System.Windows.Media.Color)value;
 
-            return new Color(mediaColor.ScR, mediaColor.ScG, mediaColor.ScB, mediaColor.ScA); 
+            return new Color(mediaColor.R, mediaColor.G, mediaColor.B, mediaColor.A); 
 
         }
     }

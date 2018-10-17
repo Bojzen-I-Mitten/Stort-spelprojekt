@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "../../GameObject.h"
+#include "Rigidbody.h"
 namespace thomas
 {
 	namespace object
@@ -8,12 +9,14 @@ namespace thomas
 		{
 			Collider::Collider()
 			{
+				m_scaling = math::Vector3(1.0f, 1.0f, 1.0f);
 				m_center = math::Vector3(0, 0, 0);
 			}
 
 			Collider::Collider(btCollisionShape * collisionShape)
 			{
 				m_center = math::Vector3(0, 0, 0);
+				m_scaling = math::Vector3(1.0f, 1.0f, 1.0f);
 				m_collisionShape = collisionShape;
 				m_collisionShape->setMargin(0);
 			}
@@ -114,7 +117,7 @@ namespace thomas
 			void Collider::Update()
 			{
 				
-				m_collisionShape->setLocalScaling((btVector3&)m_gameObject->m_transform->GetScale());
+				m_collisionShape->setLocalScaling((btVector3&)(m_scaling*m_gameObject->m_transform->GetScale()));
 				
 				if (m_collisionObject)
 				{
