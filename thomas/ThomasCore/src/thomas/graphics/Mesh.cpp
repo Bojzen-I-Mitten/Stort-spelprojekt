@@ -12,7 +12,7 @@ namespace thomas
 			m_bounds = GenerateBounds();
 		}
 
-		void Mesh::Draw(resource::Shader * shader)
+		void Mesh::BindBuffers(resource::Shader* shader)
 		{
 			std::vector<utils::buffers::VertexBuffer*> vertexBuffers;
 
@@ -20,7 +20,7 @@ namespace thomas
 			for (auto semantic : shader->GetCurrentPass().inputSemantics)
 			{
 				if (m_data.vertexBuffers.find(semantic) != m_data.vertexBuffers.end())
-					vertexBuffers.push_back(m_data.vertexBuffers[semantic].get());			
+					vertexBuffers.push_back(m_data.vertexBuffers[semantic].get());
 			}
 
 			//Set buffers and draw mesh
@@ -29,10 +29,15 @@ namespace thomas
 			if (m_data.indexBuffer)
 			{
 				shader->BindIndexBuffer(m_data.indexBuffer.get());
-				/*shader->DrawIndexed(GetIndexCount(), 0, 0);*/
 			}
-			/*else
-				shader->Draw(m_data.vertices.positions.size(), 0);*/
+		}
+
+		void Mesh::Draw(resource::Shader* shader, int instanceCount)
+		{
+			if (m_data.indexBuffer)
+				shader->DrawIndexedInstance(GetIndexCount(), instanceCount);
+			else
+				shader->DrawInstance(GetVertexCount(), instanceCount);
 		}
 
 		void Mesh::SetName(const std::string & name)

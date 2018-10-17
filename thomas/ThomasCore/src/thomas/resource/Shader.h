@@ -74,6 +74,8 @@ namespace thomas
 			void Bind();
 			void Draw(UINT vertexCount, UINT startVertexLocation);
 			void DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation);
+			void DrawIndexedInstance(UINT indexCount, int instanceCount);
+			void DrawInstance(UINT vertexCount, int instanceCount);
 			std::vector<ShaderPass>* GetPasses();
 			void SetPass(int passIndex);
 			ShaderPass& GetCurrentPass();

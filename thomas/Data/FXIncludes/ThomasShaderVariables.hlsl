@@ -41,8 +41,8 @@ cbuffer ThomasPerCamera
 
 cbuffer ThomasPerObject
 {
-	float4x4 thomas_ObjectToWorld[100];
-	float4x4 thomas_WorldToObject[100];
+	float4x4 thomas_ObjectToWorld[50];
+	float4x4 thomas_WorldToObject[50];
 	float4x4 thomas_Bone_Array[120];
 };
 

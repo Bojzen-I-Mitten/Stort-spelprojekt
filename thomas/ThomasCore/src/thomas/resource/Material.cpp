@@ -373,11 +373,7 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
-		void Material::DrawInstanced(graphics::Mesh* mesh, int count)
-		{
-			utils::D3D::Instance()->GetDeviceContext()->DrawIndexedInstanced(mesh->GetIndexCount(), count, 0, 0, 0);
-		}
-		void Material::Draw(graphics::Mesh* mesh)
+		void Material::BindMesh(graphics::Mesh* mesh)
 		{
 			Lock();
 			for (Pass p : m_passes)
@@ -385,8 +381,21 @@ namespace thomas
 				if (p.enabled)
 				{
 					m_shader->SetPass(p.index);
-					mesh->Draw(m_shader);
-					
+					mesh->BindBuffers(m_shader);
+				}
+			}
+			Unlock();
+		}
+		void Material::Draw(graphics::Mesh* mesh, int instanceCount)
+		{
+			Lock();
+			for (Pass p : m_passes)
+			{
+				if (p.enabled)
+				{
+					m_shader->SetPass(p.index);
+					mesh->Draw(m_shader, instanceCount);
+
 				}
 			}
 			Unlock();

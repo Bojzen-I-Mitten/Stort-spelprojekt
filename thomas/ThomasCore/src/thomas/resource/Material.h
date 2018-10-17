@@ -36,6 +36,7 @@ namespace thomas
 			~Material();
 
 			void Bind();
+			void BindMesh(graphics::Mesh * mesh);
 			std::shared_ptr<shaderproperty::ShaderProperty> GetProperty(const std::string& name);
 			void SetShader(resource::Shader* shader);
 			resource::Shader* GetShader();
@@ -72,8 +73,7 @@ namespace thomas
 			void SetShaderPass(int index);
 			void SetShaderPass(std::string name);
 
-			void DrawInstanced(graphics::Mesh* mesh, int count);
-			void Draw(graphics::Mesh* mesh);
+			void Draw(graphics::Mesh* mesh, int instanceCount);
 			void Draw(UINT vertexCount, UINT startVertexLocation);
 
 			std::map<std::string, std::shared_ptr<shaderproperty::ShaderProperty>> GetEditorProperties();

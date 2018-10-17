@@ -141,17 +141,19 @@ namespace thomas
 					material->Bind();
 
 					int count = 0;
-					math::Matrix matrix[100];
+					math::Matrix matrix[50];
+					math::Matrix matrixInverse[50];
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
 						matrix[count] = perMeshCommand.worldMatrix.Transpose();
+						matrix[count] = perMeshCommand.worldMatrix.Invert();
 						count++;
 					}
 
 					BindObject(perMaterialQueue.second[0], count, matrix);
-					//BindObjectInverse(perMaterialQueue.second[0], 1, &perMaterialQueue.second[0].worldMatrix.Invert());
-					material->Draw(perMaterialQueue.second[0].mesh);
-					material->DrawInstanced(perMaterialQueue.second[0].mesh, count);
+					BindObjectInverse(perMaterialQueue.second[0], count, matrixInverse);
+					material->BindMesh(perMaterialQueue.second[0].mesh);
+					material->Draw(perMaterialQueue.second[0].mesh, count);
 				}
 
 				ParticleSystem::GetGlobalSystem()->DrawParticles();

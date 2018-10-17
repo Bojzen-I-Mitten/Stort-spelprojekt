@@ -301,6 +301,17 @@ namespace thomas
 			thomas::utils::D3D::Instance()->GetDeviceContext()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
 			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount);
 		}
+		void Shader::DrawIndexedInstance(UINT indexCount, int instanceCount)
+		{
+			utils::D3D::Instance()->GetDeviceContext()->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount);
+
+		}
+		void Shader::DrawInstance(UINT vertexCount, int instanceCount)
+		{
+			utils::D3D::Instance()->GetDeviceContext()->DrawInstanced(vertexCount, instanceCount, 0, 0);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount);
+		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{
 			return &m_passes;
