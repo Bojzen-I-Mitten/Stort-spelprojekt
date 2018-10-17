@@ -15,8 +15,8 @@ public class NetworkPlayer : NetworkComponent
     Material mat;
     public override void Start()
     {
-        //mat = (gameObject.GetComponent<RenderComponent>().material = new Material(gameObject.GetComponent<RenderComponent>().material));
-        
+        mat = (gameObject.GetComponent<RenderComponent>().material = new Material(gameObject.GetComponent<RenderComponent>().material));
+        mat?.SetColor("color", Team.Color);
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -36,13 +36,22 @@ public class NetworkPlayer : NetworkComponent
         if(Team != newTeam)
             JoinTeam(newTeam);
     }
-
-
-
+    
     public void JoinTeam(TEAM_TYPE teamType)
     {
-        Team newTeam = MatchSystem.instance.FindTeam(teamType);
+        RPCJoinTeam((int)teamType);
+        SendRPC("RPCJoinTeam", (int)teamType);
+    }
+
+    public void RPCJoinTeam(int teamType)
+    {
+        Team newTeam = MatchSystem.instance.FindTeam((TEAM_TYPE)teamType);
         JoinTeam(newTeam);
+    }
+
+    public void OnRoundStart()
+    {
+        mat?.SetColor("color", Team.Color);
     }
 
     public void JoinTeam(Team team)
@@ -52,7 +61,6 @@ public class NetworkPlayer : NetworkComponent
         if (team != null)
         {
             team.AddPlayer(this);
-           // mat?.SetColor("color", team.Color);
         }
             
         this._Team = team;

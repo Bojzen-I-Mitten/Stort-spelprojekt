@@ -100,22 +100,11 @@ namespace ThomasEngine
 			);
 		}
 
-		//Converters for ray, boundingBox, boundingSphere, boundingFrustrum
 		static thomas::math::Ray Convert(const Ray% value)
 		{
 			return thomas::math::Ray(
 				thomas::math::Vector3(value.Position.x, value.Position.y, value.Position.z),
 				thomas::math::Vector3(value.Direction.x, value.Direction.y, value.Direction.z));
-		}
-
-		static thomas::math::BoundingBox Convert(const BoundingBox% value)
-		{
-			thomas::math::BoundingBox box;
-			thomas::math::BoundingBox::CreateFromPoints(box,
-				thomas::math::Vector3(value.Min.x, value.Min.y, value.Min.z),
-				thomas::math::Vector3(value.Max.x, value.Max.y, value.Max.z));
-
-			return box;
 		}
 
 		static thomas::math::BoundingSphere Convert(const BoundingSphere% value)

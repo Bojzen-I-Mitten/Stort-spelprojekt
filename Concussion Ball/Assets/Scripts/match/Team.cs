@@ -12,7 +12,6 @@ public class Team
 {
     private List<NetworkPlayer> _Players;
     private TeamSpawn _SpawnArea;
-    private TeamGoal _GoalArea;
     private int _Score;
 
     public TEAM_TYPE TeamType;
@@ -35,9 +34,30 @@ public class Team
     }
 
     public void SetSpawnArea(TeamSpawn spawn) { _SpawnArea = spawn; }
-    public void SetGoalArea(TeamGoal goal) { _GoalArea = goal; }
+    //public void SetGoalArea(TeamGoal goal) { _GoalArea = goal; }
 
 
+    public void OnRoundStart()
+    {
+        Players.ForEach((player) => 
+        {
+            switch (TeamType)
+            {
+                case TEAM_TYPE.UNASSIGNED:
+                case TEAM_TYPE.TEAM_SPECTATOR:
+                    player.gameObject.SetActive(false);
+                    break;
+                case TEAM_TYPE.TEAM_1:
+                case TEAM_TYPE.TEAM_2:
+                    player.gameObject.SetActive(true);
+                    if(player.isOwner)
+                        player.gameObject.transform.position = GetSpawnPosition();
+                    break;
+            }
+            player.OnRoundStart();
+        });
+        
+    }
 
 
     public Vector3 GetSpawnPosition()

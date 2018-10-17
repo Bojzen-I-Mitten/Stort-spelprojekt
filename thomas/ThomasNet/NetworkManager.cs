@@ -39,7 +39,7 @@ namespace ThomasEngine.Network
 
         public List<GameObject> SpawnablePrefabs { get; set; } = new List<GameObject>();
         public GameObject PlayerPrefab { get; set; }
- 
+
         public NetPeer LocalPeer = null;
 
         public NetPeer ResponsiblePeer = null;
@@ -67,10 +67,14 @@ namespace ThomasEngine.Network
         [Browsable(false)]
         public NetworkScene Scene { get { return NetScene; } }
 
-        public override void Awake()
+
+        public NetworkManager() : base()
         {
             instance = this;
-
+        }
+            
+        public override void Awake()
+        {
             NetScene = new NetworkScene();
             NetPacketProcessor = new NetPacketProcessor();
             Listener = new EventBasedNetListener();
@@ -150,10 +154,7 @@ namespace ThomasEngine.Network
         {
             
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
-
-            
-            
-                       
+        
             if(NetScene.Players.Count == 0) // We are new player.
             {
                 NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
@@ -299,56 +300,54 @@ namespace ThomasEngine.Network
         }
 
 
-        public void SendRPC(int netID, string methodName, object[] parameters)
+        public void SendRPC(int netID, string methodName, params object[] parameters)
         {
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);
             writer.Put(netID);
             writer.Put(methodName);
-
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                object parameter = parameters[i];
-                Type parameterType = parameters[i].GetType();
-                if (parameterType == typeof(int))
-                    writer.Put((int)parameter);
-                else if (parameterType == typeof(float))
-                    writer.Put((float)parameter);
-                else if (parameterType == typeof(bool))
-                    writer.Put((bool)parameter);
-                else if (parameterType == typeof(string))
-                    writer.Put((string)parameter);
-                else if (parameterType == typeof(Quaternion))
-                    writer.Put((Quaternion)parameter);
-                else if (parameterType == typeof(Vector2))
-                    writer.Put((Vector2)parameter);
-                else if (parameterType == typeof(Vector3))
-                    writer.Put((Vector3)parameter);
-                else if (parameterType == typeof(Vector4))
-                    writer.Put((Vector4)parameter);
-                else
-                {
-                    Debug.LogError("RPC error: unsupported type.");
-                    return;
-                }
-            }
+            RpcUtils.WriteRPCParameters(parameters, writer);
             InternalManager.SendToAll(writer, DeliveryMethod.ReliableOrdered);
         }
 
         private void HandleRPC(NetPacketReader reader, NetPeer peer)
         {
             int netID = reader.GetInt();
-
-            NetworkIdentity identity;
-            if (netID != -1)
-                identity = NetScene.FindNetworkObject(netID);
+            if(netID == -2) //RPC from here
+            {
+                string methodName = reader.GetString();
+                Type t = this.GetType();
+                System.Reflection.MethodInfo methodInfo = t.GetMethod(methodName);
+                if(methodInfo == null)
+                {
+                    Debug.LogError("RPC: Method: " + methodName + " does not exist.");
+                }else
+                {
+                    object[] parameters = RpcUtils.ReadRPCParameters(methodInfo, reader);
+                    methodInfo.Invoke(this, parameters);
+                }
+            }
             else
-                identity = NetScene.Players[peer];
-
-            identity.ReadRPC(reader);
+            {
+                NetworkIdentity identity;
+                if (netID > 0) //RPC from object
+                {
+                    identity = NetScene.FindNetworkObject(netID);
+                }
+                else //RPC from player
+                {
+                    identity = NetScene.Players[peer];
+                }
+                if(identity == null)
+                {
+                    Debug.LogError("RPC: Failed to find NetworkIdentity for ID: " + netID);
+                }else
+                    identity.ReadRPC(reader);
+            }
         }
 
+        
         private void TransferOwnedObjects()
         {
             foreach(NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])

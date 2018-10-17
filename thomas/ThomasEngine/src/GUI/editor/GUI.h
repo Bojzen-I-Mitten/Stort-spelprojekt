@@ -15,15 +15,15 @@ namespace ThomasEngine
 		static void DrawCube(Vector3 center, Vector3 size);
 		
 		static void DrawWireCube(Vector3 center, Vector3 size);
-		static void DrawBoundingBox(const BoundingBox % obb);
-		static void DrawBoundingSphere(const  BoundingSphere % sphere);
+		static void DrawBoundingBox(Vector3 center, Vector3 extends);
+		static void DrawBoundingSphere(const BoundingSphere % sphere);
 
 		static void DrawRing(Vector3 origin, Vector3 majorAxis, Vector3 minorAxis);
 		static void DrawLine(Vector3 from, Vector3 to);
 		static void DrawSphere(Vector3 center, float radius);
 		static void DrawWireSphere(Vector3 center, float radius);
 		static void DrawRay(Vector3 from, Vector3 direction);
-		static void DrawRay(Ray% ray);
+		static void DrawRay(const Ray% ray);
 
 		static void DrawFrustum(Vector3 center, float fov, float maxRange, float minRange, float aspect);
 

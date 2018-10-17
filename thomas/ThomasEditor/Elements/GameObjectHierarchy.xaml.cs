@@ -397,7 +397,6 @@ namespace ThomasEditor
                 if (m_inspector)
                 {
                     targetModel = (GameObject)(hierarchy.SelectedItem as TreeItemViewModel).Data;
-                    m_inspector = false;
                 }
                 else if (target != null)
                 {
@@ -445,7 +444,7 @@ namespace ThomasEditor
                         }
                     }
                 }
-                if (source.DataContext != null && targetModel == null)
+                if (source.DataContext != null && m_inspector == false)
                 {
                     //Check if object from hierarchy
                     if (source.DataContext.GetType() == typeof(TreeItemViewModel))
@@ -503,6 +502,7 @@ namespace ThomasEditor
                     }
                 }
             }
+            m_inspector = false;
         }
 
         private void hierarchy_MouseMove(object sender, MouseEventArgs e)

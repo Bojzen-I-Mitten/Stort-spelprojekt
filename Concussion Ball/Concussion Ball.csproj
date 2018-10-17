@@ -51,7 +51,7 @@
     <Reference Include="ThomasNet">
       <HintPath>$(THOMAS_ENGINE)\ThomasNet.dll</HintPath>
     </Reference>
-        <Reference Include="Newtonsoft.Json">
+    <Reference Include="Newtonsoft.Json">
       <HintPath>$(THOMAS_ENGINE)\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -65,6 +65,8 @@
     <Compile Include="Assets\Scripts\match\MatchSystem.cs" />
     <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
     <Compile Include="Assets\Scripts\match\Team.cs" />
+    <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
+    <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />

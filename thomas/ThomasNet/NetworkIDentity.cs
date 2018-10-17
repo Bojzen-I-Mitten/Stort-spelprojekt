@@ -23,7 +23,7 @@ namespace ThomasEngine.Network
 
         public int ID {
             get {
-                return Manager ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : -1; // One line master race.
+                return Manager ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : 0; // One line master race.
             }
         } 
 
@@ -38,10 +38,20 @@ namespace ThomasEngine.Network
             get{return NetworkManager.instance;}
         }
 
-        List<NetworkComponent> networkComponentsCache;
+        List<NetworkComponent> _networkComponentsCache;
+        List<NetworkComponent> networkComponentsCache
+        {
+            get
+            {
+                if(_networkComponentsCache == null)
+                    _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+                return _networkComponentsCache;
+
+            }
+        }
         public override void OnEnable()
         {
-            networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+            _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
         
         public override void Update()
@@ -76,10 +86,6 @@ namespace ThomasEngine.Network
                 DataWriter.Put(ID);
 
             DataWriter.Put(initalState);
-            if (networkComponentsCache == null)
-            {
-                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
-            }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 
@@ -90,10 +96,6 @@ namespace ThomasEngine.Network
 
         public void ReadData(NetPacketReader reader, bool initialState)
         {
-            if(networkComponentsCache == null)
-            {
-                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
-            }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 comp.OnRead(reader, initialState);

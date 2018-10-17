@@ -31,6 +31,7 @@ public class MatchSystem : NetworkManager
         get { return NetworkManager.instance as MatchSystem; }
     }
 
+
     public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
@@ -44,8 +45,7 @@ public class MatchSystem : NetworkManager
     public override void Start()
     {
         base.Start();
-        foreach (var team in Teams)
-            team.Value.Start();
+
 
         if(BallPrefab)
             SpawnablePrefabs.Add(BallPrefab);
@@ -88,7 +88,7 @@ public class MatchSystem : NetworkManager
     }
 
 
-    void OnRoundStart()
+    public void OnRoundStart()
     {
         ResetPlayers();
         ResetBall();
@@ -96,6 +96,7 @@ public class MatchSystem : NetworkManager
 
     void ResetBall()
     {
+        Ball.SetActive(false);
         Ball.SetActive(true);
         Ball.transform.position = new Vector3(0, 10, 0);
     }
@@ -104,24 +105,8 @@ public class MatchSystem : NetworkManager
     {
         foreach (var team in Teams)
         {
-            switch (team.Key)
-            {
-                case TEAM_TYPE.UNASSIGNED:
-                case TEAM_TYPE.TEAM_SPECTATOR:
-                    team.Value.Players.ForEach((player) =>
-                    {
-                        player.gameObject.SetActive(false);
-                    });
-                    break;
-                case TEAM_TYPE.TEAM_1:
-                case TEAM_TYPE.TEAM_2:
-                    team.Value.Players.ForEach((player) =>
-                    {
-                        player.gameObject.SetActive(true);
-                        player.gameObject.transform.position = team.Value.GetSpawnPosition();
-                    });
-                    break;
-            }
+            team.Value.OnRoundStart();
+            
         }
     }
 
@@ -142,9 +127,10 @@ public class MatchSystem : NetworkManager
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
             if (Input.GetKeyDown(Input.Keys.S))
                 localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-            if (Input.GetKeyDown(Input.Keys.Space))
+            if (Input.GetKeyDown(Input.Keys.Space)) 
             {
-
+                SendRPC(-2, "OnRoundStart");
+                OnRoundStart();
             }
         }
 

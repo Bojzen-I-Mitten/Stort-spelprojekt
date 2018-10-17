@@ -124,7 +124,7 @@ namespace thomas
 
 		void Gizmos::DrawCube(math::Vector3 center, math::Vector3 size)
 		{			
-			DrawModel(utils::Primitives::GetPrimitive(utils::Primitives::Type::Cube), center, math::Quaternion::Identity, size);
+			//DrawModel(utils::Primitives::GetPrimitive(utils::Primitives::Type::Cube), center, math::Quaternion::Identity, size);
 		}
 
 		void Gizmos::DrawWireCube(math::Vector3 center, math::Vector3 size)

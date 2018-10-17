@@ -105,7 +105,7 @@ namespace ThomasEngine.Network
 
         public int AddObject(NetworkIdentity identity)
         {
-            NetworkObjects.Add(nextAssignableID++, identity);
+            NetworkObjects.Add(++nextAssignableID, identity);
             return nextAssignableID;
         }
 

@@ -12,7 +12,6 @@
     <xceed:InverseBoolConverter x:Key="InverseBoolConverter" />
     <xceed:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
     <xceed:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
-    <xceed:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
     <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
 
     <SolidColorBrush x:Key="MouseOverBorderBrush" Color="#FFFFB700" />
