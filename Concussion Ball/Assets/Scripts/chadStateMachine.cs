@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
@@ -40,6 +41,7 @@ public class ChadStateMachine : NetworkComponent
 
     private bool m_ragdolling = false;
     private bool m_isTackled = false;
+    private bool m_tackling = false;
     private float m_chargeForce = 2.0f;
     private float m_maxForce = 10.0f;
 
@@ -55,6 +57,25 @@ public class ChadStateMachine : NetworkComponent
             return _chadControls;
         }
         set { _chadControls = value; }
+    }
+
+    //Coroutine for jumping delay, also used for tackling delay
+    IEnumerator DivingCoroutine()
+    { 
+        m_chadControls.HandleMovement(m_maxSpeed, 0);
+
+        yield return new WaitForSeconds(1.0f);
+        m_velocity = BaseSpeed;
+        m_state = CHAD_STATE.IDLE;
+
+        //if (tackling)
+        //{
+        //    transform.Rotate(0.0f, 0.5f, 0.0f);
+        //    tackling = false;
+        //    //test.fieldOfView = 70;
+        //}
+        //yield return new WaitForSeconds(0.2f);
+
     }
 
     public override void Start()
@@ -410,12 +431,9 @@ public class ChadStateMachine : NetworkComponent
 
             case CHAD_STATE.DIVING:
                 Weights[Chadimations.STATE.DIVING] = 1;
+                StartCoroutine(DivingCoroutine());
+                m_tackling = true;
                 m_animations.SetAnimations(Weights);
-                // chadMovement.JUMP() // gets player camera forward and launches him in that direction
-
-                // do we want to this to also set state to ragdoll?
-                // if !chadMovement.is_jumping 
-                //      m_state = State.IDLE;
                 break;
 
             case CHAD_STATE.RAGDOLL:

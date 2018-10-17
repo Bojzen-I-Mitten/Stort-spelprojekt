@@ -1,7 +1,4 @@
-﻿/* TODO: 
- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
@@ -16,7 +13,6 @@ public class ChadControls : NetworkComponent
     public float baseThrowForce { get; set; } = 5.0f;
     public float maxThrowForce { get; set; } = 20.0f;
 
-    //public int Speed { get; set; } = 5;
     public float Force { get; set; } = 5;
     public float CameraSensitivity_x { get; set; } = 10;
     public float CameraSensitivity_y { get; set; } = 20;
@@ -38,8 +34,6 @@ public class ChadControls : NetworkComponent
     private Quaternion FreeLookDirection;
     Rigidbody rBody;
 
-    //Camera test;
-
     private Ball Ball = null;
     public bool HasBall = false;
     // private bool canPickupBall = true;
@@ -51,65 +45,22 @@ public class ChadControls : NetworkComponent
     public override void Start()
     {
         rBody = gameObject.GetComponent<Rigidbody>();
-        //test = camPrefab.GetComponent<Camera>();
-        //if (!isOwner && camera)
-        //{
-        //    camera.enabled = false;
-        //    initalCameraPos = camera.transform.localPosition;
-        //}
-
 
         if (!camera)
             Debug.LogWarning("Camera not set for player");
 
-        //rBody.IsKinematic = !isOwner;
         throwForce = baseThrowForce;
         Ball = GetObjectsOfType<Ball>().FirstOrDefault();
     }
 
-    //Coroutine for jumping delay, also used for tackling delay
-    IEnumerator JumpingCoroutine()
+    public override void Update()
     {
-        jumpDelay = false;
-        Debug.Log("Started jumping.");
-        rBody.AddForce(new Vector3(0.0f, Force, 0.0f), Rigidbody.ForceMode.Impulse);
-        yield return new WaitForSeconds(1.0f);
-
-            if (tackling)
-            {
-                transform.Rotate(0.0f, 0.5f, 0.0f);
-                tackling = false;
-                //test.fieldOfView = 70;
-            }
-            yield return new WaitForSeconds(0.2f);
-            jumpDelay = true;
-            jumping = false;
-        }
-
-        public override void Update()
-        {
             
-        }
-
-        public bool Jump()
-        {
-            //StartCoroutine(JumpingCoroutine());
-
-            return false;
-        }
+    }
 
     public void HandleMovement(float velocityForward, float velocityStrafe)
     {
         transform.position += (transform.forward * velocityForward + transform.right * velocityStrafe) * Time.DeltaTime;
-        //if (Input.GetKey(Input.Keys.W))
-        //    transform.position += transform.forward * Speed * Time.DeltaTime;
-        //else if (Input.GetKey(Input.Keys.S))
-        //    transform.position -= transform.forward * Speed * Time.DeltaTime;
-
-        //else if (Input.GetKey(Input.Keys.D))
-        //    transform.position += transform.right * Speed * Time.DeltaTime;
-        //else if (Input.GetKey(Input.Keys.A))
-        //    transform.position -= transform.right * Speed * Time.DeltaTime;
     }
 
     #region Camera Controls
