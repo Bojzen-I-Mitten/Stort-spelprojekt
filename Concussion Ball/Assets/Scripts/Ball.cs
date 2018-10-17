@@ -47,8 +47,8 @@ public class Ball : NetworkComponent
 
         ResetFireEmitters();
         ResetElectricityEmitters();
-        fireIntensityreThreshold = 0;
-        electricityIntensifyerThreshold = 0;
+        fireIntensityreThreshold = 0.6f;
+        electricityIntensifyerThreshold = 0.6f;
 
 
         MultiplyWithIntensity((float)(0.5f), emitterElectricity1);
@@ -179,10 +179,11 @@ public class Ball : NetworkComponent
             MultiplyWithIntensity(0.5f, emitterSmoke);
         }
 
-        if (time > 2.0f)
+        if (time > 1.4f)
         {
             ResetFireEmitters();
-               
+            emitterFire.Emit = false;
+            emitterSmoke.Emit = false;
         }
     }
 
@@ -248,7 +249,7 @@ public class Ball : NetworkComponent
             emitterFire.Emit = true;
             emitterSmoke.Emit = true;
 
-            fireIntensityreThreshold = 1.0f;
+            fireIntensityreThreshold = 0.6f;
             // Reset values
             chargeTimeCurrent = 0;
             ResetElectricityEmitters();
