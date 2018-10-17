@@ -11,9 +11,9 @@ namespace InputIP
 
     public class InputGUI
     {
-        public static void AppendIPString(ref string IP)
+        public static void AppendIPString(ref string IP, int length)
         {
-            if (IP.Length < 15)
+            if (IP.Length < length)
             {
                 if (Input.GetKeyUp(Input.Keys.OemPeriod))
                 {

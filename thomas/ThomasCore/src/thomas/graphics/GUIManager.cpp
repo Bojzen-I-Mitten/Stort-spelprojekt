@@ -11,27 +11,22 @@ namespace thomas
 		GUIManager::GUIManager() :
 		m_spriteBatch(nullptr)
 		{
-			m_spriteBatch = new SpriteBatch(utils::D3D::Instance()->GetDeviceContext());
-			m_defaultFont = new Font("../Data/Fonts/CourierNew.spritefont");
+			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+			m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
+			m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
 		}
 
 		void GUIManager::Destroy()
 		{
 			m_images.clear();
-
-			delete m_defaultFont;
-			m_defaultFont = nullptr;
-
-			delete m_spriteBatch;
-			m_spriteBatch = nullptr;
 		}
 
 		void GUIManager::Render()
 		{
-			// Begin
 			if (m_spriteBatch != nullptr)
 			{
-				m_spriteBatch->Begin();
+				// Begin
+				m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
 
 				for (const auto& image : m_images)
 				{
@@ -41,7 +36,7 @@ namespace thomas
 
 				for (const auto& text : m_texts)
 				{
-					text.second.font->DrawGUIText(m_spriteBatch, text.second.text, text.second.position, text.second.scale, 
+					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position, text.second.scale, 
 												  text.second.color, text.second.rotation);
 				}
 
@@ -140,7 +135,7 @@ namespace thomas
 				if (image.interact)
 				{
 					// Construct boundaries
-					// Note: if origin has to be changed from (0, 0) this also has to be taken into account when constructing the boundaries!
+					// Note: If origin has to be changed from (0, 0) this also has to be taken into account when constructing the boundaries!
 					Vector2 mousePos = window->GetInput()->GetMousePosition();
 					Rect rect = { image.position.x,
 								  image.position.x + image.texture->GetWidth() * image.scale.x,
@@ -162,7 +157,7 @@ namespace thomas
 		}
 
 		// Text
-		GUIManager::Text & GUIManager::GetText(const std::string& id)
+		GUIManager::Text& GUIManager::GetText(const std::string& id)
 		{
 			auto found = m_texts.find(id);
 
@@ -173,14 +168,22 @@ namespace thomas
 			return found->second;
 		}
 
-		void GUIManager::AddText(const std::string& id, std::string text, const Vector2& position,
+		void GUIManager::AddText(const std::string& id, const std::string& text, const Vector2& position,
 								 const Vector2& scale, float rotation, const Vector4& color, Font* font)
 		{
 			if (font == nullptr)
-				font = m_defaultFont;
+			{
+				font = m_defaultFont.get();
+			}
 
 			Text newText = { font, text, position, scale, color, rotation };
 			m_texts.insert(std::make_pair(id, newText));
+		}
+
+		void GUIManager::SetText(const std::string& id, const std::string& newText)
+		{
+			auto& text = GetText(id);
+			text.text = newText;
 		}
 
 		void GUIManager::SetTextPosition(const std::string& id, const Vector2& position)
@@ -206,11 +209,10 @@ namespace thomas
 			auto& text = GetText(id);
 			text.rotation = rotation;
 		}
-
-		void GUIManager::SetText(const std::string& id, std::string newText)
+		void GUIManager::SetFont(const std::string & id, Font * font)
 		{
 			auto& text = GetText(id);
-			text.text = newText;
+			text.font = font;
 		}
 	}
 }

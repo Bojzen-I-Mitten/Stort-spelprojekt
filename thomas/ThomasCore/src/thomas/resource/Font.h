@@ -1,29 +1,36 @@
 #pragma once
 
-#include <string>
+// DirectXTK
 #include <DirectXTK/SpriteFont.h>
 #include <DirectXTK/SpriteBatch.h>
+
+// Thomas
 #include "../utils/Math.h"
 #include "Resource.h"
 
+using namespace DirectX;
+
 namespace thomas
 {
+	using namespace math;
+
 	namespace resource
 	{
 		class Font : public Resource
 		{
 		public:
-			Font(std::string path);
-			void DrawGUIText(DirectX::SpriteBatch* spritebatch, std::string text, thomas::math::Vector2 position, thomas::math::Vector2 scale, thomas::math::Vector4 color, float rotation);
-			DirectX::SpriteFont* GetFont();
+			Font(const std::string& path);
+
+		public:
+			void DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position, const Vector2& scale, 
+							 const Vector4& color, float rotation);
+			SpriteFont* GetFont() const;
+
+		public:
+			virtual void OnChanged() override;
 
 		private:
-			void LoadFont(std::string path);
-			void OnChanged();
-
-		private:
-			std::unique_ptr<DirectX::SpriteFont> m_font;
-			
+			std::unique_ptr<SpriteFont> m_font;	
 		};
 	}
 }

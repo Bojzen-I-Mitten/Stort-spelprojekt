@@ -6,7 +6,11 @@
 
 namespace ThomasEngine
 {
+	Font::Font(System::String^ path) : Resource(path, new thomas::resource::Font(Utility::ConvertString(path))) {}
 
-	Font::Font(System::String^ path) : Resource(path, new thomas::resource::Font(Utility::ConvertString(path))) {};
+	void Font::OnDeserialized(StreamingContext c)
+	{
+		m_nativePtr = new thomas::resource::Font(Utility::ConvertString(m_path));
+	}
 
 }

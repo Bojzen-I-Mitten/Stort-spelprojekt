@@ -11,5 +11,8 @@ namespace ThomasEngine
 	{
 	public:
 		Font(String^ path);
+
+		[OnDeserializedAttribute]
+		void OnDeserialized(StreamingContext c);
 	};
 }
