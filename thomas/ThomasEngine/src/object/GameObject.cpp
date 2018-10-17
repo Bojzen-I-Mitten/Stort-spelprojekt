@@ -105,25 +105,29 @@ namespace ThomasEngine {
 		} while (!completed);
 	}
 
-	void GameObject::setStatic()
+	thomas::object::Object* GameObject::setStatic()
 	{
-		nativePtr = static_cast<thomas::object::Object*>
-			(thomas::ObjectHandler::setStatic(
-				static_cast<thomas::object::GameObject*>(nativePtr)));
+
+
+		thomas::object::Object* moved;
+		nativePtr = thomas::ObjectHandler::setStatic(nativePtr, moved);
 
 		m_toBeStatic = false;
 		m_isStatic = true;
+
+		return moved;
 	}
 
 	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
 	{
-		if (nativePtr != nullptr)
+		if (nativeptr != nullptr)
 		{
 
-			for each (GameObject^ object in s_objects)
+			for each (Object^ object in s_objects)
 			{
+				
 				if (object->nativePtr == nativeptr)
-					return object;
+					return static_cast<GameObject^>(object);
 			}
 		}
 

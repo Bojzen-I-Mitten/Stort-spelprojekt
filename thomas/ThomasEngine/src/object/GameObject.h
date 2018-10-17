@@ -47,9 +47,8 @@ namespace ThomasEngine
 
 		static void InitGameObjects(bool playing);
 
-		void setStatic();
+		thomas::object::Object* setStatic();
 
-		GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 				
 		void Update();
 
@@ -66,6 +65,7 @@ namespace ThomasEngine
 		}
 
 	public:
+		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 		bool getToBeStatic();
 		GameObject(String^ name);
 		

@@ -27,6 +27,7 @@ namespace ThomasEngine
 		: m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
 		m_name = "New Scene";
 		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+		
 	}
 
 	void Scene::Play()

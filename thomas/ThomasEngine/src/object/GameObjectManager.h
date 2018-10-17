@@ -26,6 +26,7 @@ namespace ThomasEngine {
 		static void RemoveMarkedObjects();
 		static void makeStatic(GameObject^ object);
 		static void createGameObjectCore(std::string name);
+
 	private:
 
 

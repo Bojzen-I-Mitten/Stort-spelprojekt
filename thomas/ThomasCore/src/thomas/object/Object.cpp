@@ -23,6 +23,7 @@ namespace thomas
 					--i;
 				}
 			}
+
 		}
 
 		Object::~Object()

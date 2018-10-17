@@ -1,4 +1,5 @@
 #include "ObjectHandler.h"
+#include "..\editor\EditorCamera.h"
 #include <algorithm>
 namespace thomas
 {
@@ -22,7 +23,7 @@ namespace thomas
 		return &m_objectsActive.back();
 	}
 
-	object::GameObject* ObjectHandler::setStatic(object::GameObject* object)
+	object::Object* ObjectHandler::setStatic(object::Object* object, object::Object*& moved)
 	{
 
 		for (auto& it = m_objectsActive.begin(); it != m_objectsActive.end(); it++)
@@ -33,13 +34,21 @@ namespace thomas
 
 				m_objectsStatic.push_back(std::move(*it));
 
+				moved = &m_objectsActive.back();
+
 				*it = std::move(m_objectsActive.back());
 
 				m_objectsActive.pop_back();
 
 				m_objectsStatic.back().SetStatic();
 
+				// Since we have to select the object to make it static, 
+				// We have to set the new object as the selected one
+				editor::EditorCamera::Instance()->SelectObject(&m_objectsStatic.back());
+
 				return &m_objectsStatic.back(); // We have moved it
+
+
 			}
 		}
 
