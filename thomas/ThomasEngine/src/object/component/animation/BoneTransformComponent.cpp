@@ -62,6 +62,5 @@ namespace ThomasEngine
 				else
 					Native->SetReference(comp->GetBlendTree());
 			}
-			
 		}
 }

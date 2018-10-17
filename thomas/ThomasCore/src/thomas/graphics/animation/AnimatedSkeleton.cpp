@@ -152,12 +152,15 @@ namespace thomas {
 					if (m_list[i] == bC) {
 						m_list[i] = NULL;
 						// Find last slot:
-						BoneConstraint** last = m_list + i;
-						while (++last != NULL) {}
+						uint32_t last = i;
+						while (++last < MAX_CONSTRAINT_COUNT && m_list[i] != NULL) {}
 						last--; // Step back to non-empty
-						// Swap
-						m_list[i] = *last;
-						*last = NULL;
+						if (last)
+						{
+							// Swap out
+							m_list[i] = m_list[last];
+							m_list[last] = NULL;
+						}
 						return;
 					}
 				}

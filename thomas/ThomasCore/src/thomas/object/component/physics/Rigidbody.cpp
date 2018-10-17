@@ -50,7 +50,7 @@ namespace thomas
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
-				//UpdateProperties();
+				
 				Physics::AddRigidBody(this);
 			}
 
@@ -80,16 +80,18 @@ namespace thomas
 				m_gameObject->m_transform->SetRotation(rotation);
 				m_gameObject->m_transform->SetDirty(true);
 
-				m_prevMatrix = m_gameObject->m_transform->GetLocalWorldMatrix();
+				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
+
 				if (m_dirty)
 				{
 					UpdateProperties();
 				}
+
 			}
 
 			void Rigidbody::UpdateTransformToRigidBody()
 			{
-				if (m_prevMatrix != m_gameObject->m_transform->GetLocalWorldMatrix())
+				if (m_prevMatrix != m_gameObject->m_transform->GetWorldMatrix())
 				{
 					btTransform trans;
 
@@ -329,6 +331,7 @@ namespace thomas
 
 				setMassProps(mass, inertia);
 				updateInertiaTensor();
+				this->activate();
 			}
 
 			void Rigidbody::UpdateProperties()
@@ -338,6 +341,7 @@ namespace thomas
 				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 				this->setDamping(m_damping.x, m_damping.y);
 				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				this->activate(true);
 				m_dirty = false;
 			}
 		}
