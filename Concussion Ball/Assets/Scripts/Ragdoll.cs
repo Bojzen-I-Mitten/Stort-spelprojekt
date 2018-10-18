@@ -159,9 +159,8 @@ namespace ThomasEditor
             Vector3 bone2 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
             Vector3 up = bone2 - bone1;
             float length = up.Length();
-            if (length != 0)
-                up /= length; // Normalize
-            Vector3 Pos =  up * (length * 0.5f);
+            //up.Normalize(); // Normalize
+            Vector3 Pos =  up * 0.5f;
             return Pos;//DivideComponent(Pos, G_Hips.transform.localScale);
         }
         float calculateLengthBetweenSkeleton(string BoneName1, string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
@@ -173,9 +172,7 @@ namespace ThomasEditor
             Vector3 bone2 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
             Vector3 up = bone2 - bone1;
             float length = up.Length();
-            if (length != 0)
-                up /= length; // Normalize
-            Vector3 Pos = up * length;
+
             return length;//DivideComponent(Pos, G_Hips.transform.localScale);
         }
 
@@ -239,7 +236,7 @@ namespace ThomasEditor
                 return;
             }
             uint boneindex = 0;
-
+            Vector3 center = new Vector3(0);
             //Hips
             B_Hips.BoneName = Hips;
             B_Hips.AnimatedObject = gameObject;
@@ -256,7 +253,10 @@ namespace ThomasEditor
             B_Spine.AnimatedObject = gameObject;
             renderskinnedcomponent.FetchBoneIndex(Utility.hash(Spine), out boneindex);
             G_Spine.transform.local_world = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex);
-            boxcolliderSpine.center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, renderskinnedcomponent); //renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
+            center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, renderskinnedcomponent); //renderskinnedcomponent.GetBoneMatrix((int)boneindex).Translation;
+            center.x = 0;
+            center.z = 0;
+            boxcolliderSpine.center = center;
             boxcolliderSpine.size = new Vector3(0.2f, 0.2f, 0.2f);
             G_Spine.transform.localPosition = new Vector3(G_Spine.transform.localPosition.x, G_Spine.transform.localPosition.y, G_Spine.transform.localPosition.z);
             rigidbodySpine.IsKinematic = AllobjectKinectic;
@@ -287,13 +287,16 @@ namespace ThomasEditor
             rigidbodyHead.IsKinematic = AllobjectKinectic;
             rigidbodyHead.Damping = AllobjectDamping;
             rigidbodyHead.Mass = Totalmass * RealBodyMass[2];
-            spherecolliderHead.center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, renderskinnedcomponent);
+            center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, renderskinnedcomponent);
+            center.x = 0;
+            center.z = 0;
 
+            spherecolliderHead.center = center;
 
 
 
             //Joint from spine to head
-           
+
             HeadSpineJoint.Axis = new Vector3(0, 0, 90);
             HeadSpineJoint.SwingAxis = new Vector3(0, 0, 90);
             HeadSpineJoint.NoCollision = true;
@@ -319,7 +322,16 @@ namespace ThomasEditor
             rigidbodyLeftArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftArm.Damping = AllobjectDamping;
             rigidbodyLeftArm.Mass = Totalmass * RealBodyMass[3];
-            CapsuleColliderLeftArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
+            //center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
+            center = calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent);
+            center.x = 0;
+            center.z = 0;
+            float value = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, renderskinnedcomponent);
+                center.y = -value * 0.5f;
+
+            CapsuleColliderLeftArm.center = center;
+
+
 
 
 
@@ -349,12 +361,16 @@ namespace ThomasEditor
             rigidbodyLeftUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderArm.Damping = AllobjectDamping;
             rigidbodyLeftUnderArm.Mass = Totalmass * RealBodyMass[4];
-            CapsuleColliderLeftUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, renderskinnedcomponent));
-
-        
+            center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, renderskinnedcomponent));
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderLeftUnderArm.center = center;
+             value = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, renderskinnedcomponent);
+                center.y = -value * 0.5f;
+            CapsuleColliderLeftUnderArm.center = center;
 
             //Joint from leftudnerarmtooverarm
-            
+
             LowerLeftArmLeftArmJoint.Axis = new Vector3(-90, 0, 0);
             LowerLeftArmLeftArmJoint.SwingAxis = new Vector3(0, 0, 0);
             LowerLeftArmLeftArmJoint.NoCollision = true;
@@ -388,14 +404,18 @@ namespace ThomasEditor
             rigidbodyRightArm.IsKinematic = AllobjectKinectic;
             rigidbodyRightArm.Damping = AllobjectDamping;
             rigidbodyRightArm.Mass = Totalmass * RealBodyMass[5];
-            CapsuleColliderRightArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, renderskinnedcomponent));
+            center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, renderskinnedcomponent));
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderRightArm.center = center;
+            value = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, renderskinnedcomponent);
+                center.y = value * 0.5f;
+            CapsuleColliderRightArm.center = center;
 
 
-
-           
 
             //Joint from Rightarm totorso
-           
+
             RightArmTorsoJoint.Axis = new Vector3(0, 0, 0);
             RightArmTorsoJoint.SwingAxis = new Vector3(0, 0, 0);
             RightArmTorsoJoint.NoCollision = true;
@@ -421,10 +441,18 @@ namespace ThomasEditor
             rigidbodyRightUnderArm.IsKinematic = AllobjectKinectic;
             rigidbodyRightUnderArm.Damping = AllobjectDamping;
             rigidbodyRightUnderArm.Mass = Totalmass * RealBodyMass[6];
-            CapsuleColliderRightUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, renderskinnedcomponent));
-         
+            center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, renderskinnedcomponent));
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderRightUnderArm.center = center;
+            value = calculateLengthBetweenSkeleton(LowerRightArm, LowerRightHand, renderskinnedcomponent);
+                center.y = value*0.5f;
+            CapsuleColliderRightUnderArm.center = center;
+
+
+
             //Joint from Rightudnerarmtooverarm
-           
+
             LowerRightArmRightArmJoint.Axis = new Vector3(-90, 0, 0);
             LowerRightArmRightArmJoint.SwingAxis = new Vector3(0, 0, 0);
             LowerRightArmRightArmJoint.NoCollision = true;
@@ -448,8 +476,10 @@ namespace ThomasEditor
             rigidbodyRightLeg.IsKinematic = AllobjectKinectic;
             rigidbodyRightLeg.Damping = AllobjectDamping;
             rigidbodyRightLeg.Mass = Totalmass * RealBodyMass[7];
-            CapsuleColliderRightLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
-
+            center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderRightLeg.center = center;
 
 
 
@@ -479,14 +509,16 @@ namespace ThomasEditor
             rigidbodyRightUnderLeg.Damping = AllobjectDamping;
             rigidbodyRightUnderLeg.Mass = Totalmass * RealBodyMass[8];
             rigidbodyRightUnderLeg.IsKinematic = AllobjectKinectic;
-            CapsuleColliderRightUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, renderskinnedcomponent);
+            center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, renderskinnedcomponent);
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderRightUnderLeg.center = center;
 
 
 
 
 
 
-           
             RightUnderLegJoint.Axis = new Vector3(0, 0, 0);
             RightUnderLegJoint.SwingAxis = new Vector3(0, 0, 0);
             RightUnderLegJoint.NoCollision = true;
@@ -510,9 +542,11 @@ namespace ThomasEditor
             rigidbodyLeftLeg.IsKinematic = AllobjectKinectic;
             rigidbodyLeftLeg.Damping = AllobjectDamping;
             rigidbodyLeftLeg.Mass = Totalmass * RealBodyMass[9];
-            CapsuleColliderLeftLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
-
-             //Joint from LeftLegJoint
+            center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderLeftLeg.center = center;
+            //Joint from LeftLegJoint
 
             LeftLegJoint.Axis = new Vector3(0, 0, -90);
             LeftLegJoint.SwingAxis = new Vector3(0, 0, 0);
@@ -537,9 +571,11 @@ namespace ThomasEditor
             rigidbodyLeftUnderLeg.IsKinematic = AllobjectKinectic;
             rigidbodyLeftUnderLeg.Damping = AllobjectDamping;
             rigidbodyLeftUnderLeg.Mass = Totalmass * RealBodyMass[10];
-            CapsuleColliderLeftUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
+            center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
+            center.x = 0;
+            center.z = 0;
+            CapsuleColliderLeftUnderLeg.center = center;
 
-            
             LeftUnderLegJoint.Axis = new Vector3(0, 0, 0);
             LeftUnderLegJoint.SwingAxis = new Vector3(0, 0, 0);
             LeftUnderLegJoint.NoCollision = true;
