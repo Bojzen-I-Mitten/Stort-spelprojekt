@@ -36,7 +36,6 @@ public class ChadControls : NetworkComponent
     public Transform hand { get; set; }
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
-    [Category("Throwing")]
     #endregion
 
     #region Camera Settings etc.
@@ -165,7 +164,6 @@ public class ChadControls : NetworkComponent
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
-                    StartCoroutine(ChargingCoroutine());
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
@@ -173,6 +171,10 @@ public class ChadControls : NetworkComponent
                     StopCoroutine(ChargingCoroutine());
                     ResetCharge();
                     ResetCamera();
+                }
+                else if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+                {
+                    StartCoroutine(ChargingCoroutine());
                 }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
