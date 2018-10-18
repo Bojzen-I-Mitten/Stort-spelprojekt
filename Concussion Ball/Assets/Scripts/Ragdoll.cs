@@ -197,13 +197,13 @@ namespace ThomasEditor
         }
         public override void Update()
         {
-          /*  if(Input.GetKeyDown(Input.Keys.Space))
+            if(Input.GetKeyDown(Input.Keys.Space))
             {
                 if (RagdollEnabled)
                     DisableRagdoll();
                 else
                    EnableRagdoll();
-            }*/
+            }
         }
         public void EnableRagdoll()
         {
@@ -275,7 +275,9 @@ namespace ThomasEditor
             HeadSpineJoint.NoCollision = true;
             HeadSpineJoint.SwingAngle1 = 90;
             HeadSpineJoint.SwingAngle2 = 90;
-            HeadSpineJoint.ConnectedAnchor = spherecolliderHead.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, renderskinnedcomponent);
+            ExtraVector = spherecolliderHead.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, renderskinnedcomponent);
+            ExtraVector.z = 0;
+            HeadSpineJoint.ConnectedAnchor = ExtraVector;
             HeadSpineJoint.Anchor = spherecolliderHead.center * -2;
 
             //left arm
@@ -665,7 +667,10 @@ namespace ThomasEditor
 
             RagdollEnabled = false;
         }
-    
-
+        public override void Destroy()
+        {
+            DisableRagdoll();
+        }
+      
     }
 }
