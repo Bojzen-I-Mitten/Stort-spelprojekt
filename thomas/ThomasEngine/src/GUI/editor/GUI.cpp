@@ -1,11 +1,13 @@
 #include "GUI.h"
+
 #pragma unmanaged
 #include <thomas/editor/gizmos/Gizmos.h>
+
 #pragma managed
-#include "..\..\resource\Model.h"
-#include "..\..\ThomasManaged.h"
+#include "../../resource/Model.h"
+#include "../../ThomasManaged.h"
 
-
+// OLD
 void ThomasEngine::GUI::DrawModel(Model^ model, int meshIndex,Vector3 position, Quaternion rotation, Vector3 scale)
 {
 	thomas::editor::Gizmos::Gizmo().DrawModel((thomas::resource::Model*)model->m_nativePtr, meshIndex, Utility::Convert(position), Utility::Convert(rotation), Utility::Convert(scale));
@@ -25,7 +27,6 @@ void ThomasEngine::GUI::DrawWireModel(Model ^ model, Vector3 position, Quaternio
 {
 	thomas::editor::Gizmos::Gizmo().DrawWireModel((thomas::resource::Model*)model->m_nativePtr, Utility::Convert(position), Utility::Convert(rotation), Utility::Convert(scale));
 }
-
 
 void ThomasEngine::GUI::DrawCube(Vector3 center, Vector3 size)
 {
@@ -113,3 +114,4 @@ void ThomasEngine::GUI::ImguiStringUpdate(String ^ text, Vector2 pos)
 	if(ThomasEngine::ThomasWrapper::InEditor())
 		thomas::editor::Gizmos::Gizmo().ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
 }
+//

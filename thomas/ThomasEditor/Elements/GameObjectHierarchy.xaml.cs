@@ -387,6 +387,8 @@ namespace ThomasEditor
 
         public void hierarchy_Drop(object sender, DragEventArgs e)
         {
+            if (hierarchy.SelectedItem == null)
+                return;
             TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
 
             if (e.Data.GetDataPresent(typeof(TreeViewItem)) || source.DataContext != null)

@@ -1,14 +1,15 @@
 #include "Camera.h"
-#include "..\..\WindowManager.h"
+#include "../../WindowManager.h"
 #include "../GameObject.h"
 #include "../../graphics/Skybox.h"
 #include "Transform.h"
 #include "../../graphics/Renderer.h"
-#include <algorithm>
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../AutoProfile.h"
+#include "../../graphics/GUIManager.h"
 #include "RenderComponent.h"
+
 namespace thomas
 {
 	namespace object
@@ -16,13 +17,16 @@ namespace thomas
 		namespace component
 		{
 			std::vector<Camera*> Camera::s_allCameras;
+
 			void Camera::UpdateProjMatrix()
 			{
 				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
 				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
-			Camera::Camera(bool dontAddTolist)
+			Camera::Camera(bool dontAddTolist) : 
+			m_renderGUI(false),
+			m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
 				m_near = 0.1f;
@@ -32,7 +36,9 @@ namespace thomas
 				UpdateProjMatrix();
 			}
 
-			Camera::Camera()
+			Camera::Camera() :
+			m_renderGUI(false),
+			m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70;
 				m_near = 0.5;
@@ -46,16 +52,19 @@ namespace thomas
 					return a->GetTargetDisplayIndex() < b->GetTargetDisplayIndex();
 				});
 			}
+
 			Camera::~Camera()
 			{
+				m_GUIHandle->Destroy();
+				m_GUIHandle.reset();
+				
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
 					if (s_allCameras[i] == this)
 					{
 						s_allCameras.erase(s_allCameras.begin() + i);
 						break;
-					}
-						
+					}		
 				}
 			}
 
@@ -66,13 +75,23 @@ namespace thomas
 
 			void Camera::OnDisable()
 			{
-				for (int i = 0; i < s_allCameras.size(); i++) {
-					if (s_allCameras[i] == this) {
+				
+				for (int i = 0; i < s_allCameras.size(); i++) 
+				{
+					if (s_allCameras[i] == this) 
+					{
+						
+
 						s_allCameras.erase(s_allCameras.begin() + i);
 						return;
 					}
 						
 				}
+			}
+
+			void Camera::OnDestroy()
+			{
+				m_renderGUI = false;
 			}
 
 			math::Matrix Camera::GetProjMatrix()
@@ -164,6 +183,16 @@ namespace thomas
 				UpdateProjMatrix();
 			}
 
+			bool Camera::GetGUIRendering() const
+			{
+				return m_renderGUI;
+			}
+
+			void Camera::SetGUIRendering(bool rendering)
+			{
+				m_renderGUI = rendering;
+			}
+
 			math::Viewport Camera::GetViewport()
 			{
 				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
@@ -190,6 +219,11 @@ namespace thomas
 				return m_viewport.AspectRatio();
 			}
 
+			graphics::GUIManager * Camera::GetGUIHandle() const
+			{
+				return m_GUIHandle.get();
+			}
+
 			void Camera::Render()
 			{
 				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
@@ -201,8 +235,7 @@ namespace thomas
 			}
 
 			void Camera::OnDrawGizmos()
-			{
-				
+			{	
 			}
 
 			void Camera::OnDrawGizmosSelected()
@@ -219,9 +252,7 @@ namespace thomas
 				{
 					m_targetDisplay = index;
 					UpdateProjMatrix();
-				}
-					
-				
+				}	
 			}
 
 			int Camera::GetTargetDisplayIndex()
@@ -288,7 +319,6 @@ namespace thomas
 			{
 				return m_frameData;
 			}
-
 		}
 	}
 }

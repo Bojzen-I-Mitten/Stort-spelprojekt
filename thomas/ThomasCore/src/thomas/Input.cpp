@@ -16,6 +16,7 @@ namespace thomas
 
 	Input::Input()
 	{
+		m_lastKey = 0;
 		m_mouseMode = MouseMode::POSITION_ABSOLUTE;
 		Reset();
 	}
@@ -388,5 +389,25 @@ namespace thomas
 	bool Input::GetKey(Keys key)
 	{
 		return m_keyboardState.IsKeyDown((Keyboard::Keys)key);
+	}
+
+	void Input::SetLastKey(unsigned short key)
+	{
+		m_lastKey = key;
+	}
+
+	unsigned short Input::GetLastKey() const
+	{
+		return m_lastKey;
+	}
+
+	std::string Input::ConvertKeyToString(Keys key) const
+	{
+		return Keys_to_string(key);
+	}
+
+	std::string Input::ConvertKeyToString(unsigned short key) const
+	{
+		return Keys_to_string(Keys(key));
 	}
 }

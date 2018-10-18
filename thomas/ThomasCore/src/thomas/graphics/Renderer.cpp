@@ -15,6 +15,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "../graphics/GUIManager.h"
 #include "ParticleSystem.h"
 
 namespace thomas
@@ -75,9 +76,15 @@ namespace thomas
 			m_frame->m_queue.clear();
 		}
 
+		void Renderer::ClearAllCommands()
+		{
+			m_frame->m_queue.clear();
+			m_prevFrame->m_queue.clear();
+		}
+
 		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			m_frame->m_queue[command.camera][command.material].push_back(command);
+			m_frame->m_queue[command.camera].m_commands3D[command.material].push_back(command);
 		}
 
 		render::Frame & Renderer::getAllocator()
@@ -114,11 +121,12 @@ namespace thomas
 
 			//ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
 			//m_particleSystem->UpdateParticleSystem();
+
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
 				BindCamera(camera);
-				for (auto & perMaterialQueue : perCameraQueue.second)
+				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
 					auto material = perMaterialQueue.first;
 					material->Bind();
@@ -129,9 +137,15 @@ namespace thomas
 					}
 				}
 
-				
-				//m_particleSystem->DrawParticles();
+				//m_particleSystem->DrawParticles();	
+
+				// Draw GUI for each camera that has enabled GUI rendering
+				if (perCameraQueue.first->GetGUIRendering())
+				{
+					perCameraQueue.first->GetGUIHandle()->Render();
+				}
 			}
+	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 
 			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();

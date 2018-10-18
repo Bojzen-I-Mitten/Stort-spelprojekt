@@ -64,6 +64,8 @@
     <Compile Include="Assets\Scripts\chadStateMachine.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
+    <Compile Include="Assets\Scripts\GUITest.cs" />
+    <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
     <Compile Include="Assets\Scripts\match\MatchSystem.cs" />
     <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
