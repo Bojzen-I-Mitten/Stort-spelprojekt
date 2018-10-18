@@ -341,8 +341,8 @@ namespace ThomasEditor
             LeftArmTorsoJoint.NoCollision = true;
             LeftArmTorsoJoint.SwingAngle1 = 90;
             LeftArmTorsoJoint.SwingAngle2 = 90;
-            LeftArmTorsoJoint.ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, renderskinnedcomponent) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperLeftArm, renderskinnedcomponent);
-            LeftArmTorsoJoint.Anchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, renderskinnedcomponent)) * 2;// * new Vector3(1,2,1);
+            LeftArmTorsoJoint.ConnectedAnchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(Spine, UpperLeftArm, renderskinnedcomponent))+SwapXY(calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, renderskinnedcomponent));
+            LeftArmTorsoJoint.Anchor = -CapsuleColliderLeftArm.center;
 
             B_LeftUnderArm.BoneName = LowerLeftArm;
             B_LeftUnderArm.AnimatedObject = gameObject;
@@ -369,7 +369,7 @@ namespace ThomasEditor
             LowerLeftArmLeftArmJoint.NoCollision = true;
             LowerLeftArmLeftArmJoint.SwingAngle1 = 90;
             LowerLeftArmLeftArmJoint.SwingAngle2 = 90;
-            LowerLeftArmLeftArmJoint.ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, renderskinnedcomponent), 0, 0) + SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
+            LowerLeftArmLeftArmJoint.ConnectedAnchor = CapsuleColliderLeftArm.center;//new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, renderskinnedcomponent), 0, 0) + SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
             LowerLeftArmLeftArmJoint.Anchor = SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
 
             //Right arm
