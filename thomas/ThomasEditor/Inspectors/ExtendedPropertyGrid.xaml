@@ -148,11 +148,6 @@
                     <xctk:TargetPropertyType Type="managed:Curve"/>
                 </xctk:EditorTemplateDefinition.TargetProperties>
             </xctk:EditorTemplateDefinition>
-            <xctk:EditorTemplateDefinition EditingTemplate="{StaticResource ListEditor}">
-                <xctk:EditorTemplateDefinition.TargetProperties>
-                    <xctk:TargetPropertyType Type="sys:IList"/>
-                </xctk:EditorTemplateDefinition.TargetProperties>
-            </xctk:EditorTemplateDefinition>
         </xctk:PropertyGrid.EditorDefinitions>
     </xctk:PropertyGrid>
 </UserControl>

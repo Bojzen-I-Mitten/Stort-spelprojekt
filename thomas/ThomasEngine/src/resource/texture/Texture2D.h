@@ -34,7 +34,7 @@ namespace ThomasEngine
 
 		IntPtr GetRawPixelData()
 		{
-			return IntPtr(((thomas::resource::Texture2D*)m_nativePtr)->GetRawBGRAPixels());
+			return IntPtr(((thomas::resource::Texture2D*)m_nativePtr)->GetRawBGRAPixels()); 
 		}
 
 		array<Color>^ GetPixels() 

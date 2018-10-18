@@ -79,16 +79,17 @@ namespace thomas
 				void SpawnAtSphereEdge(bool const& other);
 				bool IsSpawningAtSphereEdge() const;
 				
-
+				void SetEmissionRate(unsigned const& other);
+				unsigned GetEmissionRate() const;
 				void StartEmitting();
 				void StopEmitting();
 				bool IsEmitting() const;
-				
+				void EmitOneShot(unsigned const& nrOfPaticles);
+
 				void SetTexture(resource::Texture2D* other);
 				resource::Texture2D* GetTexture() const;
 	
-				void SetEmissionRate(unsigned const& other);
-				unsigned GetEmissionRate() const;
+				
 
 
 				//void ExportEmitter(std::string path);
@@ -101,6 +102,8 @@ namespace thomas
 				graphics::ParticleSystem::InitParticleBufferStruct m_particleBufferStruct;
 
 				bool m_isEmitting;
+				bool m_emitOneShot;
+
 
 
 				unsigned m_emissionRate; //Particles per second

@@ -410,4 +410,9 @@ namespace thomas
 	{
 		return Keys_to_string(Keys(key));
 	}
+
+	Input::MouseMode Input::GetMouseMode()
+	{
+		return m_mouseMode;
+	}
 }
