@@ -108,14 +108,29 @@ namespace ThomasEngine.Network
             {
                 NetManager.NatPunchEnabled = true;
                 NetManager.NatPunchModule.Init(NatPunchListener);
-            }
+            }           
+        }
 
+        public void Init()
+        {
             NetManager.Start(LocalPort);
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
 
             NetScene.InititateScene();
+        }
 
+        public void Host()
+        {
+            ResponsiblePeer = LocalPeer;
+            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
+            NetScene.ActivateSceneObjects();
+            OnPeerJoin(LocalPeer);
+        }
+
+        public void Connect()
+        {
+            NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
         }
 
         #region Listners
@@ -238,45 +253,14 @@ namespace ThomasEngine.Network
 
         public override void Update()
         {
-            NetManager.UpdateTime = (1000 / TICK_RATE);
-            if(NetManager.NatPunchEnabled)
-                NetManager.NatPunchModule.PollEvents();
-            NetManager.PollEvents(); 
-
-            if (Input.GetKeyDown(Input.Keys.J)) //JOIN
+            if (NetManager.IsRunning)
             {
-                if (NetScene.Players.ContainsKey(LocalPeer))
-                {
-                    Debug.LogWarning("You are already connected to a match!");
-                }else
-                {
-                    if (UseLobby)
-                        NetManager.NatPunchModule.SendNatIntroduceRequest(NetUtils.MakeEndPoint(TargetIP, TargetPort), "Domarn");
-                    else
-                    {
-                        NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
-                    }
-                }
-
+                NetManager.UpdateTime = (1000 / TICK_RATE);
+                if (NetManager.NatPunchEnabled)
+                    NetManager.NatPunchModule.PollEvents();
+                NetManager.PollEvents();
+                Diagnostics();
             }
-
-            if(Input.GetKeyDown(Input.Keys.H)) //HOST
-            {
-                if (NetScene.Players.ContainsKey(LocalPeer))
-                {
-                    Debug.LogWarning("You are already connected to a match!");
-                }
-                else
-                {
-                    ResponsiblePeer = LocalPeer;
-                    NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
-                    NetScene.ActivateSceneObjects();
-                    OnPeerJoin(LocalPeer);
-                }
-              
-            }
-
-            Diagnostics();
         }
 
         protected override void OnDestroy()

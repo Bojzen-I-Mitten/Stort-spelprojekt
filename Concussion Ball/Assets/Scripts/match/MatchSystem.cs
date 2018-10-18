@@ -46,8 +46,6 @@ public class MatchSystem : NetworkManager
     public override void Start()
     {
         base.Start();
-
-
         if(BallPrefab)
             SpawnablePrefabs.Add(BallPrefab);
 
@@ -138,21 +136,25 @@ public class MatchSystem : NetworkManager
     public override void Update()
     {
         base.Update();
-        if (Scene.Players.ContainsKey(LocalPeer))
+        if (InternalManager.IsRunning)
         {
-            NetworkPlayer localPlayer = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-            if (Input.GetKeyDown(Input.Keys.D1))
-                localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
-            if (Input.GetKeyDown(Input.Keys.D2))
-                localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
-            if (Input.GetKeyDown(Input.Keys.D3))
-                localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-            if (Input.GetKeyDown(Input.Keys.Space)) 
+            if (Scene.Players.ContainsKey(LocalPeer))
             {
-                SendRPC(-2, "OnRoundStart");
-                OnRoundStart();
+                NetworkPlayer localPlayer = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
+                if (Input.GetKeyDown(Input.Keys.D1))
+                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
+                if (Input.GetKeyDown(Input.Keys.D2))
+                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
+                if (Input.GetKeyDown(Input.Keys.D3))
+                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+                if (Input.GetKeyDown(Input.Keys.Space))
+                {
+                    SendRPC(-2, "OnRoundStart");
+                    OnRoundStart();
+                }
             }
         }
+       
     }
     #region Team Manager
 
@@ -169,10 +171,17 @@ public class MatchSystem : NetworkManager
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
-        np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
+        
+        int team = Scene.Players.Count % 2;
+        if(team == 0)
+            np.JoinTeam(Teams[TEAM_TYPE.TEAM_1]);
+        else
+            np.JoinTeam(Teams[TEAM_TYPE.TEAM_2]);
 
         Scene.Players[peer].gameObject.SetActive(false);
         OnMatchStart();
+        SendRPC(-2, "OnRoundStart");
+        OnRoundStart();
     }
 
     protected override void OnPeerLeave(NetPeer peer)

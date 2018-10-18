@@ -240,9 +240,9 @@ namespace thomas
 
 			void Camera::OnDrawGizmosSelected()
 			{
-				//editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix().Transpose());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 				editor::Gizmos::Gizmo().SetColor(math::Color(0.6f, 0.6f, 0.6f));
-				editor::Gizmos::Gizmo().DrawFrustum(GetFrustrum());
+				editor::Gizmos::Gizmo().DrawFrustum(m_frustrum);
 			
 			}
 

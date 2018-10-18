@@ -217,7 +217,7 @@ namespace thomas
 			if (window->GetInput()->GetKeyDown(Keys::F))
 				SnapCameraToFocus();
 
-			if (window->GetInput()->GetKey(Input::Keys::LeftShift))
+			if (window->GetInput()->GetKey(Keys::LeftShift))
 				m_manipulatorSnapping = true;
 
 			if (active)

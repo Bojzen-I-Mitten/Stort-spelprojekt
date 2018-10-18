@@ -207,6 +207,8 @@ public class ChadControls : NetworkComponent
     
     public override void OnCollisionEnter(Collider collider)
     {
+
+        Debug.Log("wow");
         if (isOwner && Ball)
         {
             if (collider.gameObject == Ball.gameObject)
