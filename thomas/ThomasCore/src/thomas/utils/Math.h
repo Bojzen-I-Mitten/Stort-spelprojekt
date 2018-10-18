@@ -12,6 +12,7 @@ namespace DirectX
 	namespace SimpleMath
 	{
 		constexpr float PI = 3.141592654f;
+		constexpr float EPSILON = 1e-6;
 
 		using DirectX::BoundingBox;
 		using DirectX::BoundingSphere;
@@ -31,6 +32,7 @@ namespace DirectX
 		Quaternion getRotationTo(Vector3 from, Vector3 dest);
 
 		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest);
+		Matrix getMatrixRotationTo_Nor(Vector3 from, Vector3 dest);
 
 
 		/* Extract the length of each axis in the top-left 3x3 matrix.
@@ -39,6 +41,8 @@ namespace DirectX
 		/* Normalize each row vector in the topleft 3x3 matrix
 		*/
 		Matrix normalizeBasisAxis(Matrix m);
+		Matrix extractRotation(Matrix m);
+		XMFLOAT3X3 extractRotation3x3(const Matrix &m);
 		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
 		*/
 		Matrix& mult(Matrix &m, Vector3 scalars);
