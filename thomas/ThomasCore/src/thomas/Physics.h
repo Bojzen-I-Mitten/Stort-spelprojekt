@@ -46,7 +46,7 @@ namespace thomas
 		static std::unique_ptr<btDefaultCollisionConfiguration> s_collisionConfiguration;
 		static std::unique_ptr<btCollisionDispatcher> s_dispatcher;
 		static std::unique_ptr<btBroadphaseInterface> s_broadPhase;
-		static std::unique_ptr<btSequentialImpulseConstraintSolver> s_solver;
+		static std::unique_ptr<btConstraintSolver> s_solver;
 		static std::unique_ptr<graphics::BulletDebugDraw> s_debugDraw;
 
 	private:
