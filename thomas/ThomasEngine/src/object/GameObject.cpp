@@ -427,7 +427,8 @@ namespace ThomasEngine {
 	void GameObject::OnDeserialized(System::Runtime::Serialization::StreamingContext c)
 	{
 		for (int i = 0; i < m_components.Count; i++) {
-			m_components[i]->gameObject = this;
+			if(m_components[i])
+				m_components[i]->gameObject = this;
 		}
 		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));
