@@ -73,6 +73,7 @@ public class ChadControls : NetworkComponent
     private Quaternion FreeLookDirection;
     Rigidbody rBody;
     Chadimations Animations;
+    Ragdoll Ragdoll;
 
     public string PlayerPrefabName { get; set; } = "Chad";
     public float ImpactFactor { get; set; } = 10;
@@ -91,7 +92,7 @@ public class ChadControls : NetworkComponent
     }
     // private bool canPickupBall = true;
 
-    public override void Start()
+    public override void Awake()
     {
         Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
 
@@ -105,15 +106,16 @@ public class ChadControls : NetworkComponent
         {
             Camera.transform.localPosition = CameraOffset;
         }
-            
-
-
         ThrowForce = BaseThrowForce;
 
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Animations = gameObject.GetComponent<Chadimations>();
+        Ragdoll = gameObject.GetComponent<Ragdoll>();
+        NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
+        ragdollSync.target = Ragdoll.GetHips().transform;
+        ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
     }
 
     public override void Update()
@@ -132,24 +134,24 @@ public class ChadControls : NetworkComponent
     public void RPCStartRagdoll()
     {
         rBody.enabled = false;
-        gameObject.GetComponent<Ragdoll>().EnableRagdoll();
+        Ragdoll.EnableRagdoll();
     }
 
     public void RPCStopRagdoll()
     {
-        gameObject.transform.position = gameObject.GetComponent<Ragdoll>().GetHips().transform.position;
-        gameObject.transform.eulerAngles = new Vector3(0, gameObject.GetComponent<Ragdoll>().GetHips().transform.localEulerAngles.y, 0);
-        gameObject.GetComponent<Ragdoll>().DisableRagdoll();
+        gameObject.transform.position = Ragdoll.GetHips().transform.position;
+        gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
+        Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
     }
 
     IEnumerator StartRagdoll(float duration, Vector3 force)
     {
         State = STATE.RAGDOLL;
-        Camera.transform.parent = gameObject.GetComponent<Ragdoll>().GetHips().transform;
+        Camera.transform.parent = Ragdoll.GetHips().transform;
         RPCStartRagdoll();
         SendRPC("RPCStartRagdoll");
-        gameObject.GetComponent<Ragdoll>().AddForce(force);
+        Ragdoll.AddForce(force);
         yield return new WaitForSeconds(duration);
         RPCStopRagdoll();
         SendRPC("RPCStopRagdoll");
