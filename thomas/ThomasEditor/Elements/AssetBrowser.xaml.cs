@@ -260,15 +260,16 @@ namespace ThomasEditor
         private void LoadAssetImages()
         {
             
-            assetImages[ThomasEngine.Resources.AssetTypes.UNKNOWN] = new BitmapImage(new Uri("pack://application:,,/icons/assets/unknown.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.SCENE] = new BitmapImage(new Uri("pack://application:,,/icons/assets/scene.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.SHADER] = new BitmapImage(new Uri("pack://application:,,/icons/assets/shader.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.AUDIO_CLIP] = new BitmapImage(new Uri("pack://application:,,/icons/assets/audio.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.MODEL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.ANIMATION] = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.MATERIAL] = new BitmapImage(new Uri("pack://application:,,/icons/assets/material.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT] = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
-            assetImages[ThomasEngine.Resources.AssetTypes.PREFAB] = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.UNKNOWN]      = new BitmapImage(new Uri("pack://application:,,/icons/assets/unknown.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.SCENE]        = new BitmapImage(new Uri("pack://application:,,/icons/assets/scene.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.SHADER]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/shader.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.AUDIO_CLIP]   = new BitmapImage(new Uri("pack://application:,,/icons/assets/audio.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.MODEL]        = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.ANIMATION]    = new BitmapImage(new Uri("pack://application:,,/icons/assets/model.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.MATERIAL]     = new BitmapImage(new Uri("pack://application:,,/icons/assets/material.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.PREFAB]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.FONT]         = new BitmapImage(new Uri("pack://application:,,/icons/assets/font.png"));
         }
 
 

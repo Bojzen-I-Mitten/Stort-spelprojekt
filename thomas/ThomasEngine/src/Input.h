@@ -4,6 +4,9 @@
 #include <thomas\Input.h>
 #pragma managed
 #include "Utility.h"
+
+using namespace System;
+
 namespace ThomasEngine
 {
 	public ref class Input
@@ -236,9 +239,13 @@ namespace ThomasEngine
 		static bool GetMouseButton(MouseButtons button) { return thomas::WindowManager::Instance()->GetGameInput()->GetMouseButton((thomas::Input::MouseButtons)button); }
 
 		//Keyboard
-		static bool GetKeyDown(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKeyDown((thomas::Input::Keys)key); }
-		static bool GetKeyUp(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKeyUp((thomas::Input::Keys)key); }
-		static bool GetKey(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKey((thomas::Input::Keys)key); }
+		static bool GetKeyDown(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKeyDown((thomas::Keys)key); }
+		static bool GetKeyUp(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKeyUp((thomas::Keys)key); }
+		static bool GetKey(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKey((thomas::Keys)key); }
+		static unsigned short GetLastKey() { return thomas::WindowManager::Instance()->GetGameInput()->GetLastKey(); }
+		static void SetLastKey(unsigned short key) { thomas::WindowManager::Instance()->GetGameInput()->SetLastKey(key); }
+		static String^ ConvertKeyToString(unsigned short key) { return Utility::ConvertString(thomas::WindowManager::Instance()->GetGameInput()->ConvertKeyToString(key)); }
+		static String^ ConvertKeyToString(Keys key) { return Utility::ConvertString(thomas::WindowManager::Instance()->GetGameInput()->ConvertKeyToString((thomas::Keys)key)); }
 
 		//Gamepad
 		static bool GetButtonDown(Buttons button) { return thomas::WindowManager::Instance()->GetGameInput()->GetButtonDown((thomas::Input::Buttons)button); }

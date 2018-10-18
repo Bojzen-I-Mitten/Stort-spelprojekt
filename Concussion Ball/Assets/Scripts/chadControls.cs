@@ -5,6 +5,7 @@ using ThomasEngine.Network;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System.ComponentModel;
+using System.Collections;
 
 public class ChadControls : NetworkComponent
 {
@@ -308,14 +309,25 @@ public class ChadControls : NetworkComponent
                     transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                     break;
                 case STATE.DIVING:
-                    DiveTimer += Time.DeltaTime;
+                    Direction = Vector3.Zero;
+                    CurrentVelocity.x = 0;
+                    CurrentVelocity.y = MaxSpeed;
+                    transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                    StartCoroutine(DivingCoroutine());
                     break;
                 case STATE.RAGDOLL:
                     break;
             }
         }
     }
-    
+
+    IEnumerator DivingCoroutine()
+    {
+        yield return new WaitForSeconds(1.0f);
+        CurrentVelocity.y = BaseSpeed;
+        State = STATE.CHADING;
+    }
+
     public void ChargeBall()
     {
         Ball.ChargeColor();

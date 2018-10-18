@@ -41,6 +41,8 @@ namespace thomas
 		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.
 		*/
 		uint32_t Thread_Index();
+		void OnStop();
+		void OnPlay();
 
 		resource::MemoryAllocation* Memory();
 

@@ -183,6 +183,7 @@
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
+    <ClInclude Include="src\resource\Font.h" />
     <ClInclude Include="src\resource\Model.h" />
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\texture\Texture.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />
+    <ClCompile Include="src\resource\Font.cpp" />
     <ClCompile Include="src\resource\Material.cpp" />
     <ClCompile Include="src\object\Component.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>

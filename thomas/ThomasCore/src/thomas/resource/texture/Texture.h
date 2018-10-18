@@ -54,7 +54,7 @@ namespace thomas
 			int GetHeight();
 			
 			ID3D11ShaderResourceView* GetResourceView();
-
+			ID3D11Resource* GetResource();
 
 		protected:
 			WrapMode m_wrapMode;
