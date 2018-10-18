@@ -63,8 +63,11 @@ struct v2f
 
 v2f vert(uint id : SV_VertexID)
 {
-    v2f output = (v2f) 0;
+    if (id % 2 == 1)
+        return;
 
+    v2f output = (v2f) 0;
+    
     uint particleIndex = (uint) (id / 6);
     uint triangleIndex = (uint) ((id % 6) / 3);
     uint vertexIndex = id % 3;

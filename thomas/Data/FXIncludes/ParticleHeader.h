@@ -50,6 +50,8 @@ struct BillboardStruct
 	float textureIndex;
 	float fade;
     float2 uvs[2][3];
+	uint blendMode;
+	uint3 pad;
 };
 
 //particle counter byteaddressbuffer
