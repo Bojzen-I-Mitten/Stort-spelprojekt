@@ -76,35 +76,77 @@ public class ChadStateMachine : NetworkComponent
         m_state = CHAD_STATE.IDLE;
     }
 
+    //Don't extend
     IEnumerator ChargingCoroutine()
     {
         float timer = 4.0f;
+        bool charging = false;
 
-        while (timer > 0.0f && !Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        while (m_state == CHAD_STATE.THROWING && !charging)
         {
-            //Player is not 
-            m_chargeForce += m_incrementForce * Time.DeltaTime;
-            m_chadControls.ChargeBall();
+            while (timer > 0.0f && Input.GetMouseButton(Input.MouseButtons.LEFT) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
+            {
+                m_chargeForce += m_incrementForce * Time.DeltaTime;
+                m_chadControls.ChargeBall();
 
-            timer -= Time.DeltaTime;
+                timer -= Time.DeltaTime;
+                charging = true;
+                yield return null;
+            }
+            if (!Input.GetMouseButton(Input.MouseButtons.RIGHT))
+            {
+                m_chadControls.ResetCamera();
+
+                m_chargeForce = m_baseForce;
+
+                // check what mode to enter
+                if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
+                {
+                    m_state = CHAD_STATE.MOVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.RUNNING, 0);
+                    Weights.Add(Chadimations.STATE.STRAFING_LEFT, 0);
+                    Weights.Add(Chadimations.STATE.STRAFING_RIGHT, 0);
+                    Weights.Add(Chadimations.STATE.BACKWARDS, 0);
+                }
+                else
+                {
+                    m_state = CHAD_STATE.IDLE;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.IDLE, 0);
+                    Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
+                    Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+                }
+                m_ball.Cleanup();
+
+                StopCoroutine(ChargingCoroutine());
+            }
+                
             yield return null;
         }
-        if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+
+        if (charging)
         {
             timer = 1.0f;
-            while(timer > 0.0f)
+            while (Input.GetMouseButton(Input.MouseButtons.RIGHT) && charging)
             {
-                Weights[Chadimations.STATE.THROWING] = 1f;
-                m_chadControls.ThrowBall(m_chargeForce);
-                timer -= Time.DeltaTime;
+                while (timer > 0.0f && Input.GetMouseButton(Input.MouseButtons.RIGHT) && !Input.GetMouseButton(Input.MouseButtons.LEFT))
+                {
+                    Weights[Chadimations.STATE.THROWING] = 1f;
+                    m_chadControls.ThrowBall(m_chargeForce);
+                    timer -= Time.DeltaTime;
 
-                m_animations.SetAnimations(Weights);
+                    charging = false;
+                    m_animations.SetAnimations(Weights);
+                    yield return null;
+                }
                 yield return null;
             }
             
             m_chadControls.ResetCamera();
 
             m_chargeForce = m_baseForce;
+            m_ball.Cleanup();
 
             // check what mode to enter
             if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
@@ -181,6 +223,7 @@ public class ChadStateMachine : NetworkComponent
                             Weights.Add(Chadimations.STATE.BACKWARDS, 0);
                             Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                             Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+                            StartCoroutine(ChargingCoroutine());
                         }
                         else if (Input.GetKeyDown(Input.Keys.Space))
                         {
@@ -220,10 +263,10 @@ public class ChadStateMachine : NetworkComponent
                 // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
 
                 //If player started to charge
-                if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
-                {
-                    StartCoroutine(ChargingCoroutine());
-                }
+                //if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+                //{
+                //    StartCoroutine(ChargingCoroutine());
+                //}
                 if (m_isTackled)
                 {
                     m_state = CHAD_STATE.RAGDOLL;
@@ -245,27 +288,30 @@ public class ChadStateMachine : NetworkComponent
                         if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                         {
                             // blend anim strafing and throwing
-                            Weights[Chadimations.STATE.THROWING] = 1f / 3f;
-                            Weights[Chadimations.STATE.WALKING] = 1f / 3f;
-                            Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 3f;
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.WALKING] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 2f;
 
                             m_chadControls.HandleMovement(m_velocity * 0.66f, -m_velocity * 0.66f);
                         }
                         else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                         {
                             //blend anim strafing and throwing
-                            Weights[Chadimations.STATE.THROWING] = 1f / 3f;
-                            Weights[Chadimations.STATE.WALKING] = 1f / 3f;
-                            Weights[Chadimations.STATE.STRAFING_RIGHT] = 1f / 3f;
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.WALKING] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_RIGHT] = 1f / 2f;
 
                             m_chadControls.HandleMovement(m_velocity * 0.66f, m_velocity * 0.66f);
                         }
                         else if (!Input.GetKey(Input.Keys.S))
                         {
                             // blend anim walking backwards and throwing
-                            Weights[Chadimations.STATE.THROWING] = 0.5f;
-                            Weights[Chadimations.STATE.WALKING] = 0.5f;
-
+                            //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                            //Weights[Chadimations.STATE.STRAFING_LEFT] = 0.0f;
+                            //Weights[Chadimations.STATE.STRAFING_RIGHT] = 0.0f;
+                            //Weights[Chadimations.STATE.BACKWARDS] = 0.0f;
+                            Weights[Chadimations.STATE.RUNNING] = 1.0f;
+                            Debug.Log(Weights.Count);
                             m_chadControls.HandleMovement(m_velocity, 0);
                         }
 
@@ -276,24 +322,24 @@ public class ChadStateMachine : NetworkComponent
                         if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                         {
                             // blend anim backing and throwing
-                            Weights[Chadimations.STATE.THROWING] = 1f / 3f;
-                            Weights[Chadimations.STATE.BACKWARDS] = 1f / 3f;
-                            Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 3f;
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.BACKWARDS] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 2f;
                             m_chadControls.HandleMovement(-m_velocity * 0.66f, -m_velocity * 0.66f);
                         }
                         else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                         {
                             //blend anim backing and throwing
-                            Weights[Chadimations.STATE.THROWING] = 1f / 3f;
-                            Weights[Chadimations.STATE.BACKWARDS] = 1f / 3f;
-                            Weights[Chadimations.STATE.STRAFING_RIGHT] = 1f / 3f;
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.BACKWARDS] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_RIGHT] = 1f / 2f;
                             m_chadControls.HandleMovement(-m_velocity * 0.66f, m_velocity * 0.66f);
                         }
                         else if (!Input.GetKey(Input.Keys.W))
                         {
                             // blend anim backing and throwing
-                            Weights[Chadimations.STATE.THROWING] = 0.5f;
-                            Weights[Chadimations.STATE.BACKWARDS] = 0.5f;
+                            //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                            Weights[Chadimations.STATE.BACKWARDS] = 1.0f;
                             m_chadControls.HandleMovement(-m_velocity, 0);
                         }
                     }
@@ -301,15 +347,15 @@ public class ChadStateMachine : NetworkComponent
                     else if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                     {
                         // blend anim strafing and throwing
-                        Weights[Chadimations.STATE.THROWING] = 0.5f;
-                        Weights[Chadimations.STATE.STRAFING_LEFT] = 0.5f;
+                        //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                        Weights[Chadimations.STATE.STRAFING_LEFT] = 1.0f;
                         m_chadControls.HandleMovement(0, -m_velocity * 0.66f);
                     }
                     else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                     {
                         // blend anim strafing and throwing
-                        Weights[Chadimations.STATE.THROWING] = 0.5f;
-                        Weights[Chadimations.STATE.STRAFING_RIGHT] = 0.5f;
+                        //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                        Weights[Chadimations.STATE.STRAFING_RIGHT] = 1.0f;
                         m_chadControls.HandleMovement(0, m_velocity);
                     }
 
@@ -322,38 +368,7 @@ public class ChadStateMachine : NetworkComponent
                         else
                             Weights[Chadimations.STATE.TURNING_RIGHT] = 1f / 3f;
                     }
-
-                    //if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-                    //{
-                    //    Weights[Chadimations.STATE.THROWING] = 1f;
-                    //    m_chadControls.ResetCamera();
-                    //    // player was charging and is not throwing
-
-                    //    // play throwing anim
-                    //    m_chadControls.ThrowBall(m_chargeForce);
-                    //    m_chargeForce = m_baseForce;
-
-                    //    // check what mode to enter
-                    //    if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
-                    //    {
-                    //        m_state = CHAD_STATE.MOVING;
-                    //        Weights.Clear();
-                    //        Weights.Add(Chadimations.STATE.RUNNING, 0);
-                    //        Weights.Add(Chadimations.STATE.STRAFING_LEFT, 0);
-                    //        Weights.Add(Chadimations.STATE.STRAFING_RIGHT, 0);
-                    //        Weights.Add(Chadimations.STATE.BACKWARDS, 0);
-                    //    }
-                    //    else
-                    //    {
-                    //        m_state = CHAD_STATE.IDLE;
-                    //        Weights.Clear();
-                    //        Weights.Add(Chadimations.STATE.IDLE, 0);
-                    //        Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
-                    //        Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
-                    //    }
-                    //}
                 }
-
                 m_animations.SetAnimations(Weights);
                 break;
             case CHAD_STATE.MOVING:
@@ -376,7 +391,7 @@ public class ChadStateMachine : NetworkComponent
                 {
                     //if m_velocity > m_runningSpeed && anim != running {anim = running}
                     //elif m_velocity < m_runningSpeed && anim != walking {anim = walking}
-                    if (Input.GetMouseButton(Input.MouseButtons.LEFT) && m_chadControls.HasBall)
+                    if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && m_chadControls.HasBall)
                     {
                         m_state = CHAD_STATE.THROWING;
                         Weights.Clear();
@@ -386,6 +401,7 @@ public class ChadStateMachine : NetworkComponent
                         Weights.Add(Chadimations.STATE.BACKWARDS, 0);
                         Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                         Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+                        StartCoroutine(ChargingCoroutine());
                     }
                     else if (Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S))
                     {

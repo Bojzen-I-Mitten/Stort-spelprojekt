@@ -92,7 +92,7 @@ public class Ball : NetworkComponent
 
     private void ResetElectricityEmitters()
     {
-        electricityIntensifyerThreshold = 0;
+        electricityIntensifyerThreshold = 0.6f;
 
         emitterElectricity1.MinSize = 0.1f;
         emitterElectricity1.MaxSize = 0.3f;
@@ -184,6 +184,7 @@ public class Ball : NetworkComponent
             ResetFireEmitters();
             emitterFire.Emit = false;
             emitterSmoke.Emit = false;
+            ResetElectricityEmitters();
         }
     }
 
@@ -217,15 +218,15 @@ public class Ball : NetworkComponent
         Color newColor = new Color(interp, 0.0f, (1.0f-interp));
         renderComponent.material.SetColor("color", newColor);
 
-        if (interp > 0.7f)
+        if (interp > 0.8f)
         {
             emitterFire.Emit = true;
         }
         if (interp > electricityIntensifyerThreshold)
         {
-            MultiplyWithIntensity((float)(1.6f - electricityIntensifyerThreshold), emitterElectricity1);
-            MultiplyWithIntensity((float)(1.6f - electricityIntensifyerThreshold), emitterElectricity2);
-            MultiplyWithIntensity((float)(1.6f - electricityIntensifyerThreshold), emitterElectricity3);
+            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
+            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
+            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
             electricityIntensifyerThreshold += 0.3f;
         }
         
@@ -239,21 +240,30 @@ public class Ball : NetworkComponent
             transform.position = transform.position + Vector3.Normalize(force) * 2;
             rigidbody.AddForce(force, Rigidbody.ForceMode.Impulse);
 
-            renderComponent.material.SetColor("color", new Color(0, 0, 255));
-
-            EmitterExplosion();
-            emitterElectricity1.Emit = false;
-            emitterElectricity2.Emit = false;
-            emitterElectricity3.Emit = false;
-
+            Cleanup();
+            fireIntensityreThreshold = 0.6f;
             emitterFire.Emit = true;
             emitterSmoke.Emit = true;
-
-            fireIntensityreThreshold = 0.6f;
-            // Reset values
-            chargeTimeCurrent = 0;
-            ResetElectricityEmitters();
+            EmitterExplosion();
+            
+            
         }
+    }
+
+    public void Cleanup()
+    {
+        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
+        ResetFireEmitters();
+        // Reset values
+        chargeTimeCurrent = 0;
+        ResetElectricityEmitters();
     }
     
     public void Pickup(GameObject gobj, Transform hand)
