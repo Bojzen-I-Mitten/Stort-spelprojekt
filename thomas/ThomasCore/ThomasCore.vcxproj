@@ -20,6 +20,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\ImGuizmo.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\thomas\editor\gizmos\GizmoRenderBuffer.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.cpp" />
     <ClCompile Include="src\thomas\editor\Editor.cpp" />
@@ -32,6 +37,8 @@
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
+    <ClCompile Include="src\thomas\resource\Font.cpp" />
+    <ClCompile Include="src\thomas\graphics\GUIManager.cpp" />
     <ClCompile Include="src\thomas\resource\MemoryAllocation.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
     <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
@@ -43,11 +50,6 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\BaseAnimationTime.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\BarycentricBlendNode.cpp" />
-    <ClCompile Include="include\imgui\imgui.cpp" />
-    <ClCompile Include="include\imgui\ImGuizmo.cpp" />
-    <ClCompile Include="include\imgui\imgui_demo.cpp" />
-    <ClCompile Include="include\imgui\imgui_draw.cpp" />
-    <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\AnimationData.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\BoneFrame.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\data\Channel.cpp" />
@@ -115,6 +117,14 @@
     <ClCompile Include="src\thomas\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\imgui\imconfig.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
+    <ClInclude Include="include\imgui\ImGuizmo.h" />
+    <ClInclude Include="include\imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="include\imgui\imgui_internal.h" />
+    <ClInclude Include="include\imgui\stb_rect_pack.h" />
+    <ClInclude Include="include\imgui\stb_textedit.h" />
+    <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="src\thomas\Constants.h" />
     <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\EditorWindow.h" />
@@ -126,14 +136,6 @@
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
     <ClInclude Include="src\thomas\graphics\animation\BarycentricBlendNode.h" />
-    <ClInclude Include="include\imgui\imconfig.h" />
-    <ClInclude Include="include\imgui\imgui.h" />
-    <ClInclude Include="include\imgui\ImGuizmo.h" />
-    <ClInclude Include="include\imgui\imgui_impl_dx11.h" />
-    <ClInclude Include="include\imgui\imgui_internal.h" />
-    <ClInclude Include="include\imgui\stb_rect_pack.h" />
-    <ClInclude Include="include\imgui\stb_textedit.h" />
-    <ClInclude Include="include\imgui\stb_truetype.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.h" />
@@ -161,6 +163,7 @@
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
+    <ClInclude Include="src\thomas\graphics\GUIManager.h" />
     <ClInclude Include="src\thomas\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\CapsuleCollider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="src\thomas\ProfileManager.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ComputeShader.h" />
+    <ClInclude Include="src\thomas\resource\Font.h" />
     <ClInclude Include="src\thomas\resource\MemoryAllocation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderProperty.h" />

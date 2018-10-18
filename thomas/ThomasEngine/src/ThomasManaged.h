@@ -13,6 +13,7 @@ namespace ThomasEngine {
 	public ref class ThomasWrapper
 	{
 	private:
+		static bool shouldStop = false;
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
@@ -24,6 +25,8 @@ namespace ThomasEngine {
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
+	private:
+		static void Stop();
 	public:
 		static ManualResetEvent^ RenderFinished;
 
@@ -63,7 +66,7 @@ namespace ThomasEngine {
 
 		static bool IsPlaying();
 
-		static void Stop();
+		static void IssueStop();
 
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 
