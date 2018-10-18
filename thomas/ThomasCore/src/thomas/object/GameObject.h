@@ -44,12 +44,15 @@ namespace thomas
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, Scene* scene);
 			template<typename T>
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, component::Transform* parent, Scene* scene);
+
 			bool GetActive();
-			bool GetStatic();
-			void SetStatic();
 			void SetActive(bool active);
-			void SetSelection(bool selected);
+
+			bool GetStatic();
+			void SetStatic(bool state);
+
 			bool GetSelection();
+			void SetSelection(bool selected);
 
 			/* Remove the component referenced to in the pointer.
 			 comp_ptr	<<	Component to remove
@@ -60,10 +63,11 @@ namespace thomas
 			std::vector<component::Component*> m_components;
 			component::Transform* m_transform = nullptr;
 			bool m_activeSelf;
-			static bool m_staticSelf;
+
 
 		private:
 			bool m_selected;
+			bool m_staticSelf;
 			static std::vector<GameObject*> s_gameObjects;
 		};
 		

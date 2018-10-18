@@ -30,11 +30,6 @@ namespace ThomasEngine {
 			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
 	}
 
-	bool GameObject::getToBeStatic()
-	{
-		return m_toBeStatic;
-	}
-
 	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
@@ -105,13 +100,13 @@ namespace ThomasEngine {
 
 	thomas::object::Object* GameObject::setStatic()
 	{
-
-
 		thomas::object::Object* moved;
+
 		nativePtr = thomas::ObjectHandler::setStatic(nativePtr, moved);
 
-		m_toBeStatic = false;
-		m_isStatic = true;
+		((thomas::object::GameObject*)nativePtr)->SetStatic(true);
+
+		m_makeStatic = false;
 
 		return moved;
 	}
@@ -212,6 +207,11 @@ namespace ThomasEngine {
 		Object::Destroy();
 	}
 
+	bool GameObject::MakeStatic()
+	{
+		return m_makeStatic;
+	}
+
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
 		// This function has been hooked by GameObject manager, this does nothng
@@ -294,12 +294,6 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
 	}
-
-	void GameObject::toBeStatic()
-	{
-		m_toBeStatic = !m_toBeStatic;
-	}
-
 
 	generic<typename T>
 	where T : Component
@@ -416,12 +410,13 @@ namespace ThomasEngine {
 
 	bool GameObject::staticSelf::get()
 	{
-		return m_toBeStatic;
+		return ((thomas::object::GameObject*)nativePtr)->GetStatic() || m_makeStatic;
 	}
 
-	void GameObject::staticSelf::set(bool value)
+	void GameObject::staticSelf::set(bool state)
 	{
-		m_toBeStatic = value;
+		if (!((thomas::object::GameObject*)nativePtr)->GetStatic())
+			m_makeStatic = state;
 	}
 
 	void GameObject::activeSelf::set(bool value)
@@ -480,11 +475,5 @@ namespace ThomasEngine {
 		}
 		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));
-	}
-
-
-	bool GameObject::GetStatic()
-	{
-		return m_isStatic;
 	}
 }

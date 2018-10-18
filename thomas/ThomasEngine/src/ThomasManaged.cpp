@@ -231,13 +231,16 @@ namespace ThomasEngine {
 					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 					{
 						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-						thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
-						if (gameObject->getToBeStatic())
-						{
-							thomas::object::Object* old_native = gameObject->setStatic();
-							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
-							temp->nativePtr = new_temp;
 
+						if (gameObject->MakeStatic())
+						{
+							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+
+							thomas::object::Object* old_native = gameObject->setStatic();
+
+							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+							temp->nativePtr = new_temp;
 
 						}
 					}

@@ -60,16 +60,6 @@ namespace ThomasEditor
 
             }
 
-            private void StaticChanged(object sender, RoutedEventArgs e)
-            {
-                if (DataContext is GameObject)
-                {
-                    GameObject SelectedGameObject = DataContext as GameObject;
-                    GameObjectManager.makeStatic(SelectedGameObject);
-                    
-                }
-            }
-
             private void GameObjectInspector_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
             {
                 if (DataContext is GameObject)

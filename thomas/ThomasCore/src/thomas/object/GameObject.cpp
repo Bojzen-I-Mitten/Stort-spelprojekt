@@ -5,12 +5,12 @@ namespace thomas
 	namespace object
 	{
 		std::vector<GameObject*> GameObject::s_gameObjects;
-		bool GameObject::m_staticSelf;
 		GameObject::GameObject()
 		{
 			m_activeSelf = true;
 			m_name = "VoidName";
 			m_selected = false;
+			m_staticSelf = false;
 		}
 
 		GameObject::GameObject(std::string name)
@@ -169,14 +169,15 @@ namespace thomas
 			m_selected = selected;
 		}
 
-		void GameObject::SetStatic()
-		{
-			m_staticSelf = !m_staticSelf;
-		}
 
 		bool GameObject::GetStatic()
 		{
 			return m_staticSelf;
+		}
+
+		void GameObject::SetStatic(bool state)
+		{
+			m_staticSelf = state;
 		}
 
 		bool GameObject::GetSelection()

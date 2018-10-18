@@ -21,6 +21,7 @@ namespace ThomasEngine
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
 		uint32_t m_scene_id;
+		bool m_makeStatic = false;
 
 		GameObject();
 		virtual ~GameObject();
@@ -36,8 +37,6 @@ namespace ThomasEngine
 		System::String^ prefabPath;
 
 		bool m_isDestroyed = false;
-		static bool m_toBeStatic = false;
-		static bool m_isStatic = false;
 
 		System::Object^ m_componentsLock = gcnew System::Object();
 
@@ -69,11 +68,11 @@ namespace ThomasEngine
 
 	public:
 		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
-		bool getToBeStatic();
+
 		GameObject(String^ name);
 		
 		static GameObject^ CreatePrefab();
-		static void toBeStatic();
+
 		property bool inScene {
 			bool get() {
 				return m_scene_id; // != 0
@@ -91,7 +90,7 @@ namespace ThomasEngine
 		property bool staticSelf
 		{
 			bool get();
-			void set(bool value);
+			void set(bool state);
 		}
 
 		[BrowsableAttribute(false)]
@@ -101,7 +100,7 @@ namespace ThomasEngine
 			void set(String^) override;
 		};
 
-		
+		bool MakeStatic();
 
 		String^ ToString() override
 		{
@@ -160,7 +159,6 @@ namespace ThomasEngine
 		static GameObject^ CreatePrimitive(PrimitiveType type);
 
 		bool GetActive();
-		static bool GetStatic();
 		void SetActive(bool active);
 
 		static GameObject^ Instantiate(GameObject^ original);

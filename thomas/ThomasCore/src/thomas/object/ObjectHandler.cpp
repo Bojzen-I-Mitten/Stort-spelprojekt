@@ -40,7 +40,7 @@ namespace thomas
 
 				m_objectsActive.pop_back();
 
-				m_objectsStatic.back().SetStatic();
+				m_objectsStatic.back().SetStatic(true);
 
 				// Since we have to select the object to make it static, 
 				// We have to set the new object as the selected one
@@ -69,8 +69,7 @@ namespace thomas
 
 				m_objectsStatic.pop_back();
 
-				m_objectsStatic.back().SetStatic();
-				m_objectsStatic.back().SetActive(true);
+				m_objectsStatic.back().SetStatic(true);
 
 				return &m_objectsStatic.back(); // We have moved it
 			}

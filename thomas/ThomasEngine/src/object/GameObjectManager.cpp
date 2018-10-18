@@ -33,8 +33,8 @@ namespace ThomasEngine
 
 	void GameObjectManager::makeStatic(GameObject^ object)
 	{
-		if (!object->m_isStatic)
-			object->setStatic();
+		if (!object->staticSelf::get())
+			object->staticSelf::set(true);
 	}
 
 	void GameObjectManager::RemoveMarkedObjects()
