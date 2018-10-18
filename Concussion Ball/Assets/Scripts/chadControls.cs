@@ -20,16 +20,17 @@ public class ChadControls : NetworkComponent
     };
     public STATE State { get; private set; }
 
+    //public int Speed { get; set; } = 5;
+    //public float Force { get; set; } = 5;
+
     #region Throwing stuff
     public float BaseThrowForce { get; set; } = 5.0f;
     public float MaxThrowForce { get; set; } = 20.0f;
     public float ChargeRate { get; set; } = 5.0f;
     private float ThrowForce;
     public Transform hand { get; set; }
+    public float ChargeTime {get; private set;}
     #endregion
-
-    //public int Speed { get; set; } = 5;
-    //public float Force { get; set; } = 5;
 
     #region Camera Settings etc.
     [Category("Camera Settings")]
@@ -45,15 +46,13 @@ public class ChadControls : NetworkComponent
     [Category("Camera Settings")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
     [Category("Camera Settings")]
-    public float CameraHeightThrowing { get; set; } = 0.8f;
-    [Category("Camera Settings")]
-    public float CameraDistanceThrowing { get; set; } = 0.5f;
+    public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(-1.5f, 1.5f, 1.5f);
     [Category("Camera Settings")]
     public float TotalYStep { get; private set; } = 0;
     [Category("Camera Settings")]
     public float TotalXStep { get; private set; } = 0;
     #endregion
-    
+
     #region Movement stuff
     public Vector3 Direction; //Right, roll, forward
 
@@ -102,6 +101,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        Debug.Log(State);
         Direction = new Vector3(0, 0, 0);
 
         HandleKeyboardInput();
@@ -109,7 +109,7 @@ public class ChadControls : NetworkComponent
 
         StateMachine();
     }
-    
+
     #region Input handling
     private void HandleKeyboardInput()
     {
@@ -128,6 +128,12 @@ public class ChadControls : NetworkComponent
             Direction.x -= 1;
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
+
+        //if (Input.GetKey(Input.Keys.Space))
+        //{
+        //    State = STATE.DIVING;
+        //    StartCoroutine(DivingCoroutine());
+        //}
     }
 
     private void HandleMouseInput()
@@ -145,13 +151,27 @@ public class ChadControls : NetworkComponent
             if (HasBall)
             {
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+                {
                     State = STATE.THROWING;
+                    StartCoroutine(ChargingCoroutine());
+                }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
+                {
                     State = STATE.CHADING;
+                    StopCoroutine(ChargingCoroutine());
+                    ResetCharge();
+                }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
+                {
                     ChargeBall();
+                }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
+                {
+                    State = STATE.CHADING;
                     ThrowBall();
+                    StopCoroutine(ChargingCoroutine());
+                    ResetCharge();
+                }
             }
 
             float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
@@ -165,7 +185,7 @@ public class ChadControls : NetworkComponent
                 //Regular cam
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT))
+            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasBall)
             {
                 //Throwing cam
                 ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
@@ -187,8 +207,15 @@ public class ChadControls : NetworkComponent
             }
         }
     }
+
+    private void ResetCharge()
+    {
+        ChargeTime = 0;
+        Ball.chargeTimeCurrent = 0;
+        Ball.StopEmitting();
+    }
     #endregion
-    
+
     #region Camera controls
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
@@ -237,7 +264,7 @@ public class ChadControls : NetworkComponent
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
             Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = new Vector3(CameraDistanceThrowing, CameraHeightThrowing, CameraDistanceThrowing);
+            Camera.transform.localPosition = CameraOffsetThrowing;
         }
     }
 
@@ -307,7 +334,6 @@ public class ChadControls : NetworkComponent
                     CurrentVelocity.x = 0;
                     CurrentVelocity.y = MaxSpeed;
                     transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
-                    StartCoroutine(DivingCoroutine());
                     break;
                 case STATE.RAGDOLL:
                     break;
@@ -315,20 +341,40 @@ public class ChadControls : NetworkComponent
         }
     }
 
+    #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        yield return new WaitForSeconds(1.0f);
+        float timer = 1.0f;
+        while (timer > 0.0f)
+        {
+            timer -= Time.DeltaTime;
+            yield return null;
+        }
         CurrentVelocity.y = BaseSpeed;
         State = STATE.CHADING;
     }
-
-    public void ChargeBall()
+    
+    IEnumerator ChargingCoroutine()
     {
-        Ball.ChargeColor();
-        ThrowForce += ChargeRate * Time.DeltaTime;
+        float timer = 4;
+        while (timer > 0)
+        {
+            timer = MathHelper.Clamp(timer - Time.DeltaTime, 0, 4);
+            ChargeTime = 4 - timer;
+            Ball.chargeTimeCurrent = ChargeTime;
+            yield return null;
+        }
     }
 
-    public void ThrowBall()
+    #endregion
+
+    private void ChargeBall()
+    {
+        Ball.ChargeColor();
+        ThrowForce = ChargeRate * ChargeTime;
+    }
+
+    private void ThrowBall()
     {
         Ball.Throw(Camera.transform.forward * ThrowForce);
         timeSinceLastThrow = 0;

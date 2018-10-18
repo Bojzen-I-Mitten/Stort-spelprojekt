@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using ThomasEngine;
@@ -19,7 +21,7 @@ public class Ball : NetworkComponent
     private Rigidbody rigidbody;
     private RenderComponent renderComponent;
     private bool pickedUp { get { return !rigidbody.enabled; } set { rigidbody.enabled = !value; } }
-    private float chargeTimeCurrent;
+    public float chargeTimeCurrent;
     private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
     private float fireIntensityreThreshold;
@@ -211,8 +213,7 @@ public class Ball : NetworkComponent
         emitterElectricity1.Emit = true;
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
-
-        chargeTimeCurrent += Time.DeltaTime;
+        
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
         Color newColor = new Color(interp, 0.0f, (1.0f-interp));
@@ -230,6 +231,27 @@ public class Ball : NetworkComponent
             electricityIntensifyerThreshold += 0.3f;
         }
         
+    }
+
+    public void StopEmitting()
+    {
+        StartCoroutine(StopEmission());
+    }
+
+    private IEnumerator StopEmission()
+    {
+        float timer = 3;
+        while(timer > 0)
+        {
+            timer -= Time.DeltaTime;
+            yield return null;
+        }
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
     }
 
     public void Throw(Vector3 force)

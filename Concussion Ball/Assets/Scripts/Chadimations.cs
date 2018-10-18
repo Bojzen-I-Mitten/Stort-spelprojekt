@@ -18,7 +18,11 @@ public class Chadimations : NetworkComponent
 
         public float GetWeight(Vector3 target)
         {
-            float distance = Vector3.Distance(target, Position);
+            //Vector3 active = new Vector3(Position.x != 0 ? 1 : 0, Position.y != 0 ? 1 : 0, Position.z != 0 ? 1 : 0);
+            //Vector3 distanceVector = target - Position;
+            //distanceVector = Vector3.Multiply(distanceVector, active);
+            //float distance = distanceVector.Length();
+            float distance = Vector3.Distance(target, Position); //Buggy animations
             return 1.0f - MathHelper.Clamp(distance, 0.0f, 1.0f);
         }
     }
@@ -54,31 +58,37 @@ public class Chadimations : NetworkComponent
         Chad = gameObject.GetComponent<ChadControls>();
         if (Skin != null)
         {
-            foreach (var state in Animations)
+            if (Animations.Count > 0)
             {
-                BlendNode newBlendNode = new BlendNode(Skin.model);
-                foreach (var node in state.Value)
+                foreach (var state in Animations)
                 {
-                    newBlendNode.appendNode(node.Animation, true);
+                    BlendNode newBlendNode = new BlendNode(Skin.model);
+                    foreach (var node in state.Value)
+                    {
+                        newBlendNode.appendNode(node.Animation, true);
+                    }
+                    BlendNodes.Add(state.Key, newBlendNode);
+
+                    WeightHandle newWeightHandle = BlendNodes[state.Key].generateWeightHandle();
+                    WeightHandles.Add(state.Key, newWeightHandle);
                 }
-                BlendNodes.Add(state.Key, newBlendNode);
 
-                WeightHandle newWeightHandle = BlendNodes[state.Key].generateWeightHandle();
-                WeightHandles.Add(state.Key, newWeightHandle);
+                WeightHandles[ChadControls.STATE.CHADING].setWeight(0, new WeightTripple(1f));
+                Skin.setBlendTreeNode(BlendNodes[ChadControls.STATE.CHADING]);
             }
-
-            WeightHandles[ChadControls.STATE.CHADING].setWeight(0, new WeightTripple(1f));
-            Skin.setBlendTreeNode(BlendNodes[ChadControls.STATE.CHADING]);
         }
     }
 
     public override void Update()
     {
-        Skin.setBlendTreeNode(BlendNodes[State]);
-        for (uint i = 0; i < Animations[State].Count; i++)
+        if (BlendNodes.ContainsKey(State))
         {
-            AnimationNode node = Animations[State][(int)i];
-            WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+            Skin.setBlendTreeNode(BlendNodes[State]);
+            for (uint i = 0; i < Animations[State].Count; i++)
+            {
+                AnimationNode node = Animations[State][(int)i];
+                WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+            }
         }
     }
 }

@@ -137,7 +137,7 @@ namespace thomas
 		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
 		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
 
-		if(colliderA && colliderB && !colliderA->isDestroyed() && colliderB->isDestroyed())
+		if(colliderA && colliderB && !colliderA->isDestroyed() && !colliderB->isDestroyed())
 		{
 			colliderA->OnCollision(colliderB, collisionType);
 			colliderB->OnCollision(colliderA, collisionType);
