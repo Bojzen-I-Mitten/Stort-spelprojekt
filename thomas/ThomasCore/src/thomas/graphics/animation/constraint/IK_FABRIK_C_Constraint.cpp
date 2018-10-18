@@ -52,20 +52,24 @@ namespace thomas {
 				math::Vector2 q_i;
 				q_i.x = d_i.Dot(m_ii.Right());
 				q_i.y = d_i.Dot(m_ii.Forward());
-				float a = d_i.Dot(m_ii.Up());
+				float a = d_i.Dot(-m_ii.Up());
+				if (a < 0.f) 
+					return; // Point is infront of the matrix.
 				float b = q_i.Length();
 				float c = a * std::tanf(limit_bend);
-				float l_proj = std::fmaxf(b - c, 0.f);
-				q_i *= l_proj;
-				math::Vector3 proj_diff = q_i.x * m_ii.Right() + q_i.y * m_ii.Forward();			// Vector projecting p_i -> p_in
-				math::Vector3 p_n = (bone_len  / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in
+				float l_proj = b - c;
+				if (l_proj > 0.f)
+				{
+					q_i *= l_proj;
+					math::Vector3 proj_diff = q_i.x * m_ii.Right() + q_i.y * m_ii.Forward();			// Vector projecting p_i -> p_in
+					math::Vector3 p_n = (bone_len / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in
 
-				// Update p_i
-				*p_c = p_n;
+					// Update p_i
+					*p_c = p_n;
+				}
 				// Calc. orientation
-				d_i = (p_n - p_ii) / bone_len;
+				d_i = (*p_c - p_ii) / bone_len;
 				*c_orient = *c_orient * math::getMatrixRotationTo(c_orient->Up(), d_i);
-
 			}
 
 			/* FABRIK backward/forward iteration
