@@ -21,6 +21,7 @@ namespace ThomasEngine
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
 		uint32_t m_scene_id;
+		bool m_makeDynamic = false;
 		bool m_makeStatic = false;
 
 		GameObject();
@@ -50,7 +51,7 @@ namespace ThomasEngine
 		static void InitGameObjects(bool playing);
 
 		thomas::object::Object* setStatic();
-
+		thomas::object::Object* setDynamic();
 				
 		void Update();
 
@@ -67,6 +68,8 @@ namespace ThomasEngine
 		}
 
 	public:
+		bool MakeStatic();
+		bool MakeDynamic();
 		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 
 		GameObject(String^ name);
@@ -100,7 +103,7 @@ namespace ThomasEngine
 			void set(String^) override;
 		};
 
-		bool MakeStatic();
+
 
 		String^ ToString() override
 		{

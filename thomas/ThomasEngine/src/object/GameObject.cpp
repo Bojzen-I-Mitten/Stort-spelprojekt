@@ -111,6 +111,19 @@ namespace ThomasEngine {
 		return moved;
 	}
 
+	thomas::object::Object * GameObject::setDynamic()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::setDynamic(nativePtr, moved);
+
+		((thomas::object::GameObject*)nativePtr)->SetDynamic(true);
+
+		m_makeDynamic = false;
+
+		return moved;
+	}
+
 	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
 	{
 		if (nativeptr != nullptr)
@@ -211,6 +224,12 @@ namespace ThomasEngine {
 	{
 		return m_makeStatic;
 	}
+
+	bool GameObject::MakeDynamic()
+	{
+		return m_makeDynamic;
+	}
+
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
@@ -410,13 +429,25 @@ namespace ThomasEngine {
 
 	bool GameObject::staticSelf::get()
 	{
-		return ((thomas::object::GameObject*)nativePtr)->GetStatic() || m_makeStatic;
+		return (((thomas::object::GameObject*)nativePtr)->GetStatic() || m_makeStatic) && !m_makeDynamic;
 	}
 
 	void GameObject::staticSelf::set(bool state)
 	{
-		if (!((thomas::object::GameObject*)nativePtr)->GetStatic())
-			m_makeStatic = state;
+		if (state)
+		{
+			// If box was checked and it's not static, we flag that 
+			// Object is going to be moved next frame
+			if (!((thomas::object::GameObject*)nativePtr)->GetStatic())
+				m_makeStatic = true;
+		}
+		else // if state is false, somebody just unchecked the box
+		{
+			if (!((thomas::object::GameObject*)nativePtr)->GetDynamic())
+			{
+				m_makeDynamic = true;
+			}
+		}
 	}
 
 	void GameObject::activeSelf::set(bool value)

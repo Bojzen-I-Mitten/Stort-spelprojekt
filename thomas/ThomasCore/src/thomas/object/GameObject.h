@@ -48,6 +48,9 @@ namespace thomas
 			bool GetActive();
 			void SetActive(bool active);
 
+			bool GetDynamic();
+			void SetDynamic(bool state);
+
 			bool GetStatic();
 			void SetStatic(bool state);
 
@@ -68,6 +71,7 @@ namespace thomas
 		private:
 			bool m_selected;
 			bool m_staticSelf;
+			bool m_dynamicSelf;
 			static std::vector<GameObject*> s_gameObjects;
 		};
 		

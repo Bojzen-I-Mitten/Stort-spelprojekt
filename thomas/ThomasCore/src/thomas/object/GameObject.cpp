@@ -175,6 +175,16 @@ namespace thomas
 			return m_staticSelf;
 		}
 
+		bool GameObject::GetDynamic()
+		{
+			return m_dynamicSelf;
+		}
+
+		void GameObject::SetDynamic(bool state)
+		{
+			m_dynamicSelf = state;
+		}
+
 		void GameObject::SetStatic(bool state)
 		{
 			m_staticSelf = state;
