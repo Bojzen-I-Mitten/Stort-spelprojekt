@@ -310,8 +310,8 @@ namespace thomas
 				averagePosition += gameObject->m_transform->GetPosition();
 				averageScale += gameObject->m_transform->GetScale();
 			}
-			averagePosition /= m_selectedObjects.size();
-			averageScale /= m_selectedObjects.size();
+			averagePosition /= (float)m_selectedObjects.size();
+			averageScale /= (float)m_selectedObjects.size();
 			
 
 
@@ -372,8 +372,8 @@ namespace thomas
 		{
 			math::Vector2 mousePos = WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition();
 
-			m_boxSelectRect.width = mousePos.x - m_boxSelectRect.x;
-			m_boxSelectRect.height = mousePos.y - m_boxSelectRect.y;
+			m_boxSelectRect.width = (long)(mousePos.x - m_boxSelectRect.x);
+			m_boxSelectRect.height = (long)(mousePos.y - m_boxSelectRect.y);
 
 			if (abs(m_boxSelectRect.width) < 10 && abs(m_boxSelectRect.height) < 10)
 				return;
@@ -381,13 +381,13 @@ namespace thomas
 			m_isBoxSelecting = true;
 
 			ImGui::GetOverlayDrawList()->AddRectFilled(
-				ImVec2(m_boxSelectRect.x, m_boxSelectRect.y),
-				ImVec2(m_boxSelectRect.x + m_boxSelectRect.width, m_boxSelectRect.y + m_boxSelectRect.height),
+				ImVec2((float)m_boxSelectRect.x, (float)m_boxSelectRect.y),
+				ImVec2((float)(m_boxSelectRect.x + m_boxSelectRect.width), (float)(m_boxSelectRect.y + m_boxSelectRect.height)),
 				ImColor(1.0f, 1.0f, 1.0f, 0.3f));
 
 			ImGui::GetOverlayDrawList()->AddRect(
-				ImVec2(m_boxSelectRect.x, m_boxSelectRect.y),
-				ImVec2(m_boxSelectRect.x + m_boxSelectRect.width, m_boxSelectRect.y + m_boxSelectRect.height),
+				ImVec2((float)m_boxSelectRect.x, (float)m_boxSelectRect.y),
+				ImVec2((float)(m_boxSelectRect.x + m_boxSelectRect.width), (float)(m_boxSelectRect.y + m_boxSelectRect.height)),
 				ImColor(1.0f, 1.0f, 1.0f, 1.0f));
 
 			math::BoundingFrustum frustrum = m_cameraComponent->GetSubFrustrum(m_boxSelectRect);

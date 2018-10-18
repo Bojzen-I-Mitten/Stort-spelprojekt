@@ -28,72 +28,49 @@ namespace thomas {
 				assert(chainIndex < m_num_link);
 				m_chain.get()[chainIndex] = param;
 			}
-			math::Matrix weightRotationBetween(math::Vector3 from, math::Vector3 dest, float weight)
-			{
-				assert(weight >= 0.f && weight <= 1.f);
-				from.Normalize();
-				dest.Normalize();
-
-				float c = from.Dot(dest);
-				if (c >= 1.0f) // Vectors are parallel	(identical)
-					return math::Matrix::Identity;
-				if (c < (1e-6f - 1.0f)) // Vectors are parallel (opposite)
-				{
-					// Generate an axis
-					math::Vector3 axis = math::Vector3::UnitX.Cross(from);
-					if (axis.LengthSquared() < 0.0001f) // Pick another if colinear
-						axis = math::Vector3::UnitY.Cross(from);
-					axis.Normalize();
-					return math::Matrix::CreateFromAxisAngle(axis, math::PI * weight);
-				}
-				else {
-
-					// Credit goes to: Jur Van den Berg 
-					// https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/476311#476311
-					math::Vector3 v = from.Cross(dest);
-					float a = std::acosf(c) * weight + 1.f - weight; // Lerp angle 
-					float s = 1.f / (1.f + std::cosf(a));
-
-					math::Matrix vx(
-						0.f, v.z, -v.y, 0.f,
-						-v.z, 0.f, v.x, 0.f,
-						v.y, -v.x, 0.f, 0.f,
-						0.f, 0.f, 0.f, 0.f);
-					vx = vx + (vx * vx) * s; // Simplify square calc? ...
-					// Add identity
-					vx._11 += 1.f;
-					vx._22 += 1.f;
-					vx._33 += 1.f;
-					vx._44 += 1.f;
-					return vx;
-				}
-			}
-
-			math::Vector3 lerp(const math::Vector3& from, const math::Vector3& to, float amount)
-			{
-				return from * (1.f - amount) + to * amount;
-			}
 
 			/* FABRIK out of reach edge case solution.
 			*/
-			void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link)
+			void IK_FABRIK_C_Constraint::FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link)
 			{
 				// Target is further away then the length of the chain
 				for (uint32_t i = 0; i < num_link - 1; i++) {
 					float r = math::Vector3::Distance(p[i], target);
 					float lambda = d[i] / r;
-					p[i+1] = lerp(p[i], target, lambda);
+					p[i+1] = math::lerp(p[i], target, lambda);
 				}
 			}
+			constexpr float limit_bend = math::PI / 4;
+			constexpr float limit_twist = math::PI / 4;
 
-			void solve_constraint_backward(math::Vector3 *c, math::Matrix *c_orient)
+			void IK_FABRIK_C_Constraint::solve_constraint_backward(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
 			{
+				math::Matrix m_ii = *(c_orient + 1);
+				math::Vector3 p_i = *p_c;
+				math::Vector3 p_ii = *(p_c + 1);
+				math::Vector3 d_i = p_i - p_ii;
+				math::Vector2 q_i;
+				q_i.x = d_i.Dot(m_ii.Right());
+				q_i.y = d_i.Dot(m_ii.Forward());
+				float a = d_i.Dot(m_ii.Up());
+				float b = q_i.Length();
+				float c = a * std::tanf(limit_bend);
+				float l_proj = std::fmaxf(b - c, 0.f);
+				q_i *= l_proj;
+				math::Vector3 proj_diff = q_i.x * m_ii.Right() + q_i.y * m_ii.Forward();			// Vector projecting p_i -> p_in
+				math::Vector3 p_n = (bone_len  / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in
+
+				// Update p_i
+				*p_c = p_n;
+				// Calc. orientation
+				d_i = (p_n - p_ii) / bone_len;
+				*c_orient = *c_orient * math::getMatrixRotationTo(c_orient->Up(), d_i);
 
 			}
 
 			/* FABRIK backward/forward iteration
 			*/
-			void FABRIK_iteration(math::Vector3 target, float *d, math::Vector3*p, math::Matrix *orient, uint32_t num_link)
+			void IK_FABRIK_C_Constraint::FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link)
 			{
 				// Target is within reach
 				math::Vector3 b = p[0];
@@ -106,20 +83,19 @@ namespace thomas {
 					for(; i > 0;){												// Forward reaching loop
 						i--;
 						float r = math::Vector3::Distance(p[i], p[i+1]);		// Distance to next joint
-						float lambda = d[i] / r;
-						p[i] = lerp(p[i+1], p[i], lambda);						// Next iter. position
+						float lambda = len[i] / r;
+						p[i] = math::lerp(p[i+1], p[i], lambda);						// Next iter. position
 
-						orient[i] = orient[i] * math::getMatrixRotationTo_Nor(orient[i].Up(), (p[i + 1] - p[i + 1]) / r);
-						solve_constraint_backward(p + i, orient + i);
+						solve_constraint_backward(p + i, orient + i, *(len + i));
 					}
 					// Stage 2: Backward reaching
 					*p = b;														// Reset root
 					for (; i < num_link - 1; i++) {								// Backward reaching loop
 						float r = math::Vector3::Distance(p[i], p[i + 1]);		// Distance to next joint
-						float lambda = d[i] / r;
-						p[i+1] = lerp(p[i], p[i + 1], lambda);					// Next iter. position
+						float lambda = len[i] / r;
+						p[i+1] = math::lerp(p[i], p[i + 1], lambda);					// Next iter. position
 
-						orient[i] = orient[i] * math::getMatrixRotationTo_Nor(orient[i].Up(), (p[i + 1] - p[i + 1]) / r);
+						orient[i] = orient[i] * math::getMatrixRotationTo(orient[i].Up(), (p[i + 1] - p[i]) / r);
 					}
 					dif = math::Vector3::Distance(p[num_link-1], target);
 				}
@@ -144,12 +120,13 @@ namespace thomas {
 				uint32_t i = 0;
 				for (; i < m_num_link - 1; i++) {										// Find position of each bone
 					p[i] = objectPose[chain[i].m_index].Translation();					// Bone joint position (initial)
-					orient[i] = math::normalizeBasisAxis(objectPose[chain[i].m_index]);	// Get matrix orientation
+					orient[i] = math::extractRotation(objectPose[chain[i].m_index]);	// Get matrix orientation
 					len[i] = math::Vector3::Distance(		
 						p[i], objectPose[chain[i+1].m_index].Translation());			// Bone length
-					link_sum += len[i];
+					link_sum += len[i];													// Sum chain length
 				}
 				p[i] = objectPose[chain[i].m_index].Translation();						// End case
+				orient[i] = math::Matrix::CreateFromQuaternion(m_targetOrient);			// -
 				// Distance from root to target
 				float targetDist = math::Vector3::Distance(
 					objectPose[m_chain.get()[0].m_index].Translation(), m_target);
@@ -165,7 +142,7 @@ namespace thomas {
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
 					pose = pose * weightRotationBetween(pose.Up(), p[i + 1] - p[i], m_weight);	// Rotate
-					pose.Translation(lerp(trans, p[i], m_weight));								// Apply new translation
+					pose.Translation(math::lerp(trans, p[i], m_weight));								// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;										// Set
 				}
 				math::Vector3 up = math::Vector3::Transform(math::Vector3::Up, m_targetOrient);
@@ -175,7 +152,7 @@ namespace thomas {
 				pose.Translation(math::Vector3::Zero);											// Remove translation
 				pose = pose * weightRotationBetween(pose.Up(), up, m_weight);					// Rotate transform to y
 				pose = pose * weightRotationBetween(pose.Right(), right, m_weight);				// Rotate transform to x
-				pose.Translation(lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
+				pose.Translation(math::lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
 				objectPose[(chain + m_num_link - 1)->m_index] = pose;
 
 				const float GIZMO_LEN = 0.05f;

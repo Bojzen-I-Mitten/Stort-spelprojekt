@@ -12,7 +12,7 @@ namespace DirectX
 	namespace SimpleMath
 	{
 		constexpr float PI = 3.141592654f;
-		constexpr float EPSILON = 1e-6;
+		constexpr float EPSILON = 1e-5f;
 
 		using DirectX::BoundingBox;
 		using DirectX::BoundingSphere;
@@ -52,6 +52,11 @@ namespace DirectX
 			v.Normalize();
 			return v;
 		}
+		inline Vector3 lerp(const Vector3& from, const Vector3& to, float amount)
+		{
+			return from * (1.f - amount) + to * amount;
+		}
+
 
 		Vector3 SphericalCoordinate(float phi, float theta, float radius = 1);
 

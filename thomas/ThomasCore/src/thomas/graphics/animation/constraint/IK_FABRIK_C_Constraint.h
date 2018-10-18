@@ -2,14 +2,12 @@
 #include <vector>
 #include <memory>
 #include "BoneConstraint.h"
+#include "IK_FABRIK_Constraint.h"
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
-
-			constexpr float FABRIK_TOLERANCE = 1.e-5f;
-			constexpr float MAX_FABRIK_ITER = 60;
-
+			
 			/* Transform 'input' constraint, bone position is specified externally through a transform component.
 			*/
 			class IK_FABRIK_C_Constraint
@@ -24,6 +22,11 @@ namespace thomas {
 					LinkParameter(){}
 					LinkParameter(uint32_t index) : m_index(index) {}
 				};
+
+			private:
+				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
+				void solve_constraint_backward(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
+				void FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link);
 
 			public:
 
