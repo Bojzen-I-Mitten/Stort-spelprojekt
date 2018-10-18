@@ -27,6 +27,9 @@ namespace ThomasEngine
 
 		static void SerializeMaterial(Material^ material, System::String^ path);
 		static Material^ DeserializeMaterial(System::String^ path);
+
+		static void ErrorHandler(Object^ sender, Serialization::ErrorEventArgs^ args);
+
 	public:
 		static bool IsFileReady(System::String^ path);
 		//Tries to ready a file with 0.1s delay between retries

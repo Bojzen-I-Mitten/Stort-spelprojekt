@@ -29,7 +29,8 @@ namespace ThomasEditor
         public string UpperLeftLeg { get; set; } = "mixamorig:LeftUpLeg";
         public string LowerLeftLeg { get; set; } = "mixamorig:LeftLeg";
         public string LeftFoot { get; set; } = "mixamorig:LeftFoot";
-        public Vector2 AllobjectDamping { get; set; } = new Vector2(0.5f, 0.5f);
+        public float JointDamping { get; set; } = 0.5f;
+        public float RigidbodyDamping { get; set; } = 0.5f;
         public float Totalmass { get; set; } = 70.0f;
 
         public bool RagdollEnabled = false;
@@ -248,7 +249,7 @@ namespace ThomasEditor
             G_Hips.transform.localPosition = new Vector3(G_Hips.transform.localPosition.x, G_Hips.transform.localPosition.y, G_Hips.transform.localPosition.z);
             spherecolliderhips.radius = 0.2f;
             rigidbodyhips.IsKinematic = AllobjectKinectic;
-            rigidbodyhips.Damping = AllobjectDamping;
+            rigidbodyhips.Damping = RigidbodyDamping;
             rigidbodyhips.Mass = Totalmass * RealBodyMass[0];
             //Spine
        
@@ -260,14 +261,14 @@ namespace ThomasEditor
             boxcolliderSpine.size = new Vector3(0.2f, 0.2f, 0.2f);
             G_Spine.transform.localPosition = new Vector3(G_Spine.transform.localPosition.x, G_Spine.transform.localPosition.y, G_Spine.transform.localPosition.z);
             rigidbodySpine.IsKinematic = AllobjectKinectic;
-            rigidbodySpine.Damping = AllobjectDamping;
+            rigidbodySpine.Damping = RigidbodyDamping;
             rigidbodySpine.Mass = Totalmass * RealBodyMass[1];
 
-     
+
 
 
             //Joint from hips to Spine
-         
+            HipSpineJoint.Damping = JointDamping;
             HipSpineJoint.Axis = new Vector3(0, 0, -90);
             HipSpineJoint.SwingAxis = new Vector3(0, 0, -90);
             HipSpineJoint.NoCollision = true;
@@ -285,7 +286,7 @@ namespace ThomasEditor
             G_Head.transform.localPosition = new Vector3(G_Head.transform.localPosition.x, G_Head.transform.localPosition.y, G_Head.transform.localPosition.z);
             spherecolliderHead.radius = 0.2f;
             rigidbodyHead.IsKinematic = AllobjectKinectic;
-            rigidbodyHead.Damping = AllobjectDamping;
+            rigidbodyHead.Damping = RigidbodyDamping;
             rigidbodyHead.Mass = Totalmass * RealBodyMass[2];
             spherecolliderHead.center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, renderskinnedcomponent);
 
@@ -293,11 +294,11 @@ namespace ThomasEditor
 
 
             //Joint from spine to head
-           
+            HeadSpineJoint.Damping = JointDamping;
             HeadSpineJoint.Axis = new Vector3(0, 0, 90);
             HeadSpineJoint.SwingAxis = new Vector3(0, 0, 90);
             HeadSpineJoint.NoCollision = true;
-  
+ 
             HeadSpineJoint.SwingAngle1 = 90;
             HeadSpineJoint.SwingAngle2 = 90;
             HeadSpineJoint.ConnectedAnchor = spherecolliderHead.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, renderskinnedcomponent);
@@ -317,14 +318,14 @@ namespace ThomasEditor
             CapsuleColliderLeftArm.radius = 0.065f;
  
             rigidbodyLeftArm.IsKinematic = AllobjectKinectic;
-            rigidbodyLeftArm.Damping = AllobjectDamping;
+            rigidbodyLeftArm.Damping = RigidbodyDamping;
             rigidbodyLeftArm.Mass = Totalmass * RealBodyMass[3];
             CapsuleColliderLeftArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, renderskinnedcomponent));
 
 
 
             //Joint from leftarm totorso
-
+            LeftArmTorsoJoint.Damping = JointDamping;
             LeftArmTorsoJoint.Axis = new Vector3(-90, 0, 0);
             LeftArmTorsoJoint.SwingAxis = new Vector3(0, 0, 0);
             LeftArmTorsoJoint.NoCollision = true;
@@ -347,14 +348,14 @@ namespace ThomasEditor
             CapsuleColliderLeftUnderArm.radius = 0.065f;
        
             rigidbodyLeftUnderArm.IsKinematic = AllobjectKinectic;
-            rigidbodyLeftUnderArm.Damping = AllobjectDamping;
+            rigidbodyLeftUnderArm.Damping = RigidbodyDamping;
             rigidbodyLeftUnderArm.Mass = Totalmass * RealBodyMass[4];
             CapsuleColliderLeftUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, renderskinnedcomponent));
 
-        
+
 
             //Joint from leftudnerarmtooverarm
-            
+            LowerLeftArmLeftArmJoint.Damping = JointDamping;
             LowerLeftArmLeftArmJoint.Axis = new Vector3(-90, 0, 0);
             LowerLeftArmLeftArmJoint.SwingAxis = new Vector3(0, 0, 0);
             LowerLeftArmLeftArmJoint.NoCollision = true;
@@ -386,16 +387,16 @@ namespace ThomasEditor
             CapsuleColliderRightArm.radius = 0.065f;
           
             rigidbodyRightArm.IsKinematic = AllobjectKinectic;
-            rigidbodyRightArm.Damping = AllobjectDamping;
+            rigidbodyRightArm.Damping = RigidbodyDamping;
             rigidbodyRightArm.Mass = Totalmass * RealBodyMass[5];
             CapsuleColliderRightArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, renderskinnedcomponent));
 
 
 
-           
+
 
             //Joint from Rightarm totorso
-           
+            RightArmTorsoJoint.Damping = JointDamping;
             RightArmTorsoJoint.Axis = new Vector3(0, 0, 0);
             RightArmTorsoJoint.SwingAxis = new Vector3(0, 0, 0);
             RightArmTorsoJoint.NoCollision = true;
@@ -419,12 +420,13 @@ namespace ThomasEditor
             CapsuleColliderRightUnderArm.radius = 0.065f;
     
             rigidbodyRightUnderArm.IsKinematic = AllobjectKinectic;
-            rigidbodyRightUnderArm.Damping = AllobjectDamping;
+            rigidbodyRightUnderArm.Damping = RigidbodyDamping;
             rigidbodyRightUnderArm.Mass = Totalmass * RealBodyMass[6];
             CapsuleColliderRightUnderArm.center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, renderskinnedcomponent));
-         
+
             //Joint from Rightudnerarmtooverarm
-           
+
+            LowerRightArmRightArmJoint.Damping = JointDamping;
             LowerRightArmRightArmJoint.Axis = new Vector3(-90, 0, 0);
             LowerRightArmRightArmJoint.SwingAxis = new Vector3(0, 0, 0);
             LowerRightArmRightArmJoint.NoCollision = true;
@@ -446,7 +448,7 @@ namespace ThomasEditor
             CapsuleColliderRightLeg.radius = 0.065f;
           
             rigidbodyRightLeg.IsKinematic = AllobjectKinectic;
-            rigidbodyRightLeg.Damping = AllobjectDamping;
+            rigidbodyRightLeg.Damping = RigidbodyDamping;
             rigidbodyRightLeg.Mass = Totalmass * RealBodyMass[7];
             CapsuleColliderRightLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
 
@@ -455,6 +457,7 @@ namespace ThomasEditor
 
 
             //Joint from RightLegJoint
+            RightLegJoint.Damping = JointDamping;
             RightLegJoint.Axis = new Vector3(0, 0, 90);
             RightLegJoint.SwingAxis = new Vector3(0, 0, 0);
             RightLegJoint.NoCollision = true;
@@ -476,7 +479,7 @@ namespace ThomasEditor
             CapsuleColliderRightUnderLeg.height = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, renderskinnedcomponent);
             CapsuleColliderRightUnderLeg.radius = 0.065f;
             
-            rigidbodyRightUnderLeg.Damping = AllobjectDamping;
+            rigidbodyRightUnderLeg.Damping = RigidbodyDamping;
             rigidbodyRightUnderLeg.Mass = Totalmass * RealBodyMass[8];
             rigidbodyRightUnderLeg.IsKinematic = AllobjectKinectic;
             CapsuleColliderRightUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, renderskinnedcomponent);
@@ -486,7 +489,7 @@ namespace ThomasEditor
 
 
 
-           
+            RightUnderLegJoint.Damping = JointDamping;
             RightUnderLegJoint.Axis = new Vector3(0, 0, 0);
             RightUnderLegJoint.SwingAxis = new Vector3(0, 0, 0);
             RightUnderLegJoint.NoCollision = true;
@@ -508,16 +511,16 @@ namespace ThomasEditor
             CapsuleColliderLeftLeg.radius = 0.065f;
            
             rigidbodyLeftLeg.IsKinematic = AllobjectKinectic;
-            rigidbodyLeftLeg.Damping = AllobjectDamping;
+            rigidbodyLeftLeg.Damping = RigidbodyDamping;
             rigidbodyLeftLeg.Mass = Totalmass * RealBodyMass[9];
             CapsuleColliderLeftLeg.center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
 
-             //Joint from LeftLegJoint
-
+            //Joint from LeftLegJoint
+            LeftLegJoint.Damping = JointDamping;
             LeftLegJoint.Axis = new Vector3(0, 0, -90);
             LeftLegJoint.SwingAxis = new Vector3(0, 0, 0);
             LeftLegJoint.NoCollision = true;
-            
+
             LeftLegJoint.SwingAngle1 = 90;
             LeftLegJoint.SwingAngle2 = 90;
             LeftLegJoint.Anchor = -calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);//new Vector3(0, calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent) * 0.5f, 0);
@@ -535,11 +538,11 @@ namespace ThomasEditor
             CapsuleColliderLeftUnderLeg.radius = 0.065f;
             
             rigidbodyLeftUnderLeg.IsKinematic = AllobjectKinectic;
-            rigidbodyLeftUnderLeg.Damping = AllobjectDamping;
+            rigidbodyLeftUnderLeg.Damping = RigidbodyDamping;
             rigidbodyLeftUnderLeg.Mass = Totalmass * RealBodyMass[10];
             CapsuleColliderLeftUnderLeg.center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
 
-            
+            LeftUnderLegJoint.Damping = JointDamping;
             LeftUnderLegJoint.Axis = new Vector3(0, 0, 0);
             LeftUnderLegJoint.SwingAxis = new Vector3(0, 0, 0);
             LeftUnderLegJoint.NoCollision = true;

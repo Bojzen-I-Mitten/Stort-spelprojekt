@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
@@ -70,6 +71,16 @@ namespace ThomasEngine.Network
             }
         }
 
+        protected void SendRPC(string methodName, params object[] parameters)
+        {
+            Identity.SendRPC(methodName, parameters);
+        }
+
+        internal void ReadRPC(System.Reflection.MethodInfo methodInfo, NetPacketReader reader)
+        {
+            object[] parameters = RpcUtils.ReadRPCParameters(methodInfo, reader);
+            methodInfo.Invoke(this, parameters);
+        }
     }
 
 

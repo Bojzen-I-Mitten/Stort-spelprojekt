@@ -11,7 +11,7 @@ namespace thomas
 	std::unique_ptr<btDefaultCollisionConfiguration> Physics::s_collisionConfiguration;
 	std::unique_ptr<btCollisionDispatcher> Physics::s_dispatcher;
 	std::unique_ptr<btBroadphaseInterface> Physics::s_broadPhase;
-	std::unique_ptr<btSequentialImpulseConstraintSolver> Physics::s_solver;
+	std::unique_ptr<btConstraintSolver> Physics::s_solver;
 	std::unique_ptr<graphics::BulletDebugDraw> Physics::s_debugDraw;
 	std::unique_ptr<btDiscreteDynamicsWorld> Physics::s_world;
 	float Physics::s_timeStep = 1.0f / 60.0f; //Limit physics timestep to 60 FPS
@@ -43,6 +43,7 @@ namespace thomas
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
+
 		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
@@ -139,7 +140,7 @@ namespace thomas
 		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
 		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
 
-		if(colliderA && colliderB && !colliderA->isDestroyed() && colliderB->isDestroyed())
+		if(colliderA && colliderB && !colliderA->isDestroyed() && !colliderB->isDestroyed())
 		{
 			colliderA->OnCollision(colliderB, collisionType);
 			colliderB->OnCollision(colliderA, collisionType);

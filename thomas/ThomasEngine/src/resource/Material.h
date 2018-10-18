@@ -13,6 +13,7 @@ namespace ThomasEngine
 	public ref class Material : public Resource
 	{
 	private:
+		bool m_instance = false;
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
 	internal:
@@ -29,8 +30,10 @@ namespace ThomasEngine
 
 		Material(Material^ original);
 
+
 		Material();
 
+		void Reload() override;
 
 		void OnRename() override;
 

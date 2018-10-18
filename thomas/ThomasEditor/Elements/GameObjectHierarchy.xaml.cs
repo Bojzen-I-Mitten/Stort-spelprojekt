@@ -387,8 +387,6 @@ namespace ThomasEditor
 
         public void hierarchy_Drop(object sender, DragEventArgs e)
         {
-            if (hierarchy.SelectedItem == null)
-                return;
             TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
 
             if (e.Data.GetDataPresent(typeof(TreeViewItem)) || source.DataContext != null)
@@ -396,10 +394,9 @@ namespace ThomasEditor
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
                 GameObject targetModel = null;
                 //If drop function is called from Inspector
-                if (m_inspector)
+                if (m_inspector && hierarchy.SelectedItem != null)
                 {
                     targetModel = (GameObject)(hierarchy.SelectedItem as TreeItemViewModel).Data;
-                    m_inspector = false;
                 }
                 else if (target != null)
                 {
@@ -447,7 +444,7 @@ namespace ThomasEditor
                         }
                     }
                 }
-                if (source.DataContext != null)
+                if (source.DataContext != null && m_inspector == false)
                 {
                     //Check if object from hierarchy
                     if (source.DataContext.GetType() == typeof(TreeItemViewModel))
@@ -477,7 +474,7 @@ namespace ThomasEditor
                             Debug.LogWarning("Invalid parenting, can't set the selected object as a child if the specified object.");
                         }
                     }
-                    //Check if brefab. (From outside hierarchy)
+                    //Check if prefab. (From outside hierarchy)
                     else if (source.DataContext.GetType() == typeof(GameObject))
                     {
                         GameObject sourceData = (GameObject)source.DataContext;
@@ -505,6 +502,7 @@ namespace ThomasEditor
                     }
                 }
             }
+            m_inspector = false;
         }
 
         private void hierarchy_MouseMove(object sender, MouseEventArgs e)

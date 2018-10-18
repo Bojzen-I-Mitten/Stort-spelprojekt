@@ -17,3 +17,7 @@ public ref class HideInInspector : Attribute
 {
 
 };
+public ref class ExpandableObject : Attribute
+{
+
+};
