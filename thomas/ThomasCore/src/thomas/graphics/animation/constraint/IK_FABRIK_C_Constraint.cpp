@@ -40,7 +40,7 @@ namespace thomas {
 					p[i+1] = math::lerp(p[i], target, lambda);
 				}
 			}
-			constexpr float limit_bend = math::PI / 4;
+			constexpr float limit_bend = math::PI / 10;
 			constexpr float limit_twist = math::PI / 4;
 
 			void IK_FABRIK_C_Constraint::solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
@@ -64,7 +64,7 @@ namespace thomas {
 					p_n += 2 * a * m_ii.Up();														// Mirror result over T_i+1 XZ plane (always apply)
 					*p_c = p_n; // Update p_i
 				}
-				else if (l_proj < 0.f)																// Don't apply if b < c (inside angle limit)
+				else if (l_proj > 0.f)																// Don't apply if b < c (inside angle limit)
 					*p_c = p_n; // Update p_i
 				// else			// Do nothing
 
@@ -85,17 +85,19 @@ namespace thomas {
 				float c = std::fabs(a) * std::tanf(limit_bend);
 				float l_proj = b - c;									// Calc. distance on XZ from p_i -> angle limit
 				q_i *= l_proj;
-				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Forward();			// Vector from p_in -> p_i
-				math::Vector3 p_n = (bone_len / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in (normalized)
+				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Forward();				// Vector from p_in -> p_i
+				math::Vector3 p_n = (d_i - proj_diff);												// Calc. p_in (non-normalized)
 				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
-				{
 					p_n += 2 * a * m_i.Up();														// Mirror result over T_i+1 XZ plane (always apply)
-					p_c[1] = p_n; // Update p_i
-				}
-				else if (l_proj < 0.f)																// Don't apply if b < c (inside angle limit)
-					p_c[1] = p_n;	// Update p_i
-				// else				// Do nothing
-
+				p_n = (bone_len / std::sqrtf(a*a + c * c)) * p_n;									// Make offset distance == bone length
+				math::Vector3 p_n2 = p_n;
+				p_n2.Normalize();
+				p_n2 *= bone_len;
+				if (a < 0.f || l_proj <= 0.f)																	// Don't apply if b < c (inside angle limit)
+					p_n = p_i;
+				else
+					p_n = p_c[0] + p_n2;																// Offset from prev.
+				p_c[1] = p_n;
 				// Re-calculate orientation
 				d_i = (p_c[1] - p_c[0]) / bone_len;													// new forward orient
 				c_orient[1] = c_orient[1] * math::getMatrixRotationTo(c_orient[1].Up(), d_i);		// Rotate prev.->new 
@@ -115,13 +117,13 @@ namespace thomas {
 					// Stage 1: Forward reaching
 					uint32_t i = num_link - 1;
 					p[i] = target;
-					for(; i > 0;){												// Forward reaching loop
+					for(; i > 1;){												// Forward reaching loop
 						i--;
 						float r = math::Vector3::Distance(p[i], p[i+1]);		// Distance to next joint
 						float lambda = len[i] / r;
 						p[i] = math::lerp(p[i+1], p[i], lambda);				// Next iter. position
 
-						solve_constraint_backward_iter(p + i, orient + i, *(len + i));
+						//solve_constraint_backward_iter(p + i, orient + i, len[i]);
 					}
 					// Stage 2: Backward reaching
 					*p = p_init;												// Reset root
@@ -131,8 +133,7 @@ namespace thomas {
 						float lambda = len[i] / r;
 						p[i+1] = math::lerp(p[i], p[i + 1], lambda);			// Next iter. position
 
-						orient[i] = orient[i] * math::getMatrixRotationTo(orient[i].Up(), (p[i + 1] - p[i]) / r);
-						solve_constraint_forward_iter(p + i, orient + i, *(len + i + 1));
+						solve_constraint_forward_iter(p + i, orient + i, len[i]);
 					}
 					dif = math::Vector3::Distance(p[num_link-1], target);
 				}
@@ -160,6 +161,7 @@ namespace thomas {
 					orient[i] = math::extractRotation(objectPose[chain[i].m_index]);	// Get matrix orientation
 					len[i] = math::Vector3::Distance(		
 						p[i], objectPose[chain[i+1].m_index].Translation());			// Bone length
+					if(i > 0)
 					link_sum += len[i];													// Sum chain length
 				}
 				p[i] = objectPose[chain[i].m_index].Translation();						// End case
@@ -173,8 +175,8 @@ namespace thomas {
 					FABRIK_iteration(m_target, len, p, orient, m_num_link);
 				math::Vector3 trans;
 				math::Matrix pose;
-				// Apply solution to chain
-				for (i = 0; i < m_num_link - 1; i++) {
+				// Apply solution to chain (except root and end effector)
+				for (i = 1; i < m_num_link - 1; i++) {
 					pose = objectPose[(chain+i)->m_index];
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
