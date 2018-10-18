@@ -1,5 +1,7 @@
 #pragma once
 #include "Component.h"
+#include <memory>
+
 namespace thomas
 {
 	namespace graphics {
@@ -22,6 +24,7 @@ namespace thomas
 				virtual ~BoneTransformComponent();
 				virtual void Update();
 				virtual void OnEnable();
+				virtual void OnDisable();
 
 				void SetBoneHash(uint32_t hash);
 				void SetReference(graphics::animation::IBlendTree *skel);

@@ -117,5 +117,10 @@ namespace thomas {
 		{
 			return (const void*)(reinterpret_cast<uintptr_t>(p) - x);
 		}
+
+		inline std::wstring ToWChar(const std::string& inputString)
+		{
+			return std::wstring(inputString.begin(), inputString.end());
+		}
 	}
 }

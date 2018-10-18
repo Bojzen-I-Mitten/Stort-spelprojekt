@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
+#include "editor\Editor.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
@@ -17,8 +18,10 @@
 #include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
-
+#include "utils/ThreadMap.h"
 #include "object/component/LightComponent.h"
+#include "Physics.h"
+#include "graphics\ParticleSystem.h"
 
 namespace thomas 
 {
@@ -46,9 +49,10 @@ namespace thomas
 		resource::Material::Init();
 		Physics::Init();
 		editor::EditorCamera::Instance()->Init();
-		editor::Gizmos::Init();
+		editor::Gizmos::Gizmo().Init();
 
 		graphics::LightManager::Initialize();
+		graphics::ParticleSystem::InitializeGlobalSystem();
 
 		s_initialized = true;
 		return s_initialized;
@@ -63,8 +67,6 @@ namespace thomas
 			s_clearLog = false;
 		}
 
-		object::Object::Clean();
-		editor::EditorCamera::Instance()->Update();
 		resource::Shader::Update();	
 		Sound::Instance()->Update();
 	}
@@ -91,7 +93,7 @@ namespace thomas
 	}
 
 	ThomasCore::ThomasCore()
-		: m_memAlloc(new resource::MemoryAllocation())
+		: m_threadMap(new utils::ThreadMap(MAX_NUM_THREAD)), m_memAlloc(new resource::MemoryAllocation())
 	{
 	}
 
@@ -105,12 +107,12 @@ namespace thomas
 		//Destroy all objects
 		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
+		graphics::ParticleSystem::DestroyGlobalSystem();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
-		object::Object::Destroy();
 		editor::EditorCamera::Instance()->Destroy();
-		editor::Gizmos::Destroy();
+		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
 		Sound::Instance()->Destroy();
@@ -124,11 +126,38 @@ namespace thomas
 	{
 		return s_logOutput;
 	}
-
 	ThomasCore & ThomasCore::Core()
 	{
 		static ThomasCore core;
 		return core;
+	}
+
+	utils::ThreadMap & ThomasCore::getThreadMap()
+	{
+		return *m_threadMap;
+	}
+	void ThomasCore::registerThread()
+	{
+		m_threadMap->registerThread();
+	}
+	uint32_t ThomasCore::Thread_Index()
+	{
+		return m_threadMap->Thread_Index();
+	}
+
+	void ThomasCore::OnStop()
+	{
+		graphics::Renderer::Instance()->ClearAllCommands();
+
+#ifdef _EDITOR
+		editor::Editor::GetEditor().OnEditorStop();
+#endif
+	}
+	void ThomasCore::OnPlay()
+	{
+#ifdef _EDITOR
+		thomas::editor::Editor::GetEditor().OnEditorPlay();
+#endif
 	}
 
 	resource::MemoryAllocation * ThomasCore::Memory()

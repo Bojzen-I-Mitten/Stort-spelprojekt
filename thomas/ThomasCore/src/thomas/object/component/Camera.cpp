@@ -1,13 +1,15 @@
 #include "Camera.h"
-#include "..\..\WindowManager.h"
+#include "../../WindowManager.h"
 #include "../GameObject.h"
 #include "../../graphics/Skybox.h"
 #include "Transform.h"
 #include "../../graphics/Renderer.h"
-#include <algorithm>
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../AutoProfile.h"
+#include "../../graphics/GUIManager.h"
+#include "RenderComponent.h"
+
 namespace thomas
 {
 	namespace object
@@ -15,13 +17,16 @@ namespace thomas
 		namespace component
 		{
 			std::vector<Camera*> Camera::s_allCameras;
+
 			void Camera::UpdateProjMatrix()
 			{
 				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
-				m_frustrum = math::BoundingFrustum(m_projMatrix);
+				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
-			Camera::Camera(bool dontAddTolist)
+			Camera::Camera(bool dontAddTolist) : 
+			m_renderGUI(false),
+			m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
 				m_near = 0.1f;
@@ -31,7 +36,9 @@ namespace thomas
 				UpdateProjMatrix();
 			}
 
-			Camera::Camera()
+			Camera::Camera() :
+			m_renderGUI(false),
+			m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70;
 				m_near = 0.5;
@@ -45,16 +52,19 @@ namespace thomas
 					return a->GetTargetDisplayIndex() < b->GetTargetDisplayIndex();
 				});
 			}
+
 			Camera::~Camera()
 			{
+				m_GUIHandle->Destroy();
+				m_GUIHandle.reset();
+				
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
 					if (s_allCameras[i] == this)
 					{
 						s_allCameras.erase(s_allCameras.begin() + i);
 						break;
-					}
-						
+					}		
 				}
 			}
 
@@ -65,13 +75,23 @@ namespace thomas
 
 			void Camera::OnDisable()
 			{
-				for (int i = 0; i < s_allCameras.size(); i++) {
-					if (s_allCameras[i] == this) {
+				
+				for (int i = 0; i < s_allCameras.size(); i++) 
+				{
+					if (s_allCameras[i] == this) 
+					{
+						
+
 						s_allCameras.erase(s_allCameras.begin() + i);
 						return;
 					}
 						
 				}
+			}
+
+			void Camera::OnDestroy()
+			{
+				m_renderGUI = false;
 			}
 
 			math::Matrix Camera::GetProjMatrix()
@@ -163,6 +183,16 @@ namespace thomas
 				UpdateProjMatrix();
 			}
 
+			bool Camera::GetGUIRendering() const
+			{
+				return m_renderGUI;
+			}
+
+			void Camera::SetGUIRendering(bool rendering)
+			{
+				m_renderGUI = rendering;
+			}
+
 			math::Viewport Camera::GetViewport()
 			{
 				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
@@ -189,6 +219,11 @@ namespace thomas
 				return m_viewport.AspectRatio();
 			}
 
+			graphics::GUIManager * Camera::GetGUIHandle() const
+			{
+				return m_GUIHandle.get();
+			}
+
 			void Camera::Render()
 			{
 				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
@@ -200,15 +235,14 @@ namespace thomas
 			}
 
 			void Camera::OnDrawGizmos()
-			{
-				
+			{	
 			}
 
 			void Camera::OnDrawGizmosSelected()
 			{
 				//editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix().Transpose());
-				editor::Gizmos::SetColor(math::Color(0.6f, 0.6f, 0.6f));
-				editor::Gizmos::DrawFrustum(GetFrustrum());
+				editor::Gizmos::Gizmo().SetColor(math::Color(0.6f, 0.6f, 0.6f));
+				editor::Gizmos::Gizmo().DrawFrustum(GetFrustrum());
 			
 			}
 
@@ -218,9 +252,7 @@ namespace thomas
 				{
 					m_targetDisplay = index;
 					UpdateProjMatrix();
-				}
-					
-				
+				}	
 			}
 
 			int Camera::GetTargetDisplayIndex()
@@ -233,6 +265,42 @@ namespace thomas
 				math::BoundingFrustum frustrum;
 				m_frustrum.Transform(frustrum, m_gameObject->m_transform->GetWorldMatrix());
 				return frustrum;
+			}
+
+			math::BoundingFrustum Camera::GetSubFrustrum(math::Rectangle rect)
+			{
+				
+				math::BoundingFrustum subFrustrum(GetFrustrum());
+
+				math::Rectangle window = math::Rectangle(GetViewport().x, GetViewport().y, GetViewport().width, GetViewport().height);
+				math::Vector2 center = window.Center();
+				window.Offset(-center.x, -center.y);
+				rect.Offset(-center.x, -center.y);
+
+
+				if (rect.width < 0)
+				{
+					rect.x = rect.x + rect.width;
+					rect.width = abs(rect.width);
+				}
+
+				if (rect.height < 0)
+				{
+					rect.y = rect.y + rect.height;
+					rect.height = abs(rect.height);
+				}
+
+				float left = (float)rect.x / (float)window.x;
+				float right = (float)(rect.x + rect.width) / (float)(window.x + window.width);
+				float top = (float)rect.y / (float)window.y;
+				float bottom = (float)(rect.y + rect.height) / (float)(window.y + window.height);
+
+				subFrustrum.LeftSlope *= left;
+				subFrustrum.RightSlope *= right;
+				subFrustrum.TopSlope *= top;
+				subFrustrum.BottomSlope *= bottom;
+				
+				return subFrustrum;
 			}
 
 			void Camera::CopyFrameData()
@@ -251,7 +319,6 @@ namespace thomas
 			{
 				return m_frameData;
 			}
-
 		}
 	}
 }

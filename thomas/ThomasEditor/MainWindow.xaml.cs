@@ -372,7 +372,7 @@ namespace ThomasEditor
         private void PlayPauseButton_Click(object sender, ExecutedRoutedEventArgs e)
         {
             if (ThomasWrapper.IsPlaying())
-                ThomasWrapper.Stop();
+                ThomasWrapper.IssueStop();
             else
             {
                 ThomasWrapper.Play();

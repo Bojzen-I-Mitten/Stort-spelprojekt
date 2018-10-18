@@ -2,12 +2,14 @@
 #include "Component.h"
 #include "..\..\utils\math.h"
 #include <d3d11.h>
+#include "../../graphics/ParticleSystem.h"
 
 namespace thomas
 {
 	namespace resource {
 		class Material;
 	}
+	
 	namespace object
 	{
 		namespace component
@@ -20,189 +22,91 @@ namespace thomas
 					ALPHA_BLEND
 				};
 
-				struct D3DData {
-					ID3D11UnorderedAccessView* particleUAV1;
-					ID3D11ShaderResourceView* particleSRV1;
-					ID3D11Buffer* particleBuffer1;
-					ID3D11UnorderedAccessView* particleUAV2;
-					ID3D11ShaderResourceView* particleSRV2;
-					ID3D11Buffer* particleBuffer2;
-					ID3D11Buffer* particleBuffer;
-					bool swapUAVandSRV;
-
-					ID3D11UnorderedAccessView* billboardsUAV;
-					ID3D11ShaderResourceView* billboardsSRV;
-					ID3D11Buffer* billboardBuffer;
-				};
-
-				struct InitParticleBufferStruct
-				{
-					math::Vector3 position;
-					float spread;
-					
-					unsigned int currentParticleStartIndex;
-					float maxSpeed;
-					float radius;
-					bool spawnAtSphereEdge;
-
-					float minSpeed;
-					float endSpeed;
-					float maxDelay;
-					float minDelay;
-
-					float maxSize;
-					float minSize;
-					float endSize;
-					float maxLifeTime;
-
-					float minLifeTime;
-					float rand;
-					float rotationSpeed;
-					float rotation;
-
-					math::Color startColor;
-
-					math::Color endColor;
-					math::Matrix directionMatrix;
-
-					float gravity;
-					math::Vector3 padding;
-
-				};
-
-				struct ParticleStruct
-				{
-					math::Vector3 position;
-					float gravity;
-
-					math::Vector3 direction;
-					float speed;
-
-					float endSpeed;
-					float delay;
-					float size;
-					float endSize;
-
-					float lifeTime;
-					float lifeTimeLeft;
-					float rotationSpeed;
-					float rotation;
-					
-
-					math::Vector4 startColor;
-
-					math::Vector4 endColor;
-					
-				};
+				
 			private:
-				void CreateParticleUAVsandSRVs();
-				void CreateInitBuffer();
-				void CalculateMaxNrOfParticles();
+				unsigned NrOfParticlesToEmitThisFrame();
 			public:
+				void Update();
+				void OnEnable();
+				void OnDisable();
+				void OnDestroy();
 				ParticleEmitterComponent();
 				~ParticleEmitterComponent();
 
-				void Update();
+				void OnDrawGizmosSelected();
 
-				void TogglePause();
 
-				void SetSpread(float const other);
-				void SetDirection(math::Vector3 other);
-				void SetDirection(float const x, float const y, float const z);
-				void SetSpeed(float const min, float const max);
-				void SetSpeed(float const speed);
-				void SetMaxSpeed(float const other);
-				void SetMinSpeed(float const other);
-				void SetEndSpeed(float const other);
-				void SetDelay(float const min, float const max);
-				void SetDelay(float const delay);
-				void SetMaxDelay(float const other);
-				void SetMinDelay(float const other);
-				void SetSize(float const min, float const max);
-				void SetSize(float const size);
-				void SetMaxSize(float const other);
-				void SetMinSize(float const other);
-				void SetEndSize(float const other);
-				void SetLifeTime(float const min, float const max);
-				void SetLifeTime(float lifeTime);
-				void SetMaxLifeTime(float const other);
-				void SetMinLifeTime(float const other);
-				void SetRotationSpeed(float const other);
-				void SetRotation(float const other);
-				void SetLooping(bool const other);
+				void SetParticleSystem(std::shared_ptr<graphics::ParticleSystem> particleSystem);
 
-				void SetGravity(float const other);
+
+				void SetSpeed(float const& speed);
+				void SetMinSpeed(float const& other);
+				void SetMaxSpeed(float const& other);
+				void SetEndSpeed(float const& other);
+				float GetMaxSpeed() const;
+				float GetMinSpeed() const;
+				float GetEndSpeed() const;
 				
-				void SetStartColor(math::Vector4 const other);
-				void SetEndColor(math::Vector4 const other);
-				
-				void SetRadius(float radius);
-				void SpawnAtSphereEdge(bool other);
+				void SetSize(float const& size);
+				void SetMinSize(float const& other);
+				void SetMaxSize(float const& other);
+				void SetEndSize(float const& other);
+				float GetMaxSize() const;
+				float GetMinSize() const;
+				float GetEndSize() const;
+
+				void SetLifeTime(float const& lifeTime);
+				void SetMaxLifeTime(float const& other);
+				void SetMinLifeTime(float const& other);
+				float GetMaxLifeTime() const;
+				float GetMinLifeTime() const;
+
+				void SetRotationSpeed(float const& other);
+				void SetMinRotationSpeed(float const& other);
+				void SetMaxRotationSpeed(float const& other);
+				float GetMinRotationSpeed() const;
+				float GetMaxRotationSpeed() const;
+
+				void SetDistanceFromSphereCenter(float const& other);
+				float GetDistanceFromSphereCenter() const;
+
+				void SetGravity(float const& other);
+				float GetGravity() const;
+
+				void SetRadius(float const& radius);
+				float GetRadius() const;
+
+				void SpawnAtSphereEdge(bool const& other);
+				bool IsSpawningAtSphereEdge() const;
 				
 
 				void StartEmitting();
-				void StopEmitting(bool force=false);
-				
+				void StopEmitting();
 				bool IsEmitting() const;
 				
-				void SetOffset(math::Vector3 offset);
-				void SetOffset(float x, float y, float z);
-				
-				void SetMaterial(resource::Material* material);
-				resource::Material* GetMaterial();
+				void SetTexture(resource::Texture2D* other);
+				resource::Texture2D* GetTexture() const;
 	
-				void SetEmissionRate(float emissionRate);
-				void SetEmissionDuration(float duration);
-				float GetEmissionRate();
-				unsigned int GetNrOfMaxParticles() const;
+				void SetEmissionRate(unsigned const& other);
+				unsigned GetEmissionRate() const;
 
-				D3DData* GetD3DData();
 
-				void AddToDebugMenu();
-
-				std::string GetDebugMenuName();
-
-				InitParticleBufferStruct* GetInitData();
-
-				bool IsPaused();
-
-				void ExportEmitter(std::string path);
-				void ImportEmitter(std::string path);
-
-				void SetBlendState(BlendStates state);
-				BlendStates GetBlendState();
-
-				unsigned int GetSpawnedParticleCount();
-
-				float GetDrawTimer();
+				//void ExportEmitter(std::string path);
+				//void ImportEmitter(std::string path);
+				
 			private:
-				std::string m_debugBarName;
-				math::Vector3 m_offset;
-				math::Vector3 m_directionVector;
-				D3DData m_d3dData;
-				resource::Material* m_material;
+				resource::Texture2D* m_texture;
+				std::shared_ptr<graphics::ParticleSystem> m_particleSystem;
 
-				InitParticleBufferStruct m_particleBufferStruct;
-
-				bool m_paused;
-				float m_tempMaxDelay;
-				float m_tempMaxLifeTime;
-				float m_tempEmissionRate;
+				graphics::ParticleSystem::InitParticleBufferStruct m_particleBufferStruct;
 
 				bool m_isEmitting;
-				bool m_looping;
-				float m_emissionDuration;
-				bool m_shouldUpdateResources;
-				unsigned int m_maxNrOfParticles;
-				unsigned int m_spawnedParticleCount;
-				float m_emissionRate;
-				float m_emissionTimer;
-				float m_emissionTimeLeft;
 
-				float m_drawTimer;
 
-				BlendStates m_blendState;
+				unsigned m_emissionRate; //Particles per second
+				double m_emissionThreshold; //Only emitt when the rate*dt is above one particle
 
+				
 			};
 		}
 	}

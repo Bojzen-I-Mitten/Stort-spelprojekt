@@ -8,6 +8,7 @@
 #include "../ScriptingManager.h"
 using namespace System::Threading;
 #include "YieldInstructions.h"
+#include "../Debug.h"
 
 namespace ThomasEngine 
 {
@@ -17,6 +18,10 @@ namespace ThomasEngine
 	}
 	Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
 	{
+	}
+	Component::~Component()
+	{
+		Delete();
 	}
 
 	void Component::Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
@@ -63,15 +68,27 @@ namespace ThomasEngine
 			m_enabled = value;
 			if (m_firstEnable && m_gameObject->GetActive()) {
 				if (value == true) {
-					OnEnable();
+					Enable();
 					initialized = false;
 				}
 				else
-					OnDisable();
+					Disable();
 			}else
 				initialized = false;
 		}
 	}
+
+	void Component::Disable()
+	{
+		m_enabled = false;
+		OnDisable();
+	}
+	void Component::Enable()
+	{
+		m_enabled = true;
+		OnEnable();
+	}
+
 	void Component::LoadExternalComponents()
 	{
 		List<String^>^ dlls = gcnew List<String^>(Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly));
@@ -119,21 +136,25 @@ namespace ThomasEngine
 	void Component::Destroy()
 	{
 		Monitor::Enter(m_gameObject->m_componentsLock);
-		this->enabled = false;
-		for (int i = 0; i < ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.size(); i++)
-		{
-			thomas::object::component::Component* component = ((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components[i];
-			if (component == nativePtr)
-			{
-				((thomas::object::GameObject*)m_gameObject->nativePtr)->
-					m_components.erase(((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.begin() + i);
-				break;
-			}
-		}
-		StopAllCoroutines();
 		m_gameObject->Components->Remove(this);
-		Object::Destroy();
+		Delete();
 		Monitor::Exit(m_gameObject->m_componentsLock);
+		// Destroy the object
+		Object::Destroy();
+	}
+
+	void Component::Delete()
+	{
+		Disable();	// Disable first just in case
+#ifdef _DEBUG
+		// Check successfull destruction
+		if(m_gameObject->Native->RemoveComponent(this->nativePtr))
+			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
+#else
+		// Don't care
+		m_gameObject->Native->RemoveComponent(this->nativePtr);
+#endif
+		StopAllCoroutines();
 	}
 
 	List<Type^>^ Component::GetAllComponentTypes()

@@ -1,6 +1,5 @@
 #pragma once
 #include "..\utils\Math.h"
-#include "LightManager.h"
 #include <vector>
 #include <map>
 #include <memory>
@@ -50,19 +49,22 @@ namespace thomas
 			static Renderer* Instance();
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
+			/* Clear front buffer. */
 			void ClearCommands();
+			/* Clear both front, and back buffer. */
+			void ClearAllCommands();
 			void SubmitCommand(render::RenderCommand& command);
 			render::Frame& getAllocator();
-
 
 			void TransferCommandList();
 
 		private:
 			static Renderer s_renderer;
-
+			
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
+			
 		};
 	}
 }

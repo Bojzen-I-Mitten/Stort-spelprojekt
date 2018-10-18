@@ -33,7 +33,8 @@ namespace ThomasEngine
 		if (mat != nullptr)
 			return (Material^)mat;
 		else
-			return gcnew Material(nptr);
+			return Material::StandardMaterial; // Prevent new (empty) materials to be generated during deserialization.
+			//return gcnew Material(nptr);
 	}
 
 	void RenderComponent::material::set(Material^ value)

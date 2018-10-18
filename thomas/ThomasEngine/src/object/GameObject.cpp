@@ -35,20 +35,20 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-
+		// Add to scene
 		Scene::CurrentScene->GameObjects->Add(this);
-		scene = Scene::CurrentScene;
+		m_scene_id = Scene::CurrentScene->ID();
 		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}
-
 	bool GameObject::InitComponents(bool playing)
 	{
 		Monitor::Enter(m_componentsLock);
 		bool completed = true;
-		for each(Component^ component in m_components)
+		for(int i=0; i < m_components.Count; i++)
 		{
+			Component^ component = m_components[i];
 			Type^ typ = component->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
 			if ((playing || executeInEditor) && !component->initialized) {
@@ -59,6 +59,7 @@ namespace ThomasEngine {
 		Monitor::Exit(m_componentsLock);
 		return completed;
 	}
+
 	thomas::object::GameObject* GameObject::Native::get() {
 		return (thomas::object::GameObject*)nativePtr;
 	}
@@ -74,8 +75,7 @@ namespace ThomasEngine {
 
 	void GameObject::PostLoad(Scene^ scene)
 	{
-		this->scene = scene;
-
+		m_scene_id = Scene::CurrentScene->ID();
 	}
 
 	void GameObject::PostInstantiate(Scene^ scene) {
@@ -91,7 +91,8 @@ namespace ThomasEngine {
 			completed = true;
 			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
 				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-				completed = gameObject->InitComponents(playing) && completed;
+				if(gameObject->GetActive())
+					completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
 	}
@@ -146,23 +147,36 @@ namespace ThomasEngine {
 		Monitor::Exit(m_componentsLock);
 	}
 
+	GameObject::~GameObject()
+	{
+		Delete();
+	}
+
+	void GameObject::Delete()
+	{
+		for (int i = 0; i < m_components.Count; i++)
+			delete m_components[i];	// Begone you foul clr!!!!
+		m_components.Clear();
+	}
+
 	void GameObject::Destroy()
 	{
+		
 		if (m_isDestroyed)
 			return;
 		ThomasWrapper::Selection->UnSelectGameObject(this);
 		m_isDestroyed = true;
+		
+		// Remove object
 		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		Monitor::Enter(m_componentsLock);
-		for (int i = 0; i < m_components.Count; i++) {
-			m_components[i]->Destroy();
-			i--;
-		}
-		Object::Destroy();
-		m_components.Clear();
-		Monitor::Exit(m_componentsLock);
+		ThomasWrapper::RenderFinished->WaitOne();
 		Scene::CurrentScene->GameObjects->Remove(this);
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		// Destroy
+		Monitor::Enter(m_componentsLock);
+		Delete();
+		Monitor::Exit(m_componentsLock);
+		Object::Destroy();
 	}
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
@@ -191,7 +205,7 @@ namespace ThomasEngine {
 		else
 		{
 			try {
-				Newtonsoft::Json::Linq::JObject^ serialized = Serializer::SerializeGameObject(original);
+				Newtonsoft::Json::Linq::JArray^ serialized = Serializer::SerializeGameObject(original);
 				clone = Serializer::DeserializeGameObject(serialized);
 			}
 			catch (Exception^ e)
@@ -413,7 +427,8 @@ namespace ThomasEngine {
 	void GameObject::OnDeserialized(System::Runtime::Serialization::StreamingContext c)
 	{
 		for (int i = 0; i < m_components.Count; i++) {
-			m_components[i]->gameObject = this;
+			if(m_components[i])
+				m_components[i]->gameObject = this;
 		}
 		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));

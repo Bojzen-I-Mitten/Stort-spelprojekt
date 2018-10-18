@@ -18,9 +18,12 @@ namespace ThomasEngine
 	private:
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
-		Scene^ scene;
+		uint32_t m_scene_id;
 
 		GameObject();
+		virtual ~GameObject();
+
+		void Delete();
 
 		bool InitComponents(bool playing);
 
@@ -66,7 +69,7 @@ namespace ThomasEngine
 
 		property bool inScene {
 			bool get() {
-				return scene != nullptr;
+				return m_scene_id; // != 0
 			}
 		}
 
@@ -107,6 +110,12 @@ namespace ThomasEngine
 			ObservableCollection<Component^>^ get() 
 			{
 				return %m_components;
+			}
+			void set(ObservableCollection<Component^>^ value)
+			{
+				m_components.Clear();
+				for each(Component^ c in value)
+					m_components.Add(c);
 			}
 		}
 

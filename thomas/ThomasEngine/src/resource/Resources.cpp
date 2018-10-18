@@ -14,6 +14,7 @@
 #include "../Debug.h"
 #include "../object/GameObject.h"
 #include "../serialization/Serializer.h"
+#include "Font.h"
 using namespace System::Threading;
 namespace ThomasEngine
 {
@@ -131,6 +132,8 @@ namespace ThomasEngine
 			}
 			else if (extension == "prefab")
 				return AssetTypes::PREFAB;
+			else if (extension == "spritefont")
+				return AssetTypes::FONT;
 			else
 			{
 				return AssetTypes::UNKNOWN;
@@ -164,6 +167,8 @@ namespace ThomasEngine
 			{
 				return AssetTypes::TEXTURE2D;
 			}
+			else if (type == Font::typeid)
+				return AssetTypes::FONT;
 			else
 			{
 				return AssetTypes::UNKNOWN;
@@ -222,6 +227,9 @@ namespace ThomasEngine
 					case AssetTypes::AUDIO_CLIP:
 						obj = gcnew AudioClip(path);
 						break;
+					case AssetTypes::FONT:
+						obj = gcnew Font(path);
+						break;
 					case AssetTypes::UNKNOWN:
 						break;
 					default:
@@ -234,6 +242,9 @@ namespace ThomasEngine
 
 					Debug::LogError(error);
 					obj = LoadErrorResource(type);
+					if(obj == nullptr)
+						Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
+
 				}
 
 				if (obj != nullptr)
@@ -280,16 +291,6 @@ namespace ThomasEngine
 				return nullptr;
 			}
 
-		}
-
-		bool Resources::SaveResource(Resource ^ resource)
-		{
-			if (resource->GetType() == Material::typeid)
-			{
-				Serializer::SerializeMaterial((Material^)resource, resource->m_path);
-				return true;
-			}
-			return false;
 		}
 
 #pragma endregion
@@ -398,6 +399,7 @@ namespace ThomasEngine
 					//obj = Shader::Find() Failed shader
 					break;
 				case AssetTypes::MATERIAL:
+					return Material::StandardMaterial;
 					// obj = Deserialize<Material^>(path); Failed material
 					break;
 				case AssetTypes::SCRIPT:

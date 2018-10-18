@@ -1,11 +1,12 @@
 #include "Ragdoll.h"
+#include <utility>
+#include <stdint.h>
 #include "../../GameObject.h"
 #include "../RenderSkinnedComponent.h"
 #include "../../../graphics/animation/IBlendTree.h"
 #include "../../../Common.h"
-#include <stdint.h>
 #include "../../../editor/gizmos/Gizmos.h"
-#include <utility>
+#include "../../../ThomasCore.h"
 
 namespace thomas 
 {
@@ -13,7 +14,7 @@ namespace thomas
 	{
 		namespace component 
 		{
-
+/*
 			Ragdoll::Ragdoll()
 			{
 				m_bodies[0] = nullptr;
@@ -35,7 +36,7 @@ namespace thomas
 				for (unsigned int i = 0; i < 15; i++)
 					boneArr[i] = m_tree->getBoneMatrix(m_boneIndex[i]) * world;
 
-				/*btTransform trans;
+				btTransform trans;
 				btVector3 diffOrigin[10];
 				btQuaternion diffRotation[10];
 
@@ -46,7 +47,7 @@ namespace thomas
 					diffRotation[i] = prevTrans[i].getRotation() - trans.getRotation();
 					prevTrans[i].setRotation(trans.getRotation());
 					prevTrans[i].setOrigin(trans.getOrigin());
-				}*/
+				}
 
 				//btTransform trans;
 				//m_bodies[0]->getMotionState()->getWorldTransform(trans);
@@ -68,7 +69,7 @@ namespace thomas
 				m_gameObject->m_transform->SetRotation(rotation);
 				m_gameObject->m_transform->SetDirty(true);
 		//		math::Matrix world = m_gameObject->m_transform->GetWorldMatrix();
-		*/
+		
 			}
 
 			void Ragdoll::Awake()
@@ -162,9 +163,9 @@ namespace thomas
 					{
 						m_bodies[i]->getMotionState()->getWorldTransform(t);
 						math::Matrix m = math::CreateMatrix(Physics::ToSimple(t.getOrigin()), Physics::ToSimple(t.getRotation()), m_gameObject->m_transform->GetScale());
-						editor::Gizmos::SetColor(math::Color(0, 1, 0));
-						editor::Gizmos::SetMatrix(m);
-						editor::Gizmos::DrawBoundingCapsule(math::Vector3(0,0,0), boneCapsuls[i].y, m_lengths[i]);
+						editor::Gizmos::Gizmo().SetColor(math::Color(0, 1, 0));
+						editor::Gizmos::Gizmo().SetMatrix(m);
+						editor::Gizmos::Gizmo().DrawBoundingCapsule(math::Vector3(0,0,0), boneCapsuls[i].y, m_lengths[i]);
 					}
 				}
 			}
@@ -331,7 +332,7 @@ namespace thomas
 				First[BodyPart_Left_LowerLeg].setOrigin(btVector3(0, 0, 0));
 				Second[BodyPart_Left_LowerLeg].setOrigin(btVector3(0, 0, 0));
 				Twistspin[BodyPart_Left_LowerLeg] = math::Vector3(10, 30, 45);
-				*/
+				
 
 			}
 
@@ -348,7 +349,7 @@ namespace thomas
 				int c;
 
 				while (c = *str++)
-					hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+					hash = ((hash << 5) + hash) + c; /* hash * 33 + c 
 
 				return hash;
 			}
@@ -374,7 +375,7 @@ namespace thomas
 			}
 
 			/* Identifies all skeleton bone indices
-			*/	
+			
 			void Ragdoll::InitSkeleton() 
 			{
 				// Try fetch skeleton
@@ -541,12 +542,12 @@ namespace thomas
 				m_joints[Joint_Lower_Left_Leg] = CreateConstraints(m_bodies[BodyPart_Left_UpperLeg], m_bodies[BodyPart_Left_LowerLeg], First[8], Second[8], Twistspin[8].x, Twistspin[8].y, Twistspin[8].z);
 				thomas::Physics::s_world->addConstraint(m_joints[Joint_Lower_Left_Leg], false);
 
-				*/
 
 	
 
 			
 			}
+				*/
 		}
 	}
 }

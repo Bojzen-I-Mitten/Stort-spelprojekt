@@ -45,6 +45,15 @@ namespace ThomasEngine
 		OnPropertyChanged("localEulerAngles");
 		OnPropertyChanged("localScale");
 	}
+	Matrix Transform::local_world::get() { return Utility::Convert(trans->GetLocalWorldMatrix()); }
+	void Transform::local_world::set(Matrix value)
+	{
+		trans->SetLocalMatrix(Utility::Convert(value));
+		OnPropertyChanged("localPosition");
+		OnPropertyChanged("localEulerAngles");
+		OnPropertyChanged("localScale");
+	}
+
 
 	Vector3 Transform::position::get() { return Utility::Convert(trans->GetPosition()); }
 	void Transform::position::set(Vector3 value) { trans->SetPosition(Utility::Convert(value)); OnPropertyChanged("localPosition"); }
@@ -62,7 +71,7 @@ namespace ThomasEngine
 	void Transform::eulerAngles::set(Vector3 value) { trans->SetRotation(value.y, value.x,  value.z); OnPropertyChanged("localEulerAngles");}
 
 	Vector3 Transform::localEulerAngles::get() { return Utility::Convert(trans->GetLocalEulerAngles()); }
-	void Transform::localEulerAngles::set(Vector3 value) { trans->SetLocalRotation(value.y, value.x,  value.z); }
+	void Transform::localEulerAngles::set(Vector3 value) { trans->SetLocalRotation(Utility::Convert(value)); }
 
 	Vector3 Transform::scale::get() { return Utility::Convert(trans->GetScale()); }
 	void Transform::scale::set(Vector3 value) { trans->SetScale(Utility::Convert(value));  OnPropertyChanged("localScale");}
@@ -73,11 +82,14 @@ namespace ThomasEngine
 	Vector3 Transform::forward::get() { return Utility::Convert(trans->Forward()); }
 	Vector3 Transform::up::get() { return Utility::Convert(trans->Up()); }
 	Vector3 Transform::right::get() { return Utility::Convert(trans->Right()); }
+	Vector3 Transform::local_forward::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Forward()); }
+	Vector3 Transform::local_up::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Up()); }
+	Vector3 Transform::local_right::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Right()); }
 
 
 	void Transform::SetParent(Transform ^ value)
 	{
-		SetParent(value, false);
+		SetParent(value, true);
 	}
 	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
 	{
@@ -125,6 +137,11 @@ namespace ThomasEngine
 			return parent->IsChildOf(_parent);
 		else
 			return false;
+	}
+
+	void Transform::Orient(Vector3 forward, Vector3 up)
+	{
+		trans->Orient(Utility::Convert(forward), Utility::Convert(up));
 	}
 
 	void Transform::OnDestroy()
