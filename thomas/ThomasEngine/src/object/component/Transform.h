@@ -24,6 +24,7 @@ namespace ThomasEngine
 			virtual bool get() override { return false; }
 		}
 		
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 5)]
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{
@@ -54,8 +55,15 @@ namespace ThomasEngine
 			Matrix get();
 			void set(Matrix value);
 		}
+		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[BrowsableAttribute(false)]
+		property Matrix local_world
+		{
+			Matrix get();
+			void set(Matrix value);
+		}
 
-
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 3)]
 		[DisplayNameAttribute("position")]
 		property Vector3 localPosition
 		{
@@ -87,6 +95,7 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 2)]
 		[DisplayNameAttribute("rotation")]
 		property Vector3 localEulerAngles
 		{
@@ -102,6 +111,7 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 1)]
 		[DisplayNameAttribute("scale")]
 		property Vector3 localScale
 		{

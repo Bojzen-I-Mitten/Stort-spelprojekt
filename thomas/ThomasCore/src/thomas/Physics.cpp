@@ -43,11 +43,13 @@ namespace thomas
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
 	}
 	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		int size = s_rigidBodies.size();
 		bool found = false;
 		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
 		{
@@ -75,19 +77,14 @@ namespace thomas
 	//Update physics collision
 	void Physics::Simulate()
 	{
-
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
-
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
 			return;
-
-		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
-
+		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);	
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateRigidbodyToTransform();
 		}
-
 		s_timeSinceLastPhysicsStep = 0.f;
 	}
 
@@ -140,7 +137,7 @@ namespace thomas
 		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
 		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
 
-		if(colliderA && colliderB)
+		if(colliderA && colliderB && !colliderA->isDestroyed() && colliderB->isDestroyed())
 		{
 			colliderA->OnCollision(colliderB, collisionType);
 			colliderB->OnCollision(colliderA, collisionType);

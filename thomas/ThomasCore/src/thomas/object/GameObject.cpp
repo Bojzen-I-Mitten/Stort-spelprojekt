@@ -1,5 +1,7 @@
 #include "GameObject.h"
 #include "../editor/EditorCamera.h"
+#include "../ThomasCore.h"
+#include "../Common.h"
 namespace thomas
 {
 	namespace object
