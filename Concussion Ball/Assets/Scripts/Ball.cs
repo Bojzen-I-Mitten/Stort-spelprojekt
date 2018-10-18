@@ -200,11 +200,8 @@ public class Ball : NetworkComponent
 
     public void Drop()
     {
-        if (PickedUp)
-        {
-            rigidbody.enabled = true;
-            transform.parent = null;
-        }
+        RPCDrop();
+        SendRPC("RPCDrop");
         
     }
 

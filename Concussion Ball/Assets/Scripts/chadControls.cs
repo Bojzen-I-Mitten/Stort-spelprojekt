@@ -74,6 +74,10 @@ public class ChadControls : NetworkComponent
     Rigidbody rBody;
     Chadimations Animations;
 
+    public string PlayerPrefabName { get; set; } = "Chad";
+    public float ImpactFactor { get; set; } = 10;
+    public float TackleThreshold { get; set; } = 5;
+
     //Camera test;
     private Ball _Ball;
     private Ball Ball
@@ -98,7 +102,10 @@ public class ChadControls : NetworkComponent
         if (isOwner && !Camera)
             Debug.LogWarning("Camera not set for player");
         if (Camera)
+        {
             Camera.transform.localPosition = CameraOffset;
+        }
+            
 
 
         ThrowForce = BaseThrowForce;
@@ -116,9 +123,38 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             HandleKeyboardInput();
             HandleMouseInput();
+            StateMachine();
         }
 
-        StateMachine();
+        
+    }
+
+    public void RPCStartRagdoll()
+    {
+        rBody.enabled = false;
+        gameObject.GetComponent<Ragdoll>().EnableRagdoll();
+    }
+
+    public void RPCStopRagdoll()
+    {
+        gameObject.transform.position = gameObject.GetComponent<Ragdoll>().GetHips().transform.position;
+        gameObject.transform.eulerAngles = new Vector3(0, gameObject.GetComponent<Ragdoll>().GetHips().transform.localEulerAngles.y, 0);
+        gameObject.GetComponent<Ragdoll>().DisableRagdoll();
+        gameObject.GetComponent<Rigidbody>().enabled = true;
+    }
+
+    IEnumerator StartRagdoll(float duration, Vector3 force)
+    {
+        State = STATE.RAGDOLL;
+        Camera.transform.parent = gameObject.GetComponent<Ragdoll>().GetHips().transform;
+        RPCStartRagdoll();
+        SendRPC("RPCStartRagdoll");
+        gameObject.GetComponent<Ragdoll>().AddForce(force);
+        yield return new WaitForSeconds(duration);
+        RPCStopRagdoll();
+        SendRPC("RPCStopRagdoll");
+        State = STATE.CHADING;
+        ResetCamera();
     }
 
     #region Input handling
@@ -235,7 +271,7 @@ public class ChadControls : NetworkComponent
     #region Camera controls
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
-        if (Camera)
+        if (Camera && State != STATE.RAGDOLL)
         {
             Camera.transform.localPosition = Vector3.Zero;
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
@@ -298,6 +334,7 @@ public class ChadControls : NetworkComponent
     {
         if (Camera)
         {
+            Camera.transform.parent = gameObject.transform;
             Camera.transform.localPosition = CameraOffset;
             Camera.transform.LookAt(transform.position + new Vector3(0, CameraOffset.y, 0));
 
@@ -350,6 +387,8 @@ public class ChadControls : NetworkComponent
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
+                Camera.transform.rotation = Quaternion.Identity;
+                Camera.transform.LookAt(Camera.transform.parent);
                 break;
         }
     }
@@ -443,17 +482,29 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner && Ball)
+        if (isOwner)
         {
-            if (collider.gameObject == Ball.gameObject)
+            if (Ball)
             {
-                if (Ball.transform.parent == null)
+                if (collider.gameObject == Ball.gameObject)
                 {
-                    TakeOwnership(Ball.gameObject);
-                    SendRPC("RPCPickupBall");
-                    RPCPickupBall();
-                }
+                    if (Ball.transform.parent == null)
+                    {
+                        TakeOwnership(Ball.gameObject);
+                        SendRPC("RPCPickupBall");
+                        RPCPickupBall();
+                    }
 
+                }
+            }
+            if (collider.gameObject.Name == PlayerPrefabName)
+            {
+                float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
+                if (TheirVelocity > TackleThreshold)
+                {
+                    //toggle ragdoll
+                    StartCoroutine(StartRagdoll(5.0f, -collider.gameObject.transform.forward * ImpactFactor));
+                }
             }
         }
     }
