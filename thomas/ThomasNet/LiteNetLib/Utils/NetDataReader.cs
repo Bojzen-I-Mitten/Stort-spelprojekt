@@ -316,12 +316,29 @@ namespace LiteNetLib.Utils
             return result;
         }
 
+        public ThomasEngine.Vector2 GetVector2()
+        {
+            ThomasEngine.Vector2 result = new ThomasEngine.Vector2();
+            result.x = GetFloat();
+            result.y = GetFloat();
+            return result;
+        }
+
         public ThomasEngine.Vector3 GetVector3()
         {
             ThomasEngine.Vector3 result = new ThomasEngine.Vector3();
             result.x = GetFloat();
             result.y = GetFloat();
             result.z = GetFloat();
+            return result;
+        }
+        public ThomasEngine.Vector4 GetVector4()
+        {
+            ThomasEngine.Vector4 result = new ThomasEngine.Vector4();
+            result.x = GetFloat();
+            result.y = GetFloat();
+            result.z = GetFloat();
+            result.w = GetFloat();
             return result;
         }
 

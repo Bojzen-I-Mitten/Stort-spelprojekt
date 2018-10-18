@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using ThomasEngine;
 using System;
 using ThomasEngine.Network;
-
+using LiteNetLib.Utils;
+using LiteNetLib;
 
 public class ChadControls : NetworkComponent
 {
@@ -34,8 +35,15 @@ public class ChadControls : NetworkComponent
     private Quaternion FreeLookDirection;
     Rigidbody rBody;
 
-    private Ball Ball = null;
-    public bool HasBall = false;
+    //Camera test;
+    private Ball _Ball;
+    private Ball Ball {
+        get{
+            if(!_Ball)
+                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+            return _Ball;
+        }
+    }
     // private bool canPickupBall = true;
 
         bool jumpDelay = true;
@@ -45,12 +53,16 @@ public class ChadControls : NetworkComponent
     public override void Start()
     {
         rBody = gameObject.GetComponent<Rigidbody>();
+        if (!isOwner && camera)
+        {
+            camera.enabled = false;
+        }
+
 
         if (!camera)
             Debug.LogWarning("Camera not set for player");
 
         throwForce = baseThrowForce;
-        Ball = GetObjectsOfType<Ball>().FirstOrDefault();
     }
 
     public override void Update()
@@ -155,18 +167,59 @@ public class ChadControls : NetworkComponent
 
     public void ThrowBall(float chargeForce)
     {
-        Ball.Throw(camera.transform.forward * chargeForce);
-        HasBall = false;
+        if(HasBall())
+            Ball.Throw(camera.transform.forward * chargeForce);
     }
 
+    public void RPCPickupBall()
+    {
+        if(Ball)
+            Ball.Pickup(gameObject, hand ? hand : transform);
+        
+    }
+
+    public bool HasBall()
+    {
+        if (Ball)
+            return Ball.isOwner && Ball.PickedUp;
+        else
+            return false;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        if (initialState)
+        {
+            bool hasBall = reader.GetBool();
+            if (hasBall)
+                RPCPickupBall();
+        }
+    }
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        if (initialState)
+        {
+            writer.Put(HasBall());
+        }
+        return true;
+    }
+    
     public override void OnCollisionEnter(Collider collider)
     {
-        if (Ball /*&& isOwner*/)
+
+        Debug.Log("wow");
+        if (isOwner && Ball)
         {
             if (collider.gameObject == Ball.gameObject)
             {
-                Ball.Pickup(gameObject, hand ? hand : transform);
-                HasBall = true;
+                if(Ball.transform.parent == null)
+                {
+                    TakeOwnership(Ball.gameObject);
+                    SendRPC("RPCPickupBall");
+                    RPCPickupBall();
+                }
+
             }
         }
     }

@@ -201,12 +201,25 @@ namespace LiteNetLib.Utils
             _data[_position] = value;
             _position++;
         }
+        public void Put(ThomasEngine.Vector2 value)
+        {
+            Put(value.x);
+            Put(value.y);
+        }
 
         public void Put(ThomasEngine.Vector3 value)
         {
             Put(value.x);
             Put(value.y);
             Put(value.z);
+        }
+
+        public void Put(ThomasEngine.Vector4 value)
+        {
+            Put(value.x);
+            Put(value.y);
+            Put(value.z);
+            Put(value.w);
         }
 
         public void Put(ThomasEngine.Quaternion value)

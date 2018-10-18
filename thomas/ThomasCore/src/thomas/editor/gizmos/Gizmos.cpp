@@ -43,14 +43,23 @@ namespace thomas
 
 		void Gizmos::DrawModel(resource::Model * model, int meshIndex, math::Vector3 position = math::Vector3::Zero, math::Quaternion rotation = math::Quaternion::Identity, math::Vector3 scale = math::Vector3::One)
 		{
-
-
+			//std::vector<graphics::Mesh*> meshes = model->GetMeshes();
+			//if (meshIndex == -1)
+			//{
+			//	for (graphics::Mesh* mesh : meshes)
+			//		
+			//}
+			//else
+			//{
+			//	s_gizmoMaterial->Draw(meshes[meshIndex]);
+			//}*/
+			
 
 			/*s_gizmoMaterial->SetShaderPass((int)GizmoPasses::SOLID);
 			s_gizmoMaterial->m_topology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 			s_gizmoMaterial->SetMatrix("gizmoMatrix", math::CreateMatrix(position, rotation, scale));
 			s_gizmoMaterial->Bind();
-			std::vector<graphics::Mesh*> meshes = model->GetMeshes();
+			
 			if (meshIndex == -1)
 			{
 				for (graphics::Mesh* mesh : meshes)
@@ -114,11 +123,8 @@ namespace thomas
 		}
 
 		void Gizmos::DrawCube(math::Vector3 center, math::Vector3 size)
-		{
-			/*s_gizmoMaterial->SetShaderPass((int)GizmoPasses::SOLID);
-			s_gizmoMaterial->m_topology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-			s_gizmoMaterial->Bind();*/
-			//s_gizmoMaterial->Draw(graphics::Model::GetPrimitive(graphics::PrimitiveType::Cube))
+		{			
+			//DrawModel(utils::Primitives::GetPrimitive(utils::Primitives::Type::Cube), center, math::Quaternion::Identity, size);
 		}
 
 		void Gizmos::DrawWireCube(math::Vector3 center, math::Vector3 size)
