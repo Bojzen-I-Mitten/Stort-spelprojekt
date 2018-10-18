@@ -387,8 +387,6 @@ namespace ThomasEditor
 
         public void hierarchy_Drop(object sender, DragEventArgs e)
         {
-            if (hierarchy.SelectedItem == null)
-                return;
             TreeViewItem source = (TreeViewItem)e.Data.GetData(typeof(TreeViewItem));
 
             if (e.Data.GetDataPresent(typeof(TreeViewItem)) || source.DataContext != null)
@@ -396,7 +394,7 @@ namespace ThomasEditor
                 TreeViewItem target = GetItemAtLocation(e.GetPosition(hierarchy));
                 GameObject targetModel = null;
                 //If drop function is called from Inspector
-                if (m_inspector)
+                if (m_inspector && hierarchy.SelectedItem != null)
                 {
                     targetModel = (GameObject)(hierarchy.SelectedItem as TreeItemViewModel).Data;
                 }

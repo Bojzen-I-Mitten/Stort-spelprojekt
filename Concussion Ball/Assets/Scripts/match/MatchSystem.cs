@@ -147,7 +147,7 @@ public class MatchSystem : NetworkManager
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
                 if (Input.GetKeyDown(Input.Keys.D3))
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                if (Input.GetKeyDown(Input.Keys.Space))
+                if (Input.GetKeyDown(Input.Keys.Enter))
                 {
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
