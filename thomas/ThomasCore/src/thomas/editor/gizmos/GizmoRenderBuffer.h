@@ -9,8 +9,8 @@
 namespace thomas {
 	namespace editor {
 		namespace gizmo {
-			constexpr uint32_t GIZMO_BUFFER_MEMORY = 4096;
-			constexpr uint32_t GIZMO_DRAW_COMMAND_INIT = 79;
+			constexpr uint32_t GIZMO_BUFFER_MEMORY = 4096*16;
+			constexpr uint32_t GIZMO_DRAW_COMMAND_INIT = 79*128;
 
 			class GizmoRenderBuffer
 			{

@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\GUITest.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
+    <Compile Include="Assets\Scripts\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />
