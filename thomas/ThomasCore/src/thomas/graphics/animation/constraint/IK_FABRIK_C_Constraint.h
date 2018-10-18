@@ -25,7 +25,8 @@ namespace thomas {
 
 			private:
 				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
-				void solve_constraint_backward(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
+				void solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
+				void solve_constraint_forward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link);
 
 			public:

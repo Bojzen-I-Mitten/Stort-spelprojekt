@@ -43,41 +43,72 @@ namespace thomas {
 			constexpr float limit_bend = math::PI / 4;
 			constexpr float limit_twist = math::PI / 4;
 
-			void IK_FABRIK_C_Constraint::solve_constraint_backward(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
+			void IK_FABRIK_C_Constraint::solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
 			{
 				math::Matrix m_ii = *(c_orient + 1);
 				math::Vector3 p_i = *p_c;
 				math::Vector3 p_ii = *(p_c + 1);
 				math::Vector3 d_i = p_i - p_ii;
-				math::Vector2 q_i;
-				q_i.x = d_i.Dot(m_ii.Right());
+				math::Vector2 q_i;										// Project on to XZ plane of T_i+1
+				q_i.x = d_i.Dot(m_ii.Right());						
 				q_i.y = d_i.Dot(m_ii.Forward());
-				float a = d_i.Dot(-m_ii.Up());
-				if (a < 0.f) 
-					return; // Point is infront of the matrix.
 				float b = q_i.Length();
-				float c = a * std::tanf(limit_bend);
-				float l_proj = b - c;
-				if (l_proj > 0.f)
+				float a = d_i.Dot(-m_ii.Up());							// Find distances to Y axis on T_i+1
+				float c = std::fabs(a) * std::tanf(limit_bend);
+				float l_proj = b - c;									// Calc. distance on XZ from p_i -> angle limit
+				q_i *= l_proj;
+				math::Vector3 proj_diff = q_i.x * m_ii.Right() + q_i.y * m_ii.Forward();			// Vector from p_in -> p_i
+				math::Vector3 p_n = (bone_len / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in (normalized)
+				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
 				{
-					q_i *= l_proj;
-					math::Vector3 proj_diff = q_i.x * m_ii.Right() + q_i.y * m_ii.Forward();			// Vector projecting p_i -> p_in
-					math::Vector3 p_n = (bone_len / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in
-
-					// Update p_i
-					*p_c = p_n;
+					p_n += 2 * a * m_ii.Up();														// Mirror result over T_i+1 XZ plane (always apply)
+					*p_c = p_n; // Update p_i
 				}
-				// Calc. orientation
+				else if (l_proj < 0.f)																// Don't apply if b < c (inside angle limit)
+					*p_c = p_n; // Update p_i
+				// else			// Do nothing
+
+				// Re-calculate orientation
 				d_i = (*p_c - p_ii) / bone_len;
 				*c_orient = *c_orient * math::getMatrixRotationTo(c_orient->Up(), d_i);
 			}
+			void IK_FABRIK_C_Constraint::solve_constraint_forward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
+			{
+				math::Matrix m_i = c_orient[0];
+				math::Vector3 p_i = p_c[1];
+				math::Vector3 d_i = p_i - p_c[0];
+				math::Vector2 q_i;										// Project on to XZ plane of T_i+1
+				q_i.x = d_i.Dot(m_i.Right());
+				q_i.y = d_i.Dot(m_i.Forward());
+				float b = q_i.Length();
+				float a = d_i.Dot(m_i.Up());							// Find distances to Y axis on T_i+1
+				float c = std::fabs(a) * std::tanf(limit_bend);
+				float l_proj = b - c;									// Calc. distance on XZ from p_i -> angle limit
+				q_i *= l_proj;
+				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Forward();			// Vector from p_in -> p_i
+				math::Vector3 p_n = (bone_len / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in (normalized)
+				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
+				{
+					p_n += 2 * a * m_i.Up();														// Mirror result over T_i+1 XZ plane (always apply)
+					p_c[1] = p_n; // Update p_i
+				}
+				else if (l_proj < 0.f)																// Don't apply if b < c (inside angle limit)
+					p_c[1] = p_n;	// Update p_i
+				// else				// Do nothing
+
+				// Re-calculate orientation
+				d_i = (p_c[1] - p_c[0]) / bone_len;													// new forward orient
+				c_orient[1] = c_orient[1] * math::getMatrixRotationTo(c_orient[1].Up(), d_i);		// Rotate prev.->new 
+			}
+			
 
 			/* FABRIK backward/forward iteration
 			*/
 			void IK_FABRIK_C_Constraint::FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link)
 			{
 				// Target is within reach
-				math::Vector3 b = p[0];
+				math::Vector3 p_init = p[0];
+				math::Matrix orient_init = orient[0];
 				float dif = math::Vector3::Distance(p[num_link - 1], target);
 				// Iterate until a error tolerance is reached (or max. iterations)
 				for (uint32_t iter = 0; dif > FABRIK_TOLERANCE && iter < MAX_FABRIK_ITER; iter++) {
@@ -88,18 +119,20 @@ namespace thomas {
 						i--;
 						float r = math::Vector3::Distance(p[i], p[i+1]);		// Distance to next joint
 						float lambda = len[i] / r;
-						p[i] = math::lerp(p[i+1], p[i], lambda);						// Next iter. position
+						p[i] = math::lerp(p[i+1], p[i], lambda);				// Next iter. position
 
-						solve_constraint_backward(p + i, orient + i, *(len + i));
+						solve_constraint_backward_iter(p + i, orient + i, *(len + i));
 					}
 					// Stage 2: Backward reaching
-					*p = b;														// Reset root
+					*p = p_init;												// Reset root
+					*orient = orient_init;
 					for (; i < num_link - 1; i++) {								// Backward reaching loop
 						float r = math::Vector3::Distance(p[i], p[i + 1]);		// Distance to next joint
 						float lambda = len[i] / r;
-						p[i+1] = math::lerp(p[i], p[i + 1], lambda);					// Next iter. position
+						p[i+1] = math::lerp(p[i], p[i + 1], lambda);			// Next iter. position
 
 						orient[i] = orient[i] * math::getMatrixRotationTo(orient[i].Up(), (p[i + 1] - p[i]) / r);
+						solve_constraint_forward_iter(p + i, orient + i, *(len + i + 1));
 					}
 					dif = math::Vector3::Distance(p[num_link-1], target);
 				}
