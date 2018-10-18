@@ -58,7 +58,9 @@ public class Chadimations : NetworkComponent
             {
                 BlendNode newBlendNode = new BlendNode(Skin.model);
                 foreach (var node in state.Value)
+                {
                     newBlendNode.appendNode(node.Animation, true);
+                }
                 BlendNodes.Add(state.Key, newBlendNode);
 
                 WeightHandle newWeightHandle = BlendNodes[state.Key].generateWeightHandle();
@@ -66,16 +68,17 @@ public class Chadimations : NetworkComponent
             }
 
             WeightHandles[ChadControls.STATE.CHADING].setWeight(0, new WeightTripple(1f));
+            Skin.setBlendTreeNode(BlendNodes[ChadControls.STATE.CHADING]);
         }
     }
 
     public override void Update()
     {
-        //Weight update
+        Skin.setBlendTreeNode(BlendNodes[State]);
         for (uint i = 0; i < Animations[State].Count; i++)
         {
             AnimationNode node = Animations[State][(int)i];
-            WeightHandles[State].setWeight(i, new WeightTripple(node.GetWeight(Direction)));
+            WeightHandles[State].setWeight(i, node.GetWeight(Direction));
         }
     }
 }

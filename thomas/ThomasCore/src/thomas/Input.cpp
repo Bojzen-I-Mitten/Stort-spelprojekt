@@ -389,4 +389,9 @@ namespace thomas
 	{
 		return m_keyboardState.IsKeyDown((Keyboard::Keys)key);
 	}
+
+	Input::MouseMode Input::GetMouseMode()
+	{
+		return m_mouseMode;
+	}
 }

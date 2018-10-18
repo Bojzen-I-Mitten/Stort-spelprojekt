@@ -28,7 +28,7 @@ public class ChadControls : NetworkComponent
     #endregion
 
     //public int Speed { get; set; } = 5;
-    public float Force { get; set; } = 5;
+    //public float Force { get; set; } = 5;
 
     #region Camera Settings etc.
     [Category("Camera Settings")]
@@ -38,7 +38,7 @@ public class ChadControls : NetworkComponent
     [Category("Camera Settings")]
     public float CameraSensitivity_y { get; set; } = 20;
     [Category("Camera Settings")]
-    public Vector3 CameraPosition { get; set; } = new Vector3(0, 2, 2);
+    public Vector3 CameraOffset { get; set; } = new Vector3(0, 2, 2);
     [Category("Camera Settings")]
     public float CameraMaxVertDegrees { get; set; } = 60;
     [Category("Camera Settings")]
@@ -51,8 +51,6 @@ public class ChadControls : NetworkComponent
     public float TotalYStep { get; private set; } = 0;
     [Category("Camera Settings")]
     public float TotalXStep { get; private set; } = 0;
-
-    bool Escape = false;
     #endregion
     
     #region Movement stuff
@@ -86,7 +84,7 @@ public class ChadControls : NetworkComponent
         if (isOwner && !Camera)
             Debug.LogWarning("Camera not set for player");
         if (Camera)
-            Camera.transform.localPosition = CameraPosition;
+            Camera.transform.localPosition = CameraOffset;
 
 
         ThrowForce = BaseThrowForce;
@@ -114,7 +112,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyUp(Input.Keys.Escape))
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-            Escape = true;
+            //Escape = true;
         }
 
         if (Input.GetKey(Input.Keys.W))
@@ -131,13 +129,13 @@ public class ChadControls : NetworkComponent
     private void HandleMouseInput()
     {
         //Focus stuff
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && Escape)
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) /*&& Escape*/)
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-            Escape = false;
+            //Escape = false;
         }
 
-        if (!Escape)
+        if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
             if (HasBall)
@@ -200,7 +198,8 @@ public class ChadControls : NetworkComponent
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
         if (Camera)
-        { 
+        {
+            Camera.transform.localPosition = Vector3.Zero;
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
             if (velocity != 0)
                 yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
@@ -210,7 +209,7 @@ public class ChadControls : NetworkComponent
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
             Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = Vector3.Transform(CameraPosition, Camera.transform.localRotation);
+            Camera.transform.localPosition = Vector3.Transform(CameraOffset, Camera.transform.localRotation);
 
         }
     }
@@ -226,7 +225,7 @@ public class ChadControls : NetworkComponent
             Quaternion rot = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
             Camera.transform.localRotation = rot;
 
-            Camera.transform.localPosition = Vector3.Transform(CameraPosition, Camera.transform.localRotation);
+            Camera.transform.localPosition = Vector3.Transform(CameraOffset, Camera.transform.localRotation);
         }
     }
 
@@ -249,8 +248,8 @@ public class ChadControls : NetworkComponent
 
     public void InitFreeLookCamera()
     {
-        Camera.transform.localPosition = new Vector3(CameraPosition.x, CameraPosition.y, -CameraPosition.z);
-        Camera.transform.LookAt(transform.position + new Vector3(0, CameraPosition.y, 0));
+        Camera.transform.localPosition = new Vector3(CameraOffset.x, CameraOffset.y, -CameraOffset.z);
+        Camera.transform.LookAt(transform.position + new Vector3(0, CameraOffset.y, 0));
 
         Camera.transform.localEulerAngles = new Vector3(0, 180, 0);
         TotalXStep = ThomasEngine.MathHelper.Pi;
@@ -261,8 +260,8 @@ public class ChadControls : NetworkComponent
     {
         if (Camera)
         {
-            Camera.transform.localPosition = CameraPosition;
-            Camera.transform.LookAt(transform.position + new Vector3(0, CameraPosition.y, 0));
+            Camera.transform.localPosition = CameraOffset;
+            Camera.transform.LookAt(transform.position + new Vector3(0, CameraOffset.y, 0));
 
             Camera.transform.localEulerAngles = new Vector3(0, 0, 0);
             TotalXStep = 0;
@@ -282,7 +281,7 @@ public class ChadControls : NetworkComponent
 
     private void StateMachine()
     {
-        if (isOwner) //if owner, handle inputs
+        if (isOwner) //if owner, handle inputs through the Direction vector
         {
             switch (State)
             {

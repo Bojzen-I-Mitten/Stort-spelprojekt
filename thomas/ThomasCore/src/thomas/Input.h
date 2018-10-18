@@ -234,6 +234,7 @@ namespace thomas
 		int GetMouseScrollWheel();
 		math::Vector2 GetAbsolutePosition();
 		math::Vector2 GetMousePosition();
+		Input::MouseMode GetMouseMode();
 		
 		//Keyboard
 		bool GetKeyDown(Keys key);

@@ -258,6 +258,7 @@ namespace ThomasEngine
 		static Vector2 GetMousePosition() { return Utility::Convert(thomas::WindowManager::Instance()->GetGameInput()->GetMousePosition()); }
 
 		static void SetMouseMode(MouseMode mode) { return thomas::WindowManager::Instance()->GetGameInput()->SetMouseMode((thomas::Input::MouseMode)mode); }
+		static MouseMode GetMouseMode() { return (MouseMode)thomas::WindowManager::Instance()->GetGameInput()->GetMouseMode(); }
 
 	private:
 
