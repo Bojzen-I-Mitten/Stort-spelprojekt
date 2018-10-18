@@ -240,7 +240,8 @@ namespace ThomasEngine {
 
 							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
 
-							temp->nativePtr = new_temp;
+							if (temp) // If temp is nullptr, no managed object has been invalidated.
+								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
 
 						}
 					}

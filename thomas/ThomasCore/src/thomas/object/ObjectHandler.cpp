@@ -31,7 +31,7 @@ namespace thomas
 			if (&(*it) == object)
 			{
 				//std::iter_swap(it, m_objectsInActive.end() - 1);
-
+				
 				m_objectsStatic.push_back(std::move(*it));
 
 				moved = &m_objectsActive.back();
@@ -47,11 +47,11 @@ namespace thomas
 				editor::EditorCamera::Instance()->SelectObject(&m_objectsStatic.back());
 
 				return &m_objectsStatic.back(); // We have moved it
-
-
 			}
 		}
 
+		// If we reach this branch, an error has occoured
+		moved = nullptr;
 		return object;
 	}
 
