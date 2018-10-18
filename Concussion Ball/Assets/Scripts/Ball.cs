@@ -6,7 +6,7 @@ public class Ball : NetworkComponent
 {
     Rigidbody rb;
     RenderComponent rc;
-    bool pickedUp { get { return !rb.enabled; } set { rb.enabled = !value; } }
+    public bool PickedUp { get { if (rb) return !rb.enabled; else return false; } set { if (rb) rb.enabled = !value; } }
     private float accumulator;
     private float chargeupTime;
 
@@ -18,7 +18,7 @@ public class Ball : NetworkComponent
         accumulator = 0.0f;
         rb = gameObject.GetComponent<Rigidbody>();
         rc = gameObject.GetComponent<RenderComponent>();
-        
+
 
         rc.material.SetColor("color", new Color(0, 0, 255));
         //visualizer = Object.GetObjectsOfType<ThrowStrengthVisualizer>()[0];
@@ -26,20 +26,12 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
-        if (transform.parent == null)
-        {
-            Drop();
-        }
     }
 
     public void Drop()
     {
-        if (pickedUp)
-        {
-            rb.enabled = true;
-            transform.parent = null;
-        }
-        
+        RPCDrop();
+        SendRPC("RpcDrop");
     }
 
     public void ChargeColor()
@@ -51,15 +43,25 @@ public class Ball : NetworkComponent
 
         float value = interp;
 
-        Color newColor = new Color(value, 0.0f, (1.0f-interp));
-        
+        Color newColor = new Color(value, 0.0f, (1.0f - interp));
+
         rc.material.SetColor("color", newColor);
 
     }
 
+    public void RPCDrop()
+    {
+        if (PickedUp)
+        {
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+            PickedUp = false;
+            transform.parent = null;
+        }
+    }
+
     public void Throw(Vector3 force)
     {
-        if (pickedUp)
+        if (PickedUp)
         {
             Drop();
             transform.position = transform.position + Vector3.Normalize(force) * 2;
@@ -71,33 +73,31 @@ public class Ball : NetworkComponent
             accumulator = 0;
             interp = 0.0f;
         }
+
     }
+
     
     public void Pickup(GameObject gobj, Transform hand)
     {
-        rb.enabled = false;
+        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
+        PickedUp = true;
         transform.parent = hand;
         transform.localPosition = Vector3.Zero;
     }
 
-    public override void OnLostOwnership()
-    {
-        rb.enabled = false;
-    }
-
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
-        if(isOwner)
-        {
-            reader.GetBool();
-            return;
-        }
-        rb.enabled = reader.GetBool();
+        //if(isOwner)
+        //{
+        //    reader.GetBool();
+        //    return;
+        //}
+       // rb.enabled = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        writer.Put(rb.enabled);
+        //writer.Put(rb.enabled);
         return true;
     }
 }

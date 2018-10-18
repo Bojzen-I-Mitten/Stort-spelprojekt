@@ -54,7 +54,8 @@ namespace thomas
 				void SetFreezeRotation(const math::Vector3& freezeRotation);
 				void SetLinearVelocity(const math::Vector3& linearVel);
 				void SetAngularVelocity(const math::Vector3& angularVel);
-				void SetDamping(const math::Vector2& damping);
+				void SetDamping(float damping);
+				void SetAngularDamping(float angularDamping);
 				void SetSleepingThresholds(const math::Vector2& thresholds);
 				void SetDeactivationTime(float deactivationTime);
 				void SetContactProcessingThreshold(float contactProcessingThreshold);
@@ -65,6 +66,10 @@ namespace thomas
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
 				void SetCenterOfmass(math::Vector3 Centerofmass);
+
+				void SetBounciness(float bounciness);
+				void SetFriction(float friction);
+
 				math::Vector3 GetCenterOfmass();
 
 			public:
@@ -74,13 +79,17 @@ namespace thomas
 				math::Vector3 GetFreezeRotation() const;
 				math::Vector3 GetLinearVelocity() const;
 				math::Vector3 GetAngularVelocity() const;
-				math::Vector2 GetDamping() const;
+				float GetDamping() const;
+				float GetAngularDamping() const;
 				math::Vector2 GetSleepingThresholds() const;
 				float GetDeactivationTime() const;
 				float GetContactProcessingThreshold() const;
 				float GetCcdMotionThreshold() const;
 				float GetCcdSweptSphereRadius() const;
 				ActivationState GetActivationState() const;
+
+				float GetBounciness();
+				float GetFriction();
 
 			private:
 				void UpdateRigidbodyMass();
@@ -89,13 +98,15 @@ namespace thomas
 				Collider * m_collider = nullptr;
 				math::Vector3 m_freezePosition;
 				math::Vector3 m_freezeRotation;
-				math::Vector2 m_damping;
 				math::Vector2 m_sleepingThresholds;
 				math::Matrix m_prevMatrix;
 				ActivationState m_activationState;
 				math::Vector3 m_LocalCenterOfMassChange;
 				float m_mass;
+				float m_damping;
+				float m_angularDaming;
 				bool m_kinematic;
+				float m_bounciness;
 				bool m_dirty;
 			};
 		}

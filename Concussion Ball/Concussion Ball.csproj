@@ -51,8 +51,12 @@
     <Reference Include="ThomasNet">
       <HintPath>$(THOMAS_ENGINE)\ThomasNet.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(THOMAS_ENGINE)\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\RpcTest.cs" />
     <Compile Include="Assets\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
@@ -60,7 +64,14 @@
     <Compile Include="Assets\Scripts\chadStateMachine.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
+    <Compile Include="Assets\Scripts\GUITest.cs" />
+    <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
+    <Compile Include="Assets\Scripts\match\MatchSystem.cs" />
+    <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
+    <Compile Include="Assets\Scripts\match\Team.cs" />
+    <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
+    <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
     <Compile Include="Assets\Scripts\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />

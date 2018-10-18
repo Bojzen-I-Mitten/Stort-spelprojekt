@@ -27,13 +27,14 @@
 #include "GUI\editor\GUI.h"
 #include "object/GameObject.h"
 #include "Debug.h"
+
 using namespace thomas;
 
 namespace ThomasEngine {
 
 
-	void ThomasWrapper::Start() {
-
+	void ThomasWrapper::Start() 
+	{
 		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
 
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
@@ -47,7 +48,6 @@ namespace ThomasEngine {
 			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
 			Component::LoadExternalComponents();
-
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
@@ -193,7 +193,7 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
-					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
+					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Keys::F1)) {
 						showStatistics = !showStatistics;
 					}
 				}
@@ -207,7 +207,7 @@ namespace ThomasEngine {
 						if(Monitor::IsEntered(g->m_componentsLock))
 							Monitor::Exit(g->m_componentsLock);
 					}
-					Stop();
+					IssueStop();
 				}	
 			}
 			finally
@@ -225,6 +225,8 @@ namespace ThomasEngine {
 					thomas::graphics::LightManager::Update();
 					CopyCommandList();
 					
+					if (shouldStop)
+						Stop();
 					// Enter async. state 
 					RenderFinished->Reset();
 					UpdateFinished->Set();
@@ -279,9 +281,7 @@ namespace ThomasEngine {
 	Guid selectedGUID;
 	void ThomasWrapper::Play()
 	{
-#ifdef _EDITOR
-		thomas::editor::Editor::GetEditor().OnEditorPlay();
-#endif
+		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
 		Scene::CurrentScene->Play();
 		playing = true;
@@ -295,16 +295,21 @@ namespace ThomasEngine {
 		return playing;
 	}
 
+	void ThomasWrapper::IssueStop()
+	{
+		shouldStop = true;
+	}
+	
 	void ThomasWrapper::Stop()
 	{
-#ifdef _EDITOR
-		thomas::editor::Editor::GetEditor().OnEditorStop();
-#endif
+		playing = false;
+		// Synced state
+		thomas::ThomasCore::Core().OnStop();
+
 		if (s_Selection->Count > 0)
 			selectedGUID = s_Selection[0]->m_guid;
 		else
 			selectedGUID = Guid::Empty;
-		playing = false;
 		Scene::RestartCurrentScene();
 		ThomasEngine::Resources::OnStop();
 		if (selectedGUID != Guid::Empty)
@@ -316,6 +321,7 @@ namespace ThomasEngine {
 		OnStopPlaying();
 
 		Debug::Log("Stopped...");
+		shouldStop = false;
 	}
 
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }

@@ -11,6 +11,10 @@ namespace ThomasEngine.Network
 {
     public class NetworkIdentity : ScriptComponent
     {
+
+
+        public int PrefabID = -1;
+
         private bool _Owner = false;
         public bool Owner {
             set {if(value == true && IsPlayer == false) TakeOwnership();  _Owner = value; }
@@ -19,7 +23,7 @@ namespace ThomasEngine.Network
 
         public int ID {
             get {
-                return Manager ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : -1; // One line master race.
+                return Manager?.NetScene != null ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : 0; // One line master race.
             }
         } 
 
@@ -34,10 +38,20 @@ namespace ThomasEngine.Network
             get{return NetworkManager.instance;}
         }
 
-        List<NetworkComponent> networkComponentsCache;
+        List<NetworkComponent> _networkComponentsCache;
+        List<NetworkComponent> networkComponentsCache
+        {
+            get
+            {
+                if(_networkComponentsCache == null)
+                    _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+                return _networkComponentsCache;
+
+            }
+        }
         public override void OnEnable()
         {
-            networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+            _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
         
         public override void Update()
@@ -72,27 +86,43 @@ namespace ThomasEngine.Network
                 DataWriter.Put(ID);
 
             DataWriter.Put(initalState);
-            if (networkComponentsCache == null)
-            {
-                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
-            }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
+                
                 comp.OnWrite(DataWriter, initalState);
             }
-            Manager.InternalManager.SendToAll(DataWriter, DeliveryMethod.Sequenced);
+            Manager.InternalManager.SendToAll(DataWriter, initalState ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced);
         }
 
         public void ReadData(NetPacketReader reader, bool initialState)
         {
-            if(networkComponentsCache == null)
-            {
-                networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
-            }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 comp.OnRead(reader, initialState);
             }
+        }
+
+        public void ReadRPC(NetPacketReader reader)
+        {
+            NetSerializer serializer = new NetSerializer();
+            string methodName = reader.GetString();
+            System.Reflection.MethodInfo methodInfo = null;
+            foreach (NetworkComponent comp in networkComponentsCache)
+            {
+                methodInfo = comp.GetType().GetMethod(methodName);
+                if (methodInfo != null)
+                {
+                    comp.ReadRPC(methodInfo, reader);
+                    return;
+                }
+            }
+
+
+        }
+
+        internal void SendRPC(string methodName, object[] parameters)
+        {
+            Manager.SendRPC(this.ID, methodName, parameters);
         }
 
         private void TakeOwnership()

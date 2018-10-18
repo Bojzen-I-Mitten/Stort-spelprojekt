@@ -28,7 +28,7 @@ namespace ThomasEditor
         public string UpperLeftLeg { get; set; } = "mixamorig:LeftUpLeg";
         public string LowerLeftLeg { get; set; } = "mixamorig:LeftLeg";
         public string LeftFoot { get; set; } = "mixamorig:LeftFoot";
-        public Vector2 AllobjectDamping { get; set; } = new Vector2(0.5f, 0.5f);
+        public float AllobjectDamping { get; set; } = 0.5f;
         public float Totalmass { get; set; } = 70.0f;
         public bool RagdollEnabled = false;
         public bool AllobjectKinectic { get; set; } = false;
@@ -197,13 +197,13 @@ namespace ThomasEditor
         }
         public override void Update()
         {
-            if(Input.GetKeyDown(Input.Keys.Space))
+          /*  if(Input.GetKeyDown(Input.Keys.Space))
             {
                 if (RagdollEnabled)
                     DisableRagdoll();
                 else
                    EnableRagdoll();
-            }
+            }*/
         }
         public void EnableRagdoll()
         {

@@ -1,6 +1,6 @@
 #pragma once
 #include "Window.h"
-#include <imgui\imgui.h>
+#include <imgui/imgui.h>
 
 namespace thomas
 {
@@ -16,6 +16,7 @@ namespace thomas
 		void BeginFrame();
 		void EndFrame(bool copyGui);
 		virtual bool IsEditor() { return true; }
+
 	private:
 		void UpdateWindow();
 		void CloneGUIData();
