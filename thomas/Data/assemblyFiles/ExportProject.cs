@@ -190,7 +190,6 @@ namespace ThomasStandalone
             MSG msg;
             while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
             {
-                Console.Out.WriteLine(ThomasWrapper.FrameRate);
                 DispatchMessage(ref msg);
             }
 

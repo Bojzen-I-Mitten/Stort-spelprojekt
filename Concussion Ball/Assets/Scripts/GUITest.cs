@@ -88,7 +88,7 @@ public class GUITest : ScriptComponent
         {
             if (IPText != "" && PortText != "")
             {
-                MatchSystem.instance.LocalPort = 0;
+                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText);
                 MatchSystem.instance.TargetPort = Convert.ToInt32(PortText);
                 MatchSystem.instance.TargetIP = IPText;
                 MatchSystem.instance.Init();
