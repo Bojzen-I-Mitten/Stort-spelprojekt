@@ -20,8 +20,8 @@ public class ChadControls : NetworkComponent
     public float CameraMaxVertDegrees { get; set; } = 60;
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
     public float CameraDistance { get; set; } = 2;
-    public float CameraHeightThrowing { get; set; } = 0.8f;
-    public float CameraDistanceThrowing { get; set; } = 0.5f;
+    private float CameraHeightThrowing { get; set; } = 1.3f;
+    private float CameraDistanceThrowing { get; set; } = 0.7f;
     private float TotalYStep = 0;
     private float TotalXStep = 0;
     private Vector3 CameraStartPos;

@@ -262,11 +262,6 @@ public class ChadStateMachine : NetworkComponent
                 // __SIMULTAENOUS__ THROW and: MOVING
                 // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
 
-                //If player started to charge
-                //if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
-                //{
-                //    StartCoroutine(ChargingCoroutine());
-                //}
                 if (m_isTackled)
                 {
                     m_state = CHAD_STATE.RAGDOLL;
