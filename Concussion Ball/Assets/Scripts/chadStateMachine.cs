@@ -27,9 +27,12 @@ public class ChadStateMachine : NetworkComponent
     private bool m_ragdolling = false;
     private bool m_isTackled = false;
     private bool m_tackling = false;
+
     private float m_chargeForce = 2.0f;
-    private float m_maxForce = 10.0f;
-    
+    private float m_baseForce = 2.0f;
+    private float m_incrementForce = 4.0f;
+    //private float m_maxForce = 10.0f;
+
     private Ball m_ball = null;
 
     private ChadControls _chadControls;
@@ -45,12 +48,113 @@ public class ChadStateMachine : NetworkComponent
     }
 
     IEnumerator DivingCoroutine()
-    { 
-        m_chadControls.HandleMovement(m_maxSpeed, 0);
+    {
+        m_tackling = true;
+        float timer = 1.0f;
+        while (timer > 0.0f)
+        {
+            m_chadControls.HandleMovement(m_maxSpeed, 0);
+            timer -= Time.DeltaTime;
+            Debug.Log("Test1");
+            yield return null;
 
-        yield return new WaitForSeconds(1.0f);
+        }
+        Debug.Log("Test2");
         m_velocity = BaseSpeed;
         m_state = CHAD_STATE.IDLE;
+    }
+
+    //Don't extend
+    IEnumerator ChargingCoroutine()
+    {
+        float timer = 4.0f;
+        bool charging = false;
+
+        while (m_state == CHAD_STATE.THROWING && !charging)
+        {
+            while (timer > 0.0f && Input.GetMouseButton(Input.MouseButtons.LEFT) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
+            {
+                m_chargeForce += m_incrementForce * Time.DeltaTime;
+                m_chadControls.ChargeBall();
+
+                timer -= Time.DeltaTime;
+                charging = true;
+                yield return null;
+            }
+            if (!Input.GetMouseButton(Input.MouseButtons.RIGHT))
+            {
+                m_chadControls.ResetCamera();
+
+                m_chargeForce = m_baseForce;
+
+                // check what mode to enter
+                if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
+                {
+                    m_state = CHAD_STATE.MOVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.RUNNING, 0);
+                    Weights.Add(Chadimations.STATE.STRAFING_LEFT, 0);
+                    Weights.Add(Chadimations.STATE.STRAFING_RIGHT, 0);
+                    Weights.Add(Chadimations.STATE.BACKWARDS, 0);
+                }
+                else
+                {
+                    m_state = CHAD_STATE.IDLE;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.IDLE, 0);
+                    Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
+                    Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+                }
+                m_ball.Cleanup();
+
+                StopCoroutine(ChargingCoroutine());
+            }
+                
+            yield return null;
+        }
+
+        if (charging)
+        {
+            timer = 1.0f;
+            while (Input.GetMouseButton(Input.MouseButtons.RIGHT) && charging)
+            {
+                while (timer > 0.0f && Input.GetMouseButton(Input.MouseButtons.RIGHT) && !Input.GetMouseButton(Input.MouseButtons.LEFT))
+                {
+                    Weights[Chadimations.STATE.THROWING] = 1f;
+                    m_chadControls.ThrowBall(m_chargeForce);
+                    timer -= Time.DeltaTime;
+
+                    charging = false;
+                    m_animations.SetAnimations(Weights);
+                    yield return null;
+                }
+                yield return null;
+            }
+            
+            m_chadControls.ResetCamera();
+
+            m_chargeForce = m_baseForce;
+            m_ball.Cleanup();
+
+            // check what mode to enter
+            if (Input.GetKey(Input.Keys.W) || Input.GetKey(Input.Keys.S) || Input.GetKey(Input.Keys.A) || Input.GetKey(Input.Keys.D))
+            {
+                m_state = CHAD_STATE.MOVING;
+                Weights.Clear();
+                Weights.Add(Chadimations.STATE.RUNNING, 0);
+                Weights.Add(Chadimations.STATE.STRAFING_LEFT, 0);
+                Weights.Add(Chadimations.STATE.STRAFING_RIGHT, 0);
+                Weights.Add(Chadimations.STATE.BACKWARDS, 0);
+            }
+            else
+            {
+                m_state = CHAD_STATE.IDLE;
+                Weights.Clear();
+                Weights.Add(Chadimations.STATE.IDLE, 0);
+                Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
+                Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+            }
+        }
     }
 
     public override void Start()
@@ -107,12 +211,14 @@ public class ChadStateMachine : NetworkComponent
                             Weights.Add(Chadimations.STATE.BACKWARDS, 0);
                             Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                             Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+                            StartCoroutine(ChargingCoroutine());
                         }
                         else if (Input.GetKeyDown(Input.Keys.Space))
                         {
                             m_state = CHAD_STATE.DIVING;
                             Weights.Clear();
                             Weights.Add(Chadimations.STATE.DIVING, 0);
+                            StartCoroutine(DivingCoroutine());
                         }
                     }
                     if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
@@ -129,31 +235,125 @@ public class ChadStateMachine : NetworkComponent
                         }
                         else //free look
                             m_chadControls.FreeLookCamera(m_velocity, m_xStep, m_yStep);
-                        if (m_isTackled)
+
+                    }
+                    if (Input.GetKeyDown(Input.Keys.LeftShift))
+                    {
+                        m_chadControls.InitFreeLookCamera();
+                    }
+                    m_animations.SetAnimations(Weights);
+                    break;
+                }
+            case CHAD_STATE.THROWING:
+                Weights[Chadimations.STATE.THROWING] = 0f;
+                m_chadControls.ThrowingCamera(m_velocity, m_xStep, m_yStep);
+                // __SIMULTAENOUS__ THROW and: MOVING
+                // __CAN_ENTER__  IDLE/RAGDOLL/JUMP/MOVING
+
+                if (m_isTackled)
+                {
+                    m_state = CHAD_STATE.RAGDOLL;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.RAGDOLL, 0);
+                }
+                else if (Input.GetKey(Input.Keys.Space))
+                {
+                    m_state = CHAD_STATE.DIVING;
+                    Weights.Clear();
+                    Weights.Add(Chadimations.STATE.DIVING, 0);
+                    StartCoroutine(DivingCoroutine());
+                }
+                else
+                {
+                    // Throwing and pressing W, checking if also ASD pressed
+                    if (Input.GetKey(Input.Keys.W))
+                    {
+                        if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
                         {
-                            m_state = CHAD_STATE.RAGDOLL;
-                            Weights.Clear();
-                            Weights.Add(Chadimations.STATE.RAGDOLL, 0);
+                            // blend anim strafing and throwing
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.WALKING] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 2f;
+
+                            m_chadControls.HandleMovement(m_velocity * 0.66f, -m_velocity * 0.66f);
                         }
-                        else if (Input.GetKey(Input.Keys.Space))
+                        else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
                         {
-                            m_state = CHAD_STATE.DIVING;
-                            Weights.Clear();
-                            Weights.Add(Chadimations.STATE.DIVING, 0);
+                            //blend anim strafing and throwing
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.WALKING] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_RIGHT] = 1f / 2f;
+
+                            m_chadControls.HandleMovement(m_velocity * 0.66f, m_velocity * 0.66f);
                         }
+                        else if (!Input.GetKey(Input.Keys.S))
+                        {
+                            // blend anim walking backwards and throwing
+                            //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                            //Weights[Chadimations.STATE.STRAFING_LEFT] = 0.0f;
+                            //Weights[Chadimations.STATE.STRAFING_RIGHT] = 0.0f;
+                            //Weights[Chadimations.STATE.BACKWARDS] = 0.0f;
+                            Weights[Chadimations.STATE.RUNNING] = 1.0f;
+                            Debug.Log(Weights.Count);
+                            m_chadControls.HandleMovement(m_velocity, 0);
+                        }
+
+                    }
+                    // Throwing and pressed S, checking if also AWD pressed
+                    else if (Input.GetKey(Input.Keys.S))
+                    {
+                        if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
+                        {
+                            // blend anim backing and throwing
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.BACKWARDS] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 2f;
+                            m_chadControls.HandleMovement(-m_velocity * 0.66f, -m_velocity * 0.66f);
+                        }
+                        else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
+                        {
+                            //blend anim backing and throwing
+                            //Weights[Chadimations.STATE.THROWING] = 1f / 3f;
+                            Weights[Chadimations.STATE.BACKWARDS] = 1f / 2f;
+                            Weights[Chadimations.STATE.STRAFING_RIGHT] = 1f / 2f;
+                            m_chadControls.HandleMovement(-m_velocity * 0.66f, m_velocity * 0.66f);
+                        }
+                        else if (!Input.GetKey(Input.Keys.W))
+                        {
+                            // blend anim backing and throwing
+                            //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                            Weights[Chadimations.STATE.BACKWARDS] = 1.0f;
+                            m_chadControls.HandleMovement(-m_velocity, 0);
+                        }
+                    }
+                    // Throwing and pressing A, checking if also D pressed
+                    else if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
+                    {
+                        // blend anim strafing and throwing
+                        //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                        Weights[Chadimations.STATE.STRAFING_LEFT] = 1.0f;
+                        m_chadControls.HandleMovement(0, -m_velocity * 0.66f);
+                    }
+                    else if (Input.GetKey(Input.Keys.D) && !Input.GetKey(Input.Keys.A))
+                    {
+                        // blend anim strafing and throwing
+                        //Weights[Chadimations.STATE.THROWING] = 0.5f;
+                        Weights[Chadimations.STATE.STRAFING_RIGHT] = 1.0f;
+                        m_chadControls.HandleMovement(0, m_velocity);
+                    }
+
+                    if (Input.GetMouseX() * Time.ActualDeltaTime != m_xStep || Input.GetMouseY() * Time.ActualDeltaTime != m_yStep)
+                    {
+                        keys.ForEach((key) => Weights[key] *= 2f / 3f);
+
+                        if (m_xStep > 0)
+                            Weights[Chadimations.STATE.TURNING_LEFT] = 1f / 3f;
                         else
-                        {
-                            // Throwing and pressing W, checking if also ASD pressed
-                            if (Input.GetKey(Input.Keys.W))
-                            {
-                                if (Input.GetKey(Input.Keys.A) && !Input.GetKey(Input.Keys.D))
-                                {
-                                    // blend anim strafing and throwing
-                                    Weights[Chadimations.STATE.THROWING] = 1f / 3f;
-                                    Weights[Chadimations.STATE.WALKING] = 1f / 3f;
-                                    Weights[Chadimations.STATE.STRAFING_LEFT] = 1f / 3f;
-                                    m_animations.SetAnimations(Weights);
-                                    break;
+                            Weights[Chadimations.STATE.TURNING_RIGHT] = 1f / 3f;
+                    }
+                }
+                m_animations.SetAnimations(Weights);
+                break;
             case CHAD_STATE.MOVING:
                 // __SIMULTAENOUS__ MOVE and: nothing
                 // __CAN_ENTER__  IDLE/THROWING/RAGDOLL/JUMP
@@ -168,12 +368,13 @@ public class ChadStateMachine : NetworkComponent
                     m_state = CHAD_STATE.DIVING;
                     Weights.Clear();
                     Weights.Add(Chadimations.STATE.DIVING, 0);
+                    StartCoroutine(DivingCoroutine());
                 }
                 else
                 {
                     //if m_velocity > m_runningSpeed && anim != running {anim = running}
                     //elif m_velocity < m_runningSpeed && anim != walking {anim = walking}
-                    if (Input.GetMouseButton(Input.MouseButtons.LEFT) && m_chadControls.HasBall)
+                    if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && m_chadControls.HasBall)
                     {
                         m_state = CHAD_STATE.THROWING;
                         Weights.Clear();
@@ -183,6 +384,7 @@ public class ChadStateMachine : NetworkComponent
                         Weights.Add(Chadimations.STATE.BACKWARDS, 0);
                         Weights.Add(Chadimations.STATE.TURNING_LEFT, 0);
                         Weights.Add(Chadimations.STATE.TURNING_RIGHT, 0);
+                        StartCoroutine(ChargingCoroutine());
                     }
                     else if (Input.GetKey(Input.Keys.W) && !Input.GetKey(Input.Keys.S))
                     {
@@ -248,8 +450,6 @@ public class ChadStateMachine : NetworkComponent
                     {
             case CHAD_STATE.DIVING:
                 Weights[Chadimations.STATE.DIVING] = 1;
-                StartCoroutine(DivingCoroutine());
-                m_tackling = true;
                 m_animations.SetAnimations(Weights);
                 break;
         }

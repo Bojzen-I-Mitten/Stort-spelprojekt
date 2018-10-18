@@ -71,7 +71,8 @@ public class ChadControls : NetworkComponent
 
     private Ball Ball = null;
     public bool HasBall = false;
-    private bool IsThrowing = false;
+
+    private float timeSinceLastThrow;
     // private bool canPickupBall = true;
 
     public override void Start()
@@ -95,6 +96,8 @@ public class ChadControls : NetworkComponent
             rBody.IsKinematic = !isOwner;
         Animations = gameObject.GetComponent<Chadimations>();
         Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+
+        timeSinceLastThrow = 10;
     }
 
     public override void Update()
@@ -142,22 +145,13 @@ public class ChadControls : NetworkComponent
             if (HasBall)
             {
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
-                {
-                    IsThrowing = true;
                     State = STATE.THROWING;
-                }
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && IsThrowing)
-                {
-                    IsThrowing = false;
+                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                     State = STATE.CHADING;
-                }
-                else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && IsThrowing)
+                else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                     ChargeBall();
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && IsThrowing)
-                {
-                    IsThrowing = false;
+                else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                     ThrowBall();
-                }
             }
 
             float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
@@ -337,6 +331,7 @@ public class ChadControls : NetworkComponent
     public void ThrowBall()
     {
         Ball.Throw(Camera.transform.forward * ThrowForce);
+        timeSinceLastThrow = 0;
         HasBall = false;
     }
 
