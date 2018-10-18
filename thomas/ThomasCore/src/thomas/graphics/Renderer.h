@@ -42,8 +42,8 @@ namespace thomas
 
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC, math::Matrix* value);
-			void BindObject(render::RenderCommand & rC, int count, math::Matrix* value);
-			void BindObjectInverse(render::RenderCommand& rC, int count, math::Matrix* value);
+			void BindObject(render::RenderCommand & rC, int count, math::Matrix* matrix, math::Matrix* inverseMatrix);
+			void BindObject(render::RenderCommand & rC, int count, math::Matrix* matrix);
 
 		public:
 			~Renderer() = default;

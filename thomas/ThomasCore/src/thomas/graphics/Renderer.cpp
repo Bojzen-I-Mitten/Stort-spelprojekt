@@ -104,19 +104,22 @@ namespace thomas
 				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
 		}
 
-		void Renderer::BindObject(render::RenderCommand& rC, int count, math::Matrix* value)
+		void Renderer::BindObject(render::RenderCommand & rC, int count, math::Matrix * matrix, math::Matrix * inverseMatrix)
 		{
-			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD, value, count);
+			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD, matrix, count);
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
+
+			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD_INV, inverseMatrix, count);
+			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
 				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
 		}
 
-		void Renderer::BindObjectInverse(render::RenderCommand & rC, int count, math::Matrix * value)
+		void Renderer::BindObject(render::RenderCommand& rC, int count, math::Matrix* matrix)
 		{
-			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD_INV, value, count);
-			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
+			rC.material->SetMatrixArray(THOMAS_MATRIX_WORLD, matrix, count);
+			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
 				rC.local_prop[i].m_apply(rC.local_prop[i], rC.material->GetShader());
@@ -142,13 +145,15 @@ namespace thomas
 
 					int count = 0;
 					math::Matrix matrix[50];
+					math::Matrix inverseMatrix[50];
 					for (auto & perMeshCommand : perMaterialQueue.second)
 					{
 						matrix[count] = perMeshCommand.worldMatrix.Transpose();
+						inverseMatrix[count] = perMeshCommand.worldMatrix.Invert();
 						count++;
 					}
 
-					BindObject(perMaterialQueue.second[0], count, matrix);
+					BindObject(perMaterialQueue.second[0], count, matrix, inverseMatrix);
 					material->BindMesh(perMaterialQueue.second[0].mesh);
 					material->Draw(perMaterialQueue.second[0].mesh, count);
 				}

@@ -200,7 +200,7 @@ inline float3 ThomasObjectToWorldDir( in float3 dir, uint ID )
 // Transforms direction from world to object space
 inline float3 ThomasWorldToObjectDir( in float3 dir, uint ID )
 {
-    return normalize(mul(thomas_WorldToObject, float4(dir, 1.0f))).xyz;
+    return normalize(mul(thomas_WorldToObject[ID], float4(dir, 1.0f))).xyz;
 }
 
 inline float2 TransformViewToProjection(float2 v) { return float2(v.x*THOMAS_MATRIX_P[0][0], v.y*THOMAS_MATRIX_P[1][1]); }
