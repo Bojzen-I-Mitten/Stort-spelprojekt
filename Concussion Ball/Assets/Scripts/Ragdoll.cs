@@ -328,7 +328,6 @@ namespace ThomasEditor
             center.z = 0;
             float value = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, renderskinnedcomponent);
                 center.y = -value * 0.5f;
-
             CapsuleColliderLeftArm.center = center;
 
 
@@ -480,6 +479,9 @@ namespace ThomasEditor
             center.x = 0;
             center.z = 0;
             CapsuleColliderRightLeg.center = center;
+            value = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, renderskinnedcomponent);
+            center.y = -value * 0.5f;
+            CapsuleColliderRightLeg.center = center;
 
 
 
@@ -513,7 +515,9 @@ namespace ThomasEditor
             center.x = 0;
             center.z = 0;
             CapsuleColliderRightUnderLeg.center = center;
-
+            value = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, renderskinnedcomponent);
+            center.y = -value * 0.5f;
+            CapsuleColliderRightUnderLeg.center = center;
 
 
 
@@ -546,6 +550,9 @@ namespace ThomasEditor
             center.x = 0;
             center.z = 0;
             CapsuleColliderLeftLeg.center = center;
+            value = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, renderskinnedcomponent);
+            center.y = -value * 0.5f;
+            CapsuleColliderLeftLeg.center = center;
             //Joint from LeftLegJoint
 
             LeftLegJoint.Axis = new Vector3(0, 0, -90);
@@ -575,6 +582,11 @@ namespace ThomasEditor
             center.x = 0;
             center.z = 0;
             CapsuleColliderLeftUnderLeg.center = center;
+            value = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, renderskinnedcomponent);
+            center.y = -value * 0.5f;
+            CapsuleColliderLeftUnderLeg.center = center;
+
+
 
             LeftUnderLegJoint.Axis = new Vector3(0, 0, 0);
             LeftUnderLegJoint.SwingAxis = new Vector3(0, 0, 0);
