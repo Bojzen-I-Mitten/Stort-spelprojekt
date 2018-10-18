@@ -36,6 +36,7 @@ namespace thomas
 
 				void OnEnable() override;
 				void OnDisable() override;
+				void OnDestroy() override;
 
 				math::Matrix GetViewMatrix();
 				math::Matrix GetProjMatrix();

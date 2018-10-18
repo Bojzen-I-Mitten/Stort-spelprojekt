@@ -57,7 +57,7 @@ namespace thomas
 			{
 				m_GUIHandle->Destroy();
 				m_GUIHandle.reset();
-
+				
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
 					if (s_allCameras[i] == this)
@@ -87,6 +87,11 @@ namespace thomas
 					}
 						
 				}
+			}
+
+			void Camera::OnDestroy()
+			{
+				m_renderGUI = false;
 			}
 
 			math::Matrix Camera::GetProjMatrix()
