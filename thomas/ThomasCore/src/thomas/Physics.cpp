@@ -91,9 +91,11 @@ namespace thomas
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
+#ifdef _DEBUG
 		if (!s_drawDebug)
 			return;
 		s_world->debugDrawWorld();
+#endif
 	}
 
 	void Physics::Destroy()
