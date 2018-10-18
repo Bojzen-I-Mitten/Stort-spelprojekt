@@ -269,7 +269,7 @@ namespace ThomasEditor
                     if (m_hierarchyNodes.Count > 0)
                     {
                         ResetTree(m_hierarchyNodes.ToList());
-                        Inspector.instance.SelectedObject = null;
+                        //Inspector.instance.SelectedObject = null;
                     }
                         
                 }
