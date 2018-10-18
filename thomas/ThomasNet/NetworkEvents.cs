@@ -9,8 +9,11 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-    class NetworkEvents
+    public class NetworkEvents
     {
+
+        private NetSerializer NetSerializer;
+
         private NetworkManager Manager
         {
             get { return NetworkManager.instance; }
@@ -23,7 +26,9 @@ namespace ThomasEngine.Network
 
         public NetworkEvents()
         {
-            SubscribeToEvent<ConnectToPeerEvent>(ConnectToPeerEventHandler);
+            NetSerializer = new NetSerializer();
+            SubscribeToEvent<ServerInfoEvent>(ServerInfoEventHandler);
+            SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
             SubscribeToEvent<TransferOwnerEvent>(TransferOwnerEventHandler);
         }
 
@@ -38,13 +43,13 @@ namespace ThomasEngine.Network
 
         public class SpawnPrefabEvent
         {
-            public int netID { get; set; }
-            public int prefabID { get; set; }
-            public Vector3 position { get; set; }
-            public Quaternion rotation { get; set; }
-            public bool isOwner { get; set; }
+            public int NetID { get; set; }
+            public int PrefabID { get; set; }
+            public Vector3 Position { get; set; }
+            public Quaternion Rotation { get; set; }
+            public bool Owner { get; set; }
 
-            public SpawnPrefabEvent() { netID = -1; prefabID = -2; position = new Vector3(); rotation = new Quaternion(); isOwner = false; }
+            public SpawnPrefabEvent() { NetID = -1; PrefabID = -2; Position = new Vector3(); Rotation = new Quaternion(); Owner = false; }
         }
 
         public class DeletePrefabEvent
@@ -54,54 +59,116 @@ namespace ThomasEngine.Network
             public DeletePrefabEvent() { netID = -1; }
         }
 
-        public class ConnectToPeerEvent
-        {
-            public string IP { get; set; } //also holds port
-            public int Port { get; set; }
 
-            public ConnectToPeerEvent() { IP = ""; Port = -1; }
+        public class ServerInfoEvent
+        {
+
+            public string[] PeerIPs {get;set;}
+            public int[] PeerPorts { get; set; }
+            public long ServerStartTime { get; set; }
+            public bool IsResponsiblePeer { get; set; }
+
+            public ServerInfoEvent() { }
+            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible)
+            {
+                ServerStartTime = serverStartTime;
+                PeerIPs = new string[peers.Length - 1];
+                PeerPorts = new int[peers.Length - 1];
+                int i = 0;
+                foreach(NetPeer peer in peers)
+                {
+                    if (peer == excluded)
+                        continue;
+
+                    PeerIPs[i] = peer.EndPoint.Address.ToString();
+                    PeerPorts[i] = peer.EndPoint.Port;
+                    i++;
+                }
+                IsResponsiblePeer = responsible;
+            }
         }
 
         public class TransferOwnerEvent
         {
             public int NetID { get; set; }
 
-            public TransferOwnerEvent() { NetID = -1;}
+            public TransferOwnerEvent() { NetID = -1; }
         }
+
         #endregion
-        
+
         #region Event Handlers
-        public void ConnectToPeerEventHandler(ConnectToPeerEvent connectEvent, NetPeer peer)
+        public void ServerInfoEventHandler(ServerInfoEvent serverInfo, NetPeer peer)
         {
-            Manager.InternalManager.Connect(connectEvent.IP, connectEvent.Port, "SomeConnectionKey");
+            for(int i=0; i < serverInfo.PeerIPs.Length; ++i)
+            {
+                Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
+            }
+            if (serverInfo.IsResponsiblePeer)
+                Manager.ResponsiblePeer = peer;
+            Manager.ServerStartTime = serverInfo.ServerStartTime;
+            
+        }
+        
+        public void SpawnPrefabEventHandler(SpawnPrefabEvent prefabEvent, NetPeer peer)
+        {
+            Debug.LogWarning("spawnPrefabEvent!!!!!");
+            NetworkIdentity identity = null;
+            if (NetScene.NetworkObjects.ContainsKey(prefabEvent.NetID))
+            {
+                identity = NetScene.NetworkObjects[prefabEvent.NetID];
+                if (identity.PrefabID != prefabEvent.PrefabID)
+                {
+                    Debug.LogError("Object already exist with network ID: " + prefabEvent.NetID);
+                }
+            }
+            else if(Manager.SpawnablePrefabs.Count > prefabEvent.PrefabID)
+                {
+                GameObject prefab = Manager.SpawnablePrefabs[prefabEvent.PrefabID];
+                GameObject gameObject = GameObject.Instantiate(prefab, prefabEvent.Position, prefabEvent.Rotation);
+                identity = gameObject.GetComponent<NetworkIdentity>();
+                NetScene.AddObject(identity, prefabEvent.NetID);
+                //Ownership shit
+
+            }else
+            {
+                Debug.LogError("Failed to spawn prefab. It's not registered");
+            } 
+
+            if(prefabEvent.Owner && identity != null)
+            {
+                NetScene.ObjectOwners[peer].Add(identity);
+            }
         }
 
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)
         {
 
-            NetworkIdentity networkIdentiy = NetScene.FindNetworkObject(transEvent.NetID);
-            if (networkIdentiy != null)
+            NetworkIdentity networkIdentity = NetScene.FindNetworkObject(transEvent.NetID);
+            if (networkIdentity != null)
             {
-                NetPeer previousOwner = NetScene.FindOwnerOf(networkIdentiy);
+                NetPeer previousOwner = NetScene.FindOwnerOf(networkIdentity);
 
                 if (previousOwner == newOwner)
                 {
-                    Debug.Log("Peer is already owner of object: " + networkIdentiy.gameObject.Name);
+                    Debug.Log("Peer is already owner of object: " + networkIdentity.gameObject.Name);
                     return;
                 }
 
                 //Remove previous owner
                 if (previousOwner != null)
-                    NetScene.ObjectOwners[previousOwner].Remove(networkIdentiy);
+                    NetScene.ObjectOwners[previousOwner].Remove(networkIdentity);
 
-                NetScene.ObjectOwners[newOwner].Add(networkIdentiy);
-                foreach (var comp in networkIdentiy.gameObject.GetComponents<NetworkComponent>())
-                {
-                    comp.OnLostOwnership();
-                }
-
+                NetScene.ObjectOwners[newOwner].Add(networkIdentity);
                 //Make sure we do not own the object.
-                networkIdentiy.Owner = false;
+                networkIdentity.Owner = false;
+                if (previousOwner == Manager.LocalPeer)
+                {
+                    foreach (var comp in networkIdentity.gameObject.GetComponents<NetworkComponent>())
+                    {
+                        comp.OnLostOwnership();
+                    }
+                }
             }
             else
             {
@@ -109,6 +176,7 @@ namespace ThomasEngine.Network
             }
 
         }
+
         #endregion
 
         #region Writing & reading
@@ -148,6 +216,9 @@ namespace ThomasEngine.Network
             Manager.NetPacketProcessor.Write<T>(writer, data);
             sendTo.Send(writer, method);
         }
+
+
+       
         #endregion
     }
 }

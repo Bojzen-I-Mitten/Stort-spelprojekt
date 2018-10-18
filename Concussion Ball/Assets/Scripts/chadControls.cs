@@ -24,12 +24,19 @@ public class ChadControls : NetworkComponent
     //public float Force { get; set; } = 5;
 
     #region Throwing stuff
+    [Category("Throwing")]
     public float BaseThrowForce { get; set; } = 5.0f;
+    [Category("Throwing")]
     public float MaxThrowForce { get; set; } = 20.0f;
+    [Category("Throwing")]
     public float ChargeRate { get; set; } = 5.0f;
+    [Category("Throwing")]
     private float ThrowForce;
+    [Category("Throwing")]
     public Transform hand { get; set; }
-    public float ChargeTime {get; private set;}
+    [Category("Throwing")]
+    public float ChargeTime { get; private set; }
+    [Category("Throwing")]
     #endregion
 
     #region Camera Settings etc.
@@ -68,10 +75,17 @@ public class ChadControls : NetworkComponent
     Rigidbody rBody;
     Chadimations Animations;
 
-    private Ball Ball = null;
-    public bool HasBall = false;
-
-    private float timeSinceLastThrow;
+    //Camera test;
+    private Ball _Ball;
+    private Ball Ball
+    {
+        get
+        {
+            if (!_Ball)
+                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+            return _Ball;
+        }
+    }
     // private bool canPickupBall = true;
 
     public override void Start()
@@ -94,18 +108,16 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Animations = gameObject.GetComponent<Chadimations>();
-        Ball = GetObjectsOfType<Ball>().FirstOrDefault();
-
-        timeSinceLastThrow = 10;
     }
 
     public override void Update()
     {
-        Debug.Log(State);
-        Direction = new Vector3(0, 0, 0);
-
-        HandleKeyboardInput();
-        HandleMouseInput();
+        if (isOwner)
+        {
+            Direction = new Vector3(0, 0, 0);
+            HandleKeyboardInput();
+            HandleMouseInput();
+        }
 
         StateMachine();
     }
@@ -148,7 +160,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
-            if (HasBall)
+            if (HasBall())
             {
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
@@ -160,6 +172,7 @@ public class ChadControls : NetworkComponent
                     State = STATE.CHADING;
                     StopCoroutine(ChargingCoroutine());
                     ResetCharge();
+                    ResetCamera();
                 }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
@@ -171,6 +184,7 @@ public class ChadControls : NetworkComponent
                     ThrowBall();
                     StopCoroutine(ChargingCoroutine());
                     ResetCharge();
+                    ResetCamera();
                 }
             }
 
@@ -185,7 +199,7 @@ public class ChadControls : NetworkComponent
                 //Regular cam
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasBall)
+            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasBall())
             {
                 //Throwing cam
                 ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
@@ -303,41 +317,38 @@ public class ChadControls : NetworkComponent
 
     private void StateMachine()
     {
-        if (isOwner) //if owner, handle inputs through the Direction vector
+        switch (State)
         {
-            switch (State)
-            {
-                case STATE.CHADING:
-                    if (Direction.z > 0)
-                    {
-                        Direction.x = 0;
-                        Direction.y = 0;
-                    }
+            case STATE.CHADING:
+                if (Direction.z > 0)
+                {
+                    Direction.x = 0;
+                    Direction.y = 0;
+                }
 
-                    CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
-                    if (Direction.z == 0)
-                        CurrentVelocity.y = 0;
-                    CurrentVelocity.x = Direction.x * BaseSpeed;
+                CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
+                if (Direction.z == 0)
+                    CurrentVelocity.y = 0;
+                CurrentVelocity.x = Direction.x * BaseSpeed;
 
-                    CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -BaseSpeed, MaxSpeed);
-                    transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -BaseSpeed, MaxSpeed);
+                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
 
-                    break;
-                case STATE.THROWING:
-                    CurrentVelocity.y = Direction.z * BaseSpeed;
-                    CurrentVelocity.x = Direction.x * BaseSpeed;
+                break;
+            case STATE.THROWING:
+                CurrentVelocity.y = Direction.z * BaseSpeed;
+                CurrentVelocity.x = Direction.x * BaseSpeed;
 
-                    transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
-                    break;
-                case STATE.DIVING:
-                    Direction = Vector3.Zero;
-                    CurrentVelocity.x = 0;
-                    CurrentVelocity.y = MaxSpeed;
-                    transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
-                    break;
-                case STATE.RAGDOLL:
-                    break;
-            }
+                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                break;
+            case STATE.DIVING:
+                Direction = Vector3.Zero;
+                CurrentVelocity.x = 0;
+                CurrentVelocity.y = MaxSpeed;
+                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                break;
+            case STATE.RAGDOLL:
+                break;
         }
     }
 
@@ -353,7 +364,7 @@ public class ChadControls : NetworkComponent
         CurrentVelocity.y = BaseSpeed;
         State = STATE.CHADING;
     }
-    
+
     IEnumerator ChargingCoroutine()
     {
         float timer = 4;
@@ -376,36 +387,71 @@ public class ChadControls : NetworkComponent
 
     private void ThrowBall()
     {
-        Ball.Throw(Camera.transform.forward * ThrowForce);
-        timeSinceLastThrow = 0;
-        HasBall = false;
+        if (HasBall())
+        {
+            Ball.Throw(Camera.transform.forward * ThrowForce);
+        }
+    }
+
+    public void RPCPickupBall()
+    {
+        if (Ball)
+            Ball.Pickup(gameObject, hand ? hand : transform);
+
+    }
+
+    public bool HasBall()
+    {
+        if (Ball)
+            return Ball.isOwner && Ball.PickedUp;
+        else
+            return false;
     }
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
+        if (initialState)
+        {
+            bool hasBall = reader.GetBool();
+            if (hasBall)
+                RPCPickupBall();
+        }
+
         if (isOwner)
         {
             reader.GetInt();
+            reader.GetVector3();
             return;
         }
-
         State = (STATE)reader.GetInt();
+        Direction = reader.GetVector3();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
+        if (initialState)
+        {
+            writer.Put(HasBall());
+        }
         writer.Put((int)State);
+        writer.Put(Direction);
+
         return true;
     }
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (Ball /*&& isOwner*/)
+        if (isOwner && Ball)
         {
             if (collider.gameObject == Ball.gameObject)
             {
-                Ball.Pickup(gameObject, hand ? hand : transform);
-                HasBall = true;
+                if (Ball.transform.parent == null)
+                {
+                    TakeOwnership(Ball.gameObject);
+                    SendRPC("RPCPickupBall");
+                    RPCPickupBall();
+                }
+
             }
         }
     }

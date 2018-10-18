@@ -6,6 +6,10 @@ using ThomasEngine;
 using ThomasEngine.Network;
 public class Ball : NetworkComponent
 {
+    Rigidbody rb;
+    RenderComponent rc;
+    private float accumulator;
+    private float chargeupTime;
 
     private ParticleEmitter emitterElectricity1;
     private ParticleEmitter emitterElectricity2;
@@ -20,7 +24,7 @@ public class Ball : NetworkComponent
 
     private Rigidbody rigidbody;
     private RenderComponent renderComponent;
-    private bool pickedUp { get { return !rigidbody.enabled; } set { rigidbody.enabled = !value; } }
+    public bool PickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
     public float chargeTimeCurrent;
     private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
@@ -192,15 +196,11 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
-        if (transform.parent == null)
-        {
-            Drop();
-        }
     }
 
     public void Drop()
     {
-        if (pickedUp)
+        if (PickedUp)
         {
             rigidbody.enabled = true;
             transform.parent = null;
@@ -254,9 +254,19 @@ public class Ball : NetworkComponent
         emitterSmoke.Emit = false;
     }
 
+    public void RPCDrop()
+    {
+        if (PickedUp)
+        {
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+            PickedUp = false;
+            transform.parent = null;
+        }
+    }
+
     public void Throw(Vector3 force)
     {
-        if (pickedUp)
+        if (PickedUp)
         {
             Drop();
             transform.position = transform.position + Vector3.Normalize(force) * 2;
@@ -287,6 +297,7 @@ public class Ball : NetworkComponent
         chargeTimeCurrent = 0;
         ResetElectricityEmitters();
     }
+
     
     public void Pickup(GameObject gobj, Transform hand)
     {
@@ -302,17 +313,17 @@ public class Ball : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
-        if(isOwner)
-        {
-            reader.GetBool();
-            return;
-        }
-        rigidbody.enabled = reader.GetBool();
+        //if(isOwner)
+        //{
+        //    reader.GetBool();
+        //    return;
+        //}
+       // rb.enabled = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        writer.Put(rigidbody.enabled);
+        //writer.Put(rb.enabled);
         return true;
     }
 }

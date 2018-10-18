@@ -48,7 +48,7 @@ public class GUITest : ScriptComponent
         Camera.AddImage("TextBoxIP", TextBox, new Vector2(250, 145), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
         Camera.AddImage("TextBoxPort", TextBox, new Vector2(250, 245), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
         Camera.AddImage("Host", HostBtn, new Vector2(700, 252), new Vector2(0.25f), true);
- 
+        
     }
 
     public override void Update()
@@ -88,7 +88,13 @@ public class GUITest : ScriptComponent
         {
             if (IPText != "" && PortText != "")
             {
-                Debug.Log("Join lobby");
+                MatchSystem.instance.LocalPort = 0;
+                MatchSystem.instance.TargetPort = Convert.ToInt32(PortText);
+                MatchSystem.instance.TargetIP = IPText;
+                MatchSystem.instance.Init();
+                MatchSystem.instance.Connect();
+                Camera.enabled = false;
+                this.enabled = false;
             }
             else
             {
@@ -104,7 +110,11 @@ public class GUITest : ScriptComponent
         {
             if (PortText != "")
             {
-                Debug.Log("Host lobby");
+                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText);
+                MatchSystem.instance.Init();
+                MatchSystem.instance.Host();
+                Camera.enabled = false;
+                this.enabled = false;
             }
             else
             {
