@@ -34,7 +34,7 @@ public class AnimationBlendTest : ScriptComponent
         // Playback handles
         toTime = to.getTimeHandle();
         fromTime = from.getTimeHandle();
-        fromTime.SetSpeed(1f);
+        fromTime.SetSpeed(0.01f);
 
         // LookAt constraint
         lookAt = new LookAtConstraint(LookAtConstraint.AxisConstraint.AxisXYZ);
