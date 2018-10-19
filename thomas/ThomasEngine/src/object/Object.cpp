@@ -23,8 +23,6 @@ namespace ThomasEngine
 	{
 		OnDestroy();
 		bool rmvd = s_objects.Remove(this);
-		if (this->Name == "Block")
-			int a = 0;
 		//assert(rmvd);
 		nativePtr->Destroy();
 		delete nativePtr;

@@ -33,6 +33,19 @@ namespace ThomasEngine
 		UnLoad();
 	}
 
+
+	void Scene::InitGameObjects(bool playing) {
+		bool completed;
+		do {
+			completed = true;
+			for (int i = 0; i < GameObjects->Count; ++i) {
+				GameObject^ gameObject = GameObjects[i];
+				if (gameObject->GetActive())
+					completed = gameObject->InitComponents(playing) && completed;
+			}
+		} while (!completed);
+	}
+
 	void Scene::OnPlay()
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
@@ -40,6 +53,15 @@ namespace ThomasEngine
 	}
 
 
+	void Scene::UnLoad()
+	{
+		for (int i = 0; i < m_gameObjects->Count; i++)
+			delete m_gameObjects[i];
+		m_gameObjects->Clear();
+
+	}
+
+#pragma region Save scene
 
 	void Scene::SaveSceneAs(System::String ^ path)
 	{
@@ -89,13 +111,6 @@ namespace ThomasEngine
 		return scene;
 	}
 
-	void Scene::UnLoad()
-	{
-		for (int i = 0; i < m_gameObjects->Count; i++)
-			delete m_gameObjects[i];
-		m_gameObjects->Clear();
-
-	}
 
 	void Scene::EnsureLoad()
 	{
@@ -117,9 +132,7 @@ namespace ThomasEngine
 		}
 	}
 
-
-
-
+#pragma endregion
 
 	Vector3 Scene::CameraPosition::get() 
 	{

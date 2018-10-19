@@ -25,9 +25,9 @@ namespace ThomasEngine
 
 		void Delete();
 
-		bool InitComponents(bool playing);
-
 	internal:
+
+		bool InitComponents(bool playing);
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 
@@ -40,12 +40,7 @@ namespace ThomasEngine
 
 		void PostLoad(Scene^ scene);
 
-		void PostInstantiate(Scene^ scene);
-
-
-		static void InitGameObjects(bool playing);
-
-		
+		void PostInstantiate(Scene^ scene);		
 				
 		void Update();
 

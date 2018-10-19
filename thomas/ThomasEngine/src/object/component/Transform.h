@@ -11,8 +11,15 @@ namespace ThomasEngine
 	{
 	private:
 		property thomas::object::component::Transform* trans { thomas::object::component::Transform* get(); }
+		Transform^ m_parent;
+		List<Transform^>^ m_children;
+
+		void AddChild(Transform^ child);
+		bool RemoveChild(Transform^ child);
 	public:
 		Transform();
+
+		property thomas::object::component::Transform* Native { thomas::object::component::Transform* get(); }
 
 		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
 		static event ParentChanged^ OnParentChanged;

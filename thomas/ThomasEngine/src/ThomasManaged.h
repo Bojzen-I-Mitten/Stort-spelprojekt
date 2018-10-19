@@ -94,9 +94,7 @@ namespace ThomasEngine {
 
 		static bool IsPlaying();
 		static bool IsLoading();
-
-		static void IssueStop();
-
+		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 
 		static ManipulatorOperation GetEditorGizmoManipulatorOperation();

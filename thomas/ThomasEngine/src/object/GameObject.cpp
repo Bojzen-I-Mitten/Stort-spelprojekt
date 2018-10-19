@@ -85,17 +85,6 @@ namespace ThomasEngine {
 			m_transform->children[i]->gameObject->PostInstantiate(scene);
 		}
 	}
-	void GameObject::InitGameObjects(bool playing) {
-		bool completed;
-		do {
-			completed = true;
-			for (int i = 0; i < ThomasWrapper::CurrentScene->GameObjects->Count; ++i) {
-				GameObject^ gameObject = ThomasWrapper::CurrentScene->GameObjects[i];
-				if (gameObject->GetActive())
-					completed = gameObject->InitComponents(playing) && completed;
-			}
-		} while (!completed);
-	}
 
 	void GameObject::Update()
 	{

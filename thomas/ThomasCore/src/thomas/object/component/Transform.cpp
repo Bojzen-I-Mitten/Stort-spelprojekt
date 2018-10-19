@@ -26,6 +26,10 @@ namespace thomas
 			{
 				Decompose();
 			}
+			Transform::~Transform()
+			{
+
+			}
 			math::Vector3 Transform::Forward()
 			{
 				math::Vector3 temp = GetWorldMatrix().Forward();
@@ -307,52 +311,23 @@ namespace thomas
 				return m_localScale;
 			}
 
+			void Transform::RemoveParent()
+			{
+				SetParent(nullptr, true);
+			}
 		
 			void Transform::SetParent(Transform * parent, bool worldPositionStays)
 			{
-				if (m_parent != parent)
-				{
-					math::Matrix m = GetWorldMatrix();
-					RemoveParent();
-					m_parent = parent;
-					if (m_parent) {
-						m_parent->m_children.push_back(this);
-						if(worldPositionStays)
-							SetWorldMatrix(m);
-					}
-					else
-					{
-						SetLocalMatrix(m);
-					}
-				}
+				if (parent == m_parent) return;
+				// Swap parent
+				math::Matrix m = GetWorldMatrix();
+				m_parent = parent;
+				if(worldPositionStays)
+					SetWorldMatrix(m);
 			}
 			Transform * Transform::GetParent()
 			{
-				if (m_parent)
-					return m_parent;
-
-				return nullptr;
-			}
-			std::vector<Transform*> Transform::GetChildren()
-			{
-				return m_children;
-			}
-			void Transform::RemoveParent()
-			{
-				if (m_parent) //Remove from old parent
-				{
-					for (int i = 0; i < m_parent->m_children.size(); i++)
-					{
-						if (m_parent->m_children[i] == this)
-						{
-							m_parent->m_children[i] = NULL;
-							m_parent->m_children.erase(m_parent->m_children.begin() + i);
-							i -= 1;
-						}
-							
-					}
-				}
-				m_parent = NULL;
+				return m_parent;
 			}
 			void Transform::OnDestroy()
 			{	

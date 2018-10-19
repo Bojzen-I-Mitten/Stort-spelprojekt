@@ -36,6 +36,9 @@ namespace ThomasEngine {
 
 		void OnPlay();
 
+
+		void InitGameObjects(bool playing);
+
 #pragma region Serialized properties
 
 		[DataMember(Order = 1)]
