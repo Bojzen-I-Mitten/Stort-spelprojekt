@@ -50,6 +50,8 @@ namespace ThomasEngine
 	{
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
 		SaveSceneAs(tempFile);
+		// Initiate 
+		InitGameObjects(true);
 	}
 
 

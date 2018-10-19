@@ -33,6 +33,8 @@ namespace ThomasEngine
 
 	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
 	{
+		if (value == m_parent) 
+			return;
 		Transform^ oldParent = m_parent;
 		// Refresh
 		if (value)

@@ -331,16 +331,7 @@ namespace thomas
 			}
 			void Transform::OnDestroy()
 			{	
-				//if (m_parent)
-				//{
-				//	RemoveParent();
-				//}
-				//for (int i = 0; i < m_children.size(); i++)
-				//{
-				//	GameObject::Destroy(m_children[i]->m_gameObject);
-				//	//m_children.erase(m_children.begin() + i);
-				//	i -= 1;
-				//}
+				m_parent = nullptr;
 			}
 			void Transform::SetDirty(bool dirty)
 			{
