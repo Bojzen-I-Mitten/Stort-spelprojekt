@@ -39,6 +39,7 @@ namespace ThomasEngine {
 		static ThomasSelection^ s_Selection;
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
+		static void Stop();
 	public:
 
 		property SceneManager^ SceneManagerRef
@@ -94,7 +95,7 @@ namespace ThomasEngine {
 		static bool IsPlaying();
 		static bool IsLoading();
 
-		static void Stop();
+		static void IssueStop();
 
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 

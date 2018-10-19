@@ -20,13 +20,28 @@ namespace ThomasEditor
             bool isMaterialEditor = false;
             public ExtendedPropertyGrid()
             {
-#if DEBUG
-                System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level =
-                    System.Diagnostics.SourceLevels.Critical;
-#endif
+//#if DEBUG
+//                System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level =
+//                    System.Diagnostics.SourceLevels.Critical;
+//#endif
                 InitializeComponent();
+                _grid.PreparePropertyItem += _grid_PreparePropertyItem;
+                _grid.EditorDefinitions.Add(
+                    new EditorTemplateDefinition {
+                    EditingTemplate = Resources["ListEditor"] as DataTemplate,
+                    TargetProperties = {
+                            new TargetPropertyType { Type = typeof(ThomasEngine.Object[]) },
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.Object>)},
+                             new TargetPropertyType { Type = typeof(Resource[]) },
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Resource>)},
+                    }
+                    });
             }
 
+            private void _grid_PreparePropertyItem(object sender, PropertyItemEventArgs e)
+            {
+                int x = 5;
+            }
 
             private void PropertyGrid_Loaded(object sender, RoutedEventArgs e)
             {
@@ -45,7 +60,7 @@ namespace ThomasEditor
                     MaterialInspector matEditor = Parent as MaterialInspector;
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
-                grid.ExpandAllProperties();
+                grid.CollapseAllProperties();
             }
 
             private void ResourceEditor_Drop(object sender, DragEventArgs e)
@@ -145,7 +160,7 @@ namespace ThomasEditor
                     MaterialInspector matEditor = Parent as MaterialInspector;
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
-                grid.ExpandAllProperties();
+                grid.CollapseAllProperties();
             }
         }
     }

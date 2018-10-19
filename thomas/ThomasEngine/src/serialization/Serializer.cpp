@@ -23,6 +23,8 @@ namespace ThomasEngine
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
 			serializer->NullValueHandling = NullValueHandling::Ignore;
 			serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;
+			serializer->Error += gcnew EventHandler<Serialization::ErrorEventArgs^>(&Serializer::ErrorHandler);
+
 
 			serializer->Converters->Add(gcnew ResourceConverter());
 			serializer->Converters->Add(gcnew PrefabConverter());
@@ -196,6 +198,12 @@ namespace ThomasEngine
 			Debug::LogError("Failed to deserialize material: " + path + " Error: " + e->Message);
 			return nullptr;
 		}
+	}
+
+	void Serializer::ErrorHandler(Object ^ sender, Serialization::ErrorEventArgs ^ args)
+	{
+		Debug::LogException(args->ErrorContext->Error);
+		args->ErrorContext->Handled = true;
 	}
 
 }

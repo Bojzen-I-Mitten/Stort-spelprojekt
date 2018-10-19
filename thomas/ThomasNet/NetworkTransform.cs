@@ -11,6 +11,9 @@ namespace ThomasEngine.Network
 
     public class NetworkTransform : NetworkComponent
     {
+
+        Rigidbody _attachedRigidbody;
+
         Vector3 PrevPosition;
         Quaternion PrevRotation;
         Vector3 PrevScale;
@@ -33,7 +36,14 @@ namespace ThomasEngine.Network
         Vector3 TargetSyncLinearVelocity;
         Vector3 TargetSyncAngularVelocity;
 
-        Rigidbody attachedRigidbody;
+        Rigidbody AttachedRigidbody {
+            get
+            {
+                if(!_attachedRigidbody)
+                    _attachedRigidbody = gameObject.GetComponent<Rigidbody>();
+                return _attachedRigidbody;
+            }
+        }
 
         public enum TransformSyncMode
         {
@@ -53,11 +63,11 @@ namespace ThomasEngine.Network
             PrevScale = transform.scale;
             TargetSyncPosition = transform.position;
 
-            attachedRigidbody = gameObject.GetComponent<Rigidbody>();
-            if (attachedRigidbody)
+            
+            if (AttachedRigidbody)
             {
-                TargetSyncLinearVelocity = attachedRigidbody.LinearVelocity;
-                TargetSyncAngularVelocity = attachedRigidbody.AngularVelocity;
+                TargetSyncLinearVelocity = AttachedRigidbody.LinearVelocity;
+                TargetSyncAngularVelocity = AttachedRigidbody.AngularVelocity;
             }
             else
             {
@@ -98,10 +108,10 @@ namespace ThomasEngine.Network
 
         void InterpolateRigidbody()
         {
-            if (!isOwner && attachedRigidbody)
+            if (!isOwner && AttachedRigidbody)
             {
                 Vector3 newVelocity = (TargetSyncPosition - transform.position) * InterpolateMovement / SendInterval;
-                attachedRigidbody.LinearVelocity = newVelocity;
+                AttachedRigidbody.LinearVelocity = newVelocity;
 
                 TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
             }
@@ -128,9 +138,9 @@ namespace ThomasEngine.Network
                 return true;
 
 
-            if (attachedRigidbody)
+            if (AttachedRigidbody)
             {
-                diff = attachedRigidbody.LinearVelocity.LengthSquared() - prevVelocity;
+                diff = AttachedRigidbody.LinearVelocity.LengthSquared() - prevVelocity;
                 if (diff > LocalVelocityThreshold)
                     return true;
             }
@@ -192,12 +202,12 @@ namespace ThomasEngine.Network
         {
             WriteTransform(writer);
 
-            if (attachedRigidbody)
+            if (AttachedRigidbody)
             {
-                writer.Put(attachedRigidbody.LinearVelocity);
-                writer.Put(attachedRigidbody.AngularVelocity);
+                writer.Put(AttachedRigidbody.LinearVelocity);
+                writer.Put(AttachedRigidbody.AngularVelocity);
 
-                prevVelocity = attachedRigidbody.LinearVelocity.LengthSquared();
+                prevVelocity = AttachedRigidbody.LinearVelocity.LengthSquared();
             }
         }
 
@@ -259,7 +269,7 @@ namespace ThomasEngine.Network
         {
 
 
-            if (isOwner || !attachedRigidbody)
+            if (isOwner || !AttachedRigidbody)
             {
                 //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
                 reader.GetVector3();
@@ -280,11 +290,11 @@ namespace ThomasEngine.Network
             TargetSyncAngularVelocity = reader.GetVector3();
 
             float dist = Vector3.Distance(transform.position, TargetSyncPosition);
-            if (dist > SnapThreshhold || !attachedRigidbody.enabled)
+            if (dist > SnapThreshhold || !AttachedRigidbody.enabled)
             {
                 transform.position = TargetSyncPosition;
-                attachedRigidbody.LinearVelocity = TargetSyncLinearVelocity;
-                attachedRigidbody.AngularVelocity = TargetSyncAngularVelocity;
+                AttachedRigidbody.LinearVelocity = TargetSyncLinearVelocity;
+                AttachedRigidbody.AngularVelocity = TargetSyncAngularVelocity;
             }
         }
         #endregion

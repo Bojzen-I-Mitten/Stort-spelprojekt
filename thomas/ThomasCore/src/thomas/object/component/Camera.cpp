@@ -58,7 +58,6 @@ namespace thomas
 				m_GUIHandle->Destroy();
 				m_GUIHandle.reset();
 				
-
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
 					if (s_allCameras[i] == this)
@@ -76,7 +75,7 @@ namespace thomas
 
 			void Camera::OnDisable()
 			{
-				m_renderGUI = false;
+				
 				for (int i = 0; i < s_allCameras.size(); i++) 
 				{
 					if (s_allCameras[i] == this) 
@@ -88,6 +87,11 @@ namespace thomas
 					}
 						
 				}
+			}
+
+			void Camera::OnDestroy()
+			{
+				m_renderGUI = false;
 			}
 
 			math::Matrix Camera::GetProjMatrix()
@@ -236,9 +240,9 @@ namespace thomas
 
 			void Camera::OnDrawGizmosSelected()
 			{
-				//editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix().Transpose());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 				editor::Gizmos::Gizmo().SetColor(math::Color(0.6f, 0.6f, 0.6f));
-				editor::Gizmos::Gizmo().DrawFrustum(GetFrustrum());
+				editor::Gizmos::Gizmo().DrawFrustum(m_frustrum);
 			
 			}
 

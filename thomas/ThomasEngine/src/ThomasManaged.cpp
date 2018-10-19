@@ -67,7 +67,6 @@ namespace ThomasEngine {
 			Resources::LoadAll(Application::editorAssets);
 			Component::LoadExternalComponents();
 
-
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			ScriptingManger::Init();
@@ -233,7 +232,7 @@ namespace ThomasEngine {
 						if(Monitor::IsEntered(g->m_componentsLock))
 							Monitor::Exit(g->m_componentsLock);
 					}
-					Stop();
+					IssueStop();
 				}	
 			}
 			finally
@@ -251,6 +250,8 @@ namespace ThomasEngine {
 					thomas::graphics::LightManager::Update();
 					CopyCommandList();
 					
+					if (shouldStop)
+						Stop();
 					// Enter async. state 
 					RenderFinished->Reset();
 					UpdateFinished->Set();
@@ -329,6 +330,11 @@ namespace ThomasEngine {
 		return playing == RunningState::Loading;
 	}
 
+	void ThomasWrapper::IssueStop()
+	{
+		shouldStop = true;
+	}
+	
 	void ThomasWrapper::Stop()
 	{
 		

@@ -5,7 +5,7 @@ namespace thomas {
 
 	namespace resource {
 
-		constexpr uint32_t CONSTANT_MEM = 4096*100;
+		constexpr uint32_t CONSTANT_MEM = 4096*2000;
 		constexpr uint32_t STACK_ALLOC = 4096*2;
 
 		MemoryAllocation::MemoryAllocation()

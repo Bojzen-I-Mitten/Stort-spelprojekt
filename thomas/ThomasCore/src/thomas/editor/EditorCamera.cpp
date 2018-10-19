@@ -217,6 +217,8 @@ namespace thomas
 			if (window->GetInput()->GetKeyDown(Keys::F))
 				SnapCameraToFocus();
 
+			if (window->GetInput()->GetKey(Keys::LeftShift))
+				m_manipulatorSnapping = true;
 
 			if (active)
 				MoveAndRotateCamera();
@@ -259,8 +261,6 @@ namespace thomas
 					m_manipulatorOperation = ImGuizmo::OPERATION::ROTATE;
 				if (window->GetInput()->GetKeyDown(Keys::E))
 					m_manipulatorOperation = ImGuizmo::OPERATION::SCALE;
-				if (window->GetInput()->GetKey(Keys::LeftShift))
-					m_manipulatorSnapping = true;
 			}
 		}
 
@@ -321,7 +321,8 @@ namespace thomas
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
 				object::GameObject* gameObject = m_selectedObjects[i];
-				offsetMatrixes[i] = gameObject->m_transform->GetWorldMatrix() * parentMatrix.Invert();
+				math::Matrix world = gameObject->m_transform->GetWorldMatrix();
+				offsetMatrixes[i] = world * parentMatrix.Invert();
 			}
 
 			ImGuiIO& io = ImGui::GetIO();

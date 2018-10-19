@@ -10,8 +10,8 @@
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <xceed:InverseBoolConverter x:Key="InverseBoolConverter" />
-    <xceed:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
     <xceed:IsDefaultCategoryConverter x:Key="IsDefaultCategoryConverter" />
+    <xceed:ExpandableObjectMarginConverter x:Key="ExpandableObjectMarginConverter" />
     <x:Static x:Key="EmptyString" Member="sys:String.Empty" />
 
     <SolidColorBrush x:Key="MouseOverBorderBrush" Color="#FFFFB700" />
@@ -498,7 +498,7 @@
                                                             <Setter.Value>
                                                                 <ControlTemplate>
                                                                     <Border >
-                                                                        <Expander Header="{Binding Name}" Style="{StaticResource ExpanderStyle}" IsExpanded="True">
+                                                                        <Expander Header="{Binding Name}" Style="{StaticResource ExpanderStyle}" IsExpanded="False">
                                                                             <ItemsPresenter />
                                                                         </Expander>
                                                                     </Border>
