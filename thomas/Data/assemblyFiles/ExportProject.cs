@@ -36,6 +36,7 @@ namespace ThomasStandalone
             }
             //System.Console.ForegroundColor = System.ConsoleColor.Black;
             System.Console.Out.WriteLine(newMessage.Message);
+            
             System.Console.ResetColor();
         }
     }

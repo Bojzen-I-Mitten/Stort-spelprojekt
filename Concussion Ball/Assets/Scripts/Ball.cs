@@ -310,17 +310,21 @@ public class Ball : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
-        //if(isOwner)
-        //{
-        //    reader.GetBool();
-        //    return;
-        //}
-       // rb.enabled = reader.GetBool();
+        float chargeTime = reader.GetFloat();
+        if (chargeTime > 0)
+        {
+            ChargeColor();
+        }
+        else if(chargeTime == 0 && chargeTimeCurrent > 0)
+        {
+            StopEmitting();
+        }
+            
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        //writer.Put(rb.enabled);
+        writer.Put(chargeTimeCurrent);
         return true;
     }
 }
