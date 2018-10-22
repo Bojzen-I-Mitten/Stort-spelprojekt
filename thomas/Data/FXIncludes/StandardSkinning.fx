@@ -59,7 +59,7 @@ struct v2f
     float2 texcoord : TEXCOORD0;
 };
 
-v2f vert(appdata_thomas_skin v)
+v2f vert(appdata_thomas_skin v, uint instanceID : SV_INSTANCEID)
 {
     v2f o;
     
@@ -67,12 +67,12 @@ v2f vert(appdata_thomas_skin v)
     float3 normalL = v.normal;
     ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
 	
-    o.vertex = ThomasObjectToClipPos(posL);
-    o.worldPos = ThomasObjectToWorldPos(posL);
+    o.vertex = ThomasObjectToClipPos(posL, instanceID);
+    o.worldPos = ThomasObjectToWorldPos(posL, instanceID);
 
-    float3 tangent = ThomasObjectToWorldDir(v.tangent);
-    float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
-    float3 normal = ThomasObjectToWorldDir(v.normal);
+    float3 tangent = ThomasObjectToWorldDir(v.tangent, instanceID);
+    float3 bitangent = ThomasObjectToWorldDir(v.bitangent, instanceID);
+    float3 normal = ThomasObjectToWorldDir(v.normal, instanceID);
 
     o.TBN = float3x3(tangent, bitangent, normal);
     

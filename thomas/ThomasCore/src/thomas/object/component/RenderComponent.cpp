@@ -143,7 +143,7 @@ namespace thomas {
 				
 				thomas::graphics::render::RenderCommand cmd(
 					m_gameObject->m_transform->GetWorldMatrix(), 
-					mesh.get(), 
+					mesh.get(),  
 					material, 
 					camera, 
 					num_prop,
