@@ -62,11 +62,7 @@
                     <MenuItem Header="_Open Project..." Click="OpenProject_Click"/>
                     <Separator/>
                         <MenuItem Header="_Save Editor Layout" Click="SaveLayout_Click"/>
-                    <Separator/>
-                        <MenuItem Header="_Build" Click="BuildProject_Click"/>
-                        <MenuItem Header="_Build &amp; Run" Click="BuildAndRunProject_Click"/>
-                </MenuItem>
-
+                    </MenuItem>
                 <MenuItem Header="_Edit">
 
                 </MenuItem>

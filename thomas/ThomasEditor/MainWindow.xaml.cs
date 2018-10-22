@@ -619,62 +619,6 @@ namespace ThomasEditor
         {
             ThomasWrapper.TogglePhysicsDebug();
         }
-
-
-        private void BuildProject_Click(object sender, RoutedEventArgs e)
-        {
-            Project project = ThomasEngine.Application.currentProject;
-            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-            saveFileDialog.Filter = "Executable (*.exe) |*.exe";
-
-
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
-            saveFileDialog.FileName = project.name;
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                showBusyIndicator("Builing " + project.name + "...");
-                Thread worker = new Thread(new ThreadStart(() =>
-                {
-                    utils.Exporter.ExportProject(saveFileDialog.FileName, project);
-                    hideBusyIndicator();
-                }));
-                worker.SetApartmentState(ApartmentState.STA);
-                worker.Start();
-            }
-
-
-           
-        }
-
-        private void BuildAndRunProject_Click(object sender, RoutedEventArgs e)
-        {
-            Project project = ThomasEngine.Application.currentProject;
-            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-            saveFileDialog.Filter = "Executable (*.exe) |*.exe";
-
-
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
-            saveFileDialog.FileName = project.name;
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                showBusyIndicator("Builing " + project.name + "...");
-                Thread worker = new Thread(new ThreadStart(() =>
-                {
-                    string fileName = System.IO.Path.GetFileName(saveFileDialog.FileName);
-                    string dir = System.IO.Path.GetDirectoryName(saveFileDialog.FileName);
-                    if (utils.Exporter.ExportProject(saveFileDialog.FileName, project))
-                        System.Diagnostics.Process.Start(dir + "\\Bin\\" + fileName);
-                    hideBusyIndicator();
-                    
-                }));
-                worker.SetApartmentState(ApartmentState.STA);
-                worker.Start();
-            }
-        }
     }
 
     public static class Extensions

@@ -73,11 +73,6 @@ public class ChadControls : NetworkComponent
     private Quaternion FreeLookDirection;
     Rigidbody rBody;
     Chadimations Animations;
-    Ragdoll Ragdoll;
-
-    public string PlayerPrefabName { get; set; } = "Chad";
-    public float ImpactFactor { get; set; } = 10;
-    public float TackleThreshold { get; set; } = 5;
 
     //Camera test;
     private Ball _Ball;
@@ -103,20 +98,15 @@ public class ChadControls : NetworkComponent
         if (isOwner && !Camera)
             Debug.LogWarning("Camera not set for player");
         if (Camera)
-        {
             Camera.transform.localPosition = CameraOffset;
-        }
-        ThrowForce = BaseThrowForce;
 
+
+        ThrowForce = BaseThrowForce;
 
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Animations = gameObject.GetComponent<Chadimations>();
-        Ragdoll = gameObject.GetComponent<Ragdoll>();
-        NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
-        ragdollSync.target =Ragdoll.GetHips().transform;
-        ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
     }
 
     public override void Update()
@@ -126,45 +116,9 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             HandleKeyboardInput();
             HandleMouseInput();
-            StateMachine();
         }
 
-        if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
-            EnableRagdoll();
-        else if(State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
-        {
-            DisableRagdoll();
-        }
-
-        if (Input.GetKeyDown(Input.Keys.L))
-            StartCoroutine(StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 100));
-    }
-
-    public void EnableRagdoll()
-    {
-        
-        rBody.enabled = false;
-        Ragdoll.EnableRagdoll();
-    }
-
-    public void DisableRagdoll()
-    {
-        gameObject.transform.position = Ragdoll.GetHips().transform.position;
-        gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
-        Ragdoll.DisableRagdoll();
-        gameObject.GetComponent<Rigidbody>().enabled = true;
-    }
-
-    IEnumerator StartRagdoll(float duration, Vector3 force)
-    {
-        State = STATE.RAGDOLL;
-        Camera.transform.parent = null;
-        EnableRagdoll();
-        Ragdoll.AddForce(force);
-        yield return new WaitForSeconds(duration);
-        DisableRagdoll();
-        State = STATE.CHADING;
-        ResetCamera();
+        StateMachine();
     }
 
     #region Input handling
@@ -214,12 +168,13 @@ public class ChadControls : NetworkComponent
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
                     State = STATE.CHADING;
+                    StopCoroutine(ChargingCoroutine());
                     ResetCharge();
                     ResetCamera();
                 }
                 else if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
                 {
-                   
+                    StartCoroutine(ChargingCoroutine());
                 }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
@@ -229,6 +184,7 @@ public class ChadControls : NetworkComponent
                 {
                     State = STATE.CHADING;
                     ThrowBall();
+                    StopCoroutine(ChargingCoroutine());
                     ResetCharge();
                     ResetCamera();
                 }
@@ -279,7 +235,7 @@ public class ChadControls : NetworkComponent
     #region Camera controls
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
-        if (Camera && State != STATE.RAGDOLL)
+        if (Camera)
         {
             Camera.transform.localPosition = Vector3.Zero;
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
@@ -342,7 +298,6 @@ public class ChadControls : NetworkComponent
     {
         if (Camera)
         {
-            Camera.transform.parent = gameObject.transform;
             Camera.transform.localPosition = CameraOffset;
             Camera.transform.LookAt(transform.position + new Vector3(0, CameraOffset.y, 0));
 
@@ -395,10 +350,6 @@ public class ChadControls : NetworkComponent
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
-                Camera.transform.rotation = Quaternion.Identity;
-                Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
-                Camera.transform.LookAt(Ragdoll.GetHips().transform);
-                
                 break;
         }
     }
@@ -416,13 +367,22 @@ public class ChadControls : NetworkComponent
         State = STATE.CHADING;
     }
 
+    IEnumerator ChargingCoroutine()
+    {
+        float timer = 4;
+        while (timer > 0)
+        {
+            timer = MathHelper.Clamp(timer - Time.DeltaTime, 0, 4);
+            ChargeTime = 4 - timer;
+            Ball.chargeTimeCurrent = ChargeTime;
+            yield return null;
+        }
+    }
+
     #endregion
 
     private void ChargeBall()
     {
-        ChargeTime += Time.DeltaTime;
-        ChargeTime = MathHelper.Clamp(ChargeTime, 0, 4);
-        Ball.chargeTimeCurrent = ChargeTime;
         Ball.ChargeColor();
         ThrowForce = ChargeRate * ChargeTime;
     }
@@ -463,12 +423,10 @@ public class ChadControls : NetworkComponent
         {
             reader.GetInt();
             reader.GetVector3();
-            reader.GetVector2();
             return;
         }
         State = (STATE)reader.GetInt();
         Direction = reader.GetVector3();
-        CurrentVelocity = reader.GetVector2();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -479,39 +437,23 @@ public class ChadControls : NetworkComponent
         }
         writer.Put((int)State);
         writer.Put(Direction);
-        writer.Put(CurrentVelocity);
 
         return true;
     }
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner)
+        if (isOwner && Ball)
         {
-            if (Ball)
+            if (collider.gameObject == Ball.gameObject)
             {
-                if (collider.gameObject == Ball.gameObject)
+                if (Ball.transform.parent == null)
                 {
-                    if (Ball.transform.parent == null)
-                    {
-                        TakeOwnership(Ball.gameObject);
-                        SendRPC("RPCPickupBall");
-                        RPCPickupBall();
-                    }
+                    TakeOwnership(Ball.gameObject);
+                    SendRPC("RPCPickupBall");
+                    RPCPickupBall();
+                }
 
-                }
-            }
-            if (collider.gameObject.Name == PlayerPrefabName)
-            {
-                
-                float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
-                Debug.Log(TheirVelocity);
-                Debug.Log(CurrentVelocity.Length());
-                if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
-                {
-                    //toggle ragdoll
-                    StartCoroutine(StartRagdoll(5.0f, collider.gameObject.transform.forward * ImpactFactor));
-                }
             }
         }
     }

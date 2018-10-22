@@ -38,8 +38,7 @@ namespace ThomasEngine {
 		// Add to scene
 		Scene::CurrentScene->GameObjects->Add(this);
 		m_scene_id = Scene::CurrentScene->ID();
-		if (ThomasWrapper::InEditor())
-			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 
 		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
 	}

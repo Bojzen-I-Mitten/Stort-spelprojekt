@@ -44,12 +44,12 @@ namespace ThomasEngine
 
 		void AddForce(Vector3 force)
 		{
-			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(Utility::Convert(force));
+			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(thomas::math::Vector3(force.x, force.y, force.z));
 		}
 
 		void AddForce(Vector3 force, ForceMode mode) 
 		{ 
-			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(Utility::Convert(force),
+			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(thomas::math::Vector3(force.x, force.y, force.z), 
 																		   (thomas::object::component::ForceMode)mode); 
 		}
 

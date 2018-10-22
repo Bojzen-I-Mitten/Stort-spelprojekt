@@ -212,7 +212,6 @@ namespace ThomasEngine.Network
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            try {
             if (reader.EndOfData)
                 return;
             PacketType type = (PacketType)reader.GetInt();
@@ -239,11 +238,6 @@ namespace ThomasEngine.Network
                     break;
             }
             reader.Recycle();
-            }
-            catch(Exception e)
-            {
-                Debug.LogException(e);
-            }
         }
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)

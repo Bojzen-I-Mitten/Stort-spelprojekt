@@ -200,8 +200,11 @@ public class Ball : NetworkComponent
 
     public void Drop()
     {
-        RPCDrop();
-        SendRPC("RPCDrop");
+        if (PickedUp)
+        {
+            rigidbody.enabled = true;
+            transform.parent = null;
+        }
         
     }
 
@@ -310,21 +313,17 @@ public class Ball : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
-        float chargeTime = reader.GetFloat();
-        if (chargeTime > 0)
-        {
-            ChargeColor();
-        }
-        else if(chargeTime == 0 && chargeTimeCurrent > 0)
-        {
-            StopEmitting();
-        }
-            
+        //if(isOwner)
+        //{
+        //    reader.GetBool();
+        //    return;
+        //}
+       // rb.enabled = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        writer.Put(chargeTimeCurrent);
+        //writer.Put(rb.enabled);
         return true;
     }
 }

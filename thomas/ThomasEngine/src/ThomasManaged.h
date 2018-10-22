@@ -43,7 +43,6 @@ namespace ThomasEngine {
 		};
 
 		static void Start();
-		static void Start(bool editor);
 
 
 		static void StartRenderer();

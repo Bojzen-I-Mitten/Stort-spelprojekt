@@ -91,14 +91,10 @@ namespace ThomasEngine
 
 	void Component::LoadExternalComponents()
 	{
-		List<String^>^ dlls = gcnew List<String^>(Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly));
-
-		String^ assemblyPath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location) + "\\Assembly.dll";
-		if (File::Exists(assemblyPath))
-			dlls->Add(assemblyPath);
+		array<String^>^ dlls = Directory::GetFiles(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "Thomas*.dll", SearchOption::TopDirectoryOnly);
 
 		List<System::Type^>^ types = gcnew List<System::Type^>();
-		for (int i = 0; i < dlls->Count; i++) {
+		for (int i = 0; i < dlls->Length; i++) {
 			Assembly^ assembly = Assembly::LoadFrom(dlls[i]);
 			List<System::Type^>^ exportedTypes = gcnew List<System::Type^>(assembly->GetExportedTypes());
 			types->AddRange(exportedTypes);
