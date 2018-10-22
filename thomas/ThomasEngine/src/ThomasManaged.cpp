@@ -256,6 +256,9 @@ namespace ThomasEngine {
 					*/
 					thomas::graphics::LightManager::Update();
 					CopyCommandList();
+
+					// Process state switch commands
+					ProcessCommand();
 					
 					// Enter async. state 
 					RenderFinished->Reset();
