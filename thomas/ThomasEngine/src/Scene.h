@@ -64,28 +64,20 @@ namespace ThomasEngine {
 			Vector3 get();
 			void set(Vector3);
 		}
-		/* DataContract serialization access to game object list
+		/* DataContract serialization game object list
 		*/
 		[DataMember(Order = 5)]
 		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjectData {
-			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get() {
-				return m_gameObjects;
-			}
-			void set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val) {
-				m_gameObjects = val;
-				m_gameObjectsLock = gcnew Object();
-				System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
-			}
+			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get();
+			void set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val);
 		}
 
 	public:
-		/* List access to scene game objects
+		/* Accessible list of scene game objects
 		*/
 		[IgnoreDataMemberAttribute]
 		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjects {
-			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get() {
-				return m_gameObjects;
-			}
+			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get();
 		}
 
 #pragma endregion

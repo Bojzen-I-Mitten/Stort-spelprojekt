@@ -300,7 +300,7 @@ namespace ThomasEditor
 
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
-            ThomasWrapper.Thomas.SceneManagerRef.LoadScene("Scene");
+            ThomasWrapper.Thomas.SceneManagerRef.NewScene("Scene");
         }
 
         private void SaveSceneAs_Click(object sender, RoutedEventArgs e)

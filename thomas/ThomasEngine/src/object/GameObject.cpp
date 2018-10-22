@@ -81,9 +81,8 @@ namespace ThomasEngine {
 	void GameObject::PostInstantiate(Scene^ scene) {
 		PostLoad(scene);
 		scene->GameObjects->Add(this);
-		for (int i = 0; i < m_transform->children->Count; i++) {
-			m_transform->children[i]->gameObject->PostInstantiate(scene);
-		}
+		for each(Transform^ child in m_transform->children)
+			child->gameObject->PostInstantiate(scene);
 	}
 
 	void GameObject::Update()
@@ -144,7 +143,10 @@ namespace ThomasEngine {
 	void GameObject::Delete()
 	{
 		for (int i = 0; i < m_components.Count; i++)
+		{
+			m_components[i]->OnDestroy();
 			delete m_components[i];	// Begone you foul clr!!!!
+		}
 		m_components.Clear();
 	}
 

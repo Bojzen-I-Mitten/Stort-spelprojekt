@@ -21,7 +21,10 @@ namespace ThomasEngine
 	}
 	void Object::Delete()
 	{
-		OnDestroy();
+#ifdef _DEBUG
+		assert(!m_Destroyed);
+		m_Destroyed = true;
+#endif
 		bool rmvd = s_objects.Remove(this);
 		//assert(rmvd);
 		nativePtr->Destroy();

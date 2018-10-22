@@ -58,7 +58,10 @@ namespace ThomasEngine
 	void Scene::UnLoad()
 	{
 		for (int i = 0; i < m_gameObjects->Count; i++)
+		{
+			m_gameObjects[i]->OnDestroy();
 			delete m_gameObjects[i];
+		}
 		m_gameObjects->Clear();
 
 	}
@@ -158,5 +161,16 @@ namespace ThomasEngine
 		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
 	}
 
+	System::Collections::ObjectModel::ObservableCollection<GameObject^>^ Scene::GameObjectData::get() {
+		return m_gameObjects;
+	}
+	void Scene::GameObjectData::set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val) {
+		m_gameObjects = val;
+		m_gameObjectsLock = gcnew Object();
+		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+	}
+	System::Collections::ObjectModel::ObservableCollection<GameObject^>^ Scene::GameObjects::get() {
+		return m_gameObjects;
+	}
 }
 

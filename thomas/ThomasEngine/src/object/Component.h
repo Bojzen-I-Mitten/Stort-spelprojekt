@@ -81,7 +81,7 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		virtual property bool canDisable
 		{

@@ -150,10 +150,11 @@ namespace ThomasEngine {
 			// Load scene
 			if (Thomas->m_scene->LoadThreadWaiting())
 			{
+				// Swap scene
 				RenderFinished->WaitOne();
 				Thomas->m_scene->ListenToLoadProcess();
 			}
-			if (Thomas->m_scene->NoSceneExist())
+			if (Thomas->m_scene->NoSceneExist())	// Wait for scene load
 			{
 				Thread::Sleep(500);
 				continue;

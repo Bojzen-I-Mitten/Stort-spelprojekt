@@ -61,7 +61,8 @@ namespace ThomasEngine
 					Object^ propVal = prop->GetValue(value, nullptr);
 					if (propVal != nullptr)
 					{
-						jo->Add(prop->Name, JToken::FromObject(propVal, serializer));
+						String^ info = prop->Name;
+						jo->Add(info, JToken::FromObject(propVal, serializer));
 					}
 				}
 			}

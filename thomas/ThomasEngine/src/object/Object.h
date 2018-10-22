@@ -13,6 +13,10 @@ namespace ThomasEngine {
 	private:
 		/* Silent destruction. */
 		void Delete();
+
+#ifdef _DEBUG
+		bool m_Destroyed = false;
+#endif
 		
 	protected:
 		
@@ -45,9 +49,8 @@ namespace ThomasEngine {
 		
 		virtual void Destroy();
 
-	protected:
-		
 		virtual void OnDestroy() {};
+		
 
 	public:
 		static Object^ GetObject(thomas::object::Object* ptr);

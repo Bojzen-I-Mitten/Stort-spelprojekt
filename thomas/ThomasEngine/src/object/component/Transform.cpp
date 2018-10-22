@@ -30,26 +30,38 @@ namespace ThomasEngine
 	{
 		return m_children->Remove(child);
 	}
-
-	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
+	Transform ^ Transform::SwapParent(Transform ^ new_parent)
 	{
-		if (value == m_parent) 
-			return;
+		// Swap
 		Transform^ oldParent = m_parent;
-		// Refresh
-		if (value)
+		m_parent = new_parent;
+		// Add to new parent / Swap native
+		if (new_parent)
 		{
-			value->AddChild(this);
-			((thomas::object::component::Transform*)nativePtr)->SetParent(value->Native, worldPositionStays);
+			new_parent->AddChild(this);
+			((thomas::object::component::Transform*)nativePtr)->SetParent(new_parent->Native, true);
 		}
 		else
-			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
-		m_parent = value;
-		// Clear
+			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, true);
+		return oldParent;
+	}
+	/* Called when parent is destroyed rather then swapped out
+	*/
+	void Transform::OnParentDestroy(Transform ^ new_parent)
+	{
+		Transform^ oldParent = SwapParent(new_parent);
+		OnParentChanged(this, oldParent, new_parent);
+	}
+	void Transform::SetParent(Transform ^ new_parent, bool worldPositionStays)
+	{
+		if (new_parent == m_parent)
+			return;	// Do nothing
+		// Swap and clear
+		Transform^  oldParent = SwapParent(new_parent);
 		if(oldParent)
 			assert(oldParent->RemoveChild(this));
 		// Trigger event
-		OnParentChanged(this, oldParent, value);
+		OnParentChanged(this, oldParent, new_parent);
 	}
 	void Transform::SetParent(Transform ^ value)
 	{
@@ -60,7 +72,7 @@ namespace ThomasEngine
 		SetParent(value);
 	}
 
-	List<Transform^>^ Transform::children::get()
+	IEnumerable<Transform^>^ Transform::children::get()
 	{
 		return m_children;
 	}
@@ -165,9 +177,9 @@ namespace ThomasEngine
 
 	void Transform::OnDestroy()
 	{
-		for (int i = 0; i < children->Count; i++)
-			children[i]->SetParent(m_parent);
-		children->Clear();
+		for (int i = 0; i < m_children->Count; i++)
+			m_children[i]->OnParentDestroy(m_parent);
+		m_children->Clear();
 		SetParent(nullptr);
 	}
 

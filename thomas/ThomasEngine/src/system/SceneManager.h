@@ -31,6 +31,8 @@ namespace ThomasEngine
 		ManualResetEvent^ m_swap_event;
 
 		void SetCurrent(Scene^ scene);
+		/* Wait process for async. loading thread. */
+		void SyncSceneSwap(Scene ^ scene);
 
 
 	internal:
@@ -65,6 +67,8 @@ namespace ThomasEngine
 		/* Load scene asynchronous
 		*/
 		bool LoadScene(System::String^ fullPath);
+		bool NewScene(System::String^ fullPath);
+
 
 
 		delegate void CurrentSceneChanged(Scene^ oldScene, Scene^ newScene);
