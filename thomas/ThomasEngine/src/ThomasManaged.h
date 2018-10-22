@@ -17,6 +17,12 @@ namespace ThomasEngine {
 		Running,
 		Loading
 	};
+	enum ThomasStateCommand
+	{
+		NoCommand = 0,
+		PlayIssued,
+		StopIssued
+	};
 	
 	ref class SceneManager;
 	ref class Scene;
@@ -35,11 +41,14 @@ namespace ThomasEngine {
 		static RunningState playing = RunningState::Loading;
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
+		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
+		static Object^ StateCommandLock;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 
 		static void Play();
 		static void StopPlay();
+		static void ProcessCommand();
 
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
@@ -77,6 +86,7 @@ namespace ThomasEngine {
 			Scene^ get();
 		}
 
+		static void IssueStateCommand(ThomasStateCommand cmd);
 		static void IssuePlay();
 		static void IssueStopPlay();
 
@@ -94,6 +104,7 @@ namespace ThomasEngine {
 		static void Resize(IntPtr hWnd, double width, double height);
 
 		static void Update();
+
 
 		static Guid selectedGUID;
 
