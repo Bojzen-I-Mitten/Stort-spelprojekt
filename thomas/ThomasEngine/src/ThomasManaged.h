@@ -41,8 +41,8 @@ namespace ThomasEngine {
 		static RunningState playing = RunningState::Loading;
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
+		static ManualResetEvent^ StateCommandProcessed;
 		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
-		static Object^ StateCommandLock;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 
@@ -64,11 +64,6 @@ namespace ThomasEngine {
 		static void StartRenderer();
 
 	public:	// Static sys
-		delegate void StartPlayEvent();
-		delegate void StopPlayingEvent();
-		delegate void PausePlayEvent();
-		static event StartPlayEvent^ OnStartPlaying;
-		static event StopPlayingEvent^ OnStopPlaying;
 
 		enum class ManipulatorOperation {
 			TRANSLATE,

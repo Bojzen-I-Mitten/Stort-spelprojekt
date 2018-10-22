@@ -23,9 +23,10 @@ namespace ThomasEngine {
 	GameObject::GameObject() : Object(new thomas::object::GameObject("gameobject"))
 	{
 		m_name = "gameobject";
-
+#ifdef _EDITOR
 		if(ThomasWrapper::InEditor())
-			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+#endif
 	}
 
 	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))
@@ -38,7 +39,9 @@ namespace ThomasEngine {
 		// Add to scene
 		ThomasWrapper::CurrentScene->GameObjects->Add(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
+#ifdef _EDITOR
 		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+#endif
 
 		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 	}

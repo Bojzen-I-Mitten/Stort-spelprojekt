@@ -69,7 +69,7 @@ namespace ThomasEngine {
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
-			StateCommandLock = gcnew Object();
+			StateCommandProcessed = gcnew ManualResetEvent(false);
 			ScriptingManger::Init();
 			Thomas->m_scene->LogicThreadClearScene();
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
@@ -315,7 +315,7 @@ namespace ThomasEngine {
 	{
 		if (IssuedStateCommand)
 		{
-			Monitor::Enter(StateCommandLock);
+			Monitor::Enter(StateCommandProcessed);
 			if (IssuedStateCommand == ThomasStateCommand::PlayIssued)
 			{
 				Play();
@@ -325,7 +325,8 @@ namespace ThomasEngine {
 				StopPlay();
 			}
 			IssuedStateCommand = ThomasStateCommand::NoCommand;
-			Monitor::Exit(StateCommandLock);
+			StateCommandProcessed->Set();
+			Monitor::Exit(StateCommandProcessed);
 		}
 	}
 
@@ -340,8 +341,6 @@ namespace ThomasEngine {
 		ThomasEngine::Resources::OnPlay();
 		CurrentScene->OnPlay();
 		playing = RunningState::Running;
-		OnStartPlaying();
-
 		Debug::Log("Running...");
 	}
 		
@@ -365,16 +364,17 @@ namespace ThomasEngine {
 			if (gObj)
 				s_Selection->SelectGameObject(gObj);
 		}
-		OnStopPlaying();
 
 		Debug::Log("Stopped...");
 		playing = RunningState::Editor;
 	}
 	void ThomasWrapper::IssueStateCommand(ThomasStateCommand state)
 	{
-		Monitor::Enter(StateCommandLock);
+		Monitor::Enter(StateCommandProcessed);
+		StateCommandProcessed->Reset();
 		IssuedStateCommand = state;
-		Monitor::Exit(StateCommandLock);
+		Monitor::Exit(StateCommandProcessed);
+		StateCommandProcessed->WaitOne();
 	}
 	void ThomasWrapper::IssuePlay()
 	{

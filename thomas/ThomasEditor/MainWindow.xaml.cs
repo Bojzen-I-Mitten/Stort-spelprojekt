@@ -30,6 +30,10 @@ namespace ThomasEditor
         private Tester tester;
         TimeSpan lastRender;
         public static MainWindow _instance;
+        public delegate void StartPlayEvent();
+        public delegate void StopPlayingEvent();
+        public static event StartPlayEvent OnStartPlaying;
+        public static event StopPlayingEvent OnStopPlaying;
 
         Guid g;
         public MainWindow()
@@ -69,7 +73,7 @@ namespace ThomasEditor
             LoadLayout();
             Closing += MainWindow_Closing;
 
-            ThomasWrapper.OnStopPlaying += ThomasWrapper_OnStopPlaying;
+            MainWindow.OnStopPlaying += ThomasWrapper_OnStopPlaying;
 
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
@@ -360,10 +364,12 @@ namespace ThomasEditor
             if (ThomasWrapper.IsPlaying())
             {
                 ThomasWrapper.IssueStopPlay();
+                OnStopPlaying();
             }
             else
             {
                 ThomasWrapper.IssuePlay();
+                OnStartPlaying();
                 game.Focus();
             }
                 

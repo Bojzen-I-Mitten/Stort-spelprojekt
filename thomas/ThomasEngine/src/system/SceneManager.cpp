@@ -69,6 +69,7 @@ namespace ThomasEngine
 
 	void SceneManager::RestartCurrentScene()
 	{
+		// Assert: isLogicThread()
 		Object^ lock = m_current_scene->GetGameObjectsLock();
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
 		
@@ -76,7 +77,9 @@ namespace ThomasEngine
 		m_current_scene->UnLoad();
 		Monitor::Exit(lock);
 
-		LoadScene(tempFile);
+		Scene^ scene = Scene::LoadScene(tempFile, m_ID_Counter++);
+		SetCurrent(scene);
+
 		try {
 			System::IO::File::Delete(tempFile);
 		}
