@@ -174,11 +174,11 @@ public class ChadControls : NetworkComponent
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
 
-        //if (Input.GetKey(Input.Keys.Space))
-        //{
-        //    State = STATE.DIVING;
-        //    StartCoroutine(DivingCoroutine());
-        //}
+        if (Input.GetKey(Input.Keys.Space))
+        {
+            State = STATE.DIVING;
+            StartCoroutine(DivingCoroutine());
+        }
     }
 
     private void HandleMouseInput()
