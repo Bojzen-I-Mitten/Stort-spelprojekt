@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-
+#include<map>
 
 namespace thomas
 {
@@ -11,7 +11,7 @@ namespace thomas
 
 		static std::vector<object::GameObject> m_objectsInActive;
 
-		static std::vector<object::GameObject> m_objectsStatic;
+		static std::map<std::string, std::vector<object::GameObject>> m_objectsStatic;
 
 		static std::vector<object::GameObject> m_objectsWake;
 
