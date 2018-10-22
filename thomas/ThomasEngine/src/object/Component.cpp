@@ -126,6 +126,8 @@ namespace ThomasEngine
 		((thomas::object::component::Component*)nativePtr)->m_gameObject = (thomas::object::GameObject*)gObj->nativePtr;
 		((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.push_back(((thomas::object::component::Component*)nativePtr));
 		OnGameObjectSet();
+
+		((thomas::object::component::Component*)nativePtr)->m_gameObject->SetRenderComponent((thomas::object::component::Component*)nativePtr);
 	}
 
 

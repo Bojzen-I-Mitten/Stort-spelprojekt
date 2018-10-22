@@ -38,6 +38,8 @@ namespace thomas
 			m_activeSelf = move.m_activeSelf;
 			m_staticSelf = move.m_staticSelf;
 		
+
+			m_renderComponent = move.m_renderComponent;
 			move.m_transform = nullptr;
 			m_selected;// = move.m_selected;
 			m_staticSelf = move.m_staticSelf;
@@ -67,7 +69,7 @@ namespace thomas
 				move.m_transform = nullptr;
 				m_selected = move.m_selected;
 
-
+				m_renderComponent = move.m_renderComponent;
 				//object::Object::Add(this);
 				for (auto& it : m_components)
 				{
@@ -167,6 +169,16 @@ namespace thomas
 		void GameObject::SetSelection(bool selected)
 		{
 			m_selected = selected;
+		}
+
+		void GameObject::SetRenderComponent(component::Component * renderComponent)
+		{
+			m_renderComponent = renderComponent;
+		}
+
+		component::Component * GameObject::GetRenderComponent()
+		{
+			return m_renderComponent;
 		}
 
 
