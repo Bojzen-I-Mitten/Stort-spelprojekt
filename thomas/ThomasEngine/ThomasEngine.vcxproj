@@ -182,6 +182,7 @@
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\resource\Font.h" />
@@ -243,6 +244,7 @@
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
     </ClCompile>
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />

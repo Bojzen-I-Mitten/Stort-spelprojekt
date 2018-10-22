@@ -48,7 +48,7 @@ namespace thomas
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				
-				Physics::AddRigidBody(this);
+				Physics::AddRigidBody(this, m_collisionLayer);
 			}
 
 			void Rigidbody::OnDisable()
@@ -192,7 +192,7 @@ namespace thomas
 						bool removed = Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
 						if (removed)
-							Physics::AddRigidBody(this);
+							Physics::AddRigidBody(this, m_collisionLayer);
 					}		
 				}	
 			}
@@ -208,7 +208,7 @@ namespace thomas
 				collider->SetTrigger(collider->IsTrigger());
 				UpdateRigidbodyMass();
 				if(removed)
-					Physics::AddRigidBody(this);
+					Physics::AddRigidBody(this, m_collisionLayer);
 			}
 
 			void Rigidbody::SetMass(float mass)
@@ -219,7 +219,7 @@ namespace thomas
 					bool removed = Physics::RemoveRigidBody(this);
 					UpdateRigidbodyMass();
 					if (removed)
-						Physics::AddRigidBody(this);
+						Physics::AddRigidBody(this, m_collisionLayer);
 				}
 			}
 
@@ -227,6 +227,14 @@ namespace thomas
 			{
 				
 				m_LocalCenterOfMassChange = Centerofmass;
+			}
+
+			void Rigidbody::SetCollisionLayer(int layer)
+			{
+				bool removed = Physics::RemoveRigidBody(this);
+				m_collisionLayer = layer;
+				if (removed)
+					Physics::AddRigidBody(this, m_collisionLayer);
 			}
 
 			void Rigidbody::SetBounciness(float bounciness)
@@ -349,6 +357,11 @@ namespace thomas
 			float Rigidbody::GetFriction()
 			{
 				return m_friction;
+			}
+
+			int Rigidbody::GetCollisionLayer()
+			{
+				return m_collisionLayer;
 			}
 
 			void Rigidbody::UpdateRigidbodyMass()
