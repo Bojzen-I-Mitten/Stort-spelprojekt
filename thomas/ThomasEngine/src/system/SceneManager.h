@@ -32,10 +32,14 @@ namespace ThomasEngine
 
 		void SetCurrent(Scene^ scene);
 
+
 	internal:
-		/* Called by logic process to trigger scene swap.
+		/* Called by logic process to swap scene.
 		*/
 		void ListenToLoadProcess();
+		/*	Check if loading process is ready for scene swap.
+		*/ 
+		bool LoadThreadWaiting();
 		/*	Reload system temp file. Does not enter swap state, and should only be called from logic thread.
 		*/
 		void RestartCurrentScene();
@@ -46,7 +50,8 @@ namespace ThomasEngine
 		/* Check if a process initiated a loading process.
 		*/
 		bool IsAsyncLoading();
-		/* Check if a no scene are activated. */
+		/* Check if a no scene are activated. 
+		*/
 		bool NoSceneExist();
 
 	
@@ -57,7 +62,7 @@ namespace ThomasEngine
 
 
 		SceneManager();
-		/* Trigger scene loading process
+		/* Load scene asynchronous
 		*/
 		bool LoadScene(System::String^ fullPath);
 

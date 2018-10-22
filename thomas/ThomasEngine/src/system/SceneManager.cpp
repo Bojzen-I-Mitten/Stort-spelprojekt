@@ -44,6 +44,13 @@ namespace ThomasEngine
 		if (oldScene)
 			oldScene->~Scene();
 	}
+	bool SceneManager::LoadThreadWaiting()
+	{
+		Monitor::Enter(m_swap_lock);
+		bool load_waiting = m_new_loaded_scene != nullptr;
+		Monitor::Exit(m_swap_lock);
+		return load_waiting;
+	}
 
 
 	void SceneManager::ListenToLoadProcess()

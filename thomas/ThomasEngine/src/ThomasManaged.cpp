@@ -147,8 +147,12 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
-			// T
-			Thomas->m_scene->ListenToLoadProcess();
+			// Load scene
+			if (Thomas->m_scene->LoadThreadWaiting())
+			{
+				RenderFinished->WaitOne();
+				Thomas->m_scene->ListenToLoadProcess();
+			}
 			if (Thomas->m_scene->NoSceneExist())
 			{
 				Thread::Sleep(500);

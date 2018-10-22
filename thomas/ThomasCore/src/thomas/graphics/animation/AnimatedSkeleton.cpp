@@ -17,7 +17,6 @@ namespace thomas {
 			{
 				clearConstraints();
 				clearBlendTree();
-				updateSkeleton();
 			}
 
 
@@ -30,12 +29,25 @@ namespace thomas {
 				std::memset(m_constraint.get(), 0, sizeof(ConstraintList) * _ref.getNumBones());
 			}
 
-
 			void AnimatedSkeleton::update(float dT) {
+				if (!_root) return;		// Verify blend node
 				_root->update(dT);		// Update each node ONCE.
 				updateSkeleton();		// Apply skeleton.
 				_root->resetUpdate();	// Clear dirty update flags.
 			}
+
+			void AnimatedSkeleton::setPose()
+			{
+				_pose[0] = _ref.getBone(0)._bindPose * _ref.getRoot();			//	Set root bind pose
+				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];
+				for (uint32_t i = 1; i < boneCount(); i++)
+				{
+					const Bone& bone = _ref.getBone(i);
+					_pose[i] = bone._bindPose * _pose[bone._parentIndex];		//	Set bind pose
+					_skin[i] = bone._invBindPose * _pose[i];
+				}
+			}
+
 			void AnimatedSkeleton::updateSkeleton()
 			{
 				TransformComponents *frame_tmp = reinterpret_cast<TransformComponents*>(
@@ -78,8 +90,8 @@ namespace thomas {
 			}
 
 			void AnimatedSkeleton::clearBlendTree() {
-				_root = new BindPoseNode(_ref);
-				update(0.1f);
+				_root = NULL;
+				setPose();
 			}
 
 			void AnimatedSkeleton::playSingle(thomas::resource::Animation * anim)
