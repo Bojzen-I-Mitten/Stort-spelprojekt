@@ -37,6 +37,7 @@ namespace ThomasEngine.Network
 
         Transform _target;
         [Browsable(false)]
+		[Newtonsoft.Json.JsonIgnore]
         public Transform target {
             get {
                 if (!_target)

@@ -3,11 +3,10 @@
 #include "Component.h"
 #include <memory>
 
-namespace DirectX {
+namespace DirectX 
+{
 	class SoundEffectInstance;
 }
-
-
 
 namespace thomas
 {
@@ -25,6 +24,7 @@ namespace thomas
 			public:
 				SoundComponent();
 				~SoundComponent();
+
 				bool SetClip(resource::AudioClip* clip);
 				resource::AudioClip* GetClip();
 				bool SetVolume(float volume);
@@ -35,6 +35,7 @@ namespace thomas
 				void Resume();
 				void SetLooping(bool loop);
 				bool IsLooping();
+
 			private:
 				std::string m_name;
 				float m_volume;

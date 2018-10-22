@@ -51,6 +51,7 @@ namespace thomas
 			{
 				if (volume > 5)
 					return false;
+
 				m_volume = volume;
 				if (m_instance)
 				{
@@ -73,13 +74,11 @@ namespace thomas
 					return true;
 				}
 				else
-					return false;
-				
+					return false;			
 			}
 
 			bool SoundComponent::PlayOneShot(std::string name, float volume)
 			{
-				return true;
 				return Sound::Instance()->Play(name, volume);
 			}
 

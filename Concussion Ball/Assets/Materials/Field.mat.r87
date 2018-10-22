@@ -1,0 +1,28 @@
+{
+  "$id": "2178",
+  "asset_path": "%THOMAS_ASSETS%\\Materials\\Field.mat",
+  "shader": {
+    "resourcePath": "%THOMAS_DATA%\\FXIncludes\\StandardShader.fx"
+  },
+  "properties": {
+    "$id": "2179",
+    "color": {
+      "$id": "2180",
+      "$type": "ThomasEngine.Color, ThomasMath",
+      "b": 255,
+      "g": 255,
+      "r": 255,
+      "a": 255
+    },
+    "diffuseTex": {
+      "resourcePath": "%THOMAS_ASSETS%\\Textures\\Grass_COL.png"
+    },
+    "normalTex": {
+      "resourcePath": "%THOMAS_ASSETS%\\Textures\\Grass_Normal.png"
+    },
+    "smoothness": 16.0,
+    "specularTex": {
+      "resourcePath": "White Texture"
+    }
+  }
+}

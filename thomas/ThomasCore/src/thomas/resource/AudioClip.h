@@ -1,7 +1,9 @@
 #pragma once
+
 #include "Resource.h"
 #include <vector>
 #include <memory>
+
 namespace DirectX
 {
 	class SoundEffect;
@@ -15,6 +17,7 @@ namespace thomas
 		{
 		private:
 			void OnChanged();
+
 		public:
 			AudioClip(std::string path);
 			std::unique_ptr<DirectX::SoundEffectInstance> CreateInstance();
