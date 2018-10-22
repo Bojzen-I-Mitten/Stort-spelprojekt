@@ -163,7 +163,7 @@ namespace ThomasEngine
 	}
 	bool SceneManager::IsAsyncLoading()
 	{
-		return !m_state;
+		return m_state;
 	}
 	bool SceneManager::NoSceneExist()
 	{

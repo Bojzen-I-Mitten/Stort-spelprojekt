@@ -358,11 +358,12 @@ namespace ThomasEditor
         private void PlayPauseButton_Click(object sender, ExecutedRoutedEventArgs e)
         {
             if (ThomasWrapper.IsPlaying())
-            {// ThomasWrapper.IssueStop();
+            {
+                ThomasWrapper.IssueStopPlay();
             }
             else
             {
-                ThomasWrapper.Play();
+                ThomasWrapper.IssuePlay();
                 game.Focus();
             }
                 

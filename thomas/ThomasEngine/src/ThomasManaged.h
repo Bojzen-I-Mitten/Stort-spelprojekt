@@ -37,15 +37,22 @@ namespace ThomasEngine {
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
+
+		static void Play();
+		static void StopPlay();
+
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
-		static void Stop();
 	public:
 
 		property SceneManager^ SceneManagerRef
 		{
 			SceneManager^ get();
 		}
+
+
+		static void Start();
+		static void StartRenderer();
 
 	public:	// Static sys
 		delegate void StartPlayEvent();
@@ -70,10 +77,9 @@ namespace ThomasEngine {
 			Scene^ get();
 		}
 
-		static void Start();
+		static void IssuePlay();
+		static void IssueStopPlay();
 
-
-		static void StartRenderer();
 
 		static void CopyCommandList();
 
@@ -90,7 +96,6 @@ namespace ThomasEngine {
 		static void Update();
 
 		static Guid selectedGUID;
-		static void Play();
 
 		static bool IsPlaying();
 		static bool IsLoading();

@@ -95,7 +95,7 @@ namespace ThomasEngine {
 			RenderFinished->Set();
 		}
 	}
-
+	
 	void ThomasWrapper::CopyCommandList()
 	{
 
@@ -307,7 +307,6 @@ namespace ThomasEngine {
 			s_Selection->UpdateSelectedObjects();
 	}
 
-	Guid selectedGUID;
 	void ThomasWrapper::Play()
 	{
 		while (Thomas->SceneManagerRef->IsAsyncLoading())
@@ -323,18 +322,9 @@ namespace ThomasEngine {
 
 		Debug::Log("Running...");
 	}
-
-	bool ThomasWrapper::IsPlaying()
-	{
-		return playing == RunningState::Running;
-	}
-
-	bool ThomasWrapper::IsLoading()
-	{
-		return playing == RunningState::Loading;
-	}
 		
-	void ThomasWrapper::Stop()
+	Guid selectedGUID;
+	void ThomasWrapper::StopPlay()
 	{
 		
 		playing = RunningState::Loading;
@@ -358,6 +348,23 @@ namespace ThomasEngine {
 
 		Debug::Log("Stopped...");
 		playing = RunningState::Editor;
+	}
+	void ThomasWrapper::IssuePlay()
+	{
+	}
+
+	void ThomasWrapper::IssueStopPlay()
+	{
+	}
+
+	bool ThomasWrapper::IsPlaying()
+	{
+		return playing == RunningState::Running;
+	}
+
+	bool ThomasWrapper::IsLoading()
+	{
+		return playing == RunningState::Loading;
 	}
 
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
