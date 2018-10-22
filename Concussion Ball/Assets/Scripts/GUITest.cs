@@ -61,7 +61,6 @@ public class GUITest : ScriptComponent
 
         if (Camera.OnImageClicked("TextBoxIP"))
         {
-            Debug.Log("Clicked");
             TakePort = false;
             TakeIP = true;
             Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -119,6 +118,7 @@ public class GUITest : ScriptComponent
             else
             {
                 Camera.SetImageColor("TextBoxPort", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                Camera.AddText("IP", "IP, needed to join", new Vector2(260, 20), new Vector2(0.5f));
             }
         }
 

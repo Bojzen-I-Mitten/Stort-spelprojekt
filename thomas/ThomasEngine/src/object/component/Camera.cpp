@@ -103,6 +103,11 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetImageInteract(Utility::ConvertString(id), interact);
 	}
 
+	bool Camera::RemoveImage(String^ id)
+	{
+		return camera->GetGUIHandle()->RemoveImage(Utility::ConvertString(id));
+	}
+
 	//-------------------------------------------------------------------------------------------
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position)
@@ -187,9 +192,16 @@ namespace ThomasEngine
 	{
 		camera->GetGUIHandle()->SetTextRotation(Utility::ConvertString(id), rotation);
 	}
+
 	void Camera::SetTextFont(String^ id, Font^ font)
 	{
 		camera->GetGUIHandle()->SetFont(Utility::ConvertString(id), (thomas::resource::Font*)font->m_nativePtr);
 	}
+
+	void Camera::RemoveText(String^ id)
+	{
+		camera->GetGUIHandle()->RemoveText(Utility::ConvertString(id));
+	}
+
 	//-------------------------------------------------------------------------------------------
 }

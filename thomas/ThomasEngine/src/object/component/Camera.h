@@ -85,6 +85,9 @@ namespace ThomasEngine
 		void SetImageRotation(String^ id, float rotation);
 		void SetImageInteract(String^ id, bool interact);
 
+
+		bool RemoveImage(String^ id);
+
 		// GUI Text
 		void AddText(String^ id, String^ text, Vector2 position);
 		void AddText(String^ id, String^ text, Vector2 position, Vector2 scale);
@@ -102,5 +105,9 @@ namespace ThomasEngine
 		void SetTextScale(String^ id, Vector2 scale);
 		void SetTextRotation(String^ id, float rotation);
 		void SetTextFont(String^ id, Font^ font);
+		void RemoveText(String^ id);
+
+		//bool RemoveText(String^ id);
+
 	};
 }

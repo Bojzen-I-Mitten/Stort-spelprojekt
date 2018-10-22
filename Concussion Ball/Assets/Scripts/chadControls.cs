@@ -115,7 +115,7 @@ public class ChadControls : NetworkComponent
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
         NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
-        ragdollSync.target =Ragdoll.GetHips().transform;
+        //ragdollSync.target =Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
     }
 
