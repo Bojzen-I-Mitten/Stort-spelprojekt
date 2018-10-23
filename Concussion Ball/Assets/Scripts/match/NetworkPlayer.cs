@@ -72,7 +72,7 @@ public class NetworkPlayer : NetworkComponent
             gameObject.GetComponent<Rigidbody>().enabled = false;
             StartCoroutine(EnableRigidbody());
             transform.position = Team.GetSpawnPosition();
-            transform.localEulerAngles = Team.SpawnArea.Direction;
+            transform.LookAt(Vector3.Zero);
             gameObject.GetComponent<ChadControls>().Reset();
         }
     }
