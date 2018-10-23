@@ -319,7 +319,7 @@ public class Ball : NetworkComponent
                 rigidbody.enabled = false;
                 StartCoroutine(EnableRigidBody());
             }
-            transform.localEulerAngles = new Vector3(0, 0, 0);
+            transform.localEulerAngles = Vector3.Zero;
             transform.localPosition = SpawnPoint;
         }
     }
