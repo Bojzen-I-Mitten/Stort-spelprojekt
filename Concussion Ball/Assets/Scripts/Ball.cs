@@ -4,10 +4,8 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
-public class Ball : NetworkComponent
+public class Ball : PickupObjects
 {
-    Rigidbody rb;
-    RenderComponent rc;
     private float accumulator;
     private float chargeupTime;
 
@@ -24,7 +22,7 @@ public class Ball : NetworkComponent
 
     private Rigidbody rigidbody;
     private RenderComponent renderComponent;
-    public bool PickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
+    //public bool PickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
     public float chargeTimeCurrent;
     private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
@@ -251,19 +249,9 @@ public class Ball : NetworkComponent
         emitterSmoke.Emit = false;
     }
 
-    public void RPCDrop()
-    {
-        if (PickedUp)
-        {
-            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-            PickedUp = false;
-            transform.parent = null;
-        }
-    }
-
     public void Throw(Vector3 force)
     {
-        if (PickedUp)
+        if (m_pickedUp)
         {
             Drop();
             transform.position = transform.position + Vector3.Normalize(force) * 2;
