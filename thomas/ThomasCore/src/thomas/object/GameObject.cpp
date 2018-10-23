@@ -11,6 +11,9 @@ namespace thomas
 			m_name = "VoidName";
 			m_selected = false;
 			m_staticSelf = false;
+			m_GroupID = 0;
+			new_GroupID = 0;
+			m_moveStaticGroup = false;
 		}
 
 		GameObject::GameObject(std::string name)
@@ -19,6 +22,9 @@ namespace thomas
 			m_name = name;
 			m_selected = false;
 			m_staticSelf = false;
+			m_GroupID = 0;
+			new_GroupID = 0;
+			m_moveStaticGroup = false;
 		}
 
 		GameObject::~GameObject()
@@ -37,7 +43,9 @@ namespace thomas
 		{
 			m_activeSelf = move.m_activeSelf;
 			m_staticSelf = move.m_staticSelf;
-		
+			m_moveStaticGroup = move.m_moveStaticGroup;
+			m_GroupID = move.m_GroupID;
+			new_GroupID = move.new_GroupID;
 
 			m_renderComponent = move.m_renderComponent;
 			move.m_transform = nullptr;
@@ -68,7 +76,9 @@ namespace thomas
 				m_selected = std::move(move.m_selected);
 				move.m_transform = nullptr;
 				m_selected = move.m_selected;
-
+				m_moveStaticGroup = move.m_moveStaticGroup;
+				m_GroupID = move.m_GroupID;
+				new_GroupID = move.new_GroupID;
 				m_renderComponent = move.m_renderComponent;
 				//object::Object::Add(this);
 				for (auto& it : m_components)
@@ -171,12 +181,48 @@ namespace thomas
 			m_selected = selected;
 		}
 
-		void GameObject::SetRenderComponent(component::Component * renderComponent)
+		bool GameObject::ChangeGroupID(UINT id)
+		{
+			if (m_staticSelf && id != m_GroupID)
+			{
+				new_GroupID = id;
+				m_moveStaticGroup = true;
+				return true;
+			}
+			return false;
+		}
+
+		void GameObject::SetMoveStaticGroup(bool state)
+		{
+			m_moveStaticGroup = state;
+		}
+
+		bool GameObject::GetMoveStaticGroup()
+		{
+			return m_moveStaticGroup;
+		}
+
+		UINT GameObject::GetNewGroupID()
+		{
+			return new_GroupID;
+		}
+
+		UINT GameObject::GetGroupID()
+		{
+			return m_GroupID;
+		}
+
+		void GameObject::SetGroupID(UINT id)
+		{
+			m_GroupID = id;
+		}
+
+		void GameObject::SetRenderComponent(component::RenderComponent * renderComponent)
 		{
 			m_renderComponent = renderComponent;
 		}
 
-		component::Component * GameObject::GetRenderComponent()
+		component::RenderComponent * GameObject::GetRenderComponent()
 		{
 			return m_renderComponent;
 		}

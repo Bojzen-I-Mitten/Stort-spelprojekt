@@ -57,9 +57,16 @@ namespace thomas
 			bool GetSelection();
 			void SetSelection(bool selected);
 
-			void SetRenderComponent(component::Component* renderComponent);
+			bool ChangeGroupID(UINT id);
+			UINT GetGroupID();
+			void SetGroupID(UINT id);
+			UINT GetNewGroupID();
+			void SetMoveStaticGroup(bool state);
+			bool GetMoveStaticGroup();
 
-			component::Component* GetRenderComponent();
+			void SetRenderComponent(component::RenderComponent* renderComponent);
+
+			component::RenderComponent* GetRenderComponent();
 			/* Remove the component referenced to in the pointer.
 			 comp_ptr	<<	Component to remove
 			 return		>>	0 if component was found and removed.
@@ -72,10 +79,13 @@ namespace thomas
 
 
 		private:
+			bool m_moveStaticGroup;
+			UINT new_GroupID;
 			bool m_selected;
 			bool m_staticSelf;
 			bool m_dynamicSelf;
-			component::Component* m_renderComponent;
+			UINT m_GroupID; 
+			component::RenderComponent* m_renderComponent;
 			static std::vector<GameObject*> s_gameObjects;
 		};
 		

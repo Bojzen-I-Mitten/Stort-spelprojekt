@@ -111,6 +111,15 @@ namespace ThomasEngine {
 		return moved;
 	}
 
+	thomas::object::Object * GameObject::moveStaticGroup()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::moveStaticGroup(nativePtr, moved);
+
+		return moved;
+	}
+
 	thomas::object::Object * GameObject::setDynamic()
 	{
 		thomas::object::Object* moved;
@@ -228,6 +237,11 @@ namespace ThomasEngine {
 	bool GameObject::MakeDynamic()
 	{
 		return m_makeDynamic;
+	}
+
+	bool GameObject::MoveStaticGroup()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetMoveStaticGroup();
 	}
 
 
@@ -425,6 +439,17 @@ namespace ThomasEngine {
 	bool GameObject::activeSelf::get()
 	{
 		return ((thomas::object::GameObject*)nativePtr)->m_activeSelf;
+	}
+
+	UINT GameObject::GroupIDSelf::get()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetGroupID();
+	}
+
+	void GameObject::GroupIDSelf::set(UINT value)
+	{
+
+		((thomas::object::GameObject*)nativePtr)->ChangeGroupID(value);
 	}
 
 	bool GameObject::staticSelf::get()

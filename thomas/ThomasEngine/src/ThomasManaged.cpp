@@ -232,6 +232,18 @@ namespace ThomasEngine {
 					{
 						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 
+						if (gameObject->MoveStaticGroup())
+						{
+							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+
+							thomas::object::Object* old_native = gameObject->moveStaticGroup();
+
+							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+							if (temp) // If temp is nullptr, no managed object has been invalidated.
+								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+						}
+
 						if (gameObject->MakeStatic())
 						{
 							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;

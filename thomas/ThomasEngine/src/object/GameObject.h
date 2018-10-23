@@ -51,6 +51,7 @@ namespace ThomasEngine
 		static void InitGameObjects(bool playing);
 
 		thomas::object::Object* setStatic();
+		thomas::object::Object* moveStaticGroup();
 		thomas::object::Object* setDynamic();
 				
 		void Update();
@@ -70,6 +71,7 @@ namespace ThomasEngine
 	public:
 		bool MakeStatic();
 		bool MakeDynamic();
+		bool MoveStaticGroup();
 		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 
 		GameObject(String^ name);
@@ -89,6 +91,12 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}	
+
+		property UINT GroupIDSelf
+		{
+			UINT get();
+			void set(UINT state);
+		}
 
 		property bool staticSelf
 		{

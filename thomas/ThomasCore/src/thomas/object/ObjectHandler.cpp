@@ -7,7 +7,7 @@ namespace thomas
 
 	std::vector<object::GameObject> ObjectHandler::m_objectsDynamic;
 	std::vector<object::GameObject> ObjectHandler::m_objectsInActive;
-	std::map<std::string, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
+	std::map<size_t, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
 	std::vector<object::GameObject> ObjectHandler::m_objectsWake;
 
 	void ObjectHandler::Init()
@@ -25,15 +25,16 @@ namespace thomas
 
 	object::Object* ObjectHandler::setStatic(object::Object* object, object::Object*& moved)
 	{
-
+		//gObj->GetComponent<InstancingID>()
+		//type = c == null ? 0 : c->ID
 		for (auto& it = m_objectsDynamic.begin(); it != m_objectsDynamic.end(); it++)
 		{
 			if (&(*it) == object)
 			{
-				std::string type = it->GetName();
+				UINT type = it->GetGroupID();
 				if (m_objectsStatic.find(type) == m_objectsStatic.end())
 				{
-					m_objectsStatic.insert(std::pair<std::string, std::vector<object::GameObject> >(type, std::vector<object::GameObject>()));
+					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(type, std::vector<object::GameObject>()));
 					m_objectsStatic[type].reserve(1000);
 				}
 				m_objectsStatic[type].push_back(std::move(*it));
@@ -51,6 +52,8 @@ namespace thomas
 				// We have to set the new object as the selected one
 				editor::EditorCamera::Instance()->SelectObject(&m_objectsStatic[type].back());
 
+
+
 				return &m_objectsStatic[type].back(); // We have moved it
 			}
 		}
@@ -60,9 +63,40 @@ namespace thomas
 		return object;
 	}
 
+	object::Object * ObjectHandler::moveStaticGroup(object::Object * object, object::Object *& moved)
+	{
+		UINT type = static_cast<object::GameObject*>(object)->GetGroupID();
+
+
+		for (auto& it = m_objectsStatic[type].begin(); it != m_objectsStatic[type].end(); it++)
+		{
+			if (&(*it) == object)
+			{
+				UINT new_GroupID = it->GetNewGroupID();
+				m_objectsStatic[new_GroupID].push_back(std::move(*it));
+
+				moved = &m_objectsStatic[type].back();
+
+				*it = std::move(m_objectsStatic[type].back());
+
+				m_objectsStatic[type].pop_back();
+
+				editor::EditorCamera::Instance()->SelectObject(&m_objectsStatic[new_GroupID].back());
+
+				m_objectsStatic[new_GroupID].back().SetGroupID(new_GroupID);
+				m_objectsStatic[new_GroupID].back().SetMoveStaticGroup(false);
+				m_objectsStatic[new_GroupID].back().SetDynamic(true);
+				return &m_objectsStatic[new_GroupID].back(); // We have moved it
+			}
+		}
+
+		moved = nullptr;
+		return object;
+	}
+
 	object::Object * ObjectHandler::setDynamic(object::Object * object, object::Object *& moved)
 	{
-		std::string type = object->GetName();
+		UINT type = static_cast<object::GameObject*>(object)->GetGroupID();
 		for (auto& it = m_objectsStatic[type].begin(); it != m_objectsStatic[type].end(); it++)
 		{
 			if (&(*it) == object)
