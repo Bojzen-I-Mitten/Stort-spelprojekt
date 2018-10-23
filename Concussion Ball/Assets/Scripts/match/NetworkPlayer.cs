@@ -3,20 +3,23 @@ using ThomasEngine;
 using ThomasEngine.Network;
 using LiteNetLib;
 using LiteNetLib.Utils;
+
 public class NetworkPlayer : NetworkComponent
 {
-    private Team _Team;
     private String _Name;
-    
-    public Team Team
-    {
-        get { return _Team; }
-    }
+    public Team Team {get; private set;}
+    public float BottomOfTheWorld { get; set; } = -5;
     Material mat;
     public override void Start()
     {
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
         mat?.SetColor("color", Team.Color);
+    }
+
+    public override void Update()
+    {
+        if (transform.position.y < BottomOfTheWorld)
+            Respawn();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -68,15 +71,21 @@ public class NetworkPlayer : NetworkComponent
 
     public void JoinTeam(Team team)
     {
-        if (this._Team != null)
-            this._Team.RemovePlayer(this);
+        if (this.Team != null)
+            this.Team.RemovePlayer(this);
         if (team != null)
         {
             team.AddPlayer(this);
         }
             
-        this._Team = team;
+        this.Team = team;
 
 
+    }
+
+    public void Respawn()
+    {
+        if (isOwner)
+            transform.position = Team.GetSpawnPosition();
     }
 }

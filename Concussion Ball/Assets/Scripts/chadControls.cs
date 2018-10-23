@@ -78,6 +78,7 @@ public class ChadControls : NetworkComponent
     public string PlayerPrefabName { get; set; } = "Chad";
     public float ImpactFactor { get; set; } = 100;
     public float TackleThreshold { get; set; } = 5;
+    private float DivingTimer = 0.0f;
 
     //Camera test;
     private Ball _Ball;
@@ -125,6 +126,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
+            DivingTimer += Time.DeltaTime;
             Direction = new Vector3(0, 0, 0);
             HandleKeyboardInput();
             HandleMouseInput();
@@ -194,11 +196,12 @@ public class ChadControls : NetworkComponent
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
 
-        //if (Input.GetKey(Input.Keys.Space))
-        //{
-        //    State = STATE.DIVING;
-        //    StartCoroutine(DivingCoroutine());
-        //}
+        if (Input.GetKey(Input.Keys.Space) && DivingTimer > 5.0f)
+        {
+            State = STATE.DIVING;
+            StartCoroutine(DivingCoroutine());
+            DivingTimer = 0.0f;
+        }
     }
 
     private void HandleMouseInput()
@@ -422,6 +425,18 @@ public class ChadControls : NetworkComponent
         }
         CurrentVelocity.y = BaseSpeed;
         State = STATE.CHADING;
+    }
+
+    IEnumerator StartRagdoll(float duration, Vector3 force)
+    {
+        State = STATE.RAGDOLL;
+        Camera.transform.parent = null;
+        EnableRagdoll();
+        Ragdoll.AddForce(force);
+        yield return new WaitForSeconds(duration);
+        DisableRagdoll();
+        State = STATE.CHADING;
+        ResetCamera();
     }
 
     #endregion
