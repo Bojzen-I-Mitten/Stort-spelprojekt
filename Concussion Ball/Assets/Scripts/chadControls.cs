@@ -76,7 +76,7 @@ public class ChadControls : NetworkComponent
     Ragdoll Ragdoll;
 
     public string PlayerPrefabName { get; set; } = "Chad";
-    public float ImpactFactor { get; set; } = 10;
+    public float ImpactFactor { get; set; } = 100;
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
 
@@ -118,6 +118,8 @@ public class ChadControls : NetworkComponent
         NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
         ragdollSync.target = Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+
+        Identity.RefreshCache();
     }
 
     public override void Update()
@@ -139,7 +141,7 @@ public class ChadControls : NetworkComponent
         }
 
         if (Input.GetKeyDown(Input.Keys.L))
-            StartCoroutine(StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 100));
+            StartCoroutine(StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000));
     }
 
     public void EnableRagdoll()
@@ -155,6 +157,24 @@ public class ChadControls : NetworkComponent
         gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
+    }
+
+    public void RPCStartRagdoll(float duration, Vector3 force)
+    {
+        if(State != STATE.RAGDOLL)
+            StartCoroutine(StartRagdoll(duration, force));
+    }
+
+    IEnumerator StartRagdoll(float duration, Vector3 force)
+    {
+        State = STATE.RAGDOLL;
+        Camera.transform.parent = null;
+        EnableRagdoll();
+        Ragdoll.AddForce(force);
+        yield return new WaitForSeconds(duration);
+        DisableRagdoll();
+        State = STATE.CHADING;
+        ResetCamera();
     }
 
     #region Input handling
@@ -513,7 +533,8 @@ public class ChadControls : NetworkComponent
                 if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
                 {
                     //toggle ragdoll
-                    StartCoroutine(StartRagdoll(5.0f, collider.gameObject.transform.forward * ImpactFactor));
+                    RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
                 }
             }
         }

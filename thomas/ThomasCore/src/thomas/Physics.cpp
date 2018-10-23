@@ -43,7 +43,6 @@ namespace thomas
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
-
 		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
@@ -64,6 +63,19 @@ namespace thomas
 		}
 		s_world->removeRigidBody(rigidBody);
 		return found;
+	}
+
+	bool Physics::IsRigidbodyInWorld(object::component::Rigidbody * rigidBody)
+	{
+		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
+		{
+			object::component::Rigidbody* rb = s_rigidBodies[i];
+			if (rb == rigidBody)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void Physics::UpdateRigidbodies()
@@ -140,6 +152,7 @@ namespace thomas
 		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
 		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
 
+	
 		if(colliderA && colliderB && !colliderA->isDestroyed() && !colliderB->isDestroyed())
 		{
 			colliderA->OnCollision(colliderB, collisionType);
