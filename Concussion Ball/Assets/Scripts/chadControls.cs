@@ -165,17 +165,6 @@ public class ChadControls : NetworkComponent
             StartCoroutine(StartRagdoll(duration, force));
     }
 
-    IEnumerator StartRagdoll(float duration, Vector3 force)
-    {
-        State = STATE.RAGDOLL;
-        Camera.transform.parent = null;
-        EnableRagdoll();
-        Ragdoll.AddForce(force);
-        yield return new WaitForSeconds(duration);
-        DisableRagdoll();
-        State = STATE.CHADING;
-        ResetCamera();
-    }
 
     #region Input handling
     private void HandleKeyboardInput()
