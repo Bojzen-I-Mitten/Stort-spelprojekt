@@ -34,6 +34,7 @@ public class Ball : PickupObjects
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
+        #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
@@ -55,8 +56,9 @@ public class Ball : PickupObjects
         MultiplyWithIntensity((float)(0.5f), emitterElectricity1);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity2);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity3);
+        #endregion
     }
-
+    #region Particle handling
     private void ResetFireEmitters()
     {
         emitterSmoke.MinSize = 0.1f;
@@ -189,6 +191,28 @@ public class Ball : PickupObjects
         }
     }
 
+    public void StopEmitting()
+    {
+        StartCoroutine(StopEmission());
+    }
+
+    private IEnumerator StopEmission()
+    {
+        float timer = 3;
+        while (timer > 0)
+        {
+            timer -= Time.DeltaTime;
+            yield return null;
+        }
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
+    }
+    #endregion
+
     public override void Update()
     {
     }
@@ -198,6 +222,17 @@ public class Ball : PickupObjects
         RPCDrop();
         SendRPC("RPCDrop");
         
+    }
+
+    // Move to PickupObjects
+    public void RPCDrop()
+    {
+        if (m_pickedUp)
+        {
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+            m_pickedUp = false;
+            transform.parent = null;
+        }
     }
 
     public void ChargeColor()
@@ -225,29 +260,11 @@ public class Ball : PickupObjects
         
     }
 
-    public void StopEmitting()
-    {
-        StartCoroutine(StopEmission());
-    }
 
-    private IEnumerator StopEmission()
-    {
-        float timer = 3;
-        while(timer > 0)
-        {
-            timer -= Time.DeltaTime;
-            yield return null;
-        }
-
-        emitterElectricity1.Emit = false;
-        emitterElectricity2.Emit = false;
-        emitterElectricity3.Emit = false;
-        emitterFire.Emit = false;
-        emitterSmoke.Emit = false;
-    }
 
     public void Throw(Vector3 force)
     {
+        Debug.Log("Attempting to throw");
         if (m_pickedUp)
         {
             Drop();
@@ -279,10 +296,12 @@ public class Ball : PickupObjects
         chargeTimeCurrent = 0;
         ResetElectricityEmitters();
     }
-
     
+    // Move to PickupObjects
     public void Pickup(GameObject gobj, Transform hand)
     {
+        Debug.Log("Setting m_pickup to true, HasBall is true");
+        m_pickedUp = true;
         rigidbody.enabled = false;
         transform.parent = hand;
         transform.localPosition = Vector3.Zero;

@@ -198,13 +198,13 @@ public class ChadControls : NetworkComponent
             //Throw stuff
             if (HasBall())
             {
-                Debug.Log("Yeah boi we gots the ball");
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
+                    Debug.Log("Changing state to throwing");
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
@@ -439,15 +439,20 @@ public class ChadControls : NetworkComponent
         }
     }
 
-    public void RPCPickupBall()
+    public void RPCPickup()
     {
         if (Ball)
             Ball.Pickup(gameObject, hand ? hand : transform);
+        /*
+         else if (Powerup)
+            Powerup.Pickup..
+         */
 
     }
 
     public bool HasBall()
     {
+        Debug.Log("HasBall: " + Ball.m_pickedUp);
         if (Ball)
             return Ball.isOwner && Ball.m_pickedUp;
         else
@@ -460,7 +465,7 @@ public class ChadControls : NetworkComponent
         {
             bool hasBall = reader.GetBool();
             if (hasBall)
-                RPCPickupBall();
+                RPCPickup();
         }
 
         if (isOwner)
@@ -499,8 +504,8 @@ public class ChadControls : NetworkComponent
                     if (Ball.transform.parent == null)
                     {
                         TakeOwnership(Ball.gameObject);
-                        SendRPC("RPCPickupBall");
-                        RPCPickupBall();
+                        SendRPC("RPCPickup");
+                        RPCPickup();
                     }
 
                 }
@@ -517,6 +522,7 @@ public class ChadControls : NetworkComponent
                     StartCoroutine(StartRagdoll(5.0f, collider.gameObject.transform.forward * ImpactFactor));
                 }
             }
+            /*if collider.gameObject == Powerup.gameObject*/
         }
     }
 }

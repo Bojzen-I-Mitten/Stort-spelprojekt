@@ -18,24 +18,33 @@ public class PickupObjects : NetworkComponent
 
     public override void Start()
     {
-        
+        m_rigidBody = gameObject.GetComponent<Rigidbody>();
+        m_renderComponent = gameObject.GetComponent<RenderComponent>();
     }
 
     public override void Update()
     { 
-        if (/*m_pickedUp*/m_rigidBody)
-            Debug.Log("PickupObjects thinks picked up");
     }
 
-    public void RPCDrop()
-    {
-        if (m_pickedUp)
-        {
-            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-            m_pickedUp = false;
-            transform.parent = null;
-        }
-    }
+    //public void RPCDrop()
+    //{
+    //    if (m_pickedUp)
+    //    {
+    //        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+    //        m_pickedUp = false;
+    //        transform.parent = null;
+    //    }
+    //}
 
+    //public void Pickup(GameObject gobj, Transform hand)
+    //{
+    //    m_rigidBody.enabled = false;
+    //    transform.parent = hand;
+    //    transform.localPosition = Vector3.Zero;
+    //}
 
+    //public override void OnLostOwnership()
+    //{
+    //    m_rigidBody.enabled = false;
+    //}
 }
