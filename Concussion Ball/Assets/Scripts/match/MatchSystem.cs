@@ -73,8 +73,10 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log("spawned ball!");
             Ball = Scene.FindNetworkObject(8008)?.gameObject;
-            if(!Ball)
+            if (!Ball)
+            {
                 Ball = NetworkInstantiate(BallPrefab, Vector3.Zero, Quaternion.Identity, ResponsiblePeer == LocalPeer, 8008);
+            }
             Ball.SetActive(false);
         }
         MatchStarted = true;

@@ -59,15 +59,13 @@ public class Team
                 case TEAM_TYPE.TEAM_1:
                 case TEAM_TYPE.TEAM_2:
                     player.gameObject.SetActive(true);
-                    if(player.isOwner)
-                        player.gameObject.transform.position = GetSpawnPosition();
+                    player.Respawn();
                     break;
             }
             player.Reset();
         });
         
     }
-
 
     public Vector3 GetSpawnPosition()
     {
