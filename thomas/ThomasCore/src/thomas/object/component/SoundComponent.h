@@ -33,9 +33,9 @@ namespace thomas
 				void SetLooping(bool looping);
 
 			public:
-				resource::AudioClip* GetClip();
-				float GetVolume();
-				bool IsLooping();
+				resource::AudioClip* GetClip() const;
+				float GetVolume() const;
+				bool IsLooping() const;
 
 			private:
 				resource::AudioClip* m_clip;

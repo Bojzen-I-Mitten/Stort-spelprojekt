@@ -12,17 +12,16 @@ public class SoundTest : ScriptComponent
     public override void Start()
     {
         Sound = gameObject.GetComponent<SoundComponent>();
-        Sound.Play();
+       // Sound.Play();
         //Sound.Play();
     }
 
     public override void Update()
     {
-        //if(Input.GetKey(Input.Keys.W))
-        //{
-        //    //Debug.Log("W");
-        //    Sound.PlayOneShot(Sound.clip.Name, Sound.Volume);
-        //}
+        if (Input.GetKeyDown(Input.Keys.W))
+        {
+            Sound.PlayOneShot();
+        }
 
     }
 }

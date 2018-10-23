@@ -68,13 +68,14 @@ namespace thomas
 
 			void SoundComponent::SetVolume(float volume)
 			{
-				// TODO: Set volume limit
-
-				m_volume = volume;
-
-				if (m_clip != nullptr)
+				if (volume <= 5.f && volume >= 0.f)
 				{
-					m_clip->GetSoundEffectInstance()->SetVolume(volume);
+					m_volume = volume;
+
+					if (m_clip != nullptr)
+					{
+						m_clip->GetSoundEffectInstance()->SetVolume(m_volume * Sound::GetMusicVolume());
+					}
 				}
 			}
 
@@ -83,17 +84,17 @@ namespace thomas
 				m_looping = looping;
 			}
 
-			resource::AudioClip* SoundComponent::GetClip()
+			resource::AudioClip* SoundComponent::GetClip() const
 			{
 				return m_clip;
 			}
 
-			float SoundComponent::GetVolume()
+			float SoundComponent::GetVolume() const
 			{
 				return m_volume;
 			}
 
-			bool SoundComponent::IsLooping()
+			bool SoundComponent::IsLooping() const
 			{
 				return m_looping;
 			}

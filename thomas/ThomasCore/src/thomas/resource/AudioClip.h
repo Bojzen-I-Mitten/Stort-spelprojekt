@@ -22,13 +22,11 @@ namespace thomas
 
 		public:
 			AudioClip(const std::string& file);
-			~AudioClip();
 
-			//SoundEffect* GetSoundEffect() const;
 			SoundEffectInstance* GetSoundEffectInstance() const;
 
 		private:
-			std::unique_ptr<SoundEffectInstance> m_soundEffectInstance;
+			SoundEffectInstance* m_soundEffectInstance;
 		};
 	}
 }
