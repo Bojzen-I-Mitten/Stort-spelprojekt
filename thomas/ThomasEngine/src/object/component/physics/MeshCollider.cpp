@@ -44,4 +44,14 @@ namespace ThomasEngine
 		else
 			((thomas::object::component::MeshCollider*)nativePtr)->SetMesh(nullptr);
 	}
+
+	bool MeshCollider::concave::get()
+	{
+		return ((thomas::object::component::MeshCollider*)nativePtr)->GetConcave();
+	}
+
+	void MeshCollider::concave::set(bool value)
+	{
+		((thomas::object::component::MeshCollider*)nativePtr)->SetConcave(value);
+	}
 }
