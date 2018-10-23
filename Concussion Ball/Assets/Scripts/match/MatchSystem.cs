@@ -31,7 +31,7 @@ public class MatchSystem : NetworkManager
         get { return NetworkManager.instance as MatchSystem; }
     }
 
-    bool hasScored = false;
+    public bool hasScored { get; private set; } = false;
 
     public MatchSystem() : base()
     {
@@ -90,17 +90,8 @@ public class MatchSystem : NetworkManager
     public void OnRoundStart()
     {
         ResetPlayers();
-        ResetBall();
+        Ball.GetComponent<Ball>().Reset();
         hasScored = false;
-    }
-
-    void ResetBall()
-    {
-        Ball.GetComponent<Ball>().RPCDrop();
-        Ball.SetActive(false);
-        Ball.SetActive(true);
-        if(Ball.GetComponent<NetworkIdentity>().Owner)
-            Ball.transform.position = new Vector3(0, 10, 0);
     }
 
     void ResetPlayers()
@@ -108,7 +99,6 @@ public class MatchSystem : NetworkManager
         foreach (var team in Teams)
         {
             team.Value.ResetPlayers();
-            
         }
     }
 

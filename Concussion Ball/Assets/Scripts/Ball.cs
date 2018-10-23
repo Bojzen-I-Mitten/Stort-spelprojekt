@@ -10,6 +10,7 @@ public class Ball : NetworkComponent
     RenderComponent rc;
     private float accumulator;
     private float chargeupTime;
+    public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
 
     private ParticleEmitter emitterElectricity1;
     private ParticleEmitter emitterElectricity2;
@@ -196,6 +197,8 @@ public class Ball : NetworkComponent
 
     public override void Update()
     {
+        if (transform.position.y < -5)
+            Reset();
     }
 
     public void Drop()
@@ -303,6 +306,30 @@ public class Ball : NetworkComponent
         transform.localPosition = Vector3.Zero;
     }
 
+    public void Reset()
+    {
+        RPCDrop();
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
+        if (isOwner)
+        {
+            Debug.Log("Resetting ball");
+            if (rigidbody != null)
+            {
+                rigidbody.enabled = false;
+                StartCoroutine(EnableRigidBody());
+            }
+            transform.localEulerAngles = new Vector3(0, 0, 0);
+            transform.localPosition = SpawnPoint;
+        }
+    }
+
+    private IEnumerator EnableRigidBody()
+    {
+        yield return null;
+        rigidbody.enabled = true;
+    }
+
     public override void OnLostOwnership()
     {
         rigidbody.enabled = false;
@@ -319,7 +346,6 @@ public class Ball : NetworkComponent
         {
             StopEmitting();
         }
-            
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
