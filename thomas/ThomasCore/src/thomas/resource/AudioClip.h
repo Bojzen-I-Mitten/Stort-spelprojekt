@@ -25,7 +25,6 @@ namespace thomas
 
 		private:
 			std::unique_ptr<DirectX::SoundEffect> m_data;
-			std::vector<std::unique_ptr<DirectX::SoundEffectInstance>> m_instances;
 		};
 	}
 }

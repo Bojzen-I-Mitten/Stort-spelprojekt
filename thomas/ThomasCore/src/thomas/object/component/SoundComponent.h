@@ -23,16 +23,16 @@ namespace thomas
 			{
 			public:
 				SoundComponent();
-				~SoundComponent();
+				~SoundComponent() = default;
 
-				bool SetClip(resource::AudioClip* clip);
-				resource::AudioClip* GetClip();
-				bool SetVolume(float volume);
-				float GetVolume();
-				bool Play();
-				bool PlayOneShot(std::string name, float volume);
+				void Play();
+				void PlayOneShot(std::string name, float volume);
 				void Pause();
 				void Resume();
+				void SetClip(resource::AudioClip* clip);
+				resource::AudioClip* GetClip();
+				void SetVolume(float volume);
+				float GetVolume();
 				void SetLooping(bool loop);
 				bool IsLooping();
 
