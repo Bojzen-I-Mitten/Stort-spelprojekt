@@ -12,7 +12,7 @@ public class SoundTest : ScriptComponent
     public override void Start()
     {
         Sound = gameObject.GetComponent<SoundComponent>();
-        Sound.PlayOneShot(Sound.clip.Name, Sound.Volume);
+        Sound.Play();
         //Sound.Play();
     }
 

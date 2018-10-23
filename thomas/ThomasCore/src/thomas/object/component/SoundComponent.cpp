@@ -1,4 +1,5 @@
 #include "SoundComponent.h"
+
 #include "../../Sound.h"
 #include "../../resource/AudioClip.h"
 
@@ -9,62 +10,77 @@ namespace thomas
 		namespace component
 		{
 			SoundComponent::SoundComponent() :
-			m_name(""),
-			m_volume(1),
-			m_looping(true)
+			m_looping(true),
+			m_clip(nullptr),
+			m_volume(1.f)
 			{
+			}
+
+			void SoundComponent::OnDisable()
+			{
+				Stop();
 			}
 
 			void SoundComponent::Play()
 			{
-				// Is the instance removed after the first play?
-				// Instance is never set
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Play(m_looping);
+					m_clip->GetSoundEffectInstance()->Play(m_looping);
 				}
 			}
 
-			void SoundComponent::PlayOneShot(std::string name, float volume)
+			void SoundComponent::PlayOneShot()
 			{
-				return Sound::Instance()->Play(name, volume);
+				if (m_clip != nullptr)
+				{
+					Sound::Play(m_clip->GetName(), m_volume);
+				}
+			}
+
+			void SoundComponent::Stop()
+			{
+				if (m_clip != nullptr)
+				{
+					m_clip->GetSoundEffectInstance()->Stop();
+				}
 			}
 
 			void SoundComponent::Pause()
 			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Pause();
+					m_clip->GetSoundEffectInstance()->Pause();
 				}
 			}
 
 			void SoundComponent::Resume()
 			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Resume();
+					m_clip->GetSoundEffectInstance()->Resume();
 				}
 			}
 
 			void SoundComponent::SetClip(resource::AudioClip* clip)
 			{
-				m_instance = clip->CreateInstance();
+				m_clip = clip;
+			}
 
-				if (m_instance)
-				{
-					m_instance->SetVolume(m_volume);
-				}
-				else
-				{
-					//Sound::LoadWaveBank(name);
-					//Sound::LoadWave(name);
+			void SoundComponent::SetVolume(float volume)
+			{
+				// TODO: Set volume limit
 
-					//m_instance = Sound::CreateInstance(name);
-					//m_instance->SetVolume(m_volume);
-					//m_name = name;
-					//return true;
-					//return false;
+				m_volume = volume;
+
+				if (m_clip != nullptr)
+				{
+					m_clip->GetSoundEffectInstance()->SetVolume(volume);
 				}
+			}
+
+			void SoundComponent::SetLooping(bool looping)
+			{
+				m_looping = looping;
 			}
 
 			resource::AudioClip* SoundComponent::GetClip()
@@ -72,28 +88,9 @@ namespace thomas
 				return m_clip;
 			}
 
-			void SoundComponent::SetVolume(float volume)
-			{
-				if (volume > 5)
-					return false;
-
-				m_volume = volume;
-				if (m_instance)
-				{
-					m_instance->SetVolume(volume * Sound::Instance()->GetMusicVolume());
-					
-				}
-				return true;
-			}
-
 			float SoundComponent::GetVolume()
 			{
 				return m_volume;
-			}
-
-			void SoundComponent::SetLooping(bool loop)
-			{
-				m_looping = loop;
 			}
 
 			bool SoundComponent::IsLooping()

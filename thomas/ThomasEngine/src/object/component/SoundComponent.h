@@ -16,8 +16,8 @@ namespace ThomasEngine
 	public:
 		SoundComponent();
 
-		bool Play();
-		bool PlayOneShot(String^ name, float volume);
+		void Play();
+		void PlayOneShot();
 		void Pause();
 		void Resume();
 

@@ -1,10 +1,12 @@
 #include "Sound.h"
+#include <AtlBase.h>
+#include <atlconv.h>
 
 // Note: could have a separate thread for audio updates?
 namespace thomas
 {
 	std::unique_ptr<AudioEngine> Sound::s_audioEngine;
-	std::map<std::string, Sound::SoundInfo> Sound::s_waves;
+	std::map<std::string, std::unique_ptr<SoundEffect>> Sound::s_waves;
 	float Sound::s_masterVolume;
 	float Sound::s_fxVolume;
 	float Sound::s_musicVolume;
@@ -50,50 +52,40 @@ namespace thomas
 		s_audioEngine->Resume();
 	}
 
-	void Sound::Play(const std::string& file)
+	void Sound::LoadSound(const std::string& name, const std::string& file)
+	{
+		s_waves.insert(std::make_pair(name, std::make_unique<SoundEffect>(s_audioEngine.get(), CA2W(file.c_str()))));
+	}
+
+	void Sound::Play(const std::string& name, float volume)
 	{
 		// Play a oneshot
-		if (s_waves.empty())
+		if (!s_waves.empty())
 		{
 			/*if (s_audioEngine->Reset())
 			{
 
 			}*/
 
-			auto& sound = GetSoundInfo(file);
-			sound.soundEffect->Play(s_masterVolume * s_fxVolume * sound.volume, sound.pitch, sound.pan);
+			GetSoundInfo(name)->Play(s_masterVolume * s_fxVolume * volume, 0.f, 0.f);
 		}
 	}
 
-	void Sound::LoadSound(const std::string& file)
+	std::unique_ptr<SoundEffectInstance> Sound::CreateInstance(const std::string& name, SOUND_EFFECT_INSTANCE_FLAGS flags)
 	{
-		SoundInfo info = { std::make_unique<SoundEffect>(s_audioEngine.get(), file.c_str()), 1.f, 0.f, 0.f };
-		s_waves.insert(std::make_pair(file, info));
-	}
-
-	void Sound::CreateInstance(const std::string& clipName, std::unique_ptr<SoundEffectInstance> instance, 
-							   SOUND_EFFECT_INSTANCE_FLAGS flags)
-	{
-		auto found = s_waves.find(clipName);
+		auto found = s_waves.find(name);
 
 #ifdef _DEBUG
 		assert(found != s_waves.end());
 #endif
 
-		// TODO: better error checking 
-		instance = s_waves.find(clipName)->second.soundEffect->CreateInstance(flags);
+		// TODO: Better error checking 
+		return found->second->CreateInstance(flags);
 	}
 
-	SoundEffect* Sound::GetSound(const std::string& file)
+	SoundEffect* Sound::GetSound(const std::string& name)
 	{
-		auto& sound = GetSoundInfo(file);
-		return sound.soundEffect.get();
-	}
-
-	float Sound::GetClipVolume(const std::string& file)
-	{
-		auto& sound = GetSoundInfo(file);
-		return sound.volume;
+		return GetSoundInfo(name);
 	}
 
 	void Sound::SetMasterVolume(float volume)
@@ -111,12 +103,6 @@ namespace thomas
 		s_musicVolume = volume;
 	}
 
-	void Sound::SetClipVolume(const std::string& file, float volume)
-	{
-		auto& sound = GetSoundInfo(file);
-		sound.volume = volume;
-	}
-
 	float Sound::GetMasterVolume()
 	{
 		return s_masterVolume;
@@ -132,15 +118,15 @@ namespace thomas
 		return s_fxVolume;
 	}
 
-	Sound::SoundInfo& Sound::GetSoundInfo(const std::string& file)
+	SoundEffect* Sound::GetSoundInfo(const std::string& name)
 	{
-		auto found = s_waves.find(file);
+		auto found = s_waves.find(name);
 
 #ifdef _DEBUG
 		assert(found != s_waves.end());
 #endif
 
-		// TODO: better error checking, but clips should never be removed during runtime
-		return found->second;
+		// TODO: Better error checking, but clips should never be removed during runtime
+		return found->second.get();
 	}
 }

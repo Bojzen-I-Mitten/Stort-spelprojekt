@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Resource.h"
-#include <vector>
 #include <memory>
 
 namespace DirectX
@@ -9,6 +8,9 @@ namespace DirectX
 	class SoundEffect;
 	class SoundEffectInstance;
 }
+
+using namespace DirectX;
+
 namespace thomas
 {
 	namespace resource
@@ -16,15 +18,17 @@ namespace thomas
 		class AudioClip : public Resource
 		{
 		private:
-			void OnChanged();
+			void OnChanged(); // Never used...?
 
 		public:
-			AudioClip(std::string path);
-			std::unique_ptr<DirectX::SoundEffectInstance> CreateInstance();
+			AudioClip(const std::string& file);
 			~AudioClip();
 
+			//SoundEffect* GetSoundEffect() const;
+			SoundEffectInstance* GetSoundEffectInstance() const;
+
 		private:
-			std::unique_ptr<DirectX::SoundEffect> m_data;
+			std::unique_ptr<SoundEffectInstance> m_soundEffectInstance;
 		};
 	}
 }

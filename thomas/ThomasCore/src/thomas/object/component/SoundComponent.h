@@ -3,11 +3,6 @@
 #include "Component.h"
 #include <memory>
 
-namespace DirectX 
-{
-	class SoundEffectInstance;
-}
-
 namespace thomas
 {
 	namespace resource
@@ -25,23 +20,27 @@ namespace thomas
 				SoundComponent();
 				~SoundComponent() = default;
 
+				virtual void OnDisable() override;
 				void Play();
-				void PlayOneShot(std::string name, float volume);
+				void PlayOneShot();
+				void Stop();
 				void Pause();
 				void Resume();
-				void SetClip(resource::AudioClip* clip);
-				resource::AudioClip* GetClip();
+
+			public:
+				void SetClip(resource::AudioClip* clip);		
 				void SetVolume(float volume);
+				void SetLooping(bool looping);
+
+			public:
+				resource::AudioClip* GetClip();
 				float GetVolume();
-				void SetLooping(bool loop);
 				bool IsLooping();
 
 			private:
-				std::string m_name;
+				resource::AudioClip* m_clip;
 				float m_volume;
 				bool m_looping;
-				resource::AudioClip* m_clip;
-				std::unique_ptr<DirectX::SoundEffectInstance> m_instance;
 			};
 		}
 	}

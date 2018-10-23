@@ -10,24 +10,24 @@ namespace ThomasEngine
 	SoundComponent::SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}
 	thomas::object::component::SoundComponent* SoundComponent::sound::get() { return (thomas::object::component::SoundComponent*)nativePtr; }
 
-	bool SoundComponent::Play()
+	void SoundComponent::Play()
 	{
-		return sound->Play();
+		sound->Play();
 	}
 
-	bool SoundComponent::PlayOneShot(String^ name, float volume)
+	void SoundComponent::PlayOneShot()
 	{
-		return sound->PlayOneShot(Utility::ConvertString(name), volume);
+		sound->PlayOneShot();
 	}
 
 	void SoundComponent::Pause()
 	{
-		return sound->Pause();
+		sound->Pause();
 	}
 
 	void SoundComponent::Resume()
 	{
-		return sound->Resume();
+		sound->Resume();
 	}
 
 	void SoundComponent::clip::set(AudioClip^ value)
