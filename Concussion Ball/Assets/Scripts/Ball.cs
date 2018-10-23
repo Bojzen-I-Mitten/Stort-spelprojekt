@@ -313,9 +313,9 @@ public class Ball : NetworkComponent
         gameObject.SetActive(true);
         if (isOwner)
         {
-            Debug.Log("Resetting ball");
             if (rigidbody != null)
             {
+                Debug.Log("Resetting ball");
                 rigidbody.enabled = false;
                 StartCoroutine(EnableRigidBody());
             }
