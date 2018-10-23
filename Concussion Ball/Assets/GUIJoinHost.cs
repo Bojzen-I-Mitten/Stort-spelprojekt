@@ -74,8 +74,9 @@ public class GUIJoinHost : ScriptComponent
                 MatchSystem.instance.TargetIP = IPText;
                 MatchSystem.instance.Init();
                 MatchSystem.instance.Connect();
-                Camera.enabled = false;
+
                 this.enabled = false;
+                ClearImagesAndText();
                 gameObject.GetComponent<GUISelectTeam>().enabled = true;
             }
             else
@@ -91,10 +92,10 @@ public class GUIJoinHost : ScriptComponent
         {
             if (PortText != "")
             {
-                //MatchSystem.instance.LocalPort = Convert.ToInt32(PortText);
-                //MatchSystem.instance.Init();
-                //MatchSystem.instance.Host();
-                //Camera.enabled = false;
+                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText);
+                MatchSystem.instance.Init();
+                MatchSystem.instance.Host();
+                
                 this.enabled = false;
                 ClearImagesAndText();
                 gameObject.GetComponent<GUISelectTeam>().enabled = true;
@@ -126,21 +127,11 @@ public class GUIJoinHost : ScriptComponent
         Vector2 viewPort = Camera.GetViewPort();
         Vector2 scale = viewPort / new Vector2(1920, 1080);
 
-        if (TextFont != null)
-        {
-            Camera.AddText("IPText", IPText, new Vector2(150, 150) * scale, new Vector2(1.0f) * scale, TextFont);
-            Camera.AddText("PortText", PortText, new Vector2(150, 250) * scale, new Vector2(1.0f) * scale, TextFont);
-        }
-        else
-        {
-            Camera.AddText("IPText", IPText, new Vector2(150, 150) * scale, new Vector2(1.0f) * scale);
-            Camera.AddText("PortText", PortText, new Vector2(150, 250) * scale, new Vector2(1.0f) * scale);
-        }
-
+        Camera.AddText("IPText", IPText, new Vector2(150, 150) * scale, new Vector2(1.0f) * scale);
+        Camera.AddText("PortText", PortText, new Vector2(150, 250) * scale, new Vector2(1.0f) * scale);
         Camera.AddText("IP", "IP, needed to join", new Vector2(160, 110) * scale, new Vector2(0.7f) * scale);
         Camera.AddText("Port", "PORT, needed for both host and join", new Vector2(160, 210) * scale, new Vector2(0.7f) * scale);
 
-        
         Camera.AddImage("Join", JoinBtn, new Vector2(600, 152) * scale, new Vector2(0.25f) * scale, true);
         Camera.AddImage("TextBoxIP", TextBox, new Vector2(150, 145) * scale, new Vector2(0.70f, 0.5f) * scale, 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
         Camera.AddImage("TextBoxPort", TextBox, new Vector2(150, 245) * scale, new Vector2(0.70f, 0.5f) * scale, 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);

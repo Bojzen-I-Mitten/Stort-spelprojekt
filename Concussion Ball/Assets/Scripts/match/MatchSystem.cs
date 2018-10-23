@@ -37,7 +37,7 @@ public class MatchSystem : NetworkManager
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
 
-        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.White);
+        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.Gray);
 
         Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
@@ -165,18 +165,30 @@ public class MatchSystem : NetworkManager
         return team;
     }
 
+    public void JoinTeam(TEAM_TYPE team)
+    {
+        NetworkPlayer np = Scene.Players[LocalPeer].gameObject.AddComponent<NetworkPlayer>();
+        np.JoinTeam(Teams[team]);
+        Scene.Players[LocalPeer].gameObject.SetActive(false);
+        OnMatchStart();
+        SendRPC(-2, "OnRoundStart");
+        OnRoundStart();
+    }
+
     protected override void OnPeerJoin(NetPeer peer)
     {
         //Disable the players gameObject and place in him team Spectator.
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
-        
-        int team = Scene.Players.Count % 2;
-        if(team == 0)
-            np.JoinTeam(Teams[TEAM_TYPE.TEAM_1]);
-        else
-            np.JoinTeam(Teams[TEAM_TYPE.TEAM_2]);
+
+        np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
+
+        //int team = Scene.Players.Count % 2;
+        //if(team == 0)
+        //    np.JoinTeam(Teams[TEAM_TYPE.TEAM_1]);
+        //else
+        //    np.JoinTeam(Teams[TEAM_TYPE.TEAM_2]);
 
         Scene.Players[peer].gameObject.SetActive(false);
         OnMatchStart();
