@@ -74,7 +74,11 @@ namespace ThomasEditor
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
+            ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
+            ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
 
+            menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
+            menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
 
         }
 
@@ -612,12 +616,18 @@ namespace ThomasEditor
 
         private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
         {
-            ThomasWrapper.ToggleEditorRendering();
+            MenuItem item = sender as MenuItem;
+            ThomasWrapper.RenderEditor = item.IsChecked;
+            Properties.Settings.Default.RenderEditor = item.IsChecked;
+            Properties.Settings.Default.Save();
         }
 
         private void MenuItem_TogglePhysicsDebug(object sender, RoutedEventArgs e)
         {
-            ThomasWrapper.TogglePhysicsDebug();
+            MenuItem item = sender as MenuItem;
+            ThomasWrapper.RenderPhysicsDebug = item.IsChecked;
+            Properties.Settings.Default.RenderPhysicsDebug = item.IsChecked;
+            Properties.Settings.Default.Save();
         }
 
 
