@@ -30,7 +30,7 @@ public class Team
         TeamType = type;
         _Score = 0;
         Name = name;
-        _Players = new List<NetworkPlayer>(4);
+        _Players = new List<NetworkPlayer>(50);
     }
 
     public void SetSpawnArea(TeamSpawn spawn) { _SpawnArea = spawn; }

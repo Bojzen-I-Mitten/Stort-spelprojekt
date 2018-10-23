@@ -92,9 +92,11 @@ namespace thomas
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
+#ifdef _DEBUG
 		if (!s_drawDebug)
 			return;
 		s_world->debugDrawWorld();
+#endif
 	}
 
 	void Physics::Destroy()
@@ -155,7 +157,9 @@ namespace thomas
 
 	btVector3 Physics::ToBullet(const math::Vector3 & vector)
 	{
-		return *(btVector3*)&vector;
+		//TODO: Fix this.
+		return btVector3(vector.x, vector.y, vector.z);
+		//return *(btVector3*)&vector;
 	}
 
 	math::Vector3 Physics::ToSimple(const btVector3 & vector)
