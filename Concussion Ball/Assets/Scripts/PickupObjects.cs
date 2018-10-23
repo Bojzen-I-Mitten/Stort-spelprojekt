@@ -7,8 +7,8 @@ using ThomasEngine.Network;
 
 public class PickupObjects : NetworkComponent
 {
-    Rigidbody m_rigidBody;
-    RenderComponent m_renderComponent;
+    private Rigidbody m_rigidBody;
+    private RenderComponent m_renderComponent;
 
     public bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
 
@@ -22,8 +22,9 @@ public class PickupObjects : NetworkComponent
     }
 
     public override void Update()
-    {
-        
+    { 
+        if (/*m_pickedUp*/m_rigidBody)
+            Debug.Log("PickupObjects thinks picked up");
     }
 
     public void RPCDrop()

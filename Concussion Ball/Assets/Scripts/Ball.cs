@@ -6,9 +6,6 @@ using ThomasEngine;
 using ThomasEngine.Network;
 public class Ball : PickupObjects
 {
-    private float accumulator;
-    private float chargeupTime;
-
     private ParticleEmitter emitterElectricity1;
     private ParticleEmitter emitterElectricity2;
     private ParticleEmitter emitterElectricity3;
@@ -22,7 +19,7 @@ public class Ball : PickupObjects
 
     private Rigidbody rigidbody;
     private RenderComponent renderComponent;
-    //public bool PickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
+    //public bool pickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
     public float chargeTimeCurrent;
     private float chargeTimeMax;
     private float electricityIntensifyerThreshold;

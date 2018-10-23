@@ -207,6 +207,7 @@ public class ChadControls : NetworkComponent
             //Throw stuff
             if (HasBall())
             {
+                Debug.Log("Yeah boi we gots the ball");
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
@@ -445,7 +446,7 @@ public class ChadControls : NetworkComponent
     public bool HasBall()
     {
         if (Ball)
-            return Ball.isOwner && Ball.PickedUp;
+            return Ball.isOwner && Ball.m_pickedUp;
         else
             return false;
     }
