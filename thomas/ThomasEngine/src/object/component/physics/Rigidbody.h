@@ -131,19 +131,6 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCenterOfmass(Utility::Convert(value)); }
 		}
 
-		[BrowsableAttribute(false)]
-		[Newtonsoft::Json::JsonIgnoreAttribute]
-		property Vector3 Position
-		{
-			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(value)); }
-		}
-
-		[BrowsableAttribute(false)]
-		[Newtonsoft::Json::JsonIgnoreAttribute]
-		property Quaternion Rotation
-		{
-			void set(Quaternion value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(value)); }
-		}
 
 		property float Damping
 		{

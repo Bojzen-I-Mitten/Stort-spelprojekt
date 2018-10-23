@@ -59,6 +59,7 @@ namespace ThomasEngine.Network
 
         public TransformSyncMode SyncMode { get; set; } = TransformSyncMode.SyncTransform;
 
+        public bool SyncParent { get; set; } = true;
 
         public void SetTarget(Transform newTarget)
         {
@@ -67,10 +68,10 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
-            PrevPosition = target.position;
-            PrevRotation = target.rotation;
-            PrevScale = target.scale;
-            TargetSyncPosition = target.position;
+            PrevPosition = target.localPosition;
+            PrevRotation = target.localRotation;
+            PrevScale = target.localScale;
+            TargetSyncPosition = target.localPosition;
 
             targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
             if (targetRigidbody)
@@ -90,7 +91,7 @@ namespace ThomasEngine.Network
 
             if (isOwner)
             {
-                isDirty = true;
+                isDirty = true;// HasMoved();
             }
 
             switch (SyncMode)
@@ -119,7 +120,7 @@ namespace ThomasEngine.Network
         {
             if (!isOwner && targetRigidbody)
             {
-                Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
+                Vector3 newVelocity = (TargetSyncPosition - target.localPosition) * InterpolateMovement / SendInterval;
                 targetRigidbody.LinearVelocity = newVelocity;
 
                 TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
@@ -131,18 +132,18 @@ namespace ThomasEngine.Network
             float diff = 0;
 
             //Check if position has changed
-            diff = Vector3.Distance(target.position, PrevPosition);
+            diff = Vector3.Distance(target.localPosition, PrevPosition);
 
             if (diff > LocalMovementThreshold)
                 return true;
 
             //check if rotation has changed
-            diff = Quaternion.Dot(target.rotation, PrevRotation) - 1.0f;
+            diff = Quaternion.Dot(target.localRotation, PrevRotation) - 1.0f;
             if (diff < -LocalRotationThreshold)
                 return true;
 
             //Check if scale has changed (temp)
-            diff = Vector3.Distance(target.scale, PrevScale);
+            diff = Vector3.Distance(target.localScale, PrevScale);
             if (diff > LocalMovementThreshold)
                 return true;
 
@@ -195,11 +196,11 @@ namespace ThomasEngine.Network
 
         private void WriteTransform(NetDataWriter writer)
         {
-            writer.Put(target.position);
+            writer.Put(target.localPosition);
 
-            writer.Put(target.rotation);
+            writer.Put(target.localRotation);
 
-            writer.Put(target.scale);
+            writer.Put(target.localScale);
 
             //PrevPosition = transform.position;
             //PrevRotation = transform.rotation;
@@ -256,12 +257,12 @@ namespace ThomasEngine.Network
             }
 
             TargetSyncPosition = reader.GetVector3();
-            target.rotation = reader.GetQuaternion();
-            target.scale = reader.GetVector3();
+            target.localRotation = reader.GetQuaternion();
+            target.localScale = reader.GetVector3();
 
             if (Vector3.Distance(TargetSyncPosition, target.position) > SnapThreshhold)
             {
-                target.position = TargetSyncPosition;
+                target.localPosition = TargetSyncPosition;
             }
         }
 
@@ -270,7 +271,7 @@ namespace ThomasEngine.Network
 
             if (!isOwner)
             {
-                target.position = Vector3.Lerp(target.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
+                target.localPosition = TargetSyncPosition;// Vector3.Lerp(target.localPosition, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
             }
         }
 
@@ -292,21 +293,19 @@ namespace ThomasEngine.Network
             }
 
             TargetSyncPosition = reader.GetVector3();
-            TargetSyncRotation = reader.GetQuaternion();
-            target.scale = reader.GetVector3();
-
+            target.localRotation = reader.GetQuaternion();
+            target.localScale = reader.GetVector3();
 
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
 
-            float dist = Vector3.Distance(target.position, TargetSyncPosition);
+            float dist = Vector3.Distance(target.localPosition, TargetSyncPosition);
             if (dist > SnapThreshhold || !targetRigidbody.enabled)
             {
-                targetRigidbody.Position = TargetSyncPosition;
-                targetRigidbody.Rotation = TargetSyncRotation;
+                target.localPosition = TargetSyncPosition;
                 targetRigidbody.LinearVelocity = TargetSyncLinearVelocity;
+                targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
             }
-            targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
         }
         #endregion
     }

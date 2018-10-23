@@ -141,13 +141,13 @@ namespace ThomasEngine.Network
             {
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
-                    OnPeerLeave(peer);
                     NetScene.RemovePlayer(peer);
+                    OnPeerLeave(peer);
                     Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:
-                    OnPeerLeave(peer);
                     NetScene.RemovePlayer(peer);
+                    OnPeerLeave(peer);
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:

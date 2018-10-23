@@ -48,8 +48,6 @@ namespace thomas
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				
-				this->setUserPointer(m_collider);
-
 				Physics::AddRigidBody(this);
 			}
 
@@ -58,7 +56,6 @@ namespace thomas
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				clearForces();
-				this->setUserPointer(nullptr);
 				Physics::RemoveRigidBody(this);				
 			}
 
@@ -240,20 +237,6 @@ namespace thomas
 			void Rigidbody::SetFriction(float friction)
 			{
 				m_friction = friction;
-			}
-
-			void Rigidbody::SetPosition(math::Vector3 position)
-			{
-				btTransform trans = this->getWorldTransform();
-				trans.setOrigin(Physics::ToBullet(position));
-				this->setWorldTransform(trans);
-			}
-
-			void Rigidbody::SetRotation(math::Quaternion rotation)
-			{
-				btTransform trans = this->getWorldTransform();
-				trans.setRotation(Physics::ToBullet(rotation));
-				this->setWorldTransform(trans);
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()
