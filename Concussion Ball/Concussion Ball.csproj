@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DissolveTest.cs" />
     <Compile Include="Assets\RpcTest.cs" />
     <Compile Include="Assets\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
