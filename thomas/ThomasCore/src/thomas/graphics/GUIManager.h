@@ -76,6 +76,7 @@ namespace thomas
 			void SetImageInteract(const std::string& id, bool interact);
 			bool OnImageClicked(const std::string& id);
 			bool OnImageHovered(const std::string& id);
+			void DeleteImage(const std::string& id);
 
 			// Text
 			void AddText(const std::string& id, const std::string& text, const Vector2& position, const Vector2& scale = Vector2(1.f),
@@ -86,6 +87,7 @@ namespace thomas
 			void SetTextScale(const std::string& id, const Vector2& scale);
 			void SetTextRotation(const std::string& id, float rotation);
 			void SetFont(const std::string& id, Font* font);
+			void DeleteText(const std::string& id);
 
 		private:
 			Image& GetImage(const std::string& id);
