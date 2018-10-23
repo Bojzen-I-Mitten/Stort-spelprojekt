@@ -3,6 +3,7 @@
 public class TeamSpawn : ScriptComponent
 {
     public TEAM_TYPE Team { get; set; }
+    public Vector3 Direction { get; set; }
     public override void Start()
     {
         MatchSystem.instance.FindTeam(Team).SetSpawnArea(this);
