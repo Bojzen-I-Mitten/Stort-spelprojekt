@@ -40,6 +40,7 @@ namespace ThomasEngine
 		virtual void FixedUpdate();
 		virtual void OnDrawGizmosSelected();
 		virtual void OnDrawGizmos();
+		virtual void OnParentDestroy(GameObject^ object) {};
 
 		virtual void OnCollisionEnter(Collider^ collider) {};
 		virtual void OnCollisionStay(Collider^ collider) {};

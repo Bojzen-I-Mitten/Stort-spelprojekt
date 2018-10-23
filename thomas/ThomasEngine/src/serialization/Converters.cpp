@@ -47,13 +47,16 @@ namespace ThomasEngine
 	{
 		JObject^ jo = gcnew JObject();
 		GameObject^ gameObject = (GameObject^)value;
-
 		if (gameObject->prefabPath) {
 			jo->Add("prefabPath", Resources::ConvertToThomasPath(gameObject->prefabPath));
-			
 		}
 		else
 		{
+			jo = JObject::FromObject(value);
+		}
+
+		/*
+			serializer->Serialize(writer, value,)
 			for each(System::Reflection::PropertyInfo^ prop in value->GetType()->GetProperties())
 			{
 				if (prop->CanRead && prop->CanWrite && prop->SetMethod)
@@ -66,8 +69,11 @@ namespace ThomasEngine
 					}
 				}
 			}
-		}
+		*/
+
 		jo->WriteTo(writer);
+
+
 
 	}
 
@@ -82,6 +88,11 @@ namespace ThomasEngine
 			
 			String^ path = jo->Value<String^>("prefabPath");
 			return Resources::LoadPrefab(Resources::ConvertToRealPath(path));
+		}
+		else if (jo->ContainsKey("$ref"))
+		{
+			System::Object^ o = serializer->ReferenceResolver->ResolveReference(serializer, jo->Value<String^>("$ref"));
+			return o;
 		}
 		else
 		{
@@ -128,12 +139,15 @@ namespace ThomasEngine
 
 	bool ComponentConverter::CanConvert(System::Type ^ objectType)
 	{
-		return ThomasEngine::Component::typeid->IsAssignableFrom(objectType);
+		bool isInherited = ThomasEngine::Component::typeid->IsAssignableFrom(objectType);
+		return isInherited;
 	}
 
 	void ComponentConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
-		throw gcnew System::NotImplementedException();
+		JObject^ jo = gcnew JObject();
+		jo = JObject::FromObject(value);
+		jo->WriteTo(writer);
 	}
 
 }

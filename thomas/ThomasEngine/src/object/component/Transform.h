@@ -27,6 +27,7 @@ namespace ThomasEngine
 		void Update() override;
 		bool IsChildOf(Transform^ _parent);
 		void OnDestroy() override;
+		void OnParentDestroy(GameObject ^ parented_object) override;
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
@@ -68,7 +69,7 @@ namespace ThomasEngine
 			Vector3 get();
 			void set(Vector3 value);
 		}
-		[Newtonsoft::Json::JsonPropertyAttribute(Order = 4)]
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 4, IsReference = true)]
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{

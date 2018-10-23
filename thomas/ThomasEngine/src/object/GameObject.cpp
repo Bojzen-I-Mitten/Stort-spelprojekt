@@ -64,7 +64,7 @@ namespace ThomasEngine {
 	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
-		return (thomas::object::GameObject*)nativePtr;
+		return reinterpret_cast<thomas::object::GameObject*>(nativePtr);
 	}
 
 	void GameObject::FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root)
@@ -147,8 +147,10 @@ namespace ThomasEngine {
 	{
 		for (int i = 0; i < m_components.Count; i++)
 		{
+			m_components[i]->OnParentDestroy(this);
+			m_components[i]->OnDisable();
 			m_components[i]->OnDestroy();
-			delete m_components[i];	// Begone you foul clr!!!!
+			delete m_components[i];	// Begone you foul Clr!!!!
 		}
 		m_components.Clear();
 	}

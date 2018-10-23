@@ -27,6 +27,7 @@ namespace ThomasEngine
 		{
 		public:
 			BoneTransformComponent();
+			[Newtonsoft::Json::JsonPropertyAttribute(IsReference = true)]
 			property GameObject^ AnimatedObject {
 				GameObject^ get();
 				void set(GameObject^ value);
@@ -37,6 +38,7 @@ namespace ThomasEngine
 				void set(System::String^ value);
 			}
 
+			void OnParentDestroy(GameObject^ relative) override;
 			void Awake() override;
 
 		private:

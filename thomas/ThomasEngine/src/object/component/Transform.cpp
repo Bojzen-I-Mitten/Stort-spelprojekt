@@ -52,6 +52,15 @@ namespace ThomasEngine
 		Transform^ oldParent = SwapParent(new_parent);
 		OnParentChanged(this, oldParent, new_parent);
 	}
+	void Transform::OnParentDestroy(GameObject^ parented_object)
+	{
+		// Loop children
+		for each (Transform^ t in children)
+		{
+			for each(Component^ c in t->m_gameObject->Components)
+				c->OnParentDestroy(parented_object);
+		}
+	}
 	void Transform::SetParent(Transform ^ new_parent, bool worldPositionStays)
 	{
 		if (new_parent == m_parent)

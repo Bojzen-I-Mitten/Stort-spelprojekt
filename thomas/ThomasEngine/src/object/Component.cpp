@@ -141,7 +141,7 @@ namespace ThomasEngine
 
 	void Component::Delete()
 	{
-		Disable();	// Disable first just in case
+		//Disable();	
 #ifdef _DEBUG
 		// Check successfull destruction
 		if(m_gameObject->Native->RemoveComponent(this->nativePtr))

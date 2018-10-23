@@ -28,6 +28,7 @@ namespace thomas
 
 				void SetBoneHash(uint32_t hash);
 				void SetReference(graphics::animation::IBlendTree *skel);
+				void ClearReference();
 				int GetBoneIndex();
 			protected:
 
