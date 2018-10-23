@@ -17,9 +17,7 @@ public class Ball : PickupObjects
     public Texture2D smokeTex { get; set; }
     public Texture2D fireTex { get; set; }
 
-    private Rigidbody rigidbody;
     private RenderComponent renderComponent;
-    //public bool pickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
     public float chargeTimeCurrent;
     private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
@@ -27,9 +25,10 @@ public class Ball : PickupObjects
 
     public override void Start()
     {
+        base.Start();
+
         chargeTimeMax = 4.0f;
         chargeTimeCurrent = 0.0f;
-        rigidbody = gameObject.GetComponent<Rigidbody>();
 
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
@@ -217,24 +216,6 @@ public class Ball : PickupObjects
     {
     }
 
-    public void Drop()
-    {
-        RPCDrop();
-        SendRPC("RPCDrop");
-        
-    }
-
-    // Move to PickupObjects
-    public void RPCDrop()
-    {
-        if (m_pickedUp)
-        {
-            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-            m_pickedUp = false;
-            transform.parent = null;
-        }
-    }
-
     public void ChargeColor()
     {
         emitterElectricity1.Emit = true;
@@ -260,29 +241,15 @@ public class Ball : PickupObjects
         
     }
 
-
-
-    public void Throw(Vector3 force)
+    public void BallThrow(Vector3 force)
     {
-        Debug.Log("Attempting to throw");
-        if (m_pickedUp)
-        {
-            Drop();
-            transform.position = transform.position + Vector3.Normalize(force) * 2;
-            rigidbody.AddForce(force, Rigidbody.ForceMode.Impulse);
-
-            Cleanup();
-            fireIntensityreThreshold = 0.6f;
-            emitterFire.Emit = true;
-            emitterSmoke.Emit = true;
-            EmitterExplosion();
-            
-            
-        }
+        Throw(force);
+        Cleanup();
     }
 
     public void Cleanup()
     {
+        Debug.Log("test ckeanup");
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;
@@ -297,38 +264,29 @@ public class Ball : PickupObjects
         ResetElectricityEmitters();
     }
     
-    // Move to PickupObjects
-    public void Pickup(GameObject gobj, Transform hand)
-    {
-        Debug.Log("Setting m_pickup to true, HasBall is true");
-        m_pickedUp = true;
-        rigidbody.enabled = false;
-        transform.parent = hand;
-        transform.localPosition = Vector3.Zero;
-    }
 
-    public override void OnLostOwnership()
-    {
-        rigidbody.enabled = false;
-    }
+    //public override void OnLostOwnership()
+    //{
+    //    m_rigidBody.enabled = false;
+    //}
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
-    {
-        float chargeTime = reader.GetFloat();
-        if (chargeTime > 0)
-        {
-            ChargeColor();
-        }
-        else if(chargeTime == 0 && chargeTimeCurrent > 0)
-        {
-            StopEmitting();
-        }
+    //public override void OnRead(NetPacketReader reader, bool initialState)
+    //{
+    //    float chargeTime = reader.GetFloat();
+    //    if (chargeTime > 0)
+    //    {
+    //        ChargeColor();
+    //    }
+    //    else if(chargeTime == 0 && chargeTimeCurrent > 0)
+    //    {
+    //        StopEmitting();
+    //    }
             
-    }
+    //}
 
-    public override bool OnWrite(NetDataWriter writer, bool initialState)
-    {
-        writer.Put(chargeTimeCurrent);
-        return true;
-    }
+    //public override bool OnWrite(NetDataWriter writer, bool initialState)
+    //{
+    //    writer.Put(chargeTimeCurrent);
+    //    return true;
+    //}
 }

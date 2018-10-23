@@ -56,6 +56,7 @@ namespace thomas
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				clearForces();
+				setUserPointer(nullptr);
 				Physics::RemoveRigidBody(this);				
 			}
 

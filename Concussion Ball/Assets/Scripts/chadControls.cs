@@ -70,7 +70,7 @@ public class ChadControls : NetworkComponent
     public float DiveTimer { get; private set; } = 0f;
     #endregion
 
-    private Quaternion FreeLookDirection;
+    //private Quaternion FreeLookDirection;
     Rigidbody rBody;
     Chadimations Animations;
     Ragdoll Ragdoll;
@@ -122,6 +122,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        //Debug.Log(State);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -198,6 +199,7 @@ public class ChadControls : NetworkComponent
             //Throw stuff
             if (HasBall())
             {
+                Debug.Log("Plaer has ball");
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
@@ -435,12 +437,13 @@ public class ChadControls : NetworkComponent
     {
         if (HasBall())
         {
-            Ball.Throw(Camera.transform.forward * ThrowForce);
+            Ball.BallThrow(Camera.transform.forward * ThrowForce);
         }
     }
 
     public void RPCPickup()
     {
+        Debug.Log("Entere RPC Pickup in chadcont");
         if (Ball)
             Ball.Pickup(gameObject, hand ? hand : transform);
         /*
@@ -452,9 +455,8 @@ public class ChadControls : NetworkComponent
 
     public bool HasBall()
     {
-        Debug.Log("HasBall: " + Ball.m_pickedUp);
         if (Ball)
-            return Ball.isOwner && Ball.m_pickedUp;
+            return Ball.isOwner && Ball.GetPickedUp();
         else
             return false;
     }
@@ -495,12 +497,14 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
+        Debug.Log("Recognizes there is a collision");
         if (isOwner)
         {
             if (Ball)
             {
                 if (collider.gameObject == Ball.gameObject)
                 {
+                    Debug.Log("Recognizes collision with ball");
                     if (Ball.transform.parent == null)
                     {
                         TakeOwnership(Ball.gameObject);
