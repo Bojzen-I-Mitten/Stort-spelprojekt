@@ -20,6 +20,7 @@ namespace thomas
 		static bool Init();
 		static void AddRigidBody(object::component::Rigidbody* rigidBody);
 		static bool RemoveRigidBody(object::component::Rigidbody* rigidBody);
+		static bool IsRigidbodyInWorld(object::component::Rigidbody* rigidBody);
 		static void UpdateRigidbodies();
 		static void Simulate();
 		static void DrawDebug(object::component::Camera* camera);
@@ -46,7 +47,7 @@ namespace thomas
 		static std::unique_ptr<btDefaultCollisionConfiguration> s_collisionConfiguration;
 		static std::unique_ptr<btCollisionDispatcher> s_dispatcher;
 		static std::unique_ptr<btBroadphaseInterface> s_broadPhase;
-		static std::unique_ptr<btSequentialImpulseConstraintSolver> s_solver;
+		static std::unique_ptr<btConstraintSolver> s_solver;
 		static std::unique_ptr<graphics::BulletDebugDraw> s_debugDraw;
 
 	private:

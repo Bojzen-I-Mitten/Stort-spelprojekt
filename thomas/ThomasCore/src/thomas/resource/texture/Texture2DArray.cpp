@@ -80,7 +80,7 @@ namespace thomas {
 			std::vector<byte*> initData;
 			for (Texture2D* tex : m_textures)
 			{
-				initData.push_back(tex->GetRawRGBAPixels());
+				initData.push_back(tex->GetRawBGRAPixels());
 			}
 
 			ID3D11Texture2D *textureInterface = nullptr;

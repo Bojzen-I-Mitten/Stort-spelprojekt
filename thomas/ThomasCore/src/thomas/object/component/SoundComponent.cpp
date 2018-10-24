@@ -1,110 +1,100 @@
 #include "SoundComponent.h"
+
 #include "../../Sound.h"
 #include "../../resource/AudioClip.h"
+
 namespace thomas
 {
 	namespace object
 	{
 		namespace component
 		{
-			SoundComponent::SoundComponent()
+			SoundComponent::SoundComponent() :
+			m_looping(true),
+			m_clip(nullptr),
+			m_volume(1.f)
 			{
-				m_name == "";
-				m_volume = 1;
-				m_looping = true;
 			}
 
-			SoundComponent::~SoundComponent()
+			void SoundComponent::OnDisable()
 			{
-
+				Stop();
 			}
 
-			bool SoundComponent::SetClip(resource::AudioClip* clip)
+			void SoundComponent::Play()
 			{
-				m_instance = clip->CreateInstance();
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->SetVolume(m_volume);
-					//m_name = name;
-					return true;
+					m_clip->GetSoundEffectInstance()->Play(m_looping);
 				}
-				else
+			}
+
+			void SoundComponent::PlayOneShot()
+			{
+				if (m_clip != nullptr)
 				{
-					////Sound::LoadWaveBank(name);
-					//Sound::LoadWave(name);
-
-					//m_instance = Sound::CreateInstance(name);
-					//m_instance->SetVolume(m_volume);
-					//m_name = name;
-					//return true;
-					//return false;
+					Sound::Play(m_clip->GetName(), m_volume);
 				}
-				return false;
 			}
 
-			resource::AudioClip* SoundComponent::GetClip()
+			void SoundComponent::Stop()
 			{
-				return m_clip;
-			}
-
-			bool SoundComponent::SetVolume(float volume)
-			{
-				if (volume > 5)
-					return false;
-				m_volume = volume;
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->SetVolume(volume*Sound::Instance()->GetMusicVolume());
-					
+					m_clip->GetSoundEffectInstance()->Stop();
 				}
-				return true;
-			}
-
-			float SoundComponent::GetVolume()
-			{
-				return m_volume;
-			}
-
-			bool SoundComponent::Play()
-			{
-				if (m_instance)
-				{
-					m_instance->Play(m_looping);
-					return true;
-				}
-				else
-					return false;
-				
-			}
-
-			bool SoundComponent::PlayOneShot(std::string name, float volume)
-			{
-				return true;
-				return Sound::Instance()->Play(name, volume);
 			}
 
 			void SoundComponent::Pause()
 			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Pause();
+					m_clip->GetSoundEffectInstance()->Pause();
 				}
 			}
 
 			void SoundComponent::Resume()
 			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Resume();
+					m_clip->GetSoundEffectInstance()->Resume();
 				}
 			}
 
-			void SoundComponent::SetLooping(bool loop)
+			void SoundComponent::SetClip(resource::AudioClip* clip)
 			{
-				m_looping = loop;
+				m_clip = clip;
 			}
 
-			bool SoundComponent::IsLooping()
+			void SoundComponent::SetVolume(float volume)
+			{
+				if (volume <= 5.f && volume >= 0.f)
+				{
+					m_volume = volume;
+
+					if (m_clip != nullptr)
+					{
+						m_clip->GetSoundEffectInstance()->SetVolume(m_volume * Sound::GetMusicVolume());
+					}
+				}
+			}
+
+			void SoundComponent::SetLooping(bool looping)
+			{
+				m_looping = looping;
+			}
+
+			resource::AudioClip* SoundComponent::GetClip() const
+			{
+				return m_clip;
+			}
+
+			float SoundComponent::GetVolume() const
+			{
+				return m_volume;
+			}
+
+			bool SoundComponent::IsLooping() const
 			{
 				return m_looping;
 			}

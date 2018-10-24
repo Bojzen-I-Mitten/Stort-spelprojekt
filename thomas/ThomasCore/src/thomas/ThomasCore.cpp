@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
+#include "editor\Editor.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
@@ -44,7 +45,7 @@ namespace thomas
 
 		resource::Texture2D::Init();
 		ThomasTime::Init();
-		Sound::Instance()->Init();
+		Sound::Init();
 		resource::Shader::Init();
 
 		resource::Material::Init();
@@ -70,7 +71,7 @@ namespace thomas
 		}
 
 		resource::Shader::Update();	
-		Sound::Instance()->Update();
+		Sound::Update();
 	}
 
 	void ThomasCore::Render()
@@ -117,7 +118,7 @@ namespace thomas
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
-		Sound::Instance()->Destroy();
+		Sound::Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
 		utils::D3D::Instance()->Destroy();
 
@@ -145,6 +146,21 @@ namespace thomas
 	uint32_t ThomasCore::Thread_Index()
 	{
 		return m_threadMap->Thread_Index();
+	}
+
+	void ThomasCore::OnStop()
+	{
+		graphics::Renderer::Instance()->ClearAllCommands();
+
+#ifdef _EDITOR
+		editor::Editor::GetEditor().OnEditorStop();
+#endif
+	}
+	void ThomasCore::OnPlay()
+	{
+#ifdef _EDITOR
+		thomas::editor::Editor::GetEditor().OnEditorPlay();
+#endif
 	}
 
 	resource::MemoryAllocation * ThomasCore::Memory()

@@ -137,10 +137,14 @@ namespace ThomasEngine
 
 	Matrix RenderSkinnedComponent::GetBoneMatrix(int boneIndex)
 	{
+		return GetLocalBoneMatrix(boneIndex) * gameObject->transform->world;
+	}
+	Matrix RenderSkinnedComponent::GetLocalBoneMatrix(int boneIndex)
+	{
 		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
 		thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
-		if((uint32_t)boneIndex < anim->boneCount())
-			return Utility::Convert(anim->getBoneOrientation(boneIndex)) * gameObject->transform->world;
+		if ((uint32_t)boneIndex < anim->boneCount())
+			return Utility::Convert(anim->getBoneOrientation(boneIndex));
 		else return Matrix::Identity;
 	}
 

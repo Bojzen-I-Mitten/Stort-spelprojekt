@@ -28,12 +28,15 @@
 #include "GUI\editor\GUI.h"
 #include "object\GameObject.h"
 #include "Debug.h"
+
 using namespace thomas;
 
 namespace ThomasEngine {
 
-
 	void ThomasWrapper::Start() {
+		Start(true);
+	}
+	void ThomasWrapper::Start(bool editor) {
 
 		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
 
@@ -51,11 +54,13 @@ namespace ThomasEngine {
 			Resources::LoadAll(Application::editorAssets);
 			Component::LoadExternalComponents();
 
-
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
-			ScriptingManger::Init();
-			Scene::CurrentScene = gcnew Scene("test");
+			if (editor) {
+				ScriptingManger::Init();
+				Scene::CurrentScene = gcnew Scene("test");
+			}
+
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			mainThread->Name = "Thomas Engine (Logic Thread)";
@@ -176,7 +181,7 @@ namespace ThomasEngine {
 				//Rendering
 				if (WindowManager::Instance())
 				{
-					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
+					if (WindowManager::Instance()->GetEditorWindow() && RenderEditor)
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
@@ -196,7 +201,7 @@ namespace ThomasEngine {
 					{
 						camera->Render();
 					}
-					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Input::Keys::F1)) {
+					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Keys::F1)) {
 						showStatistics = !showStatistics;
 					}
 				}
@@ -210,7 +215,7 @@ namespace ThomasEngine {
 						if(Monitor::IsEntered(g->m_componentsLock))
 							Monitor::Exit(g->m_componentsLock);
 					}
-					Stop();
+					IssueStop();
 				}	
 			}
 			finally
@@ -227,6 +232,10 @@ namespace ThomasEngine {
 					*/
 					thomas::graphics::LightManager::Update();
 					CopyCommandList();
+					
+					if (shouldStop)
+						Stop();
+					// Enter async. state 
 
 					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 					{
@@ -326,9 +335,7 @@ namespace ThomasEngine {
 	Guid selectedGUID;
 	void ThomasWrapper::Play()
 	{
-#ifdef _EDITOR
-		thomas::editor::Editor::GetEditor().OnEditorPlay();
-#endif
+		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
 		Scene::CurrentScene->Play();
 		playing = true;
@@ -342,16 +349,21 @@ namespace ThomasEngine {
 		return playing;
 	}
 
+	void ThomasWrapper::IssueStop()
+	{
+		shouldStop = true;
+	}
+	
 	void ThomasWrapper::Stop()
 	{
-#ifdef _EDITOR
-		thomas::editor::Editor::GetEditor().OnEditorStop();
-#endif
+		playing = false;
+		// Synced state
+		thomas::ThomasCore::Core().OnStop();
+
 		if (s_Selection->Count > 0)
 			selectedGUID = s_Selection[0]->m_guid;
 		else
 			selectedGUID = Guid::Empty;
-		playing = false;
 		Scene::RestartCurrentScene();
 		ThomasEngine::Resources::OnStop();
 		if (selectedGUID != Guid::Empty)
@@ -363,7 +375,12 @@ namespace ThomasEngine {
 		OnStopPlaying();
 
 		Debug::Log("Stopped...");
+		shouldStop = false;
 	}
+
+	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
+
+	void ThomasWrapper::RenderPhysicsDebug::set(bool value) { thomas::Physics::Physics::s_drawDebug = value; }
 
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
 
@@ -388,12 +405,4 @@ namespace ThomasEngine {
 		return inEditor;
 	}
 
-	void ThomasWrapper::ToggleEditorRendering()
-	{
-		renderingEditor = !renderingEditor;
-	}
-	void ThomasWrapper::TogglePhysicsDebug()
-	{
-		Physics::s_drawDebug = !Physics::s_drawDebug;
-	}
 }

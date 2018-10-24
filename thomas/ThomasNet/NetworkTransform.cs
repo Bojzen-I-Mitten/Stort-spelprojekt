@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,6 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
-
     public class NetworkTransform : NetworkComponent
     {
         Vector3 PrevPosition;
@@ -33,7 +33,22 @@ namespace ThomasEngine.Network
         Vector3 TargetSyncLinearVelocity;
         Vector3 TargetSyncAngularVelocity;
 
-        Rigidbody attachedRigidbody;
+        Rigidbody targetRigidbody;
+
+        Transform _target;
+        [Browsable(false)]
+        [Newtonsoft.Json.JsonIgnore]
+        public Transform target {
+            get {
+                if (!_target)
+                    _target = transform;
+                return _target;
+            }
+            set
+            {
+                _target = value;
+            }
+        }
 
         public enum TransformSyncMode
         {
@@ -44,20 +59,24 @@ namespace ThomasEngine.Network
 
         public TransformSyncMode SyncMode { get; set; } = TransformSyncMode.SyncTransform;
 
-        public bool SyncParent { get; set; } = true;
 
-        public override void Awake()
+        public void SetTarget(Transform newTarget)
         {
-            PrevPosition = transform.position;
-            PrevRotation = transform.rotation;
-            PrevScale = transform.scale;
-            TargetSyncPosition = transform.position;
+            _target = newTarget;
+        }
 
-            attachedRigidbody = gameObject.GetComponent<Rigidbody>();
-            if (attachedRigidbody)
+        public override void Start()
+        {
+            PrevPosition = target.position;
+            PrevRotation = target.rotation;
+            PrevScale = target.scale;
+            TargetSyncPosition = target.position;
+
+            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            if (targetRigidbody)
             {
-                TargetSyncLinearVelocity = attachedRigidbody.LinearVelocity;
-                TargetSyncAngularVelocity = attachedRigidbody.AngularVelocity;
+                TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
+                TargetSyncAngularVelocity = targetRigidbody.AngularVelocity;
             }
             else
             {
@@ -71,7 +90,7 @@ namespace ThomasEngine.Network
 
             if (isOwner)
             {
-                isDirty = HasMoved();
+                isDirty = true;
             }
 
             switch (SyncMode)
@@ -98,10 +117,10 @@ namespace ThomasEngine.Network
 
         void InterpolateRigidbody()
         {
-            if (!isOwner && attachedRigidbody)
+            if (!isOwner && targetRigidbody)
             {
-                Vector3 newVelocity = (TargetSyncPosition - transform.position) * InterpolateMovement / SendInterval;
-                attachedRigidbody.LinearVelocity = newVelocity;
+                Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
+                targetRigidbody.LinearVelocity = newVelocity;
 
                 TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
             }
@@ -112,25 +131,25 @@ namespace ThomasEngine.Network
             float diff = 0;
 
             //Check if position has changed
-            diff = Vector3.Distance(transform.position, PrevPosition);
+            diff = Vector3.Distance(target.position, PrevPosition);
 
             if (diff > LocalMovementThreshold)
                 return true;
 
             //check if rotation has changed
-            diff = Quaternion.Dot(transform.rotation, PrevRotation) - 1.0f;
+            diff = Quaternion.Dot(target.rotation, PrevRotation) - 1.0f;
             if (diff < -LocalRotationThreshold)
                 return true;
 
             //Check if scale has changed (temp)
-            diff = Vector3.Distance(transform.scale, PrevScale);
+            diff = Vector3.Distance(target.scale, PrevScale);
             if (diff > LocalMovementThreshold)
                 return true;
 
 
-            if (attachedRigidbody)
+            if (targetRigidbody)
             {
-                diff = attachedRigidbody.LinearVelocity.LengthSquared() - prevVelocity;
+                diff = targetRigidbody.LinearVelocity.LengthSquared() - prevVelocity;
                 if (diff > LocalVelocityThreshold)
                     return true;
             }
@@ -176,11 +195,11 @@ namespace ThomasEngine.Network
 
         private void WriteTransform(NetDataWriter writer)
         {
-            writer.Put(transform.position);
+            writer.Put(target.position);
 
-            writer.Put(transform.rotation);
+            writer.Put(target.rotation);
 
-            writer.Put(transform.scale);
+            writer.Put(target.scale);
 
             //PrevPosition = transform.position;
             //PrevRotation = transform.rotation;
@@ -192,12 +211,12 @@ namespace ThomasEngine.Network
         {
             WriteTransform(writer);
 
-            if (attachedRigidbody)
+            if (targetRigidbody)
             {
-                writer.Put(attachedRigidbody.LinearVelocity);
-                writer.Put(attachedRigidbody.AngularVelocity);
+                writer.Put(targetRigidbody.LinearVelocity);
+                writer.Put(targetRigidbody.AngularVelocity);
 
-                prevVelocity = attachedRigidbody.LinearVelocity.LengthSquared();
+                prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
             }
         }
 
@@ -237,12 +256,12 @@ namespace ThomasEngine.Network
             }
 
             TargetSyncPosition = reader.GetVector3();
-            transform.rotation = reader.GetQuaternion();
-            transform.scale = reader.GetVector3();
+            target.rotation = reader.GetQuaternion();
+            target.scale = reader.GetVector3();
 
-            if (Vector3.Distance(TargetSyncPosition, transform.position) > SnapThreshhold)
+            if (Vector3.Distance(TargetSyncPosition, target.position) > SnapThreshhold)
             {
-                transform.position = TargetSyncPosition;
+                target.position = TargetSyncPosition;
             }
         }
 
@@ -251,7 +270,7 @@ namespace ThomasEngine.Network
 
             if (!isOwner)
             {
-                transform.position = Vector3.Lerp(transform.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
+                target.position = Vector3.Lerp(target.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
             }
         }
 
@@ -259,7 +278,7 @@ namespace ThomasEngine.Network
         {
 
 
-            if (isOwner || !attachedRigidbody)
+            if (isOwner || !targetRigidbody)
             {
                 //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
                 reader.GetVector3();
@@ -273,19 +292,21 @@ namespace ThomasEngine.Network
             }
 
             TargetSyncPosition = reader.GetVector3();
-            transform.rotation = reader.GetQuaternion();
-            transform.scale = reader.GetVector3();
+            TargetSyncRotation = reader.GetQuaternion();
+            target.scale = reader.GetVector3();
+
 
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
 
-            float dist = Vector3.Distance(transform.position, TargetSyncPosition);
-            if (dist > SnapThreshhold || !attachedRigidbody.enabled)
+            float dist = Vector3.Distance(target.position, TargetSyncPosition);
+            if (dist > SnapThreshhold || !targetRigidbody.enabled)
             {
-                transform.position = TargetSyncPosition;
-                attachedRigidbody.LinearVelocity = TargetSyncLinearVelocity;
-                attachedRigidbody.AngularVelocity = TargetSyncAngularVelocity;
+                targetRigidbody.Position = TargetSyncPosition;
+                targetRigidbody.Rotation = TargetSyncRotation;
+                targetRigidbody.LinearVelocity = TargetSyncLinearVelocity;
             }
+            targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
         }
         #endregion
     }

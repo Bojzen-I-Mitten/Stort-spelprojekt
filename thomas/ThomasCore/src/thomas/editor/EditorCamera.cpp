@@ -214,9 +214,11 @@ namespace thomas
 			else
 				window->GetInput()->SetMouseMode(Input::MouseMode::POSITION_ABSOLUTE);
 
-			if (window->GetInput()->GetKeyDown(Input::Keys::F))
+			if (window->GetInput()->GetKeyDown(Keys::F))
 				SnapCameraToFocus();
 
+			if (window->GetInput()->GetKey(Keys::LeftShift))
+				m_manipulatorSnapping = true;
 
 			if (active)
 				MoveAndRotateCamera();
@@ -230,7 +232,7 @@ namespace thomas
 				if (!ImGuizmo::IsOver())
 				{
 					object::GameObject* gObj = FindClickedGameObject();
-					if (window->GetInput()->GetKey(Input::Keys::LeftControl))
+					if (window->GetInput()->GetKey(Keys::LeftControl))
 						ToggleObjectSelection(gObj);
 					else
 						SelectObject(gObj);
@@ -253,14 +255,12 @@ namespace thomas
 			else
 			{
 				// Allow manipulation of the gizmo if the game object is focused
-				if (window->GetInput()->GetKeyDown(Input::Keys::W))
+				if (window->GetInput()->GetKeyDown(Keys::W))
 					m_manipulatorOperation = ImGuizmo::OPERATION::TRANSLATE;
-				if (window->GetInput()->GetKeyDown(Input::Keys::R))
+				if (window->GetInput()->GetKeyDown(Keys::R))
 					m_manipulatorOperation = ImGuizmo::OPERATION::ROTATE;
-				if (window->GetInput()->GetKeyDown(Input::Keys::E))
+				if (window->GetInput()->GetKeyDown(Keys::E))
 					m_manipulatorOperation = ImGuizmo::OPERATION::SCALE;
-				if (window->GetInput()->GetKey(Input::Keys::LeftShift))
-					m_manipulatorSnapping = true;
 			}
 		}
 
@@ -321,7 +321,8 @@ namespace thomas
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
 				object::GameObject* gameObject = m_selectedObjects[i];
-				offsetMatrixes[i] = gameObject->m_transform->GetWorldMatrix() * parentMatrix.Invert();
+				math::Matrix world = gameObject->m_transform->GetWorldMatrix();
+				offsetMatrixes[i] = world * parentMatrix.Invert();
 			}
 
 			ImGuiIO& io = ImGui::GetIO();
@@ -432,7 +433,7 @@ namespace thomas
 
 			float speed = m_speed;
 			// Increase camera speed
-			if (window->GetInput()->GetKey(Input::Keys::LeftShift))
+			if (window->GetInput()->GetKey(Keys::LeftShift))
 				speed *= 4.0f;
 
 			// Allow the camera to move freely in the scene
@@ -442,17 +443,17 @@ namespace thomas
 
 			math::Vector3 translation;
 			// Key input
-			if (window->GetInput()->GetKey(Input::Keys::A))
+			if (window->GetInput()->GetKey(A))
 				translation -= right * ThomasTime::GetActualDeltaTime() * speed;
-			if (window->GetInput()->GetKey(Input::Keys::D))
+			if (window->GetInput()->GetKey(Keys::D))
 				translation += right * ThomasTime::GetActualDeltaTime() * speed;
-			if (window->GetInput()->GetKey(Input::Keys::W))
+			if (window->GetInput()->GetKey(Keys::W))
 				translation += forward * ThomasTime::GetActualDeltaTime() * speed;
-			if (window->GetInput()->GetKey(Input::Keys::S))
+			if (window->GetInput()->GetKey(Keys::S))
 				translation -= forward * ThomasTime::GetActualDeltaTime() * speed;
-			if (window->GetInput()->GetKey(Input::Keys::Q))
+			if (window->GetInput()->GetKey(Keys::Q))
 				translation -= up * ThomasTime::GetActualDeltaTime() * speed;
-			if (window->GetInput()->GetKey(Input::Keys::E))
+			if (window->GetInput()->GetKey(Keys::E))
 				translation += up * ThomasTime::GetActualDeltaTime() * speed;
 			// Scroll
 			m_transform->Translate(forward * ThomasTime::GetActualDeltaTime() * float(window->GetInput()->GetMouseScrollWheel()) * speed);
