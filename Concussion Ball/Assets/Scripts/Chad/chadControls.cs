@@ -209,6 +209,10 @@ public class ChadControls : NetworkComponent
                     ResetCamera();
                 }
             }
+            else if (PickedUpObject) // player is holding object that is not throwable
+            {
+                PickedUpObject.OnActivate();
+            }
 
             float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
             float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
@@ -460,9 +464,7 @@ public class ChadControls : NetworkComponent
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         if (initialState)
-        {
             writer.Put(PickedUpObject ? PickedUpObject.ID : -1);
-        }
         writer.Put((int)State);
         writer.Put(Direction);
         writer.Put(CurrentVelocity);
@@ -483,7 +485,6 @@ public class ChadControls : NetworkComponent
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
                 }
-
             }
             if (collider.gameObject.Name == PlayerPrefabName)
             {
@@ -497,7 +498,6 @@ public class ChadControls : NetworkComponent
                     StartCoroutine(StartRagdoll(5.0f, collider.gameObject.transform.forward * ImpactFactor));
                 }
             }
-            /*if collider.gameObject == Powerup.gameObject*/
         }
     }
 }

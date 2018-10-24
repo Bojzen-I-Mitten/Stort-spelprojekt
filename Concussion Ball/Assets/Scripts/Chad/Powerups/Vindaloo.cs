@@ -21,11 +21,13 @@ public class Vindaloo : Powerup
 
         // add more code here for what happens upon throw
         // in current state Chad will just throw like it would be the ball
+
+        Debug.Log("Throw vindaloo bois");
     }
 
     // if this is a non-throwable this function will be called
     public override void OnActivate()
     {
-        
+        Debug.Log("OnActivate vindaloo bois");
     }
 }

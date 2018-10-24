@@ -88,13 +88,19 @@ public class PickupableObject : NetworkComponent
 
     public void Pickup(ChadControls chad, Transform hand)
     {
-        // m_rigidBody.IsKinematic = false;
-        m_pickupable = false;
-        m_rigidBody.enabled = false;
-        transform.parent = hand;
-        transform.localPosition = Vector3.Zero;
-        chad.PickedUpObject = this;
-        _Chad = chad;
+        if(m_pickupable)
+        {
+            if(this.GetType() == typeof(Powerup))
+                m_pickupable = false;
+
+            m_rigidBody.IsKinematic = false;
+
+            m_rigidBody.enabled = false;
+            transform.parent = hand;
+            transform.localPosition = Vector3.Zero;
+            chad.PickedUpObject = this;
+            _Chad = chad;
+        }
     }
 
     public override void OnLostOwnership()

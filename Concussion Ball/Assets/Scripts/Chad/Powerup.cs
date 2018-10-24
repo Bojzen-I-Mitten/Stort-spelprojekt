@@ -10,7 +10,7 @@ public class Powerup : PickupableObject
     /* Powerup charge particle emitters
        Powerup charge particle textures*/
 
-    private RenderComponent m_renderComponent; // in case we want to alter material with charge up
+    protected RenderComponent m_renderComponent; // in case we want to alter material with charge up
     
     public override void Start()
     {
