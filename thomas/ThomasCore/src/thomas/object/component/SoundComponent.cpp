@@ -2,7 +2,7 @@
 
 #include "../../Sound.h"
 #include "../../resource/AudioClip.h"
-
+#include "../../ThomasTime.h"
 namespace thomas
 {
 	namespace object
@@ -23,18 +23,25 @@ namespace thomas
 				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
 			}
 
-			void SoundComponent::Play3D(const Vector3& listener, const Vector3& emitter)
+			void SoundComponent::Apply3D(const Vector3& listener, const Vector3& emitter)
 			{
+				// Update sound
 				if (m_clip != nullptr)
 				{
 					m_listener.SetPosition(listener);
 					m_audioEmitter.SetPosition(emitter);
-					
-					m_clip->GetSoundEffectInstance()->Apply3D(m_listener, m_audioEmitter);
+
+					m_clip->GetSoundEffectInstance()->Apply3D(m_listener, m_audioEmitter, false);
 				}
 			}
 
-			void SoundComponent::Play2D()
+			void SoundComponent::Update3D(const Vector3& listener, const Vector3& emitter)
+			{
+				m_listener.Update(listener, math::Vector3::Up, ThomasTime::GetDeltaTime());
+				m_audioEmitter.Update(emitter, math::Vector3::Up, ThomasTime::GetDeltaTime());
+			}
+
+			void SoundComponent::Play()
 			{
 				if (m_clip != nullptr)
 				{
@@ -42,7 +49,7 @@ namespace thomas
 				}
 			}
 
-			void SoundComponent::PlayOneShot2D()
+			void SoundComponent::PlayOneShot()
 			{
 				if (m_clip != nullptr)
 				{

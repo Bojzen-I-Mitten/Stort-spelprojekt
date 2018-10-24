@@ -1,5 +1,5 @@
 #pragma unmanaged
-#include <thomas\object\component\SoundComponent.h>
+#include <thomas/object/component/SoundComponent.h>
 
 #pragma managed
 #include "../../resource/AudioClip.h"
@@ -10,19 +10,24 @@ namespace ThomasEngine
 	SoundComponent::SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}
 	thomas::object::component::SoundComponent* SoundComponent::sound::get() { return (thomas::object::component::SoundComponent*)nativePtr; }
 
-	void SoundComponent::Play3D(Vector3^ listener, Vector3^ emitter)
+	void SoundComponent::Apply3D(Vector3 listener, Vector3 emitter)
 	{
-		//sound->Play3D(Utility::Convert(listener), Utility::Convert(emitter));
+		sound->Apply3D(Utility::Convert(listener), Utility::Convert(emitter));
 	}
 
-	void SoundComponent::Play2D()
+	void SoundComponent::Update3D(Vector3 listener, Vector3 emitter)
 	{
-		sound->Play2D();
+		sound->Update3D(Utility::Convert(listener), Utility::Convert(emitter));
 	}
 
-	void SoundComponent::PlayOneShot2D()
+	void SoundComponent::Play()
 	{
-		sound->PlayOneShot2D();
+		sound->Play();
+	}
+
+	void SoundComponent::PlayOneShot()
+	{
+		sound->PlayOneShot();
 	}
 
 	void SoundComponent::Stop()

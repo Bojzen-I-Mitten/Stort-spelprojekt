@@ -4,7 +4,7 @@
 #include "../../utils/Math.h"
 
 #include <memory>
-#include <include/DirectXTK/SoundCommon.h>
+#include "../../../../include/DirectXTK/Audio.h"
 
 using namespace DirectX;
 
@@ -28,9 +28,10 @@ namespace thomas
 				~SoundComponent() = default;
 
 				virtual void OnDisable() override;
-				void Play3D(const Vector3& listener, const Vector3& emitter);
-				void Play2D();
-				void PlayOneShot2D();
+				void Apply3D(const Vector3& listener, const Vector3& emitter);
+				void Update3D(const Vector3& listener, const Vector3& emitter);
+				void Play();
+				void PlayOneShot();
 				void Stop();
 				void Pause();
 				void Resume();

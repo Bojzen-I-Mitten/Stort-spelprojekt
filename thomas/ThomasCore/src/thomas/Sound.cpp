@@ -119,12 +119,6 @@ namespace thomas
 		{
 			GetSoundInfo(name).soundEffect->Play(s_masterVolume * s_fxVolume * volume, 0.f, 0.f);
 		}
-
-		//AudioListener listener; // Where is the listener, always the camera/player?
-		//AudioEmitter emitter; // Where is the sound source?
-	
-		
-		//SOUND_EFFECT_INSTANCE_FLAGS::SoundEffectInstance_Use3D
 	}
 
 	void Sound::SetMasterVolume(float volume)

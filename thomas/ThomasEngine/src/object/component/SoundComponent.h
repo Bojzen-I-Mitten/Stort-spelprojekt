@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Component.h"
-//#include "../../Utility.h"
 
 namespace thomas { namespace object { namespace component { class SoundComponent; } } }
 
@@ -17,9 +16,10 @@ namespace ThomasEngine
 	public:
 		SoundComponent();
 
-		void Play3D(Vector3^ listener, Vector3^ emitter);
-		void Play2D();
-		void PlayOneShot2D();
+		void Apply3D(Vector3 listener, Vector3 emitter);
+		void Update3D(Vector3 listener, Vector3 emitter);
+		void Play();
+		void PlayOneShot();
 		void Stop();
 		void Pause();
 		void Resume();
