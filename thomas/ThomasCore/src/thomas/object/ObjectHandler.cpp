@@ -6,23 +6,38 @@ namespace thomas
 {
 
 	std::vector<object::GameObject> ObjectHandler::m_objectsDynamic;
-	std::vector<object::GameObject> ObjectHandler::m_objectsInActive;
-	std::map<size_t, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
+
+	std::map<UINT, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
 
 	void ObjectHandler::Init()
 	{
 		m_objectsDynamic.reserve(1000);
-		m_objectsInActive.reserve(1000);
 	}
 
 	void ObjectHandler::ClearAll()
 	{
+		// Clean all the arrays, used when scene is emptied so that we don't get any
+		// Objects without pointers
 		for (auto& key : m_objectsStatic)
 		{
 			key.second.clear();
 		}
 
 		m_objectsDynamic.clear();
+	}
+
+	std::vector<object::GameObject>* ObjectHandler::GetDynamicObjectVector()
+	{
+		return &m_objectsDynamic;
+	}
+
+	std::vector<object::GameObject>* ObjectHandler::GetVectorGroup(UINT GroupID)
+	{
+		if (m_objectsStatic.find(GroupID) != m_objectsStatic.end())
+		{
+			return &m_objectsStatic[GroupID];
+		}
+		return nullptr;
 	}
 
 	object::GameObject * ObjectHandler::createNewGameObject(std::string name)
@@ -43,14 +58,21 @@ namespace thomas
 					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(type, std::vector<object::GameObject>()));
 					m_objectsStatic[type].reserve(1000);
 				}
+
+				// Move the object to it's new location
 				m_objectsStatic[type].push_back(std::move(*it));
 
+				// Fetch the old native pointer adress, this will be a dangeling pointer
+				// But it will be used to update the new adress of this object
 				moved = &m_objectsDynamic.back();
 
+				// Move the object at the back, to remove any holes in the array
 				*it = std::move(m_objectsDynamic.back());
 
+				// remove the now empty object at the back
 				m_objectsDynamic.pop_back();
 
+				// update the states of the object
 				m_objectsStatic[type].back().SetStatic(true);
 				m_objectsStatic[type].back().SetDynamic(false);
 
@@ -59,7 +81,7 @@ namespace thomas
 				editor::EditorCamera::Instance()->SelectObject(&m_objectsStatic[type].back());
 
 
-
+				// this is the new adress of the object
 				return &m_objectsStatic[type].back(); // We have moved it
 			}
 		}
@@ -80,6 +102,7 @@ namespace thomas
 			{
 				UINT new_GroupID = it->GetNewGroupID();
 
+				// If new key, allocate memory to avoid loss of objects when reallocation happens
 				if (m_objectsStatic.find(new_GroupID) == m_objectsStatic.end())
 				{
 					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(new_GroupID, std::vector<object::GameObject>()));

@@ -237,19 +237,23 @@ namespace ThomasEngine {
 						Stop();
 					// Enter async. state 
 
+					// This is only relevant if we are running with editor, should be removed when build
 					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
 					{
 						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
 
 						if (gameObject->MoveStaticGroup())
 						{
+							// Fetch the adress of where an object might be moved to
 							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
 
+							// Fetch the adress of the object that might be moved
 							thomas::object::Object* old_native = gameObject->moveStaticGroup();
 
+							// Find the wrapped gameobject of the object that might be moved
 							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
 
-							if (temp) // If temp is nullptr, no managed object has been invalidated.
+							if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
 								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
 						}
 
