@@ -60,7 +60,6 @@
     <ClCompile Include="src\resource\Font.cpp" />
     <ClCompile Include="src\system\SceneManager.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
-
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />

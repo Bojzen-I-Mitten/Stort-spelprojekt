@@ -11,6 +11,25 @@ namespace thomas
 		ID3D11ShaderResourceView*  const ComputeShader::s_nullSRVs[8]  = { NULL };
 		ID3D11ShaderResourceView*  const ComputeShader::s_nullSRV[1]   = { NULL };
 
+		ComputeShader::ComputeShader(ID3DX11Effect * effect, std::string path)
+			: Shader(effect, path)
+		{
+		}
+
+		ComputeShader::~ComputeShader()
+		{
+		}
+		std::unique_ptr<resource::ComputeShader> ComputeShader::CreateComputeShader(std::string path)
+		{
+			ID3DX11Effect* effect = NULL;
+			Compile(path, &effect);
+
+			std::unique_ptr < resource::ComputeShader> shader(new ComputeShader(effect, path));
+			if (shader->hasPasses())
+				LOG("Shader: " << path << " contains no techniques or passes");
+			return std::move(shader);
+		}
+
 		void ComputeShader::Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ)
 		{
 			//Bind();

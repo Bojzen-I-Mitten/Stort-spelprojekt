@@ -39,13 +39,5 @@ namespace ThomasEngine
 
 	void GameObjectManager::RemoveMarkedObjects()
 	{
-		for (int i = 0; i < m_nrActive; i++)
-		{
-			GameObject^ temp_object = m_activeObjects[i];
-			if (temp_object->m_isDestroyed)
-			{
-				temp_object->Destroy();
-			}
-		}
 	}
 }

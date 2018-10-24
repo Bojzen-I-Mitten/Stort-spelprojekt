@@ -37,6 +37,7 @@
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
+    <ClCompile Include="src\thomas\graphics\render\ShaderList.cpp" />
     <ClCompile Include="src\thomas\resource\Font.cpp" />
     <ClCompile Include="src\thomas\graphics\GUIManager.cpp" />
     <ClCompile Include="src\thomas\object\ObjectHandler.cpp" />
@@ -80,6 +81,7 @@
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\LinearAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
+    <ClCompile Include="src\thomas\utils\atomic\Synchronization.cpp" />
     <ClCompile Include="src\thomas\utils\Buffers.cpp" />
     <ClCompile Include="src\thomas\graphics\BulletDebugDraw.cpp" />
     <ClCompile Include="src\thomas\resource\Material.cpp" />
@@ -162,6 +164,7 @@
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
     <ClInclude Include="src\thomas\graphics\render\Frame.h" />
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
+    <ClInclude Include="src\thomas\graphics\render\ShaderList.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\object\ObjectHandler.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
@@ -199,6 +202,7 @@
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\StackAllocator.h" />
+    <ClInclude Include="src\thomas\utils\atomic\Synchronization.h" />
     <ClInclude Include="src\thomas\utils\Buffers.h" />
     <ClInclude Include="src\thomas\graphics\BulletDebugDraw.h" />
     <ClInclude Include="src\thomas\resource\Material.h" />

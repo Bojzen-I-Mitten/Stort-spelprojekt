@@ -49,10 +49,10 @@ namespace thomas
 			void SetActive(bool active);
 
 			bool GetDynamic();
-			void SetDynamic(bool state);
+			void SetDynamic();
 
 			bool GetStatic();
-			void SetStatic(bool state);
+			void SetStatic();
 
 			bool GetSelection();
 			void SetSelection(bool selected);
@@ -77,10 +77,9 @@ namespace thomas
 
 		private:
 			bool m_moveStaticGroup;
-			UINT new_GroupID;
+			UINT new_GroupID;	// Tmp id while waiting for frame end.
 			bool m_selected;
-			bool m_staticSelf;
-			bool m_dynamicSelf;
+			bool m_static;
 			UINT m_GroupID; 
 			static std::vector<GameObject*> s_gameObjects;
 		};

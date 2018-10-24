@@ -96,8 +96,6 @@ namespace ThomasEngine {
 
 		nativePtr = thomas::ObjectHandler::setStatic(nativePtr, moved);
 
-		((thomas::object::GameObject*)nativePtr)->SetStatic(true);
-
 		m_makeStatic = false;
 
 		return moved;
@@ -117,8 +115,6 @@ namespace ThomasEngine {
 		thomas::object::Object* moved;
 
 		nativePtr = thomas::ObjectHandler::setDynamic(nativePtr, moved);
-
-		((thomas::object::GameObject*)nativePtr)->SetDynamic(true);
 
 		m_makeDynamic = false;
 

@@ -48,6 +48,7 @@ namespace thomas
 
 	object::Object* ObjectHandler::setStatic(object::Object* object, object::Object*& moved)
 	{
+		int i = 0;
 		for (auto& it = m_objectsDynamic.begin(); it != m_objectsDynamic.end(); it++)
 		{
 			if (&(*it) == object)
@@ -55,26 +56,26 @@ namespace thomas
 				UINT type = it->GetGroupID();
 				if (m_objectsStatic.find(type) == m_objectsStatic.end())
 				{
-					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(type, std::vector<object::GameObject>()));
+					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >((size_t)type, std::vector<object::GameObject>()));
 					m_objectsStatic[type].reserve(1000);
 				}
 
 				// Move the object to it's new location
-				m_objectsStatic[type].push_back(std::move(*it));
+				object::GameObject *ptr = it._Ptr;
+				m_objectsStatic[type].push_back(std::move(*ptr));
 
 				// Fetch the old native pointer adress, this will be a dangeling pointer
 				// But it will be used to update the new adress of this object
 				moved = &m_objectsDynamic.back();
 
 				// Move the object at the back, to remove any holes in the array
-				*it = std::move(m_objectsDynamic.back());
-
+				if (ptr != &m_objectsDynamic.back())
+					*ptr = std::move(m_objectsDynamic.back());
 				// remove the now empty object at the back
 				m_objectsDynamic.pop_back();
 
 				// update the states of the object
-				m_objectsStatic[type].back().SetStatic(true);
-				m_objectsStatic[type].back().SetDynamic(false);
+				m_objectsStatic[type].back().SetStatic();
 
 				// Since we have to select the object to make it static, 
 				// We have to set the new object as the selected one
@@ -84,6 +85,7 @@ namespace thomas
 				// this is the new adress of the object
 				return &m_objectsStatic[type].back(); // We have moved it
 			}
+			i++;
 		}
 
 		// If we reach this branch, an error has occoured
@@ -121,7 +123,7 @@ namespace thomas
 
 				m_objectsStatic[new_GroupID].back().SetGroupID(new_GroupID);
 				m_objectsStatic[new_GroupID].back().SetMoveStaticGroup(false);
-				m_objectsStatic[new_GroupID].back().SetDynamic(false);
+				m_objectsStatic[new_GroupID].back().SetStatic();
 				return &m_objectsStatic[new_GroupID].back(); // We have moved it
 			}
 		}
@@ -145,8 +147,7 @@ namespace thomas
 
 				m_objectsStatic[type].pop_back();
 
-				m_objectsDynamic.back().SetStatic(false);
-				m_objectsDynamic.back().SetDynamic(true);
+				m_objectsDynamic.back().SetDynamic();
 
 				// Since we have to select the object to make it static, 
 				// We have to set the new object as the selected one

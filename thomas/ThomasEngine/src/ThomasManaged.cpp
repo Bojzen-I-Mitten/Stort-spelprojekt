@@ -79,7 +79,6 @@ namespace ThomasEngine {
 			if (true)
 			{
 				ScriptingManger::Init();
-				Scene::CurrentScene = gcnew Scene("test");
 			}
 #endif
 
@@ -272,16 +271,16 @@ namespace ThomasEngine {
 					ProcessCommand();
 					
 					// Enter async. state 
-
+#ifdef _EDITOR
 					// This is only relevant if we are running with editor, should be removed when build
-					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
-						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+						GameObject^ gameObject = CurrentScene->GameObjects[i];
 
 						if (gameObject->MoveStaticGroup())
 						{
 							// Fetch the adress of where an object might be moved to
-							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+							thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
 
 							// Fetch the adress of the object that might be moved
 							thomas::object::Object* old_native = gameObject->moveStaticGroup();
@@ -295,7 +294,7 @@ namespace ThomasEngine {
 
 						else if (gameObject->MakeStatic())
 						{
-							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+							thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
 
 							thomas::object::Object* old_native = gameObject->setStatic();
 
@@ -308,7 +307,7 @@ namespace ThomasEngine {
 
 						else if (gameObject->MakeDynamic())
 						{
-							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+							thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
 
 							thomas::object::Object* old_native = gameObject->setDynamic();
 
@@ -319,6 +318,7 @@ namespace ThomasEngine {
 						}
 
 					}
+#endif
 
 					RenderFinished->Reset();
 					UpdateFinished->Set();

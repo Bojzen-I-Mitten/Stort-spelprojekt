@@ -17,12 +17,6 @@ namespace ThomasEngine
 
 		static Shader^ Find(String^ name);
 
-		static void SetGlobalColor(String^ name, Color value);
-		static void SetGlobalFloat(String^ name, float value);
-		static void SetGlobalInt(String^ name, int value);
-		static void SetGlobalMatrix(String^ name, Matrix value);
-		static void SetGlobalVector(String^ name, Vector4 value);
-
 		//static void SetGlobalTexture(String^ name, Texture& value);
 
 		static void RecompileShaders();
