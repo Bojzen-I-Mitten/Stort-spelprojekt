@@ -7,18 +7,18 @@ using ThomasEngine;
 
 public class SoundTest : ScriptComponent
 {
-    //SoundComponent Gun;
+    SoundComponent Gun;
 
     public override void Start()
     {
-        //Gun = gameObject.GetComponent<SoundComponent>();
+        Gun = gameObject.GetComponent<SoundComponent>();
     }
 
     public override void Update()
     {
         if (Input.GetKeyDown(Input.Keys.W))
         {
-            //Gun.PlayOneShot();
+            Gun.PlayOneShot();
         }
     }
 }

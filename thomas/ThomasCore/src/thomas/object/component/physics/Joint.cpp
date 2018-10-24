@@ -199,7 +199,7 @@ namespace thomas
 			}
 			void Joint::OnEnable()
 			{
-				if (m_gameObject->GetComponent<Rigidbody>() != nullptr)
+				if (m_gameObject->GetComponent<Rigidbody>() != nullptr && m_connectedBody)
 				{
 					m_gameObject->GetComponent<Rigidbody>()->SetActivationState(ActivationState::Always_Active);
 					thomas::Physics::s_world->addConstraint(CreateConstraints(), m_collision);
