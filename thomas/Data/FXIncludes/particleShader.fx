@@ -27,7 +27,7 @@ RasterizerState Rasterizer
     DepthClipEnable = FALSE;
 };
 
-BlendState SrcAlphaBlend
+BlendState AlphaBlendstate
 {
     BlendEnable[0] = TRUE;
     SrcBlend = SRC_ALPHA;
@@ -39,7 +39,7 @@ BlendState SrcAlphaBlend
     RenderTargetWriteMask[0] = 0x0F;
 };
 
-BlendState AdditiveBlending
+BlendState AdditiveBlendstate
 {
     BlendEnable[0] = TRUE;
     SrcBlend = ONE;
@@ -96,7 +96,7 @@ technique11 Particles
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 1);
         SetRasterizerState(Rasterizer);
-        SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetBlendState(AlphaBlendstate, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
     pass AdditiveBlendPass
     {
@@ -105,6 +105,6 @@ technique11 Particles
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 1);
         SetRasterizerState(Rasterizer);
-        SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetBlendState(AdditiveBlendstate, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }

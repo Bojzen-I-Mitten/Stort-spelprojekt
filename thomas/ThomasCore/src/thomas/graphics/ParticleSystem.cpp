@@ -57,7 +57,7 @@ namespace thomas
 			m_calculateEmitCountCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/calculateEmitCountCS.fx");
 
 			//PARTICLE BUFFERS
-			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(InitParticleBufferStruct), 128, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(InitParticleBufferStruct), 32, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
 			m_bufferSpawnIndex =	std::make_unique<utils::buffers::Buffer>(nullptr, sizeof(int) * 4, D3D11_BIND_CONSTANT_BUFFER, DYNAMIC_BUFFER);
 
 			m_bufferUpdate =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
@@ -237,6 +237,7 @@ namespace thomas
 
 
 			resource::ComputeShader::UnbindAllUAVs();
+			resource::ComputeShader::UnbindAllSRVs();
 		}
 
 		void ParticleSystem::DrawParticles()

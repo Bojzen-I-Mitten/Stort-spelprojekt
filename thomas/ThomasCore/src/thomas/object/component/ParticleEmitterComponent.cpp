@@ -341,6 +341,7 @@ namespace thomas
 			{
 				if (blendState != m_blendState)
 				{
+					m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
 					m_blendState = blendState;
 					if (blendState == graphics::ParticleSystem::BLEND_STATE::ALPHA)
 					{
@@ -350,6 +351,7 @@ namespace thomas
 					{
 						m_particleSystem = graphics::ParticleSystem::GetGlobalAdditiveBlendingSystem();
 					}
+					m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(m_texture);
 				}
 			}
 
