@@ -10,14 +10,19 @@ namespace ThomasEngine
 	SoundComponent::SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}
 	thomas::object::component::SoundComponent* SoundComponent::sound::get() { return (thomas::object::component::SoundComponent*)nativePtr; }
 
-	void SoundComponent::Play()
+	void SoundComponent::Play3D(Vector3^ listener, Vector3^ emitter)
 	{
-		sound->Play();
+		//sound->Play3D(Utility::Convert(listener), Utility::Convert(emitter));
 	}
 
-	void SoundComponent::PlayOneShot()
+	void SoundComponent::Play2D()
 	{
-		sound->PlayOneShot();
+		sound->Play2D();
+	}
+
+	void SoundComponent::PlayOneShot2D()
+	{
+		sound->PlayOneShot2D();
 	}
 
 	void SoundComponent::Stop()

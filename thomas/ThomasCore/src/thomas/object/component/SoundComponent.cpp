@@ -12,16 +12,29 @@ namespace thomas
 			SoundComponent::SoundComponent() :
 			m_looping(true),
 			m_clip(nullptr),
-			m_volume(1.f)
+			m_volume(1.f),
+			m_audioEmitter(),
+			m_listener()
 			{
 			}
 
 			void SoundComponent::OnDisable()
 			{
-				Stop();
+				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
 			}
 
-			void SoundComponent::Play()
+			void SoundComponent::Play3D(const Vector3& listener, const Vector3& emitter)
+			{
+				if (m_clip != nullptr)
+				{
+					m_listener.SetPosition(listener);
+					m_audioEmitter.SetPosition(emitter);
+					
+					m_clip->GetSoundEffectInstance()->Apply3D(m_listener, m_audioEmitter);
+				}
+			}
+
+			void SoundComponent::Play2D()
 			{
 				if (m_clip != nullptr)
 				{
@@ -29,7 +42,7 @@ namespace thomas
 				}
 			}
 
-			void SoundComponent::PlayOneShot()
+			void SoundComponent::PlayOneShot2D()
 			{
 				if (m_clip != nullptr)
 				{
