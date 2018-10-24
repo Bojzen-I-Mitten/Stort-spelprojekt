@@ -24,7 +24,7 @@
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
     </UserControl.Resources>
 
-    <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible" HorizontalAlignment="Left" Width="300">
+    <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
