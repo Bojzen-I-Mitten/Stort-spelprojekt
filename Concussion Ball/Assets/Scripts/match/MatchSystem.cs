@@ -16,7 +16,6 @@ public enum TEAM_TYPE
 
 public class MatchSystem : NetworkManager
 {
-    [Newtonsoft.Json.JsonIgnore]
     public Dictionary<TEAM_TYPE, Team> Teams { get; set; }
 
     public GameObject BallPrefab { get; set; }

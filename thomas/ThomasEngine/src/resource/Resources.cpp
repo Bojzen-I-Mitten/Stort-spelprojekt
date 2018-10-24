@@ -14,6 +14,7 @@
 #include "../Debug.h"
 #include "../object/GameObject.h"
 #include "../serialization/Serializer.h"
+#include "../Time.h"
 #include "Font.h"
 using namespace System::Threading;
 namespace ThomasEngine
@@ -198,6 +199,8 @@ namespace ThomasEngine
 			}
 			else
 			{
+				float startTime = Time::ElapsedTime;
+				
 				Resource^ obj;
 				AssetTypes type = GetResourceAssetType(path);
 				try {
@@ -251,6 +254,9 @@ namespace ThomasEngine
 				{
 					resources[thomasPath] = obj;
 				}
+
+				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
+
 				return obj;
 			}
 

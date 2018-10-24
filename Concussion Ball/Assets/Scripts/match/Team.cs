@@ -7,6 +7,7 @@ using ThomasEngine.Network;
 using LiteNetLib;
 using System.ComponentModel;
 
+[Newtonsoft.Json.JsonObject]
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class Team
 {

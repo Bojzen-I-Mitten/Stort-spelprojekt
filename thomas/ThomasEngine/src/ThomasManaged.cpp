@@ -48,12 +48,13 @@ namespace ThomasEngine {
 		if (ThomasCore::Initialized())
 		{
 			Model::InitPrimitives();
-			Resources::LoadAll(Application::editorAssets);
+			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			if (editor) {
+				Resources::LoadAll(Application::editorAssets);
 				ScriptingManger::Init();
 				Scene::CurrentScene = gcnew Scene("test");
 			}
