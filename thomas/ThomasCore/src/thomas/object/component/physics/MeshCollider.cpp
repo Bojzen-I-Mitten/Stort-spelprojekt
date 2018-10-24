@@ -2,6 +2,7 @@
 #include "../../../resource/Model.h"
 #include <BulletCollision\CollisionShapes\btShapeHull.h>
 #include "../../../graphics/Mesh.h"
+#include "../../../ThomasCore.h"
 namespace thomas
 {
 
@@ -9,7 +10,7 @@ namespace thomas
 	{
 		namespace component
 		{
-			MeshCollider::MeshCollider() : Collider(new btConvexHullShape())
+			MeshCollider::MeshCollider() : Collider()
 			{
 			}
 			resource::Model * MeshCollider::GetMesh()
@@ -19,8 +20,45 @@ namespace thomas
 			void MeshCollider::SetMesh(resource::Model * value)
 			{
 				m_model = value;
+				RecalcCollider();
+			}
+			void MeshCollider::OnDrawGizmosSelected()
+			{
+				//((btConvexHullShape*)m_collisionShape)->get
+			}
+			void MeshCollider::SetConcave(bool value)
+			{
+				if (m_concave != value)
+				{
+					m_concave = value;
+					RecalcCollider();
+				}
+				
+			}
+			bool MeshCollider::GetConcave()
+			{
+				return m_concave;
+			}
+			void MeshCollider::RecalcCollider()
+			{
+				if (m_collisionObject)
+				{
+					delete m_collisionShape;
+					m_collisionShape = nullptr;
+				}
+				if(m_model)
+				{
+					if (m_concave)
+						CalculateConcave();
+					else
+						CalculateConvex();
+				}
+			}
+			void MeshCollider::CalculateConvex()
+			{
+				m_collisionShape = new btConvexHullShape();
 				btConvexHullShape* temp = new btConvexHullShape();
-				for (auto mesh : value->GetMeshes())
+				for (auto mesh : m_model->GetMeshes())
 				{
 
 					for (int i = 0; i < mesh->GetVertexCount(); i++)
@@ -31,8 +69,8 @@ namespace thomas
 				}
 				btShapeHull* hull = new btShapeHull(temp);
 				hull->buildHull(1.0f);
-			
-				
+
+
 				const btVector3* hullPtr = hull->getVertexPointer();
 				for (int i = 0; i < hull->numVertices(); i++)
 					((btConvexHullShape*)m_collisionShape)->addPoint(hullPtr[i], false);
@@ -42,10 +80,37 @@ namespace thomas
 
 				delete temp;
 				delete hull;
+
 			}
-			void MeshCollider::OnDrawGizmosSelected()
+			void MeshCollider::CalculateConcave()
 			{
-				//((btConvexHullShape*)m_collisionShape)->get
+
+				btTriangleIndexVertexArray* btModel = new btTriangleIndexVertexArray();
+				for (auto mesh : m_model->GetMeshes())
+				{
+
+					btVector3* vertices = new btVector3[mesh->GetVertexCount()];
+					for (int i = 0; i < mesh->GetVertexCount(); i++)
+					{
+						vertices[i] = (btVector3&)mesh->GetVertices().positions[i];
+					}
+
+					int triangleCount = mesh->GetIndexCount() > 0 ? mesh->GetIndexCount() : mesh->GetVertexCount();
+					triangleCount /= 3;
+
+					btIndexedMesh indexedMesh;
+					indexedMesh.m_numTriangles = triangleCount;
+					indexedMesh.m_numVertices = mesh->GetVertexCount();
+					indexedMesh.m_triangleIndexStride = 3 * sizeof(unsigned int);
+					indexedMesh.m_triangleIndexBase = (unsigned char*)mesh->GetIndices().data();
+					indexedMesh.m_vertexStride = sizeof(btVector3);
+					indexedMesh.m_vertexBase = (unsigned char*)vertices;
+					
+					
+					btModel->addIndexedMesh(indexedMesh);
+				}
+
+				m_collisionShape = new btBvhTriangleMeshShape(btModel, true, true);
 			}
 		}
 	}

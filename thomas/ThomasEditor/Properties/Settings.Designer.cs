@@ -94,5 +94,29 @@ namespace ThomasEditor.Properties {
                 this["Maximized"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RenderEditor {
+            get {
+                return ((bool)(this["RenderEditor"]));
+            }
+            set {
+                this["RenderEditor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RenderPhysicsDebug {
+            get {
+                return ((bool)(this["RenderPhysicsDebug"]));
+            }
+            set {
+                this["RenderPhysicsDebug"] = value;
+            }
+        }
     }
 }

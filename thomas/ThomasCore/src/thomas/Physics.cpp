@@ -31,14 +31,14 @@ namespace thomas
 		s_debugDraw = std::make_unique<graphics::BulletDebugDraw>();
 		//Set states
 		s_world->setGravity(btVector3(0, -9.82f, 0));
-		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_FastWireframe);
 		s_world->setDebugDrawer(s_debugDraw.get());
 
 		gContactStartedCallback = Physics::CollisionStarted;
 		gContactProcessedCallback = Physics::CollisionProcessed;
 		gContactEndedCallback = Physics::CollisionEnded;
 		
-		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
+		//s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 		return true;
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
