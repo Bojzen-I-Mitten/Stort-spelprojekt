@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Powerup.cs" />
     <Compile Include="Assets\Scripts\PickupObjects.cs" />
     <Compile Include="Assets\RpcTest.cs" />
     <Compile Include="Assets\ParticleComponentTest.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\Scripts\Chad\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

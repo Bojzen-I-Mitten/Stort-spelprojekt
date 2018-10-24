@@ -18,17 +18,12 @@ public class Ball : PickupObjects
     public Texture2D fireTex { get; set; }
 
     private RenderComponent renderComponent;
-    public float chargeTimeCurrent;
-    private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
     private float fireIntensityreThreshold;
 
     public override void Start()
     {
         base.Start();
-
-        chargeTimeMax = 4.0f;
-        chargeTimeCurrent = 0.0f;
 
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
@@ -241,15 +236,8 @@ public class Ball : PickupObjects
         
     }
 
-    public void BallThrow(Vector3 force)
-    {
-        Throw(force);
-        Cleanup();
-    }
-
     public void Cleanup()
     {
-        Debug.Log("test ckeanup");
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;

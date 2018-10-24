@@ -109,6 +109,7 @@ public class ChadControls : NetworkComponent
         }
         ThrowForce = BaseThrowForce;
 
+        Ball.m_throwable = true;
 
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
@@ -122,7 +123,6 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        //Debug.Log(State);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -197,16 +197,14 @@ public class ChadControls : NetworkComponent
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
-            if (HasBall())
+            if (HasObject())
             {
-                Debug.Log("Plaer has ball");
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
-                    Debug.Log("Changing state to throwing");
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
@@ -217,12 +215,12 @@ public class ChadControls : NetworkComponent
                 }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
-                    ChargeBall();
+                    ChargeObject();
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
                     State = STATE.CHADING;
-                    ThrowBall();
+                    ThrowObject();
                     ResetCharge();
                     ResetCamera();
                 }
@@ -239,7 +237,7 @@ public class ChadControls : NetworkComponent
                 //Regular cam
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasBall())
+            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasObject())
             {
                 //Throwing cam
                 ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
@@ -267,6 +265,7 @@ public class ChadControls : NetworkComponent
         ChargeTime = 0;
         Ball.chargeTimeCurrent = 0;
         Ball.StopEmitting();
+        Ball.Cleanup();
     }
     #endregion
 
@@ -424,26 +423,30 @@ public class ChadControls : NetworkComponent
 
     #endregion
 
-    private void ChargeBall()
+    private void ChargeObject()
     {
         ChargeTime += Time.DeltaTime;
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, 4);
-        Ball.chargeTimeCurrent = ChargeTime;
-        Ball.ChargeColor();
+
+        if(HasObject())
+        {
+            // if ball
+            Ball.chargeTimeCurrent = ChargeTime;
+            Ball.ChargeColor();
+            //else, has powerup
+        }
         ThrowForce = ChargeRate * ChargeTime;
     }
 
-    private void ThrowBall()
+    private void ThrowObject()
     {
-        if (HasBall())
-        {
-            Ball.BallThrow(Camera.transform.forward * ThrowForce);
-        }
+        //if hasball
+        Ball.Throw(Camera.transform.forward * ThrowForce);
+        //else, powerup.powerupthrow
     }
 
     public void RPCPickup()
     {
-        Debug.Log("Entere RPC Pickup in chadcont");
         if (Ball)
             Ball.Pickup(gameObject, hand ? hand : transform);
         /*
@@ -453,10 +456,11 @@ public class ChadControls : NetworkComponent
 
     }
 
-    public bool HasBall()
+    public bool HasObject()
     {
         if (Ball)
             return Ball.isOwner && Ball.GetPickedUp();
+        // else if (Power-up)
         else
             return false;
     }
@@ -486,7 +490,7 @@ public class ChadControls : NetworkComponent
     {
         if (initialState)
         {
-            writer.Put(HasBall());
+            writer.Put(HasObject());
         }
         writer.Put((int)State);
         writer.Put(Direction);
@@ -497,14 +501,12 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-        Debug.Log("Recognizes there is a collision");
         if (isOwner)
         {
             if (Ball)
             {
                 if (collider.gameObject == Ball.gameObject)
                 {
-                    Debug.Log("Recognizes collision with ball");
                     if (Ball.transform.parent == null)
                     {
                         TakeOwnership(Ball.gameObject);

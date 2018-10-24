@@ -47,7 +47,7 @@ namespace thomas
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
-				
+				setUserPointer(m_collider);
 				Physics::AddRigidBody(this);
 			}
 

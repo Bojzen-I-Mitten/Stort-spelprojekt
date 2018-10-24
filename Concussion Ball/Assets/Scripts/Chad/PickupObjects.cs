@@ -8,6 +8,10 @@ using ThomasEngine.Network;
 public class PickupObjects : NetworkComponent
 {
     public Rigidbody m_rigidBody;
+    public bool m_throwable = false;
+    public float chargeTimeCurrent;
+    public float chargeTimeMax { get; set; } = 4.0f;
+
     private RenderComponent m_renderComponent;
 
     private bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
@@ -16,6 +20,8 @@ public class PickupObjects : NetworkComponent
     {
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
+
+        chargeTimeCurrent = 0.0f;
     }
 
     public override void Update()
@@ -41,7 +47,6 @@ public class PickupObjects : NetworkComponent
     {
         RPCDrop();
         SendRPC("RPCDrop");
-
     }
 
     public void RPCDrop()
