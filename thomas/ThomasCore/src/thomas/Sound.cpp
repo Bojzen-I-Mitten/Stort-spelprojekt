@@ -58,11 +58,56 @@ namespace thomas
 		s_audioEngine->Resume();
 	}
 
+	void Sound::Suspend()
+	{
+		// Should be used if pausing a game -> resume
+		s_audioEngine->Suspend();
+	}
+
+	bool Sound::IsPlaying(const std::string & name)
+	{
+		if (!s_waves.empty())
+		{
+			if (GetSoundInfo(name).soundEffectInstance->GetState() == SoundState::PLAYING)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool Sound::IsPaused(const std::string& name)
+	{
+		if (!s_waves.empty())
+		{
+			if (GetSoundInfo(name).soundEffectInstance->GetState() == SoundState::PAUSED)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool Sound::HasStopped(const std::string& name)
+	{
+		if (!s_waves.empty())
+		{
+			if (GetSoundInfo(name).soundEffectInstance->GetState() == SoundState::STOPPED)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void Sound::LoadSound(const std::string& name, const std::string& file)
 	{
 		SoundInfo info;
 		info.soundEffect = std::make_unique<SoundEffect>(s_audioEngine.get(), CA2W(file.c_str()));
-		info.soundEffectInstance = info.soundEffect->CreateInstance(); // Default flag
+		info.soundEffectInstance = info.soundEffect->CreateInstance(SoundEffectInstance_Use3D);
 
 		s_waves.insert(std::make_pair(name, std::move(info)));
 	}
@@ -74,6 +119,12 @@ namespace thomas
 		{
 			GetSoundInfo(name).soundEffect->Play(s_masterVolume * s_fxVolume * volume, 0.f, 0.f);
 		}
+
+		//AudioListener listener; // Where is the listener, always the camera/player?
+		//AudioEmitter emitter; // Where is the sound source?
+	
+		
+		//SOUND_EFFECT_INSTANCE_FLAGS::SoundEffectInstance_Use3D
 	}
 
 	void Sound::SetMasterVolume(float volume)

@@ -35,6 +35,21 @@ namespace ThomasEngine
 		sound->Resume();
 	}
 
+	bool SoundComponent::IsPlaying()
+	{
+		return sound->IsPlaying();
+	}
+
+	bool SoundComponent::IsPaused()
+	{
+		return sound->IsPaused();
+	}
+
+	bool SoundComponent::HasStopped()
+	{
+		return sound->HasStopped();
+	}
+
 	void SoundComponent::clip::set(AudioClip^ value)
 	{
 		m_clip = value;

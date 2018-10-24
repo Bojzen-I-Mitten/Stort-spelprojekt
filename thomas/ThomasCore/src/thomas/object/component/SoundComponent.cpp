@@ -61,6 +61,36 @@ namespace thomas
 				}
 			}
 
+			bool SoundComponent::IsPlaying() const
+			{
+				if (m_clip != nullptr)
+				{
+					return Sound::IsPlaying(m_clip->GetName());	
+				}
+
+				return false;
+			}
+
+			bool SoundComponent::IsPaused() const
+			{
+				if (m_clip != nullptr)
+				{
+					return Sound::IsPaused(m_clip->GetName());
+				}
+
+				return false;
+			}
+
+			bool SoundComponent::HasStopped() const
+			{
+				if (m_clip != nullptr)
+				{
+					return Sound::HasStopped(m_clip->GetName());
+				}
+
+				return false;
+			}
+
 			void SoundComponent::SetClip(resource::AudioClip* clip)
 			{
 				m_clip = clip;

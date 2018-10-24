@@ -26,6 +26,9 @@ namespace thomas
 				void Stop();
 				void Pause();
 				void Resume();
+				bool IsPlaying() const;
+				bool IsPaused() const;
+				bool HasStopped() const;
 
 			public:
 				void SetClip(resource::AudioClip* clip);		

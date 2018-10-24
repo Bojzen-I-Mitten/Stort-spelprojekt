@@ -21,6 +21,9 @@ namespace ThomasEngine
 		void Stop();
 		void Pause();
 		void Resume();
+		bool IsPlaying();
+		bool IsPaused();
+		bool HasStopped();
 
 		property AudioClip^ clip
 		{
