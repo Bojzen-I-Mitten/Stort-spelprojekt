@@ -1,0 +1,28 @@
+{
+  "$id": "460",
+  "asset_path": "%THOMAS_ASSETS%\\Materials\\Field.mat",
+  "shader": {
+    "resourcePath": "%THOMAS_DATA%\\FXIncludes\\StandardShader.fx"
+  },
+  "properties": {
+    "$id": "461",
+    "color": {
+      "$id": "462",
+      "$type": "ThomasEngine.Color, ThomasMath",
+      "b": 255,
+      "g": 255,
+      "r": 255,
+      "a": 255
+    },
+    "diffuseTex": {
+      "resourcePath": "White Texture"
+    },
+    "normalTex": {
+      "resourcePath": "Normal Texture"
+    },
+    "smoothness": 16.0,
+    "specularTex": {
+      "resourcePath": "White Texture"
+    }
+  }
+}
