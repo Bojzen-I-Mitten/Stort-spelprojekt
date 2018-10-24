@@ -8,13 +8,11 @@ namespace thomas
 	std::vector<object::GameObject> ObjectHandler::m_objectsDynamic;
 	std::vector<object::GameObject> ObjectHandler::m_objectsInActive;
 	std::map<size_t, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
-	std::vector<object::GameObject> ObjectHandler::m_objectsWake;
 
 	void ObjectHandler::Init()
 	{
-		m_objectsDynamic.reserve(100);
-		m_objectsInActive.reserve(100);
-		m_objectsWake.reserve(100);
+		m_objectsDynamic.reserve(1000);
+		m_objectsInActive.reserve(1000);
 	}
 
 	object::GameObject * ObjectHandler::createNewGameObject(std::string name)
@@ -71,6 +69,13 @@ namespace thomas
 			if (&(*it) == object)
 			{
 				UINT new_GroupID = it->GetNewGroupID();
+
+				if (m_objectsStatic.find(new_GroupID) == m_objectsStatic.end())
+				{
+					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(new_GroupID, std::vector<object::GameObject>()));
+					m_objectsStatic[new_GroupID].reserve(1000);
+				}
+
 				m_objectsStatic[new_GroupID].push_back(std::move(*it));
 
 				moved = &m_objectsStatic[type].back();
@@ -83,6 +88,7 @@ namespace thomas
 
 				m_objectsStatic[new_GroupID].back().SetGroupID(new_GroupID);
 				m_objectsStatic[new_GroupID].back().SetMoveStaticGroup(false);
+				m_objectsStatic[new_GroupID].back().SetDynamic(false);
 				return &m_objectsStatic[new_GroupID].back(); // We have moved it
 			}
 		}
