@@ -15,6 +15,16 @@ namespace thomas
 		m_objectsInActive.reserve(1000);
 	}
 
+	void ObjectHandler::ClearAll()
+	{
+		for (auto& key : m_objectsStatic)
+		{
+			key.second.clear();
+		}
+
+		m_objectsDynamic.clear();
+	}
+
 	object::GameObject * ObjectHandler::createNewGameObject(std::string name)
 	{
 		m_objectsDynamic.push_back(std::move(object::GameObject(name)));

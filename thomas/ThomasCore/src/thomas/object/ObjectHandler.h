@@ -15,6 +15,7 @@ namespace thomas
 
 	public:
 		static void Init();
+		static void ClearAll();
 		static object::GameObject* createNewGameObject(std::string name);
 		static object::Object* setStatic(object::Object* object, object::Object*& moved);
 		static object::Object* moveStaticGroup(object::Object* object, object::Object*& moved);

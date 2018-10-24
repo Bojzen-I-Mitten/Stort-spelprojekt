@@ -1,6 +1,7 @@
 
 #pragma unmanaged
 #include <thomas/editor/EditorCamera.h>
+#include <thomas/object/ObjectHandler.h>
 
 #pragma managed
 #include "Utility.h"
@@ -135,6 +136,7 @@ namespace ThomasEngine
 			delete m_gameObjects[i];
 		m_gameObjects->Clear();
 
+		thomas::ObjectHandler::ClearAll();
 	}
 
 	void Scene::EnsureLoad()

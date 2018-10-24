@@ -211,6 +211,8 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++)
 			delete m_components[i];	// Begone you foul clr!!!!
 		m_components.Clear();
+
+
 	}
 
 	void GameObject::Destroy()

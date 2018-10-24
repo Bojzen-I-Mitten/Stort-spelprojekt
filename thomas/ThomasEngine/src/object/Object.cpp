@@ -1,10 +1,12 @@
 #pragma unmanaged
 #include <thomas\object\Object.h>
+#include <thomas\object\GameObject.h>
 #pragma managed
 #include "../Utility.h"
 #include "Object.h"
 #include "GameObject.h"
 #include "Component.h"
+
 namespace ThomasEngine
 {
 	Object::Object(thomas::object::Object* ptr)
@@ -23,7 +25,9 @@ namespace ThomasEngine
 		OnDestroy();
 		s_objects.Remove(this);
 		nativePtr->Destroy();
-		delete nativePtr;
+	
+		if(this->GetType() != GameObject::typeid)
+			delete nativePtr;
 	}
 	
 	void Object::Destroy()
