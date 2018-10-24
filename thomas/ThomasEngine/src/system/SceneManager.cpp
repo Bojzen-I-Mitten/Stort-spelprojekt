@@ -92,6 +92,11 @@ namespace ThomasEngine
 
 	bool SceneManager::LoadScene(System::String ^ fullPath)
 	{
+		return LoadScene(fullPath, false);
+	}
+
+	bool SceneManager::LoadScene(System::String ^ fullPath, bool isTemporary)
+	{
 		if (Monitor::TryEnter(m_loading_lock))
 		{
 			String^ t_name = Thread::CurrentThread->Name;
@@ -153,7 +158,6 @@ namespace ThomasEngine
 	{
 		if (Monitor::TryEnter(m_loading_lock))
 		{
-			// Only trigger if a scene is actually loaded
 			m_state = SceneManagerState::LoadingInProgress;
 			Scene^ scene = CreateEmpty();
 			SyncSceneSwap(scene);

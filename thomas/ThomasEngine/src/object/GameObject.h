@@ -23,7 +23,7 @@ namespace ThomasEngine
 		GameObject();
 		virtual ~GameObject();
 
-		void Delete();
+		System::Object^ m_componentsLock = gcnew System::Object();
 
 	internal:
 
@@ -33,8 +33,6 @@ namespace ThomasEngine
 
 		System::String^ prefabPath;
 
-		bool m_isDestroyed = false;
-		System::Object^ m_componentsLock = gcnew System::Object();
 
 		void SyncComponents();
 
@@ -59,17 +57,19 @@ namespace ThomasEngine
 	public:
 
 		GameObject(String^ name);
+
+		bool RemoveComponent(Component^ comp);
 		
 		static GameObject^ CreatePrefab();
+
+
+		virtual void Destroy() override;
 
 		property bool inScene {
 			bool get() {
 				return m_scene_id; // != 0
 			}
 		}
-
-		virtual void Destroy() override;
-
 		property bool activeSelf
 		{
 			bool get();

@@ -92,28 +92,41 @@ namespace ThomasEngine {
 	{
 		Monitor::Enter(m_componentsLock);
 
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->initialized && component->enabled) {
-				component->Update();
-				component->UpdateCoroutines();
+		try {
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->initialized && component->enabled) {
+					component->Update();
+					component->UpdateCoroutines();
+				}
 			}
-				
 		}
-		Monitor::Exit(m_componentsLock);
+		catch (Exception^ e) {
+			Debug::LogError("Updating component failed with exception: " + e->Message);
+		}
+		finally{
+			Monitor::Exit(m_componentsLock);
+		}
 	}
 
 	void GameObject::FixedUpdate()
 	{
-		Monitor::Enter(m_componentsLock);
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->initialized && component->enabled)
-				component->FixedUpdate();
+		try {
+			Monitor::Enter(m_componentsLock);
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->initialized && component->enabled)
+					component->FixedUpdate();
+			}
 		}
-		Monitor::Exit(m_componentsLock);
+		catch (Exception^ e) {
+			Debug::LogError("Fixed component update failed with exception: " + e->Message);
+		}
+		finally{
+			Monitor::Exit(m_componentsLock);
+		}
 	}
 
 
@@ -137,41 +150,39 @@ namespace ThomasEngine {
 		}
 		Monitor::Exit(m_componentsLock);
 	}
+	/* Delete component
+	*/
+	void deleteComp(GameObject^ obj, Component^ comp)
+	{
+		comp->OnParentDestroy(obj);
+		comp->OnDisable();
+		comp->OnDestroy();
+		delete comp;	// Begone you foul Clr!!!!
+	}
 
 	GameObject::~GameObject()
 	{
-		Delete();
-	}
-
-	void GameObject::Delete()
-	{
+		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
-		{
-			m_components[i]->OnParentDestroy(this);
-			m_components[i]->OnDisable();
-			m_components[i]->OnDestroy();
-			delete m_components[i];	// Begone you foul Clr!!!!
-		}
+			deleteComp(this, m_components[i]);
 		m_components.Clear();
+		Monitor::Exit(m_componentsLock);
 	}
-
+	bool GameObject::RemoveComponent(Component ^ comp)
+	{
+		bool success = false;
+		Monitor::Enter(m_componentsLock);
+		if (m_components.Remove(comp))
+		{
+			deleteComp(this, comp);
+			success = true;
+		}
+		Monitor::Exit(m_componentsLock);
+		return success;
+	}
 	void GameObject::Destroy()
 	{
-		
-		if (m_isDestroyed)
-			return;
-		ThomasWrapper::Selection->UnSelectGameObject(this);
-		m_isDestroyed = true;
-		
-		// Remove object
-		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
-		ThomasWrapper::CurrentScene->GameObjects->Remove(this);
-		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
-		// Destroy
-		Monitor::Enter(m_componentsLock);
-		Delete();
-		Monitor::Exit(m_componentsLock);
-		Object::Destroy();
+		throw gcnew System::InvalidOperationException("Not allowed to call destroy on GameObjects...");
 	}
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
@@ -185,11 +196,6 @@ namespace ThomasEngine {
 	{
 		if(!original){
 			Debug::LogError("Object to instantiate is null");
-			return nullptr;
-		}
-		if (original->m_isDestroyed)
-		{
-			Debug::LogError("Trying to instantiate destroyed object.");
 			return nullptr;
 		}
 		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());

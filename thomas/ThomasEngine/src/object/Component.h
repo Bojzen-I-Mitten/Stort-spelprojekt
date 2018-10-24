@@ -29,6 +29,7 @@ namespace ThomasEngine
 		
 		Component(thomas::object::component::Component* ptr);
 		virtual ~Component();
+
 		
 		void setGameObject(GameObject^ gObj);
 		virtual void OnGameObjectSet() {};
@@ -64,8 +65,6 @@ namespace ThomasEngine
 		bool awakened = false;
 
 	private:
-		/* Delete the object, does not consider GameObject reference. */
-		void Delete();
 		/* Set enabled state. */
 		void Enable();
 		/* Set disabled state. */

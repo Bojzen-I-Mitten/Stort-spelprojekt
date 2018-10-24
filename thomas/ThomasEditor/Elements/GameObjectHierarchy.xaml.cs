@@ -203,10 +203,7 @@ namespace ThomasEditor
                 if (e.OldItems != null)
                 {
                     foreach (GameObject oldItem in e.OldItems)
-                    {
-                        oldItem.Destroy();
                         DeleteObjectInTree(m_hierarchyNodes.ToList(), oldItem);
-                    }
                 }
             }));
 

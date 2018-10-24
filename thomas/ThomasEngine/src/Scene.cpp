@@ -13,6 +13,7 @@
 #include "Application.h"
 #include "Project.h"
 #include "serialization/Serializer.h"
+#include "ThomasSelection.h"
 
 namespace ThomasEngine
 {
@@ -55,6 +56,21 @@ namespace ThomasEngine
 	}
 
 
+	void Scene::DestroyObject(GameObject ^ object)
+	{
+
+		ThomasWrapper::Selection->UnSelectGameObject(object);
+
+		// Remove object
+		Monitor::Enter(m_gameObjectsLock);
+		m_gameObjects->Remove(object);
+		Monitor::Exit(m_gameObjectsLock);
+		// Destroy object
+		object->OnDestroy();
+		delete object;
+	}
+
+
 	void Scene::UnLoad()
 	{
 		for (int i = 0; i < m_gameObjects->Count; i++)
@@ -72,10 +88,8 @@ namespace ThomasEngine
 	{
 		Serializer::SerializeScene(this, path);
 
-		if (Application::currentProject && this->RelativeSavePath != path) {
+		if (Application::currentProject && this->RelativeSavePath != path) 
 			this->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
-			Application::currentProject->currentScenePath = m_relativeSavePath;
-		}
 			
 	}
 
@@ -101,9 +115,9 @@ namespace ThomasEngine
 			for (int i = 0; i < scene->GameObjects->Count; ++i)
 				scene->GameObjects[i]->nativePtr->SetName(Utility::ConvertString(scene->GameObjects[i]->Name));
 
-			scene->PostLoad();
 			if (Application::currentProject)
 				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
+			scene->PostLoad();            
 			scene->m_uniqueID = unique_id;
 		}
 		catch (Exception^ e) {

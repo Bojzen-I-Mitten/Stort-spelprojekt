@@ -36,6 +36,7 @@ namespace ThomasEngine {
 
 		void OnPlay();
 
+		void DestroyObject(GameObject^ object);
 
 		void InitGameObjects(bool playing);
 

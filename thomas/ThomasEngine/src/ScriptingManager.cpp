@@ -9,18 +9,9 @@ namespace ThomasEngine
 
 	void ScriptingManger::LoadAssembly()
 	{
-
-
-		String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
 		if (File::Exists(fsw->Path + "/Assembly.dll"))
 		{
 			scriptReloadStarted();
-			String^ currentSavePath;
-			if (ThomasWrapper::CurrentScene)
-			{
-				currentSavePath = ThomasWrapper::CurrentScene->RelativeSavePath;
-				ThomasWrapper::CurrentScene->SaveSceneAs(tempFile);
-			}
 
 			//Delete the temp pdb file in the obj folder. Prevents the application from locking this file.
 			if (File::Exists(objPath + "/Assembly.pdb"))
@@ -29,11 +20,34 @@ namespace ThomasEngine
 			array<Byte>^ bytes = File::ReadAllBytes(fsw->Path + "/Assembly.dll");
 			array<Byte>^ symbolBytes = File::ReadAllBytes(fsw->Path + "/Assembly.pdb");
 			assembly = Assembly::Load(bytes, symbolBytes);
+		}
+		//fsw->EnableRaisingEvents = true;
+		scriptReloadFinished();
+		shouldReload = false;
+
+	}
+	void ScriptingManger::ReloadAssembly(bool forceReload) {
+		if ((forceReload || shouldReload) &&								// Check if force reload
+			!ThomasWrapper::Thomas->SceneManagerRef->IsAsyncLoading())		// Ensure thomas is not in loading process
+		{
+			// Store current scene
+			String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "ThomasEditor/scene.tds");
+			String^ currentSavePath;
+			if (ThomasWrapper::CurrentScene)
+			{
+				currentSavePath = ThomasWrapper::CurrentScene->RelativeSavePath;
+				ThomasWrapper::CurrentScene->SaveSceneAs(tempFile);
+			}
+
+			// Reload assembly
+			LoadAssembly();
+
+			// Reload scene
 			if (ThomasWrapper::CurrentScene)
 			{
 				try
 				{
-					ThomasWrapper::Thomas->SceneManagerRef->LoadScene(tempFile);
+					ThomasWrapper::Thomas->SceneManagerRef->LoadScene(tempFile, true);
 					File::Delete(tempFile);
 				}
 				catch (Exception^ e) {
@@ -43,24 +57,11 @@ namespace ThomasEngine
 				ThomasWrapper::CurrentScene->RelativeSavePath = currentSavePath;
 			}
 		}
-		//fsw->EnableRaisingEvents = true;
-		scriptReloadFinished();
-		shouldReload = false;
-
-	}
-	void ScriptingManger::ReloadIfNeeded() {
-		if (shouldReload && !ThomasWrapper::IsLoading())
-			LoadAssembly();
 	}
 
 	void ScriptingManger::OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e)
 	{
 		fsw->EnableRaisingEvents = false;
-		//FileInfo^ fInfo = gcnew FileInfo(e->FullPath);
-		//while (IsFileLocked(fInfo)) {
-		//	Thread::Sleep(500);
-		//}
-		//Thread::Sleep(1000);
 		shouldReload = true;
 	}
 

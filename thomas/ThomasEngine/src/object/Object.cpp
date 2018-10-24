@@ -77,7 +77,6 @@ namespace ThomasEngine
 					list->Add((Object^)s_objects[i]);
 				}
 			}
-
 		}
 		return list;
 	}

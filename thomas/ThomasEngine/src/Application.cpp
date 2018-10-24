@@ -15,4 +15,6 @@ void ThomasEngine::Application::currentProject::set(ThomasEngine::Project^ value
 		ThomasWrapper::Thomas->SceneManagerRef->LoadScene(m_currentProject->assetPath + "\\" + m_currentProject->currentScenePath);
 	else
 		ThomasWrapper::Thomas->SceneManagerRef->SetEmpty();
+
+
 }

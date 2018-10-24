@@ -22,11 +22,7 @@ namespace ThomasEngine
 		static event ScriptReloadBegin^ scriptReloadStarted;
 		delegate void ScriptReloadEnded();
 		static event ScriptReloadEnded^ scriptReloadFinished;
-
-		static void ForceReload() {
-			shouldReload = true;
-		}
-
+	
 		static void Init() {
 			
 			fsw = gcnew FileSystemWatcher();
@@ -74,9 +70,17 @@ namespace ThomasEngine
 			return false;
 		}
 
-		static void ReloadIfNeeded();
+		/* Reload assembly
+		forceReload	<<	Don't care if necessary or not
+		*/
+		static void ReloadAssembly(bool forceReload);
 
-		static void LoadAssembly();
 		static void OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e);
+
+	internal:
+
+		/* Load new assembly (call ReloadAssembly if not initiating new assembly)
+		*/
+		static void LoadAssembly();
 	};
 }

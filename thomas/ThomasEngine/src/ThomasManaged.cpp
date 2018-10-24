@@ -48,8 +48,10 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::Start() 
 	{
-		// System initialization
+		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
+		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
+		// System initialization
 		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
 
@@ -73,14 +75,20 @@ namespace ThomasEngine {
 			ScriptingManger::Init();
 			Thomas->m_scene->LogicThreadClearScene();
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
-			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
-			mainThread->Name = "Thomas Engine (Logic Thread)";
-			mainThread->Start();
+			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
+			logicThread->Name = "Thomas Engine (Logic Thread)";
+			logicThread->Start();
 
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
 		}
+	}
+
+	void ThomasWrapper::MainThreadUpdate()
+	{
+		if (!playing)
+			ScriptingManger::ReloadAssembly(false);
 	}
 
 
@@ -233,14 +241,6 @@ namespace ThomasEngine {
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
-				if (playing) {
-					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
-					{
-						GameObject^ g = CurrentScene->GameObjects[i];
-						if(Monitor::IsEntered(g->m_componentsLock))
-							Monitor::Exit(g->m_componentsLock);
-					}
-				}	
 			}
 			finally
 			{
@@ -265,8 +265,9 @@ namespace ThomasEngine {
 					UpdateFinished->Set();
 				}
 				Monitor::Exit(lock);
-				if(!playing)
-					ScriptingManger::ReloadIfNeeded();
+				mainThreadDispatcher->BeginInvoke(
+					System::Windows::Threading::DispatcherPriority::Normal,
+					gcnew MainThreadDelegate(MainThreadUpdate));
 			}
 		}
 		Resources::UnloadAll();
@@ -348,7 +349,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::StopPlay()
 	{
 		
-		playing = RunningState::Loading;
+		playing = RunningState::UnInitialized;
 		// Synced state
 		thomas::ThomasCore::Core().OnStop();
 
@@ -390,12 +391,7 @@ namespace ThomasEngine {
 	{
 		return playing == RunningState::Running;
 	}
-
-	bool ThomasWrapper::IsLoading()
-	{
-		return playing == RunningState::Loading;
-	}
-
+	
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
 
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)

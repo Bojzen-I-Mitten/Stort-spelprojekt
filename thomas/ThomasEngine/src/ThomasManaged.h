@@ -15,7 +15,7 @@ namespace ThomasEngine {
 	{
 		Editor,
 		Running,
-		Loading
+		UnInitialized
 	};
 	enum ThomasStateCommand
 	{
@@ -36,13 +36,21 @@ namespace ThomasEngine {
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
 		static bool renderingEditor = true;
-		static Thread^ mainThread;
+		static RunningState playing = RunningState::UnInitialized;
+		
+		/* Threading
+		*/
+		static Thread^ logicThread;
 		static Thread^ renderThread;
-		static RunningState playing = RunningState::Loading;
+		static System::Windows::Threading::Dispatcher^ mainThreadDispatcher;
+		delegate void MainThreadDelegate();
+
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
 		static ManualResetEvent^ StateCommandProcessed;
 		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
+
+
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
 
@@ -61,6 +69,7 @@ namespace ThomasEngine {
 
 
 		static void Start();
+		static void MainThreadUpdate();
 		static void StartRenderer();
 
 	public:	// Static sys
@@ -104,7 +113,6 @@ namespace ThomasEngine {
 		static Guid selectedGUID;
 
 		static bool IsPlaying();
-		static bool IsLoading();
 		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 

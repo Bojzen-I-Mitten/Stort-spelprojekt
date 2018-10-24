@@ -69,6 +69,7 @@ namespace ThomasEngine
 		/* Load scene asynchronous
 		*/
 		bool LoadScene(System::String^ fullPath);
+		bool LoadScene(System::String^ fullPath, bool isTemporary);
 		bool NewScene(System::String^ fullPath);
 
 

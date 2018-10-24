@@ -271,8 +271,7 @@ namespace ThomasEditor
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
                 ThomasWrapper.Selection.UnSelectGameObject(gObj);
-                gObj.Destroy();
-                //i--;
+                ThomasWrapper.CurrentScene.DestroyObject(gObj);
             }
         }
 
@@ -590,8 +589,6 @@ namespace ThomasEditor
             }));
             worker.SetApartmentState(ApartmentState.STA);
             worker.Start();
-            
-            //ScriptingManger.LoadAssembly();
         }
 
         private void __layoutRoot_PropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -21,8 +21,24 @@ namespace ThomasEngine
 	}
 	Component::~Component()
 	{
-		Delete();
+		//Disable();	
+#ifdef _DEBUG
+		// Check successfull destruction
+		if (m_gameObject->Native->RemoveComponent(this->nativePtr))
+			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
+#else
+		// Don't care
+		m_gameObject->Native->RemoveComponent(this->nativePtr);
+#endif
+		StopAllCoroutines();
 	}
+
+	void Component::Destroy()
+	{
+		throw gcnew System::InvalidOperationException("Can't destroy components directly");
+	}
+
+
 
 	void Component::Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
 	void Component::Start() {}
@@ -122,35 +138,9 @@ namespace ThomasEngine
 	void Component::setGameObject(GameObject ^ gObj)
 	{
 		m_gameObject = gObj;
-
 		((thomas::object::component::Component*)nativePtr)->m_gameObject = (thomas::object::GameObject*)gObj->nativePtr;
 		((thomas::object::GameObject*)m_gameObject->nativePtr)->m_components.push_back(((thomas::object::component::Component*)nativePtr));
 		OnGameObjectSet();
-	}
-
-
-	void Component::Destroy()
-	{
-		Monitor::Enter(m_gameObject->m_componentsLock);
-		m_gameObject->Components->Remove(this);
-		Delete();
-		Monitor::Exit(m_gameObject->m_componentsLock);
-		// Destroy the object
-		Object::Destroy();
-	}
-
-	void Component::Delete()
-	{
-		//Disable();	
-#ifdef _DEBUG
-		// Check successfull destruction
-		if(m_gameObject->Native->RemoveComponent(this->nativePtr))
-			Debug::LogWarning("Component destruction failed in object: " + m_gameObject->Name + ". Component of type: " + this->GetType());
-#else
-		// Don't care
-		m_gameObject->Native->RemoveComponent(this->nativePtr);
-#endif
-		StopAllCoroutines();
 	}
 
 	List<Type^>^ Component::GetAllComponentTypes()
