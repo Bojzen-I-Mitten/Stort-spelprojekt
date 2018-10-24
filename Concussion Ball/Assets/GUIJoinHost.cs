@@ -42,7 +42,6 @@ public class GUIJoinHost : ScriptComponent
 
         if (Camera.OnImageClicked("TextBoxIP"))
         {
-            Debug.Log("Clicked");
             TakePort = false;
             TakeIP = true;
             Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -76,8 +75,8 @@ public class GUIJoinHost : ScriptComponent
                 MatchSystem.instance.Connect();
 
                 this.enabled = false;
-                ClearImagesAndText();
                 gameObject.GetComponent<GUISelectTeam>().enabled = true;
+                Disabled = true;
             }
             else
             {
@@ -88,7 +87,7 @@ public class GUIJoinHost : ScriptComponent
             }
 
         }
-        if (Camera.OnImageClicked("Host"))
+        else if (Camera.OnImageClicked("Host"))
         {
             if (PortText != "")
             {
@@ -97,8 +96,8 @@ public class GUIJoinHost : ScriptComponent
                 MatchSystem.instance.Host();
                 
                 this.enabled = false;
-                ClearImagesAndText();
                 gameObject.GetComponent<GUISelectTeam>().enabled = true;
+                Disabled = true;
             }
             else
             {
@@ -118,6 +117,8 @@ public class GUIJoinHost : ScriptComponent
                 Camera.SetTextFont("Port", TextFont);
             }
         }
+        else
+            ClearImagesAndText();
     }
 
 
@@ -140,8 +141,6 @@ public class GUIJoinHost : ScriptComponent
 
     public void ClearImagesAndText()
     {
-        Disabled = true;
-
         Camera.DeleteImage("Join");
         Camera.DeleteImage("Host");
         Camera.DeleteImage("TextBoxIP");

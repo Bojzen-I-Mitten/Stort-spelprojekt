@@ -159,33 +159,21 @@ public class MatchSystem : NetworkManager
 
     public void JoinTeam(TEAM_TYPE team)
     {
-        NetworkPlayer np = Scene.Players[LocalPeer].gameObject.AddComponent<NetworkPlayer>();
-        np.JoinTeam(Teams[team]);
-        Scene.Players[LocalPeer].gameObject.SetActive(false);
-        OnMatchStart();
-        SendRPC(-2, "OnRoundStart");
-        OnRoundStart();
+        NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
+        np.JoinTeam(team);
     }
 
     protected override void OnPeerJoin(NetPeer peer)
     {
-        //Disable the players gameObject and place in him team Spectator.
+        //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
 
         np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
 
-        //int team = Scene.Players.Count % 2;
-        //if(team == 0)
-        //    np.JoinTeam(Teams[TEAM_TYPE.TEAM_1]);
-        //else
-        //    np.JoinTeam(Teams[TEAM_TYPE.TEAM_2]);
-
         Scene.Players[peer].gameObject.SetActive(false);
         OnMatchStart();
-        SendRPC(-2, "OnRoundStart");
-        OnRoundStart();
     }
 
     protected override void OnPeerLeave(NetPeer peer)
