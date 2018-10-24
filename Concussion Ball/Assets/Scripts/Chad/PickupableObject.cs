@@ -90,7 +90,7 @@ public class PickupableObject : NetworkComponent
     {
         if(m_pickupable)
         {
-            if(this.GetType() == typeof(Powerup))
+            if(!this.gameObject.GetComponent<Ball>())
                 m_pickupable = false;
 
             m_rigidBody.IsKinematic = false;

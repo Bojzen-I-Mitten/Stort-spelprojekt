@@ -211,7 +211,8 @@ public class ChadControls : NetworkComponent
             }
             else if (PickedUpObject) // player is holding object that is not throwable
             {
-                PickedUpObject.OnActivate();
+                if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                    PickedUpObject.OnActivate();
             }
 
             float xStep = Input.GetMouseX() * Time.ActualDeltaTime;

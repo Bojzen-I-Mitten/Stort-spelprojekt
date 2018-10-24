@@ -57,7 +57,7 @@ public class Powerup : PickupableObject
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (m_pickupable)
+        if (!m_pickupable)
         {
             OnActivate();
         }
