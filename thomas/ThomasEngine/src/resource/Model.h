@@ -28,7 +28,10 @@ namespace ThomasEngine
 		[OnDeserializedAttribute]
 		void OnDeserialized(StreamingContext c);
 
-		thomas::resource::Model* Native();
+		property thomas::resource::Model* Native
+		{
+			thomas::resource::Model* get() { return reinterpret_cast<thomas::resource::Model*>(m_nativePtr); }
+		}
 						
 		static Model^ GetPrimitive(PrimitiveType type);
 		static void InitPrimitives();

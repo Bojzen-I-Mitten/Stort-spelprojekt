@@ -58,6 +58,7 @@
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
     <ClCompile Include="src\resource\Font.cpp" />
+    <ClCompile Include="src\object\component\InstanceRenderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="src\math\Random.h" />
     <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\resource\Font.h" />
+    <ClInclude Include="src\object\component\InstanceRenderManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

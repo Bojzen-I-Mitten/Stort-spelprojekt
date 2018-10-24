@@ -34,6 +34,7 @@
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\IBlendTree.cpp" />
+    <ClCompile Include="src\thomas\graphics\InstanceRender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\LookAtConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\data\TransformComponents.h" />
+    <ClInclude Include="src\thomas\graphics\InstanceRenderer.h" />
     <ClInclude Include="src\thomas\graphics\animation\Playback.h" />
     <ClInclude Include="src\thomas\Common.h" />
     <ClInclude Include="src\thomas\editor\EditorCamera.h" />

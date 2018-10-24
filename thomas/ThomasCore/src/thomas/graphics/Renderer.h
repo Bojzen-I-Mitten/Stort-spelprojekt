@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include "InstanceRenderer.h"
 
 namespace thomas 
 {
@@ -18,19 +19,10 @@ namespace thomas
 		}
 	}
 
-	namespace resource
-	{
-		class Material;
-		namespace shaderproperty {
-			class ShaderProperty;
-		}
-	}
-
 	namespace graphics
 	{				
-		class Mesh;
-
-		namespace render {
+		namespace render 
+		{
 			class Frame;
 			struct RenderCommand;
 		}
@@ -60,8 +52,11 @@ namespace thomas
 
 			void TransferCommandList();
 
+			InstanceRenderer& Instancing();
+
 		private:
 			static Renderer s_renderer;
+			InstanceRenderer m_instanceRenderer;
 			
 		private:
 			std::unique_ptr<render::Frame> m_frame;

@@ -33,6 +33,11 @@ namespace ThomasEngine
 
 		Material();
 
+		property thomas::resource::Material* Native
+		{
+			thomas::resource::Material* get() { return reinterpret_cast<thomas::resource::Material*>(m_nativePtr); }
+		}
+
 		void Reload() override;
 
 		void OnRename() override;

@@ -37,8 +37,10 @@ namespace thomas
 
 		constexpr uint32_t NUM_STRUCT = 200;
 		constexpr uint32_t NUM_MATRIX = 5000;
-		Renderer::Renderer()
-			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
+		Renderer::Renderer()	: 
+			m_instanceRenderer(),
+			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), 
+			m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
 		{
 			
 		}
@@ -99,13 +101,18 @@ namespace thomas
 			m_frame->clear();
 		}
 
+		InstanceRenderer & Renderer::Instancing()
+		{
+			return m_instanceRenderer;
+		}
+
 		void Renderer::BindObject(render::RenderCommand &rC, math::Matrix* matrix)
 		{
 			/*thomas::resource::shaderproperty::ShaderProperty* prop;*/
-			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, *matrix);
+			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, matrix->Transpose());
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
 
-			rC.material->SetMatrix(THOMAS_MATRIX_WORLD_INV, *matrix);
+			rC.material->SetMatrix(THOMAS_MATRIX_WORLD_INV, matrix->Invert());
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD_INV);
 
 			for (unsigned int i = 0; i < rC.num_local_prop; i++)
