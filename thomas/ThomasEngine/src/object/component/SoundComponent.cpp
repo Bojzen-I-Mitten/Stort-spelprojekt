@@ -20,6 +20,11 @@ namespace ThomasEngine
 		sound->PlayOneShot();
 	}
 
+	void SoundComponent::Stop()
+	{
+		sound->Stop();
+	}
+
 	void SoundComponent::Pause()
 	{
 		sound->Pause();

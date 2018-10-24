@@ -18,6 +18,7 @@ namespace ThomasEngine
 
 		void Play();
 		void PlayOneShot();
+		void Stop();
 		void Pause();
 		void Resume();
 
