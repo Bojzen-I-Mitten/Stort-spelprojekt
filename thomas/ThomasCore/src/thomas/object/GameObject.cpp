@@ -46,8 +46,6 @@ namespace thomas
 			m_moveStaticGroup = move.m_moveStaticGroup;
 			m_GroupID = move.m_GroupID;
 			new_GroupID = move.new_GroupID;
-
-			m_renderComponent = move.m_renderComponent;
 			move.m_transform = nullptr;
 			m_selected;// = move.m_selected;
 			m_staticSelf = move.m_staticSelf;
@@ -79,7 +77,7 @@ namespace thomas
 				m_moveStaticGroup = move.m_moveStaticGroup;
 				m_GroupID = move.m_GroupID;
 				new_GroupID = move.new_GroupID;
-				m_renderComponent = move.m_renderComponent;
+
 				//object::Object::Add(this);
 				for (auto& it : m_components)
 				{
@@ -215,16 +213,6 @@ namespace thomas
 		void GameObject::SetGroupID(UINT id)
 		{
 			m_GroupID = id;
-		}
-
-		void GameObject::SetRenderComponent(component::RenderComponent * renderComponent)
-		{
-			m_renderComponent = renderComponent;
-		}
-
-		component::RenderComponent * GameObject::GetRenderComponent()
-		{
-			return m_renderComponent;
 		}
 
 

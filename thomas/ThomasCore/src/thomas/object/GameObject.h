@@ -64,9 +64,6 @@ namespace thomas
 			void SetMoveStaticGroup(bool state);
 			bool GetMoveStaticGroup();
 
-			void SetRenderComponent(component::RenderComponent* renderComponent);
-
-			component::RenderComponent* GetRenderComponent();
 			/* Remove the component referenced to in the pointer.
 			 comp_ptr	<<	Component to remove
 			 return		>>	0 if component was found and removed.
@@ -85,7 +82,6 @@ namespace thomas
 			bool m_staticSelf;
 			bool m_dynamicSelf;
 			UINT m_GroupID; 
-			component::RenderComponent* m_renderComponent;
 			static std::vector<GameObject*> s_gameObjects;
 		};
 		
