@@ -4,7 +4,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
-public class Ball : PickupObjects
+public class Ball : PickupableObject
 {
     private ParticleEmitter emitterElectricity1;
     private ParticleEmitter emitterElectricity2;
@@ -24,6 +24,7 @@ public class Ball : PickupObjects
     public override void Start()
     {
         base.Start();
+        m_throwable = true;
 
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
@@ -152,40 +153,40 @@ public class Ball : PickupObjects
         emitter.Radius *= intensity;
     }
 
-    void EmitterExplosion()
-    {
-        MultiplyWithIntensity((float)(2.5f), emitterElectricity1);
-        MultiplyWithIntensity((float)(2.5f), emitterElectricity2);
-        MultiplyWithIntensity((float)(2.5f), emitterElectricity3);
-        emitterElectricity1.EmitOneShot(20);
-        emitterElectricity2.EmitOneShot(15);
-        emitterElectricity3.EmitOneShot(8);
-        emitterFire.EmitOneShot(10);
+    //void EmitterExplosion()
+    //{
+    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity1);
+    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity2);
+    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity3);
+    //    emitterElectricity1.EmitOneShot(20);
+    //    emitterElectricity2.EmitOneShot(15);
+    //    emitterElectricity3.EmitOneShot(8);
+    //    emitterFire.EmitOneShot(10);
 
-        MultiplyWithIntensity(2.0f, emitterFire);
-        emitterFire.Emit = true;
-        emitterSmoke.Emit = true;
-    }
+    //    MultiplyWithIntensity(2.0f, emitterFire);
+    //    emitterFire.Emit = true;
+    //    emitterSmoke.Emit = true;
+    //}
 
-    public void TimeSinceThrown(float time)
-    {
-        if (time > fireIntensityreThreshold)
-        {
-            fireIntensityreThreshold = 9999999999.0f;
-            MultiplyWithIntensity(0.5f, emitterFire);
-            MultiplyWithIntensity(0.5f, emitterSmoke);
-        }
+    //public void TimeSinceThrown(float time)
+    //{
+    //    if (time > fireIntensityreThreshold)
+    //    {
+    //        fireIntensityreThreshold = 9999999999.0f;
+    //        MultiplyWithIntensity(0.5f, emitterFire);
+    //        MultiplyWithIntensity(0.5f, emitterSmoke);
+    //    }
 
-        if (time > 1.4f)
-        {
-            ResetFireEmitters();
-            emitterFire.Emit = false;
-            emitterSmoke.Emit = false;
-            ResetElectricityEmitters();
-        }
-    }
+    //    if (time > 1.4f)
+    //    {
+    //        ResetFireEmitters();
+    //        emitterFire.Emit = false;
+    //        emitterSmoke.Emit = false;
+    //        ResetElectricityEmitters();
+    //    }
+    //}
 
-    public void StopEmitting()
+    override public void StopEmitting()
     {
         StartCoroutine(StopEmission());
     }
@@ -211,7 +212,7 @@ public class Ball : PickupObjects
     {
     }
 
-    public void ChargeColor()
+    override public void ChargeEffect()
     {
         emitterElectricity1.Emit = true;
         emitterElectricity2.Emit = true;
@@ -236,8 +237,9 @@ public class Ball : PickupObjects
         
     }
 
-    public void Cleanup()
+    override public void Cleanup()
     {
+        base.Cleanup();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;
@@ -248,33 +250,6 @@ public class Ball : PickupObjects
         emitterSmoke.Emit = false;
         ResetFireEmitters();
         // Reset values
-        chargeTimeCurrent = 0;
         ResetElectricityEmitters();
     }
-    
-
-    //public override void OnLostOwnership()
-    //{
-    //    m_rigidBody.enabled = false;
-    //}
-
-    //public override void OnRead(NetPacketReader reader, bool initialState)
-    //{
-    //    float chargeTime = reader.GetFloat();
-    //    if (chargeTime > 0)
-    //    {
-    //        ChargeColor();
-    //    }
-    //    else if(chargeTime == 0 && chargeTimeCurrent > 0)
-    //    {
-    //        StopEmitting();
-    //    }
-            
-    //}
-
-    //public override bool OnWrite(NetDataWriter writer, bool initialState)
-    //{
-    //    writer.Put(chargeTimeCurrent);
-    //    return true;
-    //}
 }

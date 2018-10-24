@@ -20,8 +20,6 @@ public class ChadControls : NetworkComponent
     };
     public STATE State { get; private set; }
 
-    //public int Speed { get; set; } = 5;
-    //public float Force { get; set; } = 5;
 
     #region Throwing stuff
     [Category("Throwing")]
@@ -70,7 +68,6 @@ public class ChadControls : NetworkComponent
     public float DiveTimer { get; private set; } = 0f;
     #endregion
 
-    //private Quaternion FreeLookDirection;
     Rigidbody rBody;
     Chadimations Animations;
     Ragdoll Ragdoll;
@@ -80,18 +77,7 @@ public class ChadControls : NetworkComponent
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
 
-    //Camera test;
-    private Ball _Ball;
-    private Ball Ball
-    {
-        get
-        {
-            if (!_Ball)
-                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
-            return _Ball;
-        }
-    }
-    // private bool canPickupBall = true;
+    public PickupableObject PickedUpObject;
 
     public override void Start()
     {
@@ -108,8 +94,6 @@ public class ChadControls : NetworkComponent
             Camera.transform.localPosition = CameraOffset;
         }
         ThrowForce = BaseThrowForce;
-
-        Ball.m_throwable = true;
 
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
@@ -197,7 +181,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
-            if (HasObject())
+            if (HasThrowableObject())
             {
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
@@ -220,8 +204,8 @@ public class ChadControls : NetworkComponent
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
                     State = STATE.CHADING;
-                    ThrowObject();
                     ResetCharge();
+                    ThrowObject();
                     ResetCamera();
                 }
             }
@@ -230,26 +214,21 @@ public class ChadControls : NetworkComponent
             float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
             Direction.y = xStep;
-            //ChadSM.Direction.Normalize();
 
             if (!Input.GetKey(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT))
             {
-                //Regular cam
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasObject())
+            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasThrowableObject())
             {
-                //Throwing cam
                 ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
             }
             else if (Input.GetKeyDown(Input.Keys.LeftShift))
             {
-                //Free look
                 InitFreeLookCamera();
             }
             else
             {
-                //Free look
                 FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
             }
 
@@ -263,9 +242,9 @@ public class ChadControls : NetworkComponent
     private void ResetCharge()
     {
         ChargeTime = 0;
-        Ball.chargeTimeCurrent = 0;
-        Ball.StopEmitting();
-        Ball.Cleanup();
+        PickedUpObject.StopEmitting();
+        PickedUpObject.Cleanup();
+
     }
     #endregion
 
@@ -428,39 +407,31 @@ public class ChadControls : NetworkComponent
         ChargeTime += Time.DeltaTime;
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, 4);
 
-        if(HasObject())
-        {
-            // if ball
-            Ball.chargeTimeCurrent = ChargeTime;
-            Ball.ChargeColor();
-            //else, has powerup
-        }
+        PickedUpObject.chargeTimeCurrent = ChargeTime;
+        PickedUpObject.ChargeEffect();
+
         ThrowForce = ChargeRate * ChargeTime;
     }
 
     private void ThrowObject()
     {
-        //if hasball
-        Ball.Throw(Camera.transform.forward * ThrowForce);
-        //else, powerup.powerupthrow
+        PickedUpObject.Throw(Camera.transform.forward * ThrowForce);
     }
 
-    public void RPCPickup()
+    public void RPCPickup(int id)
     {
-        if (Ball)
-            Ball.Pickup(gameObject, hand ? hand : transform);
-        /*
-         else if (Powerup)
-            Powerup.Pickup..
-         */
-
+        GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
+        PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
+        pickupable.Pickup(this, hand ? hand : transform);
     }
 
-    public bool HasObject()
+    public bool HasThrowableObject()
     {
-        if (Ball)
-            return Ball.isOwner && Ball.GetPickedUp();
-        // else if (Power-up)
+        if (PickedUpObject)
+            if (PickedUpObject.m_throwable)
+                return true;
+            else
+                return false;
         else
             return false;
     }
@@ -469,9 +440,9 @@ public class ChadControls : NetworkComponent
     {
         if (initialState)
         {
-            bool hasBall = reader.GetBool();
-            if (hasBall)
-                RPCPickup();
+            int pickedUpObject = reader.GetInt();
+            if (pickedUpObject >= 0)
+                RPCPickup(pickedUpObject);
         }
 
         if (isOwner)
@@ -490,7 +461,7 @@ public class ChadControls : NetworkComponent
     {
         if (initialState)
         {
-            writer.Put(HasObject());
+            writer.Put(PickedUpObject ? PickedUpObject.ID : -1);
         }
         writer.Put((int)State);
         writer.Put(Direction);
@@ -503,18 +474,16 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            if (Ball)
+            PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
+            if (pickupable)
             {
-                if (collider.gameObject == Ball.gameObject)
+                if (pickupable.transform.parent == null)
                 {
-                    if (Ball.transform.parent == null)
-                    {
-                        TakeOwnership(Ball.gameObject);
-                        SendRPC("RPCPickup");
-                        RPCPickup();
-                    }
-
+                    TakeOwnership(pickupable.gameObject);
+                    SendRPC("RPCPickup", pickupable.ID);
+                    RPCPickup(pickupable.ID);
                 }
+
             }
             if (collider.gameObject.Name == PlayerPrefabName)
             {

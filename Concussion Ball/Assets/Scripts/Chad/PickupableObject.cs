@@ -5,15 +5,18 @@ using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
 
-public class PickupObjects : NetworkComponent
+public class PickupableObject : NetworkComponent
 {
     public Rigidbody m_rigidBody;
+
     public bool m_throwable = false;
+    public bool m_pickupable = true;
+
     public float chargeTimeCurrent;
     public float chargeTimeMax { get; set; } = 4.0f;
 
+    private ChadControls _Chad;
     private RenderComponent m_renderComponent;
-
     private bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
 
     public override void Start()
@@ -33,7 +36,12 @@ public class PickupObjects : NetworkComponent
         return m_pickedUp;
     }
 
-    public void Throw(Vector3 force)
+    virtual public void ChargeEffect()
+    {
+
+    }
+
+    virtual public void Throw(Vector3 force)
     {
         if (m_pickedUp)
         {
@@ -41,6 +49,20 @@ public class PickupObjects : NetworkComponent
             transform.position = transform.position + Vector3.Normalize(force) * 2;
             m_rigidBody.AddForce(force, Rigidbody.ForceMode.Impulse);
         }
+    }
+
+    virtual public void OnActivate()
+    {
+    }
+
+    virtual public void StopEmitting()
+    {
+
+    }
+
+    virtual public void Cleanup()
+    {
+        chargeTimeCurrent = 0;
     }
 
     public void Drop()
@@ -56,14 +78,23 @@ public class PickupObjects : NetworkComponent
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
             m_pickedUp = false;
             transform.parent = null;
+            if (_Chad)
+            {
+                _Chad.PickedUpObject = null;
+                _Chad = null;
+            }
         }
     }
 
-    public void Pickup(GameObject gobj, Transform hand)
+    public void Pickup(ChadControls chad, Transform hand)
     {
+        // m_rigidBody.IsKinematic = false;
+        m_pickupable = false;
         m_rigidBody.enabled = false;
         transform.parent = hand;
         transform.localPosition = Vector3.Zero;
+        chad.PickedUpObject = this;
+        _Chad = chad;
     }
 
     public override void OnLostOwnership()
