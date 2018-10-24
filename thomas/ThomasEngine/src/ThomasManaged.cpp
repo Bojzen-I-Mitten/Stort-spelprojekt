@@ -257,7 +257,7 @@ namespace ThomasEngine {
 								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
 						}
 
-						if (gameObject->MakeStatic())
+						else if (gameObject->MakeStatic())
 						{
 							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
 
@@ -270,7 +270,7 @@ namespace ThomasEngine {
 
 						}
 
-						if (gameObject->MakeDynamic())
+						else if (gameObject->MakeDynamic())
 						{
 							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
 
