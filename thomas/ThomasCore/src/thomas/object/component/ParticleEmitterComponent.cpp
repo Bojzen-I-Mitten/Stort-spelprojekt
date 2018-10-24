@@ -19,7 +19,8 @@ namespace thomas
 		{
 			thomas::object::component::ParticleEmitterComponent::ParticleEmitterComponent()
 			{
-				m_particleSystem = graphics::ParticleSystem::GetGlobalSystem();
+				m_particleSystem = graphics::ParticleSystem::GetGlobalAlphaBlendingSystem();
+				m_blendState = graphics::ParticleSystem::BLEND_STATE::ALPHA;
 				m_emissionRate = 32;
 				m_emissionThreshold = 0.0;
 				m_isEmitting = false;
@@ -334,6 +335,27 @@ namespace thomas
 			{
 				m_emitOneShot = true;
 				m_particleBufferStruct.nrOfParticlesToEmit = nrOfPaticles;
+			}
+
+			void ParticleEmitterComponent::SetBlendState(graphics::ParticleSystem::BLEND_STATE const & blendState)
+			{
+				if (blendState != m_blendState)
+				{
+					m_blendState = blendState;
+					if (blendState == graphics::ParticleSystem::BLEND_STATE::ALPHA)
+					{
+						m_particleSystem = graphics::ParticleSystem::GetGlobalAlphaBlendingSystem();
+					}
+					else if (blendState == graphics::ParticleSystem::BLEND_STATE::ADDITIVE)
+					{
+						m_particleSystem = graphics::ParticleSystem::GetGlobalAdditiveBlendingSystem();
+					}
+				}
+			}
+
+			graphics::ParticleSystem::BLEND_STATE ParticleEmitterComponent::GetBlendState()
+			{
+				return m_blendState;
 			}
 
 			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)

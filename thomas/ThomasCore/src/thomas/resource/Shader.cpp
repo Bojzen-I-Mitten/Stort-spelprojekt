@@ -311,7 +311,7 @@ namespace thomas
 		{
 			if (passIndex >= m_passes.size())
 			{
-				LOG("Shader pass index is out of range");
+				LOG("Shader: " + this->GetName() + " SetPass(), pass-index is out of range");
 				return;
 			}
 			utils::D3D::Instance()->GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);

@@ -63,9 +63,6 @@ struct v2f
 
 v2f vert(uint id : SV_VertexID)
 {
-    if (id % 2 == 1)
-        return;
-
     v2f output = (v2f) 0;
     
     uint particleIndex = (uint) (id / 6);
@@ -92,22 +89,22 @@ float4 frag(v2f input) : SV_Target
 
 technique11 Particles
 {
-    pass P0
+    pass AlphaBlendPass
     {
         VERT(vert());
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 1);
         SetRasterizerState(Rasterizer);
-        SetBlendState(SrcAlphaBlend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
-  //  pass AdditiveBlendPass
-  //  {
-  //      VERT(vert());
-  //      SetGeometryShader(NULL);
-		//FRAG(frag());
-  //      SetDepthStencilState(EnableDepth, 1);
-  //      SetRasterizerState(Rasterizer);
-  //      SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
-  //  }
+    pass AdditiveBlendPass
+    {
+        VERT(vert());
+        SetGeometryShader(NULL);
+		FRAG(frag());
+        SetDepthStencilState(EnableDepth, 1);
+        SetRasterizerState(Rasterizer);
+        SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
 }

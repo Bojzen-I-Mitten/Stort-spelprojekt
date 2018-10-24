@@ -13,6 +13,14 @@ namespace ThomasEngine
 		property thomas::object::component::ParticleEmitterComponent* particleEmitter {
 			thomas::object::component::ParticleEmitterComponent* get();
 		}
+
+		enum class BLEND_STATES
+		{
+			ALPHA,
+			ADDITIVE,
+			UNKNOWN
+		};
+
 	public:
 		ParticleEmitter();
 
@@ -85,6 +93,10 @@ namespace ThomasEngine
 		property unsigned EmissionRate {
 			unsigned get();
 			void set(unsigned value);
+		}
+		property BLEND_STATES BlendState {
+			BLEND_STATES get();
+			void set(BLEND_STATES value);
 		}
 		property Texture2D^ Texture {
 			Texture2D^ get();
