@@ -25,8 +25,6 @@ namespace thomas
 
 	object::Object* ObjectHandler::setStatic(object::Object* object, object::Object*& moved)
 	{
-		//gObj->GetComponent<InstancingID>()
-		//type = c == null ? 0 : c->ID
 		for (auto& it = m_objectsDynamic.begin(); it != m_objectsDynamic.end(); it++)
 		{
 			if (&(*it) == object)
@@ -85,7 +83,6 @@ namespace thomas
 
 				m_objectsStatic[new_GroupID].back().SetGroupID(new_GroupID);
 				m_objectsStatic[new_GroupID].back().SetMoveStaticGroup(false);
-				m_objectsStatic[new_GroupID].back().SetDynamic(true);
 				return &m_objectsStatic[new_GroupID].back(); // We have moved it
 			}
 		}
