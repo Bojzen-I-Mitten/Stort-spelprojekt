@@ -31,6 +31,7 @@ namespace thomas
 				Texture2D* texture;
 				Vector2 position;
 				Vector2 scale;
+				Vector2 origin;
 				Vector4 color;
 				float rotation;
 				bool interact;
@@ -54,6 +55,7 @@ namespace thomas
 				std::string text;
 				Vector2 position;
 				Vector2 scale;
+				Vector2 origin;
 				Vector4 color;
 				float rotation;
 			};
@@ -74,6 +76,7 @@ namespace thomas
 			void SetImageScale(const std::string& id, const Vector2& scale);
 			void SetImageRotation(const std::string& id, float rotation);
 			void SetImageInteract(const std::string& id, bool interact);
+			void SetImageOrigin(const std::string& id, const Vector2& origin);
 			bool OnImageClicked(const std::string& id);
 			bool OnImageHovered(const std::string& id);
 
@@ -86,7 +89,8 @@ namespace thomas
 			void SetTextScale(const std::string& id, const Vector2& scale);
 			void SetTextRotation(const std::string& id, float rotation);
 			void SetFont(const std::string& id, Font* font);
-
+			void SetTextOrigin(const std::string& id, const Vector2& origin);
+			Vector2 GetTextSize(const std::string& id);
 		private:
 			Image& GetImage(const std::string& id);
 			Text& GetText(const std::string& id);

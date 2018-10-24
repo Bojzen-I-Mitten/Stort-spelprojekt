@@ -72,7 +72,7 @@ namespace ThomasEngine
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
 		virtual void Destroy() override;
-		
+		virtual void OnDestroy() override;
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]

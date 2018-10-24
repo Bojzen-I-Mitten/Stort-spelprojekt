@@ -62,6 +62,7 @@
     <Compile Include="Assets\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
+    <Compile Include="Assets\Scripts\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Chadimations.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\Scripts\GUI\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

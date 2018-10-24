@@ -66,6 +66,7 @@ namespace ThomasEngine {
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
+
 		}
 	}
 

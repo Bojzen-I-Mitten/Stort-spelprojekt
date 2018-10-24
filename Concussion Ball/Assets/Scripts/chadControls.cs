@@ -80,6 +80,8 @@ public class ChadControls : NetworkComponent
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
 
+    public bool Locked = false;
+
     //Camera test;
     private Ball _Ball;
     private Ball Ball
@@ -98,6 +100,9 @@ public class ChadControls : NetworkComponent
         Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
 
         State = STATE.CHADING;
+
+        if (isOwner)
+            MatchSystem.instance.LocalChad = this;
 
         if (!isOwner && Camera)
             Camera.enabled = false;
@@ -175,6 +180,10 @@ public class ChadControls : NetworkComponent
             //Escape = true;
         }
 
+        if (Locked)
+            return;
+
+
         if (Input.GetKey(Input.Keys.W))
             Direction.z += 1;
         if (Input.GetKey(Input.Keys.S))
@@ -201,6 +210,7 @@ public class ChadControls : NetworkComponent
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             //Escape = false;
         }
+
 
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
@@ -495,6 +505,8 @@ public class ChadControls : NetworkComponent
 
         return true;
     }
+
+
 
     public override void OnCollisionEnter(Collider collider)
     {

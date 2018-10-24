@@ -14,6 +14,8 @@ public class NetworkPlayer : NetworkComponent
     {
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
         mat?.SetColor("color", Team.Color);
+
+        gameObject.SetActive(false);
     }
 
     public override void Update()

@@ -32,7 +32,7 @@ namespace ThomasEngine
 	void Component::FixedUpdate() { ((thomas::object::component::Component*)nativePtr)->FixedUpdate(); }
 	void Component::OnDrawGizmosSelected() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmosSelected(); }
 	void Component::OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
-
+	void Component::OnDestroy() {/* ((thomas::object::component::Component*)nativePtr)->OnDestroy(); */}
 	bool Component::initialized::get() { return ((thomas::object::component::Component*)nativePtr)->initialized; }
 	void Component::initialized::set(bool value) { ((thomas::object::component::Component*)nativePtr)->initialized = value; }
 

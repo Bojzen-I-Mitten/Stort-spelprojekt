@@ -24,6 +24,8 @@ public class Team
     [Browsable(false)]
     public List<NetworkPlayer> Players { get { return _Players; } }
    
+    public int Score { get { return _Score; } }
+
     public Team(TEAM_TYPE type, string name, Color teamColor)
     {
         Color = teamColor;
