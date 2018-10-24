@@ -44,12 +44,12 @@ namespace ThomasEngine
 
 		void AddForce(Vector3 force)
 		{
-			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(thomas::math::Vector3(force.x, force.y, force.z));
+			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(Utility::Convert(force));
 		}
 
 		void AddForce(Vector3 force, ForceMode mode) 
 		{ 
-			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(thomas::math::Vector3(force.x, force.y, force.z), 
+			((thomas::object::component::Rigidbody*)nativePtr)->AddForce(Utility::Convert(force),
 																		   (thomas::object::component::ForceMode)mode); 
 		}
 
@@ -131,6 +131,19 @@ namespace ThomasEngine
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCenterOfmass(Utility::Convert(value)); }
 		}
 
+		[BrowsableAttribute(false)]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property Vector3 Position
+		{
+			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(value)); }
+		}
+
+		[BrowsableAttribute(false)]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property Quaternion Rotation
+		{
+			void set(Quaternion value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(value)); }
+		}
 
 		property float Damping
 		{

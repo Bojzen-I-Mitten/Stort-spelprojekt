@@ -43,7 +43,6 @@ namespace thomas
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
-
 		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
@@ -64,6 +63,19 @@ namespace thomas
 		}
 		s_world->removeRigidBody(rigidBody);
 		return found;
+	}
+
+	bool Physics::IsRigidbodyInWorld(object::component::Rigidbody * rigidBody)
+	{
+		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
+		{
+			object::component::Rigidbody* rb = s_rigidBodies[i];
+			if (rb == rigidBody)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void Physics::UpdateRigidbodies()
@@ -92,9 +104,11 @@ namespace thomas
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
+#ifdef _DEBUG
 		if (!s_drawDebug)
 			return;
 		s_world->debugDrawWorld();
+#endif
 	}
 
 	void Physics::Destroy()
@@ -138,6 +152,7 @@ namespace thomas
 		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
 		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
 
+	
 		if(colliderA && colliderB && !colliderA->isDestroyed() && !colliderB->isDestroyed())
 		{
 			colliderA->OnCollision(colliderB, collisionType);
@@ -155,7 +170,9 @@ namespace thomas
 
 	btVector3 Physics::ToBullet(const math::Vector3 & vector)
 	{
-		return *(btVector3*)&vector;
+		//TODO: Fix this.
+		return btVector3(vector.x, vector.y, vector.z);
+		//return *(btVector3*)&vector;
 	}
 
 	math::Vector3 Physics::ToSimple(const btVector3 & vector)

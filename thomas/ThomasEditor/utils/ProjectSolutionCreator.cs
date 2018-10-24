@@ -148,6 +148,9 @@ namespace ThomasEditor.utils
                 string configuration = "Release";
 #endif
 
+
+                
+
                 using (var pc = new ProjectCollection())
                     result = BuildManager.DefaultBuildManager.Build(
                         new BuildParameters(pc) { Loggers = new[] { new ThomasBuildLogger() } },

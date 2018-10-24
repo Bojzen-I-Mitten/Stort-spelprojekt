@@ -32,9 +32,11 @@ using namespace thomas;
 
 namespace ThomasEngine {
 
+	void ThomasWrapper::Start() {
+		Start(true);
+	}
+	void ThomasWrapper::Start(bool editor) {
 
-	void ThomasWrapper::Start() 
-	{
 		String^ enginePath = Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
 
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
@@ -51,8 +53,11 @@ namespace ThomasEngine {
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
-			ScriptingManger::Init();
-			Scene::CurrentScene = gcnew Scene("test");
+			if (editor) {
+				ScriptingManger::Init();
+				Scene::CurrentScene = gcnew Scene("test");
+			}
+
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			mainThread->Name = "Thomas Engine (Logic Thread)";
