@@ -18,12 +18,12 @@ namespace thomas
 	{
 		// Clean all the arrays, used when scene is emptied so that we don't get any
 		// Objects without pointers
-		for (auto& key : m_objectsStatic)
-		{
-			key.second.clear();
-		}
+		//for (auto& key : m_objectsStatic)
+		//{
+		//	key.second.clear();
+		//}
 
-		m_objectsDynamic.clear();
+		//m_objectsDynamic.clear();
 	}
 
 	std::vector<object::GameObject>* ObjectHandler::GetDynamicObjectVector()

@@ -43,17 +43,22 @@ namespace thomas
 			: m_components(std::move(move.m_components)), 
 			m_transform(move.m_transform)
 		{
+			m_components = std::move(move.m_components);
+			m_selected = std::move(move.m_selected);
+			m_guid = std::move(move.m_guid);
+			m_name = std::move(move.m_name);
+
+
+
+			m_transform = move.m_transform;
+			move.m_transform = nullptr;
 			m_activeSelf = move.m_activeSelf;
 			m_staticSelf = move.m_staticSelf;
+			m_dynamicSelf = move.m_dynamicSelf;
+			m_selected = move.m_selected;
 			m_moveStaticGroup = move.m_moveStaticGroup;
 			m_GroupID = move.m_GroupID;
 			new_GroupID = move.new_GroupID;
-			move.m_transform = nullptr;
-			m_selected;// = move.m_selected;
-			m_staticSelf = move.m_staticSelf;
-			m_guid = std::move(move.m_guid);
-			m_name = std::move(move.m_name);
-			m_selected = std::move(move.m_selected);
 			
 			//object::Object::Add(this);
 			for (auto& it : m_components)
@@ -68,17 +73,23 @@ namespace thomas
 			if (this != &move)
 			{
 				m_components = std::move(move.m_components);
-				m_transform = move.m_transform;
-				m_activeSelf = move.m_activeSelf;
-				m_staticSelf = move.m_staticSelf;
+				m_selected = std::move(move.m_selected);
 				m_guid = std::move(move.m_guid);
 				m_name = std::move(move.m_name);
-				m_selected = std::move(move.m_selected);
+
+
+
+				m_transform = move.m_transform;
 				move.m_transform = nullptr;
+
+				m_activeSelf = move.m_activeSelf;
+				m_staticSelf = move.m_staticSelf;
+				m_dynamicSelf = move.m_dynamicSelf;
 				m_selected = move.m_selected;
 				m_moveStaticGroup = move.m_moveStaticGroup;
 				m_GroupID = move.m_GroupID;
 				new_GroupID = move.new_GroupID;
+
 
 				//object::Object::Add(this);
 				for (auto& it : m_components)
