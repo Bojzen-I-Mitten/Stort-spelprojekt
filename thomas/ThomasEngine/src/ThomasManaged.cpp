@@ -178,7 +178,7 @@ namespace ThomasEngine {
 				//Rendering
 				if (WindowManager::Instance())
 				{
-					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
+					if (WindowManager::Instance()->GetEditorWindow() && RenderEditor)
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
@@ -329,6 +329,10 @@ namespace ThomasEngine {
 		shouldStop = false;
 	}
 
+	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
+
+	void ThomasWrapper::RenderPhysicsDebug::set(bool value) { thomas::Physics::Physics::s_drawDebug = value; }
+
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
 
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)
@@ -352,12 +356,4 @@ namespace ThomasEngine {
 		return inEditor;
 	}
 
-	void ThomasWrapper::ToggleEditorRendering()
-	{
-		renderingEditor = !renderingEditor;
-	}
-	void ThomasWrapper::TogglePhysicsDebug()
-	{
-		Physics::s_drawDebug = !Physics::s_drawDebug;
-	}
 }

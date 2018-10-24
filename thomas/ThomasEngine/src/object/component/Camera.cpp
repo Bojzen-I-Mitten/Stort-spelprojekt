@@ -32,6 +32,12 @@ namespace ThomasEngine
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
 
+	Vector2 Camera::GetViewPort()
+	{
+		DirectX::SimpleMath::Viewport viewPort = camera->GetViewport();
+		return Vector2(viewPort.width, viewPort.height);
+	}
+
 	//-------------------------------------------------------------------------------------------
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact)
 	{
@@ -103,9 +109,9 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetImageInteract(Utility::ConvertString(id), interact);
 	}
 
-	bool Camera::RemoveImage(String^ id)
+	void Camera::DeleteImage(String ^ id)
 	{
-		return camera->GetGUIHandle()->RemoveImage(Utility::ConvertString(id));
+		camera->GetGUIHandle()->DeleteImage(Utility::ConvertString(id));
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -120,6 +126,13 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), 
 										Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(Vector4(0.f, 0.f, 0.f, 1.f)), 
 										(thomas::resource::Font*)font->m_nativePtr);
+	}
+
+	void Camera::AddText(String ^ id, String ^ text, Vector2 position, Vector2 scale, Font ^ font)
+	{
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position),
+			Utility::Convert(scale), 0.f, Utility::Convert(Vector4(0.f, 0.f, 0.f, 1.f)),
+			(thomas::resource::Font*)font->m_nativePtr);
 	}
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale)
@@ -192,15 +205,14 @@ namespace ThomasEngine
 	{
 		camera->GetGUIHandle()->SetTextRotation(Utility::ConvertString(id), rotation);
 	}
-
 	void Camera::SetTextFont(String^ id, Font^ font)
 	{
 		camera->GetGUIHandle()->SetFont(Utility::ConvertString(id), (thomas::resource::Font*)font->m_nativePtr);
 	}
 
-	void Camera::RemoveText(String^ id)
+	void Camera::DeleteText(String^ id)
 	{
-		camera->GetGUIHandle()->RemoveText(Utility::ConvertString(id));
+		camera->GetGUIHandle()->DeleteText(Utility::ConvertString(id));
 	}
 
 	//-------------------------------------------------------------------------------------------

@@ -17,7 +17,6 @@ namespace ThomasEngine {
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
-		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
@@ -78,10 +77,13 @@ namespace ThomasEngine {
 	
 		static bool InEditor();
 
-		static void ToggleEditorRendering();
-		static void TogglePhysicsDebug();
 	public:
-
+		static bool RenderEditor = true;
+		static property bool RenderPhysicsDebug
+		{
+			bool get();
+			void set(bool value);
+		}
 		static property float FrameRate
 		{
 			float get();

@@ -114,10 +114,9 @@ namespace thomas
 			return CheckImageIntersection(id);
 		}
 
-		bool GUIManager::RemoveImage(const std::string & id)
+		void GUIManager::DeleteImage(const std::string & id)
 		{
 			m_images.erase(id);
-			return true;
 		}
 
 		GUIManager::Image& GUIManager::GetImage(const std::string& id)
@@ -218,19 +217,14 @@ namespace thomas
 			auto& text = GetText(id);
 			text.rotation = rotation;
 		}
-		void GUIManager::SetFont(const std::string & id, Font * font)
+		void GUIManager::SetFont(const std::string & id, Font* font)
 		{
 			auto& text = GetText(id);
 			text.font = font;
 		}
-		bool GUIManager::RemoveText(const std::string & id)
+		void  GUIManager::DeleteText(const std::string& id)
 		{
-			size_t it = m_texts.erase(id);
-			if (it == 1)
-			{
-				int i = 1;
-			}
-			return true;
+			m_texts.erase(id);
 		}
 	}
 }

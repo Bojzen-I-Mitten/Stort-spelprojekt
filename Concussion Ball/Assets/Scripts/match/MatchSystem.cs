@@ -31,13 +31,13 @@ public class MatchSystem : NetworkManager
         get { return NetworkManager.instance as MatchSystem; }
     }
 
-    bool hasScored = false;
+    public bool hasScored { get; private set; } = false;
 
     public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
 
-        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.White);
+        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.Gray);
 
         Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
@@ -73,8 +73,10 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log("spawned ball!");
             Ball = Scene.FindNetworkObject(8008)?.gameObject;
-            if(!Ball)
+            if (!Ball)
+            {
                 Ball = NetworkInstantiate(BallPrefab, Vector3.Zero, Quaternion.Identity, ResponsiblePeer == LocalPeer, 8008);
+            }
             Ball.SetActive(false);
         }
         MatchStarted = true;
@@ -90,17 +92,8 @@ public class MatchSystem : NetworkManager
     public void OnRoundStart()
     {
         ResetPlayers();
-        ResetBall();
+        Ball.GetComponent<Ball>().Reset();
         hasScored = false;
-    }
-
-    void ResetBall()
-    {
-        Ball.GetComponent<Ball>().RPCDrop();
-        Ball.SetActive(false);
-        Ball.SetActive(true);
-        if(Ball.GetComponent<NetworkIdentity>().Owner)
-            Ball.transform.position = new Vector3(0, 10, 0);
     }
 
     void ResetPlayers()
@@ -108,7 +101,6 @@ public class MatchSystem : NetworkManager
         foreach (var team in Teams)
         {
             team.Value.ResetPlayers();
-            
         }
     }
 
@@ -165,23 +157,23 @@ public class MatchSystem : NetworkManager
         return team;
     }
 
+    public void JoinTeam(TEAM_TYPE team)
+    {
+        NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
+        np.JoinTeam(team);
+    }
+
     protected override void OnPeerJoin(NetPeer peer)
     {
-        //Disable the players gameObject and place in him team Spectator.
+        //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
-        
-        int team = Scene.Players.Count % 2;
-        if(team == 0)
-            np.JoinTeam(Teams[TEAM_TYPE.TEAM_1]);
-        else
-            np.JoinTeam(Teams[TEAM_TYPE.TEAM_2]);
+
+        np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
 
         Scene.Players[peer].gameObject.SetActive(false);
         OnMatchStart();
-        SendRPC(-2, "OnRoundStart");
-        OnRoundStart();
     }
 
     protected override void OnPeerLeave(NetPeer peer)
