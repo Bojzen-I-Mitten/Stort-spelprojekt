@@ -39,6 +39,7 @@ namespace thomas {
 				m_addLock.lock();
 				for (size_t i = 0; i < m_waitingList_Add.size(); i++)
 					m_renderableShaders.push_back(m_waitingList_Add[i]);
+				m_waitingList_Add.clear();
 				// Recompile if necessary
 				RecompileShaders();
 				m_addLock.unlock();
