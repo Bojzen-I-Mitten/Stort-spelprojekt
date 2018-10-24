@@ -48,12 +48,21 @@ namespace thomas {
 				RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam, unsigned int num_local_prop, const resource::shaderproperty::ShaderPropertyStatic * local_prop) :
 					camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(num_local_prop), local_prop(local_prop) {};
 			};
+			struct GUIRenderCommand
+			{
+
+			};
 
 			struct MaterialSorter
 			{
 				bool operator() (resource::Material* mat1, resource::Material* mat2) const;
 			};
-			typedef std::map<object::component::Camera*, std::map<resource::Material*, std::vector<RenderCommand>, MaterialSorter>> CommandQueue;
+			struct CameraRenderQueue
+			{
+				std::map<resource::Material*, std::vector<RenderCommand>, MaterialSorter> m_commands3D;
+				//std::vector<GUIRenderCommand> m_guiCommands;
+			};
+			typedef std::map<object::component::Camera*, CameraRenderQueue> CommandQueue;
 
 			/* Render frame container
 			*/

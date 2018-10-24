@@ -52,5 +52,9 @@ namespace thomas
 		{
 			return m_srv;
 		}
+		ID3D11Resource * Texture::GetResource()
+		{
+			return m_resource;
+		}
 	}
 }

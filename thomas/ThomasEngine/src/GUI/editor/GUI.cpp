@@ -1,10 +1,13 @@
 #include "GUI.h"
+
 #pragma unmanaged
 #include <thomas/editor/gizmos/Gizmos.h>
-#pragma managed
-#include "..\..\resource\Model.h"
-#include "..\..\ThomasManaged.h"
 
+#pragma managed
+#include "../../resource/Model.h"
+#include "../../ThomasManaged.h"
+
+// OLD
 void ThomasEngine::GUI::DrawModel(Model^ model, int meshIndex,Vector3 position, Quaternion rotation, Vector3 scale)
 {
 	thomas::editor::Gizmos::Gizmo().DrawModel((thomas::resource::Model*)model->m_nativePtr, meshIndex, Utility::Convert(position), Utility::Convert(rotation), Utility::Convert(scale));
@@ -25,7 +28,6 @@ void ThomasEngine::GUI::DrawWireModel(Model ^ model, Vector3 position, Quaternio
 	thomas::editor::Gizmos::Gizmo().DrawWireModel((thomas::resource::Model*)model->m_nativePtr, Utility::Convert(position), Utility::Convert(rotation), Utility::Convert(scale));
 }
 
-
 void ThomasEngine::GUI::DrawCube(Vector3 center, Vector3 size)
 {
 	thomas::editor::Gizmos::Gizmo().DrawCube(Utility::Convert(center), Utility::Convert(size));
@@ -37,14 +39,17 @@ void ThomasEngine::GUI::DrawWireCube(Vector3 center, Vector3 size)
 	thomas::editor::Gizmos::Gizmo().DrawWireCube(Utility::Convert(center), Utility::Convert(size));
 }
 
-void ThomasEngine::GUI::DrawBoundingOrientedBox(const DirectX::BoundingOrientedBox % obb)
+void ThomasEngine::GUI::DrawBoundingBox(Vector3 center, Vector3 extends)
 {
-	thomas::editor::Gizmos::Gizmo().DrawBoundingOrientedBox(obb);
+	thomas::editor::Gizmos::Gizmo().DrawBoundingOrientedBox(
+		DirectX::BoundingOrientedBox(Utility::Convert(center),
+		Utility::Convert(extends),
+		thomas::math::Quaternion::Identity));
 }
 
-void ThomasEngine::GUI::DrawBoundingSphere(const DirectX::BoundingSphere % sphere)
+void ThomasEngine::GUI::DrawBoundingSphere(const BoundingSphere % sphere)
 {
-	thomas::editor::Gizmos::Gizmo().DrawBoundingSphere(sphere);
+	thomas::editor::Gizmos::Gizmo().DrawBoundingSphere(Utility::Convert(sphere));
 }
 
 void ThomasEngine::GUI::DrawRing(Vector3 origin, Vector3 majorAxis, Vector3 minorAxis)
@@ -72,9 +77,9 @@ void ThomasEngine::GUI::DrawRay(Vector3 from, Vector3 direction)
 	thomas::editor::Gizmos::Gizmo().DrawRay(Utility::Convert(from), Utility::Convert(direction));
 }
 
-void ThomasEngine::GUI::DrawRay(DirectX::SimpleMath::Ray ray)
+void ThomasEngine::GUI::DrawRay(const Ray% ray)
 {
-	thomas::editor::Gizmos::Gizmo().DrawRay(ray);
+	thomas::editor::Gizmos::Gizmo().DrawRay(Utility::Convert(ray));
 }
 
 void ThomasEngine::GUI::DrawFrustum(Vector3 center, float fov, float maxRange, float minRange, float aspect)
@@ -82,10 +87,6 @@ void ThomasEngine::GUI::DrawFrustum(Vector3 center, float fov, float maxRange, f
 	thomas::editor::Gizmos::Gizmo().DrawFrustum(Utility::Convert(center), fov, maxRange, minRange, aspect);
 }
 
-void ThomasEngine::GUI::DrawFrustum(DirectX::BoundingFrustum % frustrum)
-{
-	thomas::editor::Gizmos::Gizmo().DrawFrustum(frustrum);
-}
 
 void ThomasEngine::GUI::SetColor(Color color)
 {
@@ -113,3 +114,4 @@ void ThomasEngine::GUI::ImguiStringUpdate(String ^ text, Vector2 pos)
 	if(ThomasEngine::ThomasWrapper::InEditor())
 		thomas::editor::Gizmos::Gizmo().ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
 }
+//

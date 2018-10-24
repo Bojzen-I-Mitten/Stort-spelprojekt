@@ -15,16 +15,18 @@ namespace ThomasEngine
 		Texture2D(String^ path) : Texture(path, new thomas::resource::Texture2D(Utility::ConvertString(path))) {};
 		Texture2D(int width, int height, bool mipMap) : Texture("", new thomas::resource::Texture2D(width, height, mipMap)) {};
 		Texture2D(thomas::resource::Texture2D* nativePtr) : Texture(Utility::ConvertString(nativePtr->GetPath()), nativePtr) {};
-	public:
 
+	public:
 		static property Texture2D^ blackTexture
 		{
 			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetBlackTexture()); }
 		}
+
 		static property Texture2D^ whiteTexture
 		{
 			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetWhiteTexture()); }
 		}
+
 		static property Texture2D^ normalTexture
 		{
 			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetNormalTexture()); }
@@ -32,8 +34,7 @@ namespace ThomasEngine
 
 		IntPtr GetRawPixelData()
 		{
-			//return IntPtr(((thomas::resource::Texture2D*)m_nativePtr)->GetRawBGRAPixels()); //Not BRGA? Rather RGBA?
-			return IntPtr(((thomas::resource::Texture2D*)m_nativePtr)->GetRawRGBAPixels());
+			return IntPtr(((thomas::resource::Texture2D*)m_nativePtr)->GetRawBGRAPixels()); 
 		}
 
 		array<Color>^ GetPixels() 
@@ -46,7 +47,6 @@ namespace ThomasEngine
 			}
 			return pixels;
 		}
-
 
 		[OnDeserializedAttribute]
 		void OnDeserialized(StreamingContext c)

@@ -99,6 +99,21 @@ namespace ThomasEngine
 				value.m[3][0], value.m[3][1], value.m[3][2], value.m[3][3]
 			);
 		}
+
+		static thomas::math::Ray Convert(const Ray% value)
+		{
+			return thomas::math::Ray(
+				thomas::math::Vector3(value.Position.x, value.Position.y, value.Position.z),
+				thomas::math::Vector3(value.Direction.x, value.Direction.y, value.Direction.z));
+		}
+
+		static thomas::math::BoundingSphere Convert(const BoundingSphere% value)
+		{
+			return thomas::math::BoundingSphere(
+				thomas::math::Vector3(value.Center.x, value.Center.y, value.Center.z),
+				value.Radius);
+		}
+
 	};
 
 }

@@ -62,7 +62,11 @@
                     <MenuItem Header="_Open Project..." Click="OpenProject_Click"/>
                     <Separator/>
                         <MenuItem Header="_Save Editor Layout" Click="SaveLayout_Click"/>
-                    </MenuItem>
+                    <Separator/>
+                        <MenuItem Header="_Build" Click="BuildProject_Click"/>
+                        <MenuItem Header="_Build &amp; Run" Click="BuildAndRunProject_Click"/>
+                </MenuItem>
+
                 <MenuItem Header="_Edit">
 
                 </MenuItem>
@@ -92,8 +96,8 @@
                 <MenuItem Header="_Tools">
                     <MenuItem Header="_Options" Click="OpenOptionsWindow"/>
                     <MenuItem Header="_Reload Assembly" Click="ReloadAssembly"/>
-                    <MenuItem Header="_Toggle Editor Rendering" IsCheckable="True" IsChecked="True" Click="MenuItem_ToggleEditorRendering"/>
-                        <MenuItem Header="_Toggle Physics Debug" IsCheckable="True" IsChecked="True" Click="MenuItem_TogglePhysicsDebug"/>
+                    <MenuItem x:Name="menuItem_editorRendering" Header="_Toggle Editor Rendering" IsCheckable="True" Click="MenuItem_ToggleEditorRendering"/>
+                        <MenuItem x:Name="menuItem_physicsDebug" Header="_Toggle Physics Debug" IsCheckable="True" Click="MenuItem_TogglePhysicsDebug"/>
                     </MenuItem>
             </Menu>
             <WrapPanel Grid.Row="1" Height="40">

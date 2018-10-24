@@ -1,9 +1,16 @@
+using System;
+using System.Collections;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
 public class Ball : NetworkComponent
 {
+    Rigidbody rb;
+    RenderComponent rc;
+    private float accumulator;
+    private float chargeupTime;
+    public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
 
     private ParticleEmitter emitterElectricity1;
     private ParticleEmitter emitterElectricity2;
@@ -18,8 +25,8 @@ public class Ball : NetworkComponent
 
     private Rigidbody rigidbody;
     private RenderComponent renderComponent;
-    private bool pickedUp { get { return !rigidbody.enabled; } set { rigidbody.enabled = !value; } }
-    private float chargeTimeCurrent;
+    public bool PickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
+    public float chargeTimeCurrent;
     private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
     private float fireIntensityreThreshold;
@@ -92,7 +99,7 @@ public class Ball : NetworkComponent
 
     private void ResetElectricityEmitters()
     {
-        electricityIntensifyerThreshold = 0;
+        electricityIntensifyerThreshold = 0.6f;
 
         emitterElectricity1.MinSize = 0.1f;
         emitterElectricity1.MaxSize = 0.3f;
@@ -184,24 +191,20 @@ public class Ball : NetworkComponent
             ResetFireEmitters();
             emitterFire.Emit = false;
             emitterSmoke.Emit = false;
+            ResetElectricityEmitters();
         }
     }
 
     public override void Update()
     {
-        if (transform.parent == null)
-        {
-            Drop();
-        }
+        if (transform.position.y < -5)
+            Reset();
     }
 
     public void Drop()
     {
-        if (pickedUp)
-        {
-            rigidbody.enabled = true;
-            transform.parent = null;
-        }
+        RPCDrop();
+        SendRPC("RPCDrop");
         
     }
 
@@ -210,57 +213,121 @@ public class Ball : NetworkComponent
         emitterElectricity1.Emit = true;
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
-
-        chargeTimeCurrent += Time.DeltaTime;
+        
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
         Color newColor = new Color(interp, 0.0f, (1.0f-interp));
         renderComponent.material.SetColor("color", newColor);
 
-        if (interp > 0.7f)
+        if (interp > 0.8f)
         {
             emitterFire.Emit = true;
         }
         if (interp > electricityIntensifyerThreshold)
         {
-            MultiplyWithIntensity((float)(1.6f - electricityIntensifyerThreshold), emitterElectricity1);
-            MultiplyWithIntensity((float)(1.6f - electricityIntensifyerThreshold), emitterElectricity2);
-            MultiplyWithIntensity((float)(1.6f - electricityIntensifyerThreshold), emitterElectricity3);
+            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
+            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
+            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
             electricityIntensifyerThreshold += 0.3f;
         }
         
     }
 
+    public void StopEmitting()
+    {
+        StartCoroutine(StopEmission());
+    }
+
+    private IEnumerator StopEmission()
+    {
+        float timer = 3;
+        while(timer > 0)
+        {
+            timer -= Time.DeltaTime;
+            yield return null;
+        }
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
+    }
+
+    public void RPCDrop()
+    {
+        if (PickedUp)
+        {
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+            PickedUp = false;
+            transform.parent = null;
+        }
+    }
+
     public void Throw(Vector3 force)
     {
-        if (pickedUp)
+        if (PickedUp)
         {
             Drop();
             transform.position = transform.position + Vector3.Normalize(force) * 2;
             rigidbody.AddForce(force, Rigidbody.ForceMode.Impulse);
 
-            renderComponent.material.SetColor("color", new Color(0, 0, 255));
-
-            EmitterExplosion();
-            emitterElectricity1.Emit = false;
-            emitterElectricity2.Emit = false;
-            emitterElectricity3.Emit = false;
-
+            Cleanup();
+            fireIntensityreThreshold = 0.6f;
             emitterFire.Emit = true;
             emitterSmoke.Emit = true;
-
-            fireIntensityreThreshold = 0.6f;
-            // Reset values
-            chargeTimeCurrent = 0;
-            ResetElectricityEmitters();
+            EmitterExplosion();
+            
+            
         }
     }
+
+    public void Cleanup()
+    {
+        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
+        ResetFireEmitters();
+        // Reset values
+        chargeTimeCurrent = 0;
+        ResetElectricityEmitters();
+    }
+
     
     public void Pickup(GameObject gobj, Transform hand)
     {
         rigidbody.enabled = false;
         transform.parent = hand;
         transform.localPosition = Vector3.Zero;
+    }
+
+    public void Reset()
+    {
+        RPCDrop();
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
+        if (isOwner)
+        {
+            if (rigidbody != null)
+            {
+                Debug.Log("Resetting ball");
+                rigidbody.enabled = false;
+                StartCoroutine(EnableRigidBody());
+            }
+            transform.localEulerAngles = Vector3.Zero;
+            transform.localPosition = SpawnPoint;
+        }
+    }
+
+    private IEnumerator EnableRigidBody()
+    {
+        yield return null;
+        rigidbody.enabled = true;
     }
 
     public override void OnLostOwnership()
@@ -270,17 +337,20 @@ public class Ball : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
-        if(isOwner)
+        float chargeTime = reader.GetFloat();
+        if (chargeTime > 0)
         {
-            reader.GetBool();
-            return;
+            ChargeColor();
         }
-        rigidbody.enabled = reader.GetBool();
+        else if(chargeTime == 0 && chargeTimeCurrent > 0)
+        {
+            StopEmitting();
+        }
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        writer.Put(rigidbody.enabled);
+        writer.Put(chargeTimeCurrent);
         return true;
     }
 }

@@ -26,6 +26,7 @@ namespace ThomasEngine
 			SCRIPT,
 			AUDIO_CLIP,
 			PREFAB,
+			FONT,
 			UNKNOWN
 		};
 

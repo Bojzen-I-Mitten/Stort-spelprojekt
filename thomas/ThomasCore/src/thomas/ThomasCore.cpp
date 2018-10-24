@@ -3,6 +3,7 @@
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
+#include "editor\Editor.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
@@ -142,6 +143,21 @@ namespace thomas
 	uint32_t ThomasCore::Thread_Index()
 	{
 		return m_threadMap->Thread_Index();
+	}
+
+	void ThomasCore::OnStop()
+	{
+		graphics::Renderer::Instance()->ClearAllCommands();
+
+#ifdef _EDITOR
+		editor::Editor::GetEditor().OnEditorStop();
+#endif
+	}
+	void ThomasCore::OnPlay()
+	{
+#ifdef _EDITOR
+		thomas::editor::Editor::GetEditor().OnEditorPlay();
+#endif
 	}
 
 	resource::MemoryAllocation * ThomasCore::Memory()

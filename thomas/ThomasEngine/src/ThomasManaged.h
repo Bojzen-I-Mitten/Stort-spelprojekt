@@ -13,18 +13,22 @@ namespace ThomasEngine {
 	public ref class ThomasWrapper
 	{
 	private:
+		static bool shouldStop = false;
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
-		static bool renderingEditor = true;
 		static Thread^ mainThread;
 		static Thread^ renderThread;
 		static bool playing = false;	
-		static ManualResetEvent^ RenderFinished;
+		
 		static ManualResetEvent^ UpdateFinished;
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
+	private:
+		static void Stop();
 	public:
+		static ManualResetEvent^ RenderFinished;
+
 		delegate void StartPlayEvent();
 		delegate void StopPlayingEvent();
 		delegate void PausePlayEvent();
@@ -38,6 +42,7 @@ namespace ThomasEngine {
 		};
 
 		static void Start();
+		static void Start(bool editor);
 
 
 		static void StartRenderer();
@@ -61,7 +66,7 @@ namespace ThomasEngine {
 
 		static bool IsPlaying();
 
-		static void Stop();
+		static void IssueStop();
 
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 
@@ -72,10 +77,13 @@ namespace ThomasEngine {
 	
 		static bool InEditor();
 
-		static void ToggleEditorRendering();
-		static void TogglePhysicsDebug();
 	public:
-
+		static bool RenderEditor = true;
+		static property bool RenderPhysicsDebug
+		{
+			bool get();
+			void set(bool value);
+		}
 		static property float FrameRate
 		{
 			float get();

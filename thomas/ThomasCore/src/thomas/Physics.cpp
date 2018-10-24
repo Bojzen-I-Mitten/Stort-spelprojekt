@@ -11,7 +11,7 @@ namespace thomas
 	std::unique_ptr<btDefaultCollisionConfiguration> Physics::s_collisionConfiguration;
 	std::unique_ptr<btCollisionDispatcher> Physics::s_dispatcher;
 	std::unique_ptr<btBroadphaseInterface> Physics::s_broadPhase;
-	std::unique_ptr<btSequentialImpulseConstraintSolver> Physics::s_solver;
+	std::unique_ptr<btConstraintSolver> Physics::s_solver;
 	std::unique_ptr<graphics::BulletDebugDraw> Physics::s_debugDraw;
 	std::unique_ptr<btDiscreteDynamicsWorld> Physics::s_world;
 	float Physics::s_timeStep = 1.0f / 60.0f; //Limit physics timestep to 60 FPS
@@ -31,23 +31,25 @@ namespace thomas
 		s_debugDraw = std::make_unique<graphics::BulletDebugDraw>();
 		//Set states
 		s_world->setGravity(btVector3(0, -9.82f, 0));
-		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_FastWireframe);
 		s_world->setDebugDrawer(s_debugDraw.get());
 
 		gContactStartedCallback = Physics::CollisionStarted;
 		gContactProcessedCallback = Physics::CollisionProcessed;
 		gContactEndedCallback = Physics::CollisionEnded;
 		
-		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
+		//s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 		return true;
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
 	}
 	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		int size = s_rigidBodies.size();
 		bool found = false;
 		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
 		{
@@ -63,6 +65,19 @@ namespace thomas
 		return found;
 	}
 
+	bool Physics::IsRigidbodyInWorld(object::component::Rigidbody * rigidBody)
+	{
+		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
+		{
+			object::component::Rigidbody* rb = s_rigidBodies[i];
+			if (rb == rigidBody)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	void Physics::UpdateRigidbodies()
 	{
 		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
@@ -75,28 +90,25 @@ namespace thomas
 	//Update physics collision
 	void Physics::Simulate()
 	{
-
 		s_timeSinceLastPhysicsStep += ThomasTime::GetDeltaTime();
-
 		if (s_timeSinceLastPhysicsStep < s_timeStep)
 			return;
-
-		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);
-
+		s_world->stepSimulation(s_timeSinceLastPhysicsStep, 5, s_timeStep);	
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateRigidbodyToTransform();
 		}
-
 		s_timeSinceLastPhysicsStep = 0.f;
 	}
 
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
+#ifdef _DEBUG
 		if (!s_drawDebug)
 			return;
 		s_world->debugDrawWorld();
+#endif
 	}
 
 	void Physics::Destroy()
@@ -140,7 +152,8 @@ namespace thomas
 		object::component::Collider* colliderA = reinterpret_cast<object::component::Collider*>(body0->getUserPointer());
 		object::component::Collider* colliderB = reinterpret_cast<object::component::Collider*>(body1->getUserPointer());
 
-		if(colliderA && colliderB)
+	
+		if(colliderA && colliderB && !colliderA->isDestroyed() && !colliderB->isDestroyed())
 		{
 			colliderA->OnCollision(colliderB, collisionType);
 			colliderB->OnCollision(colliderA, collisionType);
@@ -157,7 +170,9 @@ namespace thomas
 
 	btVector3 Physics::ToBullet(const math::Vector3 & vector)
 	{
-		return *(btVector3*)&vector;
+		//TODO: Fix this.
+		return btVector3(vector.x, vector.y, vector.z);
+		//return *(btVector3*)&vector;
 	}
 
 	math::Vector3 Physics::ToSimple(const btVector3 & vector)
