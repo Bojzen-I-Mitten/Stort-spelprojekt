@@ -1,11 +1,13 @@
 #pragma unmanaged
 #include <assert.h>
 #include <thomas\object\Object.h>
+#include <thomas\object\GameObject.h>
 #pragma managed
 #include "../Utility.h"
 #include "Object.h"
 #include "GameObject.h"
 #include "Component.h"
+
 namespace ThomasEngine
 {
 	Object::Object(thomas::object::Object* ptr)
@@ -28,7 +30,9 @@ namespace ThomasEngine
 		bool rmvd = s_objects.Remove(this);
 		//assert(rmvd);
 		nativePtr->Destroy();
-		delete nativePtr;
+	
+		if(this->GetType() != GameObject::typeid)
+			delete nativePtr;
 	}
 	
 	void Object::Destroy()

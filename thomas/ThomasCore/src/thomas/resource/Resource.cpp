@@ -8,14 +8,14 @@ namespace thomas
 		Resource::Resource(std::string path)
 		{
 			m_path = path;
+
+			m_name = PathFindFileName(m_path.c_str());
+			m_name = m_name.substr(0, m_name.find_last_of('.'));	
 		}
 
 		std::string Resource::GetName()
 		{
-			std::string name = PathFindFileName(m_path.c_str());
-			name = name.substr(0, name.find_last_of('.'));
-			return name;	
-			
+			return m_name;
 		}
 
 		std::string Resource::GetPath()
@@ -26,6 +26,10 @@ namespace thomas
 		void Resource::Rename(std::string newPath)
 		{
 			m_path = newPath;
+
+			m_name = PathFindFileName(m_path.c_str());
+			m_name = m_name.substr(0, m_name.find_last_of('.'));
+
 			OnChanged();
 		}
 

@@ -13,12 +13,16 @@ namespace ThomasEngine
 	ref class Scene;
 	ref class Transform;
 	ref class Component;
+
 	public ref class GameObject : public Object
 	{
 	private:
+		
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
 		uint32_t m_scene_id;
+		bool m_makeDynamic = false;
+		bool m_makeStatic = false;
 
 		GameObject();
 		virtual ~GameObject();
@@ -38,7 +42,12 @@ namespace ThomasEngine
 
 		void PostLoad(Scene^ scene);
 
-		void PostInstantiate(Scene^ scene);		
+		void PostInstantiate(Scene^ scene);
+
+		
+		thomas::object::Object* setStatic();
+		thomas::object::Object* moveStaticGroup();
+		thomas::object::Object* setDynamic();
 				
 		void Update();
 
@@ -55,6 +64,10 @@ namespace ThomasEngine
 		}
 
 	public:
+		bool MakeStatic();
+		bool MakeDynamic();
+		bool MoveStaticGroup();
+		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 
 		GameObject(String^ name);
 
@@ -76,6 +89,18 @@ namespace ThomasEngine
 			void set(bool value);
 		}	
 
+		property UINT GroupIDSelf
+		{
+			UINT get();
+			void set(UINT state);
+		}
+
+		property bool staticSelf
+		{
+			bool get();
+			void set(bool state);
+		}
+
 		[BrowsableAttribute(false)]
 		property String^ Name
 		{
@@ -83,7 +108,7 @@ namespace ThomasEngine
 			void set(String^) override;
 		};
 
-		
+
 
 		String^ ToString() override
 		{
@@ -142,7 +167,6 @@ namespace ThomasEngine
 		static GameObject^ CreatePrimitive(PrimitiveType type);
 
 		bool GetActive();
-
 		void SetActive(bool active);
 
 		static GameObject^ Instantiate(GameObject^ original);

@@ -78,7 +78,11 @@ namespace ThomasEditor
             ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
+            ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
+            ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
 
+            menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
+            menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
 
         }
 
@@ -380,37 +384,38 @@ namespace ThomasEditor
 
         private void AddNewCubePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            // Let's add a indirection to GameObjectManager here
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cube, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Sphere, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewQuadPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Quad, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewPlanePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Plane, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCylinderPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cylinder, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCapsulePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Capsule, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
@@ -603,12 +608,74 @@ namespace ThomasEditor
 
         private void MenuItem_ToggleEditorRendering(object sender, RoutedEventArgs e)
         {
-            ThomasWrapper.ToggleEditorRendering();
+            MenuItem item = sender as MenuItem;
+            ThomasWrapper.RenderEditor = item.IsChecked;
+            Properties.Settings.Default.RenderEditor = item.IsChecked;
+            Properties.Settings.Default.Save();
         }
 
         private void MenuItem_TogglePhysicsDebug(object sender, RoutedEventArgs e)
         {
-            ThomasWrapper.TogglePhysicsDebug();
+            MenuItem item = sender as MenuItem;
+            ThomasWrapper.RenderPhysicsDebug = item.IsChecked;
+            Properties.Settings.Default.RenderPhysicsDebug = item.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+
+        private void BuildProject_Click(object sender, RoutedEventArgs e)
+        {
+            Project project = ThomasEngine.Application.currentProject;
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.Filter = "Executable (*.exe) |*.exe";
+
+
+            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = project.name;
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                showBusyIndicator("Builing " + project.name + "...");
+                Thread worker = new Thread(new ThreadStart(() =>
+                {
+                    utils.Exporter.ExportProject(saveFileDialog.FileName, project);
+                    hideBusyIndicator();
+                }));
+                worker.SetApartmentState(ApartmentState.STA);
+                worker.Start();
+            }
+
+
+           
+        }
+
+        private void BuildAndRunProject_Click(object sender, RoutedEventArgs e)
+        {
+            Project project = ThomasEngine.Application.currentProject;
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.Filter = "Executable (*.exe) |*.exe";
+
+
+            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            saveFileDialog.RestoreDirectory = true;
+            saveFileDialog.FileName = project.name;
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                showBusyIndicator("Builing " + project.name + "...");
+                Thread worker = new Thread(new ThreadStart(() =>
+                {
+                    string fileName = System.IO.Path.GetFileName(saveFileDialog.FileName);
+                    string dir = System.IO.Path.GetDirectoryName(saveFileDialog.FileName);
+                    if (utils.Exporter.ExportProject(saveFileDialog.FileName, project))
+                        System.Diagnostics.Process.Start(dir + "\\Bin\\" + fileName);
+                    hideBusyIndicator();
+                    
+                }));
+                worker.SetApartmentState(ApartmentState.STA);
+                worker.Start();
+            }
         }
     }
 

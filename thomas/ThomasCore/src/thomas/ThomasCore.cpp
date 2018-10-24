@@ -19,6 +19,8 @@
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 #include "utils/ThreadMap.h"
+
+#include "object/ObjectHandler.h"
 #include "object/component/LightComponent.h"
 #include "Physics.h"
 #include "graphics\ParticleSystem.h"
@@ -43,7 +45,7 @@ namespace thomas
 
 		resource::Texture2D::Init();
 		ThomasTime::Init();
-		Sound::Instance()->Init();
+		Sound::Init();
 		resource::Shader::Init();
 
 		resource::Material::Init();
@@ -54,6 +56,7 @@ namespace thomas
 		graphics::LightManager::Initialize();
 		graphics::ParticleSystem::InitializeGlobalSystem();
 
+		ObjectHandler::Init();
 		s_initialized = true;
 		return s_initialized;
 	}
@@ -68,7 +71,7 @@ namespace thomas
 		}
 
 		resource::Shader::Update();	
-		Sound::Instance()->Update();
+		Sound::Update();
 	}
 
 	void ThomasCore::Render()
@@ -115,7 +118,7 @@ namespace thomas
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
-		Sound::Instance()->Destroy();
+		Sound::Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
 		utils::D3D::Instance()->Destroy();
 

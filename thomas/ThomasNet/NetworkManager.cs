@@ -141,13 +141,13 @@ namespace ThomasEngine.Network
             {
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
-                    NetScene.RemovePlayer(peer);
                     OnPeerLeave(peer);
+                    NetScene.RemovePlayer(peer);
                     Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:
-                    NetScene.RemovePlayer(peer);
                     OnPeerLeave(peer);
+                    NetScene.RemovePlayer(peer);
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
@@ -212,6 +212,7 @@ namespace ThomasEngine.Network
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
+            try {
             if (reader.EndOfData)
                 return;
             PacketType type = (PacketType)reader.GetInt();
@@ -238,6 +239,11 @@ namespace ThomasEngine.Network
                     break;
             }
             reader.Recycle();
+            }
+            catch(Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)

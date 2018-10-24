@@ -9,7 +9,7 @@ namespace ThomasEngine {
 	[System::SerializableAttribute]
 	public ref class Object: public System::ComponentModel::INotifyPropertyChanged
 	{
-		static List<Object^> s_objects;
+		
 	private:
 		/* Silent destruction. */
 		void Delete();
@@ -19,7 +19,7 @@ namespace ThomasEngine {
 #endif
 		
 	protected:
-		
+		static List<Object^> s_objects;
 		System::String^ m_name;
 	internal:
 		[System::Runtime::Serialization::DataMemberAttribute]

@@ -2,6 +2,7 @@
 
 #pragma unmanaged
 
+#include "object/GameObjectManager.h"
 #include <thomas\ThomasCore.h>
 #include <thomas\WindowManager.h>
 #include <thomas\ThomasTime.h>
@@ -21,11 +22,11 @@
 #include "resource\Model.h"
 #include "resource\Resources.h"
 #include "object\Component.h"
-#include "object/component/physics/Rigidbody.h"
+#include "object\component\physics\Rigidbody.h"
 #include "ScriptingManager.h"
 #include "ThomasSelection.h"
 #include "GUI\editor\GUI.h"
-#include "object/GameObject.h"
+#include "object\GameObject.h"
 #include "Debug.h"
 #include "system/SceneManager.h"
 
@@ -58,6 +59,7 @@ namespace ThomasEngine {
 		// Thomas Initialization
 		Thomas->m_scene = gcnew SceneManager();
 		s_Selection = gcnew ThomasSelection();
+		s_GameObjectManager = gcnew GameObjectManager();
 		thomas::ThomasCore::Core().registerThread();
 		thomas::ThomasCore::Init();
 
@@ -72,8 +74,15 @@ namespace ThomasEngine {
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
-			ScriptingManger::Init();
 			Thomas->m_scene->LogicThreadClearScene();
+#ifdef _EDITOR
+			if (true)
+			{
+				ScriptingManger::Init();
+				Scene::CurrentScene = gcnew Scene("test");
+			}
+#endif
+
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			logicThread->Name = "Thomas Engine (Logic Thread)";
@@ -87,8 +96,10 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::MainThreadUpdate()
 	{
+#ifdef _EDITOR
 		if (!playing)
 			ScriptingManger::ReloadAssembly(false);
+#endif
 	}
 
 
@@ -108,7 +119,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 
-		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		float ramUsage = 0.0f;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->SetActive(showStatistics);
 		if (showStatistics) {
@@ -214,7 +225,7 @@ namespace ThomasEngine {
 				if (WindowManager::Instance())
 				{
 					// Editor render
-					if (WindowManager::Instance()->GetEditorWindow() && renderingEditor)
+					if (WindowManager::Instance()->GetEditorWindow() && RenderEditor)
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
@@ -261,8 +272,58 @@ namespace ThomasEngine {
 					ProcessCommand();
 					
 					// Enter async. state 
+
+					// This is only relevant if we are running with editor, should be removed when build
+					for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; i++)
+					{
+						GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
+
+						if (gameObject->MoveStaticGroup())
+						{
+							// Fetch the adress of where an object might be moved to
+							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+
+							// Fetch the adress of the object that might be moved
+							thomas::object::Object* old_native = gameObject->moveStaticGroup();
+
+							// Find the wrapped gameobject of the object that might be moved
+							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+							if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
+								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+						}
+
+						else if (gameObject->MakeStatic())
+						{
+							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+
+							thomas::object::Object* old_native = gameObject->setStatic();
+
+							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+							if (temp) // If temp is nullptr, no managed object has been invalidated.
+								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+
+						}
+
+						else if (gameObject->MakeDynamic())
+						{
+							thomas::object::Object* new_temp = Scene::CurrentScene->GameObjects[i]->nativePtr;
+
+							thomas::object::Object* old_native = gameObject->setDynamic();
+
+							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+							if (temp) // If temp is nullptr, no managed object has been invalidated.
+								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+						}
+
+					}
+
 					RenderFinished->Reset();
 					UpdateFinished->Set();
+
+
 				}
 				Monitor::Exit(lock);
 				mainThreadDispatcher->BeginInvoke(
@@ -391,7 +452,11 @@ namespace ThomasEngine {
 	{
 		return playing == RunningState::Running;
 	}
-	
+
+	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
+
+	void ThomasWrapper::RenderPhysicsDebug::set(bool value) { thomas::Physics::Physics::s_drawDebug = value; }
+
 	float ThomasWrapper::FrameRate::get() { return float(thomas::ThomasTime::GetFPS()); }
 
 	void ThomasWrapper::SetEditorGizmoManipulatorOperation(ManipulatorOperation op)
@@ -415,12 +480,4 @@ namespace ThomasEngine {
 		return inEditor;
 	}
 
-	void ThomasWrapper::ToggleEditorRendering()
-	{
-		renderingEditor = !renderingEditor;
-	}
-	void ThomasWrapper::TogglePhysicsDebug()
-	{
-		Physics::s_drawDebug = !Physics::s_drawDebug;
-	}
 }

@@ -67,6 +67,11 @@ namespace ThomasEngine.Network
             }
         }
 
+        public void RefreshCache()
+        {
+            _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+        }
+
         public void WriteFrameData()
         {
             WriteData(false);

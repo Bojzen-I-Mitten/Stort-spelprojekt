@@ -54,6 +54,7 @@
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\object\GameObjectManager.cpp" />
     <ClCompile Include="src\script\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
     <ClCompile Include="src\resource\Font.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="src\math\Random.h" />
     <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\resource\Font.h" />
+    <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\system\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>

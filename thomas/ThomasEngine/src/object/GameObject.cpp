@@ -1,5 +1,6 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
+#include <thomas\object\ObjectHandler.h>
 #pragma managed
 #include "GameObject.h"
 #include "Component.h"
@@ -15,12 +16,13 @@
 #include "../resource/Resources.h"
 #include "../serialization/Serializer.h"
 #using "PresentationFramework.dll"
+
 using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
 
 
-	GameObject::GameObject() : Object(new thomas::object::GameObject("gameobject"))
+	GameObject::GameObject() : Object(thomas::ObjectHandler::createNewGameObject("gameobject"))
 	{
 		m_name = "gameobject";
 #ifdef _EDITOR
@@ -29,7 +31,7 @@ namespace ThomasEngine {
 #endif
 	}
 
-	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))
+	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
 		m_transform = AddComponent<Transform^>();
@@ -86,6 +88,57 @@ namespace ThomasEngine {
 		scene->GameObjects->Add(this);
 		for each(Transform^ child in m_transform->children)
 			child->gameObject->PostInstantiate(scene);
+	}
+
+	thomas::object::Object* GameObject::setStatic()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::setStatic(nativePtr, moved);
+
+		((thomas::object::GameObject*)nativePtr)->SetStatic(true);
+
+		m_makeStatic = false;
+
+		return moved;
+	}
+
+	thomas::object::Object * GameObject::moveStaticGroup()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::moveStaticGroup(nativePtr, moved);
+
+		return moved;
+	}
+
+	thomas::object::Object * GameObject::setDynamic()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::setDynamic(nativePtr, moved);
+
+		((thomas::object::GameObject*)nativePtr)->SetDynamic(true);
+
+		m_makeDynamic = false;
+
+		return moved;
+	}
+
+	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
+	{
+		if (nativeptr != nullptr)
+		{
+
+			for each (Object^ object in s_objects)
+			{
+				
+				if (object->nativePtr == nativeptr)
+					return static_cast<GameObject^>(object);
+			}
+		}
+
+		return nullptr;
 	}
 
 	void GameObject::Update()
@@ -185,8 +238,25 @@ namespace ThomasEngine {
 		throw gcnew System::InvalidOperationException("Not allowed to call destroy on GameObjects...");
 	}
 
+	bool GameObject::MakeStatic()
+	{
+		return m_makeStatic;
+	}
+
+	bool GameObject::MakeDynamic()
+	{
+		return m_makeDynamic;
+	}
+
+	bool GameObject::MoveStaticGroup()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetMoveStaticGroup();
+	}
+
+
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
+		// This function has been hooked by GameObject manager, this does nothng
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 		return gameObject;
@@ -261,7 +331,6 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
 	}
-
 
 	generic<typename T>
 	where T : Component
@@ -359,7 +428,7 @@ namespace ThomasEngine {
 	bool GameObject::GetActive()
 	{
 		if((thomas::object::GameObject*)nativePtr != nullptr)
-		return ((thomas::object::GameObject*)nativePtr)->GetActive();
+			return ((thomas::object::GameObject*)nativePtr)->GetActive();
 		return false;
 	}
 
@@ -374,6 +443,40 @@ namespace ThomasEngine {
 	bool GameObject::activeSelf::get()
 	{
 		return ((thomas::object::GameObject*)nativePtr)->m_activeSelf;
+	}
+
+	UINT GameObject::GroupIDSelf::get()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetGroupID();
+	}
+
+	void GameObject::GroupIDSelf::set(UINT value)
+	{
+
+		((thomas::object::GameObject*)nativePtr)->ChangeGroupID(value);
+	}
+
+	bool GameObject::staticSelf::get()
+	{
+		return (((thomas::object::GameObject*)nativePtr)->GetStatic() || m_makeStatic) && !m_makeDynamic;
+	}
+
+	void GameObject::staticSelf::set(bool state)
+	{
+		if (state)
+		{
+			// If box was checked and it's not static, we flag that 
+			// Object is going to be moved next frame
+			if (!((thomas::object::GameObject*)nativePtr)->GetStatic())
+				m_makeStatic = true;
+		}
+		else // if state is false, somebody just unchecked the box
+		{
+			if (!((thomas::object::GameObject*)nativePtr)->GetDynamic())
+			{
+				m_makeDynamic = true;
+			}
+		}
 	}
 
 	void GameObject::activeSelf::set(bool value)
@@ -434,5 +537,4 @@ namespace ThomasEngine {
 		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));
 	}
-
 }

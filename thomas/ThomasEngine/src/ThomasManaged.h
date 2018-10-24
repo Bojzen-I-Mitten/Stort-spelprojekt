@@ -28,14 +28,17 @@ namespace ThomasEngine {
 	ref class Scene;
 
 	ref class ThomasSelection;
+	ref class GameObjectManager;
 	public ref class ThomasWrapper
 	{
 	private:
+
+		static GameObjectManager^ s_GameObjectManager;
+
 		static ThomasWrapper^ s_SYS = gcnew ThomasWrapper();
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
-		static bool renderingEditor = true;
 		static RunningState playing = RunningState::UnInitialized;
 		
 		/* Threading
@@ -123,10 +126,13 @@ namespace ThomasEngine {
 	
 		static bool InEditor();
 
-		static void ToggleEditorRendering();
-		static void TogglePhysicsDebug();
 	public:
-
+		static bool RenderEditor = true;
+		static property bool RenderPhysicsDebug
+		{
+			bool get();
+			void set(bool value);
+		}
 		static property float FrameRate
 		{
 			float get();
