@@ -9,17 +9,19 @@ public class AnimationBlendTest : ScriptComponent
     PlaybackNode to;
     PlaybackHandle toTime;
     LookAtConstraint lookAt;
+    IK_FABRIK_Constraint ik;
 
     RenderSkinnedComponent skinn;
     WeightHandle weight;
     float timer;
+    float throwLerp;
 
     public Animation fromAnim { get; set; }
     public Animation toAnim { get; set; }
+    public GameObject target { get; set; }
     public override void Start()
     {
         skinn = gameObject.GetComponent<RenderSkinnedComponent>();
-
         root = new BlendNode(skinn.model);
         from = new PlaybackNode(skinn.model, fromAnim, true);
         to = new PlaybackNode(skinn.model, toAnim, true);
@@ -35,6 +37,18 @@ public class AnimationBlendTest : ScriptComponent
         uint boneIndex = 0;
         if (skinn.FetchBoneIndex(Utility.hash("mixamorig:Head"), out boneIndex))
             lookAt.apply(skinn, boneIndex);
+
+        // Set default 
+        weight.setWeight(0, 1);
+
+
+        // IK test
+
+        ik = new IK_FABRIK_Constraint(3);
+        boneIndex = 0;
+        if (skinn.FetchBoneIndex(Utility.hash("mixamorig:RightHand"), out boneIndex))
+            ik.apply(skinn, boneIndex);
+
     }
 
     public override void Update()
@@ -44,16 +58,26 @@ public class AnimationBlendTest : ScriptComponent
             //weight.m_WeightData[0] = 
             timer += Time.DeltaTime;
             float curve = (float)Math.Sin(timer*0.5f);
-            float t = 0.5f * curve + 0.5f;
-            WeightTripple w = WeightTripple.fromWeight(1);
-            WeightTripple w2 = WeightTripple.fromWeight(t);
-            weight.setWeight(0, w);
-            weight.setWeight(1, w2);
-            lookAt.Target =  new Vector3(curve, 1.5f, -1f);
-            if (curve < 0)
-                toTime.Pause();
-            else
-                toTime.Continue();
+            //float t = 0.5f * curve + 0.5f;
+            Vector3 t = target ? target.transform.position : new Vector3(curve, 1.5f, -1f);
+            lookAt.Target = t;
+            ik.Target = t;
+            ik.Orientation = target.transform.localRotation;
+            ik.Weight = 1f;
+            if (Input.GetKeyDown(Input.Keys.Space))
+            {
+                // Throw
+                weight.setWeight(1, 1f);
+                toTime.Play(); 
+                throwLerp = 1f;
+            }
+
+
+            if (!toTime.isPlaying())
+            {
+                throwLerp = Math.Max(0f, throwLerp - Time.DeltaTime);
+                weight.setWeight(1, throwLerp);
+            }
         }
     }
 }

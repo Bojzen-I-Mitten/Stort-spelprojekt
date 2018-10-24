@@ -1,6 +1,8 @@
 #pragma once
 #include "ShaderProperty.h"
 #include "../texture/Texture2D.h"
+#include "../texture/Texture2DArray.h"
+#include "../Shader.h"
 namespace thomas
 {
 	namespace resource
@@ -18,17 +20,19 @@ namespace thomas
 			private:
 				Texture2D* m_value;
 			};
-			/*
+			
 			class ShaderPropertyTexture2DArray : public ShaderProperty
 			{
 			public:
-				ShaderPropertyTexture2D(Texture2D* value);
+				ShaderPropertyTexture2DArray(Texture2DArray* value);
 				void Apply(std::string name, Shader* shader) const;
 				static ShaderProperty* GetDefault();
-				Texture2D* GetValue();
+				Texture2DArray* GetValue();
+
 			private:
-				Texture2D* m_value;
-			};*/
+				Texture2DArray* m_value;
+				unsigned m_nrOfTextures;
+			};
 
 		}
 	}

@@ -3,6 +3,8 @@
 #include "..\resource\Shader.h"
 #include "..\object\Object.h"
 #include "..\object\component\LightComponent.h"
+#include "..\utils\Buffers.h"
+#include "..\resource\Shader.h"
 #include "../AutoProfile.h"
 
 #include <algorithm>

@@ -1,4 +1,5 @@
 #include "ShaderPropertyMatrix.h"
+#include "../Shader.h"
 
 
 namespace thomas

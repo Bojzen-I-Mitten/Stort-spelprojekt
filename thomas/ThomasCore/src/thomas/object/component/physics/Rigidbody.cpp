@@ -18,15 +18,12 @@ namespace thomas
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f),
+			m_damping(0.0f),
+			m_angularDaming(0.0f),
 			m_dirty(false),
 			m_activationState(ActivationState::Default)
 			{
-		/*		setDamping(0.05, 0.85);
-				setDeactivationTime(3.0);
-				setSleepingThresholds(5.6, 5.5);
-				setContactProcessingThreshold(0.25f);
-				setCcdMotionThreshold(0.05f);
-				setCcdSweptSphereRadius(0.06f);*/
+				m_bounciness = m_restitution;
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);
@@ -50,7 +47,7 @@ namespace thomas
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
-				//UpdateProperties();
+				
 				Physics::AddRigidBody(this);
 			}
 
@@ -141,9 +138,15 @@ namespace thomas
 					this->setAngularVelocity(Physics::ToBullet(angularVel));
 			}
 
-			void Rigidbody::SetDamping(const math::Vector2& damping)
+			void Rigidbody::SetDamping(float damping)
 			{
 				m_damping = damping;
+				m_dirty = true;
+			}
+
+			void Rigidbody::SetAngularDamping(float angularDamping)
+			{
+				m_angularDaming = angularDamping;
 				m_dirty = true;
 			}
 
@@ -186,9 +189,10 @@ namespace thomas
 					m_kinematic = kinematic;
 					if (initialized)
 					{
-						Physics::RemoveRigidBody(this);
+						bool removed = Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
-						Physics::AddRigidBody(this);
+						if (removed)
+							Physics::AddRigidBody(this);
 					}		
 				}	
 			}
@@ -212,9 +216,10 @@ namespace thomas
 				m_mass = mass;
 				if (initialized)
 				{
-					Physics::RemoveRigidBody(this);
+					bool removed = Physics::RemoveRigidBody(this);
 					UpdateRigidbodyMass();
-					Physics::AddRigidBody(this);				
+					if (removed)
+						Physics::AddRigidBody(this);
 				}
 			}
 
@@ -222,6 +227,16 @@ namespace thomas
 			{
 				
 				m_LocalCenterOfMassChange = Centerofmass;
+			}
+
+			void Rigidbody::SetBounciness(float bounciness)
+			{
+				m_restitution = bounciness;
+			}
+
+			void Rigidbody::SetFriction(float friction)
+			{
+				m_friction = friction;
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()
@@ -286,9 +301,14 @@ namespace thomas
 				return Physics::ToSimple(this->getAngularVelocity());
 			}
 
-			math::Vector2 Rigidbody::GetDamping() const
+			float Rigidbody::GetDamping() const
 			{
 				return m_damping;
+			}
+
+			float Rigidbody::GetAngularDamping() const
+			{
+				return m_angularDaming;
 			}
 
 			math::Vector2 Rigidbody::GetSleepingThresholds() const
@@ -321,6 +341,16 @@ namespace thomas
 				return m_activationState;
 			}
 
+			float Rigidbody::GetBounciness()
+			{
+				return m_restitution;
+			}
+
+			float Rigidbody::GetFriction()
+			{
+				return m_friction;
+			}
+
 			void Rigidbody::UpdateRigidbodyMass()
 			{
 				float mass = m_kinematic ? 0 : m_mass;
@@ -331,6 +361,7 @@ namespace thomas
 
 				setMassProps(mass, inertia);
 				updateInertiaTensor();
+				this->activate();
 			}
 
 			void Rigidbody::UpdateProperties()
@@ -338,8 +369,10 @@ namespace thomas
 				this->setActivationState(m_activationState);
 				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
 				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
-				this->setDamping(m_damping.x, m_damping.y);
+				this->setDamping(m_damping, m_angularDaming);
 				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				this->activate(true);
+				
 				m_dirty = false;
 			}
 		}

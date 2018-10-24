@@ -1,7 +1,8 @@
-#pragma unmanaged
+
 #include <thomas\ThomasCore.h>
-#pragma managed
 #include "Debug.h"
+
+#pragma managed
 
 void ThomasEngine::Debug::UpdateCoreLog()
 {

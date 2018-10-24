@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "utils\D3D.h"
 #include "WindowManager.h"
+#include "ThomasCore.h"
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -293,7 +294,7 @@ namespace thomas
 		case WM_SIZE:
 		{
 			if (window)
-				window->QueueResize();
+				window->QueueResize();				
 		}
 		break;
 		case WM_SETFOCUS:
@@ -324,10 +325,15 @@ namespace thomas
 		case WM_SYSKEYUP:
 			window->m_input.ProcessKeyboard(message, wParam, lParam);
 			break;
+		case WM_CHAR:
+			if (wParam > 0 && wParam < 0x10000)
+				window->m_input.SetLastKey((unsigned short)wParam);
+			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;
 		}
+
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 }

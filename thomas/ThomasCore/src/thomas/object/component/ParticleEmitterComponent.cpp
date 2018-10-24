@@ -1,16 +1,16 @@
 #include "ParticleEmitterComponent.h"
-#include <cstdlib>
-#include <ctime>
 #include "../GameObject.h"
-#include <fstream>
 #include "../../utils/d3d.h"
 
 #include "..\..\resource\Material.h"
 #include "..\..\graphics\ParticleSystem.h"
 #include "Transform.h"
 #include "../../ThomasTime.h"
+#include "../../resource/texture/Texture2D.h"
 
 #include "../../editor/gizmos/Gizmos.h"
+#include <imgui/imgui.h>
+
 namespace thomas
 {
 	namespace object
@@ -23,9 +23,10 @@ namespace thomas
 				m_emissionRate = 32;
 				m_emissionThreshold = 0.0;
 				m_isEmitting = false;
+				m_emitOneShot = false;
 				m_particleBufferStruct = {};
 
-				m_particleBufferStruct.position = math::Vector3(0, 0, 0);
+				m_particleBufferStruct.position = math::Vector3::Zero;
 				m_particleBufferStruct.distanceFromSphereCenter = 0.0f;
 
 				m_particleBufferStruct.radius = 1;
@@ -43,12 +44,13 @@ namespace thomas
 				m_particleBufferStruct.minRotationSpeed = 0.0f;
 				m_particleBufferStruct.maxRotationSpeed = 0.0f;
 
-				m_particleBufferStruct.direction = math::Vector3(0, 0, 0);
+				m_particleBufferStruct.direction = math::Vector3::Forward;
 
 				m_particleBufferStruct.nrOfParticlesToEmit = 0;
 				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
 				m_particleBufferStruct.rand = std::rand();
 				
+				SetTexture(resource::Texture2D::GetWhiteTexture());
 			}
 
 			ParticleEmitterComponent::~ParticleEmitterComponent()
@@ -56,30 +58,40 @@ namespace thomas
 				
 			}
 
-			math::Vector3 SphericalCoordinate(float phi, float theta)
-			{
-				float xAngle = sin(theta) * cos(phi);
-				float yAngle = sin(theta) * sin(phi);
-				float zAngle = cos(theta);
-				return math::Vector3(xAngle, yAngle, zAngle);
-			}
 
 			void ParticleEmitterComponent::OnDrawGizmosSelected()
 			{
-				editor::Gizmos::SetColor(math::Color(1, 1, 0));
-				editor::Gizmos::SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 				
 				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
-				editor::Gizmos::DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
+				editor::Gizmos::Gizmo().DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
 				
-				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(90), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(270), math::DegreesToRadians(90)) * m_particleBufferStruct.radius, math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0)) * m_particleBufferStruct.radius, math::Vector3::Zero);
-				editor::Gizmos::DrawLine(sphereCenter + SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180)) * m_particleBufferStruct.radius, math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(0), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(90), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(180), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(270), math::DegreesToRadians(90), m_particleBufferStruct.radius), math::Vector3::Zero);
+				editor::Gizmos::Gizmo().DrawLine(sphereCenter + math::SphericalCoordinate(math::DegreesToRadians(0), math::DegreesToRadians(180), m_particleBufferStruct.radius), math::Vector3::Zero);
+				
+				//ImGui::SetNextWindowPos(ImVec2(5, 5));
 				
 				
+				//ImGui::Begin("Overlay", NULL, ImVec2(100, 0), 0.3f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+					//ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+				/*
+				std::string stop = "alt + 254";
+				
+				ImGui::Button(stop.c_str());*/
+				//if (ImGui::ArrowButton("DisplayParticles", ImGuiDir_Right));
+				//{
+					//StartEmitting();
+				//}
+				//ImGui::SameLine();
+				//ImGui::SetCursorPos(ImVec2(52, 10)); // Center buttons
+				//ImGui::Text("Status asdfasdfasdf ");
+				//ImGui::End();
+				//StartEmitting();
 			}
 
 			void ParticleEmitterComponent::SetParticleSystem(std::shared_ptr<graphics::ParticleSystem> particleSystem)
@@ -104,7 +116,16 @@ namespace thomas
 				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
 				m_particleBufferStruct.direction = m_gameObject->m_transform->Forward();
 
-				if (m_isEmitting)
+				if (m_emitOneShot)
+				{
+					if (m_particleBufferStruct.nrOfParticlesToEmit > 0)
+					{
+						m_particleBufferStruct.rand = std::rand();
+						m_particleSystem->AddEmitterToSpawn(m_particleBufferStruct);
+					}
+					m_emitOneShot = false;
+				}
+				else if (m_isEmitting)
 				{
 					unsigned nrOfParticlesToEmit = NrOfParticlesToEmitThisFrame();
 					if (nrOfParticlesToEmit > 0)
@@ -124,6 +145,11 @@ namespace thomas
 
 			void ParticleEmitterComponent::OnDisable()
 			{
+			}
+
+			void ParticleEmitterComponent::OnDestroy()
+			{
+				m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
 			}
 
 			
@@ -304,17 +330,26 @@ namespace thomas
 				return m_isEmitting;
 			}
 
-
-			void ParticleEmitterComponent::SetMaterial(resource::Material * material)
+			void ParticleEmitterComponent::EmitOneShot(unsigned const & nrOfPaticles)
 			{
-				m_material = material;
+				m_emitOneShot = true;
+				m_particleBufferStruct.nrOfParticlesToEmit = nrOfPaticles;
 			}
 
-			resource::Material * ParticleEmitterComponent::GetMaterial() const
+			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)
 			{
-				return m_material;
+				if (other == m_texture)
+					return;
+
+				m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(other);
+
+				m_texture = other;
 			}
 
+			resource::Texture2D * ParticleEmitterComponent::GetTexture() const
+			{
+				return m_texture;
+			}
 
 			void ParticleEmitterComponent::SetEmissionRate(unsigned const& other)
 			{

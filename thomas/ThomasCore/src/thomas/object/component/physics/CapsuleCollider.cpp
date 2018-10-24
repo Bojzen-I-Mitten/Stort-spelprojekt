@@ -76,7 +76,7 @@ namespace thomas
 
 			void CapsuleCollider::OnDrawGizmosSelected()
 			{
-				editor::Gizmos::SetColor(math::Color(0, 1, 0));
+				editor::Gizmos::Gizmo().SetColor(math::Color(0, 1, 0));
 				math::Matrix rotationMatrix = math::Matrix::Identity;
 
 				if (m_rotation == ColliderRotation::RotateX)
@@ -84,8 +84,8 @@ namespace thomas
 				else if (m_rotation == ColliderRotation::RotateZ)
 					rotationMatrix = math::Matrix::CreateRotationX(math::PI / 2.0f);
 
-				editor::Gizmos::SetMatrix(rotationMatrix * m_gameObject->m_transform->GetWorldMatrix());
-				editor::Gizmos::DrawBoundingCapsule(m_center, m_radius, m_height);
+				editor::Gizmos::Gizmo().SetMatrix(rotationMatrix * m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().DrawBoundingCapsule(m_center, m_radius, m_height);
 			}
 		}
 	}

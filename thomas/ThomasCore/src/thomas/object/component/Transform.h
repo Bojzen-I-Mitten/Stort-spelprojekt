@@ -27,6 +27,7 @@ namespace thomas
 				math::Matrix GetLocalWorldMatrix();
 				void SetLocalMatrix(math::Matrix matrix);
 				math::Matrix GetWorldMatrix();
+				math::Matrix GetWorldInverse();
 				void SetWorldMatrix(math::Matrix matrix);
 
 				void LookAt(Transform* target);
@@ -60,6 +61,7 @@ namespace thomas
 				void SetLocalPosition(math::Vector3 position);
 				void SetLocalPosition(float x, float y, float z);
 				void SetLocalRotation(math::Quaternion rotation);
+				void SetLocalRotation(math::Vector3 pitchyawroll);
 				void SetLocalRotation(float yaw, float pitch, float roll);
 				void SetLocalScale(math::Vector3 scale);
 				void SetLocalScale(float x, float y, float z);
@@ -87,7 +89,7 @@ namespace thomas
 
 				math::Quaternion m_localRotation;
 #ifdef _EDITOR
-				math::Vector3 m_euler;
+				math::Euler m_euler;
 #endif
 				math::Vector3 m_localPosition;
 				math::Vector3 m_localScale;

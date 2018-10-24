@@ -36,6 +36,18 @@ namespace ThomasEngine
 		{
 			m_handle->m_elapsedTime = std::fmodf(elapsed, m_handle->getDuration());
 		}
+		void PlaybackHandle::SetSpeed(float speed)
+		{
+			m_handle->setSpeed(speed);
+		}
+		float PlaybackHandle::GetSpeed()
+		{
+			return m_handle->getSpeed();
+		}
+		bool PlaybackHandle::isPlaying()
+		{
+			return m_handle->isRunning();
+		}
 		thomas::graphics::animation::Playback * PlaybackHandle::Native()
 		{
 			return m_handle;

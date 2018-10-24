@@ -5,7 +5,7 @@ namespace DirectX
 {
 	namespace SimpleMath
 	{
-		Vector3 ToEuler(const Quaternion & q)
+		Euler ToEuler(const Quaternion & q)
 		{
 			float yaw, pitch, roll;
 
@@ -27,7 +27,15 @@ namespace DirectX
 				pitch = 0.f;
 			}
 
-			return Vector3(RadiansToDegrees(pitch), RadiansToDegrees(yaw), RadiansToDegrees(roll));
+			return Euler(RadiansToDegrees(yaw), RadiansToDegrees(pitch),  RadiansToDegrees(roll));
+		}
+		Euler ToEuler(const Vector3 & v)
+		{
+			return { v.y, v.x, v.z };
+		}
+		Vector3 FromEuler(const Euler & e)
+		{
+			return Vector3(e.pitch, e.yaw, e.roll);
 		}
 		Quaternion FromEuler(const Vector3 & rotation)
 		{
@@ -119,6 +127,97 @@ namespace DirectX
 				q.Normalize();
 			}
 			return q;
+		}
+
+		Vector3 SphericalCoordinate(float phi, float theta, float radius)
+		{
+			float xAngle = sin(theta) * cos(phi);
+			float yAngle = sin(theta) * sin(phi);
+			float zAngle = cos(theta);
+
+			return Vector3(xAngle, yAngle, zAngle) * radius;
+		}
+
+		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest)
+		{
+			from.Normalize();
+			dest.Normalize();
+
+			float c = from.Dot(dest);
+			if (c >= 1.0f) // Vectors are parallel	(identical)
+				return Matrix::Identity;
+			if (c < (1e-6f - 1.0f)) // Vectors are parallel (opposite)
+			{
+				// Generate an axis
+				Vector3 axis = Vector3::UnitX.Cross(from);
+				if (axis.LengthSquared() < 0.0001f) // Pick another if colinear
+					axis = Vector3::UnitY.Cross(from);
+				axis.Normalize();
+				return Matrix::CreateFromAxisAngle(axis, PI);
+			}
+			else {
+
+				// Credit goes to: Jur Van den Berg 
+				// https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/476311#476311
+				Vector3 v = from.Cross(dest);
+				float s = 1.f / (1.f + c);
+
+				Matrix vx(
+					0.f, v.z, -v.y, 0.f,
+					-v.z, 0.f, v.x, 0.f,
+					v.y, -v.x, 0.f, 0.f,
+					0.f, 0.f, 0.f, 0.f);
+				vx = vx + (vx * vx) * s; // Simplify square calc? ...
+				// Add identity
+				vx._11 += 1.f;
+				vx._22 += 1.f;
+				vx._33 += 1.f;
+				vx._44 += 1.f;
+				return vx;
+			}
+		}
+
+		/* Extract the length of each axis in the top-left 3x3 matrix.
+		*/
+		Vector3 extractAxisScale(const Matrix& m)
+		{
+			return Vector3(
+				m.Right().Length(),
+				m.Up().Length(),
+				m.Forward().Length());
+		}
+		/* Normalize each row vector in the topleft 3x3 matrix
+		*/
+		Matrix normalizeBasisAxis(Matrix m)
+		{
+			float len = 1.f / std::sqrtf(m._11 * m._11 + m._12 * m._12 + m._13 * m._13);
+			m._11 *= len;
+			m._12 *= len;
+			m._13 *= len;
+			len = 1.f / std::sqrtf(m._21 * m._21 + m._22 * m._22 + m._23 * m._23);
+			m._21 *= len;
+			m._22 *= len;
+			m._23 *= len;
+			len = 1.f / std::sqrtf(m._31 * m._31 + m._32 * m._32 + m._33 * m._33);
+			m._31 *= len;
+			m._32 *= len;
+			m._33 *= len;
+			return m;
+		}
+		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
+		*/
+		Matrix& mult(Matrix &m, Vector3 scalars)
+		{
+			m._11 *= scalars.x;
+			m._12 *= scalars.x;
+			m._13 *= scalars.x;
+			m._21 *= scalars.y;
+			m._22 *= scalars.y;
+			m._23 *= scalars.y;
+			m._31 *= scalars.z;
+			m._32 *= scalars.z;
+			m._33 *= scalars.z;
+			return m;
 		}
 	}
 }

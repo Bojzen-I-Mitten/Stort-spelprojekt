@@ -22,9 +22,9 @@ namespace thomas
 			}
 
 			Transform::Transform()
+				: m_parent(NULL)
 			{
 				Decompose();
-				m_parent = NULL;
 			}
 			math::Vector3 Transform::Forward()
 			{
@@ -57,6 +57,10 @@ namespace thomas
 					return m_localWorldMatrix * m_parent->GetWorldMatrix();
 				else
 					return m_localWorldMatrix;
+			}
+			math::Matrix Transform::GetWorldInverse()
+			{
+				return GetWorldMatrix().Invert();
 			}
 
 			void Transform::SetWorldMatrix(math::Matrix matrix)
@@ -116,10 +120,11 @@ namespace thomas
 			void Transform::Rotate(math::Quaternion rot)
 			{
 				m_localRotation = m_localRotation * rot;
-#ifdef _EDITOR
+//#ifdef _EDITOR
 				m_euler = math::ToEuler(m_localRotation);
-#endif
+//#endif
 				UpdateLocalMatrix();
+				Decompose();
 				SetDirty(true);
 			}
 			void Transform::Rotate(float x, float y, float z)
@@ -130,6 +135,7 @@ namespace thomas
 			{
 				m_localRotation = m_localRotation * math::Quaternion::CreateFromAxisAngle(axis, angle);
 				UpdateLocalMatrix();
+				Decompose();
 			}
 			void Transform::Translate(math::Vector3 translation)
 			{
@@ -156,7 +162,7 @@ namespace thomas
 			math::Vector3 Transform::GetPosition()
 			{
 				if (m_parent)
-					return m_parent->GetPosition() + math::Vector3::Transform(m_localPosition, math::Matrix::CreateFromQuaternion(m_parent->GetRotation()));
+					return GetWorldMatrix().Translation();
 				else
 					return m_localPosition;
 			}
@@ -186,7 +192,7 @@ namespace thomas
 			{
 				if (m_parent)
 				{
-					SetLocalPosition(position - m_parent->GetPosition());
+					SetLocalPosition(math::Vector3::Transform(position, m_parent->GetWorldInverse()));
 				}
 				else
 					SetLocalPosition(position);
@@ -197,15 +203,18 @@ namespace thomas
 			}
 			void Transform::SetRotation(math::Quaternion rotation)
 			{
-				if (m_parent)
-					SetLocalRotation(rotation / m_parent->GetRotation());
+				if (m_parent) {
+					math::Quaternion q = m_parent->GetRotation();
+					q.Inverse(q);
+					SetLocalRotation(rotation * q);
+				}
 				else
 					SetLocalRotation(rotation);
 			}
 			void Transform::SetRotation(float yaw, float pitch, float roll)
 			{
 #ifdef _EDITOR
-				m_euler = math::Vector3(pitch, yaw, roll);
+				m_euler = math::Euler(yaw, pitch, roll);
 #endif
 				SetRotation(math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll)));
 			}
@@ -246,10 +255,15 @@ namespace thomas
 				m_euler = math::ToEuler(m_localRotation);
 #endif
 			}
+			void Transform::SetLocalRotation(math::Vector3 v)
+			{
+				math::Euler e = math::ToEuler(v);
+				SetLocalRotation(e.yaw, e.pitch, e.roll);
+			}
 			void Transform::SetLocalRotation(float yaw, float pitch, float roll)
 			{
 #ifdef _EDITOR
-				m_euler = math::Vector3(pitch, yaw, roll);
+				m_euler = math::Euler(yaw, pitch, roll);
 #endif
 				m_localRotation = math::Quaternion::CreateFromYawPitchRoll(math::DegreesToRadians(yaw), math::DegreesToRadians(pitch), math::DegreesToRadians(roll));
 				UpdateLocalMatrix();
@@ -282,7 +296,7 @@ namespace thomas
 			math::Vector3 Transform::GetLocalEulerAngles()
 			{
 #ifdef _EDITOR
-				return m_euler;
+				return math::FromEuler(m_euler);
 #else
 				return math::ToEuler(m_localRotation);
 #endif

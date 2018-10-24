@@ -14,7 +14,9 @@ namespace thomas
 	namespace resource {
 		class MemoryAllocation;
 	}
-
+	namespace utils {
+		class ThreadMap;
+	}
 	class ThomasCore
 	{
 	public:	
@@ -32,6 +34,15 @@ namespace thomas
 
 		static ThomasCore& Core();
 
+		/* Thread map used to register threads.
+		*/
+		utils::ThreadMap& getThreadMap();
+		void registerThread();
+		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.
+		*/
+		uint32_t Thread_Index();
+		void OnStop();
+		void OnPlay();
 
 		resource::MemoryAllocation* Memory();
 
@@ -40,11 +51,10 @@ namespace thomas
 		static void ClearLogOutput();
 		static bool IsEditor();
 		static void SetEditor(bool value);
-	private:
-		static bool InitDirectX();
 
 	private:
-		
+
+		std::unique_ptr<utils::ThreadMap> m_threadMap;
 		resource::MemoryAllocation* m_memAlloc;
 
 		static bool s_initialized;

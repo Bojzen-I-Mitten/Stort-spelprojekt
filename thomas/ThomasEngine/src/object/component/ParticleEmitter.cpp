@@ -2,14 +2,21 @@
 #include <thomas\object\component\ParticleEmitterComponent.h>
 #pragma managed
 #include "ParticleEmitter.h"
-
+#include "../../resource/texture/Texture2D.h"
+#include "../../resource/Resources.h"
 
 namespace ThomasEngine
 {
 	ParticleEmitter::ParticleEmitter() : Component(new thomas::object::component::ParticleEmitterComponent()) {}
 
+	
+
 	thomas::object::component::ParticleEmitterComponent* ParticleEmitter::particleEmitter::get() { return (thomas::object::component::ParticleEmitterComponent*)nativePtr; }
 
+	void ParticleEmitter::EmitOneShot(unsigned nrToEmit)
+	{
+		particleEmitter->EmitOneShot(nrToEmit);
+	}
 
 	float ParticleEmitter::MinSpeed::get() { return particleEmitter->GetMinSpeed(); }
 	void ParticleEmitter::MinSpeed::set(float value) { particleEmitter->SetMinSpeed(value); }
@@ -50,6 +57,28 @@ namespace ThomasEngine
 	unsigned ParticleEmitter::EmissionRate::get() { return particleEmitter->GetEmissionRate(); }
 	void ParticleEmitter::EmissionRate::set(unsigned value) { particleEmitter->SetEmissionRate(value); }
 
-	bool ParticleEmitter::Emit::get() { return particleEmitter->IsEmitting(); }
-	void ParticleEmitter::Emit::set(bool value) { particleEmitter->StartEmitting(); }
+	Texture2D^ ParticleEmitter::Texture::get() 
+	{ 
+		ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(particleEmitter->GetTexture());
+		if (res)
+			return (ThomasEngine::Texture2D^)res;
+		else
+			return gcnew ThomasEngine::Texture2D(particleEmitter->GetTexture());
+	}
+	void ParticleEmitter::Texture::set(Texture2D^ value) { particleEmitter->SetTexture((thomas::resource::Texture2D*)value->m_nativePtr); }
+
+
+	bool ParticleEmitter::Emit::get() 
+	{
+		return particleEmitter->IsEmitting(); 
+	}
+	void ParticleEmitter::Emit::set(bool value) 
+	{ 
+		if (value)
+			particleEmitter->StartEmitting();
+		else
+			particleEmitter->StopEmitting();
+	}
+	
+
 }

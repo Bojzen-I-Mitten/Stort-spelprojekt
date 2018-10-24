@@ -14,11 +14,17 @@ namespace ThomasEngine {
 	}
 	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
+		m_instance = true;
 	}
 
 	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
 	{
 
+	}
+
+	void Material::Reload()
+	{
+		m_nativePtr->Reload();
 	}
 
 	void Material::OnRename()
@@ -49,7 +55,7 @@ namespace ThomasEngine {
 	void Material::OnChange()
 	{
 #ifdef _EDITOR
-		if (!ThomasWrapper::IsPlaying())
+		if (!ThomasWrapper::IsPlaying() && !m_instance)
 			Serializer::SerializeMaterial(this, m_path);
 #endif
 	}
