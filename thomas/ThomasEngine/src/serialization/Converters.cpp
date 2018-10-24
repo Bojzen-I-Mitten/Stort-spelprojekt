@@ -42,7 +42,19 @@ namespace ThomasEngine
 		else
 			return Resource::typeid->IsAssignableFrom(objectType);
 	}
-
+	bool PrefabConverter::CanWrite::get()
+	{
+		if (m_skipWrite > 0)
+		{
+			m_skipWrite--;
+			return false;
+		}
+		return true;
+	}
+	PrefabConverter::PrefabConverter()
+		: m_skipWrite(0)
+	{
+	}
 	void PrefabConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
 		JObject^ jo = gcnew JObject();
@@ -52,24 +64,10 @@ namespace ThomasEngine
 		}
 		else
 		{
-			jo = JObject::FromObject(value);
+			m_skipWrite = 1;
+			jo = JObject::FromObject(value, serializer);
 		}
 
-		/*
-			serializer->Serialize(writer, value,)
-			for each(System::Reflection::PropertyInfo^ prop in value->GetType()->GetProperties())
-			{
-				if (prop->CanRead && prop->CanWrite && prop->SetMethod)
-				{
-					Object^ propVal = prop->GetValue(value, nullptr);
-					if (propVal != nullptr)
-					{
-						String^ info = prop->Name;
-						jo->Add(info, JToken::FromObject(propVal, serializer));
-					}
-				}
-			}
-		*/
 
 		jo->WriteTo(writer);
 
@@ -146,7 +144,21 @@ namespace ThomasEngine
 	void ComponentConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
 		JObject^ jo = gcnew JObject();
-		jo = JObject::FromObject(value);
+		// Default serialization (if converter 'this' is disabled).
+		jo = JObject::FromObject(value, serializer);
+		// Custom serialization
+		for each(System::Reflection::PropertyInfo^ prop in value->GetType()->GetProperties())
+		{
+			if (prop->CanRead && prop->CanWrite && prop->SetMethod)
+			{
+				Object^ propVal = prop->GetValue(value, nullptr);
+				if (propVal != nullptr)
+				{
+					String^ info = prop->Name;
+					jo->Add(info, JToken::FromObject(propVal, serializer));
+				}
+			}
+		}
 		jo->WriteTo(writer);
 	}
 
