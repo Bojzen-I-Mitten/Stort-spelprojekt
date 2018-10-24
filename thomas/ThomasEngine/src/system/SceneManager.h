@@ -34,6 +34,8 @@ namespace ThomasEngine
 		/* Wait process for async. loading thread. */
 		void SyncSceneSwap(Scene ^ scene);
 
+		Scene ^ CreateEmpty();
+
 
 	internal:
 		/* Called by logic process to swap scene.

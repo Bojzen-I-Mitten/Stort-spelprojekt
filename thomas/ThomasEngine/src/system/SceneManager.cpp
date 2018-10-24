@@ -25,10 +25,7 @@ namespace ThomasEngine
 	void SceneManager::SetCurrent(Scene^ value)
 	{
 		if (value == nullptr)	// If clear scene
-		{
-			SetEmpty();
-			return;
-		}
+			value = CreateEmpty();
 		assert(!m_current_scene || value->ID() != m_current_scene->ID());
 		// Set new scene
 		Scene^ oldScene = m_current_scene;
@@ -107,6 +104,8 @@ namespace ThomasEngine
 				SyncSceneSwap(scene);
 				Debug::Log("Scene: " + m_current_scene->Name + " finished loading!");
 			}
+			m_state = SceneManagerState::NormalState;
+
 			Monitor::Exit(m_loading_lock);
 		}
 		else {
@@ -126,6 +125,7 @@ namespace ThomasEngine
 			m_state = SceneManagerState::LoadingInProgress;
 			Scene^ scene = gcnew Scene(fullPath, m_ID_Counter++);
 			SyncSceneSwap(scene); // Swap
+			m_state = SceneManagerState::NormalState;
 			Monitor::Exit(m_loading_lock);
 		}
 		else {
@@ -137,23 +137,27 @@ namespace ThomasEngine
 
 	void SceneManager::SyncSceneSwap(Scene^scene)
 	{
-		// Only trigger if a scene is actually loaded
+		// Set swap state (lock preventing race conditions while setting swap parameters)
 		Monitor::Enter(m_swap_lock);
 		m_swap_event->Reset();
 		m_new_loaded_scene = scene;
 		Monitor::Exit(m_swap_lock);
 		m_swap_event->WaitOne();
-		m_state = SceneManagerState::NormalState;
+	}
+	Scene^ SceneManager::CreateEmpty()
+	{
+		return gcnew Scene("void", m_ID_Counter++);
 	}
 
 	void SceneManager::SetEmpty()
 	{
 		if (Monitor::TryEnter(m_loading_lock))
 		{
+			// Only trigger if a scene is actually loaded
 			m_state = SceneManagerState::LoadingInProgress;
-			Scene^ scene = gcnew Scene("void", m_ID_Counter++);
-			// Set swap state (lock preventing race conditions while setting swap parameters)
+			Scene^ scene = CreateEmpty();
 			SyncSceneSwap(scene);
+			m_state = SceneManagerState::NormalState;
 			Monitor::Exit(m_loading_lock);
 		}
 		else {

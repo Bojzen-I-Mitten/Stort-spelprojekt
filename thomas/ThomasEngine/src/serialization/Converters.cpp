@@ -64,6 +64,7 @@ namespace ThomasEngine
 		}
 		else
 		{
+			// Use default serialization (skip this converter to prevent looping calls)
 			m_skipWrite = 1;
 			jo = JObject::FromObject(value, serializer);
 		}
