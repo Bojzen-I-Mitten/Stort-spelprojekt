@@ -40,7 +40,7 @@ namespace ThomasEngine
 
 	void Model::InitPrimitives()
 	{
-		LoadPrimitive(PrimitiveType::Cube, "../Data/primitives/cube.obj");
+		LoadPrimitive(PrimitiveType::Cube, "../Data/primitives/box.obj");
 		LoadPrimitive(PrimitiveType::Plane, "../Data/primitives/plane.obj");
 		LoadPrimitive(PrimitiveType::Cylinder, "../Data/primitives/cylinder.obj");
 		LoadPrimitive(PrimitiveType::Quad, "../Data/primitives/quad.obj");

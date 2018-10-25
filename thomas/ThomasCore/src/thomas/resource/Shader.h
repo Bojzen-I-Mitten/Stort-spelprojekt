@@ -32,9 +32,10 @@ namespace thomas
 				PSIZE = 10,
 				BONEINDICES = 11,
 				BONEWEIGHTS = 12,
-				NORMALTEXTURE = 13,//Temporary hack
-				MATERIALSMOOTHNESSFACTOR = 14,//Temporary hack
-				UNKNOWN = 15
+				NORMALTEXTURE = 13,
+				MATERIALSMOOTHNESSFACTOR = 14,
+				UVTILING = 15,
+				UNKNOWN = 16
 			};
 
 		protected:
