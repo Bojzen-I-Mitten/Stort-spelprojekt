@@ -41,12 +41,26 @@ public class Vindaloo : Powerup
     // if this is a non-throwable this function will be called
     public override void OnActivate()
     {
+        Debug.Log("Vindaru onactivetu");
+
         //boom particles
         Explosion();
 
-        // loop through players
-        // intersection test
-        // apply force (player.position - this.gameobject.transform.position * 10.f;
+        var players = NetworkManager.instance.Scene.Players.Values.ToList();
+        players.ForEach(player =>
+        {
+            Debug.Log("Rooping etto puraya desu");
+            float distance = Vector3.Distance(player.transform.position, transform.position);
+            if (distance < ExplosionRadius)
+            {
+                Vector3 forceDir = player.transform.position - transform.position;
+                forceDir.y += 3.0f;
+
+                Debug.Log("Nani desu ka?");
+                player.gameObject.GetComponent<ChadControls>().PublicStartRagdoll(5.0f, forceDir * ExplosionForce);
+            }
+        });
+
 
         // despawn gameobject
     }
@@ -55,22 +69,6 @@ public class Vindaloo : Powerup
     {
         _Fire.Emit = true;
         StartCoroutine(StopFire());
-
-        var players = NetworkManager.instance.Scene.Players.Values.ToList();
-        players.ForEach(player =>
-        {
-            float distance = Vector3.Distance(player.transform.position, transform.position);
-            if (distance < ExplosionRadius)
-            {
-                Vector3 forceDir = player.transform.position - transform.position;
-                forceDir.y += 3.0f;
-
-                
-                //StartCoroutine(RagdollEffect(5.0f, forceDir * ExplosionForce, player));
-                // player.gameObject.GetComponent<Rigidbody>().AddForce(forceDir * ExplosionForce, Rigidbody.ForceMode.Impulse);
-            }
-        });
-
     }
 
     private void ResetFireEmitters()

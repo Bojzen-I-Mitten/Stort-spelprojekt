@@ -23,6 +23,7 @@ namespace thomas {
 				// Local data copy.
 				uint32_t bytes = cmd.numVertex * sizeof(math::Vector3);
 				math::Vector3 * alloc = reinterpret_cast<math::Vector3*>(m_alloc.allocate(bytes, sizeof(float)));
+
 				std::memcpy(alloc, cmd.vertexData, bytes);
 				cmd.vertexData = alloc;
 				// Increment

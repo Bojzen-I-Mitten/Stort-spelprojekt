@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DissolveTest.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\POWERUP_TEMPLATE.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Vindaloo.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerup.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
     <Compile Include="Assets\Scripts\Chad\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
+    <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />
     <Compile Include="Assets\test\GizmoTest.cs" />

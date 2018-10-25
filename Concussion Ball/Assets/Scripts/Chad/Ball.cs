@@ -6,6 +6,12 @@ using ThomasEngine;
 using ThomasEngine.Network;
 public class Ball : PickupableObject
 {
+    Rigidbody rb;
+    RenderComponent rc;
+    // private float accumulator;
+    // private float chargeupTime;
+    public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
+
     private ParticleEmitter emitterElectricity1;
     private ParticleEmitter emitterElectricity2;
     private ParticleEmitter emitterElectricity3;
@@ -106,7 +112,7 @@ public class Ball : PickupableObject
         emitterElectricity1.DistanceFromSphereCenter = 0;
         emitterElectricity1.Radius = 0.5f;
         emitterElectricity1.SpawnAtEdge = true;
-        
+
         emitterElectricity2.MinSize = 0.25f;
         emitterElectricity2.MaxSize = 0.5f;
         emitterElectricity2.EndSize = 0.05f;
@@ -120,7 +126,7 @@ public class Ball : PickupableObject
         emitterElectricity2.EndSpeed = -2.3f;
         emitterElectricity2.DistanceFromSphereCenter = 0;
         emitterElectricity2.Radius = 1.0f;
-        
+
         emitterElectricity3.MinSize = 0.4f;
         emitterElectricity3.MaxSize = 1.0f;
         emitterElectricity3.EndSize = 0.7f;
@@ -210,6 +216,8 @@ public class Ball : PickupableObject
 
     public override void Update()
     {
+        //if (transform.position.y < -5)
+        //    Reset();
     }
 
     override public void ChargeEffect()
@@ -217,10 +225,10 @@ public class Ball : PickupableObject
         emitterElectricity1.Emit = true;
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
-        
+
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
-        Color newColor = new Color(interp, 0.0f, (1.0f-interp));
+        Color newColor = new Color(interp, 0.0f, (1.0f - interp));
         renderComponent.material.SetColor("color", newColor);
 
         if (interp > 0.8f)
@@ -234,7 +242,7 @@ public class Ball : PickupableObject
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
             electricityIntensifyerThreshold += 0.3f;
         }
-        
+
     }
 
     override public void Cleanup()
@@ -253,3 +261,27 @@ public class Ball : PickupableObject
         ResetElectricityEmitters();
     }
 }
+
+    //public void Reset()
+    //{
+    //    RPCDrop();
+    //    gameObject.SetActive(false);
+    //    gameObject.SetActive(true);
+    //    if (isOwner)
+    //    {
+    //        if (rigidbody != null)
+    //        {
+    //            Debug.Log("Resetting ball");
+    //            rigidbody.enabled = false;
+    //            StartCoroutine(EnableRigidBody());
+    //        }
+    //        transform.localEulerAngles = Vector3.Zero;
+    //        transform.localPosition = SpawnPoint;
+    //    }
+    //}
+
+//private IEnumerator EnableRigidBody()
+//{
+//    yield return null;
+//    rigidbody.enabled = true;
+//}
