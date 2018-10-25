@@ -17,8 +17,8 @@ public class Ball : NetworkComponent
     private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
-    private ParticleEmitter emitterConfetti1;
-    private ParticleEmitter emitterConfetti2;
+  //  private ParticleEmitter emitterConfetti1;
+    //private ParticleEmitter emitterConfetti2;
 
     public Texture2D electricityTex1 { get; set; }
     public Texture2D electricityTex2 { get; set; }
@@ -66,7 +66,7 @@ public class Ball : NetworkComponent
         MultiplyWithIntensity((float)(0.5f), emitterElectricity3);
     }
 
-    private void ResetConfettiEmitters()
+   /* private void ResetConfettiEmitters()
     {
 
         emitterConfetti1.MinSize = 0.03f;
@@ -102,7 +102,7 @@ public class Ball : NetworkComponent
         emitterConfetti2.Radius = 1.0f;
         emitterConfetti2.Gravity = 5.0f;
         emitterConfetti2.SpawnAtEdge = false;
-    }
+    }*/
 
     private void ResetFireEmitters()
     {
