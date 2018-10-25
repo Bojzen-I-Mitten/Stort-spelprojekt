@@ -111,7 +111,7 @@ namespace thomas
 		//Destroy all objects
 		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
-		graphics::ParticleSystem::DestroyGlobalSystem();
+		graphics::ParticleSystem::DestroyGlobalSystems();
 		graphics::Renderer::Instance()->Destroy();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
