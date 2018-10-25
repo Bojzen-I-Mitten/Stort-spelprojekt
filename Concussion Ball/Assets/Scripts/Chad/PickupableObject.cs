@@ -10,6 +10,7 @@ public class PickupableObject : NetworkComponent
     public Rigidbody m_rigidBody;
 
     public Transform PickupOffset { get; set; } = null;
+    public float MovementSpeedModifier { get; set; } = 1.0f;
 
     public bool m_throwable = false;
     public bool m_pickupable = true;
@@ -54,9 +55,6 @@ public class PickupableObject : NetworkComponent
         }
     }
 
-    virtual public void OnActivate()
-    {
-    }
 
     virtual public void StopEmitting()
     {

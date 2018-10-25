@@ -62,6 +62,8 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
+        gameObject.GetComponent<RenderComponent>().enabled = false;
+        gameObject.GetComponent<Rigidbody>().enabled = false;
         _Fire.Emit = true;
         StartCoroutine(StopFire());
     }

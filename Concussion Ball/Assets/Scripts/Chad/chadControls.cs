@@ -365,6 +365,8 @@ public class ChadControls : NetworkComponent
 
     private void StateMachine()
     {
+        float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
+        float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
         switch (State)
         {
             case STATE.CHADING:
@@ -377,21 +379,21 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
-                CurrentVelocity.x = Direction.x * BaseSpeed;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
-                CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -BaseSpeed, MaxSpeed);
+                CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.THROWING:
-                CurrentVelocity.y = Direction.z * BaseSpeed;
-                CurrentVelocity.x = Direction.x * BaseSpeed;
+                CurrentVelocity.y = Direction.z * modifiedBaseSpeed;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
-                CurrentVelocity.y = MaxSpeed;
+                CurrentVelocity.y = modifiedMaxSpeed;
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:

@@ -12,6 +12,8 @@ public class Powerup : PickupableObject
 
     protected RenderComponent m_renderComponent; // in case we want to alter material with charge up
     public PowerupSpawner spawner;
+
+    protected bool activated = false;
     public override void Start()
     {
         base.Start();
@@ -31,6 +33,10 @@ public class Powerup : PickupableObject
     override public void ChargeEffect()
     {
         /*do particle bois and stuff*/
+    }
+
+    virtual public void OnActivate()
+    {
     }
 
     override public void StopEmitting()
@@ -67,12 +73,12 @@ public class Powerup : PickupableObject
             
     }
 
-
     public override void OnCollisionEnter(Collider collider)
     {
         if (!m_pickupable)
         {
             OnActivate();
+            SendRPC("OnActivate");  
         }
     }
 
