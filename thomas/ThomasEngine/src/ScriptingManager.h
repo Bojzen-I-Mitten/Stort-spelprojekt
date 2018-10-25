@@ -9,7 +9,7 @@ using namespace System::IO;
 using namespace System::Reflection;
 namespace ThomasEngine
 {
-	public ref class ScriptingManger
+	public ref class ScriptingManager
 	{
 	private:
 		static FileSystemWatcher^ fsw;
@@ -22,17 +22,13 @@ namespace ThomasEngine
 		static event ScriptReloadBegin^ scriptReloadStarted;
 		delegate void ScriptReloadEnded();
 		static event ScriptReloadEnded^ scriptReloadFinished;
-
-		static void ForceReload() {
-			shouldReload = true;
-		}
-
+	
 		static void Init() {
 			
 			fsw = gcnew FileSystemWatcher();
 			fsw->Filter = "Assembly.dll";
-			fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManger::OnChanged);
-			Application::currentProjectChanged += gcnew Application::CurrentProjectChangedEvent(&ScriptingManger::OnCurrentProjectChanged);
+			fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManager::OnChanged);
+			Application::currentProjectChanged += gcnew Application::CurrentProjectChangedEvent(&ScriptingManager::OnCurrentProjectChanged);
 		}
 
 		static void OnCurrentProjectChanged(Project^ newProject) {
@@ -74,12 +70,17 @@ namespace ThomasEngine
 			return false;
 		}
 
-		static void ReloadIfNeeded() {
-			if (shouldReload && !Scene::CurrentScene->IsLoading())
-				LoadAssembly();
-		}
+		/* Reload assembly
+		forceReload	<<	Don't care if necessary or not
+		*/
+		static void ReloadAssembly(bool forceReload);
 
-		static void LoadAssembly();
 		static void OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e);
+
+	internal:
+
+		/* Load new assembly (call ReloadAssembly if not initiating new assembly)
+		*/
+		static void LoadAssembly();
 	};
 }

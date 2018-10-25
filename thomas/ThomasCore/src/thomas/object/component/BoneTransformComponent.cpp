@@ -11,7 +11,7 @@ namespace thomas
 		namespace component
 		{
 			BoneTransformComponent::BoneTransformComponent()
-				: m_boneIndex(-1), m_skeleton(nullptr)
+				: m_boneIndex(UINT32_MAX), m_skeleton(nullptr)
 			{
 			}
 			BoneTransformComponent::~BoneTransformComponent()
@@ -32,9 +32,19 @@ namespace thomas
 				// Execute
 				m_constraint = std::unique_ptr<graphics::animation::BoneConstraint>(
 					new  graphics::animation::BoneChildTransformConstraint(*m_gameObject->m_transform));
-				if(m_skeleton->getBoneIndex(m_boneHash, m_boneIndex))
+				if (m_skeleton->getBoneIndex(m_boneHash, m_boneIndex))
 					m_skeleton->addConstraint(m_constraint.get(), m_boneIndex);
+				else
+					m_boneIndex = UINT32_MAX;
 			}
+
+			void BoneTransformComponent::OnDisable()
+			{
+				if(m_boneIndex != UINT32_MAX)
+					m_skeleton->rmvConstraint(m_constraint.get(), m_boneIndex);
+			}
+
+
 			void BoneTransformComponent::SetBoneHash(uint32_t hash)
 			{
 				m_boneHash = hash;
@@ -42,6 +52,11 @@ namespace thomas
 			void BoneTransformComponent::SetReference(graphics::animation::IBlendTree * skel)
 			{
 				m_skeleton = skel;
+			}
+			void BoneTransformComponent::ClearReference()
+			{
+				m_skeleton = NULL;
+				m_boneIndex = UINT32_MAX;
 			}
 			int BoneTransformComponent::GetBoneIndex()
 			{

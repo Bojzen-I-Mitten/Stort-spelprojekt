@@ -1,5 +1,6 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
+#include <thomas\object\ObjectHandler.h>
 #pragma managed
 #include "GameObject.h"
 #include "Component.h"
@@ -15,32 +16,36 @@
 #include "../resource/Resources.h"
 #include "../serialization/Serializer.h"
 #using "PresentationFramework.dll"
+
 using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
 
 
-	GameObject::GameObject() : Object(new thomas::object::GameObject("gameobject"))
+	GameObject::GameObject() : Object(thomas::ObjectHandler::createNewGameObject("gameobject"))
 	{
 		m_name = "gameobject";
-
+#ifdef _EDITOR
 		if(ThomasWrapper::InEditor())
-			System::Windows::Application::Current->Dispatcher->Invoke(gcnew Action(this, &GameObject::SyncComponents));
+			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+#endif
 	}
 
-	GameObject::GameObject(String^ name) : Object(new thomas::object::GameObject(Utility::ConvertString(name)))
+	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
 		m_transform = AddComponent<Transform^>();
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
-		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		// Add to scene
-		Scene::CurrentScene->GameObjects->Add(this);
-		m_scene_id = Scene::CurrentScene->ID();
+		ThomasWrapper::CurrentScene->GameObjects->Add(this);
+		m_scene_id = ThomasWrapper::CurrentScene->ID();
+#ifdef _EDITOR
 		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+#endif
 
-		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 	}
 	bool GameObject::InitComponents(bool playing)
 	{
@@ -61,7 +66,7 @@ namespace ThomasEngine {
 	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
-		return (thomas::object::GameObject*)nativePtr;
+		return reinterpret_cast<thomas::object::GameObject*>(nativePtr);
 	}
 
 	void GameObject::FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root)
@@ -75,53 +80,102 @@ namespace ThomasEngine {
 
 	void GameObject::PostLoad(Scene^ scene)
 	{
-		m_scene_id = Scene::CurrentScene->ID();
+		m_scene_id = ThomasWrapper::CurrentScene->ID();
 	}
 
 	void GameObject::PostInstantiate(Scene^ scene) {
 		PostLoad(scene);
 		scene->GameObjects->Add(this);
-		for (int i = 0; i < m_transform->children->Count; i++) {
-			m_transform->children[i]->gameObject->PostInstantiate(scene);
-		}
+		for each(Transform^ child in m_transform->children)
+			child->gameObject->PostInstantiate(scene);
 	}
-	void GameObject::InitGameObjects(bool playing) {
-		bool completed;
-		do {
-			completed = true;
-			for (int i = 0; i < Scene::CurrentScene->GameObjects->Count; ++i) {
-				GameObject^ gameObject = Scene::CurrentScene->GameObjects[i];
-				completed = gameObject->InitComponents(playing) && completed;
+
+	thomas::object::Object* GameObject::setStatic()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::setStatic(nativePtr, moved);
+
+		m_makeStatic = false;
+
+		return moved;
+	}
+
+	thomas::object::Object * GameObject::moveStaticGroup()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::moveStaticGroup(nativePtr, moved);
+
+		return moved;
+	}
+
+	thomas::object::Object * GameObject::setDynamic()
+	{
+		thomas::object::Object* moved;
+
+		nativePtr = thomas::ObjectHandler::setDynamic(nativePtr, moved);
+
+		m_makeDynamic = false;
+
+		return moved;
+	}
+
+	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
+	{
+		if (nativeptr != nullptr)
+		{
+
+			for each (Object^ object in s_objects)
+			{
+				
+				if (object->nativePtr == nativeptr)
+					return static_cast<GameObject^>(object);
 			}
-		} while (!completed);
+		}
+
+		return nullptr;
 	}
 
 	void GameObject::Update()
 	{
 		Monitor::Enter(m_componentsLock);
 
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->initialized && component->enabled) {
-				component->Update();
-				component->UpdateCoroutines();
+		try {
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->initialized && component->enabled) {
+					component->Update();
+					component->UpdateCoroutines();
+				}
 			}
-				
 		}
-		Monitor::Exit(m_componentsLock);
+		catch (Exception^ e) {
+			Debug::LogError("Updating component failed with exception: " + e->Message);
+		}
+		finally{
+			Monitor::Exit(m_componentsLock);
+		}
 	}
 
 	void GameObject::FixedUpdate()
 	{
-		Monitor::Enter(m_componentsLock);
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->initialized && component->enabled)
-				component->FixedUpdate();
+		try {
+			Monitor::Enter(m_componentsLock);
+			for (int i = 0; i < m_components.Count; i++)
+			{
+				Component^ component = m_components[i];
+				if (component->initialized && component->enabled)
+					component->FixedUpdate();
+			}
 		}
-		Monitor::Exit(m_componentsLock);
+		catch (Exception^ e) {
+			Debug::LogError("Fixed component update failed with exception: " + e->Message);
+		}
+		finally{
+			Monitor::Exit(m_componentsLock);
+		}
 	}
 
 
@@ -145,39 +199,60 @@ namespace ThomasEngine {
 		}
 		Monitor::Exit(m_componentsLock);
 	}
+	/* Delete component
+	*/
+	void deleteComp(GameObject^ obj, Component^ comp)
+	{
+		comp->OnParentDestroy(obj);
+		comp->OnDisable();
+		comp->OnDestroy();
+		delete comp;	// Begone you foul Clr!!!!
+	}
 
 	GameObject::~GameObject()
 	{
-		Delete();
-	}
-
-	void GameObject::Delete()
-	{
+		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
-			delete m_components[i];	// Begone you foul clr!!!!
+			deleteComp(this, m_components[i]);
 		m_components.Clear();
+		Monitor::Exit(m_componentsLock);
 	}
-
+	bool GameObject::RemoveComponent(Component ^ comp)
+	{
+		bool success = false;
+		Monitor::Enter(m_componentsLock);
+		if (m_components.Remove(comp))
+		{
+			deleteComp(this, comp);
+			success = true;
+		}
+		Monitor::Exit(m_componentsLock);
+		return success;
+	}
 	void GameObject::Destroy()
 	{
-		if (m_isDestroyed)
-			return;
-		ThomasWrapper::Selection->UnSelectGameObject(this);
-		m_isDestroyed = true;
-		
-		// Remove object
-		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
-		Scene::CurrentScene->GameObjects->Remove(this);
-		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
-		// Destroy
-		Monitor::Enter(m_componentsLock);
-		Delete();
-		Monitor::Exit(m_componentsLock);
-		Object::Destroy();
+		throw gcnew System::InvalidOperationException("Not allowed to call destroy on GameObjects...");
 	}
+
+	bool GameObject::MakeStatic()
+	{
+		return m_makeStatic;
+	}
+
+	bool GameObject::MakeDynamic()
+	{
+		return m_makeDynamic;
+	}
+
+	bool GameObject::MoveStaticGroup()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetMoveStaticGroup();
+	}
+
 
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
+		// This function has been hooked by GameObject manager, this does nothng
 		GameObject^ gameObject = gcnew GameObject("new" + type.ToString());
 		gameObject->AddComponent<RenderComponent^>()->model = Model::GetPrimitive(type);
 		return gameObject;
@@ -189,12 +264,7 @@ namespace ThomasEngine {
 			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
-		if (original->m_isDestroyed)
-		{
-			Debug::LogError("Trying to instantiate destroyed object.");
-			return nullptr;
-		}
-		Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
 		if (original->prefabPath != nullptr) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
@@ -215,11 +285,11 @@ namespace ThomasEngine {
 		
 		if (clone) {
 			clone->transform->SetParent(nullptr, true);
-			clone->PostInstantiate(Scene::CurrentScene);
+			clone->PostInstantiate(ThomasWrapper::CurrentScene);
 			clone->prefabPath = nullptr;
 		}
 			
-		Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
 
@@ -257,7 +327,6 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
 	}
-
 
 	generic<typename T>
 	where T : Component
@@ -344,7 +413,7 @@ namespace ThomasEngine {
 
 	GameObject^ GameObject::Find(String^ name)
 	{
-		for each(GameObject^ gameObject in Scene::CurrentScene->GameObjects)
+		for each(GameObject^ gameObject in ThomasWrapper::CurrentScene->GameObjects)
 		{
 			if (gameObject->Name == name)
 				return gameObject;
@@ -355,7 +424,7 @@ namespace ThomasEngine {
 	bool GameObject::GetActive()
 	{
 		if((thomas::object::GameObject*)nativePtr != nullptr)
-		return ((thomas::object::GameObject*)nativePtr)->GetActive();
+			return ((thomas::object::GameObject*)nativePtr)->GetActive();
 		return false;
 	}
 
@@ -370,6 +439,40 @@ namespace ThomasEngine {
 	bool GameObject::activeSelf::get()
 	{
 		return ((thomas::object::GameObject*)nativePtr)->m_activeSelf;
+	}
+
+	UINT GameObject::GroupIDSelf::get()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetGroupID();
+	}
+
+	void GameObject::GroupIDSelf::set(UINT value)
+	{
+
+		((thomas::object::GameObject*)nativePtr)->ChangeGroupID(value);
+	}
+
+	bool GameObject::staticSelf::get()
+	{
+		return (((thomas::object::GameObject*)nativePtr)->GetStatic() || m_makeStatic) && !m_makeDynamic;
+	}
+
+	void GameObject::staticSelf::set(bool state)
+	{
+		if (state)
+		{
+			// If box was checked and it's not static, we flag that 
+			// Object is going to be moved next frame
+			if (!((thomas::object::GameObject*)nativePtr)->GetStatic())
+				m_makeStatic = true;
+		}
+		else // if state is false, somebody just unchecked the box
+		{
+			if (!((thomas::object::GameObject*)nativePtr)->GetDynamic())
+			{
+				m_makeDynamic = true;
+			}
+		}
 	}
 
 	void GameObject::activeSelf::set(bool value)
@@ -424,10 +527,10 @@ namespace ThomasEngine {
 	void GameObject::OnDeserialized(System::Runtime::Serialization::StreamingContext c)
 	{
 		for (int i = 0; i < m_components.Count; i++) {
-			m_components[i]->gameObject = this;
+			if(m_components[i])
+				m_components[i]->gameObject = this;
 		}
 		transform = GetComponent<Transform^>();
 		nativePtr->SetName(Utility::ConvertString(m_name));
 	}
-
 }

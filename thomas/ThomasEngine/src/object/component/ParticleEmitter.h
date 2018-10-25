@@ -13,45 +13,63 @@ namespace ThomasEngine
 		property thomas::object::component::ParticleEmitterComponent* particleEmitter {
 			thomas::object::component::ParticleEmitterComponent* get();
 		}
+
+	public:
+		enum class BLEND_STATES
+		{
+			ALPHA,
+			ADDITIVE
+		};
+
 	public:
 		ParticleEmitter();
 
+		[CategoryAttribute("Speed")]
 		property float MinSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Speed")]
 		property float MaxSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Speed")]
 		property float EndSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Size")]
 		property float MinSize {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Size")]
 		property float MaxSize {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Size")]
 		property float EndSize {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("LifeTime")]
 		property float MinLifeTime {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("LifeTime")]
 		property float MaxLifeTime {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Rotation")]
 		property float MinRotationSpeed {
 			float get();
 			void set(float value);
 		}
+		[CategoryAttribute("Rotation")]
 		property float MaxRotationSpeed {
 			float get();
 			void set(float value);
@@ -76,6 +94,10 @@ namespace ThomasEngine
 			unsigned get();
 			void set(unsigned value);
 		}
+		property BLEND_STATES BlendState {
+			BLEND_STATES get();
+			void set(BLEND_STATES value);
+		}
 		property Texture2D^ Texture {
 			Texture2D^ get();
 			void set(Texture2D^ value);
@@ -84,5 +106,7 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
+
+		void EmitOneShot(unsigned nrToEmit);
 	};
 }

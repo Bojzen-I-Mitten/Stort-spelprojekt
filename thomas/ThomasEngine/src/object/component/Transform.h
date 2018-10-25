@@ -9,21 +9,67 @@ namespace ThomasEngine
 	[HideInInspector]
 	public ref class Transform : public Component
 	{
+	public:
+		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
+		static event ParentChanged^ OnParentChanged;
 	private:
 		property thomas::object::component::Transform* trans { thomas::object::component::Transform* get(); }
+		Transform^ m_parent;
+		List<Transform^>^ m_children;
+
+		void AddChild(Transform^ child);
+		bool RemoveChild(Transform^ child);
+		Transform^ SwapParent(Transform ^ value);
+		void OnParentDestroy(Transform ^ value);
 	public:
 		Transform();
 
-		delegate void ParentChanged(Transform^ child, Transform^ oldParent, Transform^ newParent);
-		static event ParentChanged^ OnParentChanged;
+		void Update() override;
+		bool IsChildOf(Transform^ _parent);
+		void OnDestroy() override;
+		void OnParentDestroy(GameObject ^ parented_object) override;
 
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property thomas::object::component::Transform* Native { thomas::object::component::Transform* get(); }
+
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		virtual property bool canDisable
 		{
 			virtual bool get() override { return false; }
 		}
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property IEnumerable<Transform^>^ children
+		{
+			IEnumerable<Transform^>^ get();
+		}
 		
+	public:	// Serialized properties
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 1)]
+		[DisplayNameAttribute("scale")]
+		property Vector3 localScale
+		{
+			Vector3 get();
+			void set(Vector3 value);
+		}
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 2)]
+		[DisplayNameAttribute("rotation")]
+		property Vector3 localEulerAngles
+		{
+			Vector3 get();
+			void set(Vector3 value);
+		}
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 3)]
+		[DisplayNameAttribute("position")]
+		property Vector3 localPosition
+		{
+			Vector3 get();
+			void set(Vector3 value);
+		}
+		[Newtonsoft::Json::JsonPropertyAttribute(Order = 4, IsReference = true)]
 		[BrowsableAttribute(false)]
 		property Transform^ parent 
 		{
@@ -32,14 +78,10 @@ namespace ThomasEngine
 			void set(Transform^ value);
 		}
 
-		[BrowsableAttribute(false)]
-		property List<Transform^>^ children 
-		{
-			List<Transform^>^ get();
-		}
+	public:	// Get/Set rotation 
 
-		 
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 position
 		{
@@ -47,23 +89,23 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Matrix world
 		{
 			Matrix get();
 			void set(Matrix value);
 		}
-
-
-		[DisplayNameAttribute("position")]
-		property Vector3 localPosition
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property Matrix local_world
 		{
-			Vector3 get();
-			void set(Vector3 value);
+			Matrix get();
+			void set(Matrix value);
 		}
 
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Quaternion rotation
 		{
@@ -71,15 +113,15 @@ namespace ThomasEngine
 			void set(Quaternion value);
 		}
 
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Quaternion localRotation
 		{
 			Quaternion get();
 			void set(Quaternion value);
 		}
-	
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 eulerAngles
 		{
@@ -87,14 +129,7 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 
-		[DisplayNameAttribute("rotation")]
-		property Vector3 localEulerAngles
-		{
-			Vector3 get();
-			void set(Vector3 value);
-		}
-		
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 scale
 		{
@@ -102,30 +137,43 @@ namespace ThomasEngine
 			void set(Vector3 value);
 		}
 
-		[DisplayNameAttribute("scale")]
-		property Vector3 localScale
-		{
-			Vector3 get();
-			void set(Vector3 value);
-		}
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 forward
 		{
 			Vector3 get();
 		}
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 up
 		{
 			Vector3 get();
 		}
-		[System::Runtime::Serialization::IgnoreDataMemberAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property Vector3 right
 		{
 			Vector3 get();
 		}
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property Vector3 local_forward
+		{
+			Vector3 get();
+		}
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property Vector3 local_up
+		{
+			Vector3 get();
+		}
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property Vector3 local_right
+		{
+			Vector3 get();
+		}
+
 
 		void LookAt(Transform^ target);
 
@@ -139,13 +187,11 @@ namespace ThomasEngine
 
 		void Translate(Vector3 translation);
 		void Translate(float x, float y, float z);
-
-		bool IsChildOf(Transform^ _parent);
-
+		
 		void SetParent(Transform^ value);
 		void SetParent(Transform^ value, bool worldPositionStays);
 
-		void OnDestroy() override;
-		void Update() override;
+		void Orient(Vector3 forward, Vector3 up);
+
 	};
 }

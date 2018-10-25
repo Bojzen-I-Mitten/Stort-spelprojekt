@@ -7,7 +7,8 @@
 namespace thomas
 {
 	namespace utils { struct Ray; }
-	namespace graphics { class Skybox; }
+	namespace graphics { class Skybox; class GUIManager; }
+
 	namespace object
 	{
 		namespace component
@@ -35,6 +36,7 @@ namespace thomas
 
 				void OnEnable() override;
 				void OnDisable() override;
+				void OnDestroy() override;
 
 				math::Matrix GetViewMatrix();
 				math::Matrix GetProjMatrix();
@@ -53,11 +55,16 @@ namespace thomas
 				float GetFar();
 				void SetFar(float viewFar);
 
+				bool GetGUIRendering() const;
+				void SetGUIRendering(bool rendering);
+
 				math::Viewport GetViewport();
 				void SetViewport(math::Viewport viewport);
 				void SetViewport(float x, float y, float width, float height);
 
 				float GetAspectRatio();
+
+				graphics::GUIManager* GetGUIHandle() const;
 
 				void Render();
 				void OnDrawGizmos();
@@ -71,6 +78,7 @@ namespace thomas
 
 				void CopyFrameData();
 				CAMERA_FRAME_DATA& GetFrameData();
+
 			private:
 				CAMERA_FRAME_DATA m_frameData;
 				math::Matrix m_projMatrix;
@@ -78,9 +86,10 @@ namespace thomas
 				float m_near;
 				float m_far;
 				int m_targetDisplay;
+				bool m_renderGUI;
 				math::Viewport m_viewport;
 				math::BoundingFrustum m_frustrum;
-
+				std::unique_ptr<graphics::GUIManager> m_GUIHandle;
 			};
 		}
 	}

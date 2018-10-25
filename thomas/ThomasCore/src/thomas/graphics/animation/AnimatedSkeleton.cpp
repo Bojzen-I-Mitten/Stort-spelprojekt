@@ -17,7 +17,6 @@ namespace thomas {
 			{
 				clearConstraints();
 				clearBlendTree();
-				updateSkeleton();
 			}
 
 
@@ -30,12 +29,25 @@ namespace thomas {
 				std::memset(m_constraint.get(), 0, sizeof(ConstraintList) * _ref.getNumBones());
 			}
 
-
 			void AnimatedSkeleton::update(float dT) {
+				if (!_root) return;		// Verify blend node
 				_root->update(dT);		// Update each node ONCE.
 				updateSkeleton();		// Apply skeleton.
 				_root->resetUpdate();	// Clear dirty update flags.
 			}
+
+			void AnimatedSkeleton::setPose()
+			{
+				_pose[0] = _ref.getBone(0)._bindPose * _ref.getRoot();			//	Set root bind pose
+				_skin[0] = _ref.getBone(0)._invBindPose * _pose[0];
+				for (uint32_t i = 1; i < boneCount(); i++)
+				{
+					const Bone& bone = _ref.getBone(i);
+					_pose[i] = bone._bindPose * _pose[bone._parentIndex];		//	Set bind pose
+					_skin[i] = bone._invBindPose * _pose[i];
+				}
+			}
+
 			void AnimatedSkeleton::updateSkeleton()
 			{
 				TransformComponents *frame_tmp = reinterpret_cast<TransformComponents*>(
@@ -69,17 +81,17 @@ namespace thomas {
 				_root = NULL;
 			}
 
-			void AnimatedSkeleton::setBlendTree(std::unique_ptr<AnimationNode> &blendTree)
+			void AnimatedSkeleton::setBlendTree(AnimationNode *blendTree)
 			{
 				if (!blendTree)
 					clearBlendTree();
 				else
-					_root = std::move(blendTree);
+					_root = blendTree;
 			}
 
 			void AnimatedSkeleton::clearBlendTree() {
-				_root = std::unique_ptr<AnimationNode>(new BindPoseNode(_ref));
-				update(0.1f);
+				_root = NULL;
+				setPose();
 			}
 
 			void AnimatedSkeleton::playSingle(thomas::resource::Animation * anim)
@@ -90,7 +102,7 @@ namespace thomas {
 				}
 				AnimationData &animRef = *anim->GetAnimation();
 				std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, animRef.m_duration, PlayType::Loop));
-				_root = std::unique_ptr<AnimationNode>(new AnimPlayback(_ref, playback, animRef));
+				_root = new AnimPlayback(_ref, playback, animRef);
 			}
 
 
@@ -152,12 +164,15 @@ namespace thomas {
 					if (m_list[i] == bC) {
 						m_list[i] = NULL;
 						// Find last slot:
-						BoneConstraint** last = m_list + i;
-						while (++last != NULL) {}
+						uint32_t last = i;
+						while (++last < MAX_CONSTRAINT_COUNT && m_list[i] != NULL) {}
 						last--; // Step back to non-empty
-						// Swap
-						m_list[i] = *last;
-						*last = NULL;
+						if (last)
+						{
+							// Swap out
+							m_list[i] = m_list[last];
+							m_list[last] = NULL;
+						}
 						return;
 					}
 				}

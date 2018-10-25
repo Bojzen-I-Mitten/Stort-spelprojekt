@@ -5,23 +5,20 @@ namespace thomas
 {
 	namespace resource
 	{
+		AudioClip::AudioClip(const std::string& file) : 
+		Resource(file)
+		{
+			Sound::LoadSound(m_name, m_path);
+			m_soundEffectInstance = Sound::GetSoundInfo(m_name).soundEffectInstance.get();
+		}
+
 		void AudioClip::OnChanged()
 		{
-			m_data.release();
-			m_data = std::unique_ptr<DirectX::SoundEffect>(Sound::Instance()->LoadWave(m_path));
 		}
-		AudioClip::AudioClip(std::string path) : Resource(path)
-		{
 
-			m_data = std::unique_ptr<DirectX::SoundEffect>(Sound::Instance()->LoadWave(path));
-		}
-		std::unique_ptr<DirectX::SoundEffectInstance> AudioClip::CreateInstance()
+		SoundEffectInstance* AudioClip::GetSoundEffectInstance() const
 		{
-			return m_data->CreateInstance();
-		}
-		AudioClip::~AudioClip()
-		{
-			m_data.release();
+			return m_soundEffectInstance;
 		}
 	}
 }

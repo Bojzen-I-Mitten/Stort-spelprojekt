@@ -6,9 +6,13 @@
 #include "..\Application.h"
 #include "../Project.h"
 #include "../Scene.h"
+#include "../ThomasManaged.h"
 
 namespace ThomasEngine
 {
+	Resource::~Resource()
+	{
+	}
 	void Resource::asset_path::set(String^ value)
 	{
 		m_path = value->Replace("%THOMAS_DATA%", Application::editorAssets);
@@ -24,9 +28,9 @@ namespace ThomasEngine
 
 	void Resource::Reload()
 	{
-		System::Threading::Monitor::Enter(Scene::CurrentScene->GetGameObjectsLock());
+		System::Threading::Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		m_nativePtr->Reload();
-		System::Threading::Monitor::Exit(Scene::CurrentScene->GetGameObjectsLock());
+		System::Threading::Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 	}
 
 	void Resource::Rename(String^ newPath) {

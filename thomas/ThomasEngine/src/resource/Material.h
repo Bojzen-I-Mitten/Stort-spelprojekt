@@ -13,6 +13,7 @@ namespace ThomasEngine
 	public ref class Material : public Resource
 	{
 	private:
+		bool m_instance = false;
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
 	internal:
@@ -29,8 +30,10 @@ namespace ThomasEngine
 
 		Material(Material^ original);
 
+
 		Material();
 
+		void Reload() override;
 
 		void OnRename() override;
 
@@ -80,10 +83,10 @@ namespace ThomasEngine
 		void SetColor(String^ name, Color value) { ((thomas::resource::Material*)m_nativePtr)->SetColor(Utility::ConvertString(name), Utility::Convert(value));  }
 
 		float GetFloat(String^ name) { return ((thomas::resource::Material*)m_nativePtr)->GetFloat(Utility::ConvertString(name)); }
-		void SetFloat(String^ name, float& value) { ((thomas::resource::Material*)m_nativePtr)->SetFloat(Utility::ConvertString(name), value); };
+		void SetFloat(String^ name, float value) { ((thomas::resource::Material*)m_nativePtr)->SetFloat(Utility::ConvertString(name), value); };
 
 		int GetInt(String^ name) { return ((thomas::resource::Material*)m_nativePtr)->GetInt(Utility::ConvertString(name)); };
-		void SetInt(String^ name, int& value) { ((thomas::resource::Material*)m_nativePtr)->SetInt(Utility::ConvertString(name),value); }
+		void SetInt(String^ name, int value) { ((thomas::resource::Material*)m_nativePtr)->SetInt(Utility::ConvertString(name),value); }
 
 		Matrix GetMatrix(String^ name) { return  Utility::Convert(((thomas::resource::Material*)m_nativePtr)->GetMatrix(Utility::ConvertString(name))); }
 		void SetMatrix(String^ name, Matrix value) { ((thomas::resource::Material*)m_nativePtr)->SetMatrix(Utility::ConvertString(name), Utility::Convert(value)); }

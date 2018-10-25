@@ -17,12 +17,15 @@ namespace ThomasEngine
 			JsonSerializer^ serializer = gcnew JsonSerializer();
 
 			serializer->Formatting = Formatting::Indented;
-			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;
-			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;
+			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;								// Serialize recursive $ref $id dependencies									
+			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;						// Give $ref $id to objects (not lists)
 			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
 			serializer->NullValueHandling = NullValueHandling::Ignore;
-			serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;
+			serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;									// Specifies if objects are created in-place or not
+			serializer->MetadataPropertyHandling = MetadataPropertyHandling::ReadAhead;							// Specifies if $ref $id handling reads forward before resolving conflict?
+			serializer->Error += gcnew EventHandler<Serialization::ErrorEventArgs^>(&Serializer::ErrorHandler);
+
 
 			serializer->Converters->Add(gcnew ResourceConverter());
 			serializer->Converters->Add(gcnew PrefabConverter());
@@ -196,6 +199,12 @@ namespace ThomasEngine
 			Debug::LogError("Failed to deserialize material: " + path + " Error: " + e->Message);
 			return nullptr;
 		}
+	}
+
+	void Serializer::ErrorHandler(Object ^ sender, Serialization::ErrorEventArgs ^ args)
+	{
+		Debug::LogException(args->ErrorContext->Error);
+		args->ErrorContext->Handled = true;
 	}
 
 }

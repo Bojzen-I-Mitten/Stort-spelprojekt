@@ -20,13 +20,28 @@ namespace ThomasEditor
             bool isMaterialEditor = false;
             public ExtendedPropertyGrid()
             {
-#if DEBUG
-                System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level =
-                    System.Diagnostics.SourceLevels.Critical;
-#endif
+//#if DEBUG
+//                System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level =
+//                    System.Diagnostics.SourceLevels.Critical;
+//#endif
                 InitializeComponent();
+                _grid.PreparePropertyItem += _grid_PreparePropertyItem;
+                _grid.EditorDefinitions.Add(
+                    new EditorTemplateDefinition {
+                    EditingTemplate = Resources["ListEditor"] as DataTemplate,
+                    TargetProperties = {
+                            new TargetPropertyType { Type = typeof(ThomasEngine.Object[]) },
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.Object>)},
+                             new TargetPropertyType { Type = typeof(Resource[]) },
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Resource>)},
+                    }
+                    });
             }
 
+            private void _grid_PreparePropertyItem(object sender, PropertyItemEventArgs e)
+            {
+                int x = 5;
+            }
 
             private void PropertyGrid_Loaded(object sender, RoutedEventArgs e)
             {
@@ -45,7 +60,7 @@ namespace ThomasEditor
                     MaterialInspector matEditor = Parent as MaterialInspector;
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
-                grid.ExpandAllProperties();
+                grid.CollapseAllProperties();
             }
 
             private void ResourceEditor_Drop(object sender, DragEventArgs e)
@@ -61,10 +76,10 @@ namespace ThomasEditor
                         PropertyItem pi = label.DataContext as PropertyItem;
                         if (resource.GetType() == pi.PropertyType)
                         {
-                            Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
+                            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                             pi.Value = resource;
 
-                            Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+                            Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         }
 
                     }
@@ -75,10 +90,10 @@ namespace ThomasEditor
                         PropertyItem pi = label.DataContext as PropertyItem;
                         if (obj.GetType() == pi.PropertyType)
                         {
-                            Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
+                            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                             pi.Value = obj;
 
-                            Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+                            Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         }else if(obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                         {
                             var method = typeof(GameObject).GetMethod("GetComponent").MakeGenericMethod(pi.PropertyType);
@@ -145,7 +160,7 @@ namespace ThomasEditor
                     MaterialInspector matEditor = Parent as MaterialInspector;
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
-                grid.ExpandAllProperties();
+                grid.CollapseAllProperties();
             }
         }
     }

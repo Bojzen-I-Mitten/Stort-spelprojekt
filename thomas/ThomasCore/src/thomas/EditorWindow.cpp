@@ -7,14 +7,32 @@
 
 namespace thomas
 {
-	EditorWindow::EditorWindow(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title) : 
+	EditorWindow::EditorWindow(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title) :
 		Window(hInstance, nCmdShow, width, height, title)
 	{
-
 	}
 
 	EditorWindow::EditorWindow(HWND hWnd) : Window(hWnd)
 	{
+		//
+		/*ID3D11Resource* resource;
+		ID3D11Texture2D* catTexture;
+
+		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+		DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), L"../Data/cat.png", &resource, &m_texture);
+
+		catTexture = (ID3D11Texture2D*)resource;
+		CD3D11_TEXTURE2D_DESC catDesc;
+		catTexture->GetDesc(&catDesc);
+
+		m_origin.x = float(catDesc.Width / 2);
+		m_origin.y = float(catDesc.Height / 2);
+		m_screenPos.x = 300 / 2.f;
+		m_screenPos.y = 300 / 2.f;
+
+		resource->Release();*/
+		//
+
 		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
 	}
 
@@ -26,9 +44,19 @@ namespace thomas
 	void EditorWindow::Present()
 	{
 		this->Bind();
+
 		if (ImGui_ImplDx11_Valid() && this->m_guiData)
 			ImGui_ImplDX11_RenderDrawData(this->m_guiData);
 
+		/*m_spriteBatch->Begin();
+
+		m_spriteBatch->Draw(m_texture, m_screenPos, nullptr, Colors::White, 0.f, m_origin);
+
+		m_spriteBatch->Draw(m_texture, Vector2(m_screenPos.x + 50.f, m_screenPos.y), nullptr, Colors::White,
+							0.f, m_origin);
+
+		m_spriteBatch->End();*/
+	
 		m_swapChain->Present(0, 0);
 	}
 
@@ -49,7 +77,7 @@ namespace thomas
 		else
 			ImGui::EndFrame();
 	}
-	
+
 	void EditorWindow::UpdateWindow()
 	{
 		if (!m_initialized)
@@ -62,7 +90,7 @@ namespace thomas
 			ImGui_ImplDX11_InvalidateDeviceObjects();
 			m_initialized = false;
 			Resize();
-			m_initialized = true; 
+			m_initialized = true;
 			m_shouldResize = false;
 			ImGui_ImplDX11_CreateDeviceObjects();
 		}

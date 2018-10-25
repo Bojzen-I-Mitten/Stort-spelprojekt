@@ -14,6 +14,7 @@
 #include "../Debug.h"
 #include "../object/GameObject.h"
 #include "../serialization/Serializer.h"
+#include "Font.h"
 using namespace System::Threading;
 namespace ThomasEngine
 {
@@ -131,6 +132,8 @@ namespace ThomasEngine
 			}
 			else if (extension == "prefab")
 				return AssetTypes::PREFAB;
+			else if (extension == "spritefont")
+				return AssetTypes::FONT;
 			else
 			{
 				return AssetTypes::UNKNOWN;
@@ -164,6 +167,8 @@ namespace ThomasEngine
 			{
 				return AssetTypes::TEXTURE2D;
 			}
+			else if (type == Font::typeid)
+				return AssetTypes::FONT;
 			else
 			{
 				return AssetTypes::UNKNOWN;
@@ -221,6 +226,9 @@ namespace ThomasEngine
 						break;
 					case AssetTypes::AUDIO_CLIP:
 						obj = gcnew AudioClip(path);
+						break;
+					case AssetTypes::FONT:
+						obj = gcnew Font(path);
 						break;
 					case AssetTypes::UNKNOWN:
 						break;
@@ -334,9 +342,7 @@ namespace ThomasEngine
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
-				{
-					resources[resource]->~Resource();
-				}
+					delete resources[resource];
 			}
 #pragma endregion
 
@@ -411,7 +417,7 @@ namespace ThomasEngine
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
-					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
+					Object^ lock = ThomasWrapper::CurrentScene->GetGameObjectsLock();
 
 					System::Threading::Monitor::Enter(lock);
 					Resource^ resource = resources[thomasPathOld];

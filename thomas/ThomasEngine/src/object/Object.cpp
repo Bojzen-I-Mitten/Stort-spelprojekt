@@ -1,10 +1,13 @@
 #pragma unmanaged
+#include <assert.h>
 #include <thomas\object\Object.h>
+#include <thomas\object\GameObject.h>
 #pragma managed
 #include "../Utility.h"
 #include "Object.h"
 #include "GameObject.h"
 #include "Component.h"
+
 namespace ThomasEngine
 {
 	Object::Object(thomas::object::Object* ptr)
@@ -20,10 +23,16 @@ namespace ThomasEngine
 	}
 	void Object::Delete()
 	{
-		OnDestroy();
-		s_objects.Remove(this);
+#ifdef _DEBUG
+		assert(!m_Destroyed);
+		m_Destroyed = true;
+#endif
+		bool rmvd = s_objects.Remove(this);
+		//assert(rmvd);
 		nativePtr->Destroy();
-		delete nativePtr;
+	
+		if(this->GetType() != GameObject::typeid)
+			delete nativePtr;
 	}
 	
 	void Object::Destroy()
@@ -48,10 +57,10 @@ namespace ThomasEngine
 
 	Object^ Object::GetObject(thomas::object::Object* ptr)
 	{
-		for each(Object^ object in s_objects)
+		for( int i=0; i < s_objects.Count; i++)
 		{
-			if (object->nativePtr == ptr)
-				return object;
+			if (s_objects[i]->nativePtr == ptr)
+				return s_objects[i];
 		}
 		return nullptr;
 	}
@@ -72,7 +81,6 @@ namespace ThomasEngine
 					list->Add((Object^)s_objects[i]);
 				}
 			}
-
 		}
 		return list;
 	}

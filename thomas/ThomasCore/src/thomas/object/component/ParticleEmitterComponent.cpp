@@ -19,10 +19,12 @@ namespace thomas
 		{
 			thomas::object::component::ParticleEmitterComponent::ParticleEmitterComponent()
 			{
-				m_particleSystem = graphics::ParticleSystem::GetGlobalSystem();
+				m_particleSystem = graphics::ParticleSystem::GetGlobalAlphaBlendingSystem();
+				m_blendState = graphics::ParticleSystem::BLEND_STATE::ALPHA;
 				m_emissionRate = 32;
 				m_emissionThreshold = 0.0;
 				m_isEmitting = false;
+				m_emitOneShot = false;
 				m_particleBufferStruct = {};
 
 				m_particleBufferStruct.position = math::Vector3::Zero;
@@ -115,7 +117,16 @@ namespace thomas
 				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
 				m_particleBufferStruct.direction = m_gameObject->m_transform->Forward();
 
-				if (m_isEmitting)
+				if (m_emitOneShot)
+				{
+					if (m_particleBufferStruct.nrOfParticlesToEmit > 0)
+					{
+						m_particleBufferStruct.rand = std::rand();
+						m_particleSystem->AddEmitterToSpawn(m_particleBufferStruct);
+					}
+					m_emitOneShot = false;
+				}
+				else if (m_isEmitting)
 				{
 					unsigned nrOfParticlesToEmit = NrOfParticlesToEmitThisFrame();
 					if (nrOfParticlesToEmit > 0)
@@ -318,6 +329,35 @@ namespace thomas
 			bool ParticleEmitterComponent::IsEmitting() const
 			{
 				return m_isEmitting;
+			}
+
+			void ParticleEmitterComponent::EmitOneShot(unsigned const & nrOfPaticles)
+			{
+				m_emitOneShot = true;
+				m_particleBufferStruct.nrOfParticlesToEmit = nrOfPaticles;
+			}
+
+			void ParticleEmitterComponent::SetBlendState(graphics::ParticleSystem::BLEND_STATE const & blendState)
+			{
+				if (blendState != m_blendState)
+				{
+					m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
+					m_blendState = blendState;
+					if (blendState == graphics::ParticleSystem::BLEND_STATE::ALPHA)
+					{
+						m_particleSystem = graphics::ParticleSystem::GetGlobalAlphaBlendingSystem();
+					}
+					else if (blendState == graphics::ParticleSystem::BLEND_STATE::ADDITIVE)
+					{
+						m_particleSystem = graphics::ParticleSystem::GetGlobalAdditiveBlendingSystem();
+					}
+					m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(m_texture);
+				}
+			}
+
+			graphics::ParticleSystem::BLEND_STATE ParticleEmitterComponent::GetBlendState()
+			{
+				return m_blendState;
 			}
 
 			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)

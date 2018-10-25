@@ -19,6 +19,11 @@ namespace ThomasEngine
 			float get() { return thomas::ThomasTime::GetActualDeltaTime(); }
 		}
 
+		property static float ElapsedTime
+		{
+			float get() { return thomas::ThomasTime::GetElapsedTime(); }
+		}
+
 		property static float TimeScale
 		{
 			float get() { return thomas::ThomasTime::GetTimescale(); }

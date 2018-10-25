@@ -53,7 +53,17 @@ namespace ThomasEngine
 			Native->SetBoneHash(hash);
 		}
 
-		void BoneTransformComponent::Awake() 
+		void BoneTransformComponent::OnParentDestroy(GameObject ^ relative)
+		{
+
+			if (m_skeletonSrc == relative) 
+			{
+				m_skeletonSrc = nullptr;
+				Native->ClearReference();	// Clear native
+			}
+		}
+
+		void BoneTransformComponent::Awake()
 		{
 			if (m_skeletonSrc) {
 				thomas::object::component::RenderSkinnedComponent* comp = m_skeletonSrc->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
@@ -62,6 +72,5 @@ namespace ThomasEngine
 				else
 					Native->SetReference(comp->GetBlendTree());
 			}
-			
 		}
 }

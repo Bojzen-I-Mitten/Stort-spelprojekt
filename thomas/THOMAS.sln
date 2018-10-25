@@ -4,12 +4,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThomasEditor", "ThomasEditor\ThomasEditor.csproj", "{1F9B09AD-D111-4B19-A00E-89D8EE39C3D1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ED0D8681-B384-43D1-8F56-B4145588E20C} = {ED0D8681-B384-43D1-8F56-B4145588E20C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThomasCore", "ThomasCore\ThomasCore.vcxproj", "{ED0D8681-B384-43D1-8F56-B4145588E20C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThomasEngine", "ThomasEngine\ThomasEngine.vcxproj", "{64D247ED-DB4D-4EA3-B8AE-680BF66A8F2E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThomasNet", "ThomasNet\ThomasNet.csproj", "{545A181E-838C-4BAC-B10A-F3459AD670A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ED0D8681-B384-43D1-8F56-B4145588E20C} = {ED0D8681-B384-43D1-8F56-B4145588E20C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,5 +75,26 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BDE2700A-3EB3-4B5A-8B33-2EE2B3683E23}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

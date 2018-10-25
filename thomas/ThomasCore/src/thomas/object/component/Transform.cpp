@@ -26,6 +26,10 @@ namespace thomas
 			{
 				Decompose();
 			}
+			Transform::~Transform()
+			{
+
+			}
 			math::Vector3 Transform::Forward()
 			{
 				math::Vector3 temp = GetWorldMatrix().Forward();
@@ -57,6 +61,10 @@ namespace thomas
 					return m_localWorldMatrix * m_parent->GetWorldMatrix();
 				else
 					return m_localWorldMatrix;
+			}
+			math::Matrix Transform::GetWorldInverse()
+			{
+				return GetWorldMatrix().Invert();
 			}
 
 			void Transform::SetWorldMatrix(math::Matrix matrix)
@@ -116,9 +124,9 @@ namespace thomas
 			void Transform::Rotate(math::Quaternion rot)
 			{
 				m_localRotation = m_localRotation * rot;
-#ifdef _EDITOR
+//#ifdef _EDITOR
 				m_euler = math::ToEuler(m_localRotation);
-#endif
+//#endif
 				UpdateLocalMatrix();
 				Decompose();
 				SetDirty(true);
@@ -158,7 +166,7 @@ namespace thomas
 			math::Vector3 Transform::GetPosition()
 			{
 				if (m_parent)
-					return m_parent->GetPosition() + math::Vector3::Transform(m_localPosition, math::Matrix::CreateFromQuaternion(m_parent->GetRotation()));
+					return GetWorldMatrix().Translation();
 				else
 					return m_localPosition;
 			}
@@ -188,7 +196,7 @@ namespace thomas
 			{
 				if (m_parent)
 				{
-					SetLocalPosition(position - m_parent->GetPosition());
+					SetLocalPosition(math::Vector3::Transform(position, m_parent->GetWorldInverse()));
 				}
 				else
 					SetLocalPosition(position);
@@ -199,8 +207,11 @@ namespace thomas
 			}
 			void Transform::SetRotation(math::Quaternion rotation)
 			{
-				if (m_parent)
-					SetLocalRotation(rotation / m_parent->GetRotation());
+				if (m_parent) {
+					math::Quaternion q = m_parent->GetRotation();
+					q.Inverse(q);
+					SetLocalRotation(rotation * q);
+				}
 				else
 					SetLocalRotation(rotation);
 			}
@@ -300,65 +311,27 @@ namespace thomas
 				return m_localScale;
 			}
 
+			void Transform::RemoveParent()
+			{
+				SetParent(nullptr, true);
+			}
 		
 			void Transform::SetParent(Transform * parent, bool worldPositionStays)
 			{
-				if (m_parent != parent)
-				{
-					math::Matrix m = GetWorldMatrix();
-					RemoveParent();
-					m_parent = parent;
-					if (m_parent) {
-						m_parent->m_children.push_back(this);
-						if(worldPositionStays)
-							SetWorldMatrix(m);
-					}
-					else
-					{
-						SetLocalMatrix(m);
-					}
-				}
+				if (parent == m_parent) return;
+				// Swap parent
+				math::Matrix m = GetWorldMatrix();
+				m_parent = parent;
+				if(worldPositionStays)
+					SetWorldMatrix(m);
 			}
 			Transform * Transform::GetParent()
 			{
-				if (m_parent)
-					return m_parent;
-
-				return nullptr;
-			}
-			std::vector<Transform*> Transform::GetChildren()
-			{
-				return m_children;
-			}
-			void Transform::RemoveParent()
-			{
-				if (m_parent) //Remove from old parent
-				{
-					for (int i = 0; i < m_parent->m_children.size(); i++)
-					{
-						if (m_parent->m_children[i] == this)
-						{
-							m_parent->m_children[i] = NULL;
-							m_parent->m_children.erase(m_parent->m_children.begin() + i);
-							i -= 1;
-						}
-							
-					}
-				}
-				m_parent = NULL;
+				return m_parent;
 			}
 			void Transform::OnDestroy()
 			{	
-				//if (m_parent)
-				//{
-				//	RemoveParent();
-				//}
-				//for (int i = 0; i < m_children.size(); i++)
-				//{
-				//	GameObject::Destroy(m_children[i]->m_gameObject);
-				//	//m_children.erase(m_children.begin() + i);
-				//	i -= 1;
-				//}
+				m_parent = nullptr;
 			}
 			void Transform::SetDirty(bool dirty)
 			{

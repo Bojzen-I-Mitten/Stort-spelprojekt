@@ -231,6 +231,7 @@
     <Compile Include="utils\EditableTextBlock.xaml.cs">
       <DependentUpon>EditableTextBlock.xaml</DependentUpon>
     </Compile>
+    <Compile Include="utils\Exporter.cs" />
     <Compile Include="utils\graph\ExpandedGraphControl.xaml.cs">
       <DependentUpon>ExpandedGraphControl.xaml</DependentUpon>
     </Compile>
@@ -510,6 +511,9 @@
     <Resource Include="icons\console\console-error.ico" />
     <Resource Include="icons\console\console-log.ico" />
     <Resource Include="icons\console\console-warning.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\assets\font.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
