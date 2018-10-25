@@ -533,6 +533,10 @@ namespace thomas
 			case D3D_SVC_VECTOR:
 				if(semantic == "COLOR")
 					newProperty = shaderproperty::ShaderPropertyColor::GetDefault();
+				else if (semantic == "UVTILING")
+				{
+					newProperty = new shaderproperty::ShaderPropertyVector(math::Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+				}
 				else
 					newProperty = shaderproperty::ShaderPropertyVector::GetDefault();
 				break;
