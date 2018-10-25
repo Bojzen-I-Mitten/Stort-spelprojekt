@@ -1,4 +1,7 @@
 
+#pragma unmanaged
+#include <thomas/graphics/Renderer.h>
+#pragma managed
 #include "Shader.h"
 #include "Resources.h"
 namespace ThomasEngine
@@ -7,12 +10,22 @@ namespace ThomasEngine
 		: Resource(Utility::ConvertString(ptr->GetPath()), ptr) 
 	{}
 	Shader::Shader(String^ path) : 
-		Resource(path, thomas::resource::Shader::CreateShader(Utility::ConvertString(path))) 
+		Resource(path, thomas::graphics::Renderer::Instance()->getShaderList().CreateShader(Utility::ConvertString(path)))
 	{}
+
+	Shader::~Shader() 
+	{
+		thomas::resource::Shader* s = dynamic_cast<thomas::resource::Shader*>(m_nativePtr);
+		if (s)
+		{
+			thomas::graphics::Renderer::Instance()->getShaderList().rmv(s);
+			m_nativePtr = nullptr;
+		}
+	}
 
 
 	Shader^ Shader::Find(String^ name) {
-		thomas::resource::Shader* nativePtr = thomas::resource::Shader::FindByName(Utility::ConvertString(name));
+		thomas::resource::Shader* nativePtr = thomas::graphics::Renderer::Instance()->getShaderList().FindByName(Utility::ConvertString(name));
 		if (nativePtr)
 		{
 			ThomasEngine::Resource^ shader = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
@@ -25,20 +38,14 @@ namespace ThomasEngine
 			return nullptr;
 	}
 
-	void Shader::SetGlobalColor(String^ name, Color value) { thomas::resource::Shader::SetGlobalColor(Utility::ConvertString(name), Utility::Convert(value)); };
-	void Shader::SetGlobalFloat(String^ name, float value) { thomas::resource::Shader::SetGlobalFloat(Utility::ConvertString(name), value); };;
-	void Shader::SetGlobalInt(String^ name, int value) { thomas::resource::Shader::SetGlobalInt(Utility::ConvertString(name), value); };;
-	void Shader::SetGlobalMatrix(String^ name, Matrix value) { thomas::resource::Shader::SetGlobalMatrix(Utility::ConvertString(name), Utility::Convert(value)); };;
-	void Shader::SetGlobalVector(String^ name, Vector4 value) { thomas::resource::Shader::SetGlobalVector(Utility::ConvertString(name), thomas::math::Vector4(value.x, value.y, value.z, value.w)); };;
-
 	//static void SetGlobalTexture(String^ name, Texture& value);
 
-	void Shader::RecompileShaders() { thomas::resource::Shader::QueueRecompile(); }
+	void Shader::RecompileShaders() { thomas::graphics::Renderer::Instance()->getShaderList().QueueRecompile(); }
 
 	[OnDeserializedAttribute]
 	void Shader::OnDeserialized(StreamingContext c)
 	{
-		m_nativePtr = thomas::resource::Shader::CreateShader(Utility::ConvertString(m_path));
+		m_nativePtr = thomas::graphics::Renderer::Instance()->getShaderList().CreateShader(Utility::ConvertString(m_path));
 	}
 
 }

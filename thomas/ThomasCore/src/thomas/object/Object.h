@@ -10,8 +10,8 @@ namespace thomas
 		class Object
 		{
 		private:
+
 		public:
-			
 			virtual ~Object();
 			void Destroy();
 			std::string GetName();

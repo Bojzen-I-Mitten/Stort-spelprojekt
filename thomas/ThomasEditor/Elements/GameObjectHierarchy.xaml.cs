@@ -43,7 +43,7 @@ namespace ThomasEditor
 
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
-            Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
+            ThomasWrapper.Thomas.SceneManagerRef.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
         }
 
         private void Ref_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -69,9 +69,9 @@ namespace ThomasEditor
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 m_hierarchyNodes.Clear();
-                for (int i = 0; i < Scene.CurrentScene.GameObjects.Count; i++)
+                for (int i = 0; i < ThomasWrapper.CurrentScene.GameObjects.Count; i++)
                 {
-                    GameObject gObj = Scene.CurrentScene.GameObjects[i];
+                    GameObject gObj = ThomasWrapper.CurrentScene.GameObjects[i];
                     if (gObj.transform.parent == null)
                     {
                         TreeItemViewModel item = new TreeItemViewModel(gObj)
@@ -203,10 +203,7 @@ namespace ThomasEditor
                 if (e.OldItems != null)
                 {
                     foreach (GameObject oldItem in e.OldItems)
-                    {
-                        oldItem.Destroy();
                         DeleteObjectInTree(m_hierarchyNodes.ToList(), oldItem);
-                    }
                 }
             }));
 
@@ -613,13 +610,13 @@ namespace ThomasEditor
             if (m_copiedObjects.Count > 0)
             {
                 DetachParent();
-                Scene.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
+                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
                     GameObject.Instantiate(copiedObject);
                     Debug.Log("Pasted object.");
                 }
-                Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
                 ResetTreeView();
                 return;
             }

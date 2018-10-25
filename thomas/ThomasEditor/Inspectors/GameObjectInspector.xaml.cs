@@ -98,7 +98,7 @@ namespace ThomasEditor
             private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             {
             
-                this.Dispatcher.Invoke((Action)(() => {
+                this.Dispatcher.BeginInvoke((Action)(() => {
                     if ((DataContext is GameObject) == false)
                     {
                         BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
@@ -214,7 +214,7 @@ namespace ThomasEditor
                 Button button = (Button)sender;
                 Component component = (Component)button.DataContext;
                 if (component.GetType() != typeof(Transform))
-                    component.Destroy();
+                    component.gameObject.RemoveComponent(component);
             }
 
             //Add so that element 0 is selected from the start.
