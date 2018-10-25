@@ -2,6 +2,8 @@
 #include "ProfileManager.h"
 #include <fstream>
 
+#include "..\..\..\include\nlohmann\json.hpp"
+#include "..\..\..\include\imgui\imgui.h"
 namespace thomas 
 {
 	namespace utils
@@ -9,47 +11,58 @@ namespace thomas
 
 		namespace profiling
 		{
-			int ProfileManager::nrOfFrames;
-			std::map<const char*, ProfileManager::Sample> ProfileManager::s_samples;
+			using namespace nlohmann;
+			std::map<const char*, std::vector<float>> ProfileManager::s_samples;
 
-			void ProfileManager::storeSample(const char* name, long elapsedTime, operationType type)
+			void ProfileManager::storeSample(const char* name, long elapsedTime)
 			{
-				// Object exists
-				if (s_samples.find(name) != s_samples.end())
-				{
-					s_samples[name].stamps.reserve(10000);
-					s_samples[name].stamps.push_back(std::move(Stamp(elapsedTime, nrOfFrames)));
-				}
-				else // Object does not exists
-				{
-					s_samples[name] = std::move(Sample(name, type, elapsedTime, nrOfFrames)); // moveable
-				}
+				s_samples[name].push_back(elapsedTime);
 			}
 
 			void ProfileManager::newFrame()
 			{
-				nrOfFrames++;
+				
 			}
 
-			void ProfileManager::dumpDataToFile(const char * filename)
+			void ProfileManager::dumpDataToFile()
 			{
-				const char* delimiter = " ";
-				std::fstream file;
-				file.open(filename, std::ios::out);
-
-				if (file.is_open())
+				json j;
+				j["SlowfilerData"];
+				j["SlowfilerData"]["functions"];
+				for (auto& it : s_samples)
 				{
-					for (const auto& keyValuePair : s_samples)
-					{
-						file << keyValuePair.second.name << delimiter;
-						for (const auto& sample : keyValuePair.second.stamps)
-						{
-							file << sample.timestamp << delimiter;
-						}
-						file << "\n";
-					}
-					file.close();
+					j["SlowfilerData"]["functions"][it.first];
+					j["SlowfilerData"]["functions"][it.first]["Sample"] = it.second;
 				}
+
+				std::ofstream o("data.json");
+				o << j << std::endl;
+				o.close();
+			}
+
+			void ProfileManager::DisplaySample(const char * functionName, long elapsedTime)
+			{
+				// Display using Imgui
+				// And store sample
+				bool test = true;
+
+
+				storeSample(functionName, elapsedTime);
+			}
+
+			long ProfileManager::GetLatestStamp(const char * functionName)
+			{
+				if (s_samples.find(functionName) != s_samples.end())
+				{
+					return 0;
+				}
+
+				return s_samples[functionName].back();
+			}
+
+			std::map<const char*, std::vector<float>>* ProfileManager::GetData()
+			{
+				return &s_samples;
 			}
 		}
 	}

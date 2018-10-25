@@ -60,12 +60,16 @@ namespace ThomasEngine {
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			mainThread = gcnew Thread(gcnew ThreadStart(StartEngine));
+
 			mainThread->Name = "Thomas Engine (Logic Thread)";
 			mainThread->Start();
+			mainThread->BeginThreadAffinity();
 
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
+		
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
+			mainThread->BeginThreadAffinity();
 		}
 	}
 
@@ -73,10 +77,15 @@ namespace ThomasEngine {
 	void ThomasWrapper::StartRenderer()
 	{
 		// Render thread start
+
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
-			UpdateFinished->WaitOne();
+			PROFILE("StartRenderer %f")
+			{
+				PROFILE("StartRenderer - Wait %f")
+				UpdateFinished->WaitOne();
+			}
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
@@ -91,6 +100,7 @@ namespace ThomasEngine {
 
 		profiler->SetActive(showStatistics);
 		if (showStatistics) {
+
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
 			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
@@ -102,6 +112,11 @@ namespace ThomasEngine {
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			//for (auto& it : *utils::profiling::ProfileManager::GetData())
+			//{
+			//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
+			//	ImGui::Text(it.first, it.second.back());
+			//}
 			ImGui::End();
 		}
 
@@ -127,17 +142,18 @@ namespace ThomasEngine {
 	void ThomasWrapper::StartEngine()
 	{
 		// Update thread start
+
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
+			PROFILE("StartEngine %f")
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
 				continue;
 			}
-			NEW_FRAME();
 			float timeStart = ThomasTime::GetElapsedTime();
-			PROFILE(__FUNCSIG__);
+
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 			try {
 
@@ -224,13 +240,16 @@ namespace ThomasEngine {
 					thomas::object::component::RenderComponent::ClearList();
 
 					// Wait for renderer
-					RenderFinished->WaitOne();
-					
+					{
+						PROFILE("StartEngine - Wait %f");
+						RenderFinished->WaitOne();
+					}
 					/* Render & Update is synced.
 					*/
 					thomas::graphics::LightManager::Update();
+
+
 					CopyCommandList();
-					
 					if (shouldStop)
 						Stop();
 					// Enter async. state 
@@ -248,7 +267,7 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
-		utils::profiling::ProfileManager::dumpDataToFile("data.csv");
+		utils::profiling::ProfileManager::dumpDataToFile();
 	
 		thomas::ThomasCore::Exit();
 	}

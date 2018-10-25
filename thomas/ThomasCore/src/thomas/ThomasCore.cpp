@@ -60,7 +60,6 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
-		PROFILE(__FUNCSIG__)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();
