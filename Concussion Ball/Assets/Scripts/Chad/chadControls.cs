@@ -127,20 +127,25 @@ public class ChadControls : NetworkComponent
             StartCoroutine(StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 100));
     }
 
-    public void EnableRagdoll()
+    private void EnableRagdoll()
     {
         
         rBody.enabled = false;
         Ragdoll.EnableRagdoll();
     }
 
-    public void DisableRagdoll()
+    private void DisableRagdoll()
     {
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
         gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
     }
+
+    //public StartRagdoll()
+    //{
+        
+    //}
 
     #region Input handling
     private void HandleKeyboardInput()
