@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <vector>
-#include <d3d11.h>
+#include <d3d11_4.h>
 #include "Input.h"
 
 namespace thomas 
@@ -11,13 +11,21 @@ namespace thomas
 	protected:
 		struct DXBuffers
 		{
-			ID3D11RenderTargetView* backBuffer = nullptr;
-			ID3D11ShaderResourceView* backBufferSRV = nullptr;
+			//Buffer pointer to render target
+			ID3D11Texture2D* buffer = nullptr;
+
+			ID3D11RenderTargetView* RTV = nullptr;
+			ID3D11ShaderResourceView* SRV = nullptr;
 			ID3D11DepthStencilState* depthStencilState = nullptr;
+			ID3D11DepthStencilView* depthStencilView1 = nullptr;
+
+			//Buffer pointer to swapChain back buffer
+			ID3D11Texture2D* backBuffer = nullptr;
+			ID3D11RenderTargetView* backBufferRTV = nullptr;
 			ID3D11DepthStencilView* depthStencilView = nullptr;
 			ID3D11DepthStencilView* depthStencilViewReadOnly = nullptr;
 			ID3D11ShaderResourceView* depthBufferSRV = nullptr;
-
+			
 		}m_dxBuffers;
 
 	public:
@@ -79,7 +87,7 @@ namespace thomas
 		WNDCLASSEX m_windowClassInfo;
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
-		IDXGISwapChain* m_swapChain;
+		IDXGISwapChain3* m_swapChain;
 	};
 }
 
