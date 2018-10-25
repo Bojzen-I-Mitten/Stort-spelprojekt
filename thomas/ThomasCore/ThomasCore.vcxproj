@@ -29,7 +29,6 @@
     <ClCompile Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.cpp" />
     <ClCompile Include="src\thomas\editor\Editor.cpp" />
     <ClCompile Include="src\thomas\EditorWindow.cpp" />
-    <ClCompile Include="src\thomas\AutoProfile.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
@@ -44,7 +43,6 @@
     <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Joint.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Ragdoll.cpp" />
-    <ClCompile Include="src\thomas\ProfileManager.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimatedSkeleton.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimationNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\AnimPlayback.cpp" />
@@ -79,6 +77,7 @@
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\LinearAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
+    <ClCompile Include="src\thomas\utils\AutoProfile.cpp" />
     <ClCompile Include="src\thomas\utils\Buffers.cpp" />
     <ClCompile Include="src\thomas\graphics\BulletDebugDraw.cpp" />
     <ClCompile Include="src\thomas\resource\Material.cpp" />
@@ -111,6 +110,7 @@
     <ClCompile Include="src\thomas\utils\GpuProfiler.cpp" />
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
+    <ClCompile Include="src\thomas\utils\ProfileManager.cpp" />
     <ClCompile Include="src\thomas\utils\ThreadMap.cpp" />
     <ClCompile Include="src\thomas\utils\Utility.cpp" />
     <ClCompile Include="src\thomas\Window.cpp" />
@@ -128,7 +128,6 @@
     <ClInclude Include="src\thomas\Constants.h" />
     <ClInclude Include="src\thomas\editor\Editor.h" />
     <ClInclude Include="src\thomas\EditorWindow.h" />
-    <ClInclude Include="src\thomas\AutoProfile.h" />
     <ClInclude Include="src\thomas\editor\gizmos\GizmoRenderBuffer.h" />
     <ClInclude Include="src\thomas\editor\gizmos\GizmoRenderCommand.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimationNode.h" />
@@ -172,7 +171,6 @@
     <ClInclude Include="src\thomas\object\component\physics\Ragdoll.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
-    <ClInclude Include="src\thomas\ProfileManager.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ComputeShader.h" />
     <ClInclude Include="src\thomas\resource\Font.h" />
@@ -197,6 +195,7 @@
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\StackAllocator.h" />
+    <ClInclude Include="src\thomas\utils\AutoProfile.h" />
     <ClInclude Include="src\thomas\utils\Buffers.h" />
     <ClInclude Include="src\thomas\graphics\BulletDebugDraw.h" />
     <ClInclude Include="src\thomas\resource\Material.h" />
@@ -229,6 +228,7 @@
     <ClInclude Include="src\thomas\utils\GpuProfiler.h" />
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />
+    <ClInclude Include="src\thomas\utils\ProfileManager.h" />
     <ClInclude Include="src\thomas\utils\ThreadMap.h" />
     <ClInclude Include="src\thomas\utils\Utility.h" />
     <ClInclude Include="src\thomas\Window.h" />

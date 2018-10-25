@@ -6,7 +6,6 @@
 #include "../../graphics/Renderer.h"
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
-#include "../../AutoProfile.h"
 #include "../../graphics/GUIManager.h"
 #include "RenderComponent.h"
 
@@ -123,7 +122,6 @@ namespace thomas
 
 			math::Ray Camera::ScreenPointToRay(math::Vector2 point)
 			{
-				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				// Move the mouse cursor coordinates into the -1 to +1 range.
 				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
 
@@ -226,7 +224,6 @@ namespace thomas
 
 			void Camera::Render()
 			{
-				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
 					if(renderComponent->m_gameObject->GetActive())
@@ -305,7 +302,6 @@ namespace thomas
 
 			void Camera::CopyFrameData()
 			{
-				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				m_frameData.targetDisplay = GetTargetDisplayIndex();
 				m_frameData.viewport = GetViewport();
 				m_frameData.viewMatrix = GetViewMatrix();

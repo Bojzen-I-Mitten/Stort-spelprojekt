@@ -10,8 +10,8 @@
 #include <thomas\Physics.h>
 #include <thomas\editor\Editor.h>
 #include <thomas\editor\EditorCamera.h>
-#include <thomas\AutoProfile.h>
-#include <thomas\ProfileManager.h>
+#include <thomas\utils\AutoProfile.h>
+#include <thomas\utils\ProfileManager.h>
 #include <thomas\utils\GpuProfiler.h>
 #include <thomas\object\component\Camera.h>
 #include <thomas\object\component\RenderComponent.h>
@@ -87,7 +87,8 @@ namespace ThomasEngine {
 	{
 
 		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+
 		profiler->SetActive(showStatistics);
 		if (showStatistics) {
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
@@ -97,10 +98,10 @@ namespace ThomasEngine {
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 			ImGui::Text("RAM Usage: %.2f MB", ramUsage);
 			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
-			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_CLEAR)*1000.0f);
-			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_MAIN_OBJECTS)*1000.0f);
-			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_PARTICLES)*1000.0f);
-			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
+			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
+			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
 			ImGui::End();
 		}
 
@@ -136,7 +137,7 @@ namespace ThomasEngine {
 			}
 			NEW_FRAME();
 			float timeStart = ThomasTime::GetElapsedTime();
-			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
+			PROFILE(__FUNCSIG__);
 			Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
 			try {
 
@@ -247,7 +248,7 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
-		ProfileManager::dumpDataToFile("data.csv");
+		utils::profiling::ProfileManager::dumpDataToFile("data.csv");
 	
 		thomas::ThomasCore::Exit();
 	}
