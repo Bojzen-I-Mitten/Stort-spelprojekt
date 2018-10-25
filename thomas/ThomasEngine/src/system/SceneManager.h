@@ -18,24 +18,40 @@ namespace ThomasEngine
 		Uninitialized =  2
 	};
 
+	public ref class TempCopy
+	{
+
+	};
+
 	public ref class SceneManager
 	{
+	public:
+		ref class TempCopy
+		{
+		public:
+			System::String^ Temp_Path;
+			TempCopy(System::String^ Path)	: 
+				Temp_Path(Path)
+			{}
+		};
 	private:
 		SceneManagerState m_state;
 		uint32_t m_ID_Counter;
 
 		Scene^ m_current_scene;
 		Scene^ m_new_loaded_scene;
+		bool m_temporarySwap;
 		Object^ m_loading_lock;
 		Object^ m_swap_lock;
 		ManualResetEvent^ m_swap_event;
 
 		void SetCurrent(Scene^ scene);
 		/* Wait process for async. loading thread. */
-		void SyncSceneSwap(Scene ^ scene);
+		void SyncSceneSwap(Scene ^ scene, bool temporary);
 
 		Scene ^ CreateEmpty();
 
+		static System::String^ Local_Temp_Copy_Path = gcnew System::String("ThomasEditor/scene.tds");
 
 	internal:
 		/* Called by logic process to swap scene.
@@ -71,6 +87,10 @@ namespace ThomasEngine
 		bool LoadScene(System::String^ fullPath);
 		bool LoadScene(System::String^ fullPath, bool isTemporary);
 		bool NewScene(System::String^ fullPath);
+		TempCopy ^ StoreTempCopy();
+		/* Load temporary file (Can throw exception)
+		*/ 
+		void LoadTempCopy(TempCopy^ copy);
 
 
 

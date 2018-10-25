@@ -9,7 +9,7 @@ using namespace System::IO;
 using namespace System::Reflection;
 namespace ThomasEngine
 {
-	public ref class ScriptingManger
+	public ref class ScriptingManager
 	{
 	private:
 		static FileSystemWatcher^ fsw;
@@ -27,8 +27,8 @@ namespace ThomasEngine
 			
 			fsw = gcnew FileSystemWatcher();
 			fsw->Filter = "Assembly.dll";
-			fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManger::OnChanged);
-			Application::currentProjectChanged += gcnew Application::CurrentProjectChangedEvent(&ScriptingManger::OnCurrentProjectChanged);
+			fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManager::OnChanged);
+			Application::currentProjectChanged += gcnew Application::CurrentProjectChangedEvent(&ScriptingManager::OnCurrentProjectChanged);
 		}
 
 		static void OnCurrentProjectChanged(Project^ newProject) {

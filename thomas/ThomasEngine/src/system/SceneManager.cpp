@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #pragma managed
-
+using namespace System::IO;
 #include "SceneManager.h"
 #include "../ThomasManaged.h"
 #include "../ThomasSelection.h"
@@ -31,7 +31,7 @@ namespace ThomasEngine
 		Scene^ oldScene = m_current_scene;
 		ThomasWrapper::Selection->UnselectGameObjects();
 		m_current_scene = value;
-		if (Application::currentProject)
+		if (!m_temporarySwap && Application::currentProject)
 			Application::currentProject->currentScenePath = m_current_scene->RelativeSavePath;
 
 		// Trigger change
@@ -67,13 +67,14 @@ namespace ThomasEngine
 	{
 		// Assert: isLogicThread()
 		Object^ lock = m_current_scene->GetGameObjectsLock();
-		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
+		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), Local_Temp_Copy_Path);
 		
 		Monitor::Enter(lock);
 		m_current_scene->UnLoad();
 		Monitor::Exit(lock);
 
 		Scene^ scene = Scene::LoadScene(tempFile, m_ID_Counter++);
+		m_temporarySwap = true;
 		SetCurrent(scene);
 
 		try {
@@ -97,6 +98,7 @@ namespace ThomasEngine
 
 	bool SceneManager::LoadScene(System::String ^ fullPath, bool isTemporary)
 	{
+		bool success = false;
 		if (Monitor::TryEnter(m_loading_lock))
 		{
 			String^ t_name = Thread::CurrentThread->Name;
@@ -106,8 +108,9 @@ namespace ThomasEngine
 			Scene^ scene = Scene::LoadScene(fullPath, m_ID_Counter++);
 			if (scene) // Only trigger if a scene is actually loaded
 			{
-				SyncSceneSwap(scene);
+				SyncSceneSwap(scene, isTemporary);
 				Debug::Log("Scene: " + m_current_scene->Name + " finished loading!");
+				success = true;
 			}
 			m_state = SceneManagerState::NormalState;
 
@@ -115,9 +118,9 @@ namespace ThomasEngine
 		}
 		else {
 			Debug::LogWarning("Error loading scene: Scene loading in progress...");
-			return false;
+			return success;
 		}
-		return true;
+		return success;
 	}
 
 	bool SceneManager::NewScene(System::String ^ fullPath)
@@ -129,7 +132,7 @@ namespace ThomasEngine
 			Debug::Log("Thread: " + t_name + " created new scene.");
 			m_state = SceneManagerState::LoadingInProgress;
 			Scene^ scene = gcnew Scene(fullPath, m_ID_Counter++);
-			SyncSceneSwap(scene); // Swap
+			SyncSceneSwap(scene, false); // Swap
 			m_state = SceneManagerState::NormalState;
 			Monitor::Exit(m_loading_lock);
 		}
@@ -140,12 +143,35 @@ namespace ThomasEngine
 		return true;
 	}
 
-	void SceneManager::SyncSceneSwap(Scene^scene)
+	SceneManager::TempCopy^ SceneManager::StoreTempCopy()
+	{
+		if (ThomasWrapper::CurrentScene)
+		{
+			TempCopy^ cpy = gcnew TempCopy(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), Local_Temp_Copy_Path));
+			ThomasWrapper::CurrentScene->SaveSceneAs(cpy->Temp_Path);
+			return cpy;
+		}
+		return nullptr;
+	}
+
+	void SceneManager::LoadTempCopy(TempCopy ^ copy)
+	{
+		if (copy)
+		{
+			ThomasWrapper::Thomas->SceneManagerRef->LoadScene(copy->Temp_Path, true);
+			File::Delete(copy->Temp_Path);
+		}
+		else
+			Debug::LogWarning("Temporary copy was null, failed re-loading scene.");
+	}
+
+	void SceneManager::SyncSceneSwap(Scene^scene, bool temporary)
 	{
 		// Set swap state (lock preventing race conditions while setting swap parameters)
 		Monitor::Enter(m_swap_lock);
 		m_swap_event->Reset();
 		m_new_loaded_scene = scene;
+		m_temporarySwap = temporary;
 		Monitor::Exit(m_swap_lock);
 		m_swap_event->WaitOne();
 	}
@@ -160,7 +186,7 @@ namespace ThomasEngine
 		{
 			m_state = SceneManagerState::LoadingInProgress;
 			Scene^ scene = CreateEmpty();
-			SyncSceneSwap(scene);
+			SyncSceneSwap(scene, false);
 			m_state = SceneManagerState::NormalState;
 			Monitor::Exit(m_loading_lock);
 		}

@@ -78,7 +78,7 @@ namespace ThomasEngine {
 #ifdef _EDITOR
 			if (true)
 			{
-				ScriptingManger::Init();
+				ScriptingManager::Init();
 			}
 #endif
 
@@ -97,7 +97,7 @@ namespace ThomasEngine {
 	{
 #ifdef _EDITOR
 		if (!playing)
-			ScriptingManger::ReloadAssembly(false);
+			ScriptingManager::ReloadAssembly(false);
 #endif
 	}
 
@@ -331,7 +331,7 @@ namespace ThomasEngine {
 					gcnew MainThreadDelegate(MainThreadUpdate));
 			}
 		}
-		renderThread->Join();
+		renderThread->Join();	// Wait until thread is finished
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
 

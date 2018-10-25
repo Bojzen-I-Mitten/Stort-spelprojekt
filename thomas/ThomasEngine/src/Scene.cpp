@@ -15,6 +15,7 @@
 #include "Project.h"
 #include "serialization/Serializer.h"
 #include "ThomasSelection.h"
+#include "system/SceneManager.h"
 
 namespace ThomasEngine
 {
@@ -51,8 +52,7 @@ namespace ThomasEngine
 
 	void Scene::OnPlay()
 	{
-		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "thomas/scene.tds");
-		SaveSceneAs(tempFile);
+		ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
 		// Initiate 
 		InitGameObjects(true);
 	}
@@ -100,6 +100,7 @@ namespace ThomasEngine
 		if(Application::currentProject && this->RelativeSavePath)
 			SaveSceneAs(Application::currentProject->assetPath + "\\" + m_relativeSavePath);
 	}
+
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath, uint32_t unique_id)
 	{

@@ -7,7 +7,7 @@
 namespace ThomasEngine
 {
 
-	void ScriptingManger::LoadAssembly()
+	void ScriptingManager::LoadAssembly()
 	{
 		if (File::Exists(fsw->Path + "/Assembly.dll"))
 		{
@@ -26,40 +26,29 @@ namespace ThomasEngine
 		shouldReload = false;
 
 	}
-	void ScriptingManger::ReloadAssembly(bool forceReload) {
+	void ScriptingManager::ReloadAssembly(bool forceReload) {
 		if ((forceReload || shouldReload) &&								// Check if force reload
 			!ThomasWrapper::Thomas->SceneManagerRef->IsAsyncLoading())		// Ensure thomas is not in loading process
 		{
 			// Store current scene
-			String^ tempFile = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), "ThomasEditor/scene.tds");
-			String^ currentSavePath;
-			if (ThomasWrapper::CurrentScene)
-			{
-				currentSavePath = ThomasWrapper::CurrentScene->RelativeSavePath;
-				ThomasWrapper::CurrentScene->SaveSceneAs(tempFile);
-			}
+
+			SceneManager::TempCopy^ tmp = ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
 
 			// Reload assembly
 			LoadAssembly();
 
 			// Reload scene
-			if (ThomasWrapper::CurrentScene)
-			{
-				try
-				{
-					ThomasWrapper::Thomas->SceneManagerRef->LoadScene(tempFile, true);
-					File::Delete(tempFile);
-				}
-				catch (Exception^ e) {
-					String^ err = "Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + e->Message;
-					Debug::Log(err);
-				}
-				ThomasWrapper::CurrentScene->RelativeSavePath = currentSavePath;
+			try {
+				ThomasWrapper::Thomas->SceneManagerRef->LoadTempCopy(tmp);
+			}
+			catch (Exception^ e) {
+				String^ err = "Warning! ThomasEngine::ScriptingManager Failure to access temporary file when loading assembly. " + e->Message;
+				Debug::Log(err);
 			}
 		}
 	}
 
-	void ScriptingManger::OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e)
+	void ScriptingManager::OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e)
 	{
 		fsw->EnableRaisingEvents = false;
 		shouldReload = true;

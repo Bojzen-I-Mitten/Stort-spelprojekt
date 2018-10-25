@@ -75,8 +75,8 @@ namespace ThomasEditor
 
             MainWindow.OnStopPlaying += ThomasWrapper_OnStopPlaying;
 
-            ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
-            ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+            ScriptingManager.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
+            ScriptingManager.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
             ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
             ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;

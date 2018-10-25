@@ -151,7 +151,7 @@ namespace ThomasEngine
 	{
 		List<System::Type^>^ types = gcnew List<System::Type^>(externalTypes);
 
-		Assembly^ scriptAssembly = ScriptingManger::GetAssembly();
+		Assembly^ scriptAssembly = ScriptingManager::GetAssembly();
 		if (scriptAssembly)
 			types->AddRange(scriptAssembly->GetExportedTypes());
 

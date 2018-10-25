@@ -342,9 +342,7 @@ namespace ThomasEngine
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
-				{
-					resources[resource]->~Resource();
-				}
+					delete resources[resource];
 			}
 #pragma endregion
 
