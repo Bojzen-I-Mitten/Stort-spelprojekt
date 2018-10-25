@@ -54,9 +54,10 @@ namespace thomas
 		private:
 			static D3D s_D3D;
 
-			ID3D11Device* m_device;
-			ID3D11DeviceContext* m_deviceContext;
+			ID3D11Device3* m_device;
+			ID3D11DeviceContext3* m_deviceContext;
 			ID3D11Debug* m_debug;
+
 			profiling::GpuProfiler* m_profiler;
 
 		};

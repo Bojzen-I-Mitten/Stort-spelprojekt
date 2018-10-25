@@ -75,7 +75,7 @@ namespace thomas
 	{
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->BeginFrame();
-		WindowManager::Instance()->ClearAllWindows();
+		WindowManager::Instance()->BeginFrame();
 		profiler->Timestamp(profiling::GTS_MAIN_CLEAR);
 		graphics::Renderer::Instance()->ProcessCommands();
 
@@ -83,7 +83,7 @@ namespace thomas
 		//  (whose data we're getting) will have finished on the GPU by now.
 
 		profiler->WaitForDataAndUpdate();
-		WindowManager::Instance()->PresentAllWindows();
+		WindowManager::Instance()->EndFrame();
 		utils::D3D::Instance()->GetProfiler()->EndFrame();
 	}
 

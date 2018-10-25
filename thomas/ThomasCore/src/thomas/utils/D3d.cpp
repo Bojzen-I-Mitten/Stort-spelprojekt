@@ -153,7 +153,7 @@ namespace thomas
 						scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 						scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 						scd.OutputWindow = handle;
-						scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+						scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
 						scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 						scd.SampleDesc.Count = 1; //Make this costomizable!!!
@@ -167,6 +167,7 @@ namespace thomas
 						if (SUCCEEDED(hr))
 						{
 							dxgiSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&swapchain);
+							swapchain->SetMaximumFrameLatency(FRAME_BUFFERS - 1);
 							SAFE_RELEASE(dxgiSwapChain);
 						}
 
@@ -196,33 +197,45 @@ namespace thomas
 			UINT createDeviceFlags = 0;
 			D3D_FEATURE_LEVEL fl;
 
-#ifdef _DEBUG_DX
+		#ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
+		#endif
 
-			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, &m_deviceContext);
-			if (FAILED(hr))
+			ID3D11Device* device;
+			ID3D11DeviceContext* deviceContext;
+			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &device, &fl, &deviceContext);
+			if (SUCCEEDED(hr))
 			{
-				LOG_HR(hr);
-				return false;
+				hr = device->QueryInterface(__uuidof(ID3D11Device3), (void**)&m_device);
+				if (SUCCEEDED(hr))
+				{
+					hr = deviceContext->QueryInterface(__uuidof(ID3D11DeviceContext3), (void**)&m_deviceContext);
+					if (SUCCEEDED(hr))
+					{
+						ID3D11Multithread* multi = nullptr;
+						hr = m_device->QueryInterface(IID_PPV_ARGS(&multi));
+						if (FAILED(hr))
+						{
+							LOG_HR(hr);
+							return false;
+						}
+
+						multi->SetMultithreadProtected(TRUE);
+						SAFE_RELEASE(multi);
+
+					#ifdef  _DEBUG_DX
+						CreateDebugInterface();
+					#endif
+						m_profiler = new profiling::GpuProfiler();
+						return m_profiler->Init();
+					}
+				}
 			}
 
-			ID3D11Multithread* multi = nullptr;
-			hr = m_device->QueryInterface(IID_PPV_ARGS(&multi));
-			if (FAILED(hr))
-			{
-				LOG_HR(hr);
-				return false;
-			}
-
-			multi->SetMultithreadProtected(TRUE);
-			SAFE_RELEASE(multi);
-
-#ifdef  _DEBUG_DX
-			CreateDebugInterface();
-#endif
-			m_profiler = new profiling::GpuProfiler();
-			return m_profiler->Init();
+			SAFE_RELEASE(device);
+			SAFE_RELEASE(deviceContext);
+			LOG_HR(hr);
+			return false;
 		}
 
 		void D3D::CreateDebugInterface()

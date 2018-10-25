@@ -39,6 +39,7 @@ namespace thomas
 		void QueueResize();
 		void Bind();
 		void Clear();
+		void WaitOnSwapChain();
 
 	public:
 		bool ShouldResize();
@@ -87,6 +88,7 @@ namespace thomas
 		WNDCLASSEX m_windowClassInfo;
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
+		HANDLE m_frameLatancyWaitableObject;
 		IDXGISwapChain3* m_swapChain;
 	};
 }

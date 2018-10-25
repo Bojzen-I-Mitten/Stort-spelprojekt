@@ -21,6 +21,25 @@ namespace thomas
 		}
 	}
 
+	void WindowManager::BeginFrame()
+	{
+		for (Window* window : m_windows)
+		{
+			if (window->Initialized())
+			{
+				window->WaitOnSwapChain();
+				window->Clear();
+			}
+		}
+	}
+
+	void WindowManager::EndFrame()
+	{
+		for (Window* window : m_windows)
+			if (window->Initialized())
+				window->Present();
+	}
+
 	void WindowManager::UpdateFocus()
 	{
 		POINT p;
@@ -43,22 +62,6 @@ namespace thomas
 			delete window;
 
 		m_windows.clear();
-	}
-
-	void WindowManager::ClearAllWindows()
-	{
-		for (Window* window : m_windows)
-			if (window->Initialized())
-				window->Clear();
-	}
-
-	void WindowManager::PresentAllWindows()
-	{
-		for (Window* window : m_windows)
-			if (window->Initialized())
-			{
-				window->Present();
-			}
 	}
 
 	bool WindowManager::WaitingForUpdate()

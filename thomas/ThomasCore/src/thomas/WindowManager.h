@@ -12,11 +12,11 @@ namespace thomas
 	public:
 		bool WaitingForUpdate();
 		void Destroy();
-		void ClearAllWindows();
-		void PresentAllWindows();
 		void Update();
 		void Create(HWND hWnd, bool isEditor);
-		void UpdateFocus();
+		void BeginFrame();
+		void EndFrame();
+		
 	public:
 		int GetNumOfWindows();
 		Window* GetCurrentBound();
@@ -32,6 +32,9 @@ namespace thomas
 
 	private:
 		WindowManager() {m_dummyInput = Input();}
+		void UpdateFocus();
+		void ClearAllWindows();
+		void PresentAllWindows();
 
 	private:
 		std::vector<Window*> m_windows;
