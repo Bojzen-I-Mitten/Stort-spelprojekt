@@ -27,6 +27,7 @@ public class Ball : PickupableObject
     {
         base.Start();
         m_throwable = true;
+        DropOnRagdoll = true;
 
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));

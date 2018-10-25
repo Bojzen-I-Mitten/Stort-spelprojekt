@@ -11,6 +11,7 @@ public class PickupableObject : NetworkComponent
 
     public Transform PickupOffset { get; set; } = null;
     public float MovementSpeedModifier { get; set; } = 1.0f;
+    public bool DropOnRagdoll { get; set; } = true;
 
     public bool m_throwable = false;
     public bool m_pickupable = true;

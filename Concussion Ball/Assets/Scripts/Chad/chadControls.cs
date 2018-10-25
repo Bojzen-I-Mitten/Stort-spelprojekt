@@ -152,6 +152,8 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
+        if (PickedUpObject && PickedUpObject.DropOnRagdoll)
+            PickedUpObject.Drop();
         if(State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
