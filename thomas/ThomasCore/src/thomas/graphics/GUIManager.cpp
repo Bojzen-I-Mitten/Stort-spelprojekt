@@ -37,8 +37,9 @@ namespace thomas
 
 				for (const auto& image : m_images)
 				{
+					Vector2 size = Vector2(image.second.texture->GetWidth(), image.second.texture->GetHeight());
 					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position * m_viewport, nullptr, image.second.color,
-										image.second.rotation, image.second.origin, image.second.scale * m_viewportScale);
+										image.second.rotation, image.second.origin * size, image.second.scale * m_viewportScale);
 				}
 
 				for (const auto& text : m_texts)

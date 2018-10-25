@@ -67,6 +67,16 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
+		[BrowsableAttribute(false)]
+		property Vector2 viewport
+		{
+			Vector2 get()
+			{
+				thomas::math::Viewport vp = ((thomas::object::component::Camera*)nativePtr)->GetViewport();
+				return Vector2(vp.width, vp.height);
+			}
+		}
+
 	public:
 
 		//GUI Images

@@ -98,15 +98,15 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+        
 
         State = STATE.CHADING;
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
 
-        if (!isOwner && Camera)
-            Camera.enabled = false;
+        if (Camera)
+            Camera.gameObject.activeSelf = false;
         if (isOwner && !Camera)
             Debug.LogWarning("Camera not set for player");
         if (Camera)
@@ -126,6 +126,16 @@ public class ChadControls : NetworkComponent
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
 
         Identity.RefreshCache();
+    }
+
+    public void ActivateCamera()
+    {
+        if (isOwner)
+        {
+            Camera.gameObject.activeSelf = true;
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+        }
+            
     }
 
     public override void Update()

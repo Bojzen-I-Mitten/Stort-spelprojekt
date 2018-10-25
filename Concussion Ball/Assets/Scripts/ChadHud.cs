@@ -21,15 +21,15 @@ public class ChadHud : ScriptComponent
             return;
         }
         cam = gameObject.GetComponent<Camera>();
-        cam.AddText("MatchTime", "00:00", new Vector2(800/2.0f, 25), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
-        cam.AddText("AnnouncementText", "", new Vector2(800 / 2.0f, 600 / 2.0f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
+        cam.AddText("MatchTime", "00:00", new Vector2(0.5f, 0.02f), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
+        cam.AddText("AnnouncementText", "", new Vector2(0.5f, 0.5f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
         cam.SetTextFont("AnnouncementText", AnnouncementFont);
-        cam.AddText("AnnouncementText2", "", new Vector2(800 / 2.0f, 600 / 2.0f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
+        cam.AddText("AnnouncementText2", "", new Vector2(0.5f, 0.5f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
         cam.SetTextOrigin("MatchTime", new Vector2(0.5f));
         cam.SetTextOrigin("AnnouncementText", new Vector2(0.5f));
         cam.SetTextOrigin("AnnouncementText2", new Vector2(0.5f));
 
-        cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(800 / 2.0f, 500 / 2.0f), Vector2.Zero, false);
+        cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(0.5f, 0.5f), Vector2.Zero, false);
         cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
 
     }
@@ -66,29 +66,29 @@ public class ChadHud : ScriptComponent
         cam.SetTextColor("AnnouncementText", color.ToVector4());
         cam.SetText("AnnouncementText2", text2);
 
-        Vector2 text1Size = cam.GetTextSize("AnnouncementText");
-        Vector2 text2Size = cam.GetTextSize("AnnouncementText2");
+        Vector2 text1Size = cam.GetTextSize("AnnouncementText") / cam.viewport;
+        Vector2 text2Size = cam.GetTextSize("AnnouncementText2") / cam.viewport;
         while (time < duration)
         {
             time += Time.ActualDeltaTime;
             xPos = (float)AnnouncementHorizontalSpeed.GetYFromX((double)time / duration);
 
-            Vector2 text1Pos = new Vector2(0, 500 / 2.0f);
-            text1Pos.x = MathHelper.Lerp(-text1Size.x / 2.0f, 800 / 2.0f, xPos);
+            Vector2 text1Pos = new Vector2(0, 0.46f);
+            text1Pos.x = MathHelper.Lerp(-text1Size.x, 0.55f, xPos);
 
-            Vector2 text2Pos = new Vector2(0, 600 / 2.0f);
-            text2Pos.x = MathHelper.Lerp(800 + text1Size.x / 2.0f, 800 / 2.0f, xPos);
+            Vector2 text2Pos = new Vector2(0, 0.55f);
+            text2Pos.x = MathHelper.Lerp(1 + text1Size.x, 0.45f, xPos);
 
             cam.SetTextPosition("AnnouncementText", text1Pos);
             cam.SetTextPosition("AnnouncementText2", text2Pos);
 
             Color c = GetRainbowColor(time, 0.5f);
-            Color c2 = GetRainbowColor(time+1.0f, 0.5f);
+            Color c2 = GetRainbowColor(time + 1.0f, 0.5f);
             cam.SetTextColor("AnnouncementText2", c.ToVector4());
 
             if (showBG)
             {
-                cam.SetImageScale("AnnouncementBg", new Vector2(1920, 1.0f + (float)Math.Sin((float)time * 0.5f) * 0.5f));
+                cam.SetImageScale("AnnouncementBg", new Vector2(10000, 1.0f + (float)Math.Sin((float)time) * 0.5f));
                 cam.SetImageColor("AnnouncementBg", c2.ToVector4());
             }
             if(MatchSystem.instance.MatchTimeLeft > 0.0f)

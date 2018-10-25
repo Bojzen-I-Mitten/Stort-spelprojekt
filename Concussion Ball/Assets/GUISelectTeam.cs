@@ -25,12 +25,14 @@ public class GUISelectTeam : ScriptComponent
         if (Camera.OnImageClicked(Team1))
         {
             MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
+            MatchSystem.instance.LocalChad.ActivateCamera();
             this.enabled = false;
             Camera.enabled = false;
         }
         else if (Camera.OnImageClicked(Team2))
         {
             MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
+            MatchSystem.instance.LocalChad.ActivateCamera();
             this.enabled = false;
             Camera.enabled = false;
         }
@@ -60,9 +62,10 @@ public class GUISelectTeam : ScriptComponent
         Camera.SetImageColor(Spectator, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Color.ToVector4());
 
         Camera.AddText(Select, "Select team", new Vector2(0.21f, 0.11f), new Vector2(1.0f));
+
         Camera.AddText(Team1, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name, new Vector2(0.10f, 0.18f), new Vector2(1.0f));
-        Camera.AddText(Team2, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name, new Vector2(0.20f, 0.18f), new Vector2(1.0f));
-        Camera.AddText(Spectator, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name, new Vector2(0.31f, 0.18f), new Vector2(1.0f));
+        Camera.AddText(Team2, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name, new Vector2(0.22f, 0.18f), new Vector2(1.0f));
+        Camera.AddText(Spectator, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name, new Vector2(0.35f, 0.18f), new Vector2(1.0f));
 
 
     }

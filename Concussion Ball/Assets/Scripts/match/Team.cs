@@ -23,7 +23,7 @@ public class Team
     [Browsable(false)]
     public List<NetworkPlayer> Players { get; private set; }
    
-    public int Score { get { return _Score; } }
+    //public int Score { get { return _Score; } }
 
     public Team(TEAM_TYPE type, string name, Color teamColor)
     {
