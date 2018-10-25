@@ -511,7 +511,7 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
-            if (pickupable)
+            if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {

@@ -73,7 +73,6 @@ public class MatchSystem : NetworkManager
         //Spawn ball or something
         if (BallPrefab)
         {
-            Debug.Log("spawned ball!");
             Ball = Scene.FindNetworkObject(8008)?.gameObject;
             if (!Ball)
             {

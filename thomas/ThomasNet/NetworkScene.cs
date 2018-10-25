@@ -12,7 +12,7 @@ namespace ThomasEngine.Network
         public NetworkScene()
         {
         }
-        int nextAssignableID = 0;
+        public int nextAssignableID = 0;
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
         public Dictionary<NetPeer, List<NetworkIdentity>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentity>>();

@@ -9,6 +9,8 @@ public class PickupableObject : NetworkComponent
 {
     public Rigidbody m_rigidBody;
 
+    public Transform PickupOffset { get; set; } = null;
+
     public bool m_throwable = false;
     public bool m_pickupable = true;
 
@@ -99,6 +101,14 @@ public class PickupableObject : NetworkComponent
             m_rigidBody.enabled = false;
             transform.parent = hand;
             transform.localPosition = Vector3.Zero;
+            transform.localRotation = Quaternion.Identity;
+            if (PickupOffset)
+            {
+                transform.localPosition = PickupOffset.localPosition;
+                transform.localRotation = PickupOffset.localRotation;
+            }
+
+            
             chad.PickedUpObject = this;
             _Chad = chad;
         }
