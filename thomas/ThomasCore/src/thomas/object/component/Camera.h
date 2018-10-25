@@ -79,6 +79,7 @@ namespace thomas
 				void CopyFrameData();
 				CAMERA_FRAME_DATA& GetFrameData();
 
+				math::Vector3 WorldToViewport(math::Vector3 position, math::Matrix world);
 			private:
 				CAMERA_FRAME_DATA m_frameData;
 				math::Matrix m_projMatrix;

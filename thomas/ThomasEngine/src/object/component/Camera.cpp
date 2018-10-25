@@ -192,4 +192,9 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetFont(Utility::ConvertString(id), (thomas::resource::Font*)font->m_nativePtr);
 	}
 	//-------------------------------------------------------------------------------------------
+
+	Vector3 Camera::WorldToViewport(Vector3 position, Matrix world)
+	{
+		return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->WorldToViewport(Utility::Convert(position), Utility::Convert(world)));
+	}
 }
