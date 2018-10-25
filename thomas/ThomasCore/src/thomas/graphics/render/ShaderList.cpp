@@ -120,7 +120,7 @@ namespace thomas {
 				{
 					resource::ComputeShader* cs = dynamic_cast<resource::ComputeShader*>(foundShader);
 					if (cs == nullptr)
-						throw std::invalid_argument("Conpute shader with path: " + path + " already exists as a normal Shader object!!!");
+						throw std::invalid_argument("Compute shader with path: " + path + " already exists as a normal Shader object!!!");
 					return cs;	// Found compatible
 				}
 				std::unique_ptr<resource::ComputeShader> shader = resource::ComputeShader::CreateComputeShader(path);
