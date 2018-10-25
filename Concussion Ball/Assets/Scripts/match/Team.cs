@@ -10,45 +10,43 @@ using System.ComponentModel;
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class Team
 {
-    private List<NetworkPlayer> _Players;
-    private TeamSpawn _SpawnArea;
-    private int _Score;
+    public int Score { get; private set; }
 
     public TEAM_TYPE TeamType;
     public Color Color { get; set; }
     public string Name { get; set; }
     [Browsable(false)]
-    public int PlayerCount { get { return _Players.Count; } }
+    public int PlayerCount { get { return Players.Count; } }
     [Browsable(false)]
-    public TeamSpawn SpawnArea { get { return _SpawnArea; } }
+    public TeamSpawn SpawnArea { get; private set; }
     [Browsable(false)]
-    public List<NetworkPlayer> Players { get { return _Players; } }
+    public List<NetworkPlayer> Players { get; private set; }
    
     public Team(TEAM_TYPE type, string name, Color teamColor)
     {
         Color = teamColor;
         TeamType = type;
-        _Score = 0;
+        Score = 0;
         Name = name;
-        _Players = new List<NetworkPlayer>(50);
+        Players = new List<NetworkPlayer>(50);
     }
 
-    public void SetSpawnArea(TeamSpawn spawn) { _SpawnArea = spawn; }
+    public void SetSpawnArea(TeamSpawn spawn) { SpawnArea = spawn; }
     //public void SetGoalArea(TeamGoal goal) { _GoalArea = goal; }
 
     public void ResetScore()
     {
-        _Score = 0;
+        Score = 0;
     }
     public void AddScore()
     {
-        _Score++;
+        Score++;
         Debug.Log(TeamType.ToString() + " Scored!");
     }
 
     public void ResetPlayers()
     {
-        Players.ForEach((player) => 
+        Players.ForEach((System.Action<NetworkPlayer>)((player) => 
         {
             switch (TeamType)
             {
@@ -59,18 +57,17 @@ public class Team
                 case TEAM_TYPE.TEAM_1:
                 case TEAM_TYPE.TEAM_2:
                     player.gameObject.SetActive(true);
-                    player.Respawn();
                     break;
             }
             player.Reset();
-        });
+        }));
         
     }
 
     public Vector3 GetSpawnPosition()
     {
         Vector3 spawnPoint = Vector3.Zero;
-        if (_SpawnArea)
+        if (SpawnArea)
         {
             spawnPoint = SpawnArea.transform.position;
             //Random x, z point inside the box
@@ -87,7 +84,7 @@ public class Team
             Debug.LogWarning("Player is already in team " + Name);
             return;
         }
-        _Players.Add(player);
+        Players.Add(player);
         Debug.Log(player.Name + " Joined team " + Name);
     }
 
@@ -99,7 +96,7 @@ public class Team
             Debug.LogWarning("Player is not in team " + Name);
             return;
         }
-        _Players.Remove(player);
+        Players.Remove(player);
         Debug.Log(player.Name + " left team " + Name);
     }
     
