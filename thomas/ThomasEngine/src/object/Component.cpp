@@ -210,7 +210,8 @@ namespace ThomasEngine
 				continue;
 			if (!iterator->MoveNext())
 			{
-				coroutines->RemoveAt(i);
+				if(coroutines->Count > i)
+					coroutines->RemoveAt(i);
 				i--;
 			}
 		}

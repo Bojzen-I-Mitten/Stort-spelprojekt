@@ -26,6 +26,7 @@ public class MatchSystem : NetworkManager
 
     private bool MatchStarted = false;
 
+    public PowerupManager PowerupManager;
     public static new MatchSystem instance
     {
         get { return NetworkManager.instance as MatchSystem; }
@@ -49,6 +50,7 @@ public class MatchSystem : NetworkManager
         if(BallPrefab)
             SpawnablePrefabs.Add(BallPrefab);
 
+        PowerupManager = gameObject.GetComponent<PowerupManager>();
         //StartCoroutine(ResetCoroutine(10));
     }
 
@@ -94,6 +96,7 @@ public class MatchSystem : NetworkManager
         ResetPlayers();
         Ball.GetComponent<Ball>().Reset();
         hasScored = false;
+        PowerupManager.ResetPowerups();
     }
 
     void ResetPlayers()

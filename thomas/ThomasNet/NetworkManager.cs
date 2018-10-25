@@ -400,6 +400,17 @@ namespace ThomasEngine.Network
             }
         }
 
+        public void RemoveNetworkObject(GameObject gObj)
+        {
+            NetworkIdentity identity = gObj.GetComponent<NetworkIdentity>();
+            NetworkEvents.DeletePrefabEvent deletePrefabEvent = new NetworkEvents.DeletePrefabEvent
+            {
+                netID = identity.ID
+            };
+            Events.SendEvent(deletePrefabEvent, DeliveryMethod.ReliableOrdered);
+            Events.DeletePrefabEventHandler(deletePrefabEvent, LocalPeer);
+        }
+
         public void CheckPacketLoss()
         {
             Debug.Log("A error has occured here are the amount of packetloss " + NetManager.Statistics.PacketLoss + "% lost " + NetManager.Statistics.PacketLossPercent);

@@ -62,8 +62,8 @@ namespace ThomasEngine
 	{
 		List<Object^>^ list = gcnew List<Object^>();
 		for (int i = 0; i < s_objects.Count; i++) {
-			if (s_objects[i]->GetType() == type) {
-				if ((Component::typeid)->IsAssignableFrom(type)) {
+			if (type->IsAssignableFrom(s_objects[i]->GetType())) {
+				if ((Component::typeid)->IsAssignableFrom(s_objects[i]->GetType())) {
 					ThomasEngine::Component^ component = (Component^)s_objects[i];
 					if (component->gameObject->inScene)
 						list->Add((Object^)component);

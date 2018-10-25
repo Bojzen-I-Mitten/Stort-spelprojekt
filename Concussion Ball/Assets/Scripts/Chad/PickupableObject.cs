@@ -87,7 +87,7 @@ public class PickupableObject : NetworkComponent
         }
     }
 
-    public void Pickup(ChadControls chad, Transform hand)
+    virtual public void Pickup(ChadControls chad, Transform hand)
     {
         if(m_pickupable)
         {

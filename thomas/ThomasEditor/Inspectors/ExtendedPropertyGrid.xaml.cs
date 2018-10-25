@@ -30,8 +30,9 @@ namespace ThomasEditor
                     new EditorTemplateDefinition {
                     EditingTemplate = Resources["ListEditor"] as DataTemplate,
                     TargetProperties = {
-                            new TargetPropertyType { Type = typeof(ThomasEngine.Object[]) },
-                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.Object>)},
+                            new TargetPropertyType { Type = typeof(ThomasEngine.GameObject[]) },
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.GameObject>)},
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.Transform>)},
                              new TargetPropertyType { Type = typeof(Resource[]) },
                             new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Resource>)},
                     }

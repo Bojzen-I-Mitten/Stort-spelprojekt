@@ -29,6 +29,7 @@ namespace ThomasEngine.Network
             NetSerializer = new NetSerializer();
             SubscribeToEvent<ServerInfoEvent>(ServerInfoEventHandler);
             SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
+            SubscribeToEvent<DeletePrefabEvent>(DeletePrefabEventHandler);
             SubscribeToEvent<TransferOwnerEvent>(TransferOwnerEventHandler);
         }
 
@@ -139,6 +140,18 @@ namespace ThomasEngine.Network
             {
                 NetScene.ObjectOwners[peer].Add(identity);
             }
+        }
+
+        public void DeletePrefabEventHandler(DeletePrefabEvent prefabEvent, NetPeer peer)
+        {
+            NetworkIdentity identity = NetScene.NetworkObjects[prefabEvent.netID];
+
+            if (identity != null)
+            {
+                NetScene.RemoveObject(identity);
+                GameObject.Destroy(identity.gameObject);
+            }else
+                Debug.LogError("Failed to find gameObject. It does not exist in scene");
         }
 
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)
