@@ -1,9 +1,9 @@
-using ThomasEngine;
+﻿using ThomasEngine;
 using ThomasEngine.Network;
 using System.Collections;
 using System.Linq;
 
-public class Vindaloo : Powerup
+public class ThomasTrain : Powerup
 {
     private ParticleEmitter _Fire;
     public Texture2D _FireTex { get; set; }
@@ -32,7 +32,22 @@ public class Vindaloo : Powerup
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 force)
     {
-        base.Throw(force);
+        base.Throw(force * 5.0f);
+        m_rigidBody.UseGravity = false;
+        StartCoroutine(Scale());
+    }
+
+    IEnumerator Scale()
+    {
+        transform.scale *= 10.0f;
+        yield return new WaitForSeconds(0.1f);
+        float t = 2.0f;
+        while(t > 0.0f)
+        {
+            transform.scale += new Vector3(1.0f) * Time.DeltaTime;
+            t -= Time.DeltaTime;
+            yield return null;
+        }
     }
 
     // this function will be called upon powerup use / collision after trown
@@ -45,7 +60,8 @@ public class Vindaloo : Powerup
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
-        // loop through players and check distance from explosion source
+       // loop through players and check distance from explosion source
+
         var players = NetworkManager.instance.Scene.Players.Values.ToList();
         players.ForEach(player =>
         {
@@ -61,15 +77,16 @@ public class Vindaloo : Powerup
         });
 
 
-        
+
     }
 
     private void Explosion()
     {
-        //hide the vindaloo.
+        //hide the train.
+        StopAllCoroutines();
         m_rigidBody.enabled = false;
         gameObject.transform.scale = Vector3.Zero;
-        
+
         _Fire.Emit = true;
         StartCoroutine(StopFire());
     }

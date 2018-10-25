@@ -29,7 +29,9 @@ public class PowerupManager : ScriptComponent
         GameObject ExistingPowerup = MatchSystem.instance.Scene.FindNetworkObject(NextPowerupID)?.gameObject;
         if (!ExistingPowerup)
         {
-            GameObject prefab = Powerups[random.Next(0, Powerups.Count - 1)];
+            int powerupIndex = random.Next(0, Powerups.Count);
+            Debug.Log(powerupIndex);
+            GameObject prefab = Powerups[powerupIndex];
             ExistingPowerup = MatchSystem.instance.NetworkInstantiate(prefab, trans.position, trans.rotation, false, NextPowerupID);
         }
         NextPowerupID++;
@@ -39,7 +41,6 @@ public class PowerupManager : ScriptComponent
     public void ResetPowerups()
     {
         List<Powerup> activePowerups = Object.GetObjectsOfType<Powerup>();
-        Debug.Log(activePowerups.Count);
         for (int i=0; i < activePowerups.Count; i++)
         {
             activePowerups[i].Remove();

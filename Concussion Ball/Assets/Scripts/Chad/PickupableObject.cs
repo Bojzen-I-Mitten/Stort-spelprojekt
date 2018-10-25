@@ -50,10 +50,20 @@ public class PickupableObject : NetworkComponent
     {
         if (m_pickedUp)
         {
+            Vector3 pos = transform.position;
             Drop();
-            transform.position = transform.position + Vector3.Normalize(force) * 2;
+            StartCoroutine(ThrowRoutine());
+            transform.position = pos;
+            transform.LookAt(transform.position + Vector3.Normalize(force));
             m_rigidBody.AddForce(force, Rigidbody.ForceMode.Impulse);
         }
+    }
+
+    public IEnumerator ThrowRoutine()
+    {
+        gameObject.GetComponent<Collider>().isTrigger = true;
+        yield return new WaitForSeconds(0.1f);
+        gameObject.GetComponent<Collider>().isTrigger = false;
     }
 
 
