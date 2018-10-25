@@ -28,9 +28,7 @@ namespace ThomasEngine
 			m_path = path;
 			m_nativePtr = ptr;
 		}
-		virtual ~Resource()
-		{
-		}
+		virtual ~Resource();
 
 		virtual void OnPlay() {};
 		virtual void OnStop() {};

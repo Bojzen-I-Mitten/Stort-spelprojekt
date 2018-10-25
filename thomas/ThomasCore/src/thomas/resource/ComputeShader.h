@@ -15,6 +15,12 @@ namespace thomas
 			static ID3D11ShaderResourceView* const s_nullSRVs[8];
 			static ID3D11ShaderResourceView* const s_nullSRV[1];
 		public:
+
+			ComputeShader(ID3DX11Effect* effect, std::string path);
+			virtual ~ComputeShader();
+
+			static std::unique_ptr<resource::ComputeShader> CreateComputeShader(std::string path);
+
 			void Dispatch(int threadGroupX, int threadGroupY = 1, int threadGroupZ = 1);
 			void DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs = 0);
 			static void UnbindAllUAVs();

@@ -10,39 +10,35 @@
 using namespace System::Runtime::Serialization;
 
 namespace ThomasEngine {
-
+	
 	ref class GameObject;
 	[DataContract]
 	public ref class Scene
 	{
-		bool m_playing;
-		static bool s_loading = false;
-		static Scene^ s_currentScene;
+	private:
+
+		uint32_t m_uniqueID;
 		System::Object^ m_gameObjectsLock = gcnew System::Object();
 		System::Collections::ObjectModel::ObservableCollection<GameObject^>^ m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
 
-		Scene();
-
-	internal:
-		static bool savingEnabled = true;
+		Scene(uint32_t unique_id);
 
 	public:
-		
-		delegate void CurrentSceneChanged(Scene^ oldScene, Scene^ newScene);
-		static event CurrentSceneChanged^ OnCurrentSceneChanged;
+		static Scene^ LoadScene(System::String^ fullPath, uint32_t unique_id);
+	public:
 
-
-		Scene(System::String^ name);
+		Scene(System::String^ name, uint32_t unique_id);
 		~Scene();
 
-		uint32_t ID() { return 1; } // 0 is reserved, unique ID's to be implemented.
+		uint32_t ID() { return m_uniqueID; } // 0 is reserved, unique ID's to be implemented.
 
-		void Play();
-		void Stop() { m_playing = false; }
+		void OnPlay();
 
-		bool IsPlaying() { return m_playing; }
+		void DestroyObject(GameObject^ object);
+
+		void InitGameObjects(bool playing);
 
 #pragma region Serialized properties
 
@@ -69,28 +65,20 @@ namespace ThomasEngine {
 			Vector3 get();
 			void set(Vector3);
 		}
-		/* DataContract serialization access to game object list
+		/* DataContract serialization game object list
 		*/
 		[DataMember(Order = 5)]
 		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjectData {
-			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get() {
-				return m_gameObjects;
-			}
-			void set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val) {
-				m_gameObjects = val;
-				m_gameObjectsLock = gcnew Object();
-				System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
-			}
+			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get();
+			void set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val);
 		}
 
 	public:
-		/* List access to scene game objects
+		/* Accessible list of scene game objects
 		*/
 		[IgnoreDataMemberAttribute]
 		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjects {
-			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get() {
-				return m_gameObjects;
-			}
+			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get();
 		}
 
 #pragma endregion
@@ -100,27 +88,16 @@ namespace ThomasEngine {
 			return m_gameObjectsLock;
 		}
 
-		static void SaveSceneAs(Scene^ scene, System::String^ fullPath);
-		static void SaveScene(Scene^ scene);
+		void SaveSceneAs(System::String^ fullPath);
+		void SaveScene();
 
-		static Scene^ LoadScene(System::String^ fullPath);
-
-		static bool IsLoading()
-		{
-			return s_loading;
-		}
-
-		static void RestartCurrentScene();
 
 
 		void UnLoad();
 		void EnsureLoad();
 		void PostLoad();
 
-		static property Scene^ CurrentScene {
-			Scene^ get();
-			void set(Scene^ value);
-		}
+	public:
 	};
 }
 

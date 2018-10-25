@@ -1,110 +1,140 @@
 #include "SoundComponent.h"
+
 #include "../../Sound.h"
 #include "../../resource/AudioClip.h"
+#include "../../ThomasTime.h"
 namespace thomas
 {
 	namespace object
 	{
 		namespace component
 		{
-			SoundComponent::SoundComponent()
+			SoundComponent::SoundComponent() :
+			m_looping(true),
+			m_clip(nullptr),
+			m_volume(0.5f)
 			{
-				m_name == "";
-				m_volume = 1;
-				m_looping = true;
 			}
 
-			SoundComponent::~SoundComponent()
+			void SoundComponent::OnDisable()
 			{
-
+				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
 			}
 
-			bool SoundComponent::SetClip(resource::AudioClip* clip)
+			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
 			{
-				m_instance = clip->CreateInstance();
-				if (m_instance)
+				// Apply 3D-effect with attenuation formula based on Inverse Square Law
+				if (m_clip != nullptr)
 				{
-					m_instance->SetVolume(m_volume);
-					//m_name = name;
-					return true;
+					float attenuation = Sound::VolumeTodB(m_volume) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
+					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
 				}
-				else
+			}
+
+			void SoundComponent::Play()
+			{
+				if (m_clip != nullptr)
 				{
-					////Sound::LoadWaveBank(name);
-					//Sound::LoadWave(name);
-
-					//m_instance = Sound::CreateInstance(name);
-					//m_instance->SetVolume(m_volume);
-					//m_name = name;
-					//return true;
-					//return false;
+					m_clip->GetSoundEffectInstance()->Play(m_looping);
 				}
-				return false;
 			}
 
-			resource::AudioClip* SoundComponent::GetClip()
+			void SoundComponent::PlayOneShot()
 			{
-				return m_clip;
-			}
-
-			bool SoundComponent::SetVolume(float volume)
-			{
-				if (volume > 5)
-					return false;
-				m_volume = volume;
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->SetVolume(volume*Sound::Instance()->GetMusicVolume());
-					
+					Sound::Play(m_clip->GetName(), m_volume);
 				}
-				return true;
 			}
 
-			float SoundComponent::GetVolume()
+			void SoundComponent::Stop()
 			{
-				return m_volume;
-			}
-
-			bool SoundComponent::Play()
-			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Play(m_looping);
-					return true;
+					m_clip->GetSoundEffectInstance()->Stop();
 				}
-				else
-					return false;
-				
-			}
-
-			bool SoundComponent::PlayOneShot(std::string name, float volume)
-			{
-				return true;
-				return Sound::Instance()->Play(name, volume);
 			}
 
 			void SoundComponent::Pause()
 			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Pause();
+					m_clip->GetSoundEffectInstance()->Pause();
 				}
 			}
 
 			void SoundComponent::Resume()
 			{
-				if (m_instance)
+				if (m_clip != nullptr)
 				{
-					m_instance->Resume();
+					m_clip->GetSoundEffectInstance()->Resume();
 				}
 			}
 
-			void SoundComponent::SetLooping(bool loop)
+			bool SoundComponent::IsPlaying() const
 			{
-				m_looping = loop;
+				if (m_clip != nullptr)
+				{
+					return Sound::IsPlaying(m_clip->GetName());	
+				}
+
+				return false;
 			}
 
-			bool SoundComponent::IsLooping()
+			bool SoundComponent::IsPaused() const
+			{
+				if (m_clip != nullptr)
+				{
+					return Sound::IsPaused(m_clip->GetName());
+				}
+
+				return false;
+			}
+
+			bool SoundComponent::HasStopped() const
+			{
+				if (m_clip != nullptr)
+				{
+					return Sound::HasStopped(m_clip->GetName());
+				}
+
+				return false;
+			}
+
+			void SoundComponent::SetClip(resource::AudioClip* clip)
+			{
+				m_clip = clip;
+			}
+
+			void SoundComponent::SetVolume(float volume)
+			{
+				if (volume <= 5.f && volume >= 0.f)
+				{
+					m_volume = volume;
+
+					if (m_clip != nullptr)
+					{
+						m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(m_volume));
+					}
+				}
+			}
+
+			void SoundComponent::SetLooping(bool looping)
+			{
+				m_looping = looping;
+			}
+
+			resource::AudioClip* SoundComponent::GetClip() const
+			{
+				return m_clip;
+			}
+
+			float SoundComponent::GetVolume() const
+			{
+				return m_volume;
+			}
+
+			bool SoundComponent::IsLooping() const
 			{
 				return m_looping;
 			}

@@ -1,16 +1,14 @@
 #pragma once
 
 #include "Component.h"
+#include "../../utils/Math.h"
+
 #include <memory>
-
-namespace DirectX {
-	class SoundEffectInstance;
-}
-
-
 
 namespace thomas
 {
+	using namespace math;
+
 	namespace resource
 	{
 		class AudioClip;
@@ -24,23 +22,33 @@ namespace thomas
 			{
 			public:
 				SoundComponent();
-				~SoundComponent();
-				bool SetClip(resource::AudioClip* clip);
-				resource::AudioClip* GetClip();
-				bool SetVolume(float volume);
-				float GetVolume();
-				bool Play();
-				bool PlayOneShot(std::string name, float volume);
+				~SoundComponent() = default;
+
+				virtual void OnDisable() override;
+				void Apply3D(const Vector3& listenerPos, const Vector3& sourcePos);
+				void Play();
+				void PlayOneShot();
+				void Stop();
 				void Pause();
 				void Resume();
-				void SetLooping(bool loop);
-				bool IsLooping();
+				bool IsPlaying() const;
+				bool IsPaused() const;
+				bool HasStopped() const;
+
+			public:
+				void SetClip(resource::AudioClip* clip);		
+				void SetVolume(float volume);
+				void SetLooping(bool looping);
+
+			public:
+				resource::AudioClip* GetClip() const;
+				float GetVolume() const;
+				bool IsLooping() const;
+
 			private:
-				std::string m_name;
+				resource::AudioClip* m_clip;
 				float m_volume;
 				bool m_looping;
-				resource::AudioClip* m_clip;
-				std::unique_ptr<DirectX::SoundEffectInstance> m_instance;
 			};
 		}
 	}

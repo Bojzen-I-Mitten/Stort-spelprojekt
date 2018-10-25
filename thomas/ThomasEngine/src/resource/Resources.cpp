@@ -342,9 +342,7 @@ namespace ThomasEngine
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
-				{
-					resources[resource]->~Resource();
-				}
+					delete resources[resource];
 			}
 #pragma endregion
 
@@ -419,7 +417,7 @@ namespace ThomasEngine
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
-					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
+					Object^ lock = ThomasWrapper::CurrentScene->GetGameObjectsLock();
 
 					System::Threading::Monitor::Enter(lock);
 					Resource^ resource = resources[thomasPathOld];

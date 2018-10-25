@@ -123,9 +123,10 @@ namespace ThomasEngine.Network
         public void Host()
         {
             ResponsiblePeer = LocalPeer;
-            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             NetScene.ActivateSceneObjects();
+            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             OnPeerJoin(LocalPeer);
+
         }
 
         public void Connect()
@@ -269,7 +270,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        protected override void OnDestroy()
+        public override void OnDestroy()
         {
             if (NetManager != null)
             {

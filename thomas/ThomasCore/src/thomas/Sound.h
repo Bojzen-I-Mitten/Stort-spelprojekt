@@ -1,5 +1,6 @@
 #pragma once
-#include "DirectXTK\SoundCommon.h"
+
+#include <include/DirectXTK/SoundCommon.h>
 #include <map>
 
 using namespace DirectX;
@@ -8,34 +9,46 @@ namespace thomas
 {
 	class Sound
 	{
-	public:
-		bool Init();
-		bool Play(const std::string & name, const float & volume);
-		std::unique_ptr<SoundEffectInstance> CreateInstance(const std::string & clipName, SOUND_EFFECT_INSTANCE_FLAGS flags);
-		bool LoadWaveBank(const std::string & name);
-		std::unique_ptr<SoundEffect> LoadWave(const std::string & path);
-		void Destroy();
-		void Update();
+	private:
+		struct SoundInfo
+		{
+			std::unique_ptr<SoundEffect> soundEffect;
+			std::unique_ptr<SoundEffectInstance> soundEffectInstance;
+		};
 
 	public:
-		void SetMasterVolume(const float & volume);
-		void SetFxVolume(const float & volume);
-		void SetMusicVolume(const float & volume);
+		static void Init();
+		static void Destroy();
+		static void Update();
+		static void Resume();
+		static void Suspend();
+		static bool IsPlaying(const std::string& name);
+		static bool IsPaused(const std::string& name);
+		static bool HasStopped(const std::string& name);
+
+		static void Play(const std::string& name, float volume);
+		static void LoadSound(const std::string& name, const std::string& file);
+
+		// Converters
+		static float dbToVolume(float dB);
+		static float VolumeTodB(float volume);
 
 	public:
-		static Sound* Instance();
-		float GetMusicVolume();
+		static void SetMasterVolume(float volume);
+		static void SetFxVolume(float volume);
+		static void SetMusicVolume(float volume);
+
+	public:
+		static float GetMasterVolume();
+		static float GetMusicVolume();
+		static float GetFxVolume();
+		static SoundInfo& GetSoundInfo(const std::string& name);
 
 	private:
-		float s_masterVolume;
-		float s_fxVolume;
-		float s_musicVolume;
-
-	private:
-		std::unique_ptr<WaveBank> s_bank;
-		std::unique_ptr<AudioEngine> s_audioEngine;
-		std::map<std::string, std::unique_ptr<SoundEffect>> s_waves;
-
-		static Sound s_sound;
+		static std::unique_ptr<AudioEngine> s_audioEngine;
+		static std::map<std::string, SoundInfo> s_waves;
+		static float s_masterVolume;
+		static float s_fxVolume;
+		static float s_musicVolume;
 	};
 }
