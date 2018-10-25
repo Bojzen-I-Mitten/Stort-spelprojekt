@@ -27,7 +27,7 @@ RasterizerState Rasterizer
     DepthClipEnable = FALSE;
 };
 
-BlendState SrcAlphaBlend
+BlendState AlphaBlendstate
 {
     BlendEnable[0] = TRUE;
     SrcBlend = SRC_ALPHA;
@@ -39,7 +39,7 @@ BlendState SrcAlphaBlend
     RenderTargetWriteMask[0] = 0x0F;
 };
 
-BlendState AdditiveBlending
+BlendState AdditiveBlendstate
 {
     BlendEnable[0] = TRUE;
     SrcBlend = ONE;
@@ -64,7 +64,7 @@ struct v2f
 v2f vert(uint id : SV_VertexID)
 {
     v2f output = (v2f) 0;
-
+    
     uint particleIndex = (uint) (id / 6);
     uint triangleIndex = (uint) ((id % 6) / 3);
     uint vertexIndex = id % 3;
@@ -89,22 +89,22 @@ float4 frag(v2f input) : SV_Target
 
 technique11 Particles
 {
-    pass P0
+    pass AlphaBlendPass
     {
         VERT(vert());
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 1);
         SetRasterizerState(Rasterizer);
-        SetBlendState(SrcAlphaBlend, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetBlendState(AlphaBlendstate, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
-  //  pass AdditiveBlendPass
-  //  {
-  //      VERT(vert());
-  //      SetGeometryShader(NULL);
-		//FRAG(frag());
-  //      SetDepthStencilState(EnableDepth, 1);
-  //      SetRasterizerState(Rasterizer);
-  //      SetBlendState(AdditiveBlending, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
-  //  }
+    pass AdditiveBlendPass
+    {
+        VERT(vert());
+        SetGeometryShader(NULL);
+		FRAG(frag());
+        SetDepthStencilState(EnableDepth, 1);
+        SetRasterizerState(Rasterizer);
+        SetBlendState(AdditiveBlendstate, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
 }

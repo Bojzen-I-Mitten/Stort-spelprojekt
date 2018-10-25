@@ -52,7 +52,7 @@ namespace thomas
 		editor::Gizmos::Gizmo().Init();
 
 		graphics::LightManager::Initialize();
-		graphics::ParticleSystem::InitializeGlobalSystem();
+		graphics::ParticleSystem::InitializeGlobalSystems();
 
 		s_initialized = true;
 		return s_initialized;
@@ -107,7 +107,7 @@ namespace thomas
 		//Destroy all objects
 		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
-		graphics::ParticleSystem::DestroyGlobalSystem();
+		graphics::ParticleSystem::DestroyGlobalSystems();
 		resource::Shader::DestroyAllShaders();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();

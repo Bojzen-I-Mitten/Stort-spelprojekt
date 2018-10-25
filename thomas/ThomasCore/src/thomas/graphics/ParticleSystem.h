@@ -50,7 +50,11 @@ namespace thomas
 				unsigned textureIndex;
 
 			};
-
+			enum BLEND_STATE
+			{
+				ALPHA = 0,
+				ADDITIVE = 1
+			};
 
 
 		private:
@@ -81,13 +85,14 @@ namespace thomas
 			};
 
 		public:
-			static void InitializeGlobalSystem();
-			static std::shared_ptr<ParticleSystem> GetGlobalSystem();
-			static void DestroyGlobalSystem();
+			static void InitializeGlobalSystems();
+			static std::shared_ptr<ParticleSystem> GetGlobalAlphaBlendingSystem();
+			static std::shared_ptr<ParticleSystem> GetGlobalAdditiveBlendingSystem();
+			static void DestroyGlobalSystems();
 			ParticleSystem();
 			~ParticleSystem();
 
-			void Initialize(unsigned maxNrOfParticles);
+			void Initialize(unsigned maxNrOfParticles, BLEND_STATE blendState);
 			void Destroy();
 			
 			void AddEmitterToSpawn(InitParticleBufferStruct& emitterInitData);
@@ -104,12 +109,12 @@ namespace thomas
 		
 
 		private:
-			static std::shared_ptr<ParticleSystem> s_globalSystem;
+			static std::shared_ptr<ParticleSystem> s_globalAlphaBlendingSystem;
+			static std::shared_ptr<ParticleSystem> s_globalAdditiveBlendingSystem;
 
 			unsigned m_maxNrOfParticles;
 
 			std::unique_ptr<utils::buffers::ByteAddressBuffer> m_bufferCounters;//struct{uint deadcount, uint alivecount , uint maxcount, -}
-			
 
 			resource::ComputeShader* m_emitParticlesCS;
 			resource::ComputeShader* m_updateParticlesCS;
@@ -124,6 +129,8 @@ namespace thomas
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferAliveListPong;
 			std::unique_ptr<utils::buffers::StructuredBuffer> m_bufferBillboard;
 			bool m_pingpong;
+
+			BLEND_STATE m_blendState;
 
 			std::vector<InitParticleBufferStruct> m_emitters;
 			
