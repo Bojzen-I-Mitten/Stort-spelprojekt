@@ -207,6 +207,7 @@ namespace thomas
 			{
 				m_viewport = viewport;
 				UpdateProjMatrix();
+				m_GUIHandle->SetViewportScale(m_viewport);
 			}
 
 			void Camera::SetViewport(float x, float y, float width, float height)
@@ -312,6 +313,9 @@ namespace thomas
 				m_frameData.projectionMatrix = GetProjMatrix();
 
 				m_frameData.position = (math::Vector4)GetPosition();
+
+				if (m_frameData.targetDisplay == 0)
+					m_GUIHandle->SetViewportScale(m_frameData.viewport);
 
 			}
 
