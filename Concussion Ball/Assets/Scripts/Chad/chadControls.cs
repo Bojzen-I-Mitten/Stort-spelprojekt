@@ -233,10 +233,10 @@ public class ChadControls : NetworkComponent
                     ResetCamera();
                 }
             }
-            else if (PickedUpObject) // player is holding object that is not throwable
+            else if (PickedUpObject && !PickedUpObject.m_throwable) // player is holding object that is not throwable
             {
                 if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-                    PickedUpObject.OnActivate();
+                    PickedUpObject.Activate();
             }
 
             float xStep = Input.GetMouseX() * Time.ActualDeltaTime;

@@ -35,10 +35,6 @@ public class Powerup : PickupableObject
         /*do particle bois and stuff*/
     }
 
-    virtual public void OnActivate()
-    {
-    }
-
     override public void StopEmitting()
     {
         StartCoroutine(StopEmission());
@@ -77,8 +73,7 @@ public class Powerup : PickupableObject
     {
         if (!m_pickupable)
         {
-            OnActivate();
-            SendRPC("OnActivate");  
+            Activate();
         }
     }
 

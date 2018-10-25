@@ -150,8 +150,8 @@ namespace ThomasEngine.Network
             {
                 NetScene.RemoveObject(identity);
                 GameObject.Destroy(identity.gameObject);
-            }else
-                Debug.LogError("Failed to find gameObject. It does not exist in scene");
+            }//else
+                //Debug.LogError("Failed to find gameObject. It does not exist in scene");
         }
 
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)

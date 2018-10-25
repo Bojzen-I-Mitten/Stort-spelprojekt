@@ -38,6 +38,10 @@ public class Vindaloo : Powerup
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
+        //Make sure powerups can only be activated once!
+        if (activated)
+            return;
+        activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
@@ -62,8 +66,10 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
-        gameObject.GetComponent<RenderComponent>().enabled = false;
+        //hide the vindaloo.
         gameObject.GetComponent<Rigidbody>().enabled = false;
+        gameObject.transform.scale = Vector3.Zero;
+        
         _Fire.Emit = true;
         StartCoroutine(StopFire());
     }

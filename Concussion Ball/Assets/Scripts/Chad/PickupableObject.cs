@@ -87,6 +87,17 @@ public class PickupableObject : NetworkComponent
         }
     }
 
+    //Never call this method without also calling RPC.
+    virtual public void OnActivate()
+    {
+    }
+
+    public void Activate()
+    {
+        OnActivate();
+        SendRPC("OnActivate");
+    }
+
     virtual public void Pickup(ChadControls chad, Transform hand)
     {
         if(m_pickupable)
