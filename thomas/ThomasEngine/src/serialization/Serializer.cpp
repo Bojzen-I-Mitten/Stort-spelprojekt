@@ -17,7 +17,7 @@ namespace ThomasEngine
 			JsonSerializer^ serializer = gcnew JsonSerializer();
 
 			serializer->Formatting = Formatting::Indented;
-			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;								// Serialize recursive $ref $id dependencies									
+			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;									// Serialize recursive $ref $id dependencies	
 			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;						// Give $ref $id to objects (not lists)
 			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
