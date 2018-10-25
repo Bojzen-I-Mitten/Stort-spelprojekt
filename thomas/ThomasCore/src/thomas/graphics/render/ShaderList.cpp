@@ -102,7 +102,7 @@ namespace thomas {
 				std::unique_ptr<resource::Shader> shader = resource::Shader::CreateShader(path);
 				if (!shader || !shader->hasPasses())
 				{
-					LOG("Shader: " << path << " contains no techniques or passes");
+					LOG("Global Shader Load at path: " << path << " failed.");
 					return nullptr;
 				}
 				else
@@ -126,7 +126,7 @@ namespace thomas {
 				std::unique_ptr<resource::ComputeShader> shader = resource::ComputeShader::CreateComputeShader(path);
 				if (!shader || !shader->hasPasses())
 				{
-					LOG("Shader: " << path << " contains no techniques or passes");
+					LOG("Global ComputeShader Load at path: " << path << " failed.");
 					return nullptr;
 				}
 				else

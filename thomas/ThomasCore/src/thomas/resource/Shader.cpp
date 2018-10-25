@@ -221,7 +221,7 @@ namespace thomas
 				return std::unique_ptr<resource::Shader>();
 
 			std::unique_ptr<resource::Shader> shader(new Shader(effect, path));
-			if (shader->hasPasses())
+			if (!shader->hasPasses())
 				LOG("Shader: " << path << " contains no techniques or passes");
 			return std::move(shader);
 		}
