@@ -16,8 +16,7 @@ namespace ThomasEngine
 	public:
 		SoundComponent();
 
-		void Apply3D(Vector3 listener, Vector3 emitter);
-		void Update3D(Vector3 listener, Vector3 emitter);
+		void Apply3D(Vector3 listenerPos, Vector3 sourcePos);
 		void Play();
 		void PlayOneShot();
 		void Stop();

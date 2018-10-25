@@ -12,9 +12,7 @@ namespace thomas
 			SoundComponent::SoundComponent() :
 			m_looping(true),
 			m_clip(nullptr),
-			m_volume(1.f),
-			m_audioEmitter(),
-			m_listener()
+			m_volume(0.5f)
 			{
 			}
 
@@ -23,22 +21,14 @@ namespace thomas
 				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
 			}
 
-			void SoundComponent::Apply3D(const Vector3& listener, const Vector3& emitter)
+			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
 			{
-				// Update sound
+				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
-					m_listener.SetPosition(listener);
-					m_audioEmitter.SetPosition(emitter);
-
-					m_clip->GetSoundEffectInstance()->Apply3D(m_listener, m_audioEmitter, false);
+					float attenuation = Sound::VolumeTodB(m_volume) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
+					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
 				}
-			}
-
-			void SoundComponent::Update3D(const Vector3& listener, const Vector3& emitter)
-			{
-				m_listener.Update(listener, math::Vector3::Up, ThomasTime::GetDeltaTime());
-				m_audioEmitter.Update(emitter, math::Vector3::Up, ThomasTime::GetDeltaTime());
 			}
 
 			void SoundComponent::Play()
@@ -124,7 +114,7 @@ namespace thomas
 
 					if (m_clip != nullptr)
 					{
-						m_clip->GetSoundEffectInstance()->SetVolume(m_volume * Sound::GetMusicVolume());
+						m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(m_volume));
 					}
 				}
 			}

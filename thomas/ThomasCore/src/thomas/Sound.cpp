@@ -107,7 +107,7 @@ namespace thomas
 	{
 		SoundInfo info;
 		info.soundEffect = std::make_unique<SoundEffect>(s_audioEngine.get(), CA2W(file.c_str()));
-		info.soundEffectInstance = info.soundEffect->CreateInstance(SoundEffectInstance_Use3D);
+		info.soundEffectInstance = info.soundEffect->CreateInstance();
 
 		s_waves.insert(std::make_pair(name, std::move(info)));
 	}
@@ -117,8 +117,18 @@ namespace thomas
 		// Play a oneshot
 		if (!s_waves.empty())
 		{
-			GetSoundInfo(name).soundEffect->Play(s_masterVolume * s_fxVolume * volume, 0.f, 0.f);
+			GetSoundInfo(name).soundEffect->Play(volume, 0.f, 0.f);
 		}
+	}
+
+	float Sound::dbToVolume(float dB)
+	{
+		return powf(10.f, 0.05f * dB);
+	}
+
+	float Sound::VolumeTodB(float volume)
+	{
+		return 20.f * log10f(volume);
 	}
 
 	void Sound::SetMasterVolume(float volume)

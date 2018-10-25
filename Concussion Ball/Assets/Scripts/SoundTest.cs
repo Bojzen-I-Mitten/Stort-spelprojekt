@@ -15,11 +15,10 @@ public class SoundTest : ScriptComponent
     {
         Gun = gameObject.GetComponent<SoundComponent>();
         Gun.Play();
-        //Gun.Apply3D(Listener.position, gameObject.transform.position);
     }
 
     public override void Update()
     {
-        //Gun.Update3D(Listener.position, gameObject.transform.position);
+        Gun.Apply3D(Listener.position, gameObject.transform.position);
     }
 }

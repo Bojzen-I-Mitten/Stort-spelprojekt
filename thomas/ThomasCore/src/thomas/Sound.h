@@ -29,6 +29,10 @@ namespace thomas
 		static void Play(const std::string& name, float volume);
 		static void LoadSound(const std::string& name, const std::string& file);
 
+		// Converters
+		static float dbToVolume(float dB);
+		static float VolumeTodB(float volume);
+
 	public:
 		static void SetMasterVolume(float volume);
 		static void SetFxVolume(float volume);

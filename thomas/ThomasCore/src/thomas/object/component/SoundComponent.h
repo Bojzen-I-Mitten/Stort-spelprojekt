@@ -4,9 +4,6 @@
 #include "../../utils/Math.h"
 
 #include <memory>
-#include "../../../../include/DirectXTK/Audio.h"
-
-using namespace DirectX;
 
 namespace thomas
 {
@@ -28,8 +25,7 @@ namespace thomas
 				~SoundComponent() = default;
 
 				virtual void OnDisable() override;
-				void Apply3D(const Vector3& listener, const Vector3& emitter);
-				void Update3D(const Vector3& listener, const Vector3& emitter);
+				void Apply3D(const Vector3& listenerPos, const Vector3& sourcePos);
 				void Play();
 				void PlayOneShot();
 				void Stop();
@@ -51,8 +47,6 @@ namespace thomas
 
 			private:
 				resource::AudioClip* m_clip;
-				AudioEmitter m_audioEmitter;
-				AudioListener m_listener;
 				float m_volume;
 				bool m_looping;
 			};
