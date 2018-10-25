@@ -23,8 +23,9 @@ public class MatchSystem : NetworkManager
 
     public ChadControls LocalChad;
 
-    public int MatchLength = 10 * 60; // Match time in seconds
+    public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
+    public float lostTime = 0.0f;
     public float ElapsedMatchTime
     {
         get
@@ -32,7 +33,7 @@ public class MatchSystem : NetworkManager
             if (!MatchStarted)
                 return 0.0f;
 
-            return TimeSinceServerStarted - MatchStartTime;
+            return TimeSinceServerStarted - MatchStartTime - lostTime;
         }
     }
 
@@ -51,7 +52,9 @@ public class MatchSystem : NetworkManager
 
     public bool hasScored { get; private set; } = false;
 
-    private float MatchStartTime;
+    public bool GoldenGoal = false;
+
+    public float MatchStartTime;
     private bool MatchStarted = false;
     public MatchSystem() : base()
     {
@@ -96,12 +99,17 @@ public class MatchSystem : NetworkManager
             }
         }
 
-        if(MatchTimeLeft <= 0 && MatchStarted)
+        if(MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
         {
             OnMatchEnd();
         }
-    }
 
+        //if (MatchStarted) //Sync time. (not done atm)
+        //{
+        //    if(MatchTimeLeft % 5 == 0)
+        //        SendRPC(-2, "RPCMatchInfo", MatchStartTime, GoldenGoal);
+        //}
+    }
 
     #region Utility
     void SpawnBall()
@@ -126,50 +134,16 @@ public class MatchSystem : NetworkManager
     }
     #endregion
 
-
     #region Coroutines
-    #endregion
-
-    #region RPC
-
-    public void RPCMatchInfo(float startTime)
+    IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
-        Debug.Log("matchInfo!");
-        if (!MatchStarted)
-        {
-            MatchStarted = true;
-            MatchStartTime = startTime;
-            Debug.Log(startTime);
-        }
+        MatchStarted = false;
+        ChadHud.Instance.OnMatchEnd(winningTeam, duration);
+        yield return new WaitForSecondsRealtime(duration);
+        GoldenGoal = false;
+        RPCStartMatch();
     }
 
-    public void RPCStartMatch()
-    {
-        MatchStarted = true;
-        MatchStartTime = TimeSinceServerStarted;
-    }
-    public void RPCEndMatch()
-    {
-        if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
-        {
-            //Golden goal
-        }else
-        {
-            Team winningTeam = Teams[TEAM_TYPE.TEAM_1].Score > Teams[TEAM_TYPE.TEAM_2].Score ? Teams[TEAM_TYPE.TEAM_1] : Teams[TEAM_TYPE.TEAM_2];
-            ChadHud.Instance.OnMatchEnd(winningTeam, 10.0f);
-            MatchStarted = false;
-        }
-    }
-
-    public void RPCOnGoal(int teamType)
-    {
-        TEAM_TYPE type = (TEAM_TYPE)teamType;
-        Team team = FindTeam(type);
-        team?.AddScore();
-        StartCoroutine(OnGoalCoroutine(team));
-    }
-
-    #endregion
     IEnumerator RoundStartCountdown(float duration)
     {
         ResetPlayers();
@@ -193,6 +167,59 @@ public class MatchSystem : NetworkManager
         OnRoundEnd();
         OnRoundStart();
     }
+    #endregion
+
+    #region RPC
+
+    public void RPCMatchInfo(float startTime, bool goldenGoal)
+    {
+        Debug.Log("matchInfo!");
+        if (!MatchStarted)
+        {
+            MatchStarted = true;
+            GoldenGoal = goldenGoal;
+            MatchStartTime = startTime;
+            Debug.Log(startTime);
+        }
+    }
+
+    public void RPCStartMatch()
+    {
+        MatchStarted = true;
+        MatchStartTime = TimeSinceServerStarted;
+        foreach (var team in Teams)
+        {
+            team.Value.ResetScore();
+        }
+        OnRoundStart();
+    }
+    public void RPCEndMatch()
+    {
+        if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
+        {
+            GoldenGoal = true;
+            OnRoundEnd();
+            OnRoundStart();
+        }
+        else
+        {
+            Team winningTeam = Teams[TEAM_TYPE.TEAM_1].Score > Teams[TEAM_TYPE.TEAM_2].Score ? Teams[TEAM_TYPE.TEAM_1] : Teams[TEAM_TYPE.TEAM_2];
+            StartCoroutine(MatchEndCoroutine(winningTeam, 10.0f));
+        }
+    }
+
+    public void RPCOnGoal(int teamType)
+    {
+        TEAM_TYPE type = (TEAM_TYPE)teamType;
+        Team team = FindTeam(type);
+        team?.AddScore();
+        if (GoldenGoal)
+            OnMatchEnd();
+        else
+            StartCoroutine(OnGoalCoroutine(team));
+    }
+
+    #endregion
 
     #region Match functions
 
@@ -215,8 +242,6 @@ public class MatchSystem : NetworkManager
         RPCStartMatch();
         SendRPC(-2, "RPCStartMatch");
 
-        //OnRoundStart();
-        //SendRPC(-2, "OnRoundStart");
     }
 
 
@@ -265,7 +290,7 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log(MatchStarted);
             if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime);
+                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal);
         }
     }
 

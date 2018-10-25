@@ -21,7 +21,7 @@ public class ChadHud : ScriptComponent
             return;
         }
         cam = gameObject.GetComponent<Camera>();
-        cam.AddText("MatchTime", "00:00", new Vector2(800/2.0f, 0), new Vector2(1, 1), Numbers, Color.DarkGray.ToVector4());
+        cam.AddText("MatchTime", "00:00", new Vector2(800/2.0f, 25), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
         cam.AddText("AnnouncementText", "", new Vector2(800 / 2.0f, 600 / 2.0f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
         cam.SetTextFont("AnnouncementText", AnnouncementFont);
         cam.AddText("AnnouncementText2", "", new Vector2(800 / 2.0f, 600 / 2.0f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
@@ -91,7 +91,8 @@ public class ChadHud : ScriptComponent
                 cam.SetImageScale("AnnouncementBg", new Vector2(1920, 1.0f + (float)Math.Sin((float)time * 0.5f) * 0.5f));
                 cam.SetImageColor("AnnouncementBg", c2.ToVector4());
             }
-
+            if(MatchSystem.instance.MatchTimeLeft > 0.0f)
+                MatchSystem.instance.MatchStartTime += Time.ActualDeltaTime;
             yield return null;
         }
         cam.SetText("AnnouncementText", "");
@@ -99,10 +100,6 @@ public class ChadHud : ScriptComponent
         cam.SetImageScale("AnnouncementBg", Vector2.Zero);
     }
 
-    public void EnableGoldenGoal()
-    {
-
-    }
 
     IEnumerator Countdown(float duration)
     {
@@ -121,6 +118,7 @@ public class ChadHud : ScriptComponent
 
     public void StartCountdown(float duration)
     {
+        cam.SetTextColor("MatchTime", Color.WhiteSmoke.ToVector4());
         StartCoroutine(Countdown(duration));
     }
 
@@ -139,6 +137,16 @@ public class ChadHud : ScriptComponent
         int matchTimeLeft = MatchSystem.instance.MatchTimeLeft;
         int minutes = matchTimeLeft / 60;
         int seconds = matchTimeLeft % 60;
-        cam.SetText("MatchTime", String.Format("{0}:{1}", minutes.ToString("00"), seconds.ToString("00")));
+
+        if (MatchSystem.instance.GoldenGoal)
+        {
+            cam.SetText("MatchTime", "GOLDEN GOAL}");
+            cam.SetTextColor("MatchTime", Color.Gold.ToVector4());
+        }else
+        {
+            cam.SetText("MatchTime", String.Format("{0}:{1}", minutes.ToString("00"), seconds.ToString("00")));
+        }
+            
+        
     }
 }
