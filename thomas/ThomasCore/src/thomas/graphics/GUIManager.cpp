@@ -13,6 +13,8 @@ namespace thomas
 			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
 			m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
 			m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
+			m_viewport = Vector2(1920.f, 1080.f);
+			m_viewportScale = Vector2(1.f, 1.f);
 		}
 
 		void GUIManager::Destroy()
@@ -33,19 +35,25 @@ namespace thomas
 
 				for (const auto& image : m_images)
 				{
-					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position, nullptr, image.second.color,
-										image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
+					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position * m_viewport, nullptr, image.second.color,
+										image.second.rotation, Vector2(0.f, 0.f), image.second.scale * m_viewportScale);
 				}
 
 				for (const auto& text : m_texts)
 				{
-					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position, text.second.scale, 
+					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position * m_viewport, text.second.scale * m_viewportScale, 
 												  text.second.color, text.second.rotation);
 				}
 
 				// End
 				m_spriteBatch->End();
 			}
+		}
+
+		void GUIManager::SetViewportScale(math::Viewport viewport)
+		{
+			m_viewport = Vector2(viewport.width, viewport.height);
+			m_viewportScale = m_viewport / Vector2(1920.f, 1080.f);	//1080p because it is our standard resolution. And textures are designed for that resolution.
 		}
 
 		// Images
@@ -145,10 +153,10 @@ namespace thomas
 					// Construct boundaries
 					// Note: If origin has to be changed from (0, 0) this also has to be taken into account when constructing the boundaries!
 					Vector2 mousePos = window->GetInput()->GetMousePosition();
-					Rect rect = { image.position.x,
-								  image.position.x + image.texture->GetWidth() * image.scale.x,
-								  image.position.y,
-								  image.position.y + image.texture->GetHeight() * image.scale.y };
+					Rect rect = { image.position.x * m_viewport.x,
+								  image.position.x * m_viewport.x + image.texture->GetWidth() * image.scale.x * m_viewportScale.x,
+								  image.position.y * m_viewport.y,
+								  image.position.y * m_viewport.y + image.texture->GetHeight() * image.scale.y * m_viewportScale.y};
 
 					if ((mousePos.x >= rect.left && mousePos.x <= rect.right) && (mousePos.y <= rect.down && mousePos.y >= rect.top))
 					{

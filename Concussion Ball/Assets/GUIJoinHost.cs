@@ -21,6 +21,12 @@ public class GUIJoinHost : ScriptComponent
     private bool TakePort;
     private bool Disabled;
 
+    private readonly string TextBoxIP = "TextBoxIP";
+    private readonly string TextBoxPort = "TextBoxPort";
+    private readonly string BG = "BG";
+    private readonly string Join = "Join";
+    private readonly string Host = "Host";
+
     public override void Start()
     {
         IPText = "";
@@ -40,31 +46,31 @@ public class GUIJoinHost : ScriptComponent
             InputGUI.AppendIPString(ref PortText, 5);
 
 
-        if (Camera.OnImageClicked("TextBoxIP"))
+        if (Camera.OnImageClicked(TextBoxIP))
         {
             TakePort = false;
             TakeIP = true;
-            Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-            Camera.SetImageColor("TextBoxIP", new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+            Camera.SetImageColor(TextBoxPort, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor(TextBoxIP, new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
         }
-        else if (Camera.OnImageClicked("TextBoxPort"))
+        else if (Camera.OnImageClicked(TextBoxPort))
         {
             TakeIP = false;
             TakePort = true;
-            Camera.SetImageColor("TextBoxIP", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-            Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+            Camera.SetImageColor(TextBoxIP, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor(TextBoxPort, new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
         }
-        else if (Camera.OnImageClicked("BG"))
+        else if (Camera.OnImageClicked(BG))
         {
             TakePort = false;
             TakeIP = false;
-            Camera.SetImageColor("TextBoxIP", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-            Camera.SetImageColor("TextBoxPort", new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor(TextBoxIP, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Camera.SetImageColor(TextBoxPort, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
         }
 
 
 
-        if (Camera.OnImageClicked("Join"))
+        if (Camera.OnImageClicked(Join))
         {
             if (IPText != "" && PortText != "")
             {
@@ -81,13 +87,13 @@ public class GUIJoinHost : ScriptComponent
             else
             {
                 if (IPText == "")
-                    Camera.SetImageColor("TextBoxIP", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                    Camera.SetImageColor(TextBoxIP, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
                 if (PortText == "")
-                    Camera.SetImageColor("TextBoxPort", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                    Camera.SetImageColor(TextBoxPort, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
             }
 
         }
-        else if (Camera.OnImageClicked("Host"))
+        else if (Camera.OnImageClicked(Host))
         {
             if (PortText != "")
             {
@@ -101,7 +107,7 @@ public class GUIJoinHost : ScriptComponent
             }
             else
             {
-                Camera.SetImageColor("TextBoxPort", new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                Camera.SetImageColor(TextBoxPort, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
             }
         }
 
@@ -125,26 +131,24 @@ public class GUIJoinHost : ScriptComponent
     public void AddImagesAndText()
     {
         Disabled = false;
-        Vector2 viewPort = Camera.GetViewPort();
-        Vector2 scale = viewPort / new Vector2(1920, 1080);
 
-        Camera.AddText("IPText", IPText, new Vector2(150, 150) * scale, new Vector2(1.0f) * scale);
-        Camera.AddText("PortText", PortText, new Vector2(150, 250) * scale, new Vector2(1.0f) * scale);
-        Camera.AddText("IP", "IP, needed to join", new Vector2(160, 110) * scale, new Vector2(0.7f) * scale);
-        Camera.AddText("Port", "PORT, needed for both host and join", new Vector2(160, 210) * scale, new Vector2(0.7f) * scale);
+        Camera.AddText("IPText", IPText, new Vector2(0.1f, 0.11f), new Vector2(1.0f));
+        Camera.AddText("PortText", PortText, new Vector2(0.1f, 0.21f), new Vector2(1.0f));
+        Camera.AddText("IP", "IP, needed to join", new Vector2(0.1f, 0.07f), new Vector2(0.7f));
+        Camera.AddText("Port", "PORT, needed for both host and join", new Vector2(0.1f, 0.17f), new Vector2(0.7f));
 
-        Camera.AddImage("Join", JoinBtn, new Vector2(600, 152) * scale, new Vector2(0.25f) * scale, true);
-        Camera.AddImage("TextBoxIP", TextBox, new Vector2(150, 145) * scale, new Vector2(0.70f, 0.5f) * scale, 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
-        Camera.AddImage("TextBoxPort", TextBox, new Vector2(150, 245) * scale, new Vector2(0.70f, 0.5f) * scale, 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
-        Camera.AddImage("Host", HostBtn, new Vector2(600, 252) * scale, new Vector2(0.25f) * scale, true);
+        Camera.AddImage(Join, JoinBtn, new Vector2(0.325f, 0.11f), new Vector2(0.25f), true);
+        Camera.AddImage(Host, HostBtn, new Vector2(0.325f, 0.21f), new Vector2(0.25f), true);
+        Camera.AddImage(TextBoxIP, TextBox, new Vector2(0.1f, 0.10f), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
+        Camera.AddImage(TextBoxPort, TextBox, new Vector2(0.1f, 0.20f), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
     }
 
     public void ClearImagesAndText()
     {
-        Camera.DeleteImage("Join");
-        Camera.DeleteImage("Host");
-        Camera.DeleteImage("TextBoxIP");
-        Camera.DeleteImage("TextBoxPort");
+        Camera.DeleteImage(Join);
+        Camera.DeleteImage(Host);
+        Camera.DeleteImage(TextBoxIP);
+        Camera.DeleteImage(TextBoxPort);
 
         Camera.DeleteText("IPText");
         Camera.DeleteText("PortText");

@@ -5,6 +5,7 @@
 #pragma managed
 #include "Camera.h"
 #include "../../Utility.h"
+#include "../../Debug.h"
 
 namespace ThomasEngine
 {
@@ -31,12 +32,6 @@ namespace ThomasEngine
 
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
-
-	Vector2 Camera::GetViewPort()
-	{
-		DirectX::SimpleMath::Viewport viewPort = camera->GetViewport();
-		return Vector2(viewPort.width, viewPort.height);
-	}
 
 	//-------------------------------------------------------------------------------------------
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact)
@@ -123,7 +118,7 @@ namespace ThomasEngine
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Font^ font)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), 
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position),
 										Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(Vector4(0.f, 0.f, 0.f, 1.f)), 
 										(thomas::resource::Font*)font->m_nativePtr);
 	}
@@ -150,14 +145,14 @@ namespace ThomasEngine
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector4 color)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
-										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, 
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f,
 										Utility::Convert(color));
 	}
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Font^ font, Vector4 color)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), 
-										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color), 
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color),
 										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
@@ -170,7 +165,7 @@ namespace ThomasEngine
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale, Font^ font, Vector4 color)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
-										Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color), 
+										Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color),
 										(thomas::resource::Font*)font->m_nativePtr);
 	}
 

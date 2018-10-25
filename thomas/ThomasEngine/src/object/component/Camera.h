@@ -68,7 +68,6 @@ namespace ThomasEngine
 		}
 
 	public:
-		Vector2 GetViewPort();
 
 		//GUI Images
 		void AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact);

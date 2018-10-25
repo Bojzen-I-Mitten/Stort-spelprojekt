@@ -8,6 +8,8 @@ public class GUITest : ScriptComponent
     ScriptComponent JoinHost;
     GUISelectTeam SelectTeam;
 
+    private readonly string BG = "BG";
+
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();
@@ -15,10 +17,7 @@ public class GUITest : ScriptComponent
         SelectTeam = gameObject.GetComponent<GUISelectTeam>();
         SelectTeam.enabled = false;
 
-        Vector2 viewPort = Camera.GetViewPort();
-        Vector2 scale = viewPort / new Vector2(1920, 1080);
-
-        Camera.AddImage("BG", Background, new Vector2(0, 0), scale, true);
+        Camera.AddImage(BG, Background, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), true);
     }
 
     public override void Update()
