@@ -20,7 +20,9 @@ namespace thomas
 				Cylinder,
 				Cube,
 				Plane,
-				Quad
+				Quad,
+				Monkey,
+				Torus
 			};
 
 			static void Destroy();

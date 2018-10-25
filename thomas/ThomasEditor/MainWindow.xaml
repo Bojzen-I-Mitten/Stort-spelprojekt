@@ -76,11 +76,13 @@
                     <MenuItem Header="_3D Object">
                         <MenuItem Header="_Cube" Click="AddNewCubePrimitive"/>
                         <MenuItem Header="_Sphere" Click="AddNewSpherePrimitive"/>
-                        <MenuItem Header="_Capsule" Click="AddNewCapsulePrimitive"/>
-                        <MenuItem Header="_Cylinder" Click="AddNewCylinderPrimitive"/>
                         <MenuItem Header="_Plane" Click="AddNewPlanePrimitive"/>
+                        <MenuItem Header="_Cylinder" Click="AddNewCylinderPrimitive"/>
+                        <MenuItem Header="_Capsule" Click="AddNewCapsulePrimitive"/>
+                        <MenuItem Header="_Torus" Click="AddNewTorusPrimitive"/>
                         <MenuItem Header="_Quad" Click="AddNewQuadPrimitive"/>
-                        </MenuItem>
+                        <MenuItem Header="_Monkey" Click="AddNewMonkeyPrimitive"/>
+                    </MenuItem>
                     <MenuItem Header="_Assisting Objects">
                         <MenuItem Header="_Camera" Click="AddNewCameraPrimitive"/>
                         <MenuItem Header="_POINT Light" Click="AddNewPointLightPrimitive"/>
@@ -135,7 +137,6 @@
             </xcad:DockingManager.Theme>-->
             <xcad:LayoutRoot x:Name="__layoutRoot">
                 <xcad:LayoutPanel>
-
                     <xcad:LayoutDocumentPaneGroup>
                         <xcad:LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="3*">
                             <xcad:LayoutDocumentPane>
@@ -150,7 +151,6 @@
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>
-
                         <xcad:LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="1*">
                             <xcad:LayoutDocumentPane>
                                     <xcad:LayoutAnchorable ContentId="Hiearchy" Title="Hierarchy" CanHide="False" CanClose="False">
