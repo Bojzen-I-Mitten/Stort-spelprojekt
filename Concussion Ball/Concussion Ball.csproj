@@ -59,6 +59,7 @@
     <Compile Include="Assets\GUIJoinHost.cs" />
     <Compile Include="Assets\GUISelectTeam.cs" />
     <Compile Include="Assets\DissolveTest.cs" />
+    <Compile Include="Assets\CameraMove.cs" />
     <Compile Include="Assets\RpcTest.cs" />
     <Compile Include="Assets\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
