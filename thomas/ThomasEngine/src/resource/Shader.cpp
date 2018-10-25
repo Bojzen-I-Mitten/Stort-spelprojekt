@@ -13,6 +13,16 @@ namespace ThomasEngine
 		Resource(path, thomas::graphics::Renderer::Instance()->getShaderList().CreateShader(Utility::ConvertString(path)))
 	{}
 
+	Shader::~Shader() 
+	{
+		thomas::resource::Shader* s = dynamic_cast<thomas::resource::Shader*>(m_nativePtr);
+		if (s)
+		{
+			thomas::graphics::Renderer::Instance()->getShaderList().rmv(s);
+			m_nativePtr = nullptr;
+		}
+	}
+
 
 	Shader^ Shader::Find(String^ name) {
 		thomas::resource::Shader* nativePtr = thomas::graphics::Renderer::Instance()->getShaderList().FindByName(Utility::ConvertString(name));

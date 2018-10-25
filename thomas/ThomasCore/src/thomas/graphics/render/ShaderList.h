@@ -30,6 +30,7 @@ namespace thomas {
 
 				void SyncList();
 				void add(resource::Shader* s) const;
+				void rmv(resource::Shader * s) const;
 
 				resource::Shader* CreateShader(std::string path) const;
 				resource::ComputeShader* CreateComputeShader(std::string path) const;
@@ -43,8 +44,6 @@ namespace thomas {
 
 				void RecompileShaders();
 
-
-				ID3DX11Effect* CompileShader(const std::string& path) const;
 			public:
 
 				resource::Shader* GetStandardShader();
@@ -66,14 +65,16 @@ namespace thomas {
 				void SetGlobalUAV(const std::string & name, ID3D11UnorderedAccessView* value);
 
 
-
+				void Destroy();
 
 			private:
 				// Containers
 				std::vector<resource::Shader*> m_renderableShaders;
 				mutable  std::vector<resource::Shader*> m_waitingList_Add;
+				mutable  std::vector<resource::Shader*> m_waitingList_Rmv;
 				// Sync.
-				mutable  util::atomics::SpinLock m_addLock;	// Should be changed to another lock
+				mutable  util::atomics::SpinLock m_addLock;	// Could be changed to another lock
+				mutable  util::atomics::SpinLock m_rmvLock;
 #ifdef _EDITOR
 				mutable  std::atomic<bool> m_syncShaders;
 #endif

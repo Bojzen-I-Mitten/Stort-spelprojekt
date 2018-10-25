@@ -23,10 +23,12 @@ namespace thomas
 		{
 			ID3DX11Effect* effect = NULL;
 			Compile(path, &effect);
+			if (!effect)
+				return std::unique_ptr<resource::ComputeShader>();
 
 			std::unique_ptr < resource::ComputeShader> shader(new ComputeShader(effect, path));
 			if (shader->hasPasses())
-				LOG("Shader: " << path << " contains no techniques or passes");
+				LOG("Compute shader: " << path << " contains no techniques or passes");
 			return std::move(shader);
 		}
 

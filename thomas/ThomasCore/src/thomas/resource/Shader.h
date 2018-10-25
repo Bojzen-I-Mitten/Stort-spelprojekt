@@ -36,13 +36,15 @@ namespace thomas
 				MATERIALSMOOTHNESSFACTOR = 14,//Temporary hack
 				UNKNOWN = 15
 			};
+
+		protected:
 			Shader(ID3DX11Effect* effect, std::string path);
+			static bool Compile(std::string path, ID3DX11Effect** effect);
+		public:
 			virtual ~Shader();
 			/* Compile the shader file
 			*/
-			static bool Compile(std::string path, ID3DX11Effect** effect);
-
-		protected:
+			static std::unique_ptr<resource::Shader> CreateShader(std::string path);
 		private:
 			void SetupReflection();
 			DXGI_FORMAT GetDXGIFormat(BYTE mask, D3D_REGISTER_COMPONENT_TYPE componentType);

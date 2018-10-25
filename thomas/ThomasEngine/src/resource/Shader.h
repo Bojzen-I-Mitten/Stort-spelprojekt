@@ -11,6 +11,7 @@ namespace ThomasEngine
 	internal:
 		Shader(thomas::resource::Shader* ptr);
 		Shader(String^ path);
+		virtual ~Shader();
 
 	public:
 		

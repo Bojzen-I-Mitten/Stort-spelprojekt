@@ -10,6 +10,9 @@
 
 namespace ThomasEngine
 {
+	Resource::~Resource()
+	{
+	}
 	void Resource::asset_path::set(String^ value)
 	{
 		m_path = value->Replace("%THOMAS_DATA%", Application::editorAssets);

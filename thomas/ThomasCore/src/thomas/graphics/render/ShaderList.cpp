@@ -1,4 +1,5 @@
 #include "ShaderList.h"
+#include<algorithm>
 #include "../../ThomasCore.h"
 #include "../../utils/Utility.h"
 #include "../../resource/Shader.h"
@@ -23,26 +24,60 @@ namespace thomas {
 			ShaderList::ShaderList()	:
 				m_renderableShaders(),
 				m_waitingList_Add(),
-				m_addLock()
+				m_waitingList_Rmv(),
+				m_addLock(),
+				m_rmvLock()
 			{
 				m_standard = CreateShader("../Data/FXIncludes/StandardShader.fx");
 				m_failed = CreateShader("../Data/FXIncludes/FailedShader.fx");
 			}
 			ShaderList::~ShaderList()
 			{
+				Destroy();
+			}
+			void ShaderList::Destroy()
+			{
+				// Cleanup
 				for (int i = 0; i < m_renderableShaders.size(); i++)
 					delete m_renderableShaders[i];
 				m_renderableShaders.clear();
+
+				m_addLock.lock();
+				for (size_t i = 0; i < m_waitingList_Add.size(); i++)
+					delete m_waitingList_Add[i];
+				m_waitingList_Add.clear();
+				m_addLock.unlock();
+
+				m_rmvLock.lock();
+				m_waitingList_Rmv.clear();
+				m_rmvLock.unlock();
 			}
 			void ShaderList::SyncList()
 			{
+				// Sync. add list
 				m_addLock.lock();
 				for (size_t i = 0; i < m_waitingList_Add.size(); i++)
 					m_renderableShaders.push_back(m_waitingList_Add[i]);
 				m_waitingList_Add.clear();
+				m_addLock.unlock();
+				// Sync. rmv list
+				m_rmvLock.lock();
+				for (size_t i = 0; i < m_waitingList_Rmv.size(); i++)
+				{
+					for (auto it = m_renderableShaders.begin(); it < m_renderableShaders.end(); it++)
+					{
+						resource::Shader * s = *it._Ptr;
+						if (m_waitingList_Rmv[i] == s)
+						{
+							m_renderableShaders.erase(it);
+							delete s;
+						}
+					}
+				}
+				m_waitingList_Rmv.clear();
+				m_rmvLock.unlock();
 				// Recompile if necessary
 				RecompileShaders();
-				m_addLock.unlock();
 			}
 			void ShaderList::add(resource::Shader * s) const
 			{
@@ -50,38 +85,31 @@ namespace thomas {
 				m_waitingList_Add.push_back(s);
 				m_addLock.unlock();
 			}
-			
-
-			ID3DX11Effect * ShaderList::CompileShader(const std::string& path) const
+			void ShaderList::rmv(resource::Shader * s) const
 			{
-				ID3DX11Effect* effect = NULL;
-
-				if (!resource::Shader::Compile(path, &effect)) {
-					if (!resource::Shader::Compile(m_failed->GetPath(), &effect))
-						throw std::exception("Fallback shader failed to compile...!");
-				}
-				return effect;
+				m_rmvLock.lock();
+				m_waitingList_Rmv.push_back(s);
+				m_rmvLock.unlock();
 			}
+			
 
 			resource::Shader * ShaderList::CreateShader(std::string path) const
 			{
 				resource::Shader* foundShader = FindByName(resource::Resource::PathToName(path));
 				if (foundShader)
 					return foundShader;
-
-				ID3DX11Effect* effect = CompileShader(path);
-
-				resource::Shader* shader = new resource::Shader(effect, path);
-				m_waitingList_Add.push_back(shader);
-				if (!shader->hasPasses())
+				
+				std::unique_ptr<resource::Shader> shader = resource::Shader::CreateShader(path);
+				if (!shader || !shader->hasPasses())
 				{
 					LOG("Shader: " << path << " contains no techniques or passes");
 					return nullptr;
 				}
 				else
 				{
-					m_waitingList_Add.push_back(shader);
-					return shader;
+					resource::Shader* ptr = shader.release();
+					m_waitingList_Add.push_back(ptr);
+					return ptr;
 				}
 			}
 
@@ -90,20 +118,20 @@ namespace thomas {
 				resource::Shader* foundShader = FindByName(resource::Resource::PathToName(path));
 				if (foundShader)
 				{
-					resource::ComputeShader* shader = dynamic_cast<resource::ComputeShader*>(foundShader);
-					if (shader == nullptr)
+					resource::ComputeShader* cs = dynamic_cast<resource::ComputeShader*>(foundShader);
+					if (cs == nullptr)
 						throw std::invalid_argument("Conpute shader with path: " + path + " already exists as a normal Shader object!!!");
-					return shader;	// Found compatible
+					return cs;	// Found compatible
 				}
-				std::unique_ptr<resource::ComputeShader> cs = resource::ComputeShader::CreateComputeShader(path);
-				if (!cs->hasPasses())
+				std::unique_ptr<resource::ComputeShader> shader = resource::ComputeShader::CreateComputeShader(path);
+				if (!shader || !shader->hasPasses())
 				{
 					LOG("Shader: " << path << " contains no techniques or passes");
 					return nullptr;
 				}
 				else
 				{
-					resource::ComputeShader* ptr = cs.release();
+					resource::ComputeShader* ptr = shader.release();
 					m_waitingList_Add.push_back(ptr);
 					return ptr;
 				}
@@ -112,9 +140,9 @@ namespace thomas {
 			void ShaderList::RecompileShaders()
 			{
 #ifdef _EDITOR
-				LOG("Recompiling Shaders...");
 				if (m_syncShaders)
 				{
+					LOG("Recompiling Shaders...");
 					for (resource::Shader* shader : m_renderableShaders)
 						shader->Recompile();
 				}

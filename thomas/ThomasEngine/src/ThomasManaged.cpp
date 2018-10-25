@@ -331,6 +331,7 @@ namespace ThomasEngine {
 					gcnew MainThreadDelegate(MainThreadUpdate));
 			}
 		}
+		renderThread->Join();
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
 

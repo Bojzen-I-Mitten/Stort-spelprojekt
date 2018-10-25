@@ -213,6 +213,19 @@ namespace thomas
 			return true;
 		}
 
+		std::unique_ptr<resource::Shader> Shader::CreateShader(std::string path)
+		{
+			ID3DX11Effect* effect = NULL;
+			Compile(path, &effect);
+			if (!effect)
+				return std::unique_ptr<resource::Shader>();
+
+			std::unique_ptr<resource::Shader> shader(new Shader(effect, path));
+			if (shader->hasPasses())
+				LOG("Shader: " << path << " contains no techniques or passes");
+			return std::move(shader);
+		}
+
 		void Shader::BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type)
 		{
 			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(type);

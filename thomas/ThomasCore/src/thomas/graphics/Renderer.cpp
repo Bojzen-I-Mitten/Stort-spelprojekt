@@ -60,7 +60,7 @@ namespace thomas
 
 		void Renderer::Destroy()
 		{
-			this->~Renderer();
+			m_shaders.Destroy();
 		}
 
 		Renderer* Renderer::Instance()
