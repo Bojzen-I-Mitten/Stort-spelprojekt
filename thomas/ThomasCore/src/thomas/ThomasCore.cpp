@@ -54,7 +54,7 @@ namespace thomas
 		editor::Gizmos::Gizmo().Init();
 
 		graphics::LightManager::Initialize();
-		graphics::ParticleSystem::InitializeGlobalSystem();
+		graphics::ParticleSystem::InitializeGlobalSystems();
 
 		ObjectHandler::Init();
 		s_initialized = true;
