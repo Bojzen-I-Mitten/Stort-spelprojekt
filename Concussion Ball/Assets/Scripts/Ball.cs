@@ -17,6 +17,9 @@ public class Ball : NetworkComponent
     private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
+    private ParticleEmitter emitterConfetti1;
+    private ParticleEmitter emitterConfetti2;
+
     public Texture2D electricityTex1 { get; set; }
     public Texture2D electricityTex2 { get; set; }
     public Texture2D electricityTex3 { get; set; }
@@ -61,6 +64,44 @@ public class Ball : NetworkComponent
         MultiplyWithIntensity((float)(0.5f), emitterElectricity1);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity2);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity3);
+    }
+
+    private void ResetConfettiEmitters()
+    {
+
+        emitterConfetti1.MinSize = 0.03f;
+        emitterConfetti1.MaxSize = 0.15f;
+        emitterConfetti1.EndSize = 0.15f;
+        emitterConfetti1.MinLifeTime = 1.0f;
+        emitterConfetti1.MaxLifeTime = 1.5f;
+        emitterConfetti1.EmissionRate = 100;
+        emitterConfetti1.MinRotationSpeed = -50.0f;
+        emitterConfetti1.MaxRotationSpeed = 50.0f;
+        emitterConfetti1.MinSpeed = 7.5f;
+        emitterConfetti1.MaxSpeed = 15.0f;
+        emitterConfetti1.EndSpeed = 0.0f;
+        emitterConfetti1.DistanceFromSphereCenter = 20;
+        emitterConfetti1.Radius = 0.4f;
+        emitterConfetti1.Gravity = 5.0f;
+        emitterConfetti1.SpawnAtEdge = true;
+        
+
+
+        emitterConfetti2.MinSize = 0.03f;
+        emitterConfetti2.MaxSize = 0.15f;
+        emitterConfetti2.EndSize = 0.15f;
+        emitterConfetti2.MinLifeTime = 0.8f;
+        emitterConfetti2.MaxLifeTime = 1.3f;
+        emitterConfetti2.EmissionRate = 125;
+        emitterConfetti2.MinRotationSpeed = -25.0f;
+        emitterConfetti2.MaxRotationSpeed = 25.0f;
+        emitterConfetti2.MinSpeed = 12.0f;
+        emitterConfetti2.MaxSpeed = 20.0f;
+        emitterConfetti2.EndSpeed = 0.0f;
+        emitterConfetti2.DistanceFromSphereCenter = 8;
+        emitterConfetti2.Radius = 1.0f;
+        emitterConfetti2.Gravity = 5.0f;
+        emitterConfetti2.SpawnAtEdge = false;
     }
 
     private void ResetFireEmitters()

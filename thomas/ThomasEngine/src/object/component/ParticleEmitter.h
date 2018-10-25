@@ -14,6 +14,7 @@ namespace ThomasEngine
 			thomas::object::component::ParticleEmitterComponent* get();
 		}
 
+	public:
 		enum class BLEND_STATES
 		{
 			ALPHA,
