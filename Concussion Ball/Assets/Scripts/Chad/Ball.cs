@@ -6,10 +6,6 @@ using ThomasEngine;
 using ThomasEngine.Network;
 public class Ball : PickupableObject
 {
-    Rigidbody rb;
-    RenderComponent rc;
-    // private float accumulator;
-    // private float chargeupTime;
     public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
 
     private ParticleEmitter emitterElectricity1;
@@ -216,8 +212,8 @@ public class Ball : PickupableObject
 
     public override void Update()
     {
-        //if (transform.position.y < -5)
-        //    Reset();
+        if (transform.position.y < -5)
+            Reset();
     }
 
     override public void ChargeEffect()
@@ -260,28 +256,30 @@ public class Ball : PickupableObject
         // Reset values
         ResetElectricityEmitters();
     }
+
+
+    public void Reset()
+    {
+        RPCDrop();
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
+        if (isOwner)
+        {
+            if (m_rigidBody != null)
+            {
+                Debug.Log("Resetting ball");
+                m_rigidBody.enabled = false;
+                StartCoroutine(EnableRigidBody());
+            }
+            transform.localEulerAngles = Vector3.Zero;
+            transform.localPosition = SpawnPoint;
+        }
+    }
+
+
+    private IEnumerator EnableRigidBody()
+    {
+        yield return null;
+        m_rigidBody.enabled = true;
+    }
 }
-
-    //public void Reset()
-    //{
-    //    RPCDrop();
-    //    gameObject.SetActive(false);
-    //    gameObject.SetActive(true);
-    //    if (isOwner)
-    //    {
-    //        if (rigidbody != null)
-    //        {
-    //            Debug.Log("Resetting ball");
-    //            rigidbody.enabled = false;
-    //            StartCoroutine(EnableRigidBody());
-    //        }
-    //        transform.localEulerAngles = Vector3.Zero;
-    //        transform.localPosition = SpawnPoint;
-    //    }
-    //}
-
-//private IEnumerator EnableRigidBody()
-//{
-//    yield return null;
-//    rigidbody.enabled = true;
-//}

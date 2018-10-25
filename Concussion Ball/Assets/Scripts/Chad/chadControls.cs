@@ -162,7 +162,6 @@ public class ChadControls : NetworkComponent
 
     public void PublicStartRagdoll(float duration, Vector3 force)
     {
-        Debug.Log("Bikku meme desu");
         RPCStartRagdoll(duration, force);
         SendRPC("RPCStartRagdoll", duration, force);
     }

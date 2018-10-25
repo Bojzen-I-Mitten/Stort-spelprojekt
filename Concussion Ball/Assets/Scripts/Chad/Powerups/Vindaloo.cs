@@ -9,8 +9,8 @@ public class Vindaloo : Powerup
     public Texture2D _FireTex { get; set; }
     private float fireMax;
 
-    public float ExplosionRadius { get; set; } = 50.0f;
-    public float ExplosionForce { get; set; } = 100.0f;
+    public float ExplosionRadius { get; set; } = 5.0f;
+    public float ExplosionForce { get; set; } = 200.0f;
 
     public override void Start()
     {
@@ -26,43 +26,38 @@ public class Vindaloo : Powerup
 
     public override void Update()
     {
-        
+
     }
 
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 force)
     {
         base.Throw(force);
-
-        // add more code here for what happens upon throw
-        // in current state Chad will just throw like it would be the ball
     }
 
-    // if this is a non-throwable this function will be called
+    // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
-        Debug.Log("Vindaru onactivetu");
-
-        //boom particles
+        // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
+        // loop through players and check distance from explosion source
         var players = NetworkManager.instance.Scene.Players.Values.ToList();
         players.ForEach(player =>
         {
-            Debug.Log("Rooping etto puraya desu");
             float distance = Vector3.Distance(player.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = player.transform.position - transform.position;
                 forceDir.y += 3.0f;
 
-                Debug.Log("Nani desu ka?");
+                // ragdoll and knock-back
                 player.gameObject.GetComponent<ChadControls>().PublicStartRagdoll(5.0f, forceDir * ExplosionForce);
             }
         });
 
 
-        // despawn gameobject
+        
     }
 
     private void Explosion()
@@ -91,13 +86,15 @@ public class Vindaloo : Powerup
 
     private IEnumerator StopFire()
     {
-        float timer = 3;
-        while (timer > 0)
-        {
-            timer -= Time.DeltaTime;
-            yield return null;
-        }
-
+        //float timer = 3;
+        //while (timer > 0)
+        //{
+        //    timer -= Time.DeltaTime;
+        //    yield return null;
+        //}
+        yield return new WaitForSeconds(3.0f);
         _Fire.Emit = false;
+        // despawn gameobject
+        this.gameObject.SetActive(false);
     }
 }

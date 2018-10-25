@@ -23,7 +23,7 @@ public class POWERUP_TEMPLATE : Powerup
         // in current state Chad will just throw like it would be the ball
     }
 
-    // if this is a non-throwable this function will be called
+    // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
 
