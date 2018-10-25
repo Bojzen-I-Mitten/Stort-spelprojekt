@@ -38,7 +38,7 @@ namespace ThomasEditor
             numberOfErrors.Content = 0;
 
             Debug.OnDebugMessage += Debug_OnDebugMessage;
-            ThomasWrapper.OnStartPlaying += ThomasWrapper_OnStartPlaying;
+            MainWindow.OnStartPlaying += ThomasWrapper_OnStartPlaying;
         }
 
         private bool CustomFilter(object obj)

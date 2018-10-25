@@ -270,7 +270,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        protected override void OnDestroy()
+        public override void OnDestroy()
         {
             if (NetManager != null)
             {

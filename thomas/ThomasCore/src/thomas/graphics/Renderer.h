@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include "render/ShaderList.h"
 
 namespace thomas 
 {
@@ -39,13 +40,17 @@ namespace thomas
 		{
 		private:
 			Renderer();
+			~Renderer();
 
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 
 		public:
-			~Renderer() = default;
+			void init();
+			void PostRender();
+			void Destroy();
 
+			/* Renderer Singleton */
 			static Renderer* Instance();
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
@@ -58,12 +63,16 @@ namespace thomas
 
 			void TransferCommandList();
 
-		private:
-			static Renderer s_renderer;
-			
+		public:
+			/* Access shaders 
+			*/
+			const render::ShaderList& getShaderList();
+			resource::Shader* GetStandardShader();
+
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
+			render::ShaderList m_shaders;
 			
 		};
 	}
