@@ -32,7 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -57,9 +56,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\GUIJoinHost.cs" />
+    <Compile Include="Assets\GUISelectTeam.cs" />
     <Compile Include="Assets\DissolveTest.cs" />
+    <Compile Include="Assets\CameraMove.cs" />
     <Compile Include="Assets\RpcTest.cs" />
     <Compile Include="Assets\ParticleComponentTest.cs" />
+    <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
     <Compile Include="Assets\Scripts\ChadHud.cs" />
@@ -76,7 +79,9 @@
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
     <Compile Include="Assets\Scripts\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
+    <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
+    <Compile Include="Assets\Scripts\vindalooexplosiontest.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />
     <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

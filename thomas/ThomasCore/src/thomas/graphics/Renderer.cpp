@@ -119,9 +119,6 @@ namespace thomas
 			//Process commands
 			BindFrame();
 
-			//ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
-			//m_particleSystem->UpdateParticleSystem();
-
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				auto camera = perCameraQueue.first;
@@ -148,16 +145,19 @@ namespace thomas
 	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 
-			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
+			ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
 			for (object::component::Camera* cam : object::component::Camera::s_allCameras)
 			{
 				BindCamera(cam);
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_PARTICLES);
 			

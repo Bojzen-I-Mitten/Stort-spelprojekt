@@ -8,21 +8,35 @@ namespace thomas
 {
 	namespace graphics
 	{
-		std::shared_ptr<ParticleSystem> ParticleSystem::s_globalSystem;
+		std::shared_ptr<ParticleSystem> ParticleSystem::s_globalAlphaBlendingSystem;
+		std::shared_ptr<ParticleSystem> ParticleSystem::s_globalAdditiveBlendingSystem;
 
-		void ParticleSystem::InitializeGlobalSystem()
+		void ParticleSystem::InitializeGlobalSystems()
 		{
-			s_globalSystem = std::make_shared<ParticleSystem>();
-			s_globalSystem->Initialize(65536);
+			s_globalAlphaBlendingSystem = std::make_shared<ParticleSystem>();
+			s_globalAlphaBlendingSystem->Initialize(8192, ALPHA);
+
+			s_globalAdditiveBlendingSystem = std::make_shared<ParticleSystem>();
+			s_globalAdditiveBlendingSystem->Initialize(8192, ADDITIVE);
+
 			std::srand(time(NULL));
 		}
-		std::shared_ptr<ParticleSystem> ParticleSystem::GetGlobalSystem()
+
+
+		std::shared_ptr<ParticleSystem> ParticleSystem::GetGlobalAlphaBlendingSystem()
 		{
-			return s_globalSystem;
+			return s_globalAlphaBlendingSystem;
 		}
-		void ParticleSystem::DestroyGlobalSystem()
+
+		std::shared_ptr<ParticleSystem> ParticleSystem::GetGlobalAdditiveBlendingSystem()
 		{
-			s_globalSystem->Destroy();
+			return s_globalAdditiveBlendingSystem;
+		}
+
+		void ParticleSystem::DestroyGlobalSystems()
+		{
+			s_globalAlphaBlendingSystem->Destroy();
+			s_globalAdditiveBlendingSystem->Destroy();
 		}
 		ParticleSystem::ParticleSystem()
 		{
@@ -34,7 +48,7 @@ namespace thomas
 
 		}
 
-		void ParticleSystem::Initialize(unsigned maxNrOfParticles)
+		void ParticleSystem::Initialize(unsigned maxNrOfParticles, BLEND_STATE blendState)
 		{
 			m_maxNrOfParticles = maxNrOfParticles;
 			m_emitParticlesCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/emitParticlesCS.fx");
@@ -43,7 +57,7 @@ namespace thomas
 			m_calculateEmitCountCS = (resource::ComputeShader*)resource::ComputeShader::CreateShader("../Data/FXIncludes/calculateEmitCountCS.fx");
 
 			//PARTICLE BUFFERS
-			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(InitParticleBufferStruct), 10, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
+			m_bufferSpawn =			std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(InitParticleBufferStruct), 128, DYNAMIC_BUFFER);//ammount of emiting emitters supported at once			
 			m_bufferSpawnIndex =	std::make_unique<utils::buffers::Buffer>(nullptr, sizeof(int) * 4, D3D11_BIND_CONSTANT_BUFFER, DYNAMIC_BUFFER);
 
 			m_bufferUpdate =		std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(ParticleStruct), maxNrOfParticles, STATIC_BUFFER, D3D11_BIND_FLAG(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS));//ammount of particles supported for entire system 
@@ -85,6 +99,8 @@ namespace thomas
 			m_particleShader = resource::Shader::CreateShader("../Data/FXIncludes/particleShader.fx");
 
 			m_texArr = new resource::Texture2DArray(256, 256, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
+
+			m_blendState = blendState;
 		}
 
 		void ParticleSystem::Destroy()
@@ -219,6 +235,7 @@ namespace thomas
 
 			m_updateParticlesCS->DispatchIndirect(m_bufferIndirectArgs->GetBuffer(), 0);
 
+
 			resource::ComputeShader::UnbindAllUAVs();
 		}
 
@@ -230,7 +247,7 @@ namespace thomas
 			m_particleShader->SetGlobalResource("billboards", m_bufferBillboard->GetSRV());
 			
 			m_particleShader->Bind();
-			m_particleShader->SetPass(0);
+			m_particleShader->SetPass(m_blendState);
 			
 			
 			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);

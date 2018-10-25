@@ -60,7 +60,7 @@ public class MatchSystem : NetworkManager
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
 
-        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.White);
+        Teams[TEAM_TYPE.TEAM_SPECTATOR] = new Team(TEAM_TYPE.TEAM_SPECTATOR, "Spectators", Color.Gray);
 
         Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
@@ -267,22 +267,24 @@ public class MatchSystem : NetworkManager
         RPCOnGoal((int)teamThatScored);
     }
 
+    public void JoinTeam(TEAM_TYPE team)
+    {
+        NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
+        np.JoinTeam(team);
+    }
+
     #endregion
 
     #region peer connection
 
     protected override void OnPeerJoin(NetPeer peer)
     {
-        //Disable the players gameObject and place in him team Spectator.
+        //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
 
-        int team = Scene.Players.Count % 2;
-        if (team == 0)
-            np.JoinTeam(Teams[TEAM_TYPE.TEAM_1]);
-        else
-            np.JoinTeam(Teams[TEAM_TYPE.TEAM_2]);
+        np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
 
         SpawnBall();
 

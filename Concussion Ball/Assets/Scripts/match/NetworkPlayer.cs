@@ -3,6 +3,7 @@ using ThomasEngine;
 using ThomasEngine.Network;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using System.Collections;
 
 public class NetworkPlayer : NetworkComponent
 {
@@ -21,7 +22,7 @@ public class NetworkPlayer : NetworkComponent
     public override void Update()
     {
         if (transform.position.y < BottomOfTheWorld)
-            Respawn();
+            Reset();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -68,6 +69,20 @@ public class NetworkPlayer : NetworkComponent
     public void Reset()
     {
         mat?.SetColor("color", Team.Color);
+        if (isOwner && (int)Team.TeamType > (int)TEAM_TYPE.TEAM_SPECTATOR)
+        {
+            gameObject.GetComponent<Rigidbody>().enabled = false;
+            StartCoroutine(EnableRigidbody());
+            transform.position = Team.GetSpawnPosition();
+            transform.LookAt(Vector3.Zero);
+            gameObject.GetComponent<ChadControls>().Reset();
+        }
+    }
+
+    IEnumerator EnableRigidbody()
+    {
+        yield return null;
+        gameObject.GetComponent<Rigidbody>().enabled = true;
     }
 
 
@@ -81,13 +96,5 @@ public class NetworkPlayer : NetworkComponent
         }
             
         this.Team = team;
-
-
-    }
-
-    public void Respawn()
-    {
-        if (isOwner)
-            transform.position = Team.GetSpawnPosition();
     }
 }

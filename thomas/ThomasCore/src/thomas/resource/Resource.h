@@ -16,8 +16,10 @@ namespace thomas
 			void Rename(std::string newPath);
 			void Reload();
 			static std::string PathToName(std::string path);
+
 		protected:
 			std::string m_path;
+			std::string m_name;
 
 		private:
 			virtual void OnChanged() = 0;

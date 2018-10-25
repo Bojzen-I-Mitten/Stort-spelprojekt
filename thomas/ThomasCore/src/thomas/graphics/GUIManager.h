@@ -67,6 +67,8 @@ namespace thomas
 			void Render();
 
 		public:
+			void SetViewportScale(math::Viewport viewport);
+
 			// Images
 			void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
 						  const Vector4& color = Vector4(1.f), const Vector2& scale = Vector2(1.f), float rotation = 0.f);
@@ -79,6 +81,7 @@ namespace thomas
 			void SetImageOrigin(const std::string& id, const Vector2& origin);
 			bool OnImageClicked(const std::string& id);
 			bool OnImageHovered(const std::string& id);
+			void DeleteImage(const std::string& id);
 
 			// Text
 			void AddText(const std::string& id, const std::string& text, const Vector2& position, const Vector2& scale = Vector2(1.f),
@@ -89,6 +92,7 @@ namespace thomas
 			void SetTextScale(const std::string& id, const Vector2& scale);
 			void SetTextRotation(const std::string& id, float rotation);
 			void SetFont(const std::string& id, Font* font);
+			void DeleteText(const std::string& id);
 			void SetTextOrigin(const std::string& id, const Vector2& origin);
 			Vector2 GetTextSize(const std::string& id);
 		private:
@@ -102,6 +106,8 @@ namespace thomas
 			std::unique_ptr<CommonStates> m_spriteStates;
 			std::unique_ptr<SpriteBatch> m_spriteBatch;
 			std::unique_ptr<Font> m_defaultFont;
+			math::Vector2 m_viewportScale;
+			math::Vector2 m_viewport;
 		};
 	}
 }

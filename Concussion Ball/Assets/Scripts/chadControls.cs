@@ -79,6 +79,7 @@ public class ChadControls : NetworkComponent
     public float ImpactFactor { get; set; } = 100;
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
+    IEnumerator Ragdolling = null;
 
     public bool Locked = false;
 
@@ -146,7 +147,12 @@ public class ChadControls : NetworkComponent
         }
 
         if (Input.GetKeyDown(Input.Keys.L))
-            StartCoroutine(StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000));
+        {
+            Ragdolling = StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000);
+            StartCoroutine(Ragdolling);
+        }
+        if (Input.GetKeyDown(Input.Keys.K))
+            gameObject.GetComponent<NetworkPlayer>().Reset();
     }
 
     public void EnableRagdoll()
@@ -167,7 +173,10 @@ public class ChadControls : NetworkComponent
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
         if(State != STATE.RAGDOLL)
-            StartCoroutine(StartRagdoll(duration, force));
+        {
+            Ragdolling = StartRagdoll(duration, force);
+            StartCoroutine(Ragdolling);
+        }
     }
 
 
@@ -390,7 +399,6 @@ public class ChadControls : NetworkComponent
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -BaseSpeed, MaxSpeed);
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
-
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Direction.z * BaseSpeed;
@@ -411,6 +419,16 @@ public class ChadControls : NetworkComponent
 
                 break;
         }
+    }
+
+    public void Reset()
+    {
+        State = STATE.CHADING;
+        StopCoroutine(DivingCoroutine());
+        DivingTimer = 5;
+        StopCoroutine(Ragdolling);
+        CurrentVelocity = Vector2.Zero;
+        ResetCamera();
     }
 
     #region Coroutines
@@ -461,7 +479,6 @@ public class ChadControls : NetworkComponent
     {
         if (Ball)
             Ball.Pickup(gameObject, hand ? hand : transform);
-
     }
 
     public bool HasBall()

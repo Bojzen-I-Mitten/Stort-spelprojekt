@@ -124,9 +124,10 @@ namespace ThomasEngine.Network
         {
             initServerStartTime();
             ResponsiblePeer = LocalPeer;
-            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             NetScene.ActivateSceneObjects();
+            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             OnPeerJoin(LocalPeer);
+
         }
 
         public void Connect()

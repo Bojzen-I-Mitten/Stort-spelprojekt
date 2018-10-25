@@ -309,6 +309,11 @@ namespace thomas
 		
 		void Shader::SetPass(int passIndex)
 		{
+			if (passIndex >= m_passes.size())
+			{
+				LOG("Shader: " + this->GetName() + " SetPass(), pass-index is out of range");
+				return;
+			}
 			utils::D3D::Instance()->GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);
 			ID3DX11EffectPass* pass = m_effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex);
 			pass->Apply(0, utils::D3D::Instance()->GetDeviceContext());

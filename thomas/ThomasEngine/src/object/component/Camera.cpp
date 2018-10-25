@@ -5,6 +5,7 @@
 #pragma managed
 #include "Camera.h"
 #include "../../Utility.h"
+#include "../../Debug.h"
 
 namespace ThomasEngine
 {
@@ -108,6 +109,11 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetImageOrigin(Utility::ConvertString(id), Utility::Convert(origin));
 	}
 
+	void Camera::DeleteImage(String ^ id)
+	{
+		camera->GetGUIHandle()->DeleteImage(Utility::ConvertString(id));
+	}
+
 	//-------------------------------------------------------------------------------------------
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position)
@@ -117,9 +123,16 @@ namespace ThomasEngine
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Font^ font)
 	{
-		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position), 
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position),
 										Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(Vector4(0.f, 0.f, 0.f, 1.f)), 
 										(thomas::resource::Font*)font->m_nativePtr);
+	}
+
+	void Camera::AddText(String ^ id, String ^ text, Vector2 position, Vector2 scale, Font ^ font)
+	{
+		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), Utility::Convert(position),
+			Utility::Convert(scale), 0.f, Utility::Convert(Vector4(0.f, 0.f, 0.f, 1.f)),
+			(thomas::resource::Font*)font->m_nativePtr);
 	}
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale)
@@ -137,14 +150,14 @@ namespace ThomasEngine
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector4 color)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
-										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, 
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f,
 										Utility::Convert(color));
 	}
 
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Font^ font, Vector4 color)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text), 
-										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color), 
+										Utility::Convert(position), Utility::Convert(Vector2(1.f)), 0.f, Utility::Convert(color),
 										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
@@ -157,7 +170,7 @@ namespace ThomasEngine
 	void Camera::AddText(String^ id, String^ text, Vector2 position, Vector2 scale, Font^ font, Vector4 color)
 	{
 		camera->GetGUIHandle()->AddText(Utility::ConvertString(id), Utility::ConvertString(text),
-										Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color), 
+										Utility::Convert(position), Utility::Convert(scale), 0.f, Utility::Convert(color),
 										(thomas::resource::Font*)font->m_nativePtr);
 	}
 
@@ -204,5 +217,11 @@ namespace ThomasEngine
 	{
 		return Utility::Convert(camera->GetGUIHandle()->GetTextSize(Utility::ConvertString(id)));
 	}
+
+	void Camera::DeleteText(String^ id)
+	{
+		camera->GetGUIHandle()->DeleteText(Utility::ConvertString(id));
+	}
+
 	//-------------------------------------------------------------------------------------------
 }

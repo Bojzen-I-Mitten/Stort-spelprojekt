@@ -331,5 +331,30 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
+#Ignore Assets
+*.obj
+*.mtl
+*.fbx
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.tds
+*.mp3
+*.wav
+*.anim
+*.blend*
+*.prefab
+*.mat
+
+Models/
+
+
+
+# Other stuff
+
+*.ini
+
+
 # SVN
 .svn/
