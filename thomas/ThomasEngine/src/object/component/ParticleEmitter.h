@@ -18,8 +18,7 @@ namespace ThomasEngine
 		enum class BLEND_STATES
 		{
 			ALPHA,
-			ADDITIVE,
-			UNKNOWN
+			ADDITIVE
 		};
 
 	public:

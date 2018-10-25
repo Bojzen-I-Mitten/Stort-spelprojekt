@@ -61,12 +61,11 @@ namespace ThomasEngine
 	ParticleEmitter::BLEND_STATES ParticleEmitter::BlendState::get() 
 	{ 
 		int blendState = particleEmitter->GetBlendState();
-		if (blendState == 0)
-			return BLEND_STATES::ALPHA;
-		else if (blendState == 1)
+		
+		if (blendState == 1)
 			return BLEND_STATES::ADDITIVE;
 		else
-		return BLEND_STATES::UNKNOWN;
+			return BLEND_STATES::ALPHA;
 	}
 	void ParticleEmitter::BlendState::set(ParticleEmitter::BLEND_STATES value) 
 	{
