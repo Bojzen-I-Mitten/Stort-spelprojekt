@@ -238,6 +238,11 @@ namespace ThomasEngine
 					default:
 						break;
 					}
+
+					if (obj != nullptr)
+					{
+						resources[thomasPath] = obj;
+					}
 				}
 				catch (Exception^ e) {
 
@@ -247,12 +252,6 @@ namespace ThomasEngine
 					obj = LoadErrorResource(type);
 					if(obj == nullptr)
 						Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
-
-				}
-
-				if (obj != nullptr)
-				{
-					resources[thomasPath] = obj;
 				}
 
 				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
@@ -265,7 +264,10 @@ namespace ThomasEngine
 
 		void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
 		{
-			path = Application::currentProject->assetPath + "\\" + path;
+			if (gameObject->prefabPath)
+				path = gameObject->prefabPath;
+			else
+				path = Application::currentProject->assetPath + "\\" + path;
 
 			Serializer::SerializeGameObject(gameObject, path);
 

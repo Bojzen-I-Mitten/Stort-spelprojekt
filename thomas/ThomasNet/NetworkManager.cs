@@ -70,11 +70,12 @@ namespace ThomasEngine.Network
 
         public NetworkManager() : base()
         {
-            instance = this;
+            
         }
 
         public override void Awake()
         {
+            instance = this;
             NetScene = new NetworkScene();
             NetPacketProcessor = new NetPacketProcessor();
             Listener = new EventBasedNetListener();

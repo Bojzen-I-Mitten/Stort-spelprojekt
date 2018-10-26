@@ -57,6 +57,7 @@ namespace ThomasEngine
 
 		void RenderSelectedGizmos();
 		
+		
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property thomas::object::GameObject* Native {
@@ -64,6 +65,9 @@ namespace ThomasEngine
 		}
 
 	public:
+
+		bool IsPrefab();
+
 		bool MakeStatic();
 		bool MakeDynamic();
 		bool MoveStaticGroup();

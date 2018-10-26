@@ -30,7 +30,7 @@ namespace ThomasEngine
 	{
 		return m_children->Remove(child);
 	}
-	Transform ^ Transform::SwapParent(Transform ^ new_parent)
+	Transform ^ Transform::SwapParent(Transform ^ new_parent, bool worldPositionStays)
 	{
 		// Swap
 		Transform^ oldParent = m_parent;
@@ -39,17 +39,17 @@ namespace ThomasEngine
 		if (new_parent)
 		{
 			new_parent->AddChild(this);
-			((thomas::object::component::Transform*)nativePtr)->SetParent(new_parent->Native, true);
+			((thomas::object::component::Transform*)nativePtr)->SetParent(new_parent->Native, worldPositionStays);
 		}
 		else
-			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, true);
+			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
 		return oldParent;
 	}
 	/* Called when parent is destroyed rather then swapped out
 	*/
 	void Transform::OnParentDestroy(Transform ^ new_parent)
 	{
-		Transform^ oldParent = SwapParent(new_parent);
+		Transform^ oldParent = SwapParent(new_parent, true);
 		OnParentChanged(this, oldParent, new_parent);
 	}
 	void Transform::OnParentDestroy(GameObject^ parented_object)
@@ -66,7 +66,7 @@ namespace ThomasEngine
 		if (new_parent == m_parent)
 			return;	// Do nothing
 		// Swap and clear
-		Transform^  oldParent = SwapParent(new_parent);
+		Transform^  oldParent = SwapParent(new_parent, worldPositionStays);
 		if(oldParent)
 			assert(oldParent->RemoveChild(this));
 		// Trigger event
@@ -78,7 +78,7 @@ namespace ThomasEngine
 	}
 	void Transform::parent::set(ThomasEngine::Transform^ value)
 	{
-		SetParent(value);
+		SetParent(value, false);
 	}
 
 	IEnumerable<Transform^>^ Transform::children::get()

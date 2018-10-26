@@ -401,16 +401,6 @@ namespace thomas
 		return m_lastKey;
 	}
 
-	std::string Input::ConvertKeyToString(Keys key) const
-	{
-		return Keys_to_string(key);
-	}
-
-	std::string Input::ConvertKeyToString(unsigned short key) const
-	{
-		return Keys_to_string(Keys(key));
-	}
-
 	Input::MouseMode Input::GetMouseMode()
 	{
 		return m_mouseMode;
