@@ -51,6 +51,7 @@ public class Chadimations : NetworkComponent
     public Dictionary<ChadControls.STATE, BlendNode> BlendNodes = new Dictionary<ChadControls.STATE, BlendNode>();
     public Dictionary<ChadControls.STATE, WeightHandle> WeightHandles = new Dictionary<ChadControls.STATE, WeightHandle>();
 
+    
     public RenderSkinnedComponent Skin { get; set; }
 
     public override void Start()

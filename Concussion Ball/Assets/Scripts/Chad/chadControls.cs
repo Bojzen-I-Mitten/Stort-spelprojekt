@@ -217,9 +217,16 @@ public class ChadControls : NetworkComponent
                     ResetCharge();
                     ResetCamera();
                 }
+                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
+                {
+                    Debug.Log("Was aiming, but dived now we chading bois");
+                    State = STATE.DIVING;
+                    ResetCharge();
+                    ResetCamera();
+                }
                 else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
                 {
-
+                    
                 }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
@@ -244,12 +251,13 @@ public class ChadControls : NetworkComponent
 
             Direction.y = xStep;
 
-            if (!Input.GetKey(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT))
+            if (!Input.GetKey(Input.Keys.LeftShift) && (!HasThrowableObject() || !Input.GetMouseButton(Input.MouseButtons.RIGHT)) || State == STATE.DIVING || State == STATE.CHADING)
             {
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasThrowableObject())
+            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasThrowableObject() && State == STATE.THROWING)
             {
+                
                 ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
             }
             else if (Input.GetKeyDown(Input.Keys.LeftShift))
@@ -436,6 +444,12 @@ public class ChadControls : NetworkComponent
         DisableRagdoll();
         State = STATE.CHADING;
         ResetCamera();
+    }
+
+    IEnumerator PauseChargeAnimation()
+    {
+        yield return new WaitForSeconds(0.5f);
+        // Animations.Animations[STATE.THROWING][0].Animation.Pause();
     }
 
     #endregion
