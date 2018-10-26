@@ -741,6 +741,18 @@ namespace ThomasEditor
             var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
+        private void AddNewTorusPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Torus);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewMonkeyPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Monkey);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
 
         private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
         {
