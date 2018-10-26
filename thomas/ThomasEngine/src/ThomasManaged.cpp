@@ -149,10 +149,6 @@ namespace ThomasEngine {
 //#ifdef _EDITOR
 //		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
 //#endif
-		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
-		{
-			camera->CopyFrameData();
-		}
 	}
 
 	void TriggerLoad()
@@ -240,7 +236,7 @@ namespace ThomasEngine {
 				
 					
 
-					for (object::component::Camera* camera : object::component::Camera::s_allCameras)
+					for (object::component::Camera* camera : graphics::Renderer::Instance()->getCameraList().getCameras())
 					{
 						camera->Render();
 					}
