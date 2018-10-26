@@ -8,16 +8,12 @@
 #include <fstream>
 #include <comdef.h>
 #include "..\ThomasCore.h"
+#include "..\graphics\Renderer.h"
 
 namespace thomas
 {
 	namespace resource
 	{
-		std::vector<Shader*> Shader::s_loadedShaders;
-		Shader* Shader::s_standardShader;
-		Shader* Shader::s_failedShader;
-		bool Shader::s_shouldRecompile = false;
-
 		Shader::Shader(ID3DX11Effect* effect, std::string path) : Resource(path)
 		{
 			m_currentPass = nullptr;
@@ -212,47 +208,24 @@ namespace thomas
 					//LOG("Shader Compiler : " << error);
 					errorBlob->Release();
 				}
-				
 			}
 			*effect = tempEffect;
 			return true;
 		}
 
-		bool Shader::Init()
+		std::unique_ptr<resource::Shader> Shader::CreateShader(std::string path)
 		{
-			s_failedShader = CreateShader("../Data/FXIncludes/FailedShader.fx");
-			s_standardShader = CreateShader("../Data/FXIncludes/StandardShader.fx");
-
-			return true;
-		}
-
-		Shader * Shader::GetStandardShader()
-		{
-			return s_standardShader;
-		}
-
-		Shader * Shader::CreateShader(std::string path)
-		{
-			Shader* foundShader = FindByName(PathToName(path));
-			if (foundShader)
-				return foundShader;
-
 			ID3DX11Effect* effect = NULL;
-			
-			if (!Compile(path, &effect)) {
-				if (!Compile(s_failedShader->m_path, &effect))
-					throw std::exception("Fallback shader failed to compile...!");
-			}
+			Compile(path, &effect);
+			if (!effect)
+				return std::unique_ptr<resource::Shader>();
 
-			Shader* shader = new Shader(effect, path);
-			s_loadedShaders.push_back(shader);
-			if (shader->m_passes.empty())
-			{
-				LOG("shader: " << path << " contains no techniques or passes");
-				
-			}
-			return shader;
+			std::unique_ptr<resource::Shader> shader(new Shader(effect, path));
+			if (!shader->hasPasses())
+				LOG("Shader: " << path << " contains no techniques or passes");
+			return std::move(shader);
 		}
+
 		void Shader::BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type)
 		{
 			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(type);
@@ -306,6 +279,11 @@ namespace thomas
 		{
 			return &m_passes;
 		}
+
+		const std::string & Shader::GetPath()
+		{
+			return m_path;
+		}
 		
 		void Shader::SetPass(int passIndex)
 		{
@@ -319,173 +297,68 @@ namespace thomas
 			pass->Apply(0, utils::D3D::Instance()->GetDeviceContext());
 			m_currentPass = &m_passes[passIndex];
 		}
+		void Shader::SetProperty(const std::string & name, std::shared_ptr<shaderproperty::ShaderProperty> prop)
+		{
+			if (HasProperty(name))
+				m_properties[name] = prop;
+		}
+		void Shader::SetPropertyInt(const std::string & name, uint32_t value)
+		{
+			if (HasProperty(name))
+			{
+				std::shared_ptr<shaderproperty::ShaderPropertyScalarInt> prop( new shaderproperty::ShaderPropertyScalarInt(value));
+				prop->SetName(name);
+				m_properties[name] = prop;
+			}
+		}
+		void Shader::SetPropertyUAV(const std::string & name, ID3D11UnorderedAccessView* value)
+		{
+			if (HasProperty(name))
+			{
+				std::shared_ptr<shaderproperty::ShaderPropertyUnorderedAccessView> prop(new shaderproperty::ShaderPropertyUnorderedAccessView(value));
+				prop->SetName(name);
+				m_properties[name] = prop;
+			}
+		}
+		void Shader::SetPropertyResource(const std::string & name, ID3D11ShaderResourceView* value)
+		{
+			if (HasProperty(name))
+			{
+				std::shared_ptr<shaderproperty::ShaderPropertyShaderResource> prop(
+					new shaderproperty::ShaderPropertyShaderResource(value));
+				prop->SetName(name);
+				m_properties[name] = prop;
+			}
+		}
+		void Shader::SetPropertyTexture2D(const std::string & name, Texture2D* value)
+		{
+			if (HasProperty(name))
+			{
+				std::shared_ptr<shaderproperty::ShaderPropertyTexture2D> prop(
+					new shaderproperty::ShaderPropertyTexture2D(value));
+				prop->SetName(name);
+				m_properties[name] = prop;
+			}
+		}
+		void Shader::SetPropertyTexture2D(const std::string & name, Texture2DArray* value)
+		{
+			if (HasProperty(name))
+			{
+				std::shared_ptr<shaderproperty::ShaderPropertyTexture2DArray> prop(
+					new shaderproperty::ShaderPropertyTexture2DArray(value));
+				prop->SetName(name);
+				m_properties[name] = prop;
+			}
+		}
+
+
+
+
 		Shader::ShaderPass & Shader::GetCurrentPass()
 		{
 			return *m_currentPass;
 		}
-		void Shader::DestroyAllShaders()
-		{
-			for (int i = 0; i < s_loadedShaders.size(); i++)
-			{
-				delete s_loadedShaders[i];
-			}
-			s_loadedShaders.clear();
-		}
-
-		bool Shader::DestroyShader(Shader * shader)
-		{
-			auto it = s_loadedShaders.begin();
-
-			while (it != s_loadedShaders.end())
-			{
-				if (*it._Ptr == shader)
-				{
-					
-					s_loadedShaders.erase(it);
-					delete shader;
-					return true;
-				}
-				it++;
-			}
-
-			LOG("FAILED TO DESTROY SHADER, SHADER NOT LOADED?");
-
-			return false;
-		}
-
-		void Shader::SetGlobalColor(const std::string & name, math::Color value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyColor(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalFloat(const std::string & name, float value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyScalarFloat(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalInt(const std::string & name, int value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyScalarInt(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalMatrix(const std::string & name, math::Matrix value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyMatrix(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalTexture2D(const std::string & name, resource::Texture2D* value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyTexture2D(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalTexture2DArray(const std::string & name, resource::Texture2DArray* value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyTexture2DArray(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalResource(const std::string & name, ID3D11ShaderResourceView * value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyShaderResource(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-		void Shader::SetGlobalConstantBuffer(const std::string & name, ID3D11Buffer * value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyConstantBuffer(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
 		
-		void Shader::SetGlobalVector(const std::string & name, math::Vector4 value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyVector(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-
-		void Shader::SetGlobalUAV(const std::string & name, ID3D11UnorderedAccessView * value)
-		{
-			for (auto shader : s_loadedShaders)
-			{
-				if (shader->HasProperty(name))
-				{
-					shader->m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyUnorderedAccessView(value));
-					shader->m_properties[name]->SetName(name);
-				}
-			}
-		}
-
-		Shader * Shader::FindByName(const std::string & name)
-		{
-			for (Shader* shader : s_loadedShaders)
-			{
-				if (shader->GetName() == name)
-					return shader;
-			}
-			return nullptr;
-		}
-
-		Shader * Shader::FindByPath(const std::string& path)
-		{
-			for (Shader* shader : s_loadedShaders)
-			{
-				if (shader->m_path == path)
-					return shader;
-			}
-			return nullptr;
-		}
-
 		std::vector<std::string> Shader::GetMaterialProperties()
 		{
 			return m_materialProperties;
@@ -522,16 +395,6 @@ namespace thomas
 			return m_properties;
 		}
 
-		void Shader::Update()
-		{
-			if (s_shouldRecompile)
-			{
-				LOG("Recompiling Shaders...");
-				RecompileShaders();
-				s_shouldRecompile = false;
-			}
-				
-		}
 
 		void Shader::Recompile()
 		{
@@ -554,16 +417,14 @@ namespace thomas
 
 		}
 
-		void Shader::RecompileShaders()
+		bool Shader::hasPasses()
 		{
-			for (Shader* shader : s_loadedShaders)
-			{
-				shader->Recompile();
-			}
+			return m_passes.size();
 		}
+
 		void Shader::OnChanged()
 		{
-			Recompile();
+			graphics::Renderer::Instance()->getShaderList().QueueRecompile();
 		}
 		Shader::Semantics Shader::GetSemanticFromName(std::string semanticName)
 		{
@@ -625,6 +486,7 @@ namespace thomas
 			}
 			
 		}
+		
 		void Shader::AddProperty(ID3DX11EffectVariable * prop, uint32_t propIndex)
 		{
 			D3DX11_EFFECT_TYPE_DESC typeDesc;
@@ -671,6 +533,10 @@ namespace thomas
 			case D3D_SVC_VECTOR:
 				if(semantic == "COLOR")
 					newProperty = shaderproperty::ShaderPropertyColor::GetDefault();
+				else if (semantic == "UVTILING")
+				{
+					newProperty = new shaderproperty::ShaderPropertyVector(math::Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+				}
 				else
 					newProperty = shaderproperty::ShaderPropertyVector::GetDefault();
 				break;
@@ -757,11 +623,6 @@ namespace thomas
 			}
 			
 		}
-		void Shader::QueueRecompile()
-		{
-			s_shouldRecompile = true;
-		}
-
 
 		Shader::ShaderInclude::ShaderInclude(const char * shaderDir, const char * systemDir) : m_shaderDir(shaderDir), m_systemDir(systemDir)
 		{

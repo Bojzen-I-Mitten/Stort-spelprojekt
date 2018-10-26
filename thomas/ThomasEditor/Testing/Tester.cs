@@ -32,7 +32,7 @@ namespace ThomasEditor.Testing
             stopwatch = new Stopwatch();
             stopwatch.Start();
             //Application.currentProjectChanged += SceneDone;
-            Scene.OnCurrentSceneChanged += SceneDone;
+            ThomasWrapper.Thomas.SceneManagerRef.OnCurrentSceneChanged += SceneDone;
         }
 
         public void Parse(string[] args)

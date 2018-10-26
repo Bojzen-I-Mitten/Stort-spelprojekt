@@ -2,6 +2,7 @@
 #include "..\utils\Math.h"
 #include <vector>
 #include <memory>
+#include "render/ShaderList.h"
 
 namespace thomas
 {
@@ -18,6 +19,10 @@ namespace thomas
 
 	namespace graphics
 	{
+		namespace render {
+			class ShaderList;
+		}
+
 		class LightManager
 		{
 		public:
@@ -63,7 +68,7 @@ namespace thomas
 			static bool RemoveLight(object::component::LightComponent* light);
 			static void Update();
 
-			static void Bind();
+			static void Bind(render::ShaderList* shaders);
 		private:
 
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);

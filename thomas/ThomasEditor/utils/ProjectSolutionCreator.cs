@@ -169,7 +169,7 @@ namespace ThomasEditor.utils
                 {
                     Debug.Log("Build succeeded.");
                 }
-                ScriptingManger.ForceReload();
+                ScriptingManager.ReloadAssembly(true);
                 MainWindow._instance.hideBusyIndicator();
                 building = false;
                 return true;

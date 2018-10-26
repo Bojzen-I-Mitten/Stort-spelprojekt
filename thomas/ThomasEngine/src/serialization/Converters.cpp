@@ -42,31 +42,37 @@ namespace ThomasEngine
 		else
 			return Resource::typeid->IsAssignableFrom(objectType);
 	}
-
+	bool PrefabConverter::CanWrite::get()
+	{
+		if (m_skipWrite > 0)
+		{
+			m_skipWrite--;
+			return false;
+		}
+		return true;
+	}
+	PrefabConverter::PrefabConverter()
+		: m_skipWrite(0)
+	{
+	}
 	void PrefabConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
 		JObject^ jo = gcnew JObject();
 		GameObject^ gameObject = (GameObject^)value;
-
 		if (gameObject->prefabPath) {
 			jo->Add("prefabPath", Resources::ConvertToThomasPath(gameObject->prefabPath));
-			
 		}
 		else
 		{
-			for each(System::Reflection::PropertyInfo^ prop in value->GetType()->GetProperties())
-			{
-				if (prop->CanRead && prop->CanWrite && prop->SetMethod)
-				{
-					Object^ propVal = prop->GetValue(value, nullptr);
-					if (propVal != nullptr)
-					{
-						jo->Add(prop->Name, JToken::FromObject(propVal, serializer));
-					}
-				}
-			}
+			// Use default serialization (skip this converter to prevent looping calls)
+			m_skipWrite = 1;
+			jo = JObject::FromObject(value, serializer);
 		}
+
+
 		jo->WriteTo(writer);
+
+
 
 	}
 
@@ -81,6 +87,11 @@ namespace ThomasEngine
 			
 			String^ path = jo->Value<String^>("prefabPath");
 			return Resources::LoadPrefab(Resources::ConvertToRealPath(path));
+		}
+		else if (jo->ContainsKey("$ref"))
+		{
+			System::Object^ o = serializer->ReferenceResolver->ResolveReference(serializer, jo->Value<String^>("$ref"));
+			return o;
 		}
 		else
 		{
@@ -127,12 +138,29 @@ namespace ThomasEngine
 
 	bool ComponentConverter::CanConvert(System::Type ^ objectType)
 	{
-		return ThomasEngine::Component::typeid->IsAssignableFrom(objectType);
+		bool isInherited = ThomasEngine::Component::typeid->IsAssignableFrom(objectType);
+		return isInherited;
 	}
 
 	void ComponentConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
-		throw gcnew System::NotImplementedException();
+		JObject^ jo = gcnew JObject();
+		// Default serialization (if converter 'this' is disabled).
+		jo = JObject::FromObject(value, serializer);
+		// Custom serialization
+		for each(System::Reflection::PropertyInfo^ prop in value->GetType()->GetProperties())
+		{
+			if (prop->CanRead && prop->CanWrite && prop->SetMethod)
+			{
+				Object^ propVal = prop->GetValue(value, nullptr);
+				if (propVal != nullptr)
+				{
+					String^ info = prop->Name;
+					jo->Add(info, JToken::FromObject(propVal, serializer));
+				}
+			}
+		}
+		jo->WriteTo(writer);
 	}
 
 }

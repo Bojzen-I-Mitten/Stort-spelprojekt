@@ -92,10 +92,10 @@ namespace ThomasEditor.Inspectors
                     //PropertyItem pi = label.DataContext as PropertyItem;
                     if (resource.GetType() == elementType)
                     {
-                        Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
+                        Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         (pi.Value as IList)[index] = resource;
 
-                        Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+                        Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                     }
 
                 }
@@ -105,9 +105,9 @@ namespace ThomasEditor.Inspectors
                     ThomasEngine.Object obj = item.DataContext as ThomasEngine.Object;
                     if (obj.GetType() == elementType)
                     {
-                        Monitor.Enter(Scene.CurrentScene.GetGameObjectsLock());
+                        Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         (pi.Value as IList)[index] = obj;
-                        Monitor.Exit(Scene.CurrentScene.GetGameObjectsLock());
+                        Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                     }
                     else if (obj is GameObject && (obj as GameObject).inScene && typeof(ThomasEngine.Component).IsAssignableFrom(elementType))
                     {

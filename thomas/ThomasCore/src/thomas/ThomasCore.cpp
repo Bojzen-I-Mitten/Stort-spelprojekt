@@ -19,6 +19,8 @@
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 #include "utils/ThreadMap.h"
+
+#include "object/ObjectHandler.h"
 #include "object/component/LightComponent.h"
 #include "Physics.h"
 #include "graphics\ParticleSystem.h"
@@ -44,7 +46,7 @@ namespace thomas
 		resource::Texture2D::Init();
 		ThomasTime::Init();
 		Sound::Init();
-		resource::Shader::Init();
+		graphics::Renderer::Instance()->init();
 
 		resource::Material::Init();
 		Physics::Init();
@@ -54,6 +56,7 @@ namespace thomas
 		graphics::LightManager::Initialize();
 		graphics::ParticleSystem::InitializeGlobalSystems();
 
+		ObjectHandler::Init();
 		s_initialized = true;
 		return s_initialized;
 	}
@@ -67,7 +70,6 @@ namespace thomas
 			s_clearLog = false;
 		}
 
-		resource::Shader::Update();	
 		Sound::Update();
 	}
 
@@ -85,6 +87,8 @@ namespace thomas
 		profiler->WaitForDataAndUpdate();
 		WindowManager::Instance()->PresentAllWindows();
 		utils::D3D::Instance()->GetProfiler()->EndFrame();
+
+		graphics::Renderer::Instance()->PostRender();	// Sync. shaders ...?
 	}
 
 	void ThomasCore::Exit()
@@ -108,7 +112,7 @@ namespace thomas
 		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
 		graphics::ParticleSystem::DestroyGlobalSystems();
-		resource::Shader::DestroyAllShaders();
+		graphics::Renderer::Instance()->Destroy();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
 		editor::EditorCamera::Instance()->Destroy();
