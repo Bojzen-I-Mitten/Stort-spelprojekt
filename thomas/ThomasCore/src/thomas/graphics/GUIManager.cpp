@@ -53,11 +53,53 @@ namespace thomas
 			}
 		}
 
+		void GUIManager::NewRender()
+		{
+			if (m_spriteBatch != nullptr)
+			{
+				m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
+
+				for (auto element : m_GUIElements)
+				{
+					element.Draw(m_spriteBatch.get(), m_viewport, m_viewportScale);
+				}
+
+				m_spriteBatch->End();
+			}
+		}
+
 		void GUIManager::SetViewportScale(math::Viewport viewport)
 		{
 			m_viewport = Vector2(viewport.width, viewport.height);
 			m_viewportScale = m_viewport / Vector2(1920.f, 1080.f);	//1080p because it is our standard resolution. And textures are designed for that resolution.
 		}
+
+		GUIManager::GUIElement* GUIManager::AddGUIElement(const std::string& id, const std::string& text, const Vector2& position,
+			const Vector2& scale, float rotation, const Vector4& color, Font* font)
+		{
+			if (font == nullptr)
+			{
+				font = m_defaultFont.get();
+			}
+
+			Text newText = { font, text, position, scale, Vector2(0, 0), color, rotation };
+			//m_texts.insert(std::make_pair(id, newText));
+			m_GUIElements.push_back(newText);
+
+			return &newText;
+		}
+
+		void GUIManager::DeleteGUIElement(GUIElement* _element)
+		{
+			auto element = m_GUIElements.begin();
+
+			while (element._Ptr != _element && element != m_GUIElements.end())
+				element++;
+
+			if (element != m_GUIElements.end())
+				m_GUIElements.erase(element);
+		}
+
 
 		// Images
 		void GUIManager::AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
@@ -65,7 +107,7 @@ namespace thomas
 		{
 			if (texture->GetResourceView())
 			{
-				Image image = { texture, position, scale, Vector2(0,0), color, rotation, interact };
+				Image image { texture, interact , position, scale, Vector2(0,0), color, rotation};
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
@@ -167,7 +209,7 @@ namespace thomas
 								  image.position.y * m_viewport.y,
 								  image.position.y * m_viewport.y + image.texture->GetHeight() * image.scale.y * m_viewportScale.y};
 
-					if ((mousePos.x >= rect.left && mousePos.x <= rect.right) && (mousePos.y <= rect.down && mousePos.y >= rect.top))
+					if ((mousePos.x >= rect.left && mousePos.x <= rect.right) && (mousePos.y <= rect.down && mousePos.y >= rect.up))
 					{
 						return true;
 					}
@@ -194,15 +236,16 @@ namespace thomas
 		}
 
 		void GUIManager::AddText(const std::string& id, const std::string& text, const Vector2& position,
-								 const Vector2& scale, float rotation, const Vector4& color, Font* font)
+			const Vector2& scale, float rotation, const Vector4& color, Font* font)
 		{
 			if (font == nullptr)
 			{
 				font = m_defaultFont.get();
 			}
 
-			Text newText = { font, text, position, scale, Vector2(0,0), color, rotation };
-			m_texts.insert(std::make_pair(id, newText));
+			Text newText = { font, text, position, scale, Vector2(0, 0), color, rotation };
+			//m_texts.insert(std::make_pair(id, newText));
+			m_GUIElements.push_back(newText);
 		}
 
 		void GUIManager::SetText(const std::string& id, const std::string& newText)

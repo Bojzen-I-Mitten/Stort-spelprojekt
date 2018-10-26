@@ -24,40 +24,95 @@ namespace thomas
 		class GUIManager
 		{
 		public:
-			struct Image
+			struct GUIElement
 			{
-				Image() = default;
+				GUIElement() = default;
+				GUIElement(Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation) :
+					position(position), scale(scale), origin(origin), color(color), rotation(rotation) {}
 
-				Texture2D* texture;
 				Vector2 position;
 				Vector2 scale;
 				Vector2 origin;
 				Vector4 color;
 				float rotation;
+
+				virtual void Draw(SpriteBatch* sb, Vector2 vp, Vector2 vpScale) = 0;
+			};
+
+			struct Text : public GUIElement
+			{
+				Text() = default;
+				Text(Font* font, std::string text, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation) :
+					font(font), text(text), GUIElement(position, scale, origin, color, rotation) {}
+
+				Font* font;
+				std::string text;
+
+				void Draw(SpriteBatch* sb, Vector2 vp, Vector2 vpScale)
+				{
+					font->DrawGUIText(sb, text, position * vp, scale * vpScale, origin, color, rotation);
+				}
+
+				Vector2 GetTextSize()
+				{
+					font->GetTextSize(text);
+				}
+			};
+
+			struct Image : public GUIElement
+			{
+				Image() = default;
+				Image(Texture2D* texture, bool interact, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation) :
+					texture(texture), interact(interact), GUIElement(position, scale, origin, color, rotation) {}
+
+				Texture2D* texture;
 				bool interact;
+
+				void Draw(SpriteBatch* sb, Vector2 vp, Vector2 vpScale)
+				{
+					Vector2 size = Vector2(texture->GetWidth(), texture->GetHeight());
+					sb->Draw(texture->GetResourceView(), position * vp, nullptr, color, rotation, size, scale * vpScale);
+				}
+
+				bool OnClick(Vector2 vp, Vector2 vpScale)
+				{
+					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
+					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
+						return false;
+
+					return OnInteract(window, vp, vpScale);
+				}
+				bool OnHover(Vector2 vp, Vector2 vpScale)
+				{
+					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
+					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
+						return false;
+
+					return OnInteract(window, vp, vpScale);
+				}
+
+				bool OnInteract(thomas::Window* window, Vector2 vp, Vector2 vpScale)
+				{
+					Rect rect{ position.x * vp.x, position.x * vp.x + texture->GetWidth() * scale.x * vpScale.x,
+									 position.y * vp.y, position.y * vp.y + texture->GetHeight() * scale.y * vpScale.y };
+					return rect.Intersect(window->GetInput->GetMousePosition());
+				}
 			};
 
 			struct Rect
 			{
 				Rect() = default;
+				Rect(float left, float right, float up, float down) : left(left), right(right), up(up), down(down) {}
 
 				float left;
 				float right;
-				float top;
+				float up;
 				float down;
-			};
 
-			struct Text
-			{
-				Text() = default;
-
-				Font* font;
-				std::string text;
-				Vector2 position;
-				Vector2 scale;
-				Vector2 origin;
-				Vector4 color;
-				float rotation;
+				bool Intersect(Vector2 point)
+				{
+					return point.x > left && point.x < right && point.y > up && point.y < down;
+				}
 			};
 
 		public:
@@ -66,8 +121,12 @@ namespace thomas
 			void Destroy();
 			void Render();
 
+			void NewRender();
+
 		public:
 			void SetViewportScale(math::Viewport viewport);
+			GUIElement* AddGUIElement(const std::string & id, const std::string & text, const Vector2 & position, const Vector2 & scale, float rotation, const Vector4 & color, Font * font);
+			void DeleteGUIElement(GUIElement* element);
 
 			// Images
 			void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
@@ -101,6 +160,7 @@ namespace thomas
 			bool CheckImageIntersection(const std::string& id);
 
 		private:
+			std::vector<GUIElement> m_GUIElements;
 			std::map<std::string, Image> m_images;
 			std::map<std::string, Text> m_texts;
 			std::unique_ptr<CommonStates> m_spriteStates;
