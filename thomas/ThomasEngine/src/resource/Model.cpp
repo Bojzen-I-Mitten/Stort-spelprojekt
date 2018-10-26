@@ -40,12 +40,14 @@ namespace ThomasEngine
 
 	void Model::InitPrimitives()
 	{
-		LoadPrimitive(PrimitiveType::Cube, "../Data/primitives/cube.obj");
+		LoadPrimitive(PrimitiveType::Cube, "../Data/primitives/box.obj");
 		LoadPrimitive(PrimitiveType::Plane, "../Data/primitives/plane.obj");
 		LoadPrimitive(PrimitiveType::Cylinder, "../Data/primitives/cylinder.obj");
 		LoadPrimitive(PrimitiveType::Quad, "../Data/primitives/quad.obj");
 		LoadPrimitive(PrimitiveType::Sphere, "../Data/primitives/sphere.obj");
 		LoadPrimitive(PrimitiveType::Capsule, "../Data/primitives/capsule.obj");
+		LoadPrimitive(PrimitiveType::Monkey, "../Data/primitives/monkey.obj");
+		LoadPrimitive(PrimitiveType::Torus, "../Data/primitives/torus.obj");
 	}
 	Model ^ Model::LoadPrimitive(PrimitiveType type, String ^ path)
 	{

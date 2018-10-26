@@ -1,21 +1,20 @@
 #include "Application.h"
 #include "Scene.h"
 #include "Project.h"
+#include "system/SceneManager.h"
+#include "ThomasManaged.h"
+#include "system/SceneManager.h"
+
 void ThomasEngine::Application::currentProject::set(ThomasEngine::Project^ value)
 {
-	m_currentProject = nullptr;
-	if (Scene::CurrentScene) {
-		Scene::CurrentScene->UnLoad();
-	}
-	Scene::CurrentScene = nullptr;
-	currentProjectChanged(value);
 	m_currentProject = value;
-	Scene^ currentScene;
-	if (m_currentProject->currentScenePath)
-		currentScene = Scene::LoadScene(m_currentProject->assetPath + "\\" + m_currentProject->currentScenePath);
+	currentProjectChanged(value);
 
-	if (currentScene)
-		Scene::CurrentScene = currentScene;
+	// Load scene
+	if (m_currentProject->currentScenePath)
+		ThomasWrapper::Thomas->SceneManagerRef->LoadScene(m_currentProject->assetPath + "\\" + m_currentProject->currentScenePath);
 	else
-		Scene::CurrentScene = gcnew Scene("scene");
+		ThomasWrapper::Thomas->SceneManagerRef->SetEmpty();
+
+
 }

@@ -22,29 +22,50 @@ namespace thomas
 {
 	namespace graphics
 	{
-		Renderer Renderer::s_renderer;
-
 		void Renderer::BindFrame()
 		{
 			//Per frame
 			float realDeltaTime = ThomasTime::GetActualDeltaTime();
 			float dt = ThomasTime::GetDeltaTime();
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
-			resource::Shader::SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
+			m_shaders.SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
 
-			LightManager::Bind();
+			LightManager::Bind(&m_shaders);
 		}
 
 		constexpr uint32_t NUM_STRUCT = 200;
 		constexpr uint32_t NUM_MATRIX = 5000;
-		Renderer::Renderer()
-			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
+		Renderer::Renderer()	: 
+			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), 
+			m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)),
+			m_shaders()
 		{
 			
 		}
 
+		Renderer::~Renderer()
+		{
+			//m_shaders~ShaderList();	Implicit call
+		}
+
+		void Renderer::init()
+		{
+			// Do something?
+		}
+
+		void Renderer::PostRender()
+		{
+			m_shaders.SyncList();
+		}
+
+		void Renderer::Destroy()
+		{
+			m_shaders.Destroy();
+		}
+
 		Renderer* Renderer::Instance()
 		{
+			static Renderer s_renderer;
 			return &s_renderer;
 		}
 
@@ -64,11 +85,11 @@ namespace thomas
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
 			//Set global camera properties
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, frameData.projectionMatrix.Transpose());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW, frameData.viewMatrix.Transpose());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
-			resource::Shader::SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, frameData.projectionMatrix.Transpose());
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW, frameData.viewMatrix.Transpose());
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
+			m_shaders.SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
 		}
 
 		void Renderer::ClearCommands()
@@ -99,6 +120,17 @@ namespace thomas
 			m_frame->clear();
 		}
 
+		const render::ShaderList & Renderer::getShaderList()
+		{
+			return m_shaders;
+		}
+
+		resource::Shader * Renderer::GetStandardShader()
+		{
+			return m_shaders.GetStandardShader();
+		}
+
+
 		void Renderer::BindObject(render::RenderCommand &rC)
 		{
 			thomas::resource::shaderproperty::ShaderProperty* prop;
@@ -118,9 +150,6 @@ namespace thomas
 			
 			//Process commands
 			BindFrame();
-
-			//ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
-			//m_particleSystem->UpdateParticleSystem();
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
@@ -148,16 +177,19 @@ namespace thomas
 	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 
-			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
+			ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 			if (editor::EditorCamera::Instance())
 			{
 				BindCamera(editor::EditorCamera::Instance()->GetCamera());
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
 			for (object::component::Camera* cam : object::component::Camera::s_allCameras)
 			{
 				BindCamera(cam);
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_PARTICLES);
 			

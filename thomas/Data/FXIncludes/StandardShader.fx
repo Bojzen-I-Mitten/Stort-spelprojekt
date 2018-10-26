@@ -11,6 +11,7 @@ cbuffer MATERIAL_PROPERTIES
 {
     float4 color : COLOR;
     float smoothness : MATERIALSMOOTHNESSFACTOR;
+    float4 uvTiling : UVTILING; // (uv tiling x, uv tiling y, uv offset x, uv offset y)
 };
 
 
@@ -73,7 +74,7 @@ v2f vert(appdata_thomas v)
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
-    o.texcoord = v.texcoord;
+    o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
     return o;
 }
 

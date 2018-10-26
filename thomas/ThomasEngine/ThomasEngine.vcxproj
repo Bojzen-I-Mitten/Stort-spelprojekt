@@ -181,6 +181,7 @@
     <ClInclude Include="src\object\component\physics\Rigidbody.h" />
     <ClInclude Include="src\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
+    <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="src\script\animation\PlaybackNode.h" />
     <ClInclude Include="src\script\animation\WeightHandle.h" />
     <ClInclude Include="src\script\animation\constraint\LookAtConstraint.h" />
+    <ClInclude Include="src\system\SceneManager.h" />
     <ClInclude Include="src\ThomasSelection.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Utility.h" />
@@ -239,10 +241,8 @@
     <ClCompile Include="src\object\component\physics\Joint.cpp" />
     <ClCompile Include="src\object\component\physics\MeshCollider.cpp" />
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
-    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsManaged>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
-    </ClCompile>
+    <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
+    <ClCompile Include="src\object\GameObjectManager.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />
@@ -276,6 +276,7 @@
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
     <ClCompile Include="src\serialization\Converters.cpp" />
     <ClCompile Include="src\serialization\Serializer.cpp" />
+    <ClCompile Include="src\system\SceneManager.cpp" />
     <ClCompile Include="src\ThomasSelection.cpp" />
     <ClCompile Include="src\ThomasManaged.cpp" />
     <ClCompile Include="src\Time.cpp" />

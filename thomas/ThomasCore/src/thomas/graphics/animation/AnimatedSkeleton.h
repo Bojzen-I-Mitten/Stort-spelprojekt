@@ -71,6 +71,11 @@ namespace thomas {
 				std::vector<math::Matrix> _skin;				// Skin Transforms in model space, stored in a property ready for the GPU
 				std::unique_ptr<ConstraintList> m_constraint;	// Constraints applied in world space.
 			private:
+				/* Set all pose matrix arrays to bind pose 
+				*/
+				void setPose();
+				/* Update skeleton pose matrix arrays
+				*/
 				void updateSkeleton();
 				void clearConstraints();
 				void applyConstraint(uint32_t index, TransformComponents *frame_tmp);

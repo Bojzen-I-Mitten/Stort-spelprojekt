@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Component.h"
+#include "../../utils/Math.h"
+
 #include <memory>
 
 namespace thomas
 {
+	using namespace math;
+
 	namespace resource
 	{
 		class AudioClip;
@@ -21,11 +25,15 @@ namespace thomas
 				~SoundComponent() = default;
 
 				virtual void OnDisable() override;
+				void Apply3D(const Vector3& listenerPos, const Vector3& sourcePos);
 				void Play();
 				void PlayOneShot();
 				void Stop();
 				void Pause();
 				void Resume();
+				bool IsPlaying() const;
+				bool IsPaused() const;
+				bool HasStopped() const;
 
 			public:
 				void SetClip(resource::AudioClip* clip);		
