@@ -113,11 +113,10 @@ namespace ThomasEngine.Network
         
         public void SpawnPrefabEventHandler(SpawnPrefabEvent prefabEvent, NetPeer peer)
         {
-            Debug.LogWarning("spawnPrefabEvent!!!!!");
-            NetworkIdentity identity = null;
-            if (NetScene.NetworkObjects.ContainsKey(prefabEvent.NetID))
+            NetworkIdentity identity;
+
+            if (NetScene.NetworkObjects.TryGetValue(prefabEvent.NetID, out identity))
             {
-                identity = NetScene.NetworkObjects[prefabEvent.NetID];
                 if (identity.PrefabID != prefabEvent.PrefabID)
                 {
                     Debug.LogError("Object already exist with network ID: " + prefabEvent.NetID);
@@ -129,8 +128,6 @@ namespace ThomasEngine.Network
                 GameObject gameObject = GameObject.Instantiate(prefab, prefabEvent.Position, prefabEvent.Rotation);
                 identity = gameObject.GetComponent<NetworkIdentity>();
                 NetScene.AddObject(identity, prefabEvent.NetID);
-                //Ownership shit
-
             }else
             {
                 Debug.LogError("Failed to spawn prefab. It's not registered");
@@ -144,9 +141,9 @@ namespace ThomasEngine.Network
 
         public void DeletePrefabEventHandler(DeletePrefabEvent prefabEvent, NetPeer peer)
         {
-            NetworkIdentity identity = NetScene.NetworkObjects[prefabEvent.netID];
+            NetworkIdentity identity;
 
-            if (identity != null)
+            if (NetScene.NetworkObjects.TryGetValue(prefabEvent.netID, out identity))
             {
                 NetScene.RemoveObject(identity);
                 GameObject.Destroy(identity.gameObject);
