@@ -11,6 +11,15 @@ public class ChadHud : ScriptComponent
     public Font AnnouncementFont { get; set; }
     public Font Numbers { get; set; }
     public Texture2D AnnouncementBackground { get; set; }
+    public Texture2D CrosshairTexture { get; set; }
+    public Texture2D ChargeBarOutlineTexture { get; set; }
+    public Texture2D ChargeBarTexture { get; set; }
+
+    private readonly string Crosshair = "Crosshair";
+    private readonly string ChargeBarOutline = "ChargeBarOutline";
+    private readonly string ChargeBar = "ChargeBar";
+
+
     public override void Awake()
     {
         if (!Instance)
@@ -31,6 +40,12 @@ public class ChadHud : ScriptComponent
 
         cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(0.5f, 0.5f), Vector2.Zero, false);
         cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
+
+        cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
+        cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
+        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
+        cam.SetImageOrigin(ChargeBar, new Vector2(0, 1));
+        //cam.SetImageRotation(ChargeBar, 90);
 
     }
 
@@ -132,6 +147,35 @@ public class ChadHud : ScriptComponent
         StartCoroutine(AnnouncementAnimation(duration, winningTeam.Name, "Wins!!!", winningTeam.Color));
     }
     
+    public void ActivateCrosshair()
+    {
+        cam.SetImageScale(Crosshair, Vector2.One);
+        cam.SetImageColor(Crosshair, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
+
+    public void DeactivateCrosshair()
+    {
+        cam.SetImageScale(Crosshair, Vector2.Zero);
+    }
+
+    public void ActivateChargeBar()
+    {
+        cam.SetImageScale(ChargeBarOutline, Vector2.One);
+        //cam.SetImageScale(ChargeBar, new Vector2(1, 0.5f));
+        cam.SetImageColor(ChargeBar, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
+
+    public void DeactivateChargeBar()
+    {
+        cam.SetImageScale(ChargeBarOutline, Vector2.Zero);
+        cam.SetImageScale(ChargeBar, Vector2.Zero);
+    }
+
+    public void ChargeChargeBar(float charge)
+    {
+        cam.SetImageScale(ChargeBar, new Vector2(charge, 1));
+    }
+
     public override void Update()
     {
         int matchTimeLeft = MatchSystem.instance.MatchTimeLeft;
