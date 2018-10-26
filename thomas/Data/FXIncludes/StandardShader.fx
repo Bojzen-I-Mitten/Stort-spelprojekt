@@ -6,6 +6,7 @@
 Texture2D diffuseTex;
 Texture2D normalTex : NORMALTEXTURE;
 Texture2D specularTex;
+Texture2D maskTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
@@ -81,7 +82,9 @@ v2f vert(appdata_thomas v)
 float4 frag(v2f input) : SV_TARGET
 {
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
-    diffuse *= color.xyz;
+    //diffuse *= color.xyz;
+    diffuse += maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
+
     float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
     float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
     
@@ -89,8 +92,12 @@ float4 frag(v2f input) : SV_TARGET
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));
 
+    
     diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light
+    
+    
     diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
+
 
     return saturate(float4(diffuse, 1.0f));
 }
