@@ -175,12 +175,6 @@ namespace thomas
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
-				// Draw GUI for each camera that has enabled GUI rendering
-				// Shitty solution to camera destruction:
-				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
-
-				if (camera && camera->GetGUIRendering())
-					camera->GetGUIHandle()->Render();
 			}
 	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
@@ -212,6 +206,12 @@ namespace thomas
 			// Gui draw
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
+				// Draw GUI for each camera that has enabled GUI rendering
+				// Shitty solution to camera destruction:
+				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+
+				if (camera && camera->GetGUIRendering())
+					camera->GetGUIHandle()->Render();
 			}
 
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
