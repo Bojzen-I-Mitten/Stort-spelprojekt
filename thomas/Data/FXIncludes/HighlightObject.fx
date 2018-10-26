@@ -2,6 +2,10 @@
 
 #include <ThomasCG.hlsl>
 
+cbuffer MATERIAL_PROPERTIES
+{
+    float4 color : COLOR;
+};
 
 SamplerState StandardWrapSampler
 {
@@ -10,14 +14,14 @@ SamplerState StandardWrapSampler
     AddressV = Wrap;
 };
 
-DepthStencilState EnableDepth
+DepthStencilState DepthTestGreater
 {
     DepthEnable = TRUE;
     DepthWriteMask = ZERO;
     DepthFunc = GREATER;
 };
 
-RasterizerState TestRasterizer
+RasterizerState Rasterizer
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -25,18 +29,6 @@ RasterizerState TestRasterizer
     DepthClipEnable = FALSE;
 };
 
-BlendState AlphaBlendingOn
-{
-    BlendEnable[0] = TRUE;
-    SrcBlend = SRC_ALPHA;
-    DestBlend = INV_SRC_ALPHA;
-    BlendOp = ADD;
-    SrcBlendAlpha = ZERO;
-    DestBlendAlpha = ZERO;
-    BlendOpAlpha = ADD;
-    RenderTargetWriteMask[0] = 0x0F;
-
-};
 
 struct v2f
 {
@@ -56,7 +48,7 @@ v2f vert(appdata_thomas v)
 
 float4 frag(v2f input) : SV_TARGET
 {
-    return float4(1.0f, 0.0f, 0.0f, 1.0f);
+    return saturate(color);
 }
 
 technique11 Standard
@@ -66,9 +58,8 @@ technique11 Standard
 		VERT(vert());
         SetGeometryShader(NULL);
 		FRAG(frag());
-        SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(TestRasterizer);
-        //SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetDepthStencilState(DepthTestGreater, 0);
+        SetRasterizerState(Rasterizer);
     }
 
 }
