@@ -67,6 +67,16 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
+		[BrowsableAttribute(false)]
+		property Vector2 viewport
+		{
+			Vector2 get()
+			{
+				thomas::math::Viewport vp = ((thomas::object::component::Camera*)nativePtr)->GetViewport();
+				return Vector2(vp.width, vp.height);
+			}
+		}
+
 	public:
 
 		//GUI Images
@@ -85,6 +95,7 @@ namespace ThomasEngine
 		void SetImageScale(String^ id, Vector2 scale);
 		void SetImageRotation(String^ id, float rotation);
 		void SetImageInteract(String^ id, bool interact);
+		void SetImageOrigin(String^ id, Vector2 origin);
 		void DeleteImage(String^ id);
 
 		// GUI Text
@@ -105,6 +116,8 @@ namespace ThomasEngine
 		void SetTextScale(String^ id, Vector2 scale);
 		void SetTextRotation(String^ id, float rotation);
 		void SetTextFont(String^ id, Font^ font);
+		void SetTextOrigin(String^ id, Vector2 origin);
+		Vector2 GetTextSize(String^ id);
 		void DeleteText(String^ id);
 	};
 }

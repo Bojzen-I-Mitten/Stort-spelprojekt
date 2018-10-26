@@ -19,6 +19,7 @@ namespace ThomasEngine
 		virtual void FixedUpdate() override {};
 		virtual void OnDrawGizmosSelected() override {};
 		virtual void OnDrawGizmos() override {};
+		virtual void OnDestroy() override {};
 
 		virtual void OnCollisionEnter(Collider^ collider) override {};
 		virtual void OnCollisionStay(Collider^ collider) override {};

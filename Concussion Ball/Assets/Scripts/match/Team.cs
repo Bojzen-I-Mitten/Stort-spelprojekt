@@ -7,6 +7,7 @@ using ThomasEngine.Network;
 using LiteNetLib;
 using System.ComponentModel;
 
+[Newtonsoft.Json.JsonObject]
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class Team
 {
@@ -22,6 +23,8 @@ public class Team
     [Browsable(false)]
     public List<NetworkPlayer> Players { get; private set; }
    
+    //public int Score { get { return _Score; } }
+
     public Team(TEAM_TYPE type, string name, Color teamColor)
     {
         Color = teamColor;

@@ -3,6 +3,8 @@
 // Thomas
 #include "../utils/d3d.h"
 #include "../WindowManager.h"
+#include "../Common.h"
+#include "../ThomasCore.h"
 
 namespace thomas
 {
@@ -35,14 +37,15 @@ namespace thomas
 
 				for (const auto& image : m_images)
 				{
+					Vector2 size = Vector2(image.second.texture->GetWidth(), image.second.texture->GetHeight());
 					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position * m_viewport, nullptr, image.second.color,
-										image.second.rotation, Vector2(0.f, 0.f), image.second.scale * m_viewportScale);
+										image.second.rotation, image.second.origin * size, image.second.scale * m_viewportScale);
 				}
 
 				for (const auto& text : m_texts)
 				{
-					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position * m_viewport, text.second.scale * m_viewportScale, 
-												  text.second.color, text.second.rotation);
+					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position * m_viewport, text.second.scale * m_viewportScale,
+						text.second.origin, text.second.color, text.second.rotation);
 				}
 
 				// End
@@ -62,7 +65,7 @@ namespace thomas
 		{
 			if (texture->GetResourceView())
 			{
-				Image image = { texture, position, scale, color, rotation, interact };
+				Image image = { texture, position, scale, Vector2(0,0), color, rotation, interact };
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
@@ -103,6 +106,12 @@ namespace thomas
 			image.interact = interact;
 		}
 
+		void GUIManager::SetImageOrigin(const std::string& id, const Vector2& origin)
+		{
+			auto& image = GetImage(id);
+			image.origin = origin;
+		}
+
 		bool GUIManager::OnImageClicked(const std::string& id)
 		{
 			thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
@@ -131,10 +140,10 @@ namespace thomas
 		{
 			auto found = m_images.find(id);
 
-#ifdef _DEBUG
-			assert(found != m_images.end());
-#endif
-
+			if (found == m_images.end()) {
+				LOG("Image id does not exist");
+				return Image();
+			}
 			return found->second;
 		}
 
@@ -177,10 +186,10 @@ namespace thomas
 		{
 			auto found = m_texts.find(id);
 
-#ifdef _DEBUG
-			assert(found != m_texts.end());
-#endif
-
+			if (found == m_texts.end()) {
+				LOG("text id does not exist");
+				return Text();
+			}
 			return found->second;
 		}
 
@@ -192,7 +201,7 @@ namespace thomas
 				font = m_defaultFont.get();
 			}
 
-			Text newText = { font, text, position, scale, color, rotation };
+			Text newText = { font, text, position, scale, Vector2(0,0), color, rotation };
 			m_texts.insert(std::make_pair(id, newText));
 		}
 
@@ -230,6 +239,18 @@ namespace thomas
 			auto& text = GetText(id);
 			text.font = font;
 		}
+		void GUIManager::SetTextOrigin(const std::string& id, const Vector2& origin)
+		{
+			auto& text = GetText(id);
+			text.origin = origin;
+		}
+
+		Vector2 GUIManager::GetTextSize(const std::string& id)
+		{
+			auto& text = GetText(id);
+			return text.font->GetTextSize(text.text);
+		}
+
 		void  GUIManager::DeleteText(const std::string& id)
 		{
 			m_texts.erase(id);

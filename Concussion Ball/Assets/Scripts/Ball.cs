@@ -301,7 +301,7 @@ public class Ball : NetworkComponent
         {
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
             PickedUp = false;
-            transform.parent = null;
+            transform.SetParent(null, true);
         }
     }
 

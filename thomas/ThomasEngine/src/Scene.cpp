@@ -118,8 +118,8 @@ namespace ThomasEngine
 			for (int i = 0; i < scene->GameObjects->Count; ++i)
 				scene->GameObjects[i]->nativePtr->SetName(Utility::ConvertString(scene->GameObjects[i]->Name));
 
-			if (Application::currentProject)
-				scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
+			//if (Application::currentProject)
+			//	scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
 			scene->PostLoad();            
 			scene->m_uniqueID = unique_id;
 		}
