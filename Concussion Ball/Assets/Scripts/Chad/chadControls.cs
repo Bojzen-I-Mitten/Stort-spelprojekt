@@ -34,6 +34,9 @@ public class ChadControls : NetworkComponent
     public Transform hand { get; set; }
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
+
+    private uint ChargeAnimIndex = 0;
+    private uint ThrowAnimIndex = 1;
     #endregion
 
     #region Camera Settings etc.
@@ -77,6 +80,7 @@ public class ChadControls : NetworkComponent
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
+    IEnumerator Throwing = null;
 
     public PickupableObject PickedUpObject;
 
@@ -210,34 +214,36 @@ public class ChadControls : NetworkComponent
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
+                    Animations.SetAnimationWeight(ChargeAnimIndex, 1);
                 }
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
+                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
                 {
+                    Debug.Log("THEBOIS");
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
+                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
                 else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
                 {
-                    Debug.Log("Was aiming, but dived now we chading bois");
                     State = STATE.DIVING;
                     ResetCharge();
                     ResetCamera();
+                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
                 else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
                 {
                     
                 }
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
-                {
+                {   
                     ChargeObject();
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
-                    State = STATE.CHADING;
-                    ResetCharge();
-                    ThrowObject();
-                    ResetCamera();
+                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+                    Throwing = PlayThrowAnim();
+                    StartCoroutine(Throwing);
                 }
             }
             else if (PickedUpObject) // player is holding object that is not throwable
@@ -446,10 +452,18 @@ public class ChadControls : NetworkComponent
         ResetCamera();
     }
 
-    IEnumerator PauseChargeAnimation()
+    IEnumerator PlayThrowAnim()
     {
-        yield return new WaitForSeconds(0.5f);
-        // Animations.Animations[STATE.THROWING][0].Animation.Pause();
+        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+        ResetCharge();
+        ThrowObject();
+
+        yield return new WaitForSeconds(1.0f);
+
+        State = STATE.CHADING;
+        ResetCamera();
+        Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+        Throwing = null;
     }
 
     #endregion

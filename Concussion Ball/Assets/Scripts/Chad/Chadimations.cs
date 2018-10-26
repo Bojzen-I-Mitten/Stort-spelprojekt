@@ -64,9 +64,12 @@ public class Chadimations : NetworkComponent
                 foreach (var state in Animations)
                 {
                     BlendNode newBlendNode = new BlendNode(Skin.model);
-                    foreach (var node in state.Value)
+                    for(int i = 0; i < state.Value.Count; ++i)
                     {
-                        newBlendNode.appendNode(node.Animation, true);
+                        if(state.Key == ChadControls.STATE.THROWING && i == 1)
+                            newBlendNode.appendNode(state.Value[i].Animation, false);
+                        else
+                            newBlendNode.appendNode(state.Value[i].Animation, true);
                     }
                     BlendNodes.Add(state.Key, newBlendNode);
 
@@ -91,5 +94,10 @@ public class Chadimations : NetworkComponent
                 WeightHandles[State].setWeight(i, node.GetWeight(Direction));
             }
         }
+    }
+
+    public void SetAnimationWeight(uint index, float weight)
+    {
+        WeightHandles[State].setWeight(index, weight);
     }
 }
