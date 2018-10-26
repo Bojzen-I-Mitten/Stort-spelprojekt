@@ -56,9 +56,9 @@ public class GUISelectTeam : ScriptComponent
     {
         Camera.AddImage(Team1, SelectBox, new Vector2(0.13f, 0.23f), new Vector2(1.0f), true);
         Camera.SetImageColor(Team1, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color.ToVector4());
-        Camera.AddImage(Team2, SelectBox, new Vector2(0.23f, 0.23f), new Vector2(1.0f), true);
+        Camera.AddImage(Team2, SelectBox, new Vector2(0.25f, 0.23f), new Vector2(1.0f), true);
         Camera.SetImageColor(Team2, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color.ToVector4());
-        Camera.AddImage(Spectator, SelectBox, new Vector2(0.33f, 0.23f), new Vector2(1.0f), true);
+        Camera.AddImage(Spectator, SelectBox, new Vector2(0.4f, 0.23f), new Vector2(1.0f), true);
         Camera.SetImageColor(Spectator, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Color.ToVector4());
 
         Camera.AddText(Select, "Select team", new Vector2(0.21f, 0.11f), new Vector2(1.0f));
