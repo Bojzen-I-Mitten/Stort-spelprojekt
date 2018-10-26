@@ -611,7 +611,7 @@ namespace thomas
 				// Verify hash doesn't exist
 				if (m_property_indices.find(hash) != m_property_indices.end()) {
 					std::string err("Warning in ThomasCore::resource::Shader::AddProperty!! Multiple effect properties with identical name hash: " + name);
-					LOG(err);
+					//LOG(err);
 				}
 #endif
 				if (!HasProperty(name)) {

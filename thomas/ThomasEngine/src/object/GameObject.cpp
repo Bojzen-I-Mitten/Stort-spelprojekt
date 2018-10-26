@@ -199,6 +199,10 @@ namespace ThomasEngine {
 		}
 		Monitor::Exit(m_componentsLock);
 	}
+	bool GameObject::IsPrefab()
+	{
+		return prefabPath != nullptr && (inScene == false);
+	}
 	/* Delete component
 	*/
 	void deleteComp(GameObject^ obj, Component^ comp)
@@ -266,7 +270,7 @@ namespace ThomasEngine {
 		}
 		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
-		if (original->prefabPath != nullptr) {
+		if (original->IsPrefab()) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
 		}
 		else
@@ -286,7 +290,6 @@ namespace ThomasEngine {
 		if (clone) {
 			clone->transform->SetParent(nullptr, true);
 			clone->PostInstantiate(ThomasWrapper::CurrentScene);
-			clone->prefabPath = nullptr;
 		}
 			
 		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
@@ -400,7 +403,7 @@ namespace ThomasEngine {
 
 		for (int i = 0; i < gObjs->Count; i++) {
 			if (!gObjs[i]->inScene) {
-				if (!includePrefabs || !gObjs[i]->prefabPath) {
+				if (!includePrefabs || !gObjs[i]->IsPrefab()) {
 					gObjs->RemoveAt(i);
 					i--;
 				}
