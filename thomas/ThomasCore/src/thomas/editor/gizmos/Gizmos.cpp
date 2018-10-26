@@ -8,6 +8,8 @@
 #include "GizmoRenderCommand.h"
 #include "GizmoRenderBuffer.h"
 #include "../../ThomasCore.h"
+#include "../../graphics/Renderer.h"
+
 namespace thomas
 {
 	namespace editor
@@ -378,7 +380,7 @@ namespace thomas
 
 		void Gizmos::Init()
 		{
-			resource::Shader* shader = resource::Shader::CreateShader("../Data/FXIncludes/GizmoShader.fx");
+			resource::Shader* shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/GizmoShader.fx");
 			if (shader)
 			{
 				m_gizmoMaterial = new resource::Material(shader);

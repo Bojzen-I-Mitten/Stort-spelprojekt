@@ -78,6 +78,7 @@ namespace ThomasEngine
 		}
 
 	public:
+
 		//GUI Images
 		void AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact);
 		void AddImage(String^ id, Texture2D^ texture, Vector2 position, Vector4 color, bool interact);
@@ -94,6 +95,7 @@ namespace ThomasEngine
 		void SetImageScale(String^ id, Vector2 scale);
 		void SetImageRotation(String^ id, float rotation);
 		void SetImageInteract(String^ id, bool interact);
+		void DeleteImage(String^ id);
 
 		// GUI Text
 		void AddText(String^ id, String^ text, Vector2 position);
@@ -101,6 +103,7 @@ namespace ThomasEngine
 		void AddText(String^ id, String^ text, Vector2 position, float rotation);
 		void AddText(String^ id, String^ text, Vector2 position, Vector4 color);
 		void AddText(String^ id, String^ text, Vector2 position, Font^ font);
+		void AddText(String^ id, String^ text, Vector2 position, Vector2 scale, Font^ font);
 		void AddText(String^ id, String^ text, Vector2 position, Font^ font, Vector4 color);
 		void AddText(String^ id, String^ text, Vector2 position, Vector2 scale, float rotation, Vector4 color);
 		void AddText(String^ id, String^ text, Vector2 position, Vector2 scale, Font^ font, Vector4 color);
@@ -114,5 +117,6 @@ namespace ThomasEngine
 		void SetTextFont(String^ id, Font^ font);
 
 		Vector3 WorldToViewport(Vector3 position, Matrix world);
+		void DeleteText(String^ id);
 	};
 }

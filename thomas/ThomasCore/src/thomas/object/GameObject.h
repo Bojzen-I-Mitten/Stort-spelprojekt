@@ -1,28 +1,28 @@
 #pragma once
 #include "Object.h"
-#include "component\Component.h"
+#include "component\Components.h"
 #include <vector>
 #include <memory>
-#include "component/Transform.h"
 
 namespace thomas
 {
 	class Scene;
 	namespace object
 	{
-		namespace component {
-		}
 		class GameObject : public Object
 		{
 		private:
 			
 		public:
-			std::vector<component::Component*> m_components;
-			component::Transform* m_transform = nullptr;
-			bool m_activeSelf;
-
+			GameObject();
 			GameObject(std::string type);
 			~GameObject();
+
+			GameObject(GameObject&& move);
+			GameObject& operator=(GameObject&& move);
+
+			GameObject(const GameObject& move) = delete;
+			GameObject& operator=(const GameObject& move) = delete;
 
 			static GameObject* Find(std::string type);
 
@@ -45,21 +45,42 @@ namespace thomas
 			template<typename T>
 			static T* Instantiate(math::Vector3 position, math::Quaternion rotation, component::Transform* parent, Scene* scene);
 
+			bool GetActive();
+			void SetActive(bool active);
+
+			bool GetDynamic();
+			void SetDynamic();
+
+			bool GetStatic();
+			void SetStatic();
+
+			bool GetSelection();
+			void SetSelection(bool selected);
+
+			bool ChangeGroupID(UINT id);
+			UINT GetGroupID();
+			void SetGroupID(UINT id);
+			UINT GetNewGroupID();
+			void SetMoveStaticGroup(bool state);
+			bool GetMoveStaticGroup();
+
 			/* Remove the component referenced to in the pointer.
 			 comp_ptr	<<	Component to remove
 			 return		>>	0 if component was found and removed.
 			*/
 			int RemoveComponent(void * comp_ptr);
-
 		public:
-			
-			bool GetActive();
-			void SetActive(bool active);
-			void SetSelection(bool selected);
-			bool GetSelection();
+			std::vector<component::Component*> m_components;
+			component::Transform* m_transform = nullptr;
+			bool m_activeSelf;
+
 
 		private:
+			bool m_moveStaticGroup;
+			UINT new_GroupID;	// Tmp id while waiting for frame end.
 			bool m_selected;
+			bool m_static;
+			UINT m_GroupID; 
 			static std::vector<GameObject*> s_gameObjects;
 		};
 		
@@ -102,7 +123,7 @@ namespace thomas
 			}
 			return components;
 		}
-		
+
 		template<typename T>
 		T * GameObject::Instantiate(component::Transform * parent, Scene * scene)
 		{

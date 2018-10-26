@@ -48,7 +48,7 @@ namespace thomas
 
 			}
 
-			resource::Shader* shader = resource::Shader::CreateShader("../Data/FXIncludes/EditorGridShader.fx");
+			resource::Shader* shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/EditorGridShader.fx");
 			if (shader)
 			{
 				m_material = new resource::Material(shader);

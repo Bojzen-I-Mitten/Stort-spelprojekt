@@ -29,9 +29,9 @@ namespace ThomasEngine
 		float theta = Range(0.0f, MathHelper::Pi);
 		float phi = Range(0.0f, MathHelper::TwoPi);
 		Vector3 sphere;
-		sphere.x = sin(theta) * cos(phi);
-		sphere.y = sin(theta) * sin(phi);
-		sphere.z = cos(theta);
+		sphere.x = sinf(theta) * cosf(phi);
+		sphere.y = sinf(theta) * sinf(phi);
+		sphere.z = cosf(theta);
 		return sphere;
 	}
 
