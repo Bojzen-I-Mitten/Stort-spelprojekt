@@ -129,7 +129,7 @@ namespace DirectX
 			return q;
 		}
 
-		Vector3 SphericalCoordinate(float phi, float theta, float radius)//phi [0, 2*pi], theta [0, pi]
+		Vector3 SphericalCoordinate(float phi, float theta, float radius)
 		{
 			float xAngle = sin(theta) * cos(phi);
 			float yAngle = cos(theta);

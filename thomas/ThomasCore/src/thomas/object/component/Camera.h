@@ -7,7 +7,7 @@
 namespace thomas
 {
 	namespace utils { struct Ray; }
-	namespace graphics { class Skybox; class GUIManager; }
+	namespace graphics { class SkyBox; class GUIManager; }
 
 	namespace object
 	{
@@ -79,6 +79,7 @@ namespace thomas
 				void CopyFrameData();
 				CAMERA_FRAME_DATA& GetFrameData();
 
+				void DrawSkyBox();
 			private:
 				CAMERA_FRAME_DATA m_frameData;
 				math::Matrix m_projMatrix;
@@ -90,6 +91,7 @@ namespace thomas
 				math::Viewport m_viewport;
 				math::BoundingFrustum m_frustrum;
 				std::unique_ptr<graphics::GUIManager> m_GUIHandle;
+				std::unique_ptr<graphics::SkyBox> m_skybox;
 			};
 		}
 	}

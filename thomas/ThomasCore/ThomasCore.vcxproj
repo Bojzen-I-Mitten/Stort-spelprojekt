@@ -38,6 +38,7 @@
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\graphics\render\ShaderList.cpp" />
+    <ClCompile Include="src\thomas\graphics\Skybox.cpp" />
     <ClCompile Include="src\thomas\resource\Font.cpp" />
     <ClCompile Include="src\thomas\graphics\GUIManager.cpp" />
     <ClCompile Include="src\thomas\object\ObjectHandler.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="src\thomas\graphics\render\Frame.h" />
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
     <ClInclude Include="src\thomas\graphics\render\ShaderList.h" />
+    <ClInclude Include="src\thomas\graphics\Skybox.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\object\ObjectHandler.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />

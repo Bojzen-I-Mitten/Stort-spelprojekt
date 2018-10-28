@@ -155,6 +155,7 @@ namespace thomas
 			{
 				auto camera = perCameraQueue.first;
 				BindCamera(camera);
+				camera->DrawSkyBox();
 				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
 					auto material = perMaterialQueue.first;

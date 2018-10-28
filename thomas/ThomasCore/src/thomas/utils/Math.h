@@ -49,6 +49,7 @@ namespace DirectX
 			return v;
 		}
 
+		//phi [0, 2*pi], theta [0, pi]
 		Vector3 SphericalCoordinate(float phi, float theta, float radius = 1);
 
 		inline float DegreesToRadians(const float & degree)

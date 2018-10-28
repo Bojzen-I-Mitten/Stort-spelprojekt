@@ -9,6 +9,7 @@
 #include "../../AutoProfile.h"
 #include "../../graphics/GUIManager.h"
 #include "RenderComponent.h"
+#include "../../graphics/Skybox.h"
 
 namespace thomas
 {
@@ -31,6 +32,7 @@ namespace thomas
 				m_fov = 70.f;
 				m_near = 0.1f;
 				m_far = 10000.f;
+				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
 				m_targetDisplay = -1;
 				UpdateProjMatrix();
@@ -43,6 +45,7 @@ namespace thomas
 				m_fov = 70;
 				m_near = 0.5;
 				m_far = 10000;
+				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1,1);
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
@@ -322,6 +325,10 @@ namespace thomas
 			Camera::CAMERA_FRAME_DATA & Camera::GetFrameData()
 			{
 				return m_frameData;
+			}
+			void Camera::DrawSkyBox()
+			{
+				m_skybox->Draw();
 			}
 		}
 	}
