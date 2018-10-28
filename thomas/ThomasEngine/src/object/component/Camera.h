@@ -9,6 +9,7 @@ namespace thomas { namespace object { namespace component { class Camera; } } }
 
 namespace ThomasEngine
 {
+	ref class Texture2D;
 	[ExecuteInEditor]
 	public ref class Camera : public Component
 	{
@@ -67,6 +68,11 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
+		/*property Texture2D^ SkyMap
+		{
+			Texture2D^ get();
+			void set(Texture2D^ value);
+		}*/
 	public:
 
 		//GUI Images

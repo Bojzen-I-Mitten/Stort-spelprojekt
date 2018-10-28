@@ -80,7 +80,8 @@ namespace thomas
 				void CopyFrameData();
 				CAMERA_FRAME_DATA& GetFrameData();
 
-				void SetSkyMap(resource::Texture2D* tex);
+				/*void SetSkyMap(resource::Texture2D* tex);
+				resource::Texture2D* GetSkyMap();*/
 				void DrawSkyBox();
 			private:
 				CAMERA_FRAME_DATA m_frameData;

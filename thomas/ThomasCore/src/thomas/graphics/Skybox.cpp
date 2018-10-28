@@ -17,7 +17,9 @@ namespace thomas
 			m_vertBuffer = std::make_unique<utils::buffers::VertexBuffer>(m_sphereVerts);
 			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_sphereIndices);
 			
-			m_cubeMap = new resource::TextureCube("../Data/SkyBox.dds");
+			//m_cubeMap = new resource::TextureCube("../Data/SkyBox.dds");
+			m_cubeMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
+			//m_skyMap = new resource::Texture2D("../Data/SkyBox.dds");
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
@@ -26,13 +28,21 @@ namespace thomas
 
 		}
 
-		bool SkyBox::SetSkyMap(resource::Texture2D * tex)
+		/*bool SkyBox::SetSkyMap(resource::Texture2D * tex)
 		{
-			delete m_cubeMap;
-			m_cubeMap = new resource::TextureCube(tex);
-			
+			if (tex != m_skyMap)
+			{
+				delete m_cubeMap;
+				m_cubeMap = new resource::TextureCube(tex);
+				m_skyMap = tex;
+			}
 			return true;
 		}
+
+		resource::Texture2D * SkyBox::GetSkyMap()
+		{
+			return m_skyMap;
+		}*/
 
 		void SkyBox::GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius)
 		{
@@ -110,6 +120,7 @@ namespace thomas
 
 		void SkyBox::Draw()
 		{
+
 			m_shader->BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			m_shader->BindVertexBuffer(m_vertBuffer.get());
