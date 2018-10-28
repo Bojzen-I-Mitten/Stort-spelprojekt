@@ -2,22 +2,21 @@
 #include "..\utils\Math.h"
 #include <vector>
 #include <memory>
-#include "../utils/Buffers.h"
-#include "../resource/Shader.h"
 
 namespace thomas
 {
+	namespace utils { namespace buffers { class VertexBuffer; class IndexBuffer; } }
+	namespace resource { class TextureCube; class Texture2D; class Shader; }
 	namespace graphics
 	{
 		class SkyBox
 		{
 		private:
-
 			void GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius);
 		public:
 			SkyBox();
 			~SkyBox();
-
+			bool SetSkyMap(resource::Texture2D* tex);
 			void Draw();
 		private:
 			unsigned m_nrOfSphereVertices;
@@ -28,6 +27,7 @@ namespace thomas
 			std::unique_ptr<utils::buffers::VertexBuffer> m_vertBuffer;
 			std::unique_ptr<utils::buffers::IndexBuffer> m_indexBuffer;
 
+			resource::TextureCube* m_cubeMap;
 			resource::Shader* m_shader;
 			
 			

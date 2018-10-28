@@ -241,7 +241,7 @@ namespace thomas
 		{
 			m_particleShader->BindPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			
-			m_particleShader->SetPropertyTexture2D("textures", m_texArr);
+			m_particleShader->SetPropertyTexture2DArray("textures", m_texArr);
 			m_particleShader->SetPropertyResource("billboards", m_bufferBillboard->GetSRV());
 			
 			m_particleShader->Bind();

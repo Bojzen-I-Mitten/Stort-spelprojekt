@@ -2,11 +2,15 @@
 
 #include <ThomasCG.hlsl>
 
+TextureCube textures;
+
 SamplerState StandardWrapSampler
 {
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
+    AddressW = Wrap;
+    
 };
 
 DepthStencilState DepthWriteAll
@@ -39,25 +43,27 @@ BlendState AlphaBlendstate
 struct v2f
 {
     float4 vertex : SV_POSITION;
-    float2 texcoord : TEXCOORD0;
+    float3 texcoord : TEXCOORD0;
 };
 
 v2f vert(appdata_thomas v)
 {
     v2f output = (v2f) 0;
 
-    output.vertex = ThomasObjectToClipPos(v.vertex).xyww;
-    
-    output.texcoord = v.texcoord;
+    float3 campos = _WorldSpaceCameraPos;
+    float3 pos = v.vertex + campos;
+
+    output.vertex = ThomasObjectToClipPos(pos).xyww;//keep vertex at same distance from camera
+    float3 dir = normalize(pos - campos);
+
+    output.texcoord = dir;
     return output;
 }
 
 
 float4 frag(v2f input) : SV_Target
 {
-    //return SkyMap.Sample(ObjSamplerState, input.texCoord);
-    return float4(1.0f,0.0f,0.0,1.0f);
-
+    return textures.Sample(StandardWrapSampler, input.texcoord);
 }
 
 technique11 Skybox

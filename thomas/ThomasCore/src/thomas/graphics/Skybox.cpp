@@ -1,5 +1,10 @@
 #include "Skybox.h"
 #include "Renderer.h"
+#include "../utils/d3d.h"
+#include "../utils/Buffers.h"
+#include "../resource/texture/Texture2D.h"
+#include "../resource/texture/TextureCube.h"
+#include "../resource/Shader.h"
 
 namespace thomas
 {
@@ -8,16 +13,25 @@ namespace thomas
 		SkyBox::SkyBox()
 		{
 
-			GenerateSphere(5, 10, 500.0f);
+			GenerateSphere(10, 10, 5.0f);
 			m_vertBuffer = std::make_unique<utils::buffers::VertexBuffer>(m_sphereVerts);
 			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_sphereIndices);
 			
+			m_cubeMap = new resource::TextureCube("../Data/SkyBox.dds");
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
 		SkyBox::~SkyBox()
 		{
 
+		}
+
+		bool SkyBox::SetSkyMap(resource::Texture2D * tex)
+		{
+			delete m_cubeMap;
+			m_cubeMap = new resource::TextureCube(tex);
+			
+			return true;
 		}
 
 		void SkyBox::GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius)
@@ -100,6 +114,8 @@ namespace thomas
 
 			m_shader->BindVertexBuffer(m_vertBuffer.get());
 			m_shader->BindIndexBuffer(m_indexBuffer.get());
+
+			m_shader->SetPropertyTextureCube("textures", m_cubeMap);
 
 			m_shader->Bind();
 			m_shader->SetPass(0);

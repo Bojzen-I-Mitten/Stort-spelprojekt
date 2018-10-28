@@ -12,7 +12,7 @@ namespace thomas
 		{
 		private:
 			void LoadTextureFromFile(std::string path);
-		
+			void LoadTextureCubeFromFile(std::string path);
 		public:
 			static void Init();
 			static void Destroy();
@@ -40,7 +40,6 @@ namespace thomas
 			static Texture2D* s_blackTexture;
 			static Texture2D* s_whiteTexture;
 			static Texture2D* s_normalTexture;
-
 		};
 	}
 }

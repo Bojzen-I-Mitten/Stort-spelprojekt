@@ -1,7 +1,6 @@
 #include "Camera.h"
 #include "../../WindowManager.h"
 #include "../GameObject.h"
-#include "../../graphics/Skybox.h"
 #include "Transform.h"
 #include "../../graphics/Renderer.h"
 #include "../../Input.h"
@@ -9,6 +8,7 @@
 #include "../../AutoProfile.h"
 #include "../../graphics/GUIManager.h"
 #include "RenderComponent.h"
+#include "../../resource/texture/Texture2D.h"
 #include "../../graphics/Skybox.h"
 
 namespace thomas
@@ -326,6 +326,13 @@ namespace thomas
 			{
 				return m_frameData;
 			}
+
+
+			void Camera::SetSkyMap(resource::Texture2D * tex)
+			{
+				m_skybox->SetSkyMap(tex);
+			}
+
 			void Camera::DrawSkyBox()
 			{
 				m_skybox->Draw();

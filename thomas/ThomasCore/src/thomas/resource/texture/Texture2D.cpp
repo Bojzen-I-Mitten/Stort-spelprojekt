@@ -52,6 +52,8 @@ namespace thomas
 			}
 		}
 
+		
+
 		Texture2D::Texture2D(int width, int height, bool mipMap) : Texture2D(nullptr, width, height, mipMap)
 		{
 			
