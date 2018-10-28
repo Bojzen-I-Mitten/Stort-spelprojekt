@@ -68,7 +68,7 @@ namespace ThomasEngine {
 		if (ThomasCore::Initialized())
 		{
 			Model::InitPrimitives();
-			Resources::LoadAll(Application::editorAssets);
+			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
@@ -76,10 +76,10 @@ namespace ThomasEngine {
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
 #ifdef _EDITOR
-			if (true)
-			{
+
+				Resources::LoadAll(Application::editorAssets);
 				ScriptingManager::Init();
-			}
+			
 #endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
@@ -90,6 +90,7 @@ namespace ThomasEngine {
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
+
 		}
 	}
 

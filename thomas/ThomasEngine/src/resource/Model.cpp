@@ -46,6 +46,8 @@ namespace ThomasEngine
 		LoadPrimitive(PrimitiveType::Quad, "../Data/primitives/quad.obj");
 		LoadPrimitive(PrimitiveType::Sphere, "../Data/primitives/sphere.obj");
 		LoadPrimitive(PrimitiveType::Capsule, "../Data/primitives/capsule.obj");
+		LoadPrimitive(PrimitiveType::Monkey, "../Data/primitives/monkey.obj");
+		LoadPrimitive(PrimitiveType::Torus, "../Data/primitives/torus.obj");
 	}
 	Model ^ Model::LoadPrimitive(PrimitiveType type, String ^ path)
 	{

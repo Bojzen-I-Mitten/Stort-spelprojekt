@@ -56,18 +56,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\GUIJoinHost.cs" />
-    <Compile Include="Assets\GUISelectTeam.cs" />
-    <Compile Include="Assets\DissolveTest.cs" />
-    <Compile Include="Assets\CameraMove.cs" />
-    <Compile Include="Assets\RpcTest.cs" />
-    <Compile Include="Assets\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
     <Compile Include="Assets\Scripts\Ball.cs" />
+    <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\chadControls.cs" />
+    <Compile Include="Assets\Scripts\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Chadimations.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
+    <Compile Include="Assets\Scripts\DissolveTest.cs" />
+    <Compile Include="Assets\Scripts\GUIJoinHost.cs" />
+    <Compile Include="Assets\Scripts\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\GUITest.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
@@ -76,7 +75,9 @@
     <Compile Include="Assets\Scripts\match\Team.cs" />
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
+    <Compile Include="Assets\Scripts\ParticleComponentTest.cs" />
     <Compile Include="Assets\Scripts\Ragdoll.cs" />
+    <Compile Include="Assets\Scripts\RpcTest.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
@@ -85,6 +86,8 @@
     <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\Scripts\GUI\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

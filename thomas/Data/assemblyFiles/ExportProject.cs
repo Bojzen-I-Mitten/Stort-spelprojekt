@@ -10,10 +10,18 @@ namespace ThomasStandalone
         {
             Debug.OnDebugMessage += Debug_OnDebugMessage;
 
+           
             ThomasWrapper.Start(false);
+
+            float startTime = Time.ElapsedTime;
+            
+            
             Application.currentProject = Project.LoadProject("..\\Data\\project.thomas");
             ThomasWrapper.Play();
-            new Win32Window().create("Thomas standalone", 800, 600);
+
+            Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
+
+            new Win32Window().create(System.AppDomain.CurrentDomain.FriendlyName, 800, 600);
             ThomasWrapper.Exit();
         }
 
@@ -36,6 +44,10 @@ namespace ThomasStandalone
             }
             //System.Console.ForegroundColor = System.ConsoleColor.Black;
             System.Console.Out.WriteLine(newMessage.Message);
+            foreach(string line in newMessage.StackTrace)
+            {
+               // System.Console.Out.WriteLine(line);
+            }
             
             System.Console.ResetColor();
         }
@@ -165,7 +177,7 @@ namespace ThomasStandalone
             //This version worked and resulted in a non-zero hWnd
             IntPtr hWnd = CreateWindowEx(0,
                 regResult,
-                "Thomas standalone",
+                name,
                 WS_OVERLAPPEDWINDOW,
                 0,
                 0,

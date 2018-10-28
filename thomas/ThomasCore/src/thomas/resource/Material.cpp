@@ -45,7 +45,7 @@ namespace thomas
 
 		void Material::Destroy()
 		{
-			delete s_standardMaterial;
+			//delete s_standardMaterial;
 		}
 
 		Material * Material::GetStandardMaterial()

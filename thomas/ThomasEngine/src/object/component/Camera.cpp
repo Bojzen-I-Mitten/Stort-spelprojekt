@@ -119,6 +119,11 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetImageInteract(Utility::ConvertString(id), interact);
 	}
 
+	void Camera::SetImageOrigin(String ^ id, Vector2 origin)
+	{
+		camera->GetGUIHandle()->SetImageOrigin(Utility::ConvertString(id), Utility::Convert(origin));
+	}
+
 	void Camera::DeleteImage(String ^ id)
 	{
 		camera->GetGUIHandle()->DeleteImage(Utility::ConvertString(id));
@@ -218,6 +223,14 @@ namespace ThomasEngine
 	void Camera::SetTextFont(String^ id, Font^ font)
 	{
 		camera->GetGUIHandle()->SetFont(Utility::ConvertString(id), (thomas::resource::Font*)font->m_nativePtr);
+	}
+	void Camera::SetTextOrigin(String ^ id, Vector2 origin)
+	{
+		camera->GetGUIHandle()->SetTextOrigin(Utility::ConvertString(id), Utility::Convert(origin));
+	}
+	Vector2 Camera::GetTextSize(String ^ id)
+	{
+		return Utility::Convert(camera->GetGUIHandle()->GetTextSize(Utility::ConvertString(id)));
 	}
 
 	void Camera::DeleteText(String^ id)
