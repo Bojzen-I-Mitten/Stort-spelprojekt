@@ -2,6 +2,7 @@
 #include "../../utils/d3d.h"
 #include "../../Common.h"
 
+#include "../../ThomasCore.h"
 namespace thomas
 {
 	namespace resource
@@ -25,8 +26,7 @@ namespace thomas
 			}
 			else
 			{
-
-				//LOG("Invalid texture");
+				LOG("Invalid skymap texture at path:" + path);
 			}
 		}
 	}

@@ -17,8 +17,8 @@ namespace thomas
 			m_vertBuffer = std::make_unique<utils::buffers::VertexBuffer>(m_sphereVerts);
 			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_sphereIndices);
 			
-			//m_cubeMap = new resource::TextureCube("../Data/SkyBox.dds");
-			m_skyMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
+			m_skyMap = new resource::TextureCube("../Data/yokohama_skybox.dds");
+			//m_skyMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
@@ -36,8 +36,7 @@ namespace thomas
 
 		bool SkyBox::SetSkyMap(resource::TextureCube * tex)
 		{
-				//delete m_cubeMap;
-				//m_cubeMap = new resource::TextureCube(tex);
+
 			m_skyMap = tex;
 			
 			return true;

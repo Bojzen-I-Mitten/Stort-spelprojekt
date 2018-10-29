@@ -9,6 +9,7 @@ namespace thomas
 		class TextureCube : public Texture
 		{
 		private:
+			
 			void LoadTextureCubeFromFile(std::string path);
 		public:
 			TextureCube(std::string path);
