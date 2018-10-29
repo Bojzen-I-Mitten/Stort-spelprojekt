@@ -11,6 +11,13 @@ public class ChadHud : ScriptComponent
     public Font AnnouncementFont { get; set; }
     public Font Numbers { get; set; }
     public Texture2D AnnouncementBackground { get; set; }
+    public Texture2D ScoreboardBackground { get; set; }
+    public Texture2D ScoreBackground { get; set; }
+    private string ScoreboardID = "ScoreBoard";
+    private string RedPointsID = "RedPoints";
+    private string BluePointsID = "BluePoints";
+    private string RedPointsBG = "RedPoints";
+    private string BluePointsBG = "BluePoints";
     public override void Awake()
     {
         if (!Instance)
@@ -21,17 +28,37 @@ public class ChadHud : ScriptComponent
             return;
         }
         cam = gameObject.GetComponent<Camera>();
-        cam.AddText("MatchTime", "00:00", new Vector2(0.5f, 0.02f), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
         cam.AddText("AnnouncementText", "", new Vector2(0.5f, 0.5f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
         cam.SetTextFont("AnnouncementText", AnnouncementFont);
         cam.AddText("AnnouncementText2", "", new Vector2(0.5f, 0.5f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
-        cam.SetTextOrigin("MatchTime", new Vector2(0.5f));
         cam.SetTextOrigin("AnnouncementText", new Vector2(0.5f));
         cam.SetTextOrigin("AnnouncementText2", new Vector2(0.5f));
 
         cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(0.5f, 0.5f), Vector2.Zero, false);
         cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
 
+        cam.AddImage(ScoreboardID, ScoreboardBackground, new Vector2(0.5f, 0), false);
+        cam.SetImageOrigin(ScoreboardID, new Vector2(0.5f, 0));
+        //Color BGcolor = Color.Lerp(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color, 0.5f);
+        cam.SetImageColor(ScoreboardID, new Vector4(0.5f, 0, 0.5f, 1));
+        cam.SetImageScale(ScoreboardID, new Vector2(0.5f, 0.75f));
+
+        cam.AddText("MatchTime", "00:00", new Vector2(0.49625f, 0.0435f), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
+        cam.SetTextScale("MatchTime", new Vector2(2));
+        cam.SetTextOrigin("MatchTime", new Vector2(0.5f));
+
+        cam.AddImage(RedPointsBG, ScoreBackground, new Vector2(0.41f, 0), false);
+        cam.AddImage(BluePointsBG, ScoreBackground, new Vector2(0.55f, 0), false);
+        cam.SetImageColor(RedPointsBG, new Vector4(1, 0, 0, 1));
+        cam.SetImageColor(BluePointsBG, new Vector4(0, 0, 1, 1));
+
+        cam.AddText(RedPointsID, "0", new Vector2(0.435f, 0.035f), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
+        cam.AddText(BluePointsID, "0", new Vector2(0.56f, 0.035f), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
+        cam.SetTextScale(RedPointsID, new Vector2(2));
+        cam.SetTextScale(BluePointsID, new Vector2(2));
+        cam.SetTextOrigin(RedPointsID, new Vector2(0.5f));
+        cam.SetTextOrigin(BluePointsID, new Vector2(0.5f));
+        
     }
 
     public override void OnDestroy()
@@ -125,6 +152,7 @@ public class ChadHud : ScriptComponent
     public void OnGoal(Team team, float duration)
     {
         StartCoroutine(AnnouncementAnimation(duration, team.Name, "Scored!!!", team.Color));
+        team.AddScore();
     }
 
     public void OnMatchEnd(Team winningTeam, float duration)
