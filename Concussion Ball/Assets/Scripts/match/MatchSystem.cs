@@ -45,6 +45,7 @@ public class MatchSystem : NetworkManager
         }
     }
 
+    public PowerupManager PowerupManager;
     public static new MatchSystem instance
     {
         get { return NetworkManager.instance as MatchSystem; }
@@ -71,6 +72,9 @@ public class MatchSystem : NetworkManager
         base.Start();
         if(BallPrefab)
             SpawnablePrefabs.Add(BallPrefab);
+
+        PowerupManager = gameObject.GetComponent<PowerupManager>();
+        //StartCoroutine(ResetCoroutine(10));
     }
     
     public override void Update()
@@ -148,12 +152,13 @@ public class MatchSystem : NetworkManager
     {
         ResetPlayers();
         Ball.GetComponent<Ball>().Reset();
-
+        PowerupManager.ResetPowerups();
         LocalChad.Locked = true;
         ChadHud.Instance.StartCountdown(duration);
         yield return new WaitForSecondsRealtime(duration);
         LocalChad.Locked = false;
 
+        hasScored = false;
     }
 
     IEnumerator OnGoalCoroutine(Team teamThatScored)
@@ -171,12 +176,13 @@ public class MatchSystem : NetworkManager
 
     #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal)
+    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID)
     {
         Debug.Log("matchInfo!");
         if (!MatchStarted)
         {
             MatchStarted = true;
+            PowerupManager.NextPowerupID = powerupID;
             GoldenGoal = goldenGoal;
             MatchStartTime = startTime;
             Debug.Log(startTime);
@@ -292,7 +298,7 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log(MatchStarted);
             if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal);
+                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID);
         }
     }
 

@@ -15,6 +15,7 @@ namespace thomas
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
 			m_kinematic(false),
+			m_useGravity(true),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f),
@@ -200,6 +201,12 @@ namespace thomas
 				}	
 			}
 
+			void Rigidbody::UseGravity(bool value)
+			{
+				m_useGravity = value;
+				m_dirty = true;
+			}
+
 			void Rigidbody::SetCollider(Collider * collider)
 			{
 				m_collider = collider;
@@ -298,6 +305,11 @@ namespace thomas
 				return m_kinematic;
 			}
 
+			bool Rigidbody::UsesGravity() const
+			{
+				return m_useGravity;
+			}
+
 			math::Vector3 Rigidbody::GetFreezePosition() const
 			{
 				return m_freezePosition;
@@ -388,6 +400,7 @@ namespace thomas
 				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 				this->setDamping(m_damping, m_angularDaming);
 				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				this->setGravity(Physics::s_world->getGravity() * m_useGravity);
 				this->activate(true);
 				
 				m_dirty = false;

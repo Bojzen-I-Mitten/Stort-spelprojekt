@@ -81,8 +81,25 @@ public class ChadControls : NetworkComponent
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
+    public bool Locked = false;
 
     public PickupableObject PickedUpObject;
+=========
+    public bool Locked = false;
+
+    //Camera test;
+    private Ball _Ball;
+    private Ball Ball
+    {
+        get
+        {
+            if (!_Ball)
+                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+            return _Ball;
+        }
+    }
+    // private bool canPickupBall = true;
+>>>>>>>>> Temporary merge branch 2:Concussion Ball/Assets/Scripts/chadControls.cs
 
     public override void Start()
     {
@@ -170,6 +187,8 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
+        if (PickedUpObject && PickedUpObject.DropOnRagdoll)
+            PickedUpObject.Drop();
         if(State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
@@ -270,10 +289,10 @@ public class ChadControls : NetworkComponent
                     StartCoroutine(Throwing);
                 }
             }
-            else if (PickedUpObject) // player is holding object that is not throwable
+            else if (PickedUpObject && !PickedUpObject.m_throwable) // player is holding object that is not throwable
             {
                 if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-                    PickedUpObject.OnActivate();
+                    PickedUpObject.Activate();
             }
 
             float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
@@ -402,6 +421,8 @@ public class ChadControls : NetworkComponent
 
     private void StateMachine()
     {
+        float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
+        float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
         switch (State)
         {
             case STATE.CHADING:
@@ -414,21 +435,21 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
-                CurrentVelocity.x = Direction.x * BaseSpeed;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
-                CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -BaseSpeed, MaxSpeed);
+                CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.THROWING:
-                CurrentVelocity.y = Direction.z * BaseSpeed;
-                CurrentVelocity.x = Direction.x * BaseSpeed;
+                CurrentVelocity.y = Direction.z * modifiedBaseSpeed;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
-                CurrentVelocity.y = MaxSpeed;
+                CurrentVelocity.y = modifiedMaxSpeed;
                 transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
@@ -565,7 +586,7 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
-            if (pickupable)
+            if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {

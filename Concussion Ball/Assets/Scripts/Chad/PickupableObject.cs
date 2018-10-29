@@ -9,6 +9,10 @@ public class PickupableObject : NetworkComponent
 {
     public Rigidbody m_rigidBody;
 
+    public Transform PickupOffset { get; set; } = null;
+    public float MovementSpeedModifier { get; set; } = 1.0f;
+    public bool DropOnRagdoll { get; set; } = true;
+
     public bool m_throwable = false;
     public bool m_pickupable = true;
 
@@ -17,7 +21,7 @@ public class PickupableObject : NetworkComponent
 
     private ChadControls _Chad;
     private RenderComponent m_renderComponent;
-    private bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
+    protected bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
 
     public override void Start()
     {
@@ -46,15 +50,22 @@ public class PickupableObject : NetworkComponent
     {
         if (m_pickedUp)
         {
+            Vector3 pos = transform.position;
             Drop();
-            transform.position = transform.position + Vector3.Normalize(force) * 2;
+            StartCoroutine(ThrowRoutine());
+            transform.position = pos;
+            transform.LookAt(transform.position + Vector3.Normalize(force));
             m_rigidBody.AddForce(force, Rigidbody.ForceMode.Impulse);
         }
     }
 
-    virtual public void OnActivate()
+    public IEnumerator ThrowRoutine()
     {
+        gameObject.GetComponent<Collider>().isTrigger = true;
+        yield return new WaitForSeconds(0.1f);
+        gameObject.GetComponent<Collider>().isTrigger = false;
     }
+
 
     virtual public void StopEmitting()
     {
@@ -87,7 +98,18 @@ public class PickupableObject : NetworkComponent
         }
     }
 
-    public void Pickup(ChadControls chad, Transform hand)
+    //Never call this method without also calling RPC.
+    virtual public void OnActivate()
+    {
+    }
+
+    public void Activate()
+    {
+        OnActivate();
+        SendRPC("OnActivate");
+    }
+
+    virtual public void Pickup(ChadControls chad, Transform hand)
     {
         if(m_pickupable)
         {
@@ -99,6 +121,14 @@ public class PickupableObject : NetworkComponent
             m_rigidBody.enabled = false;
             transform.parent = hand;
             transform.localPosition = Vector3.Zero;
+            transform.localRotation = Quaternion.Identity;
+            if (PickupOffset)
+            {
+                transform.localPosition = PickupOffset.localPosition;
+                transform.localRotation = PickupOffset.localRotation;
+            }
+
+            
             chad.PickedUpObject = this;
             _Chad = chad;
         }

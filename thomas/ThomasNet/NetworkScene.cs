@@ -12,7 +12,7 @@ namespace ThomasEngine.Network
         public NetworkScene()
         {
         }
-        int nextAssignableID = 0;
+        public int nextAssignableID = 0;
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
         public Dictionary<NetPeer, List<NetworkIdentity>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentity>>();
@@ -82,7 +82,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
-                    id.gameObject.Destroy();
+                    Object.Destroy(id.gameObject);
                 Players.Remove(peer);
             }
 
@@ -97,7 +97,7 @@ namespace ThomasEngine.Network
         {
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
             {
-                NetworkObjects.Add(nextAssignableID++, identity);
+                NetworkObjects.Add(++nextAssignableID, identity);
                 identity.gameObject.SetActive(false);
 
             });
@@ -107,6 +107,14 @@ namespace ThomasEngine.Network
         {
             NetworkObjects.Add(++nextAssignableID, identity);
             return nextAssignableID;
+        }
+
+        public void RemoveObject(NetworkIdentity identity)
+        {
+            NetPeer previousOwner = FindOwnerOf(identity);
+            NetworkObjects.Remove(identity.ID);
+            if(previousOwner != null)
+                ObjectOwners[previousOwner].Remove(identity);
         }
 
 
