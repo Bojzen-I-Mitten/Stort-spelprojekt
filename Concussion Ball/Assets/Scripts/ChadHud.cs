@@ -19,7 +19,6 @@ public class ChadHud : ScriptComponent
     private readonly string ChargeBarOutline = "ChargeBarOutline";
     private readonly string ChargeBar = "ChargeBar";
 
-
     public override void Awake()
     {
         if (!Instance)
@@ -43,9 +42,9 @@ public class ChadHud : ScriptComponent
 
         cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
         cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
-        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
-        cam.SetImageOrigin(ChargeBar, new Vector2(0, 1));
-        //cam.SetImageRotation(ChargeBar, 90);
+        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.6f, 0.5f + (ChargeBarTexture.height / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
+        cam.SetImageOrigin(ChargeBar, new Vector2(1, 0));
+        cam.SetImageRotation(ChargeBar, 3.14f);
 
     }
 
@@ -61,12 +60,12 @@ public class ChadHud : ScriptComponent
         time = time % (timePerPart * 6);
         
         Color c = Color.Red;
-        c = Color.Lerp(c, Color.Magenta, (time - timePerPart * 0)/timePerPart);
-        c = Color.Lerp(c, Color.Blue, (time - timePerPart * 1) / timePerPart);
-        c = Color.Lerp(c, Color.Cyan, (time - timePerPart * 2) / timePerPart);
-        c = Color.Lerp(c, Color.Green, (time - timePerPart * 3) / timePerPart);
-        c = Color.Lerp(c, Color.Yellow, (time - timePerPart * 4) / timePerPart);
-        c = Color.Lerp(c, Color.Red, (time - timePerPart * 5) / timePerPart);
+        c = Color.Lerp(c, Color.Magenta,    (time - timePerPart * 0) / timePerPart);
+        c = Color.Lerp(c, Color.Blue,       (time - timePerPart * 1) / timePerPart);
+        c = Color.Lerp(c, Color.Cyan,       (time - timePerPart * 2) / timePerPart);
+        c = Color.Lerp(c, Color.Green,      (time - timePerPart * 3) / timePerPart);
+        c = Color.Lerp(c, Color.Yellow,     (time - timePerPart * 4) / timePerPart);
+        c = Color.Lerp(c, Color.Red,        (time - timePerPart * 5) / timePerPart);
 
         return c;
     }
@@ -161,7 +160,6 @@ public class ChadHud : ScriptComponent
     public void ActivateChargeBar()
     {
         cam.SetImageScale(ChargeBarOutline, Vector2.One);
-        //cam.SetImageScale(ChargeBar, new Vector2(1, 0.5f));
         cam.SetImageColor(ChargeBar, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
     }
 
@@ -171,9 +169,15 @@ public class ChadHud : ScriptComponent
         cam.SetImageScale(ChargeBar, Vector2.Zero);
     }
 
+    //Charge: 0 to 1
     public void ChargeChargeBar(float charge)
     {
-        cam.SetImageScale(ChargeBar, new Vector2(charge, 1));
+        Color c = Color.Blue;
+        float timePerPart = 0.5f;
+        c = Color.Lerp(c, Color.Blue, (charge - timePerPart * 0) / timePerPart);
+        c = Color.Lerp(c, Color.Red, (charge - timePerPart * 1) / timePerPart);
+        cam.SetImageColor(ChargeBar, c.ToVector4());
+        cam.SetImageScale(ChargeBar, new Vector2(1, charge));
     }
 
     public override void Update()
