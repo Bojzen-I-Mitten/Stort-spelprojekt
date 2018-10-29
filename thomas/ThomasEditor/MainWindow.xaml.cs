@@ -261,7 +261,7 @@ namespace ThomasEditor
         private void Menu_RemoveGameObject(object sender, RoutedEventArgs e)
         {
             var x = sender as MenuItem;
-            GameObject.Destroy((x.DataContext as GameObject));
+            (x.DataContext as GameObject).Destroy();
         }
 
         private void RemoveSelectedGameObjects_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -275,7 +275,7 @@ namespace ThomasEditor
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
                 ThomasWrapper.Selection.UnSelectGameObject(gObj);
-                ThomasEngine.Object.Destroy(gObj);
+                ThomasWrapper.CurrentScene.DestroyObject(gObj);
             }
         }
 

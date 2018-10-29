@@ -30,7 +30,6 @@ namespace ThomasEngine {
 
 		static Object^ Find(System::Guid guid);
 
-		virtual void Destroy();
 
 	public:
 
@@ -45,8 +44,10 @@ namespace ThomasEngine {
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
 
+
 		static void Destroy(Object^ object) { object->Destroy(); }
-	
+		
+		virtual void Destroy();
 
 		virtual void OnDestroy() {};
 		

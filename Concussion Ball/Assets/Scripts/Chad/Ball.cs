@@ -13,6 +13,9 @@ public class Ball : PickupableObject
     private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
+  //  private ParticleEmitter emitterConfetti1;
+    //private ParticleEmitter emitterConfetti2;
+
     public Texture2D electricityTex1 { get; set; }
     public Texture2D electricityTex2 { get; set; }
     public Texture2D electricityTex3 { get; set; }
@@ -27,7 +30,6 @@ public class Ball : PickupableObject
     {
         base.Start();
         m_throwable = true;
-        DropOnRagdoll = true;
 
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));

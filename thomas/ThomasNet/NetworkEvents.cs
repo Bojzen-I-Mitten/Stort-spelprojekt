@@ -29,7 +29,6 @@ namespace ThomasEngine.Network
             NetSerializer = new NetSerializer();
             SubscribeToEvent<ServerInfoEvent>(ServerInfoEventHandler);
             SubscribeToEvent<SpawnPrefabEvent>(SpawnPrefabEventHandler);
-            SubscribeToEvent<DeletePrefabEvent>(DeletePrefabEventHandler);
             SubscribeToEvent<TransferOwnerEvent>(TransferOwnerEventHandler);
         }
 
@@ -68,15 +67,13 @@ namespace ThomasEngine.Network
             public int[] PeerPorts { get; set; }
             public long ServerStartTime { get; set; }
             public bool IsResponsiblePeer { get; set; }
-            public int SceneNextAssignableID { get; set; }
 
             public ServerInfoEvent() { }
-            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible, int nextAssignableID)
+            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible)
             {
                 ServerStartTime = serverStartTime;
                 PeerIPs = new string[peers.Length - 1];
                 PeerPorts = new int[peers.Length - 1];
-                SceneNextAssignableID = nextAssignableID;
                 int i = 0;
                 foreach(NetPeer peer in peers)
                 {
@@ -110,16 +107,16 @@ namespace ThomasEngine.Network
             if (serverInfo.IsResponsiblePeer)
                 Manager.ResponsiblePeer = peer;
             Manager.ServerStartTime = serverInfo.ServerStartTime;
-            Manager.Scene.nextAssignableID = serverInfo.SceneNextAssignableID;
             
         }
         
         public void SpawnPrefabEventHandler(SpawnPrefabEvent prefabEvent, NetPeer peer)
         {
-            NetworkIdentity identity;
-
-            if (NetScene.NetworkObjects.TryGetValue(prefabEvent.NetID, out identity))
+            Debug.LogWarning("spawnPrefabEvent!!!!!");
+            NetworkIdentity identity = null;
+            if (NetScene.NetworkObjects.ContainsKey(prefabEvent.NetID))
             {
+                identity = NetScene.NetworkObjects[prefabEvent.NetID];
                 if (identity.PrefabID != prefabEvent.PrefabID)
                 {
                     Debug.LogError("Object already exist with network ID: " + prefabEvent.NetID);
@@ -131,6 +128,8 @@ namespace ThomasEngine.Network
                 GameObject gameObject = GameObject.Instantiate(prefab, prefabEvent.Position, prefabEvent.Rotation);
                 identity = gameObject.GetComponent<NetworkIdentity>();
                 NetScene.AddObject(identity, prefabEvent.NetID);
+                //Ownership shit
+
             }else
             {
                 Debug.LogError("Failed to spawn prefab. It's not registered");
@@ -140,18 +139,6 @@ namespace ThomasEngine.Network
             {
                 NetScene.ObjectOwners[peer].Add(identity);
             }
-        }
-
-        public void DeletePrefabEventHandler(DeletePrefabEvent prefabEvent, NetPeer peer)
-        {
-            NetworkIdentity identity;
-
-            if (NetScene.NetworkObjects.TryGetValue(prefabEvent.netID, out identity))
-            {
-                NetScene.RemoveObject(identity);
-                GameObject.Destroy(identity.gameObject);
-            }//else
-                //Debug.LogError("Failed to find gameObject. It does not exist in scene");
         }
 
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)

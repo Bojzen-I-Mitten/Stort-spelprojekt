@@ -11,9 +11,7 @@ public class Powerup : PickupableObject
        Powerup charge particle textures*/
 
     protected RenderComponent m_renderComponent; // in case we want to alter material with charge up
-    public PowerupSpawner spawner;
-
-    protected bool activated = false;
+    
     public override void Start()
     {
         base.Start();
@@ -57,38 +55,11 @@ public class Powerup : PickupableObject
 
     }
 
-    public override void Pickup(ChadControls chad, Transform hand)
-    {
-        base.Pickup(chad, hand);
-
-        if (spawner)
-        {
-            spawner.Free();
-            spawner = null;
-        }
-            
-    }
-
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner)
+        if (!m_pickupable)
         {
-            if (!m_pickupable && !m_pickedUp)
-            {
-                Activate();
-            }
+            OnActivate();
         }
-
-    }
-
-    public void Remove()
-    {
-        Drop();
-        if (spawner)
-        {
-            spawner.Free();
-            spawner = null;
-        }
-        MatchSystem.instance.RemoveNetworkObject(gameObject);
     }
 }

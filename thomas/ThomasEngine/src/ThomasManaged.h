@@ -23,11 +23,6 @@ namespace ThomasEngine {
 		PlayIssued,
 		StopIssued
 	};
-	enum ThomasSystemMode
-	{
-		EditorMode,
-		Standalone
-	};
 	
 	ref class SceneManager;
 	ref class Scene;
@@ -74,7 +69,8 @@ namespace ThomasEngine {
 		{
 			SceneManager^ get();
 		}
-		static void Start(bool editor);
+
+
 		static void Start();
 		static void MainThreadUpdate();
 		static void StartRenderer();

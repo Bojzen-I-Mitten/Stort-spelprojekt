@@ -477,7 +477,7 @@ namespace ThomasEditor
                     {
                         GameObject sourceData = (GameObject)source.DataContext;
 
-                        if (target != null && sourceData != null && target.DataContext is GameObject && (GameObject)target.DataContext != sourceData)
+                        if (target != null && sourceData != null && (GameObject)target.DataContext != sourceData)
                         {
 
                             GameObject parent = target.DataContext as GameObject;
@@ -537,7 +537,7 @@ namespace ThomasEditor
                     ThomasWrapper.Selection.UnSelectGameObject(gObj);
 
                     //Destroy
-                    GameObject.Destroy(gObj);
+                    gObj.Destroy();
                 }
         }
 

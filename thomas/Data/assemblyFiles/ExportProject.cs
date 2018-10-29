@@ -14,19 +14,14 @@ namespace ThomasStandalone
             ThomasWrapper.Start(false);
 
             float startTime = Time.ElapsedTime;
-
-            Win32Window window = new Win32Window();
-            window.create(System.AppDomain.CurrentDomain.FriendlyName, 800, 600);
-
+            
+            
             Application.currentProject = Project.LoadProject("..\\Data\\project.thomas");
-
-            ThomasWrapper.IssuePlay();
+            ThomasWrapper.Play();
 
             Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
 
-            window.loop();
-
-
+            new Win32Window().create(System.AppDomain.CurrentDomain.FriendlyName, 800, 600);
             ThomasWrapper.Exit();
         }
 
@@ -205,6 +200,14 @@ namespace ThomasStandalone
 
             ThomasWrapper.CreateThomasWindow(hWnd, false);
 
+            MSG msg;
+            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+            {
+                DispatchMessage(ref msg);
+            }
+
+
+
             return true;
 
             //The explicit message pump is not necessary, messages are obviously dispatched by the framework.
@@ -215,15 +218,6 @@ namespace ThomasStandalone
             //    TranslateMessage(ref msg);
             //    DispatchMessage(ref msg);
             //}
-        }
-
-        internal void loop()
-        {
-            MSG msg;
-            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
-            {
-                DispatchMessage(ref msg);
-            }
         }
 
         private static IntPtr myWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)

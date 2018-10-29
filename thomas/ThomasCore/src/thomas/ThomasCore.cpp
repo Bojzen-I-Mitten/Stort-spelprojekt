@@ -75,7 +75,6 @@ namespace thomas
 
 	void ThomasCore::Render()
 	{
-		
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->BeginFrame();
 		WindowManager::Instance()->ClearAllWindows();
