@@ -112,6 +112,16 @@ public class ChadControls : NetworkComponent
         Identity.RefreshCache();
     }
 
+    public void DeactivateCamera()
+    {
+        if (isOwner)
+        {
+            Camera.gameObject.activeSelf = false;
+            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+        }
+            
+    }
+
     public void ActivateCamera()
     {
         if (isOwner)
@@ -173,6 +183,18 @@ public class ChadControls : NetworkComponent
             Ragdolling = StartRagdoll(duration, force);
             StartCoroutine(Ragdolling);
         }
+    }
+
+    public void OnDisconnect()
+    {
+        if (PickedUpObject)
+        {
+            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
+                (PickedUpObject as Powerup).Remove();
+            else
+                PickedUpObject.Drop();
+        }
+            
     }
 
 
@@ -540,7 +562,7 @@ public class ChadControls : NetworkComponent
             {
                 if (pickupable.transform.parent == null)
                 {
-                    TakeOwnership(pickupable.gameObject);
+                    pickupable.gameObject.GetComponent<NetworkIdentity>().Owner = true;
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
                 }

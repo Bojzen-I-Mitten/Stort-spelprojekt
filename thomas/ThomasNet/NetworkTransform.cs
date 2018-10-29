@@ -302,9 +302,9 @@ namespace ThomasEngine.Network
             
             float dist = Vector3.Distance(target.position, TargetSyncPosition);
 
-            float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
+            //float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
 
-            if (dist > SnapThreshhold || rotDiff < -LocalRotationThreshold || !targetRigidbody.enabled)
+            if (dist > SnapThreshhold || !targetRigidbody.enabled)
             {
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;

@@ -286,14 +286,15 @@ namespace ThomasEngine.Network
 
         }
 
-        public void TakeOwnership(NetworkIdentity networkIdentiy)
+        public void TakeOwnership(NetworkIdentity networkIdentity)
         {
 
             NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent
             {
-                NetID = networkIdentiy.ID
+                NetID = networkIdentity.ID
             };
-            NetScene.ObjectOwners[LocalPeer].Add(networkIdentiy);
+            if(!NetScene.ObjectOwners[LocalPeer].Contains(networkIdentity))
+                NetScene.ObjectOwners[LocalPeer].Add(networkIdentity);
             Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
         }
 
@@ -366,7 +367,10 @@ namespace ThomasEngine.Network
             foreach (NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
             {
                 if (identity.PrefabID == -1) //Scene object
+                {
                     identity.WriteInitialData();
+                    TakeOwnership(identity);
+                }
                 else
                 {
                     TransferOwnedPrefab(identity);
@@ -413,6 +417,7 @@ namespace ThomasEngine.Network
                 };
                 Events.SendEvent(spawnPrefabEvent, DeliveryMethod.ReliableOrdered);
                 identity.Owner = owner;
+                identity.PrefabID = prefabID;
                 identity.WriteInitialData();
                 return gObj;
             }

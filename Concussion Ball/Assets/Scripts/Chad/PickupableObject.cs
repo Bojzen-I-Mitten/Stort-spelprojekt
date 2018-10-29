@@ -87,9 +87,11 @@ public class PickupableObject : NetworkComponent
     {
         if (m_pickedUp)
         {
+            Vector3 scale = transform.localScale;
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
             m_pickedUp = false;
             transform.SetParent(null, true);
+            transform.localScale = scale;
             if (_Chad)
             {
                 _Chad.PickedUpObject = null;
@@ -115,6 +117,9 @@ public class PickupableObject : NetworkComponent
         {
             if(!this.gameObject.GetComponent<Ball>())
                 m_pickupable = false;
+
+            if (!m_rigidBody)
+                m_rigidBody = gameObject.GetComponent<Rigidbody>();
 
             m_rigidBody.IsKinematic = false;
 
