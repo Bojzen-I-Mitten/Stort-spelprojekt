@@ -2,6 +2,7 @@
 #pragma unmanaged
 #include <thomas/graphics/GUI/GUIElements.h>
 #pragma managed
+#include "Canvas.h"
 using namespace System;
 
 
@@ -15,7 +16,6 @@ namespace ThomasEngine
 		thomas::graphics::GUI::GUIElement* nativePtr; 
 	public:
 		GUIElement() {}
-		~GUIElement();
 
 		property Vector2 position
 		{
@@ -43,7 +43,6 @@ namespace ThomasEngine
 	{
 	public:
 		Text(thomas::graphics::GUI::GUIElement* ptr);
-		~Text() {}
 
 		property String^ text
 		{
@@ -59,7 +58,6 @@ namespace ThomasEngine
 	{
 	public:
 		Image(thomas::graphics::GUI::GUIElement* ptr);
-		~Image() {}
 
 		property Texture2D^ texture
 		{

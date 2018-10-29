@@ -59,9 +59,10 @@
     <ClCompile Include="src\resource\Font.cpp" />
     <ClCompile Include="src\system\SceneManager.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
-    <ClCompile Include="src\GUI\game\GUIManager.cpp" />
     <ClCompile Include="src\GUI\editor\Gizmos.cpp" />
     <ClCompile Include="src\GUI\game\GUIElements.cpp" />
+    <ClCompile Include="src\GUI\game\Canvas.cpp" />
+    <ClCompile Include="src\math\Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -124,9 +125,10 @@
     <ClInclude Include="src\resource\Font.h" />
     <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\system\SceneManager.h" />
-    <ClInclude Include="src\GUI\game\GUIManager.h" />
     <ClInclude Include="src\GUI\editor\Gizmos.h" />
     <ClInclude Include="src\GUI\game\GUIElements.h" />
+    <ClInclude Include="src\GUI\game\Canvas.h" />
+    <ClInclude Include="src\math\Viewport.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

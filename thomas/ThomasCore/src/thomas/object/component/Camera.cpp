@@ -7,7 +7,8 @@
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../AutoProfile.h"
-#include "../../graphics/GUIManager.h"
+#include "../../graphics/GUI/Canvas.h"
+#include "../../graphics/GUI/GUIElements.h"
 #include "RenderComponent.h"
 
 namespace thomas
@@ -24,9 +25,9 @@ namespace thomas
 				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
-			Camera::Camera(bool dontAddTolist) : 
-			m_renderGUI(false),
-			m_GUIHandle(std::make_unique<graphics::GUIManager>())
+			Camera::Camera(bool dontAddTolist) :
+				m_renderGUI(false)
+				//m_GUIManager(std::make_unique <graphics::GUI::GUIManager> ())
 			{
 				m_fov = 70.f;
 				m_near = 0.1f;
@@ -37,8 +38,8 @@ namespace thomas
 			}
 
 			Camera::Camera() :
-			m_renderGUI(false),
-			m_GUIHandle(std::make_unique<graphics::GUIManager>())
+			m_renderGUI(false)
+			//m_GUIManager(std::make_unique<graphics::GUI::GUIManager>())
 			{
 				m_fov = 70;
 				m_near = 0.5;
@@ -55,8 +56,14 @@ namespace thomas
 
 			Camera::~Camera()
 			{
-				m_GUIHandle->Destroy();
-				m_GUIHandle.reset();
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->Destroy();
+					m_canvases[i].reset();
+				}
+				m_canvases.clear();
+				//m_GUIManager->Destroy();
+				//m_GUIManager.reset();
 				
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
@@ -207,7 +214,10 @@ namespace thomas
 			{
 				m_viewport = viewport;
 				UpdateProjMatrix();
-				m_GUIHandle->SetViewportScale(m_viewport);
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->UpdateViewportScale();
+				}
 			}
 
 			void Camera::SetViewport(float x, float y, float width, float height)
@@ -218,11 +228,6 @@ namespace thomas
 			float Camera::GetAspectRatio()
 			{
 				return m_viewport.AspectRatio();
-			}
-
-			graphics::GUIManager * Camera::GetGUIHandle() const
-			{
-				return m_GUIHandle.get();
 			}
 
 			void Camera::Render()
@@ -315,13 +320,41 @@ namespace thomas
 				m_frameData.position = (math::Vector4)GetPosition();
 
 				if (m_frameData.targetDisplay == 0)
-					m_GUIHandle->SetViewportScale(m_frameData.viewport);
-
+				{
+					for (int i = 0; i < m_canvases.size(); ++i)
+					{
+						m_canvases[i]->SetViewport(m_frameData.viewport);
+					}
+				}
 			}
 
 			Camera::CAMERA_FRAME_DATA & Camera::GetFrameData()
 			{
 				return m_frameData;
+			}
+
+			graphics::GUI::Canvas* Camera::AddCanvas()
+			{
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(m_viewport, &m_viewport);
+				m_canvases.push_back(std::move(canvas));
+
+				return canvas.get();
+			}
+
+			graphics::GUI::Canvas * Camera::AddCanvas(math::Viewport viewport)
+			{
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(viewport, &m_viewport);
+				m_canvases.push_back(std::move(canvas));
+
+				return canvas.get();
+			}
+
+			void Camera::RenderGUI()
+			{
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->Render();
+				}
 			}
 		}
 	}

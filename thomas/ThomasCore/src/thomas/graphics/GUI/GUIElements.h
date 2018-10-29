@@ -36,6 +36,7 @@ namespace thomas
 				GUIElement() = default;
 				GUIElement(Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
 					position(position), scale(scale), origin(origin), color(color), rotation(rotation), interactable(interactable) {}
+				virtual ~GUIElement(){}
 
 				Vector2 position;
 				Vector2 scale;
@@ -44,7 +45,7 @@ namespace thomas
 				float rotation;
 				bool interactable;
 
-				virtual void Draw(SpriteBatch* sb, Vector2 vp, Vector2 vpScale) = 0;
+				virtual void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale) = 0;
 				virtual bool OnHover(Vector2 vp, Vector2 vpScale) = 0;
 				virtual bool OnClick(Vector2 vp, Vector2 vpScale) = 0;
 			};
@@ -54,13 +55,14 @@ namespace thomas
 				Text() = default;
 				Text(Font* font, std::string text, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
 					font(font), text(text), GUIElement(position, scale, origin, color, rotation, interactable) {}
+				virtual ~Text() {}
 
 				Font* font;
 				std::string text;
 
-				void Draw(SpriteBatch* sb, Vector2 vp, Vector2 vpScale)
+				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					font->DrawGUIText(sb, text, position * vp, scale * vpScale, origin, color, rotation);
+					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation);
 				}
 
 				bool OnHover(Vector2 vp, Vector2 vpScale)
@@ -93,13 +95,14 @@ namespace thomas
 				Image() = default;
 				Image(Texture2D* texture, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
 					texture(texture), GUIElement(position, scale, origin, color, rotation, interactable) {}
+				virtual ~Image() {}
 
 				Texture2D* texture;
 
-				void Draw(SpriteBatch* sb, Vector2 vp, Vector2 vpScale)
+				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
 					Vector2 size = Vector2(texture->GetWidth(), texture->GetHeight());
-					sb->Draw(texture->GetResourceView(), position * vp, nullptr, color, rotation, size, scale * vpScale);
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, size, scale * vpScale);
 				}
 
 				bool OnHover(Vector2 vp, Vector2 vpScale)

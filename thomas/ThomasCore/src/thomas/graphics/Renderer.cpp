@@ -15,7 +15,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
-#include "../graphics/GUIManager.h"
+#include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
 
 namespace thomas
@@ -171,7 +171,7 @@ namespace thomas
 				// Draw GUI for each camera that has enabled GUI rendering
 				if (perCameraQueue.first->GetGUIRendering())
 				{
-					perCameraQueue.first->GetGUIHandle()->Render();
+					perCameraQueue.first->RenderGUI();
 				}
 			}
 	

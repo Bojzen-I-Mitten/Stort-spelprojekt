@@ -168,10 +168,11 @@
     <ClInclude Include="src\Application.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\GUI\editor\Gizmos.h" />
-    <ClInclude Include="src\GUI\game\GUIManager.h" />
+    <ClInclude Include="src\GUI\game\Canvas.h" />
     <ClInclude Include="src\GUI\game\GUIElements.h" />
     <ClInclude Include="src\math\Curve.h" />
     <ClInclude Include="src\math\Random.h" />
+    <ClInclude Include="src\math\Viewport.h" />
     <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
     <ClInclude Include="src\object\component\ParticleEmitter.h" />
@@ -231,11 +232,12 @@
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
     </ClCompile>
     <ClCompile Include="src\GUI\editor\Gizmos.cpp" />
+    <ClCompile Include="src\GUI\game\Canvas.cpp" />
     <ClCompile Include="src\GUI\game\GUIElements.cpp" />
-    <ClCompile Include="src\GUI\game\GUIManager.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\math\Curve.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
+    <ClCompile Include="src\math\Viewport.cpp" />
     <ClCompile Include="src\object\component\animation\BoneTransformComponent.cpp" />
     <ClCompile Include="src\object\component\LightComponent.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />

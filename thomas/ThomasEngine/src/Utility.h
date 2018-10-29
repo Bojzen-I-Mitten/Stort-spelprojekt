@@ -3,6 +3,7 @@
 #pragma unmanaged
 #include <thomas/utils/Math.h>
 #pragma managed
+#include "math/Viewport.h"
 
 
 namespace ThomasEngine
@@ -56,6 +57,14 @@ namespace ThomasEngine
 		static Quaternion Convert(thomas::math::Quaternion% value)
 		{
 			return Quaternion(value.x, value.y, value.z, value.w);
+		}
+		static thomas::math::Viewport Convert(Viewport% value)
+		{
+			return thomas::math::Viewport(value.x, value.y, value.w, value.h);
+		}
+		static Viewport Convert(thomas::math::Viewport& value)
+		{
+			return Viewport(value.x, value.y, value.width, value.height);
 		}
 
 		static _GUID Convert(System::Guid% value);
