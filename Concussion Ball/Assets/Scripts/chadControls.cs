@@ -239,12 +239,17 @@ public class ChadControls : NetworkComponent
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
+                    ChadHud.Instance.ActivateCrosshair();
+                    ChadHud.Instance.ActivateChargeBar();
+
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                 }
                 else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
                 {
@@ -260,6 +265,8 @@ public class ChadControls : NetworkComponent
                     ThrowBall();
                     ResetCharge();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                 }
             }
 
@@ -475,6 +482,7 @@ public class ChadControls : NetworkComponent
         Ball.chargeTimeCurrent = ChargeTime;
         Ball.ChargeColor();
         ThrowForce = ChargeRate * ChargeTime;
+        ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
     }
 
     private void ThrowBall()

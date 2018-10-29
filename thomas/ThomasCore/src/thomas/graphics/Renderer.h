@@ -48,6 +48,7 @@ namespace thomas
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
 			void BindCamera(const render::CAMERA_FRAME_DATA& camera);
+			bool BindCameraViewport(const render::CAMERA_FRAME_DATA & frameData);
 
 		public:
 			void init();

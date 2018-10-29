@@ -35,6 +35,7 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interact;
+				DirectX::SpriteEffects effect;
 			};
 
 			struct Rect
@@ -58,6 +59,7 @@ namespace thomas
 				Vector2 origin;
 				Vector4 color;
 				float rotation;
+				DirectX::SpriteEffects effect;
 			};
 
 		public:
@@ -79,6 +81,7 @@ namespace thomas
 			void SetImageRotation(const std::string& id, float rotation);
 			void SetImageInteract(const std::string& id, bool interact);
 			void SetImageOrigin(const std::string& id, const Vector2& origin);
+			void SetImageFlipEffect(const std::string& id, const DirectX::SpriteEffects effect);
 			bool OnImageClicked(const std::string& id);
 			bool OnImageHovered(const std::string& id);
 			void DeleteImage(const std::string& id);
@@ -94,6 +97,7 @@ namespace thomas
 			void SetFont(const std::string& id, Font* font);
 			void DeleteText(const std::string& id);
 			void SetTextOrigin(const std::string& id, const Vector2& origin);
+			void SetTextFlipeffect(const std::string& id, DirectX::SpriteEffects effect);
 			Vector2 GetTextSize(const std::string& id);
 		private:
 			Image& GetImage(const std::string& id);
