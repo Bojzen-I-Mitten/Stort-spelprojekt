@@ -286,7 +286,7 @@ namespace thomas
 								gameObject->m_transform->GetWorldMatrix(),
 								mesh.get(),
 								m_objectHighlighter.get(),
-								m_cameraComponent.get());
+								m_cameraComponent.get()->ID());
 							graphics::Renderer::Instance()->SubmitCommand(cmd);
 						}
 					}
