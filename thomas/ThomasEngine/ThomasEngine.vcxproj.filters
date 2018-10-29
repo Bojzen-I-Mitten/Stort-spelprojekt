@@ -123,6 +123,7 @@
     <ClInclude Include="src\resource\Font.h" />
     <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\system\SceneManager.h" />
+    <ClInclude Include="src\resource\texture\TextureCube.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

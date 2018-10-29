@@ -6,7 +6,9 @@
 #include "Camera.h"
 #include "../../Utility.h"
 #include "../../Debug.h"
+
 #include "../../resource/texture/Texture2D.h"
+#include "../../resource/texture/TextureCube.h"
 #include "../../resource/Resources.h"
 
 namespace ThomasEngine
@@ -35,17 +37,17 @@ namespace ThomasEngine
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
 
-	Texture2D^ Camera::SkyMap::get() 
+	TextureCube^ Camera::SkyMap::get() 
 	{ 
 		ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(camera->GetSkyMap());
 		if (res)
-			return (ThomasEngine::Texture2D^)res;
+			return (ThomasEngine::TextureCube^)res;
 		else
-			return gcnew ThomasEngine::Texture2D(camera->GetSkyMap());
+			return gcnew ThomasEngine::TextureCube(camera->GetSkyMap());
 	}
-	void Camera::SkyMap::set(Texture2D^ value) 
+	void Camera::SkyMap::set(TextureCube^ value)
 	{
-		camera->SetSkyMap((thomas::resource::Texture2D*)value->m_nativePtr);
+		camera->SetSkyMap((thomas::resource::TextureCube*)value->m_nativePtr);
 	}
 
 	//-------------------------------------------------------------------------------------------

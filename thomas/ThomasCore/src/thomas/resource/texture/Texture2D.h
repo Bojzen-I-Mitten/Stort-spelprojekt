@@ -12,7 +12,6 @@ namespace thomas
 		{
 		private:
 			void LoadTextureFromFile(std::string path);
-			void LoadTextureCubeFromFile(std::string path);
 		public:
 			static void Init();
 			static void Destroy();
@@ -23,7 +22,7 @@ namespace thomas
 
 			void OnChanged();
 			std::vector<math::Color> GetPixels();
-			byte* GetRawRGBAPixels();
+			//byte* GetRawRGBAPixels();
 			byte* GetRawBGRAPixels();
 
 			//bool ChangeFormat(DXGI_FORMAT format);

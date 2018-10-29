@@ -2,13 +2,13 @@
 
 #pragma managed
 #include "../Component.h"
-#include "../../resource/texture/Texture2D.h"
 #include "../../resource/Font.h"
 
 namespace thomas { namespace object { namespace component { class Camera; } } }
 
 namespace ThomasEngine
 {
+	ref class TextureCube;
 	ref class Texture2D;
 	[ExecuteInEditor]
 	public ref class Camera : public Component
@@ -77,10 +77,10 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
-		property Texture2D^ SkyMap
+		property TextureCube^ SkyMap
 		{
-			Texture2D^ get();
-			void set(Texture2D^ value);
+			TextureCube^ get();
+			void set(TextureCube^ value);
 		}
 		[BrowsableAttribute(false)]
 		property Vector2 viewport

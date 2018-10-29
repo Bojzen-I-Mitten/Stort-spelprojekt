@@ -18,35 +18,32 @@ namespace thomas
 			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_sphereIndices);
 			
 			//m_cubeMap = new resource::TextureCube("../Data/SkyBox.dds");
-			m_cubeMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
-			m_skyMap = new resource::Texture2D("../Data/fullmoon_skybox.dds");
+			m_skyMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
 		SkyBox::~SkyBox()
 		{
-			SAFE_DELETE(m_cubeMap);
+			/*SAFE_DELETE(m_cubeMap);
 			SAFE_DELETE(m_skyMap);
 
 			SAFE_RELEASE(m_vertBuffer);
 			SAFE_RELEASE(m_indexBuffer);
 
 			m_sphereIndices.clear();
-			m_sphereVerts.clear();
+			m_sphereVerts.clear();*/
 		}
 
-		bool SkyBox::SetSkyMap(resource::Texture2D * tex)
+		bool SkyBox::SetSkyMap(resource::TextureCube * tex)
 		{
-			if (tex != m_skyMap)
-			{
 				//delete m_cubeMap;
-				m_cubeMap = new resource::TextureCube(tex);
-				m_skyMap = tex;
-			}
+				//m_cubeMap = new resource::TextureCube(tex);
+			m_skyMap = tex;
+			
 			return true;
 		}
 
-		resource::Texture2D * SkyBox::GetSkyMap()
+		resource::TextureCube * SkyBox::GetSkyMap()
 		{
 			return m_skyMap;
 		}
@@ -133,7 +130,7 @@ namespace thomas
 			m_shader->BindVertexBuffer(m_vertBuffer.get());
 			m_shader->BindIndexBuffer(m_indexBuffer.get());
 
-			m_shader->SetPropertyTextureCube("textures", m_cubeMap);
+			m_shader->SetPropertyTextureCube("SkyMap", m_skyMap);
 
 			m_shader->Bind();
 			m_shader->SetPass(0);

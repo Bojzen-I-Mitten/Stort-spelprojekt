@@ -312,12 +312,12 @@ namespace thomas
 			}
 
 
-			void Camera::SetSkyMap(resource::Texture2D * tex)
+			void Camera::SetSkyMap(resource::TextureCube * tex)
 			{
 				m_skybox->SetSkyMap(tex);
 			}
 
-			resource::Texture2D * Camera::GetSkyMap()
+			resource::TextureCube * Camera::GetSkyMap()
 			{
 				return m_skybox->GetSkyMap();
 			}

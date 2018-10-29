@@ -11,11 +11,6 @@ namespace thomas
 			LoadTextureCubeFromFile(path);
 		}
 
-		TextureCube::TextureCube(Texture2D * tex) : Texture(tex->GetPath())
-		{
-			LoadTextureCubeFromFile(tex->GetPath());
-		}
-
 		void TextureCube::LoadTextureCubeFromFile(std::string path)
 		{
 			ID3D11Resource* tempResource;

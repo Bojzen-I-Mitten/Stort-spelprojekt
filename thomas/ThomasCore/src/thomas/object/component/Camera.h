@@ -9,7 +9,7 @@ namespace thomas
 {
 	namespace utils { struct Ray; }
 	namespace graphics { class SkyBox; class GUIManager; }
-	namespace resource { class Texture2D; }
+	namespace resource { class TextureCube; }
 
 	namespace object
 	{
@@ -72,8 +72,8 @@ namespace thomas
 
 				uint32_t ID();
 
-				void SetSkyMap(resource::Texture2D* tex);
-				resource::Texture2D* GetSkyMap();
+				void SetSkyMap(resource::TextureCube* tex);
+				resource::TextureCube* GetSkyMap();
 				void DrawSkyBox();
 				bool hasSkybox();
 			private:

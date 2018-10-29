@@ -2,7 +2,7 @@
 
 #include <ThomasCG.hlsl>
 
-TextureCube textures;
+TextureCube SkyMap;
 
 SamplerState StandardWrapSampler
 {
@@ -63,7 +63,7 @@ v2f vert(appdata_thomas v)
 
 float4 frag(v2f input) : SV_Target
 {
-    return textures.Sample(StandardWrapSampler, input.texcoord);
+    return SkyMap.Sample(StandardWrapSampler, input.texcoord);
 }
 
 technique11 Skybox

@@ -99,12 +99,12 @@ namespace thomas
 			return pixels;
 		}
 
-		byte * Texture2D::GetRawRGBAPixels()
+		/*byte * Texture2D::GetRawRGBAPixels()
 		{
 			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), m_resource, *data);
 			
 			return data->GetPixels();
-		}
+		}*/
 
 		byte * Texture2D::GetRawBGRAPixels()
 		{

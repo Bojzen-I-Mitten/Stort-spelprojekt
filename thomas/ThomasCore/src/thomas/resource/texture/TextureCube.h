@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture2D.h"
+#include "Texture.h"
 
 namespace thomas
 {
@@ -12,7 +12,6 @@ namespace thomas
 			void LoadTextureCubeFromFile(std::string path);
 		public:
 			TextureCube(std::string path);
-			TextureCube(Texture2D* tex);
 		private:
 
 		};
