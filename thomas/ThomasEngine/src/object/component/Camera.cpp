@@ -47,6 +47,9 @@ namespace ThomasEngine
 	}
 	void Camera::SkyMap::set(TextureCube^ value)
 	{
+		if (value == nullptr)
+			return;
+
 		camera->SetSkyMap((thomas::resource::TextureCube*)value->m_nativePtr);
 	}
 
