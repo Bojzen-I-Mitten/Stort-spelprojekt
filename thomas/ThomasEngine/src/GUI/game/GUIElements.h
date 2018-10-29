@@ -37,6 +37,10 @@ namespace ThomasEngine
 		{
 			void set(bool interactable);
 		}
+		property Vector2 flip
+		{
+			void set(Vector2 Flip);
+		}
 	};
 
 	public ref class Text : public GUIElement

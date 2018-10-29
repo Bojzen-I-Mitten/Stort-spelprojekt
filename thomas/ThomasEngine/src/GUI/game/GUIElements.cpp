@@ -15,7 +15,13 @@ namespace ThomasEngine
 
 	void GUIElement::color::set(Vector4 color) { nativePtr->color = Utility::Convert(color); }
 
-	void GUIElement::interactable::set(bool interactable) { ((thomas::graphics::GUI::Image*)nativePtr)->interactable = interactable; }
+	void GUIElement::interactable::set(bool interactable) { nativePtr->interactable = interactable; }
+
+	void GUIElement::flip::set(Vector2 flip) 
+	{ 
+		Vector2 _flip = Vector2(flip.x ? 1 : 0, flip.y ? 2 : 0);
+		nativePtr->effect = (DirectX::SpriteEffects)((int)_flip.x | (int)_flip.y);
+	}
 
 
 	Text::Text(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
