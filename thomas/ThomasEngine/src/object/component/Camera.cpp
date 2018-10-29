@@ -124,6 +124,27 @@ namespace ThomasEngine
 		camera->GetGUIHandle()->SetImageOrigin(Utility::ConvertString(id), Utility::Convert(origin));
 	}
 
+	void Camera::SetImageFlipEffect(String ^ id, FLIP_EFFECTS effect)
+	{
+		switch (effect)
+		{
+		case ThomasEngine::Camera::FLIP_EFFECTS::NONE:
+			camera->GetGUIHandle()->SetImageFlipEffect(Utility::ConvertString(id), DirectX::SpriteEffects_None);
+			break;
+		case ThomasEngine::Camera::FLIP_EFFECTS::FLIPHORIZONTALLY:
+			camera->GetGUIHandle()->SetImageFlipEffect(Utility::ConvertString(id), DirectX::SpriteEffects_FlipHorizontally);
+			break;
+		case ThomasEngine::Camera::FLIP_EFFECTS::FLIPVERTICALLY:
+			camera->GetGUIHandle()->SetImageFlipEffect(Utility::ConvertString(id), DirectX::SpriteEffects_FlipVertically);
+			break;
+		case ThomasEngine::Camera::FLIP_EFFECTS::FLIPBOTH:
+			camera->GetGUIHandle()->SetImageFlipEffect(Utility::ConvertString(id), DirectX::SpriteEffects_FlipBoth);
+			break;
+		default:
+			break;
+		}
+	}
+
 	void Camera::DeleteImage(String ^ id)
 	{
 		camera->GetGUIHandle()->DeleteImage(Utility::ConvertString(id));
@@ -228,6 +249,29 @@ namespace ThomasEngine
 	{
 		camera->GetGUIHandle()->SetTextOrigin(Utility::ConvertString(id), Utility::Convert(origin));
 	}
+
+	void Camera::SetTextFlipEffect(String ^ id, FLIP_EFFECTS effect)
+	{
+		switch (effect)
+		{
+		case ThomasEngine::Camera::FLIP_EFFECTS::NONE:
+			camera->GetGUIHandle()->SetTextFlipeffect(Utility::ConvertString(id), DirectX::SpriteEffects_None);
+			break;
+		case ThomasEngine::Camera::FLIP_EFFECTS::FLIPHORIZONTALLY:
+			camera->GetGUIHandle()->SetTextFlipeffect(Utility::ConvertString(id), DirectX::SpriteEffects_FlipHorizontally);
+			break;
+		case ThomasEngine::Camera::FLIP_EFFECTS::FLIPVERTICALLY:
+			camera->GetGUIHandle()->SetTextFlipeffect(Utility::ConvertString(id), DirectX::SpriteEffects_FlipVertically);
+			break;
+		case ThomasEngine::Camera::FLIP_EFFECTS::FLIPBOTH:
+			camera->GetGUIHandle()->SetTextFlipeffect(Utility::ConvertString(id), DirectX::SpriteEffects_FlipBoth);
+			break;
+		default:
+			break;
+		}
+		
+	}
+
 	Vector2 Camera::GetTextSize(String ^ id)
 	{
 		return Utility::Convert(camera->GetGUIHandle()->GetTextSize(Utility::ConvertString(id)));

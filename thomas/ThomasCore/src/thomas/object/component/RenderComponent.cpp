@@ -145,7 +145,7 @@ namespace thomas {
 					m_gameObject->m_transform->GetWorldMatrix(), 
 					mesh.get(), 
 					material, 
-					camera, 
+					camera->ID(), 
 					num_prop,
 					property_data);
 
@@ -155,7 +155,7 @@ namespace thomas {
 			resource::shaderproperty::ShaderPropertyStatic & RenderComponent::insertProperty(resource::shaderproperty::ShaderPropertyStatic prop)
 			{
 				for (unsigned int i = 0; i < m_properties.size(); i++) {
-					if (m_properties[i] ==  prop) {	// If equals ->
+					if (m_properties[i] ==  prop) {			// If equals ->
 						m_properties[i] = prop;				// Insert
 						return m_properties[i];
 					}

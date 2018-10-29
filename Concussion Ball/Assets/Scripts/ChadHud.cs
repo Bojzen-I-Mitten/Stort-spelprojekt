@@ -11,6 +11,15 @@ public class ChadHud : ScriptComponent
     public Font AnnouncementFont { get; set; }
     public Font Numbers { get; set; }
     public Texture2D AnnouncementBackground { get; set; }
+    public Texture2D CrosshairTexture { get; set; }
+    public Texture2D ChargeBarOutlineTexture { get; set; }
+    public Texture2D ChargeBarTexture { get; set; }
+    public bool ToggleAim { get; set; } = true;
+
+    private readonly string Crosshair = "Crosshair";
+    private readonly string ChargeBarOutline = "ChargeBarOutline";
+    private readonly string ChargeBar = "ChargeBar";
+
     public override void Awake()
     {
         if (!Instance)
@@ -31,6 +40,12 @@ public class ChadHud : ScriptComponent
 
         cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(0.5f, 0.5f), Vector2.Zero, false);
         cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
+        cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
+        cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.9f, 0.1f), Vector2.Zero, false);
+        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height*9.0f) / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
+        //Need to rotate the bar 180, because positive x is down on the screen.
+        cam.SetImageOrigin(ChargeBar, new Vector2(1, 0));
+        cam.SetImageRotation(ChargeBar, 3.14f);
 
     }
 
@@ -46,12 +61,12 @@ public class ChadHud : ScriptComponent
         time = time % (timePerPart * 6);
         
         Color c = Color.Red;
-        c = Color.Lerp(c, Color.Magenta, (time - timePerPart * 0)/timePerPart);
-        c = Color.Lerp(c, Color.Blue, (time - timePerPart * 1) / timePerPart);
-        c = Color.Lerp(c, Color.Cyan, (time - timePerPart * 2) / timePerPart);
-        c = Color.Lerp(c, Color.Green, (time - timePerPart * 3) / timePerPart);
-        c = Color.Lerp(c, Color.Yellow, (time - timePerPart * 4) / timePerPart);
-        c = Color.Lerp(c, Color.Red, (time - timePerPart * 5) / timePerPart);
+        c = Color.Lerp(c, Color.Magenta,    (time - timePerPart * 0) / timePerPart);
+        c = Color.Lerp(c, Color.Blue,       (time - timePerPart * 1) / timePerPart);
+        c = Color.Lerp(c, Color.Cyan,       (time - timePerPart * 2) / timePerPart);
+        c = Color.Lerp(c, Color.Green,      (time - timePerPart * 3) / timePerPart);
+        c = Color.Lerp(c, Color.Yellow,     (time - timePerPart * 4) / timePerPart);
+        c = Color.Lerp(c, Color.Red,        (time - timePerPart * 5) / timePerPart);
 
         return c;
     }
@@ -132,6 +147,43 @@ public class ChadHud : ScriptComponent
         StartCoroutine(AnnouncementAnimation(duration, winningTeam.Name, "Wins!!!", winningTeam.Color));
     }
     
+    public void ActivateCrosshair()
+    {
+        if (ToggleAim)
+        {
+            cam.SetImageScale(Crosshair, Vector2.One);
+            cam.SetImageColor(Crosshair, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+        }
+    }
+
+    public void DeactivateCrosshair()
+    {
+        cam.SetImageScale(Crosshair, Vector2.Zero);
+    }
+
+    public void ActivateChargeBar()
+    {
+        cam.SetImageScale(ChargeBarOutline, new Vector2(2.0f, 9.0f));
+        cam.SetImageColor(ChargeBar, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+    }
+
+    public void DeactivateChargeBar()
+    {
+        cam.SetImageScale(ChargeBarOutline, Vector2.Zero);
+        cam.SetImageScale(ChargeBar, Vector2.Zero);
+    }
+
+    //Charge: 0 to 1
+    public void ChargeChargeBar(float charge)
+    {
+        Color c = Color.Blue;
+        float timePerPart = 0.5f;
+        c = Color.Lerp(c, Color.Blue, (charge - timePerPart * 0) / timePerPart);
+        c = Color.Lerp(c, Color.Red, (charge - timePerPart * 1) / timePerPart);
+        cam.SetImageColor(ChargeBar, c.ToVector4());
+        cam.SetImageScale(ChargeBar, new Vector2(2.0f, charge*9.0f));
+    }
+
     public override void Update()
     {
         int matchTimeLeft = MatchSystem.instance.MatchTimeLeft;
