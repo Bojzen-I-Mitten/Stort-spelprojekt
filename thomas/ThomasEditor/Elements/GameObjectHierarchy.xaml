@@ -160,10 +160,12 @@
                         <MenuItem Header="3D Objects">
                             <MenuItem Header="Cube" Click="AddNewCubePrimitive"/>
                             <MenuItem Header="Sphere" Click="AddNewSpherePrimitive"/>
+                            <MenuItem Header="Plane" Click="AddNewPlanePrimitive"/>
                             <MenuItem Header="Capsule" Click="AddNewCapsulePrimitive"/>
                             <MenuItem Header="Cylinder" Click="AddNewCylinderPrimitive"/>
-                            <MenuItem Header="Plane" Click="AddNewPlanePrimitive"/>
+                            <MenuItem Header="Torus" Click="AddNewTorusPrimitive"/>
                             <MenuItem Header="Quad" Click="AddNewQuadPrimitive"/>
+                            <MenuItem Header="Monkey" Click="AddNewMonkeyPrimitive"/>
                         </MenuItem>
                         <MenuItem Header="Assisting Objects">
                             <MenuItem Header="Camera" Click="AddNewCameraPrimitive"/>

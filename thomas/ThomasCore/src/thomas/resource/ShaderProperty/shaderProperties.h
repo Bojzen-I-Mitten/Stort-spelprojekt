@@ -1,3 +1,4 @@
+#pragma once
 #include "ShaderPropertyMatrix.h"
 #include "ShaderPropertyScalarBool.h"
 #include "ShaderPropertyScalarFloat.h"

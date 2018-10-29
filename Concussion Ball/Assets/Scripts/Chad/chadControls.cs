@@ -19,7 +19,7 @@ public class ChadControls : NetworkComponent
         NUM_STATES
     };
     public STATE State { get; private set; }
-
+    public bool Locked = false;
 
     #region Throwing stuff
     [Category("Throwing")]
@@ -86,12 +86,15 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+        
 
         State = STATE.CHADING;
 
-        if (!isOwner && Camera)
-            Camera.enabled = false;
+        if (isOwner)
+            MatchSystem.instance.LocalChad = this;
+
+        if (Camera)
+            Camera.gameObject.activeSelf = false;
         if (isOwner && !Camera)
             Debug.LogWarning("Camera not set for player");
         if (Camera)
@@ -110,6 +113,16 @@ public class ChadControls : NetworkComponent
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
 
         Identity.RefreshCache();
+    }
+
+    public void ActivateCamera()
+    {
+        if (isOwner)
+        {
+            Camera.gameObject.activeSelf = true;
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+        }
+            
     }
 
     public override void Update()
@@ -180,6 +193,9 @@ public class ChadControls : NetworkComponent
             //Escape = true;
         }
 
+        if (Locked)
+            return;
+
         if (Input.GetKey(Input.Keys.W))
             Direction.z += 1;
         if (Input.GetKey(Input.Keys.S))
@@ -206,6 +222,7 @@ public class ChadControls : NetworkComponent
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             //Escape = false;
         }
+
 
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
@@ -532,6 +549,8 @@ public class ChadControls : NetworkComponent
 
         return true;
     }
+
+
 
     public override void OnCollisionEnter(Collider collider)
     {

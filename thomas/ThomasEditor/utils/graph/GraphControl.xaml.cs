@@ -138,7 +138,8 @@ namespace Thomas_Graph
         private void GraphControl_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             Point pos = e.GetPosition(this);
-            double delta = e.Delta * 0.01;
+
+            double delta = Math.Sign(e.Delta);
             if(scaleTransform.ScaleX + delta > 1 && scaleTransform.ScaleX + delta < 15 && (currentMode == ManipulateMode.Horizontal || currentMode == ManipulateMode.All))
                 scaleTransform.ScaleX += delta;
             if (scaleTransform.ScaleY + delta > 1 && scaleTransform.ScaleY + delta < 15 && (currentMode == ManipulateMode.Vertical || currentMode == ManipulateMode.All))

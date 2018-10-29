@@ -3,6 +3,8 @@
 // Thomas
 #include "../utils/d3d.h"
 #include "../WindowManager.h"
+#include "../Common.h"
+#include "../ThomasCore.h"
 
 namespace thomas
 {
@@ -13,6 +15,8 @@ namespace thomas
 			m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
 			m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
 			m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
+			m_viewport = Vector2(1920.f, 1080.f);
+			m_viewportScale = Vector2(1.f, 1.f);
 		}
 
 		void GUIManager::Destroy()
@@ -33,19 +37,26 @@ namespace thomas
 
 				for (const auto& image : m_images)
 				{
-					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position, nullptr, image.second.color,
-										image.second.rotation, Vector2(0.f, 0.f), image.second.scale);
+					Vector2 size = Vector2(image.second.texture->GetWidth(), image.second.texture->GetHeight());
+					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position * m_viewport, nullptr, image.second.color,
+										image.second.rotation, image.second.origin * size, image.second.scale * m_viewportScale);
 				}
 
 				for (const auto& text : m_texts)
 				{
-					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position, text.second.scale, 
-												  text.second.color, text.second.rotation);
+					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position * m_viewport, text.second.scale * m_viewportScale,
+						text.second.origin, text.second.color, text.second.rotation);
 				}
 
 				// End
 				m_spriteBatch->End();
 			}
+		}
+
+		void GUIManager::SetViewportScale(math::Viewport viewport)
+		{
+			m_viewport = Vector2(viewport.width, viewport.height);
+			m_viewportScale = m_viewport / Vector2(1920.f, 1080.f);	//1080p because it is our standard resolution. And textures are designed for that resolution.
 		}
 
 		// Images
@@ -54,7 +65,7 @@ namespace thomas
 		{
 			if (texture->GetResourceView())
 			{
-				Image image = { texture, position, scale, color, rotation, interact };
+				Image image = { texture, position, scale, Vector2(0,0), color, rotation, interact };
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
@@ -95,6 +106,12 @@ namespace thomas
 			image.interact = interact;
 		}
 
+		void GUIManager::SetImageOrigin(const std::string& id, const Vector2& origin)
+		{
+			auto& image = GetImage(id);
+			image.origin = origin;
+		}
+
 		bool GUIManager::OnImageClicked(const std::string& id)
 		{
 			thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
@@ -114,14 +131,19 @@ namespace thomas
 			return CheckImageIntersection(id);
 		}
 
+		void GUIManager::DeleteImage(const std::string & id)
+		{
+			m_images.erase(id);
+		}
+
 		GUIManager::Image& GUIManager::GetImage(const std::string& id)
 		{
 			auto found = m_images.find(id);
 
-#ifdef _DEBUG
-			assert(found != m_images.end());
-#endif
-
+			if (found == m_images.end()) {
+				LOG("Image id does not exist");
+				return Image();
+			}
 			return found->second;
 		}
 
@@ -140,10 +162,10 @@ namespace thomas
 					// Construct boundaries
 					// Note: If origin has to be changed from (0, 0) this also has to be taken into account when constructing the boundaries!
 					Vector2 mousePos = window->GetInput()->GetMousePosition();
-					Rect rect = { image.position.x,
-								  image.position.x + image.texture->GetWidth() * image.scale.x,
-								  image.position.y,
-								  image.position.y + image.texture->GetHeight() * image.scale.y };
+					Rect rect = { image.position.x * m_viewport.x,
+								  image.position.x * m_viewport.x + image.texture->GetWidth() * image.scale.x * m_viewportScale.x,
+								  image.position.y * m_viewport.y,
+								  image.position.y * m_viewport.y + image.texture->GetHeight() * image.scale.y * m_viewportScale.y};
 
 					if ((mousePos.x >= rect.left && mousePos.x <= rect.right) && (mousePos.y <= rect.down && mousePos.y >= rect.top))
 					{
@@ -164,10 +186,10 @@ namespace thomas
 		{
 			auto found = m_texts.find(id);
 
-#ifdef _DEBUG
-			assert(found != m_texts.end());
-#endif
-
+			if (found == m_texts.end()) {
+				LOG("text id does not exist");
+				return Text();
+			}
 			return found->second;
 		}
 
@@ -179,7 +201,7 @@ namespace thomas
 				font = m_defaultFont.get();
 			}
 
-			Text newText = { font, text, position, scale, color, rotation };
+			Text newText = { font, text, position, scale, Vector2(0,0), color, rotation };
 			m_texts.insert(std::make_pair(id, newText));
 		}
 
@@ -212,10 +234,26 @@ namespace thomas
 			auto& text = GetText(id);
 			text.rotation = rotation;
 		}
-		void GUIManager::SetFont(const std::string & id, Font * font)
+		void GUIManager::SetFont(const std::string & id, Font* font)
 		{
 			auto& text = GetText(id);
 			text.font = font;
+		}
+		void GUIManager::SetTextOrigin(const std::string& id, const Vector2& origin)
+		{
+			auto& text = GetText(id);
+			text.origin = origin;
+		}
+
+		Vector2 GUIManager::GetTextSize(const std::string& id)
+		{
+			auto& text = GetText(id);
+			return text.font->GetTextSize(text.text);
+		}
+
+		void  GUIManager::DeleteText(const std::string& id)
+		{
+			m_texts.erase(id);
 		}
 	}
 }

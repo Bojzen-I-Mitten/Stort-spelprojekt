@@ -14,6 +14,7 @@
 #include "../Debug.h"
 #include "../object/GameObject.h"
 #include "../serialization/Serializer.h"
+#include "../Time.h"
 #include "Font.h"
 using namespace System::Threading;
 namespace ThomasEngine
@@ -198,6 +199,8 @@ namespace ThomasEngine
 			}
 			else
 			{
+				float startTime = Time::ElapsedTime;
+				
 				Resource^ obj;
 				AssetTypes type = GetResourceAssetType(path);
 				try {
@@ -235,6 +238,11 @@ namespace ThomasEngine
 					default:
 						break;
 					}
+
+					if (obj != nullptr)
+					{
+						resources[thomasPath] = obj;
+					}
 				}
 				catch (Exception^ e) {
 
@@ -244,13 +252,10 @@ namespace ThomasEngine
 					obj = LoadErrorResource(type);
 					if(obj == nullptr)
 						Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
-
 				}
 
-				if (obj != nullptr)
-				{
-					resources[thomasPath] = obj;
-				}
+				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
+
 				return obj;
 			}
 
@@ -259,7 +264,10 @@ namespace ThomasEngine
 
 		void Resources::SavePrefab(GameObject ^ gameObject, String ^ path)
 		{
-			path = Application::currentProject->assetPath + "\\" + path;
+			if (gameObject->prefabPath)
+				path = gameObject->prefabPath;
+			else
+				path = Application::currentProject->assetPath + "\\" + path;
 
 			Serializer::SerializeGameObject(gameObject, path);
 
@@ -342,9 +350,7 @@ namespace ThomasEngine
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
-				{
-					resources[resource]->~Resource();
-				}
+					delete resources[resource];
 			}
 #pragma endregion
 
@@ -419,7 +425,7 @@ namespace ThomasEngine
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
-					Object^ lock = Scene::CurrentScene->GetGameObjectsLock();
+					Object^ lock = ThomasWrapper::CurrentScene->GetGameObjectsLock();
 
 					System::Threading::Monitor::Enter(lock);
 					Resource^ resource = resources[thomasPathOld];

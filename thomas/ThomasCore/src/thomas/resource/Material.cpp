@@ -2,9 +2,10 @@
 #include "Shader.h"
 #include "../resource/texture/Texture.h"
 #include "../graphics/Mesh.h"
+#include "../graphics/Renderer.h"
 #include "ShaderProperty\shaderProperties.h"
-
 #include <mutex>
+
 namespace thomas
 {
 	namespace resource
@@ -39,12 +40,12 @@ namespace thomas
 
 		void Material::Init()
 		{
-			s_standardMaterial = new Material(resource::Shader::GetStandardShader());
+			s_standardMaterial = new Material(graphics::Renderer::Instance()->GetStandardShader());
 		}
 
 		void Material::Destroy()
 		{
-			delete s_standardMaterial;
+			//delete s_standardMaterial;
 		}
 
 		Material * Material::GetStandardMaterial()

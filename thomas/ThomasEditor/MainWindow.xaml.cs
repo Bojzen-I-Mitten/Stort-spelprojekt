@@ -30,6 +30,10 @@ namespace ThomasEditor
         private Tester tester;
         TimeSpan lastRender;
         public static MainWindow _instance;
+        public delegate void StartPlayEvent();
+        public delegate void StopPlayingEvent();
+        public static event StartPlayEvent OnStartPlaying;
+        public static event StopPlayingEvent OnStopPlaying;
 
         Guid g;
         public MainWindow()
@@ -69,10 +73,10 @@ namespace ThomasEditor
             LoadLayout();
             Closing += MainWindow_Closing;
 
-            ThomasWrapper.OnStopPlaying += ThomasWrapper_OnStopPlaying;
+            MainWindow.OnStopPlaying += ThomasWrapper_OnStopPlaying;
 
-            ScriptingManger.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
-            ScriptingManger.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
+            ScriptingManager.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
+            ScriptingManager.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
 
             ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
             ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
@@ -271,8 +275,7 @@ namespace ThomasEditor
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
                 ThomasWrapper.Selection.UnSelectGameObject(gObj);
-                gObj.Destroy();
-                //i--;
+                ThomasWrapper.CurrentScene.DestroyObject(gObj);
             }
         }
 
@@ -292,10 +295,9 @@ namespace ThomasEditor
         private void SaveScene_Click(object sender, RoutedEventArgs e)
         {
 
-            if(Scene.CurrentScene.RelativeSavePath != null)
+            if(ThomasWrapper.CurrentScene.RelativeSavePath != null)
             {
-                Scene sceneToSave = Scene.CurrentScene;
-                Scene.SaveScene(sceneToSave);
+                ThomasWrapper.CurrentScene.SaveScene();
             }
             else
             {
@@ -305,8 +307,7 @@ namespace ThomasEditor
 
         private void NewScene_Click(object sender, RoutedEventArgs e)
         {
-            Scene.CurrentScene.UnLoad();
-            Scene.CurrentScene = new Scene("Scene");
+            ThomasWrapper.Thomas.SceneManagerRef.NewScene("Scene");
         }
 
         private void SaveSceneAs_Click(object sender, RoutedEventArgs e)
@@ -320,11 +321,11 @@ namespace ThomasEditor
             else
                 saveFileDialog.InitialDirectory = ThomasEngine.Application.currentProject.assetPath;
             saveFileDialog.RestoreDirectory = true;
-            saveFileDialog.FileName = Scene.CurrentScene.Name;
+            saveFileDialog.FileName = ThomasWrapper.CurrentScene.Name;
             if (saveFileDialog.ShowDialog() == true)
             {
-                Scene sceneToSave = Scene.CurrentScene;
-                Scene.SaveSceneAs(sceneToSave, saveFileDialog.FileName);
+                Scene sceneToSave = ThomasWrapper.CurrentScene;
+                sceneToSave.SaveSceneAs(saveFileDialog.FileName);
                 sceneToSave.Name = System.IO.Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
             }
         }
@@ -352,19 +353,7 @@ namespace ThomasEditor
             showBusyIndicator("Loading scene...");
             worker.DoWork += (o, ea) =>
             {
-                Scene newScene = Scene.LoadScene(path);
-                if (newScene != null)
-                {
-                    Scene.CurrentScene.UnLoad();
-                    Scene.CurrentScene = newScene;
-                    Scene.CurrentScene.PostLoad();
-                }
-                else
-                {
-                    Scene.CurrentScene.UnLoad();
-                    Scene.CurrentScene = null;
-                    Debug.LogError("Scene failed to load...");
-                }
+                ThomasWrapper.Thomas.SceneManagerRef.LoadScene(path);
             };
             worker.RunWorkerCompleted += (o, ea) =>
             {
@@ -376,10 +365,14 @@ namespace ThomasEditor
         private void PlayPauseButton_Click(object sender, ExecutedRoutedEventArgs e)
         {
             if (ThomasWrapper.IsPlaying())
-                ThomasWrapper.IssueStop();
+            {
+                ThomasWrapper.IssueStopPlay();
+                OnStopPlaying();
+            }
             else
             {
-                ThomasWrapper.Play();
+                ThomasWrapper.IssuePlay();
+                OnStartPlaying();
                 game.Focus();
             }
                 
@@ -391,37 +384,50 @@ namespace ThomasEditor
 
         private void AddNewCubePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            // Let's add a indirection to GameObjectManager here
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cube, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Sphere, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewQuadPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Quad, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewPlanePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Plane, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCylinderPrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Cylinder, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
         private void AddNewCapsulePrimitive(object sender, RoutedEventArgs e)
         {
-            var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Capsule, false);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+        private void AddNewTorusPrimitive(object sender, RoutedEventArgs e)
+        {
+            // Let's add a indirection to GameObjectManager here
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Torus, false);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewMonkeyPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObjectManager.addPrimitive(PrimitiveType.Monkey, false);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
 
@@ -600,8 +606,6 @@ namespace ThomasEditor
             }));
             worker.SetApartmentState(ApartmentState.STA);
             worker.Start();
-            
-            //ScriptingManger.LoadAssembly();
         }
 
         private void __layoutRoot_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -638,8 +642,8 @@ namespace ThomasEditor
             saveFileDialog.Filter = "Executable (*.exe) |*.exe";
 
 
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
+            //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            saveFileDialog.RestoreDirectory = false;
             saveFileDialog.FileName = project.name;
 
             if (saveFileDialog.ShowDialog() == true)
@@ -665,8 +669,8 @@ namespace ThomasEditor
             saveFileDialog.Filter = "Executable (*.exe) |*.exe";
 
 
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
+            //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            saveFileDialog.RestoreDirectory = false;
             saveFileDialog.FileName = project.name;
 
             if (saveFileDialog.ShowDialog() == true)
@@ -677,7 +681,13 @@ namespace ThomasEditor
                     string fileName = System.IO.Path.GetFileName(saveFileDialog.FileName);
                     string dir = System.IO.Path.GetDirectoryName(saveFileDialog.FileName);
                     if (utils.Exporter.ExportProject(saveFileDialog.FileName, project))
-                        System.Diagnostics.Process.Start(dir + "\\Bin\\" + fileName);
+                    {
+                        System.Diagnostics.Process pr = new System.Diagnostics.Process();
+                        pr.StartInfo.FileName = dir + "\\Bin\\" + fileName;
+                        pr.StartInfo.WorkingDirectory = dir + "\\Bin";
+                        pr.Start();
+                    }
+
                     hideBusyIndicator();
                     
                 }));
