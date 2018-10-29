@@ -39,7 +39,7 @@ namespace thomas
 		{
 			if (tex != m_skyMap)
 			{
-				delete m_cubeMap;
+				//delete m_cubeMap;
 				m_cubeMap = new resource::TextureCube(tex);
 				m_skyMap = tex;
 			}

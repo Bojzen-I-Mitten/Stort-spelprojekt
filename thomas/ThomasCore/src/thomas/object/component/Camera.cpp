@@ -61,7 +61,7 @@ namespace thomas
 				m_GUIHandle->Destroy();
 				m_GUIHandle.reset();
 
-				m_skybox.reset();
+				//m_skybox.reset();
 				
 				for (int i = 0; i < s_allCameras.size(); i++)
 				{
