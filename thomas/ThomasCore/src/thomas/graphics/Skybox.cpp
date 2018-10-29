@@ -25,7 +25,14 @@ namespace thomas
 
 		SkyBox::~SkyBox()
 		{
+			SAFE_DELETE(m_cubeMap);
+			SAFE_DELETE(m_skyMap);
 
+			SAFE_RELEASE(m_vertBuffer);
+			SAFE_RELEASE(m_indexBuffer);
+
+			m_sphereIndices.clear();
+			m_sphereVerts.clear();
 		}
 
 		bool SkyBox::SetSkyMap(resource::Texture2D * tex)
