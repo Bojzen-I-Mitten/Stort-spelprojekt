@@ -326,6 +326,10 @@ namespace thomas
 			{
 				m_skybox->Draw();
 			}
+			bool Camera::hasSkybox()
+			{
+				return bool(m_skybox);
+			}
 		}
 	}
 }

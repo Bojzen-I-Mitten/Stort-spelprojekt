@@ -75,6 +75,7 @@ namespace thomas
 				void SetSkyMap(resource::Texture2D* tex);
 				resource::Texture2D* GetSkyMap();
 				void DrawSkyBox();
+				bool hasSkybox();
 			private:
 				uint32_t m_ID;
 				graphics::render::CAMERA_FRAME_DATA m_frameData;
