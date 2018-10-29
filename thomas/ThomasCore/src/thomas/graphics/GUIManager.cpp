@@ -39,13 +39,13 @@ namespace thomas
 				{
 					Vector2 size = Vector2(image.second.texture->GetWidth(), image.second.texture->GetHeight());
 					m_spriteBatch->Draw(image.second.texture->GetResourceView(), image.second.position * m_viewport, nullptr, image.second.color,
-										image.second.rotation, image.second.origin * size, image.second.scale * m_viewportScale);
+										image.second.rotation, image.second.origin * size, image.second.scale * m_viewportScale, image.second.effect);
 				}
 
 				for (const auto& text : m_texts)
 				{
 					text.second.font->DrawGUIText(m_spriteBatch.get(), text.second.text, text.second.position * m_viewport, text.second.scale * m_viewportScale,
-						text.second.origin, text.second.color, text.second.rotation);
+						text.second.origin, text.second.color, text.second.rotation, text.second.effect);
 				}
 
 				// End
@@ -65,7 +65,7 @@ namespace thomas
 		{
 			if (texture->GetResourceView())
 			{
-				Image image = { texture, position, scale, Vector2(0,0), color, rotation, interact };
+				Image image = { texture, position, scale, Vector2(0,0), color, rotation, interact, DirectX::SpriteEffects_None };
 				m_images.insert(std::make_pair(id, image));
 			}
 		}
@@ -110,6 +110,12 @@ namespace thomas
 		{
 			auto& image = GetImage(id);
 			image.origin = origin;
+		}
+
+		void GUIManager::SetImageFlipEffect(const std::string & id, const DirectX::SpriteEffects effect)
+		{
+			auto& image = GetImage(id);
+			image.effect = effect;
 		}
 
 		bool GUIManager::OnImageClicked(const std::string& id)
@@ -201,7 +207,7 @@ namespace thomas
 				font = m_defaultFont.get();
 			}
 
-			Text newText = { font, text, position, scale, Vector2(0,0), color, rotation };
+			Text newText = { font, text, position, scale, Vector2(0,0), color, rotation, DirectX::SpriteEffects_None };
 			m_texts.insert(std::make_pair(id, newText));
 		}
 
@@ -243,6 +249,12 @@ namespace thomas
 		{
 			auto& text = GetText(id);
 			text.origin = origin;
+		}
+
+		void GUIManager::SetTextFlipeffect(const std::string & id, DirectX::SpriteEffects effect)
+		{
+			auto& text = GetText(id);
+			text.effect = effect;
 		}
 
 		Vector2 GUIManager::GetTextSize(const std::string& id)

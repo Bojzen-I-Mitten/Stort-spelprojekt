@@ -232,6 +232,9 @@ public class ChadControls : NetworkComponent
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
+                    ChadHud.Instance.ActivateCrosshair();
+                    ChadHud.Instance.ActivateChargeBar();
+
                     Animations.SetAnimationWeight(ChargeAnimIndex, 1);
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
@@ -239,6 +242,8 @@ public class ChadControls : NetworkComponent
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
                 else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
@@ -258,6 +263,8 @@ public class ChadControls : NetworkComponent
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                     Throwing = PlayThrowAnim();
                     StartCoroutine(Throwing);
@@ -493,6 +500,7 @@ public class ChadControls : NetworkComponent
         PickedUpObject.ChargeEffect();
 
         ThrowForce = ChargeRate * ChargeTime;
+        ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
     }
 
     private void ThrowObject()

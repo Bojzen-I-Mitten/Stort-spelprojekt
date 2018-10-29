@@ -78,7 +78,7 @@ public class PickupableObject : NetworkComponent
         {
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
             m_pickedUp = false;
-            transform.parent = null;
+            transform.SetParent(null, true);
             if (_Chad)
             {
                 _Chad.PickedUpObject = null;

@@ -19,6 +19,15 @@ namespace ThomasEngine
 		}
 
 	public:
+		enum class FLIP_EFFECTS
+		{
+			NONE,
+			FLIPHORIZONTALLY,
+			FLIPVERTICALLY,
+			FLIPBOTH
+		};
+
+	public:
 		Camera();
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
@@ -77,6 +86,13 @@ namespace ThomasEngine
 			}
 		}
 
+		/*[BrowsableAttribute(false)]
+		property FLIP_EFFECTS flipEffects
+		{
+			FLIP_EFFECTS get();
+			void set(FLIP_EFFECTS value);
+		}*/
+
 	public:
 
 		//GUI Images
@@ -96,6 +112,7 @@ namespace ThomasEngine
 		void SetImageRotation(String^ id, float rotation);
 		void SetImageInteract(String^ id, bool interact);
 		void SetImageOrigin(String^ id, Vector2 origin);
+		void SetImageFlipEffect(String^ id, FLIP_EFFECTS effect);
 		void DeleteImage(String^ id);
 
 		// GUI Text
@@ -117,6 +134,7 @@ namespace ThomasEngine
 		void SetTextRotation(String^ id, float rotation);
 		void SetTextFont(String^ id, Font^ font);
 		void SetTextOrigin(String^ id, Vector2 origin);
+		void SetTextFlipEffect(String^ id, FLIP_EFFECTS effect);
 		Vector2 GetTextSize(String^ id);
 		void DeleteText(String^ id);
 	};
