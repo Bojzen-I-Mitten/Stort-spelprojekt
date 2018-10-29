@@ -77,13 +77,8 @@ namespace thomas
 		{
 			//Get the current active window
 
-			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
-
-			if (!window || !window->Initialized())
+			if (!BindCameraViewport(frameData))
 				return;
-
-			window->Bind();
-			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -93,6 +88,19 @@ namespace thomas
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
 			m_shaders.SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
+		}
+		bool Renderer::BindCameraViewport(const render::CAMERA_FRAME_DATA& frameData)
+		{
+			//Get the current active window
+
+			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
+
+			if (!window || !window->Initialized())
+				return false;
+
+			window->Bind();
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+			return true;
 		}
 
 		void Renderer::ClearCommands()
@@ -210,6 +218,7 @@ namespace thomas
 				// Shitty solution to camera destruction:
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
+				BindCameraViewport(perCameraQueue.second.m_frameData);
 				if (camera && camera->GetGUIRendering())
 					camera->GetGUIHandle()->Render();
 			}
