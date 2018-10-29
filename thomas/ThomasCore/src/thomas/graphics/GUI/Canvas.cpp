@@ -22,6 +22,8 @@ namespace thomas
 				m_camViewport = camViewport;
 				m_viewportScale = Vector2(1.f, 1.f);
 				m_baseResolution = baseResolution;
+
+				m_GUIElements = std::vector<std::unique_ptr<GUIElement>>();
 			}
 
 			void Canvas::Destroy()
@@ -75,7 +77,7 @@ namespace thomas
 					std::unique_ptr<GUIElement>(new Text(font, text, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false));
 				m_GUIElements.push_back(std::move(newText));
 
-				return newText.get();
+				return m_GUIElements[m_GUIElements.size() - 1].get();
 			}
 
 			GUIElement* Canvas::AddGUIElement(Texture2D * texture)
@@ -85,7 +87,7 @@ namespace thomas
 					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false);
 					m_GUIElements.push_back(std::move(image));
 
-					return image.get();
+					return m_GUIElements[m_GUIElements.size() - 1].get();
 				}
 
 				return nullptr;

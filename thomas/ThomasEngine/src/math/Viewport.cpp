@@ -18,13 +18,4 @@ namespace ThomasEngine
 		w = vp.w;
 		h = vp.h;
 	}
-
-	float Viewport::x::get() { return x; }
-	void Viewport::x::set(float x) { this->x = x; }
-	float Viewport::y::get() { return y; }
-	void Viewport::y::set(float y) { this->y = y; }
-	float Viewport::w::get() { return w; }
-	void Viewport::w::set(float w) { this->w = w; }
-	float Viewport::h::get() { return h; }
-	void Viewport::h::set(float h) { this->h = h; }
 }

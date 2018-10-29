@@ -14,11 +14,7 @@ namespace ThomasEngine
 		Canvas(Camera^ camera);
 		Canvas(Camera^ camera, Viewport viewport);
 
-		property Camera^ camera
-		{
-			Camera^ get();
-			void set(Camera^ camera);
-		}
+		Camera^ camera;
 
 		property Viewport viewport
 		{

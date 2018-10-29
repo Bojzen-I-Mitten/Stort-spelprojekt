@@ -338,7 +338,7 @@ namespace thomas
 				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(m_viewport, &m_viewport);
 				m_canvases.push_back(std::move(canvas));
 
-				return canvas.get();
+				return m_canvases[m_canvases.size() - 1].get();
 			}
 
 			graphics::GUI::Canvas * Camera::AddCanvas(math::Viewport viewport)
@@ -346,7 +346,7 @@ namespace thomas
 				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(viewport, &m_viewport);
 				m_canvases.push_back(std::move(canvas));
 
-				return canvas.get();
+				return m_canvases[m_canvases.size() - 1].get();
 			}
 
 			void Camera::RenderGUI()
