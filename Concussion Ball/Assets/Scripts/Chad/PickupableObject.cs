@@ -21,7 +21,7 @@ public class PickupableObject : NetworkComponent
 
     private ChadControls _Chad;
     private RenderComponent m_renderComponent;
-    private bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
+    protected bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
 
     public override void Start()
     {
@@ -89,7 +89,7 @@ public class PickupableObject : NetworkComponent
         {
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
             m_pickedUp = false;
-            transform.parent = null;
+            transform.SetParent(null, true);
             if (_Chad)
             {
                 _Chad.PickedUpObject = null;

@@ -35,7 +35,7 @@ namespace ThomasEngine
 
 	void Component::Destroy()
 	{
-		throw gcnew System::InvalidOperationException("Can't destroy components directly");
+		gameObject->RemoveComponent(this);
 	}
 
 

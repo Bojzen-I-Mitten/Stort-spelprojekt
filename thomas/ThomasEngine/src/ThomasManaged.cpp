@@ -47,8 +47,13 @@ namespace ThomasEngine {
 		return s_SYS->m_scene;
 	}
 
-	void ThomasWrapper::Start() 
+	void ThomasWrapper::Start()
 	{
+		Start(true);
+	}
+	void ThomasWrapper::Start(bool editor) 
+	{
+		inEditor = editor;
 		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
 		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
@@ -67,7 +72,7 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			Model::InitPrimitives();
+			
 			
 			Component::LoadExternalComponents();
 
@@ -75,10 +80,14 @@ namespace ThomasEngine {
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
-#ifdef _EDITOR
+#if _EDITOR
 
+			if (InEditor()) {
+				Model::InitPrimitives();
 				Resources::LoadAll(Application::editorAssets);
 				ScriptingManager::Init();
+			}
+
 			
 #endif
 

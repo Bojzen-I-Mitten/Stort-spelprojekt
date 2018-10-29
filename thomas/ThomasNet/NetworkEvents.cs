@@ -68,13 +68,15 @@ namespace ThomasEngine.Network
             public int[] PeerPorts { get; set; }
             public long ServerStartTime { get; set; }
             public bool IsResponsiblePeer { get; set; }
+            public int SceneNextAssignableID { get; set; }
 
             public ServerInfoEvent() { }
-            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible)
+            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible, int nextAssignableID)
             {
                 ServerStartTime = serverStartTime;
                 PeerIPs = new string[peers.Length - 1];
                 PeerPorts = new int[peers.Length - 1];
+                SceneNextAssignableID = nextAssignableID;
                 int i = 0;
                 foreach(NetPeer peer in peers)
                 {
@@ -108,6 +110,7 @@ namespace ThomasEngine.Network
             if (serverInfo.IsResponsiblePeer)
                 Manager.ResponsiblePeer = peer;
             Manager.ServerStartTime = serverInfo.ServerStartTime;
+            Manager.Scene.nextAssignableID = serverInfo.SceneNextAssignableID;
             
         }
         

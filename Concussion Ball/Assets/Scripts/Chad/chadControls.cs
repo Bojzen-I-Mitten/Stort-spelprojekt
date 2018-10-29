@@ -77,6 +77,7 @@ public class ChadControls : NetworkComponent
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
+    public bool Locked = false;
 
     public PickupableObject PickedUpObject;
 

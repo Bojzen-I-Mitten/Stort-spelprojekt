@@ -82,7 +82,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
-                    id.gameObject.Destroy();
+                    Object.Destroy(id.gameObject);
                 Players.Remove(peer);
             }
 

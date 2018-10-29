@@ -537,7 +537,7 @@ namespace ThomasEditor
                     ThomasWrapper.Selection.UnSelectGameObject(gObj);
 
                     //Destroy
-                    gObj.Destroy();
+                    GameObject.Destroy(gObj);
                 }
         }
 
