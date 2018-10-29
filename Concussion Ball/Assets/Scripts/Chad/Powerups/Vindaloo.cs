@@ -56,6 +56,7 @@ public class Vindaloo : Powerup
             }
         });
 
+        this.gameObject.GetComponent<Rigidbody>().IsKinematic = true;
 
         
     }
