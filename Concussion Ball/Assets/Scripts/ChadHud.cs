@@ -43,6 +43,7 @@ public class ChadHud : ScriptComponent
         cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
         cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
         cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.6f, 0.5f + (ChargeBarTexture.height / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
+        //Need to rotate the bar 180, because positive x is down on the screen.
         cam.SetImageOrigin(ChargeBar, new Vector2(1, 0));
         cam.SetImageRotation(ChargeBar, 3.14f);
 
