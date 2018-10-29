@@ -41,8 +41,8 @@ public class ChadHud : ScriptComponent
         cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
 
         cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
-        cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
-        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.6f, 0.5f + (ChargeBarTexture.height / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
+        cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.9f, 0.1f), Vector2.Zero, false);
+        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height*9.0f) / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
         //Need to rotate the bar 180, because positive x is down on the screen.
         cam.SetImageOrigin(ChargeBar, new Vector2(1, 0));
         cam.SetImageRotation(ChargeBar, 3.14f);
@@ -160,7 +160,7 @@ public class ChadHud : ScriptComponent
 
     public void ActivateChargeBar()
     {
-        cam.SetImageScale(ChargeBarOutline, Vector2.One);
+        cam.SetImageScale(ChargeBarOutline, new Vector2(2.0f, 9.0f));
         cam.SetImageColor(ChargeBar, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
     }
 
@@ -178,7 +178,7 @@ public class ChadHud : ScriptComponent
         c = Color.Lerp(c, Color.Blue, (charge - timePerPart * 0) / timePerPart);
         c = Color.Lerp(c, Color.Red, (charge - timePerPart * 1) / timePerPart);
         cam.SetImageColor(ChargeBar, c.ToVector4());
-        cam.SetImageScale(ChargeBar, new Vector2(1, charge));
+        cam.SetImageScale(ChargeBar, new Vector2(2.0f, charge*9.0f));
     }
 
     public override void Update()
