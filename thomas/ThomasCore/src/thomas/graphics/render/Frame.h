@@ -5,6 +5,7 @@
 #include "../../utils/Math.h"
 #include "FrameAllocation.h"
 #include "../../resource/ShaderProperty/ShaderPropertyStruct.h"
+#include "FrameData.h"
 
 namespace thomas {
 
@@ -35,7 +36,7 @@ namespace thomas {
 
 			struct RenderCommand
 			{
-				object::component::Camera* camera;										// Camera rendered from
+				uint32_t camera_ID;										// Camera rendered from
 				math::Matrix worldMatrix;												// World matrix, make local?
 				Mesh* mesh;																// Rendered mesh
 				resource::Material* material;											// Material used for rendering
@@ -43,10 +44,12 @@ namespace thomas {
 				const resource::shaderproperty::ShaderPropertyStatic * local_prop;	// Properties local to rendered object
 
 				RenderCommand() {}
-				RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam) :
-					camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(0), local_prop(NULL) {};
-				RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, object::component::Camera* cam, unsigned int num_local_prop, const resource::shaderproperty::ShaderPropertyStatic * local_prop) :
-					camera(cam), worldMatrix(world), mesh(m), material(mat), num_local_prop(num_local_prop), local_prop(local_prop) {};
+				RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, uint32_t cameraID) :
+					camera_ID(cameraID), worldMatrix(world), mesh(m), material(mat), num_local_prop(0), local_prop(NULL)
+				{};
+				RenderCommand(math::Matrix world, Mesh* m, resource::Material* mat, uint32_t cameraID, unsigned int num_local_prop, const resource::shaderproperty::ShaderPropertyStatic * local_prop) :
+					camera_ID(cameraID), worldMatrix(world), mesh(m), material(mat), num_local_prop(num_local_prop), local_prop(local_prop)
+				{};
 			};
 			struct GUIRenderCommand
 			{
@@ -59,10 +62,14 @@ namespace thomas {
 			};
 			struct CameraRenderQueue
 			{
+				CAMERA_FRAME_DATA m_frameData;
 				std::map<resource::Material*, std::vector<RenderCommand>, MaterialSorter> m_commands3D;
 				//std::vector<GUIRenderCommand> m_guiCommands;
 			};
-			typedef std::map<object::component::Camera*, CameraRenderQueue> CommandQueue;
+
+			/* ID, RenderQueue
+			*/
+			typedef std::map<uint32_t, CameraRenderQueue> CommandQueue;
 
 			/* Render frame container
 			*/
