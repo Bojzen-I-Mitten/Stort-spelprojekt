@@ -14,6 +14,7 @@ public class ChadHud : ScriptComponent
     public Texture2D CrosshairTexture { get; set; }
     public Texture2D ChargeBarOutlineTexture { get; set; }
     public Texture2D ChargeBarTexture { get; set; }
+    public bool ToggleAim { get; set; } = true;
 
     private readonly string Crosshair = "Crosshair";
     private readonly string ChargeBarOutline = "ChargeBarOutline";
@@ -39,7 +40,6 @@ public class ChadHud : ScriptComponent
 
         cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(0.5f, 0.5f), Vector2.Zero, false);
         cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
-
         cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
         cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.6f, 0.5f), Vector2.Zero, false);
         cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.6f, 0.5f + (ChargeBarTexture.height / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
@@ -149,8 +149,11 @@ public class ChadHud : ScriptComponent
     
     public void ActivateCrosshair()
     {
-        cam.SetImageScale(Crosshair, Vector2.One);
-        cam.SetImageColor(Crosshair, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+        if (ToggleAim)
+        {
+            cam.SetImageScale(Crosshair, Vector2.One);
+            cam.SetImageColor(Crosshair, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+        }
     }
 
     public void DeactivateCrosshair()
