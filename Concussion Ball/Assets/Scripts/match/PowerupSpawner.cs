@@ -1,4 +1,6 @@
-﻿using ThomasEngine;
+﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using ThomasEngine;
 using ThomasEngine.Network;
 public class PowerupSpawner : NetworkComponent
 {
@@ -12,28 +14,57 @@ public class PowerupSpawner : NetworkComponent
 
     public override void Update()
     {
-        if(spawnedPowerup == null)
+        if (isOwner)
         {
-            
-            timeLeftUntilSpawn -= Time.DeltaTime;
-            if (timeLeftUntilSpawn < 0.0f)
-                SpawnPowerup();
+            if (spawnedPowerup == null)
+            {
+                timeLeftUntilSpawn -= Time.DeltaTime;
+                if (timeLeftUntilSpawn < 0.0f)
+                    SpawnPowerup();
+            }
         }
+
     }
 
     public void Free()
     {
+        SendRPC("RPCFree");
+        RPCFree();
+    }
+
+    public void RPCFree()
+    {
         spawnedPowerup = null;
+    }
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        if(initialState)
+        {
+            writer.Put(timeLeftUntilSpawn);
+            return true;
+        }
+        return false;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        if (initialState)
+        {
+            timeLeftUntilSpawn = reader.GetFloat();
+        }
     }
 
     public void SpawnPowerup()
     {
-        if(spawnedPowerup == null)
+        if (spawnedPowerup == null)
         {
             spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
             spawnedPowerup.GetComponent<Powerup>().spawner = this;
             timeLeftUntilSpawn = 30.0f;
         }
+        else
+            Debug.Log("Powerup already spawned");
     }
 
     public override void OnDrawGizmos()

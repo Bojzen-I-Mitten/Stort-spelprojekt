@@ -42,10 +42,15 @@ namespace ThomasEngine {
 		ThomasWrapper::CurrentScene->GameObjects->Add(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
-		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+		if (ThomasWrapper::InEditor())
+			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 
 		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
+	}
+	void GameObject::DestroySelf()
+	{
+		ThomasWrapper::CurrentScene->DestroyObject(this);
 	}
 	bool GameObject::InitComponents(bool playing)
 	{
@@ -152,7 +157,7 @@ namespace ThomasEngine {
 			}
 		}
 		catch (Exception^ e) {
-			Debug::LogError("Updating component failed with exception: " + e->Message);
+			Debug::LogException(e);
 		}
 		finally{
 			Monitor::Exit(m_componentsLock);
@@ -235,7 +240,12 @@ namespace ThomasEngine {
 	}
 	void GameObject::Destroy()
 	{
-		throw gcnew System::InvalidOperationException("Not allowed to call destroy on GameObjects...");
+		List<Transform^>^ children = gcnew List<Transform^>(transform->children);
+		for each(Transform^ child in children)
+		{
+			Destroy(child->gameObject);
+		}
+		DestroySelf();
 	}
 
 	bool GameObject::MakeStatic()

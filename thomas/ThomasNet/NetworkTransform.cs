@@ -299,8 +299,12 @@ namespace ThomasEngine.Network
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
 
+            
             float dist = Vector3.Distance(target.position, TargetSyncPosition);
-            if (dist > SnapThreshhold || !targetRigidbody.enabled)
+
+            float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
+
+            if (dist > SnapThreshhold || rotDiff < -LocalRotationThreshold || !targetRigidbody.enabled)
             {
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;

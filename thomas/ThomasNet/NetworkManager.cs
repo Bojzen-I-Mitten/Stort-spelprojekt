@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-
+            NetScene.InititateScene();
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -118,16 +118,15 @@ namespace ThomasEngine.Network
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
 
-            NetScene.InititateScene();
         }
 
         public void Host()
         {
             initServerStartTime();
             ResponsiblePeer = LocalPeer;
-            NetScene.ActivateSceneObjects();
             NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             OnPeerJoin(LocalPeer);
+            NetScene.ActivateSceneObjects();
 
         }
 
@@ -183,7 +182,7 @@ namespace ThomasEngine.Network
             {
                 //Send server info to this guy.
                 bool responsible = ResponsiblePeer == LocalPeer;
-                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible);
+                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);

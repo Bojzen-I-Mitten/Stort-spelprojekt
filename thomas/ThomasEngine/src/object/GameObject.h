@@ -35,6 +35,10 @@ namespace ThomasEngine
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 
+		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
+		bool RemoveComponent(Component^ comp);
+		virtual void Destroy() override;
+
 		System::String^ prefabPath;
 
 
@@ -71,16 +75,12 @@ namespace ThomasEngine
 		bool MakeStatic();
 		bool MakeDynamic();
 		bool MoveStaticGroup();
-		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 
 		GameObject(String^ name);
 
-		bool RemoveComponent(Component^ comp);
-		
+		void DestroySelf();
+
 		static GameObject^ CreatePrefab();
-
-
-		virtual void Destroy() override;
 
 		property bool inScene {
 			bool get() {

@@ -71,10 +71,14 @@ public class Powerup : PickupableObject
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (!m_pickupable)
+        if (isOwner)
         {
-            Activate();
+            if (!m_pickupable && !m_pickedUp)
+            {
+                Activate();
+            }
         }
+
     }
 
     public void Remove()
