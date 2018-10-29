@@ -35,7 +35,7 @@ namespace thomas
 			{
 				GUIElement() = default;
 				GUIElement(Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
-					position(position), scale(scale), origin(origin), color(color), rotation(rotation), interactable(interactable) {}
+					position(position), scale(scale), origin(origin), color(color), rotation(rotation), interactable(interactable) {effect = DirectX::SpriteEffects::SpriteEffects_None;}
 				virtual ~GUIElement(){}
 
 				Vector2 position;
@@ -44,6 +44,7 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interactable;
+				DirectX::SpriteEffects effect;
 
 				virtual void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale) = 0;
 				virtual bool OnHover(Vector2 vp, Vector2 vpScale) = 0;
@@ -62,7 +63,7 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation);
+					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation, effect);
 				}
 
 				bool OnHover(Vector2 vp, Vector2 vpScale)
@@ -102,7 +103,7 @@ namespace thomas
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
 					Vector2 size = Vector2(texture->GetWidth(), texture->GetHeight());
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, size, scale * vpScale);
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, size, scale * vpScale, effect);
 				}
 
 				bool OnHover(Vector2 vp, Vector2 vpScale)

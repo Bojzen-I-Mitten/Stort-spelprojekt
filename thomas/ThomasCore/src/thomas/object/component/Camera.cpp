@@ -17,8 +17,6 @@ namespace thomas
 	{
 		namespace component
 		{
-			std::vector<Camera*> Camera::s_allCameras;
-
 			void Camera::UpdateProjMatrix()
 			{
 				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
@@ -26,8 +24,9 @@ namespace thomas
 			}
 
 			Camera::Camera(bool dontAddTolist) :
+				m_ID(0),
 				m_renderGUI(false)
-				//m_GUIManager(std::make_unique <graphics::GUI::GUIManager> ())
+				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
 				m_near = 0.1f;
@@ -38,8 +37,9 @@ namespace thomas
 			}
 
 			Camera::Camera() :
-			m_renderGUI(false)
-			//m_GUIManager(std::make_unique<graphics::GUI::GUIManager>())
+				m_ID(0),
+				m_renderGUI(false)
+				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70;
 				m_near = 0.5;
@@ -48,10 +48,6 @@ namespace thomas
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
 				
-				std::sort(s_allCameras.begin(), s_allCameras.end(), [](Camera* a, Camera* b) 
-				{
-					return a->GetTargetDisplayIndex() < b->GetTargetDisplayIndex();
-				});
 			}
 
 			Camera::~Camera()
@@ -62,38 +58,18 @@ namespace thomas
 					m_canvases[i].reset();
 				}
 				m_canvases.clear();
-				//m_GUIManager->Destroy();
-				//m_GUIManager.reset();
-				
-				for (int i = 0; i < s_allCameras.size(); i++)
-				{
-					if (s_allCameras[i] == this)
-					{
-						s_allCameras.erase(s_allCameras.begin() + i);
-						break;
-					}		
-				}
+				graphics::Renderer::Instance()->getCameraList().remove(this);
 			}
 
 			void Camera::OnEnable()
 			{
-				s_allCameras.push_back(this);
+				m_ID = graphics::Renderer::Instance()->getCameraList().add(this);
 			}
 
 			void Camera::OnDisable()
 			{
-				
-				for (int i = 0; i < s_allCameras.size(); i++) 
-				{
-					if (s_allCameras[i] == this) 
-					{
-						
-
-						s_allCameras.erase(s_allCameras.begin() + i);
-						return;
-					}
-						
-				}
+				graphics::Renderer::Instance()->getCameraList().remove(this);
+				m_ID = 0;
 			}
 
 			void Camera::OnDestroy()
@@ -233,6 +209,7 @@ namespace thomas
 			void Camera::Render()
 			{
 				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
+				graphics::Renderer::Instance()->SubmitCamera(this);
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
 					if(renderComponent->m_gameObject->GetActive())
@@ -328,9 +305,14 @@ namespace thomas
 				}
 			}
 
-			Camera::CAMERA_FRAME_DATA & Camera::GetFrameData()
+			const graphics::render::CAMERA_FRAME_DATA& Camera::GetFrameData()
 			{
 				return m_frameData;
+			}
+
+			uint32_t Camera::ID()
+			{
+				return m_ID;
 			}
 
 			graphics::GUI::Canvas* Camera::AddCanvas()

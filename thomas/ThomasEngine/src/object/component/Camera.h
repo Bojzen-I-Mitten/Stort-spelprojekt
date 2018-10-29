@@ -18,6 +18,15 @@ namespace ThomasEngine
 		}
 
 	public:
+		enum class FLIP_EFFECTS
+		{
+			NONE,
+			FLIPHORIZONTALLY,
+			FLIPVERTICALLY,
+			FLIPBOTH
+		};
+
+	public:
 		Camera();
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
@@ -71,6 +80,13 @@ namespace ThomasEngine
 		{
 			Viewport get();
 		}
+
+		/*[BrowsableAttribute(false)]
+		property FLIP_EFFECTS flipEffects
+		{
+			FLIP_EFFECTS get();
+			void set(FLIP_EFFECTS value);
+		}*/
 
 	public:
 		Canvas^ AddCanvas();
