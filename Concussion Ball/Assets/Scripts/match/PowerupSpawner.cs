@@ -34,7 +34,9 @@ public class PowerupSpawner : NetworkComponent
 
     public void RPCFree()
     {
+        timeLeftUntilSpawn = spawnInterval;
         spawnedPowerup = null;
+        
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -61,7 +63,7 @@ public class PowerupSpawner : NetworkComponent
         {
             spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
             spawnedPowerup.GetComponent<Powerup>().spawner = this;
-            timeLeftUntilSpawn = 30.0f;
+            timeLeftUntilSpawn = spawnInterval;
         }
         else
             Debug.Log("Powerup already spawned");

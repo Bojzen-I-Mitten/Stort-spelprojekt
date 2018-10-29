@@ -29,8 +29,8 @@ public class Ball : PickupableObject
         m_throwable = true;
         DropOnRagdoll = true;
 
-        renderComponent = gameObject.GetComponent<RenderComponent>();
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        //renderComponent = gameObject.GetComponent<RenderComponent>();
+        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
@@ -226,7 +226,7 @@ public class Ball : PickupableObject
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
         Color newColor = new Color(interp, 0.0f, (1.0f - interp));
-        renderComponent.material.SetColor("color", newColor);
+        //renderComponent.material.SetColor("color", newColor);
 
         if (interp > 0.8f)
         {
@@ -245,7 +245,7 @@ public class Ball : PickupableObject
     override public void Cleanup()
     {
         base.Cleanup();
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;
         emitterElectricity2.Emit = false;
