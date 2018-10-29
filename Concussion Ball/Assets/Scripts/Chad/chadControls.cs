@@ -114,6 +114,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        // Debug.Log(State);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -218,7 +219,6 @@ public class ChadControls : NetworkComponent
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
                 {
-                    Debug.Log("THEBOIS");
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
@@ -256,14 +256,13 @@ public class ChadControls : NetworkComponent
             float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
             Direction.y = xStep;
-
-            if (!Input.GetKey(Input.Keys.LeftShift) && (!HasThrowableObject() || !Input.GetMouseButton(Input.MouseButtons.RIGHT)) || State == STATE.DIVING || State == STATE.CHADING)
+            // Debug.Log(State);
+            if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING) || State == STATE.DIVING || State == STATE.CHADING)
             {
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
-            else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && HasThrowableObject() && State == STATE.THROWING)
+            else if (State == STATE.THROWING)
             {
-                
                 ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
             }
             else if (Input.GetKeyDown(Input.Keys.LeftShift))

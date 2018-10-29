@@ -244,17 +244,8 @@ public class Ball : PickupableObject
     override public void Cleanup()
     {
         base.Cleanup();
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
-        emitterElectricity1.Emit = false;
-        emitterElectricity2.Emit = false;
-        emitterElectricity3.Emit = false;
-
-        emitterFire.Emit = false;
-        emitterSmoke.Emit = false;
-        ResetFireEmitters();
-        // Reset values
-        ResetElectricityEmitters();
+        StartCoroutine(CleanTimer());
     }
 
 
@@ -281,5 +272,22 @@ public class Ball : PickupableObject
     {
         yield return null;
         m_rigidBody.enabled = true;
+    }
+
+    private IEnumerator CleanTimer()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
+        ResetFireEmitters();
+        // Reset values
+        ResetElectricityEmitters();
     }
 }
