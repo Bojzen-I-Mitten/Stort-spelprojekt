@@ -16,8 +16,8 @@ namespace thomas
 		public:
 			SkyBox();
 			~SkyBox();
-			//bool SetSkyMap(resource::Texture2D* tex);
-			//resource::Texture2D* GetSkyMap();
+			bool SetSkyMap(resource::Texture2D* tex);
+			resource::Texture2D* GetSkyMap();
 			void Draw();
 		private:
 
@@ -26,8 +26,7 @@ namespace thomas
 			std::unique_ptr<utils::buffers::VertexBuffer> m_vertBuffer;
 			std::unique_ptr<utils::buffers::IndexBuffer> m_indexBuffer;
 
-			//resource::Texture2D* m_skyMap;
-			//resource::Texture2D* m_skyMap;
+			resource::Texture2D* m_skyMap;
 			resource::TextureCube* m_cubeMap;
 			resource::Shader* m_shader;
 			

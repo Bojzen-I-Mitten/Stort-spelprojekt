@@ -127,7 +127,7 @@ namespace ThomasEngine
 			{
 				return AssetTypes::MATERIAL;
 			}
-			else if (extension == "bmp" || extension == "jpg" || extension == "png" || extension == "gif" || extension == "tif")
+			else if (extension == "bmp" || extension == "jpg" || extension == "png" || extension == "gif" || extension == "tif" || extension == "dds")
 			{
 				return AssetTypes::TEXTURE2D;
 			}

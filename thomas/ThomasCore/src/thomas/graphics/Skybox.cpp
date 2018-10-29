@@ -19,7 +19,7 @@ namespace thomas
 			
 			//m_cubeMap = new resource::TextureCube("../Data/SkyBox.dds");
 			m_cubeMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
-			//m_skyMap = new resource::Texture2D("../Data/SkyBox.dds");
+			m_skyMap = new resource::Texture2D("../Data/fullmoon_skybox.dds");
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
@@ -28,7 +28,7 @@ namespace thomas
 
 		}
 
-		/*bool SkyBox::SetSkyMap(resource::Texture2D * tex)
+		bool SkyBox::SetSkyMap(resource::Texture2D * tex)
 		{
 			if (tex != m_skyMap)
 			{
@@ -42,7 +42,7 @@ namespace thomas
 		resource::Texture2D * SkyBox::GetSkyMap()
 		{
 			return m_skyMap;
-		}*/
+		}
 
 		void SkyBox::GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius)
 		{

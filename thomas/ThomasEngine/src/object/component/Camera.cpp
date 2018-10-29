@@ -35,7 +35,7 @@ namespace ThomasEngine
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
 
-	/*Texture2D^ Camera::SkyMap::get() 
+	Texture2D^ Camera::SkyMap::get() 
 	{ 
 		ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(camera->GetSkyMap());
 		if (res)
@@ -46,7 +46,7 @@ namespace ThomasEngine
 	void Camera::SkyMap::set(Texture2D^ value) 
 	{
 		camera->SetSkyMap((thomas::resource::Texture2D*)value->m_nativePtr);
-	}*/
+	}
 
 	//-------------------------------------------------------------------------------------------
 	void Camera::AddImage(String^ id, Texture2D^ texture, Vector2 position, bool interact)

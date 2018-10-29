@@ -68,11 +68,11 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
-		/*property Texture2D^ SkyMap
+		property Texture2D^ SkyMap
 		{
 			Texture2D^ get();
 			void set(Texture2D^ value);
-		}*/
+		}
 		[BrowsableAttribute(false)]
 		property Vector2 viewport
 		{
