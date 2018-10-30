@@ -43,6 +43,7 @@ namespace thomas
 			{
 				if (m_clip != nullptr)
 				{
+					m_volume;
 					Sound::Play(m_clip->GetName(), m_volume);
 				}
 			}

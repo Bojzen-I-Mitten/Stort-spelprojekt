@@ -31,6 +31,7 @@ public class Ragdoll : ScriptComponent
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
     public GameObject SoundImpactObject { get; set; }
+    public Transform AudioListener { get; set; }
     RagdollImpact ImpactSpine;
 
     enum BODYPART
@@ -176,11 +177,10 @@ public class Ragdoll : ScriptComponent
             return;
         RenderSkinnedComponent renderskinnedcomponent = gameObject.GetComponent<RenderSkinnedComponent>();
         if (renderskinnedcomponent == null)
-        { 
+        {
             ThomasEngine.Debug.LogError("No renderskinnedcomponent available Noragdoll will be created");
             return;
         }
-
         // Play the ragdoll sound
         RagdollSound.PlayOneShot();
 
@@ -548,7 +548,9 @@ public class Ragdoll : ScriptComponent
 
     public override void Update()
     {
-       if (Input.GetKeyDown(Input.Keys.Space))
+        RagdollSound.Apply3D(AudioListener.position, G_BodyParts[(int)BODYPART.SPINE].transform.position);
+
+        if (Input.GetKeyDown(Input.Keys.Space))
         {
             if (RagdollEnabled == false)
                 EnableRagdoll();
@@ -561,7 +563,7 @@ public class Ragdoll : ScriptComponent
             if (ImpactSpine.GetActive)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
-                Debug.Log(RagdollSound.Volume);
+             //   Debug.Log(RagdollSound.Volume);
                 RagdollSound.PlayOneShot();
             }
                 

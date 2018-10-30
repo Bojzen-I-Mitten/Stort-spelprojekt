@@ -16,9 +16,9 @@ public class RagdollImpact : ScriptComponent
     {
         if (collider.gameObject == SoundImpactObject)
         {
-            Debug.Log(gameObject.GetComponent<Rigidbody>().LinearVelocity.x + " " + gameObject.GetComponent<Rigidbody>().LinearVelocity.y + " " + gameObject.GetComponent<Rigidbody>().LinearVelocity.z);
+        //  Debug.Log(gameObject.GetComponent<Rigidbody>().LinearVelocity.x + " " + gameObject.GetComponent<Rigidbody>().LinearVelocity.y + " " + gameObject.GetComponent<Rigidbody>().LinearVelocity.z);
             Volume = Math.Abs(gameObject.GetComponent<Rigidbody>().LinearVelocity.x) + Math.Abs(gameObject.GetComponent<Rigidbody>().LinearVelocity.y) + Math.Abs(gameObject.GetComponent<Rigidbody>().LinearVelocity.z);
-            Volume = (float)(1.0 / (1.0 + Math.Exp((double)-Volume)));
+          //  Volume = (float)(1.0 / (1.0 + Math.Exp((double)-Volume)));
             GetActive = true;
         }
         else
