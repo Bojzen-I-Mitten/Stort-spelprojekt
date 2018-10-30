@@ -26,6 +26,7 @@ public class Chadimations : NetworkComponent
             return 1.0f - MathHelper.Clamp(distance, 0.0f, 1.0f);
         }
     }
+    private bool _Throwing = false;
     private ChadControls Chad = null;
     private Vector3 Direction
     {
@@ -91,17 +92,24 @@ public class Chadimations : NetworkComponent
             Skin.setBlendTreeNode(BlendNodes[State]);
             for (uint i = 0; i < Animations[State].Count; i++)
             {
-                if(State != ChadControls.STATE.THROWING) // set throwing weights from chadControls
+                if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
                 {
                     AnimationNode node = Animations[State][(int)i];
                     WeightHandles[State].setWeight(i, node.GetWeight(Direction));
                 }
+                else if (!_Throwing && i == 1) // shouldn't be needed, but it is, rewrite
+                    WeightHandles[State].setWeight(i, 0);
             }
         }
     }
 
     public void SetAnimationWeight(uint index, float weight)
     {
+        if (index == 1 && weight == 1)
+            _Throwing = true;
+        else
+            _Throwing = false;
+
         // Debug.Log("Manually setting weight of animation numer: " + index + " to: "+ weight);
         WeightHandles[State].setWeight(index, weight);
     }
