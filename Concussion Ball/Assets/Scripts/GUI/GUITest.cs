@@ -1,4 +1,5 @@
-﻿using ThomasEngine;
+﻿using System.Collections;
+using ThomasEngine;
 
 public class GUITest : ScriptComponent
 {
@@ -8,7 +9,9 @@ public class GUITest : ScriptComponent
     ScriptComponent JoinHost;
     GUISelectTeam SelectTeam;
 
-    private readonly string BG = "BG";
+    Canvas canvas;
+
+    Image BG;
 
     public override void Start()
     {
@@ -17,11 +20,21 @@ public class GUITest : ScriptComponent
         SelectTeam = gameObject.GetComponent<GUISelectTeam>();
         SelectTeam.enabled = false;
 
-        Camera.AddImage(BG, Background, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), true);
+        canvas = Camera.AddCanvas();
+        BG = canvas.Add(Background);
+        BG.interactable = true;
     }
 
     public override void Update()
     {
+        if (!JoinHost.enabled)
+            SelectTeam.enabled = true;
+        //StartCoroutine(LoadSelectTeam());
+    }
 
+    IEnumerator LoadSelectTeam()
+    {
+        yield return new WaitForSecondsRealtime(2);
+        SelectTeam.enabled = true;
     }
 }
