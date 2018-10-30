@@ -64,11 +64,11 @@ public class ChadHud : ScriptComponent
         Crosshair.position = new Vector2(0.5f);
         Crosshair.scale = Vector2.Zero;
 
-        ChargeBarOutline = HUD.Add(CrosshairTexture);
+        ChargeBarOutline = HUD.Add(ChargeBarOutlineTexture);
         ChargeBarOutline.position = new Vector2(0.9f, 0.1f);
         ChargeBarOutline.scale = Vector2.Zero;
 
-        ChargeBar = HUD.Add(CrosshairTexture);
+        ChargeBar = HUD.Add(ChargeBarTexture);
         ChargeBar.position = new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height * 9.0f) / 1080.0f)); //Need to move the bar its own height down one step.
         ChargeBar.scale = Vector2.Zero;
         ChargeBar.origin = new Vector2(1, 0);
