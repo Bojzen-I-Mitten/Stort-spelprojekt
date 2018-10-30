@@ -138,7 +138,7 @@ public class Vindaloo : Powerup
         });
 
 
-        
+        //Remove();
     }
 
     private void Explosion()
@@ -151,7 +151,8 @@ public class Vindaloo : Powerup
         emitterFire2.EmitOneShot(45);
         emitterGravel.EmitOneShot(20);
         emitterSmoke.EmitOneShot(60);
-        
+
+        //Remove();
     }
     
 }
