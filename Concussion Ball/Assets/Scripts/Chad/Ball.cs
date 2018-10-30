@@ -263,7 +263,7 @@ public class Ball : PickupableObject
     {
         if (isOwner)
         {
-            RPCDrop();
+            Drop();
             if (isOwner)
             {
                 if (m_rigidBody != null)

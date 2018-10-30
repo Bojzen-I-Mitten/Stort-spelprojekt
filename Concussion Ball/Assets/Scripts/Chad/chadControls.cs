@@ -134,12 +134,15 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        if (isOwner && State != STATE.RAGDOLL)
+        if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
             Direction = new Vector3(0, 0, 0);
-            HandleKeyboardInput();
-            HandleMouseInput();
+            if(State != STATE.RAGDOLL)
+            {
+                HandleKeyboardInput();
+                HandleMouseInput();
+            }
             StateMachine();
         }
 
@@ -472,7 +475,7 @@ public class ChadControls : NetworkComponent
     IEnumerator StartRagdoll(float duration, Vector3 force)
     {
         State = STATE.RAGDOLL;
-        Camera.transform.parent = null;
+        Camera.transform.SetParent(null, true);
         EnableRagdoll();
         Ragdoll.AddForce(force);
         yield return new WaitForSeconds(duration);
@@ -574,6 +577,11 @@ public class ChadControls : NetworkComponent
                     //toggle ragdoll
                     RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
                     SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+
+                    
+                    if(PickedUpObject)
+                        Debug.Log("droppable: " + PickedUpObject.DropOnRagdoll);
+
                     if (PickedUpObject && PickedUpObject.DropOnRagdoll)
                         PickedUpObject.Drop();
                 }
