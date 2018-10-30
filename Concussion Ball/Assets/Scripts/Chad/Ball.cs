@@ -4,12 +4,8 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
-public class Ball : NetworkComponent
+public class Ball : PickupableObject
 {
-    Rigidbody rb;
-    RenderComponent rc;
-    private float accumulator;
-    private float chargeupTime;
     public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
 
     private ParticleEmitter emitterElectricity1;
@@ -17,32 +13,26 @@ public class Ball : NetworkComponent
     private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
-  //  private ParticleEmitter emitterConfetti1;
-    //private ParticleEmitter emitterConfetti2;
-
     public Texture2D electricityTex1 { get; set; }
     public Texture2D electricityTex2 { get; set; }
     public Texture2D electricityTex3 { get; set; }
     public Texture2D smokeTex { get; set; }
     public Texture2D fireTex { get; set; }
 
-    private Rigidbody rigidbody;
     private RenderComponent renderComponent;
-    public bool PickedUp { get { if (rigidbody != null) return !rigidbody.enabled; else return false; } set { if (rigidbody != null) rigidbody.enabled = !value; } }
-    public float chargeTimeCurrent;
-    private float chargeTimeMax;
     private float electricityIntensifyerThreshold;
     private float fireIntensityreThreshold;
 
     public override void Start()
     {
-        chargeTimeMax = 4.0f;
-        chargeTimeCurrent = 0.0f;
-        rigidbody = gameObject.GetComponent<Rigidbody>();
+        base.Start();
+        m_throwable = true;
+        DropOnRagdoll = true;
 
-        renderComponent = gameObject.GetComponent<RenderComponent>();
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        //renderComponent = gameObject.GetComponent<RenderComponent>();
+        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
+        #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
@@ -64,46 +54,9 @@ public class Ball : NetworkComponent
         MultiplyWithIntensity((float)(0.5f), emitterElectricity1);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity2);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity3);
+        #endregion
     }
-
-   /* private void ResetConfettiEmitters()
-    {
-
-        emitterConfetti1.MinSize = 0.03f;
-        emitterConfetti1.MaxSize = 0.15f;
-        emitterConfetti1.EndSize = 0.15f;
-        emitterConfetti1.MinLifeTime = 1.0f;
-        emitterConfetti1.MaxLifeTime = 1.5f;
-        emitterConfetti1.EmissionRate = 100;
-        emitterConfetti1.MinRotationSpeed = -50.0f;
-        emitterConfetti1.MaxRotationSpeed = 50.0f;
-        emitterConfetti1.MinSpeed = 7.5f;
-        emitterConfetti1.MaxSpeed = 15.0f;
-        emitterConfetti1.EndSpeed = 0.0f;
-        emitterConfetti1.DistanceFromSphereCenter = 20;
-        emitterConfetti1.Radius = 0.4f;
-        emitterConfetti1.Gravity = 5.0f;
-        emitterConfetti1.SpawnAtEdge = true;
-        
-
-
-        emitterConfetti2.MinSize = 0.03f;
-        emitterConfetti2.MaxSize = 0.15f;
-        emitterConfetti2.EndSize = 0.15f;
-        emitterConfetti2.MinLifeTime = 0.8f;
-        emitterConfetti2.MaxLifeTime = 1.3f;
-        emitterConfetti2.EmissionRate = 125;
-        emitterConfetti2.MinRotationSpeed = -25.0f;
-        emitterConfetti2.MaxRotationSpeed = 25.0f;
-        emitterConfetti2.MinSpeed = 12.0f;
-        emitterConfetti2.MaxSpeed = 20.0f;
-        emitterConfetti2.EndSpeed = 0.0f;
-        emitterConfetti2.DistanceFromSphereCenter = 8;
-        emitterConfetti2.Radius = 1.0f;
-        emitterConfetti2.Gravity = 5.0f;
-        emitterConfetti2.SpawnAtEdge = false;
-    }*/
-
+    #region Particle handling
     private void ResetFireEmitters()
     {
         emitterSmoke.MinSize = 0.1f;
@@ -156,7 +109,7 @@ public class Ball : NetworkComponent
         emitterElectricity1.DistanceFromSphereCenter = 0;
         emitterElectricity1.Radius = 0.5f;
         emitterElectricity1.SpawnAtEdge = true;
-        
+
         emitterElectricity2.MinSize = 0.25f;
         emitterElectricity2.MaxSize = 0.5f;
         emitterElectricity2.EndSize = 0.05f;
@@ -170,7 +123,7 @@ public class Ball : NetworkComponent
         emitterElectricity2.EndSpeed = -2.3f;
         emitterElectricity2.DistanceFromSphereCenter = 0;
         emitterElectricity2.Radius = 1.0f;
-        
+
         emitterElectricity3.MinSize = 0.4f;
         emitterElectricity3.MaxSize = 1.0f;
         emitterElectricity3.EndSize = 0.7f;
@@ -203,38 +156,60 @@ public class Ball : NetworkComponent
         emitter.Radius *= intensity;
     }
 
-    void EmitterExplosion()
-    {
-        MultiplyWithIntensity((float)(2.5f), emitterElectricity1);
-        MultiplyWithIntensity((float)(2.5f), emitterElectricity2);
-        MultiplyWithIntensity((float)(2.5f), emitterElectricity3);
-        emitterElectricity1.EmitOneShot(20);
-        emitterElectricity2.EmitOneShot(15);
-        emitterElectricity3.EmitOneShot(8);
-        emitterFire.EmitOneShot(10);
+    //void EmitterExplosion()
+    //{
+    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity1);
+    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity2);
+    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity3);
+    //    emitterElectricity1.EmitOneShot(20);
+    //    emitterElectricity2.EmitOneShot(15);
+    //    emitterElectricity3.EmitOneShot(8);
+    //    emitterFire.EmitOneShot(10);
 
-        MultiplyWithIntensity(2.0f, emitterFire);
-        emitterFire.Emit = true;
-        emitterSmoke.Emit = true;
+    //    MultiplyWithIntensity(2.0f, emitterFire);
+    //    emitterFire.Emit = true;
+    //    emitterSmoke.Emit = true;
+    //}
+
+    //public void TimeSinceThrown(float time)
+    //{
+    //    if (time > fireIntensityreThreshold)
+    //    {
+    //        fireIntensityreThreshold = 9999999999.0f;
+    //        MultiplyWithIntensity(0.5f, emitterFire);
+    //        MultiplyWithIntensity(0.5f, emitterSmoke);
+    //    }
+
+    //    if (time > 1.4f)
+    //    {
+    //        ResetFireEmitters();
+    //        emitterFire.Emit = false;
+    //        emitterSmoke.Emit = false;
+    //        ResetElectricityEmitters();
+    //    }
+    //}
+
+    override public void StopEmitting()
+    {
+        StartCoroutine(StopEmission());
     }
 
-    public void TimeSinceThrown(float time)
+    private IEnumerator StopEmission()
     {
-        if (time > fireIntensityreThreshold)
+        float timer = 3;
+        while (timer > 0)
         {
-            fireIntensityreThreshold = 9999999999.0f;
-            MultiplyWithIntensity(0.5f, emitterFire);
-            MultiplyWithIntensity(0.5f, emitterSmoke);
+            timer -= Time.DeltaTime;
+            yield return null;
         }
 
-        if (time > 1.4f)
-        {
-            ResetFireEmitters();
-            emitterFire.Emit = false;
-            emitterSmoke.Emit = false;
-            ResetElectricityEmitters();
-        }
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
     }
+    #endregion
 
     public override void Update()
     {
@@ -242,23 +217,16 @@ public class Ball : NetworkComponent
             Reset();
     }
 
-    public void Drop()
-    {
-        RPCDrop();
-        SendRPC("RPCDrop");
-        
-    }
-
-    public void ChargeColor()
+    override public void ChargeEffect()
     {
         emitterElectricity1.Emit = true;
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
-        
+
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
-        Color newColor = new Color(interp, 0.0f, (1.0f-interp));
-        renderComponent.material.SetColor("color", newColor);
+        Color newColor = new Color(interp, 0.0f, (1.0f - interp));
+        //renderComponent.material.SetColor("color", newColor);
 
         if (interp > 0.8f)
         {
@@ -271,61 +239,13 @@ public class Ball : NetworkComponent
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
             electricityIntensifyerThreshold += 0.3f;
         }
-        
+
     }
 
-    public void StopEmitting()
+    override public void Cleanup()
     {
-        StartCoroutine(StopEmission());
-    }
-
-    private IEnumerator StopEmission()
-    {
-        float timer = 3;
-        while(timer > 0)
-        {
-            timer -= Time.DeltaTime;
-            yield return null;
-        }
-
-        emitterElectricity1.Emit = false;
-        emitterElectricity2.Emit = false;
-        emitterElectricity3.Emit = false;
-        emitterFire.Emit = false;
-        emitterSmoke.Emit = false;
-    }
-
-    public void RPCDrop()
-    {
-        if (PickedUp)
-        {
-            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-            PickedUp = false;
-            transform.SetParent(null, true);
-        }
-    }
-
-    public void Throw(Vector3 force)
-    {
-        if (PickedUp)
-        {
-            Drop();
-            transform.position = transform.position + Vector3.Normalize(force) * 2;
-            rigidbody.AddForce(force, Rigidbody.ForceMode.Impulse);
-
-            Cleanup();
-            fireIntensityreThreshold = 0.6f;
-            emitterFire.Emit = true;
-            emitterSmoke.Emit = true;
-            EmitterExplosion();
-            
-            
-        }
-    }
-
-    public void Cleanup()
-    {
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        base.Cleanup();
+        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;
         emitterElectricity2.Emit = false;
@@ -335,63 +255,25 @@ public class Ball : NetworkComponent
         emitterSmoke.Emit = false;
         ResetFireEmitters();
         // Reset values
-        chargeTimeCurrent = 0;
         ResetElectricityEmitters();
     }
 
-    
-    public void Pickup(GameObject gobj, Transform hand)
-    {
-        rigidbody.enabled = false;
-        transform.parent = hand;
-        transform.localPosition = Vector3.Zero;
-    }
 
     public void Reset()
     {
-        RPCDrop();
-        gameObject.SetActive(false);
-        gameObject.SetActive(true);
         if (isOwner)
         {
-            if (rigidbody != null)
+            Drop();
+            if (m_rigidBody != null)
             {
-                Debug.Log("Resetting ball");
-                rigidbody.enabled = false;
-                StartCoroutine(EnableRigidBody());
+                m_rigidBody.enabled = false;
+                m_rigidBody.Position = Vector3.Zero;
+                m_rigidBody.LinearVelocity = Vector3.Zero;
+                m_rigidBody.AngularVelocity = Vector3.Zero;
+                transform.position = Vector3.Zero;
+                transform.rotation = Quaternion.Identity;
+                m_rigidBody.enabled = true;
             }
-            transform.localEulerAngles = Vector3.Zero;
-            transform.localPosition = SpawnPoint;
         }
-    }
-
-    private IEnumerator EnableRigidBody()
-    {
-        yield return null;
-        rigidbody.enabled = true;
-    }
-
-    public override void OnLostOwnership()
-    {
-        rigidbody.enabled = false;
-    }
-
-    public override void OnRead(NetPacketReader reader, bool initialState)
-    {
-        float chargeTime = reader.GetFloat();
-        if (chargeTime > 0)
-        {
-            ChargeColor();
-        }
-        else if(chargeTime == 0 && chargeTimeCurrent > 0)
-        {
-            StopEmitting();
-        }
-    }
-
-    public override bool OnWrite(NetDataWriter writer, bool initialState)
-    {
-        writer.Put(chargeTimeCurrent);
-        return true;
     }
 }
