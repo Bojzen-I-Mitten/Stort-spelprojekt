@@ -94,7 +94,7 @@ public class Vindaloo : Powerup
         emitterSmoke.MaxRotationSpeed = 2.0f;
         emitterSmoke.MinSpeed = 0.6f;
         emitterSmoke.MaxSpeed = 1.5f;
-        emitterSmoke.EndSpeed = 0.0f;
+        emitterSmoke.EndSpeed = 3.0f;
         emitterSmoke.DistanceFromSphereCenter = 0.7f;
         emitterSmoke.Radius = 1.7f;
         emitterGravel.SpawnAtEdge = false;
@@ -150,9 +150,16 @@ public class Vindaloo : Powerup
         emitterFire.EmitOneShot(25);
         emitterFire2.EmitOneShot(45);
         emitterGravel.EmitOneShot(20);
-        emitterSmoke.EmitOneShot(60);
+        emitterSmoke.EmitOneShot(50);
 
+        StartCoroutine(RemoveNextFrame());
         //Remove();
+    }
+    private IEnumerator RemoveNextFrame()
+    {
+        yield return null;
+
+        Remove();
     }
     
 }
