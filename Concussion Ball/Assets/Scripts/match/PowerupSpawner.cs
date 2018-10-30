@@ -78,8 +78,8 @@ public class PowerupSpawner : NetworkComponent
     public override void OnDrawGizmos()
     {
         BoundingSphere b = new BoundingSphere(Vector3.Zero, 0.25f);
-        GUI.SetColor(Color.Orange);
-        GUI.SetMatrix(transform.world);
-        GUI.DrawBoundingSphere(ref b);
+        Gizmos.SetColor(Color.Orange);
+        Gizmos.SetMatrix(transform.world);
+        Gizmos.DrawBoundingSphere(ref b);
     }
 }
