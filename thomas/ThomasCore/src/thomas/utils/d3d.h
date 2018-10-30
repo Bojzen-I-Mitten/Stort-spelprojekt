@@ -23,15 +23,15 @@ namespace thomas
 
 			bool Init();
 			void Destroy();
-			bool CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11RenderTargetView*& RTV, ID3D11ShaderResourceView*& SRV, ID3D11Texture2D*& backBuffer, ID3D11RenderTargetView*& backBufferRTV, ID3D11Texture2D*& buffer);
-			bool CreateDepthStencilView(LONG width, LONG height, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
+			bool CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backBuffer);
 			bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain);
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateQuery(D3D11_QUERY type, ID3D11Query*& query);
 		public:
 			ID3D11DepthStencilState* CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth);
-			bool CreateDepthStencilView(LONG width, LONG height, ID3D11DepthStencilView *& stencilView, ID3D11ShaderResourceView *& depthBufferSRV);
+			bool CreateDepthStencilView(ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11Texture2D* buffer, bool multiSampled);
+			bool CreateRenderTarget(IDXGISwapChain3* swapchain, ID3D11Texture2D*& buffer, ID3D11RenderTargetView *& RTV, bool multiSampled, ID3D11ShaderResourceView*& SRV);
 			ID3D11RasterizerState* CreateRasterizer(D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode);
 
 		public:

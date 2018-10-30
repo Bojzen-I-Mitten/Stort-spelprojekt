@@ -32,8 +32,8 @@ namespace thomas {
 				GizmoRenderCommand& operator[](uint32_t index) { return m_list[index]; }
 
 			private:
-				utility::allocator::LinearAllocator m_alloc;	// Memory buffer (Vertex data)
-				GizmoRenderCommand* m_list;						// Command buffer
+				utility::allocator::LinearAllocator m_alloc;	// Memory buffer1 (Vertex data)
+				GizmoRenderCommand* m_list;						// Command buffer1
 				uint32_t m_count;
 				uint32_t m_capacity;
 

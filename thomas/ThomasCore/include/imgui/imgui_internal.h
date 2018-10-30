@@ -379,11 +379,11 @@ struct IMGUI_API ImGuiMenuColumns
 struct IMGUI_API ImGuiTextEditState
 {
     ImGuiID             Id;                         // widget id owning the text state
-    ImVector<ImWchar>   Text;                       // edit buffer, we need to persist but can't guarantee the persistence of the user-provided buffer. so we copy into own buffer.
-    ImVector<char>      InitialText;                // backup of end-user buffer at the time of focus (in UTF-8, unaltered)
+    ImVector<ImWchar>   Text;                       // edit buffer1, we need to persist but can't guarantee the persistence of the user-provided buffer1. so we copy into own buffer1.
+    ImVector<char>      InitialText;                // backup of end-user buffer1 at the time of focus (in UTF-8, unaltered)
     ImVector<char>      TempTextBuffer;
-    int                 CurLenA, CurLenW;           // we need to maintain our buffer length in both UTF-8 and wchar format.
-    int                 BufSizeA;                   // end-user buffer size
+    int                 CurLenA, CurLenW;           // we need to maintain our buffer1 length in both UTF-8 and wchar format.
+    int                 BufSizeA;                   // end-user buffer1 size
     float               ScrollX;
     ImGuiStb::STB_TexteditState   StbState;
     float               CursorAnim;
@@ -654,7 +654,7 @@ struct ImGuiContext
     ImGuiID                 DragDropAcceptIdPrev;               // Target item id from previous frame (we need to store this to allow for overlapping drag and drop targets)
     int                     DragDropAcceptFrameCount;           // Last time a target expressed a desire to accept the source
     ImVector<unsigned char> DragDropPayloadBufHeap;             // We don't expose the ImVector<> directly
-    unsigned char           DragDropPayloadBufLocal[8];         // Local buffer for small payloads
+    unsigned char           DragDropPayloadBufLocal[8];         // Local buffer1 for small payloads
 
     // Widget state
     ImGuiTextEditState      InputTextState;
@@ -692,7 +692,7 @@ struct ImGuiContext
     int                     WantCaptureMouseNextFrame;          // explicit capture via CaptureInputs() sets those flags
     int                     WantCaptureKeyboardNextFrame;
     int                     WantTextInputNextFrame;
-    char                    TempBuffer[1024*3+1];               // temporary text buffer
+    char                    TempBuffer[1024*3+1];               // temporary text buffer1
 
     ImGuiContext(ImFontAtlas* shared_font_atlas) : OverlayDrawList(NULL)
     {
@@ -830,7 +830,7 @@ struct IMGUI_API ImGuiDrawContext
     int                     NavLayerCurrent;        // Current layer, 0..31 (we currently only use 0..1)
     int                     NavLayerCurrentMask;    // = (1 << NavLayerCurrent) used by ItemAdd prior to clipping.
     int                     NavLayerActiveMask;     // Which layer have been written to (result from previous frame)
-    int                     NavLayerActiveMaskNext; // Which layer have been written to (buffer for current frame)
+    int                     NavLayerActiveMaskNext; // Which layer have been written to (buffer1 for current frame)
     bool                    MenuBarAppending;       // FIXME: Remove this
     float                   MenuBarOffsetX;
     ImVector<ImGuiWindow*>  ChildWindows;

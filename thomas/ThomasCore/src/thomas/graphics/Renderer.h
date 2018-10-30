@@ -54,9 +54,9 @@ namespace thomas
 			static Renderer* Instance();
 			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
-			/* Clear front buffer. */
+			/* Clear front buffer1. */
 			void ClearCommands();
-			/* Clear both front, and back buffer. */
+			/* Clear both front, and back buffer1. */
 			void ClearAllCommands();
 			void SubmitCommand(render::RenderCommand& command);
 			render::Frame& getAllocator();

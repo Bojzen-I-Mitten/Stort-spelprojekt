@@ -79,7 +79,9 @@ namespace thomas
 			if (!window || !window->Initialized())
 				return;
 
+			// Draw GUI for each camera that has enabled GUI rendering
 			window->Bind();
+
 			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
@@ -90,6 +92,11 @@ namespace thomas
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
 			m_shaders.SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
+
+			if (camera->GetGUIRendering())
+			{
+				camera->GetGUIHandle()->Render();
+			}
 		}
 
 		void Renderer::ClearCommands()
@@ -168,11 +175,7 @@ namespace thomas
 
 				//m_particleSystem->DrawParticles();	
 
-				// Draw GUI for each camera that has enabled GUI rendering
-				if (perCameraQueue.first->GetGUIRendering())
-				{
-					perCameraQueue.first->GetGUIHandle()->Render();
-				}
+				
 			}
 	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);

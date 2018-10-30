@@ -11,20 +11,19 @@ namespace thomas
 	protected:
 		struct DXBuffers
 		{
-			//Buffer pointer to render target
-			ID3D11Texture2D* buffer = nullptr;
+			//Buffer pointers to render targets 3D rendering and GUI
+			ID3D11Texture2D* buffer[2] = { nullptr, nullptr };
 
-			ID3D11RenderTargetView* RTV = nullptr;
-			ID3D11ShaderResourceView* SRV = nullptr;
+			ID3D11BlendState* blendState[2] = { nullptr, nullptr };
+			ID3D11RenderTargetView* RTV[2] = { nullptr, nullptr };
+			ID3D11ShaderResourceView* SRV[2] = { nullptr, nullptr };
 			ID3D11DepthStencilState* depthStencilState = nullptr;
-			ID3D11DepthStencilView* depthStencilView1 = nullptr;
+			ID3D11DepthStencilView* depthStencilView[2] = { nullptr, nullptr };
+			ID3D11DepthStencilView* depthStencilViewReadOnly[2] = { nullptr, nullptr };
+
 
 			//Buffer pointer to swapChain back buffer
-			ID3D11Texture2D* backBuffer = nullptr;
-			ID3D11RenderTargetView* backBufferRTV = nullptr;
-			ID3D11DepthStencilView* depthStencilView = nullptr;
-			ID3D11DepthStencilView* depthStencilViewReadOnly = nullptr;
-			ID3D11ShaderResourceView* depthBufferSRV = nullptr;
+			ID3D11Texture2D* backbuffer = nullptr;
 			
 		}m_dxBuffers;
 
@@ -38,6 +37,7 @@ namespace thomas
 		virtual void Present();
 		void QueueResize();
 		void Bind();
+		/*void BindGUITarget();*/
 		void Clear();
 		void WaitOnSwapChain();
 
@@ -66,7 +66,6 @@ namespace thomas
 		IDXGISwapChain* GetSwapChain() const;
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
-
 
 		virtual bool IsEditor() { return false; }
 	protected:

@@ -108,10 +108,12 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
+			float startTime = ThomasTime::GetElapsedTime();
 			UpdateFinished->WaitOne();
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+			renderTime = ThomasTime::GetElapsedTime() - startTime;
 		}
 	}
 	
@@ -121,10 +123,12 @@ namespace ThomasEngine {
 		float ramUsage = 0.0f;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->SetActive(showStatistics);
-		if (showStatistics) {
+		if (showStatistics) 
+		{
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
-			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
+			ImGui::Text("Total CPU: %02f ms	 GPU: %02f ms", (cpuTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
+			ImGui::Text("Logic thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, renderTime*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 			ImGui::Text("RAM Usage: %.2f MB", ramUsage);
@@ -325,6 +329,7 @@ namespace ThomasEngine {
 
 
 				}
+				idleTime = ThomasTime::GetElapsedTime() - timeStart;
 				Monitor::Exit(lock);
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,

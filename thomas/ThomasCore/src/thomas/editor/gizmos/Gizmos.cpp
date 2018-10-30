@@ -337,7 +337,7 @@ namespace thomas
 		
 		void Gizmos::DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology)
 		{
-			// Submit to thread buffer:
+			// Submit to thread buffer1:
 			m_render_buffers[ThomasCore::Core().Thread_Index()]->submitCmd(
 				gizmo::GizmoRenderCommand(
 					lines.data(), lines.size(),				// Vertex info

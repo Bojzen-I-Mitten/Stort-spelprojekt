@@ -27,7 +27,6 @@ namespace thomas
 		{
 			if (window->Initialized())
 			{
-				window->WaitOnSwapChain();
 				window->Clear();
 			}
 		}
@@ -36,8 +35,13 @@ namespace thomas
 	void WindowManager::EndFrame()
 	{
 		for (Window* window : m_windows)
+		{
 			if (window->Initialized())
+			{
 				window->Present();
+				window->WaitOnSwapChain();
+			}
+		}
 	}
 
 	void WindowManager::UpdateFocus()

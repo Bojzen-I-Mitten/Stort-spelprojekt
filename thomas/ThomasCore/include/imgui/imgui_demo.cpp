@@ -3157,7 +3157,7 @@ static void ShowExampleAppLongText(bool* p_open)
     switch (test_type)
     {
     case 0:
-        // Single call to TextUnformatted() with a big buffer
+        // Single call to TextUnformatted() with a big buffer1
         ImGui::TextUnformatted(log.begin(), log.end());
         break;
     case 1:

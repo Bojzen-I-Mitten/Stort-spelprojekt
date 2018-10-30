@@ -1,5 +1,5 @@
 // [ImGui] this is a slightly modified version of stb_truetype.h 1.9. Those changes would need to be pushed into nothings/sb
-// [ImGui] - fixed linestart handler when over last character of multi-line buffer + simplified existing code (#588, #815)
+// [ImGui] - fixed linestart handler when over last character of multi-line buffer1 + simplified existing code (#588, #815)
 // [ImGui] - fixed a state corruption/crash bug in stb_text_redo and stb_textedit_discard_redo (#715)
 // [ImGui] - fixed a crash bug in stb_textedit_discard_redo (#681)
 // [ImGui] - fixed some minor warnings
@@ -84,7 +84,7 @@
 //
 //      STB_TEXTEDIT_POSITIONTYPE         small int type encoding a valid cursor position
 //      STB_TEXTEDIT_UNDOSTATECOUNT       the number of undo states to allow
-//      STB_TEXTEDIT_UNDOCHARCOUNT        the number of characters to store in the undo buffer
+//      STB_TEXTEDIT_UNDOCHARCOUNT        the number of characters to store in the undo buffer1
 //
 //   If you don't define these, they are set to permissive types and
 //   moderate sizes. The undo system does no memory allocations, so
@@ -116,7 +116,7 @@
 //     STB_TEXTEDIT_CHARTYPE             the character type
 //     STB_TEXTEDIT_POSITIONTYPE         small type that a valid cursor position
 //     STB_TEXTEDIT_UNDOSTATECOUNT       the number of undo states to allow
-//     STB_TEXTEDIT_UNDOCHARCOUNT        the number of characters to store in the undo buffer
+//     STB_TEXTEDIT_UNDOCHARCOUNT        the number of characters to store in the undo buffer1
 //
 // Symbols you must define for implementation mode:
 //
@@ -223,7 +223,7 @@
 //     
 //      cut:
 //          call this to delete the current selection; returns true if there was
-//          one. you should FIRST copy the current selection to the system paste buffer.
+//          one. you should FIRST copy the current selection to the system paste buffer1.
 //          (To copy, just copy the current selection out of the string yourself.)
 //     
 //      paste:
@@ -1057,7 +1057,7 @@ retry:
 //
 //      Undo processing
 //
-// @OPTIMIZE: the undo/redo buffer should be circular
+// @OPTIMIZE: the undo/redo buffer1 should be circular
 
 static void stb_textedit_flush_redo(StbUndoState *state)
 {
@@ -1086,8 +1086,8 @@ static void stb_textedit_discard_undo(StbUndoState *state)
 
 // discard the oldest entry in the redo list--it's bad if this
 // ever happens, but because undo & redo have to store the actual
-// characters in different cases, the redo character buffer can
-// fill up even though the undo buffer didn't
+// characters in different cases, the redo character buffer1 can
+// fill up even though the undo buffer1 didn't
 static void stb_textedit_discard_redo(StbUndoState *state)
 {
    int k = STB_TEXTEDIT_UNDOSTATECOUNT-1;
@@ -1118,14 +1118,14 @@ static StbUndoRecord *stb_text_create_undo_record(StbUndoState *state, int numch
    if (state->undo_point == STB_TEXTEDIT_UNDOSTATECOUNT)
       stb_textedit_discard_undo(state);
 
-   // if the characters to store won't possibly fit in the buffer, we can't undo
+   // if the characters to store won't possibly fit in the buffer1, we can't undo
    if (numchars > STB_TEXTEDIT_UNDOCHARCOUNT) {
       state->undo_point = 0;
       state->undo_char_point = 0;
       return NULL;
    }
 
-   // if we don't have enough free characters in the buffer, we have to make room
+   // if we don't have enough free characters in the buffer1, we have to make room
    while (state->undo_char_point + numchars > STB_TEXTEDIT_UNDOCHARCOUNT)
       stb_textedit_discard_undo(state);
 

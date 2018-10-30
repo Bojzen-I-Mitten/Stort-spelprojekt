@@ -1,11 +1,11 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
+
 #pragma managed
-
-
 #include "Rigidbody.h"
 #include "Collider.h"
 #include "../../GameObject.h"
+
 void ThomasEngine::Rigidbody::Awake()
 {
 	Collider^ collider = gameObject->GetComponent<Collider^>();
