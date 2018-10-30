@@ -50,7 +50,7 @@ public class ChadControls : NetworkComponent
     [Category("Camera Settings")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
     [Category("Camera Settings")]
-    public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(-1.5f, 1.5f, 1.5f);
+    public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(1.5f, 1.5f, 1.5f);
     [Category("Camera Settings")]
     public float TotalYStep { get; private set; } = 0;
     [Category("Camera Settings")]
@@ -134,7 +134,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        if (isOwner)
+        if (isOwner && State != STATE.RAGDOLL)
         {
             DivingTimer += Time.DeltaTime;
             Direction = new Vector3(0, 0, 0);
@@ -176,8 +176,6 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
-        if (PickedUpObject && PickedUpObject.DropOnRagdoll)
-            PickedUpObject.Drop();
         if(State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
@@ -555,7 +553,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner)
+        if (isOwner && State != STATE.RAGDOLL)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null)
@@ -578,6 +576,8 @@ public class ChadControls : NetworkComponent
                     //toggle ragdoll
                     RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
                     SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    if (PickedUpObject && PickedUpObject.DropOnRagdoll)
+                        PickedUpObject.Drop();
                 }
             }
         }
