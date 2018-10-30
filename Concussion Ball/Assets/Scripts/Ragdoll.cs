@@ -30,6 +30,8 @@ public class Ragdoll : ScriptComponent
     public float Totalmass { get; set; } = 70.0f;
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
+    public GameObject SoundImpactObject { get; set; }
+
 
     enum BODYPART
     {
@@ -250,7 +252,8 @@ public class Ragdoll : ScriptComponent
 
 
         //Spine
-
+       RagdollImpact impactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
+        impactSpine.SoundImpactObject = SoundImpactObject; 
         BoxCollider spineCollider = G_BodyParts[(int)BODYPART.SPINE].AddComponent<BoxCollider>();
         center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
         center.x = 0;
@@ -531,10 +534,7 @@ public class Ragdoll : ScriptComponent
 
 
     }
-    public override void OnDisable()
-    { 
-        DisableRagdoll();
-    }
+
     public override void Start()
     {
         DisableRagdoll();
