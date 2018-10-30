@@ -56,10 +56,21 @@ public class Team
                 case TEAM_TYPE.UNASSIGNED:
                 case TEAM_TYPE.TEAM_SPECTATOR:
                     player.gameObject.SetActive(false);
+                    if (player.isOwner)
+                    {
+                        MatchSystem.instance.LocalChad.DeactivateCamera();
+                        MatchSystem.instance.spectatorCamera.enabled = true;
+                    }
                     break;
                 case TEAM_TYPE.TEAM_1:
                 case TEAM_TYPE.TEAM_2:
                     player.gameObject.SetActive(true);
+                    if (player.isOwner)
+                    {
+                        MatchSystem.instance.spectatorCamera.enabled = false;
+                        MatchSystem.instance.LocalChad.ActivateCamera();
+                    }
+                        
                     break;
             }
             player.Reset();
