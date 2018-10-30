@@ -69,7 +69,7 @@ public class Chadimations : NetworkComponent
                     for(int i = 0; i < state.Value.Count; ++i)
                     {
                         if(state.Key == ChadControls.STATE.THROWING && i == 1)
-                            newBlendNode.appendNode(state.Value[i].Animation, true);
+                            newBlendNode.appendNode(state.Value[i].Animation, false);
                         else
                             newBlendNode.appendNode(state.Value[i].Animation, true);
                     }
@@ -106,7 +106,10 @@ public class Chadimations : NetworkComponent
     public void SetAnimationWeight(uint index, float weight)
     {
         if (index == 1 && weight == 1)
+        {
             _Throwing = true;
+            BlendNodes[State].ResetPlayback();
+        }
         else
             _Throwing = false;
 

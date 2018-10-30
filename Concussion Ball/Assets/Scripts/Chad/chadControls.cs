@@ -482,7 +482,9 @@ public class ChadControls : NetworkComponent
     {
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
         if (Camera)
-            Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 1.0f);
+            Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
+
+        yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
         ThrowObject();
 
