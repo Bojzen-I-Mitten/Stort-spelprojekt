@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-
+            NetScene.InititateScene();
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -118,16 +118,15 @@ namespace ThomasEngine.Network
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
 
-            NetScene.InititateScene();
         }
 
         public void Host()
         {
             initServerStartTime();
             ResponsiblePeer = LocalPeer;
-            NetScene.ActivateSceneObjects();
             NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             OnPeerJoin(LocalPeer);
+            NetScene.ActivateSceneObjects();
 
         }
 
@@ -183,7 +182,7 @@ namespace ThomasEngine.Network
             {
                 //Send server info to this guy.
                 bool responsible = ResponsiblePeer == LocalPeer;
-                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible);
+                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
@@ -287,14 +286,15 @@ namespace ThomasEngine.Network
 
         }
 
-        public void TakeOwnership(NetworkIdentity networkIdentiy)
+        public void TakeOwnership(NetworkIdentity networkIdentity)
         {
 
             NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent
             {
-                NetID = networkIdentiy.ID
+                NetID = networkIdentity.ID
             };
-            NetScene.ObjectOwners[LocalPeer].Add(networkIdentiy);
+            if(!NetScene.ObjectOwners[LocalPeer].Contains(networkIdentity))
+                NetScene.ObjectOwners[LocalPeer].Add(networkIdentity);
             Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
         }
 
@@ -367,7 +367,10 @@ namespace ThomasEngine.Network
             foreach (NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
             {
                 if (identity.PrefabID == -1) //Scene object
+                {
                     identity.WriteInitialData();
+                    TakeOwnership(identity);
+                }
                 else
                 {
                     TransferOwnedPrefab(identity);
@@ -414,6 +417,7 @@ namespace ThomasEngine.Network
                 };
                 Events.SendEvent(spawnPrefabEvent, DeliveryMethod.ReliableOrdered);
                 identity.Owner = owner;
+                identity.PrefabID = prefabID;
                 identity.WriteInitialData();
                 return gObj;
             }
@@ -422,6 +426,17 @@ namespace ThomasEngine.Network
                 Debug.LogError("Prefab is not registered");
                 return null;
             }
+        }
+
+        public void RemoveNetworkObject(GameObject gObj)
+        {
+            NetworkIdentity identity = gObj.GetComponent<NetworkIdentity>();
+            NetworkEvents.DeletePrefabEvent deletePrefabEvent = new NetworkEvents.DeletePrefabEvent
+            {
+                netID = identity.ID
+            };
+            Events.SendEvent(deletePrefabEvent, DeliveryMethod.ReliableOrdered);
+            Events.DeletePrefabEventHandler(deletePrefabEvent, LocalPeer);
         }
 
         public void CheckPacketLoss()
