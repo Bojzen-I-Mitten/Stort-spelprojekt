@@ -6,7 +6,7 @@ namespace thomas { namespace object { namespace component { class Camera; } } }
 
 namespace ThomasEngine
 {
-	ref class Viewport;
+	value class Viewport;
 	ref class Canvas;
 	[ExecuteInEditor]
 	public ref class Camera : public Component

@@ -34,11 +34,12 @@ namespace thomas
 
 			public:
 				Viewport GetViewport();
+				Vector2 GetViewportScale();
 				void SetViewport(Viewport viewport);
 				void UpdateViewportScale();
-				GUIElement* AddGUIElement(const std::string & text);
-				GUIElement* AddGUIElement(Texture2D* texture);
-				void DeleteGUIElement(GUIElement* element);
+				GUIElement* Add(const std::string & text);
+				GUIElement* Add(Texture2D* texture);
+				void Remove(GUIElement* element);
 
 			private:
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;

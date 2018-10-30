@@ -54,6 +54,11 @@ namespace thomas
 				return m_viewport;
 			}
 
+			Vector2 Canvas::GetViewportScale()
+			{
+				return m_viewportScale;
+			}
+
 			void Canvas::SetViewport(Viewport viewport)
 			{
 				m_viewport.x		= m_camViewport->x + viewport.x * m_camViewport->width;
@@ -70,21 +75,21 @@ namespace thomas
 					Vector2(m_camViewport->width - m_camViewport->x, m_camViewport->height - m_camViewport->y) / m_baseResolution;
 			}
 
-			GUIElement* Canvas::AddGUIElement(const std::string& text)
+			GUIElement* Canvas::Add(const std::string& text)
 			{
 				Font* font = m_defaultFont.get();
 				std::unique_ptr<GUIElement> newText =
-					std::unique_ptr<GUIElement>(new Text(font, text, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false));
+					std::unique_ptr<GUIElement>(new Text(font, text, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false, this));
 				m_GUIElements.push_back(std::move(newText));
 
 				return m_GUIElements[m_GUIElements.size() - 1].get();
 			}
 
-			GUIElement* Canvas::AddGUIElement(Texture2D * texture)
+			GUIElement* Canvas::Add(Texture2D * texture)
 			{
 				if (texture->GetResourceView())
 				{
-					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false);
+					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false, this);
 					m_GUIElements.push_back(std::move(image));
 
 					return m_GUIElements[m_GUIElements.size() - 1].get();
@@ -93,7 +98,7 @@ namespace thomas
 				return nullptr;
 			}
 
-			void Canvas::DeleteGUIElement(GUIElement* _element)
+			void Canvas::Remove(GUIElement* _element)
 			{
 				auto element = m_GUIElements.begin();
 

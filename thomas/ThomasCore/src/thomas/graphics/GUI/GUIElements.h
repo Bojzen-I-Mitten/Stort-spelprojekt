@@ -1,11 +1,11 @@
 #pragma once
 
-// Thomas
 #include "../../resource/texture/Texture2D.h"
 #include "../../utils/Math.h"
 #include "../../resource/Font.h"
 #include "../../Window.h"
 #include "../../WindowManager.h"
+#include "Canvas.h"
 
 namespace thomas
 {
@@ -34,8 +34,8 @@ namespace thomas
 			struct GUIElement
 			{
 				GUIElement() = default;
-				GUIElement(Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
-					position(position), scale(scale), origin(origin), color(color), rotation(rotation), interactable(interactable) {effect = DirectX::SpriteEffects::SpriteEffects_None;}
+				GUIElement(Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable, Canvas* canvas) :
+					position(position), scale(scale), origin(origin), color(color), rotation(rotation), interactable(interactable), canvas(canvas) {effect = DirectX::SpriteEffects::SpriteEffects_None;}
 				virtual ~GUIElement(){}
 
 				Vector2 position;
@@ -44,18 +44,37 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interactable;
+				Canvas* canvas;
 				DirectX::SpriteEffects effect;
 
 				virtual void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale) = 0;
-				virtual bool OnHover(Vector2 vp, Vector2 vpScale) = 0;
-				virtual bool OnClick(Vector2 vp, Vector2 vpScale) = 0;
+				virtual Vector2 Size() = 0;
+
+				bool Hovered()
+				{
+					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
+					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
+						return false;
+					Vector2 size = Size();
+					GUIRect rect{ position.x * canvas->GetViewport().width, position.x * canvas->GetViewport().width + size.x * scale.x * canvas->GetViewportScale().x,
+									 position.y * canvas->GetViewport().height, position.y * canvas->GetViewport().height + size.y * scale.y * canvas->GetViewportScale().y };
+					return rect.Intersect(window->GetInput()->GetMousePosition());
+				}
+
+				bool Clicked()
+				{
+					if (interactable)
+						return Hovered();
+					else
+						return false;
+				}
 			};
 
 			struct Text : public GUIElement
 			{
 				Text() = default;
-				Text(Font* font, std::string text, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
-					font(font), text(text), GUIElement(position, scale, origin, color, rotation, interactable) {}
+				Text(Font* font, std::string text, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable, Canvas* canvas) :
+					font(font), text(text), GUIElement(position, scale, origin, color, rotation, interactable, canvas) {}
 				virtual ~Text() {}
 
 				Font* font;
@@ -66,26 +85,7 @@ namespace thomas
 					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation, effect);
 				}
 
-				bool OnHover(Vector2 vp, Vector2 vpScale)
-				{
-					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
-					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
-						return false;
-					Vector2 textSize = GetTextSize();
-					GUIRect rect{ position.x * vp.x, position.x * vp.x + textSize.x * scale.x * vpScale.x,
-									 position.y * vp.y, position.y * vp.y + textSize.y * scale.y * vpScale.y };
-					return rect.Intersect(window->GetInput()->GetMousePosition());
-				}
-
-				bool OnClick(Vector2 vp, Vector2 vpScale)
-				{
-					if (interactable)
-						return OnHover(vp, vpScale);
-					else
-						return false;
-				}
-
-				Vector2 GetTextSize()
+				Vector2 Size()
 				{
 					return font->GetTextSize(text);
 				}
@@ -94,35 +94,20 @@ namespace thomas
 			struct Image : public GUIElement
 			{
 				Image() = default;
-				Image(Texture2D* texture, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable) :
-					texture(texture), GUIElement(position, scale, origin, color, rotation, interactable) {}
+				Image(Texture2D* texture, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable, Canvas* canvas) :
+					texture(texture), GUIElement(position, scale, origin, color, rotation, interactable, canvas) {}
 				virtual ~Image() {}
 
 				Texture2D* texture;
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					Vector2 size = Vector2(texture->GetWidth(), texture->GetHeight());
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, size, scale * vpScale, effect);
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * Size(), scale * vpScale, effect);
 				}
 
-				bool OnHover(Vector2 vp, Vector2 vpScale)
+				Vector2 Size()
 				{
-					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
-					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
-						return false;
-
-					GUIRect rect{ position.x * vp.x, position.x * vp.x + texture->GetWidth() * scale.x * vpScale.x,
-									 position.y * vp.y, position.y * vp.y + texture->GetHeight() * scale.y * vpScale.y };
-					return rect.Intersect(window->GetInput()->GetMousePosition());
-				}
-
-				bool OnClick(Vector2 vp, Vector2 vpScale)
-				{
-					if (interactable)
-						return OnHover(vp, vpScale);
-					else
-						return false;
+					return Vector2(texture->GetWidth(), texture->GetHeight());
 				}
 			};
 		}

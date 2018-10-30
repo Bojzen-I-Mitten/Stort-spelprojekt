@@ -60,7 +60,7 @@ namespace ThomasEngine
 		}
 		static thomas::math::Viewport Convert(Viewport% value)
 		{
-			return thomas::math::Viewport(value.x, value.y, value.w, value.h);
+			return thomas::math::Viewport(value.position.x, value.position.y, value.size.x, value.size.y);
 		}
 		static Viewport Convert(thomas::math::Viewport& value)
 		{

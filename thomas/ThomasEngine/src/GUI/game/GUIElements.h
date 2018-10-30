@@ -33,6 +33,10 @@ namespace ThomasEngine
 		{
 			void set(Vector4 color);
 		}
+		property float rotation
+		{
+			void set(float rotation);
+		}
 		property bool interactable
 		{
 			void set(bool interactable);
@@ -41,6 +45,13 @@ namespace ThomasEngine
 		{
 			void set(Vector2 Flip);
 		}
+		property Vector2 size //Note that Image size returns Vector2::Zero
+		{
+			Vector2 get();
+		}
+
+		bool Clicked();
+		bool Hovered();
 	};
 
 	public ref class Text : public GUIElement

@@ -32,24 +32,24 @@ namespace ThomasEngine
 		nativePtr->SetViewport(Utility::Convert(viewport)); 
 	}
 
-	GUIElement^ Canvas::AddGUIElement(Texture2D ^ texture)
+	Image^ Canvas::Add(Texture2D ^ texture)
 	{
 		thomas::graphics::GUI::GUIElement* image =
-			nativePtr->AddGUIElement((thomas::resource::Texture2D*)texture->m_nativePtr);
+			nativePtr->Add((thomas::resource::Texture2D*)texture->m_nativePtr);
 
 		return %Image(image);
 	}
 
-	GUIElement^ Canvas::AddGUIElement(String ^ text)
+	Text^ Canvas::Add(System::String ^ text)
 	{
 		thomas::graphics::GUI::GUIElement* newText =
-			nativePtr->AddGUIElement(Utility::ConvertString(text));
+			nativePtr->Add(Utility::ConvertString(text));
 
 		return %Text(newText);
 	}
 
-	void Canvas::DeleteGUIElement(GUIElement ^ element)
+	void Canvas::Remove(GUIElement ^ element)
 	{
-		nativePtr->DeleteGUIElement(element->nativePtr);
+		nativePtr->Remove(element->nativePtr);
 	}
 }

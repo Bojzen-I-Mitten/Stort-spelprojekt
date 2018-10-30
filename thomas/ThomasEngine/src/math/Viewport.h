@@ -4,15 +4,13 @@
 
 namespace ThomasEngine
 {
-	public ref class Viewport
+	public value class Viewport
 	{
 	public:
 		Viewport(float x, float y, float w, float h);
-		Viewport(Viewport% vp);
+		Viewport(Vector2 pos, Vector2 size);
 
-		float x;
-		float y;
-		float w;
-		float h;
+		property Vector2 position;
+		property Vector2 size;
 	};
 }

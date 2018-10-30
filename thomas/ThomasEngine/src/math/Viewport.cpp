@@ -6,16 +6,12 @@ namespace ThomasEngine
 {
 	Viewport::Viewport(float x, float y, float w, float h)
 	{
-		this->x = x;
-		this->y = y;
-		this->w = w;
-		this->h = h;
+		position = Vector2(x, y);
+		size = Vector2(w, h);
 	}
-	Viewport::Viewport(Viewport% vp)
+	Viewport::Viewport(Vector2 pos, Vector2 size)
 	{
-		x = vp.x;
-		y = vp.y;
-		w = vp.w;
-		h = vp.h;
+		this->position = pos;
+		this->size = size;
 	}
 }

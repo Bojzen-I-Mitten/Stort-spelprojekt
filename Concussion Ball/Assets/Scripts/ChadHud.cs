@@ -6,7 +6,14 @@ public class ChadHud : ScriptComponent
 {
     public static ChadHud Instance;
     Camera cam;
-
+    Canvas HUD;
+    Text Timer;
+    Text Announcement1;
+    Text Announcement2;
+    Image AnnouncementBG;
+    Image Crosshair;
+    Image ChargeBarOutline;
+    Image ChargeBar;
     public Curve AnnouncementHorizontalSpeed { get; set; }
     public Font AnnouncementFont { get; set; }
     public Font Numbers { get; set; }
@@ -15,10 +22,6 @@ public class ChadHud : ScriptComponent
     public Texture2D ChargeBarOutlineTexture { get; set; }
     public Texture2D ChargeBarTexture { get; set; }
     public bool ToggleAim { get; set; } = true;
-
-    private readonly string Crosshair = "Crosshair";
-    private readonly string ChargeBarOutline = "ChargeBarOutline";
-    private readonly string ChargeBar = "ChargeBar";
 
     public override void Awake()
     {
@@ -30,23 +33,46 @@ public class ChadHud : ScriptComponent
             return;
         }
         cam = gameObject.GetComponent<Camera>();
-        cam.AddText("MatchTime", "00:00", new Vector2(0.5f, 0.02f), new Vector2(1, 1), Numbers, Color.WhiteSmoke.ToVector4());
-        cam.AddText("AnnouncementText", "", new Vector2(0.5f, 0.5f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
-        cam.SetTextFont("AnnouncementText", AnnouncementFont);
-        cam.AddText("AnnouncementText2", "", new Vector2(0.5f, 0.5f), new Vector2(2.0f), AnnouncementFont, Color.Green.ToVector4());
-        cam.SetTextOrigin("MatchTime", new Vector2(0.5f));
-        cam.SetTextOrigin("AnnouncementText", new Vector2(0.5f));
-        cam.SetTextOrigin("AnnouncementText2", new Vector2(0.5f));
+        HUD = cam.AddCanvas();
 
-        cam.AddImage("AnnouncementBg", AnnouncementBackground, new Vector2(0.5f, 0.5f), Vector2.Zero, false);
-        cam.SetImageOrigin("AnnouncementBg", new Vector2(0.5f));
-        cam.AddImage(Crosshair, CrosshairTexture, new Vector2(0.5f), Vector2.Zero, false);
-        cam.AddImage(ChargeBarOutline, ChargeBarOutlineTexture, new Vector2(0.9f, 0.1f), Vector2.Zero, false);
-        cam.AddImage(ChargeBar, ChargeBarTexture, new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height*9.0f) / 1080.0f)), Vector2.Zero, false);  //Need to move the bar its own height down one step.
-        //Need to rotate the bar 180, because positive x is down on the screen.
-        cam.SetImageOrigin(ChargeBar, new Vector2(1, 0));
-        cam.SetImageRotation(ChargeBar, 3.14f);
+        Timer = HUD.Add("00:00");
+        Timer.position = new Vector2(0.5f, 0.02f);
+        Timer.color = Color.WhiteSmoke.ToVector4();
+        Timer.font = Numbers;
+        Timer.origin = new Vector2(0.5f);
 
+        Announcement1 = HUD.Add("");
+        Announcement1.position = new Vector2(0.5f);
+        Announcement1.scale = new Vector2(2);
+        Announcement1.font = AnnouncementFont;
+        Announcement1.color = Color.Green.ToVector4();
+        Announcement1.origin = new Vector2(0.5f);
+
+        Announcement2 = HUD.Add("");
+        Announcement2.position = new Vector2(0.5f);
+        Announcement2.scale = new Vector2(2);
+        Announcement2.font = AnnouncementFont;
+        Announcement2.color = Color.Green.ToVector4();
+        Announcement2.origin = new Vector2(0.5f);
+
+        AnnouncementBG = HUD.Add(AnnouncementBackground);
+        AnnouncementBG.position = new Vector2(0.5f);
+        AnnouncementBG.scale = Vector2.Zero;
+        AnnouncementBG.origin = new Vector2(0.5f);
+
+        Crosshair = HUD.Add(CrosshairTexture);
+        Crosshair.position = new Vector2(0.5f);
+        Crosshair.scale = Vector2.Zero;
+
+        ChargeBarOutline = HUD.Add(CrosshairTexture);
+        ChargeBarOutline.position = new Vector2(0.9f, 0.1f);
+        ChargeBarOutline.scale = Vector2.Zero;
+
+        ChargeBar = HUD.Add(CrosshairTexture);
+        ChargeBar.position = new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height * 9.0f) / 1080.0f)); //Need to move the bar its own height down one step.
+        ChargeBar.scale = Vector2.Zero;
+        ChargeBar.origin = new Vector2(1, 0);
+        ChargeBar.rotation = MathHelper.Pi; //Need to rotate the bar 180, because positive x is down on the screen.
     }
 
     public override void OnDestroy()
@@ -77,12 +103,12 @@ public class ChadHud : ScriptComponent
         float time = 0.0f;
         float xPos = 0;
         //When xPos = 1 it will be at the center
-        cam.SetText("AnnouncementText", text);
-        cam.SetTextColor("AnnouncementText", color.ToVector4());
-        cam.SetText("AnnouncementText2", text2);
+        Announcement1.text = text;
+        Announcement1.color = color.ToVector4();
+        Announcement2.text = text2;
 
-        Vector2 text1Size = cam.GetTextSize("AnnouncementText") / cam.viewport;
-        Vector2 text2Size = cam.GetTextSize("AnnouncementText2") / cam.viewport;
+        Vector2 text1Size = Announcement1.size / (HUD.viewport.size * cam.viewport.size);
+        Vector2 text2Size = Announcement2.size / (HUD.viewport.size * cam.viewport.size);
         while (time < duration)
         {
             time += Time.ActualDeltaTime;
@@ -94,46 +120,46 @@ public class ChadHud : ScriptComponent
             Vector2 text2Pos = new Vector2(0, 0.55f);
             text2Pos.x = MathHelper.Lerp(1 + text1Size.x, 0.45f, xPos);
 
-            cam.SetTextPosition("AnnouncementText", text1Pos);
-            cam.SetTextPosition("AnnouncementText2", text2Pos);
+            Announcement1.position = text1Pos;
+            Announcement2.position = text2Pos;
 
             Color c = GetRainbowColor(time, 0.5f);
             Color c2 = GetRainbowColor(time + 1.0f, 0.5f);
-            cam.SetTextColor("AnnouncementText2", c.ToVector4());
+            Announcement2.color = c.ToVector4();
 
             if (showBG)
             {
-                cam.SetImageScale("AnnouncementBg", new Vector2(10000, 1.0f + (float)Math.Sin((float)time) * 0.5f));
-                cam.SetImageColor("AnnouncementBg", c2.ToVector4());
+                AnnouncementBG.scale = new Vector2(10000, 1.0f + (float)Math.Sin(time * 0.5f));
+                AnnouncementBG.color = c2.ToVector4();
             }
             if(MatchSystem.instance.MatchTimeLeft > 0.0f)
                 MatchSystem.instance.MatchStartTime += Time.ActualDeltaTime;
             yield return null;
         }
-        cam.SetText("AnnouncementText", "");
-        cam.SetText("AnnouncementText2", "");
-        cam.SetImageScale("AnnouncementBg", Vector2.Zero);
+        Announcement1.text = "";
+        Announcement2.text = "";
+        AnnouncementBG.scale = Vector2.Zero;
     }
 
 
     IEnumerator Countdown(float duration)
     {
         StartCoroutine(AnnouncementAnimation(duration, "Round starts in", "0", Color.Cyan, false));
-        cam.SetTextFont("AnnouncementText2", Numbers);
+        Announcement2.font = Numbers;
         float time = duration;
         while(time > 0.0f)
         {
             time -= Time.DeltaTime;
             int timeLeft = (int)time;
-            cam.SetText("AnnouncementText2", String.Format("{0}",timeLeft+1));
+            Announcement2.text = string.Format("{0}", timeLeft + 1);
             yield return null;
         }
-        cam.SetTextFont("AnnouncementText2", AnnouncementFont);
+        Announcement2.font = AnnouncementFont;
     }
 
     public void StartCountdown(float duration)
     {
-        cam.SetTextColor("MatchTime", Color.WhiteSmoke.ToVector4());
+        Timer.color = Color.WhiteSmoke.ToVector4();
         StartCoroutine(Countdown(duration));
     }
 
@@ -151,26 +177,26 @@ public class ChadHud : ScriptComponent
     {
         if (ToggleAim)
         {
-            cam.SetImageScale(Crosshair, Vector2.One);
-            cam.SetImageColor(Crosshair, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+            Crosshair.scale = Vector2.One;
+            Crosshair.color = Color.Red.ToVector4();
         }
     }
 
     public void DeactivateCrosshair()
     {
-        cam.SetImageScale(Crosshair, Vector2.Zero);
+        Crosshair.scale = Vector2.Zero;
     }
 
     public void ActivateChargeBar()
     {
-        cam.SetImageScale(ChargeBarOutline, new Vector2(2.0f, 9.0f));
-        cam.SetImageColor(ChargeBar, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+        ChargeBarOutline.scale = new Vector2(2.0f, 9.0f);
+        ChargeBar.color = Color.Red.ToVector4();
     }
 
     public void DeactivateChargeBar()
     {
-        cam.SetImageScale(ChargeBarOutline, Vector2.Zero);
-        cam.SetImageScale(ChargeBar, Vector2.Zero);
+        ChargeBarOutline.scale = Vector2.Zero;
+        ChargeBar.scale = Vector2.Zero;
     }
 
     //Charge: 0 to 1
@@ -180,8 +206,8 @@ public class ChadHud : ScriptComponent
         float timePerPart = 0.5f;
         c = Color.Lerp(c, Color.Blue, (charge - timePerPart * 0) / timePerPart);
         c = Color.Lerp(c, Color.Red, (charge - timePerPart * 1) / timePerPart);
-        cam.SetImageColor(ChargeBar, c.ToVector4());
-        cam.SetImageScale(ChargeBar, new Vector2(2.0f, charge*9.0f));
+        ChargeBar.color = c.ToVector4();
+        ChargeBar.scale = new Vector2(2.0f, charge*9.0f);
     }
 
     public override void Update()
@@ -192,11 +218,12 @@ public class ChadHud : ScriptComponent
 
         if (MatchSystem.instance.GoldenGoal)
         {
-            cam.SetText("MatchTime", "GOLDEN GOAL}");
-            cam.SetTextColor("MatchTime", Color.Gold.ToVector4());
-        }else
+            Timer.text = "GOLDEN GOAL";
+            Timer.color = Color.Gold.ToVector4();
+        }
+        else
         {
-            cam.SetText("MatchTime", String.Format("{0}:{1}", minutes.ToString("00"), seconds.ToString("00")));
+            Timer.text = string.Format("{0}:{1}", minutes.ToString("00"), seconds.ToString("00"));
         }
             
         

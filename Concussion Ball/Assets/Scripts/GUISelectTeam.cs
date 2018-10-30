@@ -8,73 +8,97 @@ public class GUISelectTeam : ScriptComponent
     Camera Camera;
     private bool Disabled;
 
-    private readonly string Team1 = "Team1";
-    private readonly string Team2 = "Team2";
-    private readonly string Spectator = "Spectator";
-    private readonly string Select = "Select";
+    Canvas GUI;
+
+    Image Team1Image;
+    Image Team2Image;
+    Image SpectatorImage;
+    Text Select;
+    Text Team1Text;
+    Text Team2Text;
+    Text SpectatorText;
 
     public override void Start()
     {
         Disabled = false;
         Camera = gameObject.GetComponent<Camera>();
-        AddImagesAndText();
+        AddsAndText();
     }
 
     public override void Update()
     {
-        if (Camera.OnImageClicked(Team1))
+        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
         {
-            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
-            MatchSystem.instance.LocalChad.ActivateCamera();
-            this.enabled = false;
-            Camera.enabled = false;
+            if (Team1Image.Clicked())
+            {
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
+                MatchSystem.instance.LocalChad.ActivateCamera();
+                this.enabled = false;
+                Camera.enabled = false;
+            }
+            else if (Team2Image.Clicked())
+            {
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
+                MatchSystem.instance.LocalChad.ActivateCamera();
+                this.enabled = false;
+                Camera.enabled = false;
+            }
+            else if (SpectatorImage.Clicked())
+            {
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+                this.enabled = false;
+                Camera.enabled = false;
+            }
         }
-        else if (Camera.OnImageClicked(Team2))
-        {
-            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
-            MatchSystem.instance.LocalChad.ActivateCamera();
-            this.enabled = false;
-            Camera.enabled = false;
-        }
-        else if (Camera.OnImageClicked(Spectator))
-        {
-            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-            this.enabled = false;
-            Camera.enabled = false;
-        }
-
         if (TextFont != null && !Disabled)
         {
-            Camera.SetTextFont(Select, TextFont);
-            Camera.SetTextFont(Team1, TextFont);
-            Camera.SetTextFont(Team2, TextFont);
-            Camera.SetTextFont(Spectator, TextFont);
+            Select.font = TextFont;
+            Team1Text.font = TextFont;
+            Team2Text.font = TextFont;
+            SpectatorText.font = TextFont;
         }
     }
 
-    public void AddImagesAndText()
+    public void AddsAndText()
     {
-        Camera.AddImage(Team1, SelectBox, new Vector2(0.13f, 0.23f), new Vector2(1.0f), true);
-        Camera.SetImageColor(Team1, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color.ToVector4());
-        Camera.AddImage(Team2, SelectBox, new Vector2(0.25f, 0.23f), new Vector2(1.0f), true);
-        Camera.SetImageColor(Team2, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color.ToVector4());
-        Camera.AddImage(Spectator, SelectBox, new Vector2(0.4f, 0.23f), new Vector2(1.0f), true);
-        Camera.SetImageColor(Spectator, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Color.ToVector4());
+        GUI = Camera.AddCanvas();
 
-        Camera.AddText(Select, "Select team", new Vector2(0.21f, 0.11f), new Vector2(1.0f));
+        Team1Image = GUI.Add(SelectBox);
+        Team1Image.position = new Vector2(0.13f, 0.23f);
+        Team1Image.interactable = true;
+        Team1Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color.ToVector4();
 
-        Camera.AddText(Team1, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name, new Vector2(0.10f, 0.18f), new Vector2(1.0f));
-        Camera.AddText(Team2, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name, new Vector2(0.22f, 0.18f), new Vector2(1.0f));
-        Camera.AddText(Spectator, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name, new Vector2(0.35f, 0.18f), new Vector2(1.0f));
+        Team2Image = GUI.Add(SelectBox);
+        Team2Image.position = new Vector2(0.25f, 0.23f);
+        Team2Image.interactable = true;
+        Team2Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color.ToVector4();
 
+        SpectatorImage = GUI.Add(SelectBox);
+        SpectatorImage.position = new Vector2(0.25f, 0.23f);
+        SpectatorImage.interactable = true;
+        SpectatorImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Color.ToVector4();
 
+        Select = GUI.Add("Select Team");
+        Select.position = new Vector2(0.21f, 0.11f);
+
+        Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
+        Team1Text.position = new Vector2(0.10f, 0.18f);
+
+        Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
+        Team1Text.position = new Vector2(0.22f, 0.18f);
+
+        Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name);
+        Team1Text.position = new Vector2(0.35f, 0.18f);
     }
 
     public void ClearImagesAndText()
     {
-        Camera.DeleteImage(Select);
-        Camera.DeleteImage(Team1);
-        Camera.DeleteImage(Team2);
-        Camera.DeleteImage(Spectator);
+        GUI.Remove(Select);
+        GUI.Remove(Team1Image);
+        GUI.Remove(Team2Image);
+        GUI.Remove(SpectatorImage);
+        GUI.Remove(Team1Text);
+        GUI.Remove(Team2Text);
+        GUI.Remove(SpectatorText);
     }
 }

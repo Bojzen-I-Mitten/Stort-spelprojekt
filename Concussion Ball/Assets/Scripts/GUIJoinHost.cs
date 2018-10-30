@@ -15,22 +15,30 @@ public class GUIJoinHost : ScriptComponent
 
     Camera Camera;
 
-    private string IPText;
-    private string PortText;
+    private string IPString;
+    private string PortString;
     private bool TakeIP;
     private bool TakePort;
     private bool Disabled;
 
-    private readonly string TextBoxIP = "TextBoxIP";
-    private readonly string TextBoxPort = "TextBoxPort";
-    private readonly string BG = "BG";
-    private readonly string Join = "Join";
-    private readonly string Host = "Host";
+    Canvas GUI;
+
+    Image BG;
+
+    Image TextBoxIP;
+    Image TextBoxPort;
+    Image Join;
+    Image Host;
+
+    Text IPText;
+    Text PortText;
+    Text IP;
+    Text Port;
 
     public override void Start()
     {
-        IPText = "";
-        PortText = "";
+        IPString = "";
+        PortString = "";
         TakeIP = false;
         TakePort = false;
         Disabled = false;
@@ -41,86 +49,84 @@ public class GUIJoinHost : ScriptComponent
     public override void Update()
     {
         if (TakeIP)
-            InputGUI.AppendIPString(ref IPText, 15);
+            InputGUI.AppendIPString(ref IPString, 15);
         if (TakePort)
-            InputGUI.AppendIPString(ref PortText, 5);
+            InputGUI.AppendIPString(ref PortString, 5);
 
-
-        if (Camera.OnImageClicked(TextBoxIP))
+        if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
         {
-            TakePort = false;
-            TakeIP = true;
-            Camera.SetImageColor(TextBoxPort, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-            Camera.SetImageColor(TextBoxIP, new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-        }
-        else if (Camera.OnImageClicked(TextBoxPort))
-        {
-            TakeIP = false;
-            TakePort = true;
-            Camera.SetImageColor(TextBoxIP, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-            Camera.SetImageColor(TextBoxPort, new Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-        }
-        else if (Camera.OnImageClicked(BG))
-        {
-            TakePort = false;
-            TakeIP = false;
-            Camera.SetImageColor(TextBoxIP, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-            Camera.SetImageColor(TextBoxPort, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-        }
-
-
-
-        if (Camera.OnImageClicked(Join))
-        {
-            if (IPText != "" && PortText != "")
+            if(TextBoxIP.Clicked())
             {
-                MatchSystem.instance.LocalPort = 0;
-                MatchSystem.instance.TargetPort = Convert.ToInt32(PortText);
-                MatchSystem.instance.TargetIP = IPText;
-                MatchSystem.instance.Init();
-                MatchSystem.instance.Connect();
-
-                this.enabled = false;
-                gameObject.GetComponent<GUISelectTeam>().enabled = true;
-                Disabled = true;
+                TakePort = false;
+                TakeIP = true;
+                TextBoxPort.color = Color.Black.ToVector4();
+                TextBoxIP.color = Color.Green.ToVector4();
             }
-            else
+            else if(TextBoxPort.Clicked())
             {
-                if (IPText == "")
-                    Camera.SetImageColor(TextBoxIP, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
-                if (PortText == "")
-                    Camera.SetImageColor(TextBoxPort, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                TakeIP = false;
+                TakePort = true;
+                TextBoxIP.color = Color.Black.ToVector4();
+                TextBoxPort.color = Color.Green.ToVector4();
             }
+            else if (BG.Clicked())
+            {
+                TakePort = false;
+                TakeIP = false;
+                TextBoxIP.color = Color.Black.ToVector4();
+                TextBoxPort.color = Color.Black.ToVector4();
+            }
+            else if (Join.Clicked())
+            {
+                if (IPString != "" && PortString != "")
+                {
+                    MatchSystem.instance.LocalPort = 0;
+                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortText);
+                    MatchSystem.instance.TargetIP = IPString;
+                    MatchSystem.instance.Init();
+                    MatchSystem.instance.Connect();
 
-        }
-        else if (Camera.OnImageClicked(Host))
-        {
-            if (PortText != "")
-            {
-                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText);
-                MatchSystem.instance.Init();
-                MatchSystem.instance.Host();
-                
-                this.enabled = false;
-                gameObject.GetComponent<GUISelectTeam>().enabled = true;
-                Disabled = true;
+                    this.enabled = false;
+                    gameObject.GetComponent<GUISelectTeam>().enabled = true;
+                    Disabled = true;
+                }
+                else
+                {
+                    if (IPString == "")
+                        TextBoxIP.color = Color.Red.ToVector4();
+                    if (PortString == "")
+                        TextBoxPort.color = Color.Red.ToVector4();
+                }
+
             }
-            else
+            else if (Host.Clicked())
             {
-                Camera.SetImageColor(TextBoxPort, new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+                if (PortString != "")
+                {
+                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortText);
+                    MatchSystem.instance.Init();
+                    MatchSystem.instance.Host();
+
+                    this.enabled = false;
+                    gameObject.GetComponent<GUISelectTeam>().enabled = true;
+                    Disabled = true;
+                }
+                else
+                {
+                    TextBoxPort.color = Color.Red.ToVector4();
+                }
             }
         }
 
         if (!Disabled)
         {
-            Camera.SetText("IPText", IPText);
-            Camera.SetText("PortText", PortText);
+            IPText.text = IPString;
+            PortText.text = PortString;
             if (TextFont != null)
             {
-                Camera.SetTextFont("IPText", TextFont);
-                Camera.SetTextFont("PortText", TextFont);
-                Camera.SetTextFont("IP", TextFont);
-                Camera.SetTextFont("Port", TextFont);
+                IPText.font = TextFont;
+                PortText.font = TextFont;
+                IP.font = TextFont;
             }
         }
         else
@@ -131,28 +137,58 @@ public class GUIJoinHost : ScriptComponent
     public void AddImagesAndText()
     {
         Disabled = false;
+        GUI = Camera.AddCanvas();
 
-        Camera.AddText("IPText", IPText, new Vector2(0.1f, 0.11f), new Vector2(1.0f));
-        Camera.AddText("PortText", PortText, new Vector2(0.1f, 0.21f), new Vector2(1.0f));
-        Camera.AddText("IP", "IP, needed to join", new Vector2(0.1f, 0.07f), new Vector2(0.7f));
-        Camera.AddText("Port", "PORT, needed for both host and join", new Vector2(0.1f, 0.17f), new Vector2(0.7f));
+        IPText = GUI.Add(IPString);
+        IPText.position = new Vector2(0.1f, 0.11f);
 
-        Camera.AddImage(Join, JoinBtn, new Vector2(0.325f, 0.11f), new Vector2(0.25f), true);
-        Camera.AddImage(Host, HostBtn, new Vector2(0.325f, 0.21f), new Vector2(0.25f), true);
-        Camera.AddImage(TextBoxIP, TextBox, new Vector2(0.1f, 0.10f), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
-        Camera.AddImage(TextBoxPort, TextBox, new Vector2(0.1f, 0.20f), new Vector2(0.70f, 0.5f), 0.0f, new Vector4(0.0f, 0.0f, 0.0f, 1.0f), true);
+        PortText = GUI.Add(PortString);
+        PortText.position = new Vector2(0.1f, 0.21f);
+
+        IP = GUI.Add("IP, needed to join");
+        IP.position = new Vector2(0.1f, 0.07f);
+
+        IP.scale = new Vector2(0.7f);
+        Port = GUI.Add("PORT, needed for both host and join");
+
+        Port.position = new Vector2(0.1f, 0.17f);
+        Port.scale = new Vector2(0.7f);
+
+        Join = GUI.Add(JoinBtn);
+        Join.position = new Vector2(0.325f, 0.11f);
+        Join.scale = new Vector2(0.25f);
+        Join.interactable = true;
+
+        Host = GUI.Add(HostBtn);
+        Host.position = new Vector2(0.325f, 0.21f);
+        Host.scale = new Vector2(0.25f);
+        Host.interactable = true;
+
+        TextBoxIP = GUI.Add(TextBox);
+        TextBoxIP.position = new Vector2(0.1f);
+        TextBoxIP.scale = new Vector2(0.7f, 0.5f);
+        TextBoxIP.color = Color.Black.ToVector4();
+        TextBoxIP.interactable = true;
+
+        TextBoxPort = GUI.Add(TextBox);
+        TextBoxPort.position = new Vector2(0.1f, 0.2f);
+        TextBoxPort.scale = new Vector2(0.7f, 0.5f);
+        TextBoxPort.color = Color.Black.ToVector4();
+        TextBoxPort.interactable = true;
     }
 
     public void ClearImagesAndText()
     {
-        Camera.DeleteImage(Join);
-        Camera.DeleteImage(Host);
-        Camera.DeleteImage(TextBoxIP);
-        Camera.DeleteImage(TextBoxPort);
+        GUI.Remove(BG);
 
-        Camera.DeleteText("IPText");
-        Camera.DeleteText("PortText");
-        Camera.DeleteText("IP");
-        Camera.DeleteText("Port");
+        GUI.Remove(Join);
+        GUI.Remove(Host);
+        GUI.Remove(TextBoxIP);
+        GUI.Remove(TextBoxPort);
+
+        GUI.Remove(IPText);
+        GUI.Remove(PortText);
+        GUI.Remove(IP);
+        GUI.Remove(Port);
     }
 }
