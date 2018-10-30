@@ -31,11 +31,9 @@ namespace thomas
 		{
 			if (m_spriteBatch != nullptr)
 			{
-				try {
 
-
-					// Begin
-					m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
+				// Begin
+				m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
 
 				for (const auto& image : m_images)
 				{
