@@ -38,16 +38,19 @@ namespace thomas
 			public:
 				void SetClip(resource::AudioClip* clip);		
 				void SetVolume(float volume);
+				void SetVolumeFactor(float volumeFactor);
 				void SetLooping(bool looping);
 
 			public:
 				resource::AudioClip* GetClip() const;
 				float GetVolume() const;
+				float GetVolumeFactor() const;
 				bool IsLooping() const;
 
 			private:
 				resource::AudioClip* m_clip;
 				float m_volume;
+				float m_volumeFactor;
 				bool m_looping;
 			};
 		}

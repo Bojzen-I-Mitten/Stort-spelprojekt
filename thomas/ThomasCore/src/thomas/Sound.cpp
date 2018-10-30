@@ -7,7 +7,6 @@ namespace thomas
 {
 	std::unique_ptr<AudioEngine> Sound::s_audioEngine;
 	std::map<std::string, Sound::SoundInfo> Sound::s_waves;
-	float Sound::s_masterVolume;
 	float Sound::s_fxVolume;
 	float Sound::s_musicVolume;
 
@@ -26,7 +25,6 @@ namespace thomas
 		// TODO: check if there is a audio device available?
 
 		// Init volumes to default values
-		s_masterVolume = 0.5f;
 		s_fxVolume = 0.5f;
 		s_musicVolume = 0.5f;
 	}
@@ -133,7 +131,7 @@ namespace thomas
 
 	void Sound::SetMasterVolume(float volume)
 	{
-		s_masterVolume = volume;
+		s_audioEngine->SetMasterVolume(volume);
 	}
 
 	void Sound::SetFxVolume(float volume)
@@ -148,7 +146,7 @@ namespace thomas
 
 	float Sound::GetMasterVolume()
 	{
-		return s_masterVolume;
+		return s_audioEngine->GetMasterVolume();
 	}
 
 	float Sound::GetMusicVolume()
