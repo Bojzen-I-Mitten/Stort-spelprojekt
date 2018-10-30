@@ -46,18 +46,21 @@ public class ChadControls : NetworkComponent
     public float CameraSensitivity_x { get; set; } = 10;
     [Category("Camera Settings")]
     public float CameraSensitivity_y { get; set; } = 20;
-    [Category("Camera Settings")]
-    public Vector3 CameraOffset { get; set; } = new Vector3(0, 2, 2);
+    // [Category("Camera Settings")]
+    // public Vector3 CameraOffset { get; set; } = new Vector3(0, 1.8f, 1);
     [Category("Camera Settings")]
     public float CameraMaxVertDegrees { get; set; } = 60;
     [Category("Camera Settings")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
-    [Category("Camera Settings")]
-    public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(-1.5f, 1.5f, 1.5f);
+    // [Category("Camera Settings")]
+    // public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(0.8f, 1.6f, 0.8f);
     [Category("Camera Settings")]
     public float TotalYStep { get; private set; } = 0;
     [Category("Camera Settings")]
     public float TotalXStep { get; private set; } = 0;
+
+    private Vector3 CameraOffset = new Vector3(0, 1.6f, 1);
+    private Vector3 CameraOffsetThrowing = new Vector3(0.8f, 1.6f, 0.8f);
     #endregion
 
     #region Movement stuff
@@ -362,7 +365,7 @@ public class ChadControls : NetworkComponent
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
             Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = CameraOffsetThrowing;
+            Camera.transform.localPosition = CameraOffsetThrowing; 
         }
     }
 
@@ -478,6 +481,8 @@ public class ChadControls : NetworkComponent
     IEnumerator PlayThrowAnim()
     {
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+        if (Camera)
+            Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 1.0f);
         ResetCharge();
         ThrowObject();
 
