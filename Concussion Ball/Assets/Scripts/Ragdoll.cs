@@ -550,26 +550,18 @@ public class Ragdoll : ScriptComponent
     {
         RagdollSound.Apply3D(AudioListener.position, G_BodyParts[(int)BODYPART.SPINE].transform.position);
 
-        if (Input.GetKeyDown(Input.Keys.Space))
-        {
-            if (RagdollEnabled == false)
-                EnableRagdoll();
-            else
-                DisableRagdoll();
-        }
+
 
         if (RagdollEnabled)
         {
             if (ImpactSpine.GetActive)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
-             //   Debug.Log(RagdollSound.Volume);
                 RagdollSound.PlayOneShot();
             }
                 
             return;
         }
-        uint boneindex;
         RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
         
