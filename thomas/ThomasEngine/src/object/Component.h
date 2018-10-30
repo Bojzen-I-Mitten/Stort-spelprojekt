@@ -53,7 +53,7 @@ namespace ThomasEngine
 
 		GameObject^ m_gameObject;
 
-		
+		virtual void Destroy() override;
 		property bool initialized
 		{
 			bool get();
@@ -71,7 +71,6 @@ namespace ThomasEngine
 		void Disable();
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
-		virtual void Destroy() override;
 		virtual void OnDestroy() override;
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
