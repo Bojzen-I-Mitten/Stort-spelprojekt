@@ -130,6 +130,7 @@ namespace ThomasEngine.Network
                 GameObject prefab = Manager.SpawnablePrefabs[prefabEvent.PrefabID];
                 GameObject gameObject = GameObject.Instantiate(prefab, prefabEvent.Position, prefabEvent.Rotation);
                 identity = gameObject.GetComponent<NetworkIdentity>();
+                identity.PrefabID = prefabEvent.PrefabID;
                 NetScene.AddObject(identity, prefabEvent.NetID);
             }else
             {
@@ -156,7 +157,6 @@ namespace ThomasEngine.Network
 
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)
         {
-
             NetworkIdentity networkIdentity = NetScene.FindNetworkObject(transEvent.NetID);
             if (networkIdentity != null)
             {

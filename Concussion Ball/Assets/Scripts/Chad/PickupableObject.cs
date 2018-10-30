@@ -116,6 +116,9 @@ public class PickupableObject : NetworkComponent
             if(!this.gameObject.GetComponent<Ball>())
                 m_pickupable = false;
 
+            if (!m_rigidBody)
+                m_rigidBody = gameObject.GetComponent<Rigidbody>();
+
             m_rigidBody.IsKinematic = false;
 
             m_rigidBody.enabled = false;
@@ -136,7 +139,7 @@ public class PickupableObject : NetworkComponent
 
     public override void OnLostOwnership()
     {
-        m_rigidBody.enabled = false;
+       
     }
 
     public override void OnRead(NetPacketReader reader, bool initialState)

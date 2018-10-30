@@ -23,7 +23,7 @@ namespace ThomasEngine.Network
         const float LocalVelocityThreshold = 0.00001f;
         const float MoveAheadRatio = 0.1f;
 
-        const float SnapThreshhold = 5.0f;
+        const float SnapThreshhold = 2.0f;
 
         const float InterpolateRotation = 1.0f;
         const float InterpolateMovement = 1.0f;
@@ -63,6 +63,17 @@ namespace ThomasEngine.Network
         public void SetTarget(Transform newTarget)
         {
             _target = newTarget;
+            PrevPosition = target.position;
+            PrevRotation = target.rotation;
+            PrevScale = target.scale;
+            TargetSyncPosition = target.position;
+
+            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            if (targetRigidbody)
+            {
+                TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
+                TargetSyncAngularVelocity = targetRigidbody.AngularVelocity;
+            }
         }
 
         public override void Start()
@@ -267,7 +278,6 @@ namespace ThomasEngine.Network
 
         private void InterpolatePosition()
         {
-
             if (!isOwner)
             {
                 target.position = Vector3.Lerp(target.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
@@ -276,8 +286,6 @@ namespace ThomasEngine.Network
 
         private void ReadRigidbody(NetPacketReader reader)
         {
-
-
             if (isOwner || !targetRigidbody)
             {
                 //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
@@ -302,9 +310,9 @@ namespace ThomasEngine.Network
             
             float dist = Vector3.Distance(target.position, TargetSyncPosition);
 
-            float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
+            //float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
 
-            if (dist > SnapThreshhold || rotDiff < -LocalRotationThreshold || !targetRigidbody.enabled)
+            if (dist > SnapThreshhold || !targetRigidbody.enabled)
             {
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;

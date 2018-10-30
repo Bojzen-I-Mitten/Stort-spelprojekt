@@ -78,18 +78,21 @@ namespace ThomasEngine.Network
 
             //Transfer that players objects to someone else.
 
+            if (ObjectOwners.ContainsKey(peer))
+            {
+                foreach (NetworkIdentity identity in ObjectOwners[peer])
+                    identity.Owner = true;
+
+                ObjectOwners[peer].Clear();
+                ObjectOwners.Remove(peer);
+            }
+
             if (Players.ContainsKey(peer))
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
                     Object.Destroy(id.gameObject);
                 Players.Remove(peer);
-            }
-
-            if(ObjectOwners.ContainsKey(peer))
-            {
-                ObjectOwners[peer].Clear();
-                ObjectOwners.Remove(peer);
             }
         }
 

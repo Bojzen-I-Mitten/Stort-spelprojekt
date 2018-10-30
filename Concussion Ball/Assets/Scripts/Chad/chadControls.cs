@@ -50,7 +50,7 @@ public class ChadControls : NetworkComponent
     [Category("Camera Settings")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
     [Category("Camera Settings")]
-    public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(-1.5f, 1.5f, 1.5f);
+    public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(1.5f, 1.5f, 1.5f);
     [Category("Camera Settings")]
     public float TotalYStep { get; private set; } = 0;
     [Category("Camera Settings")]
@@ -112,6 +112,16 @@ public class ChadControls : NetworkComponent
         Identity.RefreshCache();
     }
 
+    public void DeactivateCamera()
+    {
+        if (isOwner)
+        {
+            Camera.gameObject.activeSelf = false;
+            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+        }
+            
+    }
+
     public void ActivateCamera()
     {
         if (isOwner)
@@ -128,8 +138,11 @@ public class ChadControls : NetworkComponent
         {
             DivingTimer += Time.DeltaTime;
             Direction = new Vector3(0, 0, 0);
-            HandleKeyboardInput();
-            HandleMouseInput();
+            if(State != STATE.RAGDOLL)
+            {
+                HandleKeyboardInput();
+                HandleMouseInput();
+            }
             StateMachine();
         }
 
@@ -143,6 +156,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.L))
         {
             Ragdolling = StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000);
+            State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
         if (Input.GetKeyDown(Input.Keys.K))
@@ -166,13 +180,24 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
-        if (PickedUpObject && PickedUpObject.DropOnRagdoll)
-            PickedUpObject.Drop();
         if(State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
+            State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
+    }
+
+    public void OnDisconnect()
+    {
+        if (PickedUpObject)
+        {
+            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
+                (PickedUpObject as Powerup).Remove();
+            else
+                PickedUpObject.Drop();
+        }
+            
     }
 
 
@@ -231,12 +256,17 @@ public class ChadControls : NetworkComponent
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
+                    ChadHud.Instance.ActivateCrosshair();
+                    ChadHud.Instance.ActivateChargeBar();
+
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                 }
                 else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
                 {
@@ -252,6 +282,8 @@ public class ChadControls : NetworkComponent
                     ResetCharge();
                     ThrowObject();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                 }
             }
             else if (PickedUpObject && !PickedUpObject.m_throwable) // player is holding object that is not throwable
@@ -452,7 +484,7 @@ public class ChadControls : NetworkComponent
     IEnumerator StartRagdoll(float duration, Vector3 force)
     {
         State = STATE.RAGDOLL;
-        Camera.transform.parent = null;
+        Camera.transform.SetParent(null, true);
         EnableRagdoll();
         Ragdoll.AddForce(force);
         yield return new WaitForSeconds(duration);
@@ -472,6 +504,7 @@ public class ChadControls : NetworkComponent
         PickedUpObject.ChargeEffect();
 
         ThrowForce = ChargeRate * ChargeTime;
+        ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
     }
 
     private void ThrowObject()
@@ -481,9 +514,12 @@ public class ChadControls : NetworkComponent
 
     public void RPCPickup(int id)
     {
-        GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
-        PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
-        pickupable.Pickup(this, hand ? hand : transform);
+        if(State != STATE.RAGDOLL)
+        {
+            GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
+            PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
+            pickupable.Pickup(this, hand ? hand : transform);
+        }
     }
 
     public bool HasThrowableObject()
@@ -530,10 +566,9 @@ public class ChadControls : NetworkComponent
     }
 
 
-
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner)
+        if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null)
@@ -547,7 +582,6 @@ public class ChadControls : NetworkComponent
             }
             if (collider.gameObject.Name == PlayerPrefabName)
             {
-
                 float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
                 Debug.Log(TheirVelocity);
                 Debug.Log(CurrentVelocity.Length());
@@ -556,6 +590,12 @@ public class ChadControls : NetworkComponent
                     //toggle ragdoll
                     RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
                     SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+
+                    if (PickedUpObject && PickedUpObject.DropOnRagdoll)
+                    {
+                        PickedUpObject.Drop();
+                    }
+                        
                 }
             }
         }

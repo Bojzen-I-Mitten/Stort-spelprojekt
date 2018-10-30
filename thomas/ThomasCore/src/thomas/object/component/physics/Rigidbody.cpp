@@ -254,6 +254,7 @@ namespace thomas
 				btTransform trans = this->getWorldTransform();
 				trans.setOrigin(Physics::ToBullet(position));
 				this->setWorldTransform(trans);
+				m_gameObject->m_transform->SetPosition(position);
 			}
 
 			void Rigidbody::SetRotation(math::Quaternion rotation)
@@ -261,6 +262,7 @@ namespace thomas
 				btTransform trans = this->getWorldTransform();
 				trans.setRotation(Physics::ToBullet(rotation));
 				this->setWorldTransform(trans);
+				m_gameObject->m_transform->SetRotation(rotation);
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()

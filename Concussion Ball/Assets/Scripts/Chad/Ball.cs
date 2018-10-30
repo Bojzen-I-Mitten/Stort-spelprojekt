@@ -29,8 +29,8 @@ public class Ball : PickupableObject
         m_throwable = true;
         DropOnRagdoll = true;
 
-        renderComponent = gameObject.GetComponent<RenderComponent>();
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        //renderComponent = gameObject.GetComponent<RenderComponent>();
+        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
@@ -226,7 +226,7 @@ public class Ball : PickupableObject
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
         Color newColor = new Color(interp, 0.0f, (1.0f - interp));
-        renderComponent.material.SetColor("color", newColor);
+        //renderComponent.material.SetColor("color", newColor);
 
         if (interp > 0.8f)
         {
@@ -245,7 +245,7 @@ public class Ball : PickupableObject
     override public void Cleanup()
     {
         base.Cleanup();
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;
         emitterElectricity2.Emit = false;
@@ -261,26 +261,19 @@ public class Ball : PickupableObject
 
     public void Reset()
     {
-        RPCDrop();
-        gameObject.SetActive(false);
-        gameObject.SetActive(true);
         if (isOwner)
         {
+            Drop();
             if (m_rigidBody != null)
             {
-                Debug.Log("Resetting ball");
                 m_rigidBody.enabled = false;
-                StartCoroutine(EnableRigidBody());
+                m_rigidBody.Position = Vector3.Zero;
+                m_rigidBody.LinearVelocity = Vector3.Zero;
+                m_rigidBody.AngularVelocity = Vector3.Zero;
+                transform.position = Vector3.Zero;
+                transform.rotation = Quaternion.Identity;
+                m_rigidBody.enabled = true;
             }
-            transform.localEulerAngles = Vector3.Zero;
-            transform.localPosition = SpawnPoint;
         }
-    }
-
-
-    private IEnumerator EnableRigidBody()
-    {
-        yield return null;
-        m_rigidBody.enabled = true;
     }
 }

@@ -22,6 +22,7 @@ public class MatchSystem : NetworkManager
     public GameObject Ball;
 
     public ChadControls LocalChad;
+    public Camera spectatorCamera { get; set; }
 
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
@@ -289,7 +290,7 @@ public class MatchSystem : NetworkManager
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
-
+        
         np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
 
         SpawnBall();
@@ -304,13 +305,13 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerLeave(NetPeer peer)
     {
-        return;
         NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
         if (!np)
             Debug.LogError("Failed to find network player for peer:" + peer);
         else
         {
             np.JoinTeam(null);
+            np.gameObject.GetComponent<ChadControls>().OnDisconnect();
         }
     }
     #endregion
