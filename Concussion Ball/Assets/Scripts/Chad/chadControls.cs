@@ -59,7 +59,7 @@ public class ChadControls : NetworkComponent
     [Category("Camera Settings")]
     public float TotalXStep { get; private set; } = 0;
 
-    private Vector3 CameraOffset = new Vector3(0, 1.6f, 1);
+    private Vector3 CameraOffset = new Vector3(0, 1.8f, 1.5f);
     private Vector3 CameraOffsetThrowing = new Vector3(0.8f, 1.6f, 0.8f);
     #endregion
 
