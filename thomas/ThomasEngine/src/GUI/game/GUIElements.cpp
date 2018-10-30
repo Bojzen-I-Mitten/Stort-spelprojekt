@@ -19,6 +19,8 @@ namespace ThomasEngine
 
 	void GUIElement::interactable::set(bool interactable) { nativePtr->interactable = interactable; }
 
+	void GUIElement::depth::set(float depth) { nativePtr->depth = depth; }
+
 	void GUIElement::flip::set(Vector2 flip) 
 	{ 
 		Vector2 _flip = Vector2(flip.x ? 1 : 0, flip.y ? 2 : 0);

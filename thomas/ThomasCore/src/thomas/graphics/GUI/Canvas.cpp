@@ -38,7 +38,7 @@ namespace thomas
 			{
 				if (m_spriteBatch != nullptr)
 				{
-					m_spriteBatch->Begin(SpriteSortMode_Deferred, m_spriteStates->NonPremultiplied());
+					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied());
 
 					for (int i = 0; i < m_GUIElements.size(); ++i)
 					{
@@ -79,7 +79,7 @@ namespace thomas
 			{
 				Font* font = m_defaultFont.get();
 				std::unique_ptr<GUIElement> newText =
-					std::unique_ptr<GUIElement>(new Text(font, text, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false, this));
+					std::unique_ptr<GUIElement>(new Text(font, text, this));
 				m_GUIElements.push_back(std::move(newText));
 
 				return m_GUIElements[m_GUIElements.size() - 1].get();
@@ -89,7 +89,7 @@ namespace thomas
 			{
 				if (texture->GetResourceView())
 				{
-					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, Vector2(0.f), Vector2(1.f), Vector2(0.f), Vector4(1.f), 0, false, this);
+					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, this);
 					m_GUIElements.push_back(std::move(image));
 
 					return m_GUIElements[m_GUIElements.size() - 1].get();

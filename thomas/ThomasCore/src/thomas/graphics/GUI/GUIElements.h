@@ -34,8 +34,17 @@ namespace thomas
 			struct GUIElement
 			{
 				GUIElement() = default;
-				GUIElement(Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable, Canvas* canvas) :
-					position(position), scale(scale), origin(origin), color(color), rotation(rotation), interactable(interactable), canvas(canvas) {effect = DirectX::SpriteEffects::SpriteEffects_None;}
+				GUIElement(Canvas* canvas) : canvas(canvas)
+				{
+					position = Vector2::Zero;
+					scale = Vector2::One;
+					origin = Vector2::Zero;
+					color = Vector4::One;
+					rotation = 0;
+					interactable = false;
+					depth = 0;
+					effect = DirectX::SpriteEffects::SpriteEffects_None;
+				}
 				virtual ~GUIElement(){}
 
 				Vector2 position;
@@ -44,6 +53,7 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interactable;
+				float depth;
 				Canvas* canvas;
 				DirectX::SpriteEffects effect;
 
@@ -73,8 +83,8 @@ namespace thomas
 			struct Text : public GUIElement
 			{
 				Text() = default;
-				Text(Font* font, std::string text, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable, Canvas* canvas) :
-					font(font), text(text), GUIElement(position, scale, origin, color, rotation, interactable, canvas) {}
+				Text(Font* font, std::string text, Canvas* canvas) :
+					font(font), text(text), GUIElement(canvas) {}
 				virtual ~Text() {}
 
 				Font* font;
@@ -82,7 +92,7 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation, effect);
+					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation, effect, depth);
 				}
 
 				Vector2 Size()
@@ -94,15 +104,15 @@ namespace thomas
 			struct Image : public GUIElement
 			{
 				Image() = default;
-				Image(Texture2D* texture, Vector2 position, Vector2 scale, Vector2 origin, Vector4 color, float rotation, bool interactable, Canvas* canvas) :
-					texture(texture), GUIElement(position, scale, origin, color, rotation, interactable, canvas) {}
+				Image(Texture2D* texture, Canvas* canvas) :
+					texture(texture), GUIElement(canvas) {}
 				virtual ~Image() {}
 
 				Texture2D* texture;
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * Size(), scale * vpScale, effect);
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * Size(), scale * vpScale, effect, depth);
 				}
 
 				Vector2 Size()

@@ -1,4 +1,5 @@
-﻿using ThomasEngine;
+﻿using System.Collections;
+using ThomasEngine;
 
 public class GUITest : ScriptComponent
 {
@@ -26,6 +27,14 @@ public class GUITest : ScriptComponent
 
     public override void Update()
     {
+        if (!JoinHost.enabled)
+            SelectTeam.enabled = true;
+        //StartCoroutine(LoadSelectTeam());
+    }
 
+    IEnumerator LoadSelectTeam()
+    {
+        yield return new WaitForSecondsRealtime(2);
+        SelectTeam.enabled = true;
     }
 }

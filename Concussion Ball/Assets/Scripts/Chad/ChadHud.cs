@@ -59,6 +59,7 @@ public class ChadHud : ScriptComponent
         AnnouncementBG.position = new Vector2(0.5f);
         AnnouncementBG.scale = Vector2.Zero;
         AnnouncementBG.origin = new Vector2(0.5f);
+        AnnouncementBG.depth = 1;
 
         Crosshair = HUD.Add(CrosshairTexture);
         Crosshair.position = new Vector2(0.5f);

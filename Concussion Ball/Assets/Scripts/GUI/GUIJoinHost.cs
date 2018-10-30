@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
 using InputIP;
+using System.Collections;
 
 public class GUIJoinHost : ScriptComponent
 {
@@ -15,11 +16,11 @@ public class GUIJoinHost : ScriptComponent
 
     Camera Camera;
 
+    private bool Disabled;
     private string IPString;
     private string PortString;
     private bool TakeIP;
     private bool TakePort;
-    private bool Disabled;
 
     Canvas GUI;
 
@@ -78,10 +79,10 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.TargetIP = IPString;
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();
-
-                    this.enabled = false;
-                    gameObject.GetComponent<GUISelectTeam>().enabled = true;
-                    Disabled = true;
+                    
+                    ClearImagesAndText();
+                    enabled = false;
+                    return;
                 }
                 else
                 {
@@ -99,10 +100,10 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
-
-                    this.enabled = false;
-                    gameObject.GetComponent<GUISelectTeam>().enabled = true;
-                    Disabled = true;
+                    
+                    ClearImagesAndText();
+                    enabled = false;
+                    return;
                 }
                 else
                 {
@@ -129,14 +130,11 @@ public class GUIJoinHost : ScriptComponent
                 IP.font = TextFont;
             }
         }
-        else
-            ClearImagesAndText();
     }
 
 
     public void AddImagesAndText()
     {
-        Disabled = false;
         GUI = Camera.AddCanvas();
 
         IPText = GUI.Add(IPString);
@@ -176,6 +174,7 @@ public class GUIJoinHost : ScriptComponent
         TextBoxPort.color = Color.Black.ToVector4();
         TextBoxPort.interactable = true;
     }
+
 
     public void ClearImagesAndText()
     {

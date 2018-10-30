@@ -22,7 +22,7 @@ public class GUISelectTeam : ScriptComponent
     {
         Disabled = false;
         Camera = gameObject.GetComponent<Camera>();
-        AddsAndText();
+        AddImagesAndText();
     }
 
     public override void Update()
@@ -59,7 +59,7 @@ public class GUISelectTeam : ScriptComponent
         }
     }
 
-    public void AddsAndText()
+    public void AddImagesAndText()
     {
         GUI = Camera.AddCanvas();
 

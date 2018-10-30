@@ -41,6 +41,10 @@ namespace ThomasEngine
 		{
 			void set(bool interactable);
 		}
+		property float depth
+		{
+			void set(float depth);
+		}
 		property Vector2 flip
 		{
 			void set(Vector2 Flip);
