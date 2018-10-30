@@ -34,6 +34,8 @@ public class Ball : PickupableObject
         renderComponent = gameObject.GetComponent<RenderComponent>();
         renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
+        m_rigidBody.Damping = 0.5f;
+
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
