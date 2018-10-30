@@ -10,10 +10,15 @@ public class ChadHud : ScriptComponent
     Text Timer;
     Text Announcement1;
     Text Announcement2;
+    Text Score1;
+    Text Score2;
     Image AnnouncementBG;
     Image Crosshair;
     Image ChargeBarOutline;
     Image ChargeBar;
+    Image TimerBG;
+    Image Score1BG;
+    Image Score2BG;
     public Curve AnnouncementHorizontalSpeed { get; set; }
     public Font AnnouncementFont { get; set; }
     public Font Numbers { get; set; }
@@ -21,6 +26,8 @@ public class ChadHud : ScriptComponent
     public Texture2D CrosshairTexture { get; set; }
     public Texture2D ChargeBarOutlineTexture { get; set; }
     public Texture2D ChargeBarTexture { get; set; }
+    public Texture2D TimerBGTexture { get; set; }
+    public Texture2D ScoreBGTexture { get; set; }
     public bool ToggleAim { get; set; } = true;
 
     public override void Awake()
@@ -36,10 +43,41 @@ public class ChadHud : ScriptComponent
         HUD = cam.AddCanvas();
 
         Timer = HUD.Add("00:00");
+        Timer.scale = new Vector2(1.05f);
         Timer.position = new Vector2(0.5f, 0.02f);
         Timer.color = Color.WhiteSmoke.ToVector4();
         Timer.font = Numbers;
         Timer.origin = new Vector2(0.5f);
+
+        TimerBG = HUD.Add(TimerBGTexture);
+        TimerBG.position = new Vector2(0.5f, 0);
+        TimerBG.origin = new Vector2(0.5f, 0);
+        TimerBG.scale = new Vector2(0.25f, 0.4f);
+        TimerBG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color.ToVector4() + MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color.ToVector4();
+        TimerBG.depth = 0.9f;
+
+        Score1 = HUD.Add("");
+        Score1.position = new Vector2(0.46f, 0);
+        Score1.color = Color.WhiteSmoke.ToVector4();
+        Score1.font = Numbers;
+
+        Score1BG = HUD.Add(ScoreBGTexture);
+        Score1BG.position = new Vector2(0.464f, 0);
+        Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color.ToVector4();
+        Score1BG.depth = 1;
+        Score1BG.scale = new Vector2(0.4f, 0.4f);
+        Score1BG.flip = new Vector2(0, 1);
+
+        Score2 = HUD.Add("");
+        Score2.position = new Vector2(0.525f, 0);
+        Score2.color = Color.WhiteSmoke.ToVector4();
+        Score2.font = Numbers;
+
+        Score2BG = HUD.Add(ScoreBGTexture);
+        Score2BG.position = new Vector2(0.526f, 0);
+        Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color.ToVector4();
+        Score2BG.depth = 1;
+        Score2BG.scale = new Vector2(0.4f, 0.4f);
 
         Announcement1 = HUD.Add("");
         Announcement1.position = new Vector2(0.5f);
@@ -226,7 +264,8 @@ public class ChadHud : ScriptComponent
         {
             Timer.text = string.Format("{0}:{1}", minutes.ToString("00"), seconds.ToString("00"));
         }
-            
-        
+
+        Score1.text = string.Format("{0}", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score);
+        Score2.text = string.Format("{0}", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score);
     }
 }

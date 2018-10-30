@@ -23,7 +23,7 @@ namespace ThomasEngine
 
 	void GUIElement::flip::set(Vector2 flip) 
 	{ 
-		Vector2 _flip = Vector2(flip.x ? 1 : 0, flip.y ? 2 : 0);
+		Vector2 _flip = Vector2(flip.x ? 2 : 0, flip.y ? 1 : 0);
 		nativePtr->effect = (DirectX::SpriteEffects)((int)_flip.x | (int)_flip.y);
 	}
 
