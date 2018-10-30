@@ -41,6 +41,13 @@ namespace ThomasEngine
 		{
 			return Vector3(value.x, value.y, value.z);
 		}
+
+		static Vector3 SphericalCoordinate(float phi, float theta, float radius)
+		{
+			thomas::math::Vector3 temp = thomas::math::SphericalCoordinate(phi, theta, radius);
+			return Vector3(temp.x, temp.y, temp.z);
+		}
+
 		static thomas::math::Vector4 Convert(Vector4% value)
 		{
 			return thomas::math::Vector4(value.x, value.y, value.z, value.w);
@@ -113,7 +120,6 @@ namespace ThomasEngine
 				thomas::math::Vector3(value.Center.x, value.Center.y, value.Center.z),
 				value.Radius);
 		}
-
 	};
 
 }
