@@ -4,7 +4,7 @@ using ThomasEngine;
 using ThomasEngine.Network;
 public class PowerupSpawner : NetworkComponent
 {
-    private GameObject spawnedPowerup = null;
+    private bool hasPowerup = false;
     float spawnInterval = 30.0f;
     float timeLeftUntilSpawn = 0.0f;
     public override void Start()
@@ -16,7 +16,7 @@ public class PowerupSpawner : NetworkComponent
     {
         if (isOwner)
         {
-            if (spawnedPowerup == null)
+            if (!hasPowerup)
             {
                 timeLeftUntilSpawn -= Time.DeltaTime;
                 if (timeLeftUntilSpawn < 0.0f)
@@ -35,8 +35,7 @@ public class PowerupSpawner : NetworkComponent
     public void RPCFree()
     {
         timeLeftUntilSpawn = spawnInterval;
-        spawnedPowerup = null;
-        
+        hasPowerup = false;
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -44,6 +43,7 @@ public class PowerupSpawner : NetworkComponent
         if(initialState)
         {
             writer.Put(timeLeftUntilSpawn);
+            writer.Put(hasPowerup);
             return true;
         }
         return false;
@@ -54,19 +54,25 @@ public class PowerupSpawner : NetworkComponent
         if (initialState)
         {
             timeLeftUntilSpawn = reader.GetFloat();
+            hasPowerup = reader.GetBool();
         }
     }
 
     public void SpawnPowerup()
     {
-        if (spawnedPowerup == null)
+        if (isOwner)
         {
-            spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
-            spawnedPowerup.GetComponent<Powerup>().spawner = this;
-            timeLeftUntilSpawn = spawnInterval;
+            if (!hasPowerup)
+            {
+                GameObject spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
+                spawnedPowerup.GetComponent<Powerup>().spawner = this;
+                timeLeftUntilSpawn = spawnInterval;
+                hasPowerup = true;
+            }
+            else
+                Debug.Log("Powerup already spawned");
         }
-        else
-            Debug.Log("Powerup already spawned");
+
     }
 
     public override void OnDrawGizmos()

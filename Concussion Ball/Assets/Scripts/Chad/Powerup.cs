@@ -81,6 +81,30 @@ public class Powerup : PickupableObject
 
     }
 
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        base.OnWrite(writer, initialState);
+        if (spawner)
+            writer.Put(spawner.ID);
+        else
+            writer.Put(-1);
+
+        return true;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        base.OnRead(reader, initialState);
+
+        int spawnerID = reader.GetInt();
+        if((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
+        {
+            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+        }
+    }
+
+
     public void Remove()
     {
         Drop();

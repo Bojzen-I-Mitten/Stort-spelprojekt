@@ -63,6 +63,17 @@ namespace ThomasEngine.Network
         public void SetTarget(Transform newTarget)
         {
             _target = newTarget;
+            PrevPosition = target.position;
+            PrevRotation = target.rotation;
+            PrevScale = target.scale;
+            TargetSyncPosition = target.position;
+
+            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            if (targetRigidbody)
+            {
+                TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
+                TargetSyncAngularVelocity = targetRigidbody.AngularVelocity;
+            }
         }
 
         public override void Start()

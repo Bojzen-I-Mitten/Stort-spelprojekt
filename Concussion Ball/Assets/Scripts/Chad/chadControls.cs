@@ -550,7 +550,6 @@ public class ChadControls : NetworkComponent
     }
 
 
-
     public override void OnCollisionEnter(Collider collider)
     {
         if (isOwner && State != STATE.RAGDOLL)
@@ -560,14 +559,13 @@ public class ChadControls : NetworkComponent
             {
                 if (pickupable.transform.parent == null)
                 {
-                    pickupable.gameObject.GetComponent<NetworkIdentity>().Owner = true;
+                    TakeOwnership(pickupable.gameObject);
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
                 }
             }
             if (collider.gameObject.Name == PlayerPrefabName)
             {
-
                 float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
                 Debug.Log(TheirVelocity);
                 Debug.Log(CurrentVelocity.Length());

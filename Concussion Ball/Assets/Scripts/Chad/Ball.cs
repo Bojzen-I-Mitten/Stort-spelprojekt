@@ -261,26 +261,18 @@ public class Ball : PickupableObject
 
     public void Reset()
     {
-        RPCDrop();
-        gameObject.SetActive(false);
-        gameObject.SetActive(true);
         if (isOwner)
         {
-            if (m_rigidBody != null)
+            RPCDrop();
+            if (isOwner)
             {
-                Debug.Log("Resetting ball");
-                m_rigidBody.enabled = false;
-                StartCoroutine(EnableRigidBody());
+                if (m_rigidBody != null)
+                {
+                    m_rigidBody.Position = Vector3.Zero;
+                    m_rigidBody.LinearVelocity = Vector3.Zero;
+                    m_rigidBody.AngularVelocity = Vector3.Zero;
+                }
             }
-            transform.localEulerAngles = Vector3.Zero;
-            transform.localPosition = SpawnPoint;
         }
-    }
-
-
-    private IEnumerator EnableRigidBody()
-    {
-        yield return null;
-        m_rigidBody.enabled = true;
     }
 }
