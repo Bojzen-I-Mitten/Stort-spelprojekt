@@ -256,12 +256,17 @@ public class ChadControls : NetworkComponent
                 if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
                 {
                     State = STATE.THROWING;
+                    ChadHud.Instance.ActivateCrosshair();
+                    ChadHud.Instance.ActivateChargeBar();
+
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING)
                 {
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                 }
                 else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
                 {
@@ -277,6 +282,8 @@ public class ChadControls : NetworkComponent
                     ResetCharge();
                     ThrowObject();
                     ResetCamera();
+                    ChadHud.Instance.DeactivateCrosshair();
+                    ChadHud.Instance.DeactivateChargeBar();
                 }
             }
             else if (PickedUpObject && !PickedUpObject.m_throwable) // player is holding object that is not throwable
@@ -497,6 +504,7 @@ public class ChadControls : NetworkComponent
         PickedUpObject.ChargeEffect();
 
         ThrowForce = ChargeRate * ChargeTime;
+        ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
     }
 
     private void ThrowObject()

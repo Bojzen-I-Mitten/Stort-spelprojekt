@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "../../utils/Math.h"
+#include "../../graphics/render/FrameData.h"
 /**
 *Camera class
 */
@@ -15,21 +16,10 @@ namespace thomas
 		{
 			class Camera : public Component
 			{
-			public:
-				struct CAMERA_FRAME_DATA
-				{
-					int targetDisplay;
-					math::Viewport viewport;
-					math::Matrix projectionMatrix;
-					math::Matrix viewMatrix;
-					math::Vector4 position;
-				};
 			private:
 				void UpdateProjMatrix();
 
 			public:
-				static std::vector<Camera*> s_allCameras;
-
 				Camera();
 				Camera(bool dontAddTolist);
 				~Camera();
@@ -77,10 +67,13 @@ namespace thomas
 				math::BoundingFrustum GetSubFrustrum(math::Rectangle rect);
 
 				void CopyFrameData();
-				CAMERA_FRAME_DATA& GetFrameData();
+				const graphics::render::CAMERA_FRAME_DATA& GetFrameData();
+
+				uint32_t ID();
 
 			private:
-				CAMERA_FRAME_DATA m_frameData;
+				uint32_t m_ID;
+				graphics::render::CAMERA_FRAME_DATA m_frameData;
 				math::Matrix m_projMatrix;
 				float m_fov;
 				float m_near;
