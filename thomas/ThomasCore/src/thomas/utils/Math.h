@@ -26,6 +26,22 @@ namespace DirectX
 			Euler() : yaw(0.f), pitch(0.f), roll(0.f) {}
 			Euler(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
 		};
+		enum Axis {
+			AxisX,
+			AxisY,
+			AxisZ,
+			NegAxisX,
+			NegAxisY,
+			NegAxisZ
+		};
+
+		/*	Extract the specified axis.
+		*/
+		inline Vector3 getAxis(Matrix& objectPose, Axis ind)
+		{
+			uint32_t i = ind % 3;
+			return Vector3(objectPose(i,0), objectPose(i, 1), objectPose(i, 2)) * (ind > 2 ? -1.f : 1.f);
+		}
 
 		BoundingFrustum CreateFrustrumFromMatrixRH(CXMMATRIX projection);
 

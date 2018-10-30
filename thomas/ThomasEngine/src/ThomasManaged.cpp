@@ -261,11 +261,14 @@ namespace ThomasEngine {
 					
 					/* Render & Update is synced.
 					*/
-					thomas::graphics::LightManager::Update();
-					CopyCommandList();
 
 					// Process state switch commands
 					ProcessCommand();
+
+					// Refresh frame
+					thomas::graphics::LightManager::Update();
+					CopyCommandList();
+
 					
 					// Enter async. state 
 #ifdef _EDITOR
