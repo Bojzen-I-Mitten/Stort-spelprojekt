@@ -111,7 +111,7 @@ namespace ThomasEngine
 			{
 				return AssetTypes::SCENE;
 			}
-			else if (extension == "wav")
+			else if (extension == "wav" || extension == "mp3")
 			{
 				return AssetTypes::AUDIO_CLIP;
 			}

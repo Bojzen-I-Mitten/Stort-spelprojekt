@@ -31,7 +31,6 @@ public class Ragdoll : ScriptComponent
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
 
-
     enum BODYPART
     {
         HIPS,
@@ -60,7 +59,8 @@ public class Ragdoll : ScriptComponent
     float[] Mass_BodyParts = new float[(int)BODYPART.COUNT];
     uint[] BoneIndexes = new uint[(int)BODYPART.COUNT];
     Collider[] C_BodyParts = new Collider[(int)BODYPART.COUNT];
-
+    SoundComponent RagdollSound;
+    float time=0;
 
 
     #region Utility functions
@@ -178,8 +178,9 @@ public class Ragdoll : ScriptComponent
             ThomasEngine.Debug.LogError("No renderskinnedcomponent available Noragdoll will be created");
             return;
         }
-                 
-       
+
+        // Play the ragdoll sound
+        RagdollSound.PlayOneShot();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
@@ -213,6 +214,9 @@ public class Ragdoll : ScriptComponent
             UpperLeftArm, UpperRightArm, LowerLeftArm, LowerRightArm,
             UpperLeftLeg, UpperRightLeg, LowerLeftLeg, LowerRightLeg
         };
+
+
+
 
         RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
@@ -527,10 +531,14 @@ public class Ragdoll : ScriptComponent
 
 
     }
-
+    public override void OnDisable()
+    { 
+        DisableRagdoll();
+    }
     public override void Start()
     {
         DisableRagdoll();
+        RagdollSound = gameObject.GetComponent<SoundComponent>();
     }
 
     public GameObject GetHips()
@@ -540,14 +548,24 @@ public class Ragdoll : ScriptComponent
 
     public override void Update()
     {
+       if (Input.GetKeyDown(Input.Keys.Space))
+        {
+            if (RagdollEnabled == false)
+                EnableRagdoll();
+            else
+                DisableRagdoll();
+        }
+
         if (RagdollEnabled)
             return;
 
         uint boneindex;
         RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
+        
 
-        for(int i =0; i < (int)BODYPART.COUNT; i++)
+
+        for(int i = 0; i < (int)BODYPART.COUNT; i++)
         {
             G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
         }
