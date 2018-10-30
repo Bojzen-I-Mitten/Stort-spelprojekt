@@ -9,7 +9,7 @@ using namespace System;
 namespace ThomasEngine
 {
 	ref class Model;
-	public ref class GUI
+	public ref class Gizmos
 	{
 	public:	
 		// Gizmos, move to own class

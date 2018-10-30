@@ -214,7 +214,7 @@ namespace ThomasEditor
                 Button button = (Button)sender;
                 Component component = (Component)button.DataContext;
                 if (component.GetType() != typeof(Transform))
-                    component.gameObject.RemoveComponent(component);
+                    GameObject.Destroy(component);
             }
 
             //Add so that element 0 is selected from the start.

@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-
+            NetScene.InititateScene();
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -118,16 +118,15 @@ namespace ThomasEngine.Network
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
 
-            NetScene.InititateScene();
         }
 
         public void Host()
         {
             initServerStartTime();
             ResponsiblePeer = LocalPeer;
-            NetScene.ActivateSceneObjects();
             NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
             OnPeerJoin(LocalPeer);
+            NetScene.ActivateSceneObjects();
 
         }
 
@@ -183,7 +182,7 @@ namespace ThomasEngine.Network
             {
                 //Send server info to this guy.
                 bool responsible = ResponsiblePeer == LocalPeer;
-                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible);
+                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
@@ -287,14 +286,15 @@ namespace ThomasEngine.Network
 
         }
 
-        public void TakeOwnership(NetworkIdentity networkIdentiy)
+        public void TakeOwnership(NetworkIdentity networkIdentity)
         {
 
             NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent
             {
-                NetID = networkIdentiy.ID
+                NetID = networkIdentity.ID
             };
-            NetScene.ObjectOwners[LocalPeer].Add(networkIdentiy);
+            if(!NetScene.ObjectOwners[LocalPeer].Contains(networkIdentity))
+                NetScene.ObjectOwners[LocalPeer].Add(networkIdentity);
             Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
         }
 
@@ -367,7 +367,10 @@ namespace ThomasEngine.Network
             foreach (NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
             {
                 if (identity.PrefabID == -1) //Scene object
+                {
                     identity.WriteInitialData();
+                    TakeOwnership(identity);
+                }
                 else
                 {
                     TransferOwnedPrefab(identity);
@@ -414,6 +417,7 @@ namespace ThomasEngine.Network
                 };
                 Events.SendEvent(spawnPrefabEvent, DeliveryMethod.ReliableOrdered);
                 identity.Owner = owner;
+                identity.PrefabID = prefabID;
                 identity.WriteInitialData();
                 return gObj;
             }
@@ -424,6 +428,17 @@ namespace ThomasEngine.Network
             }
         }
 
+        public void RemoveNetworkObject(GameObject gObj)
+        {
+            NetworkIdentity identity = gObj.GetComponent<NetworkIdentity>();
+            NetworkEvents.DeletePrefabEvent deletePrefabEvent = new NetworkEvents.DeletePrefabEvent
+            {
+                netID = identity.ID
+            };
+            Events.SendEvent(deletePrefabEvent, DeliveryMethod.ReliableOrdered);
+            Events.DeletePrefabEventHandler(deletePrefabEvent, LocalPeer);
+        }
+
         public void CheckPacketLoss()
         {
             Debug.Log("A error has occured here are the amount of packetloss " + NetManager.Statistics.PacketLoss + "% lost " + NetManager.Statistics.PacketLossPercent);
@@ -432,9 +447,9 @@ namespace ThomasEngine.Network
 
         public void Diagnostics()
         {
-            GUI.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent, new Vector2(0, 10));
-            GUI.ImguiStringUpdate("Total package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
-            GUI.ImguiStringUpdate("Total package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
+            Gizmos.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent, new Vector2(0, 10));
+            Gizmos.ImguiStringUpdate("Total package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
+            Gizmos.ImguiStringUpdate("Total package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
             PingToAllClients();
         }
 
@@ -443,7 +458,7 @@ namespace ThomasEngine.Network
             int i = 0;
             foreach (var player in NetManager.GetPeers(ConnectionState.Connected))
             {
-                GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
+                Gizmos.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;
             }
         }
