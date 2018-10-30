@@ -26,7 +26,6 @@ public class Chadimations : NetworkComponent
             return 1.0f - MathHelper.Clamp(distance, 0.0f, 1.0f);
         }
     }
-
     private ChadControls Chad = null;
     private Vector3 Direction
     {
@@ -56,6 +55,8 @@ public class Chadimations : NetworkComponent
 
     public override void Start()
     {
+        
+
         Chad = gameObject.GetComponent<ChadControls>();
         if (Skin != null)
         {
@@ -67,7 +68,7 @@ public class Chadimations : NetworkComponent
                     for(int i = 0; i < state.Value.Count; ++i)
                     {
                         if(state.Key == ChadControls.STATE.THROWING && i == 1)
-                            newBlendNode.appendNode(state.Value[i].Animation, false);
+                            newBlendNode.appendNode(state.Value[i].Animation, true);
                         else
                             newBlendNode.appendNode(state.Value[i].Animation, true);
                     }
@@ -82,7 +83,7 @@ public class Chadimations : NetworkComponent
             }
         }
     }
-
+    
     public override void Update()
     {
         if (BlendNodes.ContainsKey(State))
@@ -90,14 +91,18 @@ public class Chadimations : NetworkComponent
             Skin.setBlendTreeNode(BlendNodes[State]);
             for (uint i = 0; i < Animations[State].Count; i++)
             {
-                AnimationNode node = Animations[State][(int)i];
-                WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+                if(State != ChadControls.STATE.THROWING) // set throwing weights from chadControls
+                {
+                    AnimationNode node = Animations[State][(int)i];
+                    WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+                }
             }
         }
     }
 
     public void SetAnimationWeight(uint index, float weight)
     {
+        // Debug.Log("Manually setting weight of animation numer: " + index + " to: "+ weight);
         WeightHandles[State].setWeight(index, weight);
     }
-}
+} 
