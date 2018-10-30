@@ -264,14 +264,15 @@ public class Ball : PickupableObject
         if (isOwner)
         {
             Drop();
-            if (isOwner)
+            if (m_rigidBody != null)
             {
-                if (m_rigidBody != null)
-                {
-                    m_rigidBody.Position = Vector3.Zero;
-                    m_rigidBody.LinearVelocity = Vector3.Zero;
-                    m_rigidBody.AngularVelocity = Vector3.Zero;
-                }
+                m_rigidBody.enabled = false;
+                m_rigidBody.Position = Vector3.Zero;
+                m_rigidBody.LinearVelocity = Vector3.Zero;
+                m_rigidBody.AngularVelocity = Vector3.Zero;
+                transform.position = Vector3.Zero;
+                transform.rotation = Quaternion.Identity;
+                m_rigidBody.enabled = true;
             }
         }
     }

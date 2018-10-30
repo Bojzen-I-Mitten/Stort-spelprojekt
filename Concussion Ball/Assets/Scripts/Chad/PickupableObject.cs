@@ -87,11 +87,9 @@ public class PickupableObject : NetworkComponent
     {
         if (m_pickedUp)
         {
-            Vector3 scale = transform.localScale;
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
             m_pickedUp = false;
             transform.SetParent(null, true);
-            transform.localScale = scale;
             if (_Chad)
             {
                 _Chad.PickedUpObject = null;
@@ -141,7 +139,7 @@ public class PickupableObject : NetworkComponent
 
     public override void OnLostOwnership()
     {
-        m_rigidBody.enabled = false;
+       
     }
 
     public override void OnRead(NetPacketReader reader, bool initialState)

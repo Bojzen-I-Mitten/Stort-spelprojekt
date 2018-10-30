@@ -156,6 +156,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.L))
         {
             Ragdolling = StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000);
+            State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
         if (Input.GetKeyDown(Input.Keys.K))
@@ -182,6 +183,7 @@ public class ChadControls : NetworkComponent
         if(State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
+            State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
     }
@@ -504,9 +506,12 @@ public class ChadControls : NetworkComponent
 
     public void RPCPickup(int id)
     {
-        GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
-        PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
-        pickupable.Pickup(this, hand ? hand : transform);
+        if(State != STATE.RAGDOLL)
+        {
+            GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
+            PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
+            pickupable.Pickup(this, hand ? hand : transform);
+        }
     }
 
     public bool HasThrowableObject()
@@ -555,7 +560,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner && State != STATE.RAGDOLL)
+        if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null)
@@ -578,12 +583,11 @@ public class ChadControls : NetworkComponent
                     RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
                     SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
 
-                    
-                    if(PickedUpObject)
-                        Debug.Log("droppable: " + PickedUpObject.DropOnRagdoll);
-
                     if (PickedUpObject && PickedUpObject.DropOnRagdoll)
+                    {
                         PickedUpObject.Drop();
+                    }
+                        
                 }
             }
         }
