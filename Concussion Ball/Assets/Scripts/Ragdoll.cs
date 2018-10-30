@@ -31,7 +31,7 @@ public class Ragdoll : ScriptComponent
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
     public GameObject SoundImpactObject { get; set; }
-
+    RagdollImpact ImpactSpine;
 
     enum BODYPART
     {
@@ -252,8 +252,8 @@ public class Ragdoll : ScriptComponent
 
 
         //Spine
-       RagdollImpact impactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
-        impactSpine.SoundImpactObject = SoundImpactObject; 
+        ImpactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
+        ImpactSpine.SoundImpactObject = SoundImpactObject; 
         BoxCollider spineCollider = G_BodyParts[(int)BODYPART.SPINE].AddComponent<BoxCollider>();
         center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
         center.x = 0;
@@ -557,8 +557,16 @@ public class Ragdoll : ScriptComponent
         }
 
         if (RagdollEnabled)
+        {
+            if (ImpactSpine.GetActive)
+            {
+                RagdollSound.Volume = ImpactSpine.Volume;
+                Debug.Log(RagdollSound.Volume);
+                RagdollSound.PlayOneShot();
+            }
+                
             return;
-
+        }
         uint boneindex;
         RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
