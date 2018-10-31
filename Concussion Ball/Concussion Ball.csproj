@@ -77,6 +77,7 @@
     <Compile Include="Assets\Scripts\GUI\GUIJoinHost.cs" />
     <Compile Include="Assets\Scripts\GUI\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\GUI\GUITest.cs" />
+    <Compile Include="Assets\Scripts\HighlightParent.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
     <Compile Include="Assets\Scripts\match\MatchSystem.cs" />

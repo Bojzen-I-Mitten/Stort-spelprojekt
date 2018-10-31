@@ -77,6 +77,8 @@ namespace ThomasEngine {
 		return Shader;
 	}
 
+	
+
 	Texture2D^ Material::GetTexture2D(String^ name)
 	{
 		thomas::resource::Texture2D* nativePtr = ((thomas::resource::Material*)m_nativePtr)->GetTexture2D(Utility::ConvertString(name));
