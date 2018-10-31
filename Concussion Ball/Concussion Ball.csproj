@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Chad\DissolveFadeIn.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\PP.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\ThomasTrain.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
@@ -83,8 +84,8 @@
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
     <Compile Include="Assets\Scripts\ParticleComponentTest.cs" />
+    <Compile Include="Assets\Scripts\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\RpcTest.cs" />
-    <Compile Include="Assets\Scripts\Chad\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
