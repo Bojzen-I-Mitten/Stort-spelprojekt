@@ -9,13 +9,18 @@ public class Vindaloo : Powerup
     public Texture2D fire2Texture { get; set; }
     public Texture2D smokeTexture { get; set; }
     public Texture2D gravelTexture { get; set; }
+    public GameObject AudioListener { get; set; }
+
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterFire2;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
+    private SoundComponent windalooSound;
+
 
     public float ExplosionRadius { get; set; } = 5.0f;
     public float ExplosionForce { get; set; } = 200.0f;
+
 
   
 
@@ -24,7 +29,13 @@ public class Vindaloo : Powerup
         base.Start();
 
         m_throwable = true; // change depending on power-up
+        windalooSound = gameObject.GetComponent<SoundComponent>();
 
+        if(AudioListener == null)
+        {
+            AudioListener = gameObject;
+        }
+        
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterFire.MinSize = 1.2f;
         emitterFire.MaxSize = 1.99f;
@@ -143,6 +154,10 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
+        //sound for vindaloo explosion
+        windalooSound.Apply3D(AudioListener.transform.position, gameObject.transform.position);
+        windalooSound.PlayOneShot();
+
         //hide the vindaloo.
         m_rigidBody.enabled = false;
         gameObject.transform.scale = Vector3.Zero;
