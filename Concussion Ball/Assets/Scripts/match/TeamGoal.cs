@@ -21,9 +21,9 @@ public class TeamGoal : ScriptComponent
         Team t = MatchSystem.instance?.FindTeam(Team);
         if (t != null)
         {
-            GUI.SetMatrix(transform.world);
-            GUI.SetColor(t.Color * 0.5f);
-            GUI.DrawBoundingBox(Vector3.Zero, new Vector3(0.5f, 0.5f, 0.5f));
+            Gizmos.SetMatrix(transform.world);
+            Gizmos.SetColor(t.Color * 0.5f);
+            Gizmos.DrawBoundingBox(Vector3.Zero, new Vector3(0.5f, 0.5f, 0.5f));
         }
     }
 

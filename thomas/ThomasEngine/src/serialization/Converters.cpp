@@ -59,7 +59,7 @@ namespace ThomasEngine
 	{
 		JObject^ jo = gcnew JObject();
 		GameObject^ gameObject = (GameObject^)value;
-		if (gameObject->prefabPath) {
+		if (gameObject->IsPrefab()) {
 			jo->Add("prefabPath", Resources::ConvertToThomasPath(gameObject->prefabPath));
 		}
 		else

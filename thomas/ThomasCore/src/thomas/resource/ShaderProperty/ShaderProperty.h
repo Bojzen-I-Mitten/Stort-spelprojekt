@@ -23,7 +23,8 @@ namespace thomas
 					CONSTANT_BUFFER = 8,
 					TEXTURE2D = 9,
 					TEXTURE2DARRAY = 10,
-					UNORDERED_ACCESS = 11
+					TEXTURECUBE = 11,
+					UNORDERED_ACCESS = 12
 				};
 
 				ShaderProperty(Type type);

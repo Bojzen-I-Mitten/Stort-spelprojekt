@@ -14,6 +14,7 @@ namespace thomas
 		namespace shaderproperty { class ShaderProperty; }
 		class Texture2D;
 		class Texture2DArray;
+		class TextureCube;
 		class Shader : public Resource
 		{
 		public:
@@ -32,9 +33,10 @@ namespace thomas
 				PSIZE = 10,
 				BONEINDICES = 11,
 				BONEWEIGHTS = 12,
-				NORMALTEXTURE = 13,//Temporary hack
-				MATERIALSMOOTHNESSFACTOR = 14,//Temporary hack
-				UNKNOWN = 15
+				NORMALTEXTURE = 13,
+				MATERIALSMOOTHNESSFACTOR = 14,
+				UVTILING = 15,
+				UNKNOWN = 16
 			};
 
 		protected:
@@ -116,7 +118,9 @@ namespace thomas
 
 			void SetPropertyTexture2D(const std::string & name, Texture2D * value);
 
-			void SetPropertyTexture2D(const std::string & name, Texture2DArray * value);
+			void SetPropertyTexture2DArray(const std::string & name, Texture2DArray * value);
+
+			void SetPropertyTextureCube(const std::string & name, TextureCube * value);
 
 		private:
 			ID3DX11Effect* m_effect;

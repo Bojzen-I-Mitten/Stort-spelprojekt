@@ -13,8 +13,11 @@ public class NetworkPlayer : NetworkComponent
     Material mat;
     public override void Start()
     {
+        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+            gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
         mat?.SetColor("color", Team.Color);
+
     }
 
     public override void Update()
@@ -25,27 +28,21 @@ public class NetworkPlayer : NetworkComponent
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if(initialState)
-        {
-            if (Team != null)
-                writer.Put((int)Team.TeamType);
-            else
-                writer.Put((int)TEAM_TYPE.UNASSIGNED);
-        }
-
-
+        if (Team != null)
+            writer.Put((int)Team.TeamType);
+        else
+            writer.Put((int)TEAM_TYPE.UNASSIGNED);
         return true;
     }
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
+        TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
+        Team newTeam = MatchSystem.instance.FindTeam(teamType);
+        if (Team != newTeam)
+            JoinTeam(newTeam);
         if (initialState)
         {
-            TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
-            Team newTeam = MatchSystem.instance.FindTeam(teamType);
-            if (Team != newTeam)
-                JoinTeam(newTeam);
-
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
         }

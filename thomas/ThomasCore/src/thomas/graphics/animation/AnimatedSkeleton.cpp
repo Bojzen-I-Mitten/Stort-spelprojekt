@@ -53,6 +53,8 @@ namespace thomas {
 				TransformComponents *frame_tmp = reinterpret_cast<TransformComponents*>(
 					ThomasCore::Core().Memory()->stack(0).allocate(sizeof(TransformComponents)* _ref.getNumBones(), sizeof(float)));
 				//Update animation tree
+				if (_root->NumChannel() < _ref.getNumBones())	// Fill with default if not enough.
+					std::memcpy(frame_tmp, _ref.getBindComponents(), sizeof(TransformComponents) * _ref.getNumBones());
 				_root->calcFrame(frame_tmp);
 				// Update skin transforms
 				_pose[0] = frame_tmp[0].createTransform() * _ref.getRoot();						//	Update root pose

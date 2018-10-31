@@ -35,6 +35,10 @@ namespace ThomasEngine
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 
+		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
+		bool RemoveComponent(Component^ comp);
+		virtual void Destroy() override;
+
 		System::String^ prefabPath;
 
 
@@ -57,6 +61,7 @@ namespace ThomasEngine
 
 		void RenderSelectedGizmos();
 		
+		
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property thomas::object::GameObject* Native {
@@ -64,19 +69,18 @@ namespace ThomasEngine
 		}
 
 	public:
+
+		bool IsPrefab();
+
 		bool MakeStatic();
 		bool MakeDynamic();
 		bool MoveStaticGroup();
-		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 
 		GameObject(String^ name);
 
-		bool RemoveComponent(Component^ comp);
-		
+		void DestroySelf();
+
 		static GameObject^ CreatePrefab();
-
-
-		virtual void Destroy() override;
 
 		property bool inScene {
 			bool get() {

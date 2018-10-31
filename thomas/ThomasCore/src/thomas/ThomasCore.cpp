@@ -75,6 +75,7 @@ namespace thomas
 
 	void ThomasCore::Render()
 	{
+		
 		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->BeginFrame();
 		WindowManager::Instance()->BeginFrame();
@@ -147,6 +148,11 @@ namespace thomas
 	uint32_t ThomasCore::Thread_Index()
 	{
 		return m_threadMap->Thread_Index();
+	}
+
+	thomas::utility::allocator::StackAllocator& ThomasCore::MemStack()
+	{
+		return m_memAlloc->stack(Thread_Index());
 	}
 
 	void ThomasCore::OnStop()

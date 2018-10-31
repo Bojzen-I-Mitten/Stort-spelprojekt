@@ -397,75 +397,7 @@ namespace thomas
 
 			return true;
 		}
-		/*
-		bool D3D::LoadTextureArrayFromFiles(std::vector<std::string>& fileNames, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& textureView)
-		{
-			unsigned nrOfTextures = fileNames.size();
-			ID3D11Resource* tempTex;
-
-			DirectX::ScratchImage data;
-			byte** initData = new byte*[nrOfTextures];
-
-			for (unsigned i = 0; i < nrOfTextures; ++i)
-			{
-				char* filename_c = new char[fileNames[i].length() + 1];
-				strcpy_s(filename_c, fileNames[i].length() + 1, fileNames[i].c_str());
-				char * extension_char = PathFindExtensionA(filename_c);
-				std::string extension_string(extension_char);
-
-				delete[] filename_c;
-				HRESULT hr;
-				if (extension_string == ".dds")
-				{
-					hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContext, CA2W(fileNames[i].c_str()), &tempTex, nullptr);
-				}
-				else
-				{
-					hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContext, CA2W(fileNames[i].c_str()), &tempTex, nullptr);
-				}
-
-				if (FAILED(hr))
-				{
-					LOG("Failed to load texture " << i << ": " << fileNames[i] << " error: ");
-					LOG_HR(hr);
-
-					return false;
-				}
-
-				
-
-				DirectX::ScratchImage firstData;
-				hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext(), tempTex, firstData);
-				if (FAILED(hr))
-				{
-					LOG("Failed to capture texture " << i << ": " << fileNames[i] << "error: ");
-					LOG_HR(hr);
-					return false;
-				}
-				hr = DirectX::Resize(*firstData.GetImage(0,0,0), 256, 256, 0, firstData);
-				if (FAILED(hr))
-				{
-					LOG("Failed to resize texture " << i << ": " << fileNames[i] << "error: ");
-					LOG_HR(hr);
-					return false;
-				}
-				hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), DXGI_FORMAT_B8G8R8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, data);
-				if (FAILED(hr))
-				{
-					LOG("Failed to convert texture " << i << ": " << fileNames[i] << "error: ");
-					LOG_HR(hr);
-					return false;
-				}
-				firstData.Release();
-
-				initData[i] = data.GetPixels();
-				tempTex->Release(); //??
-			}
-
-			CreateTextureArray((void**)initData, 256, 256, nrOfTextures, DXGI_FORMAT_B8G8R8A8_UNORM, texure2D, textureView, false, -1);
-
-			return true;
-		}*/
+		
 
 		bool D3D::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{

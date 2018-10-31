@@ -2,6 +2,7 @@
 #include "ShaderProperty.h"
 #include "../texture/Texture2D.h"
 #include "../texture/Texture2DArray.h"
+#include "../texture/TextureCube.h"
 #include "../Shader.h"
 namespace thomas
 {
@@ -32,6 +33,17 @@ namespace thomas
 			private:
 				Texture2DArray* m_value;
 				unsigned m_nrOfTextures;
+			};
+
+			class ShaderPropertyTextureCube: public ShaderProperty
+			{
+			public:
+				ShaderPropertyTextureCube(TextureCube* value);
+				void Apply(std::string name, Shader* shader) const;
+				static ShaderProperty* GetDefault();
+				TextureCube* GetValue();
+			private:
+				TextureCube* m_value;
 			};
 
 		}

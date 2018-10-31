@@ -132,7 +132,6 @@ namespace thomas
 				aiProcess_GenSmoothNormals |
 				aiProcess_CalcTangentSpace |
 				aiProcess_FlipUVs |
-				aiProcess_ConvertToLeftHanded |
 				aiProcess_LimitBoneWeights			// Bone weight limit (4 by default)
 			);
 
@@ -169,7 +168,8 @@ namespace thomas
 			skelConstruct.m_Commands.m_IncludeAllKeyframedChannels = false;
 			skelConstruct.m_Commands.m_IgnoreLeafChains = false;
 
-			skelConstruct.m_rootID.insert("mixamorig:hips");
+			skelConstruct.m_rootID.insert("mixamorig:hips"); //TODO: is this a hack?
+			skelConstruct.m_rootID.insert("mixamorig_hips"); //TODO: is this a hack?
 
 
 			const aiScene* scene = LoadScene(importer, path);

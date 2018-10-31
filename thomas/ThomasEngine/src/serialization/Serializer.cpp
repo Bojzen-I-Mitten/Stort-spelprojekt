@@ -1,6 +1,7 @@
 #include "Serializer.h"
 #include "Converters.h"
 #include "../object/GameObject.h"
+#include "../resource/Material.h"
 #include "../Debug.h"
 
 
@@ -17,7 +18,7 @@ namespace ThomasEngine
 			JsonSerializer^ serializer = gcnew JsonSerializer();
 
 			serializer->Formatting = Formatting::Indented;
-			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;								// Serialize recursive $ref $id dependencies									
+			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;									// Serialize recursive $ref $id dependencies	
 			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;						// Give $ref $id to objects (not lists)
 			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
@@ -191,6 +192,7 @@ namespace ThomasEngine
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
 			Material^ material = (Material^)serializer->Deserialize(file, Material::typeid);
+			material->m_path = path;
 			rootType = nullptr;
 			file->Close();
 			return material;
