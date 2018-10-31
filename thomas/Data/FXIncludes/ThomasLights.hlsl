@@ -42,8 +42,6 @@ inline float3 GetHalfwayVec(float3 lightDir, float3 viewDir)
 
 inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float smoothness)//should take material properties later
 {
-    float3 ambient = float3(0.05f, 0.05f, 0.05f);
-
     float lambertian = saturate(dot(normal, lightDir));
     float specularIntensity = 0.0f;
     if (lambertian > 0.0f)
@@ -51,13 +49,14 @@ inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 
         specularIntensity = pow(saturate(dot(normal, GetHalfwayVec(viewDir, lightDir))), smoothness); //blinn-phong
     }
     
-    colorAcculmulator += (ambient + diffuse * lambertian + specular * specularIntensity) * lightMultiplyer;
+    colorAcculmulator += (diffuse * lambertian + specular * specularIntensity) * lightMultiplyer;
 }
 
 inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffuse, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
-    float3 colorAcculmulator = float3(0.0f, 0.0f, 0.0f);
+    float3 ambient = float3(0.05f, 0.05f, 0.05f);
+    float3 colorAcculmulator = ambient;
     float3 lightDir = float3(0, 0, 0);
     float lightMultiplyer = 0.0f;
     

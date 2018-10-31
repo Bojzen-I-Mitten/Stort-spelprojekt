@@ -30,10 +30,10 @@ namespace thomas
 				uint32_t add(object::component::Camera* c) const;
 				void remove(object::component::Camera* c) const;
 				void syncUpdate();
-				const util::atomics::SynchronizedList<object::component::Camera*>& getCameras() const;
+				const utils::atomics::SynchronizedList<object::component::Camera*>& getCameras() const;
 			private:
 				mutable std::atomic<uint32_t> m_idCounter;
-				mutable util::atomics::SynchronizedList<object::component::Camera*> m_sysCamera;
+				mutable utils::atomics::SynchronizedList<object::component::Camera*> m_sysCamera;
 			};
 		}
 	}
