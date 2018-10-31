@@ -6,8 +6,11 @@ using System.Linq;
 public class ThomasTrain : Powerup
 {
     private ParticleEmitter _Fire;
+    public GameObject Rail { get; set; }
     public Texture2D _FireTex { get; set; }
     private float fireMax;
+
+    private GameObject[] rails;
 
     public float ExplosionRadius { get; set; } = 5.0f;
     public float ExplosionForce { get; set; } = 200.0f;
@@ -22,6 +25,17 @@ public class ThomasTrain : Powerup
         _Fire.Texture = _FireTex;
 
         ResetFireEmitters();
+
+        RenderComponent rc;
+        rails = new GameObject[4];
+        for (uint i = 0; i < 4; ++i)
+        {
+            rc = rails[i].AddComponent<RenderComponent>();
+            rc.model = Rail.GetComponent<RenderComponent>().model;
+
+            rails[i].transform.position = new Vector3(5 * i, 0, 0);
+        }
+
     }
 
     public override void Update()
