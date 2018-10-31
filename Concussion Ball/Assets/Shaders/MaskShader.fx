@@ -3,9 +3,10 @@
 #include <ThomasCG.hlsl>
 #include <ThomasLights.hlsl>
 
-Texture2D DiffuseTexture;
-Texture2D NormalTexture : NORMALTEXTURE;
-Texture2D SpecularTexture : SPECULARTEXTURE;
+Texture2D diffuseTex;
+Texture2D normalTex : NORMALTEXTURE;
+Texture2D specularTex;
+Texture2D maskTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
@@ -80,11 +81,12 @@ v2f vert(appdata_thomas v)
 
 float4 frag(v2f input) : SV_TARGET
 {
-    float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
-    diffuse *= color.xyz;
+    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
+    //diffuse *= color.xyz;
+    diffuse += maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
 
-    float3 normal = NormalTexture.Sample(StandardWrapSampler, input.texcoord);
-    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
+    float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
     
     normal.xy = normal.xy * 2.0f - 1.0f;
     normal = normalize(normal);
