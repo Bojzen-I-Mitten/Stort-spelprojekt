@@ -5,6 +5,8 @@ namespace DirectX
 {
 	namespace SimpleMath
 	{
+#define assertNormal(v) assert(std::fabs(v.Length() - 1.f) < EPSILON)
+
 		Euler ToEuler(const Quaternion & q)
 		{
 			float yaw, pitch, roll;
@@ -142,7 +144,12 @@ namespace DirectX
 		{
 			from.Normalize();
 			dest.Normalize();
-
+			return getMatrixRotationTo_Nor(from, dest);
+		}
+		Matrix getMatrixRotationTo_Nor(Vector3 from, Vector3 dest)
+		{
+			assertNormal(from);
+			assertNormal(dest);
 			float c = from.Dot(dest);
 			if (c >= 1.0f) // Vectors are parallel	(identical)
 				return Matrix::Identity;
@@ -150,7 +157,7 @@ namespace DirectX
 			{
 				// Generate an axis
 				Vector3 axis = Vector3::UnitX.Cross(from);
-				if (axis.LengthSquared() < 0.0001f) // Pick another if colinear
+				if (axis.LengthSquared() < EPSILON) // Pick another if colinear
 					axis = Vector3::UnitY.Cross(from);
 				axis.Normalize();
 				return Matrix::CreateFromAxisAngle(axis, PI);
@@ -177,6 +184,7 @@ namespace DirectX
 			}
 		}
 
+
 		/* Extract the length of each axis in the top-left 3x3 matrix.
 		*/
 		Vector3 extractAxisScale(const Matrix& m)
@@ -202,6 +210,46 @@ namespace DirectX
 			m._31 *= len;
 			m._32 *= len;
 			m._33 *= len;
+			return m;
+		}
+		Matrix extractRotation(Matrix m)
+		{
+			float len = 1.f / std::sqrtf(m._11 * m._11 + m._12 * m._12 + m._13 * m._13);
+			m._11 *= len;
+			m._12 *= len;
+			m._13 *= len;
+			m._14 = 0;
+			len = 1.f / std::sqrtf(m._21 * m._21 + m._22 * m._22 + m._23 * m._23);
+			m._21 *= len;
+			m._22 *= len;
+			m._23 *= len;
+			m._24 = 0;
+			len = 1.f / std::sqrtf(m._31 * m._31 + m._32 * m._32 + m._33 * m._33);
+			m._31 *= len;
+			m._32 *= len;
+			m._33 *= len;
+			m._34 = 0;
+			m._41 = 0;
+			m._42 = 0;
+			m._43 = 0;
+			m._44 = 1;
+			return m;
+		}
+		XMFLOAT3X3 extractRotation3x3(const Matrix & src)
+		{
+			XMFLOAT3X3 m;
+			float len = 1.f / std::sqrtf(src._11 * src._11 + src._12 * src._12 + src._13 * src._13);
+			m._11 = src._11 * len;
+			m._12 = src._12 * len;
+			m._13 = src._13 * len;
+			len = 1.f / std::sqrtf(src._21 * src._21 + src._22 * src._22 + src._23 * src._23);
+			m._21 = src._21 * len;
+			m._22 = src._22 * len;
+			m._23 = src._23 * len;
+			len = 1.f / std::sqrtf(src._31 * src._31 + src._32 * src._32 + src._33 * src._33);
+			m._31 = src._31 * len;
+			m._32 = src._32 * len;
+			m._33 = src._33 * len;
 			return m;
 		}
 		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
