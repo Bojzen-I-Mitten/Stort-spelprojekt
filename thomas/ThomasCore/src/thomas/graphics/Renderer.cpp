@@ -14,7 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
-#include "../graphics/GUIManager.h"
+#include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
 
 namespace thomas
@@ -220,7 +220,7 @@ namespace thomas
 
 				BindCameraViewport(perCameraQueue.second.m_frameData);
 				if (camera && camera->GetGUIRendering())
-					camera->GetGUIHandle()->Render();
+					camera->RenderGUI();
 			}
 
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);

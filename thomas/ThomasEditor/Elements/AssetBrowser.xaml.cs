@@ -259,7 +259,6 @@ namespace ThomasEditor
 
         private void LoadAssetImages()
         {
-            
             assetImages[ThomasEngine.Resources.AssetTypes.UNKNOWN]      = new BitmapImage(new Uri("pack://application:,,/icons/assets/unknown.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.SCENE]        = new BitmapImage(new Uri("pack://application:,,/icons/assets/scene.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.SHADER]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/shader.png"));
@@ -282,7 +281,7 @@ namespace ThomasEditor
                 StackPanel stack = new StackPanel();
                 stack.Orientation = Orientation.Horizontal;
                 stack.Height = 18;
-                Image image = new Image();
+                System.Windows.Controls.Image image = new System.Windows.Controls.Image();
                 image.Source = new BitmapImage(new Uri("pack://application:,,/icons/assets/dir.png"));
                 EditableTextBlock lbl = new EditableTextBlock { Text = dirName };
                 stack.Children.Add(image);
@@ -311,7 +310,7 @@ namespace ThomasEditor
                 else
                     source = assetImages[assetType];
 
-                Image image = new Image { Source = source };
+                System.Windows.Controls.Image image = new System.Windows.Controls.Image { Source = source };
 
                 EditableTextBlock lbl = new EditableTextBlock { Text = fileName };
                 stack.Children.Add(image);

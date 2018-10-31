@@ -25,7 +25,7 @@
 #include "object\component\physics\Rigidbody.h"
 #include "ScriptingManager.h"
 #include "ThomasSelection.h"
-#include "GUI\editor\GUI.h"
+#include "GUI\editor\Gizmos.h"
 #include "object\GameObject.h"
 #include "Debug.h"
 #include "system/SceneManager.h"
