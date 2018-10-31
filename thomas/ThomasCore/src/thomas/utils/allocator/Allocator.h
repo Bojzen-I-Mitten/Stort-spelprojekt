@@ -14,6 +14,22 @@ namespace thomas {
 			{
 			public:
 
+				template<class T>
+				struct AllocT
+				{
+					Allocator& m_alloc;
+					T* m_ptr;
+					AllocT(Allocator& alloc, T* data);
+					~AllocT();
+
+					AllocT(const AllocT& copy) = delete;
+					AllocT& operator=(const AllocT& other) = delete;
+					AllocT(AllocT&& move);
+					AllocT& operator=(AllocT&& other);
+
+					T& operator[](uint32_t index) { return m_ptr[index]; }
+				};
+
 				Allocator(size_t size, void* start);
 				Allocator(Allocator && move);
 
@@ -24,8 +40,13 @@ namespace thomas {
 					_start = nullptr; _size = 0;
 				}
 
-				virtual void* allocate(size_t size, uint8_t alignment = 4) = 0;
+				virtual void* allocate(size_t size, uint8_t alignment) = 0;
 				virtual void deallocate(void* p) = 0;
+				
+				template<class T>
+				AllocT<T> allocateArr(size_t size, uint8_t alignment = alignof(T));
+
+
 				void* getStart() const { return _start; }
 				size_t getSize() const { return _size; }
 				size_t getUsedMemory() const { return _used_memory; }
@@ -41,6 +62,7 @@ namespace thomas {
 				size_t _used_memory;
 				size_t _num_allocations;
 			};
+
 
 			namespace allocator
 			{
@@ -91,6 +113,37 @@ namespace thomas {
 					allocator.deallocate(array - headerSize);
 				}
 			};
-		}
+
+			template<class T>
+			Allocator::AllocT<T> Allocator::allocateArr(size_t num_elem, uint8_t alignment)
+			{
+				return AllocT<T>(*this, allocate(num_elem * sizeof(T), alignment));
+			}
+			template<class T>
+			inline Allocator::AllocT<T>::AllocT(Allocator& alloc, T* data)
+				: m_alloc(alloc), m_ptr(data)
+			{
+			}
+			template<class T>
+			inline Allocator::AllocT<T>::~AllocT()
+			{
+				m_alloc.deallocate(m_ptr);
+			}
+			template<class T>
+			inline Allocator::AllocT<T>::AllocT(AllocT && move)
+				: m_alloc(move.m_alloc), m_ptr(move.m_ptr)
+			{
+				move.m_ptr = nullptr;
+			}
+			template<class T>
+			inline Allocator::AllocT<T>& Allocator::AllocT<T>::operator=(AllocT && other)
+			{
+				if (this == &other) return *this;
+				this->m_alloc = move.m_alloc;
+				this->m_ptr = move.m_ptr;
+				move.m_ptr = nullptr;
+				return *this;
+			}
+}
 	}
 }

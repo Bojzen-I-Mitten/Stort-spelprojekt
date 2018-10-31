@@ -62,6 +62,7 @@ namespace thomas {
 
 			void StackAllocator::deallocate(void* p)
 			{
+				if (!p) return; //Assert null
 #if _DEBUG 
 				assert(p == _prev_position);	// Non-deleted stack data.
 #endif 
