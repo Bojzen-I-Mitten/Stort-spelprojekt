@@ -313,7 +313,6 @@ public class ChadHud : ScriptComponent
     private void BallIndicator()
     {
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
-        Debug.Log(screenPos);
         if (!(screenPos.z > 0 && screenPos.z < 1 &&
             screenPos.x > 0 && screenPos.x < cam.viewport.size.x &&
             screenPos.y > 0 && screenPos.y < cam.viewport.size.y)) //Offscreen check
