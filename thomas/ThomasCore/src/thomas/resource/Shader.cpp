@@ -563,6 +563,10 @@ namespace thomas
 					{
 						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
 					}
+					else if (semantic == "SPECULARTEXTURE")
+					{
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetBlackTexture());
+					}
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
