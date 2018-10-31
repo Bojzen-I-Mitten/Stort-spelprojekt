@@ -28,7 +28,7 @@ namespace thomas
 			ImGui_ImplDX11_RenderDrawData(this->m_guiData);
 
 		unsigned int sub = D3D11CalcSubresource(0, 0, 1);
-		utils::D3D::Instance()->GetDeviceContext()->ResolveSubresource(m_dxBuffers.backbuffer, sub, m_dxBuffers.buffer[0], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
+		utils::D3D::Instance()->GetDeviceContext()->ResolveSubresource(m_dxBuffers.backbuffer, sub, m_dxBuffers.buffer, sub, DXGI_FORMAT_R8G8B8A8_UNORM);
 
 		m_swapChain->Present(0, 0);
 	}
