@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "../utils/GpuProfiler.h"
 
 namespace thomas 
 {
@@ -20,18 +21,23 @@ namespace thomas
 			for (auto semantic : shader->GetCurrentPass().inputSemantics)
 			{
 				if (m_data.vertexBuffers.find(semantic) != m_data.vertexBuffers.end())
-					vertexBuffers.push_back(m_data.vertexBuffers[semantic].get());			
+					vertexBuffers.push_back(m_data.vertexBuffers[semantic].get());
 			}
 
 			//Set buffers and draw mesh
 			shader->BindVertexBuffers(vertexBuffers);
-			if (m_data.indexBuffer)
+			if (!m_data.indexBuffer)
 			{
-				shader->BindIndexBuffer(m_data.indexBuffer.get());
-				shader->DrawIndexed(GetIndexCount(), 0, 0);
+				shader->Draw(GetVertexCount(), 0);
+				utils::D3D::Instance()->GetProfiler()->AddDrawCall(GetVertexCount() / 3, GetVertexCount());
 			}
 			else
-				shader->Draw(m_data.vertices.positions.size(), 0);
+			{
+				// Draw indexed
+				shader->BindIndexBuffer(m_data.indexBuffer.get());
+				shader->DrawIndexed(GetIndexCount(), 0, 0);
+				utils::D3D::Instance()->GetProfiler()->AddDrawCall(GetIndexCount() / 3, GetVertexCount());
+			}
 		}
 
 		void Mesh::SetName(const std::string & name)

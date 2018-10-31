@@ -168,7 +168,8 @@ namespace thomas
 			skelConstruct.m_Commands.m_IncludeAllKeyframedChannels = false;
 			skelConstruct.m_Commands.m_IgnoreLeafChains = false;
 
-			skelConstruct.m_rootID.insert("mixamorig:hips"); //TODO: is this a hack?
+			skelConstruct.m_rootID.insert("mixamorig:hips"); //TODO: Solve as input
+			skelConstruct.m_rootID.insert("mixamorig_hips");
 
 
 			const aiScene* scene = LoadScene(importer, path);
