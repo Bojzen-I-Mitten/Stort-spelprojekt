@@ -129,6 +129,7 @@
     <ClInclude Include="src\GUI\game\GUIElements.h" />
     <ClInclude Include="src\GUI\game\Canvas.h" />
     <ClInclude Include="src\math\Viewport.h" />
+    <ClInclude Include="src\resource\texture\TextureCube.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

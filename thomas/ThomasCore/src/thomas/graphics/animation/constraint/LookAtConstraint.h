@@ -29,7 +29,8 @@ namespace thomas {
 			public:
 				float m_weight;
 				math::Vector3 m_target;
-				AxisConstraint m_axis;
+				AxisConstraint m_axis;		// Constrained axis, specifies the axis for which rotation are applied.
+				math::Axis m_faceAxis;			// Axis faced toward the target.
 			private:
 
 			};

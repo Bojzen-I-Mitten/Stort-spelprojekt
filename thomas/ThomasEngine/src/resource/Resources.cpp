@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Animation.h"
 #include "texture\Texture2D.h"
+#include "texture\TextureCube.h"
 #include "Resources.h"
 #include "../Scene.h"
 #include "../Application.h"
@@ -111,7 +112,7 @@ namespace ThomasEngine
 			{
 				return AssetTypes::SCENE;
 			}
-			else if (extension == "wav")
+			else if (extension == "wav" || extension == "mp3")
 			{
 				return AssetTypes::AUDIO_CLIP;
 			}
@@ -130,6 +131,10 @@ namespace ThomasEngine
 			else if (extension == "bmp" || extension == "jpg" || extension == "png" || extension == "gif" || extension == "tif")
 			{
 				return AssetTypes::TEXTURE2D;
+			}
+			else if (extension == "dds")
+			{
+				return AssetTypes::TEXTURE3D;
 			}
 			else if (extension == "prefab")
 				return AssetTypes::PREFAB;
@@ -213,6 +218,9 @@ namespace ThomasEngine
 						break;
 					case AssetTypes::TEXTURE2D:
 						obj = gcnew Texture2D(path);
+						break;
+					case AssetTypes::TEXTURE3D:
+						obj = gcnew TextureCube(path);
 						break;
 					case AssetTypes::SCENE:
 						break;

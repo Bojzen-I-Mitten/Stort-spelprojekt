@@ -56,6 +56,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ToggleRagdoll.cs" />
+    <Compile Include="Assets\RagdollImpact.cs" />
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Chad\Ball.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerup.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\POWERUP_TEMPLATE.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\PP.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\ThomasTrain.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Vindaloo.cs" />
     <Compile Include="Assets\Scripts\Chad\Ragdoll.cs" />
@@ -89,7 +92,6 @@
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
-    <Compile Include="Assets\Scripts\vindalooexplosiontest.cs" />
     <Compile Include="Assets\test\AnimationBlendTest.cs" />
     <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

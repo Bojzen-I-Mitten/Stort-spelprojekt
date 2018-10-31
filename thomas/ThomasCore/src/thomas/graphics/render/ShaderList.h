@@ -73,8 +73,8 @@ namespace thomas {
 				mutable  std::vector<resource::Shader*> m_waitingList_Add;
 				mutable  std::vector<resource::Shader*> m_waitingList_Rmv;
 				// Sync.
-				mutable  util::atomics::SpinLock m_addLock;	// Could be changed to another lock
-				mutable  util::atomics::SpinLock m_rmvLock;
+				mutable  utils::atomics::SpinLock m_addLock;	// Could be changed to another lock
+				mutable  utils::atomics::SpinLock m_rmvLock;
 #ifdef _EDITOR
 				mutable  std::atomic<bool> m_syncShaders;
 #endif

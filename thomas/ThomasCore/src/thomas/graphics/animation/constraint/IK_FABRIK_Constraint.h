@@ -10,6 +10,8 @@ namespace thomas {
 			constexpr float FABRIK_TOLERANCE = 1.e-5f;
 			constexpr float MAX_FABRIK_ITER = 60;
 
+			math::Matrix weightRotationBetween(math::Vector3 from, math::Vector3 dest, float weight);
+
 			/* Transform 'input' constraint, bone position is specified externally through a transform component.
 			*/
 			class IK_FABRIK_Constraint

@@ -34,11 +34,13 @@
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\IBlendTree.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\render\CameraList.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\graphics\render\ShaderList.cpp" />
+    <ClCompile Include="src\thomas\graphics\Skybox.cpp" />
     <ClCompile Include="src\thomas\resource\Font.cpp" />
     <ClCompile Include="src\thomas\graphics\GUI\Canvas.cpp" />
     <ClCompile Include="src\thomas\object\ObjectHandler.cpp" />
@@ -79,6 +81,7 @@
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2DArray.cpp" />
+    <ClCompile Include="src\thomas\resource\texture\TextureCube.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\LinearAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
@@ -160,6 +163,7 @@
     <ClInclude Include="src\thomas\graphics\animation\data\Skeleton.h" />
     <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
     <ClInclude Include="src\thomas\graphics\animation\playback\BinaryBlendNode.h" />
+    <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
     <ClInclude Include="src\thomas\graphics\GUI\GUIElements.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
@@ -169,6 +173,7 @@
     <ClInclude Include="src\thomas\graphics\render\FrameAllocation.h" />
     <ClInclude Include="src\thomas\graphics\render\FrameData.h" />
     <ClInclude Include="src\thomas\graphics\render\ShaderList.h" />
+    <ClInclude Include="src\thomas\graphics\Skybox.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\object\ObjectHandler.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
@@ -202,6 +207,7 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2DArray.h" />
+    <ClInclude Include="src\thomas\resource\texture\TextureCube.h" />
     <ClInclude Include="src\thomas\System.h" />
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
