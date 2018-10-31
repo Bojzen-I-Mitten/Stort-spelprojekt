@@ -128,11 +128,14 @@ namespace thomas
 		s_world.reset();		
 	}
 
-	bool Physics::Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance)
+	bool Physics::Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance, unsigned int layerMask)
 	{
 		btVector3 start = ToBullet(origin);
 		btVector3 end = ToBullet(origin + direction * maxDistance);
 		btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+
+		rayCallback.m_collisionFilterMask = layerMask;
+
 		s_world->rayTest(start, end, rayCallback);
 		if (rayCallback.hasHit()) 
 		{
@@ -143,7 +146,6 @@ namespace thomas
 			return true;
 		}
 		return false;
-		
 	}
 
 

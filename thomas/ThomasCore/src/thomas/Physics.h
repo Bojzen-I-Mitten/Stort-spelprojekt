@@ -41,7 +41,7 @@ namespace thomas
 		static void Simulate();
 		static void DrawDebug(object::component::Camera* camera);
 		static void Destroy();
-		static bool Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance = FLT_MAX);
+		static bool Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance = FLT_MAX, unsigned int layerMask=~0);
 	private:
 		static void CollisionStarted(btPersistentManifold* const& manifold);
 		static bool CollisionProcessed(btManifoldPoint& cp, void* body0, void* body1);

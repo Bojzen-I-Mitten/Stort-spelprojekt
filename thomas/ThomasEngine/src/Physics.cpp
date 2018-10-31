@@ -8,11 +8,11 @@
 #pragma managed
 namespace ThomasEngine
 {
-	bool Physics::Raycast(Vector3& origin, Vector3& direction, RaycastHit & hitInfo, float maxDistance)
+	bool Physics::Raycast(Vector3& origin, Vector3& direction, RaycastHit & hitInfo, float maxDistance, unsigned int collisionMask)
 	{
 		thomas::Physics::RaycastHit nativeHitInfo;
 
-		if (thomas::Physics::Raycast(Utility::Convert(origin), Utility::Convert(direction), nativeHitInfo, maxDistance))
+		if (thomas::Physics::Raycast(Utility::Convert(origin), Utility::Convert(direction), nativeHitInfo, maxDistance, collisionMask))
 		{
 			hitInfo.normal = Utility::Convert(nativeHitInfo.normal);
 			hitInfo.point = Utility::Convert(nativeHitInfo.point);
@@ -27,13 +27,13 @@ namespace ThomasEngine
 	}
 
 	bool Physics::Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo) {
-		return Raycast(origin, direction, hitInfo, FLT_MAX);
+		return Raycast(origin, direction, hitInfo, FLT_MAX, ~0u);
 	}
-	bool Physics::Raycast(Ray& ray, RaycastHit& hitInfo, float maxDistance) {
-		return Raycast(ray.Position, ray.Direction, hitInfo, maxDistance);
+	bool Physics::Raycast(Ray& ray, RaycastHit& hitInfo, float maxDistance, unsigned int collisionMask) {
+		return Raycast(ray.Position, ray.Direction, hitInfo, maxDistance, collisionMask);
 	}
 	bool Physics::Raycast(Ray& ray, RaycastHit& hitInfo) {
-		return Raycast(ray, hitInfo, FLT_MAX);
+		return Raycast(ray, hitInfo, FLT_MAX, ~0u);
 	}
 
 	List<Layer>^ Physics::GetLayers()

@@ -35,9 +35,9 @@ namespace ThomasEngine
 		static void SetLayers(System::Collections::Generic::List<Layer>^ layers);
 	public:
 
-		static bool Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo, float maxDistance);
+		static bool Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo, float maxDistance, unsigned int collisionMask);
 		static bool Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo);
-		static bool Raycast(Ray& ray, RaycastHit& hitInfo, float maxDistance);
+		static bool Raycast(Ray& ray, RaycastHit& hitInfo, float maxDistance, unsigned int collisionMask);
 		static bool Raycast(Ray& ray, RaycastHit& hitInfo);
 
 		static void SetCollisionLayer(String^ name, unsigned int group, unsigned int mask);
