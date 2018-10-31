@@ -105,7 +105,7 @@ public class ChadHud : ScriptComponent
         float xPos = 0;
         //When xPos = 1 it will be at the center
         Announcement1.text = text;
-        Announcement1.color = color.ToVector4();
+        //Announcement1.color = color.ToVector4();
         Announcement2.text = text2;
 
         Vector2 text1Size = Announcement1.size / (HUD.viewport.size * cam.viewport.size);
@@ -126,12 +126,16 @@ public class ChadHud : ScriptComponent
 
             Color c = GetRainbowColor(time, 0.5f);
             Color c2 = GetRainbowColor(time, 0.5f);
+            Announcement1.color = c2.ToVector4();
             Announcement2.color = c.ToVector4();
 
             if (showBG)
             {
                 AnnouncementBG.scale = new Vector2(10000, 1.0f + (float)Math.Sin(time * 0.5f));
                 AnnouncementBG.color = c2.ToVector4();
+
+                //AnnouncementBG.scale = new Vector2(10000, 1.0f + (float)Math.Sin(time * 0.5f));
+                //AnnouncementBG.color = c2.ToVector4();
             }
             if(MatchSystem.instance.MatchTimeLeft > 0.0f)
                 MatchSystem.instance.MatchStartTime += Time.ActualDeltaTime;

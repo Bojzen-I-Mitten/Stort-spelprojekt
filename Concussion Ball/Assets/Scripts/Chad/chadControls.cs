@@ -106,6 +106,7 @@ public class ChadControls : NetworkComponent
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
+        rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
         NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
@@ -280,10 +281,10 @@ public class ChadControls : NetworkComponent
                     ResetCamera();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
-                else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
-                {
+                //else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+                //{
                     
-                }
+                //}
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
                     ChargeObject();
