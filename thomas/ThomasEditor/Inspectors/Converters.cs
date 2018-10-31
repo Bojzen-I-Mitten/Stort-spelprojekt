@@ -11,6 +11,19 @@ using ThomasEngine;
 namespace ThomasEditor.Converters
 {
 
+    public class CollisionLayerConveter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Physics.GetCollisionGroup((uint)value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Physics.GetCollisionGroup((string)value);
+        }
+    }
+
     public class Vector2Converter : IValueConverter
     {
         Vector2 vector;

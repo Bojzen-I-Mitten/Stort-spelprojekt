@@ -1,12 +1,10 @@
-#include "..\..\..\ThomasEngine\src\Physics.h"
-#include "..\..\..\ThomasEngine\src\Physics.h"
-#include "..\..\..\ThomasEngine\src\Physics.h"
 #include "Physics.h"
 #include "ThomasTime.h"
 #include "object\component\physics\Rigidbody.h"
 #include "object\GameObject.h"
 #include "object\component\Camera.h"
 #include "graphics\BulletDebugDraw.h"
+#include "utils/Utility.h"
 #include "AutoProfile.h"
 
 namespace thomas
@@ -20,7 +18,7 @@ namespace thomas
 	float Physics::s_timeStep = 1.0f / 60.0f; //Limit physics timestep to 60 FPS
 	float Physics::s_timeSinceLastPhysicsStep = 0.0f;
 	std::vector<object::component::Rigidbody*> Physics::s_rigidBodies;
-	std::vector<Physics::CollisionLayer> Physics::s_collisionLayers;
+	Physics::CollisionLayer Physics::s_collisionLayers[32];
 	float Physics::s_accumulator;
 	bool Physics::s_drawDebug = true;
 
@@ -44,16 +42,15 @@ namespace thomas
 		
 		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 
-
-		s_collisionLayers.push_back(CollisionLayer("Default", 0));
+		SetCollisionLayer("Default", 0, ~0u);
 
 		return true;
 	}
-	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody, int collisionLayerIndex)
+	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
 		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
-		s_world->addRigidBody(rigidBody, s_collisionLayers[collisionLayerIndex].groupBit, s_collisionLayers[collisionLayerIndex].collisionMask);
+		s_world->addRigidBody(rigidBody, GetCollisionGroupBit(rigidBody->m_gameObject->GetLayer()), GetCollisionMask(rigidBody->m_gameObject->GetLayer()));
 		
 	}
 	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
@@ -217,12 +214,53 @@ namespace thomas
 	{
 		return (math::Quaternion)quaternion;
 	}
-	int Physics::GetCollisionLayerCount()
+
+	void Physics::SetCollisionLayer(std::string name, unsigned int group, unsigned int mask)
 	{
-		return s_collisionLayers.size();;
+		s_collisionLayers[group].name = name;
+		s_collisionLayers[group].mask = mask;
 	}
-	Physics::CollisionLayer & Physics::GetLayer(int index)
+
+	void Physics::SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide)
 	{
-		return s_collisionLayers[index];
+		unsigned int groupBit = GetCollisionGroupBit(group2);
+		if (collide)
+			utility::setFlag(s_collisionLayers[group1].mask, groupBit);
+		else
+			utility::rmvFlag(s_collisionLayers[group1].mask, groupBit);
+	}
+	int Physics::GetCollisionGroup(std::string name)
+	{
+		for (int i = 0; i < 32; i++) {
+			if (s_collisionLayers[i].name == name)
+				return i;
+		}
+		return -1;
+	}
+	std::string Physics::GetCollisionGroup(unsigned int group)
+	{
+		return s_collisionLayers[group].name;
+	}
+	unsigned int Physics::GetCollisionGroupBit(unsigned int group)
+	{
+		return 1u << group;
+	}
+	unsigned int Physics::GetCollisionMask(unsigned int group)
+	{
+		return s_collisionLayers[group].mask;
+	}
+	unsigned int Physics::GetCollisionMask(std::string name)
+	{
+		return s_collisionLayers[GetCollisionGroup(name)].mask;
+	}
+
+	unsigned int Physics::GetCollisionLayerCount()
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (GetCollisionGroup(i) == "None")
+				return i;
+		}
+		return 32;
 	}
 }

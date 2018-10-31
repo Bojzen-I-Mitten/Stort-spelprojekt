@@ -51,7 +51,7 @@ namespace thomas
 				
 				this->setUserPointer(m_collider);
 
-				Physics::AddRigidBody(this, m_collisionLayer);
+				Physics::AddRigidBody(this);
 			}
 
 			void Rigidbody::OnDisable()
@@ -196,7 +196,7 @@ namespace thomas
 						bool removed = Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
 						if (removed)
-							Physics::AddRigidBody(this, m_collisionLayer);
+							Physics::AddRigidBody(this);
 					}		
 				}	
 			}
@@ -218,7 +218,7 @@ namespace thomas
 				collider->SetTrigger(collider->IsTrigger());
 				UpdateRigidbodyMass();
 				if(removed)
-					Physics::AddRigidBody(this, m_collisionLayer);
+					Physics::AddRigidBody(this);
 			}
 
 			void Rigidbody::SetMass(float mass)
@@ -229,7 +229,7 @@ namespace thomas
 					bool removed = Physics::RemoveRigidBody(this);
 					UpdateRigidbodyMass();
 					if (removed)
-						Physics::AddRigidBody(this, m_collisionLayer);
+						Physics::AddRigidBody(this);
 				}
 			}
 
@@ -237,14 +237,6 @@ namespace thomas
 			{
 				
 				m_LocalCenterOfMassChange = Centerofmass;
-			}
-
-			void Rigidbody::SetCollisionLayer(int layer)
-			{
-				bool removed = Physics::RemoveRigidBody(this);
-				m_collisionLayer = layer;
-				if (removed)
-					Physics::AddRigidBody(this, m_collisionLayer);
 			}
 
 			void Rigidbody::SetBounciness(float bounciness)
@@ -390,10 +382,6 @@ namespace thomas
 				return m_friction;
 			}
 
-			int Rigidbody::GetCollisionLayer()
-			{
-				return m_collisionLayer;
-			}
 
 			void Rigidbody::UpdateRigidbodyMass()
 			{

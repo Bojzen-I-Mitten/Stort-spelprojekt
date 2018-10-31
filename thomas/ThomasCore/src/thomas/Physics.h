@@ -15,24 +15,10 @@ namespace thomas
 
 		struct CollisionLayer
 		{
-			std::string name;
-			unsigned char groupBit;
-			unsigned char collisionMask = 0;
-			void AddCollisionLayer(CollisionLayer& otherLayer)
-			{
-				collisionMask |= otherLayer.groupBit;
-			}
-			void RemoveCollisionLayer(CollisionLayer& otherLayer)
-			{
-				collisionMask &= otherLayer.groupBit;
-			}
-			CollisionLayer(std::string name, unsigned char index)
-			{
-				this->name = name;
-				groupBit = 1 << index;
-			}
+			std::string name = "None";
+			unsigned int mask = ~0u;
 		};
-
+		
 		struct RaycastHit
 		{
 			thomas::object::component::Collider* collider;
@@ -48,7 +34,7 @@ namespace thomas
 		};
 	public:
 		static bool Init();
-		static void AddRigidBody(object::component::Rigidbody* rigidBody, int collisionLayerIndex=0);
+		static void AddRigidBody(object::component::Rigidbody* rigidBody);
 		static bool RemoveRigidBody(object::component::Rigidbody* rigidBody);
 		static bool IsRigidbodyInWorld(object::component::Rigidbody* rigidBody);
 		static void UpdateRigidbodies();
@@ -74,8 +60,15 @@ namespace thomas
 		static bool s_drawDebug;
 		static std::unique_ptr<btDiscreteDynamicsWorld> s_world;
 
-		static int GetCollisionLayerCount();
-		static CollisionLayer& GetLayer(int index);
+	public:
+		static void SetCollisionLayer(std::string name, unsigned int group, unsigned int mask);
+		static void SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide);
+		static int GetCollisionGroup(std::string name);
+		static std::string GetCollisionGroup(unsigned int group);
+		static unsigned int GetCollisionGroupBit(unsigned int group);
+		static unsigned int GetCollisionMask(unsigned int group);
+		static unsigned int GetCollisionMask(std::string name);
+		static unsigned int GetCollisionLayerCount();
 
 	private:
 		static std::unique_ptr<btDefaultCollisionConfiguration> s_collisionConfiguration;
@@ -90,6 +83,6 @@ namespace thomas
 		static float s_timeStep;
 
 		static std::vector<object::component::Rigidbody*> s_rigidBodies;
-		static std::vector<CollisionLayer> s_collisionLayers;
+		static CollisionLayer s_collisionLayers[32];
 	};
 }
