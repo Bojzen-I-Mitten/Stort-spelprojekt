@@ -133,8 +133,12 @@ namespace ThomasEngine.Network
         private void TakeOwnership()
         {
             if(Manager != null)
-                if(!_Owner)
+                if (!_Owner)
+                {
                     Manager.TakeOwnership(this);
+                    _Owner = true;
+                }
+                    
         }
     }
 }

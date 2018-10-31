@@ -13,28 +13,34 @@ namespace ThomasEngine
 	ref class Scene;
 	ref class Transform;
 	ref class Component;
+
 	public ref class GameObject : public Object
 	{
 	private:
+		
 		ObservableCollection<Component^> m_components;
 		Transform^ m_transform;
 		uint32_t m_scene_id;
+		bool m_makeDynamic = false;
+		bool m_makeStatic = false;
 
 		GameObject();
 		virtual ~GameObject();
 
-		void Delete();
-
-		bool InitComponents(bool playing);
+		System::Object^ m_componentsLock = gcnew System::Object();
 
 	internal:
 
+		bool InitComponents(bool playing);
+
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
+
+		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
+		bool RemoveComponent(Component^ comp);
+		virtual void Destroy() override;
 
 		System::String^ prefabPath;
 
-		bool m_isDestroyed = false;
-		System::Object^ m_componentsLock = gcnew System::Object();
 
 		void SyncComponents();
 
@@ -42,10 +48,10 @@ namespace ThomasEngine
 
 		void PostInstantiate(Scene^ scene);
 
-
-		static void InitGameObjects(bool playing);
-
 		
+		thomas::object::Object* setStatic();
+		thomas::object::Object* moveStaticGroup();
+		thomas::object::Object* setDynamic();
 				
 		void Update();
 
@@ -55,6 +61,7 @@ namespace ThomasEngine
 
 		void RenderSelectedGizmos();
 		
+		
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property thomas::object::GameObject* Native {
@@ -63,8 +70,16 @@ namespace ThomasEngine
 
 	public:
 
+		bool IsPrefab();
+
+		bool MakeStatic();
+		bool MakeDynamic();
+		bool MoveStaticGroup();
+
 		GameObject(String^ name);
-		
+
+		void DestroySelf();
+
 		static GameObject^ CreatePrefab();
 
 		property bool inScene {
@@ -72,14 +87,23 @@ namespace ThomasEngine
 				return m_scene_id; // != 0
 			}
 		}
-
-		virtual void Destroy() override;
-
 		property bool activeSelf
 		{
 			bool get();
 			void set(bool value);
 		}	
+
+		property UINT GroupIDSelf
+		{
+			UINT get();
+			void set(UINT state);
+		}
+
+		property bool staticSelf
+		{
+			bool get();
+			void set(bool state);
+		}
 
 		[BrowsableAttribute(false)]
 		property String^ Name
@@ -88,7 +112,7 @@ namespace ThomasEngine
 			void set(String^) override;
 		};
 
-		
+
 
 		String^ ToString() override
 		{
@@ -147,7 +171,6 @@ namespace ThomasEngine
 		static GameObject^ CreatePrimitive(PrimitiveType type);
 
 		bool GetActive();
-
 		void SetActive(bool active);
 
 		static GameObject^ Instantiate(GameObject^ original);

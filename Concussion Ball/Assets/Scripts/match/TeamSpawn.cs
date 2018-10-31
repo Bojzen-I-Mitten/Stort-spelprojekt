@@ -19,9 +19,9 @@ public class TeamSpawn : ScriptComponent
         if (t != null)
         {
 
-            GUI.SetMatrix(transform.world);
-            GUI.SetColor(t.Color);
-            GUI.DrawBoundingBox(Vector3.Zero, Vector3.One);
+            Gizmos.SetMatrix(transform.world);
+            Gizmos.SetColor(t.Color);
+            Gizmos.DrawBoundingBox(Vector3.Zero, Vector3.One);
         }
 
     }

@@ -8,6 +8,9 @@
 #include "GizmoRenderCommand.h"
 #include "GizmoRenderBuffer.h"
 #include "../../ThomasCore.h"
+#include "../../graphics/Renderer.h"
+#include "../../resource/MemoryAllocation.h"
+
 namespace thomas
 {
 	namespace editor
@@ -246,11 +249,27 @@ namespace thomas
 
 		void Gizmos::DrawLine(math::Vector3 from, math::Vector3 to)
 		{
-			std::vector<math::Vector3> corners(2);
+			math::Vector3 corners[2];
 			corners[0] = from;
 			corners[1] = to;
 
-			DrawLines(corners);
+			DrawLines(corners, 2);
+		}
+
+		void Gizmos::DrawLine(math::Vector3 from, math::Vector3 to, float len)
+		{
+			DrawLine(from, from + math::Normalize(to - from) * len);
+		}
+
+		void Gizmos::DrawMatrixBasis(const math::Matrix& mat, float len)
+		{
+			math::Vector3 p = mat.Translation();
+			editor::Gizmos::Gizmo().SetColor(math::Color(0, 1.f, 0.f));
+			DrawLine(p, p + math::Normalize(mat.Up()) * len);
+			editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 0.f, 0.f));
+			DrawLine(p, p + math::Normalize(mat.Right()) * len);
+			editor::Gizmos::Gizmo().SetColor(math::Color(0, 0.f, 1.f));
+			DrawLine(p, p + math::Normalize(mat.Backward()) * len);
 		}
 
 		void Gizmos::DrawSphere(math::Vector3 center, float radius)
@@ -275,7 +294,6 @@ namespace thomas
 			std::vector<math::Vector3> corners(2);
 			corners[0] = from;
 			corners[1] = from + direction * 1000;
-
 			DrawLines(corners);
 		}
 
@@ -332,13 +350,17 @@ namespace thomas
 
 			DrawLines(lines);
 		}
-		
 		void Gizmos::DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology)
+		{
+			DrawLines(lines.data(), lines.size(), topology);
+		}
+		
+		void Gizmos::DrawLines(math::Vector3* lines, uint32_t num, D3D_PRIMITIVE_TOPOLOGY topology)
 		{
 			// Submit to thread buffer:
 			m_render_buffers[ThomasCore::Core().Thread_Index()]->submitCmd(
 				gizmo::GizmoRenderCommand(
-					lines.data(), lines.size(),				// Vertex info
+					lines, num,								// Vertex info
 					m_matrix, s_color,						// Transform, color (Transform 'should'/could be applied to the vertex data).
 					topology, gizmo::GizmoPasses::SOLID));	// 
 		}
@@ -378,7 +400,7 @@ namespace thomas
 
 		void Gizmos::Init()
 		{
-			resource::Shader* shader = resource::Shader::CreateShader("../Data/FXIncludes/GizmoShader.fx");
+			resource::Shader* shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/GizmoShader.fx");
 			if (shader)
 			{
 				m_gizmoMaterial = new resource::Material(shader);

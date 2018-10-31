@@ -22,9 +22,10 @@ namespace thomas
 			Font(const std::string& path);
 
 		public:
-			void DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position, const Vector2& scale, 
-							 const Vector4& color, float rotation);
+			void DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position, const Vector2& scale, const Vector2& origin,
+							 const Vector4& color, float rotation, DirectX::SpriteEffects effect, const float depth);
 			SpriteFont* GetFont() const;
+			Vector2 GetTextSize(const std::string& text);
 
 		public:
 			virtual void OnChanged() override;

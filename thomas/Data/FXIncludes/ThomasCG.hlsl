@@ -229,7 +229,27 @@ inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in fl
     norm		+=	weight.y * (mul((float3x3) thomas_Bone_Array[boneInd.y], normal));
     norm		+=	weight.z * (mul((float3x3) thomas_Bone_Array[boneInd.z], normal));
     norm		+=	weight.w * (mul((float3x3) thomas_Bone_Array[boneInd.w], normal));
-    normal = norm;
+    normal = normalize(norm);
+}
+inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in out float3 tangent, in float4 weight, in int4 boneInd)
+{
+    float4 coord = weight.x * mul(thomas_Bone_Array[boneInd.x], position);
+    coord += weight.y * mul(thomas_Bone_Array[boneInd.y], position);
+    coord += weight.z * mul(thomas_Bone_Array[boneInd.z], position);
+    coord += weight.w * mul(thomas_Bone_Array[boneInd.w], position);
+    position = coord;
+	
+    float3 norm = weight.x * (mul((float3x3) thomas_Bone_Array[boneInd.x], normal));
+    norm += weight.y * (mul((float3x3) thomas_Bone_Array[boneInd.y], normal));
+    norm += weight.z * (mul((float3x3) thomas_Bone_Array[boneInd.z], normal));
+    norm += weight.w * (mul((float3x3) thomas_Bone_Array[boneInd.w], normal));
+    normal = normalize(norm);
+    
+    float3 tang = weight.x * (mul((float3x3) thomas_Bone_Array[boneInd.x], tangent));
+    tang += weight.y * (mul((float3x3) thomas_Bone_Array[boneInd.y], tangent));
+    tang += weight.z * (mul((float3x3) thomas_Bone_Array[boneInd.z], tangent));
+    tang += weight.w * (mul((float3x3) thomas_Bone_Array[boneInd.w], tangent));
+    tangent = normalize(tang);
 }
 
 

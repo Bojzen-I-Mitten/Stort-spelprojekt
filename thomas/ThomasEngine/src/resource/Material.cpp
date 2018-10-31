@@ -112,7 +112,8 @@ namespace ThomasEngine {
 			{
 				Newtonsoft::Json::Linq::JObject^ jo = (Newtonsoft::Json::Linq::JObject^)prop;
 				prop = jo->ToObject<Resource^>(Serializer::serializer);
-				t = prop->GetType();
+				if(prop)
+					t = prop->GetType();
 			}
 			if (t == Vector4::typeid)
 			{

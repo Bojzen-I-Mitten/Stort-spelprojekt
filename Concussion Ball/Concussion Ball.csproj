@@ -32,7 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -57,23 +56,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\DissolveTest.cs" />
-    <Compile Include="Assets\RpcTest.cs" />
-    <Compile Include="Assets\ParticleComponentTest.cs" />
-    <Compile Include="Assets\Scripts\Ball.cs" />
-    <Compile Include="Assets\Scripts\chadControls.cs" />
-    <Compile Include="Assets\Scripts\Chadimations.cs" />
+    <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
+    <Compile Include="Assets\Scripts\CameraMove.cs" />
+    <Compile Include="Assets\Scripts\Chad\Ball.cs" />
+    <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
+    <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
+    <Compile Include="Assets\Scripts\Chad\Chadimations.cs" />
+    <Compile Include="Assets\Scripts\Chad\DissolveFadeIn.cs" />
+    <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerup.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\POWERUP_TEMPLATE.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\PP.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\ThomasTrain.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\Vindaloo.cs" />
+    <Compile Include="Assets\Scripts\Chad\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
-    <Compile Include="Assets\Scripts\GUITest.cs" />
+    <Compile Include="Assets\Scripts\GUI\GUIJoinHost.cs" />
+    <Compile Include="Assets\Scripts\GUI\GUISelectTeam.cs" />
+    <Compile Include="Assets\Scripts\GUI\GUITest.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
     <Compile Include="Assets\Scripts\match\MatchSystem.cs" />
     <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
+    <Compile Include="Assets\Scripts\match\PowerupManager.cs" />
+    <Compile Include="Assets\Scripts\match\PowerupSpawner.cs" />
     <Compile Include="Assets\Scripts\match\Team.cs" />
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
-    <Compile Include="Assets\Scripts\Ragdoll.cs" />
+    <Compile Include="Assets\Scripts\ParticleComponentTest.cs" />
+    <Compile Include="Assets\Scripts\RpcTest.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />

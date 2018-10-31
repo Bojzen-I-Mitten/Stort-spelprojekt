@@ -92,6 +92,13 @@ namespace ThomasEngine
 			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetKinematic(value); }
 		}
 
+		[DisplayNameAttribute("Use Gravity")]
+		property bool UseGravity
+		{
+			bool get() { return ((thomas::object::component::Rigidbody*)nativePtr)->UsesGravity(); }
+			void set(bool value) { ((thomas::object::component::Rigidbody*)nativePtr)->UseGravity(value); }
+		}
+
 		property float Mass 
 		{
 			float get(){ return ((thomas::object::component::Rigidbody*)nativePtr)->GetMass(); }

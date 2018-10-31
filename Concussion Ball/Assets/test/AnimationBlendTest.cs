@@ -8,6 +8,7 @@ public class AnimationBlendTest : ScriptComponent
     PlaybackNode from;
     PlaybackNode to;
     PlaybackHandle toTime;
+    PlaybackHandle fromTime;
     LookAtConstraint lookAt;
     IK_FABRIK_Constraint ik;
 
@@ -25,11 +26,15 @@ public class AnimationBlendTest : ScriptComponent
         root = new BlendNode(skinn.model);
         from = new PlaybackNode(skinn.model, fromAnim, true);
         to = new PlaybackNode(skinn.model, toAnim, true);
-        toTime = to.getTimeHandle();
         root.appendNode(from);
         root.appendNode(to);
         weight = root.generateWeightHandle();
         skinn.setBlendTreeNode(root);
+
+        // Playback handles
+        toTime = to.getTimeHandle();
+        fromTime = from.getTimeHandle();
+        fromTime.SetSpeed(0.01f);
 
         // LookAt constraint
         lookAt = new LookAtConstraint(LookAtConstraint.AxisConstraint.AxisXYZ);

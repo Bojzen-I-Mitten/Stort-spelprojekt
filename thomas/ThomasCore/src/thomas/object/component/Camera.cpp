@@ -6,7 +6,8 @@
 #include "../../graphics/Renderer.h"
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
-#include "../../graphics/GUIManager.h"
+#include "../../graphics/GUI/Canvas.h"
+#include "../../graphics/GUI/GUIElements.h"
 #include "RenderComponent.h"
 
 namespace thomas
@@ -15,17 +16,16 @@ namespace thomas
 	{
 		namespace component
 		{
-			std::vector<Camera*> Camera::s_allCameras;
-
 			void Camera::UpdateProjMatrix()
 			{
 				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
 				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
-			Camera::Camera(bool dontAddTolist) : 
-			m_renderGUI(false),
-			m_GUIHandle(std::make_unique<graphics::GUIManager>())
+			Camera::Camera(bool dontAddTolist) :
+				m_ID(0),
+				m_renderGUI(false)
+				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
 				m_near = 0.1f;
@@ -36,8 +36,9 @@ namespace thomas
 			}
 
 			Camera::Camera() :
-			m_renderGUI(false),
-			m_GUIHandle(std::make_unique<graphics::GUIManager>())
+				m_ID(0),
+				m_renderGUI(false)
+				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70;
 				m_near = 0.5;
@@ -46,46 +47,28 @@ namespace thomas
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
 				
-				std::sort(s_allCameras.begin(), s_allCameras.end(), [](Camera* a, Camera* b) 
-				{
-					return a->GetTargetDisplayIndex() < b->GetTargetDisplayIndex();
-				});
 			}
 
 			Camera::~Camera()
 			{
-				m_GUIHandle->Destroy();
-				m_GUIHandle.reset();
-				
-				for (int i = 0; i < s_allCameras.size(); i++)
+				for (int i = 0; i < m_canvases.size(); ++i)
 				{
-					if (s_allCameras[i] == this)
-					{
-						s_allCameras.erase(s_allCameras.begin() + i);
-						break;
-					}		
+					m_canvases[i]->Destroy();
+					m_canvases[i].reset();
 				}
+				m_canvases.clear();
+				graphics::Renderer::Instance()->getCameraList().remove(this);
 			}
 
 			void Camera::OnEnable()
 			{
-				s_allCameras.push_back(this);
+				m_ID = graphics::Renderer::Instance()->getCameraList().add(this);
 			}
 
 			void Camera::OnDisable()
 			{
-				
-				for (int i = 0; i < s_allCameras.size(); i++) 
-				{
-					if (s_allCameras[i] == this) 
-					{
-						
-
-						s_allCameras.erase(s_allCameras.begin() + i);
-						return;
-					}
-						
-				}
+				graphics::Renderer::Instance()->getCameraList().remove(this);
+				m_ID = 0;
 			}
 
 			void Camera::OnDestroy()
@@ -205,6 +188,10 @@ namespace thomas
 			{
 				m_viewport = viewport;
 				UpdateProjMatrix();
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->UpdateViewportScale();
+				}
 			}
 
 			void Camera::SetViewport(float x, float y, float width, float height)
@@ -217,13 +204,10 @@ namespace thomas
 				return m_viewport.AspectRatio();
 			}
 
-			graphics::GUIManager * Camera::GetGUIHandle() const
-			{
-				return m_GUIHandle.get();
-			}
-
 			void Camera::Render()
 			{
+				//PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
+				graphics::Renderer::Instance()->SubmitCamera(this);
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
 					if(renderComponent->m_gameObject->GetActive())
@@ -309,11 +293,47 @@ namespace thomas
 
 				m_frameData.position = (math::Vector4)GetPosition();
 
+				if (m_frameData.targetDisplay == 0)
+				{
+					for (int i = 0; i < m_canvases.size(); ++i)
+					{
+						m_canvases[i]->SetViewport(m_frameData.viewport);
+					}
+				}
 			}
 
-			Camera::CAMERA_FRAME_DATA & Camera::GetFrameData()
+			const graphics::render::CAMERA_FRAME_DATA& Camera::GetFrameData()
 			{
 				return m_frameData;
+			}
+
+			uint32_t Camera::ID()
+			{
+				return m_ID;
+			}
+
+			graphics::GUI::Canvas* Camera::AddCanvas()
+			{
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(m_viewport, &m_viewport);
+				m_canvases.push_back(std::move(canvas));
+
+				return m_canvases[m_canvases.size() - 1].get();
+			}
+
+			graphics::GUI::Canvas * Camera::AddCanvas(math::Viewport viewport)
+			{
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(viewport, &m_viewport);
+				m_canvases.push_back(std::move(canvas));
+
+				return m_canvases[m_canvases.size() - 1].get();
+			}
+
+			void Camera::RenderGUI()
+			{
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->Render();
+				}
 			}
 		}
 	}

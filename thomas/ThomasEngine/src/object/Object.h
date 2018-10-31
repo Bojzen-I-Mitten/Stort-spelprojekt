@@ -9,13 +9,17 @@ namespace ThomasEngine {
 	[System::SerializableAttribute]
 	public ref class Object: public System::ComponentModel::INotifyPropertyChanged
 	{
-		static List<Object^> s_objects;
+		
 	private:
 		/* Silent destruction. */
 		void Delete();
+
+#ifdef _DEBUG
+		bool m_Destroyed = false;
+#endif
 		
 	protected:
-		
+		static List<Object^> s_objects;
 		System::String^ m_name;
 	internal:
 		[System::Runtime::Serialization::DataMemberAttribute]
@@ -26,6 +30,7 @@ namespace ThomasEngine {
 
 		static Object^ Find(System::Guid guid);
 
+		virtual void Destroy();
 
 	public:
 
@@ -40,14 +45,11 @@ namespace ThomasEngine {
 			PropertyChanged(this, gcnew PropertyChangedEventArgs(info));
 		}
 
-
 		static void Destroy(Object^ object) { object->Destroy(); }
-		
-		virtual void Destroy();
+	
 
-	protected:
-		
 		virtual void OnDestroy() {};
+		
 
 	public:
 		static Object^ GetObject(thomas::object::Object* ptr);

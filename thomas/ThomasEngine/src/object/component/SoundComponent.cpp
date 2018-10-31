@@ -1,5 +1,5 @@
 #pragma unmanaged
-#include <thomas\object\component\SoundComponent.h>
+#include <thomas/object/component/SoundComponent.h>
 
 #pragma managed
 #include "../../resource/AudioClip.h"
@@ -9,6 +9,11 @@ namespace ThomasEngine
 {
 	SoundComponent::SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}
 	thomas::object::component::SoundComponent* SoundComponent::sound::get() { return (thomas::object::component::SoundComponent*)nativePtr; }
+
+	void SoundComponent::Apply3D(Vector3 listenerPos, Vector3 sourcePos)
+	{
+		sound->Apply3D(Utility::Convert(listenerPos), Utility::Convert(sourcePos));
+	}
 
 	void SoundComponent::Play()
 	{
@@ -33,6 +38,21 @@ namespace ThomasEngine
 	void SoundComponent::Resume()
 	{
 		sound->Resume();
+	}
+
+	bool SoundComponent::IsPlaying()
+	{
+		return sound->IsPlaying();
+	}
+
+	bool SoundComponent::IsPaused()
+	{
+		return sound->IsPaused();
+	}
+
+	bool SoundComponent::HasStopped()
+	{
+		return sound->HasStopped();
 	}
 
 	void SoundComponent::clip::set(AudioClip^ value)

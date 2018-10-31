@@ -5,6 +5,7 @@
 #include "..\object\component\LightComponent.h"
 #include "..\utils\Buffers.h"
 #include "..\resource\Shader.h"
+#include "render/ShaderList.h"
 
 #include <algorithm>
 namespace thomas
@@ -102,13 +103,13 @@ namespace thomas
 
 			s_lightBuffer->SetData(allLights);
 		}
-		void LightManager::Bind()
+		void LightManager::Bind(render::ShaderList* shaders)
 		{
-			resource::Shader::SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
-			resource::Shader::SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
-			resource::Shader::SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
-			resource::Shader::SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
-			resource::Shader::SetGlobalResource("lights", s_lightBuffer->GetSRV());
+			shaders->SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
+			shaders->SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
+			shaders->SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
+			shaders->SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
+			shaders->SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
 		
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)

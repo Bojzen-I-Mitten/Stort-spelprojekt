@@ -19,6 +19,7 @@ namespace thomas
 				
 
 				Transform();
+				virtual ~Transform();
 				
 				math::Vector3 Forward();
 				math::Vector3 Up();
@@ -77,8 +78,8 @@ namespace thomas
 				//void UpdateChildren();
 				void SetParent(Transform* parent, bool worldPositionStays);
 				Transform* GetParent();
-				std::vector<Transform*> GetChildren();
 				void RemoveParent();
+
 				void OnDestroy();
 				void SetDirty(bool dirty);
 				bool IsDirty();
@@ -94,7 +95,6 @@ namespace thomas
 				math::Vector3 m_localPosition;
 				math::Vector3 m_localScale;
 				math::Matrix m_localWorldMatrix;
-				std::vector<Transform*> m_children;
 			};
 		}
 	}

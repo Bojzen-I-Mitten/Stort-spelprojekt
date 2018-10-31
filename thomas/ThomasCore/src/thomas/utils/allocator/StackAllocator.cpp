@@ -37,9 +37,11 @@ namespace thomas {
 				assert(size != 0);
 				uint8_t adjustment = alignForwardAdjustmentWithHeader(_current_pos, alignment, sizeof(AllocationHeader));
 
-				if (_used_memory + adjustment + size > _size) 
+				if (_used_memory + adjustment + size > _size)
+				{
+					assert(false);
 					return nullptr;
-
+				}
 				void* aligned_address = add(_current_pos, adjustment);
 
 				//Add Allocation Header 
@@ -60,7 +62,10 @@ namespace thomas {
 
 			void StackAllocator::deallocate(void* p)
 			{
+				if (!p) return; //Assert null
+#if _DEBUG 
 				assert(p == _prev_position);	// Non-deleted stack data.
+#endif 
 
 				//Access the AllocationHeader in the bytes before p 
 				AllocationHeader* header = (AllocationHeader*)(subtract(p, sizeof(AllocationHeader)));

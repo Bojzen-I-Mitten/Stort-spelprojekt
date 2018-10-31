@@ -29,11 +29,6 @@ namespace thomas {
 				m_chain.get()[chainIndex] = param;
 			}
 
-			math::Vector3 lerp(const math::Vector3& from, const math::Vector3& to, float amount)
-			{
-				return from * (1.f - amount) + to * amount;
-			}
-
 			/* FABRIK out of reach edge case solution.
 			*/
 			void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link)
@@ -42,7 +37,7 @@ namespace thomas {
 				for (uint32_t i = 0; i < num_link - 1; i++) {
 					float r = math::Vector3::Distance(p[i], target);
 					float lambda = d[i] / r;
-					p[i+1] = lerp(p[i], target, lambda);
+					p[i+1] = math::lerp(p[i], target, lambda);
 				}
 			}
 			/* FABRIK backward/forward iteration
@@ -61,14 +56,14 @@ namespace thomas {
 						i--;
 						float r = math::Vector3::Distance(p[i], p[i+1]);		// Distance to next joint
 						float lambda = d[i] / r;
-						p[i] = lerp(p[i+1], p[i], lambda);						// Next iter. position
+						p[i] = math::lerp(p[i+1], p[i], lambda);						// Next iter. position
 					}
 					// Stage 2: Backward reaching
 					*p = b;														// Reset root
 					for (; i < num_link - 1; i++) {								// Backward reaching loop
 						float r = math::Vector3::Distance(p[i], p[i + 1]);		// Distance to next joint
 						float lambda = d[i] / r;
-						p[i+1] = lerp(p[i], p[i + 1], lambda);					// Next iter. position
+						p[i+1] = math::lerp(p[i], p[i + 1], lambda);					// Next iter. position
 					}
 					dif = math::Vector3::Distance(p[num_link-1], target);
 				}
@@ -149,7 +144,7 @@ namespace thomas {
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
 					pose = pose * weightRotationBetween(pose.Up(), p[i + 1] - p[i], m_weight);	// Rotate
-					pose.Translation(lerp(trans, p[i], m_weight));								// Apply new translation
+					pose.Translation(math::lerp(trans, p[i], m_weight));								// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;										// Set
 				}
 				math::Vector3 up = math::Vector3::Transform(math::Vector3::Up, m_targetOrient);
@@ -159,7 +154,7 @@ namespace thomas {
 				pose.Translation(math::Vector3::Zero);											// Remove translation
 				pose = pose * weightRotationBetween(pose.Up(), up, m_weight);					// Rotate transform to y
 				pose = pose * weightRotationBetween(pose.Right(), right, m_weight);				// Rotate transform to x
-				pose.Translation(lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
+				pose.Translation(math::lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
 				objectPose[(chain + m_num_link - 1)->m_index] = pose;
 
 				const float GIZMO_LEN = 0.05f;

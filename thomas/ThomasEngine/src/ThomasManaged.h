@@ -9,31 +9,77 @@ using namespace System::Collections::ObjectModel;
 using namespace System::Threading;
 
 namespace ThomasEngine {
+
+
+	enum RunningState
+	{
+		Editor,
+		Running,
+		UnInitialized
+	};
+	enum ThomasStateCommand
+	{
+		NoCommand = 0,
+		PlayIssued,
+		StopIssued
+	};
+	enum ThomasSystemMode
+	{
+		EditorMode,
+		Standalone
+	};
+	
+	ref class SceneManager;
+	ref class Scene;
+
 	ref class ThomasSelection;
+	ref class GameObjectManager;
 	public ref class ThomasWrapper
 	{
 	private:
-		static bool shouldStop = false;
+
+		static GameObjectManager^ s_GameObjectManager;
+
+		static ThomasWrapper^ s_SYS = gcnew ThomasWrapper();
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
-		static Thread^ mainThread;
-		static Thread^ renderThread;
-		static bool playing = false;	
+		static RunningState playing = RunningState::UnInitialized;
 		
+		/* Threading
+		*/
+		static Thread^ logicThread;
+		static Thread^ renderThread;
+		static System::Windows::Threading::Dispatcher^ mainThreadDispatcher;
+		delegate void MainThreadDelegate();
+
+		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
+		static ManualResetEvent^ StateCommandProcessed;
+		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
+
+
 		static ObservableCollection<String^>^ s_OutputLog = gcnew ObservableCollection<String^>();
 		static ThomasSelection^ s_Selection;
-	private:
-		static void Stop();
-	public:
-		static ManualResetEvent^ RenderFinished;
 
-		delegate void StartPlayEvent();
-		delegate void StopPlayingEvent();
-		delegate void PausePlayEvent();
-		static event StartPlayEvent^ OnStartPlaying;
-		static event StopPlayingEvent^ OnStopPlaying;
+		static void Play();
+		static void StopPlay();
+		static void ProcessCommand();
+
+	private:	// Thomas System variables.
+		SceneManager^ m_scene;
+	public:
+
+		property SceneManager^ SceneManagerRef
+		{
+			SceneManager^ get();
+		}
+		static void Start(bool editor);
+		static void Start();
+		static void MainThreadUpdate();
+		static void StartRenderer();
+
+	public:	// Static sys
 
 		enum class ManipulatorOperation {
 			TRANSLATE,
@@ -41,11 +87,20 @@ namespace ThomasEngine {
 			SCALE
 		};
 
-		static void Start();
-		static void Start(bool editor);
 
+		static property ThomasWrapper^ Thomas
+		{
+			ThomasWrapper^ get();
+		}
+		static property Scene^ CurrentScene
+		{
+			Scene^ get();
+		}
 
-		static void StartRenderer();
+		static void IssueStateCommand(ThomasStateCommand cmd);
+		static void IssuePlay();
+		static void IssueStopPlay();
+
 
 		static void CopyCommandList();
 
@@ -61,13 +116,11 @@ namespace ThomasEngine {
 
 		static void Update();
 
+
 		static Guid selectedGUID;
-		static void Play();
 
 		static bool IsPlaying();
-
-		static void IssueStop();
-
+		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 
 		static ManipulatorOperation GetEditorGizmoManipulatorOperation();

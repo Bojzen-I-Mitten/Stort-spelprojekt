@@ -12,7 +12,9 @@ namespace ThomasEngine
 		Cylinder,
 		Cube,
 		Plane,
-		Quad
+		Quad,
+		Monkey,
+		Torus
 	};
 
 	[DataContractAttribute]
