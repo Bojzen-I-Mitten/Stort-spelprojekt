@@ -33,7 +33,6 @@ namespace ThomasEngine
 	}
 	Scene::~Scene()
 	{
-		delete m_list;
 		UnLoad();
 	}
 
@@ -57,6 +56,11 @@ namespace ThomasEngine
 		InitGameObjects(true);
 	}
 
+
+	void Scene::CreateObject(GameObject ^ object)
+	{
+		throw gcnew System::NotImplementedException();
+	}
 
 	void Scene::DestroyObject(GameObject ^ object)
 	{

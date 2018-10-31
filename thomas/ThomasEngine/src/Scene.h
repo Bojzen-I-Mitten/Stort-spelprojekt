@@ -3,7 +3,6 @@
 #pragma unmanaged
 
 #include <stdint.h>
-#include <thomas/utils/atomic/SyncronizedList.h>
 #include <thomas/ThomasCore.h>
 
 #pragma managed
