@@ -14,7 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
-#include "../graphics/GUIManager.h"
+#include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
 
 namespace thomas
@@ -55,9 +55,6 @@ namespace thomas
 
 		void Renderer::PostRender()
 		{
-			m_shaders.SyncList();
-			m_cameras.syncUpdate();
-
 			for (object::component::Camera* camera : m_cameras.getCameras())
 				camera->CopyFrameData();
 		}
@@ -132,6 +129,10 @@ namespace thomas
 			// Swap frames and clear old frame data
 			std::swap(m_frame, m_prevFrame);
 			m_frame->clear();
+
+			// Sync. update
+			m_shaders.SyncList();
+			m_cameras.syncUpdate();
 		}
 
 		const render::ShaderList & Renderer::getShaderList()
@@ -226,7 +227,7 @@ namespace thomas
 
 				BindCameraViewport(perCameraQueue.second.m_frameData);
 				if (camera && camera->GetGUIRendering())
-					camera->GetGUIHandle()->Render();
+					camera->RenderGUI();
 			}
 
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);

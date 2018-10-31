@@ -150,6 +150,11 @@ namespace thomas
 		return m_threadMap->Thread_Index();
 	}
 
+	thomas::utility::allocator::StackAllocator& ThomasCore::MemStack()
+	{
+		return m_memAlloc->stack(Thread_Index());
+	}
+
 	void ThomasCore::OnStop()
 	{
 		graphics::Renderer::Instance()->ClearAllCommands();

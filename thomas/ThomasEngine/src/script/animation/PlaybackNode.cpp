@@ -28,6 +28,9 @@ namespace ThomasEngine
 				throw gcnew System::NotSupportedException(
 					"Playback node can't be created: Skeleton does not exist in model " +
 					Utility::ConvertString(m->GetName()));
+			if(!anim)
+				throw gcnew System::NotSupportedException(
+					"Playback node can't be created: Animation was null ");
 
 			AnimationData * data = anim->Native()->GetAnimation();
 

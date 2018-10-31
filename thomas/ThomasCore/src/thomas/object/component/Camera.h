@@ -8,7 +8,7 @@
 namespace thomas
 {
 	namespace utils { struct Ray; }
-	namespace graphics { class SkyBox; class GUIManager; }
+	namespace graphics { class SkyBox; namespace GUI { class Canvas; class GUIElement; }}
 	namespace resource { class TextureCube; }
 
 	namespace object
@@ -55,8 +55,6 @@ namespace thomas
 
 				float GetAspectRatio();
 
-				graphics::GUIManager* GetGUIHandle() const;
-
 				void Render();
 				void OnDrawGizmos();
 				void OnDrawGizmosSelected();
@@ -71,6 +69,11 @@ namespace thomas
 				const graphics::render::CAMERA_FRAME_DATA& GetFrameData();
 
 				uint32_t ID();
+
+				graphics::GUI::Canvas* AddCanvas();
+				graphics::GUI::Canvas* AddCanvas(math::Viewport viewport);
+
+				void RenderGUI();
 
 				void SetSkyMap(resource::TextureCube* tex);
 				resource::TextureCube* GetSkyMap();
@@ -87,7 +90,8 @@ namespace thomas
 				bool m_renderGUI;
 				math::Viewport m_viewport;
 				math::BoundingFrustum m_frustrum;
-				std::unique_ptr<graphics::GUIManager> m_GUIHandle;
+				std::vector<std::unique_ptr<graphics::GUI::Canvas>> m_canvases;
+				
 
 				std::unique_ptr<graphics::SkyBox> m_skybox;
 			};

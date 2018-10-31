@@ -3,6 +3,7 @@
 #pragma unmanaged
 #include <thomas/utils/Math.h>
 #pragma managed
+#include "math/Viewport.h"
 
 
 namespace ThomasEngine
@@ -41,6 +42,13 @@ namespace ThomasEngine
 		{
 			return Vector3(value.x, value.y, value.z);
 		}
+
+		static Vector3 SphericalCoordinate(float phi, float theta, float radius)
+		{
+			thomas::math::Vector3 temp = thomas::math::SphericalCoordinate(phi, theta, radius);
+			return Vector3(temp.x, temp.y, temp.z);
+		}
+
 		static thomas::math::Vector4 Convert(Vector4% value)
 		{
 			return thomas::math::Vector4(value.x, value.y, value.z, value.w);
@@ -56,6 +64,14 @@ namespace ThomasEngine
 		static Quaternion Convert(thomas::math::Quaternion% value)
 		{
 			return Quaternion(value.x, value.y, value.z, value.w);
+		}
+		static thomas::math::Viewport Convert(Viewport% value)
+		{
+			return thomas::math::Viewport(value.position.x, value.position.y, value.size.x, value.size.y);
+		}
+		static Viewport Convert(thomas::math::Viewport& value)
+		{
+			return Viewport(value.x, value.y, value.width, value.height);
 		}
 
 		static _GUID Convert(System::Guid% value);
@@ -113,7 +129,6 @@ namespace ThomasEngine
 				thomas::math::Vector3(value.Center.x, value.Center.y, value.Center.z),
 				value.Radius);
 		}
-
 	};
 
 }

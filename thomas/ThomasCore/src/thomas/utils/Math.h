@@ -12,6 +12,7 @@ namespace DirectX
 	namespace SimpleMath
 	{
 		constexpr float PI = 3.141592654f;
+		constexpr float EPSILON = 1e-5f;
 
 		using DirectX::BoundingBox;
 		using DirectX::BoundingSphere;
@@ -25,12 +26,29 @@ namespace DirectX
 			Euler() : yaw(0.f), pitch(0.f), roll(0.f) {}
 			Euler(float yaw, float pitch, float roll) : yaw(yaw), pitch(pitch), roll(roll) {}
 		};
+		enum Axis {
+			AxisX,
+			AxisY,
+			AxisZ,
+			NegAxisX,
+			NegAxisY,
+			NegAxisZ
+		};
+
+		/*	Extract the specified axis.
+		*/
+		inline Vector3 getAxis(Matrix& objectPose, Axis ind)
+		{
+			uint32_t i = ind % 3;
+			return Vector3(objectPose(i,0), objectPose(i, 1), objectPose(i, 2)) * (ind > 2 ? -1.f : 1.f);
+		}
 
 		BoundingFrustum CreateFrustrumFromMatrixRH(CXMMATRIX projection);
 
 		Quaternion getRotationTo(Vector3 from, Vector3 dest);
 
 		Matrix getMatrixRotationTo(Vector3 from, Vector3 dest);
+		Matrix getMatrixRotationTo_Nor(Vector3 from, Vector3 dest);
 
 
 		/* Extract the length of each axis in the top-left 3x3 matrix.
@@ -39,6 +57,8 @@ namespace DirectX
 		/* Normalize each row vector in the topleft 3x3 matrix
 		*/
 		Matrix normalizeBasisAxis(Matrix m);
+		Matrix extractRotation(Matrix m);
+		XMFLOAT3X3 extractRotation3x3(const Matrix &m);
 		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
 		*/
 		Matrix& mult(Matrix &m, Vector3 scalars);
@@ -48,6 +68,11 @@ namespace DirectX
 			v.Normalize();
 			return v;
 		}
+		inline Vector3 lerp(const Vector3& from, const Vector3& to, float amount)
+		{
+			return from * (1.f - amount) + to * amount;
+		}
+
 
 		//phi [0, 2*pi], theta [0, pi]
 		Vector3 SphericalCoordinate(float phi, float theta, float radius = 1);

@@ -42,7 +42,6 @@
     <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\Project.cpp" />
-    <ClCompile Include="src\GUI\editor\GUI.cpp" />
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\serialization\Converters.cpp" />
@@ -60,6 +59,10 @@
     <ClCompile Include="src\resource\Font.cpp" />
     <ClCompile Include="src\system\SceneManager.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
+    <ClCompile Include="src\GUI\editor\Gizmos.cpp" />
+    <ClCompile Include="src\GUI\game\GUIElements.cpp" />
+    <ClCompile Include="src\GUI\game\Canvas.cpp" />
+    <ClCompile Include="src\math\Viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -107,7 +110,6 @@
     <ClInclude Include="src\object\component\LightComponent.h" />
     <ClInclude Include="src\object\component\ParticleEmitter.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
-    <ClInclude Include="src\GUI\editor\GUI.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
     <ClInclude Include="src\serialization\Converters.h" />
     <ClInclude Include="src\serialization\Serializer.h" />
@@ -123,6 +125,10 @@
     <ClInclude Include="src\resource\Font.h" />
     <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\system\SceneManager.h" />
+    <ClInclude Include="src\GUI\editor\Gizmos.h" />
+    <ClInclude Include="src\GUI\game\GUIElements.h" />
+    <ClInclude Include="src\GUI\game\Canvas.h" />
+    <ClInclude Include="src\math\Viewport.h" />
     <ClInclude Include="src\resource\texture\TextureCube.h" />
   </ItemGroup>
   <ItemGroup>

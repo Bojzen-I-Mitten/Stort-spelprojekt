@@ -1,11 +1,12 @@
 #include "LookAtConstraint.h"
 #include "../data/Skeleton.h"
+#include "../../../editor/gizmos/Gizmos.h"
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
 			LookAtConstraint::LookAtConstraint(AxisConstraint)
-				: m_weight(1.f), m_target(), m_axis(AxisConstraint::AxisXYZ)
+				: m_weight(1.f), m_target(), m_axis(AxisConstraint::AxisXYZ), m_faceAxis(math::Axis::AxisZ)
 			{
 			}
 			LookAtConstraint::~LookAtConstraint()
@@ -37,15 +38,16 @@ namespace thomas {
 			{
 				math::Vector3 dir = m_target - objectPose[boneInd].Translation();
 				dir.Normalize();
-				math::Vector3 forward = objectPose[boneInd].Forward();
-				forward.Normalize();
+				math::Vector3 faceAxis = math::getAxis(objectPose[boneInd], m_faceAxis);	// Axis rotated
+				faceAxis.Normalize();
 				math::Vector3 up = objectPose[boneInd].Up();
 				up.Normalize();
+
 				math::Quaternion rotation;
 				switch (m_axis) {
 					case AxisConstraint::AxisX:
 					{
-						float x = forward.Dot(dir);									// Project on ZY plane
+						float x = faceAxis.Dot(dir);								// Project on ZY plane
 						float y = up.Dot(dir);
 						float angle = std::atan2f(y, x);							// Angle diff on ZY plane
 						angle *= m_weight;											// Weighted
@@ -58,12 +60,19 @@ namespace thomas {
 					case AxisConstraint::AxisZ:
 						// Not implemented
 					case AxisConstraint::AxisXYZ:
-						rotation = math::getRotationTo(forward, dir);
+						rotation = math::getRotationTo(faceAxis, dir);
 						break;
 				}
 				math::Matrix relative = objectPose[boneInd] * objectPose[skel.getBone(boneInd)._parentIndex].Invert();
 				// Apply
 				objectPose[boneInd] = relative * math::Matrix::CreateFromQuaternion(rotation) * objectPose[skel.getBone(boneInd)._parentIndex];
+#ifdef _DEBUG
+#ifdef _EDITOR
+				editor::Gizmos::Gizmo().DrawMatrixBasis(objectPose[boneInd]);
+				editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 1.f, 0.f));
+				editor::Gizmos::Gizmo().DrawLine(objectPose[boneInd].Translation(), m_target, 0.1f);
+#endif
+#endif
 			}
 		}
 	}

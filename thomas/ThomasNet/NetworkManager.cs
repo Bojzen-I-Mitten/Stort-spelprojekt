@@ -447,9 +447,9 @@ namespace ThomasEngine.Network
 
         public void Diagnostics()
         {
-            GUI.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent, new Vector2(0, 10));
-            GUI.ImguiStringUpdate("Total package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
-            GUI.ImguiStringUpdate("Total package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
+            Gizmos.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent, new Vector2(0, 10));
+            Gizmos.ImguiStringUpdate("Total package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
+            Gizmos.ImguiStringUpdate("Total package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
             PingToAllClients();
         }
 
@@ -458,7 +458,7 @@ namespace ThomasEngine.Network
             int i = 0;
             foreach (var player in NetManager.GetPeers(ConnectionState.Connected))
             {
-                GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
+                Gizmos.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;
             }
         }
