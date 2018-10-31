@@ -19,18 +19,13 @@ public class Ball : PickupableObject
     public Texture2D smokeTex { get; set; }
     public Texture2D fireTex { get; set; }
 
-    private RenderComponent renderComponent;
     private float electricityIntensifyerThreshold;
-    private float fireIntensityreThreshold;
 
     public override void Start()
     {
         base.Start();
         m_throwable = true;
         DropOnRagdoll = true;
-
-        //renderComponent = gameObject.GetComponent<RenderComponent>();
-        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         m_rigidBody.Damping = 0.5f;
 
@@ -49,7 +44,6 @@ public class Ball : PickupableObject
 
         ResetFireEmitters();
         ResetElectricityEmitters();
-        fireIntensityreThreshold = 0.6f;
         electricityIntensifyerThreshold = 0.6f;
 
 
@@ -158,39 +152,6 @@ public class Ball : PickupableObject
         emitter.Radius *= intensity;
     }
 
-    //void EmitterExplosion()
-    //{
-    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity1);
-    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity2);
-    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity3);
-    //    emitterElectricity1.EmitOneShot(20);
-    //    emitterElectricity2.EmitOneShot(15);
-    //    emitterElectricity3.EmitOneShot(8);
-    //    emitterFire.EmitOneShot(10);
-
-    //    MultiplyWithIntensity(2.0f, emitterFire);
-    //    emitterFire.Emit = true;
-    //    emitterSmoke.Emit = true;
-    //}
-
-    //public void TimeSinceThrown(float time)
-    //{
-    //    if (time > fireIntensityreThreshold)
-    //    {
-    //        fireIntensityreThreshold = 9999999999.0f;
-    //        MultiplyWithIntensity(0.5f, emitterFire);
-    //        MultiplyWithIntensity(0.5f, emitterSmoke);
-    //    }
-
-    //    if (time > 1.4f)
-    //    {
-    //        ResetFireEmitters();
-    //        emitterFire.Emit = false;
-    //        emitterSmoke.Emit = false;
-    //        ResetElectricityEmitters();
-    //    }
-    //}
-
     override public void StopEmitting()
     {
         StartCoroutine(StopEmission());
@@ -226,9 +187,6 @@ public class Ball : PickupableObject
         emitterElectricity3.Emit = true;
 
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
-
-        Color newColor = new Color(interp, 0.0f, (1.0f - interp));
-        //renderComponent.material.SetColor("color", newColor);
 
         if (interp > 0.8f)
         {
@@ -271,14 +229,9 @@ public class Ball : PickupableObject
 
     }
 
-
-
-
     private IEnumerator CleanTimer()
     {
         yield return new WaitForSeconds(2.0f);
-
-        renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
         emitterElectricity1.Emit = false;
         emitterElectricity2.Emit = false;
