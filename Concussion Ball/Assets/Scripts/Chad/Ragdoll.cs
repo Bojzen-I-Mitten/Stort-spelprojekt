@@ -30,7 +30,6 @@ public class Ragdoll : ScriptComponent
     public float Totalmass { get; set; } = 70.0f;
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
-    public GameObject SoundImpactObject { get; set; }
     public Transform AudioListener { get; set; }
     RagdollImpact ImpactSpine;
 
@@ -532,7 +531,6 @@ public class Ragdoll : ScriptComponent
 
 
         ImpactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
-        ImpactSpine.SoundImpactObject = SoundImpactObject;
         ImpactSpine.G_BodyParts = G_BodyParts;
     }
 
