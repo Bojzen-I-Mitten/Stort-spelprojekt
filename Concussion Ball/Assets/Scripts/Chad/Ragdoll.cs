@@ -252,8 +252,7 @@ public class Ragdoll : ScriptComponent
 
 
         //Spine
-        ImpactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
-        ImpactSpine.SoundImpactObject = SoundImpactObject; 
+
         BoxCollider spineCollider = G_BodyParts[(int)BODYPART.SPINE].AddComponent<BoxCollider>();
         center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
         center.x = 0;
@@ -532,7 +531,9 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_LOWER_LEG].Anchor = -limbCollider.center;
 
 
-
+        ImpactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
+        ImpactSpine.SoundImpactObject = SoundImpactObject;
+        ImpactSpine.G_BodyParts = G_BodyParts;
     }
 
     public override void Start()
@@ -573,6 +574,11 @@ public class Ragdoll : ScriptComponent
         }
 
 
+    }
+
+    public override void OnDestroy()
+    {
+        DisableRagdoll();
     }
 
     public void DisableRagdoll()

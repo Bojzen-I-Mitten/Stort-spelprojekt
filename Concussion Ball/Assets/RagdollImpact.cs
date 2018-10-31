@@ -9,18 +9,48 @@ using ThomasEngine;
 public class RagdollImpact : ScriptComponent
 {
     public bool GetActive = false;
-    public GameObject SoundImpactObject;
     public float Volume;
+    enum BODYPART
+    {
+        HIPS,
+        SPINE,
+        HEAD,
 
+        LEFT_UPPER_ARM,
+        RIGHT_UPPER_ARM,
+
+        LEFT_LOWER_ARM,
+        RIGHT_LOWER_ARM,
+
+        LEFT_UPPER_LEG,
+        RIGHT_UPPER_LEG,
+
+        LEFT_LOWER_LEG,
+        RIGHT_LOWER_LEG,
+
+        COUNT
+    }
+
+    public GameObject[] G_BodyParts = new GameObject[(int)BODYPART.COUNT];
+    bool Bodypartcheck = true;
     public override void OnCollisionEnter(Collider collider)
     {
-        if (collider.gameObject == SoundImpactObject)
+        for (int i = 0; i < (int)BODYPART.COUNT; i++)
+        {
+            if (collider.gameObject == G_BodyParts[i])
+            {
+                Bodypartcheck = false;
+                break;
+            }
+        }
+
+        if (Bodypartcheck)
         {
             Volume = Math.Abs(gameObject.GetComponent<Rigidbody>().LinearVelocity.x) + Math.Abs(gameObject.GetComponent<Rigidbody>().LinearVelocity.y) + Math.Abs(gameObject.GetComponent<Rigidbody>().LinearVelocity.z);
             GetActive = true;
         }
-        else
-            GetActive = false;
+    
+        Bodypartcheck = true;
     }
     public override void Update()
     {
