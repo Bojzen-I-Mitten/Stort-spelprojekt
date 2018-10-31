@@ -45,7 +45,8 @@ namespace ThomasEngine
 		//control if group1 collides with with group2
 		static void SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide);
 
-		static int GetCollisionGroup(String^ name);
+		static unsigned int GetCollisionGroup(String^ name);
+		static unsigned int GetCollisionGroupBit(String^ name);
 
 		static String^ GetCollisionGroup(unsigned int group);
 

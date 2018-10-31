@@ -76,8 +76,12 @@ namespace ThomasEngine
 	}
 
 
-	int Physics::GetCollisionGroup(String^ name) {
+	unsigned int Physics::GetCollisionGroup(String^ name) {
 		return thomas::Physics::GetCollisionGroup(Utility::ConvertString(name));
+	}
+	unsigned int Physics::GetCollisionGroupBit(String^ name)
+	{
+		return thomas::Physics::GetCollisionGroupBit(GetCollisionGroup(name));
 	}
 
 	String^ Physics::GetCollisionGroup(unsigned int group)
