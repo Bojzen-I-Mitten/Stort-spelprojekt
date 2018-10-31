@@ -67,6 +67,11 @@ namespace ThomasEngine.Network
             }
         }
 
+        public void RefreshCache()
+        {
+            _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
+        }
+
         public void WriteFrameData()
         {
             WriteData(false);
@@ -128,8 +133,12 @@ namespace ThomasEngine.Network
         private void TakeOwnership()
         {
             if(Manager != null)
-                if(!_Owner)
+                if (!_Owner)
+                {
                     Manager.TakeOwnership(this);
+                    _Owner = true;
+                }
+                    
         }
     }
 }

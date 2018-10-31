@@ -70,11 +70,12 @@ namespace ThomasEngine.Network
 
         public NetworkManager() : base()
         {
-            instance = this;
-        }
             
+        }
+
         public override void Awake()
         {
+            instance = this;
             NetScene = new NetworkScene();
             NetPacketProcessor = new NetPacketProcessor();
             Listener = new EventBasedNetListener();
@@ -84,14 +85,14 @@ namespace ThomasEngine.Network
 
             NatPunchListener.NatIntroductionSuccess += NatPunchListener_NatIntroductionSuccess;
 
-            
+
             Listener.ConnectionRequestEvent += Listener_ConnectionRequestEvent;
             Listener.NetworkReceiveEvent += Listener_NetworkReceiveEvent;
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-
+            NetScene.InititateScene();
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -108,7 +109,7 @@ namespace ThomasEngine.Network
             {
                 NetManager.NatPunchEnabled = true;
                 NetManager.NatPunchModule.Init(NatPunchListener);
-            }           
+            }
         }
 
         public void Init()
@@ -117,15 +118,16 @@ namespace ThomasEngine.Network
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
 
-            NetScene.InititateScene();
         }
 
         public void Host()
         {
+            initServerStartTime();
             ResponsiblePeer = LocalPeer;
             NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
-            NetScene.ActivateSceneObjects();
             OnPeerJoin(LocalPeer);
+            NetScene.ActivateSceneObjects();
+
         }
 
         public void Connect()
@@ -141,13 +143,13 @@ namespace ThomasEngine.Network
             {
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
-                    NetScene.RemovePlayer(peer);
                     OnPeerLeave(peer);
+                    NetScene.RemovePlayer(peer);
                     Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:
-                    NetScene.RemovePlayer(peer);
                     OnPeerLeave(peer);
+                    NetScene.RemovePlayer(peer);
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
@@ -167,10 +169,10 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerConnectedEvent(NetPeer _peer)
         {
-            
+
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
-        
-            if(NetScene.Players.Count == 0) // We are new player.
+
+            if (NetScene.Players.Count == 0) // We are new player.
             {
                 NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
@@ -180,20 +182,24 @@ namespace ThomasEngine.Network
             {
                 //Send server info to this guy.
                 bool responsible = ResponsiblePeer == LocalPeer;
-                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible);
+                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
                 NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
                 TransferOwnedObjects();
-                NtpRequest.Make("pool.ntp.org", 123, dateTime =>
+            }
+            OnPeerJoin(_peer);
+        }
+
+        void initServerStartTime()
+        {
+            NtpRequest.Make("pool.ntp.org", 123, dateTime =>
                 {
                     if (dateTime.HasValue)
                     {
                         ServerStartTime = dateTime.Value.ToUniversalTime().Ticks;
                     }
                 });
-            }
-            OnPeerJoin(_peer);
         }
 
         virtual protected void OnPeerJoin(NetPeer peer)
@@ -212,35 +218,36 @@ namespace ThomasEngine.Network
 
         private void Listener_NetworkReceiveEvent(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
-            try {
-            if (reader.EndOfData)
-                return;
-            PacketType type = (PacketType)reader.GetInt();
-            switch (type)
+            try
             {
-                case PacketType.PLAYER_DATA:
-                    {
-                        NetScene.ReadPlayerData(peer, reader);
-                    }
-                    break;
-                case PacketType.OBJECT_DATA:
-                    {
-                        NetScene.ReadObjectData(reader);
-                    }
-                    break;
-                case PacketType.EVENT:
-                    Debug.Log("recived events!");
-                    NetPacketProcessor.ReadAllPackets(reader, peer);
-                    break;
-                case PacketType.RPC:
-                    HandleRPC(reader, peer);
-                    break;
-                default:
-                    break;
+                if (reader.EndOfData)
+                    return;
+                PacketType type = (PacketType)reader.GetInt();
+                switch (type)
+                {
+                    case PacketType.PLAYER_DATA:
+                        {
+                            NetScene.ReadPlayerData(peer, reader);
+                        }
+                        break;
+                    case PacketType.OBJECT_DATA:
+                        {
+                            NetScene.ReadObjectData(reader);
+                        }
+                        break;
+                    case PacketType.EVENT:
+                        Debug.Log("recived events!");
+                        NetPacketProcessor.ReadAllPackets(reader, peer);
+                        break;
+                    case PacketType.RPC:
+                        HandleRPC(reader, peer);
+                        break;
+                    default:
+                        break;
+                }
+                reader.Recycle();
             }
-            reader.Recycle();
-            }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogException(e);
             }
@@ -269,7 +276,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        protected override void OnDestroy()
+        public override void OnDestroy()
         {
             if (NetManager != null)
             {
@@ -279,16 +286,29 @@ namespace ThomasEngine.Network
 
         }
 
-        public void TakeOwnership(NetworkIdentity networkIdentiy)
+        public void TakeOwnership(NetworkIdentity networkIdentity)
         {
 
-            NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent{
-                NetID = networkIdentiy.ID
+            NetworkEvents.TransferOwnerEvent transferOwnerEvent = new NetworkEvents.TransferOwnerEvent
+            {
+                NetID = networkIdentity.ID
             };
-            NetScene.ObjectOwners[LocalPeer].Add(networkIdentiy);
+            if(!NetScene.ObjectOwners[LocalPeer].Contains(networkIdentity))
+                NetScene.ObjectOwners[LocalPeer].Add(networkIdentity);
             Events.SendEvent(transferOwnerEvent, DeliveryMethod.ReliableOrdered);
         }
 
+        public void SendRPC(NetPeer peer, int netID, string methodName, params object[] parameters)
+        {
+            Debug.Log("Sending Peer RPC: " + methodName);
+            NetDataWriter writer = new NetDataWriter();
+
+            writer.Put((int)PacketType.RPC);
+            writer.Put(netID);
+            writer.Put(methodName);
+            RpcUtils.WriteRPCParameters(parameters, writer);
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
 
         public void SendRPC(int netID, string methodName, params object[] parameters)
         {
@@ -305,15 +325,17 @@ namespace ThomasEngine.Network
         private void HandleRPC(NetPacketReader reader, NetPeer peer)
         {
             int netID = reader.GetInt();
-            if(netID == -2) //RPC from here
+            if (netID == -2) //RPC from here
             {
                 string methodName = reader.GetString();
+                Debug.Log("Recived RPC: " + methodName);
                 Type t = this.GetType();
                 System.Reflection.MethodInfo methodInfo = t.GetMethod(methodName);
-                if(methodInfo == null)
+                if (methodInfo == null)
                 {
                     Debug.LogError("RPC: Method: " + methodName + " does not exist.");
-                }else
+                }
+                else
                 {
                     object[] parameters = RpcUtils.ReadRPCParameters(methodInfo, reader);
                     methodInfo.Invoke(this, parameters);
@@ -330,21 +352,25 @@ namespace ThomasEngine.Network
                 {
                     identity = NetScene.Players[peer];
                 }
-                if(identity == null)
+                if (identity == null)
                 {
                     Debug.LogError("RPC: Failed to find NetworkIdentity for ID: " + netID);
-                }else
+                }
+                else
                     identity.ReadRPC(reader);
             }
         }
 
-        
+
         private void TransferOwnedObjects()
         {
-            foreach(NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
+            foreach (NetworkIdentity identity in NetScene.ObjectOwners[LocalPeer])
             {
-                if(identity.PrefabID == -1) //Scene object
+                if (identity.PrefabID == -1) //Scene object
+                {
                     identity.WriteInitialData();
+                    TakeOwnership(identity);
+                }
                 else
                 {
                     TransferOwnedPrefab(identity);
@@ -370,9 +396,9 @@ namespace ThomasEngine.Network
 
         public GameObject NetworkInstantiate(GameObject prefab, Vector3 position, Quaternion rotation, bool owner = false, int targetID = -1)
         {
-            
+
             int prefabID = SpawnablePrefabs.IndexOf(prefab);
-            if(prefabID >= 0)
+            if (prefabID >= 0)
             {
                 GameObject gObj = GameObject.Instantiate(prefab, position, rotation);
                 NetworkIdentity identity = gObj.GetComponent<NetworkIdentity>();
@@ -391,13 +417,26 @@ namespace ThomasEngine.Network
                 };
                 Events.SendEvent(spawnPrefabEvent, DeliveryMethod.ReliableOrdered);
                 identity.Owner = owner;
+                identity.PrefabID = prefabID;
                 identity.WriteInitialData();
                 return gObj;
-            }else
+            }
+            else
             {
                 Debug.LogError("Prefab is not registered");
                 return null;
             }
+        }
+
+        public void RemoveNetworkObject(GameObject gObj)
+        {
+            NetworkIdentity identity = gObj.GetComponent<NetworkIdentity>();
+            NetworkEvents.DeletePrefabEvent deletePrefabEvent = new NetworkEvents.DeletePrefabEvent
+            {
+                netID = identity.ID
+            };
+            Events.SendEvent(deletePrefabEvent, DeliveryMethod.ReliableOrdered);
+            Events.DeletePrefabEventHandler(deletePrefabEvent, LocalPeer);
         }
 
         public void CheckPacketLoss()
@@ -417,7 +456,7 @@ namespace ThomasEngine.Network
         public void PingToAllClients()
         {
             int i = 0;
-            foreach(var player in NetManager.GetPeers(ConnectionState.Connected))
+            foreach (var player in NetManager.GetPeers(ConnectionState.Connected))
             {
                 GUI.ImguiStringUpdate("Ping to client " + player.EndPoint.ToString() + "  " + player.Ping, new Vector2(0, 40 + 10 * i));
                 i++;

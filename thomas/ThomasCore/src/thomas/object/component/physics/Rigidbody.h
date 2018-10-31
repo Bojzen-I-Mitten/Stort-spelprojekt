@@ -63,17 +63,21 @@ namespace thomas
 				void SetCcdSweptSphereRadius(float sphereRadius);
 				void SetActivationState(ActivationState state);
 				void SetKinematic(bool kinematic);
+				void UseGravity(bool value);
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
 				void SetCenterOfmass(math::Vector3 Centerofmass);
 				void SetCollisionLayer(int layer);
 				void SetBounciness(float bounciness);
 				void SetFriction(float friction);
+				void SetPosition(math::Vector3 position);
+				void SetRotation(math::Quaternion rotation);
 
 
 			public:
 				float GetMass() const;
 				bool IsKinematic() const;
+				bool UsesGravity() const;
 				math::Vector3 GetFreezePosition() const;
 				math::Vector3 GetFreezeRotation() const;
 				math::Vector3 GetLinearVelocity() const;
@@ -105,6 +109,7 @@ namespace thomas
 				float m_damping;
 				float m_angularDaming;
 				bool m_kinematic;
+				bool m_useGravity;
 				float m_bounciness;
 				bool m_dirty;
 				int m_collisionLayer;

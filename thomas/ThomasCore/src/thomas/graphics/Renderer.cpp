@@ -1,7 +1,6 @@
 #include "Renderer.h"
 #include "..\utils\D3D.h"
 #include "..\object\GameObject.h"
-#include "..\object\component\Camera.h"
 #include "..\object\component\Transform.h"
 #include "..\ThomasCore.h"
 #include "..\ThomasTime.h"
@@ -22,53 +21,86 @@ namespace thomas
 {
 	namespace graphics
 	{
-		Renderer Renderer::s_renderer;
-
 		void Renderer::BindFrame()
 		{
 			//Per frame
 			float realDeltaTime = ThomasTime::GetActualDeltaTime();
 			float dt = ThomasTime::GetDeltaTime();
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
-			resource::Shader::SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
+			m_shaders.SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
 
-			LightManager::Bind();
+			LightManager::Bind(&m_shaders);
 		}
 
 		constexpr uint32_t NUM_STRUCT = 200;
 		constexpr uint32_t NUM_MATRIX = 5000;
-		Renderer::Renderer()
-			: m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX))
+		Renderer::Renderer()	: 
+			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), 
+			m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)),
+			m_shaders(),
+			m_cameras()
 		{
 			
 		}
 
+		Renderer::~Renderer()
+		{
+			//m_shaders~ShaderList();	Implicit call
+		}
+
+		void Renderer::init()
+		{
+			// Do something?
+		}
+
+		void Renderer::PostRender()
+		{
+			m_shaders.SyncList();
+			m_cameras.syncUpdate();
+
+			for (object::component::Camera* camera : m_cameras.getCameras())
+				camera->CopyFrameData();
+		}
+
+		void Renderer::Destroy()
+		{
+			m_shaders.Destroy();
+		}
+
 		Renderer* Renderer::Instance()
 		{
+			static Renderer s_renderer;
 			return &s_renderer;
 		}
 
-		void Renderer::BindCamera(thomas::object::component::Camera * camera)
+		void Renderer::BindCamera(const render::CAMERA_FRAME_DATA& frameData)
 		{
-			object::component::Camera::CAMERA_FRAME_DATA& frameData = camera->GetFrameData();
+			//Get the current active window
+
+			if (!BindCameraViewport(frameData))
+				return;
+
+			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
+
+			//Set global camera properties
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, frameData.projectionMatrix.Transpose());
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW, frameData.viewMatrix.Transpose());
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
+			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
+			m_shaders.SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
+		}
+		bool Renderer::BindCameraViewport(const render::CAMERA_FRAME_DATA& frameData)
+		{
 			//Get the current active window
 
 			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
 			if (!window || !window->Initialized())
-				return;
+				return false;
 
 			window->Bind();
 			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
-
-			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
-
-			//Set global camera properties
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_PROJECTION, frameData.projectionMatrix.Transpose());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW, frameData.viewMatrix.Transpose());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
-			resource::Shader::SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
-			resource::Shader::SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
+			return true;
 		}
 
 		void Renderer::ClearCommands()
@@ -81,10 +113,13 @@ namespace thomas
 			m_frame->m_queue.clear();
 			m_prevFrame->m_queue.clear();
 		}
-
+		void Renderer::SubmitCamera(object::component::Camera* cam)
+		{
+			m_frame->m_queue[cam->ID()].m_frameData = cam->GetFrameData();
+		}
 		void Renderer::SubmitCommand(render::RenderCommand& command)
 		{
-			m_frame->m_queue[command.camera].m_commands3D[command.material].push_back(command);
+			m_frame->m_queue[command.camera_ID].m_commands3D[command.material].push_back(command);
 		}
 
 		render::Frame & Renderer::getAllocator()
@@ -98,6 +133,22 @@ namespace thomas
 			std::swap(m_frame, m_prevFrame);
 			m_frame->clear();
 		}
+
+		const render::ShaderList & Renderer::getShaderList()
+		{
+			return m_shaders;
+		}
+
+		const render::CameraList & Renderer::getCameraList()
+		{
+			return m_cameras;
+		}
+
+		resource::Shader * Renderer::GetStandardShader()
+		{
+			return m_shaders.GetStandardShader();
+		}
+
 
 		void Renderer::BindObject(render::RenderCommand &rC)
 		{
@@ -119,13 +170,9 @@ namespace thomas
 			//Process commands
 			BindFrame();
 
-			//ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
-			//m_particleSystem->UpdateParticleSystem();
-
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				auto camera = perCameraQueue.first;
-				BindCamera(camera);
+				BindCamera(perCameraQueue.second.m_frameData);
 				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
 					auto material = perMaterialQueue.first;
@@ -136,28 +183,23 @@ namespace thomas
 						material->Draw(perMeshCommand.mesh);
 					}
 				}
-
-				//m_particleSystem->DrawParticles();	
-
-				// Draw GUI for each camera that has enabled GUI rendering
-				if (perCameraQueue.first->GetGUIRendering())
-				{
-					perCameraQueue.first->GetGUIHandle()->Render();
-				}
 			}
 	
 			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
 
-			ParticleSystem::GetGlobalSystem()->UpdateParticleSystem();
+			ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
+			ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::Instance()->GetCamera());
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				BindCamera(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
-			for (object::component::Camera* cam : object::component::Camera::s_allCameras)
+			for (object::component::Camera* cam : m_cameras.getCameras())
 			{
-				BindCamera(cam);
-				ParticleSystem::GetGlobalSystem()->DrawParticles();
+				BindCamera(cam->GetFrameData());
+				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
 			profiler->Timestamp(profiling::GTS_PARTICLES);
 			
@@ -165,8 +207,20 @@ namespace thomas
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::Instance()->GetCamera());
+				BindCamera(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
 				editor::Gizmos::Gizmo().RenderGizmos();
+			}
+
+			// Gui draw
+			for (auto & perCameraQueue : m_prevFrame->m_queue)
+			{
+				// Draw GUI for each camera that has enabled GUI rendering
+				// Shitty solution to camera destruction:
+				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+
+				BindCameraViewport(perCameraQueue.second.m_frameData);
+				if (camera && camera->GetGUIRendering())
+					camera->GetGUIHandle()->Render();
 			}
 
 			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);

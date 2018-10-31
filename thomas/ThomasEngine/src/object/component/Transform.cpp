@@ -8,7 +8,10 @@
 
 namespace ThomasEngine
 {
-	Transform::Transform() : Component(new thomas::object::component::Transform()){}
+	Transform::Transform() 
+		: Component(new thomas::object::component::Transform()),
+		m_children(gcnew List<Transform^>())
+	{}
 
 	thomas::object::component::Transform* Transform::trans::get() { return (thomas::object::component::Transform*)nativePtr; }
 
@@ -16,25 +19,71 @@ namespace ThomasEngine
 
 	Transform^ Transform::parent::get()
 	{
-		if (trans->GetParent())
-			return (Transform^)GetObject(trans->GetParent());
+		return m_parent;
+	}
+	void Transform::AddChild(Transform^ child)
+	{
+		m_children->Add(child);
+	}
+
+	bool Transform::RemoveChild(Transform^ child)
+	{
+		return m_children->Remove(child);
+	}
+	Transform ^ Transform::SwapParent(Transform ^ new_parent, bool worldPositionStays)
+	{
+		// Swap
+		Transform^ oldParent = m_parent;
+		m_parent = new_parent;
+		// Add to new parent / Swap native
+		if (new_parent)
+		{
+			new_parent->AddChild(this);
+			((thomas::object::component::Transform*)nativePtr)->SetParent(new_parent->Native, worldPositionStays);
+		}
 		else
-			return nullptr;
+			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
+		return oldParent;
+	}
+	/* Called when parent is destroyed rather then swapped out
+	*/
+	void Transform::OnParentDestroy(Transform ^ new_parent)
+	{
+		Transform^ oldParent = SwapParent(new_parent, true);
+		OnParentChanged(this, oldParent, new_parent);
+	}
+	void Transform::OnParentDestroy(GameObject^ parented_object)
+	{
+		// Loop children
+		for each (Transform^ t in children)
+		{
+			for each(Component^ c in t->m_gameObject->Components)
+				c->OnParentDestroy(parented_object);
+		}
+	}
+	void Transform::SetParent(Transform ^ new_parent, bool worldPositionStays)
+	{
+		if (new_parent == m_parent)
+			return;	// Do nothing
+		// Swap and clear
+		Transform^  oldParent = SwapParent(new_parent, worldPositionStays);
+		if(oldParent)
+			assert(oldParent->RemoveChild(this));
+		// Trigger event
+		OnParentChanged(this, oldParent, new_parent);
+	}
+	void Transform::SetParent(Transform ^ value)
+	{
+		SetParent(value, true);
 	}
 	void Transform::parent::set(ThomasEngine::Transform^ value)
 	{
-		SetParent(value);
+		SetParent(value, false);
 	}
 
-	List<Transform^>^ Transform::children::get()
+	IEnumerable<Transform^>^ Transform::children::get()
 	{
-		std::vector<thomas::object::component::Transform*> nativeChildren = trans->GetChildren();
-		List<Transform^>^ managedChildren = gcnew List<Transform^>(int(nativeChildren.size()));
-
-		for (thomas::object::component::Transform* nativeChild : nativeChildren)
-			managedChildren->Add((Transform^)GetObject(nativeChild));
-
-		return managedChildren;
+		return m_children;
 	}
 
 	Matrix Transform::world::get(){ return Utility::Convert(trans->GetWorldMatrix());}
@@ -87,19 +136,10 @@ namespace ThomasEngine
 	Vector3 Transform::local_right::get() { return Utility::Convert(trans->GetLocalWorldMatrix().Right()); }
 
 
-	void Transform::SetParent(Transform ^ value)
-	{
-		SetParent(value, true);
-	}
-	void Transform::SetParent(Transform ^ value, bool worldPositionStays)
-	{
-		Transform^ oldParent = parent;
-		if (value)
-			((thomas::object::component::Transform*)nativePtr)->SetParent((thomas::object::component::Transform*)value->nativePtr, worldPositionStays);
-		else
-			((thomas::object::component::Transform*)nativePtr)->SetParent(nullptr, worldPositionStays);
 
-		OnParentChanged(this, oldParent, value);
+	thomas::object::component::Transform* Transform::Native::get()
+	{
+		return reinterpret_cast<thomas::object::component::Transform*>(nativePtr);
 	}
 
 	void Transform::LookAt(Transform^ target) {
@@ -146,15 +186,10 @@ namespace ThomasEngine
 
 	void Transform::OnDestroy()
 	{
-		if (parent)
-		{
-			parent = nullptr;
-		}
-		for (int i = 0; i < children->Count; i++)
-		{
-			children[i]->gameObject->Destroy();
-			i -= 1;
-		}
+		for (int i = 0; i < m_children->Count; i++)
+			m_children[i]->OnParentDestroy(m_parent);
+		m_children->Clear();
+		SetParent(nullptr);
 	}
 
 	void Transform::Update()

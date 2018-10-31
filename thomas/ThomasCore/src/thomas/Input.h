@@ -15,9 +15,7 @@ using namespace DirectX;
 
 namespace thomas
 {
-	smart_enum
-	(
-		Keys,
+	enum Keys {
 		None = 0,
 		Back = 0x8,
 		Tab = 0x9,
@@ -175,8 +173,8 @@ namespace thomas
 		Play = 0xfa,
 		Zoom = 0xfb,
 		Pa1 = 0xfd,
-		OemClear = 0xfe,
-	);
+		OemClear = 0xfe
+	};
 
 	class Input
 	{
@@ -247,8 +245,6 @@ namespace thomas
 
 		void SetLastKey(unsigned short key);
 		unsigned short GetLastKey() const;
-		std::string ConvertKeyToString(unsigned short key) const;
-		std::string ConvertKeyToString(Keys key) const;
 	
 		//Gamepad
 		bool GetButtonDown(Buttons button);

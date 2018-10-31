@@ -142,7 +142,7 @@ namespace ThomasEditor
                    if(foundItem.DataContext is GameObject)
                     {
                         GameObject gameObject = foundItem.DataContext as GameObject;
-                        gameObject.Destroy();
+                        GameObject.Destroy(gameObject);
                         foundItem.DataContext = ThomasEngine.Resources.LoadPrefab(p);
                     }
                 }
@@ -175,7 +175,7 @@ namespace ThomasEditor
                     if (foundItem.DataContext is GameObject)
                     {
                         GameObject gameObject = foundItem.DataContext as GameObject;
-                        gameObject.Destroy();
+                        GameObject.Destroy(gameObject);
                     }
                
 

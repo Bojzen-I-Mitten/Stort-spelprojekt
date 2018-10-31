@@ -57,6 +57,24 @@ namespace ThomasEngine
 	unsigned ParticleEmitter::EmissionRate::get() { return particleEmitter->GetEmissionRate(); }
 	void ParticleEmitter::EmissionRate::set(unsigned value) { particleEmitter->SetEmissionRate(value); }
 
+
+	ParticleEmitter::BLEND_STATES ParticleEmitter::BlendState::get() 
+	{ 
+		int blendState = particleEmitter->GetBlendState();
+		
+		if (blendState == 1)
+			return BLEND_STATES::ADDITIVE;
+		else
+			return BLEND_STATES::ALPHA;
+	}
+	void ParticleEmitter::BlendState::set(ParticleEmitter::BLEND_STATES value) 
+	{
+		if (value == BLEND_STATES::ALPHA)
+			particleEmitter->SetBlendState(thomas::graphics::ParticleSystem::ALPHA);
+		else if (value == BLEND_STATES::ADDITIVE)
+			particleEmitter->SetBlendState(thomas::graphics::ParticleSystem::ADDITIVE);
+	}
+
 	Texture2D^ ParticleEmitter::Texture::get() 
 	{ 
 		ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(particleEmitter->GetTexture());

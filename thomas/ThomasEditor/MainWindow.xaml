@@ -76,11 +76,13 @@
                     <MenuItem Header="_3D Object">
                         <MenuItem Header="_Cube" Click="AddNewCubePrimitive"/>
                         <MenuItem Header="_Sphere" Click="AddNewSpherePrimitive"/>
-                        <MenuItem Header="_Capsule" Click="AddNewCapsulePrimitive"/>
-                        <MenuItem Header="_Cylinder" Click="AddNewCylinderPrimitive"/>
                         <MenuItem Header="_Plane" Click="AddNewPlanePrimitive"/>
+                        <MenuItem Header="_Cylinder" Click="AddNewCylinderPrimitive"/>
+                        <MenuItem Header="_Capsule" Click="AddNewCapsulePrimitive"/>
+                        <MenuItem Header="_Torus" Click="AddNewTorusPrimitive"/>
                         <MenuItem Header="_Quad" Click="AddNewQuadPrimitive"/>
-                        </MenuItem>
+                        <MenuItem Header="_Monkey" Click="AddNewMonkeyPrimitive"/>
+                    </MenuItem>
                     <MenuItem Header="_Assisting Objects">
                         <MenuItem Header="_Camera" Click="AddNewCameraPrimitive"/>
                         <MenuItem Header="_POINT Light" Click="AddNewPointLightPrimitive"/>
@@ -96,8 +98,8 @@
                 <MenuItem Header="_Tools">
                     <MenuItem Header="_Options" Click="OpenOptionsWindow"/>
                     <MenuItem Header="_Reload Assembly" Click="ReloadAssembly"/>
-                    <MenuItem Header="_Toggle Editor Rendering" IsCheckable="True" IsChecked="True" Click="MenuItem_ToggleEditorRendering"/>
-                        <MenuItem Header="_Toggle Physics Debug" IsCheckable="True" IsChecked="True" Click="MenuItem_TogglePhysicsDebug"/>
+                    <MenuItem x:Name="menuItem_editorRendering" Header="_Toggle Editor Rendering" IsCheckable="True" Click="MenuItem_ToggleEditorRendering"/>
+                        <MenuItem x:Name="menuItem_physicsDebug" Header="_Toggle Physics Debug" IsCheckable="True" Click="MenuItem_TogglePhysicsDebug"/>
                     </MenuItem>
             </Menu>
             <WrapPanel Grid.Row="1" Height="40">
@@ -135,7 +137,6 @@
             </xcad:DockingManager.Theme>-->
             <xcad:LayoutRoot x:Name="__layoutRoot">
                 <xcad:LayoutPanel>
-
                     <xcad:LayoutDocumentPaneGroup>
                         <xcad:LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="3*">
                             <xcad:LayoutDocumentPane>
@@ -150,7 +151,6 @@
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>
-
                         <xcad:LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="1*">
                             <xcad:LayoutDocumentPane>
                                     <xcad:LayoutAnchorable ContentId="Hiearchy" Title="Hierarchy" CanHide="False" CanClose="False">

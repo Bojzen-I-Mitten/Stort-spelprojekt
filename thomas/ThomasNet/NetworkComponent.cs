@@ -14,7 +14,7 @@ namespace ThomasEngine.Network
         protected float SmoothingFactor = 1.0f / 3;
 
 
-        protected int ID
+        public int ID
         {
             get { return Identity.ID; }
         }

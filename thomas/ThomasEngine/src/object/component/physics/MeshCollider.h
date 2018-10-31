@@ -17,5 +17,11 @@ namespace ThomasEngine
 			void set(Model^ value);
 
 		}
+
+		property bool concave
+		{
+			bool get();
+			void set(bool value);
+		}
 	};
 }

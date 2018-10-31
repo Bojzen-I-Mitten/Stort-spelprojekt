@@ -59,7 +59,7 @@ namespace thomas
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
 			m_grid = std::unique_ptr<EditorGrid>(new EditorGrid(100, 1.f, 10));
-			resource::Shader* outliner = resource::Shader::CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
+			resource::Shader* outliner = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
 
 			if (outliner)
 			{
@@ -286,7 +286,7 @@ namespace thomas
 								gameObject->m_transform->GetWorldMatrix(),
 								mesh.get(),
 								m_objectHighlighter.get(),
-								m_cameraComponent.get());
+								m_cameraComponent.get()->ID());
 							graphics::Renderer::Instance()->SubmitCommand(cmd);
 						}
 					}
@@ -310,8 +310,10 @@ namespace thomas
 				averagePosition += gameObject->m_transform->GetPosition();
 				averageScale += gameObject->m_transform->GetScale();
 			}
-			averagePosition /= m_selectedObjects.size();
-			averageScale /= m_selectedObjects.size();
+
+			float mult = 1.f / m_selectedObjects.size();
+			averagePosition *= mult;
+			averageScale *= mult;
 			
 
 

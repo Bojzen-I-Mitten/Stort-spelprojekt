@@ -3,6 +3,10 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include "render/ShaderList.h"
+#include "render/CameraList.h"
+#include "render/FrameData.h"
+
 
 namespace thomas 
 {
@@ -39,31 +43,43 @@ namespace thomas
 		{
 		private:
 			Renderer();
+			~Renderer();
 
 			void BindFrame();
 			void BindObject(render::RenderCommand & rC);
+			void BindCamera(const render::CAMERA_FRAME_DATA& camera);
+			bool BindCameraViewport(const render::CAMERA_FRAME_DATA & frameData);
 
 		public:
-			~Renderer() = default;
+			void init();
+			void PostRender();
+			void Destroy();
 
+			/* Renderer Singleton */
 			static Renderer* Instance();
-			void BindCamera(thomas::object::component::Camera* camera);
 			void ProcessCommands();
 			/* Clear front buffer. */
 			void ClearCommands();
 			/* Clear both front, and back buffer. */
 			void ClearAllCommands();
+			void SubmitCamera(object::component::Camera * cam);
 			void SubmitCommand(render::RenderCommand& command);
 			render::Frame& getAllocator();
 
 			void TransferCommandList();
 
-		private:
-			static Renderer s_renderer;
-			
+		public:
+			/* Access shaders 
+			*/
+			const render::ShaderList& getShaderList();
+			const render::CameraList& getCameraList();
+			resource::Shader* GetStandardShader();
+
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
+			render::ShaderList m_shaders;
+			render::CameraList m_cameras;
 			
 		};
 	}

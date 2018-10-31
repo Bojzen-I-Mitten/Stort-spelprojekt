@@ -31,9 +31,11 @@ namespace thomas
 				Texture2D* texture;
 				Vector2 position;
 				Vector2 scale;
+				Vector2 origin;
 				Vector4 color;
 				float rotation;
 				bool interact;
+				DirectX::SpriteEffects effect;
 			};
 
 			struct Rect
@@ -54,8 +56,10 @@ namespace thomas
 				std::string text;
 				Vector2 position;
 				Vector2 scale;
+				Vector2 origin;
 				Vector4 color;
 				float rotation;
+				DirectX::SpriteEffects effect;
 			};
 
 		public:
@@ -65,6 +69,8 @@ namespace thomas
 			void Render();
 
 		public:
+			void SetViewportScale(math::Viewport viewport);
+
 			// Images
 			void AddImage(const std::string& id, Texture2D* texture, const Vector2& position, bool interact,
 						  const Vector4& color = Vector4(1.f), const Vector2& scale = Vector2(1.f), float rotation = 0.f);
@@ -74,8 +80,11 @@ namespace thomas
 			void SetImageScale(const std::string& id, const Vector2& scale);
 			void SetImageRotation(const std::string& id, float rotation);
 			void SetImageInteract(const std::string& id, bool interact);
+			void SetImageOrigin(const std::string& id, const Vector2& origin);
+			void SetImageFlipEffect(const std::string& id, const DirectX::SpriteEffects effect);
 			bool OnImageClicked(const std::string& id);
 			bool OnImageHovered(const std::string& id);
+			void DeleteImage(const std::string& id);
 
 			// Text
 			void AddText(const std::string& id, const std::string& text, const Vector2& position, const Vector2& scale = Vector2(1.f),
@@ -86,7 +95,10 @@ namespace thomas
 			void SetTextScale(const std::string& id, const Vector2& scale);
 			void SetTextRotation(const std::string& id, float rotation);
 			void SetFont(const std::string& id, Font* font);
-
+			void DeleteText(const std::string& id);
+			void SetTextOrigin(const std::string& id, const Vector2& origin);
+			void SetTextFlipeffect(const std::string& id, DirectX::SpriteEffects effect);
+			Vector2 GetTextSize(const std::string& id);
 		private:
 			Image& GetImage(const std::string& id);
 			Text& GetText(const std::string& id);
@@ -98,6 +110,8 @@ namespace thomas
 			std::unique_ptr<CommonStates> m_spriteStates;
 			std::unique_ptr<SpriteBatch> m_spriteBatch;
 			std::unique_ptr<Font> m_defaultFont;
+			math::Vector2 m_viewportScale;
+			math::Vector2 m_viewport;
 		};
 	}
 }

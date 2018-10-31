@@ -15,6 +15,7 @@ namespace thomas
 			Rigidbody::Rigidbody() : 
 			btRigidBody(1, NULL, NULL), 
 			m_kinematic(false),
+			m_useGravity(true),
 			m_mass(1.f),
 			m_freezePosition(1.f),
 			m_freezeRotation(1.f),
@@ -48,6 +49,8 @@ namespace thomas
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				
+				this->setUserPointer(m_collider);
+
 				Physics::AddRigidBody(this, m_collisionLayer);
 			}
 
@@ -56,6 +59,7 @@ namespace thomas
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				clearForces();
+				this->setUserPointer(nullptr);
 				Physics::RemoveRigidBody(this);				
 			}
 
@@ -197,6 +201,12 @@ namespace thomas
 				}	
 			}
 
+			void Rigidbody::UseGravity(bool value)
+			{
+				m_useGravity = value;
+				m_dirty = true;
+			}
+
 			void Rigidbody::SetCollider(Collider * collider)
 			{
 				m_collider = collider;
@@ -247,6 +257,22 @@ namespace thomas
 				m_friction = friction;
 			}
 
+			void Rigidbody::SetPosition(math::Vector3 position)
+			{
+				btTransform trans = this->getWorldTransform();
+				trans.setOrigin(Physics::ToBullet(position));
+				this->setWorldTransform(trans);
+				m_gameObject->m_transform->SetPosition(position);
+			}
+
+			void Rigidbody::SetRotation(math::Quaternion rotation)
+			{
+				btTransform trans = this->getWorldTransform();
+				trans.setRotation(Physics::ToBullet(rotation));
+				this->setWorldTransform(trans);
+				m_gameObject->m_transform->SetRotation(rotation);
+			}
+
 			math::Vector3 Rigidbody::GetCenterOfmass()
 			{
 				
@@ -287,6 +313,11 @@ namespace thomas
 			bool Rigidbody::IsKinematic() const
 			{
 				return m_kinematic;
+			}
+
+			bool Rigidbody::UsesGravity() const
+			{
+				return m_useGravity;
 			}
 
 			math::Vector3 Rigidbody::GetFreezePosition() const
@@ -384,6 +415,7 @@ namespace thomas
 				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
 				this->setDamping(m_damping, m_angularDaming);
 				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
+				this->setGravity(Physics::s_world->getGravity() * m_useGravity);
 				this->activate(true);
 				
 				m_dirty = false;

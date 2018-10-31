@@ -7,7 +7,7 @@ public class TeamGoal : ScriptComponent
     {
         BoxCollider c = gameObject.AddComponent<BoxCollider>();
         c.isTrigger = true;
-        c.size = new Vector3(0.5f,0.5f,0.5f);
+        c.size = new Vector3(0.5f, 0.5f, 0.5f);
         //MatchSystem.instance.FindTeam(Team).SetGoalArea(this);
     }
 

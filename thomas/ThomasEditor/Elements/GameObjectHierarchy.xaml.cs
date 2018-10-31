@@ -43,7 +43,8 @@ namespace ThomasEditor
 
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
-            Scene.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
+            ThomasWrapper.Thomas.SceneManagerRef.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
+            ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
         }
 
         private void Ref_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -69,9 +70,9 @@ namespace ThomasEditor
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 m_hierarchyNodes.Clear();
-                for (int i = 0; i < Scene.CurrentScene.GameObjects.Count; i++)
+                for (int i = 0; i < ThomasWrapper.CurrentScene.GameObjects.Count; i++)
                 {
-                    GameObject gObj = Scene.CurrentScene.GameObjects[i];
+                    GameObject gObj = ThomasWrapper.CurrentScene.GameObjects[i];
                     if (gObj.transform.parent == null)
                     {
                         TreeItemViewModel item = new TreeItemViewModel(gObj)
@@ -203,10 +204,7 @@ namespace ThomasEditor
                 if (e.OldItems != null)
                 {
                     foreach (GameObject oldItem in e.OldItems)
-                    {
-                        oldItem.Destroy();
                         DeleteObjectInTree(m_hierarchyNodes.ToList(), oldItem);
-                    }
                 }
             }));
 
@@ -479,7 +477,7 @@ namespace ThomasEditor
                     {
                         GameObject sourceData = (GameObject)source.DataContext;
 
-                        if (target != null && sourceData != null && (GameObject)target.DataContext != sourceData)
+                        if (target != null && sourceData != null && target.DataContext is GameObject && (GameObject)target.DataContext != sourceData)
                         {
 
                             GameObject parent = target.DataContext as GameObject;
@@ -539,7 +537,7 @@ namespace ThomasEditor
                     ThomasWrapper.Selection.UnSelectGameObject(gObj);
 
                     //Destroy
-                    gObj.Destroy();
+                    GameObject.Destroy(gObj);
                 }
         }
 
@@ -613,13 +611,13 @@ namespace ThomasEditor
             if (m_copiedObjects.Count > 0)
             {
                 DetachParent();
-                Scene.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
+                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
                     GameObject.Instantiate(copiedObject);
                     Debug.Log("Pasted object.");
                 }
-                Scene.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
                 ResetTreeView();
                 return;
             }
@@ -744,6 +742,18 @@ namespace ThomasEditor
             var x = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             ThomasWrapper.Selection.SelectGameObject(x);
         }
+        private void AddNewTorusPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Torus);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
+        private void AddNewMonkeyPrimitive(object sender, RoutedEventArgs e)
+        {
+            var x = GameObject.CreatePrimitive(PrimitiveType.Monkey);
+            ThomasWrapper.Selection.SelectGameObject(x);
+        }
+
 
         private void AddNewCameraPrimitive(object sender, RoutedEventArgs e)
         {

@@ -10,10 +10,23 @@ namespace ThomasStandalone
         {
             Debug.OnDebugMessage += Debug_OnDebugMessage;
 
+           
             ThomasWrapper.Start(false);
+
+            float startTime = Time.ElapsedTime;
+
+            Win32Window window = new Win32Window();
+            window.create(System.AppDomain.CurrentDomain.FriendlyName, 800, 600);
+
             Application.currentProject = Project.LoadProject("..\\Data\\project.thomas");
-            ThomasWrapper.Play();
-            new Win32Window().create("Thomas standalone", 800, 600);
+
+            ThomasWrapper.IssuePlay();
+
+            Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
+
+            window.loop();
+
+
             ThomasWrapper.Exit();
         }
 
@@ -36,6 +49,10 @@ namespace ThomasStandalone
             }
             //System.Console.ForegroundColor = System.ConsoleColor.Black;
             System.Console.Out.WriteLine(newMessage.Message);
+            foreach(string line in newMessage.StackTrace)
+            {
+               // System.Console.Out.WriteLine(line);
+            }
             
             System.Console.ResetColor();
         }
@@ -165,7 +182,7 @@ namespace ThomasStandalone
             //This version worked and resulted in a non-zero hWnd
             IntPtr hWnd = CreateWindowEx(0,
                 regResult,
-                "Thomas standalone",
+                name,
                 WS_OVERLAPPEDWINDOW,
                 0,
                 0,
@@ -188,14 +205,6 @@ namespace ThomasStandalone
 
             ThomasWrapper.CreateThomasWindow(hWnd, false);
 
-            MSG msg;
-            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
-            {
-                DispatchMessage(ref msg);
-            }
-
-
-
             return true;
 
             //The explicit message pump is not necessary, messages are obviously dispatched by the framework.
@@ -206,6 +215,15 @@ namespace ThomasStandalone
             //    TranslateMessage(ref msg);
             //    DispatchMessage(ref msg);
             //}
+        }
+
+        internal void loop()
+        {
+            MSG msg;
+            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+            {
+                DispatchMessage(ref msg);
+            }
         }
 
         private static IntPtr myWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)

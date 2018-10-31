@@ -29,6 +29,7 @@ namespace ThomasEngine
 		
 		Component(thomas::object::component::Component* ptr);
 		virtual ~Component();
+
 		
 		void setGameObject(GameObject^ gObj);
 		virtual void OnGameObjectSet() {};
@@ -40,6 +41,7 @@ namespace ThomasEngine
 		virtual void FixedUpdate();
 		virtual void OnDrawGizmosSelected();
 		virtual void OnDrawGizmos();
+		virtual void OnParentDestroy(GameObject^ object) {};
 
 		virtual void OnCollisionEnter(Collider^ collider) {};
 		virtual void OnCollisionStay(Collider^ collider) {};
@@ -51,7 +53,7 @@ namespace ThomasEngine
 
 		GameObject^ m_gameObject;
 
-		
+		virtual void Destroy() override;
 		property bool initialized
 		{
 			bool get();
@@ -63,16 +65,13 @@ namespace ThomasEngine
 		bool awakened = false;
 
 	private:
-		/* Delete the object, does not consider GameObject reference. */
-		void Delete();
 		/* Set enabled state. */
 		void Enable();
 		/* Set disabled state. */
 		void Disable();
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
-		virtual void Destroy() override;
-		
+		virtual void OnDestroy() override;
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
@@ -81,7 +80,7 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
-		[Xml::Serialization::XmlIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		virtual property bool canDisable
 		{

@@ -53,6 +53,11 @@ namespace thomas
 			{
 				m_skeleton = skel;
 			}
+			void BoneTransformComponent::ClearReference()
+			{
+				m_skeleton = NULL;
+				m_boneIndex = UINT32_MAX;
+			}
 			int BoneTransformComponent::GetBoneIndex()
 			{
 				return m_boneIndex;

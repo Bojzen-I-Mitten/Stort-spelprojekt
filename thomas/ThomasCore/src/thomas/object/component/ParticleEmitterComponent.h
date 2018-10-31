@@ -17,12 +17,7 @@ namespace thomas
 			class ParticleEmitterComponent : public Component
 			{
 			public:
-				enum class BlendStates {
-					ADDITIVE,
-					ALPHA_BLEND
-				};
 
-				
 			private:
 				unsigned NrOfParticlesToEmitThisFrame();
 			public:
@@ -86,6 +81,9 @@ namespace thomas
 				bool IsEmitting() const;
 				void EmitOneShot(unsigned const& nrOfPaticles);
 
+				void SetBlendState(graphics::ParticleSystem::BLEND_STATE const& blendState);
+				graphics::ParticleSystem::BLEND_STATE GetBlendState();
+
 				void SetTexture(resource::Texture2D* other);
 				resource::Texture2D* GetTexture() const;
 	
@@ -104,7 +102,7 @@ namespace thomas
 				bool m_isEmitting;
 				bool m_emitOneShot;
 
-
+				graphics::ParticleSystem::BLEND_STATE m_blendState;
 
 				unsigned m_emissionRate; //Particles per second
 				double m_emissionThreshold; //Only emitt when the rate*dt is above one particle
