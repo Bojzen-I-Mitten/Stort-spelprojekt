@@ -32,6 +32,8 @@ public class Ball : PickupableObject
         //renderComponent = gameObject.GetComponent<RenderComponent>();
         //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
+        m_rigidBody.Damping = 0.5f;
+
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
@@ -245,17 +247,8 @@ public class Ball : PickupableObject
     override public void Cleanup()
     {
         base.Cleanup();
-        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
 
-        emitterElectricity1.Emit = false;
-        emitterElectricity2.Emit = false;
-        emitterElectricity3.Emit = false;
-
-        emitterFire.Emit = false;
-        emitterSmoke.Emit = false;
-        ResetFireEmitters();
-        // Reset values
-        ResetElectricityEmitters();
+        StartCoroutine(CleanTimer());
     }
 
 
@@ -275,5 +268,26 @@ public class Ball : PickupableObject
                 m_rigidBody.enabled = true;
             }
         }
+
+    }
+
+
+
+
+    private IEnumerator CleanTimer()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        renderComponent.material.SetColor("color", new Color(0, 0, 255));
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
+        ResetFireEmitters();
+        // Reset values
+        ResetElectricityEmitters();
     }
 }
