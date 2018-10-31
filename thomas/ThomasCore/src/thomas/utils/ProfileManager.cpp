@@ -1,6 +1,6 @@
 #include "ProfileManager.h"
-#include "ProfileManager.h"
 #include <fstream>
+
 
 #include "..\..\..\include\nlohmann\json.hpp"
 #include "..\..\..\include\imgui\imgui.h"
@@ -12,11 +12,13 @@ namespace thomas
 		namespace profiling
 		{
 			using namespace nlohmann;
-			std::map<const char*, std::vector<float>> ProfileManager::s_samples;
+			std::map<std::string, std::map<const char*, std::vector<float>>> ProfileManager::s_samples;
+			float ProfileManager::ramusage;
+			float ProfileManager::vramusage;
 
-			void ProfileManager::storeSample(const char* name, long elapsedTime)
+			void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
 			{
-				s_samples[name].push_back(elapsedTime);
+				s_samples[std::to_string((int)processor_id)][name].push_back(elapsedTime);
 			}
 
 			void ProfileManager::newFrame()
@@ -28,11 +30,21 @@ namespace thomas
 			{
 				json j;
 				j["SlowfilerData"];
-				j["SlowfilerData"]["functions"];
+				j["SlowfilerData"]["processor"];
 				for (auto& it : s_samples)
+					j["SlowfilerData"]["processor"][it.first];
+
+
+				//j["SlowfilerData"]["build"]; 
+				//j["SlowfilerData"]["build"]["ramUsage"] = ramusage;
+				//j["SlowfilerData"]["build"]["vramUsage"] = vramusage;
+				for (auto& id : s_samples)
 				{
-					j["SlowfilerData"]["functions"][it.first];
-					j["SlowfilerData"]["functions"][it.first]["Sample"] = it.second;
+					for (auto& processor : id.second)
+					{
+						j["SlowfilerData"]["processor"][id.first]["functions"];
+						j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = processor.second;
+					}
 				}
 
 				std::ofstream o("data.json");
@@ -40,30 +52,26 @@ namespace thomas
 				o.close();
 			}
 
-			void ProfileManager::DisplaySample(const char * functionName, long elapsedTime)
+			void ProfileManager::DisplaySample(const char * functionName, long elapsedTime, DWORD processor_id)
 			{
 				// Display using Imgui
 				// And store sample
 				bool test = true;
 
 
-				storeSample(functionName, elapsedTime);
+				storeSample(functionName, elapsedTime, processor_id);
 			}
 
-			long ProfileManager::GetLatestStamp(const char * functionName)
+			void ProfileManager::SetRAMUsage(float usage)
 			{
-				if (s_samples.find(functionName) != s_samples.end())
-				{
-					return 0;
-				}
-
-				return s_samples[functionName].back();
+				ramusage = usage;
 			}
 
-			std::map<const char*, std::vector<float>>* ProfileManager::GetData()
+			void ProfileManager::SetVRAMUsage(float usage)
 			{
-				return &s_samples;
+				vramusage = usage;
 			}
+
 		}
 	}
 }

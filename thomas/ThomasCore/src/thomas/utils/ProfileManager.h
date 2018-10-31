@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-
+#include <Windows.h>
 
 #define BENCHMARK
 
@@ -20,18 +20,20 @@ namespace thomas
 			public:
 
 			private:
-				static std::map<const char*, std::vector<float>> s_samples;
+				static std::map<std::string, std::map<const char*, std::vector<float>>> s_samples;
+				static float ramusage;
+				static float vramusage;
 
 			public:
 				static void newFrame();
 				static void dumpDataToFile();
-				static void DisplaySample(const char* functionName, long elapsedTime);
-				static long GetLatestStamp(const char* functionName);
-				static std::map<const char*, std::vector<float>>* GetData();
+				static void DisplaySample(const char* functionName, long elapsedTime, DWORD processor_id);
+				static void SetRAMUsage(float usage);
+				static void SetVRAMUsage(float usage);
 			private:
 
 
-				static void storeSample(const char* functionName, long elapsedTime);
+				static void storeSample(const char* functionName, long elapsedTime, DWORD processor_id);
 
 			};
 		}

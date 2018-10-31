@@ -63,13 +63,12 @@ namespace ThomasEngine {
 
 			mainThread->Name = "Thomas Engine (Logic Thread)";
 			mainThread->Start();
-			mainThread->BeginThreadAffinity();
 
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
 		
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
-			mainThread->BeginThreadAffinity();
+			
 		}
 	}
 
@@ -146,7 +145,7 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
-			PROFILE("StartEngine %f")
+			PROFILE("StartEngine")
 			if (Scene::IsLoading() || Scene::CurrentScene == nullptr)
 			{
 				Thread::Sleep(1000);
@@ -241,7 +240,7 @@ namespace ThomasEngine {
 
 					// Wait for renderer
 					{
-						PROFILE("StartEngine - Wait %f");
+						PROFILE("StartEngine - Wait");
 						RenderFinished->WaitOne();
 					}
 					/* Render & Update is synced.
@@ -254,6 +253,7 @@ namespace ThomasEngine {
 						Stop();
 					// Enter async. state 
 					RenderFinished->Reset();
+
 					UpdateFinished->Set();
 				}
 				Monitor::Exit(lock);
@@ -267,6 +267,8 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		utils::profiling::ProfileManager::SetRAMUsage(ramUsage);
 		utils::profiling::ProfileManager::dumpDataToFile();
 	
 		thomas::ThomasCore::Exit();
