@@ -1,110 +1,142 @@
 #include "Skybox.h"
-#include "Texture.h"
-#include "LightManager.h"
+#include "Renderer.h"
 #include "../utils/d3d.h"
-#include "../ThomasCore.h"
-#include "../resource/Material.h"
+#include "../utils/Buffers.h"
+#include "../resource/texture/Texture2D.h"
+#include "../resource/texture/TextureCube.h"
+#include "../resource/Shader.h"
+
 namespace thomas
 {
 	namespace graphics
 	{
-
-		Skybox::Skybox(std::string path, Material* material, int slot)
+		SkyBox::SkyBox()
 		{
-			SetupBuffers();
-			LoadCubeMap(path, slot);
-			CreateRasterizer();
-			CreateDepthStencilState();
-			m_data.material = material;
+
+			GenerateSphere(10, 10, 5.0f);
+			m_vertBuffer = std::make_unique<utils::buffers::VertexBuffer>(m_sphereVerts);
+			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_sphereIndices);
+			
+			m_skyMap = new resource::TextureCube("../Data/yokohama_skybox.dds");
+			//m_skyMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
+			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
-
-		Skybox::~Skybox()
+		SkyBox::~SkyBox()
 		{
-			SAFE_RELEASE(m_data.vertexBuffer);
-			SAFE_RELEASE(m_data.indexBuffer);
-			SAFE_RELEASE(m_data.constantBuffer);
-			SAFE_RELEASE(m_data.rasterizerState);
-			SAFE_RELEASE(m_data.depthStencilState);
+			/*SAFE_DELETE(m_cubeMap);
+			SAFE_DELETE(m_skyMap);
+
+			SAFE_RELEASE(m_vertBuffer);
+			SAFE_RELEASE(m_indexBuffer);
+
+			m_sphereIndices.clear();
+			m_sphereVerts.clear();*/
 		}
 
-		bool Skybox::Bind(math::Matrix viewMatrix, math::Matrix mvpMatrix)
+		bool SkyBox::SetSkyMap(resource::TextureCube * tex)
 		{
-			//Needs rework
-			ThomasCore::GetDeviceContext()->RSGetState(&m_rasterizerP);
-			ThomasCore::GetDeviceContext()->OMGetDepthStencilState(&m_depthstencilP, &m_depthRefP);
 
-			//m_data.material->m_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-			//
-
-			//m_data.material->GetShader()->BindVertexBuffer(m_data.vertexBuffer, sizeof(math::Vector3), 0);
-			//m_data.material->GetShader()->BindIndexBuffer(m_data.indexBuffer);
-			m_mvpStruct.mvpMatrix = mvpMatrix.Transpose();
-			m_mvpStruct.viewMatrix = viewMatrix;
-			viewMatrix.Invert().Decompose(math::Vector3(), math::Quaternion(),m_mvpStruct.camPosition);
-			utils::D3d::FillDynamicBufferStruct(m_data.constantBuffer, m_mvpStruct);
-			ThomasCore::GetDeviceContext()->RSSetState(m_data.rasterizerState);
-			ThomasCore::GetDeviceContext()->OMSetDepthStencilState(m_data.depthStencilState, 1);
-
-			return false;
-		}
-
-		bool Skybox::BindCubemap()
-		{
+			m_skyMap = tex;
 			
 			return true;
 		}
 
-		bool Skybox::Unbind()
+		resource::TextureCube * SkyBox::GetSkyMap()
 		{
-			//needs rework
-
-			return false;
+			return m_skyMap;
 		}
 
-		void Skybox::Draw()
+		void SkyBox::GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius)
 		{
-			thomas::ThomasCore::GetDeviceContext()->DrawIndexed(indices.size(), 0, 0);
+			float phi = 0.0f;
+			float theta = 0.0f;
+
+			float twoPiDivVerticalLines = math::PI * 2  / verticalLines;
+			float piDivHorizontalLines = math::PI / (horizontalLines + 1);
+
+			m_sphereVerts.push_back(math::Vector3(0.0f, radius, 0.0f));//endpoint 1
+
+			for (unsigned t = 1; t < horizontalLines + 1; ++t)
+			{
+				theta = t * piDivHorizontalLines;
+
+				for (unsigned p = 0; p < verticalLines; ++p)
+				{
+					phi = p * twoPiDivVerticalLines;
+
+					m_sphereVerts.push_back(math::SphericalCoordinate(phi, theta, radius));
+				}
+			}
+			m_sphereVerts.push_back(math::Vector3(0.0f, -radius, 0.0f)); //endpoint 2
+			
+			//Create top of sphere
+			for (unsigned p = 2; p < verticalLines + 1; ++p)//connect endpoint 1 indices 
+			{
+				m_sphereIndices.push_back(0);
+				m_sphereIndices.push_back(p);
+				m_sphereIndices.push_back(p - 1);
+			}
+			//add last triangle for top (first vert is douplicate)
+			m_sphereIndices.push_back(0);
+			m_sphereIndices.push_back(1);
+			m_sphereIndices.push_back(verticalLines);
+
+			//Create middle segments
+			for (unsigned t = 0; t < horizontalLines - 1; ++t)
+			{
+				for (unsigned p = 2; p < verticalLines + 1; ++p)
+				{
+					m_sphereIndices.push_back(t * verticalLines + p);//+ 1 is for to exclude top vert
+					m_sphereIndices.push_back((t + 1) * verticalLines + p);//take vert in next layer
+					m_sphereIndices.push_back(t * verticalLines + p - 1);
+					
+					m_sphereIndices.push_back(t * verticalLines + p - 1);
+					m_sphereIndices.push_back((t + 1) * verticalLines + p);
+					m_sphereIndices.push_back((t + 1) * verticalLines + p - 1);
+				}
+
+				//Again append douplicate verts
+				m_sphereIndices.push_back(t * verticalLines + 1);
+				m_sphereIndices.push_back((t + 1) * verticalLines + 1);
+				m_sphereIndices.push_back((t + 1) * verticalLines);
+
+				m_sphereIndices.push_back((t + 1) * verticalLines);
+				m_sphereIndices.push_back((t + 1) * verticalLines + 1);
+				m_sphereIndices.push_back((t + 2) * verticalLines);
+			}
+			
+			//Create bottom of sphere
+			for (unsigned p = m_sphereVerts.size() - verticalLines; p < m_sphereVerts.size(); ++p)
+			{
+				m_sphereIndices.push_back(m_sphereVerts.size() - 1);
+				m_sphereIndices.push_back(p - 1);
+				m_sphereIndices.push_back(p);
+				
+			}
+			m_sphereIndices.push_back(m_sphereVerts.size() - 1);
+			m_sphereIndices.push_back(m_sphereVerts.size() - 2);
+			m_sphereIndices.push_back(m_sphereVerts.size() - 1 - verticalLines);
 		}
 
-		void Skybox::SetupBuffers()
+
+
+		void SkyBox::Draw()
 		{
-			m_data.vertexBuffer = utils::D3d::CreateBufferFromVector(vertices, D3D11_BIND_VERTEX_BUFFER);
 
-			if (m_data.vertexBuffer == nullptr)
-				LOG("ERROR::INITIALIZING::VERTEX::BUFFER");
+			m_shader->BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+			m_shader->BindVertexBuffer(m_vertBuffer.get());
+			m_shader->BindIndexBuffer(m_indexBuffer.get());
 
-			m_data.indexBuffer = utils::D3d::CreateBufferFromVector(indices, D3D11_BIND_INDEX_BUFFER);
+			m_shader->SetPropertyTextureCube("SkyMap", m_skyMap);
 
-			if (m_data.indexBuffer == nullptr)
-				LOG("ERROR::INITIALIZING::INDEX::BUFFER");
+			m_shader->Bind();
+			m_shader->SetPass(0);
 
-			m_data.constantBuffer = utils::D3d::CreateDynamicBufferFromStruct(m_mvpStruct, D3D11_BIND_CONSTANT_BUFFER);
+			
+			m_shader->DrawIndexed(m_sphereIndices.size(), 0, 0);
 		}
-
-		void Skybox::CreateRasterizer()
-		{
-			m_data.rasterizerState = utils::D3d::CreateRasterizer(D3D11_FILL_SOLID, D3D11_CULL_NONE);
-		}
-
-		void Skybox::CreateDepthStencilState()
-		{
-			m_data.depthStencilState = utils::D3d::CreateDepthStencilState(D3D11_COMPARISON_LESS_EQUAL, true);
-		}
-
-		void Skybox::LoadCubeMap(std::string path, int slot)
-		{
-			m_data.texture.push_back(Texture::CreateTexture(Texture::SamplerState::WRAP, slot, Texture::TextureType::CUBEMAP, path));
-		}
-		void Skybox::BindSkyboxTexture()
-		{
 		
-			return;
-		}
-		void Skybox::SetLerp(math::Vector3 lerp)
-		{
-			m_mvpStruct.lerp = lerp;
-		}
 	}
 }

@@ -58,6 +58,31 @@ namespace thomas
 				return m_value;
 			}
 #pragma endregion
+
+
+#pragma region TextureCube
+			ShaderPropertyTextureCube::ShaderPropertyTextureCube(TextureCube* value) : ShaderProperty(Type::TEXTURECUBE), m_value(value)
+			{
+
+			};
+
+			void ShaderPropertyTextureCube::Apply(std::string name, Shader* shader) const
+			{
+
+				shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
+
+			}
+
+			ShaderProperty* ShaderPropertyTextureCube::GetDefault()
+			{
+				return new ShaderPropertyTextureCube(nullptr);
+			}
+
+			TextureCube* ShaderPropertyTextureCube::GetValue()
+			{
+				return m_value;
+			}
+#pragma endregion
 		}
 	}
 }

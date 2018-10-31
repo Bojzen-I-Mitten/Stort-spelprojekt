@@ -1,14 +1,16 @@
 #include "Camera.h"
 #include "../../WindowManager.h"
 #include "../GameObject.h"
-#include "../../graphics/Skybox.h"
 #include "Transform.h"
 #include "../../graphics/Renderer.h"
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../AutoProfile.h"
-#include "../../graphics/GUIManager.h"
+#include "../../graphics/GUI/Canvas.h"
+#include "../../graphics/GUI/GUIElements.h"
 #include "RenderComponent.h"
+#include "../../resource/texture/Texture2D.h"
+#include "../../graphics/Skybox.h"
 
 namespace thomas
 {
@@ -24,12 +26,13 @@ namespace thomas
 
 			Camera::Camera(bool dontAddTolist) :
 				m_ID(0),
-				m_renderGUI(false),
-				m_GUIHandle(std::make_unique<graphics::GUIManager>())
+				m_renderGUI(false)
+				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
 				m_near = 0.1f;
 				m_far = 10000.f;
+				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
 				m_targetDisplay = -1;
 				UpdateProjMatrix();
@@ -37,12 +40,13 @@ namespace thomas
 
 			Camera::Camera() :
 				m_ID(0),
-				m_renderGUI(false),
-				m_GUIHandle(std::make_unique<graphics::GUIManager>())
+				m_renderGUI(false)
+				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70;
 				m_near = 0.5;
 				m_far = 10000;
+				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1,1);
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
@@ -51,8 +55,12 @@ namespace thomas
 
 			Camera::~Camera()
 			{
-				m_GUIHandle->Destroy();
-				m_GUIHandle.reset();
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->Destroy();
+					m_canvases[i].reset();
+				}
+				m_canvases.clear();
 				graphics::Renderer::Instance()->getCameraList().remove(this);
 			}
 
@@ -63,6 +71,7 @@ namespace thomas
 
 			void Camera::OnDisable()
 			{
+				//m_skybox.reset();
 				graphics::Renderer::Instance()->getCameraList().remove(this);
 				m_ID = 0;
 			}
@@ -185,7 +194,10 @@ namespace thomas
 			{
 				m_viewport = viewport;
 				UpdateProjMatrix();
-				m_GUIHandle->SetViewportScale(m_viewport);
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->UpdateViewportScale();
+				}
 			}
 
 			void Camera::SetViewport(float x, float y, float width, float height)
@@ -196,11 +208,6 @@ namespace thomas
 			float Camera::GetAspectRatio()
 			{
 				return m_viewport.AspectRatio();
-			}
-
-			graphics::GUIManager * Camera::GetGUIHandle() const
-			{
-				return m_GUIHandle.get();
 			}
 
 			void Camera::Render()
@@ -294,17 +301,66 @@ namespace thomas
 				m_frameData.position = (math::Vector4)GetPosition();
 
 				if (m_frameData.targetDisplay == 0)
-					m_GUIHandle->SetViewportScale(m_frameData.viewport);
-
+				{
+					for (int i = 0; i < m_canvases.size(); ++i)
+					{
+						m_canvases[i]->SetViewport(m_frameData.viewport);
+					}
+				}
 			}
 
 			const graphics::render::CAMERA_FRAME_DATA& Camera::GetFrameData()
 			{
 				return m_frameData;
 			}
+
 			uint32_t Camera::ID()
 			{
 				return m_ID;
+			}
+
+			graphics::GUI::Canvas* Camera::AddCanvas()
+			{
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(m_viewport, &m_viewport);
+				m_canvases.push_back(std::move(canvas));
+
+				return m_canvases[m_canvases.size() - 1].get();
+			}
+
+			graphics::GUI::Canvas * Camera::AddCanvas(math::Viewport viewport)
+			{
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(viewport, &m_viewport);
+				m_canvases.push_back(std::move(canvas));
+
+				return m_canvases[m_canvases.size() - 1].get();
+			}
+
+			void Camera::RenderGUI()
+			{
+				for (int i = 0; i < m_canvases.size(); ++i)
+				{
+					m_canvases[i]->Render();
+				}
+			}
+
+
+			void Camera::SetSkyMap(resource::TextureCube * tex)
+			{
+				m_skybox->SetSkyMap(tex);
+			}
+
+			resource::TextureCube * Camera::GetSkyMap()
+			{
+				return m_skybox->GetSkyMap();
+			}
+			
+			void Camera::DrawSkyBox()
+			{
+				m_skybox->Draw();
+			}
+			bool Camera::hasSkybox()
+			{
+				return bool(m_skybox);
 			}
 		}
 	}

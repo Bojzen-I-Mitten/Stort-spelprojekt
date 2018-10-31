@@ -47,7 +47,6 @@ namespace thomas
 	private:
 		static std::unique_ptr<AudioEngine> s_audioEngine;
 		static std::map<std::string, SoundInfo> s_waves;
-		static float s_masterVolume;
 		static float s_fxVolume;
 		static float s_musicVolume;
 	};

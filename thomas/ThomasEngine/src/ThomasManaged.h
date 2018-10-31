@@ -65,6 +65,7 @@ namespace ThomasEngine {
 		static void Play();
 		static void StopPlay();
 		static void ProcessCommand();
+		static void SynchronousExecution();
 
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
@@ -78,6 +79,7 @@ namespace ThomasEngine {
 		static void Start();
 		static void MainThreadUpdate();
 		static void StartRenderer();
+
 
 	public:	// Static sys
 
