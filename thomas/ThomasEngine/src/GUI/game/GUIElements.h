@@ -20,6 +20,7 @@ namespace ThomasEngine
 		property Vector2 position
 		{
 			void set(Vector2 position);
+			Vector2 get();
 		}
 		property Vector2 scale
 		{

@@ -9,6 +9,8 @@ namespace ThomasEngine
 {
 	void GUIElement::position::set(Vector2 position) { nativePtr->position = Utility::Convert(position); }
 
+	Vector2 GUIElement::position::get() { return Utility::Convert(nativePtr->position); }
+
 	void GUIElement::scale::set(Vector2 scale) { nativePtr->scale = Utility::Convert(scale); }
 
 	void GUIElement::origin::set(Vector2 origin) { nativePtr->origin = Utility::Convert(origin); }
