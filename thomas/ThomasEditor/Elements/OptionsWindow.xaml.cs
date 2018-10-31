@@ -74,35 +74,35 @@ namespace ThomasEditor
         {
             TextBox text = sender as TextBox;
             int index = (int)text.Tag;
-            Physics.SetCollisionLayer(text.Text, (uint)index, Physics.GetCollisionMask((uint)index));
+            Physics.SetCollisionLayer(text.Text, index, Physics.GetCollisionMask(index));
             GenerateData(false);
         }
 
 
         private void AddLayer_Button_Click(object sender, RoutedEventArgs e)
         {
-            uint count = Physics.GetCollisionLayerCount();
-            Physics.SetCollisionLayer("Collision Layer " + count, count, ~0u);
+            int count = Physics.GetCollisionLayerCount();
+            Physics.SetCollisionLayer("Collision Layer " + count, count, ~0);
             GenerateData();
             ThomasEngine.Application.currentProject.Save();
         }
 
         private void RemoveLayer_Button_Click(object sender, RoutedEventArgs e)
         {
-            uint count = Physics.GetCollisionLayerCount();
-            Physics.SetCollisionLayer("None", count-1, ~0u);
+            int count = Physics.GetCollisionLayerCount();
+            Physics.SetCollisionLayer("None", count-1, ~0);
             GenerateData();
             ThomasEngine.Application.currentProject.Save();
         }
 
         private void SaveMatrix_Button_Click(object sender, RoutedEventArgs e)
         {
-            uint count = Physics.GetCollisionLayerCount();
-            for (uint i = 0; i < count; i++)
+            int count = Physics.GetCollisionLayerCount();
+            for (int i = 0; i < count; i++)
             {
-                DataGridRow gridRow = (DataGridRow)collisionMatrix.ItemContainerGenerator.ContainerFromIndex((int)i);
+                DataGridRow gridRow = (DataGridRow)collisionMatrix.ItemContainerGenerator.ContainerFromIndex(i);
                 object[] row = ((DataRowView)gridRow.Item).Row.ItemArray;
-                for (uint j = 0; j < count - i; j++)
+                for (int j = 0; j < count - i; j++)
                 {
                     bool collide = (bool)row[j + 1];
                     Physics.SetGroupCollisionFlag(i, (count - 1) - j, collide);

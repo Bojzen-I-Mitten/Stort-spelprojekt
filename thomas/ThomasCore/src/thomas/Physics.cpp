@@ -42,7 +42,7 @@ namespace thomas
 		
 		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 
-		SetCollisionLayer("Default", 0, ~0u);
+		SetCollisionLayer("Default", 0, ~0);
 
 		return true;
 	}
@@ -128,7 +128,7 @@ namespace thomas
 		s_world.reset();		
 	}
 
-	bool Physics::Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance, unsigned int layerMask)
+	bool Physics::Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance, int layerMask)
 	{
 		btVector3 start = ToBullet(origin);
 		btVector3 end = ToBullet(origin + direction * maxDistance);
@@ -217,15 +217,15 @@ namespace thomas
 		return (math::Quaternion)quaternion;
 	}
 
-	void Physics::SetCollisionLayer(std::string name, unsigned int group, unsigned int mask)
+	void Physics::SetCollisionLayer(std::string name, int group, int mask)
 	{
 		s_collisionLayers[group].name = name;
 		s_collisionLayers[group].mask = mask;
 	}
 
-	void Physics::SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide)
+	void Physics::SetGroupCollisionFlag(int group1, int group2, bool collide)
 	{
-		unsigned int groupBit = GetCollisionGroupBit(group2);
+		int groupBit = GetCollisionGroupBit(group2);
 		if (collide)
 			utility::setFlag(s_collisionLayers[group1].mask, groupBit);
 		else
@@ -239,24 +239,24 @@ namespace thomas
 		}
 		return -1;
 	}
-	std::string Physics::GetCollisionGroup(unsigned int group)
+	std::string Physics::GetCollisionGroup(int group)
 	{
 		return s_collisionLayers[group].name;
 	}
-	unsigned int Physics::GetCollisionGroupBit(unsigned int group)
+	int Physics::GetCollisionGroupBit(int group)
 	{
-		return 1u << group;
+		return 1 << group;
 	}
-	unsigned int Physics::GetCollisionMask(unsigned int group)
+	int Physics::GetCollisionMask(int group)
 	{
 		return s_collisionLayers[group].mask;
 	}
-	unsigned int Physics::GetCollisionMask(std::string name)
+	int Physics::GetCollisionMask(std::string name)
 	{
 		return s_collisionLayers[GetCollisionGroup(name)].mask;
 	}
 
-	unsigned int Physics::GetCollisionLayerCount()
+	int Physics::GetCollisionLayerCount()
 	{
 		for (int i = 0; i < 32; i++)
 		{

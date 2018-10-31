@@ -8,7 +8,7 @@
 #pragma managed
 namespace ThomasEngine
 {
-	bool Physics::Raycast(Vector3& origin, Vector3& direction, RaycastHit & hitInfo, float maxDistance, unsigned int collisionMask)
+	bool Physics::Raycast(Vector3 origin, Vector3 direction, RaycastHit % hitInfo, float maxDistance, int collisionMask)
 	{
 		thomas::Physics::RaycastHit nativeHitInfo;
 
@@ -26,14 +26,14 @@ namespace ThomasEngine
 		return false;
 	}
 
-	bool Physics::Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo) {
-		return Raycast(origin, direction, hitInfo, FLT_MAX, ~0u);
+	bool Physics::Raycast(Vector3 origin, Vector3 direction, RaycastHit% hitInfo) {
+		return Raycast(origin, direction, hitInfo, 10000, ~0u);
 	}
-	bool Physics::Raycast(Ray& ray, RaycastHit& hitInfo, float maxDistance, unsigned int collisionMask) {
+	bool Physics::Raycast(Ray ray, RaycastHit% hitInfo, float maxDistance, int collisionMask) {
 		return Raycast(ray.Position, ray.Direction, hitInfo, maxDistance, collisionMask);
 	}
-	bool Physics::Raycast(Ray& ray, RaycastHit& hitInfo) {
-		return Raycast(ray, hitInfo, FLT_MAX, ~0u);
+	bool Physics::Raycast(Ray ray, RaycastHit% hitInfo) {
+		return Raycast(ray, hitInfo, 10000, ~0u);
 	}
 
 	List<Layer>^ Physics::GetLayers()
@@ -64,41 +64,41 @@ namespace ThomasEngine
 	}
 
 
-	void Physics::SetCollisionLayer(String ^ name, unsigned int group, unsigned int mask)
+	void Physics::SetCollisionLayer(String ^ name, int group, int mask)
 	{
 		thomas::Physics::SetCollisionLayer(Utility::ConvertString(name), group, mask);
 	}
 
 	//control if group1 collides with with group2
-	void Physics::SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide)
+	void Physics::SetGroupCollisionFlag(int group1, int group2, bool collide)
 	{
 		thomas::Physics::SetGroupCollisionFlag(group1, group2, collide);
 	}
 
 
-	unsigned int Physics::GetCollisionGroup(String^ name) {
+	int Physics::GetCollisionGroup(String^ name) {
 		return thomas::Physics::GetCollisionGroup(Utility::ConvertString(name));
 	}
-	unsigned int Physics::GetCollisionGroupBit(String^ name)
+	int Physics::GetCollisionGroupBit(String^ name)
 	{
 		return thomas::Physics::GetCollisionGroupBit(GetCollisionGroup(name));
 	}
 
-	String^ Physics::GetCollisionGroup(unsigned int group)
+	String^ Physics::GetCollisionGroup(int group)
 	{
 		return Utility::ConvertString(thomas::Physics::GetCollisionGroup(group));
 	}
 
-	unsigned int Physics::GetCollisionMask(unsigned int group)
+	int Physics::GetCollisionMask(int group)
 	{
 		return thomas::Physics::GetCollisionMask(group);
 	}
-	unsigned int Physics::GetCollisionMask(String^ name)
+	int Physics::GetCollisionMask(String^ name)
 	{
 		return thomas::Physics::GetCollisionMask(Utility::ConvertString(name));
 	}
 
-	unsigned int Physics::GetCollisionLayerCount()
+	int Physics::GetCollisionLayerCount()
 	{
 		return thomas::Physics::GetCollisionLayerCount();
 	}
@@ -117,11 +117,11 @@ namespace ThomasEngine
 		array<array<bool>^>^ values = gcnew array<array<bool>^>(thomas::Physics::GetCollisionLayerCount());
 		for (int i = 0; i < values->Length; i++)
 		{
-			unsigned int mask = thomas::Physics::GetCollisionMask(i);
+			int mask = thomas::Physics::GetCollisionMask(i);
 			values[i] = gcnew array<bool>(values->Length);
 			for (int j = 0; j < values->Length; j++)
 			{
-				unsigned int groupBit = thomas::Physics::GetCollisionGroupBit(j);
+				int groupBit = thomas::Physics::GetCollisionGroupBit(j);
 				values[i][j] = thomas::utility::hasFlag(mask, groupBit);
 			}
 		}

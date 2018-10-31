@@ -41,7 +41,7 @@ namespace thomas
 		static void Simulate();
 		static void DrawDebug(object::component::Camera* camera);
 		static void Destroy();
-		static bool Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance = FLT_MAX, unsigned int layerMask=~0);
+		static bool Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance = 10000, int layerMask=~0);
 	private:
 		static void CollisionStarted(btPersistentManifold* const& manifold);
 		static bool CollisionProcessed(btManifoldPoint& cp, void* body0, void* body1);
@@ -61,14 +61,14 @@ namespace thomas
 		static std::unique_ptr<btDiscreteDynamicsWorld> s_world;
 
 	public:
-		static void SetCollisionLayer(std::string name, unsigned int group, unsigned int mask);
-		static void SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide);
+		static void SetCollisionLayer(std::string name, int group, int mask);
+		static void SetGroupCollisionFlag(int group1, int group2, bool collide);
 		static int GetCollisionGroup(std::string name);
-		static std::string GetCollisionGroup(unsigned int group);
-		static unsigned int GetCollisionGroupBit(unsigned int group);
-		static unsigned int GetCollisionMask(unsigned int group);
-		static unsigned int GetCollisionMask(std::string name);
-		static unsigned int GetCollisionLayerCount();
+		static std::string GetCollisionGroup(int group);
+		static int GetCollisionGroupBit(int group);
+		static int GetCollisionMask(int group);
+		static int GetCollisionMask(std::string name);
+		static int GetCollisionLayerCount();
 
 	private:
 		static std::unique_ptr<btDefaultCollisionConfiguration> s_collisionConfiguration;

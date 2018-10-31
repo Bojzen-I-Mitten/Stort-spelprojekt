@@ -15,7 +15,7 @@ namespace ThomasEditor.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Physics.GetCollisionGroup((uint)value);
+            return Physics.GetCollisionGroup((int)value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -48,8 +48,8 @@ namespace thomas
 			bool GetActive();
 			void SetActive(bool active);
 
-			unsigned int GetLayer();
-			void SetLayer(unsigned int layer);
+			int GetLayer();
+			void SetLayer(int layer);
 
 			bool GetDynamic();
 			void SetDynamic();
@@ -84,7 +84,7 @@ namespace thomas
 			bool m_selected;
 			bool m_static;
 			UINT m_GroupID; 
-			unsigned m_layer = 0;
+			int m_layer = 0;
 			static std::vector<GameObject*> s_gameObjects;
 		};
 		

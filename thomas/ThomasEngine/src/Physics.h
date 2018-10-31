@@ -1,6 +1,7 @@
 #pragma once
 
 using namespace System;
+using namespace System::Runtime::InteropServices;
 namespace ThomasEngine
 {
 	ref class Collider;
@@ -16,6 +17,7 @@ namespace ThomasEngine
 		property Vector3 normal;
 		property Vector3 point;
 	};		
+
 
 	[System::Runtime::Serialization::DataContractAttribute]
 	value class Layer
@@ -35,25 +37,25 @@ namespace ThomasEngine
 		static void SetLayers(System::Collections::Generic::List<Layer>^ layers);
 	public:
 
-		static bool Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo, float maxDistance, unsigned int collisionMask);
-		static bool Raycast(Vector3& origin, Vector3& direction, RaycastHit& hitInfo);
-		static bool Raycast(Ray& ray, RaycastHit& hitInfo, float maxDistance, unsigned int collisionMask);
-		static bool Raycast(Ray& ray, RaycastHit& hitInfo);
+		static bool Raycast(Vector3 origin, Vector3 direction, [Out] RaycastHit% hitInfo, float maxDistance, int collisionMask);
+		static bool Raycast(Vector3 origin, Vector3 direction, [Out]RaycastHit% hitInfo);
+		static bool Raycast(Ray ray, [Out] RaycastHit% hitInfo, float maxDistance, int collisionMask);
+		static bool Raycast(Ray ray, [Out] RaycastHit% hitInfo);
 
-		static void SetCollisionLayer(String^ name, unsigned int group, unsigned int mask);
+		static void SetCollisionLayer(String^ name, int group, int mask);
 
 		//control if group1 collides with with group2
-		static void SetGroupCollisionFlag(unsigned int group1, unsigned int group2, bool collide);
+		static void SetGroupCollisionFlag(int group1, int group2, bool collide);
 
-		static unsigned int GetCollisionGroup(String^ name);
-		static unsigned int GetCollisionGroupBit(String^ name);
+		static int GetCollisionGroup(String^ name);
+		static int GetCollisionGroupBit(String^ name);
 
-		static String^ GetCollisionGroup(unsigned int group);
+		static String^ GetCollisionGroup(int group);
 
-		static unsigned int GetCollisionMask(unsigned int group);
-		static unsigned int GetCollisionMask(String^ name);
+		static int GetCollisionMask(int group);
+		static int GetCollisionMask(String^ name);
 
-		static unsigned int GetCollisionLayerCount();
+		static int GetCollisionLayerCount();
 
 		static array<String^>^ GetCollisionLayerNames();
 		static array<array<bool>^>^ GetCollisionLayerValues();
