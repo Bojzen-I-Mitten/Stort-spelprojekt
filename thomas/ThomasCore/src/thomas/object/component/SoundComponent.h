@@ -25,7 +25,7 @@ namespace thomas
 				~SoundComponent() = default;
 
 				virtual void OnDisable() override;
-				void Apply3D(const Vector3& listenerPos, const Vector3& sourcePos);
+				void Apply3D(const Vector3& listenerPos);
 				void Play();
 				void PlayOneShot();
 				void Stop();

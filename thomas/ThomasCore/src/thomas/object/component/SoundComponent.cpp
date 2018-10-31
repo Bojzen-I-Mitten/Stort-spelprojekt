@@ -3,6 +3,8 @@
 #include "../../Sound.h"
 #include "../../resource/AudioClip.h"
 #include "../../ThomasTime.h"
+#include "../GameObject.h"
+
 namespace thomas
 {
 	namespace object
@@ -22,12 +24,13 @@ namespace thomas
 				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
 			}
 
-			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
+			void SoundComponent::Apply3D(const Vector3& listenerPos)
 			{
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
-					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
+					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - 
+										Sound::VolumeTodB((this->m_gameObject->m_transform->GetPosition() - listenerPos).Length());
 					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
 				
 				}
