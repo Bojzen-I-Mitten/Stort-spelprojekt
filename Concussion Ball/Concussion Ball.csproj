@@ -56,6 +56,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ToggleRagdoll.cs" />
+    <Compile Include="Assets\RagdollImpact.cs" />
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Chad\Ball.cs" />
