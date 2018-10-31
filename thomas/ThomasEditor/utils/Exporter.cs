@@ -30,14 +30,21 @@ namespace ThomasEditor.utils
 
             CSharpCodeProvider codeProvider = new CSharpCodeProvider();
             
+            string iconPath = ThomasEngine.Application.currentProject.assetPath + "\\icon.ico";
+            string extraCommands = "";
+            if (System.IO.File.Exists(iconPath))
+                extraCommands += String.Format(@"/win32icon:""{0}""", iconPath);
+
             CompilerParameters parameters = new CompilerParameters();
             parameters.GenerateExecutable = true;
             parameters.IncludeDebugInformation = false;
-            parameters.CompilerOptions = "/optimize+ /platform:x64 /target:exe";
+            parameters.CompilerOptions = @"/optimize+ /platform:x64 /target:exe " + @extraCommands;
             parameters.OutputAssembly = dir + "\\Bin\\" + fileName;
+            
             parameters.ReferencedAssemblies.Add("System.dll");
             parameters.ReferencedAssemblies.Add("ThomasEngine.dll");
             parameters.ReferencedAssemblies.Add("WPF\\WindowsBase.dll");
+            
 
 
             CompilerResults results = codeProvider.CompileAssemblyFromFile(parameters, ThomasEngine.Application.editorAssets + "\\AssemblyFiles\\ExportProject.cs");
@@ -55,7 +62,7 @@ namespace ThomasEditor.utils
             CopyFiles(ThomasEngine.Application.editorAssets, dir + "\\Data");
 
 #if DEBUG
-            File.Copy(project.assembly + "\\Debug\\Assembly.dll", dir + "\\Bin\\Assembly.dll", true);
+            System.IO.File.Copy(project.assembly + "\\Debug\\Assembly.dll", dir + "\\Bin\\Assembly.dll", true);
 #else
             File.Copy(project.assembly + "\\Release\\Assembly.dll", dir + "\\Bin\\Assembly.dll", true);
 #endif
@@ -71,16 +78,8 @@ namespace ThomasEditor.utils
             File.Copy("Newtonsoft.Json.dll", dir + "\\Bin\\Newtonsoft.Json.dll", true);
 
 
-            using (StreamWriter writer = new StreamWriter(dir + "\\" + fileNameNoExe + ".url"))
-            {
-                string app = dir + "\\Bin\\" + fileName;
-                writer.WriteLine("[InternetShortcut]");
-                writer.WriteLine("URL=file:///" + app);
-                writer.WriteLine("IconIndex=0");
-                string icon = app.Replace('\\', '/');
-                writer.WriteLine("IconFile=" + icon);
-                writer.Flush();
-            }
+            CreateShortcut(dir + "\\" + fileNameNoExe + ".lnk", dir + "\\Bin\\" + fileName, dir + "\\Bin");
+
             return true;
         }
 
@@ -95,6 +94,16 @@ namespace ThomasEditor.utils
             foreach (string newPath in Directory.GetFiles(sourceDir, "*.*",
                 SearchOption.AllDirectories))
                 File.Copy(newPath, newPath.Replace(sourceDir, targetDir), true);
+        }
+
+        private static void CreateShortcut(string path, string targetPath, string workingDir)
+        {
+            var shell = new IWshRuntimeLibrary.WshShell();
+            var shortcut = shell.CreateShortcut(path) as IWshRuntimeLibrary.IWshShortcut;
+            shortcut.TargetPath = targetPath;
+            shortcut.WorkingDirectory = workingDir;
+            //shortcut...
+            shortcut.Save();
         }
     }
 }

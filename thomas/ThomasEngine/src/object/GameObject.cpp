@@ -42,10 +42,15 @@ namespace ThomasEngine {
 		ThomasWrapper::CurrentScene->GameObjects->Add(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
-		System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+		if (ThomasWrapper::InEditor())
+			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 
 		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
+	}
+	void GameObject::DestroySelf()
+	{
+		ThomasWrapper::CurrentScene->DestroyObject(this);
 	}
 	bool GameObject::InitComponents(bool playing)
 	{
@@ -152,7 +157,7 @@ namespace ThomasEngine {
 			}
 		}
 		catch (Exception^ e) {
-			Debug::LogError("Updating component failed with exception: " + e->Message);
+			Debug::LogException(e);
 		}
 		finally{
 			Monitor::Exit(m_componentsLock);
@@ -199,6 +204,10 @@ namespace ThomasEngine {
 		}
 		Monitor::Exit(m_componentsLock);
 	}
+	bool GameObject::IsPrefab()
+	{
+		return prefabPath != nullptr && (inScene == false);
+	}
 	/* Delete component
 	*/
 	void deleteComp(GameObject^ obj, Component^ comp)
@@ -231,7 +240,12 @@ namespace ThomasEngine {
 	}
 	void GameObject::Destroy()
 	{
-		throw gcnew System::InvalidOperationException("Not allowed to call destroy on GameObjects...");
+		List<Transform^>^ children = gcnew List<Transform^>(transform->children);
+		for each(Transform^ child in children)
+		{
+			Destroy(child->gameObject);
+		}
+		DestroySelf();
 	}
 
 	bool GameObject::MakeStatic()
@@ -266,7 +280,7 @@ namespace ThomasEngine {
 		}
 		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
-		if (original->prefabPath != nullptr) {
+		if (original->IsPrefab()) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
 		}
 		else
@@ -286,7 +300,6 @@ namespace ThomasEngine {
 		if (clone) {
 			clone->transform->SetParent(nullptr, true);
 			clone->PostInstantiate(ThomasWrapper::CurrentScene);
-			clone->prefabPath = nullptr;
 		}
 			
 		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
@@ -400,7 +413,7 @@ namespace ThomasEngine {
 
 		for (int i = 0; i < gObjs->Count; i++) {
 			if (!gObjs[i]->inScene) {
-				if (!includePrefabs || !gObjs[i]->prefabPath) {
+				if (!includePrefabs || !gObjs[i]->IsPrefab()) {
 					gObjs->RemoveAt(i);
 					i--;
 				}

@@ -25,7 +25,7 @@
 #include "object\component\physics\Rigidbody.h"
 #include "ScriptingManager.h"
 #include "ThomasSelection.h"
-#include "GUI\editor\GUI.h"
+#include "GUI\editor\Gizmos.h"
 #include "object\GameObject.h"
 #include "Debug.h"
 #include "system/SceneManager.h"
@@ -47,8 +47,13 @@ namespace ThomasEngine {
 		return s_SYS->m_scene;
 	}
 
-	void ThomasWrapper::Start() 
+	void ThomasWrapper::Start()
 	{
+		Start(true);
+	}
+	void ThomasWrapper::Start(bool editor) 
+	{
+		inEditor = editor;
 		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
 		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
@@ -67,19 +72,23 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			Model::InitPrimitives();
-			Resources::LoadAll(Application::editorAssets);
+			
+			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
-#ifdef _EDITOR
-			if (true)
-			{
+#if _EDITOR
+
+			if (InEditor()) {
+				Model::InitPrimitives();
+				Resources::LoadAll(Application::editorAssets);
 				ScriptingManager::Init();
 			}
+
+			
 #endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
@@ -90,6 +99,7 @@ namespace ThomasEngine {
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
+
 		}
 	}
 
@@ -149,10 +159,6 @@ namespace ThomasEngine {
 //#ifdef _EDITOR
 //		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
 //#endif
-		for (object::component::Camera* camera : object::component::Camera::s_allCameras)
-		{
-			camera->CopyFrameData();
-		}
 	}
 
 	void TriggerLoad()
@@ -240,7 +246,7 @@ namespace ThomasEngine {
 				
 					
 
-					for (object::component::Camera* camera : object::component::Camera::s_allCameras)
+					for (object::component::Camera* camera : graphics::Renderer::Instance()->getCameraList().getCameras())
 					{
 						camera->Render();
 					}

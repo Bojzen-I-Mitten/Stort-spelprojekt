@@ -7,6 +7,7 @@ using ThomasEngine.Network;
 using LiteNetLib;
 using System.ComponentModel;
 
+[Newtonsoft.Json.JsonObject]
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class Team
 {
@@ -22,6 +23,8 @@ public class Team
     [Browsable(false)]
     public List<NetworkPlayer> Players { get; private set; }
    
+    //public int Score { get { return _Score; } }
+
     public Team(TEAM_TYPE type, string name, Color teamColor)
     {
         Color = teamColor;
@@ -53,10 +56,21 @@ public class Team
                 case TEAM_TYPE.UNASSIGNED:
                 case TEAM_TYPE.TEAM_SPECTATOR:
                     player.gameObject.SetActive(false);
+                    if (player.isOwner)
+                    {
+                        MatchSystem.instance.LocalChad.DeactivateCamera();
+                        MatchSystem.instance.spectatorCamera.enabled = true;
+                    }
                     break;
                 case TEAM_TYPE.TEAM_1:
                 case TEAM_TYPE.TEAM_2:
                     player.gameObject.SetActive(true);
+                    if (player.isOwner)
+                    {
+                        MatchSystem.instance.spectatorCamera.enabled = false;
+                        MatchSystem.instance.LocalChad.ActivateCamera();
+                    }
+                        
                     break;
             }
             player.Reset();

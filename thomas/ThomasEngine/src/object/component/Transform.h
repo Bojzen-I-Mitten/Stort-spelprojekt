@@ -19,7 +19,7 @@ namespace ThomasEngine
 
 		void AddChild(Transform^ child);
 		bool RemoveChild(Transform^ child);
-		Transform^ SwapParent(Transform ^ value);
+		Transform^ SwapParent(Transform ^ value, bool worldPositionStays);
 		void OnParentDestroy(Transform ^ value);
 	public:
 		Transform();
@@ -40,12 +40,14 @@ namespace ThomasEngine
 		{
 			virtual bool get() override { return false; }
 		}
-		[Newtonsoft::Json::JsonIgnoreAttribute]
+		//[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property IEnumerable<Transform^>^ children
 		{
 			IEnumerable<Transform^>^ get();
 		}
+
+		bool ShouldSerializechildren() { return false; }
 		
 	public:	// Serialized properties
 		[Newtonsoft::Json::JsonPropertyAttribute(Order = 1)]

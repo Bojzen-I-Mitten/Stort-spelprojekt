@@ -44,6 +44,7 @@ namespace ThomasEditor
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
             ThomasWrapper.Thomas.SceneManagerRef.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
+            ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
         }
 
         private void Ref_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -476,7 +477,7 @@ namespace ThomasEditor
                     {
                         GameObject sourceData = (GameObject)source.DataContext;
 
-                        if (target != null && sourceData != null && (GameObject)target.DataContext != sourceData)
+                        if (target != null && sourceData != null && target.DataContext is GameObject && (GameObject)target.DataContext != sourceData)
                         {
 
                             GameObject parent = target.DataContext as GameObject;
@@ -536,7 +537,7 @@ namespace ThomasEditor
                     ThomasWrapper.Selection.UnSelectGameObject(gObj);
 
                     //Destroy
-                    gObj.Destroy();
+                    GameObject.Destroy(gObj);
                 }
         }
 

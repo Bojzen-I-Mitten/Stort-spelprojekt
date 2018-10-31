@@ -1,35 +1,25 @@
 #pragma once
 #include "Component.h"
 #include "../../utils/Math.h"
+#include "../../graphics/render/FrameData.h"
 /**
 *Camera class
 */
 namespace thomas
 {
 	namespace utils { struct Ray; }
-	namespace graphics { class Skybox; class GUIManager; }
-
+	namespace graphics { class Skybox; namespace GUI { class Canvas; class GUIElement; } }
+	
 	namespace object
 	{
 		namespace component
 		{
 			class Camera : public Component
 			{
-			public:
-				struct CAMERA_FRAME_DATA
-				{
-					int targetDisplay;
-					math::Viewport viewport;
-					math::Matrix projectionMatrix;
-					math::Matrix viewMatrix;
-					math::Vector4 position;
-				};
 			private:
 				void UpdateProjMatrix();
 
 			public:
-				static std::vector<Camera*> s_allCameras;
-
 				Camera();
 				Camera(bool dontAddTolist);
 				~Camera();
@@ -64,8 +54,6 @@ namespace thomas
 
 				float GetAspectRatio();
 
-				graphics::GUIManager* GetGUIHandle() const;
-
 				void Render();
 				void OnDrawGizmos();
 				void OnDrawGizmosSelected();
@@ -77,10 +65,18 @@ namespace thomas
 				math::BoundingFrustum GetSubFrustrum(math::Rectangle rect);
 
 				void CopyFrameData();
-				CAMERA_FRAME_DATA& GetFrameData();
+				const graphics::render::CAMERA_FRAME_DATA& GetFrameData();
+
+				uint32_t ID();
+
+				graphics::GUI::Canvas* AddCanvas();
+				graphics::GUI::Canvas* AddCanvas(math::Viewport viewport);
+
+				void RenderGUI();
 
 			private:
-				CAMERA_FRAME_DATA m_frameData;
+				uint32_t m_ID;
+				graphics::render::CAMERA_FRAME_DATA m_frameData;
 				math::Matrix m_projMatrix;
 				float m_fov;
 				float m_near;
@@ -89,7 +85,7 @@ namespace thomas
 				bool m_renderGUI;
 				math::Viewport m_viewport;
 				math::BoundingFrustum m_frustrum;
-				std::unique_ptr<graphics::GUIManager> m_GUIHandle;
+				std::vector<std::unique_ptr<graphics::GUI::Canvas>> m_canvases;
 			};
 		}
 	}

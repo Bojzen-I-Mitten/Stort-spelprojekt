@@ -1,6 +1,7 @@
 #include "Serializer.h"
 #include "Converters.h"
 #include "../object/GameObject.h"
+#include "../resource/Material.h"
 #include "../Debug.h"
 
 
@@ -191,6 +192,7 @@ namespace ThomasEngine
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
 			Material^ material = (Material^)serializer->Deserialize(file, Material::typeid);
+			material->m_path = path;
 			rootType = nullptr;
 			file->Close();
 			return material;

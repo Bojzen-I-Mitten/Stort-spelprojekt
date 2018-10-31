@@ -261,7 +261,7 @@ namespace ThomasEditor
         private void Menu_RemoveGameObject(object sender, RoutedEventArgs e)
         {
             var x = sender as MenuItem;
-            (x.DataContext as GameObject).Destroy();
+            GameObject.Destroy((x.DataContext as GameObject));
         }
 
         private void RemoveSelectedGameObjects_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -275,7 +275,7 @@ namespace ThomasEditor
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
                 ThomasWrapper.Selection.UnSelectGameObject(gObj);
-                ThomasWrapper.CurrentScene.DestroyObject(gObj);
+                ThomasEngine.Object.Destroy(gObj);
             }
         }
 
@@ -642,8 +642,8 @@ namespace ThomasEditor
             saveFileDialog.Filter = "Executable (*.exe) |*.exe";
 
 
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
+            //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            saveFileDialog.RestoreDirectory = false;
             saveFileDialog.FileName = project.name;
 
             if (saveFileDialog.ShowDialog() == true)
@@ -669,8 +669,8 @@ namespace ThomasEditor
             saveFileDialog.Filter = "Executable (*.exe) |*.exe";
 
 
-            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = true;
+            //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            saveFileDialog.RestoreDirectory = false;
             saveFileDialog.FileName = project.name;
 
             if (saveFileDialog.ShowDialog() == true)
@@ -681,7 +681,13 @@ namespace ThomasEditor
                     string fileName = System.IO.Path.GetFileName(saveFileDialog.FileName);
                     string dir = System.IO.Path.GetDirectoryName(saveFileDialog.FileName);
                     if (utils.Exporter.ExportProject(saveFileDialog.FileName, project))
-                        System.Diagnostics.Process.Start(dir + "\\Bin\\" + fileName);
+                    {
+                        System.Diagnostics.Process pr = new System.Diagnostics.Process();
+                        pr.StartInfo.FileName = dir + "\\Bin\\" + fileName;
+                        pr.StartInfo.WorkingDirectory = dir + "\\Bin";
+                        pr.Start();
+                    }
+
                     hideBusyIndicator();
                     
                 }));

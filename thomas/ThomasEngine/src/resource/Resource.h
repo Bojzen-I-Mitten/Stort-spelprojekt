@@ -16,7 +16,7 @@ namespace ThomasEngine
 	internal:
 		thomas::resource::Resource* m_nativePtr;
 
-		[DataMemberAttribute(Order = 0)]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property System::String^ asset_path {
 			System::String^ get() { return GetAssetRelativePath(); }
 			void set(System::String^ value);
