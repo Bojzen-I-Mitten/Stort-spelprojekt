@@ -7,6 +7,7 @@
 #include "Shader.h"
 #include "Animation.h"
 #include "texture\Texture2D.h"
+#include "texture\TextureCube.h"
 #include "Resources.h"
 #include "../Scene.h"
 #include "../Application.h"
@@ -131,6 +132,10 @@ namespace ThomasEngine
 			{
 				return AssetTypes::TEXTURE2D;
 			}
+			else if (extension == "dds")
+			{
+				return AssetTypes::TEXTURE3D;
+			}
 			else if (extension == "prefab")
 				return AssetTypes::PREFAB;
 			else if (extension == "spritefont")
@@ -213,6 +218,9 @@ namespace ThomasEngine
 						break;
 					case AssetTypes::TEXTURE2D:
 						obj = gcnew Texture2D(path);
+						break;
+					case AssetTypes::TEXTURE3D:
+						obj = gcnew TextureCube(path);
 						break;
 					case AssetTypes::SCENE:
 						break;

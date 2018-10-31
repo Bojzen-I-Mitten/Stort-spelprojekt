@@ -13,6 +13,7 @@
 *.blend*
 *.prefab
 *.mat
+*.dds
 
 Models/
 

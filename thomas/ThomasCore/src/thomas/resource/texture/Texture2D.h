@@ -12,7 +12,6 @@ namespace thomas
 		{
 		private:
 			void LoadTextureFromFile(std::string path);
-		
 		public:
 			static void Init();
 			static void Destroy();
@@ -23,7 +22,7 @@ namespace thomas
 
 			void OnChanged();
 			std::vector<math::Color> GetPixels();
-			byte* GetRawRGBAPixels();
+			//byte* GetRawRGBAPixels();
 			byte* GetRawBGRAPixels();
 
 			//bool ChangeFormat(DXGI_FORMAT format);
@@ -40,7 +39,6 @@ namespace thomas
 			static Texture2D* s_blackTexture;
 			static Texture2D* s_whiteTexture;
 			static Texture2D* s_normalTexture;
-
 		};
 	}
 }
