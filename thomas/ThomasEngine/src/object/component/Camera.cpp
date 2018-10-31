@@ -10,6 +10,10 @@
 #include "../../GUI/game/GUIElements.h"
 #include "../../math/Viewport.h"
 
+#include "../../resource/texture/Texture2D.h"
+#include "../../resource/texture/TextureCube.h"
+#include "../../resource/Resources.h"
+
 namespace ThomasEngine
 {
 	Camera::Camera() : Component(new thomas::object::component::Camera()) { renderGUI = true; }
@@ -36,6 +40,23 @@ namespace ThomasEngine
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
 
+	TextureCube^ Camera::SkyMap::get() 
+	{ 
+		ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(camera->GetSkyMap());
+		if (res)
+			return (ThomasEngine::TextureCube^)res;
+		else
+			return gcnew ThomasEngine::TextureCube(camera->GetSkyMap());
+	}
+	void Camera::SkyMap::set(TextureCube^ value)
+	{
+		if (value == nullptr)
+			return;
+
+		camera->SetSkyMap((thomas::resource::TextureCube*)value->m_nativePtr);
+	}
+
+	//-------------------------------------------------------------------
 	Viewport Camera::viewport::get()
 	{
 		return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->GetViewport());
