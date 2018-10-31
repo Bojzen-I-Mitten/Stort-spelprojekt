@@ -265,7 +265,7 @@ namespace ThomasEngine.Network
         #endregion
 
         public override void Update()
-        {
+        { 
             if (NetManager.IsRunning)
             {
                 NetManager.UpdateTime = (1000 / TICK_RATE);

@@ -63,6 +63,8 @@
     <ClCompile Include="src\GUI\game\GUIElements.cpp" />
     <ClCompile Include="src\GUI\game\Canvas.cpp" />
     <ClCompile Include="src\math\Viewport.cpp" />
+    <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
+    <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -129,6 +131,8 @@
     <ClInclude Include="src\GUI\game\GUIElements.h" />
     <ClInclude Include="src\GUI\game\Canvas.h" />
     <ClInclude Include="src\math\Viewport.h" />
+    <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
+    <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

@@ -3,18 +3,18 @@
 #include <Windows.h>
 #include "ProfileManager.h"
 
-
-
 namespace thomas
 {
 	namespace utils
 	{
-		enum class type
-		{
-			render, logic, animation, light
-		};
+
 		namespace profiling
 		{
+			enum class type
+			{
+				render, logic, animation, light, GPU
+			};
+
 			class AutoProfile
 			{
 			public:
