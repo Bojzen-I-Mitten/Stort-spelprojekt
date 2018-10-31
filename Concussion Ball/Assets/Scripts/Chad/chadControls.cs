@@ -46,19 +46,16 @@ public class ChadControls : NetworkComponent
     public float CameraSensitivity_x { get; set; } = 10;
     [Category("Camera Settings")]
     public float CameraSensitivity_y { get; set; } = 20;
-    // [Category("Camera Settings")]
-    // public Vector3 CameraOffset { get; set; } = new Vector3(0, 1.8f, 1);
     [Category("Camera Settings")]
     public float CameraMaxVertDegrees { get; set; } = 60;
     [Category("Camera Settings")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
-    // [Category("Camera Settings")]
-    // public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(0.8f, 1.6f, 0.8f);
     [Category("Camera Settings")]
     public float TotalYStep { get; private set; } = 0;
     [Category("Camera Settings")]
     public float TotalXStep { get; private set; } = 0;
 
+    // Camera positions
     private Vector3 CameraOffset = new Vector3(0, 1.8f, 1.5f);
     private Vector3 CameraOffsetThrowing = new Vector3(0.8f, 1.6f, 0.8f);
     #endregion
