@@ -3,6 +3,8 @@
 #pragma unmanaged
 
 #include <stdint.h>
+#include <thomas/utils/atomic/SyncronizedList.h>
+#include <thomas/ThomasCore.h>
 
 #pragma managed
 
@@ -22,6 +24,7 @@ namespace ThomasEngine {
 		System::Collections::ObjectModel::ObservableCollection<GameObject^>^ m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
+		//thomas::utils::atomics::SynchronizedList< GameObject^>* m_list;
 
 		Scene(uint32_t unique_id);
 
@@ -36,6 +39,7 @@ namespace ThomasEngine {
 
 		void OnPlay();
 
+		void CreateObject(GameObject^ object);
 		void DestroyObject(GameObject^ object);
 
 		void InitGameObjects(bool playing);
@@ -97,7 +101,7 @@ namespace ThomasEngine {
 		void EnsureLoad();
 		void PostLoad();
 
-	public:
+	private:
 	};
 }
 
