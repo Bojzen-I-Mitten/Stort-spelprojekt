@@ -13,9 +13,13 @@ namespace ThomasEngine
 
 	void GUIElement::scale::set(Vector2 scale) { nativePtr->scale = Utility::Convert(scale); }
 
+	Vector2 GUIElement::scale::get() { return Utility::Convert(nativePtr->scale); }
+
 	void GUIElement::origin::set(Vector2 origin) { nativePtr->origin = Utility::Convert(origin); }
 
-	void GUIElement::color::set(Vector4 color) { nativePtr->color = Utility::Convert(color); }
+	void GUIElement::color::set(Color color) { nativePtr->color = Utility::Convert(color); }
+
+	Color GUIElement::color::get() { return Color(Utility::Convert(nativePtr->color)); }
 
 	void GUIElement::rotation::set(float rotation) { nativePtr->rotation = rotation; }
 

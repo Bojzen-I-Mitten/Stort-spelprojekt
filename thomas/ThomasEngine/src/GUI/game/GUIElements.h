@@ -25,14 +25,16 @@ namespace ThomasEngine
 		property Vector2 scale
 		{
 			void set(Vector2 scale);
+			Vector2 get();
 		}
 		property Vector2 origin
 		{
 			void set(Vector2 origin);
 		}
-		property Vector4 color
+		property Color color
 		{
-			void set(Vector4 color);
+			void set(Color color);
+			Color get();
 		}
 		property float rotation
 		{

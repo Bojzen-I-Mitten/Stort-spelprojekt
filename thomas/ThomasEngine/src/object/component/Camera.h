@@ -89,6 +89,7 @@ namespace ThomasEngine
 		}*/
 
 	public:
+		Vector3 WorldToViewport(Vector3 position, Matrix world);
 		Canvas^ AddCanvas();
 		Canvas^ AddCanvas(Viewport viewport);
 	};

@@ -74,6 +74,7 @@ namespace thomas
 
 				void RenderGUI();
 
+				math::Vector3 WorldToViewport(math::Vector3 position, math::Matrix world);
 			private:
 				uint32_t m_ID;
 				graphics::render::CAMERA_FRAME_DATA m_frameData;

@@ -41,6 +41,10 @@ namespace ThomasEngine
 		return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->GetViewport());
 	}
 
+	Vector3 Camera::WorldToViewport(Vector3 position, Matrix world)
+	{
+		return Utility::Convert(((thomas::object::component::Camera*)nativePtr)->WorldToViewport(Utility::Convert(position), Utility::Convert(world)));
+	}
 	Canvas^ Camera::AddCanvas() { return gcnew Canvas(this); }
 	Canvas^ Camera::AddCanvas(Viewport viewport) { return gcnew Canvas(this, viewport); }
 }
