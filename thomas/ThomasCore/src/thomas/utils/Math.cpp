@@ -134,8 +134,8 @@ namespace DirectX
 		Vector3 SphericalCoordinate(float phi, float theta, float radius)
 		{
 			float xAngle = sin(theta) * cos(phi);
-			float yAngle = sin(theta) * sin(phi);
-			float zAngle = cos(theta);
+			float yAngle = cos(theta);
+			float zAngle = sin(theta) * sin(phi); 
 
 			return Vector3(xAngle, yAngle, zAngle) * radius;
 		}

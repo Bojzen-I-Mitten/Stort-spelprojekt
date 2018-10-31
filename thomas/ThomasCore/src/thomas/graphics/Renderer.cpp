@@ -174,6 +174,12 @@ namespace thomas
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				BindCamera(perCameraQueue.second.m_frameData);
+
+				// Skyboxes should be submitted!
+				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+				if (camera && camera->hasSkybox())
+					camera->DrawSkyBox();
+				// Draw objects
 				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
 					auto material = perMaterialQueue.first;

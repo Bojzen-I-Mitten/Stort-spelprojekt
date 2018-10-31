@@ -57,7 +57,7 @@ namespace thomas
 					});
 				}
 			}
-			const util::atomics::SynchronizedList<object::component::Camera*>& CameraList::getCameras() const
+			const utils::atomics::SynchronizedList<object::component::Camera*>& CameraList::getCameras() const
 			{
 				return m_sysCamera;
 			}

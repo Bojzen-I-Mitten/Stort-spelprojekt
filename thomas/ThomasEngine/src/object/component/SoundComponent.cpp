@@ -76,6 +76,16 @@ namespace ThomasEngine
 		return sound->GetVolume(); 
 	}
 
+	void SoundComponent::VolumeFactor::set(float value)
+	{
+		sound->SetVolumeFactor(value);
+	}
+
+	float SoundComponent::VolumeFactor::get()
+	{
+		return sound->GetVolumeFactor();
+	}
+
 	void SoundComponent::Looping::set(bool value) 
 	{ 
 		sound->SetLooping(value); 
