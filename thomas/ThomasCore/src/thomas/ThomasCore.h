@@ -13,9 +13,17 @@ namespace thomas
 
 	namespace resource {
 		class MemoryAllocation;
+
 	}
 	namespace utils {
 		class ThreadMap;
+	}
+	namespace utility
+	{
+		namespace allocator
+		{
+			class StackAllocator;
+		}
 	}
 	class ThomasCore
 	{
@@ -41,6 +49,7 @@ namespace thomas
 		/* Get index of executing thread. Should preferably 'not' be used in non-debug code.
 		*/
 		uint32_t Thread_Index();
+		thomas::utility::allocator::StackAllocator & MemStack();
 		void OnStop();
 		void OnPlay();
 

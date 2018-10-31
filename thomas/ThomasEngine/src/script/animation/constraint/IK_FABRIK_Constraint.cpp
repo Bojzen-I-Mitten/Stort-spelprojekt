@@ -17,7 +17,7 @@ namespace ThomasEngine
 	namespace Script
 	{
 		IK_FABRIK_Constraint::IK_FABRIK_Constraint(uint32_t num_link)
-			: m_num_link(num_link), m_ptr(new thomas::graphics::animation::IK_FABRIK_Constraint(num_link))
+			: m_num_link(num_link), m_ptr(new thomas::graphics::animation::IK_FABRIK_C_Constraint(num_link))
 		{
 		}
 
@@ -45,7 +45,7 @@ namespace ThomasEngine
 		void IK_FABRIK_Constraint::Weight::set(float w) {
 			m_ptr->m_weight = w;
 		}
-		thomas::graphics::animation::IK_FABRIK_Constraint* IK_FABRIK_Constraint::Native()
+		thomas::graphics::animation::IK_FABRIK_C_Constraint* IK_FABRIK_Constraint::Native()
 		{
 			return m_ptr;
 		}
@@ -77,11 +77,11 @@ namespace ThomasEngine
 			assert(m_num_link != 0);
 			thomas::graphics::animation::IBlendTree* tree = skinn->GetBlendTree();
 			uint32_t joint_index = boneIndex;
-			m_ptr->setLinkAtIndex(m_num_link - 1, thomas::graphics::animation::IK_FABRIK_Constraint::LinkParameter(
+			m_ptr->setLinkAtIndex(m_num_link - 1, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
 				joint_index));
 			for (uint32_t i = m_num_link - 1; i-- > 0;) {
 				joint_index = tree->getBoneInfo(joint_index)._parentIndex;
-				m_ptr->setLinkAtIndex(i, thomas::graphics::animation::IK_FABRIK_Constraint::LinkParameter(
+				m_ptr->setLinkAtIndex(i, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
 					joint_index));
 			}
 			skinn->GetBlendTree()->addConstraint(m_ptr, boneIndex);
