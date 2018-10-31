@@ -186,11 +186,11 @@ namespace thomas
 			}
 		}
 
-		int GameObject::GetLayer()
+		unsigned int GameObject::GetLayer()
 		{
 			return m_layer;
 		}
-		void GameObject::SetLayer(int layer)
+		void GameObject::SetLayer(unsigned int layer)
 		{
 			m_layer = layer;
 		}
