@@ -27,7 +27,7 @@ public class Ball : PickupableObject
         m_throwable = true;
         DropOnRagdoll = true;
 
-        m_rigidBody.Damping = 0.5f;
+        // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();

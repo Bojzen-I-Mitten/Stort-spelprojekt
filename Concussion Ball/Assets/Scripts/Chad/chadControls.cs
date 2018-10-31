@@ -267,6 +267,7 @@ public class ChadControls : NetworkComponent
                 }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
                 {
+                    //Debug.Log("BIG MEME BOIS");
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
@@ -281,10 +282,6 @@ public class ChadControls : NetworkComponent
                     ResetCamera();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
-                //else if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
-                //{
-                    
-                //}
                 else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
                 {
                     ChargeObject();
@@ -308,7 +305,6 @@ public class ChadControls : NetworkComponent
             float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
             Direction.y = xStep;
-            // Debug.Log(State);
             if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING) || State == STATE.DIVING || State == STATE.CHADING)
             {
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
@@ -515,15 +511,20 @@ public class ChadControls : NetworkComponent
         if (Camera)
             Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
+        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;
+
         yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
-        ThrowObject();
+        ThrowObject(chosenDirection);
 
         yield return new WaitForSeconds(1.0f);
-
-        State = STATE.CHADING;
-        ResetCamera();
-        Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+        if(State != STATE.RAGDOLL)
+        {
+            State = STATE.CHADING;
+            ResetCamera();
+            Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+        }
+        
         Throwing = null;
     }
 
@@ -541,9 +542,9 @@ public class ChadControls : NetworkComponent
         ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
     }
 
-    private void ThrowObject()
+    private void ThrowObject(Vector3 direction)
     {
-        PickedUpObject.Throw(Camera.transform.forward * ThrowForce);
+        PickedUpObject.Throw(direction);
     }
 
     public void RPCPickup(int id)
