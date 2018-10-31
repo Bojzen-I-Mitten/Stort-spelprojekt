@@ -125,7 +125,7 @@ public class ChadHud : ScriptComponent
             Announcement2.position = text2Pos;
 
             Color c = GetRainbowColor(time, 0.5f);
-            Color c2 = GetRainbowColor(time + 1.0f, 0.5f);
+            Color c2 = GetRainbowColor(time, 0.5f);
             Announcement2.color = c.ToVector4();
 
             if (showBG)
