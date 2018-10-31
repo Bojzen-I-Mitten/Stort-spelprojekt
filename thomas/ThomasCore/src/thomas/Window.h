@@ -12,14 +12,13 @@ namespace thomas
 		struct DXBuffers
 		{
 			//Buffer pointers to render targets 3D rendering and GUI
-			ID3D11Texture2D* buffer[2] = { nullptr, nullptr };
+			ID3D11Texture2D* buffer = nullptr;
 
-			ID3D11BlendState* blendState[2] = { nullptr, nullptr };
-			ID3D11RenderTargetView* RTV[2] = { nullptr, nullptr };
-			ID3D11ShaderResourceView* SRV[2] = { nullptr, nullptr };
+			ID3D11RenderTargetView* RTV = nullptr;
+			ID3D11ShaderResourceView* SRV = nullptr;
 			ID3D11DepthStencilState* depthStencilState = nullptr;
-			ID3D11DepthStencilView* depthStencilView[2] = { nullptr, nullptr };
-			ID3D11DepthStencilView* depthStencilViewReadOnly[2] = { nullptr, nullptr };
+			ID3D11DepthStencilView* depthStencilView = nullptr;
+			ID3D11DepthStencilView* depthStencilViewReadOnly = nullptr;
 
 
 			//Buffer pointer to swapChain back buffer
