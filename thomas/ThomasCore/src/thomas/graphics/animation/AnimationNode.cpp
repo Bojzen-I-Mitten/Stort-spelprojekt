@@ -5,10 +5,15 @@
 namespace thomas {
 	namespace graphics {
 		namespace animation {
-
 			AnimationNode::AnimationNode(Skeleton &ref)
+				: AnimationNode(ref, ref.getNumBones())
+			{
+			}
+
+			AnimationNode::AnimationNode(Skeleton & ref, uint32_t mappingReserve)
 				: m_ref(ref), m_flag(0), m_boneMapping()
 			{
+				m_boneMapping.reserve(mappingReserve);	// Reserve to the number of bones
 				/*
 				// Set all bones to 'inactive' initially.
 				for (size_t i = 0; i < m_boneMapping.size(); i++)
@@ -19,6 +24,10 @@ namespace thomas {
 
 			AnimationNode::~AnimationNode()
 			{
+			}
+			uint32_t AnimationNode::NumChannel()
+			{
+				return (uint32_t)m_boneMapping.size();
 			}
 
 			math::Matrix AnimationNode::calcLocalTransform(unsigned int bone)

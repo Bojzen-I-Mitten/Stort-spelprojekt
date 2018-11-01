@@ -69,8 +69,11 @@ namespace ThomasEngine
 
 		void BoneSyncComponent::OnParentDestroy(GameObject ^ relative)
 		{
-			if (m_skeletonSrc == relative) 
+			if (m_skeletonSrc == relative)
+			{
 				m_skeletonSrc = nullptr;
+				m_updateSrc = nullptr;
+			}
 		}
 
 		void BoneSyncComponent::Awake()

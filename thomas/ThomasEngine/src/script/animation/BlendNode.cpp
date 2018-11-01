@@ -18,7 +18,6 @@ namespace ThomasEngine
 	{
 		BlendNode::BlendNode(Model ^ model)
 		{
-
 			thomas::resource::Model *m = (thomas::resource::Model*)model->m_nativePtr;
 			thomas::graphics::animation::Skeleton *skel = m->GetSkeleton();
 			if(!skel)
@@ -27,6 +26,9 @@ namespace ThomasEngine
 					Utility::ConvertString(m->GetName()));
 			// Construct wrapped node
 			this->m_node = new thomas::graphics::animation::AnimBlender(*skel);
+
+			m_weightHandle = gcnew WeightHandle(thomas::MAX_ANIMATION_BLEND_NODE);
+			m_node->setWeightMixer(m_weightHandle->Mixer());
 		}
 
 		BlendNode::~BlendNode()
@@ -37,7 +39,8 @@ namespace ThomasEngine
 		void BlendNode::appendNode(Animation ^ anim, bool loop)
 		{
 			using namespace thomas::graphics::animation;
-			if (!anim->Native()->HasAnimation()) {
+			if (!anim->Native()->HasAnimation()) 
+			{
 				Debug::Log("Failed to add BlendNode: Anim is null with name: " + anim->Name);
 				return;
 			}
@@ -67,9 +70,12 @@ namespace ThomasEngine
 
 		WeightHandle ^ BlendNode::generateWeightHandle()
 		{
-			WeightHandle^ handle = gcnew WeightHandle(m_node->NumChannel());
-			m_node->setWeightMixer(handle->Mixer());
-			return handle;
+			return m_weightHandle;
+		}
+
+		WeightHandle ^ BlendNode::getWeightHandle()
+		{
+			return m_weightHandle;
 		}
 
 		thomas::graphics::animation::AnimationNode * BlendNode::Native()

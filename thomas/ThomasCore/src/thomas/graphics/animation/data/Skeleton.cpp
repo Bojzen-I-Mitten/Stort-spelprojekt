@@ -6,7 +6,7 @@ namespace thomas {
 		namespace animation {
 
 			Skeleton::Skeleton(std::vector<Bone> &m_boneInfo, std::vector<TransformComponents> &bindPose, math::Matrix root)
-				: m_bones(m_boneInfo), m_components(std::move(bindPose)), m_root(root)
+				: m_bones(m_boneInfo), m_components(std::move(bindPose)), m_root(root), m_emptyNode(*this)
 			{
 			}
 
@@ -55,6 +55,10 @@ namespace thomas {
 			math::Matrix Skeleton::getRoot()
 			{
 				return m_root;
+			}
+			EmptyPlayback * Skeleton::nullPlayback()
+			{
+				return &m_emptyNode;
 			}
 		}
 	}

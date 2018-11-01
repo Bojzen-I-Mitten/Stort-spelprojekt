@@ -5,6 +5,7 @@
 #include "Bone.h"
 #include "AnimationData.h"
 #include "TransformComponents.h"
+#include "../playback/EmptyPlayback.h"
 
 namespace thomas {
 	namespace graphics {
@@ -19,7 +20,7 @@ namespace thomas {
 				std::vector<Bone> m_bones;
 				std::vector<TransformComponents> m_components;
 				math::Matrix m_root;
-
+				EmptyPlayback m_emptyNode;	// Empty playback node
 			public:
 				Skeleton(std::vector<Bone> &m_boneInfo, std::vector<TransformComponents> &bindPose, math::Matrix root);
 				~Skeleton();
@@ -45,6 +46,7 @@ namespace thomas {
 				/* Get root transform
 				*/
 				math::Matrix getRoot();
+				EmptyPlayback* nullPlayback();
 			};
 		}
 	}

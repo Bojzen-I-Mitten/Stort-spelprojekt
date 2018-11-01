@@ -37,13 +37,15 @@ namespace ThomasEngine
 			m_playController = new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once);
 			std::unique_ptr<Playback> playback(m_playController);
 			m_node = new AnimPlayback(*skel, playback, *data);
+
+			m_timeHandle = gcnew PlaybackHandle(m_playController);
 		}
 		PlaybackNode::~PlaybackNode()
 		{
 		}
 		PlaybackHandle ^ PlaybackNode::getTimeHandle()
 		{
-			return gcnew PlaybackHandle(m_playController);
+			return m_timeHandle;
 		}
 		thomas::graphics::animation::AnimationNode * PlaybackNode::Native()
 		{

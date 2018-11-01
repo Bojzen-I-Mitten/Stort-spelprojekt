@@ -28,12 +28,15 @@ namespace ThomasEngine
 
 			void generateLinearMixer(float durationPerNode);
 			/* Finalize blending node by generating a weight handle. */
-			WeightHandle^ generateWeightHandle();
+			WeightHandle^ generateWeightHandle();	// Deprecated, support mode only
+
+			WeightHandle^ getWeightHandle();
 
 			
 		private:
 
 			thomas::graphics::animation::AnimBlender* m_node;
+			WeightHandle^ m_weightHandle;
 
 		};
 	}

@@ -11,6 +11,8 @@ namespace ThomasEngine
 {
 	ref class Model;
 	ref class Animation;
+	ref class PlaybackHandle;
+
 	namespace Script
 	{
 
@@ -33,6 +35,7 @@ namespace ThomasEngine
 
 			thomas::graphics::animation::BaseAnimationTime * m_playController;
 			thomas::graphics::animation::AnimPlayback* m_node;
+			PlaybackHandle^ m_timeHandle;
 		};
 
 	}

@@ -1,16 +1,23 @@
 #include "AnimBlender.h"
+#include "../../utils/Utility.h"
+#include "../../Common.h"
 #include "data/Skeleton.h"
 #include "WeightMixer.h"
 #include "../../ThomasCore.h"
 #include "../../resource/MemoryAllocation.h"
-#include "../../utils/Utility.h"
 
 namespace thomas {
 	namespace graphics {
 		namespace animation {
-			AnimBlender::AnimBlender(Skeleton & skel)
-				: AnimationNode(skel), m_NumNode(0), m_weights()
+			AnimBlender::AnimBlender(Skeleton& skel)
+				: AnimBlender(skel, 0)
 			{
+			}
+			AnimBlender::AnimBlender(Skeleton & skel, uint32_t numBlendedNodes)
+				: AnimationNode(skel), m_NumNode(numBlendedNodes), m_weights()
+			{
+				for (uint32_t i = 0; i < numBlendedNodes; i++)
+					m_nodes[i] = skel.nullPlayback();
 			}
 			AnimBlender::~AnimBlender()
 			{
@@ -52,7 +59,19 @@ namespace thomas {
 
 			void AnimBlender::pushAnimation(AnimationNode * node)
 			{
+				if (m_NumNode >= MAX_ANIMATION_BLEND_NODE)
+				{
+					LOG("Warning! Not possible to push more blend nodes.");
+					return;
+				}
 				m_nodes[m_NumNode++] = node;
+				constructMapping(); // Re-construct
+			}
+
+			void AnimBlender::setAnimation(uint32_t index, AnimationNode * n)
+			{
+				assert(index < m_NumNode);
+				m_nodes[index] = n;
 				constructMapping(); // Re-construct
 			}
 
