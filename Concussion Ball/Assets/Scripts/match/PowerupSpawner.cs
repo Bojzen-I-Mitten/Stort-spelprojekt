@@ -32,7 +32,6 @@ public class PowerupSpawner : NetworkComponent
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
             float test2 = (float)Math.Cos(Time.DeltaTime);
-            Debug.Log(test2);
 
             spawnedPowerup.transform.position = pos + new Vector3(0, test, 0) / 10;
             spawnedPowerup.transform.localEulerAngles += new Vector3(0, MathHelper.ToDegrees(test2), 0) / 20;
