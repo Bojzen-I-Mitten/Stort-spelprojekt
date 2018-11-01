@@ -67,13 +67,11 @@ namespace thomas
 				void SetCollider(Collider* collider);
 				void SetMass(float mass);
 				void SetCenterOfmass(math::Vector3 Centerofmass);
-
 				void SetBounciness(float bounciness);
 				void SetFriction(float friction);
 				void SetPosition(math::Vector3 position);
 				void SetRotation(math::Quaternion rotation);
 
-				math::Vector3 GetCenterOfmass();
 
 			public:
 				float GetMass() const;
@@ -91,10 +89,9 @@ namespace thomas
 				float GetCcdMotionThreshold() const;
 				float GetCcdSweptSphereRadius() const;
 				ActivationState GetActivationState() const;
-
+				math::Vector3 GetCenterOfmass();
 				float GetBounciness();
 				float GetFriction();
-
 			private:
 				void UpdateRigidbodyMass();
 				void UpdateProperties();

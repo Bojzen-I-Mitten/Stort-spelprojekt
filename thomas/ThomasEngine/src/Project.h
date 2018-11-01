@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Physics.h"
 using namespace System;
 using namespace System::Runtime::Serialization;
 using namespace System::ComponentModel;
@@ -20,6 +20,9 @@ namespace ThomasEngine
 		
 		[DataMemberAttribute]
 		String^ m_relativeCurrentScenePath;
+
+		[DataMemberAttribute]
+		System::Collections::Generic::List<Layer>^ m_layers;
 
 	internal:
 		Project() {};
@@ -44,10 +47,16 @@ namespace ThomasEngine
 			Project^ project = (Project^)serializer->ReadObject(file);
 			file->Close();
 			project->m_path = IO::Path::GetDirectoryName(projectFile);
+
+			if (project)
+				Physics::SetLayers(project->m_layers);
+
 			return project;
 		}
 
 		void Save() {
+			m_layers = Physics::GetLayers();
+
 			DataContractSerializer^ serializer = gcnew DataContractSerializer(Project::typeid);
 			System::IO::FileInfo^ fi = gcnew System::IO::FileInfo(path);
 			fi->Directory->Create();
