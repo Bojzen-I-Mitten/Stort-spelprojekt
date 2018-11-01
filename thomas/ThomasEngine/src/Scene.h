@@ -107,6 +107,9 @@ namespace ThomasEngine {
 		void EnsureLoad();
 		void PostLoad();
 
+		void Subscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler^ func);
+		void Unsubscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler^ func);
+
 	private:
 	};
 }

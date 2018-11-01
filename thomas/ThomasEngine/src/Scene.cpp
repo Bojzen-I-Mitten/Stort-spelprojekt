@@ -97,7 +97,6 @@ namespace ThomasEngine
 
 		if (Application::currentProject && this->RelativeSavePath != path) 
 			this->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
-			m_gameObjects->CollectionChanged
 	}
 
 	void Scene::SaveScene()
@@ -173,6 +172,16 @@ namespace ThomasEngine
 		{
 			gObj->PostLoad(this);
 		}
+	}
+
+	void Scene::Subscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler ^ func)
+	{
+		m_gameObjects->CollectionChanged += func;
+	}
+
+	void Scene::Unsubscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler ^ func)
+	{
+		m_gameObjects->CollectionChanged -= func;
 	}
 
 #pragma endregion

@@ -125,7 +125,7 @@ namespace ThomasEditor
 
         private void SetPropertyToSelection()
         {
-            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+            //Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
             try {
                 if (ResourceList.SelectedItem != null)
                 {
@@ -158,7 +158,7 @@ namespace ThomasEditor
                 Debug.Log("Error at: ThomasEngine::ResourceListPopup with message: " + e.Message);
             }
             finally {
-                Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                //Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
             }
             if(OnPropertyChanged != null)
                 OnPropertyChanged();

@@ -44,7 +44,7 @@ namespace ThomasEditor
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
             ThomasWrapper.Thomas.SceneManagerRef.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
-            ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+            ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
         }
 
         private void Ref_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -55,12 +55,12 @@ namespace ThomasEditor
         private void Scene_OnCurrentSceneChanged(Scene oldScene, Scene newScene)
         {
             if(oldScene != null)
-                oldScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
+             ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Unsubscribe(SceneGameObjectsChanged);
 
             if (newScene != null)
             {
                 ResetTreeView();
-                newScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
             }
 
         }
@@ -610,13 +610,13 @@ namespace ThomasEditor
             if (m_copiedObjects.Count > 0)
             {
                 DetachParent();
-                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
+                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Unsubscribe(SceneGameObjectsChanged);
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
                     GameObject.Instantiate(copiedObject);
                     Debug.Log("Pasted object.");
                 }
-                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
                 ResetTreeView();
                 return;
             }

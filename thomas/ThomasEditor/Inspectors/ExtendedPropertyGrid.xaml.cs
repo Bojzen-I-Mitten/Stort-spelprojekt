@@ -77,10 +77,10 @@ namespace ThomasEditor
                         PropertyItem pi = label.DataContext as PropertyItem;
                         if (resource.GetType() == pi.PropertyType)
                         {
-                            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            //Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                             pi.Value = resource;
 
-                            Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            //Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         }
 
                     }
@@ -91,10 +91,10 @@ namespace ThomasEditor
                         PropertyItem pi = label.DataContext as PropertyItem;
                         if (obj.GetType() == pi.PropertyType)
                         {
-                            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            //Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                             pi.Value = obj;
 
-                            Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            //Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         }else if(obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                         {
                             var method = typeof(GameObject).GetMethod("GetComponent").MakeGenericMethod(pi.PropertyType);
