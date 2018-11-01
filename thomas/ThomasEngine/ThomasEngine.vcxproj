@@ -175,6 +175,7 @@
     <ClInclude Include="src\math\Viewport.h" />
     <ClInclude Include="src\object\component\animation\BoneTransformComponent.h" />
     <ClInclude Include="src\object\component\LightComponent.h" />
+    <ClInclude Include="src\object\component\animation\BoneSyncComponent.h" />
     <ClInclude Include="src\object\component\ParticleEmitter.h" />
     <ClInclude Include="src\object\component\physics\BoxCollider.h" />
     <ClInclude Include="src\object\component\physics\CapsuleCollider.h" />
@@ -241,6 +242,7 @@
     <ClCompile Include="src\math\Viewport.cpp" />
     <ClCompile Include="src\object\component\animation\BoneTransformComponent.cpp" />
     <ClCompile Include="src\object\component\LightComponent.cpp" />
+    <ClCompile Include="src\object\component\animation\BoneSyncComponent.cpp" />
     <ClCompile Include="src\object\component\ParticleEmitter.cpp" />
     <ClCompile Include="src\object\component\physics\BoxCollider.cpp" />
     <ClCompile Include="src\object\component\physics\CapsuleCollider.cpp" />

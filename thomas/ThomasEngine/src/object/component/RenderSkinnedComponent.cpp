@@ -19,11 +19,6 @@ namespace ThomasEngine
 		: Component(new thomas::object::component::RenderSkinnedComponent())
 	{}
 
-	thomas::object::component::RenderSkinnedComponent * RenderSkinnedComponent::get()
-	{
-		return (thomas::object::component::RenderSkinnedComponent*)nativePtr;
-	}
-
 	thomas::object::component::RenderComponent * RenderSkinnedComponent::getNativeRenderComp()
 	{
 		return (thomas::object::component::RenderComponent*)nativePtr;
@@ -89,9 +84,9 @@ namespace ThomasEngine
 	void RenderSkinnedComponent::setBlendTreeNode(thomas::graphics::animation::AnimationNode * node)
 	{
 		if (node == nullptr)
-			get()->GetBlendTree()->clearBlendTree();
+			Native->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			get()->GetBlendTree()->setBlendTree(node);
+			Native->GetBlendTree()->setBlendTree(node);
 		}
 
 	}
@@ -123,7 +118,7 @@ namespace ThomasEngine
 
 	void RenderSkinnedComponent::Update()
 	{
-		get()->Update();
+		Native->Update();
 		/*
 		if (Input::GetKeyDown(Input::Keys::Space)) {
 			thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
@@ -141,11 +136,18 @@ namespace ThomasEngine
 	}
 	Matrix RenderSkinnedComponent::GetLocalBoneMatrix(int boneIndex)
 	{
-		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
-		thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
+		assert(Native->GetBlendTree());
+		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
 		if ((uint32_t)boneIndex < anim->boneCount())
 			return Utility::Convert(anim->getBoneOrientation(boneIndex));
 		else return Matrix::Identity;
+	}
+
+	bool RenderSkinnedComponent::GetBoneIndex(uint32_t boneHash, uint32_t & boneIndex)
+	{
+		assert(Native->GetBlendTree());
+		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
+		return anim->getBoneIndex(boneHash, boneIndex);
 	}
 
 	void RenderSkinnedComponent::applyAnimation()
@@ -154,9 +156,9 @@ namespace ThomasEngine
 		if (!blendTree)
 			return;
 		if (m_anim == nullptr)
-			get()->GetBlendTree()->clearBlendTree();
+			Native->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			get()->GetBlendTree()->playSingle(m_anim->Native());
+			Native->GetBlendTree()->playSingle(m_anim->Native());
 		}
 			
 	}

@@ -175,6 +175,7 @@
     <ClInclude Include="src\thomas\graphics\render\ShaderList.h" />
     <ClInclude Include="src\thomas\graphics\Skybox.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
+    <ClInclude Include="src\thomas\object\component\EmptyComponent.h" />
     <ClInclude Include="src\thomas\object\ObjectHandler.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
     <ClInclude Include="src\thomas\graphics\GUI\Canvas.h" />
