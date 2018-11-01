@@ -11,16 +11,28 @@
 using namespace System::Runtime::Serialization;
 
 namespace ThomasEngine {
+
 	
 	ref class GameObject;
 	[DataContract]
 	public ref class Scene
 	{
 	private:
+		enum class Command
+		{
+			Add,
+			Remove
+		};
+		value struct IssuedCommand
+		{
+			Command m_cmd;
+			GameObject^ m_obj;
+		};
 
 		uint32_t m_uniqueID;
-		System::Object^ m_gameObjectsLock = gcnew System::Object();
 		System::Collections::ObjectModel::ObservableCollection<GameObject^>^ m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
+		System::Object^ m_accessLock = gcnew System::Object();
+		System::Collections::Generic::List<IssuedCommand>^ m_commandList;
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
 		//thomas::utils::atomics::SynchronizedList< GameObject^>* m_list;
@@ -77,24 +89,19 @@ namespace ThomasEngine {
 		}
 
 	public:
-		/* Accessible list of scene game objects
-		*/
-		[IgnoreDataMemberAttribute]
-		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjects {
-			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get();
+
+		property System::Collections::Generic::IEnumerable<GameObject^>^ GameObjects
+		{
+			System::Collections::Generic::IEnumerable<GameObject^>^ get();
 		}
 
 #pragma endregion
 
-		System::Object^ GetGameObjectsLock()
-		{
-			return m_gameObjectsLock;
-		}
-
 		void SaveSceneAs(System::String^ fullPath);
 		void SaveScene();
 
-
+		void Add(GameObject^obj);
+		void Remove(GameObject^obj);
 
 		void UnLoad();
 		void EnsureLoad();

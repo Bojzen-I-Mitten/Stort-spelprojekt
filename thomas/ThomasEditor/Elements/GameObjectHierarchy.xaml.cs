@@ -70,9 +70,8 @@ namespace ThomasEditor
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 m_hierarchyNodes.Clear();
-                for (int i = 0; i < ThomasWrapper.CurrentScene.GameObjects.Count; i++)
+                foreach(GameObject gObj in ThomasWrapper.CurrentScene.GameObjects)
                 {
-                    GameObject gObj = ThomasWrapper.CurrentScene.GameObjects[i];
                     if (gObj.transform.parent == null)
                     {
                         TreeItemViewModel item = new TreeItemViewModel(gObj)

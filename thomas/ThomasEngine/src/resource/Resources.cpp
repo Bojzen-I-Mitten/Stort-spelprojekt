@@ -433,16 +433,11 @@ namespace ThomasEngine
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
-					Object^ lock = ThomasWrapper::CurrentScene->GetGameObjectsLock();
-
-					System::Threading::Monitor::Enter(lock);
 					Resource^ resource = resources[thomasPathOld];
 					resources->Remove(thomasPathOld);
 					resources[thomasPathNew] = resource;
 					if (resource)
 						resource->Rename(newPath);
-
-					System::Threading::Monitor::Exit(lock);
 				}
 			}
 			generic<typename T>

@@ -66,12 +66,9 @@ namespace ThomasEngine
 	void SceneManager::RestartCurrentScene()
 	{
 		// Assert: isLogicThread()
-		Object^ lock = m_current_scene->GetGameObjectsLock();
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), Local_Temp_Copy_Path);
 		
-		Monitor::Enter(lock);
 		m_current_scene->UnLoad();
-		Monitor::Exit(lock);
 
 		Scene^ scene = Scene::LoadScene(tempFile, m_ID_Counter++);
 		m_temporarySwap = true;

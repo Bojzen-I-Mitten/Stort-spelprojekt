@@ -61,6 +61,14 @@ namespace ThomasEngine
 			// Push action
 			m_node->pushAnimation(action->Native());
 		}
+		void BlendNode::setNode(PlaybackNode^ action, uint32_t index)
+		{
+			m_node->setAnimation(index, action->Native());
+		}
+		void BlendNode::setNode(BlendNode^ action, uint32_t index)
+		{
+			m_node->setAnimation(index, action->Native());
+		}
 
 
 		void BlendNode::generateLinearMixer(float durationPerNode)

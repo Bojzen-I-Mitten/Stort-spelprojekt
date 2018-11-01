@@ -25,6 +25,8 @@ namespace ThomasEngine
 			void appendNode(Animation^ anim, bool loop);
 			void appendNode(BlendNode^ action);
 			void appendNode(PlaybackNode^ action);
+			void setNode(PlaybackNode^ action, uint32_t index);
+			void setNode(BlendNode^ action, uint32_t index);
 
 			void generateLinearMixer(float durationPerNode);
 			/* Finalize blending node by generating a weight handle. */

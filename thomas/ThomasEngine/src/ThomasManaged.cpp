@@ -137,14 +137,12 @@ namespace ThomasEngine {
 		// Enter async. state 
 #ifdef _EDITOR
 					// This is only relevant if we are running with editor, should be removed when build
-		for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+		for each(GameObject^ gameObject in CurrentScene->GameObjects)
 		{
-			GameObject^ gameObject = CurrentScene->GameObjects[i];
-
 			if (gameObject->MoveStaticGroup())
 			{
 				// Fetch the adress of where an object might be moved to
-				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+				thomas::object::Object* new_temp = gameObject->nativePtr;
 
 				// Fetch the adress of the object that might be moved
 				thomas::object::Object* old_native = gameObject->moveStaticGroup();
@@ -158,7 +156,7 @@ namespace ThomasEngine {
 
 			else if (gameObject->MakeStatic())
 			{
-				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+				thomas::object::Object* new_temp = gameObject->nativePtr;
 
 				thomas::object::Object* old_native = gameObject->setStatic();
 
@@ -171,7 +169,7 @@ namespace ThomasEngine {
 
 			else if (gameObject->MakeDynamic())
 			{
-				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+				thomas::object::Object* new_temp = gameObject->nativePtr;
 
 				thomas::object::Object* old_native = gameObject->setDynamic();
 
@@ -247,7 +245,7 @@ namespace ThomasEngine {
 			NEW_FRAME();
 			float timeStart = ThomasTime::GetElapsedTime();
 			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
-			Object^ lock = CurrentScene->GetGameObjectsLock();
+			//Object^ lock = CurrentScene->GetGameObjectsLock();
 			try {
 
 				thomas::ThomasTime::Update();
@@ -258,7 +256,7 @@ namespace ThomasEngine {
 
 
 				ThomasCore::Update();
-				Monitor::Enter(lock);
+				//Monitor::Enter(lock);
 
 				CurrentScene->InitGameObjects(IsPlaying());
 
@@ -266,9 +264,8 @@ namespace ThomasEngine {
 				{
 					//Physics
 					thomas::Physics::UpdateRigidbodies();
-					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
-						GameObject^ gameObject = CurrentScene->GameObjects[i];
 						if (gameObject->GetActive())
 							gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
 					}
@@ -276,9 +273,8 @@ namespace ThomasEngine {
 				}
 
 				//Logic
-				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+				for each (GameObject^ gameObject in CurrentScene->GameObjects)
 				{
-					GameObject^ gameObject = CurrentScene->GameObjects[i];
 					if (gameObject->GetActive())
 					{
 						gameObject->Update();
@@ -294,9 +290,9 @@ namespace ThomasEngine {
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-						for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+						
+						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							GameObject^ gameObject = CurrentScene->GameObjects[i];
 							if (gameObject->GetActive())
 								gameObject->RenderGizmos();
 						}
@@ -338,7 +334,7 @@ namespace ThomasEngine {
 
 
 				}
-				Monitor::Exit(lock);
+				//Monitor::Exit(lock);
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));

@@ -37,16 +37,13 @@ namespace ThomasEngine {
 		m_transform = AddComponent<Transform^>();
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
-		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		// Add to scene
-		ThomasWrapper::CurrentScene->GameObjects->Add(this);
+		ThomasWrapper::CurrentScene->Add(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
 		if (ThomasWrapper::InEditor())
 			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
-
-		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 	}
 	void GameObject::DestroySelf()
 	{
@@ -90,7 +87,7 @@ namespace ThomasEngine {
 
 	void GameObject::PostInstantiate(Scene^ scene) {
 		PostLoad(scene);
-		scene->GameObjects->Add(this);
+		scene->Add(this);
 		for each(Transform^ child in m_transform->children)
 			child->gameObject->PostInstantiate(scene);
 	}
@@ -278,7 +275,6 @@ namespace ThomasEngine {
 			Debug::LogError("Object to instantiate is null");
 			return nullptr;
 		}
-		Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		GameObject^ clone = nullptr;
 		if (original->IsPrefab()) {
 			clone = Resources::LoadPrefab(original->prefabPath, true);
@@ -301,8 +297,6 @@ namespace ThomasEngine {
 			clone->transform->SetParent(nullptr, true);
 			clone->PostInstantiate(ThomasWrapper::CurrentScene);
 		}
-			
-		Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		return clone;
 	}
 

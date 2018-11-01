@@ -23,13 +23,13 @@ namespace ThomasEngine
 	:	m_uniqueID(unique_id),
 		m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
 		m_name = name;;
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+		//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
 	Scene::Scene(uint32_t unique_id)
 	:	m_uniqueID(unique_id),
 		m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
 		m_name = "New Scene";
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+		//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
 	Scene::~Scene()
 	{
@@ -41,8 +41,8 @@ namespace ThomasEngine
 		bool completed;
 		do {
 			completed = true;
-			for (int i = 0; i < GameObjects->Count; ++i) {
-				GameObject^ gameObject = GameObjects[i];
+			for (int i = 0; i < m_gameObjects->Count; ++i) {
+				GameObject^ gameObject = m_gameObjects[i];
 				if (gameObject->GetActive())
 					completed = gameObject->InitComponents(playing) && completed;
 			}
@@ -68,9 +68,9 @@ namespace ThomasEngine
 		ThomasWrapper::Selection->UnSelectGameObject(object);
 
 		// Remove object
-		Monitor::Enter(m_gameObjectsLock);
+		Monitor::Enter(m_accessLock);
 		m_gameObjects->Remove(object);
-		Monitor::Exit(m_gameObjectsLock);
+		Monitor::Exit(m_accessLock);
 		// Destroy object
 		object->OnDestroy();
 		delete object;
@@ -79,13 +79,14 @@ namespace ThomasEngine
 
 	void Scene::UnLoad()
 	{
+		Monitor::Enter(m_accessLock);
 		for (int i = 0; i < m_gameObjects->Count; i++)
 		{
 			m_gameObjects[i]->OnDestroy();
 			delete m_gameObjects[i];
 		}
 		m_gameObjects->Clear();
-
+		Monitor::Exit(m_accessLock);
 	}
 
 #pragma region Save scene
@@ -96,13 +97,29 @@ namespace ThomasEngine
 
 		if (Application::currentProject && this->RelativeSavePath != path) 
 			this->m_relativeSavePath = path->Replace(Application::currentProject->assetPath + "\\", "");
-			
+			m_gameObjects->CollectionChanged
 	}
 
 	void Scene::SaveScene()
 	{
 		if(Application::currentProject && this->RelativeSavePath)
 			SaveSceneAs(Application::currentProject->assetPath + "\\" + m_relativeSavePath);
+	}
+
+	void Scene::Add(GameObject ^ obj)
+	{
+		IssuedCommand cmd;
+		cmd.m_cmd = Command::Add;
+		cmd.m_obj = obj;
+		m_commandList->Add(cmd);
+	}
+
+	void Scene::Remove(GameObject ^ obj)
+	{
+		IssuedCommand cmd;
+		cmd.m_cmd = Command::Remove;
+		cmd.m_obj = obj;
+		m_commandList->Add(cmd);
 	}
 
 
@@ -119,8 +136,8 @@ namespace ThomasEngine
 			scene = Serializer::DeserializeScene(fullPath);
 			scene->EnsureLoad();
 
-			for (int i = 0; i < scene->GameObjects->Count; ++i)
-				scene->GameObjects[i]->nativePtr->SetName(Utility::ConvertString(scene->GameObjects[i]->Name));
+			for (int i = 0; i < scene->m_gameObjects->Count; ++i)
+				scene->m_gameObjects[i]->nativePtr->SetName(Utility::ConvertString(scene->m_gameObjects[i]->Name));
 
 			//if (Application::currentProject)
 			//	scene->m_relativeSavePath = fullPath->Replace(Application::currentProject->assetPath + "\\", "");
@@ -143,9 +160,9 @@ namespace ThomasEngine
 
 		if (m_gameObjects == nullptr) { // Scene is empty
 			Debug::LogWarning("Warning, no objects in scene.");
-			m_gameObjectsLock = gcnew Object();
+			m_accessLock = gcnew Object();
 			m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
-			System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+			//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 		}
 
 	}
@@ -182,16 +199,16 @@ namespace ThomasEngine
 		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
 	}
 
+	System::Collections::Generic::IEnumerable<GameObject^>^ Scene::GameObjects::get()
+	{
+		return m_gameObjects;
+	}
 	System::Collections::ObjectModel::ObservableCollection<GameObject^>^ Scene::GameObjectData::get() {
 		return m_gameObjects;
 	}
 	void Scene::GameObjectData::set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val) {
 		m_gameObjects = val;
-		m_gameObjectsLock = gcnew Object();
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
-	}
-	System::Collections::ObjectModel::ObservableCollection<GameObject^>^ Scene::GameObjects::get() {
-		return m_gameObjects;
+		//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
 }
 
