@@ -27,7 +27,16 @@ public class Powerup : PickupableObject
     }
 
     public override void Update()
-    {   
+    {
+        if (spawner)
+        {
+            float test = (float)Math.Sin(Time.ElapsedTime);
+            float test2 = (float)Math.Cos(Time.DeltaTime);
+
+            transform.position += new Vector3(0, test, 0) / 10;
+            transform.localEulerAngles += new Vector3(0, MathHelper.ToDegrees(test2), 0) / 20;
+        }
+
     }
 
     override public void ChargeEffect()
@@ -109,12 +118,11 @@ public class Powerup : PickupableObject
     {
         //transform.enabled = false;
         MatchSystem.instance.PowerupManager.RecyclePowerup(this);
-        /*Drop();
+        Drop();
         if (spawner)
         {
             spawner.Free();
             spawner = null;
         }
-        MatchSystem.instance.RemoveNetworkObject(gameObject);*/
     }
 }

@@ -24,6 +24,7 @@ public class MatchSystem : NetworkManager
     public ChadControls LocalChad;
     public Camera spectatorCamera { get; set; }
 
+
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
     public float lostTime = 0.0f;
@@ -67,6 +68,8 @@ public class MatchSystem : NetworkManager
         Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
     }
+
+  
 
     public override void Start()
     {
