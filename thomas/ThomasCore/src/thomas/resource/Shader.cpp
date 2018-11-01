@@ -340,12 +340,23 @@ namespace thomas
 				m_properties[name] = prop;
 			}
 		}
-		void Shader::SetPropertyTexture2D(const std::string & name, Texture2DArray* value)
+		void Shader::SetPropertyTexture2DArray(const std::string & name, Texture2DArray* value)
 		{
 			if (HasProperty(name))
 			{
 				std::shared_ptr<shaderproperty::ShaderPropertyTexture2DArray> prop(
 					new shaderproperty::ShaderPropertyTexture2DArray(value));
+				prop->SetName(name);
+				m_properties[name] = prop;
+			}
+		}
+
+		void Shader::SetPropertyTextureCube(const std::string & name, TextureCube * value)
+		{
+			if (HasProperty(name))
+			{
+				std::shared_ptr<shaderproperty::ShaderPropertyTextureCube> prop(
+					new shaderproperty::ShaderPropertyTextureCube(value));
 				prop->SetName(name);
 				m_properties[name] = prop;
 			}
@@ -554,6 +565,9 @@ namespace thomas
 
 				case D3D_SVT_TEXTURE2DMS:
 				case D3D_SVT_RWTEXTURE2D:
+				case D3D_SVT_TEXTURECUBE:
+					newProperty = shaderproperty::ShaderPropertyTextureCube::GetDefault();
+					break;
 				case D3D_SVT_TEXTURE2DARRAY:
 					newProperty = shaderproperty::ShaderPropertyTexture2DArray::GetDefault();
 					break;
@@ -562,6 +576,10 @@ namespace thomas
 					if (semantic == "NORMALTEXTURE")
 					{
 						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
+					}
+					else if (semantic == "SPECULARTEXTURE")
+					{
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetBlackTexture());
 					}
 					else
 					{

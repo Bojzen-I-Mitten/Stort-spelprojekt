@@ -38,6 +38,12 @@ namespace ThomasEngine
 			void set(float value);
 		}
 
+		property float VolumeFactor
+		{
+			float get();
+			void set(float value);
+		}
+
 		property bool Looping
 		{
 			bool get();

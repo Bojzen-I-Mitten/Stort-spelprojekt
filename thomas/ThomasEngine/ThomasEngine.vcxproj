@@ -193,6 +193,7 @@
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\texture\Texture.h" />
     <ClInclude Include="src\resource\texture\Texture2D.h" />
+    <ClInclude Include="src\resource\texture\TextureCube.h" />
     <ClInclude Include="src\ScriptingManager.h" />
     <ClInclude Include="src\resource\AudioClip.h" />
     <ClInclude Include="src\resource\Resources.h" />

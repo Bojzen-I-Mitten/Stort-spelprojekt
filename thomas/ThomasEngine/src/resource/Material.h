@@ -75,6 +75,8 @@ namespace ThomasEngine
 		{
 			Material^ get();
 		}
+
+		void SetRenderQueue(int value) { ((thomas::resource::Material*)m_nativePtr)->m_renderQueue = value; }
 		
 		void SetShaderPassEnabled(int index, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(index, enabled); }
 		void SetShaderPassEnabled(std::string name, bool enabled) { ((thomas::resource::Material*)m_nativePtr)->SetShaderPassEnabled(name, enabled); }

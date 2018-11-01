@@ -8,8 +8,9 @@
 namespace thomas
 {
 	namespace utils { struct Ray; }
-	namespace graphics { class Skybox; namespace GUI { class Canvas; class GUIElement; } }
-	
+	namespace graphics { class SkyBox; namespace GUI { class Canvas; class GUIElement; }}
+	namespace resource { class TextureCube; }
+
 	namespace object
 	{
 		namespace component
@@ -74,6 +75,11 @@ namespace thomas
 
 				void RenderGUI();
 
+				void SetSkyMap(resource::TextureCube* tex);
+				resource::TextureCube* GetSkyMap();
+				void DrawSkyBox();
+				bool hasSkybox();
+				math::Vector3 WorldToViewport(math::Vector3 position, math::Matrix world);
 			private:
 				uint32_t m_ID;
 				graphics::render::CAMERA_FRAME_DATA m_frameData;
@@ -86,6 +92,9 @@ namespace thomas
 				math::Viewport m_viewport;
 				math::BoundingFrustum m_frustrum;
 				std::vector<std::unique_ptr<graphics::GUI::Canvas>> m_canvases;
+				
+
+				std::unique_ptr<graphics::SkyBox> m_skybox;
 			};
 		}
 	}

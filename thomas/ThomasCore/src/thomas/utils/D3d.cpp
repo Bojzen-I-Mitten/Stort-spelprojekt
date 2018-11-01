@@ -457,6 +457,7 @@ namespace thomas
 
 			return true;
 		}
+		
 
 		bool D3D::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{

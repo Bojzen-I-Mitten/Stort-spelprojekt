@@ -169,6 +169,7 @@ namespace thomas
 			skelConstruct.m_Commands.m_IgnoreLeafChains = false;
 
 			skelConstruct.m_rootID.insert("mixamorig:hips"); //TODO: is this a hack?
+			skelConstruct.m_rootID.insert("mixamorig_hips"); //TODO: is this a hack?
 
 
 			const aiScene* scene = LoadScene(importer, path);

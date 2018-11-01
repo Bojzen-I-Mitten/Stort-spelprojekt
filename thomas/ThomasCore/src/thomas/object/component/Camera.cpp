@@ -1,7 +1,6 @@
 #include "Camera.h"
 #include "../../WindowManager.h"
 #include "../GameObject.h"
-#include "../../graphics/Skybox.h"
 #include "Transform.h"
 #include "../../graphics/Renderer.h"
 #include "../../Input.h"
@@ -9,6 +8,8 @@
 #include "../../graphics/GUI/Canvas.h"
 #include "../../graphics/GUI/GUIElements.h"
 #include "RenderComponent.h"
+#include "../../resource/texture/Texture2D.h"
+#include "../../graphics/Skybox.h"
 
 namespace thomas
 {
@@ -30,6 +31,7 @@ namespace thomas
 				m_fov = 70.f;
 				m_near = 0.1f;
 				m_far = 10000.f;
+				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
 				m_targetDisplay = -1;
 				UpdateProjMatrix();
@@ -43,6 +45,7 @@ namespace thomas
 				m_fov = 70;
 				m_near = 0.5;
 				m_far = 10000;
+				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1,1);
 				m_targetDisplay = 0;
 				UpdateProjMatrix();
@@ -67,6 +70,7 @@ namespace thomas
 
 			void Camera::OnDisable()
 			{
+				//m_skybox.reset();
 				graphics::Renderer::Instance()->getCameraList().remove(this);
 				m_ID = 0;
 			}
@@ -334,6 +338,36 @@ namespace thomas
 				{
 					m_canvases[i]->Render();
 				}
+			}
+
+
+			void Camera::SetSkyMap(resource::TextureCube * tex)
+			{
+				m_skybox->SetSkyMap(tex);
+			}
+
+			resource::TextureCube * Camera::GetSkyMap()
+			{
+				return m_skybox->GetSkyMap();
+			}
+			
+			void Camera::DrawSkyBox()
+			{
+				m_skybox->Draw();
+			}
+			bool Camera::hasSkybox()
+			{
+				return bool(m_skybox);
+			}
+
+			math::Vector3 Camera::WorldToViewport(math::Vector3 position, math::Matrix world)
+			{
+				math::Vector3 NDC = math::Vector3::Transform(position, world * GetViewMatrix() * GetProjMatrix());
+
+				NDC.x = (NDC.x + 1.0f) * 0.5 * GetViewport().width;
+				NDC.y = (1.0f - NDC.y) * 0.5 * GetViewport().height;
+
+				return NDC;
 			}
 		}
 	}

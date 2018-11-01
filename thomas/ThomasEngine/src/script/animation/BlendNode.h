@@ -30,6 +30,7 @@ namespace ThomasEngine
 			/* Finalize blending node by generating a weight handle. */
 			WeightHandle^ generateWeightHandle();
 
+			void ResetPlayback();
 			
 		private:
 

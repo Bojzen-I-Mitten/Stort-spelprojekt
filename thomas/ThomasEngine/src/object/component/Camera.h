@@ -8,6 +8,8 @@ namespace ThomasEngine
 {
 	value class Viewport;
 	ref class Canvas;
+	ref class TextureCube;
+	ref class Texture2D;
 	[ExecuteInEditor]
 	public ref class Camera : public Component
 	{
@@ -75,6 +77,11 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
+		property TextureCube^ SkyMap
+		{
+			TextureCube^ get();
+			void set(TextureCube^ value);
+		}
 		[BrowsableAttribute(false)]
 		property Viewport viewport
 		{
@@ -89,6 +96,7 @@ namespace ThomasEngine
 		}*/
 
 	public:
+		Vector3 WorldToViewport(Vector3 position, Matrix world);
 		Canvas^ AddCanvas();
 		Canvas^ AddCanvas(Viewport viewport);
 	};

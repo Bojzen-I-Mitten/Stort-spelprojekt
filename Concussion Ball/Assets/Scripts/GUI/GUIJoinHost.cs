@@ -60,22 +60,22 @@ public class GUIJoinHost : ScriptComponent
             {
                 TakePort = false;
                 TakeIP = true;
-                TextBoxPort.color = Color.Black.ToVector4();
-                TextBoxIP.color = Color.Green.ToVector4();
+                TextBoxPort.color = Color.Black;
+                TextBoxIP.color = Color.Green;
             }
             else if(TextBoxPort.Clicked())
             {
                 TakeIP = false;
                 TakePort = true;
-                TextBoxIP.color = Color.Black.ToVector4();
-                TextBoxPort.color = Color.Green.ToVector4();
+                TextBoxIP.color = Color.Black;
+                TextBoxPort.color = Color.Green;
             }
             else if (Join.Clicked())
             {
                 if (IPString != "" && PortString != "")
                 {
                     MatchSystem.instance.LocalPort = 0;
-                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortText);
+                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.TargetIP = IPString;
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();
@@ -87,9 +87,9 @@ public class GUIJoinHost : ScriptComponent
                 else
                 {
                     if (IPString == "")
-                        TextBoxIP.color = Color.Red.ToVector4();
+                        TextBoxIP.color = Color.Red;
                     if (PortString == "")
-                        TextBoxPort.color = Color.Red.ToVector4();
+                        TextBoxPort.color = Color.Red;
                 }
 
             }
@@ -107,15 +107,15 @@ public class GUIJoinHost : ScriptComponent
                 }
                 else
                 {
-                    TextBoxPort.color = Color.Red.ToVector4();
+                    TextBoxPort.color = Color.Red;
                 }
             }
             else
             {
                 TakePort = false;
                 TakeIP = false;
-                TextBoxIP.color = Color.Black.ToVector4();
-                TextBoxPort.color = Color.Black.ToVector4();
+                TextBoxIP.color = Color.Black;
+                TextBoxPort.color = Color.Black;
             }
         }
 
@@ -165,13 +165,13 @@ public class GUIJoinHost : ScriptComponent
         TextBoxIP = GUI.Add(TextBox);
         TextBoxIP.position = new Vector2(0.1f);
         TextBoxIP.scale = new Vector2(0.7f, 0.5f);
-        TextBoxIP.color = Color.Black.ToVector4();
+        TextBoxIP.color = Color.Black;
         TextBoxIP.interactable = true;
 
         TextBoxPort = GUI.Add(TextBox);
         TextBoxPort.position = new Vector2(0.1f, 0.2f);
         TextBoxPort.scale = new Vector2(0.7f, 0.5f);
-        TextBoxPort.color = Color.Black.ToVector4();
+        TextBoxPort.color = Color.Black;
         TextBoxPort.interactable = true;
     }
 

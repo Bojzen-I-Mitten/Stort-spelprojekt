@@ -132,6 +132,66 @@ namespace ThomasEngine {
 			utils::profiling::ProfileManager::newFrame();
 		}
 	}
+
+	void ThomasWrapper::SynchronousExecution()
+	{
+		// Process state switch commands
+		ProcessCommand();
+
+		// Refresh frame
+		thomas::graphics::LightManager::Update();
+		CopyCommandList();
+
+		// Enter async. state 
+#ifdef _EDITOR
+					// This is only relevant if we are running with editor, should be removed when build
+		for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+		{
+			GameObject^ gameObject = CurrentScene->GameObjects[i];
+
+			if (gameObject->MoveStaticGroup())
+			{
+				// Fetch the adress of where an object might be moved to
+				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+
+				// Fetch the adress of the object that might be moved
+				thomas::object::Object* old_native = gameObject->moveStaticGroup();
+
+				// Find the wrapped gameobject of the object that might be moved
+				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+				if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
+					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+			}
+
+			else if (gameObject->MakeStatic())
+			{
+				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+
+				thomas::object::Object* old_native = gameObject->setStatic();
+
+				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+				if (temp) // If temp is nullptr, no managed object has been invalidated.
+					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+
+			}
+
+			else if (gameObject->MakeDynamic())
+			{
+				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+
+				thomas::object::Object* old_native = gameObject->setDynamic();
+
+				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+
+				if (temp) // If temp is nullptr, no managed object has been invalidated.
+					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+			}
+
+		}
+#endif
+	}
 	
 	void ThomasWrapper::CopyCommandList()
 	{
@@ -287,67 +347,8 @@ namespace ThomasEngine {
 					}
 					/* Render & Update is synced.
 					*/
+					SynchronousExecution();
 
-					// Process state switch commands
-					ProcessCommand();
-
-					// Refresh frame
-					thomas::graphics::LightManager::Update();
-
-
-					CopyCommandList();
-
-					
-					// Enter async. state 
-#ifdef _EDITOR
-					// This is only relevant if we are running with editor, should be removed when build
-					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
-					{
-						GameObject^ gameObject = CurrentScene->GameObjects[i];
-
-						if (gameObject->MoveStaticGroup())
-						{
-							// Fetch the adress of where an object might be moved to
-							thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
-
-							// Fetch the adress of the object that might be moved
-							thomas::object::Object* old_native = gameObject->moveStaticGroup();
-
-							// Find the wrapped gameobject of the object that might be moved
-							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
-
-							if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
-								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
-						}
-
-						else if (gameObject->MakeStatic())
-						{
-							thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
-
-							thomas::object::Object* old_native = gameObject->setStatic();
-
-							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
-
-							if (temp) // If temp is nullptr, no managed object has been invalidated.
-								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
-
-						}
-
-						else if (gameObject->MakeDynamic())
-						{
-							thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
-
-							thomas::object::Object* old_native = gameObject->setDynamic();
-
-							GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
-
-							if (temp) // If temp is nullptr, no managed object has been invalidated.
-								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
-						}
-
-
-					}
-#endif
 
 					RenderFinished->Reset();
 

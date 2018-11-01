@@ -131,6 +131,7 @@
     <ClInclude Include="src\GUI\game\GUIElements.h" />
     <ClInclude Include="src\GUI\game\Canvas.h" />
     <ClInclude Include="src\math\Viewport.h" />
+    <ClInclude Include="src\resource\texture\TextureCube.h" />
     <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
   </ItemGroup>

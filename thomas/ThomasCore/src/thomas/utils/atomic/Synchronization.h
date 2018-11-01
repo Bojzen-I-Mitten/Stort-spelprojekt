@@ -5,18 +5,21 @@
 */
 #include <atomic>
 
-namespace util
+namespace thomas
 {
-	namespace atomics
+	namespace utils
 	{
-		class SpinLock {
-			/* Simple spinlock, attributed to: 
-			 * https://en.cppreference.com/w/cpp/atomic/atomic_flag
-			*/
-			std::atomic_flag locked = ATOMIC_FLAG_INIT;
-		public:
-			void lock();
-			void unlock();
-		};
+		namespace atomics
+		{
+			class SpinLock {
+				/* Simple spinlock, attributed to:
+				 * https://en.cppreference.com/w/cpp/atomic/atomic_flag
+				*/
+				std::atomic_flag locked = ATOMIC_FLAG_INIT;
+			public:
+				void lock();
+				void unlock();
+			};
+		}
 	}
 }
