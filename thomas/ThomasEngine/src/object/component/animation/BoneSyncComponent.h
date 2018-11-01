@@ -15,11 +15,19 @@ namespace ThomasEngine
 
 	ref class GameObject;
 	ref class RenderSkinnedComponent;
+		
 
 		[DisallowMultipleComponent]
+		[ExecuteInEditor]
 		public ref class BoneSyncComponent : public Component
 		{
 		public:
+			enum class BoneSyncMode
+			{
+				Local,
+				Global
+			};
+			
 			BoneSyncComponent();
 			[Newtonsoft::Json::JsonPropertyAttribute(IsReference = true)]
 			property GameObject^ AnimatedObject {
@@ -32,21 +40,28 @@ namespace ThomasEngine
 				void set(System::String^ value);
 			}
 
-			[BrowsableAttribute(false)]
+			property BoneSyncMode Mode
+			{
+				BoneSyncMode get();
+				void set(BoneSyncMode value);
+			}
+
 			property Matrix Offset
 			{
 				Matrix get();
 				void set(Matrix value);
 			}
+		internal:
 
-			void OnParentDestroy(GameObject^ relative) override;
-			void Awake() override;
-			void Update() override;
+			virtual void OnParentDestroy(GameObject^ relative) override;
+			virtual void Awake() override;
+			virtual void Update() override;
 
 		private:
 			GameObject^ m_skeletonSrc;
 			System::String^ m_boneName;
 			uint32_t m_boneHash, m_boneIndex;
+			BoneSyncMode m_mode;
 			Matrix m_offset;
 			RenderSkinnedComponent^ m_updateSrc;
 
