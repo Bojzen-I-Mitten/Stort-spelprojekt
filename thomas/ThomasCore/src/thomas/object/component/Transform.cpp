@@ -97,7 +97,7 @@ namespace thomas
 			{
 				if (target == GetPosition())
 					return;
-				m_localWorldMatrix = math::Matrix::CreateWorld(eye, target - eye, math::Vector3::Up);
+				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(eye, target - eye, math::Vector3::Up);
 				
 				Decompose();
 				SetDirty(true);
@@ -113,7 +113,7 @@ namespace thomas
 			}
 			void Transform::Orient(math::Vector3 forward, math::Vector3 up)
 			{
-				m_localWorldMatrix = math::Matrix::CreateWorld(m_localPosition, forward, up);
+				m_localWorldMatrix = math::Matrix::CreateScale(m_localScale) * math::Matrix::CreateWorld(m_localPosition, forward, up);
 				Decompose();
 				SetDirty(true);
 			}

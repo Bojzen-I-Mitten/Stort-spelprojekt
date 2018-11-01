@@ -15,6 +15,7 @@ namespace thomas
 			m_static = false;
 			m_GroupID = 0;
 			new_GroupID = 0;
+			m_layer = 0;
 			m_moveStaticGroup = false;
 		}
 
@@ -26,6 +27,7 @@ namespace thomas
 			m_static = false;
 			m_GroupID = 0;
 			new_GroupID = 0;
+			m_layer = 0;
 			m_moveStaticGroup = false;
 		}
 
@@ -182,6 +184,15 @@ namespace thomas
 			{
 				return m_transform->GetParent()->m_gameObject->SetActive(active);
 			}
+		}
+
+		int GameObject::GetLayer()
+		{
+			return m_layer;
+		}
+		void GameObject::SetLayer(int layer)
+		{
+			m_layer = layer;
 		}
 
 		void GameObject::SetSelection(bool selected)

@@ -6,11 +6,27 @@
 
 namespace thomas
 {
+
 	namespace graphics { class BulletDebugDraw; };
-	namespace object { namespace component { class Camera; class Rigidbody; } }
+	namespace object { namespace component { class Camera; class Rigidbody; class Collider; } }
 	class Physics
 	{
 	public:
+
+		struct CollisionLayer
+		{
+			std::string name = "None";
+			unsigned int mask = ~0u;
+		};
+		
+		struct RaycastHit
+		{
+			thomas::object::component::Collider* collider;
+			math::Vector3 normal;
+			math::Vector3 point;
+			float distance;
+		};
+
 		enum class COLLISION_TYPE {
 			STARTED,
 			STAY,
@@ -25,6 +41,7 @@ namespace thomas
 		static void Simulate();
 		static void DrawDebug(object::component::Camera* camera);
 		static void Destroy();
+		static bool Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance = 10000, int layerMask=~0);
 	private:
 		static void CollisionStarted(btPersistentManifold* const& manifold);
 		static bool CollisionProcessed(btManifoldPoint& cp, void* body0, void* body1);
@@ -43,6 +60,16 @@ namespace thomas
 		static bool s_drawDebug;
 		static std::unique_ptr<btDiscreteDynamicsWorld> s_world;
 
+	public:
+		static void SetCollisionLayer(std::string name, int group, int mask);
+		static void SetGroupCollisionFlag(int group1, int group2, bool collide);
+		static int GetCollisionGroup(std::string name);
+		static std::string GetCollisionGroup(int group);
+		static int GetCollisionGroupBit(int group);
+		static int GetCollisionMask(int group);
+		static int GetCollisionMask(std::string name);
+		static int GetCollisionLayerCount();
+
 	private:
 		static std::unique_ptr<btDefaultCollisionConfiguration> s_collisionConfiguration;
 		static std::unique_ptr<btCollisionDispatcher> s_dispatcher;
@@ -56,5 +83,6 @@ namespace thomas
 		static float s_timeStep;
 
 		static std::vector<object::component::Rigidbody*> s_rigidBodies;
+		static CollisionLayer s_collisionLayers[32];
 	};
 }
