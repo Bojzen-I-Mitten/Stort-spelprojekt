@@ -23,9 +23,9 @@ namespace thomas
 				else
 				{
 					std::chrono::steady_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-					std::chrono::milliseconds stamp = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_startTime);
+					std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_startTime);
 
-					ProfileManager::storeSample(m_name, stamp.count(), m_processor_ID);
+					ProfileManager::storeSample(m_name, duration.count(), m_startTime.time_since_epoch().count(), m_processor_ID);
 				}
 			}
 		}

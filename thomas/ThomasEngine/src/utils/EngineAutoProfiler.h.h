@@ -11,6 +11,7 @@ namespace ThomasEngine {
 		~EngineAutoProfiler();
 		void sendSample();
 	private:
+		long long m_startTime;
 		int m_processor_ID;
 		System::String^ m_functionName;
 		System::Diagnostics::Stopwatch m_timestamp;

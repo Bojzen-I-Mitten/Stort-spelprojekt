@@ -7,6 +7,8 @@ namespace ThomasEngine
 		m_functionName = functionName;
 		m_processor_ID = GetCurrentProcessorNumber();
 		m_timestamp.Start();
+		m_startTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
 	}
 	EngineAutoProfiler::~EngineAutoProfiler()
 	{
@@ -17,11 +19,11 @@ namespace ThomasEngine
 		m_timestamp.Stop();
 		if (m_processor_ID != GetCurrentProcessorNumber())
 		{
-			ProfileManagerWrapper::addSample(m_functionName, m_timestamp.ElapsedMilliseconds, m_processor_ID);
+			
 		}
 		else
 		{
-			ProfileManagerWrapper::addSample(m_functionName, m_timestamp.ElapsedMilliseconds, m_processor_ID);
+			ProfileManagerWrapper::addSample(m_functionName, m_timestamp.ElapsedMilliseconds, m_startTime, m_processor_ID);
 		}
 	}
 }

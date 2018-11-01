@@ -69,6 +69,7 @@ namespace ThomasEngine {
 		thomas::ThomasCore::Init();
 
 
+		utils::profiling::ProfileManager::resetFrameCounter();
 
 		if (ThomasCore::Initialized())
 		{
@@ -120,20 +121,20 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
-			PROFILE("StartRenderer %f")
+			PROFILE("StartRenderer")
 			{
-				PROFILE("StartRenderer - Wait %f")
+				PROFILE("StartRenderer - Wait")
 				UpdateFinished->WaitOne();
 			}
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+			utils::profiling::ProfileManager::newFrame();
 		}
 	}
 	
 	void ThomasWrapper::CopyCommandList()
 	{
-
 		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 
@@ -186,6 +187,7 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
+			PROFILE("StartEngine")
 			// Load scene
 			if (Thomas->m_scene->LoadThreadWaiting())
 			{
@@ -343,6 +345,7 @@ namespace ThomasEngine {
 								temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
 						}
 
+
 					}
 #endif
 
@@ -352,12 +355,24 @@ namespace ThomasEngine {
 
 
 				}
+				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+#ifdef BENCHMARK
+				utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+				profiler->SetActive(true);
+				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+#endif
+
 				Monitor::Exit(lock);
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));
+
 			}
+
 		}
+
 		renderThread->Join();	// Wait until thread is finished
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
@@ -365,8 +380,7 @@ namespace ThomasEngine {
 	}
 
 	void ThomasWrapper::Exit() {
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-		utils::profiling::ProfileManager::SetRAMUsage(ramUsage);
+
 		utils::profiling::ProfileManager::dumpDataToFile();
 	
 		thomas::ThomasCore::Exit();

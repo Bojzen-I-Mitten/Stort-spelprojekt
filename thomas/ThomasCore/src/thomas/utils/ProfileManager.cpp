@@ -2,8 +2,6 @@
 #include <fstream>
 
 
-#include "..\..\..\include\nlohmann\json.hpp"
-#include "..\..\..\include\imgui\imgui.h"
 namespace thomas 
 {
 	namespace utils
@@ -11,14 +9,25 @@ namespace thomas
 
 		namespace profiling
 		{
-			using namespace nlohmann;
-			std::map<std::string, std::map<std::string, std::vector<float>>> ProfileManager::s_samples;
-			float ProfileManager::ramusage;
-			float ProfileManager::vramusage;
+			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
+			float ProfileManager::s_ramusage;
+			float ProfileManager::s_vramusage;
+			unsigned int ProfileManager::s_frames;
 
-			void ProfileManager::storeSample(std::string name, long elapsedTime, DWORD processor_id)
+			void ProfileManager::resetFrameCounter()
 			{
-				s_samples[std::to_string((int)processor_id)][name].push_back(elapsedTime);
+				s_frames = 0;
+			}
+
+			void ProfileManager::newFrame()
+			{
+				s_frames++;
+			}
+
+			void ProfileManager::storeSample(std::string name, long long elapsedTime, long long startTime, DWORD processor_id)
+			{
+		
+				s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));
 			}
 
 			//void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
@@ -31,18 +40,49 @@ namespace thomas
 				json j;
 				j["SlowfilerData"];
 				j["SlowfilerData"]["build"];
-				j["SlowfilerData"]["processor"];
-				for (auto& it : s_samples)
-					j["SlowfilerData"]["processor"][it.first];
+				j["SlowfilerData"]["timeline"];
+				j["SlowfilerData"]["timeline"]["processor"];
 
-				j["SlowfilerData"]["build"]["ramUsage"] = ramusage;
-				j["SlowfilerData"]["build"]["vramUsage"] = vramusage;
+				j["SlowfilerData"]["processor"];
+
 				for (auto& id : s_samples)
 				{
 					for (auto& processor : id.second)
 					{
 						j["SlowfilerData"]["processor"][id.first]["functions"];
-						j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = processor.second;
+						j["SlowfilerData"]["processor"][id.first]["functions"][processor.first];
+
+						std::vector<long long> temp_vector;
+						for (auto& sample : processor.second)
+						{
+							temp_vector.push_back(sample.m_duration);
+						}
+
+						for (auto& sample : processor.second)
+						{
+							j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = temp_vector;
+						}
+					}
+				}
+
+				for (auto& it : s_samples)
+					j["SlowfilerData"]["timeline"]["processor"][it.first];
+
+				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
+				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
+
+				for (auto& id : s_samples)
+				{
+					for (auto& processor : id.second)
+					{
+						j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"];
+						//j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = processor.second;
+						for (auto& sample : processor.second)
+						{
+							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][processor.first][std::to_string(sample.m_frame)];
+							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][processor.first][std::to_string(sample.m_frame)]["duration"] = sample.m_duration;
+							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][processor.first][std::to_string(sample.m_frame)]["startTime"] = sample.m_startTime;
+						}
 					}
 				}
 
@@ -51,14 +91,14 @@ namespace thomas
 				o.close();
 			}
 
-			void ProfileManager::SetRAMUsage(float usage)
+			void ProfileManager::setRAMUsage(float usage)
 			{
-				ramusage = usage;
+				s_ramusage = usage;
 			}
 
-			void ProfileManager::SetVRAMUsage(float usage)
+			void ProfileManager::setVRAMUsage(float usage)
 			{
-				vramusage = usage;
+				s_vramusage = usage;
 			}
 
 		}

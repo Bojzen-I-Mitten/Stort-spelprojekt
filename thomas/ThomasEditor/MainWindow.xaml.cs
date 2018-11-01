@@ -38,7 +38,7 @@ namespace ThomasEditor
         Guid g;
         public MainWindow()
         {
-            EngineAutoProfiler profile = new EngineAutoProfiler("MainWindow");
+            //EngineAutoProfiler profile = new EngineAutoProfiler("MainWindow");
             _instance = this;
             InitializeComponent();
 
@@ -82,7 +82,7 @@ namespace ThomasEditor
             
             menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
             menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
-            profile.sendSample();
+            //profile.sendSample();
         }
 
         private void ThomasWrapper_OnStopPlaying()

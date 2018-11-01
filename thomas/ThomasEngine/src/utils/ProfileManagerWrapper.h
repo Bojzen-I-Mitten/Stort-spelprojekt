@@ -9,6 +9,6 @@ namespace ThomasEngine {
 	public ref class ProfileManagerWrapper
 	{
 	public:
-		static void addSample(System::String^ functionNane, long timestamp, int processor_ID);
+		static void addSample(System::String^ functionNane, long timestamp, long long startTime, int processor_ID);
 	};
 }
