@@ -30,9 +30,9 @@ public class Powerup : PickupableObject
     {
         if (spawner)
         {
-            float test = (float)Math.Sin(Time.ElapsedTime)/2.0f;
+            float test = (float)Math.Sin(Time.ElapsedTime);
 
-            transform.position += (new Vector3(0, test, 0))*Time.DeltaTime;
+            transform.position = spawner.transform.position + (new Vector3(0, test, 0))/10.0f;
             transform.localEulerAngles += (new Vector3(0, 360.0f/5.0f, 0)) * Time.DeltaTime;
         }
 
