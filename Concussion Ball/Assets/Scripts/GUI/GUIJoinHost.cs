@@ -75,7 +75,7 @@ public class GUIJoinHost : ScriptComponent
                 if (IPString != "" && PortString != "")
                 {
                     MatchSystem.instance.LocalPort = 0;
-                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortText);
+                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.TargetIP = IPString;
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();

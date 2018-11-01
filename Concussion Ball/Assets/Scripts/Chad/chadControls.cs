@@ -27,7 +27,7 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public float MaxThrowForce { get; set; } = 20.0f;
     [Category("Throwing")]
-    public float ChargeRate { get; set; } = 5.0f;
+    public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
     private float ThrowForce;
     [Category("Throwing")]
@@ -533,13 +533,13 @@ public class ChadControls : NetworkComponent
     private void ChargeObject()
     {
         ChargeTime += Time.DeltaTime;
-        ChargeTime = MathHelper.Clamp(ChargeTime, 0, 4);
+        ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
         PickedUpObject.ChargeEffect();
 
-        ThrowForce = ChargeRate * ChargeTime;
-        ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
+        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime/maxChargeTime);
+        ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
     }
 
     private void ThrowObject(Vector3 direction)
