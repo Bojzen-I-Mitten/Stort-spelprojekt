@@ -107,12 +107,13 @@ public class Powerup : PickupableObject
 
     public void Remove()
     {
-        Drop();
+        transform.enabled = false;
+        /*Drop();
         if (spawner)
         {
             spawner.Free();
             spawner = null;
         }
-        MatchSystem.instance.RemoveNetworkObject(gameObject);
+        MatchSystem.instance.RemoveNetworkObject(gameObject);*/
     }
 }
