@@ -583,7 +583,7 @@ public class Ragdoll : ScriptComponent
 
     public override void OnDestroy()
     {
-        DisableRagdoll();
+        //DisableRagdoll();
     }
 
     public void DisableRagdoll()
