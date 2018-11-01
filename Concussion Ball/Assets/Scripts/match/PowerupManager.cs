@@ -63,6 +63,7 @@ public class PowerupManager : ScriptComponent
             powerup.activeSelf = true;
             powerup.transform.position = trans.position;
             powerup.transform.rotation = trans.rotation;
+            powerup.GetComponent<NetworkIdentity>().WriteInitialData();
         }
         NextPowerupID++;
         return powerup;
