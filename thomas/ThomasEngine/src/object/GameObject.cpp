@@ -38,16 +38,12 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
 		// Add to scene
-		ThomasWrapper::CurrentScene->Add(this);
+		ThomasWrapper::CurrentScene->CreateObject(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
 		if (ThomasWrapper::InEditor())
 			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
-	}
-	void GameObject::DestroySelf()
-	{
-		ThomasWrapper::CurrentScene->DestroyObject(this);
 	}
 	bool GameObject::InitComponents(bool playing)
 	{
@@ -87,11 +83,77 @@ namespace ThomasEngine {
 
 	void GameObject::PostInstantiate(Scene^ scene) {
 		PostLoad(scene);
-		scene->Add(this);
+		scene->CreateObject(this);
 		for each(Transform^ child in m_transform->children)
 			child->gameObject->PostInstantiate(scene);
 	}
+	GameObject::~GameObject()
+	{
+		// Final delete of object
+		Monitor::Enter(m_componentsLock);
+		for each (Component^ comp in m_components)
+		{
+			comp->OnDestroy();
+			delete comp;	// Begone you foul Clr!!!!
+		}
+		m_components.Clear();
+		Monitor::Exit(m_componentsLock);
+	}
+	void GameObject::OnDestroy()
+	{
+		// OnDisable^
+		for each (Component^ comp in m_components)
+		{
+			// Disable
+			comp->OnParentDestroy(this);
+			comp->OnDisable();
+		}
+	}
+	bool GameObject::RemoveComponent(Component ^ comp)
+	{
+		// Remove single component
+		bool success = false;
+		Monitor::Enter(m_componentsLock);
+		if (m_components.Remove(comp))
+		{
+			comp->OnParentDestroy(this);
+			comp->OnDisable();
+			comp->OnDestroy();
+			delete comp;	// Begone you foul Clr!!!!
+			success = true;
+		}
+		Monitor::Exit(m_componentsLock);
+		return success;
+	}
+	void GameObject::Destroy()
+	{
+		List<Transform^>^ children = gcnew List<Transform^>(transform->children);
+		for each(Transform^ child in children)
+		{
+			Destroy(child->gameObject);
+		}
+		DestroySelf();
+	}
+	void GameObject::DestroySelf()
+	{
+		ThomasWrapper::CurrentScene->DestroyObject(this);
+	}
 
+	bool GameObject::MakeStatic()
+	{
+		return m_makeStatic;
+	}
+
+	bool GameObject::MakeDynamic()
+	{
+		return m_makeDynamic;
+	}
+
+	bool GameObject::MoveStaticGroup()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetMoveStaticGroup();
+	}
+	
 	thomas::object::Object* GameObject::setStatic()
 	{
 		thomas::object::Object* moved;
@@ -204,63 +266,7 @@ namespace ThomasEngine {
 	bool GameObject::IsPrefab()
 	{
 		return prefabPath != nullptr && (inScene == false);
-	}
-	/* Delete component
-	*/
-	void deleteComp(GameObject^ obj, Component^ comp)
-	{
-		comp->OnParentDestroy(obj);
-		comp->OnDisable();
-		comp->OnDestroy();
-		delete comp;	// Begone you foul Clr!!!!
-	}
-
-	GameObject::~GameObject()
-	{
-		Monitor::Enter(m_componentsLock);
-		for (int i = 0; i < m_components.Count; i++)
-			deleteComp(this, m_components[i]);
-		m_components.Clear();
-		Monitor::Exit(m_componentsLock);
-	}
-	bool GameObject::RemoveComponent(Component ^ comp)
-	{
-		bool success = false;
-		Monitor::Enter(m_componentsLock);
-		if (m_components.Remove(comp))
-		{
-			deleteComp(this, comp);
-			success = true;
-		}
-		Monitor::Exit(m_componentsLock);
-		return success;
-	}
-	void GameObject::Destroy()
-	{
-		List<Transform^>^ children = gcnew List<Transform^>(transform->children);
-		for each(Transform^ child in children)
-		{
-			Destroy(child->gameObject);
-		}
-		DestroySelf();
-	}
-
-	bool GameObject::MakeStatic()
-	{
-		return m_makeStatic;
-	}
-
-	bool GameObject::MakeDynamic()
-	{
-		return m_makeDynamic;
-	}
-
-	bool GameObject::MoveStaticGroup()
-	{
-		return ((thomas::object::GameObject*)nativePtr)->GetMoveStaticGroup();
-	}
-
-
+	}	   
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
 		// This function has been hooked by GameObject manager, this does nothng

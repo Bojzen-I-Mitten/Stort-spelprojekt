@@ -21,16 +21,16 @@ namespace ThomasEngine
 {
 	Scene::Scene(System::String^ name, uint32_t unique_id)
 	:	m_uniqueID(unique_id),
-		m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
-		m_name = name;;
-		//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
+		m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()),
+		m_accessLock(gcnew System::Object()),
+		m_commandList(gcnew System::Collections::Generic::List<IssuedCommand>()),
+		m_commandSwapList(gcnew System::Collections::Generic::List<IssuedCommand>()),
+		m_name(name)
+	{
 	}
 	Scene::Scene(uint32_t unique_id)
-	:	m_uniqueID(unique_id),
-		m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()) {
-		m_name = "New Scene";
-		//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
-	}
+		: Scene("New Scene", unique_id)
+	{	}
 	Scene::~Scene()
 	{
 		UnLoad();
@@ -59,21 +59,18 @@ namespace ThomasEngine
 
 	void Scene::CreateObject(GameObject ^ object)
 	{
-		throw gcnew System::NotImplementedException();
+		IssuedCommand cmd;
+		cmd.m_cmd = Command::Add;
+		cmd.m_obj = object;
+		m_commandList->Add(cmd);
 	}
 
 	void Scene::DestroyObject(GameObject ^ object)
 	{
-
-		ThomasWrapper::Selection->UnSelectGameObject(object);
-
-		// Remove object
-		Monitor::Enter(m_accessLock);
-		m_gameObjects->Remove(object);
-		Monitor::Exit(m_accessLock);
-		// Destroy object
-		object->OnDestroy();
-		delete object;
+		IssuedCommand cmd;
+		cmd.m_cmd = Command::DisableRemove;
+		cmd.m_obj = object;
+		m_commandList->Add(cmd);
 	}
 
 
@@ -86,6 +83,8 @@ namespace ThomasEngine
 			delete m_gameObjects[i];
 		}
 		m_gameObjects->Clear();
+		m_commandList->Clear();
+		m_commandSwapList->Clear();
 		Monitor::Exit(m_accessLock);
 	}
 
@@ -104,23 +103,7 @@ namespace ThomasEngine
 		if(Application::currentProject && this->RelativeSavePath)
 			SaveSceneAs(Application::currentProject->assetPath + "\\" + m_relativeSavePath);
 	}
-
-	void Scene::Add(GameObject ^ obj)
-	{
-		IssuedCommand cmd;
-		cmd.m_cmd = Command::Add;
-		cmd.m_obj = obj;
-		m_commandList->Add(cmd);
-	}
-
-	void Scene::Remove(GameObject ^ obj)
-	{
-		IssuedCommand cmd;
-		cmd.m_cmd = Command::Remove;
-		cmd.m_obj = obj;
-		m_commandList->Add(cmd);
-	}
-
+	
 
 	Scene ^ Scene::LoadScene(System::String ^ fullPath, uint32_t unique_id)
 	{
@@ -174,6 +157,43 @@ namespace ThomasEngine
 		}
 	}
 
+	void Scene::SyncScene()
+	{
+		for each(IssuedCommand c in m_commandList)
+		{
+			switch (c.m_cmd)
+			{
+			case Command::Add:
+				m_gameObjects->Add(c.m_obj);
+				break;
+			case Command::DisableRemove:
+			{
+				// Disable object:
+				ThomasWrapper::Selection->UnSelectGameObject(c.m_obj);
+				m_gameObjects->Remove(c.m_obj);
+				c.m_obj->OnDestroy();
+				// Wait to next frame for delete:
+				IssuedCommand cmd;
+				cmd.m_cmd = Command::Remove;
+				cmd.m_obj = c.m_obj;
+				m_commandSwapList->Add(cmd);
+			}
+				break;
+			case Command::Remove:
+				// Destroy object
+				delete c.m_obj;
+				break;
+			default:
+				Debug::LogWarning("Scene: Unknown Command issued...");
+			}
+		}
+		m_commandList->Clear();
+		// Swap, std::swap plz give ._,
+		auto swp = m_commandList;
+		m_commandList = m_commandSwapList;
+		m_commandSwapList = swp;
+	}
+
 	void Scene::Subscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler ^ func)
 	{
 		m_gameObjects->CollectionChanged += func;
@@ -217,7 +237,6 @@ namespace ThomasEngine
 	}
 	void Scene::GameObjectData::set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val) {
 		m_gameObjects = val;
-		//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 	}
 }
 

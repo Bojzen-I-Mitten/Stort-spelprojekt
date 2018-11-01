@@ -75,6 +75,7 @@ namespace ThomasEngine
 		bool MakeStatic();
 		bool MakeDynamic();
 		bool MoveStaticGroup();
+		void OnDestroy() override;
 
 		GameObject(String^ name);
 

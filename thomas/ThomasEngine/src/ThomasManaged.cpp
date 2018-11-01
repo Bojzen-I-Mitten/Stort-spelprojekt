@@ -127,6 +127,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SynchronousExecution()
 	{
+		CurrentScene->SyncScene();
 		// Process state switch commands
 		ProcessCommand();
 

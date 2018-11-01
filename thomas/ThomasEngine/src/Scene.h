@@ -20,8 +20,9 @@ namespace ThomasEngine {
 	private:
 		enum class Command
 		{
-			Add,
-			Remove
+			Add,			// Add object
+			Remove,			// Stage 2. Remove object
+			DisableRemove	// Stage 1. Disable removed object
 		};
 		value struct IssuedCommand
 		{
@@ -33,9 +34,10 @@ namespace ThomasEngine {
 		System::Collections::ObjectModel::ObservableCollection<GameObject^>^ m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
 		System::Object^ m_accessLock = gcnew System::Object();
 		System::Collections::Generic::List<IssuedCommand>^ m_commandList;
+		System::Collections::Generic::List<IssuedCommand>^ m_commandSwapList;
+
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
-		//thomas::utils::atomics::SynchronizedList< GameObject^>* m_list;
 
 		Scene(uint32_t unique_id);
 
@@ -99,18 +101,16 @@ namespace ThomasEngine {
 
 		void SaveSceneAs(System::String^ fullPath);
 		void SaveScene();
-
-		void Add(GameObject^obj);
-		void Remove(GameObject^obj);
-
-		void UnLoad();
-		void EnsureLoad();
-		void PostLoad();
+		
 
 		void Subscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler^ func);
 		void Unsubscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler^ func);
 
-	private:
+	internal:
+		void UnLoad();
+		void EnsureLoad();
+		void PostLoad();
+		void SyncScene();
 	};
 }
 
