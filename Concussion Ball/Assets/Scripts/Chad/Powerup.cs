@@ -107,7 +107,8 @@ public class Powerup : PickupableObject
 
     public void Remove()
     {
-        transform.enabled = false;
+        //transform.enabled = false;
+        MatchSystem.instance.PowerupManager.RecyclePowerup(this);
         /*Drop();
         if (spawner)
         {

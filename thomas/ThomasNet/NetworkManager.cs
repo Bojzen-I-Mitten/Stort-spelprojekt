@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-            NetScene.InititateScene();
+            
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -104,6 +104,7 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
+            NetScene.InititateScene();
             //InitServerNTP();
             if (UseLobby)
             {

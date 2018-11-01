@@ -15,6 +15,7 @@ namespace ThomasEngine.Network
         public int nextAssignableID = 0;
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
+        private List<NetworkIdentity> SceneObjectToBeActivated = new List<NetworkIdentity>();
         public Dictionary<NetPeer, List<NetworkIdentity>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentity>>();
 
         public void ReadPlayerData(NetPeer peer, NetPacketReader reader)
@@ -37,8 +38,6 @@ namespace ThomasEngine.Network
             {
                 if (identity.gameObject.GetActive() || initialState)
                 {
-                    if (initialState)
-                        identity.gameObject.SetActive(true);
                     identity.ReadData(reader, initialState);
                 }
             }else
@@ -101,7 +100,13 @@ namespace ThomasEngine.Network
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
             {
                 NetworkObjects.Add(++nextAssignableID, identity);
-                identity.gameObject.SetActive(false);
+
+                if (identity.gameObject.GetActive())
+                {
+                    SceneObjectToBeActivated.Add(identity);
+                    identity.gameObject.activeSelf = false;
+                }
+                
 
             });
         }
@@ -133,7 +138,8 @@ namespace ThomasEngine.Network
                 if (!identity.gameObject.GetActive())
                 {
                     identity.Owner = true;
-                    identity.gameObject.SetActive(true);
+                    if(SceneObjectToBeActivated.Contains(identity))
+                        identity.gameObject.activeSelf = true;
                 }
             });
         }

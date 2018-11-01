@@ -77,9 +77,16 @@ public class PowerupSpawner : NetworkComponent
             if (!hasPowerup)
             {
                 spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
-                spawnedPowerup.GetComponent<Powerup>().spawner = this;
-                timeLeftUntilSpawn = spawnInterval;
-                hasPowerup = true;
+                if (spawnedPowerup)
+                {
+                    spawnedPowerup.GetComponent<Powerup>().spawner = this;
+                    timeLeftUntilSpawn = spawnInterval;
+                    hasPowerup = true;
+                }
+                else
+                {
+                    Debug.Log("No available powerup to spawn");
+                }
             }
             else
                 Debug.Log("Powerup already spawned");
