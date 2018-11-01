@@ -347,6 +347,7 @@ public class ChadControls : NetworkComponent
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
             if (velocity != 0)
                 yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
+
             transform.RotateByAxis(transform.up, yaw);
 
             TotalXStep -= yaw; //for of freelook
@@ -430,6 +431,7 @@ public class ChadControls : NetworkComponent
         float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
         switch (State)
         {
+
             case STATE.CHADING:
                 if (Direction.z > 0) // if moving forward
                 {
@@ -447,19 +449,21 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+
+                //rBody.Position = Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                //rBody.LinearVelocity = -Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Direction.z * modifiedBaseSpeed;
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
-                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                //rBody.LinearVelocity = -Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
                 CurrentVelocity.y = modifiedMaxSpeed;
-                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                //rBody.LinearVelocity = - Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
                 Camera.transform.rotation = Quaternion.Identity;
@@ -468,6 +472,8 @@ public class ChadControls : NetworkComponent
 
                 break;
         }
+
+        rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
     }
 
     public void Reset()

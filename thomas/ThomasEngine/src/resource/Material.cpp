@@ -15,6 +15,7 @@ namespace ThomasEngine {
 	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
 		m_instance = true;
+		EditorProperties = original->EditorProperties;
 	}
 
 	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
