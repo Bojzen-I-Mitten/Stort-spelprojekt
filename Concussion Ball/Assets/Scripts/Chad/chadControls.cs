@@ -487,7 +487,16 @@ public class ChadControls : NetworkComponent
         Camera.transform.SetParent(null, true);
         EnableRagdoll();
         Ragdoll.AddForce(force);
-        yield return new WaitForSeconds(duration);
+        //yield return new WaitForSeconds(duration);
+        yield return new WaitForSeconds(2);
+        float timer = 0;
+        while(Ragdoll.DistanceToWorld()>=0.02 && timer <15)
+        {
+            //Debug.Log(Ragdoll.DistanceToWorld());
+            timer += Time.DeltaTime;
+            yield return null;
+        }
+        yield return new WaitForSeconds(1);
         DisableRagdoll();
         State = STATE.CHADING;
         ResetCamera();
