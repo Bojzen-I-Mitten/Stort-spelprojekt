@@ -508,14 +508,17 @@ public class ChadControls : NetworkComponent
     IEnumerator PlayThrowAnim()
     {
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
+        Vector3 ballCamPos = Camera.transform.position;
+
         if (Camera)
             Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
-        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;
+        
 
         yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
-        ThrowObject(chosenDirection);
+        ThrowObject(ballCamPos, chosenDirection);
 
         yield return new WaitForSeconds(1.0f);
         if(State != STATE.RAGDOLL)
@@ -542,9 +545,9 @@ public class ChadControls : NetworkComponent
         ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
     }
 
-    private void ThrowObject(Vector3 direction)
+    private void ThrowObject(Vector3 camPos, Vector3 direction)
     {
-        PickedUpObject.Throw(direction);
+        PickedUpObject.Throw(camPos, direction);
     }
 
     public void RPCPickup(int id)
