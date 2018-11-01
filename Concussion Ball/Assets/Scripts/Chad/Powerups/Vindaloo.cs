@@ -101,7 +101,7 @@ public class Vindaloo : Powerup
 
     public override void Update()
     {
-
+        base.Update();
     }
 
     // if this is a throwable power-up this function will be called

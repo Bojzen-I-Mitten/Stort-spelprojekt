@@ -53,6 +53,7 @@ namespace ThomasEngine.Network
             {
                 GameObject player = GameObject.Instantiate(playerPrefab);
                 player.activeSelf = false;
+                player.GetComponent<NetworkIdentity>().IsPlayer = true;
                 PlayerPool.Add(player);
             }
         }
@@ -86,7 +87,7 @@ namespace ThomasEngine.Network
             {
                 player.activeSelf = true;
                 NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
-                networkIdentity.IsPlayer = true;
+               
                 networkIdentity.Owner = myPlayer;
                 if (myPlayer)
                     player.Name += " (my player)";
@@ -125,6 +126,9 @@ namespace ThomasEngine.Network
         {
             Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
             {
+
+                if (identity.IsPlayer)
+                    return;
                 NetworkObjects.Add(++nextAssignableID, identity);
 
                 if (identity.gameObject.GetActive())
