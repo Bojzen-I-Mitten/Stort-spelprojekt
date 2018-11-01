@@ -131,6 +131,7 @@ public class ChadHud : ScriptComponent
 
         #region Aiming Stuff
         Crosshair = HUD.Add(CrosshairTexture);
+        Crosshair.origin = new Vector2(0.5f);
         Crosshair.position = new Vector2(0.5f);
         Crosshair.scale = Vector2.Zero;
 
