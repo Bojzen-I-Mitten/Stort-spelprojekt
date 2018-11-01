@@ -61,10 +61,23 @@ namespace ThomasEngine {
 			Component^ component = m_components[i];
 			Type^ typ = component->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
-			if ((playing || executeInEditor) && !component->initialized) {
-				completed = false;
-				component->Initialize();
+
+			if (!GetActive())
+			{
+				if (!component->awakened) {
+					completed = false;
+					component->Initialize();
+				}
 			}
+			else
+			{
+				if ((playing || executeInEditor) && !component->initialized) {
+					completed = false;
+					component->Initialize();
+				}
+			}
+
+
 		}
 		Monitor::Exit(m_componentsLock);
 		return completed;

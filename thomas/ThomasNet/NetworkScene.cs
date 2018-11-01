@@ -13,6 +13,7 @@ namespace ThomasEngine.Network
         {
         }
         public int nextAssignableID = 0;
+        private List<GameObject> PlayerPool = new List<GameObject>();
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
         private List<NetworkIdentity> SceneObjectToBeActivated = new List<NetworkIdentity>();
@@ -46,7 +47,31 @@ namespace ThomasEngine.Network
             }
         }
 
-        public void SpawnPlayer(GameObject playerPrefab, NetPeer peer, bool myPlayer)
+        public void InitPlayerPool(GameObject playerPrefab, int maxPlayers)
+        {
+            for(int i=0; i < maxPlayers; i++)
+            {
+                GameObject player = GameObject.Instantiate(playerPrefab);
+                player.activeSelf = false;
+                PlayerPool.Add(player);
+            }
+        }
+
+        private GameObject GetAvailablePlayerFromPool()
+        {
+            foreach(GameObject player in PlayerPool)
+            {
+                if (!player.activeSelf)
+                    return player;
+            }
+            return null;
+        }
+        private void RecyclePlayer(GameObject player)
+        {
+            player.activeSelf = false;
+        }
+
+        public void SpawnPlayer(NetPeer peer, bool myPlayer)
         {
             if (Players.ContainsKey(peer))
             {
@@ -56,19 +81,20 @@ namespace ThomasEngine.Network
 
             ObjectOwners[peer] = new List<NetworkIdentity>();
 
-            if(playerPrefab.GetComponent<NetworkIdentity>())
+            GameObject player = GetAvailablePlayerFromPool();
+            if(player)
             {
-                GameObject obj = GameObject.Instantiate(playerPrefab);
-                NetworkIdentity networkIdentiy = obj.GetComponent<NetworkIdentity>();
-                networkIdentiy.IsPlayer = true;
-                networkIdentiy.Owner = myPlayer;
+                player.activeSelf = true;
+                NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
+                networkIdentity.IsPlayer = true;
+                networkIdentity.Owner = myPlayer;
                 if (myPlayer)
-                    obj.Name += " (my player)";
-
-                Players[peer] = networkIdentiy;
-            }else
+                    player.Name += " (my player)";
+                Players[peer] = networkIdentity;
+            }
+            else
             {
-                Debug.LogError("Failed to spawn player. Prefab does not contain a networkIdentity component");
+                Debug.LogError("Failed to spawn player. No free slots in pool");
             }
         }
         
@@ -90,7 +116,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
-                    Object.Destroy(id.gameObject);
+                    RecyclePlayer(id.gameObject);
                 Players.Remove(peer);
             }
         }
@@ -106,8 +132,6 @@ namespace ThomasEngine.Network
                     SceneObjectToBeActivated.Add(identity);
                     identity.gameObject.activeSelf = false;
                 }
-                
-
             });
         }
 
