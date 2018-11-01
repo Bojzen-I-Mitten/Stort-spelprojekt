@@ -27,7 +27,7 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public float MaxThrowForce { get; set; } = 20.0f;
     [Category("Throwing")]
-    public float ChargeRate { get; set; } = 5.0f;
+    public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
     private float ThrowForce;
     [Category("Throwing")]
@@ -514,14 +514,17 @@ public class ChadControls : NetworkComponent
     IEnumerator PlayThrowAnim()
     {
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
+        Vector3 ballCamPos = Camera.transform.position;
+
         if (Camera)
             Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
-        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;
+        
 
         yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
-        ThrowObject(chosenDirection);
+        ThrowObject(ballCamPos, chosenDirection);
 
         yield return new WaitForSeconds(1.0f);
         if(State != STATE.RAGDOLL)
@@ -539,18 +542,18 @@ public class ChadControls : NetworkComponent
     private void ChargeObject()
     {
         ChargeTime += Time.DeltaTime;
-        ChargeTime = MathHelper.Clamp(ChargeTime, 0, 4);
+        ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
         PickedUpObject.ChargeEffect();
 
-        ThrowForce = ChargeRate * ChargeTime;
-        ChadHud.Instance.ChargeChargeBar(ThrowForce/MaxThrowForce);
+        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime/maxChargeTime);
+        ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
     }
 
-    private void ThrowObject(Vector3 direction)
+    private void ThrowObject(Vector3 camPos, Vector3 direction)
     {
-        PickedUpObject.Throw(direction);
+        PickedUpObject.Throw(camPos, direction);
     }
 
     public void RPCPickup(int id)

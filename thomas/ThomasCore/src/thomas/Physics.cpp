@@ -5,6 +5,7 @@
 #include "object\component\Camera.h"
 #include "graphics\BulletDebugDraw.h"
 #include "AutoProfile.h"
+#include "ThomasCore.h"
 
 namespace thomas
 {
@@ -43,6 +44,14 @@ namespace thomas
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
+		for (unsigned i = 0; i < s_rigidBodies.size(); ++i)
+		{
+			if (s_rigidBodies[i] == rigidBody)
+			{
+				LOG("RIGIDBODY ALREADY EXIST");
+				return;
+			}
+		}
 		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
 		s_world->addRigidBody(rigidBody);
