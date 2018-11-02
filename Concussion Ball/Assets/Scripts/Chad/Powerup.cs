@@ -28,7 +28,7 @@ public class Powerup : PickupableObject
 
     public override void Update()
     {
-        if (spawner)
+        if (spawner && !GetPickedUp())
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
 
@@ -115,13 +115,14 @@ public class Powerup : PickupableObject
 
     public void Remove()
     {
-        //transform.enabled = false;
-        MatchSystem.instance.PowerupManager.RecyclePowerup(this);
         Drop();
         if (spawner)
         {
             spawner.Free();
             spawner = null;
         }
+        //transform.enabled = false;
+        MatchSystem.instance.PowerupManager.RecyclePowerup(this);
+       
     }
 }

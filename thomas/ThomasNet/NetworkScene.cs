@@ -60,16 +60,19 @@ namespace ThomasEngine.Network
 
         private GameObject GetAvailablePlayerFromPool()
         {
-            foreach(GameObject player in PlayerPool)
+            if(PlayerPool.Count > 0)
             {
-                if (!player.activeSelf)
-                    return player;
+                GameObject player = PlayerPool[0];
+                PlayerPool.RemoveAt(0);
+                return player;
             }
-            return null;
+            else
+                return null;
         }
         private void RecyclePlayer(GameObject player)
         {
             player.activeSelf = false;
+            PlayerPool.Add(player);
         }
 
         public void SpawnPlayer(NetPeer peer, bool myPlayer)

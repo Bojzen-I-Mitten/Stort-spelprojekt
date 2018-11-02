@@ -40,18 +40,6 @@ public class PowerupManager : ScriptComponent
 
     public GameObject InstantiatePowerup(Transform trans)
     {
-        //GameObject ExistingPowerup = MatchSystem.instance.Scene.FindNetworkObject(NextPowerupID)?.gameObject;
-        //if (!ExistingPowerup)
-        //{
-        //    int seed = (int)(MatchSystem.instance.MatchStartTime + NextPowerupID);
-        //    System.Random random = new System.Random(seed);
-        //    int powerupIndex = random.Next(0, Powerups.Count);
-        //    Debug.Log(powerupIndex);
-        //    GameObject prefab = Powerups[powerupIndex];
-        //    ExistingPowerup = MatchSystem.instance.NetworkInstantiate(prefab, trans.position, trans.rotation, false, NextPowerupID);
-        //}
-        //NextPowerupID++;
-        //return ExistingPowerup;
 
         int seed = (int)(MatchSystem.instance.MatchStartTime + NextPowerupID);
         System.Random random = new System.Random(seed);

@@ -489,6 +489,9 @@ public class ChadControls : NetworkComponent
             PickedUpObject.Drop();
             PickedUpObject = null;
         }
+
+        if (isOwner)
+            MatchSystem.instance.LocalChad = this;
     }
 
     #region Coroutines

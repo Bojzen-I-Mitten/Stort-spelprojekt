@@ -36,6 +36,7 @@ public class PowerupSpawner : NetworkComponent
     {
         timeLeftUntilSpawn = spawnInterval;
         hasPowerup = false;
+        spawnedPowerup = null;
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
