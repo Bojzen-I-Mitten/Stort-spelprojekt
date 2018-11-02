@@ -29,6 +29,7 @@
 #include "object\GameObject.h"
 #include "Debug.h"
 #include "system/SceneManager.h"
+#include "system/command/CommandQueue.h"
 
 using namespace thomas;
 
@@ -51,6 +52,13 @@ namespace ThomasEngine {
 	{
 		Start(true);
 	}
+
+	ThomasWrapper::ThomasWrapper()
+	{
+		// Thomas Object Initiation
+		m_scene = gcnew SceneManager();
+		m_engineCommands = gcnew CommandQueue();
+	}
 	void ThomasWrapper::Start(bool editor) 
 	{
 		inEditor = editor;
@@ -62,12 +70,11 @@ namespace ThomasEngine {
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
 
 		// Thomas Initialization
-		Thomas->m_scene = gcnew SceneManager();
+		s_SYS = gcnew ThomasWrapper();
 		s_Selection = gcnew ThomasSelection();
 		s_GameObjectManager = gcnew GameObjectManager();
 		thomas::ThomasCore::Core().registerThread();
 		thomas::ThomasCore::Init();
-
 
 
 		if (ThomasCore::Initialized())
@@ -127,9 +134,9 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SynchronousExecution()
 	{
-		CurrentScene->SyncScene();
-		// Process state switch commands
-		ProcessCommand();
+		Thomas->m_engineCommands->execute();	// Execute editor commands
+		CurrentScene->SyncScene();				// Execute scene commands
+		ProcessCommand();						// Process engine state switch commands
 
 		// Refresh frame
 		thomas::graphics::LightManager::Update();
@@ -440,6 +447,10 @@ namespace ThomasEngine {
 
 		Debug::Log("Stopped...");
 		playing = RunningState::Editor;
+	}
+	void ThomasWrapper::IssueCommand(ICommand ^ cmd)
+	{
+		Thomas->m_engineCommands->issue(cmd);
 	}
 	void ThomasWrapper::IssueStateCommand(ThomasStateCommand state)
 	{

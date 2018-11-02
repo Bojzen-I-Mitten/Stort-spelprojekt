@@ -64,6 +64,7 @@
     <ClCompile Include="src\GUI\game\Canvas.cpp" />
     <ClCompile Include="src\math\Viewport.cpp" />
     <ClCompile Include="src\object\component\animation\BoneSyncComponent.cpp" />
+    <ClCompile Include="src\system\command\CommandQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -132,6 +133,8 @@
     <ClInclude Include="src\math\Viewport.h" />
     <ClInclude Include="src\resource\texture\TextureCube.h" />
     <ClInclude Include="src\object\component\animation\BoneSyncComponent.h" />
+    <ClInclude Include="src\system\command\ICommand.h" />
+    <ClInclude Include="src\system\command\CommandQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

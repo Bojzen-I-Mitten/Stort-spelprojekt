@@ -2,6 +2,7 @@
 
 #pragma once
 
+#pragma managed
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -34,13 +35,15 @@ namespace ThomasEngine {
 
 	ref class ThomasSelection;
 	ref class GameObjectManager;
+	ref class CommandQueue;
+	interface class ICommand;
 	public ref class ThomasWrapper
 	{
 	private:
 
 		static GameObjectManager^ s_GameObjectManager;
 
-		static ThomasWrapper^ s_SYS = gcnew ThomasWrapper();
+		static ThomasWrapper^ s_SYS;
 		static bool inEditor = false;
 		static float cpuTime = 0.0f;
 		static bool showStatistics = false;
@@ -67,8 +70,11 @@ namespace ThomasEngine {
 		static void ProcessCommand();
 		static void SynchronousExecution();
 
+		ThomasWrapper();
+
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
+		CommandQueue^ m_engineCommands;
 	public:
 
 		property SceneManager^ SceneManagerRef
@@ -98,7 +104,7 @@ namespace ThomasEngine {
 		{
 			Scene^ get();
 		}
-
+		static void IssueCommand(ICommand^ cmd);
 		static void IssueStateCommand(ThomasStateCommand cmd);
 		static void IssuePlay();
 		static void IssueStopPlay();
