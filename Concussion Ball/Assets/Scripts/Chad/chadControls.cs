@@ -484,6 +484,11 @@ public class ChadControls : NetworkComponent
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
         ResetCamera();
+        if(PickedUpObject)
+        {
+            PickedUpObject.Drop();
+            PickedUpObject = null;
+        }
     }
 
     #region Coroutines
@@ -638,6 +643,7 @@ public class ChadControls : NetworkComponent
                     if (PickedUpObject && PickedUpObject.DropOnRagdoll)
                     {
                         PickedUpObject.Drop();
+                        PickedUpObject = null;
                     }
                         
                 }

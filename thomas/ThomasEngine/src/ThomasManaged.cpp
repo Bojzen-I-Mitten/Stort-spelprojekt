@@ -87,6 +87,10 @@ namespace ThomasEngine {
 				Resources::LoadAll(Application::editorAssets);
 				ScriptingManager::Init();
 			}
+			else
+			{
+				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
+			}
 
 			
 #endif

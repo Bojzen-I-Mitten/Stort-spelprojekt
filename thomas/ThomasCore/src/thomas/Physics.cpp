@@ -196,7 +196,7 @@ namespace thomas
 
 	btQuaternion Physics::ToBullet(const math::Quaternion& quaternion)
 	{
-		return *(btQuaternion*)&quaternion;
+		return btQuaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 	}
 
 	math::Quaternion Physics::ToSimple(const btQuaternion & quaternion)
