@@ -4,6 +4,7 @@
 #include "object\GameObject.h"
 #include "object\component\Camera.h"
 #include "graphics\BulletDebugDraw.h"
+#include "utils/Utility.h"
 
 namespace thomas
 {
@@ -16,6 +17,7 @@ namespace thomas
 	float Physics::s_timeStep = 1.0f / 60.0f; //Limit physics timestep to 60 FPS
 	float Physics::s_timeSinceLastPhysicsStep = 0.0f;
 	std::vector<object::component::Rigidbody*> Physics::s_rigidBodies;
+	Physics::CollisionLayer Physics::s_collisionLayers[32];
 	float Physics::s_accumulator;
 	bool Physics::s_drawDebug = true;
 
@@ -37,14 +39,18 @@ namespace thomas
 		gContactProcessedCallback = Physics::CollisionProcessed;
 		gContactEndedCallback = Physics::CollisionEnded;
 		
-		//s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
+		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
+
+		SetCollisionLayer("Default", 0, ~0);
+
 		return true;
 	}
 	void Physics::AddRigidBody(object::component::Rigidbody * rigidBody)
 	{
 		int size = s_rigidBodies.size();
 		s_rigidBodies.push_back(rigidBody);
-		s_world->addRigidBody(rigidBody);
+		s_world->addRigidBody(rigidBody, GetCollisionGroupBit(rigidBody->m_gameObject->GetLayer()), GetCollisionMask(rigidBody->m_gameObject->GetLayer()));
+		
 	}
 	bool Physics::RemoveRigidBody(object::component::Rigidbody * rigidBody)
 	{
@@ -120,6 +126,27 @@ namespace thomas
 		s_world.reset();		
 	}
 
+	bool Physics::Raycast(const math::Vector3& origin, const math::Vector3& direction, RaycastHit& hitInfo, const float maxDistance, int layerMask)
+	{
+		btVector3 start = ToBullet(origin);
+		btVector3 end = ToBullet(origin + direction * maxDistance);
+		btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
+
+		rayCallback.m_collisionFilterMask = layerMask;
+
+		s_world->rayTest(start, end, rayCallback);
+		if (rayCallback.hasHit()) 
+		{
+			hitInfo.collider = reinterpret_cast<object::component::Collider*>(rayCallback.m_collisionObject->getUserPointer());
+			hitInfo.point = ToSimple(rayCallback.m_hitPointWorld);
+			hitInfo.normal = ToSimple(rayCallback.m_hitNormalWorld);
+			hitInfo.distance = maxDistance * rayCallback.m_closestHitFraction;
+			return true;
+		}
+		return false;
+	}
+
+
 	void Physics::CollisionStarted(btPersistentManifold * const & manifold)
 	{		
 		HandleCollision(manifold->getBody0(), manifold->getBody1(), COLLISION_TYPE::STARTED);
@@ -186,5 +213,54 @@ namespace thomas
 	math::Quaternion Physics::ToSimple(const btQuaternion & quaternion)
 	{
 		return (math::Quaternion)quaternion;
+	}
+
+	void Physics::SetCollisionLayer(std::string name, int group, int mask)
+	{
+		s_collisionLayers[group].name = name;
+		s_collisionLayers[group].mask = mask;
+	}
+
+	void Physics::SetGroupCollisionFlag(int group1, int group2, bool collide)
+	{
+		int groupBit = GetCollisionGroupBit(group2);
+		if (collide)
+			utility::setFlag(s_collisionLayers[group1].mask, groupBit);
+		else
+			utility::rmvFlag(s_collisionLayers[group1].mask, groupBit);
+	}
+	int Physics::GetCollisionGroup(std::string name)
+	{
+		for (int i = 0; i < 32; i++) {
+			if (s_collisionLayers[i].name == name)
+				return i;
+		}
+		return -1;
+	}
+	std::string Physics::GetCollisionGroup(int group)
+	{
+		return s_collisionLayers[group].name;
+	}
+	int Physics::GetCollisionGroupBit(int group)
+	{
+		return 1 << group;
+	}
+	int Physics::GetCollisionMask(int group)
+	{
+		return s_collisionLayers[group].mask;
+	}
+	int Physics::GetCollisionMask(std::string name)
+	{
+		return s_collisionLayers[GetCollisionGroup(name)].mask;
+	}
+
+	int Physics::GetCollisionLayerCount()
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (GetCollisionGroup(i) == "None")
+				return i;
+		}
+		return 32;
 	}
 }

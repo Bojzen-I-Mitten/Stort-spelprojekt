@@ -186,6 +186,7 @@
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\resource\Font.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\object\GameObjectManager.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />

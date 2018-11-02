@@ -20,7 +20,6 @@ namespace ThomasEngine
 	{
 		
 	}
-
 	void Collider::OnDestroy()
 	{
 		gch.Free();

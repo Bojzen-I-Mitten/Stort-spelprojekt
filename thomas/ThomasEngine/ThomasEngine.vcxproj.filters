@@ -59,6 +59,7 @@
     <ClCompile Include="src\resource\Font.cpp" />
     <ClCompile Include="src\system\SceneManager.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\GUI\editor\Gizmos.cpp" />
     <ClCompile Include="src\GUI\game\GUIElements.cpp" />
     <ClCompile Include="src\GUI\game\Canvas.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="src\math\Random.h" />
     <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\resource\Font.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\system\SceneManager.h" />
     <ClInclude Include="src\GUI\editor\Gizmos.h" />

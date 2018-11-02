@@ -34,6 +34,8 @@ namespace ThomasEngine {
 	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
+		Tag = "";
+		Layer = 0;
 		m_transform = AddComponent<Transform^>();
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
@@ -447,6 +449,16 @@ namespace ThomasEngine {
 		((thomas::object::GameObject*)nativePtr)->SetActive(active);
 		
 
+	}
+
+	int GameObject::Layer::get()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetLayer();
+	}
+
+	void GameObject::Layer::set(int value)
+	{
+		((thomas::object::GameObject*)nativePtr)->SetLayer(value);
 	}
 
 	bool GameObject::activeSelf::get()
