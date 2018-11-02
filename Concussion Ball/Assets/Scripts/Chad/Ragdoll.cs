@@ -551,8 +551,10 @@ public class Ragdoll : ScriptComponent
 
     public override void Update()
     {
+        Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
+        Vector3 listenerpos = AudioListener.transform.position;
 
-        RagdollSound.Apply3D(AudioListener.transform.position, G_BodyParts[(int)BODYPART.SPINE].transform.position);
+        RagdollSound.Apply3D(listenerpos, spinepos);
 
 
 

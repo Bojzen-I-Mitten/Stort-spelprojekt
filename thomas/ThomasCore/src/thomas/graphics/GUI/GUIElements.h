@@ -58,14 +58,18 @@ namespace thomas
 				DirectX::SpriteEffects effect;
 
 				virtual void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale) = 0;
-				virtual Vector2 Size() = 0;
+				virtual Vector2 PixelSize() = 0;
+				Vector2 Size()
+				{
+					return scale * canvas->GetViewportScale() * PixelSize();
+				}
 
 				bool Hovered()
 				{
 					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
 					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
 						return false;
-					Vector2 size = Size();
+					Vector2 size = PixelSize();
 					GUIRect rect{ position.x * canvas->GetViewport().width, position.x * canvas->GetViewport().width + size.x * scale.x * canvas->GetViewportScale().x,
 									 position.y * canvas->GetViewport().height, position.y * canvas->GetViewport().height + size.y * scale.y * canvas->GetViewportScale().y };
 					return rect.Intersect(window->GetInput()->GetMousePosition());
@@ -95,7 +99,7 @@ namespace thomas
 					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation, effect, depth);
 				}
 
-				Vector2 Size()
+				Vector2 PixelSize()
 				{
 					return font->GetTextSize(text);
 				}
@@ -112,10 +116,15 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * Size(), scale * vpScale, effect, depth);
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
 				}
 
 				Vector2 Size()
+				{
+					return scale * canvas->GetViewportScale() * PixelSize();
+				}
+
+				Vector2 PixelSize()
 				{
 					return Vector2(texture->GetWidth(), texture->GetHeight());
 				}

@@ -4,16 +4,56 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ThomasEditor"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Options" Height="450" Width="400">
+        Title="Options" Height="650" Width="400">
+
+
     <Grid>
-        <DockPanel HorizontalAlignment="Left" Height="350" LastChildFill="False" Margin="10,10,0,0" VerticalAlignment="Top" Width="100">
+        <Expander Header="Physics" IsExpanded="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <DataGrid x:Name="collisionMatrix" Grid.Row="0"
+                      CanUserAddRows="False" CanUserDeleteRows="False" 
+                      CanUserResizeColumns="False" CanUserReorderColumns="False"
+                      CanUserResizeRows="False" CanUserSortColumns="False">
+                </DataGrid>
+                <Button Grid.Row="1" Click="SaveMatrix_Button_Click">
+                    Save Matrix
+                </Button>
+                <ListView x:Name="collisionLayers" Grid.Row="2" AlternationCount="1000">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Path=., Mode=OneWay}" 
+                                     Tag="{Binding (ItemsControl.AlternationIndex),
+       RelativeSource={RelativeSource AncestorType=ListViewItem}}" TextChanged="TextBox_TextChanged"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Width="30" Click="AddLayer_Button_Click">
+                        +
+                    </Button>
+                    <Button Width="30" Click="RemoveLayer_Button_Click">
+                        -
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+
+        </Expander>
+        <!--<DockPanel HorizontalAlignment="Left" Height="350" LastChildFill="False" Margin="10,10,0,0" VerticalAlignment="Top" Width="100">
             <ListBox x:Name="listBox" Height="350" VerticalAlignment="Top" Width="100">
                 <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Key Bindings"/>
 
 
             </ListBox>
 
-        </DockPanel>
+        </DockPanel>-->
     </Grid>
 </Window>
