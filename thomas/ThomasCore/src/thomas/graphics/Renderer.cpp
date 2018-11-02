@@ -85,11 +85,6 @@ namespace thomas
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
 			m_shaders.SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
-
-			if (camera->GetGUIRendering())
-			{
-				camera->GetGUIHandle()->Render();
-			}
 		}
 		bool Renderer::BindCameraViewport(const render::CAMERA_FRAME_DATA& frameData)
 		{
