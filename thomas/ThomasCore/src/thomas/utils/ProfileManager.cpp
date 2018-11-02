@@ -76,12 +76,11 @@ namespace thomas
 					for (auto& processor : id.second)
 					{
 						j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"];
-						//j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = processor.second;
 						for (auto& sample : processor.second)
 						{
-							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][processor.first][std::to_string(sample.m_frame)];
-							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][processor.first][std::to_string(sample.m_frame)]["duration"] = sample.m_duration;
-							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][processor.first][std::to_string(sample.m_frame)]["startTime"] = sample.m_startTime;
+							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][std::to_string(sample.m_frame)][processor.first];
+							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][std::to_string(sample.m_frame)][processor.first]["duration"] = sample.m_duration;
+							j["SlowfilerData"]["timeline"]["processor"][id.first]["functions"][std::to_string(sample.m_frame)][processor.first]["startTime"] = sample.m_startTime;
 						}
 					}
 				}
