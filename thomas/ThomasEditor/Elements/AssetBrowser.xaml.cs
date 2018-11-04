@@ -690,12 +690,7 @@ namespace ThomasEditor
             GameObject prefab = item.DataContext as GameObject;
             watcher.EnableRaisingEvents = false;
 
-            
             ThomasEngine.Resources.SavePrefab(prefab, file);
-
-            GameObject.Destroy(prefab);
-            item.DataContext = ThomasEngine.Resources.LoadPrefab(file);
-
             watcher.EnableRaisingEvents = true;
         }
     }
