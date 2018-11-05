@@ -179,13 +179,13 @@ namespace ThomasEditor
             }
         }
 
-        private void SceneGameObjectsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SceneGameObjectsChanged(object sender, ThomasEngine.Scene.SceneObjectsChangedArgs e)
         {
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
-                if (e.NewItems != null)
+                if (e.Added != null)
                 {
-                    foreach (GameObject newItem in e.NewItems)
+                    foreach (GameObject newItem in e.Added)
                     {
                         if (newItem.transform.parent == null)
                         {
@@ -200,9 +200,9 @@ namespace ThomasEditor
                     }
                 }
 
-                if (e.OldItems != null)
+                if (e.Removed != null)
                 {
-                    foreach (GameObject oldItem in e.OldItems)
+                    foreach (GameObject oldItem in e.Removed)
                         DeleteObjectInTree(m_hierarchyNodes.ToList(), oldItem);
                 }
             }));

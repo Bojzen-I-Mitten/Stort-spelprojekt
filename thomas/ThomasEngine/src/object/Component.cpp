@@ -12,7 +12,8 @@ using namespace System::Threading;
 
 namespace ThomasEngine 
 {
-	Component::Component() : Object(new thomas::object::component::Component())
+	Component::Component() : 
+		Object(new thomas::object::component::Component())
 	{
 
 	}

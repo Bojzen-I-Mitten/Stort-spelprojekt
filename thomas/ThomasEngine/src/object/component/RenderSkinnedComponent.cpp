@@ -3,6 +3,7 @@
 #pragma unmanaged
 #include <thomas\object\component\RenderComponent.h>
 #include <thomas\graphics\animation\IBlendTree.h>
+#include <thomas\utils\atomic\Synchronization.h>
 #pragma managed
 
 #include "../Component.h"

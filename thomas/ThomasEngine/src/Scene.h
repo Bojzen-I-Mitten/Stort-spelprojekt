@@ -9,6 +9,7 @@
 
 #using "PresentationFramework.dll"
 using namespace System::Runtime::Serialization;
+using namespace System::Collections::Generic;
 
 namespace ThomasEngine {
 
@@ -17,6 +18,20 @@ namespace ThomasEngine {
 	[DataContract]
 	public ref class Scene
 	{
+	public:
+		ref class SceneObjectsChangedArgs : System::EventArgs
+		{
+		public:
+#ifdef _EDITOR
+			const uint32_t EditCount;			// Number of objects edited
+			const List<GameObject^>^ Added;		// List of objects added
+			const List<GameObject^>^ Removed;	// List of objects removed
+			SceneObjectsChangedArgs(uint32_t EditCount, List<GameObject^>^ add, List<GameObject^>^ rmv)
+				: EditCount(EditCount), Added(add), Removed(rmv)
+			{			}
+		};
+		delegate void SceneObjectsChangedEventHandler(System::Object^ sender, SceneObjectsChangedArgs^ e);
+#endif
 	private:
 		enum class Command
 		{
@@ -31,13 +46,16 @@ namespace ThomasEngine {
 		};
 
 		uint32_t m_uniqueID;
-		System::Collections::ObjectModel::ObservableCollection<GameObject^>^ m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
+		List<GameObject^>^ m_gameObjects = gcnew List<GameObject^>();
 		System::Object^ m_accessLock = gcnew System::Object();
-		System::Collections::Generic::List<IssuedCommand>^ m_commandList;
-		System::Collections::Generic::List<IssuedCommand>^ m_commandSwapList;
-
+		List<IssuedCommand>^ m_commandList;
+		List<IssuedCommand>^ m_commandSwapList;
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
+
+#ifdef _EDITOR
+		event SceneObjectsChangedEventHandler^ m_changeEvent;
+#endif
 
 		Scene(uint32_t unique_id);
 
@@ -85,9 +103,9 @@ namespace ThomasEngine {
 		/* DataContract serialization game object list
 		*/
 		[DataMember(Order = 5)]
-		property System::Collections::ObjectModel::ObservableCollection<GameObject^>^ GameObjectData {
-			System::Collections::ObjectModel::ObservableCollection<GameObject^>^ get();
-			void set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val);
+		property List<GameObject^>^ GameObjectData {
+			List<GameObject^>^ get();
+			void set(List<GameObject^>^ val);
 		}
 
 	public:
@@ -103,9 +121,10 @@ namespace ThomasEngine {
 		void SaveScene();
 		
 
-		void Subscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler^ func);
-		void Unsubscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler^ func);
-
+#ifdef _EDITOR
+		void Subscribe(SceneObjectsChangedEventHandler^ func);
+		void Unsubscribe(SceneObjectsChangedEventHandler^ func);
+#endif
 	internal:
 		void UnLoad();
 		void EnsureLoad();

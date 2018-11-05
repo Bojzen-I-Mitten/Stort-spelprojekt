@@ -8,9 +8,11 @@
 #include "constraint/BoneConstraint.h"
 #include "../../resource/MemoryAllocation.h"
 #include "../../ThomasCore.h"
+
 namespace thomas {
 	namespace graphics {
 		namespace animation {
+			using namespace utils::atomics;
 
 			AnimatedSkeleton::AnimatedSkeleton(Skeleton& ref) :
 				_ref(ref), _root(),  _pose(ref.getNumBones()), _skin(ref.getNumBones()), m_constraint(new ConstraintList[ref.getNumBones()])
@@ -30,6 +32,7 @@ namespace thomas {
 			}
 
 			void AnimatedSkeleton::update(float dT) {
+				Lock lck(m_lock);
 				if (!_root) return;		// Verify blend node
 				_root->update(dT);		// Update each node ONCE.
 				updateSkeleton();		// Apply skeleton.
@@ -80,6 +83,7 @@ namespace thomas {
 			/* Freeze the current animation */
 			void AnimatedSkeleton::stopAnimation()
 			{
+				Lock lck(m_lock);
 				_root = NULL;
 			}
 
@@ -88,7 +92,10 @@ namespace thomas {
 				if (!blendTree)
 					clearBlendTree();
 				else
+				{
+					Lock lck(m_lock);
 					_root = blendTree;
+				}
 			}
 
 			void AnimatedSkeleton::clearBlendTree() {
@@ -104,6 +111,7 @@ namespace thomas {
 				}
 				AnimationData &animRef = *anim->GetAnimation();
 				std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, animRef.m_duration, PlayType::Loop));
+				Lock lck(m_lock);
 				_root = new AnimPlayback(_ref, playback, animRef);
 			}
 
@@ -144,10 +152,12 @@ namespace thomas {
 			}
 			void AnimatedSkeleton::addConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{
+				Lock lck(m_lock);
 				m_constraint.get()[boneIndex].add(bC);
 			}
 			void AnimatedSkeleton::rmvConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{
+				Lock lck(m_lock);
 				m_constraint.get()[boneIndex].rmv(bC);
 			}
 			void ConstraintList::add(BoneConstraint * bC)

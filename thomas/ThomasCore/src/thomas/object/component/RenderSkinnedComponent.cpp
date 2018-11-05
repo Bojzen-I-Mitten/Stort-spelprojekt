@@ -40,6 +40,7 @@ namespace thomas
 #ifdef _EDITOR
 				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 #endif
+				COMP_LOCK();
 				if (m_skeleton)
 					m_skeleton->update(ThomasTime::GetDeltaTime());
 			}
@@ -60,6 +61,7 @@ namespace thomas
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
 				RenderComponent::SetModel(model);
+				COMP_LOCK();
 				// Read new skeleton
 				if (!model)
 					m_skeleton = NULL;

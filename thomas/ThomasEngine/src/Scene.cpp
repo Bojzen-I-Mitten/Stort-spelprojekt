@@ -21,10 +21,10 @@ namespace ThomasEngine
 {
 	Scene::Scene(System::String^ name, uint32_t unique_id)
 	:	m_uniqueID(unique_id),
-		m_gameObjects(gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>()),
+		m_gameObjects(gcnew List<GameObject^>()),
 		m_accessLock(gcnew System::Object()),
-		m_commandList(gcnew System::Collections::Generic::List<IssuedCommand>()),
-		m_commandSwapList(gcnew System::Collections::Generic::List<IssuedCommand>()),
+		m_commandList(gcnew List<IssuedCommand>()),
+		m_commandSwapList(gcnew List<IssuedCommand>()),
 		m_name(name)
 	{
 	}
@@ -143,7 +143,7 @@ namespace ThomasEngine
 		if (m_gameObjects == nullptr) { // Scene is empty
 			Debug::LogWarning("Warning, no objects in scene.");
 			m_accessLock = gcnew Object();
-			m_gameObjects = gcnew System::Collections::ObjectModel::ObservableCollection<GameObject^>();
+			m_gameObjects = gcnew List<GameObject^>();
 			//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 		}
 
@@ -159,12 +159,22 @@ namespace ThomasEngine
 
 	void Scene::SyncScene()
 	{
+#ifdef _EDITOR
+		uint32_t numChanged = 0;
+		List<GameObject^>^ addedList = gcnew List<GameObject^>();
+		List<GameObject^>^ removedList = gcnew List<GameObject^>();
+#endif
+
 		for each(IssuedCommand c in m_commandList)
 		{
 			switch (c.m_cmd)
 			{
 			case Command::Add:
 				m_gameObjects->Add(c.m_obj);
+#ifdef _EDITOR
+				numChanged++;
+				addedList->Add(c.m_obj);
+#endif
 				break;
 			case Command::DisableRemove:
 			{
@@ -172,6 +182,10 @@ namespace ThomasEngine
 				ThomasWrapper::Selection->UnSelectGameObject(c.m_obj);
 				m_gameObjects->Remove(c.m_obj);
 				c.m_obj->OnDestroy();
+#ifdef _EDITOR
+				numChanged++;
+				removedList->Add(c.m_obj);
+#endif
 				// Wait to next frame for delete:
 				IssuedCommand cmd;
 				cmd.m_cmd = Command::Remove;
@@ -192,17 +206,24 @@ namespace ThomasEngine
 		auto swp = m_commandList;
 		m_commandList = m_commandSwapList;
 		m_commandSwapList = swp;
+
+#ifdef _EDITOR
+		if(numChanged)	// Trigger event 
+			m_changeEvent(this, gcnew SceneObjectsChangedArgs(numChanged, addedList, removedList));
+#endif
 	}
 
-	void Scene::Subscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler ^ func)
+#ifdef _EDITOR
+	void Scene::Subscribe(SceneObjectsChangedEventHandler ^ func)
 	{
-		m_gameObjects->CollectionChanged += func;
+		m_changeEvent += func;
 	}
 
-	void Scene::Unsubscribe(System::Collections::Specialized::NotifyCollectionChangedEventHandler ^ func)
+	void Scene::Unsubscribe(SceneObjectsChangedEventHandler ^ func)
 	{
-		m_gameObjects->CollectionChanged -= func;
+		m_changeEvent -= func;
 	}
+#endif
 
 #pragma endregion
 
@@ -232,10 +253,10 @@ namespace ThomasEngine
 	{
 		return m_gameObjects;
 	}
-	System::Collections::ObjectModel::ObservableCollection<GameObject^>^ Scene::GameObjectData::get() {
+	List<GameObject^>^ Scene::GameObjectData::get() {
 		return m_gameObjects;
 	}
-	void Scene::GameObjectData::set(System::Collections::ObjectModel::ObservableCollection<GameObject^>^ val) {
+	void Scene::GameObjectData::set(List<GameObject^>^ val) {
 		m_gameObjects = val;
 	}
 }
