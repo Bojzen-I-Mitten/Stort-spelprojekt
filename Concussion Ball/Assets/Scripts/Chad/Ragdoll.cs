@@ -562,12 +562,8 @@ public class Ragdoll : ScriptComponent
 
     public override void Update()
     {
-        Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
-        Vector3 listenerpos = AudioListener.transform.position;
-
-        RagdollSound.Apply3D(listenerpos, spinepos);
-
-
+        // Apply 3D-sound effect for impact sound
+        RagdollSound.Apply3D(AudioListener.transform.position, G_BodyParts[(int)BODYPART.SPINE].transform.position);
 
         if (RagdollEnabled)
         {
@@ -580,17 +576,13 @@ public class Ragdoll : ScriptComponent
                 
             return;
         }
-        RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
-        
-
+        RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
 
         for(int i = 0; i < (int)BODYPART.COUNT; i++)
         {
-            G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
         }
-
-
     }
 
     public override void OnDestroy()
