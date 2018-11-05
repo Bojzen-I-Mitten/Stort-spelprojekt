@@ -15,8 +15,10 @@ public class Vindaloo : Powerup
     private ParticleEmitter emitterGravel;
 
     public float ExplosionRadius { get; set; } = 5.0f;
-    // public float ExplosionForce { get; set; } = 200.0f;
-    public float ExplosionForce = 200.0f;
+    public float ExplosionForce { get; set; } = 200.0f;
+
+  
+
     public override void Start()
     {
         base.Start();
@@ -105,9 +107,9 @@ public class Vindaloo : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+    public override void Throw(Vector3 force)
     {
-        base.Throw(camPos, force);
+        base.Throw(force);
     }
 
     // this function will be called upon powerup use / collision after trown
@@ -159,4 +161,5 @@ public class Vindaloo : Powerup
 
         Remove();
     }
+    
 }

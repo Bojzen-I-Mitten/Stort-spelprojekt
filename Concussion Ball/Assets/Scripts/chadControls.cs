@@ -36,25 +36,29 @@ public class ChadControls : NetworkComponent
     public float ChargeTime { get; private set; }
     #endregion
 
-    #region Camera Settings etc.
-    [Category("Camera Settings")]
+    #region Camera Stuff
+    [Category("Camera Stuff")]
     public Camera Camera { get; set; }
-    [Category("Camera Settings")]
+    [Category("Camera Stuff")]
     public float CameraSensitivity_x { get; set; } = 10;
-    [Category("Camera Settings")]
+    [Category("Camera Stuff")]
     public float CameraSensitivity_y { get; set; } = 20;
-    [Category("Camera Settings")]
+    [Category("Camera Stuff")]
     public Vector3 CameraOffset { get; set; } = new Vector3(0, 2, 2);
-    [Category("Camera Settings")]
+    [Category("Camera Stuff")]
     public float CameraMaxVertDegrees { get; set; } = 60;
-    [Category("Camera Settings")]
+    [Category("Camera Stuff")]
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
     [Category("Camera Settings")]
     public Vector3 CameraOffsetThrowing { get; set; } = new Vector3(1.5f, 1.5f, 1.5f);
     [Category("Camera Settings")]
     public float TotalYStep { get; private set; } = 0;
-    [Category("Camera Settings")]
+    [Category("Camera Stuff")]
     public float TotalXStep { get; private set; } = 0;
+    [Category("Camera Stuff")]
+    public Texture2D BallArrow { get; set; }
+    [Browsable(false)]
+    private String BallArrowID { get; } = "BallArrow";
     #endregion
 
     #region Movement stuff
@@ -83,7 +87,10 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        
+        Camera.renderGUI = true;
+        Vector3 Arrowpos = Camera.WorldToViewport(Vector3.Zero, Ball.transform.world);
+        Camera.AddImage(BallArrowID, BallArrow, new Vector2(Arrowpos.x, Arrowpos.y), false);
+        Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
 
         State = STATE.CHADING;
 
@@ -161,6 +168,8 @@ public class ChadControls : NetworkComponent
         }
         if (Input.GetKeyDown(Input.Keys.K))
             gameObject.GetComponent<NetworkPlayer>().Reset();
+
+        BallIndicator();
     }
 
     private void EnableRagdoll()
@@ -180,7 +189,7 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
-        if(State != STATE.RAGDOLL)
+        if (State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
             State = STATE.RAGDOLL;
@@ -330,7 +339,7 @@ public class ChadControls : NetworkComponent
     }
     #endregion
 
-    #region Camera controls
+    #region Camera Functions
     public void FondleCamera(float velocity, float xStep, float yStep)
     {
         if (Camera && State != STATE.RAGDOLL)
@@ -413,6 +422,79 @@ public class ChadControls : NetworkComponent
         if (angle > 2 * ThomasEngine.MathHelper.Pi)
             angle -= 2 * ThomasEngine.MathHelper.Pi;
         return Math.Min(Math.Max(angle, min), max);
+    }
+
+    private void BallIndicator()
+    {
+        Vector3 screenPos = Camera.WorldToViewport(Ball.transform.localPosition, Ball.transform.world);
+
+        if (!(screenPos.z > 0 && screenPos.z < 1 &&
+            screenPos.x > 0 && screenPos.x < Camera.viewport.x &&
+            screenPos.y > 0 && screenPos.y < Camera.viewport.y)) //Offscreen check
+        {
+            //Adjust for center of screen
+            Vector3 screenCenter = new Vector3(Camera.viewport, 0) / 2;
+            screenPos -= screenCenter;
+
+            //flip coordinates if more than 90 deg away
+            if (screenPos.z > 1)
+                screenPos *= -1;
+            
+            float angle = (float)Math.Atan2(-screenPos.y, screenPos.x);
+            angle -= MathHelper.PiOver2;
+
+            float cos = (float)Math.Cos(angle);
+            float sin = -(float)Math.Sin(angle);
+
+            //screenPos = screenCenter + new Vector3(sin * )
+
+            float m = screenPos.y / screenPos.x;
+            //Debug.Log(screenPos.ToString() + '\t' + m);
+
+            Vector3 screenBounds = screenCenter; //473.5, 253.5, 0
+
+            if (screenPos.y > 0)
+                screenPos = new Vector3(screenBounds.y / m, screenBounds.y, 0);
+            else
+                screenPos = new Vector3(-screenBounds.y / m, -screenBounds.y, 0);
+
+            if (screenPos.x > screenBounds.x)
+                screenPos = new Vector3(screenBounds.x, screenBounds.x * m, 0);
+            else if (screenPos.x < -screenBounds.x)
+                screenPos = new Vector3(-screenBounds.x, -screenBounds.x * m, 0);
+
+            //Re-adjust for screen center
+            screenPos += screenCenter;
+            screenPos -= new Vector3(BallArrow.width, BallArrow.height, 0) / 2;
+            //Make sure the arrow is drawn on-screen
+            screenPos = Vector3.Clamp(screenPos, Vector3.Zero, new Vector3(Camera.viewport.x - BallArrow.width, Camera.viewport.y - BallArrow.height, 0));
+            
+            Camera.SetImagePosition(BallArrowID, new Vector2(screenPos.x, screenPos.y));
+            Camera.SetImageRotation(BallArrowID, -angle);
+        }
+        else
+        {
+            Camera.SetImagePosition(BallArrowID, new Vector2(-1000, -1000));
+        }
+        /*//Get the ball position in view port coordinates
+        Vector3 screenPos = Camera.WorldToViewport(Ball.transform.localPosition, Ball.transform.world);
+        //Correct for size of texture
+        screenPos -= new Vector3(BallArrow.width, BallArrow.width, 0) /2;
+        //flip coordinates if behind us
+        if(screenPos.z > 1)
+            screenPos *= -1;
+
+        //Clamp to screen edges, with image offset
+        screenPos = Vector3.Clamp(screenPos, Vector3.Zero, new Vector3(Camera.viewport - new Vector2(BallArrow.width, BallArrow.width), 0));
+
+        //Draw the arrow at that position
+        Camera.SetImagePosition(BallArrowID, new Vector2(screenPos.x, screenPos.y));
+        //Rotate ball indicator arrow to point outward from the center of the screen
+        Vector2 screenCenter = Camera.viewport / 2;
+        //TODO: Rotation
+        //Vector2 UnitVectorFromCenter = new Vector2(screenPos.x, screenPos.y);
+        //UnitVectorFromCenter.Normalize();
+        //Camera.SetImageRotation(BallArrowID, (float)Math.Acos(UnitVectorFromCenter.x));*/
     }
     #endregion
 

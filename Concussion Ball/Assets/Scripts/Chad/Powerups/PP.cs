@@ -24,9 +24,9 @@ public class PP : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+    public override void Throw(Vector3 force)
     {
-        base.Throw(camPos, force);
+        base.Throw(force);
     }
 
     // this function will be called upon powerup use / collision after trown

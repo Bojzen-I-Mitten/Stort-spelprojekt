@@ -69,7 +69,7 @@ public class NetworkPlayer : NetworkComponent
             gameObject.GetComponent<Rigidbody>().enabled = false;
             StartCoroutine(EnableRigidbody());
             transform.position = Team.GetSpawnPosition();
-            transform.LookAt(new Vector3(0, transform.position.y, 0));
+            transform.LookAt(Vector3.Zero);
             gameObject.GetComponent<ChadControls>().Reset();
         }
     }

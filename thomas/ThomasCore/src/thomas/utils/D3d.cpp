@@ -517,7 +517,7 @@ namespace thomas
 			return m_deviceContext;
 		}
 
-		utils::profiling::GpuProfiler* D3D::GetProfiler()
+		profiling::GpuProfiler* D3D::GetProfiler()
 		{
 			return m_profiler;
 		}

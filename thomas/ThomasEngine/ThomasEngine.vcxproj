@@ -225,8 +225,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\object\Object.h" />
     <ClInclude Include="src\ThomasManaged.h" />
-    <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
-    <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -292,8 +290,6 @@
     <ClCompile Include="src\ThomasManaged.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Utility.cpp" />
-    <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
-    <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

@@ -5,6 +5,7 @@
 #include "object\component\Camera.h"
 #include "graphics\BulletDebugDraw.h"
 #include "utils/Utility.h"
+#include "AutoProfile.h"
 
 namespace thomas
 {
@@ -85,6 +86,7 @@ namespace thomas
 
 	void Physics::UpdateRigidbodies()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateTransformToRigidBody();

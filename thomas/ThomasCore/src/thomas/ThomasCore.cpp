@@ -15,7 +15,7 @@
 #include "utils\d3d.h"
 #include <d3d11_4.h>
 #include <comdef.h>
-#include "utils/AutoProfile.h"
+#include "AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 #include "utils/ThreadMap.h"
@@ -63,6 +63,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
+		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();
@@ -74,10 +75,11 @@ namespace thomas
 
 	void ThomasCore::Render()
 	{
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		
+		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->BeginFrame();
 		WindowManager::Instance()->ClearAllWindows();
-		profiler->Timestamp(utils::profiling::GTS_MAIN_CLEAR);
+		profiler->Timestamp(profiling::GTS_MAIN_CLEAR);
 		graphics::Renderer::Instance()->ProcessCommands();
 
 		// Draw performance readout - at end of CPU frame, so hopefully the previous frame

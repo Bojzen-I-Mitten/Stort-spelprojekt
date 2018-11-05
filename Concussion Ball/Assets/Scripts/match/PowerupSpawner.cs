@@ -1,18 +1,15 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using System;
 using ThomasEngine;
 using ThomasEngine.Network;
 public class PowerupSpawner : NetworkComponent
 {
-    GameObject spawnedPowerup;
     private bool hasPowerup = false;
     float spawnInterval = 30.0f;
     float timeLeftUntilSpawn = 0.0f;
-    Vector3 pos;
     public override void Start()
     {
-        pos = transform.position;
+
     }
 
     public override void Update()
@@ -27,15 +24,6 @@ public class PowerupSpawner : NetworkComponent
             }
         }
 
-
-        if (hasPowerup)
-        {
-            float test = (float)Math.Sin(Time.ElapsedTime);
-            float test2 = (float)Math.Cos(Time.DeltaTime);
-
-            spawnedPowerup.transform.position = pos + new Vector3(0, test, 0) / 10;
-            spawnedPowerup.transform.localEulerAngles += new Vector3(0, MathHelper.ToDegrees(test2), 0) / 20;
-        }
     }
 
     public void Free()
@@ -76,7 +64,7 @@ public class PowerupSpawner : NetworkComponent
         {
             if (!hasPowerup)
             {
-                spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
+                GameObject spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
                 spawnedPowerup.GetComponent<Powerup>().spawner = this;
                 timeLeftUntilSpawn = spawnInterval;
                 hasPowerup = true;
