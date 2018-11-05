@@ -37,6 +37,7 @@ public class ChadControls : NetworkComponent
 
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
+    private bool HasThrown = false;
     #endregion
 
     #region Camera Settings etc.
@@ -67,6 +68,7 @@ public class ChadControls : NetworkComponent
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
     private float BaseSpeed = 3.0f;
     private float MaxSpeed = 10.0f;
+    private float DiveSpeed = 12.0f;
 
     public float DiveTimer { get; private set; } = 0f;
     #endregion
@@ -170,6 +172,11 @@ public class ChadControls : NetworkComponent
 
     private void EnableRagdoll()
     {
+        // reset aim stuff 
+        ResetCharge();
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        ChadHud.Instance.DeactivateCrosshair();
+        ChadHud.Instance.DeactivateChargeBar();
 
         rBody.enabled = false;
         Ragdoll.EnableRagdoll();
@@ -237,6 +244,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKey(Input.Keys.Space) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
+            CurrentVelocity.y = DiveSpeed;
             StartCoroutine(DivingCoroutine());
             DivingTimer = 0.0f;
         }
@@ -265,9 +273,21 @@ public class ChadControls : NetworkComponent
 
                     Animations.SetAnimationWeight(ChargeAnimIndex, 1);
                 }
+                else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown)
+                {
+                    ChargeObject();
+                    if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
+                    {
+                        HasThrown = true;
+                        ChadHud.Instance.DeactivateCrosshair();
+                        ChadHud.Instance.DeactivateChargeBar();
+                        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+                        Throwing = PlayThrowAnim();
+                        StartCoroutine(Throwing);
+                    }
+                }
                 else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
                 {
-                    //Debug.Log("BIG MEME BOIS");
                     State = STATE.CHADING;
                     ResetCharge();
                     ResetCamera();
@@ -281,18 +301,6 @@ public class ChadControls : NetworkComponent
                     ResetCharge();
                     ResetCamera();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                }
-                else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
-                {
-                    ChargeObject();
-                }
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
-                {
-                    ChadHud.Instance.DeactivateCrosshair();
-                    ChadHud.Instance.DeactivateChargeBar();
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                    Throwing = PlayThrowAnim();
-                    StartCoroutine(Throwing);
                 }
             }
             else if (PickedUpObject) // player is holding object that is not throwable
@@ -542,6 +550,7 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
         ThrowObject(ballCamPos, chosenDirection);
+        HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
         if(State != STATE.RAGDOLL)
