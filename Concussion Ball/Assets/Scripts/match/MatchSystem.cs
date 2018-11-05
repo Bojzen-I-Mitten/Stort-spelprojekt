@@ -22,7 +22,8 @@ public class MatchSystem : NetworkManager
     public GameObject Ball;
 
     public ChadControls LocalChad;
-    public Camera spectatorCamera { get; set; }
+    public Camera Camera { get; set; }
+    //public Camera spectatorCamera { get; set; }
 
 
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds

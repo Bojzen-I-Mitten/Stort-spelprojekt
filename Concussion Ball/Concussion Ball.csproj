@@ -56,6 +56,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
+    <Compile Include="Assets\Scripts\Camera\ChadCam.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
+    <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
     <Compile Include="Assets\rayTest.cs" />
     <Compile Include="Assets\ToggleRagdoll.cs" />
     <Compile Include="Assets\RagdollImpact.cs" />
@@ -75,9 +80,6 @@
     <Compile Include="Assets\Scripts\Chad\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUIJoinHost.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUISelectTeam.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUITest.cs" />
     <Compile Include="Assets\Scripts\HighlightParent.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />

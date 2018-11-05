@@ -40,27 +40,6 @@ public class ChadControls : NetworkComponent
     private bool HasThrown = false;
     #endregion
 
-    #region Camera Settings etc.
-    [Category("Camera Settings")]
-    public Camera Camera { get; set; }
-    [Category("Camera Settings")]
-    public float CameraSensitivity_x { get; set; } = 10;
-    [Category("Camera Settings")]
-    public float CameraSensitivity_y { get; set; } = 20;
-    [Category("Camera Settings")]
-    public float CameraMaxVertDegrees { get; set; } = 60;
-    [Category("Camera Settings")]
-    private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
-    [Category("Camera Settings")]
-    public float TotalYStep { get; private set; } = 0;
-    [Category("Camera Settings")]
-    public float TotalXStep { get; private set; } = 0;
-
-    // Camera positions
-    private Vector3 CameraOffset = new Vector3(0, 1.8f, 1.5f);
-    private Vector3 CameraOffsetThrowing = new Vector3(0.8f, 1.6f, 0.8f);
-    #endregion
-
     #region Movement stuff
     public Vector3 Direction; //Right, roll, forward
 
@@ -73,9 +52,14 @@ public class ChadControls : NetworkComponent
     public float DiveTimer { get; private set; } = 0f;
     #endregion
 
-    Rigidbody rBody;
+    [Browsable(false)]
+    public Rigidbody rBody { get;  private set; }
+    [Browsable(false)]
+    public NetworkPlayer NetworkPlayer { get; private set; }
     Chadimations Animations;
     Ragdoll Ragdoll;
+    [Browsable(false)]
+    public Camera Camera { get { return MatchSystem.instance.Camera; } }
 
     public string PlayerPrefabName { get; set; } = "Chad";
     public float ImpactFactor { get; set; } = 100;
@@ -88,21 +72,19 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        
-
         State = STATE.CHADING;
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
 
-        if (Camera)
-            Camera.gameObject.activeSelf = false;
-        if (isOwner && !Camera)
-            Debug.LogWarning("Camera not set for player");
-        if (Camera)
-        {
-            Camera.transform.localPosition = CameraOffset;
-        }
+        //if (Camera)
+        //    Camera.gameObject.activeSelf = false;
+        //if (isOwner && !Camera)
+        //    Debug.LogWarning("Camera not set for player");
+        //if (Camera)
+        //{
+        //    Camera.transform.localPosition = CameraOffset;
+        //}
         ThrowForce = BaseThrowForce;
 
         rBody = gameObject.GetComponent<Rigidbody>();
@@ -118,25 +100,25 @@ public class ChadControls : NetworkComponent
         Identity.RefreshCache();
     }
 
-    public void DeactivateCamera()
-    {
-        if (isOwner)
-        {
-            Camera.gameObject.activeSelf = false;
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        }
+    //public void DeactivateCamera()
+    //{
+    //    if (isOwner)
+    //    {
+    //        Camera.gameObject.activeSelf = false;
+    //        Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+    //    }
             
-    }
+    //}
 
-    public void ActivateCamera()
-    {
-        if (isOwner)
-        {
-            Camera.gameObject.activeSelf = true;
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-        }
+    //public void ActivateCamera()
+    //{
+    //    if (isOwner)
+    //    {
+    //        Camera.gameObject.activeSelf = true;
+    //        Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+    //    }
             
-    }
+    //}
 
     public override void Update()
     {
@@ -290,7 +272,7 @@ public class ChadControls : NetworkComponent
                 {
                     State = STATE.CHADING;
                     ResetCharge();
-                    ResetCamera();
+                    //ResetCamera();
                     ChadHud.Instance.DeactivateCrosshair();
                     ChadHud.Instance.DeactivateChargeBar();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
@@ -299,7 +281,7 @@ public class ChadControls : NetworkComponent
                 {
                     State = STATE.DIVING;
                     ResetCharge();
-                    ResetCamera();
+                    //ResetCamera();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
             }
@@ -309,30 +291,28 @@ public class ChadControls : NetworkComponent
                     PickedUpObject.OnActivate();
             }
 
-            float xStep = Input.GetMouseX() * Time.ActualDeltaTime;
-            float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
-            Direction.y = xStep;
+            //Direction.y = xStep;
             if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING) || State == STATE.DIVING || State == STATE.CHADING)
             {
-                FondleCamera(CurrentVelocity.Length(), xStep, yStep);
+                //FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
             else if (State == STATE.THROWING)
             {
-                ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
+                //ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
             }
             else if (Input.GetKeyDown(Input.Keys.LeftShift))
             {
-                InitFreeLookCamera();
+                //InitFreeLookCamera();
             }
             else
             {
-                FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
+                //FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
             }
 
             if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
             {
-                ResetCamera();
+                //ResetCamera();
             }
         }
     }
@@ -346,92 +326,6 @@ public class ChadControls : NetworkComponent
     }
     #endregion
 
-    #region Camera controls
-    public void FondleCamera(float velocity, float xStep, float yStep)
-    {
-        if (Camera && State != STATE.RAGDOLL)
-        {
-            Camera.transform.localPosition = Vector3.Zero;
-            float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-            if (velocity != 0)
-                yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
-
-            transform.RotateByAxis(transform.up, yaw);
-
-            TotalXStep -= yaw; //for of freelook
-            TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
-            TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-            Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = Vector3.Transform(CameraOffset, Camera.transform.localRotation);
-
-        }
-    }
-
-    public void FreeLookCamera(float velocity, float xStep, float yStep)
-    {
-        if (Camera)
-        {
-            TotalXStep -= ThomasEngine.MathHelper.ToRadians(xStep * CameraSensitivity_x);
-            TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
-            TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-
-            Quaternion rot = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
-            Camera.transform.localRotation = rot;
-
-            Camera.transform.localPosition = Vector3.Transform(CameraOffset, Camera.transform.localRotation);
-        }
-    }
-
-    public void ThrowingCamera(float velocity, float xStep, float yStep)
-    {
-        if (Camera)
-        {
-            float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-            if (velocity != 0)
-                yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
-            transform.RotateByAxis(transform.up, yaw);
-
-            TotalXStep -= yaw; //for of freelook
-            TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
-            TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-            Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = CameraOffsetThrowing; 
-        }
-    }
-
-    public void InitFreeLookCamera()
-    {
-        Camera.transform.localPosition = new Vector3(CameraOffset.x, CameraOffset.y, -CameraOffset.z);
-        Camera.transform.LookAt(transform.position + new Vector3(0, CameraOffset.y, 0));
-
-        Camera.transform.localEulerAngles = new Vector3(0, 180, 0);
-        TotalXStep = ThomasEngine.MathHelper.Pi;
-        TotalYStep = 0;
-    }
-
-    public void ResetCamera()
-    {
-        if (Camera)
-        {
-            Camera.transform.parent = gameObject.transform;
-            Camera.transform.localPosition = CameraOffset;
-            Camera.transform.LookAt(transform.position + new Vector3(0, CameraOffset.y, 0));
-
-            Camera.transform.localEulerAngles = new Vector3(0, 0, 0);
-            TotalXStep = 0;
-            TotalYStep = 0;
-        }
-    }
-
-    private float ClampCameraRadians(float angle, float min, float max)
-    {
-        if (angle < -2 * ThomasEngine.MathHelper.Pi)
-            angle += 2 * ThomasEngine.MathHelper.Pi;
-        if (angle > 2 * ThomasEngine.MathHelper.Pi)
-            angle -= 2 * ThomasEngine.MathHelper.Pi;
-        return Math.Min(Math.Max(angle, min), max);
-    }
-    #endregion
 
     private void StateMachine()
     {
@@ -474,9 +368,9 @@ public class ChadControls : NetworkComponent
                 //rBody.LinearVelocity = - Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
-                Camera.transform.rotation = Quaternion.Identity;
-                Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
-                Camera.transform.LookAt(Ragdoll.GetHips().transform);
+                //Camera.transform.rotation = Quaternion.Identity;
+                //Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
+                //Camera.transform.LookAt(Ragdoll.GetHips().transform);
 
                 break;
         }
@@ -491,7 +385,7 @@ public class ChadControls : NetworkComponent
         DivingTimer = 5;
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
-        ResetCamera();
+        //ResetCamera();
         if(PickedUpObject)
         {
             PickedUpObject.Drop();
@@ -518,7 +412,7 @@ public class ChadControls : NetworkComponent
     IEnumerator StartRagdoll(float duration, Vector3 force)
     {
         State = STATE.RAGDOLL;
-        Camera.transform.SetParent(null, true);
+        //Camera.transform.SetParent(null, true);
         EnableRagdoll();
         Ragdoll.AddForce(force);
         //yield return new WaitForSeconds(duration);
@@ -533,7 +427,7 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(1);
         DisableRagdoll();
         State = STATE.CHADING;
-        ResetCamera();
+        //ResetCamera();
     }
 
     IEnumerator PlayThrowAnim()
@@ -543,7 +437,7 @@ public class ChadControls : NetworkComponent
         Vector3 ballCamPos = Camera.transform.position;
 
         if (Camera)
-            Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
+            //Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
         
 
@@ -556,7 +450,7 @@ public class ChadControls : NetworkComponent
         if(State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
-            ResetCamera();
+            //ResetCamera();
             Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         }
         

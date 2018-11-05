@@ -58,8 +58,8 @@ public class Team
                     player.gameObject.SetActive(false);
                     if (player.isOwner)
                     {
-                        MatchSystem.instance.LocalChad.DeactivateCamera();
-                        MatchSystem.instance.spectatorCamera.enabled = true;
+                        //MatchSystem.instance.LocalChad.DeactivateCamera();
+                        //MatchSystem.instance.spectatorCamera.enabled = true;
                     }
                     break;
                 case TEAM_TYPE.TEAM_1:
@@ -67,8 +67,8 @@ public class Team
                     player.gameObject.SetActive(true);
                     if (player.isOwner)
                     {
-                        MatchSystem.instance.spectatorCamera.enabled = false;
-                        MatchSystem.instance.LocalChad.ActivateCamera();
+                        //MatchSystem.instance.spectatorCamera.enabled = false;
+                        //MatchSystem.instance.LocalChad.ActivateCamera();
                     }
                         
                     break;

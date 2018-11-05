@@ -32,14 +32,14 @@ public class GUISelectTeam : ScriptComponent
             if (Team1Image.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
-                MatchSystem.instance.LocalChad.ActivateCamera();
+                //MatchSystem.instance.LocalChad.ActivateCamera();
                 this.enabled = false;
                 Camera.enabled = false;
             }
             else if (Team2Image.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
-                MatchSystem.instance.LocalChad.ActivateCamera();
+                //MatchSystem.instance.LocalChad.ActivateCamera();
                 this.enabled = false;
                 Camera.enabled = false;
             }
