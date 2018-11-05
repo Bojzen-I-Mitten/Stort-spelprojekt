@@ -71,6 +71,7 @@ public class ChadControls : NetworkComponent
     private float DiveSpeed = 12.0f;
 
     public float DiveTimer { get; private set; } = 0f;
+    private float MinimumRagdollTimer = 2.0f;
     #endregion
 
     Rigidbody rBody;
@@ -140,7 +141,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        // Debug.Log(State);
+        //Debug.Log(CurrentVelocity.y);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -162,7 +163,7 @@ public class ChadControls : NetworkComponent
 
         if (Input.GetKeyDown(Input.Keys.L))
         {
-            Ragdolling = StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000);
+            Ragdolling = StartRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
             State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
@@ -658,8 +659,8 @@ public class ChadControls : NetworkComponent
                 if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
                 {
                     //toggle ragdoll
-                    RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
-                    SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    RPCStartRagdoll(MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    SendRPC("RPCStartRagdoll", MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
 
                     if (PickedUpObject && PickedUpObject.DropOnRagdoll)
                     {
