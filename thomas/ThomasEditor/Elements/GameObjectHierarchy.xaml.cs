@@ -70,7 +70,7 @@ namespace ThomasEditor
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 m_hierarchyNodes.Clear();
-                foreach(GameObject gObj in ThomasWrapper.CurrentScene.GameObjects)
+                foreach(GameObject gObj in ThomasWrapper.CurrentScene.GameObjectsSynced)
                 {
                     if (gObj.transform.parent == null)
                     {

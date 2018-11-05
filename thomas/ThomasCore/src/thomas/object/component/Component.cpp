@@ -10,6 +10,9 @@ namespace thomas
 		{
 			Component::Component() :
 				m_lock()
+#ifdef _EDITOR
+				, m_editorLock()
+#endif
 			{
 			}
 

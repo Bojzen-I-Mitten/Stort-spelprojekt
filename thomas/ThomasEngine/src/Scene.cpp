@@ -157,9 +157,13 @@ namespace ThomasEngine
 		}
 	}
 
+
+#pragma endregion
+
 	void Scene::SyncScene()
 	{
 #ifdef _EDITOR
+		Monitor::Enter(m_gameObjects);
 		uint32_t numChanged = 0;
 		List<GameObject^>^ addedList = gcnew List<GameObject^>();
 		List<GameObject^>^ removedList = gcnew List<GameObject^>();
@@ -210,6 +214,7 @@ namespace ThomasEngine
 #ifdef _EDITOR
 		if(numChanged)	// Trigger event 
 			m_changeEvent(this, gcnew SceneObjectsChangedArgs(numChanged, addedList, removedList));
+		Monitor::Exit(m_gameObjects);
 #endif
 	}
 
@@ -224,9 +229,6 @@ namespace ThomasEngine
 		m_changeEvent -= func;
 	}
 #endif
-
-#pragma endregion
-
 
 	GameObject^ Scene::Find(System::String ^ name)
 	{
@@ -259,8 +261,17 @@ namespace ThomasEngine
 
 		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
 	}
+#ifdef _EDITOR
+	IEnumerable<GameObject^>^ Scene::GameObjectsSynced::get()
+	{
+		Monitor::Enter(m_gameObjects);
+		auto l = gcnew List<GameObject^>(m_gameObjects);
+		Monitor::Exit(m_gameObjects);
+		return l;
+	}
+#endif
 
-	System::Collections::Generic::IEnumerable<GameObject^>^ Scene::GameObjects::get()
+	IEnumerable<GameObject^>^ Scene::GameObjects::get()
 	{
 		return m_gameObjects;
 	}

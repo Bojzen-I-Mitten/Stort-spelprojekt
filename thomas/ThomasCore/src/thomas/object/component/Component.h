@@ -8,7 +8,12 @@ namespace thomas
 		class GameObject;
 		namespace component
 		{
-#define COMP_LOCK() thomas::utils::atomics::Lock lck(m_lock)
+#ifdef _EDITOR											
+#define EDITOR_LOCK()	thomas::utils::atomics::Lock lck(m_editorLock)
+#else
+#define EDITOR_LOCK()	{}
+#endif
+#define COMP_LOCK()		thomas::utils::atomics::Lock lck(m_lock)
 			class Component : public Object
 			{
 			public:
@@ -28,6 +33,9 @@ namespace thomas
 				GameObject* m_gameObject;
 			protected:
 				thomas::utils::atomics::SpinLock m_lock;
+#ifdef _EDITOR				
+				thomas::utils::atomics::SpinLock m_editorLock;
+#endif
 			};
 		}
 	}

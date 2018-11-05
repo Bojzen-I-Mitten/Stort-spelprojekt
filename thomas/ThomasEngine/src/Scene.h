@@ -93,6 +93,7 @@ namespace ThomasEngine {
 			void set(System::String^ value) { m_relativeSavePath = value; }
 		}
 	private:
+
 		[DataMember(Order = 3)]
 		property Vector3 CameraPosition {
 			Vector3 get();
@@ -112,20 +113,18 @@ namespace ThomasEngine {
 			void set(List<GameObject^>^ val);
 		}
 
-	public:
-
-		property System::Collections::Generic::IEnumerable<GameObject^>^ GameObjects
-		{
-			System::Collections::Generic::IEnumerable<GameObject^>^ get();
-		}
 
 #pragma endregion
+	
+	public:
+
 
 		void SaveSceneAs(System::String^ fullPath);
 		void SaveScene();
 		
 
 #ifdef _EDITOR
+		property IEnumerable<GameObject^>^ GameObjectsSynced { IEnumerable<GameObject^>^ get(); }
 		void Subscribe(SceneObjectsChangedEventHandler^ func);
 		void Unsubscribe(SceneObjectsChangedEventHandler^ func);
 #endif
@@ -134,6 +133,13 @@ namespace ThomasEngine {
 		void EnsureLoad();
 		void PostLoad();
 		void SyncScene();
+
+		/* Engine access to objects. Engine edits are always in sync.
+		*/
+		property IEnumerable<GameObject^>^ GameObjects
+		{
+			System::Collections::Generic::IEnumerable<GameObject^>^ get();
+		}
 	};
 }
 

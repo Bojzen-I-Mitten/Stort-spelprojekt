@@ -40,13 +40,14 @@ namespace thomas
 #ifdef _EDITOR
 				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
 #endif
-				COMP_LOCK();
+				EDITOR_LOCK();
 				if (m_skeleton)
 					m_skeleton->update(ThomasTime::GetDeltaTime());
 			}
 
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
 				RenderComponent::SetMaterial(meshIndex, material);
+				EDITOR_LOCK();
 				uint32_t effectIndex;
 				if (!material || material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, effectIndex)) {
 					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
@@ -61,7 +62,7 @@ namespace thomas
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
 				RenderComponent::SetModel(model);
-				COMP_LOCK();
+				EDITOR_LOCK();
 				// Read new skeleton
 				if (!model)
 					m_skeleton = NULL;

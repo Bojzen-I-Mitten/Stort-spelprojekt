@@ -409,8 +409,7 @@ namespace ThomasEngine {
 	}
 	
 	IEnumerable<GameObject^>^ GameObject::GetAllGameObjects() {
-		List<GameObject^>^ gObjs = ThomasEngine::Object::GetObjectsOfType<GameObject^>();
-		/*
+		/* Read func. description
 		for (int i = 0; i < gObjs->Count; i++) {
 			if (!gObjs[i]->inScene && !gObjs[i]->IsPrefab()) {
 				gObjs->RemoveAt(i);
@@ -418,7 +417,7 @@ namespace ThomasEngine {
 			}
 		}
 		*/
-		return gObjs;
+		return ThomasEngine::Object::GetObjectsOfType<GameObject^>();;
 	}
 
 	GameObject^ GameObject::Find(String^ name)

@@ -41,7 +41,6 @@ namespace ThomasEditor
 
             private void _grid_PreparePropertyItem(object sender, PropertyItemEventArgs e)
             {
-                int x = 5;
             }
 
             private void PropertyGrid_Loaded(object sender, RoutedEventArgs e)
