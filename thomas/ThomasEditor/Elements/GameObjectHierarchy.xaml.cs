@@ -478,21 +478,21 @@ namespace ThomasEditor
 
                         if (target != null && sourceData != null && target.DataContext is GameObject && (GameObject)target.DataContext != sourceData)
                         {
-
+                            // Set parent to source object
                             GameObject parent = target.DataContext as GameObject;
                             if (!parent.transform.IsChildOf(sourceData.transform))
-                            {
-                                sourceData.transform.SetParent(parent.transform, true);
-                            }
+                                ThomasWrapper.IssueCommand(new ParentObjectCommand(sourceData, parent));
                         }
                         else if (sourceData != null && target == null)
                         {
                             if (sourceData.inScene)
                             {
-                                sourceData.transform.SetParent(null, true);
+                                // Clear parent
+                                ThomasWrapper.IssueCommand(new ParentObjectCommand(sourceData, null));
                             }
                             else
                             {
+                                // Create object
                                 GameObject.Instantiate(sourceData);
                             }
                         }

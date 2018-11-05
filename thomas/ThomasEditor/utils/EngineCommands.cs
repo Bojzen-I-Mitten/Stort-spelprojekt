@@ -8,6 +8,27 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace ThomasEditor.utils
 {
+    public class ParentObjectCommand
+        : ICommand
+    {
+        readonly GameObject parent;
+        readonly GameObject child;
+        readonly bool keepTransform;
+        public ParentObjectCommand(GameObject child, GameObject parent)
+        {
+            this.parent = parent;
+            this.child = child;
+            this.keepTransform = true;
+        }
+
+        public void execute()
+        {
+            if(!parent)
+                child.transform.SetParent(null, keepTransform);
+            else
+                child.transform.SetParent(parent.transform, keepTransform);
+        }
+    }
 
     /* UI Thread: Nobody toucha my spagett!!!!!!!!!! ._,
      * 
