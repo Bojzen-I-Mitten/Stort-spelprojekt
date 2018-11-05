@@ -30,6 +30,14 @@ namespace ThomasEngine
 			UNKNOWN
 		};
 
+		delegate void ResourceDelegate();
+		static event ResourceDelegate^ OnResourceLoadStarted;
+		static event ResourceDelegate^ OnResourceLoadEnded;
+
+		delegate void ResourceLoad(String^ name, int index, int total);
+		static event ResourceLoad^ OnResourceLoad;
+
+
 		static void OnPlay();
 		static void OnStop();
 		static void SavePrefab(GameObject ^ gameObject, String ^ path);
@@ -44,6 +52,7 @@ namespace ThomasEngine
 		static AssetTypes GetResourceAssetType(Type^ type);
 
 		static AssetTypes GetResourceAssetType(String^ path);
+		static bool IsResource(String^ path);
 
 		static String^ ConvertToThomasPath(String^ value);
 		static String^ ConvertToRealPath(String^ value);

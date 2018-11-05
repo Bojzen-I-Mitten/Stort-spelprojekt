@@ -59,23 +59,34 @@ struct v2f
     float2 texcoord : TEXCOORD0;
 };
 
-v2f vert(appdata_thomas v)
+
+float biTangentSign(float3 norm, float3 tang, float3 bitang)
+{
+    return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
+}
+
+v2f vert(appdata_thomas_skin v)
 {
     v2f o;
-
-    float3 posL = v.vertex;
-
+    
+    float4 posL = float4(v.vertex, 1.f);
+    float3 normalL = v.normal;
+    float3 tangentL = v.tangent;
+    float bisign = biTangentSign(v.normal, v.tangent, v.bitangent);
+    ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
+    float3 bitangL = cross(normalL, tangentL) * bisign;
+	
     o.vertex = ThomasObjectToClipPos(posL);
     o.worldPos = ThomasObjectToWorldPos(posL);
-    
-    
-    float3 tangent = ThomasObjectToWorldDir(v.tangent);
-    float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
-    float3 normal = ThomasObjectToWorldDir(v.normal);
+
+    float3 tangent = ThomasObjectToWorldDir(tangentL);
+    float3 bitangent = ThomasObjectToWorldDir(bitangL);
+    float3 normal = ThomasObjectToWorldDir(normalL);
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
-    o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
+	o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
+
     return o;
 }
 

@@ -4,10 +4,12 @@
 #include "system/SceneManager.h"
 #include "ThomasManaged.h"
 #include "system/SceneManager.h"
+#include "resource/Resources.h"
 
 void ThomasEngine::Application::currentProject::set(ThomasEngine::Project^ value)
 {
 	m_currentProject = value;
+	Resources::LoadAll(m_currentProject->assetPath);
 	currentProjectChanged(value);
 
 	// Load scene

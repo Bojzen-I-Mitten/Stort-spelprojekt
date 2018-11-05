@@ -91,6 +91,10 @@ namespace ThomasEngine.Network
                 DataWriter.Put(ID);
 
             DataWriter.Put(initalState);
+            if (initalState)
+            {
+                DataWriter.Put(gameObject.activeSelf);
+            }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 
@@ -101,6 +105,12 @@ namespace ThomasEngine.Network
 
         public void ReadData(NetPacketReader reader, bool initialState)
         {
+            if (initialState)
+            {
+                bool active = reader.GetBool();
+                gameObject.activeSelf = active;
+            }
+
             foreach (NetworkComponent comp in networkComponentsCache)
             {
                 comp.OnRead(reader, initialState);
