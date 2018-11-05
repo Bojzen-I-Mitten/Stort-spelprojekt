@@ -95,7 +95,6 @@ namespace thomas
 
 	void Physics::UpdateRigidbodies()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		for (object::component::Rigidbody* rb : s_rigidBodies)
 		{
 			rb->UpdateTransformToRigidBody();
