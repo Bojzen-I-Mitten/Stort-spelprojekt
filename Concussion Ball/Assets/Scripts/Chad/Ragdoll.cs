@@ -380,7 +380,11 @@ public class Ragdoll : ScriptComponent
         ExtraVector.z = Math.Abs(ExtraVector.z);
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].Anchor = -limbCollider.center;
-
+        if(PostiveMapping)
+        {
+            ExtraVector.x = -ExtraVector.x;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
+        }
 
 
 
@@ -408,6 +412,12 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].Anchor = -limbCollider.center;
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn),
             (-calculateLengthBetweenSkeleton(LeftShoulder, UpperLeftArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperLeftArm, skinn)) * 0.5f, 0);
+        if(PostiveMapping)
+        {
+            ExtraVector = J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor;
+            ExtraVector.x = 0;
+            J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = ExtraVector;
+        }
 
         //Right arm
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM] as CapsuleCollider);
@@ -430,6 +440,24 @@ public class Ragdoll : ScriptComponent
         ExtraVector.z = Math.Abs(ExtraVector.z);
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].Anchor = -limbCollider.center;
+        if (PostiveMapping)
+        {
+            ExtraVector.y = -ExtraVector.y;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = -ExtraVector;
+        }
+        if (PostiveMapping)
+        {
+            Vector3 Copydatahere = new Vector3();
+            ExtraVector.x = -ExtraVector.x;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
+            Copydatahere = ExtraVector;
+            Copydatahere.z = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor.z;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = Copydatahere;
+            Copydatahere = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor;
+            Copydatahere.z = ExtraVector.z;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = Copydatahere;
+        }
+
 
 
         //RightUnderArm
@@ -452,16 +480,9 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].Anchor = -limbCollider.center;
         if(PostiveMapping)
-            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn),
-           (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * 0.5f, 0);
+            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(0, (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * -0.5f, 0);
         else
-        J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn), 
-            (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * 0.5f, 0);
-
- //       J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn),
-   //       (-calculateLengthBetweenSkeleton(LeftShoulder, UpperLeftArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperLeftArm, skinn)) * 0.5f, 0);
-
-
+            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn), (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * 0.5f, 0);
 
         //RightLeg
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG] as CapsuleCollider);

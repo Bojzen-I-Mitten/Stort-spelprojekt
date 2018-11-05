@@ -1,0 +1,112 @@
+{
+  "$id": "830",
+  "shader": {
+    "resourcePath": "%THOMAS_DATA%\\FXIncludes\\StandardShader.fx"
+  },
+  "properties": {
+    "$id": "831",
+    "DiffuseTexture": {
+      "resourcePath": "White Texture"
+    },
+    "NormalTexture": {
+      "resourcePath": "Normal Texture"
+    },
+    "SpecularTexture": {
+      "resourcePath": "White Texture"
+    },
+    "color": {
+      "$id": "832",
+      "$type": "ThomasEngine.Color, ThomasMath",
+      "b": 255,
+      "g": 255,
+      "r": 255,
+      "a": 255
+    },
+    "smoothness": 16.0,
+    "uvTiling": {
+      "$id": "833",
+      "$type": "ThomasEngine.Vector4, ThomasMath",
+      "x": 1.0,
+      "y": 1.0,
+      "z": 0.0,
+      "w": 0.0,
+      "xy": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "xz": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "xw": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "yx": {
+        "x": 1.0,
+        "y": 1.0
+      },
+      "yz": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "yw": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "zx": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "zy": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "zw": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "wx": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "wy": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "wz": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "xyz": {
+        "x": 1.0,
+        "y": 1.0,
+        "z": 0.0,
+        "xy": {
+          "x": 1.0,
+          "y": 1.0
+        },
+        "xz": {
+          "x": 1.0,
+          "y": 0.0
+        },
+        "yx": {
+          "x": 1.0,
+          "y": 1.0
+        },
+        "yz": {
+          "x": 1.0,
+          "y": 0.0
+        },
+        "zx": {
+          "x": 0.0,
+          "y": 1.0
+        },
+        "zy": {
+          "x": 0.0,
+          "y": 1.0
+        }
+      }
+    }
+  }
+}
