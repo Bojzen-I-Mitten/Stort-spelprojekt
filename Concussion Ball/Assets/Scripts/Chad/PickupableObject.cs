@@ -46,11 +46,11 @@ public class PickupableObject : NetworkComponent
 
     }
 
-    virtual public void Throw(Vector3 force)
+    virtual public void Throw(Vector3 camPos, Vector3 force)
     {
         if (m_pickedUp)
         {
-            Vector3 pos = transform.position;
+            Vector3 pos = camPos;
             Drop();
             StartCoroutine(ThrowRoutine());
             transform.position = pos;

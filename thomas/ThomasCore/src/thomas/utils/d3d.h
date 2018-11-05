@@ -8,11 +8,16 @@
 
 namespace thomas
 {
-	namespace profiling{ class GpuProfiler; }
+
 	
 	class Window;
 	namespace utils
 	{
+		namespace profiling
+		{
+			class GpuProfiler;
+		}
+
 		class D3D
 		{
 		public:

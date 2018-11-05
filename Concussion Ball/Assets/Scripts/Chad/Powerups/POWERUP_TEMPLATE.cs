@@ -15,9 +15,9 @@ public class POWERUP_TEMPLATE : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 force)
+    public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(force);
+        base.Throw(camPos, force);
 
         // add more code here for what happens upon throw
         // in current state Chad will just throw like it would be the ball

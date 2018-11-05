@@ -38,7 +38,7 @@ namespace ThomasEditor
         Guid g;
         public MainWindow()
         {
-          
+            //EngineAutoProfiler profile = new EngineAutoProfiler("MainWindow");
             _instance = this;
             InitializeComponent();
 
@@ -69,7 +69,6 @@ namespace ThomasEditor
                 this.IsEnabled = false;
                 Loaded += new RoutedEventHandler(Timer_OpenProjWindow);
             }
-
             LoadLayout();
             Closing += MainWindow_Closing;
 
@@ -80,10 +79,10 @@ namespace ThomasEditor
 
             ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
             ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
-
+            
             menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
             menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
-
+            //profile.sendSample();
         }
 
         private void ThomasWrapper_OnStopPlaying()
@@ -387,6 +386,7 @@ namespace ThomasEditor
             // Let's add a indirection to GameObjectManager here
             var x = GameObjectManager.addPrimitive(PrimitiveType.Cube, false);
             ThomasWrapper.Selection.SelectGameObject(x);
+            
         }
 
         private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)

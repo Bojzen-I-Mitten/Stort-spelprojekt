@@ -583,7 +583,7 @@ public class Ragdoll : ScriptComponent
 
     public override void OnDestroy()
     {
-        DisableRagdoll();
+        //DisableRagdoll();
     }
 
     public void DisableRagdoll()
@@ -591,7 +591,8 @@ public class Ragdoll : ScriptComponent
 
         foreach(GameObject gObj in G_BodyParts)
         {
-            gObj.activeSelf = false;
+            if(gObj != null)
+                gObj.activeSelf = false;
         }
 
         RagdollEnabled = false;
