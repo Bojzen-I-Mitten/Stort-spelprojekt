@@ -444,20 +444,23 @@ public class Ragdoll : ScriptComponent
         {
             ExtraVector.y = -ExtraVector.y;
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = -ExtraVector;
+            ExtraVector = -ExtraVector;
         }
+        //LEFT arm 0.12
         if (PostiveMapping)
         {
             Vector3 Copydatahere = new Vector3();
-            ExtraVector.x = -ExtraVector.x;
-            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
-            Copydatahere = ExtraVector;
-            Copydatahere.z = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor.z;
+
+            Copydatahere = J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor;
+            
+            Copydatahere.z = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor.z * 2;
+            ExtraVector = J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor;
             J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = Copydatahere;
             Copydatahere = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor;
-            Copydatahere.z = ExtraVector.z;
+            Copydatahere.z = ExtraVector.z*2;
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = Copydatahere;
         }
-
+        
 
 
         //RightUnderArm
