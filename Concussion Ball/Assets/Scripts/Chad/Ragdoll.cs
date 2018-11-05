@@ -30,7 +30,6 @@ public class Ragdoll : ScriptComponent
     public float Totalmass { get; set; } = 70.0f;
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
-    public GameObject AudioListener { get; set; }
     RagdollImpact ImpactSpine;
 
     enum BODYPART
@@ -541,10 +540,6 @@ public class Ragdoll : ScriptComponent
 
     public override void Start()
     {
-        if (AudioListener == null)
-        {
-            AudioListener = gameObject;
-        }
         DisableRagdoll();
         RagdollSound = gameObject.GetComponent<SoundComponent>();
     }
@@ -557,7 +552,7 @@ public class Ragdoll : ScriptComponent
     public override void Update()
     {
         Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
-        Vector3 listenerpos = AudioListener.transform.position;
+        Vector3 listenerpos = MatchSystem.instance.spectatorCamera.transform.position;
 
         RagdollSound.Apply3D(listenerpos, spinepos);
 
