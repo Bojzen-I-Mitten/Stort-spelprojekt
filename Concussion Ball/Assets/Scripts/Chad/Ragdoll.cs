@@ -169,6 +169,11 @@ public class Ragdoll : ScriptComponent
             RB_BodyParts[i].AddForce(force * Mass_BodyParts[i], Rigidbody.ForceMode.Impulse);
         }
     }
+    public float DistanceToWorld()
+    {
+        Debug.Log(ImpactSpine.DistanceToCollition);
+        return ImpactSpine.DistanceToCollition;
+    }
 
     public void EnableRagdoll()
     {
@@ -560,6 +565,7 @@ public class Ragdoll : ScriptComponent
 
         if (RagdollEnabled)
         {
+
             if (ImpactSpine.GetActive)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
@@ -591,9 +597,9 @@ public class Ragdoll : ScriptComponent
 
         foreach(GameObject gObj in G_BodyParts)
         {
-            gObj.activeSelf = false;
+            if(gObj != null)
+                gObj.activeSelf = false;
         }
-
         RagdollEnabled = false;
 
     }
