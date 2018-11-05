@@ -79,8 +79,12 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
-        RPCDrop();
-        SendRPC("RPCDrop");
+        if(GetPickedUp())
+        {
+            RPCDrop();
+            SendRPC("RPCDrop");
+        }
+
     }
 
     public void RPCDrop()

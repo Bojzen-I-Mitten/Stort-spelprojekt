@@ -142,9 +142,6 @@ public class Vindaloo : Powerup
     private void Explosion()
     {
         //hide the vindaloo.
-        m_rigidBody.enabled = false;
-        gameObject.transform.scale = Vector3.Zero;
-
         emitterFire.EmitOneShot(25);
         emitterFire2.EmitOneShot(45);
         emitterGravel.EmitOneShot(20);
