@@ -21,7 +21,8 @@ public class PickupableObject : NetworkComponent
 
     private ChadControls _Chad;
     private RenderComponent m_renderComponent;
-    protected bool m_pickedUp { get { if (m_rigidBody != null) return !m_rigidBody.enabled; else return false; } set { if (m_rigidBody != null) m_rigidBody.enabled = !value; } }
+
+    public bool PickedUp = false;
 
     public override void Start()
     {
@@ -36,11 +37,6 @@ public class PickupableObject : NetworkComponent
         Debug.Log("TEST");
     }
 
-    public bool GetPickedUp()
-    {
-        return m_pickedUp;
-    }
-
     virtual public void ChargeEffect()
     {
 
@@ -48,7 +44,7 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Throw(Vector3 camPos, Vector3 force)
     {
-        if (m_pickedUp)
+        if (PickedUp)
         {
             Vector3 pos = camPos;
             Drop();
@@ -79,7 +75,7 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
-        if(GetPickedUp())
+        if(PickedUp)
         {
             RPCDrop();
             SendRPC("RPCDrop");
@@ -89,10 +85,14 @@ public class PickupableObject : NetworkComponent
 
     public void RPCDrop()
     {
-        if (m_pickedUp)
+        if (PickedUp)
         {
+            PickedUp = false;
+            m_rigidBody.IsKinematic = false;
+            m_rigidBody.enabled = true;
+            
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-            m_pickedUp = false;
+           
             transform.SetParent(null, true);
             if (_Chad)
             {
@@ -115,17 +115,14 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Pickup(ChadControls chad, Transform hand)
     {
-        if(m_pickupable)
+        if(m_pickupable && !PickedUp)
         {
-            if(!this.gameObject.GetComponent<Ball>())
-                m_pickupable = false;
-
             if (!m_rigidBody)
                 m_rigidBody = gameObject.GetComponent<Rigidbody>();
 
             m_rigidBody.IsKinematic = false;
-
             m_rigidBody.enabled = false;
+
             transform.parent = hand;
             transform.localPosition = Vector3.Zero;
             transform.localRotation = Quaternion.Identity;
@@ -134,9 +131,8 @@ public class PickupableObject : NetworkComponent
                 transform.localPosition = PickupOffset.localPosition;
                 transform.localRotation = PickupOffset.localRotation;
             }
-
-            
             chad.PickedUpObject = this;
+            PickedUp = true;
             _Chad = chad;
         }
     }
@@ -144,14 +140,5 @@ public class PickupableObject : NetworkComponent
     public override void OnLostOwnership()
     {
        
-    }
-
-    public override void OnRead(NetPacketReader reader, bool initialState)
-    {
-    }
-
-    public override bool OnWrite(NetDataWriter writer, bool initialState)
-    {
-        return true;
     }
 }

@@ -28,18 +28,12 @@ public class Powerup : PickupableObject
 
     public override void Update()
     {
-        if (spawner && !GetPickedUp())
+        if (spawner && PickedUp)
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
 
             transform.position = spawner.transform.position + (new Vector3(0, test, 0))/10.0f;
             transform.localEulerAngles += (new Vector3(0, 360.0f/5.0f, 0)) * Time.DeltaTime;
-        }
-
-        if(GetPickedUp())
-        {
-            if (spawner)
-                Debug.Log("wtf");
         }
 
     }
@@ -88,7 +82,7 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (!m_pickupable && !m_pickedUp)
+            if (!m_pickupable && !PickedUp)
             {
                 if (!activated)
                 {
@@ -135,8 +129,7 @@ public class Powerup : PickupableObject
 
     public void RPCRemove()
     {
-        if(m_pickedUp)
-            RPCDrop();
+        RPCDrop();
         if (spawner)
         {
             if (spawner.isOwner)
