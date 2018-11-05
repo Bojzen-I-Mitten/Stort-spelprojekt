@@ -48,7 +48,7 @@ namespace ThomasEngine
 			}
 		} while (!completed);
 	}
-
+	
 	void Scene::OnPlay()
 	{
 		ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
@@ -226,6 +226,17 @@ namespace ThomasEngine
 #endif
 
 #pragma endregion
+
+
+	GameObject^ Scene::Find(System::String ^ name)
+	{
+		for each(GameObject^ gameObject in GameObjects)
+		{
+			if (gameObject->Name == name)
+				return gameObject;
+		}
+		return nullptr;
+	}
 
 	Vector3 Scene::CameraPosition::get() 
 	{

@@ -288,9 +288,9 @@ namespace ThomasEngine
 		GameObject ^ Resources::LoadPrefab(String^ path, bool forceInstantiate)
 		{
 			if (!forceInstantiate) {
-				for each(GameObject^ gObj in GameObject::GetAllGameObjects(true))
+				for each(GameObject^ gObj in ThomasEngine::Object::GetObjectsOfType<GameObject^>())
 				{
-					if (gObj->prefabPath == path)
+					if (gObj->prefabPath == path && gObj->inScene)
 						return gObj;
 				}
 			}

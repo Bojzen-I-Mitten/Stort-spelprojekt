@@ -75,6 +75,10 @@ namespace ThomasEngine {
 
 		void InitGameObjects(bool playing);
 
+		/* Find gameobject by string
+		*/
+		GameObject^ Find(System::String^ name);
+
 #pragma region Serialized properties
 
 		[DataMember(Order = 1)]

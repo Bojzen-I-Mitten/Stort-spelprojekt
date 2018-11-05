@@ -407,31 +407,23 @@ namespace ThomasEngine {
 		}
 		return false;
 	}
-
-	List<GameObject^>^ GameObject::GetAllGameObjects(bool includePrefabs) {
+	
+	IEnumerable<GameObject^>^ GameObject::GetAllGameObjects() {
 		List<GameObject^>^ gObjs = ThomasEngine::Object::GetObjectsOfType<GameObject^>();
-
+		/*
 		for (int i = 0; i < gObjs->Count; i++) {
-			if (!gObjs[i]->inScene) {
-				if (!includePrefabs || !gObjs[i]->IsPrefab()) {
-					gObjs->RemoveAt(i);
-					i--;
-				}
-				
+			if (!gObjs[i]->inScene && !gObjs[i]->IsPrefab()) {
+				gObjs->RemoveAt(i);
+				i--;				
 			}
-
 		}
+		*/
 		return gObjs;
 	}
 
 	GameObject^ GameObject::Find(String^ name)
 	{
-		for each(GameObject^ gameObject in ThomasWrapper::CurrentScene->GameObjects)
-		{
-			if (gameObject->Name == name)
-				return gameObject;
-		}
-		return nullptr;
+		return ThomasWrapper::CurrentScene->Find(name);
 	}
 
 	bool GameObject::GetActive()

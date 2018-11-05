@@ -165,7 +165,10 @@ namespace ThomasEngine
 
 		bool HasComponentOfType(Type^ T);
 
-		static List<GameObject^>^ GetAllGameObjects(bool includePrefabs);
+		/* Get a list of ALL gameobjects (including inactive and disabled objects)
+		 * To get active objects only query scene....
+		*/
+		static IEnumerable<GameObject^>^ GetAllGameObjects();
 
 		static GameObject^ Find(String^ name);
 
