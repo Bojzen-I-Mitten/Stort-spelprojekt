@@ -141,7 +141,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        //Debug.Log(CurrentVelocity.y);
+        Debug.Log(CurrentVelocity.y);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -471,7 +471,8 @@ public class ChadControls : NetworkComponent
             case STATE.DIVING:
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
-                CurrentVelocity.y = modifiedMaxSpeed;
+                CurrentVelocity.y = DiveSpeed;
+                //Debug.Log(CurrentVelocity.y);
                 //rBody.LinearVelocity = - Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
