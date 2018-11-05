@@ -28,7 +28,7 @@ public class Powerup : PickupableObject
 
     public override void Update()
     {
-        if (spawner && !GetPickedUp())
+        if (spawner && PickedUp)
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
 
@@ -73,6 +73,7 @@ public class Powerup : PickupableObject
         {
             spawner.Free();
             spawner = null;
+            Debug.Log("Cleared spawner");
         }
             
     }
@@ -81,9 +82,13 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (!m_pickupable && !m_pickedUp)
+            if (!m_pickupable && !PickedUp)
             {
-                Activate();
+                if (!activated)
+                {
+                    Activate();
+                    activated = true;
+                }
             }
         }
 
@@ -93,10 +98,14 @@ public class Powerup : PickupableObject
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         base.OnWrite(writer, initialState);
-        if (spawner)
-            writer.Put(spawner.ID);
-        else
-            writer.Put(-1);
+        if (initialState)
+        {
+            if (spawner)
+                writer.Put(spawner.ID);
+            else
+                writer.Put(-1);
+        }
+
 
         return true;
     }
@@ -105,24 +114,34 @@ public class Powerup : PickupableObject
     {
         base.OnRead(reader, initialState);
 
-        int spawnerID = reader.GetInt();
-        if((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
+        if (initialState)
         {
-            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+            int spawnerID = reader.GetInt();
+            if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
+            {
+                spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+            }
         }
+
+
     }
 
 
-    public void Remove()
+    public void RPCRemove()
     {
-        Drop();
+        RPCDrop();
         if (spawner)
         {
-            spawner.Free();
+            if (spawner.isOwner)
+                spawner.Free();
             spawner = null;
         }
-        //transform.enabled = false;
         MatchSystem.instance.PowerupManager.RecyclePowerup(this);
-       
+    }
+
+    public void Remove()
+    {
+        RPCRemove();
+        SendRPC("RPCRemove");
     }
 }

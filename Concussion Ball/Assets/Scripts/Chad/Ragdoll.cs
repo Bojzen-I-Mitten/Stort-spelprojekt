@@ -558,7 +558,6 @@ public class Ragdoll : ScriptComponent
         Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
         Vector3 listenerpos = MatchSystem.instance.spectatorCamera.transform.position;
 
-        RagdollSound.Apply3D(listenerpos, spinepos);
 
         if (RagdollEnabled)
         {

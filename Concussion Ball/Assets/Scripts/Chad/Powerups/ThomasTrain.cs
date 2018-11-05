@@ -174,7 +174,6 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterDank.EmitOneShot(200);
 
-        //soundComponentExplosion.Apply3D(transform.parent.position, transform.position);
         soundComponentExplosion.PlayOneShot();
 
         StartCoroutine(KillTrain());

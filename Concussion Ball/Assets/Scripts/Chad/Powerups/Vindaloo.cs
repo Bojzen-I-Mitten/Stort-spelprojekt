@@ -9,7 +9,6 @@ public class Vindaloo : Powerup
     public Texture2D fire2Texture { get; set; }
     public Texture2D smokeTexture { get; set; }
     public Texture2D gravelTexture { get; set; }
-    public GameObject AudioListener { get; set; }
     public AudioClip VindalooExplosionSound { get; set; }
 
     private ParticleEmitter emitterFire;
@@ -150,7 +149,6 @@ public class Vindaloo : Powerup
     private void Explosion()
     {
         // Play the vindaloo explosion sound
-        ExplosionSound.Apply3D(AudioListener.transform.position, gameObject.transform.position);
         ExplosionSound.PlayOneShot();
 
         // Hide the vindaloo.
