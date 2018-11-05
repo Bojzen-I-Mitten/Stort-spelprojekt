@@ -8,12 +8,14 @@ namespace thomas
 		class GameObject;
 		namespace component
 		{
+#ifdef _CORE
 #ifdef _EDITOR											
 #define EDITOR_LOCK()	thomas::utils::atomics::Lock lck(m_editorLock)
 #else
 #define EDITOR_LOCK()	{}
 #endif
 #define COMP_LOCK()		thomas::utils::atomics::Lock lck(m_lock)
+#endif
 			class Component : public Object
 			{
 			public:
