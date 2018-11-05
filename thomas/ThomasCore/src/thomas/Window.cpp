@@ -139,7 +139,7 @@ namespace thomas
 	void Window::WaitOnSwapChain()
 	{
 		HANDLE handle = m_swapChain->GetFrameLatencyWaitableObject();
-		DWORD result = WaitForSingleObjectEx(handle,1000, true);
+		DWORD result = WaitForSingleObjectEx(handle, 1000, true);
 	}
 
 	void Window::UpdateWindow()
@@ -222,6 +222,7 @@ namespace thomas
 	void Window::Clear()
 	{
 		float clearColor[] = { 0.34375f, 0.34375f, 0.34375f, 1.0f };
+
 		utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_dxBuffers.RTV[1], clearColor);
 		utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_dxBuffers.depthStencilView[1], D3D11_CLEAR_DEPTH, 1, 0);
 	}
