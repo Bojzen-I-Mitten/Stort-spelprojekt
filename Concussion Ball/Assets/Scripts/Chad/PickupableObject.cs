@@ -24,11 +24,10 @@ public class PickupableObject : NetworkComponent
 
     public bool PickedUp = false;
 
-    public override void Start()
+    public override void Awake()
     {
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-
         chargeTimeCurrent = 0.0f;
     }
 
@@ -92,7 +91,8 @@ public class PickupableObject : NetworkComponent
             m_rigidBody.enabled = true;
             
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-           
+
+            Debug.Log("drop");
             transform.SetParent(null, true);
             if (_Chad)
             {
@@ -117,9 +117,11 @@ public class PickupableObject : NetworkComponent
     {
         if(m_pickupable && !PickedUp)
         {
+
             if (!m_rigidBody)
                 m_rigidBody = gameObject.GetComponent<Rigidbody>();
 
+            Debug.Log("pickup");
             m_rigidBody.IsKinematic = false;
             m_rigidBody.enabled = false;
 
@@ -131,14 +133,22 @@ public class PickupableObject : NetworkComponent
                 transform.localPosition = PickupOffset.localPosition;
                 transform.localRotation = PickupOffset.localRotation;
             }
+
+            
             chad.PickedUpObject = this;
             PickedUp = true;
+            m_pickupable = false;
             _Chad = chad;
         }
     }
 
-    public override void OnLostOwnership()
+    virtual public void Reset()
     {
-       
+        Drop();
+        chargeTimeCurrent = 0.0f;
+        PickedUp = false;
+        m_pickupable = true;
+        m_rigidBody.enabled = true;
+        _Chad = null;
     }
 }
