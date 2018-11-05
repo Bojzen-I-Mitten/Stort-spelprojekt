@@ -33,7 +33,7 @@ public class PickupableObject : NetworkComponent
 
     public override void Update()
     {
-        Debug.Log("TEST");
+
     }
 
     public bool GetPickedUp()

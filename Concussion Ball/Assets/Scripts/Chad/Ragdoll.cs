@@ -30,7 +30,6 @@ public class Ragdoll : ScriptComponent
     public float Totalmass { get; set; } = 70.0f;
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
-    //public GameObject AudioListener { get; set; }
     public AudioClip RagDollImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
@@ -63,15 +62,9 @@ public class Ragdoll : ScriptComponent
     uint[] BoneIndexes = new uint[(int)BODYPART.COUNT];
     Collider[] C_BodyParts = new Collider[(int)BODYPART.COUNT];
     SoundComponent RagdollSound;
-    float time=0;
 
     public override void Start()
     {
-        if (AudioListener == null)
-        {
-            AudioListener = gameObject;
-        }
-
         DisableRagdoll();
 
         // Load the ragdoll impact sound
