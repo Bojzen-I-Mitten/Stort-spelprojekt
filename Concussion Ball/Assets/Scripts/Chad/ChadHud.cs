@@ -258,7 +258,7 @@ public class ChadHud : ScriptComponent
         if (ToggleAim)
         {
             Crosshair.scale = Vector2.One;
-            Crosshair.color = Color.Red;
+            //Crosshair.color = Color.Red;
         }
     }
 
