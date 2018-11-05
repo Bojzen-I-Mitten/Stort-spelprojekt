@@ -6,7 +6,6 @@
 #include "..\utils\Buffers.h"
 #include "..\resource\Shader.h"
 #include "render/ShaderList.h"
-#include "../AutoProfile.h"
 
 #include <algorithm>
 namespace thomas
@@ -106,7 +105,6 @@ namespace thomas
 		}
 		void LightManager::Bind(render::ShaderList* shaders)
 		{
-			PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 			shaders->SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
 			shaders->SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
 			shaders->SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);

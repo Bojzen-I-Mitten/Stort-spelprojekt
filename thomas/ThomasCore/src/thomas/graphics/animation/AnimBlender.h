@@ -28,6 +28,8 @@ namespace thomas {
 				AnimBlender(Skeleton &skel);
 				virtual ~AnimBlender();
 
+				uint32_t numAnimations();
+
 				void setWeightMixer(WeightMixer* mixer);
 				void generateLinearMixer(float durationPerNode);
 
@@ -43,6 +45,8 @@ namespace thomas {
 				virtual math::Quaternion calcBoneRot(unsigned int bone) override;
 				virtual void calcFrame(unsigned int bone, math::Vector3 & trans, math::Vector3 & scale, math::Quaternion & rot) override;
 				virtual void calcFrame(TransformComponents * result) override;
+
+				AnimationNode* getAnimNode(uint32_t i);
 			};
 		}
 	}

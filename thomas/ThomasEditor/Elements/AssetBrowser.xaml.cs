@@ -445,6 +445,21 @@ namespace ThomasEditor
             return false;
         }
 
+        private bool CheckPrefabFile()
+        {
+            TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
+            StackPanel stack = item.Header as StackPanel;
+
+            String file = stack.DataContext as String;
+            ThomasEngine.Resources.AssetTypes assetType = ThomasEngine.Resources.GetResourceAssetType(file);
+            if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
+            {
+                return true;
+            }
+            return false;
+        }   
+
+
         private void AssetBrowser_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
@@ -455,6 +470,7 @@ namespace ThomasEditor
                 
                 assetBrowserContextMenu.DataContext = true;
                 contextMenuOpenItem.IsEnabled = CheckSceneFile();
+                contextMenuSaveItem.IsEnabled = CheckPrefabFile();
                 //e.Handled = true;
             }
             else
@@ -662,6 +678,20 @@ namespace ThomasEditor
                 return " : NetworkComponent";
             else
                 return "";
+        }
+
+        private void Menu_SaveAsset(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem item = fileTree.SelectedItem as TreeViewItem;
+
+            StackPanel stack = item.Header as StackPanel;
+            String file = stack.DataContext as String;
+
+            GameObject prefab = item.DataContext as GameObject;
+            watcher.EnableRaisingEvents = false;
+
+            ThomasEngine.Resources.SavePrefab(prefab, file);
+            watcher.EnableRaisingEvents = true;
         }
     }
 

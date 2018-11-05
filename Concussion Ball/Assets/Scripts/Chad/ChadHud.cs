@@ -131,6 +131,7 @@ public class ChadHud : ScriptComponent
 
         #region Aiming Stuff
         Crosshair = HUD.Add(CrosshairTexture);
+        Crosshair.origin = new Vector2(0.5f);
         Crosshair.position = new Vector2(0.5f);
         Crosshair.scale = Vector2.Zero;
 
@@ -182,7 +183,7 @@ public class ChadHud : ScriptComponent
         float xPos = 0;
         //When xPos = 1 it will be at the center
         Announcement1.text = text;
-        Announcement1.color = color;
+        //Announcement1.color = color;
         Announcement2.text = text2;
 
         Vector2 text1Size = Announcement1.size / (HUD.viewport.size * cam.viewport.size);
@@ -202,7 +203,8 @@ public class ChadHud : ScriptComponent
             Announcement2.position = text2Pos;
 
             Color c = GetRainbowColor(time, 0.5f);
-            Color c2 = GetRainbowColor(time + 1.0f, 0.5f);
+            Color c2 = GetRainbowColor(time, 0.5f);
+            Announcement1.color = c2;
             Announcement2.color = c;
 
             if (showBG)
