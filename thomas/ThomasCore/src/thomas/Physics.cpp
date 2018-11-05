@@ -5,7 +5,7 @@
 #include "object\component\Camera.h"
 #include "graphics\BulletDebugDraw.h"
 #include "utils/Utility.h"
-#include "AutoProfile.h"
+#include "utils/AutoProfile.h"
 #include "ThomasCore.h"
 
 namespace thomas
