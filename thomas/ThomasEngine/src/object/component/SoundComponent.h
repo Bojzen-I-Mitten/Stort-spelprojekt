@@ -15,8 +15,6 @@ namespace ThomasEngine
 
 	public:
 		SoundComponent();
-
-		void Apply3D(Vector3 listenerPos, Vector3 sourcePos);
 		void Play();
 		void PlayOneShot();
 		void Stop();
@@ -30,6 +28,12 @@ namespace ThomasEngine
 		{
 			AudioClip^ get();
 			void set(AudioClip^ value);
+		}
+
+		property bool Is3D
+		{
+			bool get();
+			void set(bool value);
 		}
 
 		property float Volume

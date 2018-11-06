@@ -51,8 +51,9 @@ namespace ThomasEngine.Network
         {
             for(int i=0; i < maxPlayers; i++)
             {
-                GameObject player = GameObject.Instantiate(playerPrefab);
+                GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
                 player.activeSelf = false;
+                
                 player.GetComponent<NetworkIdentity>().IsPlayer = true;
                 PlayerPool.Add(player);
             }
