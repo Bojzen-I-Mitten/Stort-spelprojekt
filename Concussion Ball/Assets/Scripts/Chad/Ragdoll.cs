@@ -258,7 +258,7 @@ public class Ragdoll : ScriptComponent
         center.x = 0;
         center.z = 0;
         spineCollider.center = center;
-        spineCollider.size = new Vector3(0.2f, 0.2f, 0.2f);
+        spineCollider.size = new Vector3(center.y, center.y, center.y);
         C_BodyParts[(int)BODYPART.SPINE] = spineCollider;
 
         //Head
@@ -276,10 +276,13 @@ public class Ragdoll : ScriptComponent
         {
             CapsuleCollider c = G_BodyParts[i].AddComponent<CapsuleCollider>();
             if(PostiveMapping)
+            { 
                 c.rotation = CapsuleCollider.ColliderRotation.RotateY;
+            }
             else
+            { 
                 c.rotation = CapsuleCollider.ColliderRotation.RotateX;
-
+            }
             c.radius = 0.065f;
             C_BodyParts[i] = c;
 
@@ -350,6 +353,13 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = headCollider.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
+        if(PostiveMapping)
+        {
+            J_BodyParts[(int)BODYPART.HEAD].NoCollision = false;
+            ExtraVector = -J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor;
+            ExtraVector.y = -ExtraVector.y;
+            J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = ExtraVector;
+        }
 
         //left arm
 
@@ -382,6 +392,10 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].Anchor = -limbCollider.center;
         if(PostiveMapping)
         {
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].Axis = new Vector3(0, -2.5f, 45);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAxis = new Vector3(0, 2.5f, -45);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAngle1 = 45;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAngle2 = 48;
             ExtraVector.x = -ExtraVector.x;
             J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         }
@@ -442,11 +456,15 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].Anchor = -limbCollider.center;
         if (PostiveMapping)
         {
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].Axis = new Vector3(0, -2.5f, 135);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAxis = new Vector3(0, 13.5f, -135);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAngle1 = 66;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAngle2 = 55;
             ExtraVector.y = -ExtraVector.y;
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = -ExtraVector;
             ExtraVector = -ExtraVector;
         }
-        //LEFT arm 0.12
+
         if (PostiveMapping)
         {
             Vector3 Copydatahere = new Vector3();
@@ -515,6 +533,7 @@ public class Ragdoll : ScriptComponent
 
         if(PostiveMapping)
         {
+
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Axis = new Vector3(0, 0, -90);
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor = -J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor;
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor = new Vector3(-J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.x, J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.y, J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.z);
@@ -577,7 +596,10 @@ public class Ragdoll : ScriptComponent
 
         if (PostiveMapping)
         {
+
             J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 0, 90);
+          //  J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 0, 0);
+  //          J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Swing = new Vector3(0, -90, -225);
             J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor = -J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor;
             J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor = new Vector3(-J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor.x, J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor.y, J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor.z);
         }
