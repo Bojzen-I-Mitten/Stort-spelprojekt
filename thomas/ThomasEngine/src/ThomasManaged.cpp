@@ -370,14 +370,7 @@ namespace ThomasEngine {
 				}
 
 
-#ifdef BENCHMARK
-				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
-				utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-				profiler->SetActive(true);
-				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
-#endif
 
 				Monitor::Exit(lock);
 				mainThreadDispatcher->BeginInvoke(
@@ -386,7 +379,17 @@ namespace ThomasEngine {
 
 			}
 
+
 		}
+
+#ifdef BENCHMARK
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(true);
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+#endif
 
 		renderThread->Join();	// Wait until thread is finished
 		Resources::UnloadAll();
