@@ -8,6 +8,6 @@
   </m_layers>
   <m_name>Concussion Ball</m_name>
   <m_relativeAssemblyPath>Assembly</m_relativeAssemblyPath>
-  <m_relativeCurrentScenePath>Ragdoll test scene.tds</m_relativeCurrentScenePath>
+  <m_relativeCurrentScenePath>Scenes\DemoScene.tds</m_relativeCurrentScenePath>
   <m_relativeResourcePath>Assets</m_relativeResourcePath>
 </Project>
