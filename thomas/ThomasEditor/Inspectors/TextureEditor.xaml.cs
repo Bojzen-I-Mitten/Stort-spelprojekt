@@ -47,10 +47,9 @@ namespace ThomasEditor.Inspectors
                     PropertyItem pi = label.DataContext as PropertyItem;
                     if (obj.GetType() == pi.PropertyType)
                     {
-                        //Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.ENTER_SYNC_STATELOCK();
                         pi.Value = obj;
-
-                        //Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.EXIT_SYNC_STATELOCK();
                     }
                     else if (obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                     {

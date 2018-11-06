@@ -23,6 +23,7 @@ namespace thomas
 
 			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
 			{
+				EDITOR_LOCK();
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
@@ -33,6 +34,7 @@ namespace thomas
 
 			void SoundComponent::Play()
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					m_clip->GetSoundEffectInstance()->Play(m_looping);
@@ -41,6 +43,7 @@ namespace thomas
 
 			void SoundComponent::PlayOneShot()
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					Sound::Play(m_clip->GetName(), m_volume);
@@ -49,6 +52,7 @@ namespace thomas
 
 			void SoundComponent::Stop()
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					m_clip->GetSoundEffectInstance()->Stop();
@@ -57,6 +61,7 @@ namespace thomas
 
 			void SoundComponent::Pause()
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					m_clip->GetSoundEffectInstance()->Pause();
@@ -65,6 +70,7 @@ namespace thomas
 
 			void SoundComponent::Resume()
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					m_clip->GetSoundEffectInstance()->Resume();
@@ -73,6 +79,7 @@ namespace thomas
 
 			bool SoundComponent::IsPlaying() const
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					return Sound::IsPlaying(m_clip->GetName());	
@@ -83,6 +90,7 @@ namespace thomas
 
 			bool SoundComponent::IsPaused() const
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					return Sound::IsPaused(m_clip->GetName());
@@ -93,6 +101,7 @@ namespace thomas
 
 			bool SoundComponent::HasStopped() const
 			{
+				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
 					return Sound::HasStopped(m_clip->GetName());
@@ -103,11 +112,13 @@ namespace thomas
 
 			void SoundComponent::SetClip(resource::AudioClip* clip)
 			{
+				EDITOR_LOCK();
 				m_clip = clip;
 			}
 
 			void SoundComponent::SetVolume(float volume)
 			{
+				EDITOR_LOCK();
 				if (volume <= 5.f && volume >= 0.f)
 				{
 					m_volume = volume;

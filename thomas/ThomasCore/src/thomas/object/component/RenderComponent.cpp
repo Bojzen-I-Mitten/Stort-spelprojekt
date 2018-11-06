@@ -25,6 +25,7 @@ namespace thomas {
 
 			bool RenderComponent::SetModel(resource::Model* model)
 			{
+				EDITOR_LOCK();
 				if (!model)
 				{
 					m_model = model;
@@ -53,6 +54,7 @@ namespace thomas {
 
 			void RenderComponent::Update()
 			{
+				EDITOR_LOCK();
 				if (m_model)
 				{
 					math::BoundingOrientedBox::CreateFromBoundingBox(m_bounds, m_model->m_bounds);
@@ -69,7 +71,7 @@ namespace thomas {
 			}
 			void RenderComponent::SetMaterial(int meshIndex, resource::Material * material)
 			{
-				
+				EDITOR_LOCK();
 				if (meshIndex >= 0)
 				{
 					if (!material)
@@ -85,6 +87,7 @@ namespace thomas {
 
 			resource::Material * RenderComponent::GetMaterial(int meshIndex)
 			{
+				EDITOR_LOCK();
 				if (m_materials.size() > meshIndex && meshIndex >= 0)
 					return m_materials[meshIndex];
 				else
@@ -94,6 +97,7 @@ namespace thomas {
 
 			void RenderComponent::SubmitToRenderer(Camera* camera)
 			{
+				EDITOR_LOCK();
 				if (m_model)
 				{
 					// Copy data to frame
@@ -154,6 +158,7 @@ namespace thomas {
 
 			resource::shaderproperty::ShaderPropertyStatic & RenderComponent::insertProperty(resource::shaderproperty::ShaderPropertyStatic prop)
 			{
+				EDITOR_LOCK();
 				for (unsigned int i = 0; i < m_properties.size(); i++) {
 					if (m_properties[i] ==  prop) {			// If equals ->
 						m_properties[i] = prop;				// Insert

@@ -11,6 +11,7 @@ using namespace System::Threading;
 
 namespace ThomasEngine {
 
+#define _THOMAS_SCENE_LOCK
 
 	enum RunningState
 	{
@@ -75,6 +76,7 @@ namespace ThomasEngine {
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
 		CommandQueue^ m_engineCommands;
+		Object^ m_sceneLock;
 	public:
 
 		property SceneManager^ SceneManagerRef
@@ -104,6 +106,8 @@ namespace ThomasEngine {
 		{
 			Scene^ get();
 		}
+		static void ENTER_SYNC_STATELOCK();
+		static void EXIT_SYNC_STATELOCK();
 		static void IssueCommand(ICommand^ cmd);
 		static void IssueStateCommand(ThomasStateCommand cmd);
 		static void IssuePlay();

@@ -114,6 +114,7 @@ namespace thomas
 			
 			void ParticleEmitterComponent::Update()
 			{
+				EDITOR_LOCK();
 				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
 				m_particleBufferStruct.direction = m_gameObject->m_transform->Forward();
 
@@ -339,6 +340,7 @@ namespace thomas
 
 			void ParticleEmitterComponent::SetBlendState(graphics::ParticleSystem::BLEND_STATE const & blendState)
 			{
+				EDITOR_LOCK();
 				if (blendState != m_blendState)
 				{
 					m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);

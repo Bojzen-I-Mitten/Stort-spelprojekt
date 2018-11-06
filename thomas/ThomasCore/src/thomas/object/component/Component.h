@@ -34,9 +34,9 @@ namespace thomas
 				bool initialized = false;
 				GameObject* m_gameObject;
 			protected:
-				thomas::utils::atomics::SpinLock m_lock;
+				mutable thomas::utils::atomics::SpinLock m_lock;
 #ifdef _EDITOR				
-				thomas::utils::atomics::SpinLock m_editorLock;
+				mutable thomas::utils::atomics::SpinLock m_editorLock;
 #endif
 			};
 		}

@@ -58,6 +58,7 @@ namespace ThomasEngine {
 		// Thomas Object Initiation
 		m_scene = gcnew SceneManager();
 		m_engineCommands = gcnew CommandQueue();
+		m_sceneLock = gcnew Object();
 	}
 	void ThomasWrapper::Start(bool editor) 
 	{
@@ -264,7 +265,9 @@ namespace ThomasEngine {
 
 
 				ThomasCore::Update();
-				//Monitor::Enter(lock);
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Enter(Thomas->m_sceneLock);
+#endif _THOMAS_SCENE_LOCK
 
 				CurrentScene->InitGameObjects(IsPlaying());
 
@@ -288,6 +291,10 @@ namespace ThomasEngine {
 						gameObject->Update();
 					}
 				}
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Exit(Thomas->m_sceneLock);
+#endif _THOMAS_SCENE_LOCK
+
 				editor::EditorCamera::Instance()->Update();
 
 				//Rendering
@@ -304,8 +311,7 @@ namespace ThomasEngine {
 							if (gameObject->GetActive())
 								gameObject->RenderGizmos();
 						}
-
-							s_Selection->render();
+						s_Selection->render();
 					}	//end editor rendering
 				
 					
@@ -324,6 +330,9 @@ namespace ThomasEngine {
 			}
 			finally
 			{
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Enter(Thomas->m_sceneLock);
+#endif
 				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
 				if (WindowManager::Instance())
 				{
@@ -342,7 +351,9 @@ namespace ThomasEngine {
 
 
 				}
-				//Monitor::Exit(lock);
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Exit(Thomas->m_sceneLock);
+#endif _THOMAS_SCENE_LOCK
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));
@@ -459,6 +470,18 @@ namespace ThomasEngine {
 		Debug::Log("Stopped...");
 		playing = RunningState::Editor;
 	}
+	void ThomasWrapper::ENTER_SYNC_STATELOCK()
+	{
+		if(IsPlaying())
+			Monitor::Enter(s_SYS->m_sceneLock);
+	}
+	void ThomasWrapper::EXIT_SYNC_STATELOCK()
+	{
+		if (IsPlaying() && Monitor::IsEntered(s_SYS->m_sceneLock))
+			Monitor::Exit(s_SYS->m_sceneLock);
+	}
+
+
 	void ThomasWrapper::IssueCommand(ICommand ^ cmd)
 	{
 		Thomas->m_engineCommands->issue(cmd);

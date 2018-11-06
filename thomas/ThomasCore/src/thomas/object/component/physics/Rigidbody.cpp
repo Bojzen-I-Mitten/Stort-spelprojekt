@@ -69,14 +69,16 @@ namespace thomas
 			}
 
 			void Rigidbody::UpdateRigidbodyToTransform()
-			{			
+			{
 				btTransform trans;
 				getMotionState()->getWorldTransform(trans);
 
 				math::Quaternion rotation = (math::Quaternion)trans.getRotation();
 				math::Vector3 pos = (math::Vector3)trans.getOrigin();
-				if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
-
+				{
+					EDITOR_LOCK();
+					if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
+				}
 				m_gameObject->m_transform->SetPosition(pos);
 				m_gameObject->m_transform->SetRotation(rotation);
 				m_gameObject->m_transform->SetDirty(true);
@@ -98,8 +100,10 @@ namespace thomas
 
 					math::Vector3 pos = m_gameObject->m_transform->GetPosition();
 					math::Quaternion rot = m_gameObject->m_transform->GetRotation();
-					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
-
+					{
+						EDITOR_LOCK();
+						if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
+					}
 					trans.setRotation((btQuaternion&)rot);
 					getMotionState()->setWorldTransform(trans);
 
@@ -209,6 +213,7 @@ namespace thomas
 
 			void Rigidbody::SetCollider(Collider * collider)
 			{
+				EDITOR_LOCK();
 				m_collider = collider;
 				bool removed = Physics::RemoveRigidBody(this);
 				delete getCollisionShape();
