@@ -180,9 +180,7 @@ public class ChadControls : NetworkComponent
 
         if (Input.GetKeyDown(Input.Keys.L))
         {
-            Ragdolling = StartRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
-            State = STATE.RAGDOLL;
-            StartCoroutine(Ragdolling);
+            ActivateRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
         }
         if (Input.GetKeyDown(Input.Keys.K))
             gameObject.GetComponent<NetworkPlayer>().Reset();
@@ -216,6 +214,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
         {
+            ChadHud.Instance.HideHeldObjectText();
             if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
             {
                 Debug.Log("remove");
@@ -307,8 +306,7 @@ public class ChadControls : NetworkComponent
                     if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT) && !HasThrown)
                     {
                         State = STATE.THROWING;
-                        ChadHud.Instance.ActivateCrosshair();
-                        ChadHud.Instance.ActivateChargeBar();
+                        ChadHud.Instance.ActivateAimHUD();
 
                         Animations.SetAnimationWeight(ChargeAnimIndex, 1);
 
@@ -382,8 +380,7 @@ public class ChadControls : NetworkComponent
     #region Reset Throw
     public void RPCResetThrow()
     {
-        ChadHud.Instance.DeactivateCrosshair();
-        ChadHud.Instance.DeactivateChargeBar();
+        ChadHud.Instance.DeactivateAimHUD();
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
@@ -537,6 +534,7 @@ public class ChadControls : NetworkComponent
                 Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
                 Camera.transform.LookAt(Ragdoll.GetHips().transform);
 
+
                 break;
         }
         if(State != STATE.DIVING)
@@ -611,8 +609,7 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
-        ChadHud.Instance.DeactivateCrosshair();
-        ChadHud.Instance.DeactivateChargeBar();
+        ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
         Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;

@@ -178,7 +178,7 @@ public class ChadHud : ScriptComponent
         {
             BallArrow = HUD.Add(BallArrowTexture);
             BallArrow.origin = new Vector2(0.5f);
-            BallArrow.scale = new Vector2(2);
+            BallArrow.scale = new Vector2(4);
             BallArrow.position = new Vector2(-1000);
             BallArrow.color = Score1BG.color + Score2BG.color;
         }
@@ -297,32 +297,34 @@ public class ChadHud : ScriptComponent
         StartCoroutine(AnnouncementAnimation(duration, winningTeam.Name, "Wins!!!", winningTeam.Color));
     }
 
-    #region Crosshair&Chargebar
-    public void ActivateCrosshair()
+    #region Aim HUD
+    public void ActivateAimHUD()
     {
         if (ToggleAim)
         {
-            LMB.scale = new Vector2(0.75f);
-            Crosshair.scale = Vector2.One;
+            if (Crosshair != null)
+                Crosshair.scale = Vector2.One;
+            if (LMB != null)
+                LMB.scale = new Vector2(0.75f);
+                
         }
+        if (ChargeBarOutline != null)
+            ChargeBarOutline.scale = new Vector2(2.0f, 9.0f);
+        if (ChargeBar != null)
+            ChargeBar.color = Color.Red;
+        
     }
 
-    public void DeactivateCrosshair()
+    public void DeactivateAimHUD()
     {
-        Crosshair.scale = Vector2.Zero;
-        LMB.scale = Vector2.Zero;
-    }
-
-    public void ActivateChargeBar()
-    {
-        ChargeBarOutline.scale = new Vector2(2.0f, 9.0f);
-        ChargeBar.color = Color.Red;
-    }
-
-    public void DeactivateChargeBar()
-    {
-        ChargeBarOutline.scale = Vector2.Zero;
-        ChargeBar.scale = Vector2.Zero;
+        if (Crosshair != null)
+            Crosshair.scale = Vector2.Zero;
+        if (LMB != null)
+            LMB.scale = Vector2.Zero;
+        if (ChargeBarOutline != null)
+            ChargeBarOutline.scale = Vector2.Zero;
+        if (ChargeBar != null)
+            ChargeBar.scale = Vector2.Zero;
     }
 
     //Charge: 0 to 1
@@ -335,8 +337,7 @@ public class ChadHud : ScriptComponent
         ChargeBar.color = c;
         ChargeBar.scale = new Vector2(2.0f, charge*9.0f);
     }
-    #endregion
-
+    
     public void ShowHeldObjectText(string name)
     {
         HeldObject.scale = Vector2.One;
@@ -347,6 +348,7 @@ public class ChadHud : ScriptComponent
     {
         HeldObject.scale = Vector2.Zero;
     }
+    #endregion
 
     public override void Update()
     {
