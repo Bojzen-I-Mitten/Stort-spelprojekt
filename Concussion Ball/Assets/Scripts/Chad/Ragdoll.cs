@@ -69,7 +69,10 @@ public class Ragdoll : ScriptComponent
 
         // Load the ragdoll impact sound
         RagdollSound = gameObject.AddComponent<SoundComponent>();
-        RagdollSound.clip = RagDollImpactSound;
+        if (RagDollImpactSound != null)
+            RagdollSound.clip = RagDollImpactSound;
+        else
+            Debug.LogError("Radoll impact sound missing");
         RagdollSound.Looping = false;
     }
 
