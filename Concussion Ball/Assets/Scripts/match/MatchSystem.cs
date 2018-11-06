@@ -59,7 +59,8 @@ public class MatchSystem : NetworkManager
     public bool GoldenGoal = false;
 
     public float MatchStartTime;
-    private bool MatchStarted = false;
+    [Browsable(false)]
+    public bool MatchStarted { get; private set; } = false;
     public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
@@ -68,6 +69,8 @@ public class MatchSystem : NetworkManager
 
         Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
+
+        Teams[TEAM_TYPE.UNASSIGNED] = new Team(TEAM_TYPE.UNASSIGNED, "Unassigned", new Color(0, 0, 0, 0));
     }
 
   
@@ -282,7 +285,7 @@ public class MatchSystem : NetworkManager
         Debug.Log("peer joined!");
         NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
         
-        np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
+        np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
 
         if (peer != LocalPeer)
         {

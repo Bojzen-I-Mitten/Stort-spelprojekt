@@ -54,12 +54,20 @@ public class ChadControls : NetworkComponent
 
     [Browsable(false)]
     public Rigidbody rBody { get;  private set; }
-    [Browsable(false)]
-    public NetworkPlayer NetworkPlayer { get; private set; }
     Chadimations Animations;
     Ragdoll Ragdoll;
-    [Browsable(false)]
-    public Camera Camera { get { return MatchSystem.instance.Camera; } }
+    //[Browsable(false)]
+    //public Camera Camera { get { return MatchSystem.instance.Camera; } }
+    ChadCam _camera;
+    ChadCam Camera
+    {
+        get
+        {
+            if(!_camera)
+                _camera = GetObjectsOfType<ChadCam>().FirstOrDefault();
+            return _camera;
+        }
+    }
 
     public string PlayerPrefabName { get; set; } = "Chad";
     public float ImpactFactor { get; set; } = 100;
@@ -77,14 +85,8 @@ public class ChadControls : NetworkComponent
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
 
-        //if (Camera)
-        //    Camera.gameObject.activeSelf = false;
-        //if (isOwner && !Camera)
-        //    Debug.LogWarning("Camera not set for player");
-        //if (Camera)
-        //{
-        //    Camera.transform.localPosition = CameraOffset;
-        //}
+        Camera.ResetCamera();
+
         ThrowForce = BaseThrowForce;
 
         rBody = gameObject.GetComponent<Rigidbody>();
@@ -122,7 +124,6 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        // Debug.Log(State);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -272,7 +273,7 @@ public class ChadControls : NetworkComponent
                 {
                     State = STATE.CHADING;
                     ResetCharge();
-                    //ResetCamera();
+                    Camera.ResetCamera();
                     ChadHud.Instance.DeactivateCrosshair();
                     ChadHud.Instance.DeactivateChargeBar();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
@@ -281,7 +282,7 @@ public class ChadControls : NetworkComponent
                 {
                     State = STATE.DIVING;
                     ResetCharge();
-                    //ResetCamera();
+                    Camera.ResetCamera();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
             }
@@ -312,7 +313,7 @@ public class ChadControls : NetworkComponent
 
             if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
             {
-                //ResetCamera();
+                Camera.ResetCamera();
             }
         }
     }
@@ -385,8 +386,8 @@ public class ChadControls : NetworkComponent
         DivingTimer = 5;
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
-        //ResetCamera();
-        if(PickedUpObject)
+        Camera.ResetCamera();
+        if (PickedUpObject)
         {
             PickedUpObject.Drop();
             PickedUpObject = null;
@@ -420,37 +421,36 @@ public class ChadControls : NetworkComponent
         float timer = 0;
         while(Ragdoll.DistanceToWorld()>=0.02 && timer <15)
         {
-            //Debug.Log(Ragdoll.DistanceToWorld());
             timer += Time.DeltaTime;
             yield return null;
         }
         yield return new WaitForSeconds(1);
         DisableRagdoll();
         State = STATE.CHADING;
-        //ResetCamera();
+        Camera.ResetCamera();
     }
 
     IEnumerator PlayThrowAnim()
     {
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
-        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
-        Vector3 ballCamPos = Camera.transform.position;
+        //Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
+        //Vector3 ballCamPos = Camera.transform.position;
 
-        if (Camera)
-            //Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
+        //if (Camera)
+        //    //Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
         
 
         yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
-        ThrowObject(ballCamPos, chosenDirection);
+        //ThrowObject(ballCamPos, chosenDirection);
         HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
         if(State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
-            //ResetCamera();
+            Camera.ResetCamera();
             Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         }
         

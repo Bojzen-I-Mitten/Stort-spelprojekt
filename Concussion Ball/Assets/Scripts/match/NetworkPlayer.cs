@@ -13,7 +13,7 @@ public class NetworkPlayer : NetworkComponent
     Material mat;
     public override void Start()
     {
-        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
         mat?.SetColor("color", Team.Color);

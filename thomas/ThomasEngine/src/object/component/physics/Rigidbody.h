@@ -143,6 +143,7 @@ namespace ThomasEngine
 		property Vector3 Position
 		{
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(value)); }
+			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetPosition()); }
 		}
 
 		[BrowsableAttribute(false)]
@@ -150,6 +151,7 @@ namespace ThomasEngine
 		property Quaternion Rotation
 		{
 			void set(Quaternion value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(value)); }
+			Quaternion get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetRotation()); }
 		}
 
 		property float Damping

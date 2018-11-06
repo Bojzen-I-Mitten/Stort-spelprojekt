@@ -383,6 +383,16 @@ namespace thomas
 				return m_friction;
 			}
 
+			math::Vector3 Rigidbody::GetPosition()
+			{
+				return Physics::ToSimple(getWorldTransform().getOrigin());
+			}
+
+			math::Quaternion Rigidbody::GetRotation()
+			{
+				return Physics::ToSimple(getWorldTransform().getRotation());
+			}
+
 
 			void Rigidbody::UpdateRigidbodyMass()
 			{
