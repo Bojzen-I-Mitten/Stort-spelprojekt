@@ -9,10 +9,8 @@ public class PowerupSpawner : NetworkComponent
     private bool hasPowerup = false;
     float spawnInterval = 30.0f;
     float timeLeftUntilSpawn = 0.0f;
-    Vector3 pos;
     public override void Start()
     {
-        pos = transform.position;
     }
 
     public override void Update()
@@ -26,16 +24,6 @@ public class PowerupSpawner : NetworkComponent
                     SpawnPowerup();
             }
         }
-
-
-        if (hasPowerup)
-        {
-            float test = (float)Math.Sin(Time.ElapsedTime);
-            float test2 = (float)Math.Cos(Time.DeltaTime);
-
-            spawnedPowerup.transform.position = pos + new Vector3(0, test, 0) / 10;
-            spawnedPowerup.transform.localEulerAngles += new Vector3(0, MathHelper.ToDegrees(test2), 0) / 20;
-        }
     }
 
     public void Free()
@@ -48,6 +36,7 @@ public class PowerupSpawner : NetworkComponent
     {
         timeLeftUntilSpawn = spawnInterval;
         hasPowerup = false;
+        spawnedPowerup = null;
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -76,10 +65,27 @@ public class PowerupSpawner : NetworkComponent
         {
             if (!hasPowerup)
             {
-                spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
-                spawnedPowerup.GetComponent<Powerup>().spawner = this;
-                timeLeftUntilSpawn = spawnInterval;
-                hasPowerup = true;
+                spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup();
+                if (spawnedPowerup)
+                {
+                    spawnedPowerup.activeSelf = true;
+                    Powerup powerup = spawnedPowerup.GetComponent<Powerup>();
+                    powerup.Reset();
+                    powerup.spawner = this;
+                    timeLeftUntilSpawn = spawnInterval;
+                    hasPowerup = true;
+
+
+                    spawnedPowerup.transform.position = transform.position;
+                    spawnedPowerup.transform.rotation = transform.rotation;
+
+                    spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
+                    
+                }
+                else
+                {
+                    Debug.Log("No available powerup to spawn");
+                }
             }
             else
                 Debug.Log("Powerup already spawned");

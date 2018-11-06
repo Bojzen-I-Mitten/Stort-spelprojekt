@@ -53,6 +53,10 @@ namespace ThomasEditor
             CompositionTarget.Rendering += DoUpdates;
 
 
+            ThomasEngine.Resources.OnResourceLoadStarted += Resources_OnResourceLoadStarted;
+            ThomasEngine.Resources.OnResourceLoadEnded += Resources_OnResourceLoadEnded;
+            ThomasEngine.Resources.OnResourceLoad += Resources_OnResourceLoad;
+
             tester = new Tester(this);
             // Hi there, jag hörde att du gillade fin kod, 
             // Så jag skrev det här för att pigga upp dig.
@@ -83,6 +87,37 @@ namespace ThomasEditor
             menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
             menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
             //profile.sendSample();
+        }
+
+        private void Resources_OnResourceLoad(string name, int index, int total)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                string fileName = System.IO.Path.GetFileName(name);
+                busyCator.BusyContent = String.Format("Loading {0} ({1}/{2})", fileName, index, total);
+                
+            }));
+        }
+
+        private void Resources_OnResourceLoadEnded()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = false;
+                editor.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
+            }));
+        }
+
+        private void Resources_OnResourceLoadStarted()
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                busyCator.IsBusy = true;
+                busyCator.BusyContent = "";
+                editor.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
+            }));
         }
 
         private void ThomasWrapper_OnStopPlaying()

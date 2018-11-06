@@ -26,6 +26,7 @@ public class Ball : PickupableObject
         base.Start();
         m_throwable = true;
         DropOnRagdoll = true;
+        MovementSpeedModifier = 0.65f;
 
         // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 
@@ -209,8 +210,14 @@ public class Ball : PickupableObject
         StartCoroutine(CleanTimer());
     }
 
+    public override void Pickup(ChadControls chad, Transform hand)
+    {
+        base.Pickup(chad, hand);
+        m_pickupable = true;
+    }
 
-    public void Reset()
+
+    public override void Reset()
     {
         if (isOwner)
         {

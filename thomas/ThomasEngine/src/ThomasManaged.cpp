@@ -88,6 +88,10 @@ namespace ThomasEngine {
 				Resources::LoadAll(Application::editorAssets);
 				ScriptingManager::Init();
 			}
+			else
+			{
+				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
+			}
 
 			
 #endif
@@ -231,7 +235,7 @@ namespace ThomasEngine {
 		thomas::graphics::Renderer::Instance()->ClearCommands();
 		thomas::editor::Gizmos::Gizmo().ClearGizmos();
 
-		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+		//editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
 //		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
 //#endif
@@ -279,6 +283,20 @@ namespace ThomasEngine {
 
 				CurrentScene->InitGameObjects(IsPlaying());
 
+				
+
+				//Logic
+				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+				{
+					GameObject^ gameObject = CurrentScene->GameObjects[i];
+					if (gameObject->GetActive())
+					{
+						gameObject->Update();
+					}
+				}
+				editor::EditorCamera::Instance()->Update();
+
+
 				if (IsPlaying())
 				{
 					//Physics
@@ -292,16 +310,6 @@ namespace ThomasEngine {
 					thomas::Physics::Simulate();
 				}
 
-				//Logic
-				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
-				{
-					GameObject^ gameObject = CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
-					{
-						gameObject->Update();
-					}
-				}
-				editor::EditorCamera::Instance()->Update();
 
 				//Rendering
 				if (WindowManager::Instance())
@@ -334,6 +342,8 @@ namespace ThomasEngine {
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
+				/*if (playing && inEditor)
+					IssueStopPlay();*/
 			}
 			finally
 			{

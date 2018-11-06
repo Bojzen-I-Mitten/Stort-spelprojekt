@@ -38,6 +38,7 @@ namespace ThomasEngine.Network
 
 
         public List<GameObject> SpawnablePrefabs { get; set; } = new List<GameObject>();
+        public int MaxPlayers { get; set; }
         public GameObject PlayerPrefab { get; set; }
 
         public NetPeer LocalPeer = null;
@@ -92,7 +93,7 @@ namespace ThomasEngine.Network
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
 
-            NetScene.InititateScene();
+            Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -104,6 +105,7 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
+            NetScene.InititateScene();
             //InitServerNTP();
             if (UseLobby)
             {
@@ -124,7 +126,7 @@ namespace ThomasEngine.Network
         {
             initServerStartTime();
             ResponsiblePeer = LocalPeer;
-            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
+            NetScene.SpawnPlayer(LocalPeer, true);
             OnPeerJoin(LocalPeer);
             NetScene.ActivateSceneObjects();
 
@@ -174,8 +176,8 @@ namespace ThomasEngine.Network
 
             if (NetScene.Players.Count == 0) // We are new player.
             {
-                NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
-                NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
+                NetScene.SpawnPlayer(LocalPeer, true);
+                NetScene.SpawnPlayer(_peer, false);
                 OnPeerJoin(LocalPeer);
             }
             else //Someone is joining us.
@@ -185,7 +187,7 @@ namespace ThomasEngine.Network
                 NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
-                NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
+                NetScene.SpawnPlayer(_peer, false);
                 TransferOwnedObjects();
             }
             OnPeerJoin(_peer);

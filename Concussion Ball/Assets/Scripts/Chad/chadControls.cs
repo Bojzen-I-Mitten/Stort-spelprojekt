@@ -37,6 +37,7 @@ public class ChadControls : NetworkComponent
 
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
+    private bool HasThrown = false;
     #endregion
 
     #region Camera Settings etc.
@@ -67,17 +68,19 @@ public class ChadControls : NetworkComponent
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
     private float BaseSpeed = 3.0f;
     private float MaxSpeed = 10.0f;
+    private float DiveSpeed = 12.0f;
 
     public float DiveTimer { get; private set; } = 0f;
+    public Quaternion DivingDirection = Quaternion.Identity;
+    private float MinimumRagdollTimer = 2.0f;
     #endregion
 
     Rigidbody rBody;
     Chadimations Animations;
     Ragdoll Ragdoll;
 
-    public string PlayerPrefabName { get; set; } = "Chad";
-    public float ImpactFactor { get; set; } = 100;
-    public float TackleThreshold { get; set; } = 5;
+    public float ImpactFactor { get; set; } = 2000;
+    public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
@@ -86,7 +89,7 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        
+
 
         State = STATE.CHADING;
 
@@ -123,7 +126,7 @@ public class ChadControls : NetworkComponent
             Camera.gameObject.activeSelf = false;
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
         }
-            
+
     }
 
     public void ActivateCamera()
@@ -133,17 +136,17 @@ public class ChadControls : NetworkComponent
             Camera.gameObject.activeSelf = true;
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
-            
+
     }
 
     public override void Update()
     {
-        // Debug.Log(State);
+        //Debug.Log(CurrentVelocity.y);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
             Direction = new Vector3(0, 0, 0);
-            if(State != STATE.RAGDOLL)
+            if (State != STATE.RAGDOLL)
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
@@ -160,7 +163,7 @@ public class ChadControls : NetworkComponent
 
         if (Input.GetKeyDown(Input.Keys.L))
         {
-            Ragdolling = StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000);
+            Ragdolling = StartRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
             State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
@@ -168,8 +171,11 @@ public class ChadControls : NetworkComponent
             gameObject.GetComponent<NetworkPlayer>().Reset();
     }
 
+    #region Ragdoll handling
     private void EnableRagdoll()
     {
+        // reset aim stuff 
+        ResetThrow();
 
         rBody.enabled = false;
         Ragdoll.EnableRagdoll();
@@ -183,15 +189,37 @@ public class ChadControls : NetworkComponent
         gameObject.GetComponent<Rigidbody>().enabled = true;
     }
 
+    public void ActivateRagdoll(float duration, Vector3 force)
+    {
+        SendRPC("RPCStartRagdoll", duration, force);
+        RPCStartRagdoll(duration, force);
+    }
+
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
-        if(State != STATE.RAGDOLL)
+        if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
+        {
+            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
+            {
+                Debug.Log("remove");
+                (PickedUpObject as Powerup).Remove();
+            }
+            else
+            {
+                PickedUpObject.Drop();
+                Debug.Log("drop");
+            }
+
+        }
+
+        if (State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
             State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
         }
     }
+    #endregion
 
     public void OnDisconnect()
     {
@@ -202,9 +230,8 @@ public class ChadControls : NetworkComponent
             else
                 PickedUpObject.Drop();
         }
-            
-    }
 
+    }
 
     public void PublicStartRagdoll(float duration, Vector3 force)
     {
@@ -225,20 +252,21 @@ public class ChadControls : NetworkComponent
             return;
 
         if (Input.GetKey(Input.Keys.W))
-            Direction.z += 1;
+            Direction.z = Direction.z + 1 + (CurrentVelocity.y / MaxSpeed);
         if (Input.GetKey(Input.Keys.S))
             Direction.z -= 1;
-
         if (Input.GetKey(Input.Keys.D))
             Direction.x -= 1;
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
 
-        if (Input.GetKey(Input.Keys.Space) && DivingTimer > 5.0f)
+        if (Input.GetKeyDown(Input.Keys.Space) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
+            CurrentVelocity.y = DiveSpeed;
             StartCoroutine(DivingCoroutine());
             DivingTimer = 0.0f;
+            DivingDirection = this.gameObject.transform.rotation;
         }
     }
 
@@ -257,47 +285,44 @@ public class ChadControls : NetworkComponent
             //Throw stuff
             if (HasThrowableObject())
             {
-                if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+                if (State != STATE.DIVING)
                 {
-                    State = STATE.THROWING;
-                    ChadHud.Instance.ActivateCrosshair();
-                    ChadHud.Instance.ActivateChargeBar();
+                    if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT) && !HasThrown)
+                    {
+                        State = STATE.THROWING;
+                        ChadHud.Instance.ActivateCrosshair();
+                        ChadHud.Instance.ActivateChargeBar();
 
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 1);
+                        Animations.SetAnimationWeight(ChargeAnimIndex, 1);
+
+                    }
+                    else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown && State == STATE.THROWING)
+                    {
+                        ChargeObject();
+                        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                        {
+                            HasThrown = true;
+
+                            Throwing = PlayThrowAnim();
+                            StartCoroutine(Throwing);
+                        }
+                    }
+                    else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
+                    {
+                        State = STATE.CHADING;
+                        ResetThrow();
+                        ResetCamera();
+                    }
                 }
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
+                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
                 {
-                    //Debug.Log("BIG MEME BOIS");
-                    State = STATE.CHADING;
-                    ResetCharge();
+                    ResetThrow();
                     ResetCamera();
-                    ChadHud.Instance.DeactivateCrosshair();
-                    ChadHud.Instance.DeactivateChargeBar();
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                }
-                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
-                {
-                    State = STATE.DIVING;
-                    ResetCharge();
-                    ResetCamera();
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                }
-                else if (Input.GetMouseButton(Input.MouseButtons.LEFT) && State == STATE.THROWING)
-                {
-                    ChargeObject();
-                }
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
-                {
-                    ChadHud.Instance.DeactivateCrosshair();
-                    ChadHud.Instance.DeactivateChargeBar();
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                    Throwing = PlayThrowAnim();
-                    StartCoroutine(Throwing);
                 }
             }
             else if (PickedUpObject) // player is holding object that is not throwable
             {
-                if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                     PickedUpObject.OnActivate();
             }
 
@@ -305,7 +330,7 @@ public class ChadControls : NetworkComponent
             float yStep = Input.GetMouseY() * Time.ActualDeltaTime;
 
             Direction.y = xStep;
-            if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING) || State == STATE.DIVING || State == STATE.CHADING)
+            if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING && State != STATE.DIVING) /*|| State == STATE.DIVING*/ || State == STATE.CHADING)
             {
                 FondleCamera(CurrentVelocity.Length(), xStep, yStep);
             }
@@ -317,7 +342,7 @@ public class ChadControls : NetworkComponent
             {
                 InitFreeLookCamera();
             }
-            else
+            else if (State != STATE.DIVING)
             {
                 FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
             }
@@ -328,12 +353,29 @@ public class ChadControls : NetworkComponent
             }
         }
     }
+    #endregion
 
-    private void ResetCharge()
+    #region Reset Throw
+    public void RPCResetThrow()
     {
+        ChadHud.Instance.DeactivateCrosshair();
+        ChadHud.Instance.DeactivateChargeBar();
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        PickedUpObject.StopEmitting();
-        PickedUpObject.Cleanup();
+        if (PickedUpObject)
+        {
+            PickedUpObject.StopEmitting();
+            PickedUpObject.Cleanup();
+        }
+
+    }
+
+    private void ResetThrow()
+    {
+        Debug.Log("TEST");
+        SendRPC("RPCResetThrow");
+        RPCResetThrow();
 
     }
     #endregion
@@ -347,6 +389,7 @@ public class ChadControls : NetworkComponent
             float yaw = ThomasEngine.MathHelper.ToRadians(-xStep * CameraSensitivity_x);
             if (velocity != 0)
                 yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
+
             transform.RotateByAxis(transform.up, yaw);
 
             TotalXStep -= yaw; //for of freelook
@@ -386,7 +429,7 @@ public class ChadControls : NetworkComponent
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
             Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = CameraOffsetThrowing; 
+            Camera.transform.localPosition = CameraOffsetThrowing;
         }
     }
 
@@ -430,6 +473,7 @@ public class ChadControls : NetworkComponent
         float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
         switch (State)
         {
+
             case STATE.CHADING:
                 if (Direction.z > 0) // if moving forward
                 {
@@ -447,19 +491,21 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+
+                //rBody.Position = Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                //rBody.LinearVelocity = -Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Direction.z * modifiedBaseSpeed;
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
-                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                //rBody.LinearVelocity = -Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
-                CurrentVelocity.y = modifiedMaxSpeed;
-                transform.position -= Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                CurrentVelocity.y = DiveSpeed;
+                //rBody.LinearVelocity = Vector3.Transform(DivingDirection * DiveSpeed, transform.rotation);
                 break;
             case STATE.RAGDOLL:
                 Camera.transform.rotation = Quaternion.Identity;
@@ -468,6 +514,10 @@ public class ChadControls : NetworkComponent
 
                 break;
         }
+        if(State != STATE.DIVING)
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
+        else
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
     }
 
     public void Reset()
@@ -478,12 +528,21 @@ public class ChadControls : NetworkComponent
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
         ResetCamera();
+        if (PickedUpObject)
+        {
+            PickedUpObject.Drop();
+            PickedUpObject = null;
+        }
+
+        if (isOwner)
+            MatchSystem.instance.LocalChad = this;
     }
 
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        float timer = 1.0f;
+        Animations.ResetTimer(0);
+        float timer = 1.5f;
         while (timer > 0.0f)
         {
             timer -= Time.DeltaTime;
@@ -499,35 +558,59 @@ public class ChadControls : NetworkComponent
         Camera.transform.SetParent(null, true);
         EnableRagdoll();
         Ragdoll.AddForce(force);
+        //yield return new WaitForSeconds(duration);
         yield return new WaitForSeconds(duration);
+        float timer = 0;
+        while (Ragdoll.DistanceToWorld() >= 0.3 && timer < 15)
+        {
+            //Debug.Log(Ragdoll.DistanceToWorld());
+            timer += Time.DeltaTime;
+            yield return null;
+        }
+        yield return new WaitForSeconds(1);
         DisableRagdoll();
         State = STATE.CHADING;
         ResetCamera();
     }
 
+    public void RPCSetAnimWeight(int index, float weight)
+    {
+        Animations.SetAnimationWeight((uint)index, weight);
+    }
+
+    public void RPCStartThrow()
+    {
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+    }
+
     IEnumerator PlayThrowAnim()
     {
-        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+        ChadHud.Instance.DeactivateCrosshair();
+        ChadHud.Instance.DeactivateChargeBar();
+        RPCStartThrow();
+        SendRPC("RPCStartThrow");
         Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
         Vector3 ballCamPos = Camera.transform.position;
 
         if (Camera)
             Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
+        yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
         
-
-        yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
-        ResetCharge();
         ThrowObject(ballCamPos, chosenDirection);
+        HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
-        if(State != STATE.RAGDOLL)
+        ResetThrow();
+        if (State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
             ResetCamera();
             Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+            SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
         }
-        
+
         Throwing = null;
     }
 
@@ -539,20 +622,20 @@ public class ChadControls : NetworkComponent
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
-        PickedUpObject.ChargeEffect();
 
-        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime/maxChargeTime);
+        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
     }
 
     private void ThrowObject(Vector3 camPos, Vector3 direction)
     {
         PickedUpObject.Throw(camPos, direction);
+        ChadHud.Instance.HideHeldObjectText();
     }
 
     public void RPCPickup(int id)
     {
-        if(State != STATE.RAGDOLL)
+        if (State != STATE.RAGDOLL)
         {
             GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
             PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
@@ -606,6 +689,11 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
+        PickupableObject pickupablea = collider.gameObject.GetComponent<PickupableObject>();
+        if (pickupablea)
+        {
+            Debug.LogError("Why denny!?");
+        }
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
@@ -616,24 +704,32 @@ public class ChadControls : NetworkComponent
                     TakeOwnership(pickupable.gameObject);
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
+
+                    ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
                 }
             }
-            if (collider.gameObject.Name == PlayerPrefabName)
+            ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+            if (otherChad)
             {
-                float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
+                float TheirVelocity = otherChad.CurrentVelocity.Length();
                 Debug.Log(TheirVelocity);
                 Debug.Log(CurrentVelocity.Length());
-                if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
+                if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
+                {
+                    Debug.Log("Trying to tackle player on same team, you baka.");
+                }
+                else if (TheirVelocity > TackleThreshold && TheirVelocity >= CurrentVelocity.Length())
                 {
                     //toggle ragdoll
-                    RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
-                    SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    RPCStartRagdoll(MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    SendRPC("RPCStartRagdoll", MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
 
                     if (PickedUpObject && PickedUpObject.DropOnRagdoll)
                     {
                         PickedUpObject.Drop();
+                        PickedUpObject = null;
                     }
-                        
+
                 }
             }
         }

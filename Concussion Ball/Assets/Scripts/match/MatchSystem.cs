@@ -24,6 +24,7 @@ public class MatchSystem : NetworkManager
     public ChadControls LocalChad;
     public Camera spectatorCamera { get; set; }
 
+
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
     public float lostTime = 0.0f;
@@ -68,11 +69,12 @@ public class MatchSystem : NetworkManager
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
     }
 
+  
+
     public override void Start()
     {
+        Ball = GameObject.Instantiate(BallPrefab);
         base.Start();
-        if(BallPrefab)
-            SpawnablePrefabs.Add(BallPrefab);
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
         //StartCoroutine(ResetCoroutine(10));
@@ -117,18 +119,6 @@ public class MatchSystem : NetworkManager
     }
 
     #region Utility
-    void SpawnBall()
-    {
-        if (BallPrefab)
-        {
-            Ball = Scene.FindNetworkObject(8008)?.gameObject;
-            if (!Ball)
-            {
-                Ball = NetworkInstantiate(BallPrefab, Vector3.Zero, Quaternion.Identity, ResponsiblePeer == LocalPeer, 8008);
-            }
-            Ball.SetActive(false);
-        }
-    }
 
     void ResetPlayers()
     {
@@ -293,8 +283,6 @@ public class MatchSystem : NetworkManager
         
         np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
 
-        SpawnBall();
-
         if (peer != LocalPeer)
         {
             Debug.Log(MatchStarted);
@@ -347,6 +335,12 @@ public class MatchSystem : NetworkManager
         //    Team1.AddPlayer(player);
         //else
         //    Team2.AddPlayer(player);
+    }
+
+    public TEAM_TYPE GetPlayerTeam(GameObject player)
+    {
+        NetworkPlayer localPlayer = player.GetComponent<NetworkPlayer>();
+        return localPlayer.Team.TeamType;
     }
     #endregion
 
