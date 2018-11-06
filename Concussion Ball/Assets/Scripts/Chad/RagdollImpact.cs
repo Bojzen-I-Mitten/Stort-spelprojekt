@@ -58,6 +58,7 @@ public class RagdollImpact : ScriptComponent
     {
         ray = new Ray(transform.position, Vector3.Down);
         RaycastHit hit;
+        ray = new Ray(transform.position, Vector3.Down);
         if (Physics.Raycast(ray, out hit))
         {
             DistanceToCollision = hit.distance;
@@ -65,13 +66,6 @@ public class RagdollImpact : ScriptComponent
         }
         GetActive = false;
     }
-    //public override void OnDrawGizmos()
-    //{
-    //    ray = new Ray(transform.position, Vector3.Down);
-    //    Gizmos.SetMatrix(Matrix.Identity);
-    ////    Gizmos.SetColor(Color.Red);
-    ////    Gizmos.DrawRay(ref ray);
-    //}
 
 
 

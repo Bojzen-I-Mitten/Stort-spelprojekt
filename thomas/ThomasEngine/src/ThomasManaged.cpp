@@ -133,7 +133,9 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+#ifdef BENCHMARK
 			utils::profiling::ProfileManager::newFrame();
+#endif
 		}
 	}
 
@@ -233,7 +235,7 @@ namespace ThomasEngine {
 		thomas::graphics::Renderer::Instance()->ClearCommands();
 		thomas::editor::Gizmos::Gizmo().ClearGizmos();
 
-		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+		//editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
 //		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
 //#endif
@@ -366,14 +368,9 @@ namespace ThomasEngine {
 
 
 				}
-				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
-#ifdef BENCHMARK
-				utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-				profiler->SetActive(true);
-				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
-#endif
+
+
 
 				Monitor::Exit(lock);
 				mainThreadDispatcher->BeginInvoke(
@@ -382,7 +379,17 @@ namespace ThomasEngine {
 
 			}
 
+
 		}
+
+#ifdef BENCHMARK
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(true);
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+#endif
 
 		renderThread->Join();	// Wait until thread is finished
 		Resources::UnloadAll();
@@ -390,10 +397,11 @@ namespace ThomasEngine {
 
 	}
 
-	void ThomasWrapper::Exit() {
-
+	void ThomasWrapper::Exit() 
+	{
+#ifdef BENCHMARK
 		utils::profiling::ProfileManager::dumpDataToFile();
-	
+#endif
 		thomas::ThomasCore::Exit();
 	}
 

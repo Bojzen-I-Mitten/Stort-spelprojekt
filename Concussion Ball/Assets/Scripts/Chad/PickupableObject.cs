@@ -36,7 +36,7 @@ public class PickupableObject : NetworkComponent
 
     public override void Update()
     {
-        if(charging)
+        if (charging)
             ChargeEffect();
     }
 
