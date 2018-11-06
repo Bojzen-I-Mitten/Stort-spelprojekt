@@ -178,7 +178,7 @@ public class ChadHud : ScriptComponent
         {
             BallArrow = HUD.Add(BallArrowTexture);
             BallArrow.origin = new Vector2(0.5f);
-            BallArrow.scale = new Vector2(2);
+            BallArrow.scale = new Vector2(4);
             BallArrow.position = new Vector2(-1000);
             BallArrow.color = Score1BG.color + Score2BG.color;
         }

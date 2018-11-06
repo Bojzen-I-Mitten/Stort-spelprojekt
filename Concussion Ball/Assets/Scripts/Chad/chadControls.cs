@@ -513,9 +513,9 @@ public class ChadControls : NetworkComponent
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
         ResetCamera();
-        ChadHud.Instance.HideHeldObjectText();
-        ChadHud.Instance.DeactivateChargeBar();
-        ChadHud.Instance.DeactivateCrosshair();
+        //ChadHud.Instance.HideHeldObjectText();
+        //ChadHud.Instance.DeactivateChargeBar();
+        //ChadHud.Instance.DeactivateCrosshair();
         if (PickedUpObject)
         {
             PickedUpObject.Drop();
