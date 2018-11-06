@@ -183,8 +183,7 @@ public class Ragdoll : ScriptComponent
     }
     public float DistanceToWorld()
     {
-        Debug.Log(ImpactSpine.DistanceToCollition);
-        return ImpactSpine.DistanceToCollition;
+        return ImpactSpine.DistanceToCollision;
     }
 
     public void EnableRagdoll()
@@ -370,14 +369,18 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = headCollider.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
-        //if(PostiveMapping)
-        //{
-        //    J_BodyParts[(int)BODYPART.HEAD].NoCollision = true;
-        //    ExtraVector = -J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor;
-        //    ExtraVector.y = -ExtraVector.y;
-        //    ExtraVector.z = ExtraVector.z * 3;
-        //    J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = ExtraVector;
-        //}
+        if (PostiveMapping)
+        {
+            J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 64;
+            J_BodyParts[(int)BODYPART.HEAD].SwingAngle2 = 59;
+
+            J_BodyParts[(int)BODYPART.HEAD].NoCollision = true;
+            ExtraVector = -J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor;
+            ExtraVector.x = -ExtraVector.x;
+            ExtraVector.y = -ExtraVector.y;
+            ExtraVector.z = ExtraVector.z + 0.1f; //* 3;
+            J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = ExtraVector;
+        }
 
         //left arm
 
@@ -551,8 +554,10 @@ public class Ragdoll : ScriptComponent
 
         if(PostiveMapping)
         {
-
-            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Axis = new Vector3(0, 0, -90);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAxis = new Vector3(0, 0, 180);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle2 = 5;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].TwistAngle = 90;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Axis = new Vector3(0, 180, 0);
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor = -J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor;
             J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor = new Vector3(-J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.x, J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.y, J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.z);
         }
@@ -615,7 +620,10 @@ public class Ragdoll : ScriptComponent
         if (PostiveMapping)
         {
 
-            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 0, 90);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAxis = new Vector3(0, 0, 180);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle2 = 5;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].TwistAngle = 90;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 180, 0);
           //  J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 0, 0);
   //          J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Swing = new Vector3(0, -90, -225);
             J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor = -J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor;
@@ -662,7 +670,6 @@ public class Ragdoll : ScriptComponent
     public override void Update()
     {
         Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
-        Vector3 listenerpos = MatchSystem.instance.spectatorCamera.transform.position;
 
 
         if (RagdollEnabled)

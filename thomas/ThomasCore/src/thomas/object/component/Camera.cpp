@@ -308,6 +308,7 @@ namespace thomas
 
 			const graphics::render::CAMERA_FRAME_DATA& Camera::GetFrameData()
 			{
+				CopyFrameData();
 				return m_frameData;
 			}
 

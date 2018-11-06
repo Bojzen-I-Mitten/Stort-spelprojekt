@@ -10,7 +10,7 @@ public class RagdollImpact : ScriptComponent
 {
     public bool GetActive = false;
     public float Volume;
-    public float DistanceToCollition;
+    public float DistanceToCollision;
     Ray ray;
     enum BODYPART
     {
@@ -56,20 +56,15 @@ public class RagdollImpact : ScriptComponent
     }
     public override void Update()
     {
+        ray = new Ray(transform.position, Vector3.Down);
         RaycastHit hit;
+        ray = new Ray(transform.position, Vector3.Down);
         if (Physics.Raycast(ray, out hit))
         {
-            DistanceToCollition = hit.distance;
+            DistanceToCollision = hit.distance;
            
         }
         GetActive = false;
-    }
-    public override void OnDrawGizmos()
-    {
-        ray = new Ray(transform.position, new Vector3(0,-90,0));
-        Gizmos.SetMatrix(Matrix.Identity);
-    //    Gizmos.SetColor(Color.Red);
-    //    Gizmos.DrawRay(ref ray);
     }
 
 
