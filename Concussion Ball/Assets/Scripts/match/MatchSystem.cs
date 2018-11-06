@@ -85,13 +85,13 @@ public class MatchSystem : NetworkManager
         PowerupManager = gameObject.GetComponent<PowerupManager>();
 
        
-            countdownSound = gameObject.AddComponent<SoundComponent>();
-            countdownSound.clip = countdownSoundClip;
-            countdownSound.Looping = false;
+        countdownSound = gameObject.AddComponent<SoundComponent>();
+        countdownSound.clip = countdownSoundClip;
+        countdownSound.Looping = false;
        
-            endroundSound = gameObject.AddComponent<SoundComponent>();
-            endroundSound.clip = endroundSoundClip;
-            endroundSound.Looping = false;
+        endroundSound = gameObject.AddComponent<SoundComponent>();
+        endroundSound.clip = endroundSoundClip;
+        endroundSound.Looping = false;
         
         //StartCoroutine(ResetCoroutine(10));
     }

@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
     <Compile Include="Assets\Scripts\Confetti.cs" />
     <Compile Include="Assets\Scripts\ConfettiEmitter.cs" />
@@ -65,7 +66,6 @@
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Chad\Ball.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
-    <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Chad\Chadimations.cs" />
     <Compile Include="Assets\Scripts\Chad\DissolveFadeIn.cs" />
     <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />
