@@ -35,6 +35,14 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
 
+    private SoundComponent ChargeUpChadSound1;
+    private SoundComponent ThrowSound1;
+    private SoundComponent PantingSound;
+
+    public AudioClip ChargeUpSoundClip1 { get; set; }
+    public AudioClip ThrowSoundClip1 { get; set; }
+    public AudioClip PantingSoundClip { get; set; }
+
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
     private bool HasThrown = false;
@@ -117,6 +125,15 @@ public class ChadControls : NetworkComponent
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
 
         Identity.RefreshCache();
+
+        ChargeUpChadSound1 = gameObject.AddComponent<SoundComponent>();
+        ChargeUpChadSound1.clip = ChargeUpSoundClip1;
+        ChargeUpChadSound1.Looping = false;
+        ThrowSound1 = gameObject.AddComponent<SoundComponent>();
+        ThrowSound1.clip = ThrowSoundClip1;
+        ThrowSound1.Looping = false;
+        PantingSound = gameObject.AddComponent<SoundComponent>();
+        PantingSound.clip = PantingSoundClip;
     }
 
     public void DeactivateCamera()
@@ -291,8 +308,15 @@ public class ChadControls : NetworkComponent
                     else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown && State == STATE.THROWING)
                     {
                         ChargeObject();
+
+                        ChargeUpChadSound1.Play();
+
+                        PantingSound.Play();
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
+                            ChargeUpChadSound1.Stop();
+                            PantingSound.Stop();
+                            ThrowSound1.PlayOneShot();
                             HasThrown = true;
                             
                             Throwing = PlayThrowAnim();
@@ -360,6 +384,8 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
+        ChargeUpChadSound1.Stop();
+        PantingSound.Stop();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
 
