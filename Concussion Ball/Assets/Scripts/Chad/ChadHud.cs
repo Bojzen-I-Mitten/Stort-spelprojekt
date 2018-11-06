@@ -35,6 +35,7 @@ public class ChadHud : ScriptComponent
     Image Score1BG;
     Image Score2BG;
     Image BallArrow;
+    Image LMB;
     #endregion
 
     public Curve AnnouncementHorizontalSpeed { get; set; }
@@ -50,6 +51,7 @@ public class ChadHud : ScriptComponent
     public Texture2D TimerBGTexture { get; set; }
     public Texture2D ScoreBGTexture { get; set; }
     public Texture2D BallArrowTexture { get; set; }
+    public Texture2D LMBTexture { get; set; }
     #endregion
 
     public override void Awake()
@@ -73,21 +75,35 @@ public class ChadHud : ScriptComponent
         Timer.origin = new Vector2(0.5f, 0);
         Timer.depth = 0.8f;
 
-        TimerBG = HUD.Add(TimerBGTexture);
-        TimerBG.position = new Vector2(0.5f, 0);
-        TimerBG.origin = new Vector2(0.5f, 0);
-        TimerBG.scale = new Vector2(0.6f, 0.7f);
-        TimerBG.color = Color.GhostWhite;
-        TimerBG.depth = 0.9f;
-        
+        if (TimerBGTexture != null)
+        {
+            TimerBG = HUD.Add(TimerBGTexture);
+            TimerBG.position = new Vector2(0.5f, 0);
+            TimerBG.origin = new Vector2(0.5f, 0);
+            TimerBG.scale = new Vector2(0.6f, 0.7f);
+            TimerBG.color = Color.GhostWhite;
+            TimerBG.depth = 0.9f;
+        }
+
         //Left of the timer
-        Score1BG = HUD.Add(ScoreBGTexture);
-        Score1BG.origin = new Vector2(0.5f, 0);
-        Score1BG.position = new Vector2(0.4175f, 0);
-        Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-        Score1BG.depth = 1;
-        Score1BG.scale = new Vector2(1, 0.7f);
-        Score1BG.flip = new Vector2(0, 1);
+        if (ScoreBGTexture != null)
+        {
+            Score1BG = HUD.Add(ScoreBGTexture);
+            Score1BG.origin = new Vector2(0.5f, 0);
+            Score1BG.position = new Vector2(0.4175f, 0);
+            Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+            Score1BG.depth = 1;
+            Score1BG.scale = new Vector2(1, 0.7f);
+            Score1BG.flip = new Vector2(0, 1);
+
+            //Right of the timer
+            Score2BG = HUD.Add(ScoreBGTexture);
+            Score2BG.origin = new Vector2(0.5f, 0);
+            Score2BG.position = new Vector2(0.5825f, 0f);
+            Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+            Score2BG.depth = 1;
+            Score2BG.scale = new Vector2(1, 0.7f);
+        }
 
         Score1 = HUD.Add("");
         Score1.scale = new Vector2(1.6f);
@@ -96,14 +112,6 @@ public class ChadHud : ScriptComponent
         Score1.color = Color.White;
         Score1.font = Numbers;
         Score1.depth = 0.8f;
-        
-        //Right of the timer
-        Score2BG = HUD.Add(ScoreBGTexture);
-        Score2BG.origin = new Vector2(0.5f, 0);
-        Score2BG.position = new Vector2(0.5825f, 0f);
-        Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
-        Score2BG.depth = 1;
-        Score2BG.scale = new Vector2(1, 0.7f);
 
         Score2 = HUD.Add("");
         Score2.scale = new Vector2(1.6f);
@@ -129,35 +137,59 @@ public class ChadHud : ScriptComponent
         Announcement2.color = Color.Green;
         Announcement2.origin = new Vector2(0.5f);
 
-        AnnouncementBG = HUD.Add(AnnouncementBackground);
-        AnnouncementBG.position = new Vector2(0.5f);
-        AnnouncementBG.scale = Vector2.Zero;
-        AnnouncementBG.origin = new Vector2(0.5f);
-        AnnouncementBG.depth = 1;
+        if (AnnouncementBackground != null)
+        {
+            AnnouncementBG = HUD.Add(AnnouncementBackground);
+            AnnouncementBG.position = new Vector2(0.5f);
+            AnnouncementBG.scale = Vector2.Zero;
+            AnnouncementBG.origin = new Vector2(0.5f);
+            AnnouncementBG.depth = 1;
+        }
         #endregion
 
         #region Aiming Stuff
-        Crosshair = HUD.Add(CrosshairTexture);
-        Crosshair.origin = new Vector2(0.5f);
-        Crosshair.position = new Vector2(0.5f);
-        Crosshair.scale = Vector2.Zero;
+        if (CrosshairTexture != null)
+        {
+            //Debug.Log(Crosshair);
+            Crosshair = HUD.Add(CrosshairTexture);
+            Crosshair.origin = new Vector2(0.5f);
+            Crosshair.position = new Vector2(0.5f);
+            Crosshair.scale = Vector2.Zero;
+        }
 
-        ChargeBarOutline = HUD.Add(ChargeBarOutlineTexture);
-        ChargeBarOutline.position = new Vector2(0.9f, 0.1f);
-        ChargeBarOutline.scale = Vector2.Zero;
+        if (ChargeBarOutlineTexture != null)
+        {
+            ChargeBarOutline = HUD.Add(ChargeBarOutlineTexture);
+            ChargeBarOutline.position = new Vector2(0.9f, 0.1f);
+            ChargeBarOutline.scale = Vector2.Zero;
+        }
 
-        ChargeBar = HUD.Add(ChargeBarTexture);
-        ChargeBar.position = new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height * 9.0f) / 1080.0f)); //Need to move the bar its own height down one step.
-        ChargeBar.scale = Vector2.Zero;
-        ChargeBar.origin = new Vector2(1, 0);
-        ChargeBar.rotation = MathHelper.Pi; //Need to rotate the bar 180, because positive x is down on the screen.
+        if (ChargeBarTexture != null)
+        {
+            ChargeBar = HUD.Add(ChargeBarTexture);
+            ChargeBar.position = new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height * 9.0f) / 1080.0f)); //Need to move the bar its own height down one step.
+            ChargeBar.scale = Vector2.Zero;
+            ChargeBar.origin = new Vector2(1, 0);
+            ChargeBar.rotation = MathHelper.Pi; //Need to rotate the bar 180, because positive x is down on the screen.
+        }
         #endregion
 
-        BallArrow = HUD.Add(BallArrowTexture);
-        BallArrow.origin = new Vector2(0.5f);
-        BallArrow.scale = new Vector2(2);
-        BallArrow.position = new Vector2(-1000);
-        BallArrow.color = Score1BG.color + Score2BG.color;
+        if (BallArrowTexture != null)
+        {
+            BallArrow = HUD.Add(BallArrowTexture);
+            BallArrow.origin = new Vector2(0.5f);
+            BallArrow.scale = new Vector2(2);
+            BallArrow.position = new Vector2(-1000);
+            BallArrow.color = Score1BG.color + Score2BG.color;
+        }
+
+        if (LMBTexture != null)
+        {
+            LMB = HUD.Add(LMBTexture);
+            LMB.origin = new Vector2(0.5f);
+            LMB.position = new Vector2(0.85f, 0.9f);
+            LMB.scale = Vector2.Zero;
+        }
 
         HeldObject = HUD.Add("Holding: ");
         HeldObject.position = new Vector2(0.0f, 0.8f);
@@ -270,6 +302,7 @@ public class ChadHud : ScriptComponent
     {
         if (ToggleAim)
         {
+            LMB.scale = new Vector2(0.75f);
             Crosshair.scale = Vector2.One;
         }
     }
@@ -277,6 +310,7 @@ public class ChadHud : ScriptComponent
     public void DeactivateCrosshair()
     {
         Crosshair.scale = Vector2.Zero;
+        LMB.scale = Vector2.Zero;
     }
 
     public void ActivateChargeBar()
