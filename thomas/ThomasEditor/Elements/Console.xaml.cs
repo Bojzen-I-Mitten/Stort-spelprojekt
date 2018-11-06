@@ -22,7 +22,7 @@ namespace ThomasEditor
     /// </summary>
     public partial class Console : UserControl
     {
-        double scrollRatio = 0;
+        //double scrollRatio = 0;
         ObservableCollection<DebugMessage> debugMessages = new ObservableCollection<DebugMessage>();
         ObservableCollection<DebugMessage> collapsedDebugMessages = new ObservableCollection<DebugMessage>();
 
@@ -38,7 +38,7 @@ namespace ThomasEditor
             numberOfErrors.Content = 0;
 
             Debug.OnDebugMessage += Debug_OnDebugMessage;
-            MainWindow.OnStartPlaying += ThomasWrapper_OnStartPlaying;
+            ThomasWrapper.OnStartPlaying += ThomasWrapper_OnStartPlaying;
         }
 
         private bool CustomFilter(object obj)

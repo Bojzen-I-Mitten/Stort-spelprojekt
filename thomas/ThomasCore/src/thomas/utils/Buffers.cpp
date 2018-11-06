@@ -32,8 +32,20 @@ namespace thomas
 				else
 					result = utils::D3D::Instance()->GetDevice()->CreateBuffer(&bufferDesc, &InitData, &m_buffer);
 
+
 				if (result != S_OK)
+				{
 					LOG(result);
+				}
+				else
+				{
+#ifdef _DEBUG
+					// Give debug names to all buffers.
+					static uint32_t BUFF_INDEX = 0;
+					std::string debugName("BUFF" + std::to_string(BUFF_INDEX++) +  ", SIZE: " + std::to_string(size));
+					SetName(debugName);
+#endif
+				}
 			}
 			Buffer::~Buffer()
 			{
@@ -62,6 +74,18 @@ namespace thomas
 				memcpy(resource.pData, data, size);
 				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_buffer, 0);
 			}
+			void Buffer::SetName(const char * name)
+			{
+#ifdef _DEBUG
+				m_buffer->SetPrivateData(WKPDID_D3DDebugObjectName, std::strlen(name) - 1, name);
+#endif
+			}
+			void Buffer::SetName(const std::string & name)
+			{
+#ifdef _DEBUG
+				m_buffer->SetPrivateData(WKPDID_D3DDebugObjectName, name.length() - 1, name.c_str());
+#endif
+			}
 			size_t Buffer::GetSize()
 			{
 				return m_size;
@@ -70,20 +94,23 @@ namespace thomas
 			{
 				return m_buffer;
 			}
-			VertexBuffer::VertexBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag): Buffer(data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride(stride)
+			VertexBuffer::VertexBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag): 
+				Buffer(data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride(stride)
 			{
 			}
 			size_t VertexBuffer::GetStride()
 			{
 				return m_stride;
 			}
-			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
+			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : 
+				Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
 			{
 
 			}
 
 			
-			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag, D3D11_BUFFER_UAV_FLAG uavFlag) : Buffer(data, count * stride, bindFlag, usageFlag, stride, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED)
+			StructuredBuffer::StructuredBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag, D3D11_BIND_FLAG bindFlag, D3D11_BUFFER_UAV_FLAG uavFlag) : 
+				Buffer(data, count * stride, bindFlag, usageFlag, stride, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED)
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;

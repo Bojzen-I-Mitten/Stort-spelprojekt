@@ -17,7 +17,6 @@ namespace thomas
 {
 	namespace editor
 	{
-		EditorCamera EditorCamera::m_editorCamera;
 
 		EditorCamera::EditorCamera() : 
 			object::GameObject("editorCamera"), 
@@ -36,14 +35,6 @@ namespace thomas
 
 		EditorCamera::~EditorCamera()
 		{
-			
-		}
-
-		void EditorCamera::Destroy()
-		{
-			SAFE_DELETE(m_transform);
-			m_cameraComponent.reset();
-			m_grid.reset();
 		}
 
 		void EditorCamera::Init()
@@ -55,7 +46,8 @@ namespace thomas
 			m_transform->LookAt(math::Vector3());
 
 			// Camera component
-			m_cameraComponent = std::make_unique<object::component::Camera>(true);
+			m_cameraComponent = std::unique_ptr<object::component::Camera>(
+				new object::component::Camera(-1));
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
 			m_grid = std::unique_ptr<EditorGrid>(new EditorGrid(100, 1.f, 10));
@@ -70,7 +62,14 @@ namespace thomas
 
 		EditorCamera* EditorCamera::Instance()
 		{
-			return &m_editorCamera;
+			static EditorCamera* s_editorCamera(new EditorCamera());
+			return s_editorCamera;
+		}
+
+
+		void EditorCamera::DeleteInstance()
+		{
+			delete Instance();
 		}
 
 		void EditorCamera::Render()
@@ -424,7 +423,7 @@ namespace thomas
 		void EditorCamera::BeginBoxSelect()
 		{
 			math::Vector2 mousePos = WindowManager::Instance()->GetEditorWindow()->GetInput()->GetMousePosition();
-			m_boxSelectRect = math::Rectangle(mousePos.x, mousePos.y, 0, 0);
+			m_boxSelectRect = math::Rectangle((long)mousePos.x, (long)mousePos.y, 0, 0);
 		}
 
 		void EditorCamera::MoveAndRotateCamera()

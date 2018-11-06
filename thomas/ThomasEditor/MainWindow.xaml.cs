@@ -30,10 +30,6 @@ namespace ThomasEditor
         private Tester tester;
         TimeSpan lastRender;
         public static MainWindow _instance;
-        public delegate void StartPlayEvent();
-        public delegate void StopPlayingEvent();
-        public static event StartPlayEvent OnStartPlaying;
-        public static event StopPlayingEvent OnStopPlaying;
 
         Guid g;
         public MainWindow()
@@ -76,7 +72,8 @@ namespace ThomasEditor
             LoadLayout();
             Closing += MainWindow_Closing;
 
-            MainWindow.OnStopPlaying += ThomasWrapper_OnStopPlaying;
+            ThomasWrapper.OnStartPlaying += ThomasWrapper_OnStartPlaying;
+            ThomasWrapper.OnStopPlaying += ThomasWrapper_OnStopPlaying;
 
             ScriptingManager.scriptReloadStarted += ScriptingManger_scriptReloadStarted;
             ScriptingManager.scriptReloadFinished += ScriptingManger_scriptReloadFinished;
@@ -120,9 +117,18 @@ namespace ThomasEditor
             }));
         }
 
+        private void ThomasWrapper_OnStartPlaying()
+        {
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                game.Focus();
+                playPauseButton.DataContext = ThomasWrapper.IsPlaying();
+            }));
+
+        }
         private void ThomasWrapper_OnStopPlaying()
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 playPauseButton.DataContext = ThomasWrapper.IsPlaying();
             }));
@@ -401,17 +407,11 @@ namespace ThomasEditor
             if (ThomasWrapper.IsPlaying())
             {
                 ThomasWrapper.IssueStopPlay();
-                OnStopPlaying();
             }
             else
             {
                 ThomasWrapper.IssuePlay();
-                OnStartPlaying();
-                game.Focus();
             }
-                
-
-            playPauseButton.DataContext = ThomasWrapper.IsPlaying();
         }
 
         #region primitives

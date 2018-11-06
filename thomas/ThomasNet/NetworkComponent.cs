@@ -9,7 +9,7 @@ namespace ThomasEngine.Network
     public class NetworkComponent : ScriptComponent
     {
         protected bool isDirty = false;
-        private int prefabID;
+        //private int prefabID;
         private NetworkIdentity networkIdentity;
         protected float SmoothingFactor = 1.0f / 3;
 

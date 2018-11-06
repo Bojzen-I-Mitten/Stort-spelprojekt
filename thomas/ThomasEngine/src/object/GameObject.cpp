@@ -291,7 +291,7 @@ namespace ThomasEngine {
 	}
 	bool GameObject::IsPrefab()
 	{
-		return prefabPath != nullptr && (inScene == false);
+		return prefabPath != nullptr && (inScene == 0);
 	}	   
 	GameObject ^ ThomasEngine::GameObject::CreatePrimitive(PrimitiveType type)
 	{
@@ -309,7 +309,8 @@ namespace ThomasEngine {
 		}
 		GameObject^ clone = nullptr;
 		if (original->IsPrefab()) {
-			clone = Resources::LoadPrefab(original->prefabPath, true);
+			// Generate a new prefab
+			clone = Resources::CreatePrefab(original->prefabPath);
 		}
 		else
 		{
@@ -359,14 +360,14 @@ namespace ThomasEngine {
 		}
 		return clone;
 	}
-
-	GameObject^ GameObject::CreatePrefab() {
+	
+	GameObject^ GameObject::CreateEmptyPrefab() {
 		GameObject^ newGobj = gcnew GameObject();
 		Transform^ t = newGobj->AddComponent<Transform^>();
 		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
 		return newGobj;
 	}
-
+	
 	generic<typename T>
 	where T : Component
 	T GameObject::AddComponent()

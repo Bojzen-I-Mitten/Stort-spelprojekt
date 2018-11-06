@@ -289,21 +289,10 @@ namespace ThomasEngine
 			gameObject->prefabPath = pp;
 		}
 
-		GameObject ^ Resources::LoadPrefab(String^ path) {
-			return LoadPrefab(path, false);
-		}
-
-		GameObject ^ Resources::LoadPrefab(String^ path, bool forceInstantiate)
+		GameObject^ Resources::CreatePrefab(String^ path)
 		{
-			if (!forceInstantiate) {
-				for each(GameObject^ gObj in ThomasEngine::Object::GetObjectsOfType<GameObject^>())
-				{
-					if (gObj->prefabPath == path && gObj->inScene)
-						return gObj;
-				}
-			}
-
-			try {
+			try
+			{
 				GameObject^ prefab = Serializer::DeserializeGameObject(path);
 				if (prefab)
 					prefab->prefabPath = path;
@@ -316,6 +305,34 @@ namespace ThomasEngine
 			}
 
 		}
+
+		GameObject ^ Resources::LoadPrefabResource(String^ path)
+		{
+			for each(GameObject^ gObj in ThomasEngine::Object::GetObjectsOfType<GameObject^>())
+			{
+				if (gObj->prefabPath == path && gObj->inScene)
+					return gObj;
+			}
+			GameObject^ prefab = CreatePrefab(path);
+			Monitor::Enter(s_PREFAB_DICT);
+			s_PREFAB_DICT[path] = prefab;
+			Monitor::Exit(s_PREFAB_DICT);
+			return prefab;
+		}
+#ifdef _EDITOR
+		IEnumerable<GameObject^>^ Resources::PrefabList::get()
+		{
+			auto l = gcnew List<GameObject^>(s_PREFAB_DICT->Count);
+			Monitor::Enter(s_PREFAB_DICT);
+			for each (auto var in s_PREFAB_DICT)
+			{
+				l->Add(var.Value);
+			}
+			Monitor::Exit(s_PREFAB_DICT);
+
+			return l;
+		}
+#endif
 
 #pragma endregion
 		generic<typename T>
@@ -339,13 +356,6 @@ namespace ThomasEngine
 					T resource = (T)Activator::CreateInstance(T::typeid, path);
 					resources[thomasPath] = resource;
 					return resource;
-				}
-			}
-
-			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
 				}
 			}
 
@@ -376,10 +386,24 @@ namespace ThomasEngine
 				OnResourceLoadEnded();
 			}
 
+			void Resources::Unload(Resource^ resource) {
+				if (Find(resource->m_path))
+				{
+					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
+					delete resource;
+				}
+			}
+
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
+				for each (auto var in s_PREFAB_DICT)
+				{
+					var.Value->OnDestroy();
+					delete var.Value;
+				}
+				resources->Clear();
 			}
 #pragma endregion
 

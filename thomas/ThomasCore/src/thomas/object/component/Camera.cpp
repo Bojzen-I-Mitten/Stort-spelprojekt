@@ -23,42 +23,27 @@ namespace thomas
 				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
-			Camera::Camera(bool dontAddTolist) :
+			Camera::Camera() :
+				Camera(0)
+			{
+			}
+			Camera::Camera(int target_display) :
 				m_ID(0),
 				m_renderGUI(false)
 				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
-				m_near = 0.1f;
+				m_near = 0.5;
 				m_far = 10000.f;
 				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
-				m_targetDisplay = -1;
+				m_targetDisplay = target_display;
 				UpdateProjMatrix();
 			}
 
-			Camera::Camera() :
-				m_ID(0),
-				m_renderGUI(false)
-				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
-			{
-				m_fov = 70;
-				m_near = 0.5;
-				m_far = 10000;
-				m_skybox = std::make_unique<graphics::SkyBox>();
-				m_viewport = math::Viewport(0, 0, 1,1);
-				m_targetDisplay = 0;
-				UpdateProjMatrix();
-				
-			}
 
 			Camera::~Camera()
 			{
-				for (int i = 0; i < m_canvases.size(); ++i)
-				{
-					m_canvases[i]->Destroy();
-					m_canvases[i].reset();
-				}
 				m_canvases.clear();
 				graphics::Renderer::Instance()->getCameraList().remove(this);
 			}
@@ -257,10 +242,10 @@ namespace thomas
 				
 				math::BoundingFrustum subFrustrum(GetFrustrum());
 
-				math::Rectangle window = math::Rectangle(GetViewport().x, GetViewport().y, GetViewport().width, GetViewport().height);
+				math::Rectangle window = math::Rectangle((long)GetViewport().x, (long)GetViewport().y, (long)GetViewport().width, (long)GetViewport().height);
 				math::Vector2 center = window.Center();
-				window.Offset(-center.x, -center.y);
-				rect.Offset(-center.x, -center.y);
+				window.Offset((long)-center.x, (long)-center.y);
+				rect.Offset((long)-center.x, (long)-center.y);
 
 
 				if (rect.width < 0)

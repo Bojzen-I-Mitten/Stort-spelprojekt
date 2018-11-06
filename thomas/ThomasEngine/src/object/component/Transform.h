@@ -43,7 +43,7 @@ namespace ThomasEngine
 		{
 			virtual bool get() override { return false; }
 		}
-		//[Newtonsoft::Json::JsonIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property IEnumerable<Transform^>^ children
 		{

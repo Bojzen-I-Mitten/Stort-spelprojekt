@@ -137,16 +137,16 @@ namespace ThomasEngine
 	}
 	Matrix RenderSkinnedComponent::GetLocalBoneMatrix(int boneIndex)
 	{
-		assert(Native->GetBlendTree());
 		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
-		if ((uint32_t)boneIndex < anim->boneCount())
-			return Utility::Convert(anim->getBoneOrientation(boneIndex));
-		else return Matrix::Identity;
+		if (!anim && (uint32_t)boneIndex >= anim->boneCount())
+			return Matrix::Identity;
+		else 
+			return Utility::Convert(Native->GetBlendTree()->getBoneOrientation(boneIndex));
 	}
 
 	bool RenderSkinnedComponent::GetBoneIndex(uint32_t boneHash, uint32_t & boneIndex)
 	{
-		assert(Native->GetBlendTree());
+		if (!Native->GetBlendTree()) return false;
 		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
 		return anim->getBoneIndex(boneHash, boneIndex);
 	}

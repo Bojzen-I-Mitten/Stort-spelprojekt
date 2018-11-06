@@ -9,10 +9,13 @@ namespace thomas
 	namespace resource
 	{
 		Font::Font(const std::string& path) : 
-		Resource(path), 
-		m_font(nullptr)
+			Resource(path), m_font(nullptr)
 		{
 			m_font = std::make_unique<SpriteFont>(utils::D3D::Instance()->GetDevice(), utility::ToWChar(path).c_str());
+		}
+
+		Font::~Font()
+		{
 		}
 
 		void Font::DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position,

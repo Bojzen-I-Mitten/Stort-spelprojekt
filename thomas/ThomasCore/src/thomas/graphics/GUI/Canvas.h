@@ -28,8 +28,7 @@ namespace thomas
 			public:
 				//Canvas();
 				Canvas(Viewport viewport, Viewport* camViewport, Vector2 baseResolution = Vector2(1920, 1080));
-				~Canvas() = default;
-				void Destroy();
+				~Canvas();
 				void Render();
 
 			public:

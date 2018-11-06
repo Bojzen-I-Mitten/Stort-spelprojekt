@@ -56,6 +56,7 @@ namespace ThomasEngine {
 		static Thread^ renderThread;
 		static System::Windows::Threading::Dispatcher^ mainThreadDispatcher;
 		delegate void MainThreadDelegate();
+		
 
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
@@ -72,6 +73,7 @@ namespace ThomasEngine {
 		static void SynchronousExecution();
 
 		ThomasWrapper();
+		~ThomasWrapper();
 
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
@@ -83,11 +85,13 @@ namespace ThomasEngine {
 		{
 			SceneManager^ get();
 		}
-		static void Start(bool editor);
-		static void Start();
-		static void MainThreadUpdate();
-		static void StartRenderer();
 
+#ifdef _EDITOR
+		delegate void StartPlayEvent();
+		delegate void StopPlayingEvent();
+		static event StartPlayEvent^ OnStartPlaying;
+		static event StopPlayingEvent^ OnStopPlaying;
+#endif
 
 	public:	// Static sys
 
@@ -96,6 +100,10 @@ namespace ThomasEngine {
 			ROTATE,
 			SCALE
 		};
+		static void Start(bool editor);
+		static void Start();
+		static void MainThreadUpdate();
+		static void StartRenderer();
 
 
 		static property ThomasWrapper^ Thomas
@@ -141,7 +149,7 @@ namespace ThomasEngine {
 
 	
 		static bool InEditor();
-
+		
 	public:
 		static bool RenderEditor = true;
 		static property bool RenderPhysicsDebug

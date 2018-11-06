@@ -60,6 +60,10 @@ namespace ThomasEngine {
 		m_engineCommands = gcnew CommandQueue();
 		m_sceneLock = gcnew Object();
 	}
+	ThomasWrapper::~ThomasWrapper()
+	{
+		m_scene->CurrentScene->UnLoad();
+	}
 	void ThomasWrapper::Start(bool editor) 
 	{
 		inEditor = editor;
@@ -292,9 +296,8 @@ namespace ThomasEngine {
 				
 
 				//Logic
-				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+				for each (GameObject^ gameObject in CurrentScene->GameObjects)
 				{
-					GameObject^ gameObject = CurrentScene->GameObjects[i];
 					if (gameObject->GetActive())
 					{
 						gameObject->Update();
@@ -398,6 +401,7 @@ namespace ThomasEngine {
 		{
 			Debug::Log("Waiting for render thread to terminate...");
 		}
+		delete s_SYS;
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
 
@@ -455,7 +459,7 @@ namespace ThomasEngine {
 				StopPlay();
 			}
 			IssuedStateCommand = ThomasStateCommand::NoCommand;
-			StateCommandProcessed->Set();
+			//StateCommandProcessed->Set();
 			Monitor::Exit(StateCommandProcessed);
 		}
 	}
@@ -474,6 +478,9 @@ namespace ThomasEngine {
 		{
 			playing = RunningState::Running;
 			Debug::Log("Running...");
+#ifdef _EDITOR
+			OnStartPlaying();
+#endif
 		}
 		else
 		{
@@ -505,6 +512,9 @@ namespace ThomasEngine {
 
 		Debug::Log("Stopped...");
 		playing = RunningState::Editor;
+#ifdef _EDITOR
+		OnStopPlaying();
+#endif
 	}
 	void ThomasWrapper::ENTER_SYNC_STATELOCK()
 	{
@@ -525,10 +535,10 @@ namespace ThomasEngine {
 	void ThomasWrapper::IssueStateCommand(ThomasStateCommand state)
 	{
 		Monitor::Enter(StateCommandProcessed);
-		StateCommandProcessed->Reset();
+		//StateCommandProcessed->Reset();
 		IssuedStateCommand = state;
 		Monitor::Exit(StateCommandProcessed);
-		StateCommandProcessed->WaitOne();
+		//StateCommandProcessed->WaitOne();
 	}
 	void ThomasWrapper::IssuePlay()
 	{

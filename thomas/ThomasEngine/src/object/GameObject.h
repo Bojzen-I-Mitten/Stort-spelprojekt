@@ -81,8 +81,6 @@ namespace ThomasEngine
 
 		void DestroySelf();
 
-		static GameObject^ CreatePrefab();
-
 		property bool inScene {
 			bool get() {
 				return m_scene_id; // != 0
@@ -186,6 +184,9 @@ namespace ThomasEngine
 		static GameObject^ Instantiate(GameObject^ original, Transform^ parent);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation);
 		static GameObject^ Instantiate(GameObject^ original, Vector3 position, Quaternion rotation, Transform^ parent);
+		/* Create an empty GameObject 'prefab' used from editor to create a new prefab object */
+		static GameObject^ CreateEmptyPrefab();
+
 
 
 		[System::Runtime::Serialization::OnDeserializedAttribute]

@@ -25,15 +25,13 @@ namespace thomas
 
 				m_GUIElements = std::vector<std::unique_ptr<GUIElement>>();
 			}
-
-			void Canvas::Destroy()
+			Canvas::~Canvas()
 			{
 				m_spriteBatch.reset();
 				m_defaultFont.reset();
 				m_spriteStates.reset();
 				m_GUIElements.clear();
 			}
-
 			void Canvas::Render()
 			{
 				if (m_spriteBatch != nullptr)

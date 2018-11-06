@@ -13,6 +13,10 @@ namespace thomas
 			m_bounds = GenerateBounds();
 		}
 
+		Mesh::~Mesh()
+		{
+		}
+
 		void Mesh::Draw(resource::Shader * shader)
 		{
 			std::vector<utils::buffers::VertexBuffer*> vertexBuffers;

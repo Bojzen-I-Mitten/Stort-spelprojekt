@@ -407,7 +407,7 @@ namespace thomas
 				SetColor(math::Color(1, 1, 1));
 				SetMatrix(math::Matrix::Identity);
 			}
-
+			assert(!m_vertexBuffer);
 			m_vertexBuffer = new utils::buffers::VertexBuffer(nullptr, sizeof(math::Vector3), 500, DYNAMIC_BUFFER); //500 hardcoded here :/
 
 		}

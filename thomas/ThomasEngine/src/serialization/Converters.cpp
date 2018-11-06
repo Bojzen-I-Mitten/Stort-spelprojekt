@@ -86,7 +86,7 @@ namespace ThomasEngine
 		{
 			
 			String^ path = jo->Value<String^>("prefabPath");
-			return Resources::LoadPrefab(Resources::ConvertToRealPath(path));
+			return Resources::CreatePrefab(Resources::ConvertToRealPath(path));
 		}
 		else if (jo->ContainsKey("$ref"))
 		{

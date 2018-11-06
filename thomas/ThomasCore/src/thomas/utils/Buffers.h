@@ -26,6 +26,12 @@ namespace thomas
 
 				template <typename T>
 				void SetData(std::vector<T>& data) {SetData(data.data(), data.size() * sizeof(T));}
+				/* Give a debug name to the buffer.
+				*/
+				void SetName(const char* name);
+				/* Give a debug name to the buffer.
+				*/
+				void SetName(const std::string& name);
 
 				size_t GetSize();
 				ID3D11Buffer* GetBuffer();
