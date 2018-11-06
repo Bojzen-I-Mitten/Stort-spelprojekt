@@ -80,15 +80,19 @@ public class GUISelectTeam : ScriptComponent
 
         Select = GUI.Add("Select Team");
         Select.position = new Vector2(0.21f, 0.11f);
+        Select.color = Color.Black;
 
         Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
         Team1Text.position = new Vector2(0.10f, 0.18f);
+        Team1Text.color = Color.Black;
 
         Team2Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
         Team2Text.position = new Vector2(0.22f, 0.18f);
+        Team2Text.color = Color.Black;
 
         SpectatorText = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name);
         SpectatorText.position = new Vector2(0.35f, 0.18f);
+        SpectatorText.color = Color.Black;
     }
 
     public void ClearImagesAndText()

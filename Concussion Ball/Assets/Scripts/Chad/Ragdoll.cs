@@ -67,10 +67,6 @@ public class Ragdoll : ScriptComponent
 
     public override void Start()
     {
-        if (AudioListener == null)
-        {
-            AudioListener = gameObject;
-        }
 
         DisableRagdoll();
 

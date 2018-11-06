@@ -21,8 +21,11 @@ public class GUITest : ScriptComponent
         SelectTeam.enabled = false;
 
         canvas = Camera.AddCanvas();
-        BG = canvas.Add(Background);
-        BG.interactable = true;
+        if (Background != null)
+        {
+            BG = canvas.Add(Background);
+            BG.interactable = true;
+        }
     }
 
     public override void Update()
