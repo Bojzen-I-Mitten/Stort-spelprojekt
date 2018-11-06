@@ -183,8 +183,7 @@ public class Ragdoll : ScriptComponent
     }
     public float DistanceToWorld()
     {
-        Debug.Log(ImpactSpine.DistanceToCollition);
-        return ImpactSpine.DistanceToCollition;
+        return ImpactSpine.DistanceToCollision;
     }
 
     public void EnableRagdoll()
