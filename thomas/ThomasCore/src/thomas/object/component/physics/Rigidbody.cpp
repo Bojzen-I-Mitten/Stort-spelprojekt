@@ -383,6 +383,7 @@ namespace thomas
 				return m_friction;
 			}
 
+
 			void Rigidbody::UpdateRigidbodyMass()
 			{
 				float mass = m_kinematic ? 0 : m_mass;

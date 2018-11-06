@@ -5,23 +5,97 @@ using System.Linq;
 
 public class ThomasTrain : Powerup
 {
-    private ParticleEmitter _Fire;
-    public Texture2D _FireTex { get; set; }
-    private float fireMax;
+    private ParticleEmitter emitterFire;
+    private ParticleEmitter emitterThomasFace;
+    private ParticleEmitter emitterSpark;
+    public Texture2D fireTexture { get; set; }
+    public Texture2D thomasTexture { get; set; }
+    public Texture2D sparkTexture { get; set; }
+
+    private SoundComponent soundComponentChargeUp;
+    private SoundComponent soundComponentTravel;
+    private SoundComponent soundComponentExplosion;
+
+    public AudioClip soundClipChargeUp { get; set; }
+    public AudioClip soundClipTravel { get; set; }
+    public AudioClip soundClipExplosion { get; set; }
 
     public float ExplosionRadius { get; set; } = 5.0f;
     public float ExplosionForce { get; set; } = 200.0f;
 
-    public override void Start()
+    private bool playChargeUpSound;
+
+
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
+        emitterFire = gameObject.AddComponent<ParticleEmitter>();
+        emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
+        emitterSpark = gameObject.AddComponent<ParticleEmitter>();
+
+        soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
 
         m_throwable = true; // change depending on power-up
-        _Fire = gameObject.AddComponent<ParticleEmitter>();
+        emitterFire.Texture = fireTexture;
+        emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
+        emitterFire.MinSize = 4.0f;
+        emitterFire.MaxSize = 6.0f;
+        emitterFire.EndSize = 0.0f;
+        emitterFire.MinLifeTime = 0.1f;
+        emitterFire.MaxLifeTime = 1.7f;
+        emitterFire.EmissionRate = 10;
+        emitterFire.MinRotationSpeed = -2.0f;
+        emitterFire.MaxRotationSpeed = 2.0f;
+        emitterFire.MinSpeed = 0.5f;
+        emitterFire.MaxSpeed = 1.0f;
+        emitterFire.EndSpeed = -6.0f;
+        emitterFire.DistanceFromSphereCenter = 0.0f;
+        emitterFire.SpawnAtEdge = true;
+        emitterFire.Radius = 5.2f;
 
-        _Fire.Texture = _FireTex;
+        emitterThomasFace.Texture = thomasTexture;
+        emitterThomasFace.MinSize = 5.0f;
+        emitterThomasFace.MaxSize = 5.0f;
+        emitterThomasFace.EndSize = 3.0f;
+        emitterThomasFace.MaxLifeTime = 1.5f;
+        emitterThomasFace.MinLifeTime = 1.5f;
+        emitterThomasFace.MinRotationSpeed = 5.0f;
+        emitterThomasFace.MaxRotationSpeed = 5.0f;
+        emitterThomasFace.MaxSpeed = 0;
+        emitterThomasFace.MinSpeed = 0;
+        emitterThomasFace.EndSpeed = 0;
 
-        ResetFireEmitters();
+        emitterSpark.Texture = sparkTexture;
+        emitterSpark.MinSize = 0.6f;
+        emitterSpark.MaxSize = 1.4f;
+        emitterSpark.EndSize = 0.02f;
+        emitterSpark.MaxLifeTime = 0.5f;
+        emitterSpark.MinLifeTime = 0.5f;
+        emitterSpark.MinRotationSpeed = 5.0f;
+        emitterSpark.MaxRotationSpeed = 5.0f;
+        emitterSpark.MaxSpeed = 20;
+        emitterSpark.MinSpeed = 10;
+        emitterSpark.EndSpeed = 0;
+        emitterSpark.SpawnAtEdge = true;
+        emitterSpark.Radius = 6.7f;
+
+        soundComponentChargeUp.Looping = false;
+        
+        soundComponentTravel.Looping = false;
+        
+        soundComponentChargeUp.clip = soundClipChargeUp;
+        soundComponentTravel.clip = soundClipTravel;
+        soundComponentExplosion.clip = soundClipExplosion;
+
+        playChargeUpSound = true;
+
     }
 
     public override void Update()
@@ -29,20 +103,36 @@ public class ThomasTrain : Powerup
         base.Update();
     }
 
+    public override void Cleanup()
+    {
+        playChargeUpSound = true;
+        soundComponentChargeUp.Stop();
+    }
+
+    public override void ChargeEffect()
+    {
+        if (playChargeUpSound)
+        {
+            soundComponentChargeUp.Play();
+            playChargeUpSound = false;
+        }
+    }
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force * 5.0f);
+        base.Throw(camPos, force * 2.5f);
+        soundComponentTravel.Play();
+
         m_rigidBody.UseGravity = false;
         StartCoroutine(Scale());
     }
 
     IEnumerator Scale()
     {
-        transform.scale *= 10.0f;
+        transform.scale *= 4.0f;
         yield return new WaitForSeconds(0.1f);
         float t = 2.0f;
-        while(t > 0.0f)
+        while (t > 0.0f)
         {
             transform.scale += new Vector3(1.0f) * Time.DeltaTime;
             t -= Time.DeltaTime;
@@ -60,7 +150,7 @@ public class ThomasTrain : Powerup
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
-       // loop through players and check distance from explosion source
+        // loop through players and check distance from explosion source
 
         var players = NetworkManager.instance.Scene.Players.Values.ToList();
         players.ForEach(player =>
@@ -84,42 +174,21 @@ public class ThomasTrain : Powerup
     {
         //hide the train.
         StopAllCoroutines();
-        m_rigidBody.enabled = false;
-        gameObject.transform.scale = Vector3.Zero;
+        gameObject.transform.scale = Vector3.One;
+        soundComponentTravel.Stop();
 
-        _Fire.Emit = true;
-        StartCoroutine(StopFire());
+        emitterThomasFace.EmitOneShot(1);
+        emitterFire.EmitOneShot(40);
+        emitterSpark.EmitOneShot(200);
+
+        soundComponentExplosion.PlayOneShot();
+
+        StartCoroutine(KillTrain());
     }
 
-    private void ResetFireEmitters()
+    private IEnumerator KillTrain()
     {
-        _Fire.MinSize = 10.0f;
-        _Fire.MaxSize = 20.0f;
-        _Fire.EndSize = 0.0f;
-        _Fire.MinLifeTime = 0.5f;
-        _Fire.MaxLifeTime = 3.0f;
-        _Fire.EmissionRate = 10;
-        _Fire.MinRotationSpeed = -2.0f;
-        _Fire.MaxRotationSpeed = 2.0f;
-        _Fire.MinSpeed = 0.2f;
-        _Fire.MaxSpeed = 0.5f;
-        _Fire.EndSpeed = 0.0f;
-        _Fire.Gravity = -1;
-        _Fire.DistanceFromSphereCenter = 5.0f;
-        _Fire.Radius = 0.7f;
-    }
-
-    private IEnumerator StopFire()
-    {
-        //float timer = 3;
-        //while (timer > 0)
-        //{
-        //    timer -= Time.DeltaTime;
-        //    yield return null;
-        //}
-        yield return new WaitForSeconds(3.0f);
-        _Fire.Emit = false;
-        // despawn gameobject
+        yield return null;//wait one frame to emit particles
         Remove();
     }
 }

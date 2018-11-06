@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
+  <m_layers>
+    <Layer>
+      <Name>Default</Name>
+      <collisionMask>4294967295</collisionMask>
+    </Layer>
+  </m_layers>
   <m_name>Concussion Ball</m_name>
   <m_relativeAssemblyPath>Assembly</m_relativeAssemblyPath>
   <m_relativeCurrentScenePath>Ragdoll test scene.tds</m_relativeCurrentScenePath>

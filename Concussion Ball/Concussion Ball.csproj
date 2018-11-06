@@ -56,6 +56,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\HoverScript.cs" />
+    <Compile Include="Assets\Scripts\Confetti.cs" />
+    <Compile Include="Assets\rayTest.cs" />
+    <Compile Include="Assets\Scripts\ConfettiEmitter.cs" />
     <Compile Include="Assets\ToggleRagdoll.cs" />
     <Compile Include="Assets\RagdollImpact.cs" />
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />

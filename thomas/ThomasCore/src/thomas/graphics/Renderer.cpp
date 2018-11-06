@@ -166,7 +166,7 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
-			profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
 			//Process commands
 			BindFrame();
@@ -192,7 +192,7 @@ namespace thomas
 				}
 			}
 	
-			profiler->Timestamp(profiling::GTS_MAIN_OBJECTS);
+			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
 			ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
 			ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
@@ -208,7 +208,7 @@ namespace thomas
 				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
-			profiler->Timestamp(profiling::GTS_PARTICLES);
+			profiler->Timestamp(utils::profiling::GTS_PARTICLES);
 			
 
 			//Take care of the editor camera and render gizmos
@@ -230,7 +230,7 @@ namespace thomas
 					camera->RenderGUI();
 			}
 
-			profiler->Timestamp(profiling::GTS_GIZMO_OBJECTS);
+			profiler->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
 		}
 
 	}

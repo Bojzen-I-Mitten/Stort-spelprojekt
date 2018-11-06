@@ -267,14 +267,16 @@ namespace ThomasEngine.Network
         #endregion
 
         public override void Update()
-        {
+        { 
             if (NetManager.IsRunning)
             {
+                EngineAutoProfiler profile = new EngineAutoProfiler("NetworkManager Update");
                 NetManager.UpdateTime = (1000 / TICK_RATE);
                 if (NetManager.NatPunchEnabled)
                     NetManager.NatPunchModule.PollEvents();
                 NetManager.PollEvents();
                 Diagnostics();
+                profile.sendSample();
             }
         }
 
