@@ -9,9 +9,9 @@ public class Confetti : ScriptComponent
     private ParticleEmitter emitterConfetti2;
     private ParticleEmitter emitterConfetti3;
 
-    public Texture2D praticleTexture1 { get; set; }
-    public Texture2D praticleTexture2 { get; set; }
-    public Texture2D praticleTexture3 { get; set; }
+    public Texture2D particleTexture1 { get; set; }
+    public Texture2D particleTexture2 { get; set; }
+    public Texture2D particleTexture3 { get; set; }
 
     public override void Start()
     {
@@ -19,7 +19,7 @@ public class Confetti : ScriptComponent
         emitterConfetti2 = gameObject.AddComponent<ParticleEmitter>();
         emitterConfetti3 = gameObject.AddComponent<ParticleEmitter>();
 
-        emitterConfetti1.Texture = praticleTexture1;
+        emitterConfetti1.Texture = particleTexture1;
         emitterConfetti1.MinSize = 0.03f;
         emitterConfetti1.MaxSize = 0.15f;
         emitterConfetti1.EndSize = 0.15f;
@@ -36,7 +36,7 @@ public class Confetti : ScriptComponent
         emitterConfetti1.Gravity = 5.0f;
         emitterConfetti1.SpawnAtEdge = true;
 
-        emitterConfetti2.Texture = praticleTexture2;
+        emitterConfetti2.Texture = particleTexture2;
         emitterConfetti2.MinSize = 0.03f;
         emitterConfetti2.MaxSize = 0.15f;
         emitterConfetti2.EndSize = 0.15f;
@@ -53,7 +53,7 @@ public class Confetti : ScriptComponent
         emitterConfetti2.Gravity = 5.0f;
         emitterConfetti2.SpawnAtEdge = false;
 
-        emitterConfetti3.Texture = praticleTexture3;
+        emitterConfetti3.Texture = particleTexture3;
         emitterConfetti3.MinSize = 0.10f;
         emitterConfetti3.MaxSize = 0.25f;
         emitterConfetti3.EndSize = 0.25f;

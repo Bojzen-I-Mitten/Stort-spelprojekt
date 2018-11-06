@@ -1,0 +1,27 @@
+{
+  "$id": "823",
+  "shader": {
+    "resourcePath": "%THOMAS_DATA%\\FXIncludes\\StandardSkinning.fx"
+  },
+  "properties": {
+    "$id": "824",
+    "color": {
+      "$id": "825",
+      "$type": "ThomasEngine.Color, ThomasMath",
+      "b": 255,
+      "g": 255,
+      "r": 255,
+      "a": 255
+    },
+    "diffuseTex": {
+      "resourcePath": "White Texture"
+    },
+    "normalTex": {
+      "resourcePath": "Normal Texture"
+    },
+    "smoothness": 16.0,
+    "specularTex": {
+      "resourcePath": "White Texture"
+    }
+  }
+}
