@@ -141,7 +141,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        Debug.Log(CurrentVelocity.y);
+        //Debug.Log(CurrentVelocity.y);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -233,16 +233,15 @@ public class ChadControls : NetworkComponent
             return;
 
         if (Input.GetKey(Input.Keys.W))
-            Direction.z += 1;
+            Direction.z = Direction.z + 1 + (CurrentVelocity.y / MaxSpeed);
         if (Input.GetKey(Input.Keys.S))
             Direction.z -= 1;
-
         if (Input.GetKey(Input.Keys.D))
             Direction.x -= 1;
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
 
-        if (Input.GetKey(Input.Keys.Space) && DivingTimer > 5.0f)
+        if (Input.GetKeyDown(Input.Keys.Space) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
             CurrentVelocity.y = DiveSpeed;
@@ -266,39 +265,42 @@ public class ChadControls : NetworkComponent
             //Throw stuff
             if (HasThrowableObject())
             {
-                if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT))
+                if (State != STATE.DIVING)
                 {
-                    State = STATE.THROWING;
-                    ChadHud.Instance.ActivateCrosshair();
-                    ChadHud.Instance.ActivateChargeBar();
-
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 1);
-                }
-                else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown)
-                {
-                    ChargeObject();
-                    if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && State == STATE.THROWING)
+                    if (Input.GetMouseButtonDown(Input.MouseButtons.RIGHT) && !HasThrown)
                     {
-                        HasThrown = true;
+                        State = STATE.THROWING;
+                        ChadHud.Instance.ActivateCrosshair();
+                        ChadHud.Instance.ActivateChargeBar();
+
+                        Animations.SetAnimationWeight(ChargeAnimIndex, 1);
+                    }
+                    else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown && State == STATE.THROWING)
+                    {
+                        ChargeObject();
+                        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                        {
+                            HasThrown = true;
+                            ChadHud.Instance.DeactivateCrosshair();
+                            ChadHud.Instance.DeactivateChargeBar();
+                            Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+                            Throwing = PlayThrowAnim();
+                            StartCoroutine(Throwing);
+                        }
+                    }
+                    else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
+                    {
+                        State = STATE.CHADING;
+                        ResetCharge();
+                        ResetCamera();
                         ChadHud.Instance.DeactivateCrosshair();
                         ChadHud.Instance.DeactivateChargeBar();
                         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                        Throwing = PlayThrowAnim();
-                        StartCoroutine(Throwing);
                     }
                 }
-                else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
+                else if (Input.GetKey(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
                 {
-                    State = STATE.CHADING;
-                    ResetCharge();
-                    ResetCamera();
-                    ChadHud.Instance.DeactivateCrosshair();
-                    ChadHud.Instance.DeactivateChargeBar();
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-                }
-                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
-                {
-                    State = STATE.DIVING;
+                    // State = STATE.DIVING;
                     ResetCharge();
                     ResetCamera();
                     Animations.SetAnimationWeight(ChargeAnimIndex, 0);
@@ -472,7 +474,6 @@ public class ChadControls : NetworkComponent
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
                 CurrentVelocity.y = DiveSpeed;
-                //Debug.Log(CurrentVelocity.y);
                 //rBody.LinearVelocity = - Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
                 break;
             case STATE.RAGDOLL:
@@ -507,7 +508,8 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        float timer = 1.0f;
+        Animations.ResetTimer(0);
+        float timer = 1.5f;
         while (timer > 0.0f)
         {
             timer -= Time.DeltaTime;
@@ -549,7 +551,7 @@ public class ChadControls : NetworkComponent
 
         
 
-        yield return new WaitForSeconds(0.70f); // animation bound, langa lite _magic_ numbers
+        yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
         ResetCharge();
         ThrowObject(ballCamPos, chosenDirection);
         HasThrown = false;
