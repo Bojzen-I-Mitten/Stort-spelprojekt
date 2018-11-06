@@ -78,8 +78,7 @@ public class ChadControls : NetworkComponent
     Chadimations Animations;
     Ragdoll Ragdoll;
 
-    public string PlayerPrefabName { get; set; } = "Chad";
-    public float ImpactFactor { get; set; } = 100;
+    public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 5;
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
@@ -186,6 +185,12 @@ public class ChadControls : NetworkComponent
         gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
+    }
+
+    public void ActivateRagdoll(float duration, Vector3 force)
+    {
+        SendRPC("RPCStartRagdoll", duration, force);
+        RPCStartRagdoll(duration, force);
     }
 
     public void RPCStartRagdoll(float duration, Vector3 force)
@@ -354,8 +359,12 @@ public class ChadControls : NetworkComponent
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        PickedUpObject.StopEmitting();
-        PickedUpObject.Cleanup();
+        if (PickedUpObject)
+        {
+            PickedUpObject.StopEmitting();
+            PickedUpObject.Cleanup();
+        }
+
     }
 
     private void ResetThrow()
@@ -547,9 +556,9 @@ public class ChadControls : NetworkComponent
         EnableRagdoll();
         Ragdoll.AddForce(force);
         //yield return new WaitForSeconds(duration);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(duration);
         float timer = 0;
-        while(Ragdoll.DistanceToWorld()>=0.02 && timer <15)
+        while(Ragdoll.DistanceToWorld()>=0.3f && timer <15)
         {
             //Debug.Log(Ragdoll.DistanceToWorld());
             timer += Time.DeltaTime;
@@ -695,27 +704,29 @@ public class ChadControls : NetworkComponent
                     ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
                 }
             }
-            if (collider.gameObject.Name == PlayerPrefabName)
+            ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+            if (otherChad)
             {
-                float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
-                Debug.Log(TheirVelocity);
-                Debug.Log(CurrentVelocity.Length());
+                Vector3 TheirVelocity = otherChad.rBody.LinearVelocity;
+                Vector3 theirForwardVelocity = TheirVelocity * Vector3.Forward;
+                Vector3 myVelocity = rBody.LinearVelocity;
+                Vector3 myForwardVelocity = myVelocity * Vector3.Forward;
+                Debug.Log(TheirVelocity.Length());
+                Debug.Log(myVelocity.Length());
                 if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
                 {
                     Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
+                else if (myForwardVelocity.Length() > TackleThreshold && myForwardVelocity.Length() >= theirForwardVelocity.Length())
                 {
-                    //toggle ragdoll
-                    RPCStartRagdoll(MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
-                    SendRPC("RPCStartRagdoll", MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+                    Vector3 relativeVelocity = myVelocity - TheirVelocity;
+                    if (relativeVelocity == Vector3.Zero)
+                        relativeVelocity = myVelocity;
 
-                    if (PickedUpObject && PickedUpObject.DropOnRagdoll)
-                    {
-                        PickedUpObject.Drop();
-                        PickedUpObject = null;
-                    }
-                        
+                    //toggle ragdoll
+                    Vector3 force = (relativeVelocity + Vector3.Up * 0.5f) * ImpactFactor;
+
+                    otherChad.ActivateRagdoll(MinimumRagdollTimer, force);
                 }
             }
         }
