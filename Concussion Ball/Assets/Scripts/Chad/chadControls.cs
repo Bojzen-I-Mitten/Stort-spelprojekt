@@ -362,6 +362,7 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
+        Debug.Log("TEST");
         SendRPC("RPCResetThrow");
         RPCResetThrow();
 
@@ -583,11 +584,12 @@ public class ChadControls : NetworkComponent
             Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
         yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
-        ResetThrow();
+        
         ThrowObject(ballCamPos, chosenDirection);
         HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
+        ResetThrow();
         if (State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
