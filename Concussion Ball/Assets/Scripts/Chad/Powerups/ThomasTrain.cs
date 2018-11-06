@@ -120,7 +120,7 @@ public class ThomasTrain : Powerup
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force * 5.0f);
+        base.Throw(camPos, force * 2.5f);
         soundComponentTravel.Play();
 
         m_rigidBody.UseGravity = false;
@@ -129,7 +129,7 @@ public class ThomasTrain : Powerup
 
     IEnumerator Scale()
     {
-        transform.scale *= 10.0f;
+        transform.scale *= 4.0f;
         yield return new WaitForSeconds(0.1f);
         float t = 2.0f;
         while (t > 0.0f)
