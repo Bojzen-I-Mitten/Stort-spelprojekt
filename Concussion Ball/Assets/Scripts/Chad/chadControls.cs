@@ -89,7 +89,7 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        
+
 
         State = STATE.CHADING;
 
@@ -126,7 +126,7 @@ public class ChadControls : NetworkComponent
             Camera.gameObject.activeSelf = false;
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
         }
-            
+
     }
 
     public void ActivateCamera()
@@ -136,7 +136,7 @@ public class ChadControls : NetworkComponent
             Camera.gameObject.activeSelf = true;
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
-            
+
     }
 
     public override void Update()
@@ -146,7 +146,7 @@ public class ChadControls : NetworkComponent
         {
             DivingTimer += Time.DeltaTime;
             Direction = new Vector3(0, 0, 0);
-            if(State != STATE.RAGDOLL)
+            if (State != STATE.RAGDOLL)
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
@@ -202,7 +202,7 @@ public class ChadControls : NetworkComponent
                 PickedUpObject.Drop();
                 Debug.Log("drop");
             }
-                
+
         }
 
         if (State != STATE.RAGDOLL)
@@ -222,7 +222,7 @@ public class ChadControls : NetworkComponent
             else
                 PickedUpObject.Drop();
         }
-            
+
     }
 
 
@@ -286,7 +286,7 @@ public class ChadControls : NetworkComponent
                         ChadHud.Instance.ActivateChargeBar();
 
                         Animations.SetAnimationWeight(ChargeAnimIndex, 1);
-                        
+
                     }
                     else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown && State == STATE.THROWING)
                     {
@@ -294,7 +294,7 @@ public class ChadControls : NetworkComponent
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
                             HasThrown = true;
-                            
+
                             Throwing = PlayThrowAnim();
                             StartCoroutine(Throwing);
                         }
@@ -306,16 +306,15 @@ public class ChadControls : NetworkComponent
                         ResetCamera();
                     }
                 }
-                else if (Input.GetKey(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
+                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
                 {
-                    // State = STATE.DIVING;
                     ResetThrow();
                     ResetCamera();
                 }
             }
             else if (PickedUpObject) // player is holding object that is not throwable
             {
-                if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                     PickedUpObject.OnActivate();
             }
 
@@ -354,8 +353,11 @@ public class ChadControls : NetworkComponent
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        PickedUpObject.StopEmitting();
-        PickedUpObject.Cleanup();
+        if (PickedUpObject != null)
+        {
+            PickedUpObject.StopEmitting();
+            PickedUpObject.Cleanup();
+        }
     }
 
     private void ResetThrow()
@@ -415,7 +417,7 @@ public class ChadControls : NetworkComponent
             TotalYStep -= ThomasEngine.MathHelper.ToRadians(yStep * CameraSensitivity_y);
             TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
             Camera.transform.localRotation = Quaternion.CreateFromAxisAngle(Vector3.Right, TotalYStep);
-            Camera.transform.localPosition = CameraOffsetThrowing; 
+            Camera.transform.localPosition = CameraOffsetThrowing;
         }
     }
 
@@ -512,7 +514,7 @@ public class ChadControls : NetworkComponent
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
         ResetCamera();
-        if(PickedUpObject)
+        if (PickedUpObject)
         {
             PickedUpObject.Drop();
             PickedUpObject = null;
@@ -545,7 +547,7 @@ public class ChadControls : NetworkComponent
         //yield return new WaitForSeconds(duration);
         yield return new WaitForSeconds(2);
         float timer = 0;
-        while(Ragdoll.DistanceToWorld()>=0.02 && timer <15)
+        while (Ragdoll.DistanceToWorld() >= 0.3 && timer < 15)
         {
             //Debug.Log(Ragdoll.DistanceToWorld());
             timer += Time.DeltaTime;
@@ -586,14 +588,14 @@ public class ChadControls : NetworkComponent
         HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
-        if(State != STATE.RAGDOLL)
+        if (State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
             ResetCamera();
             Animations.SetAnimationWeight(ThrowAnimIndex, 0);
             SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
         }
-        
+
         Throwing = null;
     }
 
@@ -605,8 +607,8 @@ public class ChadControls : NetworkComponent
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
-        
-        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime/maxChargeTime);
+
+        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
     }
 
@@ -618,7 +620,7 @@ public class ChadControls : NetworkComponent
 
     public void RPCPickup(int id)
     {
-        if(State != STATE.RAGDOLL)
+        if (State != STATE.RAGDOLL)
         {
             GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
             PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
@@ -673,7 +675,7 @@ public class ChadControls : NetworkComponent
     public override void OnCollisionEnter(Collider collider)
     {
         PickupableObject pickupablea = collider.gameObject.GetComponent<PickupableObject>();
-        if(pickupablea)
+        if (pickupablea)
         {
             Debug.LogError("Why denny!?");
         }
@@ -687,13 +689,14 @@ public class ChadControls : NetworkComponent
                     TakeOwnership(pickupable.gameObject);
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
-                    
+
                     ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
                 }
             }
-            if (collider.gameObject.Name == PlayerPrefabName)
+            ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+            if (otherChad)
             {
-                float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
+                float TheirVelocity = otherChad.CurrentVelocity.Length();
                 Debug.Log(TheirVelocity);
                 Debug.Log(CurrentVelocity.Length());
                 if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
@@ -711,7 +714,7 @@ public class ChadControls : NetworkComponent
                         PickedUpObject.Drop();
                         PickedUpObject = null;
                     }
-                        
+
                 }
             }
         }
