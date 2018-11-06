@@ -71,6 +71,7 @@ public class ChadControls : NetworkComponent
     private float DiveSpeed = 12.0f;
 
     public float DiveTimer { get; private set; } = 0f;
+    public Vector3 DivingDirection = Vector3.Zero;
     private float MinimumRagdollTimer = 2.0f;
     #endregion
 
@@ -171,6 +172,7 @@ public class ChadControls : NetworkComponent
             gameObject.GetComponent<NetworkPlayer>().Reset();
     }
 
+    #region Ragdoll handling
     private void EnableRagdoll()
     {
         // reset aim stuff 
@@ -212,6 +214,7 @@ public class ChadControls : NetworkComponent
             StartCoroutine(Ragdolling);
         }
     }
+    #endregion
 
     public void OnDisconnect()
     {
@@ -224,7 +227,6 @@ public class ChadControls : NetworkComponent
         }
 
     }
-
 
     public void PublicStartRagdoll(float duration, Vector3 force)
     {
@@ -259,6 +261,7 @@ public class ChadControls : NetworkComponent
             CurrentVelocity.y = DiveSpeed;
             StartCoroutine(DivingCoroutine());
             DivingTimer = 0.0f;
+            DivingDirection = this.gameObject.transform.forward;
         }
     }
 
@@ -345,7 +348,9 @@ public class ChadControls : NetworkComponent
             }
         }
     }
+    #endregion
 
+    #region Reset Throw
     public void RPCResetThrow()
     {
         ChadHud.Instance.DeactivateCrosshair();
@@ -494,7 +499,7 @@ public class ChadControls : NetworkComponent
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
                 CurrentVelocity.y = DiveSpeed;
-                //rBody.LinearVelocity = - Vector3.Transform(new Vector3(CurrentVelocity.x, 0, CurrentVelocity.y) * Time.DeltaTime, transform.rotation);
+                //rBody.LinearVelocity = Vector3.Transform(DivingDirection * DiveSpeed, transform.rotation);
                 break;
             case STATE.RAGDOLL:
                 Camera.transform.rotation = Quaternion.Identity;
@@ -503,7 +508,7 @@ public class ChadControls : NetworkComponent
 
                 break;
         }
-
+        //if(State != STATE.DIVING)
         rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
     }
 
