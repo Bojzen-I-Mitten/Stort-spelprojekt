@@ -79,8 +79,7 @@ public class ChadControls : NetworkComponent
     Chadimations Animations;
     Ragdoll Ragdoll;
 
-    public string PlayerPrefabName { get; set; } = "Chad";
-    public float ImpactFactor { get; set; } = 100;
+    public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
@@ -188,6 +187,12 @@ public class ChadControls : NetworkComponent
         gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
+    }
+
+    public void ActivateRagdoll(float duration, Vector3 force)
+    {
+        SendRPC("RPCStartRagdoll", duration, force);
+        RPCStartRagdoll(duration, force);
     }
 
     public void RPCStartRagdoll(float duration, Vector3 force)
@@ -358,11 +363,12 @@ public class ChadControls : NetworkComponent
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        if (PickedUpObject != null)
+        if (PickedUpObject)
         {
             PickedUpObject.StopEmitting();
             PickedUpObject.Cleanup();
         }
+
     }
 
     private void ResetThrow()
@@ -553,7 +559,7 @@ public class ChadControls : NetworkComponent
         EnableRagdoll();
         Ragdoll.AddForce(force);
         //yield return new WaitForSeconds(duration);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(duration);
         float timer = 0;
         while (Ragdoll.DistanceToWorld() >= 0.3 && timer < 15)
         {
