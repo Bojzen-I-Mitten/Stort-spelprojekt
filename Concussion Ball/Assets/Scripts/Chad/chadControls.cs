@@ -580,6 +580,7 @@ public class ChadControls : NetworkComponent
     private void ThrowObject(Vector3 camPos, Vector3 direction)
     {
         PickedUpObject.Throw(camPos, direction);
+        ChadHud.Instance.HideHeldObjectText();
     }
 
     public void RPCPickup(int id)
@@ -648,6 +649,8 @@ public class ChadControls : NetworkComponent
                     TakeOwnership(pickupable.gameObject);
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
+                    
+                    ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
                 }
             }
             if (collider.gameObject.Name == PlayerPrefabName)

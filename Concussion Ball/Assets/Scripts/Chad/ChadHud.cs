@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using ThomasEngine;
 using ThomasEngine.Network;
+
 public class ChadHud : ScriptComponent
 {
     public static ChadHud Instance;
@@ -17,13 +18,15 @@ public class ChadHud : ScriptComponent
         }
     }
     Camera cam;
-    #region GUI Stuff
+
+    #region GUI Text & Images
     Canvas HUD;
     Text Timer;
     Text Announcement1;
     Text Announcement2;
     Text Score1;
     Text Score2;
+    Text HeldObject;
     Image AnnouncementBG;
     Image Crosshair;
     Image ChargeBarOutline;
@@ -33,7 +36,11 @@ public class ChadHud : ScriptComponent
     Image Score2BG;
     Image BallArrow;
     #endregion
+
     public Curve AnnouncementHorizontalSpeed { get; set; }
+    public bool ToggleAim { get; set; } = true;
+
+    #region GUI Font & Textures
     public Font AnnouncementFont { get; set; }
     public Font Numbers { get; set; }
     public Texture2D AnnouncementBackground { get; set; }
@@ -43,7 +50,7 @@ public class ChadHud : ScriptComponent
     public Texture2D TimerBGTexture { get; set; }
     public Texture2D ScoreBGTexture { get; set; }
     public Texture2D BallArrowTexture { get; set; }
-    public bool ToggleAim { get; set; } = true;
+    #endregion
 
     public override void Awake()
     {
@@ -151,7 +158,12 @@ public class ChadHud : ScriptComponent
         BallArrow.scale = new Vector2(2);
         BallArrow.position = new Vector2(-1000);
         BallArrow.color = Score1BG.color + Score2BG.color;
-        //BallArrow.depth = 0.1f;
+
+        HeldObject = HUD.Add("Holding: ");
+        HeldObject.position = new Vector2(0.0f, 0.8f);
+        HeldObject.color = Color.Black;
+        HeldObject.scale = Vector2.Zero;
+
     }
 
     public override void OnDestroy()
@@ -252,13 +264,13 @@ public class ChadHud : ScriptComponent
     {
         StartCoroutine(AnnouncementAnimation(duration, winningTeam.Name, "Wins!!!", winningTeam.Color));
     }
-    
+
+    #region Crosshair&Chargebar
     public void ActivateCrosshair()
     {
         if (ToggleAim)
         {
             Crosshair.scale = Vector2.One;
-            //Crosshair.color = Color.Red;
         }
     }
 
@@ -288,6 +300,18 @@ public class ChadHud : ScriptComponent
         c = Color.Lerp(c, Color.Red, (charge - timePerPart * 1) / timePerPart);
         ChargeBar.color = c;
         ChargeBar.scale = new Vector2(2.0f, charge*9.0f);
+    }
+    #endregion
+
+    public void ShowHeldObjectText(string name)
+    {
+        HeldObject.scale = Vector2.One;
+        HeldObject.text = "Holding: " + name;
+    }
+
+    public void HideHeldObjectText()
+    {
+        HeldObject.scale = Vector2.Zero;
     }
 
     public override void Update()
