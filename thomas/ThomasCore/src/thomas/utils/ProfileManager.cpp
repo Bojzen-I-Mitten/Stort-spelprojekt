@@ -9,6 +9,7 @@ namespace thomas
 
 		namespace profiling
 		{
+			std::vector<long long> ProfileManager::s_fps;
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
 			float ProfileManager::s_ramusage;
 			float ProfileManager::s_vramusage;
@@ -21,6 +22,15 @@ namespace thomas
 
 			void ProfileManager::newFrame()
 			{
+				// Init to starting point, will produce a frametime of zero
+				static std::chrono::steady_clock::time_point tracktime = std::chrono::high_resolution_clock::now();
+
+				std::chrono::milliseconds frametime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tracktime);
+				
+				tracktime = std::chrono::high_resolution_clock::now();
+
+				s_fps.push_back(frametime.count());
+
 				s_frames++;
 			}
 
@@ -40,6 +50,9 @@ namespace thomas
 				json j;
 				j["SlowfilerData"];
 				j["SlowfilerData"]["build"];
+
+				j["SlowfilerData"]["build"]["fps"] = s_fps;
+
 				j["SlowfilerData"]["timeline"];
 				j["SlowfilerData"]["timeline"]["processor"];
 

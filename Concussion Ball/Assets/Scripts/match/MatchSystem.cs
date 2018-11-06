@@ -26,6 +26,12 @@ public class MatchSystem : NetworkManager
     //public Camera spectatorCamera { get; set; }
 
 
+    private SoundComponent countdownSound;
+    private SoundComponent endroundSound;
+
+    public AudioClip countdownSoundClip { get; set; }
+    public AudioClip endroundSoundClip { get; set; }
+
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
     public float lostTime = 0.0f;
@@ -81,6 +87,16 @@ public class MatchSystem : NetworkManager
         base.Start();
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
+
+       
+        countdownSound = gameObject.AddComponent<SoundComponent>();
+        countdownSound.clip = countdownSoundClip;
+        countdownSound.Looping = false;
+       
+        endroundSound = gameObject.AddComponent<SoundComponent>();
+        endroundSound.clip = endroundSoundClip;
+        endroundSound.Looping = false;
+        
         //StartCoroutine(ResetCoroutine(10));
     }
     
@@ -149,6 +165,9 @@ public class MatchSystem : NetworkManager
         Ball.GetComponent<Ball>().Reset();
         PowerupManager.ResetPowerups();
         LocalChad.Locked = true;
+
+        countdownSound.PlayOneShot();
+
         ChadHud.Instance.StartCountdown(duration);
         yield return new WaitForSecondsRealtime(duration);
         LocalChad.Locked = false;
@@ -158,6 +177,7 @@ public class MatchSystem : NetworkManager
 
     IEnumerator OnGoalCoroutine(Team teamThatScored)
     {
+        endroundSound.PlayOneShot();
         ChadHud.Instance.OnGoal(teamThatScored, 7.0f);
         Time.TimeScale = 0.5f;
 
@@ -263,6 +283,7 @@ public class MatchSystem : NetworkManager
     {
         if (hasScored)
             return;
+        
         hasScored = true;
         SendRPC(-2, "RPCOnGoal", (int)teamThatScored);
         RPCOnGoal((int)teamThatScored);
@@ -339,6 +360,12 @@ public class MatchSystem : NetworkManager
         //    Team1.AddPlayer(player);
         //else
         //    Team2.AddPlayer(player);
+    }
+
+    public TEAM_TYPE GetPlayerTeam(GameObject player)
+    {
+        NetworkPlayer localPlayer = player.GetComponent<NetworkPlayer>();
+        return localPlayer.Team.TeamType;
     }
     #endregion
 

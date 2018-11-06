@@ -50,6 +50,7 @@ namespace thomas
 				if (m_clip != nullptr)
 				{
 					m_clip->GetSoundEffectInstance()->Play(m_looping);
+					SetVolume(m_volume);
 				}
 			}
 

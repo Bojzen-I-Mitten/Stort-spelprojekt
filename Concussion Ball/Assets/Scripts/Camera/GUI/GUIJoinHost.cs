@@ -37,8 +37,8 @@ public class GUIJoinHost : ScriptComponent
 
     public override void Start()
     {
-        IPString = "";
-        PortString = "";
+        IPString = "192.168.1.";
+        PortString = "9050";
         TakeIP = false;
         TakePort = false;
         Disabled = false;
@@ -54,7 +54,7 @@ public class GUIJoinHost : ScriptComponent
         if (TakePort)
             InputGUI.AppendIPString(ref PortString, 5);
 
-        if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
         {
             if (TextBoxIP.Clicked())
             {
@@ -63,7 +63,7 @@ public class GUIJoinHost : ScriptComponent
                 TextBoxPort.color = Color.Black;
                 TextBoxIP.color = Color.Green;
             }
-            else if(TextBoxPort.Clicked())
+            else if (TextBoxPort.Clicked())
             {
                 TakeIP = false;
                 TakePort = true;
@@ -143,40 +143,54 @@ public class GUIJoinHost : ScriptComponent
 
         IPText = Canvas.Add(IPString);
         IPText.position = new Vector2(0.1f, 0.11f);
+        IPText.color = Color.Black;
 
         PortText = Canvas.Add(PortString);
         PortText.position = new Vector2(0.1f, 0.21f);
+        PortText.color = Color.Black;
 
         IP = Canvas.Add("IP, needed to join");
         IP.position = new Vector2(0.1f, 0.07f);
+        IP.scale = new Vector2(0.7f);
+        IP.color = Color.Black;
 
         IP.scale = new Vector2(0.7f);
         Port = Canvas.Add("PORT, needed for both host and join");
 
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
+        Port.color = Color.Black;
 
-        Join = Canvas.Add(JoinBtn);
-        Join.position = new Vector2(0.325f, 0.11f);
-        Join.scale = new Vector2(0.25f);
-        Join.interactable = true;
+        if (JoinBtn != null)
+        {
+            Join = Canvas.Add(JoinBtn);
+            Join.position = new Vector2(0.325f, 0.11f);
+            Join.scale = new Vector2(0.25f);
+            Join.interactable = true;
+        }
 
-        Host = Canvas.Add(HostBtn);
-        Host.position = new Vector2(0.325f, 0.21f);
-        Host.scale = new Vector2(0.25f);
-        Host.interactable = true;
+        if (HostBtn != null)
+        {
+            Host = Canvas.Add(HostBtn);
+            Host.position = new Vector2(0.325f, 0.21f);
+            Host.scale = new Vector2(0.25f);
+            Host.interactable = true;
+        }
 
-        TextBoxIP = Canvas.Add(TextBox);
-        TextBoxIP.position = new Vector2(0.1f);
-        TextBoxIP.scale = new Vector2(0.7f, 0.5f);
-        TextBoxIP.color = Color.Black;
-        TextBoxIP.interactable = true;
+        if (TextBox != null)
+        {
+            TextBoxIP = Canvas.Add(TextBox);
+            TextBoxIP.position = new Vector2(0.1f);
+            TextBoxIP.scale = new Vector2(0.7f, 0.5f);
+            TextBoxIP.color = Color.Black;
+            TextBoxIP.interactable = true;
 
-        TextBoxPort = Canvas.Add(TextBox);
-        TextBoxPort.position = new Vector2(0.1f, 0.2f);
-        TextBoxPort.scale = new Vector2(0.7f, 0.5f);
-        TextBoxPort.color = Color.Black;
-        TextBoxPort.interactable = true;
+            TextBoxPort = Canvas.Add(TextBox);
+            TextBoxPort.position = new Vector2(0.1f, 0.2f);
+            TextBoxPort.scale = new Vector2(0.7f, 0.5f);
+            TextBoxPort.color = Color.Black;
+            TextBoxPort.interactable = true;
+        }
     }
 
 

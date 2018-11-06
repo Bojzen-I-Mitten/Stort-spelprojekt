@@ -51,6 +51,14 @@ namespace ThomasEngine
 		return sound->HasStopped();
 	}
 
+	void SoundComponent::Start()
+	{
+		if (playOnStart)
+			sound->Play();
+		else
+			sound->Stop();
+	}
+
 	bool SoundComponent::Is3D::get()
 	{
 		return sound->is3D();
@@ -99,5 +107,15 @@ namespace ThomasEngine
 	bool SoundComponent::Looping::get() 
 	{ 
 		return sound->IsLooping(); 
+	}
+
+	void SoundComponent::PlayOnStart::set(bool value)
+	{
+		playOnStart = value;
+	}
+
+	bool SoundComponent::PlayOnStart::get()
+	{
+		return playOnStart;
 	}
 }

@@ -19,22 +19,25 @@ public class PickupableObject : NetworkComponent
     public float chargeTimeCurrent;
     public float chargeTimeMax { get; set; } = 4.0f;
 
+   [Newtonsoft.Json.JsonIgnore]
+    public bool charging { get { return chargeTimeCurrent > 0.0f; } }
+
     private ChadControls _Chad;
     private RenderComponent m_renderComponent;
 
     public bool PickedUp = false;
 
-    public override void Start()
+    public override void Awake()
     {
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-
         chargeTimeCurrent = 0.0f;
     }
 
     public override void Update()
     {
-        Debug.Log("TEST");
+        if (charging)
+            ChargeEffect();
     }
 
     virtual public void ChargeEffect()
@@ -92,7 +95,8 @@ public class PickupableObject : NetworkComponent
             m_rigidBody.enabled = true;
             
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-           
+
+            Debug.Log("drop");
             transform.SetParent(null, true);
             if (_Chad)
             {
@@ -117,9 +121,11 @@ public class PickupableObject : NetworkComponent
     {
         if(m_pickupable && !PickedUp)
         {
+
             if (!m_rigidBody)
                 m_rigidBody = gameObject.GetComponent<Rigidbody>();
 
+            Debug.Log("pickup");
             m_rigidBody.IsKinematic = false;
             m_rigidBody.enabled = false;
 
@@ -131,14 +137,35 @@ public class PickupableObject : NetworkComponent
                 transform.localPosition = PickupOffset.localPosition;
                 transform.localRotation = PickupOffset.localRotation;
             }
+
+            
             chad.PickedUpObject = this;
             PickedUp = true;
+            m_pickupable = false;
             _Chad = chad;
         }
     }
 
-    public override void OnLostOwnership()
+   public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-       
+        writer.Put(chargeTimeCurrent);
+        return true;
+    }
+
+    public override void OnRead(NetPacketReader reader, bool initialState)
+    {
+        chargeTimeCurrent = reader.GetFloat();
+    }
+
+
+    virtual public void Reset()
+    {
+        RPCDrop();
+        chargeTimeCurrent = 0.0f;
+        PickedUp = false;
+        m_pickupable = true;
+        transform.localRotation = Quaternion.Identity;
+        m_rigidBody.enabled = true;
+        _Chad = null;
     }
 }

@@ -127,33 +127,23 @@ public class Vindaloo : Powerup
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
-        // loop through players and check distance from explosion source
-        var players = NetworkManager.instance.Scene.Players.Values.ToList();
-        players.ForEach(player =>
+        ChadControls localChad = MatchSystem.instance.LocalChad;
+        if (localChad)
         {
-            float distance = Vector3.Distance(player.transform.position, transform.position);
+            float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
-                Vector3 forceDir = player.transform.position - transform.position;
+                Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.y += 3.0f;
-
-                // ragdoll and knock-back
-                player.gameObject.GetComponent<ChadControls>().PublicStartRagdoll(5.0f, forceDir * ExplosionForce);
+                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
             }
-        });
-
-
-        //Remove();
+        }
     }
 
     private void Explosion()
     {
         // Play the vindaloo explosion sound
         ExplosionSound.PlayOneShot();
-
-        // Hide the vindaloo.
-        m_rigidBody.enabled = false;
-        gameObject.transform.scale = Vector3.Zero;
 
         emitterFire.EmitOneShot(25);
         emitterFire2.EmitOneShot(45);
