@@ -80,6 +80,7 @@ public class PowerupSpawner : NetworkComponent
                     spawnedPowerup.transform.rotation = transform.rotation;
 
                     spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
+                    
                 }
                 else
                 {

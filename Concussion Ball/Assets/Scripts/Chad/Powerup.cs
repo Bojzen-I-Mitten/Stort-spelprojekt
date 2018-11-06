@@ -124,6 +124,7 @@ public class Powerup : PickupableObject
             {
                 spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
             }
+            Reset();
         }
 
 

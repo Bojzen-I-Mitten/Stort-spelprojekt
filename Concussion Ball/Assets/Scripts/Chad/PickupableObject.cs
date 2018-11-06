@@ -142,9 +142,10 @@ public class PickupableObject : NetworkComponent
         }
     }
 
+
     virtual public void Reset()
     {
-        Drop();
+        RPCDrop();
         chargeTimeCurrent = 0.0f;
         PickedUp = false;
         m_pickupable = true;

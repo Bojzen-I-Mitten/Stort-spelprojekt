@@ -340,8 +340,12 @@ public class ChadControls : NetworkComponent
     private void ResetCharge()
     {
         ChargeTime = 0;
-        PickedUpObject.StopEmitting();
-        PickedUpObject.Cleanup();
+        if (PickedUpObject)
+        {
+            PickedUpObject.StopEmitting();
+            PickedUpObject.Cleanup();
+        }
+
 
     }
     #endregion

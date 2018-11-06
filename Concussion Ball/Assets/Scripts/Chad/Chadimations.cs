@@ -108,12 +108,14 @@ public class Chadimations : NetworkComponent
         if (index == 1 && weight == 1)
         {
             _Throwing = true;
-            BlendNodes[State].ResetPlayback();
+            if(BlendNodes.ContainsKey(State))
+                BlendNodes[State].ResetPlayback();
         }
         else
             _Throwing = false;
 
         // Debug.Log("Manually setting weight of animation numer: " + index + " to: "+ weight);
-        WeightHandles[State].setWeight(index, weight);
+        if(WeightHandles.ContainsKey(State))
+            WeightHandles[State].setWeight(index, weight);
     }
 } 

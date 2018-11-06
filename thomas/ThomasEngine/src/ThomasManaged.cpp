@@ -340,6 +340,8 @@ namespace ThomasEngine {
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
+				if (playing && inEditor)
+					IssueStopPlay();
 			}
 			finally
 			{
