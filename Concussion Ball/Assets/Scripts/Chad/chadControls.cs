@@ -81,7 +81,7 @@ public class ChadControls : NetworkComponent
 
     public string PlayerPrefabName { get; set; } = "Chad";
     public float ImpactFactor { get; set; } = 100;
-    public float TackleThreshold { get; set; } = 5;
+    public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
@@ -710,7 +710,7 @@ public class ChadControls : NetworkComponent
                 {
                     Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
+                else if (TheirVelocity > TackleThreshold && TheirVelocity >= CurrentVelocity.Length())
                 {
                     //toggle ragdoll
                     RPCStartRagdoll(MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
