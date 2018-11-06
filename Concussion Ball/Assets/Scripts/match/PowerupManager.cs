@@ -38,18 +38,12 @@ public class PowerupManager : ScriptComponent
 
     }
 
-    public GameObject InstantiatePowerup(Transform trans)
+    public GameObject InstantiatePowerup()
     {
         int seed = (int)(MatchSystem.instance.MatchStartTime + NextPowerupID);
         System.Random random = new System.Random(seed);
         int powerupIndex = random.Next(0, Powerups.Count);
         GameObject powerup = GetAvailablePowerup(powerupIndex);
-        if(powerup)
-        {
-            powerup.activeSelf = true;
-            powerup.transform.position = trans.position;
-            powerup.transform.rotation = trans.rotation;
-        }
         NextPowerupID++;
         return powerup;
     }
