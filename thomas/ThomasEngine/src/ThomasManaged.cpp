@@ -384,10 +384,11 @@ namespace ThomasEngine {
 
 	}
 
-	void ThomasWrapper::Exit() {
-
+	void ThomasWrapper::Exit() 
+	{
+#ifdef BENCHMARK
 		utils::profiling::ProfileManager::dumpDataToFile();
-	
+#endif
 		thomas::ThomasCore::Exit();
 	}
 
