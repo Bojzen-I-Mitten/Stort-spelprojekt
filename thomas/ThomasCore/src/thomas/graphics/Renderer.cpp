@@ -134,8 +134,8 @@ namespace thomas
 			m_shaders.SyncList();
 			m_cameras.syncUpdate();
 			// Copy view matrix for next frame
-			for (object::component::Camera* camera : m_cameras.getCameras())
-				camera->CopyFrameData();
+			/*for (object::component::Camera* camera : m_cameras.getCameras())
+				camera->CopyFrameData();*/
 		}
 
 		const render::ShaderList & Renderer::getShaderList()
