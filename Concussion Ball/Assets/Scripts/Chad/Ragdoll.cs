@@ -355,9 +355,10 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = headCollider.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
         if(PostiveMapping)
         {
-            J_BodyParts[(int)BODYPART.HEAD].NoCollision = false;
+            J_BodyParts[(int)BODYPART.HEAD].NoCollision = true;
             ExtraVector = -J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor;
             ExtraVector.y = -ExtraVector.y;
+            ExtraVector.z = ExtraVector.z * 3;
             J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = ExtraVector;
         }
 
