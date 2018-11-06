@@ -162,9 +162,9 @@ public class ChadControls : NetworkComponent
 
         if (Input.GetKeyDown(Input.Keys.L))
         {
-            Ragdolling = StartRagdoll(5.0f, (-transform.forward + transform.up * 0.5f) * 2000);
-            State = STATE.RAGDOLL;
-            StartCoroutine(Ragdolling);
+            //toggle ragdoll
+            RPCStartRagdoll(5.0f, (gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
+            SendRPC("RPCStartRagdoll", 5.0f, (gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
         }
         if (Input.GetKeyDown(Input.Keys.K))
             gameObject.GetComponent<NetworkPlayer>().Reset();
@@ -192,7 +192,22 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
-        if(State != STATE.RAGDOLL)
+        if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
+        {
+            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
+            {
+                Debug.Log("remove");
+                (PickedUpObject as Powerup).Remove();
+            }
+            else
+            {
+                PickedUpObject.Drop();
+                Debug.Log("drop");
+            }
+                
+        }
+
+        if (State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
             State = STATE.RAGDOLL;
@@ -642,6 +657,11 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
+        PickupableObject pickupablea = collider.gameObject.GetComponent<PickupableObject>();
+        if(pickupablea)
+        {
+            Debug.LogError("Why denny!?");
+        }
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
@@ -664,13 +684,6 @@ public class ChadControls : NetworkComponent
                     //toggle ragdoll
                     RPCStartRagdoll(5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
                     SendRPC("RPCStartRagdoll", 5.0f, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);
-
-                    if (PickedUpObject && PickedUpObject.DropOnRagdoll)
-                    {
-                        PickedUpObject.Drop();
-                        PickedUpObject = null;
-                    }
-                        
                 }
             }
         }

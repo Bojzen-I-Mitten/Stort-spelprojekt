@@ -149,6 +149,7 @@ public class PickupableObject : NetworkComponent
         chargeTimeCurrent = 0.0f;
         PickedUp = false;
         m_pickupable = true;
+        transform.localRotation = Quaternion.Identity;
         m_rigidBody.enabled = true;
         _Chad = null;
     }
