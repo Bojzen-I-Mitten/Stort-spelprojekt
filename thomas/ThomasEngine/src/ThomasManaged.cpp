@@ -233,7 +233,7 @@ namespace ThomasEngine {
 		thomas::graphics::Renderer::Instance()->ClearCommands();
 		thomas::editor::Gizmos::Gizmo().ClearGizmos();
 
-		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+		//editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
 //		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
 //#endif
