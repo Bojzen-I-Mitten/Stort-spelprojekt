@@ -53,10 +53,12 @@ namespace thomas
 			// Do something?
 		}
 
+
+
 		void Renderer::PostRender()
 		{
-			for (object::component::Camera* camera : m_cameras.getCameras())
-				camera->CopyFrameData();
+			/*for (object::component::Camera* camera : m_cameras.getCameras())
+				camera->CopyFrameData();*/
 		}
 
 		void Renderer::Destroy()
