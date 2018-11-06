@@ -193,7 +193,22 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force)
     {
-        if(State != STATE.RAGDOLL)
+        if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
+        {
+            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
+            {
+                Debug.Log("remove");
+                (PickedUpObject as Powerup).Remove();
+            }
+            else
+            {
+                PickedUpObject.Drop();
+                Debug.Log("drop");
+            }
+                
+        }
+
+        if (State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force);
             State = STATE.RAGDOLL;
@@ -343,8 +358,12 @@ public class ChadControls : NetworkComponent
     private void ResetCharge()
     {
         ChargeTime = 0;
-        PickedUpObject.StopEmitting();
-        PickedUpObject.Cleanup();
+        if (PickedUpObject)
+        {
+            PickedUpObject.StopEmitting();
+            PickedUpObject.Cleanup();
+        }
+
 
     }
     #endregion
@@ -642,6 +661,11 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
+        PickupableObject pickupablea = collider.gameObject.GetComponent<PickupableObject>();
+        if(pickupablea)
+        {
+            Debug.LogError("Why denny!?");
+        }
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();

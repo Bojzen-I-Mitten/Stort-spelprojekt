@@ -210,8 +210,14 @@ public class Ball : PickupableObject
         StartCoroutine(CleanTimer());
     }
 
+    public override void Pickup(ChadControls chad, Transform hand)
+    {
+        base.Pickup(chad, hand);
+        m_pickupable = true;
+    }
 
-    public void Reset()
+
+    public override void Reset()
     {
         if (isOwner)
         {

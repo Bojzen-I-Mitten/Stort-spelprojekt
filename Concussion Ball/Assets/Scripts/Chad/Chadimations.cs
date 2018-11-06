@@ -116,7 +116,8 @@ public class Chadimations : NetworkComponent
         BlendNodes[State].ResetPlayback();
 
         // Debug.Log("Manually setting weight of animation numer: " + index + " to: "+ weight);
-        WeightHandles[State].setWeight(index, weight);
+        if(WeightHandles.ContainsKey(State))
+            WeightHandles[State].setWeight(index, weight);
     }
 
     public void ResetTimer(uint index)
