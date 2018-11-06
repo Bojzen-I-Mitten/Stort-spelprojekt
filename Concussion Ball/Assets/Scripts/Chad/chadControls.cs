@@ -247,7 +247,7 @@ public class ChadControls : NetworkComponent
             return;
 
         if (Input.GetKey(Input.Keys.W))
-            Direction.z = Direction.z + 1 + (CurrentVelocity.y / MaxSpeed);
+            Direction.z = Direction.z + 1 + (CurrentVelocity.y / (MaxSpeed*0.5f));
         if (Input.GetKey(Input.Keys.S))
             Direction.z -= 1;
         if (Input.GetKey(Input.Keys.D))
