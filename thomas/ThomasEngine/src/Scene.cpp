@@ -49,11 +49,22 @@ namespace ThomasEngine
 		} while (!completed);
 	}
 	
-	void Scene::OnPlay()
+	bool Scene::OnPlay()
 	{
 		ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
-		// Initiate 
-		InitGameObjects(true);
+		try
+		{
+			// Initiate 
+			InitGameObjects(true);
+		}
+		catch (Exception^ e)
+		{
+			// Inverted order..!
+			Debug::LogException(e);
+			Debug::LogError("Failed to initiate game objects with following exception:");
+			return false;
+		}
+		return true;
 	}
 
 

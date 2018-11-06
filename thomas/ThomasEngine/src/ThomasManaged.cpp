@@ -419,9 +419,17 @@ namespace ThomasEngine {
 		}
 		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
-		CurrentScene->OnPlay();
-		playing = RunningState::Running;
-		Debug::Log("Running...");
+		// Initiate all object: Start engine, Chuuchuu!
+		if (CurrentScene->OnPlay())
+		{
+			playing = RunningState::Running;
+			Debug::Log("Running...");
+		}
+		else
+		{
+			// Error failed to run...
+			StopPlay();
+		}
 	}
 		
 	Guid selectedGUID;

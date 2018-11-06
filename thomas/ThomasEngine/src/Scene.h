@@ -68,7 +68,7 @@ namespace ThomasEngine {
 
 		uint32_t ID() { return m_uniqueID; } // 0 is reserved, unique ID's to be implemented.
 
-		void OnPlay();
+		bool OnPlay();
 
 		void CreateObject(GameObject^ object);
 		void DestroyObject(GameObject^ object);
@@ -138,6 +138,8 @@ namespace ThomasEngine {
 		*/
 		property IEnumerable<GameObject^>^ GameObjects
 		{
+			/* Get all objects in the scene
+			*/
 			System::Collections::Generic::IEnumerable<GameObject^>^ get();
 		}
 	};

@@ -104,7 +104,7 @@ namespace ThomasEditor
             }
             else if ((typeof(ThomasEngine.GameObject).IsAssignableFrom(resourceType)))
             {
-                resources.AddRange(ThomasEngine.GameObject.GetAllGameObjects());
+                resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.GameObjectsSynced);
             }
             else if ((typeof(ThomasEngine.Object).IsAssignableFrom(resourceType)))
             {
