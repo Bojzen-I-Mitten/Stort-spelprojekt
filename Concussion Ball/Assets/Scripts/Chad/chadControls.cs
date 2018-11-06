@@ -174,10 +174,7 @@ public class ChadControls : NetworkComponent
     private void EnableRagdoll()
     {
         // reset aim stuff 
-        ResetCharge();
-        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-        ChadHud.Instance.DeactivateCrosshair();
-        ChadHud.Instance.DeactivateChargeBar();
+        ResetThrow();
 
         rBody.enabled = false;
         Ragdoll.EnableRagdoll();
@@ -289,6 +286,7 @@ public class ChadControls : NetworkComponent
                         ChadHud.Instance.ActivateChargeBar();
 
                         Animations.SetAnimationWeight(ChargeAnimIndex, 1);
+                        
                     }
                     else if (Input.GetMouseButton(Input.MouseButtons.RIGHT) && !HasThrown && State == STATE.THROWING)
                     {
@@ -296,9 +294,7 @@ public class ChadControls : NetworkComponent
                         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                         {
                             HasThrown = true;
-                            ChadHud.Instance.DeactivateCrosshair();
-                            ChadHud.Instance.DeactivateChargeBar();
-                            Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+                            
                             Throwing = PlayThrowAnim();
                             StartCoroutine(Throwing);
                         }
@@ -306,19 +302,15 @@ public class ChadControls : NetworkComponent
                     else if (Input.GetMouseButtonUp(Input.MouseButtons.RIGHT) && State == STATE.THROWING && Throwing == null)
                     {
                         State = STATE.CHADING;
-                        ResetCharge();
+                        ResetThrow();
                         ResetCamera();
-                        ChadHud.Instance.DeactivateCrosshair();
-                        ChadHud.Instance.DeactivateChargeBar();
-                        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                     }
                 }
                 else if (Input.GetKey(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT) && DivingTimer > 5.0f)
                 {
                     // State = STATE.DIVING;
-                    ResetCharge();
+                    ResetThrow();
                     ResetCamera();
-                    Animations.SetAnimationWeight(ChargeAnimIndex, 0);
                 }
             }
             else if (PickedUpObject) // player is holding object that is not throwable
@@ -355,15 +347,21 @@ public class ChadControls : NetworkComponent
         }
     }
 
-    private void ResetCharge()
+    public void RPCResetThrow()
     {
+        ChadHud.Instance.DeactivateCrosshair();
+        ChadHud.Instance.DeactivateChargeBar();
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        if (PickedUpObject)
-        {
-            PickedUpObject.StopEmitting();
-            PickedUpObject.Cleanup();
-        }
+        PickedUpObject.StopEmitting();
+        PickedUpObject.Cleanup();
+    }
 
+    private void ResetThrow()
+    {
+        SendRPC("RPCResetThrow");
+        RPCResetThrow();
 
     }
     #endregion
@@ -563,19 +561,31 @@ public class ChadControls : NetworkComponent
         ResetCamera();
     }
 
+    public void RPCSetAnimWeight(int index, float weight)
+    {
+        Animations.SetAnimationWeight((uint)index, weight);
+    }
+
+    public void RPCStartThrow()
+    {
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+    }
+
     IEnumerator PlayThrowAnim()
     {
-        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+        ChadHud.Instance.DeactivateCrosshair();
+        ChadHud.Instance.DeactivateChargeBar();
+        RPCStartThrow();
+        SendRPC("RPCStartThrow");
         Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
         Vector3 ballCamPos = Camera.transform.position;
 
         if (Camera)
             Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
-        
-
         yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
-        ResetCharge();
+        ResetThrow();
         ThrowObject(ballCamPos, chosenDirection);
         HasThrown = false;
 
@@ -585,6 +595,7 @@ public class ChadControls : NetworkComponent
             State = STATE.CHADING;
             ResetCamera();
             Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+            SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
         }
         
         Throwing = null;
@@ -598,8 +609,7 @@ public class ChadControls : NetworkComponent
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
-        PickedUpObject.ChargeEffect();
-
+        
         ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime/maxChargeTime);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
     }
@@ -690,7 +700,11 @@ public class ChadControls : NetworkComponent
                 float TheirVelocity = collider.gameObject.GetComponent<ChadControls>().CurrentVelocity.Length();
                 Debug.Log(TheirVelocity);
                 Debug.Log(CurrentVelocity.Length());
-                if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
+                if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
+                {
+                    Debug.Log("Trying to tackle player on same team, you baka.");
+                }
+                else if (TheirVelocity > TackleThreshold && TheirVelocity > CurrentVelocity.Length())
                 {
                     //toggle ragdoll
                     RPCStartRagdoll(MinimumRagdollTimer, (collider.gameObject.transform.forward + Vector3.Up * 0.5f) * 2000);

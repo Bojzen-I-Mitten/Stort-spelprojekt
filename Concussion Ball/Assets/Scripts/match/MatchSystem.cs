@@ -336,6 +336,12 @@ public class MatchSystem : NetworkManager
         //else
         //    Team2.AddPlayer(player);
     }
+
+    public TEAM_TYPE GetPlayerTeam(GameObject player)
+    {
+        NetworkPlayer localPlayer = player.GetComponent<NetworkPlayer>();
+        return localPlayer.Team.TeamType;
+    }
     #endregion
 
 
