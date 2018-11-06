@@ -24,8 +24,6 @@ public class GUIJoinHost : ScriptComponent
 
     Canvas GUI;
 
-    Image BG;
-
     Image TextBoxIP;
     Image TextBoxPort;
     Image Join;
@@ -54,16 +52,16 @@ public class GUIJoinHost : ScriptComponent
         if (TakePort)
             InputGUI.AppendIPString(ref PortString, 5);
 
-        if(Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
         {
-            if(TextBoxIP.Clicked())
+            if (TextBoxIP.Clicked())
             {
                 TakePort = false;
                 TakeIP = true;
                 TextBoxPort.color = Color.Black;
                 TextBoxIP.color = Color.Green;
             }
-            else if(TextBoxPort.Clicked())
+            else if (TextBoxPort.Clicked())
             {
                 TakeIP = false;
                 TakePort = true;
@@ -82,7 +80,7 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.TargetIP = IPString;
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();
-                    
+
                     ClearImagesAndText();
                     enabled = false;
                     return;
@@ -103,7 +101,7 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
-                    
+
                     ClearImagesAndText();
                     enabled = false;
                     return;
@@ -142,47 +140,57 @@ public class GUIJoinHost : ScriptComponent
 
         IPText = GUI.Add(IPString);
         IPText.position = new Vector2(0.1f, 0.11f);
+        IPText.color = Color.Black;
 
         PortText = GUI.Add(PortString);
         PortText.position = new Vector2(0.1f, 0.21f);
+        PortText.color = Color.Black;
 
         IP = GUI.Add("IP, needed to join");
         IP.position = new Vector2(0.1f, 0.07f);
-
         IP.scale = new Vector2(0.7f);
-        Port = GUI.Add("PORT, needed for both host and join");
+        IP.color = Color.Black;
 
+        Port = GUI.Add("PORT, needed for both host and join");
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
+        Port.color = Color.Black;
 
-        Join = GUI.Add(JoinBtn);
-        Join.position = new Vector2(0.325f, 0.11f);
-        Join.scale = new Vector2(0.25f);
-        Join.interactable = true;
+        if (JoinBtn != null)
+        {
+            Join = GUI.Add(JoinBtn);
+            Join.position = new Vector2(0.325f, 0.11f);
+            Join.scale = new Vector2(0.25f);
+            Join.interactable = true;
+        }
 
-        Host = GUI.Add(HostBtn);
-        Host.position = new Vector2(0.325f, 0.21f);
-        Host.scale = new Vector2(0.25f);
-        Host.interactable = true;
+        if (HostBtn != null)
+        {
+            Host = GUI.Add(HostBtn);
+            Host.position = new Vector2(0.325f, 0.21f);
+            Host.scale = new Vector2(0.25f);
+            Host.interactable = true;
+        }
 
-        TextBoxIP = GUI.Add(TextBox);
-        TextBoxIP.position = new Vector2(0.1f);
-        TextBoxIP.scale = new Vector2(0.7f, 0.5f);
-        TextBoxIP.color = Color.Black;
-        TextBoxIP.interactable = true;
+        if (TextBox != null)
+        {
+            TextBoxIP = GUI.Add(TextBox);
+            TextBoxIP.position = new Vector2(0.1f);
+            TextBoxIP.scale = new Vector2(0.7f, 0.5f);
+            TextBoxIP.color = Color.Black;
+            TextBoxIP.interactable = true;
 
-        TextBoxPort = GUI.Add(TextBox);
-        TextBoxPort.position = new Vector2(0.1f, 0.2f);
-        TextBoxPort.scale = new Vector2(0.7f, 0.5f);
-        TextBoxPort.color = Color.Black;
-        TextBoxPort.interactable = true;
+            TextBoxPort = GUI.Add(TextBox);
+            TextBoxPort.position = new Vector2(0.1f, 0.2f);
+            TextBoxPort.scale = new Vector2(0.7f, 0.5f);
+            TextBoxPort.color = Color.Black;
+            TextBoxPort.interactable = true;
+        }
     }
 
 
     public void ClearImagesAndText()
     {
-        //GUI.Remove(BG);
-
         GUI.Remove(Join);
         GUI.Remove(Host);
         GUI.Remove(TextBoxIP);

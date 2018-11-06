@@ -14,21 +14,24 @@ public class Powerup : PickupableObject
     public PowerupSpawner spawner;
 
     protected bool activated = false;
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
-
-        m_rigidBody.IsKinematic = true;
+        base.Awake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
 
-        #region Init emitters
-        // emitter bois
-        #endregion
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+        activated = false;
+        m_rigidBody.IsKinematic = true;
+        m_rigidBody.enabled = true;
     }
 
     public override void Update()
     {
-        if (spawner && PickedUp)
+        if (spawner && !PickedUp)
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
 
@@ -121,6 +124,7 @@ public class Powerup : PickupableObject
             {
                 spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
             }
+            Reset();
         }
 
 
@@ -143,5 +147,12 @@ public class Powerup : PickupableObject
     {
         RPCRemove();
         SendRPC("RPCRemove");
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        m_rigidBody.IsKinematic = true;
+        activated = false;
     }
 }
