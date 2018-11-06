@@ -112,7 +112,7 @@ namespace ThomasEngine
 			{
 				return AssetTypes::SCENE;
 			}
-			else if (extension == "wav")
+			else if (extension == "wav" || extension == "mp3")
 			{
 				return AssetTypes::AUDIO_CLIP;
 			}
@@ -144,6 +144,12 @@ namespace ThomasEngine
 			{
 				return AssetTypes::UNKNOWN;
 			}
+		}
+
+		bool Resources::IsResource(String ^ path)
+		{
+			AssetTypes type = GetResourceAssetType(path);
+			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
 		}
 
 		Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
@@ -277,8 +283,10 @@ namespace ThomasEngine
 			else
 				path = Application::currentProject->assetPath + "\\" + path;
 
+			String^ pp = gameObject->prefabPath;
+			gameObject->prefabPath = nullptr;
 			Serializer::SerializeGameObject(gameObject, path);
-
+			gameObject->prefabPath = pp;
 		}
 
 		GameObject ^ Resources::LoadPrefab(String^ path) {
@@ -343,16 +351,29 @@ namespace ThomasEngine
 
 			void Resources::LoadAll(String^ path)
 			{
-				array<String^>^ directories = IO::Directory::GetDirectories(path);
-				array<String^>^ files = IO::Directory::GetFiles(path);
-				for each(String^ dir in directories)
+				//array<String^>^ directories = IO::Directory::GetDirectories(path);
+				List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
+				/*for each(String^ dir in directories)
 				{
 					LoadAll(dir);
-				}
-				for each(String^ file in files)
+				}*/
+
+				for (int i = 0; i < files->Count; i++)
 				{
-					LoadSysPath(file);
+					if (!IsResource(files[i])) {
+						files->RemoveAt(i);
+						--i;
+					}
+						
 				}
+
+				OnResourceLoadStarted();
+				for (int i = 0; i < files->Count; i++)
+				{
+					OnResourceLoad(files[i], i, files->Count);
+					LoadSysPath(files[i]);
+				}
+				OnResourceLoadEnded();
 			}
 
 			void Resources::UnloadAll()

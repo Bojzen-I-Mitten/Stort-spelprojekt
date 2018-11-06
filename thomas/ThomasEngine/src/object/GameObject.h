@@ -113,7 +113,12 @@ namespace ThomasEngine
 			void set(String^) override;
 		};
 
-
+		property String^ Tag;
+		property int Layer
+		{
+			int get();
+			void set(int value);
+		}
 
 		String^ ToString() override
 		{

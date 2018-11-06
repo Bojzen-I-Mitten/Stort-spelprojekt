@@ -23,6 +23,11 @@ namespace thomas {
 			{
 			}
 
+			uint32_t AnimBlender::numAnimations()
+			{
+				return m_NumNode;
+			}
+
 			void AnimBlender::setWeightMixer(WeightMixer * mixer)
 			{
 				m_weights = std::unique_ptr<WeightMixer>(mixer);
@@ -147,6 +152,12 @@ namespace thomas {
 					mode++;
 				}
 				ThomasCore::Core().Memory()->stack(0).deallocate(tmp_arr);
+			}
+
+			AnimationNode * AnimBlender::getAnimNode(uint32_t i)
+			{
+				if (i >= m_NumNode) return nullptr;
+				return m_nodes[i];
 			}
 
 

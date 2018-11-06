@@ -34,6 +34,7 @@ namespace ThomasEngine
 
 			WeightHandle^ getWeightHandle();
 
+			void ResetPlayback();
 			
 		private:
 

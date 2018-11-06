@@ -187,6 +187,7 @@
     <ClInclude Include="src\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\object\GameObjectManager.h" />
     <ClInclude Include="src\object\YieldInstructions.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Project.h" />
     <ClInclude Include="src\resource\Animation.h" />
     <ClInclude Include="src\resource\Font.h" />
@@ -227,6 +228,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\object\Object.h" />
     <ClInclude Include="src\ThomasManaged.h" />
+    <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
+    <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -254,6 +257,7 @@
     <ClCompile Include="src\object\component\physics\SphereCollider.cpp" />
     <ClCompile Include="src\object\component\RenderSkinnedComponent.cpp" />
     <ClCompile Include="src\object\GameObjectManager.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\resource\Animation.cpp" />
     <ClCompile Include="src\object\YieldInstructions.cpp" />
     <ClCompile Include="src\Project.cpp" />
@@ -293,6 +297,8 @@
     <ClCompile Include="src\ThomasManaged.cpp" />
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Utility.cpp" />
+    <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
+    <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

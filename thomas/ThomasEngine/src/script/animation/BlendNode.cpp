@@ -86,6 +86,16 @@ namespace ThomasEngine
 			return m_weightHandle;
 		}
 
+		void BlendNode::ResetPlayback()
+		{
+			for (uint32_t i = 0; i < m_node->numAnimations(); i++)
+			{
+				thomas::graphics::animation::AnimPlayback* p =  dynamic_cast<thomas::graphics::animation::AnimPlayback*>(m_node->getAnimNode(i));
+				if (p)
+					p->getPlayback()->m_elapsedTime = 0.f;
+			}
+		}
+
 		thomas::graphics::animation::AnimationNode * BlendNode::Native()
 		{
 			return m_node;

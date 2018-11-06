@@ -96,7 +96,7 @@ namespace thomas
 					m_collisionObject->setUserPointer(this);
 					m_collisionObject->setRestitution(1.0f);
 					SetTrigger(m_trigger); //Update trigger flags
-					Physics::s_world->addCollisionObject(m_collisionObject);
+					Physics::s_world->addCollisionObject(m_collisionObject, Physics::GetCollisionGroupBit(m_gameObject->GetLayer()), Physics::GetCollisionMask(m_gameObject->GetLayer()));
 				}
 			}
 

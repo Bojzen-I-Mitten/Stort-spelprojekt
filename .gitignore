@@ -6,4 +6,6 @@
 /.vs
 /Concussion Ball/build.zip
 *.pdn
+*.bat
+*.thomas
 *.zip

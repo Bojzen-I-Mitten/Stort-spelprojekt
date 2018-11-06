@@ -66,17 +66,17 @@ public class GUISelectTeam : ScriptComponent
         Team1Image = GUI.Add(SelectBox);
         Team1Image.position = new Vector2(0.13f, 0.23f);
         Team1Image.interactable = true;
-        Team1Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color.ToVector4();
+        Team1Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
 
         Team2Image = GUI.Add(SelectBox);
         Team2Image.position = new Vector2(0.25f, 0.23f);
         Team2Image.interactable = true;
-        Team2Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color.ToVector4();
+        Team2Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
 
         SpectatorImage = GUI.Add(SelectBox);
         SpectatorImage.position = new Vector2(0.37f, 0.23f);
         SpectatorImage.interactable = true;
-        SpectatorImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Color.ToVector4();
+        SpectatorImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Color;
 
         Select = GUI.Add("Select Team");
         Select.position = new Vector2(0.21f, 0.11f);
@@ -84,11 +84,11 @@ public class GUISelectTeam : ScriptComponent
         Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
         Team1Text.position = new Vector2(0.10f, 0.18f);
 
-        Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
-        Team1Text.position = new Vector2(0.22f, 0.18f);
+        Team2Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
+        Team2Text.position = new Vector2(0.22f, 0.18f);
 
-        Team1Text = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name);
-        Team1Text.position = new Vector2(0.35f, 0.18f);
+        SpectatorText = GUI.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name);
+        SpectatorText.position = new Vector2(0.35f, 0.18f);
     }
 
     public void ClearImagesAndText()

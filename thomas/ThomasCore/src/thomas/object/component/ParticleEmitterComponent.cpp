@@ -151,7 +151,7 @@ namespace thomas
 
 			void ParticleEmitterComponent::OnDestroy()
 			{
-				m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
+				//m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
 			}
 
 			

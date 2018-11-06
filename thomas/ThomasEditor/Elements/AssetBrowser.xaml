@@ -25,6 +25,7 @@
                             <MenuItem Header="Material" Click="Menu_CreateMaterial"/>
                         </MenuItem>
                         <MenuItem Header="Open" x:Name="contextMenuOpenItem" IsEnabled="{Binding}" Click="Menu_OpenAsset" />
+                        <MenuItem Header="Save" x:Name="contextMenuSaveItem" IsEnabled="{Binding}" Click="Menu_SaveAsset" />
                         <MenuItem Header="Delete" IsEnabled="{Binding}"  Click="Menu_DeleteAsset"/>
                         <MenuItem Header="Rename" IsEnabled="{Binding}" Click="MenuItem_Rename"/>
                         <Separator/>

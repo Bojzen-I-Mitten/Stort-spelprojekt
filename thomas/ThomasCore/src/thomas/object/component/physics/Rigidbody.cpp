@@ -252,6 +252,7 @@ namespace thomas
 			void Rigidbody::SetFriction(float friction)
 			{
 				m_friction = friction;
+				m_rollingFriction = friction;
 			}
 
 			void Rigidbody::SetPosition(math::Vector3 position)
@@ -386,6 +387,7 @@ namespace thomas
 			{
 				return m_friction;
 			}
+
 
 			void Rigidbody::UpdateRigidbodyMass()
 			{

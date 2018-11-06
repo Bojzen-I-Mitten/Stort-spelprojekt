@@ -350,6 +350,8 @@ ASALocalRun/
 *.blend*
 *.prefab
 *.mat
+*.spritefont
+*.zip
 
 Models/
 

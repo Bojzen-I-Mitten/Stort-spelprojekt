@@ -128,7 +128,7 @@ namespace ThomasEngine.Network
 
         void InterpolateRigidbody()
         {
-            if (!isOwner && targetRigidbody)
+            if (!isOwner && targetRigidbody && targetRigidbody.enabled)
             {
                 Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
                 targetRigidbody.LinearVelocity = newVelocity;
@@ -312,11 +312,20 @@ namespace ThomasEngine.Network
 
             //float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
 
-            if (dist > SnapThreshhold || !targetRigidbody.enabled)
+
+            if(!targetRigidbody.enabled)
             {
+                transform.position = TargetSyncPosition;
+                transform.rotation = TargetSyncRotation;
+                return;
+            }
+            else if(dist > SnapThreshhold)
+            {
+
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;
                 targetRigidbody.LinearVelocity = TargetSyncLinearVelocity;
+
             }
             targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
         }

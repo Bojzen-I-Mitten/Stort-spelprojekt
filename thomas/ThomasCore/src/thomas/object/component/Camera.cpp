@@ -5,7 +5,6 @@
 #include "../../graphics/Renderer.h"
 #include "../../Input.h"
 #include "../../editor/gizmos/Gizmos.h"
-#include "../../AutoProfile.h"
 #include "../../graphics/GUI/Canvas.h"
 #include "../../graphics/GUI/GUIElements.h"
 #include "RenderComponent.h"
@@ -110,7 +109,6 @@ namespace thomas
 
 			math::Ray Camera::ScreenPointToRay(math::Vector2 point)
 			{
-				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				// Move the mouse cursor coordinates into the -1 to +1 range.
 				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
 
@@ -212,7 +210,7 @@ namespace thomas
 
 			void Camera::Render()
 			{
-				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
+				//PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				graphics::Renderer::Instance()->SubmitCamera(this);
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
@@ -292,7 +290,6 @@ namespace thomas
 
 			void Camera::CopyFrameData()
 			{
-				PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 				m_frameData.targetDisplay = GetTargetDisplayIndex();
 				m_frameData.viewport = GetViewport();
 				m_frameData.viewMatrix = GetViewMatrix();
@@ -361,6 +358,16 @@ namespace thomas
 			bool Camera::hasSkybox()
 			{
 				return bool(m_skybox);
+			}
+
+			math::Vector3 Camera::WorldToViewport(math::Vector3 position, math::Matrix world)
+			{
+				math::Vector3 NDC = math::Vector3::Transform(position, world * GetViewMatrix() * GetProjMatrix());
+
+				NDC.x = (NDC.x + 1.0f) * 0.5 * GetViewport().width;
+				NDC.y = (1.0f - NDC.y) * 0.5 * GetViewport().height;
+
+				return NDC;
 			}
 		}
 	}

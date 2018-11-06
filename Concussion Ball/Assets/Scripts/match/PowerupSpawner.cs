@@ -1,15 +1,16 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using System;
 using ThomasEngine;
 using ThomasEngine.Network;
 public class PowerupSpawner : NetworkComponent
 {
+    GameObject spawnedPowerup;
     private bool hasPowerup = false;
     float spawnInterval = 30.0f;
     float timeLeftUntilSpawn = 0.0f;
     public override void Start()
     {
-
     }
 
     public override void Update()
@@ -23,7 +24,6 @@ public class PowerupSpawner : NetworkComponent
                     SpawnPowerup();
             }
         }
-
     }
 
     public void Free()
@@ -36,6 +36,7 @@ public class PowerupSpawner : NetworkComponent
     {
         timeLeftUntilSpawn = spawnInterval;
         hasPowerup = false;
+        spawnedPowerup = null;
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -64,10 +65,17 @@ public class PowerupSpawner : NetworkComponent
         {
             if (!hasPowerup)
             {
-                GameObject spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
-                spawnedPowerup.GetComponent<Powerup>().spawner = this;
-                timeLeftUntilSpawn = spawnInterval;
-                hasPowerup = true;
+                spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup(transform);
+                if (spawnedPowerup)
+                {
+                    spawnedPowerup.GetComponent<Powerup>().spawner = this;
+                    timeLeftUntilSpawn = spawnInterval;
+                    hasPowerup = true;
+                }
+                else
+                {
+                    Debug.Log("No available powerup to spawn");
+                }
             }
             else
                 Debug.Log("Powerup already spawned");

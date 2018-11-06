@@ -12,7 +12,8 @@ namespace thomas
 			SoundComponent::SoundComponent() :
 			m_looping(true),
 			m_clip(nullptr),
-			m_volume(0.5f)
+			m_volume(0.5f),
+			m_volumeFactor(1.f)
 			{
 			}
 
@@ -27,8 +28,9 @@ namespace thomas
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
-					float attenuation = Sound::VolumeTodB(m_volume) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
+					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
 					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
+				
 				}
 			}
 
@@ -46,6 +48,7 @@ namespace thomas
 				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
+					m_volume;
 					Sound::Play(m_clip->GetName(), m_volume);
 				}
 			}
@@ -125,8 +128,16 @@ namespace thomas
 
 					if (m_clip != nullptr)
 					{
-						m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(m_volume));
+						m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(m_volume * m_volumeFactor));
 					}
+				}
+			}
+
+			void SoundComponent::SetVolumeFactor(float volumeFactor)
+			{
+				if (volumeFactor <= 1.f && volumeFactor >= 0.f)
+				{
+					m_volumeFactor = volumeFactor;
 				}
 			}
 
@@ -143,6 +154,11 @@ namespace thomas
 			float SoundComponent::GetVolume() const
 			{
 				return m_volume;
+			}
+
+			float SoundComponent::GetVolumeFactor() const
+			{
+				return m_volumeFactor;
 			}
 
 			bool SoundComponent::IsLooping() const

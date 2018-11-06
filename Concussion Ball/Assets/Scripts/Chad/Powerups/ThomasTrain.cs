@@ -26,13 +26,13 @@ public class ThomasTrain : Powerup
 
     public override void Update()
     {
-
+        base.Update();
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 force)
+    public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(force * 5.0f);
+        base.Throw(camPos, force * 5.0f);
         m_rigidBody.UseGravity = false;
         StartCoroutine(Scale());
     }

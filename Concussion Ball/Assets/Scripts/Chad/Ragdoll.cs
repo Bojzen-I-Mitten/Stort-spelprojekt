@@ -30,7 +30,8 @@ public class Ragdoll : ScriptComponent
     public float Totalmass { get; set; } = 70.0f;
     public bool RagdollEnabled = true;
     public bool AllobjectKinectic { get; set; } = false;
-
+    public GameObject AudioListener { get; set; }
+    RagdollImpact ImpactSpine;
 
     enum BODYPART
     {
@@ -60,7 +61,8 @@ public class Ragdoll : ScriptComponent
     float[] Mass_BodyParts = new float[(int)BODYPART.COUNT];
     uint[] BoneIndexes = new uint[(int)BODYPART.COUNT];
     Collider[] C_BodyParts = new Collider[(int)BODYPART.COUNT];
-
+    SoundComponent RagdollSound;
+    float time=0;
 
 
     #region Utility functions
@@ -167,6 +169,11 @@ public class Ragdoll : ScriptComponent
             RB_BodyParts[i].AddForce(force * Mass_BodyParts[i], Rigidbody.ForceMode.Impulse);
         }
     }
+    public float DistanceToWorld()
+    {
+        Debug.Log(ImpactSpine.DistanceToCollition);
+        return ImpactSpine.DistanceToCollition;
+    }
 
     public void EnableRagdoll()
     {
@@ -174,12 +181,12 @@ public class Ragdoll : ScriptComponent
             return;
         RenderSkinnedComponent renderskinnedcomponent = gameObject.GetComponent<RenderSkinnedComponent>();
         if (renderskinnedcomponent == null)
-        { 
+        {
             ThomasEngine.Debug.LogError("No renderskinnedcomponent available Noragdoll will be created");
             return;
         }
-                 
-       
+        // Play the ragdoll sound
+        RagdollSound.PlayOneShot();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
@@ -213,6 +220,9 @@ public class Ragdoll : ScriptComponent
             UpperLeftArm, UpperRightArm, LowerLeftArm, LowerRightArm,
             UpperLeftLeg, UpperRightLeg, LowerLeftLeg, LowerRightLeg
         };
+
+
+
 
         RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
@@ -525,12 +535,18 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_LOWER_LEG].Anchor = -limbCollider.center;
 
 
-
+        ImpactSpine = G_BodyParts[(int)BODYPART.SPINE].AddComponent<RagdollImpact>();
+        ImpactSpine.G_BodyParts = G_BodyParts;
     }
 
     public override void Start()
     {
+        if (AudioListener == null)
+        {
+            AudioListener = gameObject;
+        }
         DisableRagdoll();
+        RagdollSound = gameObject.GetComponent<SoundComponent>();
     }
 
     public GameObject GetHips()
@@ -540,14 +556,30 @@ public class Ragdoll : ScriptComponent
 
     public override void Update()
     {
-        if (RagdollEnabled)
-            return;
+        Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
+        Vector3 listenerpos = AudioListener.transform.position;
 
-        uint boneindex;
+        RagdollSound.Apply3D(listenerpos, spinepos);
+
+
+
+        if (RagdollEnabled)
+        {
+
+            if (ImpactSpine.GetActive)
+            {
+                RagdollSound.Volume = ImpactSpine.Volume;
+                RagdollSound.PlayOneShot();
+            }
+                
+            return;
+        }
         RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
+        
 
-        for(int i =0; i < (int)BODYPART.COUNT; i++)
+
+        for(int i = 0; i < (int)BODYPART.COUNT; i++)
         {
             G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
         }
@@ -555,14 +587,19 @@ public class Ragdoll : ScriptComponent
 
     }
 
+    public override void OnDestroy()
+    {
+        DisableRagdoll();
+    }
+
     public void DisableRagdoll()
     {
 
         foreach(GameObject gObj in G_BodyParts)
         {
-            gObj.activeSelf = false;
+            if(gObj != null)
+                gObj.activeSelf = false;
         }
-
         RagdollEnabled = false;
 
     }
