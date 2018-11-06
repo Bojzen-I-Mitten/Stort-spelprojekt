@@ -348,7 +348,10 @@ namespace ThomasEngine {
 					gcnew MainThreadDelegate(MainThreadUpdate));
 			}
 		}
-		renderThread->Join();	// Wait until thread is finished
+		while (!renderThread->Join(System::TimeSpan(0, 0, 1)))	// Wait until thread is finished
+		{
+			Debug::Log("Waiting for render thread to terminate...");
+		}
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
 
