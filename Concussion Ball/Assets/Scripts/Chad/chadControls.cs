@@ -500,6 +500,7 @@ public class ChadControls : NetworkComponent
                 Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
                 Camera.transform.LookAt(Ragdoll.GetHips().transform);
 
+
                 break;
         }
 
@@ -514,7 +515,10 @@ public class ChadControls : NetworkComponent
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
         ResetCamera();
-        if(PickedUpObject)
+        ChadHud.Instance.HideHeldObjectText();
+        ChadHud.Instance.DeactivateChargeBar();
+        ChadHud.Instance.DeactivateCrosshair();
+        if (PickedUpObject)
         {
             PickedUpObject.Drop();
             PickedUpObject = null;

@@ -36,8 +36,8 @@ public class GUIJoinHost : ScriptComponent
 
     public override void Start()
     {
-        IPString = "";
-        PortString = "";
+        IPString = "192.168.1.";
+        PortString = "9050";
         TakeIP = false;
         TakePort = false;
         Disabled = false;
