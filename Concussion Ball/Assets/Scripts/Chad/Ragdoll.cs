@@ -378,7 +378,7 @@ public class Ragdoll : ScriptComponent
             ExtraVector = -J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor;
             ExtraVector.x = -ExtraVector.x;
             ExtraVector.y = -ExtraVector.y;
-            ExtraVector.z = ExtraVector.z * 3;
+            ExtraVector.z = ExtraVector.z + 0.1f; //* 3;
             J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = ExtraVector;
         }
 
