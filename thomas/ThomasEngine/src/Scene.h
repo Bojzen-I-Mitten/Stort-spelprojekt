@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <thomas/ThomasCore.h>
+#include <thomas/object/GameObject.h>
 
 #pragma managed
 
@@ -13,8 +14,11 @@ using namespace System::Collections::Generic;
 
 namespace ThomasEngine {
 
-	
+	//Forw. declare
 	ref class GameObject;
+	ref class Component;
+
+
 	[DataContract]
 	public ref class Scene
 	{
@@ -75,9 +79,20 @@ namespace ThomasEngine {
 
 		void InitGameObjects(bool playing);
 
-		/* Find gameobject by string
+		/* Find gameobject by name
 		*/
 		GameObject^ Find(System::String^ name);
+		/* Find gameobject by GUID
+		*/
+		GameObject^ Find(System::Guid guid);
+		/* Find gameobject by it's native pointer
+		*/
+		GameObject^ Find(thomas::object::GameObject* native);
+
+		generic<typename T>
+			where T : Component
+		List<T>^ getComponentsOfType();
+		List<System::Object^>^ getComponentsOfType(System::Type^ type);
 
 #pragma region Serialized properties
 

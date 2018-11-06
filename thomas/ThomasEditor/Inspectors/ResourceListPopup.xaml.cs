@@ -106,10 +106,12 @@ namespace ThomasEditor
             {
                 resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.GameObjectsSynced);
             }
-            else if ((typeof(ThomasEngine.Object).IsAssignableFrom(resourceType)))
+            
+            else if ((typeof(ThomasEngine.Component).IsAssignableFrom(resourceType)))
             {
-                resources.AddRange(ThomasEngine.Object.GetObjectsOfType(resourceType));
+                resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.getComponentsOfType(typeof(ThomasEngine.Component)));
             }
+            
             resources.Insert(0, "None");
             ResourceList.ItemsSource = resources;
             CollectionViewSource.GetDefaultView(ResourceList.ItemsSource).Filter = ResourcesFilter;

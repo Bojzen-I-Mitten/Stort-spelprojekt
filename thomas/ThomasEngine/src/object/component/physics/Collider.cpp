@@ -4,6 +4,8 @@
 #include "Collider.h"
 #include "Rigidbody.h"
 #include "../../GameObject.h"
+#include "../../../ThomasManaged.h"
+#include "../../../Scene.h"
 
 namespace ThomasEngine
 {
@@ -27,7 +29,8 @@ namespace ThomasEngine
 
 	void Collider::OnCollision(component::Collider* otherCollider, COLLISION_TYPE collisionType)
 	{
-		Collider^ collider = (Collider^)Object::Find(Utility::Convert(otherCollider->m_guid));
+		GameObject^ obj = ThomasWrapper::CurrentScene->Find(otherCollider->m_gameObject);
+		Collider^ collider = obj->GetComponent<Collider^>(otherCollider);
 		if (!collider)
 			return;
 		if (collider->isTrigger || isTrigger) //If one of the colliders is a trigger we do OnColliderX instead.

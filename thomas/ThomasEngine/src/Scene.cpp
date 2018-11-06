@@ -250,6 +250,26 @@ namespace ThomasEngine
 		return nullptr;
 	}
 
+	GameObject ^ Scene::Find(System::Guid guid)
+	{
+		for each(GameObject^ gameObject in GameObjects)
+		{
+			if (gameObject->m_guid == guid)
+				return gameObject;
+		}
+		return nullptr;
+	}
+
+	GameObject ^ Scene::Find(thomas::object::GameObject * native)
+	{
+		for each(GameObject^ gameObject in GameObjects)
+		{
+			if (gameObject->nativePtr == native)
+				return gameObject;
+		}
+		return nullptr;
+	}
+
 	Vector3 Scene::CameraPosition::get() 
 	{
 		return Utility::Convert(thomas::editor::EditorCamera::Instance()->m_transform->GetLocalPosition());
@@ -291,5 +311,33 @@ namespace ThomasEngine
 	void Scene::GameObjectData::set(List<GameObject^>^ val) {
 		m_gameObjects = val;
 	}
+
+	generic<typename T>
+		where T : Component
+		inline List<T>^ Scene::getComponentsOfType()
+		{
+			List<T>^ list = gcnew List<T>();
+			for each(GameObject^ g in m_gameObjects)
+			{
+				for each(T c in g->Components)
+				{
+					list->Add(c);
+				}
+			}
+			return list;
+		}
+		List<System::Object^>^ Scene::getComponentsOfType(System::Type^ type)
+		{
+			List<System::Object^>^ list = gcnew List<System::Object^>();
+			for each(GameObject^ g in m_gameObjects)
+			{
+				for each(Component^ c in g->Components)
+				{
+					if(type->IsAssignableFrom(c->GetType()))
+						list->Add(c);
+				}
+			}
+			return list;
+		}
 }
 

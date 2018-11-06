@@ -155,6 +155,12 @@ namespace ThomasEngine
 		where T : Component
 		T GetComponent();
 
+		/* Find component from it's native pointer. Returns the component casted to the type or null if not found or cast failed.
+		*/
+		generic<typename T>
+		where T : Component
+		T GetComponent(void* nativePointer);
+
 		Component^ GetComponent(Type^ type);
 
 
@@ -168,10 +174,6 @@ namespace ThomasEngine
 
 		bool HasComponentOfType(Type^ T);
 
-		/* Get a list of ALL gameobjects (including inactive and disabled objects)
-		 * To get active objects only query scene....
-		*/
-		static IEnumerable<GameObject^>^ GetAllGameObjects();
 
 		static GameObject^ Find(String^ name);
 

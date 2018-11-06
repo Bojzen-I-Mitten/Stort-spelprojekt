@@ -505,7 +505,7 @@ namespace ThomasEngine {
 		ThomasEngine::Resources::OnStop();
 		if (selectedGUID != Guid::Empty)
 		{
-			GameObject^ gObj = (GameObject^)ThomasEngine::Object::Find(selectedGUID);
+			GameObject^ gObj = ThomasEngine::ThomasWrapper::CurrentScene->Find(selectedGUID);
 			if (gObj)
 				s_Selection->SelectGameObject(gObj);
 		}

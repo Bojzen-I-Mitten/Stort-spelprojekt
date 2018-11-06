@@ -308,12 +308,11 @@ namespace ThomasEngine
 
 		GameObject ^ Resources::LoadPrefabResource(String^ path)
 		{
-			for each(GameObject^ gObj in ThomasEngine::Object::GetObjectsOfType<GameObject^>())
-			{
-				if (gObj->prefabPath == path && gObj->inScene)
-					return gObj;
-			}
-			GameObject^ prefab = CreatePrefab(path);
+			GameObject^ prefab;
+			if (s_PREFAB_DICT->TryGetValue(path, prefab))
+				return prefab;
+
+			prefab = CreatePrefab(path);
 			Monitor::Enter(s_PREFAB_DICT);
 			s_PREFAB_DICT[path] = prefab;
 			Monitor::Exit(s_PREFAB_DICT);

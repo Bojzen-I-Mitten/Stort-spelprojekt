@@ -56,7 +56,7 @@ namespace thomas
 				UINT type = it->GetGroupID();
 				if (m_objectsStatic.find(type) == m_objectsStatic.end())
 				{
-					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >((size_t)type, std::vector<object::GameObject>()));
+					m_objectsStatic.insert(std::pair<UINT, std::vector<object::GameObject> >(type, std::vector<object::GameObject>()));
 					m_objectsStatic[type].reserve(1000);
 				}
 
@@ -107,7 +107,7 @@ namespace thomas
 				// If new key, allocate memory to avoid loss of objects when reallocation happens
 				if (m_objectsStatic.find(new_GroupID) == m_objectsStatic.end())
 				{
-					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(new_GroupID, std::vector<object::GameObject>()));
+					m_objectsStatic.insert(std::pair<UINT, std::vector<object::GameObject> >(new_GroupID, std::vector<object::GameObject>()));
 					m_objectsStatic[new_GroupID].reserve(1000);
 				}
 

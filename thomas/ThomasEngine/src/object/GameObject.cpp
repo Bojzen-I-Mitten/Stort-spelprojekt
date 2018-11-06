@@ -401,7 +401,6 @@ namespace ThomasEngine {
 			return T();
 	}
 
-
 	Component^ GameObject::GetComponent(Type^ type) {
 		for (int i = 0; i < m_components.Count; i++) {
 			if (m_components[i]->GetType() == type)
@@ -416,6 +415,18 @@ namespace ThomasEngine {
 	{
 		List<T>^ list = gcnew List<T>(System::Linq::Enumerable::OfType<T>(%m_components));
 		return list;
+	}
+
+	generic<typename T>
+		where T : Component
+	T GameObject::GetComponent(void* nativePtr)
+	{
+		for each (Component^ c in m_components)
+		{
+			if (c->nativePtr == nativePtr)
+				return (T)c;
+		}
+		return T();	// nullptr
 	}
 
 	List<Component^>^ GameObject::GetComponents(Type^ type) {
@@ -435,18 +446,6 @@ namespace ThomasEngine {
 		return false;
 	}
 	
-	IEnumerable<GameObject^>^ GameObject::GetAllGameObjects() {
-		/* Read func. description
-		for (int i = 0; i < gObjs->Count; i++) {
-			if (!gObjs[i]->inScene && !gObjs[i]->IsPrefab()) {
-				gObjs->RemoveAt(i);
-				i--;				
-			}
-		}
-		*/
-		return ThomasEngine::Object::GetObjectsOfType<GameObject^>();;
-	}
-
 	GameObject^ GameObject::Find(String^ name)
 	{
 		return ThomasWrapper::CurrentScene->Find(name);

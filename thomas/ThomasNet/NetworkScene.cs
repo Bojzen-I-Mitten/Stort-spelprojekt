@@ -127,7 +127,7 @@ namespace ThomasEngine.Network
 
         public void InititateScene()
         {
-            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
+            ThomasWrapper.CurrentScene.getComponentsOfType<NetworkIdentity>().ForEach((identity) =>
             {
 
                 if (identity.IsPlayer)
@@ -164,7 +164,7 @@ namespace ThomasEngine.Network
 
         public void ActivateSceneObjects()
         {
-            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
+            ThomasWrapper.CurrentScene.getComponentsOfType<NetworkIdentity>().ForEach((identity) =>
             {
                 if (!identity.gameObject.GetActive())
                 {
