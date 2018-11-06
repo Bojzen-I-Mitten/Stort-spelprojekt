@@ -316,6 +316,7 @@ namespace ThomasEngine
 		where T : Component
 		inline List<T>^ Scene::getComponentsOfType()
 		{
+			Monitor::Enter(m_gameObjects);
 			List<T>^ list = gcnew List<T>();
 			for each(GameObject^ g in m_gameObjects)
 			{
@@ -324,10 +325,12 @@ namespace ThomasEngine
 					list->Add(c);
 				}
 			}
+			Monitor::Exit(m_gameObjects);
 			return list;
 		}
 		List<System::Object^>^ Scene::getComponentsOfType(System::Type^ type)
 		{
+			Monitor::Enter(m_gameObjects);
 			List<System::Object^>^ list = gcnew List<System::Object^>();
 			for each(GameObject^ g in m_gameObjects)
 			{
@@ -337,6 +340,7 @@ namespace ThomasEngine
 						list->Add(c);
 				}
 			}
+			Monitor::Exit(m_gameObjects);
 			return list;
 		}
 }
