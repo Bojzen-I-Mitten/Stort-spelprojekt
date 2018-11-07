@@ -14,6 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "../utils/AutoProfile.h"
 #include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
 
@@ -174,25 +175,50 @@ namespace thomas
 			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
 			//Process commands
-			BindFrame();
+			{
+				PROFILE("BindFrame")
+				BindFrame();
+			}
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				BindCamera(perCameraQueue.second.m_frameData);
 
+				PROFILE("PerCameraDraw")
+				{
+					PROFILE("CameraBind")
+					BindCamera(perCameraQueue.second.m_frameData);
+				}
 				// Skyboxes should be submitted!
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
-				if (camera && camera->hasSkybox())
-					camera->DrawSkyBox();
-				// Draw objects
-				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
-					auto material = perMaterialQueue.first;
-					material->Bind();
-					for (auto & perMeshCommand : perMaterialQueue.second)
+					PROFILE("CameraDrawSkybox")
+					if (camera && camera->hasSkybox())
+						camera->DrawSkyBox();
+				}
+				// Draw objects
+				{
+					PROFILE("CameraDrawObjects")
+					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 					{
-						BindObject(perMeshCommand);
-						material->Draw(perMeshCommand.mesh);
+						auto material = perMaterialQueue.first;
+						{
+							PROFILE("BindMaterial")
+							material->Bind();
+						}
+						{
+							PROFILE("CameraDrawObjects")
+							for (auto & perMeshCommand : perMaterialQueue.second)
+							{
+								{
+									PROFILE("BindObject")
+									BindObject(perMeshCommand);
+								}
+								{
+									PROFILE("DrawCall")
+									material->Draw(perMeshCommand.mesh);
+								}
+							}
+						}
 					}
 				}
 			}

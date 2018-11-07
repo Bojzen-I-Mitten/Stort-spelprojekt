@@ -108,6 +108,18 @@ namespace ThomasEngine {
 
 		}
 	}
+	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
+	{
+#ifdef BENCHMARK
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(true);
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+#endif
+
+	}
 
 	void ThomasWrapper::MainThreadUpdate()
 	{
@@ -115,6 +127,13 @@ namespace ThomasEngine {
 		if (!playing)
 			ScriptingManager::ReloadAssembly(false);
 #endif
+		constexpr uint32_t RAM_SAMPLE_FRAME = 1000;
+		static uint32_t WaitSampleFrame = 0;
+		if (WaitSampleFrame++ > RAM_SAMPLE_FRAME)
+		{
+			ThreadPool::QueueUserWorkItem(gcnew WaitCallback(SampleRam));
+			WaitSampleFrame = 0;
+		}
 	}
 
 
@@ -201,6 +220,7 @@ namespace ThomasEngine {
 	
 	void ThomasWrapper::CopyCommandList()
 	{
+		PROFILE("CopyCommandList")
 		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 
@@ -286,12 +306,16 @@ namespace ThomasEngine {
 				
 
 				//Logic
-				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 				{
-					GameObject^ gameObject = CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
+					PROFILE("LogicLoop")
+					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
-						gameObject->Update();
+
+						GameObject^ gameObject = CurrentScene->GameObjects[i];
+						if (gameObject->GetActive())
+						{
+							gameObject->Update();
+						}
 					}
 				}
 				editor::EditorCamera::Instance()->Update();
@@ -300,7 +324,11 @@ namespace ThomasEngine {
 				if (IsPlaying())
 				{
 					//Physics
-					thomas::Physics::UpdateRigidbodies();
+					{
+						PROFILE("UpdateRigidbodies")
+
+						thomas::Physics::UpdateRigidbodies();
+					}
 					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
 						GameObject^ gameObject = CurrentScene->GameObjects[i];
@@ -382,14 +410,7 @@ namespace ThomasEngine {
 
 		}
 
-#ifdef BENCHMARK
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		profiler->SetActive(true);
-		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
-#endif
 
 		renderThread->Join();	// Wait until thread is finished
 		Resources::UnloadAll();
