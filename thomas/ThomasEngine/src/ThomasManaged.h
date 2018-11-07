@@ -76,6 +76,7 @@ namespace ThomasEngine {
 			SceneManager^ get();
 		}
 		static void Start(bool editor);
+		static void SampleRam(System::Object ^ stateInfo);
 		static void Start();
 		static void MainThreadUpdate();
 		static void StartRenderer();

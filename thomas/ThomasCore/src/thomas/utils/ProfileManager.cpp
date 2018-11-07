@@ -6,7 +6,6 @@ namespace thomas
 {
 	namespace utils
 	{
-
 		namespace profiling
 		{
 			std::vector<long long> ProfileManager::s_fps;
@@ -25,7 +24,7 @@ namespace thomas
 				// Init to starting point, will produce a frametime of zero
 				static std::chrono::steady_clock::time_point tracktime = std::chrono::high_resolution_clock::now();
 
-				std::chrono::milliseconds frametime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - tracktime);
+				std::chrono::nanoseconds frametime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - tracktime);
 				
 				tracktime = std::chrono::high_resolution_clock::now();
 
@@ -53,8 +52,6 @@ namespace thomas
 
 				j["SlowfilerData"]["build"]["fps"] = s_fps;
 
-				j["SlowfilerData"]["timeline"];
-				j["SlowfilerData"]["timeline"]["processor"];
 
 				j["SlowfilerData"]["processor"];
 
@@ -78,11 +75,17 @@ namespace thomas
 					}
 				}
 
-				for (auto& it : s_samples)
-					j["SlowfilerData"]["timeline"]["processor"][it.first];
 
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
 				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
+				/*
+
+				j["SlowfilerData"]["timeline"];
+				j["SlowfilerData"]["timeline"]["processor"];
+
+
+				for (auto& it : s_samples)
+					j["SlowfilerData"]["timeline"]["processor"][it.first];
 
 				for (auto& id : s_samples)
 				{
@@ -97,7 +100,7 @@ namespace thomas
 						}
 					}
 				}
-
+				*/
 				std::ofstream o("data.json");
 				o << j << std::endl;
 				o.close();
