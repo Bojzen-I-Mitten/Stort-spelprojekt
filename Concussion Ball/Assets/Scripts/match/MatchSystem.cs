@@ -191,7 +191,7 @@ public class MatchSystem : NetworkManager
 
     #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID)
+    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID, int team1Score, int team2Score)
     {
         Debug.Log("matchInfo!");
         if (!MatchStarted)
@@ -200,6 +200,11 @@ public class MatchSystem : NetworkManager
             PowerupManager.NextPowerupID = powerupID;
             GoldenGoal = goldenGoal;
             MatchStartTime = startTime;
+
+            Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
+            Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
+
+
             Debug.Log(startTime);
         }
     }
@@ -231,6 +236,7 @@ public class MatchSystem : NetworkManager
 
     public void RPCOnGoal(int teamType)
     {
+        hasScored = true;
         TEAM_TYPE type = (TEAM_TYPE)teamType;
         Team team = FindTeam(type);
         team?.AddScore();
@@ -283,8 +289,6 @@ public class MatchSystem : NetworkManager
     {
         if (hasScored)
             return;
-        
-        hasScored = true;
         SendRPC(-2, "RPCOnGoal", (int)teamThatScored);
         RPCOnGoal((int)teamThatScored);
     }
@@ -312,7 +316,7 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log(MatchStarted);
             if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID);
+                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID, Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score);
         }
     }
 

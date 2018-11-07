@@ -447,6 +447,12 @@ public class ChadControls : NetworkComponent
             PickedUpObject = null;
         }
 
+        if(rBody)
+        {
+            rBody.SetPosition(transform.position, true);
+            rBody.SetRotation(transform.rotation, true);
+        }
+
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
     }

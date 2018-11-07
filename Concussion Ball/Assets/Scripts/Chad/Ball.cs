@@ -229,13 +229,14 @@ public class Ball : PickupableObject
             Drop();
             if (m_rigidBody != null)
             {
-                m_rigidBody.enabled = false;
-                m_rigidBody.Position = Vector3.Zero;
+                //m_rigidBody.enabled = false;
+                m_rigidBody.SetPosition(Vector3.Zero, true);
+                m_rigidBody.SetRotation(Quaternion.Identity, true);
                 m_rigidBody.LinearVelocity = Vector3.Zero;
                 m_rigidBody.AngularVelocity = Vector3.Zero;
                 transform.position = Vector3.Zero;
                 transform.rotation = Quaternion.Identity;
-                m_rigidBody.enabled = true;
+               // m_rigidBody.enabled = true;
             }
         }
 

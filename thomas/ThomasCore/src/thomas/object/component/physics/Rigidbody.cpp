@@ -249,23 +249,37 @@ namespace thomas
 				m_rollingFriction = friction;
 			}
 
-			void Rigidbody::SetPosition(math::Vector3 position)
+			void Rigidbody::SetPosition(math::Vector3 position, bool forcePosition)
 			{
 				btTransform trans;
 				getMotionState()->getWorldTransform(trans);
 				trans.setOrigin(Physics::ToBullet(position));
 				getMotionState()->setWorldTransform(trans);
-				//m_gameObject->m_transform->SetPosition(position);
+
+				if (forcePosition)
+				{
+					setWorldTransform(trans);
+					m_gameObject->m_transform->SetPosition(position);
+				}
+
+				
 			}
 
-			void Rigidbody::SetRotation(math::Quaternion rotation)
+			void Rigidbody::SetRotation(math::Quaternion rotation, bool forceRotation)
 			{
 				
 				btTransform trans;
 				getMotionState()->getWorldTransform(trans);
 				trans.setRotation(Physics::ToBullet(rotation));
 				getMotionState()->setWorldTransform(trans);
-				//m_gameObject->m_transform->SetRotation(rotation);
+
+				if (forceRotation)
+				{
+					setWorldTransform(trans);
+					m_gameObject->m_transform->SetRotation(rotation);
+				}
+
+				
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()

@@ -11,7 +11,7 @@ using System.ComponentModel;
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class Team
 {
-    public int Score { get; private set; }
+    public int Score { get; set; }
 
     public TEAM_TYPE TeamType;
     public Color Color { get; set; }
