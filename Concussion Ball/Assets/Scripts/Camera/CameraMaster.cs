@@ -25,9 +25,20 @@ public class CameraMaster : ScriptComponent
     }
     CAMSTATE State = CAMSTATE.JOIN_HOST;
 
-    public override void Start()
+
+    public override void Awake()
     {
         Camera = gameObject.GetComponent<Camera>();
+
+        Canvas = Camera.AddCanvas();
+    }
+
+    public override void Start()
+    {
+        
+        BG = Canvas.Add(Background);
+        BG.interactable = true;
+
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
         JoinHost = gameObject.GetComponent<GUIJoinHost>();
@@ -51,10 +62,7 @@ public class CameraMaster : ScriptComponent
             Debug.Log("Camera Master could not find Hud");
 
 
-        Canvas = Camera.AddCanvas();
-        BG = Canvas.Add(Background);
-        BG.interactable = true;
-        BG.depth = 1;
+
     }
 
     public override void Update()

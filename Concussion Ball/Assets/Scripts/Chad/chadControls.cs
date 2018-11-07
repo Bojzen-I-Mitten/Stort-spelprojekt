@@ -63,7 +63,7 @@ public class ChadControls : NetworkComponent
     #endregion
 
     [Browsable(false)]
-    public Rigidbody rBody { get;  private set; }
+    public Rigidbody rBody { get; private set; }
     Chadimations Animations;
     Ragdoll Ragdoll;
     ChadCam _camera;
@@ -97,10 +97,11 @@ public class ChadControls : NetworkComponent
         Camera.ResetCamera();
 
         ThrowForce = BaseThrowForce;
-
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
+        else
+            Debug.Log("No rbody");
         rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();

@@ -144,22 +144,24 @@ public class GUIJoinHost : ScriptComponent
         IPText = Canvas.Add(IPString);
         IPText.position = new Vector2(0.1f, 0.11f);
         IPText.color = Color.Black;
+        
 
         PortText = Canvas.Add(PortString);
         PortText.position = new Vector2(0.1f, 0.21f);
         PortText.color = Color.Black;
+        
 
         IP = Canvas.Add("IP, needed to join");
         IP.position = new Vector2(0.1f, 0.07f);
         IP.scale = new Vector2(0.7f);
         IP.color = Color.Black;
-
-        IP.scale = new Vector2(0.7f);
+        
+        
         Port = Canvas.Add("PORT, needed for both host and join");
-
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
         Port.color = Color.Black;
+        
 
         if (JoinBtn != null)
         {
@@ -167,6 +169,7 @@ public class GUIJoinHost : ScriptComponent
             Join.position = new Vector2(0.325f, 0.11f);
             Join.scale = new Vector2(0.25f);
             Join.interactable = true;
+            
         }
 
         if (HostBtn != null)
@@ -175,6 +178,7 @@ public class GUIJoinHost : ScriptComponent
             Host.position = new Vector2(0.325f, 0.21f);
             Host.scale = new Vector2(0.25f);
             Host.interactable = true;
+            
         }
 
         if (TextBox != null)
@@ -184,12 +188,14 @@ public class GUIJoinHost : ScriptComponent
             TextBoxIP.scale = new Vector2(0.7f, 0.5f);
             TextBoxIP.color = Color.Black;
             TextBoxIP.interactable = true;
+            
 
             TextBoxPort = Canvas.Add(TextBox);
             TextBoxPort.position = new Vector2(0.1f, 0.2f);
             TextBoxPort.scale = new Vector2(0.7f, 0.5f);
             TextBoxPort.color = Color.Black;
             TextBoxPort.interactable = true;
+           
         }
     }
 
