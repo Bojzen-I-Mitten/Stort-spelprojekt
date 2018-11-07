@@ -49,7 +49,7 @@ namespace ThomasEngine.Network
 
         public void InitPlayerPool(GameObject playerPrefab, int maxPlayers)
         {
-            for(int i=0; i < maxPlayers; i++)
+            for(int i=0; i < maxPlayers+1; i++)
             {
                 GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
                 player.activeSelf = false;
@@ -74,6 +74,11 @@ namespace ThomasEngine.Network
         {
             player.activeSelf = false;
             PlayerPool.Add(player);
+        }
+
+        public bool PoolNotEmpty()
+        {
+            return PlayerPool.Count > 0;
         }
 
         public void SpawnPlayer(NetPeer peer, bool myPlayer)

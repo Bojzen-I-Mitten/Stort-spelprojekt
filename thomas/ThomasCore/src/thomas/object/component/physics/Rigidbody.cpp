@@ -101,11 +101,10 @@ namespace thomas
 					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
 
 					trans.setRotation((btQuaternion&)rot);
-					getMotionState()->setWorldTransform(trans);
-
 					setCenterOfMassTransform(trans);
 					trans.setOrigin((btVector3&)pos);
 					getMotionState()->setWorldTransform(trans);
+
 
 					if (ImGuizmo::IsUsing()) {
 						this->setLinearVelocity(btVector3(0, 0, 0));
@@ -252,18 +251,21 @@ namespace thomas
 
 			void Rigidbody::SetPosition(math::Vector3 position)
 			{
-				btTransform trans = this->getWorldTransform();
+				btTransform trans;
+				getMotionState()->getWorldTransform(trans);
 				trans.setOrigin(Physics::ToBullet(position));
-				this->setWorldTransform(trans);
-				m_gameObject->m_transform->SetPosition(position);
+				getMotionState()->setWorldTransform(trans);
+				//m_gameObject->m_transform->SetPosition(position);
 			}
 
 			void Rigidbody::SetRotation(math::Quaternion rotation)
 			{
-				btTransform trans = this->getWorldTransform();
+				
+				btTransform trans;
+				getMotionState()->getWorldTransform(trans);
 				trans.setRotation(Physics::ToBullet(rotation));
-				this->setWorldTransform(trans);
-				m_gameObject->m_transform->SetRotation(rotation);
+				getMotionState()->setWorldTransform(trans);
+				//m_gameObject->m_transform->SetRotation(rotation);
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()
@@ -381,6 +383,20 @@ namespace thomas
 			float Rigidbody::GetFriction()
 			{
 				return m_friction;
+			}
+
+			math::Vector3 Rigidbody::GetPosition()
+			{
+				btTransform trans;
+				getMotionState()->getWorldTransform(trans);
+				return Physics::ToSimple(trans.getOrigin());
+			}
+
+			math::Quaternion Rigidbody::GetRotation()
+			{
+				btTransform trans;
+				getMotionState()->getWorldTransform(trans);
+				return Physics::ToSimple(trans.getRotation());
 			}
 
 

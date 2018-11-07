@@ -130,10 +130,10 @@ namespace ThomasEngine.Network
         {
             if (!isOwner && targetRigidbody && targetRigidbody.enabled)
             {
-                Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
-                targetRigidbody.LinearVelocity = newVelocity;
+                //Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
+                //targetRigidbody.LinearVelocity = newVelocity;
 
-                TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
+                //TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
             }
         }
 
@@ -220,10 +220,16 @@ namespace ThomasEngine.Network
 
         private void WriteRigidbody(NetDataWriter writer)
         {
-            WriteTransform(writer);
-
             if (targetRigidbody)
             {
+                if (!targetRigidbody.enabled)
+                    WriteTransform(writer);
+                else
+                {
+                    writer.Put(targetRigidbody.Position);
+                    writer.Put(targetRigidbody.Rotation);
+                    writer.Put(transform.scale);
+                }
                 writer.Put(targetRigidbody.LinearVelocity);
                 writer.Put(targetRigidbody.AngularVelocity);
 
