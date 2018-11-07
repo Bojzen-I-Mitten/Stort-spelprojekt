@@ -70,6 +70,7 @@ public class Ball : PickupableObject
         emitterSmoke.DistanceFromSphereCenter = 0;
         emitterSmoke.Radius = 0.7f;
 
+        emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 0.1f;
         emitterFire.MaxSize = 0.5f;
         emitterFire.EndSize = 0.0f;
@@ -189,16 +190,20 @@ public class Ball : PickupableObject
 
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
-        if (interp > 0.8f)
+        if (interp > 0.7f)
         {
             emitterFire.Emit = true;
+        }
+        if (interp > 0.9f)
+        {
+            emitterSmoke.Emit = true;
         }
         if (interp > electricityIntensifyerThreshold)
         {
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
-            electricityIntensifyerThreshold += 0.3f;
+            electricityIntensifyerThreshold += 0.2f;
         }
 
     }
