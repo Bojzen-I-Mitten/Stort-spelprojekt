@@ -3,7 +3,7 @@ using ThomasEngine.Network;
 using System.Collections;
 using System.Linq;
 
-public class Confetti : NetworkComponent
+public class Confetti : ScriptComponent
 {
     private ParticleEmitter emitterConfetti1;
     private ParticleEmitter emitterConfetti2;
