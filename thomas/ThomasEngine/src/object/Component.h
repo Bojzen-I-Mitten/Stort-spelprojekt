@@ -72,6 +72,7 @@ namespace ThomasEngine
 		[BrowsableAttribute(false)]
 		property bool enabled {
 			bool get();
+			void set(bool value){}
 		}
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
@@ -103,8 +104,10 @@ namespace ThomasEngine
 		{
 			String^ get() override;
 		};
-		[System::ComponentModel::DefaultValueAttribute(Comp::State::Uninitialized)]
+		/* Serialization property only (used to store deactivation)
+		*/
 		[BrowsableAttribute(false)]
+		[System::ComponentModel::DefaultValueAttribute(true)]
 		property bool Activated
 		{
 			bool get();

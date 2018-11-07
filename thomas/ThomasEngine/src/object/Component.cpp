@@ -153,7 +153,8 @@ namespace ThomasEngine
 	}
 	void Component::Activated::set(bool state)
 	{
-		m_state = Comp::State::Disabled;
+		if(!state)
+			m_state = Comp::State::Disabled;
 	}
 
 	List<Type^>^ Component::GetAllAddableComponentTypes()
