@@ -54,7 +54,7 @@ namespace ThomasEngine
 		internal:
 
 			virtual void OnParentDestroy(GameObject^ relative) override;
-			virtual void Awake() override;
+			virtual void OnAwake() override;
 			virtual void Update() override;
 
 		private:

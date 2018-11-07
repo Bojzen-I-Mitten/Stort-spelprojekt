@@ -136,13 +136,13 @@ namespace thomas
 
 			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
 			{
-				if(initialized)
+				if(m_enabled)
 					this->setLinearVelocity(Physics::ToBullet(linearVel));
 			}
 
 			void Rigidbody::SetAngularVelocity(const math::Vector3& angularVel)
 			{
-				if (initialized)
+				if (m_enabled)
 					this->setAngularVelocity(Physics::ToBullet(angularVel));
 			}
 
@@ -195,7 +195,7 @@ namespace thomas
 				if (kinematic != m_kinematic)
 				{
 					m_kinematic = kinematic;
-					if (initialized)
+					if (m_enabled)
 					{
 						bool removed = Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
@@ -213,6 +213,7 @@ namespace thomas
 
 			void Rigidbody::SetCollider(Collider * collider)
 			{
+				if (m_collider == collider) return;	// Can't apply same collider shape
 				EDITOR_LOCK();
 				m_collider = collider;
 				bool removed = Physics::RemoveRigidBody(this);
@@ -229,7 +230,7 @@ namespace thomas
 			void Rigidbody::SetMass(float mass)
 			{
 				m_mass = mass;
-				if (initialized)
+				if (m_enabled)
 				{
 					bool removed = Physics::RemoveRigidBody(this);
 					UpdateRigidbodyMass();

@@ -36,25 +36,38 @@ namespace ThomasEngine
 		UnLoad();
 	}
 
-
-	void Scene::InitGameObjects(bool playing) {
-		bool completed;
-		do {
-			completed = true;
-			for (int i = 0; i < m_gameObjects->Count; ++i) {
-				GameObject^ gameObject = m_gameObjects[i];
-				completed = gameObject->InitComponents(playing) && completed;
-			}
-		} while (!completed);
+	void startComponents(List<GameObject^>^ objects)
+	{
+		if (objects->Count == 0) return;
+		// Verify non-editor components are activated
+		for each (GameObject^ g in objects)
+			g->InitComponents(Comp::State::Enabled, true);
+		// Start components
+		for each (GameObject^ g in objects)
+			g->StartComponents();
 	}
-	
+
+	/* Initial initiate loop over a set of game objects
+	*/
+	void initiateGameObjects(List<GameObject^>^ objects)
+	{
+		// INn
+		for each (GameObject^ g in objects)
+			g->InitComponents(Comp::State::Awake, false);
+#ifdef _EDITOR
+		// Verify non-editor components are activated
+		for each (GameObject^ g in objects)
+			g->InitComponents(Comp::State::Enabled, false);
+#endif
+	}
+
 	bool Scene::OnPlay()
 	{
 		ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
 		try
 		{
-			// Initiate 
-			InitGameObjects(true);
+			// Start game objects
+			startComponents(m_gameObjects);
 		}
 		catch (Exception^ e)
 		{
@@ -165,6 +178,8 @@ namespace ThomasEngine
 		{
 			gObj->PostLoad(this);
 		}
+
+		initiateGameObjects(m_gameObjects);
 	}
 
 
@@ -220,6 +235,10 @@ namespace ThomasEngine
 		auto swp = m_commandList;
 		m_commandList = m_commandSwapList;
 		m_commandSwapList = swp;
+		// Initiate related components
+		initiateGameObjects(addedList);
+		if(ThomasWrapper::IsPlaying())
+			startComponents(addedList);
 
 #ifdef _EDITOR
 		if(numChanged)	// Trigger event 

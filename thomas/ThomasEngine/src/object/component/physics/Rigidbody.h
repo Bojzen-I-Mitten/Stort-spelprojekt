@@ -28,7 +28,7 @@ namespace ThomasEngine
 
 	public:
 		Rigidbody() : Component(new thomas::object::component::Rigidbody()) {}
-		void Awake() override;
+		void OnAwake() override;
 		void OnDestroy() override;
 
 		void AddTorque(Vector3 torque)

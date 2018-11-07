@@ -18,7 +18,8 @@ namespace ThomasEngine {
 	ref class GameObject;
 	ref class Component;
 
-
+	/* Scene in the system. Responsible for containing active objects (and by inheritance their components)
+	*/
 	[DataContract]
 	public ref class Scene
 	{
@@ -61,7 +62,9 @@ namespace ThomasEngine {
 		event SceneObjectsChangedEventHandler^ m_changeEvent;
 #endif
 
+	private:
 		Scene(uint32_t unique_id);
+
 
 	public:
 		static Scene^ LoadScene(System::String^ fullPath, uint32_t unique_id);
@@ -76,8 +79,6 @@ namespace ThomasEngine {
 
 		void CreateObject(GameObject^ object);
 		void DestroyObject(GameObject^ object);
-
-		void InitGameObjects(bool playing);
 
 		/* Find gameobject by name
 		*/

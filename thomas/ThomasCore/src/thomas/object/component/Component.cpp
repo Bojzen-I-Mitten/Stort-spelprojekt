@@ -9,7 +9,7 @@ namespace thomas
 		namespace component
 		{
 			Component::Component() :
-				m_lock()
+				m_enabled(false), m_lock()
 #ifdef _EDITOR
 				, m_editorLock()
 #endif
@@ -27,6 +27,10 @@ namespace thomas
 						m_gameObject->m_components.erase(m_gameObject->m_components.begin() + i);
 					}
 				}
+			}
+			void Component::setEnabledState(bool state)
+			{
+				m_enabled = state;
 			}
 		}
 	}

@@ -6,7 +6,7 @@
 #include "Rigidbody.h"
 #include "Collider.h"
 #include "../../GameObject.h"
-void ThomasEngine::Rigidbody::Awake()
+void ThomasEngine::Rigidbody::OnAwake()
 {
 	Collider^ collider = gameObject->GetComponent<Collider^>();
 	if (collider)

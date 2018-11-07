@@ -2,6 +2,7 @@
 
 #include "../attributes/CustomAttributes.h"
 #include "Object.h"
+#include "ComponentState.h"
 
 namespace thomas { namespace object { namespace component { class Component; } } }
 
@@ -15,28 +16,26 @@ namespace ThomasEngine
 	public ref class Component : public Object
 	{
 		Component();
-	private:
-		bool m_enabled = true;
-		[NonSerializedAttribute]
-		bool m_started = false;
 	internal:
 		[NonSerializedAttribute]
-		bool m_firstEnable = false;
+		Comp::State m_state;
+		//bool m_firstEnable = false;
 
 		[NonSerializedAttribute]
 		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();
 		void UpdateCoroutines();
-		
+
 		Component(thomas::object::component::Component* ptr);
 		virtual ~Component();
 
-		
+
 		void setGameObject(GameObject^ gObj);
 		virtual void OnGameObjectSet() {};
-		virtual void Awake();
-		virtual void Start();
+		virtual void OnAwake();
+		//virtual void Start();
 		virtual void OnEnable();
 		virtual void OnDisable();
+		virtual void Start();
 		virtual void Update();
 		virtual void FixedUpdate();
 		virtual void OnDrawGizmosSelected();
@@ -54,20 +53,16 @@ namespace ThomasEngine
 		GameObject^ m_gameObject;
 
 		virtual void Destroy() override;
-		property bool initialized
-		{
-			bool get();
-			void set(bool value);
-		}
 
-		void Initialize();
-		[NonSerializedAttribute]
-		bool awakened = false;
+
 
 	private:
-		/* Set enabled state. */
+	internal:
+		/* Call to 'construct' the object */
+		void Awake();
+		/* Enabled the component. */
 		void Enable();
-		/* Set disabled state. */
+		/* Disable the component. */
 		void Disable();
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
@@ -77,7 +72,6 @@ namespace ThomasEngine
 		[BrowsableAttribute(false)]
 		property bool enabled {
 			bool get();
-			void set(bool value);
 		}
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
@@ -101,7 +95,7 @@ namespace ThomasEngine
 		property Transform^ transform
 		{
 			Transform^ get();
-			
+
 		}
 
 		[BrowsableAttribute(false)]
@@ -109,6 +103,13 @@ namespace ThomasEngine
 		{
 			String^ get() override;
 		};
+		[System::ComponentModel::DefaultValueAttribute(Comp::State::Uninitialized)]
+		[BrowsableAttribute(false)]
+		property bool Activated
+		{
+			bool get();
+			void set(bool state);
+		}
 
 		void StartCoroutine(System::Collections::IEnumerator^ routine);
 		void StopCoroutine(System::Collections::IEnumerator^ routine);

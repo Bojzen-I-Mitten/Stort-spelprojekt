@@ -2,6 +2,7 @@
 #pragma unmanaged 
 
 #include <thomas/object/GameObject.h>
+#include "ComponentState.h"
 #pragma managed
 #include "../attributes/CustomAttributes.h"
 #include "Object.h"
@@ -30,8 +31,14 @@ namespace ThomasEngine
 		System::Object^ m_componentsLock = gcnew System::Object();
 
 	internal:
-
-		bool InitComponents(bool playing);
+		/* Init the components within the object to the specified state
+		s		<<	State components should be initiated to
+		playing	<<	If components are 'running'
+		*/
+		void InitComponents(Comp::State s, bool playing);
+		/* Call Start on all components (even unactivated)
+		*/
+		void StartComponents();
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 

@@ -13,11 +13,12 @@ using namespace System::Threading;
 namespace ThomasEngine 
 {
 	Component::Component() : 
-		Object(new thomas::object::component::Component())
+		Component(new thomas::object::component::Component())
 	{
 
 	}
-	Component::Component(thomas::object::component::Component * ptr) : Object(ptr)
+	Component::Component(thomas::object::component::Component * ptr) 
+		: Object(ptr), m_state(Comp::State::Uninitialized)
 	{
 	}
 	Component::~Component()
@@ -41,69 +42,42 @@ namespace ThomasEngine
 
 
 
-	void Component::Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
-	void Component::Start() {}
-	void Component::OnEnable() { ((thomas::object::component::Component*)nativePtr)->OnEnable(); }
-	void Component::OnDisable() { ((thomas::object::component::Component*)nativePtr)->OnDisable(); };
+	void Component::OnAwake() {	}
+	//void Component::Start() {}
+	void Component::OnEnable() { 	}
+	void Component::OnDisable() {	}
+	void Component::Start() { }
 	void Component::Update() { ((thomas::object::component::Component*)nativePtr)->Update(); }
 	void Component::FixedUpdate() { ((thomas::object::component::Component*)nativePtr)->FixedUpdate(); }
 	void Component::OnDrawGizmosSelected() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmosSelected(); }
 	void Component::OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 	void Component::OnDestroy() {/* ((thomas::object::component::Component*)nativePtr)->OnDestroy(); */}
-	bool Component::initialized::get() { return ((thomas::object::component::Component*)nativePtr)->initialized; }
-	void Component::initialized::set(bool value) { ((thomas::object::component::Component*)nativePtr)->initialized = value; }
 
-	void Component::Initialize() {
-		if (!awakened)
-		{
-			Awake();
-			awakened = true;
-			return;
-		}
-		else if (!enabled) {	
-			initialized = true;
-			return;
-		}
-		else if (!m_firstEnable && enabled)
-		{
-			m_firstEnable = true;
-			OnEnable();
-			return;
-		}
-		else if(!m_started) {
-			m_started = true;
-			Start();
-			initialized = true;
-			return;
-		}
-		initialized = true;
+
+	bool Component::enabled::get() { return m_state == Comp::State::Enabled; }
+
+	void Component::Awake()
+	{
+		m_state = Comp::State::Awake;
+		OnAwake();
+		((thomas::object::component::Component*)nativePtr)->OnAwake();
 	}
-
-	bool Component::enabled::get() { return m_enabled; }
-	void Component::enabled::set(bool value) {
-		if (m_enabled != value) {
-			m_enabled = value;
-			if (m_firstEnable && m_gameObject->GetActive()) {
-				if (value == true) {
-					Enable();
-					initialized = false;
-				}
-				else
-					Disable();
-			}else
-				initialized = false;
-		}
+	void Component::Enable()
+	{
+		// Enable engine component, then change Core state
+		m_state = Comp::State::Enabled;
+		OnEnable();
+		((thomas::object::component::Component*)nativePtr)->OnEnable();
+		((thomas::object::component::Component*)nativePtr)->setEnabledState(true);
 	}
 
 	void Component::Disable()
 	{
-		m_enabled = false;
+		// Disable engine component, then change Core state
+		m_state = Comp::State::Disabled;
 		OnDisable();
-	}
-	void Component::Enable()
-	{
-		m_enabled = true;
-		OnEnable();
+		((thomas::object::component::Component*)nativePtr)->OnDisable();
+		((thomas::object::component::Component*)nativePtr)->setEnabledState(false);
 	}
 
 	void Component::LoadExternalComponents()
@@ -172,6 +146,14 @@ namespace ThomasEngine
 
 	String^ Component::Name::get() {
 		return gameObject->Name + " (" + this->GetType()->Name + ")";
+	}
+	bool Component::Activated::get()
+	{
+		return m_state != Comp::State::Disabled;
+	}
+	void Component::Activated::set(bool state)
+	{
+		m_state = Comp::State::Disabled;
 	}
 
 	List<Type^>^ Component::GetAllAddableComponentTypes()

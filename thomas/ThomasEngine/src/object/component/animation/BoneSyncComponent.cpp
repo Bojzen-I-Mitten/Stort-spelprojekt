@@ -76,7 +76,7 @@ namespace ThomasEngine
 			}
 		}
 
-		void BoneSyncComponent::Awake()
+		void BoneSyncComponent::OnAwake()
 		{
 			refreshBoneIndex();
 		}

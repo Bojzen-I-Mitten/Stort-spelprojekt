@@ -83,7 +83,7 @@ namespace thomas
 					m_onCollisionEvent(otherCollider, collisionType);
 			}
 
-			void Collider::Awake()
+			void Collider::OnAwake()
 			{
 			}
 

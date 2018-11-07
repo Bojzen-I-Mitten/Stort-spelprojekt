@@ -47,35 +47,48 @@ namespace ThomasEngine {
 			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
-	bool GameObject::InitComponents(bool playing)
+	void GameObject::InitComponents(Comp::State s, bool playing)
 	{
 		Monitor::Enter(m_componentsLock);
-		bool completed = true;
-		for(int i=0; i < m_components.Count; i++)
+		for each (Component^ c in m_components)
 		{
-			Component^ component = m_components[i];
-			Type^ typ = component->GetType();
-			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
-
-			if (!GetActive())
+			switch (s)
 			{
-				if (!component->awakened) {
-					completed = false;
-					component->Initialize();
+			case Comp::State::Uninitialized:
+				assert(false); // Don't
+				break;
+			case Comp::State::Awake:
+				assert(c->m_state == Comp::State::Uninitialized);
+				c->Awake();
+				break;
+			case Comp::State::Enabled:
+			{
+				bool doInit = c->m_state != Comp::State::Disabled;	// Enable components if they are not disabled
+#ifdef _EDITOR														// If editor state: don't enable all components
+				doInit = doInit && (playing || c->GetType()->IsDefined(ExecuteInEditor::typeid, false));
+#endif
+				if (doInit)
+				{
+					assert(c->m_state == Comp::State::Awake);
+					c->Enable();
 				}
 			}
-			else
-			{
-				if ((playing || executeInEditor) && !component->initialized) {
-					completed = false;
-					component->Initialize();
-				}
+				break;
+			case Comp::State::Disabled:
+			case Comp::State::EndState:
+			default:
+				break;
 			}
-
-
 		}
 		Monitor::Exit(m_componentsLock);
-		return completed;
+	}
+
+	void GameObject::StartComponents()
+	{
+		for each (Component^ c in m_components)
+		{
+			c->Start();
+		}
 	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
@@ -123,7 +136,8 @@ namespace ThomasEngine {
 		{
 			// Disable
 			comp->OnParentDestroy(this);
-			comp->OnDisable();
+			if (comp->m_state == Comp::Enabled)
+				comp->OnDisable();
 		}
 	}
 	bool GameObject::RemoveComponent(Component ^ comp)
@@ -138,12 +152,9 @@ namespace ThomasEngine {
 			Type^ typ = comp->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
 
-			if (executeInEditor || comp->awakened)
-			{
+			if (comp->m_state == Comp::Enabled)
 				comp->OnDisable();
-				comp->OnDestroy();
-			}
-			comp->OnDisable();
+			//if(comp->m_state != component::Uninitialized) // Always true.
 			comp->OnDestroy();
 			delete comp;	// Begone you foul Clr!!!!
 			success = true;
@@ -220,7 +231,7 @@ namespace ThomasEngine {
 			for (int i = 0; i < m_components.Count; i++)
 			{
 				Component^ component = m_components[i];
-				if (component->initialized && component->enabled) {
+				if (component->enabled) {
 					component->Update();
 					component->UpdateCoroutines();
 				}
@@ -241,7 +252,7 @@ namespace ThomasEngine {
 			for (int i = 0; i < m_components.Count; i++)
 			{
 				Component^ component = m_components[i];
-				if (component->initialized && component->enabled)
+				if (component->enabled)
 					component->FixedUpdate();
 			}
 		}
@@ -507,7 +518,7 @@ namespace ThomasEngine {
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			Component^ component = m_components[i];
-			if (component->m_firstEnable && component->enabled) {
+			if (component->enabled) {
 				if (value)
 					component->OnEnable();
 				else

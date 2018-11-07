@@ -290,10 +290,7 @@ namespace ThomasEngine {
 #ifdef _THOMAS_SCENE_LOCK
 				Monitor::Enter(Thomas->m_sceneLock);
 #endif _THOMAS_SCENE_LOCK
-
-				CurrentScene->InitGameObjects(IsPlaying());
-
-				
+							   	
 
 				//Logic
 				for each (GameObject^ gameObject in CurrentScene->GameObjects)

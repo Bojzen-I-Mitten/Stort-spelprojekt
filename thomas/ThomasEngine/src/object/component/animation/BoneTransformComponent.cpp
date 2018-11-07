@@ -63,7 +63,7 @@ namespace ThomasEngine
 			}
 		}
 
-		void BoneTransformComponent::Awake()
+		void BoneTransformComponent::OnAwake()
 		{
 			if (m_skeletonSrc) {
 				thomas::object::component::RenderSkinnedComponent* comp = m_skeletonSrc->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();

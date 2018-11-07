@@ -141,6 +141,7 @@
     <ClInclude Include="src\system\command\CommandQueue.h" />
     <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
+    <ClInclude Include="src\object\ComponentState.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

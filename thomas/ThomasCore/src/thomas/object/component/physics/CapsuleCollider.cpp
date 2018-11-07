@@ -13,7 +13,7 @@ namespace thomas
 				m_height = 1.0f;
 			}
 
-			void CapsuleCollider::Awake()
+			void CapsuleCollider::OnAwake()
 			{
 				if (m_rotation == ColliderRotation::RotateX)
 					m_collisionShape = new btCapsuleShapeX(1.f, 1.f);
