@@ -142,16 +142,16 @@ namespace ThomasEngine
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property Vector3 Position
 		{
+			Vector3 get() {return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetPosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(value)); }
-			Vector3 get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetPosition()); }
 		}
 
 		[BrowsableAttribute(false)]
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property Quaternion Rotation
 		{
-			void set(Quaternion value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(value)); }
 			Quaternion get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetRotation()); }
+			void set(Quaternion value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(value)); }
 		}
 
 		property float Damping

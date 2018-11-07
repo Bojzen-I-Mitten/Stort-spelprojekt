@@ -92,10 +92,8 @@ namespace thomas
 				math::Vector3 GetCenterOfmass();
 				float GetBounciness();
 				float GetFriction();
-
 				math::Vector3 GetPosition();
 				math::Quaternion GetRotation();
-
 			private:
 				void UpdateRigidbodyMass();
 				void UpdateProperties();
