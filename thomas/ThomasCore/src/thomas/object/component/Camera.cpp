@@ -311,7 +311,7 @@ namespace thomas
 			{
 				//CopyFrameData();
 				return m_frameData;
-			}
+			//}
 
 			uint32_t Camera::ID()
 			{
