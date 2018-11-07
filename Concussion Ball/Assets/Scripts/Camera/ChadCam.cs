@@ -10,10 +10,7 @@ public class ChadCam : ScriptComponent
     {
         get
         {
-            if (MatchSystem.instance.MatchStarted)
-                return MatchSystem.instance.LocalChad;
-            else
-                return null;
+            return MatchSystem.instance?.LocalChad;
         }
     }
 
@@ -41,7 +38,7 @@ public class ChadCam : ScriptComponent
     public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
     private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
-    private float velocity { get { return Chad.rBody.LinearVelocity.Length(); } }
+    private float velocity { get { if (Chad?.rBody) return Chad.rBody.LinearVelocity.z; else return 0; } }
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
     private float yStep { get { return Input.GetMouseY() * Time.ActualDeltaTime; } }
 
@@ -75,17 +72,14 @@ public class ChadCam : ScriptComponent
                 case ChadControls.STATE.RAGDOLL:
                     break;
             }
-            Camera.fieldOfView = MinFov + Chad.rBody.LinearVelocity.z;
-            Camera.fieldOfView = Math.Min(Camera.fieldOfView, MaxFov);
+            //Camera.fieldOfView = MinFov + velocity;
+            //Camera.fieldOfView = Math.Min(Camera.fieldOfView, MaxFov);
         }
     }
 
     public void FondleCamera()
     {
         float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-        if (velocity != 0)
-            yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
-
         Chad.transform.RotateByAxis(Vector3.Up, yaw);
 
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
@@ -113,8 +107,6 @@ public class ChadCam : ScriptComponent
     public void ThrowingCamera()
     {
         float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-        if (velocity != 0)
-            yaw = ClampCameraRadians(yaw, -1 / velocity, 1 / velocity);
 
         Chad.transform.RotateByAxis(Vector3.Up, yaw);
 
@@ -135,7 +127,8 @@ public class ChadCam : ScriptComponent
 
     public void ResetCamera()
     {
-        transform.position = CameraOffset * -Chad.transform.forward;
+        if(Chad)
+            transform.position = CameraOffset * -Chad.transform.forward;
         transform.LookAt(ChadHead);
 
         transform.localEulerAngles = new Vector3(0, 0, 0);

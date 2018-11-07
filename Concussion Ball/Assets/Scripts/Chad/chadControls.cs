@@ -87,21 +87,14 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        
-
         State = STATE.CHADING;
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
-
-        Camera.ResetCamera();
-
         ThrowForce = BaseThrowForce;
         rBody = gameObject.GetComponent<Rigidbody>();
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
-        else
-            Debug.Log("No rbody");
         rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
@@ -329,13 +322,11 @@ public class ChadControls : NetworkComponent
                     {
                         State = STATE.CHADING;
                         ResetThrow();
-                        Camera.ResetCamera();
                     }
                 }
                 else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
                 {
                     ResetThrow();
-                    Camera.ResetCamera();
                 }
             }
             else if (PickedUpObject) // player is holding object that is not throwable
@@ -363,7 +354,6 @@ public class ChadControls : NetworkComponent
 
             if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
             {
-                Camera.ResetCamera();
             }
         }
     }
@@ -448,7 +438,6 @@ public class ChadControls : NetworkComponent
         DivingTimer = 5;
         StopCoroutine(Ragdolling);
         CurrentVelocity = Vector2.Zero;
-        Camera.ResetCamera();
         if (PickedUpObject)
         {
             PickedUpObject.Drop();
@@ -490,7 +479,6 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(1);
         DisableRagdoll();
         State = STATE.CHADING;
-        Camera.ResetCamera();
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -528,7 +516,6 @@ public class ChadControls : NetworkComponent
         if (State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
-            Camera.ResetCamera();
             Animations.SetAnimationWeight(ThrowAnimIndex, 0);
             SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
         }
