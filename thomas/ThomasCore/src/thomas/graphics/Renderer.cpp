@@ -126,16 +126,18 @@ namespace thomas
 
 		void Renderer::TransferCommandList()
 		{
-			// Swap frames and clear old frame data
-			std::swap(m_frame, m_prevFrame);
-			m_frame->clear();
 
 			// Sync. update
 			m_shaders.SyncList();
 			m_cameras.syncUpdate();
-			// Copy view matrix for next frame
+			// Submit camera frame data...
 			for (object::component::Camera* camera : m_cameras.getCameras())
 				camera->CopyFrameData();
+			editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+
+			// Swap frames and clear old frame data
+			std::swap(m_frame, m_prevFrame);
+			m_frame->clear();
 		}
 
 		const render::ShaderList & Renderer::getShaderList()
