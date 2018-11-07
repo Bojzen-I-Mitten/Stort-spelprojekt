@@ -8,15 +8,23 @@ using System.Collections;
 public class NetworkPlayer : NetworkComponent
 {
     private String _Name;
+    [Newtonsoft.Json.JsonIgnore]
     public Team Team {get; private set;}
     public float BottomOfTheWorld { get; set; } = -5;
     Material mat;
+
+
+    public override void Awake()
+    {
+        Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
+    }
+
     public override void Start()
     {
-        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
+        if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
-        mat?.SetColor("color", Team.Color);
+        
 
     }
 

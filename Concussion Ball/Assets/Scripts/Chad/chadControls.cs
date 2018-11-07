@@ -82,7 +82,7 @@ public class ChadControls : NetworkComponent
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
-    IEnumerator Diving = null;
+    //IEnumerator Diving = null;
 
     public PickupableObject PickedUpObject;
 
@@ -177,11 +177,11 @@ public class ChadControls : NetworkComponent
             StopCoroutine(Throwing);
             Throwing = null;
         }
-        if(Diving != null)
-        {
-            StopCoroutine(Diving);
-            Diving = null;
-        }
+        //if(Diving != null)
+        //{
+        //    StopCoroutine(Diving);
+        //    Diving = null;
+        //}
             
         ResetThrow();
 
@@ -292,8 +292,8 @@ public class ChadControls : NetworkComponent
         {
             State = STATE.DIVING;
             CurrentVelocity.y = DiveSpeed;
-            Diving = DivingCoroutine();
-            StartCoroutine(Diving);
+            //Diving = DivingCoroutine();
+            //StartCoroutine(Diving);
             DivingTimer = 0.0f;
             DivingDirection = this.gameObject.transform.rotation;
         }
@@ -451,11 +451,11 @@ public class ChadControls : NetworkComponent
     public void Reset()
     {
         State = STATE.CHADING;
-        if( Diving != null)
-        {
-            StopCoroutine(Diving);
-            Diving = null;
-        }
+        //if( Diving != null)
+        //{
+        //    StopCoroutine(Diving);
+        //    Diving = null;
+        //}
         DivingTimer = 5;
         if(Ragdolling != null)
         {
