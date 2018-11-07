@@ -49,10 +49,14 @@ namespace ThomasStandalone
             }
             //System.Console.ForegroundColor = System.ConsoleColor.Black;
             System.Console.Out.WriteLine(newMessage.Message);
-            foreach(string line in newMessage.StackTrace)
+            if(newMessage.Severity == MessageSeverity.Error)
             {
-               // System.Console.Out.WriteLine(line);
+                foreach (string line in newMessage.StackTrace)
+                {
+                    System.Console.Out.WriteLine(line);
+                }
             }
+
             
             System.Console.ResetColor();
         }
