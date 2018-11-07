@@ -211,21 +211,6 @@ namespace ThomasEngine {
 		return moved;
 	}
 
-	GameObject ^ GameObject::FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr)
-	{
-		if (nativeptr != nullptr)
-		{
-
-			for each (Object^ object in s_objects)
-			{
-				
-				if (object->nativePtr == nativeptr)
-					return static_cast<GameObject^>(object);
-			}
-		}
-
-		return nullptr;
-	}
 
 	void GameObject::Update()
 	{

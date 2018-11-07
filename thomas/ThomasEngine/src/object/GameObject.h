@@ -35,7 +35,6 @@ namespace ThomasEngine
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 
-		static GameObject^ FindGameObjectFromNativePtr(thomas::object::GameObject* nativeptr);
 		bool RemoveComponent(Component^ comp);
 		virtual void Destroy() override;
 

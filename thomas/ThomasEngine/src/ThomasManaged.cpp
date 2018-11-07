@@ -174,7 +174,7 @@ namespace ThomasEngine {
 				thomas::object::Object* old_native = gameObject->moveStaticGroup();
 
 				// Find the wrapped gameobject of the object that might be moved
-				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
 				if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
 					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
@@ -186,7 +186,7 @@ namespace ThomasEngine {
 
 				thomas::object::Object* old_native = gameObject->setStatic();
 
-				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
 				if (temp) // If temp is nullptr, no managed object has been invalidated.
 					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
@@ -199,7 +199,7 @@ namespace ThomasEngine {
 
 				thomas::object::Object* old_native = gameObject->setDynamic();
 
-				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
 				if (temp) // If temp is nullptr, no managed object has been invalidated.
 					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
