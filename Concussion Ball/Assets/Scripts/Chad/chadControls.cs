@@ -23,9 +23,9 @@ public class ChadControls : NetworkComponent
 
     #region Throwing stuff
     [Category("Throwing")]
-    public float BaseThrowForce { get; set; } = 5.0f;
+    public float BaseThrowForce { get; set; } = 10.0f;
     [Category("Throwing")]
-    public float MaxThrowForce { get; set; } = 20.0f;
+    public float MaxThrowForce { get; set; } = 30.0f;
     [Category("Throwing")]
     public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
@@ -53,9 +53,8 @@ public class ChadControls : NetworkComponent
 
     public Vector2 CurrentVelocity = new Vector2(0, 0); //Right and forward
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
-    private float BaseSpeed = 3.0f;
-    private float MaxSpeed = 10.0f;
-    private float DiveSpeed = 12.0f;
+    private float BaseSpeed = 5.0f;
+    private float MaxSpeed = 12.0f;
 
     public float DiveTimer { get; private set; } = 0f;
     public Quaternion DivingDirection = Quaternion.Identity;
@@ -293,7 +292,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.Space) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
-            CurrentVelocity.y = DiveSpeed;
+            CurrentVelocity.y += 2.0f;
             Diving = DivingCoroutine();
             StartCoroutine(Diving);
             DivingTimer = 0.0f;
@@ -436,7 +435,6 @@ public class ChadControls : NetworkComponent
             case STATE.DIVING:
                 Direction = Vector3.Zero;
                 CurrentVelocity.x = 0;
-                CurrentVelocity.y = DiveSpeed;
                 break;
             case STATE.RAGDOLL:
                 //Camera.transform.rotation = Quaternion.Identity;
@@ -534,31 +532,17 @@ public class ChadControls : NetworkComponent
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
-        Vector3 chosenDirection = Camera.transform.forward * ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
+        Vector3 chosenDirection = Camera.transform.forward;
+        chosenDirection.y *= 1.2f;
+        chosenDirection *= ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
         Vector3 ballCamPos = Camera.transform.position;
-
-        //if (Camera)
-        //    //Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
-
-        yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
-
-        //if (State == STATE.RAGDOLL)
-        //{
-        //    // HasThrown = false;
-        //    Debug.Log("Was trying to throw, but got tackled, yielded first yield, stopping coroutine");
-        //    StopCoroutine(Throwing);
-        //    Throwing = null;
-        //}
+        
+        //yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
 
         ThrowObject(ballCamPos, chosenDirection);
         HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
-        //if (State == STATE.RAGDOLL)
-        //{
-        //    Debug.Log("Was trying to throw, but got tackled, yielded second yield, stopping coroutine");
-        //    StopCoroutine(PlayThrowAnim());
-        //}
 
         ResetThrow();
         if (State != STATE.RAGDOLL)
