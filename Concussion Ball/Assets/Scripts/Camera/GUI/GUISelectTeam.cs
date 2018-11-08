@@ -34,7 +34,7 @@ public class GUISelectTeam : ScriptComponent
 
     public override void Update()
     {
-        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             if (Team1Image.Clicked())
             {
