@@ -81,12 +81,24 @@ public class CameraMaster : ScriptComponent
     {
         if (Input.GetKeyDown(Input.Keys.Escape))
         {
+            Debug.Log("Escape!!!!!");
             if (State == CAMSTATE.EXIT_MENU)
+            {
                 State = PreviousState;
+                if (PreviousState == CAMSTATE.CHAD)
+                {
+                    ChadCam.enabled = true;
+                    if (Canvas.isRendering)
+                        Canvas.isRendering = false;
+                }
+            }
             else
             {
                 PreviousState = State;
                 State = CAMSTATE.EXIT_MENU;
+                if (!Canvas.isRendering)
+                    Canvas.isRendering = true;
+                ChadCam.enabled = false;
             }
         }
 

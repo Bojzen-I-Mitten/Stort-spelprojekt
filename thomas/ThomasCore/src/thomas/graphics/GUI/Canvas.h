@@ -41,6 +41,7 @@ namespace thomas
 				GUIElement* Add(Texture2D* texture);
 				void Remove(GUIElement* element);
 				void SetRendering(bool render);
+				bool GetRendering();
 
 			private:
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;
