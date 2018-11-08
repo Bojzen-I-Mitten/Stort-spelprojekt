@@ -17,23 +17,16 @@ namespace thomas
 
 	void SoundManager::Update()
 	{
-		//Check if a channel has stopped playing and destroy it
-		std::vector<Channels::const_iterator> stoppedChannels;
-
-		for (auto it = m_channels.begin(), itEnd = m_channels.end(); it != itEnd; ++it)
+		// Check if a channel has stopped playing and invalidate it
+		for (auto& sound : m_sounds)
 		{
 			bool playing = false;
-			it->second->isPlaying(&playing);
+			sound.second.channel->isPlaying(&playing);
 
 			if (!playing)
 			{
-				stoppedChannels.push_back(it);
+				sound.second.channel = nullptr;
 			}
-		}
-
-		for (const auto& it : stoppedChannels)
-		{
-			m_channels.erase(it);
 		}
 
 		ErrorCheck(m_system->update());
@@ -44,35 +37,23 @@ namespace thomas
 	{
 		// Release sounds
 		for (const auto& sound : m_sounds)
-			sound.second->release();
+			sound.second.sound->release();
 
 		ErrorCheck(m_studioSystem->unloadAll());
 		ErrorCheck(m_studioSystem->release());
 	}
 
-	void SoundManager::Play(const std::string& id, float volumedB)
+	void SoundManager::Play(const std::string& id)
 	{
-		// Need to keep track of this better...
-		int nChannelId = m_nextChannelId++;
-		auto tFoundIt = m_sounds.find(id);
+		auto found = m_sounds.find(id);
 
-		FMOD::Channel* pChannel = nullptr;
+		ErrorCheck(m_system->playSound(found->second.sound, nullptr, true, &found->second.channel));
 
-		ErrorCheck(m_system->playSound(tFoundIt->second, nullptr, true, &pChannel));
-
-		if (pChannel)
+		if (found->second.channel)
 		{
-			ErrorCheck(pChannel->setVolume(dbToVolume(volumedB)));
-			ErrorCheck(pChannel->setPaused(false));
-
-			auto inserted = m_channels.insert(std::make_pair(nChannelId, pChannel));
-
-#ifdef _DEBUG
-			assert(inserted.second);
-#endif
+			//ErrorCheck(found->second.channel->setVolume(dbToVolume(volumedB)));
+			ErrorCheck(found->second.channel->setPaused(false));
 		}
-
-		//return nChannelId;
 	}
 
 	void SoundManager::LoadSound(const std::string& id, const std::string& file, bool looping, bool stream)
@@ -84,22 +65,14 @@ namespace thomas
 		eMode |= looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
 		eMode |= stream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
 
-		FMOD::Sound* pSound = nullptr;
-		ErrorCheck(m_system->createSound(file.c_str(), eMode, nullptr, &pSound));
-		auto inserted = m_sounds.insert(std::make_pair(id, std::move(pSound)));
+		// Add the sound to the container
+		Info soundInfo;
+		ErrorCheck(m_system->createSound(file.c_str(), eMode, nullptr, &soundInfo.sound));
+		auto inserted = m_sounds.insert(std::make_pair(id, std::move(soundInfo)));
 
 #ifdef _DEBUG
 		assert(inserted.second);
 #endif
-	}
-
-	void SoundManager::SetChannelVolume(int channelId, float volumedB)
-	{
-		auto tFoundIt = m_channels.find(channelId);
-		if (tFoundIt == m_channels.end())
-			return;
-
-		ErrorCheck(tFoundIt->second->setVolume(dbToVolume(volumedB)));
 	}
 
 	float SoundManager::dbToVolume(float dB)
@@ -122,6 +95,17 @@ namespace thomas
 		static SoundManager instance;
 
 		return &instance;
+	}
+
+	SoundManager::Info& SoundManager::GetSoundInfo(const std::string& name)
+	{
+		auto found = m_sounds.find(name);
+
+#ifdef _DEBUG
+		assert(found != m_sounds.end());
+#endif
+
+		return found->second;
 	}
 
 	bool SoundManager::ErrorCheck(FMOD_RESULT result)
