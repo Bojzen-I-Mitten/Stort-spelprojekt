@@ -36,7 +36,7 @@ public class ChadCam : ScriptComponent
 
     public float CameraOffset { get; set; } = 3;
     public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
-    private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
+    private Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private float velocity { get { if (Chad?.rBody) return Chad.rBody.LinearVelocity.z; else return 0; } }
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
@@ -79,15 +79,13 @@ public class ChadCam : ScriptComponent
 
     public void FondleCamera()
     {
-        TotalXStep += MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-        //Chad.transform.RotateByAxis(Vector3.Up, yaw);
-        Quaternion newRot = Quaternion.CreateFromAxisAngle(Vector3.Up, TotalXStep);
-        Chad.rBody.Rotation = newRot;
+        float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
+        Chad.transform.RotateByAxis(Vector3.Up, yaw);
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-
+        
         transform.position = ChadHead;
-        transform.rotation = Chad.rBody.Rotation;
+        transform.rotation = Chad.transform.rotation;
         transform.RotateByAxis(transform.right, TotalYStep);
         transform.position = ChadHead + CameraOffset * -transform.forward;
     }

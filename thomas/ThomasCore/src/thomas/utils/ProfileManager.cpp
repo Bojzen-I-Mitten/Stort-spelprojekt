@@ -57,21 +57,27 @@ namespace thomas
 
 				for (auto& id : s_samples)
 				{
+					std::string temp;
+					temp.reserve(100000);
 					for (auto& processor : id.second)
 					{
 						j["SlowfilerData"]["processor"][id.first]["functions"];
 						j["SlowfilerData"]["processor"][id.first]["functions"][processor.first];
 
 						std::vector<long long> temp_vector;
-						for (auto& sample : processor.second)
-						{
-							temp_vector.push_back(sample.m_duration);
-						}
 
+						
+						for (int i = 0; i < processor.second.size() - 1; i++) 
+						{
+							temp += ' ' + std::to_string(processor.second[i].m_duration) + ',';
+						}
+						temp += std::to_string(processor.second.back().m_duration);
+						auto& obj = j["SlowfilerData"]["processor"][id.first]["functions"][processor.first];
 						for (auto& sample : processor.second)
 						{
-							j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = temp_vector;
+							 obj = temp;
 						}
+						temp.clear();
 					}
 				}
 
