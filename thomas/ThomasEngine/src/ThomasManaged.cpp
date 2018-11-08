@@ -409,20 +409,33 @@ namespace ThomasEngine {
 
 
 		}
+		// Initiate log dump
 
 
-
+		// Shutdown
+		WaitLogOutput = gcnew ManualResetEvent(false);
 		renderThread->Join();	// Wait until thread is finished
+		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
+		ThreadPool::QueueUserWorkItem(logOut);
+#ifdef BENCHMARK
+		WaitLogOutput->WaitOne();
+#endif
+
+
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
-
 	}
 
-	void ThomasWrapper::Exit() 
+	void ThomasWrapper::DumpProfilerLog(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
 		utils::profiling::ProfileManager::dumpDataToFile();
 #endif
+		WaitLogOutput->Set();
+	}
+
+	void ThomasWrapper::Exit() 
+	{
 		thomas::ThomasCore::Exit();
 	}
 

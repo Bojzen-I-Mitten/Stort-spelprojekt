@@ -55,7 +55,7 @@ public class GUIJoinHost : ScriptComponent
         if (TakePort)
             InputGUI.AppendIPString(ref PortString, 5);
 
-        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             if (TextBoxIP.Clicked())
             {
