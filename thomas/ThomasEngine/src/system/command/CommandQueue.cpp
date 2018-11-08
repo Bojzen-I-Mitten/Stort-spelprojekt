@@ -19,6 +19,7 @@ namespace ThomasEngine
 		auto swp = m_commandInput;
 		m_commandInput = m_executeList;
 		m_executeList = swp;
+		m_commandInput->Clear();
 		Monitor::Exit(m_accessLock);
 
 		for each(auto cmd in m_executeList)

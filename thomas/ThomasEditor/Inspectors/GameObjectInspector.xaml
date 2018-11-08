@@ -56,7 +56,7 @@
                     <Expander IsExpanded="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Expander.Header>
                             <DockPanel HorizontalAlignment="Stretch" LastChildFill="False">
-                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding enabled}"
+                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Activated, Mode=OneWay}" Checked="ComponentEnabled_Checked" Unchecked="ComponentEnabled_Unchecked"
                                           VerticalContentAlignment="Center" VerticalAlignment="Center" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
                                 <Label DockPanel.Dock="Left" Content="{Binding Converter={StaticResource componentToNameConverter}}"/>
                                 <Button DockPanel.Dock="Right" Content=" X " Click="RemoveComponentButton_Click" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>

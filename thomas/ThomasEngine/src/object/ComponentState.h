@@ -7,9 +7,9 @@ namespace ThomasEngine
 		public enum State
 		{
 			Uninitialized,
-			Awake,
-			Enabled,
-			Disabled,		// De-activated
+			Awake,			// First step of initiation called
+			Enabled,		// Component is fully active
+			Disabled,		// Enabled at some point but no longer active
 			EndState		// Count
 		};
 		inline State& operator++ (State& d) {	// Prefix

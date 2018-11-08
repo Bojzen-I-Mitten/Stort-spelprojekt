@@ -16,9 +16,11 @@ namespace ThomasEngine
 	public ref class Component : public Object
 	{
 		Component();
-	internal:
+	private:
 		[NonSerializedAttribute]
 		Comp::State m_state;
+		bool m_active;
+	internal:
 		//bool m_firstEnable = false;
 
 		[NonSerializedAttribute]
@@ -72,7 +74,7 @@ namespace ThomasEngine
 		[BrowsableAttribute(false)]
 		property bool enabled {
 			bool get();
-			void set(bool value){}
+			void set(bool value);
 		}
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
@@ -107,12 +109,24 @@ namespace ThomasEngine
 		/* Serialization property only (used to store deactivation)
 		*/
 		[BrowsableAttribute(false)]
+		//[Newtonsoft::Json::JsonPropertyAttribute(Newtonsoft::Json::DefaultValueHandling = Newtonsoft::Json::DefaultValueHandling::Populate)]
 		[System::ComponentModel::DefaultValueAttribute(true)]
 		property bool Activated
 		{
 			bool get();
 			void set(bool state);
 		}
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property Comp::State State 
+		{
+			Comp::State get();
+		}
+
+		/* True if object can be enabled in editor
+		*/
+		bool enableInEditor();
 
 		void StartCoroutine(System::Collections::IEnumerator^ routine);
 		void StopCoroutine(System::Collections::IEnumerator^ routine);

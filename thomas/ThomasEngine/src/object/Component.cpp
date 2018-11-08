@@ -53,8 +53,28 @@ namespace ThomasEngine
 	void Component::OnDrawGizmos() { ((thomas::object::component::Component*)nativePtr)->OnDrawGizmos(); }
 	void Component::OnDestroy() {/* ((thomas::object::component::Component*)nativePtr)->OnDestroy(); */}
 
+	bool Component::enableInEditor()
+	{
+		return GetType()->IsDefined(ExecuteInEditor::typeid, false);
+	}
 
-	bool Component::enabled::get() { return m_state == Comp::State::Enabled; }
+
+	bool Component::enabled::get() { return m_state != Comp::State::Disabled; }
+	void Component::enabled::set(bool value)
+	{
+		if (value) 
+		{
+			//	Enable
+			if(m_state == Comp::State::Disabled || m_state == Comp::State::Awake)
+				Enable();
+		}
+		else if(m_state == Comp::State::Enabled)
+		{
+			//	Disable
+			Disable();
+		}
+
+	}
 
 	void Component::Awake()
 	{
@@ -64,15 +84,21 @@ namespace ThomasEngine
 	}
 	void Component::Enable()
 	{
+		bool runStart = m_state == Comp::State::Awake;
 		// Enable engine component, then change Core state
 		m_state = Comp::State::Enabled;
 		OnEnable();
 		((thomas::object::component::Component*)nativePtr)->OnEnable();
 		((thomas::object::component::Component*)nativePtr)->setEnabledState(true);
+
+		// Start!
+		if (runStart)
+			Start();
 	}
 
 	void Component::Disable()
 	{
+		if (m_state == Comp::State::Awake) return;
 		// Disable engine component, then change Core state
 		m_state = Comp::State::Disabled;
 		OnDisable();
@@ -149,12 +175,15 @@ namespace ThomasEngine
 	}
 	bool Component::Activated::get()
 	{
-		return m_state != Comp::State::Disabled;
+		return m_active;
 	}
 	void Component::Activated::set(bool state)
 	{
-		if(!state)
-			m_state = Comp::State::Disabled;
+		m_active = state;
+	}
+	Comp::State Component::State::get()
+	{ 
+		return m_state; 
 	}
 
 	List<Type^>^ Component::GetAllAddableComponentTypes()

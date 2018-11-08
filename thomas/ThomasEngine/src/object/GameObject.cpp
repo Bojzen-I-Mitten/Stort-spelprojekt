@@ -49,46 +49,49 @@ namespace ThomasEngine {
 	}
 	void GameObject::InitComponents(Comp::State s, bool playing)
 	{
+		/* Object initiation Process.
+		 * 1. Awake()
+		 * 2. if 'Active'
+			Enable(), Start()
+
+		 * Editor is a separate case where not all objects are enabled 
+
+		*/
 		Monitor::Enter(m_componentsLock);
 		for each (Component^ c in m_components)
 		{
+			// Logic over state s to enter... Should be separate functions at some point...
 			switch (s)
 			{
-			case Comp::State::Uninitialized:
-				assert(false); // Don't
-				break;
 			case Comp::State::Awake:
-				assert(c->m_state == Comp::State::Uninitialized);
+			{
+#ifdef _EDITOR														
+				// If editor state: don't initiate all components
+				if (!(playing || c->enableInEditor())) continue;
+				// Ensure component isn't initialized
+				if (c->State != Comp::State::Uninitialized) continue;
+#else		
+				assert(c->State == Comp::State::Uninitialized);
+#endif			
 				c->Awake();
+			}
 				break;
 			case Comp::State::Enabled:
 			{
-				bool doInit = c->m_state != Comp::State::Disabled;	// Enable components if they are not disabled
-#ifdef _EDITOR														// If editor state: don't enable all components
-				doInit = doInit && (playing || c->GetType()->IsDefined(ExecuteInEditor::typeid, false));
-#endif
-				if (doInit)
-				{
-					assert(c->m_state == Comp::State::Awake);
-					c->Enable();
-				}
+				// If Component isn't activated 
+				if (!c->Activated || c->State != Comp::State::Awake) continue;
+				c->Enable();
 			}
 				break;
+			case Comp::State::Uninitialized:
 			case Comp::State::Disabled:
 			case Comp::State::EndState:
 			default:
+				assert(false); // Don't
 				break;
 			}
 		}
 		Monitor::Exit(m_componentsLock);
-	}
-
-	void GameObject::StartComponents()
-	{
-		for each (Component^ c in m_components)
-		{
-			c->Start();
-		}
 	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
@@ -136,7 +139,7 @@ namespace ThomasEngine {
 		{
 			// Disable
 			comp->OnParentDestroy(this);
-			if (comp->m_state == Comp::Enabled)
+			if (comp->State == Comp::Enabled)
 				comp->OnDisable();
 		}
 	}
@@ -152,7 +155,7 @@ namespace ThomasEngine {
 			Type^ typ = comp->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
 
-			if (comp->m_state == Comp::Enabled)
+			if (comp->State == Comp::Enabled)
 				comp->OnDisable();
 			//if(comp->m_state != component::Uninitialized) // Always true.
 			comp->OnDestroy();

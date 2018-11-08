@@ -29,6 +29,23 @@ namespace ThomasEditor.utils
                 child.transform.SetParent(parent.transform, keepTransform);
         }
     }
+    public class EnableComponentCommand
+        : ICommand
+    {
+        readonly Component comp;
+        readonly bool enabled;
+        public EnableComponentCommand(Component comp, bool enabled)
+        {
+            this.comp = comp;
+            this.enabled = enabled;
+        }
+
+        public void execute()
+        {
+            comp.enabled = enabled;
+            comp.Activated = enabled;
+        }
+    }
 
     /* UI Thread: Nobody toucha my spagett!!!!!!!!!! ._,
      * 

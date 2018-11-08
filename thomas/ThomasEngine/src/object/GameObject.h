@@ -36,9 +36,6 @@ namespace ThomasEngine
 		playing	<<	If components are 'running'
 		*/
 		void InitComponents(Comp::State s, bool playing);
-		/* Call Start on all components (even unactivated)
-		*/
-		void StartComponents();
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 
