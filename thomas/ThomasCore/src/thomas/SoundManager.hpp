@@ -25,7 +25,7 @@ namespace thomas
 		};
 
 	private:
-		SoundManager();
+		SoundManager() = default;
 		~SoundManager() = default;
 		SoundManager(const SoundManager&) {}
 		SoundManager& operator = (const SoundManager&) {}
@@ -33,6 +33,7 @@ namespace thomas
 		SoundManager& operator = (const SoundManager&&) {}
 
 	public:
+		void Init();
 		void Update();
 		void Destroy();
 		void Play(const std::string& id);

@@ -6,10 +6,11 @@
 
 namespace thomas
 {
-	SoundManager::SoundManager() :
-	m_system(nullptr),
-	m_studioSystem(nullptr)
+	void SoundManager::Init()
 	{
+		m_system = nullptr;
+		m_studioSystem = nullptr;
+
 		ErrorCheck(FMOD::Studio::System::create(&m_studioSystem));
 		ErrorCheck(m_studioSystem->initialize(32, NULL, NULL, NULL));
 		ErrorCheck(m_studioSystem->getLowLevelSystem(&m_system));
