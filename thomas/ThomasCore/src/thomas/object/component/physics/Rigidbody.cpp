@@ -259,7 +259,7 @@ namespace thomas
 				if (forcePosition)
 				{
 					setWorldTransform(trans);
-					m_gameObject->m_transform->SetPosition(position);
+					//m_gameObject->m_transform->SetPosition(position);
 				}
 
 				
@@ -276,7 +276,7 @@ namespace thomas
 				if (forceRotation)
 				{
 					setWorldTransform(trans);
-					m_gameObject->m_transform->SetRotation(rotation);
+					//m_gameObject->m_transform->SetRotation(rotation);
 				}
 
 				
