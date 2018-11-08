@@ -211,7 +211,6 @@ namespace ThomasEngine {
 	
 	void ThomasWrapper::CopyCommandList()
 	{
-		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 
 		profiler->SetActive(showStatistics);
@@ -222,7 +221,7 @@ namespace ThomasEngine {
 			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
-			ImGui::Text("RAM Usage: %.2f MB", ramUsage);
+			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
 			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
