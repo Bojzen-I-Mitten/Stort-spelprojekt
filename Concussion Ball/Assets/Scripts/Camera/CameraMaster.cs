@@ -12,6 +12,7 @@ public class CameraMaster : ScriptComponent
     SpectatorCam SpectatorCam;
     ChadHud Hud;
 
+
     Canvas Canvas;
     Image BG;
 
@@ -21,7 +22,8 @@ public class CameraMaster : ScriptComponent
         SELECT_TEAM,
         CHAD,
         SPECTATE,
-        NUMSTATES
+        NUMSTATES,
+        EXITMENU
     }
     CAMSTATE State = CAMSTATE.JOIN_HOST;
 
@@ -41,22 +43,27 @@ public class CameraMaster : ScriptComponent
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
+
         JoinHost = gameObject.GetComponent<GUIJoinHost>();
         if (JoinHost == null)
             Debug.Log("Camera Master cannot find GUI script for join/host");
+
         SelectTeam = gameObject.GetComponent<GUISelectTeam>();
         if (SelectTeam == null)
             Debug.Log("Camera Master cannot find GUI script for select");
+
         ChadCam = gameObject.GetComponent<ChadCam>();
         if (ChadCam == null)
             Debug.Log("Camera Master cannot find ChadCam");
         else
             ChadCam.enabled = false;
+
         SpectatorCam = gameObject.GetComponent<SpectatorCam>();
         if (SpectatorCam == null)
             Debug.Log("Camera Master cannot find SpectatorCam");
         else
             SpectatorCam.enabled = false;
+
         Hud = gameObject.GetComponent<ChadHud>();
         if (Hud == null)
             Debug.Log("Camera Master could not find Hud");
@@ -108,6 +115,9 @@ public class CameraMaster : ScriptComponent
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = true;
                 JoinHost.Canvas.isRendering = false;
+                break;
+            case CAMSTATE.EXITMENU:
+
                 break;
         }
     }
