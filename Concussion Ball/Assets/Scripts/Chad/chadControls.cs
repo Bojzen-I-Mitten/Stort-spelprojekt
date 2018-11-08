@@ -23,9 +23,9 @@ public class ChadControls : NetworkComponent
 
     #region Throwing stuff
     [Category("Throwing")]
-    public float BaseThrowForce { get; set; } = 10.0f;
+    public float BaseThrowForce { get; set; } = 20.0f;
     [Category("Throwing")]
-    public float MaxThrowForce { get; set; } = 30.0f;
+    public float MaxThrowForce { get; set; } = 40.0f;
     [Category("Throwing")]
     public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
@@ -54,7 +54,7 @@ public class ChadControls : NetworkComponent
     public Vector2 CurrentVelocity = new Vector2(0, 0); //Right and forward
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
     private float BaseSpeed = 5.0f;
-    private float MaxSpeed = 12.0f;
+    private float MaxSpeed = 10.0f;
 
     public float DiveTimer { get; private set; } = 0f;
     public Quaternion DivingDirection = Quaternion.Identity;
