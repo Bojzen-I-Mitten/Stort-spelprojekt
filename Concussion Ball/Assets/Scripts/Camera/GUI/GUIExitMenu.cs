@@ -1,13 +1,12 @@
-
 using ThomasEngine;
 
-public class EscapeMenu : ScriptComponent
+public class GUIExitMenu : ScriptComponent
 {
-    public Texture2D Background { get; set; }
+    public Texture2D ExitMatchBtn { get; set; }
+    public Texture2D ExitGameBtn { get; set; }
 
     Camera Camera;
-    Canvas Canvas;
-    Image BG;
+    public Canvas Canvas;
 
     public override void Awake()
     {
@@ -18,17 +17,15 @@ public class EscapeMenu : ScriptComponent
 
     public override void Start()
     {
-        BG = Canvas.Add(Background);
-        BG.scale = Vector2.Zero;
     }
 
     public override void Update()
     {
-        
+
     }
 
     public void ShowEscMenu()
     {
-        BG.scale = Vector2.One;
+
     }
 }
