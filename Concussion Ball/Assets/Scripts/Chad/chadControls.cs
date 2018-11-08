@@ -35,14 +35,6 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
 
-    private SoundComponent ChargeUpChadSound1;
-    private SoundComponent ThrowSound1;
-    private SoundComponent PantingSound;
-
-    public AudioClip ChargeUpSoundClip1 { get; set; }
-    public AudioClip ThrowSoundClip1 { get; set; }
-    public AudioClip PantingSoundClip { get; set; }
-
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
     private bool HasThrown = false;
@@ -103,19 +95,6 @@ public class ChadControls : NetworkComponent
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
 
         Identity.RefreshCache();
-
-        ChargeUpChadSound1 = gameObject.AddComponent<SoundComponent>();
-        ChargeUpChadSound1.clip = ChargeUpSoundClip1;
-        ChargeUpChadSound1.Looping = false;
-        ChargeUpChadSound1.Volume = 0.5f;
-        ChargeUpChadSound1.Is3D = true;
-        ThrowSound1 = gameObject.AddComponent<SoundComponent>();
-        ThrowSound1.clip = ThrowSoundClip1;
-        ThrowSound1.Looping = false;
-        ThrowSound1.Is3D = true;
-        PantingSound = gameObject.AddComponent<SoundComponent>();
-        PantingSound.clip = PantingSoundClip;
-        PantingSound.Is3D = true;
     }
 
     public void DeactivateCamera()
@@ -394,8 +373,7 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
-       // ChargeUpChadSound1.Stop();
-        PantingSound.Stop();
+       
         SendRPC("RPCResetThrow");
         RPCResetThrow();
 
@@ -520,9 +498,7 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartThrow()
     {
-        ChargeUpChadSound1.Stop();
-        PantingSound.Stop();
-        ThrowSound1.PlayOneShot();
+        
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
     }
@@ -563,9 +539,7 @@ public class ChadControls : NetworkComponent
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
-
-        //ChargeUpChadSound1.Play();
-        PantingSound.Play();
+        
 
         ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
@@ -618,11 +592,7 @@ public class ChadControls : NetworkComponent
         Direction = reader.GetVector3();
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
-        if (State == STATE.THROWING && !HasThrown)
-        {
-            //ChargeUpChadSound1.Play();
-            PantingSound.Play();
-        }
+        
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
