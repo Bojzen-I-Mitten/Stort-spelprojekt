@@ -79,15 +79,13 @@ public class ChadCam : ScriptComponent
 
     public void FondleCamera()
     {
-        TotalXStep += MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-        //Chad.transform.RotateByAxis(Vector3.Up, yaw);
-        Quaternion newRot = Quaternion.CreateFromAxisAngle(Vector3.Up, TotalXStep);
-        //Chad.rBody.SetRotation(newRot, true);
+        float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
+        Chad.transform.RotateByAxis(Vector3.Up, yaw);
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-
+        
         transform.position = ChadHead;
-        transform.rotation = Chad.rBody.Rotation;
+        transform.rotation = Chad.transform.rotation;
         transform.RotateByAxis(transform.right, TotalYStep);
         transform.position = ChadHead + CameraOffset * -transform.forward;
     }
