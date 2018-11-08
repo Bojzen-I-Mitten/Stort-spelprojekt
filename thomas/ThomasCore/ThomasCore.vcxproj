@@ -80,6 +80,7 @@
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2DArray.cpp" />
     <ClCompile Include="src\thomas\resource\texture\TextureCube.cpp" />
+    <ClCompile Include="src\thomas\SoundManager.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\LinearAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2DArray.h" />
     <ClInclude Include="src\thomas\resource\texture\TextureCube.h" />
+    <ClInclude Include="src\thomas\SoundManager.hpp" />
     <ClInclude Include="src\thomas\System.h" />
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
@@ -357,7 +359,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>
       </CompileAsManaged>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
