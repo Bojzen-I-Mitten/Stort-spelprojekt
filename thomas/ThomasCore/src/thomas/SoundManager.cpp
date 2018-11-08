@@ -21,11 +21,15 @@ namespace thomas
 		for (auto& sound : m_sounds)
 		{
 			bool playing = false;
-			sound.second.channel->isPlaying(&playing);
 
-			if (!playing)
+			if (sound.second.channel != nullptr)
 			{
-				sound.second.channel = nullptr;
+				ErrorCheck(sound.second.channel->isPlaying(&playing));
+
+				if (!playing)
+				{
+					sound.second.channel = nullptr;
+				}
 			}
 		}
 
@@ -49,7 +53,7 @@ namespace thomas
 
 		ErrorCheck(m_system->playSound(found->second.sound, nullptr, true, &found->second.channel));
 
-		if (found->second.channel)
+		if (found->second.channel != nullptr)
 		{
 			//ErrorCheck(found->second.channel->setVolume(dbToVolume(volumedB)));
 			ErrorCheck(found->second.channel->setPaused(false));
@@ -112,7 +116,7 @@ namespace thomas
 	{
 		if (result != FMOD_OK)
 		{
-			LOG("FMOD ERROR ", result);
+			LOG("FMOD ERROR " << result);
 			return false;
 		}
 
