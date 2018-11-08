@@ -59,7 +59,7 @@ namespace ThomasEngine
 	}
 
 
-	bool Component::enabled::get() { return m_state != Comp::State::Disabled; }
+	bool Component::enabled::get() { return m_state == Comp::State::Enabled; }
 	void Component::enabled::set(bool value)
 	{
 		if (value) 

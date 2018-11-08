@@ -375,7 +375,7 @@ namespace ThomasEngine {
 
 
 				}
-				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+				float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
 #ifdef BENCHMARK

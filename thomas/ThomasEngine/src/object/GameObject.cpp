@@ -79,7 +79,8 @@ namespace ThomasEngine {
 			case Comp::State::Enabled:
 			{
 				// If Component isn't activated 
-				if (!c->Activated || c->State != Comp::State::Awake) continue;
+				if (!c->Activated || c->State != Comp::State::Awake) 
+					continue;
 				c->Enable();
 			}
 				break;
