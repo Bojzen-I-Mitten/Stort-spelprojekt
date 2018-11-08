@@ -9,6 +9,7 @@
 using namespace System::Threading;
 #include "YieldInstructions.h"
 #include "../Debug.h"
+#include "component/Transform.h"
 
 namespace ThomasEngine 
 {
@@ -179,7 +180,10 @@ namespace ThomasEngine
 	}
 	void Component::Activated::set(bool state)
 	{
-		m_active = state;
+		if (dynamic_cast<Transform^>(this) != nullptr) 
+			m_active = true; // Can't be deactivated
+		else
+			m_active = state;
 	}
 	Comp::State Component::State::get()
 	{ 

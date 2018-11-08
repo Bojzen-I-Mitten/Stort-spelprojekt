@@ -106,8 +106,11 @@ namespace ThomasEditor
 
         private void ThomasWrapper_OnStartPlaying()
         {
-            if (clearOnPlay.IsChecked.Value)
-                ClearConsole();
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                if (clearOnPlay.IsChecked.Value)
+                    ClearConsole();
+            }));
         }
 
         

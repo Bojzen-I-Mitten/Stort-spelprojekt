@@ -42,7 +42,9 @@ namespace thomas
 
 	object::GameObject * ObjectHandler::createNewGameObject(std::string name)
 	{
-		m_objectsDynamic.push_back(std::move(object::GameObject(name)));
+		assert(m_objectsDynamic.capacity());
+		object::GameObject obj(name);
+		m_objectsDynamic.push_back(std::move(obj));
 		return &m_objectsDynamic.back();
 	}
 
