@@ -11,7 +11,7 @@ using System.ComponentModel;
 [TypeConverter(typeof(ExpandableObjectConverter))]
 public class Team
 {
-    public int Score { get; private set; }
+    public int Score { get; set; }
 
     public TEAM_TYPE TeamType;
     public Color Color { get; set; }
@@ -58,8 +58,8 @@ public class Team
                     player.gameObject.SetActive(false);
                     if (player.isOwner)
                     {
-                        MatchSystem.instance.LocalChad.DeactivateCamera();
-                        MatchSystem.instance.spectatorCamera.enabled = true;
+                        //MatchSystem.instance.LocalChad.DeactivateCamera();
+                        //MatchSystem.instance.spectatorCamera.enabled = true;
                     }
                     break;
                 case TEAM_TYPE.TEAM_1:
@@ -67,8 +67,8 @@ public class Team
                     player.gameObject.SetActive(true);
                     if (player.isOwner)
                     {
-                        MatchSystem.instance.spectatorCamera.enabled = false;
-                        MatchSystem.instance.LocalChad.ActivateCamera();
+                        //MatchSystem.instance.spectatorCamera.enabled = false;
+                        //MatchSystem.instance.LocalChad.ActivateCamera();
                     }
                         
                     break;

@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ThomasEngine;
 using InputIP;
-using System.Collections;
+using System.ComponentModel;
 
 public class GUIJoinHost : ScriptComponent
 {
@@ -21,8 +17,9 @@ public class GUIJoinHost : ScriptComponent
     private string PortString;
     private bool TakeIP;
     private bool TakePort;
-
-    Canvas GUI;
+    
+    public Canvas Canvas;
+    public bool GoToTeamSelect;
 
     Image TextBoxIP;
     Image TextBoxPort;
@@ -34,6 +31,10 @@ public class GUIJoinHost : ScriptComponent
     Text IP;
     Text Port;
 
+    public override void Awake()
+    {
+    }
+
     public override void Start()
     {
         IPString = "192.168.1.";
@@ -43,6 +44,7 @@ public class GUIJoinHost : ScriptComponent
         Disabled = false;
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
+        GoToTeamSelect = false;
     }
 
     public override void Update()
@@ -80,9 +82,10 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.TargetIP = IPString;
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();
+                    //Check if connected
+                    GoToTeamSelect = true;
+                    //enabled = false;
 
-                    ClearImagesAndText();
-                    enabled = false;
                     return;
                 }
                 else
@@ -92,7 +95,6 @@ public class GUIJoinHost : ScriptComponent
                     if (PortString == "")
                         TextBoxPort.color = Color.Red;
                 }
-
             }
             else if (Host.Clicked())
             {
@@ -101,15 +103,16 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
+                    GoToTeamSelect = true;
 
-                    ClearImagesAndText();
-                    enabled = false;
+                    //enabled = false;
                     return;
                 }
                 else
                 {
                     TextBoxPort.color = Color.Red;
                 }
+
             }
             else
             {
@@ -129,76 +132,84 @@ public class GUIJoinHost : ScriptComponent
                 IPText.font = TextFont;
                 PortText.font = TextFont;
                 IP.font = TextFont;
+                Port.font = TextFont;
             }
         }
     }
 
-
     public void AddImagesAndText()
     {
-        GUI = Camera.AddCanvas();
+        Canvas = Camera.AddCanvas();
 
-        IPText = GUI.Add(IPString);
+        IPText = Canvas.Add(IPString);
         IPText.position = new Vector2(0.1f, 0.11f);
         IPText.color = Color.Black;
+        
 
-        PortText = GUI.Add(PortString);
+        PortText = Canvas.Add(PortString);
         PortText.position = new Vector2(0.1f, 0.21f);
         PortText.color = Color.Black;
+        
 
-        IP = GUI.Add("IP, needed to join");
+        IP = Canvas.Add("IP, needed to join");
         IP.position = new Vector2(0.1f, 0.07f);
         IP.scale = new Vector2(0.7f);
         IP.color = Color.Black;
-
-        Port = GUI.Add("PORT, needed for both host and join");
+        
+        
+        Port = Canvas.Add("PORT, needed for both host and join");
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
         Port.color = Color.Black;
+        
 
         if (JoinBtn != null)
         {
-            Join = GUI.Add(JoinBtn);
+            Join = Canvas.Add(JoinBtn);
             Join.position = new Vector2(0.325f, 0.11f);
             Join.scale = new Vector2(0.25f);
             Join.interactable = true;
+            
         }
 
         if (HostBtn != null)
         {
-            Host = GUI.Add(HostBtn);
+            Host = Canvas.Add(HostBtn);
             Host.position = new Vector2(0.325f, 0.21f);
             Host.scale = new Vector2(0.25f);
             Host.interactable = true;
+            
         }
 
         if (TextBox != null)
         {
-            TextBoxIP = GUI.Add(TextBox);
+            TextBoxIP = Canvas.Add(TextBox);
             TextBoxIP.position = new Vector2(0.1f);
             TextBoxIP.scale = new Vector2(0.7f, 0.5f);
             TextBoxIP.color = Color.Black;
             TextBoxIP.interactable = true;
+            
 
-            TextBoxPort = GUI.Add(TextBox);
+            TextBoxPort = Canvas.Add(TextBox);
             TextBoxPort.position = new Vector2(0.1f, 0.2f);
             TextBoxPort.scale = new Vector2(0.7f, 0.5f);
             TextBoxPort.color = Color.Black;
             TextBoxPort.interactable = true;
+           
         }
     }
 
 
     public void ClearImagesAndText()
     {
-        GUI.Remove(Join);
-        GUI.Remove(Host);
-        GUI.Remove(TextBoxIP);
-        GUI.Remove(TextBoxPort);
+        Canvas.Remove(Join);
+        Canvas.Remove(Host);
+        Canvas.Remove(TextBoxIP);
+        Canvas.Remove(TextBoxPort);
 
-        GUI.Remove(IPText);
-        GUI.Remove(PortText);
-        GUI.Remove(IP);
-        GUI.Remove(Port);
+        Canvas.Remove(IPText);
+        Canvas.Remove(PortText);
+        Canvas.Remove(IP);
+        Canvas.Remove(Port);
     }
 }

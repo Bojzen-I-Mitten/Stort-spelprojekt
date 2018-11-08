@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using ThomasEngine.Network;
@@ -20,7 +21,7 @@ public class ChadHud : ScriptComponent
     Camera cam;
 
     #region GUI Text & Images
-    Canvas HUD;
+    public Canvas Canvas;
     Text Timer;
     Text Announcement1;
     Text Announcement2;
@@ -64,10 +65,10 @@ public class ChadHud : ScriptComponent
             return;
         }
         cam = gameObject.GetComponent<Camera>();
-        HUD = cam.AddCanvas();
+        Canvas = cam.AddCanvas();
 
         #region Timer stuff
-        Timer = HUD.Add("00:00");
+        Timer = Canvas.Add("00:00");
         Timer.scale = new Vector2(2f);
         Timer.position = new Vector2(0.4975f, 0.01f);
         Timer.color = Color.Black;
@@ -77,7 +78,7 @@ public class ChadHud : ScriptComponent
 
         if (TimerBGTexture != null)
         {
-            TimerBG = HUD.Add(TimerBGTexture);
+            TimerBG = Canvas.Add(TimerBGTexture);
             TimerBG.position = new Vector2(0.5f, 0);
             TimerBG.origin = new Vector2(0.5f, 0);
             TimerBG.scale = new Vector2(0.6f, 0.7f);
@@ -88,7 +89,7 @@ public class ChadHud : ScriptComponent
         //Left of the timer
         if (ScoreBGTexture != null)
         {
-            Score1BG = HUD.Add(ScoreBGTexture);
+            Score1BG = Canvas.Add(ScoreBGTexture);
             Score1BG.origin = new Vector2(0.5f, 0);
             Score1BG.position = new Vector2(0.4175f, 0);
             Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
@@ -97,7 +98,7 @@ public class ChadHud : ScriptComponent
             Score1BG.flip = new Vector2(0, 1);
 
             //Right of the timer
-            Score2BG = HUD.Add(ScoreBGTexture);
+            Score2BG = Canvas.Add(ScoreBGTexture);
             Score2BG.origin = new Vector2(0.5f, 0);
             Score2BG.position = new Vector2(0.5825f, 0f);
             Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
@@ -105,7 +106,7 @@ public class ChadHud : ScriptComponent
             Score2BG.scale = new Vector2(1, 0.7f);
         }
 
-        Score1 = HUD.Add("");
+        Score1 = Canvas.Add("");
         Score1.scale = new Vector2(1.6f);
         Score1.origin = new Vector2(0.5f, 0);
         Score1.position = Score1BG.position + new Vector2(0.005f, 0.001f);
@@ -113,7 +114,7 @@ public class ChadHud : ScriptComponent
         Score1.font = Numbers;
         Score1.depth = 0.8f;
 
-        Score2 = HUD.Add("");
+        Score2 = Canvas.Add("");
         Score2.scale = new Vector2(1.6f);
         Score2.origin = new Vector2(0.5f, 0);
         Score2.position = Score2BG.position - new Vector2(0.009f, -0.001f);
@@ -123,14 +124,14 @@ public class ChadHud : ScriptComponent
         #endregion
 
         #region Announcement stuff
-        Announcement1 = HUD.Add("");
+        Announcement1 = Canvas.Add("");
         Announcement1.position = new Vector2(0.5f);
         Announcement1.scale = new Vector2(2);
         Announcement1.font = AnnouncementFont;
         Announcement1.color = Color.Green;
         Announcement1.origin = new Vector2(0.5f);
 
-        Announcement2 = HUD.Add("");
+        Announcement2 = Canvas.Add("");
         Announcement2.position = new Vector2(0.5f);
         Announcement2.scale = new Vector2(2);
         Announcement2.font = AnnouncementFont;
@@ -139,7 +140,7 @@ public class ChadHud : ScriptComponent
 
         if (AnnouncementBackground != null)
         {
-            AnnouncementBG = HUD.Add(AnnouncementBackground);
+            AnnouncementBG = Canvas.Add(AnnouncementBackground);
             AnnouncementBG.position = new Vector2(0.5f);
             AnnouncementBG.scale = Vector2.Zero;
             AnnouncementBG.origin = new Vector2(0.5f);
@@ -151,7 +152,7 @@ public class ChadHud : ScriptComponent
         if (CrosshairTexture != null)
         {
             //Debug.Log(Crosshair);
-            Crosshair = HUD.Add(CrosshairTexture);
+            Crosshair = Canvas.Add(CrosshairTexture);
             Crosshair.origin = new Vector2(0.5f);
             Crosshair.position = new Vector2(0.5f);
             Crosshair.scale = Vector2.Zero;
@@ -159,14 +160,14 @@ public class ChadHud : ScriptComponent
 
         if (ChargeBarOutlineTexture != null)
         {
-            ChargeBarOutline = HUD.Add(ChargeBarOutlineTexture);
+            ChargeBarOutline = Canvas.Add(ChargeBarOutlineTexture);
             ChargeBarOutline.position = new Vector2(0.9f, 0.1f);
             ChargeBarOutline.scale = Vector2.Zero;
         }
 
         if (ChargeBarTexture != null)
         {
-            ChargeBar = HUD.Add(ChargeBarTexture);
+            ChargeBar = Canvas.Add(ChargeBarTexture);
             ChargeBar.position = new Vector2(0.9f, 0.1f + ((ChargeBarTexture.height * 9.0f) / 1080.0f)); //Need to move the bar its own height down one step.
             ChargeBar.scale = Vector2.Zero;
             ChargeBar.origin = new Vector2(1, 0);
@@ -176,7 +177,7 @@ public class ChadHud : ScriptComponent
 
         if (BallArrowTexture != null)
         {
-            BallArrow = HUD.Add(BallArrowTexture);
+            BallArrow = Canvas.Add(BallArrowTexture);
             BallArrow.origin = new Vector2(0.5f);
             BallArrow.scale = new Vector2(4);
             BallArrow.position = new Vector2(-1000);
@@ -185,13 +186,13 @@ public class ChadHud : ScriptComponent
 
         if (LMBTexture != null)
         {
-            LMB = HUD.Add(LMBTexture);
+            LMB = Canvas.Add(LMBTexture);
             LMB.origin = new Vector2(0.5f);
             LMB.position = new Vector2(0.85f, 0.9f);
             LMB.scale = Vector2.Zero;
         }
 
-        HeldObject = HUD.Add("Holding: ");
+        HeldObject = Canvas.Add("Holding: ");
         HeldObject.position = new Vector2(0.0f, 0.8f);
         HeldObject.color = Color.Black;
         HeldObject.scale = Vector2.Zero;
@@ -230,8 +231,8 @@ public class ChadHud : ScriptComponent
         //Announcement1.color = color;
         Announcement2.text = text2;
 
-        Vector2 text1Size = Announcement1.size / (HUD.viewport.size * cam.viewport.size);
-        Vector2 text2Size = Announcement2.size / (HUD.viewport.size * cam.viewport.size);
+        Vector2 text1Size = Announcement1.size / (Canvas.viewport.size * cam.viewport.size);
+        Vector2 text2Size = Announcement2.size / (Canvas.viewport.size * cam.viewport.size);
         while (time < duration)
         {
             time += Time.ActualDeltaTime;
@@ -370,6 +371,16 @@ public class ChadHud : ScriptComponent
         Score2.text = string.Format("{0}", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score);
 
         BallIndicator();
+    }
+
+    public override void OnEnable()
+    {
+        Canvas.isRendering = true;
+    }
+
+    public override void OnDisable()
+    {
+        Canvas.isRendering = false;
     }
 
     private void BallIndicator()

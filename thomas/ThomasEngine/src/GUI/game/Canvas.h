@@ -24,6 +24,11 @@ namespace ThomasEngine
 			void set(Viewport viewport);
 		}
 
+		property bool isRendering
+		{
+			void set(bool rendering);
+		}
+
 	private:
 		thomas::graphics::GUI::Canvas* nativePtr;
 	public:

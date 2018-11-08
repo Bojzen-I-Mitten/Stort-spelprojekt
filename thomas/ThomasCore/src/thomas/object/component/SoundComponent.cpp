@@ -39,7 +39,18 @@ namespace thomas
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
+					
 					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
+
+					
+					if (attenuation > 5.0f)
+					{
+					attenuation = 5.0f;
+					}
+					else if (attenuation < 0.0f)
+					{
+						attenuation = 0.0f;
+					}
 					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
 				
 				}
