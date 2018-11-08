@@ -379,7 +379,7 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
-        ChargeUpChadSound1.Stop();
+       // ChargeUpChadSound1.Stop();
         PantingSound.Stop();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
@@ -541,7 +541,7 @@ public class ChadControls : NetworkComponent
 
         PickedUpObject.chargeTimeCurrent = ChargeTime;
 
-        ChargeUpChadSound1.Play();
+        //ChargeUpChadSound1.Play();
         PantingSound.Play();
 
         ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);
@@ -597,7 +597,7 @@ public class ChadControls : NetworkComponent
         HasThrown = reader.GetBool();
         if (State == STATE.THROWING && !HasThrown)
         {
-            ChargeUpChadSound1.Play();
+            //ChargeUpChadSound1.Play();
             PantingSound.Play();
         }
     }
