@@ -82,6 +82,7 @@ public class ChadControls : NetworkComponent
     private float DivingTimer = 0.0f;
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
+    //IEnumerator Diving = null;
 
     public PickupableObject PickedUpObject;
 
@@ -148,6 +149,8 @@ public class ChadControls : NetworkComponent
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
+
+
             }
             StateMachine();
         }
@@ -171,6 +174,17 @@ public class ChadControls : NetworkComponent
     private void EnableRagdoll()
     {
         // reset aim stuff 
+        if (Throwing != null)
+        {
+            StopCoroutine(Throwing);
+            Throwing = null;
+        }
+        //if(Diving != null)
+        //{
+        //    StopCoroutine(Diving);
+        //    Diving = null;
+        //}
+            
         ResetThrow();
 
         rBody.enabled = false;
@@ -280,7 +294,8 @@ public class ChadControls : NetworkComponent
         {
             State = STATE.DIVING;
             CurrentVelocity.y = DiveSpeed;
-            StartCoroutine(DivingCoroutine());
+            //Diving = DivingCoroutine();
+            //StartCoroutine(Diving);
             DivingTimer = 0.0f;
             DivingDirection = this.gameObject.transform.rotation;
         }
@@ -365,6 +380,7 @@ public class ChadControls : NetworkComponent
     #region Reset Throw
     public void RPCResetThrow()
     {
+        HasThrown = false;
         ChadHud.Instance.DeactivateAimHUD();
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
@@ -437,9 +453,18 @@ public class ChadControls : NetworkComponent
     public void Reset()
     {
         State = STATE.CHADING;
-        StopCoroutine(DivingCoroutine());
+        //if( Diving != null)
+        //{
+        //    StopCoroutine(Diving);
+        //    Diving = null;
+        //}
         DivingTimer = 5;
-        StopCoroutine(Ragdolling);
+        if(Ragdolling != null)
+        {
+            StopCoroutine(Ragdolling);
+            Ragdolling = null;
+        }
+        
         CurrentVelocity = Vector2.Zero;
         if (PickedUpObject)
         {
@@ -516,11 +541,25 @@ public class ChadControls : NetworkComponent
         //    //Camera.transform.localPosition = new Vector3(0.0f, 1.5f, 3.0f); // m a g i c
 
         yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
-        
+
+        //if (State == STATE.RAGDOLL)
+        //{
+        //    // HasThrown = false;
+        //    Debug.Log("Was trying to throw, but got tackled, yielded first yield, stopping coroutine");
+        //    StopCoroutine(Throwing);
+        //    Throwing = null;
+        //}
+
         ThrowObject(ballCamPos, chosenDirection);
         HasThrown = false;
 
         yield return new WaitForSeconds(1.0f);
+        //if (State == STATE.RAGDOLL)
+        //{
+        //    Debug.Log("Was trying to throw, but got tackled, yielded second yield, stopping coroutine");
+        //    StopCoroutine(PlayThrowAnim());
+        //}
+
         ResetThrow();
         if (State != STATE.RAGDOLL)
         {
@@ -624,7 +663,7 @@ public class ChadControls : NetworkComponent
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null)
+            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
             {
                 if (pickupable.transform.parent == null)
                 {
