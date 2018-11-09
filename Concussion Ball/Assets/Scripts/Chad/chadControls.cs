@@ -45,8 +45,8 @@ public class ChadControls : NetworkComponent
 
     public Vector2 CurrentVelocity = new Vector2(0, 0); //Right and forward
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
-    private float BaseSpeed = 5.0f;
-    private float MaxSpeed = 10.0f;
+    public float BaseSpeed { get; private set; }  = 5.0f;
+    public float MaxSpeed { get; private set; } = 10.0f;
 
     public float DiveTimer { get; private set; } = 0f;
     public Quaternion DivingDirection = Quaternion.Identity;
@@ -79,6 +79,7 @@ public class ChadControls : NetworkComponent
     IEnumerator Diving = null;
 
     public PickupableObject PickedUpObject;
+    private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
 
     public override void Start()
     {
@@ -416,6 +417,7 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
+                CurrentVelocity.y -= Math.Abs(xStep * CurrentVelocity.y / MaxSpeed); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
