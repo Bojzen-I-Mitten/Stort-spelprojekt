@@ -20,12 +20,9 @@ public class ChadControls : NetworkComponent
     };
     public STATE State { get; private set; }
     public bool Locked = false;
+    private bool CanRagdoll = true;
 
     #region Throwing stuff
-    [Category("Throwing")]
-    public float BaseThrowForce { get; set; } = 20.0f;
-    [Category("Throwing")]
-    public float MaxThrowForce { get; set; } = 40.0f;
     [Category("Throwing")]
     public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
@@ -42,6 +39,9 @@ public class ChadControls : NetworkComponent
     public AudioClip ChargeUpSoundClip1 { get; set; }
     public AudioClip ThrowSoundClip1 { get; set; }
     public AudioClip PantingSoundClip { get; set; }
+
+    private float BaseThrowForce = 10.0f;
+    private float MaxThrowForce = 20.0f;
 
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
@@ -187,6 +187,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
+        CanRagdoll = false;
         Ragdoll.EnableRagdoll();
     }
 
@@ -196,6 +197,9 @@ public class ChadControls : NetworkComponent
         gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
+
+        // call coroutine function that sets canragdoll true
+        RagdollRecovery();
     }
 
     public void LocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
@@ -483,7 +487,7 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        Animations.ResetTimer(0);
+        Animations.ResetTimer(0); // missing network sync
         float timer = 1.5f;
         while (timer > 0.0f)
         {
@@ -511,6 +515,14 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(1);
         DisableRagdoll();
         State = STATE.CHADING;
+    }
+
+    IEnumerator RagdollRecovery()
+    {
+        yield return new WaitForSeconds(2);
+        CanRagdoll = true;
+
+        // Recovery particles
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -669,11 +681,11 @@ public class ChadControls : NetworkComponent
                 {
                     Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity)
+                else if (CanRagdoll && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
                 {
-                //toggle ragdoll
-                Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
-                otherChad.ActivateRagdoll(MinimumRagdollTimer, force);
+                    //toggle ragdoll
+                    Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
+                    otherChad.ActivateRagdoll(MinimumRagdollTimer, force);
                 }
 
             }
