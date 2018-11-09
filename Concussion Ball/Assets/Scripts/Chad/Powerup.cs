@@ -31,6 +31,7 @@ public class Powerup : PickupableObject
 
     public override void Update()
     {
+        base.Update();
         if (spawner && !PickedUp)
         {
             float test = (float)Math.Sin(Time.ElapsedTime);

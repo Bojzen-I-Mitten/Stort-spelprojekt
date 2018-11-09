@@ -34,8 +34,14 @@ public class ThomasTrain : Powerup
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentChargeUp.Looping = false;
+        soundComponentChargeUp.Is3D = true;
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel.Looping = false;
+        soundComponentTravel.Is3D = true;
         soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion.Looping = false;
+        soundComponentExplosion.Is3D = true;
     }
 
     public override void OnEnable()
@@ -120,7 +126,7 @@ public class ThomasTrain : Powerup
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force * 2.5f);
+        base.Throw(camPos, force * 2.0f);
         soundComponentTravel.Play();
 
         m_rigidBody.UseGravity = false;
@@ -129,7 +135,7 @@ public class ThomasTrain : Powerup
 
     IEnumerator Scale()
     {
-        transform.scale *= 4.0f;
+        transform.scale *= 3.0f;
         yield return new WaitForSeconds(0.1f);
         float t = 2.0f;
         while (t > 0.0f)
@@ -150,24 +156,17 @@ public class ThomasTrain : Powerup
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
-        // loop through players and check distance from explosion source
-
-        var players = NetworkManager.instance.Scene.Players.Values.ToList();
-        players.ForEach(player =>
+        ChadControls localChad = MatchSystem.instance.LocalChad;
+        if (localChad)
         {
-            float distance = Vector3.Distance(player.transform.position, transform.position);
+            float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
-                Vector3 forceDir = player.transform.position - transform.position;
+                Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.y += 3.0f;
-
-                // ragdoll and knock-back
-                player.gameObject.GetComponent<ChadControls>().PublicStartRagdoll(5.0f, forceDir * ExplosionForce);
+                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
             }
-        });
-
-
-
+        }
     }
 
     private void Explosion()

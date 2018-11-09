@@ -56,6 +56,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Camera\ChadCam.cs" />
+    <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
+    <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
+    <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
     <Compile Include="Assets\Scripts\Confetti.cs" />
     <Compile Include="Assets\Scripts\ConfettiEmitter.cs" />
@@ -65,7 +71,6 @@
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Chad\Ball.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
-    <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Chad\Chadimations.cs" />
     <Compile Include="Assets\Scripts\Chad\DissolveFadeIn.cs" />
     <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />
@@ -77,9 +82,6 @@
     <Compile Include="Assets\Scripts\Chad\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\collisionTest.cs" />
     <Compile Include="Assets\Scripts\DankLight.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUIJoinHost.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUISelectTeam.cs" />
-    <Compile Include="Assets\Scripts\GUI\GUITest.cs" />
     <Compile Include="Assets\Scripts\HighlightParent.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />

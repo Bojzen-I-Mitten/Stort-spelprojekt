@@ -14,6 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "../utils/AutoProfile.h"
 #include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
 
@@ -72,12 +73,16 @@ namespace thomas
 			return &s_renderer;
 		}
 
-		void Renderer::BindCamera(const render::CAMERA_FRAME_DATA& frameData)
+		bool Renderer::BindCameraRenderTarget(const render::CAMERA_FRAME_DATA& frameData)
 		{
 			//Get the current active window
+			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
-			if (!BindCameraViewport(frameData))
-				return;
+			if (!window || !window->Initialized())
+				return false;
+
+			window->BindRenderTarget();
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -87,17 +92,19 @@ namespace thomas
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_INV, frameData.viewMatrix.Invert());
 			m_shaders.SetGlobalMatrix(THOMAS_MATRIX_VIEW_PROJ, viewProjMatrix.Transpose());
 			m_shaders.SetGlobalVector(THOMAS_VECTOR_CAMERA_POS, frameData.position);
+
+			return true;
 		}
-		bool Renderer::BindCameraViewport(const render::CAMERA_FRAME_DATA& frameData)
+
+		bool Renderer::BindCameraBackBuffer(const render::CAMERA_FRAME_DATA& frameData)
 		{
 			//Get the current active window
-
 			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
 			if (!window || !window->Initialized())
 				return false;
 
-			window->Bind();
+			window->BindBackBuffer();
 			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
 			return true;
 		}
@@ -128,13 +135,18 @@ namespace thomas
 
 		void Renderer::TransferCommandList()
 		{
-			// Swap frames and clear old frame data
-			std::swap(m_frame, m_prevFrame);
-			m_frame->clear();
 
 			// Sync. update
 			m_shaders.SyncList();
 			m_cameras.syncUpdate();
+			// Submit camera frame data...
+			for (object::component::Camera* camera : m_cameras.getCameras())
+				camera->CopyFrameData();
+			editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+
+			// Swap frames and clear old frame data
+			std::swap(m_frame, m_prevFrame);
+			m_frame->clear();
 		}
 
 		const render::ShaderList & Renderer::getShaderList()
@@ -171,42 +183,69 @@ namespace thomas
 			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
 			//Process commands
-			BindFrame();
+			{
+				PROFILE("BindFrame")
+				BindFrame();
+			}
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				BindCamera(perCameraQueue.second.m_frameData);
-
+				
+				PROFILE("PerCameraDraw")
+				{
+					PROFILE("CameraBind")
+					BindCameraRenderTarget(perCameraQueue.second.m_frameData);
+				}
 				// Skyboxes should be submitted!
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
-				if (camera && camera->hasSkybox())
-					camera->DrawSkyBox();
-				// Draw objects
-				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
-					auto material = perMaterialQueue.first;
-					material->Bind();
-					for (auto & perMeshCommand : perMaterialQueue.second)
+					PROFILE("CameraDrawSkybox")
+					if (camera && camera->hasSkybox())
+						camera->DrawSkyBox();
+				}
+				// Draw objects
+				{
+					PROFILE("CameraDrawObjects")
+					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 					{
-						BindObject(perMeshCommand);
-						material->Draw(perMeshCommand.mesh);
+						auto material = perMaterialQueue.first;
+						{
+							PROFILE("BindMaterial")
+							material->Bind();
+						}
+						{
+							PROFILE("CameraDrawObjects")
+							for (auto & perMeshCommand : perMaterialQueue.second)
+							{
+								{
+									PROFILE("BindObject")
+									BindObject(perMeshCommand);
+								}
+								{
+									PROFILE("DrawCall")
+									material->Draw(perMeshCommand.mesh);
+								}
+							}
+						}
 					}
 				}
 			}
 	
 			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
+
+
 			ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
 			ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+				BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
 				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
 			for (object::component::Camera* cam : m_cameras.getCameras())
 			{
-				BindCamera(cam->GetFrameData());
+				BindCameraRenderTarget(cam->GetFrameData());
 				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 			}
@@ -216,9 +255,12 @@ namespace thomas
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
 			{
-				BindCamera(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+				BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
 				editor::Gizmos::Gizmo().RenderGizmos();
 			}
+
+			//Copy rendered objects into the back buffer
+			WindowManager::Instance()->ResolveRenderTarget();
 
 			// Gui draw
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
@@ -227,7 +269,7 @@ namespace thomas
 				// Shitty solution to camera destruction:
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
-				BindCameraViewport(perCameraQueue.second.m_frameData);
+				BindCameraBackBuffer(perCameraQueue.second.m_frameData);
 				if (camera && camera->GetGUIRendering())
 					camera->RenderGUI();
 			}

@@ -31,7 +31,6 @@ public class Ragdoll : ScriptComponent
     public bool RagdollEnabled = true;
     public bool PostiveMapping { get; set; } = true;
     public bool AllobjectKinectic { get; set; } = false;
-    public AudioClip RagDollImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
     enum BODYPART
@@ -70,13 +69,12 @@ public class Ragdoll : ScriptComponent
 
         // Load the ragdoll impact sound
         RagdollSound = gameObject.AddComponent<SoundComponent>();
-        if (RagDollImpactSound != null)
-            RagdollSound.clip = RagDollImpactSound;
-        else
-            Debug.LogError("Radoll impact sound missing");
+        //if (RagDollImpactSound != null)
+        //    RagdollSound.clip = RagDollImpactSound;
+        //else
+        //    Debug.LogError("Radoll impact sound missing");
         RagdollSound.Looping = false;
     }
-
     #region Utility functions
 
     //swapX with Y
@@ -174,12 +172,18 @@ public class Ragdoll : ScriptComponent
     }
 
     #endregion
-    public void AddForce(Vector3 force)
+    public void AddForce(Vector3 force, bool diveTackle)
     {
         for (int i = 0; i < (int)BODYPART.COUNT; i++)
         {
             RB_BodyParts[i].AddForce(force * Mass_BodyParts[i], Rigidbody.ForceMode.Impulse);
         }
+        if(diveTackle)
+        {
+            RB_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
+            RB_BodyParts[(int)BODYPART.LEFT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
+        }
+
     }
     public float DistanceToWorld()
     {

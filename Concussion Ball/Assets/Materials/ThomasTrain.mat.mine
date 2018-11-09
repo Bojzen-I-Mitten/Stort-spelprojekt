@@ -1,12 +1,12 @@
 {
-  "$id": "125",
+  "$id": "561",
   "shader": {
     "resourcePath": "%THOMAS_ASSETS%\\Shaders\\DissolveShader.fx"
   },
   "properties": {
-    "$id": "126",
+    "$id": "562",
     "color": {
-      "$id": "127",
+      "$id": "563",
       "$type": "ThomasEngine.Color, ThomasMath",
       "b": 255,
       "g": 255,
@@ -25,7 +25,7 @@
       "resourcePath": "Normal Texture"
     },
     "outlineColor": {
-      "$id": "128",
+      "$id": "564",
       "$type": "ThomasEngine.Color, ThomasMath",
       "b": 255,
       "g": 255,

@@ -108,6 +108,18 @@ namespace ThomasEngine {
 
 		}
 	}
+	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
+	{
+#ifdef BENCHMARK
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(true);
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+#endif
+
+	}
 
 	void ThomasWrapper::MainThreadUpdate()
 	{
@@ -115,6 +127,13 @@ namespace ThomasEngine {
 		if (!playing)
 			ScriptingManager::ReloadAssembly(false);
 #endif
+		constexpr uint32_t RAM_SAMPLE_FRAME = 1000;
+		static uint32_t WaitSampleFrame = 0;
+		if (WaitSampleFrame++ > RAM_SAMPLE_FRAME)
+		{
+			ThreadPool::QueueUserWorkItem(gcnew WaitCallback(SampleRam));
+			WaitSampleFrame = 0;
+		}
 	}
 
 
@@ -285,12 +304,16 @@ namespace ThomasEngine {
 				
 
 				//Logic
-				for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 				{
-					GameObject^ gameObject = CurrentScene->GameObjects[i];
-					if (gameObject->GetActive())
+					PROFILE("LogicLoop")
+					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
-						gameObject->Update();
+
+						GameObject^ gameObject = CurrentScene->GameObjects[i];
+						if (gameObject->GetActive())
+						{
+							gameObject->Update();
+						}
 					}
 				}
 				editor::EditorCamera::Instance()->Update();
@@ -299,7 +322,11 @@ namespace ThomasEngine {
 				if (IsPlaying())
 				{
 					//Physics
-					thomas::Physics::UpdateRigidbodies();
+					{
+						PROFILE("UpdateRigidbodies")
+
+						thomas::Physics::UpdateRigidbodies();
+					}
 					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
 					{
 						GameObject^ gameObject = CurrentScene->GameObjects[i];
@@ -380,19 +407,35 @@ namespace ThomasEngine {
 
 			}
 
-		}
 
+		}
+		// Initiate log dump
+
+
+		// Shutdown
+		WaitLogOutput = gcnew ManualResetEvent(false);
 		renderThread->Join();	// Wait until thread is finished
+		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
+		ThreadPool::QueueUserWorkItem(logOut);
+#ifdef BENCHMARK
+		WaitLogOutput->WaitOne();
+#endif
+
+
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
-
 	}
 
-	void ThomasWrapper::Exit() 
+	void ThomasWrapper::DumpProfilerLog(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
 		utils::profiling::ProfileManager::dumpDataToFile();
 #endif
+		WaitLogOutput->Set();
+	}
+
+	void ThomasWrapper::Exit() 
+	{
 		thomas::ThomasCore::Exit();
 	}
 

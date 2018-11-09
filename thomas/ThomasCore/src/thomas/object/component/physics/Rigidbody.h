@@ -69,8 +69,8 @@ namespace thomas
 				void SetCenterOfmass(math::Vector3 Centerofmass);
 				void SetBounciness(float bounciness);
 				void SetFriction(float friction);
-				void SetPosition(math::Vector3 position);
-				void SetRotation(math::Quaternion rotation);
+				void SetPosition(math::Vector3 position, bool forcePosition=false);
+				void SetRotation(math::Quaternion rotation, bool forceRotation=false);
 
 
 			public:
@@ -92,6 +92,8 @@ namespace thomas
 				math::Vector3 GetCenterOfmass();
 				float GetBounciness();
 				float GetFriction();
+				math::Vector3 GetPosition();
+				math::Quaternion GetRotation();
 			private:
 				void UpdateRigidbodyMass();
 				void UpdateProperties();
