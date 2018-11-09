@@ -38,21 +38,21 @@ public class GUISelectTeam : ScriptComponent
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.CHAD;
+                CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
             }
             else if (Team2Image.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.CHAD;
+                CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
             }
             else if (SpectatorImage.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.SPECTATE;
+                CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
             }
         }

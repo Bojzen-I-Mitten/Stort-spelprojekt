@@ -4,8 +4,7 @@ public enum CAM_STATE
 {
     JOIN_HOST,
     SELECT_TEAM,
-    CHAD,
-    SPECTATE,
+    GAME,
     NUMSTATES,
     EXIT_MENU
 }
@@ -27,6 +26,7 @@ public class CameraMaster : ScriptComponent
     public Canvas Canvas;
     Image BG;
     public CAM_STATE State = CAM_STATE.JOIN_HOST;
+
 
 
     public override void Awake()
@@ -78,75 +78,28 @@ public class CameraMaster : ScriptComponent
 
     public override void Update()
     {
-        if (Input.GetKeyDown(Input.Keys.Escape))
-        {
-            if (State == CAMSTATE.EXIT_MENU)
-            {
-                State = PreviousState;
-                if (PreviousState == CAMSTATE.CHAD)
-                {
-                    ChadCam.enabled = true;
-                    if (Canvas.isRendering)
-                        Canvas.isRendering = false;
-                }
-            }
-            else
-            {
-                PreviousState = State;
-                State = CAMSTATE.EXIT_MENU;
-                if (!Canvas.isRendering)
-                    Canvas.isRendering = true;
-                ChadCam.enabled = false;
-            }
-        }
+        SelectTeam.Canvas.isRendering = false;
+        Hud.Canvas.isRendering = false;
+        ExitMenu.Canvas.isRendering = false;
+        JoinHost.Canvas.isRendering = false;
 
         switch (State)
         {
             case CAM_STATE.JOIN_HOST:
-                SelectTeam.Canvas.isRendering = false;
-                Hud.Canvas.isRendering = false;
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
                 SelectTeam.Canvas.isRendering = true;
-                Hud.Canvas.isRendering = false;
-                JoinHost.Canvas.isRendering = false;
-                //if (MatchSystem.instance.LocalChad?.NetPlayer?.Team?.TeamType != TEAM_TYPE.UNASSIGNED)
-                //{
-                //    Canvas.isRendering = false; //canvas.Remove(BG) if we need to save some RAM.
-                //    switch (MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().Team.TeamType)
-                //    {
-                //        default:
-                //            break;
-                //        case TEAM_TYPE.TEAM_1:
-                //        case TEAM_TYPE.TEAM_2:
-                //            ChadCam.enabled = true;
-                //            State = CAM_STATE.CHAD;
-                //            break;
-                //        case TEAM_TYPE.TEAM_SPECTATOR:
-                //            SpectatorCam.enabled = true;
-                //            State = CAM_STATE.SPECTATE;
-                //            break;
-                //    }
-                //}
                 break;
-            case CAM_STATE.CHAD:
-                SelectTeam.Canvas.isRendering = false;
+            case CAM_STATE.GAME:
                 Hud.Canvas.isRendering = true;
-                JoinHost.Canvas.isRendering = false;
-                ExitMenu.Canvas.isRendering = false;
+                if(Input.GetKeyDown(Input.Keys.Escape))
+                    State = CAM_STATE.EXIT_MENU;
                 break;
-            case CAM_STATE.SPECTATE:
-                SelectTeam.Canvas.isRendering = false;
-                Hud.Canvas.isRendering = true;
-                JoinHost.Canvas.isRendering = false;
-                ExitMenu.Canvas.isRendering = false;
-                break;
-            case CAMSTATE.EXIT_MENU:
-                SelectTeam.Canvas.isRendering = false;
-                Hud.Canvas.isRendering = false;
-                JoinHost.Canvas.isRendering = false;
+            case CAM_STATE.EXIT_MENU:
                 ExitMenu.Canvas.isRendering = true;
+                if (Input.GetKeyDown(Input.Keys.Escape))
+                    State = CAM_STATE.GAME;
                 break;
         }
     }

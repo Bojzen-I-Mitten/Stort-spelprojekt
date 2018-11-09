@@ -47,11 +47,12 @@ public class GUIExitMenu : ScriptComponent
             ExitGame.color = Color.Black;
 
         if (ExitMatch.Clicked())
-            return;
-    }
-
-    public void ShowEscMenu()
-    {
-
+        {
+            CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+        }
+        if (ExitGame.Clicked())
+        {
+            ThomasWrapper.Exit();
+        }
     }
 }
