@@ -14,9 +14,11 @@ namespace thomas
 		void Destroy();
 		void ClearAllWindows();
 		void PresentAllWindows();
+		void ResolveRenderTarget();
 		void Update();
 		void Create(HWND hWnd, bool isEditor);
 		void UpdateFocus();
+
 	public:
 		int GetNumOfWindows();
 		Window* GetCurrentBound();
