@@ -10,10 +10,6 @@ namespace ThomasEngine
 	SoundComponent::SoundComponent() : Component(new thomas::object::component::SoundComponent()) {}
 	thomas::object::component::SoundComponent* SoundComponent::sound::get() { return (thomas::object::component::SoundComponent*)nativePtr; }
 
-	void SoundComponent::Apply3D(Vector3 listenerPos, Vector3 sourcePos)
-	{
-		sound->Apply3D(Utility::Convert(listenerPos), Utility::Convert(sourcePos));
-	}
 
 	void SoundComponent::Play()
 	{
@@ -55,6 +51,23 @@ namespace ThomasEngine
 		return sound->HasStopped();
 	}
 
+	void SoundComponent::Start()
+	{
+		if (playOnStart)
+			sound->Play();
+		else
+			sound->Stop();
+	}
+
+	bool SoundComponent::Is3D::get()
+	{
+		return sound->is3D();
+	}
+	void SoundComponent::Is3D::set(bool value)
+	{
+		sound->Set3D(value);
+	}
+
 	void SoundComponent::clip::set(AudioClip^ value)
 	{
 		m_clip = value;
@@ -94,5 +107,15 @@ namespace ThomasEngine
 	bool SoundComponent::Looping::get() 
 	{ 
 		return sound->IsLooping(); 
+	}
+
+	void SoundComponent::PlayOnStart::set(bool value)
+	{
+		playOnStart = value;
+	}
+
+	bool SoundComponent::PlayOnStart::get()
+	{
+		return playOnStart;
 	}
 }

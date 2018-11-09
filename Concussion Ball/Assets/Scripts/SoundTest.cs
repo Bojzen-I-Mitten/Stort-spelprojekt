@@ -23,7 +23,5 @@ public class SoundTest : ScriptComponent
         {
             Gun.PlayOneShot();
         }
-
-        //Gun.Apply3D(Listener.position, gameObject.transform.position);
     }
 }

@@ -31,6 +31,17 @@ namespace ThomasEngine
 		void Awake() override;
 		void OnDestroy() override;
 
+
+		void SetPosition(Vector3 position, bool forcePosition)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(position), forcePosition);
+		}
+
+		void SetRotation(Quaternion rotation, bool forceRotation)
+		{
+			((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(rotation), forceRotation);
+		}
+
 		void AddTorque(Vector3 torque)
 		{
 			((thomas::object::component::Rigidbody*)nativePtr)->AddTorque(thomas::math::Vector3(torque.x, torque.y, torque.z));
@@ -142,6 +153,7 @@ namespace ThomasEngine
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property Vector3 Position
 		{
+			Vector3 get() {return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetPosition()); }
 			void set(Vector3 value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(value)); }
 		}
 
@@ -149,6 +161,7 @@ namespace ThomasEngine
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property Quaternion Rotation
 		{
+			Quaternion get() { return Utility::Convert(((thomas::object::component::Rigidbody*)nativePtr)->GetRotation()); }
 			void set(Quaternion value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(value)); }
 		}
 

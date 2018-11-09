@@ -78,8 +78,6 @@ namespace ThomasEngine {
 					component->Initialize();
 				}
 			}
-
-
 		}
 		Monitor::Exit(m_componentsLock);
 		return completed;

@@ -38,21 +38,12 @@ public class PowerupManager : ScriptComponent
 
     }
 
-    public GameObject InstantiatePowerup(Transform trans)
+    public GameObject InstantiatePowerup()
     {
-
         int seed = (int)(MatchSystem.instance.MatchStartTime + NextPowerupID);
         System.Random random = new System.Random(seed);
         int powerupIndex = random.Next(0, Powerups.Count);
-        Debug.Log(powerupIndex);
         GameObject powerup = GetAvailablePowerup(powerupIndex);
-        if(powerup)
-        {
-            powerup.activeSelf = true;
-            powerup.transform.position = trans.position;
-            powerup.transform.rotation = trans.rotation;
-            powerup.GetComponent<NetworkIdentity>().WriteInitialData();
-        }
         NextPowerupID++;
         return powerup;
     }
@@ -78,11 +69,12 @@ public class PowerupManager : ScriptComponent
         List<Powerup> activePowerups = Object.GetObjectsOfType<Powerup>();
         for (int i=0; i < activePowerups.Count; i++)
         {
-            activePowerups[i].Remove();
+            if(activePowerups[i].isOwner)
+                activePowerups[i].Remove();
         }
         Object.GetObjectsOfType<Powerup>();
 
-        spawnPoints.ForEach(point => point.Free()); //Safety free
+        spawnPoints.ForEach(point => { if (point.isOwner) point.Free(); }); //Safety free
         spawnPoints.ForEach(point => point.SpawnPowerup());
     }
 }

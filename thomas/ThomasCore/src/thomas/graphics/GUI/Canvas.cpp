@@ -22,6 +22,7 @@ namespace thomas
 				m_camViewport = camViewport;
 				m_viewportScale = Vector2(1.f, 1.f);
 				m_baseResolution = baseResolution;
+				m_render = true;
 
 				m_GUIElements = std::vector<std::unique_ptr<GUIElement>>();
 			}
@@ -36,7 +37,7 @@ namespace thomas
 
 			void Canvas::Render()
 			{
-				if (m_spriteBatch != nullptr)
+				if (m_spriteBatch != nullptr && m_render)
 				{
 					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied());
 
@@ -109,6 +110,11 @@ namespace thomas
 				{
 					m_GUIElements.erase(element);
 				}
+			}
+
+			void Canvas::SetRendering(bool render)
+			{
+				m_render = render;
 			}
 		}
 	}
