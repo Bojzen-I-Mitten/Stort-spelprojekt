@@ -1,8 +1,11 @@
 #include "SoundComponent.h"
 
+#include "AudioListener.h"
 #include "../../Sound.h"
 #include "../../resource/AudioClip.h"
 #include "../../ThomasTime.h"
+#include "Transform.h"
+#include "../GameObject.h"
 namespace thomas
 {
 	namespace object
@@ -13,7 +16,8 @@ namespace thomas
 			m_looping(true),
 			m_clip(nullptr),
 			m_volume(0.5f),
-			m_volumeFactor(1.f)
+			m_volumeFactor(1.f),
+			m_is3D(false)
 			{
 			}
 
@@ -22,13 +26,32 @@ namespace thomas
 				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
 			}
 
+			void SoundComponent::Update()
+			{
+				if (m_is3D && AudioListener::GetInstance())
+				{
+					Apply3D(AudioListener::GetInstance()->m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->GetPosition());
+				}
+			}
+
 			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
 			{
 				EDITOR_LOCK();
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
+					
 					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
+
+					
+					if (attenuation > 5.0f)
+					{
+					attenuation = 5.0f;
+					}
+					else if (attenuation < 0.0f)
+					{
+						attenuation = 0.0f;
+					}
 					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
 				
 				}
@@ -40,6 +63,7 @@ namespace thomas
 				if (m_clip != nullptr)
 				{
 					m_clip->GetSoundEffectInstance()->Play(m_looping);
+					SetVolume(m_volume);
 				}
 			}
 
@@ -146,6 +170,11 @@ namespace thomas
 				m_looping = looping;
 			}
 
+			void SoundComponent::Set3D(bool value)
+			{
+				m_is3D = value;
+			}
+
 			resource::AudioClip* SoundComponent::GetClip() const
 			{
 				return m_clip;
@@ -164,6 +193,10 @@ namespace thomas
 			bool SoundComponent::IsLooping() const
 			{
 				return m_looping;
+			}
+			bool SoundComponent::is3D() const
+			{
+				return m_is3D;
 			}
 		}
 	}

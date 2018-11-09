@@ -14,8 +14,14 @@ public class PP : Powerup
 
         m_throwable = true; // change depending on power-up
 
-     
 
+        float theta = Random.Range(MathHelper.PiOver2 / 3.0f, MathHelper.PiOver2);
+        float phi = Random.Range(0.0f, MathHelper.TwoPi);
+        float radius = 5;
+
+        shipGO.transform.position = Utility.SphericalCoordinate(phi, theta, radius);
+
+        shipGO.transform.enabled = false;
     }
 
     public override void Update()
@@ -40,24 +46,20 @@ public class PP : Powerup
         WaitActivate();
         DeSpawnShip();
 
-       
+
 
     }
     private void InstantiateShip()
     {
-        GameObject.Instantiate(shipGO);
-        float theta = Random.Range(MathHelper.PiOver2 / 3.0f, MathHelper.PiOver2);
-        float phi = Random.Range(0.0f, MathHelper.TwoPi);
-        float radius = 5;
 
-        shipGO.transform.position = transform.position + Utility.SphericalCoordinate(phi, theta, radius);
+        shipGO.transform.enabled = true;//.transform.position = transform.position + Utility.SphericalCoordinate(phi, theta, radius);
         Rigidbody rb = shipGO.GetComponent<Rigidbody>();
         Vector3 direction = transform.position - shipGO.transform.position;
 
         rb.AddForce(direction);
     }
 
-    
+
 
     private IEnumerator WaitActivate()
     {
@@ -69,18 +71,18 @@ public class PP : Powerup
         }
 
         InstantiateShip();
-        
-            
+
+
     }
 
     private IEnumerator DeSpawnShip()
     {
-        
+
         yield return new WaitForSeconds(10.0f);
-        
+
         // despawn gameobject
         Remove();
     }
-    
+
 
 }

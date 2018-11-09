@@ -196,7 +196,7 @@ namespace thomas
 			void Camera::Render()
 			{
 				//PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
-				graphics::Renderer::Instance()->SubmitCamera(this);
+				//graphics::Renderer::Instance()->SubmitCamera(this);
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
 					if(renderComponent->m_gameObject->GetActive())
@@ -289,10 +289,12 @@ namespace thomas
 						m_canvases[i]->SetViewport(m_frameData.viewport);
 					}
 				}
+				graphics::Renderer::Instance()->SubmitCamera(this);
 			}
 
 			const graphics::render::CAMERA_FRAME_DATA& Camera::GetFrameData()
 			{
+				//CopyFrameData();
 				return m_frameData;
 			}
 

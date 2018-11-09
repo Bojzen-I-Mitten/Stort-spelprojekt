@@ -26,6 +26,7 @@ public class Ball : PickupableObject
         base.Start();
         m_throwable = true;
         DropOnRagdoll = true;
+        MovementSpeedModifier = 0.65f;
 
         // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 
@@ -69,6 +70,7 @@ public class Ball : PickupableObject
         emitterSmoke.DistanceFromSphereCenter = 0;
         emitterSmoke.Radius = 0.7f;
 
+        emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 0.1f;
         emitterFire.MaxSize = 0.5f;
         emitterFire.EndSize = 0.0f;
@@ -188,16 +190,20 @@ public class Ball : PickupableObject
 
         float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
 
-        if (interp > 0.8f)
+        if (interp > 0.7f)
         {
             emitterFire.Emit = true;
+        }
+        if (interp > 0.9f)
+        {
+            emitterSmoke.Emit = true;
         }
         if (interp > electricityIntensifyerThreshold)
         {
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
-            electricityIntensifyerThreshold += 0.3f;
+            electricityIntensifyerThreshold += 0.2f;
         }
 
     }
@@ -209,21 +215,28 @@ public class Ball : PickupableObject
         StartCoroutine(CleanTimer());
     }
 
+    public override void Pickup(ChadControls chad, Transform hand)
+    {
+        base.Pickup(chad, hand);
+        m_pickupable = true;
+    }
 
-    public void Reset()
+
+    public override void Reset()
     {
         if (isOwner)
         {
             Drop();
             if (m_rigidBody != null)
             {
-                m_rigidBody.enabled = false;
-                m_rigidBody.Position = Vector3.Zero;
+                //m_rigidBody.enabled = false;
+                m_rigidBody.SetPosition(Vector3.Zero, true);
+                m_rigidBody.SetRotation(Quaternion.Identity, true);
                 m_rigidBody.LinearVelocity = Vector3.Zero;
                 m_rigidBody.AngularVelocity = Vector3.Zero;
                 transform.position = Vector3.Zero;
                 transform.rotation = Quaternion.Identity;
-                m_rigidBody.enabled = true;
+               // m_rigidBody.enabled = true;
             }
         }
 

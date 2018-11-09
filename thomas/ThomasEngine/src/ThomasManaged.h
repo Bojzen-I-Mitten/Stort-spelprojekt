@@ -61,6 +61,7 @@ namespace ThomasEngine {
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
 		static ManualResetEvent^ StateCommandProcessed;
+		static ManualResetEvent^ WaitLogOutput;
 		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
 
 
@@ -71,6 +72,10 @@ namespace ThomasEngine {
 		static void StopPlay();
 		static void ProcessCommand();
 		static void SynchronousExecution();
+
+		static void DumpProfilerLog(System::Object^ stateInfo);
+		static void SampleRam(System::Object ^ stateInfo);
+
 
 		ThomasWrapper();
 		~ThomasWrapper();

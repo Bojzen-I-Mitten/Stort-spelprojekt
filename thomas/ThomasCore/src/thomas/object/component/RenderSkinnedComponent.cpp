@@ -9,6 +9,7 @@
 #include "../../editor/gizmos/Gizmos.h"
 #include "../../resource/Shader.h"
 #include "../../ThomasCore.h"
+#include "../../utils/AutoProfile.h"
 namespace thomas
 {
 	namespace object
@@ -42,7 +43,10 @@ namespace thomas
 #endif
 				EDITOR_LOCK();
 				if (m_skeleton)
+				{
+					PROFILE("AnimationUpdate")
 					m_skeleton->update(ThomasTime::GetDeltaTime());
+				}
 			}
 
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {

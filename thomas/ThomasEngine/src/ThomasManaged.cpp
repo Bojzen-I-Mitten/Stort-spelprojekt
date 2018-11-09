@@ -121,6 +121,18 @@ namespace ThomasEngine {
 
 		}
 	}
+	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
+	{
+#ifdef BENCHMARK
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->SetActive(true);
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+#endif
+
+	}
 
 	void ThomasWrapper::MainThreadUpdate()
 	{
@@ -128,6 +140,13 @@ namespace ThomasEngine {
 		if (!playing)
 			ScriptingManager::ReloadAssembly(false);
 #endif
+		constexpr uint32_t RAM_SAMPLE_FRAME = 1000;
+		static uint32_t WaitSampleFrame = 0;
+		if (WaitSampleFrame++ > RAM_SAMPLE_FRAME)
+		{
+			ThreadPool::QueueUserWorkItem(gcnew WaitCallback(SampleRam));
+			WaitSampleFrame = 0;
+		}
 	}
 
 
@@ -146,7 +165,9 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+#ifdef BENCHMARK
 			utils::profiling::ProfileManager::newFrame();
+#endif
 		}
 	}
 
@@ -211,6 +232,7 @@ namespace ThomasEngine {
 	
 	void ThomasWrapper::CopyCommandList()
 	{
+		PROFILE("CopyCommandList")
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 
 		profiler->SetActive(showStatistics);
@@ -244,7 +266,7 @@ namespace ThomasEngine {
 		thomas::graphics::Renderer::Instance()->ClearCommands();
 		thomas::editor::Gizmos::Gizmo().ClearGizmos();
 
-		editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+		//editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
 //#ifdef _EDITOR
 //		editor::Editor::GetEditor().Camera()->GetCamera()->CopyFrameData();
 //#endif
@@ -292,11 +314,14 @@ namespace ThomasEngine {
 							   	
 
 				//Logic
-				for each (GameObject^ gameObject in CurrentScene->GameObjects)
 				{
-					if (gameObject->GetActive())
+					PROFILE("LogicLoop")
+					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
-						gameObject->Update();
+						if (gameObject->GetActive())
+						{
+							gameObject->Update();
+						}
 					}
 				}
 				editor::EditorCamera::Instance()->Update();
@@ -305,7 +330,11 @@ namespace ThomasEngine {
 				if (IsPlaying())
 				{
 					//Physics
-					thomas::Physics::UpdateRigidbodies();
+					{
+						PROFILE("UpdateRigidbodies")
+
+						thomas::Physics::UpdateRigidbodies();
+					}
 					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
 						if (gameObject->GetActive())
@@ -348,6 +377,8 @@ namespace ThomasEngine {
 			}
 			catch (Exception^ e) {
 				Debug::LogException(e);
+				/*if (playing && inEditor)
+					IssueStopPlay();*/
 			}
 			finally
 			{
@@ -375,14 +406,9 @@ namespace ThomasEngine {
 
 
 				}
-				float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
-#ifdef BENCHMARK
-				utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-				profiler->SetActive(true);
-				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
-#endif
+
+
 
 #ifdef _THOMAS_SCENE_LOCK
 				Monitor::Exit(Thomas->m_sceneLock);
@@ -397,16 +423,31 @@ namespace ThomasEngine {
 		{
 			Debug::Log("Waiting for render thread to terminate...");
 		}
-		delete s_SYS;
+
+
+#ifdef BENCHMARK
+		WaitLogOutput = gcnew ManualResetEvent(false);
+		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
+		ThreadPool::QueueUserWorkItem(logOut);
+#endif
+
 		Resources::UnloadAll();
 		ThomasCore::Destroy();
-
+#ifdef BENCHMARK
+		WaitLogOutput->WaitOne();
+#endif
 	}
 
-	void ThomasWrapper::Exit() {
-
+	void ThomasWrapper::DumpProfilerLog(System::Object^ stateInfo)
+	{
+#ifdef BENCHMARK
 		utils::profiling::ProfileManager::dumpDataToFile();
-	
+#endif
+		WaitLogOutput->Set();
+	}
+
+	void ThomasWrapper::Exit() 
+	{
 		thomas::ThomasCore::Exit();
 	}
 

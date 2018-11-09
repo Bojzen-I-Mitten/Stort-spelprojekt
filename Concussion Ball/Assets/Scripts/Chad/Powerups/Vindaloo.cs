@@ -9,10 +9,13 @@ public class Vindaloo : Powerup
     public Texture2D fire2Texture { get; set; }
     public Texture2D smokeTexture { get; set; }
     public Texture2D gravelTexture { get; set; }
+    public AudioClip VindalooExplosionSound { get; set; }
+
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterFire2;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
+    private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 5.0f;
     // public float ExplosionForce { get; set; } = 200.0f;
@@ -22,6 +25,11 @@ public class Vindaloo : Powerup
         base.Start();
 
         m_throwable = true; // change depending on power-up
+
+        ExplosionSound = gameObject.AddComponent<SoundComponent>();
+        ExplosionSound.clip = VindalooExplosionSound;
+        ExplosionSound.Looping = false;
+        ExplosionSound.Is3D = true;
 
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterFire.MinSize = 1.2f;
@@ -120,30 +128,23 @@ public class Vindaloo : Powerup
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
         Explosion();
 
-        // loop through players and check distance from explosion source
-        var players = NetworkManager.instance.Scene.Players.Values.ToList();
-        players.ForEach(player =>
+        ChadControls localChad = MatchSystem.instance.LocalChad;
+        if (localChad)
         {
-            float distance = Vector3.Distance(player.transform.position, transform.position);
+            float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
-                Vector3 forceDir = player.transform.position - transform.position;
+                Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.y += 3.0f;
-
-                // ragdoll and knock-back
-                player.gameObject.GetComponent<ChadControls>().PublicStartRagdoll(5.0f, forceDir * ExplosionForce);
+                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
             }
-        });
-
-
-        //Remove();
+        }
     }
 
     private void Explosion()
     {
-        //hide the vindaloo.
-        m_rigidBody.enabled = false;
-        gameObject.transform.scale = Vector3.Zero;
+        // Play the vindaloo explosion sound
+        ExplosionSound.PlayOneShot();
 
         emitterFire.EmitOneShot(25);
         emitterFire2.EmitOneShot(45);

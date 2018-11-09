@@ -258,10 +258,14 @@ namespace ThomasEngine.Network
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
 
-            if (NetManager.PeersCount < 10 /* max connections */)
+            if (NetManager.PeersCount < MaxPlayers && Scene.PoolNotEmpty() /* max connections */)
                 request.AcceptIfKey("SomeConnectionKey");
             else
+            {
+                Debug.Log("Connection was rejected!");
                 request.Reject();
+            }
+                
         }
 
         #endregion

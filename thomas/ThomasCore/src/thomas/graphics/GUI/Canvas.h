@@ -39,6 +39,7 @@ namespace thomas
 				GUIElement* Add(const std::string & text);
 				GUIElement* Add(Texture2D* texture);
 				void Remove(GUIElement* element);
+				void SetRendering(bool render);
 
 			private:
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;
@@ -49,6 +50,7 @@ namespace thomas
 				Viewport m_viewport;
 				Viewport* m_camViewport;
 				math::Vector2 m_baseResolution;
+				bool m_render;
 			};
 		}
 	}
