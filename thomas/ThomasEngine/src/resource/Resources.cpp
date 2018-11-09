@@ -17,6 +17,7 @@
 #include "../serialization/Serializer.h"
 #include "../Time.h"
 #include "Font.h"
+#include "../object/component/Transform.h"
 using namespace System::Threading;
 namespace ThomasEngine
 {
@@ -393,15 +394,22 @@ namespace ThomasEngine
 				}
 			}
 
+			void recursivePrefabDestruction(GameObject^ obj)
+			{
+				// Delete objects recursively
+				List<Transform^> list(obj->transform->children);	// List is edited during destruction
+				for each(Transform^ o in list)
+					recursivePrefabDestruction(o->m_gameObject);
+				obj->OnDestroy(); // Should not be 'needed' prefabs should not be initiated, asserts destruction process nevertheless
+				delete obj;
+			}
+
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
 				for each (auto var in s_PREFAB_DICT)
-				{
-					var.Value->OnDestroy();
-					delete var.Value;
-				}
+					recursivePrefabDestruction(var.Value);
 				resources->Clear();
 			}
 #pragma endregion
