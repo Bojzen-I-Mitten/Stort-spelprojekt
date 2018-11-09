@@ -563,6 +563,9 @@ public class ChadControls : NetworkComponent
         ChargeTime += Time.DeltaTime;
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
 
+        //if(PickedUpObject.gameObject.GetType() is Ball.GetType())
+        //    ChargeTime = 4.0f;
+
         PickedUpObject.chargeTimeCurrent = ChargeTime;
         
 
