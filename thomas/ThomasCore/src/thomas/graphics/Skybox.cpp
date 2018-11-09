@@ -39,7 +39,7 @@ namespace thomas
 		void SkyBox::GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius)
 		{
 			std::vector<math::Vector3> sphereVerts;
-			std::vector<unsigned> sphereIndices;
+			std::vector<unsigned int> sphereIndices;
 			float phi = 0.0f;
 			float theta = 0.0f;
 
@@ -133,7 +133,7 @@ namespace thomas
 			m_shader->SetPass(0);
 
 			
-			m_shader->DrawIndexed(m_indexBuffer->GetSize(), 0, 0);
+			m_shader->DrawIndexed(m_indexBuffer->IndexCount(), 0, 0);
 		}
 		
 	}

@@ -289,6 +289,14 @@ namespace ThomasEngine
 			Serializer::SerializeGameObject(gameObject, path);
 			gameObject->prefabPath = pp;
 		}
+		void recursivePrefabClean(GameObject^ obj)
+		{
+			if (obj == nullptr) return;
+			// Clean null components recursively
+			for each(Transform^ o in obj->transform->children)
+				recursivePrefabClean(o->m_gameObject);
+			obj->CleanComponents();
+		}
 
 		GameObject^ Resources::CreatePrefab(String^ path)
 		{
@@ -296,7 +304,10 @@ namespace ThomasEngine
 			{
 				GameObject^ prefab = Serializer::DeserializeGameObject(path);
 				if (prefab)
+				{
 					prefab->prefabPath = path;
+					recursivePrefabClean(prefab);
+				}
 				return prefab;
 			}
 			catch (Exception^ e) {

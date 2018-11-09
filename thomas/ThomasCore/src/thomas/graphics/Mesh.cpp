@@ -61,7 +61,7 @@ namespace thomas
 
 		unsigned int Mesh::GetIndexCount() const
 		{
-			return m_data.indices.size();
+			return m_data.indexBuffer->IndexCount();
 		}
 
 		unsigned int Mesh::GetVertexCount() const

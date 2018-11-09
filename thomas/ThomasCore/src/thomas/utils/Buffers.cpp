@@ -86,7 +86,7 @@ namespace thomas
 				m_buffer->SetPrivateData(WKPDID_D3DDebugObjectName, name.length() - 1, name.c_str());
 #endif
 			}
-			size_t Buffer::GetSize()
+			size_t Buffer::GetByteSize()
 			{
 				return m_size;
 			}
@@ -103,7 +103,8 @@ namespace thomas
 				return m_stride;
 			}
 			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : 
-				Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag)
+				Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag),
+				m_indexCount(count)
 			{
 
 			}

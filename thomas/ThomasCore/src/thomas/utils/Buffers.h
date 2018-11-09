@@ -33,7 +33,7 @@ namespace thomas
 				*/
 				void SetName(const std::string& name);
 
-				size_t GetSize();
+				size_t GetByteSize();
 				ID3D11Buffer* GetBuffer();
 			protected:
 				D3D11_BIND_FLAG m_bindFlag;
@@ -84,7 +84,14 @@ namespace thomas
 			public:
 				IndexBuffer(void* data, size_t count, D3D11_USAGE usageFlag);
 				template <typename T>
-				IndexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : IndexBuffer(data.data(), data.size(), usageFlag) {};
+				IndexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : 
+					IndexBuffer(data.data(), data.size(), usageFlag)
+				{};
+
+				size_t IndexCount() { return m_indexCount; }
+
+			private:
+				size_t m_indexCount;
 			};
 
 			class StructuredBuffer : public Buffer

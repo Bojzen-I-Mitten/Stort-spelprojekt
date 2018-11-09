@@ -25,11 +25,12 @@ namespace ThomasEngine
 		bool m_makeDynamic = false;
 		bool m_makeStatic = false;
 
+	private:
 		GameObject();
 		virtual ~GameObject();
 
 		System::Object^ m_componentsLock = gcnew System::Object();
-
+		
 	internal:
 		/* Init the components within the object to the specified state
 		s		<<	State components should be initiated to
@@ -50,6 +51,9 @@ namespace ThomasEngine
 		void PostLoad(Scene^ scene);
 
 		void PostInstantiate(Scene^ scene);
+		/* Clean out null components (no lock applied, assert stable state)
+		*/
+		void CleanComponents();
 
 		
 		thomas::object::Object* setStatic();

@@ -113,6 +113,11 @@ namespace ThomasEngine {
 
 	void GameObject::PostLoad(Scene^ scene)
 	{
+		m_scene_id = ThomasWrapper::CurrentScene->ID();
+	}
+
+	void GameObject::CleanComponents()
+	{
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			if (m_components[i] == nullptr)
@@ -123,7 +128,6 @@ namespace ThomasEngine {
 				m_components.RemoveAt(i--);
 			}
 		}
-		m_scene_id = ThomasWrapper::CurrentScene->ID();
 	}
 
 	void GameObject::PostInstantiate(Scene^ scene) {
