@@ -66,6 +66,7 @@
     <ClCompile Include="src\math\Viewport.cpp" />
     <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
     <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
+    <ClCompile Include="src\object\component\AudioListener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -136,6 +137,7 @@
     <ClInclude Include="src\resource\texture\TextureCube.h" />
     <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
+    <ClInclude Include="src\object\component\AudioListener.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

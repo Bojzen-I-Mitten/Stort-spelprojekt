@@ -6,9 +6,9 @@ namespace thomas
 {
 	namespace utils
 	{
-
 		namespace profiling
 		{
+			std::vector<long long> ProfileManager::s_fps;
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
 			float ProfileManager::s_ramusage;
 			float ProfileManager::s_vramusage;
@@ -21,6 +21,15 @@ namespace thomas
 
 			void ProfileManager::newFrame()
 			{
+				// Init to starting point, will produce a frametime of zero
+				static std::chrono::steady_clock::time_point tracktime = std::chrono::high_resolution_clock::now();
+
+				std::chrono::nanoseconds frametime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - tracktime);
+				
+				tracktime = std::chrono::high_resolution_clock::now();
+
+				s_fps.push_back(frametime.count());
+
 				s_frames++;
 			}
 
@@ -40,36 +49,49 @@ namespace thomas
 				json j;
 				j["SlowfilerData"];
 				j["SlowfilerData"]["build"];
-				j["SlowfilerData"]["timeline"];
-				j["SlowfilerData"]["timeline"]["processor"];
+
+				j["SlowfilerData"]["build"]["fps"] = s_fps;
+
 
 				j["SlowfilerData"]["processor"];
 
 				for (auto& id : s_samples)
 				{
+					std::string temp;
+					temp.reserve(100000);
 					for (auto& processor : id.second)
 					{
 						j["SlowfilerData"]["processor"][id.first]["functions"];
 						j["SlowfilerData"]["processor"][id.first]["functions"][processor.first];
 
 						std::vector<long long> temp_vector;
-						for (auto& sample : processor.second)
-						{
-							temp_vector.push_back(sample.m_duration);
-						}
 
+						
+						for (int i = 0; i < processor.second.size() - 1; i++) 
+						{
+							temp += ' ' + std::to_string(processor.second[i].m_duration) + ',';
+						}
+						temp += std::to_string(processor.second.back().m_duration);
+						auto& obj = j["SlowfilerData"]["processor"][id.first]["functions"][processor.first];
 						for (auto& sample : processor.second)
 						{
-							j["SlowfilerData"]["processor"][id.first]["functions"][processor.first] = temp_vector;
+							 obj = temp;
 						}
+						temp.clear();
 					}
 				}
 
-				for (auto& it : s_samples)
-					j["SlowfilerData"]["timeline"]["processor"][it.first];
 
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
 				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
+				/*
+
+				j["SlowfilerData"]["timeline"];
+				j["SlowfilerData"]["timeline"]["processor"];
+
+
+				for (auto& it : s_samples)
+					j["SlowfilerData"]["timeline"]["processor"][it.first];
 
 				for (auto& id : s_samples)
 				{
@@ -84,7 +106,7 @@ namespace thomas
 						}
 					}
 				}
-
+				*/
 				std::ofstream o("data.json");
 				o << j << std::endl;
 				o.close();

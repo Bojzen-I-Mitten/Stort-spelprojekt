@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <vector>
-#include <d3d11.h>
+#include "utils/D3D.h"
 #include "Input.h"
 
 namespace thomas 
@@ -11,11 +11,13 @@ namespace thomas
 	protected:
 		struct DXBuffers
 		{
-			ID3D11RenderTargetView* backBuffer = nullptr;
-			ID3D11ShaderResourceView* backBufferSRV = nullptr;
+			ID3D11Texture2D* buffer[2];
+
+			ID3D11RenderTargetView* RTV[2] = { nullptr, nullptr };
+			ID3D11ShaderResourceView* SRV[2] = { nullptr, nullptr };
 			ID3D11DepthStencilState* depthStencilState = nullptr;
-			ID3D11DepthStencilView* depthStencilView = nullptr;
-			ID3D11DepthStencilView* depthStencilViewReadOnly = nullptr;
+			ID3D11DepthStencilView* depthStencilView[2] = { nullptr, nullptr };
+			ID3D11DepthStencilView* depthStencilViewReadOnly[2] = { nullptr, nullptr };
 			ID3D11ShaderResourceView* depthBufferSRV = nullptr;
 
 		}m_dxBuffers;
@@ -29,8 +31,11 @@ namespace thomas
 		virtual void UpdateWindow();
 		virtual void Present();
 		void QueueResize();
-		void Bind();
+		void BindBackBuffer();
+		void BindRenderTarget();
 		void Clear();
+		void ResolveRenderTarget();
+		void WaitOnSwapChain();
 
 	public:
 		bool ShouldResize();
@@ -58,8 +63,8 @@ namespace thomas
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
 
-
 		virtual bool IsEditor() { return false; }
+	
 	protected:
 		bool InitDxBuffers();
 		bool Resize();
@@ -79,7 +84,8 @@ namespace thomas
 		WNDCLASSEX m_windowClassInfo;
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
-		IDXGISwapChain* m_swapChain;
+
+		IDXGISwapChain3* m_swapChain;
 	};
 }
 

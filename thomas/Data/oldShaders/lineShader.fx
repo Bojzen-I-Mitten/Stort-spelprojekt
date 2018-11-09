@@ -1,6 +1,6 @@
 
 
-#include "ThomasCG.fx"
+#include "../FXIncludes/ThomasCG.hlsl"
 
 cbuffer camera : register(b0)
 {
