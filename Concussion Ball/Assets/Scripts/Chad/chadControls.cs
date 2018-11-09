@@ -68,6 +68,9 @@ public class ChadControls : NetworkComponent
         }
     }
 
+    [Browsable(false)]
+    public NetworkPlayer NetPlayer { get; private set; }
+
     public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
@@ -85,6 +88,7 @@ public class ChadControls : NetworkComponent
             MatchSystem.instance.LocalChad = this;
         ThrowForce = BaseThrowForce;
         rBody = gameObject.GetComponent<Rigidbody>();
+        NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         rBody.Friction = 0.99f;
@@ -145,7 +149,7 @@ public class ChadControls : NetworkComponent
             ActivateRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
         }
         if (Input.GetKeyDown(Input.Keys.K))
-            gameObject.GetComponent<NetworkPlayer>().Reset();
+            NetPlayer.Reset();
     }
 
     #region Ragdoll handling
