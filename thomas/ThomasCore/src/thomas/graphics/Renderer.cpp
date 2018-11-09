@@ -227,9 +227,6 @@ namespace thomas
 						}
 					}
 				}
-
-				//Copy rendered objects into the back buffer
-				WindowManager::Instance()->ResolveRenderTarget();
 			}
 	
 			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
@@ -259,6 +256,9 @@ namespace thomas
 				BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
 				editor::Gizmos::Gizmo().RenderGizmos();
 			}
+
+			//Copy rendered objects into the back buffer
+			WindowManager::Instance()->ResolveRenderTarget();
 
 			// Gui draw
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
