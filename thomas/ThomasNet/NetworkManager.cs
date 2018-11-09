@@ -24,7 +24,7 @@ namespace ThomasEngine.Network
 
         internal NetPacketProcessor NetPacketProcessor;
 
-        private EventBasedNetListener Listener;
+        public EventBasedNetListener Listener { get; private set; }
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
         protected NetworkEvents Events;
@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
-
+            
             Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
 
@@ -135,6 +135,11 @@ namespace ThomasEngine.Network
         public void Connect()
         {
             NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
+        }
+
+        public void Disconnect()
+        {
+            InternalManager.DisconnectAll();
         }
 
         #region Listners

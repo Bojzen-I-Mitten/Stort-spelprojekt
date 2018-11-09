@@ -132,7 +132,7 @@ public class ThomasTrain : Powerup
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force * 2.0f);
+        base.Throw(camPos, force);
         soundComponentTravel.Play();
 
         m_rigidBody.UseGravity = false;

@@ -67,6 +67,11 @@ public class MatchSystem : NetworkManager
     public float MatchStartTime;
     [Browsable(false)]
     public bool MatchStarted { get; private set; } = false;
+
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public bool Connected { get { return InternalManager.ConnectedPeerList.Count > 0; } }
+
     public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();

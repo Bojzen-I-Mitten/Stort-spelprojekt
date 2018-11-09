@@ -1,7 +1,8 @@
 using System;
+using System.Collections;
 using ThomasEngine;
 using InputIP;
-using System.ComponentModel;
+using LiteNetLib;
 
 public class GUIJoinHost : ScriptComponent
 {
@@ -17,9 +18,8 @@ public class GUIJoinHost : ScriptComponent
     private string PortString;
     private bool TakeIP;
     private bool TakePort;
-    
+
     public Canvas Canvas;
-    public bool GoToTeamSelect;
 
     Image TextBoxIP;
     Image TextBoxPort;
@@ -30,6 +30,9 @@ public class GUIJoinHost : ScriptComponent
     Text PortText;
     Text IP;
     Text Port;
+    Text ConnectingText;
+    public bool GoToTeamSelect;
+    IEnumerator test;
 
     public override void Awake()
     {
@@ -45,6 +48,27 @@ public class GUIJoinHost : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
+        MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
+        MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+    }
+
+    public void Listener_PeerConnectedEvent(NetPeer peer)
+    {
+        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
+
+        CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+        Join.interactable = true;
+        Host.interactable = true;
+    }
+
+    public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
+    {
+        ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
+        //ConnectingText.position = TextBoxIP.position + TextBoxIP.size / Canvas.viewport.size * 1.5f;
+        Join.interactable = true;
+        Host.interactable = true;
+        StopCoroutine(test);
     }
 
     public override void Update()
@@ -82,10 +106,12 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.TargetIP = IPString;
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();
-                    //Check if connected
-                    GoToTeamSelect = true;
-                    //enabled = false;
-
+                    ConnectingText.text = "Connecting";
+                    ConnectingText.position = new Vector2(0.75f, 0.9f);
+                    test = Connecting();
+                    StartCoroutine(test);
+                    Join.interactable = false;
+                    Host.interactable = false;
                     return;
                 }
                 else
@@ -103,16 +129,14 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
-                    GoToTeamSelect = true;
-
-                    //enabled = false;
+                    CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+                    
                     return;
                 }
                 else
                 {
                     TextBoxPort.color = Color.Red;
                 }
-
             }
             else
             {
@@ -144,24 +168,28 @@ public class GUIJoinHost : ScriptComponent
         IPText = Canvas.Add(IPString);
         IPText.position = new Vector2(0.1f, 0.11f);
         IPText.color = Color.Black;
-        
+        IPText.depth = 0.9f;
+
 
         PortText = Canvas.Add(PortString);
         PortText.position = new Vector2(0.1f, 0.21f);
         PortText.color = Color.Black;
-        
+        PortText.depth = 0.9f;
+
 
         IP = Canvas.Add("IP, needed to join");
         IP.position = new Vector2(0.1f, 0.07f);
         IP.scale = new Vector2(0.7f);
         IP.color = Color.Black;
-        
-        
+        IP.depth = 0.9f;
+
+
         Port = Canvas.Add("PORT, needed for both host and join");
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
         Port.color = Color.Black;
-        
+        Port.depth = 0.9f;
+
 
         if (JoinBtn != null)
         {
@@ -169,7 +197,8 @@ public class GUIJoinHost : ScriptComponent
             Join.position = new Vector2(0.325f, 0.11f);
             Join.scale = new Vector2(0.25f);
             Join.interactable = true;
-            
+            Join.depth = 0.9f;
+
         }
 
         if (HostBtn != null)
@@ -178,7 +207,8 @@ public class GUIJoinHost : ScriptComponent
             Host.position = new Vector2(0.325f, 0.21f);
             Host.scale = new Vector2(0.25f);
             Host.interactable = true;
-            
+            Host.depth = 0.9f;
+
         }
 
         if (TextBox != null)
@@ -188,17 +218,22 @@ public class GUIJoinHost : ScriptComponent
             TextBoxIP.scale = new Vector2(0.7f, 0.5f);
             TextBoxIP.color = Color.Black;
             TextBoxIP.interactable = true;
-            
+            TextBoxIP.depth = 0.9f;
+
 
             TextBoxPort = Canvas.Add(TextBox);
             TextBoxPort.position = new Vector2(0.1f, 0.2f);
             TextBoxPort.scale = new Vector2(0.7f, 0.5f);
             TextBoxPort.color = Color.Black;
             TextBoxPort.interactable = true;
-           
-        }
-    }
+            TextBoxPort.depth = 0.9f;
 
+        }
+        ConnectingText = Canvas.Add("");
+        ConnectingText.color = Color.Black;
+        ConnectingText.depth = 0;
+        ConnectingText.font = TextFont;
+    }
 
     public void ClearImagesAndText()
     {
@@ -206,10 +241,29 @@ public class GUIJoinHost : ScriptComponent
         Canvas.Remove(Host);
         Canvas.Remove(TextBoxIP);
         Canvas.Remove(TextBoxPort);
+        Canvas.Remove(ConnectingText);
 
         Canvas.Remove(IPText);
         Canvas.Remove(PortText);
         Canvas.Remove(IP);
         Canvas.Remove(Port);
+    }
+
+    IEnumerator Connecting()
+    {
+        int ticks = 0;
+        while (true)
+        {
+            ++ticks;
+            if ((ticks % 4) == 0)
+            {
+                ConnectingText.text = "Connecting";
+                ticks = 0;
+            }
+            else
+                ConnectingText.text += ".";
+
+            yield return new WaitForSecondsRealtime(0.25f);
+        }
     }
 }

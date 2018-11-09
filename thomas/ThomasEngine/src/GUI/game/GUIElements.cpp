@@ -23,6 +23,8 @@ namespace ThomasEngine
 
 	void GUIElement::rotation::set(float rotation) { nativePtr->rotation = rotation; }
 
+	float GUIElement::rotation::get() { return nativePtr->rotation; }
+
 	void GUIElement::interactable::set(bool interactable) { nativePtr->interactable = interactable; }
 
 	void GUIElement::depth::set(float depth) { nativePtr->depth = depth; }
@@ -43,6 +45,8 @@ namespace ThomasEngine
 	Text::Text(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
 
 	void Text::text::set(String^ text) { ((thomas::graphics::GUI::Text*)nativePtr)->text = Utility::ConvertString(text); }
+
+	String^ Text::text::get() { return Utility::ConvertString(((thomas::graphics::GUI::Text*)nativePtr)->text); }
 
 	void Text::font::set(Font^ font) { ((thomas::graphics::GUI::Text*)nativePtr)->font = (thomas::resource::Font*)(font->m_nativePtr); }
 
