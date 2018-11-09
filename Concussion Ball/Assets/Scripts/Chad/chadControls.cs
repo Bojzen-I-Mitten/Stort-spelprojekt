@@ -639,25 +639,28 @@ public class ChadControls : NetworkComponent
 
     public override void OnTriggerEnter(Collider collider)
     {
-
-        PickupableObject pickupablea = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
-        if (pickupablea)
+        if (isOwner)
         {
-            Debug.LogError("Why denny!?");
-        }
-
-        PickupableObject pickupable = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
-        if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
-        {
-            if (pickupable.transform.parent == null)
+            PickupableObject pickupablea = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
+            if (pickupablea)
             {
-                TakeOwnership(pickupable.gameObject);
-                SendRPC("RPCPickup", pickupable.ID);
-                RPCPickup(pickupable.ID);
+                Debug.LogError("Why Denny!?");
+            }
 
-                ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
+            PickupableObject pickupable = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
+            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
+            {
+                if (pickupable.transform.parent == null)
+                {
+                    TakeOwnership(pickupable.gameObject);
+                    SendRPC("RPCPickup", pickupable.ID);
+                    RPCPickup(pickupable.ID);
+
+                    ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
+                }
             }
         }
+        
     }
 
 
