@@ -137,6 +137,11 @@ namespace ThomasEngine.Network
             NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
         }
 
+        public void Disconnect()
+        {
+            InternalManager.DisconnectAll();
+        }
+
         #region Listners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
