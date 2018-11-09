@@ -69,9 +69,31 @@ namespace thomas
 					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
 					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
 						return false;
+
 					Vector2 size = PixelSize();
-					GUIRect rect{ position.x * canvas->GetViewport().width, position.x * canvas->GetViewport().width + size.x * scale.x * canvas->GetViewportScale().x,
-									 position.y * canvas->GetViewport().height, position.y * canvas->GetViewport().height + size.y * scale.y * canvas->GetViewportScale().y };
+
+					Vector2 res = Vector2(canvas->GetViewport().width, canvas->GetViewport().height);
+
+
+
+					float L = position.x * res.x + (0 - origin.x) * size.x * canvas->GetViewportScale().x * scale.x;
+					float R = position.x * res.x + (1 - origin.x) * size.x * canvas->GetViewportScale().x * scale.x;
+					float T = position.y * res.y + (0 - origin.y) * size.y * canvas->GetViewportScale().y * scale.y;
+					float B = position.y * res.y + (1 - origin.y) * size.y * canvas->GetViewportScale().y * scale.y;
+
+					GUIRect rect{
+						L, //scale.x,
+						R, //scale.x,
+						T, //scale.y,
+						B, //scale.y,
+					};
+
+					/*
+					GUIRect rect{	position.x * canvas->GetViewport().width,														//left
+									position.x * canvas->GetViewport().width + size.x * scale.x * canvas->GetViewportScale().x,		//right
+									position.y * canvas->GetViewport().height,														//top
+									position.y * canvas->GetViewport().height + size.y * scale.y * canvas->GetViewportScale().y };	//bot
+					*/
 					return rect.Intersect(window->GetInput()->GetMousePosition());
 				}
 
@@ -101,7 +123,8 @@ namespace thomas
 
 				Vector2 PixelSize()
 				{
-					return font->GetTextSize(text);
+					Vector2 size = font->GetTextSize(text);
+					return size;
 				}
 			};
 

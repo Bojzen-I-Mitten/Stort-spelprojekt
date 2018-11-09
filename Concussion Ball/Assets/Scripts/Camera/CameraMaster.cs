@@ -81,7 +81,6 @@ public class CameraMaster : ScriptComponent
     {
         if (Input.GetKeyDown(Input.Keys.Escape))
         {
-            Debug.Log("Escape!!!!!");
             if (State == CAMSTATE.EXIT_MENU)
             {
                 State = PreviousState;
