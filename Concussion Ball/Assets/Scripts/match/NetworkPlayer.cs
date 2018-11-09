@@ -80,6 +80,9 @@ public class NetworkPlayer : NetworkComponent
             transform.LookAt(new Vector3(0, transform.position.y, 0));
             gameObject.GetComponent<ChadControls>().Reset();
         }
+
+        CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
+        CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
     }
 
     IEnumerator EnableRigidbody()
