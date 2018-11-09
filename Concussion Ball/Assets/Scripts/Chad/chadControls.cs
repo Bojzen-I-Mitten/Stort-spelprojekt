@@ -20,7 +20,7 @@ public class ChadControls : NetworkComponent
     };
     public STATE State { get; private set; }
     public bool Locked = false;
-    private bool CanRagdoll = true;
+    public bool CanBeTackled = true;
 
     #region Throwing stuff
     [Category("Throwing")]
@@ -32,9 +32,8 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
 
-
     private float BaseThrowForce = 10.0f;
-    private float MaxThrowForce = 20.0f;
+    private float MaxThrowForce = 18.0f;
 
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
@@ -167,7 +166,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
-        CanRagdoll = false;
+        CanBeTackled = false;
         Ragdoll.EnableRagdoll();
     }
 
@@ -414,8 +413,8 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 break;
             case STATE.THROWING:
-                CurrentVelocity.y = Direction.z * modifiedBaseSpeed;
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
+                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
+                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed;
                 
                 break;
             case STATE.DIVING:
@@ -429,17 +428,19 @@ public class ChadControls : NetworkComponent
                 break;
         }
 
-        RaycastHit hit;
-       /* if(Physics.Raycast(transform.position - new Vector3(0, 2, 0), Vector3.Down, out hit, 5.0f, Physics.GetCollisionGroupBit("Ground")))
-        {
-            Debug.Log(hit.collider.Name);
-            Debug.Log(hit.distance);
-            rBody.LinearVelocity = Vector3.Transform(new Vector3(0, -Math.Abs(rBody.LinearVelocity.y), 0), transform.rotation);
-        }
-        else*/ if(State != STATE.DIVING)
+        if(State != STATE.DIVING)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
+    }
+
+    private int Slope(float delta, int absLimit)
+    {
+        if (delta >= absLimit)
+            return absLimit;
+        else if (delta <= -absLimit)
+            return -absLimit;
+        else return 0;
     }
 
     public void Reset()
@@ -510,7 +511,7 @@ public class ChadControls : NetworkComponent
     IEnumerator RagdollRecovery()
     {
         yield return new WaitForSeconds(2);
-        CanRagdoll = true;
+        CanBeTackled = true;
 
         // Recovery particles
     }
@@ -610,13 +611,15 @@ public class ChadControls : NetworkComponent
             reader.GetInt();
             reader.GetVector3();
             reader.GetVector2();
+            reader.GetBool();
+            reader.GetBool();
             return;
         }
         State = (STATE)reader.GetInt();
         Direction = reader.GetVector3();
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
-        
+        CanBeTackled = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -627,6 +630,7 @@ public class ChadControls : NetworkComponent
         writer.Put(Direction);
         writer.Put(CurrentVelocity);
         writer.Put(HasThrown);
+        writer.Put(CanBeTackled);
         return true;
     }
 
@@ -663,7 +667,7 @@ public class ChadControls : NetworkComponent
                 {
                     Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (CanRagdoll && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
+                else if (otherChad.CanBeTackled && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
                 {
                     //toggle ragdoll
                     Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
