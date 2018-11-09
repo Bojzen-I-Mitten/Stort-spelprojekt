@@ -10,8 +10,7 @@ namespace thomas
 		{
 			GpuProfiler::GpuProfiler()
 				: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0),
-				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f), m_active(false),
-				m_currentFrame(0), m_maxFrames(5)
+				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -26,13 +25,11 @@ namespace thomas
 
 				if (!device->CreateQuery(D3D11_QUERY_TIMESTAMP_DISJOINT, m_queryDisjoint[0]))
 				{
-					LOG("Could not create timestamp disjoint query for frame 0!");
 					return false;
 				}
 
 				if (!device->CreateQuery(D3D11_QUERY_TIMESTAMP_DISJOINT, m_queryDisjoint[1]))
 				{
-					LOG("Could not create timestamp disjoint query for frame 1!");
 					return false;
 				}
 
@@ -40,45 +37,44 @@ namespace thomas
 				{
 					if (!device->CreateQuery(D3D11_QUERY_TIMESTAMP, m_queryTimestamp[gts][0]))
 					{
-						LOG("Could not create start-frame timestamp query for GTS " << gts << ", frame 0!");
 						return false;
 					}
 
 					if (!device->CreateQuery(D3D11_QUERY_TIMESTAMP, m_queryTimestamp[gts][1]))
 					{
-						LOG("Could not create start-frame timestamp query for GTS " << gts << ", frame 1!");
 						return false;
 					}
 				}
 
 				IDXGIDevice* dxgiDevice = nullptr;
 				HRESULT hr = device->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)& dxgiDevice);
-				if (FAILED(hr))
+				if (SUCCEEDED(hr))
 				{
-					LOG("Could not query DXGIDevice");
-					return false;
-				}
-				IDXGIAdapter* dxgiAdapter = nullptr;
-				hr = dxgiDevice->GetAdapter(&dxgiAdapter);
-				if (FAILED(hr))
-				{
+					IDXGIAdapter* dxgiAdapter = nullptr;
+					hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+					hr = dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&m_dxgiAdapter4);
+					if (SUCCEEDED(hr))
+					{
+						m_dxgiAdapter4->SetVideoMemoryReservation(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, 512000000);
+						
+						DXGI_QUERY_VIDEO_MEMORY_INFO info;
+						if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+						{
+							m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
+							m_totalMemory = float(info.Budget * 0.001f * 0.001f);
+						};
 
-					SAFE_RELEASE(dxgiDevice);
-					LOG("Could not query DXGIAdapter");
-					return false;
-				}
-				hr = dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&m_dxgiAdapter4);
-				if (FAILED(hr))
-				{
-					SAFE_RELEASE(dxgiDevice);
+						SAFE_RELEASE(dxgiDevice);
+						SAFE_RELEASE(dxgiAdapter);
+						return true;
+					}
+
 					SAFE_RELEASE(dxgiAdapter);
-					LOG("Could not query DXGIAdapter4");
-					return false;
 				}
-				SAFE_RELEASE(dxgiDevice);
-				SAFE_RELEASE(dxgiAdapter);
 
-				return true;
+				SAFE_RELEASE(dxgiDevice);
+
+				return false;
 			}
 
 			void GpuProfiler::Destroy()
@@ -97,29 +93,24 @@ namespace thomas
 
 			void GpuProfiler::BeginFrame()
 			{
-				m_currentFrame = (m_currentFrame + 1) % 5;
-				if (m_currentFrame > 0)
-					return;
-
 				m_drawCalls = 0;
 				m_totalVertexCount = 0;
-				if (!m_active)
-					return;
 				utils::D3D::Instance()->GetDeviceContext()->Begin(m_queryDisjoint[m_frameQuery]);
 				Timestamp(GTS_BEGIN_FRAME);
 			}
 
 			void GpuProfiler::Timestamp(GTS gts)
 			{
-				if (m_currentFrame > 0 || !m_active)
+				UINT64 timestamp;
+				HRESULT hr = utils::D3D::Instance()->GetDeviceContext()->GetData(m_queryTimestamp[gts][m_frameQuery], &timestamp, sizeof(UINT64), 0);
+				if (hr == S_FALSE)
 					return;
+
 				utils::D3D::Instance()->GetDeviceContext()->End(m_queryTimestamp[gts][m_frameQuery]);
 			}
 
 			void GpuProfiler::EndFrame()
 			{
-				if (m_currentFrame > 0 || !m_active)
-					return;
 				Timestamp(GTS_END_FRAME);
 				utils::D3D::Instance()->GetDeviceContext()->End(m_queryDisjoint[m_frameQuery]);
 				++m_frameQuery &= 1; //Fancy 0/1 toggle.
@@ -127,16 +118,13 @@ namespace thomas
 
 			void profiling::GpuProfiler::AddDrawCall(int vertexCount)
 			{
-				if (m_currentFrame > 0)
-					return;
 				m_totalVertexCount += vertexCount;
 				m_drawCalls++;
 			}
 
 			void GpuProfiler::WaitForDataAndUpdate()
 			{
-				if (m_currentFrame || !m_active)
-					return;
+		
 				ID3D11DeviceContext* context = utils::D3D::Instance()->GetDeviceContext();
 				if (m_frameCollect < 0)
 				{
@@ -155,8 +143,8 @@ namespace thomas
 				++m_frameCollect &= 1;
 
 				D3D11_QUERY_DATA_TIMESTAMP_DISJOINT timestampDisjoint;
-				HRESULT HR = context->GetData(m_queryDisjoint[iFrame], &timestampDisjoint, sizeof(timestampDisjoint), 0);
-				if (HR != S_OK)
+				HRESULT hr = context->GetData(m_queryDisjoint[iFrame], &timestampDisjoint, sizeof(timestampDisjoint), 0);
+				if (hr == S_FALSE)
 				{
 					//LOG("Couldn't retrieve timestamp disjoint query data");
 					return;
@@ -170,23 +158,21 @@ namespace thomas
 				}
 
 				UINT64 timestampPrev;
-				if (context->GetData(m_queryTimestamp[GTS_BEGIN_FRAME][iFrame], &timestampPrev, sizeof(UINT64), 0) != S_OK)
+				hr = context->GetData(m_queryTimestamp[GTS_BEGIN_FRAME][iFrame], &timestampPrev, sizeof(UINT64), 0);
+				if (hr == S_FALSE)
 				{
-					LOG("Couldn't retrieve timestamp query data for GTS " << GTS_BEGIN_FRAME);
 					return;
 				}
 
 				for (GTS gts = GTS(GTS_BEGIN_FRAME + 1); gts < GTS_MAX; gts = GTS(gts + 1))
 				{
 					UINT64 timestamp;
-					if (context->GetData(m_queryTimestamp[gts][iFrame], &timestamp, sizeof(UINT64), 0) != S_OK)
+					HRESULT hr = context->GetData(m_queryTimestamp[gts][iFrame], &timestamp, sizeof(UINT64), 0);
+					if (hr == S_OK)
 					{
-						LOG("Couldn't retrieve timestamp query data for GTS " << gts);
-						return;
+						m_timings[gts] = float(timestamp - timestampPrev) / float(timestampDisjoint.Frequency);
+						timestampPrev = timestamp;
 					}
-
-					m_timings[gts] = float(timestamp - timestampPrev) / float(timestampDisjoint.Frequency);
-					timestampPrev = timestamp;
 
 					m_avgTimingsTotal[gts] += m_timings[gts];
 				}
@@ -203,20 +189,6 @@ namespace thomas
 					m_frameCountAvg = 0;
 					m_beginAvg = ThomasTime::GetElapsedTime();
 				}
-
-				//Update VRAM
-				DXGI_QUERY_VIDEO_MEMORY_INFO info;
-
-				if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
-				{
-					m_memoryUsage = float(info.CurrentUsage / 1024.0 / 1024.0); //MiB
-					m_totalMemory = float(info.Budget / 1024.0 / 1024.0);
-				};
-			}
-
-			void profiling::GpuProfiler::SetActive(bool value)
-			{
-				m_active = value;
 			}
 
 			float profiling::GpuProfiler::GetAverageTiming(GTS gts)
@@ -239,6 +211,10 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetMemoryUsage()
 			{
+				DXGI_QUERY_VIDEO_MEMORY_INFO info;
+				if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
+
 				return m_memoryUsage;
 			}
 			float profiling::GpuProfiler::GetTotalMemory()

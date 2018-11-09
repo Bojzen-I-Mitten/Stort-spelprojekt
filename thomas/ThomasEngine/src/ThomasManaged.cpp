@@ -201,30 +201,29 @@ namespace ThomasEngine {
 	
 	void ThomasWrapper::CopyCommandList()
 	{
-		float ramUsage = 0;//float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		//utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 
-		profiler->SetActive(showStatistics);
-		if (showStatistics) {
+		//profiler->SetActive(showStatistics);
+		//if (showStatistics) {
 
-			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
-			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
-			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
-			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
-			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
-			ImGui::Text("RAM Usage: %.2f MB", ramUsage);
-			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
-			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
-			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
-			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
-			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
-			//for (auto& it : *utils::profiling::ProfileManager::GetData())
-			//{
-			//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
-			//	ImGui::Text(it.first, it.second.back());
-			//}
-			ImGui::End();
-		}
+		//	ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
+		//	ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
+		//	ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
+		//	ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
+		//	ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+		//	ImGui::Text("RAM Usage: %.2f MB", ramUsage);
+		//	ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
+		//	ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
+		//	ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
+		//	ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
+		//	ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+		//	//for (auto& it : *utils::profiling::ProfileManager::GetData())
+		//	//{
+		//	//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
+		//	//	ImGui::Text(it.first, it.second.back());
+		//	//}
+		//	ImGui::End();
+		//}
 
 		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
@@ -360,23 +359,18 @@ namespace ThomasEngine {
 					/* Render & Update is synced.
 					*/
 					SynchronousExecution();
-
-
 					RenderFinished->Reset();
-
 					UpdateFinished->Set();
-
-
 				}
 
 
 #ifdef BENCHMARK
-				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 * 0.001f * 0.001f);
 				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
 				utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-				profiler->SetActive(true);
-				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+				utils::profiling::ProfileManager::storeGpuSample((long long)(profiler->GetFrameTime()*1000.0f));
+				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 #endif
 
 				Monitor::Exit(lock);
