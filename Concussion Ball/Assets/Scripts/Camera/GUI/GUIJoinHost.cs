@@ -1,7 +1,7 @@
 using System;
+using System.Collections;
 using ThomasEngine;
 using InputIP;
-using System.ComponentModel;
 
 public class GUIJoinHost : ScriptComponent
 {
@@ -17,7 +17,7 @@ public class GUIJoinHost : ScriptComponent
     private string PortString;
     private bool TakeIP;
     private bool TakePort;
-    
+
     public Canvas Canvas;
     public bool GoToTeamSelect;
 
@@ -30,6 +30,7 @@ public class GUIJoinHost : ScriptComponent
     Text PortText;
     Text IP;
     Text Port;
+    Text ConnectingText;
 
     public override void Awake()
     {
@@ -144,24 +145,24 @@ public class GUIJoinHost : ScriptComponent
         IPText = Canvas.Add(IPString);
         IPText.position = new Vector2(0.1f, 0.11f);
         IPText.color = Color.Black;
-        
+
 
         PortText = Canvas.Add(PortString);
         PortText.position = new Vector2(0.1f, 0.21f);
         PortText.color = Color.Black;
-        
+
 
         IP = Canvas.Add("IP, needed to join");
         IP.position = new Vector2(0.1f, 0.07f);
         IP.scale = new Vector2(0.7f);
         IP.color = Color.Black;
-        
-        
+
+
         Port = Canvas.Add("PORT, needed for both host and join");
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
         Port.color = Color.Black;
-        
+
 
         if (JoinBtn != null)
         {
@@ -169,7 +170,7 @@ public class GUIJoinHost : ScriptComponent
             Join.position = new Vector2(0.325f, 0.11f);
             Join.scale = new Vector2(0.25f);
             Join.interactable = true;
-            
+
         }
 
         if (HostBtn != null)
@@ -178,7 +179,7 @@ public class GUIJoinHost : ScriptComponent
             Host.position = new Vector2(0.325f, 0.21f);
             Host.scale = new Vector2(0.25f);
             Host.interactable = true;
-            
+
         }
 
         if (TextBox != null)
@@ -188,15 +189,19 @@ public class GUIJoinHost : ScriptComponent
             TextBoxIP.scale = new Vector2(0.7f, 0.5f);
             TextBoxIP.color = Color.Black;
             TextBoxIP.interactable = true;
-            
+
 
             TextBoxPort = Canvas.Add(TextBox);
             TextBoxPort.position = new Vector2(0.1f, 0.2f);
             TextBoxPort.scale = new Vector2(0.7f, 0.5f);
             TextBoxPort.color = Color.Black;
             TextBoxPort.interactable = true;
-           
+
         }
+        ConnectingText = Canvas.Add("Connecting");
+        ConnectingText.position = new Vector2(0.75f, 0.9f);
+        ConnectingText.color = Color.Black;
+        StartCoroutine(ConnectingTimer());
     }
 
 
@@ -206,10 +211,29 @@ public class GUIJoinHost : ScriptComponent
         Canvas.Remove(Host);
         Canvas.Remove(TextBoxIP);
         Canvas.Remove(TextBoxPort);
+        Canvas.Remove(ConnectingText);
 
         Canvas.Remove(IPText);
         Canvas.Remove(PortText);
         Canvas.Remove(IP);
         Canvas.Remove(Port);
+    }
+
+    IEnumerator ConnectingTimer()
+    {
+        int ticks = 0;
+        while (true)
+        {
+            ++ticks;
+            if ((ticks % 8) == 0)
+            {
+                ConnectingText.text = "Connecting";
+                ticks = 0;
+            }
+            else if ((ticks % 2) == 0)
+                ConnectingText.text += ".";
+
+            yield return new WaitForSecondsRealtime(0.25f); //3 seconds for a full spin
+        }
     }
 }
