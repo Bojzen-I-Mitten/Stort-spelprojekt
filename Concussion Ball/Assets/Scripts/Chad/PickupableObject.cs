@@ -158,6 +158,15 @@ public class PickupableObject : NetworkComponent
     }
 
 
+    public override void OnLostOwnership()
+    {
+        if(PickedUp && _Chad && _Chad.isOwner)
+        {
+            Debug.Log("nani!?");
+        }
+
+    }
+
     virtual public void Reset()
     {
         RPCDrop();

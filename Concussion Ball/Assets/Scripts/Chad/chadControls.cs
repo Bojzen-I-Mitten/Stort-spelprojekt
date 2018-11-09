@@ -260,7 +260,10 @@ public class ChadControls : NetworkComponent
             return;
 
         if (Input.GetKey(Input.Keys.W))
-            Direction.z = Direction.z + 1 + (CurrentVelocity.y / MaxSpeed);
+        {
+            Direction.z = 1 + (CurrentVelocity.y / (MaxSpeed*0.5f));
+        }
+            
         if (Input.GetKey(Input.Keys.S))
             Direction.z -= 1;
         if (Input.GetKey(Input.Keys.D))
@@ -420,7 +423,15 @@ public class ChadControls : NetworkComponent
                 //Camera.transform.LookAt(Ragdoll.GetHips().transform);
                 break;
         }
-        if(State != STATE.DIVING)
+
+        RaycastHit hit;
+       /* if(Physics.Raycast(transform.position - new Vector3(0, 2, 0), Vector3.Down, out hit, 5.0f, Physics.GetCollisionGroupBit("Ground")))
+        {
+            Debug.Log(hit.collider.Name);
+            Debug.Log(hit.distance);
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(0, -Math.Abs(rBody.LinearVelocity.y), 0), transform.rotation);
+        }
+        else*/ if(State != STATE.DIVING)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
