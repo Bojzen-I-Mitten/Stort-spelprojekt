@@ -40,6 +40,7 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.CHAD;
                 CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<ChadCam>().enabled = true;
             }
             else if (Team2Image.Clicked())
             {
@@ -47,6 +48,7 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.CHAD;
                 CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<ChadCam>().enabled = true;
             }
             else if (SpectatorImage.Clicked())
             {
@@ -54,6 +56,7 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.SPECTATE;
                 CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
         }
         if (TextFont != null && !Disabled)

@@ -129,7 +129,7 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
-                    GoToTeamSelect = true;
+                    CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
                     
                     return;
                 }
