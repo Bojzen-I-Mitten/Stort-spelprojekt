@@ -1,8 +1,8 @@
 #include "SoundComponent.h"
 
-#include "../../Sound.h"
+// Thomas
 #include "../../resource/AudioClip.h"
-#include "../../ThomasTime.h"
+
 namespace thomas
 {
 	namespace object
@@ -10,43 +10,22 @@ namespace thomas
 		namespace component
 		{
 			SoundComponent::SoundComponent() :
-			m_looping(true),
 			m_clip(nullptr),
-			m_volume(0.5f),
-			m_volumeFactor(1.f)
+			m_looping(false),
+			m_volume(1.f)
 			{
 			}
 
 			void SoundComponent::OnDisable()
 			{
-				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
-			}
-
-			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
-			{
-				// Apply 3D-effect with attenuation formula based on Inverse Square Law
-				if (m_clip != nullptr)
-				{
-					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
-					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
-				
-				}
+				Stop();
 			}
 
 			void SoundComponent::Play()
 			{
 				if (m_clip != nullptr)
 				{
-					m_clip->GetSoundEffectInstance()->Play(m_looping);
-				}
-			}
-
-			void SoundComponent::PlayOneShot()
-			{
-				if (m_clip != nullptr)
-				{
-					m_volume;
-					Sound::Play(m_clip->GetName(), m_volume);
+					SoundManager::GetInstance()->Play(m_clip->GetName());
 				}
 			}
 
@@ -54,54 +33,11 @@ namespace thomas
 			{
 				if (m_clip != nullptr)
 				{
-					m_clip->GetSoundEffectInstance()->Stop();
+					if (m_clip->GetSoundInfo()->channel != nullptr)
+					{
+						m_clip->GetSoundInfo()->channel->stop();
+					}
 				}
-			}
-
-			void SoundComponent::Pause()
-			{
-				if (m_clip != nullptr)
-				{
-					m_clip->GetSoundEffectInstance()->Pause();
-				}
-			}
-
-			void SoundComponent::Resume()
-			{
-				if (m_clip != nullptr)
-				{
-					m_clip->GetSoundEffectInstance()->Resume();
-				}
-			}
-
-			bool SoundComponent::IsPlaying() const
-			{
-				if (m_clip != nullptr)
-				{
-					return Sound::IsPlaying(m_clip->GetName());	
-				}
-
-				return false;
-			}
-
-			bool SoundComponent::IsPaused() const
-			{
-				if (m_clip != nullptr)
-				{
-					return Sound::IsPaused(m_clip->GetName());
-				}
-
-				return false;
-			}
-
-			bool SoundComponent::HasStopped() const
-			{
-				if (m_clip != nullptr)
-				{
-					return Sound::HasStopped(m_clip->GetName());
-				}
-
-				return false;
 			}
 
 			void SoundComponent::SetClip(resource::AudioClip* clip)
@@ -111,28 +47,22 @@ namespace thomas
 
 			void SoundComponent::SetVolume(float volume)
 			{
-				if (volume <= 5.f && volume >= 0.f)
-				{
-					m_volume = volume;
+				m_volume = volume;
 
-					if (m_clip != nullptr)
-					{
-						m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(m_volume * m_volumeFactor));
-					}
-				}
-			}
-
-			void SoundComponent::SetVolumeFactor(float volumeFactor)
-			{
-				if (volumeFactor <= 1.f && volumeFactor >= 0.f)
+				if (m_clip != nullptr)
 				{
-					m_volumeFactor = volumeFactor;
+					m_clip->GetSoundInfo()->volume = m_volume;
 				}
 			}
 
 			void SoundComponent::SetLooping(bool looping)
 			{
 				m_looping = looping;
+
+				if (m_clip != nullptr)
+				{
+					m_clip->GetSoundInfo()->looping = m_looping;
+				}
 			}
 
 			resource::AudioClip* SoundComponent::GetClip() const
@@ -143,11 +73,6 @@ namespace thomas
 			float SoundComponent::GetVolume() const
 			{
 				return m_volume;
-			}
-
-			float SoundComponent::GetVolumeFactor() const
-			{
-				return m_volumeFactor;
 			}
 
 			bool SoundComponent::IsLooping() const

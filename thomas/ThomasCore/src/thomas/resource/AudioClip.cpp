@@ -1,5 +1,4 @@
 #include "AudioClip.h"
-#include "../Sound.h"
 
 namespace thomas
 {
@@ -8,17 +7,18 @@ namespace thomas
 		AudioClip::AudioClip(const std::string& file) : 
 		Resource(file)
 		{
-			Sound::LoadSound(m_name, m_path);
-			m_soundEffectInstance = Sound::GetSoundInfo(m_name).soundEffectInstance.get();
+			// TODO: is there a way to allow users to set streaming functionality for clips later on?
+			SoundManager::GetInstance()->LoadSound(m_name, m_path);
+			m_soundInfo = &SoundManager::GetInstance()->GetSoundInfo(m_name);
+		}
+
+		SoundManager::Info* AudioClip::GetSoundInfo()
+		{
+			return m_soundInfo;
 		}
 
 		void AudioClip::OnChanged()
 		{
-		}
-
-		SoundEffectInstance* AudioClip::GetSoundEffectInstance() const
-		{
-			return m_soundEffectInstance;
 		}
 	}
 }

@@ -22,6 +22,8 @@ namespace thomas
 		{
 			FMOD::Sound* sound = nullptr;
 			FMOD::Channel* channel = nullptr;
+			bool looping = false;
+			float volume = 1.f;
 		};
 
 	private:
@@ -38,8 +40,6 @@ namespace thomas
 		void Destroy();
 		void Play(const std::string& id);
 		void LoadSound(const std::string& id, const std::string& file, bool looping = false, bool stream = false);
-		float dbToVolume(float dB);
-		float VolumeTodB(float volume);
 		FMOD_VECTOR Vector3ToFmod(const Vector3& v);
 		Info& GetSoundInfo(const std::string& name);
 		static SoundManager* GetInstance();

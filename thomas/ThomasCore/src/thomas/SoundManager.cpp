@@ -50,14 +50,25 @@ namespace thomas
 
 	void SoundManager::Play(const std::string& id)
 	{
-		auto found = m_sounds.find(id);
+		auto& found = GetSoundInfo(id);
 
-		ErrorCheck(m_system->playSound(found->second.sound, nullptr, true, &found->second.channel));
-
-		if (found->second.channel != nullptr)
+		// Set looping options
+		if (found.looping)
 		{
-			//ErrorCheck(found->second.channel->setVolume(dbToVolume(volumedB)));
-			ErrorCheck(found->second.channel->setPaused(false));
+			found.sound->setMode(FMOD_LOOP_NORMAL);
+			found.sound->setLoopCount(-1); // Loop repeatedly
+		}
+		else
+		{
+			found.sound->setMode(FMOD_LOOP_OFF);
+		}
+
+		ErrorCheck(m_system->playSound(found.sound, nullptr, false, &found.channel));
+
+		if (found.channel != nullptr)
+		{
+			// Set channel properties
+			ErrorCheck(found.channel->setVolume(found.volume));
 		}
 	}
 
@@ -78,16 +89,6 @@ namespace thomas
 #ifdef _DEBUG
 		assert(inserted.second);
 #endif
-	}
-
-	float SoundManager::dbToVolume(float dB)
-	{
-		return powf(10.f, 0.05f * dB);
-	}
-
-	float SoundManager::VolumeTodB(float volume)
-	{
-		return 20.f * log10f(volume);
 	}
 
 	FMOD_VECTOR SoundManager::Vector3ToFmod(const Vector3& v)

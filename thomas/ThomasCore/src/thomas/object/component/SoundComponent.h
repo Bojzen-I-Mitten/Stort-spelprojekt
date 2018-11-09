@@ -1,13 +1,12 @@
 #pragma once
 
+// Thomas
 #include "Component.h"
-#include "../../utils/Math.h"
-
-#include <memory>
+//#include "../../utils/Math.h"
 
 namespace thomas
 {
-	using namespace math;
+	//using namespace math;
 
 	namespace resource
 	{
@@ -25,33 +24,26 @@ namespace thomas
 				~SoundComponent() = default;
 
 				virtual void OnDisable() override;
-				void Apply3D(const Vector3& listenerPos, const Vector3& sourcePos);
 				void Play();
-				void PlayOneShot();
 				void Stop();
-				void Pause();
-				void Resume();
-				bool IsPlaying() const;
-				bool IsPaused() const;
-				bool HasStopped() const;
 
 			public:
-				void SetClip(resource::AudioClip* clip);		
+				void SetClip(resource::AudioClip* clip);
 				void SetVolume(float volume);
-				void SetVolumeFactor(float volumeFactor);
 				void SetLooping(bool looping);
 
 			public:
 				resource::AudioClip* GetClip() const;
 				float GetVolume() const;
-				float GetVolumeFactor() const;
 				bool IsLooping() const;
 
 			private:
 				resource::AudioClip* m_clip;
-				float m_volume;
-				float m_volumeFactor;
+
+				// These variables are a bit unconvenient but if we don't have them
+				// the user won't be able to set "properties of a clip" in the inspector before the clip is set
 				bool m_looping;
+				float m_volume;
 			};
 		}
 	}
