@@ -137,7 +137,8 @@ namespace ThomasEngine
 			scene->m_uniqueID = unique_id;
 		}
 		catch (Exception^ e) {
-			Debug::LogError("Failed loading scene: " + fullPath + "\nError: " + e->Message);
+			Debug::LogException(e);
+			Debug::LogError("Failed loading scene: " + fullPath + "\n With following error: ");
 			scene = nullptr;
 		}
 		finally{

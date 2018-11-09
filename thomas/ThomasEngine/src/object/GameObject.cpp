@@ -112,6 +112,16 @@ namespace ThomasEngine {
 
 	void GameObject::PostLoad(Scene^ scene)
 	{
+		for (int i = 0; i < m_components.Count; i++)
+		{
+			if (m_components[i] == nullptr)
+			{
+				if (i == 0)
+					throw gcnew Exception("Corrupt Transform Component in GameObject. Object is invalid.");
+				Debug::LogWarning("Corrupt Component at index: " + i + " in GameObject: " + m_name);
+				m_components.RemoveAt(i--);
+			}
+		}
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 	}
 
