@@ -103,6 +103,9 @@ public class PickupableObject : NetworkComponent
                 _Chad.PickedUpObject = null;
                 _Chad = null;
             }
+
+            StopEmitting();
+            Cleanup();
         }
     }
 
@@ -143,6 +146,8 @@ public class PickupableObject : NetworkComponent
             PickedUp = true;
             m_pickupable = false;
             _Chad = chad;
+
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
         }
     }
 
@@ -170,6 +175,7 @@ public class PickupableObject : NetworkComponent
     virtual public void Reset()
     {
         RPCDrop();
+        transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;
         PickedUp = false;
         m_pickupable = true;

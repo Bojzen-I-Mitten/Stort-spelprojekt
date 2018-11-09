@@ -46,9 +46,9 @@ public class ThomasTrain : Powerup
         playChargeUpSound = true;
     }
 
-    public override void OnEnable()
+    public override void Start()
     {
-        base.OnEnable();
+        base.Start();
 
         m_throwable = true; // change depending on power-up
         emitterFire.Texture = fireTexture;
@@ -108,7 +108,7 @@ public class ThomasTrain : Powerup
 
     public override void Update()
     {
-        
+        base.Update();
     }
 
     public override void Cleanup()
