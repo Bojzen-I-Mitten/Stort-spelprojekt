@@ -4,18 +4,23 @@
 
 namespace thomas
 {
+#ifdef LOCK_OBJECTHANDLER
+#define OH_LOCK() utils::atomics::Lock lk(m_lock)
+#else
+#define OH_LOCK()
+#endif
 
-	std::vector<object::GameObject> ObjectHandler::m_objectsDynamic;
-
-	std::map<UINT, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
-
-	void ObjectHandler::Init()
+	ObjectHandler::ObjectHandler()	:
+		m_objectsDynamic(),
+		m_objectsStatic()
 	{
 		m_objectsDynamic.reserve(1000);
 	}
-
+	ObjectHandler::~ObjectHandler() 
+	{}
 	void ObjectHandler::ClearAll()
 	{
+		OH_LOCK();
 		// Clean all the arrays, used when scene is emptied so that we don't get any
 		// Objects without pointers
 		//for (auto& key : m_objectsStatic)
@@ -26,12 +31,12 @@ namespace thomas
 		//m_objectsDynamic.clear();
 	}
 
-	std::vector<object::GameObject>* ObjectHandler::GetDynamicObjectVector()
+	const std::vector<object::GameObject>& ObjectHandler::GetDynamicObjectVector()
 	{
-		return &m_objectsDynamic;
+		return m_objectsDynamic;
 	}
 
-	std::vector<object::GameObject>* ObjectHandler::GetVectorGroup(UINT GroupID)
+	const std::vector<object::GameObject>* ObjectHandler::GetVectorGroup(UINT GroupID)
 	{
 		if (m_objectsStatic.find(GroupID) != m_objectsStatic.end())
 		{
@@ -42,6 +47,7 @@ namespace thomas
 
 	object::GameObject * ObjectHandler::createNewGameObject(std::string name)
 	{
+		OH_LOCK();
 		assert(m_objectsDynamic.capacity());
 		object::GameObject obj(name);
 		m_objectsDynamic.push_back(std::move(obj));
@@ -50,6 +56,7 @@ namespace thomas
 
 	object::Object* ObjectHandler::setStatic(object::Object* object, object::Object*& moved)
 	{
+		OH_LOCK();
 		int i = 0;
 		for (auto& it = m_objectsDynamic.begin(); it != m_objectsDynamic.end(); it++)
 		{
@@ -97,6 +104,7 @@ namespace thomas
 
 	object::Object * ObjectHandler::moveStaticGroup(object::Object * object, object::Object *& moved)
 	{
+		OH_LOCK();
 		UINT type = static_cast<object::GameObject*>(object)->GetGroupID();
 
 
@@ -136,6 +144,7 @@ namespace thomas
 
 	object::Object * ObjectHandler::setDynamic(object::Object * object, object::Object *& moved)
 	{
+		OH_LOCK();
 		UINT type = static_cast<object::GameObject*>(object)->GetGroupID();
 		for (auto& it = m_objectsStatic[type].begin(); it != m_objectsStatic[type].end(); it++)
 		{
@@ -162,6 +171,12 @@ namespace thomas
 		// If we reach this branch, an error has occoured
 		moved = nullptr;
 		return object;
+	}
+
+	ObjectHandler & ObjectHandler::Instance()
+	{
+		static ObjectHandler s_Instance;
+		return s_Instance;
 	}
 
 	

@@ -95,7 +95,8 @@ namespace ThomasEngine
 		}
 		else
 		{
-			existingValue = existingValue ? existingValue : serializer->ContractResolver->ResolveContract(objectType)->DefaultCreator();
+			if(!existingValue)
+				existingValue = serializer->ContractResolver->ResolveContract(objectType)->DefaultCreator();
 			serializer->Populate(jo->CreateReader(), existingValue);
 			return existingValue;
 		}

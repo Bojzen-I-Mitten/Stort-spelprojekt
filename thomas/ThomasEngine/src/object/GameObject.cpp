@@ -22,7 +22,8 @@ using namespace System::Threading;
 namespace ThomasEngine {
 
 
-	GameObject::GameObject() : Object(thomas::ObjectHandler::createNewGameObject("gameobject"))
+	GameObject::GameObject() : 
+		Object(thomas::ObjectHandler::Instance().createNewGameObject("gameobject"))
 	{
 		m_name = "gameobject";
 #ifdef _EDITOR
@@ -31,7 +32,8 @@ namespace ThomasEngine {
 #endif
 	}
 
-	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
+	GameObject::GameObject(String^ name) : 
+		Object(thomas::ObjectHandler::Instance().createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
 		Tag = "";
@@ -199,7 +201,7 @@ namespace ThomasEngine {
 	{
 		thomas::object::Object* moved;
 
-		nativePtr = thomas::ObjectHandler::setStatic(nativePtr, moved);
+		nativePtr = thomas::ObjectHandler::Instance().setStatic(nativePtr, moved);
 
 		m_makeStatic = false;
 
@@ -210,7 +212,7 @@ namespace ThomasEngine {
 	{
 		thomas::object::Object* moved;
 
-		nativePtr = thomas::ObjectHandler::moveStaticGroup(nativePtr, moved);
+		nativePtr = thomas::ObjectHandler::Instance().moveStaticGroup(nativePtr, moved);
 
 		return moved;
 	}
@@ -219,7 +221,7 @@ namespace ThomasEngine {
 	{
 		thomas::object::Object* moved;
 
-		nativePtr = thomas::ObjectHandler::setDynamic(nativePtr, moved);
+		nativePtr = thomas::ObjectHandler::Instance().setDynamic(nativePtr, moved);
 
 		m_makeDynamic = false;
 

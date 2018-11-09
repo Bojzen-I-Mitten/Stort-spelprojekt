@@ -56,7 +56,7 @@ namespace thomas
 		graphics::LightManager::Initialize();
 		graphics::ParticleSystem::InitializeGlobalSystems();
 
-		ObjectHandler::Init();
+		ObjectHandler::Instance(); // Init singleton
 		s_initialized = true;
 		return s_initialized;
 	}
