@@ -31,7 +31,7 @@ public class GUIJoinHost : ScriptComponent
     Text IP;
     Text Port;
 
-    public override void Awake()
+    public override void OnAwake()
     {
     }
 

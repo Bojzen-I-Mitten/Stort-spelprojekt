@@ -26,7 +26,7 @@ public class CameraMaster : ScriptComponent
     CAMSTATE State = CAMSTATE.JOIN_HOST;
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
 

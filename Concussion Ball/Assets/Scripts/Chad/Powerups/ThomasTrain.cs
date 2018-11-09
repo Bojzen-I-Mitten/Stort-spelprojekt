@@ -26,9 +26,9 @@ public class ThomasTrain : Powerup
     private bool playChargeUpSound;
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();

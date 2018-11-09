@@ -14,7 +14,7 @@ public class NetworkPlayer : NetworkComponent
     Material mat;
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
         Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
     }

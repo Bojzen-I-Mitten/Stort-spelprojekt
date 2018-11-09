@@ -69,6 +69,7 @@
     <ClCompile Include="src\object\component\AudioListener.cpp" />
     <ClCompile Include="src\object\component\animation\BoneSyncComponent.cpp" />
     <ClCompile Include="src\system\command\CommandQueue.cpp" />
+    <ClCompile Include="src\script\ScriptinUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
     <ClInclude Include="src\object\ComponentState.h" />
     <ClInclude Include="src\object\component\AudioListener.h" />
+    <ClInclude Include="src\script\ScriptingUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

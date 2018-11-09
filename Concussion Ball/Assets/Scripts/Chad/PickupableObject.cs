@@ -27,7 +27,7 @@ public class PickupableObject : NetworkComponent
 
     public bool PickedUp = false;
 
-    public override void Awake()
+    public override void OnAwake()
     {
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();

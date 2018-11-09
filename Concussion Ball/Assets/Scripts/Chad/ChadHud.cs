@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using ThomasEngine.Network;
+using ThomasEngine.Script;
 
 public class ChadHud : ScriptComponent
 {
@@ -14,7 +15,7 @@ public class ChadHud : ScriptComponent
         get
         {
             if (!_Ball)
-                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+                _Ball = ScriptUtility.FindComponent<Ball>();
             return _Ball;
         }
     }
@@ -55,7 +56,7 @@ public class ChadHud : ScriptComponent
     public Texture2D LMBTexture { get; set; }
     #endregion
 
-    public override void Awake()
+    public override void OnAwake()
     {
         if (!Instance)
             Instance = this;

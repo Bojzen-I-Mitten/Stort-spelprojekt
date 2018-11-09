@@ -333,6 +333,24 @@ namespace ThomasEngine
 			Monitor::Exit(m_gameObjects);
 			return list;
 		}
+		generic<typename T>
+			where T : Component
+		T Scene::findFirstComponent()
+		{
+			T value;
+			Monitor::Enter(m_gameObjects);
+			for each(GameObject^ g in m_gameObjects)
+			{
+				for each(T c in g->Components)
+				{
+					T value = c;
+					Monitor::Exit(m_gameObjects);
+					return c;
+				}
+			}
+			Monitor::Exit(m_gameObjects);
+			return T();
+		}
 		List<System::Object^>^ Scene::getComponentsOfType(System::Type^ type)
 		{
 			Monitor::Enter(m_gameObjects);

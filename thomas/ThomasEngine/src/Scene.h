@@ -94,6 +94,11 @@ namespace ThomasEngine {
 			where T : Component
 		List<T>^ getComponentsOfType();
 		List<System::Object^>^ getComponentsOfType(System::Type^ type);
+		/* Find the first component available.
+		*/
+		generic<typename T>
+			where T : Component
+		T findFirstComponent();
 
 #pragma region Serialized properties
 

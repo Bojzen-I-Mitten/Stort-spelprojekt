@@ -6,6 +6,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
+using ThomasEngine.Script;
 
 public class ChadControls : NetworkComponent
 {
@@ -63,7 +64,7 @@ public class ChadControls : NetworkComponent
         get
         {
             if(!_camera)
-                _camera = GetObjectsOfType<ChadCam>().FirstOrDefault();
+                _camera = ScriptUtility.FindComponent<ChadCam>();
             return _camera;
         }
     }

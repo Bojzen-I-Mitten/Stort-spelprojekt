@@ -215,7 +215,7 @@ public class Ragdoll : ScriptComponent
 
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
 
         Mass_BodyParts[(int)BODYPART.HIPS] = 0.15f;

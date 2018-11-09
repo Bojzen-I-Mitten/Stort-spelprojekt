@@ -209,6 +209,7 @@
     <ClInclude Include="src\resource\Shader.h" />
     <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
+    <ClInclude Include="src\script\ScriptingUtility.h" />
     <ClInclude Include="src\serialization\Converters.h" />
     <ClInclude Include="src\serialization\Serializer.h" />
     <ClInclude Include="src\script\animation\BlendNode.h" />
@@ -292,6 +293,7 @@
     <ClCompile Include="src\script\animation\PlaybackHandle.cpp" />
     <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
+    <ClCompile Include="src\script\ScriptinUtility.cpp" />
     <ClCompile Include="src\serialization\Converters.cpp" />
     <ClCompile Include="src\serialization\Serializer.cpp" />
     <ClCompile Include="src\system\command\CommandQueue.cpp" />
