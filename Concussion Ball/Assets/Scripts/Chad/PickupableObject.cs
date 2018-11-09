@@ -22,7 +22,7 @@ public class PickupableObject : NetworkComponent
    [Newtonsoft.Json.JsonIgnore]
     public bool charging { get { return chargeTimeCurrent > 0.0f; } }
 
-    private ChadControls _Chad;
+    public ChadControls _Chad;
     private RenderComponent m_renderComponent;
 
     public bool PickedUp = false;

@@ -108,7 +108,7 @@ public class ThomasTrain : Powerup
 
     public override void Update()
     {
-        
+        base.Update();
     }
 
     public override void Cleanup()
@@ -119,6 +119,8 @@ public class ThomasTrain : Powerup
 
     public override void ChargeEffect()
     {
+        base.ChargeEffect();
+
         soundComponentChargeUp.Play();
     }
     // if this is a throwable power-up this function will be called
