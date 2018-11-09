@@ -60,22 +60,36 @@ public class ChadCam : ScriptComponent
             {
                 case ChadControls.STATE.CHADING:
                 case ChadControls.STATE.DIVING:
-                    if (!Input.GetKey(Input.Keys.LeftShift))
-                        FondleCamera();
-                    else if (Input.GetKeyDown(Input.Keys.LeftShift))
-                        InitFreeLookCamera();
-                    else
-                        FreeLookCamera();
+                    if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
+                    {
+                        if (!Input.GetKey(Input.Keys.LeftShift))
+                            FondleCamera();
+                        else if (Input.GetKeyDown(Input.Keys.LeftShift))
+                            InitFreeLookCamera();
+                        else
+                            FreeLookCamera();
+                    }
                     break;
                 case ChadControls.STATE.THROWING:
-                    ThrowingCamera();
+                    if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
+                        ThrowingCamera();
                     break;
                 case ChadControls.STATE.RAGDOLL:
+                    {
+                        RagdollCamera();
+                    }
                     break;
             }
             //Camera.fieldOfView = MinFov + velocity;
             //Camera.fieldOfView = Math.Min(Camera.fieldOfView, MaxFov);
         }
+    }
+
+    private void RagdollCamera()
+    {
+        transform.rotation = Quaternion.Identity;
+        transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
+        transform.LookAt(Chad.Ragdoll.GetHips().transform);
     }
 
     public void FondleCamera()

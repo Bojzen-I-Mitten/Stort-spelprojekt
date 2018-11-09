@@ -154,6 +154,7 @@ public class Powerup : PickupableObject
     {
         base.Reset();
         m_rigidBody.IsKinematic = true;
+        m_rigidBody.enabled = false;
         activated = false;
     }
 }

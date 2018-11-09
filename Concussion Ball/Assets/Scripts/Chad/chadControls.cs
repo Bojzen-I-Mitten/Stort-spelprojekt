@@ -56,7 +56,7 @@ public class ChadControls : NetworkComponent
     [Browsable(false)]
     public Rigidbody rBody { get; private set; }
     Chadimations Animations;
-    Ragdoll Ragdoll;
+    public Ragdoll Ragdoll;
     ChadCam _camera;
     ChadCam Camera
     {
@@ -492,10 +492,10 @@ public class ChadControls : NetworkComponent
     IEnumerator StartRagdoll(float duration, Vector3 force, bool diveTackle)
     {
         State = STATE.RAGDOLL;
-        //Camera.transform.SetParent(null, true);
+        
         EnableRagdoll();
         Ragdoll.AddForce(force, diveTackle);
-        //yield return new WaitForSeconds(duration);
+
         yield return new WaitForSeconds(duration);
         float timer = 0;
         while (Ragdoll.DistanceToWorld() >= 0.3f && timer < 15)
@@ -637,28 +637,35 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
-
-    public override void OnCollisionEnter(Collider collider)
+    public override void OnTriggerEnter(Collider collider)
     {
-        PickupableObject pickupablea = collider.gameObject.GetComponent<PickupableObject>();
+
+        PickupableObject pickupablea = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
         if (pickupablea)
         {
             Debug.LogError("Why denny!?");
         }
+
+        PickupableObject pickupable = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
+        if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
+        {
+            if (pickupable.transform.parent == null)
+            {
+                TakeOwnership(pickupable.gameObject);
+                SendRPC("RPCPickup", pickupable.ID);
+                RPCPickup(pickupable.ID);
+
+                ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
+            }
+        }
+    }
+
+
+    public override void OnCollisionEnter(Collider collider)
+    {
+
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
-            PickupableObject pickupable = collider.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
-            {
-                if (pickupable.transform.parent == null)
-                {
-                    TakeOwnership(pickupable.gameObject);
-                    SendRPC("RPCPickup", pickupable.ID);
-                    RPCPickup(pickupable.ID);
-
-                    ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
-                }
-            }
             ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
 
             if (otherChad)

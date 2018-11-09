@@ -178,6 +178,7 @@ public class Ball : PickupableObject
 
     public override void Update()
     {
+        base.Update();
         if (transform.position.y < -5)
             Reset();
     }

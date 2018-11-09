@@ -20,8 +20,8 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipTravel { get; set; }
     public AudioClip soundClipExplosion { get; set; }
 
-    public float ExplosionRadius { get; set; } = 5.0f;
-    public float ExplosionForce { get; set; } = 200.0f;
+    public float ExplosionRadius { get; set; } = 10.0f;
+    public float ExplosionForce { get; set; } = 300.0f;
 
     private bool playChargeUpSound;
 
@@ -46,9 +46,9 @@ public class ThomasTrain : Powerup
         playChargeUpSound = true;
     }
 
-    public override void OnEnable()
+    public override void Start()
     {
-        base.OnEnable();
+        base.Start();
 
         m_throwable = true; // change depending on power-up
         emitterFire.Texture = fireTexture;
@@ -69,8 +69,8 @@ public class ThomasTrain : Powerup
         emitterFire.Radius = 1.9f;
 
         emitterThomasFace.Texture = thomasTexture;
-        emitterThomasFace.MinSize = 3.5f;
-        emitterThomasFace.MaxSize = 3.5f;
+        emitterThomasFace.MinSize = 2.5f;
+        emitterThomasFace.MaxSize = 2.5f;
         emitterThomasFace.EndSize = 2.0f;
         emitterThomasFace.MaxLifeTime = 1.5f;
         emitterThomasFace.MinLifeTime = 1.5f;
