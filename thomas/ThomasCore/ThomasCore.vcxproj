@@ -40,6 +40,7 @@
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
     <ClCompile Include="src\thomas\graphics\render\ShaderList.cpp" />
     <ClCompile Include="src\thomas\graphics\Skybox.cpp" />
+    <ClCompile Include="src\thomas\object\component\AudioListener.cpp" />
     <ClCompile Include="src\thomas\resource\Font.cpp" />
     <ClCompile Include="src\thomas\graphics\GUI\Canvas.cpp" />
     <ClCompile Include="src\thomas\object\ObjectHandler.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="src\thomas\graphics\render\FrameData.h" />
     <ClInclude Include="src\thomas\graphics\render\ShaderList.h" />
     <ClInclude Include="src\thomas\graphics\Skybox.h" />
+    <ClInclude Include="src\thomas\object\component\AudioListener.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
     <ClInclude Include="src\thomas\object\ObjectHandler.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
@@ -357,7 +359,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>
       </CompileAsManaged>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

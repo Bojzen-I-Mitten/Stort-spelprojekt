@@ -14,21 +14,25 @@ public class Powerup : PickupableObject
     public PowerupSpawner spawner;
 
     protected bool activated = false;
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
-
-        m_rigidBody.IsKinematic = true;
+        base.Awake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
 
-        #region Init emitters
-        // emitter bois
-        #endregion
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+        activated = false;
+        m_rigidBody.IsKinematic = true;
+        m_rigidBody.enabled = true;
     }
 
     public override void Update()
     {
-        if (spawner && !GetPickedUp())
+        base.Update();
+        if (spawner && !PickedUp)
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
 
@@ -73,6 +77,7 @@ public class Powerup : PickupableObject
         {
             spawner.Free();
             spawner = null;
+            Debug.Log("Cleared spawner");
         }
             
     }
@@ -81,9 +86,13 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (!m_pickupable && !m_pickedUp)
+            if (!m_pickupable && !PickedUp)
             {
-                Activate();
+                if (!activated)
+                {
+                    Activate();
+                    activated = true;
+                }
             }
         }
 
@@ -93,10 +102,14 @@ public class Powerup : PickupableObject
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         base.OnWrite(writer, initialState);
-        if (spawner)
-            writer.Put(spawner.ID);
-        else
-            writer.Put(-1);
+        if (initialState)
+        {
+            if (spawner)
+                writer.Put(spawner.ID);
+            else
+                writer.Put(-1);
+        }
+
 
         return true;
     }
@@ -105,24 +118,42 @@ public class Powerup : PickupableObject
     {
         base.OnRead(reader, initialState);
 
-        int spawnerID = reader.GetInt();
-        if((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
+        if (initialState)
         {
-            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+            int spawnerID = reader.GetInt();
+            if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
+            {
+                spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+            }
+            Reset();
         }
+
+
     }
 
 
-    public void Remove()
+    public void RPCRemove()
     {
-        Drop();
+        RPCDrop();
         if (spawner)
         {
-            spawner.Free();
+            if (spawner.isOwner)
+                spawner.Free();
             spawner = null;
         }
-        //transform.enabled = false;
         MatchSystem.instance.PowerupManager.RecyclePowerup(this);
-       
+    }
+
+    public void Remove()
+    {
+        RPCRemove();
+        SendRPC("RPCRemove");
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        m_rigidBody.IsKinematic = true;
+        activated = false;
     }
 }

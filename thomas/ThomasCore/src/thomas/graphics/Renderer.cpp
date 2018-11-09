@@ -14,6 +14,7 @@
 #include "RenderConstants.h"
 #include "render/Frame.h"
 #include "../utils/GpuProfiler.h"
+#include "../utils/AutoProfile.h"
 #include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
 
@@ -53,10 +54,10 @@ namespace thomas
 			// Do something?
 		}
 
+
+
 		void Renderer::PostRender()
 		{
-			for (object::component::Camera* camera : m_cameras.getCameras())
-				camera->CopyFrameData();
 		}
 
 		void Renderer::Destroy()
@@ -132,13 +133,18 @@ namespace thomas
 
 		void Renderer::TransferCommandList()
 		{
-			// Swap frames and clear old frame data
-			std::swap(m_frame, m_prevFrame);
-			m_frame->clear();
 
 			// Sync. update
 			m_shaders.SyncList();
 			m_cameras.syncUpdate();
+			// Submit camera frame data...
+			for (object::component::Camera* camera : m_cameras.getCameras())
+				camera->CopyFrameData();
+			editor::EditorCamera::Instance()->GetCamera()->CopyFrameData();
+
+			// Swap frames and clear old frame data
+			std::swap(m_frame, m_prevFrame);
+			m_frame->clear();
 		}
 
 		const render::ShaderList & Renderer::getShaderList()
@@ -175,31 +181,56 @@ namespace thomas
 			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
 			//Process commands
-			BindFrame();
+			{
+				PROFILE("BindFrame")
+				BindFrame();
+			}
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				BindCameraRenderTarget(perCameraQueue.second.m_frameData);
-
+				
+				PROFILE("PerCameraDraw")
+				{
+					PROFILE("CameraBind")
+					BindCameraRenderTarget(perCameraQueue.second.m_frameData);
+				}
 				// Skyboxes should be submitted!
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
-				if (camera && camera->hasSkybox())
-					camera->DrawSkyBox();
-				// Draw objects
-				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 				{
-					auto material = perMaterialQueue.first;
-					material->Bind();
-					for (auto & perMeshCommand : perMaterialQueue.second)
+					PROFILE("CameraDrawSkybox")
+					if (camera && camera->hasSkybox())
+						camera->DrawSkyBox();
+				}
+				// Draw objects
+				{
+					PROFILE("CameraDrawObjects")
+					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 					{
-						BindObject(perMeshCommand);
-						material->Draw(perMeshCommand.mesh);
+						auto material = perMaterialQueue.first;
+						{
+							PROFILE("BindMaterial")
+							material->Bind();
+						}
+						{
+							PROFILE("CameraDrawObjects")
+							for (auto & perMeshCommand : perMaterialQueue.second)
+							{
+								{
+									PROFILE("BindObject")
+									BindObject(perMeshCommand);
+								}
+								{
+									PROFILE("DrawCall")
+									material->Draw(perMeshCommand.mesh);
+								}
+							}
+						}
 					}
 				}
-			}
 
-			//Copy rendered objects into the back buffer
-			WindowManager::Instance()->ResolveRenderTarget();
+				//Copy rendered objects into the back buffer
+				WindowManager::Instance()->ResolveRenderTarget();
+			}
 	
 			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 

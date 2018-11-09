@@ -12,11 +12,9 @@ namespace ThomasEngine
 	private:
 		AudioClip^ m_clip;
 		property thomas::object::component::SoundComponent* sound { thomas::object::component::SoundComponent* get(); }
-
+		bool playOnStart;
 	public:
 		SoundComponent();
-
-		void Apply3D(Vector3 listenerPos, Vector3 sourcePos);
 		void Play();
 		void PlayOneShot();
 		void Stop();
@@ -26,10 +24,24 @@ namespace ThomasEngine
 		bool IsPaused();
 		bool HasStopped();
 
+		void Start() override;
+
+		property bool PlayOnStart
+		{
+			bool get();
+			void set(bool value);
+		}
+
 		property AudioClip^ clip
 		{
 			AudioClip^ get();
 			void set(AudioClip^ value);
+		}
+
+		property bool Is3D
+		{
+			bool get();
+			void set(bool value);
 		}
 
 		property float Volume

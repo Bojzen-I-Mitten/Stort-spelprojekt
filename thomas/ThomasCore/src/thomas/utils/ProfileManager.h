@@ -4,7 +4,7 @@
 #include <map>
 #include <algorithm>
 #include <Windows.h>
-
+#include <chrono>
 #include "..\..\..\include\nlohmann\json.hpp"
 #define BENCHMARK
 
@@ -35,6 +35,7 @@ namespace thomas
 				};
 
 			private:
+				static std::vector<long long> s_fps;
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
 				static float s_ramusage;
 				static float s_vramusage;
