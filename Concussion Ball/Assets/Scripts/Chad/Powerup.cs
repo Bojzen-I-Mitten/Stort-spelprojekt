@@ -44,6 +44,7 @@ public class Powerup : PickupableObject
 
     override public void ChargeEffect()
     {
+        base.ChargeEffect();
         /*do particle bois and stuff*/
     }
 

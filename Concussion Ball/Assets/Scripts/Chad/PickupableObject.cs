@@ -16,11 +16,11 @@ public class PickupableObject : NetworkComponent
     public bool m_throwable = false;
     public bool m_pickupable = true;
 
-    public float chargeTimeCurrent;
+    private float chargeTimeCurrent;
     public float chargeTimeMax { get; set; } = 4.0f;
 
    [Newtonsoft.Json.JsonIgnore]
-    public bool charging { get { return chargeTimeCurrent > 0.0f; } }
+    public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
 
     public ChadControls _Chad;
     private RenderComponent m_renderComponent;
@@ -37,7 +37,19 @@ public class PickupableObject : NetworkComponent
     public override void Update()
     {
         if (charging)
+        {
             ChargeEffect();
+        }
+    }
+
+    public void SetChargeTime(float other)
+    {
+        chargeTimeCurrent = other;
+    }
+
+    public float GetChargeTime()
+    {
+        return chargeTimeCurrent;
     }
 
     virtual public void ChargeEffect()
@@ -159,6 +171,11 @@ public class PickupableObject : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
+        if (isOwner)
+        {
+            reader.GetFloat();
+            return;
+        }
         chargeTimeCurrent = reader.GetFloat();
     }
 

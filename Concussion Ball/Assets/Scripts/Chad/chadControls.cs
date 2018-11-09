@@ -370,6 +370,7 @@ public class ChadControls : NetworkComponent
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
+        PickedUpObject.SetChargeTime(ChargeTime);
         if (PickedUpObject)
         {
             PickedUpObject.StopEmitting();
@@ -562,11 +563,9 @@ public class ChadControls : NetworkComponent
     {
         ChargeTime += Time.DeltaTime;
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
-
-        //if(PickedUpObject.gameObject.GetType() is Ball.GetType())
-        //    maxChargeTime = 0.5f;
-
-        PickedUpObject.chargeTimeCurrent = ChargeTime;
+        
+        PickedUpObject.SetChargeTime(ChargeTime);
+        float tets = PickedUpObject.GetChargeTime();
         
 
         ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);

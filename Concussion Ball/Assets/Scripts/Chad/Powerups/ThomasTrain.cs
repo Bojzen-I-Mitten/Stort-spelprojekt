@@ -23,6 +23,7 @@ public class ThomasTrain : Powerup
     public float ExplosionRadius { get; set; } = 10.0f;
     public float ExplosionForce { get; set; } = 300.0f;
 
+    private float soundcooldown;
     private bool playChargeUpSound;
 
 
@@ -42,8 +43,8 @@ public class ThomasTrain : Powerup
         soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
         soundComponentExplosion.Looping = false;
         soundComponentExplosion.Is3D = true;
-
-        playChargeUpSound = true;
+        
+        soundcooldown = 0.0f;
     }
 
     public override void Start()
@@ -109,10 +110,12 @@ public class ThomasTrain : Powerup
     public override void Update()
     {
         base.Update();
+        soundcooldown -= Time.DeltaTime;
     }
 
     public override void Cleanup()
     {
+        base.Cleanup();
         soundComponentChargeUp.Stop();
     }
     
@@ -120,8 +123,11 @@ public class ThomasTrain : Powerup
     public override void ChargeEffect()
     {
         base.ChargeEffect();
-
-        soundComponentChargeUp.Play();
+        if (soundcooldown < 0.0f)
+        {
+            soundcooldown = 1.0f;
+            soundComponentChargeUp.Play();
+        }
     }
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
