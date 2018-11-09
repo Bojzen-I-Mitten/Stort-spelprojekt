@@ -123,6 +123,8 @@ public class MatchSystem : NetworkManager
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+                if (Input.GetKeyDown(Input.Keys.F10))
+                    ShowOwnedObjects();
             }
         }
 
@@ -136,6 +138,17 @@ public class MatchSystem : NetworkManager
         //    if(MatchTimeLeft % 5 == 0)
         //        SendRPC(-2, "RPCMatchInfo", MatchStartTime, GoldenGoal);
         //}
+    }
+
+    private void ShowOwnedObjects()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Owned objects:");
+        foreach(var objects in Scene.ObjectOwners[LocalPeer])
+        {
+            Debug.Log(objects.gameObject.Name);
+        }
+        Debug.Log("##################################");
     }
 
     #region Utility
