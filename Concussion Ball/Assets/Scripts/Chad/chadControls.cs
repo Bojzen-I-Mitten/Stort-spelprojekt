@@ -370,7 +370,7 @@ public class ChadControls : NetworkComponent
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        PickedUpObject.SetChargeTime(ChargeTime);
+        
         if (PickedUpObject)
         {
             PickedUpObject.StopEmitting();
@@ -574,6 +574,7 @@ public class ChadControls : NetworkComponent
 
     private void ThrowObject(Vector3 camPos, Vector3 direction)
     {
+        PickedUpObject.SetChargeTime(0.0f);
         PickedUpObject.Throw(camPos, direction);
         ChadHud.Instance.HideHeldObjectText();
     }
