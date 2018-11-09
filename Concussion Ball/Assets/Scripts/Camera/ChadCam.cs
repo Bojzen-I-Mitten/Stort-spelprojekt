@@ -35,7 +35,8 @@ public class ChadCam : ScriptComponent
     private float TotalXStep = 0;
 
     public float CameraOffset { get; set; } = 3;
-    public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
+    private Vector3 ThrowingOffset = new Vector3(1.2f, -0.5f, 1.8f);
+    //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
     private Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private float velocity { get { if (Chad?.rBody) return Chad.rBody.LinearVelocity.z; else return 0; } }
@@ -59,22 +60,36 @@ public class ChadCam : ScriptComponent
             {
                 case ChadControls.STATE.CHADING:
                 case ChadControls.STATE.DIVING:
-                    if (!Input.GetKey(Input.Keys.LeftShift))
-                        FondleCamera();
-                    else if (Input.GetKeyDown(Input.Keys.LeftShift))
-                        InitFreeLookCamera();
-                    else
-                        FreeLookCamera();
+                    if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
+                    {
+                        if (!Input.GetKey(Input.Keys.LeftShift))
+                            FondleCamera();
+                        else if (Input.GetKeyDown(Input.Keys.LeftShift))
+                            InitFreeLookCamera();
+                        else
+                            FreeLookCamera();
+                    }
                     break;
                 case ChadControls.STATE.THROWING:
-                    ThrowingCamera();
+                    if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
+                        ThrowingCamera();
                     break;
                 case ChadControls.STATE.RAGDOLL:
+                    {
+                        RagdollCamera();
+                    }
                     break;
             }
             //Camera.fieldOfView = MinFov + velocity;
             //Camera.fieldOfView = Math.Min(Camera.fieldOfView, MaxFov);
         }
+    }
+
+    private void RagdollCamera()
+    {
+        transform.rotation = Quaternion.Identity;
+        transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
+        transform.LookAt(Chad.Ragdoll.GetHips().transform);
     }
 
     public void FondleCamera()

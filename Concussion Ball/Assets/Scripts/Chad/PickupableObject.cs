@@ -16,13 +16,13 @@ public class PickupableObject : NetworkComponent
     public bool m_throwable = false;
     public bool m_pickupable = true;
 
-    public float chargeTimeCurrent;
+    private float chargeTimeCurrent;
     public float chargeTimeMax { get; set; } = 4.0f;
 
    [Newtonsoft.Json.JsonIgnore]
-    public bool charging { get { return chargeTimeCurrent > 0.0f; } }
+    public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
 
-    private ChadControls _Chad;
+    public ChadControls _Chad;
     private RenderComponent m_renderComponent;
 
     public bool PickedUp = false;
@@ -37,7 +37,19 @@ public class PickupableObject : NetworkComponent
     public override void Update()
     {
         if (charging)
+        {
             ChargeEffect();
+        }
+    }
+
+    public void SetChargeTime(float other)
+    {
+        chargeTimeCurrent = other;
+    }
+
+    public float GetChargeTime()
+    {
+        return chargeTimeCurrent;
     }
 
     virtual public void ChargeEffect()
@@ -103,6 +115,9 @@ public class PickupableObject : NetworkComponent
                 _Chad.PickedUpObject = null;
                 _Chad = null;
             }
+
+            StopEmitting();
+            Cleanup();
         }
     }
 
@@ -143,6 +158,8 @@ public class PickupableObject : NetworkComponent
             PickedUp = true;
             m_pickupable = false;
             _Chad = chad;
+
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
         }
     }
 
@@ -154,13 +171,28 @@ public class PickupableObject : NetworkComponent
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
+        if (isOwner)
+        {
+            reader.GetFloat();
+            return;
+        }
         chargeTimeCurrent = reader.GetFloat();
     }
 
 
+    public override void OnLostOwnership()
+    {
+        if(PickedUp && _Chad && _Chad.isOwner)
+        {
+            Debug.Log("nani!?");
+        }
+
+    }
+
     virtual public void Reset()
     {
         RPCDrop();
+        transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;
         PickedUp = false;
         m_pickupable = true;

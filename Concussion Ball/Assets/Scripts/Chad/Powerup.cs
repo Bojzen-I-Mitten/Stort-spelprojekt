@@ -18,7 +18,7 @@ public class Powerup : PickupableObject
     {
         base.Awake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-
+        //m_chargeTimeCurrent = 4.0f;
     }
 
     public override void OnEnable()
@@ -44,6 +44,7 @@ public class Powerup : PickupableObject
 
     override public void ChargeEffect()
     {
+        base.ChargeEffect();
         /*do particle bois and stuff*/
     }
 
@@ -154,6 +155,7 @@ public class Powerup : PickupableObject
     {
         base.Reset();
         m_rigidBody.IsKinematic = true;
+        m_rigidBody.enabled = false;
         activated = false;
     }
 }

@@ -178,6 +178,7 @@ public class Ball : PickupableObject
 
     public override void Update()
     {
+        base.Update();
         if (transform.position.y < -5)
             Reset();
     }
@@ -188,7 +189,7 @@ public class Ball : PickupableObject
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
 
-        float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
+        float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
 
         if (interp > 0.7f)
         {
