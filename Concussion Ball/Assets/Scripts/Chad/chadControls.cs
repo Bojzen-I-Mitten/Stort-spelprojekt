@@ -417,7 +417,7 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-                CurrentVelocity.y -= Math.Abs(xStep * CurrentVelocity.y / MaxSpeed); //TODO:Fix this when diagonal running is added
+                CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
