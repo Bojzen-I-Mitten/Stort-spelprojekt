@@ -62,6 +62,7 @@
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
+    <Compile Include="Assets\Scripts\Chad\GUIPlayerScore.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
     <Compile Include="Assets\Scripts\Confetti.cs" />
     <Compile Include="Assets\Scripts\ConfettiEmitter.cs" />
@@ -97,10 +98,10 @@
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
-    <Compile Include="Assets\test\AnimationBlendTest.cs" />
-    <Compile Include="Assets\test\GizmoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\test\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
