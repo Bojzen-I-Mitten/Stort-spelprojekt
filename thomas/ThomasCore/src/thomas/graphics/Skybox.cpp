@@ -12,9 +12,7 @@ namespace thomas
 	{
 		SkyBox::SkyBox()
 		{
-
 			GenerateSphere(10, 10, 5.0f);
-			
 			m_skyMap = nullptr;
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
