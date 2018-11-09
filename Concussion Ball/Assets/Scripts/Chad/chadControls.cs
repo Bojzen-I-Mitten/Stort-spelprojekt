@@ -166,7 +166,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
-        CanBeTackled = false;
+        CanBeTackled = true;//false;
         Ragdoll.EnableRagdoll();
     }
 
