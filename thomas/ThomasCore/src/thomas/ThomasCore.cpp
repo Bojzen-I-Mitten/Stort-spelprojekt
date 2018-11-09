@@ -76,17 +76,18 @@ namespace thomas
 	{
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->BeginFrame();
+
 		WindowManager::Instance()->ClearAllWindows();
+		profiler->WaitForDataAndUpdate();
+
 		profiler->Timestamp(utils::profiling::GTS_MAIN_CLEAR);
 		graphics::Renderer::Instance()->ProcessCommands();
 
 		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
 		//  (whose data we're getting) will have finished on the GPU by now.
 
-		profiler->WaitForDataAndUpdate();
 		WindowManager::Instance()->PresentAllWindows();
 		utils::D3D::Instance()->GetProfiler()->EndFrame();
-
 		graphics::Renderer::Instance()->PostRender();	// Sync. shaders ...?
 	}
 

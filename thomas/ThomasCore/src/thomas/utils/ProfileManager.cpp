@@ -45,7 +45,7 @@ namespace thomas
 			{
 				if (gpuTime < 0)
 					s_gpuSamples.push_back(0);
-				
+
 				s_gpuSamples.push_back(gpuTime);
 			}
 

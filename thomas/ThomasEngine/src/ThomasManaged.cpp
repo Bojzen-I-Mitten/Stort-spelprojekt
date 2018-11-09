@@ -111,12 +111,11 @@ namespace ThomasEngine {
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 * 0.001f * 0.001f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		profiler->SetActive(true);
-		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 #endif
 
 	}
@@ -152,6 +151,10 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+
+			float gpuTime = utils::D3D::Instance()->GetProfiler()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
+			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
+
 #ifdef BENCHMARK
 			utils::profiling::ProfileManager::newFrame();
 #endif
@@ -389,24 +392,10 @@ namespace ThomasEngine {
 					RenderFinished->Reset();
 					UpdateFinished->Set();
 				}
-
-
-#ifdef BENCHMARK
-				float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 * 0.001f * 0.001f);
-				utils::profiling::ProfileManager::setRAMUsage(ramUsage);
-
-				utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-				utils::profiling::ProfileManager::storeGpuSample((long long)(profiler->GetFrameTime()*1000.0f));
-				utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage(), profiler->GetTotalMemory());
-#endif
-
-				Monitor::Exit(lock);
-				mainThreadDispatcher->BeginInvoke(
-					System::Windows::Threading::DispatcherPriority::Normal,
-					gcnew MainThreadDelegate(MainThreadUpdate));
-
 			}
 
+			mainThreadDispatcher->BeginInvoke(System::Windows::Threading::DispatcherPriority::Normal, gcnew MainThreadDelegate(MainThreadUpdate));
+			
 
 		}
 		// Initiate log dump

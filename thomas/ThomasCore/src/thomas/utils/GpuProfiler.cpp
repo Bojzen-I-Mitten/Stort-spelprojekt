@@ -101,6 +101,7 @@ namespace thomas
 
 			void GpuProfiler::Timestamp(GTS gts)
 			{
+
 				UINT64 timestamp;
 				HRESULT hr = utils::D3D::Instance()->GetDeviceContext()->GetData(m_queryTimestamp[gts][m_frameQuery], &timestamp, sizeof(UINT64), 0);
 				if (hr == S_FALSE)
@@ -172,9 +173,9 @@ namespace thomas
 					{
 						m_timings[gts] = float(timestamp - timestampPrev) / float(timestampDisjoint.Frequency);
 						timestampPrev = timestamp;
-					}
 
-					m_avgTimingsTotal[gts] += m_timings[gts];
+						m_avgTimingsTotal[gts] += m_timings[gts];
+					}
 				}
 
 				++m_frameCountAvg;
@@ -217,6 +218,7 @@ namespace thomas
 
 				return m_memoryUsage;
 			}
+
 			float profiling::GpuProfiler::GetTotalMemory()
 			{
 				return m_totalMemory;
