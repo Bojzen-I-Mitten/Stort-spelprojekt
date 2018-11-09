@@ -36,15 +36,15 @@ namespace ThomasEngine
 		UnLoad();
 	}
 
-	void initiateGameObjectComp(List<GameObject^>^ objects)
+	void initiateGameObjectComp(List<GameObject^>^ objects, bool playing)
 	{
 		if (objects->Count == 0) return;
 		// Initiate
 		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Awake, false);
+			g->InitComponents(Comp::State::Awake, playing);
 		// Verify non-editor components are activated
 		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Enabled, true);
+			g->InitComponents(Comp::State::Enabled, playing);
 	}
 
 
@@ -54,7 +54,7 @@ namespace ThomasEngine
 		try
 		{
 			// Start game objects
-			initiateGameObjectComp(m_gameObjects);
+			initiateGameObjectComp(m_gameObjects, true);
 		}
 		catch (Exception^ e)
 		{
@@ -167,7 +167,7 @@ namespace ThomasEngine
 			gObj->PostLoad(this);
 		}
 
-		initiateGameObjectComp(m_gameObjects);
+		initiateGameObjectComp(m_gameObjects, ThomasWrapper::IsPlaying());
 	}
 
 
@@ -224,7 +224,7 @@ namespace ThomasEngine
 		m_commandList = m_commandSwapList;
 		m_commandSwapList = swp;
 		// Initiate related components
-		initiateGameObjectComp(addedList);
+		initiateGameObjectComp(addedList, ThomasWrapper::IsPlaying());
 
 #ifdef _EDITOR
 		if(numChanged)	// Trigger event 
@@ -325,9 +325,11 @@ namespace ThomasEngine
 			List<T>^ list = gcnew List<T>();
 			for each(GameObject^ g in m_gameObjects)
 			{
-				for each(T c in g->Components)
+				// Check if valid object
+				for each(Component^ c in g->Components)
 				{
-					list->Add(c);
+					if (T::typeid->IsAssignableFrom(c->GetType()))
+						list->Add((T)c);
 				}
 			}
 			Monitor::Exit(m_gameObjects);
@@ -337,15 +339,17 @@ namespace ThomasEngine
 			where T : Component
 		T Scene::findFirstComponent()
 		{
-			T value;
 			Monitor::Enter(m_gameObjects);
 			for each(GameObject^ g in m_gameObjects)
 			{
-				for each(T c in g->Components)
+				for each(Component^ c in g->Components)
 				{
-					T value = c;
-					Monitor::Exit(m_gameObjects);
-					return c;
+					// Check if valid object
+					if (T::typeid->IsAssignableFrom(c->GetType()))
+					{
+						Monitor::Exit(m_gameObjects);
+						return (T)c;
+					}
 				}
 			}
 			Monitor::Exit(m_gameObjects);

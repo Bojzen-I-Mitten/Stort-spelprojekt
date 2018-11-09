@@ -404,15 +404,15 @@ namespace ThomasEngine {
 
 					UpdateFinished->Set();
 
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Exit(Thomas->m_sceneLock);
+#endif
 
 				}
 
 
 
 
-#ifdef _THOMAS_SCENE_LOCK
-				Monitor::Exit(Thomas->m_sceneLock);
-#endif _THOMAS_SCENE_LOCK
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));

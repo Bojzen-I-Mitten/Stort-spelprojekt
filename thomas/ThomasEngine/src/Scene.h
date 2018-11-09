@@ -42,7 +42,7 @@ namespace ThomasEngine {
 		{
 			Add,			// Add object
 			Remove,			// Stage 2. Remove object
-			DisableRemove	// Stage 1. Disable removed object
+			DisableRemove	// Stage 1. Disable removed object, added as following command: Remove
 		};
 		value struct IssuedCommand
 		{

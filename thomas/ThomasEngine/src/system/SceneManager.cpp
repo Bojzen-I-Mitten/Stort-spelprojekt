@@ -35,8 +35,9 @@ namespace ThomasEngine
 			Application::currentProject->currentScenePath = m_current_scene->RelativeSavePath;
 
 		// Trigger change
+#ifdef _EDITOR
 		OnCurrentSceneChanged(oldScene, value);
-
+#endif
 		// Cleanup
 		if (oldScene)
 			oldScene->~Scene();

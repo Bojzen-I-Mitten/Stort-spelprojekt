@@ -11,6 +11,7 @@
 #include "../../editor/gizmos/Gizmos.h"
 #include <imgui/imgui.h>
 
+#include "../../utils/AutoProfile.h"
 namespace thomas
 {
 	namespace object
@@ -364,8 +365,9 @@ namespace thomas
 
 			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)
 			{
-				if (other == m_texture)
-					return;
+					if (other == m_texture)
+						return;
+				PROFILE("ParticleEmiter::SetTexture")
 
 				m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(other);
 

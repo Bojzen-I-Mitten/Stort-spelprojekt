@@ -11,6 +11,8 @@ namespace ThomasEngine
 	ref class Component;
 	namespace Script
 	{
+		/* Script Utility Functions, primary use for external access not internal
+		*/
 		public ref class ScriptUtility
 		{
 		public:

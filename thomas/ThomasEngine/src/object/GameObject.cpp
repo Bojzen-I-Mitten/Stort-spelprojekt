@@ -60,8 +60,9 @@ namespace ThomasEngine {
 
 		*/
 		Monitor::Enter(m_componentsLock);
-		for each (Component^ c in m_components)
+		for (int i = 0; i < m_components.Count; i++)
 		{
+			Component^ c = m_components[i];
 			// Logic over state s to enter... Should be separate functions at some point...
 			switch (s)
 			{
@@ -395,6 +396,12 @@ namespace ThomasEngine {
 		}
 
 		T component = (T)System::Activator::CreateInstance(T::typeid);
+		if (component == nullptr)
+		{
+			Debug::LogWarning("Component failed to instantiate of type " + (T::typeid));
+			return T();
+		}
+
 		((Component^)component)->setGameObject(this);
 		m_components.Add((Component^)component);
 

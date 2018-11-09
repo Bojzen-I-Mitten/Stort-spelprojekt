@@ -396,6 +396,7 @@ namespace ThomasEngine
 
 			void recursivePrefabDestruction(GameObject^ obj)
 			{
+				if (obj == nullptr) return;
 				// Delete objects recursively
 				List<Transform^> list(obj->transform->children);	// List is edited during destruction
 				for each(Transform^ o in list)
