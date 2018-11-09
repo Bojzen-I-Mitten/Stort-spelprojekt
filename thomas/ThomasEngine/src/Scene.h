@@ -77,7 +77,11 @@ namespace ThomasEngine {
 
 		bool OnPlay();
 
+		/* Schedule an object to be created during synchronized state
+		*/
 		void CreateObject(GameObject^ object);
+		/* Schedule destruction of an object during synchonized state
+		*/
 		void DestroyObject(GameObject^ object);
 
 		/* Find gameobject by name

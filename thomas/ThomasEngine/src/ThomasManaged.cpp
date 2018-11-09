@@ -63,6 +63,8 @@ namespace ThomasEngine {
 	ThomasWrapper::~ThomasWrapper()
 	{
 		m_scene->CurrentScene->UnLoad();
+		Resources::UnloadAll();
+		ThomasCore::Destroy();				// Delete core last
 	}
 	void ThomasWrapper::Start(bool editor) 
 	{
@@ -430,9 +432,7 @@ namespace ThomasEngine {
 		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
 		ThreadPool::QueueUserWorkItem(logOut);
 #endif
-
-		Resources::UnloadAll();
-		ThomasCore::Destroy();
+		delete Thomas;				// Delete the thomas instance, unload scene...
 #ifdef BENCHMARK
 		WaitLogOutput->WaitOne();
 #endif

@@ -412,7 +412,7 @@ namespace ThomasEngine
 				List<Transform^> list(obj->transform->children);	// List is edited during destruction
 				for each(Transform^ o in list)
 					recursivePrefabDestruction(o->m_gameObject);
-				obj->OnDestroy(); // Should not be 'needed' prefabs should not be initiated, asserts destruction process nevertheless
+				//obj->OnDestroy();
 				delete obj;
 			}
 
