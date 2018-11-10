@@ -54,6 +54,8 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
+            if(Team != null)
+                mat?.SetColor("color", Team.Color);
         }
 
     }

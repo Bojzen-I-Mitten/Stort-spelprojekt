@@ -152,15 +152,6 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
-        if (PickedUpObject)
-        {
-            ChadHud.Instance.ShowHeldObjectText(PickedUpObject.gameObject.Name);
-        }
-        else
-        {
-            ChadHud.Instance.HideHeldObjectText();
-            ChadHud.Instance.DeactivateAimHUD();
-        }
     }
 
     #region Ragdoll handling
@@ -225,7 +216,7 @@ public class ChadControls : NetworkComponent
         {
             LocalActivateRagdoll(duration, force, State == STATE.DIVING);
         }
-
+        Ragdoll.Smack();
     }
 
     public void RPCStartRagdoll(float duration, Vector3 force, bool diveTackle)

@@ -57,6 +57,11 @@ public class PickupableObject : NetworkComponent
 
     }
 
+    virtual public void OnThrow()
+    {
+
+    }
+
     virtual public void Throw(Vector3 camPos, Vector3 force)
     {
         if (PickedUp)
@@ -66,7 +71,11 @@ public class PickupableObject : NetworkComponent
             StartCoroutine(ThrowRoutine());
             transform.position = pos;
             transform.LookAt(transform.position + Vector3.Normalize(force));
+            m_rigidBody.Position = transform.position;
+            m_rigidBody.Rotation = transform.rotation;
             m_rigidBody.AddForce(force, Rigidbody.ForceMode.Impulse);
+            OnThrow();
+            SendRPC("OnThrow");
         }
     }
 

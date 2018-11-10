@@ -2,9 +2,10 @@
 
 #include "Component.h"
 #include "../../utils/Math.h"
-
+#include "Component.h"
 #include <memory>
 
+namespace DirectX { class AudioEmitter; }
 namespace thomas
 {
 	using namespace math;
@@ -56,6 +57,7 @@ namespace thomas
 				float m_volumeFactor;
 				bool m_looping;
 				bool m_is3D;
+				DirectX::AudioEmitter* m_emitter;
 			};
 		}
 	}

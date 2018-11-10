@@ -19,6 +19,7 @@ namespace thomas
 			m_volumeFactor(1.f),
 			m_is3D(false)
 			{
+				m_emitter = new DirectX::AudioEmitter();
 			}
 
 			void SoundComponent::OnDisable()
@@ -30,7 +31,12 @@ namespace thomas
 			{
 				if (m_is3D && AudioListener::GetInstance())
 				{
-					Apply3D(AudioListener::GetInstance()->m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->GetPosition());
+					m_emitter->Update(m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->Up(), ThomasTime::GetActualDeltaTime());
+					//Apply3D(AudioListener::GetInstance()->m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->GetPosition());
+					if (m_clip != nullptr)
+					{
+						m_clip->GetSoundEffectInstance()->Apply3D(AudioListener::GetInstance()->GetListner(), *m_emitter);
+					}
 				}
 			}
 
@@ -39,6 +45,7 @@ namespace thomas
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
+		
 					
 					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
 

@@ -46,7 +46,7 @@ namespace thomas
 				btTransform trans;
 				trans.setFromOpenGLMatrix(*m_gameObject->m_transform->GetWorldMatrix().m);
 				getMotionState()->setWorldTransform(trans);
-				setWorldTransform(trans);
+				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
@@ -91,6 +91,7 @@ namespace thomas
 					UpdateProperties();
 				}
 
+
 			}
 
 			void Rigidbody::UpdateTransformToRigidBody()
@@ -115,8 +116,10 @@ namespace thomas
 					//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
 					//setCenterOfMassTransform(trans);
 
-					SetCenterOfmass(m_collider->getCenter());
+					
 					setWorldTransform(trans);
+					getMotionState()->setWorldTransform(trans);
+					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 				}			
@@ -256,9 +259,9 @@ namespace thomas
 
 			void Rigidbody::SetPosition(math::Vector3 position)
 			{
-				btTransform trans = getWorldTransform();
+				btTransform trans = getCenterOfMassTransform();
 				trans.setOrigin(Physics::ToBullet(position));
-				setWorldTransform(trans);
+				setCenterOfMassTransform(trans);
 				
 				
 			}
@@ -266,9 +269,9 @@ namespace thomas
 			void Rigidbody::SetRotation(math::Quaternion rotation)
 			{
 				
-				btTransform trans = getWorldTransform();
+				btTransform trans = getCenterOfMassTransform();
 				trans.setRotation(Physics::ToBullet(rotation));
-				setWorldTransform(trans);
+				setCenterOfMassTransform(trans);
 
 				
 			}
@@ -397,14 +400,14 @@ namespace thomas
 
 			math::Vector3 Rigidbody::GetPosition()
 			{
-				btTransform trans = getWorldTransform();
+				btTransform trans = getCenterOfMassTransform();
 				//getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getOrigin());
 			}
 
 			math::Quaternion Rigidbody::GetRotation()
 			{
-				btTransform trans = getWorldTransform();
+				btTransform trans = getCenterOfMassTransform();
 				//getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getRotation());
 			}

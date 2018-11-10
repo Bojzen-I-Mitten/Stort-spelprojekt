@@ -138,7 +138,9 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
-                    
+                    hasConnected = true;
+
+
                     return;
                 }
                 else

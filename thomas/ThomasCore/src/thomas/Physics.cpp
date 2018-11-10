@@ -34,7 +34,7 @@ namespace thomas
 		s_debugDraw = std::make_unique<graphics::BulletDebugDraw>();
 		//Set states
 		s_world->setGravity(btVector3(0, -9.82f, 0));
-		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe | btIDebugDraw::DBG_FastWireframe);
+		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawAabb);
 		s_world->setDebugDrawer(s_debugDraw.get());
 
 		gContactStartedCallback = Physics::CollisionStarted;
@@ -115,11 +115,11 @@ namespace thomas
 
 	void Physics::DrawDebug(object::component::Camera* camera)
 	{
-#ifdef _DEBUG
+//#ifdef _DEBUG
 		if (!s_drawDebug)
 			return;
 		s_world->debugDrawWorld();
-#endif
+//#endif
 	}
 
 	void Physics::Destroy()

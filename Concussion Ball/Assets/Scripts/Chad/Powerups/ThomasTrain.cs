@@ -129,29 +129,24 @@ public class ThomasTrain : Powerup
             soundComponentChargeUp.Play();
         }
     }
+
+
+    public override void OnThrow()
+    {
+        soundComponentTravel.Play();
+        Debug.Log("throw");
+    }
+
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force);
-        soundComponentTravel.Play();
+        base.Throw(camPos + Vector3.Normalize(force)*2, force);
+        
 
         m_rigidBody.UseGravity = false;
-        StartCoroutine(Scale());
+        transform.scale *= 8.0f;
     }
-    
-
-    IEnumerator Scale()
-    {
-        transform.scale *= 2.0f;
-        yield return new WaitForSeconds(0.1f);
-        float t = 2.0f;
-        while (t > 0.0f)
-        {
-            transform.scale += new Vector3(1.0f) * Time.DeltaTime;
-            t -= Time.DeltaTime;
-            yield return null;
-        }
-    }
+   
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -170,8 +165,10 @@ public class ThomasTrain : Powerup
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
     }

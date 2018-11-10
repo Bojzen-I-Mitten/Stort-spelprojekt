@@ -105,7 +105,7 @@ namespace thomas
 	{
 		SoundInfo info;
 		info.soundEffect = std::make_unique<SoundEffect>(s_audioEngine.get(), CA2W(file.c_str()));
-		info.soundEffectInstance = info.soundEffect->CreateInstance();
+		info.soundEffectInstance = info.soundEffect->CreateInstance(SoundEffectInstance_Use3D);
 
 		s_waves.insert(std::make_pair(name, std::move(info)));
 	}

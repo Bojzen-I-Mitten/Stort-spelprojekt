@@ -140,8 +140,10 @@ public class Vindaloo : Powerup
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
 
