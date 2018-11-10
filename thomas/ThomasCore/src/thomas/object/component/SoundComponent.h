@@ -5,7 +5,7 @@
 #include "Component.h"
 #include <memory>
 
-namespace DirectX { class AudioEmitter; }
+namespace DirectX { class AudioEmitter; class SoundEffectInstance; }
 namespace thomas
 {
 	using namespace math;
@@ -23,7 +23,7 @@ namespace thomas
 			{
 			public:
 				SoundComponent();
-				~SoundComponent() = default;
+				~SoundComponent();
 
 				virtual void OnDisable() override;
 				void Update();
@@ -58,6 +58,7 @@ namespace thomas
 				bool m_looping;
 				bool m_is3D;
 				DirectX::AudioEmitter* m_emitter;
+				std::unique_ptr<DirectX::SoundEffectInstance> m_soundEffectInstance;
 			};
 		}
 	}
