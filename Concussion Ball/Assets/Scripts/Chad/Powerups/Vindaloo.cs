@@ -126,15 +126,15 @@ public class Vindaloo : Powerup
             return;
         activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
-        Explosion();
+        
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
-        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(_Chad.gameObject);
-        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+        //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(_Chad.gameObject);
+        //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
 
 
-        if (localChad && otherPlayerTeam != playerTeam)
+        if (localChad)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
@@ -144,6 +144,8 @@ public class Vindaloo : Powerup
                 localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
             }
         }
+
+        Explosion();
     }
 
     private void Explosion()

@@ -22,6 +22,8 @@ namespace thomas
 			m_damping(0.0f),
 			m_angularDaming(0.0f),
 			m_dirty(false),
+			m_syncRotation(true),
+			m_LocalCenterOfMassChange(0,0,0),
 			m_activationState(ActivationState::Default)
 			{
 				m_bounciness = m_restitution;
@@ -44,7 +46,7 @@ namespace thomas
 				btTransform trans;
 				trans.setFromOpenGLMatrix(*m_gameObject->m_transform->GetWorldMatrix().m);
 				getMotionState()->setWorldTransform(trans);
-				setCenterOfMassTransform(trans);
+				setWorldTransform(trans);
 				UpdateRigidbodyMass();
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
@@ -77,8 +79,9 @@ namespace thomas
 				math::Vector3 pos = (math::Vector3)trans.getOrigin();
 				if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
 
-				m_gameObject->m_transform->SetPosition(pos);
+				
 				m_gameObject->m_transform->SetRotation(rotation);
+				m_gameObject->m_transform->SetPosition(pos);
 				m_gameObject->m_transform->SetDirty(true);
 
 				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
@@ -101,17 +104,19 @@ namespace thomas
 					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
 
 					trans.setRotation((btQuaternion&)rot);
-					setCenterOfMassTransform(trans);
 					trans.setOrigin((btVector3&)pos);
-					getMotionState()->setWorldTransform(trans);
+					//getMotionState()->setWorldTransform(trans);
 
 
 					if (ImGuizmo::IsUsing()) {
 						this->setLinearVelocity(btVector3(0, 0, 0));
 						this->setAngularVelocity(btVector3(0, 0, 0));
 					}
-					trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
-					setCenterOfMassTransform(trans);
+					//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
+					//setCenterOfMassTransform(trans);
+
+					SetCenterOfmass(m_collider->getCenter());
+					setWorldTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 				}			
@@ -249,37 +254,28 @@ namespace thomas
 				m_rollingFriction = friction;
 			}
 
-			void Rigidbody::SetPosition(math::Vector3 position, bool forcePosition)
+			void Rigidbody::SetPosition(math::Vector3 position)
 			{
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
+				btTransform trans = getWorldTransform();
 				trans.setOrigin(Physics::ToBullet(position));
-				getMotionState()->setWorldTransform(trans);
+				setWorldTransform(trans);
+				
+				
+			}
 
-				if (forcePosition)
-				{
-					setWorldTransform(trans);
-					//m_gameObject->m_transform->SetPosition(position);
-				}
+			void Rigidbody::SetRotation(math::Quaternion rotation)
+			{
+				
+				btTransform trans = getWorldTransform();
+				trans.setRotation(Physics::ToBullet(rotation));
+				setWorldTransform(trans);
 
 				
 			}
 
-			void Rigidbody::SetRotation(math::Quaternion rotation, bool forceRotation)
+			void Rigidbody::DisableRotationSync()
 			{
-				
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
-				trans.setRotation(Physics::ToBullet(rotation));
-				getMotionState()->setWorldTransform(trans);
-
-				if (forceRotation)
-				{
-					setWorldTransform(trans);
-					//m_gameObject->m_transform->SetRotation(rotation);
-				}
-
-				
+				m_syncRotation = false;
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()
@@ -401,15 +397,15 @@ namespace thomas
 
 			math::Vector3 Rigidbody::GetPosition()
 			{
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
+				btTransform trans = getWorldTransform();
+				//getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getOrigin());
 			}
 
 			math::Quaternion Rigidbody::GetRotation()
 			{
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
+				btTransform trans = getWorldTransform();
+				//getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getRotation());
 			}
 

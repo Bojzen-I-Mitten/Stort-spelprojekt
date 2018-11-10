@@ -426,7 +426,7 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-                CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
+               // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
@@ -444,10 +444,12 @@ public class ChadControls : NetworkComponent
                 break;
         }
 
-        if(State != STATE.DIVING)
-            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
+        if (State != STATE.DIVING)
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
+
+        rBody.DisableRotationSync();
     }
 
     private int Slope(float delta, int absLimit)
@@ -481,11 +483,11 @@ public class ChadControls : NetworkComponent
             PickedUpObject = null;
         }
 
-        if(rBody)
-        {
-            rBody.SetPosition(transform.position, true);
-            rBody.SetRotation(transform.rotation, true);
-        }
+        //if(rBody)
+        //{
+        //    rBody.SetPosition(transform.position, true);
+        //    rBody.SetRotation(transform.rotation, true);
+        //}
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -655,13 +657,13 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            PickupableObject pickupablea = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
+            PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupablea)
             {
                 Debug.LogError("Why Denny!?");
             }
 
-            PickupableObject pickupable = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
+            PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
             {
                 if (pickupable.transform.parent == null)

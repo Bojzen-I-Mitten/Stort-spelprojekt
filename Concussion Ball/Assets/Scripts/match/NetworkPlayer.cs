@@ -16,7 +16,8 @@ public class NetworkPlayer : NetworkComponent
 
     public override void Awake()
     {
-        Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
+        if(Team == null)
+            Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
     }
 
     public override void Start()

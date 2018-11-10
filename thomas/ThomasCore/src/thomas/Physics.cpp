@@ -41,7 +41,7 @@ namespace thomas
 		gContactProcessedCallback = Physics::CollisionProcessed;
 		gContactEndedCallback = Physics::CollisionEnded;
 		
-		s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
+		//s_debugDraw->setDebugMode(btIDebugDraw::DBG_DrawConstraintLimits );
 
 		SetCollisionLayer("Default", 0, ~0);
 
