@@ -12,13 +12,17 @@ public class GUIPlayerScore : ScriptComponent
     public String AmountOfPlayersTeam1 { get; set; }
     public String AmountOfPlayersTeam2 { get; set; }
     public String Test { get; set; } = "hm";
-    public Texture2D PlayerBar { get; set; }
+    public Texture2D PlayerBarTeam1 { get; set; }
+    public Texture2D PlayerBarTeam2 { get; set; }
     public Texture2D Team1Bar { get; set; }
     public Texture2D Team2Bar { get; set; }
+    public int AmountOfPlayersInTeam1 { get; set; } = 2;
+    public int AmountOfPlayersInTeam2 { get; set; } = 2;
     public Texture2D AmountOfPlayersBar { get; set; }
     public Vector2 OriginText{get;set;}
-    public Vector2 OriginImage { get; set; }
+    public Vector2 ScaleText { get; set; }
     private bool Toggle = false;
+    public Font Font { get; set; }
     public override void Start()
     {
         cam = gameObject.GetComponent<Camera>();
@@ -29,12 +33,13 @@ public class GUIPlayerScore : ScriptComponent
         team1BarImage.scale = Vector2.Zero;
         team1BarImage.color = Color.Red;
         team1BarImage.origin = new Vector2(0, -2.025f);
+
         //Team2Bar Image
         team2BarImage = Canvas.Add(Team2Bar);
         team2BarImage.scale = Vector2.Zero;
         team2BarImage.color = Color.Blue;
-        team2BarImage.flip = Vector2.One;
-        team2BarImage.origin = new Vector2(-1.48f, -1.9f);
+        team2BarImage.origin = new Vector2(-1.48f, -2.025f);
+
         //AmountOfPlayersBar Image
         AmountOfPlayersBarImage = Canvas.Add(AmountOfPlayersBar);
         AmountOfPlayersBarImage.scale = Vector2.Zero;
@@ -43,25 +48,49 @@ public class GUIPlayerScore : ScriptComponent
 
 
         //       playerBar.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-
         TeamAmountOfPlayersText = Canvas.Add(AmountOfPlayersTeam1+"    "+ AmountOfPlayersTeam2);
         TeamAmountOfPlayersText.color = Color.White;
         TeamAmountOfPlayersText.scale = Vector2.Zero;
         TeamAmountOfPlayersText.origin = new Vector2(-3.5f, -2.65f);
 
-        for(int i = 0;i<2;i++)
-        {
-            PlayerStandardbar[i] = Canvas.Add(PlayerBar);
-            PlayerStandardbar[i].scale = Vector2.Zero;
 
-            PlayerstandardText[i] = Canvas.Add("hm");
+
+        PlayerStandardbar[0] = Canvas.Add(PlayerBarTeam1);
+        PlayerStandardbar[1] = Canvas.Add(PlayerBarTeam2);
+        PlayerstandardText[1] = Canvas.Add("Ping  Tackled  Tackles  Goals   Player");
+        PlayerstandardText[0] = Canvas.Add("    Player    Goals   Tackles Tackled   Ping");
+        for (int i = 0; i < 2; i++)
+        {
+            PlayerStandardbar[i].scale = Vector2.Zero;
+            PlayerstandardText[i].font = Font;
             PlayerstandardText[i].scale = Vector2.Zero;
         }
+        PlayerstandardText[0].origin = new Vector2(-0.01f, -10.2f);
+        PlayerstandardText[1].origin = new Vector2(-1.25f, -10.2f);
         PlayerStandardbar[0].origin = new Vector2(0, -3);
         PlayerStandardbar[0].color = Color.Red;
         PlayerStandardbar[1].color = Color.Blue;
-        PlayerStandardbar[1].flip = Vector2.One;
-        PlayerStandardbar[1].origin = new Vector2(-0.84f, -2.85f);
+        PlayerStandardbar[1].origin = new Vector2(-0.84f, -3);
+
+
+       
+
+
+        for(int i=0;i< AmountOfPlayersInTeam1;i++)
+        {
+            PlayerStandardBarTeam1[i] = Canvas.Add(PlayerBarTeam1);
+            PlayerStandardBarTeam1[i].scale = Vector2.Zero;
+            PlayerStandardBarTeam1[i].color = Color.Red;
+            PlayerStandardBarTeam1[i].origin = new Vector2(0, -3.75f-(i*0.75f));
+        }
+        for (int i = 0; i < AmountOfPlayersInTeam2; i++)
+        {
+            PlayerStandardBarTeam2[i] = Canvas.Add(PlayerBarTeam2);
+            PlayerStandardBarTeam2[i].scale = Vector2.Zero;
+            PlayerStandardBarTeam2[i].color = Color.Blue;
+            PlayerStandardBarTeam2[i].origin = new Vector2(-0.84f, -3.75f - (i * 0.75f));
+        }
+
     }
 
 
@@ -73,7 +102,8 @@ public class GUIPlayerScore : ScriptComponent
 
     Text[] PlayerstandardText = new Text[2];
     Image[] PlayerStandardbar = new Image[2];
-
+    Image[] PlayerStandardBarTeam1 = new Image[15];
+    Image[] PlayerStandardBarTeam2 = new Image[15];
     public override void Awake()
     {
 
@@ -91,22 +121,40 @@ public class GUIPlayerScore : ScriptComponent
         for (int i = 0; i < 2; i++)
         {
             PlayerStandardbar[i].scale = OnOff;
-            PlayerstandardText[i].scale = Vector2.One;
+            if(OnOff.x == 0)
+                PlayerstandardText[i].scale = new Vector2(0, 0);
+            else
+               PlayerstandardText[i].scale = new Vector2(0.8f,0.6f);
+            
         }
 
+        for (int i = 0; i < AmountOfPlayersInTeam1; i++)
+        {
+            PlayerStandardBarTeam1[i].scale = OnOff;
+        }
+        for (int i = 0; i < AmountOfPlayersInTeam2; i++)
+        {
+            PlayerStandardBarTeam2[i].scale = OnOff;
+
+        }
     }
     void SetOrigin()
     {
 
     //    PlayerStandardbar[1].origin = OriginImage;
-     //   PlayerstandardText[0].origin = OriginText;
-     //   PlayerstandardText[0].text = Test;
-        
+    //      PlayerstandardText[1].origin = OriginText;
+    //      PlayerstandardText[1].text = Test;
+    //      PlayerstandardText[1].scale = ScaleText;
 
     }
+    void UpdatePlayerBars()
+    {
+
+    }
+
     public override void Update()
     {
-       // Debug.Log("KAtt");
+
         if (Input.GetKeyDown(Input.Keys.Tab) || Input.GetKeyDown(Input.Keys.LeftControl))
         {
             if (!Toggle)

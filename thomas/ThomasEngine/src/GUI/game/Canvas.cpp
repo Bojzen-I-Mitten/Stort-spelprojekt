@@ -39,6 +39,10 @@ namespace ThomasEngine
 
 	Image^ Canvas::Add(Texture2D ^ texture)
 	{
+		if(texture == nullptr)
+		{
+			return nullptr;
+		}
 		thomas::graphics::GUI::GUIElement* image =
 			nativePtr->Add((thomas::resource::Texture2D*)texture->m_nativePtr);
 
