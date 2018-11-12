@@ -83,7 +83,7 @@ namespace thomas
 			unsigned* counterInitVals = new unsigned[4] {0, maxNrOfParticles, maxNrOfParticles, 0};
 			
 			m_bufferCounters = std::make_unique<utils::buffers::ByteAddressBuffer>(sizeof(unsigned), 4, counterInitVals, D3D11_BIND_FLAG(D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE));
-			//utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+			//utils::D3D::Instance()->GetDeviceContextImmediate()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 
 			delete counterInitVals;
 			
@@ -161,14 +161,14 @@ namespace thomas
 			m_emitParticlesCS->SetPass(0);
 
 			ID3D11Buffer* cBuffer[1] = { m_bufferSpawnIndex->GetBuffer() };
-			utils::D3D::Instance()->GetDeviceContext()->CSSetConstantBuffers(7, 1, cBuffer);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->CSSetConstantBuffers(7, 1, cBuffer);
 
 			for (unsigned i = 0; i < m_emitters.size(); ++i)
 			{
 				D3D11_MAPPED_SUBRESOURCE mappedResource = {};
-				HRESULT ttttt = utils::D3D::Instance()->GetDeviceContext()->Map(m_bufferSpawnIndex->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				HRESULT ttttt = utils::D3D::Instance()->GetDeviceContextImmediate()->Map(m_bufferSpawnIndex->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				memcpy(mappedResource.pData, &i, sizeof(int));
-				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_bufferSpawnIndex->GetBuffer(), 0);
+				utils::D3D::Instance()->GetDeviceContextImmediate()->Unmap(m_bufferSpawnIndex->GetBuffer(), 0);
 
 				m_emitParticlesCS->Dispatch((m_emitters[i].nrOfParticlesToEmit + EMIT_THREAD_DIM_X - 1) / EMIT_THREAD_DIM_X);					//EMIT
 			}
@@ -183,14 +183,14 @@ namespace thomas
 			//UPDATE EMITCOUNT
 			if (m_pingpong)
 			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
+				utils::D3D::Instance()->GetDeviceContextImmediate()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPing->GetUAV());
 			}
 			else
 			{
-				utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
+				utils::D3D::Instance()->GetDeviceContextImmediate()->CopyStructureCount(m_bufferCounters->GetBuffer(), 4, m_bufferAliveListPong->GetUAV());
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
+			utils::D3D::Instance()->GetDeviceContextImmediate()->CopyStructureCount(m_bufferCounters->GetBuffer(), 0, m_bufferDeadList->GetUAV());
 
 			m_calculateEmitCountCS->SetPropertyUAV("indirectargs", m_bufferIndirectArgs->GetUAV());
 			m_calculateEmitCountCS->SetPropertyResource("counterbuffer", m_bufferCounters->GetSRV());
@@ -248,10 +248,10 @@ namespace thomas
 			m_particleShader->SetPass(m_blendState);
 			
 			
-			utils::D3D::Instance()->GetDeviceContext()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->DrawInstancedIndirect(m_bufferIndirectArgs->GetBuffer(), 12);
 
 			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 8, s_nullSRV);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->VSSetShaderResources(0, 8, s_nullSRV);
 
 		}
 

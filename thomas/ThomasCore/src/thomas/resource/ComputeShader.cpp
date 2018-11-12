@@ -35,17 +35,17 @@ namespace thomas
 		void ComputeShader::Dispatch(int threadGroupX, int threadGroupY, int threadGroupZ)
 		{
 			//Bind();
-			utils::D3D::Instance()->GetDeviceContext()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->Dispatch(threadGroupX, threadGroupY, threadGroupZ);
 		}
 
 		void ComputeShader::DispatchIndirect(ID3D11Buffer* indirectBuffer, unsigned alignedByteOffsetForArgs)
 		{
-			utils::D3D::Instance()->GetDeviceContext()->DispatchIndirect(indirectBuffer, alignedByteOffsetForArgs);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->DispatchIndirect(indirectBuffer, alignedByteOffsetForArgs);
 		}
 
 		void ComputeShader::UnbindAllUAVs()
 		{
-			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(0, 8, s_nullUAVs, nullptr);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->CSSetUnorderedAccessViews(0, 8, s_nullUAVs, nullptr);
 		}
 
 		void ComputeShader::UnbindOneUAV(unsigned startIndex)
@@ -55,12 +55,12 @@ namespace thomas
 				LOG("start index is to large. early return");
 				return;
 			}
-			utils::D3D::Instance()->GetDeviceContext()->CSSetUnorderedAccessViews(startIndex, 1, s_nullUAV, nullptr);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->CSSetUnorderedAccessViews(startIndex, 1, s_nullUAV, nullptr);
 		}
 
 		void ComputeShader::UnbindAllSRVs()
 		{
-			utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(0, 8, s_nullSRVs);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->CSSetShaderResources(0, 8, s_nullSRVs);
 		}
 
 		void ComputeShader::UnbindOneSRV(unsigned startIndex)
@@ -70,7 +70,7 @@ namespace thomas
 				LOG("start index is to large. early return");
 				return;
 			}
-			utils::D3D::Instance()->GetDeviceContext()->CSSetShaderResources(startIndex, 1, s_nullSRV);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->CSSetShaderResources(startIndex, 1, s_nullSRV);
 		}
 
 	}

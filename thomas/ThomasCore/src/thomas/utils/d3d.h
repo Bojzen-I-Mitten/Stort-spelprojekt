@@ -30,6 +30,7 @@ namespace thomas
 
 			bool Init();
 			void Destroy();
+			
 			bool CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv,
 				ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly);
 			bool CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
@@ -38,14 +39,18 @@ namespace thomas
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateQuery(D3D11_QUERY type, ID3D11Query*& query);
-		
+			
+			void FinishCommandList();
+			void ExecuteCommandList();
+
 		public:
 			bool D3D::CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth, ID3D11DepthStencilState*& depthStencilState);
 			ID3D11RasterizerState* CreateRasterizer(D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode);
 
 		public:
 			ID3D11Device* GetDevice();
-			ID3D11DeviceContext* GetDeviceContext();
+			ID3D11DeviceContext* GetDeviceContextImmediate();
+			ID3D11DeviceContext* GetDeviceContextDeferred();
 			IDXGIDevice* GetDxgiDevice();
 			IDXGIAdapter* GetDxgiAdapter();
 			profiling::GpuProfiler* GetProfiler();
@@ -68,11 +73,15 @@ namespace thomas
 			static D3D s_D3D;
 
 			ID3D11Device* m_device;
-			ID3D11DeviceContext* m_deviceContext;
+			ID3D11DeviceContext* m_deviceContextImmediate;
+			ID3D11DeviceContext* m_deviceContextDeferred;
 			ID3D11Multithread* m_multiThreaded;
+			ID3D11CommandList* m_commandList;
 			ID3D11Debug* m_debug;
 			IDXGIDevice* m_dxgiDevice;
 			IDXGIAdapter* m_dxgiAdapter;
+
+			
 			profiling::GpuProfiler* m_profiler;
 
 		};

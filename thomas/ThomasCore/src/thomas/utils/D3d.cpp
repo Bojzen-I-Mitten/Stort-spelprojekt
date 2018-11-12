@@ -243,9 +243,16 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, &m_deviceContext);
+			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, &m_deviceContextImmediate);
 			if (SUCCEEDED(hr))
 			{
+				hr = m_device->CreateDeferredContext(0, &m_deviceContextDeferred);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
+			
 				if (!CreateDxgiInterface())
 					return false;
 
@@ -289,7 +296,7 @@ namespace thomas
 
 		bool D3D::CreateMultiThreadedInterface()
 		{
-			HRESULT hr = m_deviceContext->QueryInterface(IID_PPV_ARGS(&m_multiThreaded));
+			HRESULT hr = m_deviceContextImmediate->QueryInterface(IID_PPV_ARGS(&m_multiThreaded));
 			if (FAILED(hr))
 			{
 				LOG_HR(hr);
@@ -309,15 +316,29 @@ namespace thomas
 			return SUCCEEDED(hr);
 		}
 
+		void D3D::FinishCommandList()
+		{
+			ID3D11CommandList* commandList = nullptr;
+			HRESULT hr = m_deviceContextDeferred->FinishCommandList(false, &commandList);
+			if (FAILED(hr))
+				LOG_HR(hr)
+		}
+
+		void D3D::ExecuteCommandList()
+		{
+			m_deviceContextImmediate->ExecuteCommandList(m_commandList, true);
+		}
+
 		void D3D::Destroy()
 		{
 			m_profiler->Destroy();
 			delete m_profiler;
 
-			m_deviceContext->ClearState();
-			m_deviceContext->Flush();
+			m_deviceContextImmediate->ClearState();
+			m_deviceContextImmediate->Flush();
 
-			SAFE_RELEASE(m_deviceContext);
+			SAFE_RELEASE(m_deviceContextImmediate);
+			SAFE_RELEASE(m_deviceContextDeferred);
 			SAFE_RELEASE(m_device);
 
 			if (m_debug)
@@ -504,11 +525,11 @@ namespace thomas
 			HRESULT hr;
 			if (extension_string == ".dds")
 			{
-				hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContext, CA2W(fileName.c_str()), &texture, &textureView);
+				hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
 			}
 			else
 			{
-				hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContext, CA2W(fileName.c_str()), &texture, &textureView);
+				hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
 			}
 
 			if (FAILED(hr))
@@ -575,9 +596,14 @@ namespace thomas
 			return m_device;
 		}
 
-		ID3D11DeviceContext * D3D::GetDeviceContext()
+		ID3D11DeviceContext * D3D::GetDeviceContextImmediate()
 		{
-			return m_deviceContext;
+			return m_deviceContextImmediate;
+		}
+
+		ID3D11DeviceContext* D3D::GetDeviceContextDeferred()
+		{
+			return m_deviceContextDeferred;
 		}
 
 		IDXGIDevice* D3D::GetDxgiDevice()

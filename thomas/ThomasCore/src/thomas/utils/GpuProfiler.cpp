@@ -105,7 +105,7 @@ namespace thomas
 				m_totalVertexCount = 0;
 				if (!m_active)
 					return;
-				utils::D3D::Instance()->GetDeviceContext()->Begin(m_queryDisjoint[m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextImmediate()->Begin(m_queryDisjoint[m_frameQuery]);
 				Timestamp(GTS_BEGIN_FRAME);
 			}
 
@@ -113,7 +113,7 @@ namespace thomas
 			{
 				if (m_currentFrame > 0 || !m_active)
 					return;
-				utils::D3D::Instance()->GetDeviceContext()->End(m_queryTimestamp[gts][m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextImmediate()->End(m_queryTimestamp[gts][m_frameQuery]);
 			}
 
 			void GpuProfiler::EndFrame()
@@ -121,7 +121,7 @@ namespace thomas
 				if (m_currentFrame > 0 || !m_active)
 					return;
 				Timestamp(GTS_END_FRAME);
-				utils::D3D::Instance()->GetDeviceContext()->End(m_queryDisjoint[m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextImmediate()->End(m_queryDisjoint[m_frameQuery]);
 				++m_frameQuery &= 1; //Fancy 0/1 toggle.
 			}
 
@@ -137,7 +137,7 @@ namespace thomas
 			{
 				if (m_currentFrame || !m_active)
 					return;
-				ID3D11DeviceContext* context = utils::D3D::Instance()->GetDeviceContext();
+				ID3D11DeviceContext* context = utils::D3D::Instance()->GetDeviceContextImmediate();
 				if (m_frameCollect < 0)
 				{
 					// Haven't run enough frames yet to have data

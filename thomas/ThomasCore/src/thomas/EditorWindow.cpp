@@ -18,7 +18,7 @@ namespace thomas
 		/*ID3D11Resource* resource;
 		ID3D11Texture2D* catTexture;
 
-		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextImmediate());
 		DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), L"../Data/cat.png", &resource, &m_texture);
 
 		catTexture = (ID3D11Texture2D*)resource;
@@ -33,7 +33,7 @@ namespace thomas
 		resource->Release();*/
 		//
 
-		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
+		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate());
 	}
 
 	EditorWindow::~EditorWindow()
