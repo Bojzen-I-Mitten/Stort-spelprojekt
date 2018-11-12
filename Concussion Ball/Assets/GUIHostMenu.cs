@@ -75,11 +75,6 @@ public class GUIHostMenu : ScriptComponent
             if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT) || btnDown)
             {
                 btnDown = true;
-                for (int i = 0; i < SliderKnob.Count; i++)
-                {
-                    
-                }
-
                 for (int i = 0; i < ColorSliders.Count; i++)
                 {
                     if(ColorSliders[i].Hovered())
