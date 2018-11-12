@@ -82,10 +82,9 @@ float4 frag(v2f input) : SV_TARGET
 {
     float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
+    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
 
     float3 normal = NormalTexture.Sample(StandardWrapSampler, input.texcoord);
-    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
-    
     normal.xy = normal.xy * 2.0f - 1.0f;
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));

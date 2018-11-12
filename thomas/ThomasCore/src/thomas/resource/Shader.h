@@ -72,6 +72,7 @@ namespace thomas
 			void BindVertexBuffer(utils::buffers::VertexBuffer* buffer);
 			void BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers);
 			void BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer);
+			void SetDepthStencil(ID3D11DepthStencilState* depthStencilState);
 			void Bind();
 			void Draw(UINT vertexCount, UINT startVertexLocation);
 			void DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation);

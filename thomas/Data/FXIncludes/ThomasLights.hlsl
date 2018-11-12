@@ -3,6 +3,18 @@
 
 #include <ThomasCG.hlsl>
 
+cbuffer LightMatrices
+{
+    float4x4 lightMatrixVP; //[4];
+};
+
+inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
+{
+    return mul(lightMatrixVP, float4(pos, 1.0));
+}
+
+//Texture2DArray ShadowMaps;
+
 cbuffer LightCountsStruct
 {
     uint nrOfDirectionalLights;
@@ -40,7 +52,7 @@ inline float3 GetHalfwayVec(float3 lightDir, float3 viewDir)
     return normalize(viewDir + lightDir);
 }
 
-inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float smoothness)//should take material properties later
+inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float smoothness) 
 {
     float lambertian = saturate(dot(normal, lightDir));
     float specularIntensity = 0.0f;

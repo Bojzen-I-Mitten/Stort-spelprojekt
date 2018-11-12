@@ -1,5 +1,4 @@
 #include "Texture2D.h"
-#include "../../utils/d3d.h"
 #include "../../Common.h"
 #include "../../ThomasCore.h"
 

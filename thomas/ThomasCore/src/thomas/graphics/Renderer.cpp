@@ -212,6 +212,15 @@ namespace thomas
 							material->Bind();
 						}
 						{
+							//PROFILE("ShadowDrawObjects")
+							//for each light casting shadows
+							for (auto & perMeshCommand : perMaterialQueue.second)
+							{
+								{
+									//PROFILE("DrawShadows")
+									//shadowsMaterial->draw
+								}
+							}
 							PROFILE("CameraDrawObjects")
 							for (auto & perMeshCommand : perMaterialQueue.second)
 							{
@@ -219,6 +228,9 @@ namespace thomas
 									PROFILE("BindObject")
 									BindObject(perMeshCommand);
 								}
+
+								
+
 								{
 									PROFILE("DrawCall")
 									material->Draw(perMeshCommand.mesh);

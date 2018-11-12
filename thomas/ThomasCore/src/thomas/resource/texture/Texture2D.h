@@ -2,6 +2,7 @@
 
 #include "Texture.h"
 #include "../../utils/Math.h"
+#include "../../utils/d3d.h"
 #include <DirectXTex.h>
 
 namespace thomas

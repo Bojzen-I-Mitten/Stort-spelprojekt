@@ -6,7 +6,7 @@
 #include "..\utils\Buffers.h"
 #include "..\resource\Shader.h"
 #include "render/ShaderList.h"
-
+#include "ChadowMapping.h"
 #include <algorithm>
 namespace thomas
 {
@@ -28,6 +28,7 @@ namespace thomas
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
 
+			ShadowMap::InitStatics();
 		}
 		
 		void LightManager::Destroy()
