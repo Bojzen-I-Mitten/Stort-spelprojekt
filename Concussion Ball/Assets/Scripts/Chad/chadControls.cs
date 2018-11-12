@@ -440,7 +440,6 @@ public class ChadControls : NetworkComponent
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
 
-        rBody.DisableRotationSync();
     }
 
     private int Slope(float delta, int absLimit)
