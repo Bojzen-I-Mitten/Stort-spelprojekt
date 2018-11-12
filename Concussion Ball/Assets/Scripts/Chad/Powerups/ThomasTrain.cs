@@ -35,13 +35,13 @@ public class ThomasTrain : Powerup
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
         soundComponentChargeUp.Looping = false;
-        soundComponentChargeUp.Is3D = true;
+       // soundComponentChargeUp.Is3D = true;
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
         soundComponentTravel.Looping = false;
-        soundComponentTravel.Is3D = true;
+        //soundComponentTravel.Is3D = true;
         soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
         soundComponentExplosion.Looping = false;
-        soundComponentExplosion.Is3D = true;
+        //soundComponentExplosion.Is3D = true;
     }
 
     public override void OnEnable()
@@ -180,7 +180,7 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
-        soundComponentExplosion.PlayOneShot();
+        //soundComponentExplosion.PlayOneShot();
 
         StartCoroutine(KillTrain());
     }

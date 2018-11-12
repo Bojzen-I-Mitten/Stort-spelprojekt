@@ -21,6 +21,21 @@ namespace ThomasEngine
 		sound->Stop();
 	}
 
+	bool SoundComponent::IsPlaying()
+	{
+		return sound->IsPlaying();
+	}
+
+	bool SoundComponent::IsPaused()
+	{
+		return sound->IsPaused();
+	}
+
+	void SoundComponent::Pause(bool pause)
+	{
+		sound->SetPaused(pause);
+	}
+
 	void SoundComponent::clip::set(AudioClip^ value)
 	{
 		m_clip = value;
@@ -50,5 +65,15 @@ namespace ThomasEngine
 	bool SoundComponent::Looping::get() 
 	{ 
 		return sound->IsLooping(); 
+	}
+
+	void SoundComponent::is3D::set(bool value)
+	{
+		sound->Set3D(value);
+	}
+
+	bool SoundComponent::is3D::get()
+	{
+		return sound->Is3D();
 	}
 }

@@ -21,7 +21,12 @@ public class SoundTest : ScriptComponent
     {
         if(Input.GetKeyDown(Input.Keys.W))
         {
-            Gun.PlayOneShot();
+            Gun.Play();
+        }
+
+        if (Input.GetKeyDown(Input.Keys.E))
+        {
+            Gun.Pause(false);
         }
     }
 }

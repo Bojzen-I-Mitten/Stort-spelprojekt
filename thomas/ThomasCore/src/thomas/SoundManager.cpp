@@ -3,6 +3,8 @@
 // Thomas
 #include "Common.h"
 #include "ThomasCore.h"
+#include "object/GameObject.h"
+#include "object/component/AudioListener.h"
 
 namespace thomas
 {
@@ -18,22 +20,15 @@ namespace thomas
 
 	void SoundManager::Update()
 	{
-		// Check if a channel has stopped playing and invalidate it
-		for (auto& sound : m_sounds)
+		auto listener = object::component::AudioListener::GetInstance();
+
+		// No velocity set on the listener
+		if (listener != nullptr)
 		{
-			bool playing = false;
-
-			if (sound.second.channel != nullptr)
-			{
-				ErrorCheck(sound.second.channel->isPlaying(&playing));
-
-				if (!playing)
-				{
-					sound.second.channel = nullptr;
-				}
-			}
+			m_system->set3DListenerAttributes(0, &Vector3ToFmod(listener->m_gameObject->m_transform->GetPosition()), NULL,
+				&Vector3ToFmod(listener->m_gameObject->m_transform->Forward()), &Vector3ToFmod(listener->m_gameObject->m_transform->Up()));
 		}
-
+		
 		ErrorCheck(m_system->update());
 		ErrorCheck(m_studioSystem->update());
 	}
@@ -42,7 +37,9 @@ namespace thomas
 	{
 		// Release sounds
 		for (const auto& sound : m_sounds)
+		{
 			sound.second.sound->release();
+		}
 
 		ErrorCheck(m_studioSystem->unloadAll());
 		ErrorCheck(m_studioSystem->release());
@@ -53,6 +50,9 @@ namespace thomas
 		auto& found = GetSoundInfo(id);
 
 		// Set looping options
+		// Note: if you put a sound on looping during runtime and which is playing
+		// it will play separately from the same sound instance which is not set to looping
+		// this behavior can then be repeated
 		if (found.looping)
 		{
 			found.sound->setMode(FMOD_LOOP_NORMAL);
@@ -63,7 +63,7 @@ namespace thomas
 			found.sound->setMode(FMOD_LOOP_OFF);
 		}
 
-		ErrorCheck(m_system->playSound(found.sound, nullptr, false, &found.channel));
+		ErrorCheck(m_system->playSound(found.sound, nullptr, found.paused, &found.channel));
 
 		if (found.channel != nullptr)
 		{

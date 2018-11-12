@@ -17,7 +17,10 @@ namespace ThomasEngine
 		SoundComponent();
 
 		void Play();
+		void Pause(bool paused);
 		void Stop();
+		bool IsPlaying();
+		bool IsPaused();
 
 		property AudioClip^ clip
 		{
@@ -32,6 +35,12 @@ namespace ThomasEngine
 		}
 
 		property bool Looping
+		{
+			bool get();
+			void set(bool value);
+		}
+
+		property bool is3D
 		{
 			bool get();
 			void set(bool value);

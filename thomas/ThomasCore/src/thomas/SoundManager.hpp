@@ -21,8 +21,9 @@ namespace thomas
 		struct Info
 		{
 			FMOD::Sound* sound = nullptr;
-			FMOD::Channel* channel = nullptr;
+			FMOD::Channel* channel = nullptr; // Could have this as a vector instead as this is per audio clip only
 			bool looping = false;
+			bool paused = false;
 			float volume = 1.f;
 		};
 

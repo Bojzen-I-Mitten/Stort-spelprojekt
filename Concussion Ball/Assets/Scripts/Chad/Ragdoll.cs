@@ -202,7 +202,7 @@ public class Ragdoll : ScriptComponent
         }
 
         // Play the ragdoll sound
-        RagdollSound.PlayOneShot();
+        //RagdollSound.PlayOneShot();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
@@ -682,7 +682,7 @@ public class Ragdoll : ScriptComponent
             if (ImpactSpine.GetActive)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
-                RagdollSound.PlayOneShot();
+                //RagdollSound.PlayOneShot();
             }
                 
             return;

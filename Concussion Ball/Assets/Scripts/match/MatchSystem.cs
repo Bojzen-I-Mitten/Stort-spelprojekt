@@ -166,7 +166,7 @@ public class MatchSystem : NetworkManager
         PowerupManager.ResetPowerups();
         LocalChad.Locked = true;
 
-        countdownSound.PlayOneShot();
+        //countdownSound.PlayOneShot();
 
         ChadHud.Instance.StartCountdown(duration);
         yield return new WaitForSecondsRealtime(duration);
@@ -177,7 +177,7 @@ public class MatchSystem : NetworkManager
 
     IEnumerator OnGoalCoroutine(Team teamThatScored)
     {
-        endroundSound.PlayOneShot();
+        //endroundSound.PlayOneShot();
         ChadHud.Instance.OnGoal(teamThatScored, 7.0f);
         Time.TimeScale = 0.5f;
 
