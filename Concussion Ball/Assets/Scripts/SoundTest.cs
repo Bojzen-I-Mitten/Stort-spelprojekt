@@ -14,19 +14,14 @@ public class SoundTest : ScriptComponent
     public override void Start()
     {
         Gun = gameObject.GetComponent<SoundComponent>();
-        //Gun.Play();
+        Gun.Play();
     }
 
     public override void Update()
     {
-        if(Input.GetKeyDown(Input.Keys.W))
+        if(Input.GetKeyDown(Input.Keys.K))
         {
-            Gun.Play();
-        }
-
-        if (Input.GetKeyDown(Input.Keys.E))
-        {
-            Gun.Pause(false);
+            //Gun.Play();
         }
     }
 }
