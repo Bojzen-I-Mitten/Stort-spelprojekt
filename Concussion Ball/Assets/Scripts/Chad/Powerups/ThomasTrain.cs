@@ -96,9 +96,9 @@ public class ThomasTrain : Powerup
         
         soundComponentTravel.Looping = false;
         
-        soundComponentChargeUp.clip = soundClipChargeUp;
-        soundComponentTravel.clip = soundClipTravel;
-        soundComponentExplosion.clip = soundClipExplosion;
+        soundComponentChargeUp.Clip = soundClipChargeUp;
+        soundComponentTravel.Clip = soundClipTravel;
+        soundComponentExplosion.Clip = soundClipExplosion;
 
         playChargeUpSound = true;
 

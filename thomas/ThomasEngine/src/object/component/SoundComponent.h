@@ -9,6 +9,14 @@ namespace ThomasEngine
 	ref class AudioClip;
 	public ref class SoundComponent : public Component
 	{
+	public:
+		enum class SoundType
+		{
+			Music,
+			Effect,
+			Voice
+		};
+
 	private:
 		AudioClip^ m_clip;
 		property thomas::object::component::SoundComponent* sound { thomas::object::component::SoundComponent* get(); }
@@ -25,7 +33,13 @@ namespace ThomasEngine
 		bool IsPaused();
 		bool IsMuted();
 
-		property AudioClip^ clip
+		property SoundType Type
+		{
+			SoundType get();
+			void set(SoundType value);
+		}
+
+		property AudioClip^ Clip
 		{
 			AudioClip^ get();
 			void set(AudioClip^ value);

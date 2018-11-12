@@ -90,11 +90,11 @@ public class MatchSystem : NetworkManager
 
        
         countdownSound = gameObject.AddComponent<SoundComponent>();
-        countdownSound.clip = countdownSoundClip;
+        countdownSound.Clip = countdownSoundClip;
         countdownSound.Looping = false;
        
         endroundSound = gameObject.AddComponent<SoundComponent>();
-        endroundSound.clip = endroundSoundClip;
+        endroundSound.Clip = endroundSoundClip;
         endroundSound.Looping = false;
         
         //StartCoroutine(ResetCoroutine(10));

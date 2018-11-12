@@ -13,6 +13,13 @@ namespace thomas
 		class AudioClip;
 	}
 
+	enum class SoundType
+	{
+		Music,
+		Effect,
+		Voice
+	};
+
 	namespace object
 	{
 		namespace component
@@ -30,6 +37,7 @@ namespace thomas
 				void Update() override;
 
 			public:
+				void SetType(SoundType type);
 				void SetClip(resource::AudioClip* clip);
 				void SetVolume(float volume);
 				void Set3D(bool is3D);
@@ -41,6 +49,7 @@ namespace thomas
 				void Set3DSpreadAngle(float angle);
 
 			public:
+				SoundType GetType() const;
 				resource::AudioClip* GetClip() const;
 				float GetVolume() const;
 				float Get3DMinDistance() const;
@@ -53,6 +62,7 @@ namespace thomas
 				bool IsMute() const;
 
 			private:
+				SoundType m_type;
 				FMOD::Channel* m_channel;
 				resource::AudioClip* m_clip;
 				bool m_is3D;

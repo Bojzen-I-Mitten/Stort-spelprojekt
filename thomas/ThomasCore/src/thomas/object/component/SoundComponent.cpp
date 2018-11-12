@@ -12,6 +12,7 @@ namespace thomas
 		namespace component
 		{
 			SoundComponent::SoundComponent() :
+			m_type(SoundType::Music),
 			m_channel(nullptr),
 			m_clip(nullptr),
 			m_is3D(false),
@@ -97,17 +98,18 @@ namespace thomas
 				{
 					// No velocity set on the object
 					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->m_transform->GetPosition()), NULL);
-					
-					if (m_spreadAngle >= 0.f && m_spreadAngle <= 360.f)
-					{
-						m_channel->set3DSpread(m_spreadAngle);
-					}
+					m_channel->set3DSpread(m_spreadAngle);
 
 					if (m_minDistance < m_maxDistance)
 					{
 						m_channel->set3DMinMaxDistance(m_minDistance, m_maxDistance);
 					}
 				}
+			}
+
+			void SoundComponent::SetType(SoundType type)
+			{
+				m_type = type;
 			}
 
 			void SoundComponent::SetClip(resource::AudioClip* clip)
@@ -171,6 +173,11 @@ namespace thomas
 			void SoundComponent::Set3DSpreadAngle(float angle)
 			{
 				m_spreadAngle = angle;
+			}
+
+			SoundType SoundComponent::GetType() const
+			{
+				return m_type;
 			}
 
 			resource::AudioClip* SoundComponent::GetClip() const

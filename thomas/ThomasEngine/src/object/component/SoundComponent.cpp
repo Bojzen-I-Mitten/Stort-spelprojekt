@@ -51,13 +51,23 @@ namespace ThomasEngine
 		sound->SetMute(mute);
 	}
 
-	void SoundComponent::clip::set(AudioClip^ value)
+	void SoundComponent::Type::set(SoundType value)
+	{
+		sound->SetType((thomas::SoundType)value);
+	}
+
+	SoundComponent::SoundType SoundComponent::Type::get()
+	{
+		return (SoundType)sound->GetType();
+	}
+
+	void SoundComponent::Clip::set(AudioClip^ value)
 	{
 		m_clip = value;
 		sound->SetClip((thomas::resource::AudioClip*)value->m_nativePtr);
 	}
 
-	AudioClip^ SoundComponent::clip::get() 
+	AudioClip^ SoundComponent::Clip::get() 
 	{ 
 		return m_clip; 
 	}
@@ -94,6 +104,11 @@ namespace ThomasEngine
 
 	void SoundComponent::MinDistance::set(float value)
 	{
+		if (value <= 0.f)
+		{
+			value = 0.f;
+		}
+
 		sound->Set3DMinDistance(value);
 	}
 
@@ -114,6 +129,15 @@ namespace ThomasEngine
 
 	void SoundComponent::SpreadAngle::set(float value)
 	{
+		if (value <= 0.f)
+		{
+			value = 0.f;
+		}
+		else if (value >= 360.f)
+		{
+			value = 360.f;
+		}
+
 		sound->Set3DSpreadAngle(value);
 	}
 

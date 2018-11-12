@@ -27,7 +27,7 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        ExplosionSound.clip = VindalooExplosionSound;
+        ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         //ExplosionSound.Is3D = true;
 
