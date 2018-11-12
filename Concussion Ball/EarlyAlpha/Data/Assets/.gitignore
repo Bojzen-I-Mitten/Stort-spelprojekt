@@ -1,0 +1,24 @@
+#Ignore Assets
+*.obj
+*.mtl
+*.fbx
+*.png
+*.jpg
+*.jpeg
+*.tga
+*.tds
+*.mp3
+*.wav
+*.anim
+*.blend*
+*.prefab
+*.mat
+*.dds
+
+Models/
+
+
+
+# Other stuff
+
+*.ini
