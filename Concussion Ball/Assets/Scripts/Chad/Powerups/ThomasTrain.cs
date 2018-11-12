@@ -20,13 +20,34 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipTravel { get; set; }
     public AudioClip soundClipExplosion { get; set; }
 
-    public float ExplosionRadius { get; set; } = 5.0f;
-    public float ExplosionForce { get; set; } = 200.0f;
+    public float ExplosionRadius { get; set; } = 10.0f;
+    public float ExplosionForce { get; set; } = 300.0f;
 
+    private float soundcooldown;
     private bool playChargeUpSound;
 
 
     public override void Awake()
+    {
+        base.Awake();
+        emitterFire = gameObject.AddComponent<ParticleEmitter>();
+        emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
+        emitterSpark = gameObject.AddComponent<ParticleEmitter>();
+
+        soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentChargeUp.Looping = false;
+        soundComponentChargeUp.Is3D = true;
+        soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel.Looping = false;
+        soundComponentTravel.Is3D = true;
+        soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion.Looping = false;
+        soundComponentExplosion.Is3D = true;
+        
+        soundcooldown = 0.0f;
+    }
+
+    public override void Start()
     {
         base.Awake();
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
@@ -107,44 +128,44 @@ public class ThomasTrain : Powerup
     public override void Update()
     {
         base.Update();
+        soundcooldown -= Time.DeltaTime;
     }
 
     public override void Cleanup()
     {
-        playChargeUpSound = true;
+        base.Cleanup();
+        playChargeUpSound = false;
         soundComponentChargeUp.Stop();
     }
+    
 
     public override void ChargeEffect()
     {
-        if (playChargeUpSound)
+        base.ChargeEffect();
+        if (soundcooldown < 0.0f)
         {
+            soundcooldown = 1.0f;
             soundComponentChargeUp.Play();
-            playChargeUpSound = false;
         }
     }
+
+
+    public override void OnThrow()
+    {
+        soundComponentTravel.Play();
+        Debug.Log("throw");
+    }
+
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force * 2.0f);
-        soundComponentTravel.Play();
+        base.Throw(camPos + Vector3.Normalize(force)*2, force);
+        
 
         m_rigidBody.UseGravity = false;
-        StartCoroutine(Scale());
+        transform.scale *= 8.0f;
     }
-
-    IEnumerator Scale()
-    {
-        transform.scale *= 3.0f;
-        yield return new WaitForSeconds(0.1f);
-        float t = 2.0f;
-        while (t > 0.0f)
-        {
-            transform.scale += new Vector3(1.0f) * Time.DeltaTime;
-            t -= Time.DeltaTime;
-            yield return null;
-        }
-    }
+   
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -163,8 +184,10 @@ public class ThomasTrain : Powerup
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
     }

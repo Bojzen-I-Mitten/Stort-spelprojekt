@@ -24,7 +24,7 @@ namespace thomas
 			AudioClip(const std::string& file);
 
 			SoundEffectInstance* GetSoundEffectInstance() const;
-
+			std::unique_ptr<SoundEffectInstance> CreateSoundEffectInstance();
 		private:
 			SoundEffectInstance* m_soundEffectInstance;
 		};

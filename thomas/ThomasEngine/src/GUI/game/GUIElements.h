@@ -39,6 +39,7 @@ namespace ThomasEngine
 		property float rotation
 		{
 			void set(float rotation);
+			float get();
 		}
 		property bool interactable
 		{
@@ -69,6 +70,7 @@ namespace ThomasEngine
 		property String^ text
 		{
 			void set(String^ text);
+			String^ get();
 		}
 		property Font^ font
 		{
