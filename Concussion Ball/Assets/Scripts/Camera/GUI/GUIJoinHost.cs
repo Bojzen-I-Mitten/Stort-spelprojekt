@@ -7,6 +7,7 @@ using LiteNetLib;
 public class GUIJoinHost : ScriptComponent
 {
     public Texture2D JoinBtn { get; set; }
+    public Texture2D BackBtn { get; set; }
     public Texture2D HostBtn { get; set; }
     public Texture2D TextBox { get; set; }
     public Font TextFont { get; set; }
@@ -24,6 +25,7 @@ public class GUIJoinHost : ScriptComponent
     Image TextBoxIP;
     Image TextBoxPort;
     Image Join;
+    Image Back;
     Image Host;
 
     Text IPText;
@@ -80,6 +82,10 @@ public class GUIJoinHost : ScriptComponent
 
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
+            if (Back.Clicked())
+            {
+                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            }
             if (TextBoxIP.Clicked())
             {
                 TakePort = false;
@@ -201,6 +207,16 @@ public class GUIJoinHost : ScriptComponent
 
         }
 
+        if (BackBtn != null)
+        {
+            Back = Canvas.Add(BackBtn);
+            Back.position = new Vector2(0.325f, 0.26f);
+            Back.scale = new Vector2(0.25f);
+            Back.interactable = true;
+            Back.depth = 0.9f;
+        }
+ 
+
         if (HostBtn != null)
         {
             Host = Canvas.Add(HostBtn);
@@ -239,6 +255,7 @@ public class GUIJoinHost : ScriptComponent
     {
         Canvas.Remove(Join);
         Canvas.Remove(Host);
+        Canvas.Remove(Back);
         Canvas.Remove(TextBoxIP);
         Canvas.Remove(TextBoxPort);
         Canvas.Remove(ConnectingText);

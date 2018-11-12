@@ -6,6 +6,7 @@ public enum CAM_STATE
     SELECT_TEAM,
     CHAD,
     SPECTATE,
+    MAIN_MENU,
     NUMSTATES
 }
 
@@ -17,14 +18,14 @@ public class CameraMaster : ScriptComponent
 
     Camera Camera;
     GUIJoinHost JoinHost;
+    GUIMainMenu MainMenu;
     GUISelectTeam SelectTeam;
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
     ChadHud Hud;
 
     public Canvas Canvas;
-    Image BG;
-    public CAM_STATE State = CAM_STATE.JOIN_HOST;
+    public CAM_STATE State;
 
 
     public override void Awake()
@@ -37,15 +38,18 @@ public class CameraMaster : ScriptComponent
     public override void Start()
     {
         instance = this;
-        
-      //  BG = Canvas.Add(Background);
-       // BG.interactable = true;
+        State = CAM_STATE.MAIN_MENU;
+        //  BG = Canvas.Add(Background);
+        // BG.interactable = true;
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
         JoinHost = gameObject.GetComponent<GUIJoinHost>();
         if (JoinHost == null)
             Debug.Log("Camera Master cannot find GUI script for join/host");
+        MainMenu = gameObject.GetComponent<GUIMainMenu>();
+        if (MainMenu == null)
+            Debug.Log("Camera master could not find GUI script for main menu");
         SelectTeam = gameObject.GetComponent<GUISelectTeam>();
         if (SelectTeam == null)
             Debug.Log("Camera Master cannot find GUI script for select");
@@ -70,15 +74,24 @@ public class CameraMaster : ScriptComponent
     {
         switch (State)
         {
+            case CAM_STATE.MAIN_MENU:
+                SelectTeam.Canvas.isRendering = false;
+                Hud.Canvas.isRendering = false;
+                JoinHost.Canvas.isRendering = false;
+                MainMenu.Canvas.isRendering = true;
+                break;
+
             case CAM_STATE.JOIN_HOST:
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = false;
                 JoinHost.Canvas.isRendering = true;
+                MainMenu.Canvas.isRendering = false;
                 break;
             case CAM_STATE.SELECT_TEAM:
                 SelectTeam.Canvas.isRendering = true;
                 Hud.Canvas.isRendering = false;
                 JoinHost.Canvas.isRendering = false;
+                MainMenu.Canvas.isRendering = false;
                 //if (MatchSystem.instance.LocalChad?.NetPlayer?.Team?.TeamType != TEAM_TYPE.UNASSIGNED)
                 //{
                 //    Canvas.isRendering = false; //canvas.Remove(BG) if we need to save some RAM.
@@ -102,11 +115,13 @@ public class CameraMaster : ScriptComponent
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = true;
                 JoinHost.Canvas.isRendering = false;
+                MainMenu.Canvas.isRendering = false;
                 break;
             case CAM_STATE.SPECTATE:
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = true;
                 JoinHost.Canvas.isRendering = false;
+                MainMenu.Canvas.isRendering = false;
                 break;
         }
     }
