@@ -49,7 +49,10 @@ namespace thomas
 	{
 		for (Window* window : m_windows)
 			if (window->Initialized())
+			{
+				window->WaitOnSwapChain();
 				window->Clear();
+			}
 	}
 
 	void WindowManager::PresentAllWindows()
@@ -58,6 +61,15 @@ namespace thomas
 			if (window->Initialized())
 			{
 				window->Present();
+			}
+	}
+
+	void WindowManager::ResolveRenderTarget()
+	{
+		for (Window* window : m_windows)
+			if (window->Initialized())
+			{
+				window->ResolveRenderTarget();
 			}
 	}
 
