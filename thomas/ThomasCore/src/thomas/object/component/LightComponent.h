@@ -4,6 +4,7 @@
 
 #include "../../utils/Math.h"
 #include "../../graphics/LightManager.h"
+#include "../../graphics/ChadowMapping.h"
 /**
 LightComponent class
 */
@@ -23,7 +24,7 @@ namespace thomas
 				graphics::LightManager::LightStruct m_lightComponentData;
 
 				graphics::LightManager::LIGHT_TYPES m_type;
-				
+				graphics::ShadowMap m_shadowMap;
 			public:
 				LightComponent();
 				~LightComponent();
@@ -34,6 +35,9 @@ namespace thomas
 				virtual void OnDestroy() override;
 
 			public: // Get / Set
+				void UpdateShadowMap();
+				
+
 				graphics::LightManager::LightStruct GetData();
 
 				graphics::LightManager::LIGHT_TYPES GetType();

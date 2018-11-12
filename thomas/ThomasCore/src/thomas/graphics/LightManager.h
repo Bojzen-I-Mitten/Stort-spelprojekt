@@ -67,7 +67,7 @@ namespace thomas
 			static void AddLight(object::component::LightComponent* light);
 			static bool RemoveLight(object::component::LightComponent* light);
 			static void Update();
-
+			static std::vector<object::component::LightComponent*> GetLightsCastingShadows();
 			static void Bind(render::ShaderList* shaders);
 		private:
 

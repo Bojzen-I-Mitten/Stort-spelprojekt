@@ -135,7 +135,7 @@ namespace thomas
 				return false;
 		}
 
-		bool D3D::CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels = 1)
+		bool D3D::CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels = 1, bool bindDepth)
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
 			ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -152,7 +152,16 @@ namespace thomas
 				textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 			}
 			else
-				textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			{
+				if (bindDepth)
+				{
+					textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+				}
+				else
+				{
+					textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+				}
+			}
 			textureDesc.CPUAccessFlags = 0;
 			textureDesc.MiscFlags = mipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 

@@ -188,8 +188,26 @@ namespace thomas
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				
-				PROFILE("PerCameraDraw")
+				PROFILE("ShadowDrawObjectsPerCamera")
+				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
+				{
+					
+					PROFILE("ShadowDrawObjects")
+						//for each light casting shadows
+							//{
+
+						//LightManager::GetLightsCastingShadows()
+
+					for (auto & perMeshCommand : perMaterialQueue.second)
+					{
+						{
+							//PROFILE("DrawShadows")
+							//shadowsMaterial->draw
+						}
+					}
+					
+				}
+
 				{
 					PROFILE("CameraBind")
 					BindCameraRenderTarget(perCameraQueue.second.m_frameData);
@@ -212,15 +230,6 @@ namespace thomas
 							material->Bind();
 						}
 						{
-							//PROFILE("ShadowDrawObjects")
-							//for each light casting shadows
-							for (auto & perMeshCommand : perMaterialQueue.second)
-							{
-								{
-									//PROFILE("DrawShadows")
-									//shadowsMaterial->draw
-								}
-							}
 							PROFILE("CameraDrawObjects")
 							for (auto & perMeshCommand : perMaterialQueue.second)
 							{
@@ -228,9 +237,6 @@ namespace thomas
 									PROFILE("BindObject")
 									BindObject(perMeshCommand);
 								}
-
-								
-
 								{
 									PROFILE("DrawCall")
 									material->Draw(perMeshCommand.mesh);

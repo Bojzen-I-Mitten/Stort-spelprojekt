@@ -22,7 +22,7 @@ namespace thomas
 
 		ShadowMap::ShadowMap()
 		{
-			m_depthTexture = std::make_unique<resource::Texture2D>(512, 512, false);
+			m_depthTexture = std::make_unique<resource::Texture2D>(512, 512, false, DXGI_FORMAT_R32_TYPELESS, true);
 
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 
@@ -42,7 +42,7 @@ namespace thomas
 			desc.Usage = D3D11_USAGE_DEFAULT;*/
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC desc = {};
-			desc.Format = DXGI_FORMAT_R32_FLOAT;
+			desc.Format = DXGI_FORMAT_D32_FLOAT;
 			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			
 			HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(m_depthTexture.get()->GetResource(), &desc, &m_depthStencilView);

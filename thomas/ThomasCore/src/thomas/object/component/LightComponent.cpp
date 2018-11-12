@@ -28,6 +28,7 @@ namespace thomas
 				m_lightComponentData.spotInnerAngle = 0.0f;
 				m_lightComponentData.spotOuterAngle = 20.0f;
 				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
+
 			}
 			LightComponent::~LightComponent()
 			{

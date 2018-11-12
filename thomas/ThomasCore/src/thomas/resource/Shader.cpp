@@ -260,11 +260,6 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
 
-		void Shader::SetDepthStencil(ID3D11DepthStencilState* depthStencilState)
-		{
-			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(depthStencilState, 0);
-		}
-
 		void Shader::Bind()
 		{
 			for (auto prop : m_properties) {

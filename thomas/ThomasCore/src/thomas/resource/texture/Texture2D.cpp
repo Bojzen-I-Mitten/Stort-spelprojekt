@@ -51,14 +51,11 @@ namespace thomas
 			}
 		}
 
-		
-
-		Texture2D::Texture2D(int width, int height, bool mipMap) : Texture2D(nullptr, width, height, mipMap)
+		Texture2D::Texture2D(int width, int height, bool mipMap, DXGI_FORMAT format, bool bindDepth): Texture2D(nullptr, width, height, mipMap, format, bindDepth)
 		{
-			
 		}
 
-		Texture2D::Texture2D(void * initData, int width, int height, bool mipMap)
+		Texture2D::Texture2D(void * initData, int width, int height, bool mipMap, DXGI_FORMAT format, bool bindDepth)
 		{
 			m_width = width;
 			m_height = height;
@@ -66,7 +63,7 @@ namespace thomas
 			m_mipMap = mipMap;
 
 			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+			utils::D3D::Instance()->CreateTexture(initData, width, height, format, textureInterface, m_srv, mipMap, 1, bindDepth);
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 		}
