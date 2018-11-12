@@ -52,6 +52,8 @@ public class ThomasTrain : Powerup
         base.Start();
 
         m_throwable = true; // change depending on power-up
+        MovementSpeedModifier = 0.65f;
+
         emitterFire.Texture = fireTexture;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 2.0f;

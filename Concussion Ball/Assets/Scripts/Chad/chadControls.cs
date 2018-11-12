@@ -79,7 +79,7 @@ public class ChadControls : NetworkComponent
     IEnumerator Diving = null;
 
     public PickupableObject PickedUpObject;
-    private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
+    private float xStep { get { return Input.GetMouseX()/** Time.ActualDeltaTime*/; } }
 
     public override void Start()
     {
