@@ -1,9 +1,9 @@
 #pragma once
 
-#define FRAME_BUFFERS 3
+#define FRAME_BUFFERS 2
 
 #include <d3d11_4.h>
-#include <dxgi1_4.h>
+#include <dxgi1_6.h>
 #include <string>
 
 #pragma comment (lib, "d3d11.lib")
@@ -31,10 +31,9 @@ namespace thomas
 			bool Init();
 			void Destroy();
 			bool CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv,
-				ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
-			bool CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly);
+				ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly);
+			bool CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
 			bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain);
-			bool CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
 			bool CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
@@ -47,6 +46,8 @@ namespace thomas
 		public:
 			ID3D11Device* GetDevice();
 			ID3D11DeviceContext* GetDeviceContext();
+			IDXGIDevice* GetDxgiDevice();
+			IDXGIAdapter* GetDxgiAdapter();
 			profiling::GpuProfiler* GetProfiler();
 
 		public:
@@ -60,13 +61,18 @@ namespace thomas
 		private:
 			D3D() = default;
 			void CreateDebugInterface();
+			bool CreateDxgiInterface();
+			bool CreateMultiThreadedInterface();
 			
 		private:
 			static D3D s_D3D;
 
 			ID3D11Device* m_device;
 			ID3D11DeviceContext* m_deviceContext;
+			ID3D11Multithread* m_multiThreaded;
 			ID3D11Debug* m_debug;
+			IDXGIDevice* m_dxgiDevice;
+			IDXGIAdapter* m_dxgiAdapter;
 			profiling::GpuProfiler* m_profiler;
 
 		};

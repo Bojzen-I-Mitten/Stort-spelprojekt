@@ -201,12 +201,12 @@ namespace thomas
 
 	bool Window::InitDxBuffers()
 	{
-		bool hr = utils::D3D::Instance()->CreateBackBuffer(m_swapChain, m_dxBuffers.buffer[0], m_dxBuffers.RTV[0], m_dxBuffers.SRV[0], m_dxBuffers.depthStencilView[0], m_dxBuffers.depthStencilViewReadOnly[0], m_dxBuffers.depthBufferSRV);
+		bool hr = utils::D3D::Instance()->CreateBackBuffer(m_swapChain, m_dxBuffers.buffer[0], m_dxBuffers.RTV[0], m_dxBuffers.SRV[0], m_dxBuffers.depthStencilView[0], m_dxBuffers.depthStencilViewReadOnly[0]);
 		if (hr)
 		{
 			utils::D3D::Instance()->CreateDepthStencilState(D3D11_COMPARISON_LESS, true, m_dxBuffers.depthStencilState);
 			utils::D3D::Instance()->CreateRenderTarget(m_dxBuffers.buffer[0], m_dxBuffers.buffer[1], m_dxBuffers.RTV[1], m_dxBuffers.SRV[1]);
-			utils::D3D::Instance()->CreateDepthStencilView(m_dxBuffers.buffer[1], m_dxBuffers.depthStencilView[1], m_dxBuffers.depthStencilViewReadOnly[1]);
+			utils::D3D::Instance()->CreateDepthStencilView(m_dxBuffers.buffer[1], m_dxBuffers.depthStencilView[1], m_dxBuffers.depthStencilViewReadOnly[1], m_dxBuffers.depthBufferSRV);
 
 			return true;
 		}

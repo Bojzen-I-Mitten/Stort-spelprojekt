@@ -6,11 +6,11 @@
 #include "GpuProfiler.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
+
+#include <roapi.h>
 #include <AtlBase.h>
 #include <atlconv.h>
 #include <comdef.h>
-#include <string.h>  
-
 #include <DirectXTex.h>
 
 namespace thomas
@@ -18,65 +18,6 @@ namespace thomas
 	namespace utils
 	{
 		D3D D3D::s_D3D;
-
-		bool D3D::CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv)
-		{
-			D3D11_TEXTURE2D_DESC bufferDesc;
-			ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-			bufferDesc.Width = width;
-			bufferDesc.Height = height;
-			bufferDesc.MipLevels = 1;
-			bufferDesc.ArraySize = 1;
-			bufferDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			bufferDesc.SampleDesc.Count = THOMAS_AA_COUNT;
-			bufferDesc.SampleDesc.Quality = THOMAS_AA_QUALITY;
-			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-
-			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
-			rtvDesc.Format = bufferDesc.Format;
-#if THOMAS_AA_COUNT > 1
-			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-
-#else
-			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
-
-			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			ZeroMemory(&srvDesc, sizeof(srvDesc));
-			srvDesc.Format = bufferDesc.Format;
-#if THOMAS_AA_COUNT > 1
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-
-#else
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
-			srvDesc.Texture2D.MipLevels = 1;
-			srvDesc.Texture2D.MostDetailedMip = 0;
-
-			HRESULT hr = m_device->CreateTexture2D(&bufferDesc, NULL, &buffer);
-			if (SUCCEEDED(hr))
-			{
-				hr = m_device->CreateShaderResourceView(buffer, &srvDesc, &srv);
-				if (FAILED(hr))
-				{
-					LOG_HR(hr);
-					return false;
-				}
-
-				m_device->CreateRenderTargetView(buffer, &rtvDesc, &rtv);
-				if (FAILED(hr))
-				{
-					LOG_HR(hr);
-					return false;
-				}
-			}
-
-			return true;
-		}
 
 		bool D3D::CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv)
 		{
@@ -249,56 +190,43 @@ namespace thomas
 
 		bool D3D::CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain)
 		{
-			IDXGIDevice* dxgiDevice = nullptr;
-			HRESULT hr = m_device->QueryInterface(__uuidof(IDXGIDevice), (void **)& dxgiDevice);
+			IDXGIFactory* dxgiFactory = nullptr;
+			HRESULT hr = m_dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)& dxgiFactory);
 			if (SUCCEEDED(hr))
 			{
-				IDXGIAdapter* dxgiAdapter = nullptr;
-				hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+				DXGI_SWAP_CHAIN_DESC scd;
+				ZeroMemory(&scd, sizeof(scd));
+
+				scd.BufferCount = FRAME_BUFFERS;
+				scd.BufferDesc.Height = height;
+				scd.BufferDesc.Width = width;
+				scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+				scd.OutputWindow = handle;
+				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+				scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+				scd.SampleDesc.Count = 1;
+				scd.SampleDesc.Quality = 0;
+				scd.Windowed = TRUE;
+				scd.BufferDesc.RefreshRate.Numerator = 0;
+				scd.BufferDesc.RefreshRate.Denominator = 1;
+
+				IDXGISwapChain* dxgiSwapChain = nullptr;
+				hr = dxgiFactory->CreateSwapChain(m_device, &scd, &dxgiSwapChain);
 				if (SUCCEEDED(hr))
 				{
-					IDXGIFactory* dxgiFactory = nullptr;
-					hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)& dxgiFactory);
-					if (SUCCEEDED(hr))
-					{
-						DXGI_SWAP_CHAIN_DESC scd;
-						ZeroMemory(&scd, sizeof(scd));
-
-						scd.BufferCount = FRAME_BUFFERS;
-						scd.BufferDesc.Height = height;
-						scd.BufferDesc.Width = width;
-						scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-						scd.OutputWindow = handle;
-						scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
-						scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-
-						scd.SampleDesc.Count = 1;
-						scd.SampleDesc.Quality = 0;
-						scd.Windowed = TRUE;
-						scd.BufferDesc.RefreshRate.Numerator = 0; 
-						scd.BufferDesc.RefreshRate.Denominator = 1; 
-
-						IDXGISwapChain* dxgiSwapChain = nullptr;
-						hr = dxgiFactory->CreateSwapChain(m_device, &scd, &dxgiSwapChain);
-						if (SUCCEEDED(hr))
-						{
-							dxgiSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&swapchain);
-							swapchain->SetMaximumFrameLatency(FRAME_BUFFERS - 1);
-							SAFE_RELEASE(dxgiSwapChain);
-						}
-
-						SAFE_RELEASE(dxgiFactory);
-					}
-					SAFE_RELEASE(dxgiAdapter)
+					dxgiSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&swapchain);
+					swapchain->SetMaximumFrameLatency(FRAME_BUFFERS - 1);
+					SAFE_RELEASE(dxgiSwapChain);
 				}
-				SAFE_RELEASE(dxgiDevice);
+
+				SAFE_RELEASE(dxgiFactory);
+				return true;
 			}
 
-			if (FAILED(hr))
-				return false;
-
-			return true;
+		
+			LOG_HR(hr);
+			return false;
 		}
 
 		D3D* D3D::Instance()
@@ -308,8 +236,6 @@ namespace thomas
 
 		bool D3D::Init()
 		{
-			CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-
 			const D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 			UINT createDeviceFlags = 0;
 			D3D_FEATURE_LEVEL fl;
@@ -317,30 +243,27 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-
 			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, &m_deviceContext);
-			if (FAILED(hr))
+			if (SUCCEEDED(hr))
 			{
-				LOG_HR(hr);
-				return false;
-			}
+				if (!CreateDxgiInterface())
+					return false;
 
-			ID3D11Multithread* multi = nullptr;
-			hr = m_device->QueryInterface(IID_PPV_ARGS(&multi));
-			if (FAILED(hr))
-			{
-				LOG_HR(hr);
-				return false;
-			}
-
-			multi->SetMultithreadProtected(TRUE);
-			SAFE_RELEASE(multi);
+				if (!CreateMultiThreadedInterface())
+					return false;
 
 #ifdef  _DEBUG_DX
-			CreateDebugInterface();
+				CreateDebugInterface();
 #endif
-			m_profiler = new profiling::GpuProfiler();
-			return m_profiler->Init();
+				m_profiler = new profiling::GpuProfiler();
+				if (!m_profiler->Init())
+					return false;
+			}
+
+			return true;
+
+			LOG_HR(hr);
+			return false;
 		}
 
 		void D3D::CreateDebugInterface()
@@ -348,6 +271,32 @@ namespace thomas
 			HRESULT hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
 			if (FAILED(hr))
 				LOG_HR(hr);
+		}
+
+		bool D3D::CreateDxgiInterface()
+		{
+			HRESULT hr = m_device->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice));
+			if (SUCCEEDED(hr))
+			{
+				hr = m_dxgiDevice->GetAdapter(&m_dxgiAdapter);
+				if (SUCCEEDED(hr))
+					return true;
+			}
+
+			LOG_HR(hr);
+			return false;
+		}
+
+		bool D3D::CreateMultiThreadedInterface()
+		{
+			HRESULT hr = m_deviceContext->QueryInterface(IID_PPV_ARGS(&m_multiThreaded));
+			if (FAILED(hr))
+			{
+				LOG_HR(hr);
+				return false;
+			}
+
+			return true;
 		}
 
 		bool D3D::CreateQuery(D3D11_QUERY type, ID3D11Query *& query)
@@ -378,7 +327,7 @@ namespace thomas
 		}
 
 		bool D3D::CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, 
-			ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV)
+			ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly)
 		{
 			HRESULT hr = swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backbuffer);
 			if (SUCCEEDED(hr))
@@ -431,20 +380,6 @@ namespace thomas
 						LOG_HR(hr);
 						return false;
 					}
-
-					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-					ZeroMemory(&srvDesc, sizeof(srvDesc));
-					srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-					srvDesc.Texture2D.MostDetailedMip = 0;
-					srvDesc.Texture2D.MipLevels = 1;
-
-					hr = m_device->CreateShaderResourceView(depthStencilBuffer, &srvDesc, &depthBufferSRV);
-					if (FAILED(hr))
-					{
-						LOG_HR(hr);
-						return false;
-					}
 				}
 
 				SAFE_RELEASE(depthStencilBuffer);
@@ -489,7 +424,7 @@ namespace thomas
 			return true;
 		}
 
-		bool D3D::CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly)
+		bool D3D::CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV)
 		{
 			D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
 			buffer->GetDesc(&depthStencilBufferDesc);
@@ -524,6 +459,24 @@ namespace thomas
 
 				depthViewDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
 				hr = m_device->CreateDepthStencilView(depthStencilBuffer, &depthViewDesc, &depthStencilViewReadOnly);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
+
+				D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+				ZeroMemory(&srvDesc, sizeof(srvDesc));
+				srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+#if THOMAS_AA_COUNT > 1
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+#else
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+#endif
+				srvDesc.Texture2D.MostDetailedMip = 0;
+				srvDesc.Texture2D.MipLevels = 1;
+
+				hr = m_device->CreateShaderResourceView(depthStencilBuffer, &srvDesc, &depthBufferSRV);
 				if (FAILED(hr))
 				{
 					LOG_HR(hr);
@@ -625,6 +578,16 @@ namespace thomas
 		ID3D11DeviceContext * D3D::GetDeviceContext()
 		{
 			return m_deviceContext;
+		}
+
+		IDXGIDevice* D3D::GetDxgiDevice()
+		{
+			return m_dxgiDevice;
+		}
+
+		IDXGIAdapter* D3D::GetDxgiAdapter()
+		{
+			return m_dxgiAdapter;
 		}
 
 		utils::profiling::GpuProfiler* D3D::GetProfiler()

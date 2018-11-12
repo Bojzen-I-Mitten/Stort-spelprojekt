@@ -1,6 +1,6 @@
 #pragma once
 #include "D3D.h"
-#include <dxgi1_6.h>
+
 namespace thomas
 {
 	namespace utils
