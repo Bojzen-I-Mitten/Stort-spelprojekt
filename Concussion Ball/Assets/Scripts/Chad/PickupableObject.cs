@@ -17,7 +17,7 @@ public class PickupableObject : NetworkComponent
     public bool m_pickupable = true;
 
     private float chargeTimeCurrent;
-    public float chargeTimeMax { get; set; } = 4.0f;
+    public float chargeTimeMax;// { get; set; } = 4.0f;
 
    [Newtonsoft.Json.JsonIgnore]
     public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
@@ -32,6 +32,7 @@ public class PickupableObject : NetworkComponent
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
         chargeTimeCurrent = 0.0f;
+        chargeTimeMax = 2.0f;
     }
 
     public override void Update()

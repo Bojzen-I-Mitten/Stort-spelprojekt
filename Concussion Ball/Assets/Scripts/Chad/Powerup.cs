@@ -18,7 +18,7 @@ public class Powerup : PickupableObject
     {
         base.Awake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-        //m_chargeTimeCurrent = 4.0f;
+        chargeTimeMax = 0.5f;
     }
 
     public override void OnEnable()

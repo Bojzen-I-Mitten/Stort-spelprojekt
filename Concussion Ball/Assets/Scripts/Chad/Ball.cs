@@ -27,6 +27,7 @@ public class Ball : PickupableObject
         m_throwable = true;
         DropOnRagdoll = true;
         MovementSpeedModifier = 0.65f;
+        chargeTimeMax = 2.0f;
 
         // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 

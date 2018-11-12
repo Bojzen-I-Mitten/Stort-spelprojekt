@@ -21,10 +21,9 @@ public class ChadControls : NetworkComponent
     public STATE State { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
+    
 
     #region Throwing stuff
-    [Category("Throwing")]
-    public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
     private float ThrowForce;
     [Category("Throwing")]
@@ -73,7 +72,11 @@ public class ChadControls : NetworkComponent
 
     public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 7;
+
     private float DivingTimer = 0.0f;
+    private float JumpingTimer = 0.0f;
+    private bool Jumping = false;
+
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
@@ -127,6 +130,8 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
+            JumpingTimer += Time.DeltaTime;
+
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL)
             {
@@ -280,7 +285,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
 
-        if (Input.GetKeyDown(Input.Keys.Space) && DivingTimer > 5.0f)
+        if (Input.GetKeyDown(Input.Keys.LeftShift) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
             CurrentVelocity.y += 2.0f;
@@ -288,6 +293,21 @@ public class ChadControls : NetworkComponent
             StartCoroutine(Diving);
             DivingTimer = 0.0f;
             DivingDirection = this.gameObject.transform.rotation;
+        }
+        else if (Input.GetKeyDown(Input.Keys.Space))
+        {
+            if(JumpingTimer > 3.0f)
+            {
+                JumpingTimer = 0.0f;
+                Jumping = true;
+                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 8, rBody.LinearVelocity.z), rBody.Rotation);
+            }
+            else if(Jumping)
+            {
+                JumpingTimer = 0.0f;
+                Jumping = false;
+                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 5, rBody.LinearVelocity.z), rBody.Rotation);
+            }
         }
     }
 
@@ -332,7 +352,7 @@ public class ChadControls : NetworkComponent
                         ResetThrow();
                     }
                 }
-                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
+                else if (Input.GetKeyDown(Input.Keys.LeftShift) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
                 {
                     ResetThrow();
                 }
@@ -341,27 +361,6 @@ public class ChadControls : NetworkComponent
             {
                 if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                     PickedUpObject.OnActivate();
-            }
-            
-            if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING && State != STATE.DIVING) || State == STATE.CHADING)
-            {
-                //FondleCamera(CurrentVelocity.Length(), xStep, yStep);
-            }
-            else if (State == STATE.THROWING)
-            {
-                //ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
-            }
-            else if (Input.GetKeyDown(Input.Keys.LeftShift))
-            {
-                //InitFreeLookCamera();
-            }
-            else if (State != STATE.DIVING)
-            {
-                //FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
-            }
-
-            if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
-            {
             }
         }
     }
@@ -570,14 +569,14 @@ public class ChadControls : NetworkComponent
     private void ChargeObject()
     {
         ChargeTime += Time.DeltaTime;
-        ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
+        ChargeTime = MathHelper.Clamp(ChargeTime, 0, PickedUpObject.chargeTimeMax);
         
         PickedUpObject.SetChargeTime(ChargeTime);
         float tets = PickedUpObject.GetChargeTime();
         
 
-        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);
-        ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
+        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
+        ChadHud.Instance.ChargeChargeBar(ChargeTime / PickedUpObject.chargeTimeMax);
     }
 
     private void ThrowObject(Vector3 camPos, Vector3 direction)
