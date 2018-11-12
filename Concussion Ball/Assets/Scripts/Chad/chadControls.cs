@@ -487,7 +487,7 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        Animations.ResetTimer(0); // missing network sync
+        Animations.RPCResetTimer(0); // missing network sync
         float timer = 1.5f;
         while (timer > 0.0f)
         {
