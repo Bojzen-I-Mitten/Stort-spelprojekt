@@ -81,92 +81,95 @@ public class GUIJoinHost : ScriptComponent
 
     public override void Update()
     {
-        if (TakeIP)
-            InputGUI.AppendIPString(ref IPString, 15);
-        if (TakePort)
-            InputGUI.AppendIPString(ref PortString, 5);
-
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        if (Canvas.isRendering)
         {
-            if (TextBoxIP.Clicked())
+            if (TakeIP)
+                InputGUI.AppendIPString(ref IPString, 15);
+            if (TakePort)
+                InputGUI.AppendIPString(ref PortString, 5);
+
+            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {
-                TakePort = false;
-                TakeIP = true;
-                TextBoxPort.color = Color.Black;
-                TextBoxIP.color = Color.Green;
-            }
-            else if (TextBoxPort.Clicked())
-            {
-                TakeIP = false;
-                TakePort = true;
-                TextBoxIP.color = Color.Black;
-                TextBoxPort.color = Color.Green;
-            }
-            else if (Join.Clicked())
-            {
-                if (IPString != "" && PortString != "")
+                if (TextBoxIP.Clicked())
                 {
-                    if (IPString == "127.0.0.1")
-                        MatchSystem.instance.LocalPort = 0;
+                    TakePort = false;
+                    TakeIP = true;
+                    TextBoxPort.color = Color.Black;
+                    TextBoxIP.color = Color.Green;
+                }
+                else if (TextBoxPort.Clicked())
+                {
+                    TakeIP = false;
+                    TakePort = true;
+                    TextBoxIP.color = Color.Black;
+                    TextBoxPort.color = Color.Green;
+                }
+                else if (Join.Clicked())
+                {
+                    if (IPString != "" && PortString != "")
+                    {
+                        if (IPString == "127.0.0.1")
+                            MatchSystem.instance.LocalPort = 0;
+                        else
+                            MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
+                        MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
+                        MatchSystem.instance.TargetIP = IPString;
+                        MatchSystem.instance.Init();
+                        MatchSystem.instance.Connect();
+                        ConnectingText.text = "Connecting";
+                        ConnectingText.position = new Vector2(0.75f, 0.9f);
+                        test = Connecting();
+                        StartCoroutine(test);
+                        Join.interactable = false;
+                        Host.interactable = false;
+                        return;
+                    }
                     else
+                    {
+                        if (IPString == "")
+                            TextBoxIP.color = Color.Red;
+                        if (PortString == "")
+                            TextBoxPort.color = Color.Red;
+                    }
+                }
+                else if (Host.Clicked())
+                {
+                    if (PortString != "")
+                    {
                         MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
-                    MatchSystem.instance.TargetIP = IPString;
-                    MatchSystem.instance.Init();
-                    MatchSystem.instance.Connect();
-                    ConnectingText.text = "Connecting";
-                    ConnectingText.position = new Vector2(0.75f, 0.9f);
-                    test = Connecting();
-                    StartCoroutine(test);
-                    Join.interactable = false;
-                    Host.interactable = false;
-                    return;
-                }
-                else
-                {
-                    if (IPString == "")
-                        TextBoxIP.color = Color.Red;
-                    if (PortString == "")
+                        MatchSystem.instance.Init();
+                        MatchSystem.instance.Host();
+                        CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+                        hasConnected = true;
+
+
+                        return;
+                    }
+                    else
+                    {
                         TextBoxPort.color = Color.Red;
-                }
-            }
-            else if (Host.Clicked())
-            {
-                if (PortString != "")
-                {
-                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                    MatchSystem.instance.Init();
-                    MatchSystem.instance.Host();
-                    CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
-                    hasConnected = true;
-
-
-                    return;
+                    }
                 }
                 else
                 {
-                    TextBoxPort.color = Color.Red;
+                    TakePort = false;
+                    TakeIP = false;
+                    TextBoxIP.color = Color.Black;
+                    TextBoxPort.color = Color.Black;
                 }
             }
-            else
-            {
-                TakePort = false;
-                TakeIP = false;
-                TextBoxIP.color = Color.Black;
-                TextBoxPort.color = Color.Black;
-            }
-        }
 
-        if (!Disabled)
-        {
-            IPText.text = IPString;
-            PortText.text = PortString;
-            if (TextFont != null)
+            if (!Disabled)
             {
-                IPText.font = TextFont;
-                PortText.font = TextFont;
-                IP.font = TextFont;
-                Port.font = TextFont;
+                IPText.text = IPString;
+                PortText.text = PortString;
+                if (TextFont != null)
+                {
+                    IPText.font = TextFont;
+                    PortText.font = TextFont;
+                    IP.font = TextFont;
+                    Port.font = TextFont;
+                }
             }
         }
     }
