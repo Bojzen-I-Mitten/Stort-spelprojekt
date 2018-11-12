@@ -130,7 +130,7 @@ namespace ThomasEngine.Network
         {
             if (!isOwner && targetRigidbody && targetRigidbody.enabled)
             {
-                //Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
+                //Vector3 newVelocity = (TargetSyncPosition - targetRigidbody.Position) * InterpolateMovement / SendInterval;
                 //targetRigidbody.LinearVelocity = newVelocity;
 
                 //TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
@@ -325,15 +325,16 @@ namespace ThomasEngine.Network
                 transform.rotation = TargetSyncRotation;
                 return;
             }
-            else if(dist > SnapThreshhold)
+            else
             {
 
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;
                 targetRigidbody.LinearVelocity = TargetSyncLinearVelocity;
+                targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
 
             }
-            targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
+            
         }
         #endregion
     }

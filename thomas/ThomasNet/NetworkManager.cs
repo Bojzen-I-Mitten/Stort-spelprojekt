@@ -24,7 +24,7 @@ namespace ThomasEngine.Network
 
         internal NetPacketProcessor NetPacketProcessor;
 
-        private EventBasedNetListener Listener;
+        public EventBasedNetListener Listener { get; private set; }
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
         protected NetworkEvents Events;
@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
-
+            
             Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
 
@@ -238,7 +238,6 @@ namespace ThomasEngine.Network
                         }
                         break;
                     case PacketType.EVENT:
-                        Debug.Log("recived events!");
                         NetPacketProcessor.ReadAllPackets(reader, peer);
                         break;
                     case PacketType.RPC:
@@ -308,7 +307,6 @@ namespace ThomasEngine.Network
 
         public void SendRPC(NetPeer peer, int netID, string methodName, params object[] parameters)
         {
-            Debug.Log("Sending Peer RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);
@@ -320,7 +318,6 @@ namespace ThomasEngine.Network
 
         public void SendRPC(int netID, string methodName, params object[] parameters)
         {
-            Debug.Log("Sending RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);

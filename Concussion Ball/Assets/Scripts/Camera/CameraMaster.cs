@@ -1,8 +1,18 @@
-﻿using System.Collections;
-using ThomasEngine;
+﻿using ThomasEngine;
+
+public enum CAM_STATE
+{
+    JOIN_HOST,
+    SELECT_TEAM,
+    CHAD,
+    SPECTATE,
+    NUMSTATES
+}
 
 public class CameraMaster : ScriptComponent
 {
+    public static CameraMaster instance;
+
     public Texture2D Background { get; set; }
 
     Camera Camera;
@@ -12,18 +22,9 @@ public class CameraMaster : ScriptComponent
     SpectatorCam SpectatorCam;
     ChadHud Hud;
 
-    Canvas Canvas;
+    public Canvas Canvas;
     Image BG;
-
-    enum CAMSTATE
-    {
-        JOIN_HOST,
-        SELECT_TEAM,
-        CHAD,
-        SPECTATE,
-        NUMSTATES
-    }
-    CAMSTATE State = CAMSTATE.JOIN_HOST;
+    public CAM_STATE State = CAM_STATE.JOIN_HOST;
 
 
     public override void Awake()
@@ -35,6 +36,7 @@ public class CameraMaster : ScriptComponent
 
     public override void Start()
     {
+        instance = this;
         
       //  BG = Canvas.Add(Background);
        // BG.interactable = true;
@@ -62,49 +64,46 @@ public class CameraMaster : ScriptComponent
             Debug.Log("Camera Master could not find Hud");
 
 
-
     }
 
     public override void Update()
     {
         switch (State)
         {
-            case CAMSTATE.JOIN_HOST:
+            case CAM_STATE.JOIN_HOST:
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = false;
                 JoinHost.Canvas.isRendering = true;
-                if (JoinHost.GoToTeamSelect)
-                    State = CAMSTATE.SELECT_TEAM;
                 break;
-            case CAMSTATE.SELECT_TEAM:
+            case CAM_STATE.SELECT_TEAM:
                 SelectTeam.Canvas.isRendering = true;
                 Hud.Canvas.isRendering = false;
                 JoinHost.Canvas.isRendering = false;
-                if (SelectTeam.GoToGameCam)
-                {
-                    Canvas.isRendering = false; //canvas.Remove(BG) if we need to save some RAM.
-                    switch (MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().Team.TeamType)
-                    {
-                        default:
-                            break;
-                        case TEAM_TYPE.TEAM_1:
-                        case TEAM_TYPE.TEAM_2:
-                            ChadCam.enabled = true;
-                            State = CAMSTATE.CHAD;
-                            break;
-                        case TEAM_TYPE.TEAM_SPECTATOR:
-                            SpectatorCam.enabled = true;
-                            State = CAMSTATE.SPECTATE;
-                            break;
-                    }
-                }
+                //if (MatchSystem.instance.LocalChad?.NetPlayer?.Team?.TeamType != TEAM_TYPE.UNASSIGNED)
+                //{
+                //    Canvas.isRendering = false; //canvas.Remove(BG) if we need to save some RAM.
+                //    switch (MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().Team.TeamType)
+                //    {
+                //        default:
+                //            break;
+                //        case TEAM_TYPE.TEAM_1:
+                //        case TEAM_TYPE.TEAM_2:
+                //            ChadCam.enabled = true;
+                //            State = CAM_STATE.CHAD;
+                //            break;
+                //        case TEAM_TYPE.TEAM_SPECTATOR:
+                //            SpectatorCam.enabled = true;
+                //            State = CAM_STATE.SPECTATE;
+                //            break;
+                //    }
+                //}
                 break;
-            case CAMSTATE.CHAD:
+            case CAM_STATE.CHAD:
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = true;
                 JoinHost.Canvas.isRendering = false;
                 break;
-            case CAMSTATE.SPECTATE:
+            case CAM_STATE.SPECTATE:
                 SelectTeam.Canvas.isRendering = false;
                 Hud.Canvas.isRendering = true;
                 JoinHost.Canvas.isRendering = false;
