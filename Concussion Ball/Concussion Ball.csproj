@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -70,7 +71,6 @@
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Chad\Ball.cs" />
-    <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\Chadimations.cs" />
     <Compile Include="Assets\Scripts\Chad\DissolveFadeIn.cs" />
     <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />

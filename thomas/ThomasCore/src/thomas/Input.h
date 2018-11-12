@@ -245,6 +245,7 @@ namespace thomas
 
 		void SetLastKey(unsigned short key);
 		unsigned short GetLastKey() const;
+		char GetLastKeyChar() const;
 	
 		//Gamepad
 		bool GetButtonDown(Buttons button);
