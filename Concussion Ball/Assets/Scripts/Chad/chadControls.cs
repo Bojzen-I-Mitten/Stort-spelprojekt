@@ -507,7 +507,7 @@ public class ChadControls : NetworkComponent
 
         yield return new WaitForSeconds(duration);
         float timer = 0;
-        while (Ragdoll.DistanceToWorld() >= 0.3f && timer < 15)
+        while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
         {
             timer += Time.DeltaTime;
             yield return null;
