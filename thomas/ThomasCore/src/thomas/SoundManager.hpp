@@ -29,7 +29,6 @@ namespace thomas
 		void Init();
 		void Update();
 		void Destroy();
-		//void Play(const std::string& id);
 		void LoadSound(const std::string& id, const std::string& file, bool looping = false, bool stream = false);
 		FMOD_VECTOR Vector3ToFmod(const Vector3& v);
 		FMOD::System* GetSystem() const;

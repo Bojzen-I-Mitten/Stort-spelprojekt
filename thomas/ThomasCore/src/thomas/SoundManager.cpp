@@ -45,33 +45,6 @@ namespace thomas
 		ErrorCheck(m_studioSystem->release());
 	}
 
-	//void SoundManager::Play(const std::string& id)
-	//{
-	//	auto& found = GetSoundInfo(id);
-
-	//	// Set looping options
-	//	// Note: if you put a sound on looping during runtime and which is playing
-	//	// it will play separately from the same sound instance which is not set to looping
-	//	// this behavior can then be repeated
-	//	if (found.looping)
-	//	{
-	//		found.sound->setMode(FMOD_LOOP_NORMAL);
-	//		found.sound->setLoopCount(-1); // Loop repeatedly
-	//	}
-	//	else
-	//	{
-	//		found.sound->setMode(FMOD_LOOP_OFF);
-	//	}
-
-	//	ErrorCheck(m_system->playSound(found.sound, nullptr, found.paused, &found.channel));
-
-	//	if (found.channel != nullptr)
-	//	{
-	//		// Set channel properties
-	//		ErrorCheck(found.channel->setVolume(found.volume));
-	//	}
-	//}
-
 	void SoundManager::LoadSound(const std::string& id, const std::string& file, bool looping, bool stream)
 	{
 		// Load sound and set it as 2D by default

@@ -23,10 +23,11 @@ namespace thomas
 				SoundComponent();
 				~SoundComponent() = default;
 
-				virtual void OnDisable() override;
+				void OnDisable() override;
 				void Play();
+				void Play(resource::AudioClip* clip, float volume, bool looping);
 				void Stop();
-				void Update();
+				void Update() override;
 
 			public:
 				void SetClip(resource::AudioClip* clip);
@@ -34,14 +35,22 @@ namespace thomas
 				void Set3D(bool is3D);
 				void SetLooping(bool looping);
 				void SetPaused(bool paused);
+				void SetMute(bool mute);
+				void Set3DMinDistance(float min);
+				void Set3DMaxDistance(float max);
+				void Set3DSpreadAngle(float angle);
 
 			public:
 				resource::AudioClip* GetClip() const;
 				float GetVolume() const;
+				float Get3DMinDistance() const;
+				float Get3DMaxDistance() const;
+				float Get3DSpreadAngle() const;
 				bool IsPlaying() const;
 				bool IsLooping() const;
 				bool IsPaused() const;
 				bool Is3D() const;
+				bool IsMute() const;
 
 			private:
 				FMOD::Channel* m_channel;
@@ -49,7 +58,11 @@ namespace thomas
 				bool m_is3D;
 				bool m_looping;
 				bool m_paused;
+				bool m_muted;
 				float m_volume;
+				float m_minDistance;
+				float m_maxDistance;
+				float m_spreadAngle;
 			};
 		}
 	}

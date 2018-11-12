@@ -17,7 +17,10 @@ namespace thomas
 			m_is3D(false),
 			m_looping(false),
 			m_paused(false),
-			m_volume(1.f)
+			m_volume(1.f),
+			m_spreadAngle(0.f),
+			m_minDistance(1.f),
+			m_maxDistance(100.f)
 			{
 			}
 
@@ -33,9 +36,6 @@ namespace thomas
 					auto sound = m_clip->GetSound();
 
 					// Set looping options
-					// Note: if you put a sound on looping during runtime and which is playing
-					// it will play separately from the same sound instance which is not set to looping
-					// this behavior can then be repeated
 					if (m_looping)
 					{
 						sound->setMode(FMOD_LOOP_NORMAL);
@@ -52,13 +52,40 @@ namespace thomas
 					{
 						// Set channel properties
 						m_channel->setVolume(m_volume);
+					}	
+				}
+			}
+
+			void SoundComponent::Play(resource::AudioClip* clip, float volume, bool looping)
+			{
+				if (clip != nullptr)
+				{
+					auto sound = clip->GetSound();
+
+					// Set looping options
+					if (looping)
+					{
+						sound->setMode(FMOD_LOOP_NORMAL);
+						sound->setLoopCount(-1); // Loop repeatedly
+					}
+					else
+					{
+						sound->setMode(FMOD_LOOP_OFF);
+					}
+
+					SoundManager::GetInstance()->GetSystem()->playSound(sound, nullptr, false, &m_channel);
+
+					if (m_channel != nullptr)
+					{
+						// Set channel properties
+						m_channel->setVolume(volume);
 					}
 				}
 			}
 
 			void SoundComponent::Stop()
 			{
-				if (m_clip != nullptr && m_channel != nullptr)
+				if (m_channel != nullptr)
 				{
 					m_channel->stop();
 				}
@@ -66,10 +93,20 @@ namespace thomas
 
 			void SoundComponent::Update()
 			{
-				if (m_clip != nullptr && m_channel != nullptr && m_is3D)
+				if (m_channel != nullptr && m_is3D)
 				{
 					// No velocity set on the object
 					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->m_transform->GetPosition()), NULL);
+					
+					if (m_spreadAngle >= 0.f && m_spreadAngle <= 360.f)
+					{
+						m_channel->set3DSpread(m_spreadAngle);
+					}
+
+					if (m_minDistance < m_maxDistance)
+					{
+						m_channel->set3DMinMaxDistance(m_minDistance, m_maxDistance);
+					}
 				}
 			}
 
@@ -78,6 +115,7 @@ namespace thomas
 				m_clip = clip;
 			}
 
+			// TODO: expose min and max distance of a sound
 			void SoundComponent::Set3D(bool is3D)
 			{
 				m_is3D = is3D;
@@ -110,6 +148,31 @@ namespace thomas
 				m_paused = paused;
 			}
 
+			void SoundComponent::SetMute(bool mute)
+			{
+				m_muted = mute;
+
+				if (m_channel != nullptr)
+				{
+					m_channel->setMute(mute);
+				}
+			}
+
+			void SoundComponent::Set3DMinDistance(float min)
+			{
+				m_minDistance = min;
+			}
+
+			void SoundComponent::Set3DMaxDistance(float max)
+			{
+				m_maxDistance = max;
+			}
+
+			void SoundComponent::Set3DSpreadAngle(float angle)
+			{
+				m_spreadAngle = angle;
+			}
+
 			resource::AudioClip* SoundComponent::GetClip() const
 			{
 				return m_clip;
@@ -120,9 +183,29 @@ namespace thomas
 				return m_volume;
 			}
 
+			float SoundComponent::Get3DMinDistance() const
+			{
+				return m_minDistance;
+			}
+
+			float SoundComponent::Get3DMaxDistance() const
+			{
+				return m_maxDistance;
+			}
+
+			float SoundComponent::Get3DSpreadAngle() const
+			{
+				return m_spreadAngle;
+			}
+
 			bool SoundComponent::Is3D() const
 			{
 				return m_is3D;
+			}
+
+			bool SoundComponent::IsMute() const
+			{
+				return m_muted;
 			}
 
 			bool SoundComponent::IsPlaying() const

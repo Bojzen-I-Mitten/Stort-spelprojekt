@@ -16,6 +16,11 @@ namespace ThomasEngine
 		sound->Play();
 	}
 
+	void SoundComponent::Play(AudioClip^ clip, float volume, bool looping)
+	{
+		sound->Play((thomas::resource::AudioClip*)clip->m_nativePtr, volume, looping);
+	}
+
 	void SoundComponent::Stop()
 	{
 		sound->Stop();
@@ -31,9 +36,19 @@ namespace ThomasEngine
 		return sound->IsPaused();
 	}
 
+	bool SoundComponent::IsMuted()
+	{
+		return sound->IsMute();
+	}
+
 	void SoundComponent::Pause(bool pause)
 	{
 		sound->SetPaused(pause);
+	}
+
+	void SoundComponent::Mute(bool mute)
+	{
+		sound->SetMute(mute);
 	}
 
 	void SoundComponent::clip::set(AudioClip^ value)
@@ -75,5 +90,35 @@ namespace ThomasEngine
 	bool SoundComponent::is3D::get()
 	{
 		return sound->Is3D();
+	}
+
+	void SoundComponent::MinDistance::set(float value)
+	{
+		sound->Set3DMinDistance(value);
+	}
+
+	float SoundComponent::MinDistance::get()
+	{
+		return sound->Get3DMinDistance();
+	}
+
+	void SoundComponent::MaxDistance::set(float value)
+	{
+		sound->Set3DMaxDistance(value);
+	}
+
+	float SoundComponent::MaxDistance::get()
+	{
+		return sound->Get3DMaxDistance();
+	}
+
+	void SoundComponent::SpreadAngle::set(float value)
+	{
+		sound->Set3DSpreadAngle(value);
+	}
+
+	float SoundComponent::SpreadAngle::get()
+	{
+		return sound->Get3DSpreadAngle();
 	}
 }
