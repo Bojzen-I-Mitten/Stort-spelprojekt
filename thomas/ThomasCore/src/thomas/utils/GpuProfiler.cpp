@@ -10,7 +10,7 @@ namespace thomas
 		{
 			GpuProfiler::GpuProfiler()
 				: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0),
-				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
+				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f), m_active(false)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -55,7 +55,8 @@ namespace thomas
 					hr = dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&m_dxgiAdapter4);
 					if (SUCCEEDED(hr))
 					{
-						m_dxgiAdapter4->SetVideoMemoryReservation(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, 512000000);
+						//Use this for setting memory cap of vram at 512 mega bytes
+						//m_dxgiAdapter4->SetVideoMemoryReservation(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, 512000000);
 						
 						DXGI_QUERY_VIDEO_MEMORY_INFO info;
 						if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
@@ -84,11 +85,16 @@ namespace thomas
 				SAFE_RELEASE(m_queryDisjoint[1])
 
 
-					for (GTS gts = GTS_BEGIN_FRAME; gts < GTS_MAX; gts = GTS(gts + 1))
-					{
-						SAFE_RELEASE(m_queryTimestamp[gts][0]);
-						SAFE_RELEASE(m_queryTimestamp[gts][1])
-					}
+				for (GTS gts = GTS_BEGIN_FRAME; gts < GTS_MAX; gts = GTS(gts + 1))
+				{
+					SAFE_RELEASE(m_queryTimestamp[gts][0]);
+					SAFE_RELEASE(m_queryTimestamp[gts][1])
+				}
+			}
+
+			void GpuProfiler::ShowStatistics(bool show)
+			{
+				m_active = show;
 			}
 
 			void GpuProfiler::BeginFrame()

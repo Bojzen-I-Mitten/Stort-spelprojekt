@@ -50,7 +50,6 @@ namespace thomas
 		for (Window* window : m_windows)
 			if (window->Initialized())
 			{
-				window->WaitOnSwapChain();
 				window->Clear();
 			}
 	}
@@ -61,6 +60,7 @@ namespace thomas
 			if (window->Initialized())
 			{
 				window->Present();
+				window->WaitOnSwapChain();
 			}
 	}
 

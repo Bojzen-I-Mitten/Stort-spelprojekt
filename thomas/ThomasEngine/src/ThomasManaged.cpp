@@ -143,6 +143,7 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
+			float timeStart = ThomasTime::GetElapsedTime();
 			PROFILE("StartRenderer")
 			{
 				PROFILE("StartRenderer - Wait")
@@ -151,6 +152,7 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
 			float gpuTime = utils::D3D::Instance()->GetProfiler()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
 			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
@@ -223,29 +225,29 @@ namespace ThomasEngine {
 	
 	void ThomasWrapper::CopyCommandList()
 	{
-		//utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-
-		//profiler->SetActive(showStatistics);
-		//if (showStatistics) {
-
-		//	ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
-		//	ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
-		//	ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
-		//	ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
-		//	ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
-		//	ImGui::Text("RAM Usage: %.2f MB", ramUsage);
-		//	ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
-		//	ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
-		//	ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
-		//	ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
-		//	ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
-		//	//for (auto& it : *utils::profiling::ProfileManager::GetData())
-		//	//{
-		//	//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
-		//	//	ImGui::Text(it.first, it.second.back());
-		//	//}
-		//	ImGui::End();
-		//}
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		profiler->ShowStatistics(showStatistics);
+		if (showStatistics)
+		{
+			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
+			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
+			ImGui::Text("Logic Thread: %.02f ms	 Render Thread: %.02f ms", logicTime*1000.0f, renderTime*1000.0f);
+			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
+			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
+			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+			ImGui::Text("RAM Usage: %.2f MB", 0.0f);
+			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
+			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
+			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
+			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			//for (auto& it : *utils::profiling::ProfileManager::GetData())
+			//{
+			//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
+			//	ImGui::Text(it.first, it.second.back());
+			//}
+			ImGui::End();
+		}
 
 		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
 			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
@@ -376,7 +378,7 @@ namespace ThomasEngine {
 			}
 			finally
 			{
-				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
+				logicTime = ThomasTime::GetElapsedTime() - timeStart;
 				if (WindowManager::Instance())
 				{
 					thomas::object::component::RenderComponent::ClearList();
