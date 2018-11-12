@@ -1,5 +1,8 @@
 #include "AudioClip.h"
 
+// Thomas
+#include "../SoundManager.hpp"
+
 namespace thomas
 {
 	namespace resource
@@ -9,12 +12,12 @@ namespace thomas
 		{
 			// TODO: is there a way to allow users to set streaming functionality for clips later on?
 			SoundManager::GetInstance()->LoadSound(m_name, m_path);
-			m_soundInfo = &SoundManager::GetInstance()->GetSoundInfo(m_name);
+			m_sound = SoundManager::GetInstance()->GetSound(m_name);
 		}
 
-		SoundManager::Info* AudioClip::GetSoundInfo()
+		FMOD::Sound* AudioClip::GetSound()
 		{
-			return m_soundInfo;
+			return m_sound;
 		}
 
 		void AudioClip::OnChanged()

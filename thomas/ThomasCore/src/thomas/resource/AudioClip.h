@@ -1,8 +1,10 @@
 #pragma once
 
+// Fmod
+#include <fmod/fmod.hpp>
+
 // Thomas
 #include "Resource.h"
-#include "../SoundManager.hpp"
 
 namespace thomas
 {
@@ -13,13 +15,13 @@ namespace thomas
 		public:
 			AudioClip(const std::string& file);
 
-			SoundManager::Info* GetSoundInfo();
+			FMOD::Sound* GetSound();
 
 		private:
 			// Never used, but required from abstract base class...
 			void OnChanged();
 
-			SoundManager::Info* m_soundInfo;
+			FMOD::Sound* m_sound;
 		};
 	}
 }

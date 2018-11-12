@@ -1,13 +1,13 @@
 #pragma once
 
+// Fmod
+#include <fmod/fmod.hpp>
+
 // Thomas
 #include "Component.h"
-//#include "../../utils/Math.h"
 
 namespace thomas
 {
-	//using namespace math;
-
 	namespace resource
 	{
 		class AudioClip;
@@ -44,11 +44,8 @@ namespace thomas
 				bool Is3D() const;
 
 			private:
-				// The sound component should have a channel instead? This should solve the multiple position issue...
+				FMOD::Channel* m_channel;
 				resource::AudioClip* m_clip;
-
-				// These variables are a bit unconvenient but if we don't have them
-				// the user won't be able to set "properties of a clip" in the inspector before the clip is set
 				bool m_is3D;
 				bool m_looping;
 				bool m_paused;

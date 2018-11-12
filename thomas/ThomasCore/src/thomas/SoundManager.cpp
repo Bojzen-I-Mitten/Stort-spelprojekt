@@ -38,43 +38,43 @@ namespace thomas
 		// Release sounds
 		for (const auto& sound : m_sounds)
 		{
-			sound.second.sound->release();
+			sound.second->release();
 		}
 
 		ErrorCheck(m_studioSystem->unloadAll());
 		ErrorCheck(m_studioSystem->release());
 	}
 
-	void SoundManager::Play(const std::string& id)
-	{
-		auto& found = GetSoundInfo(id);
+	//void SoundManager::Play(const std::string& id)
+	//{
+	//	auto& found = GetSoundInfo(id);
 
-		// Set looping options
-		// Note: if you put a sound on looping during runtime and which is playing
-		// it will play separately from the same sound instance which is not set to looping
-		// this behavior can then be repeated
-		if (found.looping)
-		{
-			found.sound->setMode(FMOD_LOOP_NORMAL);
-			found.sound->setLoopCount(-1); // Loop repeatedly
-		}
-		else
-		{
-			found.sound->setMode(FMOD_LOOP_OFF);
-		}
+	//	// Set looping options
+	//	// Note: if you put a sound on looping during runtime and which is playing
+	//	// it will play separately from the same sound instance which is not set to looping
+	//	// this behavior can then be repeated
+	//	if (found.looping)
+	//	{
+	//		found.sound->setMode(FMOD_LOOP_NORMAL);
+	//		found.sound->setLoopCount(-1); // Loop repeatedly
+	//	}
+	//	else
+	//	{
+	//		found.sound->setMode(FMOD_LOOP_OFF);
+	//	}
 
-		ErrorCheck(m_system->playSound(found.sound, nullptr, found.paused, &found.channel));
+	//	ErrorCheck(m_system->playSound(found.sound, nullptr, found.paused, &found.channel));
 
-		if (found.channel != nullptr)
-		{
-			// Set channel properties
-			ErrorCheck(found.channel->setVolume(found.volume));
-		}
-	}
+	//	if (found.channel != nullptr)
+	//	{
+	//		// Set channel properties
+	//		ErrorCheck(found.channel->setVolume(found.volume));
+	//	}
+	//}
 
 	void SoundManager::LoadSound(const std::string& id, const std::string& file, bool looping, bool stream)
 	{
-		// Try loading 2D sounds for now
+		// Load sound and set it as 2D by default
 		FMOD_MODE eMode = FMOD_DEFAULT;
 
 		eMode |= FMOD_2D;
@@ -82,9 +82,10 @@ namespace thomas
 		eMode |= stream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
 
 		// Add the sound to the container
-		Info soundInfo;
-		ErrorCheck(m_system->createSound(file.c_str(), eMode, nullptr, &soundInfo.sound));
-		auto inserted = m_sounds.insert(std::make_pair(id, std::move(soundInfo)));
+		FMOD::Sound* sound = nullptr;
+
+		ErrorCheck(m_system->createSound(file.c_str(), eMode, nullptr, &sound));
+		auto inserted = m_sounds.insert(std::make_pair(id, std::move(sound)));
 
 #ifdef _DEBUG
 		assert(inserted.second);
@@ -96,6 +97,11 @@ namespace thomas
 		return FMOD_VECTOR{ v.x, v.y, v.z };
 	}
 
+	FMOD::System* SoundManager::GetSystem() const
+	{
+		return m_system;
+	}
+
 	SoundManager* SoundManager::GetInstance()
 	{
 		static SoundManager instance;
@@ -103,7 +109,7 @@ namespace thomas
 		return &instance;
 	}
 
-	SoundManager::Info& SoundManager::GetSoundInfo(const std::string& name)
+	FMOD::Sound* SoundManager::GetSound(const std::string& name) const
 	{
 		auto found = m_sounds.find(name);
 

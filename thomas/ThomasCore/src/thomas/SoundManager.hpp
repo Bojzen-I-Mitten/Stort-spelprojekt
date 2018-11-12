@@ -17,16 +17,6 @@ namespace thomas
 
 	class SoundManager
 	{
-	public:
-		struct Info
-		{
-			FMOD::Sound* sound = nullptr;
-			FMOD::Channel* channel = nullptr; // Could have this as a vector instead as this is per audio clip only
-			bool looping = false;
-			bool paused = false;
-			float volume = 1.f;
-		};
-
 	private:
 		SoundManager() = default;
 		~SoundManager() = default;
@@ -39,10 +29,11 @@ namespace thomas
 		void Init();
 		void Update();
 		void Destroy();
-		void Play(const std::string& id);
+		//void Play(const std::string& id);
 		void LoadSound(const std::string& id, const std::string& file, bool looping = false, bool stream = false);
 		FMOD_VECTOR Vector3ToFmod(const Vector3& v);
-		Info& GetSoundInfo(const std::string& name);
+		FMOD::System* GetSystem() const;
+		FMOD::Sound* GetSound(const std::string& name) const;
 		static SoundManager* GetInstance();
 
 	private:
@@ -50,6 +41,6 @@ namespace thomas
 
 		FMOD::Studio::System* m_studioSystem;
 		FMOD::System* m_system;
-		std::map<std::string, Info> m_sounds;
+		std::map<std::string, FMOD::Sound*> m_sounds;
 	};
 }

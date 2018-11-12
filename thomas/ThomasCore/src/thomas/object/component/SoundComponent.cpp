@@ -1,6 +1,7 @@
 #include "SoundComponent.h"
 
 // Thomas
+#include "../../SoundManager.hpp"
 #include "../../resource/AudioClip.h"
 #include "../GameObject.h"
 
@@ -11,6 +12,7 @@ namespace thomas
 		namespace component
 		{
 			SoundComponent::SoundComponent() :
+			m_channel(nullptr),
 			m_clip(nullptr),
 			m_is3D(false),
 			m_looping(false),
@@ -28,28 +30,46 @@ namespace thomas
 			{
 				if (m_clip != nullptr)
 				{
-					SoundManager::GetInstance()->Play(m_clip->GetName());
+					auto sound = m_clip->GetSound();
+
+					// Set looping options
+					// Note: if you put a sound on looping during runtime and which is playing
+					// it will play separately from the same sound instance which is not set to looping
+					// this behavior can then be repeated
+					if (m_looping)
+					{
+						sound->setMode(FMOD_LOOP_NORMAL);
+						sound->setLoopCount(-1); // Loop repeatedly
+					}
+					else
+					{
+						sound->setMode(FMOD_LOOP_OFF);
+					}
+
+					SoundManager::GetInstance()->GetSystem()->playSound(sound, nullptr, m_paused, &m_channel);
+
+					if (m_channel != nullptr)
+					{
+						// Set channel properties
+						m_channel->setVolume(m_volume);
+					}
 				}
 			}
 
 			void SoundComponent::Stop()
 			{
-				if (m_clip != nullptr)
+				if (m_clip != nullptr && m_channel != nullptr)
 				{
-					if (m_clip->GetSoundInfo()->channel != nullptr)
-					{
-						m_clip->GetSoundInfo()->channel->stop();
-					}
+					m_channel->stop();
 				}
 			}
 
 			void SoundComponent::Update()
 			{
-				if (m_clip != nullptr && m_is3D)
+				if (m_clip != nullptr && m_channel != nullptr && m_is3D)
 				{
 					// No velocity set on the object
-					m_clip->GetSoundInfo()->channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->m_transform->GetPosition()), 
-						NULL);
+					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->m_transform->GetPosition()), NULL);
 				}
 			}
 
@@ -66,11 +86,11 @@ namespace thomas
 				{
 					if (m_is3D)
 					{
-						m_clip->GetSoundInfo()->sound->setMode(FMOD_3D);
+						m_clip->GetSound()->setMode(FMOD_3D);
 					}
 					else
 					{
-						m_clip->GetSoundInfo()->sound->setMode(FMOD_2D);
+						m_clip->GetSound()->setMode(FMOD_2D);
 					}
 				}
 			}
@@ -78,31 +98,16 @@ namespace thomas
 			void SoundComponent::SetVolume(float volume)
 			{
 				m_volume = volume;
-
-				if (m_clip != nullptr)
-				{
-					m_clip->GetSoundInfo()->volume = m_volume;
-				}
 			}
 
 			void SoundComponent::SetLooping(bool looping)
 			{
 				m_looping = looping;
-
-				if (m_clip != nullptr)
-				{
-					m_clip->GetSoundInfo()->looping = m_looping;
-				}
 			}
 
 			void SoundComponent::SetPaused(bool paused)
 			{
 				m_paused = paused;
-
-				if (m_clip != nullptr)
-				{
-					m_clip->GetSoundInfo()->paused = m_paused;
-				}
 			}
 
 			resource::AudioClip* SoundComponent::GetClip() const
@@ -122,10 +127,10 @@ namespace thomas
 
 			bool SoundComponent::IsPlaying() const
 			{				
-				if (m_clip != nullptr)
+				if (m_clip != nullptr && m_channel != nullptr)
 				{
 					bool playing = false;
-					m_clip->GetSoundInfo()->channel->isPlaying(&playing);
+					m_channel->isPlaying(&playing);
 					
 					return playing;
 				}
