@@ -32,7 +32,7 @@ namespace thomas
 
 				void OnDisable() override;
 				void Play();
-				void Play(resource::AudioClip* clip, float volume, bool looping);
+				void Play(resource::AudioClip* clip, float volume, bool looping, bool is3D);
 				void Stop();
 				void Update() override;
 

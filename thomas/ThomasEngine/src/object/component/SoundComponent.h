@@ -25,7 +25,7 @@ namespace ThomasEngine
 		SoundComponent();
 
 		void Play();
-		void Play(AudioClip^ clip, float volume, bool looping);
+		void Play(AudioClip^ clip, float volume, bool looping, bool is3D);
 		void Pause(bool paused);
 		void Mute(bool mute);
 		void Stop();

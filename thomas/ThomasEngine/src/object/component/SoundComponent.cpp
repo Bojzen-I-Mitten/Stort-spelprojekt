@@ -16,9 +16,9 @@ namespace ThomasEngine
 		sound->Play();
 	}
 
-	void SoundComponent::Play(AudioClip^ clip, float volume, bool looping)
+	void SoundComponent::Play(AudioClip^ clip, float volume, bool looping, bool is3D)
 	{
-		sound->Play((thomas::resource::AudioClip*)clip->m_nativePtr, volume, looping);
+		sound->Play((thomas::resource::AudioClip*)clip->m_nativePtr, volume, looping, is3D);
 	}
 
 	void SoundComponent::Stop()
