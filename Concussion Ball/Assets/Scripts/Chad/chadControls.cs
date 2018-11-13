@@ -157,6 +157,9 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
+        rBody.Friction = 0.5f;
+        if (!OnGround())
+            rBody.Friction = 0.0f;
     }
 
     #region Ragdoll handling
@@ -262,6 +265,22 @@ public class ChadControls : NetworkComponent
 
     }
 
+    private bool OnGround()
+    {
+        // Friction checks, no friction when Chad is in air
+        Vector3 footPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.01f, gameObject.transform.position.z);
+        RaycastHit hit;
+        Physics.Raycast(footPosition, Vector3.Down, out hit);
+
+        if (hit.distance >= 0.01f)
+        {
+            Debug.Log("NOT ON SURFACE.");
+            return false;
+        }
+        Debug.Log("ON SURFACE.");
+        return true;
+    }
+
     #region Input handling
     private void HandleKeyboardInput()
     {
@@ -296,13 +315,13 @@ public class ChadControls : NetworkComponent
         }
         else if (Input.GetKeyDown(Input.Keys.Space))
         {
-            if(JumpingTimer > 3.0f)
+            if(JumpingTimer > 3.0f && OnGround())
             {
                 JumpingTimer = 0.0f;
                 Jumping = true;
                 rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 8, rBody.LinearVelocity.z), rBody.Rotation);
             }
-            else if(Jumping)
+            else if(Jumping || (!OnGround() && JumpingTimer > 3.0f))
             {
                 JumpingTimer = 0.0f;
                 Jumping = false;

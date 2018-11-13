@@ -35,7 +35,7 @@ namespace thomas
 				return m_center;
 			}
 
-			float Collider::GetFriction()
+			/*float Collider::GetFriction()
 			{
 				if(m_attachedRigidbody)
 					return m_attachedRigidbody->getFriction();
@@ -45,7 +45,7 @@ namespace thomas
 			{
 				if(m_attachedRigidbody)
 					m_attachedRigidbody->setFriction(value);
-			}
+			}*/
 
 			Rigidbody * Collider::GetAttachedRigidbody()
 			{
@@ -108,7 +108,7 @@ namespace thomas
 					m_collisionObject->setCollisionShape(m_collisionShape);
 					m_collisionObject->setUserPointer(this);
 					m_collisionObject->setRestitution(1.0f);
-					m_collisionObject->setFriction(0.0f);
+					//m_collisionObject->setFriction(0.5f);
 
 					btTransform trans;
 					trans.setOrigin((btVector3&)(m_gameObject->m_transform->GetPosition() + m_center));
