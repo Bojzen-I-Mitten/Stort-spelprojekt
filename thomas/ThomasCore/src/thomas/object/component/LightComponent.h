@@ -12,11 +12,12 @@ LightComponent class
 
 namespace thomas
 {
+	namespace graphics { class Mesh; }
 	namespace object 
 	{
 		namespace component
 		{
-			
+			class Camera;
 			class LightComponent : public Component
 			{
 			public:
@@ -35,7 +36,9 @@ namespace thomas
 				virtual void OnDestroy() override;
 
 			public: // Get / Set
-				void UpdateShadowMap();
+				void UpdateShadowBox(Camera* camera);
+				void BindShadowMapDepthTexture();
+				void DrawShadow(graphics::Mesh* mesh);
 				
 
 				graphics::LightManager::LightStruct GetData();

@@ -18,8 +18,9 @@ namespace thomas
 			ShadowMap();
 			~ShadowMap();
 
-			void Update(object::component::Transform& lightTransform, object::component::Camera* camera);
+			void Update(object::component::Transform* lightTransform, object::component::Camera* camera);
 			void Draw(Mesh* mesh);
+			void Bind();
 
 		private:
 			std::unique_ptr<resource::Texture2D> m_depthTexture;

@@ -22,32 +22,18 @@ namespace thomas
 
 		ShadowMap::ShadowMap()
 		{
-			m_depthTexture = std::make_unique<resource::Texture2D>(512, 512, false, DXGI_FORMAT_R32_TYPELESS, true);
+			m_depthTexture = std::make_unique<resource::Texture2D>(512, 512, false, true);
 
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 
-			
-			
-			/*D3D11_TEXTURE2D_DESC desc = {};
-			desc.ArraySize = 1;
-			desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-			desc.CPUAccessFlags = 0;
-			desc.Format = DXGI_FORMAT_R32_FLOAT;
-			desc.Height = 1024;
-			desc.Width = 1024;
-			desc.MipLevels = 1;
-			desc.MiscFlags = 0;
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-			desc.Usage = D3D11_USAGE_DEFAULT;*/
 
-			D3D11_DEPTH_STENCIL_VIEW_DESC desc = {};
-			desc.Format = DXGI_FORMAT_D32_FLOAT;
-			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc = {};
+			depthViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+			depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
+			HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(m_depthTexture->GetResource(), &depthViewDesc, &m_depthStencilView);
 			
-			HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(m_depthTexture.get()->GetResource(), &desc, &m_depthStencilView);
-			int stopper = 0;
-			//utils::D3D::CreateDepthStencilView(); //m_depthTexture.get(),)
 		}
 
 		ShadowMap::~ShadowMap()
@@ -55,11 +41,11 @@ namespace thomas
 
 		}
 
-		void ShadowMap::Update(object::component::Transform& lightTransform, object::component::Camera* camera)
+		void ShadowMap::Update(object::component::Transform* lightTransform, object::component::Camera* camera)
 		{
 			//https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/
 
-			m_matrixView = lightTransform.GetWorldMatrix();
+			m_matrixView = math::Matrix::CreateLookAt(-lightTransform->Forward(), math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 
 
 			math::Vector3 corners[8];
@@ -94,7 +80,8 @@ namespace thomas
 					mins.z = corners[i].z;
 			}
 
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z/* - nearClipOffset*/, -mins.z);
+			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z/* - nearClipOffset*/, -mins.z);
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);
 
 			m_matrixVP = m_matrixProj * m_matrixView;
 
@@ -106,6 +93,13 @@ namespace thomas
 		{
 
 			s_material->Draw(mesh);
+		}
+
+		void ShadowMap::Bind()
+		{
+			utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
+			s_material->Bind();
 		}
 
 	}

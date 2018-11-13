@@ -188,24 +188,27 @@ namespace thomas
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				PROFILE("ShadowDrawObjectsPerCamera")
-				for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
+				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+
+				auto lights = LightManager::GetLightsCastingShadows();
+				for (auto l : lights)
 				{
-					
-					PROFILE("ShadowDrawObjects")
-						//for each light casting shadows
-							//{
-
-						//LightManager::GetLightsCastingShadows()
-
-					for (auto & perMeshCommand : perMaterialQueue.second)
+					if (camera)
+						l->UpdateShadowBox(camera);
+					l->BindShadowMapDepthTexture();
+					PROFILE("ShadowDrawObjectsPerCamera")
+					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 					{
+						PROFILE("ShadowDrawObjects")
+						for (auto & perMeshCommand : perMaterialQueue.second)
 						{
-							//PROFILE("DrawShadows")
-							//shadowsMaterial->draw
+							{
+								PROFILE("DrawShadow")
+								l->DrawShadow(perMeshCommand.mesh);
+							}
 						}
+
 					}
-					
 				}
 
 				{
@@ -213,7 +216,7 @@ namespace thomas
 					BindCameraRenderTarget(perCameraQueue.second.m_frameData);
 				}
 				// Skyboxes should be submitted!
-				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+				
 				{
 					PROFILE("CameraDrawSkybox")
 					if (camera && camera->hasSkybox())

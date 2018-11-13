@@ -2,8 +2,8 @@
 #include "../../utils/d3d.h"
 #include "../GameObject.h"
 #include "Transform.h"
-
-
+#include "../../graphics/Mesh.h"
+#include "Camera.h"
 
 
 
@@ -60,6 +60,22 @@ namespace thomas
 			void LightComponent::OnDestroy()
 			{
 				graphics::LightManager::RemoveLight(this);
+			}
+
+			void LightComponent::UpdateShadowBox(Camera* camera)
+			{
+				m_shadowMap.Update(m_gameObject->m_transform, camera);
+			}
+
+
+			void LightComponent::BindShadowMapDepthTexture()
+			{
+				m_shadowMap.Bind();
+			}
+
+			void LightComponent::DrawShadow(graphics::Mesh * mesh)
+			{
+				m_shadowMap.Draw(mesh);
 			}
 
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()

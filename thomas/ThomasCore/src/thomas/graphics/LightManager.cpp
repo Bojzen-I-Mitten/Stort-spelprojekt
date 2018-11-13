@@ -104,6 +104,12 @@ namespace thomas
 
 			s_lightBuffer->SetData(allLights);
 		}
+
+		std::vector<object::component::LightComponent*> LightManager::GetLightsCastingShadows()
+		{
+			return s_lights;
+		}
+
 		void LightManager::Bind(render::ShaderList* shaders)
 		{
 			shaders->SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
