@@ -80,7 +80,7 @@ namespace thomas
 				return false;
 
 			window->BindRenderTarget();
-			utils::D3D::Instance()->GetDeviceContextImmediate()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -103,7 +103,7 @@ namespace thomas
 				return false;
 
 			window->BindBackBuffer();
-			utils::D3D::Instance()->GetDeviceContextImmediate()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, frameData.viewport.Get11());
 			return true;
 		}
 
@@ -178,6 +178,7 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
+			utils::D3D::Instance()->EnableMultithreadProtection(true);
 			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
 			//Process commands
@@ -273,6 +274,8 @@ namespace thomas
 			}
 
 			profiler->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
+
+			utils::D3D::Instance()->EnableMultithreadProtection(false);
 		}
 
 	}

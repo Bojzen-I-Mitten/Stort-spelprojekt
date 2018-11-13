@@ -39,21 +39,26 @@ namespace thomas
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateQuery(D3D11_QUERY type, ID3D11Query*& query);
-			
-			void FinishCommandList(ID3D11CommandList*& commandList);
-			void ResetCommandList(ID3D11CommandList*& commandList);
-			void ExecuteCommandList(ID3D11CommandList* commandList);
 
-		public:
 			bool D3D::CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth, ID3D11DepthStencilState*& depthStencilState);
 			ID3D11RasterizerState* CreateRasterizer(D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode);
 
 		public:
+			void FinishCommandList(ID3D11CommandList*& commandList);
+			void ResetCommandList(ID3D11CommandList*& commandList);
+			void ExecuteCommandList(ID3D11CommandList* commandList);
+
+			void EnterCriticalSection();
+			void ExitCriticalSection();
+
+			void EnableMultithreadProtection(bool value);
+
+		public:
 			ID3D11Device* GetDevice();
+			ID3D11DeviceContext* GetDeviceContextDeffered();
 			ID3D11DeviceContext* GetDeviceContextImmediate();
-			ID3D11DeviceContext* GetDeviceContextDeferred();
-			IDXGIDevice* GetDxgiDevice();
-			IDXGIAdapter* GetDxgiAdapter();
+			IDXGIDevice1* GetDxgiDevice();
+			IDXGIAdapter1* GetDxgiAdapter();
 			profiling::GpuProfiler* GetProfiler();
 
 		public:
@@ -78,8 +83,8 @@ namespace thomas
 			ID3D11DeviceContext* m_deviceContextDeferred;
 			ID3D11Multithread* m_multiThreaded;
 			ID3D11Debug* m_debug;
-			IDXGIDevice* m_dxgiDevice;
-			IDXGIAdapter* m_dxgiAdapter;
+			IDXGIDevice1* m_dxgiDevice;
+			IDXGIAdapter1* m_dxgiAdapter;
 
 			
 			profiling::GpuProfiler* m_profiler;

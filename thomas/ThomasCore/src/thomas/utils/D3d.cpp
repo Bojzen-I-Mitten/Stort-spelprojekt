@@ -190,29 +190,32 @@ namespace thomas
 
 		bool D3D::CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain)
 		{
-			IDXGIFactory* dxgiFactory = nullptr;
-			HRESULT hr = m_dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)& dxgiFactory);
+			IDXGIFactory5* dxgiFactory = nullptr;
+			HRESULT hr = m_dxgiAdapter->GetParent(__uuidof(IDXGIFactory5), (void **)&dxgiFactory);
 			if (SUCCEEDED(hr))
 			{
-				DXGI_SWAP_CHAIN_DESC scd;
-				ZeroMemory(&scd, sizeof(scd));
-
+				DXGI_SWAP_CHAIN_DESC1 scd;
+				ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC1));
 				scd.BufferCount = FRAME_BUFFERS;
-				scd.BufferDesc.Height = height;
-				scd.BufferDesc.Width = width;
-				scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				scd.Height = height;
+				scd.Width = width;
+				scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 				scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-				scd.OutputWindow = handle;
-				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 				scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 				scd.SampleDesc.Count = 1;
 				scd.SampleDesc.Quality = 0;
-				scd.Windowed = TRUE;
-				scd.BufferDesc.RefreshRate.Numerator = 0;
-				scd.BufferDesc.RefreshRate.Denominator = 1;
 
-				IDXGISwapChain* dxgiSwapChain = nullptr;
-				hr = dxgiFactory->CreateSwapChain(m_device, &scd, &dxgiSwapChain);
+				DXGI_SWAP_CHAIN_FULLSCREEN_DESC scdFull;
+				ZeroMemory(&scdFull, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
+				scdFull.RefreshRate.Numerator = 0;
+				scdFull.RefreshRate.Denominator = 1;
+				scdFull.Windowed = true;
+				scdFull.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+				scdFull.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+
+				IDXGISwapChain1* dxgiSwapChain = nullptr;
+				hr = dxgiFactory->CreateSwapChainForHwnd(m_device, handle, &scd, &scdFull, NULL, &dxgiSwapChain);
 				if (SUCCEEDED(hr))
 				{
 					dxgiSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&swapchain);
@@ -285,9 +288,15 @@ namespace thomas
 			HRESULT hr = m_device->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice));
 			if (SUCCEEDED(hr))
 			{
-				hr = m_dxgiDevice->GetAdapter(&m_dxgiAdapter);
+				IDXGIAdapter* adapter = nullptr;
+				hr = m_dxgiDevice->GetAdapter(&adapter);
 				if (SUCCEEDED(hr))
+				{
+					adapter->QueryInterface(__uuidof(IDXGIAdapter1), (void**)&m_dxgiAdapter);
+					
+					SAFE_RELEASE(adapter);
 					return true;
+				}
 			}
 
 			LOG_HR(hr);
@@ -328,16 +337,27 @@ namespace thomas
 
 		void D3D::ResetCommandList(ID3D11CommandList*& commandList)
 		{
-			if (commandList)
-			{
-				commandList->Release();
-				commandList = nullptr;
-			}
+			SAFE_RELEASE(commandList);
 		}
 
 		void D3D::ExecuteCommandList(ID3D11CommandList* commandList)
 		{
 			m_deviceContextImmediate->ExecuteCommandList(commandList, true);
+		}
+
+		void D3D::EnterCriticalSection()
+		{
+			m_multiThreaded->Enter();
+		}
+
+		void D3D::ExitCriticalSection()
+		{
+			m_multiThreaded->Leave();
+		}
+
+		void D3D::EnableMultithreadProtection(bool value)
+		{
+			m_multiThreaded->SetMultithreadProtected(value);
 		}
 
 		void D3D::Destroy()
@@ -610,22 +630,22 @@ namespace thomas
 			return m_device;
 		}
 
-		ID3D11DeviceContext * D3D::GetDeviceContextImmediate()
+		ID3D11DeviceContext * D3D::GetDeviceContextDeffered()
 		{
 			return m_deviceContextDeferred;
 		}
 
-		ID3D11DeviceContext* D3D::GetDeviceContextDeferred()
+		ID3D11DeviceContext* D3D::GetDeviceContextImmediate()
 		{
-			return m_deviceContextDeferred;
+			return m_deviceContextImmediate;
 		}
 
-		IDXGIDevice* D3D::GetDxgiDevice()
+		IDXGIDevice1* D3D::GetDxgiDevice()
 		{
 			return m_dxgiDevice;
 		}
 
-		IDXGIAdapter* D3D::GetDxgiAdapter()
+		IDXGIAdapter1* D3D::GetDxgiAdapter()
 		{
 			return m_dxgiAdapter;
 		}

@@ -65,9 +65,9 @@ namespace thomas
 				if (m_linePositions.empty())
 					return;
 			DirectX::CommonStates states(utils::D3D::Instance()->GetDevice());
-			utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetBlendState(states.Opaque(), nullptr, 0xFFFFFFFF);
-			utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetDepthStencilState(states.DepthNone(), 0);
-			utils::D3D::Instance()->GetDeviceContextImmediate()->RSSetState(states.CullNone());
+			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetBlendState(states.Opaque(), nullptr, 0xFFFFFFFF);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetDepthStencilState(states.DepthNone(), 0);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetState(states.CullNone());
 			// Set the data and send to GPU
 			m_vertexBufferPos->SetData(m_linePositions);
 			m_vertexBufferColor->SetData(m_lineColors);

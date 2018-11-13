@@ -86,7 +86,7 @@ namespace thomas
 
 		std::vector<math::Color> Texture2D::GetPixels()
 		{
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, *data);
 
 			std::vector<math::Color> pixels;
 			DirectX::PackedVector::XMUBYTEN4* rawPixels = (DirectX::PackedVector::XMUBYTEN4*)data->GetPixels();
@@ -101,17 +101,19 @@ namespace thomas
 
 		/*byte * Texture2D::GetRawRGBAPixels()
 		{
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, *data);
 			
 			return data->GetPixels();
 		}*/
 
 		byte * Texture2D::GetRawBGRAPixels()
 		{
+			utils::D3D::Instance()->EnterCriticalSection();
 			DirectX::ScratchImage firstData;
 			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, firstData);
 			hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), DXGI_FORMAT_B8G8R8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, *data);
 			firstData.Release();
+			utils::D3D::Instance()->ExitCriticalSection();
 
 			return data->GetPixels();
 		}
@@ -119,7 +121,7 @@ namespace thomas
 		/*bool Texture2D::ChangeFormat(DXGI_FORMAT format)
 		{
 			DirectX::ScratchImage firstData;
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, firstData);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, firstData);
 
 			hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), format, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, *data);
 
@@ -139,7 +141,7 @@ namespace thomas
 		{
 			DirectX::ScratchImage* resizedImage = new DirectX::ScratchImage();
 			
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, *data);
 			hr = DirectX::Resize(*data->GetImage(0, 0, 0), width, height, DirectX::TEX_FILTER_DEFAULT, *resizedImage);
 			if (FAILED(hr))
 			{
