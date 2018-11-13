@@ -232,7 +232,8 @@ namespace ThomasEngine.Network
                 }
                 writer.Put(targetRigidbody.LinearVelocity);
                 writer.Put(targetRigidbody.AngularVelocity);
-
+                writer.Put(targetRigidbody.IsKinematic);
+                writer.Put(targetRigidbody.AttachedCollider.isTrigger);
                 prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
             }
         }
@@ -301,7 +302,8 @@ namespace ThomasEngine.Network
 
                 reader.GetVector3();
                 reader.GetVector3();
-
+                reader.GetBool();
+                reader.GetBool();
                 return;
             }
 
@@ -313,11 +315,14 @@ namespace ThomasEngine.Network
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
 
-            
+            targetRigidbody.IsKinematic = reader.GetBool();
+            targetRigidbody.AttachedCollider.isTrigger = reader.GetBool();
+
             float dist = Vector3.Distance(target.position, TargetSyncPosition);
 
             //float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
 
+            
 
             if(!targetRigidbody.enabled)
             {
@@ -327,7 +332,7 @@ namespace ThomasEngine.Network
             }
             else
             {
-
+                targetRigidbody.IgnoreNextTransformUpdate();
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;
                 targetRigidbody.LinearVelocity = TargetSyncLinearVelocity;

@@ -473,11 +473,6 @@ public class ChadControls : NetworkComponent
             PickedUpObject = null;
         }
 
-        //if(rBody)
-        //{
-        //    rBody.SetPosition(transform.position, true);
-        //    rBody.SetRotation(transform.rotation, true);
-        //}
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -654,7 +649,7 @@ public class ChadControls : NetworkComponent
             }
 
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
+            if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {

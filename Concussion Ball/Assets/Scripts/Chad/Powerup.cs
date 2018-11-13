@@ -25,14 +25,13 @@ public class Powerup : PickupableObject
     {
         base.OnEnable();
         activated = false;
-        m_rigidBody.IsKinematic = true;
-        m_rigidBody.enabled = true;
+        m_rigidBody.enabled = false;
     }
 
     public override void Update()
     {
         base.Update();
-        if (spawner && !PickedUp)
+        if (spawner)
         {
             float test = (float)Math.Sin(Time.ElapsedTime);
 
@@ -70,6 +69,8 @@ public class Powerup : PickupableObject
 
     }
 
+
+
     public override void Pickup(ChadControls chad, Transform hand)
     {
         base.Pickup(chad, hand);
@@ -78,7 +79,6 @@ public class Powerup : PickupableObject
         {
             spawner.Free();
             spawner = null;
-            Debug.Log("Cleared spawner");
         }
             
     }
@@ -87,7 +87,7 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (!m_pickupable && !PickedUp)
+            if (PickupCollider.enabled == false)
             {
                 if (!activated)
                 {
@@ -109,6 +109,8 @@ public class Powerup : PickupableObject
                 writer.Put(spawner.ID);
             else
                 writer.Put(-1);
+
+            writer.Put(activated);
         }
 
 
@@ -126,7 +128,7 @@ public class Powerup : PickupableObject
             {
                 spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
             }
-            Reset();
+            activated = reader.GetBool();
         }
 
 
@@ -154,7 +156,6 @@ public class Powerup : PickupableObject
     public override void Reset()
     {
         base.Reset();
-        m_rigidBody.IsKinematic = true;
         m_rigidBody.enabled = false;
         activated = false;
     }
