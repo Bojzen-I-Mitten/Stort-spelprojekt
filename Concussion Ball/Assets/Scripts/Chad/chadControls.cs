@@ -49,7 +49,7 @@ public class ChadControls : NetworkComponent
 
     public float DiveTimer { get; private set; } = 0f;
     private bool Landed = false;
-    public Quaternion DivingDirection = Quaternion.Identity;
+    public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
     #endregion
 
@@ -128,6 +128,7 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        Debug.Log(DivingRotation);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -266,14 +267,14 @@ public class ChadControls : NetworkComponent
 
     }
 
-    private bool OnGround()
+    public bool OnGround()
     {
         // Friction checks, no friction when Chad is in air
         Vector3 footPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 0.1f/*- 0.001f*/, gameObject.transform.position.z);
         RaycastHit hit;
         Physics.Raycast(footPosition, Vector3.Down, out hit);
 
-        if (hit.distance >= 0.2f)
+        if (hit.distance >= 0.2f || hit.distance == 0)
         {
             return false;
         }
@@ -312,7 +313,6 @@ public class ChadControls : NetworkComponent
             Diving = DivingCoroutine();
             StartCoroutine(Diving);
             DivingTimer = 0.0f;
-            DivingDirection = this.gameObject.transform.rotation;
         }
         else if (Input.GetKeyDown(Input.Keys.Space))
         {
@@ -322,7 +322,8 @@ public class ChadControls : NetworkComponent
                 Jumping = true;
                 Landed = false;
                 CurrentVelocity.y = BaseSpeed;
-                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 8, rBody.LinearVelocity.z), rBody.Rotation);
+                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
+                rBody.AddForce(new Vector3(0, 450, 0), Rigidbody.ForceMode.Impulse);
             }
             else if(Jumping || (!OnGround() && JumpingTimer > 3.0f))
             {
@@ -330,7 +331,8 @@ public class ChadControls : NetworkComponent
                 Jumping = false;
                 Landed = false;
                 CurrentVelocity.y = BaseSpeed;
-                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 5, rBody.LinearVelocity.z), rBody.Rotation);
+                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
+                rBody.AddForce(new Vector3(0, 350, 0), Rigidbody.ForceMode.Impulse);
             }
         }
 
@@ -439,7 +441,9 @@ public class ChadControls : NetworkComponent
                 else if (Direction.z < 0) //if walking backwards
                     CurrentVelocity.y = -modifiedBaseSpeed / 2.0f;
 
-                CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
+                if(OnGround())
+                    CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
+
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
 
@@ -465,7 +469,7 @@ public class ChadControls : NetworkComponent
         if (State != STATE.DIVING)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
         else
-            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingRotation);
 
         rBody.DisableRotationSync();
     }
