@@ -4,11 +4,110 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using System.Collections.Generic;
+public class PlayerTestClass
+{
+    String Name;
+    int goals;
+    int Tackles;
+    int Tackled;
+    int Ping;
+   public PlayerTestClass(String Name,int goals,int Tackles,int Tackled,int Ping)
+    {
+        this.Name = Name;
+        this.goals = goals;
+        this.Tackles = Tackles;
+        this.Tackled = Tackled;
+        this.Ping = Ping;
+    }
+
+}
+public class Playertext
+{
+    public Text PlayerName;
+    public Text PlayerGoals;
+    public Text PlayerTackles;
+    public Text PlayerTackled;
+    public Text PlayerPing;
+    Canvas Canvas;
+
+    public Playertext(int Number,Font font,Canvas Canvas,String Name, int goals, int Tackles, int Tackled, int Ping,int team)
+    {
+        this.Canvas = Canvas;
+        this.PlayerName = Canvas.Add(Name);
+        this.PlayerGoals = Canvas.Add(""+goals);
+        this.PlayerTackles = Canvas.Add("" + Tackles);
+        this.PlayerTackled = Canvas.Add("" + Tackled);
+        this.PlayerPing = Canvas.Add("" + Ping);
+        this.PlayerName.origin = new Vector2(0, 0);
+        this.PlayerGoals.origin = new Vector2(0, 0);
+        this.PlayerTackles.origin = new Vector2(0, 0);
+        this.PlayerTackled.origin = new Vector2(0, 0);
+        this.PlayerPing.origin = new Vector2(0, 0);
+        AddFont(font);
+        UpdateScale(Vector2.Zero);
+        UpdateColor(Color.White);
+        if (team == 1)
+            UpdatePositionTeam1(Number);
+        else
+            UpdatePositionTeam2(Number);
+    }
+    public void UpdateScale(Vector2 scale)
+    {
+        this.PlayerName.scale = scale;
+        this.PlayerGoals.scale = scale;
+        this.PlayerTackles.scale = scale;
+        this.PlayerTackled.scale = scale;
+        this.PlayerPing.scale = scale;
+    }
+    public void AddFont(Font font)
+    {
+        this.PlayerName.font = font;
+        this.PlayerGoals.font = font;
+        this.PlayerTackles.font = font;
+        this.PlayerTackled.font = font;
+        this.PlayerPing.font = font;
+    } 
+    ~Playertext()
+    {
+        Canvas.Remove(this.PlayerName);
+        Canvas.Remove(this.PlayerGoals);
+        Canvas.Remove(this.PlayerTackles);
+        Canvas.Remove(this.PlayerTackled);
+        Canvas.Remove(this.PlayerPing);
+    }
+    public void UpdatePositionTeam1(int NewPositionUpdate)
+    {
+        float PositionUpdate = NewPositionUpdate * 0.065f;
+        this.PlayerName.position    = new Vector2(0.020f, 0.34f + PositionUpdate);
+        this.PlayerGoals.position   = new Vector2(0.179f, 0.34f + PositionUpdate);
+        this.PlayerTackles.position = new Vector2(0.268f, 0.34f + PositionUpdate);
+        this.PlayerTackled.position = new Vector2(0.364f, 0.34f + PositionUpdate);
+        this.PlayerPing.position    = new Vector2(0.445f, 0.34f + PositionUpdate);
+    }
+    public void UpdatePositionTeam2(int NewPositionUpdate)
+    {
+        float PositionUpdate = NewPositionUpdate * 0.065f;
+        this.PlayerName.position    = new Vector2(0.870f, 0.34f + PositionUpdate);
+        this.PlayerGoals.position   = new Vector2(0.800f, 0.34f + PositionUpdate);
+        this.PlayerTackles.position = new Vector2(0.700f, 0.34f + PositionUpdate);
+        this.PlayerTackled.position = new Vector2(0.615f, 0.34f + PositionUpdate);
+        this.PlayerPing.position    = new Vector2(0.525f, 0.34f + PositionUpdate);
+    }
+
+    void UpdateColor(Color color)
+    {
+        this.PlayerName.color = color;
+        this.PlayerGoals.color = color;
+        this.PlayerTackles.color = color;
+        this.PlayerTackled.color = color;
+        this.PlayerPing.color = color;
+    }
+}
+
 public class GUIPlayerScore : ScriptComponent
 {
     Camera cam;
     Canvas Canvas;
-
     public String AmountOfPlayersTeam1 { get; set; }
     public String AmountOfPlayersTeam2 { get; set; }
     public Texture2D PlayerBarTeam1 { get; set; }
@@ -18,15 +117,45 @@ public class GUIPlayerScore : ScriptComponent
     public int AmountOfPlayersInTeam1 { get; set; } = 2;
     public int AmountOfPlayersInTeam2 { get; set; } = 2;
     public Texture2D AmountOfPlayersBar { get; set; }
-    public Vector2 OriginText{get;set;}
     public Vector2 ScaleText { get; set; }
     private bool Toggle = false;
     public Font Font { get; set; }
+    public List<NetworkPlayer> NetworkPlayersTeam1;
+    public List<NetworkPlayer> NetworkPlayersTeam2;
+    public List<PlayerTestClass> PlayerTestClassTestTeam1;
+    public List<PlayerTestClass> PlayerTestClassTestTeam2;
+    public int OriginText { get; set; }
+    public Vector2 OriginText1 { get; set; }
+    public Vector2 OriginText2 { get; set; }
+    public Vector2 OriginText3 { get; set; }
+    public Vector2 OriginText4 { get; set; }
+    public Vector2 OriginText5 { get; set; }
+    Image AmountOfPlayersBarImage;
+    Text TeamAmountOfPlayersText;
+
+    Image team1BarImage;
+    Image team2BarImage;
+    Playertext Playertest;
+    Text[] PlayerstandardText = new Text[2];
+    Image[] PlayerStandardbar = new Image[2];
+    List<Image> PlayerStandardBarTeam1 = new List<Image>();
+    List<Image> PlayerStandardBarTeam2 = new List<Image>();
+
+
     public override void Start()
     {
+ 
+       // PlayerTestClassTestTeam1.Add(new PlayerTestClass("TestNameTeam1", 1, 1, 1, 50));
+       // PlayerTestClassTestTeam2.Add(new PlayerTestClass("TestNameTeam2", 1, 2, 1, 50));
+        //testa koden här senare:P
+        //AmountOfPlayersInTeam1 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_1).PlayerCount;
+        //AmountOfPlayersInTeam2 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_2).PlayerCount;
+        //NetworkPlayersTeam1 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_1).Players;
+        //NetworkPlayersTeam2 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_2).Players;
+
         cam = gameObject.GetComponent<Camera>();
         Canvas = cam.AddCanvas();
-
+     
         //Team1Bar Image
         team1BarImage = Canvas.Add(Team1Bar);
         team1BarImage.scale = Vector2.Zero;
@@ -91,19 +220,11 @@ public class GUIPlayerScore : ScriptComponent
             PlayerStandardBarTeam2[i].origin = new Vector2(-0.84f, -3.75f - (i * 0.75f));
         }
 
+        Playertest = new Playertext(0, Font, Canvas, "jonn", 2, 34, 4, 94,2);
     }
 
 
-    Image AmountOfPlayersBarImage;
-    Text TeamAmountOfPlayersText;
 
-    Image team1BarImage;
-    Image team2BarImage;
-
-    Text[] PlayerstandardText = new Text[2];
-    Image[] PlayerStandardbar = new Image[2];
-    List<Image> PlayerStandardBarTeam1 = new List<Image>();
-    List<Image> PlayerStandardBarTeam2 = new List<Image>();
     public override void Awake()
     {
 
@@ -111,7 +232,7 @@ public class GUIPlayerScore : ScriptComponent
     }
     void DisplayBar(Vector2 OnOff)
     {
-
+        
         TeamAmountOfPlayersText.scale = OnOff;
         AmountOfPlayersBarImage.scale = OnOff;
 
@@ -125,8 +246,12 @@ public class GUIPlayerScore : ScriptComponent
                 PlayerstandardText[i].scale = new Vector2(0, 0);
             else
                PlayerstandardText[i].scale = new Vector2(0.8f,0.6f);
-            
         }
+
+        if (OnOff.x == 0)
+            Playertest.UpdateScale(Vector2.Zero);
+        else
+            Playertest.UpdateScale(new Vector2(0.8f, 0.6f));
 
         for (int i = 0; i < AmountOfPlayersInTeam1; i++)
         {
@@ -140,12 +265,12 @@ public class GUIPlayerScore : ScriptComponent
     }
     void SetOrigin()
     {
-
-    //    PlayerStandardbar[1].origin = OriginImage;
-    //      PlayerstandardText[1].origin = OriginText;
-    //      PlayerstandardText[1].text = Test;
-    //      PlayerstandardText[1].scale = ScaleText;
-
+        //Playertest.UpdatePositionTeam2(OriginText);
+     /*   Playertest.PlayerName.position = OriginText1;
+        Playertest.PlayerGoals.position = OriginText2;
+        Playertest.PlayerTackles.position = OriginText3;
+        Playertest.PlayerTackled.position = OriginText4;
+        Playertest.PlayerPing.position = OriginText5;*/
     }
     void UpdatePlayerBars()
     {
