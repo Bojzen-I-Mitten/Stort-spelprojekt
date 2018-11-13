@@ -48,6 +48,7 @@ public class ChadControls : NetworkComponent
     public float MaxSpeed { get; private set; } = 10.0f;
 
     public float DiveTimer { get; private set; } = 0f;
+    private bool Landed = false;
     public Quaternion DivingDirection = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
     #endregion
@@ -268,16 +269,16 @@ public class ChadControls : NetworkComponent
     private bool OnGround()
     {
         // Friction checks, no friction when Chad is in air
-        Vector3 footPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.01f, gameObject.transform.position.z);
+        Vector3 footPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 0.1f/*- 0.001f*/, gameObject.transform.position.z);
         RaycastHit hit;
         Physics.Raycast(footPosition, Vector3.Down, out hit);
 
-        if (hit.distance >= 0.01f)
+        if (hit.distance >= 0.2f)
         {
-            Debug.Log("NOT ON SURFACE.");
             return false;
         }
-        Debug.Log("ON SURFACE.");
+        if(JumpingTimer > 0.1f)
+            Landed = true;
         return true;
     }
 
@@ -315,19 +316,28 @@ public class ChadControls : NetworkComponent
         }
         else if (Input.GetKeyDown(Input.Keys.Space))
         {
-            if(JumpingTimer > 3.0f && OnGround())
+            if(OnGround())
             {
                 JumpingTimer = 0.0f;
                 Jumping = true;
+                Landed = false;
+                CurrentVelocity.y = BaseSpeed;
                 rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 8, rBody.LinearVelocity.z), rBody.Rotation);
             }
             else if(Jumping || (!OnGround() && JumpingTimer > 3.0f))
             {
                 JumpingTimer = 0.0f;
                 Jumping = false;
+                Landed = false;
+                CurrentVelocity.y = BaseSpeed;
                 rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 5, rBody.LinearVelocity.z), rBody.Rotation);
             }
         }
+
+        //No random in-air y-directional velocity
+        if (!OnGround() && rBody.LinearVelocity.y > 0 && Landed)
+            rBody.LinearVelocity = new Vector3(rBody.LinearVelocity.x, 0.0f, rBody.LinearVelocity.z);
+
     }
 
     private void HandleMouseInput()
@@ -432,10 +442,9 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-               // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
