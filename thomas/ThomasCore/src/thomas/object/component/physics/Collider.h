@@ -20,6 +20,8 @@ namespace thomas
 				
 				void SetCenter(math::Vector3 center);
 				math::Vector3 getCenter();
+				float GetFriction();
+				void SetFriction(float value);
 
 				Rigidbody* GetAttachedRigidbody();
 				void SetAttachedRigidbody(Rigidbody* rb);
