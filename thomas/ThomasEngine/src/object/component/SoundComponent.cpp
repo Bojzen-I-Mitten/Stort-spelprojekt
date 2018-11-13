@@ -92,12 +92,12 @@ namespace ThomasEngine
 		return sound->IsLooping(); 
 	}
 
-	void SoundComponent::is3D::set(bool value)
+	void SoundComponent::Is3D::set(bool value)
 	{
 		sound->Set3D(value);
 	}
 
-	bool SoundComponent::is3D::get()
+	bool SoundComponent::Is3D::get()
 	{
 		return sound->Is3D();
 	}

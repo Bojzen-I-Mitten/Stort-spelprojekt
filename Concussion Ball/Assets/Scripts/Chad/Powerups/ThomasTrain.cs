@@ -34,14 +34,19 @@ public class ThomasTrain : Powerup
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
         soundComponentChargeUp.Looping = false;
-       // soundComponentChargeUp.Is3D = true;
+        soundComponentChargeUp.Is3D = true;
+
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel.Type = SoundComponent.SoundType.Effect;
         soundComponentTravel.Looping = false;
-        //soundComponentTravel.Is3D = true;
+        soundComponentTravel.Is3D = true;
+
         soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
         soundComponentExplosion.Looping = false;
-        //soundComponentExplosion.Is3D = true;
+        soundComponentExplosion.Is3D = true;
     }
 
     public override void OnEnable()
@@ -91,10 +96,6 @@ public class ThomasTrain : Powerup
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
         emitterSpark.Radius = 6.7f;
-
-        soundComponentChargeUp.Looping = false;
-        
-        soundComponentTravel.Looping = false;
         
         soundComponentChargeUp.Clip = soundClipChargeUp;
         soundComponentTravel.Clip = soundClipTravel;
@@ -180,7 +181,7 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
-        //soundComponentExplosion.PlayOneShot();
+        soundComponentExplosion.Play();
 
         StartCoroutine(KillTrain());
     }

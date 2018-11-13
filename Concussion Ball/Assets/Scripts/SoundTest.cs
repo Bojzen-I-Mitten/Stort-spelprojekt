@@ -7,8 +7,6 @@ using ThomasEngine;
 
 public class SoundTest : ScriptComponent
 {
-    //public Transform Listener { get; set; }
-
     SoundComponent Gun;
 
     public override void Start()
@@ -19,9 +17,5 @@ public class SoundTest : ScriptComponent
 
     public override void Update()
     {
-        if(Input.GetKeyDown(Input.Keys.K))
-        {
-            //Gun.Play();
-        }
     }
 }

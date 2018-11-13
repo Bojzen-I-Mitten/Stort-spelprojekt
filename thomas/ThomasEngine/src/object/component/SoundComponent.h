@@ -57,7 +57,7 @@ namespace ThomasEngine
 			void set(bool value);
 		}
 
-		property bool is3D
+		property bool Is3D
 		{
 			bool get();
 			void set(bool value);

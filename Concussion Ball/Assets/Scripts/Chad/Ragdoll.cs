@@ -31,6 +31,7 @@ public class Ragdoll : ScriptComponent
     public bool RagdollEnabled = true;
     public bool PostiveMapping { get; set; } = true;
     public bool AllobjectKinectic { get; set; } = false;
+    public AudioClip ImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
     enum BODYPART
@@ -69,11 +70,10 @@ public class Ragdoll : ScriptComponent
 
         // Load the ragdoll impact sound
         RagdollSound = gameObject.AddComponent<SoundComponent>();
-        //if (RagDollImpactSound != null)
-        //    RagdollSound.clip = RagDollImpactSound;
-        //else
-        //    Debug.LogError("Radoll impact sound missing");
+        RagdollSound.Type = SoundComponent.SoundType.Effect;
+        RagdollSound.Clip = ImpactSound;
         RagdollSound.Looping = false;
+        RagdollSound.Is3D = true;
     }
     #region Utility functions
 
@@ -202,7 +202,7 @@ public class Ragdoll : ScriptComponent
         }
 
         // Play the ragdoll sound
-        //RagdollSound.PlayOneShot();
+        RagdollSound.Play();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
@@ -682,7 +682,7 @@ public class Ragdoll : ScriptComponent
             if (ImpactSpine.GetActive)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
-                //RagdollSound.PlayOneShot();
+                RagdollSound.Play();
             }
                 
             return;
