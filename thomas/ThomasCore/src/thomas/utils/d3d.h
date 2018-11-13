@@ -40,8 +40,9 @@ namespace thomas
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateQuery(D3D11_QUERY type, ID3D11Query*& query);
 			
-			void FinishCommandList();
-			void ExecuteCommandList();
+			void FinishCommandList(ID3D11CommandList*& commandList);
+			void ResetCommandList(ID3D11CommandList*& commandList);
+			void ExecuteCommandList(ID3D11CommandList* commandList);
 
 		public:
 			bool D3D::CreateDepthStencilState(D3D11_COMPARISON_FUNC func, bool depth, ID3D11DepthStencilState*& depthStencilState);
@@ -76,7 +77,6 @@ namespace thomas
 			ID3D11DeviceContext* m_deviceContextImmediate;
 			ID3D11DeviceContext* m_deviceContextDeferred;
 			ID3D11Multithread* m_multiThreaded;
-			ID3D11CommandList* m_commandList;
 			ID3D11Debug* m_debug;
 			IDXGIDevice* m_dxgiDevice;
 			IDXGIAdapter* m_dxgiAdapter;

@@ -46,6 +46,7 @@ namespace thomas
 			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 			if (hr)
 			{
+				m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 				ChangeWindowShowState(nCmdShow);
 			}
 		}
@@ -63,7 +64,11 @@ namespace thomas
 			m_showCursor = true; m_fullScreen = false;
 			m_windowHandler = hWnd;
 
-			utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
+			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
+			if (hr)
+			{
+				m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+			}
 		}
 		else
 			LOG("Failed to create window");
@@ -71,24 +76,30 @@ namespace thomas
 
 	Window::~Window()
 	{
-		SAFE_RELEASE(m_dxBuffers.buffer[0]);
-		SAFE_RELEASE(m_dxBuffers.buffer[1]);
+		for (int i = 0; i < FRAME_BUFFERS; i++)
+		{
+			SAFE_RELEASE(m_dx.commandList[i]);
 
-		SAFE_RELEASE(m_dxBuffers.RTV[0]);
-		SAFE_RELEASE(m_dxBuffers.RTV[1]);
+			SAFE_RELEASE(m_dx.buffer[0][i]);
+			SAFE_RELEASE(m_dx.buffer[1][i]);
 
-		SAFE_RELEASE(m_dxBuffers.SRV[0]);
-		SAFE_RELEASE(m_dxBuffers.SRV[1]);
+			SAFE_RELEASE(m_dx.RTV[0][i]);
+			SAFE_RELEASE(m_dx.RTV[1][i]);
 
-		SAFE_RELEASE(m_dxBuffers.depthStencilState);
+			SAFE_RELEASE(m_dx.SRV[0][i]);
+			SAFE_RELEASE(m_dx.SRV[1][i]);
 
-		SAFE_RELEASE(m_dxBuffers.depthStencilView[0]);
-		SAFE_RELEASE(m_dxBuffers.depthStencilView[1]);
+			SAFE_RELEASE(m_dx.depthStencilState);
 
-		SAFE_RELEASE(m_dxBuffers.depthStencilViewReadOnly[0]);
-		SAFE_RELEASE(m_dxBuffers.depthStencilViewReadOnly[1]);
+			SAFE_RELEASE(m_dx.depthStencilView[0][i]);
+			SAFE_RELEASE(m_dx.depthStencilView[1][i]);
 
-		SAFE_RELEASE(m_dxBuffers.depthBufferSRV);
+			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[0][i]);
+			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1][i]);
+
+			SAFE_RELEASE(m_dx.depthBufferSRV[i]);
+		}
+
 		SAFE_RELEASE(m_swapChain);
 
 		DestroyWindow(m_windowHandler);
@@ -110,24 +121,29 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, 0, 0);
 			utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetDepthStencilState(NULL, 1);
 
-			SAFE_RELEASE(m_dxBuffers.buffer[0]);
-			SAFE_RELEASE(m_dxBuffers.buffer[1]);
+			for (int i = 0; i < FRAME_BUFFERS; i++)
+			{
+				SAFE_RELEASE(m_dx.commandList[i]);
 
-			SAFE_RELEASE(m_dxBuffers.RTV[0]);
-			SAFE_RELEASE(m_dxBuffers.RTV[1]);
+				SAFE_RELEASE(m_dx.buffer[0][i]);
+				SAFE_RELEASE(m_dx.buffer[1][i]);
 
-			SAFE_RELEASE(m_dxBuffers.SRV[0]);
-			SAFE_RELEASE(m_dxBuffers.SRV[1]);
+				SAFE_RELEASE(m_dx.RTV[0][i]);
+				SAFE_RELEASE(m_dx.RTV[1][i]);
 
-			SAFE_RELEASE(m_dxBuffers.depthStencilState);
+				SAFE_RELEASE(m_dx.SRV[0][i]);
+				SAFE_RELEASE(m_dx.SRV[1][i]);
 
-			SAFE_RELEASE(m_dxBuffers.depthStencilView[0]);
-			SAFE_RELEASE(m_dxBuffers.depthStencilView[1]);
+				SAFE_RELEASE(m_dx.depthStencilView[0][i]);
+				SAFE_RELEASE(m_dx.depthStencilView[1][i]);
 
-			SAFE_RELEASE(m_dxBuffers.depthStencilViewReadOnly[0]);
-			SAFE_RELEASE(m_dxBuffers.depthStencilViewReadOnly[1]);
+				SAFE_RELEASE(m_dx.depthStencilViewReadOnly[0][i]);
+				SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1][i]);
 
-			SAFE_RELEASE(m_dxBuffers.depthBufferSRV);
+				SAFE_RELEASE(m_dx.depthBufferSRV[i]);
+			}
+
+			SAFE_RELEASE(m_dx.depthStencilState);
 
 			m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
 			return InitDxBuffers();
@@ -140,6 +156,22 @@ namespace thomas
 	{
 		HANDLE handle = m_swapChain->GetFrameLatencyWaitableObject();
 		DWORD result = WaitForSingleObjectEx(handle, 1000, true);
+	}
+
+	void Window::BeginFrame()
+	{
+		utils::D3D::Instance()->ResetCommandList(m_dx.commandList[m_frameIndex]);
+		Clear();
+	}
+
+	void Window::EndFrame()
+	{
+		utils::D3D::Instance()->FinishCommandList(m_dx.commandList[m_frameIndex]);
+		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList[m_frameIndex]);
+
+		Present();
+
+		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 	}
 
 	void Window::UpdateWindow()
@@ -176,16 +208,16 @@ namespace thomas
 	{
 		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, 0, 0);
 
-		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(1, &m_dxBuffers.RTV[0], m_dxBuffers.depthStencilView[0]);
-		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(1, &m_dx.RTV[0][m_frameIndex], m_dx.depthStencilView[0][m_frameIndex]);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetDepthStencilState(m_dx.depthStencilState, 1);
 	}
 
 	void Window::BindRenderTarget()
 	{
 		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, 0, 0);
 
-		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(1, &m_dxBuffers.RTV[1], m_dxBuffers.depthStencilView[1]);
-		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetDepthStencilState(m_dxBuffers.depthStencilState, 1);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(1, &m_dx.RTV[1][m_frameIndex], m_dx.depthStencilView[1][m_frameIndex]);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetDepthStencilState(m_dx.depthStencilState, 1);
 	}
 
 
@@ -201,17 +233,40 @@ namespace thomas
 
 	bool Window::InitDxBuffers()
 	{
-		bool hr = utils::D3D::Instance()->CreateBackBuffer(m_swapChain, m_dxBuffers.buffer[0], m_dxBuffers.RTV[0], m_dxBuffers.SRV[0], m_dxBuffers.depthStencilView[0], m_dxBuffers.depthStencilViewReadOnly[0]);
-		if (hr)
+		bool hr = false;
+		for (int i = 0; i < FRAME_BUFFERS; i++)
 		{
-			utils::D3D::Instance()->CreateDepthStencilState(D3D11_COMPARISON_LESS, true, m_dxBuffers.depthStencilState);
-			utils::D3D::Instance()->CreateRenderTarget(m_dxBuffers.buffer[0], m_dxBuffers.buffer[1], m_dxBuffers.RTV[1], m_dxBuffers.SRV[1]);
-			utils::D3D::Instance()->CreateDepthStencilView(m_dxBuffers.buffer[1], m_dxBuffers.depthStencilView[1], m_dxBuffers.depthStencilViewReadOnly[1], m_dxBuffers.depthBufferSRV);
+			hr = utils::D3D::Instance()->CreateBackBuffer(m_swapChain, m_dx.buffer[0][i], m_dx.RTV[0][i], m_dx.SRV[0][i],
+				m_dx.depthStencilView[0][i], m_dx.depthStencilViewReadOnly[0][i]);
+			
+			if (hr)
+			{
+				hr = utils::D3D::Instance()->CreateRenderTarget(m_dx.buffer[0][i], m_dx.buffer[1][i], m_dx.RTV[1][i], m_dx.SRV[1][i]);
+				if (!hr)
+				{
+					LOG("Failed to create render target");
+					return false;
+				}
 
-			return true;
+				hr = utils::D3D::Instance()->CreateDepthStencilView(m_dx.buffer[1][i], m_dx.depthStencilView[1][i], m_dx.depthStencilViewReadOnly[1][i], m_dx.depthBufferSRV[i]);
+				if (!hr)
+				{
+					LOG("Failed to create depth stencil view");
+					return false;
+				}
+
+				m_dx.commandList[i] = nullptr;
+			}
 		}
-		LOG("Failed to create DirectX window buffers");
-		return false;	
+
+		hr = utils::D3D::Instance()->CreateDepthStencilState(D3D11_COMPARISON_LESS, true, m_dx.depthStencilState);
+		if (!hr)
+		{
+			LOG("Failed to create depth stencil state");
+			return false;
+		}
+
+		return true;
 	}
 
 	bool Window::ShouldResize()
@@ -223,14 +278,14 @@ namespace thomas
 	{
 		float clearColor[] = { 0.34375f, 0.34375f, 0.34375f, 1.0f };
 
-		utils::D3D::Instance()->GetDeviceContextImmediate()->ClearRenderTargetView(m_dxBuffers.RTV[1], clearColor);
-		utils::D3D::Instance()->GetDeviceContextImmediate()->ClearDepthStencilView(m_dxBuffers.depthStencilView[1], D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->ClearRenderTargetView(m_dx.RTV[1][m_frameIndex], clearColor);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->ClearDepthStencilView(m_dx.depthStencilView[1][m_frameIndex], D3D11_CLEAR_DEPTH, 1, 0);
 	}
 
 	void Window::ResolveRenderTarget()
 	{
 		unsigned int sub = D3D11CalcSubresource(0, 0, 1);
-		utils::D3D::Instance()->GetDeviceContextImmediate()->ResolveSubresource(m_dxBuffers.buffer[0], sub, m_dxBuffers.buffer[1], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
+		utils::D3D::Instance()->GetDeviceContextImmediate()->ResolveSubresource(m_dx.buffer[0][m_frameIndex], sub, m_dx.buffer[1][m_frameIndex], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	void Window::SetCursor(const bool & visible)

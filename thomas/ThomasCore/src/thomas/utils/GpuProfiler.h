@@ -33,7 +33,6 @@ namespace thomas
 
 				// Wait on GPU for last frame's data (not this frame's) to be available
 				void WaitForDataAndUpdate();
-				void SetActive(bool value);
 			public:
 				float GetAverageTiming(GTS gts);
 				float GetDrawTotal();
@@ -62,8 +61,6 @@ namespace thomas
 
 				float m_memoryUsage;
 				float m_totalMemory;
-
-				bool m_active;
 
 				int m_currentFrame;
 				int m_maxFrames;

@@ -45,22 +45,22 @@ namespace thomas
 		m_windows.clear();
 	}
 
-	void WindowManager::ClearAllWindows()
+	void WindowManager::BeginFrame()
 	{
 		for (Window* window : m_windows)
 			if (window->Initialized())
 			{
 				window->WaitOnSwapChain();
-				window->Clear();
+				window->BeginFrame();
 			}
 	}
 
-	void WindowManager::PresentAllWindows()
+	void WindowManager::EndFrame()
 	{
 		for (Window* window : m_windows)
 			if (window->Initialized())
 			{
-				window->Present();
+				window->EndFrame();
 			}
 	}
 

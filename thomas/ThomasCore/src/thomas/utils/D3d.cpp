@@ -316,17 +316,28 @@ namespace thomas
 			return SUCCEEDED(hr);
 		}
 
-		void D3D::FinishCommandList()
+		void D3D::FinishCommandList(ID3D11CommandList*& commandList)
 		{
-			ID3D11CommandList* commandList = nullptr;
 			HRESULT hr = m_deviceContextDeferred->FinishCommandList(false, &commandList);
 			if (FAILED(hr))
-				LOG_HR(hr)
+			{
+				LOG_HR(hr);
+				return;
+			}
 		}
 
-		void D3D::ExecuteCommandList()
+		void D3D::ResetCommandList(ID3D11CommandList*& commandList)
 		{
-			m_deviceContextImmediate->ExecuteCommandList(m_commandList, true);
+			if (commandList)
+			{
+				commandList->Release();
+				commandList = nullptr;
+			}
+		}
+
+		void D3D::ExecuteCommandList(ID3D11CommandList* commandList)
+		{
+			m_deviceContextImmediate->ExecuteCommandList(commandList, true);
 		}
 
 		void D3D::Destroy()
@@ -334,11 +345,14 @@ namespace thomas
 			m_profiler->Destroy();
 			delete m_profiler;
 
+			m_deviceContextDeferred->ClearState();
+			m_deviceContextDeferred->Flush();
+
 			m_deviceContextImmediate->ClearState();
 			m_deviceContextImmediate->Flush();
 
-			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_deviceContextDeferred);
+			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_device);
 
 			if (m_debug)
@@ -598,7 +612,7 @@ namespace thomas
 
 		ID3D11DeviceContext * D3D::GetDeviceContextImmediate()
 		{
-			return m_deviceContextImmediate;
+			return m_deviceContextDeferred;
 		}
 
 		ID3D11DeviceContext* D3D::GetDeviceContextDeferred()

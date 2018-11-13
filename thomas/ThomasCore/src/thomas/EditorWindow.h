@@ -14,7 +14,8 @@ namespace thomas
 	public:
 		void Present();
 		void BeginFrame();
-		void EndFrame(bool copyGui);
+		void EndFrame();
+		void RenderGUIData();
 		virtual bool IsEditor() { return true; }
 
 	private:

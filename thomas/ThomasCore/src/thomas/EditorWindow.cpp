@@ -43,39 +43,35 @@ namespace thomas
 
 	void EditorWindow::Present()
 	{
-		this->BindBackBuffer();
-
-		if (ImGui_ImplDx11_Valid() && this->m_guiData)
-			ImGui_ImplDX11_RenderDrawData(this->m_guiData);
-
-		/*m_spriteBatch->Begin();
-
-		m_spriteBatch->Draw(m_texture, m_screenPos, nullptr, Colors::White, 0.f, m_origin);
-
-		m_spriteBatch->Draw(m_texture, Vector2(m_screenPos.x + 50.f, m_screenPos.y), nullptr, Colors::White,
-							0.f, m_origin);
-
-		m_spriteBatch->End();*/
-	
 		m_swapChain->Present(0, 0);
 	}
 
 	void EditorWindow::BeginFrame()
 	{
-		ImGui_ImplDX11_NewFrame();
-		ImGuizmo::BeginFrame();
+		utils::D3D::Instance()->ResetCommandList(m_dx.commandList[m_frameIndex]);
+		Clear();
 	}
 
-	void EditorWindow::EndFrame(bool copyGui)
+	void EditorWindow::EndFrame()
 	{
-		if (copyGui)
-		{
-			ImGui::Render();
-			DeleteGUIData();
-			CloneGUIData();
-		}
-		else
-			ImGui::EndFrame();
+		BindBackBuffer();
+
+		if (ImGui_ImplDx11_Valid() && m_guiData)
+			ImGui_ImplDX11_RenderDrawData(m_guiData);
+
+		utils::D3D::Instance()->FinishCommandList(m_dx.commandList[m_frameIndex]);
+		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList[m_frameIndex]);
+
+		Present();
+
+		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
+	}
+
+	void EditorWindow::RenderGUIData()
+	{
+		ImGui::Render();
+		DeleteGUIData();
+		CloneGUIData();
 	}
 
 	void EditorWindow::UpdateWindow()
@@ -94,9 +90,11 @@ namespace thomas
 			m_shouldResize = false;
 			ImGui_ImplDX11_CreateDeviceObjects();
 		}
-		BeginFrame();
 
+		ImGui_ImplDX11_NewFrame();
+		ImGuizmo::BeginFrame();
 	}
+
 	void EditorWindow::CloneGUIData()
 	{
 		ImDrawData* data = ImGui::GetDrawData();
