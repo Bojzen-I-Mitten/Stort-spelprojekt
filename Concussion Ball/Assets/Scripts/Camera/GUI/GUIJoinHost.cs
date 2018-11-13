@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using ThomasEngine;
-using InputIP;
 using LiteNetLib;
 
 public class GUIJoinHost : ScriptComponent

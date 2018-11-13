@@ -244,6 +244,7 @@ namespace ThomasEngine
 		static bool GetKey(Keys key) { return thomas::WindowManager::Instance()->GetGameInput()->GetKey((thomas::Keys)key); }
 		static unsigned short GetLastKey() { return thomas::WindowManager::Instance()->GetGameInput()->GetLastKey(); }
 		static void SetLastKey(unsigned short key) { thomas::WindowManager::Instance()->GetGameInput()->SetLastKey(key); }
+		static System::Char GetLastKeyChar() { return thomas::WindowManager::Instance()->GetGameInput()->GetLastKeyChar(); }
 
 		//Gamepad
 		static bool GetButtonDown(Buttons button) { return thomas::WindowManager::Instance()->GetGameInput()->GetButtonDown((thomas::Input::Buttons)button); }
