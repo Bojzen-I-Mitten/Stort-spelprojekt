@@ -36,6 +36,16 @@ namespace thomas
 				{
 					auto sound = m_clip->GetSound();
 
+					// Sound mode
+					if (m_is3D)
+					{
+						m_clip->GetSound()->setMode(FMOD_3D);
+					}
+					else
+					{
+						m_clip->GetSound()->setMode(FMOD_2D);
+					}
+
 					// Set looping options
 					if (m_looping)
 					{
@@ -63,9 +73,20 @@ namespace thomas
 				{
 					auto sound = clip->GetSound();
 
+					// Sound mode
+					if (m_is3D)
+					{
+						sound->setMode(FMOD_3D);
+					}
+					else
+					{
+						sound->setMode(FMOD_2D);
+					}
+
 					// Set looping options
 					if (looping)
 					{
+						// TODO: set mode for the channel instead of the sound?
 						sound->setMode(FMOD_LOOP_NORMAL);
 						sound->setLoopCount(-1); // Loop repeatedly
 					}
@@ -80,7 +101,7 @@ namespace thomas
 					{
 						// Set channel properties
 						m_channel->setVolume(volume);
-					}
+					}		
 				}
 			}
 
@@ -117,7 +138,6 @@ namespace thomas
 				m_clip = clip;
 			}
 
-			// TODO: expose min and max distance of a sound
 			void SoundComponent::Set3D(bool is3D)
 			{
 				m_is3D = is3D;
@@ -138,6 +158,11 @@ namespace thomas
 			void SoundComponent::SetVolume(float volume)
 			{
 				m_volume = volume;
+
+				if (m_channel != nullptr)
+				{
+					m_channel->setVolume(volume);
+				}
 			}
 
 			void SoundComponent::SetLooping(bool looping)
@@ -217,7 +242,7 @@ namespace thomas
 
 			bool SoundComponent::IsPlaying() const
 			{				
-				if (m_clip != nullptr && m_channel != nullptr)
+				if (m_channel != nullptr)
 				{
 					bool playing = false;
 					m_channel->isPlaying(&playing);

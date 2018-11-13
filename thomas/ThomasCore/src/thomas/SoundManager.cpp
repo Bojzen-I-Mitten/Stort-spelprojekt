@@ -14,7 +14,7 @@ namespace thomas
 		m_studioSystem = nullptr;
 
 		ErrorCheck(FMOD::Studio::System::create(&m_studioSystem));
-		ErrorCheck(m_studioSystem->initialize(32, NULL, NULL, NULL));
+		ErrorCheck(m_studioSystem->initialize(32, NULL, FMOD_INIT_3D_RIGHTHANDED, NULL));
 		ErrorCheck(m_studioSystem->getLowLevelSystem(&m_system));
 	}
 
@@ -26,7 +26,7 @@ namespace thomas
 		if (listener != nullptr)
 		{
 			m_system->set3DListenerAttributes(0, &Vector3ToFmod(listener->m_gameObject->m_transform->GetPosition()), NULL,
-				&Vector3ToFmod(listener->m_gameObject->m_transform->Forward()), &Vector3ToFmod(listener->m_gameObject->m_transform->Up()));
+				&Vector3ToFmod(-listener->m_gameObject->m_transform->Forward()), &Vector3ToFmod(listener->m_gameObject->m_transform->Up()));
 		}
 		
 		ErrorCheck(m_system->update());
