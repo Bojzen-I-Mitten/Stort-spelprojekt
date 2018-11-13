@@ -416,7 +416,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp.lib;BulletCollision.lib;BulletDynamics.lib;DirectXTex.lib;DirectXTK.lib;DirectXTKAudioWin8.lib;Effects11_64.lib;LinearMath.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;BulletCollision.lib;BulletDynamics.lib;DirectXTex.lib;DirectXTK.lib;DirectXTKAudioWin8.lib;Effects11_64.lib;LinearMath.lib;zlib.lib;fmodstudio64_vc.lib;fmod64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
