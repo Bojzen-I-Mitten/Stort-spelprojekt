@@ -4,6 +4,7 @@
 #include "../../SoundManager.hpp"
 #include "../../resource/AudioClip.h"
 #include "../GameObject.h"
+#include "AudioListener.h"
 
 namespace thomas
 {
@@ -39,7 +40,7 @@ namespace thomas
 					if (m_channel != nullptr)
 					{
 						// Set channel properties
-						m_channel->setVolume(m_volume);
+						AdjustVolumeType(m_volume);
 
 						// Sound mode
 						if (m_is3D)
@@ -51,7 +52,7 @@ namespace thomas
 							m_channel->setMode(FMOD_2D);
 						}
 
-						// Set looping options
+						// Looping options
 						if (m_looping)
 						{
 							m_channel->setMode(FMOD_LOOP_NORMAL);
@@ -74,7 +75,7 @@ namespace thomas
 					if (m_channel != nullptr)
 					{
 						// Set channel properties
-						m_channel->setVolume(volume);
+						AdjustVolumeType(volume);
 
 						// Sound mode
 						if (is3D)
@@ -86,7 +87,7 @@ namespace thomas
 							m_channel->setMode(FMOD_2D);
 						}
 
-						// Set looping options
+						// Looping options
 						if (looping)
 						{
 							m_channel->setMode(FMOD_LOOP_NORMAL);
@@ -156,7 +157,7 @@ namespace thomas
 
 				if (m_channel != nullptr)
 				{
-					m_channel->setVolume(volume);
+					AdjustVolumeType(m_volume);
 				}
 			}
 
@@ -194,7 +195,7 @@ namespace thomas
 
 				if (m_channel != nullptr)
 				{
-					m_channel->setMute(mute);
+					m_channel->setMute(m_muted);
 				}
 			}
 
@@ -274,6 +275,30 @@ namespace thomas
 			bool SoundComponent::IsPaused() const
 			{
 				return m_paused;
+			}
+
+			void SoundComponent::AdjustVolumeType(float volume)
+			{
+				auto listener = AudioListener::GetInstance();
+				auto masterVolume = listener->GetMasterVolume();
+				auto musicVolume = listener->GetMusicVolume();
+				auto fxVolume = listener->GetFXVolume();
+				auto voiceVolume = listener->GetVoiceVolume();
+
+				switch (m_type)
+				{
+				case SoundType::Music:
+					m_channel->setVolume(masterVolume * musicVolume * volume);
+					break;
+				case SoundType::Effect:
+					m_channel->setVolume(masterVolume * fxVolume * volume);
+					break;
+				case SoundType::Voice:
+					m_channel->setVolume(masterVolume * voiceVolume * volume);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}

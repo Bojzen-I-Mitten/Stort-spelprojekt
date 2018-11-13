@@ -16,9 +16,6 @@ namespace thomas
 				void OnDisable();
 
 			public:
-				// Note: if we are dealing with a 3D-sound we have to multiply the 
-				// volume factor with minimum distance instead
-				// For 2D, volume is fine
 				void SetMasterVolume(float volume);	
 				void SetMusicVolume(float volume);
 				void SetFXVolume(float volume);

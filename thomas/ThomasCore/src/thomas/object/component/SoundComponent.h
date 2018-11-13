@@ -62,6 +62,9 @@ namespace thomas
 				bool IsMute() const;
 
 			private:
+				void AdjustVolumeType(float volume);
+
+			private:
 				SoundType m_type;
 				FMOD::Channel* m_channel;
 				resource::AudioClip* m_clip;
