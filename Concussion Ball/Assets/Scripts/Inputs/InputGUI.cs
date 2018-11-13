@@ -1,33 +1,32 @@
 ﻿using System.Windows;
-using System.Net;
 using System.Threading;
 using ThomasEngine;
 
-class InputGUI
+class GUIInput
 {
-    public static void AppendIPString(ref string IP, int length)
+    public static void AppendString(ref string _string, int length)
     {
-        if (char.IsNumber(Input.GetLastKeyChar()) || char.IsPunctuation(Input.GetLastKeyChar()))
+        char c = Input.GetLastKeyChar();
+        if (char.IsPunctuation(c) || char.IsLetterOrDigit(c) || char.IsSymbol(c) || char.IsSeparator(c))
         {
-            if (IP.Length < length)
-                IP += Input.GetLastKeyChar();
+            if (_string.Length < length)
+            {
+                _string += Input.GetLastKeyChar();
+            }
         }
         else if (Input.GetKey(Input.Keys.Back))
         {
-            if (IP.Length > 0)
-                IP = IP.Remove(IP.Length - 1);
+            if (_string.Length > 0)
+            {
+                _string = _string.Remove(_string.Length - 1);
+            }
         }
         else if ((Input.GetKey(Input.Keys.LeftControl) || Input.GetKey(Input.Keys.RightControl)) && Input.GetKeyDown(Input.Keys.V))
         {
             string pastedText = TryPaste();
             if (pastedText.Length < length)
             {
-                IPAddress address;
-
-                if (IPAddress.TryParse(pastedText, out address))
-                {
-                    IP = address.ToString();
-                }
+                _string = pastedText;
             }
         }
     }
