@@ -3,7 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
-
+using System.Collections.Generic;
 public class GUIPlayerScore : ScriptComponent
 {
     Camera cam;
@@ -11,7 +11,6 @@ public class GUIPlayerScore : ScriptComponent
 
     public String AmountOfPlayersTeam1 { get; set; }
     public String AmountOfPlayersTeam2 { get; set; }
-    public String Test { get; set; } = "hm";
     public Texture2D PlayerBarTeam1 { get; set; }
     public Texture2D PlayerBarTeam2 { get; set; }
     public Texture2D Team1Bar { get; set; }
@@ -78,14 +77,15 @@ public class GUIPlayerScore : ScriptComponent
 
         for(int i=0;i< AmountOfPlayersInTeam1;i++)
         {
-            PlayerStandardBarTeam1[i] = Canvas.Add(PlayerBarTeam1);
+           
+            PlayerStandardBarTeam1.Add(Canvas.Add(PlayerBarTeam1));
             PlayerStandardBarTeam1[i].scale = Vector2.Zero;
             PlayerStandardBarTeam1[i].color = Color.Red;
             PlayerStandardBarTeam1[i].origin = new Vector2(0, -3.75f-(i*0.75f));
         }
         for (int i = 0; i < AmountOfPlayersInTeam2; i++)
         {
-            PlayerStandardBarTeam2[i] = Canvas.Add(PlayerBarTeam2);
+            PlayerStandardBarTeam2.Add(Canvas.Add(PlayerBarTeam2));
             PlayerStandardBarTeam2[i].scale = Vector2.Zero;
             PlayerStandardBarTeam2[i].color = Color.Blue;
             PlayerStandardBarTeam2[i].origin = new Vector2(-0.84f, -3.75f - (i * 0.75f));
@@ -102,8 +102,8 @@ public class GUIPlayerScore : ScriptComponent
 
     Text[] PlayerstandardText = new Text[2];
     Image[] PlayerStandardbar = new Image[2];
-    Image[] PlayerStandardBarTeam1 = new Image[15];
-    Image[] PlayerStandardBarTeam2 = new Image[15];
+    List<Image> PlayerStandardBarTeam1 = new List<Image>();
+    List<Image> PlayerStandardBarTeam2 = new List<Image>();
     public override void Awake()
     {
 
@@ -149,7 +149,52 @@ public class GUIPlayerScore : ScriptComponent
     }
     void UpdatePlayerBars()
     {
+        if(PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2 || PlayerStandardBarTeam1.Count != AmountOfPlayersInTeam1)
+        { 
+            if(PlayerStandardBarTeam2.Count< AmountOfPlayersInTeam2)
+            {
+                
+                while (PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2)
+                {
+                    int i = PlayerStandardBarTeam2.Count;
+                    PlayerStandardBarTeam2.Add(Canvas.Add(PlayerBarTeam2));
+                    PlayerStandardBarTeam2[i].scale = Vector2.Zero;
+                    PlayerStandardBarTeam2[i].color = Color.Blue;
+                    PlayerStandardBarTeam2[i].origin = new Vector2(-0.84f, -3.75f - (i * 0.75f));
+                }
+            }
+            else if(PlayerStandardBarTeam2.Count > AmountOfPlayersInTeam2)
+            {
+                while (PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2)
+                {
+                    Image tempRef = PlayerStandardBarTeam2[PlayerStandardBarTeam2.Count - 1];
+                    PlayerStandardBarTeam2.RemoveAt(PlayerStandardBarTeam2.Count - 1);
+                    Canvas.Remove(tempRef);
+                }
+            }
 
+            if (PlayerStandardBarTeam1.Count < AmountOfPlayersInTeam1)
+            {
+             
+                while (PlayerStandardBarTeam1.Count != AmountOfPlayersInTeam1)
+                {
+                    int i = PlayerStandardBarTeam1.Count;
+                    PlayerStandardBarTeam1.Add(Canvas.Add(PlayerBarTeam1));
+                    PlayerStandardBarTeam1[i].scale = Vector2.Zero;
+                    PlayerStandardBarTeam1[i].color = Color.Red;
+                    PlayerStandardBarTeam1[i].origin = new Vector2(0, -3.75f - (i * 0.75f));
+                }
+            }
+            else if (PlayerStandardBarTeam1.Count > AmountOfPlayersInTeam1)
+            {
+                while (PlayerStandardBarTeam1.Count != AmountOfPlayersInTeam1)
+                {
+                    Image tempRef = PlayerStandardBarTeam1[PlayerStandardBarTeam1.Count - 1];
+                    PlayerStandardBarTeam1.RemoveAt(PlayerStandardBarTeam1.Count - 1);
+                    Canvas.Remove(tempRef);
+                }
+            }
+        }
     }
 
     public override void Update()
@@ -159,11 +204,13 @@ public class GUIPlayerScore : ScriptComponent
         {
             if (!Toggle)
             {
+                UpdatePlayerBars();
                 DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
                   Toggle = true;
             }
             else
             {
+                UpdatePlayerBars();
                 DisplayBar(Vector2.Zero);
                 Toggle = false;
             }
