@@ -10,7 +10,8 @@ cbuffer LightMatrices
 
 inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
 {
-    return mul(lightMatrixVP, float4(pos, 1.0));
+    return mul(lightMatrixVP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
+    //return mul(THOMAS_MATRIX_VP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
 }
 
 //Texture2DArray ShadowMaps;

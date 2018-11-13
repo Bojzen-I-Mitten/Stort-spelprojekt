@@ -25,6 +25,7 @@ namespace thomas
 		private:
 			std::unique_ptr<resource::Texture2D> m_depthTexture;
 			ID3D11DepthStencilView* m_depthStencilView;
+			D3D11_VIEWPORT m_viewPort;
 
 
 			math::Matrix m_matrixProj;

@@ -193,6 +193,7 @@ namespace thomas
 				auto lights = LightManager::GetLightsCastingShadows();
 				for (auto l : lights)
 				{
+					
 					if (camera)
 						l->UpdateShadowBox(camera);
 					l->BindShadowMapDepthTexture();
@@ -203,8 +204,14 @@ namespace thomas
 						for (auto & perMeshCommand : perMaterialQueue.second)
 						{
 							{
-								PROFILE("DrawShadow")
-								l->DrawShadow(perMeshCommand.mesh);
+								{
+									PROFILE("BindObject")
+									BindObject(perMeshCommand);
+								}
+								{
+									PROFILE("DrawShadow")
+									l->DrawShadow(perMeshCommand.mesh);
+								}
 							}
 						}
 
