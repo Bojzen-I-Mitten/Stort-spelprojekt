@@ -86,7 +86,7 @@ public class CameraMaster : ScriptComponent
         //Set all CAM_STATEs exept GAME to false
         SelectTeam.Canvas.isRendering = false;
         Hud.Canvas.isRendering = false;
-        //ExitMenu.Canvas.isRendering = false;
+        ExitMenu.Canvas.isRendering = false;
         JoinHost.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
 

@@ -43,6 +43,9 @@ public class GUIHostMenu : ScriptComponent
     string _team2 = "Team 2";
     #endregion
 
+    bool InputTeam1Name = false;
+    bool InputTeam2Name = false;
+
     public override void Start()
     {
     }
@@ -163,13 +166,28 @@ public class GUIHostMenu : ScriptComponent
                 Team2TextBox.color = Color.White;
 
                 if (Team1TextBox.Hovered())
-                { 
+                {
+                    InputTeam1Name = true;
+                    InputTeam2Name = false;
                     Team1TextBox.color = Color.Green;
                 }
                 else if (Team2TextBox.Hovered())
                 {
+                    InputTeam1Name = false;
+                    InputTeam2Name = true;
                     Team2TextBox.color = Color.Green;
                 }
+            }
+
+            if (InputTeam1Name)
+            {
+                GUIInput.AppendString(ref _team1, 15);
+                Team1.text = _team1;
+            }
+            if (InputTeam2Name)
+            {
+                GUIInput.AppendString(ref _team2, 15);
+                Team2.text = _team2;
             }
         }
     }

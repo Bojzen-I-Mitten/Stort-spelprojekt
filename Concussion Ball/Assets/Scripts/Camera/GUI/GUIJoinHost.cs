@@ -82,10 +82,10 @@ public class GUIJoinHost : ScriptComponent
     {
         if (Canvas.isRendering)
         {
-            if (TakeIP)
-                InputGUI.AppendIPString(ref IPString, 15);
-            if (TakePort)
-                InputGUI.AppendIPString(ref PortString, 5);
+            //if (TakeIP)
+                //InputGUI.AppendIPString(ref IPString, 15);
+            //if (TakePort)
+                //InputGUI.AppendIPString(ref PortString, 5);
 
             if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {
