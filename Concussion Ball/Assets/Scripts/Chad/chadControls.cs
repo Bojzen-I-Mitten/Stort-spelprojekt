@@ -101,18 +101,18 @@ public class ChadControls : NetworkComponent
 
         Identity.RefreshCache();
 
-        ChargeUpChadSound1 = gameObject.AddComponent<SoundComponent>();
-        ChargeUpChadSound1.clip = ChargeUpSoundClip1;
-        ChargeUpChadSound1.Looping = false;
-        ChargeUpChadSound1.Volume = 0.5f;
-        ChargeUpChadSound1.Is3D = true;
-        ThrowSound1 = gameObject.AddComponent<SoundComponent>();
-        ThrowSound1.clip = ThrowSoundClip1;
-        ThrowSound1.Looping = false;
-        ThrowSound1.Is3D = true;
-        PantingSound = gameObject.AddComponent<SoundComponent>();
-        PantingSound.clip = PantingSoundClip;
-        PantingSound.Is3D = true;
+        //ChargeUpChadSound1 = gameObject.AddComponent<SoundComponent>();
+        //ChargeUpChadSound1.clip = ChargeUpSoundClip1;
+        //ChargeUpChadSound1.Looping = false;
+        //ChargeUpChadSound1.Volume = 0.5f;
+        //ChargeUpChadSound1.Is3D = true;
+        //ThrowSound1 = gameObject.AddComponent<SoundComponent>();
+        //ThrowSound1.clip = ThrowSoundClip1;
+        //ThrowSound1.Looping = false;
+        //ThrowSound1.Is3D = true;
+        //PantingSound = gameObject.AddComponent<SoundComponent>();
+        //PantingSound.clip = PantingSoundClip;
+        //PantingSound.Is3D = true;
     }
 
     public void DeactivateCamera()
@@ -661,13 +661,12 @@ public class ChadControls : NetworkComponent
         }
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
-            PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupablea)
+
+            PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
+            if (pickupable)
             {
                 Debug.LogError("Why Denny!?");
             }
-
-            PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
