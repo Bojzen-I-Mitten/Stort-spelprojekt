@@ -49,13 +49,31 @@ public class ThomasTrain : Powerup
 
     public override void Start()
     {
-        base.Start();
+        base.Awake();
+        emitterFire = gameObject.AddComponent<ParticleEmitter>();
+        emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
+        emitterSpark = gameObject.AddComponent<ParticleEmitter>();
+
+        soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentChargeUp.Looping = false;
+        soundComponentChargeUp.Is3D = true;
+        soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel.Looping = false;
+        soundComponentTravel.Is3D = true;
+        soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion.Looping = false;
+        soundComponentExplosion.Is3D = true;
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
 
         m_throwable = true; // change depending on power-up
         emitterFire.Texture = fireTexture;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
-        emitterFire.MinSize = 2.0f;
-        emitterFire.MaxSize = 3.0f;
+        emitterFire.MinSize = 4.0f;
+        emitterFire.MaxSize = 6.0f;
         emitterFire.EndSize = 0.0f;
         emitterFire.MinLifeTime = 0.1f;
         emitterFire.MaxLifeTime = 1.7f;
@@ -67,12 +85,12 @@ public class ThomasTrain : Powerup
         emitterFire.EndSpeed = -6.0f;
         emitterFire.DistanceFromSphereCenter = 0.0f;
         emitterFire.SpawnAtEdge = true;
-        emitterFire.Radius = 1.9f;
+        emitterFire.Radius = 5.2f;
 
         emitterThomasFace.Texture = thomasTexture;
-        emitterThomasFace.MinSize = 2.5f;
-        emitterThomasFace.MaxSize = 2.5f;
-        emitterThomasFace.EndSize = 2.0f;
+        emitterThomasFace.MinSize = 5.0f;
+        emitterThomasFace.MaxSize = 5.0f;
+        emitterThomasFace.EndSize = 3.0f;
         emitterThomasFace.MaxLifeTime = 1.5f;
         emitterThomasFace.MinLifeTime = 1.5f;
         emitterThomasFace.MinRotationSpeed = 5.0f;
@@ -82,7 +100,7 @@ public class ThomasTrain : Powerup
         emitterThomasFace.EndSpeed = 0;
 
         emitterSpark.Texture = sparkTexture;
-        emitterSpark.MinSize = 0.8f;
+        emitterSpark.MinSize = 0.6f;
         emitterSpark.MaxSize = 1.4f;
         emitterSpark.EndSize = 0.02f;
         emitterSpark.MaxLifeTime = 0.5f;
@@ -93,7 +111,7 @@ public class ThomasTrain : Powerup
         emitterSpark.MinSpeed = 10;
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
-        emitterSpark.Radius = 3.7f;
+        emitterSpark.Radius = 6.7f;
 
         soundComponentChargeUp.Looping = false;
         
@@ -116,6 +134,7 @@ public class ThomasTrain : Powerup
     public override void Cleanup()
     {
         base.Cleanup();
+        playChargeUpSound = false;
         soundComponentChargeUp.Stop();
     }
     
@@ -129,29 +148,24 @@ public class ThomasTrain : Powerup
             soundComponentChargeUp.Play();
         }
     }
+
+
+    public override void OnThrow()
+    {
+        soundComponentTravel.Play();
+        Debug.Log("throw");
+    }
+
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 force)
     {
-        base.Throw(camPos, force * 2.0f);
-        soundComponentTravel.Play();
+        base.Throw(camPos + Vector3.Normalize(force)*2, force);
+        
 
         m_rigidBody.UseGravity = false;
-        StartCoroutine(Scale());
+        transform.scale *= 8.0f;
     }
-    
-
-    IEnumerator Scale()
-    {
-        transform.scale *= 2.0f;
-        yield return new WaitForSeconds(0.1f);
-        float t = 2.0f;
-        while (t > 0.0f)
-        {
-            transform.scale += new Vector3(1.0f) * Time.DeltaTime;
-            t -= Time.DeltaTime;
-            yield return null;
-        }
-    }
+   
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -170,8 +184,10 @@ public class ThomasTrain : Powerup
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
     }
@@ -184,7 +200,7 @@ public class ThomasTrain : Powerup
         soundComponentTravel.Stop();
 
         emitterThomasFace.EmitOneShot(1);
-        emitterFire.EmitOneShot(60);
+        emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
         soundComponentExplosion.PlayOneShot();

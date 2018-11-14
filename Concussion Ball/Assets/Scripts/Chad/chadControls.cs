@@ -151,6 +151,7 @@ public class ChadControls : NetworkComponent
         }
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
+
     }
 
     #region Ragdoll handling
@@ -171,7 +172,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
-        CanBeTackled = false;
+        CanBeTackled = true;//false;
         Ragdoll.EnableRagdoll();
     }
 
@@ -215,14 +216,13 @@ public class ChadControls : NetworkComponent
         {
             LocalActivateRagdoll(duration, force, State == STATE.DIVING);
         }
-
+        Ragdoll.Smack();
     }
 
     public void RPCStartRagdoll(float duration, Vector3 force, bool diveTackle)
     {
         if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
         {
-            ChadHud.Instance.HideHeldObjectText();
             if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
             {
                 Debug.Log("remove");
@@ -375,7 +375,7 @@ public class ChadControls : NetworkComponent
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
-        PickedUpObject.SetChargeTime(ChargeTime);
+        
         if (PickedUpObject)
         {
             PickedUpObject.StopEmitting();
@@ -417,7 +417,7 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-                CurrentVelocity.y -= Math.Abs(xStep * CurrentVelocity.y / MaxSpeed); //TODO:Fix this when diagonal running is added
+               // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
@@ -435,10 +435,11 @@ public class ChadControls : NetworkComponent
                 break;
         }
 
-        if(State != STATE.DIVING)
-            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), transform.rotation);
+        if (State != STATE.DIVING)
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
+
     }
 
     private int Slope(float delta, int absLimit)
@@ -472,11 +473,11 @@ public class ChadControls : NetworkComponent
             PickedUpObject = null;
         }
 
-        if(rBody)
-        {
-            rBody.SetPosition(transform.position, true);
-            rBody.SetRotation(transform.rotation, true);
-        }
+        //if(rBody)
+        //{
+        //    rBody.SetPosition(transform.position, true);
+        //    rBody.SetRotation(transform.rotation, true);
+        //}
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -580,8 +581,8 @@ public class ChadControls : NetworkComponent
 
     private void ThrowObject(Vector3 camPos, Vector3 direction)
     {
+        PickedUpObject.SetChargeTime(0.0f);
         PickedUpObject.Throw(camPos, direction);
-        ChadHud.Instance.HideHeldObjectText();
     }
 
     public void RPCPickup(int id)
@@ -644,23 +645,23 @@ public class ChadControls : NetworkComponent
 
     public override void OnTriggerEnter(Collider collider)
     {
-
-        PickupableObject pickupablea = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
-        if (pickupablea)
+        if (isOwner)
         {
-            Debug.LogError("Why denny!?");
-        }
-
-        PickupableObject pickupable = collider.transform.parent.gameObject.GetComponent<PickupableObject>();
-        if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
-        {
-            if (pickupable.transform.parent == null)
+            PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
+            if (pickupablea)
             {
-                TakeOwnership(pickupable.gameObject);
-                SendRPC("RPCPickup", pickupable.ID);
-                RPCPickup(pickupable.ID);
+                Debug.LogError("Why Denny!?");
+            }
 
-                ChadHud.Instance.ShowHeldObjectText(pickupable.gameObject.Name);
+            PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
+            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
+            {
+                if (pickupable.transform.parent == null)
+                {
+                    TakeOwnership(pickupable.gameObject);
+                    SendRPC("RPCPickup", pickupable.ID);
+                    RPCPickup(pickupable.ID);
+                }
             }
         }
     }

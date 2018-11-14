@@ -32,16 +32,12 @@ namespace ThomasEngine
 		void OnDestroy() override;
 
 
-		void SetPosition(Vector3 position, bool forcePosition)
+		void DisableRotationSync()
 		{
-			((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(position), forcePosition);
+			((thomas::object::component::Rigidbody*)nativePtr)->DisableRotationSync();
 		}
 
-		void SetRotation(Quaternion rotation, bool forceRotation)
-		{
-			((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(rotation), forceRotation);
-		}
-
+		
 		void AddTorque(Vector3 torque)
 		{
 			((thomas::object::component::Rigidbody*)nativePtr)->AddTorque(thomas::math::Vector3(torque.x, torque.y, torque.z));

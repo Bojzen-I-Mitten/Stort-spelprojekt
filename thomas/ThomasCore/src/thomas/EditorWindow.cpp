@@ -43,7 +43,7 @@ namespace thomas
 
 	void EditorWindow::Present()
 	{
-		this->Bind();
+		this->BindBackBuffer();
 
 		if (ImGui_ImplDx11_Valid() && this->m_guiData)
 			ImGui_ImplDX11_RenderDrawData(this->m_guiData);
