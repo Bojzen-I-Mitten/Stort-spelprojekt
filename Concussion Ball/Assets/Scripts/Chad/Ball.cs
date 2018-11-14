@@ -218,31 +218,41 @@ public class Ball : PickupableObject
         StartCoroutine(CleanTimer());
     }
 
+    public override void OnDrop()
+    {
+        base.OnDrop();
+        StartCoroutine(PickupDelay());
+    }
+    IEnumerator PickupDelay()
+    {
+        PickupCollider.enabled = false; PickupCollider.enabled = false;
+        yield return new WaitForSecondsRealtime(0.5f);
+        PickupCollider.enabled = true;
+    }
+
     public override void Pickup(ChadControls chad, Transform hand)
     {
         base.Pickup(chad, hand);
-        m_pickupable = true;
     }
 
 
+    public override void Disable()
+    {
+        base.Disable();
+    }
+
+    IEnumerator ReturnToMiddle()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
+        m_rigidBody.Position = Vector3.Zero;
+        m_rigidBody.Rotation = Quaternion.Identity;
+        m_rigidBody.LinearVelocity = Vector3.Zero;
+        m_rigidBody.AngularVelocity = Vector3.Zero;
+    }
     public override void Reset()
     {
         base.Reset();
-        if (isOwner)
-        {
-            if (m_rigidBody != null)
-            {
-                m_rigidBody.enabled = false;
-                //m_rigidBody.SetPosition(Vector3.Zero, true);
-                //m_rigidBody.SetRotation(Quaternion.Identity, true);
-                m_rigidBody.LinearVelocity = Vector3.Zero;
-                m_rigidBody.AngularVelocity = Vector3.Zero;
-                transform.position = Vector3.Zero;
-                transform.rotation = Quaternion.Identity;
-                m_rigidBody.enabled = true;
-            }
-        }
-
+        StartCoroutine(ReturnToMiddle());
     }
 
     private IEnumerator CleanTimer()

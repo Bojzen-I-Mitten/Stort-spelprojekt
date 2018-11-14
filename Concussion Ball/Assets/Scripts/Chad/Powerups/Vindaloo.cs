@@ -20,9 +20,9 @@ public class Vindaloo : Powerup
     public float ExplosionRadius { get; set; } = 5.0f;
     // public float ExplosionForce { get; set; } = 200.0f;
     public float ExplosionForce = 200.0f;
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
 
         m_throwable = true; // change depending on power-up
 

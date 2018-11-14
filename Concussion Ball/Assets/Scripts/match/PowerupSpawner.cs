@@ -70,17 +70,20 @@ public class PowerupSpawner : NetworkComponent
                 {
                     spawnedPowerup.activeSelf = true;
                     Powerup powerup = spawnedPowerup.GetComponent<Powerup>();
+                    spawnedPowerup.GetComponent<NetworkIdentity>().Owner = true;
                     powerup.Reset();
+                    MatchSystem.instance.SendRPC(powerup.ID, "Reset");
+
+                    powerup.m_rigidBody.Position = transform.position;
+                    powerup.m_rigidBody.Rotation = transform.rotation;
+                    powerup.transform.position = transform.position;
+                    powerup.transform.rotation = transform.rotation;
+
                     powerup.spawner = this;
                     timeLeftUntilSpawn = spawnInterval;
                     hasPowerup = true;
-
-
-                    spawnedPowerup.transform.position = transform.position;
-                    spawnedPowerup.transform.rotation = transform.rotation;
-
                     spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
-                    
+
                 }
                 else
                 {
