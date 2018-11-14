@@ -92,21 +92,17 @@ public class CameraMaster : ScriptComponent
         Hud.Canvas.isRendering = false;
         ExitMenu.Canvas.isRendering = false;
         JoinHost.Canvas.isRendering = false;
+        MainMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
-
 
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
-                SelectTeam.Canvas.isRendering = false;
-                Hud.Canvas.isRendering = false;
-                JoinHost.Canvas.isRendering = false;
                 MainMenu.Canvas.isRendering = true;
                 break;
 
             case CAM_STATE.JOIN_HOST:
                 JoinHost.Canvas.isRendering = true;
-                MainMenu.Canvas.isRendering = false;
                 break;
             case CAM_STATE.SELECT_TEAM:
                 SelectTeam.Canvas.isRendering = true;

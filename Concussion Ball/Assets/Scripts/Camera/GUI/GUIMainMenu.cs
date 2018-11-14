@@ -5,10 +5,6 @@ using ThomasEngine;
 
 public class GUIMainMenu : ScriptComponent
 {
-    public Texture2D OptionsBtn { get; set; }
-    public Texture2D ExitBtn { get; set; }
-    public Texture2D PlayBtn { get; set; }
-    public Texture2D CreditsBtn { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
@@ -35,45 +31,45 @@ public class GUIMainMenu : ScriptComponent
         if (!Play.Hovered())
         {
             Play.color = Color.FloralWhite;
-            Play.scale = new Vector2(2.5f);
+            //Play.scale = new Vector2(2.5f);
         }
         else
         {
             Play.color = Color.IndianRed;
-            Play.scale = new Vector2(3f);
+            //Play.scale = new Vector2(3f);
         }
 
         if (!Options.Hovered())
         {
             Options.color = Color.FloralWhite;
-            Options.scale = new Vector2(2.5f);
+            //Options.scale = new Vector2(2.5f);
         }
         else
         {
             Options.color = Color.IndianRed;
-            Options.scale = new Vector2(3f);
+            //Options.scale = new Vector2(3f);
         }
 
         if (!Credits.Hovered())
         {
             Credits.color = Color.FloralWhite;
-            Credits.scale = new Vector2(2.5f);
+            //Credits.scale = new Vector2(2.5f);
         }
         else
         {
             Credits.color = Color.IndianRed;
-            Credits.scale = new Vector2(3f);
+            //Credits.scale = new Vector2(3f);
         }
 
         if (!Exit.Hovered())
         {
             Exit.color = Color.FloralWhite;
-            Exit.scale = new Vector2(2.5f);
+            //Exit.scale = new Vector2(2.5f);
         }
         else
         {
             Exit.color = Color.IndianRed;
-            Exit.scale = new Vector2(3.0f);
+            //Exit.scale = new Vector2(3.0f);
         }
 
 
@@ -93,7 +89,7 @@ public class GUIMainMenu : ScriptComponent
 
         Play = Canvas.Add("Play");
         Play.position = new Vector2(0.425f, 0.11f);
-        Play.scale = new Vector2(2.5f);
+        Play.scale = new Vector2(1.5f);
         Play.interactable = true;
         Play.depth = 0.9f;
         Play.text = "Play";
@@ -101,7 +97,7 @@ public class GUIMainMenu : ScriptComponent
 
         Options = Canvas.Add("Options");
         Options.position = new Vector2(0.425f, 0.21f);
-        Options.scale = new Vector2(2.5f);
+        Options.scale = new Vector2(1.5f);
         Options.interactable = true;
         Options.depth = 0.9f;
         Options.text = "Options";
@@ -109,7 +105,7 @@ public class GUIMainMenu : ScriptComponent
 
         Credits = Canvas.Add("Credits");
         Credits.position = new Vector2(0.425f, 0.31f);
-        Credits.scale = new Vector2(2.5f);
+        Credits.scale = new Vector2(1.5f);
         Credits.interactable = true;
         Credits.depth = 0.9f;
         Credits.text = "Credits";
@@ -117,7 +113,7 @@ public class GUIMainMenu : ScriptComponent
 
         Exit = Canvas.Add("Exit");
         Exit.position = new Vector2(0.425f, 0.41f);
-        Exit.scale = new Vector2(2.5f);
+        Exit.scale = new Vector2(1.5f);
         Exit.interactable = true;
         Exit.depth = 0.9f;
         Exit.text = "Exit";
