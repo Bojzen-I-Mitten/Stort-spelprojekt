@@ -84,19 +84,19 @@ namespace thomas
 				/*m_drawCalls = 0;
 				m_totalVertexCount = 0;
 	
-				utils::D3D::Instance()->GetDeviceContext()->Begin(m_queryDisjoint[m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextDeffered()->Begin(m_queryDisjoint[m_frameQuery]);
 				Timestamp(GTS_BEGIN_FRAME);*/
 			}
 
 			void GpuProfiler::Timestamp(GTS gts)
 			{
-				//utils::D3D::Instance()->GetDeviceContext()->End(m_queryTimestamp[gts][m_frameQuery]);
+				//utils::D3D::Instance()->GetDeviceContextDeffered()->End(m_queryTimestamp[gts][m_frameQuery]);
 			}
 
 			void GpuProfiler::EndFrame()
 			{
 				//Timestamp(GTS_END_FRAME);
-				//utils::D3D::Instance()->GetDeviceContext()->End(m_queryDisjoint[m_frameQuery]);
+				//utils::D3D::Instance()->GetDeviceContextDeffered()->End(m_queryDisjoint[m_frameQuery]);
 				//++m_frameQuery &= 1; //Fancy 0/1 toggle.
 			}
 
@@ -108,7 +108,7 @@ namespace thomas
 
 			void GpuProfiler::WaitForDataAndUpdate()
 			{
-				//ID3D11DeviceContext* context = utils::D3D::Instance()->GetDeviceContext();
+				//ID3D11DeviceContext* context = utils::D3D::Instance()->GetDeviceContextDeffered();
 				//if (m_frameCollect < 0)
 				//{
 				//	// Haven't run enough frames yet to have data
@@ -140,40 +140,35 @@ namespace thomas
 				//	return;
 				//}
 
-				/*UINT64 timestampPrev;
-				if (context->GetData(m_queryTimestamp[GTS_BEGIN_FRAME][iFrame], &timestampPrev, sizeof(UINT64), 0) != S_OK)
-				{
-					LOG("Couldn't retrieve timestamp query data for GTS " << GTS_BEGIN_FRAME);
-					return;
-				}*/
+				//UINT64 timestampPrev;
+				//if (context->GetData(m_queryTimestamp[GTS_BEGIN_FRAME][iFrame], &timestampPrev, sizeof(UINT64), 0) != S_OK)
+				//{
+				//	LOG("Couldn't retrieve timestamp query data for GTS " << GTS_BEGIN_FRAME);
+				//	return;
+				//}
 
-				/*for (GTS gts = GTS(GTS_BEGIN_FRAME + 1); gts < GTS_MAX; gts = GTS(gts + 1))
-				{
-					UINT64 timestamp;
-					if (context->GetData(m_queryTimestamp[gts][iFrame], &timestamp, sizeof(UINT64), 0) != S_OK)
-					{
-						LOG("Couldn't retrieve timestamp query data for GTS " << gts);
-						return;
-					}
+				//for (GTS gts = GTS(GTS_BEGIN_FRAME + 1); gts < GTS_MAX; gts = GTS(gts + 1))
+				//{
+				//	UINT64 timestamp;
+				//	if (context->GetData(m_queryTimestamp[gts][iFrame], &timestamp, sizeof(UINT64), 0) != S_OK)
+				//	{
+				//		LOG("Couldn't retrieve timestamp query data for GTS " << gts);
+				//		return;
+				//	}
 
-					m_timings[gts] = float(timestamp - timestampPrev) / float(timestampDisjoint.Frequency);
-					timestampPrev = timestamp;
-
-					m_avgTimingsTotal[gts] += m_timings[gts];
-				}*/
+				//	m_timings[gts] = float(timestamp - timestampPrev) / float(timestampDisjoint.Frequency);
+				//	timestampPrev = timestamp;
 
 				//	m_avgTimingsTotal[gts] += m_timings[gts];
 				//}
 
-					/*m_frameCountAvg = 0;
-					m_beginAvg = ThomasTime::GetElapsedTime();*/
-				//}
+				//m_frameCountAvg = 0;
+				//m_beginAvg = ThomasTime::GetElapsedTime();
 			}
 
 			float profiling::GpuProfiler::GetAverageTiming(GTS gts)
 			{
-				/*return m_avgTimings[gts];*/
-
+				//return m_avgTimings[gts];
 				return 0.0f;
 			}
 
@@ -183,14 +178,12 @@ namespace thomas
 				for (GTS gts = GTS_BEGIN_FRAME; gts < GTS_END_FRAME; gts = GTS(gts + 1))
 					drawTotal += GetAverageTiming(gts);
 				return drawTotal;*/
-				
 				return 0.0f;
 			}
 
 			float profiling::GpuProfiler::GetFrameTime()
 			{
-				/*return GetDrawTotal() + GetAverageTiming(GTS_END_FRAME);*/
-
+				//return GetDrawTotal() + GetAverageTiming(GTS_END_FRAME);
 				return 0.0f;
 			}
 
@@ -199,31 +192,26 @@ namespace thomas
 				/*DXGI_QUERY_VIDEO_MEMORY_INFO info;
 				if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
 					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);*/
-
-				return m_memoryUsage;
+				return 0.0f;
 			}
 
 			float profiling::GpuProfiler::GetTotalMemory()
 			{
-				/*return m_totalMemory;*/
-
+				//return m_totalMemory;
 				return 0.0f;
 			}
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()
 			{
-				/*return m_drawCalls;*/
-
+				//return m_drawCalls;
 				return 0;
 			}
 
 			int profiling::GpuProfiler::GetVertexCount()
 			{
-				/*return m_totalVertexCount;*/
-
+				//return m_totalVertexCount;
 				return 0;
 			}
-
 		}
 	}
 }
