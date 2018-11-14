@@ -8,7 +8,6 @@ public class GUIHostMenu : ScriptComponent
 
     public Texture2D ColorSliderTexture { get; set; }
     public Texture2D SliderKnobTexture { get; set; }
-    public Texture2D newBG { get; set; }
     public Texture2D TextBoxTexture { get; set; }
     public Texture2D WhiteBoxTexture { get; set; }
     public Font Font { get; set; }
@@ -40,7 +39,6 @@ public class GUIHostMenu : ScriptComponent
     Image Team2ColorSlider;
     Image Team2SliderKnob;
     Image Team2BG;
-    Image BG;
 
     bool btnDown;
     string _team1 = "Team 1";
@@ -63,9 +61,6 @@ public class GUIHostMenu : ScriptComponent
         Canvas = Camera.AddCanvas();
 
         btnDown = false;
-
-        BG = Canvas.Add(newBG);
-        BG.depth = 0.9f;
 
         HostBtn = Canvas.Add("Host Game");
         HostBtn.color = Color.Black;
