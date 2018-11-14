@@ -40,8 +40,8 @@ public class CameraMaster : ScriptComponent
     public override void Start()
     {
         instance = this;
-        BG = Canvas.Add(Background);
-        BG.interactable = true;
+        //BG = Canvas.Add(Background);
+        //BG.interactable = true;
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");

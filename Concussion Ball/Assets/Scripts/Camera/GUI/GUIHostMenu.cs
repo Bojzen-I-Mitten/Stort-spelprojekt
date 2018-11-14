@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using ThomasEngine;
 
 public class GUIHostMenu : ScriptComponent
@@ -15,12 +14,17 @@ public class GUIHostMenu : ScriptComponent
     public Font Font { get; set; }
     public int NrTeams { get; set; } = 2;
 
-    //public Vector2 TextBox1Pos { get; set; } = Vector2.Zero;
-    //public Vector2 TextBox1Scale { get; set; } = Vector2.One;
-    //public Vector4 HostBGColor { get; set; } = Vector4.One;
+    //public Vector2 HostBtnPos { get; set; } = Vector2.Zero;
+    //public Vector2 HostBtnScale { get; set; } = Vector2.One;
+    //public Vector2 ExitBtnPos { get; set; } = Vector2.Zero;
+    //public Vector2 ExitBtnScale { get; set; } = Vector2.One;
+
+    Text HostBtn;
+    Text ExitBtn;
 
     #region Host Setings
     Image HostBg;
+
     #endregion
 
     #region Teams
@@ -46,6 +50,9 @@ public class GUIHostMenu : ScriptComponent
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
 
+    private bool hasConnected = false;
+    public string PortString;
+
     public override void Start()
     {
     }
@@ -62,11 +69,12 @@ public class GUIHostMenu : ScriptComponent
 
         #region Host Setings
 
-        if(WhiteBoxTexture != null)
+        if (WhiteBoxTexture != null)
         {
             HostBg = Canvas.Add(WhiteBoxTexture);
             HostBg.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            HostBg.scale = new Vector2(6.4f, 1.44f); ;
+            HostBg.scale = new Vector2(6.4f, 1.44f);
+            HostBg.depth = 0.6f;
         }
 
         #endregion
@@ -78,13 +86,13 @@ public class GUIHostMenu : ScriptComponent
             Team1BG.position = new Vector2(0.0f, 0.4f);
             Team1BG.scale = new Vector2(2, 2.2f);
             Team1BG.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            Team1BG.depth = 0.5f;
+            Team1BG.depth = 0.7f;
 
             Team2BG = Canvas.Add(WhiteBoxTexture);
             Team2BG.position = new Vector2(0.67f, 0.4f);
             Team2BG.scale = new Vector2(2.2f, 2.4f);
             Team2BG.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            Team2BG.depth = 0.5f;
+            Team2BG.depth = 0.7f;
         }
 
         Team1 = Canvas.Add(_team1);
@@ -137,6 +145,19 @@ public class GUIHostMenu : ScriptComponent
             Team2SliderKnob.color = HSLColor(0d);
         }
         #endregion
+
+        HostBtn = Canvas.Add("Host Game");
+        HostBtn.color = Color.Green;
+        HostBtn.position = new Vector2(0.47f, 0.33f);
+        HostBtn.font = Font;
+        HostBtn.interactable = true;
+
+        ExitBtn = Canvas.Add("Exit");
+        ExitBtn.color = Color.Green;
+        ExitBtn.position = new Vector2(0.32f, 0.33f);
+        ExitBtn.font = Font;
+        ExitBtn.interactable = true;
+
     }
 
     public override void Update()
@@ -176,6 +197,16 @@ public class GUIHostMenu : ScriptComponent
                     InputTeam1Name = false;
                     InputTeam2Name = true;
                     Team2TextBox.color = Color.Green;
+                }
+            }
+
+            HostBtn.color = Color.Black;
+            if (HostBtn.Hovered())
+            {
+                HostBtn.color = Color.Green;
+                if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                {
+                    CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
                 }
             }
 
