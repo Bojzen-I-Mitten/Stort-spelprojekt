@@ -2,11 +2,10 @@ using System;
 using System.Collections;
 using ThomasEngine;
 using LiteNetLib;
+using LiteNetLib.Utils;
 
 public class GUIJoinHost : ScriptComponent
 {
-    public Texture2D JoinBtn { get; set; }
-    public Texture2D HostBtn { get; set; }
     public Texture2D TextBox { get; set; }
     public Font TextFont { get; set; }
 
@@ -24,14 +23,15 @@ public class GUIJoinHost : ScriptComponent
 
     Image TextBoxIP;
     Image TextBoxPort;
-    Image Join;
-    Image Host;
 
+    Text Join;
+    Text Host;
     Text IPText;
     Text PortText;
     Text IP;
     Text Port;
     Text ConnectingText;
+
     public bool GoToTeamSelect;
     IEnumerator test;
 
@@ -81,14 +81,15 @@ public class GUIJoinHost : ScriptComponent
     public override void Update()
     {
         if (TakeIP)
-            InputGUI.AppendIPString(ref IPString, 15);
+            GUIInput.AppendString(ref IPString, 30);
         if (TakePort)
-            InputGUI.AppendIPString(ref PortString, 5);
+            GUIInput.AppendString(ref PortString, 5);
 
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             if (TextBoxIP.Clicked())
             {
+                ConnectingText.text = "";
                 TakePort = false;
                 TakeIP = true;
                 TextBoxPort.color = Color.Black;
@@ -96,14 +97,26 @@ public class GUIJoinHost : ScriptComponent
             }
             else if (TextBoxPort.Clicked())
             {
+                ConnectingText.text = "";
                 TakeIP = false;
                 TakePort = true;
                 TextBoxIP.color = Color.Black;
                 TextBoxPort.color = Color.Green;
             }
-            else if (Join.Clicked())
+            else if (Join.Hovered())
             {
-                if (IPString != "" && PortString != "")
+                ConnectingText.text = "";
+                System.Net.IPAddress ipaddress;
+                try
+                {
+                    ipaddress = LiteNetLib.NetUtils.ResolveAddress(IPString);
+                }
+                catch (Exception e)
+                {
+                    ConnectingText.text = e.Message;
+                    return;
+                }
+                if (PortString != "")
                 {
                     if (IPString == "127.0.0.1")
                         MatchSystem.instance.LocalPort = 0;
@@ -129,8 +142,9 @@ public class GUIJoinHost : ScriptComponent
                         TextBoxPort.color = Color.Red;
                 }
             }
-            else if (Host.Clicked())
+            else if (Host.Hovered())
             {
+                ConnectingText.text = "";
                 if (PortString != "")
                 {
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
@@ -175,73 +189,78 @@ public class GUIJoinHost : ScriptComponent
         Canvas = Camera.AddCanvas();
 
         IPText = Canvas.Add(IPString);
-        IPText.position = new Vector2(0.1f, 0.11f);
+        IPText.origin = new Vector2(0, 0.5f);
+        IPText.position = new Vector2(0.1f, 0.11875f);
         IPText.color = Color.Black;
         IPText.depth = 0.9f;
 
-
         PortText = Canvas.Add(PortString);
-        PortText.position = new Vector2(0.1f, 0.21f);
+        PortText.origin = new Vector2(0, 0.5f);
+        PortText.position = new Vector2(0.1f, 0.21875f);
         PortText.color = Color.Black;
         PortText.depth = 0.9f;
 
-
-        IP = Canvas.Add("IP, needed to join");
+        IP = Canvas.Add("IP");
+        IP.origin = new Vector2(0, 0.5f);
         IP.position = new Vector2(0.1f, 0.07f);
         IP.scale = new Vector2(0.7f);
         IP.color = Color.Black;
         IP.depth = 0.9f;
 
-
-        Port = Canvas.Add("PORT, needed for both host and join");
+        Port = Canvas.Add("Port");
+        Port.origin = new Vector2(0, 0.5f);
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
         Port.color = Color.Black;
         Port.depth = 0.9f;
 
-
-        if (JoinBtn != null)
-        {
-            Join = Canvas.Add(JoinBtn);
-            Join.position = new Vector2(0.325f, 0.11f);
-            Join.scale = new Vector2(0.25f);
-            Join.interactable = true;
-            Join.depth = 0.9f;
-
-        }
-
-        if (HostBtn != null)
-        {
-            Host = Canvas.Add(HostBtn);
-            Host.position = new Vector2(0.325f, 0.21f);
-            Host.scale = new Vector2(0.25f);
-            Host.interactable = true;
-            Host.depth = 0.9f;
-
-        }
-
         if (TextBox != null)
         {
             TextBoxIP = Canvas.Add(TextBox);
+            TextBoxIP.origin = new Vector2(0, 0.5f);
             TextBoxIP.position = new Vector2(0.1f);
-            TextBoxIP.scale = new Vector2(0.7f, 0.5f);
+            TextBoxIP.scale = new Vector2(1, 0.5f);
             TextBoxIP.color = Color.Black;
             TextBoxIP.interactable = true;
             TextBoxIP.depth = 0.9f;
 
-
             TextBoxPort = Canvas.Add(TextBox);
+            TextBoxPort.origin = new Vector2(0, 0.5f);
             TextBoxPort.position = new Vector2(0.1f, 0.2f);
-            TextBoxPort.scale = new Vector2(0.7f, 0.5f);
+            TextBoxPort.scale = new Vector2(1, 0.5f);
             TextBoxPort.color = Color.Black;
             TextBoxPort.interactable = true;
             TextBoxPort.depth = 0.9f;
-
         }
+
+        if (TextBoxIP != null)
+        {
+            Join = Canvas.Add("Join");
+            Join.origin = new Vector2(0, 0.5f);
+            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x, 0.11875f);
+            Join.interactable = true;
+            Join.depth = 0.9f;
+            Join.color = Color.Black;
+            Join.font = TextFont;
+        }
+
+        if (TextBoxPort != null)
+        {
+            Host = Canvas.Add("Host");
+            Host.origin = new Vector2(0, 0.5f);
+            Host.position = new Vector2(TextBoxPort.position.x +TextBoxPort.size.x, 0.21875f);
+            Host.interactable = true;
+            Host.depth = 0.9f;
+            Host.color = Color.Black;
+            Host.font = TextFont;
+        }
+
         ConnectingText = Canvas.Add("");
+        ConnectingText.origin = new Vector2(0, 0.5f);
         ConnectingText.color = Color.Black;
         ConnectingText.depth = 0;
         ConnectingText.font = TextFont;
+        ConnectingText.position = new Vector2(0.5f, 0.11875f);
     }
 
     public void ClearImagesAndText()

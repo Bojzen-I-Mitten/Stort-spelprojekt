@@ -6,6 +6,8 @@
 #include "../../Window.h"
 #include "../../WindowManager.h"
 #include "Canvas.h"
+#include "../../Common.h"
+#include "../../ThomasCore.h"
 
 namespace thomas
 {
@@ -57,11 +59,11 @@ namespace thomas
 				Canvas* canvas;
 				DirectX::SpriteEffects effect;
 
-				virtual void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale) = 0;
+				virtual void Draw(SpriteBatch* sb, Viewport vp) = 0;
 				virtual Vector2 PixelSize() = 0;
 				Vector2 Size()
 				{
-					return scale * canvas->GetViewportScale() * PixelSize();
+					return PixelSize() / Vector2(canvas->GetViewport().width, canvas->GetViewport().height);
 				}
 
 				bool Hovered()
@@ -71,13 +73,10 @@ namespace thomas
 						return false;
 
 					Vector2 size = PixelSize();
-
-					Vector2 res = Vector2(canvas->GetViewport().width, canvas->GetViewport().height);
-
-					GUIRect rect{	position.x * canvas->GetViewport().width,														//left
-									position.x * canvas->GetViewport().width + size.x * scale.x * canvas->GetViewportScale().x,		//right
-									position.y * canvas->GetViewport().height,														//top
-									position.y * canvas->GetViewport().height + size.y * scale.y * canvas->GetViewportScale().y };	//bot
+					GUIRect rect{	position.x * canvas->GetViewport().width,				//left
+									position.x * canvas->GetViewport().width + size.x,		//right
+									position.y * canvas->GetViewport().height,				//top
+									position.y * canvas->GetViewport().height + size.y };	//bot
 					
 					return rect.Intersect(window->GetInput()->GetMousePosition());
 				}
@@ -101,15 +100,14 @@ namespace thomas
 				Font* font;
 				std::string text;
 
-				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
+				void Draw(SpriteBatch* sb, Viewport vp)
 				{
-					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), scale * vpScale, origin, color, rotation, effect, depth);
+					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale, rotation, effect, depth);
 				}
 
 				Vector2 PixelSize()
 				{
-					Vector2 size = font->GetTextSize(text);
-					return size;
+					return font->GetTextSize(text) * scale;
 				}
 			};
 
@@ -122,19 +120,14 @@ namespace thomas
 
 				Texture2D* texture;
 
-				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
+				void Draw(SpriteBatch* sb, Viewport vp)
 				{
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
-				}
-
-				Vector2 Size()
-				{
-					return scale * canvas->GetViewportScale() * PixelSize();
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale, effect, depth);
 				}
 
 				Vector2 PixelSize()
 				{
-					return Vector2(texture->GetWidth(), texture->GetHeight());
+					return Vector2(texture->GetWidth(), texture->GetHeight()) * scale;
 				}
 			};
 		}
