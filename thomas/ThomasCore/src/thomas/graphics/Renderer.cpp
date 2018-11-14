@@ -162,10 +162,8 @@ namespace thomas
 			return m_shaders.GetStandardShader();
 		}
 
-
 		void Renderer::BindObject(render::RenderCommand &rC)
 		{
-			thomas::resource::shaderproperty::ShaderProperty* prop;
 			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, rC.worldMatrix.Transpose());
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
 
@@ -195,24 +193,23 @@ namespace thomas
 				{
 					
 					if (camera)
-						l->UpdateShadowBox(camera);
+						l->UpdateShadowBox(editor::EditorCamera::Instance()->GetCamera());
+					//math::Matrix viewProjMatrix = perCameraQueue.second.m_frameData.viewMatrix * perCameraQueue.second.m_frameData.projectionMatrix;
+					//m_shaders.SetGlobalMatrix("lightMatrixVP", editor::EditorCamera::Instance()->GetCamera()->GetViewProjMatrix().Transpose());
 					l->BindShadowMapDepthTexture();
+					
 					PROFILE("ShadowDrawObjectsPerCamera")
 					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
 					{
 						PROFILE("ShadowDrawObjects")
 						for (auto & perMeshCommand : perMaterialQueue.second)
 						{
+							
 							{
-								{
-									PROFILE("BindObject")
-									BindObject(perMeshCommand);
-								}
-								{
-									PROFILE("DrawShadow")
-									l->DrawShadow(perMeshCommand.mesh);
-								}
+								PROFILE("DrawShadow")
+								l->DrawShadow(perMeshCommand);
 							}
+							
 						}
 
 					}

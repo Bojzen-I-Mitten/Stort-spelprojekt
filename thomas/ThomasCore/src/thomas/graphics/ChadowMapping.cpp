@@ -5,6 +5,8 @@
 #include "../resource/Material.h"
 #include "../resource/texture/Texture2D.h"
 #include "Mesh.h"
+#include "render/Frame.h"
+#include "RenderConstants.h"
 
 namespace thomas
 {
@@ -47,7 +49,7 @@ namespace thomas
 
 		}
 
-		void ShadowMap::Update(object::component::Transform* lightTransform, object::component::Camera* camera)
+		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)
 		{
 			//https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/
 
@@ -89,15 +91,16 @@ namespace thomas
 			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z/* - nearClipOffset*/, -mins.z);
 			m_matrixProj = camera->GetProjMatrix();//math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);
 
-			m_matrixVP = m_matrixView * m_matrixProj;
+			m_matrixVP = camera->GetViewProjMatrix();//m_matrixView * m_matrixProj;
 
 			
 		}
 
-		void ShadowMap::Draw(Mesh * mesh)
+		void ShadowMap::Draw(render::RenderCommand& renderCommand)
 		{
-
-			s_material->Draw(mesh);
+			s_material->SetMatrix(THOMAS_MATRIX_WORLD, renderCommand.worldMatrix.Transpose());
+			s_material->ApplyProperty(THOMAS_MATRIX_WORLD);
+			s_material->Draw(renderCommand.mesh);
 		}
 
 		void ShadowMap::Bind()
@@ -110,6 +113,8 @@ namespace thomas
 			s_material->Bind();
 			s_material->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
 			s_material->ApplyProperty("lightMatrixVP");
+			
+			//m_shaders.SetGlobalMatrix
 		}
 
 	}

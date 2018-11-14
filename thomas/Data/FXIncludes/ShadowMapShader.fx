@@ -1,6 +1,7 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
 #include <ThomasLights.hlsl>
+#include <ThomasCG.hlsl>
 
 DepthStencilState EnableDepth
 {
@@ -31,6 +32,7 @@ v2f vert(appdata_thomas v)
 
 
     o.vertex = WorldToLightClipPos(posL);
+    //o.vertex = ThomasObjectToClipPos(posL);
 
     return o;
 }

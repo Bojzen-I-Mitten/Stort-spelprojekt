@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "../../graphics/Mesh.h"
 #include "Camera.h"
+#include "../../graphics/render/Frame.h"
 
 
 
@@ -64,7 +65,7 @@ namespace thomas
 
 			void LightComponent::UpdateShadowBox(Camera* camera)
 			{
-				m_shadowMap.Update(m_gameObject->m_transform, camera);
+				m_shadowMap.UpdateShadowBox(m_gameObject->m_transform, camera);
 			}
 
 
@@ -73,9 +74,9 @@ namespace thomas
 				m_shadowMap.Bind();
 			}
 
-			void LightComponent::DrawShadow(graphics::Mesh * mesh)
+			void LightComponent::DrawShadow(graphics::render::RenderCommand renderCommand)
 			{
-				m_shadowMap.Draw(mesh);
+				m_shadowMap.Draw(renderCommand);
 			}
 
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()

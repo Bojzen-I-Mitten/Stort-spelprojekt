@@ -12,7 +12,9 @@ LightComponent class
 
 namespace thomas
 {
-	namespace graphics { class Mesh; }
+	namespace graphics {
+		class Mesh; namespace render { struct RenderCommand; }
+	}
 	namespace object 
 	{
 		namespace component
@@ -38,7 +40,7 @@ namespace thomas
 			public: // Get / Set
 				void UpdateShadowBox(Camera* camera);
 				void BindShadowMapDepthTexture();
-				void DrawShadow(graphics::Mesh* mesh);
+				void DrawShadow(graphics::render::RenderCommand renderCommand);
 				
 
 				graphics::LightManager::LightStruct GetData();

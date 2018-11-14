@@ -9,7 +9,9 @@ namespace thomas
 	namespace object { namespace component { class Camera; class Transform; } }
 	namespace graphics
 	{
+		namespace render { struct RenderCommand; }
 		class Mesh;
+
 
 		class ShadowMap
 		{
@@ -18,8 +20,9 @@ namespace thomas
 			ShadowMap();
 			~ShadowMap();
 
-			void Update(object::component::Transform* lightTransform, object::component::Camera* camera);
-			void Draw(Mesh* mesh);
+			void UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera);
+			
+			void Draw(render::RenderCommand& renderCommand);
 			void Bind();
 
 		private:
