@@ -57,8 +57,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Camera\ChadCam.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
+    <Compile Include="Assets\Scripts\Camera\ChadCam.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIMainMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIExitMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />

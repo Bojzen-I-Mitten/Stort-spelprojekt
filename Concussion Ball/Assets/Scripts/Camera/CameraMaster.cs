@@ -5,8 +5,9 @@ public enum CAM_STATE
     JOIN_HOST,
     SELECT_TEAM,
     GAME,
-    NUMSTATES,
-    EXIT_MENU
+    EXIT_MENU,
+    MAIN_MENU,
+    NUMSTATES
 }
 
 public class CameraMaster : ScriptComponent
@@ -17,6 +18,7 @@ public class CameraMaster : ScriptComponent
 
     Camera Camera;
     GUIJoinHost JoinHost;
+    GUIMainMenu MainMenu;
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;
     ChadCam ChadCam;
@@ -24,8 +26,7 @@ public class CameraMaster : ScriptComponent
     ChadHud Hud;
 
     public Canvas Canvas;
-    Image BG;
-    public CAM_STATE State = CAM_STATE.JOIN_HOST;
+    public CAM_STATE State;
 
 
 
@@ -39,8 +40,9 @@ public class CameraMaster : ScriptComponent
     public override void Start()
     {
         instance = this;
-        BG = Canvas.Add(Background);
-        BG.interactable = true;
+        State = CAM_STATE.MAIN_MENU;
+        //  BG = Canvas.Add(Background);
+        // BG.interactable = true;
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
@@ -48,7 +50,9 @@ public class CameraMaster : ScriptComponent
         JoinHost = gameObject.GetComponent<GUIJoinHost>();
         if (JoinHost == null)
             Debug.Log("Camera Master cannot find GUI script for join/host");
-
+        MainMenu = gameObject.GetComponent<GUIMainMenu>();
+        if (MainMenu == null)
+            Debug.Log("Camera master could not find GUI script for main menu");
         SelectTeam = gameObject.GetComponent<GUISelectTeam>();
         if (SelectTeam == null)
             Debug.Log("Camera Master cannot find GUI script for select");
@@ -82,9 +86,14 @@ public class CameraMaster : ScriptComponent
         Hud.Canvas.isRendering = false;
         ExitMenu.Canvas.isRendering = false;
         JoinHost.Canvas.isRendering = false;
+        MainMenu.Canvas.isRendering = false;
 
         switch (State)
         {
+            case CAM_STATE.MAIN_MENU:
+                MainMenu.Canvas.isRendering = true;
+                break;
+
             case CAM_STATE.JOIN_HOST:
                 JoinHost.Canvas.isRendering = true;
                 break;

@@ -26,6 +26,7 @@ public class GUIJoinHost : ScriptComponent
 
     Text Join;
     Text Host;
+    Text Back;
     Text IPText;
     Text PortText;
     Text IP;
@@ -65,8 +66,6 @@ public class GUIJoinHost : ScriptComponent
             Host.interactable = true;
             hasConnected = true;
         }
-
-
     }
 
     public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -80,6 +79,10 @@ public class GUIJoinHost : ScriptComponent
 
     public override void Update()
     {
+        Join.color = Color.White;
+        Host.color = Color.White;
+        Back.color = Color.White;
+
         if (TakeIP)
             GUIInput.AppendString(ref IPString, 30);
         if (TakePort)
@@ -87,6 +90,10 @@ public class GUIJoinHost : ScriptComponent
 
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
+            if (Back.Clicked())
+            {
+                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            }
             if (TextBoxIP.Clicked())
             {
                 ConnectingText.text = "";
@@ -169,6 +176,21 @@ public class GUIJoinHost : ScriptComponent
                 TextBoxPort.color = Color.Black;
             }
         }
+        else
+        {
+            if(Join.Hovered())
+            {
+                Join.color = Color.Red;
+            }
+            if(Host.Hovered())
+            {
+                Host.color = Color.Red;
+            }
+            if(Back.Hovered())
+            {
+                Back.color = Color.Red;
+            }
+        }
 
         if (!Disabled)
         {
@@ -191,27 +213,27 @@ public class GUIJoinHost : ScriptComponent
         IPText = Canvas.Add(IPString);
         IPText.origin = new Vector2(0, 0.5f);
         IPText.position = new Vector2(0.1f, 0.11875f);
-        IPText.color = Color.Black;
+        IPText.color = Color.White;
         IPText.depth = 0.9f;
 
         PortText = Canvas.Add(PortString);
         PortText.origin = new Vector2(0, 0.5f);
         PortText.position = new Vector2(0.1f, 0.21875f);
-        PortText.color = Color.Black;
+        PortText.color = Color.White;
         PortText.depth = 0.9f;
 
         IP = Canvas.Add("IP");
         IP.origin = new Vector2(0, 0.5f);
         IP.position = new Vector2(0.1f, 0.07f);
         IP.scale = new Vector2(0.7f);
-        IP.color = Color.Black;
+        IP.color = Color.White;
         IP.depth = 0.9f;
 
         Port = Canvas.Add("Port");
         Port.origin = new Vector2(0, 0.5f);
         Port.position = new Vector2(0.1f, 0.17f);
         Port.scale = new Vector2(0.7f);
-        Port.color = Color.Black;
+        Port.color = Color.White;
         Port.depth = 0.9f;
 
         if (TextBox != null)
@@ -220,7 +242,6 @@ public class GUIJoinHost : ScriptComponent
             TextBoxIP.origin = new Vector2(0, 0.5f);
             TextBoxIP.position = new Vector2(0.1f);
             TextBoxIP.scale = new Vector2(1, 0.5f);
-            TextBoxIP.color = Color.Black;
             TextBoxIP.interactable = true;
             TextBoxIP.depth = 0.9f;
 
@@ -228,7 +249,6 @@ public class GUIJoinHost : ScriptComponent
             TextBoxPort.origin = new Vector2(0, 0.5f);
             TextBoxPort.position = new Vector2(0.1f, 0.2f);
             TextBoxPort.scale = new Vector2(1, 0.5f);
-            TextBoxPort.color = Color.Black;
             TextBoxPort.interactable = true;
             TextBoxPort.depth = 0.9f;
         }
@@ -240,7 +260,7 @@ public class GUIJoinHost : ScriptComponent
             Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x, 0.11875f);
             Join.interactable = true;
             Join.depth = 0.9f;
-            Join.color = Color.Black;
+            Join.color = Color.White;
             Join.font = TextFont;
         }
 
@@ -248,16 +268,24 @@ public class GUIJoinHost : ScriptComponent
         {
             Host = Canvas.Add("Host");
             Host.origin = new Vector2(0, 0.5f);
-            Host.position = new Vector2(TextBoxPort.position.x +TextBoxPort.size.x, 0.21875f);
+            Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x, 0.21875f);
             Host.interactable = true;
             Host.depth = 0.9f;
-            Host.color = Color.Black;
+            Host.color = Color.White;
             Host.font = TextFont;
         }
 
+        Back = Canvas.Add("Back");
+        Back.position = new Vector2(0.325f, 0.26f);
+        Back.scale = new Vector2(0.25f);
+        Back.interactable = true;
+        Back.depth = 0.9f;
+        Back.color = Color.White;
+        Back.font = TextFont;
+
         ConnectingText = Canvas.Add("");
         ConnectingText.origin = new Vector2(0, 0.5f);
-        ConnectingText.color = Color.Black;
+        ConnectingText.color = Color.White;
         ConnectingText.depth = 0;
         ConnectingText.font = TextFont;
         ConnectingText.position = new Vector2(0.5f, 0.11875f);
@@ -267,6 +295,7 @@ public class GUIJoinHost : ScriptComponent
     {
         Canvas.Remove(Join);
         Canvas.Remove(Host);
+        Canvas.Remove(Back);
         Canvas.Remove(TextBoxIP);
         Canvas.Remove(TextBoxPort);
         Canvas.Remove(ConnectingText);
