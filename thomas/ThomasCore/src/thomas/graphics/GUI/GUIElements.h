@@ -72,11 +72,13 @@ namespace thomas
 					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
 						return false;
 
+					Viewport canvasViewport = canvas->GetViewport();
 					Vector2 size = PixelSize();
-					GUIRect rect{	position.x * canvas->GetViewport().width,				//left
-									position.x * canvas->GetViewport().width + size.x,		//right
-									position.y * canvas->GetViewport().height,				//top
-									position.y * canvas->GetViewport().height + size.y };	//bot
+					float left = position.x * canvasViewport.width - size.x * origin.x;
+					float right = left + size.x;
+					float top = position.y * canvasViewport.height - size.y * origin.y;
+					float bottom = top + size.y;
+					GUIRect rect{ left, right, top, bottom };
 					
 					return rect.Intersect(window->GetInput()->GetMousePosition());
 				}
