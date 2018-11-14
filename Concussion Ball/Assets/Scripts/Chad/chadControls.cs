@@ -442,28 +442,38 @@ public class ChadControls : NetworkComponent
     {
         float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
         float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
+
+        float diagonalModifier = 1.0f;
+
         switch (State)
         {
 
             case STATE.CHADING:
-                // if moving forward
+                // Moving forward
                 if (Direction.z > 0)
                 {
-                    //Direction.x = 0; // don't allow for strafing
+                    //Direction.x = 0; // comment back if we don't want to allow forward diagonal movement
+                    if(Direction.x != 0)
+                    {
+                        diagonalModifier = 0.5f; // fix more accurately later
+                    }
                     Direction.y = 0;
+
+                    // Started to move
                     if (CurrentVelocity.y == 0)
                         CurrentVelocity.y = modifiedBaseSpeed;
                 }
-                else if (Direction.z < 0) //if walking backwards
-                    CurrentVelocity.y = -modifiedBaseSpeed * 0.75f;
+                // Walking backwards
+                else if (Direction.z < 0) 
+                    CurrentVelocity.y = -modifiedBaseSpeed * 0.75f * diagonalModifier;
 
-                if(OnGround())
-                    CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
+                if(OnGround() && Direction.z >= 0) // as to not allow acceleration mid air
+                    CurrentVelocity.y += Direction.z * Acceleration * diagonalModifier * Time.DeltaTime;
 
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
 
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * diagonalModifier;
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 break;
             case STATE.THROWING:
