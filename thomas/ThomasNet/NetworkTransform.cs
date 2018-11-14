@@ -222,6 +222,7 @@ namespace ThomasEngine.Network
         {
             if (targetRigidbody)
             {
+                writer.Put(targetRigidbody.enabled);
                 if (!targetRigidbody.enabled)
                     WriteTransform(writer);
                 else
@@ -237,7 +238,6 @@ namespace ThomasEngine.Network
                 prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
             }
         }
-
         #endregion
         #region Read
         public override void OnRead(NetPacketReader reader, bool initialState)
@@ -296,6 +296,7 @@ namespace ThomasEngine.Network
             if (isOwner || !targetRigidbody)
             {
                 //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
+                reader.GetBool();
                 reader.GetVector3();
                 reader.GetQuaternion();
                 reader.GetVector3();
@@ -306,7 +307,7 @@ namespace ThomasEngine.Network
                 reader.GetBool();
                 return;
             }
-
+            targetRigidbody.enabled = reader.GetBool();
             TargetSyncPosition = reader.GetVector3();
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();

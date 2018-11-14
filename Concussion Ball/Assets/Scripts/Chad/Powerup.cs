@@ -18,7 +18,7 @@ public class Powerup : PickupableObject
     {
         base.Awake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-        //m_chargeTimeCurrent = 4.0f;
+        Disable();
     }
 
     public override void OnEnable()
@@ -111,6 +111,7 @@ public class Powerup : PickupableObject
                 writer.Put(-1);
 
             writer.Put(activated);
+
         }
 
 
@@ -127,6 +128,7 @@ public class Powerup : PickupableObject
             if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
             {
                 spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+                Reset();
             }
             activated = reader.GetBool();
         }
@@ -151,6 +153,12 @@ public class Powerup : PickupableObject
     {
         RPCRemove();
         SendRPC("RPCRemove");
+    }
+
+    public override void Disable()
+    {
+        base.Disable();
+        activated = false;
     }
 
     public override void Reset()

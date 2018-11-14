@@ -27,7 +27,6 @@ public class PowerupManager : ScriptComponent
             for(int i=0; i < PoolSize; i++)
             {
                 GameObject powerup = GameObject.Instantiate(prefab);
-                powerup.activeSelf = false;
                 pool.Add(powerup);
             }
             powerupPool.Add(pool);
@@ -62,8 +61,8 @@ public class PowerupManager : ScriptComponent
 
     public void RecyclePowerup(Powerup powerup)
     {
+        powerup.Disable();
         powerup.gameObject.activeSelf = false;
-
     }
 
     public void ResetPowerups()

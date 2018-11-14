@@ -169,12 +169,6 @@ public class PickupableObject : NetworkComponent
    public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         writer.Put(chargeTimeCurrent);
-        if (initialState)
-        {
-            writer.Put(PickupCollider.enabled);
-            int syncMode = (int)gameObject.GetComponent<NetworkTransform>().SyncMode;
-            writer.Put(syncMode);
-        }
         return true;
     }
 
@@ -183,22 +177,9 @@ public class PickupableObject : NetworkComponent
         if (isOwner)
         {
             reader.GetFloat();
-            if (initialState)
-            {
-                reader.GetBool();
-                reader.GetBool();
-                reader.GetInt();
-            }
             return;
         }
         chargeTimeCurrent = reader.GetFloat();
-        if (initialState)
-        {
-
-            PickupCollider.enabled = reader.GetBool();
-            NetworkTransform.TransformSyncMode syncMode = (NetworkTransform.TransformSyncMode)reader.GetInt();
-            gameObject.GetComponent<NetworkTransform>().SyncMode = syncMode;
-        }
 
     }
 
@@ -209,13 +190,23 @@ public class PickupableObject : NetworkComponent
 
     }
 
+    virtual public void Disable()
+    {
+        PickupCollider.enabled = false;
+        gameObject.activeSelf = false;
+        m_rigidBody.enabled = false;
+        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
+        gameObject.activeSelf = false;
+    }
+
     virtual public void Reset()
     {
         RPCDrop();
         transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;
         _Chad = null;
+        PickupCollider.enabled = false;
         PickupCollider.enabled = true;
-        m_rigidBody.IgnoreNextTransformUpdate();
+        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
     }
 }

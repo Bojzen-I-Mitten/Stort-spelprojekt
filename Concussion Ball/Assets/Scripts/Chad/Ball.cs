@@ -220,11 +220,13 @@ public class Ball : PickupableObject
 
     public override void OnDrop()
     {
+        base.OnDrop();
         StartCoroutine(PickupDelay());
     }
     IEnumerator PickupDelay()
     {
-        yield return new WaitForSecondsRealtime(0.1f);
+        PickupCollider.enabled = false; PickupCollider.enabled = false;
+        yield return new WaitForSecondsRealtime(0.5f);
         PickupCollider.enabled = true;
     }
 
@@ -234,16 +236,23 @@ public class Ball : PickupableObject
     }
 
 
-    public override void Reset()
+    public override void Disable()
     {
-        base.Reset();
+        base.Disable();
+    }
 
+    IEnumerator ReturnToMiddle()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
         m_rigidBody.Position = Vector3.Zero;
         m_rigidBody.Rotation = Quaternion.Identity;
         m_rigidBody.LinearVelocity = Vector3.Zero;
         m_rigidBody.AngularVelocity = Vector3.Zero;
-        
-
+    }
+    public override void Reset()
+    {
+        base.Reset();
+        StartCoroutine(ReturnToMiddle());
     }
 
     private IEnumerator CleanTimer()

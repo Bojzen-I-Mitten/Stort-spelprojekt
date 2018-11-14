@@ -640,7 +640,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnTriggerEnter(Collider collider)
     {
-        if (isOwner)
+        if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupablea)
