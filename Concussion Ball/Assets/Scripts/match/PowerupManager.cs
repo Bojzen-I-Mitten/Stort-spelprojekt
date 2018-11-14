@@ -10,7 +10,7 @@ public class PowerupManager : ScriptComponent
 
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
     public int NextPowerupID = 1000;
-    public int PoolSize { get; set; } = 5;
+    public int PoolSize { get; set; } = 10;
     public override void Awake()
     {
         spawnPoints = Object.GetObjectsOfType<PowerupSpawner>();

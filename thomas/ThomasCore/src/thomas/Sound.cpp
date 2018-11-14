@@ -105,17 +105,17 @@ namespace thomas
 	{
 		SoundInfo info;
 		info.soundEffect = std::make_unique<SoundEffect>(s_audioEngine.get(), CA2W(file.c_str()));
-		info.soundEffectInstance = info.soundEffect->CreateInstance();
+		info.soundEffectInstance = info.soundEffect->CreateInstance(SoundEffectInstance_Use3D);
 
 		s_waves.insert(std::make_pair(name, std::move(info)));
 	}
 
-	void Sound::Play(const std::string& name, float volume)
+	void Sound::Play(const std::string& name, float volume, float pan)
 	{
 		// Play a oneshot
 		if (!s_waves.empty())
 		{
-			GetSoundInfo(name).soundEffect->Play(volume, 0.f, 0.f);
+			GetSoundInfo(name).soundEffect->Play(volume, 0.f, pan);
 		}
 	}
 

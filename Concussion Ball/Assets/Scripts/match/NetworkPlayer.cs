@@ -16,7 +16,8 @@ public class NetworkPlayer : NetworkComponent
 
     public override void Awake()
     {
-        Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
+        if(Team == null)
+            Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
     }
 
     public override void Start()
@@ -53,6 +54,8 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
+            if(Team != null)
+                mat?.SetColor("color", Team.Color);
         }
 
     }
@@ -80,6 +83,9 @@ public class NetworkPlayer : NetworkComponent
             transform.LookAt(new Vector3(0, transform.position.y, 0));
             gameObject.GetComponent<ChadControls>().Reset();
         }
+
+        CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
+        CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
     }
 
     IEnumerator EnableRigidbody()
