@@ -128,7 +128,6 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        Debug.Log(DivingRotation);
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -139,8 +138,13 @@ public class ChadControls : NetworkComponent
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
-
-
+                if (Landed && !OnGround())
+                {
+                    Landed = false;
+                    DivingRotation = this.gameObject.transform.rotation;
+                }
+                else if (!Landed && OnGround() && JumpingTimer > 0.1f)
+                    Landed = true;
             }
             StateMachine();
         }
@@ -313,6 +317,7 @@ public class ChadControls : NetworkComponent
             Diving = DivingCoroutine();
             StartCoroutine(Diving);
             DivingTimer = 0.0f;
+            DivingRotation = this.gameObject.transform.rotation;
         }
         else if (Input.GetKeyDown(Input.Keys.Space))
         {
@@ -321,6 +326,7 @@ public class ChadControls : NetworkComponent
                 JumpingTimer = 0.0f;
                 Jumping = true;
                 Landed = false;
+                DivingRotation = this.gameObject.transform.rotation;
                 CurrentVelocity.y = BaseSpeed;
                 rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
                 rBody.AddForce(new Vector3(0, 450, 0), Rigidbody.ForceMode.Impulse);
@@ -330,6 +336,7 @@ public class ChadControls : NetworkComponent
                 JumpingTimer = 0.0f;
                 Jumping = false;
                 Landed = false;
+                DivingRotation = this.gameObject.transform.rotation;
                 CurrentVelocity.y = BaseSpeed;
                 rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
                 rBody.AddForce(new Vector3(0, 350, 0), Rigidbody.ForceMode.Impulse);
@@ -466,7 +473,9 @@ public class ChadControls : NetworkComponent
                 break;
         }
 
-        if (State != STATE.DIVING)
+        //Debug.Log("Landed: " + Landed);
+
+        if (State != STATE.DIVING && Landed)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingRotation);
