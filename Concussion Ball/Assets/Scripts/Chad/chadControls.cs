@@ -73,7 +73,6 @@ public class ChadControls : NetworkComponent
 
     public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 7;
-
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;
     private bool Jumping = false;
@@ -83,7 +82,7 @@ public class ChadControls : NetworkComponent
     IEnumerator Diving = null;
 
     public PickupableObject PickedUpObject;
-    private float xStep { get { return Input.GetMouseX()/** Time.ActualDeltaTime*/; } }
+    private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
 
     public override void Start()
     {
@@ -141,7 +140,7 @@ public class ChadControls : NetworkComponent
                 AirHandling();
 
                 //Accelerate fake gravity as it felt too low, playtest
-                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f)
+                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
                     rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
             }
             StateMachine();
@@ -184,7 +183,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
-        CanBeTackled = true;
+        CanBeTackled = true;//false;
         Ragdoll.EnableRagdoll();
     }
 
@@ -256,19 +255,6 @@ public class ChadControls : NetworkComponent
         }
     }
     #endregion
-
-    public void OnDisconnect()
-    {
-        if (PickedUpObject)
-        {
-            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
-                (PickedUpObject as Powerup).Remove();
-            else
-                PickedUpObject.Drop();
-        }
-
-    }
-
     public bool OnGround()
     {
         // Shoots ray down and checks if Chads feet are in air or not
@@ -283,6 +269,17 @@ public class ChadControls : NetworkComponent
         if(JumpingTimer > 0.1f)
             Landed = true;
         return true;
+    }
+    public void OnDisconnect()
+    {
+        if (PickedUpObject)
+        {
+            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
+                (PickedUpObject as Powerup).Remove();
+            else
+                PickedUpObject.Drop();
+        }
+
     }
 
     #region Input handling
@@ -416,10 +413,8 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
-       
         SendRPC("RPCResetThrow");
         RPCResetThrow();
-
     }
     #endregion
 
@@ -501,7 +496,7 @@ public class ChadControls : NetworkComponent
         if(Direction.z != 0)
             Direction.x = 0;
 
-        rBody.DisableRotationSync();
+        //rBody.IgnoreNextTransformUpdate();
     }
 
     private int Slope(float delta, int absLimit)
@@ -535,11 +530,6 @@ public class ChadControls : NetworkComponent
             PickedUpObject = null;
         }
 
-        //if(rBody)
-        //{
-        //    rBody.SetPosition(transform.position, true);
-        //    rBody.SetRotation(transform.rotation, true);
-        //}
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -548,7 +538,7 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        Animations.RPCResetTimer(0); // missing network sync
+        Animations.RPCResetTimer(0);
         float timer = 1.5f;
         while (timer > 0.0f)
         {
@@ -709,7 +699,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnTriggerEnter(Collider collider)
     {
-        if (isOwner)
+        if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupablea)
@@ -718,7 +708,7 @@ public class ChadControls : NetworkComponent
             }
 
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
+            if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {

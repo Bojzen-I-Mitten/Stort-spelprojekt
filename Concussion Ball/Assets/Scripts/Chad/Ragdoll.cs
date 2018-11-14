@@ -71,6 +71,7 @@ public class Ragdoll : ScriptComponent
         // Load the ragdoll impact sound
         RagdollSound = gameObject.GetComponent<SoundComponent>();
         identity = gameObject.GetComponent<NetworkIdentity>();
+
     }
     #region Utility functions
 
@@ -189,7 +190,8 @@ public class Ragdoll : ScriptComponent
 
     public void Smack()
     {
-        RagdollSound.PlayOneShot();
+        if(RagdollSound)
+            RagdollSound.PlayOneShot();
     }
 
     public void EnableRagdoll()
@@ -204,7 +206,7 @@ public class Ragdoll : ScriptComponent
         }
 
         // Play the ragdoll sound
-        if(identity.Owner)
+        if(identity.Owner && RagdollSound)
             RagdollSound.PlayOneShot();
 
         //enable all GameObjects
@@ -682,7 +684,7 @@ public class Ragdoll : ScriptComponent
         if (RagdollEnabled)
         {
 
-            if (ImpactSpine.GetActive && identity.Owner)
+            if (ImpactSpine.GetActive && identity.Owner && RagdollSound)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
                 RagdollSound.PlayOneShot();
