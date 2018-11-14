@@ -138,14 +138,10 @@ public class ChadControls : NetworkComponent
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
-                if (Landed && !OnGround())
-                {
-                    Landed = false;
-                    DivingRotation = this.gameObject.transform.rotation;
-                }
-                else if (!Landed && OnGround() && JumpingTimer > 0.1f)
-                    Landed = true;
-                else if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f)
+                AirHandling();
+
+                //Accelerate fake gravity as it felt too low, playtest
+                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f)
                     rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
             }
             StateMachine();
@@ -275,7 +271,7 @@ public class ChadControls : NetworkComponent
 
     public bool OnGround()
     {
-        // Friction checks, no friction when Chad is in air
+        // Shoots ray down and checks if Chads feet are in air or not
         Vector3 footPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 0.1f/*- 0.001f*/, gameObject.transform.position.z);
         RaycastHit hit;
         Physics.Raycast(footPosition, Vector3.Down, out hit);
@@ -344,11 +340,6 @@ public class ChadControls : NetworkComponent
                 rBody.AddForce(new Vector3(0, 350, 0), Rigidbody.ForceMode.Impulse);
             }
         }
-
-        //No random in-air y-directional velocity
-        if (!OnGround() && rBody.LinearVelocity.y > 0 && Landed)
-            rBody.LinearVelocity = new Vector3(rBody.LinearVelocity.x, 0.0f, rBody.LinearVelocity.z);
-
     }
 
     private void HandleMouseInput()
@@ -432,6 +423,21 @@ public class ChadControls : NetworkComponent
     }
     #endregion
 
+    private void AirHandling()
+    {
+        //if (Landed && !OnGround())
+        //{
+        //    Landed = false;
+        //    DivingRotation = this.gameObject.transform.rotation;
+        //}
+        //else if (!Landed && OnGround() && JumpingTimer > 0.1f)
+        //    Landed = true;
+
+        //No random in-air y-directional velocity
+        if (!OnGround() && rBody.LinearVelocity.y > 0 && Landed)
+            rBody.LinearVelocity = new Vector3(rBody.LinearVelocity.x, 0.0f, rBody.LinearVelocity.z);
+    }
+
     private void StateMachine()
     {
         float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
@@ -440,15 +446,16 @@ public class ChadControls : NetworkComponent
         {
 
             case STATE.CHADING:
-                if (Direction.z > 0) // if moving forward
+                // if moving forward
+                if (Direction.z > 0)
                 {
-                    Direction.x = 0; // don't allow for strafing
+                    //Direction.x = 0; // don't allow for strafing
                     Direction.y = 0;
                     if (CurrentVelocity.y == 0)
                         CurrentVelocity.y = modifiedBaseSpeed;
                 }
                 else if (Direction.z < 0) //if walking backwards
-                    CurrentVelocity.y = -modifiedBaseSpeed / 2.0f;
+                    CurrentVelocity.y = -modifiedBaseSpeed * 0.75f;
 
                 if(OnGround())
                     CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
@@ -465,7 +472,7 @@ public class ChadControls : NetworkComponent
                 
                 break;
             case STATE.DIVING:
-                Direction = Vector3.Zero;
+                Direction = Vector3.Zero; 
                 CurrentVelocity.x = 0;
                 break;
             case STATE.RAGDOLL:
@@ -475,12 +482,14 @@ public class ChadControls : NetworkComponent
                 break;
         }
 
-        //Debug.Log("Landed: " + Landed);
-
         if (State != STATE.DIVING && Landed)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
         else
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingRotation);
+
+        //Temporary animation fix, without this no animation will play when moving diagonally
+        if(Direction.z != 0)
+            Direction.x = 0;
 
         rBody.DisableRotationSync();
     }
@@ -609,6 +618,7 @@ public class ChadControls : NetworkComponent
 
     #endregion
 
+    #region Throwing stuff
     private void ChargeObject()
     {
         ChargeTime += Time.DeltaTime;
@@ -648,6 +658,7 @@ public class ChadControls : NetworkComponent
         else
             return false;
     }
+    #endregion
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
