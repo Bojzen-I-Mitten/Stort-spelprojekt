@@ -72,7 +72,7 @@ namespace thomas
 				void SetPosition(math::Vector3 position);
 				void SetRotation(math::Quaternion rotation);
 
-				void DisableRotationSync();
+				void IgnoreNextTransformUpdate();
 
 			public:
 				float GetMass() const;
@@ -113,7 +113,7 @@ namespace thomas
 				bool m_useGravity;
 				float m_bounciness;
 				bool m_dirty;
-				bool m_syncRotation;
+				bool m_ignoreTransform;
 			};
 		}
 	}

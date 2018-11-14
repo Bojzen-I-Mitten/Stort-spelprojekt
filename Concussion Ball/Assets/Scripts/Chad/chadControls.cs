@@ -21,10 +21,9 @@ public class ChadControls : NetworkComponent
     public STATE State { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
+    
 
     #region Throwing stuff
-    [Category("Throwing")]
-    public float maxChargeTime { get; set; } = 4.0f;
     [Category("Throwing")]
     private float ThrowForce;
     [Category("Throwing")]
@@ -49,7 +48,8 @@ public class ChadControls : NetworkComponent
     public float MaxSpeed { get; private set; } = 10.0f;
 
     public float DiveTimer { get; private set; } = 0f;
-    public Quaternion DivingDirection = Quaternion.Identity;
+    private bool Landed = false;
+    public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
     #endregion
 
@@ -74,6 +74,9 @@ public class ChadControls : NetworkComponent
     public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
+    private float JumpingTimer = 0.0f;
+    private bool Jumping = false;
+
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
@@ -127,13 +130,18 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
+            JumpingTimer += Time.DeltaTime;
+
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL)
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
+                AirHandling();
 
-
+                //Accelerate fake gravity as it felt too low, playtest
+                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
+                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
             }
             StateMachine();
         }
@@ -152,6 +160,9 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
+        rBody.Friction = 0.5f;
+        if (!OnGround())
+            rBody.Friction = 0.0f;
     }
 
     #region Ragdoll handling
@@ -244,7 +255,21 @@ public class ChadControls : NetworkComponent
         }
     }
     #endregion
+    public bool OnGround()
+    {
+        // Shoots ray down and checks if Chads feet are in air or not
+        Vector3 footPosition = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 0.1f/*- 0.001f*/, gameObject.transform.position.z);
+        RaycastHit hit;
+        Physics.Raycast(footPosition, Vector3.Down, out hit);
 
+        if (hit.distance >= 0.2f || hit.distance == 0)
+        {
+            return false;
+        }
+        if(JumpingTimer > 0.1f)
+            Landed = true;
+        return true;
+    }
     public void OnDisconnect()
     {
         if (PickedUpObject)
@@ -280,14 +305,37 @@ public class ChadControls : NetworkComponent
         if (Input.GetKey(Input.Keys.A))
             Direction.x += 1;
 
-        if (Input.GetKeyDown(Input.Keys.Space) && DivingTimer > 5.0f)
+        if (Input.GetKeyDown(Input.Keys.LeftShift) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
             CurrentVelocity.y += 2.0f;
             Diving = DivingCoroutine();
             StartCoroutine(Diving);
             DivingTimer = 0.0f;
-            DivingDirection = this.gameObject.transform.rotation;
+            DivingRotation = this.gameObject.transform.rotation;
+        }
+        else if (Input.GetKeyDown(Input.Keys.Space))
+        {
+            if(OnGround())
+            {
+                JumpingTimer = 0.0f;
+                Jumping = true;
+                Landed = false;
+                DivingRotation = this.gameObject.transform.rotation;
+                CurrentVelocity.y = BaseSpeed;
+                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
+                rBody.AddForce(new Vector3(0, 450, 0), Rigidbody.ForceMode.Impulse);
+            }
+            else if(Jumping || (!OnGround() && JumpingTimer > 3.0f))
+            {
+                JumpingTimer = 0.0f;
+                Jumping = false;
+                Landed = false;
+                DivingRotation = this.gameObject.transform.rotation;
+                CurrentVelocity.y = BaseSpeed;
+                rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
+                rBody.AddForce(new Vector3(0, 350, 0), Rigidbody.ForceMode.Impulse);
+            }
         }
     }
 
@@ -332,7 +380,7 @@ public class ChadControls : NetworkComponent
                         ResetThrow();
                     }
                 }
-                else if (Input.GetKeyDown(Input.Keys.Space) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
+                else if (Input.GetKeyDown(Input.Keys.LeftShift) && Input.GetMouseButton(Input.MouseButtons.RIGHT))
                 {
                     ResetThrow();
                 }
@@ -341,27 +389,6 @@ public class ChadControls : NetworkComponent
             {
                 if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                     PickedUpObject.OnActivate();
-            }
-            
-            if ((!Input.GetKey(Input.Keys.LeftShift) && State != STATE.THROWING && State != STATE.DIVING) || State == STATE.CHADING)
-            {
-                //FondleCamera(CurrentVelocity.Length(), xStep, yStep);
-            }
-            else if (State == STATE.THROWING)
-            {
-                //ThrowingCamera(CurrentVelocity.Length(), xStep, yStep);
-            }
-            else if (Input.GetKeyDown(Input.Keys.LeftShift))
-            {
-                //InitFreeLookCamera();
-            }
-            else if (State != STATE.DIVING)
-            {
-                //FreeLookCamera(CurrentVelocity.Length(), xStep, yStep);
-            }
-
-            if (Input.GetKeyUp(Input.Keys.LeftShift) && !Input.GetMouseButton(Input.MouseButtons.RIGHT)) //released shift while not throwing
-            {
             }
         }
     }
@@ -386,36 +413,62 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
-       
         SendRPC("RPCResetThrow");
         RPCResetThrow();
-
     }
     #endregion
+
+    private void AirHandling()
+    {
+        //if (Landed && !OnGround())
+        //{
+        //    Landed = false;
+        //    DivingRotation = this.gameObject.transform.rotation;
+        //}
+        //else if (!Landed && OnGround() && JumpingTimer > 0.1f)
+        //    Landed = true;
+
+        //No random in-air y-directional velocity
+        if (!OnGround() && rBody.LinearVelocity.y > 0 && Landed)
+            rBody.LinearVelocity = new Vector3(rBody.LinearVelocity.x, 0.0f, rBody.LinearVelocity.z);
+    }
 
     private void StateMachine()
     {
         float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
         float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
+
+        float diagonalModifier = 1.0f;
+
         switch (State)
         {
 
             case STATE.CHADING:
-                if (Direction.z > 0) // if moving forward
+                // Moving forward
+                if (Direction.z > 0)
                 {
-                    Direction.x = 0; // don't allow for strafing
+                    //Direction.x = 0; // comment back if we don't want to allow forward diagonal movement
+                    if(Direction.x != 0)
+                    {
+                        diagonalModifier = 0.5f; // fix more accurately later
+                    }
                     Direction.y = 0;
+
+                    // Started to move
                     if (CurrentVelocity.y == 0)
                         CurrentVelocity.y = modifiedBaseSpeed;
                 }
-                else if (Direction.z < 0) //if walking backwards
-                    CurrentVelocity.y = -modifiedBaseSpeed / 2.0f;
+                // Walking backwards
+                else if (Direction.z < 0) 
+                    CurrentVelocity.y = -modifiedBaseSpeed * 0.75f * diagonalModifier;
 
-                CurrentVelocity.y += Direction.z * Acceleration * Time.DeltaTime;
+                if(OnGround() && Direction.z >= 0) // as to not allow acceleration mid air
+                    CurrentVelocity.y += Direction.z * Acceleration * diagonalModifier * Time.DeltaTime;
+
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed;
 
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * diagonalModifier;
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
@@ -425,7 +478,7 @@ public class ChadControls : NetworkComponent
                 
                 break;
             case STATE.DIVING:
-                Direction = Vector3.Zero;
+                Direction = Vector3.Zero; 
                 CurrentVelocity.x = 0;
                 break;
             case STATE.RAGDOLL:
@@ -435,11 +488,16 @@ public class ChadControls : NetworkComponent
                 break;
         }
 
-        if (State != STATE.DIVING)
+        if (State != STATE.DIVING && Landed)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
         else
-            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingDirection);
+            rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), DivingRotation);
 
+        //Temporary animation fix, without this no animation will play when moving diagonally
+        if(Direction.z != 0)
+            Direction.x = 0;
+
+        //rBody.IgnoreNextTransformUpdate();
     }
 
     private int Slope(float delta, int absLimit)
@@ -473,11 +531,6 @@ public class ChadControls : NetworkComponent
             PickedUpObject = null;
         }
 
-        //if(rBody)
-        //{
-        //    rBody.SetPosition(transform.position, true);
-        //    rBody.SetRotation(transform.rotation, true);
-        //}
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -486,7 +539,7 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        Animations.ResetTimer(0); // missing network sync
+        Animations.RPCResetTimer(0);
         float timer = 1.5f;
         while (timer > 0.0f)
         {
@@ -506,7 +559,7 @@ public class ChadControls : NetworkComponent
 
         yield return new WaitForSeconds(duration);
         float timer = 0;
-        while (Ragdoll.DistanceToWorld() >= 0.3f && timer < 15)
+        while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
         {
             timer += Time.DeltaTime;
             yield return null;
@@ -566,17 +619,18 @@ public class ChadControls : NetworkComponent
 
     #endregion
 
+    #region Throwing stuff
     private void ChargeObject()
     {
         ChargeTime += Time.DeltaTime;
-        ChargeTime = MathHelper.Clamp(ChargeTime, 0, maxChargeTime);
+        ChargeTime = MathHelper.Clamp(ChargeTime, 0, PickedUpObject.chargeTimeMax);
         
         PickedUpObject.SetChargeTime(ChargeTime);
         float tets = PickedUpObject.GetChargeTime();
         
 
-        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / maxChargeTime);
-        ChadHud.Instance.ChargeChargeBar(ChargeTime / maxChargeTime);
+        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
+        ChadHud.Instance.ChargeChargeBar(ChargeTime / PickedUpObject.chargeTimeMax);
     }
 
     private void ThrowObject(Vector3 camPos, Vector3 direction)
@@ -605,6 +659,7 @@ public class ChadControls : NetworkComponent
         else
             return false;
     }
+    #endregion
 
     public override void OnRead(NetPacketReader reader, bool initialState)
     {
@@ -645,7 +700,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnTriggerEnter(Collider collider)
     {
-        if (isOwner)
+        if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupablea)
@@ -654,7 +709,7 @@ public class ChadControls : NetworkComponent
             }
 
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null && pickupable.m_pickupable)
+            if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {

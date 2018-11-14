@@ -22,7 +22,7 @@ namespace thomas
 			m_damping(0.0f),
 			m_angularDaming(0.0f),
 			m_dirty(false),
-			m_syncRotation(true),
+			m_ignoreTransform(false),
 			m_LocalCenterOfMassChange(0,0,0),
 			m_activationState(ActivationState::Default)
 			{
@@ -44,16 +44,28 @@ namespace thomas
 			void Rigidbody::OnEnable()
 			{
 				btTransform trans;
-				trans.setFromOpenGLMatrix(*m_gameObject->m_transform->GetWorldMatrix().m);
+				math::Vector3 pos = m_gameObject->m_transform->GetPosition();
+				math::Quaternion rot = m_gameObject->m_transform->GetRotation();
+				if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
+
+				trans.setRotation((btQuaternion&)rot);
+				trans.setOrigin((btVector3&)pos);
+
+
+				setWorldTransform(trans);
 				getMotionState()->setWorldTransform(trans);
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
+
+
+
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				
 				this->setUserPointer(m_collider);
 
 				Physics::AddRigidBody(this);
+				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
 			}
 
 			void Rigidbody::OnDisable()
@@ -96,7 +108,8 @@ namespace thomas
 
 			void Rigidbody::UpdateTransformToRigidBody()
 			{
-				if (m_prevMatrix != m_gameObject->m_transform->GetWorldMatrix())
+				math::Matrix currentMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				if (!m_ignoreTransform && m_prevMatrix != currentMatrix)
 				{
 					btTransform trans;
 
@@ -122,7 +135,10 @@ namespace thomas
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
+
 				}			
+				m_prevMatrix = currentMatrix;
+				m_ignoreTransform = false;
 			}
 
 			void Rigidbody::SetFreezePosition(const math::Vector3& freezePosition)
@@ -276,9 +292,10 @@ namespace thomas
 				
 			}
 
-			void Rigidbody::DisableRotationSync()
+
+			void Rigidbody::IgnoreNextTransformUpdate()
 			{
-				m_syncRotation = false;
+				m_ignoreTransform = true;
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()

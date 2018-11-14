@@ -89,56 +89,52 @@ public class GUIJoinHost : ScriptComponent
             //if (TakePort)
                 //InputGUI.AppendIPString(ref PortString, 5);
 
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            if (TextBoxIP.Clicked())
             {
-                if (Back.Clicked())
+                TakePort = false;
+                TakeIP = true;
+                TextBoxPort.color = Color.Black;
+                TextBoxIP.color = Color.Green;
+            }
+            else if (TextBoxPort.Clicked())
+            {
+                TakeIP = false;
+                TakePort = true;
+                TextBoxIP.color = Color.Black;
+                TextBoxPort.color = Color.Green;
+            }
+            else if (Join.Clicked())
+            {
+                if (IPString != "" && PortString != "")
                 {
-                    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-                }
-                if (TextBoxIP.Clicked())
-                {
-                    TakePort = false;
-                    TakeIP = true;
-                    TextBoxPort.color = Color.Black;
-                    TextBoxIP.color = Color.Green;
-                }
-                else if (TextBoxPort.Clicked())
-                {
-                    TakeIP = false;
-                    TakePort = true;
-                    TextBoxIP.color = Color.Black;
-                    TextBoxPort.color = Color.Green;
-                }
-                else if (Join.Clicked())
-                {
-                    if (IPString != "" && PortString != "")
-                    {
-                        if (IPString == "127.0.0.1")
-                            MatchSystem.instance.LocalPort = 0;
-                        else
-                            MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                        MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
-                        MatchSystem.instance.TargetIP = IPString;
-                        MatchSystem.instance.Init();
-                        MatchSystem.instance.Connect();
-                        ConnectingText.text = "Connecting";
-                        ConnectingText.position = new Vector2(0.75f, 0.9f);
-                        test = Connecting();
-                        StartCoroutine(test);
-                        Join.interactable = false;
-                        Host.interactable = false;
-                        return;
-                    }
+                    if (IPString == "127.0.0.1")
+                        MatchSystem.instance.LocalPort = 0;
                     else
-                    {
-                        if (IPString == "")
-                            TextBoxIP.color = Color.Red;
-                        if (PortString == "")
-                            TextBoxPort.color = Color.Red;
-                    }
+                        MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
+                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
+                    MatchSystem.instance.TargetIP = IPString;
+                    MatchSystem.instance.Init();
+                    MatchSystem.instance.Connect();
+                    ConnectingText.text = "Connecting";
+                    ConnectingText.position = new Vector2(0.75f, 0.9f);
+                    test = Connecting();
+                    StartCoroutine(test);
+                    Join.interactable = false;
+                    Host.interactable = false;
+                    return;
                 }
-                else if (Host.Clicked())
+                else
                 {
+                    if (IPString == "")
+                        TextBoxIP.color = Color.Red;
+                    if (PortString == "")
+                        TextBoxPort.color = Color.Red;
+                }
+            }
+            else if (Host.Clicked())
+            {
                     if (PortString != "")
                     {
                         MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
@@ -150,14 +146,14 @@ public class GUIJoinHost : ScriptComponent
                         TextBoxPort.color = Color.Red;
                     }
                 }
-                else
-                {
-                    TakePort = false;
-                    TakeIP = false;
-                    TextBoxIP.color = Color.Black;
-                    TextBoxPort.color = Color.Black;
-                }
+            else
+            {
+                TakePort = false;
+                TakeIP = false;
+                TextBoxIP.color = Color.Black;
+                TextBoxPort.color = Color.Black;
             }
+        }
 
             if (!Disabled)
             {
