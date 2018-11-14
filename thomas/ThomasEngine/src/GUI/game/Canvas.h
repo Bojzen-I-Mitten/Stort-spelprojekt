@@ -27,6 +27,7 @@ namespace ThomasEngine
 		property bool isRendering
 		{
 			void set(bool rendering);
+			bool get();
 		}
 
 	private:

@@ -26,7 +26,7 @@ namespace thomas
 		static bool IsPaused(const std::string& name);
 		static bool HasStopped(const std::string& name);
 
-		static void Play(const std::string& name, float volume);
+		static void Play(const std::string& name, float volume, float pan=0.0f);
 		static void LoadSound(const std::string& name, const std::string& file);
 
 		// Converters

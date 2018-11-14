@@ -173,11 +173,14 @@ public class Ball : PickupableObject
         emitterElectricity3.Emit = false;
         emitterFire.Emit = false;
         emitterSmoke.Emit = false;
+        ResetElectricityEmitters();
+        ResetFireEmitters();
     }
     #endregion
 
     public override void Update()
     {
+        base.Update();
         if (transform.position.y < -5)
             Reset();
     }
@@ -188,7 +191,7 @@ public class Ball : PickupableObject
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
 
-        float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
+        float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
 
         if (interp > 0.7f)
         {
@@ -224,19 +227,19 @@ public class Ball : PickupableObject
 
     public override void Reset()
     {
+        base.Reset();
         if (isOwner)
         {
-            Drop();
             if (m_rigidBody != null)
             {
-                //m_rigidBody.enabled = false;
-                m_rigidBody.SetPosition(Vector3.Zero, true);
-                m_rigidBody.SetRotation(Quaternion.Identity, true);
+                m_rigidBody.enabled = false;
+                //m_rigidBody.SetPosition(Vector3.Zero, true);
+                //m_rigidBody.SetRotation(Quaternion.Identity, true);
                 m_rigidBody.LinearVelocity = Vector3.Zero;
                 m_rigidBody.AngularVelocity = Vector3.Zero;
                 transform.position = Vector3.Zero;
                 transform.rotation = Quaternion.Identity;
-               // m_rigidBody.enabled = true;
+                m_rigidBody.enabled = true;
             }
         }
 

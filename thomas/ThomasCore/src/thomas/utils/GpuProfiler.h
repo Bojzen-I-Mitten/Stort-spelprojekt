@@ -1,6 +1,6 @@
 #pragma once
 #include "D3D.h"
-
+#include <dxgi1_6.h>
 namespace thomas
 {
 	namespace utils
@@ -15,6 +15,7 @@ namespace thomas
 				GTS_MAIN_OBJECTS,
 				GTS_PARTICLES,
 				GTS_GIZMO_OBJECTS,
+				GTS_GUI,
 				GTS_END_FRAME,
 
 				GTS_MAX
@@ -26,6 +27,7 @@ namespace thomas
 				GpuProfiler();
 				bool Init();
 				void Destroy();
+
 				void BeginFrame();
 				void Timestamp(GTS gts);
 				void EndFrame();
@@ -33,6 +35,7 @@ namespace thomas
 
 				// Wait on GPU for last frame's data (not this frame's) to be available
 				void WaitForDataAndUpdate();
+
 			public:
 				float GetAverageTiming(GTS gts);
 				float GetDrawTotal();
@@ -41,6 +44,8 @@ namespace thomas
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
 				int GetVertexCount();
+
+
 			private:
 				int m_frameQuery;								// Which of the two sets of queries are we currently issuing?
 				int m_frameCollect;								// Which of the two did we last collect?
@@ -61,9 +66,6 @@ namespace thomas
 
 				float m_memoryUsage;
 				float m_totalMemory;
-
-				int m_currentFrame;
-				int m_maxFrames;
 			};
 		}
 	}

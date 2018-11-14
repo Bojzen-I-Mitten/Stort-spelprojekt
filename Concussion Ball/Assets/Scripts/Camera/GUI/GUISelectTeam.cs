@@ -10,7 +10,6 @@ public class GUISelectTeam : ScriptComponent
     private bool Disabled;
 
     public Canvas Canvas;
-    public bool GoToGameCam;
 
     Image Team1Image;
     Image Team2Image;
@@ -28,31 +27,36 @@ public class GUISelectTeam : ScriptComponent
     {
         Disabled = false;
         Camera = gameObject.GetComponent<Camera>();
-        GoToGameCam = false;
         AddImagesAndText();
     }
 
     public override void Update()
     {
-        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             if (Team1Image.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
-                GoToGameCam = true;
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
             else if (Team2Image.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
-                GoToGameCam = true;
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
             else if (SpectatorImage.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                GoToGameCam = true;
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
         }
         if (TextFont != null && !Disabled)
