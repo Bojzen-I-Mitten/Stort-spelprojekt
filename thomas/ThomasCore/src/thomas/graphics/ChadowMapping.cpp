@@ -17,7 +17,7 @@ namespace thomas
 
 		void ShadowMap::InitStatics()
 		{
-			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowMapShader.fx");
+			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowPassShader.fx");
 
 			s_material = std::make_unique<resource::Material>(s_shader.get());
 		}
@@ -53,8 +53,6 @@ namespace thomas
 		{
 			//https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/
 
-			m_matrixView = camera->GetViewMatrix();//math::Matrix::CreateLookAt(-math::Vector3::Up * 20, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
-
 
 			math::Vector3 corners[8];
 			camera->GetFrustrum().GetCorners(corners);
@@ -64,13 +62,19 @@ namespace thomas
 			for (unsigned i = 0; i < 8; ++i)
 			{
 				frustumCenter += corners[i];
-				math::Vector3::Transform(corners[i], m_matrixView);//transform corner into lightspace
+				//math::Vector3::Transform(corners[i], m_matrixView);//transform corner into lightspace
 			}
 			frustumCenter /= 8;
 
+			const float nearClipOffset = 50.0f;
+			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 25/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+			
+			for (unsigned i = 0; i < 8; ++i)
+				corners[i] = math::Vector3::Transform(corners[i], m_matrixView);
+
 			//find extreme points
-			math::Vector3 maxes;
-			math::Vector3 mins;
+			math::Vector3 maxes = corners[0];
+			math::Vector3 mins = corners[0];
 
 			for (int i = 0; i < 8; i++)
 			{
@@ -88,10 +92,10 @@ namespace thomas
 					mins.z = corners[i].z;
 			}
 
-			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z/* - nearClipOffset*/, -mins.z);
-			m_matrixProj = camera->GetProjMatrix();//math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);
+			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z - nearClipOffset, -mins.z);
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-60, 60, -60, 60, -20, 40);
 
-			m_matrixVP = camera->GetViewProjMatrix();//m_matrixView * m_matrixProj;
+			m_matrixVP = m_matrixView * m_matrixProj;
 
 			
 		}
@@ -114,7 +118,6 @@ namespace thomas
 			s_material->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
 			s_material->ApplyProperty("lightMatrixVP");
 			
-			//m_shaders.SetGlobalMatrix
 		}
 
 	}

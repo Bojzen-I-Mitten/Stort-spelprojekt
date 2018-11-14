@@ -10,7 +10,7 @@ DepthStencilState EnableDepth
     DepthFunc = LESS_EQUAL;
 };
 
-RasterizerState TestRasterizer
+RasterizerState RasterizerSolid
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -29,10 +29,8 @@ v2f vert(appdata_thomas v)
     v2f o;
 
     float3 posL = v.vertex;
-
-
+    
     o.vertex = WorldToLightClipPos(posL);
-    //o.vertex = ThomasObjectToClipPos(posL);
 
     return o;
 }
@@ -51,7 +49,7 @@ technique11 Standard
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(TestRasterizer);
+        SetRasterizerState(RasterizerSolid);
     }
 
 }
