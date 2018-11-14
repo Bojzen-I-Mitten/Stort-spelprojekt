@@ -212,7 +212,7 @@ public class Ragdoll : ScriptComponent
 
         // Play the ragdoll sound
         if(identity.Owner && RagdollSound)
-            RagdollSound.PlayOneShot();
+            RagdollSound.Play();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)

@@ -24,8 +24,6 @@ public class ThomasTrain : Powerup
     public float ExplosionForce { get; set; } = 300.0f;
 
     private float soundcooldown;
-    private bool playChargeUpSound;
-
 
     public override void Awake()
     {
@@ -98,8 +96,6 @@ public class ThomasTrain : Powerup
         soundComponentChargeUp.Clip = soundClipChargeUp;
         soundComponentTravel.Clip = soundClipTravel;
         soundComponentExplosion.Clip = soundClipExplosion;
-
-        playChargeUpSound = true;
     }
 
 
@@ -112,7 +108,6 @@ public class ThomasTrain : Powerup
     public override void Cleanup()
     {
         base.Cleanup();
-        playChargeUpSound = false;
         soundComponentChargeUp.Stop();
     }
     
