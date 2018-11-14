@@ -34,6 +34,11 @@ public class GUISelectTeam : ScriptComponent
     {
         if (Canvas.isRendering)
         {
+            Team1Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+            Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
+            Team2Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+            Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
+
             if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {
                 if (Team1Image.Clicked())

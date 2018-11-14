@@ -65,7 +65,19 @@ public class GUIHostMenu : ScriptComponent
         btnDown = false;
 
         BG = Canvas.Add(newBG);
-        BG.depth = 0.6f;
+        BG.depth = 0.9f;
+
+        HostBtn = Canvas.Add("Host Game");
+        HostBtn.color = Color.Black;
+        HostBtn.position = new Vector2(0.47f, 0.33f);
+        HostBtn.font = Font;
+        HostBtn.interactable = true;
+
+        ExitBtn = Canvas.Add("Exit");
+        ExitBtn.color = Color.Black;
+        ExitBtn.position = new Vector2(0.32f, 0.33f);
+        ExitBtn.font = Font;
+        ExitBtn.interactable = true;
 
         #region Host Setings
 
@@ -74,7 +86,7 @@ public class GUIHostMenu : ScriptComponent
             HostBg = Canvas.Add(WhiteBoxTexture);
             HostBg.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             HostBg.scale = new Vector2(6.4f, 1.44f);
-            HostBg.depth = 0.6f;
+            HostBg.depth = 0.7f;
         }
 
         #endregion
@@ -146,18 +158,6 @@ public class GUIHostMenu : ScriptComponent
         }
         #endregion
 
-        HostBtn = Canvas.Add("Host Game");
-        HostBtn.color = Color.Green;
-        HostBtn.position = new Vector2(0.47f, 0.33f);
-        HostBtn.font = Font;
-        HostBtn.interactable = true;
-
-        ExitBtn = Canvas.Add("Exit");
-        ExitBtn.color = Color.Green;
-        ExitBtn.position = new Vector2(0.32f, 0.33f);
-        ExitBtn.font = Font;
-        ExitBtn.interactable = true;
-
     }
 
     public override void Update()
@@ -207,7 +207,20 @@ public class GUIHostMenu : ScriptComponent
                 if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                 {
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = Team1SliderKnob.color;
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name = Team1.text;
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = Team2SliderKnob.color;
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
+
+                    MatchSystem.instance.Init();
+                    MatchSystem.instance.Host();
+
                 }
+            }
+
+            if (ExitBtn.Hovered())
+            {
+
             }
 
             if (InputTeam1Name)

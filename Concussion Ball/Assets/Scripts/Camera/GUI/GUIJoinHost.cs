@@ -136,12 +136,7 @@ public class GUIJoinHost : ScriptComponent
                     if (PortString != "")
                     {
                         MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                        MatchSystem.instance.Init();
-                        MatchSystem.instance.Host();
                         CameraMaster.instance.State = CAM_STATE.HOST_MENU;
-                        hasConnected = true;
-
-
                         return;
                     }
                     else
