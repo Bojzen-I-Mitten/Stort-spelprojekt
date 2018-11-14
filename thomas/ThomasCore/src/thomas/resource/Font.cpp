@@ -18,7 +18,7 @@ namespace thomas
 		void Font::DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position,
 							   const Vector2& scale, const Vector2& origin, const Vector4& color, float rotation, DirectX::SpriteEffects effect, const float depth)
 		{
-			m_font->DrawString(spritebatch, utility::ToWChar(text).c_str(), position, color, rotation, origin * GetTextSize(text), scale, effect, depth);
+			m_font->DrawString(spritebatch, utility::ToWChar(text).c_str(), position, color, rotation, origin * GetTextSize(text)/* * scale*/, scale, effect, depth);
 		}
 
 		Vector2 Font::GetTextSize(const std::string& text)

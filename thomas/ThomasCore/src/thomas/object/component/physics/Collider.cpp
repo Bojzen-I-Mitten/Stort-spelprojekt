@@ -87,16 +87,25 @@ namespace thomas
 			{
 			}
 
-			void Collider::OnEnable() //maybe later
+			void Collider::OnEnable()
 			{
 				if (m_attachedRigidbody == nullptr) //only created if no rigidbody
 				{
 					m_collisionObject = new btCollisionObject();
+					m_collisionShape->setLocalScaling((btVector3&)(m_scaling*m_gameObject->m_transform->GetScale()));
 					m_collisionObject->setCollisionShape(m_collisionShape);
 					m_collisionObject->setUserPointer(this);
 					m_collisionObject->setRestitution(1.0f);
+
+					btTransform trans;
+					trans.setOrigin((btVector3&)(m_gameObject->m_transform->GetPosition() + m_center));
+					trans.setRotation((btQuaternion&)m_gameObject->m_transform->GetRotation());
+					m_collisionObject->setWorldTransform(trans);
+					
 					SetTrigger(m_trigger); //Update trigger flags
 					Physics::s_world->addCollisionObject(m_collisionObject, Physics::GetCollisionGroupBit(m_gameObject->GetLayer()), Physics::GetCollisionMask(m_gameObject->GetLayer()));
+							
+				
 				}
 			}
 

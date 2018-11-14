@@ -10,7 +10,7 @@ public class PowerupManager : ScriptComponent
 
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
     public int NextPowerupID = 1000;
-    public int PoolSize { get; set; } = 5;
+    public int PoolSize { get; set; } = 10;
     public override void Awake()
     {
         spawnPoints = Object.GetObjectsOfType<PowerupSpawner>();
@@ -20,17 +20,18 @@ public class PowerupManager : ScriptComponent
 
     void initPowerupPool()
     {
-        foreach(GameObject prefab in Powerups)
+        Debug.Log("init start");
+        foreach (GameObject prefab in Powerups)
         {
             List<GameObject> pool = new List<GameObject>(PoolSize);
             for(int i=0; i < PoolSize; i++)
             {
                 GameObject powerup = GameObject.Instantiate(prefab);
-                powerup.activeSelf = false;
                 pool.Add(powerup);
             }
             powerupPool.Add(pool);
         }
+        Debug.Log("init end");
     }
 
     public override void Update()
@@ -60,21 +61,23 @@ public class PowerupManager : ScriptComponent
 
     public void RecyclePowerup(Powerup powerup)
     {
+        powerup.Disable();
         powerup.gameObject.activeSelf = false;
-
     }
 
     public void ResetPowerups()
     {
+        Debug.Log("reset start");
         List<Powerup> activePowerups = Object.GetObjectsOfType<Powerup>();
         for (int i=0; i < activePowerups.Count; i++)
         {
             if(activePowerups[i].isOwner)
                 activePowerups[i].Remove();
         }
-        Object.GetObjectsOfType<Powerup>();
+        
 
         spawnPoints.ForEach(point => { if (point.isOwner) point.Free(); }); //Safety free
         spawnPoints.ForEach(point => point.SpawnPowerup());
+        Debug.Log("reset end");
     }
 }
