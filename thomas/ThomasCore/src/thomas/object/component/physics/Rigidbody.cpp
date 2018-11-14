@@ -22,6 +22,8 @@ namespace thomas
 			m_damping(0.0f),
 			m_angularDaming(0.0f),
 			m_dirty(false),
+			m_ignoreTransform(false),
+			m_LocalCenterOfMassChange(0,0,0),
 			m_activationState(ActivationState::Default)
 			{
 				m_bounciness = m_restitution;
@@ -42,16 +44,28 @@ namespace thomas
 			void Rigidbody::OnEnable()
 			{
 				btTransform trans;
-				trans.setFromOpenGLMatrix(*m_gameObject->m_transform->GetWorldMatrix().m);
+				math::Vector3 pos = m_gameObject->m_transform->GetPosition();
+				math::Quaternion rot = m_gameObject->m_transform->GetRotation();
+				if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
+
+				trans.setRotation((btQuaternion&)rot);
+				trans.setOrigin((btVector3&)pos);
+
+
+				setWorldTransform(trans);
 				getMotionState()->setWorldTransform(trans);
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
+
+
+
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				
 				this->setUserPointer(m_collider);
 
 				Physics::AddRigidBody(this);
+				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
 			}
 
 			void Rigidbody::OnDisable()
@@ -81,6 +95,7 @@ namespace thomas
 				}
 				m_gameObject->m_transform->SetPosition(pos);
 				m_gameObject->m_transform->SetRotation(rotation);
+				m_gameObject->m_transform->SetPosition(pos);
 				m_gameObject->m_transform->SetDirty(true);
 
 				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
@@ -90,11 +105,13 @@ namespace thomas
 					UpdateProperties();
 				}
 
+
 			}
 
 			void Rigidbody::UpdateTransformToRigidBody()
 			{
-				if (m_prevMatrix != m_gameObject->m_transform->GetWorldMatrix())
+				math::Matrix currentMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				if (!m_ignoreTransform && m_prevMatrix != currentMatrix)
 				{
 					btTransform trans;
 
@@ -105,20 +122,27 @@ namespace thomas
 						if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
 					}
 					trans.setRotation((btQuaternion&)rot);
-					setCenterOfMassTransform(trans);
 					trans.setOrigin((btVector3&)pos);
-					getMotionState()->setWorldTransform(trans);
+					//getMotionState()->setWorldTransform(trans);
 
 
 					if (ImGuizmo::IsUsing()) {
 						this->setLinearVelocity(btVector3(0, 0, 0));
 						this->setAngularVelocity(btVector3(0, 0, 0));
 					}
-					trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
+					//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
+					//setCenterOfMassTransform(trans);
+
+					
+					setWorldTransform(trans);
+					getMotionState()->setWorldTransform(trans);
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
+
 				}			
+				m_prevMatrix = currentMatrix;
+				m_ignoreTransform = false;
 			}
 
 			void Rigidbody::SetFreezePosition(const math::Vector3& freezePosition)
@@ -255,37 +279,29 @@ namespace thomas
 				m_rollingFriction = friction;
 			}
 
-			void Rigidbody::SetPosition(math::Vector3 position, bool forcePosition)
+			void Rigidbody::SetPosition(math::Vector3 position)
 			{
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
+				btTransform trans = getCenterOfMassTransform();
 				trans.setOrigin(Physics::ToBullet(position));
-				getMotionState()->setWorldTransform(trans);
+				setCenterOfMassTransform(trans);
+				
+				
+			}
 
-				if (forcePosition)
-				{
-					setWorldTransform(trans);
-					//m_gameObject->m_transform->SetPosition(position);
-				}
+			void Rigidbody::SetRotation(math::Quaternion rotation)
+			{
+				
+				btTransform trans = getCenterOfMassTransform();
+				trans.setRotation(Physics::ToBullet(rotation));
+				setCenterOfMassTransform(trans);
 
 				
 			}
 
-			void Rigidbody::SetRotation(math::Quaternion rotation, bool forceRotation)
+
+			void Rigidbody::IgnoreNextTransformUpdate()
 			{
-				
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
-				trans.setRotation(Physics::ToBullet(rotation));
-				getMotionState()->setWorldTransform(trans);
-
-				if (forceRotation)
-				{
-					setWorldTransform(trans);
-					//m_gameObject->m_transform->SetRotation(rotation);
-				}
-
-				
+				m_ignoreTransform = true;
 			}
 
 			math::Vector3 Rigidbody::GetCenterOfmass()
@@ -407,15 +423,15 @@ namespace thomas
 
 			math::Vector3 Rigidbody::GetPosition()
 			{
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
+				btTransform trans = getCenterOfMassTransform();
+				//getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getOrigin());
 			}
 
 			math::Quaternion Rigidbody::GetRotation()
 			{
-				btTransform trans;
-				getMotionState()->getWorldTransform(trans);
+				btTransform trans = getCenterOfMassTransform();
+				//getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getRotation());
 			}
 

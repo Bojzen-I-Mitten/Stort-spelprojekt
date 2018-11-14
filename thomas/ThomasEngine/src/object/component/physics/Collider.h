@@ -42,5 +42,11 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
+
+		/*property float friction
+		{
+			float get();
+			void set(float value);
+		}*/
 	};
 }

@@ -1,35 +1,37 @@
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
-using ThomasEngine.Script;
 
 public class PowerupManager : ScriptComponent
 {
     
     public List<GameObject> Powerups { get; set; } = new List<GameObject>();
+    private List<PowerupSpawner> spawnPoints;
 
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
     public int NextPowerupID = 1000;
-    public int PoolSize { get; set; } = 5;
-    public override void OnAwake()
+    public int PoolSize { get; set; } = 10;
+    public override void Awake()
     {
+        spawnPoints = Object.GetObjectsOfType<PowerupSpawner>();
         initPowerupPool();
         //MatchSystem.instance.SpawnablePrefabs.AddRange(Powerups);
     }
 
     void initPowerupPool()
     {
-        foreach(GameObject prefab in Powerups)
+        Debug.Log("init start");
+        foreach (GameObject prefab in Powerups)
         {
             List<GameObject> pool = new List<GameObject>(PoolSize);
             for(int i=0; i < PoolSize; i++)
             {
                 GameObject powerup = GameObject.Instantiate(prefab);
-                powerup.activeSelf = false;
                 pool.Add(powerup);
             }
             powerupPool.Add(pool);
         }
+        Debug.Log("init end");
     }
 
     public override void Update()
@@ -59,22 +61,23 @@ public class PowerupManager : ScriptComponent
 
     public void RecyclePowerup(Powerup powerup)
     {
+        powerup.Disable();
         powerup.gameObject.activeSelf = false;
-
     }
 
     public void ResetPowerups()
     {
-        foreach(Powerup p in ScriptUtility.GetComponentsOfType<Powerup>())
+        Debug.Log("reset start");
+        List<Powerup> activePowerups = Object.GetObjectsOfType<Powerup>();
+        for (int i=0; i < activePowerups.Count; i++)
         {
-            if(p.isOwner)
-                p.Remove();
+            if(activePowerups[i].isOwner)
+                activePowerups[i].Remove();
         }
-        foreach (PowerupSpawner ps in ScriptUtility.GetComponentsOfType<PowerupSpawner>())
-         {
-            if (ps.isOwner)
-                ps.Free();
-            ps.SpawnPowerup();
-        }
+        
+
+        spawnPoints.ForEach(point => { if (point.isOwner) point.Free(); }); //Safety free
+        spawnPoints.ForEach(point => point.SpawnPowerup());
+        Debug.Log("reset end");
     }
 }

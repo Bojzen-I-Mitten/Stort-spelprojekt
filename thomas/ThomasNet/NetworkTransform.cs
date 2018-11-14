@@ -131,7 +131,7 @@ namespace ThomasEngine.Network
         {
             if (!isOwner && targetRigidbody && targetRigidbody.enabled)
             {
-                //Vector3 newVelocity = (TargetSyncPosition - target.position) * InterpolateMovement / SendInterval;
+                //Vector3 newVelocity = (TargetSyncPosition - targetRigidbody.Position) * InterpolateMovement / SendInterval;
                 //targetRigidbody.LinearVelocity = newVelocity;
 
                 //TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
@@ -223,6 +223,7 @@ namespace ThomasEngine.Network
         {
             if (targetRigidbody)
             {
+                writer.Put(targetRigidbody.enabled);
                 if (!targetRigidbody.enabled)
                     WriteTransform(writer);
                 else
@@ -233,11 +234,11 @@ namespace ThomasEngine.Network
                 }
                 writer.Put(targetRigidbody.LinearVelocity);
                 writer.Put(targetRigidbody.AngularVelocity);
-
+                writer.Put(targetRigidbody.IsKinematic);
+                writer.Put(targetRigidbody.AttachedCollider.isTrigger);
                 prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
             }
         }
-
         #endregion
         #region Read
         public override void OnRead(NetPacketReader reader, bool initialState)
@@ -296,16 +297,18 @@ namespace ThomasEngine.Network
             if (isOwner || !targetRigidbody)
             {
                 //Read the data even though we do not use it. Otherwise the next component will get the wrong data.
+                reader.GetBool();
                 reader.GetVector3();
                 reader.GetQuaternion();
                 reader.GetVector3();
 
                 reader.GetVector3();
                 reader.GetVector3();
-
+                reader.GetBool();
+                reader.GetBool();
                 return;
             }
-
+            targetRigidbody.enabled = reader.GetBool();
             TargetSyncPosition = reader.GetVector3();
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
@@ -314,11 +317,14 @@ namespace ThomasEngine.Network
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
 
-            
+            targetRigidbody.IsKinematic = reader.GetBool();
+            targetRigidbody.AttachedCollider.isTrigger = reader.GetBool();
+
             float dist = Vector3.Distance(target.position, TargetSyncPosition);
 
             //float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
 
+            
 
             if(!targetRigidbody.enabled)
             {
@@ -326,15 +332,16 @@ namespace ThomasEngine.Network
                 transform.rotation = TargetSyncRotation;
                 return;
             }
-            else if(dist > SnapThreshhold)
+            else
             {
-
+                targetRigidbody.IgnoreNextTransformUpdate();
                 targetRigidbody.Position = TargetSyncPosition;
                 targetRigidbody.Rotation = TargetSyncRotation;
                 targetRigidbody.LinearVelocity = TargetSyncLinearVelocity;
+                targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
 
             }
-            targetRigidbody.AngularVelocity = TargetSyncAngularVelocity;
+            
         }
         #endregion
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
+using ThomasEngine.Network;
 
 public class Ragdoll : ScriptComponent
 {
@@ -62,18 +63,15 @@ public class Ragdoll : ScriptComponent
     uint[] BoneIndexes = new uint[(int)BODYPART.COUNT];
     Collider[] C_BodyParts = new Collider[(int)BODYPART.COUNT];
     SoundComponent RagdollSound;
-
+    NetworkIdentity identity;
     public override void Start()
     {
         DisableRagdoll();
 
         // Load the ragdoll impact sound
-        RagdollSound = gameObject.AddComponent<SoundComponent>();
-        //if (RagDollImpactSound != null)
-        //    RagdollSound.clip = RagDollImpactSound;
-        //else
-        //    Debug.LogError("Radoll impact sound missing");
-        RagdollSound.Looping = false;
+        RagdollSound = gameObject.GetComponent<SoundComponent>();
+        identity = gameObject.GetComponent<NetworkIdentity>();
+
     }
     #region Utility functions
 
@@ -190,6 +188,12 @@ public class Ragdoll : ScriptComponent
         return ImpactSpine.DistanceToCollision;
     }
 
+    public void Smack()
+    {
+        if(RagdollSound)
+            RagdollSound.PlayOneShot();
+    }
+
     public void EnableRagdoll()
     {
         if (RagdollEnabled)
@@ -202,7 +206,8 @@ public class Ragdoll : ScriptComponent
         }
 
         // Play the ragdoll sound
-        RagdollSound.PlayOneShot();
+        if(identity.Owner && RagdollSound)
+            RagdollSound.PlayOneShot();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
@@ -679,7 +684,7 @@ public class Ragdoll : ScriptComponent
         if (RagdollEnabled)
         {
 
-            if (ImpactSpine.GetActive)
+            if (ImpactSpine.GetActive && identity.Owner && RagdollSound)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
                 RagdollSound.PlayOneShot();

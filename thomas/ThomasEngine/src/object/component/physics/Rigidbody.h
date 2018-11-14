@@ -7,6 +7,7 @@
 #include "../../../Utility.h"
 namespace ThomasEngine
 {
+	ref class Collider;
 	[DisallowMultipleComponent]
 	public ref class Rigidbody : public Component
 	{
@@ -32,16 +33,12 @@ namespace ThomasEngine
 		void OnDestroy() override;
 
 
-		void SetPosition(Vector3 position, bool forcePosition)
+		void IgnoreNextTransformUpdate()
 		{
-			((thomas::object::component::Rigidbody*)nativePtr)->SetPosition(Utility::Convert(position), forcePosition);
+			((thomas::object::component::Rigidbody*)nativePtr)->IgnoreNextTransformUpdate();
 		}
 
-		void SetRotation(Quaternion rotation, bool forceRotation)
-		{
-			((thomas::object::component::Rigidbody*)nativePtr)->SetRotation(Utility::Convert(rotation), forceRotation);
-		}
-
+		
 		void AddTorque(Vector3 torque)
 		{
 			((thomas::object::component::Rigidbody*)nativePtr)->AddTorque(thomas::math::Vector3(torque.x, torque.y, torque.z));
@@ -213,6 +210,9 @@ namespace ThomasEngine
 			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdSweptSphereRadius(); }
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCcdSweptSphereRadius(value); }
 		}
+
+		[BrowsableAttribute(false)]
+		property Collider^ AttachedCollider;
 
 	private:
 		thomas::math::Vector3 ClampVec3(thomas::math::Vector3 & value, const float & min, const float & max)

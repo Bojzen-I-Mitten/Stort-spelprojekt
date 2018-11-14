@@ -114,6 +114,10 @@ namespace thomas
 			{
 				m_render = render;
 			}
+			bool Canvas::GetRendering()
+			{
+				return m_render;
+			}
 		}
 	}
 }

@@ -6,6 +6,7 @@
 #include "../../ThomasTime.h"
 #include "Transform.h"
 #include "../GameObject.h"
+#include "../../ThomasCore.h"
 namespace thomas
 {
 	namespace object
@@ -17,8 +18,19 @@ namespace thomas
 			m_clip(nullptr),
 			m_volume(0.5f),
 			m_volumeFactor(1.f),
-			m_is3D(false)
+			m_is3D(false),
+			m_soundEffectInstance(nullptr)
 			{
+				m_emitter = new DirectX::AudioEmitter();
+			}
+
+			SoundComponent::~SoundComponent()
+			{
+				if (m_soundEffectInstance)
+				{
+					m_soundEffectInstance->Stop();
+					m_soundEffectInstance.release();
+				}
 			}
 
 			void SoundComponent::OnDisable()
@@ -30,7 +42,9 @@ namespace thomas
 			{
 				if (m_is3D && AudioListener::GetInstance())
 				{
+					m_emitter->Update(m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->Up(), ThomasTime::GetActualDeltaTime());
 					Apply3D(AudioListener::GetInstance()->m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->GetPosition());
+
 				}
 			}
 
@@ -40,19 +54,11 @@ namespace thomas
 				// Apply 3D-effect with attenuation formula based on Inverse Square Law
 				if (m_clip != nullptr)
 				{
-					
-					float attenuation = Sound::VolumeTodB(m_volume * m_volumeFactor) - Sound::VolumeTodB((sourcePos - listenerPos).Length());
-
-					
-					if (attenuation > 5.0f)
-					{
-					attenuation = 5.0f;
-					}
-					else if (attenuation < 0.0f)
-					{
-						attenuation = 0.0f;
-					}
-					m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(attenuation));
+					float range = 10.0f;
+					float volumeModifier = range / Vector3::Distance(m_emitter->Position, AudioListener::GetInstance()->GetListner().Position);
+					volumeModifier = max(min(volumeModifier, 1.0f), 0.0f);
+					float vol = volumeModifier * m_volume;
+					m_soundEffectInstance->SetVolume(vol);
 				
 				}
 			}
@@ -62,7 +68,7 @@ namespace thomas
 				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
-					m_clip->GetSoundEffectInstance()->Play(m_looping);
+					m_soundEffectInstance->Play(m_looping);
 					SetVolume(m_volume);
 				}
 			}
@@ -72,8 +78,20 @@ namespace thomas
 				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
-					m_volume;
-					Sound::Play(m_clip->GetName(), m_volume);
+					if (m_is3D && AudioListener::GetInstance())
+					{
+
+						float range = 10.0f;
+						float volumeModifier = range/Vector3::Distance(m_emitter->Position, AudioListener::GetInstance()->GetListner().Position);
+						volumeModifier = max(min(volumeModifier, 1.0f), 0.0f);
+						float vol = volumeModifier * m_volume;
+						Sound::Play(m_clip->GetName(), vol);
+					}else
+
+					{
+						Sound::Play(m_clip->GetName(), m_volume);
+					}
+					
 				}
 			}
 
@@ -82,7 +100,7 @@ namespace thomas
 				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
-					m_clip->GetSoundEffectInstance()->Stop();
+					m_soundEffectInstance->Stop();
 				}
 			}
 
@@ -91,7 +109,7 @@ namespace thomas
 				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
-					m_clip->GetSoundEffectInstance()->Pause();
+					m_soundEffectInstance->Pause();
 				}
 			}
 
@@ -141,6 +159,17 @@ namespace thomas
 			{
 				EDITOR_LOCK();
 				m_clip = clip;
+				if (m_clip)
+				{
+					if (m_soundEffectInstance)
+					{
+						
+						m_soundEffectInstance->Stop();
+						m_soundEffectInstance.release();
+					}
+					
+					m_soundEffectInstance = m_clip->CreateSoundEffectInstance();
+				}
 			}
 
 			void SoundComponent::SetVolume(float volume)
