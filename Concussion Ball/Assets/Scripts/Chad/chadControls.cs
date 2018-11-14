@@ -145,6 +145,8 @@ public class ChadControls : NetworkComponent
                 }
                 else if (!Landed && OnGround() && JumpingTimer > 0.1f)
                     Landed = true;
+                else if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f)
+                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
             }
             StateMachine();
         }
@@ -186,7 +188,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
-        CanBeTackled = true;//false;
+        CanBeTackled = true;
         Ragdoll.EnableRagdoll();
     }
 
