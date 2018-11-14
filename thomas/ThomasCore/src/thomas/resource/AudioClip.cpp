@@ -23,5 +23,9 @@ namespace thomas
 		void AudioClip::OnChanged()
 		{
 		}
+		std::unique_ptr<SoundEffectInstance> AudioClip::CreateSoundEffectInstance()
+		{
+			return Sound::GetSoundInfo(m_name).soundEffect->CreateInstance(SoundEffectInstance_Use3D);
+		}
 	}
 }

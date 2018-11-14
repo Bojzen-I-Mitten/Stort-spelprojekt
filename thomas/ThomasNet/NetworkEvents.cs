@@ -182,6 +182,7 @@ namespace ThomasEngine.Network
                         comp.OnLostOwnership();
                     }
                 }
+                Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.ToString());
             }
             else
             {
