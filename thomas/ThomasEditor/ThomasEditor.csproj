@@ -375,6 +375,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Data\FXIncludes\" />
+    <Folder Include="dll\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\thomas.ico" />
