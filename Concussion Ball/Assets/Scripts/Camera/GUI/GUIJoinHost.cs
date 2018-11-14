@@ -19,6 +19,8 @@ public class GUIJoinHost : ScriptComponent
     private bool TakeIP;
     private bool TakePort;
 
+    private bool hasConnected = false;
+
     public Canvas Canvas;
 
     Image TextBoxIP;
@@ -57,9 +59,15 @@ public class GUIJoinHost : ScriptComponent
         MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
 
-        CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
-        Join.interactable = true;
-        Host.interactable = true;
+        if (!hasConnected)
+        {
+            CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+            Join.interactable = true;
+            Host.interactable = true;
+            hasConnected = true;
+        }
+
+
     }
 
     public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -130,7 +138,9 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Host();
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
-                    
+                    hasConnected = true;
+
+
                     return;
                 }
                 else

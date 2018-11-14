@@ -20,11 +20,17 @@ public class Vindaloo : Powerup
     public float ExplosionRadius { get; set; } = 5.0f;
     // public float ExplosionForce { get; set; } = 200.0f;
     public float ExplosionForce = 200.0f;
-    public override void Start()
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
 
         m_throwable = true; // change depending on power-up
+        MovementSpeedModifier = 0.65f;
+
+        ExplosionSound = gameObject.AddComponent<SoundComponent>();
+        ExplosionSound.clip = VindalooExplosionSound;
+        ExplosionSound.Looping = false;
+        ExplosionSound.Is3D = true;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.clip = VindalooExplosionSound;
@@ -126,24 +132,28 @@ public class Vindaloo : Powerup
             return;
         activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
-        Explosion();
+        
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
-        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(_Chad.gameObject);
-        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+        //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(_Chad.gameObject);
+        //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
 
 
-        if (localChad && otherPlayerTeam != playerTeam)
+        if (localChad)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
+
+        Explosion();
     }
 
     private void Explosion()

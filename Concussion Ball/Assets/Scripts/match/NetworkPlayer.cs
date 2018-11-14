@@ -12,11 +12,13 @@ public class NetworkPlayer : NetworkComponent
     public Team Team {get; private set;}
     public float BottomOfTheWorld { get; set; } = -5;
     Material mat;
-
+    Rigidbody rb;
 
     public override void Awake()
     {
-        Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
+        rb = gameObject.GetComponent<Rigidbody>();
+        if (Team == null)
+            Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
     }
 
     public override void Start()
@@ -53,6 +55,8 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
+            if(Team != null)
+                mat?.SetColor("color", Team.Color);
         }
 
     }
@@ -73,22 +77,20 @@ public class NetworkPlayer : NetworkComponent
     {
         mat?.SetColor("color", Team.Color);
         if (isOwner && (int)Team.TeamType > (int)TEAM_TYPE.TEAM_SPECTATOR)
-        {
-            gameObject.GetComponent<Rigidbody>().enabled = false;
-            StartCoroutine(EnableRigidbody());
+        { 
             transform.position = Team.GetSpawnPosition();
             transform.LookAt(new Vector3(0, transform.position.y, 0));
+
+            rb.Position = transform.position;
+            rb.Rotation = transform.rotation;
+            rb.IgnoreNextTransformUpdate();
+
             gameObject.GetComponent<ChadControls>().Reset();
         }
+    
 
         CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
         CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
-    }
-
-    IEnumerator EnableRigidbody()
-    {
-        yield return null;
-        gameObject.GetComponent<Rigidbody>().enabled = true;
     }
 
 

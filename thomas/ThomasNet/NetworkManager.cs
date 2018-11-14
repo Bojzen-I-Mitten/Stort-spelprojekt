@@ -137,6 +137,11 @@ namespace ThomasEngine.Network
             NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
         }
 
+        public void Disconnect()
+        {
+            InternalManager.DisconnectAll();
+        }
+
         #region Listners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -280,7 +285,32 @@ namespace ThomasEngine.Network
                 NetManager.PollEvents();
                 Diagnostics();
                 profile.sendSample();
+
+
+                //Check real owners.
+                //if((int)TimeSinceServerStarted % 3 == 0)
+                //{
+                //    foreach (var owners in Scene.ObjectOwners)
+                //    {
+                //        if (owners.Key != LocalPeer)
+                //        {
+                //            foreach (var identity in owners.Value)
+                //            {
+                //                if (identity.ID >= 0)
+                //                {
+                //                    SendRPC(owners.Key, -2, "RPCTempOwnerStuff", identity.ID);
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+                
             }
+        }
+
+        public void RPCTempOwnerStuff(int ID)
+        {
+            Scene.FindNetworkObject(ID).Owner = true;
         }
 
         public override void OnDestroy()
