@@ -10,7 +10,7 @@ namespace thomas
 		{
 			GpuProfiler::GpuProfiler()
 				: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0),
-				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
+				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f), m_dxgiAdapter4(nullptr)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -46,34 +46,21 @@ namespace thomas
 					}
 				}
 
-				IDXGIDevice* dxgiDevice = nullptr;
-				HRESULT hr = device->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)& dxgiDevice);
+				HRESULT hr = utils::D3D::Instance()->GetDxgiAdapter()->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&m_dxgiAdapter4);
 				if (SUCCEEDED(hr))
 				{
-					IDXGIAdapter* dxgiAdapter = nullptr;
-					hr = dxgiDevice->GetAdapter(&dxgiAdapter);
-					hr = dxgiAdapter->QueryInterface(__uuidof(IDXGIAdapter4), (void**)&m_dxgiAdapter4);
-					if (SUCCEEDED(hr))
-					{
-						//Use this for setting memory cap of vram at 512 mega bytes
-						//m_dxgiAdapter4->SetVideoMemoryReservation(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, 512000000);
+					//Use this for setting memory cap of vram at 512 mega bytes
+					//m_dxgiAdapter4->SetVideoMemoryReservation(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, 512000000);
 						
-						DXGI_QUERY_VIDEO_MEMORY_INFO info;
-						if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
-						{
-							m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
-							m_totalMemory = float(info.Budget * 0.001f * 0.001f);
-						};
+					DXGI_QUERY_VIDEO_MEMORY_INFO info;
+					if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+					{
+						m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
+						m_totalMemory = float(info.Budget * 0.001f * 0.001f);
+					};
 
-						SAFE_RELEASE(dxgiDevice);
-						SAFE_RELEASE(dxgiAdapter);
-						return true;
-					}
-
-					SAFE_RELEASE(dxgiAdapter);
+					return true;
 				}
-
-				SAFE_RELEASE(dxgiDevice);
 
 				return false;
 			}

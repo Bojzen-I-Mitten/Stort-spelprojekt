@@ -54,8 +54,6 @@ namespace thomas
 			// Do something?
 		}
 
-
-
 		void Renderer::PostRender()
 		{
 		}

@@ -17,8 +17,6 @@ namespace thomas
 {
 	namespace utils
 	{
-		D3D D3D::s_D3D;
-
 		bool D3D::CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv)
 		{
 		 
@@ -234,6 +232,7 @@ namespace thomas
 
 		D3D* D3D::Instance()
 		{
+			static D3D s_D3D;
 			return &s_D3D;
 		}
 
