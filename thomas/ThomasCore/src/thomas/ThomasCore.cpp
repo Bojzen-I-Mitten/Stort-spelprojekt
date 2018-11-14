@@ -78,8 +78,6 @@ namespace thomas
 		profiler->BeginFrame();
 
 		WindowManager::Instance()->ClearAllWindows();
-		profiler->WaitForDataAndUpdate();
-
 		profiler->Timestamp(utils::profiling::GTS_MAIN_CLEAR);
 		graphics::Renderer::Instance()->ProcessCommands();
 
@@ -87,6 +85,7 @@ namespace thomas
 		//  (whose data we're getting) will have finished on the GPU by now.
 
 		WindowManager::Instance()->PresentAllWindows();
+		profiler->WaitForDataAndUpdate();
 		utils::D3D::Instance()->GetProfiler()->EndFrame();
 		graphics::Renderer::Instance()->PostRender();	// Sync. shaders ...?
 	}

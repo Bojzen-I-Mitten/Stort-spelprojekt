@@ -233,24 +233,25 @@ namespace thomas
 	
 			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
-
-
-			ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
-			ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
-			if (editor::EditorCamera::Instance())
 			{
-				BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
-				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
-				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
+				PROFILE("Particles")
+					ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
+				ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
+				if (editor::EditorCamera::Instance())
+				{
+					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+					ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
+				}
+				for (object::component::Camera* cam : m_cameras.getCameras())
+				{
+					BindCameraRenderTarget(cam->GetFrameData());
+					ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
+					ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
+				}
 			}
-			for (object::component::Camera* cam : m_cameras.getCameras())
-			{
-				BindCameraRenderTarget(cam->GetFrameData());
-				ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
-				ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
-			}
+
 			profiler->Timestamp(utils::profiling::GTS_PARTICLES);
-			
 
 			//Take care of the editor camera and render gizmos
 			if (editor::EditorCamera::Instance())
@@ -259,24 +260,28 @@ namespace thomas
 				editor::Gizmos::Gizmo().RenderGizmos();
 			}
 
+			profiler->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
+
 			//Copy rendered objects into the back buffer
 			WindowManager::Instance()->ResolveRenderTarget();
 
-			// Gui draw
-			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				// Draw GUI for each camera that has enabled GUI rendering
-				// Shitty solution to camera destruction:
-				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+				// Gui draw
+				PROFILE("GUI");
+				for (auto & perCameraQueue : m_prevFrame->m_queue)
+				{
+					// Draw GUI for each camera that has enabled GUI rendering
+					// Shitty solution to camera destruction:
+					object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
-				BindCameraBackBuffer(perCameraQueue.second.m_frameData);
-				if (camera && camera->GetGUIRendering())
-					camera->RenderGUI();
+					BindCameraBackBuffer(perCameraQueue.second.m_frameData);
+					if (camera && camera->GetGUIRendering())
+						camera->RenderGUI();
+				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
+			profiler->Timestamp(utils::profiling::GTS_GUI);
 		}
-
 	}
 }
 

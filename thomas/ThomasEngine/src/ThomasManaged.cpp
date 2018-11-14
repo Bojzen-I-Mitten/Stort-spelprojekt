@@ -226,7 +226,6 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		profiler->ShowStatistics(showStatistics);
 		if (showStatistics)
 		{
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
@@ -241,11 +240,6 @@ namespace ThomasEngine {
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
-			//for (auto& it : *utils::profiling::ProfileManager::GetData())
-			//{
-			//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
-			//	ImGui::Text(it.first, it.second.back());
-			//}
 			ImGui::End();
 		}
 

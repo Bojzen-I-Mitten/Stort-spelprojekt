@@ -15,6 +15,7 @@ namespace thomas
 				GTS_MAIN_OBJECTS,
 				GTS_PARTICLES,
 				GTS_GIZMO_OBJECTS,
+				GTS_GUI,
 				GTS_END_FRAME,
 
 				GTS_MAX
@@ -26,9 +27,6 @@ namespace thomas
 				GpuProfiler();
 				bool Init();
 				void Destroy();
-
-				//Only used for toggle performance metrics in editor via imgui
-				void ShowStatistics(bool show);
 
 				void BeginFrame();
 				void Timestamp(GTS gts);
@@ -68,8 +66,6 @@ namespace thomas
 
 				float m_memoryUsage;
 				float m_totalMemory;
-
-				bool m_active;
 			};
 		}
 	}
