@@ -261,6 +261,8 @@ namespace thomas
 				if (!CreateMultiThreadedInterface())
 					return false;
 
+				m_multiThreaded->SetMultithreadProtected(true);
+
 #ifdef  _DEBUG_DX
 				CreateDebugInterface();
 #endif
@@ -369,6 +371,10 @@ namespace thomas
 
 			m_deviceContextImmediate->ClearState();
 			m_deviceContextImmediate->Flush();
+
+			m_multiThreaded->SetMultithreadProtected(false);
+
+			SAFE_RELEASE(m_multiThreaded);
 
 			SAFE_RELEASE(m_deviceContextDeferred);
 			SAFE_RELEASE(m_deviceContextImmediate);

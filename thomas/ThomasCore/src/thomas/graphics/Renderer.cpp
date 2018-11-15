@@ -176,7 +176,6 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
-			utils::D3D::Instance()->EnableMultithreadProtection(true);
 			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
 			//Process commands
@@ -281,8 +280,6 @@ namespace thomas
 			}
 
 			profiler->Timestamp(utils::profiling::GTS_GUI);
-
-			utils::D3D::Instance()->EnableMultithreadProtection(false);
 		}
 	}
 }

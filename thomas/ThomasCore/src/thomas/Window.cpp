@@ -145,7 +145,7 @@ namespace thomas
 
 			SAFE_RELEASE(m_dx.depthStencilState);
 
-			m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_R8G8B8A8_UNORM,
+			m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_B8G8R8A8_UNORM,
 				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 			return InitDxBuffers();
 		}
@@ -169,9 +169,8 @@ namespace thomas
 	{
 		utils::D3D::Instance()->FinishCommandList(m_dx.commandList[m_frameIndex]);
 		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList[m_frameIndex]);
-
 		Present();
-
+		
 		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 	}
 
@@ -286,7 +285,7 @@ namespace thomas
 	void Window::ResolveRenderTarget()
 	{
 		unsigned int sub = D3D11CalcSubresource(0, 0, 1);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->ResolveSubresource(m_dx.buffer[0][m_frameIndex], sub, m_dx.buffer[1][m_frameIndex], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
+		utils::D3D::Instance()->GetDeviceContextDeffered()->ResolveSubresource(m_dx.buffer[0][m_frameIndex], sub, m_dx.buffer[1][m_frameIndex], sub, DXGI_FORMAT_B8G8R8A8_UNORM);
 	}
 
 	void Window::SetCursor(const bool & visible)

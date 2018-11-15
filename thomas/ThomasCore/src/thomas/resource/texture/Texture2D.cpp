@@ -86,7 +86,7 @@ namespace thomas
 
 		std::vector<math::Color> Texture2D::GetPixels()
 		{
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, *data);
 
 			std::vector<math::Color> pixels;
 			DirectX::PackedVector::XMUBYTEN4* rawPixels = (DirectX::PackedVector::XMUBYTEN4*)data->GetPixels();
@@ -95,7 +95,7 @@ namespace thomas
 			{
 				pixels.push_back(math::Color(rawPixels[i].v));
 			}
-			
+
 			return pixels;
 		}
 
@@ -108,13 +108,11 @@ namespace thomas
 
 		byte * Texture2D::GetRawBGRAPixels()
 		{
-			utils::D3D::Instance()->EnterCriticalSection();
 			DirectX::ScratchImage firstData;
 			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, firstData);
 			hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), DXGI_FORMAT_B8G8R8A8_UNORM, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, *data);
 			firstData.Release();
-			utils::D3D::Instance()->ExitCriticalSection();
-
+			
 			return data->GetPixels();
 		}
 

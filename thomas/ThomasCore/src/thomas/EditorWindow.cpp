@@ -59,9 +59,9 @@ namespace thomas
 		if (ImGui_ImplDx11_Valid() && m_guiData)
 			ImGui_ImplDX11_RenderDrawData(m_guiData);
 
+
 		utils::D3D::Instance()->FinishCommandList(m_dx.commandList[m_frameIndex]);
 		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList[m_frameIndex]);
-
 		Present();
 
 		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
