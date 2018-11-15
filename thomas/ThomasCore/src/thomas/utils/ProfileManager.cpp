@@ -10,8 +10,10 @@ namespace thomas
 		{
 			std::vector<long long> ProfileManager::s_fps;
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
+			std::vector<long long> ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
 			float ProfileManager::s_vramusage;
+			float ProfileManager::s_vrambudget;
 			unsigned int ProfileManager::s_frames;
 
 			void ProfileManager::resetFrameCounter()
@@ -39,6 +41,14 @@ namespace thomas
 				s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));
 			}
 
+			void ProfileManager::storeGpuSample(long long gpuTime)
+			{
+				if (gpuTime < 0)
+					s_gpuSamples.push_back(0);
+
+				s_gpuSamples.push_back(gpuTime);
+			}
+
 			//void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
 			//{
 			//	s_samples[std::to_string((int)processor_id)][name].push_back(elapsedTime);
@@ -52,6 +62,7 @@ namespace thomas
 
 				j["SlowfilerData"]["build"]["fps"] = s_fps;
 
+				j["SlowfilerData"]["gpu"] = s_gpuSamples;
 
 				j["SlowfilerData"]["processor"];
 
@@ -117,9 +128,10 @@ namespace thomas
 				s_ramusage = usage;
 			}
 
-			void ProfileManager::setVRAMUsage(float usage)
+			void ProfileManager::setVRAMUsage(float usage, float budget)
 			{
 				s_vramusage = usage;
+				s_vrambudget = budget;
 			}
 
 		}
