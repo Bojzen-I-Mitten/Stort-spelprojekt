@@ -10,14 +10,11 @@ namespace thomas
 		{
 			GpuProfiler::GpuProfiler()
 				: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0), m_beginAvg(0.0f),
-				m_drawCalls(0), m_totalVertexCount(0), m_totalFaceCount(0),
-				m_memoryUsage(0.0f), m_active(false),
-				m_currentFrame(0), m_maxFrames(5)
+				m_drawCalls(0), m_totalVertexCount(0), m_totalFaceCount(0), m_memoryUsage(0.0f)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
 				memset(m_timings, 0, sizeof(m_timings));
-				memset(m_avgTimings, 0, sizeof(m_avgTimings));
 				memset(m_avgTimings, 0, sizeof(m_avgTimings));
 			}
 			bool GpuProfiler::Init()

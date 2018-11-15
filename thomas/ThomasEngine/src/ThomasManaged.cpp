@@ -286,13 +286,13 @@ namespace ThomasEngine {
 		while (ThomasCore::Initialized())
 		{
 			PROFILE("StartEngine")
-			// Load scene
-			if (Thomas->m_scene->LoadThreadWaiting())
-			{
-				// Swap scene
-				RenderFinished->WaitOne();
-				Thomas->m_scene->ListenToLoadProcess();
-			}
+				// Load scene
+				if (Thomas->m_scene->LoadThreadWaiting())
+				{
+					// Swap scene
+					RenderFinished->WaitOne();
+					Thomas->m_scene->ListenToLoadProcess();
+				}
 			if (Thomas->m_scene->NoSceneExist())	// Wait for scene load
 			{
 				Thread::Sleep(500);
@@ -302,7 +302,7 @@ namespace ThomasEngine {
 			try {
 
 				thomas::ThomasTime::Update();
-				
+
 				if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
 					RenderFinished->WaitOne();
 				WindowManager::Instance()->Update();
@@ -312,18 +312,18 @@ namespace ThomasEngine {
 #ifdef _THOMAS_SCENE_LOCK
 				Monitor::Enter(Thomas->m_sceneLock);
 #endif _THOMAS_SCENE_LOCK
-							   	
+
 
 				//Logic
 				{
 					PROFILE("LogicLoop")
-					for each (GameObject^ gameObject in CurrentScene->GameObjects)
-					{
-						if (gameObject->GetActive())
+						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							gameObject->Update();
+							if (gameObject->GetActive())
+							{
+								gameObject->Update();
+							}
 						}
-					}
 				}
 				editor::EditorCamera::Instance()->Update();
 
@@ -334,7 +334,7 @@ namespace ThomasEngine {
 					{
 						PROFILE("UpdateRigidbodies")
 
-						thomas::Physics::UpdateRigidbodies();
+							thomas::Physics::UpdateRigidbodies();
 					}
 					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
@@ -356,7 +356,7 @@ namespace ThomasEngine {
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-						
+
 						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
 							if (gameObject->GetActive())
@@ -364,8 +364,8 @@ namespace ThomasEngine {
 						}
 						s_Selection->render();
 					}	//end editor rendering
-				
-					
+
+
 
 					for (object::component::Camera* camera : graphics::Renderer::Instance()->getCameraList().getCameras())
 					{
@@ -414,8 +414,6 @@ namespace ThomasEngine {
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));
-			}
-
 			}
 		}
 		while (!renderThread->Join(System::TimeSpan(0, 0, 1)))	// Wait until thread is finished
