@@ -43,10 +43,10 @@ namespace ThomasEngine
 		static void OnPlay();
 		static void OnStop();
 		static void SavePrefab(GameObject ^ gameObject, String ^ path);
-		/* Create a new prefab, to be made used in some context
+		/* Create a new prefab, to be used in a scene context.
 		*/
 		static GameObject ^ CreatePrefab(String^ path);
-		/* Load a prefab as a resource
+		/* Load a prefab as an editor resource, and not to be used.
 		*/
 		static GameObject ^ LoadPrefabResource(String^ path);
 

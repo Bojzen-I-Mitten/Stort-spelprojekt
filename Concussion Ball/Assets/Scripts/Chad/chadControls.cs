@@ -94,9 +94,7 @@ public class ChadControls : NetworkComponent
         ThrowForce = BaseThrowForce;
         rBody = gameObject.GetComponent<Rigidbody>();
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
-        if (rBody != null)
-            rBody.IsKinematic = !isOwner;
-        rBody.Friction = 0.99f;
+        //rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
         NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
@@ -105,7 +103,19 @@ public class ChadControls : NetworkComponent
 
         Identity.RefreshCache();
     }
+    public override void OnGotOwnership()
+    {
+        base.OnGotOwnership();
+        if (rBody != null)
+            rBody.IsKinematic = false;
 
+    }
+    public override void OnLostOwnership()
+    {
+        base.OnLostOwnership();
+        if (rBody != null)
+            rBody.IsKinematic = true;
+    }
     public void DeactivateCamera()
     {
         if (isOwner)

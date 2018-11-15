@@ -49,7 +49,8 @@ namespace ThomasEngine
 		void SyncComponents();
 
 		void PostLoad(Scene^ scene);
-
+		/* Post instantiate the object, adding it to the scene etc.
+		*/
 		void PostInstantiate(Scene^ scene);
 		/* Clean out null components (no lock applied, assert stable state)
 		*/
