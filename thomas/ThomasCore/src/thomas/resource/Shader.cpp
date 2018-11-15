@@ -585,6 +585,8 @@ namespace thomas
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+						if (semantic == "SHADOWMAP")
+							isMaterialProperty = false;
 					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:

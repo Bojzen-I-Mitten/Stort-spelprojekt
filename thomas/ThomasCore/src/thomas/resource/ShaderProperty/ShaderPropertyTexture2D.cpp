@@ -18,7 +18,9 @@ namespace thomas
 			{
 				if (m_value)
 				{
-					shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
+					auto test = shader->GetEffect()->GetVariableByName(name.c_str());
+					HRESULT hr = test->AsShaderResource()->SetResource(m_value->GetResourceView());
+					int stop = 0;
 				}
 			}
 

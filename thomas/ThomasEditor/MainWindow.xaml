@@ -147,7 +147,7 @@
                             
                             <xcad:LayoutDocumentPane>
                                 <xcad:LayoutAnchorable ContentId="Game View" Title="Game View" CanHide="False" CanClose="False">
-                                    <local:ThomasWindow x:Name="game" IsEditor="False"/>
+                                    <!--<local:ThomasWindow x:Name="game" IsEditor="False"/>-->
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>

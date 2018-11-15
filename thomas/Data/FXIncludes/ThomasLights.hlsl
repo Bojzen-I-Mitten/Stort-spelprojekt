@@ -26,7 +26,7 @@ SamplerState StandardWrapSamplerr
     AddressV = Wrap;
 };
 //Texture2DArray ShadowMaps;
-Texture2D shadowMap;
+Texture2D ShadowMap : SHADOWMAP;
 
 cbuffer LightCountsStruct
 {
@@ -95,7 +95,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         float visibility = 5.0;
         float3 sampleCoordLS = WorldToLightClipPos(worldPos).xyz;
         
-        if (shadowMap.Sample(StandardWrapSamplerr, sampleCoordLS.xy).x < sampleCoordLS.z)
+        if (ShadowMap.Sample(StandardWrapSamplerr, sampleCoordLS.xy).x < sampleCoordLS.z)
         {
             visibility = 0.1;
         }
