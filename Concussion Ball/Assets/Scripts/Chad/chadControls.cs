@@ -98,12 +98,12 @@ public class ChadControls : NetworkComponent
         // Init pick-up text and description
         PowerupPickupText = Canvas.Add("");
         PowerupPickupText.position = new Vector2(0.4975f, 0.5f);
-        PowerupPickupText.color = Color.Yellow; // Outline would be nice on this
+        PowerupPickupText.color = Color.Yellow; // Need black outline for better visual effect
         PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
         PowerupPickupText.font = PickupFont;
 
         PowerupPickupDescText = Canvas.Add("");
-        PowerupPickupDescText.position = new Vector2(0.4975f, 0.55f);
+        PowerupPickupDescText.position = new Vector2(0.4975f, 0.56f);
         PowerupPickupDescText.color = Color.Black;
         PowerupPickupDescText.origin = new Vector2(0.5f, 0.0f);
         PowerupPickupDescText.font = PickupDescFont;
