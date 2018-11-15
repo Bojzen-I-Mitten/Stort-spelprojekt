@@ -120,9 +120,7 @@ public class GUIPlayerScore : ScriptComponent
     public Vector2 ScaleText { get; set; }
     private bool Toggle = false;
     public Font Font { get; set; }
-    public List<NetworkPlayer> NetworkPlayersTeam1;
-    public List<NetworkPlayer> NetworkPlayersTeam2;
-
+    
     Image AmountOfPlayersBarImage;
     Text TeamAmountOfPlayersText;
     Image team1BarImage;
@@ -151,19 +149,21 @@ public class GUIPlayerScore : ScriptComponent
         //Team1Bar Image
         team1BarImage = Canvas.Add(Team1Bar);
         team1BarImage.scale = Vector2.Zero;
-        team1BarImage.color = Color.Red;
+        //team1BarImage.color = Color.Red;
+        team1BarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
         team1BarImage.origin = new Vector2(0, -2.025f);
 
         //Team2Bar Image
         team2BarImage = Canvas.Add(Team2Bar);
         team2BarImage.scale = Vector2.Zero;
-        team2BarImage.color = Color.Blue;
+        team2BarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+        //team2BarImage.color = Color.Blue;
         team2BarImage.origin = new Vector2(-1.48f, -2.025f);
 
         //AmountOfPlayersBar Image
         AmountOfPlayersBarImage = Canvas.Add(AmountOfPlayersBar);
         AmountOfPlayersBarImage.scale = Vector2.Zero;
-        AmountOfPlayersBarImage.color = Color.Blue;
+        AmountOfPlayersBarImage.color = Color.MediumPurple;
         AmountOfPlayersBarImage.origin = new Vector2(-1.92f, -0.8f);
 
         //playerBar.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
@@ -185,8 +185,8 @@ public class GUIPlayerScore : ScriptComponent
         PlayerstandardText[0].origin = new Vector2(-0.01f, -10.2f);
         PlayerstandardText[1].origin = new Vector2(-1.25f, -10.2f);
         PlayerStandardbar[0].origin = new Vector2(0, -3);
-        PlayerStandardbar[0].color = Color.Red;
-        PlayerStandardbar[1].color = Color.Blue;
+        PlayerStandardbar[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
+        PlayerStandardbar[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
         PlayerStandardbar[1].origin = new Vector2(-0.84f, -3);
 
     }
@@ -266,7 +266,7 @@ public class GUIPlayerScore : ScriptComponent
                     int i = PlayerStandardBarTeam2.Count;
                     PlayerStandardBarTeam2.Add(Canvas.Add(PlayerBarTeam2));
                     PlayerStandardBarTeam2[i].scale = Vector2.Zero;
-                    PlayerStandardBarTeam2[i].color = Color.Blue;
+                    PlayerStandardBarTeam2[i].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
                     PlayerStandardBarTeam2[i].origin = new Vector2(-0.84f, -3.75f - (i * 0.75f));
                     Team2Players.Add(new Playertext(i, Font, Canvas, "jonn " + i, 2, 34, 4, 94, TEAM_TYPE.TEAM_2));
                 }
@@ -298,7 +298,7 @@ public class GUIPlayerScore : ScriptComponent
                     int i = PlayerStandardBarTeam1.Count;
                     PlayerStandardBarTeam1.Add(Canvas.Add(PlayerBarTeam1));
                     PlayerStandardBarTeam1[i].scale = Vector2.Zero;
-                    PlayerStandardBarTeam1[i].color = Color.Red;
+                    PlayerStandardBarTeam1[i].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red;
                     PlayerStandardBarTeam1[i].origin = new Vector2(0, -3.75f - (i * 0.75f));
                     Team1Players.Add(new Playertext(i, Font, Canvas, "jonn " + i, 2, 34, 4, 94, TEAM_TYPE.TEAM_1));
                 }
@@ -324,9 +324,21 @@ public class GUIPlayerScore : ScriptComponent
         }
     }
 
+    void UpdateStatistics()
+    {
+        if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score == MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score)
+            AmountOfPlayersBarImage.color = Color.MediumPurple;
+        else if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score > MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score)
+            AmountOfPlayersBarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+        else if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score > MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score)
+            AmountOfPlayersBarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+        
+    }
+
     public override void Update()
     {
         UpdatePlayerBars();
+        UpdateStatistics();
         if (Toggle)
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
