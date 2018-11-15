@@ -62,9 +62,9 @@ public class ChadCam : ScriptComponent
                 case ChadControls.STATE.DIVING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                     {
-                        if (!Input.GetKey(Input.Keys.LeftShift))
+                        if (!Input.GetKey(Input.Keys.LeftAlt))
                             FondleCamera();
-                        else if (Input.GetKeyDown(Input.Keys.LeftShift))
+                        else if (Input.GetKeyDown(Input.Keys.LeftAlt))
                             InitFreeLookCamera();
                         else
                             FreeLookCamera();
@@ -76,7 +76,7 @@ public class ChadCam : ScriptComponent
                     break;
                 case ChadControls.STATE.RAGDOLL:
                     {
-                        RagdollCamera();
+                        FreeLookCamera();
                     }
                     break;
             }
@@ -97,14 +97,11 @@ public class ChadCam : ScriptComponent
         float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
         Chad.rBody.Rotation = Chad.rBody.Rotation * Quaternion.CreateFromAxisAngle(Vector3.Up, yaw);
 
-        
-
+        ResetCamera();
 
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
         
-        transform.position = ChadHead;
-        transform.rotation = Chad.rBody.Rotation;
         transform.RotateByAxis(transform.right, TotalYStep);
         transform.position = ChadHead + CameraOffset * -transform.forward;
 
@@ -116,11 +113,21 @@ public class ChadCam : ScriptComponent
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
 
-        transform.position = ChadHead;
-        transform.rotation = Chad.rBody.Rotation;
-        transform.RotateByAxis(Vector3.Up, TotalXStep + MathHelper.Pi);
-        transform.RotateByAxis(transform.right, TotalYStep);
-        transform.position = ChadHead + CameraOffset * -transform.forward;
+        if (Chad.State != ChadControls.STATE.RAGDOLL)
+        {
+            transform.position = ChadHead;
+            transform.rotation = Chad.rBody.Rotation;
+            transform.RotateByAxis(Vector3.Up, TotalXStep + MathHelper.Pi);
+            transform.RotateByAxis(transform.right, TotalYStep);
+            transform.position = ChadHead + CameraOffset * -transform.forward;
+        }
+        else
+        {
+            transform.rotation = Chad.rBody.Rotation;
+            transform.RotateByAxis(Vector3.Up, TotalXStep);
+            transform.RotateByAxis(transform.right, TotalYStep);
+            transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
+        }
     }
 
     public void ThrowingCamera()
@@ -145,13 +152,8 @@ public class ChadCam : ScriptComponent
 
     public void ResetCamera()
     {
-        if(Chad)
-            transform.position = CameraOffset * -Chad.transform.forward;
-        transform.LookAt(ChadHead);
-
-        transform.localEulerAngles = new Vector3(0, 0, 0);
-        TotalXStep = 0;
-        TotalYStep = 0;
+        transform.position = ChadHead;
+        transform.rotation = Chad.rBody.Rotation;
     }
 
     private float ClampCameraRadians(float angle, float min, float max)

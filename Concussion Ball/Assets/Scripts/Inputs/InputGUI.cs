@@ -7,14 +7,14 @@ class GUIInput
     public static void AppendString(ref string _string, int length)
     {
         char c = Input.GetLastKeyChar();
-        if (char.IsPunctuation(c) || char.IsLetterOrDigit(c) || char.IsSymbol(c) || char.IsSeparator(c))
+        if (char.IsPunctuation(c) || char.IsLetterOrDigit(c) || char.IsSymbol(c) || char.IsSeparator(c) || char.IsWhiteSpace(c))
         {
             if (_string.Length < length)
             {
                 _string += Input.GetLastKeyChar();
             }
         }
-        else if (Input.GetKey(Input.Keys.Back))
+        else if (c == (char)Input.Keys.Back)
         {
             if (_string.Length > 0)
             {

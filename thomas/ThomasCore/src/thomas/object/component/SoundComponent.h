@@ -1,19 +1,24 @@
 #pragma once
 
-#include "Component.h"
-#include "../../utils/Math.h"
-#include "Component.h"
-#include <memory>
+// Fmod
+#include <fmod/fmod.hpp>
 
-namespace DirectX { class AudioEmitter; class SoundEffectInstance; }
+// Thomas
+#include "Component.h"
+
 namespace thomas
 {
-	using namespace math;
-
 	namespace resource
 	{
 		class AudioClip;
 	}
+
+	enum class SoundType
+	{
+		Music,
+		Effect,
+		Voice
+	};
 
 	namespace object
 	{
@@ -23,42 +28,54 @@ namespace thomas
 			{
 			public:
 				SoundComponent();
-				~SoundComponent();
+				~SoundComponent() = default;
 
-				virtual void OnDisable() override;
-				void Update();
+				void OnDisable() override;
 				void Play();
-				void PlayOneShot();
+				void Play(resource::AudioClip* clip, float volume, bool looping, bool is3D);
 				void Stop();
-				void Pause();
-				void Resume();
-
-				bool IsPlaying() const;
-				bool IsPaused() const;
-				bool HasStopped() const;
-			private:
-				void Apply3D(const Vector3& listenerPos, const Vector3& sourcePos);
+				void Update() override;
 
 			public:
-				void SetClip(resource::AudioClip* clip);		
+				void SetType(SoundType type);
+				void SetClip(resource::AudioClip* clip);
 				void SetVolume(float volume);
-				void SetVolumeFactor(float volumeFactor);
+				void Set3D(bool is3D);
 				void SetLooping(bool looping);
-				void Set3D(bool value);
+				void SetPaused(bool paused);
+				void SetMute(bool mute);
+				void Set3DMinDistance(float min);
+				void Set3DMaxDistance(float max);
+				void Set3DSpreadAngle(float angle);
+
 			public:
+				SoundType GetType() const;
 				resource::AudioClip* GetClip() const;
 				float GetVolume() const;
-				float GetVolumeFactor() const;
+				float Get3DMinDistance() const;
+				float Get3DMaxDistance() const;
+				float Get3DSpreadAngle() const;
+				bool IsPlaying() const;
 				bool IsLooping() const;
-				bool is3D() const;
+				bool IsPaused() const;
+				bool Is3D() const;
+				bool IsMute() const;
+
 			private:
+				void AdjustVolumeType(float volume);
+
+			private:
+				SoundType m_type;
+				FMOD::Channel* m_channel;
 				resource::AudioClip* m_clip;
-				float m_volume;
-				float m_volumeFactor;
-				bool m_looping;
 				bool m_is3D;
-				DirectX::AudioEmitter* m_emitter;
-				std::unique_ptr<DirectX::SoundEffectInstance> m_soundEffectInstance;
+				bool m_looping;
+				bool m_paused;
+				bool m_muted;
+				float m_volume;
+				float m_minDistance;
+				float m_maxDistance;
+				float m_spreadAngle;
 			};
 		}
 	}

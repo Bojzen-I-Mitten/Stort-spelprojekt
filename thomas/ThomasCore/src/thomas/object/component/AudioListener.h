@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-namespace DirectX { class AudioListener; }
 namespace thomas
 {
 	namespace object
@@ -10,17 +9,32 @@ namespace thomas
 			class AudioListener : public Component
 			{
 			public:
-				AudioListener();
+				AudioListener() = default;
 				~AudioListener() = default;
 
 				void OnEnable();
 				void OnDisable();
-				void Update();
+
+			public:
+				void SetMasterVolume(float volume);	
+				void SetMusicVolume(float volume);
+				void SetFXVolume(float volume);
+				void SetVoiceVolume(float volume);
+
+			public:
+				float GetMasterVolume() const;
+				float GetMusicVolume() const;
+				float GetFXVolume() const;
+				float GetVoiceVolume() const;
+
 				static AudioListener* GetInstance();
-				DirectX::AudioListener& GetListner();
+
 			private:
 				static AudioListener* s_instance;
-				DirectX::AudioListener* m_listner;
+				static float s_masterVolume;
+				static float s_musicVolume;
+				static float s_fxVolume;
+				static float s_voiceVolume;
 			};
 		}
 	}
