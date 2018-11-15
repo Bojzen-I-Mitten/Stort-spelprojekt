@@ -9,8 +9,6 @@
 #include <DirectXTK\Mouse.h>
 #include "utils\Math.h"
 
-#include <smartenum/smartenum.hpp>
-
 using namespace DirectX;
 
 namespace thomas
