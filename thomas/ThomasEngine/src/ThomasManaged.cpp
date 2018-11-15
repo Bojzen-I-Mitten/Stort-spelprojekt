@@ -126,12 +126,11 @@ namespace ThomasEngine {
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 * 0.001f * 0.001f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		profiler->SetActive(true);
-		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage());
+		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 #endif
 
 	}
@@ -159,6 +158,7 @@ namespace ThomasEngine {
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
+			float timeStart = ThomasTime::GetElapsedTime();
 			PROFILE("StartRenderer")
 			{
 				PROFILE("StartRenderer - Wait")
@@ -167,6 +167,11 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+			renderTime = ThomasTime::GetElapsedTime() - timeStart;
+
+			float gpuTime = utils::D3D::Instance()->GetProfiler()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
+			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
+
 #ifdef BENCHMARK
 			utils::profiling::ProfileManager::newFrame();
 #endif
@@ -236,13 +241,12 @@ namespace ThomasEngine {
 	{
 		PROFILE("CopyCommandList")
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-
-		profiler->SetActive(showStatistics);
-		if (showStatistics) {
-
+		if (showStatistics)
+		{
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("%d FPS (%.2f ms)", ThomasTime::GetFPS(), ThomasTime::GetFrameTime());
-			ImGui::Text("Main thread: %.02f ms	Render thread: %.02f ms", cpuTime*1000.0f, profiler->GetFrameTime()*1000.0f);
+			ImGui::Text("Logic Thread: %.02f ms	 Render Thread: %.02f ms", logicTime*1000.0f, renderTime*1000.0f);
+			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
@@ -251,11 +255,6 @@ namespace ThomasEngine {
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
-			//for (auto& it : *utils::profiling::ProfileManager::GetData())
-			//{
-			//	//ImGui::PlotHistogram(it.first, it.second.data(), it.second.size(), 0, "", 0.0f, 10000.0f, ImVec2(0, 80));
-			//	ImGui::Text(it.first, it.second.back());
-			//}
 			ImGui::End();
 		}
 
@@ -287,13 +286,13 @@ namespace ThomasEngine {
 		while (ThomasCore::Initialized())
 		{
 			PROFILE("StartEngine")
-			// Load scene
-			if (Thomas->m_scene->LoadThreadWaiting())
-			{
-				// Swap scene
-				RenderFinished->WaitOne();
-				Thomas->m_scene->ListenToLoadProcess();
-			}
+				// Load scene
+				if (Thomas->m_scene->LoadThreadWaiting())
+				{
+					// Swap scene
+					RenderFinished->WaitOne();
+					Thomas->m_scene->ListenToLoadProcess();
+				}
 			if (Thomas->m_scene->NoSceneExist())	// Wait for scene load
 			{
 				Thread::Sleep(500);
@@ -303,7 +302,7 @@ namespace ThomasEngine {
 			try {
 
 				thomas::ThomasTime::Update();
-				
+
 				if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
 					RenderFinished->WaitOne();
 				WindowManager::Instance()->Update();
@@ -313,18 +312,18 @@ namespace ThomasEngine {
 #ifdef _THOMAS_SCENE_LOCK
 				Monitor::Enter(Thomas->m_sceneLock);
 #endif _THOMAS_SCENE_LOCK
-							   	
+
 
 				//Logic
 				{
 					PROFILE("LogicLoop")
-					for each (GameObject^ gameObject in CurrentScene->GameObjects)
-					{
-						if (gameObject->GetActive())
+						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							gameObject->Update();
+							if (gameObject->GetActive())
+							{
+								gameObject->Update();
+							}
 						}
-					}
 				}
 				editor::EditorCamera::Instance()->Update();
 
@@ -335,7 +334,7 @@ namespace ThomasEngine {
 					{
 						PROFILE("UpdateRigidbodies")
 
-						thomas::Physics::UpdateRigidbodies();
+							thomas::Physics::UpdateRigidbodies();
 					}
 					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
@@ -357,7 +356,7 @@ namespace ThomasEngine {
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-						
+
 						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
 							if (gameObject->GetActive())
@@ -365,8 +364,8 @@ namespace ThomasEngine {
 						}
 						s_Selection->render();
 					}	//end editor rendering
-				
-					
+
+
 
 					for (object::component::Camera* camera : graphics::Renderer::Instance()->getCameraList().getCameras())
 					{
@@ -384,7 +383,7 @@ namespace ThomasEngine {
 			}
 			finally
 			{
-				cpuTime = ThomasTime::GetElapsedTime() - timeStart;
+				logicTime = ThomasTime::GetElapsedTime() - timeStart;
 				if (WindowManager::Instance())
 				{
 					thomas::object::component::RenderComponent::ClearList();
@@ -400,10 +399,7 @@ namespace ThomasEngine {
 					/* Render & Update is synced.
 					*/
 					SynchronousExecution();
-
-
 					RenderFinished->Reset();
-
 					UpdateFinished->Set();
 
 #ifdef _THOMAS_SCENE_LOCK
@@ -418,7 +414,6 @@ namespace ThomasEngine {
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));
-
 			}
 		}
 		while (!renderThread->Join(System::TimeSpan(0, 0, 1)))	// Wait until thread is finished

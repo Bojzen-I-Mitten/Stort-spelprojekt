@@ -376,6 +376,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Data\FXIncludes\" />
+    <Folder Include="dll\" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\thomas.ico" />
@@ -525,9 +526,18 @@
   <ItemGroup>
     <Resource Include="icons\assets\font.png" />
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>if ($(ConfigurationName)) == (Debug) (
+    xcopy "$(ProjectDir)dll\fmodL64.dll" "$(OutDir)" /y /d
+    xcopy "$(ProjectDir)dll\fmodstudioL64.dll" "$(OutDir)" /y /d
+) else (
+    xcopy "$(ProjectDir)dll\fmod64.dll" "$(OutDir)" /y /d
+    xcopy "$(ProjectDir)dll\fmodstudio64.dll" "$(OutDir)" /y /d
+)
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

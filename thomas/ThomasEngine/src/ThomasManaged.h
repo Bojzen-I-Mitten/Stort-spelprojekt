@@ -46,7 +46,8 @@ namespace ThomasEngine {
 
 		static ThomasWrapper^ s_SYS;
 		static bool inEditor = false;
-		static float cpuTime = 0.0f;
+		static float logicTime = 0.0f;
+		static float renderTime = 0.0f;
 		static bool showStatistics = false;
 		static RunningState playing = RunningState::UnInitialized;
 		
