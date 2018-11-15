@@ -73,6 +73,10 @@ namespace ThomasEngine {
 		Scene(System::String^ name, uint32_t unique_id);
 		~Scene();
 
+		void AwakeObjects(List<GameObject^>^ objects, bool playing);
+
+		void EnableObjects(List<GameObject^>^ objects, bool playing);
+
 		uint32_t ID() { return m_uniqueID; } // 0 is reserved, unique ID's to be implemented.
 
 		bool OnPlay();

@@ -36,25 +36,32 @@ namespace ThomasEngine
 		UnLoad();
 	}
 
-	void initiateGameObjectComp(List<GameObject^>^ objects, bool playing)
+	void Scene::AwakeObjects(List<GameObject^>^ objects, bool playing)
 	{
-		if (objects->Count == 0) return;
-		// Initiate
+		// Call awake
 		for each (GameObject^ g in objects)
 			g->InitComponents(Comp::State::Awake, playing);
+	}
+	void Scene::EnableObjects(List<GameObject^>^ objects, bool playing)
+	{
 		// Verify non-editor components are activated
 		for each (GameObject^ g in objects)
 			g->InitComponents(Comp::State::Enabled, playing);
 	}
-
-
 	bool Scene::OnPlay()
 	{
 		ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
 		try
 		{
+			constexpr uint32_t MAX_INITIATION_LOOPS = 1;
+
 			// Start game objects
-			initiateGameObjectComp(m_gameObjects, true);
+			AwakeObjects(m_gameObjects, true);
+			SyncScene();							// Add objects created during awake (note: the objects will be enabled first)
+			EnableObjects(m_gameObjects, true);
+
+			for (uint32_t i = 0; i < MAX_INITIATION_LOOPS; i++)
+				SyncScene();						// Add more objects if needed
 		}
 		catch (Exception^ e)
 		{
@@ -167,7 +174,8 @@ namespace ThomasEngine
 			gObj->PostLoad(this);
 		}
 
-		initiateGameObjectComp(m_gameObjects, ThomasWrapper::IsPlaying());
+		AwakeObjects(m_gameObjects, ThomasWrapper::IsPlaying());
+		EnableObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 	}
 
 
@@ -224,8 +232,17 @@ namespace ThomasEngine
 		m_commandList = m_commandSwapList;
 		m_commandSwapList = swp;
 		// Initiate related components
-		initiateGameObjectComp(addedList, ThomasWrapper::IsPlaying());
-
+		try
+		{
+			AwakeObjects(addedList, ThomasWrapper::IsPlaying());
+			EnableObjects(addedList, ThomasWrapper::IsPlaying());
+		}
+		catch (Exception^ e)
+		{
+			// Need to remove failed object?!..
+			Debug::LogException(e);
+			Debug::LogError("Initiating a set of objects during runtime failed with folling error:");
+		}
 #ifdef _EDITOR
 		if(numChanged)	// Trigger event 
 			m_changeEvent(this, gcnew SceneObjectsChangedArgs(numChanged, addedList, removedList));

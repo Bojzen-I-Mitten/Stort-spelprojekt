@@ -508,12 +508,12 @@ namespace ThomasEngine {
 			Thomas->SceneManagerRef->ListenToLoadProcess();
 			Thread::Sleep(50);
 		}
+		playing = RunningState::Running;			// Set running state, scene depends on this value set during initiation.
 		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
 		// Initiate all object: Start engine, Chuuchuu!
 		if (CurrentScene->OnPlay())
 		{
-			playing = RunningState::Running;
 			Debug::Log("Running...");
 #ifdef _EDITOR
 			OnStartPlaying();
@@ -521,6 +521,7 @@ namespace ThomasEngine {
 		}
 		else
 		{
+			playing = RunningState::Editor;
 			// Error failed to run...
 			StopPlay();
 		}
