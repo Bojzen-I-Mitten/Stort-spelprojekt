@@ -251,6 +251,7 @@ public class ChadControls : NetworkComponent
             Ragdolling = StartRagdoll(duration, force, diveTackle);
             State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
+            Camera.InitFreeLookCamera();
         }
     }
     #endregion
