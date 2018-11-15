@@ -76,7 +76,7 @@ public class ChadCam : ScriptComponent
                     break;
                 case ChadControls.STATE.RAGDOLL:
                     {
-                        RagdollCamera();
+                        FreeLookCamera();
                     }
                     break;
             }
@@ -116,11 +116,19 @@ public class ChadCam : ScriptComponent
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
 
-        transform.position = ChadHead;
-        transform.rotation = Chad.rBody.Rotation;
-        transform.RotateByAxis(Vector3.Up, TotalXStep + MathHelper.Pi);
-        transform.RotateByAxis(transform.right, TotalYStep);
-        transform.position = ChadHead + CameraOffset * -transform.forward;
+        if (Chad.State != ChadControls.STATE.RAGDOLL)
+        {
+            transform.position = ChadHead;
+            transform.rotation = Chad.rBody.Rotation;
+            transform.RotateByAxis(Vector3.Up, TotalXStep + MathHelper.Pi);
+            transform.RotateByAxis(transform.right, TotalYStep);
+            transform.position = ChadHead + CameraOffset * -transform.forward;
+        }
+        else
+        {
+            transform.RotateByAxis(Vector3.Up, TotalXStep);
+            transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
+        }
     }
 
     public void ThrowingCamera()
