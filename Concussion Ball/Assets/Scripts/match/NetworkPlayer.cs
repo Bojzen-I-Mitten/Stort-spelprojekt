@@ -33,7 +33,10 @@ public class NetworkPlayer : NetworkComponent
     public override void Update()
     {
         if (transform.position.y < BottomOfTheWorld)
+        {
+            Debug.Log("Player: " + _Name + " fell outside world.");
             Reset();
+        }
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)

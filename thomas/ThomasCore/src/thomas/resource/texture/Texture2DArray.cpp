@@ -48,6 +48,7 @@ namespace thomas {
 		unsigned Texture2DArray::AddTexture(Texture2D* tex)
 		{
 			unsigned i = 0;
+			/*
 			for (; i < m_textures.size(); ++i)
 			{
 				if (m_textures[i] == tex)//resource manager makes sure the address is unique per texture
@@ -67,7 +68,7 @@ namespace thomas {
 
 			//update
 			OnChanged();
-
+			*/
 			return i;
 		}
 
