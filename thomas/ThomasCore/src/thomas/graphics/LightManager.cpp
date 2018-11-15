@@ -9,6 +9,8 @@
 #include "ChadowMapping.h"
 #include <algorithm>
 #include "../resource/texture/Texture2DArray.h"
+#include "render/Frame.h"
+
 namespace thomas
 {
 	namespace graphics
@@ -114,6 +116,31 @@ namespace thomas
 			return s_lights;
 		}
 
+		void LightManager::DrawShadows(render::CameraRenderQueue & renderQueue)
+		{
+			//for each light casting shadows
+			//{
+			if (s_lights.size() == 0)
+				return;
+
+			
+			s_lights[0]->UpdateShadowBox(nullptr);
+			s_lights[0]->BindShadowMapDepthTexture();
+
+			//PROFILE("ShadowDrawObjectsPerCamera")
+			for (auto & perMaterialQueue : renderQueue.m_commands3D)
+			{
+				//PROFILE("ShadowDrawObjects")
+				for (auto & perMeshCommand : perMaterialQueue.second)
+				{
+					{
+						//PROFILE("DrawShadow")
+						s_lights[0]->DrawShadow(perMeshCommand);
+					}
+				}
+			}
+		}
+
 		void LightManager::BindLights(render::ShaderList* shaders)
 		{
 			shaders->SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
@@ -125,7 +152,11 @@ namespace thomas
 
 		void LightManager::BindShadows(render::ShaderList * shaders)
 		{
+			if (s_lights.size() == 0)
+				return;
 
+			shaders->SetGlobalTexture2D("shadowMap", s_lights[0]->GetShadowMapTexture());
+			shaders->SetGlobalMatrix("lightMatrixVP", s_lights[0]->GetVPMat());
 		}
 
 		

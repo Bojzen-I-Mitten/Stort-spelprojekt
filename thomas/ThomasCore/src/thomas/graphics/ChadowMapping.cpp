@@ -105,6 +105,7 @@ namespace thomas
 		{
 			s_material->SetMatrix(THOMAS_MATRIX_WORLD, renderCommand.worldMatrix.Transpose());
 			s_material->ApplyProperty(THOMAS_MATRIX_WORLD);
+
 			s_material->Draw(renderCommand.mesh);
 		}
 
@@ -137,8 +138,9 @@ namespace thomas
 
 		void ShadowMap::BindShadowToMaterial(resource::Material * mat)
 		{
-			mat->SetMatrix("lightMatrixVP", (s_matrixClamp.Transpose() * m_matrixVP).Transpose());
-			//mat->ApplyProperty("lightMatrixVP");
+			//mat->SetMatrix("lightMatrixVP", (s_matrixClamp * m_matrixVP).Transpose());
+			mat->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
+			mat->ApplyProperty("lightMatrixVP");
 
 			mat->SetTexture2D("shadowMap", m_depthTexture.get());
 			//mat->ApplyProperty("shadowMap");

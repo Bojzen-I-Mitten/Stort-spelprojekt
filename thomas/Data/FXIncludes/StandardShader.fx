@@ -29,7 +29,7 @@ DepthStencilState EnableDepth
     DepthFunc = LESS_EQUAL;
 };
 
-RasterizerState TestRasterizer
+RasterizerState RasterizerSolid
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -107,7 +107,7 @@ technique11 Standard
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(TestRasterizer);
+        SetRasterizerState(RasterizerSolid);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 

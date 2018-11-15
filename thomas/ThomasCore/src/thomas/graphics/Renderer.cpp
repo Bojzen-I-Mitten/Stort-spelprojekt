@@ -183,42 +183,12 @@ namespace thomas
 				PROFILE("BindFrame")
 				BindFrame();
 			}
-			object::component::LightComponent* lll = nullptr;
+
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
-				auto lights = LightManager::GetLightsCastingShadows();
-				for (auto l : lights)
-				{
-					
-					if (camera)
-						l->UpdateShadowBox(editor::EditorCamera::Instance()->GetCamera());
-					l->BindShadowMapDepthTexture();
-					
-					PROFILE("ShadowDrawObjectsPerCamera")
-					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
-					{
-						PROFILE("ShadowDrawObjects")
-						for (auto & perMeshCommand : perMaterialQueue.second)
-						{
-							{
-								PROFILE("DrawShadow")
-								l->DrawShadow(perMeshCommand);
-							}
-						}
-					}
-					lll = l;
-					
-					/*ID3D11ShaderResourceView* srv[1] = { l->GetShadowMapTexture()->GetResourceView() };
-					utils::D3D::Instance()->GetDeviceContext()->PSSetShaderResources(7, 1, srv);
-
-
-
-					m_shaders.SetGlobalMatrix("lightMatrixVP", l->GetVPMat());*/
-//					utils::D3D::Instance()->GetDeviceContext()->PSSetConstantBuffers(7, 1, l->GetVPMat());
-//					m_shaders.SetGlobalTexture2D("shadowMap", l->GetShadowMapTexture());
-				}
+				LightManager::DrawShadows(perCameraQueue.second);
 				
 				{
 					PROFILE("CameraBind")
@@ -230,7 +200,10 @@ namespace thomas
 					if (camera && camera->hasSkybox())
 						camera->DrawSkyBox();
 				}
+
 				// Draw objects
+				LightManager::BindShadows(&m_shaders);
+
 				{
 					PROFILE("CameraDrawObjects")
 					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
@@ -238,10 +211,8 @@ namespace thomas
 						auto material = perMaterialQueue.first;
 						{
 							PROFILE("BindMaterial")
-								if (material->GetShader()->GetName() == "StandardShader")
-									if (lll)
-										lll->Test(material);
-							//Lightmanager::bindshadows
+							
+							
 							material->Bind();
 						}
 						{

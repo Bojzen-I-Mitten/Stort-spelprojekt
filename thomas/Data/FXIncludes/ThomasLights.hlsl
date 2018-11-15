@@ -95,7 +95,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         float visibility = 5.0;
         float3 sampleCoordLS = WorldToLightClipPos(worldPos).xyz;
         
-        if (shadowMap.Sample(StandardWrapSamplerr, sampleCoordLS.xy).x < sampleCoordLS.z) //texture(shadowMap, ShadowCoord.xy).z < ShadowCoord.z)
+        if (shadowMap.Sample(StandardWrapSamplerr, sampleCoordLS.xy).x < sampleCoordLS.z)
         {
             visibility = 0.1;
         }

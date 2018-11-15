@@ -21,6 +21,7 @@ namespace thomas
 	{
 		namespace render {
 			class ShaderList;
+			struct CameraRenderQueue;
 		}
 
 		class LightManager
@@ -67,7 +68,9 @@ namespace thomas
 			static void AddLight(object::component::LightComponent* light);
 			static bool RemoveLight(object::component::LightComponent* light);
 			static void Update();
+
 			static std::vector<object::component::LightComponent*> GetLightsCastingShadows();
+			static void DrawShadows(render::CameraRenderQueue& renderQueue);
 			static void BindLights(render::ShaderList* shaders);
 			static void BindShadows(render::ShaderList* shaders);
 		private:
@@ -75,11 +78,10 @@ namespace thomas
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);
 
 			static std::vector<object::component::LightComponent*> s_lights;
-
 			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
-
 			static LightCountsStruct s_lightCounts;
 
+			
 			static utils::buffers::StructuredBuffer* s_shadowLightVPMatrices;
 			static resource::Texture2DArray* s_shadowMapTextures;
 		};
