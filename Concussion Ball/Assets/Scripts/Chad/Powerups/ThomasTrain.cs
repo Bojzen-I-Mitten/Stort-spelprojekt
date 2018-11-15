@@ -30,6 +30,8 @@ public class ThomasTrain : Powerup
     public override void Awake()
     {
         base.Awake();
+
+        #region emitters
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
@@ -89,6 +91,7 @@ public class ThomasTrain : Powerup
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
         emitterSpark.Radius = 6.7f;
+        #endregion
 
         soundComponentChargeUp.Looping = false;
 
@@ -155,7 +158,11 @@ public class ThomasTrain : Powerup
         Explosion();
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
-        if (localChad)
+
+        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+
+        if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)

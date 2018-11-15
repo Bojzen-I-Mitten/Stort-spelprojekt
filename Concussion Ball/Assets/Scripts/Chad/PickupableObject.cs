@@ -140,9 +140,14 @@ public class PickupableObject : NetworkComponent
         SendRPC("OnActivate");
     }
 
-    virtual public void Pickup(ChadControls chad, Transform hand)
+    virtual public void SaveObjectOwner(ChadControls chad)
     {
 
+    }
+
+    virtual public void Pickup(ChadControls chad, Transform hand)
+    {
+        SaveObjectOwner(chad);
         if (!m_rigidBody)
             m_rigidBody = gameObject.GetComponent<Rigidbody>();
 

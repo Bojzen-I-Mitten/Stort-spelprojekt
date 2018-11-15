@@ -5,6 +5,8 @@ using System.Linq;
 
 public class Vindaloo : Powerup
 {
+    ChadControls ObjectOwner = null;
+
     public Texture2D fireTexture { get; set; }
     public Texture2D fire2Texture { get; set; }
     public Texture2D smokeTexture { get; set; }
@@ -27,6 +29,7 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
 
+        #region big meme particle emitter bois
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
@@ -110,7 +113,7 @@ public class Vindaloo : Powerup
         emitterSmoke.DistanceFromSphereCenter = 0.7f;
         emitterSmoke.Radius = 1.7f;
         emitterGravel.SpawnAtEdge = false;
-
+        #endregion
     }
 
     public override void Update()
@@ -122,6 +125,11 @@ public class Vindaloo : Powerup
     public override void Throw(Vector3 camPos, Vector3 force)
     {
         base.Throw(camPos, force);
+    }
+
+    public override void SaveObjectOwner(ChadControls chad)
+    {
+        ObjectOwner = chad;
     }
 
     // this function will be called upon powerup use / collision after trown
@@ -136,11 +144,10 @@ public class Vindaloo : Powerup
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
-        //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(_Chad.gameObject);
-        //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
 
-
-        if (localChad)
+        if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
