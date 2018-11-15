@@ -37,8 +37,10 @@ namespace thomas
 			private:
 				static std::vector<long long> s_fps;
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
+				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
 				static float s_vramusage;
+				static float s_vrambudget;
 				static unsigned int s_frames;
 
 			public:
@@ -46,8 +48,9 @@ namespace thomas
 				static void resetFrameCounter();
 				static void dumpDataToFile();
 				static void storeSample(std::string functionName, long long elapsedTime, long long startTime, DWORD processor_id);
+				static void storeGpuSample(long long gpuTime);
 				static void setRAMUsage(float usage);
-				static void setVRAMUsage(float usage);
+				static void setVRAMUsage(float usage, float budget);
 			private:
 
 
