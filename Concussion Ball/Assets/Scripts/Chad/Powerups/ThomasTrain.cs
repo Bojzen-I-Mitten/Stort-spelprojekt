@@ -5,6 +5,8 @@ using System.Linq;
 
 public class ThomasTrain : Powerup
 {
+    ChadControls ObjectOwner = null;
+
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterThomasFace;
     private ParticleEmitter emitterSpark;
@@ -30,6 +32,9 @@ public class ThomasTrain : Powerup
     public override void Awake()
     {
         base.Awake();
+        BaseThrowForce = 20.0f;
+        MaxThrowForce = 36.0f;
+        ThrowForce = BaseThrowForce;
 
         #region emitters
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
@@ -111,6 +116,11 @@ public class ThomasTrain : Powerup
         soundcooldown -= Time.DeltaTime;
     }
 
+    public override void SaveObjectOwner(ChadControls chad)
+    {
+        ObjectOwner = chad;
+    }
+
     public override void Cleanup()
     {
         base.Cleanup();
@@ -137,9 +147,9 @@ public class ThomasTrain : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+    public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        base.Throw(camPos + Vector3.Normalize(force)*2, force);
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
         
 
         m_rigidBody.UseGravity = false;

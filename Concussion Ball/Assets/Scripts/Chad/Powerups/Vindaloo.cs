@@ -19,15 +19,19 @@ public class Vindaloo : Powerup
     private ParticleEmitter emitterGravel;
     private SoundComponent ExplosionSound;
 
-    public float ExplosionRadius { get; set; } = 5.0f;
-    // public float ExplosionForce { get; set; } = 200.0f;
-    public float ExplosionForce = 200.0f;
+    public float ExplosionRadius { get; set; } = 8.0f;
+    public float ExplosionForce = 300.0f;
     public override void Awake()
     {
         base.Awake();
 
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
+        ExplosionRadius = 8.0f;
+        ExplosionForce = 300.0f;
+        BaseThrowForce = 20.0f;
+        MaxThrowForce = 36.0f;
+        ThrowForce = BaseThrowForce;
 
         #region big meme particle emitter bois
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
@@ -122,9 +126,15 @@ public class Vindaloo : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+    public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        base.Throw(camPos, force);
+        //Change for abs
+        if (direction.y < 0)
+            direction.y += direction.y * -1.2f;
+        else
+            direction.y += direction.y * 1.2f;
+
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     public override void SaveObjectOwner(ChadControls chad)

@@ -25,14 +25,11 @@ public class ChadControls : NetworkComponent
 
     #region Throwing stuff
     [Category("Throwing")]
-    private float ThrowForce;
-    [Category("Throwing")]
     public Transform hand { get; set; }
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
 
-    private float BaseThrowForce = 10.0f;
-    private float MaxThrowForce = 18.0f;
+    
 
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
@@ -90,7 +87,6 @@ public class ChadControls : NetworkComponent
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
-        ThrowForce = BaseThrowForce;
         rBody = gameObject.GetComponent<Rigidbody>();
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         if (rBody != null)
@@ -599,8 +595,6 @@ public class ChadControls : NetworkComponent
         RPCStartThrow();
         SendRPC("RPCStartThrow");
         Vector3 chosenDirection = Camera.transform.forward;
-        chosenDirection.y *= 1.2f;
-        chosenDirection *= ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
         Vector3 ballCamPos = Camera.transform.position;
         
         //yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
@@ -633,7 +627,7 @@ public class ChadControls : NetworkComponent
         float tets = PickedUpObject.GetChargeTime();
         
 
-        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
+        PickedUpObject.ThrowForce = MathHelper.Lerp(PickedUpObject.BaseThrowForce, PickedUpObject.MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / PickedUpObject.chargeTimeMax);
     }
 

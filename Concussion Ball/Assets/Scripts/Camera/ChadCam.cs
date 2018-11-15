@@ -50,6 +50,9 @@ public class ChadCam : ScriptComponent
     {
         if (Camera)
             MinFov = Camera.fieldOfView;
+
+        CameraSensitivity_x = 0.5f;
+        CameraSensitivity_y = 1.0f;
     }
 
     public override void Update()
