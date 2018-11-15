@@ -10,12 +10,12 @@ public class PickupableObject : NetworkComponent
     public Rigidbody m_rigidBody;
 
     public Transform PickupOffset { get; set; } = null;
-    public float MovementSpeedModifier { get; set; } = 1.0f;
+    public float MovementSpeedModifier = 1.0f;//{ get; set; } = 1.0f;
     public bool DropOnRagdoll { get; set; } = true;
 
     public bool m_throwable = false;
     private float chargeTimeCurrent;
-    public float chargeTimeMax { get; set; } = 4.0f;
+    public float chargeTimeMax;// { get; set; } = 4.0f;
     public Collider PickupCollider { get; set; }
     [Newtonsoft.Json.JsonIgnore]
     public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
@@ -28,6 +28,7 @@ public class PickupableObject : NetworkComponent
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
         chargeTimeCurrent = 0.0f;
+        chargeTimeMax = 2.0f;
         if (!PickupCollider)
             Debug.LogError("Pickup collider empty");
     }
@@ -100,7 +101,6 @@ public class PickupableObject : NetworkComponent
             RPCDrop();
             SendRPC("RPCDrop");
         }
-
     }
 
     public virtual void OnDrop()

@@ -62,9 +62,9 @@ public class ChadCam : ScriptComponent
                 case ChadControls.STATE.DIVING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                     {
-                        if (!Input.GetKey(Input.Keys.LeftShift))
+                        if (!Input.GetKey(Input.Keys.LeftAlt))
                             FondleCamera();
-                        else if (Input.GetKeyDown(Input.Keys.LeftShift))
+                        else if (Input.GetKeyDown(Input.Keys.LeftAlt))
                             InitFreeLookCamera();
                         else
                             FreeLookCamera();

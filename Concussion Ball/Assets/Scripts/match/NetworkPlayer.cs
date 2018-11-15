@@ -87,6 +87,7 @@ public class NetworkPlayer : NetworkComponent
 
             gameObject.GetComponent<ChadControls>().Reset();
         }
+    
 
         CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
         CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
