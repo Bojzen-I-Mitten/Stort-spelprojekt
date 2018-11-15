@@ -25,6 +25,7 @@ public class PickupableObject : NetworkComponent
 
     public override void OnAwake()
     {
+        PickupCollider = gameObject.GetComponent<Collider>();   // Correct?
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
         chargeTimeCurrent = 0.0f;
@@ -110,7 +111,7 @@ public class PickupableObject : NetworkComponent
 
     public void RPCDrop()
     {
-        if (PickupCollider.enabled == false)
+        if (PickupCollider && PickupCollider.enabled == false)
         {
             
             m_rigidBody.enabled = true;
@@ -206,8 +207,11 @@ public class PickupableObject : NetworkComponent
         transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;
         _Chad = null;
-        PickupCollider.enabled = false;
-        PickupCollider.enabled = true;
+        if (PickupCollider)
+        {
+            PickupCollider.enabled = false;
+            PickupCollider.enabled = true;
+        }
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
     }
 }

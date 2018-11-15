@@ -294,7 +294,8 @@ public class MatchSystem : NetworkManager
     {
         if (!MatchStarted)
             return;
-
+        if (!LocalChad)
+            Debug.LogError("Local Character is NULL, error initiating game.");
         StartCoroutine(RoundStartCountdown(3.0f));
     }
 
