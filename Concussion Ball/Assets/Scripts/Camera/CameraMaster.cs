@@ -80,7 +80,8 @@ public class CameraMaster : ScriptComponent
     {
         SelectTeam.Canvas.isRendering = false;
         Hud.Canvas.isRendering = false;
-        ExitMenu.Canvas.isRendering = false;
+        if(ExitMenu)
+            ExitMenu.Canvas.isRendering = false;
         JoinHost.Canvas.isRendering = false;
 
         switch (State)

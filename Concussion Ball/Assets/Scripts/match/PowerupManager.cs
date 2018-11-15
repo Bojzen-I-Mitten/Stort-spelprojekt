@@ -1,19 +1,18 @@
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
+using ThomasEngine.Script;
 
 public class PowerupManager : ScriptComponent
 {
     
     public List<GameObject> Powerups { get; set; } = new List<GameObject>();
-    private List<PowerupSpawner> spawnPoints;
 
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
     public int NextPowerupID = 1000;
     public int PoolSize { get; set; } = 10;
-    public override void Awake()
+    public override void OnAwake()
     {
-        spawnPoints = Object.GetObjectsOfType<PowerupSpawner>();
         initPowerupPool();
         //MatchSystem.instance.SpawnablePrefabs.AddRange(Powerups);
     }
@@ -68,16 +67,18 @@ public class PowerupManager : ScriptComponent
     public void ResetPowerups()
     {
         Debug.Log("reset start");
-        List<Powerup> activePowerups = Object.GetObjectsOfType<Powerup>();
-        for (int i=0; i < activePowerups.Count; i++)
+        foreach (Powerup p in ScriptUtility.GetComponentsOfType<Powerup>())
         {
-            if(activePowerups[i].isOwner)
-                activePowerups[i].Remove();
+            if (p.isOwner)
+                p.Remove();
+        }
+        foreach (PowerupSpawner sp in ScriptUtility.GetComponentsOfType<PowerupSpawner>())
+        {
+            if (sp.isOwner)
+                sp.Free();
+            sp.SpawnPowerup();
         }
         
-
-        spawnPoints.ForEach(point => { if (point.isOwner) point.Free(); }); //Safety free
-        spawnPoints.ForEach(point => point.SpawnPowerup());
         Debug.Log("reset end");
     }
 }

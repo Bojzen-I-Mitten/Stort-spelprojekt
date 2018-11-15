@@ -192,7 +192,8 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Disable()
     {
-        PickupCollider.enabled = false;
+        if(PickupCollider)
+            PickupCollider.enabled = false;
         gameObject.activeSelf = false;
         m_rigidBody.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
