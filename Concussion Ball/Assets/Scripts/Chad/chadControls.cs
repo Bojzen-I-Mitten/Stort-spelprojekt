@@ -21,7 +21,12 @@ public class ChadControls : NetworkComponent
     public STATE State { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
-    
+
+    #region GUI
+    public Canvas Canvas;
+    public Font PickupFont { get; set; }
+    private Text PowerupPickupText;
+    #endregion
 
     #region Throwing stuff
     [Category("Throwing")]
@@ -704,6 +709,12 @@ public class ChadControls : NetworkComponent
             PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupablea)
             {
+                // Spawn power-up pickup text
+                PowerupPickupText = Canvas.Add("Picked up: " + pickupablea.gameObject.Name);
+                PowerupPickupText.position = new Vector2(0.4975f, 0.5f);
+                PowerupPickupText.color = Color.Black;
+                PowerupPickupText.font = PickupFont;
+
                 Debug.LogError("Why Denny!?");
             }
 
