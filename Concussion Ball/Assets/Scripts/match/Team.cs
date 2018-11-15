@@ -47,33 +47,38 @@ public class Team
         Debug.Log(TeamType.ToString() + " Scored!");
     }
 
+    private void ResetPlayer(NetworkPlayer player)
+    {
+        switch (TeamType)
+        {
+            case TEAM_TYPE.UNASSIGNED:
+            case TEAM_TYPE.TEAM_SPECTATOR:
+                player.gameObject.SetActive(false);
+                if (player.isOwner)
+                {
+                    //MatchSystem.instance.LocalChad.DeactivateCamera();
+                    //MatchSystem.instance.spectatorCamera.enabled = true;
+                }
+                break;
+            case TEAM_TYPE.TEAM_1:
+            case TEAM_TYPE.TEAM_2:
+                player.gameObject.SetActive(true);
+                if (player.isOwner)
+                {
+                    //MatchSystem.instance.spectatorCamera.enabled = false;
+                    //MatchSystem.instance.LocalChad.ActivateCamera();
+                }
+
+                break;
+        }
+        player.Reset();
+    }
+
     public void ResetPlayers()
     {
         Players.ForEach((System.Action<NetworkPlayer>)((player) => 
         {
-            switch (TeamType)
-            {
-                case TEAM_TYPE.UNASSIGNED:
-                case TEAM_TYPE.TEAM_SPECTATOR:
-                    player.gameObject.SetActive(false);
-                    if (player.isOwner)
-                    {
-                        //MatchSystem.instance.LocalChad.DeactivateCamera();
-                        //MatchSystem.instance.spectatorCamera.enabled = true;
-                    }
-                    break;
-                case TEAM_TYPE.TEAM_1:
-                case TEAM_TYPE.TEAM_2:
-                    player.gameObject.SetActive(true);
-                    if (player.isOwner)
-                    {
-                        //MatchSystem.instance.spectatorCamera.enabled = false;
-                        //MatchSystem.instance.LocalChad.ActivateCamera();
-                    }
-                        
-                    break;
-            }
-            player.Reset();
+            ResetPlayer(player);
         }));
         
     }
@@ -99,7 +104,10 @@ public class Team
             return;
         }
         Players.Add(player);
+        player.Team = this;
         Debug.Log(player.Name + " Joined team " + Name);
+        if(MatchSystem.instance.MatchStarted)
+            ResetPlayer(player);
     }
 
     

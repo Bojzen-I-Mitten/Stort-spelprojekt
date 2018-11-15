@@ -323,9 +323,13 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerJoin(NetPeer peer)
     {
+        if(peer == LocalPeer)
+        {
+            NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
+            np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+        }
         //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
-        Debug.Log("peer joined!");
         //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
         
         //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);

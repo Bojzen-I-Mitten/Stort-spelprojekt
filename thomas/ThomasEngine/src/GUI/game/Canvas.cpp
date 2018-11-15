@@ -42,9 +42,19 @@ namespace ThomasEngine
 		return nativePtr->GetRendering();
 	}
 
-	void Canvas::matrix::set(Matrix value)
+	void Canvas::worldMatrix::set(Matrix value)
 	{
-		nativePtr->SetMatrix(Utility::Convert(value));
+		nativePtr->SetWorldMatrix(Utility::Convert(value));
+	}
+
+	void Canvas::is3D::set(bool value)
+	{
+		nativePtr->Set3D(value);
+	}
+
+	bool Canvas::is3D::get()
+	{
+		return nativePtr->Get3D();
 	}
 
 	Image^ Canvas::Add(Texture2D ^ texture)

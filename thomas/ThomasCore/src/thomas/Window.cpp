@@ -369,9 +369,10 @@ namespace thomas
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 			window->m_input.ProcessKeyboard(message, wParam, lParam);
+			window->m_input.SetLastKey(NULL);
 			break;
 		case WM_CHAR:
-			if (wParam > 0 && wParam < 0x10000)
+			if (wParam > 0x20 && wParam < 0x7E)
 				window->m_input.SetLastKey((unsigned short)wParam);
 			break;
 		case WM_DESTROY:

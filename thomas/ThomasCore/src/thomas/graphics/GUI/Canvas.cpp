@@ -5,7 +5,7 @@
 #include "../../WindowManager.h"
 #include "../../Common.h"
 #include "../../ThomasCore.h"
-#include <DirectXTK/CommonStates.h>
+#include "../../object/component/Camera.h"
 
 namespace thomas
 {
@@ -13,20 +13,17 @@ namespace thomas
 	{
 		namespace GUI
 		{
-			Canvas::Canvas(Viewport viewport, Viewport* camViewport, Vector2 baseResolution)
+			Canvas::Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution)
 			{
 				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
 				m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
 				m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
-			
+				m_camera = cam;
 				m_viewport = viewport;
-				m_camViewport = camViewport;
-				m_viewportScale = Vector2(1.f, 1.f);
 				m_baseResolution = baseResolution;
 				m_render = true;
 				m_GUIElements = std::vector<std::unique_ptr<GUIElement>>();
-				m_matrix = math::Matrix::Identity;
-				
+				Set3D(false);
 			}
 
 			void Canvas::Destroy()
@@ -40,43 +37,47 @@ namespace thomas
 			void Canvas::Render()
 			{
 				if (m_spriteBatch != nullptr && m_render)
-				{					
-					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, m_matrix);
+				{		
+					math::Matrix matrix = math::Matrix::Identity;
+					if (Get3D())
+					{
+						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
+					}
 
+					m_spriteBatch->SetViewport(GetViewport());
+					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
+
+					Vector2 vpScale(GetViewport().width / 1920.0f, GetViewport().height / 1080.0f);
 					for (int i = 0; i < m_GUIElements.size(); ++i)
 					{
-						m_GUIElements[i]->Draw(m_spriteBatch.get(), m_viewport, m_viewportScale);
+						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport(), vpScale);
 					}
 					
-
 					m_spriteBatch->End();
 				}
 			}
 
 			Viewport Canvas::GetViewport()
 			{
-				return m_viewport;
+				if (Get3D())
+					return Viewport(0, 0, 1920, 1080);
+
+				Viewport camViewport = m_camera->GetViewport();
+				return Viewport(
+					camViewport.x + m_viewport.x * camViewport.width, 
+					camViewport.y + m_viewport.y * camViewport.height,
+					m_viewport.width * camViewport.width, 
+					m_viewport.height * camViewport.height);
 			}
 
 			Vector2 Canvas::GetViewportScale()
 			{
-				return m_viewportScale;
+				return Vector2(m_viewport.width, m_viewport.height);
 			}
 
 			void Canvas::SetViewport(Viewport viewport)
 			{
-				m_viewport.x		= m_camViewport->x + viewport.x * m_camViewport->width;
-				m_viewport.width	= m_camViewport->x + viewport.width * m_camViewport->width;
-				m_viewport.y		= m_camViewport->y + viewport.y * m_camViewport->height;
-				m_viewport.height	= m_camViewport->x + viewport.height * m_camViewport->height;
-
-				UpdateViewportScale();
-			}
-
-			void Canvas::UpdateViewportScale()
-			{
-				m_viewportScale = Vector2(m_viewport.width - m_viewport.x, m_viewport.height - m_viewport.y) *
-					Vector2(m_camViewport->width - m_camViewport->x, m_camViewport->height - m_camViewport->y) / m_baseResolution;
+				m_viewport = viewport;
 			}
 
 			GUIElement* Canvas::Add(const std::string& text)
@@ -123,9 +124,9 @@ namespace thomas
 			{
 				return m_render;
 			}
-			void Canvas::SetMatrix(math::Matrix value)
+			void Canvas::SetWorldMatrix(math::Matrix value)
 			{
-				m_matrix = value;
+				m_worldMatrix = value;
 			}
 			void Canvas::Set3D(bool value)
 			{
