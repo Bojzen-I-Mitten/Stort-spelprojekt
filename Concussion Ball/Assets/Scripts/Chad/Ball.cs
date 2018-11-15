@@ -190,7 +190,6 @@ public class Ball : PickupableObject
 
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        //direction.y *= 1.2f;
         //Change for abs
         if (direction.y < 0)
             direction.y += direction.y * -1.2f;

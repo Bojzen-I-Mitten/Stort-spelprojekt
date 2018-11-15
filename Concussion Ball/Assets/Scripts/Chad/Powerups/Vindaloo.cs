@@ -29,8 +29,8 @@ public class Vindaloo : Powerup
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
         ExplosionForce = 300.0f;
-        BaseThrowForce = 20.0f;
-        MaxThrowForce = 36.0f;
+        BaseThrowForce = 15.0f;
+        MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
 
         #region big meme particle emitter bois
