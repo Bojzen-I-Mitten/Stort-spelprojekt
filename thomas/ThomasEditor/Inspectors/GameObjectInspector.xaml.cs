@@ -62,6 +62,9 @@ namespace ThomasEditor
 
             private void GameObjectInspector_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
             {
+
+                LayerBox.ItemsSource = Physics.GetCollisionLayerNames();
+
                 if (DataContext is GameObject)
                 {
                     gameObjectGrid.Visibility = Visibility.Visible;

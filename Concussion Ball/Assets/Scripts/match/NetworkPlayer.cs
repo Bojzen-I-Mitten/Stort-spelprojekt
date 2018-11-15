@@ -8,15 +8,25 @@ using System.Collections;
 public class NetworkPlayer : NetworkComponent
 {
     private String _Name;
+    [Newtonsoft.Json.JsonIgnore]
     public Team Team {get; private set;}
     public float BottomOfTheWorld { get; set; } = -5;
     Material mat;
+    Rigidbody rb;
+
+    public override void Awake()
+    {
+        rb = gameObject.GetComponent<Rigidbody>();
+        if (Team == null)
+            Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
+    }
+
     public override void Start()
     {
-        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+        if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
-        mat?.SetColor("color", Team.Color);
+        
 
     }
 
@@ -45,6 +55,8 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
+            if(Team != null)
+                mat?.SetColor("color", Team.Color);
         }
 
     }
@@ -65,19 +77,20 @@ public class NetworkPlayer : NetworkComponent
     {
         mat?.SetColor("color", Team.Color);
         if (isOwner && (int)Team.TeamType > (int)TEAM_TYPE.TEAM_SPECTATOR)
-        {
-            gameObject.GetComponent<Rigidbody>().enabled = false;
-            StartCoroutine(EnableRigidbody());
+        { 
             transform.position = Team.GetSpawnPosition();
-            transform.LookAt(Vector3.Zero);
+            transform.LookAt(new Vector3(0, transform.position.y, 0));
+
+            rb.Position = transform.position;
+            rb.Rotation = transform.rotation;
+            rb.IgnoreNextTransformUpdate();
+
             gameObject.GetComponent<ChadControls>().Reset();
         }
-    }
+    
 
-    IEnumerator EnableRigidbody()
-    {
-        yield return null;
-        gameObject.GetComponent<Rigidbody>().enabled = true;
+        CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
+        CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
     }
 
 

@@ -24,7 +24,7 @@ namespace ThomasEngine.Network
 
         internal NetPacketProcessor NetPacketProcessor;
 
-        private EventBasedNetListener Listener;
+        public EventBasedNetListener Listener { get; private set; }
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
         protected NetworkEvents Events;
@@ -38,6 +38,7 @@ namespace ThomasEngine.Network
 
 
         public List<GameObject> SpawnablePrefabs { get; set; } = new List<GameObject>();
+        public int MaxPlayers { get; set; }
         public GameObject PlayerPrefab { get; set; }
 
         public NetPeer LocalPeer = null;
@@ -91,8 +92,8 @@ namespace ThomasEngine.Network
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
-
-            NetScene.InititateScene();
+            
+            Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
 
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -104,6 +105,7 @@ namespace ThomasEngine.Network
 
         public override void Start()
         {
+            NetScene.InititateScene();
             //InitServerNTP();
             if (UseLobby)
             {
@@ -124,7 +126,7 @@ namespace ThomasEngine.Network
         {
             initServerStartTime();
             ResponsiblePeer = LocalPeer;
-            NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
+            NetScene.SpawnPlayer(LocalPeer, true);
             OnPeerJoin(LocalPeer);
             NetScene.ActivateSceneObjects();
 
@@ -133,6 +135,11 @@ namespace ThomasEngine.Network
         public void Connect()
         {
             NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
+        }
+
+        public void Disconnect()
+        {
+            InternalManager.DisconnectAll();
         }
 
         #region Listners
@@ -174,8 +181,8 @@ namespace ThomasEngine.Network
 
             if (NetScene.Players.Count == 0) // We are new player.
             {
-                NetScene.SpawnPlayer(PlayerPrefab, LocalPeer, true);
-                NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
+                NetScene.SpawnPlayer(LocalPeer, true);
+                NetScene.SpawnPlayer(_peer, false);
                 OnPeerJoin(LocalPeer);
             }
             else //Someone is joining us.
@@ -185,7 +192,7 @@ namespace ThomasEngine.Network
                 NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
-                NetScene.SpawnPlayer(PlayerPrefab, _peer, false);
+                NetScene.SpawnPlayer(_peer, false);
                 TransferOwnedObjects();
             }
             OnPeerJoin(_peer);
@@ -236,7 +243,6 @@ namespace ThomasEngine.Network
                         }
                         break;
                     case PacketType.EVENT:
-                        Debug.Log("recived events!");
                         NetPacketProcessor.ReadAllPackets(reader, peer);
                         break;
                     case PacketType.RPC:
@@ -256,24 +262,55 @@ namespace ThomasEngine.Network
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
 
-            if (NetManager.PeersCount < 10 /* max connections */)
+            if (NetManager.PeersCount < MaxPlayers && Scene.PoolNotEmpty() /* max connections */)
                 request.AcceptIfKey("SomeConnectionKey");
             else
+            {
+                Debug.Log("Connection was rejected!");
                 request.Reject();
+            }
+                
         }
 
         #endregion
 
         public override void Update()
-        {
+        { 
             if (NetManager.IsRunning)
             {
+                EngineAutoProfiler profile = new EngineAutoProfiler("NetworkManager Update");
                 NetManager.UpdateTime = (1000 / TICK_RATE);
                 if (NetManager.NatPunchEnabled)
                     NetManager.NatPunchModule.PollEvents();
                 NetManager.PollEvents();
                 Diagnostics();
+                profile.sendSample();
+
+
+                //Check real owners.
+                //if((int)TimeSinceServerStarted % 3 == 0)
+                //{
+                //    foreach (var owners in Scene.ObjectOwners)
+                //    {
+                //        if (owners.Key != LocalPeer)
+                //        {
+                //            foreach (var identity in owners.Value)
+                //            {
+                //                if (identity.ID >= 0)
+                //                {
+                //                    SendRPC(owners.Key, -2, "RPCTempOwnerStuff", identity.ID);
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+                
             }
+        }
+
+        public void RPCTempOwnerStuff(int ID)
+        {
+            Scene.FindNetworkObject(ID).Owner = true;
         }
 
         public override void OnDestroy()
@@ -300,7 +337,6 @@ namespace ThomasEngine.Network
 
         public void SendRPC(NetPeer peer, int netID, string methodName, params object[] parameters)
         {
-            Debug.Log("Sending Peer RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);
@@ -312,7 +348,6 @@ namespace ThomasEngine.Network
 
         public void SendRPC(int netID, string methodName, params object[] parameters)
         {
-            Debug.Log("Sending RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);

@@ -34,6 +34,8 @@ namespace ThomasEngine {
 	GameObject::GameObject(String^ name) : Object(thomas::ObjectHandler::createNewGameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
+		Tag = "";
+		Layer = 0;
 		m_transform = AddComponent<Transform^>();
 		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
 
@@ -61,9 +63,20 @@ namespace ThomasEngine {
 			Component^ component = m_components[i];
 			Type^ typ = component->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
-			if ((playing || executeInEditor) && !component->initialized) {
-				completed = false;
-				component->Initialize();
+
+			if (!GetActive())
+			{
+				if (!component->awakened) {
+					completed = false;
+					component->Initialize();
+				}
+			}
+			else
+			{
+				if ((playing || executeInEditor) && !component->initialized) {
+					completed = false;
+					component->Initialize();
+				}
 			}
 		}
 		Monitor::Exit(m_componentsLock);
@@ -213,8 +226,15 @@ namespace ThomasEngine {
 	void deleteComp(GameObject^ obj, Component^ comp)
 	{
 		comp->OnParentDestroy(obj);
-		comp->OnDisable();
-		comp->OnDestroy();
+
+		Type^ typ = comp->GetType();
+		bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
+
+		if (executeInEditor || comp->awakened)
+		{
+			comp->OnDisable();
+			comp->OnDestroy();
+		}
 		delete comp;	// Begone you foul Clr!!!!
 	}
 
@@ -449,6 +469,16 @@ namespace ThomasEngine {
 
 	}
 
+	int GameObject::Layer::get()
+	{
+		return ((thomas::object::GameObject*)nativePtr)->GetLayer();
+	}
+
+	void GameObject::Layer::set(int value)
+	{
+		((thomas::object::GameObject*)nativePtr)->SetLayer(value);
+	}
+
 	bool GameObject::activeSelf::get()
 	{
 		return ((thomas::object::GameObject*)nativePtr)->m_activeSelf;
@@ -508,7 +538,7 @@ namespace ThomasEngine {
 	}
 
 	String^ GameObject::Name::get() {
-		if (inScene)
+		if (!IsPrefab())
 			return m_name;
 		else
 			return m_name + " (prefab)";

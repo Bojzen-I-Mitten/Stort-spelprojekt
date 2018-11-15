@@ -32,6 +32,16 @@ namespace ThomasEngine
 		nativePtr->SetViewport(Utility::Convert(viewport)); 
 	}
 
+	void Canvas::isRendering::set(bool rendering)
+	{
+		nativePtr->SetRendering(rendering);
+	}
+
+	bool Canvas::isRendering::get()
+	{
+		return nativePtr->GetRendering();
+	}
+
 	Image^ Canvas::Add(Texture2D ^ texture)
 	{
 		thomas::graphics::GUI::GUIElement* image =

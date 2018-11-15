@@ -22,6 +22,7 @@
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConveter"/>
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
+        <converters:CollisionLayerConveter x:Key="collisionLayerConverter"/>
     </UserControl.Resources>
 
     <Grid x:Name="gameObjectGrid" Background="#444444" Visibility="Visible">
@@ -41,8 +42,12 @@
             </Grid.ColumnDefinitions>
             <CheckBox Margin="10"  IsChecked="{Binding activeSelf}" Grid.Column="0" HorizontalAlignment="Center" ToolTip="Active?"/>
             <TextBox VerticalAlignment="Top" Height="20" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="5" Grid.Column="1"/>
-            <TextBox VerticalAlignment="Top" Height="20" Text="{Binding GroupIDSelf, UpdateSourceTrigger=LostFocus}" Margin="5,30,167,0" Grid.Column="1"/>
-            <CheckBox Content="Static"  IsChecked="{Binding staticSelf}" Grid.Column="2" Margin="0,10" HorizontalAlignment="Right" Width="46"/>
+            <!--<TextBox VerticalAlignment="Top" Height="20" Text="{Binding GroupIDSelf, UpdateSourceTrigger=LostFocus}" Margin="5,30,167,0" Grid.Column="1"/>-->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Width="263" RenderTransformOrigin="0.507,0.444" Grid.ColumnSpan="2" Margin="0,30,0,2" Grid.Column="1">
+                <TextBlock Text="Layer" Width="41" VerticalAlignment="Center"/>
+                <ComboBox x:Name="LayerBox" SelectedIndex="{Binding Layer}" Width="163" VerticalAlignment="Center"></ComboBox>
+            </StackPanel>
+            <CheckBox Content="Static"  IsChecked="{Binding staticSelf}" Grid.Column="2" Margin="3,10" HorizontalAlignment="Right" Width="46"/>
         </Grid>
 
         <ItemsControl ItemsSource="{Binding Components}" Grid.Row="1" Background="#333333">

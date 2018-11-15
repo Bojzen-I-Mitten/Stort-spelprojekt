@@ -1,7 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/ThomasEngine">
+  <m_layers>
+    <Layer>
+      <Name>Default</Name>
+      <collisionMask>4294967295</collisionMask>
+    </Layer>
+    <Layer>
+      <Name>Ground</Name>
+      <collisionMask>4294967295</collisionMask>
+    </Layer>
+    <Layer>
+      <Name>Team 1 character</Name>
+      <collisionMask>4294967295</collisionMask>
+    </Layer>
+    <Layer>
+      <Name>Team 2 character</Name>
+      <collisionMask>4294967295</collisionMask>
+    </Layer>
+  </m_layers>
   <m_name>Concussion Ball</m_name>
   <m_relativeAssemblyPath>Assembly</m_relativeAssemblyPath>
-  <m_relativeCurrentScenePath>Scenes\DemoScene.tds</m_relativeCurrentScenePath>
+  <m_relativeCurrentScenePath>soundFmodTest.tds</m_relativeCurrentScenePath>
   <m_relativeResourcePath>Assets</m_relativeResourcePath>
 </Project>

@@ -42,7 +42,8 @@ namespace ThomasEngine {
 
 		static ThomasWrapper^ s_SYS = gcnew ThomasWrapper();
 		static bool inEditor = false;
-		static float cpuTime = 0.0f;
+		static float logicTime = 0.0f;
+		static float renderTime = 0.0f;
 		static bool showStatistics = false;
 		static RunningState playing = RunningState::UnInitialized;
 		
@@ -56,6 +57,7 @@ namespace ThomasEngine {
 		static ManualResetEvent^ RenderFinished;
 		static ManualResetEvent^ UpdateFinished;
 		static ManualResetEvent^ StateCommandProcessed;
+		static ManualResetEvent^ WaitLogOutput;
 		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
 
 
@@ -66,6 +68,10 @@ namespace ThomasEngine {
 		static void StopPlay();
 		static void ProcessCommand();
 		static void SynchronousExecution();
+
+		static void DumpProfilerLog(System::Object^ stateInfo);
+		static void SampleRam(System::Object ^ stateInfo);
+
 
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;

@@ -19,18 +19,17 @@ public class Ball : PickupableObject
     public Texture2D smokeTex { get; set; }
     public Texture2D fireTex { get; set; }
 
-    private RenderComponent renderComponent;
     private float electricityIntensifyerThreshold;
-    private float fireIntensityreThreshold;
 
     public override void Start()
     {
         base.Start();
         m_throwable = true;
         DropOnRagdoll = true;
+        MovementSpeedModifier = 0.65f;
+        chargeTimeMax = 2.0f;
 
-        //renderComponent = gameObject.GetComponent<RenderComponent>();
-        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
+        // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
@@ -47,7 +46,6 @@ public class Ball : PickupableObject
 
         ResetFireEmitters();
         ResetElectricityEmitters();
-        fireIntensityreThreshold = 0.6f;
         electricityIntensifyerThreshold = 0.6f;
 
 
@@ -73,6 +71,7 @@ public class Ball : PickupableObject
         emitterSmoke.DistanceFromSphereCenter = 0;
         emitterSmoke.Radius = 0.7f;
 
+        emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 0.1f;
         emitterFire.MaxSize = 0.5f;
         emitterFire.EndSize = 0.0f;
@@ -156,39 +155,6 @@ public class Ball : PickupableObject
         emitter.Radius *= intensity;
     }
 
-    //void EmitterExplosion()
-    //{
-    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity1);
-    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity2);
-    //    MultiplyWithIntensity((float)(2.5f), emitterElectricity3);
-    //    emitterElectricity1.EmitOneShot(20);
-    //    emitterElectricity2.EmitOneShot(15);
-    //    emitterElectricity3.EmitOneShot(8);
-    //    emitterFire.EmitOneShot(10);
-
-    //    MultiplyWithIntensity(2.0f, emitterFire);
-    //    emitterFire.Emit = true;
-    //    emitterSmoke.Emit = true;
-    //}
-
-    //public void TimeSinceThrown(float time)
-    //{
-    //    if (time > fireIntensityreThreshold)
-    //    {
-    //        fireIntensityreThreshold = 9999999999.0f;
-    //        MultiplyWithIntensity(0.5f, emitterFire);
-    //        MultiplyWithIntensity(0.5f, emitterSmoke);
-    //    }
-
-    //    if (time > 1.4f)
-    //    {
-    //        ResetFireEmitters();
-    //        emitterFire.Emit = false;
-    //        emitterSmoke.Emit = false;
-    //        ResetElectricityEmitters();
-    //    }
-    //}
-
     override public void StopEmitting()
     {
         StartCoroutine(StopEmission());
@@ -208,11 +174,14 @@ public class Ball : PickupableObject
         emitterElectricity3.Emit = false;
         emitterFire.Emit = false;
         emitterSmoke.Emit = false;
+        ResetElectricityEmitters();
+        ResetFireEmitters();
     }
     #endregion
 
     public override void Update()
     {
+        base.Update();
         if (transform.position.y < -5)
             Reset();
     }
@@ -223,21 +192,22 @@ public class Ball : PickupableObject
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
 
-        float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
+        float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
 
-        Color newColor = new Color(interp, 0.0f, (1.0f - interp));
-        //renderComponent.material.SetColor("color", newColor);
-
-        if (interp > 0.8f)
+        if (interp > 0.7f)
         {
             emitterFire.Emit = true;
+        }
+        if (interp > 0.9f)
+        {
+            emitterSmoke.Emit = true;
         }
         if (interp > electricityIntensifyerThreshold)
         {
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
-            electricityIntensifyerThreshold += 0.3f;
+            electricityIntensifyerThreshold += 0.2f;
         }
 
     }
@@ -245,7 +215,50 @@ public class Ball : PickupableObject
     override public void Cleanup()
     {
         base.Cleanup();
-        //renderComponent.material.SetColor("color", new Color(0, 0, 255));
+
+        StartCoroutine(CleanTimer());
+    }
+
+    public override void OnDrop()
+    {
+        base.OnDrop();
+        StartCoroutine(PickupDelay());
+    }
+    IEnumerator PickupDelay()
+    {
+        PickupCollider.enabled = false; PickupCollider.enabled = false;
+        yield return new WaitForSecondsRealtime(0.5f);
+        PickupCollider.enabled = true;
+    }
+
+    public override void Pickup(ChadControls chad, Transform hand)
+    {
+        base.Pickup(chad, hand);
+    }
+
+
+    public override void Disable()
+    {
+        base.Disable();
+    }
+
+    IEnumerator ReturnToMiddle()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
+        m_rigidBody.Position = Vector3.Zero;
+        m_rigidBody.Rotation = Quaternion.Identity;
+        m_rigidBody.LinearVelocity = Vector3.Zero;
+        m_rigidBody.AngularVelocity = Vector3.Zero;
+    }
+    public override void Reset()
+    {
+        base.Reset();
+        StartCoroutine(ReturnToMiddle());
+    }
+
+    private IEnumerator CleanTimer()
+    {
+        yield return new WaitForSeconds(2.0f);
 
         emitterElectricity1.Emit = false;
         emitterElectricity2.Emit = false;
@@ -256,24 +269,5 @@ public class Ball : PickupableObject
         ResetFireEmitters();
         // Reset values
         ResetElectricityEmitters();
-    }
-
-
-    public void Reset()
-    {
-        if (isOwner)
-        {
-            Drop();
-            if (m_rigidBody != null)
-            {
-                m_rigidBody.enabled = false;
-                m_rigidBody.Position = Vector3.Zero;
-                m_rigidBody.LinearVelocity = Vector3.Zero;
-                m_rigidBody.AngularVelocity = Vector3.Zero;
-                transform.position = Vector3.Zero;
-                transform.rotation = Quaternion.Identity;
-                m_rigidBody.enabled = true;
-            }
-        }
     }
 }

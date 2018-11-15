@@ -43,8 +43,7 @@ namespace ThomasEngine
 			completed = true;
 			for (int i = 0; i < GameObjects->Count; ++i) {
 				GameObject^ gameObject = GameObjects[i];
-				if (gameObject->GetActive())
-					completed = gameObject->InitComponents(playing) && completed;
+				completed = gameObject->InitComponents(playing) && completed;
 			}
 		} while (!completed);
 	}

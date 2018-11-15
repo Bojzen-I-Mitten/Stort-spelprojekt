@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
+using ThomasEngine.Network;
 
 public class Ragdoll : ScriptComponent
 {
@@ -29,8 +30,9 @@ public class Ragdoll : ScriptComponent
     public float AllobjectDamping { get; set; } = 0.5f;
     public float Totalmass { get; set; } = 70.0f;
     public bool RagdollEnabled = true;
+    public bool PostiveMapping { get; set; } = true;
     public bool AllobjectKinectic { get; set; } = false;
-    public GameObject AudioListener { get; set; }
+    public AudioClip ImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
     enum BODYPART
@@ -62,9 +64,20 @@ public class Ragdoll : ScriptComponent
     uint[] BoneIndexes = new uint[(int)BODYPART.COUNT];
     Collider[] C_BodyParts = new Collider[(int)BODYPART.COUNT];
     SoundComponent RagdollSound;
-    float time=0;
+    NetworkIdentity identity;
+    public override void Start()
+    {
+        DisableRagdoll();
 
+        // Load the ragdoll impact sound
+        RagdollSound = gameObject.AddComponent<SoundComponent>();
+        RagdollSound.Type = SoundComponent.SoundType.Effect;
+        RagdollSound.Clip = ImpactSound;
+        RagdollSound.Looping = false;
+        RagdollSound.Is3D = true;
+        identity = gameObject.GetComponent<NetworkIdentity>();
 
+    }
     #region Utility functions
 
     //swapX with Y
@@ -162,12 +175,28 @@ public class Ragdoll : ScriptComponent
     }
 
     #endregion
-    public void AddForce(Vector3 force)
+    public void AddForce(Vector3 force, bool diveTackle)
     {
         for (int i = 0; i < (int)BODYPART.COUNT; i++)
         {
             RB_BodyParts[i].AddForce(force * Mass_BodyParts[i], Rigidbody.ForceMode.Impulse);
         }
+        if(diveTackle)
+        {
+            RB_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
+            RB_BodyParts[(int)BODYPART.LEFT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
+        }
+
+    }
+    public float DistanceToWorld()
+    {
+        return ImpactSpine.DistanceToCollision;
+    }
+
+    public void Smack()
+    {
+        if(RagdollSound)
+            RagdollSound.Play();
     }
 
     public void EnableRagdoll()
@@ -180,8 +209,10 @@ public class Ragdoll : ScriptComponent
             ThomasEngine.Debug.LogError("No renderskinnedcomponent available Noragdoll will be created");
             return;
         }
+
         // Play the ragdoll sound
-        RagdollSound.PlayOneShot();
+        if(identity.Owner && RagdollSound)
+            RagdollSound.Play();
 
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
@@ -257,7 +288,7 @@ public class Ragdoll : ScriptComponent
         center.x = 0;
         center.z = 0;
         spineCollider.center = center;
-        spineCollider.size = new Vector3(0.2f, 0.2f, 0.2f);
+        spineCollider.size = new Vector3(center.y, center.y, center.y);
         C_BodyParts[(int)BODYPART.SPINE] = spineCollider;
 
         //Head
@@ -274,7 +305,14 @@ public class Ragdoll : ScriptComponent
         for (int i = (int)BODYPART.LEFT_UPPER_ARM; i <= (int)BODYPART.RIGHT_LOWER_ARM; i++)
         {
             CapsuleCollider c = G_BodyParts[i].AddComponent<CapsuleCollider>();
-            c.rotation = CapsuleCollider.ColliderRotation.RotateX;
+            if(PostiveMapping)
+            { 
+                c.rotation = CapsuleCollider.ColliderRotation.RotateY;
+            }
+            else
+            { 
+                c.rotation = CapsuleCollider.ColliderRotation.RotateX;
+            }
             c.radius = 0.065f;
             C_BodyParts[i] = c;
 
@@ -345,6 +383,18 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = headCollider.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
+        if (PostiveMapping)
+        {
+            J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 64;
+            J_BodyParts[(int)BODYPART.HEAD].SwingAngle2 = 59;
+
+            J_BodyParts[(int)BODYPART.HEAD].NoCollision = true;
+            ExtraVector = -J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor;
+            ExtraVector.x = -ExtraVector.x;
+            ExtraVector.y = -ExtraVector.y;
+            ExtraVector.z = ExtraVector.z + 0.1f; //* 3;
+            J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = ExtraVector;
+        }
 
         //left arm
 
@@ -359,7 +409,10 @@ public class Ragdoll : ScriptComponent
         center.x = 0;
         center.z = 0;
         float value = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn);
-        center.y = -value * 0.5f;
+        if (PostiveMapping)
+            center.y = value * 0.5f;
+        else
+            center.y = -value * 0.5f;
         limbCollider.center = center;
 
         //Joint from leftarm totorso 
@@ -372,6 +425,17 @@ public class Ragdoll : ScriptComponent
         ExtraVector.z = Math.Abs(ExtraVector.z);
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].Anchor = -limbCollider.center;
+        if(PostiveMapping)
+        {
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].Axis = new Vector3(0, -2.5f, 45);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAxis = new Vector3(0, 2.5f, -45);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAngle1 = 45;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAngle2 = 48;
+            ExtraVector.x = -ExtraVector.x;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
+        }
+
+
 
         //left under arm
         limbCollider = (C_BodyParts[(int)BODYPART.LEFT_LOWER_ARM] as CapsuleCollider);
@@ -382,7 +446,10 @@ public class Ragdoll : ScriptComponent
         center.z = 0;
         limbCollider.center = center;
         value = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, skinn);
-        center.y = -value * 0.5f;
+        if (PostiveMapping)
+            center.y = value * 0.5f;
+        else
+            center.y = -value * 0.5f;
         limbCollider.center = center;
 
         //Joint from leftudnerarmtooverarm
@@ -394,11 +461,16 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].Anchor = -limbCollider.center;
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn),
             (-calculateLengthBetweenSkeleton(LeftShoulder, UpperLeftArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperLeftArm, skinn)) * 0.5f, 0);
+        if(PostiveMapping)
+        {
+            ExtraVector = J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor;
+            ExtraVector.x = 0;
+            J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = ExtraVector;
+        }
 
         //Right arm
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM] as CapsuleCollider);
         limbCollider.height = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn);
-
         center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, skinn));
         center.x = 0;
         center.z = 0;
@@ -417,6 +489,32 @@ public class Ragdoll : ScriptComponent
         ExtraVector.z = Math.Abs(ExtraVector.z);
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].Anchor = -limbCollider.center;
+        if (PostiveMapping)
+        {
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].Axis = new Vector3(0, -2.5f, 135);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAxis = new Vector3(0, 13.5f, -135);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAngle1 = 66;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAngle2 = 55;
+            ExtraVector.y = -ExtraVector.y;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = -ExtraVector;
+            ExtraVector = -ExtraVector;
+        }
+
+        if (PostiveMapping)
+        {
+            Vector3 Copydatahere = new Vector3();
+
+            Copydatahere = J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor;
+            
+            Copydatahere.z = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor.z * 2;
+            ExtraVector = J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = Copydatahere;
+            Copydatahere = J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor;
+            Copydatahere.z = ExtraVector.z*2;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = Copydatahere;
+        }
+        
+
 
         //RightUnderArm
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM] as CapsuleCollider);
@@ -437,7 +535,10 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].Anchor = -limbCollider.center;
-        J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn), (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * 0.5f, 0);
+        if(PostiveMapping)
+            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(0, (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * -0.5f, 0);
+        else
+            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn), (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * 0.5f, 0);
 
         //RightLeg
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG] as CapsuleCollider);
@@ -449,7 +550,10 @@ public class Ragdoll : ScriptComponent
         center.z = 0;
         limbCollider.center = center;
         value = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skinn);
-        center.y = -value * 0.5f;
+        if (PostiveMapping)
+            center.y = value * 0.5f;
+        else
+            center.y = -value * 0.5f;
         limbCollider.center = center;
 
         //Joint from RightLegJoint
@@ -457,9 +561,20 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAxis = new Vector3(0, 0, 0);
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].NoCollision = true;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle1 = 90;
-        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle2 = 90;
+        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle2 = 10;
+        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].TwistAngle = 60;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor = new Vector3(0, calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skinn) * 0.5f, 0);
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperRightLeg, skinn) * 2;
+
+        if(PostiveMapping)
+        {
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAxis = new Vector3(0, 0, 180);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle2 = 5;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].TwistAngle = 90;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Axis = new Vector3(0, 180, 0);
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor = -J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor;
+            J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor = new Vector3(-J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.x, J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.y, J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor.z);
+        }
 
         //RightUnderLeg
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG] as CapsuleCollider);
@@ -471,7 +586,10 @@ public class Ragdoll : ScriptComponent
         center.z = 0;
         limbCollider.center = center;
         value = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, skinn);
-        center.y = -value * 0.5f;
+        if (PostiveMapping)
+            center.y = value * 0.5f;
+        else
+            center.y = -value * 0.5f;
         limbCollider.center = center;
 
         //RightUnderLegJoint
@@ -484,8 +602,11 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG].ConnectedAnchor = limbCollider.center;
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG].Anchor = -limbCollider.center;
 
-        //left leg
-        limbCollider = (C_BodyParts[(int)BODYPART.LEFT_UPPER_LEG] as CapsuleCollider);
+
+
+
+            //left leg
+            limbCollider = (C_BodyParts[(int)BODYPART.LEFT_UPPER_LEG] as CapsuleCollider);
         limbCollider.height = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skinn);
         limbCollider.radius = 0.065f;
 
@@ -494,7 +615,10 @@ public class Ragdoll : ScriptComponent
         center.z = 0;
         limbCollider.center = center;
         value = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skinn);
-        center.y = -value * 0.5f;
+        if (PostiveMapping)
+            center.y = value * 0.5f;
+        else
+            center.y = -value * 0.5f;
         limbCollider.center = center;
 
         //Joint from LeftLegJoint
@@ -502,9 +626,24 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAxis = new Vector3(0, 0, 0);
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].NoCollision = true;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle1 = 90;
-        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle2 = 90;
+        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle2 = 10;
+        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].TwistAngle = 60;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor = new Vector3(0, calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skinn) * 0.5f, 0);
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperLeftLeg, skinn) * 2;
+
+        if (PostiveMapping)
+        {
+
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAxis = new Vector3(0, 0, 180);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle2 = 5;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].TwistAngle = 90;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 180, 0);
+          //  J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Axis = new Vector3(0, 0, 0);
+  //          J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Swing = new Vector3(0, -90, -225);
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor = -J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor;
+            J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor = new Vector3(-J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor.x, J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor.y, J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor.z);
+        }
+
 
         //LeftUnderLeg
         limbCollider = (C_BodyParts[(int)BODYPART.LEFT_LOWER_LEG] as CapsuleCollider);
@@ -516,7 +655,10 @@ public class Ragdoll : ScriptComponent
         center.z = 0;
         limbCollider.center = center;
         value = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, skinn);
-        center.y = -value * 0.5f;
+        if (PostiveMapping)
+            center.y = value * 0.5f;
+        else
+            center.y = -value * 0.5f;
         limbCollider.center = center;
 
         //leftUnderLegJoint
@@ -534,16 +676,6 @@ public class Ragdoll : ScriptComponent
         ImpactSpine.G_BodyParts = G_BodyParts;
     }
 
-    public override void Start()
-    {
-        if (AudioListener == null)
-        {
-            AudioListener = gameObject;
-        }
-        DisableRagdoll();
-        RagdollSound = gameObject.GetComponent<SoundComponent>();
-    }
-
     public GameObject GetHips()
     {
         return G_BodyParts[(int)BODYPART.SPINE];
@@ -551,32 +683,27 @@ public class Ragdoll : ScriptComponent
 
     public override void Update()
     {
-
-        RagdollSound.Apply3D(AudioListener.transform.position, G_BodyParts[(int)BODYPART.SPINE].transform.position);
-
+        Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
 
 
         if (RagdollEnabled)
         {
-            if (ImpactSpine.GetActive)
+
+            if (ImpactSpine.GetActive && identity.Owner && RagdollSound)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
-                RagdollSound.PlayOneShot();
+                RagdollSound.Play();
             }
                 
             return;
         }
-        RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
 
-        
-
+        RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
 
         for(int i = 0; i < (int)BODYPART.COUNT; i++)
         {
-            G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
         }
-
-
     }
 
     public override void OnDestroy()
@@ -589,9 +716,9 @@ public class Ragdoll : ScriptComponent
 
         foreach(GameObject gObj in G_BodyParts)
         {
-            gObj.activeSelf = false;
+            if(gObj != null)
+                gObj.activeSelf = false;
         }
-
         RagdollEnabled = false;
 
     }

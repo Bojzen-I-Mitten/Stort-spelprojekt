@@ -22,7 +22,15 @@ public class MatchSystem : NetworkManager
     public GameObject Ball;
 
     public ChadControls LocalChad;
-    public Camera spectatorCamera { get; set; }
+    public Camera Camera { get; set; }
+    //public Camera spectatorCamera { get; set; }
+
+
+    private SoundComponent countdownSound;
+    private SoundComponent endroundSound;
+
+    public AudioClip countdownSoundClip { get; set; }
+    public AudioClip endroundSoundClip { get; set; }
 
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
@@ -57,7 +65,13 @@ public class MatchSystem : NetworkManager
     public bool GoldenGoal = false;
 
     public float MatchStartTime;
-    private bool MatchStarted = false;
+    [Browsable(false)]
+    public bool MatchStarted { get; private set; } = false;
+
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public bool Connected { get { return InternalManager.ConnectedPeerList.Count > 0; } }
+
     public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
@@ -66,15 +80,28 @@ public class MatchSystem : NetworkManager
 
         Teams[TEAM_TYPE.TEAM_1] = new Team(TEAM_TYPE.TEAM_1, "Team 1", Color.Red);
         Teams[TEAM_TYPE.TEAM_2] = new Team(TEAM_TYPE.TEAM_2, "Team 2", Color.Blue);
+
+        Teams[TEAM_TYPE.UNASSIGNED] = new Team(TEAM_TYPE.UNASSIGNED, "Unassigned", new Color(0, 0, 0, 0));
     }
+
+  
 
     public override void Start()
     {
+        Ball = GameObject.Instantiate(BallPrefab);
         base.Start();
-        if(BallPrefab)
-            SpawnablePrefabs.Add(BallPrefab);
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
+
+       
+        countdownSound = gameObject.AddComponent<SoundComponent>();
+        countdownSound.Clip = countdownSoundClip;
+        countdownSound.Looping = false;
+       
+        endroundSound = gameObject.AddComponent<SoundComponent>();
+        endroundSound.Clip = endroundSoundClip;
+        endroundSound.Looping = false;
+        
         //StartCoroutine(ResetCoroutine(10));
     }
     
@@ -101,6 +128,8 @@ public class MatchSystem : NetworkManager
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+                if (Input.GetKeyDown(Input.Keys.F10))
+                    ShowOwnedObjects();
             }
         }
 
@@ -116,19 +145,18 @@ public class MatchSystem : NetworkManager
         //}
     }
 
-    #region Utility
-    void SpawnBall()
+    private void ShowOwnedObjects()
     {
-        if (BallPrefab)
+        Debug.Log("##################################");
+        Debug.Log("Owned objects:");
+        foreach(var objects in Scene.ObjectOwners[LocalPeer])
         {
-            Ball = Scene.FindNetworkObject(8008)?.gameObject;
-            if (!Ball)
-            {
-                Ball = NetworkInstantiate(BallPrefab, Vector3.Zero, Quaternion.Identity, ResponsiblePeer == LocalPeer, 8008);
-            }
-            Ball.SetActive(false);
+            Debug.Log(objects.gameObject.Name);
         }
+        Debug.Log("##################################");
     }
+
+    #region Utility
 
     void ResetPlayers()
     {
@@ -155,6 +183,9 @@ public class MatchSystem : NetworkManager
         Ball.GetComponent<Ball>().Reset();
         PowerupManager.ResetPowerups();
         LocalChad.Locked = true;
+
+        //countdownSound.PlayOneShot();
+
         ChadHud.Instance.StartCountdown(duration);
         yield return new WaitForSecondsRealtime(duration);
         LocalChad.Locked = false;
@@ -164,6 +195,7 @@ public class MatchSystem : NetworkManager
 
     IEnumerator OnGoalCoroutine(Team teamThatScored)
     {
+        //endroundSound.PlayOneShot();
         ChadHud.Instance.OnGoal(teamThatScored, 7.0f);
         Time.TimeScale = 0.5f;
 
@@ -177,7 +209,7 @@ public class MatchSystem : NetworkManager
 
     #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID)
+    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID, int team1Score, int team2Score)
     {
         Debug.Log("matchInfo!");
         if (!MatchStarted)
@@ -186,6 +218,11 @@ public class MatchSystem : NetworkManager
             PowerupManager.NextPowerupID = powerupID;
             GoldenGoal = goldenGoal;
             MatchStartTime = startTime;
+
+            Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
+            Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
+
+
             Debug.Log(startTime);
         }
     }
@@ -217,6 +254,7 @@ public class MatchSystem : NetworkManager
 
     public void RPCOnGoal(int teamType)
     {
+        hasScored = true;
         TEAM_TYPE type = (TEAM_TYPE)teamType;
         Team team = FindTeam(type);
         team?.AddScore();
@@ -269,7 +307,6 @@ public class MatchSystem : NetworkManager
     {
         if (hasScored)
             return;
-        hasScored = true;
         SendRPC(-2, "RPCOnGoal", (int)teamThatScored);
         RPCOnGoal((int)teamThatScored);
     }
@@ -289,17 +326,15 @@ public class MatchSystem : NetworkManager
         //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
-        NetworkPlayer np = Scene.Players[peer].gameObject.AddComponent<NetworkPlayer>();
+        //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
         
-        np.JoinTeam(Teams[TEAM_TYPE.TEAM_SPECTATOR]);
-
-        SpawnBall();
+        //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
 
         if (peer != LocalPeer)
         {
             Debug.Log(MatchStarted);
             if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID);
+                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID, Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score);
         }
     }
 
@@ -347,6 +382,12 @@ public class MatchSystem : NetworkManager
         //    Team1.AddPlayer(player);
         //else
         //    Team2.AddPlayer(player);
+    }
+
+    public TEAM_TYPE GetPlayerTeam(GameObject player)
+    {
+        NetworkPlayer localPlayer = player.GetComponent<NetworkPlayer>();
+        return localPlayer.Team.TeamType;
     }
     #endregion
 

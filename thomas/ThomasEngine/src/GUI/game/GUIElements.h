@@ -20,22 +20,26 @@ namespace ThomasEngine
 		property Vector2 position
 		{
 			void set(Vector2 position);
+			Vector2 get();
 		}
 		property Vector2 scale
 		{
 			void set(Vector2 scale);
+			Vector2 get();
 		}
 		property Vector2 origin
 		{
 			void set(Vector2 origin);
 		}
-		property Vector4 color
+		property Color color
 		{
-			void set(Vector4 color);
+			void set(Color color);
+			Color get();
 		}
 		property float rotation
 		{
 			void set(float rotation);
+			float get();
 		}
 		property bool interactable
 		{
@@ -66,6 +70,7 @@ namespace ThomasEngine
 		property String^ text
 		{
 			void set(String^ text);
+			String^ get();
 		}
 		property Font^ font
 		{

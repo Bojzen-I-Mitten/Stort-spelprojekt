@@ -1,5 +1,5 @@
 #include "ThomasCore.h"
-#include "Sound.h"
+#include "SoundManager.hpp"
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
@@ -15,7 +15,7 @@
 #include "utils\d3d.h"
 #include <d3d11_4.h>
 #include <comdef.h>
-#include "AutoProfile.h"
+#include "utils/AutoProfile.h"
 #include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 #include "utils/ThreadMap.h"
@@ -45,7 +45,7 @@ namespace thomas
 
 		resource::Texture2D::Init();
 		ThomasTime::Init();
-		Sound::Init();
+		SoundManager::GetInstance()->Init();
 		graphics::Renderer::Instance()->init();
 
 		resource::Material::Init();
@@ -63,23 +63,21 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
-		PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic)
 		if (s_clearLog)
 		{
 			s_logOutput.clear();
 			s_clearLog = false;
 		}
 
-		Sound::Update();
+		SoundManager::GetInstance()->Update();
 	}
 
 	void ThomasCore::Render()
 	{
-		
-		profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		profiler->BeginFrame();
 		WindowManager::Instance()->ClearAllWindows();
-		profiler->Timestamp(profiling::GTS_MAIN_CLEAR);
+		profiler->Timestamp(utils::profiling::GTS_MAIN_CLEAR);
 		graphics::Renderer::Instance()->ProcessCommands();
 
 		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
@@ -120,7 +118,7 @@ namespace thomas
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
-		Sound::Destroy();
+		SoundManager::GetInstance()->Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
 		utils::D3D::Instance()->Destroy();
 

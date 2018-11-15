@@ -2,6 +2,7 @@
 #include "../../Component.h"
 using namespace System::Runtime::InteropServices;
 using namespace thomas::object;
+namespace thomas { namespace object { namespace component { class Collider; } } }
 namespace ThomasEngine
 {
 	ref class Rigidbody;
@@ -42,5 +43,11 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
+
+		/*property float friction
+		{
+			float get();
+			void set(float value);
+		}*/
 	};
 }

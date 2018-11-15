@@ -20,7 +20,6 @@ namespace ThomasEngine
 	{
 		
 	}
-
 	void Collider::OnDestroy()
 	{
 		gch.Free();
@@ -101,5 +100,8 @@ namespace ThomasEngine
 
 	bool Collider::isTrigger::get() { return ((component::Collider*)nativePtr)->IsTrigger(); }
 	void Collider::isTrigger::set(bool value) { ((component::Collider*)nativePtr)->SetTrigger(value); }
+
+	/*float Collider::friction::get() { return ((component::Collider*)nativePtr)->GetFriction(); }
+	void Collider::friction::set(float value) { ((component::Collider*)nativePtr)->SetFriction(value); }*/
 }
 
