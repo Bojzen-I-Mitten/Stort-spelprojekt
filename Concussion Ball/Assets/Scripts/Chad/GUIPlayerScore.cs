@@ -114,8 +114,8 @@ public class GUIPlayerScore : ScriptComponent
     public Texture2D PlayerBarTeam2 { get; set; }
     public Texture2D Team1Bar { get; set; }
     public Texture2D Team2Bar { get; set; }
-    public int AmountOfPlayersInTeam1 { get; set; } = 2;
-    public int AmountOfPlayersInTeam2 { get; set; } = 2;
+    public int AmountOfPlayersInTeam1 { get; set; } = 0;
+    public int AmountOfPlayersInTeam2 { get; set; } = 0;
     public Texture2D AmountOfPlayersBar { get; set; }
     private bool Toggle = false;
     public Font Font { get; set; }
@@ -348,13 +348,14 @@ public class GUIPlayerScore : ScriptComponent
         else if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score > MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score)
             AmountOfPlayersBarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
 
-        
+        AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
+        AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
     }
 
     public override void Update()
     {
-        UpdatePlayerBars();
         UpdateStatistics();
+        UpdatePlayerBars();
         if (Toggle)
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
