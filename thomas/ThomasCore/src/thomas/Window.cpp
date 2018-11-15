@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "WindowManager.h"
 #include "ThomasCore.h"
+#include "utils\AutoProfile.h"
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -138,6 +139,7 @@ namespace thomas
 
 	void Window::WaitOnSwapChain()
 	{
+		PROFILE("Wait-SwapChain")
 		HANDLE handle = m_swapChain->GetFrameLatencyWaitableObject();
 		DWORD result = WaitForSingleObjectEx(handle, 1000, true);
 	}
