@@ -29,7 +29,7 @@ namespace thomas
 			public:
 				//Canvas();
 				Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution = Vector2(1920, 1080));
-				~Canvas() = default;
+				~Canvas();
 				void Destroy();
 				void Render();
 

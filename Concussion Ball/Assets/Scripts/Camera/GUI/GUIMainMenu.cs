@@ -16,7 +16,7 @@ public class GUIMainMenu : ScriptComponent
     Text Exit;
     Text Credits;
 
-    public override void Awake()
+    public override void OnAwake()
     {
     }
 
