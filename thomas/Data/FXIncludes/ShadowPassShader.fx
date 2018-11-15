@@ -30,7 +30,7 @@ v2f vert(appdata_thomas v)
 
     float3 posL = v.vertex;
     
-    o.vertex = WorldToLightClipPos(posL);
+    o.vertex = ObjectToLightClipPos(posL);
 
     return o;
 }

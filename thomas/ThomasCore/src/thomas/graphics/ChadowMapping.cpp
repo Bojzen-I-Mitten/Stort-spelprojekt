@@ -14,12 +14,12 @@ namespace thomas
 	{
 		std::unique_ptr<resource::Material> ShadowMap::s_material;
 		std::unique_ptr<resource::Shader> ShadowMap::s_shader;
-
+		math::Matrix ShadowMap::s_matrixClamp;
 		void ShadowMap::InitStatics()
 		{
 			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowPassShader.fx");
-
-			s_material = std::make_unique<resource::Material>(s_shader.get());
+			s_material = std::make_unique<resource::Material>(s_shader.get()); 
+			s_matrixClamp = math::Matrix(0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f);
 		}
 
 		ShadowMap::ShadowMap()
@@ -54,7 +54,7 @@ namespace thomas
 			//https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/
 
 
-			math::Vector3 corners[8];
+			/*math::Vector3 corners[8];
 			camera->GetFrustrum().GetCorners(corners);
 
 			math::Vector3 frustumCenter = math::Vector3(0, 0, 0);
@@ -67,7 +67,7 @@ namespace thomas
 			frustumCenter /= 8;
 
 			const float nearClipOffset = 50.0f;
-			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 25/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 25/* (camera->GetFar() + nearClipOffset), math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 			
 			for (unsigned i = 0; i < 8; ++i)
 				corners[i] = math::Vector3::Transform(corners[i], m_matrixView);
@@ -91,8 +91,9 @@ namespace thomas
 				else if (corners[i].z < mins.z)
 					mins.z = corners[i].z;
 			}
-
+			*/
 			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z - nearClipOffset, -mins.z);
+			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 25/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-60, 60, -60, 60, -20, 40);
 
 			m_matrixVP = m_matrixView * m_matrixProj;
@@ -118,6 +119,29 @@ namespace thomas
 			s_material->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
 			s_material->ApplyProperty("lightMatrixVP");
 			
+		}
+
+		
+
+		resource::Texture2D * ShadowMap::GetShadowMapTexture()
+		{
+			//s_material->SetMatrix("lightMatrixVP", (m_matrixVP * s_matrixClamp).Transpose());
+			//s_material->ApplyProperty("lightMatrixVP");
+			return m_depthTexture.get();
+		}
+
+		math::Matrix ShadowMap::GetVPMat()
+		{
+			return (s_matrixClamp * m_matrixVP).Transpose();
+		}
+
+		void ShadowMap::BindShadowToMaterial(resource::Material * mat)
+		{
+			mat->SetMatrix("lightMatrixVP", (s_matrixClamp.Transpose() * m_matrixVP).Transpose());
+			//mat->ApplyProperty("lightMatrixVP");
+
+			mat->SetTexture2D("shadowMap", m_depthTexture.get());
+			//mat->ApplyProperty("shadowMap");
 		}
 
 	}

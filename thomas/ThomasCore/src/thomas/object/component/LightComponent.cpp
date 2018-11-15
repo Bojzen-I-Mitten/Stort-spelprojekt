@@ -5,7 +5,7 @@
 #include "../../graphics/Mesh.h"
 #include "Camera.h"
 #include "../../graphics/render/Frame.h"
-
+#include "../../resource/texture/Texture2D.h"
 
 
 namespace thomas
@@ -77,6 +77,21 @@ namespace thomas
 			void LightComponent::DrawShadow(graphics::render::RenderCommand renderCommand)
 			{
 				m_shadowMap.Draw(renderCommand);
+			}
+
+			resource::Texture2D* LightComponent::GetShadowMapTexture()
+			{
+				return m_shadowMap.GetShadowMapTexture();
+			}
+
+			math::Matrix LightComponent::GetVPMat()
+			{
+				return m_shadowMap.GetVPMat();
+			}
+
+			void LightComponent::Test(resource::Material * mat)
+			{
+				m_shadowMap.BindShadowToMaterial(mat);
 			}
 
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
@@ -183,6 +198,15 @@ namespace thomas
 			void LightComponent::SetRectangleDimensions(math::Vector2 const& value)
 			{
 				m_lightComponentData.rectangleDimensions = value;
+			}
+
+			bool LightComponent::CastsShadows() const
+			{
+				return false;
+			}
+
+			void LightComponent::SetCastShadows(bool const & value)
+			{
 			}
 
 }

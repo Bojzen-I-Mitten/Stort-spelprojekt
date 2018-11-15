@@ -8,13 +8,25 @@ cbuffer LightMatrices
     float4x4 lightMatrixVP; //[4];
 };
 
-inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
+inline float4 ObjectToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
 {
     return mul(lightMatrixVP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
-    //return mul(THOMAS_MATRIX_VP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
 }
 
+inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
+{
+    return mul(lightMatrixVP, float4(pos, 1.0));
+}
+
+
+SamplerState StandardWrapSamplerr
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
 //Texture2DArray ShadowMaps;
+Texture2D shadowMap;
 
 cbuffer LightCountsStruct
 {
@@ -68,7 +80,7 @@ inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 
 inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffuse, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
-    float3 ambient = float3(0.05f, 0.05f, 0.05f);
+    float3 ambient = float3(0.1f, 0.1f, 0.1f);
     float3 colorAcculmulator = ambient;
     float3 lightDir = float3(0, 0, 0);
     float lightMultiplyer = 0.0f;
@@ -78,7 +90,17 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
     for (; i < roof; ++i) //directional
     {
         lightDir = lights[i].direction; //should be normalized already
-        lightMultiplyer = lights[i].intensity;
+
+
+        float visibility = 5.0;
+        float3 sampleCoordLS = WorldToLightClipPos(worldPos).xyz;
+        
+        if (shadowMap.Sample(StandardWrapSamplerr, sampleCoordLS.xy).x < sampleCoordLS.z) //texture(shadowMap, ShadowCoord.xy).z < ShadowCoord.z)
+        {
+            visibility = 0.1;
+        }
+
+        lightMultiplyer = lights[i].intensity * visibility;
         Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     roof += nrOfPointLights;

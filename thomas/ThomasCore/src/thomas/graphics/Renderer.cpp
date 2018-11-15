@@ -30,7 +30,7 @@ namespace thomas
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
 			m_shaders.SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
 
-			LightManager::Bind(&m_shaders);
+			LightManager::BindLights(&m_shaders);
 		}
 
 		constexpr uint32_t NUM_STRUCT = 200;
@@ -183,7 +183,7 @@ namespace thomas
 				PROFILE("BindFrame")
 				BindFrame();
 			}
-
+			object::component::LightComponent* lll = nullptr;
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
@@ -194,8 +194,6 @@ namespace thomas
 					
 					if (camera)
 						l->UpdateShadowBox(editor::EditorCamera::Instance()->GetCamera());
-					//math::Matrix viewProjMatrix = perCameraQueue.second.m_frameData.viewMatrix * perCameraQueue.second.m_frameData.projectionMatrix;
-					//m_shaders.SetGlobalMatrix("lightMatrixVP", editor::EditorCamera::Instance()->GetCamera()->GetViewProjMatrix().Transpose());
 					l->BindShadowMapDepthTexture();
 					
 					PROFILE("ShadowDrawObjectsPerCamera")
@@ -204,23 +202,29 @@ namespace thomas
 						PROFILE("ShadowDrawObjects")
 						for (auto & perMeshCommand : perMaterialQueue.second)
 						{
-							
 							{
 								PROFILE("DrawShadow")
 								l->DrawShadow(perMeshCommand);
 							}
-							
 						}
-
 					}
-				}
+					lll = l;
+					
+					/*ID3D11ShaderResourceView* srv[1] = { l->GetShadowMapTexture()->GetResourceView() };
+					utils::D3D::Instance()->GetDeviceContext()->PSSetShaderResources(7, 1, srv);
 
+
+
+					m_shaders.SetGlobalMatrix("lightMatrixVP", l->GetVPMat());*/
+//					utils::D3D::Instance()->GetDeviceContext()->PSSetConstantBuffers(7, 1, l->GetVPMat());
+//					m_shaders.SetGlobalTexture2D("shadowMap", l->GetShadowMapTexture());
+				}
+				
 				{
 					PROFILE("CameraBind")
 					BindCameraRenderTarget(perCameraQueue.second.m_frameData);
 				}
 				// Skyboxes should be submitted!
-				
 				{
 					PROFILE("CameraDrawSkybox")
 					if (camera && camera->hasSkybox())
@@ -234,6 +238,10 @@ namespace thomas
 						auto material = perMaterialQueue.first;
 						{
 							PROFILE("BindMaterial")
+								if (material->GetShader()->GetName() == "StandardShader")
+									if (lll)
+										lll->Test(material);
+							//Lightmanager::bindshadows
 							material->Bind();
 						}
 						{
@@ -253,7 +261,7 @@ namespace thomas
 					}
 				}
 			}
-	
+
 			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
 

@@ -20,9 +20,10 @@ namespace thomas
 			void DeRefTexture(unsigned i);
 			
 			unsigned AddTexture(Texture2D* tex);
+			unsigned AddTextureReference(Texture2D*& tex);//does not create a new copy nor resize the texture
 
 			void OnChanged();
-
+			void UpdateTextures();
 		private:
 
 			std::vector<Texture2D*> m_textures;

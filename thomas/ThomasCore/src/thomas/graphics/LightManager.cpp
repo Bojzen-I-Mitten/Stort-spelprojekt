@@ -8,6 +8,7 @@
 #include "render/ShaderList.h"
 #include "ChadowMapping.h"
 #include <algorithm>
+#include "../resource/texture/Texture2DArray.h"
 namespace thomas
 {
 	namespace graphics
@@ -15,18 +16,21 @@ namespace thomas
 		
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
-
+		resource::Texture2DArray* LightManager::s_shadowMapTextures;
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
+		utils::buffers::StructuredBuffer* LightManager::s_shadowLightVPMatrices;
 		
 
 		void LightManager::Initialize()
 		{
-			s_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 15, DYNAMIC_BUFFER);
+			s_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 25, DYNAMIC_BUFFER);
 
 			s_lightCounts.nrOfDirectionalLights = 0;
 			s_lightCounts.nrOfSpotLights = 0;
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
+
+			s_shadowMapTextures = new resource::Texture2DArray(512, 512, DXGI_FORMAT_R32_FLOAT);
 
 			ShadowMap::InitStatics();
 		}
@@ -110,7 +114,7 @@ namespace thomas
 			return s_lights;
 		}
 
-		void LightManager::Bind(render::ShaderList* shaders)
+		void LightManager::BindLights(render::ShaderList* shaders)
 		{
 			shaders->SetGlobalInt("nrOfPointLights", s_lightCounts.nrOfPointLights);
 			shaders->SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
@@ -118,6 +122,13 @@ namespace thomas
 			shaders->SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
 			shaders->SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
+
+		void LightManager::BindShadows(render::ShaderList * shaders)
+		{
+
+		}
+
+		
 		
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{

@@ -25,6 +25,10 @@ namespace thomas
 			void Draw(render::RenderCommand& renderCommand);
 			void Bind();
 
+			resource::Texture2D* GetShadowMapTexture();
+			math::Matrix GetVPMat();
+			void BindShadowToMaterial(resource::Material* mat);
+
 		private:
 			std::unique_ptr<resource::Texture2D> m_depthTexture;
 			ID3D11DepthStencilView* m_depthStencilView;
@@ -40,6 +44,7 @@ namespace thomas
 
 			static std::unique_ptr<resource::Material> s_material;
 			static std::unique_ptr<resource::Shader> s_shader;
+			static math::Matrix s_matrixClamp;
 		};
 	}
 }

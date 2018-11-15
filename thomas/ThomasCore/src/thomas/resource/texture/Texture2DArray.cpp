@@ -71,6 +71,30 @@ namespace thomas {
 			return i;
 		}
 
+		unsigned Texture2DArray::AddTextureReference(Texture2D *& tex)
+		{
+			if (tex->GetWidth() != m_width)
+				return -1;
+			if (tex->GetHeight() != m_height)
+				return -1;
+
+
+			unsigned i = 0;
+			for (; i < m_textures.size(); ++i)
+			{
+				if (m_textures[i] == tex)//resource manager makes sure the address is unique per texture
+				{
+					m_textureRefCount[i]++;
+
+					return i;
+				}
+			}
+			m_textures.push_back(tex);
+			OnChanged();
+
+			return i;
+		}
+
 
 		void Texture2DArray::OnChanged()
 		{
@@ -86,6 +110,20 @@ namespace thomas {
 			ID3D11Texture2D *textureInterface = nullptr;
 			utils::D3D::Instance()->CreateTextureArray((void**)initData.data(), m_width, m_height, initData.size(), m_format, textureInterface, m_srv, true, 1);
 			m_resource = textureInterface;
+		}
+		void Texture2DArray::UpdateTextures()
+		{
+			
+			unsigned size = m_width * m_height;
+			unsigned arraySize = m_textures.size() *size;
+			std::vector<byte*> initData(arraySize);
+
+			for (unsigned i = 0; i < arraySize; ++size)
+			{
+				initData[i] = m_textures[i]->GetRawBGRAPixels();
+			}
+
+			utils::D3D::Instance()->GetDeviceContext()->UpdateSubresource(m_resource, 0, NULL, &initData, 4 * m_width, 4 * m_width * m_height);
 		}
 	}
 }

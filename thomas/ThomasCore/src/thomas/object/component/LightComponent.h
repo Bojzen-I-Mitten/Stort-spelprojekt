@@ -15,6 +15,7 @@ namespace thomas
 	namespace graphics {
 		class Mesh; namespace render { struct RenderCommand; }
 	}
+	namespace resource { namespace texture { class Texture2D; } }
 	namespace object 
 	{
 		namespace component
@@ -41,7 +42,9 @@ namespace thomas
 				void UpdateShadowBox(Camera* camera);
 				void BindShadowMapDepthTexture();
 				void DrawShadow(graphics::render::RenderCommand renderCommand);
-				
+				resource::Texture2D* GetShadowMapTexture();
+				math::Matrix GetVPMat();
+				void Test(resource::Material* mat);
 
 				graphics::LightManager::LightStruct GetData();
 
@@ -75,7 +78,8 @@ namespace thomas
 				math::Vector2 GetRectangleDimensions() const;
 				void SetRectangleDimensions(math::Vector2 const& value);
 
-
+				bool CastsShadows() const;
+				void SetCastShadows(bool const& value);
 			};
 
 		}
