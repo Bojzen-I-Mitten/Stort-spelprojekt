@@ -117,7 +117,6 @@ public class GUIPlayerScore : ScriptComponent
     public int AmountOfPlayersInTeam1 { get; set; } = 2;
     public int AmountOfPlayersInTeam2 { get; set; } = 2;
     public Texture2D AmountOfPlayersBar { get; set; }
-    public Vector2 ScaleText { get; set; }
     private bool Toggle = false;
     public Font Font { get; set; }
     
@@ -128,6 +127,7 @@ public class GUIPlayerScore : ScriptComponent
     List<Playertext> Team1Players = new List<Playertext>();
     List<Playertext> Team2Players = new List<Playertext>();
     Text[] PlayerstandardText = new Text[2];
+    Text[] TeamName = new Text[2];
     Image[] PlayerStandardbar = new Image[2];
     List<Image> PlayerStandardBarTeam1 = new List<Image>();
     List<Image> PlayerStandardBarTeam2 = new List<Image>();
@@ -174,6 +174,8 @@ public class GUIPlayerScore : ScriptComponent
 
         PlayerStandardbar[0] = Canvas.Add(PlayerBarTeam1);
         PlayerStandardbar[1] = Canvas.Add(PlayerBarTeam2);
+        TeamName[0] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
+        TeamName[1] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
         PlayerstandardText[1] = Canvas.Add("Ping  Tackled  Tackles  Goals   Player");
         PlayerstandardText[0] = Canvas.Add("    Player    Goals   Tackles Tackled   Ping");
         for (int i = 0; i < 2; i++)
@@ -181,6 +183,8 @@ public class GUIPlayerScore : ScriptComponent
             PlayerStandardbar[i].scale = Vector2.Zero;
             PlayerstandardText[i].font = Font;
             PlayerstandardText[i].scale = Vector2.Zero;
+            TeamName[i].font = Font;
+            TeamName[i].scale = Vector2.Zero;
         }
         PlayerstandardText[0].origin = new Vector2(-0.01f, -10.2f);
         PlayerstandardText[1].origin = new Vector2(-1.25f, -10.2f);
@@ -189,6 +193,11 @@ public class GUIPlayerScore : ScriptComponent
         PlayerStandardbar[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
         PlayerStandardbar[1].origin = new Vector2(-0.84f, -3);
 
+        TeamName[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
+        TeamName[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
+
+        TeamName[0].position = new Vector2(0.1f, 0.175f);
+        TeamName[1].position = new Vector2(0.7f, 0.175f);
     }
 
     void DisplayBar(Vector2 OnOff)
@@ -201,10 +210,16 @@ public class GUIPlayerScore : ScriptComponent
         for (int i = 0; i < 2; i++)
         {
             PlayerStandardbar[i].scale = OnOff;
-            if(OnOff.x == 0)
+            if (OnOff.x == 0)
+            {
+                TeamName[i].scale = new Vector2(0, 0);
                 PlayerstandardText[i].scale = new Vector2(0, 0);
+            }
             else
-               PlayerstandardText[i].scale = new Vector2(0.8f,0.6f);
+            {
+                TeamName[i].scale = OnOff;
+                PlayerstandardText[i].scale = new Vector2(0.8f, 0.6f);
+            }
         }
 
         if(OnOff.x != 0)
@@ -332,6 +347,7 @@ public class GUIPlayerScore : ScriptComponent
             AmountOfPlayersBarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
         else if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score > MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score)
             AmountOfPlayersBarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+
         
     }
 
@@ -343,24 +359,22 @@ public class GUIPlayerScore : ScriptComponent
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
             DisplayBar(Vector2.Zero);
-        if (Input.GetKeyDown(Input.Keys.Tab) || Input.GetKeyDown(Input.Keys.LeftControl))
+        if (Input.GetKeyDown(Input.Keys.Tab) /*|| Input.GetKeyDown(Input.Keys.LeftControl)*/)
         {
             if (!Toggle)
             {
-             //   UpdatePlayerBars();
-               // DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
-                  Toggle = true;
+                Toggle = true;
             }
-            else
+     /*     else
             {
-           //     UpdatePlayerBars();
-              //  DisplayBar(Vector2.Zero);
                 Toggle = false;
             }
+            */
         }
-
-
-
+        if(Input.GetKeyUp(Input.Keys.Tab))
+        {
+            Toggle = false;
+        }
         SetOrigin();
     }
 }
