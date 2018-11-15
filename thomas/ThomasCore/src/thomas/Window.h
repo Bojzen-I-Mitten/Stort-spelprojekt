@@ -90,6 +90,7 @@ namespace thomas
 
 		IDXGISwapChain3* m_swapChain;
 		int m_frameIndex;
+		HANDLE m_waitableObject;
 	};
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#define FRAME_BUFFERS 2
+#define FRAME_BUFFERS 3
 
 #include <d3d11_4.h>
 #include <dxgi1_6.h>
@@ -73,6 +73,7 @@ namespace thomas
 			D3D() = default;
 			void CreateDebugInterface();
 			bool CreateDxgiInterface();
+			bool CreateDeviceContext();
 			bool CreateMultiThreadedInterface();
 			
 		private:

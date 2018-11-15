@@ -2,6 +2,8 @@
 #include "Common.h"
 #include "WindowManager.h"
 #include "ThomasCore.h"
+#include "../thomas/utils/AutoProfile.h"
+
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -46,6 +48,7 @@ namespace thomas
 			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 			if (hr)
 			{
+				m_waitableObject = m_swapChain->GetFrameLatencyWaitableObject();
 				m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 				ChangeWindowShowState(nCmdShow);
 			}
@@ -67,6 +70,7 @@ namespace thomas
 			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
 			if (hr)
 			{
+				m_waitableObject = m_swapChain->GetFrameLatencyWaitableObject();
 				m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 			}
 		}
@@ -145,7 +149,7 @@ namespace thomas
 
 			SAFE_RELEASE(m_dx.depthStencilState);
 
-			m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_B8G8R8A8_UNORM,
+			m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_R8G8B8A8_UNORM,
 				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
 			return InitDxBuffers();
 		}
@@ -155,8 +159,8 @@ namespace thomas
 
 	void Window::WaitOnSwapChain()
 	{
-		HANDLE handle = m_swapChain->GetFrameLatencyWaitableObject();
-		DWORD result = WaitForSingleObjectEx(handle, 1000, true);
+		PROFILE("WAITGPU")
+		DWORD result = WaitForSingleObjectEx(m_waitableObject, 1000, true);
 	}
 
 	void Window::BeginFrame()
@@ -285,7 +289,7 @@ namespace thomas
 	void Window::ResolveRenderTarget()
 	{
 		unsigned int sub = D3D11CalcSubresource(0, 0, 1);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->ResolveSubresource(m_dx.buffer[0][m_frameIndex], sub, m_dx.buffer[1][m_frameIndex], sub, DXGI_FORMAT_B8G8R8A8_UNORM);
+		utils::D3D::Instance()->GetDeviceContextDeffered()->ResolveSubresource(m_dx.buffer[0][m_frameIndex], sub, m_dx.buffer[1][m_frameIndex], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	void Window::SetCursor(const bool & visible)
@@ -397,10 +401,6 @@ namespace thomas
 				window->QueueResize();				
 		}
 		break;
-		case WM_SETFOCUS:
-			break;
-		case WM_KILLFOCUS:
-			break;
 		case WM_ACTIVATEAPP:
 				window->m_input.ProcessKeyboard(message, wParam, lParam);
 				window->m_input.ProcessMouse(message, wParam, lParam, hWnd);

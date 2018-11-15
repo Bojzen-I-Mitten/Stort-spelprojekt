@@ -245,33 +245,26 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, &m_deviceContextImmediate);
+			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
 			if (SUCCEEDED(hr))
 			{
-				hr = m_device->CreateDeferredContext(0, &m_deviceContextDeferred);
-				if (FAILED(hr))
-				{
-					LOG_HR(hr);
+				if (!CreateDeviceContext())
 					return false;
-				}
-			
+
 				if (!CreateDxgiInterface())
 					return false;
 
 				if (!CreateMultiThreadedInterface())
 					return false;
-
-				m_multiThreaded->SetMultithreadProtected(true);
-
 #ifdef  _DEBUG_DX
 				CreateDebugInterface();
 #endif
 				m_profiler = new profiling::GpuProfiler();
 				if (!m_profiler->Init())
 					return false;
-			}
 
-			return true;
+				return true;
+			}
 
 			LOG_HR(hr);
 			return false;
@@ -304,6 +297,19 @@ namespace thomas
 			return false;
 		}
 
+		bool D3D::CreateDeviceContext()
+		{
+			m_device->GetImmediateContext(&m_deviceContextImmediate);
+			HRESULT hr = m_device->CreateDeferredContext(0, &m_deviceContextDeferred);
+			if (FAILED(hr))
+			{
+				LOG_HR(hr);
+				return false;
+			}
+
+			return true;
+		}
+
 		bool D3D::CreateMultiThreadedInterface()
 		{
 			HRESULT hr = m_deviceContextImmediate->QueryInterface(IID_PPV_ARGS(&m_multiThreaded));
@@ -313,6 +319,7 @@ namespace thomas
 				return false;
 			}
 
+			m_multiThreaded->SetMultithreadProtected(true);
 			return true;
 		}
 
