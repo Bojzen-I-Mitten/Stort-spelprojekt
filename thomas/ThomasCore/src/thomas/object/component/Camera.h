@@ -50,6 +50,7 @@ namespace thomas
 				void SetGUIRendering(bool rendering);
 
 				math::Viewport GetViewport();
+				math::Vector2 GetViewportScale();
 				void SetViewport(math::Viewport viewport);
 				void SetViewport(float x, float y, float width, float height);
 
