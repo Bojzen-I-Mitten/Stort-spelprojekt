@@ -88,6 +88,8 @@ public class ChadControls : NetworkComponent
     public override void Start()
     {
         State = STATE.CHADING;
+        if (rBody != null)
+            rBody.IsKinematic = true;   // Alayws off
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -107,7 +109,7 @@ public class ChadControls : NetworkComponent
     {
         base.OnGotOwnership();
         if (rBody != null)
-            rBody.IsKinematic = false;
+            rBody.IsKinematic = false; // Enable
 
     }
     public override void OnLostOwnership()
