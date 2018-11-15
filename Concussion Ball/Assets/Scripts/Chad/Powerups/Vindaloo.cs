@@ -28,7 +28,8 @@ public class Vindaloo : Powerup
         MovementSpeedModifier = 0.65f;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        ExplosionSound.clip = VindalooExplosionSound;
+        ExplosionSound.Type = SoundComponent.SoundType.Effect;
+        ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
 

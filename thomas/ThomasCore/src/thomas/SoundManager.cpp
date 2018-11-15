@@ -26,7 +26,7 @@ namespace thomas
 		if (listener != nullptr)
 		{
 			m_system->set3DListenerAttributes(0, &Vector3ToFmod(listener->m_gameObject->m_transform->GetPosition()), NULL,
-				&Vector3ToFmod(-listener->m_gameObject->m_transform->Forward()), &Vector3ToFmod(listener->m_gameObject->m_transform->Up()));
+				&Vector3ToFmod(listener->m_gameObject->m_transform->Forward()), &Vector3ToFmod(listener->m_gameObject->m_transform->Up()));
 		}
 		
 		ErrorCheck(m_system->update());
