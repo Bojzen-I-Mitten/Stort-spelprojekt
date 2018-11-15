@@ -11,12 +11,6 @@ public class GUIHostMenu : ScriptComponent
     public Texture2D TextBoxTexture { get; set; }
     public Texture2D WhiteBoxTexture { get; set; }
     public Font Font { get; set; }
-    public int NrTeams { get; set; } = 2;
-
-    //public Vector2 HostBtnPos { get; set; } = Vector2.Zero;
-    //public Vector2 HostBtnScale { get; set; } = Vector2.One;
-    //public Vector2 ExitBtnPos { get; set; } = Vector2.Zero;
-    //public Vector2 ExitBtnScale { get; set; } = Vector2.One;
 
     Text HostBtn;
     Text ExitBtn;
@@ -47,8 +41,7 @@ public class GUIHostMenu : ScriptComponent
 
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
-
-    private bool hasConnected = false;
+    
     public string PortString;
 
     public override void Start()
