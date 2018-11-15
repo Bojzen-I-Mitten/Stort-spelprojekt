@@ -9,48 +9,43 @@ namespace ThomasEngine
 	ref class AudioClip;
 	public ref class SoundComponent : public Component
 	{
+	public:
+		enum class SoundType
+		{
+			Music,
+			Effect,
+			Voice
+		};
+
 	private:
 		AudioClip^ m_clip;
 		property thomas::object::component::SoundComponent* sound { thomas::object::component::SoundComponent* get(); }
-		bool playOnStart;
+
 	public:
 		SoundComponent();
+
 		void Play();
-		void PlayOneShot();
+		void Play(AudioClip^ clip, float volume, bool looping, bool is3D);
+		void Pause(bool paused);
+		void Mute(bool mute);
 		void Stop();
-		void Pause();
-		void Resume();
 		bool IsPlaying();
 		bool IsPaused();
-		bool HasStopped();
+		bool IsMuted();
 
-		void Start() override;
-
-		property bool PlayOnStart
+		property SoundType Type
 		{
-			bool get();
-			void set(bool value);
+			SoundType get();
+			void set(SoundType value);
 		}
 
-		property AudioClip^ clip
+		property AudioClip^ Clip
 		{
 			AudioClip^ get();
 			void set(AudioClip^ value);
 		}
 
-		property bool Is3D
-		{
-			bool get();
-			void set(bool value);
-		}
-
 		property float Volume
-		{
-			float get();
-			void set(float value);
-		}
-
-		property float VolumeFactor
 		{
 			float get();
 			void set(float value);
@@ -60,6 +55,36 @@ namespace ThomasEngine
 		{
 			bool get();
 			void set(bool value);
+		}
+
+		property bool Is3D
+		{
+			bool get();
+			void set(bool value);
+		}
+
+		[DisplayNameAttribute("Min Distance")]
+		[CategoryAttribute("3D")]
+		property float MinDistance
+		{
+			float get();
+			void set(float value);
+		}
+
+		[DisplayNameAttribute("Max Distance")]
+		[CategoryAttribute("3D")]
+		property float MaxDistance
+		{
+			float get();
+			void set(float value);
+		}
+
+		[DisplayNameAttribute("Spread Angle")]
+		[CategoryAttribute("3D")]
+		property float SpreadAngle
+		{
+			float get();
+			void set(float value);
 		}
 	};
 }
