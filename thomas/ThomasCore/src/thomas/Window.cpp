@@ -372,7 +372,7 @@ namespace thomas
 			window->m_input.SetLastKey(NULL);
 			break;
 		case WM_CHAR:
-			if (wParam > 0x20 && wParam < 0x7E)
+			//if (wParam > 0x20 && wParam < 0x7E)
 				window->m_input.SetLastKey((unsigned short)wParam);
 			break;
 		case WM_DESTROY:
