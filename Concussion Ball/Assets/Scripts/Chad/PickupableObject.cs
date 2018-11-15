@@ -73,7 +73,6 @@ public class PickupableObject : NetworkComponent
         transform.LookAt(transform.position + Vector3.Normalize(direction));
         m_rigidBody.Position = transform.position;
         m_rigidBody.Rotation = transform.rotation;
-        Debug.Log("Throwing item with force: " + direction);
         StartCoroutine(ThrowRoutine(direction));
         OnThrow();
         SendRPC("OnThrow");
