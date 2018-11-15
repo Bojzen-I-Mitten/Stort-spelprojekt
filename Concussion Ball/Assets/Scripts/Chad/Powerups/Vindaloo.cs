@@ -33,7 +33,8 @@ public class Vindaloo : Powerup
         ExplosionSound.Is3D = true;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        ExplosionSound.clip = VindalooExplosionSound;
+        ExplosionSound.Type = SoundComponent.SoundType.Effect;
+        ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
 
@@ -159,7 +160,7 @@ public class Vindaloo : Powerup
     private void Explosion()
     {
         // Play the vindaloo explosion sound
-        ExplosionSound.PlayOneShot();
+        ExplosionSound.Play();
 
         emitterFire.EmitOneShot(25);
         emitterFire2.EmitOneShot(45);
