@@ -119,7 +119,7 @@ namespace ThomasEngine
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
-		property Comp::State State 
+		property Comp::State ComponentState 
 		{
 			Comp::State get();
 		}

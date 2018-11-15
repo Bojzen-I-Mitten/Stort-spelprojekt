@@ -72,7 +72,7 @@ namespace ThomasEngine {
 				// If editor state: don't initiate all components
 				if (!(playing || c->enableInEditor())) continue;
 				// Ensure component isn't initialized
-				if (c->State != Comp::State::Uninitialized) continue;
+				if (c->ComponentState != Comp::State::Uninitialized) continue;
 #else		
 				assert(c->State == Comp::State::Uninitialized);
 #endif			
@@ -82,7 +82,7 @@ namespace ThomasEngine {
 			case Comp::State::Enabled:
 			{
 				// If Component isn't activated 
-				if (!c->Activated || c->State != Comp::State::Awake) 
+				if (!c->Activated || c->ComponentState != Comp::State::Awake) 
 					continue;
 				c->Enable();
 			}
@@ -157,7 +157,7 @@ namespace ThomasEngine {
 		{
 			// Disable
 			comp->OnParentDestroy(this);
-			if (comp->State == Comp::Enabled)
+			if (comp->ComponentState == Comp::Enabled)
 				comp->OnDisable();
 		}
 	}
@@ -173,7 +173,7 @@ namespace ThomasEngine {
 			Type^ typ = comp->GetType();
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
 
-			if (comp->State == Comp::Enabled)
+			if (comp->ComponentState == Comp::Enabled)
 				comp->OnDisable();
 			//if(comp->m_state != component::Uninitialized) // Always true.
 			comp->OnDestroy();

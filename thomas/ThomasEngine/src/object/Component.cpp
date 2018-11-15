@@ -185,7 +185,7 @@ namespace ThomasEngine
 		else
 			m_active = state;
 	}
-	Comp::State Component::State::get()
+	Comp::State Component::ComponentState::get()
 	{ 
 		return m_state; 
 	}

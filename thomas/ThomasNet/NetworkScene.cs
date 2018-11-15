@@ -96,8 +96,8 @@ namespace ThomasEngine.Network
             {
                 player.activeSelf = true;
                 NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
-               
-                networkIdentity.Owner = myPlayer;
+                // If spawned player is local character: Receive ownership  
+                networkIdentity.ReceiveOwnershipStatus(myPlayer);
                 if (myPlayer)
                     player.Name += " (my player)";
                 Players[peer] = networkIdentity;
@@ -133,9 +133,8 @@ namespace ThomasEngine.Network
 
         public void InititateScene()
         {
-            ThomasWrapper.CurrentScene.getComponentsOfType<NetworkIdentity>().ForEach((identity) =>
+            foreach ( NetworkIdentity identity in ThomasWrapper.CurrentScene.getComponentsOfType<NetworkIdentity>())
             {
-
                 if (identity.IsPlayer)
                     return;
                 NetworkObjects.Add(++nextAssignableID, identity);
@@ -145,7 +144,8 @@ namespace ThomasEngine.Network
                     SceneObjectToBeActivated.Add(identity);
                     identity.gameObject.activeSelf = false;
                 }
-            });
+
+            }
         }
 
         public int AddObject(NetworkIdentity identity)

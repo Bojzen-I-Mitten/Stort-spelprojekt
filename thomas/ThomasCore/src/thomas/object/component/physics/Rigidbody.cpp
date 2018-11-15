@@ -12,33 +12,33 @@ namespace thomas
 	{
 		namespace component
 		{
-			Rigidbody::Rigidbody() : 
-			btRigidBody(1, NULL, NULL), 
-			m_kinematic(false),
-			m_useGravity(true),
-			m_mass(1.f),
-			m_freezePosition(1.f),
-			m_freezeRotation(1.f),
-			m_damping(0.0f),
-			m_angularDaming(0.0f),
-			m_dirty(false),
-			m_ignoreTransform(false),
-			m_LocalCenterOfMassChange(0,0,0),
-			m_activationState(ActivationState::Default)
+			Rigidbody::Rigidbody() :
+				btRigidBody(1, NULL, NULL),
+				m_kinematic(false),
+				m_useGravity(true),
+				m_mass(1.f),
+				m_freezePosition(1.f),
+				m_freezeRotation(1.f),
+				m_damping(0.0f),
+				m_angularDaming(0.0f),
+				m_dirty(false),
+				m_ignoreTransform(false),
+				m_LocalCenterOfMassChange(0, 0, 0),
+				m_activationState(ActivationState::Default)
 			{
 				m_bounciness = m_restitution;
 				Physics::RemoveRigidBody(this);
 				btDefaultMotionState* motionState = new btDefaultMotionState();
 				setMotionState(motionState);
 			}
-			
+
 			Rigidbody::~Rigidbody()
 			{
 				Physics::RemoveRigidBody(this);
 				delete getMotionState();
-				
+
 				Physics::s_world->removeCollisionObject(this);
-				delete getCollisionShape();		
+				delete getCollisionShape();
 			}
 
 			void Rigidbody::OnEnable()
@@ -51,21 +51,21 @@ namespace thomas
 				trans.setRotation((btQuaternion&)rot);
 				trans.setOrigin((btVector3&)pos);
 
-
 				setWorldTransform(trans);
 				getMotionState()->setWorldTransform(trans);
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
 
 
-
+				// Clear velocity
 				this->setLinearVelocity(btVector3(0, 0, 0));
 				this->setAngularVelocity(btVector3(0, 0, 0));
-				
+
 				this->setUserPointer(m_collider);
 
 				Physics::AddRigidBody(this);
 				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				UpdateProperties();
 			}
 
 			void Rigidbody::OnDisable()
@@ -74,7 +74,7 @@ namespace thomas
 				this->setAngularVelocity(btVector3(0, 0, 0));
 				clearForces();
 				this->setUserPointer(nullptr);
-				Physics::RemoveRigidBody(this);				
+				Physics::RemoveRigidBody(this);
 			}
 
 			void Rigidbody::OnDestroy()
@@ -89,11 +89,9 @@ namespace thomas
 
 				math::Quaternion rotation = (math::Quaternion)trans.getRotation();
 				math::Vector3 pos = (math::Vector3)trans.getOrigin();
-				{
-					EDITOR_LOCK();
-					if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
-				}
-				m_gameObject->m_transform->SetPosition(pos);
+				if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
+
+
 				m_gameObject->m_transform->SetRotation(rotation);
 				m_gameObject->m_transform->SetPosition(pos);
 				m_gameObject->m_transform->SetDirty(true);
@@ -117,10 +115,8 @@ namespace thomas
 
 					math::Vector3 pos = m_gameObject->m_transform->GetPosition();
 					math::Quaternion rot = m_gameObject->m_transform->GetRotation();
-					{
-						EDITOR_LOCK();
-						if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
-					}
+					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
+
 					trans.setRotation((btQuaternion&)rot);
 					trans.setOrigin((btVector3&)pos);
 					//getMotionState()->setWorldTransform(trans);
@@ -133,14 +129,14 @@ namespace thomas
 					//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
 					//setCenterOfMassTransform(trans);
 
-					
+
 					setWorldTransform(trans);
 					getMotionState()->setWorldTransform(trans);
 					setCenterOfMassTransform(trans);
 					Physics::s_world->updateSingleAabb(this);
 					activate();
 
-				}			
+				}
 				m_prevMatrix = currentMatrix;
 				m_ignoreTransform = false;
 			}
@@ -159,13 +155,13 @@ namespace thomas
 
 			void Rigidbody::SetLinearVelocity(const math::Vector3& linearVel)
 			{
-				if(m_enabled)
+				//if (initialized)
 					this->setLinearVelocity(Physics::ToBullet(linearVel));
 			}
 
 			void Rigidbody::SetAngularVelocity(const math::Vector3& angularVel)
 			{
-				if (m_enabled)
+				//if (initialized)
 					this->setAngularVelocity(Physics::ToBullet(angularVel));
 			}
 
@@ -193,7 +189,7 @@ namespace thomas
 			}
 
 			void Rigidbody::SetContactProcessingThreshold(float contactProcessingThreshold)
-			{	
+			{
 				this->setContactProcessingThreshold(contactProcessingThreshold);
 			}
 
@@ -214,18 +210,19 @@ namespace thomas
 			}
 
 			void Rigidbody::SetKinematic(bool kinematic)
-			{	
+			{
 				if (kinematic != m_kinematic)
 				{
 					m_kinematic = kinematic;
+					
 					if (m_enabled)
 					{
 						bool removed = Physics::RemoveRigidBody(this);
 						UpdateRigidbodyMass();
 						if (removed)
 							Physics::AddRigidBody(this);
-					}		
-				}	
+					}
+				}
 			}
 
 			void Rigidbody::UseGravity(bool value)
@@ -236,8 +233,6 @@ namespace thomas
 
 			void Rigidbody::SetCollider(Collider * collider)
 			{
-				if (m_collider == collider) return;	// Can't apply same collider shape
-				EDITOR_LOCK();
 				m_collider = collider;
 				bool removed = Physics::RemoveRigidBody(this);
 				delete getCollisionShape();
@@ -246,7 +241,7 @@ namespace thomas
 				collider->SetAttachedRigidbody(this);
 				collider->SetTrigger(collider->IsTrigger());
 				UpdateRigidbodyMass();
-				if(removed)
+				if (removed)
 					Physics::AddRigidBody(this);
 			}
 
@@ -264,7 +259,7 @@ namespace thomas
 
 			void Rigidbody::SetCenterOfmass(math::Vector3 Centerofmass)
 			{
-				
+
 				m_LocalCenterOfMassChange = Centerofmass;
 			}
 
@@ -284,18 +279,18 @@ namespace thomas
 				btTransform trans = getCenterOfMassTransform();
 				trans.setOrigin(Physics::ToBullet(position));
 				setCenterOfMassTransform(trans);
-				
-				
+
+
 			}
 
 			void Rigidbody::SetRotation(math::Quaternion rotation)
 			{
-				
+
 				btTransform trans = getCenterOfMassTransform();
 				trans.setRotation(Physics::ToBullet(rotation));
 				setCenterOfMassTransform(trans);
 
-				
+
 			}
 
 
@@ -306,11 +301,11 @@ namespace thomas
 
 			math::Vector3 Rigidbody::GetCenterOfmass()
 			{
-				
+
 				return m_LocalCenterOfMassChange;
 			}
 
-			
+
 
 			void Rigidbody::AddTorque(const math::Vector3 & torque, ForceMode mode)
 			{
@@ -322,9 +317,9 @@ namespace thomas
 
 			void Rigidbody::AddForce(const math::Vector3 & force, ForceMode mode)
 			{
-				if(mode == ForceMode::Force)
+				if (mode == ForceMode::Force)
 					this->applyCentralForce(Physics::ToBullet(force));
-				else if(mode == ForceMode::Impulse)
+				else if (mode == ForceMode::Impulse)
 					this->applyCentralImpulse(Physics::ToBullet(force));
 			}
 
@@ -335,7 +330,7 @@ namespace thomas
 				else if (mode == ForceMode::Impulse)
 					this->applyImpulse(Physics::ToBullet(force), Physics::ToBullet(relPos));
 			}
-						
+
 			float Rigidbody::GetMass() const
 			{
 				return m_mass;
@@ -453,15 +448,14 @@ namespace thomas
 			{
 				this->setActivationState(m_activationState);
 				this->setLinearFactor(Physics::ToBullet(m_freezePosition));
-				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));	
+				this->setAngularFactor(Physics::ToBullet(m_freezeRotation));
 				this->setDamping(m_damping, m_angularDaming);
 				this->setSleepingThresholds(m_sleepingThresholds.x, m_sleepingThresholds.y);
 				this->setGravity(Physics::s_world->getGravity() * m_useGravity);
 				this->activate(true);
-				
+
 				m_dirty = false;
 			}
 		}
 	}
 }
-
