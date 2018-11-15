@@ -750,7 +750,7 @@ public class ChadControls : NetworkComponent
                     }
                     else if (pickupablea.gameObject.Name == "ThomasTrain")
                     {
-                        DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the train");
+                        DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the Train");
                     }
 
                     TakeOwnership(pickupable.gameObject);
