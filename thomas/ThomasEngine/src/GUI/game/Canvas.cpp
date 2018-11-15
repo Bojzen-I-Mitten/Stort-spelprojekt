@@ -42,6 +42,11 @@ namespace ThomasEngine
 		return nativePtr->GetRendering();
 	}
 
+	void Canvas::matrix::set(Matrix value)
+	{
+		nativePtr->SetMatrix(Utility::Convert(value));
+	}
+
 	Image^ Canvas::Add(Texture2D ^ texture)
 	{
 		thomas::graphics::GUI::GUIElement* image =

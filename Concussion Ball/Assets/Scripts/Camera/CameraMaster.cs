@@ -15,7 +15,7 @@ public class CameraMaster : ScriptComponent
 
     public Texture2D Background { get; set; }
 
-    Camera Camera;
+    public Camera Camera;
     GUIJoinHost JoinHost;
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;

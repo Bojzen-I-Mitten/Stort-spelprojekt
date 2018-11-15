@@ -30,6 +30,11 @@ namespace ThomasEngine
 			bool get();
 		}
 
+		property Matrix matrix
+		{
+			void set(Matrix value);
+		}
+
 	private:
 		thomas::graphics::GUI::Canvas* nativePtr;
 	public:

@@ -7,13 +7,16 @@ using System.Collections;
 
 public class NetworkPlayer : NetworkComponent
 {
-    private String _Name;
+    public String Name = "Chad";
     [Newtonsoft.Json.JsonIgnore]
     public Team Team {get; private set;}
     public float BottomOfTheWorld { get; set; } = -5;
+    public float TextOffset { get; set; } = 2.0f;
+    public Font NameFont { get; set; }
     Material mat;
     Rigidbody rb;
-
+    Canvas nameCanvas;
+    Text text;
     public override void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody>();
@@ -26,12 +29,18 @@ public class NetworkPlayer : NetworkComponent
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
-        
 
+        nameCanvas = CameraMaster.instance.Camera.AddCanvas();
+        text = nameCanvas.Add("Cool player");
+        text.scale = new Vector2(0.05f);
+        text.origin = new Vector2(0.5f, 0.5f);
     }
 
     public override void Update()
     {
+        text.text = Name;
+        nameCanvas.matrix = Matrix.CreateConstrainedBillboard(transform.position + new Vector3(0, TextOffset, 0), CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null) *
+            CameraMaster.instance.Camera.viewMatrix * CameraMaster.instance.Camera.projectionMatrix;
         if (transform.position.y < BottomOfTheWorld)
             Reset();
     }

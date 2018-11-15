@@ -6,7 +6,7 @@
 // DirectXTK
 #include <DirectXTK/SpriteBatch.h>
 #include <DirectXTK/CommonStates.h>
-
+#include <DirectXTK/Effects.h>
 // Thomas
 #include "../../resource/texture/Texture2D.h"
 #include "../../utils/Math.h"
@@ -42,8 +42,11 @@ namespace thomas
 				void Remove(GUIElement* element);
 				void SetRendering(bool render);
 				bool GetRendering();
-
+				void SetMatrix(math::Matrix value);
+				void Set3D(bool value);
+				bool Get3D();
 			private:
+				
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;
 				std::unique_ptr<CommonStates> m_spriteStates;
 				std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -51,6 +54,7 @@ namespace thomas
 				math::Vector2 m_viewportScale;
 				Viewport m_viewport;
 				Viewport* m_camViewport;
+				math::Matrix m_matrix;
 				math::Vector2 m_baseResolution;
 				bool m_render;
 			};

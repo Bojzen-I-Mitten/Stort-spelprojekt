@@ -5,7 +5,7 @@
 #include "../../WindowManager.h"
 #include "../../Common.h"
 #include "../../ThomasCore.h"
-
+#include <DirectXTK/CommonStates.h>
 
 namespace thomas
 {
@@ -18,13 +18,15 @@ namespace thomas
 				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
 				m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
 				m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
+			
 				m_viewport = viewport;
 				m_camViewport = camViewport;
 				m_viewportScale = Vector2(1.f, 1.f);
 				m_baseResolution = baseResolution;
 				m_render = true;
-
 				m_GUIElements = std::vector<std::unique_ptr<GUIElement>>();
+				m_matrix = math::Matrix::Identity;
+				
 			}
 
 			void Canvas::Destroy()
@@ -38,13 +40,14 @@ namespace thomas
 			void Canvas::Render()
 			{
 				if (m_spriteBatch != nullptr && m_render)
-				{
-					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied());
+				{					
+					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, m_matrix);
 
 					for (int i = 0; i < m_GUIElements.size(); ++i)
 					{
 						m_GUIElements[i]->Draw(m_spriteBatch.get(), m_viewport, m_viewportScale);
 					}
+					
 
 					m_spriteBatch->End();
 				}
@@ -119,6 +122,21 @@ namespace thomas
 			bool Canvas::GetRendering()
 			{
 				return m_render;
+			}
+			void Canvas::SetMatrix(math::Matrix value)
+			{
+				m_matrix = value;
+			}
+			void Canvas::Set3D(bool value)
+			{
+				if(value)
+					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
+				else
+					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
+			}
+			bool Canvas::Get3D()
+			{
+				return m_spriteBatch->GetRotation() == DXGI_MODE_ROTATION_UNSPECIFIED;
 			}
 		}
 	}
