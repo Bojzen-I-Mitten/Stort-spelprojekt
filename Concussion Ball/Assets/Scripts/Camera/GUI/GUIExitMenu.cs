@@ -36,27 +36,30 @@ public class GUIExitMenu : ScriptComponent
 
     public override void Update()
     {
-        //if (ExitMatch.Hovered())
-        //    ExitMatch.color = Color.Blue;
-        //else
-        //    ExitMatch.color = Color.Black;
-
-        if (ExitGame.Hovered())
-            ExitGame.color = Color.Red;
-        else
-            ExitGame.color = Color.Black;
-
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        if (Canvas.isRendering)
         {
-            //if (ExitMatch.Clicked())
-            //{
-            //    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-            //    CameraMaster.instance.Canvas.isRendering = true;
-            //}
-            if (ExitGame.Clicked())
+            //if (ExitMatch.Hovered())
+            //    ExitMatch.color = Color.Blue;
+            //else
+            //    ExitMatch.color = Color.Black;
+
+            if (ExitGame.Hovered())
+                ExitGame.color = Color.Red;
+            else
+                ExitGame.color = Color.Black;
+
+            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {
-                Debug.Log("I'm exiting!");
-                ThomasWrapper.Exit();
+                //if (ExitMatch.Clicked())
+                //{
+                //    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                //    CameraMaster.instance.Canvas.isRendering = true;
+                //}
+                if (ExitGame.Clicked())
+                {
+                    Debug.Log("I'm exiting!");
+                    ThomasWrapper.Exit();
+                }
             }
         }
     }

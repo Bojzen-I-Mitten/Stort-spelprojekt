@@ -10,6 +10,8 @@
 #include "RenderComponent.h"
 #include "../../resource/texture/Texture2D.h"
 #include "../../graphics/Skybox.h"
+#include "../../Common.h"
+#include "../../ThomasCore.h"
 
 namespace thomas
 {
@@ -168,19 +170,24 @@ namespace thomas
 				Window* window = WindowManager::Instance()->GetWindow(m_targetDisplay);
 
 				if (window)
+				{
 					return math::Viewport(m_viewport.x, m_viewport.y, m_viewport.width * window->GetWidth(), m_viewport.height * window->GetHeight());
+				}
 				else
+				{
 					return m_viewport;
+				}
+			}
+
+			math::Vector2 Camera::GetViewportScale()
+			{
+				return Vector2(m_viewport.width, m_viewport.height);
 			}
 
 			void Camera::SetViewport(math::Viewport viewport)
 			{
 				m_viewport = viewport;
 				UpdateProjMatrix();
-				for (int i = 0; i < m_canvases.size(); ++i)
-				{
-					m_canvases[i]->UpdateViewportScale();
-				}
 			}
 
 			void Camera::SetViewport(float x, float y, float width, float height)
@@ -282,13 +289,13 @@ namespace thomas
 
 				m_frameData.position = (math::Vector4)GetPosition();
 
-				if (m_frameData.targetDisplay == 0)
-				{
-					for (int i = 0; i < m_canvases.size(); ++i)
-					{
-						m_canvases[i]->SetViewport(m_frameData.viewport);
-					}
-				}
+				//if (m_frameData.targetDisplay == 0)
+				//{
+				//	for (int i = 0; i < m_canvases.size(); ++i)
+				//	{
+				//		m_canvases[i]->SetViewport(m_frameData.viewport);
+				//	}
+				//}
 				graphics::Renderer::Instance()->SubmitCamera(this);
 			}
 
@@ -305,7 +312,7 @@ namespace thomas
 
 			graphics::GUI::Canvas* Camera::AddCanvas()
 			{
-				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(m_viewport, &m_viewport);
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(m_viewport, this);
 				m_canvases.push_back(std::move(canvas));
 
 				return m_canvases[m_canvases.size() - 1].get();
@@ -313,7 +320,7 @@ namespace thomas
 
 			graphics::GUI::Canvas * Camera::AddCanvas(math::Viewport viewport)
 			{
-				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(viewport, &m_viewport);
+				std::unique_ptr<graphics::GUI::Canvas> canvas = std::make_unique<graphics::GUI::Canvas>(viewport, this);
 				m_canvases.push_back(std::move(canvas));
 
 				return m_canvases[m_canvases.size() - 1].get();

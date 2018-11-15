@@ -14,14 +14,10 @@ namespace thomas
 			m_font = std::make_unique<SpriteFont>(utils::D3D::Instance()->GetDevice(), utility::ToWChar(path).c_str());
 		}
 
-		Font::~Font()
+		void Font::DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position, 
+			const Vector4& color, const Vector2& origin, const Vector2& scale, float rotation, DirectX::SpriteEffects effect, const float depth)
 		{
-		}
-
-		void Font::DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position,
-							   const Vector2& scale, const Vector2& origin, const Vector4& color, float rotation, DirectX::SpriteEffects effect, const float depth)
-		{
-			m_font->DrawString(spritebatch, utility::ToWChar(text).c_str(), position, color, rotation, origin * GetTextSize(text)/* * scale*/, scale, effect, depth);
+			m_font->DrawString(spritebatch, utility::ToWChar(text).c_str(), position, color, rotation, origin, scale, effect, depth);
 		}
 
 		Vector2 Font::GetTextSize(const std::string& text)

@@ -2,14 +2,22 @@
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using ThomasEngine;
+using System.Diagnostics;
 namespace ThomasStandalone
 {
+    
     class Program
     {
+        static public UInt32 run_time;
+
         static void Main(string[] args)
         {
-            Debug.OnDebugMessage += Debug_OnDebugMessage;
 
+            ThomasEngine.Debug.OnDebugMessage += Debug_OnDebugMessage;
+            if (args.Length == 1)
+                run_time = UInt32.Parse(args[0]);
+            else
+                run_time = 0;                
            
             ThomasWrapper.Start(false);
 
@@ -22,7 +30,7 @@ namespace ThomasStandalone
 
             ThomasWrapper.IssuePlay();
 
-            Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
+            ThomasEngine.Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
 
             window.loop();
 
@@ -223,10 +231,23 @@ namespace ThomasStandalone
 
         internal void loop()
         {
+            
             MSG msg;
-            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+            if (ThomasStandalone.Program.run_time == 0)
             {
-                DispatchMessage(ref msg);
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+                {
+                    DispatchMessage(ref msg);
+                }
+            }
+            else
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1 && stopwatch.ElapsedMilliseconds < ThomasStandalone.Program.run_time)
+                {
+                    DispatchMessage(ref msg);
+                }
             }
         }
 

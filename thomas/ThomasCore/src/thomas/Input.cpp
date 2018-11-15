@@ -16,7 +16,7 @@ namespace thomas
 
 	Input::Input()
 	{
-		m_lastKey = 0;
+		m_lastKey = NULL;
 		m_mouseMode = MouseMode::POSITION_ABSOLUTE;
 		Reset();
 	}
@@ -34,8 +34,8 @@ namespace thomas
 			s_mouse = std::make_unique<Mouse>();
 		
 		if (!s_gamePad)
-		s_gamePad = std::make_unique<GamePad>();
-			
+			s_gamePad = std::make_unique<GamePad>();
+
 		m_initialized = true;
 		LOG("Initiating Input");
 		return m_initialized;
@@ -69,7 +69,6 @@ namespace thomas
 			// Update absolute position (if not in relative mode)
 			if (m_mouseState.positionMode == Mouse::Mode::MODE_ABSOLUTE)
 				m_absolutePosition = m_mousePosition;
-
 		}
 	}
 
@@ -399,6 +398,11 @@ namespace thomas
 	unsigned short Input::GetLastKey() const
 	{
 		return m_lastKey;
+	}
+
+	char Input::GetLastKeyChar() const
+	{
+		return static_cast<char>(m_lastKey);
 	}
 
 	Input::MouseMode Input::GetMouseMode()
