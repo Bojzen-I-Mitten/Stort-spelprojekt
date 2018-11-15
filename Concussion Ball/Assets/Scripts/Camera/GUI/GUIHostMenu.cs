@@ -46,23 +46,19 @@ public class GUIHostMenu : ScriptComponent
 
     public override void Start()
     {
-    }
-
-    public override void Awake()
-    {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
 
         btnDown = false;
 
         HostBtn = Canvas.Add("Host Game");
-        HostBtn.color = Color.Black;
+        HostBtn.color = Color.FloralWhite;
         HostBtn.position = new Vector2(0.47f, 0.33f);
         HostBtn.font = Font;
         HostBtn.interactable = true;
 
         ExitBtn = Canvas.Add("Exit");
-        ExitBtn.color = Color.Black;
+        ExitBtn.color = Color.FloralWhite;
         ExitBtn.position = new Vector2(0.32f, 0.33f);
         ExitBtn.font = Font;
         ExitBtn.interactable = true;
@@ -97,12 +93,12 @@ public class GUIHostMenu : ScriptComponent
 
         Team1 = Canvas.Add(_team1);
         Team1.position = new Vector2(0.02f, 0.4f);
-        Team1.color = Color.Black;
+        Team1.color = Color.FloralWhite;
         Team1.font = Font;
 
         Team2 = Canvas.Add(_team2);
         Team2.position = new Vector2(0.69f, 0.4f);
-        Team2.color = Color.Black;
+        Team2.color = Color.FloralWhite;
         Team2.font = Font;
 
         if (TextBoxTexture != null)
@@ -145,7 +141,10 @@ public class GUIHostMenu : ScriptComponent
             Team2SliderKnob.color = HSLColor(0d);
         }
         #endregion
+    }
 
+    public override void Awake()
+    {
     }
 
     public override void Update()
@@ -159,12 +158,12 @@ public class GUIHostMenu : ScriptComponent
 
                 if (Team1ColorSlider.Hovered())
                     Team1SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team1SliderKnob.position.y);
-                hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / (Team1ColorSlider.size.x / Canvas.camera.viewport.size.x);
+                hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
                 Team1SliderKnob.color = HSLColor(hue);
 
                 if (Team2ColorSlider.Hovered())
                     Team2SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team2SliderKnob.position.y);
-                hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / (Team2ColorSlider.size.x / Canvas.camera.viewport.size.x);
+                hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / Team2ColorSlider.size.x;
                 Team2SliderKnob.color = HSLColor(hue);
             }
 
@@ -188,10 +187,9 @@ public class GUIHostMenu : ScriptComponent
                 }
             }
 
-            HostBtn.color = Color.Black;
             if (HostBtn.Hovered())
             {
-                HostBtn.color = Color.Green;
+                HostBtn.color = Color.IndianRed;
                 if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                 {
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
@@ -205,11 +203,19 @@ public class GUIHostMenu : ScriptComponent
 
                 }
             }
+            else
+                HostBtn.color = Color.FloralWhite;
 
             if (ExitBtn.Hovered())
             {
-
+                ExitBtn.color = Color.IndianRed;
+                if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                {
+                    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+                }
             }
+            else
+                ExitBtn.color = Color.FloralWhite;
 
             if (InputTeam1Name)
             {
