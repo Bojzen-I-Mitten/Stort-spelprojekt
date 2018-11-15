@@ -1,12 +1,11 @@
 #include "SoundComponent.h"
 
-#include "AudioListener.h"
-#include "../../Sound.h"
+// Thomas
+#include "../../SoundManager.hpp"
 #include "../../resource/AudioClip.h"
-#include "../../ThomasTime.h"
-#include "Transform.h"
 #include "../GameObject.h"
-#include "../../ThomasCore.h"
+#include "AudioListener.h"
+
 namespace thomas
 {
 	namespace object
@@ -14,194 +13,210 @@ namespace thomas
 		namespace component
 		{
 			SoundComponent::SoundComponent() :
-			m_looping(true),
+			m_type(SoundType::Music),
+			m_channel(nullptr),
 			m_clip(nullptr),
-			m_volume(0.5f),
-			m_volumeFactor(1.f),
 			m_is3D(false),
-			m_soundEffectInstance(nullptr)
+			m_looping(false),
+			m_paused(false),
+			m_volume(1.f),
+			m_spreadAngle(0.f),
+			m_minDistance(1.f),
+			m_maxDistance(100.f)
 			{
-				m_emitter = new DirectX::AudioEmitter();
-			}
-
-			SoundComponent::~SoundComponent()
-			{
-				if (m_soundEffectInstance)
-				{
-					m_soundEffectInstance->Stop();
-					m_soundEffectInstance.release();
-				}
 			}
 
 			void SoundComponent::OnDisable()
 			{
-				Stop(); // Would be better to just use the sound engine to stop when not in play mode and then resume...
-			}
-
-			void SoundComponent::Update()
-			{
-				if (m_is3D && AudioListener::GetInstance())
-				{
-					m_emitter->Update(m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->Up(), ThomasTime::GetActualDeltaTime());
-					Apply3D(AudioListener::GetInstance()->m_gameObject->m_transform->GetPosition(), m_gameObject->m_transform->GetPosition());
-
-				}
-			}
-
-			void SoundComponent::Apply3D(const Vector3& listenerPos, const Vector3& sourcePos)
-			{
-				EDITOR_LOCK();
-				// Apply 3D-effect with attenuation formula based on Inverse Square Law
-				if (m_clip != nullptr)
-				{
-					float range = 10.0f;
-					float volumeModifier = range / Vector3::Distance(m_emitter->Position, AudioListener::GetInstance()->GetListner().Position);
-					volumeModifier = max(min(volumeModifier, 1.0f), 0.0f);
-					float vol = volumeModifier * m_volume;
-					m_soundEffectInstance->SetVolume(vol);
-				
-				}
+				Stop();
 			}
 
 			void SoundComponent::Play()
 			{
-				EDITOR_LOCK();
 				if (m_clip != nullptr)
 				{
-					m_soundEffectInstance->Play(m_looping);
-					SetVolume(m_volume);
+					SoundManager::GetInstance()->GetSystem()->playSound(m_clip->GetSound(), nullptr, m_paused, &m_channel);
+
+					if (m_channel != nullptr)
+					{
+						// Set channel properties
+						AdjustVolumeType(m_volume);
+
+						// Sound mode
+						if (m_is3D)
+						{
+							m_channel->setMode(FMOD_3D);
+						}
+						else
+						{
+							m_channel->setMode(FMOD_2D);
+						}
+
+						// Looping options
+						if (m_looping)
+						{
+							m_channel->setMode(FMOD_LOOP_NORMAL);
+							m_channel->setLoopCount(-1); // Loop repeatedly
+						}
+						else
+						{
+							m_channel->setMode(FMOD_LOOP_OFF);
+						}
+					}	
 				}
 			}
 
-			void SoundComponent::PlayOneShot()
+			void SoundComponent::Play(resource::AudioClip* clip, float volume, bool looping, bool is3D)
 			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
+				if (clip != nullptr)
 				{
-					if (m_is3D && AudioListener::GetInstance())
-					{
+					SoundManager::GetInstance()->GetSystem()->playSound(clip->GetSound(), nullptr, false, &m_channel);
 
-						float range = 10.0f;
-						float volumeModifier = range/Vector3::Distance(m_emitter->Position, AudioListener::GetInstance()->GetListner().Position);
-						volumeModifier = max(min(volumeModifier, 1.0f), 0.0f);
-						float vol = volumeModifier * m_volume;
-						Sound::Play(m_clip->GetName(), vol);
-					}else
-
+					if (m_channel != nullptr)
 					{
-						Sound::Play(m_clip->GetName(), m_volume);
-					}
-					
+						// Set channel properties
+						AdjustVolumeType(volume);
+
+						// Sound mode
+						if (is3D)
+						{
+							m_channel->setMode(FMOD_3D);
+						}
+						else
+						{
+							m_channel->setMode(FMOD_2D);
+						}
+
+						// Looping options
+						if (looping)
+						{
+							m_channel->setMode(FMOD_LOOP_NORMAL);
+							m_channel->setLoopCount(-1); // Loop repeatedly
+						}
+						else
+						{
+							m_channel->setMode(FMOD_LOOP_OFF);
+						}
+					}		
 				}
 			}
 
 			void SoundComponent::Stop()
 			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
+				if (m_channel != nullptr)
 				{
-					m_soundEffectInstance->Stop();
+					m_channel->stop();
 				}
 			}
 
-			void SoundComponent::Pause()
+			void SoundComponent::Update()
 			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
+				if (m_channel != nullptr && m_is3D)
 				{
-					m_soundEffectInstance->Pause();
+					// No velocity set on the object
+					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->m_transform->GetPosition()), NULL);
+					m_channel->set3DSpread(m_spreadAngle);
+
+					if (m_minDistance < m_maxDistance)
+					{
+						m_channel->set3DMinMaxDistance(m_minDistance, m_maxDistance);
+					}
 				}
 			}
 
-			void SoundComponent::Resume()
+			void SoundComponent::SetType(SoundType type)
 			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
-				{
-					m_clip->GetSoundEffectInstance()->Resume();
-				}
-			}
-
-			bool SoundComponent::IsPlaying() const
-			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
-				{
-					return Sound::IsPlaying(m_clip->GetName());	
-				}
-
-				return false;
-			}
-
-			bool SoundComponent::IsPaused() const
-			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
-				{
-					return Sound::IsPaused(m_clip->GetName());
-				}
-
-				return false;
-			}
-
-			bool SoundComponent::HasStopped() const
-			{
-				EDITOR_LOCK();
-				if (m_clip != nullptr)
-				{
-					return Sound::HasStopped(m_clip->GetName());
-				}
-
-				return false;
+				m_type = type;
 			}
 
 			void SoundComponent::SetClip(resource::AudioClip* clip)
 			{
-				EDITOR_LOCK();
 				m_clip = clip;
-				if (m_clip)
+			}
+
+			void SoundComponent::Set3D(bool is3D)
+			{
+				m_is3D = is3D;
+
+				if (m_channel != nullptr)
 				{
-					if (m_soundEffectInstance)
+					if (m_is3D)
 					{
-						
-						m_soundEffectInstance->Stop();
-						m_soundEffectInstance.release();
+						m_channel->setMode(FMOD_3D);
 					}
-					
-					m_soundEffectInstance = m_clip->CreateSoundEffectInstance();
+					else
+					{
+						m_channel->setMode(FMOD_2D);
+					}
 				}
 			}
 
 			void SoundComponent::SetVolume(float volume)
 			{
-				EDITOR_LOCK();
-				if (volume <= 5.f && volume >= 0.f)
-				{
-					m_volume = volume;
+				m_volume = volume;
 
-					if (m_clip != nullptr)
-					{
-						m_clip->GetSoundEffectInstance()->SetVolume(Sound::dbToVolume(m_volume * m_volumeFactor));
-					}
-				}
-			}
-
-			void SoundComponent::SetVolumeFactor(float volumeFactor)
-			{
-				if (volumeFactor <= 1.f && volumeFactor >= 0.f)
+				if (m_channel != nullptr)
 				{
-					m_volumeFactor = volumeFactor;
+					AdjustVolumeType(m_volume);
 				}
 			}
 
 			void SoundComponent::SetLooping(bool looping)
 			{
 				m_looping = looping;
+
+				if (m_channel != nullptr)
+				{
+					if (m_looping)
+					{
+						m_channel->setMode(FMOD_LOOP_NORMAL);
+						m_channel->setLoopCount(-1); // Loop repeatedly
+					}
+					else
+					{
+						m_channel->setMode(FMOD_LOOP_OFF);
+					}
+				}
 			}
 
-			void SoundComponent::Set3D(bool value)
+			void SoundComponent::SetPaused(bool paused)
 			{
-				m_is3D = value;
+				m_paused = paused;
+
+				if (m_channel != nullptr)
+				{
+					m_channel->setPaused(paused);
+				}
+			}
+
+			void SoundComponent::SetMute(bool mute)
+			{
+				m_muted = mute;
+
+				if (m_channel != nullptr)
+				{
+					m_channel->setMute(m_muted);
+				}
+			}
+
+			void SoundComponent::Set3DMinDistance(float min)
+			{
+				m_minDistance = min;
+			}
+
+			void SoundComponent::Set3DMaxDistance(float max)
+			{
+				m_maxDistance = max;
+			}
+
+			void SoundComponent::Set3DSpreadAngle(float angle)
+			{
+				m_spreadAngle = angle;
+			}
+
+			SoundType SoundComponent::GetType() const
+			{
+				return m_type;
 			}
 
 			resource::AudioClip* SoundComponent::GetClip() const
@@ -214,18 +229,76 @@ namespace thomas
 				return m_volume;
 			}
 
-			float SoundComponent::GetVolumeFactor() const
+			float SoundComponent::Get3DMinDistance() const
 			{
-				return m_volumeFactor;
+				return m_minDistance;
+			}
+
+			float SoundComponent::Get3DMaxDistance() const
+			{
+				return m_maxDistance;
+			}
+
+			float SoundComponent::Get3DSpreadAngle() const
+			{
+				return m_spreadAngle;
+			}
+
+			bool SoundComponent::Is3D() const
+			{
+				return m_is3D;
+			}
+
+			bool SoundComponent::IsMute() const
+			{
+				return m_muted;
+			}
+
+			bool SoundComponent::IsPlaying() const
+			{				
+				if (m_channel != nullptr)
+				{
+					bool playing = false;
+					m_channel->isPlaying(&playing);
+					
+					return playing;
+				}
+
+				return false;
 			}
 
 			bool SoundComponent::IsLooping() const
 			{
 				return m_looping;
 			}
-			bool SoundComponent::is3D() const
+
+			bool SoundComponent::IsPaused() const
 			{
-				return m_is3D;
+				return m_paused;
+			}
+
+			void SoundComponent::AdjustVolumeType(float volume)
+			{
+				auto listener = AudioListener::GetInstance();
+				auto masterVolume = listener->GetMasterVolume();
+				auto musicVolume = listener->GetMusicVolume();
+				auto fxVolume = listener->GetFXVolume();
+				auto voiceVolume = listener->GetVoiceVolume();
+
+				switch (m_type)
+				{
+				case SoundType::Music:
+					m_channel->setVolume(masterVolume * musicVolume * volume);
+					break;
+				case SoundType::Effect:
+					m_channel->setVolume(masterVolume * fxVolume * volume);
+					break;
+				case SoundType::Voice:
+					m_channel->setVolume(masterVolume * voiceVolume * volume);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}

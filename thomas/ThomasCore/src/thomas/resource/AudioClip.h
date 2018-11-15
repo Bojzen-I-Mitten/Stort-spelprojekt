@@ -1,15 +1,10 @@
 #pragma once
 
+// Fmod
+#include <fmod/fmod.hpp>
+
+// Thomas
 #include "Resource.h"
-#include <memory>
-
-namespace DirectX
-{
-	class SoundEffect;
-	class SoundEffectInstance;
-}
-
-using namespace DirectX;
 
 namespace thomas
 {
@@ -17,16 +12,16 @@ namespace thomas
 	{
 		class AudioClip : public Resource
 		{
-		private:
-			void OnChanged(); // Never used...?
-
 		public:
 			AudioClip(const std::string& file);
 
-			SoundEffectInstance* GetSoundEffectInstance() const;
-			std::unique_ptr<SoundEffectInstance> CreateSoundEffectInstance();
+			FMOD::Sound* GetSound();
+
 		private:
-			SoundEffectInstance* m_soundEffectInstance;
+			// Never used, but required from abstract base class...
+			void OnChanged();
+
+			FMOD::Sound* m_sound;
 		};
 	}
 }
