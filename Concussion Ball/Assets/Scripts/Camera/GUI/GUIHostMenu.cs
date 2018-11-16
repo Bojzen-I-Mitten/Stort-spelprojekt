@@ -12,13 +12,6 @@ public class GUIHostMenu : ScriptComponent
     public Texture2D WhiteBoxTexture { get; set; }
     public Font Font { get; set; }
 
-    //public Vector2 HostBGP { get; set; } = Vector2.Zero;
-    //public Vector2 HostBGS { get; set; } = new Vector2(6.4f, 1.44f);
-    //public Vector2 Team1BGP { get; set; } = new Vector2(0.0f, 0.4f);
-    //public Vector2 Team1BGS { get; set; } = new Vector2(2, 2.2f);
-    //public Vector2 Team2BGP { get; set; } = new Vector2(0.67f, 0.4f);
-    //public Vector2 Team2BGS { get; set; } = new Vector2(2.2f, 2.4f);
-
     Text HostBtn;
     Text ExitBtn;
 

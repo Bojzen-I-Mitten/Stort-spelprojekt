@@ -6,13 +6,6 @@ public class GUISelectTeam : ScriptComponent
     public Texture2D SelectBox { get; set; }
     public Font TextFont { get; set; }
 
-    public Vector2 Team1TP { get; set; } = new Vector2(0.3f, 0.23f);
-    public Vector2 Team1IP { get; set; } = new Vector2(0.35f, 0.3f);
-    public Vector2 Team2TP { get; set; } = new Vector2(0.6f, 0.23f);
-    public Vector2 Team2IP { get; set; } = new Vector2(0.65f, 0.3f);
-    public Vector2 SpecTP { get; set; } = new Vector2(0.8f, 0.15f);
-    public Vector2 SpecIP { get; set; } = new Vector2(0.8f, 0.23f);
-
     Camera Camera;
     private bool Disabled;
 
@@ -80,14 +73,6 @@ public class GUISelectTeam : ScriptComponent
                 Team2Text.font = TextFont;
                 SpectatorText.font = TextFont;
             }
-
-            //Team1Image.position = Team1IP;
-            //Team1Text.position = Team1TP;
-            //Team2Image.position = Team2IP;
-            //Team2Text.position = Team2TP;
-            //SpectatorImage.position = SpecIP;
-            //SpectatorText.position = SpecTP;
-
         }
     }
 
