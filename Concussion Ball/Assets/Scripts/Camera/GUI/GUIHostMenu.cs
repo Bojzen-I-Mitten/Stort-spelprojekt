@@ -12,6 +12,13 @@ public class GUIHostMenu : ScriptComponent
     public Texture2D WhiteBoxTexture { get; set; }
     public Font Font { get; set; }
 
+    //public Vector2 HostBGP { get; set; } = Vector2.Zero;
+    //public Vector2 HostBGS { get; set; } = new Vector2(6.4f, 1.44f);
+    //public Vector2 Team1BGP { get; set; } = new Vector2(0.0f, 0.4f);
+    //public Vector2 Team1BGS { get; set; } = new Vector2(2, 2.2f);
+    //public Vector2 Team2BGP { get; set; } = new Vector2(0.67f, 0.4f);
+    //public Vector2 Team2BGS { get; set; } = new Vector2(2.2f, 2.4f);
+
     Text HostBtn;
     Text ExitBtn;
 
@@ -79,14 +86,14 @@ public class GUIHostMenu : ScriptComponent
         if (WhiteBoxTexture != null)
         {
             Team1BG = Canvas.Add(WhiteBoxTexture);
-            Team1BG.position = new Vector2(0.0f, 0.4f);
+            Team1BG.position = new Vector2(0.0f, 0.398f);
             Team1BG.scale = new Vector2(2, 2.2f);
             Team1BG.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             Team1BG.depth = 0.7f;
 
             Team2BG = Canvas.Add(WhiteBoxTexture);
-            Team2BG.position = new Vector2(0.67f, 0.4f);
-            Team2BG.scale = new Vector2(2.2f, 2.4f);
+            Team2BG.position = new Vector2(0.67f, 0.398f);
+            Team2BG.scale = new Vector2(2.25f, 2.4f);
             Team2BG.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             Team2BG.depth = 0.7f;
         }
@@ -227,6 +234,7 @@ public class GUIHostMenu : ScriptComponent
                 GUIInput.AppendString(ref _team2, 15);
                 Team2.text = _team2;
             }
+
         }
     }
 
