@@ -84,7 +84,8 @@ namespace ThomasEngine {
 			case Comp::State::Enabled:
 			{
 				// If Component isn't activated 
-				if (!c->Activated || c->ComponentState != Comp::State::Awake) 
+				if (!c->Activated || 
+					!(c->ComponentState == Comp::State::Awake || c->ComponentState == Comp::State::Disabled))
 					continue;
 				c->Enable();
 			}
@@ -156,6 +157,19 @@ namespace ThomasEngine {
 		m_components.Clear();
 		Monitor::Exit(m_componentsLock);
 	}
+	void GameObject::OnActivate()
+	{
+		// Activate components
+		InitComponents(Comp::State::Enabled, ThomasWrapper::IsPlaying());
+		for each (Transform^ g in Children)
+			g->gameObject->OnActivate();
+	}
+	void GameObject::OnDeactivate()
+	{
+		InitComponents(Comp::State::Disabled, ThomasWrapper::IsPlaying());
+		for each (Transform^ g in Children)
+			g->gameObject->OnDeactivate();
+	}
 	void GameObject::OnDestroy()
 	{
 		// OnDisable^
@@ -163,7 +177,7 @@ namespace ThomasEngine {
 		{
 			// Disable
 			comp->OnParentDestroy(this);
-			if (comp->ComponentState == Comp::Enabled)
+			if (comp->ComponentState != Comp::Uninitialized)
 				comp->OnDisable();
 		}
 	}
@@ -493,9 +507,13 @@ namespace ThomasEngine {
 			return;
 		// Activate object
 		((thomas::object::GameObject*)nativePtr)->SetActive(active);
-		// Activate components
-		Comp::State s = active ? Comp::State::Enabled : Comp::State::Disabled;
-		InitComponents(s, ThomasWrapper::IsPlaying());
+		
+		if (active)
+			OnActivate();
+		else
+			OnDeactivate();
+
+
 		// Trigger change
 		OnPropertyChanged("activeSelf");
 	}
@@ -551,7 +569,16 @@ namespace ThomasEngine {
 
 	void GameObject::activeSelf::set(bool value)
 	{
-		SetActive(value);
+#ifdef _EDITOR
+		// If editor make it trigger full activation part.
+		// (variable is not enabled during play mode)
+		if (!ThomasWrapper::IsPlaying())
+			SetActive(value);
+		else
+#endif
+		{
+			((thomas::object::GameObject*)nativePtr)->SetActive(value);
+		}
 	}
 
 	String^ GameObject::Name::get() {
@@ -569,6 +596,11 @@ namespace ThomasEngine {
 	Transform^ GameObject::transform::get()
 	{
 		return m_transform;
+	}
+
+	IEnumerable<Transform^>^ GameObject::Children::get()
+	{
+		return transform->children;
 	}
 
 	void GameObject::transform::set(Transform^ value)

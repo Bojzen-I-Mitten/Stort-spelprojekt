@@ -19,7 +19,7 @@ public class PowerupManager : ScriptComponent
 
     void initPowerupPool()
     {
-        Debug.Log("init start");
+        Debug.Log("Initiating Powerups of poolsize: " + PoolSize);
         foreach (GameObject prefab in Powerups)
         {
             List<GameObject> pool = new List<GameObject>(PoolSize);
@@ -30,7 +30,7 @@ public class PowerupManager : ScriptComponent
             }
             powerupPool.Add(pool);
         }
-        Debug.Log("init end");
+        Debug.Log("Powerup Initiation Complete");
     }
 
     public override void Update()

@@ -30,6 +30,9 @@ namespace ThomasEngine
 		virtual ~GameObject();
 
 		System::Object^ m_componentsLock = gcnew System::Object();
+
+		void OnActivate();
+		void OnDeactivate();
 		
 	internal:
 		/* Init the components within the object to the specified state
@@ -100,6 +103,7 @@ namespace ThomasEngine
 		}
 		/* Serialization property. Use GetActive() or SetActive() instead
 		*/
+		[Newtonsoft::Json::JsonPropertyAttribute]
 		[System::ComponentModel::DefaultValueAttribute(true)]
 		property bool activeSelf
 		{
@@ -132,6 +136,13 @@ namespace ThomasEngine
 			return Name;
 		}
 
+
+		[BrowsableAttribute(false)]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property IEnumerable<Transform^>^ Children
+		{
+			IEnumerable<Transform^>^ get();
+		}
 
 		[BrowsableAttribute(false)]
 		[Newtonsoft::Json::JsonIgnoreAttribute]

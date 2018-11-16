@@ -286,13 +286,14 @@ namespace ThomasEngine {
 		while (ThomasCore::Initialized())
 		{
 			PROFILE("StartEngine")
-				// Load scene
-				if (Thomas->m_scene->LoadThreadWaiting())
-				{
-					// Swap scene
-					RenderFinished->WaitOne();
-					Thomas->m_scene->ListenToLoadProcess();
-				}
+			// Load scene
+			if (Thomas->m_scene->LoadThreadWaiting())
+			{
+				// Swap scene
+				RenderFinished->WaitOne();
+				Thomas->m_scene->ListenToLoadProcess();
+				thomas::graphics::Renderer::Instance()->ClearAllCommands();	// Clear renderer
+			}
 			if (Thomas->m_scene->NoSceneExist())	// Wait for scene load
 			{
 				Thread::Sleep(500);

@@ -85,7 +85,7 @@ public class PowerupSpawner : NetworkComponent
                     spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
 
                 }
-                else
+                else if(timeLeftUntilSpawn>-0.5f)
                 {
                     Debug.Log("No available powerup to spawn");
                 }
