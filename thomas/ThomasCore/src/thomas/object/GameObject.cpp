@@ -180,10 +180,12 @@ namespace thomas
 		void GameObject::SetActive(bool active)
 		{
 			m_activeSelf = active;
+			/*
 			if (m_transform && m_transform->GetParent())
 			{
 				return m_transform->GetParent()->m_gameObject->SetActive(active);
 			}
+			*/
 		}
 
 		int GameObject::GetLayer()

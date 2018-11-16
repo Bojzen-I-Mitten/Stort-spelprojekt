@@ -57,8 +57,10 @@ namespace ThomasEngine {
 			Enable(), Start()
 
 		 * Editor is a separate case where not all objects are enabled 
-
 		*/
+		if (s != Comp::State::Awake && !this->GetActive())
+			return;	// Don't enable de-activated objects.
+
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
@@ -87,8 +89,12 @@ namespace ThomasEngine {
 				c->Enable();
 			}
 				break;
-			case Comp::State::Uninitialized:
 			case Comp::State::Disabled:
+				if (!c->Activated || c->ComponentState != Comp::State::Enabled)
+					continue;	// Ignore inactive components.
+				c->Disable();
+				break;
+			case Comp::State::Uninitialized:
 			case Comp::State::EndState:
 			default:
 				assert(false); // Don't
@@ -483,10 +489,15 @@ namespace ThomasEngine {
 
 	void GameObject::SetActive(bool active)
 	{
-		activeSelf = active;
+		if (active == GetActive())
+			return;
+		// Activate object
 		((thomas::object::GameObject*)nativePtr)->SetActive(active);
-		
-
+		// Activate components
+		Comp::State s = active ? Comp::State::Enabled : Comp::State::Disabled;
+		InitComponents(s, ThomasWrapper::IsPlaying());
+		// Trigger change
+		OnPropertyChanged("activeSelf");
 	}
 
 	int GameObject::Layer::get()
@@ -501,7 +512,7 @@ namespace ThomasEngine {
 
 	bool GameObject::activeSelf::get()
 	{
-		return ((thomas::object::GameObject*)nativePtr)->m_activeSelf;
+		return GetActive();
 	}
 
 	UINT GameObject::GroupIDSelf::get()
@@ -540,21 +551,7 @@ namespace ThomasEngine {
 
 	void GameObject::activeSelf::set(bool value)
 	{
-		if (value == activeSelf)
-			return;
-		for (int i = 0; i < m_components.Count; i++)
-		{
-			Component^ component = m_components[i];
-			if (component->enabled) {
-				if (value)
-					component->OnEnable();
-				else
-					component->OnDisable();
-			}
-				
-		}
-		((thomas::object::GameObject*)nativePtr)->m_activeSelf = value;
-		OnPropertyChanged("activeSelf");
+		SetActive(value);
 	}
 
 	String^ GameObject::Name::get() {

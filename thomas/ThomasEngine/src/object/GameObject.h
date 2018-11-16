@@ -75,7 +75,6 @@ namespace ThomasEngine
 		property thomas::object::GameObject* Native {
 			thomas::object::GameObject* get();
 		}
-
 	public:
 
 		bool IsPrefab();
@@ -94,16 +93,18 @@ namespace ThomasEngine
 				return m_scene_id; // != 0
 			}
 		}
-		property bool activeSelf
-		{
-			bool get();
-			void set(bool value);
-		}	
-
 		property UINT GroupIDSelf
 		{
 			UINT get();
 			void set(UINT state);
+		}
+		/* Serialization property. Use GetActive() or SetActive() instead
+		*/
+		[System::ComponentModel::DefaultValueAttribute(true)]
+		property bool activeSelf
+		{
+			bool get();
+			void set(bool value);
 		}
 
 		property bool staticSelf
@@ -187,7 +188,11 @@ namespace ThomasEngine
 
 		static GameObject^ CreatePrimitive(PrimitiveType type);
 
+		/* Returns True if object is in an active state (may not be enabled/'running' if in editor)
+		*/
 		bool GetActive();
+		/* Set activation state.
+		*/
 		void SetActive(bool active);
 
 		static GameObject^ Instantiate(GameObject^ original);

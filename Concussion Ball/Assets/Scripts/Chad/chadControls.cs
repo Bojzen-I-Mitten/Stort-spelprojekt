@@ -90,9 +90,7 @@ public class ChadControls : NetworkComponent
         State = STATE.CHADING;
         if (rBody != null)
             rBody.IsKinematic = true;   // Alayws off
-
-        if (isOwner)
-            MatchSystem.instance.LocalChad = this;
+        
         ThrowForce = BaseThrowForce;
         rBody = gameObject.GetComponent<Rigidbody>();
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
@@ -110,6 +108,8 @@ public class ChadControls : NetworkComponent
         base.OnGotOwnership();
         if (rBody != null)
             rBody.IsKinematic = false; // Enable
+        //if (isOwner)
+        MatchSystem.instance.LocalChad = this;
 
     }
     public override void OnLostOwnership()
@@ -122,7 +122,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            Camera.gameObject.activeSelf = false;
+            Camera.gameObject.SetActive(false);
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
         }
 
@@ -132,7 +132,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            Camera.gameObject.activeSelf = true;
+            Camera.gameObject.SetActive(true);
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
 
@@ -658,6 +658,11 @@ public class ChadControls : NetworkComponent
         if (State != STATE.RAGDOLL)
         {
             GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
+            if(!pickupableObject)
+            {
+                Debug.LogWarning("Pickupable object is null/not found.");
+                return;
+            }
             PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
             pickupable.Pickup(this, hand ? hand : transform);
         }

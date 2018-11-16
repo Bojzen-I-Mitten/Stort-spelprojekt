@@ -14,7 +14,7 @@ namespace thomas
 		m_objectsDynamic(),
 		m_objectsStatic()
 	{
-		m_objectsDynamic.reserve(1000);
+		m_objectsDynamic.reserve(10000);
 	}
 	ObjectHandler::~ObjectHandler() 
 	{}

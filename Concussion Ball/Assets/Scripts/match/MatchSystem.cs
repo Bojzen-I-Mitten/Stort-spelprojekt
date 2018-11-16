@@ -83,12 +83,15 @@ public class MatchSystem : NetworkManager
 
         Teams[TEAM_TYPE.UNASSIGNED] = new Team(TEAM_TYPE.UNASSIGNED, "Unassigned", new Color(0, 0, 0, 0));
     }
-
-  
+    
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        Ball = GameObject.Instantiate(BallPrefab);
+    }
 
     public override void Start()
     {
-        Ball = GameObject.Instantiate(BallPrefab);
         base.Start();
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
