@@ -49,58 +49,69 @@ namespace ThomasEngine {
 			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
-	void GameObject::InitComponents(Comp::State s, bool playing)
+
+	/* Initiation of a single component. Ensure GameObject is Active
+	*/
+	void InitComponent(Component^ c, Comp::State s, bool playing)
 	{
 		/* Object initiation Process.
 		 * 1. Awake()
 		 * 2. if 'Active'
 			Enable(), Start()
 
-		 * Editor is a separate case where not all objects are enabled 
+		 * Editor is a separate case where not all objects are enabled
 		*/
+		switch (s)
+		{
+		case Comp::State::Awake:
+		{
+#ifdef _EDITOR														
+			// If editor state: don't initiate all components
+			if (!(playing || c->enableInEditor())) return;
+			// Ensure component isn't initialized
+			if (c->ComponentState != Comp::State::Uninitialized) return;
+#else		
+			assert(c->State == Comp::State::Uninitialized);
+#endif			
+			c->Awake();
+		}
+		break;
+		case Comp::State::Enabled:
+		{
+			// If Component isn't activated 
+			if (!c->Activated ||
+				!(c->ComponentState == Comp::State::Awake || c->ComponentState == Comp::State::Disabled))
+				return;
+			c->Enable();
+		}
+		break;
+		case Comp::State::Disabled:
+		{
+			if (!c->Activated || c->ComponentState != Comp::State::Enabled)
+				return;	// Ignore inactive components.
+			c->Disable();
+		}
+			break;
+		case Comp::State::Uninitialized:
+		case Comp::State::EndState:
+		default:
+			assert(false); // Don't
+			break;
+		}
+	}
+	/* Initiation process for activating the object.
+	*/
+	void GameObject::InitComponents(Comp::State s, bool playing)
+	{
+		// Don't enable de-activated objects.
 		if (s != Comp::State::Awake && !this->GetActive())
-			return;	// Don't enable de-activated objects.
+			return;
 
+		// Activate
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
-			Component^ c = m_components[i];
-			// Logic over state s to enter... Should be separate functions at some point...
-			switch (s)
-			{
-			case Comp::State::Awake:
-			{
-#ifdef _EDITOR														
-				// If editor state: don't initiate all components
-				if (!(playing || c->enableInEditor())) continue;
-				// Ensure component isn't initialized
-				if (c->ComponentState != Comp::State::Uninitialized) continue;
-#else		
-				assert(c->State == Comp::State::Uninitialized);
-#endif			
-				c->Awake();
-			}
-				break;
-			case Comp::State::Enabled:
-			{
-				// If Component isn't activated 
-				if (!c->Activated || 
-					!(c->ComponentState == Comp::State::Awake || c->ComponentState == Comp::State::Disabled))
-					continue;
-				c->Enable();
-			}
-				break;
-			case Comp::State::Disabled:
-				if (!c->Activated || c->ComponentState != Comp::State::Enabled)
-					continue;	// Ignore inactive components.
-				c->Disable();
-				break;
-			case Comp::State::Uninitialized:
-			case Comp::State::EndState:
-			default:
-				assert(false); // Don't
-				break;
-			}
+			InitComponent(m_components[i], s, playing);
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -425,10 +436,17 @@ namespace ThomasEngine {
 			Debug::LogWarning("Component failed to instantiate of type " + (T::typeid));
 			return T();
 		}
+		Component^ comp = (Component^)component;
 
-		((Component^)component)->setGameObject(this);
-		m_components.Add((Component^)component);
+		comp->setGameObject(this);
+		m_components.Add(comp);
 
+		// Wake up
+		if (GetActive())
+		{
+			InitComponent(comp, Comp::State::Awake, ThomasWrapper::IsPlaying());
+			InitComponent(comp, Comp::State::Enabled, ThomasWrapper::IsPlaying());
+		}
 		Monitor::Exit(m_componentsLock);
 		return component;
 	}
@@ -571,14 +589,10 @@ namespace ThomasEngine {
 	{
 #ifdef _EDITOR
 		// If editor make it trigger full activation part.
-		// (variable is not enabled during play mode)
-		if (!ThomasWrapper::IsPlaying())
-			SetActive(value);
-		else
+		SetActive(value);
+#else
+		((thomas::object::GameObject*)nativePtr)->SetActive(value);
 #endif
-		{
-			((thomas::object::GameObject*)nativePtr)->SetActive(value);
-		}
 	}
 
 	String^ GameObject::Name::get() {

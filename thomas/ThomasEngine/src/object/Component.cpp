@@ -19,7 +19,8 @@ namespace ThomasEngine
 
 	}
 	Component::Component(thomas::object::component::Component * ptr) 
-		: Object(ptr), m_state(Comp::State::Uninitialized)
+		: Object(ptr), m_state(Comp::State::Uninitialized),
+		m_active(true)
 	{
 	}
 	Component::~Component()

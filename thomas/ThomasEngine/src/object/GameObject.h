@@ -31,7 +31,11 @@ namespace ThomasEngine
 
 		System::Object^ m_componentsLock = gcnew System::Object();
 
+		/* Function called when SetActive(true) is called on the object or a parent object
+		*/
 		void OnActivate();
+		/* Function called when SetActive(false) is called on the object or a parent object
+		*/
 		void OnDeactivate();
 		
 	internal:
@@ -42,8 +46,11 @@ namespace ThomasEngine
 		void InitComponents(Comp::State s, bool playing);
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
-
+		/* Remove a single component from the object.
+		*/
 		bool RemoveComponent(Component^ comp);
+		/* Issue Destroy Command for the object. The object will persist through the frame(s) until destroyed properly.
+		*/
 		virtual void Destroy() override;
 
 		System::String^ prefabPath;
