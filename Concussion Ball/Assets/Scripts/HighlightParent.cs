@@ -8,6 +8,7 @@ using ThomasEngine.Network;
 public class HighlightParent : NetworkComponent
 {
     private Color color = Color.White;// { get; set; }
+    private Ball ball;
     private Material highLightMat;
 
     public override void Start()
@@ -26,11 +27,16 @@ public class HighlightParent : NetworkComponent
         transform.scale *= 1.1f;
 
         rc.material = highLightMat;
+
+        ball = transform.parent.transform.parent.gameObject.GetComponent<Ball>();
     }
 
     public override void Update()
     {
-        
+        if (ball?._Chad)
+            color = ball._Chad.NetPlayer.Team.Color;
+        else
+            color = Color.White;
     }
 }
 

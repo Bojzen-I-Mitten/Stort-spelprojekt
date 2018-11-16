@@ -97,9 +97,6 @@ public class ChadCam : ScriptComponent
         float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
         Chad.rBody.Rotation = Chad.rBody.Rotation * Quaternion.CreateFromAxisAngle(Vector3.Up, yaw);
 
-        
-
-
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
         
