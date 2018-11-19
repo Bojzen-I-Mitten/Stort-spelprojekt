@@ -18,6 +18,30 @@ public class GUIHostMenu : ScriptComponent
     #region Host Setings
     Image HostBg;
 
+    Text ServerName;
+    Text ServerNameString;
+    Image ServerNameBox;
+
+    Text MaxPlayers;
+    Text MaxPlayersString;
+    Image MaxPlayerBox;
+
+    Text TimeRound;
+    Text TimeRoundString;
+    Image TimeRoundBox;
+
+    Text PublicServer;
+    Text PublicServerCheck;
+    Image PublicServerBox;
+
+    Text ScoreLimit;
+    Text ScoreLimitString;
+    Image ScoreLimitBox;
+
+    Text PowerUps;
+    Text PowerUpsCheck;
+    Image PowerUpsBox;
+
     #endregion
 
     #region Teams
