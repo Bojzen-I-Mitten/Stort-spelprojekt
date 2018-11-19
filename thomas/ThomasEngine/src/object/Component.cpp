@@ -1,6 +1,7 @@
 #pragma unmanaged
 #include <thomas\object\component\Component.h>
 #include <thomas\object\GameObject.h>
+#include <thomas\utils\Utility.h>
 #pragma managed
 
 #include "Component.h"
@@ -64,18 +65,73 @@ namespace ThomasEngine
 	bool Component::enabled::get() { return m_state == Comp::State::Enabled; }
 	void Component::enabled::set(bool value)
 	{
-		if (value) 
+		if (value)
 		{
 			//	Enable
-			if(m_state == Comp::State::Disabled || m_state == Comp::State::Awake)
+			if (m_state == Comp::State::Disabled || m_state == Comp::State::Awake)
 				Enable();
 		}
-		else if(m_state == Comp::State::Enabled)
+		else if (m_state == Comp::State::Enabled)
 		{
 			//	Disable
 			Disable();
 		}
+		else if (m_state == Comp::State::Awake)
+			m_active = false;	// Ensure object activation isn't run.
 
+	}
+	/* Initiation of a single component. Ensure GameObject is Active
+	*/
+	void Component::InitComponent(Comp::State s, uint32_t InitBits)
+	{
+		using namespace thomas;
+		/* Object initiation Process.
+		 * 1. Awake()
+		 * 2. if 'Active'
+			Enable(), Start()
+
+		 * Editor is a separate case where not all objects are enabled
+		*/
+		switch (s)
+		{
+		case Comp::State::Awake:
+		{
+#ifdef _EDITOR														
+			// If editor state: don't initiate all components
+			if (!(utility::hasFlag(InitBits, INIT_PLAYING_BIT) || this->enableInEditor())) return;
+			// Ensure component isn't initialized
+			if (this->ComponentState != Comp::State::Uninitialized) return;
+#else		
+			assert(c->State == Comp::State::Uninitialized);
+#endif			
+			this->Awake();
+		}
+		break;
+		case Comp::State::Enabled:
+		{
+			// If Component isn't activated, and not explicit call: ignore
+			// If Component isn't in a valid state for this call:	ignore
+			if ((!this->Activated && !utility::hasFlag(InitBits, INIT_EXPLICIT_CALL_BIT)) ||
+				!(this->ComponentState == Comp::State::Awake || this->ComponentState == Comp::State::Disabled))
+				return;
+			this->Enable();
+		}
+		break;
+		case Comp::State::Disabled:
+		{
+			if (!this->Activated)
+				return;	// Ignore inactive components.
+
+			if (this->ComponentState == Comp::State::Enabled)
+				this->Disable();
+		}
+		break;
+		case Comp::State::Uninitialized:
+		case Comp::State::EndState:
+		default:
+			assert(false); // Don't
+			break;
+		}
 	}
 
 	void Component::Awake()

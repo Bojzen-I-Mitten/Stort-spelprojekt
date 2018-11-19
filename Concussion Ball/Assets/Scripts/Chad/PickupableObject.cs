@@ -97,6 +97,7 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
+        // This check is dangerous! Somehow 'failed' to drop an object?, OutOfSync. Assert always valid pickup instead!
         if(PickupCollider.enabled == false)
         {
             RPCDrop();
@@ -111,6 +112,7 @@ public class PickupableObject : NetworkComponent
 
     public void RPCDrop()
     {
+        // Assert pickup is clean
         if (PickupCollider && PickupCollider.enabled == false)
         {
             
@@ -202,6 +204,10 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Reset()
     {
+        if (PickupCollider)
+        {
+            PickupCollider.enabled = false;
+        }
         RPCDrop();
         transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;

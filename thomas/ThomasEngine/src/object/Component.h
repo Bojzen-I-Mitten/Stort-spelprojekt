@@ -8,6 +8,11 @@ namespace thomas { namespace object { namespace component { class Component; } }
 
 namespace ThomasEngine 
 {
+	/* Component initiation call bits
+	*/
+	constexpr uint32_t INIT_PLAYING_BIT = 1;			// If set: System is playing
+	constexpr uint32_t INIT_EXPLICIT_CALL_BIT = 2;		// If set: Activation is called explicitly (not initial initiation).
+
 	ref class GameObject;
 	ref class Collider;
 	ref class Transform;
@@ -60,12 +65,20 @@ namespace ThomasEngine
 
 	private:
 	internal:
+		/* Combined initiation logic function for component initiation
+		s			<<	State to enter
+		InitBits	<<	Information specific to the initiation call.
+		*/
+		void InitComponent(Comp::State s, uint32_t InitBits);
 		/* Call to 'construct' the object */
 		void Awake();
 		/* Enabled the component. */
 		void Enable();
 		/* Disable the component. */
 		void Disable();
+
+
+
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
 		virtual void OnDestroy() override;

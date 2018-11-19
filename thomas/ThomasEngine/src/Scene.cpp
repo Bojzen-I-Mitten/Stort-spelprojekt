@@ -2,6 +2,7 @@
 #pragma unmanaged
 #include <thomas/editor/EditorCamera.h>
 #include <thomas/object/ObjectHandler.h>
+#include <thomas/utils/Utility.h>
 
 #pragma managed
 #include "Utility.h"
@@ -39,14 +40,16 @@ namespace ThomasEngine
 	void Scene::AwakeObjects(List<GameObject^>^ objects, bool playing)
 	{
 		// Call awake
+		uint32_t initFlag = playing ? INIT_PLAYING_BIT : 0;
 		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Awake, playing);
+			g->InitComponents(Comp::State::Awake, initFlag);
 	}
 	void Scene::EnableObjects(List<GameObject^>^ objects, bool playing)
 	{
 		// Verify non-editor components are activated
+		uint32_t initFlag = playing ? INIT_PLAYING_BIT : 0;
 		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Enabled, playing);
+			g->InitComponents(Comp::State::Enabled, initFlag);
 	}
 	bool Scene::OnPlay()
 	{

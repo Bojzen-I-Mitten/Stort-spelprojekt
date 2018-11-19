@@ -172,7 +172,7 @@ namespace thomas
 		{
 			if (m_transform && m_transform->GetParent())
 			{
-				return m_activeSelf && m_transform->GetParent()->m_gameObject->m_activeSelf;
+				return m_activeSelf && m_transform->GetParent()->m_gameObject->GetActive();
 			}
 			return m_activeSelf;
 		}

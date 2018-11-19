@@ -14,6 +14,7 @@ namespace ThomasEngine
 	ref class Scene;
 	ref class Transform;
 	ref class Component;
+	
 
 	public ref class GameObject : public Object
 	{
@@ -40,10 +41,10 @@ namespace ThomasEngine
 		
 	internal:
 		/* Init the components within the object to the specified state
-		s		<<	State components should be initiated to
-		playing	<<	If components are 'running'
+		s			<<	State components should be initiated to
+		InitBits	<<	Initiation information bits.
 		*/
-		void InitComponents(Comp::State s, bool playing);
+		void InitComponents(Comp::State s, uint32_t InitBits);
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 		/* Remove a single component from the object.

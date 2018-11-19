@@ -1,6 +1,7 @@
 #pragma unmanaged
 #include <thomas\object\GameObject.h>
 #include <thomas\object\ObjectHandler.h>
+#include <thomas/utils/Utility.h>
 #pragma managed
 #include "GameObject.h"
 #include "Component.h"
@@ -20,7 +21,6 @@
 using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
-
 
 	GameObject::GameObject() : 
 		Object(thomas::ObjectHandler::Instance().createNewGameObject("gameobject"))
@@ -50,58 +50,9 @@ namespace ThomasEngine {
 #endif
 	}
 
-	/* Initiation of a single component. Ensure GameObject is Active
-	*/
-	void InitComponent(Component^ c, Comp::State s, bool playing)
-	{
-		/* Object initiation Process.
-		 * 1. Awake()
-		 * 2. if 'Active'
-			Enable(), Start()
-
-		 * Editor is a separate case where not all objects are enabled
-		*/
-		switch (s)
-		{
-		case Comp::State::Awake:
-		{
-#ifdef _EDITOR														
-			// If editor state: don't initiate all components
-			if (!(playing || c->enableInEditor())) return;
-			// Ensure component isn't initialized
-			if (c->ComponentState != Comp::State::Uninitialized) return;
-#else		
-			assert(c->State == Comp::State::Uninitialized);
-#endif			
-			c->Awake();
-		}
-		break;
-		case Comp::State::Enabled:
-		{
-			// If Component isn't activated 
-			if (!c->Activated ||
-				!(c->ComponentState == Comp::State::Awake || c->ComponentState == Comp::State::Disabled))
-				return;
-			c->Enable();
-		}
-		break;
-		case Comp::State::Disabled:
-		{
-			if (!c->Activated || c->ComponentState != Comp::State::Enabled)
-				return;	// Ignore inactive components.
-			c->Disable();
-		}
-			break;
-		case Comp::State::Uninitialized:
-		case Comp::State::EndState:
-		default:
-			assert(false); // Don't
-			break;
-		}
-	}
 	/* Initiation process for activating the object.
 	*/
-	void GameObject::InitComponents(Comp::State s, bool playing)
+	void GameObject::InitComponents(Comp::State s, uint32_t InitBits)
 	{
 		// Don't enable de-activated objects.
 		if (s != Comp::State::Awake && !this->GetActive())
@@ -111,7 +62,7 @@ namespace ThomasEngine {
 		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
-			InitComponent(m_components[i], s, playing);
+			m_components[i]->InitComponent(s, InitBits);
 		}
 		Monitor::Exit(m_componentsLock);
 	}
@@ -170,14 +121,15 @@ namespace ThomasEngine {
 	}
 	void GameObject::OnActivate()
 	{
-		// Activate components
-		InitComponents(Comp::State::Enabled, ThomasWrapper::IsPlaying());
+		uint32_t bits = INIT_EXPLICIT_CALL_BIT | (ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0u);
+		InitComponents(Comp::State::Enabled, bits);
 		for each (Transform^ g in Children)
 			g->gameObject->OnActivate();
 	}
 	void GameObject::OnDeactivate()
 	{
-		InitComponents(Comp::State::Disabled, ThomasWrapper::IsPlaying());
+		uint32_t bits = INIT_EXPLICIT_CALL_BIT | (ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0u);
+		InitComponents(Comp::State::Disabled, bits);
 		for each (Transform^ g in Children)
 			g->gameObject->OnDeactivate();
 	}
@@ -442,11 +394,10 @@ namespace ThomasEngine {
 		m_components.Add(comp);
 
 		// Wake up
-		if (GetActive())
-		{
-			InitComponent(comp, Comp::State::Awake, ThomasWrapper::IsPlaying());
-			InitComponent(comp, Comp::State::Enabled, ThomasWrapper::IsPlaying());
-		}
+		uint32_t BITS = ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0;
+		comp->InitComponent(Comp::State::Awake, BITS);
+		if(this->GetActive())
+			comp->InitComponent(Comp::State::Enabled, BITS);
 		Monitor::Exit(m_componentsLock);
 		return component;
 	}
@@ -523,13 +474,19 @@ namespace ThomasEngine {
 	{
 		if (active == GetActive())
 			return;
-		// Activate object
-		((thomas::object::GameObject*)nativePtr)->SetActive(active);
-		
+		// Activate/Deactivate object. Calls: SetActive(true/false)
 		if (active)
+		{
+			// Activate object before initiation trigger (prevents initiation process to fail on inactive)
+			((thomas::object::GameObject*)nativePtr)->SetActive(true);
 			OnActivate();
+		}
 		else
+		{
 			OnDeactivate();
+			// Deactivate object after trigger (prevents initiation process to fail on inactive)
+			((thomas::object::GameObject*)nativePtr)->SetActive(false);
+		}
 
 
 		// Trigger change

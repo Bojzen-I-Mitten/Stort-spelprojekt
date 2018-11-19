@@ -7,6 +7,7 @@ using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
 using ThomasEngine.Script;
+using ThomasEngine;
 
 public class ChadControls : NetworkComponent
 {
@@ -245,7 +246,7 @@ public class ChadControls : NetworkComponent
 
     public void RPCStartRagdoll(float duration, Vector3 force, bool diveTackle)
     {
-        if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
+        if (isOwner && HasPickedUpObject() && PickedUpObject.DropOnRagdoll)
         {
             if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
             {
@@ -254,7 +255,7 @@ public class ChadControls : NetworkComponent
             }
             else
             {
-                PickedUpObject.Drop();
+                DropPickUp();
                 Debug.Log("drop");
             }
 
@@ -286,12 +287,12 @@ public class ChadControls : NetworkComponent
     }
     public void OnDisconnect()
     {
-        if (PickedUpObject)
+        if (HasPickedUpObject())
         {
             if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
                 (PickedUpObject as Powerup).Remove();
             else
-                PickedUpObject.Drop();
+                DropPickUp();
         }
 
     }
@@ -449,8 +450,8 @@ public class ChadControls : NetworkComponent
 
     private void StateMachine()
     {
-        float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
-        float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
+        float modifiedBaseSpeed = HasPickedUpObject() ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
+        float modifiedMaxSpeed = HasPickedUpObject() ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
 
         float diagonalModifier = 1.0f;
 
@@ -539,12 +540,10 @@ public class ChadControls : NetworkComponent
         }
         
         CurrentVelocity = Vector2.Zero;
-        if (PickedUpObject)
+        if (HasPickedUpObject())
         {
-            PickedUpObject.Drop();
-            PickedUpObject = null;
+            DropPickUp();
         }
-
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -655,8 +654,14 @@ public class ChadControls : NetworkComponent
 
     public void RPCPickup(int id)
     {
-        if (State != STATE.RAGDOLL)
+        // Drop or can only have one ?
+        if (HasPickedUpObject())
         {
+            Debug.Log("Object already picked up.");
+            return;
+        }
+        if (State != STATE.RAGDOLL)
+        {            
             GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
             if(!pickupableObject)
             {
@@ -667,16 +672,29 @@ public class ChadControls : NetworkComponent
             pickupable.Pickup(this, hand ? hand : transform);
         }
     }
+    /* Routine for dropping an object. Assert no object is still held (assert not verified atm).
+    */
+    private void DropPickUp()
+    {
+        PickedUpObject.Drop();
+        PickedUpObject = null;
+    }
 
     public bool HasThrowableObject()
     {
-        if (PickedUpObject)
+        if (HasPickedUpObject())
             if (PickedUpObject.m_throwable)
                 return true;
             else
                 return false;
         else
             return false;
+    }
+    /*  True if the player currently holds an object.
+     */
+    public bool HasPickedUpObject()
+    {
+        return PickedUpObject != null;
     }
     #endregion
 
@@ -728,7 +746,7 @@ public class ChadControls : NetworkComponent
             }
 
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null)
+            if (pickupable && !HasPickedUpObject())
             {
                 if (pickupable.transform.parent == null)
                 {

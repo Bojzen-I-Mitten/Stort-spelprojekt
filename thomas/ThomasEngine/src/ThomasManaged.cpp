@@ -138,9 +138,10 @@ namespace ThomasEngine {
 	void ThomasWrapper::MainThreadUpdate()
 	{
 #ifdef _EDITOR
-		if (!playing)
-			ScriptingManager::ReloadAssembly(false);
+		// Check if scripts require a reload
+		ScriptingManager::ReloadAssembly(false);
 #endif
+
 		constexpr uint32_t RAM_SAMPLE_FRAME = 1000;
 		static uint32_t WaitSampleFrame = 0;
 		if (WaitSampleFrame++ > RAM_SAMPLE_FRAME)
@@ -413,7 +414,8 @@ namespace ThomasEngine {
 
 
 
-
+				/* Run async. update on main thread.
+				*/
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));

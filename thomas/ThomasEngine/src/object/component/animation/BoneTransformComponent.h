@@ -38,6 +38,8 @@ namespace ThomasEngine
 				void set(System::String^ value);
 			}
 
+			void RefreshAnimated();
+
 			void OnParentDestroy(GameObject^ relative) override;
 			void OnAwake() override;
 
