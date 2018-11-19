@@ -73,7 +73,9 @@ namespace thomas
 						return false;
 
 					Viewport canvasViewport = canvas->GetViewport();
+					Vector2 vpScale = canvas->GetViewportScale();
 					Vector2 size = PixelSize();
+					size *= scale* vpScale;
 					float left = position.x * canvasViewport.width - size.x * origin.x;
 					float right = left + size.x;
 					float top = position.y * canvasViewport.height - size.y * origin.y;
@@ -102,7 +104,7 @@ namespace thomas
 				Font* font;
 				std::string text;
 
-				void Draw(SpriteBatch* sb, Viewport vp)
+				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
 					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
 				}
@@ -122,9 +124,9 @@ namespace thomas
 
 				Texture2D* texture;
 
-				void Draw(SpriteBatch* sb, Viewport vp)
+				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale, effect, depth);
+					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
 				}
 
 				Vector2 PixelSize()

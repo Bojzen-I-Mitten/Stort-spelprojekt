@@ -31,7 +31,6 @@ public class NetworkPlayer : NetworkComponent
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
 
-        nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
         text.font = NameFont;
         text.scale = new Vector2(0.05f);
@@ -47,7 +46,7 @@ public class NetworkPlayer : NetworkComponent
             text.scale = new Vector2(textScale);
             text.color = Team.Color;
             nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(rb.Position + new Vector3(0, TextOffset, 0),
-                CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+                CameraMaster.instance.transform.position, Vector3.Down, null, null);
         }
 
 

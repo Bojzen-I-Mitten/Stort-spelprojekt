@@ -72,7 +72,8 @@ namespace thomas
 
 			Vector2 Canvas::GetViewportScale()
 			{
-				return Vector2(m_viewport.width, m_viewport.height);
+				Viewport vp = GetViewport();
+				return Vector2(vp.width / 1920.f , vp.height / 1080.f);
 			}
 
 			void Canvas::SetViewport(Viewport viewport)
