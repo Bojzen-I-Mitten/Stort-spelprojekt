@@ -1,5 +1,5 @@
 #include "ThomasCore.h"
-#include "Sound.h"
+#include "SoundManager.hpp"
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
@@ -45,7 +45,7 @@ namespace thomas
 
 		resource::Texture2D::Init();
 		ThomasTime::Init();
-		Sound::Init();
+		SoundManager::GetInstance()->Init();
 		graphics::Renderer::Instance()->init();
 
 		resource::Material::Init();
@@ -69,7 +69,7 @@ namespace thomas
 			s_clearLog = false;
 		}
 
-		Sound::Update();
+		SoundManager::GetInstance()->Update();
 	}
 
 	void ThomasCore::Render()
@@ -118,7 +118,7 @@ namespace thomas
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
-		Sound::Destroy();
+		SoundManager::GetInstance()->Destroy();
 		ImGui::DestroyContext(s_imGuiContext);
 		utils::D3D::Instance()->Destroy();
 

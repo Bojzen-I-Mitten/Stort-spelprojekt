@@ -56,7 +56,7 @@ public class RagdollImpact : ScriptComponent
     }
     public override void Update()
     {
-        ray = new Ray(transform.position, Vector3.Down);
+        //ray = new Ray(transform.position, Vector3.Down);
         RaycastHit hit;
         ray = new Ray(transform.position, Vector3.Down);
         if (Physics.Raycast(ray, out hit))
@@ -66,7 +66,4 @@ public class RagdollImpact : ScriptComponent
         }
         GetActive = false;
     }
-
-
-
 }

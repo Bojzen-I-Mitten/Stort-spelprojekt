@@ -288,7 +288,7 @@ namespace ThomasEngine {
 			//PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
 			Object^ lock = CurrentScene->GetGameObjectsLock();
 			try {
-
+				bool hasKey = thomas::WindowManager::Instance() && thomas::WindowManager::Instance()->GetGameInput()->GetLastKey() != NULL;
 				thomas::ThomasTime::Update();
 				
 				if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
@@ -364,6 +364,8 @@ namespace ThomasEngine {
 					if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->GetInput()->GetKeyDown(Keys::F1)) {
 						showStatistics = !showStatistics;
 					}
+					if(hasKey)
+						thomas::WindowManager::Instance()->GetGameInput()->SetLastKey(NULL);
 				}
 			}
 			catch (Exception^ e) {
