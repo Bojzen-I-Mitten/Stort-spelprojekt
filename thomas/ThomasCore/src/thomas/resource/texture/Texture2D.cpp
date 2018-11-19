@@ -139,7 +139,7 @@ namespace thomas
 		{
 			DirectX::ScratchImage* resizedImage = new DirectX::ScratchImage();
 			
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextImmediate(), m_resource, *data);
 			hr = DirectX::Resize(*data->GetImage(0, 0, 0), width, height, DirectX::TEX_FILTER_DEFAULT, *resizedImage);
 			if (FAILED(hr))
 			{
