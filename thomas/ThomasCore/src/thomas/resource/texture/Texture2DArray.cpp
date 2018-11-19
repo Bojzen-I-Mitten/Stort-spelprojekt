@@ -15,6 +15,7 @@ namespace thomas {
 
 			m_srv = nullptr;
 			m_resource = nullptr;
+			AddTexture(Texture2D::GetWhiteTexture());
 		}
 
 		Texture2DArray::~Texture2DArray()
@@ -27,6 +28,7 @@ namespace thomas {
 			for (Texture2D* tex : m_textures)
 				SAFE_DELETE(tex);
 			m_textures.clear();
+			m_referenceTextures.clear();
 		}
 
 		void Texture2DArray::DeRefTexture(unsigned i)
@@ -41,6 +43,7 @@ namespace thomas {
 			{
 				SAFE_DELETE(m_textures[i]);
 				m_textures.erase(m_textures.begin() + i, m_textures.begin() + i + 1);
+				m_referenceTextures.erase(m_referenceTextures.begin() + i, m_referenceTextures.begin() + i + 1);
 				m_textureRefCount.erase(m_textureRefCount.begin() + i, m_textureRefCount.begin() + i + 1);
 			}
 		}
@@ -48,9 +51,9 @@ namespace thomas {
 		unsigned Texture2DArray::AddTexture(Texture2D* tex)
 		{
 			unsigned i = 0;
-			for (; i < m_textures.size(); ++i)
+			for (; i < m_referenceTextures.size(); ++i)
 			{
-				if (m_textures[i] == tex)//resource manager makes sure the address is unique per texture
+				if (m_referenceTextures[i] == tex)//resource manager makes sure the address is unique per texture
 				{
 					m_textureRefCount[i]++;
 					
@@ -62,6 +65,7 @@ namespace thomas {
 			//tex->ChangeFormat(m_format);
 			texCpy->Resize(m_width, m_height);
 
+			m_referenceTextures.push_back(tex);
 			m_textures.push_back(texCpy);
 			m_textureRefCount.push_back(1);
 
