@@ -29,6 +29,7 @@ namespace thomas {
 				SAFE_DELETE(tex);
 			m_textures.clear();
 			m_referenceTextures.clear();
+			m_textureRefCount.clear();
 		}
 
 		void Texture2DArray::DeRefTexture(unsigned i)
