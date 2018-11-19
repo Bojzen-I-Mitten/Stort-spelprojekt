@@ -18,12 +18,14 @@ public class GUIMainMenu : ScriptComponent
 
     public override void Awake()
     {
+        Camera = gameObject.GetComponent<Camera>();
+        AddImagesAndText();
     }
 
     public override void Start()
     {
-        Camera = gameObject.GetComponent<Camera>();
-        AddImagesAndText();
+        //Camera = gameObject.GetComponent<Camera>();
+        //AddImagesAndText();
     }
 
     public override void Update()

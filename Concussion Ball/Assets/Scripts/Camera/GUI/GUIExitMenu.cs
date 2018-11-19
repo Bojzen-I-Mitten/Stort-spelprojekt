@@ -1,4 +1,5 @@
 using ThomasEngine;
+using System.Collections;
 
 public class GUIExitMenu : ScriptComponent
 {
@@ -22,12 +23,6 @@ public class GUIExitMenu : ScriptComponent
         ExitGame.position = new Vector2(0.4f, 0.25f);
         ExitGame.color = Color.Black;
         ExitGame.interactable = true;
-
-        //ExitMatch = Canvas.Add(_exitMatch);
-        //ExitMatch.font = Font;
-        //ExitMatch.position = new Vector2(0.4f, 0.35f);
-        //ExitMatch.color = Color.Black;
-        //ExitMatch.interactable = true;
     }
 
     public override void Start()
@@ -38,11 +33,6 @@ public class GUIExitMenu : ScriptComponent
     {
         if (Canvas.isRendering)
         {
-            //if (ExitMatch.Hovered())
-            //    ExitMatch.color = Color.Blue;
-            //else
-            //    ExitMatch.color = Color.Black;
-
             if (ExitGame.Hovered())
                 ExitGame.color = Color.Red;
             else
@@ -57,10 +47,26 @@ public class GUIExitMenu : ScriptComponent
                 //}
                 if (ExitGame.Clicked())
                 {
-                    Debug.Log("I'm exiting!");
-                    ThomasWrapper.Exit();
+                    Debug.Log("I'm exciting! :^)");
+                    ThomasWrapper.IssueStopPlay();
+                    Debug.Log("TEST2");
+                    StartCoroutine(Replay());
+                    //ThomasWrapper.Exit();
                 }
             }
         }
+    }
+
+    IEnumerator Replay()
+    {
+        int counter = 0;
+        while (ThomasWrapper.IsPlaying())
+        {
+            Debug.Log("Clicked exit, still playing: " + counter);
+            counter++;
+            yield return null;
+        }
+        Debug.Log("Stopped playing, resetting play");
+        ThomasWrapper.IssuePlay();
     }
 }
