@@ -102,7 +102,7 @@ namespace thomas
 				Font* font;
 				std::string text;
 
-				void Draw(SpriteBatch* sb, Viewport vp)
+				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
 					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
 				}
@@ -122,7 +122,7 @@ namespace thomas
 
 				Texture2D* texture;
 
-				void Draw(SpriteBatch* sb, Viewport vp)
+				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
 					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale, effect, depth);
 				}

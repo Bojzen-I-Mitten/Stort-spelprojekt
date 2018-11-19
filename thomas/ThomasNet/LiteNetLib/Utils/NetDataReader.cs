@@ -342,6 +342,16 @@ namespace LiteNetLib.Utils
             return result;
         }
 
+        public ThomasEngine.Color GetColor()
+        {
+            ThomasEngine.Color result = new ThomasEngine.Color();
+            result.r = GetByte();
+            result.g = GetByte();
+            result.b = GetByte();
+            result.a = GetByte();
+            return result;
+        }
+
         public ThomasEngine.Quaternion GetQuaternion()
         {
             ThomasEngine.Quaternion result = new ThomasEngine.Quaternion();

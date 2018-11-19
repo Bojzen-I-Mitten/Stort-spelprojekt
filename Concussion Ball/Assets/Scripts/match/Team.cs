@@ -13,8 +13,21 @@ public class Team
 {
     public int Score { get; set; }
 
+    public List<Material> materials { get; set; } = new List<Material>();
     public TEAM_TYPE TeamType;
-    public Color Color { get; set; }
+
+    private Color _Color;
+
+    public Color Color {get
+        {
+            return _Color;
+        }
+        set
+        {
+            _Color = value;
+            materials.ForEach((mat) => mat.SetColor("color", _Color));
+        }
+    }
     public string Name { get; set; }
     [Browsable(false)]
     public int PlayerCount { get { return Players.Count; } }

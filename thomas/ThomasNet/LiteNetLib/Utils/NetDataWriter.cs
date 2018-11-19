@@ -222,6 +222,15 @@ namespace LiteNetLib.Utils
             Put(value.w);
         }
 
+        public void Put(ThomasEngine.Color value)
+        {
+            Put(value.r);
+            Put(value.g);
+            Put(value.b);
+            Put(value.a);
+        }
+
+
         public void Put(ThomasEngine.Quaternion value)
         {
             Put(value.x);
