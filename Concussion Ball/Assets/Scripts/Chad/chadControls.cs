@@ -153,10 +153,10 @@ public class ChadControls : NetworkComponent
             DisableRagdoll();
         }
 
-        if (Input.GetKeyDown(Input.Keys.L))
-        {
-            ActivateRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
-        }
+        //if (Input.GetKeyDown(Input.Keys.L))
+        //{
+        //    ActivateRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
+        //}
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 

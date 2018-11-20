@@ -11,15 +11,22 @@ public class NetworkPlayer : NetworkComponent
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
-    public float TextOffset { get; set; } = 1.2f;
+    public float ragdollOffset = 0.8f;
+    public float textOffset = 1.3f;
     public Font NameFont { get; set; }
     public float textScale { get; set; } = 0.008f;
+    public int HasTackled = 0;
+    public int BeenTackled = 0;
+    public int GoalsScored = 0;
+
     Material mat;
     Rigidbody rb;
+    Ragdoll rag;
     Canvas nameCanvas;
     Text text;
     public override void Awake()
     {
+        rag = gameObject.GetComponent<Ragdoll>();
         rb = gameObject.GetComponent<Rigidbody>();
         if (Team == null)
             Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
@@ -31,6 +38,7 @@ public class NetworkPlayer : NetworkComponent
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
 
+        nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
         text.font = NameFont;
         text.scale = new Vector2(0.05f);
@@ -45,8 +53,13 @@ public class NetworkPlayer : NetworkComponent
             text.text = PlayerName;
             text.scale = new Vector2(textScale);
             text.color = Team.Color;
-            nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(rb.Position + new Vector3(0, TextOffset, 0),
-                CameraMaster.instance.transform.position, Vector3.Down, null, null);
+            Vector3 position = Vector3.Zero;
+            if (rag.RagdollEnabled)
+                position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
+            else
+                position = rb.Position + new Vector3(0, textOffset, 0);
+
+            nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
         }
 
 
