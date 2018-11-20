@@ -202,10 +202,10 @@ public class PickupableObject : NetworkComponent
     virtual public void Disable()
     {
         PickupCollider.enabled = false;
-        gameObject.activeSelf = false;
+        gameObject.SetActive(false);
         m_rigidBody.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
-        gameObject.activeSelf = false;
+        gameObject.SetActive(false);
     }
 
     virtual public void Reset()

@@ -34,7 +34,7 @@ namespace ThomasEngine
 		if (forceReload || shouldReload)
 		{
 			// Store current scene
-
+			Debug::Log("Reloading assembly...");
 			SceneManager::TempCopy^ tmp = ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
 
 			// Reload assembly

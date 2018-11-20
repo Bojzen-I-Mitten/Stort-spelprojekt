@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include <chrono>
 #include "..\..\..\include\nlohmann\json.hpp"
-#define BENCHMARK
+//#define BENCHMARK
 
 
 namespace thomas

@@ -86,12 +86,11 @@ public class ChadControls : NetworkComponent
     {
         State = STATE.CHADING;
 
-        if (isOwner)
-            MatchSystem.instance.LocalChad = this;
+        // Access rigidbody and apply
         rBody = gameObject.GetComponent<Rigidbody>();
+        rBody.IsKinematic = false;
+
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
-        if (rBody != null)
-            rBody.IsKinematic = !isOwner;
         rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
@@ -101,13 +100,26 @@ public class ChadControls : NetworkComponent
 
         Identity.RefreshCache();
     }
+    public override void OnGotOwnership()
+    {
+        base.OnGotOwnership();
+        MatchSystem.instance.LocalChad = this;
+
+    }
+    public override void OnLostOwnership()
+    {
+        base.OnLostOwnership();
+        if (this == MatchSystem.instance.LocalChad) // Currently chad is lost control of
+            MatchSystem.instance.LocalChad = null;
+    }
+
 
     #region camera state
     public void DeactivateCamera()
     {
         if (isOwner)
         {
-            Camera.gameObject.activeSelf = false;
+            Camera.gameObject.SetActive(false);
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
         }
 
@@ -117,7 +129,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            Camera.gameObject.activeSelf = true;
+            Camera.gameObject.SetActive(true);
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
 
@@ -167,6 +179,7 @@ public class ChadControls : NetworkComponent
     #region Ragdoll handling
     private void EnableRagdoll()
     {
+        Debug.Log(gameObject.Name + " ragdoll ON");
         // reset aim stuff 
         if (Throwing != null)
         {
@@ -188,6 +201,7 @@ public class ChadControls : NetworkComponent
 
     private void DisableRagdoll()
     {
+        Debug.Log(gameObject.Name + " ragdoll OFF");
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
         gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
@@ -250,7 +264,6 @@ public class ChadControls : NetworkComponent
         if (State != STATE.RAGDOLL)
         {
             Ragdolling = StartRagdoll(duration, force, diveTackle);
-            State = STATE.RAGDOLL;
             StartCoroutine(Ragdolling);
             Camera.InitFreeLookCamera();
         }
@@ -556,8 +569,6 @@ public class ChadControls : NetworkComponent
     IEnumerator StartRagdoll(float duration, Vector3 force, bool diveTackle)
     {
         State = STATE.RAGDOLL;
-        
-        EnableRagdoll();
         Ragdoll.AddForce(force, diveTackle);
 
         yield return new WaitForSeconds(duration);
@@ -568,7 +579,6 @@ public class ChadControls : NetworkComponent
             yield return null;
         }
         yield return new WaitForSeconds(1);
-        DisableRagdoll();
         State = STATE.CHADING;
     }
 

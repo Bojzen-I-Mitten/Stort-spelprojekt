@@ -98,8 +98,11 @@ namespace ThomasEngine.Network
                 NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
                 // If spawned player is local character: Receive ownership  
                 networkIdentity.ReceiveOwnershipStatus(myPlayer);
+                String name = "Chad_" + networkIdentity.ID;
                 if (myPlayer)
-                    player.Name += " (my player)";
+                    player.Name = name + "_(my player)";
+                else
+                    player.Name = name;
                 Players[peer] = networkIdentity;
             }
             else

@@ -4,6 +4,7 @@
 #include "../../Utility.h"
 #include "../../resource/Font.h"
 #include "../../resource/texture/Texture2D.h"
+#include "../../Debug.h"
 
 namespace ThomasEngine
 {
@@ -48,7 +49,14 @@ namespace ThomasEngine
 
 	String^ Text::text::get() { return Utility::ConvertString(((thomas::graphics::GUI::Text*)nativePtr)->text); }
 
-	void Text::font::set(Font^ font) { ((thomas::graphics::GUI::Text*)nativePtr)->font = (thomas::resource::Font*)(font->m_nativePtr); }
+	void Text::font::set(Font^ font) 
+	{ 
+		if (!font)
+			Debug::LogWarning("Font was null");
+		else
+			((thomas::graphics::GUI::Text*)nativePtr)->font = (thomas::resource::Font*)(font->m_nativePtr);
+
+	}
 
 
 	Image::Image(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }

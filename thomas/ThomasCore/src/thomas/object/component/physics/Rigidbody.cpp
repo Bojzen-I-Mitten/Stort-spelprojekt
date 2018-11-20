@@ -56,11 +56,6 @@ namespace thomas
 				setCenterOfMassTransform(trans);
 				UpdateRigidbodyMass();
 
-
-				// Clear velocity
-				this->setLinearVelocity(btVector3(0, 0, 0));
-				this->setAngularVelocity(btVector3(0, 0, 0));
-
 				this->setUserPointer(m_collider);
 
 				Physics::AddRigidBody(this);
@@ -121,11 +116,12 @@ namespace thomas
 					trans.setOrigin((btVector3&)pos);
 					//getMotionState()->setWorldTransform(trans);
 
-
+#ifdef _EDITOR
 					if (ImGuizmo::IsUsing()) {
 						this->setLinearVelocity(btVector3(0, 0, 0));
 						this->setAngularVelocity(btVector3(0, 0, 0));
 					}
+#endif
 					//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
 					//setCenterOfMassTransform(trans);
 

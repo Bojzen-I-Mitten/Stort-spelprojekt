@@ -54,7 +54,7 @@ public class PowerupManager : ScriptComponent
     {
         foreach(GameObject powerup in powerupPool[powerupIndex])
         {
-            if (!powerup.activeSelf)
+            if (!powerup.GetActive())
                 return powerup;
         }
         return null;
@@ -63,7 +63,7 @@ public class PowerupManager : ScriptComponent
     public void RecyclePowerup(Powerup powerup)
     {
         powerup.Disable();
-        powerup.gameObject.activeSelf = false;
+        powerup.gameObject.SetActive(false);
     }
 
     public void ResetPowerups()
