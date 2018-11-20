@@ -25,14 +25,11 @@ public class ChadControls : NetworkComponent
 
     #region Throwing stuff
     [Category("Throwing")]
-    private float ThrowForce;
-    [Category("Throwing")]
     public Transform hand { get; set; }
     [Category("Throwing")]
     public float ChargeTime { get; private set; }
 
-    private float BaseThrowForce = 10.0f;
-    private float MaxThrowForce = 18.0f;
+    
 
     private uint ChargeAnimIndex = 0;
     private uint ThrowAnimIndex = 1;
@@ -47,10 +44,15 @@ public class ChadControls : NetworkComponent
     public float BaseSpeed { get; private set; }  = 5.0f;
     public float MaxSpeed { get; private set; } = 10.0f;
 
-    public float DiveTimer { get; private set; } = 0f;
-    private bool Landed = false;
     public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
+
+    public float ImpactFactor { get; set; } = 2000;
+    public float TackleThreshold { get; set; } = 7;
+    private float DivingTimer = 0.0f;
+    private float JumpingTimer = 0.0f;
+    private bool Jumping = false;
+    private bool Landed = false;
     #endregion
 
     [Browsable(false)]
@@ -71,12 +73,7 @@ public class ChadControls : NetworkComponent
     [Browsable(false)]
     public NetworkPlayer NetPlayer { get; private set; }
 
-    public float ImpactFactor { get; set; } = 2000;
-    public float TackleThreshold { get; set; } = 7;
-    private float DivingTimer = 0.0f;
-    private float JumpingTimer = 0.0f;
-    private bool Jumping = false;
-
+    IEnumerator RagdollRecoverer = null;
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
@@ -90,7 +87,6 @@ public class ChadControls : NetworkComponent
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
-        ThrowForce = BaseThrowForce;
         rBody = gameObject.GetComponent<Rigidbody>();
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         if (rBody != null)
@@ -105,6 +101,7 @@ public class ChadControls : NetworkComponent
         Identity.RefreshCache();
     }
 
+    #region camera state
     public void DeactivateCamera()
     {
         if (isOwner)
@@ -124,6 +121,7 @@ public class ChadControls : NetworkComponent
         }
 
     }
+    #endregion
 
     public override void Update()
     {
@@ -183,7 +181,7 @@ public class ChadControls : NetworkComponent
         ResetThrow();
 
         rBody.enabled = false;
-        CanBeTackled = true;//false;
+        CanBeTackled = false;
         Ragdoll.EnableRagdoll();
     }
 
@@ -195,7 +193,8 @@ public class ChadControls : NetworkComponent
         gameObject.GetComponent<Rigidbody>().enabled = true;
 
         // call coroutine function that sets canragdoll true
-        RagdollRecovery();
+        RagdollRecoverer = RagdollRecovery();
+        StartCoroutine(RagdollRecoverer);
     }
 
     public void LocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
@@ -256,6 +255,7 @@ public class ChadControls : NetworkComponent
         }
     }
     #endregion
+
     public bool OnGround()
     {
         // Shoots ray down and checks if Chads feet are in air or not
@@ -271,6 +271,7 @@ public class ChadControls : NetworkComponent
             Landed = true;
         return true;
     }
+
     public void OnDisconnect()
     {
         if (PickedUpObject)
@@ -596,8 +597,6 @@ public class ChadControls : NetworkComponent
         RPCStartThrow();
         SendRPC("RPCStartThrow");
         Vector3 chosenDirection = Camera.transform.forward;
-        chosenDirection.y *= 1.2f;
-        chosenDirection *= ThrowForce;// new Vector3(Camera.transform.forward.x, Camera.transform.forward.y, Camera.transform.forward.z) * ThrowForce;
         Vector3 ballCamPos = Camera.transform.position;
         
         //yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
@@ -630,7 +629,7 @@ public class ChadControls : NetworkComponent
         float tets = PickedUpObject.GetChargeTime();
         
 
-        ThrowForce = MathHelper.Lerp(BaseThrowForce, MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
+        PickedUpObject.ThrowForce = MathHelper.Lerp(PickedUpObject.BaseThrowForce, PickedUpObject.MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / PickedUpObject.chargeTimeMax);
     }
 
@@ -721,7 +720,6 @@ public class ChadControls : NetworkComponent
             }
         }
     }
-
 
     public override void OnCollisionEnter(Collider collider)
     {
