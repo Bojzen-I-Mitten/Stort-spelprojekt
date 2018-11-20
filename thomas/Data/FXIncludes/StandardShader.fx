@@ -94,8 +94,7 @@ float4 frag(v2f input) : SV_TARGET
     
     
     diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
-
-    //return float4(ShadowMap.Sample(StandardWrapSampler, input.texcoord).x, 0, 0, 1.0f);
+    
     return saturate(float4(diffuse, 1.0f));
 }
 

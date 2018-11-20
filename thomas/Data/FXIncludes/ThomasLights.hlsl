@@ -19,11 +19,11 @@ inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirli
 }
 
 
-SamplerState StandardWrapSamplerr
+SamplerState StandardClampSampler
 {
     Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Wrap;
-    AddressV = Wrap;
+    AddressU = CLAMP;
+    AddressV = CLAMP;
 };
 //Texture2DArray ShadowMaps;
 Texture2D ShadowMap : SHADOWMAP;
@@ -93,9 +93,16 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
 
 
         float visibility = 5.0;
-        float3 sampleCoordLS = WorldToLightClipPos(worldPos).xyz;
+        float4 sampleCoordLS = WorldToLightClipPos(worldPos); //ObjectToLightClipPos(WorldTo //mul(thomas_WorldToObject, float4(worldPos, 1.0)).xyz).xyz;
+        sampleCoordLS.xyz /= sampleCoordLS.w;
+        sampleCoordLS.x = (sampleCoordLS.x + 1.0f) / 2.0f;
+        sampleCoordLS.y = (sampleCoordLS.y + 1.0f) / 2.0f;
+
+        //float depthValue = ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy).x
+
+        //if (saturate(light
         
-        if (ShadowMap.Sample(StandardWrapSamplerr, sampleCoordLS.xy).x < sampleCoordLS.z)
+        if (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy).x < sampleCoordLS.z - 0.02f)
         {
             visibility = 0.1;
         }

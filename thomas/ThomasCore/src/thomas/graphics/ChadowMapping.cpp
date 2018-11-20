@@ -20,6 +20,7 @@ namespace thomas
 			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowPassShader.fx");
 			s_material = std::make_unique<resource::Material>(s_shader.get()); 
 			s_matrixClamp = math::Matrix(0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f);
+			s_matrixClamp.Transpose();
 		}
 
 		ShadowMap::ShadowMap()
@@ -111,6 +112,9 @@ namespace thomas
 
 		void ShadowMap::Bind()
 		{
+			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
+			utils::D3D::Instance()->GetDeviceContext()->PSSetShaderResources(0, 8, s_nullSRV);
+
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 			utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
@@ -133,18 +137,9 @@ namespace thomas
 
 		math::Matrix ShadowMap::GetVPMat()
 		{
-			return (s_matrixClamp * m_matrixVP).Transpose();
+			return (m_matrixVP).Transpose();
 		}
 
-		void ShadowMap::BindShadowToMaterial(resource::Material * mat)
-		{
-			//mat->SetMatrix("lightMatrixVP", (s_matrixClamp * m_matrixVP).Transpose());
-			mat->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
-			mat->ApplyProperty("lightMatrixVP");
-
-			mat->SetTexture2D("shadowMap", m_depthTexture.get());
-			//mat->ApplyProperty("shadowMap");
-		}
-
+		
 	}
 }

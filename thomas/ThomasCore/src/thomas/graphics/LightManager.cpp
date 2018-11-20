@@ -139,6 +139,7 @@ namespace thomas
 					}
 				}
 			}
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 		}
 
 		void LightManager::BindLights(render::ShaderList* shaders)
@@ -154,8 +155,8 @@ namespace thomas
 		{
 			if (s_lights.size() == 0)
 				return;
-
-			shaders->SetGlobalTexture2D("shadowMap", s_lights[0]->GetShadowMapTexture());
+			int stop = 0;
+			shaders->SetGlobalTexture2D("ShadowMap", s_lights[0]->GetShadowMapTexture());
 			shaders->SetGlobalMatrix("lightMatrixVP", s_lights[0]->GetVPMat());
 		}
 

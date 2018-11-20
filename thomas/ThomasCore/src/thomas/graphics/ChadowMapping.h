@@ -27,8 +27,6 @@ namespace thomas
 
 			resource::Texture2D* GetShadowMapTexture();
 			math::Matrix GetVPMat();
-			void BindShadowToMaterial(resource::Material* mat);
-
 		private:
 			std::unique_ptr<resource::Texture2D> m_depthTexture;
 			ID3D11DepthStencilView* m_depthStencilView;

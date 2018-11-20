@@ -44,7 +44,6 @@ namespace thomas
 				void DrawShadow(graphics::render::RenderCommand renderCommand);
 				resource::Texture2D* GetShadowMapTexture();
 				math::Matrix GetVPMat();
-				void Test(resource::Material* mat);
 
 				graphics::LightManager::LightStruct GetData();
 

@@ -89,11 +89,6 @@ namespace thomas
 				return m_shadowMap.GetVPMat();
 			}
 
-			void LightComponent::Test(resource::Material * mat)
-			{
-				m_shadowMap.BindShadowToMaterial(mat);
-			}
-
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
 			{
 				return m_type;

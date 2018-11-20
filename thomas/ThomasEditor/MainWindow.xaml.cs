@@ -105,7 +105,7 @@ namespace ThomasEditor
             {
                 busyCator.IsBusy = false;
                 editor.Visibility = Visibility.Visible;
-               // game.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
             }));
         }
 
@@ -116,7 +116,7 @@ namespace ThomasEditor
                 busyCator.IsBusy = true;
                 busyCator.BusyContent = "";
                 editor.Visibility = Visibility.Hidden;
-               // game.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
             }));
         }
 
@@ -151,7 +151,7 @@ namespace ThomasEditor
             {
                 busyCator.IsBusy = false;
                 editor.Visibility = Visibility.Visible;
-               // game.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
                 ThomasWrapper.Selection.SelectGameObject(g);
             }));
         }
@@ -164,7 +164,7 @@ namespace ThomasEditor
                 busyCator.IsBusy = true;
                 busyCator.BusyContent = "Reloading scripts...";
                 editor.Visibility = Visibility.Hidden;
-              //  game.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
             }));
         }
 
@@ -619,7 +619,7 @@ namespace ThomasEditor
                 busyCator.IsBusy = true;
                 busyCator.BusyContent = message;
                 editor.Visibility = Visibility.Hidden;
-            //    game.Visibility = Visibility.Hidden;
+                game.Visibility = Visibility.Hidden;
             }));
         }
         public void hideBusyIndicator()
@@ -628,7 +628,7 @@ namespace ThomasEditor
             {
                 busyCator.IsBusy = false;
                 editor.Visibility = Visibility.Visible;
-               // game.Visibility = Visibility.Visible;
+                game.Visibility = Visibility.Visible;
             }));
         }
 
