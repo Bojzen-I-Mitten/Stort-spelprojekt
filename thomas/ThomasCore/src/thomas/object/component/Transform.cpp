@@ -327,6 +327,7 @@ namespace thomas
 			}
 			Transform * Transform::GetParent()
 			{
+
 				return m_parent;
 			}
 			void Transform::OnDestroy()

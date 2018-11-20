@@ -193,7 +193,9 @@ public class ChadHud : ScriptComponent
         }
 
         HeldObject = Canvas.Add("Holding: ");
-        HeldObject.position = new Vector2(0.0f, 0.8f);
+        HeldObject.font = AnnouncementFont;
+        HeldObject.position = new Vector2(0.2f, 0.8f);
+        HeldObject.origin = new Vector2(0.5f, 0.5f);
         HeldObject.color = Color.Black;
         HeldObject.scale = Vector2.Zero;
 
@@ -341,8 +343,9 @@ public class ChadHud : ScriptComponent
     
     public void ShowHeldObjectText(string name)
     {
-        HeldObject.scale = Vector2.One;
-        HeldObject.text = "Holding: " + name;
+        HeldObject.color = GetRainbowColor(Time.ElapsedTime, 1.0f);
+        HeldObject.scale = Vector2.One*2.0f;
+        HeldObject.text = name;
     }
 
     public void HideHeldObjectText()
@@ -371,6 +374,19 @@ public class ChadHud : ScriptComponent
         Score2.text = string.Format("{0}", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score);
 
         BallIndicator();
+
+        if (MatchSystem.instance?.LocalChad?.PickedUpObject != null)
+        {
+
+            ShowHeldObjectText(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
+        }
+        else
+        {
+            HideHeldObjectText();
+            DeactivateAimHUD();
+        }
+            
+
     }
 
     public override void OnEnable()

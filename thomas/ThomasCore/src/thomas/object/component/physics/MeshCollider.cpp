@@ -12,6 +12,7 @@ namespace thomas
 		{
 			MeshCollider::MeshCollider() : Collider()
 			{
+				m_collisionObject = nullptr;
 			}
 			resource::Model * MeshCollider::GetMesh()
 			{
@@ -38,6 +39,14 @@ namespace thomas
 			bool MeshCollider::GetConcave()
 			{
 				return m_concave;
+			}
+			void MeshCollider::Update()
+			{
+				if (!m_concave)
+				{
+					Collider::Update();
+				}
+
 			}
 			void MeshCollider::RecalcCollider()
 			{

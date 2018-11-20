@@ -27,6 +27,17 @@ namespace ThomasEngine
 		property bool isRendering
 		{
 			void set(bool rendering);
+			bool get();
+		}
+
+		property Matrix worldMatrix
+		{
+			void set(Matrix value);
+		}
+		property bool is3D
+		{
+			void set(bool value);
+			bool get();
 		}
 
 	private:

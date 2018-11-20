@@ -2,14 +2,22 @@
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using ThomasEngine;
+using System.Diagnostics;
 namespace ThomasStandalone
 {
+    
     class Program
     {
+        static public UInt32 run_time;
+
         static void Main(string[] args)
         {
-            Debug.OnDebugMessage += Debug_OnDebugMessage;
 
+            ThomasEngine.Debug.OnDebugMessage += Debug_OnDebugMessage;
+            if (args.Length == 1)
+                run_time = UInt32.Parse(args[0]);
+            else
+                run_time = 0;                
            
             ThomasWrapper.Start(false);
 
@@ -22,11 +30,11 @@ namespace ThomasStandalone
 
             ThomasWrapper.IssuePlay();
 
-            Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
+            ThomasEngine.Debug.Log("Game loaded. It took " + (Time.ElapsedTime - startTime) + " ms");
 
             window.loop();
 
-
+            ThomasEngine.Debug.Log("Shutting down");
             ThomasWrapper.Exit();
         }
 
@@ -79,6 +87,7 @@ namespace ThomasStandalone
         const UInt32 WM_PAINT = 0x0f;
         const UInt32 WM_LBUTTONUP = 0x0202;
         const UInt32 WM_LBUTTONDBLCLK = 0x0203;
+        const UInt32 WM_CHAR = 0x0102;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         struct WNDCLASSEX
@@ -97,6 +106,16 @@ namespace ThomasStandalone
             public string lpszMenuName;
             public string lpszClassName;
             public IntPtr hIconSm;
+        }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
         }
 
 
@@ -128,6 +147,9 @@ namespace ThomasStandalone
            IntPtr hMenu,
            IntPtr hInstance,
            IntPtr lpParam);
+
+        [DllImport("user32.dll")]
+        static extern bool AdjustWindowRectEx(ref RECT lpRect, uint dwStyle, bool bMenu, uint dwExStyle);
 
         [DllImport("user32.dll", SetLastError = true, EntryPoint = "RegisterClassEx")]
         static extern System.UInt16 RegisterClassEx([In] ref WNDCLASSEX lpWndClass);
@@ -167,10 +189,18 @@ namespace ThomasStandalone
             wind_class.hIcon = IntPtr.Zero;
             // wind_class.hCursor = LoadCursor(IntPtr.Zero, (int)IDC_CROSS);// Crosshair cursor;
             wind_class.lpszMenuName = null;
-            wind_class.lpszClassName = "myClass";
+            wind_class.lpszClassName = name;
             wind_class.lpfnWndProc = Marshal.GetFunctionPointerForDelegate(delegWndProc);
             wind_class.hIconSm = IntPtr.Zero;
             ushort regResult = RegisterClassEx(ref wind_class);
+
+            RECT rectangle = new RECT();
+            rectangle.Left = 0;
+            rectangle.Top = 0;
+            rectangle.Right = width;
+            rectangle.Bottom = height;
+
+            AdjustWindowRectEx(ref rectangle, WS_OVERLAPPEDWINDOW, false, 0);
 
             if (regResult == 0)
             {
@@ -188,10 +218,10 @@ namespace ThomasStandalone
                 regResult,
                 name,
                 WS_OVERLAPPEDWINDOW,
-                0,
-                0,
-                width,
-                height,
+                rectangle.Left,
+                rectangle.Top,
+                rectangle.Right - rectangle.Left,
+                rectangle.Bottom - rectangle.Top,
                 IntPtr.Zero,
                 IntPtr.Zero,
                 wind_class.hInstance,
@@ -223,16 +253,30 @@ namespace ThomasStandalone
 
         internal void loop()
         {
+            
             MSG msg;
-            while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+            if (ThomasStandalone.Program.run_time == 0)
             {
-                DispatchMessage(ref msg);
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+                {
+                    TranslateMessage(ref msg);
+                    DispatchMessage(ref msg);
+                }
+            }
+            else
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1 && stopwatch.ElapsedMilliseconds < ThomasStandalone.Program.run_time)
+                {
+                    TranslateMessage(ref msg);
+                    DispatchMessage(ref msg);
+                }
             }
         }
 
         private static IntPtr myWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
-
             ThomasWrapper.eventHandler(hWnd, (int)msg, wParam, lParam);
             return DefWindowProc(hWnd, msg, wParam, lParam);
         }

@@ -9,8 +9,6 @@
 #include <DirectXTK\Mouse.h>
 #include "utils\Math.h"
 
-#include <smartenum/smartenum.hpp>
-
 using namespace DirectX;
 
 namespace thomas
@@ -245,6 +243,7 @@ namespace thomas
 
 		void SetLastKey(unsigned short key);
 		unsigned short GetLastKey() const;
+		char GetLastKeyChar() const;
 	
 		//Gamepad
 		bool GetButtonDown(Buttons button);

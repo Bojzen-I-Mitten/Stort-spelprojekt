@@ -27,8 +27,11 @@ public class Ball : PickupableObject
         m_throwable = true;
         DropOnRagdoll = true;
         MovementSpeedModifier = 0.65f;
+        chargeTimeMax = 2.0f;
+        BaseThrowForce = 10.0f;
+        MaxThrowForce = 18.0f;
+        ThrowForce = BaseThrowForce;
 
-        // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
@@ -173,13 +176,23 @@ public class Ball : PickupableObject
         emitterElectricity3.Emit = false;
         emitterFire.Emit = false;
         emitterSmoke.Emit = false;
+        ResetElectricityEmitters();
+        ResetFireEmitters();
     }
     #endregion
 
     public override void Update()
     {
+        base.Update();
         if (transform.position.y < -5)
             Reset();
+    }
+
+    public override void Throw(Vector3 camPos, Vector3 direction)
+    {
+        direction.y += 0.2f;
+
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     override public void ChargeEffect()
@@ -188,7 +201,7 @@ public class Ball : PickupableObject
         emitterElectricity2.Emit = true;
         emitterElectricity3.Emit = true;
 
-        float interp = MathHelper.Min(chargeTimeCurrent / chargeTimeMax, 1.0f);
+        float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
 
         if (interp > 0.7f)
         {
@@ -215,31 +228,41 @@ public class Ball : PickupableObject
         StartCoroutine(CleanTimer());
     }
 
+    public override void OnDrop()
+    {
+        base.OnDrop();
+        StartCoroutine(PickupDelay());
+    }
+    IEnumerator PickupDelay()
+    {
+        PickupCollider.enabled = false; PickupCollider.enabled = false;
+        yield return new WaitForSecondsRealtime(0.5f);
+        PickupCollider.enabled = true;
+    }
+
     public override void Pickup(ChadControls chad, Transform hand)
     {
         base.Pickup(chad, hand);
-        m_pickupable = true;
     }
 
 
+    public override void Disable()
+    {
+        base.Disable();
+    }
+
+    IEnumerator ReturnToMiddle()
+    {
+        yield return new WaitForSecondsRealtime(0.3f);
+        m_rigidBody.Position = Vector3.Zero;
+        m_rigidBody.Rotation = Quaternion.Identity;
+        m_rigidBody.LinearVelocity = Vector3.Zero;
+        m_rigidBody.AngularVelocity = Vector3.Zero;
+    }
     public override void Reset()
     {
-        if (isOwner)
-        {
-            Drop();
-            if (m_rigidBody != null)
-            {
-                //m_rigidBody.enabled = false;
-                m_rigidBody.SetPosition(Vector3.Zero, true);
-                m_rigidBody.SetRotation(Quaternion.Identity, true);
-                m_rigidBody.LinearVelocity = Vector3.Zero;
-                m_rigidBody.AngularVelocity = Vector3.Zero;
-                transform.position = Vector3.Zero;
-                transform.rotation = Quaternion.Identity;
-               // m_rigidBody.enabled = true;
-            }
-        }
-
+        base.Reset();
+        StartCoroutine(ReturnToMiddle());
     }
 
     private IEnumerator CleanTimer()

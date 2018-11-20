@@ -20,6 +20,7 @@ namespace thomas
 				void OnDrawGizmosSelected();
 				void SetConcave(bool value);
 				bool GetConcave();
+				void Update() override;
 			private:
 				void RecalcCollider();
 				void CalculateConvex();

@@ -5,6 +5,8 @@ using System.Linq;
 
 public class Vindaloo : Powerup
 {
+    ChadControls ObjectOwner = null;
+
     public Texture2D fireTexture { get; set; }
     public Texture2D fire2Texture { get; set; }
     public Texture2D smokeTexture { get; set; }
@@ -17,17 +19,29 @@ public class Vindaloo : Powerup
     private ParticleEmitter emitterGravel;
     private SoundComponent ExplosionSound;
 
-    public float ExplosionRadius { get; set; } = 5.0f;
-    // public float ExplosionForce { get; set; } = 200.0f;
-    public float ExplosionForce = 200.0f;
-    public override void Start()
+    public float ExplosionRadius { get; set; } = 8.0f;
+    public float ExplosionForce = 300.0f;
+    public override void Awake()
     {
-        base.Start();
+        base.Awake();
 
         m_throwable = true; // change depending on power-up
+        MovementSpeedModifier = 0.65f;
+        ExplosionRadius = 8.0f;
+        ExplosionForce = 300.0f;
+        BaseThrowForce = 15.0f;
+        MaxThrowForce = 25.0f;
+        ThrowForce = BaseThrowForce;
+
+        #region big meme particle emitter bois
+        ExplosionSound = gameObject.AddComponent<SoundComponent>();
+        ExplosionSound.Type = SoundComponent.SoundType.Effect;
+        ExplosionSound.Clip = VindalooExplosionSound;
+        ExplosionSound.Looping = false;
+        ExplosionSound.Is3D = true;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        ExplosionSound.clip = VindalooExplosionSound;
+        ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
 
@@ -104,7 +118,7 @@ public class Vindaloo : Powerup
         emitterSmoke.DistanceFromSphereCenter = 0.7f;
         emitterSmoke.Radius = 1.7f;
         emitterGravel.SpawnAtEdge = false;
-
+        #endregion
     }
 
     public override void Update()
@@ -113,9 +127,20 @@ public class Vindaloo : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+    public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        base.Throw(camPos, force);
+        //Change for abs
+        //if (direction.y < 0)
+        //    direction.y += direction.y * -1.2f;
+        //else
+        //    direction.y += direction.y * 1.2f;
+
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+    }
+
+    public override void SaveObjectOwner(ChadControls chad)
+    {
+        ObjectOwner = chad;
     }
 
     // this function will be called upon powerup use / collision after trown
@@ -126,25 +151,33 @@ public class Vindaloo : Powerup
             return;
         activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
-        Explosion();
+        
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
-        if (localChad)
+
+        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+
+        if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
+
+        Explosion();
     }
 
     private void Explosion()
     {
         // Play the vindaloo explosion sound
-        ExplosionSound.PlayOneShot();
+        ExplosionSound.Play();
 
         emitterFire.EmitOneShot(25);
         emitterFire2.EmitOneShot(45);

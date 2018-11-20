@@ -24,7 +24,7 @@ namespace ThomasEngine.Network
 
         internal NetPacketProcessor NetPacketProcessor;
 
-        private EventBasedNetListener Listener;
+        public EventBasedNetListener Listener { get; private set; }
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
         protected NetworkEvents Events;
@@ -92,7 +92,7 @@ namespace ThomasEngine.Network
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
-
+            
             Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
 
@@ -137,6 +137,11 @@ namespace ThomasEngine.Network
             NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
         }
 
+        public void Disconnect()
+        {
+            InternalManager.DisconnectAll();
+        }
+
         #region Listners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -171,7 +176,6 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerConnectedEvent(NetPeer _peer)
         {
-
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
 
             if (NetScene.Players.Count == 0) // We are new player.
@@ -179,6 +183,7 @@ namespace ThomasEngine.Network
                 NetScene.SpawnPlayer(LocalPeer, true);
                 NetScene.SpawnPlayer(_peer, false);
                 OnPeerJoin(LocalPeer);
+                NetScene.Players[LocalPeer].WriteInitialData();
             }
             else //Someone is joining us.
             {
@@ -238,7 +243,6 @@ namespace ThomasEngine.Network
                         }
                         break;
                     case PacketType.EVENT:
-                        Debug.Log("recived events!");
                         NetPacketProcessor.ReadAllPackets(reader, peer);
                         break;
                     case PacketType.RPC:
@@ -257,7 +261,6 @@ namespace ThomasEngine.Network
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
-
             if (NetManager.PeersCount < MaxPlayers && Scene.PoolNotEmpty() /* max connections */)
                 request.AcceptIfKey("SomeConnectionKey");
             else
@@ -281,7 +284,32 @@ namespace ThomasEngine.Network
                 NetManager.PollEvents();
                 Diagnostics();
                 profile.sendSample();
+
+
+                //Check real owners.
+                //if((int)TimeSinceServerStarted % 3 == 0)
+                //{
+                //    foreach (var owners in Scene.ObjectOwners)
+                //    {
+                //        if (owners.Key != LocalPeer)
+                //        {
+                //            foreach (var identity in owners.Value)
+                //            {
+                //                if (identity.ID >= 0)
+                //                {
+                //                    SendRPC(owners.Key, -2, "RPCTempOwnerStuff", identity.ID);
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+                
             }
+        }
+
+        public void RPCTempOwnerStuff(int ID)
+        {
+            Scene.FindNetworkObject(ID).Owner = true;
         }
 
         public override void OnDestroy()
@@ -308,7 +336,6 @@ namespace ThomasEngine.Network
 
         public void SendRPC(NetPeer peer, int netID, string methodName, params object[] parameters)
         {
-            Debug.Log("Sending Peer RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);
@@ -320,7 +347,6 @@ namespace ThomasEngine.Network
 
         public void SendRPC(int netID, string methodName, params object[] parameters)
         {
-            Debug.Log("Sending RPC: " + methodName);
             NetDataWriter writer = new NetDataWriter();
 
             writer.Put((int)PacketType.RPC);

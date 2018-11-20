@@ -1,6 +1,6 @@
 #pragma once
 
-#define FRAME_BUFFERS 3
+#define FRAME_BUFFERS 2
 
 #include <d3d11_4.h>
 #include <dxgi1_4.h>

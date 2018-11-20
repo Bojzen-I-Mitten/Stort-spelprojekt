@@ -25,7 +25,7 @@ namespace thomas
 			void OnChanged();
 			void UpdateTextures();
 		private:
-
+			std::vector<Texture2D*> m_referenceTextures;//stores a comparison address
 			std::vector<Texture2D*> m_textures;
 			std::vector<unsigned> m_textureRefCount;
 

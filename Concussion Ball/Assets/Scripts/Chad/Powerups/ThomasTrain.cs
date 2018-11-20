@@ -5,6 +5,8 @@ using System.Linq;
 
 public class ThomasTrain : Powerup
 {
+    ChadControls ObjectOwner = null;
+
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterThomasFace;
     private ParticleEmitter emitterSpark;
@@ -20,35 +22,46 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipTravel { get; set; }
     public AudioClip soundClipExplosion { get; set; }
 
-    public float ExplosionRadius { get; set; } = 5.0f;
-    public float ExplosionForce { get; set; } = 200.0f;
+    public float ExplosionRadius { get; set; } = 10.0f;
+    public float ExplosionForce { get; set; } = 300.0f;
 
-    private bool playChargeUpSound;
-
+    private float soundcooldown;
 
     public override void Awake()
     {
         base.Awake();
+        BaseThrowForce = 20.0f;
+        MaxThrowForce = 36.0f;
+        ThrowForce = BaseThrowForce;
+
+        soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
+        soundComponentChargeUp.Looping = false;
+        soundComponentChargeUp.Is3D = true;
+
+        soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel.Type = SoundComponent.SoundType.Effect;
+        soundComponentTravel.Looping = false;
+        soundComponentTravel.Is3D = true;
+
+        soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
+        soundComponentExplosion.Looping = false;
+        soundComponentExplosion.Is3D = true;
+
+        soundcooldown = 0.0f;
+
+        soundComponentChargeUp.Clip = soundClipChargeUp;
+        soundComponentTravel.Clip = soundClipTravel;
+        soundComponentExplosion.Clip = soundClipExplosion;
+
+        m_throwable = true; // change depending on power-up
+
+        #region emitters
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
-
-        soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
-        soundComponentChargeUp.Looping = false;
-        soundComponentChargeUp.Is3D = true;
-        soundComponentTravel = gameObject.AddComponent<SoundComponent>();
-        soundComponentTravel.Looping = false;
-        soundComponentTravel.Is3D = true;
-        soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
-        soundComponentExplosion.Looping = false;
-        soundComponentExplosion.Is3D = true;
-    }
-
-    public override void OnEnable()
-    {
-        base.OnEnable();
-
-        m_throwable = true; // change depending on power-up
+        
         emitterFire.Texture = fireTexture;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 4.0f;
@@ -91,60 +104,55 @@ public class ThomasTrain : Powerup
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
         emitterSpark.Radius = 6.7f;
-
-        soundComponentChargeUp.Looping = false;
-        
-        soundComponentTravel.Looping = false;
-        
-        soundComponentChargeUp.clip = soundClipChargeUp;
-        soundComponentTravel.clip = soundClipTravel;
-        soundComponentExplosion.clip = soundClipExplosion;
-
-        playChargeUpSound = true;
-
+        #endregion
     }
+
 
     public override void Update()
     {
         base.Update();
+        soundcooldown -= Time.DeltaTime;
+    }
+
+    public override void SaveObjectOwner(ChadControls chad)
+    {
+        ObjectOwner = chad;
     }
 
     public override void Cleanup()
     {
-        playChargeUpSound = true;
+        base.Cleanup();
         soundComponentChargeUp.Stop();
     }
+    
 
     public override void ChargeEffect()
     {
-        if (playChargeUpSound)
+        base.ChargeEffect();
+        if (soundcooldown < 0.0f)
         {
+            soundcooldown = 1.0f;
             soundComponentChargeUp.Play();
-            playChargeUpSound = false;
         }
     }
-    // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+
+
+    public override void OnThrow()
     {
-        base.Throw(camPos, force * 2.0f);
         soundComponentTravel.Play();
+        Debug.Log("throw");
+    }
+
+    // if this is a throwable power-up this function will be called
+    public override void Throw(Vector3 camPos, Vector3 direction)
+    {
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+        
 
         m_rigidBody.UseGravity = false;
-        StartCoroutine(Scale());
+        transform.scale *= 8.0f;
     }
-
-    IEnumerator Scale()
-    {
-        transform.scale *= 3.0f;
-        yield return new WaitForSeconds(0.1f);
-        float t = 2.0f;
-        while (t > 0.0f)
-        {
-            transform.scale += new Vector3(1.0f) * Time.DeltaTime;
-            t -= Time.DeltaTime;
-            yield return null;
-        }
-    }
+   
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -157,14 +165,20 @@ public class ThomasTrain : Powerup
         Explosion();
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
-        if (localChad)
+
+        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+
+        if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
                 Vector3 forceDir = localChad.transform.position - transform.position;
+                forceDir.Normalize();
                 forceDir.y += 3.0f;
-                localChad.ActivateRagdoll(2.0f, forceDir * ExplosionForce);
+                float distForce = ExplosionRadius - distance;
+                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
             }
         }
     }
@@ -180,7 +194,7 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
-        soundComponentExplosion.PlayOneShot();
+        soundComponentExplosion.Play();
 
         StartCoroutine(KillTrain());
     }

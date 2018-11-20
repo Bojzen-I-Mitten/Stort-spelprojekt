@@ -82,6 +82,7 @@
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2DArray.cpp" />
     <ClCompile Include="src\thomas\resource\texture\TextureCube.cpp" />
+    <ClCompile Include="src\thomas\SoundManager.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\Allocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\LinearAllocator.cpp" />
     <ClCompile Include="src\thomas\utils\allocator\StackAllocator.cpp" />
@@ -108,7 +109,6 @@
     <ClCompile Include="src\thomas\Physics.cpp" />
     <ClCompile Include="src\thomas\resource\AudioClip.cpp" />
     <ClCompile Include="src\thomas\resource\Resource.cpp" />
-    <ClCompile Include="src\thomas\Sound.cpp" />
     <ClCompile Include="src\thomas\ThomasCore.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
@@ -210,6 +210,7 @@
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2DArray.h" />
     <ClInclude Include="src\thomas\resource\texture\TextureCube.h" />
+    <ClInclude Include="src\thomas\SoundManager.hpp" />
     <ClInclude Include="src\thomas\System.h" />
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
@@ -241,7 +242,6 @@
     <ClInclude Include="src\thomas\Physics.h" />
     <ClInclude Include="src\thomas\resource\AudioClip.h" />
     <ClInclude Include="src\thomas\resource\Resource.h" />
-    <ClInclude Include="src\thomas\Sound.h" />
     <ClInclude Include="src\thomas\ThomasCore.h" />
     <ClInclude Include="src\thomas\ThomasTime.h" />
     <ClInclude Include="src\thomas\utils\AssimpLoader.h" />
@@ -368,7 +368,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>$(ProjectDir)\lib\assimp.lib;$(ProjectDir)\lib\libnoise.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies>BulletCollision_Debug.lib;BulletDynamics_Debug.lib;DirectXTex_Debug.lib;DirectXTK_Debug.lib;DirectXTKAudioWin8_Debug.lib;Effects11_64_Debug.lib;LinearMath_Debug.lib;assimp_Debug.lib;zlib_Debug.lib</AdditionalDependencies>
+      <AdditionalDependencies>BulletCollision_Debug.lib;BulletDynamics_Debug.lib;DirectXTex_Debug.lib;DirectXTK_Debug.lib;DirectXTKAudioWin8_Debug.lib;Effects11_64_Debug.lib;LinearMath_Debug.lib;assimp_Debug.lib;zlib_Debug.lib;fmodstudioL64_vc.lib;fmodL64_vc.lib</AdditionalDependencies>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -418,7 +418,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp.lib;BulletCollision.lib;BulletDynamics.lib;DirectXTex.lib;DirectXTK.lib;DirectXTKAudioWin8.lib;Effects11_64.lib;LinearMath.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;BulletCollision.lib;BulletDynamics.lib;DirectXTex.lib;DirectXTK.lib;DirectXTKAudioWin8.lib;Effects11_64.lib;LinearMath.lib;zlib.lib;fmodstudio64_vc.lib;fmod64_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

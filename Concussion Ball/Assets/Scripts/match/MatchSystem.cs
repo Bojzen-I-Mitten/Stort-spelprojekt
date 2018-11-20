@@ -67,6 +67,11 @@ public class MatchSystem : NetworkManager
     public float MatchStartTime;
     [Browsable(false)]
     public bool MatchStarted { get; private set; } = false;
+
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public bool Connected { get { return InternalManager.ConnectedPeerList.Count > 0; } }
+
     public MatchSystem() : base()
     {
         Teams = new Dictionary<TEAM_TYPE, Team>();
@@ -90,11 +95,11 @@ public class MatchSystem : NetworkManager
 
        
         countdownSound = gameObject.AddComponent<SoundComponent>();
-        countdownSound.clip = countdownSoundClip;
+        countdownSound.Clip = countdownSoundClip;
         countdownSound.Looping = false;
        
         endroundSound = gameObject.AddComponent<SoundComponent>();
-        endroundSound.clip = endroundSoundClip;
+        endroundSound.Clip = endroundSoundClip;
         endroundSound.Looping = false;
         
         //StartCoroutine(ResetCoroutine(10));
@@ -123,6 +128,8 @@ public class MatchSystem : NetworkManager
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+                if (Input.GetKeyDown(Input.Keys.F10))
+                    ShowOwnedObjects();
             }
         }
 
@@ -136,6 +143,17 @@ public class MatchSystem : NetworkManager
         //    if(MatchTimeLeft % 5 == 0)
         //        SendRPC(-2, "RPCMatchInfo", MatchStartTime, GoldenGoal);
         //}
+    }
+
+    private void ShowOwnedObjects()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Owned objects:");
+        foreach(var objects in Scene.ObjectOwners[LocalPeer])
+        {
+            Debug.Log(objects.gameObject.Name);
+        }
+        Debug.Log("##################################");
     }
 
     #region Utility
@@ -166,7 +184,7 @@ public class MatchSystem : NetworkManager
         PowerupManager.ResetPowerups();
         LocalChad.Locked = true;
 
-        countdownSound.PlayOneShot();
+        //countdownSound.PlayOneShot();
 
         ChadHud.Instance.StartCountdown(duration);
         yield return new WaitForSecondsRealtime(duration);
@@ -177,7 +195,7 @@ public class MatchSystem : NetworkManager
 
     IEnumerator OnGoalCoroutine(Team teamThatScored)
     {
-        endroundSound.PlayOneShot();
+        //endroundSound.PlayOneShot();
         ChadHud.Instance.OnGoal(teamThatScored, 7.0f);
         Time.TimeScale = 0.5f;
 
@@ -191,7 +209,10 @@ public class MatchSystem : NetworkManager
 
     #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID, int team1Score, int team2Score)
+    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID,
+        int team1Score, int team2Score,
+        Color team1Color, Color team2Color,
+        string team1Name, string team2Name)
     {
         Debug.Log("matchInfo!");
         if (!MatchStarted)
@@ -201,6 +222,10 @@ public class MatchSystem : NetworkManager
             GoldenGoal = goldenGoal;
             MatchStartTime = startTime;
 
+            Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
+            Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
+            Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
+            Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
             Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
             Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
 
@@ -305,9 +330,14 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerJoin(NetPeer peer)
     {
+        if(peer == LocalPeer)
+        {
+            NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
+            np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+            Debug.Log(np.PlayerName);
+        }
         //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
-        Debug.Log("peer joined!");
         //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
         
         //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
@@ -316,7 +346,10 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log(MatchStarted);
             if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID, Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score);
+                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+                    Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
+                    Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
+                    Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
         }
     }
 
