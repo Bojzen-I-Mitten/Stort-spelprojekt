@@ -358,8 +358,8 @@ namespace thomas
 			{
 				math::Vector3 NDC = math::Vector3::Transform(position, world * GetViewMatrix() * GetProjMatrix());
 
-				NDC.x = (NDC.x + 1.0f) * 0.5 * GetViewport().width;
-				NDC.y = (1.0f - NDC.y) * 0.5 * GetViewport().height;
+				NDC.x = (NDC.x + 1.0f) * 0.5f * GetViewport().width;
+				NDC.y = (1.0f - NDC.y) * 0.5f * GetViewport().height;
 
 				return NDC;
 			}

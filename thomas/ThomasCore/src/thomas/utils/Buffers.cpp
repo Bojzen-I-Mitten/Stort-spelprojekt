@@ -95,7 +95,7 @@ namespace thomas
 				return m_buffer;
 			}
 			VertexBuffer::VertexBuffer(void * data, size_t stride, size_t count, D3D11_USAGE usageFlag): 
-				Buffer(data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride(stride)
+				Buffer(data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride((uint32_t)stride)
 			{
 			}
 			uint32_t VertexBuffer::GetStride()

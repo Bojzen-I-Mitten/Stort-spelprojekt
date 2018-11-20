@@ -681,7 +681,7 @@ namespace thomas
 					LOG("Failed to find shader: " << finalPath);
 					return E_FAIL;
 				}
-				uint32_t fileSize = fileStream.tellg();
+				uint32_t fileSize = (uint32_t)fileStream.tellg();
 
 				if (fileSize)
 				{
