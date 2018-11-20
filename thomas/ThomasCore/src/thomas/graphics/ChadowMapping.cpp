@@ -18,16 +18,15 @@ namespace thomas
 		void ShadowMap::InitStatics()
 		{
 			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowPassShader.fx");
-			s_material = std::make_unique<resource::Material>(s_shader.get()); 
-			s_matrixClamp = math::Matrix(0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f);
-			s_matrixClamp.Transpose();
+			s_material = std::make_unique<resource::Material>(s_shader.get());
 		}
 
 		ShadowMap::ShadowMap()
 		{
-			m_depthTexture = std::make_unique<resource::Texture2D>(1024, 1024, false, true);
+			unsigned size = 512;
+			m_depthTexture = std::make_unique<resource::Texture2D>(size, size, false, true);
 
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-20, 20, -20, 20, -10, 40);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 
 
 
@@ -37,8 +36,8 @@ namespace thomas
 
 			HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(m_depthTexture->GetResource(), &depthViewDesc, &m_depthStencilView);
 			
-			m_viewPort.Height = 1024;
-			m_viewPort.Width = 1024;
+			m_viewPort.Height = size;
+			m_viewPort.Width = size;
 			m_viewPort.TopLeftY = 0;
 			m_viewPort.TopLeftX = 0;
 			m_viewPort.MinDepth = 0.0f;
@@ -53,49 +52,70 @@ namespace thomas
 		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)
 		{
 			//https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/
-
-
-			/*math::Vector3 corners[8];
-			camera->GetFrustrum().GetCorners(corners);
-
-			math::Vector3 frustumCenter = math::Vector3(0, 0, 0);
-
-			for (unsigned i = 0; i < 8; ++i)
+			if (camera != nullptr)
 			{
-				frustumCenter += corners[i];
-				//math::Vector3::Transform(corners[i], m_matrixView);//transform corner into lightspace
-			}
-			frustumCenter /= 8;
+				/*math::Vector3 corners[8];
+				camera->GetFrustrum().GetCorners(corners);
 
-			const float nearClipOffset = 50.0f;
-			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 25/* (camera->GetFar() + nearClipOffset), math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+				float distance = 30.0f;
+
+				for (unsigned i = 0; i < 4; ++i)
+				{
+					math::Vector3 dir = corners[4 + i] - corners[0 + i];
+					dir.Normalize();
+					corners[4 + i] = corners[0 + i] + dir * distance;
+				}
+				
+				
+				math::Vector3 frustumCenter = math::Vector3(0, 0, 0);
+
+
+				for (unsigned i = 0; i < 8; ++i)
+				{
+					frustumCenter += corners[i];
+					//math::Vector3::Transform(corners[i], m_matrixView);//transform corner into lightspace
+				}*/
+				//frustumCenter /= 8;
+				
+				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 10.0f;
+				//const float nearClipOffset = 20.0f;
+				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward() * 10.0f, frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 			
-			for (unsigned i = 0; i < 8; ++i)
-				corners[i] = math::Vector3::Transform(corners[i], m_matrixView);
+				//for (unsigned i = 0; i < 8; ++i)
+					//corners[i] = math::Vector3::Transform(corners[i], m_matrixView);
 
-			//find extreme points
-			math::Vector3 maxes = corners[0];
-			math::Vector3 mins = corners[0];
+				//find extreme points
+				/*math::Vector3 maxes = corners[0];
+				math::Vector3 mins = corners[0];
 
-			for (int i = 0; i < 8; i++)
-			{
-				if (corners[i].x > maxes.x)
-					maxes.x = corners[i].x;
-				else if (corners[i].x < mins.x)
-					mins.x = corners[i].x;
-				if (corners[i].y > maxes.y)
-					maxes.y = corners[i].y;
-				else if (corners[i].y < mins.y)
-					mins.y = corners[i].y;
-				if (corners[i].z > maxes.z)
-					maxes.z = corners[i].z;
-				else if (corners[i].z < mins.z)
-					mins.z = corners[i].z;
+				for (int i = 0; i < 8; i++)
+				{
+					if (corners[i].x > maxes.x)
+						maxes.x = corners[i].x;
+					else if (corners[i].x < mins.x)
+						mins.x = corners[i].x;
+					if (corners[i].y > maxes.y)
+						maxes.y = corners[i].y;
+					else if (corners[i].y < mins.y)
+						mins.y = corners[i].y;
+					if (corners[i].z > maxes.z)
+						maxes.z = corners[i].z;
+					else if (corners[i].z < mins.z)
+						mins.z = corners[i].z;
+				}*/
+				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(frustumCenter.x -10, frustumCenter.x + 10, frustumCenter.y -10, frustumCenter.y + 10, frustumCenter.z - 25, frustumCenter.z + 60);
+				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, maxes.z, mins.z);
 			}
-			*/
+			else
+			{
+				m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 20/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 30);
+			}
+			
+			
 			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z - nearClipOffset, -mins.z);
-			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 30/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-60, 60, -60, 60, -10, 120);
+			
+			
 
 			m_matrixVP = m_matrixView * m_matrixProj;
 

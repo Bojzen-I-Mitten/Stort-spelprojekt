@@ -9,6 +9,7 @@ namespace thomas
 	namespace object {
 		namespace component {
 			class LightComponent;
+			class Camera;
 		}
 	}
 	namespace utils {
@@ -70,7 +71,7 @@ namespace thomas
 			static void Update();
 
 			static std::vector<object::component::LightComponent*> GetLightsCastingShadows();
-			static void DrawShadows(render::CameraRenderQueue& renderQueue);
+			static void DrawShadows(render::CameraRenderQueue& renderQueue, object::component::Camera* camera);
 			static void BindLights(render::ShaderList* shaders);
 			static void BindShadows(render::ShaderList* shaders);
 		private:

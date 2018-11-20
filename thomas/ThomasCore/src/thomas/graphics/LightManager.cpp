@@ -116,15 +116,14 @@ namespace thomas
 			return s_lights;
 		}
 
-		void LightManager::DrawShadows(render::CameraRenderQueue & renderQueue)
+		void LightManager::DrawShadows(render::CameraRenderQueue & renderQueue, object::component::Camera* camera)
 		{
 			//for each light casting shadows
 			//{
 			if (s_lights.size() == 0)
 				return;
 
-			
-			s_lights[0]->UpdateShadowBox(nullptr);
+			s_lights[0]->UpdateShadowBox(camera);
 			s_lights[0]->BindShadowMapDepthTexture();
 
 			//PROFILE("ShadowDrawObjectsPerCamera")

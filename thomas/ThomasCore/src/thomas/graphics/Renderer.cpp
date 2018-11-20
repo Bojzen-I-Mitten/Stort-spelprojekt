@@ -188,7 +188,7 @@ namespace thomas
 			{
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
-				LightManager::DrawShadows(perCameraQueue.second);
+				LightManager::DrawShadows(perCameraQueue.second, camera);
 				
 				{
 					PROFILE("CameraBind")
