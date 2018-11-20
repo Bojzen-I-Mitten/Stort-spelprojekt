@@ -183,7 +183,7 @@ namespace ThomasEngine {
 	{
 		Thomas->m_engineCommands->execute();	// Execute editor commands
 		CurrentScene->SyncScene();				// Execute scene commands
-		ProcessCommand();						// Process engine state switch commands
+		ProcessStateCommand();						// Process engine state switch commands
 
 		// Refresh frame
 		thomas::graphics::LightManager::Update();
@@ -482,7 +482,7 @@ namespace ThomasEngine {
 			s_Selection->UpdateSelectedObjects();
 	}
 
-	void ThomasWrapper::ProcessCommand()
+	void ThomasWrapper::ProcessStateCommand()
 	{
 		if (IssuedStateCommand)
 		{
@@ -494,6 +494,11 @@ namespace ThomasEngine {
 			else if (IssuedStateCommand == ThomasStateCommand::StopIssued)
 			{
 				StopPlay();
+			}
+			else if (IssuedStateCommand == ThomasStateCommand::ReplayIssued)
+			{
+				StopPlay();
+				Play();
 			}
 			IssuedStateCommand = ThomasStateCommand::NoCommand;
 			//StateCommandProcessed->Set();
@@ -573,10 +578,9 @@ namespace ThomasEngine {
 	void ThomasWrapper::IssueStateCommand(ThomasStateCommand state)
 	{
 		Monitor::Enter(StateCommandProcessed);
-		//StateCommandProcessed->Reset();
-		IssuedStateCommand = state;
+		if(IssuedStateCommand != ThomasStateCommand::NoCommand)
+			IssuedStateCommand = state;
 		Monitor::Exit(StateCommandProcessed);
-		//StateCommandProcessed->WaitOne();
 	}
 	void ThomasWrapper::IssuePlay()
 	{

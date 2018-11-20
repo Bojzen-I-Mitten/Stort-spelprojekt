@@ -23,7 +23,8 @@ namespace ThomasEngine {
 	{
 		NoCommand = 0,
 		PlayIssued,
-		StopIssued
+		StopIssued,
+		ReplayIssued
 	};
 	enum ThomasSystemMode
 	{
@@ -71,7 +72,7 @@ namespace ThomasEngine {
 
 		static void Play();
 		static void StopPlay();
-		static void ProcessCommand();
+		static void ProcessStateCommand();
 		static void SynchronousExecution();
 
 		static void DumpProfilerLog(System::Object^ stateInfo);
@@ -120,11 +121,22 @@ namespace ThomasEngine {
 		{
 			Scene^ get();
 		}
+		/* Enter a lock synchonizing state with thomas logic loop, use with care (inefficient).
+		 * Lock can be disabled by undef _THOMAS_SCENE_LOCK
+		*/
 		static void ENTER_SYNC_STATELOCK();
+		/* Exit the synchronous state lock
+		*/
 		static void EXIT_SYNC_STATELOCK();
 		static void IssueCommand(ICommand^ cmd);
+		/* Issue a specific state switch command to thomas
+		*/
 		static void IssueStateCommand(ThomasStateCommand cmd);
+		/* Issue a play state command to thomas
+		*/
 		static void IssuePlay();
+		/* Issue a stop playing state command to thomas
+		*/
 		static void IssueStopPlay();
 
 
