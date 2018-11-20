@@ -84,27 +84,29 @@ public class ChadHud : ScriptComponent
             TimerBG.scale = new Vector2(0.6f, 0.7f);
             TimerBG.color = Color.GhostWhite;
             TimerBG.depth = 0.9f;
+
+            //Left of the timer
+            if (ScoreBGTexture != null)
+            {
+                Score1BG = Canvas.Add(ScoreBGTexture);
+                Score1BG.origin = new Vector2(0.5f, 0);
+                Score1BG.position = TimerBG.position - new Vector2((TimerBG.size.x + Score1BG.size.x) / 2 , 0);
+                Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+                Score1BG.depth = 1;
+                Score1BG.scale = new Vector2(1, 0.7f);
+                Score1BG.flip = new Vector2(0, 1);
+
+                //Right of the timer
+                Score2BG = Canvas.Add(ScoreBGTexture);
+                Score2BG.origin = new Vector2(0.5f, 0); //for clarity
+                Score2BG.position = TimerBG.position + new Vector2((TimerBG.size.x + Score1BG.size.x) / 2, 0);
+                Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+                Score2BG.depth = 1;
+                Score2BG.scale = new Vector2(1, 0.7f);
+            }
         }
 
-        //Left of the timer
-        if (ScoreBGTexture != null)
-        {
-            Score1BG = Canvas.Add(ScoreBGTexture);
-            Score1BG.origin = new Vector2(0.5f, 0);
-            Score1BG.position = new Vector2(0.4175f, 0);
-            Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-            Score1BG.depth = 1;
-            Score1BG.scale = new Vector2(1, 0.7f);
-            Score1BG.flip = new Vector2(0, 1);
-
-            //Right of the timer
-            Score2BG = Canvas.Add(ScoreBGTexture);
-            Score2BG.origin = new Vector2(0.5f, 0);
-            Score2BG.position = new Vector2(0.5825f, 0f);
-            Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
-            Score2BG.depth = 1;
-            Score2BG.scale = new Vector2(1, 0.7f);
-        }
+        
 
         Score1 = Canvas.Add("");
         Score1.scale = new Vector2(1.6f);
@@ -385,8 +387,17 @@ public class ChadHud : ScriptComponent
             HideHeldObjectText();
             DeactivateAimHUD();
         }
-            
 
+
+        if (BallArrow != null)
+        {
+            Color color;
+            if (Ball?._Chad)
+                color = Ball._Chad.NetPlayer.Team.Color;
+            else
+                color = Color.White;
+            BallArrow.color = color;
+        }
     }
 
     public override void OnEnable()
@@ -410,18 +421,22 @@ public class ChadHud : ScriptComponent
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;
             screenPos -= screenCenter;
 
-            //flip coordinates if more than 90 deg away
+            //flip coordinates if more than 90 deg away, makes the math easier and easier to understand
             if (screenPos.z > 1)
+            {
                 screenPos *= -1;
 
+                //make sure the arrow is above (or below) chad if the ball is above (or below) him
+                int sign = 1;
+                if (MatchSystem.instance && MatchSystem.instance.MatchStarted)
+                {
+                    sign = Math.Sign(MatchSystem.instance.LocalChad.transform.position.y + 1.8f/*chad height?*/ - Ball.transform.position.y);
+                }
+
+                screenPos.y = Math.Abs(screenPos.y) * sign;
+            }
+
             Vector3 screenBounds = screenCenter;
-
-            int sign = 1;
-            if (MatchSystem.instance && MatchSystem.instance.MatchStarted)
-                 sign = Math.Sign(MatchSystem.instance.LocalChad.transform.position.y - transform.position.y);
-
-            screenPos.y = Math.Abs(screenPos.y) * sign;
-
             float angle = (float)Math.Atan2(-screenPos.y, screenPos.x);
             angle -= MathHelper.PiOver2;
 
