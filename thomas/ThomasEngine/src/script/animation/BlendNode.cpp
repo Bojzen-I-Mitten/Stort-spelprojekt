@@ -10,7 +10,7 @@
 #pragma managed
 #include "../../Debug.h"
 #include "PlaybackNode.h"
-
+#include "PlaybackHandle.h"
 
 namespace ThomasEngine
 {
@@ -94,6 +94,27 @@ namespace ThomasEngine
 				if (p)
 					p->getPlayback()->m_elapsedTime = 0.f;
 			}
+		}
+
+		thomas::graphics::animation::AnimationNode * BlendNode::getNodeAtIndex(uint32_t node_index)
+		{
+			return m_node->getAnimNode(node_index);
+		}
+
+		PlaybackHandle ^ BlendNode::tryGetPlayback(uint32_t node_index)
+		{
+			using namespace thomas::graphics::animation;
+			AnimationNode* node = getNodeAtIndex(node_index);
+			if (!node)
+				return nullptr;
+			AnimPlayback* playback = dynamic_cast<AnimPlayback*>(node);
+			if (!playback)
+				return nullptr;
+			BaseAnimationTime* t = dynamic_cast<BaseAnimationTime*>(playback->getPlayback());
+			if (!t)
+				return nullptr;
+			// Yay...
+			return gcnew PlaybackHandle(t);
 		}
 
 		thomas::graphics::animation::AnimationNode * BlendNode::Native()

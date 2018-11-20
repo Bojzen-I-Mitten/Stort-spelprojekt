@@ -13,6 +13,7 @@ namespace ThomasEngine
 	{
 
 		ref class PlaybackNode;
+		ref class PlaybackHandle;
 
 		public ref class BlendNode {
 		private:
@@ -35,6 +36,13 @@ namespace ThomasEngine
 			WeightHandle^ getWeightHandle();
 
 			void ResetPlayback();
+
+			/* Get a animation node from index
+			*/
+			thomas::graphics::animation::AnimationNode* getNodeAtIndex(uint32_t node_index);
+			/* Try get a playback handle. Returns null if node is NULL or not a playback handle
+			*/
+			PlaybackHandle^ tryGetPlayback(uint32_t node_index);
 			
 		private:
 
