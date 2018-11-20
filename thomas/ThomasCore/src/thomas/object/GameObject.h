@@ -67,15 +67,14 @@ namespace thomas
 			void SetMoveStaticGroup(bool state);
 			bool GetMoveStaticGroup();
 
+			void appendComponent(component::Component* existing_comp);
 			/* Remove the component referenced to in the pointer.
 			 comp_ptr	<<	Component to remove
 			 return		>>	0 if component was found and removed.
 			*/
 			int RemoveComponent(void * comp_ptr);
-		public:
 			component::Transform* GetTransform();
 			const std::vector<component::Component*>& getComponents();
-		protected:
 			void SetTransform(component::Transform* t);
 		private:
 			std::vector<component::Component*> m_components;

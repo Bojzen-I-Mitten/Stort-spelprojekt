@@ -39,7 +39,7 @@ namespace ThomasEngine {
 		Tag = "";
 		Layer = 0;
 		m_transform = AddComponent<Transform^>();
-		((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
+		((thomas::object::GameObject*)nativePtr)->SetTransform((thomas::object::component::Transform*)m_transform->nativePtr);
 
 		// Add to scene
 		ThomasWrapper::CurrentScene->CreateObject(this);
@@ -82,6 +82,7 @@ namespace ThomasEngine {
 
 	void GameObject::PostLoad(Scene^ scene)
 	{
+		CleanComponents();
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 	}
 
@@ -364,7 +365,7 @@ namespace ThomasEngine {
 	GameObject^ GameObject::CreateEmptyPrefab() {
 		GameObject^ newGobj = gcnew GameObject();
 		Transform^ t = newGobj->AddComponent<Transform^>();
-		((thomas::object::GameObject*)newGobj->nativePtr)->m_transform = (thomas::object::component::Transform*)t->nativePtr;
+		((thomas::object::GameObject*)newGobj->nativePtr)->SetTransform((thomas::object::component::Transform*)t->nativePtr);
 		return newGobj;
 	}
 	
@@ -579,7 +580,7 @@ namespace ThomasEngine {
 		if (value)
 		{
 			m_transform = value;
-			((thomas::object::GameObject*)nativePtr)->m_transform = (thomas::object::component::Transform*)m_transform->nativePtr;
+			((thomas::object::GameObject*)nativePtr)->SetTransform((thomas::object::component::Transform*)m_transform->nativePtr);
 		}
 	}
 

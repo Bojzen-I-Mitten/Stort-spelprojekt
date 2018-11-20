@@ -238,6 +238,11 @@ namespace thomas
 			return m_moveStaticGroup;
 		}
 
+		void GameObject::appendComponent(component::Component * comp)
+		{
+			m_components.push_back(comp);
+		}
+
 		UINT GameObject::GetNewGroupID()
 		{
 			return new_GroupID;

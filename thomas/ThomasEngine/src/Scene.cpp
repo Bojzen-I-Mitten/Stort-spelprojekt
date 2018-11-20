@@ -297,24 +297,24 @@ namespace ThomasEngine
 
 	Vector3 Scene::CameraPosition::get() 
 	{
-		return Utility::Convert(thomas::editor::EditorCamera::Instance()->m_transform->GetLocalPosition());
+		return Utility::Convert(thomas::editor::EditorCamera::Instance()->GetTransform()->GetLocalPosition());
 	}
 
 	void Scene::CameraPosition::set(Vector3 pos) 
 	{
 
-		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalPosition(Utility::Convert(pos));
+		thomas::editor::EditorCamera::Instance()->GetTransform()->SetLocalPosition(Utility::Convert(pos));
 	}
 
 	Vector3 Scene::CameraEuler::get() 
 	{
-		return Utility::Convert(thomas::editor::EditorCamera::Instance()->m_transform->GetLocalEulerAngles());
+		return Utility::Convert(thomas::editor::EditorCamera::Instance()->GetTransform()->GetLocalEulerAngles());
 	}
 
 	void Scene::CameraEuler::set(Vector3 euler) 
 	{
 
-		thomas::editor::EditorCamera::Instance()->m_transform->SetLocalRotation(euler.y, euler.x, euler.z);
+		thomas::editor::EditorCamera::Instance()->GetTransform()->SetLocalRotation(euler.y, euler.x, euler.z);
 	}
 #ifdef _EDITOR
 	IEnumerable<GameObject^>^ Scene::GameObjectsSynced::get()
