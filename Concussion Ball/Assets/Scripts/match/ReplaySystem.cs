@@ -13,7 +13,7 @@ public class ReplaySystem : ScriptComponent
         public float timestamp;
         public NetDataReader reader;
     }
-    public float durationInSeconds = 10.0f;
+    public float durationInSeconds { get; set; } = 10.0f;
     public float saveInterval = 0.1f;
     public float initialStateInterval = 1.0f;
     float timeSinceLastSave = 0.1f;

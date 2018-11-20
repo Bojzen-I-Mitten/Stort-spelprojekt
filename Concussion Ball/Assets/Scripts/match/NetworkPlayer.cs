@@ -59,8 +59,11 @@ public class NetworkPlayer : NetworkComponent
             else
                 position = rb.Position + new Vector3(0, textOffset, 0);
 
+            nameCanvas.isRendering = true;
             nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
         }
+        else
+            nameCanvas.isRendering = false;
 
 
         if (transform.position.y < BottomOfTheWorld)

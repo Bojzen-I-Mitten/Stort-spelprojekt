@@ -207,10 +207,7 @@ public class MatchSystem : NetworkManager
         yield return new WaitForSecondsRealtime(3.0f);
         Time.TimeScale = 1.0f;
         ReplaySystem.StartReplay(teamThatScored);
-        while (ReplaySystem.Replaying)
-        {
-            yield return null;
-        }
+        yield return new WaitForSecondsRealtime(ReplaySystem.durationInSeconds + 1.0f);
         ReplaySystem.recordGame = true;
         OnRoundEnd();
         OnRoundStart();

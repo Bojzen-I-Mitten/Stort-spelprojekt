@@ -49,8 +49,8 @@ public class CameraMaster : ScriptComponent
 
     public void StopReplay()
     {
-        ChadCam.enabled = true;
-        SpectatorCam.enabled = false;
+        //ChadCam.enabled = true;
+        //SpectatorCam.enabled = false;
     }
 
     public override void Start()
