@@ -97,7 +97,7 @@ namespace thomas
 							inputSemantics.push_back(semantic);
 						}
 
-						HRESULT result = utils::D3D::Instance()->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
+						HRESULT result = utils::D3D::Instance()->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], (uint32_t)inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
 						pass.inputSemantics = inputSemantics;
 						if (result != S_OK)
 						{
@@ -231,7 +231,7 @@ namespace thomas
 		}
 		void Shader::BindVertexBuffer(utils::buffers::VertexBuffer* buffer)
 		{
-			UINT stride = buffer->GetStride();
+			UINT stride = (uint32_t)buffer->GetStride();
 			ID3D11Buffer* buff = buffer->GetBuffer();
 			UINT offset = 0;
 			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
@@ -250,7 +250,7 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 

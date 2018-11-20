@@ -120,7 +120,7 @@ namespace thomas {
 				return _skin.data();
 			}
 			unsigned int AnimatedSkeleton::boneCount() const {
-				return _pose.size();
+				return (uint32_t)_pose.size();
 			}
 
 			/* Get the local matrix of a bone

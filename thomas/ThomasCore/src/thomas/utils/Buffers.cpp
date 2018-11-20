@@ -11,12 +11,12 @@ namespace thomas
 			Buffer::Buffer(void * data, size_t size, D3D11_BIND_FLAG bindFlag, D3D11_USAGE usageFlag, size_t structureByteStride, D3D11_RESOURCE_MISC_FLAG miscFlag) : m_size(size), m_bindFlag(bindFlag)
 			{
 				D3D11_BUFFER_DESC bufferDesc;
-				bufferDesc.ByteWidth = size;
+				bufferDesc.ByteWidth = (uint32_t)size;
 				bufferDesc.Usage = usageFlag; 
 				bufferDesc.BindFlags = bindFlag;
 				bufferDesc.CPUAccessFlags = usageFlag == DYNAMIC_BUFFER ? D3D11_CPU_ACCESS_WRITE : 0; //CPU if dynamic
 				bufferDesc.MiscFlags = miscFlag;
-				bufferDesc.StructureByteStride = structureByteStride;
+				bufferDesc.StructureByteStride = (uint32_t)structureByteStride;
 				
 				D3D11_SUBRESOURCE_DATA InitData;
 				InitData.pSysMem = data;
@@ -98,13 +98,13 @@ namespace thomas
 				Buffer(data, stride*count, D3D11_BIND_VERTEX_BUFFER, usageFlag), m_stride(stride)
 			{
 			}
-			size_t VertexBuffer::GetStride()
+			uint32_t VertexBuffer::GetStride()
 			{
 				return m_stride;
 			}
 			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : 
 				Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag),
-				m_indexCount(count)
+				m_indexCount((uint32_t)count)
 			{
 
 			}
@@ -121,10 +121,10 @@ namespace thomas
 				{
 					D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 
-					desc.Buffer.ElementWidth = stride;
+					desc.Buffer.ElementWidth = (uint32_t)stride;
 					desc.Buffer.ElementOffset = 0;
 					desc.Buffer.FirstElement = 0;
-					desc.Buffer.NumElements = count;
+					desc.Buffer.NumElements = (uint32_t)count;
 					desc.Format = DXGI_FORMAT_UNKNOWN;
 					desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 
@@ -138,7 +138,7 @@ namespace thomas
 					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 					uavDesc.Buffer.FirstElement = 0;
 					uavDesc.Buffer.Flags = uavFlag;
-					uavDesc.Buffer.NumElements = count;
+					uavDesc.Buffer.NumElements = (uint32_t)count;
 					uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
@@ -187,7 +187,7 @@ namespace thomas
 				{
 					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 					srvDesc.BufferEx.FirstElement = 0;
-					srvDesc.BufferEx.NumElements = count;
+					srvDesc.BufferEx.NumElements = (uint32_t)count;
 					srvDesc.BufferEx.Flags = D3D11_BUFFEREX_SRV_FLAG_RAW;
 					srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
@@ -202,7 +202,7 @@ namespace thomas
 					D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 					uavDesc.Buffer.FirstElement = 0;
 					uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_RAW;
-					uavDesc.Buffer.NumElements = count;
+					uavDesc.Buffer.NumElements = (uint32_t)count;
 					uavDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 					uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 

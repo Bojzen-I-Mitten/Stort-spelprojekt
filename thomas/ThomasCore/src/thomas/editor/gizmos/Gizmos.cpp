@@ -352,7 +352,7 @@ namespace thomas
 		}
 		void Gizmos::DrawLines(std::vector<math::Vector3> lines, D3D_PRIMITIVE_TOPOLOGY topology)
 		{
-			DrawLines(lines.data(), lines.size(), topology);
+			DrawLines(lines.data(), (uint32_t)lines.size(), topology);
 		}
 		
 		void Gizmos::DrawLines(math::Vector3* lines, uint32_t num, D3D_PRIMITIVE_TOPOLOGY topology)

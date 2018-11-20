@@ -88,7 +88,7 @@ namespace thomas {
 			}
 
 			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3D::Instance()->CreateTextureArray((void**)initData.data(), m_width, m_height, initData.size(), m_format, textureInterface, m_srv, true, 1);
+			utils::D3D::Instance()->CreateTextureArray((void**)initData.data(), m_width, m_height, (int)initData.size(), m_format, textureInterface, m_srv, true, 1);
 			m_resource = textureInterface;
 		}
 	}

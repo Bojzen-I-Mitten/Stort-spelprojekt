@@ -480,7 +480,7 @@ namespace thomas
 
 			aiMatrix4x4 nodeTransform = node->mTransformation;
 			aiMatrix4x4 object_space = parentTransform * nodeTransform;
-			size_t BoneIndex = boneMap.m_boneInfo.size();
+			uint32_t BoneIndex = (uint32_t)boneMap.m_boneInfo.size();
 			boneMap.m_boneInfo.push_back(graphics::animation::Bone()); // Reserve empty slot, allocate at end
 
 			bool marked = false;

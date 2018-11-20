@@ -578,7 +578,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::IssueStateCommand(ThomasStateCommand state)
 	{
 		Monitor::Enter(StateCommandProcessed);
-		if(IssuedStateCommand != ThomasStateCommand::NoCommand)
+		if(IssuedStateCommand == ThomasStateCommand::NoCommand)
 			IssuedStateCommand = state;
 		Monitor::Exit(StateCommandProcessed);
 	}

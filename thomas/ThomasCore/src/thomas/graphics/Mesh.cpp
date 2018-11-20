@@ -66,7 +66,7 @@ namespace thomas
 
 		unsigned int Mesh::GetVertexCount() const
 		{
-			return m_data.vertices.positions.size();
+			return (uint32_t)m_data.vertices.positions.size();
 		}
 
 		Vertices & Mesh::GetVertices()

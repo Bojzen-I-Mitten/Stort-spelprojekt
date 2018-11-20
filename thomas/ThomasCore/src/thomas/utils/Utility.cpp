@@ -36,7 +36,7 @@ namespace thomas {
 			return value;
 		}
 		uint32_t hash(const std::string &str) {
-			return hash(str.c_str(), str.length());
+			return hash(str.c_str(), (uint32_t)str.length());
 		}
 	}
 }

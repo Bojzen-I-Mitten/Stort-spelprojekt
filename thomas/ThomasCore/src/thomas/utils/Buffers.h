@@ -73,9 +73,9 @@ namespace thomas
 					Buffer::SetData(data, numVertex * sizeof(T));
 				}
 
-				size_t GetStride();
+				uint32_t GetStride();
 			private:
-				size_t m_stride;
+				uint32_t m_stride;
 			};
 
 
@@ -88,10 +88,10 @@ namespace thomas
 					IndexBuffer(data.data(), data.size(), usageFlag)
 				{};
 
-				size_t IndexCount() { return m_indexCount; }
+				uint32_t IndexCount() { return m_indexCount; }
 
 			private:
-				size_t m_indexCount;
+				uint32_t m_indexCount;
 			};
 
 			class StructuredBuffer : public Buffer

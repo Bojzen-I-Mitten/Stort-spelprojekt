@@ -98,16 +98,16 @@ namespace thomas
 			}
 			
 			//Create bottom of sphere
-			for (unsigned p = sphereVerts.size() - verticalLines; p < sphereVerts.size(); ++p)
+			for (unsigned p = (uint32_t)sphereVerts.size() - verticalLines; p < sphereVerts.size(); ++p)
 			{
-				sphereIndices.push_back(sphereVerts.size() - 1);
+				sphereIndices.push_back((uint32_t)sphereVerts.size() - 1);
 				sphereIndices.push_back(p - 1);
 				sphereIndices.push_back(p);
 				
 			}
-			sphereIndices.push_back(sphereVerts.size() - 1);
-			sphereIndices.push_back(sphereVerts.size() - 2);
-			sphereIndices.push_back(sphereVerts.size() - 1 - verticalLines);
+			sphereIndices.push_back((uint32_t)sphereVerts.size() - 1);
+			sphereIndices.push_back((uint32_t)sphereVerts.size() - 2);
+			sphereIndices.push_back((uint32_t)sphereVerts.size() - 1 - verticalLines);
 			m_vertBuffer = std::unique_ptr<utils::buffers::VertexBuffer>(
 				new utils::buffers::VertexBuffer(sphereVerts));
 			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(sphereIndices);

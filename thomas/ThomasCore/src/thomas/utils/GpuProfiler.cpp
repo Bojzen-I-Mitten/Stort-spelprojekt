@@ -228,7 +228,7 @@ namespace thomas
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()
 			{
-				return m_drawCalls;
+				return (int)m_drawCalls;
 			}
 
 			size_t profiling::GpuProfiler::GetVertexCount()

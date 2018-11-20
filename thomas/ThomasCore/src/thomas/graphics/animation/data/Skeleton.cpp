@@ -50,7 +50,7 @@ namespace thomas {
 				return false;
 			}
 			unsigned int Skeleton::getNumBones() const {
-				return m_bones.size();
+				return (uint32_t)m_bones.size();
 			}
 			math::Matrix Skeleton::getRoot()
 			{
