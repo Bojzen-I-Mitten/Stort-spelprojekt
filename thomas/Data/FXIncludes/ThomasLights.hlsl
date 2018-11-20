@@ -93,11 +93,16 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         
         float4 sampleCoordLS = WorldToLightClipPos(worldPos);
         sampleCoordLS.xyz /= sampleCoordLS.w;
-        sampleCoordLS.x = (sampleCoordLS.x + 1.0f) / 2.0f;
-        sampleCoordLS.y = 1.0 - (sampleCoordLS.y + 1.0f) / 2.0f;
+        sampleCoordLS.x = sampleCoordLS.x *0.5 + 0.5;
+        sampleCoordLS.y = 0.5 - sampleCoordLS.y *0.5;
         
-        float shadowFactor = 1.0 - (float) (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy).x < sampleCoordLS.z - 0.0005)*0.85;
+        float shadowFactor = 1.0;
         
+        float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
+        for (int si = 0; si < 4; ++si)
+        {
+            shadowFactor -= (float) (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy + poissonDisk[si]/700.0).x < sampleCoordLS.z - 0.0005) * 0.15;
+        }
 
         lightMultiplyer = lights[i].intensity * shadowFactor;
         Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
