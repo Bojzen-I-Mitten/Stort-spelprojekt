@@ -12,22 +12,50 @@ public class GUIHostMenu : ScriptComponent
     public Texture2D WhiteBoxTexture { get; set; }
     public Font Font { get; set; }
 
+    //public Vector2 _ServerNamePos { get; set; }          = new Vector2(0.0f, 0.4f);
+    //public Vector2 _ServerNameStringPos { get; set; }    = new Vector2(0.0f, 0.4f);
+    //public Vector2 _ServerNameBoxPos { get; set; }       = new Vector2(0.0f, 0.4f);
+
+    //public Vector2 _MaxPlayersPos { get; set; }          = new Vector2(0.0f, 0.4f);
+    //public Vector2 _MaxPlayersStringPos { get; set; }    = new Vector2(0.0f, 0.4f);
+    //public Vector2 _MaxPlayersBoxPos { get; set; }       = new Vector2(0.0f, 0.4f);
+
+    //public Vector2 _TimeRoundPos { get; set; }           = new Vector2(0.0f, 0.4f);
+    //public Vector2 _TimeRoundStringPos { get; set; }     = new Vector2(0.0f, 0.4f);
+    //public Vector2 _TimeRoundBoxPos { get; set; }        = new Vector2(0.0f, 0.4f);
+
+    //public Vector2 _PublicServerPos { get; set; }        = new Vector2(0.0f, 0.4f);
+    //public Vector2 _PublicServerCheckPos { get; set; }   = new Vector2(0.0f, 0.4f);
+    //public Vector2 _PublicServerBoxPos { get; set; }     = new Vector2(0.0f, 0.4f);
+
+    //public Vector2 _ScoreLimitPos { get; set; }          = new Vector2(0.0f, 0.4f);
+    //public Vector2 _ScoreLimitStringPos { get; set; }    = new Vector2(0.0f, 0.4f);
+    //public Vector2 _ScoreLimitBoxPos { get; set; }       = new Vector2(0.0f, 0.4f);
+
+    //public Vector2 _PowerUpsPos { get; set; }            = new Vector2(0.0f, 0.4f);
+    //public Vector2 _PowerUpsCheckPos { get; set; }       = new Vector2(0.0f, 0.4f);
+    //public Vector2 _PowerUpsBoxPos { get; set; }         = new Vector2(0.0f, 0.4f);
+
     Text HostBtn;
     Text ExitBtn;
 
     #region Host Setings
+    Text HostOptions;
     Image HostBg;
 
     Text ServerName;
     Text ServerNameString;
+    string _ServerNameString = "My server";
     Image ServerNameBox;
 
     Text MaxPlayers;
     Text MaxPlayersString;
-    Image MaxPlayerBox;
+    string _MaxPlayersString = "8";
+    Image MaxPlayersBox;
 
     Text TimeRound;
     Text TimeRoundString;
+    string _TimeRoundString = "5";
     Image TimeRoundBox;
 
     Text PublicServer;
@@ -36,6 +64,7 @@ public class GUIHostMenu : ScriptComponent
 
     Text ScoreLimit;
     Text ScoreLimitString;
+    string _ScoreLimitString = "10";
     Image ScoreLimitBox;
 
     Text PowerUps;
@@ -94,6 +123,12 @@ public class GUIHostMenu : ScriptComponent
 
         #region Host Setings
 
+        HostOptions = Canvas.Add("Host Options");
+        HostOptions.position = new Vector2(0.5f, 0f);
+        HostOptions.origin = new Vector2(0.5f, 0.0f);
+        HostOptions.font = Font;
+        HostOptions.color = Color.FloralWhite;
+
         if (WhiteBoxTexture != null)
         {
             HostBg = Canvas.Add(WhiteBoxTexture);
@@ -102,6 +137,7 @@ public class GUIHostMenu : ScriptComponent
             HostBg.depth = 0.7f;
         }
 
+        #region Color Check
         SimilarColor = Canvas.Add("Teams have similar color, can't host");
         SimilarColor.position = new Vector2(0.5f, 0.52f);
         SimilarColor.origin = new Vector2(0.5f);
@@ -109,7 +145,9 @@ public class GUIHostMenu : ScriptComponent
         SimilarColor.scale = Vector2.Zero;
         SimilarColor.font = Font;
         SimilarColor.depth = 0;
+        #endregion
 
+        #region Name Check
         SameName = Canvas.Add("Teams have same name, can't host");
         SameName.position = new Vector2(0.5f, 0.58f);
         SameName.origin = new Vector2(0.5f);
@@ -117,6 +155,168 @@ public class GUIHostMenu : ScriptComponent
         SameName.scale = Vector2.Zero;
         SameName.font = Font;
         SameName.depth = 0;
+        #endregion
+
+        float column1 = 0f;
+        float column2 = 0.14f;
+        float column3 = 0.35f;
+        float column4 = 0.47f;
+
+        float row1 = 0.07f;
+        float row2 = 0.14f;
+        float row3 = 0.21f;
+
+        #region Server Name
+        ServerName = Canvas.Add("Server name:");
+        ServerName.position = new Vector2(column1, row1);
+        ServerName.scale = new Vector2(0.5f);
+        ServerName.color = Color.FloralWhite;
+        ServerName.font = Font;
+        ServerName.depth = 0.4f;
+
+        ServerNameString = Canvas.Add(_ServerNameString);
+        ServerNameString.position = new Vector2(column2, row1);
+        ServerNameString.scale = new Vector2(0.5f);
+        ServerNameString.color = Color.FloralWhite;
+        ServerNameString.font = Font;
+        ServerNameString.depth = 0.4f;
+
+        if (TextBoxTexture != null)
+        {
+            ServerNameBox = Canvas.Add(TextBoxTexture);
+            ServerNameBox.position = new Vector2(column2, row1);
+            ServerNameBox.scale = new Vector2(0.5f);
+            ServerNameBox.color = Color.FloralWhite;
+            ServerNameBox.interactable = true;
+            ServerNameBox.depth = 0.5f;
+
+        }
+        #endregion
+
+        #region Max Players
+        MaxPlayers = Canvas.Add("Max players:");
+        MaxPlayers.position = new Vector2(column1, row2);
+        MaxPlayers.scale = new Vector2(0.5f);
+        MaxPlayers.color = Color.FloralWhite;
+        MaxPlayers.font = Font;
+        MaxPlayers.depth = 0.4f;
+
+        MaxPlayersString = Canvas.Add(_MaxPlayersString);
+        MaxPlayersString.position = new Vector2(column2, row2);
+        MaxPlayersString.scale = new Vector2(0.5f);
+        MaxPlayersString.color = Color.FloralWhite;
+        MaxPlayersString.font = Font;
+        MaxPlayersString.depth = 0.4f;
+
+        if (TextBoxTexture != null)
+        {
+            MaxPlayersBox = Canvas.Add(TextBoxTexture);
+            MaxPlayersBox.position = new Vector2(column2, row2);
+            MaxPlayersBox.scale = new Vector2(0.5f);
+            MaxPlayersBox.interactable = true;
+            MaxPlayersBox.depth = 0.5f;
+        }
+        #endregion
+
+        #region Time Round
+        TimeRound = Canvas.Add("Time per round:");
+        TimeRound.position = new Vector2(column1, row3);
+        TimeRound.scale = new Vector2(0.5f);
+        TimeRound.color = Color.FloralWhite;
+        TimeRound.font = Font;
+        TimeRound.depth = 0.4f;
+
+        TimeRoundString = Canvas.Add(_TimeRoundString);
+        TimeRoundString.position = new Vector2(column2, row3);
+        TimeRoundString.scale = new Vector2(0.5f);
+        TimeRoundString.color = Color.FloralWhite;
+        TimeRoundString.font = Font;
+        TimeRoundString.depth = 0.4f;
+
+        if (TextBoxTexture != null)
+        {
+            TimeRoundBox = Canvas.Add(TextBoxTexture);
+            TimeRoundBox.position = new Vector2(column2, row3);
+            TimeRoundBox.scale = new Vector2(0.5f);
+            TimeRoundBox.interactable = true;
+            TimeRoundBox.depth = 0.5f;
+        }
+        #endregion
+
+        #region Public Server
+        PublicServer = Canvas.Add("Public server:");
+        PublicServer.position = new Vector2(column3, row1);
+        PublicServer.scale = new Vector2(0.5f);
+        PublicServer.color = Color.FloralWhite;
+        PublicServer.font = Font;
+        PublicServer.depth = 0.4f;
+
+        PublicServerCheck = Canvas.Add("X");
+        PublicServerCheck.position = new Vector2(column4, row1);
+        PublicServerCheck.scale = new Vector2(0.5f);
+        PublicServerCheck.color = Color.Black;
+        PublicServerCheck.font = Font;
+        PublicServerCheck.depth = 0.4f;
+
+        if (WhiteBoxTexture != null)
+        {
+            PublicServerBox = Canvas.Add(WhiteBoxTexture);
+            PublicServerBox.position = new Vector2(column4, row1);
+            PublicServerBox.scale = new Vector2(0.1f);
+            PublicServerBox.interactable = true;
+            PublicServerBox.depth = 0.5f;
+        }
+        #endregion
+
+        #region Score limit
+        ScoreLimit = Canvas.Add("Score Limit:");
+        ScoreLimit.position = new Vector2(column3, row2);
+        ScoreLimit.scale = new Vector2(0.5f);
+        ScoreLimit.color = Color.FloralWhite;
+        ScoreLimit.font = Font;
+        ScoreLimit.depth = 0.4f;
+
+        ScoreLimitString = Canvas.Add(_ScoreLimitString);
+        ScoreLimitString.position = new Vector2(column4, row2);
+        ScoreLimitString.scale = new Vector2(0.5f);
+        ScoreLimitString.color = Color.FloralWhite;
+        ScoreLimitString.font = Font;
+        ScoreLimitString.depth = 0.4f;
+
+        if (TextBoxTexture != null)
+        {
+            ScoreLimitBox = Canvas.Add(TextBoxTexture);
+            ScoreLimitBox.position = new Vector2(column4, row2);
+            ScoreLimitBox.scale = new Vector2(0.5f);
+            ScoreLimitBox.interactable = true;
+            ScoreLimitBox.depth = 0.5f;
+        }
+        #endregion
+
+        #region Power Ups
+        PowerUps = Canvas.Add("Power ups:");
+        PowerUps.position = new Vector2(column3, row3);
+        PowerUps.scale = new Vector2(0.5f);
+        PowerUps.color = Color.FloralWhite;
+        PowerUps.font = Font;
+        PowerUps.depth = 0.4f;
+
+        PowerUpsCheck = Canvas.Add("X");
+        PowerUpsCheck.position = new Vector2(column4, row3);
+        PowerUpsCheck.scale = new Vector2(0.5f);
+        PowerUpsCheck.color = Color.Black;
+        PowerUpsCheck.font = Font;
+        PowerUpsCheck.depth = 0.4f;
+
+        if (WhiteBoxTexture != null)
+        {
+            PowerUpsBox = Canvas.Add(WhiteBoxTexture);
+            PowerUpsBox.position = new Vector2(column4, row3);
+            PowerUpsBox.scale = new Vector2(0.1f);
+            PowerUpsBox.interactable = true;
+            PowerUpsBox.depth = 0.5f;
+        }
+        #endregion
 
         #endregion
 
@@ -177,13 +377,13 @@ public class GUIHostMenu : ScriptComponent
         {
             Team1SliderKnob = Canvas.Add(SliderKnobTexture);
             Team1SliderKnob.position = team1SliderKnobPos;
-            Team1SliderKnob.origin = new Vector2(0.5f);
-            Team1SliderKnob.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+            Team1SliderKnob.origin = new Vector2(0.5f, 0.0f);
+            //Team1SliderKnob.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
 
             Team2SliderKnob = Canvas.Add(SliderKnobTexture);
-            Team2SliderKnob.position = team2SliderKnobPos + Team2ColorSlider.size * new Vector2(0.66f, 0);
-            Team2SliderKnob.origin = new Vector2(0.5f);
-            Team2SliderKnob.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+            Team2SliderKnob.position = team2SliderKnobPos + Team2ColorSlider.size * new Vector2(0.66f, 0);  //+... Is to offset it to blue color. Derp.
+            Team2SliderKnob.origin = new Vector2(0.5f, 0.0f);
+            //Team2SliderKnob.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
         }
         #endregion
     }
@@ -205,16 +405,16 @@ public class GUIHostMenu : ScriptComponent
                 {
                     Team1SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team1SliderKnob.position.y);
                     hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
-                    Team1SliderKnob.color = HSLColor(hue);
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = Team1SliderKnob.color;
+                    //Team1SliderKnob.color = HSLColor(hue);
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = HSLColor(hue);
                 }
 
                 if (Team2ColorSlider.Hovered())
                 {
                     Team2SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team2SliderKnob.position.y);
                     hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / Team2ColorSlider.size.x;
-                    Team2SliderKnob.color = HSLColor(hue);
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = Team2SliderKnob.color;
+                    //Team2SliderKnob.color = HSLColor(hue);
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = HSLColor(hue);
                 }
             }
 
@@ -280,6 +480,32 @@ public class GUIHostMenu : ScriptComponent
 
             NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
             NotSameNameTest(Team1.text, Team2.text);
+
+            //ServerName.position = _ServerNamePos;
+            //ServerNameString.position = _ServerNameStringPos;
+            //ServerNameBox.position = _ServerNameBoxPos;
+
+            //MaxPlayers.position = _MaxPlayersPos;
+            //MaxPlayersString.position = _MaxPlayersStringPos;
+            //MaxPlayersBox.position = _MaxPlayersBoxPos;
+
+            //TimeRound.position = _TimeRoundPos;
+            //TimeRoundString.position = _TimeRoundStringPos;
+            //TimeRoundBox.position = _TimeRoundBoxPos;
+
+            //PublicServer.position = _PublicServerPos;
+            //PublicServerCheck.position = _PublicServerCheckPos;
+            //PublicServerBox.position = _PublicServerBoxPos;
+
+            //ScoreLimit.position = _ScoreLimitPos;
+            //ScoreLimitString.position = _ScoreLimitStringPos;
+            //ScoreLimitBox.position = _ScoreLimitBoxPos;
+
+            //PowerUps.position = _PowerUpsPos;
+            //PowerUpsCheck.position = _PowerUpsCheckPos;
+            //PowerUpsBox.position = _PowerUpsBoxPos;
+
+
         }
     }
 
