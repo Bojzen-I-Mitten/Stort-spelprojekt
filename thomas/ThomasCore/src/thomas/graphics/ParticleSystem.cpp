@@ -166,7 +166,7 @@ namespace thomas
 			for (unsigned i = 0; i < m_emitters.size(); ++i)
 			{
 				D3D11_MAPPED_SUBRESOURCE mappedResource = {};
-				HRESULT ttttt = utils::D3D::Instance()->GetDeviceContext()->Map(m_bufferSpawnIndex->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+				utils::D3D::Instance()->GetDeviceContext()->Map(m_bufferSpawnIndex->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 				memcpy(mappedResource.pData, &i, sizeof(int));
 				utils::D3D::Instance()->GetDeviceContext()->Unmap(m_bufferSpawnIndex->GetBuffer(), 0);
 

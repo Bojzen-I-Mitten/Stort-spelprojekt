@@ -30,6 +30,16 @@ namespace ThomasEngine
 			bool get();
 		}
 
+		property Matrix worldMatrix
+		{
+			void set(Matrix value);
+		}
+		property bool is3D
+		{
+			void set(bool value);
+			bool get();
+		}
+
 	private:
 		thomas::graphics::GUI::Canvas* nativePtr;
 	public:

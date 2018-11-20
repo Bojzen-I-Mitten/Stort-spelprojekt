@@ -31,6 +31,8 @@ namespace ThomasEngine.Network
                     writer.Put((Vector3)parameter);
                 else if (parameterType == typeof(Vector4))
                     writer.Put((Vector4)parameter);
+                else if (parameterType == typeof(Color))
+                    writer.Put((Color)parameter);
                 else
                 {
                     Debug.LogError("RPC error: unsupported type.");
@@ -63,6 +65,8 @@ namespace ThomasEngine.Network
                     parameter = reader.GetVector3();
                 else if (parameterType == typeof(Vector4))
                     parameter = reader.GetVector4();
+                else if (parameterType == typeof(Color))
+                    parameter = reader.GetColor();
                 else
                 {
                     Debug.LogError("RPC error: unsupported type.");

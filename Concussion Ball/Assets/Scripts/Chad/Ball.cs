@@ -28,8 +28,10 @@ public class Ball : PickupableObject
         DropOnRagdoll = true;
         MovementSpeedModifier = 0.65f;
         chargeTimeMax = 2.0f;
+        BaseThrowForce = 10.0f;
+        MaxThrowForce = 18.0f;
+        ThrowForce = BaseThrowForce;
 
-        // m_rigidBody.Damping = 0.5f; //adds air resistance which is not wanted
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
@@ -184,6 +186,13 @@ public class Ball : PickupableObject
         base.Update();
         if (transform.position.y < -5)
             Reset();
+    }
+
+    public override void Throw(Vector3 camPos, Vector3 direction)
+    {
+        direction.y += 0.2f;
+
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     override public void ChargeEffect()

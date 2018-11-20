@@ -7,7 +7,6 @@
 #include "../../ThomasCore.h"
 #include "../../object/component/Camera.h"
 
-
 namespace thomas
 {
 	namespace graphics
@@ -23,8 +22,8 @@ namespace thomas
 				m_viewport = viewport;
 				m_baseResolution = baseResolution;
 				m_render = true;
-
 				m_GUIElements = std::vector<std::unique_ptr<GUIElement>>();
+				Set3D(false);
 			}
 
 			void Canvas::Destroy()
@@ -38,20 +37,31 @@ namespace thomas
 			void Canvas::Render()
 			{
 				if (m_spriteBatch != nullptr && m_render)
-				{
-					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied());
-
-					for (int i = 0; i < m_GUIElements.size(); ++i)
+				{		
+					math::Matrix matrix = math::Matrix::Identity;
+					if (Get3D())
 					{
-						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport());
+						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
 					}
 
+					m_spriteBatch->SetViewport(GetViewport());
+					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
+
+					Vector2 vpScale(GetViewport().width / 1920.0f, GetViewport().height / 1080.0f);
+					for (int i = 0; i < m_GUIElements.size(); ++i)
+					{
+						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport(), vpScale);
+					}
+					
 					m_spriteBatch->End();
 				}
 			}
 
 			Viewport Canvas::GetViewport()
 			{
+				if (Get3D())
+					return Viewport(0, 0, 1920, 1080);
+
 				Viewport camViewport = m_camera->GetViewport();
 				return Viewport(
 					camViewport.x + m_viewport.x * camViewport.width, 
@@ -62,7 +72,8 @@ namespace thomas
 
 			Vector2 Canvas::GetViewportScale()
 			{
-				return Vector2(m_viewport.width, m_viewport.height);
+				Viewport vp = GetViewport();
+				return Vector2(vp.width / 1920.f , vp.height / 1080.f);
 			}
 
 			void Canvas::SetViewport(Viewport viewport)
@@ -113,6 +124,21 @@ namespace thomas
 			bool Canvas::GetRendering()
 			{
 				return m_render;
+			}
+			void Canvas::SetWorldMatrix(math::Matrix value)
+			{
+				m_worldMatrix = value;
+			}
+			void Canvas::Set3D(bool value)
+			{
+				if(value)
+					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
+				else
+					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
+			}
+			bool Canvas::Get3D()
+			{
+				return m_spriteBatch->GetRotation() == DXGI_MODE_ROTATION_UNSPECIFIED;
 			}
 		}
 	}
