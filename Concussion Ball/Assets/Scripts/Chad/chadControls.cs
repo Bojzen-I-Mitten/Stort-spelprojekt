@@ -87,6 +87,7 @@ public class ChadControls : NetworkComponent
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
+    IEnumerator FadeText = null;
 
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
@@ -149,6 +150,17 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        // Stop the fading routine 
+        if (FadeText != null)
+        {
+            if(PowerupPickupText.color.a == 0 && PowerupPickupDescText.color.a == 0)
+            {
+                Debug.Log("Should stop");
+                StopCoroutine(FadeText);
+                FadeText = null;
+            }
+        }
+
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -465,7 +477,6 @@ public class ChadControls : NetworkComponent
 
         switch (State)
         {
-
             case STATE.CHADING:
                 // Moving forward
                 if (Direction.z > 0)
@@ -598,6 +609,33 @@ public class ChadControls : NetworkComponent
         CanBeTackled = true;
 
         // Recovery particles
+    }
+
+    IEnumerator FadePickupText()
+    {
+        Color pickupColor = PowerupPickupText.color;
+        Color descriptionColor = PowerupPickupDescText.color;
+
+        while (pickupColor.a > 0 && descriptionColor.a > 0)
+        {
+            pickupColor.a -= 25;
+            descriptionColor.a -= 25;
+
+            if(pickupColor.a > 0 || descriptionColor.a > 0)
+            {
+                PowerupPickupText.color = pickupColor;
+                PowerupPickupDescText.color = descriptionColor;
+            }
+            else
+            {
+                pickupColor.a = 0;
+                descriptionColor.a = 0;
+                PowerupPickupText.color = pickupColor;
+                PowerupPickupDescText.color = descriptionColor;
+            }
+            
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -749,6 +787,8 @@ public class ChadControls : NetworkComponent
                     if (pickupablea.gameObject.Name == "Vindaloo")
                     {
                         DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Vindaloo", "Throw to Explode");
+                        FadeText = FadePickupText();
+                        StartCoroutine(FadeText); 
                     }
                     else if (pickupablea.gameObject.Name == "ThomasTrain")
                     {
