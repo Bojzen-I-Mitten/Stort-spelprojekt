@@ -24,8 +24,6 @@ public class ThomasTrain : Powerup
     public float ExplosionForce { get; set; } = 300.0f;
 
     private float soundcooldown;
-    private bool playChargeUpSound;
-
 
     public override void Awake()
     {
@@ -35,12 +33,17 @@ public class ThomasTrain : Powerup
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
+        soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
         soundComponentChargeUp.Looping = false;
         soundComponentChargeUp.Is3D = true;
+
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
+        soundComponentTravel.Type = SoundComponent.SoundType.Effect;
         soundComponentTravel.Looping = false;
         soundComponentTravel.Is3D = true;
+
         soundComponentExplosion = gameObject.AddComponent<SoundComponent>();
+        soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
         soundComponentExplosion.Looping = false;
         soundComponentExplosion.Is3D = true;
         
@@ -89,16 +92,10 @@ public class ThomasTrain : Powerup
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
         emitterSpark.Radius = 6.7f;
-
-        soundComponentChargeUp.Looping = false;
-
-        soundComponentTravel.Looping = false;
-
-        soundComponentChargeUp.clip = soundClipChargeUp;
-        soundComponentTravel.clip = soundClipTravel;
-        soundComponentExplosion.clip = soundClipExplosion;
-
-        playChargeUpSound = true;
+        
+        soundComponentChargeUp.Clip = soundClipChargeUp;
+        soundComponentTravel.Clip = soundClipTravel;
+        soundComponentExplosion.Clip = soundClipExplosion;
     }
 
 
@@ -111,7 +108,6 @@ public class ThomasTrain : Powerup
     public override void Cleanup()
     {
         base.Cleanup();
-        playChargeUpSound = false;
         soundComponentChargeUp.Stop();
     }
     
@@ -180,7 +176,7 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
-        soundComponentExplosion.PlayOneShot();
+        soundComponentExplosion.Play();
 
         StartCoroutine(KillTrain());
     }

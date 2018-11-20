@@ -75,8 +75,16 @@ namespace ThomasEditor.utils
                 File.Copy(dll, dir + "\\Bin\\" + dllName, true);
             }
 
+            
             File.Copy("Newtonsoft.Json.dll", dir + "\\Bin\\Newtonsoft.Json.dll", true);
 
+#if DEBUG
+            File.Copy("fmodL64.dll", dir + "\\Bin\\fmodL64.dll", true);
+            File.Copy("fmodstudioL64.dll", dir + "\\Bin\\fmodstudioL64.dll", true);
+#else
+            File.Copy("fmod64.dll", dir + "\\Bin\\fmod64.dll", true);
+            File.Copy("fmodstudio64.dll", dir + "\\Bin\\fmodstudio64.dll", true);
+#endif
 
             CreateShortcut(dir + "\\" + fileNameNoExe + ".lnk", dir + "\\Bin\\" + fileName, dir + "\\Bin");
 

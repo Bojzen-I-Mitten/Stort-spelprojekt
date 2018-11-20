@@ -16,6 +16,7 @@ using namespace DirectX;
 
 namespace thomas
 {
+	namespace object { namespace component { class Camera; } }
 	using namespace resource;
 	using namespace math;
 	namespace graphics
@@ -27,16 +28,15 @@ namespace thomas
 			{
 			public:
 				//Canvas();
-				Canvas(Viewport viewport, Viewport* camViewport, Vector2 baseResolution = Vector2(1920, 1080));
+				Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution = Vector2(1920, 1080));
 				~Canvas() = default;
 				void Destroy();
 				void Render();
 
 			public:
-				Viewport GetViewport();
+				Viewport GetViewport(); //returns the actual viewport for the canvas
 				Vector2 GetViewportScale();
 				void SetViewport(Viewport viewport);
-				void UpdateViewportScale();
 				GUIElement* Add(const std::string & text);
 				GUIElement* Add(Texture2D* texture);
 				void Remove(GUIElement* element);
@@ -48,9 +48,8 @@ namespace thomas
 				std::unique_ptr<CommonStates> m_spriteStates;
 				std::unique_ptr<SpriteBatch> m_spriteBatch;
 				std::unique_ptr<Font> m_defaultFont;
-				math::Vector2 m_viewportScale;
 				Viewport m_viewport;
-				Viewport* m_camViewport;
+				object::component::Camera* m_camera;
 				math::Vector2 m_baseResolution;
 				bool m_render;
 			};
