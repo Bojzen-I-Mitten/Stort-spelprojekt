@@ -319,11 +319,12 @@ namespace ThomasEngine.Network
             targetRigidbody.IsKinematic = reader.GetBool();
             targetRigidbody.AttachedCollider.isTrigger = reader.GetBool();
 
-            float dist = Vector3.Distance(target.position, TargetSyncPosition);
+            //float dist = Vector3.Distance(target.position, TargetSyncPosition);
 
             //float rotDiff = Quaternion.Dot(target.rotation, TargetSyncRotation) - 1.0f;
 
-            
+            if (TargetSyncPosition.x == float.NaN)
+                Debug.LogError("Rigidbody position is NaN");
 
             if(!targetRigidbody.enabled)
             {

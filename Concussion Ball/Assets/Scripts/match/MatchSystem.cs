@@ -84,7 +84,7 @@ public class MatchSystem : NetworkManager
         Teams[TEAM_TYPE.UNASSIGNED] = new Team(TEAM_TYPE.UNASSIGNED, "Unassigned", new Color(0, 0, 0, 0));
     }
 
-  
+
 
     public override void Start()
     {
@@ -93,18 +93,18 @@ public class MatchSystem : NetworkManager
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
 
-       
+
         countdownSound = gameObject.AddComponent<SoundComponent>();
         countdownSound.Clip = countdownSoundClip;
         countdownSound.Looping = false;
-       
+
         endroundSound = gameObject.AddComponent<SoundComponent>();
         endroundSound.Clip = endroundSoundClip;
         endroundSound.Looping = false;
-        
+
         //StartCoroutine(ResetCoroutine(10));
     }
-    
+
     public override void Update()
     {
         base.Update();
@@ -123,17 +123,19 @@ public class MatchSystem : NetworkManager
                 {
                     OnMatchStart();
                 }
-                if(Input.GetKeyDown(Input.Keys.R))
+                if (Input.GetKeyDown(Input.Keys.R))
                 {
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
                 if (Input.GetKeyDown(Input.Keys.F10))
                     ShowOwnedObjects();
+                if (Input.GetKeyDown(Input.Keys.F9))
+                    ShowPlayerPositions();
             }
         }
 
-        if(MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
+        if (MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
         {
             OnMatchEnd();
         }
@@ -149,9 +151,24 @@ public class MatchSystem : NetworkManager
     {
         Debug.Log("##################################");
         Debug.Log("Owned objects:");
-        foreach(var objects in Scene.ObjectOwners[LocalPeer])
+        foreach (var objects in Scene.ObjectOwners[LocalPeer])
         {
             Debug.Log(objects.gameObject.Name);
+        }
+        Debug.Log("##################################");
+    }
+
+    private void ShowPlayerPositions()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Owned objects:");
+        foreach (var player in Scene.Players)
+        {
+            if (player.Key != LocalPeer)
+            {
+                ChadControls chad = player.Value.gameObject.GetComponent<ChadControls>();
+                Debug.Log(player.Key.EndPoint.Address + ":\t" + chad?.rBody.Position);
+            }
         }
         Debug.Log("##################################");
     }
@@ -327,7 +344,7 @@ public class MatchSystem : NetworkManager
         //Give him a NetworkPlayer object.
         Debug.Log("peer joined!");
         //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        
+
         //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
 
         if (peer != LocalPeer)
@@ -355,12 +372,12 @@ public class MatchSystem : NetworkManager
 
     public Team FindTeam(TEAM_TYPE type)
     {
-        
+
         Team team = null;
         Teams.TryGetValue(type, out team);
         return team;
     }
-        
+
     public TEAM_TYPE GetOpposingTeam(TEAM_TYPE team)
     {
         switch (team)

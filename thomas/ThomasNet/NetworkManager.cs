@@ -152,7 +152,7 @@ namespace ThomasEngine.Network
                 case DisconnectReason.DisconnectPeerCalled:
                     OnPeerLeave(peer);
                     NetScene.RemovePlayer(peer);
-                    Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
+                    Debug.Log("The peer you were connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:
                     OnPeerLeave(peer);
@@ -250,6 +250,10 @@ namespace ThomasEngine.Network
                         break;
                     default:
                         break;
+                }
+                if(!reader.EndOfData)
+                {
+                    Debug.LogError("Did not read all data");
                 }
                 reader.Recycle();
             }

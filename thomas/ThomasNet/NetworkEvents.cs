@@ -105,7 +105,12 @@ namespace ThomasEngine.Network
         {
             for(int i=0; i < serverInfo.PeerIPs.Length; ++i)
             {
-                Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
+                NetPeer np = Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
+                if(np == null)
+                {
+                    Manager.InternalManager.DisconnectAll();
+                    throw new ArgumentException("Could not connect to peer:\t" + serverInfo.PeerIPs[i] + ". Disconnecting from all...");
+                }
             }
             if (serverInfo.IsResponsiblePeer)
                 Manager.ResponsiblePeer = peer;
@@ -164,7 +169,7 @@ namespace ThomasEngine.Network
 
                 if (previousOwner == newOwner)
                 {
-                    Debug.Log("Peer is already owner of object: " + networkIdentity.gameObject.Name);
+                    //Debug.Log("Peer is already owner of object: " + networkIdentity.gameObject.Name);
                     return;
                 }
 
@@ -182,7 +187,7 @@ namespace ThomasEngine.Network
                         comp.OnLostOwnership();
                     }
                 }
-                Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.ToString());
+                //Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.ToString());
             }
             else
             {
