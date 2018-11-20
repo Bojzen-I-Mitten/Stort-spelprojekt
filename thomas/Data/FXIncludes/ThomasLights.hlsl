@@ -93,15 +93,19 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         
         float4 sampleCoordLS = WorldToLightClipPos(worldPos);
         sampleCoordLS.xyz /= sampleCoordLS.w;
-        sampleCoordLS.x = sampleCoordLS.x *0.5 + 0.5;
-        sampleCoordLS.y = 0.5 - sampleCoordLS.y *0.5;
+        sampleCoordLS.x = sampleCoordLS.x * 0.5 + 0.5;
+        sampleCoordLS.y = 0.5 - sampleCoordLS.y * 0.5;
         
+        //http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+        float bias = 0.005 * tan(acos(saturate(dot(worldNormal, lightDir))));
+        bias = clamp(bias, 0, 0.01);
+
         float shadowFactor = 1.0;
         
         float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
         for (int si = 0; si < 4; ++si)
         {
-            shadowFactor -= (float) (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy + poissonDisk[si]/700.0).x < sampleCoordLS.z - 0.0005) * 0.15;
+            shadowFactor -= (float) (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy + poissonDisk[si] / 700.0).x < sampleCoordLS.z - bias) * 0.15;
         }
 
         lightMultiplyer = lights[i].intensity * shadowFactor;
