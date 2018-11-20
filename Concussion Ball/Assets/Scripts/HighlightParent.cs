@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 using ThomasEngine;
 using ThomasEngine.Network;
 
-public class HighlightParent : NetworkComponent
+public class HighlightParent : ScriptComponent
 {
     private Color Color = Color.White;// { get; set; }
     private Ball Ball;
@@ -25,7 +25,7 @@ public class HighlightParent : NetworkComponent
         
         RenderComponent rc = gameObject.AddComponent<RenderComponent>();
         rc.model = gameObject.transform.parent.gameObject.GetComponent<RenderComponent>().model;
-        transform.scale *= 5.0f;
+        //transform.scale *= 5.0f;
 
         rc.material = highLightMat;
 
@@ -34,11 +34,19 @@ public class HighlightParent : NetworkComponent
 
     public override void Update()
     {
-        if (Ball?._Chad)
-            Color = Ball._Chad.NetPlayer.Team.Color;
+        if(Ball._Chad == MatchSystem.instance.LocalChad)
+        {
+            gameObject.transform.localScale = new Vector3(0, 0, 0);
+        }
         else
-            Color = Color.White;
-        highLightMat.SetColor("color", Color);
+        {
+            if (Ball?._Chad)
+                Color = Ball._Chad.NetPlayer.Team.Color;
+            else
+                Color = Color.White;
+            highLightMat.SetColor("color", Color);
+            gameObject.transform.localScale = new Vector3(2.001f, 2.001f, 2.001f);
+        }
     }
 }
 
