@@ -90,24 +90,16 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
     for (; i < roof; ++i) //directional
     {
         lightDir = lights[i].direction; //should be normalized already
-
-
-        float visibility = 5.0;
-        float4 sampleCoordLS = WorldToLightClipPos(worldPos); //ObjectToLightClipPos(WorldTo //mul(thomas_WorldToObject, float4(worldPos, 1.0)).xyz).xyz;
+        
+        float4 sampleCoordLS = WorldToLightClipPos(worldPos);
         sampleCoordLS.xyz /= sampleCoordLS.w;
         sampleCoordLS.x = (sampleCoordLS.x + 1.0f) / 2.0f;
-        sampleCoordLS.y = (sampleCoordLS.y + 1.0f) / 2.0f;
-
-        //float depthValue = ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy).x
-
-        //if (saturate(light
+        sampleCoordLS.y = 1.0 - (sampleCoordLS.y + 1.0f) / 2.0f;
         
-        if (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy).x < sampleCoordLS.z - 0.02f)
-        {
-            visibility = 0.1;
-        }
+        float shadowFactor = 1.0 - (float) (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy).x < sampleCoordLS.z - 0.0005)*0.85;
+        
 
-        lightMultiplyer = lights[i].intensity * visibility;
+        lightMultiplyer = lights[i].intensity * shadowFactor;
         Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     roof += nrOfPointLights;

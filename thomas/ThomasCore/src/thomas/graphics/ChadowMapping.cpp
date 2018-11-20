@@ -25,7 +25,7 @@ namespace thomas
 
 		ShadowMap::ShadowMap()
 		{
-			m_depthTexture = std::make_unique<resource::Texture2D>(512, 512, false, true);
+			m_depthTexture = std::make_unique<resource::Texture2D>(1024, 1024, false, true);
 
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 20);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 
@@ -37,8 +37,8 @@ namespace thomas
 
 			HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(m_depthTexture->GetResource(), &depthViewDesc, &m_depthStencilView);
 			
-			m_viewPort.Height = 512;
-			m_viewPort.Width = 512;
+			m_viewPort.Height = 1024;
+			m_viewPort.Width = 1024;
 			m_viewPort.TopLeftY = 0;
 			m_viewPort.TopLeftX = 0;
 			m_viewPort.MinDepth = 0.0f;
@@ -94,8 +94,8 @@ namespace thomas
 			}
 			*/
 			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z - nearClipOffset, -mins.z);
-			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 25/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-60, 60, -60, 60, -20, 40);
+			m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 30/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-60, 60, -60, 60, -10, 120);
 
 			m_matrixVP = m_matrixView * m_matrixProj;
 
