@@ -3,7 +3,6 @@
 #pragma unmanaged
 #include <thomas/resource/Model.h>
 #include <thomas/graphics/animation/data/AnimationData.h>
-#include <thomas/graphics/animation/data/Skeleton.h>
 
 #pragma managed
 #include "../../resource/Model.h"
@@ -40,6 +39,28 @@ namespace ThomasEngine
 
 			m_timeHandle = gcnew PlaybackHandle(m_playController);
 		}
+		PlaybackNode::PlaybackNode(thomas::graphics::animation::Skeleton& skel, Animation^ anim, bool loop)
+		{
+			Initiate(skel, anim, loop);
+		}
+
+		void PlaybackNode::Initiate(thomas::graphics::animation::Skeleton& skel, Animation^ anim, bool loop)
+		{
+
+			using namespace thomas::graphics::animation;
+			if (!anim)
+				throw gcnew System::NotSupportedException(
+					"Playback node can't be created: Animation was null ");
+
+			AnimationData * data = anim->Native()->GetAnimation();
+
+			m_playController = new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once);
+			std::unique_ptr<Playback> playback(m_playController);
+			m_node = new AnimPlayback(skel, playback, *data);
+
+			m_timeHandle = gcnew PlaybackHandle(m_playController);
+		}
+
 		PlaybackNode::~PlaybackNode()
 		{
 		}

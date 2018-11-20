@@ -7,7 +7,6 @@ using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
 using ThomasEngine.Script;
-using ThomasEngine;
 
 public class ChadControls : NetworkComponent
 {

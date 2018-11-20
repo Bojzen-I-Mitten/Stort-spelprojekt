@@ -3,6 +3,7 @@
 #pragma unmanaged
 #include<thomas/graphics/animation/AnimPlayback.h>
 #include <thomas/graphics/animation/BaseAnimationTime.h>
+#include <thomas/graphics/animation/data/Skeleton.h>
 
 #pragma managed
 
@@ -26,6 +27,8 @@ namespace ThomasEngine
 
 			PlaybackNode(Model ^ model, Animation^ anim);
 			PlaybackNode(Model ^ model, Animation ^ anim, bool loop);
+			PlaybackNode(thomas::graphics::animation::Skeleton& model, Animation ^ anim, bool loop);
+			void Initiate(thomas::graphics::animation::Skeleton& skel, Animation ^ anim, bool loop);
 			~PlaybackNode();
 
 			PlaybackHandle^ getTimeHandle();

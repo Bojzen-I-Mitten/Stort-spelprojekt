@@ -36,19 +36,19 @@ namespace ThomasEngine
 			delete m_node;
 		}
 		
-		void BlendNode::appendNode(Animation ^ anim, bool loop)
+		PlaybackNode^ BlendNode::appendNode(Animation ^ anim, bool loop)
 		{
 			using namespace thomas::graphics::animation;
 			if (!anim->Native()->HasAnimation()) 
 			{
 				Debug::Log("Failed to add BlendNode: Anim is null with name: " + anim->Name);
-				return;
+				return nullptr;
 			}
 			AnimationData * data = anim->Native()->GetAnimation();
 
-			std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once));
-			AnimationNode *node = (new AnimPlayback(m_node->m_ref, playback, *data));
-			m_node->pushAnimation(node);
+			PlaybackNode^ playback = gcnew PlaybackNode(m_node->m_ref, anim, loop);
+			appendNode(playback);
+			return playback;
 		}
 		void BlendNode::appendNode(BlendNode ^ action)
 		{

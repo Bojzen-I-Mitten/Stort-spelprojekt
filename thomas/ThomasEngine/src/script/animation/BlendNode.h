@@ -23,7 +23,7 @@ namespace ThomasEngine
 			BlendNode(Model^model);
 			~BlendNode();
 
-			void appendNode(Animation^ anim, bool loop);
+			PlaybackNode^ appendNode(Animation^ anim, bool loop);
 			void appendNode(BlendNode^ action);
 			void appendNode(PlaybackNode^ action);
 			void setNode(PlaybackNode^ action, uint32_t index);
