@@ -63,7 +63,7 @@ namespace thomas
 				virtual Vector2 PixelSize() = 0;
 				Vector2 Size()
 				{
-					return (PixelSize()*scale) / Vector2(canvas->GetViewport().width, canvas->GetViewport().height);
+					return (PixelSize() * scale * canvas->GetViewportScale()) / Vector2(canvas->GetViewport().width, canvas->GetViewport().height);
 				}
 
 				bool Hovered()

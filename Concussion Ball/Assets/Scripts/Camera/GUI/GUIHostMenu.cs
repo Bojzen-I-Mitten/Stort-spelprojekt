@@ -159,11 +159,6 @@ public class GUIHostMenu : ScriptComponent
                 if (Team1ColorSlider.Hovered())
                     Team1SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team1SliderKnob.position.y);
                 hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
-
-                Debug.Log("VP size: " + Canvas.camera.viewport.size.x);
-                Debug.Log("Pos from edge: " + (Team1SliderKnob.position.x - Team1ColorSlider.position.x));
-                Debug.Log("Size: " + Team1ColorSlider.size.x);
-                Debug.Log("Hue: " + hue);
                 Team1SliderKnob.color = HSLColor(hue);
 
                 if (Team2ColorSlider.Hovered())
