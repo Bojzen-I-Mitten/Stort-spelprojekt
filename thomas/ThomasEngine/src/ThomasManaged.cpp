@@ -474,6 +474,13 @@ namespace ThomasEngine {
 			{
 				StopPlay();
 			}
+			else if (IssuedStateCommand == ThomasStateCommand::RestartIssued)
+			{
+				LOG("Entered restart function");
+				StopPlay();
+				LOG("Stop finished");
+				//Play();
+			}
 			IssuedStateCommand = ThomasStateCommand::NoCommand;
 			StateCommandProcessed->Set();
 			Monitor::Exit(StateCommandProcessed);
@@ -534,6 +541,11 @@ namespace ThomasEngine {
 	void ThomasWrapper::IssueStopPlay()
 	{
 		IssueStateCommand(ThomasStateCommand::StopIssued);
+	}
+
+	void ThomasWrapper::IssueRestart()
+	{
+		IssueStateCommand(ThomasStateCommand::RestartIssued);
 	}
 
 	bool ThomasWrapper::IsPlaying()

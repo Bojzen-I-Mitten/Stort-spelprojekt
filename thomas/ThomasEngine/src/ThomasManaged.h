@@ -21,7 +21,8 @@ namespace ThomasEngine {
 	{
 		NoCommand = 0,
 		PlayIssued,
-		StopIssued
+		StopIssued,
+		RestartIssued
 	};
 	enum ThomasSystemMode
 	{
@@ -108,6 +109,7 @@ namespace ThomasEngine {
 		static void IssueStateCommand(ThomasStateCommand cmd);
 		static void IssuePlay();
 		static void IssueStopPlay();
+		static void IssueRestart();
 
 
 		static void CopyCommandList();

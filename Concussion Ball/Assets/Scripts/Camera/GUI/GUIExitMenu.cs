@@ -50,23 +50,10 @@ public class GUIExitMenu : ScriptComponent
                     Debug.Log("I'm exciting! :^)");
                     ThomasWrapper.IssueStopPlay();
                     Debug.Log("TEST2");
-                    StartCoroutine(Replay());
+                    //StartCoroutine(Replay());
                     //ThomasWrapper.Exit();
                 }
             }
         }
-    }
-
-    IEnumerator Replay()
-    {
-        int counter = 0;
-        while (ThomasWrapper.IsPlaying())
-        {
-            Debug.Log("Clicked exit, still playing: " + counter);
-            counter++;
-            yield return null;
-        }
-        Debug.Log("Stopped playing, resetting play");
-        ThomasWrapper.IssuePlay();
     }
 }
