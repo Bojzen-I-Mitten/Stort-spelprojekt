@@ -172,7 +172,7 @@ public class PickupableObject : NetworkComponent
         return true;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
         if (isOwner)
         {

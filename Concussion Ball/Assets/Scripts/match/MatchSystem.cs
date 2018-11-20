@@ -25,7 +25,6 @@ public class MatchSystem : NetworkManager
     public Camera Camera { get; set; }
     //public Camera spectatorCamera { get; set; }
 
-
     private SoundComponent countdownSound;
     private SoundComponent endroundSound;
 
@@ -104,7 +103,8 @@ public class MatchSystem : NetworkManager
         
         //StartCoroutine(ResetCoroutine(10));
     }
-    
+
+
     public override void Update()
     {
         base.Update();

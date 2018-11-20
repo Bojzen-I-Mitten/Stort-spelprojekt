@@ -240,7 +240,7 @@ namespace ThomasEngine.Network
         }
         #endregion
         #region Read
-        public override void OnRead(NetPacketReader reader, bool initialState)
+        public override void OnRead(NetDataReader reader, bool initialState)
         {
             if (!initialState && reader.GetInt() == 0)
             {
@@ -261,7 +261,7 @@ namespace ThomasEngine.Network
 
         }
 
-        private void ReadTransform(NetPacketReader reader)
+        private void ReadTransform(NetDataReader reader)
         {
             CurrentPositionDuration = 0;
             if (isOwner)
@@ -291,7 +291,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        private void ReadRigidbody(NetPacketReader reader)
+        private void ReadRigidbody(NetDataReader reader)
         {
             if (isOwner || !targetRigidbody)
             {

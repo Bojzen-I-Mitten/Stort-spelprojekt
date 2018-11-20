@@ -45,7 +45,7 @@ public class NetworkPlayer : NetworkComponent
         return true;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);

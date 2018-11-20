@@ -662,7 +662,7 @@ public class ChadControls : NetworkComponent
     }
     #endregion
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
         if (initialState)
         {

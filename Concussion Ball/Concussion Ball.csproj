@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
     <Compile Include="Assets\Scripts\match\PowerupManager.cs" />
     <Compile Include="Assets\Scripts\match\PowerupSpawner.cs" />
+    <Compile Include="Assets\Scripts\match\ReplaySystem.cs" />
     <Compile Include="Assets\Scripts\match\Team.cs" />
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />

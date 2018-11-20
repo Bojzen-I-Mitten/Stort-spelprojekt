@@ -44,9 +44,10 @@ namespace ThomasEngine.Network
         public NetPeer LocalPeer = null;
 
         public NetPeer ResponsiblePeer = null;
-
+        
         public int TICK_RATE { get; set; } = 24;
 
+        public bool ReadOwnerAsNormal = false;
 
         public long ServerStartTime;
         [Browsable(false)]

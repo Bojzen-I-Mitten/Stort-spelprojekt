@@ -120,7 +120,7 @@ public class Powerup : PickupableObject
         return true;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
         base.OnRead(reader, initialState);
 

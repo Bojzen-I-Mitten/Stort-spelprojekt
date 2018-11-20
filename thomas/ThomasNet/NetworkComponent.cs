@@ -46,7 +46,7 @@ namespace ThomasEngine.Network
             get { return Identity ? Identity.Owner : false; } 
         }
 
-        virtual public void OnRead(NetPacketReader reader, bool initialState)
+        virtual public void OnRead(NetDataReader reader, bool initialState)
         {
             if (!initialState)
                 reader.GetInt();
@@ -76,7 +76,7 @@ namespace ThomasEngine.Network
             Identity.SendRPC(methodName, parameters);
         }
 
-        internal void ReadRPC(System.Reflection.MethodInfo methodInfo, NetPacketReader reader)
+        internal void ReadRPC(System.Reflection.MethodInfo methodInfo, NetDataReader reader)
         {
             object[] parameters = RpcUtils.ReadRPCParameters(methodInfo, reader);
             methodInfo.Invoke(this, parameters);

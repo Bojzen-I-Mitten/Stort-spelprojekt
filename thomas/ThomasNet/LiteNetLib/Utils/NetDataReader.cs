@@ -71,6 +71,13 @@ namespace LiteNetLib.Utils
         {
             return new NetDataReader(_data, _position, _dataSize);
         }
+        
+        public NetDataReader Copy()
+        {
+            byte[] data = new byte[AvailableBytes];
+            Buffer.BlockCopy(_data, _position, data, 0, AvailableBytes);
+            return new NetDataReader(data);
+        }
 
         public NetDataReader()
         {

@@ -18,7 +18,7 @@ namespace ThomasEngine.Network
         private bool _Owner = false;
         public bool Owner {
             set {if(value == true && IsPlayer == false) TakeOwnership();  _Owner = value; }
-            get { return _Owner; }
+            get { return (NetworkManager.instance && NetworkManager.instance.ReadOwnerAsNormal) ? false : _Owner; }
         }
 
         public int ID {
@@ -74,36 +74,48 @@ namespace ThomasEngine.Network
 
         public void WriteFrameData()
         {
-            WriteData(false);
-        }
-
-        public void WriteInitialData()
-        {
-            WriteData(true);
-        }
-
-        private void WriteData(bool initalState=false)
-        {
             DataWriter.Reset();
+
             PacketType packetType = IsPlayer ? PacketType.PLAYER_DATA : PacketType.OBJECT_DATA;
             DataWriter.Put((int)packetType);
             if (packetType == PacketType.OBJECT_DATA)
                 DataWriter.Put(ID);
 
-            DataWriter.Put(initalState);
+            DataWriter.Put(false);
+
+            WriteData(DataWriter, false);
+            Manager.InternalManager.SendToAll(DataWriter, DeliveryMethod.Sequenced);
+        }
+
+        public void WriteInitialData()
+        {
+            DataWriter.Reset();
+
+            PacketType packetType = IsPlayer ? PacketType.PLAYER_DATA : PacketType.OBJECT_DATA;
+            DataWriter.Put((int)packetType);
+            if (packetType == PacketType.OBJECT_DATA)
+                DataWriter.Put(ID);
+
+            DataWriter.Put(true);
+
+            WriteData(DataWriter, true);
+            Manager.InternalManager.SendToAll(DataWriter, DeliveryMethod.ReliableOrdered);
+        }
+
+        public void WriteData(NetDataWriter writer, bool initalState = false)
+        {
             if (initalState)
             {
                 DataWriter.Put(gameObject.activeSelf);
             }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
-                
+
                 comp.OnWrite(DataWriter, initalState);
             }
-            Manager.InternalManager.SendToAll(DataWriter, initalState ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced);
         }
 
-        public void ReadData(NetPacketReader reader, bool initialState)
+        public void ReadData(NetDataReader reader, bool initialState)
         {
             if (initialState)
             {
@@ -117,7 +129,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        public void ReadRPC(NetPacketReader reader)
+        public void ReadRPC(NetDataReader reader)
         {
             NetSerializer serializer = new NetSerializer();
             string methodName = reader.GetString();
