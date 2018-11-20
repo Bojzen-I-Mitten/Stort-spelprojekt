@@ -39,7 +39,7 @@ namespace thomas
 			{
 				RenderComponent::Update();
 #ifdef _EDITOR
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 #endif
 				EDITOR_LOCK();
 				if (m_skeleton)

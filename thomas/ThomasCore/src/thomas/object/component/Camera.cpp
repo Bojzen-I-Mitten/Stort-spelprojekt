@@ -75,7 +75,7 @@ namespace thomas
 
 			math::Matrix Camera::GetViewMatrix()
 			{
-				math::Matrix viewMatrix =  m_gameObject->m_transform->GetWorldMatrix();
+				math::Matrix viewMatrix =  m_gameObject->GetTransform()->GetWorldMatrix();
 				return viewMatrix.Invert();
 			}
 
@@ -86,12 +86,12 @@ namespace thomas
 
 			math::Vector3 Camera::GetPosition()
 			{
-				return m_gameObject->m_transform->GetPosition();
+				return m_gameObject->GetTransform()->GetPosition();
 			}
 
 			math::Vector3 Camera::GetDirection()
 			{
-				return m_gameObject->m_transform->Forward();
+				return m_gameObject->GetTransform()->Forward();
 			}
 
 			math::Ray Camera::ScreenPointToRay(math::Vector2 point)
@@ -217,7 +217,7 @@ namespace thomas
 
 			void Camera::OnDrawGizmosSelected()
 			{
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 				editor::Gizmos::Gizmo().SetColor(math::Color(0.6f, 0.6f, 0.6f));
 				editor::Gizmos::Gizmo().DrawFrustum(m_frustrum);
 			
@@ -240,7 +240,7 @@ namespace thomas
 			math::BoundingFrustum Camera::GetFrustrum()
 			{
 				math::BoundingFrustum frustrum;
-				m_frustrum.Transform(frustrum, m_gameObject->m_transform->GetWorldMatrix());
+				m_frustrum.Transform(frustrum, m_gameObject->GetTransform()->GetWorldMatrix());
 				return frustrum;
 			}
 

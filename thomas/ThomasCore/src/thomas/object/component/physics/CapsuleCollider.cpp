@@ -57,7 +57,7 @@ namespace thomas
 
 			void CapsuleCollider::Update()
 			{
-				math::Vector3 scale = m_gameObject->m_transform->GetScale();
+				math::Vector3 scale = m_gameObject->GetTransform()->GetScale();
 				float xzRadius = scale.x >= scale.z ? scale.x : scale.z;
 				scale.x = scale.z = xzRadius;
 				scale.x *= m_radius; scale.z *= m_radius;
@@ -67,8 +67,8 @@ namespace thomas
 				if (m_collisionObject)
 				{
 					btTransform trans;
-					trans.setOrigin((btVector3&)(m_gameObject->m_transform->GetPosition() + m_center));
-					trans.setRotation((btQuaternion&)m_gameObject->m_transform->GetRotation());
+					trans.setOrigin((btVector3&)(m_gameObject->GetTransform()->GetPosition() + m_center));
+					trans.setRotation((btQuaternion&)m_gameObject->GetTransform()->GetRotation());
 					m_collisionObject->setWorldTransform(trans);
 					Physics::s_world->updateSingleAabb(m_collisionObject);
 				}
@@ -84,7 +84,7 @@ namespace thomas
 				else if (m_rotation == ColliderRotation::RotateZ)
 					rotationMatrix = math::Matrix::CreateRotationX(math::PI / 2.0f);
 
-				editor::Gizmos::Gizmo().SetMatrix(rotationMatrix * m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(rotationMatrix * m_gameObject->GetTransform()->GetWorldMatrix());
 				editor::Gizmos::Gizmo().DrawBoundingCapsule(m_center, m_radius, m_height);
 			}
 		}

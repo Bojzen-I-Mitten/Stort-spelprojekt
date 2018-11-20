@@ -44,8 +44,8 @@ namespace thomas
 			void Rigidbody::OnEnable()
 			{
 				btTransform trans;
-				math::Vector3 pos = m_gameObject->m_transform->GetPosition();
-				math::Quaternion rot = m_gameObject->m_transform->GetRotation();
+				math::Vector3 pos = m_gameObject->GetTransform()->GetPosition();
+				math::Quaternion rot = m_gameObject->GetTransform()->GetRotation();
 				if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
 
 				trans.setRotation((btQuaternion&)rot);
@@ -64,7 +64,7 @@ namespace thomas
 				this->setUserPointer(m_collider);
 
 				Physics::AddRigidBody(this);
-				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				m_prevMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
 				UpdateProperties();
 			}
 
@@ -92,11 +92,11 @@ namespace thomas
 				if (m_collider)pos -= math::Vector3::Transform(m_collider->getCenter(), rotation);
 
 
-				m_gameObject->m_transform->SetRotation(rotation);
-				m_gameObject->m_transform->SetPosition(pos);
-				m_gameObject->m_transform->SetDirty(true);
+				m_gameObject->GetTransform()->SetRotation(rotation);
+				m_gameObject->GetTransform()->SetPosition(pos);
+				m_gameObject->GetTransform()->SetDirty(true);
 
-				m_prevMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				m_prevMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
 
 				if (m_dirty)
 				{
@@ -108,13 +108,13 @@ namespace thomas
 
 			void Rigidbody::UpdateTransformToRigidBody()
 			{
-				math::Matrix currentMatrix = m_gameObject->m_transform->GetWorldMatrix();
+				math::Matrix currentMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
 				if (!m_ignoreTransform && m_prevMatrix != currentMatrix)
 				{
 					btTransform trans;
 
-					math::Vector3 pos = m_gameObject->m_transform->GetPosition();
-					math::Quaternion rot = m_gameObject->m_transform->GetRotation();
+					math::Vector3 pos = m_gameObject->GetTransform()->GetPosition();
+					math::Quaternion rot = m_gameObject->GetTransform()->GetRotation();
 					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
 
 					trans.setRotation((btQuaternion&)rot);

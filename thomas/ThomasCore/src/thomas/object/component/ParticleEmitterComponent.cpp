@@ -65,7 +65,7 @@ namespace thomas
 			void ParticleEmitterComponent::OnDrawGizmosSelected()
 			{
 				editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 				
 				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
 				editor::Gizmos::Gizmo().DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
@@ -117,8 +117,8 @@ namespace thomas
 			void ParticleEmitterComponent::Update()
 			{
 				EDITOR_LOCK();
-				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
-				m_particleBufferStruct.direction = m_gameObject->m_transform->Forward();
+				m_particleBufferStruct.position = m_gameObject->GetTransform()->GetPosition();
+				m_particleBufferStruct.direction = m_gameObject->GetTransform()->Forward();
 
 				if (m_emitOneShot)
 				{

@@ -40,10 +40,11 @@ namespace thomas
 		void EditorCamera::Init()
 		{
 			// Transform component
-			m_transform = new object::component::Transform();
-			m_transform->m_gameObject = this;
-			m_transform->SetPosition(math::Vector3(5.f));
-			m_transform->LookAt(math::Vector3());
+			auto transform = new object::component::Transform();
+			transform->m_gameObject = this;
+			transform->SetPosition(math::Vector3(5.f));
+			transform->LookAt(math::Vector3());
+			SetTransform(transform);
 
 			// Camera component
 			m_cameraComponent = std::unique_ptr<object::component::Camera>(
@@ -282,7 +283,7 @@ namespace thomas
 					{
 						for (auto mesh : model->GetMeshes()) {
 							graphics::render::RenderCommand cmd(
-								gameObject->m_transform->GetWorldMatrix(),
+								gameObject->GetTransform()->GetWorldMatrix(),
 								mesh.get(),
 								m_objectHighlighter.get(),
 								m_cameraComponent.get()->ID());
@@ -301,13 +302,13 @@ namespace thomas
 
 			math::Vector3 averagePosition = math::Vector3::Zero;
 			math::Vector3 averageScale = math::Vector3::Zero;
-			math::Quaternion rot = m_selectedObjects[0]->m_transform->GetRotation();
+			math::Quaternion rot = m_selectedObjects[0]->GetTransform()->GetRotation();
 			std::vector<math::Matrix> offsetMatrixes = std::vector<math::Matrix>(m_selectedObjects.size());
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
 				object::GameObject* gameObject = m_selectedObjects[i];
-				averagePosition += gameObject->m_transform->GetPosition();
-				averageScale += gameObject->m_transform->GetScale();
+				averagePosition += gameObject->GetTransform()->GetPosition();
+				averageScale += gameObject->GetTransform()->GetScale();
 			}
 
 			float mult = 1.f / m_selectedObjects.size();
@@ -322,7 +323,7 @@ namespace thomas
 			for (unsigned i = 0; i < m_selectedObjects.size(); ++i)
 			{
 				object::GameObject* gameObject = m_selectedObjects[i];
-				math::Matrix world = gameObject->m_transform->GetWorldMatrix();
+				math::Matrix world = gameObject->GetTransform()->GetWorldMatrix();
 				offsetMatrixes[i] = world * parentMatrix.Invert();
 			}
 
@@ -344,8 +345,8 @@ namespace thomas
 				{
 					object::GameObject* gameObject = m_selectedObjects[i];
 
-					gameObject->m_transform->SetWorldMatrix(offsetMatrixes[i] * parentMatrix);
-					gameObject->m_transform->SetDirty(true);
+					gameObject->GetTransform()->SetWorldMatrix(offsetMatrixes[i] * parentMatrix);
+					gameObject->GetTransform()->SetDirty(true);
 				}
 			}
 
@@ -438,8 +439,8 @@ namespace thomas
 				speed *= 4.0f;
 
 			// Allow the camera to move freely in the scene
-			math::Vector3 right = m_transform->Right();
-			math::Vector3 up = m_transform->Up();
+			math::Vector3 right = GetTransform()->Right();
+			math::Vector3 up = GetTransform()->Up();
 			math::Vector3 forward = up.Cross(right);
 
 			math::Vector3 translation;
@@ -457,9 +458,9 @@ namespace thomas
 			if (window->GetInput()->GetKey(Keys::E))
 				translation += up * ThomasTime::GetActualDeltaTime() * speed;
 			// Scroll
-			m_transform->Translate(forward * ThomasTime::GetActualDeltaTime() * float(window->GetInput()->GetMouseScrollWheel()) * speed);
+			GetTransform()->Translate(forward * ThomasTime::GetActualDeltaTime() * float(window->GetInput()->GetMouseScrollWheel()) * speed);
 			// Apply translation
-			m_transform->Translate(translation);
+			GetTransform()->Translate(translation);
 			
 			float xStep = window->GetInput()->GetMouseX() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
 			float yStep = window->GetInput()->GetMouseY() * ThomasTime::GetActualDeltaTime() * m_sensitivity;
@@ -470,7 +471,7 @@ namespace thomas
 			// Recreate matrix to prevent it from accumulating error
 			up = math::Vector3::Transform(up, rot);
 			forward = math::Vector3::Transform(forward, rot);
-			m_transform->Orient(forward, up);
+			GetTransform()->Orient(forward, up);
 		}
 
 		void EditorCamera::SnapCameraToFocus()
@@ -478,7 +479,7 @@ namespace thomas
 			if (m_selectedObjects.empty())
 				return;
 
-			math::BoundingBox combinedBox = math::BoundingBox(m_selectedObjects[0]->m_transform->GetPosition(), math::Vector3::Zero);
+			math::BoundingBox combinedBox = math::BoundingBox(m_selectedObjects[0]->GetTransform()->GetPosition(), math::Vector3::Zero);
 			for each(GameObject* gameObject in m_selectedObjects)
 			{
 				auto renderComponent = gameObject->GetComponent<object::component::RenderComponent>();
@@ -489,15 +490,15 @@ namespace thomas
 				}
 				else
 				{
-					boundingBox = math::BoundingBox(gameObject->m_transform->GetPosition(), math::Vector3::Zero);
+					boundingBox = math::BoundingBox(gameObject->GetTransform()->GetPosition(), math::Vector3::Zero);
 				}
 
 				math::BoundingBox::CreateMerged(combinedBox, boundingBox, combinedBox);
 			}
 
-			m_transform->LookAt(combinedBox.Center);
-			m_transform->SetPosition(combinedBox.Center);
-			m_transform->Translate(-m_transform->Forward()*combinedBox.Extents*5.0f);
+			GetTransform()->LookAt(combinedBox.Center);
+			GetTransform()->SetPosition(combinedBox.Center);
+			GetTransform()->Translate(-GetTransform()->Forward()*combinedBox.Extents*5.0f);
 		}
 	}
 }

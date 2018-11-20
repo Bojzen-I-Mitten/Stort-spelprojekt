@@ -159,6 +159,21 @@ namespace thomas
 			return 1;
 		}
 
+		component::Transform * GameObject::GetTransform()
+		{
+			return m_transform;
+		}
+
+		const std::vector<component::Component*>& GameObject::getComponents()
+		{
+			return m_components;
+		}
+
+		void GameObject::SetTransform(component::Transform * t)
+		{
+			m_transform = t;
+		}
+
 		void GameObject::Destroy()
 		{
 			for (unsigned int i = 0; i < s_gameObjects.size(); ++i)

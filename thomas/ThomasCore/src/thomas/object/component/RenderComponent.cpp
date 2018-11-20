@@ -58,7 +58,7 @@ namespace thomas {
 				if (m_model)
 				{
 					math::BoundingOrientedBox::CreateFromBoundingBox(m_bounds, m_model->m_bounds);
-					m_bounds.Transform(m_bounds, m_gameObject->m_transform->GetWorldMatrix());
+					m_bounds.Transform(m_bounds, m_gameObject->GetTransform()->GetWorldMatrix());
 
 					s_renderComponents.push_back(this);
 				
@@ -146,7 +146,7 @@ namespace thomas {
 				//assert(verifyPropertyList(m_properties.data(), m_properties.size()));
 				
 				thomas::graphics::render::RenderCommand cmd(
-					m_gameObject->m_transform->GetWorldMatrix(), 
+					m_gameObject->GetTransform()->GetWorldMatrix(),
 					mesh.get(), 
 					material, 
 					camera->ID(), 

@@ -73,12 +73,14 @@ namespace thomas
 			*/
 			int RemoveComponent(void * comp_ptr);
 		public:
+			component::Transform* GetTransform();
+			const std::vector<component::Component*>& getComponents();
+		protected:
+			void SetTransform(component::Transform* t);
+		private:
 			std::vector<component::Component*> m_components;
 			component::Transform* m_transform = nullptr;
 			bool m_activeSelf;
-
-
-		private:
 			bool m_moveStaticGroup;
 			UINT new_GroupID;	// Tmp id while waiting for frame end.
 			bool m_selected;
