@@ -267,7 +267,7 @@ namespace ThomasStandalone
             {
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1 && stopwatch.ElapsedMilliseconds > ThomasStandalone.Program.run_time)
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1 && stopwatch.ElapsedMilliseconds < ThomasStandalone.Program.run_time)
                 {
                     TranslateMessage(ref msg);
                     DispatchMessage(ref msg);
