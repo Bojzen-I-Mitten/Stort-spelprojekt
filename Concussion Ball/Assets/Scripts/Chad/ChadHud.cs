@@ -414,18 +414,20 @@ public class ChadHud : ScriptComponent
             if (screenPos.z > 1)
                 screenPos *= -1;
 
+            Vector3 screenBounds = screenCenter;
+
+            int sign = 1;
+            if (MatchSystem.instance && MatchSystem.instance.MatchStarted)
+                 sign = Math.Sign(MatchSystem.instance.LocalChad.transform.position.y - transform.position.y);
+
+            screenPos.y = Math.Abs(screenPos.y) * sign;
+
             float angle = (float)Math.Atan2(-screenPos.y, screenPos.x);
             angle -= MathHelper.PiOver2;
 
-            float cos = (float)Math.Cos(angle);
-            float sin = -(float)Math.Sin(angle);
-
-            //screenPos = screenCenter + new Vector3(sin * )
-
             float m = screenPos.y / screenPos.x;
 
-            Vector3 screenBounds = screenCenter; //473.5, 253.5, 0
-
+            //Clamp the arrow to the edge of the screen
             if (screenPos.y > 0)
                 screenPos = new Vector3(screenBounds.y / m, screenBounds.y, 0);
             else
