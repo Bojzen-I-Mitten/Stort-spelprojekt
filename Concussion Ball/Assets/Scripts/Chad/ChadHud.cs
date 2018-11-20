@@ -18,6 +18,14 @@ public class ChadHud : ScriptComponent
             return _Ball;
         }
     }
+    private ChadControls Chad
+    {
+        get
+        {
+            return MatchSystem.instance?.LocalChad;
+        }
+    }
+
     Camera cam;
 
     #region GUI Text & Images
@@ -415,7 +423,7 @@ public class ChadHud : ScriptComponent
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
         if (!(screenPos.z > 0 && screenPos.z < 1 &&
             screenPos.x > 0 && screenPos.x < cam.viewport.size.x &&
-            screenPos.y > 0 && screenPos.y < cam.viewport.size.y)) //Offscreen check
+            screenPos.y > 0 && screenPos.y < cam.viewport.size.y))//Offscreen check
         {
             //Adjust for center of screen
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;
@@ -441,24 +449,21 @@ public class ChadHud : ScriptComponent
             angle -= MathHelper.PiOver2;
 
             float m = screenPos.y / screenPos.x;
-
             //Clamp the arrow to the edge of the screen
             if (screenPos.y > 0)
                 screenPos = new Vector3(screenBounds.y / m, screenBounds.y, 0);
             else
                 screenPos = new Vector3(-screenBounds.y / m, -screenBounds.y, 0);
 
-            if (screenPos.x > screenBounds.x)
+            if (screenPos.x > screenBounds.x * 0.8f)
                 screenPos = new Vector3(screenBounds.x, screenBounds.x * m, 0);
-            else if (screenPos.x < -screenBounds.x)
+            else if (screenPos.x < -screenBounds.x * 0.8f)
                 screenPos = new Vector3(-screenBounds.x, -screenBounds.x * m, 0);
 
             //Re-adjust for screen center
             screenPos += screenCenter;
-            //Adjust for texture size
-            Vector2 size = new Vector2(BallArrowTexture.width, BallArrowTexture.height) * BallArrow.scale / 2;
-            screenPos -= new Vector3(size, 0);
             //Make sure the arrow is drawn on-screen
+            Vector2 size = new Vector2(BallArrowTexture.width, BallArrowTexture.height) * BallArrow.scale / 2;
             screenPos = Vector3.Clamp(screenPos, Vector3.Zero + new Vector3(size, 0), new Vector3(cam.viewport.size - size, 0));
 
             screenPos /= new Vector3(cam.viewport.size, 1);
