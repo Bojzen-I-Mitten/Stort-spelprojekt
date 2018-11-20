@@ -50,8 +50,9 @@ namespace thomas
 				m_particleBufferStruct.nrOfParticlesToEmit = 0;
 				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
 				m_particleBufferStruct.rand = std::rand();
-				
-				SetTexture(resource::Texture2D::GetWhiteTexture());
+
+				m_particleBufferStruct.textureIndex = 0;
+				m_texture = resource::Texture2D::GetWhiteTexture();
 			}
 
 			ParticleEmitterComponent::~ParticleEmitterComponent()
@@ -341,7 +342,7 @@ namespace thomas
 			{
 				if (blendState != m_blendState)
 				{
-					m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
+					//m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
 					m_blendState = blendState;
 					if (blendState == graphics::ParticleSystem::BLEND_STATE::ALPHA)
 					{
