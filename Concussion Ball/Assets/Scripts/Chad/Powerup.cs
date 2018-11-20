@@ -105,18 +105,12 @@ public class Powerup : PickupableObject
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         base.OnWrite(writer, initialState);
-        if (initialState)
-        {
-            if (spawner)
-                writer.Put(spawner.ID);
-            else
-                writer.Put(-1);
+        if (spawner)
+            writer.Put(spawner.ID);
+        else
+            writer.Put(-1);
 
-            writer.Put(activated);
-
-        }
-
-
+        writer.Put(activated);
         return true;
     }
 
@@ -124,16 +118,22 @@ public class Powerup : PickupableObject
     {
         base.OnRead(reader, initialState);
 
-        if (initialState)
+        int spawnerID = reader.GetInt();
+        if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
         {
-            int spawnerID = reader.GetInt();
-            if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
-            {
-                spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
-                Reset();
-            }
-            activated = reader.GetBool();
+            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
+            Reset();
         }
+        if (spawnerID == -1)
+            spawner = null;
+
+        bool newActivation = reader.GetBool();
+        if (!activated && newActivation)
+        {
+            OnActivate();
+        }
+        activated = newActivation;
+        
 
 
     }

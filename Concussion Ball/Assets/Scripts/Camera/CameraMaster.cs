@@ -34,13 +34,27 @@ public class CameraMaster : ScriptComponent
 
     public override void Awake()
     {
+        instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
     }
 
+
+    public void StartReplay()
+    {
+        ChadCam.enabled = false;
+        SpectatorCam.enabled = false;
+        
+    }
+
+    public void StopReplay()
+    {
+        ChadCam.enabled = true;
+        SpectatorCam.enabled = false;
+    }
+
     public override void Start()
     {
-        instance = this;
         State = CAM_STATE.MAIN_MENU;
         //BG = Canvas.Add(Background);
         //BG.interactable = true;

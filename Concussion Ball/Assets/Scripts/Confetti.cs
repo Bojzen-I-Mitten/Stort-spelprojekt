@@ -75,11 +75,14 @@ public class Confetti : ScriptComponent
 
     public override void Update()
     {
-        bool hasScored = MatchSystem.instance.hasScored;
-        
-        emitterConfetti1.Emit = hasScored;
-        emitterConfetti2.Emit = hasScored;
-        emitterConfetti3.Emit = hasScored;
+        //bool hasScored = MatchSystem.instance.hasScored;
+        //if(hasScored)
+        //{
+        //    emitterConfetti1.Emit = true;
+        //    emitterConfetti2.Emit = true;
+        //    emitterConfetti3.Emit = true;
+        //}
+
 
     }
 
@@ -89,7 +92,7 @@ public class Confetti : ScriptComponent
         emitterConfetti2.Emit = true;
         emitterConfetti3.Emit = true;
 
-        yield return new WaitForSeconds(5.0f);
+        yield return new WaitForSeconds(duration);
 
         emitterConfetti1.Emit = false;
         emitterConfetti2.Emit = false;

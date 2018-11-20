@@ -48,14 +48,10 @@ namespace ThomasEngine.Network
 
         virtual public void OnRead(NetDataReader reader, bool initialState)
         {
-            if (!initialState)
-                reader.GetInt();
         }
 
         virtual public bool OnWrite(NetDataWriter writer, bool initialState)
         {
-            if (!initialState)
-                writer.Put(0);
             return false;
         }
 

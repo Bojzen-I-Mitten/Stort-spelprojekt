@@ -2,6 +2,8 @@
 using ThomasEngine.Network;
 
 using System.Collections;
+using System.Collections.Generic;
+
 public class TeamGoal : ScriptComponent
 {
     public TEAM_TYPE Team { get; set; }
@@ -13,14 +15,16 @@ public class TeamGoal : ScriptComponent
     public Texture2D goalCenterTexture { get; set; }
     public Texture2D goalSparkTexture { get; set; }
     public Texture2D goalShockWaveTexture { get; set; }
-    
+
+    List<Confetti> confettis;
 
     public override void Start()
     {
+        confettis = Object.GetObjectsOfType<Confetti>();
         BoxCollider c = gameObject.AddComponent<BoxCollider>();
         c.isTrigger = true;
         c.size = new Vector3(0.5f, 0.5f, 0.5f);
-        //MatchSystem.instance.FindTeam(Team).SetGoalArea(this);
+        MatchSystem.instance.FindTeam(Team).GoalPosition = transform.position;
 
         goalEmitterCenter = gameObject.AddComponent<ParticleEmitter>();
         goalEmitterSpark = gameObject.AddComponent<ParticleEmitter>();
@@ -93,9 +97,11 @@ public class TeamGoal : ScriptComponent
                 {
                     TEAM_TYPE teamThatScored = MatchSystem.instance.GetOpposingTeam(Team);
                     MatchSystem.instance.OnGoal(teamThatScored);
-                    goalEmitterCenter.EmitOneShot(100);
-                    goalEmitterShock.EmitOneShot(1);
-                    StartCoroutine(EmitSparkForDuration(3.0f));
+                    StartCoroutine(EmitSparkForDuration(5.0f));
+                }
+                if(MatchSystem.instance.ReplaySystem.Replaying)
+                {
+                    StartCoroutine(EmitSparkForDuration(5.0f));
                 }
             }
         }
@@ -103,9 +109,11 @@ public class TeamGoal : ScriptComponent
     }
     public IEnumerator EmitSparkForDuration(float duration)
     {
-
+        confettis.ForEach((confetti) => confetti.EmitForDuration(duration));
+        goalEmitterCenter.EmitOneShot(100);
+        goalEmitterShock.EmitOneShot(1);
         goalEmitterSpark.Emit = true;
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(duration);
         goalEmitterSpark.Emit = false;
     }
 

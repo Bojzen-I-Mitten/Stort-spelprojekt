@@ -19,15 +19,26 @@ public class ReplaySystem : ScriptComponent
     float timeSinceLastSave = 0.1f;
     float timeSinceLastIntialStateSave = 1.0f;
     List<ReplayState> States = new List<ReplayState>();
-    bool replaying = false;
+    public bool Replaying = false;
+    public bool recordGame = true;
+    ChadCam chadCam;
+    SpectatorCam specCam;
+
     public override void Start()
     {
+        chadCam = CameraMaster.instance.gameObject.GetComponent<ChadCam>();
+        specCam = CameraMaster.instance.gameObject.GetComponent<SpectatorCam>();
     }
 
     public override void Update()
     {
-        if (!MatchSystem.instance || !MatchSystem.instance.MatchStarted || replaying)
+        if(Replaying)
+            specCam.transform.LookAt(MatchSystem.instance.Ball.transform.position);
+
+        if (!MatchSystem.instance || !MatchSystem.instance.MatchStarted || Replaying || !recordGame)
             return;
+
+        saveInterval = MatchSystem.instance.InternalManager.UpdateTime / 1000.0f;
 
         timeSinceLastSave += Time.ActualDeltaTime;
         timeSinceLastIntialStateSave += Time.ActualDeltaTime;
@@ -42,19 +53,28 @@ public class ReplaySystem : ScriptComponent
                 SaveObjectState(false);
         }
 
-        if (States.Count > 0 && (MatchSystem.instance.ElapsedMatchTime - States[0].timestamp) > durationInSeconds + 1.0f)
+        if (States.Count > 0 && (Time.ElapsedTime - States[0].timestamp) > durationInSeconds + 1.0f)
         {
             States.RemoveAt(0);
             RemoveUntilInitialState();
         }
-        if (Input.GetKeyDown(Input.Keys.P))
-            StartCoroutine(StartReplay());
     }
 
-    private IEnumerator StartReplay()
+    public void StartReplay(Team teamThatScored)
     {
+        if(!Replaying)
+        {
+            Vector3 goalPos = MatchSystem.instance.Teams[MatchSystem.instance.GetOpposingTeam(teamThatScored.TeamType)].GoalPosition;
+            StartCoroutine(RelayCoroutine(goalPos));
+        }
+    }
+
+    private IEnumerator RelayCoroutine(Vector3 goalPos)
+    {
+        CameraMaster.instance.StartReplay();
+        specCam.transform.position = goalPos + new Vector3(goalPos.z / 1.2f, 5, 0);
         MatchSystem.instance.ReadOwnerAsNormal = true;
-        replaying = true;
+        Replaying = true;
         ReplayState initialState = States[0];
         RemoveAllInitialStates();
         float currentTime = initialState.timestamp;
@@ -70,9 +90,11 @@ public class ReplaySystem : ScriptComponent
             LoadObjectState(States[0]);
             States.RemoveAt(0);
         }
-        replaying = false;
+        Replaying = false;
         MatchSystem.instance.ReadOwnerAsNormal = false;
+        CameraMaster.instance.StopReplay();
     }
+
 
     private void RemoveUntilInitialState()
     {
@@ -97,6 +119,12 @@ public class ReplaySystem : ScriptComponent
     private void SaveObjectState(bool initialState)
     {
         NetDataWriter writer = new NetDataWriter(true);
+
+        foreach(var player in MatchSystem.instance.Scene.AllPlayers)
+        {
+            player.WriteData(writer, initialState);
+        }
+
         foreach (var netObj in MatchSystem.instance.Scene.NetworkObjects)
         {
             writer.Put(netObj.Key); //Network ID
@@ -108,7 +136,7 @@ public class ReplaySystem : ScriptComponent
         ReplayState state = new ReplayState
         {
             initialState = initialState,
-            timestamp = MatchSystem.instance.ElapsedMatchTime,
+            timestamp = Time.ElapsedTime,
             reader = reader
         };
         States.Add(state);
@@ -116,10 +144,15 @@ public class ReplaySystem : ScriptComponent
 
     private void LoadObjectState(ReplayState state)
     {
+
+        foreach (var player in MatchSystem.instance.Scene.AllPlayers)
+        {
+            player.ReadData(state.reader, state.initialState);
+        }
+
         while (!state.reader.EndOfData)
         {
             int id = state.reader.GetInt();
-            Debug.Log("ID: " + id);
             NetworkIdentity identity = MatchSystem.instance.Scene.NetworkObjects[id];
             identity.ReadData(state.reader, state.initialState);
         }

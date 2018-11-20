@@ -106,12 +106,12 @@ namespace ThomasEngine.Network
         {
             if (initalState)
             {
-                DataWriter.Put(gameObject.activeSelf);
+                writer.Put(gameObject.activeSelf);
             }
             foreach (NetworkComponent comp in networkComponentsCache)
             {
 
-                comp.OnWrite(DataWriter, initalState);
+                comp.OnWrite(writer, initalState);
             }
         }
 

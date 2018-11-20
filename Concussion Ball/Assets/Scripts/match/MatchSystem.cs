@@ -53,6 +53,7 @@ public class MatchSystem : NetworkManager
         }
     }
 
+    public ReplaySystem ReplaySystem;
     public PowerupManager PowerupManager;
     public static new MatchSystem instance
     {
@@ -87,12 +88,13 @@ public class MatchSystem : NetworkManager
 
     public override void Start()
     {
+        
         Ball = GameObject.Instantiate(BallPrefab);
         base.Start();
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
 
-       
+        ReplaySystem = gameObject.GetComponent<ReplaySystem>();
         countdownSound = gameObject.AddComponent<SoundComponent>();
         countdownSound.Clip = countdownSoundClip;
         countdownSound.Looping = false;
@@ -196,12 +198,20 @@ public class MatchSystem : NetworkManager
     IEnumerator OnGoalCoroutine(Team teamThatScored)
     {
         //endroundSound.PlayOneShot();
-        ChadHud.Instance.OnGoal(teamThatScored, 7.0f);
+        
+        ChadHud.Instance.OnGoal(teamThatScored, 5.0f);
         Time.TimeScale = 0.5f;
 
-        Time.TimeScale = 0.5f;
-        yield return new WaitForSecondsRealtime(7.0f);
+        yield return new WaitForSecondsRealtime(2.0f);
+        ReplaySystem.recordGame = false;
+        yield return new WaitForSecondsRealtime(3.0f);
         Time.TimeScale = 1.0f;
+        ReplaySystem.StartReplay(teamThatScored);
+        while (ReplaySystem.Replaying)
+        {
+            yield return null;
+        }
+        ReplaySystem.recordGame = true;
         OnRoundEnd();
         OnRoundStart();
     }

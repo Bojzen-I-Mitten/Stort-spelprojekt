@@ -13,7 +13,8 @@ namespace ThomasEngine.Network
         {
         }
         public int nextAssignableID = 0;
-        private List<GameObject> PlayerPool = new List<GameObject>();
+        private List<NetworkIdentity> PlayerPool = new List<NetworkIdentity>();
+        public List<NetworkIdentity> AllPlayers = new List<NetworkIdentity>();
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
         private List<NetworkIdentity> SceneObjectToBeActivated = new List<NetworkIdentity>();
@@ -53,26 +54,27 @@ namespace ThomasEngine.Network
             {
                 GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
                 player.activeSelf = false;
-                
-                player.GetComponent<NetworkIdentity>().IsPlayer = true;
-                PlayerPool.Add(player);
+                NetworkIdentity identity = player.GetComponent<NetworkIdentity>();
+                identity.IsPlayer = true;
+                PlayerPool.Add(identity);
+                AllPlayers.Add(identity);
             }
         }
 
-        private GameObject GetAvailablePlayerFromPool()
+        private NetworkIdentity GetAvailablePlayerFromPool()
         {
             if(PlayerPool.Count > 0)
             {
-                GameObject player = PlayerPool[0];
+                NetworkIdentity player = PlayerPool[0];
                 PlayerPool.RemoveAt(0);
                 return player;
             }
             else
                 return null;
         }
-        private void RecyclePlayer(GameObject player)
+        private void RecyclePlayer(NetworkIdentity player)
         {
-            player.activeSelf = false;
+            player.gameObject.activeSelf = false;
             PlayerPool.Add(player);
         }
 
@@ -91,16 +93,15 @@ namespace ThomasEngine.Network
 
             ObjectOwners[peer] = new List<NetworkIdentity>();
 
-            GameObject player = GetAvailablePlayerFromPool();
+            NetworkIdentity player = GetAvailablePlayerFromPool();
             if(player)
             {
-                player.activeSelf = true;
-                NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
-               
-                networkIdentity.Owner = myPlayer;
+                player.gameObject.activeSelf = true;
+
+                player.Owner = myPlayer;
                 if (myPlayer)
-                    player.Name += " (my player)";
-                Players[peer] = networkIdentity;
+                    player.gameObject.Name += " (my player)";
+                Players[peer] = player;
             }
             else
             {
@@ -126,7 +127,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
-                    RecyclePlayer(id.gameObject);
+                    RecyclePlayer(id);
                 Players.Remove(peer);
             }
         }

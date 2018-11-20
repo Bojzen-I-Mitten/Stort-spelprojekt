@@ -644,6 +644,14 @@ public class ChadControls : NetworkComponent
     {
         if (State != STATE.RAGDOLL)
         {
+            if (PickedUpObject)
+            {
+                if (PickedUpObject.ID == id)
+                    return;
+                else
+                    PickedUpObject.Drop();
+            }
+
             GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
             PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
             pickupable.Pickup(this, hand ? hand : transform);
@@ -664,11 +672,15 @@ public class ChadControls : NetworkComponent
 
     public override void OnRead(NetDataReader reader, bool initialState)
     {
-        if (initialState)
+
+        int pickedUpObject = reader.GetInt();
+        if (pickedUpObject >= 0)
         {
-            int pickedUpObject = reader.GetInt();
-            if (pickedUpObject >= 0)
-                RPCPickup(pickedUpObject);
+            RPCPickup(pickedUpObject);
+        }    
+        else if(PickedUpObject)
+        {
+            PickedUpObject.Drop();
         }
 
         if (isOwner)
@@ -689,8 +701,7 @@ public class ChadControls : NetworkComponent
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if (initialState)
-            writer.Put(PickedUpObject ? PickedUpObject.ID : -1);
+        writer.Put(PickedUpObject ? PickedUpObject.ID : -1);
         writer.Put((int)State);
         writer.Put(Direction);
         writer.Put(CurrentVelocity);
