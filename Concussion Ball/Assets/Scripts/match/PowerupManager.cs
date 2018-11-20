@@ -7,19 +7,21 @@ public class PowerupManager : ScriptComponent
 {
     
     public List<GameObject> Powerups { get; set; } = new List<GameObject>();
+    private List<PowerupSpawner> spawnPoints;
 
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
     public int NextPowerupID = 1000;
     public int PoolSize { get; set; } = 10;
     public override void OnAwake()
     {
+        spawnPoints = new List<PowerupSpawner>(ScriptUtility.GetComponentsOfType<PowerupSpawner>());
         initPowerupPool();
         //MatchSystem.instance.SpawnablePrefabs.AddRange(Powerups);
     }
 
     void initPowerupPool()
     {
-        Debug.Log("Initiating Powerups of poolsize: " + PoolSize);
+        Debug.Log("init start");
         foreach (GameObject prefab in Powerups)
         {
             List<GameObject> pool = new List<GameObject>(PoolSize);
@@ -30,7 +32,7 @@ public class PowerupManager : ScriptComponent
             }
             powerupPool.Add(pool);
         }
-        Debug.Log("Powerup Initiation Complete");
+        Debug.Log("init end");
     }
 
     public override void Update()
@@ -52,7 +54,7 @@ public class PowerupManager : ScriptComponent
     {
         foreach(GameObject powerup in powerupPool[powerupIndex])
         {
-            if (!powerup.GetActive())
+            if (!powerup.activeSelf)
                 return powerup;
         }
         return null;
@@ -61,7 +63,7 @@ public class PowerupManager : ScriptComponent
     public void RecyclePowerup(Powerup powerup)
     {
         powerup.Disable();
-        powerup.gameObject.SetActive(false);
+        powerup.gameObject.activeSelf = false;
     }
 
     public void ResetPowerups()
@@ -69,16 +71,13 @@ public class PowerupManager : ScriptComponent
         Debug.Log("reset start");
         foreach (Powerup p in ScriptUtility.GetComponentsOfType<Powerup>())
         {
-            if (p.isOwner)
+            if(p.isOwner)
                 p.Remove();
         }
-        foreach (PowerupSpawner sp in ScriptUtility.GetComponentsOfType<PowerupSpawner>())
-        {
-            if (sp.isOwner)
-                sp.Free();
-            sp.SpawnPowerup();
-        }
         
+
+        spawnPoints.ForEach(point => { if (point.isOwner) point.Free(); }); //Safety free
+        spawnPoints.ForEach(point => point.SpawnPowerup());
         Debug.Log("reset end");
     }
 }

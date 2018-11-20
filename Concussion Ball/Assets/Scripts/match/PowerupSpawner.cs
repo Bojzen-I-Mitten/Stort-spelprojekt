@@ -68,7 +68,7 @@ public class PowerupSpawner : NetworkComponent
                 spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup();
                 if (spawnedPowerup)
                 {
-                    spawnedPowerup.SetActive(true);
+                    spawnedPowerup.activeSelf = true;
                     Powerup powerup = spawnedPowerup.GetComponent<Powerup>();
                     spawnedPowerup.GetComponent<NetworkIdentity>().Owner = true;
                     powerup.Reset();
@@ -85,7 +85,7 @@ public class PowerupSpawner : NetworkComponent
                     spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
 
                 }
-                else if(timeLeftUntilSpawn>-0.5f)
+                else
                 {
                     Debug.Log("No available powerup to spawn");
                 }

@@ -17,7 +17,7 @@ public class CameraMaster : ScriptComponent
 
     public Texture2D Background { get; set; }
 
-    Camera Camera;
+    public Camera Camera;
     GUIJoinHost JoinHost;
     GUIMainMenu MainMenu;
     GUISelectTeam SelectTeam;
@@ -90,8 +90,7 @@ public class CameraMaster : ScriptComponent
         //Set all CAM_STATEs exept GAME to false
         SelectTeam.Canvas.isRendering = false;
         Hud.Canvas.isRendering = false;
-        if(ExitMenu)
-            ExitMenu.Canvas.isRendering = false;
+        ExitMenu.Canvas.isRendering = false;
         JoinHost.Canvas.isRendering = false;
         MainMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;

@@ -217,7 +217,7 @@ public class Ragdoll : ScriptComponent
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
         {
-            gObj.SetActive(true);
+            gObj.activeSelf = true;
         }
 
         RagdollEnabled = true;
@@ -717,7 +717,7 @@ public class Ragdoll : ScriptComponent
         foreach(GameObject gObj in G_BodyParts)
         {
             if(gObj != null)
-                gObj.SetActive(false);
+                gObj.activeSelf = false;
         }
         RagdollEnabled = false;
 
