@@ -183,13 +183,20 @@ namespace thomas
 				PROFILE("BindFrame")
 				BindFrame();
 			}
-
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
 				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
 				LightManager::DrawShadows(perCameraQueue.second, camera);
-				
+			}
+
+
+			profiler->Timestamp(utils::profiling::GTS_SHADOWS);
+
+			for (auto & perCameraQueue : m_prevFrame->m_queue)
+			{
+				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+
 				{
 					PROFILE("CameraBind")
 					BindCameraRenderTarget(perCameraQueue.second.m_frameData);

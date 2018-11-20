@@ -16,6 +16,7 @@ namespace thomas
 				GTS_PARTICLES,
 				GTS_GIZMO_OBJECTS,
 				GTS_GUI,
+				GTS_SHADOWS,
 				GTS_END_FRAME,
 
 				GTS_MAX

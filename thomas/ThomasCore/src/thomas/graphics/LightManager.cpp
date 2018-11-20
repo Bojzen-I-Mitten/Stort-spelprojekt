@@ -122,23 +122,25 @@ namespace thomas
 			//{
 			if (s_lights.size() == 0)
 				return;
+			
+			if (s_lights[0]->GetType() != LIGHT_TYPES::DIRECTIONAL)
+				return;
 
 			s_lights[0]->UpdateShadowBox(camera);
 			s_lights[0]->BindShadowMapDepthTexture();
 
-			//PROFILE("ShadowDrawObjectsPerCamera")
+			
 			for (auto & perMaterialQueue : renderQueue.m_commands3D)
 			{
-				//PROFILE("ShadowDrawObjects")
+				
 				for (auto & perMeshCommand : perMaterialQueue.second)
 				{
 					{
-						//PROFILE("DrawShadow")
+						
 						s_lights[0]->DrawShadow(perMeshCommand);
 					}
 				}
 			}
-			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 		}
 
 		void LightManager::BindLights(render::ShaderList* shaders)
