@@ -42,6 +42,9 @@ public class GUIHostMenu : ScriptComponent
     Text PowerUpsCheck;
     Image PowerUpsBox;
 
+    Text SimilarColor;
+    Text SameName;
+
     #endregion
 
     #region Teams
@@ -65,6 +68,8 @@ public class GUIHostMenu : ScriptComponent
 
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
+    bool NotSameName = true;
+    bool NotSimilarColor = true;
     
     public string PortString;
 
@@ -96,6 +101,22 @@ public class GUIHostMenu : ScriptComponent
             HostBg.scale = new Vector2(6.4f, 1.44f);
             HostBg.depth = 0.7f;
         }
+
+        SimilarColor = Canvas.Add("Teams have similar color, can't host");
+        SimilarColor.position = new Vector2(0.5f, 0.52f);
+        SimilarColor.origin = new Vector2(0.5f);
+        SimilarColor.color = Color.Red;
+        SimilarColor.scale = Vector2.Zero;
+        SimilarColor.font = Font;
+        SimilarColor.depth = 0;
+
+        SameName = Canvas.Add("Teams have same name, can't host");
+        SameName.position = new Vector2(0.5f, 0.58f);
+        SameName.origin = new Vector2(0.5f);
+        SameName.color = Color.Red;
+        SameName.scale = Vector2.Zero;
+        SameName.font = Font;
+        SameName.depth = 0;
 
         #endregion
 
@@ -157,12 +178,12 @@ public class GUIHostMenu : ScriptComponent
             Team1SliderKnob = Canvas.Add(SliderKnobTexture);
             Team1SliderKnob.position = team1SliderKnobPos;
             Team1SliderKnob.origin = new Vector2(0.5f);
-            Team1SliderKnob.color = HSLColor(0d);
+            Team1SliderKnob.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
 
             Team2SliderKnob = Canvas.Add(SliderKnobTexture);
-            Team2SliderKnob.position = team2SliderKnobPos;
+            Team2SliderKnob.position = team2SliderKnobPos + Team2ColorSlider.size * new Vector2(0.66f, 0);
             Team2SliderKnob.origin = new Vector2(0.5f);
-            Team2SliderKnob.color = HSLColor(0d);
+            Team2SliderKnob.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
         }
         #endregion
     }
@@ -181,14 +202,20 @@ public class GUIHostMenu : ScriptComponent
                 float hue = 0.0f;
 
                 if (Team1ColorSlider.Hovered())
+                {
                     Team1SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team1SliderKnob.position.y);
-                hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
-                Team1SliderKnob.color = HSLColor(hue);
+                    hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
+                    Team1SliderKnob.color = HSLColor(hue);
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = Team1SliderKnob.color;
+                }
 
                 if (Team2ColorSlider.Hovered())
+                {
                     Team2SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team2SliderKnob.position.y);
-                hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / Team2ColorSlider.size.x;
-                Team2SliderKnob.color = HSLColor(hue);
+                    hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / Team2ColorSlider.size.x;
+                    Team2SliderKnob.color = HSLColor(hue);
+                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = Team2SliderKnob.color;
+                }
             }
 
             if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
@@ -216,15 +243,14 @@ public class GUIHostMenu : ScriptComponent
                 HostBtn.color = Color.IndianRed;
                 if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
                 {
-                    CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = Team1SliderKnob.color;
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name = Team1.text;
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = Team2SliderKnob.color;
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
-
-                    MatchSystem.instance.Init();
-                    MatchSystem.instance.Host();
-
+                    if (NotSimilarColor && NotSameName)
+                    {
+                        CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+                        MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name = Team1.text;
+                        MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
+                        MatchSystem.instance.Init();
+                        MatchSystem.instance.Host();
+                    }
                 }
             }
             else
@@ -252,7 +278,36 @@ public class GUIHostMenu : ScriptComponent
                 Team2.text = _team2;
             }
 
+            NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
+            NotSameNameTest(Team1.text, Team2.text);
         }
+    }
+
+    /*
+     * Can't get this to work properly.
+     */
+    private float HueFromRGB(Color rgba)
+    {
+        Vector3 rgb = rgba.ToVector3() / 255.0f;
+        float hue = 0;
+
+        float _min = Math.Min(Math.Min(rgb.x, rgb.y), rgb.z);
+        float _max = Math.Max(Math.Max(rgb.x, rgb.y), rgb.z);
+        float _delta = _max - _min;
+        if (_delta != 0)
+        {
+            if (rgb.x == _max)
+                hue = (rgb.y - rgb.z) / _delta;
+            else if (rgb.y == _max)
+                hue = 2.0f + (rgb.z - rgb.x) / _delta;
+            else if (rgb.z == _max)
+                hue = 4.0f + (rgb.x - rgb.y) / _delta;
+        }
+        Debug.Log("Hue: " + hue);
+        Debug.Log("R: " + rgb.x);
+        Debug.Log("G: " + rgb.y);
+        Debug.Log("B: " + rgb.z);
+        return hue;
     }
 
     private Color HSLColor(double hue)
@@ -263,7 +318,7 @@ public class GUIHostMenu : ScriptComponent
         byte r, g, b;
 
         double t1, t2;
-        double th = hue; // /6.0d;
+        double th = hue;
 
         t2 = (luminosity + saturation) - (luminosity * saturation);
         t1 = 2d * luminosity - t2;
@@ -291,5 +346,34 @@ public class GUIHostMenu : ScriptComponent
         if (2.0d * c < 1.0d) return t2;
         if (3.0d * c < 2.0d) return t1 + (t2 - t1) * (2.0d / 3.0d - c) * 6.0d;
         return t1;
+    }
+
+    private void NotSimilarColorTest(Color c1, Color c2)
+    {
+        float distance = Vector3.Distance(c1.ToVector3(), c2.ToVector3());
+        if(distance >= 0.25f)
+        {
+            NotSimilarColor = true;
+            SimilarColor.scale = Vector2.Zero;
+        }
+        else
+        {
+            NotSimilarColor = false;
+            SimilarColor.scale = Vector2.One;
+        }
+    }
+
+    private void NotSameNameTest(string n1, string n2)
+    {
+        if (n1 != n2)
+        {
+            NotSameName = true;
+            SameName.scale = Vector2.Zero;
+        }
+        else
+        {
+            NotSameName = false;
+            SameName.scale = Vector2.One;
+        }
     }
 }
