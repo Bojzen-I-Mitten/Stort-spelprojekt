@@ -177,8 +177,12 @@ public class ThomasTrain : Powerup
                 Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.Normalize();
                 forceDir.y += 3.0f;
+
+
                 float distForce = ExplosionRadius - distance;
-                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
+                Vector3 force = forceDir * ExplosionForce * distForce;
+                Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
+                localChad.ActivateRagdoll(2.0f, param);
             }
         }
     }

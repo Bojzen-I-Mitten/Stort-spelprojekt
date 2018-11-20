@@ -61,6 +61,7 @@ namespace thomas
 				Physics::AddRigidBody(this);
 				m_prevMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
 				UpdateProperties();
+				UpdateRigidBodyTransform();	// Reset transform
 			}
 
 			void Rigidbody::OnDisable()
@@ -101,37 +102,43 @@ namespace thomas
 
 			}
 
+			void Rigidbody::UpdateRigidBodyTransform()
+			{
+				btTransform trans;
+
+				math::Vector3 pos = m_gameObject->GetTransform()->GetPosition();
+				math::Quaternion rot = m_gameObject->GetTransform()->GetRotation();
+				if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
+
+				trans.setRotation((btQuaternion&)rot);
+				trans.setOrigin((btVector3&)pos);
+				//getMotionState()->setWorldTransform(trans);
+
+#ifdef _EDITOR
+				if (ImGuizmo::IsUsing()) {
+					this->setLinearVelocity(btVector3(0, 0, 0));
+					this->setAngularVelocity(btVector3(0, 0, 0));
+				}
+#endif
+				//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
+				//setCenterOfMassTransform(trans);
+
+
+				setWorldTransform(trans);
+				getMotionState()->setWorldTransform(trans);
+				setCenterOfMassTransform(trans);
+				Physics::s_world->updateSingleAabb(this);
+				activate();
+			}
+
 			void Rigidbody::UpdateTransformToRigidBody()
 			{
 				math::Matrix currentMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
+				// Verify not changed and that it shouldn't be skipped for the frame.
 				if (!m_ignoreTransform && m_prevMatrix != currentMatrix)
 				{
-					btTransform trans;
-
-					math::Vector3 pos = m_gameObject->GetTransform()->GetPosition();
-					math::Quaternion rot = m_gameObject->GetTransform()->GetRotation();
-					if (m_collider)pos += math::Vector3::Transform(m_collider->getCenter(), rot);
-
-					trans.setRotation((btQuaternion&)rot);
-					trans.setOrigin((btVector3&)pos);
-					//getMotionState()->setWorldTransform(trans);
-
-#ifdef _EDITOR
-					if (ImGuizmo::IsUsing()) {
-						this->setLinearVelocity(btVector3(0, 0, 0));
-						this->setAngularVelocity(btVector3(0, 0, 0));
-					}
-#endif
-					//trans.setOrigin((btVector3&)(pos + m_LocalCenterOfMassChange));
-					//setCenterOfMassTransform(trans);
-
-
-					setWorldTransform(trans);
-					getMotionState()->setWorldTransform(trans);
-					setCenterOfMassTransform(trans);
-					Physics::s_world->updateSingleAabb(this);
-					activate();
-
+					// Update rigid body transform
+					UpdateRigidBodyTransform();
 				}
 				m_prevMatrix = currentMatrix;
 				m_ignoreTransform = false;

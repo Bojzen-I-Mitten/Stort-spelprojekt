@@ -157,6 +157,8 @@ public class ChadControls : NetworkComponent
             StateMachine();
         }
 
+        /* Enter leave ragdoll state
+         */ 
         if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
             EnableRagdoll();
         else if (State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
@@ -164,10 +166,11 @@ public class ChadControls : NetworkComponent
             DisableRagdoll();
         }
 
-        //if (Input.GetKeyDown(Input.Keys.L))
-        //{
-        //    ActivateRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
-        //}
+        if (Input.GetKeyDown(Input.Keys.L))
+        {
+            Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (-transform.forward + transform.up * 0.5f) * 2000, 1);
+            ActivateRagdoll(MinimumRagdollTimer, param);
+        }
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
@@ -212,39 +215,40 @@ public class ChadControls : NetworkComponent
         StartCoroutine(RagdollRecoverer);
     }
 
-    public void LocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
+    private void LocalActivateRagdoll(float duration, Ragdoll.ImpactParams param)
     {
-        SendRPC("RPCStartRagdoll", duration, force);
-        RPCStartRagdoll(duration, force, diveTackle);
+        SendRPC("RPCStartRagdoll", duration, param);
+        RPCStartRagdoll(duration, param);
     }
 
-    public void RPCLocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
+    public void RPCLocalActivateRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         if(MatchSystem.instance.LocalChad)
         {
-            MatchSystem.instance.LocalChad.LocalActivateRagdoll(duration, force, diveTackle);
+            MatchSystem.instance.LocalChad.LocalActivateRagdoll(duration, param);
         }
     }
-
-    public void ActivateRagdoll(float duration, Vector3 force)
+    /* Call for activating ragdoll
+    */
+    public void ActivateRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         if(!isOwner)
         {
             NetPeer peerThatOwnsThisPlayer = MatchSystem.instance.Scene.Players.FirstOrDefault(player => player.Value == Identity).Key;
             if(peerThatOwnsThisPlayer != null)
             {
-                MatchSystem.instance.SendRPC(peerThatOwnsThisPlayer, -1, "RPCLocalActivateRagdoll", duration, force);
+                MatchSystem.instance.SendRPC(peerThatOwnsThisPlayer, -1, "RPCLocalActivateRagdoll", duration, param);
             }
-            RPCStartRagdoll(duration, force, State == STATE.DIVING);
+            RPCStartRagdoll(duration, param);
         }
         else
         {
-            LocalActivateRagdoll(duration, force, State == STATE.DIVING);
+            LocalActivateRagdoll(duration, param);
         }
         Ragdoll.Smack();
     }
 
-    public void RPCStartRagdoll(float duration, Vector3 force, bool diveTackle)
+    public void RPCStartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
         {
@@ -263,7 +267,7 @@ public class ChadControls : NetworkComponent
 
         if (State != STATE.RAGDOLL)
         {
-            Ragdolling = StartRagdoll(duration, force, diveTackle);
+            Ragdolling = StartRagdoll(duration, param);
             StartCoroutine(Ragdolling);
             Camera.InitFreeLookCamera();
         }
@@ -566,10 +570,10 @@ public class ChadControls : NetworkComponent
         State = STATE.CHADING;
     }
 
-    IEnumerator StartRagdoll(float duration, Vector3 force, bool diveTackle)
+    IEnumerator StartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         State = STATE.RAGDOLL;
-        Ragdoll.AddForce(force, diveTackle);
+        Ragdoll.AddForce(param);
 
         yield return new WaitForSeconds(duration);
         float timer = 0;
@@ -750,9 +754,12 @@ public class ChadControls : NetworkComponent
                 }
                 else if (otherChad.CanBeTackled && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
                 {
-                    //toggle ragdoll
+                    // Activate ragdoll
                     Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
-                    otherChad.ActivateRagdoll(MinimumRagdollTimer, force);
+                    Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(otherChad.gameObject.transform.position, force, 0.5f);
+                    param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
+                    param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
+                    otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
                 }
 
             }
