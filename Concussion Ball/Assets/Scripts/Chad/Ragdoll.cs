@@ -739,15 +739,17 @@ public class Ragdoll : ScriptComponent
                 RagdollSound.Volume = ImpactSpine.Volume;
                 RagdollSound.Play();
             }
-                
+
             return;
         }
-
-        RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
-
-        for(int i = 0; i < (int)BODYPART.COUNT; i++)
+        else
         {
-            G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
+
+            for (int i = 0; i < (int)BODYPART.COUNT; i++)
+            {
+                G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            }
         }
     }
 

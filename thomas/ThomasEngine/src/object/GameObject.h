@@ -179,6 +179,12 @@ namespace ThomasEngine
 		where T : Component
 		T AddComponent();
 
+		/* Set index of component.
+		c	<<	Component to move
+		index	<<	Index to set.  If index is larger then number of components it will be moved last.
+		*/
+		void SetComponentIndex(Component^ c, uint32_t index);
+
 		generic<typename T>
 		where T : Component
 		T GetComponent();

@@ -58,6 +58,7 @@ public class ChadControls : NetworkComponent
 
     [Browsable(false)]
     public Rigidbody rBody { get; private set; }
+    private NetworkTransform ragdollSync;
     Chadimations Animations;
     public Ragdoll Ragdoll;
     ChadCam _camera;
@@ -82,6 +83,13 @@ public class ChadControls : NetworkComponent
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
 
+    public override void OnAwake()
+    {
+        ragdollSync = gameObject.AddComponent<NetworkTransform>();
+        NetworkIdentity c = gameObject.GetComponent<NetworkIdentity>();
+        gameObject.SetComponentIndex(c, 0xfffffff);  // Ensure network writer is last
+    }
+
     public override void Start()
     {
         State = STATE.CHADING;
@@ -94,7 +102,6 @@ public class ChadControls : NetworkComponent
         rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
-        NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
         ragdollSync.target = Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
 
@@ -572,18 +579,21 @@ public class ChadControls : NetworkComponent
 
     IEnumerator StartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
-        State = STATE.RAGDOLL;
-        Ragdoll.AddForce(param);
-
-        yield return new WaitForSeconds(duration);
-        float timer = 0;
-        while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
+        if (isOwner)
         {
-            timer += Time.DeltaTime;
-            yield return null;
+            State = STATE.RAGDOLL;
+            Ragdoll.AddForce(param);
+
+            yield return new WaitForSeconds(duration);
+            float timer = 0;
+            while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
+            {
+                timer += Time.DeltaTime;
+                yield return null;
+            }
+            yield return new WaitForSeconds(1);
+            State = STATE.CHADING;
         }
-        yield return new WaitForSeconds(1);
-        State = STATE.CHADING;
     }
 
     IEnumerator RagdollRecovery()

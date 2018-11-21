@@ -369,6 +369,26 @@ namespace ThomasEngine {
 		return newGobj;
 	}
 	
+	void GameObject::SetComponentIndex(Component ^ c, uint32_t index)
+	{
+		Monitor::Enter(m_componentsLock);
+		// Clamp to valid indices
+		if (index < 1u) index = 1;
+		if (index >= (uint32_t)m_components.Count) index = m_components.Count - 1;
+
+		for (uint32_t i = 0; i < m_components.Count; i++) {
+			if (m_components[i] == c)
+			{
+				if (i == index) break;
+				// Found comp. insert at new index.
+				m_components[i] = m_components[index];
+				m_components[index] = c;
+				break;
+			}
+		}
+
+		Monitor::Exit(m_componentsLock);
+	}
 	generic<typename T>
 	where T : Component
 	T GameObject::AddComponent()
@@ -413,6 +433,7 @@ namespace ThomasEngine {
 		else
 			return T();
 	}
+
 
 	Component^ GameObject::GetComponent(Type^ type) {
 		for (int i = 0; i < m_components.Count; i++) {

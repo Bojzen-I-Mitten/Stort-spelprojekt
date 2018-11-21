@@ -16,7 +16,7 @@ namespace ThomasEngine.Network
 
         public int ID
         {
-            get { return Identity.ID; }
+            get { return Identity == null ? 0 : Identity.ID; }
         }
 
         protected NetworkIdentity Identity
@@ -43,7 +43,7 @@ namespace ThomasEngine.Network
         [Browsable(false)]
         public bool isOwner
         {
-            get { return Identity ? Identity.Owner : false; } 
+            get { return Identity != null ? Identity.Owner : false; } 
         }
 
         virtual public void OnRead(NetPacketReader reader, bool initialState)

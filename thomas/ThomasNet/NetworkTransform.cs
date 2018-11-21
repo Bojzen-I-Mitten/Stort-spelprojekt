@@ -34,7 +34,16 @@ namespace ThomasEngine.Network
         Vector3 TargetSyncLinearVelocity;
         Vector3 TargetSyncAngularVelocity;
 
-        Rigidbody targetRigidbody;
+        Rigidbody _targetRigidbody;
+        Rigidbody targetRigidbody
+        {
+            get
+            {
+                if (!_targetRigidbody)
+                    _targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+                return _targetRigidbody;
+            }
+        }
 
         Transform _target;
         [Browsable(false)]
@@ -48,6 +57,7 @@ namespace ThomasEngine.Network
             set
             {
                 _target = value;
+                _targetRigidbody = _target.gameObject.GetComponent<Rigidbody>();
             }
         }
 
@@ -68,8 +78,7 @@ namespace ThomasEngine.Network
             PrevRotation = target.rotation;
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
-
-            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -83,8 +92,7 @@ namespace ThomasEngine.Network
             PrevRotation = target.rotation;
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
-
-            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -278,6 +286,11 @@ namespace ThomasEngine.Network
             target.rotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
 
+            String msg = "T_Target: " + targetRigidbody.Name + (targetRigidbody.enabled ? "T" : "F");
+            msg += ";Pos: " + TargetSyncPosition.x + ", " + TargetSyncPosition.y + ", " + TargetSyncPosition.z;
+            msg += ";Rot: " + target.rotation.x + ", " + target.rotation.y + ", " + target.rotation.z;
+            ThomasEngine.Debug.Log(msg);
+
             if (Vector3.Distance(TargetSyncPosition, target.position) > SnapThreshhold)
             {
                 target.position = TargetSyncPosition;
@@ -312,6 +325,11 @@ namespace ThomasEngine.Network
             TargetSyncPosition = reader.GetVector3();
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
+
+            String msg = "RB_Target: " + targetRigidbody.Name + (targetRigidbody.enabled ? "T" : "F");
+            msg += ";Pos: " + TargetSyncPosition.x + ", " + TargetSyncPosition.y + ", " + TargetSyncPosition.z;
+            msg += ";Rot: " + TargetSyncRotation.x + ", " + TargetSyncRotation.y + ", " + TargetSyncRotation.z;
+            ThomasEngine.Debug.Log(msg);
 
 
             TargetSyncLinearVelocity = reader.GetVector3();

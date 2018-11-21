@@ -22,11 +22,12 @@ namespace ThomasEngine
 	{
 		Component();
 	private:
+		/* Tracks component state. Enabled/Disabled... */
 		[NonSerializedAttribute]
 		Comp::State m_state;
+		/* Tracks if component is an 'Activated' in context of the editor. Does not directly indicate if it's 'enabled'. */
 		bool m_active;
 	internal:
-		//bool m_firstEnable = false;
 
 		[NonSerializedAttribute]
 		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();

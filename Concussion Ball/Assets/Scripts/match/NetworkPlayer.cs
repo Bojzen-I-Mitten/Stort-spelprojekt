@@ -34,7 +34,7 @@ public class NetworkPlayer : NetworkComponent
 
     public override void Start()
     {
-        if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+        if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
 
