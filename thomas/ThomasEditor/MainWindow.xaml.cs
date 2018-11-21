@@ -80,7 +80,7 @@ namespace ThomasEditor
 
             ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
             ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
-            
+
             menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
             menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
             //profile.sendSample();
@@ -92,7 +92,7 @@ namespace ThomasEditor
             {
                 string fileName = System.IO.Path.GetFileName(name);
                 busyCator.BusyContent = String.Format("Loading {0} ({1}/{2})", fileName, index, total);
-                
+
             }));
         }
 
@@ -132,7 +132,7 @@ namespace ThomasEditor
             {
                 playPauseButton.DataContext = ThomasWrapper.IsPlaying();
             }));
-            
+
         }
 
         private DispatcherTimer timer;
@@ -194,7 +194,8 @@ namespace ThomasEditor
                         sw.Write(fs.ToString());
                     }
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.LogError("Failed to save layout.dock. Error: " + e.Message);
             }
@@ -237,7 +238,8 @@ namespace ThomasEditor
                         }
                     }
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.LogError("Failed to load editor layout. Error: " + e.Message);
             }
@@ -252,27 +254,27 @@ namespace ThomasEditor
                 WindowState = WindowState.Maximized;
             }
         }
-                
+
         private void Node_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             ContextMenu cm = this.FindResource("gameObjectContext") as ContextMenu;
             cm.PlacementTarget = sender as TreeViewItem;
             cm.IsOpen = true;
         }
-                
+
         private void DoUpdates(object sender, EventArgs e)
-        {                       
+        {
             RenderingEventArgs args = (RenderingEventArgs)e;
-            
-            if(this.lastRender != args.RenderingTime)
+
+            if (this.lastRender != args.RenderingTime)
             {
                 ThomasWrapper.Update();
                 tester.Update();
                 editorWindow.Title = ThomasWrapper.FrameRate.ToString();
                 lastRender = args.RenderingTime;
                 transformGizmo.UpdateTransformGizmo();
-             }
-            
+            }
+
         }
 
         private void NewEmptyObject_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -311,7 +313,7 @@ namespace ThomasEditor
 
         private void RemoveSelectedGameObjects(object sender, RoutedEventArgs e)
         {
-            for(int i=0; i < ThomasWrapper.Selection.Count; i++)
+            for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
             {
                 GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
                 ThomasWrapper.Selection.UnSelectGameObject(gObj);
@@ -320,7 +322,7 @@ namespace ThomasEditor
         }
 
 
-        
+
 
         private void Recompile_Shader_Click(object sender, RoutedEventArgs e)
         {
@@ -335,7 +337,7 @@ namespace ThomasEditor
         private void SaveScene_Click(object sender, RoutedEventArgs e)
         {
 
-            if(ThomasWrapper.CurrentScene.RelativeSavePath != null)
+            if (ThomasWrapper.CurrentScene.RelativeSavePath != null)
             {
                 ThomasWrapper.CurrentScene.SaveScene();
             }
@@ -384,7 +386,7 @@ namespace ThomasEditor
             if (openFileDialog.ShowDialog() == true)
             {
                 LoadScene(openFileDialog.FileName);
-            }     
+            }
         }
 
         public void LoadScene(string path)
@@ -421,7 +423,7 @@ namespace ThomasEditor
             // Let's add a indirection to GameObjectManager here
             var x = GameObjectManager.addPrimitive(PrimitiveType.Cube, false);
             ThomasWrapper.Selection.SelectGameObject(x);
-            
+
         }
 
         private void AddNewSpherePrimitive(object sender, RoutedEventArgs e)
@@ -613,7 +615,7 @@ namespace ThomasEditor
 
 
         public void showBusyIndicator(string message)
-       {
+        {
             this.Dispatcher.Invoke((Action)(() =>
             {
                 busyCator.IsBusy = true;
@@ -669,10 +671,25 @@ namespace ThomasEditor
             Properties.Settings.Default.Save();
         }
 
-
-        private void BuildProject_Click(object sender, RoutedEventArgs e)
+        private bool Build(String filename, Project project)
         {
-            Project project = ThomasEngine.Application.currentProject;
+            try
+            {
+                return utils.Exporter.ExportProject(filename, project);
+            }
+            catch (Exception err)
+            {
+                Debug.LogError("Build failed with exception:");
+                Debug.LogError(err);
+            }
+            finally
+            {
+                hideBusyIndicator();
+            }
+            return false;
+        }
+        private String AcquireBuildDirectory(Project project)
+        {
             Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.Filter = "Executable (*.exe) |*.exe";
 
@@ -684,38 +701,38 @@ namespace ThomasEditor
             if (saveFileDialog.ShowDialog() == true)
             {
                 showBusyIndicator("Builing " + project.name + "...");
+                return saveFileDialog.FileName;
+            }
+            return String.Empty;
+        }
+
+        private void BuildProject_Click(object sender, RoutedEventArgs e)
+        {
+            Project project = ThomasEngine.Application.currentProject;
+            String diagFile = AcquireBuildDirectory(project);
+            if (diagFile != String.Empty)
+            {
                 Thread worker = new Thread(new ThreadStart(() =>
                 {
-                    utils.Exporter.ExportProject(saveFileDialog.FileName, project);
-                    hideBusyIndicator();
+                    Build(diagFile, project);
                 }));
                 worker.SetApartmentState(ApartmentState.STA);
                 worker.Start();
             }
-
-
-           
         }
 
         private void BuildAndRunProject_Click(object sender, RoutedEventArgs e)
         {
             Project project = ThomasEngine.Application.currentProject;
-            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-            saveFileDialog.Filter = "Executable (*.exe) |*.exe";
-
-
-            //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            saveFileDialog.RestoreDirectory = false;
-            saveFileDialog.FileName = project.name;
-
-            if (saveFileDialog.ShowDialog() == true)
+            String diagFile = AcquireBuildDirectory(project);
+            if (diagFile != String.Empty)
             {
-                showBusyIndicator("Builing " + project.name + "...");
                 Thread worker = new Thread(new ThreadStart(() =>
                 {
-                    string fileName = System.IO.Path.GetFileName(saveFileDialog.FileName);
-                    string dir = System.IO.Path.GetDirectoryName(saveFileDialog.FileName);
-                    if (utils.Exporter.ExportProject(saveFileDialog.FileName, project))
+                    string fileName = System.IO.Path.GetFileName(diagFile);
+                    string dir = System.IO.Path.GetDirectoryName(diagFile);
+                    bool success = Build(diagFile, project);
+                    if (success)
                     {
                         System.Diagnostics.Process pr = new System.Diagnostics.Process();
                         pr.StartInfo.FileName = dir + "\\Bin\\" + fileName;
@@ -724,7 +741,7 @@ namespace ThomasEditor
                     }
 
                     hideBusyIndicator();
-                    
+
                 }));
                 worker.SetApartmentState(ApartmentState.STA);
                 worker.Start();
