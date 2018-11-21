@@ -22,7 +22,10 @@ public class ChadControls : NetworkComponent
     public STATE State { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
-    
+
+    // Counter tracking frames before enabling ragdoll
+    private readonly static int FRAME_TICK_WAIT_RAGDOLL = 2;
+    private static int frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
 
     #region Throwing stuff
     [Category("Throwing")]
@@ -170,7 +173,12 @@ public class ChadControls : NetworkComponent
             EnableRagdoll();
         else if (State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
         {
-            DisableRagdoll();
+            // Wait N frames before disabling ragdoll
+            if (isOwner || frameRagdollDisableTick-- == 0)
+            {
+                DisableRagdoll();
+                frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
+            }
         }
 
         if (Input.GetKeyDown(Input.Keys.L))
