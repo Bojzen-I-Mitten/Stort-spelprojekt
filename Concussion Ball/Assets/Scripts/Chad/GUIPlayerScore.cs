@@ -368,12 +368,10 @@ public class GUIPlayerScore : ScriptComponent
         else if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score > MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score)
             AmountOfPlayersBarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
 
-        AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
-        AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
 
-        for(int i = 0;i< Team1Players.Count; i++)
+        for(int i = 0;i< Math.Min(Team1Players.Count, AmountOfPlayersInTeam1); i++)
         {
-            if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName.Length >= 9)
+            if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName.Length > 9)
                 Team1Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName.Substring(0,9)+"-";
             else
                 Team1Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName;
@@ -382,9 +380,9 @@ public class GUIPlayerScore : ScriptComponent
             Team1Players[i].PlayerTackled.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].BeenTackled.ToString();
             Team1Players[i].PlayerPing.text = "0";// går ej att hämta ping?
         }
-        for (int i = 0; i < Team2Players.Count; i++)
+        for (int i = 0; i < Math.Min(Team2Players.Count, AmountOfPlayersInTeam2); i++)
         {
-            if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName.Length >= 9)
+            if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName.Length > 9)
                 Team2Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName.Substring(0, 9) + "-";
             else
                 Team2Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName;
@@ -399,6 +397,8 @@ public class GUIPlayerScore : ScriptComponent
 
     public override void Update()
     {
+        AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
+        AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
         UpdateStatistics();
         UpdatePlayerBars();
         if (Toggle)
