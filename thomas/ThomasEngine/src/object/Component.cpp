@@ -38,8 +38,6 @@ namespace ThomasEngine
 		gameObject->RemoveComponent(this);
 	}
 
-
-
 	void Component::Awake() { ((thomas::object::component::Component*)nativePtr)->Awake(); }
 	void Component::Start() {}
 	void Component::OnEnable() { ((thomas::object::component::Component*)nativePtr)->OnEnable(); }
