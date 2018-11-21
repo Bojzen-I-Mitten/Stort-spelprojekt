@@ -360,7 +360,7 @@ public class GUIPlayerScore : ScriptComponent
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
             DisplayBar(Vector2.Zero);
-        if (Input.GetKeyDown(Input.Keys.Tab) /*|| Input.GetKeyDown(Input.Keys.LeftControl)*/)
+        if (Input.GetKeyDown(Input.Keys.Tab) || Input.GetKeyDown(Input.Keys.I))
         {
             if (!Toggle)
             {
@@ -372,7 +372,7 @@ public class GUIPlayerScore : ScriptComponent
             }
             */
         }
-        if(Input.GetKeyUp(Input.Keys.Tab))
+        if(Input.GetKeyUp(Input.Keys.Tab) || Input.GetKeyUp(Input.Keys.I))
         {
             Toggle = false;
         }

@@ -26,8 +26,7 @@ public class Powerup : PickupableObject
     {
         base.OnEnable();
         activated = false;
-        m_rigidBody.IsKinematic = true;
-        m_rigidBody.enabled = true;
+        m_rigidBody.enabled = false;
     }
 
     public override void Update()
