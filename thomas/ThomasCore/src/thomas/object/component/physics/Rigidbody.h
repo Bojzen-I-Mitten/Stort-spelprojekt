@@ -77,8 +77,8 @@ namespace thomas
 				void SetCenterOfmass(math::Vector3 Centerofmass);
 				void SetBounciness(float bounciness);
 				void SetFriction(float friction);
-				void SetPosition(math::Vector3 position);
-				void SetRotation(math::Quaternion rotation);
+				void SetPosition(math::Vector3 position, bool forcePosition=false);
+				void SetRotation(math::Quaternion rotation, bool forceRotation=false);
 
 				void IgnoreNextTransformUpdate();
 

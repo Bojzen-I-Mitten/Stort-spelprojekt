@@ -33,17 +33,13 @@ public class Vindaloo : Powerup
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
 
-        #region big meme particle emitter bois
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.Type = SoundComponent.SoundType.Effect;
         ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
 
-        ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        ExplosionSound.Clip = VindalooExplosionSound;
-        ExplosionSound.Looping = false;
-        ExplosionSound.Is3D = true;
+        #region big meme particle emitter bois
 
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterFire.MinSize = 1.2f;

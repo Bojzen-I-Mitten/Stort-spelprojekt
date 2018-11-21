@@ -7,8 +7,10 @@ using ThomasEngine.Network;
 
 public class HighlightParent : NetworkComponent
 {
-    private Color color = Color.White;// { get; set; }
+    private Color Color = Color.White;// { get; set; }
+    private Ball Ball;
     private Material highLightMat;
+    public Vector3 scale { get; set; } = new Vector3(1.1f);
 
     public override void Start()
     {
@@ -18,7 +20,7 @@ public class HighlightParent : NetworkComponent
 
         Shader s = Shader.Find("HighlightObject");
         highLightMat = new Material(s);
-        highLightMat.SetColor("color", color);
+        highLightMat.SetColor("color", Color);
         //highLightMat->SetRenderQueue(2001);
         
         RenderComponent rc = gameObject.AddComponent<RenderComponent>();
@@ -26,11 +28,17 @@ public class HighlightParent : NetworkComponent
         transform.scale *= 1.1f;
 
         rc.material = highLightMat;
+
+        Ball = transform.parent.transform.parent.gameObject.GetComponent<Ball>();
     }
 
     public override void Update()
     {
-        
+        if (Ball?._Chad)
+            Color = Ball._Chad.NetPlayer.Team.Color;
+        else
+            Color = Color.White;
+        highLightMat.SetColor("color", Color);
     }
 }
 
