@@ -396,7 +396,6 @@ public class ChadHud : ScriptComponent
             DeactivateAimHUD();
         }
 
-
         if (BallArrow != null)
         {
             Color color;
@@ -406,6 +405,9 @@ public class ChadHud : ScriptComponent
                 color = Color.White;
             BallArrow.color = color;
         }
+
+        Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+        Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
     }
 
     public override void OnEnable()
