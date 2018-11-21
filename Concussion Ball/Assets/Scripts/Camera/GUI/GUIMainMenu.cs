@@ -182,6 +182,11 @@ public class GUIMainMenu : ScriptComponent
     public void ClearImagesAndText()
     {
         Canvas.Remove(Play);
+        Canvas.Remove(Options);
+        Canvas.Remove(Credits);
+        Canvas.Remove(Exit);
+        Canvas.Remove(PlayerName);
+        Canvas.Remove(TextBoxBGName);
+        Canvas.Remove(TextBoxName);
     }
-
 }

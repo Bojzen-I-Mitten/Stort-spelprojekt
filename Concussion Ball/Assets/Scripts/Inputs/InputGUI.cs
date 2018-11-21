@@ -11,9 +11,8 @@ class GUIInput
         string regexString = "";
         regexString += c;
 
-        // TODO: fix punctation 
-        if ((char.IsPunctuation(c) || char.IsLetterOrDigit(c) || char.IsSymbol(c) || char.IsSeparator(c) || char.IsWhiteSpace(c)) && 
-            (Regex.IsMatch(regexString, "^[a-zA-Z0-9]*$")))
+        // No whitespace allowed
+        if (Regex.IsMatch(regexString, "^[a-zA-Z0-9-.]*$"))
         {
 
             if (_string.Length < length)
