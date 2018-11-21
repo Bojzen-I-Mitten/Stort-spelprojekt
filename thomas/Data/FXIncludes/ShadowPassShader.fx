@@ -18,6 +18,15 @@ RasterizerState RasterizerSolid
     DepthClipEnable = FALSE;
 };
 
+cbuffer LightMatrices
+{
+    float4x4 lightMatrixVP;
+};
+
+inline float4 ObjectToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
+{
+    return mul(lightMatrixVP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
+}
 
 struct v2f
 {

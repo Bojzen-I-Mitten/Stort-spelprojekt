@@ -171,6 +171,7 @@ namespace thomas
 			shaders->SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
 			shaders->SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
 			shaders->SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
+			shaders->SetGlobalInt("nrOfShadowMaps", s_usedShadowMapViews.size());
 			shaders->SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
 
@@ -178,10 +179,23 @@ namespace thomas
 		{
 			if (s_lights.size() == 0)
 				return;
-			int stop = 0;
+
+
 			shaders->SetGlobalTexture2DArray("ShadowMaps", s_shadowMapTextures);//s_lights[0]->GetShadowMapTexture());
-			if (s_lights[0]->CastsShadows())
-				shaders->SetGlobalMatrix("lightMatrixVP", s_lights[0]->GetVPMat());
+			
+			std::vector<math::Matrix> lightMatrices(s_usedShadowMapViews.size());
+			unsigned i = 0;
+			for (object::component::LightComponent* l : s_lights)
+			{
+				if (l->CastsShadows())
+				{
+					lightMatrices[i] = l->GetVPMat();
+					++i;
+				}
+			}
+
+			shaders->SetGlobalMatrixArray("LightMatricesVP", lightMatrices.data(), lightMatrices.size());
+			
 		}
 
 		ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()

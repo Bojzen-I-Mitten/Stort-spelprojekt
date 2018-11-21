@@ -5,17 +5,16 @@
 
 cbuffer LightMatrices
 {
-    float4x4 lightMatrixVP; //[4];
+    float4x4 LightMatricesVP[8];
 };
 
-inline float4 ObjectToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
-{
-    return mul(lightMatrixVP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
-}
+
+
+
 
 inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
 {
-    return mul(lightMatrixVP, float4(pos, 1.0));
+    return mul(LightMatricesVP[0], float4(pos, 1.0));
 }
 
 
@@ -34,6 +33,7 @@ cbuffer LightCountsStruct
     uint nrOfPointLights;
     uint nrOfSpotLights;
     uint nrOfAreaLights;
+    uint nrOfShadowMaps;
 };
 
 struct LightStruct
@@ -80,34 +80,40 @@ inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 
 inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffuse, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
-    float3 ambient = float3(0.1f, 0.1f, 0.1f);
+    float3 ambient = float3(0.2, 0.2, 0.2);
     float3 colorAcculmulator = ambient;
     float3 lightDir = float3(0, 0, 0);
-    float lightMultiplyer = 0.0f;
+    float lightMultiplyer = 0.0;
     
+    float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
+    float shadowMapIndex = 0.0;
+
     int i = 0;
     int roof = nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
         lightDir = lights[i].direction; //should be normalized already
         
-        float4 sampleCoordLS = WorldToLightClipPos(worldPos);
-        sampleCoordLS.xyz /= sampleCoordLS.w;
-        sampleCoordLS.x = sampleCoordLS.x * 0.5 + 0.5;
-        sampleCoordLS.y = 0.5 - sampleCoordLS.y * 0.5;
-        
-        //http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
-        float bias = 0.005 * tan(acos(saturate(dot(worldNormal, lightDir))));
-        bias = clamp(bias, 0, 0.01);
-
         float shadowFactor = 1.0;
-        
-        float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
-        for (int si = 0; si < 4; ++si)
-        {
-            shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 700.0, 0.0f)).x < sampleCoordLS.z - bias) * 0.15;
-        }
 
+        if (shadowMapIndex < nrOfShadowMaps)
+        {
+            float4 sampleCoordLS = WorldToLightClipPos(worldPos);
+            sampleCoordLS.xyz /= sampleCoordLS.w;
+            sampleCoordLS.x = sampleCoordLS.x * 0.5 + 0.5;
+            sampleCoordLS.y = 0.5 - sampleCoordLS.y * 0.5;
+        
+            float bias = 0.005 * tan(acos(saturate(dot(worldNormal, lightDir))));
+            bias = clamp(bias, 0, 0.01);
+            
+            for (int si = 0; si < 4; ++si)
+            {
+                shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 700.0, shadowMapIndex)).x < sampleCoordLS.z - bias) * 0.15;
+            }
+
+            shadowMapIndex += 1.0f;
+        }
+    
         lightMultiplyer = lights[i].intensity * shadowFactor;
         Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
