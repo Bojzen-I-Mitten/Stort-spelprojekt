@@ -23,11 +23,11 @@ public class ChadControls : NetworkComponent
     public bool CanBeTackled = true;
 
     #region GUI
-    private Canvas Canvas;
-    public Font PickupFont { get; set; }
-    public Font PickupDescFont { get; set; }
-    private Text PowerupPickupText;
-    private Text PowerupPickupDescText;
+    //private Canvas Canvas;
+    //public Font PickupFont { get; set; }
+    //public Font PickupDescFont { get; set; }
+    //private Text PowerupPickupText;
+    //private Text PowerupPickupDescText;
     #endregion
 
     #region Throwing stuff
@@ -91,20 +91,20 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
-        Canvas = ChadHud.Instance.Canvas;
+        //Canvas = ChadHud.Instance.Canvas;
 
         // Init pick-up text and description
-        PowerupPickupText = Canvas.Add("");
-        PowerupPickupText.position = new Vector2(0.4975f, 0.5f);
-        PowerupPickupText.color = Color.Yellow; // Need black outline for better visual effect
-        PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
-        PowerupPickupText.font = PickupFont;
+        //PowerupPickupText = Canvas.Add("");
+        //PowerupPickupText.position = new Vector2(0.4975f, 0.5f);
+        //PowerupPickupText.color = Color.Yellow; // Need black outline for better visual effect
+        //PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
+        //PowerupPickupText.font = PickupFont;
 
-        PowerupPickupDescText = Canvas.Add("");
-        PowerupPickupDescText.position = new Vector2(0.4975f, 0.56f);
-        PowerupPickupDescText.color = Color.Black;
-        PowerupPickupDescText.origin = new Vector2(0.5f, 0.0f);
-        PowerupPickupDescText.font = PickupDescFont;
+        //PowerupPickupDescText = Canvas.Add("");
+        //PowerupPickupDescText.position = new Vector2(0.4975f, 0.56f);
+        //PowerupPickupDescText.color = Color.Black;
+        //PowerupPickupDescText.origin = new Vector2(0.5f, 0.0f);
+        //PowerupPickupDescText.font = PickupDescFont;
 
         State = STATE.CHADING;
 
@@ -149,15 +149,16 @@ public class ChadControls : NetworkComponent
     public override void Update()
     {
         // Stop the fading routine 
-        if (FadeText != null)
-        {
-            if(PowerupPickupText.color.a == 0 && PowerupPickupDescText.color.a == 0)
-            {
-                Debug.Log("Should stop");
-                StopCoroutine(FadeText);
-                FadeText = null;
-            }
-        }
+        // Note: Doesn't properly work, the couroutine doesn't stop when the alpha has reached zero
+        //if (FadeText != null)
+        //{
+        //    if(PowerupPickupText.color.a == 0 && PowerupPickupDescText.color.a == 0)
+        //    {
+        //        Debug.Log("Should stop");
+        //        StopCoroutine(FadeText);
+        //        FadeText = null;
+        //    }
+        //}
 
         if (isOwner)
         {
@@ -612,32 +613,32 @@ public class ChadControls : NetworkComponent
         // Recovery particles
     }
 
-    IEnumerator FadePickupText()
-    {
-        Color pickupColor = PowerupPickupText.color;
-        Color descriptionColor = PowerupPickupDescText.color;
+    //IEnumerator FadePickupText()
+    //{
+    //    Color pickupColor = PowerupPickupText.color;
+    //    Color descriptionColor = PowerupPickupDescText.color;
 
-        while (pickupColor.a > 0 && descriptionColor.a > 0)
-        {
-            pickupColor.a -= 25;
-            descriptionColor.a -= 25;
+    //    while (pickupColor.a > 0 && descriptionColor.a > 0)
+    //    {
+    //        pickupColor.a -= 25;
+    //        descriptionColor.a -= 25;
 
-            if(pickupColor.a > 0 || descriptionColor.a > 0)
-            {
-                PowerupPickupText.color = pickupColor;
-                PowerupPickupDescText.color = descriptionColor;
-            }
-            else
-            {
-                pickupColor.a = 0;
-                descriptionColor.a = 0;
-                PowerupPickupText.color = pickupColor;
-                PowerupPickupDescText.color = descriptionColor;
-            }
+    //        if(pickupColor.a > 0 || descriptionColor.a > 0)
+    //        {
+    //            PowerupPickupText.color = pickupColor;
+    //            PowerupPickupDescText.color = descriptionColor;
+    //        }
+    //        else
+    //        {
+    //            pickupColor.a = 0;
+    //            descriptionColor.a = 0;
+    //            PowerupPickupText.color = pickupColor;
+    //            PowerupPickupDescText.color = descriptionColor;
+    //        }
             
-            yield return new WaitForSeconds(0.2f);
-        }
-    }
+    //        yield return new WaitForSeconds(0.2f);
+    //    }
+    //}
 
     public void RPCSetAnimWeight(int index, float weight)
     {
@@ -781,18 +782,17 @@ public class ChadControls : NetworkComponent
             {
                 if (pickupable.transform.parent == null)
                 {
-                    // TODO: fade text over time and reset alpha when the player has picked up a new item
-                    // Change pick-up text
-                    if (pickupablea.gameObject.Name == "Vindaloo")
-                    {
-                        DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Vindaloo", "Throw to Explode");
-                        FadeText = FadePickupText();
-                        StartCoroutine(FadeText); 
-                    }
-                    else if (pickupablea.gameObject.Name == "ThomasTrain")
-                    {
-                        DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the Train");
-                    }
+                    // Change pick-up text ON screen
+                    //if (pickupablea.gameObject.Name == "Vindaloo")
+                    //{
+                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Vindaloo", "Throw to Explode");
+                    //    FadeText = FadePickupText();
+                    //    StartCoroutine(FadeText); 
+                    //}
+                    //else if (pickupablea.gameObject.Name == "ThomasTrain")
+                    //{
+                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the Train");
+                    //}
 
                     TakeOwnership(pickupable.gameObject);
                     SendRPC("RPCPickup", pickupable.ID);

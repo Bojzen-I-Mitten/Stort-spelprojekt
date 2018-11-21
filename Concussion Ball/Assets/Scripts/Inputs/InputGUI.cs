@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Threading;
+using System.Text.RegularExpressions;
 using ThomasEngine;
 
 class GUIInput
@@ -7,8 +8,14 @@ class GUIInput
     public static void AppendString(ref string _string, int length)
     {
         char c = Input.GetLastKeyChar();
-        if (char.IsPunctuation(c) || char.IsLetterOrDigit(c) || char.IsSymbol(c) || char.IsSeparator(c) || char.IsWhiteSpace(c))
+        string regexString = "";
+        regexString += c;
+
+        // TODO: fix punctation 
+        if ((char.IsPunctuation(c) || char.IsLetterOrDigit(c) || char.IsSymbol(c) || char.IsSeparator(c) || char.IsWhiteSpace(c)) && 
+            (Regex.IsMatch(regexString, "^[a-zA-Z0-9]*$")))
         {
+
             if (_string.Length < length)
             {
                 _string += Input.GetLastKeyChar();
@@ -29,6 +36,8 @@ class GUIInput
                 _string = pastedText;
             }
         }
+
+        Input.SetLastKey(0);
     }
 
     public static string TryPaste()
