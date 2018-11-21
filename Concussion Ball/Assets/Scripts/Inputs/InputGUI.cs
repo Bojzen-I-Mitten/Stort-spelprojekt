@@ -14,7 +14,6 @@ class GUIInput
         // No whitespace allowed
         if (Regex.IsMatch(regexString, "^[a-zA-Z0-9-.]*$"))
         {
-
             if (_string.Length < length)
             {
                 _string += Input.GetLastKeyChar();
