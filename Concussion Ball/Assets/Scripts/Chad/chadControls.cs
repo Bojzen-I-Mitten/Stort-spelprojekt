@@ -136,9 +136,10 @@ public class ChadControls : NetworkComponent
     }
     public override void OnGotOwnership()
     {
+        // Called when NetworkScene::SpawnPlayer is called
         base.OnGotOwnership();
+        gameObject.setActive(true);
         MatchSystem.instance.LocalChad = this;
-
     }
     public override void OnLostOwnership()
     {

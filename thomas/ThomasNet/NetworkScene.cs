@@ -94,7 +94,6 @@ namespace ThomasEngine.Network
             GameObject player = GetAvailablePlayerFromPool();
             if(player)
             {
-                player.SetActive(true);
                 NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
                 // If spawned player is local character: Receive ownership  
                 networkIdentity.ReceiveOwnershipStatus(myPlayer);
