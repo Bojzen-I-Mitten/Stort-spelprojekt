@@ -197,7 +197,7 @@ public class GUIPlayerScore : ScriptComponent
         TeamName[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
 
         TeamName[0].position = new Vector2(0.1f, 0.175f);
-        TeamName[1].position = new Vector2(0.7f, 0.175f);
+        TeamName[1].position = new Vector2(0.65f, 0.175f);
     }
 
     void DisplayBar(Vector2 OnOff)
@@ -341,6 +341,26 @@ public class GUIPlayerScore : ScriptComponent
 
     void UpdateStatistics()
     {
+
+        if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name.Length >= 13)
+            TeamName[0].text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name.Substring(0, 13) + "-";
+        else
+            TeamName[0].text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name.ToString();
+
+        if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name.Length >= 13)
+            TeamName[1].text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name.Substring(0, 13) + "-";
+        else
+            TeamName[1].text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name.ToString();
+        team1BarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+        team2BarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+
+        PlayerStandardbar[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
+        PlayerStandardbar[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
+        TeamName[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
+        TeamName[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
+
+
+
         if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score == MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score)
             AmountOfPlayersBarImage.color = Color.MediumPurple;
         else if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score > MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score)
@@ -350,6 +370,31 @@ public class GUIPlayerScore : ScriptComponent
 
         AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
         AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
+
+        for(int i = 0;i< Team1Players.Count; i++)
+        {
+            if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName.Length >= 9)
+                Team1Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName.Substring(0,9)+"-";
+            else
+                Team1Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName;
+            Team1Players[i].PlayerGoals.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored.ToString();
+            Team1Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled.ToString();
+            Team1Players[i].PlayerTackled.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].BeenTackled.ToString();
+            Team1Players[i].PlayerPing.text = "0";// går ej att hämta ping?
+        }
+        for (int i = 0; i < Team2Players.Count; i++)
+        {
+            if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName.Length >= 9)
+                Team2Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName.Substring(0, 9) + "-";
+            else
+                Team2Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName;
+            Team2Players[i].PlayerGoals.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored.ToString();
+            Team2Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled.ToString();
+            Team2Players[i].PlayerTackled.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].BeenTackled.ToString();
+            Team2Players[i].PlayerPing.text = "0";// går ej att hämta ping?
+        }
+
+
     }
 
     public override void Update()
