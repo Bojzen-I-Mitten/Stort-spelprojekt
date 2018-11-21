@@ -7,15 +7,29 @@ namespace thomas {
 
 
 
-		Texture2DArray::Texture2DArray(int width, int height, DXGI_FORMAT format)
+		Texture2DArray::Texture2DArray(unsigned width, unsigned height, DXGI_FORMAT format, unsigned nrOfTextures, bool isDepthTexture)
 		{
 			m_width = width;
 			m_height = height;
 			m_format = format;
+			m_capacity = nrOfTextures;
 
 			m_srv = nullptr;
 			m_resource = nullptr;
-			AddTexture(Texture2D::GetWhiteTexture());
+
+			ID3D11Texture2D *textureInterface = nullptr;
+			if (isDepthTexture)
+			{
+				utils::D3D::Instance()->CreateDepthStencilTextureArray(m_width, m_height, textureInterface, m_srv, nrOfTextures);
+			}
+			else
+			{
+				utils::D3D::Instance()->CreateTextureArray(nullptr, m_width, m_height, m_capacity, m_format, textureInterface, m_srv, false, 1);
+				AddTexture(Texture2D::GetWhiteTexture());
+			}
+			m_resource = textureInterface;
+
+			
 		}
 
 		Texture2DArray::~Texture2DArray()
@@ -46,6 +60,8 @@ namespace thomas {
 				m_textures.erase(m_textures.begin() + i, m_textures.begin() + i + 1);
 				m_referenceTextures.erase(m_referenceTextures.begin() + i, m_referenceTextures.begin() + i + 1);
 				m_textureRefCount.erase(m_textureRefCount.begin() + i, m_textureRefCount.begin() + i + 1);
+
+				//onchanged
 			}
 		}
 
@@ -71,31 +87,10 @@ namespace thomas {
 			m_textureRefCount.push_back(1);
 
 			//update
-			OnChanged();
-
-			return i;
-		}
-
-		unsigned Texture2DArray::AddTextureReference(Texture2D *& tex)
-		{
-			if (tex->GetWidth() != m_width)
-				return -1;
-			if (tex->GetHeight() != m_height)
-				return -1;
-
-
-			unsigned i = 0;
-			for (; i < m_textures.size(); ++i)
-			{
-				if (m_textures[i] == tex)//resource manager makes sure the address is unique per texture
-				{
-					m_textureRefCount[i]++;
-
-					return i;
-				}
-			}
-			m_textures.push_back(tex);
-			OnChanged();
+			//if (m_textures.size() >= m_capacity)
+				OnChanged();
+			//else
+				//UpdateTextures();
 
 			return i;
 		}
@@ -111,16 +106,18 @@ namespace thomas {
 			{
 				initData.push_back(tex->GetRawBGRAPixels());
 			}
-
+			m_capacity = m_textures.size();
+			
 			ID3D11Texture2D *textureInterface = nullptr;
 			utils::D3D::Instance()->CreateTextureArray((void**)initData.data(), m_width, m_height, initData.size(), m_format, textureInterface, m_srv, true, 1);
 			m_resource = textureInterface;
 		}
+
 		void Texture2DArray::UpdateTextures()
 		{
 			
 			unsigned size = m_width * m_height;
-			unsigned arraySize = m_textures.size() *size;
+			unsigned arraySize = m_textures.size() * size;
 			std::vector<byte*> initData(arraySize);
 
 			for (unsigned i = 0; i < arraySize; ++size)

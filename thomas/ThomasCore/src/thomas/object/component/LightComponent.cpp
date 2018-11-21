@@ -29,6 +29,7 @@ namespace thomas
 				m_lightComponentData.spotInnerAngle = 0.0f;
 				m_lightComponentData.spotOuterAngle = 20.0f;
 				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
+				m_castsShadows = false;
 
 			}
 			LightComponent::~LightComponent()
@@ -77,11 +78,6 @@ namespace thomas
 			void LightComponent::DrawShadow(graphics::render::RenderCommand renderCommand)
 			{
 				m_shadowMap.Draw(renderCommand);
-			}
-
-			resource::Texture2D* LightComponent::GetShadowMapTexture()
-			{
-				return m_shadowMap.GetShadowMapTexture();
 			}
 
 			math::Matrix LightComponent::GetVPMat()
@@ -197,11 +193,25 @@ namespace thomas
 
 			bool LightComponent::CastsShadows() const
 			{
-				return false;
+				return m_castsShadows;
 			}
 
 			void LightComponent::SetCastShadows(bool const & value)
 			{
+				if (value != m_castsShadows)
+				{
+					m_castsShadows = value;
+
+					if (m_castsShadows)
+					{
+						m_shadowMap.SetShadowMapDepthStencilView(graphics::LightManager::GetFreeShadowMapView());
+					}
+					else
+					{
+						graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
+						m_shadowMap.SetShadowMapDepthStencilView(nullptr);
+					}
+				}
 			}
 
 }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "render/ShaderList.h"
+#include <d3d11.h>
 
 namespace thomas
 {
@@ -70,12 +71,15 @@ namespace thomas
 			static bool RemoveLight(object::component::LightComponent* light);
 			static void Update();
 
-			static std::vector<object::component::LightComponent*> GetLightsCastingShadows();
 			static void DrawShadows(render::CameraRenderQueue& renderQueue, object::component::Camera* camera);
 			static void BindLights(render::ShaderList* shaders);
 			static void BindShadows(render::ShaderList* shaders);
+			static ID3D11DepthStencilView* GetFreeShadowMapView();
+			static bool ResturnShadowMapView(ID3D11DepthStencilView * dsv);
 		private:
-
+			static const unsigned s_nrOfShadowMapsSupported = 8;
+			static std::vector<ID3D11DepthStencilView*> s_freeShadowMapViews;
+			static std::vector<ID3D11DepthStencilView*> s_usedShadowMapViews;
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);
 
 			static std::vector<object::component::LightComponent*> s_lights;
@@ -85,6 +89,7 @@ namespace thomas
 			
 			static utils::buffers::StructuredBuffer* s_shadowLightVPMatrices;
 			static resource::Texture2DArray* s_shadowMapTextures;
+			static unsigned s_shadowMapSize;
 		};
 	}
 }

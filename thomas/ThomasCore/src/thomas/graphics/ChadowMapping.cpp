@@ -3,7 +3,7 @@
 #include "../object/component/Transform.h"
 #include "../resource/Shader.h"
 #include "../resource/Material.h"
-#include "../resource/texture/Texture2D.h"
+#include "../resource/texture/Texture2DArray.h"
 #include "Mesh.h"
 #include "render/Frame.h"
 #include "RenderConstants.h"
@@ -14,39 +14,32 @@ namespace thomas
 	{
 		std::unique_ptr<resource::Material> ShadowMap::s_material;
 		std::unique_ptr<resource::Shader> ShadowMap::s_shader;
-		math::Matrix ShadowMap::s_matrixClamp;
-		void ShadowMap::InitStatics()
+		D3D11_VIEWPORT ShadowMap::s_viewPort;
+
+		void ShadowMap::InitStatics(unsigned size)
 		{
 			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowPassShader.fx");
 			s_material = std::make_unique<resource::Material>(s_shader.get());
+			
+			s_viewPort.Height = size;
+			s_viewPort.Width = size;
+			s_viewPort.TopLeftY = 0.0f;
+			s_viewPort.TopLeftX = 0.0f;
+			s_viewPort.MinDepth = 0.0f;
+			s_viewPort.MaxDepth = 1.0f;
 		}
 
 		ShadowMap::ShadowMap()
 		{
-			unsigned size = 512;
-			m_depthTexture = std::make_unique<resource::Texture2D>(size, size, false, true);
-
+			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-20, 20, -20, 20, -10, 40);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
-
-
-
-			D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc = {};
-			depthViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-			depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-
-			HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(m_depthTexture->GetResource(), &depthViewDesc, &m_depthStencilView);
-			
-			m_viewPort.Height = size;
-			m_viewPort.Width = size;
-			m_viewPort.TopLeftY = 0;
-			m_viewPort.TopLeftX = 0;
-			m_viewPort.MinDepth = 0.0f;
-			m_viewPort.MaxDepth = 1.0f;
+			m_matrixVP = m_matrixView * m_matrixProj;
+			m_depthStencilView = nullptr;
 		}
 
 		ShadowMap::~ShadowMap()
 		{
-
+			SAFE_RELEASE(m_depthStencilView);
 		}
 
 		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)
@@ -132,13 +125,16 @@ namespace thomas
 
 		void ShadowMap::Bind()
 		{
+			if (m_depthStencilView == nullptr)
+				return;
+
 			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
 			utils::D3D::Instance()->GetDeviceContext()->PSSetShaderResources(0, 8, s_nullSRV);
 
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 			utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
-			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, &m_viewPort);
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, &s_viewPort);
 
 			s_material->Bind();
 			s_material->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
@@ -146,18 +142,19 @@ namespace thomas
 			
 		}
 
-		
-
-		resource::Texture2D * ShadowMap::GetShadowMapTexture()
+		void ShadowMap::SetShadowMapDepthStencilView(ID3D11DepthStencilView * dsv)
 		{
-			//s_material->SetMatrix("lightMatrixVP", (m_matrixVP * s_matrixClamp).Transpose());
-			//s_material->ApplyProperty("lightMatrixVP");
-			return m_depthTexture.get();
+			m_depthStencilView = dsv;
+		}
+
+		ID3D11DepthStencilView * ShadowMap::GetShadowMapDepthStencilView()
+		{
+			return m_depthStencilView;
 		}
 
 		math::Matrix ShadowMap::GetVPMat()
 		{
-			return (m_matrixVP).Transpose();
+			return m_matrixVP.Transpose();
 		}
 
 		

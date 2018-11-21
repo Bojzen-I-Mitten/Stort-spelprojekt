@@ -25,8 +25,8 @@ SamplerState StandardClampSampler
     AddressU = CLAMP;
     AddressV = CLAMP;
 };
-//Texture2DArray ShadowMaps;
-Texture2D ShadowMap : SHADOWMAP;
+Texture2DArray ShadowMaps : SHADOWMAPS;
+//Texture2D ShadowMap : SHADOWMAP;
 
 cbuffer LightCountsStruct
 {
@@ -105,7 +105,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
         for (int si = 0; si < 4; ++si)
         {
-            shadowFactor -= (float) (ShadowMap.Sample(StandardClampSampler, sampleCoordLS.xy + poissonDisk[si] / 700.0).x < sampleCoordLS.z - bias) * 0.15;
+            shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 700.0, 0.0f)).x < sampleCoordLS.z - bias) * 0.15;
         }
 
         lightMultiplyer = lights[i].intensity * shadowFactor;

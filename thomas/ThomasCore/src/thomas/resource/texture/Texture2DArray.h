@@ -13,14 +13,13 @@ namespace thomas
 		private:
 			
 		public:
-			Texture2DArray(int width, int height, DXGI_FORMAT format);
+			Texture2DArray(unsigned width, unsigned height, DXGI_FORMAT format, unsigned nrOfTextures = 1u, bool isDepthTexture = false);
 			~Texture2DArray();
 
 			void UnloadTextures();
 			void DeRefTexture(unsigned i);
 			
 			unsigned AddTexture(Texture2D* tex);
-			unsigned AddTextureReference(Texture2D*& tex);//does not create a new copy nor resize the texture
 
 			void OnChanged();
 			void UpdateTextures();
@@ -30,6 +29,7 @@ namespace thomas
 			std::vector<unsigned> m_textureRefCount;
 
 			DXGI_FORMAT m_format;
+			unsigned m_capacity;
 		};
 	}
 }

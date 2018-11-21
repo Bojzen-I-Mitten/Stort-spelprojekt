@@ -5,7 +5,7 @@
 
 namespace thomas
 {
-	namespace resource { class TextureCube; class Texture2D; class Shader; class Material; }
+	namespace resource { class TextureCube; class Texture2DArray; class Shader; class Material; }
 	namespace object { namespace component { class Camera; class Transform; } }
 	namespace graphics
 	{
@@ -16,7 +16,7 @@ namespace thomas
 		class ShadowMap
 		{
 		public:
-			static void InitStatics();
+			static void InitStatics(unsigned size);
 			ShadowMap();
 			~ShadowMap();
 
@@ -24,25 +24,22 @@ namespace thomas
 			
 			void Draw(render::RenderCommand& renderCommand);
 			void Bind();
+			void SetShadowMapDepthStencilView(ID3D11DepthStencilView* dsv);
+			ID3D11DepthStencilView* GetShadowMapDepthStencilView();
 
-			resource::Texture2D* GetShadowMapTexture();
 			math::Matrix GetVPMat();
 		private:
-			std::unique_ptr<resource::Texture2D> m_depthTexture;
 			ID3D11DepthStencilView* m_depthStencilView;
-			D3D11_VIEWPORT m_viewPort;
-
-
+			
 			math::Matrix m_matrixProj;
 			math::Matrix m_matrixView;
-
 			math::Matrix m_matrixVP;
 
 
 
 			static std::unique_ptr<resource::Material> s_material;
 			static std::unique_ptr<resource::Shader> s_shader;
-			static math::Matrix s_matrixClamp;
+			static D3D11_VIEWPORT s_viewPort;
 		};
 	}
 }

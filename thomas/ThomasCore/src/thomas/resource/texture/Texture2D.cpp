@@ -70,7 +70,7 @@ namespace thomas
 			}
 			else
 			{
-				utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1, bindDepth);
+				utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
 			}
 
 			m_resource = textureInterface;

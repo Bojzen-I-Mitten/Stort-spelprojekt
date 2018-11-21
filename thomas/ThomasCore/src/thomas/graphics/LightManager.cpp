@@ -21,6 +21,11 @@ namespace thomas
 		resource::Texture2DArray* LightManager::s_shadowMapTextures;
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
 		utils::buffers::StructuredBuffer* LightManager::s_shadowLightVPMatrices;
+
+		const unsigned LightManager::s_nrOfShadowMapsSupported;
+		unsigned LightManager::s_shadowMapSize;
+		std::vector<ID3D11DepthStencilView*> LightManager::s_freeShadowMapViews;
+		std::vector<ID3D11DepthStencilView*> LightManager::s_usedShadowMapViews;
 		
 
 		void LightManager::Initialize()
@@ -32,9 +37,29 @@ namespace thomas
 			s_lightCounts.nrOfPointLights = 0;
 			s_lightCounts.nrOfAreaLights = 0;
 
-			s_shadowMapTextures = new resource::Texture2DArray(512, 512, DXGI_FORMAT_R32_FLOAT);
 
-			ShadowMap::InitStatics();
+			s_shadowMapSize = 512;
+			s_shadowMapTextures = new resource::Texture2DArray(s_shadowMapSize, s_shadowMapSize, DXGI_FORMAT_R32_TYPELESS, s_nrOfShadowMapsSupported, true);
+
+			s_freeShadowMapViews.resize(s_nrOfShadowMapsSupported);
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc = {};
+			depthViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+			depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			depthViewDesc.Texture2DArray.ArraySize = 1u;
+			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
+			{
+				ID3D11DepthStencilView* dsv;
+				depthViewDesc.Texture2DArray.FirstArraySlice = i;
+
+				HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(s_shadowMapTextures->GetResource(), &depthViewDesc, &dsv);
+
+				s_freeShadowMapViews[i] = dsv;
+			}
+
+
+
+			ShadowMap::InitStatics(s_shadowMapSize);
 		}
 		
 		void LightManager::Destroy()
@@ -111,33 +136,30 @@ namespace thomas
 			s_lightBuffer->SetData(allLights);
 		}
 
-		std::vector<object::component::LightComponent*> LightManager::GetLightsCastingShadows()
-		{
-			return s_lights;
-		}
-
 		void LightManager::DrawShadows(render::CameraRenderQueue & renderQueue, object::component::Camera* camera)
 		{
-			//for each light casting shadows
-			//{
-			if (s_lights.size() == 0)
-				return;
-			
-			if (s_lights[0]->GetType() != LIGHT_TYPES::DIRECTIONAL)
-				return;
-
-			s_lights[0]->UpdateShadowBox(camera);
-			s_lights[0]->BindShadowMapDepthTexture();
-
-			
-			for (auto & perMaterialQueue : renderQueue.m_commands3D)
+			for (object::component::LightComponent* l : s_lights)
 			{
-				
-				for (auto & perMeshCommand : perMaterialQueue.second)
+				if (l->CastsShadows())
 				{
+					if (l->GetType() != LIGHT_TYPES::DIRECTIONAL)//right now only works for dir lights
+						return;
+
+
+					l->UpdateShadowBox(camera);
+					l->BindShadowMapDepthTexture();
+
+
+					for (auto & perMaterialQueue : renderQueue.m_commands3D)
 					{
-						
-						s_lights[0]->DrawShadow(perMeshCommand);
+
+						for (auto & perMeshCommand : perMaterialQueue.second)
+						{
+							{
+
+								l->DrawShadow(perMeshCommand);
+							}
+						}
 					}
 				}
 			}
@@ -157,11 +179,36 @@ namespace thomas
 			if (s_lights.size() == 0)
 				return;
 			int stop = 0;
-			shaders->SetGlobalTexture2D("ShadowMap", s_lights[0]->GetShadowMapTexture());
-			shaders->SetGlobalMatrix("lightMatrixVP", s_lights[0]->GetVPMat());
+			shaders->SetGlobalTexture2DArray("ShadowMaps", s_shadowMapTextures);//s_lights[0]->GetShadowMapTexture());
+			if (s_lights[0]->CastsShadows())
+				shaders->SetGlobalMatrix("lightMatrixVP", s_lights[0]->GetVPMat());
 		}
 
-		
+		ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()
+		{
+			ID3D11DepthStencilView* dsv = s_freeShadowMapViews[s_freeShadowMapViews.size() - 1];
+			s_usedShadowMapViews.push_back(dsv);
+			s_freeShadowMapViews.pop_back();
+			return dsv;
+		}
+
+		bool LightManager::ResturnShadowMapView(ID3D11DepthStencilView * dsv)
+		{
+			auto it = s_usedShadowMapViews.begin();
+
+			while (it != s_usedShadowMapViews.end())
+			{
+				if (*it._Ptr == dsv)
+				{
+					s_freeShadowMapViews.push_back(*it._Ptr);
+					s_usedShadowMapViews.erase(it);
+
+					return true;
+				}
+				it++;
+			}
+			return false;
+		}
 		
 		bool LightManager::SortLights(object::component::LightComponent * light1, object::component::LightComponent * light2)
 		{

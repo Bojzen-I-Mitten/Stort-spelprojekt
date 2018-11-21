@@ -15,7 +15,7 @@ namespace thomas
 	namespace graphics {
 		class Mesh; namespace render { struct RenderCommand; }
 	}
-	namespace resource { namespace texture { class Texture2D; } }
+	namespace resource { namespace texture { class Texture2D; class Texture2DArray; } }
 	namespace object 
 	{
 		namespace component
@@ -28,6 +28,7 @@ namespace thomas
 				graphics::LightManager::LightStruct m_lightComponentData;
 
 				graphics::LightManager::LIGHT_TYPES m_type;
+				bool m_castsShadows;
 				graphics::ShadowMap m_shadowMap;
 			public:
 				LightComponent();
@@ -37,12 +38,12 @@ namespace thomas
 				virtual void OnEnable() override;
 				virtual void OnDisable() override;
 				virtual void OnDestroy() override;
+			private:
 
 			public: // Get / Set
 				void UpdateShadowBox(Camera* camera);
 				void BindShadowMapDepthTexture();
 				void DrawShadow(graphics::render::RenderCommand renderCommand);
-				resource::Texture2D* GetShadowMapTexture();
 				math::Matrix GetVPMat();
 
 				graphics::LightManager::LightStruct GetData();
@@ -54,7 +55,6 @@ namespace thomas
 				void SetColorDiffuse(thomas::math::Color other);
 				thomas::math::Color GetColorSpecular();
 				void SetColorSpecular(thomas::math::Color other);
-				
 
 				float GetIntensity() const;
 				void SetIntensity(float const& value);
