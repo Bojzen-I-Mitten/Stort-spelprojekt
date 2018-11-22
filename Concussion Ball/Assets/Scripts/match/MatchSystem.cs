@@ -170,11 +170,14 @@ public class MatchSystem : NetworkManager
     #region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
+        GUIScoreScreen.Instance.Toggle(false);
+        Debug.Log("I have entered the matchendCoroutine");
         MatchStarted = false;
         ChadHud.Instance.OnMatchEnd(winningTeam, duration);
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
         RPCStartMatch();
+        GUIScoreScreen.Instance.Toggle(true);
     }
 
     IEnumerator RoundStartCountdown(float duration)

@@ -124,25 +124,17 @@ public class GUIPlayerScore : ScriptComponent
     Text TeamAmountOfPlayersText;
     Image team1BarImage;
     Image team2BarImage;
-    List<Playertext> Team1Players = new List<Playertext>();
-    List<Playertext> Team2Players = new List<Playertext>();
-    Text[] PlayerstandardText = new Text[2];
-    Text[] TeamName = new Text[2];
-    Image[] PlayerStandardbar = new Image[2];
-    List<Image> PlayerStandardBarTeam1 = new List<Image>();
-    List<Image> PlayerStandardBarTeam2 = new List<Image>();
+   public List<Playertext> Team1Players = new List<Playertext>();
+   public List<Playertext> Team2Players = new List<Playertext>();
+   public Text[] PlayerstandardText = new Text[2];
+   public Text[] TeamName = new Text[2];
+   public Image[] PlayerStandardbar = new Image[2];
+   public List<Image> PlayerStandardBarTeam1 = new List<Image>();
+   public List<Image> PlayerStandardBarTeam2 = new List<Image>();
+
 
     public override void Start()
     {
- 
-       // PlayerTestClassTestTeam1.Add(new PlayerTestClass("TestNameTeam1", 1, 1, 1, 50));
-       // PlayerTestClassTestTeam2.Add(new PlayerTestClass("TestNameTeam2", 1, 2, 1, 50));
-        //testa koden här senare:P
-        //AmountOfPlayersInTeam1 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_1).PlayerCount;
-        //AmountOfPlayersInTeam2 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_2).PlayerCount;
-        //NetworkPlayersTeam1 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_1).Players;
-        //NetworkPlayersTeam2 = MatchSystem.instance.FindTeam(TEAM_TYPE.TEAM_2).Players;
-
         cam = gameObject.GetComponent<Camera>();
         Canvas = cam.AddCanvas();
      
@@ -397,15 +389,18 @@ public class GUIPlayerScore : ScriptComponent
 
     public override void Update()
     {
-        AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
-        AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
-        UpdateStatistics();
-        UpdatePlayerBars();
+        if(GUIScoreScreen.Instance.ToggleBool)
+        { 
+            AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
+            AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
+            UpdateStatistics();
+            UpdatePlayerBars();
+        }
         if (Toggle)
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
             DisplayBar(Vector2.Zero);
-        if (Input.GetKeyDown(Input.Keys.Tab) || Input.GetKeyDown(Input.Keys.I))
+        if (((Input.GetKeyDown(Input.Keys.Tab) || Input.GetKeyDown(Input.Keys.I)) &&(MatchSystem.instance.MatchStarted)) || !GUIScoreScreen.Instance.ToggleBool)
         {
             if (!Toggle)
             {
@@ -417,7 +412,7 @@ public class GUIPlayerScore : ScriptComponent
             }
             */
         }
-        if(Input.GetKeyUp(Input.Keys.Tab) || Input.GetKeyUp(Input.Keys.I))
+        if((Input.GetKeyUp(Input.Keys.Tab) || Input.GetKeyUp(Input.Keys.I)) )
         {
             Toggle = false;
         }

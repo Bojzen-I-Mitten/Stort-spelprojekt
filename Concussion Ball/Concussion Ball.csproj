@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Camera\GUI\GUIMainMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIExitMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
