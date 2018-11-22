@@ -48,7 +48,7 @@ namespace thomas
 
 	void EditorWindow::BeginFrame()
 	{
-		utils::D3D::Instance()->ResetCommandList(m_dx.commandList[m_frameIndex]);
+		utils::D3D::Instance()->ResetCommandList(m_dx.commandList);
 		Clear();
 	}
 
@@ -60,11 +60,9 @@ namespace thomas
 			ImGui_ImplDX11_RenderDrawData(m_guiData);
 
 
-		utils::D3D::Instance()->FinishCommandList(m_dx.commandList[m_frameIndex]);
-		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList[m_frameIndex]);
+		utils::D3D::Instance()->FinishCommandList(m_dx.commandList);
+		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList);
 		Present();
-
-		m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();
 	}
 
 	void EditorWindow::RenderGUIData()

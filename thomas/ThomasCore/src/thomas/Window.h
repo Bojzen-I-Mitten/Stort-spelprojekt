@@ -11,15 +11,15 @@ namespace thomas
 	protected:
 		struct DX
 		{
-			ID3D11CommandList* commandList[FRAME_BUFFERS];
-			ID3D11Texture2D* buffer[2][FRAME_BUFFERS];
+			ID3D11CommandList* commandList;
+			ID3D11Texture2D* buffer[2];
 
-			ID3D11RenderTargetView* RTV[2][FRAME_BUFFERS];
-			ID3D11ShaderResourceView* SRV[2][FRAME_BUFFERS];
-			ID3D11DepthStencilView* depthStencilView[2][FRAME_BUFFERS];
-			ID3D11DepthStencilView* depthStencilViewReadOnly[2][FRAME_BUFFERS];
+			ID3D11RenderTargetView* RTV[2];
+			ID3D11ShaderResourceView* SRV[2];
+			ID3D11DepthStencilView* depthStencilView[2];
+			ID3D11DepthStencilView* depthStencilViewReadOnly[2];
 			ID3D11DepthStencilState* depthStencilState;
-			ID3D11ShaderResourceView* depthBufferSRV[FRAME_BUFFERS];
+			ID3D11ShaderResourceView* depthBufferSRV;
 
 		} m_dx;
 
@@ -89,7 +89,6 @@ namespace thomas
 		RECT m_windowRectangle;
 
 		IDXGISwapChain3* m_swapChain;
-		int m_frameIndex;
 		HANDLE m_waitableObject;
 	};
 }
