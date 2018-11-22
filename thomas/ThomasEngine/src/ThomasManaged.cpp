@@ -277,7 +277,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::LoadEditorAssets()
 	{
 #if _EDITOR
-		if (InEditor()) {
+		if (IsExternalBuild()) {
 			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
 			ScriptingManager::Init();
@@ -614,6 +614,11 @@ namespace ThomasEngine {
 		return playing == RunningState::Running;
 	}
 
+	bool ThomasWrapper::IsEditor()
+	{
+		return playing == RunningState::Editor;
+	}
+
 	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
 
 	void ThomasWrapper::RenderPhysicsDebug::set(bool value) { thomas::Physics::Physics::s_drawDebug = value; }
@@ -636,7 +641,7 @@ namespace ThomasEngine {
 	}
 
 	
-	bool ThomasWrapper::InEditor()
+	bool ThomasWrapper::IsExternalBuild()
 	{
 		return inEditor;
 	}

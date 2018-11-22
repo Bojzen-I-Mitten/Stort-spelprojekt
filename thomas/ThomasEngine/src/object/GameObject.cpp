@@ -27,7 +27,7 @@ namespace ThomasEngine {
 	{
 		m_name = "gameobject";
 #ifdef _EDITOR
-		if(ThomasWrapper::InEditor())
+		if(ThomasWrapper::IsExternalBuild())
 			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
@@ -45,7 +45,7 @@ namespace ThomasEngine {
 		ThomasWrapper::CurrentScene->CreateObject(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
-		if (ThomasWrapper::InEditor())
+		if (ThomasWrapper::IsExternalBuild())
 			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}

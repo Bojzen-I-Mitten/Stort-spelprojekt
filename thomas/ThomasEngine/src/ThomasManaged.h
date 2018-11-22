@@ -166,11 +166,15 @@ namespace ThomasEngine {
 
 		static Guid selectedGUID;
 
-		static bool IsPlaying();
-		static bool IsRunningEditor();
-		/* Don't confuse with is running editor. This value determines if build out or not
+		/* If Running State
 		*/
-		static bool InEditor();
+		static bool IsPlaying();
+		/* True if editor state
+		*/
+		static bool IsEditor();
+		/* If this is an external build without editor window
+		*/
+		static bool IsExternalBuild();
 		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 

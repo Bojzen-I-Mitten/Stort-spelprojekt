@@ -60,7 +60,7 @@ namespace ThomasEngine {
 	void Material::OnChange()
 	{
 #ifdef _EDITOR
-		if (!ThomasWrapper::IsPlaying() && !m_instance)
+		if (ThomasWrapper::IsEditor() && !m_instance)
 			Serializer::SerializeMaterial(this, m_path);
 #endif
 	}
