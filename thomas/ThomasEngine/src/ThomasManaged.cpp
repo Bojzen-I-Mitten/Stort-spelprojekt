@@ -69,6 +69,8 @@ namespace ThomasEngine {
 	void ThomasWrapper::Start(bool editor) 
 	{
 		inEditor = editor;
+		EditorWindowLoaded = gcnew ManualResetEvent(!inEditor);
+		GameWindowLoaded = gcnew ManualResetEvent(!inEditor);
 		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
 		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
@@ -88,28 +90,12 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			
-			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
-#if _EDITOR
-
-			if (InEditor()) {
-				Model::InitPrimitives();
-				Resources::LoadAll(Application::editorAssets);
-				ScriptingManager::Init();
-			}
-			else
-			{
-				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
-			}
-
-			
-#endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
@@ -117,12 +103,23 @@ namespace ThomasEngine {
 			logicThread->Start();
 
 			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
-		
 			renderThread->Name = "Thomas Engine (Render Thread)";
 			renderThread->Start();
 
 		}
 	}
+#ifdef _EDITOR
+	void ThomasWrapper::ThomasGameWindowLoaded()
+	{
+		GameWindowLoaded->Set();
+	}
+
+	void ThomasWrapper::ThomasEditorWindowLoaded()
+	{
+		EditorWindowLoaded->Set();
+	}
+#endif
+
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
@@ -154,6 +151,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartRenderer()
 	{
+		GameWindowLoaded->WaitOne();
+		EditorWindowLoaded->WaitOne();
 		// Render thread start
 
 		ThomasCore::Core().registerThread();
@@ -279,8 +278,26 @@ namespace ThomasEngine {
 		// Called when system can replace 
 	}
 
+	void ThomasWrapper::LoadEditorAssets()
+	{
+#if _EDITOR
+		if (InEditor()) {
+			Model::InitPrimitives();
+			Resources::LoadAll(Application::editorAssets);
+			ScriptingManager::Init();
+		}
+		else
+		{
+			Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
+		}
+#endif
+	}
+
 	void ThomasWrapper::StartEngine()
 	{
+		LoadEditorAssets();
+
+
 		// Update thread start
 
 		ThomasCore::Core().registerThread();

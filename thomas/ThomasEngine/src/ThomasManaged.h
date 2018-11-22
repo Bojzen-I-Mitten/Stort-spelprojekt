@@ -60,8 +60,8 @@ namespace ThomasEngine {
 		delegate void MainThreadDelegate();
 		
 
-		static ManualResetEvent^ RenderFinished;
-		static ManualResetEvent^ UpdateFinished;
+		static ManualResetEvent^ RenderFinished, ^UpdateFinished;
+		static ManualResetEvent^ EditorWindowLoaded, ^GameWindowLoaded;
 		static ManualResetEvent^ StateCommandProcessed;
 		static ManualResetEvent^ WaitLogOutput;
 		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
@@ -86,6 +86,8 @@ namespace ThomasEngine {
 		SceneManager^ m_scene;
 		CommandQueue^ m_engineCommands;
 		Object^ m_sceneLock;
+
+		static void LoadEditorAssets();
 	public:
 
 		property SceneManager^ SceneManagerRef
@@ -111,7 +113,14 @@ namespace ThomasEngine {
 		static void Start();
 		static void MainThreadUpdate();
 		static void StartRenderer();
-
+#ifdef _EDITOR
+		/* Triggered event on game window load, only called when editor is used
+		*/
+		static void ThomasGameWindowLoaded();
+		/* Triggered event on editor window load, only called when editor is used
+		*/
+		static void ThomasEditorWindowLoaded();
+#endif
 
 		static property ThomasWrapper^ Thomas
 		{

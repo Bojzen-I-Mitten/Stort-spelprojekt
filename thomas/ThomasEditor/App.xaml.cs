@@ -26,10 +26,6 @@ namespace ThomasEditor
         {
             ThomasWrapper.Exit();
         }
-
-        protected override void OnLoadCompleted(NavigationEventArgs e)
-        {
-            base.OnLoadCompleted(e);
-        }
+        
     }
 }
