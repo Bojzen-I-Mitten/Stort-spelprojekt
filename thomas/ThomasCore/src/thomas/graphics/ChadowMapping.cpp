@@ -154,7 +154,7 @@ namespace thomas
 
 		math::Matrix ShadowMap::GetVPMat()
 		{
-			return m_matrixVP.Transpose();
+			return m_matrixVP;
 		}
 
 		

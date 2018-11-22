@@ -5,16 +5,12 @@
 
 cbuffer LightMatrices
 {
-    float4x4 LightMatricesVP[8];
+    float4x4 LightMatricesVP[2] : MATRIXARRAY;
 };
 
-
-
-
-
-inline float4 WorldToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
+inline float4 WorldToLightClipPos(in float3 pos, in float shadowMapIndex)//, uint lightIndex)//temp dirlight id
 {
-    return mul(LightMatricesVP[0], float4(pos, 1.0));
+    return mul(LightMatricesVP[(uint) shadowMapIndex], float4(pos, 1.0));
 }
 
 
@@ -54,7 +50,9 @@ struct LightStruct
     float3 right;
     float3 up;
     float2 rectangleDimension;
-    float2 pad;
+    
+    float shadowMapIndex;
+    float pad;
 };
 
 
@@ -85,8 +83,8 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
     float3 lightDir = float3(0, 0, 0);
     float lightMultiplyer = 0.0;
     
-    float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
-    float shadowMapIndex = 0.0;
+    static float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
+    float shadowMapIndex = 0.5;
 
     int i = 0;
     int roof = nrOfDirectionalLights;
@@ -98,7 +96,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
 
         if (shadowMapIndex < nrOfShadowMaps)
         {
-            float4 sampleCoordLS = WorldToLightClipPos(worldPos);
+            float4 sampleCoordLS = WorldToLightClipPos(worldPos, shadowMapIndex);
             sampleCoordLS.xyz /= sampleCoordLS.w;
             sampleCoordLS.x = sampleCoordLS.x * 0.5 + 0.5;
             sampleCoordLS.y = 0.5 - sampleCoordLS.y * 0.5;

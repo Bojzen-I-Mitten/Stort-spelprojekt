@@ -61,6 +61,10 @@ namespace thomas
 			}
 			void LightComponent::OnDestroy()
 			{
+				
+				if (m_castsShadows)
+					graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
+	
 				graphics::LightManager::RemoveLight(this);
 			}
 
@@ -198,20 +202,25 @@ namespace thomas
 
 			void LightComponent::SetCastShadows(bool const & value)
 			{
-				if (value != m_castsShadows)
-				{
-					m_castsShadows = value;
+				m_castsShadows = value;
 
-					if (m_castsShadows)
+				if (m_castsShadows)
+				{
+					ID3D11DepthStencilView* dsv = graphics::LightManager::GetFreeShadowMapView();
+					if (dsv == nullptr)
 					{
-						m_shadowMap.SetShadowMapDepthStencilView(graphics::LightManager::GetFreeShadowMapView());
+						m_castsShadows = false;
+
 					}
 					else
-					{
-						graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
-						m_shadowMap.SetShadowMapDepthStencilView(nullptr);
-					}
+						m_shadowMap.SetShadowMapDepthStencilView(dsv);
 				}
+				else
+				{
+					graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
+					m_shadowMap.SetShadowMapDepthStencilView(nullptr);
+				}
+				
 			}
 
 }

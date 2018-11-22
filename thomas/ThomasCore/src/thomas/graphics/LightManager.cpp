@@ -45,12 +45,13 @@ namespace thomas
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc = {};
 			depthViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
-			depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			depthViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 			depthViewDesc.Texture2DArray.ArraySize = 1u;
 			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
 			{
 				ID3D11DepthStencilView* dsv;
 				depthViewDesc.Texture2DArray.FirstArraySlice = i;
+				
 
 				HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(s_shadowMapTextures->GetResource(), &depthViewDesc, &dsv);
 
@@ -181,9 +182,10 @@ namespace thomas
 				return;
 
 
-			shaders->SetGlobalTexture2DArray("ShadowMaps", s_shadowMapTextures);//s_lights[0]->GetShadowMapTexture());
+			shaders->SetGlobalTexture2DArray("ShadowMaps", s_shadowMapTextures);
 			
-			std::vector<math::Matrix> lightMatrices(s_usedShadowMapViews.size());
+
+			math::Matrix* lightMatrices = new math::Matrix[s_usedShadowMapViews.size()];
 			unsigned i = 0;
 			for (object::component::LightComponent* l : s_lights)
 			{
@@ -194,17 +196,36 @@ namespace thomas
 				}
 			}
 
-			shaders->SetGlobalMatrixArray("LightMatricesVP", lightMatrices.data(), lightMatrices.size());
-			
+			shaders->SetGlobalMatrixArray("LightMatricesVP", lightMatrices, s_usedShadowMapViews.size());
+			delete lightMatrices;
 		}
 
 		ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()
 		{
+			if (s_freeShadowMapViews.size() <= 0)
+			{
+				//LOG("Not enough shadowmaps");
+				return nullptr;
+			}
 			ID3D11DepthStencilView* dsv = s_freeShadowMapViews[s_freeShadowMapViews.size() - 1];
 			s_usedShadowMapViews.push_back(dsv);
 			s_freeShadowMapViews.pop_back();
 			return dsv;
 		}
+
+		/*ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()
+		{
+			if (s_freeShadowMapViews.size() <= 0)
+			{
+				//LOG("Not enough shadowmaps");
+				return nullptr;
+			}
+			auto it = s_freeShadowMapViews.begin();
+			ID3D11DepthStencilView* dsv = *it._Ptr;
+			s_usedShadowMapViews.push_back(dsv);
+			s_freeShadowMapViews.erase(it);
+			return dsv;
+		}*/
 
 		bool LightManager::ResturnShadowMapView(ID3D11DepthStencilView * dsv)
 		{

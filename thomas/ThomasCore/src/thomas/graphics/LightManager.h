@@ -61,7 +61,8 @@ namespace thomas
 				thomas::math::Vector3 right;
 				thomas::math::Vector3 up;
 				thomas::math::Vector2 rectangleDimensions;
-				thomas::math::Vector2 pad;
+				float shadowMapIndex;
+				float pad;
 			};
 
 		public:
@@ -77,7 +78,7 @@ namespace thomas
 			static ID3D11DepthStencilView* GetFreeShadowMapView();
 			static bool ResturnShadowMapView(ID3D11DepthStencilView * dsv);
 		private:
-			static const unsigned s_nrOfShadowMapsSupported = 8;
+			static const unsigned s_nrOfShadowMapsSupported = 2;
 			static std::vector<ID3D11DepthStencilView*> s_freeShadowMapViews;
 			static std::vector<ID3D11DepthStencilView*> s_usedShadowMapViews;
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);

@@ -554,7 +554,14 @@ namespace thomas
 				break;
 			case D3D_SVC_MATRIX_COLUMNS:
 			case D3D_SVC_MATRIX_ROWS:
-				newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				if (semantic == "MATRIXARRAY")
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrixArray::GetDefault();
+				}
+				else
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				}
 				break;
 			case D3D_SVC_OBJECT:
 			{

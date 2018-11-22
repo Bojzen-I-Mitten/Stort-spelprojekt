@@ -1,6 +1,5 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
-#include <ThomasLights.hlsl>
 #include <ThomasCG.hlsl>
 
 DepthStencilState EnableDepth
