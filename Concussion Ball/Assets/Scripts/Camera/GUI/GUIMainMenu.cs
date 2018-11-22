@@ -24,6 +24,9 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
+    Color Unselected = Color.FloralWhite;
+    Color Selected = Color.IndianRed;
+
     public override void Awake()
     {
         
@@ -40,78 +43,51 @@ public class GUIMainMenu : ScriptComponent
     {
         if (Canvas.isRendering)
         {
+            Play.color = Unselected;
+            Options.color = Unselected;
+            Credits.color = Unselected;
+            Exit.color = Unselected;
+
+            if (Play.Hovered())
+                Play.color = Selected;
+            else if (Options.Hovered())
+                Options.color = Selected;
+            else if (Credits.Hovered())
+                Credits.color = Selected;
+            else if (Exit.Hovered())
+                Exit.color = Selected;
+
+            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+            {
+                TextBoxName.color = Unselected;
+                if (TextBoxName.Clicked())
+                {
+                    TakeName = true;
+                    TextBoxName.color = Selected;
+                }
+
+                if (Play.Clicked())
+                {
+                    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                }
+            }
+
+            PlayerString = PlayerString.ToUpper();
+            PlayerName.text = PlayerString;
+
             if (TakeName)
             {
                 GUIInput.AppendString(ref PlayerString, 8);
             }
-            if (!Play.Hovered())
-            {
-                Play.color = Color.FloralWhite;
-                //Play.scale = new Vector2(2.5f);
-            }
-            else
-            {
-                Play.color = Color.IndianRed;
-                //Play.scale = new Vector2(3f);
-            }
-
-            if (!Options.Hovered())
-            {
-                Options.color = Color.FloralWhite;
-                //Options.scale = new Vector2(2.5f);
-            }
-            else
-            {
-                Options.color = Color.IndianRed;
-                //Options.scale = new Vector2(3f);
-            }
-
-            if (!Credits.Hovered())
-            {
-                Credits.color = Color.FloralWhite;
-                //Credits.scale = new Vector2(2.5f);
-            }
-            else
-            {
-                Credits.color = Color.IndianRed;
-                //Credits.scale = new Vector2(3f);
-            }
-
-            if (!Exit.Hovered())
-            {
-                Exit.color = Color.FloralWhite;
-                //Exit.scale = new Vector2(2.5f);
-            }
-            else
-            {
-                Exit.color = Color.IndianRed;
-                //Exit.scale = new Vector2(3.0f);
-            }
-
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            if (TextBoxName.Clicked())
-            {
-                TakeName = true;
-                TextBoxName.color = Color.Green;
-            }
-
-            if (Play.Clicked())
-            {
-                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-            }
         }
-
-        PlayerString = PlayerString.ToUpper();
-        PlayerName.text = PlayerString;
     }
-
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
 
-        // *** Text ***
-        // Play
+        #region Text
+
+        #region  Play
         Play = Canvas.Add("Play");
         Play.position = new Vector2(0.425f, 0.11f);
         Play.scale = new Vector2(1.5f);
@@ -119,8 +95,9 @@ public class GUIMainMenu : ScriptComponent
         Play.depth = 0.9f;
         Play.text = "Play";
         Play.font = TextFont;
+        #endregion
 
-        //  Options
+        #region  Options
         Options = Canvas.Add("Options");
         Options.position = new Vector2(0.425f, 0.21f);
         Options.scale = new Vector2(1.5f);
@@ -128,8 +105,9 @@ public class GUIMainMenu : ScriptComponent
         Options.depth = 0.9f;
         Options.text = "Options";
         Options.font = TextFont;
+        #endregion
 
-        // Credits
+        #region Credits
         Credits = Canvas.Add("Credits");
         Credits.position = new Vector2(0.425f, 0.31f);
         Credits.scale = new Vector2(1.5f);
@@ -137,8 +115,9 @@ public class GUIMainMenu : ScriptComponent
         Credits.depth = 0.9f;
         Credits.text = "Credits";
         Credits.font = TextFont;
+        #endregion
 
-        // Exit
+        #region Exit
         Exit = Canvas.Add("Exit");
         Exit.position = new Vector2(0.425f, 0.41f);
         Exit.scale = new Vector2(1.5f);
@@ -146,8 +125,9 @@ public class GUIMainMenu : ScriptComponent
         Exit.depth = 0.9f;
         Exit.text = "Exit";
         Exit.font = TextFont;
+        #endregion
 
-        // Player name
+        #region Player name
         PlayerName = Canvas.Add("PlayerName");
         PlayerName.position = new Vector2(0.423f, 0.918f);
         PlayerName.scale = new Vector2(0.9f);
@@ -156,8 +136,10 @@ public class GUIMainMenu : ScriptComponent
         PlayerName.text = PlayerString;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
+        #endregion
+        #endregion
 
-        // *** Images ***
+        #region Images
         if (TextBoxBG != null)
         {
             TextBoxBGName = Canvas.Add(TextBoxBG);
@@ -178,6 +160,7 @@ public class GUIMainMenu : ScriptComponent
             TextBoxName.depth = 0.9f;
             TextBoxName.color = Color.Black;
         }
+        #endregion
     }
 
     public void ClearImagesAndText()
