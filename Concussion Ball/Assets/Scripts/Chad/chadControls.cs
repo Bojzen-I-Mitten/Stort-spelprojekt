@@ -142,7 +142,7 @@ public class ChadControls : NetworkComponent
     {
         // Called when NetworkScene::SpawnPlayer is called
         base.OnGotOwnership();
-        gameObject.setActive(true);
+        gameObject.SetActive(true);
         MatchSystem.instance.LocalChad = this;
     }
     public override void OnLostOwnership()
@@ -814,7 +814,7 @@ public class ChadControls : NetworkComponent
             PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
 #if (PRINT_CONSOLE_DEBUG)
             if (pickupablea)
-                Debug.LogError("Entered Pickup: " + pickupablea.Name);
+                Debug.Log("Entered Pickup: " + pickupablea.Name);
 #endif
 
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
