@@ -19,10 +19,6 @@ public class GUISelectTeam : ScriptComponent
     Text Team2Text;
     Text SpectatorText;
 
-    public override void OnAwake()
-    {
-    }
-
     public override void Start()
     {
         Disabled = false;
