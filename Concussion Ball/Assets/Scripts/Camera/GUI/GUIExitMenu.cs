@@ -40,19 +40,20 @@ public class GUIExitMenu : ScriptComponent
 
             if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {
-                //if (ExitMatch.Clicked())
-                //{
-                //    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-                //    CameraMaster.instance.Canvas.isRendering = true;
-                //}
                 if (ExitGame.Clicked())
                 {
                     Debug.Log("I'm exciting! :^)");
                     if (ThomasWrapper.IsPlaying())
+                    {
+                        Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                        CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
                         ThomasWrapper.IssueRestart();
-                    Debug.Log("TEST2");
-                    //StartCoroutine(Replay());
-                    //ThomasWrapper.Exit();
+                        //if (ThomasWrapper.IsPlaying())
+                        //{
+                        //    Debug.Log("Finished reloading to main menu.");
+                        //    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+                        //}
+                    }       
                 }
             }
         }
