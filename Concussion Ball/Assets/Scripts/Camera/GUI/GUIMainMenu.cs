@@ -27,11 +27,6 @@ public class GUIMainMenu : ScriptComponent
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
 
-    public override void Awake()
-    {
-        
-    }
-
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();
@@ -77,7 +72,7 @@ public class GUIMainMenu : ScriptComponent
 
             if (TakeName)
             {
-                GUIInput.AppendString(ref PlayerString, 8);
+                GUIInput.AppendString(ref PlayerString, 14);
             }
         }
     }
@@ -140,26 +135,26 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Images
-        if (TextBoxBG != null)
-        {
-            TextBoxBGName = Canvas.Add(TextBoxBG);
-            TextBoxBGName.origin = new Vector2(0.5f);
-            TextBoxBGName.position = new Vector2(0.485f, 0.94f);
-            TextBoxBGName.scale = new Vector2(0.65f, 0.65f);
-            TextBoxBGName.depth = 0.9f;
-            TextBoxBGName.color = Color.FloralWhite;
-        }
-
+        
         if (TextBox != null)
         {
             TextBoxName = Canvas.Add(TextBox);
             TextBoxName.origin = new Vector2(0.5f);
             TextBoxName.position = new Vector2(0.485f, 0.94f);
-            TextBoxName.scale = new Vector2(0.65f, 0.65f);
             TextBoxName.interactable = true;
             TextBoxName.depth = 0.9f;
             TextBoxName.color = Color.Black;
         }
+
+        if (TextBoxBG != null)
+        {
+            TextBoxBGName = Canvas.Add(TextBoxBG);
+            TextBoxBGName.origin = new Vector2(0.5f);
+            TextBoxBGName.position = new Vector2(0.485f, 0.94f);
+            TextBoxBGName.depth = 0.9f;
+            TextBoxBGName.color = Unselected;
+        }
+
         #endregion
     }
 
