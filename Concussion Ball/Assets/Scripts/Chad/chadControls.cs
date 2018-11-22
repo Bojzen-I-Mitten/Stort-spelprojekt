@@ -234,7 +234,7 @@ public class ChadControls : NetworkComponent
 
     public void LocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
     {
-        SendRPC("RPCStartRagdoll", duration, force);
+        SendRPC("RPCStartRagdoll", duration, force, diveTackle);
         RPCStartRagdoll(duration, force, diveTackle);
     }
 
@@ -253,7 +253,7 @@ public class ChadControls : NetworkComponent
             NetPeer peerThatOwnsThisPlayer = MatchSystem.instance.Scene.Players.FirstOrDefault(player => player.Value == Identity).Key;
             if(peerThatOwnsThisPlayer != null)
             {
-                MatchSystem.instance.SendRPC(peerThatOwnsThisPlayer, -1, "RPCLocalActivateRagdoll", duration, force);
+                MatchSystem.instance.SendRPC(peerThatOwnsThisPlayer, -1, "RPCLocalActivateRagdoll", duration, force, State == STATE.DIVING);
             }
             RPCStartRagdoll(duration, force, State == STATE.DIVING);
         }

@@ -33,7 +33,16 @@ namespace ThomasEngine.Network
         Vector3 TargetSyncLinearVelocity;
         Vector3 TargetSyncAngularVelocity;
 
-        Rigidbody targetRigidbody;
+        Rigidbody _targetRigidbody;
+        Rigidbody targetRigidbody
+        {
+            get
+            {
+                if (!_targetRigidbody)
+                    _targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+                return _targetRigidbody;
+            }
+        }
 
         Transform _target;
         [Browsable(false)]
@@ -47,6 +56,7 @@ namespace ThomasEngine.Network
             set
             {
                 _target = value;
+                _targetRigidbody = _target.gameObject.GetComponent<Rigidbody>();
             }
         }
 
@@ -68,7 +78,6 @@ namespace ThomasEngine.Network
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
 
-            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -83,7 +92,6 @@ namespace ThomasEngine.Network
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
 
-            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -189,7 +197,7 @@ namespace ThomasEngine.Network
             {
                 writer.Put(1);
             }
-
+            writer.Put((int)SyncMode);
             switch (SyncMode)
             {
                 case TransformSyncMode.SyncTransform:
@@ -236,6 +244,14 @@ namespace ThomasEngine.Network
                 writer.Put(targetRigidbody.IsKinematic);
                 writer.Put(targetRigidbody.AttachedCollider.isTrigger);
                 prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
+            }else
+            {
+                writer.Put(false);
+                WriteTransform(writer);
+                writer.Put(new Vector3());
+                writer.Put(new Vector3());
+                writer.Put(false);
+                writer.Put(false);
             }
         }
         #endregion
@@ -246,7 +262,7 @@ namespace ThomasEngine.Network
             {
                 return; //No dirty bit or initial state. Lets get the fuck out of here!
             }
-
+            SyncMode = (TransformSyncMode)reader.GetInt();
             switch (SyncMode)
             {
                 case TransformSyncMode.SyncTransform:
@@ -261,7 +277,7 @@ namespace ThomasEngine.Network
 
         }
 
-        private void ReadTransform(NetPacketReader reader)
+        private void ReadTransform(NetDataReader reader)
         {
             CurrentPositionDuration = 0;
             if (isOwner)
@@ -291,7 +307,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        private void ReadRigidbody(NetPacketReader reader)
+        private void ReadRigidbody(NetDataReader reader)
         {
             if (isOwner || !targetRigidbody)
             {
@@ -307,7 +323,9 @@ namespace ThomasEngine.Network
                 reader.GetBool();
                 return;
             }
+            
             targetRigidbody.enabled = reader.GetBool();
+
             TargetSyncPosition = reader.GetVector3();
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
