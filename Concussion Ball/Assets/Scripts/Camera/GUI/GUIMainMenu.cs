@@ -28,56 +28,59 @@ public class GUIMainMenu : ScriptComponent
 
     public override void Update()
     {
-        if (!Play.Hovered())
+        if (Canvas.isRendering)
         {
-            Play.color = Color.FloralWhite;
-            //Play.scale = new Vector2(2.5f);
-        }
-        else
-        {
-            Play.color = Color.IndianRed;
-            //Play.scale = new Vector2(3f);
-        }
-
-        if (!Options.Hovered())
-        {
-            Options.color = Color.FloralWhite;
-            //Options.scale = new Vector2(2.5f);
-        }
-        else
-        {
-            Options.color = Color.IndianRed;
-            //Options.scale = new Vector2(3f);
-        }
-
-        if (!Credits.Hovered())
-        {
-            Credits.color = Color.FloralWhite;
-            //Credits.scale = new Vector2(2.5f);
-        }
-        else
-        {
-            Credits.color = Color.IndianRed;
-            //Credits.scale = new Vector2(3f);
-        }
-
-        if (!Exit.Hovered())
-        {
-            Exit.color = Color.FloralWhite;
-            //Exit.scale = new Vector2(2.5f);
-        }
-        else
-        {
-            Exit.color = Color.IndianRed;
-            //Exit.scale = new Vector2(3.0f);
-        }
-
-
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            if (Play.Clicked())
+            if (!Play.Hovered())
             {
-                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                Play.color = Color.FloralWhite;
+                //Play.scale = new Vector2(2.5f);
+            }
+            else
+            {
+                Play.color = Color.IndianRed;
+                //Play.scale = new Vector2(3f);
+            }
+
+            if (!Options.Hovered())
+            {
+                Options.color = Color.FloralWhite;
+                //Options.scale = new Vector2(2.5f);
+            }
+            else
+            {
+                Options.color = Color.IndianRed;
+                //Options.scale = new Vector2(3f);
+            }
+
+            if (!Credits.Hovered())
+            {
+                Credits.color = Color.FloralWhite;
+                //Credits.scale = new Vector2(2.5f);
+            }
+            else
+            {
+                Credits.color = Color.IndianRed;
+                //Credits.scale = new Vector2(3f);
+            }
+
+            if (!Exit.Hovered())
+            {
+                Exit.color = Color.FloralWhite;
+                //Exit.scale = new Vector2(2.5f);
+            }
+            else
+            {
+                Exit.color = Color.IndianRed;
+                //Exit.scale = new Vector2(3.0f);
+            }
+
+
+            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+            {
+                if (Play.Clicked())
+                {
+                    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                }
             }
         }
     }
