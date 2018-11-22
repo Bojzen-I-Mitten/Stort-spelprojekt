@@ -69,7 +69,9 @@ namespace thomas
 				bool Hovered()
 				{
 					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
-					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
+					if (!window || 
+						WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow() || 
+						!interactable)
 						return false;
 
 					Viewport canvasViewport = canvas->GetViewport();
@@ -87,7 +89,7 @@ namespace thomas
 
 				bool Clicked()
 				{
-					if (interactable)
+					if (WindowManager::Instance()->GetGameInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
 						return Hovered();
 					else
 						return false;
