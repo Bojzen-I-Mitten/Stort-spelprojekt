@@ -476,7 +476,6 @@ namespace ThomasEngine {
 			}
 			else if (IssuedStateCommand == ThomasStateCommand::RestartIssued)
 			{
-				LOG("Entered restart function");
 				StopPlay();
 				Play();
 			}
@@ -545,8 +544,6 @@ namespace ThomasEngine {
 	void ThomasWrapper::IssueRestart()
 	{
 		IssuedStateCommand = ThomasStateCommand::RestartIssued;
-		//IssueStateCommand(ThomasStateCommand::RestartIssued);
-		//IssueStateCommand(ThomasStateCommand::StopIssued);
 	}
 
 	bool ThomasWrapper::IsPlaying()
