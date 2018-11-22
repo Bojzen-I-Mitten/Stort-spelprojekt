@@ -10,10 +10,13 @@
 #include "../Debug.h"
 namespace ThomasEngine {
 
-	Material::Material(ThomasEngine::Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
+	Material::Material(ThomasEngine::Shader^ shader) : Resource(
+			(shader == nullptr ? "Failed" : shader->Name) + " Material.mat",
+			(shader == nullptr ? thomas::resource::Material::GetStandardMaterial() :  new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr)))
 	{
 	}
-	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
+	Material::Material(Material^ original) : 
+		Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
 		m_instance = true;
 		EditorProperties = original->EditorProperties;
