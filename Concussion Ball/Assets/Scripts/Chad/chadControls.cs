@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿#define PRINT_CONSOLE_DEBUG
+//#define L_FOR_RAGDOLL
+
+using System.Linq;
 using ThomasEngine;
 using System;
 using ThomasEngine.Network;
@@ -7,6 +10,7 @@ using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
 using ThomasEngine.Script;
+
 
 public class ChadControls : NetworkComponent
 {
@@ -217,12 +221,13 @@ public class ChadControls : NetworkComponent
                 frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
             }
         }
-
+#if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {
             Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (-transform.forward + transform.up * 0.5f) * 2000, 1);
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
+#endif
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
@@ -807,10 +812,10 @@ public class ChadControls : NetworkComponent
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
+#if (PRINT_CONSOLE_DEBUG)
             if (pickupablea)
-            {
-                Debug.LogError("Why Denny!?");
-            }
+                Debug.LogError("Entered Pickup: " + pickupablea.Name);
+#endif
 
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null)
