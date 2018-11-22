@@ -44,10 +44,10 @@ namespace thomas
 
 			void LightComponent::Update()
 			{
-				m_lightComponentData.position = m_gameObject->m_transform->GetPosition();
-				m_lightComponentData.direction = m_gameObject->m_transform->Forward();
-				m_lightComponentData.right = m_gameObject->m_transform->Right();
-				m_lightComponentData.up = m_gameObject->m_transform->Up();
+				m_lightComponentData.position = m_gameObject->GetTransform()->GetPosition();
+				m_lightComponentData.direction = m_gameObject->GetTransform()->Forward();
+				m_lightComponentData.right = m_gameObject->GetTransform()->Right();
+				m_lightComponentData.up = m_gameObject->GetTransform()->Up();
 			}
 
 			void LightComponent::OnEnable()
@@ -70,7 +70,7 @@ namespace thomas
 
 			void LightComponent::UpdateShadowBox(Camera* camera)
 			{
-				m_shadowMap.UpdateShadowBox(m_gameObject->m_transform, camera);
+				m_shadowMap.UpdateShadowBox(m_gameObject->GetTransform(), camera);
 			}
 
 

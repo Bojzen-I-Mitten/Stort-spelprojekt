@@ -7,6 +7,7 @@
 
 namespace thomas
 {
+
 	namespace utils
 	{
 		namespace atomics
@@ -19,6 +20,17 @@ namespace thomas
 			public:
 				void lock();
 				void unlock();
+			};
+
+			/* Lock for small functions
+			*/
+			struct Lock
+			{
+			private:
+				SpinLock& m_mtx;
+			public:
+				Lock(SpinLock& mtx);
+				~Lock();
 			};
 		}
 	}

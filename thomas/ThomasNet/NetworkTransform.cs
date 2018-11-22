@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define TRANSFORM_PRINT_DEBUG
+
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using ThomasEngine;
+
 
 namespace ThomasEngine.Network
 {
@@ -33,7 +38,16 @@ namespace ThomasEngine.Network
         Vector3 TargetSyncLinearVelocity;
         Vector3 TargetSyncAngularVelocity;
 
-        Rigidbody targetRigidbody;
+        Rigidbody _targetRigidbody;
+        Rigidbody targetRigidbody
+        {
+            get
+            {
+                if (!_targetRigidbody)
+                    _targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+                return _targetRigidbody;
+            }
+        }
 
         Transform _target;
         [Browsable(false)]
@@ -47,6 +61,7 @@ namespace ThomasEngine.Network
             set
             {
                 _target = value;
+                _targetRigidbody = _target.gameObject.GetComponent<Rigidbody>();
             }
         }
 
@@ -67,8 +82,7 @@ namespace ThomasEngine.Network
             PrevRotation = target.rotation;
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
-
-            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -82,8 +96,7 @@ namespace ThomasEngine.Network
             PrevRotation = target.rotation;
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
-
-            targetRigidbody = target.gameObject.GetComponent<Rigidbody>();
+            
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -229,7 +242,7 @@ namespace ThomasEngine.Network
                 {
                     writer.Put(targetRigidbody.Position);
                     writer.Put(targetRigidbody.Rotation);
-                    writer.Put(transform.scale);
+                    writer.Put(target.scale);
                 }
                 writer.Put(targetRigidbody.LinearVelocity);
                 writer.Put(targetRigidbody.AngularVelocity);
@@ -277,6 +290,13 @@ namespace ThomasEngine.Network
             target.rotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
 
+#if (TRANSFORM_PRINT_DEBUG)
+            String msg = "T_Target: " + targetRigidbody.Name + (targetRigidbody.enabled ? "T" : "F");
+            msg += ";Pos: " + TargetSyncPosition.x + ", " + TargetSyncPosition.y + ", " + TargetSyncPosition.z;
+            msg += ";Rot: " + target.rotation.x + ", " + target.rotation.y + ", " + target.rotation.z + ", " + target.rotation.w;
+            ThomasEngine.Debug.Log(msg);
+#endif
+
             if (Vector3.Distance(TargetSyncPosition, target.position) > SnapThreshhold)
             {
                 target.position = TargetSyncPosition;
@@ -312,6 +332,13 @@ namespace ThomasEngine.Network
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
 
+#if (TRANSFORM_PRINT_DEBUG)
+            String msg = "RB_Target: " + targetRigidbody.Name + (targetRigidbody.enabled ? "T" : "F");
+            msg += ";Pos: " + TargetSyncPosition.x + ", " + TargetSyncPosition.y + ", " + TargetSyncPosition.z;
+            msg += ";Rot: " + TargetSyncRotation.x + ", " + TargetSyncRotation.y + ", " + TargetSyncRotation.z + ", " + target.rotation.w;
+            ThomasEngine.Debug.Log(msg);
+#endif
+
 
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
@@ -327,8 +354,8 @@ namespace ThomasEngine.Network
 
             if(!targetRigidbody.enabled)
             {
-                transform.position = TargetSyncPosition;
-                transform.rotation = TargetSyncRotation;
+                target.position = TargetSyncPosition;
+                target.rotation = TargetSyncRotation;
                 return;
             }
             else
@@ -342,6 +369,6 @@ namespace ThomasEngine.Network
             }
             
         }
-        #endregion
+#endregion
     }
 }

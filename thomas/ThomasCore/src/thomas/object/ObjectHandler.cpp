@@ -4,18 +4,23 @@
 
 namespace thomas
 {
+#ifdef LOCK_OBJECTHANDLER
+#define OH_LOCK() utils::atomics::Lock lk(m_lock)
+#else
+#define OH_LOCK()
+#endif
 
-	std::vector<object::GameObject> ObjectHandler::m_objectsDynamic;
-
-	std::map<UINT, std::vector<object::GameObject>> ObjectHandler::m_objectsStatic;
-
-	void ObjectHandler::Init()
+	ObjectHandler::ObjectHandler()	:
+		m_objectsDynamic(),
+		m_objectsStatic()
 	{
-		m_objectsDynamic.reserve(1000);
+		m_objectsDynamic.reserve(10000);
 	}
-
+	ObjectHandler::~ObjectHandler() 
+	{}
 	void ObjectHandler::ClearAll()
 	{
+		OH_LOCK();
 		// Clean all the arrays, used when scene is emptied so that we don't get any
 		// Objects without pointers
 		//for (auto& key : m_objectsStatic)
@@ -26,12 +31,12 @@ namespace thomas
 		//m_objectsDynamic.clear();
 	}
 
-	std::vector<object::GameObject>* ObjectHandler::GetDynamicObjectVector()
+	const std::vector<object::GameObject>& ObjectHandler::GetDynamicObjectVector()
 	{
-		return &m_objectsDynamic;
+		return m_objectsDynamic;
 	}
 
-	std::vector<object::GameObject>* ObjectHandler::GetVectorGroup(UINT GroupID)
+	const std::vector<object::GameObject>* ObjectHandler::GetVectorGroup(UINT GroupID)
 	{
 		if (m_objectsStatic.find(GroupID) != m_objectsStatic.end())
 		{
@@ -42,12 +47,16 @@ namespace thomas
 
 	object::GameObject * ObjectHandler::createNewGameObject(std::string name)
 	{
-		m_objectsDynamic.push_back(std::move(object::GameObject(name)));
+		OH_LOCK();
+		assert(m_objectsDynamic.capacity());
+		object::GameObject obj(name);
+		m_objectsDynamic.push_back(std::move(obj));
 		return &m_objectsDynamic.back();
 	}
 
 	object::Object* ObjectHandler::setStatic(object::Object* object, object::Object*& moved)
 	{
+		OH_LOCK();
 		int i = 0;
 		for (auto& it = m_objectsDynamic.begin(); it != m_objectsDynamic.end(); it++)
 		{
@@ -56,7 +65,7 @@ namespace thomas
 				UINT type = it->GetGroupID();
 				if (m_objectsStatic.find(type) == m_objectsStatic.end())
 				{
-					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >((size_t)type, std::vector<object::GameObject>()));
+					m_objectsStatic.insert(std::pair<UINT, std::vector<object::GameObject> >(type, std::vector<object::GameObject>()));
 					m_objectsStatic[type].reserve(1000);
 				}
 
@@ -95,6 +104,7 @@ namespace thomas
 
 	object::Object * ObjectHandler::moveStaticGroup(object::Object * object, object::Object *& moved)
 	{
+		OH_LOCK();
 		UINT type = static_cast<object::GameObject*>(object)->GetGroupID();
 
 
@@ -107,7 +117,7 @@ namespace thomas
 				// If new key, allocate memory to avoid loss of objects when reallocation happens
 				if (m_objectsStatic.find(new_GroupID) == m_objectsStatic.end())
 				{
-					m_objectsStatic.insert(std::pair<size_t, std::vector<object::GameObject> >(new_GroupID, std::vector<object::GameObject>()));
+					m_objectsStatic.insert(std::pair<UINT, std::vector<object::GameObject> >(new_GroupID, std::vector<object::GameObject>()));
 					m_objectsStatic[new_GroupID].reserve(1000);
 				}
 
@@ -134,6 +144,7 @@ namespace thomas
 
 	object::Object * ObjectHandler::setDynamic(object::Object * object, object::Object *& moved)
 	{
+		OH_LOCK();
 		UINT type = static_cast<object::GameObject*>(object)->GetGroupID();
 		for (auto& it = m_objectsStatic[type].begin(); it != m_objectsStatic[type].end(); it++)
 		{
@@ -160,6 +171,12 @@ namespace thomas
 		// If we reach this branch, an error has occoured
 		moved = nullptr;
 		return object;
+	}
+
+	ObjectHandler & ObjectHandler::Instance()
+	{
+		static ObjectHandler s_Instance;
+		return s_Instance;
 	}
 
 	

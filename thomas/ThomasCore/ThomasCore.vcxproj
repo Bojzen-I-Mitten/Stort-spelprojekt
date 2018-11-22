@@ -34,6 +34,8 @@
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\IBlendTree.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\playback\BinaryBlendNode.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\playback\EmptyPlayback.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
     <ClCompile Include="src\thomas\graphics\ChadowMapping.cpp" />
     <ClCompile Include="src\thomas\graphics\render\CameraList.cpp" />
@@ -165,6 +167,7 @@
     <ClInclude Include="src\thomas\graphics\animation\IBlendTree.h" />
     <ClInclude Include="src\thomas\graphics\animation\playback\BinaryBlendNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.h" />
+    <ClInclude Include="src\thomas\graphics\animation\playback\EmptyPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
     <ClInclude Include="src\thomas\graphics\ChadowMapping.h" />
     <ClInclude Include="src\thomas\graphics\GUI\GUIElements.h" />
@@ -178,6 +181,7 @@
     <ClInclude Include="src\thomas\graphics\Skybox.h" />
     <ClInclude Include="src\thomas\object\component\AudioListener.h" />
     <ClInclude Include="src\thomas\object\component\BoneTransformComponent.h" />
+    <ClInclude Include="src\thomas\object\component\EmptyComponent.h" />
     <ClInclude Include="src\thomas\object\ObjectHandler.h" />
     <ClInclude Include="src\thomas\graphics\ParticleSystem.h" />
     <ClInclude Include="src\thomas\graphics\GUI\Canvas.h" />
@@ -186,7 +190,6 @@
     <ClInclude Include="src\thomas\object\component\physics\Collider.h" />
     <ClInclude Include="src\thomas\object\component\physics\Joint.h" />
     <ClInclude Include="src\thomas\object\component\physics\MeshCollider.h" />
-    <ClInclude Include="src\thomas\object\component\physics\Ragdoll.h" />
     <ClInclude Include="src\thomas\object\component\physics\SphereCollider.h" />
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
@@ -354,7 +357,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_EDITOR;_DEBUG;_DEBUG;_LIB;THOMAS_EXPORT;_DEBUG_DX;%(PreprocessorDefinitions)%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CORE;_EDITOR;_DEBUG;_DEBUG;_LIB;THOMAS_EXPORT;_DEBUG_DX;%(PreprocessorDefinitions)%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
@@ -404,7 +407,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_EDITOR;NDEBUG;_LIB;THOMAS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CORE;_EDITOR;NDEBUG;_LIB;THOMAS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>

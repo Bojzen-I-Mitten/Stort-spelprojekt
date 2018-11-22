@@ -16,7 +16,16 @@
 
 namespace ThomasEngine
 {
-	Camera::Camera() : Component(new thomas::object::component::Camera()) { renderGUI = true; }
+	Camera::Camera() : 
+		Component(new thomas::object::component::Camera()) 
+	{ 
+		renderGUI = true; 
+	}
+
+	Camera::~Camera()
+	{
+
+	}
 
 	thomas::object::component::Camera* Camera::camera::get(){ return (thomas::object::component::Camera*)nativePtr; }
 
@@ -42,11 +51,15 @@ namespace ThomasEngine
 
 	TextureCube^ Camera::SkyMap::get() 
 	{ 
-		ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(camera->GetSkyMap());
-		if (res)
-			return (ThomasEngine::TextureCube^)res;
-		else
-			return gcnew ThomasEngine::TextureCube(camera->GetSkyMap());
+		// Ensure skymap is not null
+		if (camera->GetSkyMap())
+		{
+			// Find it...
+			ThomasEngine::Resource^ res = ThomasEngine::Resources::FindResourceFromNativePtr(camera->GetSkyMap());
+			if (res)
+				return (ThomasEngine::TextureCube^)res;
+		}
+		return nullptr;
 	}
 	void Camera::SkyMap::set(TextureCube^ value)
 	{

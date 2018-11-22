@@ -26,7 +26,7 @@ namespace thomas
 			void BoxCollider::OnDrawGizmosSelected()
 			{
 				editor::Gizmos::Gizmo().SetColor(math::Color(0, 1, 0));
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 				editor::Gizmos::Gizmo().DrawBoundingOrientedBox(DirectX::BoundingOrientedBox(m_center, m_scaling * 0.5f, math::Quaternion::Identity));
 				//editor::Gizmos::DrawBoundingCapsule(m_center, 0.5f, 5);
 			}

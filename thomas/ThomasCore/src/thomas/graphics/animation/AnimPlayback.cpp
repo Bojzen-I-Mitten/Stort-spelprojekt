@@ -12,10 +12,9 @@ namespace thomas {
 			*/
 
 			AnimPlayback::AnimPlayback(Skeleton &ref)
-				: AnimationNode(ref),
+				: AnimationNode(ref, ref.getNumBones()),
 				m_playback(new BaseAnimationTime(0.f,0.f, graphics::animation::PlayType::None)), m_anim(NULL), m_channel(ref.getNumBones())
 			{
-				m_boneMapping.reserve(ref.getNumBones());
 				//Each channel needs to be initiated so it can generate it's own frames.
 				for (unsigned int i = 0; i < ref.getNumBones(); i++) {
 					m_channel[i].init(ref.getBone(i)._bindPose);
@@ -25,13 +24,12 @@ namespace thomas {
 			/* Generate an animation player
 			*/
 			AnimPlayback::AnimPlayback(Skeleton &ref, std::unique_ptr<Playback> &playback, AnimationData &anim)
-				: AnimationNode(ref),
+				: AnimationNode(ref, anim.numChannel()),
 				m_playback(std::move(playback)), m_anim(&anim), m_channel()
 			{
 				m_channel.reserve(anim.numChannel());
-				m_boneMapping.reserve(anim.numChannel());
 				//Each channel needs to be initiated so it can generate it's own frames.
-				for (size_t i = 0; i < anim.numChannel(); i++) {
+				for (uint32_t i = 0; i < anim.numChannel(); i++) {
 					const ObjectChannel& ch = anim[i];
 					unsigned int boneInd;
 					if(ch.numNodeChannels() == 0 ||

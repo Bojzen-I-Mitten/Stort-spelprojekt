@@ -29,6 +29,9 @@ namespace ThomasEngine
 		void OnDestroy() override;
 		void OnParentDestroy(GameObject ^ parented_object) override;
 
+		void SetParent(Transform^ value);
+		void SetParent(Transform^ value, bool worldPositionStays);
+
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property thomas::object::component::Transform* Native { thomas::object::component::Transform* get(); }
@@ -40,7 +43,7 @@ namespace ThomasEngine
 		{
 			virtual bool get() override { return false; }
 		}
-		//[Newtonsoft::Json::JsonIgnoreAttribute]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]
 		property IEnumerable<Transform^>^ children
 		{
@@ -190,9 +193,6 @@ namespace ThomasEngine
 		void Translate(Vector3 translation);
 		void Translate(float x, float y, float z);
 		
-		void SetParent(Transform^ value);
-		void SetParent(Transform^ value, bool worldPositionStays);
-
 		void Orient(Vector3 forward, Vector3 up);
 
 	};

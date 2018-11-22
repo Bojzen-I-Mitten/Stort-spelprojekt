@@ -67,6 +67,8 @@
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
+    <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />
+    <Compile Include="Assets\Scripts\Chad\GUIPlayerScore.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
     <Compile Include="Assets\Scripts\Confetti.cs" />
     <Compile Include="Assets\Scripts\ConfettiEmitter.cs" />
@@ -77,7 +79,6 @@
     <Compile Include="Assets\Scripts\Chad\Ball.cs" />
     <Compile Include="Assets\Scripts\Chad\Chadimations.cs" />
     <Compile Include="Assets\Scripts\Chad\DissolveFadeIn.cs" />
-    <Compile Include="Assets\Scripts\Chad\PickupableObject.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerup.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\POWERUP_TEMPLATE.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\PP.cs" />
@@ -103,6 +104,8 @@
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Assets\test\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

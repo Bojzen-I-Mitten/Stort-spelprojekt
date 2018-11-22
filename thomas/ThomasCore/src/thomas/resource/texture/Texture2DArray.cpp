@@ -87,11 +87,7 @@ namespace thomas {
 			m_textureRefCount.push_back(1);
 
 			//update
-			//if (m_textures.size() >= m_capacity)
-				OnChanged();
-			//else
-				//UpdateTextures();
-
+			OnChanged();
 			return i;
 		}
 
@@ -109,7 +105,7 @@ namespace thomas {
 			m_capacity = m_textures.size();
 			
 			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3D::Instance()->CreateTextureArray((void**)initData.data(), m_width, m_height, initData.size(), m_format, textureInterface, m_srv, true, 1);
+			utils::D3D::Instance()->CreateTextureArray((void**)initData.data(), m_width, m_height, (int)initData.size(), m_format, textureInterface, m_srv, true, 1);
 			m_resource = textureInterface;
 		}
 

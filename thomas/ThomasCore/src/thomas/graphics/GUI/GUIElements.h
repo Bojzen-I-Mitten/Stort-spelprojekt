@@ -131,7 +131,7 @@ namespace thomas
 
 				Vector2 PixelSize()
 				{
-					return Vector2(texture->GetWidth(), texture->GetHeight()) * scale;
+					return Vector2(float(texture->GetWidth()), float(texture->GetHeight()));
 				}
 			};
 		}

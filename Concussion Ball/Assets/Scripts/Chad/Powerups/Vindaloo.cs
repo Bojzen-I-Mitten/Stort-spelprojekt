@@ -21,9 +21,9 @@ public class Vindaloo : Powerup
 
     public float ExplosionRadius { get; set; } = 8.0f;
     public float ExplosionForce = 300.0f;
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
 
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
@@ -33,17 +33,13 @@ public class Vindaloo : Powerup
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
 
-        #region big meme particle emitter bois
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.Type = SoundComponent.SoundType.Effect;
         ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
 
-        ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        ExplosionSound.Clip = VindalooExplosionSound;
-        ExplosionSound.Looping = false;
-        ExplosionSound.Is3D = true;
+        #region big meme particle emitter bois
 
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterFire.MinSize = 1.2f;
@@ -166,8 +162,12 @@ public class Vindaloo : Powerup
                 Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.Normalize();
                 forceDir.y += 3.0f;
+
                 float distForce = ExplosionRadius - distance;
-                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
+                Vector3 force = forceDir * ExplosionForce * distForce;
+                Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
+                param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
+                localChad.ActivateRagdoll(2.0f, param);
             }
         }
 
