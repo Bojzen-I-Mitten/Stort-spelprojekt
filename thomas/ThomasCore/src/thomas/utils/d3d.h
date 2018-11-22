@@ -3,7 +3,7 @@
 #define FRAME_BUFFERS 3
 
 #include <d3d11_4.h>
-#include <dxgi1_6.h>
+#include <dxgi1_4.h>
 #include <string>
 
 #pragma comment (lib, "d3d11.lib")
@@ -58,7 +58,7 @@ namespace thomas
 			ID3D11DeviceContext* GetDeviceContextDeffered();
 			ID3D11DeviceContext* GetDeviceContextImmediate();
 			IDXGIDevice1* GetDxgiDevice();
-			IDXGIAdapter1* GetDxgiAdapter();
+			IDXGIAdapter3* GetDxgiAdapter();
 			profiling::GpuProfiler* GetProfiler();
 
 		public:
@@ -83,7 +83,7 @@ namespace thomas
 			ID3D11Multithread* m_multiThreaded;
 			ID3D11Debug* m_debug;
 			IDXGIDevice1* m_dxgiDevice;
-			IDXGIAdapter1* m_dxgiAdapter;
+			IDXGIAdapter3* m_dxgiAdapter;
 
 			
 			profiling::GpuProfiler* m_profiler;

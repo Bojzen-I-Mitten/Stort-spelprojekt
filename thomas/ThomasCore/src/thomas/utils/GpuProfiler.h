@@ -11,7 +11,6 @@ namespace thomas
 			enum GTS
 			{
 				GTS_BEGIN_FRAME,
-				GTS_MAIN_CLEAR,
 				GTS_MAIN_OBJECTS,
 				GTS_PARTICLES,
 				GTS_GIZMO_OBJECTS,
@@ -37,9 +36,9 @@ namespace thomas
 				void RetriveTimeStamps();
 
 			public:
-				float GetAverageTiming(GTS gts);
-				float GetDrawTotal();
-				static float GetFrameTime();
+				int GetNumOfDrawCalls();
+				float GetTimeStamp(GTS gts);
+				float GetFrameTime();
 				float GetMemoryUsage();
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
@@ -51,7 +50,7 @@ namespace thomas
 				ID3D11Query * m_queryDisjoint[FRAME_BUFFERS];				// "Timestamp disjoint" query; records whether timestamps are valid
 				ID3D11Query * m_queryTimestamp[GTS_MAX][FRAME_BUFFERS];		// Individual timestamp queries for each relevant point in the frame
 
-				static float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
+				float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
 
 				int m_totalVertexCount;
 				int m_drawCalls;

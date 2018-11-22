@@ -236,11 +236,9 @@ namespace ThomasEngine {
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 			ImGui::Text("RAM Usage: %.2f MB", 0.0f);
-			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
-			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
-			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
-			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
-			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			ImGui::Text("	Main objects: %0.2f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
+			ImGui::Text("	Particles: %0.2f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES)*1000.0f);
+			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetTimeStamp(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
 			ImGui::End();
 		}
 

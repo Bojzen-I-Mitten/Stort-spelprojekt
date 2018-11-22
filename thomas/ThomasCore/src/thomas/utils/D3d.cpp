@@ -286,7 +286,7 @@ namespace thomas
 				hr = m_dxgiDevice->GetAdapter(&adapter);
 				if (SUCCEEDED(hr))
 				{
-					adapter->QueryInterface(__uuidof(IDXGIAdapter1), (void**)&m_dxgiAdapter);
+					adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)&m_dxgiAdapter);
 					
 					SAFE_RELEASE(adapter);
 					return true;
@@ -657,7 +657,7 @@ namespace thomas
 			return m_dxgiDevice;
 		}
 
-		IDXGIAdapter1* D3D::GetDxgiAdapter()
+		IDXGIAdapter3* D3D::GetDxgiAdapter()
 		{
 			return m_dxgiAdapter;
 		}

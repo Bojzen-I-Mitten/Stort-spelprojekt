@@ -12,11 +12,8 @@
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
-#include "utils\d3d.h"
-#include <d3d11_4.h>
+#include "utils\D3D.h"
 #include <comdef.h>
-#include "utils/AutoProfile.h"
-#include "utils/GpuProfiler.h"
 #include "graphics/Renderer.h"
 #include "utils/ThreadMap.h"
 
@@ -74,19 +71,13 @@ namespace thomas
 
 	void ThomasCore::Render()
 	{
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		profiler->BeginFrame();
 		WindowManager::Instance()->BeginFrame();
-		profiler->Timestamp(utils::profiling::GTS_MAIN_CLEAR);
 		graphics::Renderer::Instance()->ProcessCommands();
 
 		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
 		//  (whose data we're getting) will have finished on the GPU by now.
 
-		profiler->WaitForDataAndUpdate();
 		WindowManager::Instance()->EndFrame();
-		utils::D3D::Instance()->GetProfiler()->EndFrame();
-
 		graphics::Renderer::Instance()->PostRender();	// Sync. shaders ...?
 	}
 

@@ -1,4 +1,5 @@
 #include "WindowManager.h"
+#include "utils/GpuProfiler.h"
 
 namespace thomas
 {
@@ -53,6 +54,9 @@ namespace thomas
 				window->WaitOnSwapChain();
 				window->BeginFrame();
 			}
+
+		utils::D3D::Instance()->GetProfiler()->RetriveTimeStamps();
+		utils::D3D::Instance()->GetProfiler()->BeginFrame();
 	}
 
 	void WindowManager::EndFrame()
@@ -62,6 +66,8 @@ namespace thomas
 			{
 				window->EndFrame();
 			}
+
+		utils::D3D::Instance()->GetProfiler()->EndFrame();
 	}
 
 	void WindowManager::ResolveRenderTarget()

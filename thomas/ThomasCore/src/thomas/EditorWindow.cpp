@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Common.h"
 #include "utils\D3D.h"
+#include "utils\GpuProfiler.h"
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -58,7 +59,6 @@ namespace thomas
 
 		if (ImGui_ImplDx11_Valid() && m_guiData)
 			ImGui_ImplDX11_RenderDrawData(m_guiData);
-
 
 		utils::D3D::Instance()->FinishCommandList(m_dx.commandList);
 		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList);

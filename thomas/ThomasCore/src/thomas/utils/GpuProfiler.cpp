@@ -8,8 +8,6 @@ namespace thomas
 	{
 		namespace profiling
 		{
-			float GpuProfiler::m_timings[GTS_MAX];
-
 			GpuProfiler::GpuProfiler()
 				: m_frameQuery(0), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
 			{
@@ -83,8 +81,8 @@ namespace thomas
 
 			void profiling::GpuProfiler::AddDrawCall(int vertexCount)
 			{
-				/*m_totalVertexCount += vertexCount;
-				m_drawCalls++;*/
+				m_totalVertexCount += vertexCount;
+				m_drawCalls++;
 			}
 
 			void GpuProfiler::RetriveTimeStamps()
@@ -123,19 +121,15 @@ namespace thomas
 				}
 			}
 
-			float profiling::GpuProfiler::GetAverageTiming(GTS gts)
+			float profiling::GpuProfiler::GetTimeStamp(GTS gts)
 			{
-				//return m_avgTimings[gts];
-				return 0.0f;
+				float timeStamp = m_timings[gts] - m_timings[gts - 1];
+				return timeStamp;
 			}
 
-			float profiling::GpuProfiler::GetDrawTotal()
+			int GpuProfiler::GetNumOfDrawCalls()
 			{
-				/*float drawTotal = 0.0f;
-				for (GTS gts = GTS_BEGIN_FRAME; gts < GTS_END_FRAME; gts = GTS(gts + 1))
-					drawTotal += m_timings[gts];
-				return drawTotal;*/
-				return 0.0f;
+				return m_drawCalls;
 			}
 
 			float profiling::GpuProfiler::GetFrameTime()
@@ -145,28 +139,26 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetMemoryUsage()
 			{
-				/*DXGI_QUERY_VIDEO_MEMORY_INFO info;
-				if (SUCCEEDED(m_dxgiAdapter4->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
-					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);*/
-				return 0.0f;
+				DXGI_QUERY_VIDEO_MEMORY_INFO info;
+				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
+					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
+
+				return m_memoryUsage;
 			}
 
 			float profiling::GpuProfiler::GetTotalMemory()
 			{
-				//return m_totalMemory;
-				return 0.0f;
+				return m_totalMemory;
 			}
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()
 			{
-				//return m_drawCalls;
-				return 0;
+				return m_drawCalls;
 			}
 
 			int profiling::GpuProfiler::GetVertexCount()
 			{
-				//return m_totalVertexCount;
-				return 0;
+				return m_totalVertexCount;
 			}
 		}
 	}
