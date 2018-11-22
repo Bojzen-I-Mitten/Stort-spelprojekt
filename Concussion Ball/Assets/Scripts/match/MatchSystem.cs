@@ -178,6 +178,7 @@ public class MatchSystem : NetworkManager
         GoldenGoal = false;
         RPCStartMatch();
         GUIScoreScreen.Instance.Toggle(true);
+        GUIPlayerScore.Instance.Toggle = false;
     }
 
     IEnumerator RoundStartCountdown(float duration)

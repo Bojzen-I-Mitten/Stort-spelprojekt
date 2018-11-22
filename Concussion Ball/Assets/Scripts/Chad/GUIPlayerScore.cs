@@ -117,7 +117,7 @@ public class GUIPlayerScore : ScriptComponent
     public int AmountOfPlayersInTeam1 { get; set; } = 0;
     public int AmountOfPlayersInTeam2 { get; set; } = 0;
     public Texture2D AmountOfPlayersBar { get; set; }
-    private bool Toggle = false;
+    public bool Toggle = false;
     public Font Font { get; set; }
     
     Image AmountOfPlayersBarImage;
@@ -132,9 +132,18 @@ public class GUIPlayerScore : ScriptComponent
    public List<Image> PlayerStandardBarTeam1 = new List<Image>();
    public List<Image> PlayerStandardBarTeam2 = new List<Image>();
 
-
+    public static GUIPlayerScore Instance = null;
     public override void Start()
     {
+        if (!Instance)
+            Instance = this;
+        else
+        {
+            Destroy(this);
+            return;
+        }
+
+
         cam = gameObject.GetComponent<Camera>();
         Canvas = cam.AddCanvas();
      
@@ -386,7 +395,13 @@ public class GUIPlayerScore : ScriptComponent
 
 
     }
-
+    public void lastupdate()
+    {
+        AmountOfPlayersInTeam1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount;
+        AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
+        UpdateStatistics();
+        UpdatePlayerBars();
+    }
     public override void Update()
     {
         if(GUIScoreScreen.Instance.ToggleBool)

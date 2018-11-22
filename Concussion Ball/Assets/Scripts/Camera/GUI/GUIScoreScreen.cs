@@ -38,6 +38,10 @@ public class GUIScoreScreen : ScriptComponent
    public void Toggle(bool OnOff)
     {
         ToggleBool = OnOff;
+        GUIPlayerScore.Instance.lastupdate();
+
+        if (!OnOff)
+        GUIPlayerScore.Instance.Toggle = false;
     }
     public bool getToggleBool()
     {
