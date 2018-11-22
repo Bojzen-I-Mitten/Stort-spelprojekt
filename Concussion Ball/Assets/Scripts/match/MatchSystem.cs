@@ -161,7 +161,7 @@ public class MatchSystem : NetworkManager
     private void ShowPlayerPositions()
     {
         Debug.Log("##################################");
-        Debug.Log("Owned objects:");
+        Debug.Log("Players:");
         foreach (var player in Scene.Players)
         {
             if (player.Key != LocalPeer)

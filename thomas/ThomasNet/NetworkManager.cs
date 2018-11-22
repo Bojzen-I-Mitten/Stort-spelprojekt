@@ -142,7 +142,7 @@ namespace ThomasEngine.Network
             InternalManager.DisconnectAll();
         }
 
-        #region Listners
+        #region Listeners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
@@ -253,7 +253,8 @@ namespace ThomasEngine.Network
                 }
                 if(!reader.EndOfData)
                 {
-                    Debug.LogError("Did not read all data");
+                    Debug.LogError("Did not read all data in packet. Type: " + type);
+                    Debug.LogError("Bytes left: " + reader.AvailableBytes);
                 }
                 reader.Recycle();
             }
