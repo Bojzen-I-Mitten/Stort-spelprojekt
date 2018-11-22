@@ -544,7 +544,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::IssueRestart()
 	{
-		IssueStateCommand(ThomasStateCommand::RestartIssued);
+		IssuedStateCommand = ThomasStateCommand::RestartIssued;
+		//IssueStateCommand(ThomasStateCommand::RestartIssued);
 		//IssueStateCommand(ThomasStateCommand::StopIssued);
 	}
 
