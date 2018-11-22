@@ -167,6 +167,10 @@ namespace ThomasEngine {
 		static Guid selectedGUID;
 
 		static bool IsPlaying();
+		static bool IsRunningEditor();
+		/* Don't confuse with is running editor. This value determines if build out or not
+		*/
+		static bool InEditor();
 		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 
@@ -175,7 +179,6 @@ namespace ThomasEngine {
 		static void ToggleEditorGizmoManipulatorMode();
 
 	
-		static bool InEditor();
 		
 	public:
 		static bool RenderEditor = true;

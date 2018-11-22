@@ -41,15 +41,43 @@ namespace ThomasEngine
 	{
 		// Call awake
 		uint32_t initFlag = playing ? INIT_PLAYING_BIT : 0;
-		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Awake, initFlag);
+		for (int i = 0; i < objects->Count; i++)
+		{
+			GameObject^ g = objects[i];
+			try
+			{
+				g->InitComponents(Comp::State::Awake, initFlag);
+			}
+			catch (Exception^ e)
+			{
+				// Need to remove failed object?!..
+				Debug::LogException(e);
+				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
+				g->TryReleaseComponentLock();
+				DeleteInstant(g);
+			}
+		}
 	}
 	void Scene::EnableObjects(List<GameObject^>^ objects, bool playing)
 	{
 		// Verify non-editor components are activated
 		uint32_t initFlag = playing ? INIT_PLAYING_BIT : 0;
-		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Enabled, initFlag);
+		for (int i = 0; i < objects->Count; i++)
+		{
+			GameObject^ g = objects[i];
+			try
+			{
+				g->InitComponents(Comp::State::Enabled, initFlag);
+			}
+			catch (Exception^ e)
+			{
+				// Need to remove failed object?!..
+				Debug::LogException(e);
+				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
+				g->TryReleaseComponentLock();
+				DeleteInstant(g);
+			}
+		}
 	}
 	bool Scene::OnPlay()
 	{
@@ -91,6 +119,20 @@ namespace ThomasEngine
 		cmd.m_cmd = Command::DisableRemove;
 		cmd.m_obj = object;
 		m_commandList->Add(cmd);
+	}
+	void Scene::DeleteInstant(GameObject ^ object)
+	{
+		m_gameObjects->Remove(object);
+		try
+		{
+			object->OnDestroy();
+
+		}
+		catch (Exception^e)
+		{
+			Debug::LogError(e);
+		}
+		delete object;
 	}
 
 
@@ -220,7 +262,7 @@ namespace ThomasEngine
 				cmd.m_obj = c.m_obj;
 				m_commandSwapList->Add(cmd);
 			}
-				break;
+			break;
 			case Command::Remove:
 				// Destroy object
 				delete c.m_obj;
@@ -235,19 +277,10 @@ namespace ThomasEngine
 		m_commandList = m_commandSwapList;
 		m_commandSwapList = swp;
 		// Initiate related components
-		try
-		{
-			AwakeObjects(addedList, ThomasWrapper::IsPlaying());
-			EnableObjects(addedList, ThomasWrapper::IsPlaying());
-		}
-		catch (Exception^ e)
-		{
-			// Need to remove failed object?!..
-			Debug::LogException(e);
-			Debug::LogError("Initiating a set of objects during runtime failed with folling error:");
-		}
+		AwakeObjects(addedList, ThomasWrapper::IsPlaying());
+		EnableObjects(addedList, ThomasWrapper::IsPlaying());
 #ifdef _EDITOR
-		if(numChanged)	// Trigger event 
+		if (numChanged)	// Trigger event 
 			m_changeEvent(this, gcnew SceneObjectsChangedArgs(numChanged, addedList, removedList));
 		Monitor::Exit(m_gameObjects);
 #endif

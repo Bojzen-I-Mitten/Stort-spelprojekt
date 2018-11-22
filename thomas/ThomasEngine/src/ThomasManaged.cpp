@@ -101,11 +101,7 @@ namespace ThomasEngine {
 			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			logicThread->Name = "Thomas Engine (Logic Thread)";
 			logicThread->Start();
-
-			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
-			renderThread->Name = "Thomas Engine (Render Thread)";
-			renderThread->Start();
-
+			
 		}
 	}
 #ifdef _EDITOR
@@ -296,6 +292,10 @@ namespace ThomasEngine {
 	void ThomasWrapper::StartEngine()
 	{
 		LoadEditorAssets();
+		// Boot up render thread
+		renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
+		renderThread->Name = "Thomas Engine (Render Thread)";
+		renderThread->Start();
 
 
 		// Update thread start

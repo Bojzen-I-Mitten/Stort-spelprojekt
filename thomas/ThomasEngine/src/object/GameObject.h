@@ -46,6 +46,11 @@ namespace ThomasEngine
 		*/
 		void InitComponents(Comp::State s, uint32_t InitBits);
 
+		/* Try release object lock if lock is entered.
+		 * Debug function used to release locks if errors occured inside the object.
+		*/
+		void TryReleaseComponentLock();
+
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 		/* Remove a single component from the object.
 		*/

@@ -42,7 +42,7 @@ namespace thomas
 		//Init all required classes
 		if (!utils::D3D::Instance()->Init())
 			return false;
-
+		graphics::Renderer::Instance()->init();
 		resource::Texture2D::Init();
 		ThomasTime::Init();
 		SoundManager::GetInstance()->Init();

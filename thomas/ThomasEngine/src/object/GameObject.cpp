@@ -66,6 +66,11 @@ namespace ThomasEngine {
 		}
 		Monitor::Exit(m_componentsLock);
 	}
+	void GameObject::TryReleaseComponentLock()
+	{
+		if(Monitor::IsEntered(m_componentsLock))
+			Monitor::Exit(m_componentsLock);
+	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
 		return reinterpret_cast<thomas::object::GameObject*>(nativePtr);
