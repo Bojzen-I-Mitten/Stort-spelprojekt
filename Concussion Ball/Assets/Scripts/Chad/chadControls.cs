@@ -21,7 +21,14 @@ public class ChadControls : NetworkComponent
     public STATE State { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
-    
+
+    #region GUI
+    //private Canvas Canvas;
+    //public Font PickupFont { get; set; }
+    //public Font PickupDescFont { get; set; }
+    //private Text PowerupPickupText;
+    //private Text PowerupPickupDescText;
+    #endregion
 
     #region Throwing stuff
     [Category("Throwing")]
@@ -77,12 +84,28 @@ public class ChadControls : NetworkComponent
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
+    IEnumerator FadeText = null;
 
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
 
     public override void Start()
     {
+        //Canvas = ChadHud.Instance.Canvas;
+
+        // Init pick-up text and description
+        //PowerupPickupText = Canvas.Add("");
+        //PowerupPickupText.position = new Vector2(0.4975f, 0.5f);
+        //PowerupPickupText.color = Color.Yellow; // Need black outline for better visual effect
+        //PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
+        //PowerupPickupText.font = PickupFont;
+
+        //PowerupPickupDescText = Canvas.Add("");
+        //PowerupPickupDescText.position = new Vector2(0.4975f, 0.56f);
+        //PowerupPickupDescText.color = Color.Black;
+        //PowerupPickupDescText.origin = new Vector2(0.5f, 0.0f);
+        //PowerupPickupDescText.font = PickupDescFont;
+
         State = STATE.CHADING;
 
         if (isOwner)
@@ -123,6 +146,18 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        // Stop the fading routine 
+        // Note: Doesn't properly work, the couroutine doesn't stop when the alpha has reached zero
+        //if (FadeText != null)
+        //{
+        //    if(PowerupPickupText.color.a == 0 && PowerupPickupDescText.color.a == 0)
+        //    {
+        //        Debug.Log("Should stop");
+        //        StopCoroutine(FadeText);
+        //        FadeText = null;
+        //    }
+        //}
+
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -444,7 +479,6 @@ public class ChadControls : NetworkComponent
 
         switch (State)
         {
-
             case STATE.CHADING:
                 // Moving forward
                 if (Direction.z > 0)
@@ -579,6 +613,33 @@ public class ChadControls : NetworkComponent
         // Recovery particles
     }
 
+    //IEnumerator FadePickupText()
+    //{
+    //    Color pickupColor = PowerupPickupText.color;
+    //    Color descriptionColor = PowerupPickupDescText.color;
+
+    //    while (pickupColor.a > 0 && descriptionColor.a > 0)
+    //    {
+    //        pickupColor.a -= 25;
+    //        descriptionColor.a -= 25;
+
+    //        if(pickupColor.a > 0 || descriptionColor.a > 0)
+    //        {
+    //            PowerupPickupText.color = pickupColor;
+    //            PowerupPickupDescText.color = descriptionColor;
+    //        }
+    //        else
+    //        {
+    //            pickupColor.a = 0;
+    //            descriptionColor.a = 0;
+    //            PowerupPickupText.color = pickupColor;
+    //            PowerupPickupDescText.color = descriptionColor;
+    //        }
+            
+    //        yield return new WaitForSeconds(0.2f);
+    //    }
+    //}
+
     public void RPCSetAnimWeight(int index, float weight)
     {
         Animations.SetAnimationWeight((uint)index, weight);
@@ -668,7 +729,13 @@ public class ChadControls : NetworkComponent
             return false;
     }
     #endregion
-
+    #region PickupPowerup
+    private void DisplayPowerupText(ref Text powerupText, ref Text powerupDesc, String powerup, String description)
+    {
+        powerupText.text = powerup;
+        powerupDesc.text = description;
+    }
+    #endregion
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 
@@ -724,6 +791,18 @@ public class ChadControls : NetworkComponent
             {
                 if (pickupable.transform.parent == null)
                 {
+                    // Change pick-up text ON screen
+                    //if (pickupablea.gameObject.Name == "Vindaloo")
+                    //{
+                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Vindaloo", "Throw to Explode");
+                    //    FadeText = FadePickupText();
+                    //    StartCoroutine(FadeText); 
+                    //}
+                    //else if (pickupablea.gameObject.Name == "ThomasTrain")
+                    //{
+                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the Train");
+                    //}
+
                     TakeOwnership(pickupable.gameObject);
                     SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
@@ -734,7 +813,6 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
@@ -755,8 +833,7 @@ public class ChadControls : NetworkComponent
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, force);
                 }
 
-            }
-        
+            } 
         }
     }
 }

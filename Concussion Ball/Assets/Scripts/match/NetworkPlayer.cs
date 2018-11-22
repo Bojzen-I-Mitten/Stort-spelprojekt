@@ -7,7 +7,7 @@ using System.Collections;
 
 public class NetworkPlayer : NetworkComponent
 {
-    public String PlayerName = "Chad";
+    public String PlayerName;
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
@@ -44,6 +44,7 @@ public class NetworkPlayer : NetworkComponent
         text.scale = new Vector2(0.05f);
         text.origin = new Vector2(0.5f, 0.5f);
         nameCanvas.is3D = true;
+        PlayerName = GUIMainMenu.PlayerString;
     }
 
     public int GetPing()
