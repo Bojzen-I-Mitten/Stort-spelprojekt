@@ -37,11 +37,9 @@ namespace ThomasEngine.Network
             NetworkIdentity identity = NetworkObjects.ContainsKey(networkID) ? NetworkObjects[networkID] : null;
             if (identity)
             {
-                if (identity.gameObject.GetActive() || initialState)
-                {
-                    identity.ReadData(reader, initialState);
-                }
-            }else
+                identity.ReadData(reader, initialState);
+            }
+            else
             {
                 Debug.LogError("network ID: " + networkID + " does not exist in scene");
             }
@@ -49,11 +47,11 @@ namespace ThomasEngine.Network
 
         public void InitPlayerPool(GameObject playerPrefab, int maxPlayers)
         {
-            for(int i=0; i < maxPlayers+1; i++)
+            for (int i = 0; i < maxPlayers + 1; i++)
             {
                 GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
                 player.activeSelf = false;
-                
+
                 player.GetComponent<NetworkIdentity>().IsPlayer = true;
                 PlayerPool.Add(player);
             }
@@ -61,7 +59,7 @@ namespace ThomasEngine.Network
 
         private GameObject GetAvailablePlayerFromPool()
         {
-            if(PlayerPool.Count > 0)
+            if (PlayerPool.Count > 0)
             {
                 GameObject player = PlayerPool[0];
                 PlayerPool.RemoveAt(0);
@@ -92,11 +90,11 @@ namespace ThomasEngine.Network
             ObjectOwners[peer] = new List<NetworkIdentity>();
 
             GameObject player = GetAvailablePlayerFromPool();
-            if(player)
+            if (player)
             {
                 player.activeSelf = true;
                 NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
-               
+
                 networkIdentity.Owner = myPlayer;
                 if (myPlayer)
                     player.Name += " (my player)";
@@ -107,7 +105,7 @@ namespace ThomasEngine.Network
                 Debug.LogError("Failed to spawn player. No free slots in pool");
             }
         }
-        
+
         public void RemovePlayer(NetPeer peer)
         {
 
@@ -158,7 +156,7 @@ namespace ThomasEngine.Network
         {
             NetPeer previousOwner = FindOwnerOf(identity);
             NetworkObjects.Remove(identity.ID);
-            if(previousOwner != null)
+            if (previousOwner != null)
                 ObjectOwners[previousOwner].Remove(identity);
         }
 
@@ -175,12 +173,12 @@ namespace ThomasEngine.Network
                 if (!identity.gameObject.GetActive())
                 {
                     identity.Owner = true;
-                    if(SceneObjectToBeActivated.Contains(identity))
+                    if (SceneObjectToBeActivated.Contains(identity))
                         identity.gameObject.activeSelf = true;
                 }
             });
         }
-        
+
         public NetworkIdentity FindNetworkObject(int netID)
         {
             if (NetworkObjects.ContainsKey(netID))
