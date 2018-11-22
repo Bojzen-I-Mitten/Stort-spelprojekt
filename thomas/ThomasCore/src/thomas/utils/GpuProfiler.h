@@ -34,12 +34,12 @@ namespace thomas
 				void AddDrawCall(int vertexCount);
 
 				// Wait on GPU for last frame's data (not this frame's) to be available
-				void WaitForDataAndUpdate();
+				void RetriveTimeStamps();
 
 			public:
 				float GetAverageTiming(GTS gts);
 				float GetDrawTotal();
-				float GetFrameTime();
+				static float GetFrameTime();
 				float GetMemoryUsage();
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
@@ -47,19 +47,11 @@ namespace thomas
 
 
 			private:
-				int m_frameQuery;								// Which of the two sets of queries are we currently issuing?
-				int m_frameCollect;								// Which of the two did we last collect?
+				int m_frameQuery;								
 				ID3D11Query * m_queryDisjoint[FRAME_BUFFERS];				// "Timestamp disjoint" query; records whether timestamps are valid
 				ID3D11Query * m_queryTimestamp[GTS_MAX][FRAME_BUFFERS];		// Individual timestamp queries for each relevant point in the frame
 
-				IDXGIAdapter4* m_dxgiAdapter4;			// Adapter for checking VRAM
-
-				float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
-				float m_avgTimings[GTS_MAX];					// Timings averaged over 0.5 second
-
-				float m_avgTimingsTotal[GTS_MAX];				// Total timings thus far within this averaging period
-				int m_frameCountAvg;							// Frames rendered in current averaging period
-				float m_beginAvg;								// Time at which current averaging period started
+				static float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
 
 				int m_totalVertexCount;
 				int m_drawCalls;
