@@ -42,8 +42,27 @@ namespace ThomasEngine
 		return nativePtr->GetRendering();
 	}
 
+	void Canvas::worldMatrix::set(Matrix value)
+	{
+		nativePtr->SetWorldMatrix(Utility::Convert(value));
+	}
+
+	void Canvas::is3D::set(bool value)
+	{
+		nativePtr->Set3D(value);
+	}
+
+	bool Canvas::is3D::get()
+	{
+		return nativePtr->Get3D();
+	}
+
 	Image^ Canvas::Add(Texture2D ^ texture)
 	{
+		if(texture == nullptr)
+		{
+			return nullptr;
+		}
 		thomas::graphics::GUI::GUIElement* image =
 			nativePtr->Add((thomas::resource::Texture2D*)texture->m_nativePtr);
 

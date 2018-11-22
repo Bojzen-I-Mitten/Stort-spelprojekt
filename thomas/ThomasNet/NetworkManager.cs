@@ -176,7 +176,6 @@ namespace ThomasEngine.Network
 
         private void Listener_PeerConnectedEvent(NetPeer _peer)
         {
-
             ThomasEngine.Debug.Log("A peer has connected with the IP" + _peer.EndPoint.ToString());
 
             if (NetScene.Players.Count == 0) // We are new player.
@@ -184,6 +183,7 @@ namespace ThomasEngine.Network
                 NetScene.SpawnPlayer(LocalPeer, true);
                 NetScene.SpawnPlayer(_peer, false);
                 OnPeerJoin(LocalPeer);
+                NetScene.Players[LocalPeer].WriteInitialData();
             }
             else //Someone is joining us.
             {
@@ -265,7 +265,6 @@ namespace ThomasEngine.Network
 
         private void Listener_ConnectionRequestEvent(ConnectionRequest request)
         {
-
             if (NetManager.PeersCount < MaxPlayers && Scene.PoolNotEmpty() /* max connections */)
                 request.AcceptIfKey("SomeConnectionKey");
             else
