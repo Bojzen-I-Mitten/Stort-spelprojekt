@@ -21,9 +21,10 @@ namespace thomas {
 				std::vector<int> m_boneMapping;
 
 
-				uint32_t NumChannel() { return (uint32_t)m_boneMapping.size(); }
+				uint32_t NumChannel();
 
 				AnimationNode(Skeleton &ref);
+				AnimationNode(Skeleton &ref, uint32_t mappingReserve);
 				virtual ~AnimationNode();
 
 				virtual void update(float) = 0;

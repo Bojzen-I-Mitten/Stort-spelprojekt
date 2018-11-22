@@ -31,7 +31,7 @@ namespace thomas
 		uint32_t ThreadMap::Thread_Index()
 		{
 			std::thread::id id = std::this_thread::get_id();
-			for (size_t i = 0; i < m_numThread; i++) {
+			for (uint32_t i = 0; i < m_numThread; i++) {
 				std::thread::id cmp = m_thread_list[i];
 				if (id == cmp)
 					return i;

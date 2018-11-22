@@ -14,7 +14,7 @@ namespace ThomasEngine
 	internal:
 		TextureCube(String^ path) : Texture(path, new thomas::resource::TextureCube(Utility::ConvertString(path))) {};
 		TextureCube(thomas::resource::TextureCube* nativePtr) : Texture(Utility::ConvertString(nativePtr->GetPath()), nativePtr) {};
-
+		virtual ~TextureCube();
 	public:
 		
 		

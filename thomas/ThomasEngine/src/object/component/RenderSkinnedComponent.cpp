@@ -3,6 +3,7 @@
 #pragma unmanaged
 #include <thomas\object\component\RenderComponent.h>
 #include <thomas\graphics\animation\IBlendTree.h>
+#include <thomas\utils\atomic\Synchronization.h>
 #pragma managed
 
 #include "../Component.h"
@@ -18,11 +19,6 @@ namespace ThomasEngine
 	RenderSkinnedComponent::RenderSkinnedComponent()
 		: Component(new thomas::object::component::RenderSkinnedComponent())
 	{}
-
-	thomas::object::component::RenderSkinnedComponent * RenderSkinnedComponent::get()
-	{
-		return (thomas::object::component::RenderSkinnedComponent*)nativePtr;
-	}
 
 	thomas::object::component::RenderComponent * RenderSkinnedComponent::getNativeRenderComp()
 	{
@@ -89,9 +85,9 @@ namespace ThomasEngine
 	void RenderSkinnedComponent::setBlendTreeNode(thomas::graphics::animation::AnimationNode * node)
 	{
 		if (node == nullptr)
-			get()->GetBlendTree()->clearBlendTree();
+			Native->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			get()->GetBlendTree()->setBlendTree(node);
+			Native->GetBlendTree()->setBlendTree(node);
 		}
 
 	}
@@ -123,7 +119,7 @@ namespace ThomasEngine
 
 	void RenderSkinnedComponent::Update()
 	{
-		get()->Update();
+		Native->Update();
 		/*
 		if (Input::GetKeyDown(Input::Keys::Space)) {
 			thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
@@ -141,11 +137,18 @@ namespace ThomasEngine
 	}
 	Matrix RenderSkinnedComponent::GetLocalBoneMatrix(int boneIndex)
 	{
-		thomas::object::component::RenderSkinnedComponent* ptr = ((thomas::object::component::RenderSkinnedComponent*)nativePtr);
-		thomas::graphics::animation::IBlendTree *anim = ptr->GetBlendTree();
-		if ((uint32_t)boneIndex < anim->boneCount())
-			return Utility::Convert(anim->getBoneOrientation(boneIndex));
-		else return Matrix::Identity;
+		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
+		if (!anim && (uint32_t)boneIndex >= anim->boneCount())
+			return Matrix::Identity;
+		else 
+			return Utility::Convert(Native->GetBlendTree()->getBoneOrientation(boneIndex));
+	}
+
+	bool RenderSkinnedComponent::GetBoneIndex(uint32_t boneHash, uint32_t & boneIndex)
+	{
+		if (!Native->GetBlendTree()) return false;
+		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
+		return anim->getBoneIndex(boneHash, boneIndex);
 	}
 
 	void RenderSkinnedComponent::applyAnimation()
@@ -154,9 +157,9 @@ namespace ThomasEngine
 		if (!blendTree)
 			return;
 		if (m_anim == nullptr)
-			get()->GetBlendTree()->clearBlendTree();
+			Native->GetBlendTree()->clearBlendTree();
 		else if (m_model != nullptr) {
-			get()->GetBlendTree()->playSingle(m_anim->Native());
+			Native->GetBlendTree()->playSingle(m_anim->Native());
 		}
 			
 	}

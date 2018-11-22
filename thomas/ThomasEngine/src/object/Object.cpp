@@ -13,7 +13,6 @@ namespace ThomasEngine
 	Object::Object(thomas::object::Object* ptr)
 	{
 		nativePtr = ptr;
-		s_objects.Add(this);
 		m_guid = Guid::NewGuid();
 		nativePtr->m_guid = Utility::Convert(m_guid);
 	}
@@ -27,8 +26,6 @@ namespace ThomasEngine
 		assert(!m_Destroyed);
 		m_Destroyed = true;
 #endif
-		bool rmvd = s_objects.Remove(this);
-		//assert(rmvd);
 		nativePtr->Destroy();
 	
 		if(this->GetType() != GameObject::typeid)
@@ -40,50 +37,6 @@ namespace ThomasEngine
 		Delete();
 	}
 
-	Object^ Object::Find(Guid guid)
-	{
-		for each(Object^ o in s_objects)
-		{
-			if (o->m_guid == guid)
-				return o;
-		}
-		return nullptr;
-	}
-
-	List<Object^>^ Object::GetObjects()
-	{
-		return %s_objects;
-	}
-
-	Object^ Object::GetObject(thomas::object::Object* ptr)
-	{
-		for( int i=0; i < s_objects.Count; i++)
-		{
-			if (s_objects[i]->nativePtr == ptr)
-				return s_objects[i];
-		}
-		return nullptr;
-	}
-
-
-
-	List<Object^>^ Object::GetObjectsOfType(Type^ type)
-	{
-		List<Object^>^ list = gcnew List<Object^>();
-		for (int i = 0; i < s_objects.Count; i++) {
-			if (type->IsAssignableFrom(s_objects[i]->GetType())) {
-				if ((Component::typeid)->IsAssignableFrom(s_objects[i]->GetType())) {
-					ThomasEngine::Component^ component = (Component^)s_objects[i];
-					if (component->gameObject->inScene)
-						list->Add((Object^)component);
-				}
-				else {
-					list->Add((Object^)s_objects[i]);
-				}
-			}
-		}
-		return list;
-	}
 
 
 

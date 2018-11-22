@@ -18,7 +18,7 @@ namespace HierarchyTreeView
 
         private bool _isExpanded;
         private bool _isSelected;
-
+        
         public string DisplayName {
             get { return ((GameObject)_data).Name; }
         }

@@ -5,6 +5,7 @@
 #include "../../utils/Math.h"
 #include "IBlendTree.h"
 #include "data/TransformComponents.h"
+#include "../../utils/atomic/Synchronization.h"
 
 
 namespace thomas {
@@ -70,6 +71,7 @@ namespace thomas {
 				std::vector<math::Matrix> _pose;				// Bone transform in model space
 				std::vector<math::Matrix> _skin;				// Skin Transforms in model space, stored in a property ready for the GPU
 				std::unique_ptr<ConstraintList> m_constraint;	// Constraints applied in world space.
+				utils::atomics::SpinLock m_lock;
 			private:
 				/* Set all pose matrix arrays to bind pose 
 				*/

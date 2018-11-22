@@ -165,7 +165,6 @@ namespace thomas
 
 		void Renderer::BindObject(render::RenderCommand &rC)
 		{
-			thomas::resource::shaderproperty::ShaderProperty* prop;
 			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, rC.worldMatrix.Transpose());
 			rC.material->ApplyProperty(THOMAS_MATRIX_WORLD);
 

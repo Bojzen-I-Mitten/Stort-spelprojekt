@@ -264,6 +264,38 @@ namespace ThomasEditor
             {
                 addComponentsListPopup.IsOpen = false;
             }
+
+            private void ComponentEnabled_Checked(object sender, RoutedEventArgs e)
+            {
+                FrameworkElement fE = e.OriginalSource as FrameworkElement;
+                if (fE != null && fE.DataContext is Component)
+                    ThomasWrapper.IssueCommand(new utils.EnableComponentCommand((Component)fE.DataContext, true));
+            }
+
+            private void ComponentEnabled_Unchecked(object sender, RoutedEventArgs e)
+            {
+                FrameworkElement fE = e.OriginalSource as FrameworkElement;
+                if(fE != null && fE.DataContext is Component)
+                    ThomasWrapper.IssueCommand(new utils.EnableComponentCommand((Component)fE.DataContext, false));
+            }
+
+            private void ComponentIndex_Changed(object sender, RoutedEventArgs e)
+            {
+                FrameworkElement fE = e.OriginalSource as FrameworkElement;
+                if (fE != null && fE.DataContext is Component && !(fE.DataContext is Transform))
+                {
+                    Component c = (Component)fE.DataContext;
+                    String text = (sender as TextBox).Text;
+                    int ind;
+                    if (Int32.TryParse(text, out ind))
+                    {
+                        uint index = (uint)ind;
+                        if (ind < 1)    // Not 0, Reserverd for transform
+                            index = 1;
+                        c.gameObject.SetComponentIndex(c, index);
+                    }
+                }
+            }
         }
     }
 }

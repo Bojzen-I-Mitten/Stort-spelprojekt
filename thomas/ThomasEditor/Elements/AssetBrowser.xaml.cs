@@ -143,7 +143,7 @@ namespace ThomasEditor
                     {
                         GameObject gameObject = foundItem.DataContext as GameObject;
                         GameObject.Destroy(gameObject);
-                        foundItem.DataContext = ThomasEngine.Resources.LoadPrefab(p);
+                        foundItem.DataContext = ThomasEngine.Resources.LoadPrefabResource(p);
                     }
                 }
 
@@ -318,7 +318,7 @@ namespace ThomasEditor
                 stack.DataContext = filePath;
 
                 if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
-                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefab(filePath) };
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefabResource(filePath) };
                 else
                     return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadSysPath(filePath) };
             }
@@ -559,7 +559,7 @@ namespace ThomasEditor
 
         private void Menu_CreatePrefab(object sender, RoutedEventArgs e)
         {
-            GameObject prefab = GameObject.CreatePrefab();
+            GameObject prefab = GameObject.CreateEmptyPrefab();
             ThomasEngine.Resources.SavePrefab(prefab, prefab.Name + ".prefab");
         }
 

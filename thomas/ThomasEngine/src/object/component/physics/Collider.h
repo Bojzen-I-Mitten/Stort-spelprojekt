@@ -1,7 +1,6 @@
 #pragma once
 #include "../../Component.h"
 using namespace System::Runtime::InteropServices;
-using namespace thomas::object;
 namespace thomas { namespace object { namespace component { class Collider; } } }
 namespace ThomasEngine
 {
@@ -22,11 +21,11 @@ namespace ThomasEngine
 		virtual void OnGameObjectSet() override {};
 	private:
 		Rigidbody^ m_attachedRigidbody;
-		delegate void OnCollisionDelegate(component::Collider* otherCollider, COLLISION_TYPE collisionType);
+		delegate void OnCollisionDelegate(thomas::object::component::Collider* otherCollider, COLLISION_TYPE collisionType);
 		GCHandle gch;
-		void OnCollision(component::Collider* otherCollider, COLLISION_TYPE collisionType);
+		void OnCollision(thomas::object::component::Collider* otherCollider, COLLISION_TYPE collisionType);
 	public:
-		Collider(component::Collider* nativePtr);
+		Collider(thomas::object::component::Collider* nativePtr);
 		~Collider();
 		virtual void OnDestroy() override;
 

@@ -50,6 +50,7 @@ namespace thomas
 				static void storeSample(std::string functionName, long long elapsedTime, long long startTime, DWORD processor_id);
 				static void storeGpuSample(long long gpuTime);
 				static void setRAMUsage(float usage);
+				static float getRAMUsage();
 				static void setVRAMUsage(float usage, float budget);
 			private:
 
