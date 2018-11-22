@@ -48,7 +48,8 @@ public class GUIExitMenu : ScriptComponent
                 if (ExitGame.Clicked())
                 {
                     Debug.Log("I'm exciting! :^)");
-                    ThomasWrapper.IssueStopPlay();
+                    if (ThomasWrapper.IsPlaying())
+                        ThomasWrapper.IssueRestart();
                     Debug.Log("TEST2");
                     //StartCoroutine(Replay());
                     //ThomasWrapper.Exit();
