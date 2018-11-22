@@ -27,6 +27,8 @@ namespace ThomasEngine
 		static Object^ resourceLock = gcnew Object();
 		static Dictionary<String^, Resource^>^ resources = gcnew Dictionary<String^, Resource^>();
 		static Dictionary<String^, GameObject^>^ s_PREFAB_DICT = gcnew Dictionary<String^, GameObject^>();
+		/* Load a list of asset using assetworker*/
+		static void LoadAssetFiles(List<String^>^ files);
 	internal:
 
 	public:
@@ -115,6 +117,7 @@ namespace ThomasEngine
 
 
 		static void Unload(Resource^ resource);
+
 
 		static void LoadAll(String^ path);
 

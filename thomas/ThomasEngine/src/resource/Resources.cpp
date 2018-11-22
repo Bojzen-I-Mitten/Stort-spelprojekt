@@ -362,16 +362,33 @@ namespace ThomasEngine
 			}
 		}
 
+		void Resources::LoadAssetFiles(List<String^>^ files)
+		{
+			using namespace System::Threading;
+
+			auto counter = gcnew CountdownEvent(files->Count);
+			// Start workers.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetLoadWorker^ w = gcnew AssetLoadWorker(files[i], counter);
+				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
+			}
+			// Wait for workers.
+			counter->Wait();
+		}
+
 		void Resources::LoadAll(String^ path)
 		{
 			//array<String^>^ directories = IO::Directory::GetDirectories(path);
 			List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
+			List<String^>^ shaderFiles = gcnew List<String^>();
 			List<String^>^ materialFiles =  gcnew List<String^>();
 			/*for each(String^ dir in directories)
 			{
 				LoadAll(dir);
 			}*/
 
+			// Sort on asset type(s), to load files with dependencies in order.
 			for (int i = 0; i < files->Count; i++)
 			{
 				AssetTypes type = GetResourceAssetType(files[i]);
@@ -385,27 +402,17 @@ namespace ThomasEngine
 					files->RemoveAt(i);
 					--i;
 				}
+				else if (type == AssetTypes::SHADER)
+				{
+					shaderFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
 			}
-			using namespace System::Threading;
-
 			OnResourceLoadStarted();
-			auto independentAssetC = gcnew CountdownEvent(files->Count);
-			// Start workers.
-			for (int i = 0; i < files->Count; i++)
-			{
-				AssetLoadWorker^ w = gcnew AssetLoadWorker(files[i], independentAssetC);
-				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
-			}
-			// Wait for workers.
-			independentAssetC->Wait();
-			// Start dependent workers (materials)
-			auto dependentAssetC = gcnew CountdownEvent(materialFiles->Count);
-			for (int i = 0; i < materialFiles->Count; i++)
-			{
-				AssetLoadWorker^ w = gcnew AssetLoadWorker(materialFiles[i], dependentAssetC);
-				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
-			}
-			dependentAssetC->Wait();
+			LoadAssetFiles(files);
+			LoadAssetFiles(shaderFiles);
+			LoadAssetFiles(materialFiles);
 			OnResourceLoadEnded();
 		}
 

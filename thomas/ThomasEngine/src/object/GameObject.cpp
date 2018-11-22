@@ -141,6 +141,7 @@ namespace ThomasEngine {
 	}
 	void GameObject::OnDestroy()
 	{
+		TryReleaseComponentLock();
 		// OnDisable^
 		for each (Component^ comp in m_components)
 		{
@@ -418,6 +419,7 @@ namespace ThomasEngine {
 		if (existingComponent && typ->IsDefined(DisallowMultipleComponent::typeid, false))
 		{
 			//LOG("Cannot add multiple instances of " << typ->Name);
+			Monitor::Exit(m_componentsLock);
 			return T();
 		}
 
@@ -425,6 +427,7 @@ namespace ThomasEngine {
 		if (component == nullptr)
 		{
 			Debug::LogWarning("Component failed to instantiate of type " + (T::typeid));
+			Monitor::Exit(m_componentsLock);
 			return T();
 		}
 		Component^ comp = (Component^)component;
