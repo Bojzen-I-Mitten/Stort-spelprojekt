@@ -184,6 +184,9 @@ namespace ThomasEngine
 		index	<<	Index to set.  If index is larger then number of components it will be moved last.
 		*/
 		void SetComponentIndex(Component^ c, uint32_t index);
+		/* Fetch the component index.
+		*/
+		uint32_t GetComponentIndex(Component^ c);
 
 		generic<typename T>
 		where T : Component

@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Navigation;
 using ThomasEngine;
 namespace ThomasEditor
 {
@@ -24,6 +25,11 @@ namespace ThomasEditor
         protected override void OnExit(ExitEventArgs e)
         {
             ThomasWrapper.Exit();
+        }
+
+        protected override void OnLoadCompleted(NavigationEventArgs e)
+        {
+            base.OnLoadCompleted(e);
         }
     }
 }

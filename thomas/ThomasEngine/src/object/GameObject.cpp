@@ -376,7 +376,7 @@ namespace ThomasEngine {
 		if (index < 1u) index = 1;
 		if (index >= (uint32_t)m_components.Count) index = m_components.Count - 1;
 
-		for (uint32_t i = 0; i < m_components.Count; i++) {
+		for (uint32_t i = 0; i < (uint32_t)m_components.Count; i++) {
 			if (m_components[i] == c)
 			{
 				if (i == index) break;
@@ -388,6 +388,19 @@ namespace ThomasEngine {
 		}
 
 		Monitor::Exit(m_componentsLock);
+	}
+	uint32_t GameObject::GetComponentIndex(Component ^ c)
+	{
+		Monitor::Enter(m_componentsLock);
+		uint32_t index = UINT_MAX;
+		for (uint32_t i = 0; i < (uint32_t)m_components.Count; i++) {
+			if (m_components[i] == c)
+			{
+				return i;
+			}
+		}
+		Monitor::Exit(m_componentsLock);
+		return index;
 	}
 	generic<typename T>
 	where T : Component
