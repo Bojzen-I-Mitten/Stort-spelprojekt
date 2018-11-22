@@ -24,9 +24,9 @@ namespace thomas
 
 		const unsigned LightManager::s_nrOfShadowMapsSupported;
 		unsigned LightManager::s_shadowMapSize;
-		std::vector<ID3D11DepthStencilView*> LightManager::s_freeShadowMapViews;
-		std::vector<ID3D11DepthStencilView*> LightManager::s_usedShadowMapViews;
-		
+		ID3D11DepthStencilView* LightManager::s_shadowMapViews[LightManager::s_nrOfShadowMapsSupported];
+		math::Matrix LightManager::s_lightMatrices[LightManager::s_nrOfShadowMapsSupported];
+		std::vector<unsigned> LightManager::s_freeShadowMapViewIndexes;
 
 		void LightManager::Initialize()
 		{
@@ -41,7 +41,6 @@ namespace thomas
 			s_shadowMapSize = 512;
 			s_shadowMapTextures = new resource::Texture2DArray(s_shadowMapSize, s_shadowMapSize, DXGI_FORMAT_R32_TYPELESS, s_nrOfShadowMapsSupported, true);
 
-			s_freeShadowMapViews.resize(s_nrOfShadowMapsSupported);
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc = {};
 			depthViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -49,13 +48,12 @@ namespace thomas
 			depthViewDesc.Texture2DArray.ArraySize = 1u;
 			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
 			{
-				ID3D11DepthStencilView* dsv;
 				depthViewDesc.Texture2DArray.FirstArraySlice = i;
 				
+				HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(s_shadowMapTextures->GetResource(), &depthViewDesc, &s_shadowMapViews[i]);
 
-				HRESULT hr = utils::D3D::Instance()->GetDevice()->CreateDepthStencilView(s_shadowMapTextures->GetResource(), &depthViewDesc, &dsv);
-
-				s_freeShadowMapViews[i] = dsv;
+				s_freeShadowMapViewIndexes.push_back(i);
+				s_lightMatrices[i] = math::Matrix::Identity;
 			}
 
 
@@ -172,35 +170,31 @@ namespace thomas
 			shaders->SetGlobalInt("nrOfDirectionalLights", s_lightCounts.nrOfDirectionalLights);
 			shaders->SetGlobalInt("nrOfSpotLights", s_lightCounts.nrOfSpotLights);
 			shaders->SetGlobalInt("nrOfAreaLights", s_lightCounts.nrOfAreaLights);
-			shaders->SetGlobalInt("nrOfShadowMaps", s_usedShadowMapViews.size());
+			shaders->SetGlobalInt("nrOfShadowMaps", s_nrOfShadowMapsSupported - s_freeShadowMapViewIndexes.size());
 			shaders->SetGlobalResource("lights", s_lightBuffer->GetSRV());
 		}
 
 		void LightManager::BindShadows(render::ShaderList * shaders)
 		{
-			if (s_lights.size() == 0)
+			int nrOfUsedShadowMaps = s_nrOfShadowMapsSupported - s_freeShadowMapViewIndexes.size();
+			if (nrOfUsedShadowMaps == 0)
 				return;
 
 
 			shaders->SetGlobalTexture2DArray("ShadowMaps", s_shadowMapTextures);
 			
-
-			math::Matrix* lightMatrices = new math::Matrix[s_usedShadowMapViews.size()];
-			unsigned i = 0;
 			for (object::component::LightComponent* l : s_lights)
 			{
 				if (l->CastsShadows())
 				{
-					lightMatrices[i] = l->GetVPMat();
-					++i;
+					s_lightMatrices[l->GetShadowMapIndex()] = l->GetVPMat();
 				}
 			}
 
-			shaders->SetGlobalMatrixArray("LightMatricesVP", lightMatrices, s_usedShadowMapViews.size());
-			delete lightMatrices;
+			shaders->SetGlobalMatrixArray("LightMatricesVP", s_lightMatrices, s_nrOfShadowMapsSupported);
 		}
 
-		ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()
+		/*ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()
 		{
 			if (s_freeShadowMapViews.size() <= 0)
 			{
@@ -211,36 +205,32 @@ namespace thomas
 			s_usedShadowMapViews.push_back(dsv);
 			s_freeShadowMapViews.pop_back();
 			return dsv;
-		}
+		}*/
 
-		/*ID3D11DepthStencilView * LightManager::GetFreeShadowMapView()
+		int LightManager::GetFreeShadowMapView(ID3D11DepthStencilView*& dsv)
 		{
-			if (s_freeShadowMapViews.size() <= 0)
+			if (s_freeShadowMapViewIndexes.size() == 0)
 			{
 				//LOG("Not enough shadowmaps");
-				return nullptr;
+				return -1;
 			}
-			auto it = s_freeShadowMapViews.begin();
-			ID3D11DepthStencilView* dsv = *it._Ptr;
-			s_usedShadowMapViews.push_back(dsv);
-			s_freeShadowMapViews.erase(it);
-			return dsv;
-		}*/
+			auto it = s_freeShadowMapViewIndexes.begin();
+			unsigned freeIndex = *it._Ptr;
+			s_freeShadowMapViewIndexes.erase(it);
+
+			dsv = s_shadowMapViews[freeIndex];
+			return freeIndex;
+		}
 
 		bool LightManager::ResturnShadowMapView(ID3D11DepthStencilView * dsv)
 		{
-			auto it = s_usedShadowMapViews.begin();
-
-			while (it != s_usedShadowMapViews.end())
+			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
 			{
-				if (*it._Ptr == dsv)
+				if (dsv == s_shadowMapViews[i])
 				{
-					s_freeShadowMapViews.push_back(*it._Ptr);
-					s_usedShadowMapViews.erase(it);
-
+					s_freeShadowMapViewIndexes.push_back(i);
 					return true;
 				}
-				it++;
 			}
 			return false;
 		}

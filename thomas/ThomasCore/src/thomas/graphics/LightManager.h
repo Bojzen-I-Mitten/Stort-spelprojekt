@@ -75,12 +75,14 @@ namespace thomas
 			static void DrawShadows(render::CameraRenderQueue& renderQueue, object::component::Camera* camera);
 			static void BindLights(render::ShaderList* shaders);
 			static void BindShadows(render::ShaderList* shaders);
-			static ID3D11DepthStencilView* GetFreeShadowMapView();
+			static int GetFreeShadowMapView(ID3D11DepthStencilView*& dsv);
 			static bool ResturnShadowMapView(ID3D11DepthStencilView * dsv);
 		private:
 			static const unsigned s_nrOfShadowMapsSupported = 2;
-			static std::vector<ID3D11DepthStencilView*> s_freeShadowMapViews;
-			static std::vector<ID3D11DepthStencilView*> s_usedShadowMapViews;
+			static ID3D11DepthStencilView* s_shadowMapViews[s_nrOfShadowMapsSupported];
+			static math::Matrix s_lightMatrices[s_nrOfShadowMapsSupported];
+			static std::vector<unsigned> s_freeShadowMapViewIndexes;
+
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);
 
 			static std::vector<object::component::LightComponent*> s_lights;

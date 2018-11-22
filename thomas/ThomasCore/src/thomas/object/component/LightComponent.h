@@ -45,6 +45,7 @@ namespace thomas
 				void BindShadowMapDepthTexture();
 				void DrawShadow(graphics::render::RenderCommand renderCommand);
 				math::Matrix GetVPMat();
+				int GetShadowMapIndex() const;
 
 				graphics::LightManager::LightStruct GetData();
 

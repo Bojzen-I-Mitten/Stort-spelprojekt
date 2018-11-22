@@ -10,7 +10,7 @@ cbuffer LightMatrices
 
 inline float4 WorldToLightClipPos(in float3 pos, in float shadowMapIndex)//, uint lightIndex)//temp dirlight id
 {
-    return mul(LightMatricesVP[(uint) shadowMapIndex], float4(pos, 1.0));
+    return mul(LightMatricesVP[(int) shadowMapIndex], float4(pos, 1.0));
 }
 
 
@@ -84,7 +84,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
     float lightMultiplyer = 0.0;
     
     static float2 poissonDisk[4] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
-    float shadowMapIndex = 0.5;
+    
 
     int i = 0;
     int roof = nrOfDirectionalLights;
@@ -93,8 +93,8 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         lightDir = lights[i].direction; //should be normalized already
         
         float shadowFactor = 1.0;
-
-        if (shadowMapIndex < nrOfShadowMaps)
+        float shadowMapIndex = lights[i].shadowMapIndex + 0.5;
+        if (shadowMapIndex > 0)
         {
             float4 sampleCoordLS = WorldToLightClipPos(worldPos, shadowMapIndex);
             sampleCoordLS.xyz /= sampleCoordLS.w;
@@ -108,8 +108,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
             {
                 shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 700.0, shadowMapIndex)).x < sampleCoordLS.z - bias) * 0.15;
             }
-
-            shadowMapIndex += 1.0f;
+            
         }
     
         lightMultiplyer = lights[i].intensity * shadowFactor;

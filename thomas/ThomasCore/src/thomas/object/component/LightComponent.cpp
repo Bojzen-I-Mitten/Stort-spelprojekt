@@ -25,12 +25,12 @@ namespace thomas
 				m_lightComponentData.direction = math::Vector3(0.0f, 0.0f, -1.0f);
 				m_lightComponentData.right = math::Vector3(1.0f, 0.0f, 0.0f);
 				m_lightComponentData.up = math::Vector3(0.0f, 1.0f, 0.0f);
-				m_lightComponentData.intensity = 1.0f;
+				m_lightComponentData.intensity = 0.3f;
 				m_lightComponentData.spotInnerAngle = 0.0f;
 				m_lightComponentData.spotOuterAngle = 20.0f;
 				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
 				m_castsShadows = false;
-
+				m_lightComponentData.shadowMapIndex = -1;
 			}
 			LightComponent::~LightComponent()
 			{
@@ -87,6 +87,11 @@ namespace thomas
 			math::Matrix LightComponent::GetVPMat()
 			{
 				return m_shadowMap.GetVPMat();
+			}
+
+			int LightComponent::GetShadowMapIndex() const
+			{
+				return m_lightComponentData.shadowMapIndex;
 			}
 
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
@@ -206,8 +211,9 @@ namespace thomas
 
 				if (m_castsShadows)
 				{
-					ID3D11DepthStencilView* dsv = graphics::LightManager::GetFreeShadowMapView();
-					if (dsv == nullptr)
+					ID3D11DepthStencilView* dsv;
+					m_lightComponentData.shadowMapIndex = graphics::LightManager::GetFreeShadowMapView(dsv);
+					if (m_lightComponentData.shadowMapIndex == -1)
 					{
 						m_castsShadows = false;
 
@@ -219,6 +225,7 @@ namespace thomas
 				{
 					graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
 					m_shadowMap.SetShadowMapDepthStencilView(nullptr);
+					m_lightComponentData.shadowMapIndex = -1;
 				}
 				
 			}
