@@ -86,7 +86,12 @@ public class Confetti : ScriptComponent
 
     }
 
-    public IEnumerator EmitForDuration(float duration)
+    public void Emit(float duration)
+    {
+        StartCoroutine(EmitForDuration(duration));
+    }
+
+    private IEnumerator EmitForDuration(float duration)
     {
         emitterConfetti1.Emit = true;
         emitterConfetti2.Emit = true;

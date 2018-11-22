@@ -52,8 +52,6 @@ public class GUIJoinHost : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
-        MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-        MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
     }
 
     public void Listener_PeerConnectedEvent(NetPeer peer)
@@ -136,6 +134,10 @@ public class GUIJoinHost : ScriptComponent
                             MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                         MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
                         MatchSystem.instance.TargetIP = IPString;
+
+                        MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
+                        MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+
                         MatchSystem.instance.Init();
                         MatchSystem.instance.Connect();
                         ConnectingText.text = "Connecting";

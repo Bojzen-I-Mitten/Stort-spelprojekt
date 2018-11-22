@@ -56,6 +56,7 @@ namespace ThomasEngine.Network
             set
             {
                 _target = value;
+                _targetRigidbody = _target.gameObject.GetComponent<Rigidbody>();
             }
         }
 
@@ -105,11 +106,7 @@ namespace ThomasEngine.Network
         public override void Update()
         {
             CurrentPositionDuration += Time.DeltaTime;
-
-            if (isOwner)
-            {
-                isDirty = true;
-            }
+            isDirty = true;
 
             switch (SyncMode)
             {

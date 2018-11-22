@@ -21,6 +21,7 @@ public class TeamGoal : ScriptComponent
     public override void Start()
     {
         confettis = Object.GetObjectsOfType<Confetti>();
+        Debug.Log(confettis.Count);
         BoxCollider c = gameObject.AddComponent<BoxCollider>();
         c.isTrigger = true;
         c.size = new Vector3(0.5f, 0.5f, 0.5f);
@@ -97,19 +98,16 @@ public class TeamGoal : ScriptComponent
                 {
                     TEAM_TYPE teamThatScored = MatchSystem.instance.GetOpposingTeam(Team);
                     MatchSystem.instance.OnGoal(teamThatScored);
-                    StartCoroutine(EmitSparkForDuration(5.0f));
+                    
                 }
-                if(MatchSystem.instance.ReplaySystem.Replaying)
-                {
-                    StartCoroutine(EmitSparkForDuration(5.0f));
-                }
+                StartCoroutine(EmitSparkForDuration(5.0f));
             }
         }
         
     }
     public IEnumerator EmitSparkForDuration(float duration)
     {
-        confettis.ForEach((confetti) => confetti.EmitForDuration(duration));
+        confettis.ForEach((confetti) => confetti.Emit(duration));
         goalEmitterCenter.EmitOneShot(100);
         goalEmitterShock.EmitOneShot(1);
         goalEmitterSpark.Emit = true;

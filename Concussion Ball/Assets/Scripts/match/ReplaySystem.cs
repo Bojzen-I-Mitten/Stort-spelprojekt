@@ -32,9 +32,6 @@ public class ReplaySystem : ScriptComponent
 
     public override void Update()
     {
-        if(Replaying)
-            specCam.transform.LookAt(MatchSystem.instance.Ball.transform.position);
-
         if (!MatchSystem.instance || !MatchSystem.instance.MatchStarted || Replaying || !recordGame)
             return;
 
@@ -71,6 +68,7 @@ public class ReplaySystem : ScriptComponent
 
     private IEnumerator RelayCoroutine(Vector3 goalPos)
     {
+        MatchSystem.instance.blockIncomingData = true;
         CameraMaster.instance.StartReplay();
         specCam.transform.position = goalPos + new Vector3(goalPos.z / 1.2f, 5, 0);
         MatchSystem.instance.ReadOwnerAsNormal = true;
@@ -92,6 +90,7 @@ public class ReplaySystem : ScriptComponent
         }
         Replaying = false;
         MatchSystem.instance.ReadOwnerAsNormal = false;
+        MatchSystem.instance.blockIncomingData = false;
         CameraMaster.instance.StopReplay();
     }
 

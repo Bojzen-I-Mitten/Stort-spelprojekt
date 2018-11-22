@@ -100,11 +100,8 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
-        if(PickupCollider.enabled == false)
-        {
             RPCDrop();
             SendRPC("RPCDrop");
-        }
     }
 
     public virtual void OnDrop()
@@ -113,24 +110,21 @@ public class PickupableObject : NetworkComponent
     }
 
     public void RPCDrop()
-    {
-        if (PickupCollider.enabled == false)
-        {
+    { 
+        m_rigidBody.enabled = true;
             
-            m_rigidBody.enabled = true;
-            
-            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
 
-            transform.SetParent(null, true);
-            if (_Chad)
-            {
-                _Chad.PickedUpObject = null;
-                _Chad = null;
-            }
-            OnDrop();
-            StopEmitting();
-            Cleanup();
+        transform.SetParent(null, true);
+        if (_Chad)
+        {
+            _Chad.PickedUpObject = null;
+            _Chad = null;
         }
+        OnDrop();
+        StopEmitting();
+        Cleanup();
+        
     }
 
     //Never call this method without also calling RPC.
@@ -177,6 +171,7 @@ public class PickupableObject : NetworkComponent
 
    public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
+        writer.Put(PickupCollider.enabled);
         writer.Put(chargeTimeCurrent);
         return true;
     }
@@ -185,9 +180,11 @@ public class PickupableObject : NetworkComponent
     {
         if (isOwner)
         {
+            reader.GetBool();
             reader.GetFloat();
             return;
         }
+        PickupCollider.enabled = reader.GetBool();
         chargeTimeCurrent = reader.GetFloat();
 
     }

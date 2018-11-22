@@ -23,7 +23,7 @@ namespace ThomasEngine.Network
         //private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
 
         internal NetPacketProcessor NetPacketProcessor;
-
+        public bool blockIncomingData = false;
         public EventBasedNetListener Listener { get; private set; }
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
@@ -228,7 +228,7 @@ namespace ThomasEngine.Network
         {
             try
             {
-                if (reader.EndOfData)
+                if (reader.EndOfData || blockIncomingData)
                     return;
                 PacketType type = (PacketType)reader.GetInt();
                 switch (type)

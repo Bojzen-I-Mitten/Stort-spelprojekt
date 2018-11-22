@@ -14,7 +14,7 @@ namespace ThomasEngine.Network
 
 
         public int PrefabID = -1;
-
+        public int Ping = 0;
         private bool _Owner = false;
         public bool Owner {
             set {if(value == true && IsPlayer == false) TakeOwnership();  _Owner = value; }

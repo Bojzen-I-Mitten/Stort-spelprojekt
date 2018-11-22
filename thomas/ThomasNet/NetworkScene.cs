@@ -26,6 +26,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity playerID = Players[peer];
                 bool initialState = reader.GetBool();
+                playerID.Ping = peer.Ping;
                 playerID.ReadData(reader, initialState);
             }
 

@@ -48,6 +48,27 @@ namespace thomas
 				}
 
 			}
+			void MeshCollider::SetTrigger(bool trigger)
+			{
+				if (!m_concave)
+				{
+					Collider::Update();
+					return;
+				}
+
+				if (trigger) {
+					if (m_collisionObject) {
+						m_collisionObject->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+					}
+				}
+				else
+				{
+					if (m_collisionObject) {
+						m_collisionObject->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+					}
+				}
+				m_trigger = trigger;
+			}
 			void MeshCollider::RecalcCollider()
 			{
 				if (m_collisionObject)
@@ -120,6 +141,7 @@ namespace thomas
 				}
 
 				m_collisionShape = new btBvhTriangleMeshShape(btModel, true, true);
+				
 			}
 		}
 	}

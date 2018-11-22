@@ -89,8 +89,6 @@ public class ChadControls : NetworkComponent
             MatchSystem.instance.LocalChad = this;
         rBody = gameObject.GetComponent<Rigidbody>();
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
-        if (rBody != null)
-            rBody.IsKinematic = !isOwner;
         rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
@@ -143,6 +141,8 @@ public class ChadControls : NetworkComponent
             }
             StateMachine();
         }
+        if (rBody != null)
+            rBody.IsKinematic = !isOwner;
 
         if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
             EnableRagdoll();

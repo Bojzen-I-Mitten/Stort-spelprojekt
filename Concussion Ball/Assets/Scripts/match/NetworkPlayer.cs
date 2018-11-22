@@ -46,6 +46,18 @@ public class NetworkPlayer : NetworkComponent
         nameCanvas.is3D = true;
     }
 
+    public int GetPing()
+    {
+        return Identity.Ping;
+    }
+
+
+    public override void OnDisable()
+    {
+        if(nameCanvas != null)
+            nameCanvas.isRendering = false;
+    }
+
     public override void Update()
     {
         if (!isOwner)
@@ -62,9 +74,11 @@ public class NetworkPlayer : NetworkComponent
             nameCanvas.isRendering = true;
             nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
         }
-        else
+        else if(nameCanvas != null)
             nameCanvas.isRendering = false;
 
+        if (Team != null && mat != null)
+            mat.SetColor("color", Team.Color);
 
         if (transform.position.y < BottomOfTheWorld)
             Reset();
@@ -100,8 +114,6 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
-            if(Team != null)
-                mat?.SetColor("color", Team.Color);
         }
 
     }
