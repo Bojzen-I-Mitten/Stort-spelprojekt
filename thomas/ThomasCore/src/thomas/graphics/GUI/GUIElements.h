@@ -71,6 +71,7 @@ namespace thomas
 					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
 					if (!window || 
 						WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow() || 
+						!canvas->GetRendering() || 
 						!interactable)
 						return false;
 
