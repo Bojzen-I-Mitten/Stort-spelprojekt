@@ -35,6 +35,7 @@ namespace ThomasEditor
                             new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.Transform>)},
                              new TargetPropertyType { Type = typeof(Resource[]) },
                             new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Resource>)},
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Material>)},
                     }
                     });
             }

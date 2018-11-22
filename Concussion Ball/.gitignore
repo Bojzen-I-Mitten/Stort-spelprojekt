@@ -360,6 +360,7 @@ Models/
 # Other stuff
 
 *.ini
+*.ico
 
 
 # SVN
