@@ -12,33 +12,18 @@ namespace thomas
 	{
 		SkyBox::SkyBox()
 		{
-
 			GenerateSphere(10, 10, 5.0f);
-			m_vertBuffer = std::make_unique<utils::buffers::VertexBuffer>(m_sphereVerts);
-			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_sphereIndices);
-			
-			m_skyMap = new resource::TextureCube("../Data/yokohama_skybox.dds");
-			//m_skyMap = new resource::TextureCube("../Data/fullmoon_skybox.dds");
+			m_skyMap = nullptr;
 			m_shader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/SkyBoxShader.fx");
 		}
 
 		SkyBox::~SkyBox()
 		{
-			/*SAFE_DELETE(m_cubeMap);
-			SAFE_DELETE(m_skyMap);
-
-			SAFE_RELEASE(m_vertBuffer);
-			SAFE_RELEASE(m_indexBuffer);
-
-			m_sphereIndices.clear();
-			m_sphereVerts.clear();*/
 		}
 
 		bool SkyBox::SetSkyMap(resource::TextureCube * tex)
 		{
-
 			m_skyMap = tex;
-			
 			return true;
 		}
 
@@ -46,16 +31,22 @@ namespace thomas
 		{
 			return m_skyMap;
 		}
+		SkyBox::operator bool() const
+		{
+			return m_skyMap; //Check null
+		}
 
 		void SkyBox::GenerateSphere(unsigned horizontalLines, unsigned verticalLines, float radius)
 		{
+			std::vector<math::Vector3> sphereVerts;
+			std::vector<unsigned int> sphereIndices;
 			float phi = 0.0f;
 			float theta = 0.0f;
 
 			float twoPiDivVerticalLines = math::PI * 2  / verticalLines;
 			float piDivHorizontalLines = math::PI / (horizontalLines + 1);
 
-			m_sphereVerts.push_back(math::Vector3(0.0f, radius, 0.0f));//endpoint 1
+			sphereVerts.push_back(math::Vector3(0.0f, radius, 0.0f));//endpoint 1
 
 			for (unsigned t = 1; t < horizontalLines + 1; ++t)
 			{
@@ -65,65 +56,72 @@ namespace thomas
 				{
 					phi = p * twoPiDivVerticalLines;
 
-					m_sphereVerts.push_back(math::SphericalCoordinate(phi, theta, radius));
+					sphereVerts.push_back(math::SphericalCoordinate(phi, theta, radius));
 				}
 			}
-			m_sphereVerts.push_back(math::Vector3(0.0f, -radius, 0.0f)); //endpoint 2
+			sphereVerts.push_back(math::Vector3(0.0f, -radius, 0.0f)); //endpoint 2
 			
 			//Create top of sphere
 			for (unsigned p = 2; p < verticalLines + 1; ++p)//connect endpoint 1 indices 
 			{
-				m_sphereIndices.push_back(0);
-				m_sphereIndices.push_back(p);
-				m_sphereIndices.push_back(p - 1);
+				sphereIndices.push_back(0);
+				sphereIndices.push_back(p);
+				sphereIndices.push_back(p - 1);
 			}
 			//add last triangle for top (first vert is douplicate)
-			m_sphereIndices.push_back(0);
-			m_sphereIndices.push_back(1);
-			m_sphereIndices.push_back(verticalLines);
+			sphereIndices.push_back(0);
+			sphereIndices.push_back(1);
+			sphereIndices.push_back(verticalLines);
 
 			//Create middle segments
 			for (unsigned t = 0; t < horizontalLines - 1; ++t)
 			{
 				for (unsigned p = 2; p < verticalLines + 1; ++p)
 				{
-					m_sphereIndices.push_back(t * verticalLines + p);//+ 1 is for to exclude top vert
-					m_sphereIndices.push_back((t + 1) * verticalLines + p);//take vert in next layer
-					m_sphereIndices.push_back(t * verticalLines + p - 1);
+					sphereIndices.push_back(t * verticalLines + p);//+ 1 is for to exclude top vert
+					sphereIndices.push_back((t + 1) * verticalLines + p);//take vert in next layer
+					sphereIndices.push_back(t * verticalLines + p - 1);
 					
-					m_sphereIndices.push_back(t * verticalLines + p - 1);
-					m_sphereIndices.push_back((t + 1) * verticalLines + p);
-					m_sphereIndices.push_back((t + 1) * verticalLines + p - 1);
+					sphereIndices.push_back(t * verticalLines + p - 1);
+					sphereIndices.push_back((t + 1) * verticalLines + p);
+					sphereIndices.push_back((t + 1) * verticalLines + p - 1);
 				}
 
 				//Again append douplicate verts
-				m_sphereIndices.push_back(t * verticalLines + 1);
-				m_sphereIndices.push_back((t + 1) * verticalLines + 1);
-				m_sphereIndices.push_back((t + 1) * verticalLines);
+				sphereIndices.push_back(t * verticalLines + 1);
+				sphereIndices.push_back((t + 1) * verticalLines + 1);
+				sphereIndices.push_back((t + 1) * verticalLines);
 
-				m_sphereIndices.push_back((t + 1) * verticalLines);
-				m_sphereIndices.push_back((t + 1) * verticalLines + 1);
-				m_sphereIndices.push_back((t + 2) * verticalLines);
+				sphereIndices.push_back((t + 1) * verticalLines);
+				sphereIndices.push_back((t + 1) * verticalLines + 1);
+				sphereIndices.push_back((t + 2) * verticalLines);
 			}
 			
 			//Create bottom of sphere
-			for (unsigned p = m_sphereVerts.size() - verticalLines; p < m_sphereVerts.size(); ++p)
+			for (unsigned p = (uint32_t)sphereVerts.size() - verticalLines; p < sphereVerts.size(); ++p)
 			{
-				m_sphereIndices.push_back(m_sphereVerts.size() - 1);
-				m_sphereIndices.push_back(p - 1);
-				m_sphereIndices.push_back(p);
+				sphereIndices.push_back((uint32_t)sphereVerts.size() - 1);
+				sphereIndices.push_back(p - 1);
+				sphereIndices.push_back(p);
 				
 			}
-			m_sphereIndices.push_back(m_sphereVerts.size() - 1);
-			m_sphereIndices.push_back(m_sphereVerts.size() - 2);
-			m_sphereIndices.push_back(m_sphereVerts.size() - 1 - verticalLines);
+			sphereIndices.push_back((uint32_t)sphereVerts.size() - 1);
+			sphereIndices.push_back((uint32_t)sphereVerts.size() - 2);
+			sphereIndices.push_back((uint32_t)sphereVerts.size() - 1 - verticalLines);
+			m_vertBuffer = std::unique_ptr<utils::buffers::VertexBuffer>(
+				new utils::buffers::VertexBuffer(sphereVerts));
+			m_indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(sphereIndices);
+#ifdef _DEBUG
+			m_vertBuffer->SetName("SKYBOX_VERTEX");
+			m_indexBuffer->SetName("SKYBOX_INDEX");
+#endif
 		}
 
 
 
 		void SkyBox::Draw()
 		{
-
+			if (!m_skyMap) return;	// No skymap, don't...
 			m_shader->BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			m_shader->BindVertexBuffer(m_vertBuffer.get());
@@ -135,7 +133,7 @@ namespace thomas
 			m_shader->SetPass(0);
 
 			
-			m_shader->DrawIndexed(m_sphereIndices.size(), 0, 0);
+			m_shader->DrawIndexed(m_indexBuffer->IndexCount(), 0, 0);
 		}
 		
 	}

@@ -24,7 +24,7 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
-    public override void Awake()
+    public override void OnAwake()
     {
         
     }

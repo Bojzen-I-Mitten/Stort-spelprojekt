@@ -18,7 +18,7 @@ namespace thomas
 			{
 			public:
 				CapsuleCollider();
-				void Awake();
+				void OnAwake();
 				void Update();
 				void OnDrawGizmosSelected();
 

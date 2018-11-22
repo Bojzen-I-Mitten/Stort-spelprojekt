@@ -9,7 +9,7 @@
 
 namespace ThomasEngine
 {
-	void Rigidbody::Awake()
+	void Rigidbody::OnAwake()
 	{
 		Collider^ collider = gameObject->GetComponent<Collider^>();
 		if (collider)

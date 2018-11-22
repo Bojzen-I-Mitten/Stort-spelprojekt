@@ -143,7 +143,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
     }
 
-    public override void Awake()
+    public override void OnAwake()
     {
     }
 

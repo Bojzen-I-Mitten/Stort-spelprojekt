@@ -18,7 +18,10 @@ namespace ThomasEngine
 
 	void SoundComponent::Play(AudioClip^ clip, float volume, bool looping, bool is3D)
 	{
-		sound->Play((thomas::resource::AudioClip*)clip->m_nativePtr, volume, looping, is3D);
+		if (!clip)
+			sound->Stop();
+		else
+			sound->Play((thomas::resource::AudioClip*)clip->m_nativePtr, volume, looping, is3D);
 	}
 
 	void SoundComponent::Stop()
@@ -64,7 +67,10 @@ namespace ThomasEngine
 	void SoundComponent::Clip::set(AudioClip^ value)
 	{
 		m_clip = value;
-		sound->SetClip((thomas::resource::AudioClip*)value->m_nativePtr);
+		if (value)
+			sound->SetClip((thomas::resource::AudioClip*)value->m_nativePtr);
+		else
+			sound->SetClip(nullptr);
 	}
 
 	AudioClip^ SoundComponent::Clip::get() 

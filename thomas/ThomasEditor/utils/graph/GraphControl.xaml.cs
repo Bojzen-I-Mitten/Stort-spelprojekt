@@ -185,18 +185,18 @@ namespace Thomas_Graph
             double largestScale = (scaleTransform.ScaleX + scaleTransform.ScaleY)/2;
 
             
+            double pxPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;   // Not sure if this is correct but it's only a warning...
             for (int x = startX; x < endX; x+= dynamicGridSpacingX) // x-axis
             {
                 drawingContext.DrawLine(new Pen(Brushes.DimGray, 1.0/scaleTransform.ScaleX), new Point(x, startY), new Point(x, endY));
                 drawingContext.PushTransform(new ScaleTransform(scaleTransform.ScaleY, scaleTransform.ScaleX));
                 if (x != 0)
                 {
-
                     FormattedText ft = new FormattedText((x / (float)gridSpacing).ToString(),
                         CultureInfo.GetCultureInfo("en-us"),
                         FlowDirection.LeftToRight,
                         new Typeface("Verdana"),
-                       12/ Math.Pow(largestScale, 2), System.Windows.Media.Brushes.Black);
+                       12/ Math.Pow(largestScale, 2), System.Windows.Media.Brushes.Black, pxPerDip);
                     ft.TextAlignment = TextAlignment.Center;
                     drawingContext.DrawText(ft, new System.Windows.Point(x/scaleTransform.ScaleY, 1.0/ scaleTransform.ScaleX));
                 }
@@ -214,7 +214,7 @@ namespace Thomas_Graph
                          CultureInfo.GetCultureInfo("en-us"),
                          FlowDirection.LeftToRight,
                          new Typeface("Verdana"),
-                         12/Math.Pow(largestScale, 2), System.Windows.Media.Brushes.Black);
+                         12/Math.Pow(largestScale, 2), System.Windows.Media.Brushes.Black, pxPerDip);
                     ft.TextAlignment = TextAlignment.Right;
                     drawingContext.DrawText(ft, new System.Windows.Point(-1.0/ scaleTransform.ScaleY, (y/ scaleTransform.ScaleX)));
                 }

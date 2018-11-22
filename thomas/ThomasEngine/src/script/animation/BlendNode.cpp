@@ -10,7 +10,7 @@
 #pragma managed
 #include "../../Debug.h"
 #include "PlaybackNode.h"
-
+#include "PlaybackHandle.h"
 
 namespace ThomasEngine
 {
@@ -18,7 +18,6 @@ namespace ThomasEngine
 	{
 		BlendNode::BlendNode(Model ^ model)
 		{
-
 			thomas::resource::Model *m = (thomas::resource::Model*)model->m_nativePtr;
 			thomas::graphics::animation::Skeleton *skel = m->GetSkeleton();
 			if(!skel)
@@ -27,6 +26,9 @@ namespace ThomasEngine
 					Utility::ConvertString(m->GetName()));
 			// Construct wrapped node
 			this->m_node = new thomas::graphics::animation::AnimBlender(*skel);
+
+			m_weightHandle = gcnew WeightHandle(thomas::MAX_ANIMATION_BLEND_NODE);
+			m_node->setWeightMixer(m_weightHandle->Mixer());
 		}
 
 		BlendNode::~BlendNode()
@@ -34,18 +36,19 @@ namespace ThomasEngine
 			delete m_node;
 		}
 		
-		void BlendNode::appendNode(Animation ^ anim, bool loop)
+		PlaybackNode^ BlendNode::appendNode(Animation ^ anim, bool loop)
 		{
 			using namespace thomas::graphics::animation;
-			if (!anim->Native()->HasAnimation()) {
+			if (!anim->Native()->HasAnimation()) 
+			{
 				Debug::Log("Failed to add BlendNode: Anim is null with name: " + anim->Name);
-				return;
+				return nullptr;
 			}
 			AnimationData * data = anim->Native()->GetAnimation();
 
-			std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, data->m_duration, loop ? PlayType::Loop : PlayType::Once));
-			AnimationNode *node = (new AnimPlayback(m_node->m_ref, playback, *data));
-			m_node->pushAnimation(node);
+			PlaybackNode^ playback = gcnew PlaybackNode(m_node->m_ref, anim, loop);
+			appendNode(playback);
+			return playback;
 		}
 		void BlendNode::appendNode(BlendNode ^ action)
 		{
@@ -58,6 +61,14 @@ namespace ThomasEngine
 			// Push action
 			m_node->pushAnimation(action->Native());
 		}
+		void BlendNode::setNode(PlaybackNode^ action, uint32_t index)
+		{
+			m_node->setAnimation(index, action->Native());
+		}
+		void BlendNode::setNode(BlendNode^ action, uint32_t index)
+		{
+			m_node->setAnimation(index, action->Native());
+		}
 
 
 		void BlendNode::generateLinearMixer(float durationPerNode)
@@ -67,9 +78,12 @@ namespace ThomasEngine
 
 		WeightHandle ^ BlendNode::generateWeightHandle()
 		{
-			WeightHandle^ handle = gcnew WeightHandle(m_node->NumChannel());
-			m_node->setWeightMixer(handle->Mixer());
-			return handle;
+			return m_weightHandle;
+		}
+
+		WeightHandle ^ BlendNode::getWeightHandle()
+		{
+			return m_weightHandle;
 		}
 
 		void BlendNode::ResetPlayback()
@@ -80,6 +94,27 @@ namespace ThomasEngine
 				if (p)
 					p->getPlayback()->m_elapsedTime = 0.f;
 			}
+		}
+
+		thomas::graphics::animation::AnimationNode * BlendNode::getNodeAtIndex(uint32_t node_index)
+		{
+			return m_node->getAnimNode(node_index);
+		}
+
+		PlaybackHandle ^ BlendNode::tryGetPlayback(uint32_t node_index)
+		{
+			using namespace thomas::graphics::animation;
+			AnimationNode* node = getNodeAtIndex(node_index);
+			if (!node)
+				return nullptr;
+			AnimPlayback* playback = dynamic_cast<AnimPlayback*>(node);
+			if (!playback)
+				return nullptr;
+			BaseAnimationTime* t = dynamic_cast<BaseAnimationTime*>(playback->getPlayback());
+			if (!t)
+				return nullptr;
+			// Yay...
+			return gcnew PlaybackHandle(t);
 		}
 
 		thomas::graphics::animation::AnimationNode * BlendNode::Native()

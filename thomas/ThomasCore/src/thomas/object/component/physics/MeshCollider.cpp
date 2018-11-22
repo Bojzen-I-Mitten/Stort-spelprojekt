@@ -70,7 +70,7 @@ namespace thomas
 				for (auto mesh : m_model->GetMeshes())
 				{
 
-					for (int i = 0; i < mesh->GetVertexCount(); i++)
+					for (uint32_t i = 0; i < mesh->GetVertexCount(); i++)
 					{
 						math::Vector4 v = mesh->GetVertices().positions[i];
 						temp->addPoint(btVector3(v.x, v.y, v.z));
@@ -99,7 +99,7 @@ namespace thomas
 				{
 
 					btVector3* vertices = new btVector3[mesh->GetVertexCount()];
-					for (int i = 0; i < mesh->GetVertexCount(); i++)
+					for (uint32_t i = 0; i < mesh->GetVertexCount(); i++)
 					{
 						vertices[i] = (btVector3&)mesh->GetVertices().positions[i];
 					}

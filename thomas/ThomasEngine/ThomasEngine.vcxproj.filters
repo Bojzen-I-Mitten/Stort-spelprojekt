@@ -67,6 +67,9 @@
     <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
     <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
     <ClCompile Include="src\object\component\AudioListener.cpp" />
+    <ClCompile Include="src\object\component\animation\BoneSyncComponent.cpp" />
+    <ClCompile Include="src\system\command\CommandQueue.cpp" />
+    <ClCompile Include="src\script\ScriptinUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -135,9 +138,14 @@
     <ClInclude Include="src\GUI\game\Canvas.h" />
     <ClInclude Include="src\math\Viewport.h" />
     <ClInclude Include="src\resource\texture\TextureCube.h" />
+    <ClInclude Include="src\object\component\animation\BoneSyncComponent.h" />
+    <ClInclude Include="src\system\command\ICommand.h" />
+    <ClInclude Include="src\system\command\CommandQueue.h" />
     <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
+    <ClInclude Include="src\object\ComponentState.h" />
     <ClInclude Include="src\object\component\AudioListener.h" />
+    <ClInclude Include="src\script\ScriptingUtility.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

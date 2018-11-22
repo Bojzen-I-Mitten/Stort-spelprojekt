@@ -24,7 +24,7 @@ namespace thomas {
 				~AnimationData();
 
 
-				size_t numChannel() const;
+				uint32_t numChannel() const;
 				/* Get the channel related to a bone */
 				const ObjectChannel& operator[](unsigned int bone) const;
 			};

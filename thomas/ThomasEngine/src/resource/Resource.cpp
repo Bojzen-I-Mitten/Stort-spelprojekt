@@ -28,9 +28,9 @@ namespace ThomasEngine
 
 	void Resource::Reload()
 	{
-		System::Threading::Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
+		//System::Threading::Monitor::Enter(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 		m_nativePtr->Reload();
-		System::Threading::Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
+		//System::Threading::Monitor::Exit(ThomasWrapper::CurrentScene->GetGameObjectsLock());
 	}
 
 	void Resource::Rename(String^ newPath) {

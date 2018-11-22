@@ -193,7 +193,7 @@ namespace thomas
 				
 			}
 			#pragma endregion
-			void Joint::Awake()
+			void Joint::OnAwake()
 			{
 			
 			}

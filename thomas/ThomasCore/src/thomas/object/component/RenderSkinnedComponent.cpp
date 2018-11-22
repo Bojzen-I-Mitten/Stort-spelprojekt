@@ -39,8 +39,9 @@ namespace thomas
 			{
 				RenderComponent::Update();
 #ifdef _EDITOR
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 #endif
+				EDITOR_LOCK();
 				if (m_skeleton)
 				{
 					PROFILE("AnimationUpdate")
@@ -50,6 +51,7 @@ namespace thomas
 
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
 				RenderComponent::SetMaterial(meshIndex, material);
+				EDITOR_LOCK();
 				uint32_t effectIndex;
 				if (!material || material->GetShader()->GetPropertyIndex(graphics::THOMAS_MATRIX_SKIN_ARRAY_HASH, effectIndex)) {
 					m_skinInfo->m_apply = thomas::resource::shaderproperty::ApplyEffectMatrixDynamicArray;
@@ -64,6 +66,7 @@ namespace thomas
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
 				RenderComponent::SetModel(model);
+				EDITOR_LOCK();
 				// Read new skeleton
 				if (!model)
 					m_skeleton = NULL;
