@@ -56,7 +56,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
     float3 ambient = float3(0.05f, 0.05f, 0.05f);
-    float3 colorAcculmulator = ambient;
+    float3 colorAcculmulator = ambient * surfaceDiffuse;
     float3 lightDir = float3(0, 0, 0);
     float lightMultiplyer = 0.0f;
     
