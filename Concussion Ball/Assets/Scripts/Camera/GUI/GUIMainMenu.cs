@@ -36,44 +36,38 @@ public class GUIMainMenu : ScriptComponent
 
     public override void Update()
     {
-        if (Canvas.isRendering)
+        Play.color = Unselected;
+        Options.color = Unselected;
+        Credits.color = Unselected;
+        Exit.color = Unselected;
+        TextBoxName.color = Unselected;
+
+        if (Play.Hovered())
+            Play.color = Selected;
+        else if (Options.Hovered())
+            Options.color = Selected;
+        else if (Credits.Hovered())
+            Credits.color = Selected;
+        else if (Exit.Hovered())
+            Exit.color = Selected;
+
+        if (TextBoxName.Clicked())
         {
-            Play.color = Unselected;
-            Options.color = Unselected;
-            Credits.color = Unselected;
-            Exit.color = Unselected;
+            TakeName = true;
+            TextBoxName.color = Selected;
+        }
 
-            if (Play.Hovered())
-                Play.color = Selected;
-            else if (Options.Hovered())
-                Options.color = Selected;
-            else if (Credits.Hovered())
-                Credits.color = Selected;
-            else if (Exit.Hovered())
-                Exit.color = Selected;
+        if (Play.Clicked())
+        {
+            CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+        }
 
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-            {
-                TextBoxName.color = Unselected;
-                if (TextBoxName.Clicked())
-                {
-                    TakeName = true;
-                    TextBoxName.color = Selected;
-                }
+        PlayerString = PlayerString.ToUpper();
+        PlayerName.text = PlayerString;
 
-                if (Play.Clicked())
-                {
-                    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-                }
-            }
-
-            PlayerString = PlayerString.ToUpper();
-            PlayerName.text = PlayerString;
-
-            if (TakeName)
-            {
-                GUIInput.AppendString(ref PlayerString, 14);
-            }
+        if (TakeName)
+        {
+            GUIInput.AppendString(ref PlayerString, 14);
         }
     }
     public void AddImagesAndText()
@@ -135,7 +129,7 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Images
-        
+
         if (TextBox != null)
         {
             TextBoxName = Canvas.Add(TextBox);

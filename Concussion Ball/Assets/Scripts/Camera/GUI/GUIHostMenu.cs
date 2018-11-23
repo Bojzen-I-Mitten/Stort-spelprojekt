@@ -441,77 +441,38 @@ public class GUIHostMenu : ScriptComponent
 
     public override void Update()
     {
-        if (Canvas.isRendering)
+        NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
+        NotSameNameTest(Team1.text, Team2.text);
+
+        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT)/* || btnDown*/)
         {
-            NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
-            NotSameNameTest(Team1.text, Team2.text);
+            //btnDown = true;
+            float hue = 0.0f;
 
-            if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT) || btnDown)
+            if (Team1ColorSlider.Hovered())
             {
-                btnDown = true;
-                float hue = 0.0f;
-
-                if (Team1ColorSlider.Hovered())
-                {
-                    Team1SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team1SliderKnob.position.y);
-                    hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = HSLColor(hue);
-                }
-
-                if (Team2ColorSlider.Hovered())
-                {
-                    Team2SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team2SliderKnob.position.y);
-                    hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / Team2ColorSlider.size.x;
-                    MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = HSLColor(hue);
-                }
+                Team1SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team1SliderKnob.position.y);
+                hue = (Team1SliderKnob.position.x - Team1ColorSlider.position.x) / Team1ColorSlider.size.x;
+                MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color = HSLColor(hue);
             }
 
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+            if (Team2ColorSlider.Hovered())
             {
-                btnDown = false;
-                CheckForSelectedInputBoxes();
+                Team2SliderKnob.position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Team2SliderKnob.position.y);
+                hue = (Team2SliderKnob.position.x - Team2ColorSlider.position.x) / Team2ColorSlider.size.x;
+                MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color = HSLColor(hue);
             }
-
-            if (HostBtn.Hovered())
-            {
-                HostBtn.color = Selected;
-                if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-                {
-                    if (NotSimilarColor && NotSameName)
-                    {
-                        CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
-                        //Set match options
-                        MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name = Team1.text;
-                        MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
-                        MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
-                        MatchSystem.instance.MatchLength = ConvertToInt(TimeRoundString.text) * 60; //Convert to seconds.
-                        MatchSystem.instance.ScoreLimit = ConvertToInt(ScoreLimitString.text);
-                        MatchSystem.instance.ServerName = ServerNameString.text;
-                        MatchSystem.instance.PublicServer = PublicServerCheck.scale != Vector2.Zero ? true : false;
-                        MatchSystem.instance.SpawnPowerupsDuringGame = PowerUpsCheck.scale != Vector2.Zero ? true : false;
-
-                        MatchSystem.instance.LocalPort = ConvertToInt(PortNameString.text);
-                        MatchSystem.instance.Init();
-                        MatchSystem.instance.Host();
-                    }
-                }
-            }
-            else
-                HostBtn.color = Unselected;
-
-            if (ExitBtn.Hovered())
-            {
-                ExitBtn.color = Selected;
-                if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-                {
-                    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-                }
-            }
-            else
-                ExitBtn.color = Unselected;
-
-            TakeKeyboardInput();
         }
+
+
+
+        CheckForSelectedInputBoxes();
+        TakeKeyboardInput();
+
+        //if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        //{
+        //    btnDown = false;
+        //}
     }
 
     /*
@@ -582,7 +543,7 @@ public class GUIHostMenu : ScriptComponent
     private void NotSimilarColorTest(Color c1, Color c2)
     {
         float distance = Vector3.Distance(c1.ToVector3(), c2.ToVector3());
-        if(distance >= 0.25f)
+        if (distance >= 0.25f)
         {
             NotSimilarColor = true;
             SimilarColor.scale = Vector2.Zero;
@@ -631,62 +592,106 @@ public class GUIHostMenu : ScriptComponent
         InputMaxPlayers = false;
         InputTimeRound = false;
 
-        Team1TextBox.color = Unselected;
-        Team2TextBox.color = Unselected;
-        ServerNameBox.color = Unselected;
-        PortNameBox.color = Unselected;
-        MaxPlayersBox.color = Unselected;
-        TimeRoundBox.color = Unselected;
-
-        if (Team1TextBox.Hovered())
+        if (Team1TextBox.Clicked())
         {
             InputTeam1Name = true;
             Team1TextBox.color = Selected;
         }
-        else if (Team2TextBox.Hovered())
+        else if (Team2TextBox.Clicked())
         {
             InputTeam2Name = true;
             Team2TextBox.color = Selected;
         }
-        else if (ServerNameBox.Hovered())
+        else if (ServerNameBox.Clicked())
         {
             InputServerName = true;
             ServerNameBox.color = Selected;
         }
-        else if (PortNameBox.Hovered())
+        else if (PortNameBox.Clicked())
         {
             InputPortName = true;
             PortNameBox.color = Selected;
         }
-        else if (MaxPlayersBox.Hovered())
+        else if (MaxPlayersBox.Clicked())
         {
             InputMaxPlayers = true;
             MaxPlayersBox.color = Selected;
         }
-        else if (TimeRoundBox.Hovered())
+        else if (TimeRoundBox.Clicked())
         {
             InputTimeRound = true;
             TimeRoundBox.color = Selected;
         }
-        else if (ScoreLimitBox.Hovered())
+        else if (ScoreLimitBox.Clicked())
         {
             InputScoreLimit = true;
             ScoreLimitBox.color = Selected;
         }
-        else if (PublicServerBox.Hovered())
+        else if (PublicServerBox.Clicked())
         {
             if (PublicServerCheck.scale != Vector2.Zero)
                 PublicServerCheck.scale = Vector2.Zero;
             else
                 PublicServerCheck.scale = Vector2.One;
         }
-        else if (PowerUpsBox.Hovered())
+        else if (PowerUpsBox.Clicked())
         {
             if (PowerUpsCheck.scale != Vector2.Zero)
                 PowerUpsCheck.scale = Vector2.Zero;
             else
                 PowerUpsCheck.scale = Vector2.One;
         }
+        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            Team1TextBox.color = Unselected;
+            Team2TextBox.color = Unselected;
+            ServerNameBox.color = Unselected;
+            PortNameBox.color = Unselected;
+            MaxPlayersBox.color = Unselected;
+            TimeRoundBox.color = Unselected;
+        }
+    }
+
+    private void CheckButtonInteraction()
+    {
+        if (HostBtn.Hovered())
+        {
+            HostBtn.color = Selected;
+
+        }
+        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            if (NotSimilarColor && NotSameName)
+            {
+                CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+                //Set match options
+                MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name = Team1.text;
+                MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
+                MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
+                MatchSystem.instance.MatchLength = ConvertToInt(TimeRoundString.text) * 60; //Convert to seconds.
+                MatchSystem.instance.ScoreLimit = ConvertToInt(ScoreLimitString.text);
+                MatchSystem.instance.ServerName = ServerNameString.text;
+                MatchSystem.instance.PublicServer = PublicServerCheck.scale != Vector2.Zero ? true : false;
+                MatchSystem.instance.SpawnPowerupsDuringGame = PowerUpsCheck.scale != Vector2.Zero ? true : false;
+
+                MatchSystem.instance.LocalPort = ConvertToInt(PortNameString.text);
+                MatchSystem.instance.Init();
+                MatchSystem.instance.Host();
+            }
+        }
+        else
+            HostBtn.color = Unselected;
+
+        if (ExitBtn.Hovered())
+        {
+            ExitBtn.color = Selected;
+        }
+        else if (ExitBtn.Clicked())
+        {
+            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+        }
+        else
+            ExitBtn.color = Unselected;
     }
 
     private void TakeKeyboardInput()
