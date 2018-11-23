@@ -7,6 +7,12 @@ public class GUISelectTeam : ScriptComponent
     public Texture2D SpectatorCamTexture { get; set; }
     public Font TextFont { get; set; }
 
+    public GameObject ChadTeam1 { get; set; }
+    public GameObject ChadTeam2 { get; set; }
+
+    public Animation RunningAnim { get; set; }
+    public Animation IdleAnim { get; set; }
+
     Camera Camera;
 
     //public Vector2 SelectboxPos { get; set; } = new Vector2(0.37f, 0.33f);
@@ -22,6 +28,10 @@ public class GUISelectTeam : ScriptComponent
     Text Team2Text;
     Text SpectatorText;
 
+    RenderSkinnedComponent ChadRSC1;
+    RenderSkinnedComponent ChadRSC2;
+    Material Chad1Mat;
+    Material Chad2Mat;
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
@@ -30,6 +40,18 @@ public class GUISelectTeam : ScriptComponent
     {
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
+        if (ChadTeam1 != null)
+        {
+            ChadRSC1 = ChadTeam1.GetComponent<RenderSkinnedComponent>();
+            Chad1Mat = (ChadTeam1.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+        }
+        if (ChadTeam2 != null)
+        {
+            ChadRSC2 = ChadTeam2.GetComponent<RenderSkinnedComponent>();
+            Chad2Mat = (ChadTeam2.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+        }
+        
+
     }
 
     public override void Update()
@@ -72,11 +94,39 @@ public class GUISelectTeam : ScriptComponent
             SpectatorText.color = Unselected;
 
             if (Team1Image.Hovered())
+            {
                 Team1Text.color = Selected;
+                if (RunningAnim != null)
+                {
+                    if (ChadRSC1.animation != RunningAnim)
+                    {
+                        ChadRSC1.animation = RunningAnim;
+                        ChadRSC2.animation = IdleAnim;
+                    }
+                }
+
+            }
             else if (Team2Image.Hovered())
+            {
                 Team2Text.color = Selected;
+                if (RunningAnim != null)
+                {
+                    if (ChadRSC2.animation != RunningAnim)
+                    {
+                        ChadRSC1.animation = IdleAnim;
+                        ChadRSC2.animation = RunningAnim;
+                    }
+                }
+            }
             else if (SpectatorImage.Hovered())
+            {
                 SpectatorText.color = Selected;
+                IdleChads();
+            }
+            else
+            {
+                IdleChads();
+            }
 
             if (TextFont != null)
             {
@@ -150,5 +200,14 @@ public class GUISelectTeam : ScriptComponent
         Canvas.Remove(Team1Text);
         Canvas.Remove(Team2Text);
         Canvas.Remove(SpectatorText);
+    }
+
+    private void IdleChads()
+    {
+        if (IdleAnim != null)
+        {
+            ChadRSC1.animation = IdleAnim;
+            ChadRSC2.animation = IdleAnim;
+        }
     }
 }
