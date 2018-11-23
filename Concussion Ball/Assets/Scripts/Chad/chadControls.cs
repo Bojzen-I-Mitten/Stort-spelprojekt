@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-//#define L_FOR_RAGDOLL
+#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
@@ -203,13 +203,13 @@ public class ChadControls : NetworkComponent
 
                 //Accelerate fake gravity as it felt too low, playtest
                 if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
-                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
+                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y - 2, rBody.LinearVelocity.z), rBody.Rotation);
             }
             StateMachine();
         }
 
         /* Enter leave ragdoll state
-         */ 
+         */
         if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
             EnableRagdoll();
         else if (State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
@@ -263,7 +263,7 @@ public class ChadControls : NetworkComponent
     {
         Debug.Log(gameObject.Name + " ragdoll OFF");
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
-        gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
+        //gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
         gameObject.GetComponent<Rigidbody>().enabled = true;
 
@@ -326,8 +326,8 @@ public class ChadControls : NetworkComponent
         {
             Ragdolling = StartRagdoll(duration, param);
             StartCoroutine(Ragdolling);
-            if(isOwner)
-                Camera.InitFreeLookCamera();
+            //if(isOwner)
+            //    Camera.InitFreeLookCamera();
         }
     }
     #endregion
