@@ -362,10 +362,10 @@ public class ChadControls : NetworkComponent
     #region Input handling
     private void HandleKeyboardInput()
     {
-        if (Input.GetKeyUp(Input.Keys.Escape))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        }
+        //if (Input.GetKeyUp(Input.Keys.Escape))
+        //{
+        //    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+        //}
 
         if (Locked)
             return;
