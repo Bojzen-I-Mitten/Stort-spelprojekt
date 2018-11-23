@@ -585,70 +585,71 @@ public class GUIHostMenu : ScriptComponent
 
     private void CheckForSelectedInputBoxes()
     {
-        InputTeam1Name = false;
-        InputTeam2Name = false;
-        InputServerName = false;
-        InputPortName = false;
-        InputMaxPlayers = false;
-        InputTimeRound = false;
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            InputTeam1Name = false;
+            InputTeam2Name = false;
+            InputServerName = false;
+            InputPortName = false;
+            InputMaxPlayers = false;
+            InputTimeRound = false;
 
-        if (Team1TextBox.Clicked())
-        {
-            InputTeam1Name = true;
-            Team1TextBox.color = Selected;
-        }
-        else if (Team2TextBox.Clicked())
-        {
-            InputTeam2Name = true;
-            Team2TextBox.color = Selected;
-        }
-        else if (ServerNameBox.Clicked())
-        {
-            InputServerName = true;
-            ServerNameBox.color = Selected;
-        }
-        else if (PortNameBox.Clicked())
-        {
-            InputPortName = true;
-            PortNameBox.color = Selected;
-        }
-        else if (MaxPlayersBox.Clicked())
-        {
-            InputMaxPlayers = true;
-            MaxPlayersBox.color = Selected;
-        }
-        else if (TimeRoundBox.Clicked())
-        {
-            InputTimeRound = true;
-            TimeRoundBox.color = Selected;
-        }
-        else if (ScoreLimitBox.Clicked())
-        {
-            InputScoreLimit = true;
-            ScoreLimitBox.color = Selected;
-        }
-        else if (PublicServerBox.Clicked())
-        {
-            if (PublicServerCheck.scale != Vector2.Zero)
-                PublicServerCheck.scale = Vector2.Zero;
-            else
-                PublicServerCheck.scale = Vector2.One;
-        }
-        else if (PowerUpsBox.Clicked())
-        {
-            if (PowerUpsCheck.scale != Vector2.Zero)
-                PowerUpsCheck.scale = Vector2.Zero;
-            else
-                PowerUpsCheck.scale = Vector2.One;
-        }
-        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
             Team1TextBox.color = Unselected;
             Team2TextBox.color = Unselected;
             ServerNameBox.color = Unselected;
             PortNameBox.color = Unselected;
             MaxPlayersBox.color = Unselected;
             TimeRoundBox.color = Unselected;
+
+            if (Team1TextBox.Clicked())
+            {
+                InputTeam1Name = true;
+                Team1TextBox.color = Selected;
+            }
+            else if (Team2TextBox.Clicked())
+            {
+                InputTeam2Name = true;
+                Team2TextBox.color = Selected;
+            }
+            else if (ServerNameBox.Clicked())
+            {
+                InputServerName = true;
+                ServerNameBox.color = Selected;
+            }
+            else if (PortNameBox.Clicked())
+            {
+                InputPortName = true;
+                PortNameBox.color = Selected;
+            }
+            else if (MaxPlayersBox.Clicked())
+            {
+                InputMaxPlayers = true;
+                MaxPlayersBox.color = Selected;
+            }
+            else if (TimeRoundBox.Clicked())
+            {
+                InputTimeRound = true;
+                TimeRoundBox.color = Selected;
+            }
+            else if (ScoreLimitBox.Clicked())
+            {
+                InputScoreLimit = true;
+                ScoreLimitBox.color = Selected;
+            }
+            else if (PublicServerBox.Clicked())
+            {
+                if (PublicServerCheck.scale != Vector2.Zero)
+                    PublicServerCheck.scale = Vector2.Zero;
+                else
+                    PublicServerCheck.scale = Vector2.One;
+            }
+            else if (PowerUpsBox.Clicked())
+            {
+                if (PowerUpsCheck.scale != Vector2.Zero)
+                    PowerUpsCheck.scale = Vector2.Zero;
+                else
+                    PowerUpsCheck.scale = Vector2.One;
+            }
         }
     }
 
