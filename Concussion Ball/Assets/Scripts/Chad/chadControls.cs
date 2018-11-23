@@ -535,18 +535,21 @@ public class ChadControls : NetworkComponent
                         CurrentVelocity.y = modifiedBaseSpeed;
                 }
                 // Walking backwards
-                else if (Direction.z < 0) 
+                else if (Direction.z < 0)
+                {
+                    if (Direction.x != 0)
+                        diagonalModifier = 0.5f;
                     CurrentVelocity.y = -modifiedBaseSpeed * 0.75f * diagonalModifier;
-
+                }
+                    
                 if(OnGround() && Direction.z >= 0) // as to not allow acceleration mid air
                     CurrentVelocity.y += Direction.z * Acceleration * diagonalModifier * Time.DeltaTime;
 
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
 
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * diagonalModifier;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * 0.75f * diagonalModifier;
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-               // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
