@@ -59,6 +59,7 @@ public class GUIMainMenu : ScriptComponent
 
         if (Play.Clicked())
         {
+            TakeName = false;
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
         }
 
