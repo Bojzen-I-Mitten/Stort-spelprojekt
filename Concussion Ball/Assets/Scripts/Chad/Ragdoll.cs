@@ -306,6 +306,7 @@ public class Ragdoll : ScriptComponent
             {
                 J_BodyParts[i] = G_BodyParts[i].AddComponent<Joint>();
                 J_BodyParts[i].NoCollision = true;
+                J_BodyParts[i].Damping = 0.85f;
             }
                 
 
@@ -384,6 +385,7 @@ public class Ragdoll : ScriptComponent
             RB_BodyParts[i].IsKinematic = AllobjectKinectic;
             //RB_BodyParts[i].Damping = AllobjectDamping;
             //RB_BodyParts[i].AngularDamping = 0.85f;
+            
             RB_BodyParts[i].Mass = Totalmass * Mass_BodyParts[i];
             RB_BodyParts[i].ActiveState = Rigidbody.ActivationState.Always_Active;
         }
