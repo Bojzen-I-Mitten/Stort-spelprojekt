@@ -642,6 +642,7 @@ public class ChadControls : NetworkComponent
             }
             yield return new WaitForSeconds(1);
             State = STATE.CHADING;
+            CurrentVelocity.y = BaseSpeed;
         }
     }
 
