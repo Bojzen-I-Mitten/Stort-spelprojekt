@@ -43,7 +43,7 @@ namespace thomas
 					}
 
 					m_spriteBatch->SetViewport(GetViewport());
-					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
+					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, m_spriteStates->DepthRead(), m_spriteStates->CullNone(), nullptr, matrix);
 
 					Vector2 vpScale(GetViewport().width / 1920.0f, GetViewport().height / 1080.0f);
 					for (int i = 0; i < m_GUIElements.size(); ++i)
