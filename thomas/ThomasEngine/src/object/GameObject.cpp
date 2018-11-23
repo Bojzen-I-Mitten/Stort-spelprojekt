@@ -21,6 +21,7 @@
 using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
+
 	GameObject::GameObject() :
 		Object(thomas::ObjectHandler::Instance().createNewGameObject("gameobject"))
 	{
