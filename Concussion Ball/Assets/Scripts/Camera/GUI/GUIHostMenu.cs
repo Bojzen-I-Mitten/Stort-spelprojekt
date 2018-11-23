@@ -444,7 +444,7 @@ public class GUIHostMenu : ScriptComponent
         NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
         NotSameNameTest(Team1.text, Team2.text);
 
-        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT)/* || btnDown*/)
+        if (Input.GetMouseButton(Input.MouseButtons.LEFT)/* || btnDown*/)
         {
             //btnDown = true;
             float hue = 0.0f;
