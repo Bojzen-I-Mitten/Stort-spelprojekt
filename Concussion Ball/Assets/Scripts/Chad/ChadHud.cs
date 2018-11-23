@@ -411,16 +411,6 @@ public class ChadHud : ScriptComponent
         Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
     }
 
-    public override void OnEnable()
-    {
-        Canvas.isRendering = true;
-    }
-
-    public override void OnDisable()
-    {
-        Canvas.isRendering = false;
-    }
-
     private void BallIndicator()
     {
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
