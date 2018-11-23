@@ -28,7 +28,7 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
-        ExplosionForce = 300.0f;
+        ExplosionForce = 50.0f;
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;

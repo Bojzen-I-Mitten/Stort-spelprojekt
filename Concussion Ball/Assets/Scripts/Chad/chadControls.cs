@@ -63,7 +63,7 @@ public class ChadControls : NetworkComponent
     public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
 
-    public float ImpactFactor { get; set; } = 100;
+    public float ImpactFactor = 25.0f;//{ get; set; } = 100;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;

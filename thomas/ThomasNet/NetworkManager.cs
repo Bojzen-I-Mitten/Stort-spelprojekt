@@ -251,6 +251,13 @@ namespace ThomasEngine.Network
                     default:
                         break;
                 }
+
+                if(!reader.EndOfData)
+                {
+                    Debug.Log("Reader not at end of data with " + reader.AvailableBytes + " bytes left");
+                    Debug.Log("Packet type: " + type);
+                }
+
                 reader.Recycle();
             }
             catch (Exception e)
