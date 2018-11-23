@@ -92,6 +92,7 @@ namespace thomas
 			default:
 				break;
 			}
+
 			s_lights.push_back(light);
 			std::sort(s_lights.begin(), s_lights.end(), SortLights);
 		}
@@ -122,10 +123,7 @@ namespace thomas
 						break;
 					}
 					
-					if (light->CastsShadows())
-					{
-						light->SetCastShadows(false);//returns the shadowmap
-					}
+					
 					*it._Ptr = nullptr;
 					s_lights.erase(it);
 					
@@ -241,6 +239,9 @@ namespace thomas
 
 		bool LightManager::ResturnShadowMapView(ID3D11DepthStencilView * dsv)
 		{
+			if (dsv == nullptr)
+				return false;
+
 			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
 			{
 				if (dsv == s_shadowMapViews[i])

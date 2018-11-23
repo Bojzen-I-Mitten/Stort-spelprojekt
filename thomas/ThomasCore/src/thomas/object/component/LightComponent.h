@@ -39,7 +39,7 @@ namespace thomas
 				virtual void OnDisable() override;
 				virtual void OnDestroy() override;
 			private:
-
+				void ReturnShadowMap();
 			public: // Get / Set
 				void UpdateShadowBox(Camera* camera);
 				void BindShadowMapDepthTexture();

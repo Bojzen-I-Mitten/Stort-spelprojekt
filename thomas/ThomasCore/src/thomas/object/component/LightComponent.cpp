@@ -53,16 +53,26 @@ namespace thomas
 
 			void LightComponent::OnEnable()
 			{
+				SetCastShadows(m_castsShadows);
 				graphics::LightManager::AddLight(this);
 			}
 
 			void LightComponent::OnDisable()
 			{
+				ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
 			}
 			void LightComponent::OnDestroy()
 			{
+				ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
+			}
+
+			void LightComponent::ReturnShadowMap()
+			{
+				bool temp = m_castsShadows;
+				SetCastShadows(false);
+				m_castsShadows = temp;
 			}
 
 			void LightComponent::UpdateShadowBox(Camera* camera)
