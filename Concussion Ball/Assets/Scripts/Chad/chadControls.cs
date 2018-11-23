@@ -63,7 +63,7 @@ public class ChadControls : NetworkComponent
     public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
 
-    public float ImpactFactor { get; set; } = 2000;
+    public float ImpactFactor { get; set; } = 100;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;
@@ -635,7 +635,7 @@ public class ChadControls : NetworkComponent
 
             yield return new WaitForSeconds(duration);
             float timer = 0;
-            while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
+            while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 5)
             {
                 timer += Time.DeltaTime;
                 yield return null;
