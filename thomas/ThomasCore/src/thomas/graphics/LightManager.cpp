@@ -20,7 +20,6 @@ namespace thomas
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 		resource::Texture2DArray* LightManager::s_shadowMapTextures;
 		LightManager::LightCountsStruct LightManager::s_lightCounts;
-		utils::buffers::StructuredBuffer* LightManager::s_shadowLightVPMatrices;
 
 		const unsigned LightManager::s_nrOfShadowMapsSupported;
 		unsigned LightManager::s_shadowMapSize;
@@ -67,9 +66,12 @@ namespace thomas
 			{
 				SAFE_RELEASE(s_shadowMapViews[i]);
 			}
-			//delete s_shadowMapTextures;
+			delete s_shadowMapTextures;
+
+			ShadowMap::Destroy();
 			SAFE_RELEASE(s_lightBuffer);
 			s_lights.clear();
+			s_freeShadowMapViewIndexes.clear();
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{

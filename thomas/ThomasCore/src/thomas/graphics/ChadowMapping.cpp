@@ -29,17 +29,23 @@ namespace thomas
 			s_viewPort.MaxDepth = 1.0f;
 		}
 
+		void ShadowMap::Destroy()
+		{
+			s_shader.reset();
+			s_material.reset();
+		}
+
 		ShadowMap::ShadowMap()
 		{
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-50, 50, -50, 50, -50, 50);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 			m_matrixVP = m_matrixView * m_matrixProj;
-			m_depthStencilView = nullptr;
+			_depthStencilView = nullptr;
 		}
 
 		ShadowMap::~ShadowMap()
 		{
-
+			
 		}
 
 		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)
@@ -125,15 +131,15 @@ namespace thomas
 
 		void ShadowMap::Bind()
 		{
-			if (m_depthStencilView == nullptr)
+			if (_depthStencilView == nullptr)
 				return;
 
 			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
 			utils::D3D::Instance()->GetDeviceContext()->PSSetShaderResources(0, 8, s_nullSRV);
 
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
-			utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
+			utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, nullptr, _depthStencilView);
 			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, &s_viewPort);
 
 			s_material->Bind();
@@ -144,12 +150,12 @@ namespace thomas
 
 		void ShadowMap::SetShadowMapDepthStencilView(ID3D11DepthStencilView * dsv)
 		{
-			m_depthStencilView = dsv;
+			_depthStencilView = dsv;
 		}
 
 		ID3D11DepthStencilView * ShadowMap::GetShadowMapDepthStencilView()
 		{
-			return m_depthStencilView;
+			return _depthStencilView;
 		}
 
 		math::Matrix ShadowMap::GetVPMat()

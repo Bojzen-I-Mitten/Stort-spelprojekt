@@ -17,6 +17,7 @@ namespace thomas
 		{
 		public:
 			static void InitStatics(unsigned size);
+			static void Destroy();
 			ShadowMap();
 			~ShadowMap();
 
@@ -29,7 +30,7 @@ namespace thomas
 
 			math::Matrix GetVPMat();
 		private:
-			ID3D11DepthStencilView* m_depthStencilView;
+			ID3D11DepthStencilView* _depthStencilView;
 			
 			math::Matrix m_matrixProj;
 			math::Matrix m_matrixView;

@@ -90,7 +90,6 @@ namespace thomas
 			static LightCountsStruct s_lightCounts;
 
 			
-			static utils::buffers::StructuredBuffer* s_shadowLightVPMatrices;
 			static resource::Texture2DArray* s_shadowMapTextures;
 			static unsigned s_shadowMapSize;
 		};

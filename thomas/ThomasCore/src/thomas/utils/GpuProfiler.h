@@ -12,11 +12,11 @@ namespace thomas
 			{
 				GTS_BEGIN_FRAME,
 				GTS_MAIN_CLEAR,
+				GTS_SHADOWS,
 				GTS_MAIN_OBJECTS,
 				GTS_PARTICLES,
 				GTS_GIZMO_OBJECTS,
 				GTS_GUI,
-				GTS_SHADOWS,
 				GTS_END_FRAME,
 
 				GTS_MAX
