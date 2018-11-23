@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define R_FOR_RESTART
+
+using System;
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
@@ -127,11 +129,13 @@ public class MatchSystem : NetworkManager
                 {
                     OnMatchStart();
                 }
+#if (R_FOR_RESTART)
                 if(Input.GetKeyDown(Input.Keys.R))
                 {
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+#endif
                 if (Input.GetKeyDown(Input.Keys.F10))
                     ShowOwnedObjects();
             }

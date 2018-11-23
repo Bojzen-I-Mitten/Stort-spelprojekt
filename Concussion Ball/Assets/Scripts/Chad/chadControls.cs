@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-//#define L_FOR_RAGDOLL
+#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
