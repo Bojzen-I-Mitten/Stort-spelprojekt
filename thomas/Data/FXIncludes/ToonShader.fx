@@ -3,9 +3,11 @@
 #include <ThomasCG.hlsl>
 #include <ThomasLights.hlsl>
 
-Texture2D DiffuseTexture;
-Texture2D NormalTexture : NORMALTEXTURE;
-Texture2D SpecularTexture : SPECULARTEXTURE;
+Texture2D diffuseTex;
+Texture2D normalTex : NORMALTEXTURE;
+Texture2D specularTex;
+Texture2D maskTex;
+Texture2D rampTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
@@ -54,102 +56,71 @@ struct v2f
 {
     float4 vertex : SV_POSITION;
     float4 worldPos : POSITIONWS;
-    float3 normal : NORMAL;
+    float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
 };
 
-// Test for toon shading
-static float3 DiffuseLightDirection = float3(1.f, 0.f, 0.f);
-static float4 DiffuseColor = float4(1.f, 1.f, 1.f, 1.f);
-static float DiffuseIntensity = 1.f;
-static float4 LineColor = float4(0.f, 0.f, 0.f, 1.f);
-static float LineThickness = 0.03f;
 
-v2f CelVertexShader(appdata_thomas v)
+float biTangentSign(float3 norm, float3 tang, float3 bitang)
+{
+    return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
+}
+
+v2f vert(appdata_thomas_skin v)
 {
     v2f o;
+    
+    float4 posL = float4(v.vertex, 1.f);
+    float3 normalL = v.normal;
+    float3 tangentL = v.tangent;
+    float bisign = biTangentSign(v.normal, v.tangent, v.bitangent);
+    ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
+    float3 bitangL = cross(normalL, tangentL) * bisign;
+	
+    o.vertex = ThomasObjectToClipPos(posL);
+    o.worldPos = ThomasObjectToWorldPos(posL);
 
-    o.vertex = ThomasObjectToClipPos(v.vertex);
-    o.worldPos = ThomasObjectToWorldPos(v.vertex);
-    o.normal = normalize(v.normal);
-    o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
+    float3 tangent = ThomasObjectToWorldDir(tangentL);
+    float3 bitangent = ThomasObjectToWorldDir(bitangL);
+    float3 normal = ThomasObjectToWorldDir(normalL);
+
+    o.TBN = float3x3(tangent, bitangent, normal);
+    
+	o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
 
     return o;
 }
 
-float4 CelPixelShader(v2f input) : SV_TARGET
+float4 frag(v2f input) : SV_TARGET
 {
-	// Calculate diffuse light amount
-    float intensity = dot(normalize(DiffuseLightDirection), input.normal);
+    float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
+    normal.xy = normal.xy * 2.0f - 1.0f;
+    normal = normalize(normal);
+    normal = normalize(mul(normal, input.TBN));
 
-    if (intensity < 0)
-        intensity = 0;
+    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord) * 3.5f;
+    //diffuse *= color.xyz;
+    diffuse += maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
+    diffuse *= rampTex.Sample(StandardWrapSampler, Intensity(normal, input.worldPos.xyz));
  
-    // Calculate what would normally be the final color, including texturing and diffuse lighting
-    float4 color = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord) * DiffuseColor * DiffuseIntensity;
-    color.a = 1;
- 
-    // Discretize the intensity, based on a few cutoff points
-    if (intensity > 0.95)
-        color = float4(1.0, 1, 1, 1.0) * color;
-    else if (intensity > 0.5)
-        color = float4(0.7, 0.7, 0.7, 1.0) * color;
-    else if (intensity > 0.05)
-        color = float4(0.35, 0.35, 0.35, 1.0) * color;
-    else
-        color = float4(0.1, 0.1, 0.1, 1.0) * color;
- 
-    return color;
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
+    
+    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light 
+    diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
+
+    return saturate(float4(diffuse, 1.0f));
 }
 
-// The vertex shader that does the outlines
-v2f OutlineVertexShader(appdata_thomas input)
+technique11 Standard
 {
-    v2f output = (v2f)0;
- 
-    float4 original = ThomasObjectToWorldPos(input.vertex);
-    float4 normal = ThomasObjectToWorldPos(input.normal);
- 
-    // Take the correct "original" location and translate the vertex a little
-    // bit in the direction of the normal to draw a slightly expanded object.
-    // Later, we will draw over most of this with the right color, except the expanded
-    // part, which will leave the outline that we want.
-    output.vertex = original + (mul(LineThickness, normal));
- 
-    return output;
-}
-
-//// The pixel shader for the outline.  It is pretty simple: draw everything with the
-// correct line color.
-float4 OutlinePixelShader(v2f input) : SV_TARGET
-{
-    return LineColor;
-}
-
-technique11 Toon
-{
-	// The first pass will go through and draw the back-facing triangles with the outline shader,
-    // which will draw a slightly larger version of the model with the outline color.  Later, the
-    // model will get drawn normally, and draw over the top most of this, leaving only an outline.
-  //  pass Pass1
-  //  {
-		//VERT(OutlineVertexShader());
-  //      SetGeometryShader(NULL);
-		//FRAG(OutlinePixelShader());
-  //      SetDepthStencilState(EnableDepth, 0);
-  //      SetRasterizerState(TestRasterizer);
-  //      SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
-  //  }
-
-	// The second pass will draw the model like normal, but with the cel pixel shader, which will
-    // color the model with certain colors, giving us the cel/toon effect that we are looking for.
-    pass Pass1
+    pass P0
     {
-		VERT(CelVertexShader());
+		VERT(vert());
         SetGeometryShader(NULL);
-		FRAG(CelPixelShader());
+		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
         SetRasterizerState(TestRasterizer);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
+
 }
