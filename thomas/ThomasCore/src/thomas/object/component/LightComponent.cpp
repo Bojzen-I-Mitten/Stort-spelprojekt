@@ -31,6 +31,7 @@ namespace thomas
 				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
 				m_castsShadows = false;
 				m_lightComponentData.shadowMapIndex = -1;
+				m_lightComponentData.shadowHardness = 0.5f;
 			}
 			LightComponent::~LightComponent()
 			{
@@ -63,8 +64,11 @@ namespace thomas
 			{
 				
 				if (m_castsShadows)
+				{
 					graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
-	
+					m_shadowMap.SetShadowMapDepthStencilView(nullptr);
+					m_lightComponentData.shadowMapIndex = -1;
+				}
 				graphics::LightManager::RemoveLight(this);
 			}
 
@@ -228,6 +232,16 @@ namespace thomas
 					m_lightComponentData.shadowMapIndex = -1;
 				}
 				
+			}
+
+			float LightComponent::GetShadowHardness() const
+			{
+				return m_lightComponentData.shadowHardness;
+			}
+
+			void LightComponent::SetShadowHardness(float const & value)
+			{
+				m_lightComponentData.shadowHardness = value;
 			}
 
 }

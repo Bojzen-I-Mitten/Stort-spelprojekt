@@ -42,5 +42,7 @@ namespace ThomasEngine
 	bool LightComponent::CastShadows::get() { return light->CastsShadows(); }
 	void LightComponent::CastShadows::set(bool value) { light->SetCastShadows(value); }
 	
+	float LightComponent::ShadowHardness::get() { return light->GetShadowHardness(); }
+	void LightComponent::ShadowHardness::set(float value) { light->SetShadowHardness(value); }
 }
 

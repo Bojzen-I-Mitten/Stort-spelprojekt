@@ -62,7 +62,7 @@ namespace thomas
 				thomas::math::Vector3 up;
 				thomas::math::Vector2 rectangleDimensions;
 				float shadowMapIndex;
-				float pad;
+				float shadowHardness;
 			};
 
 		public:
@@ -78,7 +78,7 @@ namespace thomas
 			static int GetFreeShadowMapView(ID3D11DepthStencilView*& dsv);
 			static bool ResturnShadowMapView(ID3D11DepthStencilView * dsv);
 		private:
-			static const unsigned s_nrOfShadowMapsSupported = 2;
+			static const unsigned s_nrOfShadowMapsSupported = 8;
 			static ID3D11DepthStencilView* s_shadowMapViews[s_nrOfShadowMapsSupported];
 			static math::Matrix s_lightMatrices[s_nrOfShadowMapsSupported];
 			static std::vector<unsigned> s_freeShadowMapViewIndexes;

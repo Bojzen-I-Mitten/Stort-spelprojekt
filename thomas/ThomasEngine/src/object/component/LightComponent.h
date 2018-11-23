@@ -70,5 +70,9 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
+		property float ShadowHardness {
+			float get();
+			void set(float value);
+		}
 	};
 }

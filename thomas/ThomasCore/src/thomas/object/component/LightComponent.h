@@ -80,6 +80,9 @@ namespace thomas
 
 				bool CastsShadows() const;
 				void SetCastShadows(bool const& value);
+
+				float GetShadowHardness() const;
+				void SetShadowHardness(float const& value);
 			};
 
 		}
