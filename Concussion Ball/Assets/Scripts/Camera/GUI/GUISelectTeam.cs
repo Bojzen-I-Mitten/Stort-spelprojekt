@@ -28,47 +28,41 @@ public class GUISelectTeam : ScriptComponent
 
     public override void Update()
     {
-        if (Canvas.isRendering)
-        {
-            Team1Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-            Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
-            Team2Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
-            Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
+        Team1Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+        Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
+        Team2Image.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+        Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
 
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-            {
-                if (Team1Image.Clicked())
-                {
-                    MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
-                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
-                    CameraMaster.instance.Canvas.isRendering = false;
-                    gameObject.GetComponent<SpectatorCam>().enabled = true;
-                }
-                else if (Team2Image.Clicked())
-                {
-                    MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
-                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
-                    CameraMaster.instance.Canvas.isRendering = false;
-                    gameObject.GetComponent<SpectatorCam>().enabled = true;
-                }
-                else if (SpectatorImage.Clicked())
-                {
-                    MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
-                    CameraMaster.instance.Canvas.isRendering = false;
-                    gameObject.GetComponent<SpectatorCam>().enabled = true;
-                }
-            }
-            if (TextFont != null && !Disabled)
-            {
-                Select.font = TextFont;
-                Team1Text.font = TextFont;
-                Team2Text.font = TextFont;
-                SpectatorText.font = TextFont;
-            }
+        if (Team1Image.Clicked())
+        {
+            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+            CameraMaster.instance.State = CAM_STATE.GAME;
+            CameraMaster.instance.Canvas.isRendering = false;
+            gameObject.GetComponent<SpectatorCam>().enabled = true;
+        }
+        else if (Team2Image.Clicked())
+        {
+            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+            CameraMaster.instance.State = CAM_STATE.GAME;
+            CameraMaster.instance.Canvas.isRendering = false;
+            gameObject.GetComponent<SpectatorCam>().enabled = true;
+        }
+        else if (SpectatorImage.Clicked())
+        {
+            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+            CameraMaster.instance.State = CAM_STATE.GAME;
+            CameraMaster.instance.Canvas.isRendering = false;
+            gameObject.GetComponent<SpectatorCam>().enabled = true;
+        }
+        if (TextFont != null && !Disabled)
+        {
+            Select.font = TextFont;
+            Team1Text.font = TextFont;
+            Team2Text.font = TextFont;
+            SpectatorText.font = TextFont;
         }
     }
 
