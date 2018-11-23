@@ -21,14 +21,13 @@
 using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
-
-	GameObject::GameObject() : 
+	GameObject::GameObject() :
 		Object(thomas::ObjectHandler::Instance().createNewGameObject("gameobject"))
 	{
 		m_name = "gameobject";
 #ifdef _EDITOR
-		if(ThomasWrapper::IsExternalBuild())
-			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+		//if(ThomasWrapper::IsExternalBuild())
+		//	System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
 
@@ -45,8 +44,8 @@ namespace ThomasEngine {
 		ThomasWrapper::CurrentScene->CreateObject(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
-		if (ThomasWrapper::IsExternalBuild())
-			System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
+		//if (ThomasWrapper::IsExternalBuild())
+		//	System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
 
@@ -59,17 +58,13 @@ namespace ThomasEngine {
 			return;
 
 		// Activate
-		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			m_components[i]->InitComponent(s, InitBits);
 		}
-		Monitor::Exit(m_componentsLock);
 	}
 	void GameObject::TryReleaseComponentLock()
 	{
-		if(Monitor::IsEntered(m_componentsLock))
-			Monitor::Exit(m_componentsLock);
 	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
@@ -116,14 +111,12 @@ namespace ThomasEngine {
 	GameObject::~GameObject()
 	{
 		// Final delete of object
-		Monitor::Enter(m_componentsLock);
 		for each (Component^ comp in m_components)
 		{
 			comp->OnDestroy();
 			delete comp;	// Begone you foul Clr!!!!
 		}
 		m_components.Clear();
-		Monitor::Exit(m_componentsLock);
 	}
 	void GameObject::OnActivate()
 	{
@@ -155,7 +148,6 @@ namespace ThomasEngine {
 	{
 		// Remove single component
 		bool success = false;
-		Monitor::Enter(m_componentsLock);
 		if (m_components.Remove(comp))
 		{
 			comp->OnParentDestroy(this);
@@ -169,8 +161,8 @@ namespace ThomasEngine {
 			comp->OnDestroy();
 			delete comp;	// Begone you foul Clr!!!!
 			success = true;
+			m_changeEvent(this, gcnew ComponentsChangedArgs());
 		}
-		Monitor::Exit(m_componentsLock);
 		return success;
 	}
 	void GameObject::Destroy()
@@ -236,7 +228,6 @@ namespace ThomasEngine {
 
 	void GameObject::Update()
 	{
-		Monitor::Enter(m_componentsLock);
 
 		try {
 			for (int i = 0; i < m_components.Count; i++)
@@ -252,14 +243,12 @@ namespace ThomasEngine {
 			Debug::LogException(e);
 		}
 		finally{
-			Monitor::Exit(m_componentsLock);
 		}
 	}
 
 	void GameObject::FixedUpdate()
 	{
 		try {
-			Monitor::Enter(m_componentsLock);
 			for (int i = 0; i < m_components.Count; i++)
 			{
 				Component^ component = m_components[i];
@@ -271,30 +260,25 @@ namespace ThomasEngine {
 			Debug::LogError("Fixed component update failed with exception: " + e->Message);
 		}
 		finally{
-			Monitor::Exit(m_componentsLock);
 		}
 	}
 
 
 	void GameObject::RenderGizmos()
 	{
-		Monitor::Enter(m_componentsLock);
 		for (int i = 0; i < m_components.Count; i++)
 		{
 			if(m_components[i]->enabled)
 				m_components[i]->OnDrawGizmos();
 		}
-		Monitor::Exit(m_componentsLock);
 	}
 
 	void GameObject::RenderSelectedGizmos()
 	{
-		Monitor::Enter(m_componentsLock);
 		for each(Component^ component in m_components)
 		{
 			component->OnDrawGizmosSelected();
 		}
-		Monitor::Exit(m_componentsLock);
 	}
 	bool GameObject::IsPrefab()
 	{
@@ -377,7 +361,6 @@ namespace ThomasEngine {
 	
 	void GameObject::SetComponentIndex(Component ^ c, uint32_t index)
 	{
-		Monitor::Enter(m_componentsLock);
 		// Clamp to valid indices
 		if (index < 1u) index = 1;
 		if (index >= (uint32_t)m_components.Count) index = m_components.Count - 1;
@@ -389,37 +372,39 @@ namespace ThomasEngine {
 				// Found comp. insert at new index.
 				m_components[i] = m_components[index];
 				m_components[index] = c;
+				m_changeEvent(this, gcnew ComponentsChangedArgs());
 				break;
 			}
 		}
-
-		Monitor::Exit(m_componentsLock);
 	}
 	uint32_t GameObject::GetComponentIndex(Component ^ c)
 	{
-		Monitor::Enter(m_componentsLock);
 		uint32_t index = UINT_MAX;
-		for (uint32_t i = 0; i < (uint32_t)m_components.Count; i++) {
-			if (m_components[i] == c)
-			{
-				return i;
+		try
+		{
+			for (uint32_t i = 0; i < (uint32_t)m_components.Count; i++) {
+				if (m_components[i] == c)
+				{
+					return i;
+				}
 			}
 		}
-		Monitor::Exit(m_componentsLock);
+		catch (System::Exception^ e)
+		{
+			Debug::LogWarning("GetComponentIndex failed due to wpf thread active in serial state in editor.");
+		}
 		return index;
 	}
 	generic<typename T>
 	where T : Component
 	T GameObject::AddComponent()
 	{
-		Monitor::Enter(m_componentsLock);
 		Type^ typ = T::typeid;
 
 		T existingComponent = GetComponent<T>();
 		if (existingComponent && typ->IsDefined(DisallowMultipleComponent::typeid, false))
 		{
 			//LOG("Cannot add multiple instances of " << typ->Name);
-			Monitor::Exit(m_componentsLock);
 			return T();
 		}
 
@@ -427,7 +412,6 @@ namespace ThomasEngine {
 		if (component == nullptr)
 		{
 			Debug::LogWarning("Component failed to instantiate of type " + (T::typeid));
-			Monitor::Exit(m_componentsLock);
 			return T();
 		}
 		Component^ comp = (Component^)component;
@@ -440,7 +424,7 @@ namespace ThomasEngine {
 		comp->InitComponent(Comp::State::Awake, BITS);
 		if(this->GetActive())
 			comp->InitComponent(Comp::State::Enabled, BITS);
-		Monitor::Exit(m_componentsLock);
+		m_changeEvent(this, gcnew ComponentsChangedArgs());
 		return component;
 	}
 
@@ -626,10 +610,6 @@ namespace ThomasEngine {
 		}
 	}
 
-	void GameObject::SyncComponents() {
-		System::Windows::Data::BindingOperations::EnableCollectionSynchronization(%m_components, m_componentsLock);
-	}
-
 	void GameObject::OnDeserialized(System::Runtime::Serialization::StreamingContext c)
 	{
 		transform = GetComponent<Transform^>();
@@ -638,5 +618,13 @@ namespace ThomasEngine {
 			if(m_components[i])
 				m_components[i]->gameObject = this;
 		}
+	}
+	void GameObject::Subscribe(ComponentsChangedEventHandler ^ e)
+	{
+		m_changeEvent += e;
+	}
+	void GameObject::UnSubscribe(ComponentsChangedEventHandler ^ e)
+	{
+		m_changeEvent -= e;
 	}
 }

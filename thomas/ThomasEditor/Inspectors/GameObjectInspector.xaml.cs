@@ -14,6 +14,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 using System.Collections.Generic;
 
 using ThomasEngine;
+using ThomasEditor.utils;
 
 namespace ThomasEditor
 {
@@ -86,7 +87,7 @@ namespace ThomasEditor
                 {
                     gameObjectGrid.Visibility = Visibility.Visible;
                     GameObject SelectedGameObject = DataContext as GameObject;
-                    SelectedGameObject.Components.CollectionChanged += Components_CollectionChanged;
+                    SelectedGameObject.Subscribe(Components_CollectionChanged);
                     prevGameObject = SelectedGameObject;
                     RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();
                     if (rc && rc.material != null)
@@ -111,11 +112,11 @@ namespace ThomasEditor
             {
                 if(prevGameObject != null)
                 {
-                    prevGameObject.Components.CollectionChanged -= Components_CollectionChanged;
+                    prevGameObject.UnSubscribe(Components_CollectionChanged);
                 }
             }
 
-            private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            private void Components_CollectionChanged(object sender, GameObject.ComponentsChangedArgs e)
             {
             
                 this.Dispatcher.BeginInvoke((Action)(() => {
@@ -218,14 +219,11 @@ namespace ThomasEditor
             {
                 if (addComponentList.SelectedItem != null && Mouse.LeftButton == MouseButtonState.Pressed && addComponentList.IsMouseOver)
                 {
-
-                    lock (DataContext)
-                    {
+                    if(DataContext is GameObject)
+                    { 
                         Type component = addComponentList.SelectedItem as Type;
-                        var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(component);
-                        method.Invoke(DataContext, null);
+                        ThomasWrapper.IssueCommand(new AddComponentCommand((GameObject)DataContext, component));
                     }
-
                 }
             }
 
@@ -307,9 +305,9 @@ namespace ThomasEditor
                     if (Int32.TryParse(text, out ind))
                     {
                         uint index = (uint)ind;
-                        if (ind < 1)    // Not 0, Reserverd for transform
+                        if (ind < 1)    // Not 0, Reserved for transform
                             index = 1;
-                        c.gameObject.SetComponentIndex(c, index);
+                        ThomasWrapper.IssueCommand(new ComponentSetIndexCommand(c, index));
                     }
                 }
             }

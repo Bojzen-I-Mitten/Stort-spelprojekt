@@ -432,9 +432,7 @@ namespace ThomasEditor
                                 {
                                     Type componentToAdd = componentList[i] as Type;
 
-                                    var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
-                                    method.Invoke(targetModel, null);
-
+                                    ThomasWrapper.IssueCommand(new AddComponentCommand(targetModel, componentToAdd));
                                     Debug.Log("Script found and added.");
                                 }
                             }
