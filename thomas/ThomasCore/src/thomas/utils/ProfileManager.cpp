@@ -127,6 +127,10 @@ namespace thomas
 			{
 				s_ramusage = usage;
 			}
+			float ProfileManager::getRAMUsage()
+			{
+				return s_ramusage;
+			}
 
 			void ProfileManager::setVRAMUsage(float usage, float budget)
 			{

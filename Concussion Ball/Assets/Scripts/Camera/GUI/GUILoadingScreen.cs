@@ -11,7 +11,7 @@ public class GUILoadingScreen : ScriptComponent
     public Texture2D Background { get; set; }
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
     }
 

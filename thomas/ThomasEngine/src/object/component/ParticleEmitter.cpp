@@ -4,6 +4,7 @@
 #include "ParticleEmitter.h"
 #include "../../resource/texture/Texture2D.h"
 #include "../../resource/Resources.h"
+#include "../../utils/ProfileManagerWrapper.h"
 
 namespace ThomasEngine
 {
@@ -83,7 +84,10 @@ namespace ThomasEngine
 		else
 			return gcnew ThomasEngine::Texture2D(particleEmitter->GetTexture());
 	}
-	void ParticleEmitter::Texture::set(Texture2D^ value) { particleEmitter->SetTexture((thomas::resource::Texture2D*)value->m_nativePtr); }
+	void ParticleEmitter::Texture::set(Texture2D^ value) 
+	{ 
+		particleEmitter->SetTexture((thomas::resource::Texture2D*)value->m_nativePtr); 
+	}
 
 
 	bool ParticleEmitter::Emit::get() 

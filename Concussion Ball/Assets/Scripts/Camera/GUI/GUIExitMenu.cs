@@ -13,7 +13,7 @@ public class GUIExitMenu : ScriptComponent
     private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
-    public override void Awake()
+    public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();

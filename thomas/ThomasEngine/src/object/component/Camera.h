@@ -30,6 +30,7 @@ namespace ThomasEngine
 
 	public:
 		Camera();
+		virtual ~Camera();
 
 		[Newtonsoft::Json::JsonIgnoreAttribute]
 		[BrowsableAttribute(false)]

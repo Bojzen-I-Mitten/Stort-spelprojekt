@@ -20,7 +20,7 @@ namespace thomas
 			s_globalAdditiveBlendingSystem = std::make_shared<ParticleSystem>();
 			s_globalAdditiveBlendingSystem->Initialize(8192, ADDITIVE);
 
-			std::srand(time(NULL));
+			std::srand((uint32_t)time(NULL));
 		}
 
 

@@ -34,7 +34,7 @@ public class CameraMaster : ScriptComponent
 
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();

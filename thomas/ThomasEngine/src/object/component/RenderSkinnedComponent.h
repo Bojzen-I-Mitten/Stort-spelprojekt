@@ -24,7 +24,6 @@ namespace ThomasEngine
 		Model^ m_model;
 		Animation^ m_anim;
 	internal:
-		thomas::object::component::RenderSkinnedComponent* get();
 		thomas::object::component::RenderComponent* getNativeRenderComp();
 
 		property thomas::graphics::animation::IBlendTree* BlendTree {
@@ -60,10 +59,13 @@ namespace ThomasEngine
 
 
 
-		void Update() override;
 
 		Matrix GetBoneMatrix(int boneIndex);
 		Matrix GetLocalBoneMatrix(int boneIndex);
+		bool GetBoneIndex(uint32_t boneHash, uint32_t & boneIndex);
+
+	internal:
+		void Update() override;
 
 	private:
 		void applyAnimation();

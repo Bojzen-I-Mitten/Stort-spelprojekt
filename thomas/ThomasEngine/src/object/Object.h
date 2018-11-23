@@ -19,7 +19,7 @@ namespace ThomasEngine {
 #endif
 		
 	protected:
-		static List<Object^> s_objects;
+	protected:
 		System::String^ m_name;
 	internal:
 		[System::Runtime::Serialization::DataMemberAttribute]
@@ -28,7 +28,6 @@ namespace ThomasEngine {
 		[System::NonSerializedAttribute]
 		thomas::object::Object* nativePtr;
 
-		static Object^ Find(System::Guid guid);
 
 		virtual void Destroy();
 
@@ -52,17 +51,6 @@ namespace ThomasEngine {
 		
 
 	public:
-		static Object^ GetObject(thomas::object::Object* ptr);
-
-
-		static List<Object^>^ GetObjects();
-		static List<Object^>^ GetObjectsOfType(System::Type^ type);
-
-		generic<typename T>
-		where T: Object
-		static List<T>^ GetObjectsOfType() {
-			return gcnew List<T>(System::Linq::Enumerable::OfType<T>(GetObjectsOfType(T::typeid)));
-		}
 
 
 		[BrowsableAttribute(false)]

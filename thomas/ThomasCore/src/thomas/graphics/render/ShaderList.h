@@ -21,7 +21,8 @@ namespace thomas {
 	namespace graphics {
 
 		namespace render {
-
+			/* Resource container for shaders
+			*/
 			class ShaderList
 			{
 			public:

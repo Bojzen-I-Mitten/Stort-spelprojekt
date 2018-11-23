@@ -16,68 +16,34 @@ namespace ThomasEngine
 		static String^ objPath;
 		static Assembly^ assembly;
 		static bool shouldReload = false;
+
 	public:
-		
 		delegate void ScriptReloadBegin();
 		static event ScriptReloadBegin^ scriptReloadStarted;
 		delegate void ScriptReloadEnded();
 		static event ScriptReloadEnded^ scriptReloadFinished;
-	
-		static void Init() {
-			
-			fsw = gcnew FileSystemWatcher();
-			fsw->Filter = "Assembly.dll";
-			fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManager::OnChanged);
-			Application::currentProjectChanged += gcnew Application::CurrentProjectChangedEvent(&ScriptingManager::OnCurrentProjectChanged);
-		}
 
-		static void OnCurrentProjectChanged(Project^ newProject) {
-			String^ assemblyFolderPath = newProject->assembly;
-			objPath = newProject->path + "/obj";
-#ifdef _DEBUG
-			assemblyFolderPath += "/Debug";
-			objPath += "/Debug";
-#else
-			assemblyFolderPath += "/Release";
-			objPath += "/Release";
-#endif
-			fsw->EnableRaisingEvents = false;
-			fsw->Path = assemblyFolderPath;
-			//fsw->EnableRaisingEvents = true;
-			LoadAssembly();
-		}
-		static Assembly^ GetAssembly()
-		{
-			return assembly;
-		}
+		/* Public access function for assembly reload. Assure synchronous state!!!
+		*/
+		static void ForceReloadAssembly();
+
+	internal:
+		static void Init();
+
+		static void OnCurrentProjectChanged(Project^ newProject);
+		static Assembly^ GetAssembly();
 
 		delegate void OnChanged(Object^ sender, FileSystemEventArgs e);
 		
 
-		static bool IsFileLocked(FileInfo^ file)
-		{
-			FileStream^ stream;
-			try {
-				stream = file->Open(FileMode::Open, FileAccess::ReadWrite, FileShare::None);
-			}
-			catch (IOException^) {
-				return true;
-			}
-			finally{
-				if (stream)
-					stream->Close();
-			}
-			return false;
-		}
+		static bool IsFileLocked(FileInfo^ file);
 
-		/* Reload assembly
+		/* Reload script assembly if necessary. Reloading Updates the script .dll
 		forceReload	<<	Don't care if necessary or not
 		*/
 		static void ReloadAssembly(bool forceReload);
 
 		static void OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e);
-
-	internal:
 
 		/* Load new assembly (call ReloadAssembly if not initiating new assembly)
 		*/

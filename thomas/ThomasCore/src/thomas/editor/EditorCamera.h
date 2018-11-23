@@ -47,7 +47,12 @@ namespace thomas
 			void SetManipulatorOperation(ImGuizmo::OPERATION operation);
 
 		public:
+			/* Access the editor camera
+			*/
 			static EditorCamera* Instance();
+			/* Delete the editor camera
+			*/
+			static void  DeleteInstance();
 			ImGuizmo::OPERATION GetManipulatorOperation();
 			const std::vector<object::GameObject*>& GetSelectedObjects();
 			object::component::Camera* GetCamera() const;
@@ -63,7 +68,7 @@ namespace thomas
 			void BoxSelect();
 			void BeginBoxSelect();
 			EditorCamera();
-			~EditorCamera();
+			virtual ~EditorCamera();
 
 		private:
 			ImGuizmo::OPERATION m_manipulatorOperation;
@@ -82,8 +87,6 @@ namespace thomas
 			object::GameObject* m_selectedObject;
 			std::vector<object::GameObject*> m_selectedObjects;
 
-		private:
-			static EditorCamera m_editorCamera;
 		};
 	}
 }

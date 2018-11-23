@@ -15,9 +15,6 @@ namespace thomas
 				void UpdateLocalMatrix();
 			public:
 				
-					
-				
-
 				Transform();
 				virtual ~Transform();
 				

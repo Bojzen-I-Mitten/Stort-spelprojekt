@@ -52,7 +52,7 @@ namespace ThomasEngine.Network
             for(int i=0; i < maxPlayers+1; i++)
             {
                 GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
-                player.activeSelf = false;
+                player.SetActive(false);
                 
                 player.GetComponent<NetworkIdentity>().IsPlayer = true;
                 PlayerPool.Add(player);
@@ -72,7 +72,7 @@ namespace ThomasEngine.Network
         }
         private void RecyclePlayer(GameObject player)
         {
-            player.activeSelf = false;
+            player.SetActive(false);
             PlayerPool.Add(player);
         }
 
@@ -94,12 +94,14 @@ namespace ThomasEngine.Network
             GameObject player = GetAvailablePlayerFromPool();
             if(player)
             {
-                player.activeSelf = true;
                 NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
-               
-                networkIdentity.Owner = myPlayer;
+                // If spawned player is local character: Receive ownership  
+                networkIdentity.ReceiveOwnershipStatus(myPlayer);
+                String name = "Chad_" + networkIdentity.ID;
                 if (myPlayer)
-                    player.Name += " (my player)";
+                    player.Name = name + "_(my player)";
+                else
+                    player.Name = name;
                 Players[peer] = networkIdentity;
             }
             else
@@ -133,19 +135,20 @@ namespace ThomasEngine.Network
 
         public void InititateScene()
         {
-            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
+            IEnumerable<NetworkIdentity> enumer = ThomasWrapper.CurrentScene.getComponentsOfType<NetworkIdentity>();
+            foreach ( NetworkIdentity identity in enumer)
             {
-
                 if (identity.IsPlayer)
-                    return;
+                    continue;
                 NetworkObjects.Add(++nextAssignableID, identity);
 
                 if (identity.gameObject.GetActive())
                 {
                     SceneObjectToBeActivated.Add(identity);
-                    identity.gameObject.activeSelf = false;
+                    identity.gameObject.SetActive(false);
                 }
-            });
+
+            }
         }
 
         public int AddObject(NetworkIdentity identity)
@@ -170,13 +173,13 @@ namespace ThomasEngine.Network
 
         public void ActivateSceneObjects()
         {
-            Object.GetObjectsOfType<NetworkIdentity>().ForEach((identity) =>
+            ThomasWrapper.CurrentScene.getComponentsOfType<NetworkIdentity>().ForEach((identity) =>
             {
                 if (!identity.gameObject.GetActive())
                 {
                     identity.Owner = true;
                     if(SceneObjectToBeActivated.Contains(identity))
-                        identity.gameObject.activeSelf = true;
+                        identity.gameObject.SetActive(true);
                 }
             });
         }
