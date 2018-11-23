@@ -120,6 +120,10 @@ namespace thomas
 						break;
 					}
 					
+					if (light->CastsShadows())
+					{
+						light->SetCastShadows(false);//returns the shadowmap
+					}
 					*it._Ptr = nullptr;
 					s_lights.erase(it);
 					

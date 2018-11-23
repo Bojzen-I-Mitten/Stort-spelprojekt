@@ -62,13 +62,6 @@ namespace thomas
 			}
 			void LightComponent::OnDestroy()
 			{
-				
-				if (m_castsShadows)
-				{
-					graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
-					m_shadowMap.SetShadowMapDepthStencilView(nullptr);
-					m_lightComponentData.shadowMapIndex = -1;
-				}
 				graphics::LightManager::RemoveLight(this);
 			}
 
