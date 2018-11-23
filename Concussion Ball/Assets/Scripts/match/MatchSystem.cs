@@ -218,29 +218,24 @@ public class MatchSystem : NetworkManager
 
     #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID,
+    public void RPCMatchInfo(bool matchStarted, float startTime, bool goldenGoal, int powerupID,
         int team1Score, int team2Score,
         Color team1Color, Color team2Color,
         string team1Name, string team2Name)
     {
-        Debug.Log("matchInfo!");
-        if (!MatchStarted)
-        {
-            MatchStarted = true;
-            PowerupManager.NextPowerupID = powerupID;
-            GoldenGoal = goldenGoal;
-            MatchStartTime = startTime;
 
-            Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
-            Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
-            Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
-            Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
-            Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
-            Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
+        MatchStarted = matchStarted;
+        PowerupManager.NextPowerupID = powerupID;
+        GoldenGoal = goldenGoal;
+        MatchStartTime = startTime;
 
+        Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
+        Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
+        Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
+        Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
+        Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
+        Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
 
-            Debug.Log(startTime);
-        }
     }
 
     public void RPCStartMatch()
@@ -343,22 +338,13 @@ public class MatchSystem : NetworkManager
         {
             NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
             np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
-            Debug.Log(np.PlayerName);
         }
-        //Disable the players gameObject and place him in team Spectator.
-        //Give him a NetworkPlayer object.
-        //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        
-        //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
-
-        if (peer != LocalPeer)
+        if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
         {
-            Debug.Log(MatchStarted);
-            if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
-                    Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
-                    Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
-                    Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
+            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+                Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
+                Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
+                Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
         }
     }
 

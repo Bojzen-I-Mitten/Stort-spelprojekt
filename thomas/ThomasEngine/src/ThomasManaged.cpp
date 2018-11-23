@@ -466,6 +466,7 @@ namespace ThomasEngine {
 		if (IssuedStateCommand)
 		{
 			Monitor::Enter(StateCommandProcessed);
+			
 			if (IssuedStateCommand == ThomasStateCommand::PlayIssued)
 			{
 				Play();
@@ -482,6 +483,7 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::Play()
 	{
+		playing = RunningState::Running;
 		while (Thomas->SceneManagerRef->IsAsyncLoading())
 		{
 			Thomas->SceneManagerRef->ListenToLoadProcess();
@@ -490,7 +492,7 @@ namespace ThomasEngine {
 		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
 		CurrentScene->OnPlay();
-		playing = RunningState::Running;
+		
 		Debug::Log("Running...");
 	}
 		

@@ -104,10 +104,8 @@ namespace ThomasEngine.Network
 
         public void WriteData(NetDataWriter writer, bool initalState = false)
         {
-            if (initalState)
-            {
-                writer.Put(gameObject.activeSelf);
-            }
+            writer.Put(gameObject.activeSelf);
+            
             foreach (NetworkComponent comp in networkComponentsCache)
             {
 
@@ -117,11 +115,8 @@ namespace ThomasEngine.Network
 
         public void ReadData(NetDataReader reader, bool initialState)
         {
-            if (initialState)
-            {
-                bool active = reader.GetBool();
-                gameObject.activeSelf = active;
-            }
+            gameObject.activeSelf = reader.GetBool();
+            
 
             foreach (NetworkComponent comp in networkComponentsCache)
             {

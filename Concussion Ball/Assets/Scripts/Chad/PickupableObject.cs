@@ -35,6 +35,8 @@ public class PickupableObject : NetworkComponent
         chargeTimeMax = 2.0f;
         if (!PickupCollider)
             Debug.LogError("Pickup collider empty");
+
+        Disable();
     }
 
     public override void Update()
@@ -100,8 +102,12 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
+        if(PickupCollider.enabled == false)
+        {
             RPCDrop();
             SendRPC("RPCDrop");
+        }
+
     }
 
     public virtual void OnDrop()
@@ -111,19 +117,23 @@ public class PickupableObject : NetworkComponent
 
     public void RPCDrop()
     { 
-        m_rigidBody.enabled = true;
-            
-        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-
-        transform.SetParent(null, true);
-        if (_Chad)
+        if(PickupCollider.enabled == false)
         {
-            _Chad.PickedUpObject = null;
-            _Chad = null;
+            m_rigidBody.enabled = true;
+
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+
+            transform.SetParent(null, true);
+            if (_Chad)
+            {
+                _Chad.PickedUpObject = null;
+                _Chad = null;
+            }
+            OnDrop();
+            StopEmitting();
+            Cleanup();
         }
-        OnDrop();
-        StopEmitting();
-        Cleanup();
+
         
     }
 
@@ -199,7 +209,6 @@ public class PickupableObject : NetworkComponent
     virtual public void Disable()
     {
         PickupCollider.enabled = false;
-        gameObject.activeSelf = false;
         m_rigidBody.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
         gameObject.activeSelf = false;

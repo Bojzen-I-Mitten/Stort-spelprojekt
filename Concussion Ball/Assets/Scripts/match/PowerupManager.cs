@@ -20,18 +20,18 @@ public class PowerupManager : ScriptComponent
 
     void initPowerupPool()
     {
-        Debug.Log("init start");
         foreach (GameObject prefab in Powerups)
         {
             List<GameObject> pool = new List<GameObject>(PoolSize);
             for(int i=0; i < PoolSize; i++)
             {
                 GameObject powerup = GameObject.Instantiate(prefab);
+                powerup.activeSelf = false;
+                
                 pool.Add(powerup);
             }
             powerupPool.Add(pool);
         }
-        Debug.Log("init end");
     }
 
     public override void Update()

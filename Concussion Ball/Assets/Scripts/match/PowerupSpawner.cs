@@ -79,7 +79,6 @@ public class PowerupSpawner : NetworkComponent
                     powerup.spawner = this;
                     timeLeftUntilSpawn = spawnInterval;
                     hasPowerup = true;
-                    spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
 
                 }
                 else

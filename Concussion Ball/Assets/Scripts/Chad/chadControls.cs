@@ -739,18 +739,10 @@ public class ChadControls : NetworkComponent
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 
-        int pickedUpObject = reader.GetInt();
-        if (pickedUpObject >= 0)
-        {
-            RPCPickup(pickedUpObject);
-        }    
-        else if(PickedUpObject)
-        {
-            PickedUpObject.Drop();
-        }
 
         if (isOwner)
         {
+            reader.GetInt();
             reader.GetInt();
             reader.GetVector3();
             reader.GetVector2();
@@ -758,6 +750,19 @@ public class ChadControls : NetworkComponent
             reader.GetBool();
             return;
         }
+
+        int pickedUpObject = reader.GetInt();
+        if (pickedUpObject >= 0)
+        {
+            RPCPickup(pickedUpObject);
+        }
+        else if (PickedUpObject)
+        {
+            PickedUpObject.Drop();
+            PickedUpObject = null;
+        }
+
+
         State = (STATE)reader.GetInt();
         Direction = reader.GetVector3();
         CurrentVelocity = reader.GetVector2();
@@ -780,32 +785,15 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
-            PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupablea)
-            {
-                Debug.LogError("Why Denny!?");
-            }
-
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {
-                    // Change pick-up text ON screen
-                    //if (pickupablea.gameObject.Name == "Vindaloo")
-                    //{
-                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Vindaloo", "Throw to Explode");
-                    //    FadeText = FadePickupText();
-                    //    StartCoroutine(FadeText); 
-                    //}
-                    //else if (pickupablea.gameObject.Name == "ThomasTrain")
-                    //{
-                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the Train");
-                    //}
-
                     TakeOwnership(pickupable.gameObject);
-                    SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
+                    //SendRPC("RPCPickup", pickupable.ID);
+
                 }
             }
         }
@@ -824,7 +812,7 @@ public class ChadControls : NetworkComponent
                 Debug.Log(CurrentVelocity.Length());
                 if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
                 {
-                    Debug.Log("Trying to tackle player on same team, you baka.");
+                    //Debug.Log("Trying to tackle player on same team, you baka.");
                 }
                 else if (otherChad.CanBeTackled && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
                 {

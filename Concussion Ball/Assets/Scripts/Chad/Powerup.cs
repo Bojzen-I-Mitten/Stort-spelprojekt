@@ -89,7 +89,7 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (PickupCollider.enabled == false)
+            if (PickupCollider.enabled == false && m_rigidBody.enabled)
             {
                 if (!activated)
                 {
@@ -133,8 +133,6 @@ public class Powerup : PickupableObject
             OnActivate();
         }
         activated = newActivation;
-        
-
 
     }
 
@@ -166,6 +164,7 @@ public class Powerup : PickupableObject
     public override void Reset()
     {
         base.Reset();
+        spawner = null;
         m_rigidBody.enabled = false;
         activated = false;
     }

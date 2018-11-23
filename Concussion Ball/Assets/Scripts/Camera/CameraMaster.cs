@@ -37,6 +37,7 @@ public class CameraMaster : ScriptComponent
         instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
+        //BG = Canvas.Add(Background);
     }
 
 
@@ -56,7 +57,7 @@ public class CameraMaster : ScriptComponent
     public override void Start()
     {
         State = CAM_STATE.MAIN_MENU;
-        //BG = Canvas.Add(Background);
+        
         //BG.interactable = true;
 
         if (Camera == null)

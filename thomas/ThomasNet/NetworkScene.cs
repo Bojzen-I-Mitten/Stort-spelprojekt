@@ -39,10 +39,8 @@ namespace ThomasEngine.Network
             NetworkIdentity identity = NetworkObjects.ContainsKey(networkID) ? NetworkObjects[networkID] : null;
             if (identity)
             {
-                if (identity.gameObject.GetActive() || initialState)
-                {
-                    identity.ReadData(reader, initialState);
-                }
+                identity.ReadData(reader, initialState);
+                
             }else
             {
                 Debug.LogError("network ID: " + networkID + " does not exist in scene");
