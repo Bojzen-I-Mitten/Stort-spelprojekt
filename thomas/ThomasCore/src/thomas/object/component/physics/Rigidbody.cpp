@@ -277,7 +277,7 @@ namespace thomas
 				m_rollingFriction = friction;
 			}
 
-			void Rigidbody::SetPosition(math::Vector3 position, bool forcePosition)
+			void Rigidbody::SetPosition(math::Vector3 position)
 			{
 				btTransform trans = getCenterOfMassTransform();
 				trans.setOrigin(Physics::ToBullet(position));
@@ -286,7 +286,7 @@ namespace thomas
 
 			}
 
-			void Rigidbody::SetRotation(math::Quaternion rotation, bool forceRotation)
+			void Rigidbody::SetRotation(math::Quaternion rotation)
 			{
 
 				btTransform trans = getCenterOfMassTransform();
