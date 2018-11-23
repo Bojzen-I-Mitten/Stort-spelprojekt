@@ -55,6 +55,7 @@ namespace ThomasEngine
 				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
 				g->TryReleaseComponentLock();
 				DeleteInstant(g);
+				objects->RemoveAt(i);
 			}
 		}
 	}
@@ -73,9 +74,10 @@ namespace ThomasEngine
 			{
 				// Need to remove failed object?!..
 				Debug::LogException(e);
-				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
+				Debug::LogError("Enable on object failed: " + (g != nullptr ? g->Name : "NULL"));
 				g->TryReleaseComponentLock();
 				DeleteInstant(g);
+				objects->RemoveAt(i);
 			}
 		}
 	}
@@ -122,11 +124,13 @@ namespace ThomasEngine
 	}
 	void Scene::DeleteInstant(GameObject ^ object)
 	{
-		m_gameObjects->Remove(object);
+		if (!m_gameObjects->Remove(object))
+		{
+			Debug::LogWarning("Instant delete failed remove on: " + (object == nullptr ? "NULL" : object->Name));
+		}
 		try
 		{
 			object->OnDestroy();
-
 		}
 		catch (Exception^e)
 		{
