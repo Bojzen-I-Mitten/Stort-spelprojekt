@@ -260,6 +260,7 @@ public class MatchSystem : NetworkManager
     }
     public void RPCEndMatch()
     {
+        hasScored = true;
         if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
         {
             GoldenGoal = true;
