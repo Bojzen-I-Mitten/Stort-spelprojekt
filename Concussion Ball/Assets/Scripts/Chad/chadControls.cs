@@ -326,7 +326,8 @@ public class ChadControls : NetworkComponent
         {
             Ragdolling = StartRagdoll(duration, param);
             StartCoroutine(Ragdolling);
-            Camera.InitFreeLookCamera();
+            if(isOwner)
+                Camera.InitFreeLookCamera();
         }
     }
     #endregion
