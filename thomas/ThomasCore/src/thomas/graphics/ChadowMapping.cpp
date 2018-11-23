@@ -32,7 +32,7 @@ namespace thomas
 		ShadowMap::ShadowMap()
 		{
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-20, 20, -20, 20, -10, 40);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-50, 50, -50, 50, -10, 60);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 			m_matrixVP = m_matrixView * m_matrixProj;
 			m_depthStencilView = nullptr;
 		}
@@ -70,9 +70,9 @@ namespace thomas
 				}*/
 				//frustumCenter /= 8;
 				
-				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 10.0f;
+				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 40.0f;
 				//const float nearClipOffset = 20.0f;
-				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward() * 10.0f, frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward() * 20.0f, frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 			
 				//for (unsigned i = 0; i < 8; ++i)
 					//corners[i] = math::Vector3::Transform(corners[i], m_matrixView);

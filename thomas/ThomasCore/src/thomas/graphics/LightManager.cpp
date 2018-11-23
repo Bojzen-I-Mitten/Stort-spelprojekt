@@ -38,7 +38,7 @@ namespace thomas
 			s_lightCounts.nrOfAreaLights = 0;
 
 
-			s_shadowMapSize = 512;
+			s_shadowMapSize = 1024;
 			s_shadowMapTextures = new resource::Texture2DArray(s_shadowMapSize, s_shadowMapSize, DXGI_FORMAT_R32_TYPELESS, s_nrOfShadowMapsSupported, true);
 
 
@@ -114,6 +114,7 @@ namespace thomas
 						break;
 					}
 					
+					*it._Ptr = nullptr;
 					s_lights.erase(it);
 					
 					return true;
@@ -139,24 +140,28 @@ namespace thomas
 		{
 			for (object::component::LightComponent* l : s_lights)
 			{
-				if (l->CastsShadows())
+				if (l)
 				{
-					if (l->GetType() != LIGHT_TYPES::DIRECTIONAL)//right now only works for dir lights
-						return;
 
-
-					l->UpdateShadowBox(camera);
-					l->BindShadowMapDepthTexture();
-
-
-					for (auto & perMaterialQueue : renderQueue.m_commands3D)
+					if (l->CastsShadows())
 					{
+						if (l->GetType() != LIGHT_TYPES::DIRECTIONAL)//right now only works for dir lights
+							return;
 
-						for (auto & perMeshCommand : perMaterialQueue.second)
+
+						l->UpdateShadowBox(camera);
+						l->BindShadowMapDepthTexture();
+
+
+						for (auto & perMaterialQueue : renderQueue.m_commands3D)
 						{
-							{
 
-								l->DrawShadow(perMeshCommand);
+							for (auto & perMeshCommand : perMaterialQueue.second)
+							{
+								{
+
+									l->DrawShadow(perMeshCommand);
+								}
 							}
 						}
 					}
