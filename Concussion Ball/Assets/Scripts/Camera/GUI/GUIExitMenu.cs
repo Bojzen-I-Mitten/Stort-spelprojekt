@@ -31,31 +31,29 @@ public class GUIExitMenu : ScriptComponent
 
     public override void Update()
     {
-        if (Canvas.isRendering)
-        {
-            if (ExitGame.Hovered())
-                ExitGame.color = Color.Red;
-            else
-                ExitGame.color = Color.Black;
+        if (ExitGame.Hovered())
+            ExitGame.color = Color.Red;
+        else
+            ExitGame.color = Color.Black;
 
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            if (ExitGame.Clicked())
             {
-                if (ExitGame.Clicked())
+                Debug.Log("I'm exciting! :^)");
+                if (ThomasWrapper.IsPlaying())
                 {
-                    Debug.Log("I'm exciting! :^)");
-                    if (ThomasWrapper.IsPlaying())
-                    {
-                        Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-                        CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
-                        ThomasWrapper.IssueRestart();
-                        //if (ThomasWrapper.IsPlaying())
-                        //{
-                        //    Debug.Log("Finished reloading to main menu.");
-                        //    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-                        //}
-                    }       
-                }
+                    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                    CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
+                    ThomasWrapper.IssueRestart();
+                    //if (ThomasWrapper.IsPlaying())
+                    //{
+                    //    Debug.Log("Finished reloading to main menu.");
+                    //    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+                    //}
+                }       
             }
         }
+        
     }
 }
