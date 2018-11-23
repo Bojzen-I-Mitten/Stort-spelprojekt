@@ -39,7 +39,7 @@ namespace thomas
 
 		ShadowMap::~ShadowMap()
 		{
-			SAFE_RELEASE(m_depthStencilView);
+
 		}
 
 		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)

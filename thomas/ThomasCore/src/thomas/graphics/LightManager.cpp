@@ -63,7 +63,13 @@ namespace thomas
 		
 		void LightManager::Destroy()
 		{
+			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
+			{
+				SAFE_RELEASE(s_shadowMapViews[i]);
+			}
+			//delete s_shadowMapTextures;
 			SAFE_RELEASE(s_lightBuffer);
+			s_lights.clear();
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{

@@ -94,7 +94,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         lightDir = lights[i].direction; //should be normalized already
         
         float shadowFactor = 1.0;
-        float shadowMapIndex = lights[i].shadowMapIndex + 0.5;
+        float shadowMapIndex = lights[i].shadowMapIndex + 0.1;
         if (shadowMapIndex > 0)
         {
             float shadowHardnessFactor = lights[i].shadowHardness / (float) poissonDiskSize;
