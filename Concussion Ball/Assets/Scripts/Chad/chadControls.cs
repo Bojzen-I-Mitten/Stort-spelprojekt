@@ -94,7 +94,7 @@ public class ChadControls : NetworkComponent
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
-    IEnumerator FadeText = null;
+    //IEnumerator FadeText = null;
 
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }

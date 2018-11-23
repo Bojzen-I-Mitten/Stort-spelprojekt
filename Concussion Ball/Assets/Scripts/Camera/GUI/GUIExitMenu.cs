@@ -6,10 +6,10 @@ public class GUIExitMenu : ScriptComponent
 
     Camera Camera;
     public Canvas Canvas;
-    Text ExitMatch;
+    //Text ExitMatch;
     Text ExitGame;
 
-    private readonly string _exitMatch = "Exit Match";
+    //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
     public override void OnAwake()
@@ -36,31 +36,24 @@ public class GUIExitMenu : ScriptComponent
 
     public override void Update()
     {
-        if (Canvas.isRendering)
+        //if (ExitMatch.Hovered())
+        //    ExitMatch.color = Color.Blue;
+        //else
+        //    ExitMatch.color = Color.Black;
+
+        if (ExitGame.Hovered())
+            ExitGame.color = Color.Red;
+        else
+            ExitGame.color = Color.Black;
+        //if (ExitMatch.Clicked())
+        //{
+        //    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+        //    CameraMaster.instance.Canvas.isRendering = true;
+        //}
+        if (ExitGame.Clicked())
         {
-            //if (ExitMatch.Hovered())
-            //    ExitMatch.color = Color.Blue;
-            //else
-            //    ExitMatch.color = Color.Black;
-
-            if (ExitGame.Hovered())
-                ExitGame.color = Color.Red;
-            else
-                ExitGame.color = Color.Black;
-
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-            {
-                //if (ExitMatch.Clicked())
-                //{
-                //    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-                //    CameraMaster.instance.Canvas.isRendering = true;
-                //}
-                if (ExitGame.Clicked())
-                {
-                    Debug.Log("I'm exiting!");
-                    ThomasWrapper.Exit();
-                }
-            }
+            Debug.Log("I'm exiting!");
+            ThomasWrapper.Exit();
         }
     }
 }

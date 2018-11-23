@@ -43,102 +43,102 @@ public class GUISelectTeam : ScriptComponent
         if (ChadTeam1 != null)
         {
             ChadRSC1 = ChadTeam1.GetComponent<RenderSkinnedComponent>();
-            Chad1Mat = (ChadTeam1.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+            Chad1Mat = ChadRSC1.material = new Material(ChadRSC1.material);
         }
         if (ChadTeam2 != null)
         {
             ChadRSC2 = ChadTeam2.GetComponent<RenderSkinnedComponent>();
-            Chad2Mat = (ChadTeam2.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+            Chad2Mat = ChadRSC2.material = new Material(ChadRSC2.material);
         }
-        
+
 
     }
 
     public override void Update()
     {
-        if (Canvas.isRendering)
+        Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
+        Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
+        Chad1Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
+        Chad2Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
+
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
-            Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
-            Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
-
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+            if (Team1Image.Clicked())
             {
-                if (Team1Image.Clicked())
-                {
-                    MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
-                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
-                    CameraMaster.instance.Canvas.isRendering = false;
-                    gameObject.GetComponent<SpectatorCam>().enabled = true;
-                }
-                else if (Team2Image.Clicked())
-                {
-                    MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
-                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
-                    CameraMaster.instance.Canvas.isRendering = false;
-                    gameObject.GetComponent<SpectatorCam>().enabled = true;
-                }
-                else if (SpectatorImage.Clicked())
-                {
-                    MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
-                    CameraMaster.instance.Canvas.isRendering = false;
-                    gameObject.GetComponent<SpectatorCam>().enabled = true;
-                }
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
-
-            Team1Text.color = Unselected;
-            Team2Text.color = Unselected;
-            SpectatorText.color = Unselected;
-
-            if (Team1Image.Hovered())
+            else if (Team2Image.Clicked())
             {
-                Team1Text.color = Selected;
-                if (RunningAnim != null)
-                {
-                    if (ChadRSC1.animation != RunningAnim)
-                    {
-                        ChadRSC1.animation = RunningAnim;
-                        ChadRSC2.animation = IdleAnim;
-                    }
-                }
-
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
-            else if (Team2Image.Hovered())
+            else if (SpectatorImage.Clicked())
             {
-                Team2Text.color = Selected;
-                if (RunningAnim != null)
-                {
-                    if (ChadRSC2.animation != RunningAnim)
-                    {
-                        ChadRSC1.animation = IdleAnim;
-                        ChadRSC2.animation = RunningAnim;
-                    }
-                }
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
             }
-            else if (SpectatorImage.Hovered())
-            {
-                SpectatorText.color = Selected;
-                IdleChads();
-            }
-            else
-            {
-                IdleChads();
-            }
-
-            if (TextFont != null)
-            {
-                Select.font = TextFont;
-                Team1Text.font = TextFont;
-                Team2Text.font = TextFont;
-                SpectatorText.font = TextFont;
-            }
-
-            //Team1Image.position = SelectboxPos;
-            //Team1Image.scale = SelectboxScale;
         }
+
+        Team1Text.color = Unselected;
+        Team2Text.color = Unselected;
+        SpectatorText.color = Unselected;
+
+        if (Team1Image.Hovered())
+        {
+            Team1Text.color = Selected;
+            if (RunningAnim != null)
+            {
+                if (ChadRSC1.animation != RunningAnim)
+                {
+                    ChadRSC1.animation = RunningAnim;
+                    ChadRSC2.animation = IdleAnim;
+                }
+            }
+
+        }
+        else if (Team2Image.Hovered())
+        {
+            Team2Text.color = Selected;
+            if (RunningAnim != null)
+            {
+                if (ChadRSC2.animation != RunningAnim)
+                {
+                    ChadRSC1.animation = IdleAnim;
+                    ChadRSC2.animation = RunningAnim;
+                }
+            }
+        }
+        else if (SpectatorImage.Hovered())
+        {
+            SpectatorText.color = Selected;
+            IdleChads();
+        }
+        else
+        {
+            IdleChads();
+        }
+
+        if (TextFont != null)
+        {
+            Select.font = TextFont;
+            Team1Text.font = TextFont;
+            Team2Text.font = TextFont;
+            SpectatorText.font = TextFont;
+        }
+
+        //Team1Image.position = SelectboxPos;
+        //Team1Image.scale = SelectboxScale;
+
     }
 
     public void AddImagesAndText()
