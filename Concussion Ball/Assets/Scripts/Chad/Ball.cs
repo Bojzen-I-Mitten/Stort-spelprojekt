@@ -197,20 +197,21 @@ public class Ball : PickupableObject
         emitterFire.Emit = true;
         emitterSmoke.Emit = true;
         //emitterElectricity1.Emit = true;
-        emitterElectricity2.Emit = true;
-        emitterElectricity3.Emit = true;
+        //emitterElectricity2.Emit = true;
+        //emitterElectricity3.Emit = true;
 
-        MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
-        MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
-        MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
+        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
+        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
+        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
 
         MultiplyWithIntensity(smokeIntensityThreshold, emitterSmoke);
+        MultiplyWithIntensity(2.0f, emitterFire);
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     override public void ChargeEffect()
     {
-        emitterElectricity1.Emit = true;
+        //emitterElectricity1.Emit = true;
         //emitterElectricity2.Emit = true;
         //emitterElectricity3.Emit = true;
 

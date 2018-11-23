@@ -152,7 +152,26 @@ public class ThomasTrain : Powerup
         m_rigidBody.UseGravity = false;
         transform.scale *= 8.0f;
     }
-   
+
+    public override void OnCollisionEnter(Collider collider)
+    {
+        //Check if colliding with a player
+        ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+        if (!otherChad)
+        {
+            base.OnCollisionEnter(collider);
+        }
+        else
+        {
+            ChadControls localChad = MatchSystem.instance.LocalChad;
+
+            TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+            TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
+
+            if (localChad && (otherPlayerTeam != playerTeam))
+                base.OnCollisionEnter(collider);
+        }
+    }
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
