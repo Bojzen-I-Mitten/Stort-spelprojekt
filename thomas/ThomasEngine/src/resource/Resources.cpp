@@ -348,34 +348,6 @@ namespace ThomasEngine
 		}
 #endif
 
-		GameObject ^ Resources::LoadPrefabResource(String^ path)
-		{
-			GameObject^ prefab;
-			Monitor::Enter(s_PREFAB_DICT);
-			if (s_PREFAB_DICT->TryGetValue(path, prefab))
-				return prefab;
-			Monitor::Exit(s_PREFAB_DICT);
-
-			prefab = CreatePrefab(path);
-			Monitor::Enter(s_PREFAB_DICT);
-			s_PREFAB_DICT[path] = prefab;
-			Monitor::Exit(s_PREFAB_DICT);
-			return prefab;
-		}
-#ifdef _EDITOR
-		IEnumerable<GameObject^>^ Resources::PrefabList::get()
-		{
-			auto l = gcnew List<GameObject^>(s_PREFAB_DICT->Count);
-			Monitor::Enter(s_PREFAB_DICT);
-			for each (auto var in s_PREFAB_DICT)
-			{
-				l->Add(var.Value);
-			}
-			Monitor::Exit(s_PREFAB_DICT);
-
-			return l;
-		}
-#endif
 		void Resources::AssetLoadWorker::LoadAsset(System::Object ^state)
 		{
 			try
@@ -468,25 +440,6 @@ namespace ThomasEngine
 				}
 			}
 
-
-			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
-					delete resource;
-				}
-			}
-
-			void recursivePrefabDestruction(GameObject^ obj)
-			{
-				if (obj == nullptr) return;
-				// Delete objects recursively
-				List<Transform^> list(obj->transform->children);	// List is edited during destruction
-				for each(Transform^ o in list)
-					recursivePrefabDestruction(o->m_gameObject);
-				//obj->OnDestroy();
-				delete obj;
-			}
 
 			void Resources::Unload(Resource^ resource) {
 				if (Find(resource->m_path))
