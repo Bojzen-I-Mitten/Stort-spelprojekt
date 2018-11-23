@@ -74,10 +74,22 @@ public class ChadCam : ScriptComponent
                         else
                             ReverseCamera();
                     }
+                    else
+                    {
+                        ResetCamera();
+                        transform.rotation = Chad.transform.rotation;
+                        transform.position = ChadHead + CameraOffset * -transform.forward;
+                    }
                     break;
                 case ChadControls.STATE.THROWING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                         ThrowingCamera();
+                    else
+                    {
+                        ResetCamera();
+                        transform.rotation = Chad.transform.rotation;
+                        transform.position = ChadHead + CameraOffset * -transform.forward;
+                    }
                     break;
                 case ChadControls.STATE.RAGDOLL:
                     {
