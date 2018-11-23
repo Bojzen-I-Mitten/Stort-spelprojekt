@@ -201,9 +201,6 @@ public class GUIPlayerScore : ScriptComponent
         TeamAmountOfPlayersText.scale = Vector2.Zero;
         TeamAmountOfPlayersText.origin = new Vector2(-3.5f, -2.65f);
 
- //       GetingrealvaluesPlayerstandbarteam1.Add(Canvas.Add(PlayerBarTeam1));
-//        GetingrealvaluesPlayerstandbarteam1.Add(Canvas.Add(PlayerBarTeam1));
-
         PlayerStandardbar[0] = Canvas.Add(PlayerBarTeam1);
         PlayerStandardbar[1] = Canvas.Add(PlayerBarTeam2);
         TeamName[0] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
@@ -226,12 +223,13 @@ public class GUIPlayerScore : ScriptComponent
         PlayerStandardbar[1].position = new Vector2(0.5f, 0.316f + (-1 * 0.063f)); 
 
 
-        TeamName[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
-        TeamName[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
+   //     TeamName[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
+   //     TeamName[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
 
-        TeamName[0].position = new Vector2(0.1f, 0.19f);
-        TeamName[1].position = new Vector2(0.65f, 0.19f);
-
+        TeamName[0].position = new Vector2(0.11f, 0.192f);
+        TeamName[0].origin = Vector2.Zero;
+        TeamName[1].position = new Vector2(0.885f, 0.192f);
+        TeamName[1].origin = new Vector2(1, 0);
 
         testtext = Canvas.Add(Textdata);
         testtext.scale = new Vector2(1.5f, 1.5f);

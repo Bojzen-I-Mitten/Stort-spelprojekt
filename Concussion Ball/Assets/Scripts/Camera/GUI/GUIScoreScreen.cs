@@ -10,6 +10,9 @@ public class GUIScoreScreen : ScriptComponent
     public static GUIScoreScreen Instance = null;
     Camera cam;
     Canvas Canvas;
+    Text Lobby;
+    Text Playagain;
+    Text MainMenu;
     public bool ToggleBool = true;
     public override void Awake()
     {
@@ -24,8 +27,12 @@ public class GUIScoreScreen : ScriptComponent
     }
     public override void Start()
     {
-       
+        Canvas = gameObject.GetComponent<Camera>().AddCanvas();
         ToggleBool = true;
+        Lobby = Canvas.Add("LOBBY");
+        Lobby.font = GUIPlayerScore.Instance.Font;
+        Lobby.scale = Vector2.Zero;
+        Lobby.position = new Vector2(0.2f, 0.04f);
     }
     public override void Update()
     {
@@ -39,9 +46,16 @@ public class GUIScoreScreen : ScriptComponent
     {
         ToggleBool = OnOff;
         GUIPlayerScore.Instance.lastupdate();
-
         if (!OnOff)
-        GUIPlayerScore.Instance.Toggle = false;
+        { 
+            GUIPlayerScore.Instance.Toggle = false;
+            Lobby.scale = Vector2.Zero;
+        }
+        else
+        {
+            Lobby.scale = new Vector2(1.5f, 1.5f);
+        }
+
     }
     public bool getToggleBool()
     {
