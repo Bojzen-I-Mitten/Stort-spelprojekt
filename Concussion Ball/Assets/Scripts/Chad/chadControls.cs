@@ -786,7 +786,7 @@ public class ChadControls : NetworkComponent
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null)
+            if (pickupable && pickupable.gameObject.activeSelf && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {

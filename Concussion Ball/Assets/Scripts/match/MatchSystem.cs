@@ -334,11 +334,11 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerJoin(NetPeer peer)
     {
-        if(peer == LocalPeer)
-        {
-            NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-            np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
-        }
+        //if(peer == LocalPeer)
+        //{
+        //    NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
+        //    np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+        //}
         if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
         {
             SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,

@@ -102,11 +102,10 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
-        if(PickupCollider.enabled == false)
-        {
-            RPCDrop();
-            SendRPC("RPCDrop");
-        }
+
+        RPCDrop();
+        SendRPC("RPCDrop");
+        
 
     }
 
@@ -117,22 +116,21 @@ public class PickupableObject : NetworkComponent
 
     public void RPCDrop()
     { 
-        if(PickupCollider.enabled == false)
+
+        m_rigidBody.enabled = true;
+
+        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+
+        transform.SetParent(null, true);
+        if (_Chad)
         {
-            m_rigidBody.enabled = true;
-
-            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-
-            transform.SetParent(null, true);
-            if (_Chad)
-            {
-                _Chad.PickedUpObject = null;
-                _Chad = null;
-            }
-            OnDrop();
-            StopEmitting();
-            Cleanup();
+            _Chad.PickedUpObject = null;
+            _Chad = null;
         }
+        OnDrop();
+        StopEmitting();
+        Cleanup();
+        
 
         
     }

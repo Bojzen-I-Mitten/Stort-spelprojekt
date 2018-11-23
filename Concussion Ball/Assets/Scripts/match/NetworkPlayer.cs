@@ -7,7 +7,7 @@ using System.Collections;
 
 public class NetworkPlayer : NetworkComponent
 {
-    public String PlayerName;
+    public String PlayerName = "";
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
@@ -87,10 +87,8 @@ public class NetworkPlayer : NetworkComponent
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if(initialState)
-        {
-            writer.Put(PlayerName);
-        }
+
+        writer.Put(PlayerName);
 
         if (Team != null)
             writer.Put((int)Team.TeamType);
@@ -102,10 +100,8 @@ public class NetworkPlayer : NetworkComponent
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 
-        if(initialState)
-        {
-            PlayerName = reader.GetString();
-        }
+        PlayerName = reader.GetString();
+        
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
