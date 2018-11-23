@@ -115,7 +115,7 @@ namespace thomas {
 				else
 				{
 					resource::Shader* ptr = shader.release();
-					m_waitingList_Add.push_back(ptr);
+					add(ptr);
 					return ptr;
 				}
 			}
@@ -139,7 +139,7 @@ namespace thomas {
 				else
 				{
 					resource::ComputeShader* ptr = shader.release();
-					m_waitingList_Add.push_back(ptr);
+					add(ptr);
 					return ptr;
 				}
 			}
