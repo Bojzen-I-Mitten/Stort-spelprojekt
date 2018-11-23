@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-#define L_FOR_RAGDOLL
+//#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
@@ -188,39 +188,40 @@ public class ChadControls : NetworkComponent
         //        FadeText = null;
         //    }
         //}
-
-        if (isOwner)
+        if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
         {
-            DivingTimer += Time.DeltaTime;
-            JumpingTimer += Time.DeltaTime;
-
-            Direction = new Vector3(0, 0, 0);
-            if (State != STATE.RAGDOLL)
+            if (isOwner)
             {
-                HandleKeyboardInput();
-                HandleMouseInput();
-                AirHandling();
+                DivingTimer += Time.DeltaTime;
+                JumpingTimer += Time.DeltaTime;
 
-                //Accelerate fake gravity as it felt too low, playtest
-                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
-                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
+                Direction = new Vector3(0, 0, 0);
+                if (State != STATE.RAGDOLL)
+                {
+                    HandleKeyboardInput();
+                    HandleMouseInput();
+                    AirHandling();
+
+                    //Accelerate fake gravity as it felt too low, playtest
+                    if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
+                        rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y - 2, rBody.LinearVelocity.z), rBody.Rotation);
+                }
+                StateMachine();
             }
-            StateMachine();
-        }
 
-        /* Enter leave ragdoll state
-         */ 
-        if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
-            EnableRagdoll();
-        else if (State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
-        {
-            // Wait N frames before disabling ragdoll
-            if (isOwner || frameRagdollDisableTick-- == 0)
+            /* Enter leave ragdoll state
+             */
+            if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
+                EnableRagdoll();
+            else if (State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
             {
-                DisableRagdoll();
-                frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
+                // Wait N frames before disabling ragdoll
+                if (isOwner || frameRagdollDisableTick-- == 0)
+                {
+                    DisableRagdoll();
+                    frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
+                }
             }
-        }
 #if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {
@@ -228,12 +229,13 @@ public class ChadControls : NetworkComponent
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
 #endif
-        if (Input.GetKeyDown(Input.Keys.K))
-            NetPlayer.Reset();
+            if (Input.GetKeyDown(Input.Keys.K))
+                NetPlayer.Reset();
 
-        rBody.Friction = 0.5f;
-        if (!OnGround())
-            rBody.Friction = 0.0f;
+            rBody.Friction = 0.5f;
+            if (!OnGround())
+                rBody.Friction = 0.0f;
+        }
     }
 
     #region Ragdoll handling
@@ -257,6 +259,7 @@ public class ChadControls : NetworkComponent
         rBody.enabled = false;
         CanBeTackled = false;
         Ragdoll.EnableRagdoll();
+
     }
 
     private void DisableRagdoll()
