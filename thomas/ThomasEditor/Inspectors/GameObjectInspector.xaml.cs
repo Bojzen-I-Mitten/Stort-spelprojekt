@@ -118,8 +118,9 @@ namespace ThomasEditor
 
             private void Components_CollectionChanged(object sender, GameObject.ComponentsChangedArgs e)
             {
-            
+                
                 this.Dispatcher.BeginInvoke((Action)(() => {
+                    componentItemList.Items.Refresh();// Refresh component list
                     if ((DataContext is GameObject) == false)
                     {
                         BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
