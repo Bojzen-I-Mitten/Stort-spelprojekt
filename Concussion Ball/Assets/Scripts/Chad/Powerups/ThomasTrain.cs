@@ -140,7 +140,6 @@ public class ThomasTrain : Powerup
     public override void OnThrow()
     {
         soundComponentTravel.Play();
-        Debug.Log("throw");
     }
 
     // if this is a throwable power-up this function will be called
@@ -199,7 +198,6 @@ public class ThomasTrain : Powerup
 
 
                 float distForce = ExplosionRadius - distance;
-                Debug.Log("Vindaloo force: " + ExplosionForce);
                 Vector3 force = forceDir * ExplosionForce * distForce;
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 localChad.ActivateRagdoll(2.0f, param);

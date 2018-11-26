@@ -163,7 +163,6 @@ public class Vindaloo : Powerup
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
-        Debug.Log("Vindaloo 1");
         //Make sure powerups can only be activated once!
         if (activated)
             return;
@@ -175,20 +174,16 @@ public class Vindaloo : Powerup
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-        Debug.Log("Vindaloo 2");
         if (localChad && otherPlayerTeam != playerTeam)
         {
-            Debug.Log("Vindaloo 3");
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
             {
-                Debug.Log("Vindaloo 4");
                 Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.Normalize();
                 forceDir.y += 3.0f;
 
                 float distForce = ExplosionRadius - distance;
-                Debug.Log("Vindaloo force: " + ExplosionForce);
                 Vector3 force = forceDir * ExplosionForce * distForce;
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
