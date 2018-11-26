@@ -97,14 +97,22 @@ public class Chadimations : NetworkComponent
             Skin.setBlendTreeNode(BlendNodes[State]);
             for (uint i = 0; i < Animations[State].Count; i++)
             {
+                AnimationNode node = Animations[State][(int)i];
                 if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
                 {
-                    AnimationNode node = Animations[State][(int)i];
                     WeightHandles[State].setWeight(i, node.GetWeight(Direction));
                     node.Node.getTimeHandle().SetSpeed(1);
                 }
-                else if (!_Throwing && i == 1) // shouldn't be needed, but it is, rewrite
+                else if (!_Throwing && i == 0)
+                {
                     WeightHandles[State].setWeight(i, 0);
+                    node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
+                }
+                else if (!_Throwing && i == 1)
+                {
+                    WeightHandles[State].setWeight(i, 0);
+                    node.Node.getTimeHandle().SetSpeed(2);
+                }
             }
         }
     }
@@ -121,7 +129,7 @@ public class Chadimations : NetworkComponent
 
         if (BlendNodes.ContainsKey(State))
             BlendNodes[State].ResetPlayback();
-
+        
         // Debug.Log("Manually setting weight of animation numer: " + index + " to: "+ weight);
         if(WeightHandles.ContainsKey(State))
             WeightHandles[State].setWeight(index, weight);
