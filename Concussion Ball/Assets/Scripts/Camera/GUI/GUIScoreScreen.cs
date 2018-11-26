@@ -10,6 +10,7 @@ public class GUIScoreScreen : ScriptComponent
     public static GUIScoreScreen Instance = null;
     Camera cam;
     Canvas Canvas;
+    public int ScoreScreenTimeLast { get; set; } = 10;
     List<Text> Textdatalist = new List<Text>();
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
@@ -48,7 +49,6 @@ public class GUIScoreScreen : ScriptComponent
     }
     public override void Update()
     {
-
         foreach (Text Textdata in Textdatalist)
         { 
                 if (Textdata.Hovered())
@@ -58,6 +58,28 @@ public class GUIScoreScreen : ScriptComponent
             else
                 Textdata.color = Unselected;
         }
+
+
+        if (Textdatalist[0].Clicked())//Lobby
+        {
+
+        }
+        if (Textdatalist[1].Clicked())//Play again
+        {
+            foreach (Text Textdata in Textdatalist)
+                Textdata.scale = Vector2.Zero;
+            Debug.Log("button was pressed");
+            ToggleBool = true;
+
+        }
+        if (Textdatalist[2].Clicked()) // Main Menu
+        {
+
+        }
+
+        if (MatchSystem.instance.PlayAgain != null)
+            Textdatalist[1].text = "Play again : ";//+MatchSystem.instance.PlayAgain.timeLeft;
+
     }
     public void DisplayBar(Vector2 OnOff)
     {
@@ -80,22 +102,10 @@ public class GUIScoreScreen : ScriptComponent
                 Textdata.scale = Vector2.Zero;
         }
 
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            if(Textdatalist[0].Clicked())//Lobby
-            {
-
-            }
-            if (Textdatalist[1].Clicked())//Play again
-            {
-                foreach (Text Textdata in Textdatalist)
-                    Textdata.scale = Vector2.Zero;
-            }
-            if (Textdatalist[2].Clicked()) // Main Menu
-            {
-
-            }
-        }
+        
+  
+        
+        
 
     }
     public bool getToggleBool()

@@ -24,7 +24,7 @@ public class MatchSystem : NetworkManager
     public ChadControls LocalChad;
     public Camera Camera { get; set; }
     //public Camera spectatorCamera { get; set; }
-
+    public WaitForSecondsRealtime PlayAgain;//toggle how long
 
     private SoundComponent countdownSound;
     private SoundComponent endroundSound;
@@ -71,6 +71,8 @@ public class MatchSystem : NetworkManager
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
     public bool Connected { get { return InternalManager.ConnectedPeerList.Count > 0; } }
+
+    public IEnumerator MatchEnd = null;
 
     public MatchSystem() : base()
     {
@@ -170,12 +172,22 @@ public class MatchSystem : NetworkManager
     #region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
-        GUIScoreScreen.Instance.Toggle(false);
+      
         Debug.Log("I have entered the matchendCoroutine");
         MatchStarted = false;
         ChadHud.Instance.OnMatchEnd(winningTeam, duration);
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
+
+        GUIScoreScreen.Instance.Toggle(false);
+        for(int i=0;i<GUIScoreScreen.Instance.ScoreScreenTimeLast;i++)
+        { 
+
+            PlayAgain = new WaitForSecondsRealtime(1);//toggle how long
+            yield return PlayAgain;
+            if (GUIScoreScreen.Instance.getToggleBool())
+                break;
+        }
         RPCStartMatch();
         GUIScoreScreen.Instance.Toggle(true);
         GUIPlayerScore.Instance.Toggle = false;
@@ -259,7 +271,8 @@ public class MatchSystem : NetworkManager
         else
         {
             Team winningTeam = Teams[TEAM_TYPE.TEAM_1].Score > Teams[TEAM_TYPE.TEAM_2].Score ? Teams[TEAM_TYPE.TEAM_1] : Teams[TEAM_TYPE.TEAM_2];
-            StartCoroutine(MatchEndCoroutine(winningTeam, 10.0f));
+            MatchEnd = MatchEndCoroutine(winningTeam, 10.0f);
+            StartCoroutine(MatchEnd);
         }
     }
 
