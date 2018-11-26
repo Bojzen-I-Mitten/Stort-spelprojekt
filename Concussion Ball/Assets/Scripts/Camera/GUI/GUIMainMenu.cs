@@ -26,12 +26,16 @@ public class GUIMainMenu : ScriptComponent
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
+    Vector3 MainMenuCamPos;
+    Vector3 MainMenuCamRot;
 
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();
         TakeName = false;
         AddImagesAndText();
+        MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
+        MainMenuCamRot = Vector3.Zero;
     }
 
     public override void Update()
@@ -151,6 +155,13 @@ public class GUIMainMenu : ScriptComponent
         }
 
         #endregion
+    }
+
+    public void SetUpScene()
+    {
+        transform.position = MainMenuCamPos;
+        transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
+
     }
 
     public void ClearImagesAndText()

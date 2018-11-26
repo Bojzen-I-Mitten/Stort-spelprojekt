@@ -7,8 +7,8 @@ public class GUISelectTeam : ScriptComponent
     public Texture2D SpectatorCamTexture { get; set; }
     public Font TextFont { get; set; }
 
-    public GameObject ChadTeam1 { get; set; }
-    public GameObject ChadTeam2 { get; set; }
+    //public GameObject ChadTeam1 { get; set; }
+    //public GameObject ChadTeam2 { get; set; }
 
     public Animation RunningAnim { get; set; }
     public Animation IdleAnim { get; set; }
@@ -35,23 +35,41 @@ public class GUISelectTeam : ScriptComponent
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
+    Vector3 SelectTeamCamPos;
+    Vector3 SelectTeamCamRot;
+    Vector3 Chad1Pos;
+    Vector3 Chad1Rot;
+    Vector3 Chad2Pos;
+    Vector3 Chad2Rot;
 
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
-        if (ChadTeam1 != null)
+        SelectTeamCamPos = new Vector3(0, -198.5f, 8.2f);
+        SelectTeamCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
+        Chad1Pos = new Vector3(1.7f, 0, 0);
+        Chad1Rot = new Vector3(45, 0, 0);
+        Chad2Pos = new Vector3(-1.7f, 0, 0);
+        Chad2Rot = new Vector3(-20, 0, 0);
+
+        if (CameraMaster.instance.ChadTeam1 != null)
         {
-            ChadRSC1 = ChadTeam1.GetComponent<RenderSkinnedComponent>();
+            ChadRSC1 = CameraMaster.instance.ChadTeam1.GetComponent<RenderSkinnedComponent>();
             Chad1Mat = ChadRSC1.material = new Material(ChadRSC1.material);
         }
-        if (ChadTeam2 != null)
+        if (CameraMaster.instance.ChadTeam2 != null)
         {
-            ChadRSC2 = ChadTeam2.GetComponent<RenderSkinnedComponent>();
+            ChadRSC2 = CameraMaster.instance.ChadTeam2.GetComponent<RenderSkinnedComponent>();
             Chad2Mat = ChadRSC2.material = new Material(ChadRSC2.material);
         }
 
 
+    }
+
+    public override void OnAwake()
+    {
+        Debug.Log("SelectTeamOnAwake");
     }
 
     public override void Update()
@@ -208,5 +226,21 @@ public class GUISelectTeam : ScriptComponent
             ChadRSC1.animation = IdleAnim;
             ChadRSC2.animation = IdleAnim;
         }
+    }
+
+    public void SetUpScene()
+    {
+        if (CameraMaster.instance.ChadTeam1 != null)
+        {
+            CameraMaster.instance.ChadTeam1.transform.localPosition = Chad1Pos;
+            CameraMaster.instance.ChadTeam1.transform.localRotation = Quaternion.CreateFromYawPitchRoll(Chad1Rot.x * MathHelper.Pi / 180, 0, 0);
+        }
+        if (CameraMaster.instance.ChadTeam2 != null)
+        {
+            CameraMaster.instance.ChadTeam2.transform.localPosition = Chad2Pos;
+            CameraMaster.instance.ChadTeam2.transform.localRotation = Quaternion.CreateFromYawPitchRoll(Chad2Rot.x * MathHelper.Pi / 180, 0, 0);
+        }
+        transform.position = SelectTeamCamPos;
+        transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
     }
 }

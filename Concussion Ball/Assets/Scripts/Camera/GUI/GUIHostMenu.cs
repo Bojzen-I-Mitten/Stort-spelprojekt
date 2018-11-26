@@ -109,11 +109,24 @@ public class GUIHostMenu : ScriptComponent
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
+    Vector3 HostMenuCamPos;
+    Vector3 HostMenuCamRot;
+    Vector3 Chad1Pos;
+    Vector3 Chad1Rot;
+    Vector3 Chad2Pos;
+    Vector3 Chad2Rot;
 
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
+
+        HostMenuCamPos = new Vector3(0, -198.108f, 8.208f);
+        HostMenuCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
+        Chad1Pos = new Vector3(0.866f, 0, 0.561f);
+        Chad1Rot = new Vector3(45, 0, 0);
+        Chad2Pos = new Vector3(-0.717f, 0, 0.554f);
+        Chad2Rot = new Vector3(-20, 0, 0);
 
         HostBtn = Canvas.Add("Host Game");
         HostBtn.color = Unselected;
@@ -749,5 +762,22 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 3);
             ScoreLimitString.text = str;
         }
+    }
+
+    public void SetUpScene()
+    {
+        if (CameraMaster.instance.ChadTeam1 != null)
+        {
+            CameraMaster.instance.ChadTeam1.transform.localPosition = Chad1Pos;
+            CameraMaster.instance.ChadTeam1.transform.localRotation = Quaternion.CreateFromYawPitchRoll(Chad1Rot.x * MathHelper.Pi / 180, 0, 0);
+        }
+        if (CameraMaster.instance.ChadTeam2 != null)
+        {
+            CameraMaster.instance.ChadTeam2.transform.localPosition = Chad2Pos;
+            CameraMaster.instance.ChadTeam2.transform.localRotation = Quaternion.CreateFromYawPitchRoll(Chad2Rot.x * MathHelper.Pi / 180, 0, 0);
+        }
+        transform.position = HostMenuCamPos;
+        transform.rotation = Quaternion.CreateFromYawPitchRoll(HostMenuCamRot.x, HostMenuCamRot.y, HostMenuCamRot.z);
+
     }
 }
