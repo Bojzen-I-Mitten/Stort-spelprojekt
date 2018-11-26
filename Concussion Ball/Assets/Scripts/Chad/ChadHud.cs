@@ -371,7 +371,12 @@ public class ChadHud : ScriptComponent
         int minutes = matchTimeLeft / 60;
         int seconds = matchTimeLeft % 60;
 
-        if (MatchSystem.instance.GoldenGoal)
+        if (MatchSystem.instance.ReplaySystem.Replaying)
+        {
+            Timer.text = "REPLAY";
+            Timer.color = Color.Red;
+        }
+        else if (MatchSystem.instance.GoldenGoal)
         {
             Timer.text = "GOLDEN GOAL";
             Timer.color = Color.Gold;
@@ -386,9 +391,8 @@ public class ChadHud : ScriptComponent
 
         BallIndicator();
 
-        if (MatchSystem.instance?.LocalChad?.PickedUpObject != null)
+        if (MatchSystem.instance?.LocalChad?.PickedUpObject != null && !MatchSystem.instance.ReplaySystem.Replaying)
         {
-
             ShowHeldObjectText(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
         }
         else

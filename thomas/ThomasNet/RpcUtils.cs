@@ -51,7 +51,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        static public object[] ReadRPCParameters(System.Reflection.MethodInfo methodInfo, NetPacketReader reader)
+        static public object[] ReadRPCParameters(System.Reflection.MethodInfo methodInfo, NetDataReader reader)
         {
             System.Reflection.ParameterInfo[] parameterInfos = methodInfo.GetParameters();
             object[] parameters = new object[parameterInfos.Length];

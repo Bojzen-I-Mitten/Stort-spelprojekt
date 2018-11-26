@@ -487,6 +487,7 @@ namespace ThomasEngine {
 		if (IssuedStateCommand)
 		{
 			Monitor::Enter(StateCommandProcessed);
+			
 			if (IssuedStateCommand == ThomasStateCommand::PlayIssued)
 			{
 				Play();

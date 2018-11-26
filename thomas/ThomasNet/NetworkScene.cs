@@ -13,7 +13,8 @@ namespace ThomasEngine.Network
         {
         }
         public int nextAssignableID = 0;
-        private List<GameObject> PlayerPool = new List<GameObject>();
+        private List<NetworkIdentity> PlayerPool = new List<NetworkIdentity>();
+        public List<NetworkIdentity> AllPlayers = new List<NetworkIdentity>();
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
         private List<NetworkIdentity> SceneObjectToBeActivated = new List<NetworkIdentity>();
@@ -25,6 +26,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity playerID = Players[peer];
                 bool initialState = reader.GetBool();
+                playerID.Ping = peer.Ping;
                 playerID.ReadData(reader, initialState);
             }
 
@@ -37,10 +39,8 @@ namespace ThomasEngine.Network
             NetworkIdentity identity = NetworkObjects.ContainsKey(networkID) ? NetworkObjects[networkID] : null;
             if (identity)
             {
-                if (identity.gameObject.GetActive() || initialState)
-                {
-                    identity.ReadData(reader, initialState);
-                }
+                identity.ReadData(reader, initialState);
+                
             }else
             {
                 Debug.LogError("network ID: " + networkID + " does not exist in scene");
@@ -53,26 +53,27 @@ namespace ThomasEngine.Network
             {
                 GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
                 player.SetActive(false);
-                
-                player.GetComponent<NetworkIdentity>().IsPlayer = true;
-                PlayerPool.Add(player);
+                NetworkIdentity identity = player.GetComponent<NetworkIdentity>();
+                identity.IsPlayer = true;
+                PlayerPool.Add(identity);
+                AllPlayers.Add(identity);
             }
         }
 
-        private GameObject GetAvailablePlayerFromPool()
-        {
+        private NetworkIdentity GetAvailablePlayerFromPool()
+        { 
             if(PlayerPool.Count > 0)
             {
-                GameObject player = PlayerPool[0];
+                NetworkIdentity player = PlayerPool[0];
                 PlayerPool.RemoveAt(0);
                 return player;
             }
             else
                 return null;
         }
-        private void RecyclePlayer(GameObject player)
+        private void RecyclePlayer(NetworkIdentity player)
         {
-            player.SetActive(false);
+            player.gameObject.SetActive(false);
             PlayerPool.Add(player);
         }
 
@@ -91,18 +92,19 @@ namespace ThomasEngine.Network
 
             ObjectOwners[peer] = new List<NetworkIdentity>();
 
-            GameObject player = GetAvailablePlayerFromPool();
+            NetworkIdentity player = GetAvailablePlayerFromPool();
             if(player)
             {
-                NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
                 // If spawned player is local character: Receive ownership  
-                networkIdentity.ReceiveOwnershipStatus(myPlayer);
-                String name = "Chad_" + networkIdentity.ID;
+                player.ReceiveOwnershipStatus(myPlayer);
+                String name = "Chad_";
                 if (myPlayer)
-                    player.Name = name + "_(my player)";
+                    name += "(my player)";
                 else
-                    player.Name = name;
-                Players[peer] = networkIdentity;
+                    name += peer.EndPoint.Address.ToString();
+
+                player.gameObject.Name = name;
+                Players[peer] = player;
             }
             else
             {
@@ -128,7 +130,7 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
-                    RecyclePlayer(id.gameObject);
+                    RecyclePlayer(id);
                 Players.Remove(peer);
             }
         }
