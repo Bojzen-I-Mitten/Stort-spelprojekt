@@ -42,8 +42,8 @@ namespace thomas
 				float GetMemoryUsage();
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
-				size_t GetVertexCount();
-				size_t GetFaceCount();
+				int GetVertexCount();
+				int GetFaceCount();
 
 			private:
 				int m_frameQuery;								
@@ -55,9 +55,9 @@ namespace thomas
 
 				float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
 
-			size_t m_totalVertexCount;
-			size_t m_totalFaceCount;
-			size_t m_drawCalls;
+			int m_totalVertexCount;
+			int m_totalFaceCount;
+			int m_drawCalls;
 			
 			float m_memoryUsage;
 			float m_totalMemory;

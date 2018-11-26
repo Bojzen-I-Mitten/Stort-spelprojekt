@@ -1,14 +1,15 @@
 #include "Shader.h"
-#include <AtlBase.h>
-#include <atlconv.h>
-#include <d3dcompiler.h>
 #include "ShaderProperty\shaderProperties.h"
-#include "../utils/Utility.h"
-#include <fstream>
-#include <comdef.h>
+#include "..\utils\Utility.h"
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
+#include "..\utils\GpuProfiler.h"
 
+#include <d3dcompiler.h>
+#include <AtlBase.h>
+#include <atlconv.h>
+#include <fstream>
+#include <comdef.h>
 namespace thomas
 {
 	namespace resource
@@ -250,7 +251,7 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 
@@ -266,15 +267,13 @@ namespace thomas
 		}
 		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
 		{
-			
 			thomas::utils::D3D::Instance()->GetDeviceContextDeffered()->Draw(vertexCount, startVertexLocation);
-			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount, 0);
 		}
 		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
 		{
-			
 			thomas::utils::D3D::Instance()->GetDeviceContextDeffered()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
-			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount);
+			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount, 0);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{

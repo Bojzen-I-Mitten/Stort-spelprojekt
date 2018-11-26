@@ -381,6 +381,8 @@ namespace thomas
 
 			m_multiThreaded->SetMultithreadProtected(false);
 
+			SAFE_RELEASE(m_dxgiAdapter);
+			SAFE_RELEASE(m_dxgiDevice);
 			SAFE_RELEASE(m_multiThreaded);
 
 			SAFE_RELEASE(m_deviceContextDeferred);
