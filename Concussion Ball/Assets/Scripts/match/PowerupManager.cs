@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
+using ThomasEngine.Script;
 
 public class PowerupManager : ScriptComponent
 {
@@ -11,9 +12,9 @@ public class PowerupManager : ScriptComponent
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
     public int NextPowerupID = 1000;
     public int PoolSize { get; set; } = 10;
-    public override void Awake()
+    public override void OnAwake()
     {
-        spawnPoints = Object.GetObjectsOfType<PowerupSpawner>();
+        spawnPoints = new List<PowerupSpawner>(ScriptUtility.GetComponentsOfType<PowerupSpawner>());
         initPowerupPool();
         //MatchSystem.instance.SpawnablePrefabs.AddRange(Powerups);
     }
@@ -26,7 +27,7 @@ public class PowerupManager : ScriptComponent
             for(int i=0; i < PoolSize; i++)
             {
                 GameObject powerup = GameObject.Instantiate(prefab);
-                powerup.activeSelf = false;
+                powerup.SetActive(false);
                 
                 pool.Add(powerup);
             }
@@ -53,7 +54,7 @@ public class PowerupManager : ScriptComponent
     {
         foreach(GameObject powerup in powerupPool[powerupIndex])
         {
-            if (!powerup.activeSelf)
+            if (!powerup.GetActive())
                 return powerup;
         }
         return null;
@@ -62,17 +63,16 @@ public class PowerupManager : ScriptComponent
     public void RecyclePowerup(Powerup powerup)
     {
         powerup.Disable();
-        powerup.gameObject.activeSelf = false;
+        powerup.gameObject.SetActive(false);
     }
 
     public void ResetPowerups()
     {
         Debug.Log("reset start");
-        List<Powerup> activePowerups = Object.GetObjectsOfType<Powerup>();
-        for (int i=0; i < activePowerups.Count; i++)
+        foreach (Powerup p in ScriptUtility.GetComponentsOfType<Powerup>())
         {
-            if(activePowerups[i].isOwner)
-                activePowerups[i].Remove();
+            if(p.isOwner)
+                p.Remove();
         }
         
 

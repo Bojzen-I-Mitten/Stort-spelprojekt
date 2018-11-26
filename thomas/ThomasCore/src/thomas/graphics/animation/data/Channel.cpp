@@ -72,10 +72,10 @@ namespace thomas {
 
 
 			unsigned int ObjectChannel::numKeys(unsigned int chInd) const {
-				return chInd < m_channels.size() ? m_channels[chInd].m_keys.size() : 0;
+				return chInd < (uint32_t)m_channels.size() ? (uint32_t)m_channels[chInd].m_keys.size() : 0;
 			}
 			unsigned int ObjectChannel::numNodeChannels() const {
-				return m_channels.size();
+				return (uint32_t)m_channels.size();
 			}
 
 			unsigned long ObjectChannel::getHash() const

@@ -6,9 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using ThomasEngine;
 using ThomasEngine.Network;
+using LiteNetLib.Utils;
+
 
 public class Ragdoll : ScriptComponent
 {
+
+
     public string Spine { get; set; } = "mixamorig:Spine";
     public string Hips { get; set; } = "mixamorig:Hips";
     public string Neck { get; set; } = "mixamorig:Neck";
@@ -35,7 +39,44 @@ public class Ragdoll : ScriptComponent
     public AudioClip ImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
-    enum BODYPART
+    /* Struct determining ragdol force parameters
+    */
+    public class ImpactParams : RPCWriteable
+    {
+        public Vector3 origin;      // Origin of the ragdoll impact
+        public Vector3 force;       // Force applied
+        public float forceFallof;   // Decay over distance for the impact force
+
+        public float[] bodyPartFactor;
+        private ImpactParams()
+        {
+            // For Read Construction only
+        }
+        public ImpactParams(Vector3 origin, Vector3 force, float forceFallof)
+        {
+            this.origin = origin;
+            this.force = force;
+            this.forceFallof = forceFallof;
+            this.bodyPartFactor = new float[(int)BODYPART.COUNT];
+            for (int i = 0; i < bodyPartFactor.Length; i++)
+                this.bodyPartFactor[i] = 1.0f;
+        }
+        public void Write(NetDataWriter writer)
+        {
+            writer.Put(origin);
+            writer.Put(force);
+            writer.Put(forceFallof);
+            writer.PutArray(bodyPartFactor);
+        }
+        public void Read(NetDataReader reader)
+        {
+            origin = reader.GetVector3();
+            force = reader.GetVector3();
+            forceFallof = reader.GetFloat();
+            bodyPartFactor = reader.GetFloatArray();
+        }
+    }
+    public enum BODYPART
     {
         HIPS,
         SPINE,
@@ -175,17 +216,21 @@ public class Ragdoll : ScriptComponent
     }
 
     #endregion
-    public void AddForce(Vector3 force, bool diveTackle)
+    public void AddForce(ImpactParams param)
     {
         for (int i = 0; i < (int)BODYPART.COUNT; i++)
         {
-            RB_BodyParts[i].AddForce(force * Mass_BodyParts[i], Rigidbody.ForceMode.Impulse);
+            Vector3 force = param.force * param.bodyPartFactor[i] * Mass_BodyParts[i];
+            // Linear fallof
+            float fallof = Math.Min(1, param.forceFallof * Vector3.Distance(RB_BodyParts[i].transform.position, param.origin));
+            force -= force * fallof;
+            RB_BodyParts[i].AddForce(force, Rigidbody.ForceMode.Impulse);
         }
-        if(diveTackle)
-        {
-            RB_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
-            RB_BodyParts[(int)BODYPART.LEFT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
-        }
+        //if (diveTackle)
+        //{
+        //    RB_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
+        //    RB_BodyParts[(int)BODYPART.LEFT_LOWER_LEG].AddForce(force * 0.3f, Rigidbody.ForceMode.Impulse);
+        //}
 
     }
     public float DistanceToWorld()
@@ -217,7 +262,7 @@ public class Ragdoll : ScriptComponent
         //enable all GameObjects
         foreach(GameObject gObj in  G_BodyParts)
         {
-            gObj.activeSelf = true;
+            gObj.SetActive(true);
         }
 
         RagdollEnabled = true;
@@ -225,7 +270,7 @@ public class Ragdoll : ScriptComponent
 
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
 
         Mass_BodyParts[(int)BODYPART.HIPS] = 0.15f;
@@ -694,15 +739,17 @@ public class Ragdoll : ScriptComponent
                 RagdollSound.Volume = ImpactSpine.Volume;
                 RagdollSound.Play();
             }
-                
+
             return;
         }
-
-        RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
-
-        for(int i = 0; i < (int)BODYPART.COUNT; i++)
+        else
         {
-            G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
+
+            for (int i = 0; i < (int)BODYPART.COUNT; i++)
+            {
+                G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            }
         }
     }
 
@@ -717,7 +764,7 @@ public class Ragdoll : ScriptComponent
         foreach(GameObject gObj in G_BodyParts)
         {
             if(gObj != null)
-                gObj.activeSelf = false;
+                gObj.SetActive(false);
         }
         RagdollEnabled = false;
 

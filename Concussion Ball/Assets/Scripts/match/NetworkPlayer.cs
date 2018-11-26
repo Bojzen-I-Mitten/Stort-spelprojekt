@@ -24,7 +24,7 @@ public class NetworkPlayer : NetworkComponent
     Ragdoll rag;
     Canvas nameCanvas;
     Text text;
-    public override void Awake()
+    public override void OnAwake()
     {
         rag = gameObject.GetComponent<Ragdoll>();
         rb = gameObject.GetComponent<Rigidbody>();

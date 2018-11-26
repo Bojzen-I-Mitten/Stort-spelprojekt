@@ -1,6 +1,9 @@
 #include "Utility.h"
 #include "Physics.h"
 #include "object/component/physics/Collider.h"
+#include "ThomasManaged.h"
+#include "Scene.h"
+#include "object/GameObject.h"
 #pragma unmanaged
 #include <thomas/object/component/physics/Collider.h>
 #include <thomas/Physics.h>
@@ -17,7 +20,8 @@ namespace ThomasEngine
 			hitInfo.normal = Utility::Convert(nativeHitInfo.normal);
 			hitInfo.point = Utility::Convert(nativeHitInfo.point);
 			hitInfo.distance = nativeHitInfo.distance;
-			Collider^ collider = (Collider^)ThomasEngine::Object::Find(Utility::Convert(nativeHitInfo.collider->m_guid));
+			GameObject^ obj = ThomasWrapper::CurrentScene->Find(nativeHitInfo.collider->m_gameObject);
+			Collider^ collider = obj->GetComponent<Collider^>(nativeHitInfo.collider);
 			hitInfo.collider = collider;
 			hitInfo.rigidbody = collider->attachedRigidbody;
 			hitInfo.transform = collider->transform;

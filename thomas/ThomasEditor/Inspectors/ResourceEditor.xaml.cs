@@ -22,7 +22,7 @@ namespace ThomasEditor.Inspectors
 
         private void ResourceEditor_Drop(object sender, DragEventArgs e)
         {
-
+            // Sets property during drop?
             if (e.Data.GetDataPresent(typeof(TreeViewItem)))
             {
                 TreeViewItem item = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
@@ -33,10 +33,9 @@ namespace ThomasEditor.Inspectors
                     PropertyItem pi = label.DataContext as PropertyItem;
                     if (resource.GetType() == pi.PropertyType)
                     {
-                        Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.ENTER_SYNC_STATELOCK();
                         pi.Value = resource;
-
-                        Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.EXIT_SYNC_STATELOCK();
                     }
 
                 }
@@ -47,10 +46,9 @@ namespace ThomasEditor.Inspectors
                     PropertyItem pi = label.DataContext as PropertyItem;
                     if (obj.GetType() == pi.PropertyType)
                     {
-                        Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.ENTER_SYNC_STATELOCK();
                         pi.Value = obj;
-
-                        Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.EXIT_SYNC_STATELOCK();
                     }
                     else if (obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                     {

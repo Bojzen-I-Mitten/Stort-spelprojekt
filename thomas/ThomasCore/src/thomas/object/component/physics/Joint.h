@@ -46,7 +46,7 @@ namespace thomas
 
 			public:
 				virtual void Update() override;
-				virtual void Awake() override;
+				virtual void OnAwake() override;
 				virtual void OnDisable() override;
 				virtual void OnEnable() override;
 

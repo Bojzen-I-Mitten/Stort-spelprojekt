@@ -65,7 +65,7 @@ public class PowerupSpawner : NetworkComponent
                 spawnedPowerup = MatchSystem.instance.PowerupManager.InstantiatePowerup();
                 if (spawnedPowerup)
                 {
-                    spawnedPowerup.activeSelf = true;
+                    spawnedPowerup.SetActive(true);
                     Powerup powerup = spawnedPowerup.GetComponent<Powerup>();
                     spawnedPowerup.GetComponent<NetworkIdentity>().Owner = true;
                     powerup.Reset();

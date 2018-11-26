@@ -11,6 +11,7 @@ namespace thomas
 	{
 		namespace component
 		{
+			/*
 			class Ragdoll : public Component
 			{
 
@@ -97,6 +98,8 @@ namespace thomas
 
 				
 			};
+
+			*/
 
 		}
 

@@ -75,7 +75,7 @@ namespace ThomasEngine.Network
             
         }
 
-        public override void Awake()
+        public override void OnAwake()
         {
             instance = this;
             NetScene = new NetworkScene();

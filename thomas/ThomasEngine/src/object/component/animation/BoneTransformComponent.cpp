@@ -36,6 +36,18 @@ namespace ThomasEngine
 		void BoneTransformComponent::AnimatedObject::set(GameObject^ value)
 		{
 			m_skeletonSrc = value;
+			RefreshAnimated();
+		}
+
+		void BoneTransformComponent::RefreshAnimated()
+		{
+			if (m_skeletonSrc) {
+				thomas::object::component::RenderSkinnedComponent* comp = m_skeletonSrc->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
+				if (comp == NULL)
+					Native->SetReference(NULL);
+				else
+					Native->SetReference(comp->GetBlendTree());
+			}
 		}
 
 
@@ -63,14 +75,8 @@ namespace ThomasEngine
 			}
 		}
 
-		void BoneTransformComponent::Awake()
+		void BoneTransformComponent::OnAwake()
 		{
-			if (m_skeletonSrc) {
-				thomas::object::component::RenderSkinnedComponent* comp = m_skeletonSrc->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
-				if (comp == NULL)
-					Native->SetReference(NULL);
-				else
-					Native->SetReference(comp->GetBlendTree());
-			}
+			RefreshAnimated();
 		}
 }

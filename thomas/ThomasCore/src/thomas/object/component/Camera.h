@@ -8,7 +8,7 @@
 namespace thomas
 {
 	namespace utils { struct Ray; }
-	namespace graphics { class SkyBox; namespace GUI { class Canvas; class GUIElement; }}
+	namespace graphics { class SkyBox; namespace GUI { class Canvas; struct GUIElement; }}
 	namespace resource { class TextureCube; }
 
 	namespace object
@@ -22,7 +22,7 @@ namespace thomas
 
 			public:
 				Camera();
-				Camera(bool dontAddTolist);
+				Camera(int target_display);
 				~Camera();
 
 				void OnEnable() override;

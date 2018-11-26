@@ -38,7 +38,7 @@ public class GUIJoinHost : ScriptComponent
     public bool GoToTeamSelect;
     IEnumerator test;
 
-    public override void Awake()
+    public override void OnAwake()
     {
     }
 

@@ -38,8 +38,10 @@ namespace ThomasEngine
 				void set(System::String^ value);
 			}
 
+			void RefreshAnimated();
+
 			void OnParentDestroy(GameObject^ relative) override;
-			void Awake() override;
+			void OnAwake() override;
 
 		private:
 			property thomas::object::component::BoneTransformComponent* Native

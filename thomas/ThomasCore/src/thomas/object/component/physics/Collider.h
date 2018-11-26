@@ -29,7 +29,7 @@ namespace thomas
 				virtual void SetTrigger(bool trigger);
 				void SetOnCollisionEvent(OnCollisionEvent value);
 				void OnCollision(Collider* otherCollider, Physics::COLLISION_TYPE collisionType);
-				void Awake();
+				void OnAwake();
 				void OnEnable();
 				void OnDisable();
 				void OnDestroy();

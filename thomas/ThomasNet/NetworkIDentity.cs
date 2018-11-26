@@ -17,13 +17,38 @@ namespace ThomasEngine.Network
         public int Ping = 0;
         private bool _Owner = false;
         public bool Owner {
-            set {if(value == true && IsPlayer == false) TakeOwnership();  _Owner = value; }
+            set
+            {
+                if (value && !IsPlayer) // IsPlayer, redundant? Players are activated through ReceiveOwnership.
+                    TakeOwnership();
+                else if (!value && _Owner)
+                    ReceiveOwnershipStatus(false);
+            }
             get { return (NetworkManager.instance && NetworkManager.instance.ReadOwnerAsNormal) ? false : _Owner; }
+        }
+        /* Sets Ownership Status of the identity, assumes ownership status is resolved and forcefully set.
+        */
+        public void ReceiveOwnershipStatus(bool ownership)
+        {
+            _Owner = ownership;
+            if (ownership)  // Trigger enabled
+            {
+                foreach (NetworkComponent nc in networkComponentsCache)
+                    nc.OnGotOwnership();
+            }
+            else        // Trigger disabled
+            {
+                foreach (NetworkComponent nc in networkComponentsCache)
+                    nc.OnLostOwnership();
+            }
         }
 
         public int ID {
             get {
-                return Manager?.NetScene != null ? Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key : 0; // One line master race.
+                if (Manager?.NetScene != null)
+                    return Manager.NetScene.NetworkObjects.FirstOrDefault(pair => pair.Value == this).Key;
+                else
+                    return 0; // One line master race.
             }
         } 
 
@@ -149,13 +174,15 @@ namespace ThomasEngine.Network
 
         private void TakeOwnership()
         {
-            if(Manager != null)
+            if (Manager != null)
+            {
                 if (!_Owner)
                 {
+                    // Broadcast ownership
                     Manager.TakeOwnership(this);
-                    _Owner = true;
+                    ReceiveOwnershipStatus(true);
                 }
-                    
+            }       
         }
     }
 }

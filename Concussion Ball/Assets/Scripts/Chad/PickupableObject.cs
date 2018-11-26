@@ -20,6 +20,8 @@ public class PickupableObject : NetworkComponent
     public float MaxThrowForce = 0;
     public float ThrowForce = 0;
 
+    public bool pickedUp = false;
+
     public Collider PickupCollider { get; set; }
     [Newtonsoft.Json.JsonIgnore]
     public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
@@ -27,7 +29,7 @@ public class PickupableObject : NetworkComponent
     public ChadControls _Chad;
     private RenderComponent m_renderComponent;
 
-    public override void Awake()
+    public override void OnAwake()
     {
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
@@ -36,7 +38,6 @@ public class PickupableObject : NetworkComponent
         if (!PickupCollider)
             Debug.LogError("Pickup collider empty");
 
-        Disable();
     }
 
     public override void Update()
@@ -115,24 +116,25 @@ public class PickupableObject : NetworkComponent
     }
 
     public void RPCDrop()
-    { 
-
-        m_rigidBody.enabled = true;
-
-        gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-
-        transform.SetParent(null, true);
-        if (_Chad)
+    {
+        if(pickedUp)
         {
-            _Chad.PickedUpObject = null;
-            _Chad = null;
-        }
-        OnDrop();
-        StopEmitting();
-        Cleanup();
-        
+            Debug.Log("Drop!");
+            m_rigidBody.enabled = true;
 
-        
+            gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
+
+            transform.SetParent(null, true);
+            if (_Chad)
+            {
+                _Chad.PickedUpObject = null;
+                _Chad = null;
+            }
+            OnDrop();
+            StopEmitting();
+            Cleanup();
+            pickedUp = false;
+        }
     }
 
     //Never call this method without also calling RPC.
@@ -153,6 +155,7 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Pickup(ChadControls chad, Transform hand)
     {
+
         SaveObjectOwner(chad);
         if (!m_rigidBody)
             m_rigidBody = gameObject.GetComponent<Rigidbody>();
@@ -174,11 +177,12 @@ public class PickupableObject : NetworkComponent
         _Chad = chad;
         PickupCollider.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
-        
+        pickedUp = true;
     }
 
    public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
+        writer.Put(pickedUp);
         writer.Put(PickupCollider.enabled);
         writer.Put(chargeTimeCurrent);
         return true;
@@ -189,9 +193,11 @@ public class PickupableObject : NetworkComponent
         if (isOwner)
         {
             reader.GetBool();
+            reader.GetBool();
             reader.GetFloat();
             return;
         }
+        pickedUp = reader.GetBool();
         PickupCollider.enabled = reader.GetBool();
         chargeTimeCurrent = reader.GetFloat();
 
@@ -206,10 +212,11 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Disable()
     {
+        pickedUp = false;
         PickupCollider.enabled = false;
         m_rigidBody.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
-        gameObject.activeSelf = false;
+        gameObject.SetActive(false);
     }
 
     virtual public void Reset()

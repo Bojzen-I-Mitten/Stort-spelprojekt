@@ -15,7 +15,7 @@ namespace thomas {
 			{
 			}
 			IK_FABRIK_Constraint::IK_FABRIK_Constraint(const std::vector<LinkParameter>& link_chain)
-				: IK_FABRIK_Constraint(link_chain.size())
+				: IK_FABRIK_Constraint((uint32_t)link_chain.size())
 			{
 				std::memcpy(m_chain.get(), link_chain.data(), sizeof(LinkParameter) * m_num_link);
 			}

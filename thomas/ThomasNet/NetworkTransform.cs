@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define TRANSFORM_PRINT_DEBUG
+
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using ThomasEngine;
+
 
 namespace ThomasEngine.Network
 {
@@ -233,7 +238,7 @@ namespace ThomasEngine.Network
                 {
                     writer.Put(targetRigidbody.Position);
                     writer.Put(targetRigidbody.Rotation);
-                    writer.Put(transform.scale);
+                    writer.Put(target.scale);
                 }
                 writer.Put(targetRigidbody.LinearVelocity);
                 writer.Put(targetRigidbody.AngularVelocity);
@@ -289,6 +294,13 @@ namespace ThomasEngine.Network
             target.rotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
 
+#if (TRANSFORM_PRINT_DEBUG)
+            String msg = "T_Target: " + targetRigidbody.Name + (targetRigidbody.enabled ? "T" : "F");
+            msg += ";Pos: " + TargetSyncPosition.x + ", " + TargetSyncPosition.y + ", " + TargetSyncPosition.z;
+            msg += ";Rot: " + target.rotation.x + ", " + target.rotation.y + ", " + target.rotation.z + ", " + target.rotation.w;
+            ThomasEngine.Debug.Log(msg);
+#endif
+
             if (Vector3.Distance(TargetSyncPosition, target.position) > SnapThreshhold)
             {
                 target.position = TargetSyncPosition;
@@ -326,6 +338,13 @@ namespace ThomasEngine.Network
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
 
+#if (TRANSFORM_PRINT_DEBUG)
+            String msg = "RB_Target: " + targetRigidbody.Name + (targetRigidbody.enabled ? "T" : "F");
+            msg += ";Pos: " + TargetSyncPosition.x + ", " + TargetSyncPosition.y + ", " + TargetSyncPosition.z;
+            msg += ";Rot: " + TargetSyncRotation.x + ", " + TargetSyncRotation.y + ", " + TargetSyncRotation.z + ", " + target.rotation.w;
+            ThomasEngine.Debug.Log(msg);
+#endif
+
 
             TargetSyncLinearVelocity = reader.GetVector3();
             TargetSyncAngularVelocity = reader.GetVector3();
@@ -341,8 +360,8 @@ namespace ThomasEngine.Network
 
             if(!targetRigidbody.enabled)
             {
-                transform.position = TargetSyncPosition;
-                transform.rotation = TargetSyncRotation;
+                target.position = TargetSyncPosition;
+                target.rotation = TargetSyncRotation;
                 return;
             }
             else
@@ -356,6 +375,6 @@ namespace ThomasEngine.Network
             }
             
         }
-        #endregion
+#endregion
     }
 }

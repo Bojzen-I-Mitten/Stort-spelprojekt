@@ -32,7 +32,7 @@ public class CameraMaster : ScriptComponent
 
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
         instance = this;
         Camera = gameObject.GetComponent<Camera>();

@@ -26,7 +26,7 @@ namespace thomas {
 #endif
 			uint32_t value = 5381;
 			int c;
-			int step = 0;
+			uint32_t step = 0;
 			while ((c = *str++) && step++ <= len)
 				value = ((value << 5) + value) + c; /* hash * 33 + c */
 
@@ -36,7 +36,7 @@ namespace thomas {
 			return value;
 		}
 		uint32_t hash(const std::string &str) {
-			return hash(str.c_str(), str.length());
+			return hash(str.c_str(), (uint32_t)str.length());
 		}
 	}
 }

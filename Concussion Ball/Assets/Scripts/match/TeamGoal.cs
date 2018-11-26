@@ -1,6 +1,6 @@
 ﻿using ThomasEngine;
 using ThomasEngine.Network;
-
+using ThomasEngine.Script;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -20,7 +20,7 @@ public class TeamGoal : ScriptComponent
 
     public override void Start()
     {
-        confettis = Object.GetObjectsOfType<Confetti>();
+        confettis = new List<Confetti>(ScriptUtility.GetComponentsOfType<Confetti>());
         Debug.Log(confettis.Count);
         BoxCollider c = gameObject.AddComponent<BoxCollider>();
         c.isTrigger = true;

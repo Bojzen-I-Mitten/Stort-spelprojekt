@@ -14,11 +14,10 @@ public class Powerup : PickupableObject
     public PowerupSpawner spawner;
 
     protected bool activated = false;
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-        Disable();
         chargeTimeMax = 0.5f;
     }
 
@@ -89,10 +88,11 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (PickupCollider.enabled == false && m_rigidBody.enabled)
+            if (PickupCollider.enabled == false && m_rigidBody.enabled && pickedUp == false)
             {
                 if (!activated)
                 {
+                    Debug.Log("boom!");
                     Activate();
                     activated = true;
                 }
@@ -121,8 +121,8 @@ public class Powerup : PickupableObject
         int spawnerID = reader.GetInt();
         if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
         {
-            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
             Reset();
+            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();    
         }
         if (spawnerID == -1)
             spawner = null;
