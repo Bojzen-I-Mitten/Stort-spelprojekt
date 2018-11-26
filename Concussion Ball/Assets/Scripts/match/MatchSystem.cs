@@ -1,4 +1,4 @@
-﻿//#define R_FOR_RESTART
+﻿#define T_FOR_RESET
 
 using System;
 using System.Collections.Generic;
@@ -135,12 +135,13 @@ public class MatchSystem : NetworkManager
                 {
                     OnMatchStart();
                 }
-#if (R_FOR_RESTART)
-                if(Input.GetKeyDown(Input.Keys.R))
+#if T_FOR_RESET
+                if(Input.GetKeyDown(Input.Keys.T))
                 {
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+
 #endif
                 if (Input.GetKeyDown(Input.Keys.F9))
                     ShowPlayers();
@@ -196,9 +197,9 @@ public class MatchSystem : NetworkManager
             team.Value.ResetPlayers();
         }
     }
-    #endregion
+#endregion
 
-    #region Coroutines
+#region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
         MatchStarted = false;
@@ -236,9 +237,9 @@ public class MatchSystem : NetworkManager
         OnRoundEnd();
         OnRoundStart();
     }
-    #endregion
+#endregion
 
-    #region RPC
+#region RPC
 
     public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID,
         int team1Score, int team2Score,
@@ -277,6 +278,7 @@ public class MatchSystem : NetworkManager
     }
     public void RPCEndMatch()
     {
+        hasScored = true;
         if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
         {
             GoldenGoal = true;
@@ -302,9 +304,9 @@ public class MatchSystem : NetworkManager
             StartCoroutine(OnGoalCoroutine(team));
     }
 
-    #endregion
+#endregion
 
-    #region Match functions
+#region Match functions
 
     void OnMatchEnd()
     {
@@ -355,9 +357,9 @@ public class MatchSystem : NetworkManager
         np.JoinTeam(team);
     }
 
-    #endregion
+#endregion
 
-    #region peer connection
+#region peer connection
 
     protected override void OnPeerJoin(NetPeer peer)
     {
@@ -395,9 +397,9 @@ public class MatchSystem : NetworkManager
             np.gameObject.GetComponent<ChadControls>().OnDisconnect();
         }
     }
-    #endregion
+#endregion
 
-    #region Team Manager
+#region Team Manager
 
     public Team FindTeam(TEAM_TYPE type)
     {
@@ -435,7 +437,7 @@ public class MatchSystem : NetworkManager
         NetworkPlayer localPlayer = player.GetComponent<NetworkPlayer>();
         return localPlayer.Team.TeamType;
     }
-    #endregion
+#endregion
 
 
 }

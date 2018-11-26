@@ -250,6 +250,15 @@ namespace ThomasEngine.Network
                 writer.Put(targetRigidbody.AttachedCollider.isTrigger);
                 prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
             }
+            else
+            {
+                writer.Put(false);
+                WriteTransform(writer);
+                writer.Put(Vector3.Zero);
+                writer.Put(Vector3.Zero);
+                writer.Put(false);
+                writer.Put(false);
+            }
         }
         #endregion
         #region Read
