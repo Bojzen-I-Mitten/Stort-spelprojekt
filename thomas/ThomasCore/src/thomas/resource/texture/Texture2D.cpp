@@ -175,6 +175,11 @@ namespace thomas
 			return s_normalTexture;
 		}
 
+		Texture2D::~Texture2D()
+		{
+			delete data;
+		}
+
 
 	}
 }
