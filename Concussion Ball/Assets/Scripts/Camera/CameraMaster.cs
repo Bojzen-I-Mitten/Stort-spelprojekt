@@ -16,8 +16,6 @@ public class CameraMaster : ScriptComponent
 {
     public static CameraMaster instance;
 
-    public Texture2D Background { get; set; }
-
     public Camera Camera;
     GUIJoinHost JoinHost;
     GUIMainMenu MainMenu;
@@ -39,20 +37,32 @@ public class CameraMaster : ScriptComponent
 
     public override void OnAwake()
     {
+        instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
     }
 
+
+    public void StartReplay()
+    {
+        ChadCam.enabled = false;
+        SpectatorCam.enabled = false;
+        
+    }
+
+    public void StopReplay()
+    {
+        //ChadCam.enabled = true;
+        //SpectatorCam.enabled = false;
+    }
+
     public override void Start()
     {
-        instance = this;
         State = CAM_STATE.MAIN_MENU;
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
         MainMenuCamRot = Vector3.Zero;
         SelectTeamCamPos = new Vector3(0, -198.5f, 8.2f);
         SelectTeamCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
-        //BG = Canvas.Add(Background);
-        //BG.interactable = true;
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
