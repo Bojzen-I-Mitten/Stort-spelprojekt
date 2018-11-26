@@ -188,26 +188,30 @@ public class ChadControls : NetworkComponent
         //        FadeText = null;
         //    }
         //}
-        if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
+        //if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
+        
+        if (isOwner)
         {
-            if (isOwner)
-            {
-                DivingTimer += Time.DeltaTime;
-                JumpingTimer += Time.DeltaTime;
+            DivingTimer += Time.DeltaTime;
+            JumpingTimer += Time.DeltaTime;
 
-                Direction = new Vector3(0, 0, 0);
-                if (State != STATE.RAGDOLL)
+            Direction = new Vector3(0, 0, 0);
+            if (State != STATE.RAGDOLL)
+            {
+                if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
                 {
                     HandleKeyboardInput();
                     HandleMouseInput();
-                    AirHandling();
                 }
-                //Accelerate fake gravity as it felt too low, playtest
-                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
-                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y - 2, rBody.LinearVelocity.z), rBody.Rotation);
+
+                AirHandling();
             }
-            StateMachine();
+            //Accelerate fake gravity as it felt too low, playtest
+            if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
+                rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y - 2, rBody.LinearVelocity.z), rBody.Rotation);
         }
+        StateMachine();
+        
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
 
