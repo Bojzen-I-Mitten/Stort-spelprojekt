@@ -132,10 +132,10 @@ public class Chadimations : NetworkComponent
                     else if (!_Throwing && i == 1) // not throwing and index handling throwing anim
                     {
                         WeightHandles[State].setWeight(i, 0); // set throwing anim weight to 0
-                        node.Node.getTimeHandle().SetSpeed(2);
+                        node.Node.getTimeHandle().SetSpeed(2.2f);
                     }
                     else if (i == 1) // throw anim
-                        node.Node.getTimeHandle().SetSpeed(2);
+                        node.Node.getTimeHandle().SetSpeed(2.2f);
                     else if (Chad.PickedUpObject) // charge throw anim
                         node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
                 }
