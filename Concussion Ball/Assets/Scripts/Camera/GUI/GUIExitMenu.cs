@@ -7,10 +7,10 @@ public class GUIExitMenu : ScriptComponent
 
     Camera Camera;
     public Canvas Canvas;
-    Text ExitMatch;
+    //Text ExitMatch;
     Text ExitGame;
 
-    private readonly string _exitMatch = "Exit Match";
+    //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
     public override void OnAwake()
