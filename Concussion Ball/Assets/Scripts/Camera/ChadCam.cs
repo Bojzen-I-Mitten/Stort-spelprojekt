@@ -137,16 +137,9 @@ public class ChadCam : ScriptComponent
 
     public void ThrowingCamera()
     {
-        float yaw = MathHelper.ToRadians(-xStep * CameraSensitivity_x);
-        Chad.rBody.Rotation = Chad.rBody.Rotation * Quaternion.CreateFromAxisAngle(Vector3.Up, yaw);
-
-        TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
-        TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
-
-        transform.position = ChadHead;
-        transform.rotation = Chad.rBody.Rotation;
-        transform.RotateByAxis(transform.right, TotalYStep);
+        FreeLookCamera(false);
         transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
+        Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(-transform.forward.x, 0, transform.forward.z), Vector3.Up));
     }
 
     public void ResetCamera()
