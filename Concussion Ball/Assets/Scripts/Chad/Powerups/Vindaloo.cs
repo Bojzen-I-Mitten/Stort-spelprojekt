@@ -185,6 +185,7 @@ public class Vindaloo : Powerup
                 forceDir.y += 3.0f;
 
                 float distForce = ExplosionRadius - distance;
+                Debug.Log("Vindaloo force: " + ExplosionForce);
                 Vector3 force = forceDir * ExplosionForce * distForce;
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;

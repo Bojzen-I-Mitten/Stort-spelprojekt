@@ -23,7 +23,7 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipExplosion { get; set; }
 
     public float ExplosionRadius { get; set; } = 10.0f;
-    public float ExplosionForce { get; set; } = 50.0f;
+    public float ExplosionForce = 50.0f;//{ get; set; } = 50.0f;
 
     private float soundcooldown;
 
@@ -199,6 +199,7 @@ public class ThomasTrain : Powerup
 
 
                 float distForce = ExplosionRadius - distance;
+                Debug.Log("Vindaloo force: " + ExplosionForce);
                 Vector3 force = forceDir * ExplosionForce * distForce;
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 localChad.ActivateRagdoll(2.0f, param);

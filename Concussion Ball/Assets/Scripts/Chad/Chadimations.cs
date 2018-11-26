@@ -113,11 +113,11 @@ public class Chadimations : NetworkComponent
                         WeightHandles[State].setWeight(i, 0);
                         node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
                     }
-                    else if (!_Throwing && i == 1)
-                    {
-                        WeightHandles[State].setWeight(i, 0);
-                        node.Node.getTimeHandle().SetSpeed(2);
-                    }
+                    //else if (!_Throwing && i == 1)
+                    //{
+                    //    WeightHandles[State].setWeight(i, 0);
+                    //    node.Node.getTimeHandle().SetSpeed(2);
+                    //}
                 }
             }
         }

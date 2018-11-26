@@ -188,8 +188,8 @@ public class ChadControls : NetworkComponent
         //        FadeText = null;
         //    }
         //}
-        //if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
         
+
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -198,11 +198,11 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL)
             {
-                if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
-                {
-                    HandleKeyboardInput();
-                    HandleMouseInput();
-                }
+            if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
+            {
+                HandleKeyboardInput();
+                HandleMouseInput();
+            }
 
                 AirHandling();
             }
