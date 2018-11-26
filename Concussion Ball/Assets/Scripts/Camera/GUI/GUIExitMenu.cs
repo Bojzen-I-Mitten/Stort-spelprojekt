@@ -1,4 +1,5 @@
 using ThomasEngine;
+using System.Collections;
 
 public class GUIExitMenu : ScriptComponent
 {
@@ -22,12 +23,6 @@ public class GUIExitMenu : ScriptComponent
         ExitGame.position = new Vector2(0.4f, 0.25f);
         ExitGame.color = Color.Black;
         ExitGame.interactable = true;
-
-        //ExitMatch = Canvas.Add(_exitMatch);
-        //ExitMatch.font = Font;
-        //ExitMatch.position = new Vector2(0.4f, 0.35f);
-        //ExitMatch.color = Color.Black;
-        //ExitMatch.interactable = true;
     }
 
     public override void Start()
@@ -36,24 +31,29 @@ public class GUIExitMenu : ScriptComponent
 
     public override void Update()
     {
-        //if (ExitMatch.Hovered())
-        //    ExitMatch.color = Color.Blue;
-        //else
-        //    ExitMatch.color = Color.Black;
-
         if (ExitGame.Hovered())
             ExitGame.color = Color.Red;
         else
             ExitGame.color = Color.Black;
-        //if (ExitMatch.Clicked())
-        //{
-        //    CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-        //    CameraMaster.instance.Canvas.isRendering = true;
-        //}
-        if (ExitGame.Clicked())
+
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
-            Debug.Log("I'm exiting!");
-            ThomasWrapper.Exit();
+            if (ExitGame.Clicked())
+            {
+                Debug.Log("I'm exciting! :^)");
+                if (ThomasWrapper.IsPlaying())
+                {
+                    //Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                    CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
+                    ThomasWrapper.IssueRestart();
+                    //if (ThomasWrapper.IsPlaying())
+                    //{
+                    //    Debug.Log("Finished reloading to main menu.");
+                    //    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+                    //}
+                }       
+            }
         }
+        
     }
 }

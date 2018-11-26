@@ -63,7 +63,7 @@ public class ChadControls : NetworkComponent
     public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
 
-    public float ImpactFactor { get; set; } = 2000;
+    public float ImpactFactor = 25.0f;//{ get; set; } = 100;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;
@@ -188,18 +188,19 @@ public class ChadControls : NetworkComponent
         //        FadeText = null;
         //    }
         //}
-
-        if (isOwner)
+        if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
         {
-            DivingTimer += Time.DeltaTime;
-            JumpingTimer += Time.DeltaTime;
-
-            Direction = new Vector3(0, 0, 0);
-            if (State != STATE.RAGDOLL)
+            if (isOwner)
             {
-                HandleKeyboardInput();
-                HandleMouseInput();
-                AirHandling();
+                DivingTimer += Time.DeltaTime;
+                JumpingTimer += Time.DeltaTime;
+
+                Direction = new Vector3(0, 0, 0);
+                if (State != STATE.RAGDOLL)
+                {
+                    HandleKeyboardInput();
+                    HandleMouseInput();
+                    AirHandling();
 
                 //Accelerate fake gravity as it felt too low, playtest
                 if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
@@ -228,8 +229,8 @@ public class ChadControls : NetworkComponent
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
 #endif
-        if (Input.GetKeyDown(Input.Keys.K))
-            NetPlayer.Reset();
+            if (Input.GetKeyDown(Input.Keys.K))
+                NetPlayer.Reset();
 
         rBody.Friction = 0.5f;
         if (!OnGround())
@@ -261,6 +262,7 @@ public class ChadControls : NetworkComponent
         rBody.enabled = false;
         CanBeTackled = false;
         Ragdoll.EnableRagdoll();
+
     }
 
     private void DisableRagdoll()
@@ -367,10 +369,10 @@ public class ChadControls : NetworkComponent
     #region Input handling
     private void HandleKeyboardInput()
     {
-        if (Input.GetKeyUp(Input.Keys.Escape))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        }
+        //if (Input.GetKeyUp(Input.Keys.Escape))
+        //{
+        //    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+        //}
 
         if (Locked)
             return;
@@ -540,18 +542,21 @@ public class ChadControls : NetworkComponent
                         CurrentVelocity.y = modifiedBaseSpeed;
                 }
                 // Walking backwards
-                else if (Direction.z < 0) 
+                else if (Direction.z < 0)
+                {
+                    if (Direction.x != 0)
+                        diagonalModifier = 0.5f;
                     CurrentVelocity.y = -modifiedBaseSpeed * 0.75f * diagonalModifier;
-
+                }
+                    
                 if(OnGround() && Direction.z >= 0) // as to not allow acceleration mid air
                     CurrentVelocity.y += Direction.z * Acceleration * diagonalModifier * Time.DeltaTime;
 
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
 
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * diagonalModifier;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * 0.75f * diagonalModifier;
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-               // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
@@ -640,13 +645,14 @@ public class ChadControls : NetworkComponent
 
             yield return new WaitForSeconds(duration);
             float timer = 0;
-            while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
+            while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 5)
             {
                 timer += Time.DeltaTime;
                 yield return null;
             }
             yield return new WaitForSeconds(1);
             State = STATE.CHADING;
+            CurrentVelocity.y = BaseSpeed;
         }
     }
 

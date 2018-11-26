@@ -141,7 +141,10 @@ public class MatchSystem : NetworkManager
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+
 #endif
+                if (Input.GetKeyDown(Input.Keys.F9))
+                    ShowPlayers();
                 if (Input.GetKeyDown(Input.Keys.F10))
                     ShowOwnedObjects();
             }
@@ -170,7 +173,22 @@ public class MatchSystem : NetworkManager
         Debug.Log("##################################");
     }
 
-#region Utility
+    private void ShowPlayers()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Players:");
+        foreach (var player in Scene.Players)
+        {
+            if (player.Key != LocalPeer)
+            {
+                ChadControls chad = player.Value.gameObject.GetComponent<ChadControls>();
+                Debug.Log(player.Key.EndPoint.Address + ":\t" + chad?.rBody.Position);
+            }
+        }
+        Debug.Log("##################################");
+    }
+
+    #region Utility
 
     void ResetPlayers()
     {
