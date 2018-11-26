@@ -69,25 +69,28 @@ namespace thomas
 				bool Hovered()
 				{
 					thomas::Window* window = WindowManager::Instance()->GetCurrentBound();
-					if (!window || WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow())
+					if (!window ||
+						WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow() ||
+						!canvas->GetRendering() ||
+						!interactable)
 						return false;
 
 					Viewport canvasViewport = canvas->GetViewport();
 					Vector2 vpScale = canvas->GetViewportScale();
 					Vector2 size = PixelSize();
-					size *= scale* vpScale;
+					size *= scale * vpScale;
 					float left = position.x * canvasViewport.width - size.x * origin.x;
 					float right = left + size.x;
 					float top = position.y * canvasViewport.height - size.y * origin.y;
 					float bottom = top + size.y;
 					GUIRect rect{ left, right, top, bottom };
-					
+
 					return rect.Intersect(window->GetInput()->GetMousePosition());
 				}
 
 				bool Clicked()
 				{
-					if (interactable)
+					if (WindowManager::Instance()->GetGameInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
 						return Hovered();
 					else
 						return false;
