@@ -1,22 +1,33 @@
 #include "GpuProfiler.h"
-#include "../Common.h"
-#include "../ThomasTime.h"
+#include "..\Common.h"
+#include "..\ThomasTime.h"
 #include "..\ThomasCore.h"
+
 namespace thomas
 {
 	namespace utils
 	{
 		namespace profiling
 		{
-			GpuProfiler::GpuProfiler()
-				: m_frameQuery(0), m_memoryQuery(0), m_drawCalls(0), m_totalVertexCount(0), m_totalFaceCount(0), m_memoryUsage(0.0f)
+			GpuProfiler* GpuProfiler::Instance()
 			{
+				static GpuProfiler s_gpuProfiler;
+				return &s_gpuProfiler;
+			}
+
+			bool GpuProfiler::Init()
+			{
+				m_frameQuery = 0;
+				m_memoryQuery = 0;
+				m_drawCalls = 0;
+				m_totalVertexCount = 0;
+				m_totalFaceCount = 0;
+				m_memoryUsage = 0.0f;
+
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
 				memset(m_timings, 0, sizeof(m_timings));
-			}
-			bool GpuProfiler::Init()
-			{
+
 				for (int i = 0; i < FRAME_BUFFERS; i++)
 				{
 					if (!utils::D3D::Instance()->CreateQuery(D3D11_QUERY_TIMESTAMP_DISJOINT, m_queryDisjoint[i]))

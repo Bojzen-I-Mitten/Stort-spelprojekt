@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include <chrono>
 #include "..\..\..\include\nlohmann\json.hpp"
-//#define BENCHMARK
+#define BENCHMARK
 
 
 namespace thomas
@@ -39,7 +39,7 @@ namespace thomas
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
 				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
-				static float s_vramusage;
+				static std::vector<float> s_vramusage;
 				static float s_vrambudget;
 				static unsigned int s_frames;
 
@@ -49,6 +49,8 @@ namespace thomas
 				static void dumpDataToFile();
 				static void storeSample(std::string functionName, long long elapsedTime, long long startTime, DWORD processor_id);
 				static void storeGpuSample(long long gpuTime);
+				static void storeVramSample(float usage);
+
 				static void setRAMUsage(float usage);
 				static float getRAMUsage();
 				static void setVRAMUsage(float usage, float budget);

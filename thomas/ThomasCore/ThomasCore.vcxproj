@@ -117,6 +117,7 @@
     <ClCompile Include="src\thomas\ThomasTime.cpp" />
     <ClCompile Include="src\thomas\utils\AssimpLoader.cpp" />
     <ClCompile Include="src\thomas\utils\D3D.cpp" />
+    <ClCompile Include="src\thomas\utils\D3DDevice.cpp" />
     <ClCompile Include="src\thomas\utils\GpuProfiler.cpp" />
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="src\thomas\ThomasTime.h" />
     <ClInclude Include="src\thomas\utils\AssimpLoader.h" />
     <ClInclude Include="src\thomas\utils\D3D.h" />
+    <ClInclude Include="src\thomas\utils\D3DDevice.h" />
     <ClInclude Include="src\thomas\utils\GpuProfiler.h" />
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />

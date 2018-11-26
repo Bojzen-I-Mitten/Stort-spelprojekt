@@ -268,12 +268,12 @@ namespace thomas
 		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
 		{
 			thomas::utils::D3D::Instance()->GetDeviceContextDeffered()->Draw(vertexCount, startVertexLocation);
-			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount, 0);
+			utils::profiling::GpuProfiler::Instance()->AddDrawCall(vertexCount, 0);
 		}
 		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
 		{
 			thomas::utils::D3D::Instance()->GetDeviceContextDeffered()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
-			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount, 0);
+			utils::profiling::GpuProfiler::Instance()->AddDrawCall(indexCount, 0);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{

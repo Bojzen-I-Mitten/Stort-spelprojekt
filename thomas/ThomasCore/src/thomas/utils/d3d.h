@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFERS 3
 
-#include <d3d11_4.h>
+#include "D3DDevice.h"
 #include <dxgi1_4.h>
 #include <string>
 
@@ -15,11 +15,6 @@ namespace thomas
 	class Window;
 	namespace utils
 	{
-		namespace profiling
-		{
-			class GpuProfiler;
-		}
-
 		class D3D
 		{
 		public:
@@ -57,7 +52,6 @@ namespace thomas
 			ID3D11DeviceContext* GetDeviceContextImmediate();
 			IDXGIDevice1* GetDxgiDevice();
 			IDXGIAdapter3* GetDxgiAdapter();
-			profiling::GpuProfiler* GetProfiler();
 
 		public:
 			bool LoadTextureFromFile(std::string fileName, _Outptr_opt_ ID3D11Resource*& texture, _Outptr_opt_ ID3D11ShaderResourceView*& textureView);
@@ -75,17 +69,14 @@ namespace thomas
 			bool CreateMultiThreadedInterface();
 			
 		private:
-			ID3D11Device* m_device;
+			D3DDevice* m_device;
 			ID3D11DeviceContext* m_deviceContextImmediate;
 			ID3D11DeviceContext* m_deviceContextDeferred;
 			ID3D11Multithread* m_multiThreaded;
 			ID3D11Debug* m_debug;
+
 			IDXGIDevice1* m_dxgiDevice;
 			IDXGIAdapter3* m_dxgiAdapter;
-
-			
-			profiling::GpuProfiler* m_profiler;
-
 		};
 	}
 }

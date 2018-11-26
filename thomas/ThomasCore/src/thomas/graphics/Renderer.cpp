@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include "..\utils\D3D.h"
 #include "..\object\GameObject.h"
 #include "..\object\component\Transform.h"
 #include "..\ThomasCore.h"
@@ -12,10 +11,10 @@
 #include "..\WindowManager.h"
 #include "..\graphics\LightManager.h"
 #include "RenderConstants.h"
-#include "render/Frame.h"
-#include "../utils/GpuProfiler.h"
-#include "../utils/AutoProfile.h"
-#include "../graphics/GUI/Canvas.h"
+#include "render\Frame.h"
+#include "..\utils\GpuProfiler.h"
+#include "..\utils\AutoProfile.h"
+#include "..\graphics\GUI\Canvas.h"
 #include "ParticleSystem.h"
 
 namespace thomas
@@ -175,8 +174,6 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
-			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-			
 			//Process commands
 			{
 				PROFILE("BindFrame")
@@ -226,7 +223,7 @@ namespace thomas
 				}
 			}
 	
-			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
 			{
 				PROFILE("Particles");
@@ -246,7 +243,7 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_PARTICLES);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_PARTICLES);
 
 			{
 				PROFILE("Gizmos");
@@ -258,7 +255,7 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
 
 			//Copy rendered objects into the back buffer
 			WindowManager::Instance()->ResolveRenderTarget();
@@ -278,7 +275,7 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_GUI);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GUI);
 		}
 	}
 }

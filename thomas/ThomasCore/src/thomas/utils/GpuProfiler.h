@@ -1,6 +1,6 @@
 #pragma once
 #include "D3D.h"
-#include <dxgi1_6.h>
+
 namespace thomas
 {
 	namespace utils
@@ -22,8 +22,9 @@ namespace thomas
 			class GpuProfiler
 			{
 			public:
+				static GpuProfiler* Instance();
+				~GpuProfiler() = default;
 
-				GpuProfiler();
 				bool Init();
 				void Destroy();
 
@@ -46,6 +47,8 @@ namespace thomas
 				int GetFaceCount();
 
 			private:
+				GpuProfiler() = default;
+
 				int m_frameQuery;								
 				ID3D11Query * m_queryDisjoint[FRAME_BUFFERS];				// "Timestamp disjoint" query; records whether timestamps are valid
 				ID3D11Query * m_queryTimestamp[GTS_MAX][FRAME_BUFFERS];		// Individual timestamp queries for each relevant point in the frame

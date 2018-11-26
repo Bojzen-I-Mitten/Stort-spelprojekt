@@ -52,7 +52,6 @@ namespace thomas
 					srvDesc.Texture2D.MipLevels = 1;
 					srvDesc.Texture2D.MostDetailedMip = 0;
 
-
 					HRESULT hr = m_device->CreateShaderResourceView(buffer, &srvDesc, &srv);
 					if (FAILED(hr))
 					{
@@ -245,29 +244,23 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
-			if (SUCCEEDED(hr))
-			{
-				if (!CreateDeviceContext())
-					return false;
+			CreateD3DDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), &m_device, D3D11_SDK_VERSION, &fl);
 
-				if (!CreateDxgiInterface())
-					return false;
+			if (!CreateDeviceContext())
+				return false;
 
-				if (!CreateMultiThreadedInterface())
-					return false;
+			if (!CreateDxgiInterface())
+				return false;
+
+			if (!CreateMultiThreadedInterface())
+				return false;
 #ifdef  _DEBUG_DX
-				CreateDebugInterface();
+			CreateDebugInterface();
 #endif
-				m_profiler = new profiling::GpuProfiler();
-				if (!m_profiler->Init())
-					return false;
+			if (!profiling::GpuProfiler::Instance()->Init())
+				return false;
 
-				return true;
-			}
-
-			LOG_HR(hr);
-			return false;
+			return true;
 		}
 
 		void D3D::CreateDebugInterface()
@@ -370,8 +363,7 @@ namespace thomas
 
 		void D3D::Destroy()
 		{
-			m_profiler->Destroy();
-			delete m_profiler;
+			profiling::GpuProfiler::Instance()->Destroy();
 
 			m_deviceContextDeferred->ClearState();
 			m_deviceContextDeferred->Flush();
@@ -590,7 +582,6 @@ namespace thomas
 			return true;
 		}
 		
-
 		bool D3D::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{
 			char* filename_c = new char[fileName.length() + 1];
@@ -662,11 +653,6 @@ namespace thomas
 		IDXGIAdapter3* D3D::GetDxgiAdapter()
 		{
 			return m_dxgiAdapter;
-		}
-
-		utils::profiling::GpuProfiler* D3D::GetProfiler()
-		{
-			return m_profiler;
 		}
 
 		void D3D::CreateTextureAndViews(UINT width, UINT height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)

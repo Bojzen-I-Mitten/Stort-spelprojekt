@@ -162,7 +162,7 @@ namespace ThomasEngine {
 			RenderFinished->Set();
 			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
-			float gpuTime = utils::D3D::Instance()->GetProfiler()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
+			float gpuTime = utils::profiling::GpuProfiler::Instance()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
 			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
 
 #ifdef BENCHMARK
@@ -233,7 +233,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		PROFILE("CopyCommandList")
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		utils::profiling::GpuProfiler* profiler = utils::profiling::GpuProfiler::Instance();
 		if (showStatistics)
 		{
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);

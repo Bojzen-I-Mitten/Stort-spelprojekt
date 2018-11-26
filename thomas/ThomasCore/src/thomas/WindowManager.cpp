@@ -55,8 +55,8 @@ namespace thomas
 				window->BeginFrame();
 			}
 
-		utils::D3D::Instance()->GetProfiler()->RetriveTimeStamps();
-		utils::D3D::Instance()->GetProfiler()->BeginFrame();
+		utils::profiling::GpuProfiler::Instance()->RetriveTimeStamps();
+		utils::profiling::GpuProfiler::Instance()->BeginFrame();
 	}
 
 	void WindowManager::EndFrame()
@@ -67,7 +67,7 @@ namespace thomas
 				window->EndFrame();
 			}
 
-		utils::D3D::Instance()->GetProfiler()->EndFrame();
+		utils::profiling::GpuProfiler::Instance()->EndFrame();
 	}
 
 	void WindowManager::ResolveRenderTarget()
