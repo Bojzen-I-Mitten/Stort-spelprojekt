@@ -127,14 +127,14 @@ public class Chadimations : NetworkComponent
             WeightHandles[State].setWeight(index, weight);
     }
 
-    private void ResetTimer(uint index)
+    public void ResetTimer(ChadControls.STATE state, uint index)
     {
-        BlendNodes[State].ResetPlayback();
+        BlendNodes[state].ResetPlayback();
     }
 
     public void RPCResetTimer(uint index)
     {
-        ResetTimer(index);
+        ResetTimer(State, index);
         SendRPC("ResetTimer", (int)index);
     }
 } 

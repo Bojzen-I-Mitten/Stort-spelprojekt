@@ -234,6 +234,10 @@ public class ChadControls : NetworkComponent
         rBody.Friction = 0.5f;
         if (!OnGround())
             rBody.Friction = 0.0f;
+
+
+        if (State != STATE.DIVING)
+            Animations.ResetTimer(STATE.DIVING, 0);
     }
 
     #region Ragdoll handling
@@ -616,7 +620,7 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        Animations.RPCResetTimer(0);
+        //Animations.RPCResetTimer(0);
         float timer = 1.5f;
         while (timer > 0.0f)
         {
