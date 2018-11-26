@@ -49,7 +49,7 @@ namespace thomas
 				DXGI_QUERY_VIDEO_MEMORY_INFO info;
 				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
 				{
-					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
+					m_memoryUsage = float(info.CurrentUsage / 1024.0f / 1024.0f);
 					m_totalMemory = 0.0f;
 				};
 
@@ -160,8 +160,8 @@ namespace thomas
 					float usage = float(m_info[m_memoryQuery].CurrentUsage);
 					if (m_memoryUsage > usage)
 					{
-						m_totalMemory += (m_memoryUsage - usage) * 0.001f * 0.001f;
-						return (m_memoryUsage - usage) * 0.001f * 0.001f;
+						m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+						return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
 					}
 				}
 

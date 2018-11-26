@@ -16,6 +16,7 @@ namespace thomas
 				UINT FeatureLevels,
 				UINT SDKVersion,
 				_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel);
+
 			virtual ~D3DDevice();
 
 			virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, _COM_Outptr_ void** ppvObject);

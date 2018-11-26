@@ -39,7 +39,7 @@ namespace thomas
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
 				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
-				static std::vector<float> s_vramusage;
+				static std::map<std::string, float> s_vramusage;
 				static float s_vrambudget;
 				static unsigned int s_frames;
 
@@ -49,7 +49,7 @@ namespace thomas
 				static void dumpDataToFile();
 				static void storeSample(std::string functionName, long long elapsedTime, long long startTime, DWORD processor_id);
 				static void storeGpuSample(long long gpuTime);
-				static void storeVramSample(float usage);
+				static void storeVramSample(std::string name, float usage);
 
 				static void setRAMUsage(float usage);
 				static float getRAMUsage();
