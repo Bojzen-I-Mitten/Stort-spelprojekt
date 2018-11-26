@@ -6,7 +6,6 @@
 Texture2D diffuseTex;
 Texture2D normalTex : NORMALTEXTURE;
 Texture2D specularTex;
-Texture2D maskTex;
 Texture2D rampTex;
 
 cbuffer MATERIAL_PROPERTIES
@@ -98,9 +97,8 @@ float4 frag(v2f input) : SV_TARGET
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));
 
-    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord) * 3.5f;
-    //diffuse *= color.xyz;
-    diffuse += maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
+    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
+    diffuse *= color.xyz;
     diffuse *= rampTex.Sample(StandardWrapSampler, Intensity(normal, input.worldPos.xyz));
  
     float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
