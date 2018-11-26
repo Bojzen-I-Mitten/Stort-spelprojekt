@@ -104,7 +104,6 @@ public class GUISelectTeam : ScriptComponent
                     ChadRSC2.animation = IdleAnim;
                 }
             }
-
         }
         else if (Team2Image.Hovered())
         {
