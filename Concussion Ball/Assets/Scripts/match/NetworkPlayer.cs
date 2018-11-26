@@ -18,6 +18,7 @@ public class NetworkPlayer : NetworkComponent
     public int HasTackled = 0;
     public int BeenTackled = 0;
     public int GoalsScored = 0;
+    public bool ReadyToStart = false;
 
     Material mat;
     Rigidbody rb;
@@ -94,6 +95,8 @@ public class NetworkPlayer : NetworkComponent
             writer.Put((int)Team.TeamType);
         else
             writer.Put((int)TEAM_TYPE.UNASSIGNED);
+
+        writer.Put(ReadyToStart);
         return true;
     }
 
