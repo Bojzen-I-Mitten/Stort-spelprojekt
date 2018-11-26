@@ -592,6 +592,11 @@ namespace ThomasEngine {
 		IssueStateCommand(ThomasStateCommand::StopIssued);
 	}
 
+	void ThomasWrapper::IssueRestart()
+	{
+		IssuedStateCommand = ThomasStateCommand::ReplayIssued;
+	}
+
 	bool ThomasWrapper::IsPlaying()
 	{
 		return playing == RunningState::Running;
