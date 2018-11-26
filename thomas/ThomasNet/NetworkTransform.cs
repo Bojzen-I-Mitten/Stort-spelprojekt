@@ -254,15 +254,6 @@ namespace ThomasEngine.Network
                 writer.Put(false);
                 writer.Put(false);
             }
-            else
-            {
-                writer.Put(false);
-                WriteTransform(writer);
-                writer.Put(Vector3.Zero);
-                writer.Put(Vector3.Zero);
-                writer.Put(false);
-                writer.Put(false);
-            }
         }
         #endregion
         #region Read

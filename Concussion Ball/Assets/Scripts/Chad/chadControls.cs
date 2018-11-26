@@ -201,7 +201,7 @@ public class ChadControls : NetworkComponent
                     HandleKeyboardInput();
                     HandleMouseInput();
                     AirHandling();
-
+                }
                 //Accelerate fake gravity as it felt too low, playtest
                 if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
                     rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y - 2, rBody.LinearVelocity.z), rBody.Rotation);
@@ -231,8 +231,8 @@ public class ChadControls : NetworkComponent
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
 #endif
-            if (Input.GetKeyDown(Input.Keys.K))
-                NetPlayer.Reset();
+        if (Input.GetKeyDown(Input.Keys.K))
+            NetPlayer.Reset();
 
         rBody.Friction = 0.5f;
         if (!OnGround())
