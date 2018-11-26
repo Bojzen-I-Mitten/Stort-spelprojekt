@@ -146,7 +146,7 @@ public class ThomasTrain : Powerup
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce * ThrowStrength.ThrowStrengthFactor);
         
 
         m_rigidBody.UseGravity = false;

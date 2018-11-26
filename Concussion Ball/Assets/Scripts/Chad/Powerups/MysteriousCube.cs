@@ -7,11 +7,23 @@ public class MysteriousCube : Powerup
 {
     ChadControls ObjectOwner = null;
 
+    // Modifiers
+    enum Modifier
+    {
+        MOVEMENT_INCREASE = 1,
+        MOVEMENT_DECREASE = 2,
+        RAGDOLL_IMMUNITY = 3,
+
+    }
+
+
     // Coroutines
     IEnumerator MovementClock = null;
     IEnumerator ScaleClock = null;
     IEnumerator RagdollImmunityClock = null;
+    IEnumerator ThrowStrengthClock = null;
 
+    private float ThrowStrengthCountdown;
     private float MovementCountdown;
     private float ScaleCountdown;
     private float RagdollCountdown;
@@ -19,16 +31,20 @@ public class MysteriousCube : Powerup
     private float OriginalBaseSpeed;
     private float OriginalMaxSpeed;
     private float OriginalRagdollTimer;
+    private float OriginalThrowStrength;
     private Vector3 OriginalScale;
 
-    // Tweaking constant
+    // Tweaking constants
     private float MovementSpeedupDuration = 5.0f;
+    private float MovementSpeedDecreaseDuration = 5.0f;
     private float MovementSpeedDecreaseFactor = 0.5f;
     private float MovementSpeedUpFactor = 2.0f;
     private float ScaleDuration = 5.0f;
     private float ScaleDecreaseFactor = 0.5f;
     private float PushBackForce = 100.0f;
-    private float RagDollImunityDuration = 7.0f; 
+    private float RagDollImunityDuration = 7.0f;
+    private float ThrowStrengthFactor = 2.0f;
+    private float ThrowStrengthDuration = 7.0f;
 
     public override void OnAwake()
     {
@@ -70,11 +86,11 @@ public class MysteriousCube : Powerup
             // Choose random power-up 
             System.Random rnd = new System.Random();
             int number = rnd.Next(1, 6);
-
             // Might need a very small distance to check against or this will modify all chads?
 
+            // TODO: make this an enum check here instead
             // The power-up effect only affects the collision object
-            if(number == 1)
+            if(number == (int)Modifier.MOVEMENT_INCREASE)
             {
                 // Increase movement speed -> Speed Demon
                 OriginalBaseSpeed = localChad.BaseSpeed;
@@ -87,25 +103,32 @@ public class MysteriousCube : Powerup
             }
             else if(number == 2)
             {
-                // Ragdoll immunity -> Unstoppable
-                OriginalRagdollTimer = localChad.MinimumRagdollTimer;
-
-                RagdollImmunityModifier(ref localChad);
-            }
-            else if (number == 3)
-            {
-                // TODO: Increase throw distance
-            }
-            else if (number == 4)
-            {
                 // Decrease movement speed -> Never Lucky
                 OriginalBaseSpeed = localChad.BaseSpeed;
                 OriginalMaxSpeed = localChad.MaxSpeed;
                 OriginalAcceleration = localChad.Acceleration;
 
                 ConfigureMovementSpeed(MovementSpeedDecreaseFactor, ref localChad);
-                MovementClock = MovementTimerRoutine(MovementSpeedupDuration, localChad);
+                MovementClock = MovementTimerRoutine(MovementSpeedDecreaseDuration, localChad);
                 StartCoroutine(MovementClock);
+            }
+            else if (number == 3)
+            {
+                // Increase throw distance -> Muscle Up
+                OriginalThrowStrength = ThrowStrength.ThrowStrengthFactor;
+
+                ThrowStrengthModifier();
+                ThrowStrengthClock = ThrowStrengthRoutine(ThrowStrengthDuration);
+                StartCoroutine(ThrowStrengthClock);
+            }
+            else if (number == 4)
+            {
+                // Ragdoll immunity -> Unstoppable
+                OriginalRagdollTimer = localChad.MinimumRagdollTimer;
+
+                RagdollImmunityModifier(ref localChad);
+                RagdollImmunityClock = RagdollTimerRoutine(RagDollImunityDuration, localChad);
+                StartCoroutine(RagdollImmunityClock);
             }
             else if (number == 5)
             {
@@ -149,6 +172,11 @@ public class MysteriousCube : Powerup
     private void RagdollImmunityModifier(ref ChadControls targetChad)
     {
         targetChad.MinimumRagdollTimer = RagDollImunityDuration;
+    }
+
+    private void ThrowStrengthModifier()
+    {
+        ThrowStrength.ThrowStrengthFactor = ThrowStrengthFactor;
     }
     #endregion
 
@@ -202,6 +230,22 @@ public class MysteriousCube : Powerup
         // Set back original immunity when timer has expired
         targetChad.MinimumRagdollTimer = OriginalRagdollTimer;
         RagdollCountdown = RagDollImunityDuration;
+    }
+
+    IEnumerator ThrowStrengthRoutine(float seconds)
+    {
+        ThrowStrengthCountdown = seconds;
+
+        while (ThrowStrengthCountdown > 0)
+        {
+            Debug.Log("Throw strength affector remaining: " + ThrowStrengthCountdown);
+            yield return new WaitForSeconds(1.0f);
+            ThrowStrengthCountdown--;
+        }
+
+        // Set back original throw strength when timer has expired
+        ThrowStrength.ThrowStrengthFactor = OriginalThrowStrength;
+        ThrowStrengthCountdown = ThrowStrengthDuration;
     }
     #endregion
 }

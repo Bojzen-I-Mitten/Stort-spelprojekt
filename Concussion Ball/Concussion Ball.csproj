@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Chad\GUIPlayerScore.cs" />
+    <Compile Include="Assets\Scripts\Chad\ThrowStrength.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
     <Compile Include="Assets\Scripts\Confetti.cs" />
     <Compile Include="Assets\Scripts\Chad\ToggleRagdoll.cs" />
