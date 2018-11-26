@@ -100,26 +100,6 @@ public class Chadimations : NetworkComponent
             Skin.setBlendTreeNode(BlendNodes[State]);
             for (uint i = 0; i < Animations[State].Count; i++)
             {
-                //if (State != ChadControls.STATE.RAGDOLL)
-                //{
-                //AnimationNode node = Animations[State][(int)i];
-                //if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
-                //{
-                //    WeightHandles[State].setWeight(i, node.GetWeight(Direction));
-                //    node.Node.getTimeHandle().SetSpeed(1);
-                //}
-                //else if (!_Throwing && i == 0)
-                //{
-                //    WeightHandles[State].setWeight(i, 0);
-                //    node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
-                //}
-                //else if (!_Throwing && i == 1)
-                //{
-                //    WeightHandles[State].setWeight(i, 0);
-                //    node.Node.getTimeHandle().SetSpeed(2);
-                //}
-                //}
-
                 AnimationNode node = Animations[State][(int)i];
                 if (node != null)
                 {

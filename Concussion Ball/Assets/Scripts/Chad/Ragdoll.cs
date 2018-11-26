@@ -218,6 +218,7 @@ public class Ragdoll : ScriptComponent
     #endregion
     public void AddForce(ImpactParams param)
     {
+        Debug.Log("Force length: " + param.force.Length());
         for (int i = 0; i < (int)BODYPART.COUNT; i++)
         {
             Vector3 force = param.force * param.bodyPartFactor[i] * Mass_BodyParts[i];
@@ -225,6 +226,8 @@ public class Ragdoll : ScriptComponent
             float fallof = Math.Min(1, param.forceFallof * Vector3.Distance(RB_BodyParts[i].transform.position, param.origin));
             force -= force * fallof;
             RB_BodyParts[i].AddForce(force, Rigidbody.ForceMode.Impulse);
+            //Debug.Log(force.Length());
+            //Debug.Log("Yoooohooooo! " + force + "Bodypart: " + Mass_BodyParts[i]);
         }
         //if (diveTackle)
         //{

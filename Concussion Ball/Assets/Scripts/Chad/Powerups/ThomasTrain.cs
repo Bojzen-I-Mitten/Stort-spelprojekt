@@ -23,7 +23,7 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipExplosion { get; set; }
 
     public float ExplosionRadius { get; set; } = 10.0f;
-    public float ExplosionForce { get; set; } = 50.0f;
+    public float ExplosionForce { get; set; } = 40.0f;
 
     private float soundcooldown;
 
@@ -33,6 +33,7 @@ public class ThomasTrain : Powerup
         BaseThrowForce = 20.0f;
         MaxThrowForce = 36.0f;
         ThrowForce = BaseThrowForce;
+        ExplosionForce = 40.0f;
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;

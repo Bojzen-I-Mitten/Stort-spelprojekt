@@ -20,7 +20,7 @@ public class Vindaloo : Powerup
     private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 8.0f;
-    public float ExplosionForce = 300.0f;
+    public float ExplosionForce = 40.0f;
     public override void OnAwake()
     {
         base.OnAwake();
@@ -28,7 +28,7 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
-        ExplosionForce = 50.0f;
+        ExplosionForce = 40.0f;
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
@@ -174,7 +174,7 @@ public class Vindaloo : Powerup
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-        if (localChad && otherPlayerTeam != playerTeam)
+        if (/*localChad && otherPlayerTeam != playerTeam*/true)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
