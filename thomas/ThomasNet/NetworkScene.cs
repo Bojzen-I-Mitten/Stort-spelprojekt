@@ -52,7 +52,7 @@ namespace ThomasEngine.Network
             for(int i=0; i < maxPlayers+1; i++)
             {
                 GameObject player = GameObject.Instantiate(playerPrefab, new Vector3(-1000, -1000, -1000), Quaternion.Identity);
-                player.activeSelf = false;
+                player.SetActive(false);
                 NetworkIdentity identity = player.GetComponent<NetworkIdentity>();
                 identity.IsPlayer = true;
                 PlayerPool.Add(identity);
@@ -61,7 +61,7 @@ namespace ThomasEngine.Network
         }
 
         private NetworkIdentity GetAvailablePlayerFromPool()
-        {
+        { 
             if(PlayerPool.Count > 0)
             {
                 NetworkIdentity player = PlayerPool[0];
@@ -95,15 +95,16 @@ namespace ThomasEngine.Network
             NetworkIdentity player = GetAvailablePlayerFromPool();
             if(player)
             {
-                NetworkIdentity networkIdentity = player.GetComponent<NetworkIdentity>();
                 // If spawned player is local character: Receive ownership  
-                networkIdentity.ReceiveOwnershipStatus(myPlayer);
-                String name = "Chad_" + networkIdentity.ID;
+                player.ReceiveOwnershipStatus(myPlayer);
+                String name = "Chad_";
                 if (myPlayer)
-                    player.Name = name + "_(my player)";
+                    name += "(my player)";
                 else
-                    player.Name = name;
-                Players[peer] = networkIdentity;
+                    name += peer.EndPoint.Address.ToString();
+
+                player.gameObject.Name = name;
+                Players[peer] = player;
             }
             else
             {
