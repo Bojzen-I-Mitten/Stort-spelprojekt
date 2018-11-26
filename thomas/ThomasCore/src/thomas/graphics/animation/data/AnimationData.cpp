@@ -15,9 +15,9 @@ namespace thomas {
 			{
 			}
 
-			size_t AnimationData::numChannel() const
+			uint32_t AnimationData::numChannel() const
 			{
-				return m_channels.size();
+				return (uint32_t)m_channels.size();
 			}
 
 

@@ -17,6 +17,7 @@
 #include "../serialization/Serializer.h"
 #include "../Time.h"
 #include "Font.h"
+#include "../object/component/Transform.h"
 using namespace System::Threading;
 namespace ThomasEngine
 {
@@ -288,25 +289,25 @@ namespace ThomasEngine
 			Serializer::SerializeGameObject(gameObject, path);
 			gameObject->prefabPath = pp;
 		}
-
-		GameObject ^ Resources::LoadPrefab(String^ path) {
-			return LoadPrefab(path, false);
+		void recursivePrefabClean(GameObject^ obj)
+		{
+			if (obj == nullptr) return;
+			// Clean null components recursively
+			for each(Transform^ o in obj->transform->children)
+				recursivePrefabClean(o->m_gameObject);
+			obj->CleanComponents();
 		}
 
-		GameObject ^ Resources::LoadPrefab(String^ path, bool forceInstantiate)
+		GameObject^ Resources::CreatePrefab(String^ path)
 		{
-			if (!forceInstantiate) {
-				for each(GameObject^ gObj in GameObject::GetAllGameObjects(true))
-				{
-					if (gObj->prefabPath == path)
-						return gObj;
-				}
-			}
-
-			try {
+			try
+			{
 				GameObject^ prefab = Serializer::DeserializeGameObject(path);
 				if (prefab)
+				{
 					prefab->prefabPath = path;
+					recursivePrefabClean(prefab);
+				}
 				return prefab;
 			}
 			catch (Exception^ e) {
@@ -316,6 +317,33 @@ namespace ThomasEngine
 			}
 
 		}
+
+		GameObject ^ Resources::LoadPrefabResource(String^ path)
+		{
+			GameObject^ prefab;
+			if (s_PREFAB_DICT->TryGetValue(path, prefab))
+				return prefab;
+
+			prefab = CreatePrefab(path);
+			Monitor::Enter(s_PREFAB_DICT);
+			s_PREFAB_DICT[path] = prefab;
+			Monitor::Exit(s_PREFAB_DICT);
+			return prefab;
+		}
+#ifdef _EDITOR
+		IEnumerable<GameObject^>^ Resources::PrefabList::get()
+		{
+			auto l = gcnew List<GameObject^>(s_PREFAB_DICT->Count);
+			Monitor::Enter(s_PREFAB_DICT);
+			for each (auto var in s_PREFAB_DICT)
+			{
+				l->Add(var.Value);
+			}
+			Monitor::Exit(s_PREFAB_DICT);
+
+			return l;
+		}
+#endif
 
 #pragma endregion
 		generic<typename T>
@@ -339,13 +367,6 @@ namespace ThomasEngine
 					T resource = (T)Activator::CreateInstance(T::typeid, path);
 					resources[thomasPath] = resource;
 					return resource;
-				}
-			}
-
-			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
 				}
 			}
 
@@ -376,10 +397,32 @@ namespace ThomasEngine
 				OnResourceLoadEnded();
 			}
 
+			void Resources::Unload(Resource^ resource) {
+				if (Find(resource->m_path))
+				{
+					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
+					delete resource;
+				}
+			}
+
+			void recursivePrefabDestruction(GameObject^ obj)
+			{
+				if (obj == nullptr) return;
+				// Delete objects recursively
+				List<Transform^> list(obj->transform->children);	// List is edited during destruction
+				for each(Transform^ o in list)
+					recursivePrefabDestruction(o->m_gameObject);
+				//obj->OnDestroy();
+				delete obj;
+			}
+
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
+				for each (auto var in s_PREFAB_DICT)
+					recursivePrefabDestruction(var.Value);
+				resources->Clear();
 			}
 #pragma endregion
 
@@ -454,16 +497,11 @@ namespace ThomasEngine
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
-					Object^ lock = ThomasWrapper::CurrentScene->GetGameObjectsLock();
-
-					System::Threading::Monitor::Enter(lock);
 					Resource^ resource = resources[thomasPathOld];
 					resources->Remove(thomasPathOld);
 					resources[thomasPathNew] = resource;
 					if (resource)
 						resource->Rename(newPath);
-
-					System::Threading::Monitor::Exit(lock);
 				}
 			}
 			generic<typename T>

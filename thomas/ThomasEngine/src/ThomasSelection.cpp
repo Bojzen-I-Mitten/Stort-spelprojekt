@@ -2,6 +2,7 @@
 #include <thomas\editor\EditorCamera.h>
 #pragma managed
 #include "ThomasSelection.h"
+#include "Scene.h"
 #include "object\GameObject.h"
 #include "Debug.h"
 
@@ -48,7 +49,7 @@ namespace ThomasEngine {
 	{
 		if (guid != Guid::Empty)
 		{
-			GameObject^ gObj = (GameObject^)ThomasEngine::Object::Find(guid);
+			GameObject^ gObj = ThomasEngine::ThomasWrapper::CurrentScene->Find(guid);
 			if (gObj)
 				SelectGameObject(gObj);
 		}
@@ -112,7 +113,7 @@ namespace ThomasEngine {
 		try {
 			for (thomas::object::GameObject* gameObject : thomas::editor::EditorCamera::Instance()->GetSelectedObjects())
 			{
-				GameObject^ gObj = (GameObject^)ThomasEngine::Object::GetObject(gameObject);
+				GameObject^ gObj = ThomasWrapper::CurrentScene->Find(gameObject);
 				if (gObj)
 					tempSelectedGameObjects.Add(gObj);
 			}

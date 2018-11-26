@@ -86,7 +86,7 @@ namespace ThomasEngine
 		{
 			
 			String^ path = jo->Value<String^>("prefabPath");
-			return Resources::LoadPrefab(Resources::ConvertToRealPath(path));
+			return Resources::CreatePrefab(Resources::ConvertToRealPath(path));
 		}
 		else if (jo->ContainsKey("$ref"))
 		{
@@ -95,7 +95,8 @@ namespace ThomasEngine
 		}
 		else
 		{
-			existingValue = existingValue ? existingValue : serializer->ContractResolver->ResolveContract(objectType)->DefaultCreator();
+			if(!existingValue)
+				existingValue = serializer->ContractResolver->ResolveContract(objectType)->DefaultCreator();
 			serializer->Populate(jo->CreateReader(), existingValue);
 			return existingValue;
 		}

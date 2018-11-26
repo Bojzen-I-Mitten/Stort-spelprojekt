@@ -114,7 +114,7 @@ namespace thomas
 				if (m_channel != nullptr && m_is3D)
 				{
 					// No velocity set on the object
-					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->m_transform->GetPosition()), NULL);
+					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->GetTransform()->GetPosition()), NULL);
 					m_channel->set3DSpread(m_spreadAngle);
 
 					if (m_minDistance < m_maxDistance)

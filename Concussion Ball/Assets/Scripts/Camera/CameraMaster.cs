@@ -8,6 +8,7 @@ public enum CAM_STATE
     MAIN_MENU,
     EXIT_MENU,
     HOST_MENU,
+    LOADING_SCREEN,
     NUMSTATES
 }
 
@@ -23,6 +24,7 @@ public class CameraMaster : ScriptComponent
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;
     GUIHostMenu HostMenu;
+    GUILoadingScreen LoadingScreen;
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
     ChadHud Hud;
@@ -32,7 +34,7 @@ public class CameraMaster : ScriptComponent
 
 
 
-    public override void Awake()
+    public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
@@ -66,6 +68,10 @@ public class CameraMaster : ScriptComponent
         if (HostMenu == null)
             Debug.Log("Camera Master cannot find GUI script for host");
 
+        LoadingScreen = gameObject.GetComponent<GUILoadingScreen>();
+        if (LoadingScreen == null)
+            Debug.Log("Camera Maser cannot find GUI script for loading screen");
+
         ChadCam = gameObject.GetComponent<ChadCam>();
         if (ChadCam == null)
             Debug.Log("Camera Master cannot find ChadCam");
@@ -94,6 +100,7 @@ public class CameraMaster : ScriptComponent
         JoinHost.Canvas.isRendering = false;
         MainMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
+        LoadingScreen.Canvas.isRendering = false;
 
         switch (State)
         {
@@ -119,6 +126,9 @@ public class CameraMaster : ScriptComponent
                 break;
             case CAM_STATE.HOST_MENU:
                 HostMenu.Canvas.isRendering = true;
+                break;
+            case CAM_STATE.LOADING_SCREEN:
+                LoadingScreen.Canvas.isRendering = true;
                 break;
         }
     }

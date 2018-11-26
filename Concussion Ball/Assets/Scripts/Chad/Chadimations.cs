@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ThomasEngine;
 using ThomasEngine.Network;
 using ThomasEngine.Script;
-
+using Newtonsoft.Json;
 
 public class Chadimations : NetworkComponent
 {
@@ -15,6 +15,11 @@ public class Chadimations : NetworkComponent
     {
         public Animation Animation { get; set; }
         public Vector3 Position { get; set; }
+        /* PlaybackHandle node related to the anim
+        */
+        [JsonIgnoreAttribute]
+        [BrowsableAttribute(false)]
+        public PlaybackNode Node { get; set; }
 
         public float GetWeight(Vector3 target)
         {
@@ -69,9 +74,9 @@ public class Chadimations : NetworkComponent
                     for(int i = 0; i < state.Value.Count; ++i)
                     {
                         if(state.Key == ChadControls.STATE.THROWING)
-                            newBlendNode.appendNode(state.Value[i].Animation, false);
+                            state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, false);
                         else
-                            newBlendNode.appendNode(state.Value[i].Animation, true);
+                            state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, true);
                     }
                     BlendNodes.Add(state.Key, newBlendNode);
 
@@ -96,6 +101,7 @@ public class Chadimations : NetworkComponent
                 {
                     AnimationNode node = Animations[State][(int)i];
                     WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+                    node.Node.getTimeHandle().SetSpeed(1);
                 }
                 else if (!_Throwing && i == 1) // shouldn't be needed, but it is, rewrite
                     WeightHandles[State].setWeight(i, 0);

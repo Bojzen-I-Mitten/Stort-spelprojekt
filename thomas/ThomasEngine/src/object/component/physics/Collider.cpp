@@ -4,16 +4,18 @@
 #include "Collider.h"
 #include "Rigidbody.h"
 #include "../../GameObject.h"
+#include "../../../ThomasManaged.h"
+#include "../../../Scene.h"
 
 namespace ThomasEngine
 {
-
-	Collider::Collider(component::Collider * nativePtr) : Component(nativePtr)
+#define TCollider thomas::object::component::Collider
+	Collider::Collider(TCollider * nativePtr) : Component(nativePtr)
 	{
 		OnCollisionDelegate^ fp = gcnew OnCollisionDelegate(this, &Collider::OnCollision);
 		gch = GCHandle::Alloc(fp);
 		IntPtr ip = Marshal::GetFunctionPointerForDelegate(fp);
-		component::Collider::OnCollisionEvent cb = static_cast<component::Collider::OnCollisionEvent>(ip.ToPointer());
+		TCollider::OnCollisionEvent cb = static_cast<TCollider::OnCollisionEvent>(ip.ToPointer());
 		nativePtr->SetOnCollisionEvent(cb);
 	}
 	Collider::~Collider() 
@@ -25,9 +27,10 @@ namespace ThomasEngine
 		gch.Free();
 	}
 
-	void Collider::OnCollision(component::Collider* otherCollider, COLLISION_TYPE collisionType)
+	void Collider::OnCollision(TCollider* otherCollider, COLLISION_TYPE collisionType)
 	{
-		Collider^ collider = (Collider^)Object::Find(Utility::Convert(otherCollider->m_guid));
+		GameObject^ obj = ThomasWrapper::CurrentScene->Find(otherCollider->m_gameObject);
+		Collider^ collider = obj->GetComponent<Collider^>(otherCollider);
 		if (!collider)
 			return;
 		if (collider->isTrigger || isTrigger) //If one of the colliders is a trigger we do OnColliderX instead.
@@ -90,18 +93,15 @@ namespace ThomasEngine
 		m_attachedRigidbody = value;
 		if (m_attachedRigidbody)
 		{
-			((component::Collider*)nativePtr)->SetAttachedRigidbody((component::Rigidbody*)value->nativePtr);
+			((TCollider*)nativePtr)->SetAttachedRigidbody((thomas::object::component::Rigidbody*)value->nativePtr);
 		}
 		else
 		{
-			((component::Collider*)nativePtr)->SetAttachedRigidbody(nullptr);
+			((TCollider*)nativePtr)->SetAttachedRigidbody(nullptr);
 		}
 	}
 
-	bool Collider::isTrigger::get() { return ((component::Collider*)nativePtr)->IsTrigger(); }
-	void Collider::isTrigger::set(bool value) { ((component::Collider*)nativePtr)->SetTrigger(value); }
-
-	/*float Collider::friction::get() { return ((component::Collider*)nativePtr)->GetFriction(); }
-	void Collider::friction::set(float value) { ((component::Collider*)nativePtr)->SetFriction(value); }*/
+	bool Collider::isTrigger::get() { return ((TCollider*)nativePtr)->IsTrigger(); }
+	void Collider::isTrigger::set(bool value) { ((TCollider*)nativePtr)->SetTrigger(value); }
 }
 

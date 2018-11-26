@@ -27,11 +27,14 @@ namespace ThomasEngine
 
 	}
 	void ScriptingManager::ReloadAssembly(bool forceReload) {
-		if ((forceReload || shouldReload) &&								// Check if force reload
-			!ThomasWrapper::Thomas->SceneManagerRef->IsAsyncLoading())		// Ensure thomas is not in loading process
+		// Ensure thomas is in a proper state: Not running or load in process
+		if (ThomasWrapper::IsPlaying() || ThomasWrapper::Thomas->SceneManagerRef->IsAsyncLoading())
+			return;
+		// If needed
+		if (forceReload || shouldReload)
 		{
 			// Store current scene
-
+			Debug::Log("Reloading assembly...");
 			SceneManager::TempCopy^ tmp = ThomasWrapper::Thomas->SceneManagerRef->StoreTempCopy();
 
 			// Reload assembly
@@ -47,6 +50,60 @@ namespace ThomasEngine
 			}
 		}
 	}
+	void ScriptingManager::ForceReloadAssembly()
+	{
+		ReloadAssembly(true);
+	}
+
+	
+	void ScriptingManager::Init() {
+
+		fsw = gcnew FileSystemWatcher();
+		fsw->Filter = "Assembly.dll";
+		fsw->Changed += gcnew FileSystemEventHandler(&ScriptingManager::OnChanged);
+		Application::currentProjectChanged += gcnew Application::CurrentProjectChangedEvent(&ScriptingManager::OnCurrentProjectChanged);
+	}
+
+	void ScriptingManager::OnCurrentProjectChanged(Project^ newProject) 
+	{
+		String^ assemblyFolderPath = newProject->assembly;
+		objPath = newProject->path + "/obj";
+#ifdef _DEBUG
+		assemblyFolderPath += "/Debug";
+		objPath += "/Debug";
+#else
+		assemblyFolderPath += "/Release";
+		objPath += "/Release";
+#endif
+		fsw->EnableRaisingEvents = false;
+		fsw->Path = assemblyFolderPath;
+		//fsw->EnableRaisingEvents = true;
+		LoadAssembly();
+	}
+	Assembly^ ScriptingManager::GetAssembly()
+	{
+		return assembly;
+	}
+
+	delegate void OnChanged(Object^ sender, FileSystemEventArgs e);
+
+
+	bool ScriptingManager::IsFileLocked(FileInfo^ file)
+	{
+		FileStream^ stream;
+		try {
+			stream = file->Open(FileMode::Open, FileAccess::ReadWrite, FileShare::None);
+		}
+		catch (IOException^) {
+			return true;
+		}
+		finally{
+			if (stream)
+				stream->Close();
+		}
+		return false;
+	}
+
 
 	void ScriptingManager::OnChanged(System::Object ^sender, System::IO::FileSystemEventArgs ^e)
 	{

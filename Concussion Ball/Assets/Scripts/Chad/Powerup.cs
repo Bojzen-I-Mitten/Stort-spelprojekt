@@ -14,9 +14,9 @@ public class Powerup : PickupableObject
     public PowerupSpawner spawner;
 
     protected bool activated = false;
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
         Disable();
         chargeTimeMax = 0.5f;

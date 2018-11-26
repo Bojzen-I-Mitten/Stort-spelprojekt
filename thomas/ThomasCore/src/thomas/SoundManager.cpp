@@ -25,8 +25,8 @@ namespace thomas
 		// No velocity set on the listener
 		if (listener != nullptr)
 		{
-			m_system->set3DListenerAttributes(0, &Vector3ToFmod(listener->m_gameObject->m_transform->GetPosition()), NULL,
-				&Vector3ToFmod(listener->m_gameObject->m_transform->Forward()), &Vector3ToFmod(listener->m_gameObject->m_transform->Up()));
+			m_system->set3DListenerAttributes(0, &Vector3ToFmod(listener->m_gameObject->GetTransform()->GetPosition()), NULL,
+				&Vector3ToFmod(listener->m_gameObject->GetTransform()->Forward()), &Vector3ToFmod(listener->m_gameObject->GetTransform()->Up()));
 		}
 		
 		ErrorCheck(m_system->update());

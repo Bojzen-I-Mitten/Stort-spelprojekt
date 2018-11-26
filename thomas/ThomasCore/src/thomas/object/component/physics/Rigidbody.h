@@ -43,12 +43,20 @@ namespace thomas
 				void OnEnable();
 				void OnDisable();
 				void OnDestroy();
+				/* Update object transform from the rigid body.
+				*/
 				void UpdateRigidbodyToTransform();
+				/* Update rigid body transform from object's transform if a new 
+				 * transform is generated during the frame from non-simulation parameters.
+				*/
 				void UpdateTransformToRigidBody();
 				void AddTorque(const math::Vector3& torque, ForceMode mode = ForceMode::Force);
 				void AddForce(const math::Vector3& force, ForceMode mode = ForceMode::Force);
 				void AddRelativeForce(const math::Vector3& force, const math::Vector3 & relPos, ForceMode mode = ForceMode::Force);
-
+			private:
+				/* Always update rigidbody transform
+				*/
+				void UpdateRigidBodyTransform();
 			public:
 				void SetFreezePosition(const math::Vector3& freezePosition);
 				void SetFreezeRotation(const math::Vector3& freezeRotation);
@@ -69,8 +77,8 @@ namespace thomas
 				void SetCenterOfmass(math::Vector3 Centerofmass);
 				void SetBounciness(float bounciness);
 				void SetFriction(float friction);
-				void SetPosition(math::Vector3 position, bool forcePosition=false);
-				void SetRotation(math::Quaternion rotation, bool forceRotation=false);
+				void SetPosition(math::Vector3 position);
+				void SetRotation(math::Quaternion rotation);
 
 				void IgnoreNextTransformUpdate();
 

@@ -34,6 +34,12 @@ public class MatchSystem : NetworkManager
 
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
+    public string ServerName = "Pelles server";
+    public bool PublicServer = true;
+    public bool SpawnPowerupsDuringGame = true;
+    public int ScoreLimit = 0;
+
+
     public float lostTime = 0.0f;
     public float ElapsedMatchTime
     {
@@ -83,12 +89,16 @@ public class MatchSystem : NetworkManager
 
         Teams[TEAM_TYPE.UNASSIGNED] = new Team(TEAM_TYPE.UNASSIGNED, "Unassigned", new Color(0, 0, 0, 0));
     }
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        Ball = GameObject.Instantiate(BallPrefab);
+    }
 
-  
+
 
     public override void Start()
     {
-        Ball = GameObject.Instantiate(BallPrefab);
         base.Start();
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
