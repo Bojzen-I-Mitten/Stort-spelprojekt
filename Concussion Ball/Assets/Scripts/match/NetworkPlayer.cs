@@ -7,7 +7,7 @@ using System.Collections;
 
 public class NetworkPlayer : NetworkComponent
 {
-    public String PlayerName;
+    public String PlayerName = "";
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
@@ -47,6 +47,18 @@ public class NetworkPlayer : NetworkComponent
         PlayerName = GUIMainMenu.PlayerString;
     }
 
+    public int GetPing()
+    {
+        return Identity.Ping;
+    }
+
+
+    public override void OnDisable()
+    {
+        if(nameCanvas != null)
+            nameCanvas.isRendering = false;
+    }
+
     public override void Update()
     {
         if (!isOwner)
@@ -60,9 +72,14 @@ public class NetworkPlayer : NetworkComponent
             else
                 position = rb.Position + new Vector3(0, textOffset, 0);
 
+            nameCanvas.isRendering = true;
             nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
         }
+        else if(nameCanvas != null)
+            nameCanvas.isRendering = false;
 
+        if (Team != null && mat != null)
+            mat.SetColor("color", Team.Color);
 
         if (transform.position.y < BottomOfTheWorld)
             Reset();
@@ -70,10 +87,8 @@ public class NetworkPlayer : NetworkComponent
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if(initialState)
-        {
-            writer.Put(PlayerName);
-        }
+
+        writer.Put(PlayerName);
 
         if (Team != null)
             writer.Put((int)Team.TeamType);
@@ -82,13 +97,11 @@ public class NetworkPlayer : NetworkComponent
         return true;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
 
-        if(initialState)
-        {
-            PlayerName = reader.GetString();
-        }
+        PlayerName = reader.GetString();
+        
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
@@ -98,8 +111,6 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
-            if(Team != null)
-                mat?.SetColor("color", Team.Color);
         }
 
     }
