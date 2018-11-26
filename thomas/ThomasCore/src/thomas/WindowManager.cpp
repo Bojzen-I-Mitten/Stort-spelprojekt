@@ -103,7 +103,7 @@ namespace thomas
 
 	int WindowManager::GetNumOfWindows()
 	{
-		return m_windows.size();
+		return (int)m_windows.size();
 	}
 
 	Window* WindowManager::GetCurrentBound()

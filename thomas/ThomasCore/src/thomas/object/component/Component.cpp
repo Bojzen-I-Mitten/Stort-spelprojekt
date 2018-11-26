@@ -1,14 +1,29 @@
 #include "Component.h"
 
 #include "../GameObject.h"
-thomas::object::component::Component::~Component()
+
+namespace thomas
 {
-	for (int i = 0; i < m_gameObject->m_components.size(); i++)
+	namespace object
 	{
-		Component* component = m_gameObject->m_components[i];
-		if (component == this)
+		namespace component
 		{
-			m_gameObject->m_components.erase(m_gameObject->m_components.begin() + i);
+			Component::Component() :
+				m_enabled(false), m_lock()
+#ifdef _EDITOR
+				, m_editorLock()
+#endif
+			{
+			}
+
+
+			thomas::object::component::Component::~Component()
+			{
+			}
+			void Component::setEnabledState(bool state)
+			{
+				m_enabled = state;
+			}
 		}
 	}
 }

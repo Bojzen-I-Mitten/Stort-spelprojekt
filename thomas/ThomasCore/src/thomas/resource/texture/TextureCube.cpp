@@ -12,6 +12,11 @@ namespace thomas
 			LoadTextureCubeFromFile(path);
 		}
 
+		TextureCube::~TextureCube()
+		{
+
+		}
+
 		void TextureCube::LoadTextureCubeFromFile(std::string path)
 		{
 			ID3D11Resource* tempResource;

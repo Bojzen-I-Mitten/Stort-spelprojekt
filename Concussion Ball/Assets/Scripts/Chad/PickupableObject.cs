@@ -16,6 +16,10 @@ public class PickupableObject : NetworkComponent
     public bool m_throwable = false;
     private float chargeTimeCurrent;
     public float chargeTimeMax;// { get; set; } = 4.0f;
+    public float BaseThrowForce = 0;
+    public float MaxThrowForce = 0;
+    public float ThrowForce = 0;
+
     public Collider PickupCollider { get; set; }
     [Newtonsoft.Json.JsonIgnore]
     public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
@@ -23,7 +27,7 @@ public class PickupableObject : NetworkComponent
     public ChadControls _Chad;
     private RenderComponent m_renderComponent;
 
-    public override void Awake()
+    public override void OnAwake()
     {
         m_rigidBody = gameObject.GetComponent<Rigidbody>();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
@@ -61,15 +65,15 @@ public class PickupableObject : NetworkComponent
 
     }
 
-    virtual public void Throw(Vector3 camPos, Vector3 force)
+    virtual public void Throw(Vector3 camPos, Vector3 direction)
     {
         Vector3 pos = camPos;
         Drop();
         transform.position = pos;
-        transform.LookAt(transform.position + Vector3.Normalize(force));
+        transform.LookAt(transform.position + Vector3.Normalize(direction));
         m_rigidBody.Position = transform.position;
         m_rigidBody.Rotation = transform.rotation;
-        StartCoroutine(ThrowRoutine(force));
+        StartCoroutine(ThrowRoutine(direction));
         OnThrow();
         SendRPC("OnThrow");
     }
@@ -140,9 +144,14 @@ public class PickupableObject : NetworkComponent
         SendRPC("OnActivate");
     }
 
-    virtual public void Pickup(ChadControls chad, Transform hand)
+    virtual public void SaveObjectOwner(ChadControls chad)
     {
 
+    }
+
+    virtual public void Pickup(ChadControls chad, Transform hand)
+    {
+        SaveObjectOwner(chad);
         if (!m_rigidBody)
             m_rigidBody = gameObject.GetComponent<Rigidbody>();
 
@@ -193,10 +202,10 @@ public class PickupableObject : NetworkComponent
     virtual public void Disable()
     {
         PickupCollider.enabled = false;
-        gameObject.activeSelf = false;
+        gameObject.SetActive(false);
         m_rigidBody.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
-        gameObject.activeSelf = false;
+        gameObject.SetActive(false);
     }
 
     virtual public void Reset()

@@ -35,8 +35,9 @@ namespace ThomasEngine
 			Application::currentProject->currentScenePath = m_current_scene->RelativeSavePath;
 
 		// Trigger change
+#ifdef _EDITOR
 		OnCurrentSceneChanged(oldScene, value);
-
+#endif
 		// Cleanup
 		if (oldScene)
 			oldScene->~Scene();
@@ -66,12 +67,9 @@ namespace ThomasEngine
 	void SceneManager::RestartCurrentScene()
 	{
 		// Assert: isLogicThread()
-		Object^ lock = m_current_scene->GetGameObjectsLock();
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), Local_Temp_Copy_Path);
 		
-		Monitor::Enter(lock);
 		m_current_scene->UnLoad();
-		Monitor::Exit(lock);
 
 		Scene^ scene = Scene::LoadScene(tempFile, m_ID_Counter++);
 		m_temporarySwap = true;
@@ -196,7 +194,7 @@ namespace ThomasEngine
 	}
 	bool SceneManager::IsAsyncLoading()
 	{
-		return m_state;
+		return m_state == LoadingInProgress;
 	}
 	bool SceneManager::NoSceneExist()
 	{

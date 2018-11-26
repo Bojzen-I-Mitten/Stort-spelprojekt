@@ -20,7 +20,7 @@ namespace thomas
 		{
 		public:
 			Font(const std::string& path);
-
+			virtual ~Font();
 		public:
 			void DrawGUIText(SpriteBatch* spritebatch, const std::string& text, const Vector2& position, const Vector4& color, 
 				const Vector2& origin, const Vector2& scale, float rotation, DirectX::SpriteEffects effect, const float depth);

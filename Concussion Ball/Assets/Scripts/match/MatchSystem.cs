@@ -34,6 +34,12 @@ public class MatchSystem : NetworkManager
 
     public int MatchLength { get; set; } = 10 * 60; // Match time in seconds
 
+    public string ServerName = "Pelles server";
+    public bool PublicServer = true;
+    public bool SpawnPowerupsDuringGame = true;
+    public int ScoreLimit = 0;
+
+
     public float lostTime = 0.0f;
     public float ElapsedMatchTime
     {
@@ -83,12 +89,16 @@ public class MatchSystem : NetworkManager
 
         Teams[TEAM_TYPE.UNASSIGNED] = new Team(TEAM_TYPE.UNASSIGNED, "Unassigned", new Color(0, 0, 0, 0));
     }
+    public override void OnAwake()
+    {
+        base.OnAwake();
+        Ball = GameObject.Instantiate(BallPrefab);
+    }
 
-  
+
 
     public override void Start()
     {
-        Ball = GameObject.Instantiate(BallPrefab);
         base.Start();
 
         PowerupManager = gameObject.GetComponent<PowerupManager>();
@@ -209,7 +219,10 @@ public class MatchSystem : NetworkManager
 
     #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID, int team1Score, int team2Score)
+    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID,
+        int team1Score, int team2Score,
+        Color team1Color, Color team2Color,
+        string team1Name, string team2Name)
     {
         Debug.Log("matchInfo!");
         if (!MatchStarted)
@@ -219,6 +232,10 @@ public class MatchSystem : NetworkManager
             GoldenGoal = goldenGoal;
             MatchStartTime = startTime;
 
+            Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
+            Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
+            Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
+            Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
             Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
             Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
 
@@ -323,9 +340,14 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerJoin(NetPeer peer)
     {
+        if(peer == LocalPeer)
+        {
+            NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
+            np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+            Debug.Log(np.PlayerName);
+        }
         //Disable the players gameObject and place him in team Spectator.
         //Give him a NetworkPlayer object.
-        Debug.Log("peer joined!");
         //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
         
         //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
@@ -334,7 +356,10 @@ public class MatchSystem : NetworkManager
         {
             Debug.Log(MatchStarted);
             if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID, Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score);
+                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+                    Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
+                    Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
+                    Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
         }
     }
 

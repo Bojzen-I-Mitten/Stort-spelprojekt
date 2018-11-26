@@ -74,7 +74,7 @@ namespace thomas
 		{
 		public:
 			Mesh(const Vertices & vertices, std::vector<unsigned int> indices, const std::string & name);
-			~Mesh() = default;
+			~Mesh();
 			void Draw(resource::Shader* shader);
 
 		public:

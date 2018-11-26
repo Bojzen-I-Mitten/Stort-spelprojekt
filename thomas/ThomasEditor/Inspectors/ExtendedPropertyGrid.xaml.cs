@@ -35,13 +35,13 @@ namespace ThomasEditor
                             new TargetPropertyType { Type = typeof(System.Collections.Generic.List<ThomasEngine.Transform>)},
                              new TargetPropertyType { Type = typeof(Resource[]) },
                             new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Resource>)},
+                            new TargetPropertyType { Type = typeof(System.Collections.Generic.List<Material>)},
                     }
                     });
             }
 
             private void _grid_PreparePropertyItem(object sender, PropertyItemEventArgs e)
             {
-                int x = 5;
             }
 
             private void PropertyGrid_Loaded(object sender, RoutedEventArgs e)
@@ -77,10 +77,9 @@ namespace ThomasEditor
                         PropertyItem pi = label.DataContext as PropertyItem;
                         if (resource.GetType() == pi.PropertyType)
                         {
-                            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            ThomasWrapper.ENTER_SYNC_STATELOCK();
                             pi.Value = resource;
-
-                            Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            ThomasWrapper.EXIT_SYNC_STATELOCK();
                         }
 
                     }
@@ -91,10 +90,10 @@ namespace ThomasEditor
                         PropertyItem pi = label.DataContext as PropertyItem;
                         if (obj.GetType() == pi.PropertyType)
                         {
-                            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                            ThomasWrapper.ENTER_SYNC_STATELOCK();
                             pi.Value = obj;
+                            ThomasWrapper.EXIT_SYNC_STATELOCK();
 
-                            Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
                         }else if(obj is GameObject && (obj as GameObject).inScene && typeof(Component).IsAssignableFrom(pi.PropertyType))
                         {
                             var method = typeof(GameObject).GetMethod("GetComponent").MakeGenericMethod(pi.PropertyType);

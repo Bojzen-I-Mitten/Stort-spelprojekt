@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using ThomasEngine.Network;
+using ThomasEngine.Script;
 
 public class ChadHud : ScriptComponent
 {
@@ -14,10 +15,18 @@ public class ChadHud : ScriptComponent
         get
         {
             if (!_Ball)
-                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+                _Ball = ScriptUtility.FindComponent<Ball>();
             return _Ball;
         }
     }
+    private ChadControls Chad
+    {
+        get
+        {
+            return MatchSystem.instance?.LocalChad;
+        }
+    }
+
     Camera cam;
 
     #region GUI Text & Images
@@ -55,7 +64,7 @@ public class ChadHud : ScriptComponent
     public Texture2D LMBTexture { get; set; }
     #endregion
 
-    public override void Awake()
+    public override void OnAwake()
     {
         if (!Instance)
             Instance = this;
@@ -84,27 +93,29 @@ public class ChadHud : ScriptComponent
             TimerBG.scale = new Vector2(0.6f, 0.7f);
             TimerBG.color = Color.GhostWhite;
             TimerBG.depth = 0.9f;
+
+            //Left of the timer
+            if (ScoreBGTexture != null)
+            {
+                Score1BG = Canvas.Add(ScoreBGTexture);
+                Score1BG.origin = new Vector2(0.5f, 0);
+                Score1BG.position = TimerBG.position - new Vector2((TimerBG.size.x + Score1BG.size.x) / 2 , 0);
+                Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+                Score1BG.depth = 1;
+                Score1BG.scale = new Vector2(1, 0.7f);
+                Score1BG.flip = new Vector2(0, 1);
+
+                //Right of the timer
+                Score2BG = Canvas.Add(ScoreBGTexture);
+                Score2BG.origin = new Vector2(0.5f, 0); //for clarity
+                Score2BG.position = TimerBG.position + new Vector2((TimerBG.size.x + Score1BG.size.x) / 2, 0);
+                Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
+                Score2BG.depth = 1;
+                Score2BG.scale = new Vector2(1, 0.7f);
+            }
         }
 
-        //Left of the timer
-        if (ScoreBGTexture != null)
-        {
-            Score1BG = Canvas.Add(ScoreBGTexture);
-            Score1BG.origin = new Vector2(0.5f, 0);
-            Score1BG.position = new Vector2(0.4175f, 0);
-            Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-            Score1BG.depth = 1;
-            Score1BG.scale = new Vector2(1, 0.7f);
-            Score1BG.flip = new Vector2(0, 1);
-
-            //Right of the timer
-            Score2BG = Canvas.Add(ScoreBGTexture);
-            Score2BG.origin = new Vector2(0.5f, 0);
-            Score2BG.position = new Vector2(0.5825f, 0f);
-            Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
-            Score2BG.depth = 1;
-            Score2BG.scale = new Vector2(1, 0.7f);
-        }
+        
 
         Score1 = Canvas.Add("");
         Score1.scale = new Vector2(1.6f);
@@ -385,18 +396,19 @@ public class ChadHud : ScriptComponent
             HideHeldObjectText();
             DeactivateAimHUD();
         }
-            
 
-    }
+        if (BallArrow != null)
+        {
+            Color color;
+            if (Ball?._Chad)
+                color = Ball._Chad.NetPlayer.Team.Color;
+            else
+                color = Color.White;
+            BallArrow.color = color;
+        }
 
-    public override void OnEnable()
-    {
-        Canvas.isRendering = true;
-    }
-
-    public override void OnDisable()
-    {
-        Canvas.isRendering = false;
+        Score1BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+        Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
     }
 
     private void BallIndicator()
@@ -404,44 +416,47 @@ public class ChadHud : ScriptComponent
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
         if (!(screenPos.z > 0 && screenPos.z < 1 &&
             screenPos.x > 0 && screenPos.x < cam.viewport.size.x &&
-            screenPos.y > 0 && screenPos.y < cam.viewport.size.y)) //Offscreen check
+            screenPos.y > 0 && screenPos.y < cam.viewport.size.y))//Offscreen check
         {
             //Adjust for center of screen
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;
             screenPos -= screenCenter;
 
-            //flip coordinates if more than 90 deg away
+            //flip coordinates if more than 90 deg away, makes the math easier and easier to understand
             if (screenPos.z > 1)
+            {
                 screenPos *= -1;
 
+                //make sure the arrow is above (or below) chad if the ball is above (or below) him
+                int sign = 1;
+                if (MatchSystem.instance && MatchSystem.instance.MatchStarted)
+                {
+                    sign = Math.Sign(MatchSystem.instance.LocalChad.transform.position.y + 1.8f/*chad height?*/ - Ball.transform.position.y);
+                }
+
+                screenPos.y = Math.Abs(screenPos.y) * sign;
+            }
+
+            Vector3 screenBounds = screenCenter;
             float angle = (float)Math.Atan2(-screenPos.y, screenPos.x);
             angle -= MathHelper.PiOver2;
 
-            float cos = (float)Math.Cos(angle);
-            float sin = -(float)Math.Sin(angle);
-
-            //screenPos = screenCenter + new Vector3(sin * )
-
             float m = screenPos.y / screenPos.x;
-
-            Vector3 screenBounds = screenCenter; //473.5, 253.5, 0
-
+            //Clamp the arrow to the edge of the screen
             if (screenPos.y > 0)
                 screenPos = new Vector3(screenBounds.y / m, screenBounds.y, 0);
             else
                 screenPos = new Vector3(-screenBounds.y / m, -screenBounds.y, 0);
 
-            if (screenPos.x > screenBounds.x)
+            if (screenPos.x > screenBounds.x * 0.8f)
                 screenPos = new Vector3(screenBounds.x, screenBounds.x * m, 0);
-            else if (screenPos.x < -screenBounds.x)
+            else if (screenPos.x < -screenBounds.x * 0.8f)
                 screenPos = new Vector3(-screenBounds.x, -screenBounds.x * m, 0);
 
             //Re-adjust for screen center
             screenPos += screenCenter;
-            //Adjust for texture size
-            Vector2 size = new Vector2(BallArrowTexture.width, BallArrowTexture.height) * BallArrow.scale / 2;
-            screenPos -= new Vector3(size, 0);
             //Make sure the arrow is drawn on-screen
+            Vector2 size = new Vector2(BallArrowTexture.width, BallArrowTexture.height) * BallArrow.scale / 2;
             screenPos = Vector3.Clamp(screenPos, Vector3.Zero + new Vector3(size, 0), new Vector3(cam.viewport.size - size, 0));
 
             screenPos /= new Vector3(cam.viewport.size, 1);

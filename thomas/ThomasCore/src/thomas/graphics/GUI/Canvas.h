@@ -29,7 +29,7 @@ namespace thomas
 			public:
 				//Canvas();
 				Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution = Vector2(1920, 1080));
-				~Canvas() = default;
+				~Canvas();
 				void Destroy();
 				void Render();
 
@@ -42,8 +42,11 @@ namespace thomas
 				void Remove(GUIElement* element);
 				void SetRendering(bool render);
 				bool GetRendering();
-
+				void SetWorldMatrix(math::Matrix value);
+				void Set3D(bool value);
+				bool Get3D();
 			private:
+				
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;
 				std::unique_ptr<CommonStates> m_spriteStates;
 				std::unique_ptr<SpriteBatch> m_spriteBatch;
@@ -51,6 +54,7 @@ namespace thomas
 				Viewport m_viewport;
 				object::component::Camera* m_camera;
 				math::Vector2 m_baseResolution;
+				math::Matrix m_worldMatrix;
 				bool m_render;
 			};
 		}

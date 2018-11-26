@@ -23,7 +23,7 @@ namespace ThomasEngine
 		}
 		else
 		{
-			ProfileManagerWrapper::addSample(m_functionName, m_timestamp.ElapsedMilliseconds, m_startTime, m_processor_ID);
+			ProfileManagerWrapper::addSample(m_functionName, long(m_timestamp.ElapsedMilliseconds), m_startTime, m_processor_ID);
 		}
 	}
 }

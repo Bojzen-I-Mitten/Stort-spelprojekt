@@ -31,7 +31,7 @@ namespace thomas
 	}
 }
 #ifdef BENCHMARK
-#define PROFILE(name) thomas::utils::profiling::AutoProfile temp = thomas::utils::profiling::AutoProfile(name);
+#define PROFILE(name) thomas::utils::profiling::AutoProfile temp(name);
 #else
 #define PROFILE(name) 
 #endif

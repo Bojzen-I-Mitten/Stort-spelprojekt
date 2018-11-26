@@ -56,10 +56,12 @@
                     <Expander IsExpanded="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Expander.Header>
                             <DockPanel HorizontalAlignment="Stretch" LastChildFill="False">
-                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding enabled}"
+                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Activated, Mode=OneWay}" Checked="ComponentEnabled_Checked" Unchecked="ComponentEnabled_Unchecked"
                                           VerticalContentAlignment="Center" VerticalAlignment="Center" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
                                 <Label DockPanel.Dock="Left" Content="{Binding Converter={StaticResource componentToNameConverter}}"/>
-                                <Button DockPanel.Dock="Right" Content=" X " Click="RemoveComponentButton_Click" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
+                                <Label DockPanel.Dock="Left" Content="Index:" Margin="15,0,0,0"/>
+                                <TextBox VerticalAlignment="Center" Height="20" Width="30" Text="{Binding Index, UpdateSourceTrigger=LostFocus}" LostFocus="ComponentIndex_Changed" Margin="15,0,0,0"/>
+                                <Button DockPanel.Dock="Right" Content=" X " Click="RemoveComponentButton_Click" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}" Margin="15,0,0,0"/>
                             </DockPanel>
                         </Expander.Header>
                         <local:ExtendedPropertyGrid DataContext="{Binding}"/>

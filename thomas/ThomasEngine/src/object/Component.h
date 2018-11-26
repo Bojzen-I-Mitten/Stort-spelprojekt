@@ -2,11 +2,17 @@
 
 #include "../attributes/CustomAttributes.h"
 #include "Object.h"
+#include "ComponentState.h"
 
 namespace thomas { namespace object { namespace component { class Component; } } }
 
 namespace ThomasEngine 
 {
+	/* Component initiation call bits
+	*/
+	constexpr uint32_t INIT_PLAYING_BIT = 1;			// If set: System is playing
+	constexpr uint32_t INIT_EXPLICIT_CALL_BIT = 2;		// If set: Activation is called explicitly (not initial initiation).
+
 	ref class GameObject;
 	ref class Collider;
 	ref class Transform;
@@ -16,27 +22,28 @@ namespace ThomasEngine
 	{
 		Component();
 	private:
-		bool m_enabled = true;
+		/* Tracks component state. Enabled/Disabled... */
 		[NonSerializedAttribute]
-		bool m_started = false;
+		Comp::State m_state;
+		/* Tracks if component is an 'Activated' in context of the editor. Does not directly indicate if it's 'enabled'. */
+		bool m_active;
 	internal:
-		[NonSerializedAttribute]
-		bool m_firstEnable = false;
 
 		[NonSerializedAttribute]
 		List<System::Collections::IEnumerator^>^ coroutines = gcnew List<System::Collections::IEnumerator^>();
 		void UpdateCoroutines();
-		
+
 		Component(thomas::object::component::Component* ptr);
 		virtual ~Component();
 
-		
+
 		void setGameObject(GameObject^ gObj);
 		virtual void OnGameObjectSet() {};
-		virtual void Awake();
-		virtual void Start();
+		virtual void OnAwake();
+		//virtual void Start();
 		virtual void OnEnable();
 		virtual void OnDisable();
+		virtual void Start();
 		virtual void Update();
 		virtual void FixedUpdate();
 		virtual void OnDrawGizmosSelected();
@@ -54,21 +61,25 @@ namespace ThomasEngine
 		GameObject^ m_gameObject;
 
 		virtual void Destroy() override;
-		property bool initialized
-		{
-			bool get();
-			void set(bool value);
-		}
 
-		void Initialize();
-		[NonSerializedAttribute]
-		bool awakened = false;
+
 
 	private:
-		/* Set enabled state. */
+	internal:
+		/* Combined initiation logic function for component initiation
+		s			<<	State to enter
+		InitBits	<<	Information specific to the initiation call.
+		*/
+		void InitComponent(Comp::State s, uint32_t InitBits);
+		/* Call to 'construct' the object */
+		void Awake();
+		/* Enabled the component. */
 		void Enable();
-		/* Set disabled state. */
+		/* Disable the component. */
 		void Disable();
+
+
+
 	public:
 		/* Dynamic destruction of the object callable from object handle. */
 		virtual void OnDestroy() override;
@@ -101,7 +112,7 @@ namespace ThomasEngine
 		property Transform^ transform
 		{
 			Transform^ get();
-			
+
 		}
 
 		[BrowsableAttribute(false)]
@@ -109,6 +120,27 @@ namespace ThomasEngine
 		{
 			String^ get() override;
 		};
+		/* Serialization property only (used to store deactivation)
+		*/
+		[BrowsableAttribute(false)]
+		//[Newtonsoft::Json::JsonPropertyAttribute(Newtonsoft::Json::DefaultValueHandling = Newtonsoft::Json::DefaultValueHandling::Populate)]
+		[System::ComponentModel::DefaultValueAttribute(true)]
+		property bool Activated
+		{
+			bool get();
+			void set(bool state);
+		}
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		[BrowsableAttribute(false)]
+		property Comp::State ComponentState 
+		{
+			Comp::State get();
+		}
+
+		/* True if object can be enabled in editor
+		*/
+		bool enableInEditor();
 
 		void StartCoroutine(System::Collections::IEnumerator^ routine);
 		void StopCoroutine(System::Collections::IEnumerator^ routine);

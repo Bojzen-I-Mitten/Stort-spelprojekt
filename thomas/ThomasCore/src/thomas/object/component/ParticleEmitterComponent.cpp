@@ -11,6 +11,7 @@
 #include "../../editor/gizmos/Gizmos.h"
 #include <imgui/imgui.h>
 
+#include "../../utils/AutoProfile.h"
 namespace thomas
 {
 	namespace object
@@ -50,8 +51,9 @@ namespace thomas
 				m_particleBufferStruct.nrOfParticlesToEmit = 0;
 				m_particleBufferStruct.spawnAtSphereEdge = (unsigned)false;
 				m_particleBufferStruct.rand = std::rand();
-				
-				SetTexture(resource::Texture2D::GetWhiteTexture());
+
+				m_particleBufferStruct.textureIndex = 0;
+				m_texture = resource::Texture2D::GetWhiteTexture();
 			}
 
 			ParticleEmitterComponent::~ParticleEmitterComponent()
@@ -63,7 +65,7 @@ namespace thomas
 			void ParticleEmitterComponent::OnDrawGizmosSelected()
 			{
 				editor::Gizmos::Gizmo().SetColor(math::Color(1, 1, 0));
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 				
 				math::Vector3 sphereCenter = math::Vector3::Forward * m_particleBufferStruct.distanceFromSphereCenter; 
 				editor::Gizmos::Gizmo().DrawBoundingSphere(math::BoundingSphere(sphereCenter, m_particleBufferStruct.radius));
@@ -114,8 +116,9 @@ namespace thomas
 			
 			void ParticleEmitterComponent::Update()
 			{
-				m_particleBufferStruct.position = m_gameObject->m_transform->GetPosition();
-				m_particleBufferStruct.direction = m_gameObject->m_transform->Forward();
+				EDITOR_LOCK();
+				m_particleBufferStruct.position = m_gameObject->GetTransform()->GetPosition();
+				m_particleBufferStruct.direction = m_gameObject->GetTransform()->Forward();
 
 				if (m_emitOneShot)
 				{
@@ -339,9 +342,10 @@ namespace thomas
 
 			void ParticleEmitterComponent::SetBlendState(graphics::ParticleSystem::BLEND_STATE const & blendState)
 			{
+				EDITOR_LOCK();
 				if (blendState != m_blendState)
 				{
-					m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
+					//m_particleSystem->DeRefTexFromTexArray(m_particleBufferStruct.textureIndex);
 					m_blendState = blendState;
 					if (blendState == graphics::ParticleSystem::BLEND_STATE::ALPHA)
 					{
@@ -362,8 +366,9 @@ namespace thomas
 
 			void ParticleEmitterComponent::SetTexture(resource::Texture2D * other)
 			{
-				if (other == m_texture)
-					return;
+					if (other == m_texture)
+						return;
+				PROFILE("ParticleEmiter::SetTexture")
 
 				m_particleBufferStruct.textureIndex = m_particleSystem->AddTexture(other);
 

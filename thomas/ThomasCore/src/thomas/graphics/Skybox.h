@@ -21,14 +21,14 @@ namespace thomas
 			void Draw();
 		private:
 
-			std::vector<math::Vector3> m_sphereVerts;
-			std::vector<unsigned> m_sphereIndices;
 			std::unique_ptr<utils::buffers::VertexBuffer> m_vertBuffer;
 			std::unique_ptr<utils::buffers::IndexBuffer> m_indexBuffer;
 
 			resource::TextureCube* m_skyMap;
 			resource::Shader* m_shader;
 			
+			operator bool() const;
+
 			
 		};
 	}

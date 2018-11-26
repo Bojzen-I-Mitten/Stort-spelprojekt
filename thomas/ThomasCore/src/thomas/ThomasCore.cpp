@@ -54,7 +54,7 @@ namespace thomas
 		graphics::LightManager::Initialize();
 		graphics::ParticleSystem::InitializeGlobalSystems();
 
-		ObjectHandler::Init();
+		ObjectHandler::Instance(); // Init singleton
 		s_initialized = true;
 		return s_initialized;
 	}
@@ -100,13 +100,13 @@ namespace thomas
 	bool ThomasCore::Destroy()
 	{	
 		//Destroy all objects
+		editor::EditorCamera::DeleteInstance();
 		WindowManager::Instance()->Destroy();
 		graphics::LightManager::Destroy();
 		graphics::ParticleSystem::DestroyGlobalSystems();
 		graphics::Renderer::Instance()->Destroy();
 		resource::Material::Destroy();
 		resource::Texture2D::Destroy();
-		editor::EditorCamera::Instance()->Destroy();
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();

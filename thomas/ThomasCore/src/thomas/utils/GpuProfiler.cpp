@@ -9,7 +9,7 @@ namespace thomas
 		namespace profiling
 		{
 			GpuProfiler::GpuProfiler()
-				: m_frameQuery(0), m_memoryQuery(0), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
+				: m_frameQuery(0), m_memoryQuery(0), m_drawCalls(0), m_totalVertexCount(0), m_totalFaceCount(0), m_memoryUsage(0.0f)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -62,7 +62,7 @@ namespace thomas
 			{
 				m_drawCalls = 0;
 				m_totalVertexCount = 0;
-	
+				m_totalFaceCount = 0;
 				utils::D3D::Instance()->GetDeviceContextDeffered()->Begin(m_queryDisjoint[m_frameQuery]);
 				Timestamp(GTS_BEGIN_FRAME);
 			}
@@ -79,9 +79,10 @@ namespace thomas
 				m_frameQuery = (m_frameQuery + 1) % FRAME_BUFFERS; 
 			}
 
-			void profiling::GpuProfiler::AddDrawCall(int vertexCount)
+			void profiling::GpuProfiler::AddDrawCall(size_t faceCount, size_t vertexCount)
 			{
 				m_totalVertexCount += vertexCount;
+				m_totalFaceCount += faceCount;
 				m_drawCalls++;
 			}
 
@@ -163,12 +164,17 @@ namespace thomas
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()
 			{
-				return m_drawCalls;
+				return (int)m_drawCalls;
 			}
 
 			int profiling::GpuProfiler::GetVertexCount()
 			{
 				return m_totalVertexCount;
+			}
+
+			int profiling::GpuProfiler::GetFaceCount()
+			{
+				return m_totalFaceCount;
 			}
 		}
 	}

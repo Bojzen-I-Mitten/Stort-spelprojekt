@@ -31,7 +31,7 @@ namespace thomas
 				}
 				// Execute
 				m_constraint = std::unique_ptr<graphics::animation::BoneConstraint>(
-					new  graphics::animation::BoneChildTransformConstraint(*m_gameObject->m_transform));
+					new  graphics::animation::BoneChildTransformConstraint(*m_gameObject->GetTransform()));
 				if (m_skeleton->getBoneIndex(m_boneHash, m_boneIndex))
 					m_skeleton->addConstraint(m_constraint.get(), m_boneIndex);
 				else

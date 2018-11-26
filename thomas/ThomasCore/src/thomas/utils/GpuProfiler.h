@@ -30,7 +30,7 @@ namespace thomas
 				void BeginFrame();
 				void Timestamp(GTS gts);
 				void EndFrame();
-				void AddDrawCall(int vertexCount);
+				void AddDrawCall(size_t faceCount, size_t vertexCount);
 
 				// Wait on GPU for last frame's data (not this frame's) to be available
 				void RetriveTimeStamps();
@@ -42,8 +42,8 @@ namespace thomas
 				float GetMemoryUsage();
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
-				int GetVertexCount();
-
+				size_t GetVertexCount();
+				size_t GetFaceCount();
 
 			private:
 				int m_frameQuery;								
@@ -55,11 +55,12 @@ namespace thomas
 
 				float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
 
-				int m_totalVertexCount;
-				int m_drawCalls;
-
-				float m_memoryUsage;
-				float m_totalMemory;
+			size_t m_totalVertexCount;
+			size_t m_totalFaceCount;
+			size_t m_drawCalls;
+			
+			float m_memoryUsage;
+			float m_totalMemory;
 			};
 		}
 	}

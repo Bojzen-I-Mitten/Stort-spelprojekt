@@ -5,6 +5,8 @@ using System.Linq;
 
 public class ThomasTrain : Powerup
 {
+    ChadControls ObjectOwner = null;
+
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterThomasFace;
     private ParticleEmitter emitterSpark;
@@ -25,12 +27,12 @@ public class ThomasTrain : Powerup
 
     private float soundcooldown;
 
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
-        emitterFire = gameObject.AddComponent<ParticleEmitter>();
-        emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
-        emitterSpark = gameObject.AddComponent<ParticleEmitter>();
+        base.OnAwake();
+        BaseThrowForce = 20.0f;
+        MaxThrowForce = 36.0f;
+        ThrowForce = BaseThrowForce;
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
@@ -46,10 +48,20 @@ public class ThomasTrain : Powerup
         soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
         soundComponentExplosion.Looping = false;
         soundComponentExplosion.Is3D = true;
-        
+
         soundcooldown = 0.0f;
 
+        soundComponentChargeUp.Clip = soundClipChargeUp;
+        soundComponentTravel.Clip = soundClipTravel;
+        soundComponentExplosion.Clip = soundClipExplosion;
+
         m_throwable = true; // change depending on power-up
+
+        #region emitters
+        emitterFire = gameObject.AddComponent<ParticleEmitter>();
+        emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
+        emitterSpark = gameObject.AddComponent<ParticleEmitter>();
+        
         emitterFire.Texture = fireTexture;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 4.0f;
@@ -92,10 +104,7 @@ public class ThomasTrain : Powerup
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
         emitterSpark.Radius = 6.7f;
-        
-        soundComponentChargeUp.Clip = soundClipChargeUp;
-        soundComponentTravel.Clip = soundClipTravel;
-        soundComponentExplosion.Clip = soundClipExplosion;
+        #endregion
     }
 
 
@@ -103,6 +112,11 @@ public class ThomasTrain : Powerup
     {
         base.Update();
         soundcooldown -= Time.DeltaTime;
+    }
+
+    public override void SaveObjectOwner(ChadControls chad)
+    {
+        ObjectOwner = chad;
     }
 
     public override void Cleanup()
@@ -130,9 +144,9 @@ public class ThomasTrain : Powerup
     }
 
     // if this is a throwable power-up this function will be called
-    public override void Throw(Vector3 camPos, Vector3 force)
+    public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        base.Throw(camPos + Vector3.Normalize(force)*2, force);
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
         
 
         m_rigidBody.UseGravity = false;
@@ -151,7 +165,11 @@ public class ThomasTrain : Powerup
         Explosion();
 
         ChadControls localChad = MatchSystem.instance.LocalChad;
-        if (localChad)
+
+        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+
+        if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
@@ -159,8 +177,12 @@ public class ThomasTrain : Powerup
                 Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.Normalize();
                 forceDir.y += 3.0f;
+
+
                 float distForce = ExplosionRadius - distance;
-                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
+                Vector3 force = forceDir * ExplosionForce * distForce;
+                Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
+                localChad.ActivateRagdoll(2.0f, param);
             }
         }
     }
