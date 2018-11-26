@@ -38,10 +38,6 @@ public class GUIJoinHost : ScriptComponent
     public bool GoToTeamSelect;
     IEnumerator test;
 
-    public override void OnAwake()
-    {
-    }
-
     public override void Start()
     {
         IPString = "192.168.1.";
