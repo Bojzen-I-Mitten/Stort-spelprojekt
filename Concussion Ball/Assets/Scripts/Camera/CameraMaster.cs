@@ -112,8 +112,8 @@ public class CameraMaster : ScriptComponent
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
-                Camera.gameObject.transform.position = MainMenuCamPos;
-                Camera.gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
+                transform.position = MainMenuCamPos;
+                transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
                 MainMenu.Canvas.isRendering = true;
                 break;
 
@@ -121,8 +121,8 @@ public class CameraMaster : ScriptComponent
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
-                Camera.gameObject.transform.position = SelectTeamCamPos;
-                Camera.gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
+                transform.position = SelectTeamCamPos;
+                transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
                 SelectTeam.Canvas.isRendering = true;
                 break;
             case CAM_STATE.GAME:
@@ -136,8 +136,8 @@ public class CameraMaster : ScriptComponent
                     State = CAM_STATE.GAME;
                 break;
             case CAM_STATE.HOST_MENU:
-                Camera.gameObject.transform.position = SelectTeamCamPos;
-                Camera.gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
+                transform.position = SelectTeamCamPos;
+                transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
                 HostMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.LOADING_SCREEN:
