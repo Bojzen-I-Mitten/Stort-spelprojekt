@@ -39,8 +39,10 @@ namespace ThomasEngine
 	Vector2 LightComponent::AreaRectangle::get() { return Utility::Convert(light->GetRectangleDimensions()); }
 	void LightComponent::AreaRectangle::set(Vector2 value) { light->SetRectangleDimensions(Utility::Convert(value)); }
 
-
-
-
+	bool LightComponent::CastShadows::get() { return light->CastsShadows(); }
+	void LightComponent::CastShadows::set(bool value) { light->SetCastShadows(value); }
+	
+	float LightComponent::ShadowHardness::get() { return light->GetShadowHardness(); }
+	void LightComponent::ShadowHardness::set(float value) { light->SetShadowHardness(value); }
 }
 

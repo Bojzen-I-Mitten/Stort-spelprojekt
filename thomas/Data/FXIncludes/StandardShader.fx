@@ -29,7 +29,7 @@ DepthStencilState EnableDepth
     DepthFunc = LESS_EQUAL;
 };
 
-RasterizerState TestRasterizer
+RasterizerState RasterizerSolid
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -82,10 +82,9 @@ float4 frag(v2f input) : SV_TARGET
 {
     float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
+    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
 
     float3 normal = NormalTexture.Sample(StandardWrapSampler, input.texcoord);
-    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
-    
     normal.xy = normal.xy * 2.0f - 1.0f;
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));
@@ -95,8 +94,7 @@ float4 frag(v2f input) : SV_TARGET
     
     
     diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
-
-
+    
     return saturate(float4(diffuse, 1.0f));
 }
 
@@ -108,7 +106,7 @@ technique11 Standard
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(TestRasterizer);
+        SetRasterizerState(RasterizerSolid);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 

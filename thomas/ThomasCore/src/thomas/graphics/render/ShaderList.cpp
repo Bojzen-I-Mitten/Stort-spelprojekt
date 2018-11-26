@@ -233,6 +233,14 @@ namespace thomas {
 				for (auto shader : m_renderableShaders)
 					shader->SetProperty(name, prop);
 			}
+			void ShaderList::SetGlobalMatrixArray(const std::string & name, math::Matrix* value, unsigned nrOfMatrices)
+			{
+				using namespace resource::shaderproperty;
+				std::shared_ptr<ShaderProperty> prop(new ShaderPropertyMatrixArray(value, nrOfMatrices));
+				prop->SetName(name);
+				for (auto shader : m_renderableShaders)
+					shader->SetProperty(name, prop);
+			}
 			void ShaderList::SetGlobalTexture2D(const std::string & name, resource::Texture2D* value)
 			{
 				using namespace resource::shaderproperty;

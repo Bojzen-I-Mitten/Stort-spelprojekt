@@ -413,6 +413,8 @@ namespace ThomasEditor
             else
             {
                 ThomasWrapper.IssuePlay();
+                //OnStartPlaying();
+               // game.Focus();
             }
         }
 
