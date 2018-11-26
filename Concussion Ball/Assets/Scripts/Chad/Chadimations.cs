@@ -100,24 +100,48 @@ public class Chadimations : NetworkComponent
             Skin.setBlendTreeNode(BlendNodes[State]);
             for (uint i = 0; i < Animations[State].Count; i++)
             {
-                if (State != ChadControls.STATE.RAGDOLL)
+                //if (State != ChadControls.STATE.RAGDOLL)
+                //{
+                //AnimationNode node = Animations[State][(int)i];
+                //if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
+                //{
+                //    WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+                //    node.Node.getTimeHandle().SetSpeed(1);
+                //}
+                //else if (!_Throwing && i == 0)
+                //{
+                //    WeightHandles[State].setWeight(i, 0);
+                //    node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
+                //}
+                //else if (!_Throwing && i == 1)
+                //{
+                //    WeightHandles[State].setWeight(i, 0);
+                //    node.Node.getTimeHandle().SetSpeed(2);
+                //}
+                //}
+
+                AnimationNode node = Animations[State][(int)i];
+                if (node != null)
                 {
-                    AnimationNode node = Animations[State][(int)i];
                     if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
                     {
+
                         WeightHandles[State].setWeight(i, node.GetWeight(Direction));
                         node.Node.getTimeHandle().SetSpeed(1);
                     }
-                    else if (!_Throwing && i == 0)
+                    else if (!_Throwing && i == 1) // not throwing and index handling throwing anim
                     {
-                        WeightHandles[State].setWeight(i, 0);
-                        node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
+                        WeightHandles[State].setWeight(i, 0); // set throwing anim weight to 0
+                        node.Node.getTimeHandle().SetSpeed(2);
                     }
-                    //else if (!_Throwing && i == 1)
-                    //{
-                    //    WeightHandles[State].setWeight(i, 0);
-                    //    node.Node.getTimeHandle().SetSpeed(2);
-                    //}
+                    else if (i == 1) // throw anim
+                        node.Node.getTimeHandle().SetSpeed(2);
+                    else if (Chad.PickedUpObject) // charge throw anim
+                        node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
+                }
+                else
+                {
+                    Debug.Log("Animation not found for: " + State + i);
                 }
             }
         }
