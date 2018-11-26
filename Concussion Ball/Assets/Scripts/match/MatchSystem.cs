@@ -27,7 +27,6 @@ public class MatchSystem : NetworkManager
     public Camera Camera { get; set; }
     //public Camera spectatorCamera { get; set; }
 
-
     private SoundComponent countdownSound;
     private SoundComponent endroundSound;
 
@@ -62,6 +61,7 @@ public class MatchSystem : NetworkManager
         }
     }
 
+    public ReplaySystem ReplaySystem;
     public PowerupManager PowerupManager;
     public static new MatchSystem instance
     {
@@ -102,10 +102,10 @@ public class MatchSystem : NetworkManager
     public override void Start()
     {
         base.Start();
-
+        //Ball.SetActive(true);
         PowerupManager = gameObject.GetComponent<PowerupManager>();
 
-       
+        ReplaySystem = gameObject.GetComponent<ReplaySystem>();
         countdownSound = gameObject.AddComponent<SoundComponent>();
         countdownSound.Clip = countdownSoundClip;
         countdownSound.Looping = false;
@@ -116,7 +116,8 @@ public class MatchSystem : NetworkManager
         
         //StartCoroutine(ResetCoroutine(10));
     }
-    
+
+
     public override void Update()
     {
         base.Update();
@@ -202,11 +203,13 @@ public class MatchSystem : NetworkManager
 #region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
+        
         MatchStarted = false;
         ChadHud.Instance.OnMatchEnd(winningTeam, duration);
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
         RPCStartMatch();
+
     }
 
     IEnumerator RoundStartCountdown(float duration)
@@ -228,12 +231,17 @@ public class MatchSystem : NetworkManager
     IEnumerator OnGoalCoroutine(Team teamThatScored)
     {
         //endroundSound.PlayOneShot();
-        ChadHud.Instance.OnGoal(teamThatScored, 7.0f);
+        
+        ChadHud.Instance.OnGoal(teamThatScored, 5.0f);
         Time.TimeScale = 0.5f;
 
-        Time.TimeScale = 0.5f;
-        yield return new WaitForSecondsRealtime(7.0f);
+        yield return new WaitForSecondsRealtime(2.0f);
+        ReplaySystem.recordGame = false;
+        yield return new WaitForSecondsRealtime(3.0f);
         Time.TimeScale = 1.0f;
+        ReplaySystem.StartReplay(teamThatScored);
+        yield return new WaitForSecondsRealtime(ReplaySystem.durationInSeconds + 1.0f);
+        ReplaySystem.recordGame = true;
         OnRoundEnd();
         OnRoundStart();
     }
@@ -241,29 +249,24 @@ public class MatchSystem : NetworkManager
 
 #region RPC
 
-    public void RPCMatchInfo(float startTime, bool goldenGoal, int powerupID,
+    public void RPCMatchInfo(bool matchStarted, float startTime, bool goldenGoal, int powerupID,
         int team1Score, int team2Score,
         Color team1Color, Color team2Color,
         string team1Name, string team2Name)
     {
-        Debug.Log("matchInfo!");
-        if (!MatchStarted)
-        {
-            MatchStarted = true;
-            PowerupManager.NextPowerupID = powerupID;
-            GoldenGoal = goldenGoal;
-            MatchStartTime = startTime;
 
-            Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
-            Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
-            Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
-            Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
-            Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
-            Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
+        MatchStarted = matchStarted;
+        PowerupManager.NextPowerupID = powerupID;
+        GoldenGoal = goldenGoal;
+        MatchStartTime = startTime;
 
-
-            Debug.Log(startTime);
-        }
+        Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
+        Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
+        Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
+        Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
+        Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
+        Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
+        Debug.Log("Got matchinfo from network!");
     }
 
     public void RPCStartMatch()
@@ -363,26 +366,17 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerJoin(NetPeer peer)
     {
-        if(peer == LocalPeer)
+        //if(peer == LocalPeer)
+        //{
+        //    NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
+        //    np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+        //}
+        if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
         {
-            NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-            np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
-            Debug.Log(np.PlayerName);
-        }
-        //Disable the players gameObject and place him in team Spectator.
-        //Give him a NetworkPlayer object.
-        //NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        
-        //np.JoinTeam(Teams[TEAM_TYPE.UNASSIGNED]);
-
-        if (peer != LocalPeer)
-        {
-            Debug.Log(MatchStarted);
-            if (MatchStarted)
-                SendRPC(peer, -2, "RPCMatchInfo", MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
-                    Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
-                    Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
-                    Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
+            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+                Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
+                Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
+                Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
         }
     }
 

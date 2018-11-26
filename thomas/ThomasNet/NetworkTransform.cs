@@ -82,7 +82,7 @@ namespace ThomasEngine.Network
             PrevRotation = target.rotation;
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
-            
+
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -96,7 +96,7 @@ namespace ThomasEngine.Network
             PrevRotation = target.rotation;
             PrevScale = target.scale;
             TargetSyncPosition = target.position;
-            
+
             if (targetRigidbody)
             {
                 TargetSyncLinearVelocity = targetRigidbody.LinearVelocity;
@@ -111,11 +111,7 @@ namespace ThomasEngine.Network
         public override void Update()
         {
             CurrentPositionDuration += Time.DeltaTime;
-
-            if (isOwner)
-            {
-                isDirty = true;
-            }
+            isDirty = true;
 
             switch (SyncMode)
             {
@@ -202,7 +198,7 @@ namespace ThomasEngine.Network
             {
                 writer.Put(1);
             }
-
+            writer.Put((int)SyncMode);
             switch (SyncMode)
             {
                 case TransformSyncMode.SyncTransform:
@@ -249,6 +245,14 @@ namespace ThomasEngine.Network
                 writer.Put(targetRigidbody.IsKinematic);
                 writer.Put(targetRigidbody.AttachedCollider.isTrigger);
                 prevVelocity = targetRigidbody.LinearVelocity.LengthSquared();
+            }else
+            {
+                writer.Put(false);
+                WriteTransform(writer);
+                writer.Put(new Vector3());
+                writer.Put(new Vector3());
+                writer.Put(false);
+                writer.Put(false);
             }
             else
             {
@@ -262,13 +266,13 @@ namespace ThomasEngine.Network
         }
         #endregion
         #region Read
-        public override void OnRead(NetPacketReader reader, bool initialState)
+        public override void OnRead(NetDataReader reader, bool initialState)
         {
             if (!initialState && reader.GetInt() == 0)
             {
                 return; //No dirty bit or initial state. Lets get the fuck out of here!
             }
-
+            SyncMode = (TransformSyncMode)reader.GetInt();
             switch (SyncMode)
             {
                 case TransformSyncMode.SyncTransform:
@@ -283,7 +287,7 @@ namespace ThomasEngine.Network
 
         }
 
-        private void ReadTransform(NetPacketReader reader)
+        private void ReadTransform(NetDataReader reader)
         {
             CurrentPositionDuration = 0;
             if (isOwner)
@@ -320,7 +324,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        private void ReadRigidbody(NetPacketReader reader)
+        private void ReadRigidbody(NetDataReader reader)
         {
             if (isOwner || !targetRigidbody)
             {
@@ -336,7 +340,9 @@ namespace ThomasEngine.Network
                 reader.GetBool();
                 return;
             }
+            
             targetRigidbody.enabled = reader.GetBool();
+
             TargetSyncPosition = reader.GetVector3();
             TargetSyncRotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();

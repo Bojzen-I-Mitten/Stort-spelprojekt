@@ -41,22 +41,19 @@ public class PowerupSpawner : NetworkComponent
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if(initialState)
-        {
-            writer.Put(timeLeftUntilSpawn);
-            writer.Put(hasPowerup);
-            return true;
-        }
+
+        writer.Put(timeLeftUntilSpawn);
+        writer.Put(hasPowerup);
+
         return false;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
-        if (initialState)
-        {
-            timeLeftUntilSpawn = reader.GetFloat();
-            hasPowerup = reader.GetBool();
-        }
+  
+        timeLeftUntilSpawn = reader.GetFloat();
+        hasPowerup = reader.GetBool();
+        
     }
 
     public void SpawnPowerup()
@@ -82,7 +79,6 @@ public class PowerupSpawner : NetworkComponent
                     powerup.spawner = this;
                     timeLeftUntilSpawn = spawnInterval;
                     hasPowerup = true;
-                    spawnedPowerup.GetComponent<NetworkIdentity>().WriteInitialData();
 
                 }
                 else

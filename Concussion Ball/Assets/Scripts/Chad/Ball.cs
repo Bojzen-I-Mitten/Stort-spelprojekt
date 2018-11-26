@@ -249,7 +249,7 @@ public class Ball : PickupableObject
     }
     IEnumerator PickupDelay()
     {
-        PickupCollider.enabled = false; PickupCollider.enabled = false;
+        PickupCollider.enabled = false;
         yield return new WaitForSecondsRealtime(0.5f);
         PickupCollider.enabled = true;
     }
