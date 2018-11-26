@@ -4,6 +4,7 @@
 
 #include "D3DDevice.h"
 #include <dxgi1_4.h>
+#include <dxgidebug.h>
 #include <string>
 
 #pragma comment (lib, "d3d11.lib")
@@ -73,8 +74,8 @@ namespace thomas
 			ID3D11DeviceContext* m_deviceContextImmediate;
 			ID3D11DeviceContext* m_deviceContextDeferred;
 			ID3D11Multithread* m_multiThreaded;
-			ID3D11Debug* m_debug;
 
+			IDXGIDebug* m_dxgiDebug;
 			IDXGIDevice1* m_dxgiDevice;
 			IDXGIAdapter3* m_dxgiAdapter;
 		};

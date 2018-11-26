@@ -265,9 +265,16 @@ namespace thomas
 
 		void D3D::CreateDebugInterface()
 		{
-			HRESULT hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
-			if (FAILED(hr))
-				LOG_HR(hr);
+			typedef HRESULT(WINAPI * LPDXGIGETDEBUGINTERFACE)(REFIID, void **);
+
+			HMODULE dxgidebug = LoadLibraryEx("DXGIDEBUG.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+			if (dxgidebug)
+			{
+				LPDXGIGETDEBUGINTERFACE DxgiGetDebugInterface = (LPDXGIGETDEBUGINTERFACE)GetProcAddress(dxgidebug, "DXGIGetDebugInterface");
+				HRESULT hr = DxgiGetDebugInterface(__uuidof(IDXGIDebug), (void**)&m_dxgiDebug);
+				if (FAILED(hr))
+					LOG_HR(hr);
+			}
 		}
 
 		bool D3D::CreateDxgiInterface()
@@ -381,10 +388,15 @@ namespace thomas
 			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_device);
 
-			if (m_debug)
+			/*if (m_debug)
 				m_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 
-			SAFE_RELEASE(m_debug);
+			SAFE_RELEASE(m_debug);*/
+
+			if (m_dxgiDebug)
+				m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
+
+			SAFE_RELEASE(m_dxgiDebug);
 		}
 
 		bool D3D::CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, 
