@@ -37,7 +37,7 @@ namespace thomas
 			s_lightCounts.nrOfAreaLights = 0;
 
 
-			s_shadowMapSize = 1024;
+			s_shadowMapSize = 512;
 			s_shadowMapTextures = new resource::Texture2DArray(s_shadowMapSize, s_shadowMapSize, DXGI_FORMAT_R32_TYPELESS, s_nrOfShadowMapsSupported, true);
 
 

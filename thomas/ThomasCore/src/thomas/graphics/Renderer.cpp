@@ -35,13 +35,13 @@ namespace thomas
 
 		constexpr uint32_t NUM_STRUCT = 200;
 		constexpr uint32_t NUM_MATRIX = 5000;
-		Renderer::Renderer()	: 
-			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), 
+		Renderer::Renderer() :
+			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)),
 			m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)),
 			m_shaders(),
 			m_cameras()
 		{
-			
+			m_enableShadows = true;
 		}
 
 		Renderer::~Renderer()
@@ -183,13 +183,16 @@ namespace thomas
 				PROFILE("BindFrame")
 				BindFrame();
 			}
-			for (auto & perCameraQueue : m_prevFrame->m_queue)
+			
+			if (m_enableShadows)
 			{
-				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+				for (auto & perCameraQueue : m_prevFrame->m_queue)
+				{
+					object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 
-				LightManager::DrawShadows(perCameraQueue.second, camera);
+					LightManager::DrawShadows(perCameraQueue.second, camera);
+				}
 			}
-
 
 			profiler->Timestamp(utils::profiling::GTS_SHADOWS);
 
@@ -209,7 +212,10 @@ namespace thomas
 				}
 
 				// Draw objects
-				LightManager::BindShadows(&m_shaders);
+				if (m_enableShadows)
+				{
+					LightManager::BindShadows(&m_shaders);
+				}
 
 				{
 					PROFILE("CameraDrawObjects")

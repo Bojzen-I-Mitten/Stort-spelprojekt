@@ -15,6 +15,7 @@ RasterizerState RasterizerSolid
     CullMode = BACK;
     FrontCounterClockWise = TRUE;
     DepthClipEnable = FALSE;
+    MultisampleEnable = FALSE;
 };
 
 cbuffer LightMatrices
