@@ -3,25 +3,26 @@
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
+
 #include "editor\Editor.h"
 #include "object\Object.h"
 #include "resource\texture\Texture2D.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
-#include "resource/MemoryAllocation.h"
+#include "resource\MemoryAllocation.h"
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
 #include "utils\D3D.h"
-#include <comdef.h>
 #include "graphics/Renderer.h"
-#include "utils/ThreadMap.h"
+#include "utils\ThreadMap.h"
 
-#include "object/ObjectHandler.h"
-#include "object/component/LightComponent.h"
+#include "object\ObjectHandler.h"
+#include "object\component/LightComponent.h"
 #include "Physics.h"
 #include "graphics\ParticleSystem.h"
 
+#include <comdef.h>
 namespace thomas 
 {
 	std::vector<std::string> ThomasCore::s_logOutput;

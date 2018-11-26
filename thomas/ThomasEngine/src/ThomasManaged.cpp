@@ -73,10 +73,8 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			
-			
 			Component::LoadExternalComponents();
-
+	
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
@@ -92,8 +90,6 @@ namespace ThomasEngine {
 			{
 				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
 			}
-
-			
 #endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
@@ -113,9 +109,6 @@ namespace ThomasEngine {
 #ifdef BENCHMARK
 		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 * 0.001f * 0.001f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
-
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage(), profiler->GetTotalMemory());
 #endif
 
 	}
@@ -139,7 +132,6 @@ namespace ThomasEngine {
 	void ThomasWrapper::StartRenderer()
 	{
 		// Render thread start
-
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
@@ -234,7 +226,7 @@ namespace ThomasEngine {
 			ImGui::Text("Logic Thread: %.02f ms	 Render Thread: %.02f ms", logicTime*1000.0f, renderTime*1000.0f);
 			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
-			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetTotalMemory(), 512.0f);
 			ImGui::Text("RAM Usage: %.2f MB", 0.0f);
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES)*1000.0f);
@@ -265,7 +257,6 @@ namespace ThomasEngine {
 	void ThomasWrapper::StartEngine()
 	{
 		// Update thread start
-
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{

@@ -49,6 +49,9 @@ namespace thomas
 				int m_frameQuery;								
 				ID3D11Query * m_queryDisjoint[FRAME_BUFFERS];				// "Timestamp disjoint" query; records whether timestamps are valid
 				ID3D11Query * m_queryTimestamp[GTS_MAX][FRAME_BUFFERS];		// Individual timestamp queries for each relevant point in the frame
+				
+				int m_memoryQuery;
+				DXGI_QUERY_VIDEO_MEMORY_INFO m_info[2];
 
 				float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
 

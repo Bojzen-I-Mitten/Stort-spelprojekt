@@ -1,5 +1,5 @@
 #include "Texture2D.h"
-#include "../../utils/d3d.h"
+#include "../../utils/D3D.h"
 #include "../../Common.h"
 #include "../../ThomasCore.h"
 
@@ -70,6 +70,7 @@ namespace thomas
 			utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
+
 		}
 
 		Texture2D::Texture2D(std::string path) : Texture(path)

@@ -9,7 +9,7 @@ namespace thomas
 		namespace profiling
 		{
 			GpuProfiler::GpuProfiler()
-				: m_frameQuery(0), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
+				: m_frameQuery(0), m_memoryQuery(0), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
@@ -39,7 +39,7 @@ namespace thomas
 				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
 				{
 					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
-					m_totalMemory = float(info.Budget * 0.001f * 0.001f);
+					m_totalMemory = 0.0f;
 				};
 
 				return true;
@@ -139,11 +139,21 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetMemoryUsage()
 			{
-				DXGI_QUERY_VIDEO_MEMORY_INFO info;
-				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info)))
-					m_memoryUsage = float(info.CurrentUsage * 0.001f * 0.001f);
+				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &m_info[m_memoryQuery])))
+				{
+					m_memoryUsage = float(m_info[m_memoryQuery].CurrentUsage);
 
-				return m_memoryUsage;
+					m_memoryQuery = (m_memoryQuery + 1) % 2;
+
+					float usage = float(m_info[m_memoryQuery].CurrentUsage);
+					if (m_memoryUsage > usage)
+					{
+						m_totalMemory += (m_memoryUsage - usage) * 0.001f * 0.001f;
+						return (m_memoryUsage - usage) * 0.001f * 0.001f;
+					}
+				}
+
+				return 0.0f;
 			}
 
 			float profiling::GpuProfiler::GetTotalMemory()

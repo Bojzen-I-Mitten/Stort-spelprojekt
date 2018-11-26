@@ -12,8 +12,6 @@
 
 namespace thomas
 {
-
-	
 	class Window;
 	namespace utils
 	{
