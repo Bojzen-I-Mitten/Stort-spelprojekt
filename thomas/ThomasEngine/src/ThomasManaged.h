@@ -147,6 +147,7 @@ namespace ThomasEngine {
 		/* Issue a stop playing state command to thomas
 		*/
 		static void IssueStopPlay();
+		static void IssueRestart();
 
 
 		static void CopyCommandList();

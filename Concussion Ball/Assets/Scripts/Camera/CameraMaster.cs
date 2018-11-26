@@ -8,6 +8,7 @@ public enum CAM_STATE
     MAIN_MENU,
     EXIT_MENU,
     HOST_MENU,
+    LOADING_SCREEN,
     NUMSTATES
 }
 
@@ -15,14 +16,13 @@ public class CameraMaster : ScriptComponent
 {
     public static CameraMaster instance;
 
-    public Texture2D Background { get; set; }
-
     public Camera Camera;
     GUIJoinHost JoinHost;
     GUIMainMenu MainMenu;
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;
     GUIHostMenu HostMenu;
+    GUILoadingScreen LoadingScreen;
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
     ChadHud Hud;
@@ -30,20 +30,39 @@ public class CameraMaster : ScriptComponent
     public Canvas Canvas;
     public CAM_STATE State;
 
-
+    Vector3 MainMenuCamPos;
+    Vector3 MainMenuCamRot;
+    Vector3 SelectTeamCamPos;
+    Vector3 SelectTeamCamRot;
 
     public override void OnAwake()
     {
+        instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
     }
 
+
+    public void StartReplay()
+    {
+        ChadCam.enabled = false;
+        SpectatorCam.enabled = false;
+        
+    }
+
+    public void StopReplay()
+    {
+        //ChadCam.enabled = true;
+        //SpectatorCam.enabled = false;
+    }
+
     public override void Start()
     {
-        instance = this;
         State = CAM_STATE.MAIN_MENU;
-        //BG = Canvas.Add(Background);
-        //BG.interactable = true;
+        MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
+        MainMenuCamRot = Vector3.Zero;
+        SelectTeamCamPos = new Vector3(0, -198.5f, 8.2f);
+        SelectTeamCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
@@ -65,6 +84,10 @@ public class CameraMaster : ScriptComponent
         HostMenu = gameObject.GetComponent<GUIHostMenu>();
         if (HostMenu == null)
             Debug.Log("Camera Master cannot find GUI script for host");
+
+        LoadingScreen = gameObject.GetComponent<GUILoadingScreen>();
+        if (LoadingScreen == null)
+            Debug.Log("Camera Maser cannot find GUI script for loading screen");
 
         ChadCam = gameObject.GetComponent<ChadCam>();
         if (ChadCam == null)
@@ -94,10 +117,13 @@ public class CameraMaster : ScriptComponent
         JoinHost.Canvas.isRendering = false;
         MainMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
+        LoadingScreen.Canvas.isRendering = false;
 
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
+                Camera.gameObject.transform.position = MainMenuCamPos;
+                Camera.gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
                 MainMenu.Canvas.isRendering = true;
                 break;
 
@@ -105,6 +131,8 @@ public class CameraMaster : ScriptComponent
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
+                Camera.gameObject.transform.position = SelectTeamCamPos;
+                Camera.gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
                 SelectTeam.Canvas.isRendering = true;
                 break;
             case CAM_STATE.GAME:
@@ -118,7 +146,12 @@ public class CameraMaster : ScriptComponent
                     State = CAM_STATE.GAME;
                 break;
             case CAM_STATE.HOST_MENU:
+                Camera.gameObject.transform.position = SelectTeamCamPos;
+                Camera.gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
                 HostMenu.Canvas.isRendering = true;
+                break;
+            case CAM_STATE.LOADING_SCREEN:
+                LoadingScreen.Canvas.isRendering = true;
                 break;
         }
     }

@@ -57,6 +57,7 @@ namespace thomas {
 				void SetGlobalInt(const std::string& name, int value);
 
 				void SetGlobalMatrix(const std::string& name, math::Matrix value);
+				void SetGlobalMatrixArray(const std::string& name, math::Matrix* value, unsigned nrOfMatrices);
 
 				void SetGlobalTexture2D(const std::string& name, resource::Texture2D* value);
 				void SetGlobalTexture2DArray(const std::string & name, resource::Texture2DArray* value);

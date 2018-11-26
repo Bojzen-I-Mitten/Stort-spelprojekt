@@ -38,10 +38,6 @@ public class GUIJoinHost : ScriptComponent
     public bool GoToTeamSelect;
     IEnumerator test;
 
-    public override void OnAwake()
-    {
-    }
-
     public override void Start()
     {
         IPString = "192.168.1.";
@@ -52,8 +48,6 @@ public class GUIJoinHost : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
-        MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-        MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
     }
 
     public void Listener_PeerConnectedEvent(NetPeer peer)
@@ -72,6 +66,8 @@ public class GUIJoinHost : ScriptComponent
 
     public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
     {
+        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
         ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
         //ConnectingText.position = TextBoxIP.position + TextBoxIP.size / Canvas.viewport.size * 1.5f;
         Join.interactable = true;
@@ -132,6 +128,10 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
                 MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
                 MatchSystem.instance.TargetIP = IPString;
+
+                MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+                MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
+
                 MatchSystem.instance.Init();
                 MatchSystem.instance.Connect();
                 ConnectingText.text = "Connecting";
