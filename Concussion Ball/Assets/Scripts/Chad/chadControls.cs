@@ -57,11 +57,11 @@ public class ChadControls : NetworkComponent
 
     public Vector2 CurrentVelocity = new Vector2(0, 0); //Right and forward
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
-    public float BaseSpeed { get; private set; }  = 5.0f;
-    public float MaxSpeed { get; private set; } = 10.0f;
+    public float BaseSpeed { get; set; }  = 5.0f;
+    public float MaxSpeed { get; set; } = 10.0f;
 
     public Quaternion DivingRotation = Quaternion.Identity;
-    private float MinimumRagdollTimer = 2.0f;
+    public float MinimumRagdollTimer = 2.0f;
 
     public float ImpactFactor { get; set; } = 2000;
     public float TackleThreshold { get; set; } = 7;
