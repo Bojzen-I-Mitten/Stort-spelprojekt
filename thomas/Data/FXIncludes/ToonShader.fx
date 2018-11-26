@@ -12,7 +12,6 @@ cbuffer MATERIAL_PROPERTIES
 {
     float4 color : COLOR;
     float smoothness : MATERIALSMOOTHNESSFACTOR;
-    float4 uvTiling : UVTILING; // (uv tiling x, uv tiling y, uv offset x, uv offset y)
 };
 
 
@@ -22,6 +21,7 @@ SamplerState StandardWrapSampler
     AddressU = Wrap;
     AddressV = Wrap;
 };
+
 
 DepthStencilState EnableDepth
 {
@@ -37,6 +37,7 @@ RasterizerState TestRasterizer
     FrontCounterClockWise = TRUE;
     DepthClipEnable = FALSE;
 };
+
 
 BlendState AlphaBlendingOn
 {
@@ -58,7 +59,6 @@ struct v2f
     float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
 };
-
 
 float biTangentSign(float3 norm, float3 tang, float3 bitang)
 {
@@ -85,10 +85,10 @@ v2f vert(appdata_thomas_skin v)
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
-	o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
-
+    o.texcoord = v.texcoord;
     return o;
 }
+
 
 float4 frag(v2f input) : SV_TARGET
 {
@@ -100,14 +100,15 @@ float4 frag(v2f input) : SV_TARGET
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
     diffuse *= rampTex.Sample(StandardWrapSampler, Intensity(normal, input.worldPos.xyz));
- 
+
     float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
-    
-    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light 
-    diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
+
+    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1); // Calculate light
+    diffuse.xyz = pow(diffuse, 0.4545454545f); // Gamma correction
 
     return saturate(float4(diffuse, 1.0f));
 }
+
 
 technique11 Standard
 {
@@ -120,5 +121,4 @@ technique11 Standard
         SetRasterizerState(TestRasterizer);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
-
 }
