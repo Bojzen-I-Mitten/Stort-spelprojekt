@@ -211,6 +211,24 @@ public class ChadHud : ScriptComponent
 
     }
 
+    public void ToggleScoreVisability(bool OnOff)
+    {
+        if(!OnOff)
+        { 
+            Score1BG.scale = new Vector2(1, 0.7f);
+            Score2BG.scale = new Vector2(1, 0.7f);
+            Score1.scale = new Vector2(1.6f);
+            Score2.scale = new Vector2(1.6f);
+        }
+        else
+        {
+            Score1BG.scale = new Vector2(0);
+            Score2BG.scale = new Vector2(0);
+            Score1.scale = new Vector2(0);
+            Score2.scale = new Vector2(0);
+        }
+    }
+
     public override void OnDestroy()
     {
         if (Instance == this)

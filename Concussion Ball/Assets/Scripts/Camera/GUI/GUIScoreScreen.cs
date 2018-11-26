@@ -4,15 +4,16 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using ThomasEngine.Network;
-
+using System.Collections.Generic;
 public class GUIScoreScreen : ScriptComponent
 {
     public static GUIScoreScreen Instance = null;
     Camera cam;
     Canvas Canvas;
-    Text Lobby;
-    Text Playagain;
-    Text MainMenu;
+    List<Text> Textdatalist = new List<Text>();
+    Color Unselected = Color.FloralWhite;
+    Color Selected = Color.IndianRed;
+    public Font Font { get; set; }
     public bool ToggleBool = true;
     public override void Awake()
     {
@@ -29,14 +30,34 @@ public class GUIScoreScreen : ScriptComponent
     {
         Canvas = gameObject.GetComponent<Camera>().AddCanvas();
         ToggleBool = true;
-        Lobby = Canvas.Add("LOBBY");
-        Lobby.font = GUIPlayerScore.Instance.Font;
-        Lobby.scale = Vector2.Zero;
-        Lobby.position = new Vector2(0.2f, 0.04f);
+        Textdatalist.Add(Canvas.Add("Lobby"));
+        Textdatalist.Add(Canvas.Add("Play again"));
+        Textdatalist.Add(Canvas.Add("Main Menu"));
+        for(int i = 0;i<Textdatalist.Count;i++)
+        {
+            Textdatalist[i].font = Font;
+            Textdatalist[i].scale = Vector2.Zero;
+            Textdatalist[i].interactable = true;
+            Textdatalist[i].depth = 0.9f;
+        }
+        Textdatalist[0].position = new Vector2(0.15f, 0.7f);
+        Textdatalist[1].position = new Vector2(0.35f, 0.7f);
+        Textdatalist[2].position = new Vector2(0.65f, 0.7f);
+
+        //        Lobby.position = new Vector2(0.2f, 0.04f);
     }
     public override void Update()
     {
-       
+
+        foreach (Text Textdata in Textdatalist)
+        { 
+                if (Textdata.Hovered())
+            {
+                Textdata.color = Selected;
+            }
+            else
+                Textdata.color = Unselected;
+        }
     }
     public void DisplayBar(Vector2 OnOff)
     {
@@ -49,11 +70,31 @@ public class GUIScoreScreen : ScriptComponent
         if (!OnOff)
         { 
             GUIPlayerScore.Instance.Toggle = false;
-            Lobby.scale = Vector2.Zero;
+            for (int i = 0; i < Textdatalist.Count; i++)
+                Textdatalist[i].scale = new Vector2(1.5f);
+            
         }
         else
         {
-            Lobby.scale = new Vector2(1.5f, 1.5f);
+            foreach (Text Textdata in Textdatalist)
+                Textdata.scale = Vector2.Zero;
+        }
+
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            if(Textdatalist[0].Clicked())//Lobby
+            {
+
+            }
+            if (Textdatalist[1].Clicked())//Play again
+            {
+                foreach (Text Textdata in Textdatalist)
+                    Textdata.scale = Vector2.Zero;
+            }
+            if (Textdatalist[2].Clicked()) // Main Menu
+            {
+
+            }
         }
 
     }

@@ -144,9 +144,7 @@ public class GUIPlayerScore : ScriptComponent
     public Vector2 Textposition { get; set; }
     public Vector2 Textorigin { get; set; }
     Image AmountOfPlayersBarImage;
-    public string Textdata { get; set; } = " yo";
     Text TeamAmountOfPlayersText;
-    Text testtext;
     Image team1BarImage;
     Image team2BarImage;
    public List<Playertext> Team1Players = new List<Playertext>();
@@ -231,9 +229,7 @@ public class GUIPlayerScore : ScriptComponent
         TeamName[1].position = new Vector2(0.885f, 0.192f);
         TeamName[1].origin = new Vector2(1, 0);
 
-        testtext = Canvas.Add(Textdata);
-        testtext.scale = new Vector2(1.5f, 1.5f);
-        testtext.font = Font;
+
 
     }
 
@@ -296,9 +292,7 @@ public class GUIPlayerScore : ScriptComponent
     }
     void SetOrigin()
     {
-        testtext.text = Textdata;
-        testtext.position = Textposition;
-        testtext.origin = Textorigin;
+
     }
     void UpdatePlayerBars()
     {
@@ -450,6 +444,9 @@ public class GUIPlayerScore : ScriptComponent
             UpdateStatistics();
             UpdatePlayerBars();
         }
+
+        ChadHud.Instance.ToggleScoreVisability(Toggle);
+
         if (Toggle)
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
@@ -468,7 +465,7 @@ public class GUIPlayerScore : ScriptComponent
         }
         if((Input.GetKeyUp(Input.Keys.Tab) || Input.GetKeyUp(Input.Keys.I)) )
         {
-          //  Toggle = false;
+            Toggle = false;
         }
         SetOrigin();
     }
