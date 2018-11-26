@@ -108,6 +108,8 @@ public class ChadControls : NetworkComponent
 
     public override void Start()
     {
+
+
         //Canvas = ChadHud.Instance.Canvas;
 
         // Init pick-up text and description
@@ -128,6 +130,9 @@ public class ChadControls : NetworkComponent
         // Access rigidbody and apply
         rBody = gameObject.GetComponent<Rigidbody>();
         rBody.IsKinematic = false;
+
+        if (rBody != null)
+            rBody.IsKinematic = !isOwner;
 
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         rBody.Friction = 0.99f;
@@ -207,8 +212,7 @@ public class ChadControls : NetworkComponent
             }
             StateMachine();
         }
-        if (rBody != null)
-            rBody.IsKinematic = !isOwner;
+       
 
         /* Enter leave ragdoll state
          */ 

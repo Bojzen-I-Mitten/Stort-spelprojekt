@@ -323,6 +323,10 @@ namespace thomas
 			vertices.positions.resize(mesh->mNumVertices);
 			vertices.normals.resize(mesh->mNumVertices);
 
+			if (mesh->HasVertexColors(0))
+				vertices.colors.resize(mesh->mNumVertices);
+				
+
 			if (mesh->mTextureCoords[0])
 				vertices.texCoord0.resize(mesh->mNumVertices);
 
@@ -353,6 +357,13 @@ namespace thomas
 				// Normals
 				vertices.normals[i] = math::Vector3((float*)&(normalTrans *mesh->mNormals[i]));
 				vertices.normals[i].Normalize();
+
+
+				if (mesh->HasVertexColors(0))
+				{
+					vertices.colors[i] = math::Color((float*)mesh->mColors[0]);
+				}
+				
 
 				// Tangents
 				if (mesh->HasTangentsAndBitangents())
