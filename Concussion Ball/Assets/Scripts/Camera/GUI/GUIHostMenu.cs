@@ -742,7 +742,7 @@ public class GUIHostMenu : ScriptComponent
             string str = Team1.text;
             GUIInput.AppendString(ref str, 15);
             Team1.text = str;
-            Caret.position = Team1.position + new Vector2(Team1.size.x, -Team1.size.y * CaretOffset);
+            Caret.position = Team1.position + new Vector2(Team1.size.x, Team1.size.y * (0.5f - CaretOffset));
             Caret.scale = Team1.scale * 1.333f;
         }
         else if (InputTeam2Name)
@@ -750,7 +750,7 @@ public class GUIHostMenu : ScriptComponent
             string str = Team2.text;
             GUIInput.AppendString(ref str, 15);
             Team2.text = str;
-            Caret.position = Team2.position + new Vector2(Team2.size.x, -Team2.size.y * CaretOffset);
+            Caret.position = Team2.position + new Vector2(Team2.size.x, Team2.size.y * (0.5f -  CaretOffset));
             Caret.scale = Team2.scale * 1.333f;
         }
         else if (InputServerName)

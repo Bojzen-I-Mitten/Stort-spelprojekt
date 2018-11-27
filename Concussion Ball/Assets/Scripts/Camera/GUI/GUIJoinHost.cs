@@ -88,9 +88,15 @@ public class GUIJoinHost : ScriptComponent
         Back.color = Color.FloralWhite;
 
         if (TakeIP)
+        {
             GUIInput.AppendString(ref IPString, 30);
+            Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, -IPText.size.y * CaretOffset);
+        }
         if (TakePort)
+        {
             GUIInput.AppendString(ref PortString, 5);
+            Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, -PortText.size.y * CaretOffset);
+        }
 
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
@@ -173,13 +179,11 @@ public class GUIJoinHost : ScriptComponent
         {
             ConnectingText.text = "";
             TakeIP = true;
-            Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, -IPText.size.y * CaretOffset);
         }
         else if (TextBoxPort.Clicked())
         {
             ConnectingText.text = "";
             TakePort = true;
-            Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, -PortText.size.y * CaretOffset);
         }
         else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
