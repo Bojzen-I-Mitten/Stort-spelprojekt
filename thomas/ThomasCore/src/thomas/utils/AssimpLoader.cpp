@@ -124,7 +124,6 @@ namespace thomas
 				aiProcess_ImproveCacheLocality |
 				aiProcess_JoinIdenticalVertices |
 				aiProcess_OptimizeGraph |
-				aiProcess_OptimizeMeshes |
 				aiProcess_RemoveRedundantMaterials |
 				aiProcess_SortByPType |
 				aiProcess_Triangulate |
