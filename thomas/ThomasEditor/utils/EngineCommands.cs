@@ -46,6 +46,39 @@ namespace ThomasEditor.utils
             comp.Activated = enabled;
         }
     }
+    public class AddComponentCommand
+        : ICommand
+    {
+        GameObject obj;
+        Type comp_type;
+        public AddComponentCommand(GameObject obj, Type comp)
+        {
+            this.obj = obj;
+            this.comp_type = comp;
+        }
+
+        public void execute()
+        {
+            var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(comp_type);
+            method.Invoke(obj, null);
+        }
+    }
+    public class ComponentSetIndexCommand
+        : ICommand
+    {
+        Component comp;
+        uint index;
+        public ComponentSetIndexCommand(Component comp, uint index)
+        {
+            this.comp = comp;
+            this.index = index;
+        }
+
+        public void execute()
+        {
+            comp.gameObject.SetComponentIndex(comp, index);
+        }
+    }
 
     /* UI Thread: Nobody toucha my spagett!!!!!!!!!! ._,
      * 

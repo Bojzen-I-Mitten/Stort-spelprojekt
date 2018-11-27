@@ -38,6 +38,7 @@ namespace thomas {
 
 				resource::Shader* FindByName(const std::string& name) const;
 				resource::Shader* FindByPath(const std::string& path) const;
+				resource::Shader* StandardShader() const ;
 
 				void QueueRecompile() const;
 
@@ -72,11 +73,13 @@ namespace thomas {
 			private:
 				// Containers
 				std::vector<resource::Shader*> m_renderableShaders;
+				mutable std::vector<resource::Shader*> m_accessableShaders;
+				/* List of objects to be added to the shader list. To lazy to update this to something better atm.
+				*/
 				mutable  std::vector<resource::Shader*> m_waitingList_Add;
 				mutable  std::vector<resource::Shader*> m_waitingList_Rmv;
 				// Sync.
-				mutable  utils::atomics::SpinLock m_addLock;	// Could be changed to another lock
-				mutable  utils::atomics::SpinLock m_rmvLock;
+				mutable  utils::atomics::SpinLock m_accessLock;
 #ifdef _EDITOR
 				mutable  std::atomic<bool> m_syncShaders;
 #endif

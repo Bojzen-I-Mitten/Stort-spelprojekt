@@ -24,8 +24,14 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
+
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
+
+    public override void OnAwake()
+    {
+        
+    }
 
     public override void Start()
     {
