@@ -65,6 +65,12 @@ struct appdata_thomas {
 	float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
 };
+struct appdata_thomas_vertex
+{
+    float3 vertex : POSITION;
+    float3 normal : NORMAL;
+    float4 color : COLOR;
+};
 struct appdata_thomas_skin
 {
     float3 vertex : POSITION;

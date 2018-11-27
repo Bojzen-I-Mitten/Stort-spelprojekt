@@ -421,7 +421,8 @@ namespace ThomasEngine
 			}
 			OnResourceLoadStarted();
 			auto counter = LoadAssetFiles(files);
-			LoadAssetFilesSynced(shaderFiles);	// Load shaders synced, threads seems to fight over shared shader files...
+			counter->Wait(); 
+			counter = LoadAssetFiles(shaderFiles);
 			counter->Wait();
 			counter = LoadAssetFiles(materialFiles);
 			counter->Wait();

@@ -24,7 +24,7 @@ namespace thomas
 				TEXCOORD = 1,
 				NORMAL = 2,
 				TANGENT = 3,
-				BITANGENT = 4, //Remove?
+				BITANGENT = 4, // Replace with Tangent + cross mult?
 				BINORMAL = 5,
 				BLENDINDICES = 6,
 				BLENDWEIGHT = 7,
