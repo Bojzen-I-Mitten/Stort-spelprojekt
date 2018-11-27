@@ -6,12 +6,12 @@ public class GUIHostMenu : ScriptComponent
     Camera Camera;
     public Canvas Canvas;
 
+    public Texture2D HostMenuBGTexture { get; set; }
     public Texture2D ColorSliderTexture { get; set; }
     public Texture2D SliderKnobTexture { get; set; }
     public Texture2D TextBox6010Texture { get; set; }
     public Texture2D TextBox305Texture { get; set; }
     public Texture2D TextBox105Texture { get; set; }
-    public Texture2D WhiteBoxTexture { get; set; }
     public Texture2D TextBoxBG55Texture { get; set; }
     public Texture2D TextBoxCross55Texture { get; set; }
     public Font Font { get; set; }
@@ -42,10 +42,10 @@ public class GUIHostMenu : ScriptComponent
 
     Text HostBtn;
     Text ExitBtn;
+    Image HostMenuBg;
 
     #region Host Setings
     Text HostOptions;
-    Image HostBg;
 
     Text ServerName;
     Text ServerNameString;
@@ -87,12 +87,10 @@ public class GUIHostMenu : ScriptComponent
     Image Team1TextBox;
     Image Team1ColorSlider;
     Image Team1SliderKnob;
-    Image Team1BG;
 
     Image Team2TextBox;
     Image Team2ColorSlider;
     Image Team2SliderKnob;
-    Image Team2BG;
     
     #endregion
 
@@ -131,32 +129,26 @@ public class GUIHostMenu : ScriptComponent
         HostBtn = Canvas.Add("Host Game");
         HostBtn.color = Unselected;
         HostBtn.position = new Vector2(0.47f, 0.33f);
-        HostBtn.font = Font;
         HostBtn.interactable = true;
 
         ExitBtn = Canvas.Add("Exit");
         ExitBtn.color = Unselected;
         ExitBtn.position = new Vector2(0.32f, 0.33f);
-        ExitBtn.font = Font;
         ExitBtn.interactable = true;
+
+        if (HostMenuBGTexture != null)
+        {
+            HostMenuBg = Canvas.Add(HostMenuBGTexture);
+            HostMenuBg.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+            HostMenuBg.depth = 0.7f;
+        }
 
         #region Host Setings
 
         HostOptions = Canvas.Add("Host Options");
         HostOptions.position = new Vector2(0.5f, 0f);
         HostOptions.origin = new Vector2(0.5f, 0.0f);
-        HostOptions.font = Font;
         HostOptions.color = Unselected;
-
-        #region Host BG
-        if (WhiteBoxTexture != null)
-        {
-            HostBg = Canvas.Add(WhiteBoxTexture);
-            HostBg.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            HostBg.scale = new Vector2(6.4f, 1.44f);
-            HostBg.depth = 0.7f;
-        }
-        #endregion
 
         #region Color Check
         SimilarColor = Canvas.Add("Teams have similar color, can't host");
@@ -164,7 +156,6 @@ public class GUIHostMenu : ScriptComponent
         SimilarColor.origin = new Vector2(0.5f);
         SimilarColor.color = Color.Red;
         SimilarColor.scale = Vector2.Zero;
-        SimilarColor.font = Font;
         SimilarColor.depth = 0;
         #endregion
 
@@ -174,7 +165,6 @@ public class GUIHostMenu : ScriptComponent
         SameName.origin = new Vector2(0.5f);
         SameName.color = Color.Red;
         SameName.scale = Vector2.Zero;
-        SameName.font = Font;
         SameName.depth = 0;
         #endregion
 
@@ -194,7 +184,6 @@ public class GUIHostMenu : ScriptComponent
         ServerName.scale = new Vector2(0.5f);
         ServerName.origin = new Vector2(0.0f, 0.5f);
         ServerName.color = Unselected;
-        ServerName.font = Font;
         ServerName.depth = 0.4f;
 
         ServerNameString = Canvas.Add("Pelles server");
@@ -202,7 +191,6 @@ public class GUIHostMenu : ScriptComponent
         ServerNameString.scale = new Vector2(0.5f);
         ServerNameString.origin = new Vector2(0.0f, 0.5f);
         ServerNameString.color = Unselected;
-        ServerNameString.font = Font;
         ServerNameString.depth = 0.4f;
 
         if (TextBox305Texture != null)
@@ -222,7 +210,6 @@ public class GUIHostMenu : ScriptComponent
         PortName.scale = new Vector2(0.5f);
         PortName.origin = new Vector2(0.0f, 0.5f);
         PortName.color = Unselected;
-        PortName.font = Font;
         PortName.depth = 0.4f;
 
         PortNameString = Canvas.Add("9050");
@@ -230,7 +217,6 @@ public class GUIHostMenu : ScriptComponent
         PortNameString.scale = new Vector2(0.5f);
         PortNameString.origin = new Vector2(0.0f, 0.5f);
         PortNameString.color = Unselected;
-        PortNameString.font = Font;
         PortNameString.depth = 0.4f;
 
         if (TextBox305Texture != null)
@@ -250,7 +236,6 @@ public class GUIHostMenu : ScriptComponent
         MaxPlayers.scale = new Vector2(0.5f);
         MaxPlayers.origin = new Vector2(0.0f, 0.5f);
         MaxPlayers.color = Unselected;
-        MaxPlayers.font = Font;
         MaxPlayers.depth = 0.4f;
 
         MaxPlayersString = Canvas.Add("8");
@@ -258,7 +243,6 @@ public class GUIHostMenu : ScriptComponent
         MaxPlayersString.scale = new Vector2(0.5f);
         MaxPlayersString.origin = new Vector2(0.0f, 0.5f);
         MaxPlayersString.color = Unselected;
-        MaxPlayersString.font = Font;
         MaxPlayersString.depth = 0.4f;
 
         if (TextBox105Texture != null)
@@ -277,7 +261,6 @@ public class GUIHostMenu : ScriptComponent
         TimeRound.scale = new Vector2(0.5f);
         TimeRound.origin = new Vector2(0.0f, 0.5f);
         TimeRound.color = Unselected;
-        TimeRound.font = Font;
         TimeRound.depth = 0.4f;
 
         TimeRoundString = Canvas.Add("5");
@@ -285,7 +268,6 @@ public class GUIHostMenu : ScriptComponent
         TimeRoundString.scale = new Vector2(0.5f);
         TimeRoundString.origin = new Vector2(0.0f, 0.5f);
         TimeRoundString.color = Unselected;
-        TimeRoundString.font = Font;
         TimeRoundString.depth = 0.4f;
 
         if (TextBox105Texture != null)
@@ -305,7 +287,6 @@ public class GUIHostMenu : ScriptComponent
         PublicServer.scale = new Vector2(0.5f);
         PublicServer.origin = new Vector2(0.0f, 0.5f);
         PublicServer.color = Unselected;
-        PublicServer.font = Font;
         PublicServer.depth = 0.4f;
 
         if (TextBoxCross55Texture != null)
@@ -332,7 +313,6 @@ public class GUIHostMenu : ScriptComponent
         ScoreLimit.scale = new Vector2(0.5f);
         ScoreLimit.origin = new Vector2(0.0f, 0.5f);
         ScoreLimit.color = Unselected;
-        ScoreLimit.font = Font;
         ScoreLimit.depth = 0.4f;
 
         ScoreLimitString = Canvas.Add("10");
@@ -340,7 +320,6 @@ public class GUIHostMenu : ScriptComponent
         ScoreLimitString.scale = new Vector2(0.5f);
         ScoreLimitString.origin = new Vector2(0.0f, 0.5f);
         ScoreLimitString.color = Unselected;
-        ScoreLimitString.font = Font;
         ScoreLimitString.depth = 0.4f;
 
         if (TextBox105Texture != null)
@@ -360,7 +339,6 @@ public class GUIHostMenu : ScriptComponent
         PowerUps.scale = new Vector2(0.5f);
         PowerUps.origin = new Vector2(0.0f, 0.5f);
         PowerUps.color = Unselected;
-        PowerUps.font = Font;
         PowerUps.depth = 0.4f;
 
         if (TextBoxCross55Texture != null)
@@ -384,20 +362,6 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Teams
-        if (WhiteBoxTexture != null)
-        {
-            Team1BG = Canvas.Add(WhiteBoxTexture);
-            Team1BG.position = new Vector2(0.0f, 0.398f);
-            Team1BG.scale = new Vector2(2, 2.2f);
-            Team1BG.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            Team1BG.depth = 0.7f;
-
-            Team2BG = Canvas.Add(WhiteBoxTexture);
-            Team2BG.position = new Vector2(0.67f, 0.398f);
-            Team2BG.scale = new Vector2(2.25f, 2.4f);
-            Team2BG.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-            Team2BG.depth = 0.7f;
-        }
 
         Team1 = Canvas.Add("Team 1");
         Team1.position = new Vector2(0.02f, 0.4f);
@@ -405,7 +369,7 @@ public class GUIHostMenu : ScriptComponent
         Team1.font = Font;
 
         Team2 = Canvas.Add("Team 2");
-        Team2.position = new Vector2(0.69f, 0.4f);
+        Team2.position = new Vector2(0.72f, 0.4f);
         Team2.color = Unselected;
         Team2.font = Font;
 
@@ -417,7 +381,8 @@ public class GUIHostMenu : ScriptComponent
             Team1TextBox.interactable = true;
 
             Team2TextBox = Canvas.Add(TextBox6010Texture);
-            Team2TextBox.position = new Vector2(0.68f, 0.39f);
+            Team2TextBox.position = new Vector2(0.99f, 0.39f);
+            Team2TextBox.origin = new Vector2(1, 0);
             Team2TextBox.scale = new Vector2(0.9f, 1f);
             Team2TextBox.interactable = true;
         }
@@ -447,10 +412,6 @@ public class GUIHostMenu : ScriptComponent
             Team2SliderKnob.origin = new Vector2(0.5f, 0.0f);
         }
         #endregion
-    }
-
-    public override void OnAwake()
-    {
     }
 
     public override void Update()

@@ -24,7 +24,6 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
-
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
     Vector3 MainMenuCamPos;
@@ -50,7 +49,6 @@ public class GUIMainMenu : ScriptComponent
         Options.color = Unselected;
         Credits.color = Unselected;
         Exit.color = Unselected;
-        TextBoxName.color = Unselected;
 
         if (Play.Hovered())
             Play.color = Selected;
@@ -60,11 +58,15 @@ public class GUIMainMenu : ScriptComponent
             Credits.color = Selected;
         else if (Exit.Hovered())
             Exit.color = Selected;
-
-        if (TextBoxName.Clicked())
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
-            TakeName = true;
-            TextBoxName.color = Selected;
+            TextBoxName.color = Color.Black;
+            TakeName = false;
+            if (TextBoxName.Clicked())
+            {
+                TakeName = true;
+                TextBoxName.color = Selected;
+            }
         }
 
         if (Play.Clicked())
@@ -90,41 +92,33 @@ public class GUIMainMenu : ScriptComponent
         #region  Play
         Play = Canvas.Add("Play");
         Play.position = new Vector2(0.1f, 0.11f);
-        Play.scale = new Vector2(1.5f);
         Play.interactable = true;
         Play.depth = 0.9f;
         Play.text = "Play";
-        Play.font = TextFont;
         #endregion
 
         #region  Options
         Options = Canvas.Add("Options");
         Options.position = new Vector2(0.1f, 0.21f);
-        Options.scale = new Vector2(1.5f);
         Options.interactable = true;
         Options.depth = 0.9f;
         Options.text = "Options";
-        Options.font = TextFont;
         #endregion
 
         #region Credits
         Credits = Canvas.Add("Credits");
         Credits.position = new Vector2(0.1f, 0.31f);
-        Credits.scale = new Vector2(1.5f);
         Credits.interactable = true;
         Credits.depth = 0.9f;
         Credits.text = "Credits";
-        Credits.font = TextFont;
         #endregion
 
         #region Exit
         Exit = Canvas.Add("Exit");
         Exit.position = new Vector2(0.1f, 0.41f);
-        Exit.scale = new Vector2(1.5f);
         Exit.interactable = true;
         Exit.depth = 0.9f;
         Exit.text = "Exit";
-        Exit.font = TextFont;
         #endregion
 
         #region Player name
@@ -147,7 +141,7 @@ public class GUIMainMenu : ScriptComponent
             TextBoxName.origin = new Vector2(0.5f);
             TextBoxName.position = new Vector2(0.485f, 0.94f);
             TextBoxName.interactable = true;
-            TextBoxName.depth = 0.9f;
+            TextBoxName.depth = 0.8f;
             TextBoxName.color = Color.Black;
         }
 

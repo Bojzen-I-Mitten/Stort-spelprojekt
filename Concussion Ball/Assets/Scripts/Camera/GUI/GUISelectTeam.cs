@@ -178,14 +178,6 @@ public class GUISelectTeam : ScriptComponent
             StartGame.interactable = false;
         }
 
-        if (TextFont != null)
-        {
-            Select.font = TextFont;
-            Team1Text.font = TextFont;
-            Team2Text.font = TextFont;
-            SpectatorText.font = TextFont;
-        }
-
         Team1List.position = Team1ListPos;
         Team1List.scale = Team1ListScale;
         Team2List.position = Team2ListPos;
@@ -229,11 +221,13 @@ public class GUISelectTeam : ScriptComponent
         Team1Text = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
         Team1Text.position = new Vector2(0.235f, 0.25f);
         Team1Text.origin = new Vector2(0.5f);
+        Team1Text.font = TextFont;
         Team1Text.color = Unselected;
 
         Team2Text = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
         Team2Text.position = new Vector2(0.777f, 0.25f);
         Team2Text.origin = new Vector2(0.5f);
+        Team2Text.font = TextFont;
         Team2Text.color = Unselected;
 
         SpectatorText = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name);

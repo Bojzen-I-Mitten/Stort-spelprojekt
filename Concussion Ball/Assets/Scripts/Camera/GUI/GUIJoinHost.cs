@@ -7,7 +7,6 @@ public class GUIJoinHost : ScriptComponent
 {
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
-    public Font TextFont { get; set; }
 
     Camera Camera;
 
@@ -188,13 +187,6 @@ public class GUIJoinHost : ScriptComponent
         {
             IPText.text = IPString;
             PortText.text = PortString;
-            if (TextFont != null)
-            {
-                IPText.font = TextFont;
-                PortText.font = TextFont;
-                IP.font = TextFont;
-                Port.font = TextFont;
-            }
         }
     }
 
@@ -272,7 +264,6 @@ public class GUIJoinHost : ScriptComponent
         Join.interactable = true;
         Join.depth = 0.9f;
         Join.color = Color.FloralWhite;
-        Join.font = TextFont;
     }
 
     if (TextBoxPort != null)
@@ -283,7 +274,6 @@ public class GUIJoinHost : ScriptComponent
         Host.interactable = true;
         Host.depth = 0.9f;
         Host.color = Color.FloralWhite;
-        Host.font = TextFont;
     }
 
     Back = Canvas.Add("Back");
@@ -292,13 +282,11 @@ public class GUIJoinHost : ScriptComponent
     Back.interactable = true;
     Back.depth = 0.9f;
     Back.color = Color.FloralWhite;
-    Back.font = TextFont;
 
     ConnectingText = Canvas.Add("");
     ConnectingText.origin = new Vector2(0.5f);
     ConnectingText.color = Color.FloralWhite;
     ConnectingText.depth = 0;
-    ConnectingText.font = TextFont;
     ConnectingText.position = new Vector2(0.5f, 0.75f);
 }
 
