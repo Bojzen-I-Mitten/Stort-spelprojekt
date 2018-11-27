@@ -4,23 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using System.Collections.Generic;
-public class PlayerTestClass
-{
-    String Name;
-    int goals;
-    int Tackles;
-    int Tackled;
-    int Ping;
-   public PlayerTestClass(String Name,int goals,int Tackles,int Tackled,int Ping)
-    {
-        this.Name = Name;
-        this.goals = goals;
-        this.Tackles = Tackles;
-        this.Tackled = Tackled;
-        this.Ping = Ping;
-    }
 
-}
 public class Playertext
 {
     public Text PlayerName;
@@ -43,14 +27,17 @@ public class Playertext
         this.PlayerTackles.origin = new Vector2(0, 0);
         this.PlayerTackled.origin = new Vector2(0, 0);
         this.PlayerPing.origin = new Vector2(0, 0);
+
         AddFont(font);
         UpdateScale(Vector2.Zero);
         UpdateColor(Color.White);
+
         if (team == TEAM_TYPE.TEAM_1)
             UpdatePositionTeam1(playerbar);
         else
             UpdatePositionTeam2(playerbar);
     }
+
     public void UpdateScale(Vector2 scale)
     {
         this.PlayerName.scale = scale;
@@ -59,6 +46,7 @@ public class Playertext
         this.PlayerTackled.scale = scale;
         this.PlayerPing.scale = scale;
     }
+
     public void AddFont(Font font)
     {
         this.PlayerName.font = font;
@@ -94,7 +82,8 @@ public class Playertext
 
 
     }
-    public void UpdatePositionTeam2( Image Playerbar2)
+
+    public void UpdatePositionTeam2(Image Playerbar2)
     {
         //    float PositionUpdate = NewPositionUpdate * 0.064f;
         //    this.PlayerName.position    = new Vector2(0.870f, 0.34f + PositionUpdate);
@@ -167,9 +156,7 @@ public class GUIPlayerScore : ScriptComponent
 
         cam = gameObject.GetComponent<Camera>();
         Canvas = cam.AddCanvas();
-
- 
-
+     
         //Team1Bar Image
         team1BarImage = Canvas.Add(Team1Bar);
         team1BarImage.scale = Vector2.Zero;
@@ -249,6 +236,7 @@ public class GUIPlayerScore : ScriptComponent
         AmountOfPlayersBarImage.scale = OnOff;
         team1BarImage.scale = OnOff;
         team2BarImage.scale = OnOff;
+
         for (int i = 0; i < 2; i++)
         {
          
@@ -317,8 +305,7 @@ public class GUIPlayerScore : ScriptComponent
             //ScoreText.origin = new Vector2(-3.5f, -2.65f);
 
             if (PlayerStandardBarTeam2.Count< AmountOfPlayersInTeam2)
-            {
-                
+            {                
                 while (PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2)
                 {
                     int i = PlayerStandardBarTeam2.Count;
