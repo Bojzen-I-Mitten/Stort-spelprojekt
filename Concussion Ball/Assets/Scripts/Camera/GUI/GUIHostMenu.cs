@@ -110,6 +110,14 @@ public class GUIHostMenu : ScriptComponent
     bool InputTimeRound = false;
     bool InputScoreLimit = false;
 
+    bool ClearTeam1 = true;
+    bool ClearTeam2 = true;
+    bool ClearServerName = true;
+    bool ClearPort = true;
+    bool ClearTime = true;
+    bool ClearMaxPlayers = true;
+    bool ClearScoreLimit = true;
+
     bool NotSameName = true;
     bool NotSimilarColor = true;
 
@@ -621,36 +629,71 @@ public class GUIHostMenu : ScriptComponent
             {
                 InputTeam1Name = true;
                 Team1TextBox.color = Selected;
+                if(ClearTeam1)
+                {
+                    Team1.text = "";
+                    ClearTeam1 = false;
+                }
             }
             else if (Team2TextBox.Clicked())
             {
                 InputTeam2Name = true;
                 Team2TextBox.color = Selected;
+                if (ClearTeam2)
+                {
+                    Team2.text = "";
+                    ClearTeam2 = false;
+                }
             }
             else if (ServerNameBox.Clicked())
             {
                 InputServerName = true;
                 ServerNameBox.color = Selected;
+                if(ClearServerName)
+                {
+                    ServerNameString.text = "";
+                    ClearServerName = false;
+                }
             }
             else if (PortNameBox.Clicked())
             {
                 InputPortName = true;
                 PortNameBox.color = Selected;
+                if(ClearPort)
+                {
+                    PortNameString.text = "";
+                    ClearPort = true;
+                }
             }
             else if (MaxPlayersBox.Clicked())
             {
                 InputMaxPlayers = true;
                 MaxPlayersBox.color = Selected;
+                if(ClearMaxPlayers)
+                {
+                    MaxPlayersString.text = "";
+                    ClearMaxPlayers = false;
+                }
             }
             else if (TimeRoundBox.Clicked())
             {
                 InputTimeRound = true;
                 TimeRoundBox.color = Selected;
+                if(ClearTime)
+                {
+                    TimeRoundString.text = "";
+                    ClearTime = false;
+                }
             }
             else if (ScoreLimitBox.Clicked())
             {
                 InputScoreLimit = true;
                 ScoreLimitBox.color = Selected;
+                if(ClearScoreLimit)
+                {
+                    ScoreLimitString.text = "";
+                    ClearScoreLimit = false;
+                }
             }
             else
             {

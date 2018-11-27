@@ -29,12 +29,14 @@ public class GUIMainMenu : ScriptComponent
 
     public float CaretOffset { get; set; } = 0.19f;
 
+    private bool ClearName = true;
+
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
 
     public override void OnAwake()
     {
-        
+
     }
 
     public override void Start()
@@ -70,8 +72,13 @@ public class GUIMainMenu : ScriptComponent
                 Blink = CaretBlink();
                 StartCoroutine(Blink);
             }
+            if (ClearName)
+            {
+                PlayerString = "";
+                ClearName = false;
+            }
         }
-        else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             TakeName = false;
             if (Blink != null)
@@ -92,10 +99,10 @@ public class GUIMainMenu : ScriptComponent
 
         if (TakeName)
         {
-            GUIInput.AppendString(ref PlayerString, 14);
+            GUIInput.AppendString(ref PlayerString, 9);
         }
 
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - Caret.size.x, -PlayerName.size.y * CaretOffset);
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - Caret.size.x, CaretOffset);
     }
     public void AddImagesAndText()
     {
@@ -198,14 +205,15 @@ public class GUIMainMenu : ScriptComponent
         Canvas.Remove(PlayerName);
         Canvas.Remove(TextBoxBGName);
         Canvas.Remove(TextBoxName);
+        Canvas.Remove(Caret);
     }
 
     IEnumerator CaretBlink()
     {
         bool underscore = true;
-        while(true)
+        while (true)
         {
-            if(underscore)
+            if (underscore)
             {
                 Caret.text = "|";
                 underscore = false;

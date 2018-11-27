@@ -17,6 +17,9 @@ public class GUIJoinHost : ScriptComponent
     private bool TakeIP;
     private bool TakePort;
 
+    private bool ClearIP = true;
+    private bool ClearPort = true;
+
     private bool hasConnected = false;
 
     public Canvas Canvas;
@@ -90,12 +93,12 @@ public class GUIJoinHost : ScriptComponent
         if (TakeIP)
         {
             GUIInput.AppendString(ref IPString, 30);
-            Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, -IPText.size.y * CaretOffset);
+            Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, CaretOffset);
         }
         if (TakePort)
         {
             GUIInput.AppendString(ref PortString, 5);
-            Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, -PortText.size.y * CaretOffset);
+            Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
         }
 
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
@@ -179,11 +182,21 @@ public class GUIJoinHost : ScriptComponent
         {
             ConnectingText.text = "";
             TakeIP = true;
+            if (ClearIP)
+            {
+                IPString = "";
+                ClearIP = false;
+            }
         }
         else if (TextBoxPort.Clicked())
         {
             ConnectingText.text = "";
             TakePort = true;
+            if (ClearPort)
+            {
+                PortString = "";
+                ClearPort = false;
+            }
         }
         else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
