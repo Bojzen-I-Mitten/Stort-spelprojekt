@@ -16,29 +16,33 @@ public class GUIHostMenu : ScriptComponent
     public Texture2D TextBoxCross55Texture { get; set; }
     public Font Font { get; set; }
 
-    //public Vector2 _ServerNamePos { get; set; }          = new Vector2(0.0f, 0.4f);
-    //public Vector2 _ServerNameStringPos { get; set; }    = new Vector2(0.0f, 0.4f);
-    //public Vector2 _ServerNameBoxPos { get; set; }       = new Vector2(0.0f, 0.4f);
+    //public Vector2 _ServerNamePos { get; set; }
+    //public Vector2 _ServerNameStringPos { get; set; }
+    //public Vector2 _ServerNameBoxPos { get; set; }
 
-    //public Vector2 _MaxPlayersPos { get; set; } = new Vector2(0.0f, 0.15f);
-    //public Vector2 _MaxPlayersStringPos { get; set; } = new Vector2(0.14f, 0.15f);
-    //public Vector2 _MaxPlayersBoxPos { get; set; } = new Vector2(0.14f, 0.15f);
+    //public Vector2 _MaxPlayersPos { get; set; }
+    //public Vector2 _MaxPlayersStringPos { get; set; }
+    //public Vector2 _MaxPlayersBoxPos { get; set; }
 
-    //public Vector2 _TimeRoundPos { get; set; } = new Vector2(0.0f, 0.4f);
-    //public Vector2 _TimeRoundStringPos { get; set; } = new Vector2(0.14f, 0.21f);
-    //public Vector2 _TimeRoundBoxPos { get; set; } = new Vector2(0.14f, 0.21f);
+    //public Vector2 _TimeRoundPos { get; set; }
+    //public Vector2 _TimeRoundStringPos { get; set; }
+    //public Vector2 _TimeRoundBoxPos { get; set; }
 
-    //public Vector2 _PublicServerPos { get; set; }        = new Vector2(0.0f, 0.4f);
-    //public Vector2 _PublicServerCheckPos { get; set; }   = new Vector2(0.0f, 0.4f);
-    //public Vector2 _PublicServerBoxPos { get; set; }     = new Vector2(0.0f, 0.4f);
+    //public Vector2 _PortNamePos { get; set; }
+    //public Vector2 _PortNameStringPos { get; set; }
+    //public Vector2 _PortNameBoxPos { get; set; }
 
-    //public Vector2 _ScoreLimitPos { get; set; } = new Vector2(0.35f, 0.15f);
-    //public Vector2 _ScoreLimitStringPos { get; set; } = new Vector2(0.47f, 0.15f);
-    //public Vector2 _ScoreLimitBoxPos { get; set; } = new Vector2(0.47f, 0.15f);
+    //public Vector2 _PublicServerPos { get; set; }
+    //public Vector2 _PublicServerCheckPos { get; set; }
+    //public Vector2 _PublicServerBoxPos { get; set; }
 
-    //public Vector2 _PowerUpsPos { get; set; }            = new Vector2(0.0f, 0.4f);
-    //public Vector2 _PowerUpsCheckPos { get; set; }       = new Vector2(0.0f, 0.4f);
-    //public Vector2 _PowerUpsBoxPos { get; set; }         = new Vector2(0.0f, 0.4f);
+    //public Vector2 _ScoreLimitPos { get; set; }
+    //public Vector2 _ScoreLimitStringPos { get; set; }
+    //public Vector2 _ScoreLimitBoxPos { get; set; }
+
+    //public Vector2 _PowerUpsPos { get; set; }
+    //public Vector2 _PowerUpsCheckPos { get; set; }
+    //public Vector2 _PowerUpsBoxPos { get; set; }
 
     Text HostBtn;
     Text ExitBtn;
@@ -91,9 +95,10 @@ public class GUIHostMenu : ScriptComponent
     Image Team2TextBox;
     Image Team2ColorSlider;
     Image Team2SliderKnob;
-    
+
     #endregion
 
+    #region Inputs
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
     bool InputServerName = false;
@@ -101,6 +106,7 @@ public class GUIHostMenu : ScriptComponent
     bool InputMaxPlayers = false;
     bool InputTimeRound = false;
     bool InputScoreLimit = false;
+    #endregion
 
     bool NotSameName = true;
     bool NotSimilarColor = true;
@@ -128,12 +134,12 @@ public class GUIHostMenu : ScriptComponent
 
         HostBtn = Canvas.Add("Host Game");
         HostBtn.color = Unselected;
-        HostBtn.position = new Vector2(0.47f, 0.33f);
+        HostBtn.position = new Vector2(0.47f, 0.32f);
         HostBtn.interactable = true;
 
         ExitBtn = Canvas.Add("Exit");
         ExitBtn.color = Unselected;
-        ExitBtn.position = new Vector2(0.32f, 0.33f);
+        ExitBtn.position = new Vector2(0.32f, 0.32f);
         ExitBtn.interactable = true;
 
         if (HostMenuBGTexture != null)
@@ -168,18 +174,18 @@ public class GUIHostMenu : ScriptComponent
         SameName.depth = 0;
         #endregion
 
-        float column1 = 0f;
-        float column2 = 0.14f;
+        float column1 = 0.00f;
+        float column2 = 0.15f;
         float column3 = 0.35f;
-        float column4 = 0.47f;
+        float column4 = 0.50f;
 
-        float row1 = 0.09f;
-        float row2 = 0.16f;
-        float row3 = 0.23f;
-        float row4 = 0.30f;
+        float row1 = 0.130f;
+        float row2 = 0.185f;
+        float row3 = 0.244f;
+        float row4 = 0.299f;
 
         #region Server Name
-        ServerName = Canvas.Add("Server name:");
+        ServerName = Canvas.Add("Server name");
         ServerName.position = new Vector2(column1, row1);
         ServerName.scale = new Vector2(0.5f);
         ServerName.origin = new Vector2(0.0f, 0.5f);
@@ -205,7 +211,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Server Port
-        PortName = Canvas.Add("Port:");
+        PortName = Canvas.Add("Port");
         PortName.position = new Vector2(column1, row2);
         PortName.scale = new Vector2(0.5f);
         PortName.origin = new Vector2(0.0f, 0.5f);
@@ -231,7 +237,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Max Players
-        MaxPlayers = Canvas.Add("Max players:");
+        MaxPlayers = Canvas.Add("Max players");
         MaxPlayers.position = new Vector2(column1, row3);
         MaxPlayers.scale = new Vector2(0.5f);
         MaxPlayers.origin = new Vector2(0.0f, 0.5f);
@@ -256,7 +262,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Time Round
-        TimeRound = Canvas.Add("Time per round:");
+        TimeRound = Canvas.Add("Time per round");
         TimeRound.position = new Vector2(column1, row4);
         TimeRound.scale = new Vector2(0.5f);
         TimeRound.origin = new Vector2(0.0f, 0.5f);
@@ -274,7 +280,6 @@ public class GUIHostMenu : ScriptComponent
         {
             TimeRoundBox = Canvas.Add(TextBox105Texture);
             TimeRoundBox.position = new Vector2(column2, row4);
-            //TimeRoundBox.scale = new Vector2(0.5f);
             TimeRoundBox.origin = new Vector2(0.0f, 0.5f);
             TimeRoundBox.interactable = true;
             TimeRoundBox.depth = 0.5f;
@@ -282,7 +287,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Public Server
-        PublicServer = Canvas.Add("Public server:");
+        PublicServer = Canvas.Add("Public server");
         PublicServer.position = new Vector2(column3, row1);
         PublicServer.scale = new Vector2(0.5f);
         PublicServer.origin = new Vector2(0.0f, 0.5f);
@@ -308,7 +313,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Score limit
-        ScoreLimit = Canvas.Add("Score Limit:");
+        ScoreLimit = Canvas.Add("Score Limit");
         ScoreLimit.position = new Vector2(column3, row2);
         ScoreLimit.scale = new Vector2(0.5f);
         ScoreLimit.origin = new Vector2(0.0f, 0.5f);
@@ -326,7 +331,6 @@ public class GUIHostMenu : ScriptComponent
         {
             ScoreLimitBox = Canvas.Add(TextBox105Texture);
             ScoreLimitBox.position = new Vector2(column4, row2);
-            //ScoreLimitBox.scale = new Vector2(0.5f);
             ScoreLimitBox.origin = new Vector2(0.0f, 0.5f);
             ScoreLimitBox.interactable = true;
             ScoreLimitBox.depth = 0.5f;
@@ -334,7 +338,7 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         #region Power Ups
-        PowerUps = Canvas.Add("Power ups:");
+        PowerUps = Canvas.Add("Power ups");
         PowerUps.position = new Vector2(column3, row3);
         PowerUps.scale = new Vector2(0.5f);
         PowerUps.origin = new Vector2(0.0f, 0.5f);
