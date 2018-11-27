@@ -160,13 +160,9 @@ public class GUIPlayerScore : ScriptComponent
     public static GUIPlayerScore Instance = null;
     public override void Start()
     {
-        if (!Instance)
+        
             Instance = this;
-        else
-        {
-            Destroy(this);
-            return;
-        }
+      
 
 
         cam = gameObject.GetComponent<Camera>();
