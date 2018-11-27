@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-//#define L_FOR_RAGDOLL
+#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
@@ -246,7 +246,7 @@ public class ChadControls : NetworkComponent
     #region Ragdoll handling
     private void EnableRagdoll()
     {
-        Debug.Log(gameObject.Name + " ragdoll ON");
+        //Debug.Log(gameObject.Name + " ragdoll ON");
         // reset aim stuff 
         if (Throwing != null)
         {
@@ -269,7 +269,7 @@ public class ChadControls : NetworkComponent
 
     private void DisableRagdoll()
     {
-        Debug.Log(gameObject.Name + " ragdoll OFF");
+        //Debug.Log(gameObject.Name + " ragdoll OFF");
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
         //gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
@@ -862,14 +862,14 @@ public class ChadControls : NetworkComponent
 
             if (otherChad)
             {
-                float TheirVelocity = otherChad.CurrentVelocity.Length();
-                Debug.Log(TheirVelocity);
-                Debug.Log(CurrentVelocity.Length());
+                float TheirVelocity = otherChad.CurrentVelocity.y;//Length();
+                Debug.Log("They tackled with: " + TheirVelocity + "(Forward: " + otherChad.CurrentVelocity.y + ", Strafe: " + otherChad.CurrentVelocity.x + ")");
+                Debug.Log("You tackled with: " + CurrentVelocity.y/*Length()*/ + "(Forward: " + CurrentVelocity.y + ", Strafe: " + CurrentVelocity.x + ")");
                 if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
                 {
                     //Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (otherChad.CanBeTackled && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
+                else if (otherChad.CanBeTackled && (CurrentVelocity.y/*Length()*/ > TackleThreshold && CurrentVelocity.y/*Length()*/ >= TheirVelocity))
                 {
                     // Activate ragdoll
                     Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
