@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using ThomasEngine;
 
 public class GUIHostMenu : ScriptComponent
@@ -93,8 +94,13 @@ public class GUIHostMenu : ScriptComponent
     Image Team2ColorSlider;
     Image Team2SliderKnob;
     Image Team2BG;
-    
+
     #endregion
+    Text Caret;
+
+    IEnumerator Blink = null;
+
+    public float CaretOffset { get; set; } = 0;
 
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
@@ -434,6 +440,14 @@ public class GUIHostMenu : ScriptComponent
             Team2SliderKnob.origin = new Vector2(0.5f, 0.0f);
         }
         #endregion
+        
+        Caret = Canvas.Add("");
+        Caret.origin = new Vector2(0, 0.5f);
+        Caret.scale = new Vector2(1.2f);
+        Caret.interactable = false;
+        Caret.depth = 0.8f;
+        Caret.color = Color.Black;
+        Caret.font = Font;
     }
 
     public override void Update()
@@ -578,6 +592,11 @@ public class GUIHostMenu : ScriptComponent
     {
         if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
             InputTeam1Name = false;
             InputTeam2Name = false;
             InputServerName = false;
@@ -629,7 +648,14 @@ public class GUIHostMenu : ScriptComponent
                 InputScoreLimit = true;
                 ScoreLimitBox.color = Selected;
             }
-            else if (PublicServerBox.Clicked())
+            else
+            {
+                StopCoroutine(Blink);
+                Blink = null;
+                Caret.text = "";
+            }
+
+            if (PublicServerBox.Clicked())
             {
                 if (PublicServerCheck.scale != Vector2.Zero)
                     PublicServerCheck.scale = Vector2.Zero;
@@ -712,42 +738,76 @@ public class GUIHostMenu : ScriptComponent
             string str = Team1.text;
             GUIInput.AppendString(ref str, 15);
             Team1.text = str;
+            Caret.position = Team1.position + new Vector2(Team1.size.x, -Team1.size.y * CaretOffset);
+            Caret.scale = Team1.scale * 1.333f;
         }
         else if (InputTeam2Name)
         {
             string str = Team2.text;
             GUIInput.AppendString(ref str, 15);
             Team2.text = str;
+            Caret.position = Team2.position + new Vector2(Team2.size.x, -Team2.size.y * CaretOffset);
+            Caret.scale = Team2.scale * 1.333f;
         }
         else if (InputServerName)
         {
             string str = ServerNameString.text;
             GUIInput.AppendString(ref str, 15);
             ServerNameString.text = str;
+            Caret.position = ServerNameString.position + new Vector2(ServerNameString.size.x, -ServerNameString.size.y * CaretOffset);
+            Caret.scale = ServerNameString.scale * 1.333f;
         }
         else if (InputPortName)
         {
             string str = PortNameString.text;
             GUIInput.AppendString(ref str, 4);
             PortNameString.text = str;
+            Caret.position = PortNameString.position + new Vector2(PortNameString.size.x, -PortNameString.size.y * CaretOffset);
+            Caret.scale = PortNameString.scale * 1.333f;
         }
         else if (InputMaxPlayers)
         {
             string str = MaxPlayersString.text;
             GUIInput.AppendString(ref str, 3);
             MaxPlayersString.text = str;
+            Caret.position = MaxPlayersString.position + new Vector2(MaxPlayersString.size.x, -MaxPlayersString.size.y * CaretOffset);
+            Caret.scale = MaxPlayersString.scale * 1.333f;
         }
         else if (InputTimeRound)
         {
             string str = TimeRoundString.text;
             GUIInput.AppendString(ref str, 2);
             TimeRoundString.text = str;
+            Caret.position = TimeRoundString.position + new Vector2(TimeRoundString.size.x, -TimeRoundString.size.y * CaretOffset);
+            Caret.scale = TimeRoundString.scale * 1.333f;
         }
         else if (InputScoreLimit)
         {
             string str = ScoreLimitString.text;
             GUIInput.AppendString(ref str, 3);
             ScoreLimitString.text = str;
+            Caret.position = ScoreLimitString.position + new Vector2(ScoreLimitString.size.x, 0);
+            Caret.scale = ScoreLimitString.scale * 1.333f;
+        }
+    }
+
+    IEnumerator CaretBlink()
+    {
+        bool underscore = true;
+        while (true)
+        {
+            if (underscore)
+            {
+                Caret.text = "|";
+                underscore = false;
+            }
+            else
+            {
+                Caret.text = "";
+                underscore = true;
+            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
 }

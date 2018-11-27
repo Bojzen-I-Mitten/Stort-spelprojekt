@@ -22,8 +22,12 @@ public class GUIMainMenu : ScriptComponent
     Text PlayerName;
     Text Caret;
 
+    IEnumerator Blink = null;
+
     private bool TakeName;
     public static string PlayerString = "CHAD";
+
+    public float CaretOffset { get; set; } = 0.19f;
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
@@ -56,12 +60,20 @@ public class GUIMainMenu : ScriptComponent
         {
             TakeName = true;
             TextBoxName.color = Selected;
-            StartCoroutine(CaretEnumerator());
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
         }
         else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             TakeName = false;
-            StopCoroutine(CaretEnumerator());
+            if (Blink != null)
+            {
+                StopCoroutine(Blink);
+                Blink = null;
+            }
             Caret.text = "";
         }
 
@@ -78,7 +90,7 @@ public class GUIMainMenu : ScriptComponent
             GUIInput.AppendString(ref PlayerString, 14);
         }
 
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, -0.0175f);
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - Caret.size.x, -PlayerName.size.y * CaretOffset);
     }
     public void AddImagesAndText()
     {
@@ -183,7 +195,7 @@ public class GUIMainMenu : ScriptComponent
         Canvas.Remove(TextBoxName);
     }
 
-    IEnumerator CaretEnumerator()
+    IEnumerator CaretBlink()
     {
         bool underscore = true;
         while(true)
