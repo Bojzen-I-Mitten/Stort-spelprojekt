@@ -33,6 +33,8 @@ namespace ThomasEditor
         public ObservableCollection<TreeItemViewModel> m_hierarchyNodes { get; set; }
         List<GameObject> m_copiedObjects = new List<GameObject>(); //??correct code convention?
         public static GameObjectHierarchy instance;
+
+        public bool updateHiearchyParenting = true;
         public GameObjectHierarchy()
         {
             InitializeComponent();
@@ -91,7 +93,8 @@ namespace ThomasEditor
             if (oldParent == newParent || !child.gameObject)
                 return;
 
-            ResetTreeView();
+            if(updateHiearchyParenting)
+                ResetTreeView();
             //this.Dispatcher.BeginInvoke((Action)(() =>
             //{
             //    if (oldParent == newParent || !child.gameObject)

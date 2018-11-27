@@ -442,11 +442,8 @@ namespace ThomasEngine
 
 
 			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
+				if(resources->Remove(ConvertToThomasPath(resource->m_path)))
 					delete resource;
-				}
 			}
 
 			void recursivePrefabDestruction(GameObject^ obj)
