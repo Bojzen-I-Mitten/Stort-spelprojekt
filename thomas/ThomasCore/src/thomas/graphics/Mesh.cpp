@@ -85,6 +85,8 @@ namespace thomas
 			if (m_data.vertices.boneWeights.size() > 0)
 				computeShader->SetPropertyUAV("boneWeightData", m_data.skinVertexBuffers[resource::Shader::Semantics::BONEWEIGHTS].get()->GetUAV());
 
+			computeShader->SetPropertyInt("maxNrOfVerts", GetVertexCount());
+
 			computeShader->Dispatch(GetVertexCount() / 256.0f);
 
 			computeShader->UnbindAllSRVs();
