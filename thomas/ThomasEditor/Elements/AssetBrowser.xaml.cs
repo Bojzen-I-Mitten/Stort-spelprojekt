@@ -314,7 +314,7 @@ namespace ThomasEditor
                     {
                         try
                         {
-                            source = new BitmapImage(new Uri(Path.GetFullPath(filePath)),);
+                            source = new BitmapImage(new Uri(Path.GetFullPath(filePath)));
                             break;
                         }
                         catch (IOException e)
