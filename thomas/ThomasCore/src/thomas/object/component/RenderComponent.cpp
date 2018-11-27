@@ -108,8 +108,16 @@ namespace thomas {
 					else
 						local_prop = nullptr;
 					// Submit
-					for (int i = 0; i < m_model->GetMeshes().size(); i++)
-						SubmitPart(camera, i, local_prop, num_prop);
+					/*if (m_model->GetSkeleton())
+					{
+						for (int i = 0; i < m_model->GetMeshes().size(); i++)
+							SubmitSkinningPart(camera, i, local_prop, num_prop);
+					}
+					else
+					{*/
+						for (int i = 0; i < m_model->GetMeshes().size(); i++)
+							SubmitPart(camera, i, local_prop, num_prop);
+					//}
 				}
 			}
 
@@ -135,6 +143,32 @@ namespace thomas {
 				return s_renderComponents;
 			}
 
+			
+
+			void RenderComponent::SubmitSkinningPart(Camera * camera, unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic * property_data, uint32_t num_prop)
+			{
+				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
+				if (material == nullptr)
+					material = resource::Material::GetStandardMaterial();
+
+				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
+		
+				//assert(verifyPropertyList(m_properties.data(), m_properties.size()));
+
+				//auto test = mesh->GetData().vertexBuffers;
+				
+				thomas::graphics::render::RenderCommand cmd(
+					m_gameObject->GetTransform()->GetWorldMatrix(),
+					mesh.get(),
+					material,
+					camera->ID(),
+					num_prop,
+					property_data);
+
+
+				graphics::Renderer::Instance()->SubmitCommand(cmd);
+			}
+
 			void RenderComponent::SubmitPart(Camera* camera, unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic* property_data, uint32_t num_prop)
 			{
 				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
@@ -142,7 +176,7 @@ namespace thomas {
 					material = resource::Material::GetStandardMaterial();
 
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
-
+				
 				//assert(verifyPropertyList(m_properties.data(), m_properties.size()));
 				
 				thomas::graphics::render::RenderCommand cmd(

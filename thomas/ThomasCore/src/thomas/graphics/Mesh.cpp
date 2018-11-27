@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "../utils/GpuProfiler.h"
 
+
 namespace thomas 
 {
 	namespace graphics 
@@ -19,17 +20,34 @@ namespace thomas
 
 		void Mesh::Draw(resource::Shader * shader)
 		{
-			std::vector<utils::buffers::VertexBuffer*> vertexBuffers;
-
-			//Add vertex buffers?
-			for (auto semantic : shader->GetCurrentPass().inputSemantics)
+			if ((m_data.vertices.boneIndices.size() > 0))
 			{
-				if (m_data.vertexBuffers.find(semantic) != m_data.vertexBuffers.end())
-					vertexBuffers.push_back(m_data.vertexBuffers[semantic].get());
-			}
+				std::vector<utils::buffers::ByteAddressBuffer*> vertexBuffer;
 
-			//Set buffers and draw mesh
-			shader->BindVertexBuffers(vertexBuffers);
+				//Add vertex buffers?
+				for (auto semantic : shader->GetCurrentPass().inputSemantics)
+				{
+					if (m_data.skinVertexBuffers.find(semantic) != m_data.skinVertexBuffers.end())
+						vertexBuffer.push_back(m_data.skinVertexBuffers[semantic].get());
+				}
+
+				//Set buffers and draw mesh
+				shader->BindVertexBuffers(vertexBuffer);
+			}
+			else
+			{
+				std::vector<utils::buffers::VertexBuffer*> vertexBuffers;
+
+				//Add vertex buffers?
+				for (auto semantic : shader->GetCurrentPass().inputSemantics)
+				{
+					if (m_data.vertexBuffers.find(semantic) != m_data.vertexBuffers.end())
+						vertexBuffers.push_back(m_data.vertexBuffers[semantic].get());
+				}
+
+				//Set buffers and draw mesh
+				shader->BindVertexBuffers(vertexBuffers);
+			}
 			if (!m_data.indexBuffer)
 			{
 				shader->Draw(GetVertexCount(), 0);
@@ -81,23 +99,74 @@ namespace thomas
 
 		void Mesh::SetupMesh()
 		{
-			//Insert data if the property exist
-			if (m_data.vertices.positions.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::POSITION, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.positions)));
-			if (m_data.vertices.colors.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::COLOR, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.colors)));
-			if (m_data.vertices.texCoord0.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.texCoord0)));
-			if (m_data.vertices.normals.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.normals)));
-			if (m_data.vertices.tangents.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.tangents)));
-			if (m_data.vertices.bitangents.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.bitangents)));
+			
+
 			if (m_data.vertices.boneIndices.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEINDICES, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneIndices)));
-			if (m_data.vertices.boneWeights.size() > 0)
-				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHTS, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
+			{
+
+				if (m_data.vertices.positions.size() > 0)
+					m_data.skinOrigVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::POSITION, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.positions,D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE))));
+				if (m_data.vertices.normals.size() > 0)
+					m_data.skinOrigVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.normals, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE))));
+
+				m_data.skinOrigVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEINDICES, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.boneIndices, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE))));
+				if (m_data.vertices.boneWeights.size() > 0)
+					m_data.skinOrigVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHTS, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.boneWeights, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE))));
+
+				//Insert data if the property exist
+				if (m_data.vertices.positions.size() > 0)
+				{
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::POSITION, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.positions, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.colors.size() > 0)
+				{		
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::COLOR, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.colors, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.texCoord0.size() > 0)
+				{		
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.texCoord0, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.normals.size() > 0)
+				{		
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.normals, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.tangents.size() > 0)
+				{
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TANGENT, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.tangents, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.bitangents.size() > 0)
+				{
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.bitangents, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.boneIndices.size() > 0)
+				{
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEINDICES, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.boneIndices, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+				if (m_data.vertices.boneWeights.size() > 0)
+				{
+					m_data.skinVertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHTS, std::make_unique<utils::buffers::ByteAddressBuffer>(m_data.vertices.boneWeights, D3D11_BIND_FLAG(D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS))));
+				}
+			}
+			else
+			{
+				//Insert data if the property exist
+				if (m_data.vertices.positions.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::POSITION, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.positions)));
+				if (m_data.vertices.colors.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::COLOR, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.colors)));
+				if (m_data.vertices.texCoord0.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.texCoord0)));
+				if (m_data.vertices.normals.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.normals)));
+				if (m_data.vertices.tangents.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.tangents)));
+				if (m_data.vertices.bitangents.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BITANGENT, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.bitangents)));
+				if (m_data.vertices.boneIndices.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEINDICES, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneIndices)));
+				if (m_data.vertices.boneWeights.size() > 0)
+					m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::BONEWEIGHTS, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.boneWeights)));
+			}
 
 			if (!m_data.indices.empty())
 				m_data.indexBuffer = std::make_unique<utils::buffers::IndexBuffer>(m_data.indices);

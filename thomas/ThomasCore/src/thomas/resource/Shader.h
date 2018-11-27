@@ -71,6 +71,7 @@ namespace thomas
 			void BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type);
 			void BindVertexBuffer(utils::buffers::VertexBuffer* buffer);
 			void BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers);
+			void BindVertexBuffers(std::vector<utils::buffers::ByteAddressBuffer*> buffers);
 			void BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer);
 			void Bind();
 			void Draw(UINT vertexCount, UINT startVertexLocation);

@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include "../utils/Buffers.h"
 
 namespace thomas
 {
@@ -67,6 +68,8 @@ namespace thomas
 			std::vector<unsigned int> indices;
 			
 			std::map<resource::Shader::Semantics, std::unique_ptr<utils::buffers::VertexBuffer>> vertexBuffers;
+			std::map<resource::Shader::Semantics, std::unique_ptr<utils::buffers::ByteAddressBuffer>> skinOrigVertexBuffers;
+			std::map<resource::Shader::Semantics, std::unique_ptr<utils::buffers::ByteAddressBuffer>> skinVertexBuffers;
 			std::unique_ptr<utils::buffers::IndexBuffer> indexBuffer = nullptr;
 		};
 

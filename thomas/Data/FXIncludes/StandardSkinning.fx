@@ -59,10 +59,7 @@ struct v2f
     float2 texcoord : TEXCOORD0;
 };
 
-float biTangentSign(float3 norm, float3 tang, float3 bitang)
-{
-    return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
-}
+//StructuredBuffer<appdata_thomas> vertexData;
 
 v2f vert(appdata_thomas_skin v)
 {
@@ -71,7 +68,7 @@ v2f vert(appdata_thomas_skin v)
     float4 posL = float4(v.vertex, 1.f);
     float3 normalL = v.normal;
     float3 tangentL = v.tangent;
-    float bisign = biTangentSign(v.normal, v.tangent, v.bitangent);
+    float bisign = BiTangentSign(v.normal, v.tangent, v.bitangent);
     ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
     float3 bitangL = cross(normalL, tangentL) * bisign;
 	
@@ -85,6 +82,24 @@ v2f vert(appdata_thomas_skin v)
     o.TBN = float3x3(tangent, bitangent, normal);
     
     o.texcoord = v.texcoord;
+    return o;
+}
+
+v2f vertAlreadySkinned(appdata_thomas v)
+{
+    v2f o;
+
+    o.vertex = ThomasObjectToClipPos(v.vertex);
+    o.worldPos = ThomasObjectToWorldPos(v.vertex);
+
+    float3 tangent = ThomasObjectToWorldDir(v.tangent);
+    float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
+    float3 normal = ThomasObjectToWorldDir(v.normal);
+
+    o.TBN = float3x3(tangent, bitangent, normal);
+    
+    o.texcoord = v.texcoord;
+
     return o;
 }
 
@@ -118,5 +133,13 @@ technique11 Standard
         SetRasterizerState(TestRasterizer);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
-
+    pass P1
+    {
+		VERT(vertAlreadySkinned());
+        SetGeometryShader(NULL);
+		FRAG(frag());
+        SetDepthStencilState(EnableDepth, 0);
+        SetRasterizerState(TestRasterizer);
+        SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
 }

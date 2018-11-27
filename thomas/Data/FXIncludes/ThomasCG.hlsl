@@ -65,6 +65,7 @@ struct appdata_thomas {
 	float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
 };
+
 struct appdata_thomas_skin
 {
     float3 vertex : POSITION;
@@ -215,6 +216,11 @@ inline float3 ThomasObjectToWorldNormal( in float3 norm )
 inline float4 ThomasObjectToWorldNormal(in float4 norm)
 {
 	return float4(ThomasObjectToWorldDir(norm.xyz), 0);
+}
+
+inline float BiTangentSign(float3 norm, float3 tang, float3 bitang)
+{
+    return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
 }
 
 inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in float4 weight, in int4 boneInd)

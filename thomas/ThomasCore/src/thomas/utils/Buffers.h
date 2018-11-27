@@ -118,10 +118,12 @@ namespace thomas
 			{
 			public:
 				ByteAddressBuffer(size_t stride, size_t count, void* data = nullptr, D3D11_BIND_FLAG bindFlags = D3D11_BIND_UNORDERED_ACCESS);
-
+				template <typename T>
+				ByteAddressBuffer(std::vector<T>& data, D3D11_BIND_FLAG bindFlags = D3D11_BIND_UNORDERED_ACCESS) : ByteAddressBuffer(sizeof(T), data.size(), data.data(), bindFlags) {};
+				
 				void Release();
 
-
+				uint32_t GetStride();
 				ID3D11ShaderResourceView* GetSRV();
 				ID3D11UnorderedAccessView* GetUAV();
 			private:
@@ -129,6 +131,7 @@ namespace thomas
 				bool m_hasSRV;
 				ID3D11UnorderedAccessView* m_uav;
 				bool m_hasUAV;
+				uint32_t m_stride;
 			};
 		}
 	}

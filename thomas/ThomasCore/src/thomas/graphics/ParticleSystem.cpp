@@ -252,7 +252,6 @@ namespace thomas
 
 			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
 			utils::D3D::Instance()->GetDeviceContext()->VSSetShaderResources(0, 8, s_nullSRV);
-
 		}
 
 		

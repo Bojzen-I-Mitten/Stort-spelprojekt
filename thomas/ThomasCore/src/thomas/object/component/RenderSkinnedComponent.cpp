@@ -31,6 +31,8 @@ namespace thomas
 				prop.m_type = resource::shaderproperty::ShaderPropertyType::MATRIX_ARRAY;
 #endif
 				m_skinInfo = &insertProperty(prop);
+
+
 			}
 			RenderSkinnedComponent::~RenderSkinnedComponent() {
 
@@ -45,8 +47,21 @@ namespace thomas
 				if (m_skeleton)
 				{
 					PROFILE("AnimationUpdate")
+					// Updates skin matrices
 					m_skeleton->update(ThomasTime::GetDeltaTime());
 				}
+			}
+
+			void RenderSkinnedComponent::SubmitPart(Camera * camera, unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic * property_data, uint32_t num_prop)
+			{
+
+				//for (unsigned i = 0; i < num_prop; ++i)
+				{
+					//property_data[i].m_apply(property_data[i], )
+				}
+
+				int steta = 0;
+				RenderComponent::SubmitPart(camera, i, property_data, num_prop);
 			}
 
 			void RenderSkinnedComponent::SetMaterial(int meshIndex, resource::Material* material) {
@@ -66,6 +81,7 @@ namespace thomas
 			bool RenderSkinnedComponent::SetModel(resource::Model * model)
 			{
 				RenderComponent::SetModel(model);
+				
 				EDITOR_LOCK();
 				// Read new skeleton
 				if (!model)

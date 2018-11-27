@@ -177,7 +177,8 @@ namespace thomas
 				return nullptr;
 			}
 
-			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data, D3D11_BIND_FLAG bindFlags) : Buffer(data, count * stride, bindFlags, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_FLAG(D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS))
+			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data, D3D11_BIND_FLAG bindFlags) :
+				Buffer(data, count * stride, bindFlags, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_FLAG(D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS)), m_stride((uint32_t)stride)
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;
@@ -239,7 +240,10 @@ namespace thomas
 				LOG("No availible uav");
 				return nullptr;
 			}
-
-}
+			uint32_t ByteAddressBuffer::GetStride()
+			{
+				return m_stride;
+			}
+		}
 	}
 }

@@ -253,6 +253,28 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
+		void Shader::BindVertexBuffers(std::vector<utils::buffers::ByteAddressBuffer*> buffers)
+		{
+			std::vector<ID3D11Buffer*> buffs;
+			std::vector<UINT> strides;
+			std::vector<UINT> offsets;
+			
+			for (utils::buffers::ByteAddressBuffer* buffer : buffers)
+			{
+				/*D3D11_BUFFER_DESC desc;
+				buffer->GetBuffer()->GetDesc(&desc);
+				if (desc.BindFlags & D3D11_BIND_VERTEX_BUFFER)
+				{
+					//ok
+				}*/
+				buffs.push_back(buffer->GetBuffer());
+				strides.push_back(buffer->GetStride());
+				offsets.push_back(0);
+			}
+
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
+		}
+
 
 		void Shader::BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer)
 		{
