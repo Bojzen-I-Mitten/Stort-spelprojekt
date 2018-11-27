@@ -23,7 +23,7 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipExplosion { get; set; }
 
     public float ExplosionRadius { get; set; } = 10.0f;
-    public float ExplosionForce { get; set; } = 40.0f;
+    public float ExplosionForce { get; set; } = 100.0f;
 
     private float soundcooldown;
 

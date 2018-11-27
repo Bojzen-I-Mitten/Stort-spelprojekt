@@ -63,7 +63,7 @@ public class ChadControls : NetworkComponent
     public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
 
-    public float ImpactFactor = 50.0f;//{ get; set; } = 100;
+    public float ImpactFactor = 80.0f;//{ get; set; } = 100;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;
@@ -635,14 +635,15 @@ public class ChadControls : NetworkComponent
 
     IEnumerator StartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
+
+        State = STATE.RAGDOLL;
+        EnableRagdoll();
+        Ragdoll.AddForce(param);
         if (isOwner)
         {
-            State = STATE.RAGDOLL;
-            Ragdoll.EnableRagdoll();
-            Ragdoll.AddForce(param);
-
             yield return new WaitForSeconds(duration);
             //float timer = 0;
+
             while (Ragdoll.DistanceToWorld() >= 0.75f/* && timer < 5*/)
             {
                 //timer += Time.DeltaTime;
@@ -652,6 +653,8 @@ public class ChadControls : NetworkComponent
             State = STATE.CHADING;
             CurrentVelocity.y = BaseSpeed;
         }
+        else
+            yield return null;
     }
 
     IEnumerator RagdollRecovery()
