@@ -1,4 +1,4 @@
-﻿#define T_FOR_RESET
+﻿//#define T_FOR_RESET
 
 using System;
 using System.Collections.Generic;
