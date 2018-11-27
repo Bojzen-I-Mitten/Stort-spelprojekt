@@ -317,7 +317,7 @@ public class ChadHud : ScriptComponent
         if (ToggleAim)
         {
             if (Crosshair != null)
-                Crosshair.scale = Vector2.One;
+                Crosshair.scale = new Vector2(0.5f, 0.5f);
             if (LMB != null)
                 LMB.scale = new Vector2(0.75f);
                 

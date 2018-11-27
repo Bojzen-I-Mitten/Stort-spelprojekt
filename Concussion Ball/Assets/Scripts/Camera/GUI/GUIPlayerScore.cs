@@ -4,23 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using System.Collections.Generic;
-public class PlayerTestClass
-{
-    String Name;
-    int goals;
-    int Tackles;
-    int Tackled;
-    int Ping;
-   public PlayerTestClass(String Name,int goals,int Tackles,int Tackled,int Ping)
-    {
-        this.Name = Name;
-        this.goals = goals;
-        this.Tackles = Tackles;
-        this.Tackled = Tackled;
-        this.Ping = Ping;
-    }
 
-}
 public class Playertext
 {
     public Text PlayerName;
@@ -43,14 +27,17 @@ public class Playertext
         this.PlayerTackles.origin = new Vector2(0, 0);
         this.PlayerTackled.origin = new Vector2(0, 0);
         this.PlayerPing.origin = new Vector2(0, 0);
+
         AddFont(font);
         UpdateScale(Vector2.Zero);
         UpdateColor(Color.White);
+
         if (team == TEAM_TYPE.TEAM_1)
             UpdatePositionTeam1(Number);
         else
             UpdatePositionTeam2(Number);
     }
+
     public void UpdateScale(Vector2 scale)
     {
         this.PlayerName.scale = scale;
@@ -59,6 +46,7 @@ public class Playertext
         this.PlayerTackled.scale = scale;
         this.PlayerPing.scale = scale;
     }
+
     public void AddFont(Font font)
     {
         this.PlayerName.font = font;
@@ -86,6 +74,7 @@ public class Playertext
         this.PlayerTackled.position = new Vector2(0.364f, 0.34f + PositionUpdate);
         this.PlayerPing.position    = new Vector2(0.445f, 0.34f + PositionUpdate);
     }
+
     public void UpdatePositionTeam2(int NewPositionUpdate)
     {
         float PositionUpdate = NewPositionUpdate * 0.064f;
@@ -133,8 +122,7 @@ public class GUIPlayerScore : ScriptComponent
     List<Image> PlayerStandardBarTeam2 = new List<Image>();
 
     public override void Start()
-    {
- 
+    { 
        // PlayerTestClassTestTeam1.Add(new PlayerTestClass("TestNameTeam1", 1, 1, 1, 50));
        // PlayerTestClassTestTeam2.Add(new PlayerTestClass("TestNameTeam2", 1, 2, 1, 50));
         //testa koden här senare:P
@@ -178,6 +166,7 @@ public class GUIPlayerScore : ScriptComponent
         TeamName[1] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
         PlayerstandardText[1] = Canvas.Add("Ping  Tackled  Tackles  Goals   Player");
         PlayerstandardText[0] = Canvas.Add("    Player    Goals   Tackles Tackled   Ping");
+
         for (int i = 0; i < 2; i++)
         {
             PlayerStandardbar[i].scale = Vector2.Zero;
@@ -186,6 +175,7 @@ public class GUIPlayerScore : ScriptComponent
             TeamName[i].font = Font;
             TeamName[i].scale = Vector2.Zero;
         }
+
         PlayerstandardText[0].origin = new Vector2(-0.01f, -10.2f);
         PlayerstandardText[1].origin = new Vector2(-1.25f, -10.2f);
         PlayerStandardbar[0].origin = new Vector2(0, -3);
@@ -207,6 +197,7 @@ public class GUIPlayerScore : ScriptComponent
         AmountOfPlayersBarImage.scale = OnOff;
         team1BarImage.scale = OnOff;
         team2BarImage.scale = OnOff;
+
         for (int i = 0; i < 2; i++)
         {
             PlayerStandardbar[i].scale = OnOff;
@@ -274,8 +265,7 @@ public class GUIPlayerScore : ScriptComponent
             //TeamAmountOfPlayersText.origin = new Vector2(-3.5f, -2.65f);
 
             if (PlayerStandardBarTeam2.Count< AmountOfPlayersInTeam2)
-            {
-                
+            {                
                 while (PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2)
                 {
                     int i = PlayerStandardBarTeam2.Count;
@@ -405,6 +395,8 @@ public class GUIPlayerScore : ScriptComponent
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
             DisplayBar(Vector2.Zero);
+
+        // Check if the player is in game or not
         if (Input.GetKeyDown(Input.Keys.Tab) || Input.GetKeyDown(Input.Keys.I))
         {
             if (!Toggle)
