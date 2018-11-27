@@ -181,8 +181,8 @@ public class MatchSystem : NetworkManager
 
         GUIScoreScreen.Instance.Toggle(false);
         for(int i=0;i<GUIScoreScreen.Instance.ScoreScreenTimeLast;i++)
-        { 
-
+        {
+            GUIScoreScreen.Instance.updateTextPlayAgain();
             PlayAgain = new WaitForSecondsRealtime(1);//toggle how long
             yield return PlayAgain;
             if (GUIScoreScreen.Instance.getToggleBool())

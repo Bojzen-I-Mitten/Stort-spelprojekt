@@ -11,6 +11,7 @@ public class GUIScoreScreen : ScriptComponent
     Camera cam;
     Canvas Canvas;
     public int ScoreScreenTimeLast { get; set; } = 10;
+    public int Timedisplay;
     List<Text> Textdatalist = new List<Text>();
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
@@ -29,6 +30,7 @@ public class GUIScoreScreen : ScriptComponent
     }
     public override void Start()
     {
+        Timedisplay = ScoreScreenTimeLast + 1;
         Canvas = gameObject.GetComponent<Camera>().AddCanvas();
         ToggleBool = true;
         Textdatalist.Add(Canvas.Add("Lobby"));
@@ -43,7 +45,7 @@ public class GUIScoreScreen : ScriptComponent
         }
         Textdatalist[0].position = new Vector2(0.15f, 0.7f);
         Textdatalist[1].position = new Vector2(0.35f, 0.7f);
-        Textdatalist[2].position = new Vector2(0.65f, 0.7f);
+        Textdatalist[2].position = new Vector2(0.75f, 0.7f);
 
         //        Lobby.position = new Vector2(0.2f, 0.04f);
     }
@@ -68,7 +70,7 @@ public class GUIScoreScreen : ScriptComponent
         {
             foreach (Text Textdata in Textdatalist)
                 Textdata.scale = Vector2.Zero;
-            Debug.Log("button was pressed");
+
             ToggleBool = true;
 
         }
@@ -77,10 +79,16 @@ public class GUIScoreScreen : ScriptComponent
 
         }
 
-        if (MatchSystem.instance.PlayAgain != null)
-            Textdatalist[1].text = "Play again : ";//+MatchSystem.instance.PlayAgain.timeLeft;
+
 
     }
+    public void updateTextPlayAgain()
+    {
+        
+        Textdatalist[1].text = "Play again:" + (Timedisplay -= 1);
+    }
+
+
     public void DisplayBar(Vector2 OnOff)
     {
 
@@ -100,6 +108,7 @@ public class GUIScoreScreen : ScriptComponent
         {
             foreach (Text Textdata in Textdatalist)
                 Textdata.scale = Vector2.Zero;
+            Timedisplay = ScoreScreenTimeLast+1;
         }
 
         
