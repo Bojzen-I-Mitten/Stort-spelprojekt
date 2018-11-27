@@ -63,17 +63,31 @@ public class NetworkPlayer : NetworkComponent
     {
         if (!isOwner)
         {
-            text.text = PlayerName;
-            text.scale = new Vector2(textScale);
-            text.color = Team.Color;
-            Vector3 position = Vector3.Zero;
-            if (rag.RagdollEnabled)
-                position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
-            else
-                position = rb.Position + new Vector3(0, textOffset, 0);
+            Vector3 betweenChads = transform.position - ChadCam.instance.transform.position;
+            betweenChads.Normalize();
+            Ray ray = new Ray(ChadCam.instance.transform.position, betweenChads);
+            RaycastHit info;
+            Physics.Raycast(ray, out info);
+            if(Input.GetKeyDown(Input.Keys.B))
+            {
+                Debug.Log("Object hit: " + info.collider.Name);
+            }
+            if (info.rigidbody == rb)
+            {
+                text.text = PlayerName;
+                text.scale = new Vector2(textScale);
+                text.color = Team.Color;
+                Vector3 position = Vector3.Zero;
+                if (rag.RagdollEnabled)
+                    position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
+                else
+                    position = rb.Position + new Vector3(0, textOffset, 0);
 
-            nameCanvas.isRendering = true;
-            nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+                nameCanvas.isRendering = true;
+                nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+            }
+            else if(nameCanvas != null)
+                nameCanvas.isRendering = false;
         }
         else if(nameCanvas != null)
             nameCanvas.isRendering = false;
