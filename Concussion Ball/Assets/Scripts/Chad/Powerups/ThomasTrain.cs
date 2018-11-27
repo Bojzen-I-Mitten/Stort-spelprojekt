@@ -188,7 +188,7 @@ public class ThomasTrain : Powerup
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
 
-        if (localChad && otherPlayerTeam != playerTeam)
+        if (/*localChad && otherPlayerTeam != playerTeam*/true)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
             if (distance < ExplosionRadius)
