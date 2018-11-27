@@ -3,15 +3,16 @@
 #include <ThomasCG.hlsl>
 #include <ThomasLights.hlsl>
 
-Texture2D diffuseTex;
-Texture2D normalTex : NORMALTEXTURE;
-Texture2D specularTex;
+Texture2D DiffuseTexture;
+Texture2D NormalTexture : NORMALTEXTURE;
+Texture2D SpecularTexture : SPECULARTEXTURE;
 Texture2D rampTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
     float4 color : COLOR;
     float smoothness : MATERIALSMOOTHNESSFACTOR;
+    float4 uvTiling : UVTILING; // (uv tiling x, uv tiling y, uv offset x, uv offset y)
 };
 
 
@@ -21,7 +22,6 @@ SamplerState StandardWrapSampler
     AddressU = Wrap;
     AddressV = Wrap;
 };
-
 
 DepthStencilState EnableDepth
 {
@@ -37,7 +37,6 @@ RasterizerState TestRasterizer
     FrontCounterClockWise = TRUE;
     DepthClipEnable = FALSE;
 };
-
 
 BlendState AlphaBlendingOn
 {
@@ -60,55 +59,43 @@ struct v2f
     float2 texcoord : TEXCOORD0;
 };
 
-float biTangentSign(float3 norm, float3 tang, float3 bitang)
-{
-    return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
-}
-
-v2f vert(appdata_thomas_skin v)
+v2f vert(appdata_thomas v)
 {
     v2f o;
-    
-    float4 posL = float4(v.vertex, 1.f);
-    float3 normalL = v.normal;
-    float3 tangentL = v.tangent;
-    float bisign = biTangentSign(v.normal, v.tangent, v.bitangent);
-    ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
-    float3 bitangL = cross(normalL, tangentL) * bisign;
-	
+
+    float3 posL = v.vertex;
+
     o.vertex = ThomasObjectToClipPos(posL);
     o.worldPos = ThomasObjectToWorldPos(posL);
-
-    float3 tangent = ThomasObjectToWorldDir(tangentL);
-    float3 bitangent = ThomasObjectToWorldDir(bitangL);
-    float3 normal = ThomasObjectToWorldDir(normalL);
+     
+    float3 tangent = ThomasObjectToWorldDir(v.tangent);
+    float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
+    float3 normal = ThomasObjectToWorldDir(v.normal);
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
-    o.texcoord = v.texcoord;
+    o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
     return o;
 }
 
-
 float4 frag(v2f input) : SV_TARGET
 {
-    float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
+    float3 normal = NormalTexture.Sample(StandardWrapSampler, input.texcoord);
     normal.xy = normal.xy * 2.0f - 1.0f;
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));
 
-    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
+    float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
     diffuse *= rampTex.Sample(StandardWrapSampler, Intensity(normal, input.worldPos.xyz));
-
-    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
-
-    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1); // Calculate light
-    diffuse.xyz = pow(diffuse, 0.4545454545f); // Gamma correction
+ 
+    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
+     
+    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light    
+    diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
 
     return saturate(float4(diffuse, 1.0f));
 }
-
 
 technique11 Standard
 {
@@ -121,4 +108,5 @@ technique11 Standard
         SetRasterizerState(TestRasterizer);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
+
 }
