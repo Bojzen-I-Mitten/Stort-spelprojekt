@@ -25,11 +25,13 @@ namespace thomas {
 				m_renderableShaders(),
 				m_waitingList_Add(),
 				m_waitingList_Rmv(),
-				m_addLock(),
-				m_rmvLock()
+				m_accessableShaders(),
+				m_accessLock()
 			{
 				m_standard = CreateShader("../Data/FXIncludes/StandardShader.fx");
 				m_failed = CreateShader("../Data/FXIncludes/FailedShader.fx");
+				m_accessableShaders.push_back(m_standard);
+				m_accessableShaders.push_back(m_failed);
 			}
 			ShaderList::~ShaderList()
 			{
@@ -42,26 +44,22 @@ namespace thomas {
 					delete m_renderableShaders[i];
 				m_renderableShaders.clear();
 
-				m_addLock.lock();
+				// Clear waiting list
+				m_accessLock.lock();
 				for (size_t i = 0; i < m_waitingList_Add.size(); i++)
 					delete m_waitingList_Add[i];
 				m_waitingList_Add.clear();
-				m_addLock.unlock();
-
-				m_rmvLock.lock();
 				m_waitingList_Rmv.clear();
-				m_rmvLock.unlock();
+				m_accessLock.unlock();
 			}
 			void ShaderList::SyncList()
 			{
 				// Sync. add list
-				m_addLock.lock();
+				m_accessLock.lock();
 				for (size_t i = 0; i < m_waitingList_Add.size(); i++)
 					m_renderableShaders.push_back(m_waitingList_Add[i]);
 				m_waitingList_Add.clear();
-				m_addLock.unlock();
 				// Sync. rmv list
-				m_rmvLock.lock();
 				for (size_t i = 0; i < m_waitingList_Rmv.size(); i++)
 				{
 					for (auto it = m_renderableShaders.begin(); it < m_renderableShaders.end(); it++)
@@ -75,21 +73,30 @@ namespace thomas {
 					}
 				}
 				m_waitingList_Rmv.clear();
-				m_rmvLock.unlock();
+				m_accessLock.unlock();
 				// Recompile if necessary
 				RecompileShaders();
 			}
 			void ShaderList::add(resource::Shader * s) const
 			{
-				m_addLock.lock();
+				m_accessLock.lock();
 				m_waitingList_Add.push_back(s);
-				m_addLock.unlock();
+				m_accessableShaders.push_back(s);
+				m_accessLock.unlock();
 			}
 			void ShaderList::rmv(resource::Shader * s) const
 			{
-				m_rmvLock.lock();
+				m_accessLock.lock();
 				m_waitingList_Rmv.push_back(s);
-				m_rmvLock.unlock();
+				for (uint32_t i = 0; i < m_accessableShaders.size(); i++)
+				{
+					if (m_accessableShaders[i] == s)
+					{
+						m_accessableShaders.erase(m_accessableShaders.begin() + i);
+						break;
+					}
+				}
+				m_accessLock.unlock();
 			}
 			
 
@@ -108,7 +115,7 @@ namespace thomas {
 				else
 				{
 					resource::Shader* ptr = shader.release();
-					m_waitingList_Add.push_back(ptr);
+					add(ptr);
 					return ptr;
 				}
 			}
@@ -132,7 +139,7 @@ namespace thomas {
 				else
 				{
 					resource::ComputeShader* ptr = shader.release();
-					m_waitingList_Add.push_back(ptr);
+					add(ptr);
 					return ptr;
 				}
 			}
@@ -152,22 +159,35 @@ namespace thomas {
 
 			resource::Shader * ShaderList::FindByName(const std::string & name) const
 			{
-				for (resource::Shader* shader : m_renderableShaders)
+				m_accessLock.lock();
+				resource::Shader* s = nullptr;
+				for (resource::Shader* shader : m_accessableShaders)
 				{
 					if (shader->GetName() == name)
-						return shader;
+					{
+						s = shader;
+						break;
+					}
 				}
-				return nullptr;
+				m_accessLock.unlock();
+				return s;
 			}
 
 			resource::Shader * ShaderList::FindByPath(const std::string& path) const
 			{
-				for (resource::Shader* shader : m_renderableShaders)
+				m_accessLock.lock();
+				resource::Shader* s = nullptr;
+				for (resource::Shader* shader : m_accessableShaders)
 				{
 					if (m_failed->GetPath() == path)
 						return shader;
 				}
-				return nullptr;
+				m_accessLock.unlock();
+				return s;
+			}
+			resource::Shader * ShaderList::StandardShader() const
+			{
+				return m_standard;
 			}
 			void ShaderList::QueueRecompile() const
 			{
@@ -229,6 +249,14 @@ namespace thomas {
 			{
 				using namespace resource::shaderproperty;
 				std::shared_ptr<ShaderProperty> prop(new ShaderPropertyMatrix(value));
+				prop->SetName(name);
+				for (auto shader : m_renderableShaders)
+					shader->SetProperty(name, prop);
+			}
+			void ShaderList::SetGlobalMatrixArray(const std::string & name, math::Matrix* value, unsigned nrOfMatrices)
+			{
+				using namespace resource::shaderproperty;
+				std::shared_ptr<ShaderProperty> prop(new ShaderPropertyMatrixArray(value, nrOfMatrices));
 				prop->SetName(name);
 				for (auto shader : m_renderableShaders)
 					shader->SetProperty(name, prop);

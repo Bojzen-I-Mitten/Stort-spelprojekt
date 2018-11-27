@@ -80,7 +80,7 @@ namespace thomas
 			std::unique_ptr<render::Frame> m_prevFrame;
 			render::ShaderList m_shaders;
 			render::CameraList m_cameras;
-			
+			bool m_enableShadows;
 		};
 	}
 }

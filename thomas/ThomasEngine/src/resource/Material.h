@@ -16,6 +16,7 @@ namespace ThomasEngine
 		bool m_instance = false;
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
+		static Material^ s_standardMaterial = nullptr;
 	internal:
 		static List<Type^>^ GetKnownTypes();
 		Material(thomas::resource::Material* ptr) : Resource(Utility::ConvertString(ptr->GetPath()), ptr) {};

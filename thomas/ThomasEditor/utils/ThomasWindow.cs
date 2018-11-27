@@ -6,6 +6,11 @@ using System.Windows.Interop;
 using ThomasEngine;
 namespace ThomasEditor
 {
+    public enum WindowType
+    {
+        EditorWindow,
+        GameWindow
+    }
 
     public class ThomasWindow : HwndHost
     {
@@ -23,6 +28,11 @@ namespace ThomasEditor
             {
                 SetValue(IsEditorProperty, value);
             }
+        }
+
+        public WindowType Type
+        {
+            get; set;
         }
 
         public new IntPtr Handle { get; private set; }
@@ -165,6 +175,20 @@ namespace ThomasEditor
 
             ThomasWrapper.CreateThomasWindow(Handle, IsEditor);
             GotFocus += ThomasWindow_GotFocus;
+
+            switch (Type)
+            {
+                case WindowType.EditorWindow:
+                    ThomasWrapper.ThomasEditorWindowLoaded();
+                    break;
+                case WindowType.GameWindow:
+                    ThomasWrapper.ThomasGameWindowLoaded();
+                    break;
+                default:
+                    throw new System.InvalidOperationException("Non-supported window type was added to the execution");
+                    break;
+            }
+
             return new HandleRef(this, Handle);
             
         }

@@ -94,6 +94,16 @@ namespace thomas {
 					return resource::Material::GetStandardMaterial();
 			}
 
+			std::vector<resource::Material*> RenderComponent::GetMaterials()
+			{
+				return m_materials;
+			}
+
+			void RenderComponent::SetMaterials(std::vector<resource::Material*> value)
+			{
+				m_materials = value;
+			}
+
 
 			void RenderComponent::SubmitToRenderer(Camera* camera)
 			{

@@ -181,6 +181,10 @@ public class GUISelectTeam : ScriptComponent
             Team2Text.font = TextFont;
             SpectatorText.font = TextFont;
         }
+
+        //Team1Image.position = SelectboxPos;
+        //Team1Image.scale = SelectboxScale;
+
     }
 
     public void AddImagesAndText()
@@ -352,5 +356,14 @@ public class GUISelectTeam : ScriptComponent
         if (ready < players && players > 0)
             return false;
         return true;
+    }
+
+    private void IdleChads()
+    {
+        if (IdleAnim != null)
+        {
+            ChadRSC1.animation = IdleAnim;
+            ChadRSC2.animation = IdleAnim;
+        }
     }
 }
