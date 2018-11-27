@@ -357,13 +357,4 @@ public class GUISelectTeam : ScriptComponent
             return false;
         return true;
     }
-
-    private void IdleChads()
-    {
-        if (IdleAnim != null)
-        {
-            ChadRSC1.animation = IdleAnim;
-            ChadRSC2.animation = IdleAnim;
-        }
-    }
 }
