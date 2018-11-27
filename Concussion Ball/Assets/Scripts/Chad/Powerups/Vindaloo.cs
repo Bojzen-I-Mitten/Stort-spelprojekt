@@ -20,7 +20,7 @@ public class Vindaloo : Powerup
     private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 8.0f;
-    public float ExplosionForce = 40.0f;
+    public float ExplosionForce = 100.0f;
     public override void OnAwake()
     {
         base.OnAwake();

@@ -32,6 +32,11 @@ public class GUIMainMenu : ScriptComponent
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
 
+    public override void OnAwake()
+    {
+        
+    }
+
     public override void Start()
     {
         Camera = gameObject.GetComponent<Camera>();

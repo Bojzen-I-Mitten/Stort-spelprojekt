@@ -65,6 +65,9 @@ namespace ThomasEngine {
 	private:
 		Scene(uint32_t unique_id);
 
+		/* Instantly remove and delete an object.
+		*/
+		void DeleteInstant(GameObject ^ object);
 
 	public:
 		static Scene^ LoadScene(System::String^ fullPath, uint32_t unique_id);

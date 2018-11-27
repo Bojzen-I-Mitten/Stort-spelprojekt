@@ -450,6 +450,10 @@ public class GUIHostMenu : ScriptComponent
         Caret.font = Font;
     }
 
+    public override void OnAwake()
+    {
+    }
+
     public override void Update()
     {
         NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
