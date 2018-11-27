@@ -4,6 +4,7 @@ using ThomasEngine;
 
 public class ChadCam : ScriptComponent
 {
+    public static ChadCam instance;
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
     public ChadControls Chad
@@ -31,19 +32,22 @@ public class ChadCam : ScriptComponent
     public float CameraMaxVertDegrees { get; set; } = 60;
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
 
-    private float TotalYStep = 0;
-    private float TotalXStep = 0;
+    [Browsable(false)]
+    public float TotalYStep { get; private set; } = 0;
+    [Browsable(false)]
+    public float TotalXStep { get; private set; } = 0;
 
     public float CameraOffset { get; set; } = 3;
     private Vector3 ThrowingOffset = new Vector3(1.2f, -0.5f, 1.8f);
     //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
-    private Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
+    private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private float velocity { get { if (Chad?.rBody) return Chad.rBody.LinearVelocity.z; else return 0; } }
-    private float xStep { get { return Input.GetMouseX(); } }
-    private float yStep { get { return Input.GetMouseY(); } }
+    public float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
+    public float yStep { get { return Input.GetMouseY() * Time.ActualDeltaTime; } }
 
     public float MaxFov { get; set; } = 110;
+    public float Smoothing { get; set; } = 1;
     private float MinFov;
 
     public override void Start()
@@ -51,8 +55,9 @@ public class ChadCam : ScriptComponent
         if (Camera)
             MinFov = Camera.fieldOfView;
 
-        CameraSensitivity_x = 0.5f;
-        CameraSensitivity_y = 1.0f;
+        instance = this;
+        //CameraSensitivity_x = 0.5f;
+        //CameraSensitivity_y = 1.0f;
     }
 
     public override void Update()
@@ -67,8 +72,6 @@ public class ChadCam : ScriptComponent
                     {
                         if (!Input.GetKey(Input.Keys.LeftAlt) && !Input.GetKey(Input.Keys.R))
                             FondleCamera();
-                        //else if (Input.GetKeyDown(Input.Keys.LeftAlt))
-                        //    InitFreeLookCamera();
                         else if (Input.GetKey(Input.Keys.LeftAlt))
                             FreeLookCamera(false);
                         else
@@ -92,8 +95,15 @@ public class ChadCam : ScriptComponent
                     }
                     break;
                 case ChadControls.STATE.RAGDOLL:
+                    if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                     {
                         RagdollCamera();
+                    }
+                    else
+                    {
+                        ResetCamera();
+                        transform.rotation = Chad.transform.rotation;
+                        transform.position = ChadHead + CameraOffset * -transform.forward;
                     }
                     break;
             }
@@ -105,20 +115,20 @@ public class ChadCam : ScriptComponent
     private void FondleCamera()
     {
         FreeLookCamera(false);
-        transform.position = ChadHead + CameraOffset * -transform.forward;
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(-transform.forward.x, 0, transform.forward.z), Vector3.Up));
+        Chad.rBody.IgnoreNextTransformUpdate();
     }
 
     private void RagdollCamera()
     {
         FreeLookCamera(false);
-        transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
     }
 
     private void ReverseCamera()
     {
         FreeLookCamera(true);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(transform.forward.x, 0, -transform.forward.z), Vector3.Up));
+        Chad.rBody.IgnoreNextTransformUpdate();
     }
 
     private void FreeLookCamera(bool reverse)
@@ -127,19 +137,39 @@ public class ChadCam : ScriptComponent
         TotalYStep -= MathHelper.ToRadians(yStep * CameraSensitivity_y);
         TotalYStep = ClampCameraRadians(TotalYStep, -CameraMaxVertRadians, CameraMaxVertRadians);
         
-        if(reverse)
-            transform.rotation = Quaternion.CreateFromYawPitchRoll(TotalXStep + MathHelper.Pi, TotalYStep, 0);
-        else
-            transform.rotation = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
 
-        transform.position = ChadHead + CameraOffset * -transform.forward;
+        if (reverse)
+        {
+            transform.rotation = Quaternion.CreateFromYawPitchRoll(TotalXStep + MathHelper.Pi, TotalYStep, 0);
+        }
+        else
+        {
+            transform.rotation = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
+        }
     }
+
 
     public void ThrowingCamera()
     {
         FreeLookCamera(false);
-        transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(-transform.forward.x, 0, transform.forward.z), Vector3.Up));
+    }
+
+    public override void FixedUpdate()
+    {
+        switch (Chad.State)
+        {
+            case ChadControls.STATE.THROWING:
+                transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
+                break;
+            case ChadControls.STATE.RAGDOLL:
+                transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
+                break;
+            default:
+                transform.position = ChadHead - transform.forward * CameraOffset;
+                break;
+        }
+        
     }
 
     public void ResetCamera()
