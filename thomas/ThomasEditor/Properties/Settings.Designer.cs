@@ -118,5 +118,17 @@ namespace ThomasEditor.Properties {
                 this["RenderPhysicsDebug"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool updateHiearchyParenting {
+            get {
+                return ((bool)(this["updateHiearchyParenting"]));
+            }
+            set {
+                this["updateHiearchyParenting"] = value;
+            }
+        }
     }
 }
