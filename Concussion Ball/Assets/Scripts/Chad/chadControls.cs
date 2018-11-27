@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-#define L_FOR_RAGDOLL
+//#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
@@ -638,6 +638,7 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             State = STATE.RAGDOLL;
+            Ragdoll.EnableRagdoll();
             Ragdoll.AddForce(param);
 
             yield return new WaitForSeconds(duration);
