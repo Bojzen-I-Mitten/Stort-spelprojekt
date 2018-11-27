@@ -273,7 +273,7 @@ public class ChadControls : NetworkComponent
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
         //gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
-        gameObject.GetComponent<Rigidbody>().enabled = true;
+        rBody.enabled = true;
 
         // call coroutine function that sets canragdoll true
         RagdollRecoverer = RagdollRecovery();
@@ -599,6 +599,7 @@ public class ChadControls : NetworkComponent
 
     public void Reset()
     {
+        DisableRagdoll();
         State = STATE.CHADING;
         if (Diving != null)
         {
