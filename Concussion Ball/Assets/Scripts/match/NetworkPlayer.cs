@@ -68,10 +68,6 @@ public class NetworkPlayer : NetworkComponent
             Ray ray = new Ray(ChadCam.instance.transform.position, betweenChads);
             RaycastHit info;
             Physics.Raycast(ray, out info);
-            if(Input.GetKeyDown(Input.Keys.B))
-            {
-                Debug.Log("Object hit: " + info.collider.Name);
-            }
             if (info.rigidbody == rb)
             {
                 text.text = PlayerName;
