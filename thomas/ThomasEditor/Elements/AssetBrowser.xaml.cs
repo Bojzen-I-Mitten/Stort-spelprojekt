@@ -304,9 +304,27 @@ namespace ThomasEditor
                 stack.Orientation = Orientation.Horizontal;
                 stack.Height = 18;
 
-                ImageSource source;
+                // Default case:
+                ImageSource source = assetImages[ThomasEngine.Resources.AssetTypes.UNKNOWN];
+                // Attempt load texture2D image representation
                 if (assetType == ThomasEngine.Resources.AssetTypes.TEXTURE2D)
-                    source = new BitmapImage(new Uri(Path.GetFullPath(filePath)));
+                {
+                    int attempts = 5;
+                    while (attempts-- <= 0)
+                    {
+                        try
+                        {
+                            source = new BitmapImage(new Uri(Path.GetFullPath(filePath)),);
+                            break;
+                        }
+                        catch (IOException e)
+                        {
+                            // Primarily check is constructed to validate image isn't locked by another process.
+                            Debug.LogWarning(e.Message);
+                            Thread.Sleep(500);
+                        }
+                    }
+                }
                 else
                     source = assetImages[assetType];
 
