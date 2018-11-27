@@ -6,6 +6,7 @@ public class GUISelectTeam : ScriptComponent
 {
     public Texture2D SelectBox { get; set; }
     public Texture2D SpectatorCamTexture { get; set; }
+    public Texture2D TeamListTexture { get; set; }
     public Font TextFont { get; set; }
 
     //public GameObject ChadTeam1 { get; set; }
@@ -16,13 +17,16 @@ public class GUISelectTeam : ScriptComponent
 
     Camera Camera;
 
-    //public Vector2 SelectboxPos { get; set; } = new Vector2(0.37f, 0.33f);
-    //public Vector2 SelectboxScale { get; set; } = new Vector2(0.37f, 0.33f);
-
+    public Vector2 Team1ListPos { get; set; } = new Vector2(0, 0);
+    public Vector2 Team1ListScale { get; set; } = new Vector2(0, 0);
+    public Vector2 Team2ListPos { get; set; } = new Vector2(0, 0);
+    public Vector2 Team2ListScale { get; set; } = new Vector2(0, 0);
     public Canvas Canvas;
 
     Image Team1Image;
     Image Team2Image;
+    Image Team1List;
+    Image Team2List;
     Image SpectatorImage;
     Text Select;
     Text Team1Text;
@@ -182,8 +186,10 @@ public class GUISelectTeam : ScriptComponent
             SpectatorText.font = TextFont;
         }
 
-        //Team1Image.position = SelectboxPos;
-        //Team1Image.scale = SelectboxScale;
+        Team1List.position = Team1ListPos;
+        Team1List.scale = Team1ListScale;
+        Team2List.position = Team2ListPos;
+        Team2List.scale = Team2ListScale;
 
     }
 
@@ -254,12 +260,20 @@ public class GUISelectTeam : ScriptComponent
         PlayersInTeam1.position = new Vector2(0, 0.05f);
         PlayersInTeam1.color = Unselected;
 
-        Debug.Log(PlayersInTeam1.text);
-
         PlayersInTeam2 = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount + "/" + MatchSystem.instance.MaxPlayers / 2);
         PlayersInTeam2.origin = new Vector2(1, 0);
         PlayersInTeam2.position = new Vector2(1, 0.05f);
         PlayersInTeam2.color = Unselected;
+
+        if (TeamListTexture != null)
+        {
+            Team1List = Canvas.Add(TeamListTexture);
+            Team1List.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+
+            Team2List = Canvas.Add(TeamListTexture);
+            Team2List.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        }
+
     }
 
     public void ClearImagesAndText()
@@ -350,7 +364,6 @@ public class GUISelectTeam : ScriptComponent
             players++;
             if (np.ReadyToStart)
                 ready++;
-                
         }
 
         if (ready < players && players > 0)
