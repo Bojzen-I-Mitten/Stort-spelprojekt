@@ -31,7 +31,7 @@ public class Chadimations : NetworkComponent
             return 1.0f - MathHelper.Clamp(distance, 0.0f, 1.0f);
         }
     }
-    private bool _Throwing = false;
+    public bool Throwing = false;
     private ChadControls Chad = null;
     private Vector3 Direction
     {
@@ -107,17 +107,21 @@ public class Chadimations : NetworkComponent
                     {
 
                         WeightHandles[State].setWeight(i, node.GetWeight(Direction));
-                        node.Node.getTimeHandle().SetSpeed(1);
+                        //node.Node.getTimeHandle().SetSpeed(1);
+                        AnimationSpeed(node, 1);
                     }
-                    else if (!_Throwing && i == 1) // not throwing and index handling throwing anim
+                    else if (!Throwing && i == 1) // not throwing and index handling throwing anim
                     {
                         WeightHandles[State].setWeight(i, 0); // set throwing anim weight to 0
-                        node.Node.getTimeHandle().SetSpeed(2.2f);
+                        //node.Node.getTimeHandle().SetSpeed(2.2f);
+                        AnimationSpeed(node, 2.4f);
                     }
                     else if (i == 1) // throw anim
-                        node.Node.getTimeHandle().SetSpeed(2.2f);
+                        AnimationSpeed(node, 2.4f);
+                    //node.Node.getTimeHandle().SetSpeed(2.2f);
                     else if (Chad.PickedUpObject) // charge throw anim
-                        node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
+                        AnimationSpeed(node, 2.6f / Chad.PickedUpObject.chargeTimeMax);
+                        //node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
                 }
                 else
                 {
@@ -127,15 +131,16 @@ public class Chadimations : NetworkComponent
         }
     }
 
+
     public void SetAnimationWeight(uint index, float weight)
     {
         if (index == 1 && weight == 1)
         {
-            _Throwing = true;
+            Throwing = true;
             
         }
         else
-            _Throwing = false;
+            Throwing = false;
 
         if (BlendNodes.ContainsKey(State))
             BlendNodes[State].ResetPlayback();
@@ -154,5 +159,16 @@ public class Chadimations : NetworkComponent
     {
         ResetTimer(State, index);
         SendRPC("ResetTimer", (int)index);
+    }
+
+    private void RPCAnimationSpeed(AnimationNode node, float amount)
+    {
+        AnimationSpeed(node, amount);
+        SendRPC("AnimationSpeed", (AnimationNode)node, (float)amount);
+    }
+
+    private void AnimationSpeed(AnimationNode node, float amount)
+    {
+        node.Node.getTimeHandle().SetSpeed(amount);
     }
 } 
