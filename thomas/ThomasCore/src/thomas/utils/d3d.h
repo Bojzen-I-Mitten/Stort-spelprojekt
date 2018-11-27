@@ -2,8 +2,7 @@
 
 #define FRAME_BUFFERS 3
 
-#include "D3DDevice.h"
-#include <dxgi1_4.h>
+#include "DankD3D.h"
 #include <dxgidebug.h>
 #include <string>
 
