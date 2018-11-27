@@ -20,7 +20,7 @@ public class Vindaloo : Powerup
     private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 8.0f;
-    public float ExplosionForce = 300.0f;
+    public float ExplosionForce = 40.0f;
     public override void OnAwake()
     {
         base.OnAwake();
@@ -28,7 +28,7 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
-        ExplosionForce = 50.0f;
+        ExplosionForce = 40.0f;
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
@@ -139,26 +139,26 @@ public class Vindaloo : Powerup
         ObjectOwner = chad;
     }
 
-    public override void OnCollisionEnter(Collider collider)
-    {
-        //Check if colliding with a player
-        ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-        if (!otherChad)
-        { 
-            base.OnCollisionEnter(collider);
-        }
-        else
-        {
-            ChadControls localChad = MatchSystem.instance.LocalChad;
+    //public override void OnCollisionEnter(Collider collider)
+    //{
+    //    //Check if colliding with a player
+    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+    //    if (!otherChad)
+    //    { 
+    //        base.OnCollisionEnter(collider);
+    //    }
+    //    else
+    //    {
+    //        ChadControls localChad = MatchSystem.instance.LocalChad;
 
-            TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-            TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
+    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
 
-            if (localChad && (otherPlayerTeam != playerTeam))
-                base.OnCollisionEnter(collider);
-        }
+    //        if (localChad && (otherPlayerTeam != playerTeam))
+    //            base.OnCollisionEnter(collider);
+    //    }
         
-    }
+    //}
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -174,7 +174,6 @@ public class Vindaloo : Powerup
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-
         if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);

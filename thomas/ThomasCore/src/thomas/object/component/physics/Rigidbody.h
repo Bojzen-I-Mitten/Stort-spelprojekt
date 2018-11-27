@@ -122,6 +122,7 @@ namespace thomas
 				float m_bounciness;
 				bool m_dirty;
 				bool m_ignoreTransform;
+				bool m_first;
 			};
 		}
 	}

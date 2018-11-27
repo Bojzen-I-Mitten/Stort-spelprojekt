@@ -24,6 +24,7 @@ namespace thomas
 				m_dirty(false),
 				m_ignoreTransform(false),
 				m_LocalCenterOfMassChange(0, 0, 0),
+				m_first(true),
 				m_activationState(ActivationState::Default)
 			{
 				m_bounciness = m_restitution;
@@ -57,6 +58,17 @@ namespace thomas
 				UpdateRigidbodyMass();
 
 				this->setUserPointer(m_collider);
+
+				if (m_first)
+				{
+					//this->setLinearVelocity(btVector3(0, 0, 0));
+					//this->setAngularVelocity(btVector3(0, 0, 0));
+					this->setLinearVelocity(this->getLinearVelocity() / 20);
+					this->setAngularVelocity(this->getLinearVelocity() / 20);
+					clearForces();
+					m_first = false;
+				}
+				
 
 				Physics::AddRigidBody(this);
 				m_prevMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
