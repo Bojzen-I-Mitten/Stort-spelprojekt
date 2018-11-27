@@ -37,6 +37,7 @@ public class MatchSystem : NetworkManager
     public bool PublicServer = true;
     public bool SpawnPowerupsDuringGame = true;
     public int ScoreLimit = 0;
+    public int MaxPlayers = 8;
 
 
     public float lostTime = 0.0f;
@@ -334,7 +335,11 @@ public class MatchSystem : NetworkManager
     public void JoinTeam(TEAM_TYPE team)
     {
         NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-        np.JoinTeam(team);
+        int playersInTeam = Teams[team].PlayerCount;
+        if ((MaxPlayers / 2.0f) > playersInTeam)
+            np.JoinTeam(team);
+        else
+            Debug.Log(team + " is already full");
     }
 
     #endregion

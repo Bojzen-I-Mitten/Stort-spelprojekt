@@ -453,6 +453,7 @@ public class GUIHostMenu : ScriptComponent
     {
         NotSimilarColorTest(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color, MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
         NotSameNameTest(Team1.text, Team2.text);
+        AdjustMaxPlayers();
 
         if (Input.GetMouseButton(Input.MouseButtons.LEFT))
         {
@@ -682,6 +683,7 @@ public class GUIHostMenu : ScriptComponent
                     MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
                     MatchSystem.instance.MatchLength = ConvertToInt(TimeRoundString.text) * 60; //Convert to seconds.
                     MatchSystem.instance.ScoreLimit = ConvertToInt(ScoreLimitString.text);
+                    MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
                     MatchSystem.instance.ServerName = ServerNameString.text;
                     MatchSystem.instance.PublicServer = PublicServerCheck.scale != Vector2.Zero ? true : false;
                     MatchSystem.instance.SpawnPowerupsDuringGame = PowerUpsCheck.scale != Vector2.Zero ? true : false;
@@ -713,9 +715,6 @@ public class GUIHostMenu : ScriptComponent
         }
         else
             ExitBtn.color = Unselected;
-
-        
-        
     }
 
     private void TakeKeyboardInput()
@@ -779,5 +778,11 @@ public class GUIHostMenu : ScriptComponent
         transform.position = HostMenuCamPos;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(HostMenuCamRot.x, HostMenuCamRot.y, HostMenuCamRot.z);
 
+    }
+
+    private void AdjustMaxPlayers()
+    {
+        if (!InputMaxPlayers)
+            MaxPlayersString.text = (ConvertToInt(MaxPlayersString.text) + ConvertToInt(MaxPlayersString.text) % 2).ToString();
     }
 }
