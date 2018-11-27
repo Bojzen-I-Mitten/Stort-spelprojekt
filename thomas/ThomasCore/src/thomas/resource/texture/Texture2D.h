@@ -2,6 +2,7 @@
 
 #include "Texture.h"
 #include "../../utils/Math.h"
+#include "../../utils/d3d.h"
 #include <DirectXTex.h>
 
 namespace thomas
@@ -16,8 +17,8 @@ namespace thomas
 			static void Init();
 			static void Destroy();
 
-			Texture2D(int width, int height, bool mipMap);
-			Texture2D(void* initData, int width, int height, bool mipMap);
+			Texture2D(int width, int height, bool mipMap = false, bool bindDepth = false);
+			Texture2D(void* initData, int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(std::string path);
 
 			void OnChanged();

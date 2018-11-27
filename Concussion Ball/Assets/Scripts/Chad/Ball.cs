@@ -192,8 +192,14 @@ public class Ball : PickupableObject
 
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
+        RPCParticles(camPos, direction);
+        MatchSystem.instance.SendRPC(ID, "RPCParticles", camPos, direction);
         direction.y += 0.2f;
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+    }
 
+    private void RPCParticles(Vector3 camPos, Vector3 direction)
+    {
         emitterFire.Emit = true;
         emitterSmoke.Emit = true;
         //emitterElectricity1.Emit = true;
@@ -206,7 +212,6 @@ public class Ball : PickupableObject
 
         MultiplyWithIntensity(smokeIntensityThreshold, emitterSmoke);
         MultiplyWithIntensity(2.0f, emitterFire);
-        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     override public void ChargeEffect()

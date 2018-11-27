@@ -31,11 +31,9 @@ public class ChadCam : ScriptComponent
 
     public float CameraMaxVertDegrees { get; set; } = 60;
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
-
-    [Browsable(false)]
-    public float TotalYStep { get; private set; } = 0;
-    [Browsable(false)]
-    public float TotalXStep { get; private set; } = 0;
+    
+    private float TotalYStep { get; set; } = 0;
+    private float TotalXStep { get; set; } = 0;
 
     public float CameraOffset { get; set; } = 3;
     private Vector3 ThrowingOffset = new Vector3(1.2f, -0.5f, 1.8f);
@@ -43,11 +41,10 @@ public class ChadCam : ScriptComponent
     private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private float velocity { get { if (Chad?.rBody) return Chad.rBody.LinearVelocity.z; else return 0; } }
-    public float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
-    public float yStep { get { return Input.GetMouseY() * Time.ActualDeltaTime; } }
+    private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
+    private float yStep { get { return Input.GetMouseY() * Time.ActualDeltaTime; } }
 
     public float MaxFov { get; set; } = 110;
-    public float Smoothing { get; set; } = 1;
     private float MinFov;
 
     public override void Start()

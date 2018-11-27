@@ -18,9 +18,19 @@ namespace ThomasEngine
 
 	public ref class GameObject : public Object
 	{
+	public:
+		ref class ComponentsChangedArgs
+		{
+		public:
+			ComponentsChangedArgs(){}
+		};
+		delegate void ComponentsChangedEventHandler(System::Object^ sender, ComponentsChangedArgs^ e);
+
+		void Subscribe(ComponentsChangedEventHandler ^e);
+		void UnSubscribe(ComponentsChangedEventHandler ^e);
 	private:
 		
-		ObservableCollection<Component^> m_components;
+		List<Component^> m_components;
 		Transform^ m_transform;
 		uint32_t m_scene_id;
 		bool m_makeDynamic = false;
@@ -29,15 +39,14 @@ namespace ThomasEngine
 	private:
 		GameObject();
 		virtual ~GameObject();
-
-		System::Object^ m_componentsLock = gcnew System::Object();
-
+		
 		/* Function called when SetActive(true) is called on the object or a parent object
 		*/
 		void OnActivate();
 		/* Function called when SetActive(false) is called on the object or a parent object
 		*/
 		void OnDeactivate();
+		event ComponentsChangedEventHandler^ m_changeEvent;
 		
 	internal:
 		/* Init the components within the object to the specified state
@@ -45,6 +54,11 @@ namespace ThomasEngine
 		InitBits	<<	Initiation information bits.
 		*/
 		void InitComponents(Comp::State s, uint32_t InitBits);
+
+		/* Try release object lock if lock is entered.
+		 * Debug function used to release locks if errors occured inside the object.
+		*/
+		void TryReleaseComponentLock();
 
 		static void FlattenGameObjectTree(List<GameObject^>^ list, GameObject ^ root);
 		/* Remove a single component from the object.
@@ -55,9 +69,6 @@ namespace ThomasEngine
 		virtual void Destroy() override;
 
 		System::String^ prefabPath;
-
-
-		void SyncComponents();
 
 		void PostLoad(Scene^ scene);
 		/* Post instantiate the object, adding it to the scene etc.
@@ -160,14 +171,15 @@ namespace ThomasEngine
 
 			void set(Transform^ value);
 		}
-
-		property ObservableCollection<Component^>^ Components 
+		/* Serialized attribute
+		*/
+		property List<Component^>^ Components 
 		{
-			ObservableCollection<Component^>^ get() 
+			List<Component^>^ get()
 			{
 				return %m_components;
 			}
-			void set(ObservableCollection<Component^>^ value)
+			void set(List<Component^>^ value)
 			{
 				m_components.Clear();
 				for each(Component^ c in value)
@@ -184,6 +196,9 @@ namespace ThomasEngine
 		index	<<	Index to set.  If index is larger then number of components it will be moved last.
 		*/
 		void SetComponentIndex(Component^ c, uint32_t index);
+		/* Fetch the component index.
+		*/
+		uint32_t GetComponentIndex(Component^ c);
 
 		generic<typename T>
 		where T : Component

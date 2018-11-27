@@ -8,6 +8,7 @@
 #include <comdef.h>
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
+#include "../Common.h"
 
 namespace thomas
 {
@@ -258,6 +259,7 @@ namespace thomas
 		{
 			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
+
 		void Shader::Bind()
 		{
 			for (auto prop : m_properties) {
@@ -331,6 +333,11 @@ namespace thomas
 		{
 			if (HasProperty(name))
 			{
+				if (value == nullptr)
+				{
+					LOG("Can't set null texture in property: " + name);
+					value = Texture2D::GetWhiteTexture();
+				}
 				std::shared_ptr<shaderproperty::ShaderPropertyTexture2D> prop(
 					new shaderproperty::ShaderPropertyTexture2D(value));
 				prop->SetName(name);
@@ -550,7 +557,14 @@ namespace thomas
 				break;
 			case D3D_SVC_MATRIX_COLUMNS:
 			case D3D_SVC_MATRIX_ROWS:
-				newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				if (semantic == "MATRIXARRAY")
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrixArray::GetDefault();
+				}
+				else
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				}
 				break;
 			case D3D_SVC_OBJECT:
 			{
@@ -581,6 +595,8 @@ namespace thomas
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+						if (semantic == "SHADOWMAP")
+							isMaterialProperty = false;
 					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
@@ -636,6 +652,11 @@ namespace thomas
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}
+			/*else
+			{
+				std::string err("ShaderProperty default valye was null in shader" + this->m_name + " with propertyname: " + name);
+				LOG(err);
+			}*/
 			
 		}
 
