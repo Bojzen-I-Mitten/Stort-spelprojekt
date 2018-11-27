@@ -72,9 +72,12 @@ namespace ThomasEditor.Inspectors
                 {
                     Resource resource = item.DataContext as Resource;
                     ContentControl label = sender as ContentControl;
-                    PropertyItem pi = label.DataContext as PropertyItem;
-                    if (resource.GetType() == pi.PropertyType)
-                        e.Handled = true;
+                    if (label != null && resource != null) // Verify objects are valid...
+                    {
+                        PropertyItem pi = label.DataContext as PropertyItem;
+                        if (resource.GetType() == pi.PropertyType)
+                            e.Handled = true;
+                    }
                 }
             }
 
