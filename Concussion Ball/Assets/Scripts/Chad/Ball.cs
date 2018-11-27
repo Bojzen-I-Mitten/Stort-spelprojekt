@@ -192,7 +192,7 @@ public class Ball : PickupableObject
     {
         direction.y += 0.2f;
 
-        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce * ThrowStrength.ThrowStrengthFactor);
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     override public void ChargeEffect()

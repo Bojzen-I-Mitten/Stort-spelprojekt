@@ -131,7 +131,7 @@ public class Vindaloo : Powerup
         //else
         //    direction.y += direction.y * 1.2f;
 
-        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce * ThrowStrength.ThrowStrengthFactor);
+        base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
     public override void SaveObjectOwner(ChadControls chad)
