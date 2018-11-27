@@ -36,7 +36,7 @@ public class ChadCam : ScriptComponent
     private float TotalXStep { get; set; } = 0;
 
     public float CameraOffset { get; set; } = 3;
-    private Vector3 ThrowingOffset = new Vector3(1.2f, -0.5f, 1.8f);
+    private Vector3 ThrowingOffset = new Vector3(1.0f, 0.0f, 1.2f);
     //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
     private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
