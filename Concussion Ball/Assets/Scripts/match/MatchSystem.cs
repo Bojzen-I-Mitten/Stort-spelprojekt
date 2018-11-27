@@ -242,8 +242,13 @@ public class MatchSystem : NetworkManager
         ReplaySystem.StartReplay(teamThatScored);
         yield return new WaitForSecondsRealtime(ReplaySystem.durationInSeconds + 1.0f);
         ReplaySystem.recordGame = true;
-        OnRoundEnd();
-        OnRoundStart();
+        if (GoldenGoal)
+            OnMatchEnd();
+        else
+        {
+            OnRoundEnd();
+            OnRoundStart();
+        }
     }
 #endregion
 
@@ -301,10 +306,7 @@ public class MatchSystem : NetworkManager
         TEAM_TYPE type = (TEAM_TYPE)teamType;
         Team team = FindTeam(type);
         team?.AddScore();
-        if (GoldenGoal)
-            OnMatchEnd();
-        else
-            StartCoroutine(OnGoalCoroutine(team));
+        StartCoroutine(OnGoalCoroutine(team));
     }
 
 #endregion

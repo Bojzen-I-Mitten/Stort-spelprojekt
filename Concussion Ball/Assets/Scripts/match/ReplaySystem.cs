@@ -83,6 +83,7 @@ public class ReplaySystem : ScriptComponent
             while(currentTime < States[0].timestamp)
             {
                 currentTime += Time.ActualDeltaTime;
+                MatchSystem.instance.MatchStartTime += Time.ActualDeltaTime;
                 yield return null;
             }
             LoadObjectState(States[0]);
