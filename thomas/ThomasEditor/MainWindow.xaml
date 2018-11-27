@@ -99,7 +99,8 @@
                     <MenuItem Header="_Options" Click="OpenOptionsWindow"/>
                     <MenuItem Header="_Reload Assembly" Click="ReloadAssembly"/>
                     <MenuItem x:Name="menuItem_editorRendering" Header="_Toggle Editor Rendering" IsCheckable="True" Click="MenuItem_ToggleEditorRendering"/>
-                        <MenuItem x:Name="menuItem_physicsDebug" Header="_Toggle Physics Debug" IsCheckable="True" Click="MenuItem_TogglePhysicsDebug"/>
+                    <MenuItem x:Name="menuItem_physicsDebug" Header="_Toggle Physics Debug" IsCheckable="True" Click="MenuItem_TogglePhysicsDebug"/>
+                        <MenuItem x:Name="menuItem_hiarchyUpdate" Header="_Toggle Hiearchy update" IsCheckable="True" Click="MenuItem_ToggleHiearchy"/>
                     </MenuItem>
             </Menu>
             <WrapPanel Grid.Row="1" Height="40">
@@ -141,13 +142,13 @@
                         <xcad:LayoutDocumentPaneGroup Orientation="Vertical" DockWidth="3*">
                             <xcad:LayoutDocumentPane>
                                 <xcad:LayoutAnchorable x:Name="editorWindow" ContentId="EditorView" Title="Editor View" CanHide="False" CanClose="False">
-                                    <local:ThomasWindow x:Name="editor" IsEditor="True" />
+                                    <local:ThomasWindow x:Name="editor" Type="EditorWindow" IsEditor="True" />
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                             
                             <xcad:LayoutDocumentPane>
                                 <xcad:LayoutAnchorable ContentId="Game View" Title="Game View" CanHide="False" CanClose="False">
-                                    <local:ThomasWindow x:Name="game" IsEditor="False"/>
+                                    <local:ThomasWindow x:Name="game" Type="GameWindow" IsEditor="False"/>
                                 </xcad:LayoutAnchorable>
                             </xcad:LayoutDocumentPane>
                         </xcad:LayoutDocumentPaneGroup>

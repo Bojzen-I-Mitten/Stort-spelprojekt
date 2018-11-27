@@ -7,18 +7,22 @@
 #include "texture\Texture2D.h"
 #include "Resources.h"
 #include "../serialization/Serializer.h"
+#include "../Debug.h"
 namespace ThomasEngine {
 
-	Material::Material(ThomasEngine::Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
+	Material::Material(ThomasEngine::Shader^ shader) : 
+		Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
 	{
 	}
-	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
+	Material::Material(Material^ original) : 
+		Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
 		m_instance = true;
 		EditorProperties = original->EditorProperties;
 	}
 
-	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
+	Material::Material() 
+		: Material(ThomasEngine::Shader::Find("StandardShader"))
 	{
 
 	}
@@ -34,6 +38,8 @@ namespace ThomasEngine {
 	}
 
 	Material^ Material::StandardMaterial::get() {
+		/*if(s_standardMaterial == nullptr)
+			s_standardMaterial = gcnew Material(thomas::resource::Material::GetStandardMaterial());*/
 		return gcnew Material(thomas::resource::Material::GetStandardMaterial());
 	}
 
@@ -56,7 +62,7 @@ namespace ThomasEngine {
 	void Material::OnChange()
 	{
 #ifdef _EDITOR
-		if (!ThomasWrapper::IsPlaying() && !m_instance)
+		if (ThomasWrapper::IsEditor() && !m_instance)
 			Serializer::SerializeMaterial(this, m_path);
 #endif
 	}
@@ -86,8 +92,10 @@ namespace ThomasEngine {
 		ThomasEngine::Resource^ texture = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
 		if (texture)
 			return (ThomasEngine::Texture2D^)texture;
-		else
+		else if (nativePtr)
 			return gcnew ThomasEngine::Texture2D(nativePtr);
+		else
+			return nullptr;
 	}
 
 	void Material::SetTexture2D(String^ name, Texture2D^ value)
@@ -181,7 +189,10 @@ namespace ThomasEngine {
 			default:
 				break;
 			}
-			properties->Add(name, value);
+			if (value == nullptr)
+				Debug::LogWarning("Material property: " + name + "  was null in: " + this->Name);
+			else
+				properties->Add(name, value);
 		}
 		return properties;
 	}

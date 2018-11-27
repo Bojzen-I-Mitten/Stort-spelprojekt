@@ -1,53 +1,23 @@
-#include "RenderSkinnedComponent.h"
 #pragma once
 #pragma unmanaged
-#include <thomas\object\component\RenderComponent.h>
 #include <thomas\graphics\animation\IBlendTree.h>
 #include <thomas\utils\atomic\Synchronization.h>
-#pragma managed
+#include <thomas\object\component\RenderSkinnedComponent.h>
+#include <thomas/graphics/animation/AnimationNode.h>
+#pragma unmanaged
+#include "RenderSkinnedComponent.h"
 
-#include "../Component.h"
-#include "../../resource/Model.h"
-#include "../../resource/Material.h"
-#include "../../Input.h"
-#include "../../resource/Resources.h"
+#include "../../resource/Animation.h"
+#include "../../script/animation/BlendNode.h"
+#include "../../script/animation/PlaybackNode.h"
 #include "../GameObject.h"
 #include "Transform.h"
 
 namespace ThomasEngine
 {
 	RenderSkinnedComponent::RenderSkinnedComponent()
-		: Component(new thomas::object::component::RenderSkinnedComponent())
+		: RenderComponent(new thomas::object::component::RenderSkinnedComponent())
 	{}
-
-	thomas::object::component::RenderComponent * RenderSkinnedComponent::getNativeRenderComp()
-	{
-		return (thomas::object::component::RenderComponent*)nativePtr;
-	}
-
-	Model^ RenderSkinnedComponent::model::get()
-	{
-		return m_model;
-	}
-
-	void RenderSkinnedComponent::model::set(Model^ value)
-	{
-		if (value == nullptr)
-		{
-			getNativeRenderComp()->SetModel(nullptr);
-			m_model = nullptr;
-		}
-		else {
-			if (!(getNativeRenderComp())->SetModel(value->Native()))
-				m_model = nullptr;
-			else
-			{
-				// Set only if valid model
-				m_model = value;
-				applyAnimation();
-			}
-		}
-	}
 
 	void RenderSkinnedComponent::animation::set(Animation^ value) {
 		m_anim = value;
@@ -55,32 +25,15 @@ namespace ThomasEngine
 	}
 
 
-	Material^ RenderSkinnedComponent::material::get() {
-		thomas::resource::Material* nptr = (getNativeRenderComp())->GetMaterial(0);
-		Resource^ mat = ThomasEngine::Resources::FindResourceFromNativePtr(nptr);
-		if (mat != nullptr)
-			return (Material^)mat;
-		else
-			return gcnew Material(nptr);
-		applyAnimation();
-	}
-	void RenderSkinnedComponent::material::set(Material^ value) {
-		if (value)
-			((thomas::object::component::RenderComponent*)nativePtr)->SetMaterial((thomas::resource::Material*)value->m_nativePtr);
-		else
-			((thomas::object::component::RenderComponent*)nativePtr)->SetMaterial(nullptr);
-		OnPropertyChanged("material");
-	}
 	thomas::object::component::RenderSkinnedComponent* RenderSkinnedComponent::Native::get()
 	{
 		return (thomas::object::component::RenderSkinnedComponent*)nativePtr;
 	}
+
 	thomas::graphics::animation::IBlendTree* RenderSkinnedComponent::BlendTree::get()
 	{
 		return Native->GetBlendTree();
 	}
-
-
 
 	void RenderSkinnedComponent::setBlendTreeNode(thomas::graphics::animation::AnimationNode * node)
 	{
@@ -104,12 +57,12 @@ namespace ThomasEngine
 		setBlendTreeNode(node->Native());
 	}
 
-	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, uint32_t& boneIndex)
+	bool RenderSkinnedComponent::FetchBoneIndex(unsigned int boneHash, unsigned int& boneIndex)
 	{
 		return BlendTree->getBoneIndex(boneHash, boneIndex);
 	}
 
-	bool RenderSkinnedComponent::FetchBoneIndex(uint32_t boneHash, [Out] uint32_t%  boneIndex)
+	bool RenderSkinnedComponent::FetchBoneIndex(unsigned int boneHash, [Out] unsigned int%  boneIndex)
 	{
 		unsigned int ind;
 		bool result =  BlendTree->getBoneIndex(boneHash, ind);
@@ -144,7 +97,7 @@ namespace ThomasEngine
 			return Utility::Convert(Native->GetBlendTree()->getBoneOrientation(boneIndex));
 	}
 
-	bool RenderSkinnedComponent::GetBoneIndex(uint32_t boneHash, uint32_t & boneIndex)
+	bool RenderSkinnedComponent::GetBoneIndex(unsigned int boneHash, unsigned int & boneIndex)
 	{
 		if (!Native->GetBlendTree()) return false;
 		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();

@@ -62,10 +62,17 @@ namespace ThomasEngine
 			float get();
 			void set(float value);
 		}
-		
 		property Vector2 AreaRectangle {
 			Vector2 get();
 			void set(Vector2 value);
+		}
+		property bool CastShadows {
+			bool get();
+			void set(bool value);
+		}
+		property float ShadowHardness {
+			float get();
+			void set(float value);
 		}
 	};
 }

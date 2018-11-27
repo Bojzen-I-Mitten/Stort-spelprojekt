@@ -81,6 +81,8 @@ namespace ThomasEditor
             ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
             ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
 
+            GameObjectHierarchy.instance.updateHiearchyParenting = Properties.Settings.Default.updateHiearchyParenting;
+
             menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
             menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
             //profile.sendSample();
@@ -413,6 +415,8 @@ namespace ThomasEditor
             else
             {
                 ThomasWrapper.IssuePlay();
+                //OnStartPlaying();
+               // game.Focus();
             }
         }
 
@@ -668,6 +672,15 @@ namespace ThomasEditor
             MenuItem item = sender as MenuItem;
             ThomasWrapper.RenderPhysicsDebug = item.IsChecked;
             Properties.Settings.Default.RenderPhysicsDebug = item.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+
+        private void MenuItem_ToggleHiearchy(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            GameObjectHierarchy.instance.updateHiearchyParenting = item.IsChecked;
+            Properties.Settings.Default.updateHiearchyParenting = item.IsChecked;
             Properties.Settings.Default.Save();
         }
 

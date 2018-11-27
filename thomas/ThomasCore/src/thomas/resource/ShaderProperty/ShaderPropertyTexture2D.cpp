@@ -43,9 +43,10 @@ namespace thomas
 
 			void ShaderPropertyTexture2DArray::Apply(std::string name, Shader* shader) const
 			{
-				
-				shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
-				
+				if (m_value)
+				{
+					shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
+				}
 			}
 
 			ShaderProperty* ShaderPropertyTexture2DArray::GetDefault()
@@ -68,9 +69,10 @@ namespace thomas
 
 			void ShaderPropertyTextureCube::Apply(std::string name, Shader* shader) const
 			{
-
-				shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
-
+				if (m_value)
+				{
+					shader->GetEffect()->GetVariableByName(name.c_str())->AsShaderResource()->SetResource(m_value->GetResourceView());
+				}
 			}
 
 			ShaderProperty* ShaderPropertyTextureCube::GetDefault()

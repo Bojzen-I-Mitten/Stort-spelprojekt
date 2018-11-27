@@ -69,6 +69,8 @@ namespace ThomasEngine {
 	void ThomasWrapper::Start(bool editor) 
 	{
 		inEditor = editor;
+		EditorWindowLoaded = gcnew ManualResetEvent(!inEditor);
+		GameWindowLoaded = gcnew ManualResetEvent(!inEditor);
 		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
 		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
@@ -88,41 +90,32 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			
-			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
-#if _EDITOR
-
-			if (InEditor()) {
-				Model::InitPrimitives();
-				Resources::LoadAll(Application::editorAssets);
-				ScriptingManager::Init();
-			}
-			else
-			{
-				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
-			}
-
-			
-#endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			logicThread->Name = "Thomas Engine (Logic Thread)";
 			logicThread->Start();
-
-			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
-		
-			renderThread->Name = "Thomas Engine (Render Thread)";
-			renderThread->Start();
-
+			
 		}
 	}
+#ifdef _EDITOR
+	void ThomasWrapper::ThomasGameWindowLoaded()
+	{
+		GameWindowLoaded->Set();
+	}
+
+	void ThomasWrapper::ThomasEditorWindowLoaded()
+	{
+		EditorWindowLoaded->Set();
+	}
+#endif
+
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
@@ -154,6 +147,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartRenderer()
 	{
+		GameWindowLoaded->WaitOne();
+		EditorWindowLoaded->WaitOne();
 		// Render thread start
 
 		ThomasCore::Core().registerThread();
@@ -253,6 +248,7 @@ namespace ThomasEngine {
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
 			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Draw Shadows: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_SHADOWS)*1000.0f);
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
@@ -279,8 +275,30 @@ namespace ThomasEngine {
 		// Called when system can replace 
 	}
 
+	void ThomasWrapper::LoadEditorAssets()
+	{
+#if _EDITOR
+		if (IsExternalBuild()) {
+			Model::InitPrimitives();
+			Resources::LoadAll(Application::editorAssets);
+			ScriptingManager::Init();
+		}
+		else
+		{
+			Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
+		}
+#endif
+	}
+
 	void ThomasWrapper::StartEngine()
 	{
+		LoadEditorAssets();
+		// Boot up render thread
+		renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
+		renderThread->Name = "Thomas Engine (Render Thread)";
+		renderThread->Start();
+
+
 		// Update thread start
 
 		ThomasCore::Core().registerThread();
@@ -603,6 +621,11 @@ namespace ThomasEngine {
 		return playing == RunningState::Running;
 	}
 
+	bool ThomasWrapper::IsEditor()
+	{
+		return playing == RunningState::Editor;
+	}
+
 	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
 
 	void ThomasWrapper::RenderPhysicsDebug::set(bool value) { thomas::Physics::Physics::s_drawDebug = value; }
@@ -625,7 +648,7 @@ namespace ThomasEngine {
 	}
 
 	
-	bool ThomasWrapper::InEditor()
+	bool ThomasWrapper::IsExternalBuild()
 	{
 		return inEditor;
 	}
