@@ -25,6 +25,8 @@ namespace ThomasEngine
 			render->SetModel(nullptr);
 		else
 			render->SetModel((thomas::resource::Model*)value->m_nativePtr);
+
+		OnPropertyChanged("materials");
 	}
 
 
@@ -49,6 +51,8 @@ namespace ThomasEngine
 			std::vector<thomas::resource::Material*> nativeMats(value->Length);
 			for (int i = 0; i < value->Length; i++)
 			{
+				if (value[i] == nullptr)
+					value[i] = Material::StandardMaterial;
 				nativeMats[i] = (thomas::resource::Material*)value[i]->m_nativePtr;
 			}
 			render->SetMaterials(nativeMats);
