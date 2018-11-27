@@ -371,10 +371,6 @@ public class ChadControls : NetworkComponent
     #region Input handling
     private void HandleKeyboardInput()
     {
-        //if (Input.GetKeyUp(Input.Keys.Escape))
-        //{
-        //    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        //}
 
         if (Locked)
             return;
@@ -427,13 +423,6 @@ public class ChadControls : NetworkComponent
 
     private void HandleMouseInput()
     {
-        //Focus stuff
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-        }
-
-
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
