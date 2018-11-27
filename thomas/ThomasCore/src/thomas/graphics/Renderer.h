@@ -28,6 +28,7 @@ namespace thomas
 		namespace shaderproperty {
 			class ShaderProperty;
 		}
+		class ComputeShader;
 	}
 
 	namespace graphics
@@ -74,12 +75,13 @@ namespace thomas
 			const render::ShaderList& getShaderList();
 			const render::CameraList& getCameraList();
 			resource::Shader* GetStandardShader();
-
+			resource::ComputeShader* GetSkinningShader();
 		private:
 			std::unique_ptr<render::Frame> m_frame;
 			std::unique_ptr<render::Frame> m_prevFrame;
 			render::ShaderList m_shaders;
 			render::CameraList m_cameras;
+			std::unique_ptr<resource::ComputeShader> m_skinningCS;
 			bool m_enableShadows;
 		};
 	}

@@ -21,7 +21,7 @@ namespace thomas
 			class Transform;
 		}
 	}
-	namespace resource { class Material; }
+	namespace resource { class Material; class ComputeShader; }
 
 
 	namespace graphics 
@@ -79,7 +79,7 @@ namespace thomas
 			Mesh(const Vertices & vertices, std::vector<unsigned int> indices, const std::string & name);
 			~Mesh();
 			void Draw(resource::Shader* shader);
-
+			void Skin(resource::ComputeShader* computeShader);
 		public:
 			void SetName(const std::string & name);
 

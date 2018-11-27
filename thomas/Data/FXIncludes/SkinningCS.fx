@@ -8,29 +8,43 @@ cbuffer constants
     uint maxNrOfVerts;
 };
 
+ByteAddressBuffer vertexOrigData; //<float3>
+ByteAddressBuffer normalOrigData; //<float3>
+ByteAddressBuffer boneWeightOrigData; //<float4>
+ByteAddressBuffer boneIndexOrigData; //<float>
+
 RWByteAddressBuffer vertexData; //<float3>
 RWByteAddressBuffer normalData; //<float3>
-RWByteAddressBuffer boneWieghtData; //<float4>
+RWByteAddressBuffer boneWeightData; //<float4>
 RWByteAddressBuffer boneIndexData; //<float>
 
 [numthreads(256, 1, 1)]
 void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
 {
     uint Tid = (Gid.x * 256) + GTid.x;
+    uint vertexTid = Tid * 16;
+    uint normalTid = Tid * 12;
+    uint boneWeightTid = Tid * 16;
+    uint boneIndexTid = Tid * 4;
 
     if (Tid < maxNrOfVerts)
     {
-        appdata_thomas_skin data; // = skinData[Tid];
-        appdata_thomas output;
-
-        float4 posL = float4(data.vertex, 1.f);
-        float3 normalL = data.normal;
-        float3 tangentL = data.tangent;
         
-        ThomasSkinVertex(posL, normalL, data.boneWeight, data.boneIndex);
+        float4 posL = vertexOrigData.Load4(vertexTid);
+        float3 normalL = normalOrigData.Load3(normalTid);
+        float4 boneWeight = boneWeightOrigData.Load4(boneWeightTid);
+        float boneIndex = boneIndexOrigData.Load(boneIndexTid);
+        
+        ThomasSkinVertex(posL, normalL, boneWeight, boneIndex);
 
-
+        vertexData.Store4(vertexTid, posL);
+        normalData.Store3(normalTid, normalL);
+        boneWeightData.Store4(boneWeightTid, boneWeight);
+        boneIndexData.Store(boneIndexTid, boneIndex);
+       
+        /*
         float bisign = BiTangentSign(data.normal, data.tangent, data.bitangent);
+        float3 tangentL = data.tangent;
         float3 bitangL = cross(normalL, tangentL) * bisign;
 	
         output.vertex = posL;
@@ -40,7 +54,7 @@ void CSMain(uint3 Gid : SV_GroupID, uint3 GTid : SV_GroupThreadID)
         output.bitangent = bitangL;
         output.normal = normalL;
         
-        output.texcoord = data.texcoord;
+        output.texcoord = data.texcoord;*/
        
       //  vertexData[Tid] = output;
     }

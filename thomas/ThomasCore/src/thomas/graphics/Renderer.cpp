@@ -17,6 +17,7 @@
 #include "../utils/AutoProfile.h"
 #include "../graphics/GUI/Canvas.h"
 #include "ParticleSystem.h"
+#include "../resource/ComputeShader.h"
 
 namespace thomas
 {
@@ -41,6 +42,8 @@ namespace thomas
 			m_shaders(),
 			m_cameras()
 		{
+			
+			m_skinningCS = resource::ComputeShader::CreateComputeShader("../Data/FXIncludes/SkinningCS.fx");
 			m_enableShadows = true;
 		}
 
@@ -160,6 +163,11 @@ namespace thomas
 		resource::Shader * Renderer::GetStandardShader()
 		{
 			return m_shaders.GetStandardShader();
+		}
+
+		resource::ComputeShader * Renderer::GetSkinningShader()
+		{
+			return m_skinningCS.get();
 		}
 
 		void Renderer::BindObject(render::RenderCommand &rC)

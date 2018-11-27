@@ -91,9 +91,13 @@ v2f vertAlreadySkinned(appdata_thomas v)
 
     o.vertex = ThomasObjectToClipPos(v.vertex);
     o.worldPos = ThomasObjectToWorldPos(v.vertex);
+    
+    float bisign = BiTangentSign(v.normal, v.tangent, v.bitangent);
+    float3 tangentL = v.tangent;
+    float3 bitangL = cross(v.normal, tangentL) * bisign;
 
-    float3 tangent = ThomasObjectToWorldDir(v.tangent);
-    float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
+    float3 tangent = ThomasObjectToWorldDir(tangentL);
+    float3 bitangent = ThomasObjectToWorldDir(bitangL);
     float3 normal = ThomasObjectToWorldDir(v.normal);
 
     o.TBN = float3x3(tangent, bitangent, normal);
@@ -126,7 +130,7 @@ technique11 Standard
 {
     pass P0
     {
-		VERT(vert());
+		VERT(vertAlreadySkinned());
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);

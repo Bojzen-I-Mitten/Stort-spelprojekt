@@ -1,6 +1,6 @@
 #include "Mesh.h"
 #include "../utils/GpuProfiler.h"
-
+#include "../resource/ComputeShader.h"
 
 namespace thomas 
 {
@@ -60,6 +60,35 @@ namespace thomas
 				shader->DrawIndexed(GetIndexCount(), 0, 0);
 				utils::D3D::Instance()->GetProfiler()->AddDrawCall(GetIndexCount() / 3, GetVertexCount());
 			}
+		}
+
+		void Mesh::Skin(resource::ComputeShader * computeShader)
+		{
+			
+
+			//set srvs
+			if (m_data.vertices.positions.size() > 0)
+				computeShader->SetPropertyResource("vertexOrigData", m_data.skinOrigVertexBuffers[resource::Shader::Semantics::POSITION].get()->GetSRV());
+			if (m_data.vertices.normals.size() > 0)
+				computeShader->SetPropertyResource("normalOrigData", m_data.skinOrigVertexBuffers[resource::Shader::Semantics::NORMAL].get()->GetSRV());
+			if (m_data.vertices.boneIndices.size() > 0)
+				computeShader->SetPropertyResource("boneIndexOrigData", m_data.skinOrigVertexBuffers[resource::Shader::Semantics::BONEINDICES].get()->GetSRV());
+			if (m_data.vertices.boneWeights.size() > 0)
+				computeShader->SetPropertyResource("boneWeightOrigData", m_data.skinOrigVertexBuffers[resource::Shader::Semantics::BONEWEIGHTS].get()->GetSRV());
+
+			if (m_data.vertices.positions.size() > 0)
+				computeShader->SetPropertyUAV("vertexData", m_data.skinVertexBuffers[resource::Shader::Semantics::POSITION].get()->GetUAV());
+			if (m_data.vertices.normals.size() > 0)
+				computeShader->SetPropertyUAV("normalData", m_data.skinVertexBuffers[resource::Shader::Semantics::NORMAL].get()->GetUAV());
+			if (m_data.vertices.boneIndices.size() > 0)
+				computeShader->SetPropertyUAV("boneIndexData", m_data.skinVertexBuffers[resource::Shader::Semantics::BONEINDICES].get()->GetUAV());
+			if (m_data.vertices.boneWeights.size() > 0)
+				computeShader->SetPropertyUAV("boneWeightData", m_data.skinVertexBuffers[resource::Shader::Semantics::BONEWEIGHTS].get()->GetUAV());
+
+			computeShader->Dispatch(GetVertexCount() / 256.0f);
+
+			computeShader->UnbindAllSRVs();
+			computeShader->UnbindAllUAVs();
 		}
 
 		void Mesh::SetName(const std::string & name)

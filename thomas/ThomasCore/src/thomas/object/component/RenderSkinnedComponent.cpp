@@ -1,6 +1,8 @@
 #include "RenderSkinnedComponent.h"
 #include "../../graphics/animation/AnimatedSkeleton.h"
 #include "../../ThomasTime.h"
+#include "../../graphics/Mesh.h"
+#include "../../resource/Material.h"
 #include "../../resource/Model.h"
 #include "../../graphics/Renderer.h"
 #include "../../graphics/RenderConstants.h"
@@ -10,6 +12,8 @@
 #include "../../resource/Shader.h"
 #include "../../ThomasCore.h"
 #include "../../utils/AutoProfile.h"
+#include "../../resource/ComputeShader.h"
+
 namespace thomas
 {
 	namespace object
@@ -55,12 +59,21 @@ namespace thomas
 			void RenderSkinnedComponent::SubmitPart(Camera * camera, unsigned int i, const thomas::resource::shaderproperty::ShaderPropertyStatic * property_data, uint32_t num_prop)
 			{
 
-				//for (unsigned i = 0; i < num_prop; ++i)
-				{
-					//property_data[i].m_apply(property_data[i], )
-				}
+				resource::Material* material = m_materials.size() > i ? m_materials[i] : nullptr;
+				if (material == nullptr)
+					material = resource::Material::GetStandardMaterial();
 
-				int steta = 0;
+				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
+
+				resource::ComputeShader* skinningCS = graphics::Renderer::Instance()->GetSkinningShader();
+
+
+				skinningCS->Bind();
+				skinningCS->SetPass(0);
+
+				property_data[0].m_apply(property_data[0], skinningCS);
+				mesh->Skin(skinningCS);
+				
 				RenderComponent::SubmitPart(camera, i, property_data, num_prop);
 			}
 
