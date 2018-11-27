@@ -361,7 +361,7 @@ namespace ThomasEngine
 			}
 		}
 
-		void Resources::LoadAssetFiles(List<String^>^ files)
+		CountdownEvent^ Resources::LoadAssetFiles(List<String^>^ files)
 		{
 			using namespace System::Threading;
 
@@ -373,7 +373,18 @@ namespace ThomasEngine
 				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
 			}
 			// Wait for workers.
-			counter->Wait();
+			return counter;
+		}
+		/* Load assets on same thread.
+		*/
+		void Resources::LoadAssetFilesSynced(List<String^>^ files)
+		{
+			// Start work.
+			for (int i = 0; i < files->Count; i++)
+			{
+				LoadSysPath(files[i]);
+				//OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
 		}
 
 		void Resources::LoadAll(String^ path)
@@ -409,9 +420,11 @@ namespace ThomasEngine
 				}
 			}
 			OnResourceLoadStarted();
-			LoadAssetFiles(files);
-			LoadAssetFiles(shaderFiles);
-			LoadAssetFiles(materialFiles);
+			auto counter = LoadAssetFiles(files);
+			LoadAssetFilesSynced(shaderFiles);	// Load shaders synced, threads seems to fight over shared shader files...
+			counter->Wait();
+			counter = LoadAssetFiles(materialFiles);
+			counter->Wait();
 			OnResourceLoadEnded();
 		}
 
