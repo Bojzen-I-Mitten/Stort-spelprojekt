@@ -76,16 +76,6 @@ public class ChadControls : NetworkComponent
     private NetworkTransform ragdollSync;
     Chadimations Animations;
     public Ragdoll Ragdoll;
-    ChadCam _camera;
-    ChadCam Camera
-    {
-        get
-        {
-            if (!_camera)
-                _camera = ScriptUtility.FindComponent<ChadCam>();
-            return _camera;
-        }
-    }
 
     [Browsable(false)]
     public NetworkPlayer NetPlayer { get; private set; }
@@ -135,7 +125,8 @@ public class ChadControls : NetworkComponent
         Ragdoll = gameObject.GetComponent<Ragdoll>();
         ragdollSync.target = Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-
+        if (rBody != null)
+            rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
     }
     public override void OnGotOwnership()
@@ -158,7 +149,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            Camera.gameObject.SetActive(false);
+            ChadCam.instance.gameObject.SetActive(false);
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
         }
 
@@ -168,7 +159,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            Camera.gameObject.SetActive(true);
+            ChadCam.instance.gameObject.SetActive(true);
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
 
@@ -715,8 +706,8 @@ public class ChadControls : NetworkComponent
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
-        Vector3 chosenDirection = Camera.transform.forward;
-        Vector3 ballCamPos = Camera.transform.position;
+        Vector3 chosenDirection = ChadCam.instance.transform.forward;
+        Vector3 ballCamPos = ChadCam.instance.transform.position;
         
         //yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
 
