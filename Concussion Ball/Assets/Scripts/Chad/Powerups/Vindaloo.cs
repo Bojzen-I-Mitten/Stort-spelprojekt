@@ -20,7 +20,7 @@ public class Vindaloo : Powerup
     private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 8.0f;
-    public float ExplosionForce = 100.0f;
+    public float ExplosionForce;
     public override void OnAwake()
     {
         base.OnAwake();
@@ -28,7 +28,7 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
-        ExplosionForce = 40.0f;
+        ExplosionForce = 60.0f;
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;

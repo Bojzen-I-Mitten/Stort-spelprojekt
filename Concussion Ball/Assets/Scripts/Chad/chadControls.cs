@@ -371,11 +371,6 @@ public class ChadControls : NetworkComponent
     #region Input handling
     private void HandleKeyboardInput()
     {
-        //if (Input.GetKeyUp(Input.Keys.Escape))
-        //{
-        //    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        //}
-
         if (Locked)
             return;
 
@@ -647,14 +642,13 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             yield return new WaitForSeconds(duration);
-            //float timer = 0;
 
-            while (Ragdoll.DistanceToWorld() >= 0.75f/* && timer < 5*/)
+            while (Ragdoll.DistanceToWorld() >= 0.75f)
             {
-                //timer += Time.DeltaTime;
                 yield return null;
             }
-            yield return new WaitForSeconds(1);
+            Debug.Log("The ground has been reached.");
+            yield return new WaitForSeconds(2);
             State = STATE.CHADING;
             CurrentVelocity.y = BaseSpeed;
         }
