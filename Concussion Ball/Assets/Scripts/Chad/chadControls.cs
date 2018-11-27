@@ -797,6 +797,7 @@ public class ChadControls : NetworkComponent
             reader.GetVector2();
             reader.GetBool();
             reader.GetBool();
+            reader.GetBool();
             return;
         }
 
@@ -817,6 +818,9 @@ public class ChadControls : NetworkComponent
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
         CanBeTackled = reader.GetBool();
+        if(!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        Animations.Throwing = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -827,6 +831,9 @@ public class ChadControls : NetworkComponent
         writer.Put(CurrentVelocity);
         writer.Put(HasThrown);
         writer.Put(CanBeTackled);
+        if (!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        writer.Put(Animations.Throwing);
         return true;
     }
 
