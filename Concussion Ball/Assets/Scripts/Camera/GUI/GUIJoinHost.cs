@@ -68,7 +68,6 @@ public class GUIJoinHost : ScriptComponent
         MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
         ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
-        //ConnectingText.position = TextBoxIP.position + TextBoxIP.size / Canvas.viewport.size * 1.5f;
         Join.interactable = true;
         Host.interactable = true;
         StopCoroutine(test);
@@ -81,7 +80,7 @@ public class GUIJoinHost : ScriptComponent
         Back.color = Color.FloralWhite;
 
         if (TakeIP)
-            GUIInput.AppendString(ref IPString, 30);
+            GUIInput.AppendString(ref IPString, 15);
         if (TakePort)
             GUIInput.AppendString(ref PortString, 5);
 
@@ -90,6 +89,7 @@ public class GUIJoinHost : ScriptComponent
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
             ConnectingText.text = "";
         }
+
         if (TextBoxIP.Clicked())
         {
             ConnectingText.text = "";
@@ -196,26 +196,26 @@ public class GUIJoinHost : ScriptComponent
 
     IPText = Canvas.Add(IPString);
     IPText.origin = new Vector2(0.5f);
-    IPText.position = new Vector2(0.5f, 0.11875f);
+    IPText.position = new Vector2(0.2f, 0.15f);
     IPText.color = Color.Black;
     IPText.depth = 0.8f;
 
     PortText = Canvas.Add(PortString);
     PortText.origin = new Vector2(0.5f);
-    PortText.position = new Vector2(0.5f, 0.26875f);
+    PortText.position = new Vector2(0.2f, 0.35f);
     PortText.color = Color.Black;
     PortText.depth = 0.8f;
 
     IP = Canvas.Add("IP");
     IP.origin = new Vector2(0.5f);
-    IP.position = new Vector2(0.5f, 0.05f);
+    IP.position = new Vector2(0.2f, 0.08f);
     IP.scale = new Vector2(0.7f);
     IP.color = Color.FloralWhite;
     IP.depth = 0.9f;
 
     Port = Canvas.Add("Port");
     Port.origin = new Vector2(0.5f);
-    Port.position = new Vector2(0.5f, 0.2f);
+    Port.position = new Vector2(0.2f, 0.28f);
     Port.scale = new Vector2(0.7f);
     Port.color = Color.FloralWhite;
     Port.depth = 0.9f;
@@ -224,18 +224,16 @@ public class GUIJoinHost : ScriptComponent
     {
         TextBoxIP = Canvas.Add(TextBox);
         TextBoxIP.origin = new Vector2(0.5f);
-        TextBoxIP.position = new Vector2(0.5f, 0.1f);
-        TextBoxIP.scale = new Vector2(1, 0.75f);
+        TextBoxIP.position = new Vector2(0.2f, 0.15f);
         TextBoxIP.interactable = true;
-        TextBoxIP.depth = 0.9f;
+        TextBoxIP.depth = 0.8f;
         TextBoxIP.color = Color.Black;
 
         TextBoxPort = Canvas.Add(TextBox);
         TextBoxPort.origin = new Vector2(0.5f);
-        TextBoxPort.position = new Vector2(0.5f, 0.25f);
-        TextBoxPort.scale = new Vector2(1, 0.75f);
+        TextBoxPort.position = new Vector2(0.2f, 0.35f);
         TextBoxPort.interactable = true;
-        TextBoxPort.depth = 0.9f;
+        TextBoxPort.depth = 0.8f;
         TextBoxPort.color = Color.Black;
     }
 
@@ -243,15 +241,13 @@ public class GUIJoinHost : ScriptComponent
     {
         TextBoxBGIP = Canvas.Add(TextBoxBG);
         TextBoxBGIP.origin = new Vector2(0.5f);
-        TextBoxBGIP.position = new Vector2(0.5f, 0.1f);
-        TextBoxBGIP.scale = new Vector2(1, 0.75f);
+        TextBoxBGIP.position = new Vector2(0.2f, 0.15f);
         TextBoxBGIP.depth = 0.9f;
         TextBoxBGIP.color = Color.FloralWhite;
 
         TextBoxBGPort = Canvas.Add(TextBoxBG);
         TextBoxBGPort.origin = new Vector2(0.5f);
-        TextBoxBGPort.position = new Vector2(0.5f, 0.25f);
-        TextBoxBGPort.scale = new Vector2(1, 0.75f);
+        TextBoxBGPort.position = new Vector2(0.2f, 0.35f);
         TextBoxBGPort.depth = 0.9f;
         TextBoxBGPort.color = Color.FloralWhite;
     }
@@ -260,7 +256,7 @@ public class GUIJoinHost : ScriptComponent
     {
         Join = Canvas.Add("Join");
         Join.origin = new Vector2(0.5f);
-        Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.11875f);
+        Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.15f);
         Join.interactable = true;
         Join.depth = 0.9f;
         Join.color = Color.FloralWhite;
@@ -270,7 +266,7 @@ public class GUIJoinHost : ScriptComponent
     {
         Host = Canvas.Add("Host");
         Host.origin = new Vector2(0.5f);
-        Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.26875f);
+        Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.35f);
         Host.interactable = true;
         Host.depth = 0.9f;
         Host.color = Color.FloralWhite;
