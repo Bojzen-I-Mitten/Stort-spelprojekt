@@ -19,17 +19,13 @@ public class GUIScoreScreen : ScriptComponent
     public bool ToggleBool = true;
     public override void OnAwake()
     {
-        if (!Instance)
-            Instance = this;
-        else
-        {
-            Destroy(this);
-            return;
-        }
-        ToggleBool = true;
+       
     }
     public override void Start()
     {
+        Instance = this;
+        ToggleBool = true;
+
         Timedisplay = ScoreScreenTimeLast + 1;
         Canvas = gameObject.GetComponent<Camera>().AddCanvas();
         ToggleBool = true;
