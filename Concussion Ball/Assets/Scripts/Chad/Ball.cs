@@ -193,12 +193,12 @@ public class Ball : PickupableObject
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
         RPCParticles(camPos, direction);
-        MatchSystem.instance.SendRPC(ID, "RPCParticles", camPos, direction);
+        SendRPC("RPCParticles", camPos, direction);
         direction.y += 0.2f;
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
-    private void RPCParticles(Vector3 camPos, Vector3 direction)
+    public void RPCParticles(Vector3 camPos, Vector3 direction)
     {
         emitterFire.Emit = true;
         emitterSmoke.Emit = true;
