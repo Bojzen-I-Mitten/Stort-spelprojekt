@@ -45,6 +45,7 @@ namespace thomas
 			std::vector<math::Vector4>	positions;
 			std::vector<math::Vector4>	colors;
 			std::vector<math::Vector2>	texCoord0;
+			std::vector<math::Vector2>	texCoord1;
 			std::vector<math::Vector3>	normals;
 			std::vector<math::Vector3>	tangents;
 			std::vector<math::Vector3>	bitangents;
