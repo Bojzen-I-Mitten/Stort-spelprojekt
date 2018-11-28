@@ -57,15 +57,15 @@ namespace ThomasStandalone
             }
             //System.Console.ForegroundColor = System.ConsoleColor.Black;
             System.Console.Out.WriteLine(newMessage.Message);
-            //if(newMessage.Severity == MessageSeverity.Error)
-            //{
-            //    foreach (string line in newMessage.StackTrace)
-            //    {
-            //        System.Console.Out.WriteLine(line);
-            //    }
-            //}
+            if (newMessage.Severity == MessageSeverity.Error)
+            {
+                foreach (string line in newMessage.StackTrace)
+                {
+                    System.Console.Out.WriteLine(line);
+                }
+            }
 
-            
+
             System.Console.ResetColor();
         }
     }
@@ -82,6 +82,7 @@ namespace ThomasStandalone
         const UInt32 CS_HREDRAW = 2;
         const UInt32 COLOR_WINDOW = 5;
         const UInt32 COLOR_BACKGROUND = 1;
+        const UInt32 IDC_ARROW = 32512;
         const UInt32 IDC_CROSS = 32515;
         const UInt32 WM_DESTROY = 2;
         const UInt32 WM_PAINT = 0x0f;
@@ -180,16 +181,16 @@ namespace ThomasStandalone
         {
             WNDCLASSEX wind_class = new WNDCLASSEX();
             wind_class.cbSize = Marshal.SizeOf(typeof(WNDCLASSEX));
-            //wind_class.style = (int)(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS); //Doubleclicks are active
-            // wind_class.hbrBackground = (IntPtr)COLOR_BACKGROUND + 1; //Black background, +1 is necessary
+            wind_class.style = (int)(CS_HREDRAW | CS_VREDRAW); //Doubleclicks are active
+            wind_class.hbrBackground = (IntPtr)COLOR_BACKGROUND + 1; //Black background, +1 is necessary
             wind_class.cbClsExtra = 0;
             wind_class.cbWndExtra = 0;
 
             wind_class.hInstance = Marshal.GetHINSTANCE(this.GetType().Module); ;// alternative: Process.GetCurrentProcess().Handle;
             wind_class.hIcon = IntPtr.Zero;
-            // wind_class.hCursor = LoadCursor(IntPtr.Zero, (int)IDC_CROSS);// Crosshair cursor;
+            wind_class.hCursor = LoadCursor(IntPtr.Zero, (int)IDC_ARROW);// Crosshair cursor;
             wind_class.lpszMenuName = null;
-            wind_class.lpszClassName = name;
+            wind_class.lpszClassName = "ThomasWindow";
             wind_class.lpfnWndProc = Marshal.GetFunctionPointerForDelegate(delegWndProc);
             wind_class.hIconSm = IntPtr.Zero;
             ushort regResult = RegisterClassEx(ref wind_class);
@@ -218,8 +219,8 @@ namespace ThomasStandalone
                 regResult,
                 name,
                 WS_OVERLAPPEDWINDOW,
-                rectangle.Left,
-                rectangle.Top,
+                300,
+                300,
                 rectangle.Right - rectangle.Left,
                 rectangle.Bottom - rectangle.Top,
                 IntPtr.Zero,
@@ -257,7 +258,7 @@ namespace ThomasStandalone
             MSG msg;
             if (ThomasStandalone.Program.run_time == 0)
             {
-                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1)
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) != 0)
                 {
                     TranslateMessage(ref msg);
                     DispatchMessage(ref msg);
@@ -267,7 +268,7 @@ namespace ThomasStandalone
             {
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                while (GetMessage(out msg, IntPtr.Zero, 0, 0) == 1 && stopwatch.ElapsedMilliseconds < ThomasStandalone.Program.run_time)
+                while (GetMessage(out msg, IntPtr.Zero, 0, 0) != 0 && stopwatch.ElapsedMilliseconds < ThomasStandalone.Program.run_time)
                 {
                     TranslateMessage(ref msg);
                     DispatchMessage(ref msg);
@@ -277,6 +278,15 @@ namespace ThomasStandalone
 
         private static IntPtr myWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
+            switch (msg)
+            {
+                case WM_DESTROY:
+                    {
+                        PostQuitMessage(0);
+                        return IntPtr.Zero;
+                    }
+                    break;
+            }
             ThomasWrapper.eventHandler(hWnd, (int)msg, wParam, lParam);
             return DefWindowProc(hWnd, msg, wParam, lParam);
         }

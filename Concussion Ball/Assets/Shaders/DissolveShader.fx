@@ -3,15 +3,18 @@
 #include <ThomasCG.hlsl>
 #include <ThomasLights.hlsl>
 
-Texture2D DiffuseTexture;
-Texture2D NormalTexture : NORMALTEXTURE;
-Texture2D SpecularTexture : SPECULARTEXTURE;
+Texture2D diffuseTex;
+Texture2D normalTex : NORMALTEXTURE;
+Texture2D specularTex;
+Texture2D dissolveTexture;
 
 cbuffer MATERIAL_PROPERTIES
 {
     float4 color : COLOR;
     float smoothness : MATERIALSMOOTHNESSFACTOR;
-    float4 uvTiling : UVTILING; // (uv tiling x, uv tiling y, uv offset x, uv offset y)
+    float dissolveAmount;
+    float dissolveOffset;
+    float4 outlineColor : COLOR;
 };
 
 
@@ -20,7 +23,6 @@ SamplerState StandardWrapSampler
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
-    MipLODBias = -2;    // Do not sample to low!!!
 };
 
 DepthStencilState EnableDepth
@@ -30,7 +32,7 @@ DepthStencilState EnableDepth
     DepthFunc = LESS_EQUAL;
 };
 
-RasterizerState RasterizerSolid
+RasterizerState TestRasterizer
 {
     FillMode = SOLID;
     CullMode = BACK;
@@ -75,27 +77,34 @@ v2f vert(appdata_thomas v)
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
-    o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
+    o.texcoord = v.texcoord;
     return o;
 }
 
 float4 frag(v2f input) : SV_TARGET
 {
-    float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
-    diffuse *= color.xyz;
-    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
 
-    float3 normal = NormalTexture.Sample(StandardWrapSampler, input.texcoord);
+    float dissolve = dissolveTexture.Sample(StandardWrapSampler, input.texcoord + float2(dissolveOffset, dissolveOffset)).r;
+    clip(dissolve - dissolveAmount);
+
+    float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
+    diffuse *= color.xyz;
+    float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
+    
     normal.xy = normal.xy * 2.0f - 1.0f;
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));
 
-    
     diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light
-    
-    
+
+
+    if (dissolve - dissolveAmount < .05f)
+        diffuse = outlineColor.xyz;
+
     diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
-    
+
+
     return saturate(float4(diffuse, 1.0f));
 }
 
@@ -107,7 +116,7 @@ technique11 Standard
         SetGeometryShader(NULL);
 		FRAG(frag());
         SetDepthStencilState(EnableDepth, 0);
-        SetRasterizerState(RasterizerSolid);
+        SetRasterizerState(TestRasterizer);
         SetBlendState(AlphaBlendingOn, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 
