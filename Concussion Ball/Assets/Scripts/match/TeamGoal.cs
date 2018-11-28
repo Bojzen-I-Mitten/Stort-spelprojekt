@@ -16,15 +16,13 @@ public class TeamGoal : ScriptComponent
     public Texture2D goalSparkTexture { get; set; }
     public Texture2D goalShockWaveTexture { get; set; }
 
+
     List<Confetti> confettis;
 
     public override void Start()
     {
         confettis = new List<Confetti>(ScriptUtility.GetComponentsOfType<Confetti>());
         Debug.Log(confettis.Count);
-        BoxCollider c = gameObject.AddComponent<BoxCollider>();
-        c.isTrigger = true;
-        c.size = new Vector3(0.5f, 0.5f, 0.5f);
         MatchSystem.instance.FindTeam(Team).GoalPosition = transform.position;
 
         goalEmitterCenter = gameObject.AddComponent<ParticleEmitter>();
@@ -77,7 +75,7 @@ public class TeamGoal : ScriptComponent
 
     }
 
-    public override void OnDrawGizmos()
+    public override void OnDrawGizmosSelected()
     {
         Team t = MatchSystem.instance?.FindTeam(Team);
         if (t != null)

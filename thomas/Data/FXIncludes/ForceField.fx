@@ -98,9 +98,9 @@ float4 frag(v2f input) : SV_TARGET
 
     float4 forceTex = ForcefieldTexture.Sample(StandardWrapSampler, input.texcoord);
 
-    float ballImpact = smoothstep(maxBallDistance, 0.0f, ballDist) * 2.0f;
+    float ballImpact = smoothstep(maxBallDistance, 0.0f, ballDist) * 4.0f;
 
-    forceTex.r *= ballImpact + triWave(thomas_Time.x * 5, abs((-input.texcoord.y / uvTiling.y) + 1), -0.7) * 6;
+    forceTex.r *= ballImpact + triWave(thomas_Time.x * 5, abs((uvTiling.z * input.texcoord.y / uvTiling.y) + 1), -0.7) * 6;
 				// I ended up saturaing the rim calculation because negative values caused weird artifacts
     forceTex.g *= ballImpact + saturate(saturate(rim) + 0.05f) * (sin(thomas_Time.z + forceTex.b * 5) + 1);
 
