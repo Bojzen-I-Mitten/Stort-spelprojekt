@@ -701,6 +701,7 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
+        Debug.Log("Deactivating aim hud");
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");

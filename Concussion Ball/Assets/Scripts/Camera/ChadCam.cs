@@ -113,6 +113,9 @@ public class ChadCam : ScriptComponent
     {
         FreeLookCamera(false);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(-transform.forward.x, 0, transform.forward.z), Vector3.Up));
+        if (Chad.CurrentVelocity.y > 0)
+            Chad.CurrentVelocity.y -= Math.Abs(xStep * CameraSensitivity_x / 50);
+        Chad.CurrentVelocity.y = Math.Max(Chad.CurrentVelocity.y, 0);
         Chad.rBody.IgnoreNextTransformUpdate();
     }
 
@@ -125,6 +128,9 @@ public class ChadCam : ScriptComponent
     {
         FreeLookCamera(true);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(transform.forward.x, 0, -transform.forward.z), Vector3.Up));
+        if(Chad.CurrentVelocity.y > 0)
+            Chad.CurrentVelocity.y -= Math.Abs(xStep * CameraSensitivity_x / 50);
+        Chad.CurrentVelocity.y = Math.Max(Chad.CurrentVelocity.y, 0);
         Chad.rBody.IgnoreNextTransformUpdate();
     }
 
@@ -143,6 +149,8 @@ public class ChadCam : ScriptComponent
         {
             transform.rotation = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
         }
+
+        //transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
     }
 
 
@@ -166,7 +174,7 @@ public class ChadCam : ScriptComponent
                 transform.position = ChadHead - transform.forward * CameraOffset;
                 break;
         }
-        
+
     }
 
     public void ResetCamera()
