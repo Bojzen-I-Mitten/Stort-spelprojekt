@@ -93,7 +93,7 @@ namespace ThomasEditor
             if (oldParent == newParent || !child.gameObject)
                 return;
 
-            //if(updateHiearchyParenting)
+            if(updateHiearchyParenting)
                 ResetTreeView();
             //this.Dispatcher.BeginInvoke((Action)(() =>
             //{
