@@ -372,9 +372,6 @@ namespace thomas
 		{
 			profiling::GpuProfiler::Instance()->Destroy();
 
-			m_deviceContextDeferred->ClearState();
-			m_deviceContextDeferred->Flush();
-
 			m_deviceContextImmediate->ClearState();
 			m_deviceContextImmediate->Flush();
 
@@ -387,11 +384,6 @@ namespace thomas
 			SAFE_RELEASE(m_deviceContextDeferred);
 			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_device);
-
-			/*if (m_debug)
-				m_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-
-			SAFE_RELEASE(m_debug);*/
 
 			if (m_dxgiDebug)
 				m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
