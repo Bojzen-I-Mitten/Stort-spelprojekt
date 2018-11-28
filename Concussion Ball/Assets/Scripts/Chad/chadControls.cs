@@ -639,12 +639,12 @@ public class ChadControls : NetworkComponent
         {
             yield return new WaitForSeconds(duration);
 
-            while (Ragdoll.DistanceToWorld() >= 0.75f)
+            while (Ragdoll.DistanceToWorld() >= 0.75f) // can trigger mid air atm, check if ray hits ground and not chad
             {
                 yield return null;
             }
             Debug.Log("The ground has been reached.");
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(1);
             State = STATE.CHADING;
             CurrentVelocity.y = BaseSpeed;
         }

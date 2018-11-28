@@ -59,7 +59,7 @@ public class ChadCam : ScriptComponent
 
     public override void Update()
     {
-        if (Chad)
+        if (Chad && MatchSystem.instance.ReplaySystem.Replaying)
         {
             switch (Chad.State)
             {
@@ -162,19 +162,21 @@ public class ChadCam : ScriptComponent
 
     public override void FixedUpdate()
     {
-        switch (Chad.State)
+        if (Chad && MatchSystem.instance.ReplaySystem.Replaying)
         {
-            case ChadControls.STATE.THROWING:
-                transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
-                break;
-            case ChadControls.STATE.RAGDOLL:
-                transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
-                break;
-            default:
-                transform.position = ChadHead - transform.forward * CameraOffset;
-                break;
+            switch (Chad.State)
+            {
+                case ChadControls.STATE.THROWING:
+                    transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
+                    break;
+                case ChadControls.STATE.RAGDOLL:
+                    transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
+                    break;
+                default:
+                    transform.position = ChadHead - transform.forward * CameraOffset;
+                    break;
+            }
         }
-
     }
 
     public void ResetCamera()
