@@ -102,7 +102,7 @@ public class GUIMainMenu : ScriptComponent
             GUIInput.AppendString(ref PlayerString, 9);
         }
 
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - Caret.size.x, CaretOffset);
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
     }
     public void AddImagesAndText()
     {

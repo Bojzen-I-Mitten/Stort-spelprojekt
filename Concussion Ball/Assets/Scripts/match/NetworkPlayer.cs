@@ -11,7 +11,7 @@ public class NetworkPlayer : NetworkComponent
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
-    public float ragdollOffset = 0.8f;
+    public float ragdollOffset = 1.0f;
     public float textOffset = 1.3f;
     public Font NameFont { get; set; }
     public float textScale { get; set; } = 0.008f;
@@ -63,7 +63,11 @@ public class NetworkPlayer : NetworkComponent
     {
         if (!isOwner)
         {
-            Vector3 betweenChads = transform.position - ChadCam.instance.transform.position;
+            Vector3 betweenChads = Vector3.Zero;
+            if (!rag.RagdollEnabled)
+                betweenChads = transform.position - ChadCam.instance.transform.position;
+            else
+                betweenChads = rag.GetHips().transform.position - ChadCam.instance.transform.position;
             betweenChads.Normalize();
             Ray ray = new Ray(ChadCam.instance.transform.position, betweenChads);
             RaycastHit info;

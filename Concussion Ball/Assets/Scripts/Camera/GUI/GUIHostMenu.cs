@@ -100,7 +100,8 @@ public class GUIHostMenu : ScriptComponent
 
     IEnumerator Blink = null;
 
-    public float CaretOffset { get; set; } = 0;
+    public float CaretOffsetBig { get; set; } = 0;
+    public float CaretOffsetSmall { get; set; } = 0;
 
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
@@ -785,7 +786,7 @@ public class GUIHostMenu : ScriptComponent
             string str = Team1.text;
             GUIInput.AppendString(ref str, 15);
             Team1.text = str;
-            Caret.position = Team1.position + new Vector2(Team1.size.x, Team1.size.y * (0.5f - CaretOffset));
+            Caret.position = Team1.position + new Vector2(Team1.size.x, 0.5f - CaretOffsetBig);
             Caret.scale = Team1.scale * 1.333f;
         }
         else if (InputTeam2Name)
@@ -793,7 +794,7 @@ public class GUIHostMenu : ScriptComponent
             string str = Team2.text;
             GUIInput.AppendString(ref str, 15);
             Team2.text = str;
-            Caret.position = Team2.position + new Vector2(Team2.size.x, Team2.size.y * (0.5f -  CaretOffset));
+            Caret.position = Team2.position + new Vector2(Team2.size.x, 0.5f -  CaretOffsetBig);
             Caret.scale = Team2.scale * 1.333f;
         }
         else if (InputServerName)
@@ -801,7 +802,7 @@ public class GUIHostMenu : ScriptComponent
             string str = ServerNameString.text;
             GUIInput.AppendString(ref str, 15);
             ServerNameString.text = str;
-            Caret.position = ServerNameString.position + new Vector2(ServerNameString.size.x, -ServerNameString.size.y * CaretOffset);
+            Caret.position = ServerNameString.position + new Vector2(ServerNameString.size.x, CaretOffsetSmall);
             Caret.scale = ServerNameString.scale * 1.333f;
         }
         else if (InputPortName)
@@ -809,7 +810,7 @@ public class GUIHostMenu : ScriptComponent
             string str = PortNameString.text;
             GUIInput.AppendString(ref str, 4);
             PortNameString.text = str;
-            Caret.position = PortNameString.position + new Vector2(PortNameString.size.x, -PortNameString.size.y * CaretOffset);
+            Caret.position = PortNameString.position + new Vector2(PortNameString.size.x, CaretOffsetSmall);
             Caret.scale = PortNameString.scale * 1.333f;
         }
         else if (InputMaxPlayers)
@@ -817,7 +818,7 @@ public class GUIHostMenu : ScriptComponent
             string str = MaxPlayersString.text;
             GUIInput.AppendString(ref str, 3);
             MaxPlayersString.text = str;
-            Caret.position = MaxPlayersString.position + new Vector2(MaxPlayersString.size.x, -MaxPlayersString.size.y * CaretOffset);
+            Caret.position = MaxPlayersString.position + new Vector2(MaxPlayersString.size.x, -MaxPlayersString.size.y * CaretOffsetSmall);
             Caret.scale = MaxPlayersString.scale * 1.333f;
         }
         else if (InputTimeRound)
@@ -825,7 +826,7 @@ public class GUIHostMenu : ScriptComponent
             string str = TimeRoundString.text;
             GUIInput.AppendString(ref str, 2);
             TimeRoundString.text = str;
-            Caret.position = TimeRoundString.position + new Vector2(TimeRoundString.size.x, -TimeRoundString.size.y * CaretOffset);
+            Caret.position = TimeRoundString.position + new Vector2(TimeRoundString.size.x, -TimeRoundString.size.y * CaretOffsetSmall);
             Caret.scale = TimeRoundString.scale * 1.333f;
         }
         else if (InputScoreLimit)
@@ -833,7 +834,7 @@ public class GUIHostMenu : ScriptComponent
             string str = ScoreLimitString.text;
             GUIInput.AppendString(ref str, 3);
             ScoreLimitString.text = str;
-            Caret.position = ScoreLimitString.position + new Vector2(ScoreLimitString.size.x, 0);
+            Caret.position = ScoreLimitString.position + new Vector2(ScoreLimitString.size.x, CaretOffsetSmall);
             Caret.scale = ScoreLimitString.scale * 1.333f;
         }
     }
