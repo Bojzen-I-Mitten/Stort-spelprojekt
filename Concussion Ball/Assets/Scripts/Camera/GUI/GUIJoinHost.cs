@@ -17,8 +17,8 @@ public class GUIJoinHost : ScriptComponent
     private bool TakeIP;
     private bool TakePort;
 
-    private bool ClearIP = true;
-    private bool ClearPort = true;
+    private bool ClearIP = false;
+    private bool ClearPort = false;
 
     private bool hasConnected = false;
 
@@ -46,6 +46,7 @@ public class GUIJoinHost : ScriptComponent
     IEnumerator test;
 
     public float CaretOffset { get; set; } = 0.0f;
+    public float TextOffset { get; set; } = 0.0f;
 
     public override void Start()
     {
@@ -233,6 +234,8 @@ public class GUIJoinHost : ScriptComponent
                 Port.font = TextFont;
             }
         }
+        IPText.position = new Vector2(0.5f, 0.11875f + TextOffset);
+        PortText.position = new Vector2(0.5f, 0.26875f + TextOffset);
     }
 
     public void AddImagesAndText()
@@ -241,13 +244,13 @@ public class GUIJoinHost : ScriptComponent
 
         IPText = Canvas.Add(IPString);
         IPText.origin = new Vector2(0.5f);
-        IPText.position = new Vector2(0.5f, 0.11875f);
+        IPText.position = new Vector2(0.5f, 0.11875f + TextOffset);
         IPText.color = Color.Black;
         IPText.depth = 0.8f;
 
         PortText = Canvas.Add(PortString);
         PortText.origin = new Vector2(0.5f);
-        PortText.position = new Vector2(0.5f, 0.26875f);
+        PortText.position = new Vector2(0.5f, 0.26875f + TextOffset);
         PortText.color = Color.Black;
         PortText.depth = 0.8f;
 
