@@ -175,7 +175,7 @@ namespace ThomasEngine {
 		static bool IsEditor();
 		/* If this is an external build without editor window
 		*/
-		static bool IsExternalBuild();
+		static bool IsEditorBuild();
 		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 

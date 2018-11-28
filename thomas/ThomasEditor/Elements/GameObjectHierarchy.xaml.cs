@@ -366,7 +366,10 @@ namespace ThomasEditor
             {
                 if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform && !CheckIfChild(node, parentTransform))
                 {
-                    ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
+                    GameObject child = node.Data as GameObject;
+                    GameObject parent = parentTransform == null ? null : parentTransform.gameObject;
+                    ThomasWrapper.IssueCommand(new ParentObjectCommand(child, parent));
+                    //((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
                 }
                 ChangeParent(parentTransform, node.Children);
             }

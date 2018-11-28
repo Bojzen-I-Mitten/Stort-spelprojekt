@@ -360,7 +360,7 @@ namespace thomas
 
 				if (mesh->HasVertexColors(0))
 				{
-					vertices.colors[i] = math::Color((float*)mesh->mColors[0]);
+					vertices.colors[i] = math::Color((float*)(&mesh->mColors[0][i]));
 				}
 				
 
