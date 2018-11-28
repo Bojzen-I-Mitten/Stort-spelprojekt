@@ -90,7 +90,7 @@ public class TeamGoal : ScriptComponent
     {
         if (MatchSystem.instance)
         {
-            if (collider.gameObject == MatchSystem.instance.Ball)
+            if (collider.gameObject == MatchSystem.instance.Ball && MatchSystem.instance.MatchStarted)
             {
                 if (MatchSystem.instance.Ball.GetComponent<NetworkIdentity>().Owner)
                 {

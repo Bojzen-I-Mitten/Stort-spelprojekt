@@ -4,23 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using System.Collections.Generic;
-public class PlayerTestClass
-{
-    String Name;
-    int goals;
-    int Tackles;
-    int Tackled;
-    int Ping;
-   public PlayerTestClass(String Name,int goals,int Tackles,int Tackled,int Ping)
-    {
-        this.Name = Name;
-        this.goals = goals;
-        this.Tackles = Tackles;
-        this.Tackled = Tackled;
-        this.Ping = Ping;
-    }
 
-}
 public class Playertext
 {
     public Text PlayerName;
@@ -43,14 +27,17 @@ public class Playertext
         this.PlayerTackles.origin = new Vector2(0, 0);
         this.PlayerTackled.origin = new Vector2(0, 0);
         this.PlayerPing.origin = new Vector2(0, 0);
+
         AddFont(font);
         UpdateScale(Vector2.Zero);
         UpdateColor(Color.White);
+
         if (team == TEAM_TYPE.TEAM_1)
             UpdatePositionTeam1(playerbar);
         else
             UpdatePositionTeam2(playerbar);
     }
+
     public void UpdateScale(Vector2 scale)
     {
         this.PlayerName.scale = scale;
@@ -59,6 +46,7 @@ public class Playertext
         this.PlayerTackled.scale = scale;
         this.PlayerPing.scale = scale;
     }
+
     public void AddFont(Font font)
     {
         this.PlayerName.font = font;
@@ -80,7 +68,7 @@ public class Playertext
     public void UpdatePositionTeam1( Image Playerbar1)
     {
         //float PositionUpdate = NewPositionUpdate * 0.064f;
-        this.PlayerName.position = Playerbar1.position+new Vector2(0.06f,0.047f); //new Vector2(0.020f, 0.34f + PositionUpdate);
+        this.PlayerName.position = Playerbar1.position+new Vector2(0.0725f,0.047f); //new Vector2(0.020f, 0.34f + PositionUpdate);
         this.PlayerGoals.position   = Playerbar1.position + new Vector2(0.19f, 0.047f);//new Vector2(0.179f, 0.34f + PositionUpdate);
         this.PlayerTackles.position = Playerbar1.position + new Vector2(0.29f, 0.047f);//new Vector2(0.268f, 0.34f + PositionUpdate);
         this.PlayerTackled.position = Playerbar1.position + new Vector2(0.38f, 0.047f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
@@ -94,7 +82,8 @@ public class Playertext
 
 
     }
-    public void UpdatePositionTeam2( Image Playerbar2)
+
+    public void UpdatePositionTeam2(Image Playerbar2)
     {
         //    float PositionUpdate = NewPositionUpdate * 0.064f;
         //    this.PlayerName.position    = new Vector2(0.870f, 0.34f + PositionUpdate);
@@ -102,7 +91,7 @@ public class Playertext
         //    this.PlayerTackles.position = new Vector2(0.700f, 0.34f + PositionUpdate);
         //    this.PlayerTackled.position = new Vector2(0.615f, 0.34f + PositionUpdate);
         //    this.PlayerPing.position    = new Vector2(0.525f, 0.34f + PositionUpdate);
-        this.PlayerName.position = Playerbar2.position + new Vector2(0.43f, 0.047f); //new Vector2(0.020f, 0.34f + PositionUpdate);
+        this.PlayerName.position = Playerbar2.position + new Vector2(0.425f, 0.047f); //new Vector2(0.020f, 0.34f + PositionUpdate);
         this.PlayerGoals.position = Playerbar2.position + new Vector2(0.3f, 0.047f);//new Vector2(0.179f, 0.34f + PositionUpdate);
         this.PlayerTackles.position = Playerbar2.position + new Vector2(0.21f, 0.047f);//new Vector2(0.268f, 0.34f + PositionUpdate);
         this.PlayerTackled.position = Playerbar2.position + new Vector2(0.11f, 0.047f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
@@ -160,20 +149,13 @@ public class GUIPlayerScore : ScriptComponent
     public static GUIPlayerScore Instance = null;
     public override void Start()
     {
-      
-            Instance = this;
-       
-
-
+        Instance = this;
         cam = gameObject.GetComponent<Camera>();
         Canvas = cam.AddCanvas();
-
- 
-
+     
         //Team1Bar Image
         team1BarImage = Canvas.Add(Team1Bar);
         team1BarImage.scale = Vector2.Zero;
-        //team1BarImage.color = Color.Red;
         team1BarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
         team1BarImage.position = new Vector2(0, 0.172f);
         
@@ -181,7 +163,6 @@ public class GUIPlayerScore : ScriptComponent
         team2BarImage = Canvas.Add(Team2Bar);
         team2BarImage.scale = Vector2.Zero;
         team2BarImage.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
-        //team2BarImage.color = Color.Blue;
         team2BarImage.position = new Vector2(0.596f,0.172f);
 
         //AmountOfPlayersBar Image
@@ -190,7 +171,6 @@ public class GUIPlayerScore : ScriptComponent
         AmountOfPlayersBarImage.color = Color.White;
         AmountOfPlayersBarImage.position = new Vector2(0.4f, 0.11f);
 
-        //playerBar.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
         ScoreText[0] = Canvas.Add(""+MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score);
         ScoreText[1] = Canvas.Add("" + MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Score);
         for(int i=0;i<2;i++)
@@ -199,8 +179,6 @@ public class GUIPlayerScore : ScriptComponent
             ScoreText[i].scale = Vector2.Zero;
             ScoreText[i].font = Font;
         }
-        
-        
         TextScore = Canvas.Add("Score");
         TextScore.color = Color.Black;
         TextScore.scale = Vector2.Zero;
@@ -227,35 +205,25 @@ public class GUIPlayerScore : ScriptComponent
         PlayerStandardbar[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
         PlayerStandardbar[1].position = new Vector2(0.5f, 0.32f + (-1 * 0.063f)); 
 
-
-   //     TeamName[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
-   //     TeamName[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
-
         TeamName[0].position = new Vector2(0.11f, 0.192f);
         TeamName[0].origin = Vector2.Zero;
         TeamName[1].position = new Vector2(0.885f, 0.192f);
         TeamName[1].origin = new Vector2(1, 0);
         TeamName[0].color = Color.White;
         TeamName[1].color = Color.White;
-
-
     }
 
     void DisplayBar(Vector2 OnOff)
     {
-        
-
         TextScore.scale = OnOff;
         AmountOfPlayersBarImage.scale = OnOff;
         team1BarImage.scale = OnOff;
         team2BarImage.scale = OnOff;
         for (int i = 0; i < 2; i++)
         {
-         
             PlayerStandardbar[i].scale = OnOff;
             if (OnOff.x == 0)
             {
-                
                 ScoreText[i].scale = Vector2.Zero;
                 TeamName[i].scale = new Vector2(0, 0);
                 PlayerstandardText[i].scale = new Vector2(0, 0);
@@ -267,7 +235,6 @@ public class GUIPlayerScore : ScriptComponent
                 PlayerstandardText[i].scale = OnOff;//new Vector2(0.8f, 0.6f);
             }
         }
-
         if(OnOff.x != 0)
         { 
             for(int i = 0;i< Team1Players.Count;i++)
@@ -290,8 +257,6 @@ public class GUIPlayerScore : ScriptComponent
                 Team2Players[i].UpdateScale(OnOff);
             }
         }
-       
-
         for (int i = 0; i < AmountOfPlayersInTeam1; i++)
         {
             PlayerStandardBarTeam1[i].scale = OnOff;
@@ -304,21 +269,13 @@ public class GUIPlayerScore : ScriptComponent
     }
     void SetOrigin()
     {
-
     }
     void UpdatePlayerBars()
     {
         if(PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2 || PlayerStandardBarTeam1.Count != AmountOfPlayersInTeam1)
         {
-            //playerBar.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-
-
-            // ScoreText.position = new Vector2(0.435f, 0.1755f);
-            //ScoreText.origin = new Vector2(-3.5f, -2.65f);
-
             if (PlayerStandardBarTeam2.Count< AmountOfPlayersInTeam2)
-            {
-                
+            {                
                 while (PlayerStandardBarTeam2.Count != AmountOfPlayersInTeam2)
                 {
                     int i = PlayerStandardBarTeam2.Count;
@@ -347,10 +304,8 @@ public class GUIPlayerScore : ScriptComponent
                     Team2Players.Add(new Playertext(i, Font, Canvas, "jonn " + i, 2, 34, 4, 94, TEAM_TYPE.TEAM_2, PlayerStandardBarTeam2[i]));
                 }
             }
-
             if (PlayerStandardBarTeam1.Count < AmountOfPlayersInTeam1)
-            {
-             
+            {            
                 while (PlayerStandardBarTeam1.Count != AmountOfPlayersInTeam1)
                 {
                     int i = PlayerStandardBarTeam1.Count;
@@ -381,10 +336,8 @@ public class GUIPlayerScore : ScriptComponent
             }
         }
     }
-
     void UpdateStatistics()
     {
-
         Canvas.Remove(ScoreText[0]);
         Canvas.Remove(ScoreText[1]);
         ScoreText[0] = Canvas.Add(""+MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score);
@@ -412,9 +365,6 @@ public class GUIPlayerScore : ScriptComponent
 
         PlayerStandardbar[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
         PlayerStandardbar[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
-
-
-
         for(int i = 0;i< Math.Min(Team1Players.Count, AmountOfPlayersInTeam1); i++)
         {
             if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName.Length > 9)
@@ -437,8 +387,6 @@ public class GUIPlayerScore : ScriptComponent
             Team2Players[i].PlayerTackled.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].BeenTackled.ToString();
             Team2Players[i].PlayerPing.text = "0";// går ej att hämta ping?
         }
-
-
     }
     public void lastupdate()
     {
@@ -456,9 +404,7 @@ public class GUIPlayerScore : ScriptComponent
             UpdateStatistics();
             UpdatePlayerBars();
         }
-
         ChadHud.Instance.ToggleScoreVisability(Toggle);
-
         if (Toggle)
             DisplayBar(new Vector2(1.5f, 1.5f));//DisplayBar(Vector2.One);
         else
@@ -469,11 +415,6 @@ public class GUIPlayerScore : ScriptComponent
             {
                 Toggle = true;
             }
-     /*     else
-            {
-                Toggle = false;
-            }
-            */
         }
         if((Input.GetKeyUp(Input.Keys.Tab) || Input.GetKeyUp(Input.Keys.I)) )
         {
