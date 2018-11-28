@@ -69,7 +69,7 @@ namespace ThomasEngine {
 
 	void Material::shader::set(ThomasEngine::Shader^ value)
 	{
-		if (!value)
+		if (!value || !value->m_nativePtr)
 			return;
 		if (m_nativePtr)
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);

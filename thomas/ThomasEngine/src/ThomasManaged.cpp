@@ -278,7 +278,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::LoadEditorAssets()
 	{
 #if _EDITOR
-		if (IsExternalBuild()) {
+		if (IsEditorBuild()) {
 			Model::InitPrimitives();
 			Resources::LoadAll(Application::editorAssets);
 			ScriptingManager::Init();
@@ -297,7 +297,7 @@ namespace ThomasEngine {
 		renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
 		renderThread->Name = "Thomas Engine (Render Thread)";
 		renderThread->Start();
-
+		playing = IsEditorBuild() ? RunningState::Editor : RunningState::UnInitialized;
 
 		// Update thread start
 
@@ -648,7 +648,7 @@ namespace ThomasEngine {
 	}
 
 	
-	bool ThomasWrapper::IsExternalBuild()
+	bool ThomasWrapper::IsEditorBuild()
 	{
 		return inEditor;
 	}
