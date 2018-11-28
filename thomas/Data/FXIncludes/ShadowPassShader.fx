@@ -29,10 +29,6 @@ inline float4 ObjectToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirl
     return mul(lightMatrixVP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
 }
 
-float biTangentSign(float3 norm, float3 tang, float3 bitang)
-{
-    return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
-}
 
 struct v2f
 {
@@ -44,7 +40,7 @@ v2f vert(appdata_thomas_skin v)
     v2f o;
 
     float4 posL = float4(v.vertex, 1.0);
-    if (animate >= 1)
+    if (animate > 1)
     {
         ThomasSkinVertex(posL, v.normal, v.boneWeight, v.boneIndex);
     }
