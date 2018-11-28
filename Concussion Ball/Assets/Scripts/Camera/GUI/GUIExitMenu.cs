@@ -7,10 +7,10 @@ public class GUIExitMenu : ScriptComponent
 
     Camera Camera;
     public Canvas Canvas;
-    Text ExitMatch;
+    //Text ExitMatch;
     Text ExitGame;
 
-    private readonly string _exitMatch = "Exit Match";
+    //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
     public override void OnAwake()
@@ -43,7 +43,7 @@ public class GUIExitMenu : ScriptComponent
                 Debug.Log("I'm exciting! :^)");
                 if (ThomasWrapper.IsPlaying())
                 {
-                    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                    //Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
                     CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
                     ThomasWrapper.IssueRestart();
                     //if (ThomasWrapper.IsPlaying())

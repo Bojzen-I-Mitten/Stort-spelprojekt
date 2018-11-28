@@ -77,6 +77,7 @@ namespace thomas
 					if (m_attachedRigidbody) {
 						m_attachedRigidbody->setCollisionFlags(m_attachedRigidbody->getCollisionFlags() & ~Rigidbody::CF_NO_CONTACT_RESPONSE);
 					}
+					
 					else if (m_collisionObject) {
 						m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() & ~Rigidbody::CF_NO_CONTACT_RESPONSE);
 					}

@@ -106,12 +106,12 @@ void ThomasEngine::Gizmos::DrawPing(String^ ping)
 
 void ThomasEngine::Gizmos::ImguiStringUpdate(String^ text, Vector2 size, Vector2 pos)
 {
-	if (ThomasEngine::ThomasWrapper::InEditor())
+	if (ThomasEngine::ThomasWrapper::IsExternalBuild())
 		thomas::editor::Gizmos::Gizmo().ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(size), Utility::Convert(pos));
 }
 void ThomasEngine::Gizmos::ImguiStringUpdate(String ^ text, Vector2 pos)
 {
-	if(ThomasEngine::ThomasWrapper::InEditor())
+	if(ThomasEngine::ThomasWrapper::IsExternalBuild())
 		thomas::editor::Gizmos::Gizmo().ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
 }
 //

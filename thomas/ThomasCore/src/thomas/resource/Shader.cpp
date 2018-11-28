@@ -8,6 +8,7 @@
 #include <comdef.h>
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
+#include "../Common.h"
 
 namespace thomas
 {
@@ -354,6 +355,11 @@ namespace thomas
 		{
 			if (HasProperty(name))
 			{
+				if (value == nullptr)
+				{
+					LOG("Can't set null texture in property: " + name);
+					value = Texture2D::GetWhiteTexture();
+				}
 				std::shared_ptr<shaderproperty::ShaderPropertyTexture2D> prop(
 					new shaderproperty::ShaderPropertyTexture2D(value));
 				prop->SetName(name);
@@ -668,6 +674,11 @@ namespace thomas
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}
+			/*else
+			{
+				std::string err("ShaderProperty default valye was null in shader" + this->m_name + " with propertyname: " + name);
+				LOG(err);
+			}*/
 			
 		}
 

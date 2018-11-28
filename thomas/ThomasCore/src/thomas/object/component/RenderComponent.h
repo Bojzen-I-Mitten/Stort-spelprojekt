@@ -31,6 +31,9 @@ namespace thomas
 				virtual void SetMaterial(int meshIndex, resource::Material* material);
 				resource::Material* GetMaterial(int meshIndex);
 
+				std::vector<resource::Material*> GetMaterials();
+				void SetMaterials(std::vector<resource::Material*> value);
+
 				void OnDrawGizmos();
 				void SubmitToRenderer(Camera* camera);
 				void OnDestroy();
