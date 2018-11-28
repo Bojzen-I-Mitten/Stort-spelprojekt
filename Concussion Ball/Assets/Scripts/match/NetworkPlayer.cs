@@ -34,6 +34,9 @@ public class NetworkPlayer : NetworkComponent
 
     public override void Start()
     {
+        HasTackled = 0;
+        BeenTackled = 0;
+        GoalsScored = 0;
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
         mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
@@ -91,10 +94,8 @@ public class NetworkPlayer : NetworkComponent
         }
         else if(nameCanvas != null)
             nameCanvas.isRendering = false;
-
         if (Team != null && mat != null)
             mat.SetColor("color", Team.Color);
-
         if (transform.position.y < BottomOfTheWorld)
             Reset();
     }
@@ -103,7 +104,9 @@ public class NetworkPlayer : NetworkComponent
     {
 
         writer.Put(PlayerName);
-
+        writer.Put(HasTackled);
+        writer.Put(BeenTackled);
+        writer.Put(GoalsScored);
         if (Team != null)
             writer.Put((int)Team.TeamType);
         else
@@ -113,9 +116,20 @@ public class NetworkPlayer : NetworkComponent
 
     public override void OnRead(NetDataReader reader, bool initialState)
     {
-
-        PlayerName = reader.GetString();
-        
+        if(isOwner)
+        {
+            reader.GetString();
+            reader.GetInt();
+            reader.GetInt();
+            reader.GetInt();
+        }
+        else
+        {
+            PlayerName = reader.GetString();
+            HasTackled = reader.GetInt();
+            BeenTackled = reader.GetInt();
+            GoalsScored = reader.GetInt();
+        }
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
@@ -165,8 +179,10 @@ public class NetworkPlayer : NetworkComponent
             CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
             CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
         }
-        
-    }
+
+
+
+}
 
 
     public void JoinTeam(Team team)

@@ -98,7 +98,8 @@ public class TeamGoal : ScriptComponent
                 {
                     TEAM_TYPE teamThatScored = MatchSystem.instance.GetOpposingTeam(Team);
                     MatchSystem.instance.OnGoal(teamThatScored);
-                    
+                    if(teamThatScored == MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().Team.TeamType)
+                        MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().GoalsScored += 1;
                 }
                 StartCoroutine(EmitSparkForDuration(5.0f));
             }
