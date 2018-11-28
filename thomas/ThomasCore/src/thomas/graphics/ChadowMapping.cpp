@@ -38,7 +38,7 @@ namespace thomas
 		ShadowMap::ShadowMap()
 		{
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-50, 50, -50, 50, -50, 50);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-25, 25, -25, 25, -25, 25);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 			m_matrixVP = m_matrixView * m_matrixProj;
 			_depthStencilView = nullptr;
 		}
@@ -76,7 +76,7 @@ namespace thomas
 				}*/
 				//frustumCenter /= 8;
 				
-				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 40.0f;
+				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 20.0f;
 				//const float nearClipOffset = 20.0f;
 				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward() * 20.0f, frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 			
@@ -126,6 +126,16 @@ namespace thomas
 			s_material->SetMatrix(THOMAS_MATRIX_WORLD, renderCommand.worldMatrix.Transpose());
 			s_material->ApplyProperty(THOMAS_MATRIX_WORLD);
 
+			if (renderCommand.mesh->GetData().vertices.boneIndices.size() > 0)
+			{
+				int temp = 10;
+				s_material->SetInt("animate", temp);
+			}
+			else
+			{
+				int temp = 0;
+				s_material->SetInt("animate", temp);
+			}
 			s_material->Draw(renderCommand.mesh);
 		}
 

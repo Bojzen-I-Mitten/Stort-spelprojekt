@@ -40,6 +40,7 @@ namespace thomas
 
 			static std::unique_ptr<resource::Material> s_material;
 			static std::unique_ptr<resource::Shader> s_shader;
+			
 			static D3D11_VIEWPORT s_viewPort;
 		};
 	}
