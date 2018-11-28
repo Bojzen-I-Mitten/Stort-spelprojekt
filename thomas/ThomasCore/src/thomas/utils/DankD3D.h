@@ -7,20 +7,48 @@ namespace thomas
 {
 	namespace utils
 	{
-		/*class DankSwapChain : public IDXGISwapChain3
+		/*class DankSwapChain : public IDXGISwapChain
 		{
 		public:
 			DankSwapChain();
 			virtual ~DankSwapChain();
 
-		private:
+			virtual HRESULT STDMETHODCALLTYPE Present(UINT SyncInterval, UINT Flags);
 
+			virtual HRESULT STDMETHODCALLTYPE GetBuffer(UINT Buffer,
+				_In_  REFIID riid,
+				_COM_Outptr_  void **ppSurface);
+
+			virtual HRESULT STDMETHODCALLTYPE SetFullscreenState(BOOL Fullscreen,
+				_In_opt_  IDXGIOutput *pTarget);
+
+			virtual HRESULT STDMETHODCALLTYPE GetFullscreenState(_Out_opt_  BOOL *pFullscreen,
+				_COM_Outptr_opt_result_maybenull_  IDXGIOutput **ppTarget);
+
+			virtual HRESULT STDMETHODCALLTYPE GetDesc(_Out_  DXGI_SWAP_CHAIN_DESC *pDesc);
+
+			virtual HRESULT STDMETHODCALLTYPE ResizeBuffers(UINT BufferCount, 
+				UINT Width,
+				UINT Height,
+				DXGI_FORMAT NewFormat,
+				UINT SwapChainFlags);
+
+			virtual HRESULT STDMETHODCALLTYPE ResizeTarget(_In_  const DXGI_MODE_DESC *pNewTargetParameters);
+
+			virtual HRESULT STDMETHODCALLTYPE GetContainingOutput(_COM_Outptr_  IDXGIOutput **ppOutput);
+
+			virtual HRESULT STDMETHODCALLTYPE GetFrameStatistics(_Out_  DXGI_FRAME_STATISTICS *pStats);
+
+			virtual HRESULT STDMETHODCALLTYPE GetLastPresentCount(_Out_  UINT *pLastPresentCount);
+
+		private:
+			IDXGISwapChain3* m_swapChain;
 		};*/
 
-		class D3DDevice : public ID3D11Device
+		class DankDevice : public ID3D11Device
 		{
 		public:
-			D3DDevice(_In_opt_ IDXGIAdapter* pAdapter,
+			DankDevice(_In_opt_ IDXGIAdapter* pAdapter,
 				D3D_DRIVER_TYPE DriverType,
 				HMODULE Software,
 				UINT Flags,
@@ -29,7 +57,7 @@ namespace thomas
 				UINT SDKVersion,
 				_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel);
 
-			virtual ~D3DDevice();
+			virtual ~DankDevice();
 
 			virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, _COM_Outptr_ void** ppvObject);
 
@@ -211,15 +239,15 @@ namespace thomas
 	}
 }
 
-inline void CreateD3DDevice(_In_opt_ IDXGIAdapter* pAdapter,
+inline void CreateDankDevice(_In_opt_ IDXGIAdapter* pAdapter,
 	D3D_DRIVER_TYPE DriverType,
 	HMODULE Software,
 	UINT Flags,
 	_In_reads_opt_(FeatureLevels) CONST D3D_FEATURE_LEVEL* pFeatureLevels,
 	UINT FeatureLevels,
-	thomas::utils::D3DDevice** ppDevice,
+	thomas::utils::DankDevice** ppDevice,
 	UINT SDKVersion,
 	_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel)
 {
-	*ppDevice = new thomas::utils::D3DDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pFeatureLevel);
+	*ppDevice = new thomas::utils::DankDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pFeatureLevel);
 }

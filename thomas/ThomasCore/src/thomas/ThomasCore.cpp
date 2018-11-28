@@ -14,11 +14,11 @@
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
 #include "utils\D3D.h"
-#include "graphics/Renderer.h"
+#include "graphics\Renderer.h"
 #include "utils\ThreadMap.h"
 
 #include "object\ObjectHandler.h"
-#include "object\component/LightComponent.h"
+#include "object\component\LightComponent.h"
 #include "Physics.h"
 #include "graphics\ParticleSystem.h"
 
@@ -74,12 +74,9 @@ namespace thomas
 	{
 		WindowManager::Instance()->BeginFrame();
 		graphics::Renderer::Instance()->ProcessCommands();
-
-		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
-		//  (whose data we're getting) will have finished on the GPU by now.
-
 		WindowManager::Instance()->EndFrame();
-		graphics::Renderer::Instance()->PostRender();	// Sync. shaders ...?
+
+		graphics::Renderer::Instance()->PostRender();	
 	}
 
 	void ThomasCore::Exit()
