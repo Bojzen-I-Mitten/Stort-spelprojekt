@@ -189,7 +189,7 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_SHADOWS);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_SHADOWS);
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{

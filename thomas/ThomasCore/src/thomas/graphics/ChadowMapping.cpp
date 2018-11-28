@@ -4,6 +4,7 @@
 #include "../resource/Shader.h"
 #include "../resource/Material.h"
 #include "../resource/texture/Texture2DArray.h"
+#include "../Common.h"
 #include "Mesh.h"
 #include "render/Frame.h"
 #include "RenderConstants.h"
@@ -40,12 +41,12 @@ namespace thomas
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
 			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-50, 50, -50, 50, -50, 50);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 			m_matrixVP = m_matrixView * m_matrixProj;
-			_depthStencilView = nullptr;
+			m_depthStencilView = nullptr;
 		}
 
 		ShadowMap::~ShadowMap()
 		{
-			
+			SAFE_RELEASE(m_depthStencilView);
 		}
 
 		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)
@@ -131,16 +132,16 @@ namespace thomas
 
 		void ShadowMap::Bind()
 		{
-			if (_depthStencilView == nullptr)
+			if (m_depthStencilView == nullptr)
 				return;
 
 			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
-			utils::D3D::Instance()->GetDeviceContext()->PSSetShaderResources(0, 8, s_nullSRV);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->PSSetShaderResources(0, 8, s_nullSRV);
 
-			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
-			utils::D3D::Instance()->GetDeviceContext()->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, nullptr, _depthStencilView);
-			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, &s_viewPort);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, 0, 0);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
+			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, &s_viewPort);
 
 			s_material->Bind();
 			s_material->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
@@ -150,12 +151,12 @@ namespace thomas
 
 		void ShadowMap::SetShadowMapDepthStencilView(ID3D11DepthStencilView * dsv)
 		{
-			_depthStencilView = dsv;
+			m_depthStencilView = dsv;
 		}
 
 		ID3D11DepthStencilView * ShadowMap::GetShadowMapDepthStencilView()
 		{
-			return _depthStencilView;
+			return m_depthStencilView;
 		}
 
 		math::Matrix ShadowMap::GetVPMat()

@@ -30,7 +30,7 @@ namespace thomas
 
 			math::Matrix GetVPMat();
 		private:
-			ID3D11DepthStencilView* _depthStencilView;
+			ID3D11DepthStencilView* m_depthStencilView;
 			
 			math::Matrix m_matrixProj;
 			math::Matrix m_matrixView;

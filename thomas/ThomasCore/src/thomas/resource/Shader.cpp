@@ -4,6 +4,7 @@
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
 #include "..\Common.h"
+#include "..\utils\GpuProfiler.h"
 
 #include <d3dcompiler.h>
 #include <AtlBase.h>

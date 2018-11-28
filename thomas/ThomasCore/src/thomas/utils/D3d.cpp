@@ -585,7 +585,6 @@ namespace thomas
 			viewDesc.Texture2D.MostDetailedMip = 0;
 
 			HRESULT hr = m_device->CreateTexture2D(&textureDesc, NULL, &tex);
-
 			if (FAILED(hr))
 			{
 				LOG_HR(hr);

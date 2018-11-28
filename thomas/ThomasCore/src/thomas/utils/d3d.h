@@ -25,8 +25,8 @@ namespace thomas
 			void Destroy();
 			
 			bool CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv,
-				ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
-			bool CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly);
+				ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly);
+			bool CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV);
 			bool CreateDepthStencilTexture(int width, int height, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV);
 			bool CreateDepthStencilTextureArray(int width, int height, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, int arraySize);
 			bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain);
