@@ -106,7 +106,7 @@ float3 FresnelSchlickWithRoughness(float3 SpecularColor, float3 E, float3 N, flo
 float3 ambientSpec(in float3 V, in float3 N, in float3 R_world, in float3 specCol, in float specPow, in float gloss)
 {
     float MipmapIndex = -1.66096404744368 * log(specPow) + 5.5;
-    float3 IndirectSpecular = environmentMap.SampleLevel(EnvironmentSampler, R_world, MipmapIndex).rgb * specCol;
+    float3 IndirectSpecular = environmentMap.SampleLevel(EnvironmentSampler, R_world, MipmapIndex).rgb * float3(1.f, 1.f, 1.f);
     return FresnelSchlickWithRoughness(specCol, N, V, gloss) * IndirectSpecular;
 }
 

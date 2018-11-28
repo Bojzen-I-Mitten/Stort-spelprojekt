@@ -117,7 +117,7 @@ namespace ThomasEngine {
 
 	void Material::SetTextureCube(String^ name, TextureCube^ value)
 	{
-		((thomas::resource::Material*)m_nativePtr)->S(Utility::ConvertString(name), (thomas::resource::Texture2D*)value->m_nativePtr);
+		((thomas::resource::Material*)m_nativePtr)->SetCubeMap(Utility::ConvertString(name), (thomas::resource::TextureCube*)value->m_nativePtr);
 	}
 
 
