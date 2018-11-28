@@ -153,7 +153,7 @@ public class NetworkPlayer : NetworkComponent
 
             rb.Position = transform.position;
             rb.Rotation = transform.rotation;
-            rb.IgnoreNextTransformUpdate(); 
+            rb.IgnoreNextTransformUpdate();
         }
 
         if(Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)

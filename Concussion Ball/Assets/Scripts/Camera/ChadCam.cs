@@ -47,19 +47,23 @@ public class ChadCam : ScriptComponent
     public float MaxFov { get; set; } = 110;
     private float MinFov;
 
+    public override void OnAwake()
+    {
+        instance = this;
+    }
+
     public override void Start()
     {
         if (Camera)
             MinFov = Camera.fieldOfView;
 
-        instance = this;
         //CameraSensitivity_x = 0.5f;
         //CameraSensitivity_y = 1.0f;
     }
 
     public override void Update()
     {
-        if (Chad && MatchSystem.instance.ReplaySystem.Replaying)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
             switch (Chad.State)
             {
@@ -162,7 +166,7 @@ public class ChadCam : ScriptComponent
 
     public override void FixedUpdate()
     {
-        if (Chad && MatchSystem.instance.ReplaySystem.Replaying)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
             switch (Chad.State)
             {
