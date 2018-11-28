@@ -7,11 +7,14 @@ public class GUIMainMenu : ScriptComponent
 {
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
+    public Texture2D InstructionsI { get; set; }
+    public Texture2D BGI { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
 
     public Canvas Canvas;
+    public Canvas Canvas2;
 
     Image TextBoxName;
     Image TextBoxBGName;
@@ -21,6 +24,11 @@ public class GUIMainMenu : ScriptComponent
     Text Credits;
     Text PlayerName;
     Text Caret;
+    Text Controls;
+
+    Image Instructions;
+    Image BG;
+    Text Back;
 
     IEnumerator Blink = null;
 
@@ -53,6 +61,7 @@ public class GUIMainMenu : ScriptComponent
         Credits.color = Unselected;
         Exit.color = Unselected;
         TextBoxName.color = Unselected;
+        Controls.color = Unselected;
 
         if (Play.Hovered())
             Play.color = Selected;
@@ -62,6 +71,10 @@ public class GUIMainMenu : ScriptComponent
             Credits.color = Selected;
         else if (Exit.Hovered())
             Exit.color = Selected;
+        else if (Controls.Hovered())
+            Controls.color = Selected;
+        else if (Back.Hovered())
+            Back.color = Selected;
 
         if (TextBoxName.Clicked())
         {
@@ -102,16 +115,29 @@ public class GUIMainMenu : ScriptComponent
             GUIInput.AppendString(ref PlayerString, 9);
         }
 
+        if(Back.Clicked())
+        {
+            Canvas.isRendering = true;
+            Canvas2.isRendering = false;
+        }
+        if (Controls.Clicked())
+        {
+            Canvas2.isRendering = true;
+            Canvas.isRendering = false;
+        }
+
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
     }
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
+        Canvas2 = Camera.AddCanvas();
+        Canvas2.isRendering = false;
 
         #region Text
         #region  Play
         Play = Canvas.Add("Play");
-        Play.position = new Vector2(0.425f, 0.11f);
+        Play.position = new Vector2(0.425f, 0.01f);
         Play.scale = new Vector2(1.5f);
         Play.interactable = true;
         Play.depth = 0.9f;
@@ -121,7 +147,7 @@ public class GUIMainMenu : ScriptComponent
 
         #region  Options
         Options = Canvas.Add("Options");
-        Options.position = new Vector2(0.425f, 0.21f);
+        Options.position = new Vector2(0.425f, 0.11f);
         Options.scale = new Vector2(1.5f);
         Options.interactable = true;
         Options.depth = 0.9f;
@@ -131,7 +157,7 @@ public class GUIMainMenu : ScriptComponent
 
         #region Credits
         Credits = Canvas.Add("Credits");
-        Credits.position = new Vector2(0.425f, 0.31f);
+        Credits.position = new Vector2(0.425f, 0.21f);
         Credits.scale = new Vector2(1.5f);
         Credits.interactable = true;
         Credits.depth = 0.9f;
@@ -141,7 +167,7 @@ public class GUIMainMenu : ScriptComponent
 
         #region Exit
         Exit = Canvas.Add("Exit");
-        Exit.position = new Vector2(0.425f, 0.41f);
+        Exit.position = new Vector2(0.425f, 0.31f);
         Exit.scale = new Vector2(1.5f);
         Exit.interactable = true;
         Exit.depth = 0.9f;
@@ -170,6 +196,12 @@ public class GUIMainMenu : ScriptComponent
         Caret.font = TextFont;
         #endregion
 
+        Controls = Canvas.Add("Controls");
+        Controls.position = new Vector2(0.425f, 0.41f);
+        Controls.scale = new Vector2(1.5f);
+        Controls.interactable = true;
+        Controls.depth = 0.9f;
+        Controls.font = TextFont;
         #endregion
 
         #region Images
@@ -194,6 +226,19 @@ public class GUIMainMenu : ScriptComponent
         }
 
         #endregion
+
+        Instructions = Canvas2.Add(InstructionsI);
+        Instructions.depth = 0.9f;
+        BG = Canvas2.Add(BGI);
+        BG.scale = new Vector2(10000);
+        BG.color = new Color(new Vector4(1, 1, 1, 0.5f));
+
+
+        Back = Canvas2.Add("Back");
+        Back.origin = new Vector2(1, 1);
+        Back.position = new Vector2(1, 1);
+        Back.interactable = true;
+        Back.depth = 0.9f;
     }
 
     public void ClearImagesAndText()
