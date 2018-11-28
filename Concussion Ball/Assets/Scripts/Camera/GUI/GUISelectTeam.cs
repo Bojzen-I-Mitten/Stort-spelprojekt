@@ -250,11 +250,11 @@ public class GUISelectTeam : ScriptComponent
         StartGame.interactable = true;
         StartGame.color = Unselected;
 
-        PlayersInTeam1 = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + "/" + MatchSystem.instance.MaxPlayers / 2);
+        PlayersInTeam1 = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2);
         PlayersInTeam1.position = new Vector2(0, 0.05f);
         PlayersInTeam1.color = Unselected;
 
-        PlayersInTeam2 = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount + "/" + MatchSystem.instance.MaxPlayers / 2);
+        PlayersInTeam2 = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2);
         PlayersInTeam2.origin = new Vector2(1, 0);
         PlayersInTeam2.position = new Vector2(1, 0.05f);
         PlayersInTeam2.color = Unselected;
@@ -318,7 +318,7 @@ public class GUISelectTeam : ScriptComponent
         foreach (NetworkPlayer player in team1)
         {
             Text p = Canvas.Add(player.PlayerName);
-            p.position = new Vector2(0.0f, 0.1f + 0.1f * i);
+            p.position = new Vector2(0.0f, 0.1f + 0.25f * i);
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
@@ -329,15 +329,15 @@ public class GUISelectTeam : ScriptComponent
         {
             Text p = Canvas.Add(player.PlayerName);
             p.origin = new Vector2(1, 0);
-            p.position = new Vector2(1, 0.1f + 0.1f * i);
+            p.position = new Vector2(1.0f, 0.1f + 0.25f * i);
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
             Team2Players.Add(p);
         }
 
-        PlayersInTeam1.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + "/" + MatchSystem.instance.MaxPlayers / 2;
-        PlayersInTeam2.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount + "/" + MatchSystem.instance.MaxPlayers / 2;
+        PlayersInTeam1.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2;
+        PlayersInTeam2.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2;
     }
 
     private void DeletePlayersLists()
