@@ -38,7 +38,7 @@ namespace thomas
 		ShadowMap::ShadowMap()
 		{
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-45, 45, -45, 45, -20, 40);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-45, 45, -45, 45, -45, 45);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 			m_matrixVP = m_matrixView * m_matrixProj;
 			_depthStencilView = nullptr;
 		}
