@@ -21,6 +21,7 @@ namespace thomas
 
 	namespace graphics
 	{
+		class Mesh;
 		namespace render {
 			class ShaderList;
 			struct CameraRenderQueue;

@@ -38,7 +38,7 @@ namespace thomas
 		ShadowMap::ShadowMap()
 		{
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-50, 50, -50, 50, -50, 50);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-45, 45, -45, 45, -45, 45);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
 			m_matrixVP = m_matrixView * m_matrixProj;
 			_depthStencilView = nullptr;
 		}
@@ -78,7 +78,7 @@ namespace thomas
 				
 				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 40.0f;
 				//const float nearClipOffset = 20.0f;
-				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward() * 20.0f, frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward(), frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 			
 				//for (unsigned i = 0; i < 8; ++i)
 					//corners[i] = math::Vector3::Transform(corners[i], m_matrixView);
@@ -107,7 +107,7 @@ namespace thomas
 			}
 			else
 			{
-				m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 20/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+				m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 35/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
 				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 30);
 			}
 			
@@ -125,7 +125,23 @@ namespace thomas
 		{
 			s_material->SetMatrix(THOMAS_MATRIX_WORLD, renderCommand.worldMatrix.Transpose());
 			s_material->ApplyProperty(THOMAS_MATRIX_WORLD);
+			
+			if (renderCommand.num_local_prop)
+			{
+				int temp = 10;
+				
+				s_material->SetInt("animate", temp);
+				renderCommand.local_prop[0].m_apply(renderCommand.local_prop[0], s_material->GetShader());
 
+			}
+			else
+			{
+				int temp = 0;
+
+				s_material->SetInt("animate", temp);
+				
+			}
+			s_material->ApplyProperty("animate");
 			s_material->Draw(renderCommand.mesh);
 		}
 
@@ -143,6 +159,8 @@ namespace thomas
 			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, &s_viewPort);
 
 			s_material->Bind();
+			
+
 			s_material->SetMatrix("lightMatrixVP", m_matrixVP.Transpose());
 			s_material->ApplyProperty("lightMatrixVP");
 			

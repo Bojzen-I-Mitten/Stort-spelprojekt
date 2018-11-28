@@ -21,12 +21,10 @@ public class ReplaySystem : ScriptComponent
     List<ReplayState> States = new List<ReplayState>();
     public bool Replaying = false;
     public bool recordGame = true;
-    ChadCam chadCam;
     SpectatorCam specCam;
 
     public override void Start()
     {
-        chadCam = CameraMaster.instance.gameObject.GetComponent<ChadCam>();
         specCam = CameraMaster.instance.gameObject.GetComponent<SpectatorCam>();
     }
 
@@ -93,6 +91,7 @@ public class ReplaySystem : ScriptComponent
         MatchSystem.instance.ReadOwnerAsNormal = false;
         MatchSystem.instance.blockIncomingData = false;
         CameraMaster.instance.StopReplay();
+
     }
 
 

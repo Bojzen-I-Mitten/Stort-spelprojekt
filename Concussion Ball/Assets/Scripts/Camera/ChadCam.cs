@@ -47,19 +47,23 @@ public class ChadCam : ScriptComponent
     public float MaxFov { get; set; } = 110;
     private float MinFov;
 
+    public override void OnAwake()
+    {
+        instance = this;
+    }
+
     public override void Start()
     {
         if (Camera)
             MinFov = Camera.fieldOfView;
 
-        instance = this;
         //CameraSensitivity_x = 0.5f;
         //CameraSensitivity_y = 1.0f;
     }
 
     public override void Update()
     {
-        if (Chad)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
             switch (Chad.State)
             {
@@ -113,6 +117,9 @@ public class ChadCam : ScriptComponent
     {
         FreeLookCamera(false);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(-transform.forward.x, 0, transform.forward.z), Vector3.Up));
+        if (Chad.CurrentVelocity.y > 0)
+            Chad.CurrentVelocity.y -= Math.Abs(xStep * CameraSensitivity_x / 50);
+        Chad.CurrentVelocity.y = Math.Max(Chad.CurrentVelocity.y, 0);
         Chad.rBody.IgnoreNextTransformUpdate();
     }
 
@@ -125,6 +132,9 @@ public class ChadCam : ScriptComponent
     {
         FreeLookCamera(true);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(transform.forward.x, 0, -transform.forward.z), Vector3.Up));
+        if(Chad.CurrentVelocity.y > 0)
+            Chad.CurrentVelocity.y -= Math.Abs(xStep * CameraSensitivity_x / 50);
+        Chad.CurrentVelocity.y = Math.Max(Chad.CurrentVelocity.y, 0);
         Chad.rBody.IgnoreNextTransformUpdate();
     }
 
@@ -143,6 +153,8 @@ public class ChadCam : ScriptComponent
         {
             transform.rotation = Quaternion.CreateFromYawPitchRoll(TotalXStep, TotalYStep, 0);
         }
+
+        //transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
     }
 
 
@@ -154,19 +166,21 @@ public class ChadCam : ScriptComponent
 
     public override void FixedUpdate()
     {
-        switch (Chad.State)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
-            case ChadControls.STATE.THROWING:
-                transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
-                break;
-            case ChadControls.STATE.RAGDOLL:
-                transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
-                break;
-            default:
-                transform.position = ChadHead - transform.forward * CameraOffset;
-                break;
+            switch (Chad.State)
+            {
+                case ChadControls.STATE.THROWING:
+                    transform.position = ChadHead + ThrowingOffset.z * -transform.forward + ThrowingOffset.x * transform.right + ThrowingOffset.y * transform.up;
+                    break;
+                case ChadControls.STATE.RAGDOLL:
+                    transform.position = Chad.Ragdoll.GetHips().transform.position + new Vector3(0, 0.8f, 0) + CameraOffset * -transform.forward; //magic number
+                    break;
+                default:
+                    transform.position = ChadHead - transform.forward * CameraOffset;
+                    break;
+            }
         }
-        
     }
 
     public void ResetCamera()
