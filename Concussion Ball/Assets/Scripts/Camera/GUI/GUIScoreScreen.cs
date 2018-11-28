@@ -89,7 +89,7 @@ public class GUIScoreScreen : ScriptComponent
     public void updateTextPlayAgain()
     {
         
-        Textdatalist[1].text = "Play again:" + (Timedisplay -= 1);
+        Textdatalist[1].text = "Play again: " + (Timedisplay -= 1);
     }
 
 
