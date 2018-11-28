@@ -23,6 +23,11 @@ namespace thomas
 			return m_path;
 		}
 
+		void Resource::SetPath(std::string path)
+		{
+			m_path = path;
+		}
+
 		void Resource::Rename(std::string newPath)
 		{
 			m_path = newPath;

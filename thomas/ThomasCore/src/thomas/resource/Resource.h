@@ -12,6 +12,9 @@ namespace thomas
 			virtual ~Resource() {};
 			std::string GetName();
 			std::string GetPath();
+			/* Set path, don't ever do this... 
+			*/
+			void SetPath(std::string path);
 
 			void Rename(std::string newPath);
 			void Reload();

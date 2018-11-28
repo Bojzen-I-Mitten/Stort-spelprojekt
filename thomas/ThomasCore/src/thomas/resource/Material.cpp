@@ -259,6 +259,17 @@ namespace thomas
 				return nullptr;
 			}
 		}
+		resource::TextureCube *Material::GetCubeMap(const std::string & name)
+		{
+			if (HasProperty(name) && m_properties[name]->GetType() == shaderproperty::ShaderProperty::Type::TEXTURECUBE)
+			{
+				return ((shaderproperty::ShaderPropertyTextureCube*)m_properties[name].get())->GetValue();
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
 		void Material::SetTexture2D(const std::string & name, resource::Texture2D* value)
 		{
 			Lock();

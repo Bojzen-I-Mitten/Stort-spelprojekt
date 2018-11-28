@@ -16,6 +16,7 @@ namespace thomas
 	{
 		namespace shaderproperty { class ShaderProperty; }
 		class Texture2D;
+		class TextureCube;
 		class Shader;
 		class Material : public Resource
 		{
@@ -56,6 +57,7 @@ namespace thomas
 			void SetMatrix(const std::string& name, math::Matrix& value);
 
 			resource::Texture2D* GetTexture2D(const std::string& name);
+			resource::TextureCube * GetCubeMap(const std::string & name);
 			void SetTexture2D(const std::string& name, resource::Texture2D* value);
 
 			math::Vector4 GetVector(const std::string& name);
