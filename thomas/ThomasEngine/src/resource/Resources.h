@@ -10,9 +10,27 @@ namespace ThomasEngine
 	public ref class Resources
 	{
 	private:
+		ref class AssetLoadWorker
+		{
+		private:
+			String^ file; 
+			System::Threading::CountdownEvent^ countdown;
+
+		public:
+			AssetLoadWorker(String^ file, System::Threading::CountdownEvent^ countdown)
+			{
+				this->file = file;
+				this->countdown = countdown;
+			}
+			void LoadAsset(System::Object ^state);
+		};
 		static Object^ resourceLock = gcnew Object();
 		static Dictionary<String^, Resource^>^ resources = gcnew Dictionary<String^, Resource^>();
 		static Dictionary<String^, GameObject^>^ s_PREFAB_DICT = gcnew Dictionary<String^, GameObject^>();
+		/* Load a list of asset using assetworker*/
+		static System::Threading::CountdownEvent^ LoadAssetFiles(List<String^>^ files);
+		/* Load assets on the same thread. */
+		static void LoadAssetFilesSynced(List<String^>^ files);
 	internal:
 
 	public:
@@ -49,7 +67,7 @@ namespace ThomasEngine
 		/* Load a prefab as an editor resource, and not to be used.
 		*/
 		static GameObject ^ LoadPrefabResource(String^ path);
-
+		
 #ifdef _EDITOR
 		/* Synchronous access to prefab list
 		*/
@@ -68,6 +86,8 @@ namespace ThomasEngine
 
 		static AssetTypes GetResourceAssetType(String^ path);
 		static bool IsResource(String^ path);
+
+		static bool IsResource(AssetTypes type);
 
 		static String^ ConvertToThomasPath(String^ value);
 		static String^ ConvertToRealPath(String^ value);
@@ -99,6 +119,7 @@ namespace ThomasEngine
 
 
 		static void Unload(Resource^ resource);
+
 
 		static void LoadAll(String^ path);
 

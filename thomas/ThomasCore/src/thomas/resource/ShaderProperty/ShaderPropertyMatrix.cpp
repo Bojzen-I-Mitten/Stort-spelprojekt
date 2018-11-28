@@ -38,8 +38,10 @@ namespace thomas
 			{
 			}
 			ShaderPropertyMatrixArray::ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int num_matrix)
-				: ShaderPropertyMatrixArray(value, 0, num_matrix)
-			{	}
+				: ShaderProperty(Type::MATRIX_ARRAY), m_value(new math::Matrix[num_matrix]), m_offset(0), m_num_matrix(num_matrix)
+			{	
+				std::memcpy(m_value.get(), value, num_matrix * sizeof(math::Matrix));
+			}
 			ShaderPropertyMatrixArray::ShaderPropertyMatrixArray(const math::Matrix * value, unsigned int offset, unsigned int num_matrix)
 				: ShaderProperty(Type::MATRIX_ARRAY), m_value(new math::Matrix[num_matrix]), m_offset(offset), m_num_matrix(num_matrix)
 			{
@@ -53,7 +55,8 @@ namespace thomas
 			void ShaderPropertyMatrixArray::Apply(std::string name, Shader* shader) const
 			{
 
-				shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrixTransposeArray(reinterpret_cast<const float*>(m_value.get()[0][0]), m_offset, m_num_matrix);
+				HRESULT hr = shader->GetEffect()->GetVariableByName(name.c_str())->AsMatrix()->SetMatrixTransposeArray(reinterpret_cast<const float*>(m_value.get()[0][0]), m_offset, m_num_matrix);
+				int stop = 0;
 			}
 			ShaderProperty* ShaderPropertyMatrixArray::GetDefault()
 			{

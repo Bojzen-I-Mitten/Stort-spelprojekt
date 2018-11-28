@@ -19,6 +19,54 @@ namespace ThomasEditor.Inspectors
         {
             InitializeComponent();
         }
+        /* Apply a resource property to an item
+        */
+        private void SetResourceProperty(PropertyItem pi, Resource res)
+        {
+            if (res.GetType() == pi.PropertyType)
+            {
+                ThomasWrapper.ENTER_SYNC_STATELOCK();
+                pi.Value = res;
+                ThomasWrapper.EXIT_SYNC_STATELOCK();
+            }
+        }
+        /* Apply a resource to a button
+         */
+        private void SetButtonResource(Button b, Resource res)
+        {
+            PropertyItem pi = b.DataContext as PropertyItem;
+            if(pi != null)
+            {
+                SetResourceProperty(pi, res);
+            }
+        }
+        private void SetResource(object target, Resource res)
+        {
+            if (target is ContentControl)
+            {
+                ContentControl label = target as ContentControl;
+                PropertyItem pi = label.DataContext as PropertyItem;
+                SetResourceProperty(pi, res);
+            }
+            else if (target is Button)
+            {
+                Button b = target as Button;
+                SetButtonResource(b, res);
+            }
+            else if(target is Grid)
+            {
+                Grid g = target as Grid;
+                foreach( object o in g.Children)
+                {
+                    SetResource(o, res);
+                }
+            }
+            else
+            {
+                String n = target == null ? "NULL" : target.GetType().ToString();
+                Debug.LogWarning("Item: " + n + " does not support drop operations.");
+            }
+        }
 
         private void ResourceEditor_Drop(object sender, DragEventArgs e)
         {
@@ -29,15 +77,7 @@ namespace ThomasEditor.Inspectors
                 if (item.DataContext is Resource)
                 {
                     Resource resource = item.DataContext as Resource;
-                    ContentControl label = sender as ContentControl;
-                    PropertyItem pi = label.DataContext as PropertyItem;
-                    if (resource.GetType() == pi.PropertyType)
-                    {
-                        ThomasWrapper.ENTER_SYNC_STATELOCK();
-                        pi.Value = resource;
-                        ThomasWrapper.EXIT_SYNC_STATELOCK();
-                    }
-
+                    SetResource(sender, resource);
                 }
                 else if (item.DataContext is ThomasEngine.Object)
                 {
@@ -72,9 +112,12 @@ namespace ThomasEditor.Inspectors
                 {
                     Resource resource = item.DataContext as Resource;
                     ContentControl label = sender as ContentControl;
-                    PropertyItem pi = label.DataContext as PropertyItem;
-                    if (resource.GetType() == pi.PropertyType)
-                        e.Handled = true;
+                    if (label != null && resource != null) // Verify objects are valid...
+                    {
+                        PropertyItem pi = label.DataContext as PropertyItem;
+                        if (resource.GetType() == pi.PropertyType)
+                            e.Handled = true;
+                    }
                 }
             }
 

@@ -37,6 +37,7 @@
     <ClCompile Include="src\thomas\graphics\animation\playback\BinaryBlendNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\playback\EmptyPlayback.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
+    <ClCompile Include="src\thomas\graphics\ChadowMapping.cpp" />
     <ClCompile Include="src\thomas\graphics\render\CameraList.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\playback\EmptyPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
+    <ClInclude Include="src\thomas\graphics\ChadowMapping.h" />
     <ClInclude Include="src\thomas\graphics\GUI\GUIElements.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />

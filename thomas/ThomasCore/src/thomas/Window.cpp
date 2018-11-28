@@ -57,7 +57,7 @@ namespace thomas
 	{
 		m_input.Init();
 
-		bool result = GetWindowRect(hWnd, &m_windowRectangle);
+		bool result = GetClientRect(hWnd, &m_windowRectangle);
 		if (result)
 		{
 			m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
@@ -106,14 +106,14 @@ namespace thomas
 
 	bool Window::Resize()
 	{
-		bool result = GetWindowRect(m_windowHandler, &m_windowRectangle);
+		bool result = GetClientRect(m_windowHandler, &m_windowRectangle);
 		if (result)
 		{
-			LONG newWidth = m_windowRectangle.right - m_windowRectangle.left;
-			LONG newHeight = m_windowRectangle.bottom - m_windowRectangle.top;
+			LONG newWidth = m_windowRectangle.right;
+			LONG newHeight = m_windowRectangle.bottom;
 
-			if (m_height == newHeight && m_width == newWidth)
-				return false;
+			//if (m_height == newHeight && m_width == newWidth)
+			//	return false;
 			m_height = newHeight;
 			m_width = newWidth;
 

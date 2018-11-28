@@ -11,6 +11,7 @@ namespace thomas
 			enum GTS
 			{
 				GTS_BEGIN_FRAME,
+				GTS_SHADOWS,
 				GTS_MAIN_OBJECTS,
 				GTS_PARTICLES,
 				GTS_GIZMO_OBJECTS,

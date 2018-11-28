@@ -29,18 +29,18 @@ namespace thomas
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
 			m_shaders.SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
 
-			LightManager::Bind(&m_shaders);
+			LightManager::BindLights(&m_shaders);
 		}
 
 		constexpr uint32_t NUM_STRUCT = 200;
 		constexpr uint32_t NUM_MATRIX = 5000;
-		Renderer::Renderer()	: 
-			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)), 
+		Renderer::Renderer() :
+			m_frame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)),
 			m_prevFrame(new render::Frame(NUM_STRUCT, 64 * NUM_MATRIX)),
 			m_shaders(),
 			m_cameras()
 		{
-			
+			m_enableShadows = true;
 		}
 
 		Renderer::~Renderer()
@@ -159,7 +159,6 @@ namespace thomas
 			return m_shaders.GetStandardShader();
 		}
 
-
 		void Renderer::BindObject(render::RenderCommand &rC)
 		{
 			rC.material->SetMatrix(THOMAS_MATRIX_WORLD, rC.worldMatrix.Transpose());
@@ -179,23 +178,40 @@ namespace thomas
 				PROFILE("BindFrame")
 				BindFrame();
 			}
+			
+			if (m_enableShadows)
+			{
+				for (auto & perCameraQueue : m_prevFrame->m_queue)
+				{
+					object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+
+					LightManager::DrawShadows(perCameraQueue.second, camera);
+				}
+			}
+
+			profiler->Timestamp(utils::profiling::GTS_SHADOWS);
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
-				
-				PROFILE("PerCameraDraw")
+				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
+
 				{
 					PROFILE("CameraBind")
 					BindCameraRenderTarget(perCameraQueue.second.m_frameData);
 				}
 				// Skyboxes should be submitted!
-				object::component::Camera* camera = m_cameras.getCamera(perCameraQueue.first);
 				{
 					PROFILE("CameraDrawSkybox")
 					if (camera && camera->hasSkybox())
 						camera->DrawSkyBox();
 				}
+
 				// Draw objects
+				if (m_enableShadows)
+				{
+					LightManager::BindShadows(&m_shaders);
+				}
+
 				{
 					PROFILE("CameraDrawObjects")
 					for (auto & perMaterialQueue : perCameraQueue.second.m_commands3D)
@@ -203,6 +219,8 @@ namespace thomas
 						auto material = perMaterialQueue.first;
 						{
 							PROFILE("BindMaterial")
+							
+							
 							material->Bind();
 						}
 						{
@@ -222,7 +240,7 @@ namespace thomas
 					}
 				}
 			}
-	
+
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
 			{

@@ -498,7 +498,8 @@ namespace thomas
 
 			GetTransform()->LookAt(combinedBox.Center);
 			GetTransform()->SetPosition(combinedBox.Center);
-			GetTransform()->Translate(-GetTransform()->Forward()*combinedBox.Extents*5.0f);
+			float dist = std::fmin(math::Vector3(combinedBox.Extents).Length(), 150.f);
+			GetTransform()->Translate(-GetTransform()->Forward()*dist);
 		}
 	}
 }

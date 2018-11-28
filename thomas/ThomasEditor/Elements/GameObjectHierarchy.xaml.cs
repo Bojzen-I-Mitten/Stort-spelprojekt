@@ -33,6 +33,8 @@ namespace ThomasEditor
         public ObservableCollection<TreeItemViewModel> m_hierarchyNodes { get; set; }
         List<GameObject> m_copiedObjects = new List<GameObject>(); //??correct code convention?
         public static GameObjectHierarchy instance;
+
+        public bool updateHiearchyParenting = true;
         public GameObjectHierarchy()
         {
             InitializeComponent();
@@ -91,7 +93,8 @@ namespace ThomasEditor
             if (oldParent == newParent || !child.gameObject)
                 return;
 
-            ResetTreeView();
+            if(updateHiearchyParenting)
+                ResetTreeView();
             //this.Dispatcher.BeginInvoke((Action)(() =>
             //{
             //    if (oldParent == newParent || !child.gameObject)
@@ -363,7 +366,10 @@ namespace ThomasEditor
             {
                 if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform && !CheckIfChild(node, parentTransform))
                 {
-                    ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
+                    GameObject child = node.Data as GameObject;
+                    GameObject parent = parentTransform == null ? null : parentTransform.gameObject;
+                    ThomasWrapper.IssueCommand(new ParentObjectCommand(child, parent));
+                    //((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
                 }
                 ChangeParent(parentTransform, node.Children);
             }
@@ -432,9 +438,7 @@ namespace ThomasEditor
                                 {
                                     Type componentToAdd = componentList[i] as Type;
 
-                                    var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
-                                    method.Invoke(targetModel, null);
-
+                                    ThomasWrapper.IssueCommand(new AddComponentCommand(targetModel, componentToAdd));
                                     Debug.Log("Script found and added.");
                                 }
                             }
@@ -610,14 +614,11 @@ namespace ThomasEditor
             if (m_copiedObjects.Count > 0)
             {
                 DetachParent();
-                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Unsubscribe(SceneGameObjectsChanged);
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
                     GameObject.Instantiate(copiedObject);
                     Debug.Log("Pasted object.");
                 }
-                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
-                ResetTreeView();
                 return;
             }
         }

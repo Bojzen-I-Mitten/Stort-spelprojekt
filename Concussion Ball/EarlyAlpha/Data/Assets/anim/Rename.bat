@@ -1,1 +1,0 @@
-ren *.fbx *.anim

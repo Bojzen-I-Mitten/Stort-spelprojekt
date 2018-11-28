@@ -31,7 +31,8 @@ namespace ThomasEditor.Inspectors
         private void ListEditor_Loaded(object sender, RoutedEventArgs e)
         {
             PropertyItem pi = DataContext as PropertyItem;
-            elementType = pi.PropertyType.GetGenericArguments().Single();
+            elementType = pi.PropertyType.GetElementType();
+            listCounter.Visibility = pi.PropertyType.IsArray ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void PropertyGridEditorIntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -157,6 +158,8 @@ namespace ThomasEditor.Inspectors
         {
             ICollectionView view = CollectionViewSource.GetDefaultView(listView.ItemsSource);
             view.Refresh();
+            PropertyItem pi = DataContext as PropertyItem;
+            pi.Value = pi.Value;
         }
     }
 }

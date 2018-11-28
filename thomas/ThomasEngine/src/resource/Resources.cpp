@@ -152,6 +152,10 @@ namespace ThomasEngine
 			AssetTypes type = GetResourceAssetType(path);
 			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
 		}
+		bool Resources::IsResource(AssetTypes type)
+		{
+			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
+		}
 
 		Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
 		{
@@ -204,16 +208,15 @@ namespace ThomasEngine
 		}
 		Resource^ Resources::Load(String^ path, String^ thomasPath)
 		{
+			Monitor::Enter(resourceLock);
+			Resource^ obj;
 			if (resources->ContainsKey(thomasPath))
 			{
-				Resource^ obj = resources[thomasPath];
-				return obj;
+				obj = resources[thomasPath];
 			}
 			else
 			{
 				float startTime = Time::ElapsedTime;
-				
-				Resource^ obj;
 				AssetTypes type = GetResourceAssetType(path);
 				try {
 					if (!System::IO::File::Exists(path))
@@ -271,9 +274,9 @@ namespace ThomasEngine
 
 				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
 
-				return obj;
 			}
-
+			Monitor::Exit(resourceLock);
+			return obj;
 		}
 #pragma region PreFab
 
@@ -345,6 +348,87 @@ namespace ThomasEngine
 		}
 #endif
 
+		void Resources::AssetLoadWorker::LoadAsset(System::Object ^state)
+		{
+			try
+			{
+				LoadSysPath(file);
+				OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
+			finally
+			{
+				countdown->Signal();
+			}
+		}
+
+		CountdownEvent^ Resources::LoadAssetFiles(List<String^>^ files)
+		{
+			using namespace System::Threading;
+
+			auto counter = gcnew CountdownEvent(files->Count);
+			// Start workers.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetLoadWorker^ w = gcnew AssetLoadWorker(files[i], counter);
+				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
+			}
+			// Wait for workers.
+			return counter;
+		}
+		/* Load assets on same thread.
+		*/
+		void Resources::LoadAssetFilesSynced(List<String^>^ files)
+		{
+			// Start work.
+			for (int i = 0; i < files->Count; i++)
+			{
+				LoadSysPath(files[i]);
+				//OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
+		}
+
+		void Resources::LoadAll(String^ path)
+		{
+			//array<String^>^ directories = IO::Directory::GetDirectories(path);
+			List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
+			List<String^>^ shaderFiles = gcnew List<String^>();
+			List<String^>^ materialFiles =  gcnew List<String^>();
+			/*for each(String^ dir in directories)
+			{
+				LoadAll(dir);
+			}*/
+
+			// Sort on asset type(s), to load files with dependencies in order.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetTypes type = GetResourceAssetType(files[i]);
+				if (!IsResource(type)) {
+					files->RemoveAt(i);
+					--i;
+				}
+				else if (type == AssetTypes::MATERIAL)
+				{
+					materialFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
+				else if (type == AssetTypes::SHADER)
+				{
+					shaderFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
+			}
+			OnResourceLoadStarted();
+			auto counter = LoadAssetFiles(files);
+			counter->Wait(); 
+			counter = LoadAssetFiles(shaderFiles);
+			counter->Wait();
+			counter = LoadAssetFiles(materialFiles);
+			counter->Wait();
+			OnResourceLoadEnded();
+		}
+
 #pragma endregion
 		generic<typename T>
 			where T : Resource
@@ -370,39 +454,10 @@ namespace ThomasEngine
 				}
 			}
 
-			void Resources::LoadAll(String^ path)
-			{
-				//array<String^>^ directories = IO::Directory::GetDirectories(path);
-				List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
-				/*for each(String^ dir in directories)
-				{
-					LoadAll(dir);
-				}*/
-
-				for (int i = 0; i < files->Count; i++)
-				{
-					if (!IsResource(files[i])) {
-						files->RemoveAt(i);
-						--i;
-					}
-						
-				}
-
-				OnResourceLoadStarted();
-				for (int i = 0; i < files->Count; i++)
-				{
-					OnResourceLoad(files[i], i, files->Count);
-					LoadSysPath(files[i]);
-				}
-				OnResourceLoadEnded();
-			}
 
 			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
+				if(resources->Remove(ConvertToThomasPath(resource->m_path)))
 					delete resource;
-				}
 			}
 
 			void recursivePrefabDestruction(GameObject^ obj)
