@@ -6,6 +6,7 @@
 namespace thomas {
 	namespace graphics {
 
+		const static std::string THOMAS_TIME("thomas_Time");
 		const static std::string THOMAS_DELTA_TIME("thomas_DeltaTime");
 
 

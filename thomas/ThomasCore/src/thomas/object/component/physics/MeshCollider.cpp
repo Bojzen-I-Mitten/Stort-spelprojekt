@@ -44,7 +44,7 @@ namespace thomas
 			{
 				if (!m_concave)
 				{
-					Collider::Update();
+					//Collider::Update();
 				}
 
 			}
