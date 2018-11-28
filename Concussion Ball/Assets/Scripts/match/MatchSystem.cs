@@ -20,6 +20,7 @@ public class MatchSystem : NetworkManager
 {
     public Dictionary<TEAM_TYPE, Team> Teams { get; set; }
 
+    public WaitForSecondsRealtime PlayAgain;//toggle how long
     public GameObject BallPrefab { get; set; }
     public GameObject Ball;
 
@@ -208,8 +209,20 @@ public class MatchSystem : NetworkManager
         ChadHud.Instance.OnMatchEnd(winningTeam, duration);
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
-        RPCStartMatch();
-
+        
+	GUIScoreScreen.Instance.Toggle(false);
+        for(int i=0;i<GUIScoreScreen.Instance.ScoreScreenTimeLast;i++)
+        {
+            GUIScoreScreen.Instance.updateTextPlayAgain();
+            PlayAgain = new WaitForSecondsRealtime(1);//toggle how long
+            yield return PlayAgain;
+            if (GUIScoreScreen.Instance.getToggleBool())
+                break;
+        }
+	RPCStartMatch();
+	
+	GUIScoreScreen.Instance.Toggle(true);
+        GUIPlayerScore.Instance.Toggle = false;
     }
 
     IEnumerator RoundStartCountdown(float duration)
@@ -242,8 +255,13 @@ public class MatchSystem : NetworkManager
         ReplaySystem.StartReplay(teamThatScored);
         yield return new WaitForSecondsRealtime(ReplaySystem.durationInSeconds + 1.0f);
         ReplaySystem.recordGame = true;
-        OnRoundEnd();
-        OnRoundStart();
+        if (GoldenGoal)
+            OnMatchEnd();
+        else
+        {
+            OnRoundEnd();
+            OnRoundStart();
+        }
     }
 #endregion
 
@@ -301,10 +319,7 @@ public class MatchSystem : NetworkManager
         TEAM_TYPE type = (TEAM_TYPE)teamType;
         Team team = FindTeam(type);
         team?.AddScore();
-        if (GoldenGoal)
-            OnMatchEnd();
-        else
-            StartCoroutine(OnGoalCoroutine(team));
+        StartCoroutine(OnGoalCoroutine(team));
     }
 
 #endregion

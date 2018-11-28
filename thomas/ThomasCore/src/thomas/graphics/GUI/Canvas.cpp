@@ -35,25 +35,21 @@ namespace thomas
 			void Canvas::Render()
 			{
 				if (m_spriteBatch != nullptr && m_render)
-				{		
+				{
 					math::Matrix matrix = math::Matrix::Identity;
 					m_spriteBatch->SetViewport(GetViewport());
 					if (Get3D())
 					{
 						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
-						m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, m_spriteStates->DepthRead(), m_spriteStates->CullNone(), nullptr, matrix);
 					}
-					else
-					{
-						m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
-					}
+					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
 
 					Vector2 vpScale(GetViewport().width / 1920.0f, GetViewport().height / 1080.0f);
 					for (int i = 0; i < m_GUIElements.size(); ++i)
 					{
 						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport(), vpScale);
 					}
-					
+
 					m_spriteBatch->End();
 				}
 			}
@@ -65,16 +61,16 @@ namespace thomas
 
 				Viewport camViewport = m_camera->GetViewport();
 				return Viewport(
-					camViewport.x + m_viewport.x * camViewport.width, 
+					camViewport.x + m_viewport.x * camViewport.width,
 					camViewport.y + m_viewport.y * camViewport.height,
-					m_viewport.width * camViewport.width, 
+					m_viewport.width * camViewport.width,
 					m_viewport.height * camViewport.height);
 			}
 
 			Vector2 Canvas::GetViewportScale()
 			{
 				Viewport vp = GetViewport();
-				return Vector2(vp.width / 1920.f , vp.height / 1080.f);
+				return Vector2(vp.width / 1920.f, vp.height / 1080.f);
 			}
 
 			void Canvas::SetViewport(Viewport viewport)
@@ -132,7 +128,7 @@ namespace thomas
 			}
 			void Canvas::Set3D(bool value)
 			{
-				if(value)
+				if (value)
 					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
 				else
 					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);

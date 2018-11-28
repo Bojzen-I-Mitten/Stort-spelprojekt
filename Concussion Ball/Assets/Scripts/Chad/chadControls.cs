@@ -227,10 +227,12 @@ public class ChadControls : NetworkComponent
 #if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {
-            Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (-transform.forward + transform.up * 0.5f) * 2000, 1);
+            Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (/*-transform.forward +*/ transform.up * 0.5f) * 200000, 1);
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
 #endif
+        if (Input.GetKeyDown(Input.Keys.J))
+            Debug.Log(rBody.Position);
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
@@ -273,7 +275,7 @@ public class ChadControls : NetworkComponent
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
         //gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
-        gameObject.GetComponent<Rigidbody>().enabled = true;
+        rBody.enabled = true;
 
         // call coroutine function that sets canragdoll true
         RagdollRecoverer = RagdollRecovery();
@@ -371,11 +373,6 @@ public class ChadControls : NetworkComponent
     #region Input handling
     private void HandleKeyboardInput()
     {
-        //if (Input.GetKeyUp(Input.Keys.Escape))
-        //{
-        //    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        //}
-
         if (Locked)
             return;
 
@@ -427,13 +424,6 @@ public class ChadControls : NetworkComponent
 
     private void HandleMouseInput()
     {
-        //Focus stuff
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-        }
-
-
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
@@ -599,6 +589,7 @@ public class ChadControls : NetworkComponent
 
     public void Reset()
     {
+        DisableRagdoll();
         State = STATE.CHADING;
         if (Diving != null)
         {
@@ -647,14 +638,13 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             yield return new WaitForSeconds(duration);
-            //float timer = 0;
 
-            while (Ragdoll.DistanceToWorld() >= 0.75f/* && timer < 5*/)
+            while (Ragdoll.DistanceToWorld() >= 0.75f)
             {
-                //timer += Time.DeltaTime;
                 yield return null;
             }
-            yield return new WaitForSeconds(1);
+            Debug.Log("The ground has been reached.");
+            yield return new WaitForSeconds(2);
             State = STATE.CHADING;
             CurrentVelocity.y = BaseSpeed;
         }
@@ -803,6 +793,7 @@ public class ChadControls : NetworkComponent
             reader.GetVector2();
             reader.GetBool();
             reader.GetBool();
+            reader.GetBool();
             return;
         }
 
@@ -823,6 +814,9 @@ public class ChadControls : NetworkComponent
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
         CanBeTackled = reader.GetBool();
+        if(!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        Animations.Throwing = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -833,6 +827,9 @@ public class ChadControls : NetworkComponent
         writer.Put(CurrentVelocity);
         writer.Put(HasThrown);
         writer.Put(CanBeTackled);
+        if (!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        writer.Put(Animations.Throwing);
         return true;
     }
 
