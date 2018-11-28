@@ -372,15 +372,7 @@ namespace thomas
 		}
 		HRESULT __stdcall DankDevice::CreateDeferredContext(UINT ContextFlags, ID3D11DeviceContext ** ppDeferredContext)
 		{
-			static int m_count;
-
 			HRESULT hr = m_device->CreateDeferredContext(ContextFlags, ppDeferredContext);
-
-			m_count += 1;
-			std::string name = "DeferredContext" + std::to_string(m_count);
-			profiling::ProfileManager::storeVramSample(name, profiling::GpuProfiler::Instance()->GetMemoryUsage());
-			m_deviceContext->Flush();
-
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::OpenSharedResource(HANDLE hResource, REFIID ReturnedInterface, void ** ppResource)
