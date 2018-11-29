@@ -105,6 +105,8 @@ namespace thomas
 
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
 				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
+				j["SlowfilerData"]["build"]["contextSwitches"] = s_contextSwitch.load();
+
 				/*
 
 				j["SlowfilerData"]["timeline"];
