@@ -53,7 +53,7 @@ public class GUISelectTeam : ScriptComponent
 
             Material[] mats = ChadRSC1.materials;
 
-            Chad1Mat = mats[1] = new Material(mats[1]);
+            Chad1Mat = mats[0] = new Material(mats[0]);
 
             ChadRSC1.materials = mats;
 
@@ -65,7 +65,7 @@ public class GUISelectTeam : ScriptComponent
 
             Material[] mats = ChadRSC2.materials;
 
-            Chad2Mat = mats[1] = new Material(mats[1]);
+            Chad2Mat = mats[0] = new Material(mats[0]);
 
             ChadRSC2.materials = mats;
         }
