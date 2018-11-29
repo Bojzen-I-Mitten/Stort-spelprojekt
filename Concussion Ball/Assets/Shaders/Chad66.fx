@@ -6,7 +6,6 @@
 Texture2D diffuseTex;
 Texture2D normalTex : NORMALTEXTURE;
 Texture2D specularTex;
-Texture2D maskTex;
 Texture2D shirtPattern;
 
 cbuffer MATERIAL_PROPERTIES
@@ -105,8 +104,10 @@ v2f vert(appdata_chad_skin v)
 
 float4 frag(v2f input) : SV_TARGET
 {
+    // Base texture
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
-    diffuse *= maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
+    // TeamColor
+    diffuse *= color;
     // Mix in shirt pattern
     float3 shirtDiffuse = shirtPattern.Sample(StandardWrapSampler, input.shirtCoord);
     if(shirtDiffuse.r < 0.8f)

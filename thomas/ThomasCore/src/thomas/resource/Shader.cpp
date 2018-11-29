@@ -80,8 +80,7 @@ namespace thomas
 						{
 							D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 							vs->GetInputSignatureElementDesc(vsPassDesc.ShaderIndex, iInput, &paramDesc);
-
-							Semantics semantic = GetSemanticFromName(paramDesc.SemanticName);
+							Semantics semantic = GetSemanticFromName(paramDesc.SemanticName, paramDesc.SemanticIndex);
 
 							D3D11_INPUT_ELEMENT_DESC elementDesc;
 							elementDesc.SemanticName = paramDesc.SemanticName;
@@ -441,7 +440,7 @@ namespace thomas
 		{
 			graphics::Renderer::Instance()->getShaderList().QueueRecompile();
 		}
-		Shader::Semantics Shader::GetSemanticFromName(std::string semanticName)
+		Shader::Semantics Shader::GetSemanticFromName(std::string semanticName, uint32_t semanticIndex)
 		{
 			if (semanticName.find("BINORMAL") != std::string::npos)
 			{
@@ -481,7 +480,7 @@ namespace thomas
 			}
 			else if (semanticName.find("TEXCOORD") != std::string::npos)
 			{
-				return Semantics::TEXCOORD;
+				return Semantics((int)Semantics::TEXCOORD + semanticIndex);
 			}
 			else if (semanticName.find("BITANGENT") != std::string::npos)
 			{
