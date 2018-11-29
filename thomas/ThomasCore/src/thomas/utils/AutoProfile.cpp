@@ -18,7 +18,7 @@ namespace thomas
 			{
 				if (m_processor_ID != GetCurrentProcessorNumber())
 				{
-					// Pipeline will guess false
+					ProfileManager::increaseContextSwitches();
 				}	
 				else
 				{
