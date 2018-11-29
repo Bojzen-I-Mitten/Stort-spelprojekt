@@ -605,6 +605,10 @@ namespace ThomasEngine {
 	{
 		return transform->children;
 	}
+	GameObject^ GameObject::Parent::get()
+	{
+		return transform->parent != nullptr ? transform->parent->gameObject : nullptr;
+	}
 
 	void GameObject::transform::set(Transform^ value)
 	{
