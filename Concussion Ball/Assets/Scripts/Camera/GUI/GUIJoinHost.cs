@@ -191,131 +191,131 @@ public class GUIJoinHost : ScriptComponent
     }
 
     public void AddImagesAndText()
-{
-    Canvas = Camera.AddCanvas();
-
-    IPText = Canvas.Add(IPString);
-    IPText.origin = new Vector2(0.5f);
-    IPText.position = new Vector2(0.2f, 0.15f);
-    IPText.color = Color.Black;
-    IPText.depth = 0.8f;
-
-    PortText = Canvas.Add(PortString);
-    PortText.origin = new Vector2(0.5f);
-    PortText.position = new Vector2(0.2f, 0.35f);
-    PortText.color = Color.Black;
-    PortText.depth = 0.8f;
-
-    IP = Canvas.Add("IP");
-    IP.origin = new Vector2(0.5f);
-    IP.position = new Vector2(0.2f, 0.08f);
-    IP.scale = new Vector2(0.7f);
-    IP.color = Color.FloralWhite;
-    IP.depth = 0.9f;
-
-    Port = Canvas.Add("Port");
-    Port.origin = new Vector2(0.5f);
-    Port.position = new Vector2(0.2f, 0.28f);
-    Port.scale = new Vector2(0.7f);
-    Port.color = Color.FloralWhite;
-    Port.depth = 0.9f;
-
-    if (TextBox != null)
     {
-        TextBoxIP = Canvas.Add(TextBox);
-        TextBoxIP.origin = new Vector2(0.5f);
-        TextBoxIP.position = new Vector2(0.2f, 0.15f);
-        TextBoxIP.interactable = true;
-        TextBoxIP.depth = 0.8f;
-        TextBoxIP.color = Color.Black;
+        Canvas = Camera.AddCanvas();
 
-        TextBoxPort = Canvas.Add(TextBox);
-        TextBoxPort.origin = new Vector2(0.5f);
-        TextBoxPort.position = new Vector2(0.2f, 0.35f);
-        TextBoxPort.interactable = true;
-        TextBoxPort.depth = 0.8f;
-        TextBoxPort.color = Color.Black;
-    }
+        IPText = Canvas.Add(IPString);
+        IPText.origin = new Vector2(0.5f);
+        IPText.position = new Vector2(0.2f, 0.15f);
+        IPText.color = Color.Black;
+        IPText.depth = 0.8f;
 
-    if (TextBoxBG != null)
-    {
-        TextBoxBGIP = Canvas.Add(TextBoxBG);
-        TextBoxBGIP.origin = new Vector2(0.5f);
-        TextBoxBGIP.position = new Vector2(0.2f, 0.15f);
-        TextBoxBGIP.depth = 0.9f;
-        TextBoxBGIP.color = Color.FloralWhite;
+        PortText = Canvas.Add(PortString);
+        PortText.origin = new Vector2(0.5f);
+        PortText.position = new Vector2(0.2f, 0.35f);
+        PortText.color = Color.Black;
+        PortText.depth = 0.8f;
 
-        TextBoxBGPort = Canvas.Add(TextBoxBG);
-        TextBoxBGPort.origin = new Vector2(0.5f);
-        TextBoxBGPort.position = new Vector2(0.2f, 0.35f);
-        TextBoxBGPort.depth = 0.9f;
-        TextBoxBGPort.color = Color.FloralWhite;
-    }
+        IP = Canvas.Add("IP");
+        IP.origin = new Vector2(0.5f);
+        IP.position = new Vector2(0.2f, 0.08f);
+        IP.scale = new Vector2(0.7f);
+        IP.color = Color.FloralWhite;
+        IP.depth = 0.9f;
 
-    if (TextBoxIP != null)
-    {
-        Join = Canvas.Add("Join");
-        Join.origin = new Vector2(0.5f);
-        Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.15f);
-        Join.interactable = true;
-        Join.depth = 0.9f;
-        Join.color = Color.FloralWhite;
-    }
+        Port = Canvas.Add("Port");
+        Port.origin = new Vector2(0.5f);
+        Port.position = new Vector2(0.2f, 0.28f);
+        Port.scale = new Vector2(0.7f);
+        Port.color = Color.FloralWhite;
+        Port.depth = 0.9f;
 
-    if (TextBoxPort != null)
-    {
-        Host = Canvas.Add("Host");
-        Host.origin = new Vector2(0.5f);
-        Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.35f);
-        Host.interactable = true;
-        Host.depth = 0.9f;
-        Host.color = Color.FloralWhite;
-    }
-
-    Back = Canvas.Add("Back");
-    Back.origin = new Vector2(0.5f);
-    Back.position = new Vector2(0.575f, 0.36f);
-    Back.interactable = true;
-    Back.depth = 0.9f;
-    Back.color = Color.FloralWhite;
-
-    ConnectingText = Canvas.Add("");
-    ConnectingText.origin = new Vector2(0.5f);
-    ConnectingText.color = Color.FloralWhite;
-    ConnectingText.depth = 0;
-    ConnectingText.position = new Vector2(0.5f, 0.75f);
-}
-
-public void ClearImagesAndText()
-{
-    Canvas.Remove(Join);
-    Canvas.Remove(Host);
-    Canvas.Remove(Back);
-    Canvas.Remove(TextBoxIP);
-    Canvas.Remove(TextBoxPort);
-    Canvas.Remove(ConnectingText);
-
-    Canvas.Remove(IPText);
-    Canvas.Remove(PortText);
-    Canvas.Remove(IP);
-    Canvas.Remove(Port);
-}
-
-IEnumerator Connecting()
-{
-    int ticks = 0;
-    while (true)
-    {
-        ++ticks;
-        if ((ticks % 4) == 0)
+        if (TextBox != null)
         {
-            ConnectingText.text = "Connecting";
-            ticks = 0;
-        }
-        else
-            ConnectingText.text += ".";
+            TextBoxIP = Canvas.Add(TextBox);
+            TextBoxIP.origin = new Vector2(0.5f);
+            TextBoxIP.position = new Vector2(0.2f, 0.15f);
+            TextBoxIP.interactable = true;
+            TextBoxIP.depth = 0.8f;
+            TextBoxIP.color = Color.Black;
 
-        yield return new WaitForSecondsRealtime(0.25f);
+            TextBoxPort = Canvas.Add(TextBox);
+            TextBoxPort.origin = new Vector2(0.5f);
+            TextBoxPort.position = new Vector2(0.2f, 0.35f);
+            TextBoxPort.interactable = true;
+            TextBoxPort.depth = 0.8f;
+            TextBoxPort.color = Color.Black;
+        }
+
+        if (TextBoxBG != null)
+        {
+            TextBoxBGIP = Canvas.Add(TextBoxBG);
+            TextBoxBGIP.origin = new Vector2(0.5f);
+            TextBoxBGIP.position = new Vector2(0.2f, 0.15f);
+            TextBoxBGIP.depth = 0.9f;
+            TextBoxBGIP.color = Color.FloralWhite;
+
+            TextBoxBGPort = Canvas.Add(TextBoxBG);
+            TextBoxBGPort.origin = new Vector2(0.5f);
+            TextBoxBGPort.position = new Vector2(0.2f, 0.35f);
+            TextBoxBGPort.depth = 0.9f;
+            TextBoxBGPort.color = Color.FloralWhite;
+        }
+
+        if (TextBoxIP != null)
+        {
+            Join = Canvas.Add("Join");
+            Join.origin = new Vector2(0.5f);
+            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.15f);
+            Join.interactable = true;
+            Join.depth = 0.9f;
+            Join.color = Color.FloralWhite;
+        }
+
+        if (TextBoxPort != null)
+        {
+            Host = Canvas.Add("Host");
+            Host.origin = new Vector2(0.5f);
+            Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.35f);
+            Host.interactable = true;
+            Host.depth = 0.9f;
+            Host.color = Color.FloralWhite;
+        }
+
+        Back = Canvas.Add("Back");
+        Back.origin = new Vector2(0.5f);
+        Back.position = new Vector2(0.575f, 0.36f);
+        Back.interactable = true;
+        Back.depth = 0.9f;
+        Back.color = Color.FloralWhite;
+
+        ConnectingText = Canvas.Add("");
+        ConnectingText.origin = new Vector2(0.5f);
+        ConnectingText.color = Color.FloralWhite;
+        ConnectingText.depth = 0;
+        ConnectingText.position = new Vector2(0.5f, 0.75f);
     }
-}
+
+    public void ClearImagesAndText()
+    {
+        Canvas.Remove(Join);
+        Canvas.Remove(Host);
+        Canvas.Remove(Back);
+        Canvas.Remove(TextBoxIP);
+        Canvas.Remove(TextBoxPort);
+        Canvas.Remove(ConnectingText);
+
+        Canvas.Remove(IPText);
+        Canvas.Remove(PortText);
+        Canvas.Remove(IP);
+        Canvas.Remove(Port);
+    }
+
+    IEnumerator Connecting()
+    {
+        int ticks = 0;
+        while (true)
+        {
+            ++ticks;
+            if ((ticks % 4) == 0)
+            {
+                ConnectingText.text = "Connecting";
+                ticks = 0;
+            }
+            else
+                ConnectingText.text += ".";
+
+            yield return new WaitForSecondsRealtime(0.25f);
+        }
+    }
 }
