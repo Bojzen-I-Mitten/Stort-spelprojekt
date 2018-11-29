@@ -18,6 +18,7 @@ public class NetworkPlayer : NetworkComponent
     public int HasTackled = 0;
     public int Owngoal = 0;
     public int GoalsScored = 0;
+    public int Score = 0;
     Material mat;
     Rigidbody rb;
     Ragdoll rag;

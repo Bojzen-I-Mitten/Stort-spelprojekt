@@ -374,6 +374,7 @@ public class GUIPlayerScore : ScriptComponent
             Team1Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled.ToString();
             Team1Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored - 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].Owngoal).ToString();
             Team1Players[i].PlayerPing.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GetPing().ToString();
+            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].Score = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored - 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].Owngoal);
         }
         for (int i = 0; i < Math.Min(Team2Players.Count, AmountOfPlayersInTeam2); i++)
         {
@@ -385,6 +386,7 @@ public class GUIPlayerScore : ScriptComponent
             Team2Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled.ToString();
             Team2Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored - 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].Owngoal).ToString();
             Team2Players[i].PlayerPing.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GetPing().ToString();
+            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].Score = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored - 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].Owngoal);
         }
     }
     public void lastupdate()
@@ -394,6 +396,14 @@ public class GUIPlayerScore : ScriptComponent
         UpdateStatistics();
         UpdatePlayerBars();
     }
+    public void UpdateList()
+    {
+        if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players.Count>1)
+            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players.Sort((x, y) => y.Score.CompareTo(x.Score));
+        if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players.Count > 1)
+            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players.Sort((x, y) => y.Score.CompareTo(x.Score));
+    }
+
     public override void Update()
     {
         if(GUIScoreScreen.Instance.ToggleBool)
@@ -402,6 +412,7 @@ public class GUIPlayerScore : ScriptComponent
             AmountOfPlayersInTeam2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount;
             UpdateStatistics();
             UpdatePlayerBars();
+            UpdateList();
         }
         ChadHud.Instance.ToggleScoreVisability(Toggle);
         if (Toggle)
