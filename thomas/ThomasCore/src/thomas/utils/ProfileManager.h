@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <Windows.h>
 #include <chrono>
+#include <atomic>
 #include "..\..\..\include\nlohmann\json.hpp"
 #define BENCHMARK
 
@@ -42,6 +43,7 @@ namespace thomas
 				static std::map<std::string, float> s_vramusage;
 				static float s_vrambudget;
 				static unsigned int s_frames;
+				static std::atomic<unsigned int> s_contextSwitch;
 
 			public:
 				static void newFrame();
@@ -50,6 +52,7 @@ namespace thomas
 				static void storeSample(std::string functionName, long long elapsedTime, long long startTime, DWORD processor_id);
 				static void storeGpuSample(long long gpuTime);
 				static void storeVramSample(std::string name, float usage);
+				static void increaseContextSwitches();
 
 				static void setRAMUsage(float usage);
 				static float getRAMUsage();

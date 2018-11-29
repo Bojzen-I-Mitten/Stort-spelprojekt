@@ -15,10 +15,11 @@ namespace thomas
 			std::map<std::string, float> ProfileManager::s_vramusage;
 			float ProfileManager::s_vrambudget;
 			unsigned int ProfileManager::s_frames;
-
+			std::atomic<unsigned int> ProfileManager::s_contextSwitch;
 			void ProfileManager::resetFrameCounter()
 			{
 				s_frames = 0;
+				s_contextSwitch = 0;
 			}
 
 			void ProfileManager::newFrame()
@@ -51,6 +52,11 @@ namespace thomas
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
 				s_vramusage.insert(std::make_pair(name, usage));
+			}
+
+			void ProfileManager::increaseContextSwitches()
+			{
+				s_contextSwitch++;
 			}
 
 			//void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
