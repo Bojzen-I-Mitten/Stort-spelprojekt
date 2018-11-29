@@ -6,28 +6,18 @@ public class GUISelectTeam : ScriptComponent
 {
     public Texture2D SelectBox { get; set; }
     public Texture2D SpectatorCamTexture { get; set; }
-    public Texture2D TeamListTexture { get; set; }
     public Font ChadFont { get; set; }
     public Font SportFont32 { get; set; }
-
-    //public GameObject ChadTeam1 { get; set; }
-    //public GameObject ChadTeam2 { get; set; }
 
     public Animation RunningAnim { get; set; }
     public Animation IdleAnim { get; set; }
 
     Camera Camera;
 
-    public Vector2 Team1ListPos { get; set; } = new Vector2(0, 0);
-    public Vector2 Team1ListScale { get; set; } = new Vector2(0, 0);
-    public Vector2 Team2ListPos { get; set; } = new Vector2(0, 0);
-    public Vector2 Team2ListScale { get; set; } = new Vector2(0, 0);
     public Canvas Canvas;
     
     Image Team1Image;
     Image Team2Image;
-    Image Team1List;
-    Image Team2List;
     Image SpectatorImage;
     Text Select;
     Text Team1Text;
@@ -70,12 +60,24 @@ public class GUISelectTeam : ScriptComponent
         if (CameraMaster.instance.ChadTeam1 != null)
         {
             ChadRSC1 = CameraMaster.instance.ChadTeam1.GetComponent<RenderSkinnedComponent>();
-            Chad1Mat = ChadRSC1.material = new Material(ChadRSC1.material);
+
+            Material[] mats = ChadRSC1.materials;
+
+            Chad1Mat = mats[1] = new Material(mats[1]);
+
+            ChadRSC1.materials = mats;
+
+
         }
         if (CameraMaster.instance.ChadTeam2 != null)
         {
             ChadRSC2 = CameraMaster.instance.ChadTeam2.GetComponent<RenderSkinnedComponent>();
-            Chad2Mat = ChadRSC2.material = new Material(ChadRSC2.material);
+
+            Material[] mats = ChadRSC2.materials;
+
+            Chad2Mat = mats[1] = new Material(mats[1]);
+
+            ChadRSC2.materials = mats;
         }
 
 
@@ -190,11 +192,6 @@ public class GUISelectTeam : ScriptComponent
             StartGame.interactable = false;
         }
 
-        Team1List.position = Team1ListPos;
-        Team1List.scale = Team1ListScale;
-        Team2List.position = Team2ListPos;
-        Team2List.scale = Team2ListScale;
-
     }
 
     public void AddImagesAndText()
@@ -273,15 +270,6 @@ public class GUISelectTeam : ScriptComponent
         PlayersInTeam2.origin = new Vector2(1, 0);
         PlayersInTeam2.position = new Vector2(1, 0.05f);
         PlayersInTeam2.color = Unselected;
-
-        if (TeamListTexture != null)
-        {
-            Team1List = Canvas.Add(TeamListTexture);
-            Team1List.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-
-            Team2List = Canvas.Add(TeamListTexture);
-            Team2List.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-        }
 
         ExitText = Canvas.Add("Exit");
         ExitText.position = new Vector2(0.05f, 0.85f);

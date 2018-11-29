@@ -10,8 +10,6 @@ public class GUIJoinHost : ScriptComponent
 
     Camera Camera;
     
-    private string IPString;
-    private string PortString;
     private bool TakeIP;
     private bool TakePort;
 
@@ -47,8 +45,6 @@ public class GUIJoinHost : ScriptComponent
 
     public override void Start()
     {
-        IPString = "192.168.1.";
-        PortString = "9050";
         TakeIP = false;
         TakePort = false;
         Camera = gameObject.GetComponent<Camera>();
@@ -88,13 +84,30 @@ public class GUIJoinHost : ScriptComponent
 
         if (TakeIP)
         {
-            GUIInput.AppendString(ref IPString, 15);
+            string str = IPText.text;
+            GUIInput.AppendString(ref str, 15);
+            IPText.text = str;
             Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, CaretOffset);
         }
         if (TakePort)
         {
-            GUIInput.AppendString(ref PortString, 5);
+            string str = PortText.text;
+            GUIInput.AppendString(ref str, 5);
+            PortText.text = str;
             Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
+        }
+
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            TakePort = false;
+            TakeIP = false;
+            TextBoxIP.color = Color.Black;
+            TextBoxPort.color = Color.Black;
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
         }
 
         if (Join.Clicked())
@@ -105,21 +118,21 @@ public class GUIJoinHost : ScriptComponent
             System.Net.IPAddress ipaddress;
             try
             {
-                ipaddress = NetUtils.ResolveAddress(IPString);
+                ipaddress = NetUtils.ResolveAddress(IPText.text);
             }
             catch (Exception e)
             {
                 ConnectingText.text = e.Message;
                 return;
             }
-            if (PortString != "")
+            if (PortText.text != "")
             {
-                if (IPString == "127.0.0.1")
+                if (IPText.text == "127.0.0.1")
                     MatchSystem.instance.LocalPort = 0;
                 else
-                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
-                MatchSystem.instance.TargetIP = IPString;
+                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
+                MatchSystem.instance.TargetPort = Convert.ToInt32(PortText.text);
+                MatchSystem.instance.TargetIP = IPText.text;
 
                 MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
                 MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
@@ -136,9 +149,9 @@ public class GUIJoinHost : ScriptComponent
             }
             else
             {
-                if (IPString == "")
+                if (IPText.text == "")
                     TextBoxIP.color = Color.Red;
-                if (PortString == "")
+                if (PortText.text == "")
                     TextBoxPort.color = Color.Red;
             }
         }
@@ -147,9 +160,9 @@ public class GUIJoinHost : ScriptComponent
             TakeIP = false;
             TakePort = false;
             ConnectingText.text = "";
-            if (PortString != "")
+            if (PortText.text != "")
             {
-                MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
+                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
                 CameraMaster.instance.State = CAM_STATE.HOST_MENU;
                 return;
             }
@@ -173,13 +186,8 @@ public class GUIJoinHost : ScriptComponent
             TakeIP = true;
             if (ClearIP)
             {
-                IPString = "";
+                IPText.text = "";
                 ClearIP = false;
-            }
-            if (Blink == null)
-            {
-                Blink = CaretBlink();
-                StartCoroutine(Blink);
             }
         }
         else if (TextBoxPort.Clicked())
@@ -188,13 +196,8 @@ public class GUIJoinHost : ScriptComponent
             TakePort = true;
             if (ClearPort)
             {
-                PortString = "";
+                PortText.text = "";
                 ClearPort = false;
-            }
-            if (Blink == null)
-            {
-                Blink = CaretBlink();
-                StartCoroutine(Blink);
             }
         }
         else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
@@ -225,13 +228,13 @@ public class GUIJoinHost : ScriptComponent
     {
         Canvas = Camera.AddCanvas();
 
-        IPText = Canvas.Add(IPString);
+        IPText = Canvas.Add("192.168.1.");
         IPText.origin = new Vector2(0.5f);
         IPText.position = new Vector2(0.2f, 0.15f);
         IPText.color = Color.Black;
         IPText.depth = 0.8f;
 
-        PortText = Canvas.Add(PortString);
+        PortText = Canvas.Add("9050");
         PortText.origin = new Vector2(0.5f);
         PortText.position = new Vector2(0.2f, 0.35f);
         PortText.color = Color.Black;

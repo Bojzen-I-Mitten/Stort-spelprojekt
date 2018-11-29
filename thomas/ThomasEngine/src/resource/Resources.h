@@ -28,7 +28,9 @@ namespace ThomasEngine
 		static Dictionary<String^, Resource^>^ resources = gcnew Dictionary<String^, Resource^>();
 		static Dictionary<String^, GameObject^>^ s_PREFAB_DICT = gcnew Dictionary<String^, GameObject^>();
 		/* Load a list of asset using assetworker*/
-		static void LoadAssetFiles(List<String^>^ files);
+		static System::Threading::CountdownEvent^ LoadAssetFiles(List<String^>^ files);
+		/* Load assets on the same thread. */
+		static void LoadAssetFilesSynced(List<String^>^ files);
 	internal:
 
 	public:

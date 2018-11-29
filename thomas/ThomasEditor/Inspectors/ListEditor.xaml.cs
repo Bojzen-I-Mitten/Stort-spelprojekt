@@ -158,8 +158,10 @@ namespace ThomasEditor.Inspectors
         {
             ICollectionView view = CollectionViewSource.GetDefaultView(listView.ItemsSource);
             view.Refresh();
+
             PropertyItem pi = DataContext as PropertyItem;
-            pi.Value = pi.Value;
+            if(pi.PropertyType.IsArray)
+                pi.Value = pi.Value;
         }
     }
 }

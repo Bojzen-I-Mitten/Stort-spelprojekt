@@ -27,7 +27,7 @@ namespace ThomasEngine {
 	{
 		m_name = "gameobject";
 #ifdef _EDITOR
-		//if(ThomasWrapper::IsExternalBuild())
+		//if(ThomasWrapper::IsEditorBuild())
 		//	System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
@@ -45,7 +45,7 @@ namespace ThomasEngine {
 		ThomasWrapper::CurrentScene->CreateObject(this);
 		m_scene_id = ThomasWrapper::CurrentScene->ID();
 #ifdef _EDITOR
-		//if (ThomasWrapper::IsExternalBuild())
+		//if (ThomasWrapper::IsEditorBuild())
 		//	System::Windows::Application::Current->Dispatcher->BeginInvoke(gcnew Action(this, &GameObject::SyncComponents));
 #endif
 	}
@@ -573,8 +573,12 @@ namespace ThomasEngine {
 	void GameObject::activeSelf::set(bool value)
 	{
 #ifdef _EDITOR
-		// If editor make it trigger full activation part.
-		SetActive(value);
+		if(m_transform == nullptr)
+			// Serialization activation
+			((thomas::object::GameObject*)nativePtr)->SetActive(value);
+		else
+			// If editor make it trigger full activation part.
+			SetActive(value);
 #else
 		((thomas::object::GameObject*)nativePtr)->SetActive(value);
 #endif

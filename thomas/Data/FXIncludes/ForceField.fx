@@ -3,15 +3,13 @@
 #include <ThomasCG.hlsl>
 #include <ThomasLights.hlsl>
 
-Texture2D DiffuseTexture;
-Texture2D NormalTexture : NORMALTEXTURE;
-Texture2D SpecularTexture : SPECULARTEXTURE;
-
+Texture2D ForcefieldTexture;
 cbuffer MATERIAL_PROPERTIES
 {
     float4 color : COLOR;
-    float smoothness : MATERIALSMOOTHNESSFACTOR;
     float4 uvTiling : UVTILING; // (uv tiling x, uv tiling y, uv offset x, uv offset y)
+    float4 ballPosition : POSITION;
+    float maxBallDistance : TEXCOORD0;
 };
 
 
@@ -20,20 +18,19 @@ SamplerState StandardWrapSampler
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
-    MipLODBias = -2;    // Do not sample to low!!!
 };
 
 DepthStencilState EnableDepth
 {
     DepthEnable = TRUE;
-    DepthWriteMask = ALL;
+    DepthWriteMask = ZERO;
     DepthFunc = LESS_EQUAL;
 };
 
 RasterizerState RasterizerSolid
 {
     FillMode = SOLID;
-    CullMode = BACK;
+    CullMode = NONE;
     FrontCounterClockWise = TRUE;
     DepthClipEnable = FALSE;
 };
@@ -53,21 +50,27 @@ BlendState AlphaBlendingOn
 
 struct v2f
 {
+    
     float4 vertex : SV_POSITION;
     float4 worldPos : POSITIONWS;
     float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
+    float3 objectPos : POSITION;
+    float3 viewDir : TEXCOORD1;
 };
 
 v2f vert(appdata_thomas v)
 {
     v2f o;
 
+    float3 scale = float3(thomas_ObjectToWorld[0][0], thomas_ObjectToWorld[1][1], thomas_ObjectToWorld[2][2]);
+
     float3 posL = v.vertex;
 
     o.vertex = ThomasObjectToClipPos(posL);
     o.worldPos = ThomasObjectToWorldPos(posL);
-    
+	
+    o.objectPos = v.vertex;
     
     float3 tangent = ThomasObjectToWorldDir(v.tangent);
     float3 bitangent = ThomasObjectToWorldDir(v.bitangent);
@@ -75,28 +78,40 @@ v2f vert(appdata_thomas v)
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
-    o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
+    o.viewDir = normalize(ThomasWorldSpaceViewDir(mul(thomas_ObjectToWorld, float4(v.vertex, 1.0f)).xyz));
+
+    o.texcoord = v.texcoord * uvTiling.xy * scale.yx + uvTiling.zw;
     return o;
+}
+
+
+float triWave(float t, float offset, float yOffset)
+{
+    return saturate(abs(frac(offset + t) * 2 - 1) + yOffset);
 }
 
 float4 frag(v2f input) : SV_TARGET
 {
-    float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
-    diffuse *= color.xyz;
-    float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
+      
+    float rim = 1 - abs(dot(input.TBN[2], normalize(input.viewDir)));
+    float ballDist = distance(input.worldPos.xyz, ballPosition.xyz);
 
-    float3 normal = NormalTexture.Sample(StandardWrapSampler, input.texcoord);
-    normal.xy = normal.xy * 2.0f - 1.0f;
-    normal = normalize(normal);
-    normal = normalize(mul(normal, input.TBN));
+    float4 forceTex = ForcefieldTexture.Sample(StandardWrapSampler, input.texcoord);
 
+    float ballImpact = smoothstep(maxBallDistance, 0.0f, ballDist) * 8.0f;
+
+    forceTex.r *= ballImpact + triWave(thomas_Time.x * 5, abs((uvTiling.z * input.texcoord.y / uvTiling.y) + 1), -0.7) * 6;
+				// I ended up saturaing the rim calculation because negative values caused weird artifacts
+    forceTex.g *= ballImpact + saturate(saturate(rim) + 0.05f) * (sin(thomas_Time.z + forceTex.b * 5) + 1);
+
+    float glow = rim * 0.2f;
+    float4 glowColor = float4(lerp(color.rgb, float3(1, 1, 1), pow(glow, 4)), 1);
+    //return ballImpact * color;
     
-    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light
-    
-    
-    diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
-    
-    return saturate(float4(diffuse, 1.0f));
+
+   // float strength = 0.5f + forcefield + impact * maxBallDistance / ballDist;
+    float4 hexes = forceTex.r * color + forceTex.g * color;
+    return color * color.a + glowColor * glow + hexes;
 }
 
 technique11 Standard
