@@ -379,7 +379,7 @@ namespace ThomasEngine {
 
 						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							if (gameObject->GetActive())
+							//if (gameObject->GetActive())
 								gameObject->RenderGizmos();
 						}
 						s_Selection->render();

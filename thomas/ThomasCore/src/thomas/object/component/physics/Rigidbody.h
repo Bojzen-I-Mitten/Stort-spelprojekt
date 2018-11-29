@@ -40,6 +40,7 @@ namespace thomas
 				~Rigidbody();
 
 			public:
+
 				void OnEnable();
 				void OnDisable();
 				void OnDestroy();
@@ -81,7 +82,7 @@ namespace thomas
 				void SetRotation(math::Quaternion rotation);
 
 				void IgnoreNextTransformUpdate();
-
+				
 			public:
 				float GetMass() const;
 				bool IsKinematic() const;

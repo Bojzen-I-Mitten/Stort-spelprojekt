@@ -31,7 +31,7 @@ public class Chadimations : NetworkComponent
             return 1.0f - MathHelper.Clamp(distance, 0.0f, 1.0f);
         }
     }
-    private bool _Throwing = false;
+    public bool Throwing = false;
     private ChadControls Chad = null;
     private Vector3 Direction
     {
@@ -70,18 +70,21 @@ public class Chadimations : NetworkComponent
             {
                 foreach (var state in Animations)
                 {
-                    BlendNode newBlendNode = new BlendNode(Skin.model);
-                    for(int i = 0; i < state.Value.Count; ++i)
+                    if (state.Key != ChadControls.STATE.RAGDOLL) // No Ragdoll animations
                     {
-                        if(state.Key == ChadControls.STATE.THROWING)
-                            state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, false);
-                        else
-                            state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, true);
-                    }
-                    BlendNodes.Add(state.Key, newBlendNode);
+                        BlendNode newBlendNode = new BlendNode(Skin.model);
+                        for (int i = 0; i < state.Value.Count; ++i)
+                        {
+                            if (state.Key == ChadControls.STATE.THROWING)
+                                state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, false);
+                            else
+                                state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, true);
+                        }
+                        BlendNodes.Add(state.Key, newBlendNode);
 
-                    WeightHandle newWeightHandle = BlendNodes[state.Key].generateWeightHandle();
-                    WeightHandles.Add(state.Key, newWeightHandle);
+                        WeightHandle newWeightHandle = BlendNodes[state.Key].generateWeightHandle();
+                        WeightHandles.Add(state.Key, newWeightHandle);
+                    }
                 }
 
                 WeightHandles[ChadControls.STATE.CHADING].setWeight(0, new WeightTripple(1f));
@@ -97,44 +100,75 @@ public class Chadimations : NetworkComponent
             Skin.setBlendTreeNode(BlendNodes[State]);
             for (uint i = 0; i < Animations[State].Count; i++)
             {
-                if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
+                AnimationNode node = Animations[State][(int)i];
+                if (node != null)
                 {
-                    AnimationNode node = Animations[State][(int)i];
-                    WeightHandles[State].setWeight(i, node.GetWeight(Direction));
-                    node.Node.getTimeHandle().SetSpeed(1);
+                    if (State != ChadControls.STATE.THROWING) // set throwing weights from chadControls instead
+                    {
+
+                        WeightHandles[State].setWeight(i, node.GetWeight(Direction));
+                        //node.Node.getTimeHandle().SetSpeed(1);
+                        AnimationSpeed(node, 1);
+                    }
+                    else if (!Throwing && i == 1) // not throwing and index handling throwing anim
+                    {
+                        WeightHandles[State].setWeight(i, 0); // set throwing anim weight to 0
+                        //node.Node.getTimeHandle().SetSpeed(2.2f);
+                        AnimationSpeed(node, 2.4f);
+                    }
+                    else if (i == 1) // throw anim
+                        AnimationSpeed(node, 2.4f);
+                    //node.Node.getTimeHandle().SetSpeed(2.2f);
+                    else if (Chad.PickedUpObject) // charge throw anim
+                        AnimationSpeed(node, 2.6f / Chad.PickedUpObject.chargeTimeMax);
+                        //node.Node.getTimeHandle().SetSpeed(2.6f / Chad.PickedUpObject.chargeTimeMax);
                 }
-                else if (!_Throwing && i == 1) // shouldn't be needed, but it is, rewrite
-                    WeightHandles[State].setWeight(i, 0);
+                else
+                {
+                    Debug.Log("Animation not found for: " + State + i);
+                }
             }
         }
     }
+
 
     public void SetAnimationWeight(uint index, float weight)
     {
         if (index == 1 && weight == 1)
         {
-            _Throwing = true;
+            Throwing = true;
             
         }
         else
-            _Throwing = false;
+            Throwing = false;
 
         if (BlendNodes.ContainsKey(State))
             BlendNodes[State].ResetPlayback();
-
+        
         // Debug.Log("Manually setting weight of animation numer: " + index + " to: "+ weight);
         if(WeightHandles.ContainsKey(State))
             WeightHandles[State].setWeight(index, weight);
     }
 
-    private void ResetTimer(uint index)
+    public void ResetTimer(ChadControls.STATE state, uint index)
     {
-        BlendNodes[State].ResetPlayback();
+        BlendNodes[state].ResetPlayback();
     }
 
     public void RPCResetTimer(uint index)
     {
-        ResetTimer(index);
+        ResetTimer(State, index);
         SendRPC("ResetTimer", (int)index);
+    }
+
+    private void RPCAnimationSpeed(AnimationNode node, float amount)
+    {
+        AnimationSpeed(node, amount);
+        SendRPC("AnimationSpeed", (AnimationNode)node, (float)amount);
+    }
+
+    private void AnimationSpeed(AnimationNode node, float amount)
+    {
+        node.Node.getTimeHandle().SetSpeed(amount);
     }
 } 

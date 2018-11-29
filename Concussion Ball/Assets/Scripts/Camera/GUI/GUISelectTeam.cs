@@ -5,6 +5,7 @@ public class GUISelectTeam : ScriptComponent
 {
     public Texture2D SelectBox { get; set; }
     public Texture2D SpectatorCamTexture { get; set; }
+    public Texture2D ExitTexture { get; set; }
     public Font TextFont { get; set; }
 
     public GameObject ChadTeam1 { get; set; }
@@ -20,6 +21,7 @@ public class GUISelectTeam : ScriptComponent
 
     public Canvas Canvas;
 
+    Image ExitImage;
     Image Team1Image;
     Image Team2Image;
     Image SpectatorImage;
@@ -27,6 +29,7 @@ public class GUISelectTeam : ScriptComponent
     Text Team1Text;
     Text Team2Text;
     Text SpectatorText;
+    Text ExitText;
 
     RenderSkinnedComponent ChadRSC1;
     RenderSkinnedComponent ChadRSC2;
@@ -47,12 +50,24 @@ public class GUISelectTeam : ScriptComponent
         if (ChadTeam1 != null)
         {
             ChadRSC1 = ChadTeam1.GetComponent<RenderSkinnedComponent>();
-            Chad1Mat = ChadRSC1.material = new Material(ChadRSC1.material);
+
+            Material[] mats = ChadRSC1.materials;
+
+            Chad1Mat = mats[1] = new Material(mats[1]);
+
+            ChadRSC1.materials = mats;
+
+
         }
         if (ChadTeam2 != null)
         {
             ChadRSC2 = ChadTeam2.GetComponent<RenderSkinnedComponent>();
-            Chad2Mat = ChadRSC2.material = new Material(ChadRSC2.material);
+
+            Material[] mats = ChadRSC2.materials;
+
+            Chad2Mat = mats[1] = new Material(mats[1]);
+
+            ChadRSC2.materials = mats;
         }
 
 
@@ -96,6 +111,7 @@ public class GUISelectTeam : ScriptComponent
         Team1Text.color = Unselected;
         Team2Text.color = Unselected;
         SpectatorText.color = Unselected;
+        ExitText.color = Unselected;
 
         if (Team1Image.Hovered())
         {
@@ -126,6 +142,15 @@ public class GUISelectTeam : ScriptComponent
             SpectatorText.color = Selected;
             IdleChads();
         }
+        else if (ExitText.Hovered())
+        {
+            ExitText.color = Color.Black;
+            
+            if (ExitText.Clicked())
+            {
+                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            }
+        }
         else
         {
             IdleChads();
@@ -137,6 +162,7 @@ public class GUISelectTeam : ScriptComponent
             Team1Text.font = TextFont;
             Team2Text.font = TextFont;
             SpectatorText.font = TextFont;
+            ExitText.font = TextFont;
         }
 
         //Team1Image.position = SelectboxPos;
@@ -172,6 +198,13 @@ public class GUISelectTeam : ScriptComponent
             SpectatorImage.interactable = true;
         }
 
+        if(ExitTexture != null)
+        {
+            ExitImage = Canvas.Add(ExitTexture);
+            ExitImage.position = new Vector2(0.05f, 0.8f);
+            ExitImage.origin = new Vector2(0.5f);
+        }
+
         Select = Canvas.Add("Select Team");
         Select.position = new Vector2(0.5f, 0.1f);
         Select.origin = new Vector2(0.5f);
@@ -191,6 +224,12 @@ public class GUISelectTeam : ScriptComponent
         SpectatorText.position = new Vector2(0.5f, 0.8f);
         SpectatorText.origin = new Vector2(0.5f);
         SpectatorText.color = Unselected;
+
+        ExitText = Canvas.Add("Exit");
+        ExitText.position = new Vector2(0.05f, 0.85f);
+        ExitText.origin = new Vector2(0.5f);
+        ExitText.color = Unselected;
+        ExitText.interactable = true;
     }
 
     public void ClearImagesAndText()
@@ -203,6 +242,8 @@ public class GUISelectTeam : ScriptComponent
         Canvas.Remove(Team1Text);
         Canvas.Remove(Team2Text);
         Canvas.Remove(SpectatorText);
+        Canvas.Remove(ExitText);
+        Canvas.Remove(ExitImage);
     }
 
     private void IdleChads()

@@ -162,7 +162,7 @@ inline float2 Intensity(float3 normal, float3 worldPos)
 inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffuse, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
-    float3 ambient = float3(0.05f, 0.05f, 0.05f);
+    float3 ambient = float3(0.12f, 0.12f, 0.12f);
     float3 colorAcculmulator = ambient * surfaceDiffuse;
     float3 lightDir = float3(0, 0, 0);
     float lightMultiplyer = 0.0;
@@ -193,7 +193,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
             
             for (int si = 0; si < poissonDiskSize; ++si)
             {
-                shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 700.0, shadowMapIndex)).x < sampleCoordLS.z - bias) * shadowHardnessFactor;
+                shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 1200.0, shadowMapIndex)).x < sampleCoordLS.z - bias) * shadowHardnessFactor;
             }
             
         }

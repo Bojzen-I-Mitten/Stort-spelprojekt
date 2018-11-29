@@ -27,6 +27,7 @@ namespace ThomasEditor.utils
                 child.transform.SetParent(null, keepTransform);
             else
                 child.transform.SetParent(parent.transform, keepTransform);
+            
         }
     }
     public class EnableComponentCommand

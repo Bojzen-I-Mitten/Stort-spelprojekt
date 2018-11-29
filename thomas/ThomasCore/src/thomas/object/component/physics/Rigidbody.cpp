@@ -58,6 +58,10 @@ namespace thomas
 
 				this->setUserPointer(m_collider);
 
+				this->setLinearVelocity(btVector3(0, 0, 0));
+				this->setAngularVelocity(btVector3(0, 0, 0));
+				clearForces();
+				
 				Physics::AddRigidBody(this);
 				m_prevMatrix = m_gameObject->GetTransform()->GetWorldMatrix();
 				UpdateProperties();

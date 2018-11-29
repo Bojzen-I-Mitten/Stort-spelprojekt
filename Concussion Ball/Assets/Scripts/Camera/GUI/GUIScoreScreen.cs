@@ -19,11 +19,13 @@ public class GUIScoreScreen : ScriptComponent
     public bool ToggleBool = true;
     public override void OnAwake()
     {
-       
+
     }
     public override void Start()
     {
-        Instance = this;
+       
+            Instance = this;
+      
         ToggleBool = true;
 
         Timedisplay = ScoreScreenTimeLast + 1;
@@ -87,7 +89,7 @@ public class GUIScoreScreen : ScriptComponent
     public void updateTextPlayAgain()
     {
         
-        Textdatalist[1].text = "Play again:" + (Timedisplay -= 1);
+        Textdatalist[1].text = "Play again: " + (Timedisplay -= 1);
     }
 
 
