@@ -58,6 +58,10 @@ namespace ThomasEngine
 
 	}
 
+	void Text::dropShadow::set(bool dropShadow)
+	{
+		((thomas::graphics::GUI::Text*)nativePtr)->dropShadow = dropShadow;
+	}
 
 	Image::Image(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
 

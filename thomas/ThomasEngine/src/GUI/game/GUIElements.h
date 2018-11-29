@@ -76,6 +76,11 @@ namespace ThomasEngine
 		{
 			void set(Font^ font);
 		}
+
+		property bool dropShadow
+		{
+			void set(bool dropShadow);
+		}
 	};
 
 	public ref class Image : public GUIElement

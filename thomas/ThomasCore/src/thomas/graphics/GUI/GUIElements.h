@@ -44,6 +44,7 @@ namespace thomas
 					color = Vector4::One;
 					rotation = 0;
 					interactable = false;
+					dropShadow = false;
 					depth = 0;
 					effect = DirectX::SpriteEffects::SpriteEffects_None;
 				}
@@ -55,6 +56,7 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interactable;
+				bool dropShadow;
 				float depth;
 				Canvas* canvas;
 				DirectX::SpriteEffects effect;
@@ -109,6 +111,12 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
+					if (dropShadow)
+					{
+						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position + Vector2(0.01f, 0.01f) * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position  + Vector2(-0.01f, 0.01f) * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+					}
+
 					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
 				}
 
