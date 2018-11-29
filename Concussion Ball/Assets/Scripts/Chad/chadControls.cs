@@ -487,13 +487,19 @@ public class ChadControls : NetworkComponent
 
     private void JumpFondling()
     {
+        float modifiedBaseSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * BaseSpeed : BaseSpeed;
+        float modifiedMaxSpeed = PickedUpObject ? PickedUpObject.MovementSpeedModifier * MaxSpeed : MaxSpeed;
+
         if (OnGround())
         {
             JumpingTimer = 0.0f;
             Jumping = true;
             Landed = false;
             DivingRotation = this.gameObject.transform.rotation;
-            CurrentVelocity.y = BaseSpeed;
+
+            float velocityBetweenBaseAndMax = modifiedMaxSpeed - ((modifiedMaxSpeed - modifiedBaseSpeed) / 2);
+            if (CurrentVelocity.y > velocityBetweenBaseAndMax)
+                CurrentVelocity.y = velocityBetweenBaseAndMax;
             rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
             rBody.AddForce(new Vector3(0, 450, 0), Rigidbody.ForceMode.Impulse);
         }
