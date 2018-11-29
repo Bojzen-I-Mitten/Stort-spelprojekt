@@ -20,17 +20,23 @@ public class GUIMainMenu : ScriptComponent
     Text Exit;
     Text Credits;
     Text PlayerName;
+    Text Caret;
+
+    IEnumerator Blink = null;
 
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
+    public float CaretOffset { get; set; } = 0.19f;
+
+    private bool ClearName = true;
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
 
     public override void OnAwake()
     {
-        
+
     }
 
     public override void Start()
@@ -61,11 +67,30 @@ public class GUIMainMenu : ScriptComponent
         {
             TakeName = true;
             TextBoxName.color = Selected;
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
+            if (ClearName)
+            {
+                PlayerString = "";
+                ClearName = false;
+            }
+        }
+        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            TakeName = false;
+            if (Blink != null)
+            {
+                StopCoroutine(Blink);
+                Blink = null;
+            }
+            Caret.text = "";
         }
 
         if (Play.Clicked())
         {
-            TakeName = false;
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
         }
 
@@ -74,15 +99,16 @@ public class GUIMainMenu : ScriptComponent
 
         if (TakeName)
         {
-            GUIInput.AppendString(ref PlayerString, 14);
+            GUIInput.AppendString(ref PlayerString, 9);
         }
+
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
     }
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
 
         #region Text
-
         #region  Play
         Play = Canvas.Add("Play");
         Play.position = new Vector2(0.425f, 0.11f);
@@ -124,15 +150,26 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Player name
-        PlayerName = Canvas.Add("PlayerName");
-        PlayerName.position = new Vector2(0.423f, 0.918f);
+        PlayerName = Canvas.Add(PlayerString);
+        PlayerName.origin = new Vector2(0.5f);
+        PlayerName.position = new Vector2(0.5f, 0.94f);
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
-        PlayerName.text = PlayerString;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
         #endregion
+
+        #region Caret
+        Caret = Canvas.Add("");
+        Caret.origin = new Vector2(0, 0.5f);
+        Caret.scale = new Vector2(1.2f);
+        Caret.interactable = false;
+        Caret.depth = 0.8f;
+        Caret.color = Color.Black;
+        Caret.font = TextFont;
+        #endregion
+
         #endregion
 
         #region Images
@@ -141,7 +178,7 @@ public class GUIMainMenu : ScriptComponent
         {
             TextBoxName = Canvas.Add(TextBox);
             TextBoxName.origin = new Vector2(0.5f);
-            TextBoxName.position = new Vector2(0.485f, 0.94f);
+            TextBoxName.position = new Vector2(0.5f, 0.94f);
             TextBoxName.interactable = true;
             TextBoxName.depth = 0.9f;
             TextBoxName.color = Color.Black;
@@ -151,7 +188,7 @@ public class GUIMainMenu : ScriptComponent
         {
             TextBoxBGName = Canvas.Add(TextBoxBG);
             TextBoxBGName.origin = new Vector2(0.5f);
-            TextBoxBGName.position = new Vector2(0.485f, 0.94f);
+            TextBoxBGName.position = new Vector2(0.5f, 0.94f);
             TextBoxBGName.depth = 0.9f;
             TextBoxBGName.color = Unselected;
         }
@@ -168,5 +205,26 @@ public class GUIMainMenu : ScriptComponent
         Canvas.Remove(PlayerName);
         Canvas.Remove(TextBoxBGName);
         Canvas.Remove(TextBoxName);
+        Canvas.Remove(Caret);
+    }
+
+    IEnumerator CaretBlink()
+    {
+        bool underscore = true;
+        while (true)
+        {
+            if (underscore)
+            {
+                Caret.text = "|";
+                underscore = false;
+            }
+            else
+            {
+                Caret.text = "";
+                underscore = true;
+            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
+        }
     }
 }

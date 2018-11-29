@@ -18,9 +18,10 @@ RasterizerState RasterizerSolid
     MultisampleEnable = FALSE;
 };
 
-cbuffer LightMatrices
+cbuffer LightMatrix
 {
     float4x4 lightMatrixVP;
+    int animate;
 };
 
 inline float4 ObjectToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirlight id
@@ -28,18 +29,24 @@ inline float4 ObjectToLightClipPos(in float3 pos)//, uint lightIndex)//temp dirl
     return mul(lightMatrixVP, mul(thomas_ObjectToWorld, float4(pos, 1.0)));
 }
 
+
 struct v2f
 {
     float4 vertex : SV_POSITION;
 };
 
-v2f vert(appdata_thomas v)
+v2f vert(appdata_thomas_skin v)
 {
     v2f o;
 
-    float3 posL = v.vertex;
+    float4 posL = float4(v.vertex, 1.0);
+    if (animate > 1)
+    {
+        ThomasSkinVertex(posL, v.normal, v.boneWeight, v.boneIndex);
+    }
     
-    o.vertex = ObjectToLightClipPos(posL);
+
+    o.vertex = ObjectToLightClipPos(posL.xyz);
 
     return o;
 }

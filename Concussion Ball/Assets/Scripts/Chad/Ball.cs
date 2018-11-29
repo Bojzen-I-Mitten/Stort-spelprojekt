@@ -20,6 +20,7 @@ public class Ball : PickupableObject
     public Texture2D fireTex { get; set; }
 
     private float electricityIntensifyerThreshold;
+    private float smokeIntensityThreshold;
 
     public override void Start()
     {
@@ -49,6 +50,7 @@ public class Ball : PickupableObject
         ResetFireEmitters();
         ResetElectricityEmitters();
         electricityIntensifyerThreshold = 0.6f;
+        smokeIntensityThreshold = 0.85f;
 
 
         MultiplyWithIntensity((float)(0.5f), emitterElectricity1);
@@ -190,36 +192,53 @@ public class Ball : PickupableObject
 
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
+        RPCParticles(camPos, direction);
+        SendRPC("RPCParticles", camPos, direction);
         direction.y += 0.2f;
-
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+    }
+
+    public void RPCParticles(Vector3 camPos, Vector3 direction)
+    {
+        emitterFire.Emit = true;
+        emitterSmoke.Emit = true;
+        //emitterElectricity1.Emit = true;
+        //emitterElectricity2.Emit = true;
+        //emitterElectricity3.Emit = true;
+
+        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
+        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
+        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
+
+        MultiplyWithIntensity(smokeIntensityThreshold, emitterSmoke);
+        MultiplyWithIntensity(2.0f, emitterFire);
     }
 
     override public void ChargeEffect()
     {
-        emitterElectricity1.Emit = true;
-        emitterElectricity2.Emit = true;
-        emitterElectricity3.Emit = true;
+        //emitterElectricity1.Emit = true;
+        //emitterElectricity2.Emit = true;
+        //emitterElectricity3.Emit = true;
 
         float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
 
-        if (interp > 0.7f)
-        {
-            emitterFire.Emit = true;
-        }
-        if (interp > 0.9f)
-        {
-            emitterSmoke.Emit = true;
-        }
+        //if (interp > 0.7f)
+        //{
+        //    emitterFire.Emit = true;
+        //}
+        //if (interp > 0.9f)
+        //{
+        //    emitterSmoke.Emit = true;
+        //}
         if (interp > electricityIntensifyerThreshold)
         {
             MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
-            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
-            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
-            electricityIntensifyerThreshold += 0.2f;
+            //    MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
+            //    MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
+            //    electricityIntensifyerThreshold += 0.2f;
         }
 
-    }
+        }
 
     override public void Cleanup()
     {

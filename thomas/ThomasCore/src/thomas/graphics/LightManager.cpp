@@ -10,6 +10,7 @@
 #include <algorithm>
 #include "../resource/texture/Texture2DArray.h"
 #include "render/Frame.h"
+#include "../graphics/Mesh.h"
 
 namespace thomas
 {
@@ -54,8 +55,6 @@ namespace thomas
 				s_freeShadowMapViewIndexes.push_back(i);
 				s_lightMatrices[i] = math::Matrix::Identity;
 			}
-
-
 
 			ShadowMap::InitStatics(s_shadowMapSize);
 		}
@@ -169,8 +168,9 @@ namespace thomas
 							for (auto & perMeshCommand : perMaterialQueue.second)
 							{
 								{
-
+									
 									l->DrawShadow(perMeshCommand);
+									
 								}
 							}
 						}
