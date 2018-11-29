@@ -65,6 +65,12 @@ struct appdata_thomas {
 	float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
 };
+struct appdata_thomas_vertex
+{
+    float3 vertex : POSITION;
+    float3 normal : NORMAL;
+    float4 color : COLOR;
+};
 struct appdata_thomas_skin
 {
     float3 vertex : POSITION;
@@ -252,6 +258,19 @@ inline void ThomasSkinVertex(in out float4 position, in out float3 normal, in ou
     tangent = normalize(tang);
 }
 
+// Computes world space view direction, from object space position
+inline float3 ThomasWorldSpaceViewDir(in float3 worldPos)
+{
+    return _WorldSpaceCameraPos.xyz - worldPos;
+}
+
+// Computes world space view direction, from object space position
+// *Legacy* Please use ThomasWorldSpaceViewDir instead
+inline float3 WorldSpaceViewDir(in float4 localPos)
+{
+    float3 worldPos = mul(thomas_ObjectToWorld, localPos).xyz;
+    return ThomasWorldSpaceViewDir(worldPos);
+}
 
 /*
 
@@ -284,19 +303,7 @@ inline float3 ObjSpaceLightDir( in float4 v )
     #endif
 }
 
-// Computes world space view direction, from object space position
-inline float3 ThomasWorldSpaceViewDir( in float3 worldPos )
-{
-    return _WorldSpaceCameraPos.xyz - worldPos;
-}
 
-// Computes world space view direction, from object space position
-// *Legacy* Please use ThomasWorldSpaceViewDir instead
-inline float3 WorldSpaceViewDir( in float4 localPos )
-{
-    float3 worldPos = mul(thomas_ObjectToWorld, localPos).xyz;
-    return ThomasWorldSpaceViewDir(worldPos);
-}
 
 // Computes object space view direction
 inline float3 ObjSpaceViewDir( in float4 v )
