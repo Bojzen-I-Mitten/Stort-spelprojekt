@@ -7,7 +7,8 @@ public class GUISelectTeam : ScriptComponent
     public Texture2D SelectBox { get; set; }
     public Texture2D SpectatorCamTexture { get; set; }
     public Texture2D TeamListTexture { get; set; }
-    public Font TextFont { get; set; }
+    public Font ChadFont { get; set; }
+    public Font SportFont32 { get; set; }
 
     //public GameObject ChadTeam1 { get; set; }
     //public GameObject ChadTeam2 { get; set; }
@@ -221,24 +222,26 @@ public class GUISelectTeam : ScriptComponent
         Team1Text = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
         Team1Text.position = new Vector2(0.235f, 0.25f);
         Team1Text.origin = new Vector2(0.5f);
-        Team1Text.font = TextFont;
+        Team1Text.font = ChadFont;
         Team1Text.color = Unselected;
 
         Team2Text = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
         Team2Text.position = new Vector2(0.777f, 0.25f);
         Team2Text.origin = new Vector2(0.5f);
-        Team2Text.font = TextFont;
+        Team2Text.font = ChadFont;
         Team2Text.color = Unselected;
 
         SpectatorText = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_SPECTATOR].Name);
         SpectatorText.position = new Vector2(0.5f, 0.8f);
         SpectatorText.origin = new Vector2(0.5f);
+        SpectatorText.font = SportFont32;
         SpectatorText.interactable = true;
         SpectatorText.color = Unselected;
 
         ReadyUp = Canvas.Add("Ready Up!");
         ReadyUp.position = new Vector2(0.5f, 0.25f);
         ReadyUp.origin = new Vector2(0.5f);
+        ReadyUp.font = SportFont32;
         ReadyUp.scale = Vector2.Zero;
         ReadyUp.interactable = true;
         ReadyUp.color = Unselected;
@@ -247,6 +250,7 @@ public class GUISelectTeam : ScriptComponent
         StartGame.position = new Vector2(0.5f, 0.35f);
         StartGame.origin = new Vector2(0.5f);
         StartGame.scale = Vector2.Zero;
+        StartGame.font = SportFont32;
         StartGame.interactable = true;
         StartGame.color = Unselected;
 
@@ -318,7 +322,8 @@ public class GUISelectTeam : ScriptComponent
         foreach (NetworkPlayer player in team1)
         {
             Text p = Canvas.Add(player.PlayerName);
-            p.position = new Vector2(0.0f, 0.1f + 0.25f * i);
+            p.position = new Vector2(0.0f, 0.15f + 0.15f * i);
+            p.font = SportFont32;
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
@@ -329,7 +334,8 @@ public class GUISelectTeam : ScriptComponent
         {
             Text p = Canvas.Add(player.PlayerName);
             p.origin = new Vector2(1, 0);
-            p.position = new Vector2(1.0f, 0.1f + 0.25f * i);
+            p.position = new Vector2(1.0f, 0.15f + 0.15f * i);
+            p.font = SportFont32;
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
