@@ -39,7 +39,7 @@ namespace thomas
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
 				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
-				static std::map<std::string, float> s_vramusage;
+				static std::map<std::string, std::vector<float>> s_vramusage;
 				static float s_vrambudget;
 				static unsigned int s_frames;
 

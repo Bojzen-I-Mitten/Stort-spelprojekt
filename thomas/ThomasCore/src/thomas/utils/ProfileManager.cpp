@@ -12,7 +12,7 @@ namespace thomas
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
 			std::vector<long long> ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
-			std::map<std::string, float> ProfileManager::s_vramusage;
+			std::map<std::string, std::vector<float>> ProfileManager::s_vramusage;
 			float ProfileManager::s_vrambudget;
 			unsigned int ProfileManager::s_frames;
 
@@ -50,7 +50,7 @@ namespace thomas
 
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
-				s_vramusage.insert(std::make_pair(name, usage));
+				s_vramusage[name].push_back(usage);
 			}
 
 			//void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
@@ -66,7 +66,7 @@ namespace thomas
 
 				j["SlowfilerData"]["build"]["fps"] = s_fps;
 
-				j["SlowfilerData"]["gpu"] = s_gpuSamples;
+				j["SlowfilerData"]["build"]["gpu"] = s_gpuSamples;
 
 				j["SlowfilerData"]["processor"];
 
