@@ -65,15 +65,16 @@ namespace thomas
 
 				std::shared_ptr<graphics::Mesh> mesh = m_model->GetMeshes()[i];
 
+				int test = mesh->GetData().vertices.boneIndices.size();
+
 				resource::ComputeShader* skinningCS = graphics::Renderer::Instance()->GetSkinningShader();
 
 
-				skinningCS->Bind();
-				skinningCS->SetPass(0);
+				for (unsigned p = 0; p < num_prop; ++p)
+					property_data[p].m_apply(property_data[p], skinningCS);
 
-				property_data[0].m_apply(property_data[0], skinningCS);
 				mesh->Skin(skinningCS);
-				
+
 				RenderComponent::SubmitPart(camera, i, property_data, num_prop);
 			}
 

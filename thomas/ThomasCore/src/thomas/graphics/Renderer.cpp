@@ -186,6 +186,7 @@ namespace thomas
 		{
 			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 			
+
 			//Process commands
 			{
 				PROFILE("BindFrame")

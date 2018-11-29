@@ -65,7 +65,8 @@ namespace thomas
 		void Mesh::Skin(resource::ComputeShader * computeShader)
 		{
 			
-
+			int test = m_data.skinOrigVertexBuffers[resource::Shader::Semantics::POSITION].get()->GetStride(); 
+			int test2 = m_data.skinOrigVertexBuffers[resource::Shader::Semantics::NORMAL].get()->GetStride(); 
 			//set srvs
 			if (m_data.vertices.positions.size() > 0)
 				computeShader->SetPropertyResource("vertexOrigData", m_data.skinOrigVertexBuffers[resource::Shader::Semantics::POSITION].get()->GetSRV());
@@ -86,8 +87,12 @@ namespace thomas
 				computeShader->SetPropertyUAV("boneWeightData", m_data.skinVertexBuffers[resource::Shader::Semantics::BONEWEIGHTS].get()->GetUAV());
 
 			computeShader->SetPropertyInt("maxNrOfVerts", GetVertexCount());
+			
+			computeShader->Bind();
+			computeShader->SetPass(0);
 
-			computeShader->Dispatch(GetVertexCount() / 256.0f);
+			int gridDimX = (GetVertexCount() + 255) / 256;
+			computeShader->Dispatch(gridDimX);
 
 			computeShader->UnbindAllSRVs();
 			computeShader->UnbindAllUAVs();

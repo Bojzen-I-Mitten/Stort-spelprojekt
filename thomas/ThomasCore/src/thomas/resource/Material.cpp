@@ -5,6 +5,7 @@
 #include "../graphics/Renderer.h"
 #include "ShaderProperty\shaderProperties.h"
 #include <mutex>
+#include "../ThomasCore.h"
 
 namespace thomas
 {
@@ -110,6 +111,11 @@ namespace thomas
 
 		void Material::SetShader(resource::Shader * shader)
 		{
+			if (shader == nullptr)
+			{
+				LOG("shader is nullptr, causing early exit");
+				return;
+			}
 			Lock();
 			m_shader = shader;
 			m_passes.clear();
