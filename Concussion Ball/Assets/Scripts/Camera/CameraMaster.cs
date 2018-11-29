@@ -134,12 +134,18 @@ public class CameraMaster : ScriptComponent
             case CAM_STATE.GAME:
                 Hud.Canvas.isRendering = true;
                 if(Input.GetKeyDown(Input.Keys.Escape))
+                {
                     State = CAM_STATE.EXIT_MENU;
+                    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                }
                 break;
             case CAM_STATE.EXIT_MENU:
                 ExitMenu.Canvas.isRendering = true;
                 if (Input.GetKeyDown(Input.Keys.Escape))
+                {
                     State = CAM_STATE.GAME;
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                }
                 break;
             case CAM_STATE.HOST_MENU:
                 HostMenu.SetUpScene();

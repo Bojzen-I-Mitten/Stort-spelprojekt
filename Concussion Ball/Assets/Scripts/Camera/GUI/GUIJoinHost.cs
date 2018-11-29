@@ -16,6 +16,9 @@ public class GUIJoinHost : ScriptComponent
     private bool TakeIP;
     private bool TakePort;
 
+    private bool ClearIP = false;
+    private bool ClearPort = false;
+
     private bool hasConnected = false;
 
     public Canvas Canvas;
@@ -34,8 +37,15 @@ public class GUIJoinHost : ScriptComponent
     Text Port;
     Text ConnectingText;
 
+    Text Caret;
+
+    IEnumerator Blink = null;
+
     public bool GoToTeamSelect;
     IEnumerator test;
+
+    public float CaretOffset { get; set; } = 0.0f;
+    public float TextOffset { get; set; } = 0.0f;
 
     public override void Start()
     {
@@ -80,11 +90,17 @@ public class GUIJoinHost : ScriptComponent
         Back.color = Color.FloralWhite;
 
         if (TakeIP)
+        {
             GUIInput.AppendString(ref IPString, 15);
+            Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, CaretOffset);
+        }
         if (TakePort)
+        {
             GUIInput.AppendString(ref PortString, 5);
+            Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
+        }
 
-        if (Back.Clicked())
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
             ConnectingText.text = "";
@@ -94,19 +110,17 @@ public class GUIJoinHost : ScriptComponent
         {
             ConnectingText.text = "";
             TakePort = false;
-            TakeIP = true;
-            TextBoxPort.color = Color.Black;
-            TextBoxIP.color = Color.Green;
-        }
-        else if (TextBoxPort.Clicked())
-        {
-            ConnectingText.text = "";
             TakeIP = false;
-            TakePort = true;
             TextBoxIP.color = Color.Black;
-            TextBoxPort.color = Color.Green;
+            TextBoxPort.color = Color.Black;
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
         }
-        else if (Join.Clicked())
+
+        if (Join.Clicked())
         {
             ConnectingText.text = "";
             System.Net.IPAddress ipaddress;
@@ -163,14 +177,44 @@ public class GUIJoinHost : ScriptComponent
                 TextBoxPort.color = Color.Red;
             }
         }
-        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+
+        if (Back.Clicked())
         {
-            TakePort = false;
-            TakeIP = false;
-            TextBoxIP.color = Color.Black;
-            TextBoxPort.color = Color.Black;
+            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            ConnectingText.text = "";
         }
-        else if (Join.Hovered())
+
+        if (TextBoxIP.Clicked())
+        {
+            ConnectingText.text = "";
+            TakeIP = true;
+            if (ClearIP)
+            {
+                IPString = "";
+                ClearIP = false;
+            }
+        }
+        else if (TextBoxPort.Clicked())
+        {
+            ConnectingText.text = "";
+            TakePort = true;
+            if (ClearPort)
+            {
+                PortString = "";
+                ClearPort = false;
+            }
+        }
+        else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            if (Blink != null)
+            {
+                StopCoroutine(Blink);
+                Blink = null;
+                Caret.text = "";
+            }
+        }
+
+        if (Join.Hovered())
         {
             Join.color = Color.IndianRed;
         }
@@ -299,6 +343,7 @@ public class GUIJoinHost : ScriptComponent
         Canvas.Remove(PortText);
         Canvas.Remove(IP);
         Canvas.Remove(Port);
+        Canvas.Remove(Caret);
     }
 
     IEnumerator Connecting()
@@ -316,6 +361,26 @@ public class GUIJoinHost : ScriptComponent
                 ConnectingText.text += ".";
 
             yield return new WaitForSecondsRealtime(0.25f);
+        }
+    }
+
+    IEnumerator CaretBlink()
+    {
+        bool underscore = true;
+        while (true)
+        {
+            if (underscore)
+            {
+                Caret.text = "|";
+                underscore = false;
+            }
+            else
+            {
+                Caret.text = "";
+                underscore = true;
+            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
 }

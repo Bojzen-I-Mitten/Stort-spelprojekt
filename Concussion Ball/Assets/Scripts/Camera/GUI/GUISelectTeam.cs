@@ -9,6 +9,7 @@ public class GUISelectTeam : ScriptComponent
     public Texture2D TeamListTexture { get; set; }
     public Font ChadFont { get; set; }
     public Font SportFont32 { get; set; }
+    public Texture2D ExitTexture { get; set; }
 
     //public GameObject ChadTeam1 { get; set; }
     //public GameObject ChadTeam2 { get; set; }
@@ -24,6 +25,7 @@ public class GUISelectTeam : ScriptComponent
     public Vector2 Team2ListScale { get; set; } = new Vector2(0, 0);
     public Canvas Canvas;
 
+    Image ExitImage;
     Image Team1Image;
     Image Team2Image;
     Image Team1List;
@@ -37,6 +39,7 @@ public class GUISelectTeam : ScriptComponent
     Text SpectatorText;
     Text ReadyUp;
     Text StartGame;
+    Text ExitText;
 
     List<Text> Team1Players = new List<Text>();
     List<Text> Team2Players = new List<Text>();
@@ -125,6 +128,7 @@ public class GUISelectTeam : ScriptComponent
         SpectatorText.color = Unselected;
         ReadyUp.color = Unselected;
         StartGame.color = Unselected;
+        ExitText.color = Unselected;
 
         if (Team1Image.Hovered())
         {
@@ -162,6 +166,15 @@ public class GUISelectTeam : ScriptComponent
         else if (StartGame.Hovered() && CheckReadyPlayers())
         {
             StartGame.color = Selected;
+        }
+        else if (ExitText.Hovered())
+        {
+            ExitText.color = Color.Black;
+            
+            if (ExitText.Clicked())
+            {
+                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            }
         }
         else
         {
@@ -212,6 +225,13 @@ public class GUISelectTeam : ScriptComponent
             SpectatorImage.position = new Vector2(0.5f, 0.88f);
             SpectatorImage.origin = new Vector2(0.5f);
             SpectatorImage.interactable = true;
+        }
+
+        if(ExitTexture != null)
+        {
+            ExitImage = Canvas.Add(ExitTexture);
+            ExitImage.position = new Vector2(0.05f, 0.8f);
+            ExitImage.origin = new Vector2(0.5f);
         }
 
         Select = Canvas.Add("Select Team");
@@ -272,6 +292,11 @@ public class GUISelectTeam : ScriptComponent
             Team2List.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
         }
 
+        ExitText = Canvas.Add("Exit");
+        ExitText.position = new Vector2(0.05f, 0.85f);
+        ExitText.origin = new Vector2(0.5f);
+        ExitText.color = Unselected;
+        ExitText.interactable = true;
     }
 
     public void ClearImagesAndText()
@@ -285,6 +310,8 @@ public class GUISelectTeam : ScriptComponent
         Canvas.Remove(Team2Text);
         Canvas.Remove(SpectatorText);
         DeletePlayersLists();
+        Canvas.Remove(ExitText);
+        Canvas.Remove(ExitImage);
     }
 
     private void IdleChads()
