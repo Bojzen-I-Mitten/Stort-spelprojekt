@@ -50,12 +50,24 @@ public class GUISelectTeam : ScriptComponent
         if (ChadTeam1 != null)
         {
             ChadRSC1 = ChadTeam1.GetComponent<RenderSkinnedComponent>();
-            Chad1Mat = ChadRSC1.material = new Material(ChadRSC1.material);
+
+            Material[] mats = ChadRSC1.materials;
+
+            Chad1Mat = mats[1] = new Material(mats[1]);
+
+            ChadRSC1.materials = mats;
+
+
         }
         if (ChadTeam2 != null)
         {
             ChadRSC2 = ChadTeam2.GetComponent<RenderSkinnedComponent>();
-            Chad2Mat = ChadRSC2.material = new Material(ChadRSC2.material);
+
+            Material[] mats = ChadRSC2.materials;
+
+            Chad2Mat = mats[1] = new Material(mats[1]);
+
+            ChadRSC2.materials = mats;
         }
 
 

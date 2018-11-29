@@ -328,6 +328,8 @@ namespace thomas
 
 			if (mesh->mTextureCoords[0])
 				vertices.texCoord0.resize(mesh->mNumVertices);
+			if (mesh->mTextureCoords[1])
+				vertices.texCoord1.resize(mesh->mNumVertices);
 
 			if (mesh->HasTangentsAndBitangents())
 			{
@@ -360,7 +362,7 @@ namespace thomas
 
 				if (mesh->HasVertexColors(0))
 				{
-					vertices.colors[i] = math::Color((float*)mesh->mColors[0]);
+					vertices.colors[i] = math::Color((float*)(&mesh->mColors[0][i]));
 				}
 				
 
@@ -380,12 +382,13 @@ namespace thomas
 				// Texture Coordinates
 				if (mesh->mTextureCoords[0])
 				{
-
-					math::Vector2 vec;
-
 					// A vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
 					// use models where a vertex can have multiple texture coordinates so we always take the first set (0).
 					vertices.texCoord0[i] = math::Vector2((float*)&mesh->mTextureCoords[0][i]);
+				}
+				if (mesh->mTextureCoords[1])
+				{
+					vertices.texCoord1[i] = math::Vector2((float*)&mesh->mTextureCoords[1][i]);
 				}
 			}
 

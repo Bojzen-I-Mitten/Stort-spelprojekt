@@ -39,7 +39,11 @@ public class NetworkPlayer : NetworkComponent
         GoalsScored = 0;
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+        Material[] mats = gameObject.GetComponent<RenderSkinnedComponent>().materials;
+
+        mat = mats[1] = new Material(mats[1]);
+
+        gameObject.GetComponent<RenderSkinnedComponent>().materials = mats;
 
         nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");

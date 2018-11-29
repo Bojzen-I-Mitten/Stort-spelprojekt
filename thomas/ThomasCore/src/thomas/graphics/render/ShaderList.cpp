@@ -152,6 +152,7 @@ namespace thomas {
 					LOG("Recompiling Shaders...");
 					for (resource::Shader* shader : m_renderableShaders)
 						shader->Recompile();
+					LOG("...Done");
 					m_syncShaders = false;
 				}
 #endif
