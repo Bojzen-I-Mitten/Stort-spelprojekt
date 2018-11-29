@@ -33,10 +33,10 @@ namespace thomas {
 
 			void AnimatedSkeleton::update(float dT) {
 				Lock lck(m_lock);
-				if (!_root) return;		// Verify blend node
-				_root->update(dT);		// Update each node ONCE.
-				updateSkeleton();		// Apply skeleton.
-				_root->resetUpdate();	// Clear dirty update flags.
+				if (_root.empty()) return;		// Verify blend node
+				_root->update(dT);				// Update each node ONCE.
+				updateSkeleton();				// Apply skeleton.
+				_root->resetUpdate();			// Clear dirty update flags.
 			}
 
 			void AnimatedSkeleton::setPose()
@@ -84,7 +84,7 @@ namespace thomas {
 			void AnimatedSkeleton::stopAnimation()
 			{
 				Lock lck(m_lock);
-				_root = NULL;
+				_root.unassign();
 			}
 
 			void AnimatedSkeleton::setBlendTree(AnimationNode *blendTree)
@@ -94,12 +94,12 @@ namespace thomas {
 				else
 				{
 					Lock lck(m_lock);
-					_root = blendTree;
+					_root.assign(blendTree, thomas::utility::allocator::OWNED_BY_ENGINE);
 				}
 			}
 
 			void AnimatedSkeleton::clearBlendTree() {
-				_root = NULL;
+				_root.unassign();
 				setPose();
 			}
 
@@ -112,7 +112,7 @@ namespace thomas {
 				AnimationData &animRef = *anim->GetAnimation();
 				std::unique_ptr<Playback> playback(new BaseAnimationTime(0.f, animRef.m_duration, PlayType::Loop));
 				Lock lck(m_lock);
-				_root = new AnimPlayback(_ref, playback, animRef);
+				_root.assign(new AnimPlayback(_ref, playback, animRef), thomas::utility::allocator::OWNED_BY_CORE);
 			}
 
 
