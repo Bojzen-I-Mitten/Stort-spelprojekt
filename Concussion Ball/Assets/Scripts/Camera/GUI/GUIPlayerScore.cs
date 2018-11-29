@@ -68,11 +68,11 @@ public class Playertext
     public void UpdatePositionTeam1( Image Playerbar1)
     {
         //float PositionUpdate = NewPositionUpdate * 0.064f;
-        this.PlayerName.position = Playerbar1.position+new Vector2(0.0725f,0.047f); //new Vector2(0.020f, 0.34f + PositionUpdate);
-        this.PlayerGoals.position   = Playerbar1.position + new Vector2(0.19f, 0.047f);//new Vector2(0.179f, 0.34f + PositionUpdate);
-        this.PlayerTackles.position = Playerbar1.position + new Vector2(0.29f, 0.047f);//new Vector2(0.268f, 0.34f + PositionUpdate);
-        this.PlayerTackled.position = Playerbar1.position + new Vector2(0.38f, 0.047f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
-        this.PlayerPing.position    = Playerbar1.position + new Vector2(0.455f, 0.047f); ;//new Vector2(0.445f, 0.34f + PositionUpdate);
+        this.PlayerName.position = Playerbar1.position + new Vector2(0.0725f,0.042f); //new Vector2(0.020f, 0.34f + PositionUpdate);
+        this.PlayerGoals.position   = Playerbar1.position + new Vector2(0.19f, 0.042f);//new Vector2(0.179f, 0.34f + PositionUpdate);
+        this.PlayerTackles.position = Playerbar1.position + new Vector2(0.29f, 0.042f);//new Vector2(0.268f, 0.34f + PositionUpdate);
+        this.PlayerTackled.position = Playerbar1.position + new Vector2(0.38f, 0.042f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
+        this.PlayerPing.position    = Playerbar1.position + new Vector2(0.455f, 0.042f); ;//new Vector2(0.445f, 0.34f + PositionUpdate);
        
         this.PlayerName.origin = new Vector2(0.5f, 0.5f); //new Vector2(0.020f, 0.34f + PositionUpdate);
         this.PlayerGoals.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.179f, 0.34f + PositionUpdate);
@@ -85,24 +85,19 @@ public class Playertext
 
     public void UpdatePositionTeam2(Image Playerbar2)
     {
-        //    float PositionUpdate = NewPositionUpdate * 0.064f;
-        //    this.PlayerName.position    = new Vector2(0.870f, 0.34f + PositionUpdate);
-        //    this.PlayerGoals.position   = new Vector2(0.800f, 0.34f + PositionUpdate);
-        //    this.PlayerTackles.position = new Vector2(0.700f, 0.34f + PositionUpdate);
-        //    this.PlayerTackled.position = new Vector2(0.615f, 0.34f + PositionUpdate);
-        //    this.PlayerPing.position    = new Vector2(0.525f, 0.34f + PositionUpdate);
-        this.PlayerName.position = Playerbar2.position + new Vector2(0.425f, 0.047f); //new Vector2(0.020f, 0.34f + PositionUpdate);
-        this.PlayerGoals.position = Playerbar2.position + new Vector2(0.3f, 0.047f);//new Vector2(0.179f, 0.34f + PositionUpdate);
-        this.PlayerTackles.position = Playerbar2.position + new Vector2(0.21f, 0.047f);//new Vector2(0.268f, 0.34f + PositionUpdate);
-        this.PlayerTackled.position = Playerbar2.position + new Vector2(0.11f, 0.047f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
-        this.PlayerPing.position = Playerbar2.position + new Vector2(0.04f, 0.047f); ;//new Vector2(0.445f, 0.34f + PositionUpdate);
+
+        this.PlayerName.position = Playerbar2.position + new Vector2(0.425f, 0.042f);
+        this.PlayerGoals.position = Playerbar2.position + new Vector2(0.3f, 0.042f);
+        this.PlayerTackles.position = Playerbar2.position + new Vector2(0.21f, 0.042f);
+        this.PlayerTackled.position = Playerbar2.position + new Vector2(0.11f, 0.042f);
+        this.PlayerPing.position = Playerbar2.position + new Vector2(0.04f, 0.042f); ;
 
 
-        this.PlayerName.origin = new Vector2(0.5f, 0.5f); //new Vector2(0.020f, 0.34f + PositionUpdate);
-        this.PlayerGoals.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.179f, 0.34f + PositionUpdate);
-        this.PlayerTackles.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.268f, 0.34f + PositionUpdate);
-        this.PlayerTackled.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.364f, 0.34f + PositionUpdate);
-        this.PlayerPing.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.445f, 0.34f + PositionUpdate);
+        this.PlayerName.origin = new Vector2(0.5f, 0.5f); 
+        this.PlayerGoals.origin = new Vector2(0.5f, 0.5f);
+        this.PlayerTackles.origin = new Vector2(0.5f, 0.5f);
+        this.PlayerTackled.origin = new Vector2(0.5f, 0.5f);
+        this.PlayerPing.origin = new Vector2(0.5f, 0.5f);
 
 
     }
@@ -183,13 +178,13 @@ public class GUIPlayerScore : ScriptComponent
         TextScore.color = Color.Black;
         TextScore.scale = Vector2.Zero;
         TextScore.font = Font;
-        TextScore.position = new Vector2(0.466f, 0.14f);
+        TextScore.position = new Vector2(0.45f, 0.1225f);
         PlayerStandardbar[0] = Canvas.Add(PlayerBarTeam1);
         PlayerStandardbar[1] = Canvas.Add(PlayerBarTeam2);
         TeamName[0] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
         TeamName[1] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
-        PlayerstandardText[1] = Canvas.Add("Ping  Tackled  Tackles  Goals         Player");
-        PlayerstandardText[0] = Canvas.Add("   Player        Goals     Tackles  Tackled  Ping");
+        PlayerstandardText[1] = Canvas.Add("Ping  Tackled  Tackles   Goals        Player");
+        PlayerstandardText[0] = Canvas.Add("     Player        Goals    Tackles Tackled  Ping");
         for (int i = 0; i < 2; i++)
         {
             PlayerStandardbar[i].scale = Vector2.Zero;
@@ -198,16 +193,16 @@ public class GUIPlayerScore : ScriptComponent
             TeamName[i].font = Font;
             TeamName[i].scale = Vector2.Zero;
         }
-        PlayerstandardText[0].position = new Vector2(0, 0.275f);
-        PlayerstandardText[1].position = new Vector2(0.52f, 0.275f);
+        PlayerstandardText[0].position = new Vector2(0.003f, 0.27f);
+        PlayerstandardText[1].position = new Vector2(0.52f, 0.27f);
         PlayerStandardbar[0].position = new Vector2(0, 0.32f + (-1 * 0.063f));
         PlayerStandardbar[0].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;//Color.Red; 
         PlayerStandardbar[1].color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;//Color.Blue;
         PlayerStandardbar[1].position = new Vector2(0.5f, 0.32f + (-1 * 0.063f)); 
 
-        TeamName[0].position = new Vector2(0.11f, 0.192f);
+        TeamName[0].position = new Vector2(0.11f, 0.173f);
         TeamName[0].origin = Vector2.Zero;
-        TeamName[1].position = new Vector2(0.885f, 0.192f);
+        TeamName[1].position = new Vector2(0.885f, 0.173f);
         TeamName[1].origin = new Vector2(1, 0);
         TeamName[0].color = Color.White;
         TeamName[1].color = Color.White;
@@ -232,18 +227,18 @@ public class GUIPlayerScore : ScriptComponent
             {
                 ScoreText[i].scale = new Vector2(2, 2);
                 TeamName[i].scale = OnOff;
-                PlayerstandardText[i].scale = OnOff;//new Vector2(0.8f, 0.6f);
+                PlayerstandardText[i].scale = new Vector2(1.0f, 1.0f);//new Vector2(0.8f, 0.6f);
             }
         }
         if(OnOff.x != 0)
         { 
             for(int i = 0;i< Team1Players.Count;i++)
             {
-                Team1Players[i].UpdateScale(OnOff/*new Vector2(0.8f, 0.6f)*/);
+                Team1Players[i].UpdateScale(new Vector2(1.1f, 1.1f));
             }
             for (int i = 0; i < Team2Players.Count; i++)
             {
-                Team2Players[i].UpdateScale(OnOff/*new Vector2(0.8f, 0.6f)*/);
+                Team2Players[i].UpdateScale(new Vector2(1.1f, 1.1f));
             }
         }
         else
@@ -348,8 +343,8 @@ public class GUIPlayerScore : ScriptComponent
         ScoreText[i].scale = Vector2.Zero;
         ScoreText[i].font = Font;
         }
-        ScoreText[0].position = new Vector2(0.44f, 0.2f);
-        ScoreText[1].position = new Vector2(0.53f,0.2f);
+        ScoreText[0].position = new Vector2(0.435f, 0.18f);
+        ScoreText[1].position = new Vector2(0.525f,0.18f);
 
         if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name.Length >= 13)
             TeamName[0].text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name.Substring(0, 13) + "-";

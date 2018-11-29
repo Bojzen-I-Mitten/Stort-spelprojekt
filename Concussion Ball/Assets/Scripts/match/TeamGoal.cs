@@ -94,7 +94,7 @@ public class TeamGoal : ScriptComponent
         {
             if (collider.gameObject == MatchSystem.instance.Ball && MatchSystem.instance.MatchStarted)
             {
-                if (MatchSystem.instance.Ball.GetComponent<NetworkIdentity>().Owner)
+                if (MatchSystem.instance.Ball.GetComponent<NetworkIdentity>().Owner && !MatchSystem.instance.hasScored)
                 {
                     TEAM_TYPE teamThatScored = MatchSystem.instance.GetOpposingTeam(Team);
                     MatchSystem.instance.OnGoal(teamThatScored);
