@@ -74,6 +74,14 @@ namespace thomas
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
+			for (object::component::LightComponent* l : s_lights)
+			{
+				if (l == light)
+				{
+					//LOG("light already added");
+					return;
+				}
+			}
 			switch (light->GetType())
 			{
 			case DIRECTIONAL:
