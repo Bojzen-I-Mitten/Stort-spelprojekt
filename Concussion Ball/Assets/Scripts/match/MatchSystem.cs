@@ -202,6 +202,20 @@ public class MatchSystem : NetworkManager
     }
 #endregion
 
+   void ResetNetworkplayerPoints()
+    {
+        foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_1].Players)
+        {
+            Player.GoalsScored = 0;
+            Player.HasTackled = 0;
+        }
+        foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_2].Players)
+        {
+            Player.GoalsScored = 0;
+            Player.HasTackled = 0;
+        }
+
+    }
 #region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
@@ -211,7 +225,7 @@ public class MatchSystem : NetworkManager
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
         
-	GUIScoreScreen.Instance.Toggle(false);
+	    GUIScoreScreen.Instance.Toggle(false);
         for(int i=0;i<GUIScoreScreen.Instance.ScoreScreenTimeLast;i++)
         {
             GUIScoreScreen.Instance.updateTextPlayAgain();
@@ -220,9 +234,9 @@ public class MatchSystem : NetworkManager
             if (GUIScoreScreen.Instance.getToggleBool())
                 break;
         }
-	RPCStartMatch();
-	
-	GUIScoreScreen.Instance.Toggle(true);
+        ResetNetworkplayerPoints();
+        RPCStartMatch();
+	    GUIScoreScreen.Instance.Toggle(true);
         GUIPlayerScore.Instance.Toggle = false;
     }
 

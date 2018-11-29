@@ -10,22 +10,22 @@ public class Playertext
     public Text PlayerName;
     public Text PlayerGoals;
     public Text PlayerTackles;
-    public Text PlayerTackled;
+    public Text PlayerScore;
     public Text PlayerPing;
     Canvas Canvas;
     
-    public Playertext(int Number,Font font,Canvas Canvas,String Name, int goals, int Tackles, int Tackled, int Ping, TEAM_TYPE team, Image playerbar)
+    public Playertext(int Number,Font font,Canvas Canvas,String Name, int goals, int Tackles, int score, int Ping, TEAM_TYPE team, Image playerbar)
     {
         this.Canvas = Canvas;
         this.PlayerName = Canvas.Add(Name);
         this.PlayerGoals = Canvas.Add(""+goals);
         this.PlayerTackles = Canvas.Add("" + Tackles);
-        this.PlayerTackled = Canvas.Add("" + Tackled);
+        this.PlayerScore = Canvas.Add("" + score);
         this.PlayerPing = Canvas.Add("" + Ping);
         this.PlayerName.origin = new Vector2(0, 0);
         this.PlayerGoals.origin = new Vector2(0, 0);
         this.PlayerTackles.origin = new Vector2(0, 0);
-        this.PlayerTackled.origin = new Vector2(0, 0);
+        this.PlayerScore.origin = new Vector2(0, 0);
         this.PlayerPing.origin = new Vector2(0, 0);
 
         AddFont(font);
@@ -43,7 +43,7 @@ public class Playertext
         this.PlayerName.scale = scale;
         this.PlayerGoals.scale = scale;
         this.PlayerTackles.scale = scale;
-        this.PlayerTackled.scale = scale;
+        this.PlayerScore.scale = scale;
         this.PlayerPing.scale = scale;
     }
 
@@ -52,7 +52,7 @@ public class Playertext
         this.PlayerName.font = font;
         this.PlayerGoals.font = font;
         this.PlayerTackles.font = font;
-        this.PlayerTackled.font = font;
+        this.PlayerScore.font = font;
         this.PlayerPing.font = font;
     } 
 
@@ -61,7 +61,7 @@ public class Playertext
         Canvas.Remove(this.PlayerName);
         Canvas.Remove(this.PlayerGoals);
         Canvas.Remove(this.PlayerTackles);
-        Canvas.Remove(this.PlayerTackled);
+        Canvas.Remove(this.PlayerScore);
         Canvas.Remove(this.PlayerPing);
     }
 
@@ -69,15 +69,15 @@ public class Playertext
     {
         //float PositionUpdate = NewPositionUpdate * 0.064f;
         this.PlayerName.position = Playerbar1.position + new Vector2(0.0725f,0.042f); //new Vector2(0.020f, 0.34f + PositionUpdate);
-        this.PlayerGoals.position   = Playerbar1.position + new Vector2(0.19f, 0.042f);//new Vector2(0.179f, 0.34f + PositionUpdate);
-        this.PlayerTackles.position = Playerbar1.position + new Vector2(0.29f, 0.042f);//new Vector2(0.268f, 0.34f + PositionUpdate);
-        this.PlayerTackled.position = Playerbar1.position + new Vector2(0.38f, 0.042f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
+        this.PlayerScore.position   = Playerbar1.position + new Vector2(0.19f, 0.042f);//new Vector2(0.179f, 0.34f + PositionUpdate);
+        this.PlayerGoals.position = Playerbar1.position + new Vector2(0.29f, 0.042f);//new Vector2(0.268f, 0.34f + PositionUpdate);
+        this.PlayerTackles.position = Playerbar1.position + new Vector2(0.38f, 0.042f); ;//new Vector2(0.364f, 0.34f + PositionUpdate);
         this.PlayerPing.position    = Playerbar1.position + new Vector2(0.455f, 0.042f); ;//new Vector2(0.445f, 0.34f + PositionUpdate);
        
         this.PlayerName.origin = new Vector2(0.5f, 0.5f); //new Vector2(0.020f, 0.34f + PositionUpdate);
         this.PlayerGoals.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.179f, 0.34f + PositionUpdate);
         this.PlayerTackles.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.268f, 0.34f + PositionUpdate);
-        this.PlayerTackled.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.364f, 0.34f + PositionUpdate);
+        this.PlayerScore.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.364f, 0.34f + PositionUpdate);
         this.PlayerPing.origin = new Vector2(0.5f, 0.5f);//new Vector2(0.445f, 0.34f + PositionUpdate);
 
 
@@ -87,16 +87,16 @@ public class Playertext
     {
 
         this.PlayerName.position = Playerbar2.position + new Vector2(0.425f, 0.042f);
-        this.PlayerGoals.position = Playerbar2.position + new Vector2(0.3f, 0.042f);
-        this.PlayerTackles.position = Playerbar2.position + new Vector2(0.21f, 0.042f);
-        this.PlayerTackled.position = Playerbar2.position + new Vector2(0.11f, 0.042f);
+        this.PlayerScore.position = Playerbar2.position + new Vector2(0.3f, 0.042f);
+        this.PlayerGoals.position = Playerbar2.position + new Vector2(0.21f, 0.042f);
+        this.PlayerTackles.position = Playerbar2.position + new Vector2(0.11f, 0.042f);
         this.PlayerPing.position = Playerbar2.position + new Vector2(0.04f, 0.042f); ;
 
 
         this.PlayerName.origin = new Vector2(0.5f, 0.5f); 
         this.PlayerGoals.origin = new Vector2(0.5f, 0.5f);
         this.PlayerTackles.origin = new Vector2(0.5f, 0.5f);
-        this.PlayerTackled.origin = new Vector2(0.5f, 0.5f);
+        this.PlayerScore.origin = new Vector2(0.5f, 0.5f);
         this.PlayerPing.origin = new Vector2(0.5f, 0.5f);
 
 
@@ -107,7 +107,7 @@ public class Playertext
         this.PlayerName.color = color;
         this.PlayerGoals.color = color;
         this.PlayerTackles.color = color;
-        this.PlayerTackled.color = color;
+        this.PlayerScore.color = color;
         this.PlayerPing.color = color;
     }
 }
@@ -183,8 +183,8 @@ public class GUIPlayerScore : ScriptComponent
         PlayerStandardbar[1] = Canvas.Add(PlayerBarTeam2);
         TeamName[0] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name);
         TeamName[1] = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name);
-        PlayerstandardText[1] = Canvas.Add("Ping  Tackled  Tackles   Goals        Player");
-        PlayerstandardText[0] = Canvas.Add("     Player        Goals    Tackles Tackled  Ping");
+        PlayerstandardText[1] = Canvas.Add("Ping  Tackles    Goals     Score        Player");
+        PlayerstandardText[0] = Canvas.Add("     Player        Score      Goals   Tackles  Ping");
         for (int i = 0; i < 2; i++)
         {
             PlayerStandardbar[i].scale = Vector2.Zero;
@@ -331,6 +331,10 @@ public class GUIPlayerScore : ScriptComponent
             }
         }
     }
+    void UpdatePlayertextbasedonscore()
+    {
+
+    }
     void UpdateStatistics()
     {
         Canvas.Remove(ScoreText[0]);
@@ -368,7 +372,7 @@ public class GUIPlayerScore : ScriptComponent
                 Team1Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName;
             Team1Players[i].PlayerGoals.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored.ToString();
             Team1Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled.ToString();
-            Team1Players[i].PlayerTackled.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].BeenTackled.ToString();
+            Team1Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored).ToString();
             Team1Players[i].PlayerPing.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GetPing().ToString();
         }
         for (int i = 0; i < Math.Min(Team2Players.Count, AmountOfPlayersInTeam2); i++)
@@ -379,7 +383,7 @@ public class GUIPlayerScore : ScriptComponent
                 Team2Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName;
             Team2Players[i].PlayerGoals.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored.ToString();
             Team2Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled.ToString();
-            Team2Players[i].PlayerTackled.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].BeenTackled.ToString();
+            Team2Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored).ToString();
             Team2Players[i].PlayerPing.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GetPing().ToString();
         }
     }
