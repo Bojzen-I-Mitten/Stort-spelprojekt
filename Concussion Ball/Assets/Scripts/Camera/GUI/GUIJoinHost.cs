@@ -97,20 +97,6 @@ public class GUIJoinHost : ScriptComponent
             Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
         }
 
-        if (TextBoxIP.Clicked())
-        {
-            ConnectingText.text = "";
-            TakePort = false;
-            TakeIP = false;
-            TextBoxIP.color = Color.Black;
-            TextBoxPort.color = Color.Black;
-            if (Blink == null)
-            {
-                Blink = CaretBlink();
-                StartCoroutine(Blink);
-            }
-        }
-
         if (Join.Clicked())
         {
             TakeIP = false;
@@ -190,6 +176,11 @@ public class GUIJoinHost : ScriptComponent
                 IPString = "";
                 ClearIP = false;
             }
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
         }
         else if (TextBoxPort.Clicked())
         {
@@ -199,6 +190,11 @@ public class GUIJoinHost : ScriptComponent
             {
                 PortString = "";
                 ClearPort = false;
+            }
+            if (Blink == null)
+            {
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
             }
         }
         else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))

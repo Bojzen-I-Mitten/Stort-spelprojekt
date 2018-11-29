@@ -66,6 +66,15 @@ public class GUIMainMenu : ScriptComponent
         else if (Exit.Hovered())
             Exit.color = Selected;
 
+        if (PlayerString == "")
+        {
+            TextBoxName.color = Color.Red;
+        }
+        else
+        {
+            TextBoxName.color = Color.Black;
+        }
+
         if (TextBoxName.Clicked())
         {
             TakeName = true;
@@ -92,7 +101,7 @@ public class GUIMainMenu : ScriptComponent
             Caret.text = "";
         }
 
-        if (Play.Clicked())
+        if (Play.Clicked() && PlayerString != "")
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
