@@ -9,8 +9,7 @@ public class GUIJoinHost : ScriptComponent
     public Texture2D TextBoxBG { get; set; }
 
     Camera Camera;
-
-    private bool Disabled;
+    
     private string IPString;
     private string PortString;
     private bool TakeIP;
@@ -45,7 +44,6 @@ public class GUIJoinHost : ScriptComponent
     IEnumerator test;
 
     public float CaretOffset { get; set; } = 0.0f;
-    public float TextOffset { get; set; } = 0.0f;
 
     public override void Start()
     {
@@ -53,7 +51,6 @@ public class GUIJoinHost : ScriptComponent
         PortString = "9050";
         TakeIP = false;
         TakePort = false;
-        Disabled = false;
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
@@ -100,12 +97,6 @@ public class GUIJoinHost : ScriptComponent
             Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
         }
 
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-            ConnectingText.text = "";
-        }
-
         if (TextBoxIP.Clicked())
         {
             ConnectingText.text = "";
@@ -122,6 +113,8 @@ public class GUIJoinHost : ScriptComponent
 
         if (Join.Clicked())
         {
+            TakeIP = false;
+            TakePort = false;
             ConnectingText.text = "";
             System.Net.IPAddress ipaddress;
             try
@@ -165,6 +158,8 @@ public class GUIJoinHost : ScriptComponent
         }
         else if (Host.Clicked())
         {
+            TakeIP = false;
+            TakePort = false;
             ConnectingText.text = "";
             if (PortString != "")
             {
@@ -180,6 +175,8 @@ public class GUIJoinHost : ScriptComponent
 
         if (Back.Clicked())
         {
+            TakeIP = false;
+            TakePort = false;
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
             ConnectingText.text = "";
         }
@@ -225,12 +222,6 @@ public class GUIJoinHost : ScriptComponent
         else if (Back.Hovered())
         {
             Back.color = Color.IndianRed;
-        }
-
-        if (!Disabled)
-        {
-            IPText.text = IPString;
-            PortText.text = PortString;
         }
     }
 
@@ -328,6 +319,13 @@ public class GUIJoinHost : ScriptComponent
         ConnectingText.color = Color.FloralWhite;
         ConnectingText.depth = 0;
         ConnectingText.position = new Vector2(0.5f, 0.75f);
+
+        Caret = Canvas.Add("");
+        Caret.origin = new Vector2(0, 0.5f);
+        Caret.scale = IPText.scale;
+        Caret.interactable = false;
+        Caret.depth = 0.8f;
+        Caret.color = Color.Black;
     }
 
     public void ClearImagesAndText()

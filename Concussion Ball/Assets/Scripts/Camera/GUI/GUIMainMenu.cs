@@ -95,6 +95,7 @@ public class GUIMainMenu : ScriptComponent
         if (Play.Clicked())
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+            TakeName = false;
         }
 
         PlayerString = PlayerString.ToUpper();

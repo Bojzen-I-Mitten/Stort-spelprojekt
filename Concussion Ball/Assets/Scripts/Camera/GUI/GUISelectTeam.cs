@@ -9,7 +9,6 @@ public class GUISelectTeam : ScriptComponent
     public Texture2D TeamListTexture { get; set; }
     public Font ChadFont { get; set; }
     public Font SportFont32 { get; set; }
-    public Texture2D ExitTexture { get; set; }
 
     //public GameObject ChadTeam1 { get; set; }
     //public GameObject ChadTeam2 { get; set; }
@@ -24,8 +23,7 @@ public class GUISelectTeam : ScriptComponent
     public Vector2 Team2ListPos { get; set; } = new Vector2(0, 0);
     public Vector2 Team2ListScale { get; set; } = new Vector2(0, 0);
     public Canvas Canvas;
-
-    Image ExitImage;
+    
     Image Team1Image;
     Image Team2Image;
     Image Team1List;
@@ -227,13 +225,6 @@ public class GUISelectTeam : ScriptComponent
             SpectatorImage.interactable = true;
         }
 
-        if(ExitTexture != null)
-        {
-            ExitImage = Canvas.Add(ExitTexture);
-            ExitImage.position = new Vector2(0.05f, 0.8f);
-            ExitImage.origin = new Vector2(0.5f);
-        }
-
         Select = Canvas.Add("Select Team");
         Select.position = new Vector2(0.5f, 0.1f);
         Select.origin = new Vector2(0.5f);
@@ -311,7 +302,6 @@ public class GUISelectTeam : ScriptComponent
         Canvas.Remove(SpectatorText);
         DeletePlayersLists();
         Canvas.Remove(ExitText);
-        Canvas.Remove(ExitImage);
     }
 
     private void IdleChads()

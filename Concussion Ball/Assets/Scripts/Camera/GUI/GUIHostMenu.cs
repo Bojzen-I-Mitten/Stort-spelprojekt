@@ -17,33 +17,33 @@ public class GUIHostMenu : ScriptComponent
     public Texture2D TextBoxCross55Texture { get; set; }
     public Font Font { get; set; }
 
-    //public Vector2 _ServerNamePos { get; set; }
-    //public Vector2 _ServerNameStringPos { get; set; }
-    //public Vector2 _ServerNameBoxPos { get; set; }
+    //public Vector2 _ServerNamePos           { get; set; }
+    //public Vector2 _ServerNameStringPos     { get; set; }
+    //public Vector2 _ServerNameBoxPos        { get; set; }
 
-    //public Vector2 _MaxPlayersPos { get; set; }
-    //public Vector2 _MaxPlayersStringPos { get; set; }
-    //public Vector2 _MaxPlayersBoxPos { get; set; }
+    //public Vector2 _MaxPlayersPos           { get; set; }
+    //public Vector2 _MaxPlayersStringPos     { get; set; }
+    //public Vector2 _MaxPlayersBoxPos        { get; set; }
 
-    //public Vector2 _TimeRoundPos { get; set; }
-    //public Vector2 _TimeRoundStringPos { get; set; }
-    //public Vector2 _TimeRoundBoxPos { get; set; }
+    //public Vector2 _TimeRoundPos            { get; set; }
+    //public Vector2 _TimeRoundStringPos      { get; set; }
+    //public Vector2 _TimeRoundBoxPos         { get; set; }
 
-    //public Vector2 _PortNamePos { get; set; }
-    //public Vector2 _PortNameStringPos { get; set; }
-    //public Vector2 _PortNameBoxPos { get; set; }
+    //public Vector2 _PortNamePos             { get; set; }
+    //public Vector2 _PortNameStringPos       { get; set; }
+    //public Vector2 _PortNameBoxPos          { get; set; }
 
-    //public Vector2 _PublicServerPos { get; set; }
-    //public Vector2 _PublicServerCheckPos { get; set; }
-    //public Vector2 _PublicServerBoxPos { get; set; }
+    //public Vector2 _PublicServerPos         { get; set; }
+    //public Vector2 _PublicServerCheckPos    { get; set; }
+    //public Vector2 _PublicServerBoxPos      { get; set; }
 
-    //public Vector2 _ScoreLimitPos { get; set; }
-    //public Vector2 _ScoreLimitStringPos { get; set; }
-    //public Vector2 _ScoreLimitBoxPos { get; set; }
+    //public Vector2 _ScoreLimitPos           { get; set; }
+    //public Vector2 _ScoreLimitStringPos     { get; set; }
+    //public Vector2 _ScoreLimitBoxPos        { get; set; }
 
-    //public Vector2 _PowerUpsPos { get; set; }
-    //public Vector2 _PowerUpsCheckPos { get; set; }
-    //public Vector2 _PowerUpsBoxPos { get; set; }
+    //public Vector2 _PowerUpsPos             { get; set; }
+    //public Vector2 _PowerUpsCheckPos        { get; set; }
+    //public Vector2 _PowerUpsBoxPos          { get; set; }
 
     Text HostBtn;
     Text ExitBtn;
@@ -105,6 +105,7 @@ public class GUIHostMenu : ScriptComponent
     public float CaretOffsetBig { get; set; } = 0;
     public float CaretOffsetSmall { get; set; } = 0;
 
+    #region Take Inputs
     bool InputTeam1Name = false;
     bool InputTeam2Name = false;
     bool InputServerName = false;
@@ -117,10 +118,10 @@ public class GUIHostMenu : ScriptComponent
     bool ClearTeam1 = true;
     bool ClearTeam2 = true;
     bool ClearServerName = true;
-    bool ClearPort = true;
-    bool ClearTime = true;
-    bool ClearMaxPlayers = true;
-    bool ClearScoreLimit = true;
+    bool ClearPort = false;
+    bool ClearTime = false;
+    bool ClearMaxPlayers = false;
+    bool ClearScoreLimit = false;
 
     bool NotSameName = true;
     bool NotSimilarColor = true;
@@ -189,9 +190,9 @@ public class GUIHostMenu : ScriptComponent
         #endregion
 
         float column1 = 0.00f;
-        float column2 = 0.15f;
-        float column3 = 0.35f;
-        float column4 = 0.50f;
+        float column2 = 0.17f;
+        float column3 = 0.52f;
+        float column4 = 0.7f;
 
         float row1 = 0.130f;
         float row2 = 0.185f;
@@ -311,16 +312,16 @@ public class GUIHostMenu : ScriptComponent
         if (TextBoxCross55Texture != null)
         {
             PublicServerCheck = Canvas.Add(TextBoxCross55Texture);
-            PublicServerCheck.position = new Vector2(column4 + PublicServerCheck.size.x / 2, row1);
-            PublicServerCheck.origin = new Vector2(0.5f);
+            PublicServerCheck.position = new Vector2(column4 /*+ PublicServerCheck.size.x / 2*/, row1);
+            PublicServerCheck.origin = new Vector2(0.0f, 0.5f);
             PublicServerCheck.depth = 0.4f;
         }
 
         if (TextBoxBG55Texture != null)
         {
             PublicServerBox = Canvas.Add(TextBoxBG55Texture);
-            PublicServerBox.position = new Vector2(column4 + PublicServerBox.size.x / 2, row1);
-            PublicServerBox.origin = new Vector2(0.5f);
+            PublicServerBox.position = new Vector2(column4 /*+ PublicServerBox.size.x / 2*/, row1);
+            PublicServerBox.origin = new Vector2(0.0f, 0.5f);
             PublicServerBox.interactable = true;
             PublicServerBox.depth = 0.5f;
         }
@@ -362,16 +363,16 @@ public class GUIHostMenu : ScriptComponent
         if (TextBoxCross55Texture != null)
         {
             PowerUpsCheck = Canvas.Add(TextBoxCross55Texture);
-            PowerUpsCheck.position = new Vector2(column4 + PowerUpsCheck.size.x / 2, row3);
-            PowerUpsCheck.origin = new Vector2(0.5f);
+            PowerUpsCheck.position = new Vector2(column4 /*+ PowerUpsCheck.size.x / 2*/, row3);
+            PowerUpsCheck.origin = new Vector2(0.0f, 0.5f);
             PowerUpsCheck.depth = 0.4f;
         }
 
         if (TextBoxBG55Texture != null)
         {
             PowerUpsBox = Canvas.Add(TextBoxBG55Texture);
-            PowerUpsBox.position = new Vector2(column4 + PowerUpsBox.size.x / 2, row3);
-            PowerUpsBox.origin = new Vector2(0.5f);
+            PowerUpsBox.position = new Vector2(column4 /*+ PowerUpsBox.size.x / 2*/, row3);
+            PowerUpsBox.origin = new Vector2(0.0f, 0.5f);
             PowerUpsBox.interactable = true;
             PowerUpsBox.depth = 0.5f;
         }
@@ -433,11 +434,10 @@ public class GUIHostMenu : ScriptComponent
         
         Caret = Canvas.Add("");
         Caret.origin = new Vector2(0, 0.5f);
-        Caret.scale = new Vector2(1.2f);
+        Caret.scale = new Vector2(0.5f);
         Caret.interactable = false;
-        Caret.depth = 0.8f;
+        Caret.depth = 0.7f;
         Caret.color = Color.Black;
-        Caret.font = Font;
     }
 
     public override void Update()
@@ -469,6 +469,36 @@ public class GUIHostMenu : ScriptComponent
         CheckButtonInteraction();
         CheckForSelectedInputBoxes();
         TakeKeyboardInput();
+
+        #region Debug
+        //ServerName.position = _ServerNamePos;
+        //ServerNameString.position = _ServerNameStringPos;
+        //ServerNameBox.position = _ServerNameBoxPos;
+
+        //MaxPlayers.position = _MaxPlayersPos;
+        //MaxPlayersString.position = _MaxPlayersStringPos;
+        //MaxPlayersBox.position = _MaxPlayersBoxPos;
+
+        //TimeRound.position = _TimeRoundPos;
+        //TimeRoundString.position = _TimeRoundStringPos;
+        //TimeRoundBox.position = _TimeRoundBoxPos;
+
+        //PortName.position = _PortNamePos;
+        //PortNameString.position = _PortNameStringPos;
+        //PortNameBox.position = _PortNameBoxPos;
+
+        //PublicServer.position = _PublicServerPos;
+        //PublicServerCheck.position = _PublicServerCheckPos;
+        //PublicServerBox.position = _PublicServerBoxPos;
+
+        //ScoreLimit.position = _ScoreLimitPos;
+        //ScoreLimitString.position = _ScoreLimitStringPos;
+        //ScoreLimitBox.position = _ScoreLimitBoxPos;
+
+        //PowerUps.position = _PowerUpsPos;
+        //PowerUpsCheck.position = _PowerUpsCheckPos;
+        //PowerUpsBox.position = _PowerUpsBoxPos;
+        #endregion
     }
 
     /*
@@ -607,7 +637,6 @@ public class GUIHostMenu : ScriptComponent
             if (Team1TextBox.Clicked())
             {
                 InputTeam1Name = true;
-                Team1TextBox.color = Selected;
                 if(ClearTeam1)
                 {
                     Team1.text = "";
@@ -617,7 +646,6 @@ public class GUIHostMenu : ScriptComponent
             else if (Team2TextBox.Clicked())
             {
                 InputTeam2Name = true;
-                Team2TextBox.color = Selected;
                 if (ClearTeam2)
                 {
                     Team2.text = "";
@@ -627,7 +655,6 @@ public class GUIHostMenu : ScriptComponent
             else if (ServerNameBox.Clicked())
             {
                 InputServerName = true;
-                ServerNameBox.color = Selected;
                 if(ClearServerName)
                 {
                     ServerNameString.text = "";
@@ -637,7 +664,6 @@ public class GUIHostMenu : ScriptComponent
             else if (PortNameBox.Clicked())
             {
                 InputPortName = true;
-                PortNameBox.color = Selected;
                 if(ClearPort)
                 {
                     PortNameString.text = "";
@@ -647,7 +673,6 @@ public class GUIHostMenu : ScriptComponent
             else if (MaxPlayersBox.Clicked())
             {
                 InputMaxPlayers = true;
-                MaxPlayersBox.color = Selected;
                 if(ClearMaxPlayers)
                 {
                     MaxPlayersString.text = "";
@@ -657,7 +682,6 @@ public class GUIHostMenu : ScriptComponent
             else if (TimeRoundBox.Clicked())
             {
                 InputTimeRound = true;
-                TimeRoundBox.color = Selected;
                 if(ClearTime)
                 {
                     TimeRoundString.text = "";
@@ -667,7 +691,6 @@ public class GUIHostMenu : ScriptComponent
             else if (ScoreLimitBox.Clicked())
             {
                 InputScoreLimit = true;
-                ScoreLimitBox.color = Selected;
                 if(ClearScoreLimit)
                 {
                     ScoreLimitString.text = "";
@@ -707,12 +730,7 @@ public class GUIHostMenu : ScriptComponent
             {
                 if (NotSimilarColor && NotSameName)
                 {
-                    InputTeam1Name = false;
-                    InputTeam2Name = false;
-                    InputServerName = false;
-                    InputPortName = false;
-                    InputMaxPlayers = false;
-                    InputTimeRound = false;
+                    DontTakeInput();
 
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
                     //Set match options
@@ -741,13 +759,7 @@ public class GUIHostMenu : ScriptComponent
             ExitBtn.color = Selected;
             if (ExitBtn.Clicked())
             {
-                InputTeam1Name = false;
-                InputTeam2Name = false;
-                InputServerName = false;
-                InputPortName = false;
-                InputMaxPlayers = false;
-                InputTimeRound = false;
-
+                DontTakeInput();
                 CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
             }
         }
@@ -757,13 +769,14 @@ public class GUIHostMenu : ScriptComponent
 
     private void TakeKeyboardInput()
     {
+        Caret.scale = new Vector2(0.5f);
         if (InputTeam1Name)
         {
             string str = Team1.text;
             GUIInput.AppendString(ref str, 15);
             Team1.text = str;
             Caret.position = Team1.position + new Vector2(Team1.size.x, CaretOffsetBig);
-            Caret.scale = Team1.scale * 1.333f;
+            Caret.scale = new Vector2(1);
         }
         else if (InputTeam2Name)
         {
@@ -771,7 +784,7 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 15);
             Team2.text = str;
             Caret.position = Team2.position + new Vector2(Team2.size.x, CaretOffsetBig);
-            Caret.scale = Team2.scale * 1.333f;
+            Caret.scale = new Vector2(1);
         }
         else if (InputServerName)
         {
@@ -779,7 +792,6 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 15);
             ServerNameString.text = str;
             Caret.position = ServerNameString.position + new Vector2(ServerNameString.size.x, CaretOffsetSmall);
-            Caret.scale = ServerNameString.scale * 1.333f;
         }
         else if (InputPortName)
         {
@@ -787,7 +799,6 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 4);
             PortNameString.text = str;
             Caret.position = PortNameString.position + new Vector2(PortNameString.size.x, CaretOffsetSmall);
-            Caret.scale = PortNameString.scale * 1.333f;
         }
         else if (InputMaxPlayers)
         {
@@ -795,7 +806,6 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 3);
             MaxPlayersString.text = str;
             Caret.position = MaxPlayersString.position + new Vector2(MaxPlayersString.size.x, -MaxPlayersString.size.y * CaretOffsetSmall);
-            Caret.scale = MaxPlayersString.scale * 1.333f;
         }
         else if (InputTimeRound)
         {
@@ -803,7 +813,6 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 2);
             TimeRoundString.text = str;
             Caret.position = TimeRoundString.position + new Vector2(TimeRoundString.size.x, -TimeRoundString.size.y * CaretOffsetSmall);
-            Caret.scale = TimeRoundString.scale * 1.333f;
         }
         else if (InputScoreLimit)
         {
@@ -811,8 +820,18 @@ public class GUIHostMenu : ScriptComponent
             GUIInput.AppendString(ref str, 3);
             ScoreLimitString.text = str;
             Caret.position = ScoreLimitString.position + new Vector2(ScoreLimitString.size.x, CaretOffsetSmall);
-            Caret.scale = ScoreLimitString.scale * 1.333f;
         }
+    }
+
+    private void DontTakeInput()
+    {
+        InputTeam1Name = false;
+        InputTeam2Name = false;
+        InputServerName = false;
+        InputPortName = false;
+        InputMaxPlayers = false;
+        InputTimeRound = false;
+        InputScoreLimit = false;
     }
 
     IEnumerator CaretBlink()
