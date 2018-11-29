@@ -266,8 +266,6 @@ public class ChadControls : NetworkComponent
         rBody.enabled = false;
         CanBeTackled = false;
         Ragdoll.EnableRagdoll();
-
-        NetPlayer.BeenTackled += 1;
     }
 
     private void DisableRagdoll()

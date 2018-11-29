@@ -16,9 +16,8 @@ public class NetworkPlayer : NetworkComponent
     public Font NameFont { get; set; }
     public float textScale { get; set; } = 0.008f;
     public int HasTackled = 0;
-    public int BeenTackled = 0;
+    public int Owngoal = 0;
     public int GoalsScored = 0;
-
     Material mat;
     Rigidbody rb;
     Ragdoll rag;
@@ -35,7 +34,7 @@ public class NetworkPlayer : NetworkComponent
     public override void Start()
     {
         HasTackled = 0;
-        BeenTackled = 0;
+        Owngoal = 0;
         GoalsScored = 0;
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
@@ -105,7 +104,7 @@ public class NetworkPlayer : NetworkComponent
 
         writer.Put(PlayerName);
         writer.Put(HasTackled);
-        writer.Put(BeenTackled);
+        writer.Put(Owngoal);
         writer.Put(GoalsScored);
         if (Team != null)
             writer.Put((int)Team.TeamType);
@@ -127,7 +126,7 @@ public class NetworkPlayer : NetworkComponent
         {
             PlayerName = reader.GetString();
             HasTackled = reader.GetInt();
-            BeenTackled = reader.GetInt();
+            Owngoal = reader.GetInt();
             GoalsScored = reader.GetInt();
         }
 

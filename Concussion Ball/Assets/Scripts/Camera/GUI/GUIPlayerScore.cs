@@ -372,7 +372,7 @@ public class GUIPlayerScore : ScriptComponent
                 Team1Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].PlayerName;
             Team1Players[i].PlayerGoals.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored.ToString();
             Team1Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled.ToString();
-            Team1Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored).ToString();
+            Team1Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GoalsScored - 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].Owngoal).ToString();
             Team1Players[i].PlayerPing.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players[i].GetPing().ToString();
         }
         for (int i = 0; i < Math.Min(Team2Players.Count, AmountOfPlayersInTeam2); i++)
@@ -383,7 +383,7 @@ public class GUIPlayerScore : ScriptComponent
                 Team2Players[i].PlayerName.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].PlayerName;
             Team2Players[i].PlayerGoals.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored.ToString();
             Team2Players[i].PlayerTackles.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled.ToString();
-            Team2Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored).ToString();
+            Team2Players[i].PlayerScore.text = (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].HasTackled * 10 + 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GoalsScored - 100 * MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].Owngoal).ToString();
             Team2Players[i].PlayerPing.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players[i].GetPing().ToString();
         }
     }

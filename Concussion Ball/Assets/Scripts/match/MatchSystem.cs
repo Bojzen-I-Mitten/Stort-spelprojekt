@@ -208,11 +208,13 @@ public class MatchSystem : NetworkManager
         {
             Player.GoalsScored = 0;
             Player.HasTackled = 0;
+            Player.Owngoal = 0;
         }
         foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_2].Players)
         {
             Player.GoalsScored = 0;
             Player.HasTackled = 0;
+            Player.Owngoal = 0;
         }
 
     }
