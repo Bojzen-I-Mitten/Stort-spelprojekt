@@ -2,6 +2,7 @@
 
 namespace thomas { namespace resource { class Resource; } }
 using namespace System;
+using namespace System::Collections::Generic;
 namespace ThomasEngine
 {
 	ref class GameObject;
@@ -9,8 +10,27 @@ namespace ThomasEngine
 	public ref class Resources
 	{
 	private:
+		ref class AssetLoadWorker
+		{
+		private:
+			String^ file; 
+			System::Threading::CountdownEvent^ countdown;
+
+		public:
+			AssetLoadWorker(String^ file, System::Threading::CountdownEvent^ countdown)
+			{
+				this->file = file;
+				this->countdown = countdown;
+			}
+			void LoadAsset(System::Object ^state);
+		};
 		static Object^ resourceLock = gcnew Object();
-		static System::Collections::Generic::Dictionary<String^, Resource^>^ resources = gcnew System::Collections::Generic::Dictionary<String^, ThomasEngine::Resource^>();
+		static Dictionary<String^, Resource^>^ resources = gcnew Dictionary<String^, Resource^>();
+		static Dictionary<String^, GameObject^>^ s_PREFAB_DICT = gcnew Dictionary<String^, GameObject^>();
+		/* Load a list of asset using assetworker*/
+		static System::Threading::CountdownEvent^ LoadAssetFiles(List<String^>^ files);
+		/* Load assets on the same thread. */
+		static void LoadAssetFilesSynced(List<String^>^ files);
 	internal:
 
 	public:
@@ -41,8 +61,21 @@ namespace ThomasEngine
 		static void OnPlay();
 		static void OnStop();
 		static void SavePrefab(GameObject ^ gameObject, String ^ path);
-		static GameObject ^ LoadPrefab(String^ path);
-		static GameObject ^ LoadPrefab(String^ path, bool forceInstantiate);
+		/* Create a new prefab, to be used in a scene context.
+		*/
+		static GameObject ^ CreatePrefab(String^ path);
+		/* Load a prefab as an editor resource, and not to be used.
+		*/
+		static GameObject ^ LoadPrefabResource(String^ path);
+		
+#ifdef _EDITOR
+		/* Synchronous access to prefab list
+		*/
+		static property IEnumerable<GameObject^>^ PrefabList
+		{
+			IEnumerable<GameObject^>^ get();
+		}
+#endif
 
 
 		static String^ GetUniqueName(String^ path);
@@ -54,6 +87,8 @@ namespace ThomasEngine
 		static AssetTypes GetResourceAssetType(String^ path);
 		static bool IsResource(String^ path);
 
+		static bool IsResource(AssetTypes type);
+
 		static String^ ConvertToThomasPath(String^ value);
 		static String^ ConvertToRealPath(String^ value);
 
@@ -63,9 +98,9 @@ namespace ThomasEngine
 
 		generic<typename T>
 		where T : Resource
-		static System::Collections::Generic::List<T>^ GetResourcesOfType();
+		static List<T>^ GetResourcesOfType();
 
-		static System::Collections::Generic::List<Resource^>^ GetResourcesOfType(Type^ type);
+		static List<Resource^>^ GetResourcesOfType(Type^ type);
 
 		static Resource^ FindResourceFromNativePtr(thomas::resource::Resource* nativePtr);
 		/* Load resource using converted file path to thomas internal representation
@@ -84,6 +119,7 @@ namespace ThomasEngine
 
 
 		static void Unload(Resource^ resource);
+
 
 		static void LoadAll(String^ path);
 

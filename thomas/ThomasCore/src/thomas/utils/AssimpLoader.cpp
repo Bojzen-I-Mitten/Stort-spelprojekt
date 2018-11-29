@@ -124,7 +124,6 @@ namespace thomas
 				aiProcess_ImproveCacheLocality |
 				aiProcess_JoinIdenticalVertices |
 				aiProcess_OptimizeGraph |
-				aiProcess_OptimizeMeshes |
 				aiProcess_RemoveRedundantMaterials |
 				aiProcess_SortByPType |
 				aiProcess_Triangulate |
@@ -168,8 +167,8 @@ namespace thomas
 			skelConstruct.m_Commands.m_IncludeAllKeyframedChannels = false;
 			skelConstruct.m_Commands.m_IgnoreLeafChains = false;
 
-			skelConstruct.m_rootID.insert("mixamorig:hips"); //TODO: is this a hack?
-			skelConstruct.m_rootID.insert("mixamorig_hips"); //TODO: is this a hack?
+			skelConstruct.m_rootID.insert("mixamorig:hips"); //TODO: Solve as input
+			skelConstruct.m_rootID.insert("mixamorig_hips");
 
 
 			const aiScene* scene = LoadScene(importer, path);
@@ -323,6 +322,10 @@ namespace thomas
 			vertices.positions.resize(mesh->mNumVertices);
 			vertices.normals.resize(mesh->mNumVertices);
 
+			if (mesh->HasVertexColors(0))
+				vertices.colors.resize(mesh->mNumVertices);
+				
+
 			if (mesh->mTextureCoords[0])
 				vertices.texCoord0.resize(mesh->mNumVertices);
 
@@ -353,6 +356,13 @@ namespace thomas
 				// Normals
 				vertices.normals[i] = math::Vector3((float*)&(normalTrans *mesh->mNormals[i]));
 				vertices.normals[i].Normalize();
+
+
+				if (mesh->HasVertexColors(0))
+				{
+					vertices.colors[i] = math::Color((float*)(&mesh->mColors[0][i]));
+				}
+				
 
 				// Tangents
 				if (mesh->HasTangentsAndBitangents())
@@ -480,7 +490,7 @@ namespace thomas
 
 			aiMatrix4x4 nodeTransform = node->mTransformation;
 			aiMatrix4x4 object_space = parentTransform * nodeTransform;
-			size_t BoneIndex = boneMap.m_boneInfo.size();
+			uint32_t BoneIndex = (uint32_t)boneMap.m_boneInfo.size();
 			boneMap.m_boneInfo.push_back(graphics::animation::Bone()); // Reserve empty slot, allocate at end
 
 			bool marked = false;

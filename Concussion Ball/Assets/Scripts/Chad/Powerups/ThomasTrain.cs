@@ -23,16 +23,17 @@ public class ThomasTrain : Powerup
     public AudioClip soundClipExplosion { get; set; }
 
     public float ExplosionRadius { get; set; } = 10.0f;
-    public float ExplosionForce { get; set; } = 300.0f;
+    public float ExplosionForce { get; set; }
 
     private float soundcooldown;
 
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
         BaseThrowForce = 20.0f;
         MaxThrowForce = 36.0f;
         ThrowForce = BaseThrowForce;
+        ExplosionForce = 60.0f;
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
@@ -140,7 +141,6 @@ public class ThomasTrain : Powerup
     public override void OnThrow()
     {
         soundComponentTravel.Play();
-        Debug.Log("throw");
     }
 
     // if this is a throwable power-up this function will be called
@@ -152,7 +152,26 @@ public class ThomasTrain : Powerup
         m_rigidBody.UseGravity = false;
         transform.scale *= 8.0f;
     }
-   
+
+    //public override void OnCollisionEnter(Collider collider)
+    //{
+    //    //Check if colliding with a player
+    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+    //    if (!otherChad)
+    //    {
+    //        base.OnCollisionEnter(collider);
+    //    }
+    //    else
+    //    {
+    //        ChadControls localChad = MatchSystem.instance.LocalChad;
+
+    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
+
+    //        if (localChad && (otherPlayerTeam != playerTeam))
+    //            base.OnCollisionEnter(collider);
+    //    }
+    //}
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -177,8 +196,12 @@ public class ThomasTrain : Powerup
                 Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.Normalize();
                 forceDir.y += 3.0f;
+
+
                 float distForce = ExplosionRadius - distance;
-                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
+                Vector3 force = forceDir * ExplosionForce * distForce;
+                Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
+                localChad.ActivateRagdoll(2.0f, param);
             }
         }
     }

@@ -4,7 +4,7 @@ public class DissolveFadeIn : ScriptComponent
 {
     public float fadeInTime { get; set; } = 1.0f;
     Material m;
-    public override void Awake()
+    public override void OnAwake()
     {
         m = gameObject.GetComponent<RenderComponent>()?.material;
 
@@ -12,9 +12,9 @@ public class DissolveFadeIn : ScriptComponent
 
     public override void OnEnable()
     {
-        m.SetFloat("dissolveAmount", 1.0f);
+        m.SetFloat("dissolveAmount", 0.0f);
         m.SetFloat("dissolveOffset", 0.0f);
-        StartCoroutine(FadeIn(fadeInTime));
+        //StartCoroutine(FadeIn(fadeInTime));
     }
 
     public override void OnDisable()

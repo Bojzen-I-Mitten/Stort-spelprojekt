@@ -17,12 +17,7 @@ namespace ThomasEngine
 		LoadingInProgress = 1,	// Marked for asynchronous loading, scene loading is locked
 		Uninitialized =  2
 	};
-
-	public ref class TempCopy
-	{
-
-	};
-
+	
 	public ref class SceneManager
 	{
 	public:

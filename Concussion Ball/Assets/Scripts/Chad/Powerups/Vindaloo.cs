@@ -20,15 +20,15 @@ public class Vindaloo : Powerup
     private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 8.0f;
-    public float ExplosionForce = 300.0f;
-    public override void Awake()
+    public float ExplosionForce;
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
 
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
-        ExplosionForce = 300.0f;
+        ExplosionForce = 60.0f;
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
@@ -139,6 +139,27 @@ public class Vindaloo : Powerup
         ObjectOwner = chad;
     }
 
+    //public override void OnCollisionEnter(Collider collider)
+    //{
+    //    //Check if colliding with a player
+    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+    //    if (!otherChad)
+    //    { 
+    //        base.OnCollisionEnter(collider);
+    //    }
+    //    else
+    //    {
+    //        ChadControls localChad = MatchSystem.instance.LocalChad;
+
+    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
+
+    //        if (localChad && (otherPlayerTeam != playerTeam))
+    //            base.OnCollisionEnter(collider);
+    //    }
+        
+    //}
+
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
@@ -153,7 +174,6 @@ public class Vindaloo : Powerup
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-
         if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
@@ -162,8 +182,12 @@ public class Vindaloo : Powerup
                 Vector3 forceDir = localChad.transform.position - transform.position;
                 forceDir.Normalize();
                 forceDir.y += 3.0f;
+
                 float distForce = ExplosionRadius - distance;
-                localChad.ActivateRagdoll(2.0f, distForce * forceDir * ExplosionForce);
+                Vector3 force = forceDir * ExplosionForce * distForce;
+                Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
+                param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
+                localChad.ActivateRagdoll(2.0f, param);
             }
         }
 

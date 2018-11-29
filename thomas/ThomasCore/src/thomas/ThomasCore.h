@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <imgui\imgui.h>
+#include "utils/atomic/Synchronization.h"
 
 namespace thomas
 {
@@ -67,8 +68,8 @@ namespace thomas
 		resource::MemoryAllocation* m_memAlloc;
 
 		static bool s_initialized;
-		static std::vector<std::string> s_logOutput;
-		static bool s_clearLog;
+		static std::vector<std::string> s_logOutput;	// List over log messages
+		static utils::atomics::SpinLock s_logLock;		// Access lock to Log
 		static bool s_isEditor;
 
 	private:

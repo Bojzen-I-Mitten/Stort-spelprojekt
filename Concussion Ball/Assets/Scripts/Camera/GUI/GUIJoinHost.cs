@@ -17,6 +17,9 @@ public class GUIJoinHost : ScriptComponent
     private bool TakeIP;
     private bool TakePort;
 
+    private bool ClearIP = false;
+    private bool ClearPort = false;
+
     private bool hasConnected = false;
 
     public Canvas Canvas;
@@ -35,12 +38,15 @@ public class GUIJoinHost : ScriptComponent
     Text Port;
     Text ConnectingText;
 
+    Text Caret;
+
+    IEnumerator Blink = null;
+
     public bool GoToTeamSelect;
     IEnumerator test;
 
-    public override void Awake()
-    {
-    }
+    public float CaretOffset { get; set; } = 0.0f;
+    public float TextOffset { get; set; } = 0.0f;
 
     public override void Start()
     {
@@ -52,8 +58,6 @@ public class GUIJoinHost : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
-        MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
-        MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
     }
 
     public void Listener_PeerConnectedEvent(NetPeer peer)
@@ -72,6 +76,8 @@ public class GUIJoinHost : ScriptComponent
 
     public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
     {
+        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
         ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
         //ConnectingText.position = TextBoxIP.position + TextBoxIP.size / Canvas.viewport.size * 1.5f;
         Join.interactable = true;
@@ -81,130 +87,155 @@ public class GUIJoinHost : ScriptComponent
 
     public override void Update()
     {
-        if (Canvas.isRendering)
+        Join.color = Color.FloralWhite;
+        Host.color = Color.FloralWhite;
+        Back.color = Color.FloralWhite;
+
+        if (TakeIP)
         {
-            Join.color = Color.FloralWhite;
-            Host.color = Color.FloralWhite;
-            Back.color = Color.FloralWhite;
+            GUIInput.AppendString(ref IPString, 30);
+            Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, CaretOffset);
+        }
+        if (TakePort)
+        {
+            GUIInput.AppendString(ref PortString, 5);
+            Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
+        }
 
-            if (TakeIP)
-                GUIInput.AppendString(ref IPString, 30);
-            if (TakePort)
-                GUIInput.AppendString(ref PortString, 5);
-
-            if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            TakePort = false;
+            TakeIP = false;
+            TextBoxIP.color = Color.Black;
+            TextBoxPort.color = Color.Black;
+            if (Blink == null)
             {
-                if (Back.Clicked())
-                {
-                    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-                    ConnectingText.text = "";
-                }
-                if (TextBoxIP.Clicked())
-                {
-                    ConnectingText.text = "";
-                    TakePort = false;
-                    TakeIP = true;
-                    TextBoxPort.color = Color.Black;
-                    TextBoxIP.color = Color.Green;
-                }
-                else if (TextBoxPort.Clicked())
-                {
-                    ConnectingText.text = "";
-                    TakeIP = false;
-                    TakePort = true;
-                    TextBoxIP.color = Color.Black;
-                    TextBoxPort.color = Color.Green;
-                }
-                else if (Join.Hovered())
-                {
-                    ConnectingText.text = "";
-                    System.Net.IPAddress ipaddress;
-                    try
-                    {
-                        ipaddress = NetUtils.ResolveAddress(IPString);
-                    }
-                    catch (Exception e)
-                    {
-                        ConnectingText.text = e.Message;
-                        return;
-                    }
-                    if (PortString != "")
-                    {
-                        if (IPString == "127.0.0.1")
-                            MatchSystem.instance.LocalPort = 0;
-                        else
-                            MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                        MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
-                        MatchSystem.instance.TargetIP = IPString;
-                        MatchSystem.instance.Init();
-                        MatchSystem.instance.Connect();
-                        ConnectingText.text = "Connecting";
-                        ConnectingText.position = new Vector2(0.75f, 0.9f);
-                        test = Connecting();
-                        StartCoroutine(test);
-                        Join.interactable = false;
-                        Host.interactable = false;
-                        return;
-                    }
-                    else
-                    {
-                        if (IPString == "")
-                            TextBoxIP.color = Color.Red;
-                        if (PortString == "")
-                            TextBoxPort.color = Color.Red;
-                    }
-                }
-                else if (Host.Hovered())
-                {
-                    ConnectingText.text = "";
-                    if (PortString != "")
-                    {
-                        MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                        CameraMaster.instance.State = CAM_STATE.HOST_MENU;
-                        return;
-                    }
-                    else
-                    {
-                        TextBoxPort.color = Color.Red;
-                    }
-                }
+                Blink = CaretBlink();
+                StartCoroutine(Blink);
+            }
+        }
+
+        if (Join.Clicked())
+        {
+            ConnectingText.text = "";
+            System.Net.IPAddress ipaddress;
+            try
+            {
+                ipaddress = NetUtils.ResolveAddress(IPString);
+            }
+            catch (Exception e)
+            {
+                ConnectingText.text = e.Message;
+                return;
+            }
+            if (PortString != "")
+            {
+                if (IPString == "127.0.0.1")
+                    MatchSystem.instance.LocalPort = 0;
                 else
-                {
-                    TakePort = false;
-                    TakeIP = false;
-                    TextBoxIP.color = Color.Black;
-                    TextBoxPort.color = Color.Black;
-                }
+                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
+                MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
+                MatchSystem.instance.TargetIP = IPString;
+
+                MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+                MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
+
+                MatchSystem.instance.Init();
+                MatchSystem.instance.Connect();
+                ConnectingText.text = "Connecting";
+                ConnectingText.position = new Vector2(0.75f, 0.9f);
+                test = Connecting();
+                StartCoroutine(test);
+                Join.interactable = false;
+                Host.interactable = false;
+                return;
             }
             else
             {
-                if (Join.Hovered())
-                {
-                    Join.color = Color.IndianRed;
-                }
-                if (Host.Hovered())
-                {
-                    Host.color = Color.IndianRed;
-                }
-                if (Back.Hovered())
-                {
-                    Back.color = Color.IndianRed;
-                }
-            }
-
-            if (!Disabled)
-            {
-                IPText.text = IPString;
-                PortText.text = PortString;
-                if (TextFont != null)
-                {
-                    IPText.font = TextFont;
-                    PortText.font = TextFont;
-                    IP.font = TextFont;
-                    Port.font = TextFont;
-                }
+                if (IPString == "")
+                    TextBoxIP.color = Color.Red;
+                if (PortString == "")
+                    TextBoxPort.color = Color.Red;
             }
         }
+        else if (Host.Clicked())
+        {
+            ConnectingText.text = "";
+            if (PortString != "")
+            {
+                MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
+                CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+                return;
+            }
+            else
+            {
+                TextBoxPort.color = Color.Red;
+            }
+        }
+
+        if (Back.Clicked())
+        {
+            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            ConnectingText.text = "";
+        }
+
+        if (TextBoxIP.Clicked())
+        {
+            ConnectingText.text = "";
+            TakeIP = true;
+            if (ClearIP)
+            {
+                IPString = "";
+                ClearIP = false;
+            }
+        }
+        else if (TextBoxPort.Clicked())
+        {
+            ConnectingText.text = "";
+            TakePort = true;
+            if (ClearPort)
+            {
+                PortString = "";
+                ClearPort = false;
+            }
+        }
+        else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        {
+            if (Blink != null)
+            {
+                StopCoroutine(Blink);
+                Blink = null;
+                Caret.text = "";
+            }
+        }
+
+        if (Join.Hovered())
+        {
+            Join.color = Color.IndianRed;
+        }
+        else if (Host.Hovered())
+        {
+            Host.color = Color.IndianRed;
+        }
+        else if (Back.Hovered())
+        {
+            Back.color = Color.IndianRed;
+        }
+
+        if (!Disabled)
+        {
+            IPText.text = IPString;
+            PortText.text = PortString;
+            if (TextFont != null)
+            {
+                IPText.font = TextFont;
+                PortText.font = TextFont;
+                IP.font = TextFont;
+                Port.font = TextFont;
+            }
+        }
+        IPText.position = new Vector2(0.5f, 0.11875f + TextOffset);
+        PortText.position = new Vector2(0.5f, 0.26875f + TextOffset);
     }
 
     public void AddImagesAndText()
@@ -213,13 +244,13 @@ public class GUIJoinHost : ScriptComponent
 
         IPText = Canvas.Add(IPString);
         IPText.origin = new Vector2(0.5f);
-        IPText.position = new Vector2(0.5f, 0.11875f);
+        IPText.position = new Vector2(0.5f, 0.11875f + TextOffset);
         IPText.color = Color.Black;
         IPText.depth = 0.8f;
 
         PortText = Canvas.Add(PortString);
         PortText.origin = new Vector2(0.5f);
-        PortText.position = new Vector2(0.5f, 0.26875f);
+        PortText.position = new Vector2(0.5f, 0.26875f + TextOffset);
         PortText.color = Color.Black;
         PortText.depth = 0.8f;
 
@@ -244,7 +275,7 @@ public class GUIJoinHost : ScriptComponent
             TextBoxIP.position = new Vector2(0.5f, 0.1f);
             TextBoxIP.scale = new Vector2(1, 0.75f);
             TextBoxIP.interactable = true;
-            TextBoxIP.depth = 0.9f;
+            TextBoxIP.depth = 0.8f;
             TextBoxIP.color = Color.Black;
 
             TextBoxPort = Canvas.Add(TextBox);
@@ -252,7 +283,7 @@ public class GUIJoinHost : ScriptComponent
             TextBoxPort.position = new Vector2(0.5f, 0.25f);
             TextBoxPort.scale = new Vector2(1, 0.75f);
             TextBoxPort.interactable = true;
-            TextBoxPort.depth = 0.9f;
+            TextBoxPort.depth = 0.8f;
             TextBoxPort.color = Color.Black;
         }
 
@@ -277,7 +308,7 @@ public class GUIJoinHost : ScriptComponent
         {
             Join = Canvas.Add("Join");
             Join.origin = new Vector2(0.5f);
-            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x/2, 0.11875f);
+            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.11875f);
             Join.interactable = true;
             Join.depth = 0.9f;
             Join.color = Color.FloralWhite;
@@ -309,6 +340,14 @@ public class GUIJoinHost : ScriptComponent
         ConnectingText.depth = 0;
         ConnectingText.font = TextFont;
         ConnectingText.position = new Vector2(0.5f, 0.75f);
+
+        Caret = Canvas.Add("");
+        Caret.origin = new Vector2(0, 0.5f);
+        Caret.scale = IPText.scale * 1.333f;
+        Caret.interactable = false;
+        Caret.depth = 0.8f;
+        Caret.color = Color.Black;
+        Caret.font = TextFont;
     }
 
     public void ClearImagesAndText()
@@ -324,6 +363,8 @@ public class GUIJoinHost : ScriptComponent
         Canvas.Remove(PortText);
         Canvas.Remove(IP);
         Canvas.Remove(Port);
+
+        Canvas.Remove(Caret);
     }
 
     IEnumerator Connecting()
@@ -341,6 +382,26 @@ public class GUIJoinHost : ScriptComponent
                 ConnectingText.text += ".";
 
             yield return new WaitForSecondsRealtime(0.25f);
+        }
+    }
+
+    IEnumerator CaretBlink()
+    {
+        bool underscore = true;
+        while (true)
+        {
+            if (underscore)
+            {
+                Caret.text = "|";
+                underscore = false;
+            }
+            else
+            {
+                Caret.text = "";
+                underscore = true;
+            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
 }

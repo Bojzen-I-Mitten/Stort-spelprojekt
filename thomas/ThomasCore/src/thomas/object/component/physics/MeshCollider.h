@@ -21,6 +21,7 @@ namespace thomas
 				void SetConcave(bool value);
 				bool GetConcave();
 				void Update() override;
+				void SetTrigger(bool trigger) override;
 			private:
 				void RecalcCollider();
 				void CalculateConvex();

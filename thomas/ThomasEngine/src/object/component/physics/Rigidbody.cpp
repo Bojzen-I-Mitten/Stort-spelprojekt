@@ -9,7 +9,7 @@
 
 namespace ThomasEngine
 {
-	void Rigidbody::Awake()
+	void Rigidbody::OnAwake()
 	{
 		Collider^ collider = gameObject->GetComponent<Collider^>();
 		if (collider)
@@ -18,6 +18,7 @@ namespace ThomasEngine
 			AttachedCollider = collider;
 			((thomas::object::component::Rigidbody*)nativePtr)->SetCollider((thomas::object::component::Collider*)collider->nativePtr);
 		}
+		((thomas::object::component::Rigidbody*)nativePtr)->OnAwake();
 	}
 
 	void Rigidbody::OnDestroy()
@@ -28,7 +29,7 @@ namespace ThomasEngine
 			AttachedCollider->attachedRigidbody = nullptr;
 			AttachedCollider = nullptr;
 		}
-		Component::OnDestroy();
+		((thomas::object::component::Rigidbody*)nativePtr)->OnDestroy();
 	}
 
 }

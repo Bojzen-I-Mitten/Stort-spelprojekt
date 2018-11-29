@@ -4,11 +4,11 @@
 #include <d3dcompiler.h>
 #include "ShaderProperty\shaderProperties.h"
 #include "../utils/Utility.h"
-#include "../utils/GpuProfiler.h"
 #include <fstream>
 #include <comdef.h>
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
+#include "../Common.h"
 
 namespace thomas
 {
@@ -98,7 +98,7 @@ namespace thomas
 							inputSemantics.push_back(semantic);
 						}
 
-						HRESULT result = utils::D3D::Instance()->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
+						HRESULT result = utils::D3D::Instance()->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], (uint32_t)inputLayoutDesc.size(), vsDesc.pBytecode, vsDesc.BytecodeLength, &pass.inputLayout);
 						pass.inputSemantics = inputSemantics;
 						if (result != S_OK)
 						{
@@ -232,7 +232,7 @@ namespace thomas
 		}
 		void Shader::BindVertexBuffer(utils::buffers::VertexBuffer* buffer)
 		{
-			UINT stride = buffer->GetStride();
+			UINT stride = (uint32_t)buffer->GetStride();
 			ID3D11Buffer* buff = buffer->GetBuffer();
 			UINT offset = 0;
 			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
@@ -251,7 +251,7 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 
@@ -259,6 +259,7 @@ namespace thomas
 		{
 			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
+
 		void Shader::Bind()
 		{
 			for (auto prop : m_properties) {
@@ -268,12 +269,10 @@ namespace thomas
 		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
 		{
 			thomas::utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
-			utils::D3D::Instance()->GetProfiler()->AddDrawCall(vertexCount);
 		}
 		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
 		{
 			thomas::utils::D3D::Instance()->GetDeviceContext()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
-			utils::D3D::Instance()->GetProfiler()->AddDrawCall(indexCount);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{
@@ -334,6 +333,11 @@ namespace thomas
 		{
 			if (HasProperty(name))
 			{
+				if (value == nullptr)
+				{
+					LOG("Can't set null texture in property: " + name);
+					value = Texture2D::GetWhiteTexture();
+				}
 				std::shared_ptr<shaderproperty::ShaderPropertyTexture2D> prop(
 					new shaderproperty::ShaderPropertyTexture2D(value));
 				prop->SetName(name);
@@ -553,7 +557,14 @@ namespace thomas
 				break;
 			case D3D_SVC_MATRIX_COLUMNS:
 			case D3D_SVC_MATRIX_ROWS:
-				newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				if (semantic == "MATRIXARRAY")
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrixArray::GetDefault();
+				}
+				else
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				}
 				break;
 			case D3D_SVC_OBJECT:
 			{
@@ -584,6 +595,8 @@ namespace thomas
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+						if (semantic == "SHADOWMAP")
+							isMaterialProperty = false;
 					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
@@ -639,6 +652,11 @@ namespace thomas
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}
+			/*else
+			{
+				std::string err("ShaderProperty default valye was null in shader" + this->m_name + " with propertyname: " + name);
+				LOG(err);
+			}*/
 			
 		}
 
@@ -684,7 +702,7 @@ namespace thomas
 					LOG("Failed to find shader: " << finalPath);
 					return E_FAIL;
 				}
-				uint32_t fileSize = fileStream.tellg();
+				uint32_t fileSize = (uint32_t)fileStream.tellg();
 
 				if (fileSize)
 				{

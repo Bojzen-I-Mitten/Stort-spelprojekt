@@ -25,42 +25,27 @@ namespace thomas
 				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
-			Camera::Camera(bool dontAddTolist) :
+			Camera::Camera() :
+				Camera(0)
+			{
+			}
+			Camera::Camera(int target_display) :
 				m_ID(0),
 				m_renderGUI(false)
 				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
-				m_near = 0.1f;
+				m_near = 0.5;
 				m_far = 10000.f;
 				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
-				m_targetDisplay = -1;
+				m_targetDisplay = target_display;
 				UpdateProjMatrix();
 			}
 
-			Camera::Camera() :
-				m_ID(0),
-				m_renderGUI(false)
-				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
-			{
-				m_fov = 70;
-				m_near = 0.5;
-				m_far = 10000;
-				m_skybox = std::make_unique<graphics::SkyBox>();
-				m_viewport = math::Viewport(0, 0, 1,1);
-				m_targetDisplay = 0;
-				UpdateProjMatrix();
-				
-			}
 
 			Camera::~Camera()
 			{
-				for (int i = 0; i < m_canvases.size(); ++i)
-				{
-					m_canvases[i]->Destroy();
-					m_canvases[i].reset();
-				}
 				m_canvases.clear();
 				graphics::Renderer::Instance()->getCameraList().remove(this);
 			}
@@ -90,7 +75,7 @@ namespace thomas
 
 			math::Matrix Camera::GetViewMatrix()
 			{
-				math::Matrix viewMatrix =  m_gameObject->m_transform->GetWorldMatrix();
+				math::Matrix viewMatrix =  m_gameObject->GetTransform()->GetWorldMatrix();
 				return viewMatrix.Invert();
 			}
 
@@ -101,12 +86,12 @@ namespace thomas
 
 			math::Vector3 Camera::GetPosition()
 			{
-				return m_gameObject->m_transform->GetPosition();
+				return m_gameObject->GetTransform()->GetPosition();
 			}
 
 			math::Vector3 Camera::GetDirection()
 			{
-				return m_gameObject->m_transform->Forward();
+				return m_gameObject->GetTransform()->Forward();
 			}
 
 			math::Ray Camera::ScreenPointToRay(math::Vector2 point)
@@ -232,7 +217,7 @@ namespace thomas
 
 			void Camera::OnDrawGizmosSelected()
 			{
-				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->m_transform->GetWorldMatrix());
+				editor::Gizmos::Gizmo().SetMatrix(m_gameObject->GetTransform()->GetWorldMatrix());
 				editor::Gizmos::Gizmo().SetColor(math::Color(0.6f, 0.6f, 0.6f));
 				editor::Gizmos::Gizmo().DrawFrustum(m_frustrum);
 			
@@ -255,7 +240,7 @@ namespace thomas
 			math::BoundingFrustum Camera::GetFrustrum()
 			{
 				math::BoundingFrustum frustrum;
-				m_frustrum.Transform(frustrum, m_gameObject->m_transform->GetWorldMatrix());
+				m_frustrum.Transform(frustrum, m_gameObject->GetTransform()->GetWorldMatrix());
 				return frustrum;
 			}
 
@@ -264,10 +249,10 @@ namespace thomas
 				
 				math::BoundingFrustum subFrustrum(GetFrustrum());
 
-				math::Rectangle window = math::Rectangle(GetViewport().x, GetViewport().y, GetViewport().width, GetViewport().height);
+				math::Rectangle window = math::Rectangle((long)GetViewport().x, (long)GetViewport().y, (long)GetViewport().width, (long)GetViewport().height);
 				math::Vector2 center = window.Center();
-				window.Offset(-center.x, -center.y);
-				rect.Offset(-center.x, -center.y);
+				window.Offset((long)-center.x, (long)-center.y);
+				rect.Offset((long)-center.x, (long)-center.y);
 
 
 				if (rect.width < 0)
@@ -373,8 +358,8 @@ namespace thomas
 			{
 				math::Vector3 NDC = math::Vector3::Transform(position, world * GetViewMatrix() * GetProjMatrix());
 
-				NDC.x = (NDC.x + 1.0f) * 0.5 * GetViewport().width;
-				NDC.y = (1.0f - NDC.y) * 0.5 * GetViewport().height;
+				NDC.x = (NDC.x + 1.0f) * 0.5f * GetViewport().width;
+				NDC.y = (1.0f - NDC.y) * 0.5f * GetViewport().height;
 
 				return NDC;
 			}

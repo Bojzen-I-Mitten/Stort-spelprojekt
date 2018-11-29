@@ -44,9 +44,30 @@ namespace thomas
 			{
 				if (!m_concave)
 				{
-					Collider::Update();
+					//Collider::Update();
 				}
 
+			}
+			void MeshCollider::SetTrigger(bool trigger)
+			{
+				if (!m_concave)
+				{
+					Collider::Update();
+					return;
+				}
+
+				if (trigger) {
+					if (m_collisionObject) {
+						m_collisionObject->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+					}
+				}
+				else
+				{
+					if (m_collisionObject) {
+						m_collisionObject->setCollisionFlags(btCollisionObject::CF_STATIC_OBJECT);
+					}
+				}
+				m_trigger = trigger;
 			}
 			void MeshCollider::RecalcCollider()
 			{
@@ -70,7 +91,7 @@ namespace thomas
 				for (auto mesh : m_model->GetMeshes())
 				{
 
-					for (int i = 0; i < mesh->GetVertexCount(); i++)
+					for (uint32_t i = 0; i < mesh->GetVertexCount(); i++)
 					{
 						math::Vector4 v = mesh->GetVertices().positions[i];
 						temp->addPoint(btVector3(v.x, v.y, v.z));
@@ -99,7 +120,7 @@ namespace thomas
 				{
 
 					btVector3* vertices = new btVector3[mesh->GetVertexCount()];
-					for (int i = 0; i < mesh->GetVertexCount(); i++)
+					for (uint32_t i = 0; i < mesh->GetVertexCount(); i++)
 					{
 						vertices[i] = (btVector3&)mesh->GetVertices().positions[i];
 					}
@@ -120,6 +141,7 @@ namespace thomas
 				}
 
 				m_collisionShape = new btBvhTriangleMeshShape(btModel, true, true);
+				
 			}
 		}
 	}

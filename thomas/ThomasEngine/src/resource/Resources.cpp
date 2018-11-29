@@ -17,6 +17,7 @@
 #include "../serialization/Serializer.h"
 #include "../Time.h"
 #include "Font.h"
+#include "../object/component/Transform.h"
 using namespace System::Threading;
 namespace ThomasEngine
 {
@@ -151,6 +152,10 @@ namespace ThomasEngine
 			AssetTypes type = GetResourceAssetType(path);
 			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
 		}
+		bool Resources::IsResource(AssetTypes type)
+		{
+			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
+		}
 
 		Resources::AssetTypes Resources::GetResourceAssetType(Type ^ type)
 		{
@@ -203,16 +208,15 @@ namespace ThomasEngine
 		}
 		Resource^ Resources::Load(String^ path, String^ thomasPath)
 		{
+			Monitor::Enter(resourceLock);
+			Resource^ obj;
 			if (resources->ContainsKey(thomasPath))
 			{
-				Resource^ obj = resources[thomasPath];
-				return obj;
+				obj = resources[thomasPath];
 			}
 			else
 			{
 				float startTime = Time::ElapsedTime;
-				
-				Resource^ obj;
 				AssetTypes type = GetResourceAssetType(path);
 				try {
 					if (!System::IO::File::Exists(path))
@@ -270,9 +274,9 @@ namespace ThomasEngine
 
 				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
 
-				return obj;
 			}
-
+			Monitor::Exit(resourceLock);
+			return obj;
 		}
 #pragma region PreFab
 
@@ -288,25 +292,25 @@ namespace ThomasEngine
 			Serializer::SerializeGameObject(gameObject, path);
 			gameObject->prefabPath = pp;
 		}
-
-		GameObject ^ Resources::LoadPrefab(String^ path) {
-			return LoadPrefab(path, false);
+		void recursivePrefabClean(GameObject^ obj)
+		{
+			if (obj == nullptr) return;
+			// Clean null components recursively
+			for each(Transform^ o in obj->transform->children)
+				recursivePrefabClean(o->m_gameObject);
+			obj->CleanComponents();
 		}
 
-		GameObject ^ Resources::LoadPrefab(String^ path, bool forceInstantiate)
+		GameObject^ Resources::CreatePrefab(String^ path)
 		{
-			if (!forceInstantiate) {
-				for each(GameObject^ gObj in GameObject::GetAllGameObjects(true))
-				{
-					if (gObj->prefabPath == path)
-						return gObj;
-				}
-			}
-
-			try {
+			try
+			{
 				GameObject^ prefab = Serializer::DeserializeGameObject(path);
 				if (prefab)
+				{
 					prefab->prefabPath = path;
+					recursivePrefabClean(prefab);
+				}
 				return prefab;
 			}
 			catch (Exception^ e) {
@@ -315,6 +319,114 @@ namespace ThomasEngine
 				return nullptr;
 			}
 
+		}
+
+		GameObject ^ Resources::LoadPrefabResource(String^ path)
+		{
+			GameObject^ prefab;
+			if (s_PREFAB_DICT->TryGetValue(path, prefab))
+				return prefab;
+
+			prefab = CreatePrefab(path);
+			Monitor::Enter(s_PREFAB_DICT);
+			s_PREFAB_DICT[path] = prefab;
+			Monitor::Exit(s_PREFAB_DICT);
+			return prefab;
+		}
+#ifdef _EDITOR
+		IEnumerable<GameObject^>^ Resources::PrefabList::get()
+		{
+			auto l = gcnew List<GameObject^>(s_PREFAB_DICT->Count);
+			Monitor::Enter(s_PREFAB_DICT);
+			for each (auto var in s_PREFAB_DICT)
+			{
+				l->Add(var.Value);
+			}
+			Monitor::Exit(s_PREFAB_DICT);
+
+			return l;
+		}
+#endif
+
+		void Resources::AssetLoadWorker::LoadAsset(System::Object ^state)
+		{
+			try
+			{
+				LoadSysPath(file);
+				OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
+			finally
+			{
+				countdown->Signal();
+			}
+		}
+
+		CountdownEvent^ Resources::LoadAssetFiles(List<String^>^ files)
+		{
+			using namespace System::Threading;
+
+			auto counter = gcnew CountdownEvent(files->Count);
+			// Start workers.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetLoadWorker^ w = gcnew AssetLoadWorker(files[i], counter);
+				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
+			}
+			// Wait for workers.
+			return counter;
+		}
+		/* Load assets on same thread.
+		*/
+		void Resources::LoadAssetFilesSynced(List<String^>^ files)
+		{
+			// Start work.
+			for (int i = 0; i < files->Count; i++)
+			{
+				LoadSysPath(files[i]);
+				//OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
+		}
+
+		void Resources::LoadAll(String^ path)
+		{
+			//array<String^>^ directories = IO::Directory::GetDirectories(path);
+			List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
+			List<String^>^ shaderFiles = gcnew List<String^>();
+			List<String^>^ materialFiles =  gcnew List<String^>();
+			/*for each(String^ dir in directories)
+			{
+				LoadAll(dir);
+			}*/
+
+			// Sort on asset type(s), to load files with dependencies in order.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetTypes type = GetResourceAssetType(files[i]);
+				if (!IsResource(type)) {
+					files->RemoveAt(i);
+					--i;
+				}
+				else if (type == AssetTypes::MATERIAL)
+				{
+					materialFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
+				else if (type == AssetTypes::SHADER)
+				{
+					shaderFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
+			}
+			OnResourceLoadStarted();
+			auto counter = LoadAssetFiles(files);
+			counter->Wait(); 
+			counter = LoadAssetFiles(shaderFiles);
+			counter->Wait();
+			counter = LoadAssetFiles(materialFiles);
+			counter->Wait();
+			OnResourceLoadEnded();
 		}
 
 #pragma endregion
@@ -342,44 +454,30 @@ namespace ThomasEngine
 				}
 			}
 
+
 			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
-				}
+				if(resources->Remove(ConvertToThomasPath(resource->m_path)))
+					delete resource;
 			}
 
-			void Resources::LoadAll(String^ path)
+			void recursivePrefabDestruction(GameObject^ obj)
 			{
-				//array<String^>^ directories = IO::Directory::GetDirectories(path);
-				List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
-				/*for each(String^ dir in directories)
-				{
-					LoadAll(dir);
-				}*/
-
-				for (int i = 0; i < files->Count; i++)
-				{
-					if (!IsResource(files[i])) {
-						files->RemoveAt(i);
-						--i;
-					}
-						
-				}
-
-				OnResourceLoadStarted();
-				for (int i = 0; i < files->Count; i++)
-				{
-					OnResourceLoad(files[i], i, files->Count);
-					LoadSysPath(files[i]);
-				}
-				OnResourceLoadEnded();
+				if (obj == nullptr) return;
+				// Delete objects recursively
+				List<Transform^> list(obj->transform->children);	// List is edited during destruction
+				for each(Transform^ o in list)
+					recursivePrefabDestruction(o->m_gameObject);
+				//obj->OnDestroy();
+				delete obj;
 			}
 
 			void Resources::UnloadAll()
 			{
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
+				for each (auto var in s_PREFAB_DICT)
+					recursivePrefabDestruction(var.Value);
+				resources->Clear();
 			}
 #pragma endregion
 
@@ -454,16 +552,11 @@ namespace ThomasEngine
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
 				if (resources->ContainsKey(thomasPathOld))
 				{
-					Object^ lock = ThomasWrapper::CurrentScene->GetGameObjectsLock();
-
-					System::Threading::Monitor::Enter(lock);
 					Resource^ resource = resources[thomasPathOld];
 					resources->Remove(thomasPathOld);
 					resources[thomasPathNew] = resource;
 					if (resource)
 						resource->Rename(newPath);
-
-					System::Threading::Monitor::Exit(lock);
 				}
 			}
 			generic<typename T>

@@ -9,13 +9,12 @@ namespace thomas
 		namespace profiling
 		{
 			GpuProfiler::GpuProfiler()
-				: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0),
-				m_beginAvg(0.0f), m_drawCalls(0), m_totalVertexCount(0), m_memoryUsage(0.0f)
+				: m_frameQuery(0), m_frameCollect(-1), m_frameCountAvg(0), m_beginAvg(0.0f),
+				m_drawCalls(0), m_totalVertexCount(0), m_totalFaceCount(0), m_memoryUsage(0.0f)
 			{
 				memset(m_queryDisjoint, 0, sizeof(m_queryDisjoint));
 				memset(m_queryTimestamp, 0, sizeof(m_queryTimestamp));
 				memset(m_timings, 0, sizeof(m_timings));
-				memset(m_avgTimings, 0, sizeof(m_avgTimings));
 				memset(m_avgTimings, 0, sizeof(m_avgTimings));
 			}
 			bool GpuProfiler::Init()
@@ -96,6 +95,7 @@ namespace thomas
 			{
 				m_drawCalls = 0;
 				m_totalVertexCount = 0;
+				m_totalFaceCount = 0;
 				utils::D3D::Instance()->GetDeviceContext()->Begin(m_queryDisjoint[m_frameQuery]);
 				Timestamp(GTS_BEGIN_FRAME);
 			}
@@ -118,9 +118,10 @@ namespace thomas
 				++m_frameQuery &= 1; //Fancy 0/1 toggle.
 			}
 
-			void profiling::GpuProfiler::AddDrawCall(int vertexCount)
+			void profiling::GpuProfiler::AddDrawCall(size_t faceCount, size_t vertexCount)
 			{
 				m_totalVertexCount += vertexCount;
+				m_totalFaceCount += faceCount;
 				m_drawCalls++;
 			}
 
@@ -227,14 +228,18 @@ namespace thomas
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()
 			{
-				return m_drawCalls;
+				return (int)m_drawCalls;
 			}
 
-			int profiling::GpuProfiler::GetVertexCount()
+			size_t profiling::GpuProfiler::GetVertexCount()
 			{
 				return m_totalVertexCount;
 			}
 
+			size_t profiling::GpuProfiler::GetFaceCount()
+			{
+				return m_totalFaceCount;
+			}
 		}
 	}
 }

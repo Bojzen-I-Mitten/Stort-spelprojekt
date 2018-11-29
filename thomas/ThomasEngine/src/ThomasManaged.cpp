@@ -29,6 +29,7 @@
 #include "object\GameObject.h"
 #include "Debug.h"
 #include "system/SceneManager.h"
+#include "system/command/CommandQueue.h"
 
 using namespace thomas;
 
@@ -51,9 +52,25 @@ namespace ThomasEngine {
 	{
 		Start(true);
 	}
+
+	ThomasWrapper::ThomasWrapper()
+	{
+		// Thomas Object Initiation
+		m_scene = gcnew SceneManager();
+		m_engineCommands = gcnew CommandQueue();
+		m_sceneLock = gcnew Object();
+	}
+	ThomasWrapper::~ThomasWrapper()
+	{
+		m_scene->CurrentScene->UnLoad();
+		Resources::UnloadAll();
+		ThomasCore::Destroy();				// Delete core last
+	}
 	void ThomasWrapper::Start(bool editor) 
 	{
 		inEditor = editor;
+		EditorWindowLoaded = gcnew ManualResetEvent(!inEditor);
+		GameWindowLoaded = gcnew ManualResetEvent(!inEditor);
 		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
 		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
@@ -62,7 +79,7 @@ namespace ThomasEngine {
 		Environment::SetEnvironmentVariable("THOMAS_ENGINE", enginePath, EnvironmentVariableTarget::User);
 
 		// Thomas Initialization
-		Thomas->m_scene = gcnew SceneManager();
+		s_SYS = gcnew ThomasWrapper();
 		s_Selection = gcnew ThomasSelection();
 		s_GameObjectManager = gcnew GameObjectManager();
 		thomas::ThomasCore::Core().registerThread();
@@ -73,41 +90,32 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			
-			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
-#if _EDITOR
-
-			if (InEditor()) {
-				Model::InitPrimitives();
-				Resources::LoadAll(Application::editorAssets);
-				ScriptingManager::Init();
-			}
-			else
-			{
-				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
-			}
-
-			
-#endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			logicThread->Name = "Thomas Engine (Logic Thread)";
 			logicThread->Start();
-
-			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
-		
-			renderThread->Name = "Thomas Engine (Render Thread)";
-			renderThread->Start();
-
+			
 		}
 	}
+#ifdef _EDITOR
+	void ThomasWrapper::ThomasGameWindowLoaded()
+	{
+		GameWindowLoaded->Set();
+	}
+
+	void ThomasWrapper::ThomasEditorWindowLoaded()
+	{
+		EditorWindowLoaded->Set();
+	}
+#endif
+
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
@@ -123,9 +131,10 @@ namespace ThomasEngine {
 	void ThomasWrapper::MainThreadUpdate()
 	{
 #ifdef _EDITOR
-		if (!playing)
-			ScriptingManager::ReloadAssembly(false);
+		// Check if scripts require a reload
+		ScriptingManager::ReloadAssembly(false);
 #endif
+
 		constexpr uint32_t RAM_SAMPLE_FRAME = 1000;
 		static uint32_t WaitSampleFrame = 0;
 		if (WaitSampleFrame++ > RAM_SAMPLE_FRAME)
@@ -138,6 +147,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartRenderer()
 	{
+		GameWindowLoaded->WaitOne();
+		EditorWindowLoaded->WaitOne();
 		// Render thread start
 
 		ThomasCore::Core().registerThread();
@@ -165,8 +176,9 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SynchronousExecution()
 	{
-		// Process state switch commands
-		ProcessCommand();
+		Thomas->m_engineCommands->execute();	// Execute editor commands
+		CurrentScene->SyncScene();				// Execute scene commands
+		ProcessStateCommand();						// Process engine state switch commands
 
 		// Refresh frame
 		thomas::graphics::LightManager::Update();
@@ -175,20 +187,18 @@ namespace ThomasEngine {
 		// Enter async. state 
 #ifdef _EDITOR
 					// This is only relevant if we are running with editor, should be removed when build
-		for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+		for each(GameObject^ gameObject in CurrentScene->GameObjects)
 		{
-			GameObject^ gameObject = CurrentScene->GameObjects[i];
-
 			if (gameObject->MoveStaticGroup())
 			{
 				// Fetch the adress of where an object might be moved to
-				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+				thomas::object::Object* new_temp = gameObject->nativePtr;
 
 				// Fetch the adress of the object that might be moved
 				thomas::object::Object* old_native = gameObject->moveStaticGroup();
 
 				// Find the wrapped gameobject of the object that might be moved
-				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
 				if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
 					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
@@ -196,11 +206,11 @@ namespace ThomasEngine {
 
 			else if (gameObject->MakeStatic())
 			{
-				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+				thomas::object::Object* new_temp = gameObject->nativePtr;
 
 				thomas::object::Object* old_native = gameObject->setStatic();
 
-				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
 				if (temp) // If temp is nullptr, no managed object has been invalidated.
 					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
@@ -209,11 +219,11 @@ namespace ThomasEngine {
 
 			else if (gameObject->MakeDynamic())
 			{
-				thomas::object::Object* new_temp = CurrentScene->GameObjects[i]->nativePtr;
+				thomas::object::Object* new_temp = gameObject->nativePtr;
 
 				thomas::object::Object* old_native = gameObject->setDynamic();
 
-				GameObject^ temp = GameObject::FindGameObjectFromNativePtr(static_cast<thomas::object::GameObject*>(old_native));
+				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
 				if (temp) // If temp is nullptr, no managed object has been invalidated.
 					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
@@ -225,6 +235,7 @@ namespace ThomasEngine {
 	
 	void ThomasWrapper::CopyCommandList()
 	{
+		PROFILE("CopyCommandList")
 		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
 		if (showStatistics)
 		{
@@ -234,9 +245,10 @@ namespace ThomasEngine {
 			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
-			ImGui::Text("RAM Usage: %.2f MB", 0.0f);
+			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
 			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Draw Shadows: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_SHADOWS)*1000.0f);
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
@@ -263,8 +275,30 @@ namespace ThomasEngine {
 		// Called when system can replace 
 	}
 
+	void ThomasWrapper::LoadEditorAssets()
+	{
+#if _EDITOR
+		if (IsEditorBuild()) {
+			Model::InitPrimitives();
+			Resources::LoadAll(Application::editorAssets);
+			ScriptingManager::Init();
+		}
+		else
+		{
+			Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
+		}
+#endif
+	}
+
 	void ThomasWrapper::StartEngine()
 	{
+		LoadEditorAssets();
+		// Boot up render thread
+		renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
+		renderThread->Name = "Thomas Engine (Render Thread)";
+		renderThread->Start();
+		playing = IsEditorBuild() ? RunningState::Editor : RunningState::UnInitialized;
+
 		// Update thread start
 
 		ThomasCore::Core().registerThread();
@@ -277,6 +311,7 @@ namespace ThomasEngine {
 				// Swap scene
 				RenderFinished->WaitOne();
 				Thomas->m_scene->ListenToLoadProcess();
+				thomas::graphics::Renderer::Instance()->ClearAllCommands();	// Clear renderer
 			}
 			if (Thomas->m_scene->NoSceneExist())	// Wait for scene load
 			{
@@ -284,36 +319,31 @@ namespace ThomasEngine {
 				continue;
 			}
 			float timeStart = ThomasTime::GetElapsedTime();
-			//PROFILE(__FUNCSIG__, thomas::ProfileManager::operationType::miscLogic);
-			Object^ lock = CurrentScene->GetGameObjectsLock();
 			try {
 				bool hasKey = thomas::WindowManager::Instance() && thomas::WindowManager::Instance()->GetGameInput()->GetLastKey() != NULL;
 				thomas::ThomasTime::Update();
-				
+
 				if (WindowManager::Instance()->WaitingForUpdate()) //Make sure that we are not rendering when resizing the window.
 					RenderFinished->WaitOne();
 				WindowManager::Instance()->Update();
 
 
 				ThomasCore::Update();
-				Monitor::Enter(lock);
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Enter(Thomas->m_sceneLock);
+#endif _THOMAS_SCENE_LOCK
 
-				CurrentScene->InitGameObjects(IsPlaying());
-
-				
 
 				//Logic
 				{
 					PROFILE("LogicLoop")
-					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
-					{
-
-						GameObject^ gameObject = CurrentScene->GameObjects[i];
-						if (gameObject->GetActive())
+						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							gameObject->Update();
+							if (gameObject->GetActive())
+							{
+								gameObject->Update();
+							}
 						}
-					}
 				}
 				editor::EditorCamera::Instance()->Update();
 
@@ -324,16 +354,18 @@ namespace ThomasEngine {
 					{
 						PROFILE("UpdateRigidbodies")
 
-						thomas::Physics::UpdateRigidbodies();
+							thomas::Physics::UpdateRigidbodies();
 					}
-					for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
-						GameObject^ gameObject = CurrentScene->GameObjects[i];
 						if (gameObject->GetActive())
 							gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
 					}
 					thomas::Physics::Simulate();
 				}
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Exit(Thomas->m_sceneLock);
+#endif _THOMAS_SCENE_LOCK
 
 
 				//Rendering
@@ -344,17 +376,16 @@ namespace ThomasEngine {
 					{
 						editor::EditorCamera::Instance()->Render();
 						//GUI::ImguiStringUpdate(thomas::ThomasTime::GetFPS().ToString(), Vector2(Window::GetEditorWindow()->GetWidth() - 100, 0)); TEMP FPS stuff :)
-						for (int i = 0; i < CurrentScene->GameObjects->Count; i++)
+
+						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							GameObject^ gameObject = CurrentScene->GameObjects[i];
-							if (gameObject->GetActive())
+							//if (gameObject->GetActive())
 								gameObject->RenderGizmos();
 						}
-
-							s_Selection->render();
+						s_Selection->render();
 					}	//end editor rendering
-				
-					
+
+
 
 					for (object::component::Camera* camera : graphics::Renderer::Instance()->getCameraList().getCameras())
 					{
@@ -382,6 +413,9 @@ namespace ThomasEngine {
 					// Wait for renderer
 					{
 						PROFILE("StartEngine - Wait");
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Enter(Thomas->m_sceneLock);
+#endif
 						RenderFinished->WaitOne();
 					}
 					/* Render & Update is synced.
@@ -389,32 +423,37 @@ namespace ThomasEngine {
 					SynchronousExecution();
 					RenderFinished->Reset();
 					UpdateFinished->Set();
+
+#ifdef _THOMAS_SCENE_LOCK
+				Monitor::Exit(Thomas->m_sceneLock);
+#endif
+
 				}
 
-				Monitor::Exit(lock);
+
+
+				/* Run async. update on main thread.
+				*/
 				mainThreadDispatcher->BeginInvoke(
 					System::Windows::Threading::DispatcherPriority::Normal,
 					gcnew MainThreadDelegate(MainThreadUpdate));
 			}
-
-			
-
 		}
-		// Initiate log dump
+		while (!renderThread->Join(System::TimeSpan(0, 0, 1)))	// Wait until thread is finished
+		{
+			Debug::Log("Waiting for render thread to terminate...");
+		}
 
 
-		// Shutdown
+#ifdef BENCHMARK
 		WaitLogOutput = gcnew ManualResetEvent(false);
-		renderThread->Join();	// Wait until thread is finished
 		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
 		ThreadPool::QueueUserWorkItem(logOut);
+#endif
+		delete Thomas;				// Delete the thomas instance, unload scene...
 #ifdef BENCHMARK
 		WaitLogOutput->WaitOne();
 #endif
-
-
-		Resources::UnloadAll();
-		ThomasCore::Destroy();
 	}
 
 	void ThomasWrapper::DumpProfilerLog(System::Object^ stateInfo)
@@ -461,11 +500,12 @@ namespace ThomasEngine {
 			s_Selection->UpdateSelectedObjects();
 	}
 
-	void ThomasWrapper::ProcessCommand()
+	void ThomasWrapper::ProcessStateCommand()
 	{
 		if (IssuedStateCommand)
 		{
 			Monitor::Enter(StateCommandProcessed);
+			
 			if (IssuedStateCommand == ThomasStateCommand::PlayIssued)
 			{
 				Play();
@@ -474,8 +514,13 @@ namespace ThomasEngine {
 			{
 				StopPlay();
 			}
+			else if (IssuedStateCommand == ThomasStateCommand::ReplayIssued)
+			{
+				StopPlay();
+				Play();
+			}
 			IssuedStateCommand = ThomasStateCommand::NoCommand;
-			StateCommandProcessed->Set();
+			//StateCommandProcessed->Set();
 			Monitor::Exit(StateCommandProcessed);
 		}
 	}
@@ -487,11 +532,23 @@ namespace ThomasEngine {
 			Thomas->SceneManagerRef->ListenToLoadProcess();
 			Thread::Sleep(50);
 		}
+		playing = RunningState::Running;			// Set running state, scene depends on this value set during initiation.
 		thomas::ThomasCore::Core().OnPlay();
 		ThomasEngine::Resources::OnPlay();
-		CurrentScene->OnPlay();
-		playing = RunningState::Running;
-		Debug::Log("Running...");
+		// Initiate all object: Start engine, Chuuchuu!
+		if (CurrentScene->OnPlay())
+		{
+			Debug::Log("Running...");
+#ifdef _EDITOR
+			OnStartPlaying();
+#endif
+		}
+		else
+		{
+			playing = RunningState::Editor;
+			// Error failed to run...
+			StopPlay();
+		}
 	}
 		
 	Guid selectedGUID;
@@ -510,21 +567,39 @@ namespace ThomasEngine {
 		ThomasEngine::Resources::OnStop();
 		if (selectedGUID != Guid::Empty)
 		{
-			GameObject^ gObj = (GameObject^)ThomasEngine::Object::Find(selectedGUID);
+			GameObject^ gObj = ThomasEngine::ThomasWrapper::CurrentScene->Find(selectedGUID);
 			if (gObj)
 				s_Selection->SelectGameObject(gObj);
 		}
 
 		Debug::Log("Stopped...");
 		playing = RunningState::Editor;
+#ifdef _EDITOR
+		OnStopPlaying();
+#endif
+	}
+	void ThomasWrapper::ENTER_SYNC_STATELOCK()
+	{
+		if(IsPlaying())
+			Monitor::Enter(s_SYS->m_sceneLock);
+	}
+	void ThomasWrapper::EXIT_SYNC_STATELOCK()
+	{
+		if (IsPlaying() && Monitor::IsEntered(s_SYS->m_sceneLock))
+			Monitor::Exit(s_SYS->m_sceneLock);
+	}
+
+
+	void ThomasWrapper::IssueCommand(ICommand ^ cmd)
+	{
+		Thomas->m_engineCommands->issue(cmd);
 	}
 	void ThomasWrapper::IssueStateCommand(ThomasStateCommand state)
 	{
 		Monitor::Enter(StateCommandProcessed);
-		StateCommandProcessed->Reset();
-		IssuedStateCommand = state;
+		if(IssuedStateCommand == ThomasStateCommand::NoCommand)
+			IssuedStateCommand = state;
 		Monitor::Exit(StateCommandProcessed);
-		StateCommandProcessed->WaitOne();
 	}
 	void ThomasWrapper::IssuePlay()
 	{
@@ -536,9 +611,19 @@ namespace ThomasEngine {
 		IssueStateCommand(ThomasStateCommand::StopIssued);
 	}
 
+	void ThomasWrapper::IssueRestart()
+	{
+		IssuedStateCommand = ThomasStateCommand::ReplayIssued;
+	}
+
 	bool ThomasWrapper::IsPlaying()
 	{
 		return playing == RunningState::Running;
+	}
+
+	bool ThomasWrapper::IsEditor()
+	{
+		return playing == RunningState::Editor;
 	}
 
 	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
@@ -563,7 +648,7 @@ namespace ThomasEngine {
 	}
 
 	
-	bool ThomasWrapper::InEditor()
+	bool ThomasWrapper::IsEditorBuild()
 	{
 		return inEditor;
 	}

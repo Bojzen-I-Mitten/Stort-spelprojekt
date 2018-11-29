@@ -26,8 +26,14 @@ namespace thomas
 
 				template <typename T>
 				void SetData(std::vector<T>& data) {SetData(data.data(), data.size() * sizeof(T));}
+				/* Give a debug name to the buffer.
+				*/
+				void SetName(const char* name);
+				/* Give a debug name to the buffer.
+				*/
+				void SetName(const std::string& name);
 
-				size_t GetSize();
+				size_t GetByteSize();
 				ID3D11Buffer* GetBuffer();
 			protected:
 				D3D11_BIND_FLAG m_bindFlag;
@@ -67,9 +73,9 @@ namespace thomas
 					Buffer::SetData(data, numVertex * sizeof(T));
 				}
 
-				size_t GetStride();
+				uint32_t GetStride();
 			private:
-				size_t m_stride;
+				uint32_t m_stride;
 			};
 
 
@@ -78,7 +84,14 @@ namespace thomas
 			public:
 				IndexBuffer(void* data, size_t count, D3D11_USAGE usageFlag);
 				template <typename T>
-				IndexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : IndexBuffer(data.data(), data.size(), usageFlag) {};
+				IndexBuffer(std::vector<T>& data, D3D11_USAGE usageFlag = STATIC_BUFFER) : 
+					IndexBuffer(data.data(), data.size(), usageFlag)
+				{};
+
+				uint32_t IndexCount() { return m_indexCount; }
+
+			private:
+				uint32_t m_indexCount;
 			};
 
 			class StructuredBuffer : public Buffer

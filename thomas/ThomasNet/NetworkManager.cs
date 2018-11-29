@@ -23,7 +23,7 @@ namespace ThomasEngine.Network
         //private Dictionary<NetPeer, List<GameObject>> ownedObjects = new Dictionary<NetPeer, List<GameObject>>();
 
         internal NetPacketProcessor NetPacketProcessor;
-
+        public bool blockIncomingData = false;
         public EventBasedNetListener Listener { get; private set; }
         private NetManager NetManager;
         private EventBasedNatPunchListener NatPunchListener;
@@ -44,9 +44,10 @@ namespace ThomasEngine.Network
         public NetPeer LocalPeer = null;
 
         public NetPeer ResponsiblePeer = null;
-
+        
         public int TICK_RATE { get; set; } = 24;
 
+        public bool ReadOwnerAsNormal = false;
 
         public long ServerStartTime;
         [Browsable(false)]
@@ -74,7 +75,7 @@ namespace ThomasEngine.Network
             
         }
 
-        public override void Awake()
+        public override void OnAwake()
         {
             instance = this;
             NetScene = new NetworkScene();
@@ -227,7 +228,7 @@ namespace ThomasEngine.Network
         {
             try
             {
-                if (reader.EndOfData)
+                if (reader.EndOfData || blockIncomingData)
                     return;
                 PacketType type = (PacketType)reader.GetInt();
                 switch (type)
@@ -251,6 +252,13 @@ namespace ThomasEngine.Network
                     default:
                         break;
                 }
+
+                if(!reader.EndOfData)
+                {
+                    Debug.Log("Reader not at end of data with " + reader.AvailableBytes + " bytes left");
+                    Debug.Log("Packet type: " + type);
+                }
+
                 reader.Recycle();
             }
             catch (Exception e)

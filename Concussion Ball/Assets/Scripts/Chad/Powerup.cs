@@ -14,11 +14,10 @@ public class Powerup : PickupableObject
     public PowerupSpawner spawner;
 
     protected bool activated = false;
-    public override void Awake()
+    public override void OnAwake()
     {
-        base.Awake();
+        base.OnAwake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
-        Disable();
         chargeTimeMax = 0.5f;
     }
 
@@ -89,10 +88,11 @@ public class Powerup : PickupableObject
     {
         if (isOwner)
         {
-            if (PickupCollider.enabled == false)
+            if (PickupCollider.enabled == false && m_rigidBody.enabled && pickedUp == false)
             {
                 if (!activated)
                 {
+                    Debug.Log("boom!");
                     Activate();
                     activated = true;
                 }
@@ -105,36 +105,34 @@ public class Powerup : PickupableObject
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         base.OnWrite(writer, initialState);
-        if (initialState)
-        {
-            if (spawner)
-                writer.Put(spawner.ID);
-            else
-                writer.Put(-1);
+        if (spawner)
+            writer.Put(spawner.ID);
+        else
+            writer.Put(-1);
 
-            writer.Put(activated);
-
-        }
-
-
+        writer.Put(activated);
         return true;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
         base.OnRead(reader, initialState);
 
-        if (initialState)
+        int spawnerID = reader.GetInt();
+        if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
         {
-            int spawnerID = reader.GetInt();
-            if ((!spawner && spawnerID != -1) || (spawner && spawner.ID != spawnerID))
-            {
-                spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();
-                Reset();
-            }
-            activated = reader.GetBool();
+            Reset();
+            spawner = MatchSystem.instance.Scene.FindNetworkObject(spawnerID)?.gameObject.GetComponent<PowerupSpawner>();    
         }
+        if (spawnerID == -1)
+            spawner = null;
 
+        bool newActivation = reader.GetBool();
+        if (!activated && newActivation)
+        {
+            OnActivate();
+        }
+        activated = newActivation;
 
     }
 
@@ -166,6 +164,7 @@ public class Powerup : PickupableObject
     public override void Reset()
     {
         base.Reset();
+        spawner = null;
         m_rigidBody.enabled = false;
         activated = false;
     }

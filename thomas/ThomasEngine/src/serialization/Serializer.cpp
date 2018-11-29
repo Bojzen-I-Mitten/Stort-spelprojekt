@@ -24,7 +24,8 @@ namespace ThomasEngine
 			serializer->TypeNameHandling = TypeNameHandling::Auto;
 			serializer->NullValueHandling = NullValueHandling::Ignore;
 			serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;									// Specifies if objects are created in-place or not
-			serializer->MetadataPropertyHandling = MetadataPropertyHandling::ReadAhead;							// Specifies if $ref $id handling reads forward before resolving conflict?
+			serializer->MetadataPropertyHandling = MetadataPropertyHandling::Default;							// Specifies if $ref $id handling reads forward before resolving conflict?
+			serializer->DefaultValueHandling = DefaultValueHandling::Populate;									// Set to default value
 			serializer->Error += gcnew EventHandler<Serialization::ErrorEventArgs^>(&Serializer::ErrorHandler);
 
 

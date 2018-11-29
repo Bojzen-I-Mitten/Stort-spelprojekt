@@ -57,20 +57,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Camera\GUI\GUILoadingScreen.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIHostMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\ChadCam.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIMainMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIExitMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
+    <Compile Include="Assets\Scripts\Camera\ReplayCamera.cs" />
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
-    <Compile Include="Assets\Scripts\Chad\GUIPlayerScore.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIPlayerScore.cs" />
+    <Compile Include="Assets\Scripts\Forcefield.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
     <Compile Include="Assets\Scripts\Confetti.cs" />
-    <Compile Include="Assets\Scripts\ConfettiEmitter.cs" />
     <Compile Include="Assets\Scripts\Chad\ToggleRagdoll.cs" />
     <Compile Include="Assets\Scripts\Chad\RagdollImpact.cs" />
     <Compile Include="Assets\Scripts\AnimationBlendTree.cs" />
@@ -94,6 +97,7 @@
     <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
     <Compile Include="Assets\Scripts\match\PowerupManager.cs" />
     <Compile Include="Assets\Scripts\match\PowerupSpawner.cs" />
+    <Compile Include="Assets\Scripts\match\ReplaySystem.cs" />
     <Compile Include="Assets\Scripts\match\Team.cs" />
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />

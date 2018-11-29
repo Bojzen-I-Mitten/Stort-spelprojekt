@@ -159,6 +159,21 @@ namespace thomas
 			return 1;
 		}
 
+		component::Transform * GameObject::GetTransform()
+		{
+			return m_transform;
+		}
+
+		const std::vector<component::Component*>& GameObject::getComponents()
+		{
+			return m_components;
+		}
+
+		void GameObject::SetTransform(component::Transform * t)
+		{
+			m_transform = t;
+		}
+
 		void GameObject::Destroy()
 		{
 			for (unsigned int i = 0; i < s_gameObjects.size(); ++i)
@@ -172,7 +187,7 @@ namespace thomas
 		{
 			if (m_transform && m_transform->GetParent())
 			{
-				return m_activeSelf && m_transform->GetParent()->m_gameObject->m_activeSelf;
+				return m_activeSelf && m_transform->GetParent()->m_gameObject->GetActive();
 			}
 			return m_activeSelf;
 		}
@@ -180,10 +195,12 @@ namespace thomas
 		void GameObject::SetActive(bool active)
 		{
 			m_activeSelf = active;
+			/*
 			if (m_transform && m_transform->GetParent())
 			{
 				return m_transform->GetParent()->m_gameObject->SetActive(active);
 			}
+			*/
 		}
 
 		int GameObject::GetLayer()
@@ -219,6 +236,11 @@ namespace thomas
 		bool GameObject::GetMoveStaticGroup()
 		{
 			return m_moveStaticGroup;
+		}
+
+		void GameObject::appendComponent(component::Component * comp)
+		{
+			m_components.push_back(comp);
 		}
 
 		UINT GameObject::GetNewGroupID()

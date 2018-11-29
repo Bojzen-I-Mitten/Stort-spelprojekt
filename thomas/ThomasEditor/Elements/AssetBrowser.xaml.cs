@@ -143,7 +143,7 @@ namespace ThomasEditor
                     {
                         GameObject gameObject = foundItem.DataContext as GameObject;
                         GameObject.Destroy(gameObject);
-                        foundItem.DataContext = ThomasEngine.Resources.LoadPrefab(p);
+                        foundItem.DataContext = ThomasEngine.Resources.LoadPrefabResource(p);
                     }
                 }
 
@@ -304,9 +304,27 @@ namespace ThomasEditor
                 stack.Orientation = Orientation.Horizontal;
                 stack.Height = 18;
 
-                ImageSource source;
+                // Default case:
+                ImageSource source = assetImages[ThomasEngine.Resources.AssetTypes.UNKNOWN];
+                // Attempt load texture2D image representation
                 if (assetType == ThomasEngine.Resources.AssetTypes.TEXTURE2D)
-                    source = new BitmapImage(new Uri(Path.GetFullPath(filePath)));
+                {
+                    int attempts = 5;
+                    while (attempts-- <= 0)
+                    {
+                        try
+                        {
+                            source = new BitmapImage(new Uri(Path.GetFullPath(filePath)));
+                            break;
+                        }
+                        catch (IOException e)
+                        {
+                            // Primarily check is constructed to validate image isn't locked by another process.
+                            Debug.LogWarning(e.Message);
+                            Thread.Sleep(500);
+                        }
+                    }
+                }
                 else
                     source = assetImages[assetType];
 
@@ -318,7 +336,7 @@ namespace ThomasEditor
                 stack.DataContext = filePath;
 
                 if (assetType == ThomasEngine.Resources.AssetTypes.PREFAB)
-                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefab(filePath) };
+                    return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadPrefabResource(filePath) };
                 else
                     return new TreeViewItem { Header = stack, DataContext = ThomasEngine.Resources.LoadSysPath(filePath) };
             }
@@ -559,7 +577,7 @@ namespace ThomasEditor
 
         private void Menu_CreatePrefab(object sender, RoutedEventArgs e)
         {
-            GameObject prefab = GameObject.CreatePrefab();
+            GameObject prefab = GameObject.CreateEmptyPrefab();
             ThomasEngine.Resources.SavePrefab(prefab, prefab.Name + ".prefab");
         }
 

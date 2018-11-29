@@ -104,12 +104,14 @@ namespace ThomasEditor
             }
             else if ((typeof(ThomasEngine.GameObject).IsAssignableFrom(resourceType)))
             {
-                resources.AddRange(ThomasEngine.GameObject.GetAllGameObjects(true));
+                resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.GameObjectsSynced);
             }
-            else if ((typeof(ThomasEngine.Object).IsAssignableFrom(resourceType)))
+            
+            else if ((typeof(ThomasEngine.Component).IsAssignableFrom(resourceType)))
             {
-                resources.AddRange(ThomasEngine.Object.GetObjectsOfType(resourceType));
+                resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.getComponentsOfType(typeof(ThomasEngine.Component)));
             }
+            
             resources.Insert(0, "None");
             ResourceList.ItemsSource = resources;
             CollectionViewSource.GetDefaultView(ResourceList.ItemsSource).Filter = ResourcesFilter;
@@ -125,7 +127,7 @@ namespace ThomasEditor
 
         private void SetPropertyToSelection()
         {
-            Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+            ThomasWrapper.ENTER_SYNC_STATELOCK();
             try {
                 if (ResourceList.SelectedItem != null)
                 {
@@ -158,7 +160,7 @@ namespace ThomasEditor
                 Debug.Log("Error at: ThomasEngine::ResourceListPopup with message: " + e.Message);
             }
             finally {
-                Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                ThomasWrapper.EXIT_SYNC_STATELOCK();
             }
             if(OnPropertyChanged != null)
                 OnPropertyChanged();

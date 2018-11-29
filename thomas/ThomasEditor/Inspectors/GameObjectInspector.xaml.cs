@@ -14,6 +14,7 @@ using Xceed.Wpf.Toolkit.PropertyGrid;
 using System.Collections.Generic;
 
 using ThomasEngine;
+using ThomasEditor.utils;
 
 namespace ThomasEditor
 {
@@ -23,7 +24,24 @@ namespace ThomasEditor
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
-                return value.GetType().Name;
+                return value != null ? value.GetType().Name : "NULL";
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        public class ComponentIndexConverter : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                if(value != null && value is Component)
+                {
+                    Component c = value as Component;
+                    return c.gameObject.GetComponentIndex(c).ToString();
+                }
+                return "Nan";
             }
 
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -69,7 +87,7 @@ namespace ThomasEditor
                 {
                     gameObjectGrid.Visibility = Visibility.Visible;
                     GameObject SelectedGameObject = DataContext as GameObject;
-                    SelectedGameObject.Components.CollectionChanged += Components_CollectionChanged;
+                    SelectedGameObject.Subscribe(Components_CollectionChanged);
                     prevGameObject = SelectedGameObject;
                     RenderComponent rc = SelectedGameObject.GetComponent<RenderComponent>();
                     if (rc && rc.material != null)
@@ -94,14 +112,15 @@ namespace ThomasEditor
             {
                 if(prevGameObject != null)
                 {
-                    prevGameObject.Components.CollectionChanged -= Components_CollectionChanged;
+                    prevGameObject.UnSubscribe(Components_CollectionChanged);
                 }
             }
 
-            private void Components_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+            private void Components_CollectionChanged(object sender, GameObject.ComponentsChangedArgs e)
             {
-            
+                
                 this.Dispatcher.BeginInvoke((Action)(() => {
+                    componentItemList.Items.Refresh();// Refresh component list
                     if ((DataContext is GameObject) == false)
                     {
                         BindingOperations.ClearBinding(MaterialEditor, MaterialInspector.DataContextProperty);
@@ -201,14 +220,11 @@ namespace ThomasEditor
             {
                 if (addComponentList.SelectedItem != null && Mouse.LeftButton == MouseButtonState.Pressed && addComponentList.IsMouseOver)
                 {
-
-                    lock (DataContext)
-                    {
+                    if(DataContext is GameObject)
+                    { 
                         Type component = addComponentList.SelectedItem as Type;
-                        var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(component);
-                        method.Invoke(DataContext, null);
+                        ThomasWrapper.IssueCommand(new AddComponentCommand((GameObject)DataContext, component));
                     }
-
                 }
             }
 
@@ -263,6 +279,38 @@ namespace ThomasEditor
             private void AddComponentsListContainer_LostFocus(object sender, RoutedEventArgs e)
             {
                 addComponentsListPopup.IsOpen = false;
+            }
+
+            private void ComponentEnabled_Checked(object sender, RoutedEventArgs e)
+            {
+                FrameworkElement fE = e.OriginalSource as FrameworkElement;
+                if (fE != null && fE.DataContext is Component)
+                    ThomasWrapper.IssueCommand(new utils.EnableComponentCommand((Component)fE.DataContext, true));
+            }
+
+            private void ComponentEnabled_Unchecked(object sender, RoutedEventArgs e)
+            {
+                FrameworkElement fE = e.OriginalSource as FrameworkElement;
+                if(fE != null && fE.DataContext is Component)
+                    ThomasWrapper.IssueCommand(new utils.EnableComponentCommand((Component)fE.DataContext, false));
+            }
+
+            private void ComponentIndex_Changed(object sender, RoutedEventArgs e)
+            {
+                FrameworkElement fE = e.OriginalSource as FrameworkElement;
+                if (fE != null && fE.DataContext is Component && !(fE.DataContext is Transform))
+                {
+                    Component c = (Component)fE.DataContext;
+                    String text = (sender as TextBox).Text;
+                    int ind;
+                    if (Int32.TryParse(text, out ind))
+                    {
+                        uint index = (uint)ind;
+                        if (ind < 1)    // Not 0, Reserved for transform
+                            index = 1;
+                        ThomasWrapper.IssueCommand(new ComponentSetIndexCommand(c, index));
+                    }
+                }
             }
         }
     }

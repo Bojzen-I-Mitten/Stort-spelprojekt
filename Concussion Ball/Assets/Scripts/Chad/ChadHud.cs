@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using ThomasEngine;
 using ThomasEngine.Network;
+using ThomasEngine.Script;
 
 public class ChadHud : ScriptComponent
 {
@@ -14,7 +15,7 @@ public class ChadHud : ScriptComponent
         get
         {
             if (!_Ball)
-                _Ball = GetObjectsOfType<Ball>().FirstOrDefault();
+                _Ball = ScriptUtility.FindComponent<Ball>();
             return _Ball;
         }
     }
@@ -63,7 +64,7 @@ public class ChadHud : ScriptComponent
     public Texture2D LMBTexture { get; set; }
     #endregion
 
-    public override void Awake()
+    public override void OnAwake()
     {
         if (!Instance)
             Instance = this;
@@ -316,7 +317,7 @@ public class ChadHud : ScriptComponent
         if (ToggleAim)
         {
             if (Crosshair != null)
-                Crosshair.scale = Vector2.One;
+                Crosshair.scale = new Vector2(0.5f, 0.5f);
             if (LMB != null)
                 LMB.scale = new Vector2(0.75f);
                 
@@ -366,11 +367,16 @@ public class ChadHud : ScriptComponent
 
     public override void Update()
     {
-        int matchTimeLeft = MatchSystem.instance.MatchTimeLeft;
+        int matchTimeLeft = MatchSystem.instance? MatchSystem.instance.MatchTimeLeft : 0;
         int minutes = matchTimeLeft / 60;
         int seconds = matchTimeLeft % 60;
 
-        if (MatchSystem.instance.GoldenGoal)
+        if (MatchSystem.instance.ReplaySystem.Replaying)
+        {
+            Timer.text = "REPLAY";
+            Timer.color = Color.Red;
+        }
+        else if (MatchSystem.instance.GoldenGoal)
         {
             Timer.text = "GOLDEN GOAL";
             Timer.color = Color.Gold;
@@ -385,15 +391,14 @@ public class ChadHud : ScriptComponent
 
         BallIndicator();
 
-        if (MatchSystem.instance?.LocalChad?.PickedUpObject != null)
+        if (MatchSystem.instance?.LocalChad?.PickedUpObject != null && !MatchSystem.instance.ReplaySystem.Replaying)
         {
-
             ShowHeldObjectText(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
         }
         else
         {
             HideHeldObjectText();
-            DeactivateAimHUD();
+            //DeactivateAimHUD();
         }
 
         if (BallArrow != null)
@@ -410,14 +415,22 @@ public class ChadHud : ScriptComponent
         Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
     }
 
-    public override void OnEnable()
+    public void ToggleScoreVisability(bool OnOff)
     {
-        Canvas.isRendering = true;
-    }
-
-    public override void OnDisable()
-    {
-        Canvas.isRendering = false;
+        if (!OnOff)
+        {
+            Score1BG.scale = new Vector2(1, 0.7f);
+            Score2BG.scale = new Vector2(1, 0.7f);
+            Score1.scale = new Vector2(1.6f);
+            Score2.scale = new Vector2(1.6f);
+        }
+        else
+        {
+            Score1BG.scale = new Vector2(0);
+            Score2BG.scale = new Vector2(0);
+            Score1.scale = new Vector2(0);
+            Score2.scale = new Vector2(0);
+        }
     }
 
     private void BallIndicator()
@@ -425,7 +438,8 @@ public class ChadHud : ScriptComponent
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
         if (!(screenPos.z > 0 && screenPos.z < 1 &&
             screenPos.x > 0 && screenPos.x < cam.viewport.size.x &&
-            screenPos.y > 0 && screenPos.y < cam.viewport.size.y))//Offscreen check
+            screenPos.y > 0 && screenPos.y < cam.viewport.size.y//Offscreen check
+            ) && !Ball.pickedUp)
         {
             //Adjust for center of screen
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;

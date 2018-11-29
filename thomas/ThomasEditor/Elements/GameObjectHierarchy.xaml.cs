@@ -33,6 +33,8 @@ namespace ThomasEditor
         public ObservableCollection<TreeItemViewModel> m_hierarchyNodes { get; set; }
         List<GameObject> m_copiedObjects = new List<GameObject>(); //??correct code convention?
         public static GameObjectHierarchy instance;
+
+        public bool updateHiearchyParenting = true;
         public GameObjectHierarchy()
         {
             InitializeComponent();
@@ -44,7 +46,7 @@ namespace ThomasEditor
             m_hierarchyNodes = new ObservableCollection<TreeItemViewModel>();
             hierarchy.ItemsSource = m_hierarchyNodes;
             ThomasWrapper.Thomas.SceneManagerRef.OnCurrentSceneChanged += Scene_OnCurrentSceneChanged;
-            ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+            ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
         }
 
         private void Ref_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -55,12 +57,12 @@ namespace ThomasEditor
         private void Scene_OnCurrentSceneChanged(Scene oldScene, Scene newScene)
         {
             if(oldScene != null)
-                oldScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
+             ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Unsubscribe(SceneGameObjectsChanged);
 
             if (newScene != null)
             {
                 ResetTreeView();
-                newScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
+                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
             }
 
         }
@@ -70,9 +72,8 @@ namespace ThomasEditor
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
                 m_hierarchyNodes.Clear();
-                for (int i = 0; i < ThomasWrapper.CurrentScene.GameObjects.Count; i++)
+                foreach(GameObject gObj in ThomasWrapper.CurrentScene.GameObjectsSynced)
                 {
-                    GameObject gObj = ThomasWrapper.CurrentScene.GameObjects[i];
                     if (gObj.transform.parent == null)
                     {
                         TreeItemViewModel item = new TreeItemViewModel(gObj)
@@ -92,7 +93,8 @@ namespace ThomasEditor
             if (oldParent == newParent || !child.gameObject)
                 return;
 
-            ResetTreeView();
+            if(updateHiearchyParenting)
+                ResetTreeView();
             //this.Dispatcher.BeginInvoke((Action)(() =>
             //{
             //    if (oldParent == newParent || !child.gameObject)
@@ -180,13 +182,13 @@ namespace ThomasEditor
             }
         }
 
-        private void SceneGameObjectsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SceneGameObjectsChanged(object sender, ThomasEngine.Scene.SceneObjectsChangedArgs e)
         {
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
-                if (e.NewItems != null)
+                if (e.Added != null)
                 {
-                    foreach (GameObject newItem in e.NewItems)
+                    foreach (GameObject newItem in e.Added)
                     {
                         if (newItem.transform.parent == null)
                         {
@@ -201,9 +203,9 @@ namespace ThomasEditor
                     }
                 }
 
-                if (e.OldItems != null)
+                if (e.Removed != null)
                 {
-                    foreach (GameObject oldItem in e.OldItems)
+                    foreach (GameObject oldItem in e.Removed)
                         DeleteObjectInTree(m_hierarchyNodes.ToList(), oldItem);
                 }
             }));
@@ -364,7 +366,10 @@ namespace ThomasEditor
             {
                 if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform && !CheckIfChild(node, parentTransform))
                 {
-                    ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
+                    GameObject child = node.Data as GameObject;
+                    GameObject parent = parentTransform == null ? null : parentTransform.gameObject;
+                    ThomasWrapper.IssueCommand(new ParentObjectCommand(child, parent));
+                    //((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
                 }
                 ChangeParent(parentTransform, node.Children);
             }
@@ -433,9 +438,7 @@ namespace ThomasEditor
                                 {
                                     Type componentToAdd = componentList[i] as Type;
 
-                                    var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
-                                    method.Invoke(targetModel, null);
-
+                                    ThomasWrapper.IssueCommand(new AddComponentCommand(targetModel, componentToAdd));
                                     Debug.Log("Script found and added.");
                                 }
                             }
@@ -479,21 +482,21 @@ namespace ThomasEditor
 
                         if (target != null && sourceData != null && target.DataContext is GameObject && (GameObject)target.DataContext != sourceData)
                         {
-
+                            // Set parent to source object
                             GameObject parent = target.DataContext as GameObject;
                             if (!parent.transform.IsChildOf(sourceData.transform))
-                            {
-                                sourceData.transform.SetParent(parent.transform, true);
-                            }
+                                ThomasWrapper.IssueCommand(new ParentObjectCommand(sourceData, parent));
                         }
                         else if (sourceData != null && target == null)
                         {
                             if (sourceData.inScene)
                             {
-                                sourceData.transform.SetParent(null, true);
+                                // Clear parent
+                                ThomasWrapper.IssueCommand(new ParentObjectCommand(sourceData, null));
                             }
                             else
                             {
+                                // Create object
                                 GameObject.Instantiate(sourceData);
                             }
                         }
@@ -611,14 +614,11 @@ namespace ThomasEditor
             if (m_copiedObjects.Count > 0)
             {
                 DetachParent();
-                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged -= SceneGameObjectsChanged;
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
                     GameObject.Instantiate(copiedObject);
                     Debug.Log("Pasted object.");
                 }
-                ThomasWrapper.CurrentScene.GameObjects.CollectionChanged += SceneGameObjectsChanged;
-                ResetTreeView();
                 return;
             }
         }

@@ -7,11 +7,11 @@ using System.Collections;
 
 public class NetworkPlayer : NetworkComponent
 {
-    public String PlayerName;
+    public String PlayerName = "";
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
-    public float ragdollOffset = 0.8f;
+    public float ragdollOffset = 1.0f;
     public float textOffset = 1.3f;
     public Font NameFont { get; set; }
     public float textScale { get; set; } = 0.008f;
@@ -24,7 +24,7 @@ public class NetworkPlayer : NetworkComponent
     Ragdoll rag;
     Canvas nameCanvas;
     Text text;
-    public override void Awake()
+    public override void OnAwake()
     {
         rag = gameObject.GetComponent<Ragdoll>();
         rb = gameObject.GetComponent<Rigidbody>();
@@ -36,7 +36,11 @@ public class NetworkPlayer : NetworkComponent
     {
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+        Material[] mats = gameObject.GetComponent<RenderSkinnedComponent>().materials;
+
+        mat = mats[1] = new Material(mats[1]);
+
+        gameObject.GetComponent<RenderSkinnedComponent>().materials = mats;
 
         nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
@@ -47,22 +51,53 @@ public class NetworkPlayer : NetworkComponent
         PlayerName = GUIMainMenu.PlayerString;
     }
 
+    public int GetPing()
+    {
+        return Identity.Ping;
+    }
+
+
+    public override void OnDisable()
+    {
+        if(nameCanvas != null)
+            nameCanvas.isRendering = false;
+    }
+
     public override void Update()
     {
         if (!isOwner)
         {
-            text.text = PlayerName;
-            text.scale = new Vector2(textScale);
-            text.color = Team.Color;
-            Vector3 position = Vector3.Zero;
-            if (rag.RagdollEnabled)
-                position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
+            Vector3 betweenChads = Vector3.Zero;
+            if (!rag.RagdollEnabled)
+                betweenChads = transform.position - ChadCam.instance.transform.position;
             else
-                position = rb.Position + new Vector3(0, textOffset, 0);
+                betweenChads = rag.GetHips().transform.position - ChadCam.instance.transform.position;
+            betweenChads.Normalize();
+            Ray ray = new Ray(ChadCam.instance.transform.position, betweenChads);
+            RaycastHit info;
+            Physics.Raycast(ray, out info);
+            if (info.rigidbody == rb)
+            {
+                text.text = PlayerName;
+                text.scale = new Vector2(textScale);
+                text.color = Team.Color;
+                Vector3 position = Vector3.Zero;
+                if (rag.RagdollEnabled)
+                    position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
+                else
+                    position = rb.Position + new Vector3(0, textOffset, 0);
 
-            nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+                nameCanvas.isRendering = true;
+                nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+            }
+            else if(nameCanvas != null)
+                nameCanvas.isRendering = false;
         }
+        else if(nameCanvas != null)
+            nameCanvas.isRendering = false;
 
+        if (Team != null && mat != null)
+            mat.SetColor("color", Team.Color);
 
         if (transform.position.y < BottomOfTheWorld)
             Reset();
@@ -70,10 +105,8 @@ public class NetworkPlayer : NetworkComponent
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if(initialState)
-        {
-            writer.Put(PlayerName);
-        }
+
+        writer.Put(PlayerName);
 
         if (Team != null)
             writer.Put((int)Team.TeamType);
@@ -82,13 +115,11 @@ public class NetworkPlayer : NetworkComponent
         return true;
     }
 
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
 
-        if(initialState)
-        {
-            PlayerName = reader.GetString();
-        }
+        PlayerName = reader.GetString();
+        
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
@@ -98,8 +129,6 @@ public class NetworkPlayer : NetworkComponent
         {
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
-            if(Team != null)
-                mat?.SetColor("color", Team.Color);
         }
 
     }
@@ -128,7 +157,7 @@ public class NetworkPlayer : NetworkComponent
 
             rb.Position = transform.position;
             rb.Rotation = transform.rotation;
-            rb.IgnoreNextTransformUpdate(); 
+            rb.IgnoreNextTransformUpdate();
         }
 
         if(Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)

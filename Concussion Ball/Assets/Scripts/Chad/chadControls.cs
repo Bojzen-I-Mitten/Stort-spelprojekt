@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿#define PRINT_CONSOLE_DEBUG
+//#define L_FOR_RAGDOLL
+
+using System.Linq;
 using ThomasEngine;
 using System;
 using ThomasEngine.Network;
@@ -6,6 +9,8 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
+using ThomasEngine.Script;
+
 
 public class ChadControls : NetworkComponent
 {
@@ -21,6 +26,10 @@ public class ChadControls : NetworkComponent
     public STATE State { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
+
+    // Counter tracking frames before enabling ragdoll
+    private readonly static int FRAME_TICK_WAIT_RAGDOLL = 2;
+    private static int frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
 
     #region GUI
     //private Canvas Canvas;
@@ -54,7 +63,7 @@ public class ChadControls : NetworkComponent
     public Quaternion DivingRotation = Quaternion.Identity;
     private float MinimumRagdollTimer = 2.0f;
 
-    public float ImpactFactor { get; set; } = 2000;
+    public float ImpactFactor = 80.0f;//{ get; set; } = 100;
     public float TackleThreshold { get; set; } = 7;
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;
@@ -64,18 +73,9 @@ public class ChadControls : NetworkComponent
 
     [Browsable(false)]
     public Rigidbody rBody { get; private set; }
+    private NetworkTransform ragdollSync;
     Chadimations Animations;
     public Ragdoll Ragdoll;
-    ChadCam _camera;
-    ChadCam Camera
-    {
-        get
-        {
-            if(!_camera)
-                _camera = GetObjectsOfType<ChadCam>().FirstOrDefault();
-            return _camera;
-        }
-    }
 
     [Browsable(false)]
     public NetworkPlayer NetPlayer { get; private set; }
@@ -84,13 +84,22 @@ public class ChadControls : NetworkComponent
     IEnumerator Ragdolling = null;
     IEnumerator Throwing = null;
     IEnumerator Diving = null;
-    IEnumerator FadeText = null;
+    //IEnumerator FadeText = null;
 
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
 
+    public override void OnAwake()
+    {
+        ragdollSync = gameObject.AddComponent<NetworkTransform>();
+        NetworkIdentity c = gameObject.GetComponent<NetworkIdentity>();
+        gameObject.SetComponentIndex(c, 0xfffffff);  // Ensure network writer is last
+    }
+
     public override void Start()
     {
+
+
         //Canvas = ChadHud.Instance.Canvas;
 
         // Init pick-up text and description
@@ -108,28 +117,44 @@ public class ChadControls : NetworkComponent
 
         State = STATE.CHADING;
 
-        if (isOwner)
-            MatchSystem.instance.LocalChad = this;
+        // Access rigidbody and apply
         rBody = gameObject.GetComponent<Rigidbody>();
-        NetPlayer = gameObject.GetComponent<NetworkPlayer>();
+        rBody.IsKinematic = false;
+
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
+
+        NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         rBody.Friction = 0.99f;
         Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
-        NetworkTransform ragdollSync = gameObject.AddComponent<NetworkTransform>();
         ragdollSync.target = Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
-
+        if (rBody != null)
+            rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
     }
+    public override void OnGotOwnership()
+    {
+        // Called when NetworkScene::SpawnPlayer is called
+        base.OnGotOwnership();
+        gameObject.SetActive(true);
+        MatchSystem.instance.LocalChad = this;
+    }
+    public override void OnLostOwnership()
+    {
+        base.OnLostOwnership();
+        if (this == MatchSystem.instance.LocalChad) // Currently chad is lost control of
+            MatchSystem.instance.LocalChad = null;
+    }
+
 
     #region camera state
     public void DeactivateCamera()
     {
         if (isOwner)
         {
-            Camera.gameObject.activeSelf = false;
+            ChadCam.instance.gameObject.SetActive(false);
             Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
         }
 
@@ -139,7 +164,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
-            Camera.gameObject.activeSelf = true;
+            ChadCam.instance.gameObject.SetActive(true);
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
 
@@ -159,6 +184,7 @@ public class ChadControls : NetworkComponent
         //        FadeText = null;
         //    }
         //}
+        
 
         if (isOwner)
         {
@@ -168,39 +194,61 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL)
             {
+            if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
+            {
                 HandleKeyboardInput();
                 HandleMouseInput();
-                AirHandling();
-
-                //Accelerate fake gravity as it felt too low, playtest
-                if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
-                    rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y-2, rBody.LinearVelocity.z), rBody.Rotation);
             }
-            StateMachine();
-        }
 
+                AirHandling();
+            }
+            //Accelerate fake gravity as it felt too low, playtest
+            if (!OnGround() && rBody.LinearVelocity.y < 0 && rBody.LinearVelocity.y > -5.9f && JumpingTimer > 1)
+                rBody.LinearVelocity = rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, rBody.LinearVelocity.y - 2, rBody.LinearVelocity.z), rBody.Rotation);
+        }
+        StateMachine();
+        
+        if (rBody != null)
+            rBody.IsKinematic = !isOwner;
+
+        /* Enter leave ragdoll state
+         */
         if (State == STATE.RAGDOLL && !Ragdoll.RagdollEnabled)
             EnableRagdoll();
         else if (State != STATE.RAGDOLL && Ragdoll.RagdollEnabled)
         {
-            DisableRagdoll();
+            // Wait N frames before disabling ragdoll
+            if (isOwner || frameRagdollDisableTick-- == 0)
+            {
+                DisableRagdoll();
+                frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
+            }
         }
-
-        //if (Input.GetKeyDown(Input.Keys.L))
-        //{
-        //    ActivateRagdoll(MinimumRagdollTimer, (-transform.forward + transform.up * 0.5f) * 2000);
-        //}
+#if (L_FOR_RAGDOLL)
+        if (Input.GetKeyDown(Input.Keys.L))
+        {
+            Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (/*-transform.forward +*/ transform.up * 0.5f) * 200000, 1);
+            ActivateRagdoll(MinimumRagdollTimer, param);
+        }
+#endif
+        if (Input.GetKeyDown(Input.Keys.J))
+            Debug.Log(rBody.Position);
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
         rBody.Friction = 0.5f;
         if (!OnGround())
             rBody.Friction = 0.0f;
+
+
+        if (State != STATE.DIVING)
+            Animations.ResetTimer(STATE.DIVING, 0);
     }
 
     #region Ragdoll handling
     private void EnableRagdoll()
     {
+        //Debug.Log(gameObject.Name + " ragdoll ON");
         // reset aim stuff 
         if (Throwing != null)
         {
@@ -218,53 +266,56 @@ public class ChadControls : NetworkComponent
         rBody.enabled = false;
         CanBeTackled = false;
         Ragdoll.EnableRagdoll();
+
     }
 
     private void DisableRagdoll()
     {
+        //Debug.Log(gameObject.Name + " ragdoll OFF");
         gameObject.transform.position = Ragdoll.GetHips().transform.position;
-        gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
+        //gameObject.transform.eulerAngles = new Vector3(0, Ragdoll.GetHips().transform.localEulerAngles.y, 0);
         Ragdoll.DisableRagdoll();
-        gameObject.GetComponent<Rigidbody>().enabled = true;
+        rBody.enabled = true;
 
         // call coroutine function that sets canragdoll true
         RagdollRecoverer = RagdollRecovery();
         StartCoroutine(RagdollRecoverer);
     }
 
-    public void LocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
+    private void LocalActivateRagdoll(float duration, Ragdoll.ImpactParams param)
     {
-        SendRPC("RPCStartRagdoll", duration, force);
-        RPCStartRagdoll(duration, force, diveTackle);
+        SendRPC("RPCStartRagdoll", duration, param);
+        RPCStartRagdoll(duration, param);
     }
 
-    public void RPCLocalActivateRagdoll(float duration, Vector3 force, bool diveTackle)
+    public void RPCLocalActivateRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         if(MatchSystem.instance.LocalChad)
         {
-            MatchSystem.instance.LocalChad.LocalActivateRagdoll(duration, force, diveTackle);
+            MatchSystem.instance.LocalChad.LocalActivateRagdoll(duration, param);
         }
     }
-
-    public void ActivateRagdoll(float duration, Vector3 force)
+    /* Call for activating ragdoll
+    */
+    public void ActivateRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         if(!isOwner)
         {
             NetPeer peerThatOwnsThisPlayer = MatchSystem.instance.Scene.Players.FirstOrDefault(player => player.Value == Identity).Key;
             if(peerThatOwnsThisPlayer != null)
             {
-                MatchSystem.instance.SendRPC(peerThatOwnsThisPlayer, -1, "RPCLocalActivateRagdoll", duration, force);
+                MatchSystem.instance.SendRPC(peerThatOwnsThisPlayer, -1, "RPCLocalActivateRagdoll", duration, param);
             }
-            RPCStartRagdoll(duration, force, State == STATE.DIVING);
+            RPCStartRagdoll(duration, param);
         }
         else
         {
-            LocalActivateRagdoll(duration, force, State == STATE.DIVING);
+            LocalActivateRagdoll(duration, param);
         }
         Ragdoll.Smack();
     }
 
-    public void RPCStartRagdoll(float duration, Vector3 force, bool diveTackle)
+    public void RPCStartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
         if (isOwner && PickedUpObject && PickedUpObject.DropOnRagdoll)
         {
@@ -283,10 +334,10 @@ public class ChadControls : NetworkComponent
 
         if (State != STATE.RAGDOLL)
         {
-            Ragdolling = StartRagdoll(duration, force, diveTackle);
-            State = STATE.RAGDOLL;
+            Ragdolling = StartRagdoll(duration, param);
             StartCoroutine(Ragdolling);
-            Camera.InitFreeLookCamera();
+            //if(isOwner)
+            //    Camera.InitFreeLookCamera();
         }
     }
     #endregion
@@ -322,11 +373,6 @@ public class ChadControls : NetworkComponent
     #region Input handling
     private void HandleKeyboardInput()
     {
-        if (Input.GetKeyUp(Input.Keys.Escape))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        }
-
         if (Locked)
             return;
 
@@ -378,13 +424,6 @@ public class ChadControls : NetworkComponent
 
     private void HandleMouseInput()
     {
-        //Focus stuff
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-        }
-
-
         if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
         {
             //Throw stuff
@@ -495,18 +534,21 @@ public class ChadControls : NetworkComponent
                         CurrentVelocity.y = modifiedBaseSpeed;
                 }
                 // Walking backwards
-                else if (Direction.z < 0) 
+                else if (Direction.z < 0)
+                {
+                    if (Direction.x != 0)
+                        diagonalModifier = 0.5f;
                     CurrentVelocity.y = -modifiedBaseSpeed * 0.75f * diagonalModifier;
-
+                }
+                    
                 if(OnGround() && Direction.z >= 0) // as to not allow acceleration mid air
                     CurrentVelocity.y += Direction.z * Acceleration * diagonalModifier * Time.DeltaTime;
 
                 if (Direction.z == 0)
                     CurrentVelocity.y = 0;
 
-                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * diagonalModifier;
+                CurrentVelocity.x = Direction.x * modifiedBaseSpeed * 0.75f * diagonalModifier;
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
-               // CurrentVelocity.y -= Math.Abs(xStep / (MaxSpeed / CurrentVelocity.y)); //TODO:Fix this when diagonal running is added
                 break;
             case STATE.THROWING:
                 CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
@@ -547,6 +589,7 @@ public class ChadControls : NetworkComponent
 
     public void Reset()
     {
+        DisableRagdoll();
         State = STATE.CHADING;
         if (Diving != null)
         {
@@ -575,7 +618,7 @@ public class ChadControls : NetworkComponent
     #region Coroutines
     IEnumerator DivingCoroutine()
     {
-        Animations.RPCResetTimer(0);
+        //Animations.RPCResetTimer(0);
         float timer = 1.5f;
         while (timer > 0.0f)
         {
@@ -586,23 +629,27 @@ public class ChadControls : NetworkComponent
         State = STATE.CHADING;
     }
 
-    IEnumerator StartRagdoll(float duration, Vector3 force, bool diveTackle)
+    IEnumerator StartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
-        State = STATE.RAGDOLL;
-        
-        EnableRagdoll();
-        Ragdoll.AddForce(force, diveTackle);
 
-        yield return new WaitForSeconds(duration);
-        float timer = 0;
-        while (Ragdoll.DistanceToWorld() >= 0.5f && timer < 15)
+        State = STATE.RAGDOLL;
+        EnableRagdoll();
+        Ragdoll.AddForce(param);
+        if (isOwner)
         {
-            timer += Time.DeltaTime;
-            yield return null;
+            yield return new WaitForSeconds(duration);
+
+            while (Ragdoll.DistanceToWorld() >= 0.75f) // can trigger mid air atm, check if ray hits ground and not chad
+            {
+                yield return null;
+            }
+            Debug.Log("The ground has been reached.");
+            yield return new WaitForSeconds(1);
+            State = STATE.CHADING;
+            CurrentVelocity.y = BaseSpeed;
         }
-        yield return new WaitForSeconds(1);
-        DisableRagdoll();
-        State = STATE.CHADING;
+        else
+            yield return null;
     }
 
     IEnumerator RagdollRecovery()
@@ -654,11 +701,12 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
+        Debug.Log("Deactivating aim hud");
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
-        Vector3 chosenDirection = Camera.transform.forward;
-        Vector3 ballCamPos = Camera.transform.position;
+        Vector3 chosenDirection = ChadCam.instance.transform.forward;
+        Vector3 ballCamPos = ChadCam.instance.transform.position;
         
         //yield return new WaitForSeconds(0.50f); // animation bound, langa lite _magic_ numbers
 
@@ -687,8 +735,6 @@ public class ChadControls : NetworkComponent
         ChargeTime = MathHelper.Clamp(ChargeTime, 0, PickedUpObject.chargeTimeMax);
         
         PickedUpObject.SetChargeTime(ChargeTime);
-        float tets = PickedUpObject.GetChargeTime();
-        
 
         PickedUpObject.ThrowForce = MathHelper.Lerp(PickedUpObject.BaseThrowForce, PickedUpObject.MaxThrowForce, ChargeTime / PickedUpObject.chargeTimeMax);
         ChadHud.Instance.ChargeChargeBar(ChargeTime / PickedUpObject.chargeTimeMax);
@@ -704,6 +750,14 @@ public class ChadControls : NetworkComponent
     {
         if (State != STATE.RAGDOLL)
         {
+            if (PickedUpObject)
+            {
+                if (PickedUpObject.ID == id)
+                    return;
+                else
+                    PickedUpObject.RPCDrop();
+            }
+
             GameObject pickupableObject = NetworkManager.instance.Scene.FindNetworkObject(id)?.gameObject;
             PickupableObject pickupable = pickupableObject.GetComponent<PickupableObject>();
             pickupable.Pickup(this, hand ? hand : transform);
@@ -721,7 +775,6 @@ public class ChadControls : NetworkComponent
             return false;
     }
     #endregion
-
     #region PickupPowerup
     private void DisplayPowerupText(ref Text powerupText, ref Text powerupDesc, String powerup, String description)
     {
@@ -729,41 +782,55 @@ public class ChadControls : NetworkComponent
         powerupDesc.text = description;
     }
     #endregion
-
-    public override void OnRead(NetPacketReader reader, bool initialState)
+    public override void OnRead(NetDataReader reader, bool initialState)
     {
-        if (initialState)
-        {
-            int pickedUpObject = reader.GetInt();
-            if (pickedUpObject >= 0)
-                RPCPickup(pickedUpObject);
-        }
+
 
         if (isOwner)
         {
+            reader.GetInt();
             reader.GetInt();
             reader.GetVector3();
             reader.GetVector2();
             reader.GetBool();
             reader.GetBool();
+            reader.GetBool();
             return;
         }
+
+        int pickedUpObject = reader.GetInt();
+        if (pickedUpObject >= 0)
+        {
+            RPCPickup(pickedUpObject);
+        }
+        else if (PickedUpObject)
+        {
+            PickedUpObject.RPCDrop();
+            PickedUpObject = null;
+        }
+
+
         State = (STATE)reader.GetInt();
         Direction = reader.GetVector3();
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
         CanBeTackled = reader.GetBool();
+        if(!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        Animations.Throwing = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        if (initialState)
-            writer.Put(PickedUpObject ? PickedUpObject.ID : -1);
+        writer.Put(PickedUpObject ? PickedUpObject.ID : -1);
         writer.Put((int)State);
         writer.Put(Direction);
         writer.Put(CurrentVelocity);
         writer.Put(HasThrown);
         writer.Put(CanBeTackled);
+        if (!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        writer.Put(Animations.Throwing);
         return true;
     }
 
@@ -771,32 +838,15 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner && State != STATE.RAGDOLL && !Locked)
         {
-            PickupableObject pickupablea = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupablea)
-            {
-                Debug.LogError("Why Denny!?");
-            }
-
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
-            if (pickupable && PickedUpObject == null)
+            if (pickupable && pickupable.gameObject.GetActive() && PickedUpObject == null)
             {
                 if (pickupable.transform.parent == null)
                 {
-                    // Change pick-up text ON screen
-                    //if (pickupablea.gameObject.Name == "Vindaloo")
-                    //{
-                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Vindaloo", "Throw to Explode");
-                    //    FadeText = FadePickupText();
-                    //    StartCoroutine(FadeText); 
-                    //}
-                    //else if (pickupablea.gameObject.Name == "ThomasTrain")
-                    //{
-                    //    DisplayPowerupText(ref PowerupPickupText, ref PowerupPickupDescText, "Thomas Train", "Release the Train");
-                    //}
-
                     TakeOwnership(pickupable.gameObject);
-                    SendRPC("RPCPickup", pickupable.ID);
                     RPCPickup(pickupable.ID);
+                    //SendRPC("RPCPickup", pickupable.ID);
+
                 }
             }
         }
@@ -810,18 +860,21 @@ public class ChadControls : NetworkComponent
 
             if (otherChad)
             {
-                float TheirVelocity = otherChad.CurrentVelocity.Length();
-                Debug.Log(TheirVelocity);
-                Debug.Log(CurrentVelocity.Length());
+                float TheirVelocity = otherChad.CurrentVelocity.y;//Length();
+                Debug.Log("They tackled with: " + TheirVelocity + "(Forward: " + otherChad.CurrentVelocity.y + ", Strafe: " + otherChad.CurrentVelocity.x + ")");
+                Debug.Log("You tackled with: " + CurrentVelocity.y/*Length()*/ + "(Forward: " + CurrentVelocity.y + ", Strafe: " + CurrentVelocity.x + ")");
                 if (MatchSystem.instance.GetPlayerTeam(collider.gameObject) == MatchSystem.instance.GetPlayerTeam(this.gameObject))
                 {
-                    Debug.Log("Trying to tackle player on same team, you baka.");
+                    //Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (otherChad.CanBeTackled && (CurrentVelocity.Length() > TackleThreshold && CurrentVelocity.Length() >= TheirVelocity))
+                else if (otherChad.CanBeTackled && (CurrentVelocity.y/*Length()*/ > TackleThreshold && CurrentVelocity.y/*Length()*/ >= TheirVelocity))
                 {
-                    //toggle ragdoll
+                    // Activate ragdoll
                     Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
-                    otherChad.ActivateRagdoll(MinimumRagdollTimer, force);
+                    Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(otherChad.gameObject.transform.position, force, 0.5f);
+                    param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
+                    param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
+                    otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
                 }
 
             } 

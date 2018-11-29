@@ -3,12 +3,14 @@
 #include <vector>
 #include <memory>
 #include "render/ShaderList.h"
+#include <d3d11.h>
 
 namespace thomas
 {
 	namespace object {
 		namespace component {
 			class LightComponent;
+			class Camera;
 		}
 	}
 	namespace utils {
@@ -19,8 +21,10 @@ namespace thomas
 
 	namespace graphics
 	{
+		class Mesh;
 		namespace render {
 			class ShaderList;
+			struct CameraRenderQueue;
 		}
 
 		class LightManager
@@ -58,7 +62,8 @@ namespace thomas
 				thomas::math::Vector3 right;
 				thomas::math::Vector3 up;
 				thomas::math::Vector2 rectangleDimensions;
-				thomas::math::Vector2 pad;
+				float shadowMapIndex;
+				float shadowHardness;
 			};
 
 		public:
@@ -68,16 +73,26 @@ namespace thomas
 			static bool RemoveLight(object::component::LightComponent* light);
 			static void Update();
 
-			static void Bind(render::ShaderList* shaders);
+			static void DrawShadows(render::CameraRenderQueue& renderQueue, object::component::Camera* camera);
+			static void BindLights(render::ShaderList* shaders);
+			static void BindShadows(render::ShaderList* shaders);
+			static int GetFreeShadowMapView(ID3D11DepthStencilView*& dsv);
+			static bool ResturnShadowMapView(ID3D11DepthStencilView * dsv);
 		private:
+			static const unsigned s_nrOfShadowMapsSupported = 2;
+			static ID3D11DepthStencilView* s_shadowMapViews[s_nrOfShadowMapsSupported];
+			static math::Matrix s_lightMatrices[s_nrOfShadowMapsSupported];
+			static std::vector<unsigned> s_freeShadowMapViewIndexes;
 
 			static bool SortLights(object::component::LightComponent* light1, object::component::LightComponent* light2);
 
 			static std::vector<object::component::LightComponent*> s_lights;
-
 			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
-
 			static LightCountsStruct s_lightCounts;
+
+			
+			static resource::Texture2DArray* s_shadowMapTextures;
+			static unsigned s_shadowMapSize;
 		};
 	}
 }

@@ -6,6 +6,12 @@ using LiteNetLib.Utils;
 
 namespace ThomasEngine.Network
 {
+
+    public interface RPCWriteable
+    {
+        void Write(NetDataWriter writer);
+        void Read(NetDataReader reader);
+    }
     public class RpcUtils
     {
 
@@ -33,6 +39,10 @@ namespace ThomasEngine.Network
                     writer.Put((Vector4)parameter);
                 else if (parameterType == typeof(Color))
                     writer.Put((Color)parameter);
+                else if (parameter is RPCWriteable)
+                {
+                    ((RPCWriteable)parameter).Write(writer);
+                }
                 else
                 {
                     Debug.LogError("RPC error: unsupported type.");
@@ -41,7 +51,7 @@ namespace ThomasEngine.Network
             }
         }
 
-        static public object[] ReadRPCParameters(System.Reflection.MethodInfo methodInfo, NetPacketReader reader)
+        static public object[] ReadRPCParameters(System.Reflection.MethodInfo methodInfo, NetDataReader reader)
         {
             System.Reflection.ParameterInfo[] parameterInfos = methodInfo.GetParameters();
             object[] parameters = new object[parameterInfos.Length];
@@ -67,6 +77,12 @@ namespace ThomasEngine.Network
                     parameter = reader.GetVector4();
                 else if (parameterType == typeof(Color))
                     parameter = reader.GetColor();
+                else if (typeof(RPCWriteable).IsAssignableFrom(parameterType))
+                {
+                    RPCWriteable instance = (RPCWriteable)Activator.CreateInstance(parameterType, true); // true for private empty constructors!
+                    instance.Read(reader);
+                    parameter = instance;
+                }
                 else
                 {
                     Debug.LogError("RPC error: unsupported type.");

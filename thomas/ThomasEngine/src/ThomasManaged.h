@@ -2,6 +2,7 @@
 
 #pragma once
 
+#pragma managed
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -10,6 +11,7 @@ using namespace System::Threading;
 
 namespace ThomasEngine {
 
+#define _THOMAS_SCENE_LOCK
 
 	enum RunningState
 	{
@@ -21,7 +23,8 @@ namespace ThomasEngine {
 	{
 		NoCommand = 0,
 		PlayIssued,
-		StopIssued
+		StopIssued,
+		ReplayIssued
 	};
 	enum ThomasSystemMode
 	{
@@ -34,13 +37,15 @@ namespace ThomasEngine {
 
 	ref class ThomasSelection;
 	ref class GameObjectManager;
+	ref class CommandQueue;
+	interface class ICommand;
 	public ref class ThomasWrapper
 	{
 	private:
 
 		static GameObjectManager^ s_GameObjectManager;
 
-		static ThomasWrapper^ s_SYS = gcnew ThomasWrapper();
+		static ThomasWrapper^ s_SYS;
 		static bool inEditor = false;
 		static float logicTime = 0.0f;
 		static float renderTime = 0.0f;
@@ -53,9 +58,10 @@ namespace ThomasEngine {
 		static Thread^ renderThread;
 		static System::Windows::Threading::Dispatcher^ mainThreadDispatcher;
 		delegate void MainThreadDelegate();
+		
 
-		static ManualResetEvent^ RenderFinished;
-		static ManualResetEvent^ UpdateFinished;
+		static ManualResetEvent^ RenderFinished, ^UpdateFinished;
+		static ManualResetEvent^ EditorWindowLoaded, ^GameWindowLoaded;
 		static ManualResetEvent^ StateCommandProcessed;
 		static ManualResetEvent^ WaitLogOutput;
 		static ThomasStateCommand IssuedStateCommand = ThomasStateCommand::NoCommand;
@@ -66,26 +72,35 @@ namespace ThomasEngine {
 
 		static void Play();
 		static void StopPlay();
-		static void ProcessCommand();
+		static void ProcessStateCommand();
 		static void SynchronousExecution();
 
 		static void DumpProfilerLog(System::Object^ stateInfo);
 		static void SampleRam(System::Object ^ stateInfo);
 
 
+		ThomasWrapper();
+		~ThomasWrapper();
+
 	private:	// Thomas System variables.
 		SceneManager^ m_scene;
+		CommandQueue^ m_engineCommands;
+		Object^ m_sceneLock;
+
+		static void LoadEditorAssets();
 	public:
 
 		property SceneManager^ SceneManagerRef
 		{
 			SceneManager^ get();
 		}
-		static void Start(bool editor);
-		static void Start();
-		static void MainThreadUpdate();
-		static void StartRenderer();
 
+#ifdef _EDITOR
+		delegate void StartPlayEvent();
+		delegate void StopPlayingEvent();
+		static event StartPlayEvent^ OnStartPlaying;
+		static event StopPlayingEvent^ OnStopPlaying;
+#endif
 
 	public:	// Static sys
 
@@ -94,7 +109,18 @@ namespace ThomasEngine {
 			ROTATE,
 			SCALE
 		};
-
+		static void Start(bool editor);
+		static void Start();
+		static void MainThreadUpdate();
+		static void StartRenderer();
+#ifdef _EDITOR
+		/* Triggered event on game window load, only called when editor is used
+		*/
+		static void ThomasGameWindowLoaded();
+		/* Triggered event on editor window load, only called when editor is used
+		*/
+		static void ThomasEditorWindowLoaded();
+#endif
 
 		static property ThomasWrapper^ Thomas
 		{
@@ -104,10 +130,24 @@ namespace ThomasEngine {
 		{
 			Scene^ get();
 		}
-
+		/* Enter a lock synchonizing state with thomas logic loop, use with care (inefficient).
+		 * Lock can be disabled by undef _THOMAS_SCENE_LOCK
+		*/
+		static void ENTER_SYNC_STATELOCK();
+		/* Exit the synchronous state lock
+		*/
+		static void EXIT_SYNC_STATELOCK();
+		static void IssueCommand(ICommand^ cmd);
+		/* Issue a specific state switch command to thomas
+		*/
 		static void IssueStateCommand(ThomasStateCommand cmd);
+		/* Issue a play state command to thomas
+		*/
 		static void IssuePlay();
+		/* Issue a stop playing state command to thomas
+		*/
 		static void IssueStopPlay();
+		static void IssueRestart();
 
 
 		static void CopyCommandList();
@@ -127,7 +167,15 @@ namespace ThomasEngine {
 
 		static Guid selectedGUID;
 
+		/* If Running State
+		*/
 		static bool IsPlaying();
+		/* True if editor state
+		*/
+		static bool IsEditor();
+		/* If this is an external build without editor window
+		*/
+		static bool IsEditorBuild();
 		
 		static void SetEditorGizmoManipulatorOperation(ManipulatorOperation op);
 
@@ -136,8 +184,7 @@ namespace ThomasEngine {
 		static void ToggleEditorGizmoManipulatorMode();
 
 	
-		static bool InEditor();
-
+		
 	public:
 		static bool RenderEditor = true;
 		static property bool RenderPhysicsDebug

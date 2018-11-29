@@ -110,6 +110,8 @@ namespace thomas
 
 		void Material::SetShader(resource::Shader * shader)
 		{
+			if (shader == nullptr)
+				return;
 			Lock();
 			m_shader = shader;
 			m_passes.clear();

@@ -77,6 +77,7 @@ namespace thomas
 					if (m_attachedRigidbody) {
 						m_attachedRigidbody->setCollisionFlags(m_attachedRigidbody->getCollisionFlags() & ~Rigidbody::CF_NO_CONTACT_RESPONSE);
 					}
+					
 					else if (m_collisionObject) {
 						m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() & ~Rigidbody::CF_NO_CONTACT_RESPONSE);
 					}
@@ -95,7 +96,7 @@ namespace thomas
 					m_onCollisionEvent(otherCollider, collisionType);
 			}
 
-			void Collider::Awake()
+			void Collider::OnAwake()
 			{
 			}
 
@@ -104,15 +105,15 @@ namespace thomas
 				if (m_attachedRigidbody == nullptr) //only created if no rigidbody
 				{
 					m_collisionObject = new btCollisionObject();
-					m_collisionShape->setLocalScaling((btVector3&)(m_scaling*m_gameObject->m_transform->GetScale()));
+					m_collisionShape->setLocalScaling((btVector3&)(m_scaling*m_gameObject->GetTransform()->GetScale()));
 					m_collisionObject->setCollisionShape(m_collisionShape);
 					m_collisionObject->setUserPointer(this);
 					m_collisionObject->setRestitution(1.0f);
 					//m_collisionObject->setFriction(0.5f);
 
 					btTransform trans;
-					trans.setOrigin((btVector3&)(m_gameObject->m_transform->GetPosition() + m_center));
-					trans.setRotation((btQuaternion&)m_gameObject->m_transform->GetRotation());
+					trans.setOrigin((btVector3&)(m_gameObject->GetTransform()->GetPosition() + m_center));
+					trans.setRotation((btQuaternion&)m_gameObject->GetTransform()->GetRotation());
 					m_collisionObject->setWorldTransform(trans);
 					
 					SetTrigger(m_trigger); //Update trigger flags
@@ -140,13 +141,13 @@ namespace thomas
 			void Collider::Update()
 			{
 				
-				m_collisionShape->setLocalScaling((btVector3&)(m_scaling*m_gameObject->m_transform->GetScale()));
+				m_collisionShape->setLocalScaling((btVector3&)(m_scaling*m_gameObject->GetTransform()->GetScale()));
 				
 				if (m_collisionObject)
 				{
 					btTransform trans;
-					trans.setOrigin((btVector3&)(m_gameObject->m_transform->GetPosition() + m_center));
-					trans.setRotation((btQuaternion&)m_gameObject->m_transform->GetRotation());
+					trans.setOrigin((btVector3&)(m_gameObject->GetTransform()->GetPosition() + m_center));
+					trans.setRotation((btQuaternion&)m_gameObject->GetTransform()->GetRotation());
 					m_collisionObject->setWorldTransform(trans);
 					Physics::s_world->updateSingleAabb(m_collisionObject);
 				}

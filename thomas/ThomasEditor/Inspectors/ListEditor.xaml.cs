@@ -31,7 +31,8 @@ namespace ThomasEditor.Inspectors
         private void ListEditor_Loaded(object sender, RoutedEventArgs e)
         {
             PropertyItem pi = DataContext as PropertyItem;
-            elementType = pi.PropertyType.GetGenericArguments().Single();
+            elementType = pi.PropertyType.GetElementType();
+            listCounter.Visibility = pi.PropertyType.IsArray ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void PropertyGridEditorIntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -92,10 +93,9 @@ namespace ThomasEditor.Inspectors
                     //PropertyItem pi = label.DataContext as PropertyItem;
                     if (resource.GetType() == elementType)
                     {
-                        Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.ENTER_SYNC_STATELOCK();
                         (pi.Value as IList)[index] = resource;
-
-                        Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.EXIT_SYNC_STATELOCK();
                     }
 
                 }
@@ -105,9 +105,9 @@ namespace ThomasEditor.Inspectors
                     ThomasEngine.Object obj = item.DataContext as ThomasEngine.Object;
                     if (obj.GetType() == elementType)
                     {
-                        Monitor.Enter(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.ENTER_SYNC_STATELOCK();
                         (pi.Value as IList)[index] = obj;
-                        Monitor.Exit(ThomasWrapper.CurrentScene.GetGameObjectsLock());
+                        ThomasWrapper.EXIT_SYNC_STATELOCK();
                     }
                     else if (obj is GameObject && (obj as GameObject).inScene && typeof(ThomasEngine.Component).IsAssignableFrom(elementType))
                     {
@@ -158,6 +158,10 @@ namespace ThomasEditor.Inspectors
         {
             ICollectionView view = CollectionViewSource.GetDefaultView(listView.ItemsSource);
             view.Refresh();
+
+            PropertyItem pi = DataContext as PropertyItem;
+            if(pi.PropertyType.IsArray)
+                pi.Value = pi.Value;
         }
     }
 }

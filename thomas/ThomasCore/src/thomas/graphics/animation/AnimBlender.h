@@ -26,6 +26,8 @@ namespace thomas {
 
 			public:
 				AnimBlender(Skeleton &skel);
+				AnimBlender(Skeleton &skel, uint32_t numNodes);
+
 				virtual ~AnimBlender();
 
 				uint32_t numAnimations();
@@ -34,6 +36,7 @@ namespace thomas {
 				void generateLinearMixer(float durationPerNode);
 
 				void pushAnimation(AnimationNode* node);
+				void setAnimation(uint32_t index, AnimationNode* n);
 				void constructMapping();
 
 				// Inherited via AnimationNode

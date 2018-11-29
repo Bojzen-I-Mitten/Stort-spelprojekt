@@ -35,8 +35,9 @@ namespace ThomasEngine
 
 
 	internal:
-		Texture(String^ path) : Resource(path, new thomas::resource::Texture(Utility::ConvertString(path))) {};
-		Texture(String^ path, thomas::resource::Texture* nativePtr) : Resource(path, nativePtr) {};
+		Texture(String^ path);
+		Texture(String^ path, thomas::resource::Texture* nativePtr);
+		virtual ~Texture();
 
 	public:
 		property int width

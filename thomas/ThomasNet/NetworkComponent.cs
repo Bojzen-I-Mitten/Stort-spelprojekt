@@ -9,14 +9,14 @@ namespace ThomasEngine.Network
     public class NetworkComponent : ScriptComponent
     {
         protected bool isDirty = false;
-        private int prefabID;
+        //private int prefabID;
         private NetworkIdentity networkIdentity;
         protected float SmoothingFactor = 1.0f / 3;
 
 
         public int ID
         {
-            get { return Identity.ID; }
+            get { return Identity == null ? 0 : Identity.ID; }
         }
 
         protected NetworkIdentity Identity
@@ -43,19 +43,15 @@ namespace ThomasEngine.Network
         [Browsable(false)]
         public bool isOwner
         {
-            get { return Identity ? Identity.Owner : false; } 
+            get { return Identity != null ? Identity.Owner : false; } 
         }
 
-        virtual public void OnRead(NetPacketReader reader, bool initialState)
+        virtual public void OnRead(NetDataReader reader, bool initialState)
         {
-            if (!initialState)
-                reader.GetInt();
         }
 
         virtual public bool OnWrite(NetDataWriter writer, bool initialState)
         {
-            if (!initialState)
-                writer.Put(0);
             return false;
         }
 
@@ -76,7 +72,7 @@ namespace ThomasEngine.Network
             Identity.SendRPC(methodName, parameters);
         }
 
-        internal void ReadRPC(System.Reflection.MethodInfo methodInfo, NetPacketReader reader)
+        internal void ReadRPC(System.Reflection.MethodInfo methodInfo, NetDataReader reader)
         {
             object[] parameters = RpcUtils.ReadRPCParameters(methodInfo, reader);
             methodInfo.Invoke(this, parameters);

@@ -13,7 +13,7 @@ public class TeamSpawn : ScriptComponent
 
     }
 
-    public override void OnDrawGizmos()
+    public override void OnDrawGizmosSelected()
     {
         Team t = MatchSystem.instance?.FindTeam(Team);
         if (t != null)

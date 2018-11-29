@@ -2,9 +2,10 @@
 #include "../../utils/d3d.h"
 #include "../GameObject.h"
 #include "Transform.h"
-
-
-
+#include "../../graphics/Mesh.h"
+#include "Camera.h"
+#include "../../graphics/render/Frame.h"
+#include "../../resource/texture/Texture2D.h"
 
 
 namespace thomas
@@ -24,10 +25,13 @@ namespace thomas
 				m_lightComponentData.direction = math::Vector3(0.0f, 0.0f, -1.0f);
 				m_lightComponentData.right = math::Vector3(1.0f, 0.0f, 0.0f);
 				m_lightComponentData.up = math::Vector3(0.0f, 1.0f, 0.0f);
-				m_lightComponentData.intensity = 1.0f;
+				m_lightComponentData.intensity = 0.3f;
 				m_lightComponentData.spotInnerAngle = 0.0f;
 				m_lightComponentData.spotOuterAngle = 20.0f;
 				m_lightComponentData.rectangleDimensions = math::Vector2(1.0f, 1.0f);
+				m_castsShadows = false;
+				m_lightComponentData.shadowMapIndex = -1;
+				m_lightComponentData.shadowHardness = 0.5f;
 			}
 			LightComponent::~LightComponent()
 			{
@@ -41,24 +45,60 @@ namespace thomas
 
 			void LightComponent::Update()
 			{
-				m_lightComponentData.position = m_gameObject->m_transform->GetPosition();
-				m_lightComponentData.direction = m_gameObject->m_transform->Forward();
-				m_lightComponentData.right = m_gameObject->m_transform->Right();
-				m_lightComponentData.up = m_gameObject->m_transform->Up();
+				m_lightComponentData.position = m_gameObject->GetTransform()->GetPosition();
+				m_lightComponentData.direction = m_gameObject->GetTransform()->Forward();
+				m_lightComponentData.right = m_gameObject->GetTransform()->Right();
+				m_lightComponentData.up = m_gameObject->GetTransform()->Up();
 			}
 
 			void LightComponent::OnEnable()
 			{
+				//SetCastShadows(m_castsShadows);
 				graphics::LightManager::AddLight(this);
 			}
 
 			void LightComponent::OnDisable()
 			{
+				//ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
 			}
 			void LightComponent::OnDestroy()
 			{
+				//ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
+			}
+
+			void LightComponent::ReturnShadowMap()
+			{
+				bool temp = m_castsShadows;
+				SetCastShadows(false);
+				m_castsShadows = temp;
+			}
+
+			void LightComponent::UpdateShadowBox(Camera* camera)
+			{
+				m_shadowMap.UpdateShadowBox(m_gameObject->GetTransform(), camera);
+			}
+
+
+			void LightComponent::BindShadowMapDepthTexture()
+			{
+				m_shadowMap.Bind();
+			}
+
+			void LightComponent::DrawShadow(graphics::render::RenderCommand renderCommand)
+			{
+				m_shadowMap.Draw(renderCommand);
+			}
+
+			math::Matrix LightComponent::GetVPMat()
+			{
+				return m_shadowMap.GetVPMat();
+			}
+
+			int LightComponent::GetShadowMapIndex() const
+			{
+				return m_lightComponentData.shadowMapIndex;
 			}
 
 			graphics::LightManager::LIGHT_TYPES LightComponent::GetType()
@@ -165,6 +205,46 @@ namespace thomas
 			void LightComponent::SetRectangleDimensions(math::Vector2 const& value)
 			{
 				m_lightComponentData.rectangleDimensions = value;
+			}
+
+			bool LightComponent::CastsShadows() const
+			{
+				return m_castsShadows;
+			}
+
+			void LightComponent::SetCastShadows(bool const & value)
+			{
+				m_castsShadows = value;
+
+				if (m_castsShadows)
+				{
+					ID3D11DepthStencilView* dsv;
+					m_lightComponentData.shadowMapIndex = graphics::LightManager::GetFreeShadowMapView(dsv);
+					if (m_lightComponentData.shadowMapIndex == -1)
+					{
+						m_castsShadows = false;
+
+					}
+					else
+						m_shadowMap.SetShadowMapDepthStencilView(dsv);
+				}
+				else
+				{
+					graphics::LightManager::ResturnShadowMapView(m_shadowMap.GetShadowMapDepthStencilView());
+					m_shadowMap.SetShadowMapDepthStencilView(nullptr);
+					m_lightComponentData.shadowMapIndex = -1;
+				}
+				
+			}
+
+			float LightComponent::GetShadowHardness() const
+			{
+				return m_lightComponentData.shadowHardness;
+			}
+
+			void LightComponent::SetShadowHardness(float const & value)
+			{
+				m_lightComponentData.shadowHardness = value;
 			}
 
 }
