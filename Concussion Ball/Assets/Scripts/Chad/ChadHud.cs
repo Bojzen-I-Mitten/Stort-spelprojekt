@@ -391,15 +391,15 @@ public class ChadHud : ScriptComponent
 
         BallIndicator();
 
-        if (MatchSystem.instance?.LocalChad?.PickedUpObject != null && !MatchSystem.instance.ReplaySystem.Replaying)
-        {
-            ShowHeldObjectText(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
-        }
-        else
-        {
-            HideHeldObjectText();
-            //DeactivateAimHUD();
-        }
+        //if (MatchSystem.instance?.LocalChad?.PickedUpObject != null && !MatchSystem.instance.ReplaySystem.Replaying)
+        //{
+        //    ShowHeldObjectText(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
+        //}
+        //else
+        //{
+        //    HideHeldObjectText();
+        //    //DeactivateAimHUD();
+        //}
 
         if (BallArrow != null)
         {
