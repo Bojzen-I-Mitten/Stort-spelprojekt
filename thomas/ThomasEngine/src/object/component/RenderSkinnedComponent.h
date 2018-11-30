@@ -47,6 +47,8 @@ namespace ThomasEngine
 		void setBlendTreeNode(thomas::graphics::animation::AnimationNode * node);
 	public:
 		RenderSkinnedComponent();
+
+		virtual void OnAwake() override;
 		
 		property Animation^ animation {
 			Animation ^get() { return m_anim; }
