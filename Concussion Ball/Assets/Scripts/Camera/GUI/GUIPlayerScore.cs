@@ -399,9 +399,9 @@ public class GUIPlayerScore : ScriptComponent
     public void UpdateList()
     {
         if(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players.Count>1)
-            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players.Sort((x, y) => y.Score.CompareTo(x.Score));
+            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players.OrderByDescending(x => x.Score).ToList();//MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players.Sort((x, y) => y.Score.CompareTo(x.Score));
         if (MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players.Count > 1)
-            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players.Sort((x, y) => y.Score.CompareTo(x.Score));
+            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players.OrderByDescending(x => x.Score).ToList();//            MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players.Sort((x, y) => y.Score.CompareTo(x.Score));
     }
 
     public override void Update()

@@ -34,7 +34,7 @@ public class Team
     [Browsable(false)]
     public TeamSpawn SpawnArea { get; private set; }
     [Browsable(false)]
-    public List<NetworkPlayer> Players { get; private set; }
+    public List<NetworkPlayer> Players { get; set; }
     public Vector3 GoalPosition;
    
     //public int Score { get { return _Score; } }
