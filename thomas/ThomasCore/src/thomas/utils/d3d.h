@@ -36,7 +36,7 @@ namespace thomas
 			bool CreateDepthStencilTexture(int width, int height, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV);
 			bool CreateDepthStencilTextureArray(int width, int height, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, int arraySize);
 			bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain);
-			bool CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
+			bool CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, bool multiSample = true);
 			bool CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);

@@ -38,7 +38,7 @@ public class NetworkPlayer : NetworkComponent
             gameObject.SetActive(false);
         Material[] mats = gameObject.GetComponent<RenderSkinnedComponent>().materials;
 
-        mat = mats[1] = new Material(mats[1]);
+        mat = mats[0] = new Material(mats[0]);
 
         gameObject.GetComponent<RenderSkinnedComponent>().materials = mats;
 

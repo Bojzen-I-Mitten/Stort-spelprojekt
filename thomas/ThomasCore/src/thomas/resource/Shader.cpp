@@ -594,7 +594,7 @@ namespace thomas
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
-						if (semantic == "SHADOWMAP")
+						if (semantic == "RENDERTEXTURE")
 							isMaterialProperty = false;
 					}
 					break;

@@ -17,6 +17,7 @@ namespace thomas
 			static void Init();
 			static void Destroy();
 
+			Texture2D() {};
 			Texture2D(int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(void* initData, int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(std::string path);

@@ -1,24 +1,25 @@
 using ThomasEngine;
 using ThomasEngine.Network;
-public class RpcTest : NetworkComponent
+public class RpcTest : ScriptComponent
 {
-    public override void Start()
+    RenderTexture rt;
+    Canvas canvas;
+    public override void OnAwake()
     {
+        
+        canvas = new Canvas(new Viewport(0, 0, 1024, 1024));
+        rt = new RenderTexture(1024, 1024);
+        Text t = canvas.Add("Test");
+        t.color = Color.Red;
+        Debug.Log(t.text);
+        rt.WriteCanvas(canvas);
         
     }
 
-    public override void Update()
+    public override void Start()
     {
-        if (isOwner)
-            if (Input.GetKeyDown(Input.Keys.Space))
-                SendRPC("RPCHelloWorld", "testString", 5, true);
+        Material mat = gameObject.GetComponent<RenderComponent>().material;
+        mat.SetTexture2D("DiffuseTexture", rt);
     }
 
-    public void RPCHelloWorld(string message, int number, bool sendMessage)
-    {
-        if (sendMessage)
-            Debug.Log("Hello! " + message + " number: " + number);
-        else
-            Debug.Log("sendmessage was false");
-    }
 }

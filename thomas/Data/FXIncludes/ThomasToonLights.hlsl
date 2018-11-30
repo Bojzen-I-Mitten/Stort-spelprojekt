@@ -21,7 +21,7 @@ SamplerState StandardClampSampler
     AddressV = CLAMP;
 };
 Texture2DArray ShadowMaps : SHADOWMAPS;
-//Texture2D ShadowMap : SHADOWMAP;
+Texture2D RampTexture;
 
 cbuffer LightCountsStruct
 {
@@ -65,7 +65,7 @@ inline float3 GetHalfwayVec(float3 lightDir, float3 viewDir)
 
 inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float smoothness) 
 {
-    float lambertian = saturate(dot(normal, lightDir));
+    float lambertian = RampTexture.Sample(StandardClampSampler, float2(saturate(dot(normal, lightDir)), 0));
     float specularIntensity = 0.0f;
     if (lambertian > 0.0f)
     {
@@ -77,11 +77,11 @@ inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 
 
 
 
-inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffuse, float specularMapFactor, float smoothness)
+inline float3 AddToonLights(float3 worldPos, float3 worldNormal, float3 surfaceColor, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
     float3 ambient = float3(0.12f, 0.12f, 0.12f);
-    float3 colorAcculmulator = ambient * surfaceDiffuse;
+    float3 colorAcculmulator = ambient * surfaceColor;
     float3 lightDir = float3(0, 0, 0);
     float lightMultiplyer = 0.0;
     
@@ -117,7 +117,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         }
     
         lightMultiplyer = lights[i].intensity * shadowFactor;
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceColor * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     roof += nrOfPointLights;
     for (; i < roof; ++i) //point
@@ -128,7 +128,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
 
         float3 atten = lights[i].attenuation;
         lightMultiplyer = lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceColor * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     roof += nrOfSpotLights;
     for (; i < roof; ++i) //spot
@@ -154,7 +154,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
         
         float3 atten = lights[i].attenuation;
         lightMultiplyer = spotFactor * lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceColor * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     roof += nrOfAreaLights;
     for (; i < roof; ++i)
@@ -180,7 +180,7 @@ inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffu
 
         float3 atten = lights[i].attenuation;
         lightMultiplyer = lights[i].intensity / (atten.x + atten.y * lightDistance + atten.z * lightDistance * lightDistance);
-        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
+        Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceColor * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     return colorAcculmulator;
 }
