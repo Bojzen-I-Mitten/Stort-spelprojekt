@@ -19,6 +19,9 @@ namespace ThomasEngine
 	public:
 		RenderComponent();
 		RenderComponent(thomas::object::component::RenderComponent* inherit);
+
+		virtual void OnAwake() override {}
+
 		property Model^ model {
 			Model^ get();
 			void set(Model^ value);

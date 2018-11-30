@@ -236,6 +236,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
+
         rBody.Friction = 0.5f;
         if (!OnGround())
             rBody.Friction = 0.0f;
@@ -358,17 +359,8 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
-    public void OnDisconnect()
-    {
-        if (PickedUpObject)
-        {
-            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
-                (PickedUpObject as Powerup).Remove();
-            else
-                PickedUpObject.Drop();
-        }
 
-    }
+
 
     #region Input handling
     private void HandleKeyboardInput()
@@ -842,6 +834,17 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
+    private void Pickup(PickupableObject pickupable)
+    {
+        if (pickupable.transform.parent == null)
+        {
+            TakeOwnership(pickupable.gameObject);
+            RPCPickup(pickupable.ID);
+            //SendRPC("RPCPickup", pickupable.ID);
+
+        }
+    }
+
     public override void OnTriggerEnter(Collider collider)
     {
         if (isOwner && State != STATE.RAGDOLL && !Locked)
@@ -849,13 +852,7 @@ public class ChadControls : NetworkComponent
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && pickupable.gameObject.GetActive() && PickedUpObject == null)
             {
-                if (pickupable.transform.parent == null)
-                {
-                    TakeOwnership(pickupable.gameObject);
-                    RPCPickup(pickupable.ID);
-                    //SendRPC("RPCPickup", pickupable.ID);
-
-                }
+                Pickup(pickupable);
             }
         }
     }
