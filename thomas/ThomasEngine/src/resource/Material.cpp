@@ -57,6 +57,10 @@ namespace ThomasEngine {
 		shader = value;
 		OnChange();
 	}
+	thomas::resource::Material* Material::Native::get()
+	{
+		return (thomas::resource::Material*)m_nativePtr;
+	}
 
 
 	void Material::OnChange()

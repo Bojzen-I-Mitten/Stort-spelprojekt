@@ -106,6 +106,11 @@ namespace ThomasEngine
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
 		}
+		[IgnoreDataMemberAttribute]
+		property thomas::resource::Material* Native
+		{
+			thomas::resource::Material* get();
+		}
 #ifdef _EDITOR
 		[IgnoreDataMemberAttribute]
 		property Dictionary<String^, System::Object^>^ EditorProperties

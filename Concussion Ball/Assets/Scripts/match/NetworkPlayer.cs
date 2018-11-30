@@ -37,9 +37,9 @@ public class NetworkPlayer : NetworkComponent
     {
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        Material[] mats = gameObject.GetComponent<RenderSkinnedComponent>().materials;
+        Material chadMat = gameObject.GetComponent<RenderSkinnedComponent>().FindMaterial("Chad66");
 
-        mat = mats[0] = new Material(mats[0]);
+        mat = mats[0] = new Material(chadMat);
 
         gameObject.GetComponent<RenderSkinnedComponent>().materials = mats;
 
