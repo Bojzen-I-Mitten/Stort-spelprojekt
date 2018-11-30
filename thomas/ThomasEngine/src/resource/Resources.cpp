@@ -340,6 +340,7 @@ namespace ThomasEngine
 			Monitor::Enter(s_PREFAB_DICT);
 			for each (auto var in s_PREFAB_DICT)
 			{
+
 				l->Add(var.Value);
 			}
 			Monitor::Exit(s_PREFAB_DICT);
