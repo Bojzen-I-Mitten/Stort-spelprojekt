@@ -395,17 +395,6 @@ public class MatchSystem : NetworkManager
         }
     }
 
-    protected override void OnPeerLeave(NetPeer peer)
-    {
-        NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        if (!np)
-            Debug.LogError("Failed to find network player for peer:" + peer);
-        else
-        {
-            np.JoinTeam(null);
-            np.gameObject.GetComponent<ChadControls>().OnDisconnect();
-        }
-    }
 #endregion
 
 #region Team Manager
