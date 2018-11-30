@@ -190,6 +190,21 @@ public class MatchSystem : NetworkManager
         Debug.Log("##################################");
     }
 
+    private void ShowPlayers()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Players:");
+        foreach (var player in Scene.Players)
+        {
+            if (player.Key != LocalPeer)
+            {
+                ChadControls chad = player.Value.gameObject.GetComponent<ChadControls>();
+                Debug.Log(player.Key.EndPoint.Address + ":\t" + chad?.rBody.Position);
+            }
+        }
+        Debug.Log("##################################");
+    }
+
     #region Utility
 
     void ResetPlayers()
@@ -395,17 +410,6 @@ public class MatchSystem : NetworkManager
         }
     }
 
-    protected override void OnPeerLeave(NetPeer peer)
-    {
-        NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        if (!np)
-            Debug.LogError("Failed to find network player for peer:" + peer);
-        else
-        {
-            np.JoinTeam(null);
-            np.gameObject.GetComponent<ChadControls>().OnDisconnect();
-        }
-    }
 #endregion
 
 #region Team Manager

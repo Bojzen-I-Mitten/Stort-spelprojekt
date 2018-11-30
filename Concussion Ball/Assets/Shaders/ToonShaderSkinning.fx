@@ -23,6 +23,8 @@ SamplerState StandardWrapSampler
 };
 
 
+
+
 DepthStencilState EnableDepth
 {
     DepthEnable = TRUE;
@@ -58,6 +60,7 @@ struct v2f
     float4 worldPos : POSITIONWS;
     float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
+    float3 viewDir : TEXCOORD1;
 };
 
 float biTangentSign(float3 norm, float3 tang, float3 bitang)
@@ -85,6 +88,8 @@ v2f vert(appdata_thomas_skin v)
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
+    o.viewDir = normalize(ThomasWorldSpaceViewDir(mul(thomas_ObjectToWorld, float4(v.vertex, 1.0f)).xyz));
+
     o.texcoord = v.texcoord;
     return o;
 }
@@ -97,16 +102,21 @@ float4 frag(v2f input) : SV_TARGET
     normal = normalize(normal);
     normal = normalize(mul(normal, input.TBN));
 
+    
+
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
-    diffuse *= rampTex.Sample(StandardWrapSampler, Intensity(normal, input.worldPos.xyz));
+    diffuse *= rampTex.Sample(StandardClampSampler, Intensity(normal, input.worldPos.xyz));
 
-    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord) * 0.5f;
+
+    float3 rim = pow(max(0, dot(float3(0, 1, 0), 1 - abs(dot(normal, normalize(input.viewDir))))), 2.5f) * float3(0.97f, 0.88f, 1.0f) * specularMapFactor;
+
 
     diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1); // Calculate light
     diffuse.xyz = pow(diffuse, 0.4545454545f); // Gamma correction
 
-    return saturate(float4(diffuse, 1.0f));
+    return saturate(float4(diffuse + rim, 1.0f));
 }
 
 

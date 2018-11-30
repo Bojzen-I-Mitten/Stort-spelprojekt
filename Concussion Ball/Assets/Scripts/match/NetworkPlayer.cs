@@ -115,6 +115,11 @@ public class NetworkPlayer : NetworkComponent
         return true;
     }
 
+    public override void OnDisconnect()
+    {
+        JoinTeam(null);
+    }
+
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 

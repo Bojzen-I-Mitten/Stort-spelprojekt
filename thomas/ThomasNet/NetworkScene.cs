@@ -17,6 +17,7 @@ namespace ThomasEngine.Network
         public List<NetworkIdentity> AllPlayers = new List<NetworkIdentity>();
         public Dictionary<NetPeer, NetworkIdentity> Players = new Dictionary<NetPeer, NetworkIdentity>();
         public Dictionary<int, NetworkIdentity> NetworkObjects = new Dictionary<int, NetworkIdentity>();
+        internal Dictionary<NetPeer, long> TimePlayerJoined = new Dictionary<NetPeer, long>();
         private List<NetworkIdentity> SceneObjectToBeActivated = new List<NetworkIdentity>();
         public Dictionary<NetPeer, List<NetworkIdentity>> ObjectOwners = new Dictionary<NetPeer, List<NetworkIdentity>>();
 
@@ -117,10 +118,31 @@ namespace ThomasEngine.Network
 
             //Transfer that players objects to someone else.
 
+
+            TimePlayerJoined.Remove(peer);
+
+
+
+            long timeIConnected = TimePlayerJoined[NetworkManager.instance.LocalPeer];
+
+            bool amINewOwner = true;
+            foreach(var pair in TimePlayerJoined)
+            {
+                //If someones time is lower than my time. Let that player own the object.
+                if (pair.Value < timeIConnected)
+                    amINewOwner = false;
+            }
+
+            //If i got the lowest time. I will own the objects.
             if (ObjectOwners.ContainsKey(peer))
             {
                 foreach (NetworkIdentity identity in ObjectOwners[peer])
-                    identity.Owner = true;
+                {
+                    if (amINewOwner)
+                        identity.Owner = true;
+
+                    identity.OnDisconnect();
+                }
 
                 ObjectOwners[peer].Clear();
                 ObjectOwners.Remove(peer);
@@ -130,7 +152,10 @@ namespace ThomasEngine.Network
             {
                 NetworkIdentity id = Players[peer];
                 if (id != null)
+                {
+                    id.OnDisconnect();
                     RecyclePlayer(id);
+                }
                 Players.Remove(peer);
             }
         }
