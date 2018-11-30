@@ -28,6 +28,8 @@ namespace thomas {
 				std::shared_ptr<graphics::animation::Skeleton> m_skeleton;
 
 				void clear();
+				void PreSkeletonParse();
+				void PostLoad();
 			};
 			Model(std::string path);
 

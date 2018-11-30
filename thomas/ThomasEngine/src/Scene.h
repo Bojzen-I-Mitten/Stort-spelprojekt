@@ -69,8 +69,15 @@ namespace ThomasEngine {
 		*/
 		void DeleteInstant(GameObject ^ object);
 
+		/* Verify object is in scene
+		*/
+		bool InScene(GameObject ^ gObj, int &index);
+
 	public:
 		static Scene^ LoadScene(System::String^ fullPath, uint32_t unique_id);
+		/* Verify object is in scene
+		*/
+		bool InScene(GameObject ^ gObj);
 	public:
 
 		Scene(System::String^ name, uint32_t unique_id);
