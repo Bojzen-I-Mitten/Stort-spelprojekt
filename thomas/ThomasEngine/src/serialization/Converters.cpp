@@ -23,7 +23,7 @@ namespace ThomasEngine
 		JObject^ jo = JObject::Load(reader);
 		String^ path = jo->Value<String^>("resourcePath");
 		
-		if (path == "")
+		if (path == "" || path == nullptr)
 			return Material::StandardMaterial;
 		else if (path == "White Texture")
 			return Texture2D::whiteTexture;
