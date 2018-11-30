@@ -103,6 +103,7 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.position = new Vector2(0.4975f, 0.83f);
         PowerupPickupText.color = Color.White; // Need black outline for better visual effect
         PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
+        PowerupPickupText.dropShadow = true;
         PowerupPickupText.font = PickupFont;
 
         State = STATE.CHADING;

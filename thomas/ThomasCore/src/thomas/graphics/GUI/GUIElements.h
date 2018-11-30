@@ -113,8 +113,9 @@ namespace thomas
 				{
 					if (dropShadow)
 					{
-						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position + Vector2(0.01f, 0.01f) * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
-						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position  + Vector2(-0.01f, 0.01f) * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+						// Only black outline for now	
+						font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(0.01f, 0.01f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+						font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-0.01f, 0.01f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
 					}
 
 					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
