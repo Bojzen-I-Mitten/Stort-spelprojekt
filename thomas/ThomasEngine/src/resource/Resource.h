@@ -31,6 +31,7 @@ namespace ThomasEngine
 		}
 		virtual ~Resource();
 
+		[Newtonsoft::Json::JsonIgnoreAttribute]
 		property String^ Path
 		{
 			String^ get();
