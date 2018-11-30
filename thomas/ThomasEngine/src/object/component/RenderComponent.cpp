@@ -130,7 +130,7 @@ namespace ThomasEngine
 			Debug::LogWarning("Failed to set material " + mat->Name + " at index: " + index + ", in RenderComponent: " + Name);
 			return;
 		}
-		render->SetMaterial(mat->Native);
+		render->SetMaterial(index, mat->Native);
 	}
 
 
