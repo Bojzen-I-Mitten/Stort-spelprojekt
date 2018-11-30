@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using ThomasEditor.Testing;
 using HierarchyTreeView;
+using ThomasEditor.utils;
 
 namespace ThomasEditor
 {
@@ -315,10 +316,10 @@ namespace ThomasEditor
 
         private void RemoveSelectedGameObjects(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
+            var c = Utils.DetachParents(ThomasWrapper.Selection.Ref);
+            ThomasWrapper.Selection.UnselectGameObjects();
+            foreach (GameObject gObj in c)
             {
-                GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
-                ThomasWrapper.Selection.UnSelectGameObject(gObj);
                 ThomasEngine.Object.Destroy(gObj);
             }
         }

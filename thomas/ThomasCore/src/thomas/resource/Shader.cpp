@@ -9,6 +9,7 @@
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
 #include "../Common.h"
+#include "../utils/Math.h"
 
 namespace thomas
 {
@@ -480,7 +481,8 @@ namespace thomas
 			}
 			else if (semanticName.find("TEXCOORD") != std::string::npos)
 			{
-				return Semantics((int)Semantics::TEXCOORD + semanticIndex);
+				semanticIndex = min(semanticIndex, 1u); // Clamp limit
+				return Semantics((uint32_t)Semantics::TEXCOORD + semanticIndex);
 			}
 			else if (semanticName.find("BITANGENT") != std::string::npos)
 			{
