@@ -95,6 +95,13 @@ namespace DirectX
 		inline float square(float x) {
 			return x * x;
 		}
+		/* Clamp within the range
+		*/ 
+		template<typename N>
+		inline N clamp(N v, N minimum, N maximum)
+		{
+			return min(max(v, minimum), maximum);
+		}
 
 		/* Convert rotation quatenion to pitch/yaw/roll vector
 		*/

@@ -188,7 +188,6 @@ namespace thomas
 			m_properties[name] = std::shared_ptr<shaderproperty::ShaderProperty>(new shaderproperty::ShaderPropertyColor(value));
 			m_properties[name]->SetName(name);
 			Unlock();
-
 		}
 		float Material::GetFloat(const std::string& name)
 		{

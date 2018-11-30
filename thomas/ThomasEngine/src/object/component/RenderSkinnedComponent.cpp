@@ -24,6 +24,12 @@ namespace ThomasEngine
 		applyAnimation();
 	}
 
+	void RenderSkinnedComponent::OnAwake()
+	{
+		RenderComponent::OnAwake();
+		applyAnimation();
+	}
+
 
 	thomas::object::component::RenderSkinnedComponent* RenderSkinnedComponent::Native::get()
 	{

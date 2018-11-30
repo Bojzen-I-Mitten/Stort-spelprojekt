@@ -19,6 +19,8 @@ public class NetworkPlayer : NetworkComponent
     public int Owngoal = 0;
     public int GoalsScored = 0;
     public int Score = 0;
+    public bool ReadyToStart = false;
+
     Material mat;
     Rigidbody rb;
     Ragdoll rag;
@@ -62,7 +64,7 @@ public class NetworkPlayer : NetworkComponent
 
     public override void OnDisable()
     {
-        if(nameCanvas != null)
+        if (nameCanvas != null)
             nameCanvas.isRendering = false;
     }
 
@@ -93,10 +95,10 @@ public class NetworkPlayer : NetworkComponent
                 nameCanvas.isRendering = true;
                 nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
             }
-            else if(nameCanvas != null)
+            else if (nameCanvas != null)
                 nameCanvas.isRendering = false;
         }
-        else if(nameCanvas != null)
+        else if (nameCanvas != null)
             nameCanvas.isRendering = false;
         if (Team != null && mat != null)
             mat.SetColor("color", Team.Color);
@@ -108,6 +110,7 @@ public class NetworkPlayer : NetworkComponent
     {
 
         writer.Put(PlayerName);
+        writer.Put(ReadyToStart);
         writer.Put(HasTackled);
         writer.Put(Owngoal);
         writer.Put(GoalsScored);
@@ -115,25 +118,19 @@ public class NetworkPlayer : NetworkComponent
             writer.Put((int)Team.TeamType);
         else
             writer.Put((int)TEAM_TYPE.UNASSIGNED);
+
         return true;
     }
 
     public override void OnRead(NetDataReader reader, bool initialState)
     {
-        if(isOwner)
-        {
-            reader.GetString();
-            reader.GetInt();
-            reader.GetInt();
-            reader.GetInt();
-        }
-        else
-        {
-            PlayerName = reader.GetString();
-            HasTackled = reader.GetInt();
-            Owngoal = reader.GetInt();
-            GoalsScored = reader.GetInt();
-        }
+
+
+        PlayerName = reader.GetString();
+        ReadyToStart = reader.GetBool();
+        HasTackled = reader.GetInt();
+        Owngoal = reader.GetInt();
+        GoalsScored = reader.GetInt();
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
@@ -144,11 +141,14 @@ public class NetworkPlayer : NetworkComponent
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
         }
-
     }
-    
+
     public void JoinTeam(TEAM_TYPE teamType)
     {
+        HasTackled = 0;
+        Owngoal = 0;
+        GoalsScored = 0;
+        Score = 0;
         RPCJoinTeam((int)teamType);
         SendRPC("RPCJoinTeam", (int)teamType);
     }
@@ -174,32 +174,42 @@ public class NetworkPlayer : NetworkComponent
             rb.IgnoreNextTransformUpdate();
         }
 
-        if(Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
         {
             CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = false;
             CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = true;
-        }else
+        }
+        else
         {
             CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
             CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
         }
 
-
-
-}
-
-
+    }
     public void JoinTeam(Team team)
     {
+        if (this.Team == team)
+        {
+            Debug.LogWarning("Player is already in team.");
+            return;
+        }
+
         if (this.Team != null)
         {
             this.Team.RemovePlayer(this);
-        }        
+        }
         if (team != null)
         {
             team.AddPlayer(this);
             mat?.SetColor("color", Team.Color);
         }
 
+    }
+
+    public void Ready(bool ready)
+    {
+        ReadyToStart = ready;
+        if (isOwner)
+            SendRPC("Ready", ReadyToStart);
     }
 }
