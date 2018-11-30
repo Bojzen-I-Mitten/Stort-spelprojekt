@@ -7,13 +7,9 @@ public class GUIJoinHost : ScriptComponent
 {
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
-    public Font TextFont { get; set; }
 
     Camera Camera;
-
-    private bool Disabled;
-    private string IPString;
-    private string PortString;
+    
     private bool TakeIP;
     private bool TakePort;
 
@@ -46,15 +42,11 @@ public class GUIJoinHost : ScriptComponent
     IEnumerator test;
 
     public float CaretOffset { get; set; } = 0.0f;
-    public float TextOffset { get; set; } = 0.0f;
 
     public override void Start()
     {
-        IPString = "192.168.1.";
-        PortString = "9050";
         TakeIP = false;
         TakePort = false;
-        Disabled = false;
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
@@ -79,7 +71,6 @@ public class GUIJoinHost : ScriptComponent
         MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
         ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
-        //ConnectingText.position = TextBoxIP.position + TextBoxIP.size / Canvas.viewport.size * 1.5f;
         Join.interactable = true;
         Host.interactable = true;
         StopCoroutine(test);
@@ -93,12 +84,16 @@ public class GUIJoinHost : ScriptComponent
 
         if (TakeIP)
         {
-            GUIInput.AppendString(ref IPString, 30);
+            string str = IPText.text;
+            GUIInput.AppendString(ref str, 15);
+            IPText.text = str;
             Caret.position = IPText.position + new Vector2(IPText.size.x / 2 - 0.005f, CaretOffset);
         }
         if (TakePort)
         {
-            GUIInput.AppendString(ref PortString, 5);
+            string str = PortText.text;
+            GUIInput.AppendString(ref str, 5);
+            PortText.text = str;
             Caret.position = PortText.position + new Vector2(PortText.size.x / 2 - 0.005f, CaretOffset);
         }
 
@@ -117,25 +112,27 @@ public class GUIJoinHost : ScriptComponent
 
         if (Join.Clicked())
         {
+            TakeIP = false;
+            TakePort = false;
             ConnectingText.text = "";
             System.Net.IPAddress ipaddress;
             try
             {
-                ipaddress = NetUtils.ResolveAddress(IPString);
+                ipaddress = NetUtils.ResolveAddress(IPText.text);
             }
             catch (Exception e)
             {
                 ConnectingText.text = e.Message;
                 return;
             }
-            if (PortString != "")
+            if (PortText.text != "")
             {
-                if (IPString == "127.0.0.1")
+                if (IPText.text == "127.0.0.1")
                     MatchSystem.instance.LocalPort = 0;
                 else
-                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
-                MatchSystem.instance.TargetPort = Convert.ToInt32(PortString);
-                MatchSystem.instance.TargetIP = IPString;
+                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
+                MatchSystem.instance.TargetPort = Convert.ToInt32(PortText.text);
+                MatchSystem.instance.TargetIP = IPText.text;
 
                 MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
                 MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
@@ -152,18 +149,20 @@ public class GUIJoinHost : ScriptComponent
             }
             else
             {
-                if (IPString == "")
+                if (IPText.text == "")
                     TextBoxIP.color = Color.Red;
-                if (PortString == "")
+                if (PortText.text == "")
                     TextBoxPort.color = Color.Red;
             }
         }
         else if (Host.Clicked())
         {
+            TakeIP = false;
+            TakePort = false;
             ConnectingText.text = "";
-            if (PortString != "")
+            if (PortText.text != "")
             {
-                MatchSystem.instance.LocalPort = Convert.ToInt32(PortString);
+                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
                 CameraMaster.instance.State = CAM_STATE.HOST_MENU;
                 return;
             }
@@ -175,6 +174,8 @@ public class GUIJoinHost : ScriptComponent
 
         if (Back.Clicked())
         {
+            TakeIP = false;
+            TakePort = false;
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
             ConnectingText.text = "";
         }
@@ -185,7 +186,7 @@ public class GUIJoinHost : ScriptComponent
             TakeIP = true;
             if (ClearIP)
             {
-                IPString = "";
+                IPText.text = "";
                 ClearIP = false;
             }
         }
@@ -195,7 +196,7 @@ public class GUIJoinHost : ScriptComponent
             TakePort = true;
             if (ClearPort)
             {
-                PortString = "";
+                PortText.text = "";
                 ClearPort = false;
             }
         }
@@ -221,49 +222,34 @@ public class GUIJoinHost : ScriptComponent
         {
             Back.color = Color.IndianRed;
         }
-
-        if (!Disabled)
-        {
-            IPText.text = IPString;
-            PortText.text = PortString;
-            if (TextFont != null)
-            {
-                IPText.font = TextFont;
-                PortText.font = TextFont;
-                IP.font = TextFont;
-                Port.font = TextFont;
-            }
-        }
-        IPText.position = new Vector2(0.5f, 0.11875f + TextOffset);
-        PortText.position = new Vector2(0.5f, 0.26875f + TextOffset);
     }
 
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
 
-        IPText = Canvas.Add(IPString);
+        IPText = Canvas.Add("192.168.1.");
         IPText.origin = new Vector2(0.5f);
-        IPText.position = new Vector2(0.5f, 0.11875f + TextOffset);
+        IPText.position = new Vector2(0.2f, 0.15f);
         IPText.color = Color.Black;
         IPText.depth = 0.8f;
 
-        PortText = Canvas.Add(PortString);
+        PortText = Canvas.Add("9050");
         PortText.origin = new Vector2(0.5f);
-        PortText.position = new Vector2(0.5f, 0.26875f + TextOffset);
+        PortText.position = new Vector2(0.2f, 0.35f);
         PortText.color = Color.Black;
         PortText.depth = 0.8f;
 
         IP = Canvas.Add("IP");
         IP.origin = new Vector2(0.5f);
-        IP.position = new Vector2(0.5f, 0.05f);
+        IP.position = new Vector2(0.2f, 0.08f);
         IP.scale = new Vector2(0.7f);
         IP.color = Color.FloralWhite;
         IP.depth = 0.9f;
 
         Port = Canvas.Add("Port");
         Port.origin = new Vector2(0.5f);
-        Port.position = new Vector2(0.5f, 0.2f);
+        Port.position = new Vector2(0.2f, 0.28f);
         Port.scale = new Vector2(0.7f);
         Port.color = Color.FloralWhite;
         Port.depth = 0.9f;
@@ -272,16 +258,14 @@ public class GUIJoinHost : ScriptComponent
         {
             TextBoxIP = Canvas.Add(TextBox);
             TextBoxIP.origin = new Vector2(0.5f);
-            TextBoxIP.position = new Vector2(0.5f, 0.1f);
-            TextBoxIP.scale = new Vector2(1, 0.75f);
+            TextBoxIP.position = new Vector2(0.2f, 0.15f);
             TextBoxIP.interactable = true;
             TextBoxIP.depth = 0.8f;
             TextBoxIP.color = Color.Black;
 
             TextBoxPort = Canvas.Add(TextBox);
             TextBoxPort.origin = new Vector2(0.5f);
-            TextBoxPort.position = new Vector2(0.5f, 0.25f);
-            TextBoxPort.scale = new Vector2(1, 0.75f);
+            TextBoxPort.position = new Vector2(0.2f, 0.35f);
             TextBoxPort.interactable = true;
             TextBoxPort.depth = 0.8f;
             TextBoxPort.color = Color.Black;
@@ -291,15 +275,13 @@ public class GUIJoinHost : ScriptComponent
         {
             TextBoxBGIP = Canvas.Add(TextBoxBG);
             TextBoxBGIP.origin = new Vector2(0.5f);
-            TextBoxBGIP.position = new Vector2(0.5f, 0.1f);
-            TextBoxBGIP.scale = new Vector2(1, 0.75f);
+            TextBoxBGIP.position = new Vector2(0.2f, 0.15f);
             TextBoxBGIP.depth = 0.9f;
             TextBoxBGIP.color = Color.FloralWhite;
 
             TextBoxBGPort = Canvas.Add(TextBoxBG);
             TextBoxBGPort.origin = new Vector2(0.5f);
-            TextBoxBGPort.position = new Vector2(0.5f, 0.25f);
-            TextBoxBGPort.scale = new Vector2(1, 0.75f);
+            TextBoxBGPort.position = new Vector2(0.2f, 0.35f);
             TextBoxBGPort.depth = 0.9f;
             TextBoxBGPort.color = Color.FloralWhite;
         }
@@ -308,22 +290,20 @@ public class GUIJoinHost : ScriptComponent
         {
             Join = Canvas.Add("Join");
             Join.origin = new Vector2(0.5f);
-            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.11875f);
+            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.15f);
             Join.interactable = true;
             Join.depth = 0.9f;
             Join.color = Color.FloralWhite;
-            Join.font = TextFont;
         }
 
         if (TextBoxPort != null)
         {
             Host = Canvas.Add("Host");
             Host.origin = new Vector2(0.5f);
-            Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.26875f);
+            Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.35f);
             Host.interactable = true;
             Host.depth = 0.9f;
             Host.color = Color.FloralWhite;
-            Host.font = TextFont;
         }
 
         Back = Canvas.Add("Back");
@@ -332,22 +312,19 @@ public class GUIJoinHost : ScriptComponent
         Back.interactable = true;
         Back.depth = 0.9f;
         Back.color = Color.FloralWhite;
-        Back.font = TextFont;
 
         ConnectingText = Canvas.Add("");
         ConnectingText.origin = new Vector2(0.5f);
         ConnectingText.color = Color.FloralWhite;
         ConnectingText.depth = 0;
-        ConnectingText.font = TextFont;
         ConnectingText.position = new Vector2(0.5f, 0.75f);
 
         Caret = Canvas.Add("");
         Caret.origin = new Vector2(0, 0.5f);
-        Caret.scale = IPText.scale * 1.333f;
+        Caret.scale = IPText.scale;
         Caret.interactable = false;
         Caret.depth = 0.8f;
         Caret.color = Color.Black;
-        Caret.font = TextFont;
     }
 
     public void ClearImagesAndText()
@@ -363,7 +340,6 @@ public class GUIJoinHost : ScriptComponent
         Canvas.Remove(PortText);
         Canvas.Remove(IP);
         Canvas.Remove(Port);
-
         Canvas.Remove(Caret);
     }
 
