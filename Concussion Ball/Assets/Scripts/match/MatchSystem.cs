@@ -190,6 +190,21 @@ public class MatchSystem : NetworkManager
         Debug.Log("##################################");
     }
 
+    private void ShowPlayers()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Players:");
+        foreach (var player in Scene.Players)
+        {
+            if (player.Key != LocalPeer)
+            {
+                ChadControls chad = player.Value.gameObject.GetComponent<ChadControls>();
+                Debug.Log(player.Key.EndPoint.Address + ":\t" + chad?.rBody.Position);
+            }
+        }
+        Debug.Log("##################################");
+    }
+
     #region Utility
 
     void ResetPlayers()
