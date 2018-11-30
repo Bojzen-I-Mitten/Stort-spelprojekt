@@ -37,11 +37,16 @@ public class NetworkPlayer : NetworkComponent
     {
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        Material chadMat = gameObject.GetComponent<RenderSkinnedComponent>().FindMaterial("Chad66");
-
-        mat = mats[0] = new Material(chadMat);
-
-        gameObject.GetComponent<RenderSkinnedComponent>().materials = mats;
+        RenderSkinnedComponent model = gameObject.GetComponent<RenderSkinnedComponent>();
+        if(!model)
+        {
+            throw new InvalidOperationException("Player requires a RenderSkinnedComponent.");
+        }
+        mat = model.CreateMaterialInstance("Chad66");
+        if(mat == null)
+        {
+            throw new InvalidOperationException("Player not assigned Chad66 material.");
+        }
 
         nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
