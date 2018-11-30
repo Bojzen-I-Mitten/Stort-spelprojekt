@@ -222,7 +222,10 @@ namespace ThomasEngine
 		{
 			gObj->PostLoad(this);
 		}
+	}
 
+	void Scene::InitiateScene()
+	{
 		AwakeObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 		EnableObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 	}
