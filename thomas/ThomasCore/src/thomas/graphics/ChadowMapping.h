@@ -36,7 +36,7 @@ namespace thomas
 			math::Matrix m_matrixView;
 			math::Matrix m_matrixVP;
 
-
+			unsigned m_nrOfCascades;
 
 			static std::unique_ptr<resource::Material> s_material;
 			static std::unique_ptr<resource::Material> s_animmaterial;

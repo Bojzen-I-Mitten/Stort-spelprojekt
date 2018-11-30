@@ -244,6 +244,50 @@ namespace thomas
 				return frustrum;
 			}
 
+			void Camera::GetFrustumCornersRH(math::Vector3* corners)
+			{
+				math::BoundingFrustum frustum(m_projMatrix);
+				m_frustrum.Transform(frustum, m_gameObject->GetTransform()->GetWorldMatrix());
+				assert(corners != 0);
+
+				// Load origin and orientation of the frustum.
+				DirectX::XMVECTOR vOrigin = XMLoadFloat3(&frustum.Origin);
+				DirectX::XMVECTOR vOrientation = XMLoadFloat4(&frustum.Orientation);
+
+				assert(DirectX::Internal::XMQuaternionIsUnit(vOrientation));
+
+				// Build the corners of the frustum.
+				DirectX::XMVECTOR vRightTop = DirectX::XMVectorSet(frustum.RightSlope, frustum.TopSlope, -1.0f, 0.0f);
+				DirectX::XMVECTOR vRightBottom = DirectX::XMVectorSet(frustum.RightSlope, frustum.BottomSlope, 1.0f, 0.0f);
+				DirectX::XMVECTOR vLeftTop = DirectX::XMVectorSet(frustum.LeftSlope, frustum.TopSlope, -1.0f, 0.0f);
+				DirectX::XMVECTOR vLeftBottom = DirectX::XMVectorSet(frustum.LeftSlope, frustum.BottomSlope, 1.0f, 0.0f);
+				DirectX::XMVECTOR vNear = DirectX::XMVectorReplicatePtr(&frustum.Near);
+				DirectX::XMVECTOR vFar = DirectX::XMVectorReplicatePtr(&frustum.Far);
+
+				// Returns 8 corners position of bounding frustum.
+				//     Near    Far
+				//    0----1  4----5
+				//    |    |  |    |
+				//    |    |  |    |
+				//    3----2  7----6
+
+				DirectX::XMVECTOR vCorners[8];
+				vCorners[0] = DirectX::XMVectorMultiply(vLeftTop, vNear);
+				vCorners[1] = DirectX::XMVectorMultiply(vRightTop, vNear);
+				vCorners[2] = DirectX::XMVectorMultiply(vRightBottom, vNear);
+				vCorners[3] = DirectX::XMVectorMultiply(vLeftBottom, vNear);
+				vCorners[4] = DirectX::XMVectorMultiply(vLeftTop, vFar);
+				vCorners[5] = DirectX::XMVectorMultiply(vRightTop, vFar);
+				vCorners[6] = DirectX::XMVectorMultiply(vRightBottom, vFar);
+				vCorners[7] = DirectX::XMVectorMultiply(vLeftBottom, vFar);
+
+				for (size_t i = 0; i < 8; ++i)
+				{
+					DirectX::XMVECTOR C = DirectX::XMVectorAdd(DirectX::XMVector3Rotate(vCorners[i], vOrientation), vOrigin);
+					DirectX::XMStoreFloat3(&corners[i], C);
+				}
+			}
+
 			math::BoundingFrustum Camera::GetSubFrustrum(math::Rectangle rect)
 			{
 				

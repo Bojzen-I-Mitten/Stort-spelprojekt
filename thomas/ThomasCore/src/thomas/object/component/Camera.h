@@ -64,6 +64,7 @@ namespace thomas
 				int GetTargetDisplayIndex();
 
 				math::BoundingFrustum GetFrustrum();
+				void GetFrustumCornersRH(math::Vector3* corners);
 				math::BoundingFrustum GetSubFrustrum(math::Rectangle rect);
 
 				void CopyFrameData();

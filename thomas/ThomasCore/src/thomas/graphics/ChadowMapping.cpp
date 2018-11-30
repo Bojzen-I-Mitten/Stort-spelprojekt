@@ -38,8 +38,11 @@ namespace thomas
 		ShadowMap::ShadowMap()
 		{
 			m_matrixView = math::Matrix::CreateLookAt(math::Vector3::Up, math::Vector3::Zero, math::Vector3::Up);
-			m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-45, 45, -45, 45, -45, 45);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
-			m_matrixVP = m_matrixView * m_matrixProj;
+			m_nrOfCascades = 2;
+
+			m_matrixVP = m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 10);//http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+			
+			
 			_depthStencilView = nullptr;
 		}
 
@@ -48,75 +51,94 @@ namespace thomas
 			
 		}
 
+		
+
 		void ShadowMap::UpdateShadowBox(object::component::Transform* lightTransform, object::component::Camera* camera)
 		{
 			//https://www.gamedev.net/forums/topic/505893-orthographic-projection-for-shadow-mapping/
 			if (camera != nullptr)
 			{
-				/*math::Vector3 corners[8];
-				camera->GetFrustrum().GetCorners(corners);
+				
+				math::Vector3 corners[8];
+				camera->GetFrustumCornersRH(corners);
 
-				float distance = 30.0f;
-
-				for (unsigned i = 0; i < 4; ++i)
+				// Returns 8 corners position of bounding frustum.
+				//     Far     Near
+				//    0----1  4----5
+				//    |    |  |    |
+				//    |    |  |    |
+				//    3----2  7----6
+				
+				float nearOffset = 0.0f;
+				float cascadeTopology[2] = { 40, 80 };
+				for (unsigned c = 0; c < m_nrOfCascades; ++c)
 				{
-					math::Vector3 dir = corners[4 + i] - corners[0 + i];
-					dir.Normalize();
-					corners[4 + i] = corners[0 + i] + dir * distance;
-				}
-				
-				
-				math::Vector3 frustumCenter = math::Vector3(0, 0, 0);
+					for (unsigned i = 0; i < 4; ++i)
+					{
+						math::Vector3 dir = corners[0 + i] - corners[4 + i];
+						
 
+						dir.Normalize();
+						math::Vector3 temp = corners[4 + i] + dir * cascadeTopology[c];
 
-				for (unsigned i = 0; i < 8; ++i)
-				{
-					frustumCenter += corners[i];
-					//math::Vector3::Transform(corners[i], m_matrixView);//transform corner into lightspace
-				}*/
-				//frustumCenter /= 8;
+						corners[0 + i] = temp;
+					}
 				
-				math::Vector3 frustumCenter = camera->GetPosition() + camera->GetDirection() * 40.0f;
-				//const float nearClipOffset = 20.0f;
-				m_matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward(), frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+				
+					math::Vector3 frustumCenter = math::Vector3(0, 0, 0);
+
+				
+					for (unsigned i = 0; i < 8; ++i)
+					{
+						frustumCenter += corners[i];
+						//math::Vector3::Transform(corners[i], m_matrixView);//transform corner into lightspace
+					}
+					frustumCenter /= 8;
+
+					math::Matrix matrixView = math::Matrix::CreateLookAt(frustumCenter + lightTransform->Forward(), frustumCenter, math::Vector3::Up); //lightTransform->GetWorldMatrix();
+
+					//frustumCenter = math::Vector3::Zero;//camera->GetPosition() + camera->GetDirection() * 40.0f;
+					//const float nearClipOffset = 20.0f;
+				
 			
-				//for (unsigned i = 0; i < 8; ++i)
-					//corners[i] = math::Vector3::Transform(corners[i], m_matrixView);
+					for (unsigned i = 0; i < 8; ++i)
+						corners[i] = math::Vector3::Transform(corners[i], matrixView);
 
-				//find extreme points
-				/*math::Vector3 maxes = corners[0];
-				math::Vector3 mins = corners[0];
+					//find extreme points
+					math::Vector3 maxes = corners[0];
+					math::Vector3 mins = corners[0];
 
-				for (int i = 0; i < 8; i++)
-				{
-					if (corners[i].x > maxes.x)
-						maxes.x = corners[i].x;
-					else if (corners[i].x < mins.x)
-						mins.x = corners[i].x;
-					if (corners[i].y > maxes.y)
-						maxes.y = corners[i].y;
-					else if (corners[i].y < mins.y)
-						mins.y = corners[i].y;
-					if (corners[i].z > maxes.z)
-						maxes.z = corners[i].z;
-					else if (corners[i].z < mins.z)
-						mins.z = corners[i].z;
-				}*/
-				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(frustumCenter.x -10, frustumCenter.x + 10, frustumCenter.y -10, frustumCenter.y + 10, frustumCenter.z - 25, frustumCenter.z + 60);
-				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, maxes.z, mins.z);
+					for (int i = 0; i < 8; i++)
+					{
+						if (corners[i].x > maxes.x)
+							maxes.x = corners[i].x;
+						else if (corners[i].x < mins.x)
+							mins.x = corners[i].x;
+						if (corners[i].y > maxes.y)
+							maxes.y = corners[i].y;
+						else if (corners[i].y < mins.y)
+							mins.y = corners[i].y;
+						if (corners[i].z > maxes.z)
+							maxes.z = corners[i].z;
+						else if (corners[i].z < mins.z)
+							mins.z = corners[i].z;
+					}
+
+					int stop = 0;
+					floor
+					//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(frustumCenter.x -10, frustumCenter.x + 10, frustumCenter.y -10, frustumCenter.y + 10, frustumCenter.z - 25, frustumCenter.z + 60);
+					m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, mins.z, maxes.z);
+					m_matrixVP = matrixView * m_matrixProj;
+				}
 			}
-			else
-			{
-				m_matrixView = math::Matrix::CreateLookAt(lightTransform->Forward() * 35/* (camera->GetFar() + nearClipOffset)*/, math::Vector3::Zero, math::Vector3::Up); //lightTransform->GetWorldMatrix();
-				//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(-10, 10, -10, 10, -10, 30);
-			}
+			
 			
 			
 			//m_matrixProj = math::Matrix::CreateOrthographicOffCenter(mins.x, maxes.x, mins.y, maxes.y, -maxes.z - nearClipOffset, -mins.z);
 			
 			
 
-			m_matrixVP = m_matrixView * m_matrixProj;
+			
 
 			
 		}
