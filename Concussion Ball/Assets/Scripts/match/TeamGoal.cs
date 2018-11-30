@@ -92,11 +92,14 @@ public class TeamGoal : ScriptComponent
         {
             if (collider.gameObject == MatchSystem.instance.Ball && MatchSystem.instance.MatchStarted)
             {
-                if (MatchSystem.instance.Ball.GetComponent<NetworkIdentity>().Owner)
+                if (MatchSystem.instance.Ball.GetComponent<NetworkIdentity>().Owner && !MatchSystem.instance.hasScored)
                 {
                     TEAM_TYPE teamThatScored = MatchSystem.instance.GetOpposingTeam(Team);
                     MatchSystem.instance.OnGoal(teamThatScored);
-                    
+                    if(teamThatScored == MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().Team.TeamType)
+                        MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().GoalsScored += 1;
+                    else
+                        MatchSystem.instance.LocalChad.gameObject.GetComponent<NetworkPlayer>().Owngoal += 1;
                 }
                 StartCoroutine(EmitSparkForDuration(5.0f));
             }
