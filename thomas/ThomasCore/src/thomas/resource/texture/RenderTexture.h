@@ -20,12 +20,11 @@ namespace thomas
 		{
 		public:
 			RenderTexture(int width, int height);
-
+			virtual ~RenderTexture();
 			void WriteCanvas(graphics::GUI::Canvas* canvas);
 
 		private:
 			ID3D11RenderTargetView* m_rtv;
-			DirectX::ScratchImage* data;
 		};
 	}
 }

@@ -39,6 +39,7 @@ namespace thomas
 			bool CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, bool multiSample = true);
 			bool CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
+			bool CreateRenderTexture(int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView*& RTV);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateQuery(D3D11_QUERY type, ID3D11Query*& query);
 		

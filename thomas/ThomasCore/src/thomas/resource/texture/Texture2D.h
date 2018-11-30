@@ -34,7 +34,7 @@ namespace thomas
 			static Texture2D* GetWhiteTexture();
 			static Texture2D* GetNormalTexture();
 
-		private:
+		protected:
 			DirectX::ScratchImage* data;
 			int m_mipmapCount;
 			bool m_mipMap;

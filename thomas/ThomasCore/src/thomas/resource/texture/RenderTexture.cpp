@@ -15,11 +15,16 @@ namespace thomas
 
 			ID3D11Texture2D *textureInterface = nullptr;
 
-			utils::D3D::Instance()->CreateRenderTarget(width, height, textureInterface, m_rtv, m_srv, false);
+			utils::D3D::Instance()->CreateRenderTexture(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, m_rtv);
 			
 
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
+		}
+
+		RenderTexture::~RenderTexture()
+		{
+			SAFE_RELEASE(m_rtv);
 		}
 
 		void RenderTexture::WriteCanvas(graphics::GUI::Canvas * canvas)
