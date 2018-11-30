@@ -133,6 +133,7 @@ public class Team
             return;
         }
         Players.Remove(player);
+        player.Team = null;
         Debug.Log(player.Name + " left team " + Name);
     }
     

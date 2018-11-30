@@ -28,8 +28,8 @@ namespace ThomasEngine
 #endif
 		nativePtr->Destroy();
 	
-		if(this->GetType() != GameObject::typeid)
-			delete nativePtr;
+		//if(this->GetType() != GameObject::typeid)
+		delete nativePtr;
 	}
 	
 	void Object::Destroy()

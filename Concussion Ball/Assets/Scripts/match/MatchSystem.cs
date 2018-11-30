@@ -40,6 +40,7 @@ public class MatchSystem : NetworkManager
     public bool PublicServer = true;
     public bool SpawnPowerupsDuringGame = true;
     public int ScoreLimit = 0;
+    //public int MaxPlayers = 8;
 
 
     public float lostTime = 0.0f;
@@ -133,10 +134,6 @@ public class MatchSystem : NetworkManager
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
                 if (Input.GetKeyDown(Input.Keys.D3))
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                if (Input.GetKeyDown(Input.Keys.Enter))
-                {
-                    OnMatchStart();
-                }
 #if T_FOR_RESET
                 if(Input.GetKeyDown(Input.Keys.T))
                 {
@@ -338,7 +335,7 @@ public class MatchSystem : NetworkManager
     }
 
 
-    void OnMatchStart()
+    public void OnMatchStart()
     {
         if (MatchStarted)
             return;
@@ -372,7 +369,11 @@ public class MatchSystem : NetworkManager
     public void JoinTeam(TEAM_TYPE team)
     {
         NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-        np.JoinTeam(team);
+        int playersInTeam = Teams[team].PlayerCount;
+        if ((MaxPlayers / 2.0f) > playersInTeam)
+            np.JoinTeam(team);
+        else
+            Debug.Log(team + " is already full");
     }
 
 #endregion
