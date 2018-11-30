@@ -12,9 +12,6 @@ public class GUISelectTeam : ScriptComponent
     public Animation RunningAnim { get; set; }
     public Animation IdleAnim { get; set; }
 
-    public GameObject ChadTeam1 { get; set; }
-    public GameObject ChadTeam2 { get; set; }
-
     Camera Camera;
 
     public Canvas Canvas;
@@ -118,7 +115,7 @@ public class GUISelectTeam : ScriptComponent
             Debug.Log("Ready up clicked!!");
             MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
         }
-        else if (StartGame.Clicked() || MatchSystem.instance.MatchStarted)
+        else if ((StartGame.Clicked() || MatchSystem.instance.MatchStarted) && Canvas.isRendering)
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             CameraMaster.instance.State = CAM_STATE.GAME;
