@@ -67,7 +67,7 @@ namespace ThomasEngine {
 	{
 #ifdef _EDITOR
 		if (ThomasWrapper::IsEditor() && !m_instance)
-			Serializer::SerializeMaterial(this, m_path);
+			Serializer::SerializeMaterial(this, Path);
 #endif
 	}
 
@@ -79,7 +79,7 @@ namespace ThomasEngine {
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		else
 		{
-			m_nativePtr = new thomas::resource::Material(Utility::ConvertString(m_path));
+			m_nativePtr = new thomas::resource::Material(Utility::ConvertString(Path));
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		}
 	}

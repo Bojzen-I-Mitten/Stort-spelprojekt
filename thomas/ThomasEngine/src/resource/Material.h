@@ -60,8 +60,8 @@ namespace ThomasEngine
 		property String^ Name
 		{
 			String^ get() override { 
-				if (m_path->Length > 0)
-					return System::IO::Path::GetFileNameWithoutExtension(m_path);
+				if (ContainsData())
+					return System::IO::Path::GetFileNameWithoutExtension(Path);
 				else
 				{
 					return "Default Material";

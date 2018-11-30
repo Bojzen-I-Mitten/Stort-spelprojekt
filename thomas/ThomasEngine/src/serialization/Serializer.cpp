@@ -193,7 +193,7 @@ namespace ThomasEngine
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
 			Material^ material = (Material^)serializer->Deserialize(file, Material::typeid);
-			material->m_path = path;
+			material->Path = path;
 			rootType = nullptr;
 			file->Close();
 			return material;

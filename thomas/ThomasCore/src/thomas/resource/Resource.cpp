@@ -53,7 +53,7 @@ namespace thomas
 			name = name.substr(0, name.find_last_of('.'));
 			return name;
 		}
-		void Resource::setName(std::string name)
+		void Resource::setName(const std::string& name)
 		{
 			m_name = name;
 			m_hash = utility::hash(name);
