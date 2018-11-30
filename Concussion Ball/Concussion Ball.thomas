@@ -17,6 +17,10 @@
       <Name>Team 2 character</Name>
       <collisionMask>4294967295</collisionMask>
     </Layer>
+    <Layer>
+      <Name>Chad</Name>
+      <collisionMask>4294967295</collisionMask>
+    </Layer>
   </m_layers>
   <m_name>Concussion Ball</m_name>
   <m_relativeAssemblyPath>Assembly</m_relativeAssemblyPath>

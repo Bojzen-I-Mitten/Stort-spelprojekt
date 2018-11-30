@@ -1,6 +1,6 @@
 ﻿using ThomasEngine;
 
-[ExecuteInEditor]
+//[ExecuteInEditor]
 public class Forcefield : ScriptComponent
 {
     public TEAM_TYPE Team { get; set; }
