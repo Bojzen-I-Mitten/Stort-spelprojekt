@@ -40,7 +40,7 @@ public class MatchSystem : NetworkManager
     public bool PublicServer = true;
     public bool SpawnPowerupsDuringGame = true;
     public int ScoreLimit = 0;
-    public int MaxPlayers = 8;
+    //public int MaxPlayers = 8;
 
 
     public float lostTime = 0.0f;
@@ -134,10 +134,6 @@ public class MatchSystem : NetworkManager
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
                 if (Input.GetKeyDown(Input.Keys.D3))
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                if (Input.GetKeyDown(Input.Keys.Enter))
-                {
-                    OnMatchStart();
-                }
 #if T_FOR_RESET
                 if(Input.GetKeyDown(Input.Keys.T))
                 {
@@ -339,7 +335,7 @@ public class MatchSystem : NetworkManager
     }
 
 
-    void OnMatchStart()
+    public void OnMatchStart()
     {
         if (MatchStarted)
             return;

@@ -12,6 +12,9 @@ public class GUISelectTeam : ScriptComponent
     public Animation RunningAnim { get; set; }
     public Animation IdleAnim { get; set; }
 
+    public GameObject ChadTeam1 { get; set; }
+    public GameObject ChadTeam2 { get; set; }
+
     Camera Camera;
 
     public Canvas Canvas;
@@ -63,7 +66,7 @@ public class GUISelectTeam : ScriptComponent
 
             Material[] mats = ChadRSC1.materials;
 
-            Chad1Mat = mats[1] = new Material(mats[1]);
+            Chad1Mat = mats[0] = new Material(mats[0]);
 
             ChadRSC1.materials = mats;
 
@@ -75,7 +78,7 @@ public class GUISelectTeam : ScriptComponent
 
             Material[] mats = ChadRSC2.materials;
 
-            Chad2Mat = mats[1] = new Material(mats[1]);
+            Chad2Mat = mats[0] = new Material(mats[0]);
 
             ChadRSC2.materials = mats;
         }
@@ -115,11 +118,12 @@ public class GUISelectTeam : ScriptComponent
             Debug.Log("Ready up clicked!!");
             MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
         }
-        else if (StartGame.Clicked())
+        else if (StartGame.Clicked() || MatchSystem.instance.MatchStarted)
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             CameraMaster.instance.State = CAM_STATE.GAME;
             CameraMaster.instance.Canvas.isRendering = false;
+            MatchSystem.instance.OnMatchStart();
             gameObject.GetComponent<SpectatorCam>().enabled = true;
         }
 
