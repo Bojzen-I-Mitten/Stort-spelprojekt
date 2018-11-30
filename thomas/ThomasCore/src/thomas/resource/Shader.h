@@ -21,22 +21,23 @@ namespace thomas
 			enum class Semantics
 			{
 				POSITION = 0,
-				TEXCOORD = 1,
-				NORMAL = 2,
-				TANGENT = 3,
-				BITANGENT = 4, // Replace with Tangent + cross mult?
-				BINORMAL = 5,
-				BLENDINDICES = 6,
-				BLENDWEIGHT = 7,
-				COLOR = 8,
-				POSITIONT = 9,
-				PSIZE = 10,
-				BONEINDICES = 11,
-				BONEWEIGHTS = 12,
-				NORMALTEXTURE = 13,
-				MATERIALSMOOTHNESSFACTOR = 14,
-				UVTILING = 15,
-				UNKNOWN = 16
+				TEXCOORD = 1, // TEXCOORD0
+				TEXCOORD1 = 2,
+				NORMAL = 3,
+				TANGENT = 4,
+				BITANGENT = 5, // Replace with Tangent + cross mult?
+				BINORMAL = 6,
+				BLENDINDICES = 7,
+				BLENDWEIGHT = 8,
+				COLOR = 9,
+				POSITIONT = 10,
+				PSIZE = 11,
+				BONEINDICES = 12,
+				BONEWEIGHTS = 13,
+				NORMALTEXTURE = 14,
+				MATERIALSMOOTHNESSFACTOR = 15,
+				UVTILING = 16,
+				UNKNOWN = 17
 			};
 
 		protected:
@@ -54,7 +55,7 @@ namespace thomas
 			void Destroy();
 			void OnChanged();
 
-			Semantics GetSemanticFromName(std::string semanticName);
+			Semantics GetSemanticFromName(std::string semanticName, uint32_t semanticIndex);
 			/* Add the effect variable property.
 			prop		<<	Effect variable read from shader
 			propIndex	<<	Index of the effect variable

@@ -33,6 +33,8 @@ public class GUIMainMenu : ScriptComponent
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
+    Vector3 MainMenuCamPos;
+    Vector3 MainMenuCamRot;
 
     public override void OnAwake()
     {
@@ -44,6 +46,8 @@ public class GUIMainMenu : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         TakeName = false;
         AddImagesAndText();
+        MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
+        MainMenuCamRot = Vector3.Zero;
     }
 
     public override void Update()
@@ -52,7 +56,6 @@ public class GUIMainMenu : ScriptComponent
         Options.color = Unselected;
         Credits.color = Unselected;
         Exit.color = Unselected;
-        TextBoxName.color = Unselected;
 
         if (Play.Hovered())
             Play.color = Selected;
@@ -62,6 +65,15 @@ public class GUIMainMenu : ScriptComponent
             Credits.color = Selected;
         else if (Exit.Hovered())
             Exit.color = Selected;
+
+        if (PlayerString == "")
+        {
+            TextBoxName.color = Color.Red;
+        }
+        else
+        {
+            TextBoxName.color = Color.Black;
+        }
 
         if (TextBoxName.Clicked())
         {
@@ -89,9 +101,10 @@ public class GUIMainMenu : ScriptComponent
             Caret.text = "";
         }
 
-        if (Play.Clicked())
+        if (Play.Clicked() && PlayerString != "")
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+            TakeName = false;
         }
 
         PlayerString = PlayerString.ToUpper();
@@ -111,42 +124,34 @@ public class GUIMainMenu : ScriptComponent
         #region Text
         #region  Play
         Play = Canvas.Add("Play");
-        Play.position = new Vector2(0.425f, 0.11f);
-        Play.scale = new Vector2(1.5f);
+        Play.position = new Vector2(0.1f, 0.11f);
         Play.interactable = true;
         Play.depth = 0.9f;
         Play.text = "Play";
-        Play.font = TextFont;
         #endregion
 
         #region  Options
         Options = Canvas.Add("Options");
-        Options.position = new Vector2(0.425f, 0.21f);
-        Options.scale = new Vector2(1.5f);
+        Options.position = new Vector2(0.1f, 0.21f);
         Options.interactable = true;
         Options.depth = 0.9f;
         Options.text = "Options";
-        Options.font = TextFont;
         #endregion
 
         #region Credits
         Credits = Canvas.Add("Credits");
-        Credits.position = new Vector2(0.425f, 0.31f);
-        Credits.scale = new Vector2(1.5f);
+        Credits.position = new Vector2(0.1f, 0.31f);
         Credits.interactable = true;
         Credits.depth = 0.9f;
         Credits.text = "Credits";
-        Credits.font = TextFont;
         #endregion
 
         #region Exit
         Exit = Canvas.Add("Exit");
-        Exit.position = new Vector2(0.425f, 0.41f);
-        Exit.scale = new Vector2(1.5f);
+        Exit.position = new Vector2(0.1f, 0.41f);
         Exit.interactable = true;
         Exit.depth = 0.9f;
         Exit.text = "Exit";
-        Exit.font = TextFont;
         #endregion
 
         #region Player name
@@ -180,7 +185,7 @@ public class GUIMainMenu : ScriptComponent
             TextBoxName.origin = new Vector2(0.5f);
             TextBoxName.position = new Vector2(0.5f, 0.94f);
             TextBoxName.interactable = true;
-            TextBoxName.depth = 0.9f;
+            TextBoxName.depth = 0.8f;
             TextBoxName.color = Color.Black;
         }
 
@@ -194,6 +199,13 @@ public class GUIMainMenu : ScriptComponent
         }
 
         #endregion
+    }
+
+    public void SetUpScene()
+    {
+        transform.position = MainMenuCamPos;
+        transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
+
     }
 
     public void ClearImagesAndText()

@@ -18,6 +18,7 @@ public class NetworkPlayer : NetworkComponent
     public int HasTackled = 0;
     public int BeenTackled = 0;
     public int GoalsScored = 0;
+    public bool ReadyToStart = false;
 
     Material mat;
     Rigidbody rb;
@@ -107,11 +108,13 @@ public class NetworkPlayer : NetworkComponent
     {
 
         writer.Put(PlayerName);
+        writer.Put(ReadyToStart);
 
         if (Team != null)
             writer.Put((int)Team.TeamType);
         else
             writer.Put((int)TEAM_TYPE.UNASSIGNED);
+
         return true;
     }
 
@@ -119,7 +122,7 @@ public class NetworkPlayer : NetworkComponent
     {
 
         PlayerName = reader.GetString();
-        
+        ReadyToStart = reader.GetBool();
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
@@ -130,7 +133,6 @@ public class NetworkPlayer : NetworkComponent
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
         }
-
     }
     
     public void JoinTeam(TEAM_TYPE teamType)
@@ -172,9 +174,14 @@ public class NetworkPlayer : NetworkComponent
         
     }
 
-
     public void JoinTeam(Team team)
     {
+        if (this.Team == team)
+        {
+            Debug.LogWarning("Player is already in team.");
+            return;
+        }
+
         if (this.Team != null)
         {
             this.Team.RemovePlayer(this);
@@ -185,5 +192,12 @@ public class NetworkPlayer : NetworkComponent
             mat?.SetColor("color", Team.Color);
         }
 
+    }
+
+    public void Ready(bool ready)
+    {
+        ReadyToStart = ready;
+        if(isOwner)
+            SendRPC("Ready", ReadyToStart);
     }
 }
