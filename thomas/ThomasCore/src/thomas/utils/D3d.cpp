@@ -202,7 +202,7 @@ namespace thomas
 			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
 			rtvDesc.Format = bufferDesc.Format;
 			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
+			
 			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 			ZeroMemory(&srvDesc, sizeof(srvDesc));
 			srvDesc.Format = bufferDesc.Format;
@@ -210,7 +210,7 @@ namespace thomas
 
 			srvDesc.Texture2D.MipLevels = 1;
 			srvDesc.Texture2D.MostDetailedMip = 0;
-
+			
 			HRESULT hr = m_device->CreateTexture2D(&bufferDesc, NULL, &tex);
 			if (SUCCEEDED(hr))
 			{

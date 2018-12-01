@@ -42,6 +42,7 @@ namespace thomas
 					{
 						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
 					}
+					m_spriteBatch->SetViewport(GetViewport());
 					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
 
 					for (int i = 0; i < m_GUIElements.size(); ++i)

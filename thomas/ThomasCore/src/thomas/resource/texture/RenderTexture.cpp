@@ -29,7 +29,6 @@ namespace thomas
 
 		void RenderTexture::WriteCanvas(graphics::GUI::Canvas * canvas)
 		{
-
 			utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_rtv, Color(1.0f, 1.0f, 1.0f));
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 
