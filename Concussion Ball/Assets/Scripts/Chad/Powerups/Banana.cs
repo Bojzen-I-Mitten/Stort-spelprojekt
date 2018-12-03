@@ -9,10 +9,10 @@ public class Banana : Powerup
 
     public float ExplosionRadius { get; set; } = 8.0f;
     public float ExplosionForce;
-    public float DespawnTime = 60.0f;
+    public float DespawnTime;
 
-    private bool _BananaTriggered = false;
-    private float _BananaTimer = 0.0f;
+    private bool _BananaTriggered;
+    private float _BananaTimer;
 
     public override void OnAwake()
     {
@@ -27,9 +27,9 @@ public class Banana : Powerup
         ThrowForce = BaseThrowForce;
         m_rigidBody.Friction = 100.0f;
 
-        //DespawnTime = 60.0f;
-        //_BananaTriggered = false;
-        //_BananaTimer = 0.0f;
+        DespawnTime = 6.0f;
+        _BananaTriggered = false;
+        _BananaTimer = 0.0f;
 
 
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
@@ -45,7 +45,8 @@ public class Banana : Powerup
 
         if (_BananaTimer > DespawnTime)
         {
-            Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
+            //Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
+            //Activate();
             // Despawn
         }
         else if (_BananaTimer > 0)
@@ -65,11 +66,12 @@ public class Banana : Powerup
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
         if (otherChad)
         {
-            TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-            TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(otherChad.gameObject);
+            //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+            //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(otherChad.gameObject);
 
-            if(playerTeam != otherPlayerTeam)
-                base.OnCollisionEnter(collider);
+            //if(playerTeam != otherPlayerTeam)
+            //    base.OnCollisionEnter(collider);
+            base.OnCollisionEnter(collider);
         }
         else
         {
@@ -77,7 +79,7 @@ public class Banana : Powerup
             Debug.Log("Banana collision with static object: " + collider.gameObject.Name);
 
             m_rigidBody.Friction = 100.0f;
-            PickupCollider.enabled = true;
+            //PickupCollider.enabled = true;
             //Debug.Log("Iskinematic enabled: " + m_rigidBody.IsKinematic);
             
         }
