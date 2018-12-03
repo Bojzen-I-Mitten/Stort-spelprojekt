@@ -61,8 +61,8 @@ namespace ThomasEngine
 		property String^ Name
 		{
 			String^ get() override { 
-				if (m_path->Length > 0)
-					return System::IO::Path::GetFileNameWithoutExtension(m_path);
+				if (ContainsData())
+					return System::IO::Path::GetFileNameWithoutExtension(Path);
 				else
 				{
 					return "Default Material";
@@ -107,6 +107,11 @@ namespace ThomasEngine
 		{
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
+		}
+		[IgnoreDataMemberAttribute]
+		property thomas::resource::Material* Native
+		{
+			thomas::resource::Material* get();
 		}
 #ifdef _EDITOR
 		[IgnoreDataMemberAttribute]

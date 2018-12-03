@@ -138,8 +138,10 @@ namespace ThomasEngine.Network
             {
                 foreach (NetworkIdentity identity in ObjectOwners[peer])
                 {
+                    identity.OnDisconnect();
                     if (amINewOwner)
                         identity.Owner = true;
+                }
 
                     identity.OnDisconnect();
                 }

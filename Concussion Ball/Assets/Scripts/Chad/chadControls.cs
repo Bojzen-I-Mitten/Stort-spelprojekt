@@ -466,7 +466,6 @@ public class ChadControls : NetworkComponent
     public void RPCResetThrow()
     {
         HasThrown = false;
-        ChadHud.Instance.DeactivateAimHUD();
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
@@ -481,6 +480,7 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
+        ChadHud.Instance.DeactivateAimHUD();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
     }
@@ -851,7 +851,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner && State != STATE.RAGDOLL && !Locked)
+        if (MatchSystem.instance && isOwner && State != STATE.RAGDOLL && !Locked)
         {
             ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
 
@@ -872,6 +872,8 @@ public class ChadControls : NetworkComponent
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
+
+                    NetPlayer.HasTackled += 1;
                 }
 
             } 

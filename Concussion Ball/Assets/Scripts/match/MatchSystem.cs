@@ -40,6 +40,7 @@ public class MatchSystem : NetworkManager
     public bool PublicServer = true;
     public bool SpawnPowerupsDuringGame = true;
     public int ScoreLimit = 0;
+    //public int MaxPlayers = 8;
 
 
     public float lostTime = 0.0f;
@@ -115,6 +116,7 @@ public class MatchSystem : NetworkManager
         endroundSound.Clip = endroundSoundClip;
         endroundSound.Looping = false;
         
+        
         //StartCoroutine(ResetCoroutine(10));
     }
 
@@ -133,10 +135,6 @@ public class MatchSystem : NetworkManager
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
                 if (Input.GetKeyDown(Input.Keys.D3))
                     localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                if (Input.GetKeyDown(Input.Keys.Enter))
-                {
-                    OnMatchStart();
-                }
 #if T_FOR_RESET
                 if(Input.GetKeyDown(Input.Keys.T))
                 {
@@ -202,6 +200,22 @@ public class MatchSystem : NetworkManager
     }
 #endregion
 
+   void ResetNetworkplayerPoints()
+    {
+        foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_1].Players)
+        {
+            Player.GoalsScored = 0;
+            Player.HasTackled = 0;
+            Player.Owngoal = 0;
+        }
+        foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_2].Players)
+        {
+            Player.GoalsScored = 0;
+            Player.HasTackled = 0;
+            Player.Owngoal = 0;
+        }
+
+    }
 #region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
@@ -211,7 +225,7 @@ public class MatchSystem : NetworkManager
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
         
-	GUIScoreScreen.Instance.Toggle(false);
+	    GUIScoreScreen.Instance.Toggle(false);
         for(int i=0;i<GUIScoreScreen.Instance.ScoreScreenTimeLast;i++)
         {
             GUIScoreScreen.Instance.updateTextPlayAgain();
@@ -220,9 +234,9 @@ public class MatchSystem : NetworkManager
             if (GUIScoreScreen.Instance.getToggleBool())
                 break;
         }
-	RPCStartMatch();
-	
-	GUIScoreScreen.Instance.Toggle(true);
+        ResetNetworkplayerPoints();
+        RPCStartMatch();
+	    GUIScoreScreen.Instance.Toggle(true);
         GUIPlayerScore.Instance.Toggle = false;
     }
 
@@ -339,7 +353,7 @@ public class MatchSystem : NetworkManager
     }
 
 
-    void OnMatchStart()
+    public void OnMatchStart()
     {
         if (MatchStarted)
             return;
@@ -373,7 +387,11 @@ public class MatchSystem : NetworkManager
     public void JoinTeam(TEAM_TYPE team)
     {
         NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-        np.JoinTeam(team);
+        int playersInTeam = Teams[team].PlayerCount;
+        if ((MaxPlayers / 2.0f) > playersInTeam)
+            np.JoinTeam(team);
+        else
+            Debug.Log(team + " is already full");
     }
 
 #endregion
