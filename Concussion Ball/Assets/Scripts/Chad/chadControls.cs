@@ -480,7 +480,6 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
-        Debug.Log("Deactivate Aim HUD");
         ChadHud.Instance.DeactivateAimHUD();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
