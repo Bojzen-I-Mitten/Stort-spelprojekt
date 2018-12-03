@@ -161,8 +161,8 @@ namespace ThomasEngine
 
 	GameObject^ Serializer::DeserializeGameObject(Newtonsoft::Json::Linq::JArray^ ja)
 	{
-		try {
-
+		try 
+		{
 			List<GameObject^>^ gameObject = ja->ToObject<List<GameObject^>^>(serializer);
 			return gameObject[0];
 		}
