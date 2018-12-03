@@ -67,8 +67,11 @@ namespace ThomasEngine
 			return;	// Do nothing
 		// Swap and clear
 		Transform^  oldParent = SwapParent(new_parent, worldPositionStays);
-		if(oldParent)
-			assert(oldParent->RemoveChild(this));
+		if (oldParent) {
+			bool result = oldParent->RemoveChild(this);
+			assert(result);
+		}
+			
 		// Trigger event
 		OnParentChanged(this, oldParent, new_parent);
 	}

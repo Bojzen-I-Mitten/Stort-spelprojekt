@@ -681,6 +681,8 @@ namespace ThomasEditor
         {
             MenuItem item = sender as MenuItem;
             GameObjectHierarchy.instance.updateHiearchyParenting = item.IsChecked;
+            if (item.IsChecked)
+                GameObjectHierarchy.instance.ResetTreeView();
             Properties.Settings.Default.updateHiearchyParenting = item.IsChecked;
             Properties.Settings.Default.Save();
         }

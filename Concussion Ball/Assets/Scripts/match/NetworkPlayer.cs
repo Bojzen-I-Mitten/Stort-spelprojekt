@@ -130,7 +130,7 @@ public class NetworkPlayer : NetworkComponent
 
     public override void OnDisconnect()
     {
-        JoinTeam(null);
+        JoinTeam(TEAM_TYPE.UNASSIGNED);
     }
 
     public override void OnRead(NetDataReader reader, bool initialState)

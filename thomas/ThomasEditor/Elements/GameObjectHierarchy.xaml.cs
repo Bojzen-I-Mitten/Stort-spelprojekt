@@ -67,7 +67,7 @@ namespace ThomasEditor
 
         }
 
-        private void ResetTreeView()
+        public void ResetTreeView()
         {
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
