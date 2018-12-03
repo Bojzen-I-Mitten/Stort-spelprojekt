@@ -398,7 +398,6 @@ public class ChadHud : ScriptComponent
         //else
         //{
         //    HideHeldObjectText();
-        //    //DeactivateAimHUD();
         //}
 
         if (BallArrow != null)
