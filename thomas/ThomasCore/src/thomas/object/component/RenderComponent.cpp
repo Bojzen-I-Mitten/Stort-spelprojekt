@@ -69,6 +69,10 @@ namespace thomas {
 				for (unsigned int i = 0; i < m_materials.size(); i++)
 					SetMaterial(i, material);
 			}
+			uint32_t RenderComponent::numMeshes()
+			{
+				return m_model != nullptr ? m_model->GetMeshCount() : 0;
+			}
 			void RenderComponent::SetMaterial(int meshIndex, resource::Material * material)
 			{
 				EDITOR_LOCK();
@@ -92,6 +96,26 @@ namespace thomas {
 					return m_materials[meshIndex];
 				else
 					return resource::Material::GetStandardMaterial();
+			}
+			resource::Material * RenderComponent::findMaterial(uint32_t hash)
+			{
+				EDITOR_LOCK();
+				for (size_t i = 0; i < m_materials.size(); i++)
+				{
+					if (m_materials[i]->getHash() == hash)
+						return m_materials[i];
+				}
+				return nullptr;
+			}
+			int RenderComponent::findMaterialIndex(uint32_t hash)
+			{
+				EDITOR_LOCK();
+				for (size_t i = 0; i < m_materials.size(); i++)
+				{
+					if (m_materials[i]->getHash() == hash)
+						return (int)i;
+				}
+				return -1;
 			}
 
 			std::vector<resource::Material*> RenderComponent::GetMaterials()

@@ -115,6 +115,12 @@ namespace ThomasEngine
 				return m_scene_id; // != 0
 			}
 		}
+		/* Fetch scene index
+		*/
+		property uint32_t SceneID {
+			uint32_t get() { return m_scene_id;  }
+		}
+
 		property UINT GroupIDSelf
 		{
 			UINT get();
@@ -161,6 +167,15 @@ namespace ThomasEngine
 		property IEnumerable<Transform^>^ Children
 		{
 			IEnumerable<Transform^>^ get();
+		}
+
+		/* Quick access to the object's parent.
+		*/
+		[BrowsableAttribute(false)]
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property GameObject^ Parent
+		{
+			GameObject^ get();
 		}
 
 		[BrowsableAttribute(false)]

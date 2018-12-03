@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-//#define L_FOR_RAGDOLL
+#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
@@ -236,6 +236,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
+
         rBody.Friction = 0.5f;
         if (!OnGround())
             rBody.Friction = 0.0f;
@@ -358,17 +359,8 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
-    public void OnDisconnect()
-    {
-        if (PickedUpObject)
-        {
-            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
-                (PickedUpObject as Powerup).Remove();
-            else
-                PickedUpObject.Drop();
-        }
 
-    }
+
 
     #region Input handling
     private void HandleKeyboardInput()
@@ -474,7 +466,6 @@ public class ChadControls : NetworkComponent
     public void RPCResetThrow()
     {
         HasThrown = false;
-        ChadHud.Instance.DeactivateAimHUD();
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
@@ -489,6 +480,7 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
+        ChadHud.Instance.DeactivateAimHUD();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
     }
@@ -834,6 +826,17 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
+    private void Pickup(PickupableObject pickupable)
+    {
+        if (pickupable.transform.parent == null)
+        {
+            TakeOwnership(pickupable.gameObject);
+            RPCPickup(pickupable.ID);
+            //SendRPC("RPCPickup", pickupable.ID);
+
+        }
+    }
+
     public override void OnTriggerEnter(Collider collider)
     {
         if (isOwner && State != STATE.RAGDOLL && !Locked)
@@ -841,20 +844,14 @@ public class ChadControls : NetworkComponent
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && pickupable.gameObject.GetActive() && PickedUpObject == null)
             {
-                if (pickupable.transform.parent == null)
-                {
-                    TakeOwnership(pickupable.gameObject);
-                    RPCPickup(pickupable.ID);
-                    //SendRPC("RPCPickup", pickupable.ID);
-
-                }
+                Pickup(pickupable);
             }
         }
     }
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner && State != STATE.RAGDOLL && !Locked)
+        if (MatchSystem.instance && isOwner && State != STATE.RAGDOLL && !Locked)
         {
             ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
 
@@ -875,6 +872,8 @@ public class ChadControls : NetworkComponent
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
+
+                    NetPlayer.HasTackled += 1;
                 }
 
             } 

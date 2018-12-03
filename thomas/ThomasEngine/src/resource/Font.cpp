@@ -17,7 +17,7 @@ namespace ThomasEngine
 
 	void Font::OnDeserialized(StreamingContext c)
 	{
-		m_nativePtr = new thomas::resource::Font(Utility::ConvertString(m_path));
+		m_nativePtr = new thomas::resource::Font(Utility::ConvertString(Path));
 	}
 
 }

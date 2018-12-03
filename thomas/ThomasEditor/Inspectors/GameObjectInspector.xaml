@@ -41,7 +41,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <!--<CheckBox Margin="10"  IsChecked="{Binding activeSelf}" Grid.Column="0" HorizontalAlignment="Center" ToolTip="Active?"/>-->
+            <CheckBox Margin="10"  IsChecked="{Binding activeSelf}" Grid.Column="0" HorizontalAlignment="Center" ToolTip="Active?"/>
             <TextBox VerticalAlignment="Top" Height="20" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="5" Grid.Column="1"/>
             <!--<TextBox VerticalAlignment="Top" Height="20" Text="{Binding GroupIDSelf, UpdateSourceTrigger=LostFocus}" Margin="5,30,167,0" Grid.Column="1"/>-->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Width="263" RenderTransformOrigin="0.507,0.444" Grid.ColumnSpan="2" Margin="0,30,0,2" Grid.Column="1">
