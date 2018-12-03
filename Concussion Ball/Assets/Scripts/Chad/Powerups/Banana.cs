@@ -69,7 +69,7 @@ public class Banana : Powerup
             //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
             //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(otherChad.gameObject);
 
-            //if(playerTeam != otherPlayerTeam)
+            //if (playerTeam != otherPlayerTeam)
             //    base.OnCollisionEnter(collider);
             base.OnCollisionEnter(collider);
         }
@@ -79,8 +79,7 @@ public class Banana : Powerup
             Debug.Log("Banana collision with static object: " + collider.gameObject.Name);
 
             m_rigidBody.Friction = 100.0f;
-            //PickupCollider.enabled = true;
-            //Debug.Log("Iskinematic enabled: " + m_rigidBody.IsKinematic);
+            //PickupCollider.enabled = true; // for testing
             
         }
 
@@ -105,6 +104,8 @@ public class Banana : Powerup
             // rustle his jimmies
             Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, Vector3.Zero, 0.0f);
             param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
+            param.force = otherChad.transform.forward * 500.0f;
+            param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 10.0f;
             otherChad.ActivateRagdoll(4.0f, param);
         }
         
