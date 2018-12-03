@@ -112,7 +112,10 @@ public class GUISelectTeam : ScriptComponent
         }
         else if (ReadyUp.Clicked())
         {
-            MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
+            if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
+            else
+                MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
         }
         else if ((StartGame.Clicked() || MatchSystem.instance.MatchStarted) && Canvas.isRendering)
         {
@@ -192,13 +195,13 @@ public class GUISelectTeam : ScriptComponent
             StartGame.interactable = false;
         }
 
-        if (MatchSystem.instance.LocalChad.NetPlayer.ReadyToStart)
+        if (ReadyUp.scale == Vector2.One)
         {
-            ReadyUp.text = "Unready";
+            if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                ReadyUp.text = "Unready";
+            else
+                ReadyUp.text = "Ready";
         }
-        else
-            ReadyUp.text = "Ready";
-
     }
 
     public void AddImagesAndText()
