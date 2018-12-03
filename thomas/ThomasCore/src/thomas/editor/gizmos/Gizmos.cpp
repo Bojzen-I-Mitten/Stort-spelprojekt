@@ -296,6 +296,14 @@ namespace thomas
 			corners[1] = from + direction * 1000;
 			DrawLines(corners);
 		}
+		void Gizmos::DrawRay(math::Vector3 from, math::Vector3 direction, float len)
+		{
+
+			std::vector<math::Vector3> corners(2);
+			corners[0] = from;
+			corners[1] = from + direction * len;
+			DrawLines(corners);
+		}
 
 		void Gizmos::DrawRay(math::Ray ray)
 		{

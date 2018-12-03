@@ -69,9 +69,10 @@ namespace ThomasEngine
 		return BlendTree->getBoneIndex(boneHash, boneIndex);
 	}
 
-	bool RenderSkinnedComponent::FetchBoneIndex(unsigned int boneHash, [Out] unsigned int%  boneIndex)
+	bool RenderSkinnedComponent::FetchBoneIndex(String^ boneName, [Out] unsigned int%  boneIndex)
 	{
 		if (!Native->GetBlendTree()) return false;
+		unsigned int boneHash = Utility::hash(boneName);
 		unsigned int ind;
 		bool result =  BlendTree->getBoneIndex(boneHash, ind);
 		boneIndex = ind;
@@ -103,6 +104,17 @@ namespace ThomasEngine
 			return Matrix::Identity;
 		else 
 			return Utility::Convert(Native->GetBlendTree()->getBoneOrientation(boneIndex));
+	}
+	Matrix RenderSkinnedComponent::GetBoneMatrix(uint32_t boneIndex)
+	{
+		return GetLocalBoneMatrix(boneIndex) * gameObject->transform->world;
+	}
+	Matrix RenderSkinnedComponent::GetLocalBoneMatrix(uint32_t boneIndex)
+	{
+		thomas::graphics::animation::IBlendTree *anim = Native->GetBlendTree();
+		return !anim ?
+			Matrix::Identity :
+			Utility::Convert(Native->GetBlendTree()->getBoneOrientation(boneIndex));
 	}
 
 	void RenderSkinnedComponent::applyAnimation()

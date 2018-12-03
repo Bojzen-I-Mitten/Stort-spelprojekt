@@ -67,17 +67,21 @@ namespace ThomasEngine
 		*/
 		void setBlendTreeNode(Script::PlaybackNode ^ node);
 		/* Fetch bone index from name hash.
+		*/
+		bool FetchBoneIndex(String^ bone, [Out] unsigned int% boneIndex);
+		/* Fetch bone index from name hash.
 		*/ 
 		bool FetchBoneIndex(unsigned int boneHash, unsigned int& boneIndex);
-		/* Fetch bone index from name hash.
-		*/
-		bool FetchBoneIndex(unsigned int boneHash, [Out] unsigned int% boneIndex);
 		/* Get the bone matrix in world space.
 		*/
 		Matrix GetBoneMatrix(int boneIndex);
 		/* Get the bone matrix in local space.
 		*/
 		Matrix GetLocalBoneMatrix(int boneIndex);
+
+		Matrix GetBoneMatrix(uint32_t boneIndex);
+
+		Matrix GetLocalBoneMatrix(uint32_t boneIndex);
 
 	internal:
 		void Update() override;

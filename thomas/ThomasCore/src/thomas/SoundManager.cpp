@@ -8,6 +8,10 @@
 
 namespace thomas
 {
+	SoundManager::SoundManager()
+		: m_lock()
+	{
+	}
 	void SoundManager::Init()
 	{
 		m_system = nullptr;
@@ -58,7 +62,9 @@ namespace thomas
 		FMOD::Sound* sound = nullptr;
 
 		ErrorCheck(m_system->createSound(file.c_str(), eMode, nullptr, &sound));
+		m_lock.lock();
 		auto inserted = m_sounds.insert(std::make_pair(id, std::move(sound)));
+		m_lock.unlock();
 
 #ifdef _DEBUG
 		assert(inserted.second);
@@ -84,11 +90,13 @@ namespace thomas
 
 	FMOD::Sound* SoundManager::GetSound(const std::string& name) const
 	{
+		m_lock.lock();
 		auto found = m_sounds.find(name);
-
 #ifdef _DEBUG
 		assert(found != m_sounds.end());
 #endif
+		m_lock.unlock();
+
 
 		return found->second;
 	}
