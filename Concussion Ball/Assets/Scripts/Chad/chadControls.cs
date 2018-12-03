@@ -881,6 +881,8 @@ public class ChadControls : NetworkComponent
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
+
+                    NetPlayer.HasTackled += 1;
                     CurrentVelocity.y = modifiedBaseSpeed;
                 }
 
