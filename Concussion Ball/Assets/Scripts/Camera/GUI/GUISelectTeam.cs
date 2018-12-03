@@ -56,7 +56,7 @@ public class GUISelectTeam : ScriptComponent
         Chad1Rot = new Vector3(45, 0, 0);
         Chad2Pos = new Vector3(-1.7f, 0, 0);
         Chad2Rot = new Vector3(-20, 0, 0);
-        
+
         if (CameraMaster.instance.ChadTeam1 != null)
         {
             ChadRSC1 = CameraMaster.instance.ChadTeam1.GetComponent<RenderSkinnedComponent>();

@@ -174,17 +174,19 @@ public class NetworkPlayer : NetworkComponent
             rb.IgnoreNextTransformUpdate();
         }
 
-        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+        if (isOwner)
         {
-            CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = false;
-            CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = true;
+            if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+            {
+                CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = false;
+                CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = true;
+            }
+            else
+            {
+                CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
+                CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
+            }
         }
-        else
-        {
-            CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
-            CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
-        }
-
     }
     public void JoinTeam(Team team)
     {
