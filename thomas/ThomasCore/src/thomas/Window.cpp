@@ -274,6 +274,7 @@ namespace thomas
 
 		utils::D3D::Instance()->GetDeviceContextDeffered()->ClearRenderTargetView(m_dx.RTV[1], clearColor);
 		utils::D3D::Instance()->GetDeviceContextDeffered()->ClearDepthStencilView(m_dx.depthStencilView[1], D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::Instance()->GetDeviceContextDeffered()->ClearDepthStencilView(m_dx.depthStencilView[0], D3D11_CLEAR_DEPTH, 1, 0);
 	}
 
 	void Window::ResolveRenderTarget()

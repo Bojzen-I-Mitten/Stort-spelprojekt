@@ -56,7 +56,7 @@ namespace thomas
 
 				static void setRAMUsage(float usage);
 				static float getRAMUsage();
-				static void setVRAMUsage(float usage, float budget);
+				static void setVRAMUsage(float total);
 			private:
 
 

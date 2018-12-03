@@ -121,6 +121,9 @@ namespace ThomasEngine {
 #ifdef BENCHMARK
 		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+
+		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetTotalMemory());
 #endif
 
 	}

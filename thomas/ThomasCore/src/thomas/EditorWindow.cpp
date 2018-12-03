@@ -3,6 +3,7 @@
 #include "Common.h"
 #include "utils\D3D.h"
 #include "utils\GpuProfiler.h"
+#include "utils\ProfileManager.h"
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -81,6 +82,7 @@ namespace thomas
 		}
 		if (m_shouldResize)
 		{
+			utils::profiling::GpuProfiler::Instance()->GetMemoryUsage();
 			ImGui_ImplDX11_InvalidateDeviceObjects();
 			m_initialized = false;
 			Resize();

@@ -1,21 +1,20 @@
 #include "LightManager.h"
-#include "..\utils\D3D.h"
 #include "..\resource\Shader.h"
 #include "..\object\Object.h"
 #include "..\object\component\LightComponent.h"
 #include "..\utils\Buffers.h"
 #include "..\resource\Shader.h"
-#include "render/ShaderList.h"
+#include "render\ShaderList.h"
 #include "ChadowMapping.h"
+#include "..\resource\texture\Texture2DArray.h"
+#include "render\Frame.h"
+
 #include <algorithm>
-#include "../resource/texture/Texture2DArray.h"
-#include "render/Frame.h"
 
 namespace thomas
 {
 	namespace graphics
 	{
-		
 		std::vector<object::component::LightComponent*> LightManager::s_lights;
 		std::unique_ptr<utils::buffers::StructuredBuffer> LightManager::s_lightBuffer;
 		resource::Texture2DArray* LightManager::s_shadowMapTextures;
@@ -23,12 +22,16 @@ namespace thomas
 
 		const unsigned LightManager::s_nrOfShadowMapsSupported;
 		unsigned LightManager::s_shadowMapSize;
+		ID3D11CommandList* LightManager::s_commandList;
 		ID3D11DepthStencilView* LightManager::s_shadowMapViews[LightManager::s_nrOfShadowMapsSupported];
 		math::Matrix LightManager::s_lightMatrices[LightManager::s_nrOfShadowMapsSupported];
 		std::vector<unsigned> LightManager::s_freeShadowMapViewIndexes;
 
 		void LightManager::Initialize()
 		{
+			s_commandList = nullptr;
+			utils::D3D::Instance()->ResetCommandList(s_commandList);
+
 			s_lightBuffer = std::make_unique<utils::buffers::StructuredBuffer>(nullptr, sizeof(LightStruct), 25, DYNAMIC_BUFFER);
 
 			s_lightCounts.nrOfDirectionalLights = 0;
@@ -55,13 +58,15 @@ namespace thomas
 				s_lightMatrices[i] = math::Matrix::Identity;
 			}
 
-
-
 			ShadowMap::InitStatics(s_shadowMapSize);
+
+			utils::D3D::Instance()->FinishCommandList(s_commandList);
+			utils::D3D::Instance()->ExecuteCommandList(s_commandList);
 		}
 		
 		void LightManager::Destroy()
 		{
+			SAFE_RELEASE(s_commandList);
 			for (unsigned i = 0; i < s_nrOfShadowMapsSupported; ++i)
 			{
 				SAFE_RELEASE(s_shadowMapViews[i]);

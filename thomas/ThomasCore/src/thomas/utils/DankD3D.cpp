@@ -18,12 +18,15 @@ namespace thomas
 			UINT SDKVersion,
 			_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel)
 		{
-			D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, &m_device, pFeatureLevel, NULL);
+			ID3D11Device* device;
+			D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, &device, pFeatureLevel, NULL);
+			device->QueryInterface(IID_PPV_ARGS(&m_device));
+			SAFE_RELEASE(device);
 		}
 
 		DankDevice::DankDevice(ID3D11Device* pdevice)
 		{
-			m_device = pdevice;
+			pdevice->QueryInterface(IID_PPV_ARGS(&m_device));
 		}
 
 		DankDevice::~DankDevice()
@@ -216,9 +219,10 @@ namespace thomas
 		}
 		HRESULT __stdcall DankDevice::CreateDeferredContext(UINT ContextFlags, ID3D11DeviceContext ** ppDeferredContext)
 		{
-			/*ID3D11DeviceContext* deviceContext;*/
-			HRESULT hr = m_device->CreateDeferredContext(ContextFlags, ppDeferredContext);
-			/**ppDeferredContext = new DankDeviceContext(deviceContext);*/
+			ID3D11DeviceContext* deviceContext;
+			HRESULT hr = m_device->CreateDeferredContext(ContextFlags, &deviceContext);
+			*ppDeferredContext = new DankDeviceContext(deviceContext);
+			SAFE_RELEASE(deviceContext);
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::OpenSharedResource(HANDLE hResource, REFIID ReturnedInterface, void ** ppResource)
@@ -271,10 +275,10 @@ namespace thomas
 		}
 		void __stdcall DankDevice::GetImmediateContext(ID3D11DeviceContext ** ppImmediateContext)
 		{
-			/*ID3D11DeviceContext* deviceContext;*/
-			m_device->GetImmediateContext(ppImmediateContext);
-			/**ppImmediateContext = new DankDeviceContext(deviceContext);
-			SAFE_RELEASE(deviceContext);*/
+			ID3D11DeviceContext* deviceContext;
+			m_device->GetImmediateContext(&deviceContext);
+			*ppImmediateContext = new DankDeviceContext(deviceContext);
+			SAFE_RELEASE(deviceContext);
 		}
 		HRESULT __stdcall DankDevice::SetExceptionMode(UINT RaiseFlags)
 		{
@@ -288,7 +292,7 @@ namespace thomas
 		//Device Context
 		DankDeviceContext::DankDeviceContext(ID3D11DeviceContext* pDeviceContext)
 		{
-			m_deviceContext = pDeviceContext;
+			pDeviceContext->QueryInterface(IID_PPV_ARGS(&m_deviceContext));
 		}
 		DankDeviceContext::~DankDeviceContext()
 		{
@@ -493,7 +497,7 @@ namespace thomas
 
 		void __stdcall DankDeviceContext::RSSetScissorRects(UINT NumRects, const D3D11_RECT * pRects)
 		{
-			RSSetScissorRects(NumRects, pRects);
+			m_deviceContext->RSSetScissorRects(NumRects, pRects);
 		}
 
 		void __stdcall DankDeviceContext::CopySubresourceRegion(ID3D11Resource * pDstResource, UINT DstSubresource, UINT DstX, UINT DstY, UINT DstZ, ID3D11Resource * pSrcResource, UINT SrcSubresource, const D3D11_BOX * pSrcBox)
@@ -508,7 +512,7 @@ namespace thomas
 
 		void __stdcall DankDeviceContext::UpdateSubresource(ID3D11Resource * pDstResource, UINT DstSubresource, const D3D11_BOX * pDstBox, const void * pSrcData, UINT SrcRowPitch, UINT SrcDepthPitch)
 		{
-			m_deviceContext->UpdateSubresource(pDstResource, DstSubresource, pDstBox, pSrcData, SrcRowPitch, SrcDepthPitch);
+			m_deviceContext->UpdateSubresource1(pDstResource, DstSubresource, pDstBox, pSrcData, SrcRowPitch, SrcDepthPitch, 0);
 		}
 
 		void __stdcall DankDeviceContext::CopyStructureCount(ID3D11Buffer * pDstBuffer, UINT DstAlignedByteOffset, ID3D11UnorderedAccessView * pSrcView)

@@ -19,7 +19,6 @@ namespace thomas
 	{
 		bool D3D::CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv)
 		{
-		 
 				D3D11_TEXTURE2D_DESC bufferDesc = {};
 				backbuffer->GetDesc(&bufferDesc);
 
@@ -31,24 +30,22 @@ namespace thomas
 				{
 
 					D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-					ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+					ZeroMemory(&rtvDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
 					rtvDesc.Format = bufferDesc.Format;
 #if THOMAS_AA_COUNT > 1
 					rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-
 #else
 					rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
+#endif
 
 					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-					ZeroMemory(&srvDesc, sizeof(srvDesc));
+					ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
 					srvDesc.Format = bufferDesc.Format;
 #if THOMAS_AA_COUNT > 1
 					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-
 #else
 					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
+#endif
 					srvDesc.Texture2D.MipLevels = 1;
 					srvDesc.Texture2D.MostDetailedMip = 0;
 

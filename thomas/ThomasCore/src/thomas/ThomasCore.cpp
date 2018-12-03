@@ -40,11 +40,11 @@ namespace thomas
 		//Init all required classes
 		if (!utils::D3D::Instance()->Init())
 			return false;
+
 		resource::Texture2D::Init();
 		graphics::Renderer::Instance()->init();		// Needs to be initiated after textures, initiates default shaders (default tex needs to be loaded)
 		ThomasTime::Init();
 		SoundManager::GetInstance()->Init();
-		graphics::Renderer::Instance()->init();
 
 		resource::Material::Init();
 		Physics::Init();

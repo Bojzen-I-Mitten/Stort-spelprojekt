@@ -294,7 +294,10 @@ namespace thomas
 				LOG("Shader: " + this->GetName() + " SetPass(), pass-index is out of range");
 				return;
 			}
-			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetInputLayout(m_passes[passIndex].inputLayout);
+			
+			if (m_passes[passIndex].inputLayout != nullptr)
+				utils::D3D::Instance()->GetDeviceContextDeffered()->IASetInputLayout(m_passes[passIndex].inputLayout);
+			
 			ID3DX11EffectPass* pass = m_effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex);
 			pass->Apply(0, utils::D3D::Instance()->GetDeviceContextDeffered());
 			m_currentPass = &m_passes[passIndex];

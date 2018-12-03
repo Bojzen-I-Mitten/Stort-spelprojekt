@@ -71,7 +71,7 @@ namespace thomas
 			bool CreateMultiThreadedInterface();
 			
 		private:
-			DankDevice* m_device;
+			ID3D11Device* m_device;
 			ID3D11DeviceContext* m_deviceContextImmediate;
 			ID3D11DeviceContext* m_deviceContextDeferred;
 			ID3D11Multithread* m_multiThreaded;

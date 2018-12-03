@@ -51,6 +51,8 @@ namespace thomas
 
 		void ParticleSystem::Initialize(unsigned maxNrOfParticles, BLEND_STATE blendState)
 		{
+			m_commandList = nullptr;
+			utils::D3D::Instance()->ResetCommandList(m_commandList);
 			m_maxNrOfParticles = maxNrOfParticles;
 			m_emitParticlesCS = Renderer::Instance()->getShaderList().CreateComputeShader("../Data/FXIncludes/emitParticlesCS.fx");
 			m_updateParticlesCS = Renderer::Instance()->getShaderList().CreateComputeShader("../Data/FXIncludes/updateParticlesCS.fx");
@@ -99,11 +101,14 @@ namespace thomas
 			m_texArr = new resource::Texture2DArray(256, 256, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
 
 			m_blendState = blendState;
+
+			utils::D3D::Instance()->FinishCommandList(m_commandList);
+			utils::D3D::Instance()->ExecuteCommandList(m_commandList);
 		}
 
 		void ParticleSystem::Destroy()
 		{
-			
+			SAFE_RELEASE(m_commandList);
 			SAFE_RELEASE(m_bufferAliveListPing);
 			SAFE_RELEASE(m_bufferAliveListPong);
 			SAFE_RELEASE(m_bufferDeadList);

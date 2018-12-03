@@ -233,7 +233,7 @@ namespace thomas
 			virtual UINT STDMETHODCALLTYPE GetExceptionMode(void);
 
 		protected:
-			ID3D11Device* m_device;
+			ID3D11Device1* m_device;
 		};
 
 		class DankDeviceContext : public ID3D11DeviceContext
@@ -677,7 +677,7 @@ namespace thomas
 				_COM_Outptr_opt_  ID3D11CommandList **ppCommandList);
 
 		private:
-			ID3D11DeviceContext* m_deviceContext;
+			ID3D11DeviceContext1* m_deviceContext;
 		};
 	}
 }
@@ -688,7 +688,7 @@ inline void CreateDankDevice(_In_opt_ IDXGIAdapter* pAdapter,
 	UINT Flags,
 	_In_reads_opt_(FeatureLevels) CONST D3D_FEATURE_LEVEL* pFeatureLevels,
 	UINT FeatureLevels,
-	thomas::utils::DankDevice** ppDevice,
+	ID3D11Device** ppDevice,
 	UINT SDKVersion,
 	_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel)
 {

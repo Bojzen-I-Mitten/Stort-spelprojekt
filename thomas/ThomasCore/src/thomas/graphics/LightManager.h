@@ -1,9 +1,9 @@
 #pragma once
 #include "..\utils\Math.h"
+#include "..\utils\D3D.h"
 #include <vector>
 #include <memory>
 #include "render/ShaderList.h"
-#include <d3d11.h>
 
 namespace thomas
 {
@@ -79,6 +79,7 @@ namespace thomas
 			static bool ResturnShadowMapView(ID3D11DepthStencilView * dsv);
 		private:
 			static const unsigned s_nrOfShadowMapsSupported = 2;
+			static ID3D11CommandList* s_commandList;
 			static ID3D11DepthStencilView* s_shadowMapViews[s_nrOfShadowMapsSupported];
 			static math::Matrix s_lightMatrices[s_nrOfShadowMapsSupported];
 			static std::vector<unsigned> s_freeShadowMapViewIndexes;
@@ -88,10 +89,9 @@ namespace thomas
 			static std::vector<object::component::LightComponent*> s_lights;
 			static std::unique_ptr<utils::buffers::StructuredBuffer> s_lightBuffer;
 			static LightCountsStruct s_lightCounts;
-
 			
 			static resource::Texture2DArray* s_shadowMapTextures;
-			static unsigned s_shadowMapSize;
+			static unsigned s_shadowMapSize;			
 		};
 	}
 }

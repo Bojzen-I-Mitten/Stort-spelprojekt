@@ -243,19 +243,22 @@ namespace thomas
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
 
+			//Copy rendered objects into the back buffer
+			WindowManager::Instance()->ResolveRenderTarget();
+
 			{
 				PROFILE("Particles");
 				ParticleSystem::GetGlobalAlphaBlendingSystem()->UpdateParticleSystem();
 				ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 				if (editor::EditorCamera::Instance())
 				{
-					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					BindCameraBackBuffer(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
 					ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 					ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 				}
 				for (object::component::Camera* cam : m_cameras.getCameras())
 				{
-					BindCameraRenderTarget(cam->GetFrameData());
+					BindCameraBackBuffer(cam->GetFrameData());
 					ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 					ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 				}
@@ -268,15 +271,12 @@ namespace thomas
 				//Take care of the editor camera and render gizmos
 				if (editor::EditorCamera::Instance())
 				{
-					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					BindCameraBackBuffer(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
 					editor::Gizmos::Gizmo().RenderGizmos();
 				}
 			}
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
-
-			//Copy rendered objects into the back buffer
-			WindowManager::Instance()->ResolveRenderTarget();
 
 			{
 				PROFILE("GUI");

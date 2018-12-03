@@ -104,6 +104,7 @@ namespace thomas
 
 
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
+				j["SlowfilerData"]["build"]["vramTotal"] = s_vrambudget;
 				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
 				j["SlowfilerData"]["build"]["contextSwitches"] = s_contextSwitch.load();
 
@@ -144,9 +145,9 @@ namespace thomas
 				return s_ramusage;
 			}
 
-			void ProfileManager::setVRAMUsage(float usage, float budget)
+			void ProfileManager::setVRAMUsage(float total)
 			{
-				s_vrambudget = budget;
+				s_vrambudget = total;
 			}
 
 		}
