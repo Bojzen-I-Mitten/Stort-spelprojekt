@@ -58,10 +58,15 @@ namespace ThomasEngine
 
 	}
 
-	/*void Text::dropShadow::set(bool dropShadow)
+	void Text::outline::set(bool outline)
 	{
-		((thomas::graphics::GUI::Text*)nativePtr)->dropShadow = dropShadow;
-	}*/
+		((thomas::graphics::GUI::Text*)nativePtr)->outline = outline;
+	}
+
+	void Text::renderable::set(bool renderable)
+	{
+		((thomas::graphics::GUI::Text*)nativePtr)->renderable = renderable;
+	}
 
 	Image::Image(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
 

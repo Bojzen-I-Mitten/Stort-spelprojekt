@@ -103,7 +103,7 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.position = new Vector2(0.4975f, 0.83f);
         PowerupPickupText.color = Color.White; // Need black outline for better visual effect
         PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
-        //PowerupPickupText.dropShadow = true;
+        PowerupPickupText.outline = true;
         PowerupPickupText.font = PickupFont;
 
         State = STATE.CHADING;
@@ -164,19 +164,6 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        // Stop the fading routine 
-        // Note: Doesn't properly work, the couroutine doesn't stop when the alpha has reached zero
-        //if (FadeText != null)
-        //{
-        //    if(PowerupPickupText.color.a == 0 && PowerupPickupDescText.color.a == 0)
-        //    {
-        //        Debug.Log("Should stop");
-        //        StopCoroutine(FadeText);
-        //        FadeText = null;
-        //    }
-        //}
-        
-
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -661,6 +648,8 @@ public class ChadControls : NetworkComponent
 
             yield return new WaitForSeconds(0.01f);
         }
+
+        PowerupPickupText.renderable = false;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -751,6 +740,7 @@ public class ChadControls : NetworkComponent
             return false;
     }
     #endregion
+
     #region PickupPowerup
     private void DisplayPowerupText(ref Text powerupText, String description)
     {
@@ -762,6 +752,7 @@ public class ChadControls : NetworkComponent
         Color pickupColor = powerupText.color;
         pickupColor.a = 255;
         powerupText.color = pickupColor;
+        powerupText.renderable = true;
     }
 
     #endregion

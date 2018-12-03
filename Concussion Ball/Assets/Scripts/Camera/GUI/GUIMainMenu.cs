@@ -128,6 +128,7 @@ public class GUIMainMenu : ScriptComponent
         Play.interactable = true;
         Play.depth = 0.9f;
         Play.text = "Play";
+        Play.outline = true;
         #endregion
 
         #region  Options
@@ -136,6 +137,7 @@ public class GUIMainMenu : ScriptComponent
         Options.interactable = true;
         Options.depth = 0.9f;
         Options.text = "Options";
+        Options.outline = true;
         #endregion
 
         #region Credits
@@ -144,6 +146,7 @@ public class GUIMainMenu : ScriptComponent
         Credits.interactable = true;
         Credits.depth = 0.9f;
         Credits.text = "Credits";
+        Credits.outline = true;
         #endregion
 
         #region Exit
@@ -152,6 +155,7 @@ public class GUIMainMenu : ScriptComponent
         Exit.interactable = true;
         Exit.depth = 0.9f;
         Exit.text = "Exit";
+        Exit.outline = true;
         #endregion
 
         #region Player name

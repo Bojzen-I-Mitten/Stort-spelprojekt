@@ -44,7 +44,8 @@ namespace thomas
 					color = Vector4::One;
 					rotation = 0;
 					interactable = false;
-					//dropShadow = false;
+					outline = false;
+					renderable = true;
 					depth = 0;
 					effect = DirectX::SpriteEffects::SpriteEffects_None;
 				}
@@ -56,7 +57,8 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interactable;
-				//bool dropShadow;
+				bool outline;
+				bool renderable;
 				float depth;
 				Canvas* canvas;
 				DirectX::SpriteEffects effect;
@@ -111,14 +113,19 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					//if (dropShadow)
-					//{
-					//	// Only black outline for now	
-					//	font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(0.01f, 0.01f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
-					//	font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-0.01f, 0.01f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
-					//}
+					if (renderable)
+					{
+						if (outline)
+						{
+							// Only black outline for now	
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+						}
 
-					font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+					}
 				}
 
 				Vector2 PixelSize()

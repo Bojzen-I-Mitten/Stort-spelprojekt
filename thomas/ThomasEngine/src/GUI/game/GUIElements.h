@@ -77,10 +77,15 @@ namespace ThomasEngine
 			void set(Font^ font);
 		}
 
-		/*property bool dropShadow
+		property bool outline
 		{
-			void set(bool dropShadow);
-		}*/
+			void set(bool outline);
+		}
+
+		property bool renderable
+		{
+			void set(bool renderable);
+		}
 	};
 
 	public ref class Image : public GUIElement
