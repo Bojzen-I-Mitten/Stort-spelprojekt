@@ -142,7 +142,12 @@ namespace ThomasEngine
 		}
 
 		static Vector3 Average(array<Vector3>^ points);
+		static Vector3 Average(array<Vector3>^ points, int numPoints);
 		static bool PlaneFromPoints(array<Vector3>^ points, [Out] Vector3% center, [Out] Vector3% normal);
+		/* Fit a plane to the points minimizing error on Y axis. Returns false if it was not possible to extract a result from the data.
+		*/
+		static bool PlaneFromPointsY(array<Vector3>^ points, [Out] Vector3% center, [Out] Vector3% normal);
+		static bool PlaneFromPointsY(array<Vector3>^ points, int numPoints, [Out] Vector3% center, [Out] Vector3% normal);
 	};
 
 }

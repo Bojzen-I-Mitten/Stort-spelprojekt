@@ -35,7 +35,7 @@ namespace ThomasEngine
 	array<Material^>^ RenderComponent::materials::get()
 	{
 		auto nativeMats = render->GetMaterials();
-		array<Material^>^ mats = gcnew array<Material^>(nativeMats.size());
+		array<Material^>^ mats = gcnew array<Material^>((int)nativeMats.size());
 		for (int i=0; i < mats->Length; i++)
 		{
 			Resource^ resource = ThomasEngine::Resources::FindResourceFromNativePtr(nativeMats[i]);
@@ -114,7 +114,7 @@ namespace ThomasEngine
 	}
 	Material^ RenderComponent::GetMaterial(int index)
 	{
-		if (index < 0 || render->numMeshes() <= index) return nullptr;
+		if ((uint32_t)index < 0 || render->numMeshes() <= (uint32_t)index) return nullptr;
 		thomas::resource::Material* nptr = render->GetMaterial(index);
 		Resource^ mat = ThomasEngine::Resources::FindResourceFromNativePtr(nptr);
 		if (mat != nullptr)
@@ -125,7 +125,7 @@ namespace ThomasEngine
 	{
 		if(mat == nullptr)
 			mat = Material::StandardMaterial;
-		if (index < 0 || render->numMeshes() <= index)
+		if (index < 0 || render->numMeshes() <= (uint32_t)index)
 		{
 			Debug::LogWarning("Failed to set material " + mat->Name + " at index: " + index + ", in RenderComponent: " + Name);
 			return;

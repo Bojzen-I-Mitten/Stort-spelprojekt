@@ -291,27 +291,25 @@ namespace thomas
 		void Gizmos::DrawRay(math::Vector3 from, math::Vector3 direction)
 		{
 
-			std::vector<math::Vector3> corners(2);
+			math::Vector3 corners[2];
 			corners[0] = from;
 			corners[1] = from + direction * 1000;
-			DrawLines(corners);
+			DrawLines(corners, 2);
 		}
 		void Gizmos::DrawRay(math::Vector3 from, math::Vector3 direction, float len)
 		{
-
-			std::vector<math::Vector3> corners(2);
+			math::Vector3 corners[2];
 			corners[0] = from;
 			corners[1] = from + direction * len;
-			DrawLines(corners);
+			DrawLines(corners, 2);
 		}
 
 		void Gizmos::DrawRay(math::Ray ray)
 		{
-			std::vector<math::Vector3> corners(2);
+			math::Vector3 corners[2];
 			corners[0] = ray.position;
 			corners[1] = ray.position + ray.direction * 1000;
-
-			DrawLines(corners);
+			DrawLines(corners, 2);
 		}
 
 		void Gizmos::DrawFrustum(math::Vector3 center, float fov, float maxRange, float minRange, float aspect)
