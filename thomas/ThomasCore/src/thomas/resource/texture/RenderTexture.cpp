@@ -29,12 +29,18 @@ namespace thomas
 
 		void RenderTexture::WriteCanvas(graphics::GUI::Canvas * canvas)
 		{
+			Bind();
+			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, canvas->GetViewport().Get11());
+			canvas->Render();
+		}
+
+		void RenderTexture::Bind()
+		{
 			utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_rtv, Color(1.0f, 1.0f, 1.0f));
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(1, &m_rtv, 0);
 			utils::D3D::Instance()->GetDeviceContext()->OMSetDepthStencilState(0, 0);
-			canvas->Render();
 		}
 
 

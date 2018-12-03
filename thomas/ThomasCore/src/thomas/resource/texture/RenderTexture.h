@@ -22,7 +22,7 @@ namespace thomas
 			RenderTexture(int width, int height);
 			virtual ~RenderTexture();
 			void WriteCanvas(graphics::GUI::Canvas* canvas);
-
+			void Bind();
 		private:
 			ID3D11RenderTargetView* m_rtv;
 		};
