@@ -22,8 +22,8 @@ using namespace System;
 using namespace System::Threading;
 namespace ThomasEngine {
 
-	GameObject::GameObject() :
-		Object(thomas::ObjectHandler::Instance().createNewGameObject("gameobject"))
+	GameObject::GameObject() : 
+		Object(new thomas::object::GameObject("gameobject"))
 	{
 		m_name = "gameobject";
 #ifdef _EDITOR
@@ -33,7 +33,7 @@ namespace ThomasEngine {
 	}
 
 	GameObject::GameObject(String^ name) : 
-		Object(thomas::ObjectHandler::Instance().createNewGameObject(Utility::ConvertString(name)))
+		Object(new thomas::object::GameObject(Utility::ConvertString(name)))
 	{
 		m_name = name;
 		Tag = "";
@@ -604,6 +604,10 @@ namespace ThomasEngine {
 	IEnumerable<Transform^>^ GameObject::Children::get()
 	{
 		return transform->children;
+	}
+	GameObject^ GameObject::Parent::get()
+	{
+		return transform->parent != nullptr ? transform->parent->gameObject : nullptr;
 	}
 
 	void GameObject::transform::set(Transform^ value)

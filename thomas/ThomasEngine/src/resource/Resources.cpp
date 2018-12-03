@@ -213,69 +213,67 @@ namespace ThomasEngine
 			if (resources->ContainsKey(thomasPath))
 			{
 				obj = resources[thomasPath];
-			}
-			else
-			{
-				float startTime = Time::ElapsedTime;
-				AssetTypes type = GetResourceAssetType(path);
-				try {
-					if (!System::IO::File::Exists(path))
-						throw gcnew System::IO::FileNotFoundException("File not found");
-					switch (type)
-					{
-					case AssetTypes::MODEL:
-						obj = gcnew Model(path);
-						break;
-					case AssetTypes::TEXTURE2D:
-						obj = gcnew Texture2D(path);
-						break;
-					case AssetTypes::TEXTURE3D:
-						obj = gcnew TextureCube(path);
-						break;
-					case AssetTypes::SCENE:
-						break;
-					case AssetTypes::SHADER:
-						obj = gcnew Shader(path);
-						break;
-					case AssetTypes::ANIMATION:
-						obj = gcnew Animation(path);
-						break;
-					case AssetTypes::MATERIAL:
-						obj = Serializer::DeserializeMaterial(path);
-						break;
-					case AssetTypes::SCRIPT:
-						break;
-					case AssetTypes::AUDIO_CLIP:
-						obj = gcnew AudioClip(path);
-						break;
-					case AssetTypes::FONT:
-						obj = gcnew Font(path);
-						break;
-					case AssetTypes::UNKNOWN:
-						break;
-					default:
-						break;
-					}
-
-					if (obj != nullptr)
-					{
-						resources[thomasPath] = obj;
-					}
-				}
-				catch (Exception^ e) {
-
-					String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
-
-					Debug::LogError(error);
-					obj = LoadErrorResource(type);
-					if(obj == nullptr)
-						Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
-				}
-
-				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
-
+				Monitor::Exit(resourceLock);
+				return obj;
 			}
 			Monitor::Exit(resourceLock);
+			// Load asset
+			AssetTypes type = GetResourceAssetType(path);
+			try {
+				if (!System::IO::File::Exists(path))
+					throw gcnew System::IO::FileNotFoundException("File not found");
+				switch (type)
+				{
+				case AssetTypes::MODEL:
+					obj = gcnew Model(path);
+					break;
+				case AssetTypes::TEXTURE2D:
+					obj = gcnew Texture2D(path);
+					break;
+				case AssetTypes::TEXTURE3D:
+					obj = gcnew TextureCube(path);
+					break;
+				case AssetTypes::SCENE:
+					break;
+				case AssetTypes::SHADER:
+					obj = gcnew Shader(path);
+					break;
+				case AssetTypes::ANIMATION:
+					obj = gcnew Animation(path);
+					break;
+				case AssetTypes::MATERIAL:
+					obj = Serializer::DeserializeMaterial(path);
+					break;
+				case AssetTypes::SCRIPT:
+					break;
+				case AssetTypes::AUDIO_CLIP:
+					obj = gcnew AudioClip(path);
+					break;
+				case AssetTypes::FONT:
+					obj = gcnew Font(path);
+					break;
+				case AssetTypes::UNKNOWN:
+					break;
+				default:
+					break;
+				}
+
+				if (obj != nullptr)
+				{
+					Monitor::Enter(resourceLock);
+					resources[thomasPath] = obj;
+					Monitor::Exit(resourceLock);
+				}
+			}
+			catch (Exception^ e) {
+
+				String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
+
+				Debug::LogError(error);
+				obj = LoadErrorResource(type);
+				if (obj == nullptr)
+					Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
+			}
 			return obj;
 		}
 #pragma region PreFab
@@ -340,6 +338,7 @@ namespace ThomasEngine
 			Monitor::Enter(s_PREFAB_DICT);
 			for each (auto var in s_PREFAB_DICT)
 			{
+
 				l->Add(var.Value);
 			}
 			Monitor::Exit(s_PREFAB_DICT);
@@ -456,7 +455,7 @@ namespace ThomasEngine
 
 
 			void Resources::Unload(Resource^ resource) {
-				if(resources->Remove(ConvertToThomasPath(resource->m_path)))
+				if(resources->Remove(ConvertToThomasPath(resource->Path)))
 					delete resource;
 			}
 

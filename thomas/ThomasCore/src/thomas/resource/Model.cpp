@@ -1,5 +1,5 @@
 #include "Model.h"
-
+#include<algorithm>
 #include "../graphics/Mesh.h"
 #include "../utils/AssimpLoader.h"
 #include "../graphics/animation/data/Skeleton.h"
@@ -57,5 +57,18 @@ namespace thomas {
 			m_skeleton = NULL;
 		}
 
+		bool sortMeshName(std::shared_ptr<graphics::Mesh> &m1, std::shared_ptr<graphics::Mesh> &m2)
+		{
+			return m1->GetName() < m2->GetName();
+		}
+
+		void Model::ModelData::PreSkeletonParse()
+		{
+			std::sort(m_meshes.begin(), m_meshes.end(), sortMeshName);
+		}
+		void Model::ModelData::PostLoad()
+		{
+
+		}
 	}
 }

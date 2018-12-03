@@ -48,7 +48,7 @@
                 <TextBlock Text="Layer" Width="41" VerticalAlignment="Center"/>
                 <ComboBox x:Name="LayerBox" SelectedIndex="{Binding Layer}" Width="163" VerticalAlignment="Center"></ComboBox>
             </StackPanel>
-            <CheckBox Content="Static"  IsChecked="{Binding staticSelf}" Grid.Column="2" Margin="3,10" HorizontalAlignment="Right" Width="46"/>
+            <!-- <CheckBox Content="Static"  IsChecked="{Binding staticSelf}" Grid.Column="2" Margin="3,10" HorizontalAlignment="Right" Width="46"/> -->
         </Grid>
 
         <ItemsControl x:Name="componentItemList" ItemsSource="{Binding Components}" Grid.Row="1" Background="#333333" HorizontalAlignment="Stretch">

@@ -57,7 +57,9 @@ namespace ThomasEngine.Network
 
         virtual public void OnGotOwnership() { }
         virtual public void OnLostOwnership() { }
-        
+
+        virtual public void OnDisconnect() { }
+
         protected void TakeOwnership(GameObject obj)
         {
             NetworkIdentity networkIdentity = obj.GetComponent<NetworkIdentity>();
