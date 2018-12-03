@@ -98,7 +98,7 @@ namespace ThomasEngine.Network
             
             Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
-
+        
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
         {
             if (targetEndPoint.Address.ToString() == "::1")
@@ -343,6 +343,8 @@ namespace ThomasEngine.Network
                 NetManager.Stop();
             }
 
+            // Cleanup the match instance.
+            instance = null;
         }
 
         public void TakeOwnership(NetworkIdentity networkIdentity)

@@ -208,12 +208,23 @@ namespace ThomasEngine
 	{
 
 		if (m_gameObjects == nullptr) { // Scene is empty
-			Debug::LogWarning("Warning, no objects in scene.");
+			Debug::LogWarning("No objects in scene.");
 			m_accessLock = gcnew Object();
 			m_gameObjects = gcnew List<GameObject^>();
 			//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 		}
-
+		int invalidCounter = 0;
+		for (int i = 0; i < m_gameObjects->Count; i++)
+		{
+			if (m_gameObjects[i] == nullptr ||			// Deserialization failed.
+				m_gameObjects[i]->transform == nullptr)	// Gameobject is invalid, can't be cleaned (objects must have transform)
+			{
+				m_gameObjects->RemoveAt(i--);
+				invalidCounter++;
+			}
+		}
+		if(invalidCounter)
+			Debug::LogWarning("Object(s) not deserailized successfully, " + invalidCounter + " found to be NULL.");
 	}
 
 	void Scene::PostLoad()
@@ -222,7 +233,10 @@ namespace ThomasEngine
 		{
 			gObj->PostLoad(this);
 		}
+	}
 
+	void Scene::InitiateScene()
+	{
 		AwakeObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 		EnableObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 	}

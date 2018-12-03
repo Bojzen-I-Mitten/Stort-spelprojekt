@@ -11,7 +11,12 @@ namespace thomas
 			Resource(std::string path);
 			virtual ~Resource() {};
 			std::string GetName();
+			const std::string& getName();
+			/* Set the name hash.
+			*/
+			void setName(const std::string& name);
 			std::string GetPath();
+			uint32_t getHash();
 
 			void Rename(std::string newPath);
 			void Reload();
@@ -19,9 +24,11 @@ namespace thomas
 
 		protected:
 			std::string m_path;
-			std::string m_name;
+
 
 		private:
+			std::string m_name;
+			uint32_t m_hash;
 			virtual void OnChanged() = 0;
 		};
 	}
