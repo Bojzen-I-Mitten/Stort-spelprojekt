@@ -29,7 +29,7 @@ public class Ball : PickupableObject
         DropOnRagdoll = true;
         MovementSpeedModifier = 0.65f;
         chargeTimeMax = 2.0f;
-        BaseThrowForce = 10.0f;
+        BaseThrowForce = 12.0f;
         MaxThrowForce = 18.0f;
         ThrowForce = BaseThrowForce;
 
