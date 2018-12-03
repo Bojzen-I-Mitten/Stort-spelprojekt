@@ -447,7 +447,6 @@ public class ChadControls : NetworkComponent
     public void RPCResetThrow()
     {
         HasThrown = false;
-        ChadHud.Instance.DeactivateAimHUD();
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
@@ -462,6 +461,7 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
+        ChadHud.Instance.DeactivateAimHUD();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
     }
