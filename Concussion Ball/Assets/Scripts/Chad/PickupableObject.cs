@@ -147,25 +147,7 @@ public class PickupableObject : NetworkComponent
 
     public override void OnDisconnect()
     {
-        if (pickedUp)
-        {
-             
-            if (this is Ball)
-            {
-                StartCoroutine(DisconnectRoutine());
-            }
-            else
-                RPCDrop();
-        }
-    }
-
-    public IEnumerator DisconnectRoutine()
-    {
         RPCDrop();
-        yield return null;
-        gameObject.SetActive(false);
-        yield return null;
-        gameObject.SetActive(true);
     }
 
     virtual public void SaveObjectOwner(ChadControls chad)

@@ -851,7 +851,7 @@ public class ChadControls : NetworkComponent
 
     public override void OnCollisionEnter(Collider collider)
     {
-        if (isOwner && State != STATE.RAGDOLL && !Locked)
+        if (MatchSystem.instance && isOwner && State != STATE.RAGDOLL && !Locked)
         {
             ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
 
