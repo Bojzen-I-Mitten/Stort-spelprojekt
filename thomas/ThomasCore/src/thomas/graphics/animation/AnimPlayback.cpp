@@ -35,7 +35,8 @@ namespace thomas {
 					if(ch.numNodeChannels() == 0 ||
 						!ref.findBoneIndex(ch.getHash(), boneInd))
 						continue; // Empty or culled
-					else {
+					else 
+					{
 						//m_boneMapping[boneInd] = m_channel.size();
 						m_boneMapping.push_back(boneInd);
 						m_channel.push_back(BoneFrame());

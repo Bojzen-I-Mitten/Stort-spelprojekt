@@ -174,8 +174,11 @@ namespace thomas
 			const aiScene* scene = LoadScene(importer, path);
 			if (!scene) return;
 			Process(scene, modelData, skelConstruct);
+			modelData.PreSkeletonParse();
+			// Parse skeleton
 			if (skelConstruct.hasSkeleton())
 				modelData.m_skeleton = std::shared_ptr<graphics::animation::Skeleton>(skelConstruct.generateSkeleton());
+			modelData.PostLoad();
 			return;
 		}
 		std::vector<std::shared_ptr<graphics::animation::AnimationData>> AssimpLoader::LoadAnimation(std::string path)

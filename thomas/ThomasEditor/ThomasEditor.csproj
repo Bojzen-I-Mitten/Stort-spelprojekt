@@ -247,6 +247,7 @@
     <Compile Include="Elements\TransformGizmo.xaml.cs">
       <DependentUpon>TransformGizmo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="utils\Utils.cs" />
     <Page Include="Elements\AssetBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

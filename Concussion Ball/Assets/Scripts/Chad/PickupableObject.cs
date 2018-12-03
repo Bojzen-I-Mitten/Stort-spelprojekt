@@ -103,11 +103,8 @@ public class PickupableObject : NetworkComponent
 
     public void Drop()
     {
-
         RPCDrop();
         SendRPC("RPCDrop");
-        
-
     }
 
     public virtual void OnDrop()
@@ -148,6 +145,29 @@ public class PickupableObject : NetworkComponent
         SendRPC("OnActivate");
     }
 
+    public override void OnDisconnect()
+    {
+        if (pickedUp)
+        {
+             
+            if (this is Ball)
+            {
+                StartCoroutine(DisconnectRoutine());
+            }
+            else
+                RPCDrop();
+        }
+    }
+
+    public IEnumerator DisconnectRoutine()
+    {
+        RPCDrop();
+        yield return null;
+        gameObject.SetActive(false);
+        yield return null;
+        gameObject.SetActive(true);
+    }
+
     virtual public void SaveObjectOwner(ChadControls chad)
     {
 
@@ -155,7 +175,7 @@ public class PickupableObject : NetworkComponent
 
     virtual public void Pickup(ChadControls chad, Transform hand)
     {
-
+        RPCDrop();
         SaveObjectOwner(chad);
         if (!m_rigidBody)
             m_rigidBody = gameObject.GetComponent<Rigidbody>();
@@ -206,7 +226,10 @@ public class PickupableObject : NetworkComponent
 
     public override void OnLostOwnership()
     {
-
+        if(_Chad == MatchSystem.instance.LocalChad || pickedUp || transform.parent != null)
+        {
+            Drop();
+        }
 
     }
 

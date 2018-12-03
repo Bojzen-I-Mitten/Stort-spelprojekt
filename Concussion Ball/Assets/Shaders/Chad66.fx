@@ -21,6 +21,7 @@ SamplerState StandardWrapSampler
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
+    MipLODBias = -1;    // Do not sample to low!!!
 };
 
 DepthStencilState EnableDepth

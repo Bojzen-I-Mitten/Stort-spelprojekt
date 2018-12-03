@@ -103,7 +103,7 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.position = new Vector2(0.4975f, 0.83f);
         PowerupPickupText.color = Color.White; // Need black outline for better visual effect
         PowerupPickupText.origin = new Vector2(0.5f, 0.0f);
-        PowerupPickupText.dropShadow = true;
+        //PowerupPickupText.dropShadow = true;
         PowerupPickupText.font = PickupFont;
 
         State = STATE.CHADING;
@@ -227,6 +227,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
 
+
         rBody.Friction = 0.5f;
         if (!OnGround())
             rBody.Friction = 0.0f;
@@ -349,17 +350,8 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
-    public void OnDisconnect()
-    {
-        if (PickedUpObject)
-        {
-            if (typeof(Powerup).IsAssignableFrom(PickedUpObject.GetType()))
-                (PickedUpObject as Powerup).Remove();
-            else
-                PickedUpObject.Drop();
-        }
 
-    }
+
 
     #region Input handling
     private void HandleKeyboardInput()
@@ -775,8 +767,6 @@ public class ChadControls : NetworkComponent
     #endregion
     public override void OnRead(NetDataReader reader, bool initialState)
     {
-
-
         if (isOwner)
         {
             reader.GetInt();
@@ -825,6 +815,43 @@ public class ChadControls : NetworkComponent
         return true;
     }
 
+    private void Pickup(PickupableObject pickupable)
+    {
+        if (pickupable.transform.parent == null)
+        {
+            if (pickupable.gameObject.Name == "ball")
+            {
+                ResetAlpha(ref PowerupPickupText);
+
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
+                FadeText = FadePickupText();
+                StartCoroutine(FadeText);
+            }
+            else if (pickupable.gameObject.Name == "Vindaloo")
+            {
+                // Reset to full alpha
+                ResetAlpha(ref PowerupPickupText);
+
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
+                FadeText = FadePickupText();
+                StartCoroutine(FadeText);
+            }
+            else if (pickupable.gameObject.Name == "ThomasTrain")
+            {
+                // Reset to full alpha
+                ResetAlpha(ref PowerupPickupText);
+
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
+                FadeText = FadePickupText();
+                StartCoroutine(FadeText);
+            }
+
+            TakeOwnership(pickupable.gameObject);
+            RPCPickup(pickupable.ID);
+            //SendRPC("RPCPickup", pickupable.ID);
+        }
+    }
+
     public override void OnTriggerEnter(Collider collider)
     {
         if (isOwner && State != STATE.RAGDOLL && !Locked)
@@ -832,39 +859,7 @@ public class ChadControls : NetworkComponent
             PickupableObject pickupable = collider.transform.parent?.gameObject.GetComponent<PickupableObject>();
             if (pickupable && pickupable.gameObject.GetActive() && PickedUpObject == null)
             {
-                if (pickupable.transform.parent == null)
-                {
-                    if (pickupable.gameObject.Name == "ball")
-                    {
-                        ResetAlpha(ref PowerupPickupText);
-
-                        DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
-                        FadeText = FadePickupText();
-                        StartCoroutine(FadeText);
-                    }
-                    else if (pickupable.gameObject.Name == "Vindaloo")
-                    {
-                        // Reset to full alpha
-                        ResetAlpha(ref PowerupPickupText);
-
-                        DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
-                        FadeText = FadePickupText();
-                        StartCoroutine(FadeText);
-                    }
-                    else if (pickupable.gameObject.Name == "ThomasTrain")
-                    {
-                        // Reset to full alpha
-                        ResetAlpha(ref PowerupPickupText);
-
-                        DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
-                        FadeText = FadePickupText();
-                        StartCoroutine(FadeText);
-                    }
-
-                    TakeOwnership(pickupable.gameObject);
-                    RPCPickup(pickupable.ID);
-                    //SendRPC("RPCPickup", pickupable.ID);
-                }
+                Pickup(pickupable);
             }
         }
     }
@@ -892,6 +887,8 @@ public class ChadControls : NetworkComponent
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
+
+                    NetPlayer.HasTackled += 1;
                 }
 
             } 
