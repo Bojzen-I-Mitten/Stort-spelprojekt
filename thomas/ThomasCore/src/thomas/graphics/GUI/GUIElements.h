@@ -118,10 +118,10 @@ namespace thomas
 						if (outline)
 						{
 							// Only black outline for now	
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), scale * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
 						}
 
 						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);

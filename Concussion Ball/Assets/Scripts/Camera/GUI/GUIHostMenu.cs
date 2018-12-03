@@ -149,12 +149,12 @@ public class GUIHostMenu : ScriptComponent
 
         HostBtn = Canvas.Add("Host Game");
         HostBtn.color = Unselected;
-        HostBtn.position = new Vector2(0.47f, 0.32f);
+        HostBtn.position = new Vector2(0.46f, 0.32f);
         HostBtn.interactable = true;
 
         ExitBtn = Canvas.Add("Exit");
         ExitBtn.color = Unselected;
-        ExitBtn.position = new Vector2(0.32f, 0.32f);
+        ExitBtn.position = new Vector2(0.31f, 0.32f);
         ExitBtn.interactable = true;
 
         if (HostMenuBGTexture != null)
@@ -167,7 +167,7 @@ public class GUIHostMenu : ScriptComponent
         #region Host Setings
 
         HostOptions = Canvas.Add("Host Options");
-        HostOptions.position = new Vector2(0.5f, 0f);
+        HostOptions.position = new Vector2(0.45f, -0.01f);
         HostOptions.origin = new Vector2(0.5f, 0.0f);
         HostOptions.color = Unselected;
 
