@@ -117,6 +117,11 @@ public class GUISelectTeam : ScriptComponent
             else
                 MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
         }
+        else if (ExitText.Clicked())
+        {
+            MatchSystem.instance.Disconnect();
+            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+        }
         else if ((StartGame.Clicked() || MatchSystem.instance.MatchStarted) && Canvas.isRendering)
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
@@ -172,12 +177,7 @@ public class GUISelectTeam : ScriptComponent
         }
         else if (ExitText.Hovered())
         {
-            ExitText.color = Color.Black;
-            
-            if (ExitText.Clicked())
-            {
-                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-            }
+            ExitText.color = Selected;
         }
         else
         {

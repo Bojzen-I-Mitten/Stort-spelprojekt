@@ -53,7 +53,8 @@ public class NetworkPlayer : NetworkComponent
         text.scale = new Vector2(0.05f);
         text.origin = new Vector2(0.5f, 0.5f);
         nameCanvas.is3D = true;
-        PlayerName = GUIMainMenu.PlayerString;
+        if (isOwner)
+            PlayerName = GUIMainMenu.PlayerString;
     }
 
     public int GetPing()
