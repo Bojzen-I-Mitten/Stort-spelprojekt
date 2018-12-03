@@ -44,6 +44,7 @@ namespace ThomasEngine
 		property bool interactable
 		{
 			void set(bool interactable);
+			bool get();
 		}
 		property float depth
 		{

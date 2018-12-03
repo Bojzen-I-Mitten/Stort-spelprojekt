@@ -112,7 +112,6 @@ public class GUISelectTeam : ScriptComponent
         }
         else if (ReadyUp.Clicked())
         {
-            Debug.Log("Ready up clicked!!");
             MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
         }
         else if ((StartGame.Clicked() || MatchSystem.instance.MatchStarted) && Canvas.isRendering)
@@ -193,6 +192,13 @@ public class GUISelectTeam : ScriptComponent
             StartGame.interactable = false;
         }
 
+        if (MatchSystem.instance.LocalChad.NetPlayer.ReadyToStart)
+        {
+            ReadyUp.text = "Unready";
+        }
+        else
+            ReadyUp.text = "Ready";
+
     }
 
     public void AddImagesAndText()
@@ -247,7 +253,7 @@ public class GUISelectTeam : ScriptComponent
         SpectatorText.interactable = true;
         SpectatorText.color = Unselected;
 
-        ReadyUp = Canvas.Add("Ready Up!");
+        ReadyUp = Canvas.Add("Ready");
         ReadyUp.position = new Vector2(0.5f, 0.25f);
         ReadyUp.origin = new Vector2(0.5f);
         ReadyUp.font = SportFont32;
@@ -364,7 +370,7 @@ public class GUISelectTeam : ScriptComponent
     {
         int ready = 0;
         int players = 0;
-        foreach (var player in MatchSystem.instance.Scene.Players)
+        foreach (var player in MatchSystem.instance?.Scene.Players)
         {
             NetworkPlayer np = player.Value.gameObject?.GetComponent<NetworkPlayer>();
             players++;
