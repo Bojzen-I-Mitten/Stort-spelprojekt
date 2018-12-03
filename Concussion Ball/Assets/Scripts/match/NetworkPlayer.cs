@@ -41,11 +41,16 @@ public class NetworkPlayer : NetworkComponent
         GoalsScored = 0;
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        Material[] mats = gameObject.GetComponent<RenderSkinnedComponent>().materials;
-
-        mat = mats[1] = new Material(mats[1]);
-
-        gameObject.GetComponent<RenderSkinnedComponent>().materials = mats;
+        RenderSkinnedComponent model = gameObject.GetComponent<RenderSkinnedComponent>();
+        if(!model)
+        {
+            throw new InvalidOperationException("Player requires a RenderSkinnedComponent.");
+        }
+        mat = model.CreateMaterialInstance("Chad66");
+        if(mat == null)
+        {
+            throw new InvalidOperationException("Player not assigned Chad66 material.");
+        }
 
         nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
@@ -120,6 +125,11 @@ public class NetworkPlayer : NetworkComponent
             writer.Put((int)TEAM_TYPE.UNASSIGNED);
 
         return true;
+    }
+
+    public override void OnDisconnect()
+    {
+        JoinTeam(null);
     }
 
     public override void OnRead(NetDataReader reader, bool initialState)

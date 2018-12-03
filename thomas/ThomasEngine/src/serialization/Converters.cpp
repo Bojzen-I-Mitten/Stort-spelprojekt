@@ -10,6 +10,14 @@
 #include "Serializer.h"
 namespace ThomasEngine
 {
+	ResourceConverter::ResourceConverter()
+		: ResourceConverter(nullptr)
+	{
+	}
+	ResourceConverter::ResourceConverter(System::Type ^ ignoreType)
+		: m_ignoreType(ignoreType)
+	{
+	}
 	void ResourceConverter::WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer)
 	{
 		Resource^ resource = (Resource^)value;
@@ -23,7 +31,7 @@ namespace ThomasEngine
 		JObject^ jo = JObject::Load(reader);
 		String^ path = jo->Value<String^>("resourcePath");
 		
-		if (path == "")
+		if (path == "" || path == nullptr)
 			return Material::StandardMaterial;
 		else if (path == "White Texture")
 			return Texture2D::whiteTexture;
@@ -37,7 +45,7 @@ namespace ThomasEngine
 
 	bool ResourceConverter::CanConvert(System::Type ^objectType)
 	{
-		if (Serializer::rootType == objectType)
+		if (m_ignoreType == objectType)
 			return false;
 		else
 			return Resource::typeid->IsAssignableFrom(objectType);

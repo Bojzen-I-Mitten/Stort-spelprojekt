@@ -72,6 +72,9 @@ namespace ThomasEngine {
 		/* Verify object is in scene
 		*/
 		bool InScene(GameObject ^ gObj, int &index);
+		/* Executed directly after Scene is loaeded. Is not the active scene (ThomasManaged.CurrentScene)
+		*/
+		void PostLoad();
 
 	public:
 		static Scene^ LoadScene(System::String^ fullPath, uint32_t unique_id);
@@ -170,7 +173,9 @@ namespace ThomasEngine {
 	internal:
 		void UnLoad();
 		void EnsureLoad();
-		void PostLoad();
+		/* Function called to initiate the scene. Called when made the 'active' scene (ThomasManaged.CurrentScene).
+		*/
+		void InitiateScene();
 		void SyncScene();
 
 		/* Engine access to objects. Engine edits are always in sync.

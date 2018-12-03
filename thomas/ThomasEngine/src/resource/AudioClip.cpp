@@ -9,6 +9,6 @@ namespace ThomasEngine
 
 	void AudioClip::OnDeserialized(StreamingContext c)
 	{
-		m_nativePtr = new thomas::resource::AudioClip(Utility::ConvertString(m_path));
+		m_nativePtr = new thomas::resource::AudioClip(Utility::ConvertString(Path));
 	}
 }
