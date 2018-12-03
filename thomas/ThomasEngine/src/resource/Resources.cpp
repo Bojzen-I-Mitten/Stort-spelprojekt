@@ -24,17 +24,21 @@ namespace ThomasEngine
 
 	void Resources::OnPlay()
 	{
+		Monitor::Enter(resourceLock);
 		for each (Resource^ resource in resources->Values)
 		{
 			resource->OnPlay();
 		}
+		Monitor::Exit(resourceLock);
 	}
 	void Resources::OnStop()
 	{
+		Monitor::Enter(resourceLock);
 		for each (Resource^ resource in resources->Values)
 		{
 			resource->OnStop();
 		}
+		Monitor::Exit(resourceLock);
 	}
 
 
@@ -434,9 +438,12 @@ namespace ThomasEngine
 			T Resources::Load(String^ path)
 			{
 				String^ thomasPath = ConvertToThomasPath(path);
-				if (resources->ContainsKey(thomasPath))
+				Resource^ obj;
+				Monitor::Enter(resourceLock);
+				bool found = resources->TryGetValue(thomasPath, obj);
+				Monitor::Exit(resourceLock);
+				if (found)
 				{
-					Resource^ obj = resources[thomasPath];
 					if (obj->GetType() == T::typeid)
 						return (T)obj;
 					else
@@ -448,15 +455,19 @@ namespace ThomasEngine
 				else
 				{
 					T resource = (T)Activator::CreateInstance(T::typeid, path);
+					Monitor::Enter(resourceLock);
 					resources[thomasPath] = resource;
+					Monitor::Exit(resourceLock);
 					return resource;
 				}
 			}
 
 
 			void Resources::Unload(Resource^ resource) {
+				Monitor::Enter(resourceLock);
 				if(resources->Remove(ConvertToThomasPath(resource->Path)))
 					delete resource;
+				Monitor::Exit(resourceLock);
 			}
 
 			void recursivePrefabDestruction(GameObject^ obj)
@@ -472,8 +483,10 @@ namespace ThomasEngine
 
 			void Resources::UnloadAll()
 			{
+				Monitor::Enter(resourceLock);
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
+				Monitor::Exit(resourceLock);
 				for each (auto var in s_PREFAB_DICT)
 					recursivePrefabDestruction(var.Value);
 				resources->Clear();
@@ -497,21 +510,24 @@ namespace ThomasEngine
 			Resource ^ Resources::Find(String ^ path)
 			{
 				String^ thomasPath = ConvertToThomasPath(path);
-				if (resources->ContainsKey(thomasPath))
-				{
-					return resources[thomasPath];
-				}
-				return nullptr;
+				Resource^value;
+				Monitor::Enter(resourceLock);
+				if (!resources->TryGetValue(thomasPath, value))
+					value = nullptr;
+				Monitor::Exit(resourceLock);
+				return value;
 			}
 
 			List<Resource^>^ Resources::GetResourcesOfType(Type^ type)
 			{
 				List<Resource^>^ list = gcnew List<Resource^>();
+				Monitor::Enter(resourceLock);
 				for each (Resource^ resource in resources->Values)
 				{
 					if (resource->GetType() == type)
 						list->Add(resource);
 				}
+				Monitor::Exit(resourceLock);
 				return list;
 			}
 			Resource ^ Resources::LoadErrorResource(AssetTypes type)
@@ -549,6 +565,7 @@ namespace ThomasEngine
 			{
 				String^ thomasPathOld = ConvertToThomasPath(oldPath);
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
+				Monitor::Enter(resourceLock);
 				if (resources->ContainsKey(thomasPathOld))
 				{
 					Resource^ resource = resources[thomasPathOld];
@@ -557,12 +574,16 @@ namespace ThomasEngine
 					if (resource)
 						resource->Rename(newPath);
 				}
+				Monitor::Exit(resourceLock);
 			}
 			generic<typename T>
 				where T : Resource
 			List<T>^ Resources::GetResourcesOfType()
 			{
-					return (List<T>^)System::Linq::Enumerable::OfType<T>(resources->Values);
+				Monitor::Enter(resourceLock);
+				List<T>^ val = (List<T>^)System::Linq::Enumerable::OfType<T>(resources->Values);
+				Monitor::Exit(resourceLock);
+				return val;
 			}
 #pragma endregion
 
