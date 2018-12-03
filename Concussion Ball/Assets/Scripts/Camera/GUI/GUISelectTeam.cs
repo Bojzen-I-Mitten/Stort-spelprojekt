@@ -337,8 +337,8 @@ public class GUISelectTeam : ScriptComponent
         foreach (NetworkPlayer player in team1)
         {
             Text p = Canvas.Add(player.PlayerName);
-            p.position = new Vector2(0.0f, 0.15f + 0.15f * i);
-            p.font = SportFont32;
+            p.position = new Vector2(0.0f, 0.15f + 0.1f * i);
+            p.font = ChadFont;
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
@@ -349,8 +349,8 @@ public class GUISelectTeam : ScriptComponent
         {
             Text p = Canvas.Add(player.PlayerName);
             p.origin = new Vector2(1, 0);
-            p.position = new Vector2(1.0f, 0.15f + 0.15f * i);
-            p.font = SportFont32;
+            p.position = new Vector2(1.0f, 0.15f + 0.1f * i);
+            p.font = ChadFont;
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
