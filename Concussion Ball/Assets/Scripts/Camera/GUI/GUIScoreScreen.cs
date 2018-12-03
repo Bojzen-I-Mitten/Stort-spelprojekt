@@ -19,11 +19,13 @@ public class GUIScoreScreen : ScriptComponent
     public bool ToggleBool = true;
     public override void OnAwake()
     {
-       
+
     }
     public override void Start()
     {
-        Instance = this;
+       
+            Instance = this;
+      
         ToggleBool = true;
 
         Timedisplay = ScoreScreenTimeLast + 1;
@@ -40,8 +42,8 @@ public class GUIScoreScreen : ScriptComponent
             Textdatalist[i].depth = 0.9f;
         }
         Textdatalist[0].position = new Vector2(0.25f, 0.7f);
-        Textdatalist[1].position = new Vector2(0.35f, 0.7f);
-        Textdatalist[2].position = new Vector2(0.55f, 0.7f);
+        Textdatalist[1].position = new Vector2(0.4f, 0.7f);
+        Textdatalist[2].position = new Vector2(0.65f, 0.7f);
 
         //        Lobby.position = new Vector2(0.2f, 0.04f);
     }
@@ -87,7 +89,7 @@ public class GUIScoreScreen : ScriptComponent
     public void updateTextPlayAgain()
     {
         
-        Textdatalist[1].text = "Play again:" + (Timedisplay -= 1);
+        Textdatalist[1].text = "Play again: " + (Timedisplay -= 1);
     }
 
 

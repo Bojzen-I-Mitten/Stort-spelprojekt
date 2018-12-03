@@ -92,7 +92,7 @@ public class PowerupSpawner : NetworkComponent
 
     }
 
-    public override void OnDrawGizmos()
+    public override void OnDrawGizmosSelected()
     {
         BoundingSphere b = new BoundingSphere(Vector3.Zero, 0.25f);
         Gizmos.SetColor(Color.Orange);

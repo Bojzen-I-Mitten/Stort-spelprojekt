@@ -23,7 +23,7 @@ namespace ThomasEngine
 	}
 	void Model::OnDeserialized(StreamingContext c)
 	{
-		m_nativePtr = new thomas::resource::Model(Utility::ConvertString(m_path));
+		m_nativePtr = new thomas::resource::Model(Utility::ConvertString(Path));
 	}
 
 	thomas::resource::Model * Model::Native()

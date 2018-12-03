@@ -219,6 +219,7 @@
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\StackAllocator.h" />
+    <ClInclude Include="src\thomas\utils\allocator\ThomasPointer.h" />
     <ClInclude Include="src\thomas\utils\atomic\Synchronization.h" />
     <ClInclude Include="src\thomas\utils\atomic\SyncronizedList.h" />
     <ClInclude Include="src\thomas\utils\AutoProfile.h" />

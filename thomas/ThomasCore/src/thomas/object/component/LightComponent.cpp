@@ -53,18 +53,18 @@ namespace thomas
 
 			void LightComponent::OnEnable()
 			{
-				SetCastShadows(m_castsShadows);
+				//SetCastShadows(m_castsShadows);
 				graphics::LightManager::AddLight(this);
 			}
 
 			void LightComponent::OnDisable()
 			{
-				ReturnShadowMap();
+				//ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
 			}
 			void LightComponent::OnDestroy()
 			{
-				ReturnShadowMap();
+				//ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
 			}
 

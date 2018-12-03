@@ -16,7 +16,7 @@ namespace thomas
 			Canvas::Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution)
 			{
 				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeffered());
-				m_defaultFont = std::make_unique<Font>("../Data/Fonts/CourierNew.spritefont");
+				m_defaultFont = std::make_unique<Font>("../Data/Fonts/sportNumbers64.spritefont");
 				m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
 				m_camera = cam;
 				m_viewport = viewport;
@@ -35,14 +35,13 @@ namespace thomas
 			void Canvas::Render()
 			{
 				if (m_spriteBatch != nullptr && m_render)
-				{		
+				{
 					math::Matrix matrix = math::Matrix::Identity;
+					m_spriteBatch->SetViewport(GetViewport());
 					if (Get3D())
 					{
 						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
 					}
-
-					m_spriteBatch->SetViewport(GetViewport());
 					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
 
 					Vector2 vpScale(GetViewport().width / 1920.0f, GetViewport().height / 1080.0f);
@@ -50,7 +49,7 @@ namespace thomas
 					{
 						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport(), vpScale);
 					}
-					
+
 					m_spriteBatch->End();
 				}
 			}
@@ -62,16 +61,16 @@ namespace thomas
 
 				Viewport camViewport = m_camera->GetViewport();
 				return Viewport(
-					camViewport.x + m_viewport.x * camViewport.width, 
+					camViewport.x + m_viewport.x * camViewport.width,
 					camViewport.y + m_viewport.y * camViewport.height,
-					m_viewport.width * camViewport.width, 
+					m_viewport.width * camViewport.width,
 					m_viewport.height * camViewport.height);
 			}
 
 			Vector2 Canvas::GetViewportScale()
 			{
 				Viewport vp = GetViewport();
-				return Vector2(vp.width / 1920.f , vp.height / 1080.f);
+				return Vector2(vp.width / 1920.f, vp.height / 1080.f);
 			}
 
 			void Canvas::SetViewport(Viewport viewport)
@@ -129,7 +128,7 @@ namespace thomas
 			}
 			void Canvas::Set3D(bool value)
 			{
-				if(value)
+				if (value)
 					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
 				else
 					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);

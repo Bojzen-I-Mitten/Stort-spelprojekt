@@ -88,6 +88,8 @@ namespace thomas
 				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::COLOR, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.colors)));
 			if (m_data.vertices.texCoord0.size() > 0)
 				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.texCoord0)));
+			if (m_data.vertices.texCoord1.size() > 0)
+				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::TEXCOORD1, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.texCoord1)));
 			if (m_data.vertices.normals.size() > 0)
 				m_data.vertexBuffers.insert(std::make_pair(resource::Shader::Semantics::NORMAL, std::make_unique<utils::buffers::VertexBuffer>(m_data.vertices.normals)));
 			if (m_data.vertices.tangents.size() > 0)

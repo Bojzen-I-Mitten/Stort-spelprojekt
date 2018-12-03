@@ -34,6 +34,9 @@ namespace ThomasEngine
 		if (!m_temporarySwap && Application::currentProject)
 			Application::currentProject->currentScenePath = m_current_scene->RelativeSavePath;
 
+		// Run initiation sequence
+		m_current_scene->InitiateScene();
+
 		// Trigger change
 #ifdef _EDITOR
 		OnCurrentSceneChanged(oldScene, value);
@@ -69,7 +72,6 @@ namespace ThomasEngine
 		// Assert: isLogicThread()
 		String^ tempFile = System::IO::Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), Local_Temp_Copy_Path);
 		
-		m_current_scene->UnLoad();
 
 		Scene^ scene = Scene::LoadScene(tempFile, m_ID_Counter++);
 		m_temporarySwap = true;

@@ -10,6 +10,9 @@
 #include "render\Frame.h"
 
 #include <algorithm>
+#include "../resource/texture/Texture2DArray.h"
+#include "render/Frame.h"
+#include "../graphics/Mesh.h"
 
 namespace thomas
 {
@@ -174,8 +177,9 @@ namespace thomas
 							for (auto & perMeshCommand : perMaterialQueue.second)
 							{
 								{
-
+									
 									l->DrawShadow(perMeshCommand);
+									
 								}
 							}
 						}

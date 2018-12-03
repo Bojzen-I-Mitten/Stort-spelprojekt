@@ -11,13 +11,15 @@ public class NetworkPlayer : NetworkComponent
     [Newtonsoft.Json.JsonIgnore]
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
-    public float ragdollOffset = 0.8f;
+    public float ragdollOffset = 1.0f;
     public float textOffset = 1.3f;
     public Font NameFont { get; set; }
     public float textScale { get; set; } = 0.008f;
     public int HasTackled = 0;
-    public int BeenTackled = 0;
+    public int Owngoal = 0;
     public int GoalsScored = 0;
+    public int Score = 0;
+    public bool ReadyToStart = false;
 
     Material mat;
     Rigidbody rb;
@@ -34,9 +36,21 @@ public class NetworkPlayer : NetworkComponent
 
     public override void Start()
     {
+        HasTackled = 0;
+        Owngoal = 0;
+        GoalsScored = 0;
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        mat = (gameObject.GetComponent<RenderSkinnedComponent>().material = new Material(gameObject.GetComponent<RenderSkinnedComponent>().material));
+        RenderSkinnedComponent model = gameObject.GetComponent<RenderSkinnedComponent>();
+        if(!model)
+        {
+            throw new InvalidOperationException("Player requires a RenderSkinnedComponent.");
+        }
+        mat = model.CreateMaterialInstance("Chad66");
+        if(mat == null)
+        {
+            throw new InvalidOperationException("Player not assigned Chad66 material.");
+        }
 
         nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
@@ -55,7 +69,7 @@ public class NetworkPlayer : NetworkComponent
 
     public override void OnDisable()
     {
-        if(nameCanvas != null)
+        if (nameCanvas != null)
             nameCanvas.isRendering = false;
     }
 
@@ -63,24 +77,36 @@ public class NetworkPlayer : NetworkComponent
     {
         if (!isOwner)
         {
-            text.text = PlayerName;
-            text.scale = new Vector2(textScale);
-            text.color = Team.Color;
-            Vector3 position = Vector3.Zero;
-            if (rag.RagdollEnabled)
-                position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
+            Vector3 betweenChads = Vector3.Zero;
+            if (!rag.RagdollEnabled)
+                betweenChads = transform.position - ChadCam.instance.transform.position;
             else
-                position = rb.Position + new Vector3(0, textOffset, 0);
+                betweenChads = rag.GetHips().transform.position - ChadCam.instance.transform.position;
+            betweenChads.Normalize();
+            Ray ray = new Ray(ChadCam.instance.transform.position, betweenChads);
+            RaycastHit info;
+            Physics.Raycast(ray, out info);
+            if (info.rigidbody == rb)
+            {
+                text.text = PlayerName;
+                text.scale = new Vector2(textScale);
+                text.color = Team.Color;
+                Vector3 position = Vector3.Zero;
+                if (rag.RagdollEnabled)
+                    position = rag.GetHips().transform.position + new Vector3(0, ragdollOffset, 0);
+                else
+                    position = rb.Position + new Vector3(0, textOffset, 0);
 
-            nameCanvas.isRendering = true;
-            nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+                nameCanvas.isRendering = true;
+                nameCanvas.worldMatrix = Matrix.CreateConstrainedBillboard(position, CameraMaster.instance.Camera.transform.position, Vector3.Down, null, null);
+            }
+            else if (nameCanvas != null)
+                nameCanvas.isRendering = false;
         }
-        else if(nameCanvas != null)
+        else if (nameCanvas != null)
             nameCanvas.isRendering = false;
-
         if (Team != null && mat != null)
             mat.SetColor("color", Team.Color);
-
         if (transform.position.y < BottomOfTheWorld)
             Reset();
     }
@@ -89,19 +115,32 @@ public class NetworkPlayer : NetworkComponent
     {
 
         writer.Put(PlayerName);
-
+        writer.Put(ReadyToStart);
+        writer.Put(HasTackled);
+        writer.Put(Owngoal);
+        writer.Put(GoalsScored);
         if (Team != null)
             writer.Put((int)Team.TeamType);
         else
             writer.Put((int)TEAM_TYPE.UNASSIGNED);
+
         return true;
+    }
+
+    public override void OnDisconnect()
+    {
+        JoinTeam(null);
     }
 
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 
+
         PlayerName = reader.GetString();
-        
+        ReadyToStart = reader.GetBool();
+        HasTackled = reader.GetInt();
+        Owngoal = reader.GetInt();
+        GoalsScored = reader.GetInt();
 
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
@@ -112,11 +151,14 @@ public class NetworkPlayer : NetworkComponent
             if (teamType == TEAM_TYPE.TEAM_1 || teamType == TEAM_TYPE.TEAM_2)
                 gameObject.SetActive(true);
         }
-
     }
-    
+
     public void JoinTeam(TEAM_TYPE teamType)
     {
+        HasTackled = 0;
+        Owngoal = 0;
+        GoalsScored = 0;
+        Score = 0;
         RPCJoinTeam((int)teamType);
         SendRPC("RPCJoinTeam", (int)teamType);
     }
@@ -139,33 +181,45 @@ public class NetworkPlayer : NetworkComponent
 
             rb.Position = transform.position;
             rb.Rotation = transform.rotation;
-            rb.IgnoreNextTransformUpdate(); 
+            rb.IgnoreNextTransformUpdate();
         }
 
-        if(Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
+        if (Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR)
         {
             CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = false;
             CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = true;
-        }else
+        }
+        else
         {
             CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
             CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
         }
-        
+
     }
-
-
     public void JoinTeam(Team team)
     {
+        if (this.Team == team)
+        {
+            Debug.LogWarning("Player is already in team.");
+            return;
+        }
+
         if (this.Team != null)
         {
             this.Team.RemovePlayer(this);
-        }        
+        }
         if (team != null)
         {
             team.AddPlayer(this);
             mat?.SetColor("color", Team.Color);
         }
 
+    }
+
+    public void Ready(bool ready)
+    {
+        ReadyToStart = ready;
+        if (isOwner)
+            SendRPC("Ready", ReadyToStart);
     }
 }

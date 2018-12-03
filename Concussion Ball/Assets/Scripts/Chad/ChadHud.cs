@@ -317,7 +317,7 @@ public class ChadHud : ScriptComponent
         if (ToggleAim)
         {
             if (Crosshair != null)
-                Crosshair.scale = Vector2.One;
+                Crosshair.scale = new Vector2(0.5f, 0.5f);
             if (LMB != null)
                 LMB.scale = new Vector2(0.75f);
                 
@@ -367,7 +367,7 @@ public class ChadHud : ScriptComponent
 
     public override void Update()
     {
-        int matchTimeLeft = MatchSystem.instance.MatchTimeLeft;
+        int matchTimeLeft = MatchSystem.instance? MatchSystem.instance.MatchTimeLeft : 0;
         int minutes = matchTimeLeft / 60;
         int seconds = matchTimeLeft % 60;
 
@@ -398,7 +398,6 @@ public class ChadHud : ScriptComponent
         else
         {
             HideHeldObjectText();
-            DeactivateAimHUD();
         }
 
         if (BallArrow != null)
@@ -438,7 +437,8 @@ public class ChadHud : ScriptComponent
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
         if (!(screenPos.z > 0 && screenPos.z < 1 &&
             screenPos.x > 0 && screenPos.x < cam.viewport.size.x &&
-            screenPos.y > 0 && screenPos.y < cam.viewport.size.y))//Offscreen check
+            screenPos.y > 0 && screenPos.y < cam.viewport.size.y//Offscreen check
+            ) && !Ball.pickedUp)
         {
             //Adjust for center of screen
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;
