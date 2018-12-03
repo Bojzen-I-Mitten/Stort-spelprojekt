@@ -408,13 +408,11 @@ public class ChadControls : NetworkComponent
                     {
                         State = STATE.THROWING;
                         ChadHud.Instance.ActivateAimHUD();
-                        Debug.Log("Starting to throw");
 
                         Animations.SetAnimationWeight(ChargeAnimIndex, 1);
                     }
                     else if((Input.GetMouseButtonUp(Input.MouseButtons.LEFT) || Input.GetMouseButtonUp(Input.MouseButtons.RIGHT)) && !HasThrown && State == STATE.THROWING)
                     {
-                        //Debug.Log("Throwing");
                         HasThrown = true;
 
                         Throwing = PlayThrowAnim();
@@ -422,7 +420,6 @@ public class ChadControls : NetworkComponent
                     }
                     else if ((Input.GetMouseButton(Input.MouseButtons.RIGHT) || Input.GetMouseButton(Input.MouseButtons.LEFT)) && !HasThrown && State == STATE.THROWING)
                     {
-                        //Debug.Log("Chargin");
                         ChargeObject();
                         
                     }
@@ -563,8 +560,8 @@ public class ChadControls : NetworkComponent
                 //Camera.transform.LookAt(Ragdoll.GetHips().transform);
                 break;
         }
-        if (Input.GetKeyDown(Input.Keys.M))
-            Debug.Log(CurrentVelocity.Length());
+        //if (Input.GetKeyDown(Input.Keys.M))
+        //    Debug.Log(CurrentVelocity.Length());
 
         if (State != STATE.DIVING && Landed)
             rBody.LinearVelocity = Vector3.Transform(new Vector3(-CurrentVelocity.x, rBody.LinearVelocity.y, -CurrentVelocity.y), rBody.Rotation);
