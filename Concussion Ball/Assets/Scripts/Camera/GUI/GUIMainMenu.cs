@@ -106,6 +106,10 @@ public class GUIMainMenu : ScriptComponent
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
         }
+        if(Options.Clicked())
+        {
+            CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
+        }
 
         PlayerString = PlayerString.ToUpper();
         PlayerName.text = PlayerString;
