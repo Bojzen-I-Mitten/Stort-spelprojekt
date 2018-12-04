@@ -50,9 +50,11 @@ namespace thomas
 			}
 			void MeshCollider::SetTrigger(bool trigger)
 			{
+				// Not concave?
 				if (!m_concave)
 				{
-					Collider::Update();
+					if(m_enabled)	// Check enabled
+						Collider::Update();
 					return;
 				}
 

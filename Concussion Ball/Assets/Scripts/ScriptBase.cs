@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using ThomasEngine;
 using ThomasEngine.Script;
 
@@ -12,6 +13,9 @@ namespace Concussion_Ball.Assets.Scripts
     public class ScriptBase
         : ScriptComponent
     {
+        //[Browsable(false)]
+        //[Newtonsoft.Json.JsonIgnore]
+
         public ScriptBase()
             : base()
         {

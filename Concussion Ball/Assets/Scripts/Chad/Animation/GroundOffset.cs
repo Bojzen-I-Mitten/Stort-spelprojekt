@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using ThomasEngine;
 using ThomasEngine.Script;
 
@@ -22,7 +23,16 @@ public class GroundOffset : ScriptComponent
     int FoundSamples = 0;
     private Vector3[] Points = new Vector3[MAX_SAMPLES];
     private Vector3[] Src_Points = new Vector3[MAX_SAMPLES];
-    private Vector3 center, normal;
+    private Vector3 center, normal, forward;
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public Vector3 Forward { get { return forward; } }
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public Vector3 Up { get { return normal; } }
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public Vector3 Right { get { return Vector3.Cross(forward, normal); } }
 
     public GroundOffset() 
         : base()
@@ -95,6 +105,8 @@ public class GroundOffset : ScriptComponent
             center = m.Translation;
             normal = m.Forward;
         }
+        forward = m.Up;
+        forward = forward - Vector3.Dot(normal, forward) * normal;
     }
 
     public override void OnDrawGizmos()
@@ -105,6 +117,17 @@ public class GroundOffset : ScriptComponent
             Gizmos.DrawLine(Src_Points[i], Points[i]);
         Gizmos.SetColor(Color.Green);
         Gizmos.DrawRay(center, normal, OffsetCast + OffsetSide);
+        Gizmos.SetColor(Color.Blue);
+        Gizmos.DrawRay(center, forward, OffsetForward);
+
+        Vector3 p0 = center + forward * OffsetForward + Right * OffsetSide;
+        Vector3 p1 = center + forward * OffsetForward - Right * OffsetSide;
+        Vector3 p2 = center - forward * OffsetForward - Right * OffsetSide;
+        Vector3 p3 = center - forward * OffsetForward + Right * OffsetSide;
+        Gizmos.DrawLine(p0, p1);
+        Gizmos.DrawLine(p1, p2);
+        Gizmos.DrawLine(p2, p3);
+        Gizmos.DrawLine(p3, p0);
         //Gizmos.DrawBoundingBox()
     }
 
