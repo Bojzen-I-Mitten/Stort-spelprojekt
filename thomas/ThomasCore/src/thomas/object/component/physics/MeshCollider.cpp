@@ -50,11 +50,11 @@ namespace thomas
 			}
 			void MeshCollider::SetTrigger(bool trigger)
 			{
-				if (!m_concave)
-				{
-					Collider::Update();
-					return;
-				}
+				//if (!m_concave)
+				//{
+				//	Collider::Update();
+				//	return;
+				//}
 
 				if (trigger) {
 					if (m_collisionObject) {
@@ -69,6 +69,14 @@ namespace thomas
 				}
 				m_trigger = trigger;
 			}
+			void MeshCollider::SetMargin(float margin)
+			{
+				m_margin = margin;
+			}
+			float MeshCollider::GetMargin()
+			{
+				return m_margin;
+			}
 			void MeshCollider::RecalcCollider()
 			{
 				if (m_collisionObject)
@@ -82,6 +90,8 @@ namespace thomas
 						CalculateConcave();
 					else
 						CalculateConvex();
+
+					m_collisionShape->setMargin(m_margin);
 				}
 			}
 			void MeshCollider::CalculateConvex()
