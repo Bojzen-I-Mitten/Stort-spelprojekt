@@ -144,7 +144,7 @@ namespace ThomasEngine
 
 				auto cube = path->Split(delimiter);
 				String^ cubeString = "cube.dds";
-				if (cube->Length > 1 && String::Equals(cubeString, cube[1]))
+				if (cube->Length > 0 && String::Equals(cubeString, cube[cube->Length - 1]))
 				{
 					return AssetTypes::TEXTURE3D;
 				}
