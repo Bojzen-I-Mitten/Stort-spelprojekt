@@ -167,6 +167,7 @@ public class Banana : Powerup
             BananaFull.SetActive(true);
             BananaEaten.SetActive(false);
         }
+        _BananaTimer = 0.0f;
         Remove();
     }
 }
