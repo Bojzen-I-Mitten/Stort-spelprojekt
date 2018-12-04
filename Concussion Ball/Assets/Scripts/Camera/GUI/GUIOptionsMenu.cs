@@ -14,14 +14,23 @@ public class GUIOptionsMenu : ScriptComponent
         AIMSENSE_TEXT,
         NUMSTATES
     }
+    public enum Imagestate
+    {
+        MUSIC_VOLUME_IMAGE,
+        MUSIC_VOLUME_TOGGLE_IMAGE,
+        MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE,
+        NUMSTATES
+    }
+
+
     Camera Camera;
     public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
     public Textstate State { set; get; } = Textstate.BACK_TEXT;
     public Textstate OldState = Textstate.NUMSTATES;
     public Font Font           { set; get; }
-    public Vector2 SetOrigin   { set; get; }
-    public Vector2 SetPosition { set; get; }
+    public Vector2 SetOriginText   { set; get; }
+    public Vector2 SetPositionText { set; get; }
     public Vector2 SetScale { set; get; } = Vector2.One;
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
@@ -65,9 +74,10 @@ public class GUIOptionsMenu : ScriptComponent
         Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.05f, 0.45f);
         Text[(int)Textstate.MUSIC_TEXT] = Canvas.Add("Music"); Text[(int)Textstate.MUSIC_TEXT].position = new Vector2(0.05f, 0.25f);
         Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.05f, 0.35f);
-        for (int i = 0; i < (int)Textstate.NUMSTATES; i++)
+
+       foreach(Text Texture in Text)
         {
-            Text[i].depth = 0.9f;
+            Texture.depth = 0.9f;
         }
     }
     public void ClearImagesAndText()
@@ -92,16 +102,16 @@ public class GUIOptionsMenu : ScriptComponent
     {
         if(State!= OldState)
         {
-           SetPosition = Text[(int)State].position;
+           SetPositionText = Text[(int)State].position;
 
             OldState = State;
-//            Debug.Log(SetPosition.x+" "+SetPosition.y);
+//            Debug.Log(SetPositionText.x+" "+SetPositionText.y);
         }
         else
         {
          //   Text[(int)State].scale = SetScale;
-            Text[(int)State].origin = SetOrigin;
-            Text[(int)State].position = SetPosition;
+            Text[(int)State].origin = SetOriginText;
+            Text[(int)State].position = SetPositionText;
         }
     }
 }
