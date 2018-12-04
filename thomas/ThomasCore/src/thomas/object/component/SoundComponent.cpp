@@ -6,6 +6,9 @@
 #include "../GameObject.h"
 #include "AudioListener.h"
 
+//
+#include "../../ThomasCore.h"
+
 namespace thomas
 {
 	namespace object
@@ -28,6 +31,13 @@ namespace thomas
 
 			void SoundComponent::OnDisable()
 			{
+				LOG("I went here");
+				Stop();
+			}
+
+			void SoundComponent::OnDestroy()
+			{
+				LOG("I went here");
 				Stop();
 			}
 

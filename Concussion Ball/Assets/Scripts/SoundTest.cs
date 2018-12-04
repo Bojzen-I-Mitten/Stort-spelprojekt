@@ -28,9 +28,9 @@ public class SoundTest : ScriptComponent
 
     public override void Update()
     {
-        if(Input.GetKeyDown(Input.Keys.W))
-        {
-            ExplosionSound.Stop();
-        }
+        //if(Input.GetKeyDown(Input.Keys.W))
+        //{
+        //    ExplosionSound.Stop();
+        //}
     }
 }
