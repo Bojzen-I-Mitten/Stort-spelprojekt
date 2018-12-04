@@ -61,6 +61,13 @@ public class Banana : Powerup
         else if (_BananaTimer > 0)
         {
             _BananaTimer += Time.DeltaTime;
+
+            // If Banana falls on side, reset
+            if (m_rigidBody.LinearVelocity.y < 0.1f && (gameObject.transform.rotation.x > 0.5f || gameObject.transform.rotation.z > 0.5f))
+            {
+                Debug.Log("Banana fell on side");
+                gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0,0,0);
+            }
         }
         else
         {
@@ -97,9 +104,9 @@ public class Banana : Powerup
         {
             // colliding with static object 
             m_rigidBody.Friction = 100.0f;
-            m_rigidBody.IsKinematic = true;
+            //m_rigidBody.IsKinematic = true;
             m_rigidBody.LinearVelocity = Vector3.Zero;
-            //PickupCollider.enabled = true; // for testing
+            PickupCollider.enabled = true; // for testing
         }
 
     }
