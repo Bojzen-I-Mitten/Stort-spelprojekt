@@ -74,6 +74,14 @@ namespace thomas
 		}
 		void LightManager::AddLight(object::component::LightComponent* light)
 		{
+			for (object::component::LightComponent* l : s_lights)
+			{
+				if (l == light)
+				{
+					//LOG("light already added");
+					return;
+				}
+			}
 			switch (light->GetType())
 			{
 			case DIRECTIONAL:
@@ -135,11 +143,11 @@ namespace thomas
 
 		void LightManager::Update()
 		{
-			std::vector<LightStruct> allLights;
+			std::vector<LightStruct> allLights(s_lights.size());
 
-			for (object::component::LightComponent* light : s_lights)
+			for (unsigned i = 0; i < s_lights.size(); ++i)//object::component::LightComponent* light : s_lights)
 			{
-				allLights.push_back(light->GetData());
+				allLights[i] = s_lights[i]->GetData();//.push_back(light->GetData());
 			}
 
 			s_lightBuffer->SetData(allLights);
@@ -147,8 +155,9 @@ namespace thomas
 
 		void LightManager::DrawShadows(render::CameraRenderQueue & renderQueue, object::component::Camera* camera)
 		{
-			for (object::component::LightComponent* l : s_lights)
+			for (unsigned i = 0; i < s_lights.size(); ++i)
 			{
+				object::component::LightComponent* l = s_lights[i];
 				if (l)
 				{
 

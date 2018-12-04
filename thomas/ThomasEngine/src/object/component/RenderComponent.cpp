@@ -114,7 +114,7 @@ namespace ThomasEngine
 	}
 	Material^ RenderComponent::GetMaterial(int index)
 	{
-		if ((uint32_t)index < 0 || render->numMeshes() <= (uint32_t)index) return nullptr;
+		if (index < 0 || render->numMeshes() <= index) return nullptr;
 		thomas::resource::Material* nptr = render->GetMaterial(index);
 		Resource^ mat = ThomasEngine::Resources::FindResourceFromNativePtr(nptr);
 		if (mat != nullptr)
@@ -125,7 +125,7 @@ namespace ThomasEngine
 	{
 		if(mat == nullptr)
 			mat = Material::StandardMaterial;
-		if (index < 0 || render->numMeshes() <= (uint32_t)index)
+		if (index < 0 || render->numMeshes() <= index)
 		{
 			Debug::LogWarning("Failed to set material " + mat->Name + " at index: " + index + ", in RenderComponent: " + Name);
 			return;

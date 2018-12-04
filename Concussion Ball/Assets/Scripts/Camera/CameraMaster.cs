@@ -125,6 +125,7 @@ public class CameraMaster : ScriptComponent
                 break;
 
             case CAM_STATE.JOIN_HOST:
+                MainMenu.SetUpScene();
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
