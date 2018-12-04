@@ -499,12 +499,18 @@ namespace ThomasEngine
 			{
 				if (nativePtr == nullptr)
 					return nullptr;
+				Monitor::Enter(resourceLock);
+				Resource^ var = nullptr;
 				for each(Resource^ resource in resources->Values)
 				{
 					if (resource->m_nativePtr == nativePtr)
-						return resource;
+					{
+						var = resource;
+						break;
+					}
 				}
-				return nullptr;
+				Monitor::Exit(resourceLock);
+				return var;
 			}
 
 			Resource ^ Resources::Find(String ^ path)
