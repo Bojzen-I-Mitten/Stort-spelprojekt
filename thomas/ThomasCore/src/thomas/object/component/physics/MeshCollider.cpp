@@ -90,10 +90,10 @@ namespace thomas
 				btConvexHullShape* temp = new btConvexHullShape();
 				for (auto mesh : m_model->GetMeshes())
 				{
-
+					thomas::graphics::Vertices & verts = mesh->GetVertices();
 					for (uint32_t i = 0; i < mesh->GetVertexCount(); i++)
 					{
-						math::Vector4 v = mesh->GetVertices().positions[i];
+						math::Vector4 v = verts.positions[i];
 						temp->addPoint(btVector3(v.x, v.y, v.z));
 					}
 				}
