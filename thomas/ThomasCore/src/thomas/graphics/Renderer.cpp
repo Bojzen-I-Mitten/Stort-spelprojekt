@@ -25,9 +25,12 @@ namespace thomas
 		void Renderer::BindFrame()
 		{
 			//Per frame
+			float elapsed = ThomasTime::GetElapsedTime();
 			float realDeltaTime = ThomasTime::GetActualDeltaTime();
 			float dt = ThomasTime::GetDeltaTime();
+			math::Vector4 thomas_Time(elapsed / 20.0f, elapsed, elapsed*2.0f, elapsed*3.0f);
 			math::Vector4 thomas_DeltaTime(realDeltaTime, 1.f / realDeltaTime, dt, 1.f / dt);
+			m_shaders.SetGlobalVector(THOMAS_TIME, thomas_Time);
 			m_shaders.SetGlobalVector(THOMAS_DELTA_TIME, thomas_DeltaTime);
 
 			LightManager::BindLights(&m_shaders);

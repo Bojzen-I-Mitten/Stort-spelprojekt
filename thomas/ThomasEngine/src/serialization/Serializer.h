@@ -9,10 +9,16 @@ namespace ThomasEngine
 	public ref class Serializer
 	{
 	private:
-		static JsonSerializer^ s_serializer;
+		/* Create a serializer with base properties set
+		*/
+		static JsonSerializer^ CreateSerializerBase();
 	internal:
-		static System::Type^ rootType = nullptr;
 		static property JsonSerializer^ serializer {
+			JsonSerializer^ get();
+		}
+		/* Create a serializer specified for serializing/deserializing materials
+		*/
+		static property JsonSerializer^ SerializerMaterial {
 			JsonSerializer^ get();
 		}
 

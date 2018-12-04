@@ -28,11 +28,14 @@ namespace thomas {
 				std::shared_ptr<graphics::animation::Skeleton> m_skeleton;
 
 				void clear();
+				void PreSkeletonParse();
+				void PostLoad();
 			};
 			Model(std::string path);
 
 			std::vector<std::shared_ptr<graphics::Mesh>> GetMeshes();
 			graphics::animation::Skeleton* GetSkeleton();
+			uint32_t GetMeshCount() { return (uint32_t)m_data.m_meshes.size(); }
 
 			~Model();
 			

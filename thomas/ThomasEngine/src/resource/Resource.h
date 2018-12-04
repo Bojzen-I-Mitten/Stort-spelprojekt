@@ -13,6 +13,8 @@ namespace ThomasEngine
 	[DataContractAttribute]
 	public ref class Resource : public System::ComponentModel::INotifyPropertyChanged
 	{
+	private:
+		System::String^ m_path;
 	internal:
 		thomas::resource::Resource* m_nativePtr;
 
@@ -21,7 +23,6 @@ namespace ThomasEngine
 			System::String^ get() { return GetAssetRelativePath(); }
 			void set(System::String^ value);
 		}
-		System::String^ m_path;
 
 		Resource(System::String^ path, thomas::resource::Resource* ptr)
 		{
@@ -29,6 +30,16 @@ namespace ThomasEngine
 			m_nativePtr = ptr;
 		}
 		virtual ~Resource();
+
+		[Newtonsoft::Json::JsonIgnoreAttribute]
+		property String^ Path
+		{
+			String^ get();
+			void set(String^ path);
+		}
+		/* True if path is set. Indicates data is loaded in to the object (non-Default).
+		*/
+		bool ContainsData();
 
 		virtual void OnPlay() {};
 		virtual void OnStop() {};

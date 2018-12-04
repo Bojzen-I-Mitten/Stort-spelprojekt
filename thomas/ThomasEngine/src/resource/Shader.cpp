@@ -45,7 +45,7 @@ namespace ThomasEngine
 	[OnDeserializedAttribute]
 	void Shader::OnDeserialized(StreamingContext c)
 	{
-		m_nativePtr = thomas::graphics::Renderer::Instance()->getShaderList().CreateShader(Utility::ConvertString(m_path));
+		m_nativePtr = thomas::graphics::Renderer::Instance()->getShaderList().CreateShader(Utility::ConvertString(Path));
 	}
 
 }

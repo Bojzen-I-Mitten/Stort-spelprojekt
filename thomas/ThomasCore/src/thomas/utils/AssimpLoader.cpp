@@ -174,8 +174,11 @@ namespace thomas
 			const aiScene* scene = LoadScene(importer, path);
 			if (!scene) return;
 			Process(scene, modelData, skelConstruct);
+			modelData.PreSkeletonParse();
+			// Parse skeleton
 			if (skelConstruct.hasSkeleton())
 				modelData.m_skeleton = std::shared_ptr<graphics::animation::Skeleton>(skelConstruct.generateSkeleton());
+			modelData.PostLoad();
 			return;
 		}
 		std::vector<std::shared_ptr<graphics::animation::AnimationData>> AssimpLoader::LoadAnimation(std::string path)
@@ -328,6 +331,8 @@ namespace thomas
 
 			if (mesh->mTextureCoords[0])
 				vertices.texCoord0.resize(mesh->mNumVertices);
+			if (mesh->mTextureCoords[1])
+				vertices.texCoord1.resize(mesh->mNumVertices);
 
 			if (mesh->HasTangentsAndBitangents())
 			{
@@ -380,12 +385,13 @@ namespace thomas
 				// Texture Coordinates
 				if (mesh->mTextureCoords[0])
 				{
-
-					math::Vector2 vec;
-
 					// A vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
 					// use models where a vertex can have multiple texture coordinates so we always take the first set (0).
 					vertices.texCoord0[i] = math::Vector2((float*)&mesh->mTextureCoords[0][i]);
+				}
+				if (mesh->mTextureCoords[1])
+				{
+					vertices.texCoord1[i] = math::Vector2((float*)&mesh->mTextureCoords[1][i]);
 				}
 			}
 

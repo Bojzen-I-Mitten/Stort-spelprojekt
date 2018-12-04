@@ -9,6 +9,7 @@ namespace ThomasEngine
 {
 	ref class GameObject;
 	ref class Component;
+	ref class Material;
 	namespace Script
 	{
 		/* Script Utility Functions, primary use for external access not internal

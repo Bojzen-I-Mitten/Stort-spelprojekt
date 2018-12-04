@@ -67,11 +67,11 @@ namespace ThomasEngine.Network
             public string[] PeerIPs {get;set;}
             public int[] PeerPorts { get; set; }
             public long ServerStartTime { get; set; }
-            public bool IsResponsiblePeer { get; set; }
+            public long TimeConnected { get; set; }
             public int SceneNextAssignableID { get; set; }
 
             public ServerInfoEvent() { }
-            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible, int nextAssignableID)
+            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, long timeConnected, int nextAssignableID)
             {
                 ServerStartTime = serverStartTime;
                 PeerIPs = new string[peers.Length - 1];
@@ -87,7 +87,7 @@ namespace ThomasEngine.Network
                     PeerPorts[i] = peer.EndPoint.Port;
                     i++;
                 }
-                IsResponsiblePeer = responsible;
+                TimeConnected = timeConnected;
             }
         }
 
@@ -107,11 +107,10 @@ namespace ThomasEngine.Network
             {
                 Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
             }
-            if (serverInfo.IsResponsiblePeer)
-                Manager.ResponsiblePeer = peer;
+            
             Manager.ServerStartTime = serverInfo.ServerStartTime;
             Manager.Scene.nextAssignableID = serverInfo.SceneNextAssignableID;
-            
+            Manager.Scene.TimePlayerJoined.Add(peer, serverInfo.TimeConnected);
         }
         
         public void SpawnPrefabEventHandler(SpawnPrefabEvent prefabEvent, NetPeer peer)
@@ -182,7 +181,7 @@ namespace ThomasEngine.Network
                         comp.OnLostOwnership();
                     }
                 }
-                Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.ToString());
+                Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.EndPoint.Address.ToString());
             }
             else
             {
