@@ -139,6 +139,8 @@ namespace ThomasEngine {
 		for each(String^ key in value->Keys)
 		{
 			System::Object^ prop = value[key];
+			if (prop == nullptr)
+				continue;
 			Type^ t = prop->GetType();
 			if (t == Newtonsoft::Json::Linq::JObject::typeid)
 			{
