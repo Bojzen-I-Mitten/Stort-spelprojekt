@@ -53,7 +53,6 @@ namespace ThomasEngine
 				// Need to remove failed object?!..
 				Debug::LogException(e);
 				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
-				g->TryReleaseComponentLock();
 				DeleteInstant(g);
 				objects->RemoveAt(i);
 			}
@@ -75,7 +74,6 @@ namespace ThomasEngine
 				// Need to remove failed object?!..
 				Debug::LogException(e);
 				Debug::LogError("Enable on object failed: " + (g != nullptr ? g->Name : "NULL"));
-				g->TryReleaseComponentLock();
 				DeleteInstant(g);
 				objects->RemoveAt(i);
 			}

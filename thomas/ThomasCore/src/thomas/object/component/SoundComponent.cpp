@@ -29,15 +29,8 @@ namespace thomas
 			{
 			}
 
-			void SoundComponent::OnDisable()
-			{
-				LOG("I went here");
-				Stop();
-			}
-
 			void SoundComponent::OnDestroy()
 			{
-				LOG("I went here");
 				Stop();
 			}
 

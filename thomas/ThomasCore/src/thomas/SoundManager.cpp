@@ -11,11 +11,9 @@ namespace thomas
 	void SoundManager::Init()
 	{
 		m_system = nullptr;
-		m_studioSystem = nullptr;
 
-		ErrorCheck(FMOD::Studio::System::create(&m_studioSystem));
-		ErrorCheck(m_studioSystem->initialize(32, NULL, FMOD_INIT_3D_RIGHTHANDED, NULL));
-		ErrorCheck(m_studioSystem->getLowLevelSystem(&m_system));
+		ErrorCheck(FMOD::System_Create(&m_system));
+		ErrorCheck(m_system->init(36, FMOD_INIT_3D_RIGHTHANDED, NULL));
 	}
 
 	void SoundManager::Update()
@@ -30,7 +28,6 @@ namespace thomas
 		}
 		
 		ErrorCheck(m_system->update());
-		ErrorCheck(m_studioSystem->update());
 	}
 
 	void SoundManager::Destroy()
@@ -40,9 +37,6 @@ namespace thomas
 		{
 			sound.second->release();
 		}
-
-		ErrorCheck(m_studioSystem->unloadAll());
-		ErrorCheck(m_studioSystem->release());
 	}
 
 	void SoundManager::LoadSound(const std::string& id, const std::string& file, bool looping, bool stream)

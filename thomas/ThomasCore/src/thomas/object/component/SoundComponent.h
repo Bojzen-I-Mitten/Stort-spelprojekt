@@ -28,14 +28,13 @@ namespace thomas
 			{
 			public:
 				SoundComponent();
-				virtual ~SoundComponent() = default;
+				~SoundComponent() = default;
 
-				virtual void OnDisable() override;
-				virtual void OnDestroy() override;
+				void OnDestroy() override;
 				void Play();
 				void Play(resource::AudioClip* clip, float volume, bool looping, bool is3D);
 				void Stop();
-				virtual void Update() override;
+				void Update() override;
 
 			public:
 				void SetType(SoundType type);
