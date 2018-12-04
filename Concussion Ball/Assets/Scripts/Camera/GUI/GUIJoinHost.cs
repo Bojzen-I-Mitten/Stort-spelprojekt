@@ -26,7 +26,6 @@ public class GUIJoinHost : ScriptComponent
     Image TextBoxBGPort;
 
     Text Join;
-    Text Host;
     Text Back;
     Text IPText;
     Text PortText;
@@ -61,7 +60,6 @@ public class GUIJoinHost : ScriptComponent
         {
             CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
             Join.interactable = true;
-            Host.interactable = true;
             hasConnected = true;
         }
     }
@@ -72,14 +70,12 @@ public class GUIJoinHost : ScriptComponent
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
         ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
         Join.interactable = true;
-        Host.interactable = true;
         StopCoroutine(test);
     }
 
     public override void Update()
     {
         Join.color = Color.FloralWhite;
-        Host.color = Color.FloralWhite;
         Back.color = Color.FloralWhite;
 
         if (TakeIP)
@@ -144,7 +140,6 @@ public class GUIJoinHost : ScriptComponent
                 test = Connecting();
                 StartCoroutine(test);
                 Join.interactable = false;
-                Host.interactable = false;
                 return;
             }
             else
@@ -153,22 +148,6 @@ public class GUIJoinHost : ScriptComponent
                     TextBoxIP.color = Color.Red;
                 if (PortText.text == "")
                     TextBoxPort.color = Color.Red;
-            }
-        }
-        else if (Host.Clicked())
-        {
-            TakeIP = false;
-            TakePort = false;
-            ConnectingText.text = "";
-            if (PortText.text != "")
-            {
-                MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
-                CameraMaster.instance.State = CAM_STATE.HOST_MENU;
-                return;
-            }
-            else
-            {
-                TextBoxPort.color = Color.Red;
             }
         }
 
@@ -213,10 +192,6 @@ public class GUIJoinHost : ScriptComponent
         if (Join.Hovered())
         {
             Join.color = Color.IndianRed;
-        }
-        else if (Host.Hovered())
-        {
-            Host.color = Color.IndianRed;
         }
         else if (Back.Hovered())
         {
@@ -296,16 +271,6 @@ public class GUIJoinHost : ScriptComponent
             Join.color = Color.FloralWhite;
         }
 
-        if (TextBoxPort != null)
-        {
-            Host = Canvas.Add("Host");
-            Host.origin = new Vector2(0.5f);
-            Host.position = new Vector2(TextBoxPort.position.x + TextBoxPort.size.x / 2 + Host.size.x / 2, 0.35f);
-            Host.interactable = true;
-            Host.depth = 0.9f;
-            Host.color = Color.FloralWhite;
-        }
-
         Back = Canvas.Add("Back");
         Back.origin = new Vector2(0.5f);
         Back.position = new Vector2(0.575f, 0.36f);
@@ -330,7 +295,6 @@ public class GUIJoinHost : ScriptComponent
     public void ClearImagesAndText()
     {
         Canvas.Remove(Join);
-        Canvas.Remove(Host);
         Canvas.Remove(Back);
         Canvas.Remove(TextBoxIP);
         Canvas.Remove(TextBoxPort);
