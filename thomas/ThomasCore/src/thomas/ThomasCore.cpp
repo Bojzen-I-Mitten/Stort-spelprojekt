@@ -63,7 +63,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
-		//SoundManager::GetInstance()->Update();
+		SoundManager::GetInstance()->Update();
 	}
 
 	void ThomasCore::Render()

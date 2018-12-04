@@ -36,8 +36,8 @@ public class Vindaloo : Powerup
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.Type = SoundComponent.SoundType.Effect;
         ExplosionSound.Clip = VindalooExplosionSound;
-        ExplosionSound.Looping = false;
-        ExplosionSound.Is3D = true;
+        ExplosionSound.Looping = true;
+        ExplosionSound.Is3D = false;
 
         #region big meme particle emitter bois
 
@@ -205,8 +205,8 @@ public class Vindaloo : Powerup
         emitterSmoke.EmitOneShot(50);
 
         StartCoroutine(RemoveNextFrame());
-        //Remove();
     }
+
     private IEnumerator RemoveNextFrame()
     {
         yield return null;

@@ -133,14 +133,14 @@ public class ThomasTrain : Powerup
         if (soundcooldown < 0.0f)
         {
             soundcooldown = 1.0f;
-            soundComponentChargeUp.Play();
+            //soundComponentChargeUp.Play();
         }
     }
 
 
     public override void OnThrow()
     {
-        soundComponentTravel.Play();
+        //soundComponentTravel.Play();
     }
 
     // if this is a throwable power-up this function will be called
@@ -217,7 +217,7 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
-        soundComponentExplosion.Play();
+        //soundComponentExplosion.Play();
 
         StartCoroutine(KillTrain());
     }
