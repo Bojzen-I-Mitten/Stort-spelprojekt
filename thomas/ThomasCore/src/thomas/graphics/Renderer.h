@@ -82,7 +82,7 @@ namespace thomas
 			render::CameraList m_cameras;
 			bool m_enableShadows;
 
-			ID3D11CommandList* m_commmandList[3];
+			ID3D11CommandList* m_commmandList[5];
 		};
 	}
 }
