@@ -2,6 +2,7 @@ using ThomasEngine;
 using ThomasEngine.Network;
 using System.Collections;
 using System.Linq;
+using LiteNetLib.Utils;
 
 public class Banana : Powerup
 {    
@@ -39,11 +40,7 @@ public class Banana : Powerup
         _BananaTimer = 0.0f;
 
 
-        if(BananaFull && BananaEaten)
-        {
-            BananaFull.SetActive(true);
-            BananaEaten.SetActive(false);
-        }
+        SetModels(true, false);
 
         SlipSound = gameObject.AddComponent<SoundComponent>();
         SlipSound.Type = SoundComponent.SoundType.Effect;
@@ -75,11 +72,7 @@ public class Banana : Powerup
         }
         else
         {
-            if (BananaFull && BananaEaten)
-            {
-                BananaFull.SetActive(true);
-                BananaEaten.SetActive(false);
-            }
+            SetModels(true, false);
         }
     }
 
@@ -87,11 +80,7 @@ public class Banana : Powerup
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
         _BananaTimer += Time.DeltaTime;
-        if (BananaFull && BananaEaten)
-        {
-            BananaFull.SetActive(false);
-            BananaEaten.SetActive(true);
-        }
+        SetModels(false, true);
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
@@ -162,12 +151,46 @@ public class Banana : Powerup
     private IEnumerator RemoveNextFrame()
     {
         yield return null;
-        if (BananaFull && BananaEaten)
-        {
-            BananaFull.SetActive(true);
-            BananaEaten.SetActive(false);
-        }
+        SetModels(true, false);
         _BananaTimer = 0.0f;
         Remove();
+    }
+
+    public void SetModels(bool full, bool peel)
+    {
+        if (BananaFull && BananaEaten)
+        {
+            BananaFull.SetActive(full);
+            BananaEaten.SetActive(peel);
+        }
+    }
+
+    //private void SetModels(bool full, bool peel)
+    //{
+    //    SetModels(full, peel);
+    //    SendRPC("RPCSetModels", (bool)full, (bool)peel);
+    //}
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        base.OnWrite(writer, initialState);
+
+        writer.Put(BananaFull.GetActive());
+        writer.Put(BananaEaten.GetActive());
+
+        return true;
+    }
+
+    public override void OnRead(NetDataReader reader, bool initialState)
+    {
+        base.OnRead(reader, initialState);
+
+        BananaFull.SetActive(reader.GetBool());
+        BananaEaten.SetActive(reader.GetBool());
+
+        if (BananaFull.GetActive())
+            Debug.Log("Full banana active");
+        else if (BananaEaten.GetActive())
+            Debug.Log("Eaten banana active");
     }
 }
