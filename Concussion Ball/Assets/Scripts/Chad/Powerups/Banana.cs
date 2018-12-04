@@ -4,15 +4,19 @@ using System.Collections;
 using System.Linq;
 
 public class Banana : Powerup
-{
-    ChadControls ObjectOwner = null;
-
+{    
+    // Public
     public GameObject BananaFull { get; set; }
     public GameObject BananaEaten {get; set; }
-    
+    public AudioClip BananaSlipSound { get; set; }
+
     public float DespawnTime;
 
+     // Private
+    private SoundComponent SlipSound;
     private Collider _FirstCollider;
+    private ChadControls ObjectOwner = null;
+
     private bool _BananaTriggered;
     private float _BananaTimer;
     private float _Force;
@@ -41,11 +45,11 @@ public class Banana : Powerup
             BananaEaten.SetActive(false);
         }
 
-        //ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        //ExplosionSound.Type = SoundComponent.SoundType.Effect;
-        //ExplosionSound.Clip = VindalooExplosionSound;
-        //ExplosionSound.Looping = false;
-        //ExplosionSound.Is3D = true;
+        SlipSound = gameObject.AddComponent<SoundComponent>();
+        SlipSound.Type = SoundComponent.SoundType.Effect;
+        SlipSound.Clip = BananaSlipSound;
+        SlipSound.Looping = false;
+        SlipSound.Is3D = true;
     }
 
     public override void Update()
@@ -134,8 +138,9 @@ public class Banana : Powerup
             param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 10.0f;
             param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 5.0f;
             param.bodyPartFactor[(int)Ragdoll.BODYPART.HEAD] = -2.0f;
-            param.force = otherChad.transform.forward * 500.0f;
+            param.force = otherChad.transform.forward * otherChad.CurrentVelocity.y * 50.0f;
             otherChad.ActivateRagdoll(4.0f, param);
+            SlipSound.Play();
         }
         
         Explosion();
@@ -157,7 +162,11 @@ public class Banana : Powerup
     private IEnumerator RemoveNextFrame()
     {
         yield return null;
-
+        if (BananaFull && BananaEaten)
+        {
+            BananaFull.SetActive(true);
+            BananaEaten.SetActive(false);
+        }
         Remove();
     }
 }
