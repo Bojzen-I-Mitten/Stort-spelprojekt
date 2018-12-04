@@ -5,7 +5,7 @@
 #include "ThomasTime.h"
 #include "editor\Editor.h"
 #include "object\Object.h"
-#include "resource\texture\Texture2D.h"
+#include "resource\ResourceManager.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
 #include "resource/MemoryAllocation.h"
@@ -42,7 +42,7 @@ namespace thomas
 		//Init all required classes
 		if (!utils::D3D::Instance()->Init())
 			return false;
-		resource::Texture2D::Init();
+		resource::ResourceManager::Init();
 		graphics::Renderer::Instance()->init();		// Needs to be initiated after textures, initiates default shaders (default tex needs to be loaded)
 		ThomasTime::Init();
 		SoundManager::GetInstance()->Init();
@@ -108,7 +108,7 @@ namespace thomas
 		graphics::ParticleSystem::DestroyGlobalSystems();
 		graphics::Renderer::Instance()->Destroy();
 		resource::Material::Destroy();
-		resource::Texture2D::Destroy();
+		resource::ResourceManager::Destroy();
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
