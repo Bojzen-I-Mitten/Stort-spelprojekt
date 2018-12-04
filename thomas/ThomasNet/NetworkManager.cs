@@ -49,6 +49,8 @@ namespace ThomasEngine.Network
 
         public bool ReadOwnerAsNormal = false;
 
+        public int ConnectTo = 0;
+
         
 
         public long ServerStartTime;
@@ -164,12 +166,15 @@ namespace ThomasEngine.Network
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
+                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " rejected");
                     break;
                 case DisconnectReason.ConnectionFailed:
+                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed");
                     break;
                 case DisconnectReason.SocketReceiveError:
+                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, peer socket closed"); //Could be the other way around
                     break;
                 case DisconnectReason.SocketSendError:

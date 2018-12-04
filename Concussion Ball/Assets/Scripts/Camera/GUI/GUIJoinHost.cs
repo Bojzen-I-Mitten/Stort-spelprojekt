@@ -52,9 +52,9 @@ public class GUIJoinHost : ScriptComponent
         GoToTeamSelect = false;
     }
 
-    public void Listener_PeerConnectedEvent(NetPeer peer)
+    public void Listener_AllPeersConnectedEvent()
     {
-        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.AllPeersConnectedEvent -= Listener_AllPeersConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
 
         if (!hasConnected)
@@ -68,31 +68,34 @@ public class GUIJoinHost : ScriptComponent
 
     public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.AllPeersConnectedEvent -= Listener_AllPeersConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
-        ConnectingText.text = "Connection failed:\n";
         switch (disconnectInfo.Reason)
         {
             case DisconnectReason.RemoteConnectionClose:
             case DisconnectReason.DisconnectPeerCalled:
-                ConnectingText.text += "The peer you where connected to has disconnected with the IP\n" + peer.EndPoint.ToString();
+                ConnectingText.text = "The peer you where connected to has disconnected with the IP\n" + peer.EndPoint.ToString();
                 break;
             case DisconnectReason.Timeout:
-                ConnectingText.text += "Connection to peer " + peer.EndPoint.ToString() + " timed out";
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " timed out";
                 break;
             case DisconnectReason.ConnectionRejected:
-                ConnectingText.text += "Connection to peer " + peer.EndPoint.ToString() + " rejected";
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " rejected";
                 break;
             case DisconnectReason.ConnectionFailed:
-                ConnectingText.text += "Failed to establish connection to\n" + peer.EndPoint.ToString();
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                ConnectingText.text = "Failed to establish connection to\n" + peer.EndPoint.Address.ToString();
                 break;
             case DisconnectReason.SocketReceiveError:
-                ConnectingText.text += "Connection to peer " + peer.EndPoint.ToString() + " failed, peer socket closed"; //Could be the other way around
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " failed, peer socket closed"; //Could be the other way around
                 break;
             case DisconnectReason.SocketSendError:
-                ConnectingText.text += "Connection to peer " + peer.EndPoint.ToString() + " failed, local socket closed"; //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " failed, local socket closed"; //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                 break;
         }
+        ConnectingText.scale = new Vector2(0.5f);
         Join.interactable = true;
         Host.interactable = true;
         StopCoroutine(Connect);
@@ -158,12 +161,13 @@ public class GUIJoinHost : ScriptComponent
                     MatchSystem.instance.TargetPort = Convert.ToInt32(PortText.text);
                     MatchSystem.instance.TargetIP = IPText.text;
 
-                    MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
+                    MatchSystem.instance.Listener.AllPeersConnectedEvent += Listener_AllPeersConnectedEvent;
                     MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
 
                     MatchSystem.instance.Init();
                     MatchSystem.instance.Connect();
                     ConnectingText.text = "Connecting";
+                    ConnectingText.scale = new Vector2(1);
                     ConnectingText.position = new Vector2(0.75f, 0.9f);
                     Connect = Connecting();
                     StartCoroutine(Connect);

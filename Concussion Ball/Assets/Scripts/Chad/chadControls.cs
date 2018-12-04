@@ -9,7 +9,6 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
-using ThomasEngine.Script;
 
 
 public class ChadControls : NetworkComponent
