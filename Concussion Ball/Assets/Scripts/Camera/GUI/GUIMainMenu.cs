@@ -14,8 +14,6 @@ public class GUIMainMenu : ScriptComponent
 
     public Canvas Canvas;
 
-    Image TextBoxName;
-    Image TextBoxBGName;
     Image MyNameSticker;
     Text Play;
     Text HostGame;
@@ -30,7 +28,7 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
-    public float CaretOffset { get; set; } = 0.19f;
+    public float CaretOffset { get; set; } = -0.015f;
 
     private bool ClearName = true;
 
@@ -72,19 +70,9 @@ public class GUIMainMenu : ScriptComponent
         else if (Exit.Hovered())
             Exit.color = Selected;
 
-        if (PlayerString == "")
-        {
-            TextBoxName.color = Color.Red;
-        }
-        else
-        {
-            TextBoxName.color = Color.Black;
-        }
-
-        if (TextBoxName.Clicked())
+        if (MyNameSticker.Clicked())
         {
             TakeName = true;
-            TextBoxName.color = Selected;
             if (Blink == null)
             {
                 Blink = CaretBlink();
@@ -206,27 +194,9 @@ public class GUIMainMenu : ScriptComponent
             MyNameSticker = Canvas.Add(MyNameTexture);
             MyNameSticker.origin = new Vector2(0.5f);
             MyNameSticker.position = new Vector2(0.6f, 0.14f);
+            MyNameSticker.scale = new Vector2(0.5f);
             MyNameSticker.interactable = true;
             MyNameSticker.depth = 0.9f;
-        }
-
-        if (TextBox != null)
-        {
-            TextBoxName = Canvas.Add(TextBox);
-            TextBoxName.origin = new Vector2(0.5f);
-            TextBoxName.position = new Vector2(0.5f, 0.94f);
-            TextBoxName.interactable = true;
-            TextBoxName.depth = 0.8f;
-            TextBoxName.color = Color.Black;
-        }
-
-        if (TextBoxBG != null)
-        {
-            TextBoxBGName = Canvas.Add(TextBoxBG);
-            TextBoxBGName.origin = new Vector2(0.5f);
-            TextBoxBGName.position = new Vector2(0.5f, 0.94f);
-            TextBoxBGName.depth = 0.9f;
-            TextBoxBGName.color = Unselected;
         }
 
         #endregion
@@ -247,8 +217,6 @@ public class GUIMainMenu : ScriptComponent
         Canvas.Remove(Credits);
         Canvas.Remove(Exit);
         Canvas.Remove(PlayerName);
-        Canvas.Remove(TextBoxBGName);
-        Canvas.Remove(TextBoxName);
         Canvas.Remove(Caret);
     }
 
