@@ -682,7 +682,7 @@ namespace thomas
 	}
 }
 
-inline void CreateDankDevice(_In_opt_ IDXGIAdapter* pAdapter,
+inline void D3D11CreateDevice(_In_opt_ IDXGIAdapter* pAdapter,
 	D3D_DRIVER_TYPE DriverType,
 	HMODULE Software,
 	UINT Flags,

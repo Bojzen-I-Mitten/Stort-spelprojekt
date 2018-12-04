@@ -146,7 +146,7 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetFrameTime()
 			{
-				return m_timings[GTS::GTS_END_FRAME];
+				return m_timings[GTS_END_FRAME];
 			}
 
 			float profiling::GpuProfiler::GetMemoryUsage()
