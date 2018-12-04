@@ -12,10 +12,10 @@ public class Banana : Powerup
     
     public float DespawnTime;
 
+    private Collider _FirstCollider;
     private bool _BananaTriggered;
     private float _BananaTimer;
     private float _Force;
-    private Quaternion _InitRot;
 
     public override void OnAwake()
     {
@@ -29,11 +29,11 @@ public class Banana : Powerup
         ThrowForce = BaseThrowForce;
         m_rigidBody.Friction = 100.0f;
 
-        DespawnTime = 6.0f;
+        _FirstCollider = null;
+        DespawnTime = 60.0f;
         _BananaTriggered = false;
         _BananaTimer = 0.0f;
 
-        _InitRot = gameObject.transform.rotation;
 
         if(BananaFull && BananaEaten)
         {
@@ -54,14 +54,21 @@ public class Banana : Powerup
 
         if (_BananaTimer > DespawnTime)
         {
-            //Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
-            //Activate();
+            Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
             // Despawn
+            base.OnCollisionEnter(_FirstCollider);
         }
         else if (_BananaTimer > 0)
         {
-            gameObject.transform.rotation = _InitRot;
             _BananaTimer += Time.DeltaTime;
+        }
+        else
+        {
+            if (BananaFull && BananaEaten)
+            {
+                BananaFull.SetActive(true);
+                BananaEaten.SetActive(false);
+            }
         }
     }
 
@@ -79,9 +86,10 @@ public class Banana : Powerup
 
     public override void OnCollisionEnter(Collider collider)
     {
+        _FirstCollider = collider;
         //Check if colliding with a player
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-        if (/*otherChad*/false)
+        if (otherChad)
         {
             base.OnCollisionEnter(collider);
         }
@@ -89,8 +97,9 @@ public class Banana : Powerup
         {
             // colliding with static object 
             m_rigidBody.Friction = 100.0f;
-            gameObject.transform.rotation = _InitRot;
-            PickupCollider.enabled = true; // for testing
+            m_rigidBody.IsKinematic = true;
+            m_rigidBody.LinearVelocity = Vector3.Zero;
+            //PickupCollider.enabled = true; // for testing
         }
 
     }
