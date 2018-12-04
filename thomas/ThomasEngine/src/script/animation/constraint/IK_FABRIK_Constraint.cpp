@@ -74,16 +74,26 @@ namespace ThomasEngine
 		}
 		void IK_FABRIK_Constraint::apply(thomas::object::component::RenderSkinnedComponent * skinn, uint32_t boneIndex)
 		{
-			assert(m_num_link != 0);
 			thomas::graphics::animation::IBlendTree* tree = skinn->GetBlendTree();
 			uint32_t joint_index = boneIndex;
+			if(m_num_link == 0 || tree->getBoneInfo(joint_index)._parentIndex == 0)
+			{
+				Debug::LogWarning("Creating IK constraint failed: Bone chain not found.");
+				return;
+			}
 			m_ptr->setLinkAtIndex(m_num_link - 1, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
 				joint_index));
-			for (uint32_t i = m_num_link - 1; i-- > 0;) {
+
+			uint32_t numLinks = 2;
+			for (; numLinks <= m_num_link; numLinks++)
+			{
 				joint_index = tree->getBoneInfo(joint_index)._parentIndex;
-				m_ptr->setLinkAtIndex(i, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
+				m_ptr->setLinkAtIndex(m_num_link - numLinks, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
 					joint_index));
+				if (joint_index == 0)
+					break;
 			}
+			m_num_link = numLinks;
 			m_skinn = skinn;
 			m_boneIndex = boneIndex;
 			skinn->GetBlendTree()->addConstraint(m_ptr, boneIndex);

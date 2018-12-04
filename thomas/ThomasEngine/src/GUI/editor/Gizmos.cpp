@@ -91,6 +91,23 @@ void ThomasEngine::Gizmos::DrawRay(Vector3 from, Vector3 direction, float len)
 	thomas::editor::Gizmos::Gizmo().DrawRay(Utility::Convert(from), Utility::Convert(direction), len);
 }
 
+void ThomasEngine::Gizmos::DrawMatrix(const Matrix % matrix)
+{
+	thomas::editor::Gizmos::Gizmo().DrawMatrixBasis(Utility::Convert(matrix));
+}
+
+void ThomasEngine::Gizmos::DrawMatrix(const Matrix % matrix, float len)
+{
+	thomas::editor::Gizmos::Gizmo().DrawMatrixBasis(Utility::Convert(matrix), len);
+}
+
+void ThomasEngine::Gizmos::DrawQuat(const Quaternion % q, const Vector3% center, float len)
+{
+	Matrix m = Matrix::CreateFromQuaternion(q);
+	m.Translation = center;
+	DrawMatrix(m, len);
+}
+
 
 void ThomasEngine::Gizmos::SetColor(Color color)
 {

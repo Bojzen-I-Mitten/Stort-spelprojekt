@@ -11,10 +11,10 @@ public class GroundOffset : ScriptComponent
 {
     
     public string BoneName { get; set; }                // Name of the bone ray's are traced from
-    public float OffsetForward { get; set; } = 0.1f;    // Sample offsets along foot forward
+    public float OffsetForward { get; set; } = 0.2f;    // Sample offsets along foot forward
     public float OffsetSide { get; set; } = 0.1f;       // Sample offset on foot side
-    public float OffsetCast { get; set; } = 0.1f;       // Raycast offset along Y
-
+    public float OffsetCast { get; set; } = 0.3f;       // Raycast offset along Y
+    public Vector3 OrientAngle { get; set; }            // Orienatation around each axis
 
     private int maskGround;                 // Mask index for tracing ground
     protected uint traceBoneIndex;            // Index for raytraced bone
@@ -40,13 +40,16 @@ public class GroundOffset : ScriptComponent
     public Vector3 Forward { get { return forward; } }
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
+    public Vector3 Z { get { return -forward; } }
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
     public Vector3 Up { get { return normal; } }
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
-    public Vector3 Right { get { return Vector3.Cross(forward, normal); } }
+    public Vector3 Right { get { return Vector3.Cross(normal, Z); } }
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
-    public Quaternion Orient { get { return MathEngine.CreateRotation(Right, normal, forward); } }
+    public Quaternion Orient { get { return MathEngine.CreateRotation(Right, normal, Z); } }
 
     public GroundOffset() 
         : base()
@@ -97,6 +100,8 @@ public class GroundOffset : ScriptComponent
     public override void Update()
     {
         Matrix m = rC.GetLocalBoneMatrix(traceBoneIndex);
+        Matrix world = gameObject.transform.world;
+        m = m * world;
         // Result output
         RaycastHit res;
         // Cast rays from 'foot':
@@ -106,7 +111,6 @@ public class GroundOffset : ScriptComponent
         Src_Points[s++] = m.Translation + m.Down * OffsetForward + Vector3.Up * OffsetCast;       // Heel
         Src_Points[s++] = m.Translation + m.Right * OffsetSide + Vector3.Up * OffsetCast;         // Left side
         Src_Points[s++] = m.Translation + m.Left * OffsetSide + Vector3.Up * OffsetCast;          // Right side
-
         FoundSamples = 0;
         for (int i = 0; i < MAX_SAMPLES; i++)
         {
@@ -123,17 +127,28 @@ public class GroundOffset : ScriptComponent
         forward = m.Up;
         forward = forward - Vector3.Dot(normal, forward) * normal;
         forward.Normalize();
+        normal.Normalize();
+        // Orient in to local space
+        Matrix inv = Matrix.Invert(world);
+        center = Vector3.Transform(center, inv);
+        // Custom orientation of basis
+        inv = MathEngine.CreateRotationXYZ(Right, Up, Z, OrientAngle) * inv;
+        forward = Vector3.TransformNormal(forward, inv);
+        normal = Vector3.TransformNormal(normal, inv);
     }
 
     public override void OnDrawGizmos()
     {
-        Gizmos.SetColor(Color.Red);
-        for (int i = 0; i < FoundSamples; i++)
-            Gizmos.DrawLine(Src_Points[i], Points[i]);
-        Gizmos.SetColor(Color.Green);
-        Gizmos.DrawRay(center, normal, OffsetCast + OffsetSide);
-        Gizmos.SetColor(Color.Blue);
-        Gizmos.DrawRay(center, forward, OffsetForward);
+        //Gizmos.SetColor(Color.Green);
+        //Gizmos.DrawRay(center, normal, OffsetCast + OffsetSide);
+        //Gizmos.SetColor(Color.Blue);
+        //Gizmos.DrawRay(center, forward, OffsetForward);
+        Quaternion q = Orient;
+        Gizmos.DrawQuat(ref q, ref center, 0.05f);
+
+        Matrix orientInv = MathEngine.CreateRotationXYZ(Right, Up, Z, -OrientAngle);
+        Vector3 forward = Vector3.TransformNormal(this.forward, orientInv);
+        Vector3 normal = Vector3.TransformNormal(this.normal, orientInv);
 
         Vector3 p0 = center + forward * OffsetForward + Right * OffsetSide;
         Vector3 p1 = center + forward * OffsetForward - Right * OffsetSide;
@@ -144,6 +159,11 @@ public class GroundOffset : ScriptComponent
         Gizmos.DrawLine(p2, p3);
         Gizmos.DrawLine(p3, p0);
         //Gizmos.DrawBoundingBox()
+
+        Gizmos.SetMatrix(Matrix.Identity);  // In world space
+        Gizmos.SetColor(Color.Red);
+        for (int i = 0; i < FoundSamples; i++)
+            Gizmos.DrawLine(Src_Points[i], Points[i]);
     }
 
 }

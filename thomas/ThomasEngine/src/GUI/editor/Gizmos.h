@@ -31,6 +31,15 @@ namespace ThomasEngine
 		static void DrawRay(Vector3 from, Vector3 direction);
 		static void DrawRay(const Ray% ray);
 		static void DrawRay(Vector3 from, Vector3 direction, float len);
+		/* Draw matrix basis vectors
+		*/
+		static void DrawMatrix(const Matrix% matrix);
+		/* Draw matrix basis vectors with specified axis length
+		*/
+		static void DrawMatrix(const Matrix% matrix, float len);
+		/* Draw rotation axis with specified length with origin at the specified point.
+		*/
+		static void DrawQuat(const Quaternion% q, const Vector3% center, float len);
 
 		static void DrawFrustum(Vector3 center, float fov, float maxRange, float minRange, float aspect);
 

@@ -16,10 +16,10 @@ namespace Concussion_Ball.Assets.Scripts
         //[Newtonsoft.Json.JsonIgnore]
 
         //public string IKTargetBone { get; set; }    // Name of the bone ray's are traced from
+        //public string IKResolveBoneName { get; set; }
         //private uint ikBoneIndex;                   // Index for raytraced bone
         private IK_FABRIK_Constraint IK { get; set; }
 
-        public string IKResolveBoneName { get; set; }
 
         public FeetIK()
             : base()
