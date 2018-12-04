@@ -56,7 +56,7 @@ public class GUISelectTeam : ScriptComponent
         Chad1Rot = new Vector3(45, 0, 0);
         Chad2Pos = new Vector3(-1.7f, 0, 0);
         Chad2Rot = new Vector3(-20, 0, 0);
-        
+
         if (CameraMaster.instance.ChadTeam1 != null)
         {
             ChadRSC1 = CameraMaster.instance.ChadTeam1.GetComponent<RenderSkinnedComponent>();
@@ -112,8 +112,15 @@ public class GUISelectTeam : ScriptComponent
         }
         else if (ReadyUp.Clicked())
         {
-            Debug.Log("Ready up clicked!!");
-            MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
+            if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
+            else
+                MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
+        }
+        else if (ExitText.Clicked())
+        {
+            MatchSystem.instance.Disconnect();
+            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
         }
         else if ((StartGame.Clicked() || MatchSystem.instance.MatchStarted) && Canvas.isRendering)
         {
@@ -170,12 +177,7 @@ public class GUISelectTeam : ScriptComponent
         }
         else if (ExitText.Hovered())
         {
-            ExitText.color = Color.Black;
-            
-            if (ExitText.Clicked())
-            {
-                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-            }
+            ExitText.color = Selected;
         }
         else
         {
@@ -193,6 +195,13 @@ public class GUISelectTeam : ScriptComponent
             StartGame.interactable = false;
         }
 
+        if (ReadyUp.scale == Vector2.One)
+        {
+            if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                ReadyUp.text = "Unready";
+            else
+                ReadyUp.text = "Ready";
+        }
     }
 
     public void AddImagesAndText()
@@ -247,7 +256,7 @@ public class GUISelectTeam : ScriptComponent
         SpectatorText.interactable = true;
         SpectatorText.color = Unselected;
 
-        ReadyUp = Canvas.Add("Ready Up!");
+        ReadyUp = Canvas.Add("Ready");
         ReadyUp.position = new Vector2(0.5f, 0.25f);
         ReadyUp.origin = new Vector2(0.5f);
         ReadyUp.font = SportFont32;
@@ -328,8 +337,8 @@ public class GUISelectTeam : ScriptComponent
         foreach (NetworkPlayer player in team1)
         {
             Text p = Canvas.Add(player.PlayerName);
-            p.position = new Vector2(0.0f, 0.15f + 0.15f * i);
-            p.font = SportFont32;
+            p.position = new Vector2(0.0f, 0.15f + 0.1f * i);
+            p.font = ChadFont;
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
@@ -340,8 +349,8 @@ public class GUISelectTeam : ScriptComponent
         {
             Text p = Canvas.Add(player.PlayerName);
             p.origin = new Vector2(1, 0);
-            p.position = new Vector2(1.0f, 0.15f + 0.15f * i);
-            p.font = SportFont32;
+            p.position = new Vector2(1.0f, 0.15f + 0.1f * i);
+            p.font = ChadFont;
             if (player.ReadyToStart)
                 p.color = Color.Green;
             i++;
@@ -364,7 +373,7 @@ public class GUISelectTeam : ScriptComponent
     {
         int ready = 0;
         int players = 0;
-        foreach (var player in MatchSystem.instance.Scene.Players)
+        foreach (var player in MatchSystem.instance?.Scene.Players)
         {
             NetworkPlayer np = player.Value.gameObject?.GetComponent<NetworkPlayer>();
             players++;

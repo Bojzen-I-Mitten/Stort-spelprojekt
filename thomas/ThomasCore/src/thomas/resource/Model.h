@@ -35,6 +35,7 @@ namespace thomas {
 
 			std::vector<std::shared_ptr<graphics::Mesh>> GetMeshes();
 			graphics::animation::Skeleton* GetSkeleton();
+			uint32_t GetMeshCount() { return (uint32_t)m_data.m_meshes.size(); }
 
 			~Model();
 			

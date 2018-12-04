@@ -9,33 +9,41 @@ using namespace System::IO;
 namespace ThomasEngine
 {
 
+	JsonSerializer^ Serializer::CreateSerializerBase()
+	{
+		JsonSerializer^ serializer = gcnew JsonSerializer();
+
+		serializer->Formatting = Formatting::Indented;
+		serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;									// Serialize recursive $ref $id dependencies	
+		serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;						// Give $ref $id to objects (not lists)
+		serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
+		serializer->TypeNameHandling = TypeNameHandling::Auto;
+		serializer->NullValueHandling = NullValueHandling::Ignore;
+		serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;									// Specifies if objects are created in-place or not
+		serializer->MetadataPropertyHandling = MetadataPropertyHandling::Default;							// Specifies if $ref $id handling reads forward before resolving conflict?
+		serializer->DefaultValueHandling = DefaultValueHandling::Populate;									// Set to default value
+		serializer->Error += gcnew EventHandler<Serialization::ErrorEventArgs^>(&Serializer::ErrorHandler);
+		return serializer;
+	}
+	
 	JsonSerializer^ Serializer::serializer::get()
 	{
-		if (s_serializer)
-			return s_serializer;
-		else
-		{
-			JsonSerializer^ serializer = gcnew JsonSerializer();
+		JsonSerializer^ serializer = CreateSerializerBase();
 
-			serializer->Formatting = Formatting::Indented;
-			serializer->ReferenceLoopHandling = ReferenceLoopHandling::Ignore;									// Serialize recursive $ref $id dependencies	
-			serializer->PreserveReferencesHandling = PreserveReferencesHandling::Objects;						// Give $ref $id to objects (not lists)
-			serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
-			serializer->TypeNameHandling = TypeNameHandling::Auto;
-			serializer->NullValueHandling = NullValueHandling::Ignore;
-			serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;									// Specifies if objects are created in-place or not
-			serializer->MetadataPropertyHandling = MetadataPropertyHandling::Default;							// Specifies if $ref $id handling reads forward before resolving conflict?
-			serializer->DefaultValueHandling = DefaultValueHandling::Populate;									// Set to default value
-			serializer->Error += gcnew EventHandler<Serialization::ErrorEventArgs^>(&Serializer::ErrorHandler);
+		serializer->Converters->Add(gcnew ResourceConverter());
+		serializer->Converters->Add(gcnew PrefabConverter());
+		serializer->Converters->Add(gcnew ComponentConverter());
+		return serializer;
+	}
+	JsonSerializer^ Serializer::SerializerMaterial::get()
+	{
+		JsonSerializer^ serializer = CreateSerializerBase();
 
+		serializer->Converters->Add(gcnew ResourceConverter(Material::typeid));
+		serializer->Converters->Add(gcnew PrefabConverter());
+		serializer->Converters->Add(gcnew ComponentConverter());
+		return serializer;
 
-			serializer->Converters->Add(gcnew ResourceConverter());
-			serializer->Converters->Add(gcnew PrefabConverter());
-			serializer->Converters->Add(gcnew ComponentConverter());
-			s_serializer = serializer;
-			return s_serializer;
-		}
-		
 	}
 
 	bool Serializer::IsFileReady(System::String ^ path)
@@ -153,8 +161,8 @@ namespace ThomasEngine
 
 	GameObject^ Serializer::DeserializeGameObject(Newtonsoft::Json::Linq::JArray^ ja)
 	{
-		try {
-
+		try 
+		{
 			List<GameObject^>^ gameObject = ja->ToObject<List<GameObject^>^>(serializer);
 			return gameObject[0];
 		}
@@ -170,10 +178,8 @@ namespace ThomasEngine
 		StringWriter^ writer;
 		try
 		{
-			rootType = Material::typeid;
 			writer = gcnew StringWriter();
-			serializer->Serialize(writer, material);
-			rootType = nullptr;
+			SerializerMaterial->Serialize(writer, material);
 			File::WriteAllText(path, writer->ToString());
 		}
 		catch (System::Exception^ e)
@@ -189,12 +195,10 @@ namespace ThomasEngine
 	Material ^ Serializer::DeserializeMaterial(System::String ^ path)
 	{
 		try {
-			rootType = Material::typeid;
 			WaitForFile(path, 10);
 			StreamReader^ file = File::OpenText(path);
-			Material^ material = (Material^)serializer->Deserialize(file, Material::typeid);
-			material->m_path = path;
-			rootType = nullptr;
+			Material^ material = (Material^)SerializerMaterial->Deserialize(file, Material::typeid);
+			material->Path = path;
 			file->Close();
 			return material;
 		}

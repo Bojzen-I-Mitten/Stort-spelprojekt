@@ -6,7 +6,13 @@ namespace ThomasEngine
 {
 	ref class ResourceConverter : JsonConverter
 	{
+	private:
+		/* Resource type ignore by the converter (ignored is defined as unable to convert).
+		*/
+		System::Type^ m_ignoreType;
 	public:
+		ResourceConverter();
+		ResourceConverter(System::Type^ ignoreType);
 		// Inherited via JsonConverter
 		virtual void WriteJson(Newtonsoft::Json::JsonWriter ^writer, System::Object ^value, Newtonsoft::Json::JsonSerializer ^serializer) override;
 		virtual System::Object ^ ReadJson(Newtonsoft::Json::JsonReader ^reader, System::Type ^objectType, System::Object ^existingValue, Newtonsoft::Json::JsonSerializer ^serializer) override;

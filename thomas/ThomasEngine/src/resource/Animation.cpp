@@ -21,6 +21,6 @@ namespace ThomasEngine
 	}
 	void Animation::OnDeserialized(StreamingContext c)
 	{
-		m_nativePtr = new thomas::resource::Animation(Utility::ConvertString(m_path));
+		m_nativePtr = new thomas::resource::Animation(Utility::ConvertString(Path));
 	}
 }

@@ -13,6 +13,19 @@ namespace ThomasEngine
 	Resource::~Resource()
 	{
 	}
+	String^ Resource::Path::get()
+	{
+		return m_path;
+	}
+	void Resource::Path::set(System::String ^ path)
+	{
+		m_path = path;
+		m_nativePtr->setName(Utility::ConvertString(Name));
+	}
+	bool Resource::ContainsData()
+	{
+		return m_path->Length;
+	}
 	void Resource::asset_path::set(String^ value)
 	{
 		m_path = value->Replace("%THOMAS_DATA%", Application::editorAssets);
