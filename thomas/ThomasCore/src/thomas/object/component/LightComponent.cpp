@@ -53,33 +53,24 @@ namespace thomas
 
 			void LightComponent::OnEnable()
 			{
-				//SetCastShadows(m_castsShadows);
 				graphics::LightManager::AddLight(this);
 			}
 
 			void LightComponent::OnDisable()
 			{
-				//ReturnShadowMap();
-				graphics::LightManager::RemoveLight(this);
-			}
-			void LightComponent::OnDestroy()
-			{
-				//ReturnShadowMap();
 				graphics::LightManager::RemoveLight(this);
 			}
 
-			void LightComponent::ReturnShadowMap()
+			void LightComponent::OnDestroy()
 			{
-				bool temp = m_castsShadows;
-				SetCastShadows(false);
-				m_castsShadows = temp;
+				SetCastShadows(false);//returns the shadowmap
+				graphics::LightManager::RemoveLight(this);
 			}
 
 			void LightComponent::UpdateShadowBox(Camera* camera)
 			{
 				m_shadowMap.UpdateShadowBox(m_gameObject->GetTransform(), camera);
 			}
-
 
 			void LightComponent::BindShadowMapDepthTexture()
 			{

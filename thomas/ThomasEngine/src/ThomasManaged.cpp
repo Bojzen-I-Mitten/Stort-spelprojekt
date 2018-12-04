@@ -231,6 +231,11 @@ namespace ThomasEngine {
 		//}
 #endif
 	}
+
+	void ThomasWrapper::Shutdown()
+	{
+		Environment::Exit(0);
+	}
 	
 	void ThomasWrapper::CopyCommandList()
 	{
@@ -464,6 +469,19 @@ namespace ThomasEngine {
 	void ThomasWrapper::Exit() 
 	{
 		thomas::ThomasCore::Exit();
+	}
+
+	void ThomasWrapper::IssueShutdown()
+	{
+		if(inEditor)
+		{
+			IssueStopPlay();
+			return;
+		}
+
+		mainThreadDispatcher->BeginInvoke(
+			System::Windows::Threading::DispatcherPriority::Normal,
+			gcnew MainThreadDelegate(Shutdown));
 	}
 
 	void ThomasWrapper::CreateThomasWindow(IntPtr hWnd, bool isEditor)
