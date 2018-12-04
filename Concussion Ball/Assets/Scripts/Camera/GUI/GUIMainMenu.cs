@@ -7,6 +7,7 @@ public class GUIMainMenu : ScriptComponent
 {
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
+    public Texture2D MyNameTexture { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
@@ -15,7 +16,9 @@ public class GUIMainMenu : ScriptComponent
 
     Image TextBoxName;
     Image TextBoxBGName;
+    Image MyNameSticker;
     Text Play;
+    Text HostGame;
     Text Options;
     Text Exit;
     Text Credits;
@@ -53,12 +56,15 @@ public class GUIMainMenu : ScriptComponent
     public override void Update()
     {
         Play.color = Unselected;
+        HostGame.color = Unselected;
         Options.color = Unselected;
         Credits.color = Unselected;
         Exit.color = Unselected;
 
         if (Play.Hovered())
             Play.color = Selected;
+        else if (HostGame.Hovered())
+            HostGame.color = Selected;
         else if (Options.Hovered())
             Options.color = Selected;
         else if (Credits.Hovered())
@@ -106,6 +112,15 @@ public class GUIMainMenu : ScriptComponent
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
         }
+        else if (HostGame.Clicked())
+        {
+            CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+            TakeName = false;
+        }
+        else if (Exit.Clicked())
+        {
+            ThomasWrapper.IssueShutdown();
+        }
 
         PlayerString = PlayerString.ToUpper();
         PlayerName.text = PlayerString;
@@ -115,12 +130,10 @@ public class GUIMainMenu : ScriptComponent
             GUIInput.AppendString(ref PlayerString, 9);
         }
 
-        if(Exit.Clicked())
-        {
-            ThomasWrapper.IssueShutdown();
-        }
+        
 
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
+
     }
     public void AddImagesAndText()
     {
@@ -132,40 +145,44 @@ public class GUIMainMenu : ScriptComponent
         Play.position = new Vector2(0.1f, 0.11f);
         Play.interactable = true;
         Play.depth = 0.9f;
-        Play.text = "Play";
+        #endregion
+
+        #region Host Game
+        HostGame = Canvas.Add("Host Game");
+        HostGame.position = new Vector2(0.1f, 0.21f);
+        HostGame.interactable = true;
+        HostGame.depth = 0.9f;
         #endregion
 
         #region  Options
         Options = Canvas.Add("Options");
-        Options.position = new Vector2(0.1f, 0.21f);
+        Options.position = new Vector2(0.1f, 0.31f);
         Options.interactable = true;
         Options.depth = 0.9f;
-        Options.text = "Options";
         #endregion
 
         #region Credits
         Credits = Canvas.Add("Credits");
-        Credits.position = new Vector2(0.1f, 0.31f);
+        Credits.position = new Vector2(0.1f, 0.41f);
         Credits.interactable = true;
         Credits.depth = 0.9f;
-        Credits.text = "Credits";
         #endregion
 
         #region Exit
         Exit = Canvas.Add("Exit");
-        Exit.position = new Vector2(0.1f, 0.41f);
+        Exit.position = new Vector2(0.1f, 0.51f);
         Exit.interactable = true;
         Exit.depth = 0.9f;
-        Exit.text = "Exit";
         #endregion
 
         #region Player name
         PlayerName = Canvas.Add(PlayerString);
         PlayerName.origin = new Vector2(0.5f);
-        PlayerName.position = new Vector2(0.5f, 0.94f);
+        PlayerName.position = new Vector2(0.59f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
+        PlayerName.rotation = -0.1f;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
         #endregion
@@ -183,6 +200,15 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Images
+
+        if (MyNameTexture != null)
+        {
+            MyNameSticker = Canvas.Add(MyNameTexture);
+            MyNameSticker.origin = new Vector2(0.5f);
+            MyNameSticker.position = new Vector2(0.6f, 0.14f);
+            MyNameSticker.interactable = true;
+            MyNameSticker.depth = 0.9f;
+        }
 
         if (TextBox != null)
         {
@@ -216,6 +242,7 @@ public class GUIMainMenu : ScriptComponent
     public void ClearImagesAndText()
     {
         Canvas.Remove(Play);
+        Canvas.Remove(HostGame);
         Canvas.Remove(Options);
         Canvas.Remove(Credits);
         Canvas.Remove(Exit);
