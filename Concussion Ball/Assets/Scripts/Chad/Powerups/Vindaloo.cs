@@ -18,9 +18,12 @@ public class Vindaloo : Powerup
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
     private SoundComponent ExplosionSound;
+    private float _DespawnTimer;
 
     public float ExplosionRadius { get; set; } = 8.0f;
     public float ExplosionForce;
+
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -32,6 +35,7 @@ public class Vindaloo : Powerup
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
+        _DespawnTimer = 0.0f;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.Type = SoundComponent.SoundType.Effect;
@@ -120,6 +124,10 @@ public class Vindaloo : Powerup
     public override void Update()
     {
         base.Update();
+
+        // Despawn if Vindaloo has not hit anyone in 30 seconds
+        if (_DespawnTimer > 30)
+            base.Activate();
     }
 
     // if this is a throwable power-up this function will be called

@@ -26,6 +26,7 @@ public class ThomasTrain : Powerup
     public float ExplosionForce { get; set; }
 
     private float soundcooldown;
+    private float _DespawnTimer; 
 
     public override void OnAwake()
     {
@@ -34,6 +35,7 @@ public class ThomasTrain : Powerup
         MaxThrowForce = 36.0f;
         ThrowForce = BaseThrowForce;
         ExplosionForce = 60.0f;
+        _DespawnTimer = 0.0f;
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
@@ -113,6 +115,11 @@ public class ThomasTrain : Powerup
     {
         base.Update();
         soundcooldown -= Time.DeltaTime;
+        _DespawnTimer += Time.DeltaTime;
+
+        // Despawn if Train has not hit anyone in 30 seconds
+        if (_DespawnTimer > 30)
+            base.Activate();
     }
 
     public override void OnCollisionStay(Collider collider)
