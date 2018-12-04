@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderComponent.h"
+#include "../../script/animation/BoneInfo.h"
 
 using namespace System::Runtime::InteropServices;
 namespace thomas
@@ -70,8 +71,11 @@ namespace ThomasEngine
 		*/
 		bool FetchBoneIndex(String^ bone, [Out] unsigned int% boneIndex);
 		/* Fetch bone index from name hash.
-		*/ 
+		*/
 		bool FetchBoneIndex(unsigned int boneHash, unsigned int& boneIndex);
+		/* Fetch bone information
+		*/
+		bool FetchBoneInformation(String^ boneName, [Out] Script::BoneInfo% boneInfo);
 		/* Get the bone matrix in world space.
 		*/
 		Matrix GetBoneMatrix(int boneIndex);

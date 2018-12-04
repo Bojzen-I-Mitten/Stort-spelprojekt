@@ -207,6 +207,7 @@
     <ClInclude Include="src\object\component\Camera.h" />
     <ClInclude Include="src\object\component\SoundComponent.h" />
     <ClInclude Include="src\resource\Shader.h" />
+    <ClInclude Include="src\script\animation\BoneInfo.h" />
     <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
     <ClInclude Include="src\script\ScriptingUtility.h" />
@@ -232,6 +233,7 @@
     <ClInclude Include="src\object\Object.h" />
     <ClInclude Include="src\ThomasManaged.h" />
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
+    <ClInclude Include="src\utils\MathEngine.h" />
     <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +305,7 @@
     <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
+    <ClCompile Include="src\utils\MathEngine.cpp" />
     <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -10,20 +10,31 @@ using ThomasEngine.Script;
 public class GroundOffset : ScriptComponent
 {
     
-    public string BoneName { get; set; }
+    public string BoneName { get; set; }                // Name of the bone ray's are traced from
     public float OffsetForward { get; set; } = 0.1f;    // Sample offsets along foot forward
     public float OffsetSide { get; set; } = 0.1f;       // Sample offset on foot side
     public float OffsetCast { get; set; } = 0.1f;       // Raycast offset along Y
 
 
-    private int maskGround;
-    private uint boneIndex;
-    private RenderSkinnedComponent rC;
-    const int MAX_SAMPLES = 5;
+    private int maskGround;                 // Mask index for tracing ground
+    protected uint traceBoneIndex;            // Index for raytraced bone
+    protected RenderSkinnedComponent rC;    // Render component used as animation src
+    const int MAX_SAMPLES = 5;              // Number of samples (hardcoded)
+    /* Trace information
+     */
     int FoundSamples = 0;
     private Vector3[] Points = new Vector3[MAX_SAMPLES];
     private Vector3[] Src_Points = new Vector3[MAX_SAMPLES];
+    /* Traced params
+    */
     private Vector3 center, normal, forward;
+
+    /* Access to trace result
+    */
+
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public Vector3 Center { get { return center; } }
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
     public Vector3 Forward { get { return forward; } }
@@ -33,6 +44,9 @@ public class GroundOffset : ScriptComponent
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
     public Vector3 Right { get { return Vector3.Cross(forward, normal); } }
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public Quaternion Orient { get { return MathEngine.CreateRotation(Right, normal, forward); } }
 
     public GroundOffset() 
         : base()
@@ -50,10 +64,10 @@ public class GroundOffset : ScriptComponent
         uint index;
         if (rC.FetchBoneIndex(BoneName, out index))
         {
-            boneIndex = index;
+            traceBoneIndex = index;
         }
         else
-            boneIndex = 0;
+            traceBoneIndex = 0;
     }
 
     public override void Start()
@@ -82,7 +96,7 @@ public class GroundOffset : ScriptComponent
 
     public override void Update()
     {
-        Matrix m = rC.GetBoneMatrix(boneIndex);
+        Matrix m = rC.GetLocalBoneMatrix(traceBoneIndex);
         // Result output
         RaycastHit res;
         // Cast rays from 'foot':
@@ -104,14 +118,15 @@ public class GroundOffset : ScriptComponent
         {
             center = m.Translation;
             normal = m.Forward;
+            normal.Normalize();
         }
         forward = m.Up;
         forward = forward - Vector3.Dot(normal, forward) * normal;
+        forward.Normalize();
     }
 
     public override void OnDrawGizmos()
     {
-        Gizmos.SetMatrix(Matrix.Identity);
         Gizmos.SetColor(Color.Red);
         for (int i = 0; i < FoundSamples; i++)
             Gizmos.DrawLine(Src_Points[i], Points[i]);

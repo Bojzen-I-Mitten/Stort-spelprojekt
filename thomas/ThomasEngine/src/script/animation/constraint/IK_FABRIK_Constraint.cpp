@@ -17,7 +17,7 @@ namespace ThomasEngine
 	namespace Script
 	{
 		IK_FABRIK_Constraint::IK_FABRIK_Constraint(uint32_t num_link)
-			: m_num_link(num_link), m_ptr(new thomas::graphics::animation::IK_FABRIK_C_Constraint(num_link))
+			: m_num_link(num_link), m_boneIndex(UINT_MAX), m_ptr(new thomas::graphics::animation::IK_FABRIK_C_Constraint(num_link)), m_skinn(nullptr)
 		{
 		}
 
@@ -84,7 +84,15 @@ namespace ThomasEngine
 				m_ptr->setLinkAtIndex(i, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
 					joint_index));
 			}
+			m_skinn = skinn;
+			m_boneIndex = boneIndex;
 			skinn->GetBlendTree()->addConstraint(m_ptr, boneIndex);
+		}
+
+		void IK_FABRIK_Constraint::disable()
+		{
+			if (m_skinn)
+				m_skinn->GetBlendTree()->rmvConstraint(m_ptr, m_boneIndex);
 		}
 	}
 }

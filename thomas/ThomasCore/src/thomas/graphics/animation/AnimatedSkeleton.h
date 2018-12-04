@@ -39,9 +39,14 @@ namespace thomas {
 				void stopAnimation();
 
 			public:
-
+				/* Set the root bone for the animation blend tree.
+				*/
 				virtual void setBlendTree(AnimationNode *blendTree);
+				/* Clear the  blend tree, setting root to NULL.
+				*/
 				virtual void clearBlendTree();
+				/* Set the root bone for the animation blend tree as a single clip
+				*/
 				virtual void playSingle(thomas::resource::Animation * anim);
 
 				/* Get skin matrixes
@@ -54,7 +59,8 @@ namespace thomas {
 				*/
 				virtual math::Matrix getBoneOrientation(unsigned int bone) const;
 				bool getBoneIndex(uint32_t boneNameHash, unsigned int & boneIndex) const;
-				
+				/* Get name of the bone at the index.
+				*/
 				virtual const std::string& getBoneName(unsigned int bone) const;
 				/* Access skeleton info. */
 				virtual const Bone& getBoneInfo(unsigned int bone);

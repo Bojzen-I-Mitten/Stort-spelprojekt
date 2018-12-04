@@ -78,6 +78,20 @@ namespace ThomasEngine
 		boneIndex = ind;
 		return result;
 	}
+	/* Fetch bone information
+	*/
+	bool RenderSkinnedComponent::FetchBoneInformation(String^ boneName, [Out] Script::BoneInfo% boneInfo)
+	{
+		if (!Native->GetBlendTree()) return false;
+		unsigned int boneHash = Utility::hash(boneName);
+		unsigned int ind;
+		if (BlendTree->getBoneIndex(boneHash, ind))
+		{
+			boneInfo.SetData(BlendTree->getBoneInfo(ind));
+			return true;
+		}
+		return false;
+	}
 
 	void RenderSkinnedComponent::Update()
 	{

@@ -13,6 +13,8 @@ namespace ThomasEngine
 
 	namespace Script
 	{
+		/*	
+		*/
 		public ref class IK_FABRIK_Constraint
 		{
 		public:
@@ -39,11 +41,14 @@ namespace ThomasEngine
 			void apply(GameObject^ obj, uint32_t boneIndex);
 			void apply(RenderSkinnedComponent^ skinn, uint32_t boneIndex);
 			void apply(thomas::object::component::RenderSkinnedComponent* skinn, uint32_t boneIndex);
+			/* Remove constraint. */
+			void disable();
 
 			thomas::graphics::animation::IK_FABRIK_C_Constraint* Native();
 		private:
-			uint32_t m_num_link;
+			uint32_t m_num_link, m_boneIndex;
 			thomas::graphics::animation::IK_FABRIK_C_Constraint* m_ptr;
+			thomas::object::component::RenderSkinnedComponent* m_skinn;
 		};
 	}
 }

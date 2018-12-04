@@ -70,6 +70,7 @@
     <ClCompile Include="src\object\component\animation\BoneSyncComponent.cpp" />
     <ClCompile Include="src\system\command\CommandQueue.cpp" />
     <ClCompile Include="src\script\ScriptinUtility.cpp" />
+    <ClCompile Include="src\utils\MathEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -146,6 +147,8 @@
     <ClInclude Include="src\object\ComponentState.h" />
     <ClInclude Include="src\object\component\AudioListener.h" />
     <ClInclude Include="src\script\ScriptingUtility.h" />
+    <ClInclude Include="src\script\animation\BoneInfo.h" />
+    <ClInclude Include="src\utils\MathEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

@@ -19,8 +19,14 @@ namespace thomas {
 			*/
 			class IBlendTree {
 			public:
+				/* Set the root bone for the animation blend tree.
+				*/
 				virtual void setBlendTree(AnimationNode *blendTree) = 0;
+				/* Clear the  blend tree, setting root to NULL.
+				*/
 				virtual void clearBlendTree() = 0;
+				/* Set the root bone for the animation blend tree as a single clip
+				*/
 				virtual void playSingle(thomas::resource::Animation * anim) = 0;
 
 				/* Constraints
