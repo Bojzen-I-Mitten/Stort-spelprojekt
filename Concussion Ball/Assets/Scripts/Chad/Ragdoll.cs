@@ -319,6 +319,7 @@ public class Ragdoll : ScriptComponent
             G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
 
         }
+        //J_BodyParts[(int)BODYPART.HEAD].Damping = 50.0f;
 
         Vector3 center;
         //Hips

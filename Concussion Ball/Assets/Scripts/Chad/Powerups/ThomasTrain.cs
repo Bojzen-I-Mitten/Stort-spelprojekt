@@ -115,6 +115,11 @@ public class ThomasTrain : Powerup
         soundcooldown -= Time.DeltaTime;
     }
 
+    public override void OnCollisionStay(Collider collider)
+    {
+        base.OnCollisionEnter(collider);
+    }
+
     public override void SaveObjectOwner(ChadControls chad)
     {
         ObjectOwner = chad;
