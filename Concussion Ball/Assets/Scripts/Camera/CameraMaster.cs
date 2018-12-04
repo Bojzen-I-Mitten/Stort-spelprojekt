@@ -123,6 +123,7 @@ public class CameraMaster : ScriptComponent
         MainMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
         LoadingScreen.Canvas.isRendering = false;
+        OptionsMenu.Canvas.isRendering = false;
 
         switch (State)
         {
