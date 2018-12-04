@@ -105,7 +105,12 @@ namespace ThomasEngine.Network
         {
             for(int i=0; i < serverInfo.PeerIPs.Length; ++i)
             {
-                Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
+                NetPeer np = Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
+                if(np?.EndPoint == null)
+                {
+                    Manager.InternalManager.DisconnectAll();
+                    throw new Exception("Could not connect to peer " + serverInfo.PeerIPs[i]);
+                }
             }
             
             Manager.ServerStartTime = serverInfo.ServerStartTime;

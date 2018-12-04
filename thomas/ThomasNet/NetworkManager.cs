@@ -173,7 +173,7 @@ namespace ThomasEngine.Network
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, peer socket closed"); //Could be the other way around
                     break;
                 case DisconnectReason.SocketSendError:
-                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, lcoal socket closed"); //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, local socket closed"); //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                     break;
             }
         }
