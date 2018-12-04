@@ -106,7 +106,7 @@ public class Banana : Powerup
             m_rigidBody.Friction = 100.0f;
             //m_rigidBody.IsKinematic = true;
             m_rigidBody.LinearVelocity = Vector3.Zero;
-            PickupCollider.enabled = true; // for testing
+            //PickupCollider.enabled = true; // for testing
         }
 
     }
