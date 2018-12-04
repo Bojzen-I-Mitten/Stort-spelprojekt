@@ -281,7 +281,7 @@ public class MatchSystem : NetworkManager
 
 #region RPC
 
-    public void RPCMatchInfo(bool matchStarted, float startTime, bool goldenGoal, int powerupID,
+    public void RPCMatchInfo(bool matchStarted, float startTime, int length, bool goldenGoal, int powerupID,
         int team1Score, int team2Score,
         Color team1Color, Color team2Color,
         string team1Name, string team2Name)
@@ -291,6 +291,7 @@ public class MatchSystem : NetworkManager
         PowerupManager.NextPowerupID = powerupID;
         GoldenGoal = goldenGoal;
         MatchStartTime = startTime;
+        MatchLength = length;
 
         Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
         Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
@@ -406,7 +407,7 @@ public class MatchSystem : NetworkManager
         //}
         if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
         {
-            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, MatchLength, GoldenGoal, PowerupManager.NextPowerupID,
                 Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
                 Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
                 Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
