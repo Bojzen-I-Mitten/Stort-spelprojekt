@@ -42,6 +42,10 @@ public class GUIJoinHost : ScriptComponent
 
     public float CaretOffset { get; set; } = 0.0f;
 
+    public override void OnAwake()
+    {
+    }
+
     public override void Start()
     {
         TakeIP = false;
@@ -49,6 +53,8 @@ public class GUIJoinHost : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
+
+
     }
 
     public void Listener_PeerConnectedEvent(NetPeer peer)
@@ -265,7 +271,7 @@ public class GUIJoinHost : ScriptComponent
         {
             Join = Canvas.Add("Join");
             Join.origin = new Vector2(0.5f);
-            Join.position = new Vector2(TextBoxIP.position.x + TextBoxIP.size.x / 2 + Join.size.x / 2, 0.15f);
+            Join.position = new Vector2(0.4f, 0.25f);
             Join.interactable = true;
             Join.depth = 0.9f;
             Join.color = Color.FloralWhite;
@@ -273,7 +279,7 @@ public class GUIJoinHost : ScriptComponent
 
         Back = Canvas.Add("Back");
         Back.origin = new Vector2(0.5f);
-        Back.position = new Vector2(0.575f, 0.36f);
+        Back.position = new Vector2(0.1f, 0.8f);
         Back.interactable = true;
         Back.depth = 0.9f;
         Back.color = Color.FloralWhite;
