@@ -617,7 +617,7 @@ public class ChadControls : NetworkComponent
             {
                 yield return null;
             }
-            Debug.Log("The ground has been reached.");
+            //Debug.Log("The ground has been reached.");
             yield return new WaitForSeconds(1);
             State = STATE.CHADING;
             CurrentVelocity.y = BaseSpeed;
@@ -670,7 +670,7 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
-        Debug.Log("Deactivating aim hud");
+        //Debug.Log("Deactivating aim hud");
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
