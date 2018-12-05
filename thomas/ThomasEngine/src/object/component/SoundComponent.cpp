@@ -19,9 +19,13 @@ namespace ThomasEngine
 	void SoundComponent::Play(AudioClip^ clip, float volume, bool looping, bool is3D)
 	{
 		if (!clip)
+		{
 			sound->Stop();
+		}
 		else
+		{
 			sound->Play((thomas::resource::AudioClip*)clip->m_nativePtr, volume, looping, is3D);
+		}
 	}
 
 	void SoundComponent::Stop()

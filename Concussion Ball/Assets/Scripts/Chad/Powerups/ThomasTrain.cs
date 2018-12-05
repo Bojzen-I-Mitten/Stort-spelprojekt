@@ -41,6 +41,7 @@ public class ThomasTrain : Powerup
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
         soundComponentChargeUp.Looping = false;
         soundComponentChargeUp.Is3D = true;
+        soundComponentChargeUp.MinDistance = 0.1f;
 
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
         soundComponentTravel.Type = SoundComponent.SoundType.Effect;
@@ -51,6 +52,9 @@ public class ThomasTrain : Powerup
         soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
         soundComponentExplosion.Looping = false;
         soundComponentExplosion.Is3D = true;
+
+        soundComponentExplosion.MaxDistance = 10000;
+        soundComponentExplosion.MinDistance = 20;
 
         soundcooldown = 0.0f;
 
