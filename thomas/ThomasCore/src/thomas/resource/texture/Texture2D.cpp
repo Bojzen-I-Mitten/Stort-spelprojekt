@@ -160,7 +160,7 @@ namespace thomas
 
 		Texture2D::~Texture2D()
 		{
-			SAFE_DELETE(data);
+			
 		}
 
 
