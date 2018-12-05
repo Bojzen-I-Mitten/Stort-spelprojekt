@@ -97,18 +97,39 @@ public class GUISelectTeam : ScriptComponent
             MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
             MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
             ReadyUp.scale = Vector2.One;
+            if (MatchSystem.instance.MatchStarted)
+            {
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
+            }
         }
         else if (Team2Image.Clicked())
         {
             MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
             MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
             ReadyUp.scale = Vector2.One;
+            if (MatchSystem.instance.MatchStarted)
+            {
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
+            }
         }
         else if (SpectatorImage.Clicked())
         {
             MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
             MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
             ReadyUp.scale = Vector2.Zero;
+            if (MatchSystem.instance.MatchStarted)
+            {
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
+            }
         }
         else if (ReadyUp.Clicked())
         {
@@ -122,7 +143,7 @@ public class GUISelectTeam : ScriptComponent
             MatchSystem.instance.Disconnect();
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
         }
-        else if ((StartGame.Clicked() || MatchSystem.instance.MatchStarted) && Canvas.isRendering)
+        else if (StartGame.Clicked() && Canvas.isRendering)
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             CameraMaster.instance.State = CAM_STATE.GAME;
