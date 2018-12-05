@@ -743,12 +743,16 @@ namespace thomas
 			delete[] filename_c;
 
 			HRESULT hr;
-			if (extension_string == ".dds")
+			if (extension_string == ".dds" || extension_string == ".DDS")
+			{
 				hr = DirectX::CreateDDSTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
 					D3D11_RESOURCE_MISC_TEXTURECUBE, false, &texture, &textureView, nullptr);
+			}
 			else
+			{
 				hr = DirectX::CreateWICTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
 					D3D11_RESOURCE_MISC_TEXTURECUBE, 0, &texture, &textureView);
+			}
 
 			if (FAILED(hr))
 			{
