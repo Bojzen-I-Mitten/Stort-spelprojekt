@@ -143,7 +143,7 @@ public class GUISelectTeam : ScriptComponent
             MatchSystem.instance.Disconnect();
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
         }
-        else if (StartGame.Clicked() && Canvas.isRendering)
+        else if ((StartGame.Clicked() || (MatchSystem.instance.MatchLength == MatchSystem.instance.MatchTimeLeft && MatchSystem.instance.MatchStarted)) && Canvas.isRendering)
         {
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             CameraMaster.instance.State = CAM_STATE.GAME;
