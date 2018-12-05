@@ -7,6 +7,7 @@ Texture2D diffuseTex;
 Texture2D normalTex : NORMALTEXTURE;
 Texture2D specularTex;
 Texture2D maskTex;
+Texture2D shirtPattern;
 
 cbuffer MATERIAL_PROPERTIES
 {
@@ -50,6 +51,17 @@ BlendState AlphaBlendingOn
     RenderTargetWriteMask[0] = 0x0F;
 
 };
+struct appdata_chad_skin
+{
+    float3 vertex : POSITION;
+    float2 texcoord : TEXCOORD0;
+    float2 shirtCoord : TEXCOORD1;
+    float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float3 bitangent : BITANGENT;
+    float4 boneWeight : BONEWEIGHTS;
+    int4 boneIndex : BONEINDICES;
+};
 
 struct v2f
 {
@@ -57,6 +69,7 @@ struct v2f
     float4 worldPos : POSITIONWS;
     float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
+    float2 shirtCoord : TEXCOORD1;
 };
 
 
@@ -65,7 +78,7 @@ float biTangentSign(float3 norm, float3 tang, float3 bitang)
     return dot(cross(norm, tang), bitang) > 0.f ? 1.f : -1.f;
 }
 
-v2f vert(appdata_thomas_skin v)
+v2f vert(appdata_chad_skin v)
 {
     v2f o;
     
@@ -75,7 +88,6 @@ v2f vert(appdata_thomas_skin v)
     float bisign = biTangentSign(v.normal, v.tangent, v.bitangent);
     ThomasSkinVertex(posL, normalL, v.boneWeight, v.boneIndex);
     float3 bitangL = cross(normalL, tangentL) * bisign;
-	
     o.vertex = ThomasObjectToClipPos(posL);
     o.worldPos = ThomasObjectToWorldPos(posL);
 
@@ -86,6 +98,7 @@ v2f vert(appdata_thomas_skin v)
     o.TBN = float3x3(tangent, bitangent, normal);
     
 	o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
+    o.shirtCoord = v.shirtCoord;
 
     return o;
 }
@@ -93,8 +106,11 @@ v2f vert(appdata_thomas_skin v)
 float4 frag(v2f input) : SV_TARGET
 {
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
-    //diffuse *= color.xyz;
-    diffuse += maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
+    diffuse *= maskTex.Sample(StandardWrapSampler, input.texcoord) * color;
+    // Mix in shirt pattern
+    float3 shirtDiffuse = shirtPattern.Sample(StandardWrapSampler, input.shirtCoord);
+    if(shirtDiffuse.r < 0.8f)
+        diffuse = shirtDiffuse;
 
     float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
     float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);

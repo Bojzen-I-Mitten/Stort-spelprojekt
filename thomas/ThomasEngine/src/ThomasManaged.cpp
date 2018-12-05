@@ -69,6 +69,8 @@ namespace ThomasEngine {
 	void ThomasWrapper::Start(bool editor) 
 	{
 		inEditor = editor;
+		EditorWindowLoaded = gcnew ManualResetEvent(!inEditor);
+		GameWindowLoaded = gcnew ManualResetEvent(!inEditor);
 		//Thread init
 		Thread::CurrentThread->Name = "Main Thread";
 		mainThreadDispatcher = System::Windows::Threading::Dispatcher::CurrentDispatcher;					// Create/Get dispatcher
@@ -88,41 +90,32 @@ namespace ThomasEngine {
 
 		if (ThomasCore::Initialized())
 		{
-			
-			
 			Component::LoadExternalComponents();
 
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
 			Thomas->m_scene->LogicThreadClearScene();
-#if _EDITOR
-
-			if (InEditor()) {
-				Model::InitPrimitives();
-				Resources::LoadAll(Application::editorAssets);
-				ScriptingManager::Init();
-			}
-			else
-			{
-				Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
-			}
-
-			
-#endif
 
 			LOG("Thomas fully initiated, Chugga-chugga-whoo-whoo!");
 			logicThread = gcnew Thread(gcnew ThreadStart(StartEngine));
 			logicThread->Name = "Thomas Engine (Logic Thread)";
 			logicThread->Start();
-
-			renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
-		
-			renderThread->Name = "Thomas Engine (Render Thread)";
-			renderThread->Start();
-
+			
 		}
 	}
+#ifdef _EDITOR
+	void ThomasWrapper::ThomasGameWindowLoaded()
+	{
+		GameWindowLoaded->Set();
+	}
+
+	void ThomasWrapper::ThomasEditorWindowLoaded()
+	{
+		EditorWindowLoaded->Set();
+	}
+#endif
+
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
@@ -154,6 +147,8 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::StartRenderer()
 	{
+		GameWindowLoaded->WaitOne();
+		EditorWindowLoaded->WaitOne();
 		// Render thread start
 
 		ThomasCore::Core().registerThread();
@@ -192,50 +187,55 @@ namespace ThomasEngine {
 		// Enter async. state 
 #ifdef _EDITOR
 					// This is only relevant if we are running with editor, should be removed when build
-		for each(GameObject^ gameObject in CurrentScene->GameObjects)
-		{
-			if (gameObject->MoveStaticGroup())
-			{
-				// Fetch the adress of where an object might be moved to
-				thomas::object::Object* new_temp = gameObject->nativePtr;
+		//for each(GameObject^ gameObject in CurrentScene->GameObjects)
+		//{
+		//	if (gameObject->MoveStaticGroup())
+		//	{
+		//		// Fetch the adress of where an object might be moved to
+		//		thomas::object::Object* new_temp = gameObject->nativePtr;
 
-				// Fetch the adress of the object that might be moved
-				thomas::object::Object* old_native = gameObject->moveStaticGroup();
+		//		// Fetch the adress of the object that might be moved
+		//		thomas::object::Object* old_native = gameObject->moveStaticGroup();
 
-				// Find the wrapped gameobject of the object that might be moved
-				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
+		//		// Find the wrapped gameobject of the object that might be moved
+		//		GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
-				if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
-					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
-			}
+		//		if (temp) // If temp is nullptr, no managed object has been invalidated, no move will be done.
+		//			temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+		//	}
 
-			else if (gameObject->MakeStatic())
-			{
-				thomas::object::Object* new_temp = gameObject->nativePtr;
+		//	else if (gameObject->MakeStatic())
+		//	{
+		//		thomas::object::Object* new_temp = gameObject->nativePtr;
 
-				thomas::object::Object* old_native = gameObject->setStatic();
+		//		thomas::object::Object* old_native = gameObject->setStatic();
 
-				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
+		//		GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
-				if (temp) // If temp is nullptr, no managed object has been invalidated.
-					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+		//		if (temp) // If temp is nullptr, no managed object has been invalidated.
+		//			temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
 
-			}
+		//	}
 
-			else if (gameObject->MakeDynamic())
-			{
-				thomas::object::Object* new_temp = gameObject->nativePtr;
+		//	else if (gameObject->MakeDynamic())
+		//	{
+		//		thomas::object::Object* new_temp = gameObject->nativePtr;
 
-				thomas::object::Object* old_native = gameObject->setDynamic();
+		//		thomas::object::Object* old_native = gameObject->setDynamic();
 
-				GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
+		//		GameObject^ temp = CurrentScene->Find(static_cast<thomas::object::GameObject*>(old_native));
 
-				if (temp) // If temp is nullptr, no managed object has been invalidated.
-					temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
-			}
+		//		if (temp) // If temp is nullptr, no managed object has been invalidated.
+		//			temp->nativePtr = new_temp; // Nothing becomes invalidated if we don't do anything.
+		//	}
 
-		}
+		//}
 #endif
+	}
+
+	void ThomasWrapper::Shutdown()
+	{
+		Environment::Exit(0);
 	}
 	
 	void ThomasWrapper::CopyCommandList()
@@ -253,6 +253,7 @@ namespace ThomasEngine {
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
 			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
+			ImGui::Text("	Draw Shadows: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_SHADOWS)*1000.0f);
 			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
 			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
@@ -279,8 +280,30 @@ namespace ThomasEngine {
 		// Called when system can replace 
 	}
 
+	void ThomasWrapper::LoadEditorAssets()
+	{
+#if _EDITOR
+		if (IsEditorBuild()) {
+			Model::InitPrimitives();
+			Resources::LoadAll(Application::editorAssets);
+			ScriptingManager::Init();
+		}
+		else
+		{
+			Resources::LoadAll(Application::editorAssets + "\\FXIncludes");
+		}
+#endif
+	}
+
 	void ThomasWrapper::StartEngine()
 	{
+		LoadEditorAssets();
+		// Boot up render thread
+		renderThread = gcnew Thread(gcnew ThreadStart(StartRenderer));
+		renderThread->Name = "Thomas Engine (Render Thread)";
+		renderThread->Start();
+		playing = IsEditorBuild() ? RunningState::Editor : RunningState::UnInitialized;
+
 		// Update thread start
 
 		ThomasCore::Core().registerThread();
@@ -361,7 +384,7 @@ namespace ThomasEngine {
 
 						for each (GameObject^ gameObject in CurrentScene->GameObjects)
 						{
-							if (gameObject->GetActive())
+							//if (gameObject->GetActive())
 								gameObject->RenderGizmos();
 						}
 						s_Selection->render();
@@ -449,6 +472,19 @@ namespace ThomasEngine {
 	void ThomasWrapper::Exit() 
 	{
 		thomas::ThomasCore::Exit();
+	}
+
+	void ThomasWrapper::IssueShutdown()
+	{
+		if(inEditor)
+		{
+			IssueStopPlay();
+			return;
+		}
+
+		mainThreadDispatcher->BeginInvoke(
+			System::Windows::Threading::DispatcherPriority::Normal,
+			gcnew MainThreadDelegate(Shutdown));
 	}
 
 	void ThomasWrapper::CreateThomasWindow(IntPtr hWnd, bool isEditor)
@@ -603,6 +639,11 @@ namespace ThomasEngine {
 		return playing == RunningState::Running;
 	}
 
+	bool ThomasWrapper::IsEditor()
+	{
+		return playing == RunningState::Editor;
+	}
+
 	bool ThomasWrapper::RenderPhysicsDebug::get() { return thomas::Physics::Physics::s_drawDebug; }
 
 	void ThomasWrapper::RenderPhysicsDebug::set(bool value) { thomas::Physics::Physics::s_drawDebug = value; }
@@ -625,7 +666,7 @@ namespace ThomasEngine {
 	}
 
 	
-	bool ThomasWrapper::InEditor()
+	bool ThomasWrapper::IsEditorBuild()
 	{
 		return inEditor;
 	}

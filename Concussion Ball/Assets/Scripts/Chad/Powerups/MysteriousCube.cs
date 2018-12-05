@@ -23,7 +23,7 @@ public class MysteriousCube : Powerup
     IEnumerator MovementClock = null;
     IEnumerator ScaleClock = null;
     IEnumerator RagdollImmunityClock = null;
-    IEnumerator ThrowStrengthClock = null;
+    //IEnumerator ThrowStrengthClock = null;
 
     private float ThrowStrengthCountdown;
     private float MovementCountdown;
@@ -33,7 +33,7 @@ public class MysteriousCube : Powerup
     private float OriginalBaseSpeed;
     private float OriginalMaxSpeed;
     private float OriginalRagdollTimer;
-    private float OriginalThrowStrength;
+    //private float OriginalThrowStrength;
     private Vector3 OriginalScale;
 
     // Tweaking constants
@@ -45,8 +45,8 @@ public class MysteriousCube : Powerup
     private float ScaleDecreaseFactor = 0.5f;
     private float PushBackForce = 100.0f;
     private float RagDollImunityDuration = 7.0f;
-    private float ThrowStrengthFactor = 2.0f;
-    private float ThrowStrengthDuration = 7.0f;
+    //private float ThrowStrengthFactor = 2.0f;
+    //private float ThrowStrengthDuration = 7.0f;
 
     public override void OnAwake()
     {
@@ -201,10 +201,10 @@ public class MysteriousCube : Powerup
         targetChad.MinimumRagdollTimer = RagDollImunityDuration;
     }
 
-    private void ThrowStrengthModifier()
-    {
-        ThrowStrength.ThrowStrengthFactor = ThrowStrengthFactor;
-    }
+    //private void ThrowStrengthModifier()
+    //{
+    //    ThrowStrength.ThrowStrengthFactor = ThrowStrengthFactor;
+    //}
     #endregion
 
     #region Coroutines
@@ -262,22 +262,22 @@ public class MysteriousCube : Powerup
         //StartCoroutine(RemoveCube());
     }
 
-    IEnumerator ThrowStrengthRoutine(float seconds)
-    {
-        ThrowStrengthCountdown = seconds;
+    //IEnumerator ThrowStrengthRoutine(float seconds)
+    //{
+    //    ThrowStrengthCountdown = seconds;
 
-        while (ThrowStrengthCountdown > 0)
-        {
-            Debug.Log("Throw strength affector remaining: " + ThrowStrengthCountdown);
-            yield return new WaitForSeconds(1.0f);
-            ThrowStrengthCountdown--;
-        }
+    //    while (ThrowStrengthCountdown > 0)
+    //    {
+    //        Debug.Log("Throw strength affector remaining: " + ThrowStrengthCountdown);
+    //        yield return new WaitForSeconds(1.0f);
+    //        ThrowStrengthCountdown--;
+    //    }
 
-        // Set back original throw strength when timer has expired
-        ThrowStrength.ThrowStrengthFactor = OriginalThrowStrength;
-        ThrowStrengthCountdown = ThrowStrengthDuration;
-        //StartCoroutine(RemoveCube());
-    }
+    //    // Set back original throw strength when timer has expired
+    //    ThrowStrength.ThrowStrengthFactor = OriginalThrowStrength;
+    //    ThrowStrengthCountdown = ThrowStrengthDuration;
+    //    //StartCoroutine(RemoveCube());
+    //}
 
     private IEnumerator RemoveCube()
     {

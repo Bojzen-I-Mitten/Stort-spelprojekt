@@ -157,9 +157,9 @@ public class Ragdoll : ScriptComponent
     Vector3 calculatePosbetweenTwoSkeletonschanges(string BoneName1,string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
     {
         uint boneindex = 0;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName1), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName1, out boneindex);
         Vector3 bone1 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName2), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName2, out boneindex);
         Vector3 bone2 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
         Vector3 up = bone2 - bone1;
         float length = up.Length();
@@ -170,9 +170,9 @@ public class Ragdoll : ScriptComponent
     float calculateLengthBetweenSkeleton(string BoneName1, string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
     {
         uint boneindex = 0;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName1), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName1, out boneindex);
         Vector3 bone1 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName2), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName2, out boneindex);
         Vector3 bone2 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
         Vector3 up = bone2 - bone1;
         float length = up.Length();
@@ -306,6 +306,7 @@ public class Ragdoll : ScriptComponent
             {
                 J_BodyParts[i] = G_BodyParts[i].AddComponent<Joint>();
                 J_BodyParts[i].NoCollision = true;
+                J_BodyParts[i].Damping = 0.85f;
             }
                 
 
@@ -314,10 +315,11 @@ public class Ragdoll : ScriptComponent
 
             BT_BodyParts[i].BoneName = BoneNames[i];
             BT_BodyParts[i].AnimatedObject = gameObject;
-            skinn.FetchBoneIndex(Utility.hash(BoneNames[i]), out BoneIndexes[i]);
+            skinn.FetchBoneIndex(BoneNames[i], out BoneIndexes[i]);
             G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
 
         }
+        //J_BodyParts[(int)BODYPART.HEAD].Damping = 50.0f;
 
         Vector3 center;
         //Hips
@@ -382,8 +384,10 @@ public class Ragdoll : ScriptComponent
             RB_BodyParts[i] = G_BodyParts[i].AddComponent<Rigidbody>();
 
             RB_BodyParts[i].IsKinematic = AllobjectKinectic;
-            RB_BodyParts[i].Damping = AllobjectDamping;
-            RB_BodyParts[i].AngularDamping = 0.85f;
+            //RB_BodyParts[i].Damping = AllobjectDamping;
+            //RB_BodyParts[i].AngularDamping = 0.85f;
+
+            RB_BodyParts[i].Friction = 0.8f;
             RB_BodyParts[i].Mass = Totalmass * Mass_BodyParts[i];
             RB_BodyParts[i].ActiveState = Rigidbody.ActivationState.Always_Active;
         }

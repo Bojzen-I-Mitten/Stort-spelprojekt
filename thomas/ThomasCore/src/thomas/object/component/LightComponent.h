@@ -4,6 +4,7 @@
 
 #include "../../utils/Math.h"
 #include "../../graphics/LightManager.h"
+#include "../../graphics/ChadowMapping.h"
 /**
 LightComponent class
 */
@@ -11,11 +12,15 @@ LightComponent class
 
 namespace thomas
 {
+	namespace graphics {
+		class Mesh; namespace render { struct RenderCommand; }
+	}
+	namespace resource { namespace texture { class Texture2D; class Texture2DArray; } }
 	namespace object 
 	{
 		namespace component
 		{
-			
+			class Camera;
 			class LightComponent : public Component
 			{
 			public:
@@ -23,7 +28,8 @@ namespace thomas
 				graphics::LightManager::LightStruct m_lightComponentData;
 
 				graphics::LightManager::LIGHT_TYPES m_type;
-				
+				bool m_castsShadows;
+				graphics::ShadowMap m_shadowMap;
 			public:
 				LightComponent();
 				~LightComponent();
@@ -32,8 +38,15 @@ namespace thomas
 				virtual void OnEnable() override;
 				virtual void OnDisable() override;
 				virtual void OnDestroy() override;
+			private:
 
 			public: // Get / Set
+				void UpdateShadowBox(Camera* camera);
+				void BindShadowMapDepthTexture();
+				void DrawShadow(graphics::render::RenderCommand renderCommand);
+				math::Matrix GetVPMat();
+				int GetShadowMapIndex() const;
+
 				graphics::LightManager::LightStruct GetData();
 
 				graphics::LightManager::LIGHT_TYPES GetType();
@@ -43,7 +56,6 @@ namespace thomas
 				void SetColorDiffuse(thomas::math::Color other);
 				thomas::math::Color GetColorSpecular();
 				void SetColorSpecular(thomas::math::Color other);
-				
 
 				float GetIntensity() const;
 				void SetIntensity(float const& value);
@@ -66,7 +78,11 @@ namespace thomas
 				math::Vector2 GetRectangleDimensions() const;
 				void SetRectangleDimensions(math::Vector2 const& value);
 
+				bool CastsShadows() const;
+				void SetCastShadows(bool const& value);
 
+				float GetShadowHardness() const;
+				void SetShadowHardness(float const& value);
 			};
 
 		}

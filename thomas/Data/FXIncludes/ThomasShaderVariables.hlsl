@@ -18,6 +18,7 @@
 
 cbuffer ThomasPerFrame
 {
+    float4 thomas_Time; // t/20, t, t*2, t*3
 	float4 thomas_DeltaTime; // dt, 1/dt, smoothdt, 1/smoothdt
 };
 

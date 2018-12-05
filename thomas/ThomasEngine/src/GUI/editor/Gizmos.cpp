@@ -86,6 +86,10 @@ void ThomasEngine::Gizmos::DrawFrustum(Vector3 center, float fov, float maxRange
 {
 	thomas::editor::Gizmos::Gizmo().DrawFrustum(Utility::Convert(center), fov, maxRange, minRange, aspect);
 }
+void ThomasEngine::Gizmos::DrawRay(Vector3 from, Vector3 direction, float len)
+{
+	thomas::editor::Gizmos::Gizmo().DrawRay(Utility::Convert(from), Utility::Convert(direction), len);
+}
 
 
 void ThomasEngine::Gizmos::SetColor(Color color)
@@ -106,12 +110,12 @@ void ThomasEngine::Gizmos::DrawPing(String^ ping)
 
 void ThomasEngine::Gizmos::ImguiStringUpdate(String^ text, Vector2 size, Vector2 pos)
 {
-	if (ThomasEngine::ThomasWrapper::InEditor())
+	if (ThomasEngine::ThomasWrapper::IsEditorBuild())
 		thomas::editor::Gizmos::Gizmo().ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(size), Utility::Convert(pos));
 }
 void ThomasEngine::Gizmos::ImguiStringUpdate(String ^ text, Vector2 pos)
 {
-	if(ThomasEngine::ThomasWrapper::InEditor())
+	if(ThomasEngine::ThomasWrapper::IsEditorBuild())
 		thomas::editor::Gizmos::Gizmo().ImguiStringUpdate(Utility::ConvertString(text), Utility::Convert(pos));
 }
 //

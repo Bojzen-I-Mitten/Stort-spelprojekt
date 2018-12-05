@@ -79,6 +79,12 @@ namespace ThomasEngine.Network
             _networkComponentsCache = gameObject.GetComponents<NetworkComponent>();
         }
         
+        public void OnDisconnect()
+        {
+            foreach (NetworkComponent nc in networkComponentsCache)
+                nc.OnDisconnect();
+        }
+
         public override void Update()
         {
             if(Owner && Manager.InternalManager.IsRunning)

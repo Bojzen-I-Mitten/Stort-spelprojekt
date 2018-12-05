@@ -33,6 +33,8 @@ namespace ThomasEditor
         public ObservableCollection<TreeItemViewModel> m_hierarchyNodes { get; set; }
         List<GameObject> m_copiedObjects = new List<GameObject>(); //??correct code convention?
         public static GameObjectHierarchy instance;
+
+        public bool updateHiearchyParenting = true;
         public GameObjectHierarchy()
         {
             InitializeComponent();
@@ -65,7 +67,7 @@ namespace ThomasEditor
 
         }
 
-        private void ResetTreeView()
+        public void ResetTreeView()
         {
             this.Dispatcher.BeginInvoke((Action)(() =>
             {
@@ -91,7 +93,8 @@ namespace ThomasEditor
             if (oldParent == newParent || !child.gameObject)
                 return;
 
-            ResetTreeView();
+            if(updateHiearchyParenting)
+                ResetTreeView();
             //this.Dispatcher.BeginInvoke((Action)(() =>
             //{
             //    if (oldParent == newParent || !child.gameObject)
@@ -363,7 +366,10 @@ namespace ThomasEditor
             {
                 if (node.IsSelected && ((GameObject)node.Data).transform != parentTransform && !CheckIfChild(node, parentTransform))
                 {
-                    ((GameObject)node.Data).transform.parent = parentTransform; //parentTransform is null if no parent is given.
+                    GameObject child = node.Data as GameObject;
+                    // parentTransform is null if no parent is given.
+                    GameObject parent = parentTransform == null ? null : parentTransform.gameObject;
+                    ThomasWrapper.IssueCommand(new ParentObjectCommand(child, parent));
                 }
                 ChangeParent(parentTransform, node.Children);
             }
@@ -432,9 +438,7 @@ namespace ThomasEditor
                                 {
                                     Type componentToAdd = componentList[i] as Type;
 
-                                    var method = typeof(GameObject).GetMethod("AddComponent").MakeGenericMethod(componentToAdd);
-                                    method.Invoke(targetModel, null);
-
+                                    ThomasWrapper.IssueCommand(new AddComponentCommand(targetModel, componentToAdd));
                                     Debug.Log("Script found and added.");
                                 }
                             }
@@ -527,6 +531,7 @@ namespace ThomasEditor
         {
             TreeViewItem item = hierarchy.SelectedItem as TreeViewItem;
             if (item != null)
+                //DetachParent();
                 //Loop through selected objects
                 for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
                 {
@@ -534,7 +539,6 @@ namespace ThomasEditor
 
                     //Unselect selected object
                     ThomasWrapper.Selection.UnSelectGameObject(gObj);
-
                     //Destroy
                     GameObject.Destroy(gObj);
                 }
@@ -607,17 +611,23 @@ namespace ThomasEditor
 
         public void MenuItem_PasteGameObject(object sender, RoutedEventArgs e)
         {
+            // Remove any non-valid objects to copy
+            int count = m_copiedObjects.Count;
+            m_copiedObjects = Utils.VerifyValidObjects(m_copiedObjects);
+            if (m_copiedObjects.Count < count)
+                Debug.LogWarning("Copy src was deleted, nothing left to copy.");
+            // Do the actuall copying
             if (m_copiedObjects.Count > 0)
             {
-                DetachParent();
-                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Unsubscribe(SceneGameObjectsChanged);
+                // First also verify that there are no children of copied objects in the list!
+                m_copiedObjects = Utils.DetachParents(m_copiedObjects);
                 foreach (GameObject copiedObject in m_copiedObjects)
                 {
-                    GameObject.Instantiate(copiedObject);
+                    GameObject gObj = GameObject.Instantiate(copiedObject);
+                    if (copiedObject.Parent != null)
+                        ThomasWrapper.IssueCommand(new ParentObjectCommand(gObj, copiedObject.Parent));
                     Debug.Log("Pasted object.");
                 }
-                ThomasWrapper.Thomas.SceneManagerRef.CurrentScene.Subscribe(SceneGameObjectsChanged);
-                ResetTreeView();
                 return;
             }
         }
@@ -683,27 +693,6 @@ namespace ThomasEditor
                 selected.AddRange(GetSelectedRootNodes(node.Children));
             }
             return selected;
-        }
-
-        /// <summary>
-        /// Will remove parent from child if Parent is not selected to copy. When copy is executed.
-        /// </summary>
-        private void DetachParent()
-        {
-            for (int i = 0; i < m_copiedObjects.Count; i++)
-            {
-                if (m_copiedObjects[i].transform.parent != null)
-                {
-                    //if (!m_copiedObjects.Contains(gObj.transform.parent.gameObject))
-                    //{
-                    //    gObj.transform.parent = null;
-                    //}
-                    if (m_copiedObjects.Contains(m_copiedObjects[i].transform.parent.gameObject))
-                    {
-                        m_copiedObjects[i] = null;
-                    }
-                }
-            }
         }
 
         private void AddNewCubePrimitive(object sender, RoutedEventArgs e)

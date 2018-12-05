@@ -11,8 +11,8 @@ namespace thomas
 		Resource(file)
 		{
 			// TODO: is there a way to allow users to set streaming functionality for clips later on?
-			SoundManager::GetInstance()->LoadSound(m_name, m_path);
-			m_sound = SoundManager::GetInstance()->GetSound(m_name);
+			SoundManager::GetInstance()->LoadSound(getName(), m_path);
+			m_sound = SoundManager::GetInstance()->GetSound(getName());
 		}
 
 		FMOD::Sound* AudioClip::GetSound()

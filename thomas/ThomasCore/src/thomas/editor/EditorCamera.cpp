@@ -51,6 +51,7 @@ namespace thomas
 				new object::component::Camera(-1));
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
+			m_cameraComponent->SetFar(500.f);
 			m_grid = std::unique_ptr<EditorGrid>(new EditorGrid(100, 1.f, 10));
 			resource::Shader* outliner = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
 
@@ -498,7 +499,8 @@ namespace thomas
 
 			GetTransform()->LookAt(combinedBox.Center);
 			GetTransform()->SetPosition(combinedBox.Center);
-			GetTransform()->Translate(-GetTransform()->Forward()*combinedBox.Extents*5.0f);
+			float dist = std::fmin(math::Vector3(combinedBox.Extents).Length(), 150.f);
+			GetTransform()->Translate(-GetTransform()->Forward()*dist);
 		}
 	}
 }

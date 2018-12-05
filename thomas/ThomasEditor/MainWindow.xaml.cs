@@ -16,6 +16,7 @@ using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using ThomasEditor.Testing;
 using HierarchyTreeView;
+using ThomasEditor.utils;
 
 namespace ThomasEditor
 {
@@ -80,6 +81,8 @@ namespace ThomasEditor
 
             ThomasWrapper.RenderEditor = Properties.Settings.Default.RenderEditor;
             ThomasWrapper.RenderPhysicsDebug = Properties.Settings.Default.RenderPhysicsDebug;
+
+            GameObjectHierarchy.instance.updateHiearchyParenting = Properties.Settings.Default.updateHiearchyParenting;
 
             menuItem_editorRendering.IsChecked = ThomasWrapper.RenderEditor;
             menuItem_physicsDebug.IsChecked = ThomasWrapper.RenderPhysicsDebug;
@@ -313,10 +316,10 @@ namespace ThomasEditor
 
         private void RemoveSelectedGameObjects(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < ThomasWrapper.Selection.Count; i++)
+            var c = Utils.DetachParents(ThomasWrapper.Selection.Ref);
+            ThomasWrapper.Selection.UnselectGameObjects();
+            foreach (GameObject gObj in c)
             {
-                GameObject gObj = ThomasWrapper.Selection.op_Subscript(i);
-                ThomasWrapper.Selection.UnSelectGameObject(gObj);
                 ThomasEngine.Object.Destroy(gObj);
             }
         }
@@ -413,6 +416,8 @@ namespace ThomasEditor
             else
             {
                 ThomasWrapper.IssuePlay();
+                //OnStartPlaying();
+               // game.Focus();
             }
         }
 
@@ -668,6 +673,17 @@ namespace ThomasEditor
             MenuItem item = sender as MenuItem;
             ThomasWrapper.RenderPhysicsDebug = item.IsChecked;
             Properties.Settings.Default.RenderPhysicsDebug = item.IsChecked;
+            Properties.Settings.Default.Save();
+        }
+
+
+        private void MenuItem_ToggleHiearchy(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            GameObjectHierarchy.instance.updateHiearchyParenting = item.IsChecked;
+            if (item.IsChecked)
+                GameObjectHierarchy.instance.ResetTreeView();
+            Properties.Settings.Default.updateHiearchyParenting = item.IsChecked;
             Properties.Settings.Default.Save();
         }
 

@@ -1,36 +1,11 @@
 #include "Texture2D.h"
-#include "../../utils/d3d.h"
 #include "../../Common.h"
 #include "../../ThomasCore.h"
-
+#include "../ResourceManager.h"
 namespace thomas
 {
 	namespace resource
 	{
-		Texture2D* Texture2D::s_blackTexture;
-		Texture2D* Texture2D::s_whiteTexture;
-		Texture2D* Texture2D::s_normalTexture;
-
-		void Texture2D::Init()
-		{
-			DirectX::PackedVector::XMUBYTEN4 colors[16];
-			std::fill(std::begin(colors), std::end(colors), math::Color(0, 0, 0, 1).RGBA());
-			s_blackTexture = new Texture2D((void*)&colors, 4, 4, false);
-			s_blackTexture->m_path = "Black Texture";
-			std::fill(std::begin(colors), std::end(colors), math::Color(0.5f, 0.5f, 1, 1).RGBA());
-			s_normalTexture = new Texture2D((void*)&colors, 4, 4, false);
-			s_normalTexture->m_path = "Normal Texture";
-			std::fill(std::begin(colors), std::end(colors), math::Color(1, 1, 1, 1).RGBA());
-			s_whiteTexture = new Texture2D((void*)&colors, 4, 4, false);
-			s_whiteTexture->m_path = "White Texture";
-		}
-		void Texture2D::Destroy()
-		{
-			delete s_blackTexture;
-			delete s_whiteTexture;
-			delete s_normalTexture;
-		}
-
 		void Texture2D::LoadTextureFromFile(std::string path)
 		{
 			if (utils::D3D::Instance()->LoadTextureFromFile(path, m_resource, m_srv))
@@ -52,14 +27,11 @@ namespace thomas
 			}
 		}
 
-		
-
-		Texture2D::Texture2D(int width, int height, bool mipMap) : Texture2D(nullptr, width, height, mipMap)
+		Texture2D::Texture2D(int width, int height, bool mipMap, bool bindDepth): Texture2D(nullptr, width, height, mipMap, bindDepth)
 		{
-			
 		}
 
-		Texture2D::Texture2D(void * initData, int width, int height, bool mipMap)
+		Texture2D::Texture2D(void * initData, int width, int height, bool mipMap, bool bindDepth)
 		{
 			m_width = width;
 			m_height = height;
@@ -67,7 +39,16 @@ namespace thomas
 			m_mipMap = mipMap;
 
 			ID3D11Texture2D *textureInterface = nullptr;
-			utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+
+			if (bindDepth)
+			{
+				utils::D3D::Instance()->CreateDepthStencilTexture(width, height, textureInterface, m_srv);
+			}
+			else
+			{
+				utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+			}
+
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 		}
@@ -161,17 +142,17 @@ namespace thomas
 
 		Texture2D * Texture2D::GetBlackTexture()
 		{
-			return s_blackTexture;
+			return ResourceManager::GetBlackTexture();
 		}
 
 		Texture2D * Texture2D::GetWhiteTexture()
 		{
-			return s_whiteTexture;
+			return ResourceManager::GetWhiteTexture();
 		}
 
 		Texture2D * Texture2D::GetNormalTexture()
 		{
-			return s_normalTexture;
+			return ResourceManager::GetNormalTexture();
 		}
 
 

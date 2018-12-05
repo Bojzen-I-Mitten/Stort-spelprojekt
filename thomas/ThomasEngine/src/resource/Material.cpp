@@ -5,20 +5,25 @@
 #include "../ThomasManaged.h"
 #include "Shader.h"
 #include "texture\Texture2D.h"
+#include "texture\TextureCube.h"
 #include "Resources.h"
 #include "../serialization/Serializer.h"
+#include "../Debug.h"
 namespace ThomasEngine {
 
-	Material::Material(ThomasEngine::Shader^ shader) : Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
+	Material::Material(ThomasEngine::Shader^ shader) : 
+		Resource(shader->Name + " Material.mat", new thomas::resource::Material((thomas::resource::Shader*)shader->m_nativePtr))
 	{
 	}
-	Material::Material(Material^ original) : Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
+	Material::Material(Material^ original) : 
+		Resource(original->ToString() + " (instance).mat", new thomas::resource::Material((thomas::resource::Material*)original->m_nativePtr))
 	{
 		m_instance = true;
 		EditorProperties = original->EditorProperties;
 	}
 
-	Material::Material() : Material(ThomasEngine::Shader::Find("StandardShader"))
+	Material::Material() 
+		: Material(ThomasEngine::Shader::Find("StandardShader"))
 	{
 
 	}
@@ -34,6 +39,8 @@ namespace ThomasEngine {
 	}
 
 	Material^ Material::StandardMaterial::get() {
+		/*if(s_standardMaterial == nullptr)
+			s_standardMaterial = gcnew Material(thomas::resource::Material::GetStandardMaterial());*/
 		return gcnew Material(thomas::resource::Material::GetStandardMaterial());
 	}
 
@@ -51,25 +58,29 @@ namespace ThomasEngine {
 		shader = value;
 		OnChange();
 	}
+	thomas::resource::Material* Material::Native::get()
+	{
+		return (thomas::resource::Material*)m_nativePtr;
+	}
 
 
 	void Material::OnChange()
 	{
 #ifdef _EDITOR
-		if (!ThomasWrapper::IsPlaying() && !m_instance)
-			Serializer::SerializeMaterial(this, m_path);
+		if (ThomasWrapper::IsEditor() && !m_instance)
+			Serializer::SerializeMaterial(this, Path);
 #endif
 	}
 
 	void Material::shader::set(ThomasEngine::Shader^ value)
 	{
-		if (!value)
+		if (!value || !value->m_nativePtr)
 			return;
 		if (m_nativePtr)
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		else
 		{
-			m_nativePtr = new thomas::resource::Material(Utility::ConvertString(m_path));
+			m_nativePtr = new thomas::resource::Material(Utility::ConvertString(Path));
 			((thomas::resource::Material*)m_nativePtr)->SetShader((thomas::resource::Shader*)value->m_nativePtr);
 		}
 	}
@@ -86,13 +97,31 @@ namespace ThomasEngine {
 		ThomasEngine::Resource^ texture = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
 		if (texture)
 			return (ThomasEngine::Texture2D^)texture;
-		else
+		else if (nativePtr)
 			return gcnew ThomasEngine::Texture2D(nativePtr);
+		else
+			return nullptr;
+	}
+	TextureCube^ Material::GetTextureCube(String^ name)
+	{
+		thomas::resource::TextureCube* nativePtr = ((thomas::resource::Material*)m_nativePtr)->GetCubeMap(Utility::ConvertString(name));
+		ThomasEngine::Resource^ texture = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
+		if (texture)
+			return (ThomasEngine::TextureCube^)texture;
+		else if (nativePtr)
+			return gcnew ThomasEngine::TextureCube(nativePtr);
+		else
+			return nullptr;
 	}
 
 	void Material::SetTexture2D(String^ name, Texture2D^ value)
 	{
 		((thomas::resource::Material*)m_nativePtr)->SetTexture2D(Utility::ConvertString(name), (thomas::resource::Texture2D*)value->m_nativePtr);
+	}
+
+	void Material::SetTextureCube(String^ name, TextureCube^ value)
+	{
+		((thomas::resource::Material*)m_nativePtr)->SetCubeMap(Utility::ConvertString(name), (thomas::resource::TextureCube*)value->m_nativePtr);
 	}
 
 
@@ -110,6 +139,8 @@ namespace ThomasEngine {
 		for each(String^ key in value->Keys)
 		{
 			System::Object^ prop = value[key];
+			if (prop == nullptr)
+				continue;
 			Type^ t = prop->GetType();
 			if (t == Newtonsoft::Json::Linq::JObject::typeid)
 			{
@@ -178,10 +209,16 @@ namespace ThomasEngine {
 			case ShaderProperty::Type::TEXTURE2D:
 				value = GetTexture2D(name);
 				break;
+			case ShaderProperty::Type::TEXTURECUBE:
+				value = GetTextureCube(name);
+				break;
 			default:
 				break;
 			}
-			properties->Add(name, value);
+			if (value == nullptr)
+				Debug::LogWarning("Material property: " + name + "  was null in: " + this->Name);
+			else
+				properties->Add(name, value);
 		}
 		return properties;
 	}

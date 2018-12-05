@@ -20,7 +20,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <xctk:IntegerUpDown Grid.Row="0" IsReadOnly="False" AllowSpin="False" Minimum="0" Foreground="White"
+        <xctk:IntegerUpDown x:Name="listCounter"  Grid.Row="0" IsReadOnly="False" AllowSpin="False" Minimum="0" Foreground="White"
             Value="{Binding Value.Count, Mode=OneWay}"
             ValueChanged="PropertyGridEditorIntegerUpDown_ValueChanged"
                             UpdateValueOnEnterKey="True"/>

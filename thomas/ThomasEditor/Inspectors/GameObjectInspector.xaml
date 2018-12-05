@@ -22,6 +22,7 @@
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="boolToVisibilityConveter"/>
         <converters:ComponentToNameConverter x:Key="componentToNameConverter"/>
+        <converters:ComponentIndexConverter x:Key="componentIndexConverter"/>
         <converters:CollisionLayerConveter x:Key="collisionLayerConverter"/>
     </UserControl.Resources>
 
@@ -47,22 +48,27 @@
                 <TextBlock Text="Layer" Width="41" VerticalAlignment="Center"/>
                 <ComboBox x:Name="LayerBox" SelectedIndex="{Binding Layer}" Width="163" VerticalAlignment="Center"></ComboBox>
             </StackPanel>
-            <CheckBox Content="Static"  IsChecked="{Binding staticSelf}" Grid.Column="2" Margin="3,10" HorizontalAlignment="Right" Width="46"/>
+            <!-- <CheckBox Content="Static"  IsChecked="{Binding staticSelf}" Grid.Column="2" Margin="3,10" HorizontalAlignment="Right" Width="46"/> -->
         </Grid>
 
-        <ItemsControl ItemsSource="{Binding Components}" Grid.Row="1" Background="#333333">
+        <ItemsControl x:Name="componentItemList" ItemsSource="{Binding Components}" Grid.Row="1" Background="#333333" HorizontalAlignment="Stretch">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Expander IsExpanded="True" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Expander.Header>
-                            <DockPanel HorizontalAlignment="Stretch" LastChildFill="False">
-                                <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Activated, Mode=OneWay}" Checked="ComponentEnabled_Checked" Unchecked="ComponentEnabled_Unchecked"
-                                          VerticalContentAlignment="Center" VerticalAlignment="Center" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
-                                <Label DockPanel.Dock="Left" Content="{Binding Converter={StaticResource componentToNameConverter}}"/>
-                                <Label DockPanel.Dock="Left" Content="Index:" Margin="15,0,0,0"/>
-                                <TextBox VerticalAlignment="Center" Height="20" Width="30" Text="{Binding Index, UpdateSourceTrigger=LostFocus}" LostFocus="ComponentIndex_Changed" Margin="15,0,0,0"/>
-                                <Button DockPanel.Dock="Right" Content=" X " Click="RemoveComponentButton_Click" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}" Margin="15,0,0,0"/>
-                            </DockPanel>
+                            <Grid HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition MaxWidth="20"  />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition MaxWidth="35"/>
+                                    <ColumnDefinition MaxWidth="30"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0" IsChecked="{Binding Activated, Mode=OneWay}" Checked="ComponentEnabled_Checked" Unchecked="ComponentEnabled_Unchecked"
+                                          VerticalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
+                                <Label Grid.Column="1"  Content="{Binding Converter={StaticResource componentToNameConverter}}"/>
+                                <TextBox Grid.Column="2" HorizontalAlignment="Right"  Height="20" Width="30" Text="{Binding Converter={StaticResource componentIndexConverter}, Mode=OneWay, UpdateSourceTrigger=LostFocus}" LostFocus="ComponentIndex_Changed"/>
+                                <Button Grid.Column="3" HorizontalAlignment="Right" Content=" X " Click="RemoveComponentButton_Click" Visibility="{Binding canDisable, Converter={StaticResource boolToVisibilityConveter}}"/>
+                            </Grid>
                         </Expander.Header>
                         <local:ExtendedPropertyGrid DataContext="{Binding}"/>
                     </Expander>

@@ -5,7 +5,7 @@
 #include "ThomasTime.h"
 #include "editor\Editor.h"
 #include "object\Object.h"
-#include "resource\texture\Texture2D.h"
+#include "resource\ResourceManager.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
 #include "resource/MemoryAllocation.h"
@@ -28,7 +28,7 @@
 namespace thomas 
 {
 	std::vector<std::string> ThomasCore::s_logOutput;
-	bool ThomasCore::s_clearLog;
+	utils::atomics::SpinLock ThomasCore::s_logLock;
 	bool ThomasCore::s_initialized;
 	bool ThomasCore::s_isEditor = false;
 	ImGuiContext* ThomasCore::s_imGuiContext;
@@ -37,13 +37,13 @@ namespace thomas
 	{
 		s_initialized = false;
 		s_imGuiContext = ImGui::CreateContext();
-		s_logOutput.reserve(10);
+		s_logOutput.reserve(100);
 
 		//Init all required classes
 		if (!utils::D3D::Instance()->Init())
 			return false;
-
-		resource::Texture2D::Init();
+		resource::ResourceManager::Init();
+		graphics::Renderer::Instance()->init();		// Needs to be initiated after textures, initiates default shaders (default tex needs to be loaded)
 		ThomasTime::Init();
 		SoundManager::GetInstance()->Init();
 		graphics::Renderer::Instance()->init();
@@ -63,13 +63,7 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
-		if (s_clearLog)
-		{
-			s_logOutput.clear();
-			s_clearLog = false;
-		}
-
-		SoundManager::GetInstance()->Update();
+		//SoundManager::GetInstance()->Update();
 	}
 
 	void ThomasCore::Render()
@@ -114,7 +108,7 @@ namespace thomas
 		graphics::ParticleSystem::DestroyGlobalSystems();
 		graphics::Renderer::Instance()->Destroy();
 		resource::Material::Destroy();
-		resource::Texture2D::Destroy();
+		resource::ResourceManager::Destroy();
 		editor::Gizmos::Gizmo().Destroy();
 		utils::Primitives::Destroy();
 		Physics::Destroy();
@@ -175,14 +169,18 @@ namespace thomas
 
 	void ThomasCore::LogOutput(const std::string & message)
 	{
+		s_logLock.lock();
 		s_logOutput.push_back(message);
 		if (s_logOutput.size() > 10)
 			s_logOutput.erase(s_logOutput.begin());
+		s_logLock.unlock();
 	}
 
 	void ThomasCore::ClearLogOutput()
 	{
-		s_clearLog = true;
+		s_logLock.lock();
+		s_logOutput.clear();
+		s_logLock.unlock();
 	}
 	bool ThomasCore::IsEditor()
 	{

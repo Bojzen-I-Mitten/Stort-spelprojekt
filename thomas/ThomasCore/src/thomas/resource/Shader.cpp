@@ -8,6 +8,9 @@
 #include <comdef.h>
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
+#include "../Common.h"
+#include "../utils/Math.h"
+#include "ResourceManager.h"
 
 namespace thomas
 {
@@ -79,8 +82,7 @@ namespace thomas
 						{
 							D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 							vs->GetInputSignatureElementDesc(vsPassDesc.ShaderIndex, iInput, &paramDesc);
-
-							Semantics semantic = GetSemanticFromName(paramDesc.SemanticName);
+							Semantics semantic = GetSemanticFromName(paramDesc.SemanticName, paramDesc.SemanticIndex);
 
 							D3D11_INPUT_ELEMENT_DESC elementDesc;
 							elementDesc.SemanticName = paramDesc.SemanticName;
@@ -258,6 +260,7 @@ namespace thomas
 		{
 			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
+
 		void Shader::Bind()
 		{
 			for (auto prop : m_properties) {
@@ -331,6 +334,11 @@ namespace thomas
 		{
 			if (HasProperty(name))
 			{
+				if (value == nullptr)
+				{
+					LOG("Can't set null texture in property: " + name);
+					value = Texture2D::GetWhiteTexture();
+				}
 				std::shared_ptr<shaderproperty::ShaderPropertyTexture2D> prop(
 					new shaderproperty::ShaderPropertyTexture2D(value));
 				prop->SetName(name);
@@ -434,7 +442,7 @@ namespace thomas
 		{
 			graphics::Renderer::Instance()->getShaderList().QueueRecompile();
 		}
-		Shader::Semantics Shader::GetSemanticFromName(std::string semanticName)
+		Shader::Semantics Shader::GetSemanticFromName(std::string semanticName, uint32_t semanticIndex)
 		{
 			if (semanticName.find("BINORMAL") != std::string::npos)
 			{
@@ -474,7 +482,8 @@ namespace thomas
 			}
 			else if (semanticName.find("TEXCOORD") != std::string::npos)
 			{
-				return Semantics::TEXCOORD;
+				semanticIndex = min(semanticIndex, 1u); // Clamp limit
+				return Semantics((uint32_t)Semantics::TEXCOORD + semanticIndex);
 			}
 			else if (semanticName.find("BITANGENT") != std::string::npos)
 			{
@@ -550,7 +559,14 @@ namespace thomas
 				break;
 			case D3D_SVC_MATRIX_COLUMNS:
 			case D3D_SVC_MATRIX_ROWS:
-				newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				if (semantic == "MATRIXARRAY")
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrixArray::GetDefault();
+				}
+				else
+				{
+					newProperty = shaderproperty::ShaderPropertyMatrix::GetDefault();
+				}
 				break;
 			case D3D_SVC_OBJECT:
 			{
@@ -563,7 +579,8 @@ namespace thomas
 				case D3D_SVT_TEXTURE2DMS:
 				case D3D_SVT_RWTEXTURE2D:
 				case D3D_SVT_TEXTURECUBE:
-					newProperty = shaderproperty::ShaderPropertyTextureCube::GetDefault();
+					isMaterialProperty = true;
+					newProperty = new shaderproperty::ShaderPropertyTextureCube(ResourceManager::GetCubeDefault());
 					break;
 				case D3D_SVT_TEXTURE2DARRAY:
 					newProperty = shaderproperty::ShaderPropertyTexture2DArray::GetDefault();
@@ -572,15 +589,17 @@ namespace thomas
 					isMaterialProperty = true;
 					if (semantic == "NORMALTEXTURE")
 					{
-						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(ResourceManager::GetNormalTexture());
 					}
 					else if (semantic == "SPECULARTEXTURE")
 					{
-						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetBlackTexture());
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(ResourceManager::GetBlackTexture());
 					}
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
+						if (semantic == "SHADOWMAP")
+							isMaterialProperty = false;
 					}
 					break;
 				case D3D_SVT_STRUCTURED_BUFFER:
@@ -636,6 +655,11 @@ namespace thomas
 				if(isMaterialProperty)
 					m_materialProperties.push_back(name);
 			}
+			/*else
+			{
+				std::string err("ShaderProperty default valye was null in shader" + this->m_name + " with propertyname: " + name);
+				LOG(err);
+			}*/
 			
 		}
 

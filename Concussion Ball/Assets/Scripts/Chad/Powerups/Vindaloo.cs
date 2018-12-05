@@ -18,9 +18,12 @@ public class Vindaloo : Powerup
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
     private SoundComponent ExplosionSound;
+    private float _DespawnTimer;
 
     public float ExplosionRadius { get; set; } = 8.0f;
-    public float ExplosionForce = 300.0f;
+    public float ExplosionForce;
+
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -28,10 +31,11 @@ public class Vindaloo : Powerup
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
         ExplosionRadius = 8.0f;
-        ExplosionForce = 300.0f;
+        ExplosionForce = 60.0f;
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
+        _DespawnTimer = 0.0f;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.Type = SoundComponent.SoundType.Effect;
@@ -120,24 +124,48 @@ public class Vindaloo : Powerup
     public override void Update()
     {
         base.Update();
+
+        // Despawn if Vindaloo has not hit anyone in 30 seconds
+        if (_DespawnTimer > 30)
+            base.Activate();
+        else if (_DespawnTimer > 0)
+            _DespawnTimer += Time.DeltaTime;
+        
     }
 
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        //Change for abs
-        //if (direction.y < 0)
-        //    direction.y += direction.y * -1.2f;
-        //else
-        //    direction.y += direction.y * 1.2f;
-
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+
+        _DespawnTimer += Time.DeltaTime;
     }
 
     public override void SaveObjectOwner(ChadControls chad)
     {
         ObjectOwner = chad;
     }
+
+    //public override void OnCollisionEnter(Collider collider)
+    //{
+    //    //Check if colliding with a player
+    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
+    //    if (!otherChad)
+    //    { 
+    //        base.OnCollisionEnter(collider);
+    //    }
+    //    else
+    //    {
+    //        ChadControls localChad = MatchSystem.instance.LocalChad;
+
+    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
+
+    //        if (localChad && (otherPlayerTeam != playerTeam))
+    //            base.OnCollisionEnter(collider);
+    //    }
+        
+    //}
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -153,7 +181,6 @@ public class Vindaloo : Powerup
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-
         if (localChad && otherPlayerTeam != playerTeam)
         {
             float distance = Vector3.Distance(localChad.transform.position, transform.position);
@@ -185,6 +212,8 @@ public class Vindaloo : Powerup
         emitterSmoke.EmitOneShot(50);
 
         StartCoroutine(RemoveNextFrame());
+
+        _DespawnTimer = 0.0f;
         //Remove();
     }
     private IEnumerator RemoveNextFrame()

@@ -24,17 +24,21 @@ namespace ThomasEngine
 
 	void Resources::OnPlay()
 	{
+		Monitor::Enter(resourceLock);
 		for each (Resource^ resource in resources->Values)
 		{
 			resource->OnPlay();
 		}
+		Monitor::Exit(resourceLock);
 	}
 	void Resources::OnStop()
 	{
+		Monitor::Enter(resourceLock);
 		for each (Resource^ resource in resources->Values)
 		{
 			resource->OnStop();
 		}
+		Monitor::Exit(resourceLock);
 	}
 
 
@@ -97,10 +101,16 @@ namespace ThomasEngine
 
 		Resources::AssetTypes Resources::GetResourceAssetType(String^ path)
 		{
+
 			String^ extension = System::IO::Path::GetExtension(path);
 			if (extension->Length == 0)
 				return AssetTypes::UNKNOWN;
 			extension = extension->Remove(0, 1)->ToLower();
+
+			// Used for capturing cubic postfixes
+			String^ delimStr = "_";
+			array<Char>^ delimiter = delimStr->ToCharArray();
+
 			if (extension == "fx")
 			{
 				return AssetTypes::SHADER;
@@ -135,7 +145,15 @@ namespace ThomasEngine
 			}
 			else if (extension == "dds")
 			{
-				return AssetTypes::TEXTURE3D;
+
+				auto cube = path->Split(delimiter);
+				String^ cubeString = "cube.dds";
+				if (cube->Length > 0 && String::Equals(cubeString, cube[cube->Length - 1]))
+				{
+					return AssetTypes::TEXTURE3D;
+				}
+				
+				return AssetTypes::TEXTURE2D;
 			}
 			else if (extension == "prefab")
 				return AssetTypes::PREFAB;
@@ -150,6 +168,10 @@ namespace ThomasEngine
 		bool Resources::IsResource(String ^ path)
 		{
 			AssetTypes type = GetResourceAssetType(path);
+			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
+		}
+		bool Resources::IsResource(AssetTypes type)
+		{
 			return (type != AssetTypes::UNKNOWN && type != AssetTypes::SCENE && type != AssetTypes::SCRIPT);
 		}
 
@@ -204,76 +226,73 @@ namespace ThomasEngine
 		}
 		Resource^ Resources::Load(String^ path, String^ thomasPath)
 		{
+			Monitor::Enter(resourceLock);
+			Resource^ obj;
 			if (resources->ContainsKey(thomasPath))
 			{
-				Resource^ obj = resources[thomasPath];
+				obj = resources[thomasPath];
+				Monitor::Exit(resourceLock);
 				return obj;
 			}
-			else
-			{
-				float startTime = Time::ElapsedTime;
-				
-				Resource^ obj;
-				AssetTypes type = GetResourceAssetType(path);
-				try {
-					if (!System::IO::File::Exists(path))
-						throw gcnew System::IO::FileNotFoundException("File not found");
-					switch (type)
-					{
-					case AssetTypes::MODEL:
-						obj = gcnew Model(path);
-						break;
-					case AssetTypes::TEXTURE2D:
-						obj = gcnew Texture2D(path);
-						break;
-					case AssetTypes::TEXTURE3D:
-						obj = gcnew TextureCube(path);
-						break;
-					case AssetTypes::SCENE:
-						break;
-					case AssetTypes::SHADER:
-						obj = gcnew Shader(path);
-						break;
-					case AssetTypes::ANIMATION:
-						obj = gcnew Animation(path);
-						break;
-					case AssetTypes::MATERIAL:
-						obj = Serializer::DeserializeMaterial(path);
-						break;
-					case AssetTypes::SCRIPT:
-						break;
-					case AssetTypes::AUDIO_CLIP:
-						obj = gcnew AudioClip(path);
-						break;
-					case AssetTypes::FONT:
-						obj = gcnew Font(path);
-						break;
-					case AssetTypes::UNKNOWN:
-						break;
-					default:
-						break;
-					}
-
-					if (obj != nullptr)
-					{
-						resources[thomasPath] = obj;
-					}
-				}
-				catch (Exception^ e) {
-
-					String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
-
-					Debug::LogError(error);
-					obj = LoadErrorResource(type);
-					if(obj == nullptr)
-						Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
+			Monitor::Exit(resourceLock);
+			// Load asset
+			AssetTypes type = GetResourceAssetType(path);
+			try {
+				if (!System::IO::File::Exists(path))
+					throw gcnew System::IO::FileNotFoundException("File not found");
+				switch (type)
+				{
+				case AssetTypes::MODEL:
+					obj = gcnew Model(path);
+					break;
+				case AssetTypes::TEXTURE2D:
+					obj = gcnew Texture2D(path);
+					break;
+				case AssetTypes::TEXTURE3D:
+					obj = gcnew TextureCube(path);
+					break;
+				case AssetTypes::SCENE:
+					break;
+				case AssetTypes::SHADER:
+					obj = gcnew Shader(path);
+					break;
+				case AssetTypes::ANIMATION:
+					obj = gcnew Animation(path);
+					break;
+				case AssetTypes::MATERIAL:
+					obj = Serializer::DeserializeMaterial(path);
+					break;
+				case AssetTypes::SCRIPT:
+					break;
+				case AssetTypes::AUDIO_CLIP:
+					obj = gcnew AudioClip(path);
+					break;
+				case AssetTypes::FONT:
+					obj = gcnew Font(path);
+					break;
+				case AssetTypes::UNKNOWN:
+					break;
+				default:
+					break;
 				}
 
-				//Debug::Log(path + " (" + (Time::ElapsedTime - startTime).ToString("0.00") + ")");
-
-				return obj;
+				if (obj != nullptr)
+				{
+					Monitor::Enter(resourceLock);
+					resources[thomasPath] = obj;
+					Monitor::Exit(resourceLock);
+				}
 			}
+			catch (Exception^ e) {
 
+				String^ error = "Error loading " + type.ToString() + " resource from: " + path + " Error: " + e->Message;
+
+				Debug::LogError(error);
+				obj = LoadErrorResource(type);
+				if (obj == nullptr)
+					Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
+			}
+			return obj;
 		}
 #pragma region PreFab
 
@@ -337,6 +356,7 @@ namespace ThomasEngine
 			Monitor::Enter(s_PREFAB_DICT);
 			for each (auto var in s_PREFAB_DICT)
 			{
+
 				l->Add(var.Value);
 			}
 			Monitor::Exit(s_PREFAB_DICT);
@@ -345,15 +365,99 @@ namespace ThomasEngine
 		}
 #endif
 
+		void Resources::AssetLoadWorker::LoadAsset(System::Object ^state)
+		{
+			try
+			{
+				LoadSysPath(file);
+				OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
+			finally
+			{
+				countdown->Signal();
+			}
+		}
+
+		CountdownEvent^ Resources::LoadAssetFiles(List<String^>^ files)
+		{
+			using namespace System::Threading;
+
+			auto counter = gcnew CountdownEvent(files->Count);
+			// Start workers.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetLoadWorker^ w = gcnew AssetLoadWorker(files[i], counter);
+				System::Threading::ThreadPool::QueueUserWorkItem(gcnew WaitCallback(w, &AssetLoadWorker::LoadAsset));
+			}
+			// Wait for workers.
+			return counter;
+		}
+		/* Load assets on same thread.
+		*/
+		void Resources::LoadAssetFilesSynced(List<String^>^ files)
+		{
+			// Start work.
+			for (int i = 0; i < files->Count; i++)
+			{
+				LoadSysPath(files[i]);
+				//OnResourceLoad(file, countdown->InitialCount - countdown->CurrentCount, countdown->InitialCount);
+			}
+		}
+
+		void Resources::LoadAll(String^ path)
+		{
+			//array<String^>^ directories = IO::Directory::GetDirectories(path);
+			List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
+			List<String^>^ shaderFiles = gcnew List<String^>();
+			List<String^>^ materialFiles =  gcnew List<String^>();
+			/*for each(String^ dir in directories)
+			{
+				LoadAll(dir);
+			}*/
+
+			// Sort on asset type(s), to load files with dependencies in order.
+			for (int i = 0; i < files->Count; i++)
+			{
+				AssetTypes type = GetResourceAssetType(files[i]);
+				if (!IsResource(type)) {
+					files->RemoveAt(i);
+					--i;
+				}
+				else if (type == AssetTypes::MATERIAL)
+				{
+					materialFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
+				else if (type == AssetTypes::SHADER)
+				{
+					shaderFiles->Add(files[i]);
+					files->RemoveAt(i);
+					--i;
+				}
+			}
+			OnResourceLoadStarted();
+			auto counter = LoadAssetFiles(files);
+			counter->Wait(); 
+			counter = LoadAssetFiles(shaderFiles);
+			counter->Wait();
+			LoadAssetFilesSynced(materialFiles);
+			//counter->Wait();
+			OnResourceLoadEnded();
+		}
+
 #pragma endregion
 		generic<typename T>
 			where T : Resource
 			T Resources::Load(String^ path)
 			{
 				String^ thomasPath = ConvertToThomasPath(path);
-				if (resources->ContainsKey(thomasPath))
+				Resource^ obj;
+				Monitor::Enter(resourceLock);
+				bool found = resources->TryGetValue(thomasPath, obj);
+				Monitor::Exit(resourceLock);
+				if (found)
 				{
-					Resource^ obj = resources[thomasPath];
 					if (obj->GetType() == T::typeid)
 						return (T)obj;
 					else
@@ -365,44 +469,19 @@ namespace ThomasEngine
 				else
 				{
 					T resource = (T)Activator::CreateInstance(T::typeid, path);
+					Monitor::Enter(resourceLock);
 					resources[thomasPath] = resource;
+					Monitor::Exit(resourceLock);
 					return resource;
 				}
 			}
 
-			void Resources::LoadAll(String^ path)
-			{
-				//array<String^>^ directories = IO::Directory::GetDirectories(path);
-				List<String^>^ files = gcnew List<String^>(IO::Directory::GetFiles(path, "*", IO::SearchOption::AllDirectories));
-				/*for each(String^ dir in directories)
-				{
-					LoadAll(dir);
-				}*/
-
-				for (int i = 0; i < files->Count; i++)
-				{
-					if (!IsResource(files[i])) {
-						files->RemoveAt(i);
-						--i;
-					}
-						
-				}
-
-				OnResourceLoadStarted();
-				for (int i = 0; i < files->Count; i++)
-				{
-					OnResourceLoad(files[i], i, files->Count);
-					LoadSysPath(files[i]);
-				}
-				OnResourceLoadEnded();
-			}
 
 			void Resources::Unload(Resource^ resource) {
-				if (Find(resource->m_path))
-				{
-					resources->Remove(System::IO::Path::GetFullPath(resource->m_path));
+				Monitor::Enter(resourceLock);
+				if(resources->Remove(ConvertToThomasPath(resource->Path)))
 					delete resource;
-				}
+				Monitor::Exit(resourceLock);
 			}
 
 			void recursivePrefabDestruction(GameObject^ obj)
@@ -418,11 +497,13 @@ namespace ThomasEngine
 
 			void Resources::UnloadAll()
 			{
+				Monitor::Enter(resourceLock);
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
 				for each (auto var in s_PREFAB_DICT)
 					recursivePrefabDestruction(var.Value);
 				resources->Clear();
+				Monitor::Exit(resourceLock);
 			}
 #pragma endregion
 
@@ -432,32 +513,41 @@ namespace ThomasEngine
 			{
 				if (nativePtr == nullptr)
 					return nullptr;
+				Monitor::Enter(resourceLock);
+				Resource^ var = nullptr;
 				for each(Resource^ resource in resources->Values)
 				{
 					if (resource->m_nativePtr == nativePtr)
-						return resource;
+					{
+						var = resource;
+						break;
+					}
 				}
-				return nullptr;
+				Monitor::Exit(resourceLock);
+				return var;
 			}
 
 			Resource ^ Resources::Find(String ^ path)
 			{
 				String^ thomasPath = ConvertToThomasPath(path);
-				if (resources->ContainsKey(thomasPath))
-				{
-					return resources[thomasPath];
-				}
-				return nullptr;
+				Resource^value;
+				Monitor::Enter(resourceLock);
+				if (!resources->TryGetValue(thomasPath, value))
+					value = nullptr;
+				Monitor::Exit(resourceLock);
+				return value;
 			}
 
 			List<Resource^>^ Resources::GetResourcesOfType(Type^ type)
 			{
 				List<Resource^>^ list = gcnew List<Resource^>();
+				Monitor::Enter(resourceLock);
 				for each (Resource^ resource in resources->Values)
 				{
 					if (resource->GetType() == type)
 						list->Add(resource);
 				}
+				Monitor::Exit(resourceLock);
 				return list;
 			}
 			Resource ^ Resources::LoadErrorResource(AssetTypes type)
@@ -495,6 +585,7 @@ namespace ThomasEngine
 			{
 				String^ thomasPathOld = ConvertToThomasPath(oldPath);
 				String^ thomasPathNew = ConvertToThomasPath(newPath);
+				Monitor::Enter(resourceLock);
 				if (resources->ContainsKey(thomasPathOld))
 				{
 					Resource^ resource = resources[thomasPathOld];
@@ -503,12 +594,16 @@ namespace ThomasEngine
 					if (resource)
 						resource->Rename(newPath);
 				}
+				Monitor::Exit(resourceLock);
 			}
 			generic<typename T>
 				where T : Resource
 			List<T>^ Resources::GetResourcesOfType()
 			{
-					return (List<T>^)System::Linq::Enumerable::OfType<T>(resources->Values);
+				Monitor::Enter(resourceLock);
+				List<T>^ val = (List<T>^)System::Linq::Enumerable::OfType<T>(resources->Values);
+				Monitor::Exit(resourceLock);
+				return val;
 			}
 #pragma endregion
 

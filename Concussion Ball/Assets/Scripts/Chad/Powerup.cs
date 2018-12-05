@@ -14,6 +14,7 @@ public class Powerup : PickupableObject
     public PowerupSpawner spawner;
     public GameObject colliderObject;
 
+
     protected bool activated = false;
     public override void OnAwake()
     {
@@ -75,6 +76,7 @@ public class Powerup : PickupableObject
 
     public override void Pickup(ChadControls chad, Transform hand)
     {
+        
         base.Pickup(chad, hand);
 
         if (spawner)
@@ -88,7 +90,8 @@ public class Powerup : PickupableObject
 
     public override void OnCollisionEnter(Collider collider)
     {
-        colliderObject = collider.gameObject;
+        if (collider)
+            colliderObject = collider.gameObject;
 
         if (isOwner)
         {

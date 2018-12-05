@@ -14,9 +14,10 @@ public enum CAM_STATE
 
 public class CameraMaster : ScriptComponent
 {
-    public static CameraMaster instance;
+    public GameObject ChadTeam1 { get; set; }
+    public GameObject ChadTeam2 { get; set; }
 
-    public Texture2D Background { get; set; }
+    public static CameraMaster instance;
 
     public Camera Camera;
     GUIJoinHost JoinHost;
@@ -32,14 +33,14 @@ public class CameraMaster : ScriptComponent
     public Canvas Canvas;
     public CAM_STATE State;
 
-
+    
+    
 
     public override void OnAwake()
     {
         instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
-        //BG = Canvas.Add(Background);
     }
 
 
@@ -60,7 +61,6 @@ public class CameraMaster : ScriptComponent
     {
         State = CAM_STATE.MAIN_MENU;
         
-        //BG.interactable = true;
 
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
@@ -120,26 +120,36 @@ public class CameraMaster : ScriptComponent
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
+                MainMenu.SetUpScene();
                 MainMenu.Canvas.isRendering = true;
                 break;
 
             case CAM_STATE.JOIN_HOST:
+                MainMenu.SetUpScene();
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
+                SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
                 break;
             case CAM_STATE.GAME:
                 Hud.Canvas.isRendering = true;
                 if(Input.GetKeyDown(Input.Keys.Escape))
+                {
                     State = CAM_STATE.EXIT_MENU;
+                    Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                }
                 break;
             case CAM_STATE.EXIT_MENU:
                 ExitMenu.Canvas.isRendering = true;
                 if (Input.GetKeyDown(Input.Keys.Escape))
+                {
                     State = CAM_STATE.GAME;
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                }
                 break;
             case CAM_STATE.HOST_MENU:
+                HostMenu.SetUpScene();
                 HostMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.LOADING_SCREEN:

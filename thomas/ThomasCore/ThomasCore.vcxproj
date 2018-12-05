@@ -37,6 +37,7 @@
     <ClCompile Include="src\thomas\graphics\animation\playback\BinaryBlendNode.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\playback\EmptyPlayback.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\WeightMixer.cpp" />
+    <ClCompile Include="src\thomas\graphics\ChadowMapping.cpp" />
     <ClCompile Include="src\thomas\graphics\render\CameraList.cpp" />
     <ClCompile Include="src\thomas\graphics\render\Frame.cpp" />
     <ClCompile Include="src\thomas\graphics\render\FrameAllocation.cpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="src\thomas\graphics\GUI\Canvas.cpp" />
     <ClCompile Include="src\thomas\object\ObjectHandler.cpp" />
     <ClCompile Include="src\thomas\resource\MemoryAllocation.cpp" />
+    <ClCompile Include="src\thomas\resource\ResourceManager.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
     <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Joint.cpp" />
@@ -168,6 +170,7 @@
     <ClInclude Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\playback\EmptyPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\WeightMixer.h" />
+    <ClInclude Include="src\thomas\graphics\ChadowMapping.h" />
     <ClInclude Include="src\thomas\graphics\GUI\GUIElements.h" />
     <ClInclude Include="src\thomas\graphics\RenderConstants.h" />
     <ClInclude Include="src\thomas\graphics\LightManager.h" />
@@ -192,6 +195,7 @@
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ComputeShader.h" />
+    <ClInclude Include="src\thomas\resource\ResourceManager.h" />
     <ClInclude Include="src\thomas\resource\Font.h" />
     <ClInclude Include="src\thomas\resource\MemoryAllocation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
@@ -216,6 +220,7 @@
     <ClInclude Include="src\thomas\utils\allocator\Allocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\LinearAllocator.h" />
     <ClInclude Include="src\thomas\utils\allocator\StackAllocator.h" />
+    <ClInclude Include="src\thomas\utils\allocator\ThomasPointer.h" />
     <ClInclude Include="src\thomas\utils\atomic\Synchronization.h" />
     <ClInclude Include="src\thomas\utils\atomic\SyncronizedList.h" />
     <ClInclude Include="src\thomas\utils\AutoProfile.h" />

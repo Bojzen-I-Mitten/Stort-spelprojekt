@@ -26,10 +26,21 @@ namespace thomas
 				void Update();
 
 				void SetMaterial(resource::Material * material);
-				
+				/* Get the number of meshes associated with the render component. */
+				uint32_t numMeshes();
 
 				virtual void SetMaterial(int meshIndex, resource::Material* material);
 				resource::Material* GetMaterial(int meshIndex);
+				/* Find material by name hash
+				*/
+				resource::Material* findMaterial(uint32_t hashID);
+
+				/* Find material index by name hash
+				*/
+				int findMaterialIndex(uint32_t hash);
+
+				std::vector<resource::Material*> GetMaterials();
+				void SetMaterials(std::vector<resource::Material*> value);
 
 				void OnDrawGizmos();
 				void SubmitToRenderer(Camera* camera);

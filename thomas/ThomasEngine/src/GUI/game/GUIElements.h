@@ -44,6 +44,7 @@ namespace ThomasEngine
 		property bool interactable
 		{
 			void set(bool interactable);
+			bool get();
 		}
 		property float depth
 		{
@@ -75,6 +76,16 @@ namespace ThomasEngine
 		property Font^ font
 		{
 			void set(Font^ font);
+		}
+
+		property bool outline
+		{
+			void set(bool outline);
+		}
+
+		property bool renderable
+		{
+			void set(bool renderable);
 		}
 	};
 

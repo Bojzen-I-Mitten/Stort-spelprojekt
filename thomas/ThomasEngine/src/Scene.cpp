@@ -41,15 +41,45 @@ namespace ThomasEngine
 	{
 		// Call awake
 		uint32_t initFlag = playing ? INIT_PLAYING_BIT : 0;
-		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Awake, initFlag);
+		for (int i = 0; i < objects->Count; i++)
+		{
+			GameObject^ g = objects[i];
+			try
+			{
+				g->InitComponents(Comp::State::Awake, initFlag);
+			}
+			catch (Exception^ e)
+			{
+				// Need to remove failed object?!..
+				Debug::LogException(e);
+				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
+				g->TryReleaseComponentLock();
+				DeleteInstant(g);
+				objects->RemoveAt(i);
+			}
+		}
 	}
 	void Scene::EnableObjects(List<GameObject^>^ objects, bool playing)
 	{
 		// Verify non-editor components are activated
 		uint32_t initFlag = playing ? INIT_PLAYING_BIT : 0;
-		for each (GameObject^ g in objects)
-			g->InitComponents(Comp::State::Enabled, initFlag);
+		for (int i = 0; i < objects->Count; i++)
+		{
+			GameObject^ g = objects[i];
+			try
+			{
+				g->InitComponents(Comp::State::Enabled, initFlag);
+			}
+			catch (Exception^ e)
+			{
+				// Need to remove failed object?!..
+				Debug::LogException(e);
+				Debug::LogError("Enable on object failed: " + (g != nullptr ? g->Name : "NULL"));
+				g->TryReleaseComponentLock();
+				DeleteInstant(g);
+				objects->RemoveAt(i);
+			}
+		}
 	}
 	bool Scene::OnPlay()
 	{
@@ -91,6 +121,22 @@ namespace ThomasEngine
 		cmd.m_cmd = Command::DisableRemove;
 		cmd.m_obj = object;
 		m_commandList->Add(cmd);
+	}
+	void Scene::DeleteInstant(GameObject ^ object)
+	{
+		if (!m_gameObjects->Remove(object))
+		{
+			Debug::LogWarning("Instant delete failed remove on: " + (object == nullptr ? "NULL" : object->Name));
+		}
+		try
+		{
+			object->OnDestroy();
+		}
+		catch (Exception^e)
+		{
+			Debug::LogError(e);
+		}
+		delete object;
 	}
 
 
@@ -162,12 +208,23 @@ namespace ThomasEngine
 	{
 
 		if (m_gameObjects == nullptr) { // Scene is empty
-			Debug::LogWarning("Warning, no objects in scene.");
+			Debug::LogWarning("No objects in scene.");
 			m_accessLock = gcnew Object();
 			m_gameObjects = gcnew List<GameObject^>();
 			//System::Windows::Data::BindingOperations::EnableCollectionSynchronization(m_gameObjects, m_gameObjectsLock);
 		}
-
+		int invalidCounter = 0;
+		for (int i = 0; i < m_gameObjects->Count; i++)
+		{
+			if (m_gameObjects[i] == nullptr ||			// Deserialization failed.
+				m_gameObjects[i]->transform == nullptr)	// Gameobject is invalid, can't be cleaned (objects must have transform)
+			{
+				m_gameObjects->RemoveAt(i--);
+				invalidCounter++;
+			}
+		}
+		if(invalidCounter)
+			Debug::LogWarning("Object(s) not deserailized successfully, " + invalidCounter + " found to be NULL.");
 	}
 
 	void Scene::PostLoad()
@@ -176,7 +233,10 @@ namespace ThomasEngine
 		{
 			gObj->PostLoad(this);
 		}
+	}
 
+	void Scene::InitiateScene()
+	{
 		AwakeObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 		EnableObjects(m_gameObjects, ThomasWrapper::IsPlaying());
 	}
@@ -193,8 +253,9 @@ namespace ThomasEngine
 		List<GameObject^>^ removedList = gcnew List<GameObject^>();
 #endif
 
-		for each(IssuedCommand c in m_commandList)
+		for(int i = 0; i < m_commandList->Count; i++)
 		{
+			IssuedCommand c = m_commandList[i];
 			switch (c.m_cmd)
 			{
 			case Command::Add:
@@ -206,21 +267,30 @@ namespace ThomasEngine
 				break;
 			case Command::DisableRemove:
 			{
-				// Disable object:
-				ThomasWrapper::Selection->UnSelectGameObject(c.m_obj);
-				m_gameObjects->Remove(c.m_obj);
-				c.m_obj->OnDestroy();
+				int index;
+				// Verify delete call is valid.
+				if (!InScene(c.m_obj, index))
+				{
+					Debug::LogWarning("Delete on object: " + c.m_obj->Name + " was called twice");
+				}
+				else
+				{
+					// Disable object:
+					ThomasWrapper::Selection->UnSelectGameObject(c.m_obj);
+					m_gameObjects->RemoveAt(index);
+					c.m_obj->OnDestroy();
 #ifdef _EDITOR
-				numChanged++;
-				removedList->Add(c.m_obj);
+					numChanged++;
+					removedList->Add(c.m_obj);
 #endif
-				// Wait to next frame for delete:
-				IssuedCommand cmd;
-				cmd.m_cmd = Command::Remove;
-				cmd.m_obj = c.m_obj;
-				m_commandSwapList->Add(cmd);
+					// Wait to next frame for delete:
+					IssuedCommand cmd;
+					cmd.m_cmd = Command::Remove;
+					cmd.m_obj = c.m_obj;
+					m_commandSwapList->Add(cmd);
+				}
 			}
-				break;
+			break;
 			case Command::Remove:
 				// Destroy object
 				delete c.m_obj;
@@ -235,19 +305,10 @@ namespace ThomasEngine
 		m_commandList = m_commandSwapList;
 		m_commandSwapList = swp;
 		// Initiate related components
-		try
-		{
-			AwakeObjects(addedList, ThomasWrapper::IsPlaying());
-			EnableObjects(addedList, ThomasWrapper::IsPlaying());
-		}
-		catch (Exception^ e)
-		{
-			// Need to remove failed object?!..
-			Debug::LogException(e);
-			Debug::LogError("Initiating a set of objects during runtime failed with folling error:");
-		}
+		AwakeObjects(addedList, ThomasWrapper::IsPlaying());
+		EnableObjects(addedList, ThomasWrapper::IsPlaying());
 #ifdef _EDITOR
-		if(numChanged)	// Trigger event 
+		if (numChanged)	// Trigger event 
 			m_changeEvent(this, gcnew SceneObjectsChangedArgs(numChanged, addedList, removedList));
 		Monitor::Exit(m_gameObjects);
 #endif
@@ -293,6 +354,28 @@ namespace ThomasEngine
 				return gameObject;
 		}
 		return nullptr;
+	}
+	bool Scene::InScene(GameObject^ gObj, int &index)
+	{
+		index = -1;
+		if (!gObj->SceneID == this->m_uniqueID)
+			return false;
+		for(int i = 0; i < m_gameObjects->Count; i++)
+		{
+			if (m_gameObjects[i] == gObj)
+			{
+				index = i;
+				return true;
+			}
+		}
+		return false;
+	}
+	/* Verify object is in scene
+	*/
+	bool Scene::InScene(GameObject ^ gObj)
+	{
+		int index;
+		return InScene(gObj, index);
 	}
 
 	Vector3 Scene::CameraPosition::get() 

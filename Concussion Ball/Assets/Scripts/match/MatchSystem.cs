@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define T_FOR_RESET
+
+using System;
 using System.Collections.Generic;
 using ThomasEngine;
 using ThomasEngine.Network;
@@ -18,6 +20,7 @@ public class MatchSystem : NetworkManager
 {
     public Dictionary<TEAM_TYPE, Team> Teams { get; set; }
 
+    public WaitForSecondsRealtime PlayAgain;//toggle how long
     public GameObject BallPrefab { get; set; }
     public GameObject Ball;
 
@@ -37,6 +40,7 @@ public class MatchSystem : NetworkManager
     public bool PublicServer = true;
     public bool SpawnPowerupsDuringGame = true;
     public int ScoreLimit = 0;
+    //public int MaxPlayers = 8;
 
 
     public float lostTime = 0.0f;
@@ -112,6 +116,7 @@ public class MatchSystem : NetworkManager
         endroundSound.Clip = endroundSoundClip;
         endroundSound.Looping = false;
         
+        
         //StartCoroutine(ResetCoroutine(10));
     }
 
@@ -124,21 +129,25 @@ public class MatchSystem : NetworkManager
             if (Scene.Players.ContainsKey(LocalPeer))
             {
                 NetworkPlayer localPlayer = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-                if (Input.GetKeyDown(Input.Keys.D1))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
-                if (Input.GetKeyDown(Input.Keys.D2))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
-                if (Input.GetKeyDown(Input.Keys.D3))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-                if (Input.GetKeyDown(Input.Keys.Enter))
+                if (MatchStarted)
                 {
-                    OnMatchStart();
+                    if (Input.GetKeyDown(Input.Keys.D1))
+                        localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
+                    if (Input.GetKeyDown(Input.Keys.D2))
+                        localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
+                    if (Input.GetKeyDown(Input.Keys.D3))
+                        localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
                 }
-                if(Input.GetKeyDown(Input.Keys.R))
+#if T_FOR_RESET
+                if(Input.GetKeyDown(Input.Keys.T))
                 {
                     SendRPC(-2, "OnRoundStart");
                     OnRoundStart();
                 }
+
+#endif
+                if (Input.GetKeyDown(Input.Keys.F9))
+                    ShowPlayers();
                 if (Input.GetKeyDown(Input.Keys.F10))
                     ShowOwnedObjects();
             }
@@ -167,6 +176,21 @@ public class MatchSystem : NetworkManager
         Debug.Log("##################################");
     }
 
+    private void ShowPlayers()
+    {
+        Debug.Log("##################################");
+        Debug.Log("Players:");
+        foreach (var player in Scene.Players)
+        {
+            if (player.Key != LocalPeer)
+            {
+                ChadControls chad = player.Value.gameObject.GetComponent<ChadControls>();
+                Debug.Log(player.Key.EndPoint.Address + ":\t" + chad?.rBody.Position);
+            }
+        }
+        Debug.Log("##################################");
+    }
+
     #region Utility
 
     void ResetPlayers()
@@ -176,9 +200,25 @@ public class MatchSystem : NetworkManager
             team.Value.ResetPlayers();
         }
     }
-    #endregion
+#endregion
 
-    #region Coroutines
+   void ResetNetworkplayerPoints()
+    {
+        foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_1].Players)
+        {
+            Player.GoalsScored = 0;
+            Player.HasTackled = 0;
+            Player.Owngoal = 0;
+        }
+        foreach (NetworkPlayer Player in Teams[TEAM_TYPE.TEAM_2].Players)
+        {
+            Player.GoalsScored = 0;
+            Player.HasTackled = 0;
+            Player.Owngoal = 0;
+        }
+
+    }
+#region Coroutines
     IEnumerator MatchEndCoroutine(Team winningTeam, float duration)
     {
         
@@ -186,8 +226,20 @@ public class MatchSystem : NetworkManager
         ChadHud.Instance.OnMatchEnd(winningTeam, duration);
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
+        
+	    GUIScoreScreen.Instance.Toggle(false);
+        for(int i=0;i<GUIScoreScreen.Instance.ScoreScreenTimeLast;i++)
+        {
+            GUIScoreScreen.Instance.updateTextPlayAgain();
+            PlayAgain = new WaitForSecondsRealtime(1);//toggle how long
+            yield return PlayAgain;
+            if (GUIScoreScreen.Instance.getToggleBool())
+                break;
+        }
+        ResetNetworkplayerPoints();
         RPCStartMatch();
-
+	    GUIScoreScreen.Instance.Toggle(true);
+        GUIPlayerScore.Instance.Toggle = false;
     }
 
     IEnumerator RoundStartCountdown(float duration)
@@ -220,14 +272,19 @@ public class MatchSystem : NetworkManager
         ReplaySystem.StartReplay(teamThatScored);
         yield return new WaitForSecondsRealtime(ReplaySystem.durationInSeconds + 1.0f);
         ReplaySystem.recordGame = true;
-        OnRoundEnd();
-        OnRoundStart();
+        if (GoldenGoal)
+            OnMatchEnd();
+        else
+        {
+            OnRoundEnd();
+            OnRoundStart();
+        }
     }
-    #endregion
+#endregion
 
-    #region RPC
+#region RPC
 
-    public void RPCMatchInfo(bool matchStarted, float startTime, bool goldenGoal, int powerupID,
+    public void RPCMatchInfo(bool matchStarted, float startTime, int length, bool goldenGoal, int powerupID, int players, string name,
         int team1Score, int team2Score,
         Color team1Color, Color team2Color,
         string team1Name, string team2Name)
@@ -237,6 +294,9 @@ public class MatchSystem : NetworkManager
         PowerupManager.NextPowerupID = powerupID;
         GoldenGoal = goldenGoal;
         MatchStartTime = startTime;
+        MatchLength = length;
+        MaxPlayers = players;
+        ServerName = name;
 
         Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
         Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
@@ -259,6 +319,7 @@ public class MatchSystem : NetworkManager
     }
     public void RPCEndMatch()
     {
+        hasScored = true;
         if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
         {
             GoldenGoal = true;
@@ -278,15 +339,12 @@ public class MatchSystem : NetworkManager
         TEAM_TYPE type = (TEAM_TYPE)teamType;
         Team team = FindTeam(type);
         team?.AddScore();
-        if (GoldenGoal)
-            OnMatchEnd();
-        else
-            StartCoroutine(OnGoalCoroutine(team));
+        StartCoroutine(OnGoalCoroutine(team));
     }
 
-    #endregion
+#endregion
 
-    #region Match functions
+#region Match functions
 
     void OnMatchEnd()
     {
@@ -300,7 +358,7 @@ public class MatchSystem : NetworkManager
     }
 
 
-    void OnMatchStart()
+    public void OnMatchStart()
     {
         if (MatchStarted)
             return;
@@ -334,12 +392,16 @@ public class MatchSystem : NetworkManager
     public void JoinTeam(TEAM_TYPE team)
     {
         NetworkPlayer np = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-        np.JoinTeam(team);
+        int playersInTeam = Teams[team].PlayerCount;
+        if ((MaxPlayers / 2.0f) > playersInTeam)
+            np.JoinTeam(team);
+        else
+            Debug.Log(team + " is already full");
     }
 
-    #endregion
+#endregion
 
-    #region peer connection
+#region peer connection
 
     protected override void OnPeerJoin(NetPeer peer)
     {
@@ -350,27 +412,16 @@ public class MatchSystem : NetworkManager
         //}
         if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
         {
-            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, MatchLength, GoldenGoal, PowerupManager.NextPowerupID, MaxPlayers, ServerName,
                 Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
                 Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
                 Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
         }
     }
 
-    protected override void OnPeerLeave(NetPeer peer)
-    {
-        NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        if (!np)
-            Debug.LogError("Failed to find network player for peer:" + peer);
-        else
-        {
-            np.JoinTeam(null);
-            np.gameObject.GetComponent<ChadControls>().OnDisconnect();
-        }
-    }
-    #endregion
+#endregion
 
-    #region Team Manager
+#region Team Manager
 
     public Team FindTeam(TEAM_TYPE type)
     {
@@ -408,7 +459,7 @@ public class MatchSystem : NetworkManager
         NetworkPlayer localPlayer = player.GetComponent<NetworkPlayer>();
         return localPlayer.Team.TeamType;
     }
-    #endregion
+#endregion
 
 
 }

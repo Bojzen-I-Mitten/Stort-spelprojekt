@@ -43,11 +43,15 @@ namespace ThomasEngine.Network
 
         public NetPeer LocalPeer = null;
 
-        public NetPeer ResponsiblePeer = null;
-        
+        private long TimeConnected = 0;
+
         public int TICK_RATE { get; set; } = 24;
 
         public bool ReadOwnerAsNormal = false;
+
+        public int ConnectTo = 0;
+
+        
 
         public long ServerStartTime;
         [Browsable(false)]
@@ -96,7 +100,7 @@ namespace ThomasEngine.Network
             
             Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
-
+        
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
         {
             if (targetEndPoint.Address.ToString() == "::1")
@@ -126,7 +130,7 @@ namespace ThomasEngine.Network
         public void Host()
         {
             initServerStartTime();
-            ResponsiblePeer = LocalPeer;
+            initConnectTime();
             NetScene.SpawnPlayer(LocalPeer, true);
             OnPeerJoin(LocalPeer);
             NetScene.ActivateSceneObjects();
@@ -135,6 +139,7 @@ namespace ThomasEngine.Network
 
         public void Connect()
         {
+            initConnectTime();
             NetManager.Connect(TargetIP, TargetPort, "SomeConnectionKey");
         }
 
@@ -151,26 +156,29 @@ namespace ThomasEngine.Network
             {
                 case DisconnectReason.RemoteConnectionClose:
                 case DisconnectReason.DisconnectPeerCalled:
-                    OnPeerLeave(peer);
                     NetScene.RemovePlayer(peer);
+                    OnPeerLeave(peer);
                     Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
-                case DisconnectReason.Timeout:
-                    OnPeerLeave(peer);
+                case DisconnectReason.Timeout:   
                     NetScene.RemovePlayer(peer);
+                    OnPeerLeave(peer);
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
+                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " rejected");
                     break;
                 case DisconnectReason.ConnectionFailed:
+                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed");
                     break;
                 case DisconnectReason.SocketReceiveError:
+                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, peer socket closed"); //Could be the other way around
                     break;
                 case DisconnectReason.SocketSendError:
-                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, lcoal socket closed"); //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, local socket closed"); //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                     break;
             }
         }
@@ -184,13 +192,13 @@ namespace ThomasEngine.Network
                 NetScene.SpawnPlayer(LocalPeer, true);
                 NetScene.SpawnPlayer(_peer, false);
                 OnPeerJoin(LocalPeer);
+                
                 NetScene.Players[LocalPeer].WriteInitialData();
             }
             else //Someone is joining us.
             {
                 //Send server info to this guy.
-                bool responsible = ResponsiblePeer == LocalPeer;
-                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, responsible, Scene.nextAssignableID);
+                NetworkEvents.ServerInfoEvent serverInfoEvent = new NetworkEvents.ServerInfoEvent(ServerStartTime, NetManager.GetPeers(ConnectionState.Connected), _peer, TimeConnected, Scene.nextAssignableID);
                 Events.SendEventToPeer(serverInfoEvent, DeliveryMethod.ReliableOrdered, _peer);
 
                 NetScene.SpawnPlayer(_peer, false);
@@ -208,6 +216,18 @@ namespace ThomasEngine.Network
                         ServerStartTime = dateTime.Value.ToUniversalTime().Ticks;
                     }
                 });
+        }
+
+        void initConnectTime()
+        {
+            NtpRequest.Make("pool.ntp.org", 123, dateTime =>
+            {
+                if (dateTime.HasValue)
+                {
+                    TimeConnected = dateTime.Value.ToUniversalTime().Ticks;
+                    NetScene.TimePlayerJoined.Add(LocalPeer, TimeConnected);
+                }
+            });
         }
 
         virtual protected void OnPeerJoin(NetPeer peer)
@@ -252,6 +272,13 @@ namespace ThomasEngine.Network
                     default:
                         break;
                 }
+
+                if(!reader.EndOfData)
+                {
+                    Debug.Log("Reader not at end of data with " + reader.AvailableBytes + " bytes left");
+                    Debug.Log("Packet type: " + type);
+                }
+
                 reader.Recycle();
             }
             catch (Exception e)
@@ -321,6 +348,8 @@ namespace ThomasEngine.Network
                 NetManager.Stop();
             }
 
+            // Cleanup the match instance.
+            instance = null;
         }
 
         public void TakeOwnership(NetworkIdentity networkIdentity)

@@ -30,6 +30,8 @@ namespace ThomasEngine
 	void Collider::OnCollision(TCollider* otherCollider, COLLISION_TYPE collisionType)
 	{
 		GameObject^ obj = ThomasWrapper::CurrentScene->Find(otherCollider->m_gameObject);
+		if (!obj) // Verify object was found
+			return;
 		Collider^ collider = obj->GetComponent<Collider^>(otherCollider);
 		if (!collider)
 			return;

@@ -36,7 +36,7 @@ public class ChadHud : ScriptComponent
     Text Announcement2;
     Text Score1;
     Text Score2;
-    Text HeldObject;
+    Image HeldObjectIcon;
     Image AnnouncementBG;
     Image Crosshair;
     Image ChargeBarOutline;
@@ -62,6 +62,10 @@ public class ChadHud : ScriptComponent
     public Texture2D ScoreBGTexture { get; set; }
     public Texture2D BallArrowTexture { get; set; }
     public Texture2D LMBTexture { get; set; }
+    public Texture2D HeldObjectIconVindaloo { get; set; }
+    public Texture2D HeldObjectIconBananaPeel { get; set; }
+    public Texture2D HeldObjectIconThomasTrain { get; set; }
+    public Texture2D HeldObjectIconBall { get; set; }
     #endregion
 
     public override void OnAwake()
@@ -203,12 +207,15 @@ public class ChadHud : ScriptComponent
             LMB.scale = Vector2.Zero;
         }
 
-        HeldObject = Canvas.Add("Holding: ");
-        HeldObject.font = AnnouncementFont;
-        HeldObject.position = new Vector2(0.2f, 0.8f);
-        HeldObject.origin = new Vector2(0.5f, 0.5f);
-        HeldObject.color = Color.Black;
-        HeldObject.scale = Vector2.Zero;
+        if (HeldObjectIconBall != null)
+        {
+            HeldObjectIcon = Canvas.Add(HeldObjectIconBall);
+            HeldObjectIcon.position = new Vector2(0.1f, 0.9f);
+            HeldObjectIcon.origin = new Vector2(0.5f, 0.5f);
+            HeldObjectIcon.scale = Vector2.Zero;
+        }
+
+        
 
     }
 
@@ -317,7 +324,7 @@ public class ChadHud : ScriptComponent
         if (ToggleAim)
         {
             if (Crosshair != null)
-                Crosshair.scale = Vector2.One;
+                Crosshair.scale = new Vector2(0.5f, 0.5f);
             if (LMB != null)
                 LMB.scale = new Vector2(0.75f);
                 
@@ -352,22 +359,37 @@ public class ChadHud : ScriptComponent
         ChargeBar.scale = new Vector2(2.0f, charge*9.0f);
     }
     
-    public void ShowHeldObjectText(string name)
+    public void ShowHeldObjectIcon(string name)
     {
-        HeldObject.color = GetRainbowColor(Time.ElapsedTime, 1.0f);
-        HeldObject.scale = Vector2.One*2.0f;
-        HeldObject.text = name;
+        if (name == "ball")
+        {
+            HeldObjectIcon.texture = HeldObjectIconBall;
+        }
+        else if (name == "Vindaloo")
+        {
+            HeldObjectIcon.texture = HeldObjectIconVindaloo;
+        }
+        else if (name == "ThomasTrain")
+        {
+            HeldObjectIcon.texture = HeldObjectIconThomasTrain;
+        }
+        if (name == "Banana")
+        {
+            HeldObjectIcon.texture = HeldObjectIconBananaPeel;
+        }
+
+        HeldObjectIcon.scale = Vector2.One;
     }
 
-    public void HideHeldObjectText()
+    public void HideHeldObjectIcon()
     {
-        HeldObject.scale = Vector2.Zero;
+        HeldObjectIcon.scale = Vector2.Zero;
     }
     #endregion
 
     public override void Update()
     {
-        int matchTimeLeft = MatchSystem.instance.MatchTimeLeft;
+        int matchTimeLeft = MatchSystem.instance? MatchSystem.instance.MatchTimeLeft : 0;
         int minutes = matchTimeLeft / 60;
         int seconds = matchTimeLeft % 60;
 
@@ -393,12 +415,11 @@ public class ChadHud : ScriptComponent
 
         if (MatchSystem.instance?.LocalChad?.PickedUpObject != null && !MatchSystem.instance.ReplaySystem.Replaying)
         {
-            ShowHeldObjectText(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
+            ShowHeldObjectIcon(MatchSystem.instance.LocalChad.PickedUpObject.gameObject.Name);
         }
         else
         {
-            HideHeldObjectText();
-            DeactivateAimHUD();
+            HideHeldObjectIcon();
         }
 
         if (BallArrow != null)
@@ -415,12 +436,31 @@ public class ChadHud : ScriptComponent
         Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
     }
 
+    public void ToggleScoreVisability(bool OnOff)
+    {
+        if (!OnOff)
+        {
+            Score1BG.scale = new Vector2(1, 0.7f);
+            Score2BG.scale = new Vector2(1, 0.7f);
+            Score1.scale = new Vector2(1.6f);
+            Score2.scale = new Vector2(1.6f);
+        }
+        else
+        {
+            Score1BG.scale = new Vector2(0);
+            Score2BG.scale = new Vector2(0);
+            Score1.scale = new Vector2(0);
+            Score2.scale = new Vector2(0);
+        }
+    }
+
     private void BallIndicator()
     {
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
         if (!(screenPos.z > 0 && screenPos.z < 1 &&
             screenPos.x > 0 && screenPos.x < cam.viewport.size.x &&
-            screenPos.y > 0 && screenPos.y < cam.viewport.size.y))//Offscreen check
+            screenPos.y > 0 && screenPos.y < cam.viewport.size.y//Offscreen check
+            ) && !Ball.pickedUp)
         {
             //Adjust for center of screen
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;

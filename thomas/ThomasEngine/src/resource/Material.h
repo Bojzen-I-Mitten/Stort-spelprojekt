@@ -9,6 +9,7 @@ namespace ThomasEngine
 {
 	ref class Shader;
 	ref class Texture2D;
+	ref class TextureCube;
 	[DataContractAttribute]
 	public ref class Material : public Resource
 	{
@@ -16,6 +17,7 @@ namespace ThomasEngine
 		bool m_instance = false;
 		Shader ^ m_shaderBeforePlay;
 		Dictionary<String^, System::Object^>^ m_propertiesBeforePlay;
+		static Material^ s_standardMaterial = nullptr;
 	internal:
 		static List<Type^>^ GetKnownTypes();
 		Material(thomas::resource::Material* ptr) : Resource(Utility::ConvertString(ptr->GetPath()), ptr) {};
@@ -59,8 +61,8 @@ namespace ThomasEngine
 		property String^ Name
 		{
 			String^ get() override { 
-				if (m_path->Length > 0)
-					return System::IO::Path::GetFileNameWithoutExtension(m_path);
+				if (ContainsData())
+					return System::IO::Path::GetFileNameWithoutExtension(Path);
 				else
 				{
 					return "Default Material";
@@ -98,12 +100,19 @@ namespace ThomasEngine
 
 		Texture2D^ GetTexture2D(String^ name);
 		void SetTexture2D(String^ name, Texture2D^ value);
+		void SetTextureCube(String ^ name, TextureCube ^ value);
+		TextureCube^ GetTextureCube(String^name);
 
 		[IgnoreDataMemberAttribute]
 		property Shader^ Shader
 		{
 			ThomasEngine::Shader^ get();
 			void set(ThomasEngine::Shader^ value);
+		}
+		[IgnoreDataMemberAttribute]
+		property thomas::resource::Material* Native
+		{
+			thomas::resource::Material* get();
 		}
 #ifdef _EDITOR
 		[IgnoreDataMemberAttribute]

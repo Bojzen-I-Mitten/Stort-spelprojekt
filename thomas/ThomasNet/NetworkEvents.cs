@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThomasEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using System.Threading;
 
 namespace ThomasEngine.Network
 {
@@ -64,21 +61,21 @@ namespace ThomasEngine.Network
         public class ServerInfoEvent
         {
 
-            public string[] PeerIPs {get;set;}
+            public string[] PeerIPs { get; set; }
             public int[] PeerPorts { get; set; }
             public long ServerStartTime { get; set; }
-            public bool IsResponsiblePeer { get; set; }
+            public long TimeConnected { get; set; }
             public int SceneNextAssignableID { get; set; }
 
             public ServerInfoEvent() { }
-            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, bool responsible, int nextAssignableID)
+            public ServerInfoEvent(long serverStartTime, NetPeer[] peers, NetPeer excluded, long timeConnected, int nextAssignableID)
             {
                 ServerStartTime = serverStartTime;
                 PeerIPs = new string[peers.Length - 1];
                 PeerPorts = new int[peers.Length - 1];
                 SceneNextAssignableID = nextAssignableID;
                 int i = 0;
-                foreach(NetPeer peer in peers)
+                foreach (NetPeer peer in peers)
                 {
                     if (peer == excluded)
                         continue;
@@ -87,7 +84,7 @@ namespace ThomasEngine.Network
                     PeerPorts[i] = peer.EndPoint.Port;
                     i++;
                 }
-                IsResponsiblePeer = responsible;
+                TimeConnected = timeConnected;
             }
         }
 
@@ -103,17 +100,40 @@ namespace ThomasEngine.Network
         #region Event Handlers
         public void ServerInfoEventHandler(ServerInfoEvent serverInfo, NetPeer peer)
         {
-            for(int i=0; i < serverInfo.PeerIPs.Length; ++i)
+            List<NetPeer> nps = new List<NetPeer>();
+            for (int i = 0; i < serverInfo.PeerIPs.Length; ++i)
             {
-                Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey");
+                nps.Add(Manager.InternalManager.Connect(serverInfo.PeerIPs[i], serverInfo.PeerPorts[i], "SomeConnectionKey"));
             }
-            if (serverInfo.IsResponsiblePeer)
-                Manager.ResponsiblePeer = peer;
-            Manager.ServerStartTime = serverInfo.ServerStartTime;
-            Manager.Scene.nextAssignableID = serverInfo.SceneNextAssignableID;
-            
+
+            Thread t = new Thread(() =>
+            {
+                while (true)
+                {
+                    bool AllDone = true;
+                    foreach (var np in nps)
+                    {
+                        if (np.ConnectionState == ConnectionState.Disconnected)
+                        {
+                            Manager.InternalManager.DisconnectAll();
+                            return;
+                        }
+                        AllDone &= np.ConnectionState == ConnectionState.Connected;
+                    }
+                    if (AllDone)
+                    {
+                        break;
+                    }
+                }
+
+                Manager.InternalManager.OnAllConnected();
+                Manager.ServerStartTime = serverInfo.ServerStartTime;
+                Manager.Scene.nextAssignableID = serverInfo.SceneNextAssignableID;
+                Manager.Scene.TimePlayerJoined.Add(peer, serverInfo.TimeConnected);
+            });
+            t.Start();
         }
-        
+
         public void SpawnPrefabEventHandler(SpawnPrefabEvent prefabEvent, NetPeer peer)
         {
             NetworkIdentity identity;
@@ -125,19 +145,20 @@ namespace ThomasEngine.Network
                     Debug.LogError("Object already exist with network ID: " + prefabEvent.NetID);
                 }
             }
-            else if(Manager.SpawnablePrefabs.Count > prefabEvent.PrefabID)
-                {
+            else if (Manager.SpawnablePrefabs.Count > prefabEvent.PrefabID)
+            {
                 GameObject prefab = Manager.SpawnablePrefabs[prefabEvent.PrefabID];
                 GameObject gameObject = GameObject.Instantiate(prefab, prefabEvent.Position, prefabEvent.Rotation);
                 identity = gameObject.GetComponent<NetworkIdentity>();
                 identity.PrefabID = prefabEvent.PrefabID;
                 NetScene.AddObject(identity, prefabEvent.NetID);
-            }else
+            }
+            else
             {
                 Debug.LogError("Failed to spawn prefab. It's not registered");
-            } 
+            }
 
-            if(prefabEvent.Owner && identity != null)
+            if (prefabEvent.Owner && identity != null)
             {
                 NetScene.ObjectOwners[peer].Add(identity);
             }
@@ -152,7 +173,7 @@ namespace ThomasEngine.Network
                 NetScene.RemoveObject(identity);
                 GameObject.Destroy(identity.gameObject);
             }//else
-                //Debug.LogError("Failed to find gameObject. It does not exist in scene");
+             //Debug.LogError("Failed to find gameObject. It does not exist in scene");
         }
 
         public void TransferOwnerEventHandler(TransferOwnerEvent transEvent, NetPeer newOwner)
@@ -182,7 +203,7 @@ namespace ThomasEngine.Network
                         comp.OnLostOwnership();
                     }
                 }
-                Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.ToString());
+                Debug.LogWarning("Transfered GameObject: " + networkIdentity.gameObject.Name + " to: " + newOwner.EndPoint.Address.ToString());
             }
             else
             {
@@ -231,8 +252,7 @@ namespace ThomasEngine.Network
             sendTo.Send(writer, method);
         }
 
-
-       
         #endregion
     }
+
 }

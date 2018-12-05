@@ -269,6 +269,7 @@ namespace ThomasEditor
             assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.PREFAB]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.FONT]         = new BitmapImage(new Uri("pack://application:,,/icons/assets/font.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.TEXTURE3D] = new BitmapImage(new Uri("pack://application:,,/icons/assets/unknown.png"));
         }
 
 
@@ -304,9 +305,27 @@ namespace ThomasEditor
                 stack.Orientation = Orientation.Horizontal;
                 stack.Height = 18;
 
-                ImageSource source;
+                // Default case:
+                ImageSource source = assetImages[ThomasEngine.Resources.AssetTypes.UNKNOWN];
+                // Attempt load texture2D image representation
                 if (assetType == ThomasEngine.Resources.AssetTypes.TEXTURE2D)
-                    source = new BitmapImage(new Uri(Path.GetFullPath(filePath)));
+                {
+                    int attempts = 5;
+                    while (attempts-- <= 0)
+                    {
+                        try
+                        {
+                            source = new BitmapImage(new Uri(Path.GetFullPath(filePath)));
+                            break;
+                        }
+                        catch (IOException e)
+                        {
+                            // Primarily check is constructed to validate image isn't locked by another process.
+                            Debug.LogWarning(e.Message);
+                            Thread.Sleep(500);
+                        }
+                    }
+                }
                 else
                     source = assetImages[assetType];
 

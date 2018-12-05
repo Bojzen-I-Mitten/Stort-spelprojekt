@@ -3,12 +3,33 @@
 
 #include <ThomasCG.hlsl>
 
+cbuffer LightMatrices
+{
+    float4x4 LightMatricesVP[8] : MATRIXARRAY;
+};
+
+inline float4 WorldToLightClipPos(in float3 pos, in float shadowMapIndex)//, uint lightIndex)//temp dirlight id
+{
+    return mul(LightMatricesVP[(int) shadowMapIndex], float4(pos, 1.0));
+}
+
+
+SamplerState StandardClampSampler
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = CLAMP;
+    AddressV = CLAMP;
+};
+Texture2DArray ShadowMaps : SHADOWMAPS;
+//Texture2D ShadowMap : SHADOWMAP;
+
 cbuffer LightCountsStruct
 {
     uint nrOfDirectionalLights;
     uint nrOfPointLights;
     uint nrOfSpotLights;
     uint nrOfAreaLights;
+    uint nrOfShadowMaps;
 };
 
 struct LightStruct
@@ -29,7 +50,9 @@ struct LightStruct
     float3 right;
     float3 up;
     float2 rectangleDimension;
-    float2 pad;
+    
+    float shadowMapIndex;
+    float shadowHardness;
 };
 
 
@@ -40,7 +63,7 @@ inline float3 GetHalfwayVec(float3 lightDir, float3 viewDir)
     return normalize(viewDir + lightDir);
 }
 
-inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float smoothness)//should take material properties later
+inline void Apply(inout float3 colorAcculmulator, float lightMultiplyer, float3 normal, float3 lightDir, float3 viewDir, float3 diffuse, float3 specular, float smoothness) 
 {
     float lambertian = saturate(dot(normal, lightDir));
     float specularIntensity = 0.0f;
@@ -139,17 +162,43 @@ inline float2 Intensity(float3 normal, float3 worldPos)
 inline float3 AddLights(float3 worldPos, float3 worldNormal, float3 surfaceDiffuse, float specularMapFactor, float smoothness)
 {
     float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
-    float3 ambient = float3(0.05f, 0.05f, 0.05f);
-    float3 colorAcculmulator = ambient;
+    float3 ambient = float3(0.12f, 0.12f, 0.12f);
+    float3 colorAcculmulator = ambient * surfaceDiffuse;
     float3 lightDir = float3(0, 0, 0);
-    float lightMultiplyer = 0.0f;
+    float lightMultiplyer = 0.0;
     
+    const int poissonDiskSize = 4;
+    static float2 poissonDisk[poissonDiskSize] = { float2(-0.94201624, -0.39906216), float2(0.94558609, -0.76890725), float2(-0.094184101, -0.92938870), float2(0.34495938, 0.29387760) };
+    
+
     int i = 0;
     int roof = nrOfDirectionalLights;
     for (; i < roof; ++i) //directional
     {
         lightDir = lights[i].direction; //should be normalized already
-        lightMultiplyer = lights[i].intensity;
+        
+        float shadowFactor = 1.0;
+        float shadowMapIndex = lights[i].shadowMapIndex + 0.1;
+        if (shadowMapIndex > 0)
+        {
+            float shadowHardnessFactor = lights[i].shadowHardness / (float) poissonDiskSize;
+
+            float4 sampleCoordLS = WorldToLightClipPos(worldPos, shadowMapIndex);
+            sampleCoordLS.xyz /= sampleCoordLS.w;
+            sampleCoordLS.x = sampleCoordLS.x * 0.5 + 0.5;
+            sampleCoordLS.y = 0.5 - sampleCoordLS.y * 0.5;
+        
+            float bias = 0.005 * tan(acos(saturate(dot(worldNormal, lightDir))));
+            bias = clamp(bias, 0, 0.01);
+            
+            for (int si = 0; si < poissonDiskSize; ++si)
+            {
+                shadowFactor -= (float) (ShadowMaps.Sample(StandardClampSampler, float3(sampleCoordLS.xy + poissonDisk[si] / 1200.0, shadowMapIndex)).x < sampleCoordLS.z - bias) * shadowHardnessFactor;
+            }
+            
+        }
+    
+        lightMultiplyer = lights[i].intensity * shadowFactor;
         Apply(colorAcculmulator, lightMultiplyer, worldNormal, lightDir, viewDir, surfaceDiffuse * lights[i].colorDiffuse, specularMapFactor * lights[i].colorSpecular, smoothness);
     }
     roof += nrOfPointLights;
