@@ -96,7 +96,11 @@ public class MatchSystem : NetworkManager
     public override void OnAwake()
     {
         base.OnAwake();
+        
         Ball = GameObject.Instantiate(BallPrefab);
+        InternalManager.SimulateLatency = true;
+        InternalManager.SimulationMinLatency = 50;
+        InternalManager.SimulationMaxLatency = 200;
     }
 
 

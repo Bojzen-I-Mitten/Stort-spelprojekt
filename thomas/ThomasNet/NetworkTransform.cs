@@ -289,7 +289,7 @@ namespace ThomasEngine.Network
                 reader.GetVector3();
                 return;
             }
-
+            PrevPosition = transform.position;
             TargetSyncPosition = reader.GetVector3();
             target.rotation = reader.GetQuaternion();
             target.scale = reader.GetVector3();
@@ -311,7 +311,7 @@ namespace ThomasEngine.Network
         {
             if (!isOwner)
             {
-                target.position = Vector3.Lerp(target.position, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
+                target.position = Vector3.Lerp(PrevPosition, TargetSyncPosition, Math.Min(1.0f, (CurrentPositionDuration / SendInterval) * SmoothingFactor));
             }
         }
 

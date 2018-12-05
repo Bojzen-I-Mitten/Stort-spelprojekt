@@ -1,3 +1,5 @@
+#define DEBUG
+
 #if DEBUG
 #define STATS_ENABLED
 #endif
