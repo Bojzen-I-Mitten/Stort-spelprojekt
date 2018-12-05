@@ -15,10 +15,9 @@ public class Banana : Powerup
 
      // Private
     private SoundComponent SlipSound;
-    private Collider _FirstCollider;
+    private Collider _LastCollider;
     private ChadControls ObjectOwner = null;
 
-    private bool _BananaTriggered;
     private float _BananaTimer;
     private float _Force;
 
@@ -34,9 +33,8 @@ public class Banana : Powerup
         ThrowForce = BaseThrowForce;
         m_rigidBody.Friction = 100.0f;
 
-        _FirstCollider = null;
+        _LastCollider = null;
         DespawnTime = 60.0f;
-        _BananaTriggered = false;
         _BananaTimer = 0.0f;
 
 
@@ -53,27 +51,31 @@ public class Banana : Powerup
     {
         base.Update();
 
-        if (_BananaTimer > DespawnTime)
+        if (isOwner)
         {
-            //Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
-            // Despawn
-            base.OnCollisionEnter(_FirstCollider);
-        }
-        else if (_BananaTimer > 0)
-        {
-            _BananaTimer += Time.DeltaTime;
-
-            // If Banana falls on side, reset
-            if (m_rigidBody.LinearVelocity.y < 0.1f && (gameObject.transform.rotation.x > 0.4f || gameObject.transform.rotation.z > 0.4f))
+            if (_BananaTimer > DespawnTime)
             {
-                //Debug.Log("Banana fell on side");
-                gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0,0,0);
+                //Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
+                // Despawn
+                base.OnCollisionEnter(_LastCollider);
+            }
+            else if (_BananaTimer > 0)
+            {
+                _BananaTimer += Time.DeltaTime;
+
+                // If Banana falls on side, reset
+                if (m_rigidBody.LinearVelocity.y < 0.1f && (gameObject.transform.rotation.x > 0.4f || gameObject.transform.rotation.z > 0.4f))
+                {
+                    //Debug.Log("Banana fell on side");
+                    gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0, 0, 0);
+                }
+            }
+            else
+            {
+                SetModels(true, false);
             }
         }
-        else
-        {
-            SetModels(true, false);
-        }
+
     }
 
     // if this is a throwable power-up this function will be called
@@ -86,7 +88,7 @@ public class Banana : Powerup
 
     public override void OnCollisionEnter(Collider collider)
     {
-        _FirstCollider = collider;
+        _LastCollider = collider;
         //Check if colliding with a player
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
         if (otherChad && _BananaTimer > 1)
@@ -97,7 +99,6 @@ public class Banana : Powerup
         {
             // colliding with static object 
             m_rigidBody.Friction = 100.0f;
-            //m_rigidBody.IsKinematic = true;
             m_rigidBody.LinearVelocity = Vector3.Zero;
             //PickupCollider.enabled = true; // for testing
         }
@@ -118,8 +119,9 @@ public class Banana : Powerup
             return;
         activated = true;
 
-        ChadControls otherChad = colliderObject.GetComponent<ChadControls>();
-        if(otherChad)
+        //ChadControls otherChad = colliderObject.GetComponent<ChadControls>();
+        ChadControls otherChad = _LastCollider.gameObject.GetComponent<ChadControls>();
+        if (otherChad)
         {
             // rustle his jimmies
             Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, Vector3.Zero, 0.0f);
@@ -156,7 +158,7 @@ public class Banana : Powerup
         Remove();
     }
 
-    public void RPCSetModels(bool full, bool peel)
+    public void SetModels(bool full, bool peel)
     {
         if (BananaFull && BananaEaten)
         {
@@ -165,34 +167,27 @@ public class Banana : Powerup
         }
     }
 
-    private void SetModels(bool full, bool peel)
+    //private void SetModels(bool full, bool peel)
+    //{
+    //    RPCSetModels(full, peel);
+    //    SendRPC("RPCSetModels", (bool)full, (bool)peel);
+    //}
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
-        SetModels(full, peel);
-        SendRPC("RPCSetModels", (bool)full, (bool)peel);
+        base.OnWrite(writer, initialState);
+
+        writer.Put(BananaFull.GetActive());
+        writer.Put(BananaEaten.GetActive());
+
+        return true;
     }
 
-    //public override bool OnWrite(NetDataWriter writer, bool initialState)
-    //{
-    //    base.OnWrite(writer, initialState);
+    public override void OnRead(NetDataReader reader, bool initialState)
+    {
+        base.OnRead(reader, initialState);
 
-    //    writer.Put(BananaFull.GetActive());
-    //    writer.Put(BananaEaten.GetActive());
-
-    //    return true;
-    //}
-
-    //public override void OnRead(NetDataReader reader, bool initialState)
-    //{
-    //    base.OnRead(reader, initialState);
-    //    bool full = BananaFull.GetActive();
-    //    bool eat = BananaEaten.GetActive();
-
-    //    BananaFull.SetActive(reader.GetBool());
-    //    BananaEaten.SetActive(reader.GetBool());
-
-    //    if (BananaFull.GetActive() && !full)
-    //        Debug.Log("Full banana active");
-    //    else if (BananaEaten.GetActive() && !eat)
-    //        Debug.Log("Eaten banana active");
-    //}
+        BananaFull.SetActive(reader.GetBool());
+        BananaEaten.SetActive(reader.GetBool());
+    }
 }
