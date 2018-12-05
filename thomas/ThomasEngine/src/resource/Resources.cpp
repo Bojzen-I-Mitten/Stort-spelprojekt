@@ -500,7 +500,6 @@ namespace ThomasEngine
 				Monitor::Enter(resourceLock);
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
-				Monitor::Exit(resourceLock);
 				for each (auto var in s_PREFAB_DICT)
 					recursivePrefabDestruction(var.Value);
 				resources->Clear();

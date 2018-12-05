@@ -153,7 +153,14 @@ namespace thomas {
 			void AnimatedSkeleton::addConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{
 				Lock lck(m_lock);
-				m_constraint.get()[boneIndex].add(bC);
+				if (!bC->apply(_ref, boneIndex))
+				{
+					std::string s("Constraint failed to be applied at bone index: ");
+					s += std::to_string(boneIndex);
+					LOG(s);
+				}
+				else
+					m_constraint.get()[boneIndex].add(bC);
 			}
 			void AnimatedSkeleton::rmvConstraint(BoneConstraint * bC, uint32_t boneIndex)
 			{

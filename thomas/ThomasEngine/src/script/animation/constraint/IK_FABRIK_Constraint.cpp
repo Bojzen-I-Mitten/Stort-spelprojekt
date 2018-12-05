@@ -45,12 +45,22 @@ namespace ThomasEngine
 		void IK_FABRIK_Constraint::Weight::set(float w) {
 			m_ptr->m_weight = w;
 		}
+		float IK_FABRIK_Constraint::OrientationWeight::get() {
+			return m_ptr->m_orientationWeight;
+		}
+		void IK_FABRIK_Constraint::OrientationWeight::set(float w) {
+			m_ptr->m_orientationWeight = w;
+		}
+		uint32_t IK_FABRIK_Constraint::SrcBoneIndex::get() {
+			return m_ptr->getSrcBoneIndex();
+		}
+		float IK_FABRIK_Constraint::BoneChainLength::get() {
+			return m_ptr->getChainLength();
+		}
 		thomas::graphics::animation::IK_FABRIK_C_Constraint* IK_FABRIK_Constraint::Native()
 		{
 			return m_ptr;
 		}
-
-
 
 		void IK_FABRIK_Constraint::apply(GameObject^ gObj, uint32_t boneIndex)
 		{

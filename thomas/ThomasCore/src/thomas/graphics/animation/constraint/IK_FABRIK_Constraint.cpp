@@ -173,6 +173,10 @@ namespace thomas {
 				// Clean stack
 				ThomasCore::Core().Memory()->stack(0).deallocate(d);
 			}
+			bool IK_FABRIK_Constraint::apply(Skeleton & skel, uint32_t boneInd)
+			{
+				return true;
+			}
 		}
 	}
 }

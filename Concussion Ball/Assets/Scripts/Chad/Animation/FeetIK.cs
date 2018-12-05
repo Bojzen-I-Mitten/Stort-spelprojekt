@@ -19,6 +19,10 @@ namespace Concussion_Ball.Assets.Scripts
         //public string IKResolveBoneName { get; set; }
         //private uint ikBoneIndex;                   // Index for raytraced bone
         private IK_FABRIK_Constraint IK { get; set; }
+        private float ikTargetWeight = 1;
+        private float ikOrientWeight = 1;
+        public float IKBlendFactor { get; set; } = 0.5f;        // Factor determining how fast IK is blended in when activated
+        public float MaxDistanceOffset { get; set; } = 0.2f;    // Offset from max chain length IK is blended in
 
 
         public FeetIK()
@@ -42,7 +46,7 @@ namespace Concussion_Ball.Assets.Scripts
             //}
             //else
             //    ikBoneIndex = 0;
-            IK.apply(rC, traceBoneIndex);
+            IK.apply(m_rC, m_traceBoneIndex);
         }
 
         public override void Start()
@@ -61,11 +65,35 @@ namespace Concussion_Ball.Assets.Scripts
             base.OnDestroy();
         }
 
+        private static float blendInFactor(float weight, float targetWeight, float blendFactor)
+        {
+            float diff = Math.Abs(targetWeight - weight) * Time.DeltaTime * blendFactor;    // Find diff. adjusted over time and mixed with blend in factor
+            diff = MathHelper.Clamp(diff, 0.05f, 1.0f);                                     // Clamp to [0.1,1], assert not large delta/blend factor and minimal mix in
+            weight = MathHelper.Lerp(weight, targetWeight, diff);                           // Lerp, if values are equal minimal diff. has no effect!
+            return weight;
+        }
+
         public override void Update()
         {
             base.Update();
+
+            Vector3 srcPoint = m_rC.GetLocalBoneMatrix((int)IK.SrcBoneIndex).Translation;
+            if (!m_sampleSuccess ||                                                             // Verify enough samples found
+                Vector3.Distance(srcPoint, Center) > IK.BoneChainLength - MaxDistanceOffset)    // Verify target point is close enough
+            {
+                ikTargetWeight = 0;
+                ikOrientWeight = 0;
+            }
+            else
+            {
+                ikTargetWeight = 1;
+                ikOrientWeight = 1;
+            }
+
             IK.Target = Center;
             IK.Orientation = Orient;
+            IK.Weight = blendInFactor(IK.Weight, ikTargetWeight, IKBlendFactor);
+            IK.OrientationWeight = blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
         }
     }
 }

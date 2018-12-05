@@ -16,7 +16,7 @@ namespace thomas {
 
 
 				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp,  uint32_t boneInd) = 0;
-
+				virtual bool apply(Skeleton& skel, uint32_t boneInd) = 0;
 			};
 		}
 	}

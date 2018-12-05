@@ -74,6 +74,10 @@ namespace thomas {
 #endif
 #endif
 			}
+			bool LookAtConstraint::apply(Skeleton & skel, uint32_t boneInd)
+			{
+				return true;
+			}
 		}
 	}
 }

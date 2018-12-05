@@ -21,6 +21,7 @@ namespace thomas {
 
 				// Replaces the bone transform from a separate object.
 				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd) override;
+				virtual bool apply(Skeleton& skel, uint32_t boneInd) override;
 
 			private:
 				object::component::Transform * m_ref;

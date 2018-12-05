@@ -27,6 +27,11 @@ namespace thomas {
 				//objectPose[boneInd] = m_ref->getWorldMatrix() * /* object world inverse... */ * objectPose[skel.getBone(boneInd)._parentIndex].Invert();
 			}
 
+			bool BoneChildTransformConstraint::apply(Skeleton & skel, uint32_t boneInd)
+			{
+				return true;
+			}
+
 		}
 	}
 }

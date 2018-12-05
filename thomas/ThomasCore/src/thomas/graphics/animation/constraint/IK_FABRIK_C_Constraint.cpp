@@ -2,6 +2,7 @@
 #include "../../../ThomasCore.h"
 #include "../../../resource/MemoryAllocation.h"
 #include "../../../editor/gizmos/Gizmos.h"
+#include "../data/Skeleton.h"
 
 #define IK_DRAW
 
@@ -10,7 +11,7 @@ namespace thomas {
 		namespace animation {
 
 			IK_FABRIK_C_Constraint::IK_FABRIK_C_Constraint(uint32_t num_link)
-				: m_target(), m_targetOrient(), m_weight(1.f),
+				: m_target(), m_targetOrient(), m_weight(1.f), m_orientationWeight(1.f),
 					m_chain(new LinkParameter[num_link]), m_num_link(num_link)
 			{
 			}
@@ -148,32 +149,42 @@ namespace thomas {
 			void IK_FABRIK_C_Constraint::execute(Skeleton & skel, math::Matrix * objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
 				assert(m_num_link > 1);
+				if (m_weight < math::EPSILON)
+					return; // Do nothing
+
 				// Stack alloc.
 				uint32_t num_float_alloc = m_num_link * (3 + 1 + 16);	// Trans, len, rot mat
 				void * alloc = ThomasCore::Core().Memory()->stack(0).allocate(sizeof(float) * num_float_alloc, sizeof(float));
 				float *len = reinterpret_cast<float*>(alloc);
 				math::Vector3 *p = reinterpret_cast<math::Vector3*>(len + m_num_link);
 				math::Matrix *orient = reinterpret_cast<math::Matrix*>(p + m_num_link);
+
+
+
 				// Calc. distance of each bone/link
 				LinkParameter* chain = m_chain.get();
-				float link_sum = 0.f;
+				float linkLengthSum = 0.f;
 				uint32_t i = 0;
-				for (; i < m_num_link - 1; i++) {										// Find position of each bone
-					p[i] = objectPose[chain[i].m_index].Translation();					// Bone joint position (initial)
-					orient[i] = math::extractRotation(objectPose[chain[i].m_index]);	// Get matrix orientation
+				for (; i < m_num_link - 1; i++) {												// Find position of each bone
+					p[i] = objectPose[chain[i].m_index].Translation();							// Bone joint position (initial)
+					orient[i] = math::extractRotation(objectPose[chain[i].m_index]);			// Get matrix orientation
 					len[i] = math::Vector3::Distance(		
-						p[i], objectPose[chain[i+1].m_index].Translation());			// Bone length
-					link_sum += len[i];													// Sum chain length
+						p[i], objectPose[chain[i+1].m_index].Translation());					// Bone length
+					linkLengthSum += len[i];													// Sum chain length
 				}
-				p[i] = objectPose[chain[i].m_index].Translation();						// End case
-				orient[i] = math::Matrix::CreateFromQuaternion(m_targetOrient);			// -
+				math::Quaternion targetO = math::Quaternion::CreateFromRotationMatrix(			// Calc. target orientation
+					math::extractRotation(objectPose[chain[i].m_index]));
+				targetO = math::Quaternion::Slerp(targetO, m_targetOrient, m_orientationWeight);// End cases
+				p[i] = objectPose[chain[i].m_index].Translation();								
+				math::Vector3 targetP = math::Vector3::Lerp(p[i], m_target, m_weight);			// Calc. target point
+				orient[i] = math::Matrix::CreateFromQuaternion(targetO);						// --
 				// Distance from root to target
 				float targetDist = math::Vector3::Distance(
-					objectPose[m_chain.get()[0].m_index].Translation(), m_target);
-				if (targetDist > link_sum)
-					FABRIK_unreachable(m_target, len, p, m_num_link);
+					objectPose[m_chain.get()[0].m_index].Translation(), targetP);
+				if (targetDist > linkLengthSum)
+					FABRIK_unreachable(targetP, len, p, m_num_link);
 				else
-					FABRIK_iteration(m_target, len, p, orient, m_num_link);
+					FABRIK_iteration(targetP, len, p, orient, m_num_link);
 				math::Vector3 trans;
 				math::Matrix pose;
 				// Apply solution to chain
@@ -181,18 +192,19 @@ namespace thomas {
 					pose = objectPose[(chain+i)->m_index];
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
-					pose = pose * weightRotationBetween(pose.Up(), p[i + 1] - p[i], m_weight);	// Rotate
-					pose.Translation(math::lerp(trans, p[i], m_weight));								// Apply new translation
+					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate
+					pose.Translation(p[i]);														// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;										// Set
 				}
-				math::Vector3 up = math::Vector3::Transform(math::Vector3::Up, m_targetOrient);
-				math::Vector3 right = math::Vector3::Transform(math::Vector3::Right, m_targetOrient);
+				// End case, apply target orient
+				math::Vector3 up = math::Vector3::Transform(math::Vector3::Up, targetO);
+				math::Vector3 right = math::Vector3::Transform(math::Vector3::Right, targetO);
 				pose = objectPose[(chain + m_num_link - 1)->m_index];
 				trans = pose.Translation();
-				pose.Translation(math::Vector3::Zero);											// Remove translation
-				pose = pose * weightRotationBetween(pose.Up(), up, m_weight);					// Rotate transform to y
-				pose = pose * weightRotationBetween(pose.Right(), right, m_weight);				// Rotate transform to x
-				pose.Translation(math::lerp(trans, p[m_num_link - 1], m_weight));								// Apply new translation
+				pose.Translation(math::Vector3::Zero);								// Remove translation
+				pose = pose * math::getMatrixRotationTo(pose.Up(), up);				// Rotate transform to y
+				pose = pose * math::getMatrixRotationTo(pose.Right(), right);		// Rotate transform to x
+				pose.Translation(p[m_num_link - 1]);								// Apply new translation
 				objectPose[(chain + m_num_link - 1)->m_index] = pose;
 
 				const float GIZMO_LEN = 0.05f;
@@ -210,6 +222,31 @@ namespace thomas {
 #endif
 				// Clean stack
 				ThomasCore::Core().Memory()->stack(0).deallocate(alloc);
+			}
+			bool IK_FABRIK_C_Constraint::apply(Skeleton & skel, uint32_t boneInd)
+			{
+				if (m_num_link < 2)
+					return false;	// No links in bone chain
+				// Calculate bone chain length
+				float sum = 0.f;
+				math::Vector3 v = skel.getBone(0)._bindPose.Translation();
+				int validCount = m_chain.get()[0].m_index < skel.getNumBones();;
+				for (uint32_t i = 1; i < m_num_link; i++) {
+					math::Vector3 vn = skel.getBone(i)._bindPose.Translation();
+					sum += math::Vector3::Distance(v, vn);
+					v = vn;
+					validCount += m_chain.get()[i].m_index < skel.getNumBones();
+				}
+				m_chainLength = sum;
+				return validCount == m_num_link;
+			}
+			float IK_FABRIK_C_Constraint::getChainLength()
+			{
+				return m_chainLength;
+			}
+			uint32_t IK_FABRIK_C_Constraint::getSrcBoneIndex()
+			{
+				return m_chain.get()[0].m_index;
 			}
 		}
 	}

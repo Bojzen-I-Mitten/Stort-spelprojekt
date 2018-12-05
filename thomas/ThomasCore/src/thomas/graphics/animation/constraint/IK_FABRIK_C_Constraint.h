@@ -40,15 +40,22 @@ namespace thomas {
 
 				// Replaces the bone transform from a separate object.
 				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd) override;
+				virtual bool apply(Skeleton& skel, uint32_t boneInd) override;
 
 				math::Vector3 m_target;					// Target in object space.
 				math::Quaternion m_targetOrient;		// Orientation at target
-				float m_weight;							// IK weight
+				float m_weight;							// IK weight for target point
+				float m_orientationWeight;				// IK weight for orientation
+
+				float getChainLength();					// Access bone chain length
+				uint32_t getSrcBoneIndex();				// Get bone index of bone chain root
+
 
 			private:
 
-				std::unique_ptr<LinkParameter> m_chain;	// Link chain paramters (root at 0)
+				std::unique_ptr<LinkParameter> m_chain;	// Link chain parameters (root at 0)
 				uint32_t m_num_link;					// Number of links
+				float m_chainLength;					// Updated length of bone chain (originates as bind pose chain length)
 			};
 
 		}

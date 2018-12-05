@@ -31,11 +31,24 @@ namespace ThomasEngine
 				Quaternion get();
 				void set(Quaternion rot);
 			}
-			/* Weight applied
+			/* Weight over IK influence over the animated bone chain.
 			*/
 			property float Weight {
 				float get();
 				void set(float w);
+			}
+			/* Weight influence of the Orientation argument
+			*/
+			property float OrientationWeight {
+				float get();
+				void set(float w);
+			}
+
+			property uint32_t SrcBoneIndex {
+				uint32_t get();
+			}
+			property float BoneChainLength {
+				float get();
 			}
 
 			void apply(GameObject^ obj, uint32_t boneIndex);
