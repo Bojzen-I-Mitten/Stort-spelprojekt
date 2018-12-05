@@ -1,9 +1,99 @@
 ﻿using System;
 using System.Collections;
 using ThomasEngine;
+using System.Collections.Generic;
+public class ImageBaradjustment
+{
+
+    Image[] Image = new Image[(int)Imagestate.NUMSTATES];
+    Text number;
+    int numbervalue = 0;
+    public Canvas Canvas;
+    public enum Imagestate
+    {
+        MUSIC_VOLUME_IMAGE,
+        MUSIC_VOLUME_TOGGLE_IMAGE,
+        MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE,
+        NUMSTATES
+    }
+
+    public Imagestate ImageBarstate;
+    public ImageBaradjustment(Vector2 input, Canvas Canvas, Texture2D ImageBackground, Texture2D ImageToggle, Texture2D ImageAftermathToggle)
+    {
+        this.Canvas = Canvas;
+        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE] = Canvas.Add(ImageBackground);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE] = Canvas.Add(ImageToggle);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE] = Canvas.Add(ImageAftermathToggle);
+        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].scale = new Vector2(0.5f,1);
+        foreach (Image Images in Image)
+        {
+            Images.interactable = true;
+            Images.position = input;
+        }
+        number = Canvas.Add("0");
+        number.scale = new Vector2(0.5f);
+        number.position = new Vector2(0.165f + Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].position.x, Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].position.y);
+    }
+    public ImageBaradjustment(Canvas Canvas)
+    {
+        this.Canvas = Canvas;
+    }
+
+    public ImageBaradjustment(Canvas Canvas, Texture2D ImageBackground, Texture2D ImageToggle, Texture2D ImageAftermathToggle)
+    {
+        this.Canvas = Canvas;
+        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE] = Canvas.Add(ImageBackground);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE] = Canvas.Add(ImageToggle);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE] = Canvas.Add(ImageAftermathToggle);
+        foreach (Image Images in Image)
+        {
+            Images.interactable = true;
+        }
+    }
+    public void start(Vector2 input, Canvas Canvas, Texture2D ImageBackground, Texture2D ImageToggle, Texture2D ImageAftermathToggle)
+    {
+        this.Canvas = Canvas;
+        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE] = Canvas.Add(ImageBackground);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE] = Canvas.Add(ImageToggle);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE] = Canvas.Add(ImageAftermathToggle);
+        foreach (Image Images in Image)
+        {
+            Images.interactable = true;
+            Images.position = input;
+        }
+    }
+    public void UpdatePositionInworld(Vector2 input)
+    {
+        foreach (Image Images in Image)
+        {
+            Images.position = input;
+        }
+    }
+
+    public void update()
+    {
+        if (Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].Hovered())
+        { 
+            if(Input.GetMouseButton(Input.MouseButtons.LEFT))
+            { 
+                Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
+                Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
+            }
+        }
+        if (Input.GetKeyDown(Input.Keys.X))
+            Debug.Log(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);
+
+         numbervalue = ((int)(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x / 3.15f));
+        number.text = numbervalue.ToString();
+        //320 max 0 minst
+
+
+    }
+}
 
 public class GUIOptionsMenu : ScriptComponent
 {
+
     public enum Textstate
     {
         OPTIONS_TEXT,
@@ -16,22 +106,23 @@ public class GUIOptionsMenu : ScriptComponent
         AIMSENSE_TEXT,
         NUMSTATES
     }
-    public enum Imagestate
+    public enum ImageBarstate
     {
-        MUSIC_VOLUME_IMAGE,
-        MUSIC_VOLUME_TOGGLE_IMAGE,
-        MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE,
+        MUSICBar_IMAGE,
+        sfxBar_Image,
+        AIM,
+        Movement,
         NUMSTATES
     }
 
 
     Camera Camera;
-    public Canvas Canvas;
+   public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
-    Image[] Image = new Image[(int)Imagestate.NUMSTATES];
-    public Textstate TextState { set; get; } = Textstate.BACK_TEXT;
+
+    public Textstate TextState { set; get; } = Textstate.NUMSTATES;
     public Textstate OldState = Textstate.NUMSTATES;
-    public Imagestate ImageState { set; get; } = Imagestate.MUSIC_VOLUME_IMAGE;
+    public ImageBarstate ImageState { set; get; } = ImageBarstate.NUMSTATES;
     public Font Font{ set; get; }
     public Vector2 SetOriginText   { set; get; }
     public Vector2 SetPositionText { set; get; }
@@ -43,8 +134,10 @@ public class GUIOptionsMenu : ScriptComponent
     public Texture2D ImageBackground { set; get; }
     public Texture2D ImageToggle { set; get; }
     public Texture2D ImageAftermathToggle { set; get;}
+    public List<ImageBaradjustment> ImageBar;
     public override void Start()
     {
+        ImageBar = new List<ImageBaradjustment>();
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         OldState = Textstate.NUMSTATES; 
@@ -58,12 +151,12 @@ public class GUIOptionsMenu : ScriptComponent
 
         if (Input.GetKeyDown(Input.Keys.P))
             printPosition();
-        if (Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].Hovered())
-            Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
 
-        if (Input.GetKeyDown(Input.Keys.Y))
-            Debug.Log(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);
+        foreach (ImageBaradjustment Images in ImageBar)
+            Images.update();
+
+/*        if (Input.GetKeyDown(Input.Keys.Y))
+            Debug.Log(Image[(int)ImageBarstate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);*/
     }
     void ButtonHovered()
     {
@@ -88,7 +181,7 @@ public class GUIOptionsMenu : ScriptComponent
         Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.5f);
         Text[(int)Textstate.MUSIC_TEXT] = Canvas.Add("Music"); Text[(int)Textstate.MUSIC_TEXT].position = new Vector2(0.02f, 0.27f);
         Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.02f, 0.32f);
-        Text[(int)Textstate.Music_Area_Text] = Canvas.Add("MUSIC"); Text[1].scale = new Vector2(0.75f); Text[(int)Textstate.Music_Area_Text].position = new Vector2(0.01f, 0.2f);
+        Text[(int)Textstate.Music_Area_Text] = Canvas.Add("Audio"); Text[1].scale = new Vector2(0.75f); Text[(int)Textstate.Music_Area_Text].position = new Vector2(0.01f, 0.2f);
         Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.42f);
         foreach (Text Texture in Text)
         {
@@ -98,17 +191,13 @@ public class GUIOptionsMenu : ScriptComponent
         {
             Text[i].scale = new Vector2(0.5f);
         }
-
-
-        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE] = Canvas.Add(ImageBackground);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE] = Canvas.Add(ImageToggle);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE] = Canvas.Add(ImageAftermathToggle);
-        foreach (Image Images in Image)
-        {
-            Images.interactable = true;
-            Images.position = new Vector2(0.5f, 0.5f);
-        }
-
+        Texture2D CopyImageBackground = ImageBackground; Texture2D CopyImageImageToggle = ImageToggle; Texture2D CopyImageImageAftermathToggle = ImageAftermathToggle;
+       
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f,0.27f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//music bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));
+        //ImageBar.Add(new ImageBaradjustment(Canvas));
 
     }
     public void ClearImagesAndText()
@@ -124,12 +213,7 @@ public class GUIOptionsMenu : ScriptComponent
             Debug.Log(tempstate.ToString() + "x = " + Texture.position.x + "   y = " + Texture.position.y);
             tempstate++;
         }
-        Imagestate Imagetempstate = Imagestate.MUSIC_VOLUME_IMAGE;
-        foreach (Image images in Image)
-        {
-            Debug.Log(Imagetempstate.ToString() + "x = " + images.position.x + "   y = " + images.position.y);
-            Imagetempstate++;
-        }
+        
     }
     public override void OnDestroy()
     {
@@ -152,11 +236,15 @@ public class GUIOptionsMenu : ScriptComponent
              Text[(int)TextState].origin = SetOriginText;
              Text[(int)TextState].position = SetPositionText;
         }
+
+   //     if (ImageState != ImageBarstate.NUMSTATES)
+    //        ImageBar[(int)ImageState].UpdatePositionInworld(SetPositionImage);
+
         // }
-        if (ImageState != Imagestate.NUMSTATES)
-        {
-            Image[(int)ImageState].origin = SetOriginImage;
-            Image[(int)ImageState].position = SetPositionImage;
-        }
+        //   if (ImageState != ImageBarstate.NUMSTATES)
+        //      ImageBar
+        //     ImageBar[(int)ImageState].UpdatePositionInworld = SetPositionImage;
+        //      Image[(int)ImageBarstate].position = SetPositionImage;
+        // }
     }
 }
