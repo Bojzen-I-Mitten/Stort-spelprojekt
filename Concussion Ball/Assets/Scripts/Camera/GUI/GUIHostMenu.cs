@@ -728,9 +728,10 @@ public class GUIHostMenu : ScriptComponent
             HostBtn.color = Selected;
             if (HostBtn.Clicked())
             {
-                if (NotSimilarColor && NotSameName)
+                if (NotSimilarColor && NotSameName && Team1.text != "" && Team2.text != "")
                 {
                     DontTakeInput();
+                    AdjustMaxPlayers();
 
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
                     //Set match options
