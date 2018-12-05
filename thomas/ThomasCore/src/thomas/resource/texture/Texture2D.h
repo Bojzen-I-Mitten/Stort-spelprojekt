@@ -14,13 +14,10 @@ namespace thomas
 		private:
 			void LoadTextureFromFile(std::string path);
 		public:
-			static void Init();
-			static void Destroy();
-
-			Texture2D() {};
 			Texture2D(int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(void* initData, int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(std::string path);
+			Texture2D() {};
 
 			void OnChanged();
 			std::vector<math::Color> GetPixels();
@@ -38,9 +35,6 @@ namespace thomas
 			DirectX::ScratchImage* data;
 			int m_mipmapCount;
 			bool m_mipMap;
-			static Texture2D* s_blackTexture;
-			static Texture2D* s_whiteTexture;
-			static Texture2D* s_normalTexture;
 		};
 	}
 }

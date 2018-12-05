@@ -5,6 +5,7 @@
 #include "../ThomasManaged.h"
 #include "Shader.h"
 #include "texture\Texture2D.h"
+#include "texture\TextureCube.h"
 #include "Resources.h"
 #include "../serialization/Serializer.h"
 #include "../Debug.h"
@@ -101,10 +102,26 @@ namespace ThomasEngine {
 		else
 			return nullptr;
 	}
+	TextureCube^ Material::GetTextureCube(String^ name)
+	{
+		thomas::resource::TextureCube* nativePtr = ((thomas::resource::Material*)m_nativePtr)->GetCubeMap(Utility::ConvertString(name));
+		ThomasEngine::Resource^ texture = ThomasEngine::Resources::FindResourceFromNativePtr(nativePtr);
+		if (texture)
+			return (ThomasEngine::TextureCube^)texture;
+		else if (nativePtr)
+			return gcnew ThomasEngine::TextureCube(nativePtr);
+		else
+			return nullptr;
+	}
 
 	void Material::SetTexture2D(String^ name, Texture2D^ value)
 	{
 		((thomas::resource::Material*)m_nativePtr)->SetTexture2D(Utility::ConvertString(name), (thomas::resource::Texture2D*)value->m_nativePtr);
+	}
+
+	void Material::SetTextureCube(String^ name, TextureCube^ value)
+	{
+		((thomas::resource::Material*)m_nativePtr)->SetCubeMap(Utility::ConvertString(name), (thomas::resource::TextureCube*)value->m_nativePtr);
 	}
 
 
@@ -121,6 +138,8 @@ namespace ThomasEngine {
 		for each(String^ key in value->Keys)
 		{
 			System::Object^ prop = value[key];
+			if (prop == nullptr)
+				continue;
 			Type^ t = prop->GetType();
 			if (t == Newtonsoft::Json::Linq::JObject::typeid)
 			{
@@ -188,6 +207,9 @@ namespace ThomasEngine {
 				break;
 			case ShaderProperty::Type::TEXTURE2D:
 				value = GetTexture2D(name);
+				break;
+			case ShaderProperty::Type::TEXTURECUBE:
+				value = GetTextureCube(name);
 				break;
 			default:
 				break;

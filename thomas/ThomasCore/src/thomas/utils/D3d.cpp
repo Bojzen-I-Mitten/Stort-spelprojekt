@@ -298,6 +298,65 @@ namespace thomas
 			return true;
 		}
 
+		bool D3D::CreateTextureCubeMap(void** initData, uint32_t dim, DXGI_FORMAT format, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels)
+		{
+			D3D11_TEXTURE2D_DESC textureDesc;
+
+			ZeroMemory(&textureDesc, sizeof(textureDesc));
+			textureDesc.Width = dim;
+			textureDesc.Height = dim;
+			textureDesc.MipLevels = mipLevels;
+			textureDesc.ArraySize = 6;
+			textureDesc.Format = format;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.CPUAccessFlags = 0;
+			textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE |
+				(mipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0);
+
+			HRESULT hr;
+
+			if (initData)
+			{
+				D3D11_SUBRESOURCE_DATA* texInitData = new D3D11_SUBRESOURCE_DATA[6];
+				for (int i = 0; i < 6; ++i) {
+
+					D3D11_SUBRESOURCE_DATA sd = {};
+					sd.pSysMem = initData[i];
+					sd.SysMemPitch = static_cast<UINT>(4 * dim);
+					sd.SysMemSlicePitch = static_cast<UINT>(4 * dim * dim);
+
+					texInitData[i] = sd;
+				}
+				hr = m_device->CreateTexture2D(&textureDesc, texInitData, &texure2D);
+				delete[] texInitData;
+			}
+			else
+				hr = m_device->CreateTexture2D(&textureDesc, NULL, &texure2D);
+
+			if (FAILED(hr))
+			{
+				LOG_HR(hr);
+				return false;
+			}
+			D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+			ZeroMemory(&viewDesc, sizeof(viewDesc));
+			viewDesc.Format = textureDesc.Format;
+			viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+			viewDesc.Texture2DArray.ArraySize = 6;
+			viewDesc.Texture2DArray.FirstArraySlice = 0;
+			viewDesc.Texture2DArray.MipLevels = mipLevels;
+			viewDesc.Texture2DArray.MostDetailedMip = 0;
+
+			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
+			if (FAILED(hr))
+				return false;
+
+			return true;
+		}
+
 		bool D3D::CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain)
 		{
 			IDXGIDevice* dxgiDevice = nullptr;

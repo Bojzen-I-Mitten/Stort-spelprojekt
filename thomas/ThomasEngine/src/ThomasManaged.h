@@ -75,6 +75,8 @@ namespace ThomasEngine {
 		static void ProcessStateCommand();
 		static void SynchronousExecution();
 
+		static void Shutdown();
+
 		static void DumpProfilerLog(System::Object^ stateInfo);
 		static void SampleRam(System::Object ^ stateInfo);
 
@@ -155,6 +157,8 @@ namespace ThomasEngine {
 		static void StartEngine();
 
 		static void Exit();
+
+		static void IssueShutdown();
 
 		static void CreateThomasWindow(IntPtr hWnd, bool isEditor);
 

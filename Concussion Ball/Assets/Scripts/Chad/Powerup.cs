@@ -12,6 +12,8 @@ public class Powerup : PickupableObject
 
     protected RenderComponent m_renderComponent; // in case we want to alter material with charge up
     public PowerupSpawner spawner;
+    public GameObject colliderObject;
+
 
     protected bool activated = false;
     public override void OnAwake()
@@ -19,6 +21,7 @@ public class Powerup : PickupableObject
         base.OnAwake();
         m_renderComponent = gameObject.GetComponent<RenderComponent>();
         chargeTimeMax = 0.5f;
+        colliderObject = null;
     }
 
     public override void OnEnable()
@@ -73,6 +76,7 @@ public class Powerup : PickupableObject
 
     public override void Pickup(ChadControls chad, Transform hand)
     {
+        
         base.Pickup(chad, hand);
 
         if (spawner)
@@ -86,6 +90,8 @@ public class Powerup : PickupableObject
 
     public override void OnCollisionEnter(Collider collider)
     {
+        if(collider)
+            colliderObject = collider.gameObject;
         if (isOwner)
         {
             if (PickupCollider.enabled == false && m_rigidBody.enabled && pickedUp == false)

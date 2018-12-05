@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Chad\Powerups\Banana.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUILoadingScreen.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIHostMenu.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\Camera\ReplayCamera.cs" />
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
+    <Compile Include="Assets\Scripts\Chad\Animation\GroundOffset.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIPlayerScore.cs" />
@@ -104,6 +106,8 @@
     <Compile Include="Assets\Scripts\match\TeamGoal.cs" />
     <Compile Include="Assets\Scripts\match\TeamSpawn.cs" />
     <Compile Include="Assets\Scripts\ParticleComponentTest.cs" />
+    <Compile Include="Assets\Scripts\RpcTest.cs" />
+    <Compile Include="Assets\Scripts\ScriptBase.cs" />
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />

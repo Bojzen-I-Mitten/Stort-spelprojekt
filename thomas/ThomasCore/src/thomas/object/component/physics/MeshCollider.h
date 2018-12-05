@@ -22,13 +22,20 @@ namespace thomas
 				bool GetConcave();
 				void Update() override;
 				void SetTrigger(bool trigger) override;
+
+				void SetMargin(float margin);
+				float GetMargin();
 			private:
 				void RecalcCollider();
 				void CalculateConvex();
 				void CalculateConcave();
+
+
+
 			private:
 				bool m_concave = false;
 				resource::Model* m_model = nullptr;
+				float m_margin = 0.0f;
 			};
 		}
 	}

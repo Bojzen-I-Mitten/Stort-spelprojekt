@@ -48,6 +48,7 @@
     <ClCompile Include="src\thomas\graphics\GUI\Canvas.cpp" />
     <ClCompile Include="src\thomas\object\ObjectHandler.cpp" />
     <ClCompile Include="src\thomas\resource\MemoryAllocation.cpp" />
+    <ClCompile Include="src\thomas\resource\ResourceManager.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyStruct.cpp" />
     <ClCompile Include="src\thomas\object\component\BoneTransformComponent.cpp" />
     <ClCompile Include="src\thomas\object\component\physics\Joint.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="src\thomas\object\component\RenderSkinnedComponent.h" />
     <ClInclude Include="src\thomas\resource\Animation.h" />
     <ClInclude Include="src\thomas\resource\ComputeShader.h" />
+    <ClInclude Include="src\thomas\resource\ResourceManager.h" />
     <ClInclude Include="src\thomas\resource\Font.h" />
     <ClInclude Include="src\thomas\resource\MemoryAllocation.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\shaderProperties.h" />
