@@ -156,7 +156,7 @@ public class Banana : Powerup
         Remove();
     }
 
-    public void SetModels(bool full, bool peel)
+    public void RPCSetModels(bool full, bool peel)
     {
         if (BananaFull && BananaEaten)
         {
@@ -165,34 +165,34 @@ public class Banana : Powerup
         }
     }
 
-    //private void SetModels(bool full, bool peel)
+    private void SetModels(bool full, bool peel)
+    {
+        SetModels(full, peel);
+        SendRPC("RPCSetModels", (bool)full, (bool)peel);
+    }
+
+    //public override bool OnWrite(NetDataWriter writer, bool initialState)
     //{
-    //    SetModels(full, peel);
-    //    SendRPC("RPCSetModels", (bool)full, (bool)peel);
+    //    base.OnWrite(writer, initialState);
+
+    //    writer.Put(BananaFull.GetActive());
+    //    writer.Put(BananaEaten.GetActive());
+
+    //    return true;
     //}
 
-    public override bool OnWrite(NetDataWriter writer, bool initialState)
-    {
-        base.OnWrite(writer, initialState);
+    //public override void OnRead(NetDataReader reader, bool initialState)
+    //{
+    //    base.OnRead(reader, initialState);
+    //    bool full = BananaFull.GetActive();
+    //    bool eat = BananaEaten.GetActive();
 
-        writer.Put(BananaFull.GetActive());
-        writer.Put(BananaEaten.GetActive());
+    //    BananaFull.SetActive(reader.GetBool());
+    //    BananaEaten.SetActive(reader.GetBool());
 
-        return true;
-    }
-
-    public override void OnRead(NetDataReader reader, bool initialState)
-    {
-        base.OnRead(reader, initialState);
-        bool full = BananaFull.GetActive();
-        bool eat = BananaEaten.GetActive();
-
-        BananaFull.SetActive(reader.GetBool());
-        BananaEaten.SetActive(reader.GetBool());
-
-        if (BananaFull.GetActive() && !full)
-            Debug.Log("Full banana active");
-        else if (BananaEaten.GetActive() && !eat)
-            Debug.Log("Eaten banana active");
-    }
+    //    if (BananaFull.GetActive() && !full)
+    //        Debug.Log("Full banana active");
+    //    else if (BananaEaten.GetActive() && !eat)
+    //        Debug.Log("Eaten banana active");
+    //}
 }
