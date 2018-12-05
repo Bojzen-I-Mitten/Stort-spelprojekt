@@ -10,10 +10,11 @@ public class SoundBomb : Powerup
     //public AudioClip VindalooExplosionSound { get; set; }
     //private SoundComponent ExplosionSound;
 
-    public float ExplosionRadius { get; set; } = 8.0f;
+    public float ExplosionRadius;
     public float ExplosionForce;
 
     private float _JumpTimer;
+    private float _DanceDuration;
 
     public override void OnAwake()
     {
@@ -29,6 +30,7 @@ public class SoundBomb : Powerup
         _FirstCollider = null;
         m_rigidBody.Friction = 100.0f;
         _JumpTimer = 0.0f;
+        _DanceDuration = 5.0f;
 
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
         //ExplosionSound.Type = SoundComponent.SoundType.Effect;
@@ -161,14 +163,13 @@ public class SoundBomb : Powerup
             //Debug.Log("Colliding with object that is not ya boi");
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
-            PickupCollider.enabled = true; // for testing
+            //PickupCollider.enabled = true; // for testing
 
             _JumpTimer += Time.DeltaTime;
 
-
             // Test
             //OnActivate();
-            //base.OnCollisionEnter(collider);
+            base.OnCollisionEnter(collider);
         }
 
 
@@ -189,9 +190,7 @@ public class SoundBomb : Powerup
         activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
 
-        StartCoroutine(BlastingMusic());
-
-        Explosion();
+        StartCoroutine(BlastingMusic());   
     }
 
     private void Explosion()
@@ -217,11 +216,12 @@ public class SoundBomb : Powerup
     private IEnumerator BlastingMusic()
     {
         // Start blasting 
-        //ChadControls localChad = MatchSystem.instance.LocalChad;
+        //Debug.Log("Looking for players to blast");
+        ChadControls localChad = MatchSystem.instance.LocalChad;
 
         //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-        //if (localChad && otherPlayerTeam != playerTeam)
+        //if (localChad /*&& otherPlayerTeam != playerTeam*/)
         //{
         //    float distance = Vector3.Distance(localChad.transform.position, transform.position);
         //    if (distance < ExplosionRadius)
@@ -238,9 +238,24 @@ public class SoundBomb : Powerup
         //    }
         //}
 
+        float timer = 0.0f;
 
-        yield return new WaitForSeconds(5);
+        while (timer < _DanceDuration)
+        {
+            timer += Time.DeltaTime;
 
-        Activate();
+            float distance = Vector3.Distance(localChad.transform.position, transform.position);
+            if (distance < ExplosionRadius)
+            {
+                Debug.Log("Chad within distance");
+            //    //localChad.rBody.AddTorque(new Vector3(0, 10.0f, 0));
+            //    localChad.rBody.AddForce(new Vector3(0, 10, 0));
+            }
+            Debug.Log("Distance to player: " + distance);
+
+
+            yield return null;
+        }
+        Explosion();
     }
 }
