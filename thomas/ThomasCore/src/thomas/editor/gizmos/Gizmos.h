@@ -51,6 +51,7 @@ namespace thomas
 			void DrawSphere(math::Vector3 center, float radius);
 			void DrawWireSphere(math::Vector3 center, float radius);
 			void DrawRay(math::Vector3 from, math::Vector3 direction);
+			void DrawRay(math::Vector3 from, math::Vector3 direction, float len);
 			void DrawRay(math::Ray ray);
 
 			void DrawFrustum(math::Vector3 center, float fov, float maxRange, float minRange, float aspect);

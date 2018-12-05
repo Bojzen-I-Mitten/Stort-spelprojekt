@@ -51,6 +51,7 @@ namespace thomas
 				new object::component::Camera(-1));
 			m_cameraComponent->SetTargetDisplay(-1);
 			m_cameraComponent->m_gameObject = this;
+			m_cameraComponent->SetFar(500.f);
 			m_grid = std::unique_ptr<EditorGrid>(new EditorGrid(100, 1.f, 10));
 			resource::Shader* outliner = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/EditorOutlineShader.fx");
 
