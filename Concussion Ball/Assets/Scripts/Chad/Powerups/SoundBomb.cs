@@ -249,7 +249,7 @@ public class SoundBomb : Powerup
             {
                 Debug.Log("Chad within distance");
             //    //localChad.rBody.AddTorque(new Vector3(0, 10.0f, 0));
-            //    localChad.rBody.AddForce(new Vector3(0, 10, 0));
+                localChad.rBody.AddForce(new Vector3(0, 100, 0));
             }
             Debug.Log("Distance to player: " + distance);
 
