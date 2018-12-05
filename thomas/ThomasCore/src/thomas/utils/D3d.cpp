@@ -713,7 +713,7 @@ namespace thomas
 			delete[] filename_c;
 
 			HRESULT hr;
-			if (extension_string == ".dds")
+			if (extension_string == ".dds" || extension_string == ".DDS")
 			{
 				hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
 			}

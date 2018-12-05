@@ -3,6 +3,7 @@
 #include "../../Common.h"
 #include "../../ThomasCore.h"
 #include "../ResourceManager.h"
+
 namespace thomas
 {
 	namespace resource
@@ -159,7 +160,7 @@ namespace thomas
 
 		Texture2D::~Texture2D()
 		{
-			delete data;
+			SAFE_DELETE(data);
 		}
 
 

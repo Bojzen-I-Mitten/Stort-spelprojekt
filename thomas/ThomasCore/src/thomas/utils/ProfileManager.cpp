@@ -16,6 +16,7 @@ namespace thomas
 			float ProfileManager::s_vrambudget;
 			unsigned int ProfileManager::s_frames;
 			std::atomic<unsigned int> ProfileManager::s_contextSwitch;
+			utils::atomics::SpinLock ProfileManager::s_profileLock;
 			void ProfileManager::resetFrameCounter()
 			{
 				s_frames = 0;
@@ -51,7 +52,9 @@ namespace thomas
 
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
+				s_profileLock.lock();
 				s_vramusage[name].push_back(usage);
+				s_profileLock.unlock();
 			}
 
 			void ProfileManager::increaseContextSwitches()

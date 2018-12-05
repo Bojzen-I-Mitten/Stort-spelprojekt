@@ -7,6 +7,7 @@
 #include <chrono>
 #include <atomic>
 #include "..\..\..\include\nlohmann\json.hpp"
+#include "..\utils\atomic\Synchronization.h"
 #define BENCHMARK
 
 
@@ -44,6 +45,7 @@ namespace thomas
 				static float s_vrambudget;
 				static unsigned int s_frames;
 				static std::atomic<unsigned int> s_contextSwitch;
+				static utils::atomics::SpinLock s_profileLock;
 
 			public:
 				static void newFrame();
