@@ -101,10 +101,16 @@ namespace ThomasEngine
 
 		Resources::AssetTypes Resources::GetResourceAssetType(String^ path)
 		{
+
 			String^ extension = System::IO::Path::GetExtension(path);
 			if (extension->Length == 0)
 				return AssetTypes::UNKNOWN;
 			extension = extension->Remove(0, 1)->ToLower();
+
+			// Used for capturing cubic postfixes
+			String^ delimStr = "_";
+			array<Char>^ delimiter = delimStr->ToCharArray();
+
 			if (extension == "fx")
 			{
 				return AssetTypes::SHADER;
@@ -139,7 +145,15 @@ namespace ThomasEngine
 			}
 			else if (extension == "dds")
 			{
-				return AssetTypes::TEXTURE3D;
+
+				auto cube = path->Split(delimiter);
+				String^ cubeString = "cube.dds";
+				if (cube->Length > 0 && String::Equals(cubeString, cube[cube->Length - 1]))
+				{
+					return AssetTypes::TEXTURE3D;
+				}
+				
+				return AssetTypes::TEXTURE2D;
 			}
 			else if (extension == "prefab")
 				return AssetTypes::PREFAB;
@@ -427,8 +441,8 @@ namespace ThomasEngine
 			counter->Wait(); 
 			counter = LoadAssetFiles(shaderFiles);
 			counter->Wait();
-			counter = LoadAssetFiles(materialFiles);
-			counter->Wait();
+			LoadAssetFilesSynced(materialFiles);
+			//counter->Wait();
 			OnResourceLoadEnded();
 		}
 
@@ -490,6 +504,7 @@ namespace ThomasEngine
 				for each (auto var in s_PREFAB_DICT)
 					recursivePrefabDestruction(var.Value);
 				resources->Clear();
+				Monitor::Exit(resourceLock);
 			}
 #pragma endregion
 

@@ -39,7 +39,7 @@ public class GUIJoinHost : ScriptComponent
     IEnumerator Blink = null;
 
     public bool GoToTeamSelect;
-    IEnumerator test;
+    IEnumerator Connect = null;
 
     public float CaretOffset { get; set; } = 0.0f;
 
@@ -52,9 +52,9 @@ public class GUIJoinHost : ScriptComponent
         GoToTeamSelect = false;
     }
 
-    public void Listener_PeerConnectedEvent(NetPeer peer)
+    public void Listener_AllPeersConnectedEvent()
     {
-        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.AllPeersConnectedEvent -= Listener_AllPeersConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
 
         if (!hasConnected)
@@ -68,12 +68,37 @@ public class GUIJoinHost : ScriptComponent
 
     public void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        MatchSystem.instance.Listener.PeerConnectedEvent -= Listener_PeerConnectedEvent;
+        MatchSystem.instance.Listener.AllPeersConnectedEvent -= Listener_AllPeersConnectedEvent;
         MatchSystem.instance.Listener.PeerDisconnectedEvent -= Listener_PeerDisconnectedEvent;
-        ConnectingText.text = "Connection failed:\n" + disconnectInfo.Reason.ToString();
+        switch (disconnectInfo.Reason)
+        {
+            case DisconnectReason.RemoteConnectionClose:
+            case DisconnectReason.DisconnectPeerCalled:
+                ConnectingText.text = "The peer you where connected to has disconnected with the IP\n" + peer.EndPoint.ToString();
+                break;
+            case DisconnectReason.Timeout:
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " timed out";
+                break;
+            case DisconnectReason.ConnectionRejected:
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " rejected";
+                break;
+            case DisconnectReason.ConnectionFailed:
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                ConnectingText.text = "Failed to establish connection to\n" + peer.EndPoint.Address.ToString();
+                break;
+            case DisconnectReason.SocketReceiveError:
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " failed, peer socket closed"; //Could be the other way around
+                break;
+            case DisconnectReason.SocketSendError:
+                ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " failed, local socket closed"; //^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                break;
+        }
+        ConnectingText.scale = new Vector2(0.5f);
         Join.interactable = true;
         Host.interactable = true;
-        StopCoroutine(test);
+        StopCoroutine(Connect);
     }
 
     public override void Update()
@@ -127,25 +152,36 @@ public class GUIJoinHost : ScriptComponent
             }
             if (PortText.text != "")
             {
-                if (IPText.text == "127.0.0.1")
-                    MatchSystem.instance.LocalPort = 0;
-                else
-                    MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
-                MatchSystem.instance.TargetPort = Convert.ToInt32(PortText.text);
-                MatchSystem.instance.TargetIP = IPText.text;
+                try
+                {
+                    if (IPText.text == "127.0.0.1")
+                        MatchSystem.instance.LocalPort = 0;
+                    else
+                        MatchSystem.instance.LocalPort = Convert.ToInt32(PortText.text);
+                    MatchSystem.instance.TargetPort = Convert.ToInt32(PortText.text);
+                    MatchSystem.instance.TargetIP = IPText.text;
 
-                MatchSystem.instance.Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
-                MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
+                    MatchSystem.instance.Listener.AllPeersConnectedEvent += Listener_AllPeersConnectedEvent;
+                    MatchSystem.instance.Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
 
-                MatchSystem.instance.Init();
-                MatchSystem.instance.Connect();
-                ConnectingText.text = "Connecting";
-                ConnectingText.position = new Vector2(0.75f, 0.9f);
-                test = Connecting();
-                StartCoroutine(test);
-                Join.interactable = false;
-                Host.interactable = false;
-                return;
+                    MatchSystem.instance.Init();
+                    MatchSystem.instance.Connect();
+                    ConnectingText.text = "Connecting";
+                    ConnectingText.scale = new Vector2(1);
+                    ConnectingText.position = new Vector2(0.75f, 0.9f);
+                    Connect = Connecting();
+                    StartCoroutine(Connect);
+                    Join.interactable = false;
+                    Host.interactable = false;
+                    return;
+                }
+                catch (Exception e) //Hopefully this catches the exception thrown in ServerInfoEventHandler
+                {
+                    ConnectingText.text = e.Message;
+                    Join.interactable = true;
+                    Host.interactable = true;
+                    StopCoroutine(Connect);
+                }
             }
             else
             {
