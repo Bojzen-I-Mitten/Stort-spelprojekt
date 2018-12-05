@@ -223,6 +223,12 @@ public class GUISelectTeam : ScriptComponent
             else
                 ReadyUp.text = "Ready";
         }
+
+        if (MatchSystem.instance.MatchStarted)
+        {
+            ReadyUp.scale = Vector2.Zero;
+            StartGame.scale = Vector2.Zero;
+        }
     }
 
     public void AddImagesAndText()
