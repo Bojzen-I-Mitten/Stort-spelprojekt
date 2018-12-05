@@ -1,12 +1,11 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
 #include <ThomasCG.hlsl>
-#include <ThomasLights.hlsl>
+#include <ThomasToonLights.hlsl>
 
 Texture2D diffuseTex;
 Texture2D normalTex : NORMALTEXTURE;
 Texture2D specularTex;
-Texture2D rampTex;
 
 cbuffer MATERIAL_PROPERTIES
 {
@@ -106,14 +105,12 @@ float4 frag(v2f input) : SV_TARGET
 
     float3 diffuse = diffuseTex.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
-    diffuse *= rampTex.Sample(StandardClampSampler, Intensity(normal, input.worldPos.xyz));
-
-    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord) * 0.5f;
+    float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);
 
     float3 rim = pow(max(0, dot(float3(0, 1, 0), 1 - abs(dot(normal, normalize(input.viewDir))))), 2.5f) * float3(0.97f, 0.88f, 1.0f) * specularMapFactor;
 
 
-    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1); // Calculate light
+    diffuse = AddToonLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1); // Calculate light
     diffuse.xyz = pow(diffuse, 0.4545454545f); // Gamma correction
 
     return saturate(float4(diffuse + rim, 1.0f));

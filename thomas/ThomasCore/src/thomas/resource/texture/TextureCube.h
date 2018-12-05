@@ -13,6 +13,7 @@ namespace thomas
 			void LoadTextureCubeFromFile(std::string path);
 		public:
 			TextureCube(std::string path);
+			TextureCube(uint32_t color);
 			virtual ~TextureCube();
 		private:
 

@@ -10,6 +10,7 @@
 #include "..\graphics\Renderer.h"
 #include "../Common.h"
 #include "../utils/Math.h"
+#include "ResourceManager.h"
 
 namespace thomas
 {
@@ -578,7 +579,8 @@ namespace thomas
 				case D3D_SVT_TEXTURE2DMS:
 				case D3D_SVT_RWTEXTURE2D:
 				case D3D_SVT_TEXTURECUBE:
-					newProperty = shaderproperty::ShaderPropertyTextureCube::GetDefault();
+					isMaterialProperty = true;
+					newProperty = new shaderproperty::ShaderPropertyTextureCube(ResourceManager::GetCubeDefault());
 					break;
 				case D3D_SVT_TEXTURE2DARRAY:
 					newProperty = shaderproperty::ShaderPropertyTexture2DArray::GetDefault();
@@ -587,16 +589,16 @@ namespace thomas
 					isMaterialProperty = true;
 					if (semantic == "NORMALTEXTURE")
 					{
-						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetNormalTexture());
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(ResourceManager::GetNormalTexture());
 					}
 					else if (semantic == "SPECULARTEXTURE")
 					{
-						newProperty = new shaderproperty::ShaderPropertyTexture2D(Texture2D::GetBlackTexture());
+						newProperty = new shaderproperty::ShaderPropertyTexture2D(ResourceManager::GetBlackTexture());
 					}
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
-						if (semantic == "SHADOWMAP")
+						if (semantic == "RENDERTEXTURE")
 							isMaterialProperty = false;
 					}
 					break;

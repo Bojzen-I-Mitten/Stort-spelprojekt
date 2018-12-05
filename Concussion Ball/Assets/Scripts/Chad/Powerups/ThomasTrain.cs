@@ -26,6 +26,7 @@ public class ThomasTrain : Powerup
     public float ExplosionForce { get; set; }
 
     private float soundcooldown;
+    private float _DespawnTimer; 
 
     public override void OnAwake()
     {
@@ -34,11 +35,13 @@ public class ThomasTrain : Powerup
         MaxThrowForce = 36.0f;
         ThrowForce = BaseThrowForce;
         ExplosionForce = 60.0f;
+        _DespawnTimer = 0.0f;
 
         soundComponentChargeUp = gameObject.AddComponent<SoundComponent>();
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
         soundComponentChargeUp.Looping = false;
         soundComponentChargeUp.Is3D = true;
+        soundComponentChargeUp.MinDistance = 0.1f;
 
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
         soundComponentTravel.Type = SoundComponent.SoundType.Effect;
@@ -49,6 +52,9 @@ public class ThomasTrain : Powerup
         soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
         soundComponentExplosion.Looping = false;
         soundComponentExplosion.Is3D = true;
+
+        soundComponentExplosion.MaxDistance = 10000;
+        soundComponentExplosion.MinDistance = 20;
 
         soundcooldown = 0.0f;
 
@@ -113,6 +119,17 @@ public class ThomasTrain : Powerup
     {
         base.Update();
         soundcooldown -= Time.DeltaTime;
+
+        // Despawn if Train has not hit anyone in 30 seconds
+        if (_DespawnTimer > 30)
+            base.Activate();
+        else if (_DespawnTimer > 0)
+            _DespawnTimer += Time.DeltaTime;
+    }
+
+    public override void OnCollisionStay(Collider collider)
+    {
+        base.OnCollisionEnter(collider);
     }
 
     public override void SaveObjectOwner(ChadControls chad)
@@ -147,8 +164,8 @@ public class ThomasTrain : Powerup
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
-        
 
+        _DespawnTimer += Time.DeltaTime;
         m_rigidBody.UseGravity = false;
         transform.scale *= 8.0f;
     }
@@ -220,6 +237,8 @@ public class ThomasTrain : Powerup
         soundComponentExplosion.Play();
 
         StartCoroutine(KillTrain());
+
+        _DespawnTimer = 0.0f;
     }
 
     private IEnumerator KillTrain()

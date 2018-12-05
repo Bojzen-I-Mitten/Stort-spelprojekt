@@ -7,7 +7,7 @@
     </Layer>
     <Layer>
       <Name>Ground</Name>
-      <collisionMask>4294967295</collisionMask>
+      <collisionMask>4294967293</collisionMask>
     </Layer>
     <Layer>
       <Name>Team 1 character</Name>

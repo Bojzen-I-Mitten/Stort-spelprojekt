@@ -6,9 +6,9 @@
 
 // Thomas
 #include "utils/Math.h"
+#include "utils/atomic/Synchronization.h"
 
 // Fmod
-#include <fmod/fmod_studio.hpp>
 #include <fmod/fmod.hpp>
 
 namespace thomas
@@ -18,7 +18,7 @@ namespace thomas
 	class SoundManager
 	{
 	private:
-		SoundManager() = default;
+		SoundManager();
 		~SoundManager() = default;
 		SoundManager(const SoundManager&) {}
 		SoundManager& operator = (const SoundManager&) {}
@@ -38,8 +38,8 @@ namespace thomas
 	private:
 		bool ErrorCheck(FMOD_RESULT result);
 
-		FMOD::Studio::System* m_studioSystem;
 		FMOD::System* m_system;
 		std::map<std::string, FMOD::Sound*> m_sounds;
+		mutable utils::atomics::SpinLock m_lock;		// Simple resource lock for multi-threaded access
 	};
 }

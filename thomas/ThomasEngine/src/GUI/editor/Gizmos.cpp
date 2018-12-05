@@ -86,6 +86,10 @@ void ThomasEngine::Gizmos::DrawFrustum(Vector3 center, float fov, float maxRange
 {
 	thomas::editor::Gizmos::Gizmo().DrawFrustum(Utility::Convert(center), fov, maxRange, minRange, aspect);
 }
+void ThomasEngine::Gizmos::DrawRay(Vector3 from, Vector3 direction, float len)
+{
+	thomas::editor::Gizmos::Gizmo().DrawRay(Utility::Convert(from), Utility::Convert(direction), len);
+}
 
 
 void ThomasEngine::Gizmos::SetColor(Color color)

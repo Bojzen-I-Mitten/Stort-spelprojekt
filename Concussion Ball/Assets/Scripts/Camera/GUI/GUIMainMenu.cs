@@ -7,15 +7,16 @@ public class GUIMainMenu : ScriptComponent
 {
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
+    public Texture2D MyNameTexture { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
 
     public Canvas Canvas;
 
-    Image TextBoxName;
-    Image TextBoxBGName;
+    Image MyNameSticker;
     Text Play;
+    Text HostGame;
     Text Options;
     Text Exit;
     Text Credits;
@@ -27,8 +28,8 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
-    public float CaretOffset { get; set; } = 0.19f;
-
+    public float CaretOffset { get; set; }
+    public float NameRotation { get; set; }
     private bool ClearName = true;
 
     Color Unselected = Color.FloralWhite;
@@ -38,7 +39,8 @@ public class GUIMainMenu : ScriptComponent
 
     public override void OnAwake()
     {
-
+        CaretOffset = -0.02f;
+        NameRotation = -0.1f;
     }
 
     public override void Start()
@@ -48,17 +50,21 @@ public class GUIMainMenu : ScriptComponent
         AddImagesAndText();
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
         MainMenuCamRot = Vector3.Zero;
+        
     }
 
     public override void Update()
     {
         Play.color = Unselected;
+        HostGame.color = Unselected;
         Options.color = Unselected;
         Credits.color = Unselected;
         Exit.color = Unselected;
 
         if (Play.Hovered())
             Play.color = Selected;
+        else if (HostGame.Hovered())
+            HostGame.color = Selected;
         else if (Options.Hovered())
             Options.color = Selected;
         else if (Credits.Hovered())
@@ -66,19 +72,9 @@ public class GUIMainMenu : ScriptComponent
         else if (Exit.Hovered())
             Exit.color = Selected;
 
-        if (PlayerString == "")
-        {
-            TextBoxName.color = Color.Red;
-        }
-        else
-        {
-            TextBoxName.color = Color.Black;
-        }
-
-        if (TextBoxName.Clicked())
+        if (MyNameSticker.Clicked())
         {
             TakeName = true;
-            TextBoxName.color = Selected;
             if (Blink == null)
             {
                 Blink = CaretBlink();
@@ -86,7 +82,7 @@ public class GUIMainMenu : ScriptComponent
             }
             if (ClearName)
             {
-                PlayerString = "";
+                PlayerName.text = "";
                 ClearName = false;
             }
         }
@@ -101,30 +97,39 @@ public class GUIMainMenu : ScriptComponent
             Caret.text = "";
         }
 
-        if (Play.Clicked() && PlayerString != "")
+        if (Play.Clicked() && PlayerName.text != "")
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
+        }
+        else if (HostGame.Clicked())
+        {
+            CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+            TakeName = false;
+        }
+        else if (Exit.Clicked())
+        {
+            ThomasWrapper.IssueShutdown();
         }
         if(Options.Clicked())
         {
             CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
         }
 
-        PlayerString = PlayerString.ToUpper();
-        PlayerName.text = PlayerString;
+        //PlayerString = PlayerString.ToUpper();
+        //PlayerName.text = PlayerString;
 
         if (TakeName)
         {
-            GUIInput.AppendString(ref PlayerString, 9);
+            string str = PlayerName.text;
+            GUIInput.AppendString(ref str, 9);
+            PlayerName.text = str;
         }
 
-        if(Exit.Clicked())
-        {
-            ThomasWrapper.IssueShutdown();
-        }
+        
 
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
+        PlayerString = PlayerName.text;
     }
     public void AddImagesAndText()
     {
@@ -136,40 +141,44 @@ public class GUIMainMenu : ScriptComponent
         Play.position = new Vector2(0.1f, 0.11f);
         Play.interactable = true;
         Play.depth = 0.9f;
-        Play.text = "Play";
+        #endregion
+
+        #region Host Game
+        HostGame = Canvas.Add("Host Game");
+        HostGame.position = new Vector2(0.1f, 0.21f);
+        HostGame.interactable = true;
+        HostGame.depth = 0.9f;
         #endregion
 
         #region  Options
         Options = Canvas.Add("Options");
-        Options.position = new Vector2(0.1f, 0.21f);
+        Options.position = new Vector2(0.1f, 0.31f);
         Options.interactable = true;
         Options.depth = 0.9f;
-        Options.text = "Options";
         #endregion
 
         #region Credits
         Credits = Canvas.Add("Credits");
-        Credits.position = new Vector2(0.1f, 0.31f);
+        Credits.position = new Vector2(0.1f, 0.41f);
         Credits.interactable = true;
         Credits.depth = 0.9f;
-        Credits.text = "Credits";
         #endregion
 
         #region Exit
         Exit = Canvas.Add("Exit");
-        Exit.position = new Vector2(0.1f, 0.41f);
+        Exit.position = new Vector2(0.1f, 0.51f);
         Exit.interactable = true;
         Exit.depth = 0.9f;
-        Exit.text = "Exit";
         #endregion
 
         #region Player name
-        PlayerName = Canvas.Add(PlayerString);
+        PlayerName = Canvas.Add("CHAD");
         PlayerName.origin = new Vector2(0.5f);
-        PlayerName.position = new Vector2(0.5f, 0.94f);
+        PlayerName.position = new Vector2(0.59f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
+        PlayerName.rotation = NameRotation;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
         #endregion
@@ -180,6 +189,7 @@ public class GUIMainMenu : ScriptComponent
         Caret.scale = new Vector2(1.2f);
         Caret.interactable = false;
         Caret.depth = 0.8f;
+        Caret.rotation = NameRotation;
         Caret.color = Color.Black;
         Caret.font = TextFont;
         #endregion
@@ -188,23 +198,14 @@ public class GUIMainMenu : ScriptComponent
 
         #region Images
 
-        if (TextBox != null)
+        if (MyNameTexture != null)
         {
-            TextBoxName = Canvas.Add(TextBox);
-            TextBoxName.origin = new Vector2(0.5f);
-            TextBoxName.position = new Vector2(0.5f, 0.94f);
-            TextBoxName.interactable = true;
-            TextBoxName.depth = 0.8f;
-            TextBoxName.color = Color.Black;
-        }
-
-        if (TextBoxBG != null)
-        {
-            TextBoxBGName = Canvas.Add(TextBoxBG);
-            TextBoxBGName.origin = new Vector2(0.5f);
-            TextBoxBGName.position = new Vector2(0.5f, 0.94f);
-            TextBoxBGName.depth = 0.9f;
-            TextBoxBGName.color = Unselected;
+            MyNameSticker = Canvas.Add(MyNameTexture);
+            MyNameSticker.origin = new Vector2(0.5f);
+            MyNameSticker.position = new Vector2(0.6f, 0.14f);
+            MyNameSticker.scale = new Vector2(0.5f);
+            MyNameSticker.interactable = true;
+            MyNameSticker.depth = 0.9f;
         }
 
         #endregion
@@ -220,12 +221,11 @@ public class GUIMainMenu : ScriptComponent
     public void ClearImagesAndText()
     {
         Canvas.Remove(Play);
+        Canvas.Remove(HostGame);
         Canvas.Remove(Options);
         Canvas.Remove(Credits);
         Canvas.Remove(Exit);
         Canvas.Remove(PlayerName);
-        Canvas.Remove(TextBoxBGName);
-        Canvas.Remove(TextBoxName);
         Canvas.Remove(Caret);
     }
 

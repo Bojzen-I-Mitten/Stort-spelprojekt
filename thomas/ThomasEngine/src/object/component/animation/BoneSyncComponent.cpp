@@ -94,7 +94,7 @@ namespace ThomasEngine
 			if (m_skeletonSrc) {
 				m_updateSrc = m_skeletonSrc->GetComponent<RenderSkinnedComponent^>();
 				uint32_t boneInd;
-				if (!m_updateSrc->GetBoneIndex(m_boneHash, boneInd))
+				if (!m_updateSrc->FetchBoneIndex(m_boneHash, boneInd))
 					Debug::LogWarning("BoneIndex for bone: " + m_boneName + " was not found in object: " + gameObject->Name);
 				else
 					m_boneIndex = boneInd;	// Set

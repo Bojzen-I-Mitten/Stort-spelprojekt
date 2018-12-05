@@ -4,6 +4,7 @@
 #include <thomas/utils/Math.h>
 #pragma managed
 #include "math/Viewport.h"
+using namespace System::Runtime::InteropServices;
 
 
 namespace ThomasEngine
@@ -129,6 +130,24 @@ namespace ThomasEngine
 				thomas::math::Vector3(value.Center.x, value.Center.y, value.Center.z),
 				value.Radius);
 		}
+
+		static Matrix Zero()
+		{
+			Matrix m;
+			m.M11 = 0; m.M12 = 0; m.M13 = 0; m.M14 = 0;
+			m.M21 = 0; m.M22 = 0; m.M23 = 0; m.M24 = 0;
+			m.M31 = 0; m.M32 = 0; m.M33 = 0; m.M34 = 0;
+			m.M41 = 0; m.M42 = 0; m.M43 = 0; m.M44 = 0;
+			return m;
+		}
+
+		static Vector3 Average(array<Vector3>^ points);
+		static Vector3 Average(array<Vector3>^ points, int numPoints);
+		static bool PlaneFromPoints(array<Vector3>^ points, [Out] Vector3% center, [Out] Vector3% normal);
+		/* Fit a plane to the points minimizing error on Y axis. Returns false if it was not possible to extract a result from the data.
+		*/
+		static bool PlaneFromPointsY(array<Vector3>^ points, [Out] Vector3% center, [Out] Vector3% normal);
+		static bool PlaneFromPointsY(array<Vector3>^ points, int numPoints, [Out] Vector3% center, [Out] Vector3% normal);
 	};
 
 }

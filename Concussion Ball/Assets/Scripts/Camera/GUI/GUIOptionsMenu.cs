@@ -7,7 +7,7 @@ public class ImageBaradjustment
 
     Image[] Image = new Image[(int)Imagestate.NUMSTATES];
     Text number;
-    int numbervalue = 0;
+    public int numbervalue = 0;
     public Canvas Canvas;
     public enum Imagestate
     {
@@ -80,8 +80,8 @@ public class ImageBaradjustment
                 Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
             }
         }
-        if (Input.GetKeyDown(Input.Keys.X))
-            Debug.Log(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);
+    //    if (Input.GetKeyDown(Input.Keys.X))
+        //   Debug.Log(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);
 
          numbervalue = ((int)(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x / 3.15f));
         number.text = numbervalue.ToString();
@@ -110,8 +110,8 @@ public class GUIOptionsMenu : ScriptComponent
     {
         MUSICBar_IMAGE,
         sfxBar_Image,
-        AIM,
         Movement,
+        AIM,
         NUMSTATES
     }
 
@@ -135,8 +135,10 @@ public class GUIOptionsMenu : ScriptComponent
     public Texture2D ImageToggle { set; get; }
     public Texture2D ImageAftermathToggle { set; get;}
     public List<ImageBaradjustment> ImageBar;
+    public AudioListener Audio;
     public override void Start()
     {
+        Audio = gameObject.GetComponent<AudioListener>();
         ImageBar = new List<ImageBaradjustment>();
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
@@ -155,8 +157,17 @@ public class GUIOptionsMenu : ScriptComponent
         foreach (ImageBaradjustment Images in ImageBar)
             Images.update();
 
-/*        if (Input.GetKeyDown(Input.Keys.Y))
-            Debug.Log(Image[(int)ImageBarstate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);*/
+
+        Audio.SetFXVolume((float)ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue / (float)100);
+        Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
+
+        if (Input.GetKeyDown(Input.Keys.X))
+        {
+            Debug.Log(Audio.GetMusicVolume());
+            Debug.Log(Audio.GetFXVolume());
+        }
+        /*        if (Input.GetKeyDown(Input.Keys.Y))
+                    Debug.Log(Image[(int)ImageBarstate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);*/
     }
     void ButtonHovered()
     {
@@ -195,8 +206,8 @@ public class GUIOptionsMenu : ScriptComponent
        
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f,0.27f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//music bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
         //ImageBar.Add(new ImageBaradjustment(Canvas));
 
     }
