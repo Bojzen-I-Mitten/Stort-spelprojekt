@@ -28,6 +28,7 @@ namespace ThomasEditor
     {
         public class ResourceImageConverter : IValueConverter
         {
+            static Dictionary<Texture2D, BitmapSource> bitmapCache = new Dictionary<Texture2D, BitmapSource>();
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             {
                 try
@@ -38,9 +39,23 @@ namespace ThomasEditor
                         Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(res.GetType());
                         if (type == Resources.AssetTypes.TEXTURE2D)
                         {
+                            
                             Texture2D tex = res as Texture2D;
-                            BitmapSource bitmapSource = BitmapSource.Create(tex.width, tex.height, 300, 300, PixelFormats.Bgra32, BitmapPalettes.WebPaletteTransparent, tex.GetRawPixelData(), tex.width * tex.height * 4, 4 * tex.width);
+                            
+                            BitmapSource bitmapSource = null;
+                            if (!bitmapCache.TryGetValue(tex, out bitmapSource))
+                            {
+                                try
+                                {
+                                    bitmapSource = BitmapSource.Create(tex.width, tex.height, 300, 300, PixelFormats.Bgra32, BitmapPalettes.WebPaletteTransparent, tex.GetRawPixelData(), tex.width * tex.height * 4, 4 * tex.width);
+                                    
+                                } catch(Exception e)
+                                {
+                                    Debug.LogWarning("Failed to create editor image of texture: " + tex.Name);
+                                }
+                                bitmapCache.Add(tex, bitmapSource);
 
+                            }
                             return bitmapSource;
                         }
                         return AssetBrowser.assetImages[type].UriSource.LocalPath;

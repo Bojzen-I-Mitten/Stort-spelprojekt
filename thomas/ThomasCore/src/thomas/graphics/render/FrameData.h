@@ -3,6 +3,10 @@
 
 namespace thomas
 {
+	namespace resource
+	{
+		class RenderTexture;
+	}
 	namespace graphics
 	{
 		namespace render 
@@ -12,6 +16,7 @@ namespace thomas
 			struct CAMERA_FRAME_DATA
 			{
 				int targetDisplay;
+				resource::RenderTexture* renderTexture = nullptr;
 				math::Viewport viewport;
 				math::Matrix projectionMatrix;
 				math::Matrix viewMatrix;
