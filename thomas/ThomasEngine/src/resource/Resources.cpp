@@ -441,8 +441,8 @@ namespace ThomasEngine
 			counter->Wait(); 
 			counter = LoadAssetFiles(shaderFiles);
 			counter->Wait();
-			counter = LoadAssetFiles(materialFiles);
-			counter->Wait();
+			LoadAssetFilesSynced(materialFiles);
+			//counter->Wait();
 			OnResourceLoadEnded();
 		}
 
@@ -500,10 +500,10 @@ namespace ThomasEngine
 				Monitor::Enter(resourceLock);
 				for each(String^ resource in resources->Keys)
 					delete resources[resource];
-				Monitor::Exit(resourceLock);
 				for each (auto var in s_PREFAB_DICT)
 					recursivePrefabDestruction(var.Value);
 				resources->Clear();
+				Monitor::Exit(resourceLock);
 			}
 #pragma endregion
 
