@@ -1,6 +1,5 @@
-﻿using System;
-
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
 using ThomasEngine;
 
 public class GUIMainMenu : ScriptComponent
@@ -36,6 +35,9 @@ public class GUIMainMenu : ScriptComponent
     Color Selected = Color.IndianRed;
     Vector3 MainMenuCamPos;
     Vector3 MainMenuCamRot;
+
+    System.Random random = new System.Random();
+    List<string> Names = new List<string>() { "Chad", "PungKrockare", "Thierry", "Jerry", "Alex", "Chris"};
 
     public override void OnAwake()
     {
@@ -117,6 +119,13 @@ public class GUIMainMenu : ScriptComponent
         {
             GUIInput.AppendString(ref PlayerString, 9);
         }
+        else
+        {
+            if (PlayerString == "")
+            {
+                PlayerString = Names[random.Next(0, Names.Count)];
+            }
+        }
 
         
 
@@ -164,7 +173,7 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Player name
-        PlayerName = Canvas.Add(PlayerString);
+        PlayerName = Canvas.Add(Names[random.Next(0, Names.Count)]);
         PlayerName.origin = new Vector2(0.5f);
         PlayerName.position = new Vector2(0.59f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
