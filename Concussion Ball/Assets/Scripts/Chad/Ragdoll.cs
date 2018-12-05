@@ -738,16 +738,8 @@ public class Ragdoll : ScriptComponent
     {
         Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
 
-
         if (RagdollEnabled)
         {
-
-            if (ImpactSpine.GetActive && identity.Owner && RagdollSound)
-            {
-                RagdollSound.Volume = ImpactSpine.Volume;
-                RagdollSound.Play();
-            }
-
             return;
         }
         else
