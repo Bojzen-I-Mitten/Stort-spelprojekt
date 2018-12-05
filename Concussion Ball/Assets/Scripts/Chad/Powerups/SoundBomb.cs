@@ -182,12 +182,12 @@ public class SoundBomb : Powerup
     private void Explosion()
     {
         // Play the vindaloo explosion sound
-        ExplosionSound.Play();
+        //ExplosionSound.Play();
 
-        emitterFire.EmitOneShot(25);
-        emitterFire2.EmitOneShot(45);
-        emitterGravel.EmitOneShot(20);
-        emitterSmoke.EmitOneShot(50);
+        //emitterFire.EmitOneShot(25);
+        //emitterFire2.EmitOneShot(45);
+        //emitterGravel.EmitOneShot(20);
+        //emitterSmoke.EmitOneShot(50);
 
         StartCoroutine(RemoveNextFrame());
         //Remove();
