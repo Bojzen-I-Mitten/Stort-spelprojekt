@@ -184,13 +184,15 @@ public class Banana : Powerup
     public override void OnRead(NetDataReader reader, bool initialState)
     {
         base.OnRead(reader, initialState);
+        bool full = BananaFull.GetActive();
+        bool eat = BananaEaten.GetActive();
 
         BananaFull.SetActive(reader.GetBool());
         BananaEaten.SetActive(reader.GetBool());
 
-        if (BananaFull.GetActive())
+        if (BananaFull.GetActive() && !full)
             Debug.Log("Full banana active");
-        else if (BananaEaten.GetActive())
+        else if (BananaEaten.GetActive() && !eat)
             Debug.Log("Eaten banana active");
     }
 }
