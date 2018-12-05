@@ -143,9 +143,6 @@ namespace ThomasEngine.Network
                         identity.Owner = true;
                 }
 
-                    identity.OnDisconnect();
-                }
-
                 ObjectOwners[peer].Clear();
                 ObjectOwners.Remove(peer);
             }

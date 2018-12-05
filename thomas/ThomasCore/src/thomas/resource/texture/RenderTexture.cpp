@@ -32,11 +32,13 @@ namespace thomas
 			Bind();
 			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, canvas->GetViewport().Get11());
 			canvas->Render();
+
+			utils::D3D::Instance()->GetDeviceContext()->GenerateMips(m_srv);
 		}
 
 		void RenderTexture::Bind()
 		{
-			utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_rtv, Color(1.0f, 1.0f, 1.0f));
+			utils::D3D::Instance()->GetDeviceContext()->ClearRenderTargetView(m_rtv, Color(1.0f, 1.0f, 1.0f, 0.0f));
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(0, 0, 0);
 
 			utils::D3D::Instance()->GetDeviceContext()->OMSetRenderTargets(1, &m_rtv, 0);

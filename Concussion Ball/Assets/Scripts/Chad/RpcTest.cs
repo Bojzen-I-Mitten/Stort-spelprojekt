@@ -53,9 +53,9 @@ public class RpcTest : ScriptComponent
     {
         
        
-        rt = new RenderTexture(512, 512);
+        rt = new RenderTexture(1024, 1024);
 
-        canvas = new Canvas(new Viewport(0, 0, 512, 512));
+        canvas = new Canvas(new Viewport(0, 0, 1024, 1024));
 
         numberText = canvas.Add(number.ToString());
         numberText.origin = new Vector2(0.5f);

@@ -188,7 +188,7 @@ namespace thomas
 			ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 			bufferDesc.Width = width;
 			bufferDesc.Height = height;
-			bufferDesc.MipLevels = 1;
+			bufferDesc.MipLevels = 0;
 			bufferDesc.ArraySize = 1;
 			bufferDesc.Format = format;
 			bufferDesc.SampleDesc.Count = 1;
@@ -196,7 +196,7 @@ namespace thomas
 			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
+			bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
@@ -208,7 +208,7 @@ namespace thomas
 			srvDesc.Format = bufferDesc.Format;
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-			srvDesc.Texture2D.MipLevels = 1;
+			srvDesc.Texture2D.MipLevels = -1;
 			srvDesc.Texture2D.MostDetailedMip = 0;
 			
 			HRESULT hr = m_device->CreateTexture2D(&bufferDesc, NULL, &tex);

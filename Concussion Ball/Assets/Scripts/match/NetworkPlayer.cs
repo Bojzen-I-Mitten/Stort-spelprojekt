@@ -19,17 +19,19 @@ public class NetworkPlayer : NetworkComponent
     public int Owngoal = 0;
     public int GoalsScored = 0;
     public int Score = 0;
+    public string shirtNumber = "00";
     public bool ReadyToStart = false;
 
-    Material mat;
     Rigidbody rb;
     Ragdoll rag;
     Canvas nameCanvas;
     Text text;
+    ShirtRenderer shirt;
     public override void OnAwake()
     {
         rag = gameObject.GetComponent<Ragdoll>();
         rb = gameObject.GetComponent<Rigidbody>();
+        shirt = gameObject.GetComponent<ShirtRenderer>();
         if (Team == null)
             Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
     }
@@ -41,7 +43,6 @@ public class NetworkPlayer : NetworkComponent
         GoalsScored = 0;
         if (Team == null || Team.TeamType == TEAM_TYPE.TEAM_SPECTATOR || Team.TeamType == TEAM_TYPE.UNASSIGNED)
             gameObject.SetActive(false);
-        Material[] mats = gameObject.GetComponent<RenderSkinnedComponent>().materials;
 
         nameCanvas = CameraMaster.instance.Camera.AddCanvas();
         text = nameCanvas.Add("");
@@ -62,6 +63,15 @@ public class NetworkPlayer : NetworkComponent
     {
         if (nameCanvas != null)
             nameCanvas.isRendering = false;
+    }
+
+    public override void OnEnable()
+    {
+        if (isOwner)
+        {
+            string ip = NetUtils.GetLocalIp(LocalAddrType.IPv4);
+            shirtNumber = ip.Substring(ip.Length - 2);
+        }
     }
 
     public override void Update()
@@ -96,10 +106,21 @@ public class NetworkPlayer : NetworkComponent
         }
         else if (nameCanvas != null)
             nameCanvas.isRendering = false;
-        if (Team != null && mat != null)
-            mat.SetColor("color", Team.Color);
         if (transform.position.y < BottomOfTheWorld)
             Reset();
+
+        if (shirt)
+        {
+            shirt.PlayerName = PlayerName;
+            shirt.number = shirtNumber;
+            if (Team != null)
+            {
+                shirt.TeamName = Team.Name;
+                shirt.Team = Team.TeamType;
+                shirt.Color = Team.Color;
+            }
+        }
+            
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -110,6 +131,7 @@ public class NetworkPlayer : NetworkComponent
         writer.Put(HasTackled);
         writer.Put(Owngoal);
         writer.Put(GoalsScored);
+        writer.Put(shirtNumber);
         if (Team != null)
             writer.Put((int)Team.TeamType);
         else
@@ -132,7 +154,7 @@ public class NetworkPlayer : NetworkComponent
         HasTackled = reader.GetInt();
         Owngoal = reader.GetInt();
         GoalsScored = reader.GetInt();
-
+        shirtNumber = reader.GetString();
         TEAM_TYPE teamType = (TEAM_TYPE)reader.GetInt();
         Team newTeam = MatchSystem.instance.FindTeam(teamType);
         if (Team != newTeam)
@@ -162,7 +184,6 @@ public class NetworkPlayer : NetworkComponent
 
     public void Reset()
     {
-        mat?.SetColor("color", Team.Color);
         if (isOwner && (int)Team.TeamType > (int)TEAM_TYPE.TEAM_SPECTATOR)
         {
             gameObject.GetComponent<ChadControls>().Reset();
@@ -202,7 +223,6 @@ public class NetworkPlayer : NetworkComponent
         if (team != null)
         {
             team.AddPlayer(this);
-            mat?.SetColor("color", Team.Color);
         }
 
     }
