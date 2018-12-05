@@ -108,6 +108,7 @@ namespace thomas
 				TexInitData.pSysMem = initData;
 				TexInitData.SysMemPitch = static_cast<UINT>(4 * width);
 				TexInitData.SysMemSlicePitch = static_cast<UINT>(4 * width * height);
+
 				hr = m_device->CreateTexture2D(&textureDesc, &TexInitData, &tex);
 			}
 			else
@@ -152,7 +153,6 @@ namespace thomas
 			textureDesc.MiscFlags = mipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 			HRESULT hr;
-			
 			if (initData)
 			{
 				D3D11_SUBRESOURCE_DATA* texInitData = new D3D11_SUBRESOURCE_DATA[arraySize];
@@ -745,12 +745,12 @@ namespace thomas
 			HRESULT hr;
 			if (extension_string == ".dds" || extension_string == ".DDS")
 			{
-				hr = DirectX::CreateDDSTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
-					D3D11_RESOURCE_MISC_TEXTURECUBE, false, &texture, &textureView, nullptr);
+				hr = DirectX::CreateDDSTextureFromFileEx(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
+					D3D11_RESOURCE_MISC_TEXTURECUBE, false, &texture, &textureView);
 			}
 			else
 			{
-				hr = DirectX::CreateWICTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
+				hr = DirectX::CreateWICTextureFromFileEx(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
 					D3D11_RESOURCE_MISC_TEXTURECUBE, 0, &texture, &textureView);
 			}
 
