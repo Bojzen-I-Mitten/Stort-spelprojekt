@@ -23,5 +23,11 @@ namespace ThomasEngine
 			bool get();
 			void set(bool value);
 		}
+
+		property float margin
+		{
+			float get();
+			void set(float value);
+		}
 	};
 }

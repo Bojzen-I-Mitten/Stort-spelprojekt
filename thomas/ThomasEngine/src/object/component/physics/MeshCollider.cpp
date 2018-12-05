@@ -54,4 +54,14 @@ namespace ThomasEngine
 	{
 		((thomas::object::component::MeshCollider*)nativePtr)->SetConcave(value);
 	}
+
+	float MeshCollider::margin::get()
+	{
+		return ((thomas::object::component::MeshCollider*)nativePtr)->GetMargin();
+	}
+
+	void MeshCollider::margin::set(float value)
+	{
+		((thomas::object::component::MeshCollider*)nativePtr)->SetMargin(value);
+	}
 }

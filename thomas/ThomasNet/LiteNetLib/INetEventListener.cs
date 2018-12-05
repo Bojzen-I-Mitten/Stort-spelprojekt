@@ -98,6 +98,8 @@ namespace LiteNetLib
         /// </summary>
         /// <param name="request">Request information (EndPoint, internal id, additional data)</param>
         void OnConnectionRequest(ConnectionRequest request);
+
+        void OnAllPeersConnected();
     }
 
     public class EventBasedNetListener : INetEventListener
@@ -108,6 +110,7 @@ namespace LiteNetLib
         public delegate void OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod);
         public delegate void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType);
         public delegate void OnNetworkLatencyUpdate(NetPeer peer, int latency);
+        public delegate void OnAllPeersConnected();
 
         public delegate void OnConnectionRequest(ConnectionRequest request);
 
@@ -118,6 +121,7 @@ namespace LiteNetLib
         public event OnNetworkReceiveUnconnected NetworkReceiveUnconnectedEvent;
         public event OnNetworkLatencyUpdate NetworkLatencyUpdateEvent;
         public event OnConnectionRequest ConnectionRequestEvent;
+        public event OnAllPeersConnected AllPeersConnectedEvent;
 
         public void ClearPeerConnectedEvent()
         {
@@ -152,6 +156,11 @@ namespace LiteNetLib
         public void ClearConnectionRequestEvent()
         {
             ConnectionRequestEvent = null;
+        }
+
+        public void ClearAllPeersConnectedEvent()
+        {
+            AllPeersConnectedEvent = null;
         }
 
         void INetEventListener.OnPeerConnected(NetPeer peer)
@@ -194,6 +203,11 @@ namespace LiteNetLib
         {
             if (ConnectionRequestEvent != null)
                 ConnectionRequestEvent(request);
+        }
+
+        void INetEventListener.OnAllPeersConnected()
+        {
+            AllPeersConnectedEvent?.Invoke();
         }
     }
 }
