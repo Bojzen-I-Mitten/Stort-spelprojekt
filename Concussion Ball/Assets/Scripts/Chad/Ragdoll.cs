@@ -157,9 +157,9 @@ public class Ragdoll : ScriptComponent
     Vector3 calculatePosbetweenTwoSkeletonschanges(string BoneName1,string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
     {
         uint boneindex = 0;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName1), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName1, out boneindex);
         Vector3 bone1 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName2), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName2, out boneindex);
         Vector3 bone2 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
         Vector3 up = bone2 - bone1;
         float length = up.Length();
@@ -170,9 +170,9 @@ public class Ragdoll : ScriptComponent
     float calculateLengthBetweenSkeleton(string BoneName1, string BoneName2, RenderSkinnedComponent renderskinnedcomponent)
     {
         uint boneindex = 0;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName1), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName1, out boneindex);
         Vector3 bone1 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
-        renderskinnedcomponent.FetchBoneIndex(Utility.hash(BoneName2), out boneindex);
+        renderskinnedcomponent.FetchBoneIndex(BoneName2, out boneindex);
         Vector3 bone2 = renderskinnedcomponent.GetLocalBoneMatrix((int)boneindex).Translation;
         Vector3 up = bone2 - bone1;
         float length = up.Length();
@@ -315,7 +315,7 @@ public class Ragdoll : ScriptComponent
 
             BT_BodyParts[i].BoneName = BoneNames[i];
             BT_BodyParts[i].AnimatedObject = gameObject;
-            skinn.FetchBoneIndex(Utility.hash(BoneNames[i]), out BoneIndexes[i]);
+            skinn.FetchBoneIndex(BoneNames[i], out BoneIndexes[i]);
             G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
 
         }
