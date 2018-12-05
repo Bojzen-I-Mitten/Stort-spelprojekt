@@ -16,6 +16,9 @@ namespace thomas
 			*/
 			void setName(const std::string& name);
 			std::string GetPath();
+			/* Set path, don't ever do this... 
+			*/
+			void SetPath(std::string path);
 			uint32_t getHash();
 
 			void Rename(std::string newPath);

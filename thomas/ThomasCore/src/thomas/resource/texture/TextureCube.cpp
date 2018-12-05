@@ -12,6 +12,17 @@ namespace thomas
 			LoadTextureCubeFromFile(path);
 		}
 
+		TextureCube::TextureCube(uint32_t color)
+		{
+
+			m_width = 1;
+			m_height = 1;
+
+			ID3D11Texture2D *textureInterface = nullptr;
+			void* data[6] = { &color, &color, &color, &color, &color, &color };
+			utils::D3D::Instance()->CreateTextureCubeMap(data, 1, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, 0, 1);
+		}
+
 		TextureCube::~TextureCube()
 		{
 
