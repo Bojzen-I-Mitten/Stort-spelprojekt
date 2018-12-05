@@ -129,12 +129,12 @@ public class MatchSystem : NetworkManager
             if (Scene.Players.ContainsKey(LocalPeer))
             {
                 NetworkPlayer localPlayer = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-                if (Input.GetKeyDown(Input.Keys.D1))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
-                if (Input.GetKeyDown(Input.Keys.D2))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
-                if (Input.GetKeyDown(Input.Keys.D3))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+                //if (Input.GetKeyDown(Input.Keys.D1))
+                //    localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
+                //if (Input.GetKeyDown(Input.Keys.D2))
+                //    localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
+                //if (Input.GetKeyDown(Input.Keys.D3))
+                //    localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
 #if T_FOR_RESET
                 if(Input.GetKeyDown(Input.Keys.T))
                 {

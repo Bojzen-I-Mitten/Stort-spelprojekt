@@ -38,21 +38,16 @@ public class GUIExitMenu : ScriptComponent
 
         if (ExitGame.Clicked())
         {
-            Debug.Log("I'm exciting! :^)");
             if (ThomasWrapper.IsPlaying())
             {
-                //Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
                 CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
                 ThomasWrapper.IssueRestart();
-                //if (ThomasWrapper.IsPlaying())
-                //{
-                //    Debug.Log("Finished reloading to main menu.");
-                //    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-                //}
             } 
         }
         else if (SwitchTeam.Clicked())
         {
+            CameraMaster.instance.Canvas.isRendering = true;
+            gameObject.GetComponent<ChadCam>().enabled = false;
             CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
         }
     }
