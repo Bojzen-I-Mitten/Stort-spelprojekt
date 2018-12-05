@@ -129,12 +129,15 @@ public class MatchSystem : NetworkManager
             if (Scene.Players.ContainsKey(LocalPeer))
             {
                 NetworkPlayer localPlayer = Scene.Players[LocalPeer].gameObject.GetComponent<NetworkPlayer>();
-                if (Input.GetKeyDown(Input.Keys.D1))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
-                if (Input.GetKeyDown(Input.Keys.D2))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
-                if (Input.GetKeyDown(Input.Keys.D3))
-                    localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+                if (MatchStarted)
+                {
+                    if (Input.GetKeyDown(Input.Keys.D1))
+                        localPlayer.JoinTeam(TEAM_TYPE.TEAM_1);
+                    if (Input.GetKeyDown(Input.Keys.D2))
+                        localPlayer.JoinTeam(TEAM_TYPE.TEAM_2);
+                    if (Input.GetKeyDown(Input.Keys.D3))
+                        localPlayer.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
+                }
 #if T_FOR_RESET
                 if(Input.GetKeyDown(Input.Keys.T))
                 {
@@ -281,7 +284,7 @@ public class MatchSystem : NetworkManager
 
 #region RPC
 
-    public void RPCMatchInfo(bool matchStarted, float startTime, bool goldenGoal, int powerupID,
+    public void RPCMatchInfo(bool matchStarted, float startTime, int length, bool goldenGoal, int powerupID, int players, string name,
         int team1Score, int team2Score,
         Color team1Color, Color team2Color,
         string team1Name, string team2Name)
@@ -291,6 +294,9 @@ public class MatchSystem : NetworkManager
         PowerupManager.NextPowerupID = powerupID;
         GoldenGoal = goldenGoal;
         MatchStartTime = startTime;
+        MatchLength = length;
+        MaxPlayers = players;
+        ServerName = name;
 
         Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
         Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
@@ -406,7 +412,7 @@ public class MatchSystem : NetworkManager
         //}
         if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
         {
-            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, GoldenGoal, PowerupManager.NextPowerupID,
+            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, MatchLength, GoldenGoal, PowerupManager.NextPowerupID, MaxPlayers, ServerName,
                 Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
                 Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
                 Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
