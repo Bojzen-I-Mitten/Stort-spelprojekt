@@ -35,7 +35,7 @@ namespace ThomasEngine
 	array<Material^>^ RenderComponent::materials::get()
 	{
 		auto nativeMats = render->GetMaterials();
-		array<Material^>^ mats = gcnew array<Material^>(nativeMats.size());
+		array<Material^>^ mats = gcnew array<Material^>((int)nativeMats.size());
 		for (int i=0; i < mats->Length; i++)
 		{
 			Resource^ resource = ThomasEngine::Resources::FindResourceFromNativePtr(nativeMats[i]);

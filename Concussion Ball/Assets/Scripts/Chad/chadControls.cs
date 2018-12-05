@@ -9,7 +9,6 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.ComponentModel;
 using System.Collections;
-using ThomasEngine.Script;
 
 
 public class ChadControls : NetworkComponent
@@ -834,6 +833,10 @@ public class ChadControls : NetworkComponent
             else if (pickupable.gameObject.Name == "ThomasTrain")
             {
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
+            }
+            else if (pickupable.gameObject.Name == "Banana")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
             }
 
             FadeText = FadePickupText();

@@ -31,8 +31,17 @@ namespace ThomasEditor.Inspectors
         private void ListEditor_Loaded(object sender, RoutedEventArgs e)
         {
             PropertyItem pi = DataContext as PropertyItem;
-            elementType = pi.PropertyType.GetElementType();
-            listCounter.Visibility = pi.PropertyType.IsArray ? Visibility.Hidden : Visibility.Visible;
+            if (pi.PropertyType.IsArray)
+            {
+                elementType = pi.PropertyType.GetElementType();
+                listCounter.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                elementType = pi.PropertyType.GetGenericArguments().Single();
+                listCounter.Visibility = Visibility.Visible;
+            }
+
         }
 
         private void PropertyGridEditorIntegerUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

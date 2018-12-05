@@ -269,6 +269,7 @@ namespace ThomasEditor
             assetImages[ThomasEngine.Resources.AssetTypes.SCRIPT]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/script.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.PREFAB]       = new BitmapImage(new Uri("pack://application:,,/icons/assets/prefab.png"));
             assetImages[ThomasEngine.Resources.AssetTypes.FONT]         = new BitmapImage(new Uri("pack://application:,,/icons/assets/font.png"));
+            assetImages[ThomasEngine.Resources.AssetTypes.TEXTURE3D] = new BitmapImage(new Uri("pack://application:,,/icons/assets/unknown.png"));
         }
 
 

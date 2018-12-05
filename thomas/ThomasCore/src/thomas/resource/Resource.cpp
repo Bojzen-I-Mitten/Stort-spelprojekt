@@ -27,6 +27,11 @@ namespace thomas
 			return m_path;
 		}
 
+		void Resource::SetPath(std::string path)
+		{
+			m_path = path;
+		}
+
 		uint32_t Resource::getHash()
 		{
 			return m_hash;

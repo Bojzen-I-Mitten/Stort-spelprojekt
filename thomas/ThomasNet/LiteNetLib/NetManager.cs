@@ -55,7 +55,8 @@ namespace LiteNetLib
             ConnectionLatencyUpdated,
             DiscoveryRequest,
             DiscoveryResponse,
-            ConnectionRequest
+            ConnectionRequest,
+            AllConnected
         }
         public EType Type;
 
@@ -402,6 +403,9 @@ namespace LiteNetLib
                     break;
                 case NetEvent.EType.ConnectionRequest:
                     _netEventListener.OnConnectionRequest(evt.ConnectionRequest);
+                    break;
+                case NetEvent.EType.AllConnected:
+                    _netEventListener.OnAllPeersConnected();
                     break;
             }
             //Recycle if not message
@@ -1204,6 +1208,11 @@ namespace LiteNetLib
                 data, 
                 start, 
                 count);
+        }
+
+        public void OnAllConnected()
+        {
+            CreateEvent(NetEvent.EType.AllConnected);
         }
 
         public IEnumerator<NetPeer> GetEnumerator()
