@@ -39,6 +39,7 @@ public class ThomasTrain : Powerup
         soundComponentChargeUp.Type = SoundComponent.SoundType.Effect;
         soundComponentChargeUp.Looping = false;
         soundComponentChargeUp.Is3D = true;
+        soundComponentChargeUp.MinDistance = 0.1f;
 
         soundComponentTravel = gameObject.AddComponent<SoundComponent>();
         soundComponentTravel.Type = SoundComponent.SoundType.Effect;
@@ -49,6 +50,9 @@ public class ThomasTrain : Powerup
         soundComponentExplosion.Type = SoundComponent.SoundType.Effect;
         soundComponentExplosion.Looping = false;
         soundComponentExplosion.Is3D = true;
+
+        soundComponentExplosion.MaxDistance = 10000;
+        soundComponentExplosion.MinDistance = 20;
 
         soundcooldown = 0.0f;
 
@@ -133,14 +137,14 @@ public class ThomasTrain : Powerup
         if (soundcooldown < 0.0f)
         {
             soundcooldown = 1.0f;
-            //soundComponentChargeUp.Play();
+            soundComponentChargeUp.Play();
         }
     }
 
 
     public override void OnThrow()
     {
-        //soundComponentTravel.Play();
+        soundComponentTravel.Play();
     }
 
     // if this is a throwable power-up this function will be called
@@ -217,7 +221,7 @@ public class ThomasTrain : Powerup
         emitterFire.EmitOneShot(40);
         emitterSpark.EmitOneShot(200);
 
-        //soundComponentExplosion.Play();
+        soundComponentExplosion.Play();
 
         StartCoroutine(KillTrain());
     }

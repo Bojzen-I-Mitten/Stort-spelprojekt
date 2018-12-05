@@ -38,7 +38,8 @@ public class Vindaloo : Powerup
         ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
-        ExplosionSound.Volume = 0.5f;
+        ExplosionSound.MaxDistance = 10000;
+        ExplosionSound.MinDistance = 20;
 
         #region big meme particle emitter bois
 

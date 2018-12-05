@@ -242,7 +242,7 @@ public class Ragdoll : ScriptComponent
     {
         if(RagdollSound)
         {
-            //RagdollSound.Play();
+            RagdollSound.Play();
         }
     }
 
@@ -260,7 +260,7 @@ public class Ragdoll : ScriptComponent
         // Play the ragdoll sound
         if(identity.Owner && RagdollSound)
         {
-            //RagdollSound.Play();
+            RagdollSound.Play();
         }
 
         //enable all GameObjects
@@ -744,7 +744,7 @@ public class Ragdoll : ScriptComponent
             if (ImpactSpine.GetActive && identity.Owner && RagdollSound)
             {
                 RagdollSound.Volume = ImpactSpine.Volume;
-                //RagdollSound.Play();
+                RagdollSound.Play();
             }
 
             return;

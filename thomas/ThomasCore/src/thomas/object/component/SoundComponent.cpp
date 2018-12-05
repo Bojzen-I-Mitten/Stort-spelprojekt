@@ -22,7 +22,7 @@ namespace thomas
 			m_is3D(false),
 			m_looping(false),
 			m_paused(false),
-			m_volume(1.f),
+			m_volume(0.5f),
 			m_spreadAngle(0.f),
 			m_minDistance(1.f),
 			m_maxDistance(100.f)
