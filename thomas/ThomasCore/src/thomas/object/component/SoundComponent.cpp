@@ -48,7 +48,7 @@ namespace thomas
 						// Sound mode
 						if (m_is3D)
 						{
-							m_channel->setMode(FMOD_3D);
+							m_channel->setMode(FMOD_3D | FMOD_3D_LINEARROLLOFF);
 						}
 						else
 						{
@@ -83,7 +83,7 @@ namespace thomas
 						// Sound mode
 						if (is3D)
 						{
-							m_channel->setMode(FMOD_3D);
+							m_channel->setMode(FMOD_3D | FMOD_3D_LINEARROLLOFF);
 						}
 						else
 						{
@@ -145,7 +145,7 @@ namespace thomas
 				{
 					if (m_is3D)
 					{
-						m_channel->setMode(FMOD_3D);
+						m_channel->setMode(FMOD_3D | FMOD_3D_LINEARROLLOFF);
 					}
 					else
 					{

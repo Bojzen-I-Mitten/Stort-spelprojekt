@@ -94,10 +94,15 @@ namespace thomas
 
 				bool Clicked()
 				{
-					if (WindowManager::Instance()->GetGameInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
-						return Hovered();
-					else
-						return false;
+					if (renderable)
+					{
+						if (WindowManager::Instance()->GetGameInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
+							return Hovered();
+						else
+							return false;
+					}
+
+					return false;
 				}
 			};
 
