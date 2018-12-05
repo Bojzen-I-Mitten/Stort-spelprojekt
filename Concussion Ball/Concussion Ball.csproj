@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\newComponent.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Banana.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUILoadingScreen.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
