@@ -58,7 +58,6 @@ public class Banana : Powerup
 
         if (_BananaTimer > DespawnTime)
         {
-            Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
             // Despawn
             base.OnCollisionEnter(_FirstCollider);
         }
@@ -69,7 +68,6 @@ public class Banana : Powerup
             // If Banana falls on side, reset
             if (m_rigidBody.LinearVelocity.y < 0.1f && (gameObject.transform.rotation.x > 0.4f || gameObject.transform.rotation.z > 0.4f))
             {
-                Debug.Log("Banana fell on side");
                 gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0,0,0);
             }
         }
@@ -123,7 +121,6 @@ public class Banana : Powerup
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
-        Debug.Log("Entered activate");
         //Make sure powerups can only be activated once!
         if (activated)
             return;

@@ -6,12 +6,15 @@ using System.Linq;
 public class SoundBomb : Powerup
 {
     ChadControls ObjectOwner = null;
-
+    Collider _FirstCollider;
     //public AudioClip VindalooExplosionSound { get; set; }
     //private SoundComponent ExplosionSound;
 
     public float ExplosionRadius { get; set; } = 8.0f;
     public float ExplosionForce;
+
+    private float _JumpTimer;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -23,6 +26,9 @@ public class SoundBomb : Powerup
         BaseThrowForce = 12.0f;
         MaxThrowForce = 18.0f;
         ThrowForce = BaseThrowForce;
+        _FirstCollider = null;
+        m_rigidBody.Friction = 100.0f;
+        _JumpTimer = 0.0f;
 
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
         //ExplosionSound.Type = SoundComponent.SoundType.Effect;
@@ -111,6 +117,31 @@ public class SoundBomb : Powerup
     public override void Update()
     {
         base.Update();
+
+        if (isOwner)
+        {
+            if (_JumpTimer > 0)
+            {
+                _JumpTimer += Time.DeltaTime;
+
+                // Jump animation
+                if (_JumpTimer > 2.0f)
+                {
+                    m_rigidBody.LinearVelocity = Vector3.Zero;
+                    m_rigidBody.AddForce(new Vector3(0, 150, 0));
+
+                    // splash some particles Gustav @gustav @ijäzy
+
+                    _JumpTimer = Time.DeltaTime;
+                }
+
+                // If Sound Bomb falls on side, reset
+                if (m_rigidBody.LinearVelocity.y < 0.1f && (gameObject.transform.rotation.x > 0.4f || gameObject.transform.rotation.z > 0.4f))
+                {
+                    gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0, 0, 0);
+                }
+            }
+        }
     }
 
     // if this is a throwable power-up this function will be called
@@ -119,62 +150,46 @@ public class SoundBomb : Powerup
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
+    public override void OnCollisionEnter(Collider collider)
+    {
+        _FirstCollider = collider;
+
+        ChadControls colliderPlayer = _FirstCollider.gameObject.GetComponent<ChadControls>();
+
+        if(!colliderPlayer && _JumpTimer == 0 && isOwner)
+        {
+            //Debug.Log("Colliding with object that is not ya boi");
+            m_rigidBody.Friction = 100.0f;
+            m_rigidBody.LinearVelocity = Vector3.Zero;
+            PickupCollider.enabled = true; // for testing
+
+            _JumpTimer += Time.DeltaTime;
+
+
+            // Test
+            //OnActivate();
+            //base.OnCollisionEnter(collider);
+        }
+
+
+    }
+
     public override void SaveObjectOwner(ChadControls chad)
     {
         ObjectOwner = chad;
     }
 
-    //public override void OnCollisionEnter(Collider collider)
-    //{
-    //    //Check if colliding with a player
-    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-    //    if (!otherChad)
-    //    { 
-    //        base.OnCollisionEnter(collider);
-    //    }
-    //    else
-    //    {
-    //        ChadControls localChad = MatchSystem.instance.LocalChad;
-
-    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
-
-    //        if (localChad && (otherPlayerTeam != playerTeam))
-    //            base.OnCollisionEnter(collider);
-    //    }
-
-    //}
-
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
+        Debug.Log("SoundBomb activated boi");
         //Make sure powerups can only be activated once!
         if (activated)
             return;
         activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
 
-
-        ChadControls localChad = MatchSystem.instance.LocalChad;
-
-        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-        if (localChad && otherPlayerTeam != playerTeam)
-        {
-            float distance = Vector3.Distance(localChad.transform.position, transform.position);
-            if (distance < ExplosionRadius)
-            {
-                Vector3 forceDir = localChad.transform.position - transform.position;
-                forceDir.Normalize();
-                forceDir.y += 3.0f;
-
-                float distForce = ExplosionRadius - distance;
-                Vector3 force = forceDir * ExplosionForce * distForce;
-                Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
-                param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
-                localChad.ActivateRagdoll(2.0f, param);
-            }
-        }
+        StartCoroutine(BlastingMusic());
 
         Explosion();
     }
@@ -197,5 +212,35 @@ public class SoundBomb : Powerup
         yield return null;
 
         Remove();
+    }
+
+    private IEnumerator BlastingMusic()
+    {
+        // Start blasting 
+        //ChadControls localChad = MatchSystem.instance.LocalChad;
+
+        //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
+        //if (localChad && otherPlayerTeam != playerTeam)
+        //{
+        //    float distance = Vector3.Distance(localChad.transform.position, transform.position);
+        //    if (distance < ExplosionRadius)
+        //    {
+        //        Vector3 forceDir = localChad.transform.position - transform.position;
+        //        forceDir.Normalize();
+        //        forceDir.y += 3.0f;
+
+        //        float distForce = ExplosionRadius - distance;
+        //        Vector3 force = forceDir * ExplosionForce * distForce;
+        //        Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
+        //        param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
+        //        localChad.ActivateRagdoll(2.0f, param);
+        //    }
+        //}
+
+
+        yield return new WaitForSeconds(5);
+
+        Activate();
     }
 }
