@@ -19,6 +19,7 @@ public class ChadControls : NetworkComponent
         THROWING,   // player throws ball / power-up, not all power-ups activate this state
         DIVING,    // user got tackled / hit by a power-up
         RAGDOLL,    // user pressed Space to jump tackle
+        DANCING,    // user dances to powerup music
 
         NUM_STATES
     };
@@ -169,7 +170,7 @@ public class ChadControls : NetworkComponent
             JumpingTimer += Time.DeltaTime;
 
             Direction = new Vector3(0, 0, 0);
-            if (State != STATE.RAGDOLL)
+            if (State != STATE.RAGDOLL && State != STATE.DANCING)
             {
             if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
             {
@@ -535,6 +536,8 @@ public class ChadControls : NetworkComponent
                 //Camera.transform.rotation = Quaternion.Identity;
                 //Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
                 //Camera.transform.LookAt(Ragdoll.GetHips().transform);
+                break;
+            case STATE.DANCING:
                 break;
         }
         //if (Input.GetKeyDown(Input.Keys.M))

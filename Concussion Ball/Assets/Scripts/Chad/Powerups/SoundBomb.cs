@@ -22,7 +22,7 @@ public class SoundBomb : Powerup
 
         m_throwable = true; // change depending on power-up
         MovementSpeedModifier = 0.65f;
-        ExplosionRadius = 8.0f;
+        ExplosionRadius = 5.0f;
         ExplosionForce = 60.0f;
         BaseThrowForce = 12.0f;
         MaxThrowForce = 18.0f;
@@ -127,10 +127,11 @@ public class SoundBomb : Powerup
                 _JumpTimer += Time.DeltaTime;
 
                 // Jump animation
-                if (_JumpTimer > 2.0f)
+                if (_JumpTimer > 1.0f)
                 {
+                    Debug.Log("Jumping, timer: " + _JumpTimer);
                     m_rigidBody.LinearVelocity = Vector3.Zero;
-                    m_rigidBody.AddForce(new Vector3(0, 150, 0));
+                    m_rigidBody.AddForce(new Vector3(0, 100, 0));
 
                     // splash some particles Gustav @gustav @ijäzy
 
@@ -219,24 +220,8 @@ public class SoundBomb : Powerup
         //Debug.Log("Looking for players to blast");
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
-        //TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-        //TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
-        //if (localChad /*&& otherPlayerTeam != playerTeam*/)
-        //{
-        //    float distance = Vector3.Distance(localChad.transform.position, transform.position);
-        //    if (distance < ExplosionRadius)
-        //    {
-        //        Vector3 forceDir = localChad.transform.position - transform.position;
-        //        forceDir.Normalize();
-        //        forceDir.y += 3.0f;
-
-        //        float distForce = ExplosionRadius - distance;
-        //        Vector3 force = forceDir * ExplosionForce * distForce;
-        //        Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
-        //        param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
-        //        localChad.ActivateRagdoll(2.0f, param);
-        //    }
-        //}
+        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
+        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
 
         float timer = 0.0f;
 
@@ -244,15 +229,14 @@ public class SoundBomb : Powerup
         {
             timer += Time.DeltaTime;
 
-            float distance = Vector3.Distance(localChad.transform.position, transform.position);
-            if (distance < ExplosionRadius)
+            if (localChad && otherPlayerTeam != playerTeam)
             {
-                Debug.Log("Chad within distance");
-            //    //localChad.rBody.AddTorque(new Vector3(0, 10.0f, 0));
-                localChad.rBody.AddForce(new Vector3(0, 100, 0));
+                float distance = Vector3.Distance(localChad.transform.position, transform.position);
+                if (distance < ExplosionRadius)
+                {
+                    localChad.rBody.LinearVelocity = Vector3.Zero;
+                }
             }
-            Debug.Log("Distance to player: " + distance);
-
 
             yield return null;
         }
