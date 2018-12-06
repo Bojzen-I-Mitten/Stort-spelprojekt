@@ -69,6 +69,7 @@ public class ChadCam : ScriptComponent
             switch (Chad.State)
             {
                 case ChadControls.STATE.CHADING:
+                case ChadControls.STATE.DANCING:
                 case ChadControls.STATE.DIVING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                     {

@@ -23,7 +23,7 @@ public class ChadControls : NetworkComponent
 
         NUM_STATES
     };
-    public STATE State { get; private set; }
+    public STATE State { get; set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
 

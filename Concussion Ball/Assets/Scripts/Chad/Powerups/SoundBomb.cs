@@ -2,11 +2,15 @@ using ThomasEngine;
 using ThomasEngine.Network;
 using System.Collections;
 using System.Linq;
+using System;
 
 public class SoundBomb : Powerup
 {
     ChadControls ObjectOwner = null;
     Collider _FirstCollider;
+
+    public LightComponent PointBoi { get; set; }
+
     //public AudioClip VindalooExplosionSound { get; set; }
     //private SoundComponent ExplosionSound;
 
@@ -15,6 +19,7 @@ public class SoundBomb : Powerup
 
     private float _JumpTimer;
     private float _DanceDuration;
+    private float _Hue;
 
     public override void OnAwake()
     {
@@ -31,6 +36,13 @@ public class SoundBomb : Powerup
         m_rigidBody.Friction = 100.0f;
         _JumpTimer = 0.0f;
         _DanceDuration = 5.0f;
+        _Hue = 0.0f;
+
+        //if (PointBoi)
+        //{
+        //    PointBoi.enabled = false;
+        //}
+            
 
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
         //ExplosionSound.Type = SoundComponent.SoundType.Effect;
@@ -124,12 +136,14 @@ public class SoundBomb : Powerup
         {
             if (_JumpTimer > 0)
             {
+                _Hue = _JumpTimer % 1.0f;
+                PointBoi.DiffuseColor = HSLColor(_Hue);
+
                 _JumpTimer += Time.DeltaTime;
 
                 // Jump animation
                 if (_JumpTimer > 1.0f)
                 {
-                    Debug.Log("Jumping, timer: " + _JumpTimer);
                     m_rigidBody.LinearVelocity = Vector3.Zero;
                     m_rigidBody.AddForce(new Vector3(0, 100, 0));
 
@@ -143,6 +157,10 @@ public class SoundBomb : Powerup
                 {
                     gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0, 0, 0);
                 }
+            }
+            else
+            {
+                PointBoi.enabled = false;
             }
         }
     }
@@ -161,15 +179,14 @@ public class SoundBomb : Powerup
 
         if(!colliderPlayer && _JumpTimer == 0 && isOwner)
         {
-            //Debug.Log("Colliding with object that is not ya boi");
+            if (PointBoi)
+                PointBoi.enabled = true;
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
             //PickupCollider.enabled = true; // for testing
 
             _JumpTimer += Time.DeltaTime;
 
-            // Test
-            //OnActivate();
             base.OnCollisionEnter(collider);
         }
 
@@ -184,7 +201,6 @@ public class SoundBomb : Powerup
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
-        Debug.Log("SoundBomb activated boi");
         //Make sure powerups can only be activated once!
         if (activated)
             return;
@@ -217,7 +233,6 @@ public class SoundBomb : Powerup
     private IEnumerator BlastingMusic()
     {
         // Start blasting 
-        //Debug.Log("Looking for players to blast");
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
@@ -234,12 +249,78 @@ public class SoundBomb : Powerup
                 float distance = Vector3.Distance(localChad.transform.position, transform.position);
                 if (distance < ExplosionRadius)
                 {
+                    localChad.Direction = Vector3.Zero;
                     localChad.rBody.LinearVelocity = Vector3.Zero;
+                    localChad.State = ChadControls.STATE.DANCING;
                 }
             }
 
             yield return null;
         }
+        localChad.State = ChadControls.STATE.CHADING;
         Explosion();
+    }
+
+
+    // COLOR CALCS FROM ALBIN
+    private float HueFromRGB(Color rgba)
+    {
+        Vector3 rgb = rgba.ToVector3() / 255.0f;
+        float hue = 0;
+
+        float _min = Math.Min(Math.Min(rgb.x, rgb.y), rgb.z);
+        float _max = Math.Max(Math.Max(rgb.x, rgb.y), rgb.z);
+        float _delta = _max - _min;
+        if (_delta != 0)
+        {
+            if (rgb.x == _max)
+                hue = (rgb.y - rgb.z) / _delta;
+            else if (rgb.y == _max)
+                hue = 2.0f + (rgb.z - rgb.x) / _delta;
+            else if (rgb.z == _max)
+                hue = 4.0f + (rgb.x - rgb.y) / _delta;
+        }
+        //Debug.Log("Hue: " + hue);
+        //Debug.Log("R: " + rgb.x);
+        //Debug.Log("G: " + rgb.y);
+        //Debug.Log("B: " + rgb.z);
+        return hue;
+    }
+
+    private Color HSLColor(double hue)
+    {
+        double saturation = 1.0d;
+        double luminosity = 0.5d;
+
+        byte r, g, b;
+
+        double t1, t2;
+        double th = hue;
+
+        t2 = (luminosity + saturation) - (luminosity * saturation);
+        t1 = 2d * luminosity - t2;
+
+        double tr, tg, tb;
+        tr = th + (1.0d / 3.0d);
+        tg = th;
+        tb = th - (1.0d / 3.0d);
+
+        tr = ColorCalc(tr, t1, t2);
+        tg = ColorCalc(tg, t1, t2);
+        tb = ColorCalc(tb, t1, t2);
+        r = (byte)Math.Round(tr * 255d);
+        g = (byte)Math.Round(tg * 255d);
+        b = (byte)Math.Round(tb * 255d);
+        return new Color(r, g, b);
+    }
+
+    private double ColorCalc(double c, double t1, double t2)
+    {
+        if (c < 0) c += 1d;
+        if (c > 1) c -= 1d;
+        if (6.0d * c < 1.0d) return t1 + (t2 - t1) * 6.0d * c;
+        if (2.0d * c < 1.0d) return t2;
+        if (3.0d * c < 2.0d) return t1 + (t2 - t1) * (2.0d / 3.0d - c) * 6.0d;
+        return t1;
     }
 }
