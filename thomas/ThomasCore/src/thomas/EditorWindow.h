@@ -7,8 +7,8 @@ namespace thomas
 	class EditorWindow : public Window
 	{
 	public:
-		EditorWindow(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title);
-		EditorWindow(HWND hWnd);
+		EditorWindow(HWND& hwnd, HWND parent, int width, int height);
+		/*EditorWindow(HWND hWnd);*/
 		~EditorWindow();
 
 	public:

@@ -36,7 +36,6 @@ namespace ThomasEditor
         }
 
         public new IntPtr Handle { get; private set; }
-        Procedure procedure;
         const int WM_PAINT = 0x000F;
         const int WM_SIZE = 0x0005;
         const int WM_LBUTTONDOWN = 0x0201;
@@ -137,43 +136,11 @@ namespace ThomasEditor
             [In] ref Paint paint);
 
         protected override HandleRef BuildWindowCore(HandleRef parent)
-        {
-            var callback = Marshal.GetFunctionPointerForDelegate(procedure = WndProc);
+        {            
             var width = Convert.ToInt32(ActualWidth);
             var height = Convert.ToInt32(ActualHeight);
-            var cursor = LoadCursor(IntPtr.Zero, 32512);
-            var menu = string.Empty;
-            var background = new IntPtr(1);
-            var zero = IntPtr.Zero;
-            var caption = string.Empty;
-            var style = 3u;
-            var extra = 0;
-            var extended = 0u;
-            var window = 0x50000000u;
-            var point = 0;
-            var name = "Win32";
 
-            var wnd = new WindowClass
-            {
-                Style = style,
-                Callback = callback,
-                ClassExtra = extra,
-                WindowExtra = extra,
-                Instance = zero,
-                Icon = zero,
-                Cursor = cursor,
-                Background = background,
-                Menu = menu,
-                Class = name
-            };
-
-            RegisterClass(ref wnd);
-            Handle = CreateWindowEx(extended, name, caption,
-                window, point, point, width, height,
-                parent.Handle, zero, zero, zero);
-
-
-            ThomasWrapper.CreateThomasWindow(Handle, IsEditor);
+            Handle = ThomasWrapper.CreateThomasWindow(parent.Handle, width, height, IsEditor);
             GotFocus += ThomasWindow_GotFocus;
 
             switch (Type)
@@ -186,11 +153,9 @@ namespace ThomasEditor
                     break;
                 default:
                     throw new System.InvalidOperationException("Non-supported window type was added to the execution");
-                    break;
             }
 
-            return new HandleRef(this, Handle);
-            
+            return new HandleRef(this, Handle);            
         }
 
 
@@ -213,15 +178,15 @@ namespace ThomasEditor
                 if (message == WM_PAINT)
                 {
                     Paint paint;
-                    BeginPaint(handle, out paint);
-                    EndPaint(handle, ref paint);
+                    BeginPaint(Handle, out paint);
+                    EndPaint(Handle, ref paint);
                     handled = true;
                 }
                 else
                 {
                    
                 }
-                ThomasWrapper.eventHandler(handle, message, wparam, lparam);
+                ThomasWrapper.eventHandler(Handle, message, wparam, lparam);
 
             }
             catch (Exception e)
@@ -229,12 +194,11 @@ namespace ThomasEditor
                 MessageBox.Show(e.Message);
             }
 
-            return base.WndProc(handle, message, wparam, lparam, ref handled);
+            return base.WndProc(Handle, message, wparam, lparam, ref handled);
         }
 
         static IntPtr WndProc(IntPtr handle, uint message, IntPtr wparam, IntPtr lparam)
         {
-           
             return DefWindowProc(handle, message, wparam, lparam);
         }
     }

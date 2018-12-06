@@ -5,18 +5,18 @@ namespace thomas
 {
 	WindowManager WindowManager::s_windowManager;
 
-	void WindowManager::Create(HWND hWnd, bool isEditor)
+	void WindowManager::Create(HWND& hwnd, HWND parent, int width, int height, bool isEditor)
 	{
 		
 		if (isEditor)
 		{
-			m_editorWindow = new EditorWindow(hWnd);
+			m_editorWindow = new EditorWindow(hwnd, parent, width, height);
 			m_current = m_editorWindow;
 			m_windows.push_back(m_editorWindow);
 		}
 		else
 		{
-			Window* window = new Window(hWnd);
+			Window* window = new Window(hwnd, parent, width, height);
 			m_current = window;
 			m_windows.push_back(window);
 		}

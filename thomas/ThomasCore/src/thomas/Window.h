@@ -24,8 +24,8 @@ namespace thomas
 		} m_dx;
 
 	public:
-		Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title);
-		Window(HWND hWnd);
+		Window(HWND& hwnd, HWND parent, int width, int height);
+		/*Window(HWND hWnd);*/
 		virtual ~Window();
 
 	public:
@@ -85,6 +85,7 @@ namespace thomas
 	protected:
 		Input m_input;
 		WNDCLASSEX m_windowClassInfo;
+		HINSTANCE m_hInstance;
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
 

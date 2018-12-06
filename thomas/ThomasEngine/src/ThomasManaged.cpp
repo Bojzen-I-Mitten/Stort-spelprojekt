@@ -484,20 +484,30 @@ namespace ThomasEngine {
 			gcnew MainThreadDelegate(Shutdown));
 	}
 
-	void ThomasWrapper::CreateThomasWindow(IntPtr hWnd, bool isEditor)
+	IntPtr ThomasWrapper::CreateThomasWindow(int width, int height)
 	{
-		if (thomas::ThomasCore::Initialized())
-			WindowManager::Instance()->Create((HWND)hWnd.ToPointer(), isEditor);
+		HWND hwnd;
+		WindowManager::Instance()->Create(hwnd, nullptr, width, height, false);
+			
+		return IntPtr(hwnd);
+	}
 
-		if (isEditor) {
+	IntPtr ThomasWrapper::CreateThomasWindow(IntPtr parent, int width, int height, bool isEditor)
+	{
+		HWND hwnd;
+		WindowManager::Instance()->Create(hwnd, (HWND)parent.ToPointer(), width, height, isEditor);
+
+		if (isEditor) 
+		{
 			inEditor = true;
 			thomas::ThomasCore::SetEditor(true);
 		}
-			
+
+		return IntPtr(hwnd);
 	}
 
-
-	void ThomasWrapper::eventHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) {
+	void ThomasWrapper::eventHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) 
+{
 		thomas::Window::EventHandler((HWND)hWnd.ToPointer(), msg, (WPARAM)wParam.ToPointer(), (LPARAM)lParam.ToPointer());
 	}
 
