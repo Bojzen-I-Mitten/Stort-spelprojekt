@@ -168,6 +168,10 @@ namespace ThomasEngine {
 
 		static void Update();
 
+		static void WaitForRender()
+		{
+			RenderFinished->WaitOne();
+		}
 
 		static Guid selectedGUID;
 

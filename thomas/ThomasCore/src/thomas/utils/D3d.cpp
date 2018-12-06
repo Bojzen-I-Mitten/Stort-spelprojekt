@@ -19,7 +19,7 @@ namespace thomas
 	{
 		D3D D3D::s_D3D;
 
-		bool D3D::CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv)
+		bool D3D::CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv, bool multiSample)
 		{
 			D3D11_TEXTURE2D_DESC bufferDesc;
 			ZeroMemory(&bufferDesc, sizeof(bufferDesc));
@@ -28,8 +28,8 @@ namespace thomas
 			bufferDesc.MipLevels = 1;
 			bufferDesc.ArraySize = 1;
 			bufferDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			bufferDesc.SampleDesc.Count = THOMAS_AA_COUNT;
-			bufferDesc.SampleDesc.Quality = THOMAS_AA_QUALITY;
+			bufferDesc.SampleDesc.Count = multiSample ? THOMAS_AA_COUNT : 1;
+			bufferDesc.SampleDesc.Quality = multiSample ? THOMAS_AA_QUALITY : 0;
 			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 			bufferDesc.CPUAccessFlags = 0;
@@ -38,22 +38,13 @@ namespace thomas
 			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
 			rtvDesc.Format = bufferDesc.Format;
-#if THOMAS_AA_COUNT > 1
-			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-
-#else
-			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
+			rtvDesc.ViewDimension = (multiSample || THOMAS_AA_COUNT > 1) ?  D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
 
 			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 			ZeroMemory(&srvDesc, sizeof(srvDesc));
 			srvDesc.Format = bufferDesc.Format;
-#if THOMAS_AA_COUNT > 1
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+			srvDesc.ViewDimension = (multiSample || THOMAS_AA_COUNT > 1) ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
 
-#else
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
 			srvDesc.Texture2D.MipLevels = 1;
 			srvDesc.Texture2D.MostDetailedMip = 0;
 
@@ -187,6 +178,56 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(tex, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
+
+			return true;
+		}
+
+		bool D3D::CreateRenderTexture(int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)
+		{
+			D3D11_TEXTURE2D_DESC bufferDesc;
+			ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+			bufferDesc.Width = width;
+			bufferDesc.Height = height;
+			bufferDesc.MipLevels = 0;
+			bufferDesc.ArraySize = 1;
+			bufferDesc.Format = format;
+			bufferDesc.SampleDesc.Count = 1;
+			bufferDesc.SampleDesc.Quality = 0;
+			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+			rtvDesc.Format = bufferDesc.Format;
+			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			ZeroMemory(&srvDesc, sizeof(srvDesc));
+			srvDesc.Format = bufferDesc.Format;
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+			srvDesc.Texture2D.MipLevels = -1;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			
+			HRESULT hr = m_device->CreateTexture2D(&bufferDesc, NULL, &tex);
+			if (SUCCEEDED(hr))
+			{
+				hr = m_device->CreateShaderResourceView(tex, &srvDesc, &SRV);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
+
+				m_device->CreateRenderTargetView(tex, &rtvDesc, &RTV);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
+			}
 
 			return true;
 		}
