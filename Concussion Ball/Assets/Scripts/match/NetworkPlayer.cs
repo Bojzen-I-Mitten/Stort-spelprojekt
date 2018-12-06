@@ -183,7 +183,6 @@ public class NetworkPlayer : NetworkComponent
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 
-
         PlayerName = reader.GetString();
         ReadyToStart = reader.GetBool();
         HasTackled = reader.GetInt();

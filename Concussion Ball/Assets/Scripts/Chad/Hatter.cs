@@ -28,8 +28,10 @@ public class Hatter : ScriptComponent
         {
             HatRenderer.model = hat.hatModel;
             HatRenderer.material = hat.material;
-            transform.eulerAngles = hat.rotation;
-            boneSyncer.Offset = Matrix.CreateScale(hat.scale) * Matrix.CreateWorld(hat.position, transform.forward, transform.up);
+            if(HatRenderer.materials.Length == 2)
+                HatRenderer.SetMaterial(1, hat.material);
+            HatRenderer.transform.eulerAngles = hat.rotation;
+            boneSyncer.Offset = Matrix.CreateScale(hat.scale) * Matrix.CreateWorld(hat.position, HatRenderer.transform.forward, HatRenderer.transform.up);
             return true;
         }
         else
@@ -41,9 +43,9 @@ public class Hatter : ScriptComponent
 #if (PER_FRAME_HAT_SYNC)
         if (hat != null)
         {
-            
-            transform.eulerAngles = hat.rotation;
-            boneSyncer.Offset = Matrix.CreateScale(hat.scale) * Matrix.CreateWorld(hat.position, transform.forward, transform.up);
+
+            HatRenderer.transform.eulerAngles = hat.rotation;
+            boneSyncer.Offset = Matrix.CreateScale(hat.scale) * Matrix.CreateWorld(hat.position, HatRenderer.transform.forward, HatRenderer.transform.up);
         }
 
 #endif

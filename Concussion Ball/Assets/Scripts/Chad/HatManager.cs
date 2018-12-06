@@ -14,6 +14,8 @@ public class HatManager : ScriptComponent
         public Vector3 rotation { get; set; } = Vector3.Zero;
         public Vector3 scale { get; set; } = Vector3.One;
         public Texture2D texture { get; set; } = Texture2D.whiteTexture;
+
+        [Newtonsoft.Json.JsonIgnore]
         public Material material;
         public Hat()
         {
