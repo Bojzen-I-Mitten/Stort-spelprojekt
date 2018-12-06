@@ -728,9 +728,10 @@ public class GUIHostMenu : ScriptComponent
             HostBtn.color = Selected;
             if (HostBtn.Clicked())
             {
-                if (NotSimilarColor && NotSameName)
+                if (NotSimilarColor && NotSameName && Team1.text != "" && Team2.text != "")
                 {
                     DontTakeInput();
+                    AdjustMaxPlayers();
 
                     CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
                     //Set match options
@@ -739,7 +740,6 @@ public class GUIHostMenu : ScriptComponent
                     MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
                     MatchSystem.instance.MatchLength = ConvertToInt(TimeRoundString.text) * 60; //Convert to seconds.
                     MatchSystem.instance.ScoreLimit = ConvertToInt(ScoreLimitString.text);
-                    MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
                     MatchSystem.instance.ServerName = ServerNameString.text;
                     MatchSystem.instance.PublicServer = PublicServerCheck.scale != Vector2.Zero ? true : false;
                     MatchSystem.instance.SpawnPowerupsDuringGame = PowerUpsCheck.scale != Vector2.Zero ? true : false;
@@ -874,6 +874,11 @@ public class GUIHostMenu : ScriptComponent
     private void AdjustMaxPlayers()
     {
         if (!InputMaxPlayers)
-            MaxPlayersString.text = (ConvertToInt(MaxPlayersString.text) + ConvertToInt(MaxPlayersString.text) % 2).ToString();
+        {
+            if (ConvertToInt(MaxPlayersString.text) <= 1)
+                MaxPlayersString.text = 2.ToString();
+            else
+                MaxPlayersString.text = (ConvertToInt(MaxPlayersString.text) + ConvertToInt(MaxPlayersString.text) % 2).ToString();
+        }
     }
 }
