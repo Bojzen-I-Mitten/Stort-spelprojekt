@@ -212,14 +212,14 @@ public class GUIMainMenu : ScriptComponent
         {
             SelectHatRight = Canvas.Add(ArrowTexture);
             SelectHatRight.origin = new Vector2(0.5f);
-            SelectHatRight.scale = new Vector2(0.5f);
+            SelectHatRight.scale = new Vector2(0.25f);
             SelectHatRight.position = new Vector2(0.85f, 0.25f);
             SelectHatRight.interactable = true;
             SelectHatRight.depth = 0.9f;
 
             SelectHatLeft = Canvas.Add(ArrowTexture);
             SelectHatLeft.origin = new Vector2(0.5f);
-            SelectHatLeft.scale = new Vector2(0.5f);
+            SelectHatLeft.scale = new Vector2(0.25f);
             SelectHatLeft.position = new Vector2(0.68f, 0.25f);
             SelectHatLeft.rotation = (float)Math.PI;
             SelectHatLeft.interactable = true;
