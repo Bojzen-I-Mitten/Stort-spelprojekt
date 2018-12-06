@@ -36,13 +36,7 @@ public class SoundBomb : Powerup
         m_rigidBody.Friction = 100.0f;
         _JumpTimer = 0.0f;
         _DanceDuration = 5.0f;
-        _Hue = 0.0f;
-
-        //if (PointBoi)
-        //{
-        //    PointBoi.enabled = false;
-        //}
-            
+        _Hue = 0.0f;            
 
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
         //ExplosionSound.Type = SoundComponent.SoundType.Effect;
@@ -160,7 +154,8 @@ public class SoundBomb : Powerup
             }
             else
             {
-                PointBoi.enabled = false;
+                if (PointBoi)
+                    PointBoi.enabled = false;
             }
         }
     }
@@ -244,7 +239,7 @@ public class SoundBomb : Powerup
         {
             timer += Time.DeltaTime;
 
-            if (localChad && otherPlayerTeam != playerTeam)
+            if (localChad /*&& otherPlayerTeam != playerTeam*/)
             {
                 float distance = Vector3.Distance(localChad.transform.position, transform.position);
                 if (distance < ExplosionRadius)
@@ -280,10 +275,6 @@ public class SoundBomb : Powerup
             else if (rgb.z == _max)
                 hue = 4.0f + (rgb.x - rgb.y) / _delta;
         }
-        //Debug.Log("Hue: " + hue);
-        //Debug.Log("R: " + rgb.x);
-        //Debug.Log("G: " + rgb.y);
-        //Debug.Log("B: " + rgb.z);
         return hue;
     }
 
