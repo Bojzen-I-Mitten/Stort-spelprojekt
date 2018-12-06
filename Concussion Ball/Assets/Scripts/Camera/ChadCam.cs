@@ -64,6 +64,11 @@ public class ChadCam : ScriptComponent
 
     public override void Update()
     {
+        if (Input.GetKeyDown(Input.Keys.X))
+        { 
+            Debug.Log(CameraSensitivity_x);
+            Debug.Log(CameraSensitivity_y);
+        }
         if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
             switch (Chad.State)
@@ -88,9 +93,16 @@ public class ChadCam : ScriptComponent
                     break;
                 case ChadControls.STATE.THROWING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
+                    {
+                        CameraSensitivity_x = GUIOptionsMenu.instance.getAim();
+                        CameraSensitivity_y = GUIOptionsMenu.instance.getAim();
                         ThrowingCamera();
+                        
+                    }
                     else
                     {
+                        CameraSensitivity_x = GUIOptionsMenu.instance.getMovement();
+                        CameraSensitivity_y = GUIOptionsMenu.instance.getMovement();
                         ResetCamera();
                         transform.rotation = Chad.transform.rotation;
                         transform.position = ChadHead + CameraOffset * -transform.forward;

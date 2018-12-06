@@ -8,6 +8,7 @@ public class ImageBaradjustment
     Image[] Image = new Image[(int)Imagestate.NUMSTATES];
     Text number;
     public int numbervalue = 0;
+    public float LastMousePosition = 0;
     public Canvas Canvas;
     public enum Imagestate
     {
@@ -78,22 +79,30 @@ public class ImageBaradjustment
             { 
                 Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(Input.GetMouseX() / Canvas.camera.viewport.size.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
                 Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
+                LastMousePosition = Input.GetMouseX();
             }
         }
-    //    if (Input.GetKeyDown(Input.Keys.X))
+        //    if (Input.GetKeyDown(Input.Keys.X))
         //   Debug.Log(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);
-
+       
          numbervalue = ((int)(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x / 3.15f));
         number.text = numbervalue.ToString();
         //320 max 0 minst
 
 
     }
+    public void UpdateWithLoadedvalues()
+    {
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(LastMousePosition / Canvas.camera.viewport.size.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
+        numbervalue = ((int)(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x / 3.15f));
+        number.text = numbervalue.ToString();
+    }
 }
 
 public class GUIOptionsMenu : ScriptComponent
 {
-
+    public static GUIOptionsMenu instance;
     public enum Textstate
     {
         OPTIONS_TEXT,
@@ -136,6 +145,12 @@ public class GUIOptionsMenu : ScriptComponent
     public Texture2D ImageAftermathToggle { set; get;}
     public List<ImageBaradjustment> ImageBar;
     public AudioListener Audio;
+
+    public override void OnAwake()
+    {
+        instance = this;
+    }
+
     public override void Start()
     {
         Audio = gameObject.GetComponent<AudioListener>();
@@ -161,10 +176,10 @@ public class GUIOptionsMenu : ScriptComponent
         Audio.SetFXVolume((float)ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue / (float)100);
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
 
-        if (Input.GetKeyDown(Input.Keys.X))
+    /*    if (Input.GetKeyDown(Input.Keys.X))
         {
-            Debug.Log(Audio.GetMusicVolume());
-            Debug.Log(Audio.GetFXVolume());
+            Debug.Log(ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition);
+            Debug.Log(ImageBar[(int)ImageBarstate.Movement].LastMousePosition);
         }
         /*        if (Input.GetKeyDown(Input.Keys.Y))
                     Debug.Log(Image[(int)ImageBarstate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);*/
@@ -208,7 +223,17 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
-        //ImageBar.Add(new ImageBaradjustment(Canvas));
+                                                                                                                                                          //ImageBar.Add(new ImageBaradjustment(Canvas));
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 373;// load LastMousePosition here
+        ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 460; // load LastMousePosition here
+        ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 373;// load LastMousePosition here
+        ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 460; // load LastMousePosition here
+        ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
+        ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
+        ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
+        ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
+        ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
     }
     public void ClearImagesAndText()
@@ -228,7 +253,13 @@ public class GUIOptionsMenu : ScriptComponent
     }
     public override void OnDestroy()
     {
-  //      ClearImagesAndText();
+        //MORGAN SPARA HÄR
+/*      
+ *      ImageBar[(int)ImageBarstate.Movement].LastMousePosition;  // save from this call to Movement LastMousePosition here
+        ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition;  // save from this call to sfxBar_Image LastMousePosition here
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition;  // save from this call to MUSICBar_IMAGE LastMousePosition here
+        ImageBar[(int)ImageBarstate.AIM].LastMousePosition;  // save from this call to aim LastMousePosition here
+          */                                                                //      ClearImagesAndText();
     }
     public void updatePosOrigin()
     {
@@ -257,5 +288,13 @@ public class GUIOptionsMenu : ScriptComponent
         //     ImageBar[(int)ImageState].UpdatePositionInworld = SetPositionImage;
         //      Image[(int)ImageBarstate].position = SetPositionImage;
         // }
+    }
+    public int getAim()
+    {
+        return ImageBar[(int)ImageBarstate.AIM].numbervalue;
+    }
+    public int getMovement()
+    {
+        return ImageBar[(int)ImageBarstate.Movement].numbervalue;
     }
 }
