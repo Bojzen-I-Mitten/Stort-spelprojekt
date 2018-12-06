@@ -241,7 +241,9 @@ public class Ragdoll : ScriptComponent
     public void Smack()
     {
         if(RagdollSound)
+        {
             RagdollSound.Play();
+        }
     }
 
     public void EnableRagdoll()
@@ -257,10 +259,12 @@ public class Ragdoll : ScriptComponent
 
         // Play the ragdoll sound
         if(identity.Owner && RagdollSound)
+        {
             RagdollSound.Play();
+        }
 
         //enable all GameObjects
-        foreach(GameObject gObj in  G_BodyParts)
+        foreach (GameObject gObj in  G_BodyParts)
         {
             gObj.SetActive(true);
         }
@@ -734,16 +738,8 @@ public class Ragdoll : ScriptComponent
     {
         Vector3 spinepos = G_BodyParts[(int)BODYPART.SPINE].transform.position;
 
-
         if (RagdollEnabled)
         {
-
-            if (ImpactSpine.GetActive && identity.Owner && RagdollSound)
-            {
-                RagdollSound.Volume = ImpactSpine.Volume;
-                RagdollSound.Play();
-            }
-
             return;
         }
         else

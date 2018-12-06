@@ -16,7 +16,7 @@
 #include "..\utils\AutoProfile.h"
 #include "..\graphics\GUI\Canvas.h"
 #include "ParticleSystem.h"
-
+#include "..\resource\texture\RenderTexture.h"
 namespace thomas
 {
 	namespace graphics
@@ -83,13 +83,22 @@ namespace thomas
 
 		bool Renderer::BindCameraRenderTarget(const render::CAMERA_FRAME_DATA& frameData)
 		{
-			//Get the current active window
-			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
+			
 
-			if (!window || !window->Initialized())
-				return false;
+			if (frameData.renderTexture) {
+				frameData.renderTexture->Bind();
+			}
+			else
+			{
+				//Get the current active window
+				auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
-			window->BindRenderTarget();
+				if (!window || !window->Initialized())
+					return false;
+
+				window->BindRenderTarget();
+			}
+
 			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
@@ -276,7 +285,8 @@ namespace thomas
 				ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 				if (editor::EditorCamera::Instance())
 				{
-					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					object::component::Camera* camera = editor::EditorCamera::Instance()->GetCamera();
+					BindCameraRenderTarget(camera->GetFrameData());
 					ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 					ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 				}
@@ -300,7 +310,8 @@ namespace thomas
 				//Take care of the editor camera and render gizmos
 				if (editor::EditorCamera::Instance())
 				{
-					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					object::component::Camera* camera = editor::EditorCamera::Instance()->GetCamera();
+					BindCameraRenderTarget(camera->GetFrameData());
 					editor::Gizmos::Gizmo().RenderGizmos();
 				}
 			}

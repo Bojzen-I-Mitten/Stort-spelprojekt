@@ -114,7 +114,7 @@ public class PickupableObject : NetworkComponent
 
     public void RPCDrop()
     {
-        if(pickedUp)
+        if (pickedUp)
         {
             Debug.Log("Drop!");
             m_rigidBody.enabled = true;
@@ -173,16 +173,16 @@ public class PickupableObject : NetworkComponent
             transform.localRotation = PickupOffset.localRotation;
         }
 
-            
+
         chad.PickedUpObject = this;
-        
+
         _Chad = chad;
         PickupCollider.enabled = false;
         gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncNone;
         pickedUp = true;
     }
 
-   public override bool OnWrite(NetDataWriter writer, bool initialState)
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
         writer.Put(pickedUp);
         writer.Put(PickupCollider.enabled);
@@ -208,7 +208,7 @@ public class PickupableObject : NetworkComponent
 
     public override void OnLostOwnership()
     {
-        if(_Chad == MatchSystem.instance.LocalChad || pickedUp || transform.parent != null)
+        if (_Chad == MatchSystem.instance.LocalChad || pickedUp || transform.parent != null)
         {
             Drop();
         }

@@ -32,6 +32,7 @@ namespace thomas
 			bool CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain);
 			bool CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv);
 			bool CreateTexture(void* initData, int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
+			bool CreateRenderTexture(int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView*& RTV);
 			bool CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texArray, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateTextureCubeMap(void ** initData, uint32_t dim, DXGI_FORMAT format, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels);
 			bool CreateQuery(D3D11_QUERY type, ID3D11Query*& query);

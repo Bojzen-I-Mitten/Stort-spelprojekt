@@ -15,6 +15,7 @@ namespace ThomasEngine
 	public:
 		Canvas(Camera^ camera);
 		Canvas(Camera^ camera, Viewport viewport);
+		Canvas(Viewport viewport);
 
 		Camera^ camera;
 
@@ -40,7 +41,7 @@ namespace ThomasEngine
 			bool get();
 		}
 
-	private:
+	internal:
 		thomas::graphics::GUI::Canvas* nativePtr;
 	public:
 		Image^ Add(Texture2D^ texture);
