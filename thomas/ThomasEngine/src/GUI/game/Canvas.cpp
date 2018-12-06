@@ -23,6 +23,12 @@ namespace ThomasEngine
 		nativePtr = ((thomas::object::component::Camera*)camera->nativePtr)->AddCanvas(Utility::Convert(viewport));
 	}
 
+	Canvas::Canvas(Viewport viewport)
+	{
+		this->camera = nullptr;
+		nativePtr = new thomas::graphics::GUI::Canvas(Utility::Convert(viewport), nullptr, Utility::Convert(viewport.size));
+	}
+
 	Viewport Canvas::viewport::get()
 	{ 
 		return Utility::Convert(nativePtr->GetViewport());

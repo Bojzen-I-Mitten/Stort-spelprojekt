@@ -85,6 +85,13 @@ namespace ThomasEngine
 		property bool outline
 		{
 			void set(bool outline);
+			bool get();
+		}
+
+		property Color outlineColor
+		{
+			void set(Color outlineColor);
+			Color get();
 		}
 	};
 

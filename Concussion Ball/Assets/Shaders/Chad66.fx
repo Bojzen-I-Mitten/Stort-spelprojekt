@@ -18,10 +18,10 @@ cbuffer MATERIAL_PROPERTIES
 
 SamplerState StandardWrapSampler
 {
-    Filter = MIN_MAG_MIP_LINEAR;
+    Filter = ANISOTROPIC;
     AddressU = Wrap;
     AddressV = Wrap;
-    MipLODBias = -1;    // Do not sample to low!!!
+    MaxAnisotropy = 16;
 };
 
 DepthStencilState EnableDepth
@@ -111,8 +111,9 @@ float4 frag(v2f input) : SV_TARGET
     diffuse *= color;
     // Mix in shirt pattern
     float3 shirtDiffuse = shirtPattern.Sample(StandardWrapSampler, input.shirtCoord);
-    if(shirtDiffuse.r < 0.8f)
-        diffuse = shirtDiffuse;
+    diffuse = lerp(shirtDiffuse, diffuse, shirtDiffuse.g);
+    //if(shirtDiffuse.g < 0.75f)
+    //    diffuse = shirtDiffuse;
 
     float3 normal = normalTex.Sample(StandardWrapSampler, input.texcoord);
     float specularMapFactor = specularTex.Sample(StandardWrapSampler, input.texcoord);

@@ -1,7 +1,7 @@
 #pragma warning(disable: 4717) // removes effect deprecation warning.
 
 #include <ThomasCG.hlsl>
-#include <ThomasLights.hlsl>
+#include <ThomasToonLights.hlsl>
 
 Texture2D DiffuseTexture;
 Texture2D NormalTexture : NORMALTEXTURE;
@@ -57,6 +57,7 @@ struct v2f
     float4 worldPos : POSITIONWS;
     float3x3 TBN : TBN;
     float2 texcoord : TEXCOORD0;
+    float3 viewDir : TEXCOORD1;
 };
 
 v2f vert(appdata_thomas v)
@@ -74,6 +75,8 @@ v2f vert(appdata_thomas v)
 
     o.TBN = float3x3(tangent, bitangent, normal);
     
+    o.viewDir = normalize(ThomasWorldSpaceViewDir(mul(thomas_ObjectToWorld, float4(v.vertex, 1.0f)).xyz));
+
     o.texcoord = v.texcoord * uvTiling.xy + uvTiling.zw;
     return o;
 }
@@ -87,11 +90,12 @@ float4 frag(v2f input) : SV_TARGET
 
     float3 diffuse = DiffuseTexture.Sample(StandardWrapSampler, input.texcoord);
     diffuse *= color.xyz;
-    diffuse *= rampTex.Sample(StandardWrapSampler, Intensity(normal, input.worldPos.xyz));
  
     float specularMapFactor = SpecularTexture.Sample(StandardWrapSampler, input.texcoord);
      
-    diffuse = AddLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light    
+    float3 rim = pow(max(0, dot(float3(0, 1, 0), 1 - abs(dot(normal, normalize(input.viewDir))))), 2.5f) * float3(0.97f, 0.88f, 1.0f) * specularMapFactor;
+
+    diffuse = AddToonLights(input.worldPos.xyz, normal, diffuse, specularMapFactor, smoothness + 1);        // Calculate light    
     diffuse.xyz = pow(diffuse, 0.4545454545f);                                                          // Gamma correction
 
     return saturate(float4(diffuse, 1.0f));

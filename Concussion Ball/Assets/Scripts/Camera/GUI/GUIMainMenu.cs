@@ -28,8 +28,8 @@ public class GUIMainMenu : ScriptComponent
     private bool TakeName;
     public static string PlayerString = "CHAD";
 
-    public float CaretOffset { get; set; } = -0.015f;
-
+    public float CaretOffset { get; set; }
+    public float NameRotation { get; set; }
     private bool ClearName = true;
 
     Color Unselected = Color.FloralWhite;
@@ -39,7 +39,8 @@ public class GUIMainMenu : ScriptComponent
 
     public override void OnAwake()
     {
-
+        CaretOffset = -0.02f;
+        NameRotation = -0.1f;
     }
 
     public override void Start()
@@ -49,6 +50,7 @@ public class GUIMainMenu : ScriptComponent
         AddImagesAndText();
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
         MainMenuCamRot = Vector3.Zero;
+        
     }
 
     public override void Update()
@@ -80,7 +82,7 @@ public class GUIMainMenu : ScriptComponent
             }
             if (ClearName)
             {
-                PlayerString = "";
+                PlayerName.text = "";
                 ClearName = false;
             }
         }
@@ -95,7 +97,7 @@ public class GUIMainMenu : ScriptComponent
             Caret.text = "";
         }
 
-        if (Play.Clicked() && PlayerString != "")
+        if (Play.Clicked() && PlayerName.text != "")
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
@@ -110,18 +112,20 @@ public class GUIMainMenu : ScriptComponent
             ThomasWrapper.IssueShutdown();
         }
 
-        PlayerString = PlayerString.ToUpper();
-        PlayerName.text = PlayerString;
+        //PlayerString = PlayerString.ToUpper();
+        //PlayerName.text = PlayerString;
 
         if (TakeName)
         {
-            GUIInput.AppendString(ref PlayerString, 9);
+            string str = PlayerName.text;
+            GUIInput.AppendString(ref str, 9);
+            PlayerName.text = str;
         }
 
         
 
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
-
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
+        PlayerString = PlayerName.text;
     }
     public void AddImagesAndText()
     {
@@ -164,13 +168,13 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Player name
-        PlayerName = Canvas.Add(PlayerString);
+        PlayerName = Canvas.Add("CHAD");
         PlayerName.origin = new Vector2(0.5f);
         PlayerName.position = new Vector2(0.59f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
-        PlayerName.rotation = -0.1f;
+        PlayerName.rotation = NameRotation;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
         #endregion
@@ -181,6 +185,7 @@ public class GUIMainMenu : ScriptComponent
         Caret.scale = new Vector2(1.2f);
         Caret.interactable = false;
         Caret.depth = 0.8f;
+        Caret.rotation = NameRotation;
         Caret.color = Color.Black;
         Caret.font = TextFont;
         #endregion

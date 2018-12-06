@@ -18,9 +18,12 @@ public class Vindaloo : Powerup
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
     private SoundComponent ExplosionSound;
+    private float _DespawnTimer;
 
     public float ExplosionRadius { get; set; } = 8.0f;
     public float ExplosionForce;
+
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -32,12 +35,15 @@ public class Vindaloo : Powerup
         BaseThrowForce = 15.0f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
+        _DespawnTimer = 0.0f;
 
         ExplosionSound = gameObject.AddComponent<SoundComponent>();
         ExplosionSound.Type = SoundComponent.SoundType.Effect;
         ExplosionSound.Clip = VindalooExplosionSound;
         ExplosionSound.Looping = false;
         ExplosionSound.Is3D = true;
+        ExplosionSound.MaxDistance = 10000;
+        ExplosionSound.MinDistance = 20;
 
         #region big meme particle emitter bois
 
@@ -120,18 +126,21 @@ public class Vindaloo : Powerup
     public override void Update()
     {
         base.Update();
+
+        // Despawn if Vindaloo has not hit anyone in 30 seconds
+        if (_DespawnTimer > 30)
+            base.Activate();
+        else if (_DespawnTimer > 0)
+            _DespawnTimer += Time.DeltaTime;
+        
     }
 
     // if this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        //Change for abs
-        //if (direction.y < 0)
-        //    direction.y += direction.y * -1.2f;
-        //else
-        //    direction.y += direction.y * 1.2f;
-
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+
+        _DespawnTimer += Time.DeltaTime;
     }
 
     public override void SaveObjectOwner(ChadControls chad)
@@ -196,6 +205,7 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
+        // This sound will instantly stop playing when the 
         // Play the vindaloo explosion sound
         ExplosionSound.Play();
 
@@ -205,8 +215,11 @@ public class Vindaloo : Powerup
         emitterSmoke.EmitOneShot(50);
 
         StartCoroutine(RemoveNextFrame());
+        
+        _DespawnTimer = 0.0f;
         //Remove();
     }
+
     private IEnumerator RemoveNextFrame()
     {
         yield return null;

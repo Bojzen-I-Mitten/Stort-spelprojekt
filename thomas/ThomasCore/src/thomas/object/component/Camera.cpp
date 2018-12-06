@@ -286,7 +286,7 @@ namespace thomas
 				m_frameData.viewport = GetViewport();
 				m_frameData.viewMatrix = GetViewMatrix();
 				m_frameData.projectionMatrix = GetProjMatrix();
-
+				m_frameData.renderTexture = m_renderTexture;
 				m_frameData.position = (math::Vector4)GetPosition();
 
 				//if (m_frameData.targetDisplay == 0)
@@ -365,6 +365,14 @@ namespace thomas
 				NDC.y = (1.0f - NDC.y) * 0.5f * GetViewport().height;
 
 				return NDC;
+			}
+			void Camera::SetRenderTexture(resource::RenderTexture * texture)
+			{
+				m_renderTexture = texture;
+			}
+			resource::RenderTexture * Camera::GetRenderTexture()
+			{
+				return m_renderTexture;
 			}
 		}
 	}

@@ -10,6 +10,7 @@ namespace ThomasEngine
 	ref class Shader;
 	ref class Texture2D;
 	ref class TextureCube;
+	ref class RenderTexture;
 	[DataContractAttribute]
 	public ref class Material : public Resource
 	{
@@ -102,6 +103,7 @@ namespace ThomasEngine
 		void SetTexture2D(String^ name, Texture2D^ value);
 		void SetTextureCube(String ^ name, TextureCube ^ value);
 		TextureCube^ GetTextureCube(String^name);
+
 
 		[IgnoreDataMemberAttribute]
 		property Shader^ Shader

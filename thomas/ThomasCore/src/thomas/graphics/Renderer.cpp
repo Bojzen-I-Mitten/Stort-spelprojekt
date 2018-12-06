@@ -1,5 +1,4 @@
 #include "Renderer.h"
-#include "..\utils\D3D.h"
 #include "..\object\GameObject.h"
 #include "..\object\component\Transform.h"
 #include "..\ThomasCore.h"
@@ -12,12 +11,12 @@
 #include "..\WindowManager.h"
 #include "..\graphics\LightManager.h"
 #include "RenderConstants.h"
-#include "render/Frame.h"
-#include "../utils/GpuProfiler.h"
-#include "../utils/AutoProfile.h"
-#include "../graphics/GUI/Canvas.h"
+#include "render\Frame.h"
+#include "..\utils\GpuProfiler.h"
+#include "..\utils\AutoProfile.h"
+#include "..\graphics\GUI\Canvas.h"
 #include "ParticleSystem.h"
-
+#include "..\resource\texture\RenderTexture.h"
 namespace thomas
 {
 	namespace graphics
@@ -44,6 +43,11 @@ namespace thomas
 			m_shaders(),
 			m_cameras()
 		{
+			m_commmandList[0] = nullptr;
+			m_commmandList[1] = nullptr;
+			m_commmandList[2] = nullptr;
+			m_commmandList[3] = nullptr;
+			m_commmandList[4] = nullptr;
 			m_enableShadows = true;
 		}
 
@@ -57,8 +61,6 @@ namespace thomas
 			// Do something?
 		}
 
-
-
 		void Renderer::PostRender()
 		{
 		}
@@ -66,6 +68,11 @@ namespace thomas
 		void Renderer::Destroy()
 		{
 			m_shaders.Destroy();
+			SAFE_RELEASE(m_commmandList[0]);
+			SAFE_RELEASE(m_commmandList[1]);
+			SAFE_RELEASE(m_commmandList[2]);
+			SAFE_RELEASE(m_commmandList[3]);
+			SAFE_RELEASE(m_commmandList[4]);
 		}
 
 		Renderer* Renderer::Instance()
@@ -76,14 +83,23 @@ namespace thomas
 
 		bool Renderer::BindCameraRenderTarget(const render::CAMERA_FRAME_DATA& frameData)
 		{
-			//Get the current active window
-			auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
+			
 
-			if (!window || !window->Initialized())
-				return false;
+			if (frameData.renderTexture) {
+				frameData.renderTexture->Bind();
+			}
+			else
+			{
+				//Get the current active window
+				auto window = WindowManager::Instance()->GetWindow(frameData.targetDisplay);
 
-			window->BindRenderTarget();
-			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+				if (!window || !window->Initialized())
+					return false;
+
+				window->BindRenderTarget();
+			}
+
+			utils::D3D::Instance()->GetDeviceContextDeferred()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -106,7 +122,7 @@ namespace thomas
 				return false;
 
 			window->BindBackBuffer();
-			utils::D3D::Instance()->GetDeviceContext()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContextDeferred()->RSSetViewports(1, frameData.viewport.Get11());
 			return true;
 		}
 
@@ -179,14 +195,16 @@ namespace thomas
 
 		void Renderer::ProcessCommands()
 		{
-			utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-			
 			//Process commands
 			{
 				PROFILE("BindFrame")
-				BindFrame();
+					BindFrame();
 			}
-			
+
+
+			utils::D3D::Instance()->ResetCommandList(m_commmandList[0]);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_SHADOWS_BEGIN);
+
 			if (m_enableShadows)
 			{
 				for (auto & perCameraQueue : m_prevFrame->m_queue)
@@ -197,7 +215,12 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_SHADOWS);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_SHADOWS_END);
+			utils::D3D::Instance()->FinishCommandList(m_commmandList[0]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[0]);
+
+			utils::D3D::Instance()->ResetCommandList(m_commmandList[1]);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS_BEGIN);
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
 			{
@@ -249,7 +272,12 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_MAIN_OBJECTS);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS_END);
+			utils::D3D::Instance()->FinishCommandList(m_commmandList[1]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[1]);
+
+			utils::D3D::Instance()->ResetCommandList(m_commmandList[2]);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_PARTICLES_BEGIN);
 
 			{
 				PROFILE("Particles");
@@ -257,7 +285,8 @@ namespace thomas
 				ParticleSystem::GetGlobalAdditiveBlendingSystem()->UpdateParticleSystem();
 				if (editor::EditorCamera::Instance())
 				{
-					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					object::component::Camera* camera = editor::EditorCamera::Instance()->GetCamera();
+					BindCameraRenderTarget(camera->GetFrameData());
 					ParticleSystem::GetGlobalAlphaBlendingSystem()->DrawParticles();
 					ParticleSystem::GetGlobalAdditiveBlendingSystem()->DrawParticles();
 				}
@@ -269,22 +298,33 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_PARTICLES);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_PARTICLES_END);
+			utils::D3D::Instance()->FinishCommandList(m_commmandList[2]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[2]);
+
+			utils::D3D::Instance()->ResetCommandList(m_commmandList[3]);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS_BEGIN);
 
 			{
 				PROFILE("Gizmos");
 				//Take care of the editor camera and render gizmos
 				if (editor::EditorCamera::Instance())
 				{
-					BindCameraRenderTarget(editor::EditorCamera::Instance()->GetCamera()->GetFrameData());
+					object::component::Camera* camera = editor::EditorCamera::Instance()->GetCamera();
+					BindCameraRenderTarget(camera->GetFrameData());
 					editor::Gizmos::Gizmo().RenderGizmos();
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS_END);
+			utils::D3D::Instance()->FinishCommandList(m_commmandList[3]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[3]);
 
 			//Copy rendered objects into the back buffer
 			WindowManager::Instance()->ResolveRenderTarget();
+
+			utils::D3D::Instance()->ResetCommandList(m_commmandList[4]);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GUI_BEGIN);
 
 			{
 				PROFILE("GUI");
@@ -301,7 +341,9 @@ namespace thomas
 				}
 			}
 
-			profiler->Timestamp(utils::profiling::GTS_GUI);
+			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GUI_END);
+			utils::D3D::Instance()->FinishCommandList(m_commmandList[4]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[4]);
 		}
 	}
 }
