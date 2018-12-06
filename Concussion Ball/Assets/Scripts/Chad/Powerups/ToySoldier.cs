@@ -7,14 +7,7 @@ public class ToySoldier : Powerup
 {
     ChadControls ObjectOwner = null;
 
-    // Coroutines
-    IEnumerator ScaleClock = null;
-
-    private float ScaleCountdown;
-    private Vector3 OriginalScale;
-
-    // Tweaking constants
-    private float ScaleDuration = 5.0f;
+    // Tweaking constant
     private float ScaleDecreaseFactor = 0.5f;
 
     public override void OnAwake()
@@ -46,6 +39,9 @@ public class ToySoldier : Powerup
     // This function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
+        if (activated)
+            return;
+
         PickupCollider.enabled = true;
         pickedUp = false;
 
@@ -58,41 +54,13 @@ public class ToySoldier : Powerup
             {
                 Debug.Log("Activated");
                 activated = true;
+                collisionChad.ToySoliderAffected = true;              
+                colliderObject.transform.scale *= ScaleDecreaseFactor;
 
-                //OriginalScale = collisionChad.transform.scale;
-
-                //ConfigureScale(ScaleDecreaseFactor, ref collisionChad);
-                //ScaleClock = ScaleTimerRoutine(ScaleDuration, collisionChad);
-                //StartCoroutine(ScaleClock);
-                //gameObject.transform.scale = new Vector3(0);
-
-                // Scale down cube to 0 then disable when the requested corot has ended
+                // Remove powerup
                 StartCoroutine(RemoveCube());
             }
         }
-    }
-
-    private void ConfigureScale(float scaleFactor, ref ChadControls targetChad)
-    {
-        targetChad.transform.scale *= scaleFactor;
-    }
-
-    #region Coroutines
-    IEnumerator ScaleTimerRoutine(float seconds, ChadControls targetChad)
-    {
-        ScaleCountdown = seconds;
-
-        while (ScaleCountdown > 0)
-        {
-            Debug.Log("Scale affector remaining: " + ScaleCountdown);
-            yield return new WaitForSeconds(1.0f);
-            ScaleCountdown--;
-        }
-
-        // Set back original scale when timer has expired
-        // TODO: Make this better with a scale up over a short amount of time instead of instant growth
-        targetChad.transform.scale = OriginalScale;
-        ScaleCountdown = ScaleDuration;
     }
 
     private IEnumerator RemoveCube()
@@ -100,5 +68,4 @@ public class ToySoldier : Powerup
         yield return null;
         Remove();
     }
-    #endregion
 }

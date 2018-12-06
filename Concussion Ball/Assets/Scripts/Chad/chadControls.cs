@@ -86,6 +86,17 @@ public class ChadControls : NetworkComponent
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
 
+    // TOY SOLDIER
+    // Coroutines
+    IEnumerator ScaleClock = null;
+
+    public bool ToySoliderAffected = false;
+    private float ScaleCountdown;
+    private Vector3 OriginalScale;
+
+    // Tweaking constants
+    private float ScaleDuration = 5.0f;
+
     public override void OnAwake()
     {
         ragdollSync = gameObject.AddComponent<NetworkTransform>();
@@ -123,6 +134,9 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+
+        //
+        OriginalScale = gameObject.transform.scale;
     }
     public override void OnGotOwnership()
     {
@@ -163,6 +177,13 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
+        // Toy solider powerup
+        if (ToySoliderAffected)
+        {
+            ScaleClock = ScaleTimerRoutine(ScaleDuration);
+            StartCoroutine(ScaleClock);
+        }
+
         if (isOwner)
         {
             DivingTimer += Time.DeltaTime;
@@ -654,6 +675,24 @@ public class ChadControls : NetworkComponent
         }
 
         PowerupPickupText.renderable = false;
+    }
+
+    IEnumerator ScaleTimerRoutine(float seconds)
+    {
+        ScaleCountdown = seconds;
+
+        while (ScaleCountdown > 0)
+        {
+            Debug.Log("Scale affector remaining: " + ScaleCountdown);
+            yield return new WaitForSeconds(1.0f);
+            ScaleCountdown--;
+        }
+
+        // Set back original scale when timer has expired
+        // TODO: Make this better with a scale up over a short amount of time instead of instant growth
+        gameObject.transform.scale = OriginalScale;
+        ScaleCountdown = ScaleDuration;
+        ToySoliderAffected = false;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
