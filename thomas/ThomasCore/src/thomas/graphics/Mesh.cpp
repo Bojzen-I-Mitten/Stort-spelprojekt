@@ -33,14 +33,14 @@ namespace thomas
 			if (!m_data.indexBuffer)
 			{
 				shader->Draw(GetVertexCount(), 0);
-				utils::D3D::Instance()->GetProfiler()->AddDrawCall(GetVertexCount() / 3, GetVertexCount());
+				utils::profiling::GpuProfiler::Instance()->AddDrawCall(GetVertexCount() / 3, GetVertexCount());
 			}
 			else
 			{
 				// Draw indexed
 				shader->BindIndexBuffer(m_data.indexBuffer.get());
 				shader->DrawIndexed(GetIndexCount(), 0, 0);
-				utils::D3D::Instance()->GetProfiler()->AddDrawCall(GetIndexCount() / 3, GetVertexCount());
+				utils::profiling::GpuProfiler::Instance()->AddDrawCall(GetIndexCount() / 3, GetVertexCount());
 			}
 		}
 

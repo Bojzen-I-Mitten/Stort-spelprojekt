@@ -122,7 +122,7 @@ namespace thomas {
 				initData[i] = m_textures[i]->GetRawBGRAPixels();
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->UpdateSubresource(m_resource, 0, NULL, &initData, 4 * m_width, 4 * m_width * m_height);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->UpdateSubresource(m_resource, 0, NULL, &initData, 4 * m_width, 4 * m_width * m_height);
 		}
 	}
 }
