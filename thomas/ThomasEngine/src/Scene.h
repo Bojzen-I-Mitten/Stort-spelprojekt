@@ -42,12 +42,23 @@ namespace ThomasEngine {
 		{
 			Add,			// Add object
 			Remove,			// Stage 2. Remove object
-			DisableRemove	// Stage 1. Disable removed object, added as following command: Remove
+			DisableRemove,	// Stage 1. Disable removed object, added as following command: Remove
+			AddDisposable
 		};
 		value struct IssuedCommand
 		{
 			Command m_cmd;
-			GameObject^ m_obj;
+			Object^ m_obj;
+		};
+		template<typename T>
+		ref class DisposableNative 
+		{
+		public:
+			DisposableNative(T* nativePtr);
+			virtual ~DisposableNative();
+
+		private:
+			T* m_native;
 		};
 
 		uint32_t m_uniqueID;
@@ -55,6 +66,9 @@ namespace ThomasEngine {
 		System::Object^ m_accessLock = gcnew System::Object();
 		List<IssuedCommand>^ m_commandList;
 		List<IssuedCommand>^ m_commandSwapList;
+		/* Objects attached to the scene withot proper ownership. I.e. objects not created as gameobjects.
+		*/
+		List<System::IDisposable^>^ m_looseObjects;
 		System::String^ m_name;
 		System::String^ m_relativeSavePath;
 
@@ -100,6 +114,12 @@ namespace ThomasEngine {
 		/* Schedule destruction of an object during synchonized state
 		*/
 		void DestroyObject(GameObject^ object);
+		/* Add object to be deleted at scene destruction.
+		*/
+		void AddLooseObject(System::IDisposable^ object);
+		/* Add object to be deleted at scene destruction.
+		*/
+		void AddLooseNative(thomas::object::Object* nativePtr);
 
 		/* Find gameobject by name
 		*/
@@ -187,5 +207,15 @@ namespace ThomasEngine {
 			System::Collections::Generic::IEnumerable<GameObject^>^ get();
 		}
 	};
+	template<typename T>
+	inline Scene::DisposableNative<T>::DisposableNative(T * nativePtr)
+	{
+		m_native = nativePtr;
+	}
+	template<typename T>
+	inline Scene::DisposableNative<T>::~DisposableNative()
+	{
+		delete m_native;
+	}
 }
 

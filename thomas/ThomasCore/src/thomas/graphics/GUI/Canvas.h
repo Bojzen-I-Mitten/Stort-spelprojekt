@@ -11,6 +11,7 @@
 #include "../../resource/texture/Texture2D.h"
 #include "../../utils/Math.h"
 #include "../../resource/Font.h"
+#include "../../object/Object.h"
 
 using namespace DirectX;
 
@@ -24,13 +25,13 @@ namespace thomas
 		namespace GUI
 		{
 			struct GUIElement;
-			class Canvas
+			class Canvas 
+				: public object::Object
 			{
 			public:
 				//Canvas();
 				Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution = Vector2(1920, 1080));
-				~Canvas();
-				void Destroy();
+				virtual ~Canvas();
 				void Render();
 
 			public:

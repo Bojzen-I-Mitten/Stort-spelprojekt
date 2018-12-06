@@ -112,13 +112,14 @@ namespace thomas
 			LONG newWidth = m_windowRectangle.right;
 			LONG newHeight = m_windowRectangle.bottom;
 
-			//if (m_height == newHeight && m_width == newWidth)
-			//	return false;
+			if (m_height == newHeight && m_width == newWidth)
+				return false;
+
 			m_height = newHeight;
 			m_width = newWidth;
 
 			utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(0, NULL, NULL);
-			
+
 			SAFE_RELEASE(m_dx.commandList);
 
 			SAFE_RELEASE(m_dx.buffer[0]);
@@ -137,12 +138,12 @@ namespace thomas
 			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1]);
 
 			SAFE_RELEASE(m_dx.depthBufferSRV);
-			
 
 			SAFE_RELEASE(m_dx.depthStencilState);
 
-			m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_R8G8B8A8_UNORM,
-				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING);
+			HRESULT hr = m_swapChain->ResizeBuffers(FRAME_BUFFERS, 0, 0, DXGI_FORMAT_UNKNOWN,
+				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
+						
 			return InitDxBuffers();
 		}
 		else

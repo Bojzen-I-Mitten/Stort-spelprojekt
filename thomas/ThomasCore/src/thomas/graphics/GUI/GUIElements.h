@@ -49,7 +49,7 @@ namespace thomas
 					depth = 0;
 					effect = DirectX::SpriteEffects::SpriteEffects_None;
 				}
-				virtual ~GUIElement(){}
+				virtual ~GUIElement(){ }
 
 				Vector2 position;
 				Vector2 scale;
