@@ -88,14 +88,17 @@ public class ChadControls : NetworkComponent
 
     // TOY SOLDIER
     // Coroutines
-    IEnumerator ScaleClock = null;
+    IEnumerator ToySoldierModifier = null;
 
     public bool ToySoldierAffected = false;
     private float ScaleCountdown;
     private Vector3 OriginalScale;
+    private float OriginalAcceleration;
+    private float OriginalBaseSpeed;
+    private float OriginalMaxSpeed;
 
     // Tweaking constants
-    private float ScaleDuration = 8.0f;
+    private float ScaleDuration = 5.0f;
 
     public override void OnAwake()
     {
@@ -137,6 +140,9 @@ public class ChadControls : NetworkComponent
 
         //
         OriginalScale = gameObject.transform.scale;
+        OriginalAcceleration = Acceleration;
+        OriginalBaseSpeed = BaseSpeed;
+        OriginalMaxSpeed = MaxSpeed;
     }
     public override void OnGotOwnership()
     {
@@ -182,10 +188,10 @@ public class ChadControls : NetworkComponent
             // Toy solider powerup
             if (ToySoldierAffected)
             {
-                if(ScaleClock == null)
+                if(ToySoldierModifier == null)
                 {
-                    ScaleClock = ScaleTimerRoutine(ScaleDuration);
-                    StartCoroutine(ScaleClock);
+                    ToySoldierModifier = ToySoldierRoutine(ScaleDuration);
+                    StartCoroutine(ToySoldierModifier);
                 }
             }
 
@@ -680,22 +686,24 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.renderable = false;
     }
 
-    IEnumerator ScaleTimerRoutine(float seconds)
+    IEnumerator ToySoldierRoutine(float seconds)
     {
         ScaleCountdown = seconds;
 
         while (ScaleCountdown > 0)
         {
-            //Debug.Log("Scale affector remaining: " + ScaleCountdown);
-            yield return new WaitForSeconds(5.0f);
+            yield return new WaitForSeconds(ScaleDuration);
             ScaleCountdown = 0;
         }
 
-        // Set back original scale when timer has expired
+        // Set back original scale and movement speed when timer has expired
         gameObject.transform.localScale = OriginalScale;
+        Acceleration = OriginalAcceleration;
+        BaseSpeed = OriginalBaseSpeed;
+        MaxSpeed = OriginalMaxSpeed;
         ScaleCountdown = ScaleDuration;
         ToySoldierAffected = false;
-        ScaleClock = null;
+        ToySoldierModifier = null;
     }
 
     public void RPCSetAnimWeight(int index, float weight)

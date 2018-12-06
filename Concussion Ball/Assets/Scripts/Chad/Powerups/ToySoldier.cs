@@ -2,6 +2,7 @@
 using ThomasEngine.Network;
 using System;
 using System.Collections;
+using LiteNetLib;
 
 public class ToySoldier : Powerup
 {
@@ -49,10 +50,20 @@ public class ToySoldier : Powerup
 
             if (collisionChad != null && collisionChad != ObjectOwner)
             {
-                collisionChad.ToySoldierAffected = true;
-                colliderObject.transform.scale = new Vector3(0.5f);
+                NetPeer peer = null;
+                foreach (var player in MatchSystem.instance.Scene.Players)
+                {
+                    if(player.Value == collisionChad.gameObject.GetComponent<NetworkIdentity>())
+                    {
+                        peer = player.Key;
+                        break;
+                    }
+                }
 
-                // Should also be movement slowed here
+                if(peer != null)
+                {
+                    MatchSystem.instance.SendRPC(peer, ID, "RPCIGotHit");
+                }
 
                 // Remove powerup
                 PickupCollider.enabled = false;
@@ -61,6 +72,18 @@ public class ToySoldier : Powerup
                 StartCoroutine(RemoveCube());
             }
         }
+    }
+
+    public void RPCIGotHit()
+    {
+        ChadControls localChad = MatchSystem.instance.LocalChad;
+
+        // Scale and movement decrease
+        localChad.ToySoldierAffected = true;
+        localChad.transform.scale *= 0.5f;
+        localChad.Acceleration *= 0.5f;
+        localChad.BaseSpeed *= 0.5f;
+        localChad.MaxSpeed *= 0.5f;
     }
 
     private IEnumerator RemoveCube()
