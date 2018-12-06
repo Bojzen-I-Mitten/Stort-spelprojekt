@@ -15,7 +15,7 @@ namespace thomas
 		{
 			Canvas::Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution)
 			{
-				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeffered());
+				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeferred());
 				m_defaultFont = std::make_unique<Font>("../Data/Fonts/sportNumbers64.spritefont");
 				m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
 				m_camera = cam;

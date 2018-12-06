@@ -42,7 +42,7 @@ namespace thomas
 				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
 				static std::map<std::string, std::vector<float>> s_vramusage;
-				static float s_vrambudget;
+				static float s_vramTotal;
 				static unsigned int s_frames;
 				static std::atomic<unsigned int> s_contextSwitch;
 				static utils::atomics::SpinLock s_profileLock;

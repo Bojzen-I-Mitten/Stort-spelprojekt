@@ -74,19 +74,19 @@ namespace thomas
 				m_drawCalls = 0;
 				m_totalVertexCount = 0;
 				m_totalFaceCount = 0;
-				utils::D3D::Instance()->GetDeviceContextDeffered()->Begin(m_queryDisjoint[m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextDeferred()->Begin(m_queryDisjoint[m_frameQuery]);
 				Timestamp(GTS_BEGIN_FRAME);
 			}
 
 			void GpuProfiler::Timestamp(GTS gts)
 			{
-				utils::D3D::Instance()->GetDeviceContextDeffered()->End(m_queryTimestamp[gts][m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextDeferred()->End(m_queryTimestamp[gts][m_frameQuery]);
 			}
 
 			void GpuProfiler::EndFrame()
 			{
 				Timestamp(GTS_END_FRAME);
-				utils::D3D::Instance()->GetDeviceContextDeffered()->End(m_queryDisjoint[m_frameQuery]);
+				utils::D3D::Instance()->GetDeviceContextDeferred()->End(m_queryDisjoint[m_frameQuery]);
 				m_frameQuery = (m_frameQuery + 1) % FRAME_BUFFERS; 
 			}
 

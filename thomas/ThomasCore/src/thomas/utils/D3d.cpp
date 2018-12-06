@@ -840,7 +840,7 @@ namespace thomas
 			return m_device;
 		}
 
-		ID3D11DeviceContext * D3D::GetDeviceContextDeffered()
+		ID3D11DeviceContext * D3D::GetDeviceContextDeferred()
 		{
 			return m_deviceContextDeferred;
 		}

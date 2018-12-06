@@ -99,7 +99,7 @@ namespace thomas
 				window->BindRenderTarget();
 			}
 
-			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContextDeferred()->RSSetViewports(1, frameData.viewport.Get11());
 
 			math::Matrix viewProjMatrix = frameData.viewMatrix * frameData.projectionMatrix;
 
@@ -122,7 +122,7 @@ namespace thomas
 				return false;
 
 			window->BindBackBuffer();
-			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, frameData.viewport.Get11());
+			utils::D3D::Instance()->GetDeviceContextDeferred()->RSSetViewports(1, frameData.viewport.Get11());
 			return true;
 		}
 

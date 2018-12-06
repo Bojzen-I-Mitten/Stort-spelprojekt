@@ -117,9 +117,7 @@ namespace thomas
 			m_height = newHeight;
 			m_width = newWidth;
 
-			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, 0, 0);
-			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetDepthStencilState(NULL, 1);
-
+			utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(0, NULL, NULL);
 			
 			SAFE_RELEASE(m_dx.commandList);
 
@@ -203,18 +201,18 @@ namespace thomas
 
 	void Window::BindBackBuffer()
 	{
-		utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, 0, 0);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(0, NULL, NULL);
 
-		utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(1, &m_dx.RTV[0], m_dx.depthStencilView[0]);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetDepthStencilState(m_dx.depthStencilState, 1);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(1, &m_dx.RTV[0], m_dx.depthStencilView[0]);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetDepthStencilState(m_dx.depthStencilState, 1);
 	}
 
 	void Window::BindRenderTarget()
 	{
-		utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, 0, 0);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(0, NULL, NULL);
 
-		utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(1, &m_dx.RTV[1], m_dx.depthStencilView[1]);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetDepthStencilState(m_dx.depthStencilState, 1);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(1, &m_dx.RTV[1], m_dx.depthStencilView[1]);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetDepthStencilState(m_dx.depthStencilState, 1);
 	}
 
 
@@ -272,15 +270,15 @@ namespace thomas
 	{
 		float clearColor[] = { 0.34375f, 0.34375f, 0.34375f, 1.0f };
 
-		utils::D3D::Instance()->GetDeviceContextDeffered()->ClearRenderTargetView(m_dx.RTV[1], clearColor);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->ClearDepthStencilView(m_dx.depthStencilView[1], D3D11_CLEAR_DEPTH, 1, 0);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->ClearDepthStencilView(m_dx.depthStencilView[0], D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->ClearRenderTargetView(m_dx.RTV[1], clearColor);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->ClearDepthStencilView(m_dx.depthStencilView[1], D3D11_CLEAR_DEPTH, 1, 0);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->ClearDepthStencilView(m_dx.depthStencilView[0], D3D11_CLEAR_DEPTH, 1, 0);
 	}
 
 	void Window::ResolveRenderTarget()
 	{
 		unsigned int sub = D3D11CalcSubresource(0, 0, 1);
-		utils::D3D::Instance()->GetDeviceContextDeffered()->ResolveSubresource(m_dx.buffer[0], sub, m_dx.buffer[1], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
+		utils::D3D::Instance()->GetDeviceContextDeferred()->ResolveSubresource(m_dx.buffer[0], sub, m_dx.buffer[1], sub, DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	void Window::SetCursor(const bool & visible)

@@ -13,7 +13,7 @@ namespace thomas
 			std::vector<long long> ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
 			std::map<std::string, std::vector<float>> ProfileManager::s_vramusage;
-			float ProfileManager::s_vrambudget;
+			float ProfileManager::s_vramTotal;
 			unsigned int ProfileManager::s_frames;
 			std::atomic<unsigned int> ProfileManager::s_contextSwitch;
 			utils::atomics::SpinLock ProfileManager::s_profileLock;
@@ -107,7 +107,7 @@ namespace thomas
 
 
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
-				j["SlowfilerData"]["build"]["vramTotal"] = s_vrambudget;
+				j["SlowfilerData"]["build"]["vramTotal"] = s_vramTotal;
 				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
 				j["SlowfilerData"]["build"]["contextSwitches"] = s_contextSwitch.load();
 
@@ -145,12 +145,12 @@ namespace thomas
 			}
 			float ProfileManager::getRAMUsage()
 			{
-				return s_ramusage;
+				return s_ramusage - s_vramTotal;
 			}
 
 			void ProfileManager::setVRAMUsage(float total)
 			{
-				s_vrambudget = total;
+				s_vramTotal = total;
 			}
 
 		}

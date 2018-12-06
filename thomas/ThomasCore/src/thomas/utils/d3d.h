@@ -52,7 +52,7 @@ namespace thomas
 
 		public:
 			ID3D11Device* GetDevice();
-			ID3D11DeviceContext* GetDeviceContextDeffered();
+			ID3D11DeviceContext* GetDeviceContextDeferred();
 			ID3D11DeviceContext* GetDeviceContextImmediate();
 			IDXGIDevice1* GetDxgiDevice();
 			IDXGIAdapter3* GetDxgiAdapter();

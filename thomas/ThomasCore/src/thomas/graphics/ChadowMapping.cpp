@@ -152,12 +152,12 @@ namespace thomas
 				return;
 
 			ID3D11ShaderResourceView* const s_nullSRV[8] = { NULL };
-			utils::D3D::Instance()->GetDeviceContextDeffered()->PSSetShaderResources(0, 8, s_nullSRV);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->PSSetShaderResources(0, 8, s_nullSRV);
 
-			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, 0, 0);
-			utils::D3D::Instance()->GetDeviceContextDeffered()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-			utils::D3D::Instance()->GetDeviceContextDeffered()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
-			utils::D3D::Instance()->GetDeviceContextDeffered()->RSSetViewports(1, &s_viewPort);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(0, 0, 0);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->OMSetRenderTargets(0, nullptr, m_depthStencilView);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->RSSetViewports(1, &s_viewPort);
 
 			s_material->Bind();
 			

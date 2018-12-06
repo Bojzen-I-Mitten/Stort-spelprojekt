@@ -385,7 +385,7 @@ namespace thomas
 			{
 				prop.second->Apply(m_shader);
 			}
-			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetPrimitiveTopology(m_topology);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetPrimitiveTopology(m_topology);
 			Unlock();
 		}
 		void Material::Draw(graphics::Mesh* mesh)
