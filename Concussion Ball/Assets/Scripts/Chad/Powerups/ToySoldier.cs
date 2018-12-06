@@ -7,9 +7,6 @@ public class ToySoldier : Powerup
 {
     ChadControls ObjectOwner = null;
 
-    // Tweaking constant
-    private float ScaleDecreaseFactor = 0.5f;
-
     public override void OnAwake()
     {
         base.OnAwake();
@@ -52,12 +49,15 @@ public class ToySoldier : Powerup
 
             if (collisionChad != null && collisionChad != ObjectOwner)
             {
-                Debug.Log("Activated");
-                activated = true;
-                collisionChad.ToySoliderAffected = true;              
-                colliderObject.transform.scale *= ScaleDecreaseFactor;
+                collisionChad.ToySoldierAffected = true;
+                colliderObject.transform.scale = new Vector3(0.5f);
+
+                // Should also be movement slowed here
 
                 // Remove powerup
+                PickupCollider.enabled = false;
+                pickedUp = true;
+                activated = true;
                 StartCoroutine(RemoveCube());
             }
         }

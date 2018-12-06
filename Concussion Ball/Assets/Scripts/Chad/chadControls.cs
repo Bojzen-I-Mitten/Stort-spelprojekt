@@ -90,12 +90,12 @@ public class ChadControls : NetworkComponent
     // Coroutines
     IEnumerator ScaleClock = null;
 
-    public bool ToySoliderAffected = false;
+    public bool ToySoldierAffected = false;
     private float ScaleCountdown;
     private Vector3 OriginalScale;
 
     // Tweaking constants
-    private float ScaleDuration = 5.0f;
+    private float ScaleDuration = 8.0f;
 
     public override void OnAwake()
     {
@@ -177,15 +177,18 @@ public class ChadControls : NetworkComponent
 
     public override void Update()
     {
-        // Toy solider powerup
-        if (ToySoliderAffected)
-        {
-            ScaleClock = ScaleTimerRoutine(ScaleDuration);
-            StartCoroutine(ScaleClock);
-        }
-
         if (isOwner)
         {
+            // Toy solider powerup
+            if (ToySoldierAffected)
+            {
+                if(ScaleClock == null)
+                {
+                    ScaleClock = ScaleTimerRoutine(ScaleDuration);
+                    StartCoroutine(ScaleClock);
+                }
+            }
+
             DivingTimer += Time.DeltaTime;
             JumpingTimer += Time.DeltaTime;
 
@@ -683,16 +686,16 @@ public class ChadControls : NetworkComponent
 
         while (ScaleCountdown > 0)
         {
-            Debug.Log("Scale affector remaining: " + ScaleCountdown);
-            yield return new WaitForSeconds(1.0f);
-            ScaleCountdown--;
+            //Debug.Log("Scale affector remaining: " + ScaleCountdown);
+            yield return new WaitForSeconds(5.0f);
+            ScaleCountdown = 0;
         }
 
         // Set back original scale when timer has expired
-        // TODO: Make this better with a scale up over a short amount of time instead of instant growth
-        gameObject.transform.scale = OriginalScale;
+        gameObject.transform.localScale = OriginalScale;
         ScaleCountdown = ScaleDuration;
-        ToySoliderAffected = false;
+        ToySoldierAffected = false;
+        ScaleClock = null;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
