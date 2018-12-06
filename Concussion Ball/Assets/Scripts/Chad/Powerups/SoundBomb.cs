@@ -3,6 +3,7 @@ using ThomasEngine.Network;
 using System.Collections;
 using System.Linq;
 using System;
+using LiteNetLib.Utils;
 
 public class SoundBomb : Powerup
 {
@@ -20,6 +21,7 @@ public class SoundBomb : Powerup
     private float _JumpTimer;
     private float _DanceDuration;
     private float _Hue;
+    private bool _SpawnedLight;
 
     public override void OnAwake()
     {
@@ -36,8 +38,8 @@ public class SoundBomb : Powerup
         m_rigidBody.Friction = 100.0f;
         _JumpTimer = 0.0f;
         _DanceDuration = 5.0f;
-        _Hue = 0.0f;            
-
+        _Hue = 0.0f;
+        _SpawnedLight = false;
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
         //ExplosionSound.Type = SoundComponent.SoundType.Effect;
         //ExplosionSound.Clip = VindalooExplosionSound;
@@ -155,7 +157,21 @@ public class SoundBomb : Powerup
             else
             {
                 if (PointBoi)
+                {
+                    _SpawnedLight = false;
                     PointBoi.enabled = false;
+                }
+            }
+        }
+        else
+        {
+            if (_SpawnedLight)
+            {
+                PointBoi.enabled = true;
+            }
+            else
+            {
+                PointBoi.enabled = false;
             }
         }
     }
@@ -172,10 +188,13 @@ public class SoundBomb : Powerup
 
         ChadControls colliderPlayer = _FirstCollider.gameObject.GetComponent<ChadControls>();
 
-        if(!colliderPlayer && _JumpTimer == 0 && isOwner)
+        if (!colliderPlayer && _JumpTimer == 0 && isOwner)
         {
             if (PointBoi)
+            {
+                _SpawnedLight = true;
                 PointBoi.enabled = true;
+            }
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
             //PickupCollider.enabled = true; // for testing
@@ -202,7 +221,7 @@ public class SoundBomb : Powerup
         activated = true;
         // boom particles, Gustav do your magic, sprinkla lite magic till boisen
 
-        StartCoroutine(BlastingMusic());   
+        StartCoroutine(BlastingMusic());
     }
 
     private void Explosion()
@@ -254,6 +273,12 @@ public class SoundBomb : Powerup
         }
         localChad.State = ChadControls.STATE.CHADING;
         Explosion();
+
+        if (PointBoi)
+        {
+            _SpawnedLight = false;
+            PointBoi.enabled = false;
+        }
     }
 
 
@@ -313,5 +338,21 @@ public class SoundBomb : Powerup
         if (2.0d * c < 1.0d) return t2;
         if (3.0d * c < 2.0d) return t1 + (t2 - t1) * (2.0d / 3.0d - c) * 6.0d;
         return t1;
+    }
+
+    public override bool OnWrite(NetDataWriter writer, bool initialState)
+    {
+        base.OnWrite(writer, initialState);
+
+        writer.Put(_SpawnedLight);
+
+        return true;
+    }
+
+    public override void OnRead(NetDataReader reader, bool initialState)
+    {
+        base.OnRead(reader, initialState);
+
+        _SpawnedLight = reader.GetBool();
     }
 }
