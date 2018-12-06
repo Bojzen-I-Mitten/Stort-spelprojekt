@@ -35,8 +35,7 @@ namespace ThomasEditor.Inspectors
             {
                 elementType = pi.PropertyType.GetElementType();
                 listCounter.Visibility = Visibility.Hidden;
-            }
-            else
+            }else
             {
                 elementType = pi.PropertyType.GetGenericArguments().Single();
                 listCounter.Visibility = Visibility.Visible;

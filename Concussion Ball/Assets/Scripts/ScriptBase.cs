@@ -7,14 +7,10 @@ using System.ComponentModel;
 using ThomasEngine;
 using ThomasEngine.Script;
 
-
-namespace Concussion_Ball.Assets.Scripts
+public class ScriptBase : ScriptComponent
 {
-    public class ScriptBase
-        : ScriptComponent
-    {
-        //[Browsable(false)]
-        //[Newtonsoft.Json.JsonIgnore]
+    //[Browsable(false)]
+    //[Newtonsoft.Json.JsonIgnore]
 
         public ScriptBase()
             : base()

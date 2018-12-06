@@ -30,7 +30,7 @@ namespace thomas
 				SoundComponent();
 				~SoundComponent() = default;
 
-				void OnDisable() override;
+				void OnDestroy() override;
 				void Play();
 				void Play(resource::AudioClip* clip, float volume, bool looping, bool is3D);
 				void Stop();

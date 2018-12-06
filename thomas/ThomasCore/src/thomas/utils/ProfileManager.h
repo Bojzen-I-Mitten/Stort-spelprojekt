@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <Windows.h>
 #include <chrono>
+#include <atomic>
 #include "..\..\..\include\nlohmann\json.hpp"
-//#define BENCHMARK
+#include "..\utils\atomic\Synchronization.h"
+#define BENCHMARK
 
 
 namespace thomas
@@ -39,9 +41,11 @@ namespace thomas
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
 				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
-				static float s_vramusage;
-				static float s_vrambudget;
+				static std::map<std::string, std::vector<float>> s_vramusage;
+				static float s_vramTotal;
 				static unsigned int s_frames;
+				static std::atomic<unsigned int> s_contextSwitch;
+				static utils::atomics::SpinLock s_profileLock;
 
 			public:
 				static void newFrame();
@@ -49,9 +53,12 @@ namespace thomas
 				static void dumpDataToFile();
 				static void storeSample(std::string functionName, long long elapsedTime, long long startTime, DWORD processor_id);
 				static void storeGpuSample(long long gpuTime);
+				static void storeVramSample(std::string name, float usage);
+				static void increaseContextSwitches();
+
 				static void setRAMUsage(float usage);
 				static float getRAMUsage();
-				static void setVRAMUsage(float usage, float budget);
+				static void setVRAMUsage(float total);
 			private:
 
 

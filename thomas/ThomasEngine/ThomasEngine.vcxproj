@@ -195,6 +195,7 @@
     <ClInclude Include="src\resource\Font.h" />
     <ClInclude Include="src\resource\Model.h" />
     <ClInclude Include="src\resource\Resource.h" />
+    <ClInclude Include="src\resource\texture\RenderTexture.h" />
     <ClInclude Include="src\resource\texture\Texture.h" />
     <ClInclude Include="src\resource\texture\Texture2D.h" />
     <ClInclude Include="src\resource\texture\TextureCube.h" />
@@ -285,6 +286,7 @@
     <ClCompile Include="src\resource\Model.cpp" />
     <ClCompile Include="src\resource\Resource.cpp" />
     <ClCompile Include="src\resource\Resources.cpp" />
+    <ClCompile Include="src\resource\texture\RenderTexture.cpp" />
     <ClCompile Include="src\resource\texture\Texture.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\ScriptingManager.cpp" />
