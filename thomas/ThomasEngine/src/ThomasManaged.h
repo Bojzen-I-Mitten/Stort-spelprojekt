@@ -11,7 +11,7 @@ using namespace System::Threading;
 
 namespace ThomasEngine {
 
-#define _THOMAS_SCENE_LOCK
+//#define _THOMAS_SCENE_LOCK
 
 	enum RunningState
 	{

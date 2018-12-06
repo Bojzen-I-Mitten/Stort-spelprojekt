@@ -12,40 +12,39 @@ public class ScriptBase : ScriptComponent
     //[Browsable(false)]
     //[Newtonsoft.Json.JsonIgnore]
 
-        public ScriptBase()
-            : base()
-        {
-        }
+    public ScriptBase()
+        : base()
+    {
+    }
 
 
-        public override void OnAwake()
-        {
-            base.OnAwake();
-        }
+    public override void OnAwake()
+    {
+        base.OnAwake();
+    }
 
-        public override void OnEnable()
-        {
-            base.OnEnable();
-        }
+    public override void OnEnable()
+    {
+        base.OnEnable();
+    }
 
-        public override void Start()
-        {
-            base.Start();
-        }
+    public override void Start()
+    {
+        base.Start();
+    }
 
-        public override void OnDisable()
-        {
-            base.OnDisable();
-        }
+    public override void OnDisable()
+    {
+        base.OnDisable();
+    }
 
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-        }
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
 
-        public override void Update()
-        {
-            base.Update();
-        }
+    public override void Update()
+    {
+        base.Update();
     }
 }

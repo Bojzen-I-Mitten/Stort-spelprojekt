@@ -19,8 +19,8 @@ namespace Concussion_Ball.Assets.Scripts
         //public string IKResolveBoneName { get; set; }
         //private uint ikBoneIndex;                   // Index for raytraced bone
         private IK_FABRIK_Constraint IK { get; set; }
-        private float ikTargetWeight = 1;
-        private float ikOrientWeight = 1;
+        private float ikTargetWeight = 0;
+        private float ikOrientWeight = 0;
         public float IKBlendFactor { get; set; } = 0.5f;        // Factor determining how fast IK is blended in when activated
         public float MaxDistanceOffset { get; set; } = 0.2f;    // Offset from max chain length IK is blended in
 
@@ -47,6 +47,8 @@ namespace Concussion_Ball.Assets.Scripts
             //else
             //    ikBoneIndex = 0;
             IK.apply(m_rC, m_traceBoneIndex);
+            IK.Weight = ikTargetWeight;
+            IK.OrientationWeight = ikOrientWeight;
         }
 
         public override void Start()

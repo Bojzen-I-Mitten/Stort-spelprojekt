@@ -89,7 +89,7 @@ namespace thomas
 
 		void IdentifyAnimatedNodes(const aiScene* scene, SkeletonConstruct& construct);
 		void FindSkeleton(aiNode * node, SkeletonConstruct &boneMap, aiMatrix4x4 parentTransform);
-		bool ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform);
+		int ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform);
 		void ProcessMesh(aiNode* node, const aiScene* scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap, aiMatrix4x4 parentTransform);
 		void ProcessAnimations(const aiScene* scene, SkeletonConstruct& construct);
 
@@ -98,9 +98,9 @@ namespace thomas
 #pragma region Utility functions
 
 		constexpr float EPSILON = 0.0001f;
-		/* Converts assimp 4x4 matrix to glm::mat4x4
+		/* Converts assimp 4x4 matrix to math lib matrix
 		*/
-		math::Matrix convertAssimpMatrix(aiMatrix4x4 matrix) {
+		math::Matrix convert(aiMatrix4x4 matrix) {
 			math::Matrix m(&matrix.a1);
 			m = m.Transpose();
 			//m[0][0] = matrix.a1; m[0][1] = matrix.a2;  m[0][2] = matrix.c1;  m[0][3] = matrix.d1;
@@ -108,6 +108,24 @@ namespace thomas
 			//m[2][0] = matrix.a3; m[2][1] = matrix.b3;  m[2][2] = matrix.c3;  m[2][3] = matrix.d3;
 			//m[3][0] = matrix.a4; m[3][1] = matrix.b4;  m[3][2] = matrix.c4;  m[3][3] = matrix.d4;
 			return m;
+		}
+		/* Convert assimp vector to math lib vector
+		*/
+		math::Vector3 convert(const aiVector3D & vec)
+		{
+			return math::Vector3(vec.x, vec.y, vec.z);
+		}
+		/* Extract translation part from the matrix (4:th column)
+		*/
+		aiVector3D extractTrans(const aiMatrix4x4& matrix)
+		{
+			return aiVector3D(matrix[0][3], matrix[1][3], matrix[2][3]);
+		}
+		/* Extract up vector from the matrix (2:nd column)
+		*/
+		aiVector3D extractUp(const aiMatrix4x4& matrix)
+		{
+		return aiVector3D(matrix[0][1], matrix[1][1], matrix[2][1]);
 		}
 
 #pragma endregion
@@ -424,7 +442,7 @@ namespace thomas
 					{
 						boneIndex = boneMap.m_mapping[boneName];
 						boneMap.m_invBind[boneIndex] = meshBone->mOffsetMatrix;                        
-						boneMap.m_boneInfo[boneIndex]._invBindPose = convertAssimpMatrix(meshBone->mOffsetMatrix * bakeInv);
+						boneMap.m_boneInfo[boneIndex]._invBindPose = convert(meshBone->mOffsetMatrix * bakeInv);
 
 					}
 
@@ -471,7 +489,7 @@ namespace thomas
 				marked = boneMap.m_rootID.find(boneName) != boneMap.m_rootID.end();
 			
 			if (marked) {
-				boneMap.m_skeletonRoot = convertAssimpMatrix(parentTransform);
+				boneMap.m_skeletonRoot = convert(parentTransform);
 				ProcessSkeleton(node, boneMap, -1, parentTransform);
 			}
 			else {
@@ -489,8 +507,9 @@ namespace thomas
 			}
 			return UINT32_MAX;
 		}
-
-		bool ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform)
+		/* Recursive skeleton parse function. Returns index of child bone, -1 of processing failed
+		*/
+		int ProcessSkeleton(aiNode * node, SkeletonConstruct &boneMap, int parentBone, aiMatrix4x4 parentTransform)
 		{
 			std::string boneName = node->mName.C_Str();
 
@@ -508,12 +527,12 @@ namespace thomas
 			// Process children
 			for (unsigned int i = 0; i < node->mNumChildren; i++)
 			{
-				bool processedChild = ProcessSkeleton(node->mChildren[i], boneMap, BoneIndex, object_space);
-				if (boneMap.m_Commands.m_IgnoreLeafChains && processedChild)
+				int childIndex = ProcessSkeleton(node->mChildren[i], boneMap, BoneIndex, object_space);
+				if (boneMap.m_Commands.m_IgnoreLeafChains && childIndex >= 0)
 					process |= bool(itr->second.NumChannel);
 			}
 			
-			if (!process) return false;
+			if (!process) return -1;
 
 			// Process Skeleton
 
@@ -528,7 +547,8 @@ namespace thomas
 			else {					// Root bone (no parent)
 				boneMap.m_relativeParent.push_back(parentTransform);
 			}
-			bi._bindPose = convertAssimpMatrix(nodeTransform);
+			bi._bindPose = convert(nodeTransform);
+			bi._invParentOrient = math::Matrix::Identity;
 
 			// Store absolute transform
 			boneMap.m_absoluteBind.push_back(object_space);
@@ -543,7 +563,20 @@ namespace thomas
 
 			boneMap.m_boneInfo[BoneIndex] = bi;
 			boneMap.m_mapping[boneName] = BoneIndex;
-			return marked;
+
+			/* Find parent offset
+			*/
+			if(parentBone>= 0){
+				aiVector3D toChild = extractTrans(object_space) - extractTrans(parentTransform);
+				toChild.Normalize();
+				aiVector3D boneUp = extractUp(parentTransform);
+				boneUp.Normalize();
+				// Find rotation from parent forward, to child bone (if there is an angle difference)
+				if(toChild * boneUp < 1.f - math::EPSILON)
+					boneMap.m_boneInfo[BoneIndex]._invParentOrient = math::getMatrixRotationTo(convert(toChild), convert(boneUp));;
+			}
+			// Return index of processed bone
+			return BoneIndex;
 		}
 
 		void ProcessMesh(aiNode * node, const aiScene * scene, resource::Model::ModelData& modelData, SkeletonConstruct &boneMap, aiMatrix4x4 parentTransform)

@@ -192,7 +192,8 @@ namespace thomas {
 					pose = objectPose[(chain+i)->m_index];
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
-					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate
+					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate bone Y toward child's point
+					pose = pose * skel.getBone((chain + i + 1)->m_index)._invParentOrient;		// Apply orientation offset in relation to child (Y axis of the bone may not face child)
 					pose.Translation(p[i]);														// Apply new translation
 					objectPose[(chain+i)->m_index] = pose;										// Set
 				}
@@ -201,10 +202,10 @@ namespace thomas {
 				math::Vector3 right = math::Vector3::Transform(math::Vector3::Right, targetO);
 				pose = objectPose[(chain + m_num_link - 1)->m_index];
 				trans = pose.Translation();
-				pose.Translation(math::Vector3::Zero);								// Remove translation
-				pose = pose * math::getMatrixRotationTo(pose.Up(), up);				// Rotate transform to y
-				pose = pose * math::getMatrixRotationTo(pose.Right(), right);		// Rotate transform to x
-				pose.Translation(p[m_num_link - 1]);								// Apply new translation
+				pose.Translation(math::Vector3::Zero);											// Remove translation
+				pose = pose * math::getMatrixRotationTo(pose.Up(), up);							// Rotate transform to y
+				pose = pose * math::getMatrixRotationTo(pose.Right(), right);					// Rotate transform to x
+				pose.Translation(p[m_num_link - 1]);											// Apply new translation
 				objectPose[(chain + m_num_link - 1)->m_index] = pose;
 
 				const float GIZMO_LEN = 0.05f;
