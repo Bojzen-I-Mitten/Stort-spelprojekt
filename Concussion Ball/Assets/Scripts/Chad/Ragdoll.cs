@@ -39,6 +39,7 @@ public class Ragdoll : ScriptComponent
     public AudioClip ImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
+
     /* Struct determining ragdol force parameters
     */
     public class ImpactParams : RPCWriteable
@@ -319,6 +320,7 @@ public class Ragdoll : ScriptComponent
             G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
 
         }
+
         //J_BodyParts[(int)BODYPART.HEAD].Damping = 50.0f;
 
         Vector3 center;
@@ -765,13 +767,13 @@ public class Ragdoll : ScriptComponent
     public void DisableRagdoll()
     {
 
-        foreach(GameObject gObj in G_BodyParts)
+        foreach (GameObject gObj in G_BodyParts)
         {
             if(gObj != null)
                 gObj.SetActive(false);
         }
         RagdollEnabled = false;
-
+        
     }
     
 

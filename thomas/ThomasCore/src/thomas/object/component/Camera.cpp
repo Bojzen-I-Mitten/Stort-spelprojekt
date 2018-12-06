@@ -35,8 +35,8 @@ namespace thomas
 				//m_GUIHandle(std::make_unique<graphics::GUIManager>())
 			{
 				m_fov = 70.f;
-				m_near = 0.5;
-				m_far = 10000.f;
+				m_near = 0.1;
+				m_far = 300.f;
 				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
 				m_targetDisplay = target_display;

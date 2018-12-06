@@ -41,7 +41,7 @@ namespace ThomasEditor
                         {
                             
                             Texture2D tex = res as Texture2D;
-                            
+                            return AssetBrowser.assetImages[type].UriSource.LocalPath;
                             BitmapSource bitmapSource = null;
                             if (!bitmapCache.TryGetValue(tex, out bitmapSource))
                             {
