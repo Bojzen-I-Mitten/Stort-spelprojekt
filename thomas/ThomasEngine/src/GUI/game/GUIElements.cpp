@@ -60,15 +60,17 @@ namespace ThomasEngine
 
 	}
 
-	void Text::outline::set(bool outline)
-	{
-		((thomas::graphics::GUI::Text*)nativePtr)->outline = outline;
-	}
+	void Text::outline::set(bool outline) { ((thomas::graphics::GUI::Text*)nativePtr)->outline = outline; }
 
-	void Text::renderable::set(bool renderable)
-	{
-		((thomas::graphics::GUI::Text*)nativePtr)->renderable = renderable;
-	}
+	bool Text::outline::get() { return ((thomas::graphics::GUI::Text*)nativePtr)->outline; }
+
+	void Text::outlineColor::set(Color outlineColor) { ((thomas::graphics::GUI::Text*)nativePtr)->outlineColor = Utility::Convert(outlineColor); }
+
+	Color Text::outlineColor::get() { return Color(Utility::Convert(((thomas::graphics::GUI::Text*)nativePtr)->outlineColor)); }
+
+	void Text::renderable::set(bool renderable) { ((thomas::graphics::GUI::Text*)nativePtr)->renderable = renderable; }
+
+	bool Text::renderable::get() { return ((thomas::graphics::GUI::Text*)nativePtr)->renderable; }
 
 	Image::Image(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
 
