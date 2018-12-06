@@ -653,7 +653,7 @@ public class ChadControls : NetworkComponent
             yield return new WaitForSeconds(0.01f);
         }
 
-        PowerupPickupText.renderable = false;
+        PowerupPickupText.rendering = false;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -756,10 +756,10 @@ public class ChadControls : NetworkComponent
         Color pickupColor = powerupText.color;
         pickupColor.a = 255;
         powerupText.color = pickupColor;
-        powerupText.renderable = true;
+        powerupText.rendering = true;
     }
-
     #endregion
+
     public override void OnRead(NetDataReader reader, bool initialState)
     {
         if (isOwner)

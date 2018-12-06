@@ -15,17 +15,12 @@ public class GUIScoreScreen : ScriptComponent
     List<Text> Textdatalist = new List<Text>();
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
-    public Font Font { get; set; }
     public bool ToggleBool = true;
-    public override void OnAwake()
-    {
 
-    }
     public override void Start()
     {
-       
-            Instance = this;
-      
+        Instance = this;
+
         ToggleBool = true;
 
         Timedisplay = ScoreScreenTimeLast + 1;
@@ -34,9 +29,8 @@ public class GUIScoreScreen : ScriptComponent
         Textdatalist.Add(Canvas.Add("Lobby"));
         Textdatalist.Add(Canvas.Add("Play again"));
         Textdatalist.Add(Canvas.Add("Main Menu"));
-        for(int i = 0;i<Textdatalist.Count;i++)
+        for (int i = 0; i < Textdatalist.Count; i++)
         {
-            Textdatalist[i].font = Font;
             Textdatalist[i].scale = Vector2.Zero;
             Textdatalist[i].interactable = true;
             Textdatalist[i].depth = 0.9f;
@@ -47,11 +41,12 @@ public class GUIScoreScreen : ScriptComponent
 
         //        Lobby.position = new Vector2(0.2f, 0.04f);
     }
+
     public override void Update()
     {
         foreach (Text Textdata in Textdatalist)
-        { 
-                if (Textdata.Hovered())
+        {
+            if (Textdata.Hovered())
             {
                 Textdata.color = Selected;
             }
@@ -74,7 +69,7 @@ public class GUIScoreScreen : ScriptComponent
         }
         if (Textdatalist[2].Clicked()) // Main Menu
         {
-           
+
             if (ThomasWrapper.IsPlaying())
             {
                 Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
@@ -86,9 +81,10 @@ public class GUIScoreScreen : ScriptComponent
 
 
     }
+
     public void updateTextPlayAgain()
     {
-        
+
         Textdatalist[1].text = "Play again: " + (Timedisplay -= 1);
     }
 
@@ -97,12 +93,13 @@ public class GUIScoreScreen : ScriptComponent
     {
 
     }
-   public void Toggle(bool OnOff)
+
+    public void Toggle(bool OnOff)
     {
         ToggleBool = OnOff;
-        GUIPlayerScore.Instance.lastupdate();
+        //GUIPlayerScore.Instance.LastUpdate();
         if (!OnOff)
-        { 
+        {
             GUIPlayerScore.Instance.Toggle = false;
             for (int i = 0; i < Textdatalist.Count; i++)
                 Textdatalist[i].scale = new Vector2(1.5f);
@@ -112,16 +109,11 @@ public class GUIScoreScreen : ScriptComponent
         {
             foreach (Text Textdata in Textdatalist)
                 Textdata.scale = Vector2.Zero;
-            Timedisplay = ScoreScreenTimeLast+1;
+            Timedisplay = ScoreScreenTimeLast + 1;
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
-
-        
-  
-        
-        
-
     }
+
     public bool getToggleBool()
     {
         return ToggleBool;
