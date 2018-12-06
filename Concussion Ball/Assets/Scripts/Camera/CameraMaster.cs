@@ -16,6 +16,7 @@ public class CameraMaster : ScriptComponent
 {
     public GameObject ChadTeam1 { get; set; }
     public GameObject ChadTeam2 { get; set; }
+    public GameObject ChadPreviewArea { get; set; }
 
     public static CameraMaster instance;
 
@@ -117,6 +118,9 @@ public class CameraMaster : ScriptComponent
         HostMenu.Canvas.isRendering = false;
         LoadingScreen.Canvas.isRendering = false;
 
+        if (ChadPreviewArea != null)
+            ChadPreviewArea?.SetActive(true);
+
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
@@ -134,7 +138,9 @@ public class CameraMaster : ScriptComponent
                 break;
             case CAM_STATE.GAME:
                 Hud.Canvas.isRendering = true;
-                if(Input.GetKeyDown(Input.Keys.Escape))
+                if(ChadPreviewArea != null)
+                    ChadPreviewArea?.SetActive(false);
+                if (Input.GetKeyDown(Input.Keys.Escape))
                 {
                     State = CAM_STATE.EXIT_MENU;
                     Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
@@ -142,6 +148,8 @@ public class CameraMaster : ScriptComponent
                 break;
             case CAM_STATE.EXIT_MENU:
                 ExitMenu.Canvas.isRendering = true;
+                if (ChadPreviewArea != null)
+                    ChadPreviewArea?.SetActive(false);
                 if (Input.GetKeyDown(Input.Keys.Escape))
                 {
                     State = CAM_STATE.GAME;
