@@ -328,6 +328,9 @@ namespace thomas
 
 			void Camera::RenderGUI()
 			{
+				//Wait for logic thread
+
+				//Render GUI
 				for (int i = 0; i < m_canvases.size(); ++i)
 				{
 					m_canvases[i]->Render();

@@ -45,7 +45,7 @@ namespace thomas
 					rotation = 0;
 					interactable = false;
 					outline = false;
-					renderable = true;
+					rendering = true;
 					depth = 0;
 					effect = DirectX::SpriteEffects::SpriteEffects_None;
 				}
@@ -58,7 +58,7 @@ namespace thomas
 				float rotation;
 				bool interactable;
 				bool outline;
-				bool renderable;
+				bool rendering;
 				float depth;
 				Canvas* canvas;
 				DirectX::SpriteEffects effect;
@@ -113,7 +113,7 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					if (renderable)
+					if (rendering)
 					{
 						if (outline)
 						{
@@ -145,7 +145,8 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
+					if(rendering)
+						sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
 				}
 
 				Vector2 PixelSize()
