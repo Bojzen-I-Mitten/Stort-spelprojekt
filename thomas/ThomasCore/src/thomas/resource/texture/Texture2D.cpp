@@ -45,10 +45,16 @@ namespace thomas
 			if (bindDepth)
 			{
 				utils::D3D::Instance()->CreateDepthStencilTexture(width, height, textureInterface, m_srv);
+
+				static const char c_szName[] = "Stencil";
+				textureInterface->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
 			}
 			else
 			{
 				utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+
+				static const char c_szName[] = "Texture";
+				textureInterface->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
 			}
 
 			m_resource = textureInterface;

@@ -110,6 +110,10 @@ namespace thomas
 				TexInitData.SysMemSlicePitch = static_cast<UINT>(4 * width * height);
 
 				hr = m_device->CreateTexture2D(&textureDesc, &TexInitData, &tex);
+#ifdef _DEBUG
+				static const char c_szName[] = "Texture2D";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 			else
 				hr = m_device->CreateTexture2D(&textureDesc, NULL, &tex);
@@ -172,6 +176,10 @@ namespace thomas
 					LOG_HR(hr);
 					return false;
 				}
+#ifdef _DEBUG
+				static const char c_szName[] = "TextureRender ";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 
 			return true;
@@ -238,7 +246,10 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
-
+#ifdef _DEBUG
+			static const char c_szName[] = "TextureArray";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			return true;
 		}
 
@@ -297,6 +308,11 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
+
+#ifdef _DEBUG
+			static const char c_szName[] = "CubeMap";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 
 			return true;
 		}
@@ -391,6 +407,8 @@ namespace thomas
 				if (FAILED(hr))
 					LOG_HR(hr);
 			}
+
+			m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&m_debug);
 		}
 
 		bool D3D::CreateDxgiInterface()
@@ -491,6 +509,9 @@ namespace thomas
 			m_deviceContextImmediate->ClearState();
 			m_deviceContextImmediate->Flush();
 
+			m_deviceContextDeferred->ClearState();
+			m_deviceContextDeferred->Flush();
+
 			m_multiThreaded->SetMultithreadProtected(false);
 
 			SAFE_RELEASE(m_dxgiAdapter);
@@ -501,10 +522,14 @@ namespace thomas
 			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_device);
 
+			if (m_debug)
+				m_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+
 			if (m_dxgiDebug)
 				m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
 
 			SAFE_RELEASE(m_dxgiDebug);
+			SAFE_RELEASE(m_debug);
 		}
 
 		bool D3D::CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, 
