@@ -4,6 +4,7 @@
 #include "../Window.h"
 #include "../ThomasCore.h"
 #include "GpuProfiler.h"
+#include "ProfileManager.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
 
@@ -376,7 +377,12 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), &m_device, D3D11_SDK_VERSION, &fl);
+
+#ifdef BENCHMARK
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl);
+#else
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
+#endif
 
 			if (!CreateDeviceContext())
 				return false;
@@ -407,8 +413,6 @@ namespace thomas
 				if (FAILED(hr))
 					LOG_HR(hr);
 			}
-
-			m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&m_debug);
 		}
 
 		bool D3D::CreateDxgiInterface()
@@ -509,9 +513,6 @@ namespace thomas
 			m_deviceContextImmediate->ClearState();
 			m_deviceContextImmediate->Flush();
 
-			m_deviceContextDeferred->ClearState();
-			m_deviceContextDeferred->Flush();
-
 			m_multiThreaded->SetMultithreadProtected(false);
 
 			SAFE_RELEASE(m_dxgiAdapter);
@@ -522,14 +523,10 @@ namespace thomas
 			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_device);
 
-			if (m_debug)
-				m_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-
 			if (m_dxgiDebug)
 				m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
 
 			SAFE_RELEASE(m_dxgiDebug);
-			SAFE_RELEASE(m_debug);
 		}
 
 		bool D3D::CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, 

@@ -79,7 +79,6 @@ namespace thomas
 			ID3D11Multithread* m_multiThreaded;
 
 			IDXGIDebug* m_dxgiDebug;
-			ID3D11Debug* m_debug;
 			IDXGIDevice1* m_dxgiDevice;
 			IDXGIAdapter3* m_dxgiAdapter;
 		};
