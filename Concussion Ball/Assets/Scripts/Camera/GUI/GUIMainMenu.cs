@@ -29,7 +29,6 @@ public class GUIMainMenu : ScriptComponent
     IEnumerator Blink = null;
 
     private bool TakeName;
-    public static string PlayerString = "CHAD";
 
     public float CaretOffset { get; set; } = -0.015f;
 
@@ -47,6 +46,9 @@ public class GUIMainMenu : ScriptComponent
 
     public override void Start()
     {
+
+        
+
         Camera = gameObject.GetComponent<Camera>();
         TakeName = false;
         AddImagesAndText();
@@ -83,7 +85,7 @@ public class GUIMainMenu : ScriptComponent
             }
             if (ClearName)
             {
-                PlayerString = "";
+                PlayerName.text = "";
                 ClearName = false;
             }
         }
@@ -98,15 +100,19 @@ public class GUIMainMenu : ScriptComponent
             Caret.text = "";
         }
 
-        if (Play.Clicked() && PlayerString != "")
+        if (Play.Clicked() && PlayerName.text != "")
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
+            UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
+            UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
         }
         else if (HostGame.Clicked())
         {
             CameraMaster.instance.State = CAM_STATE.HOST_MENU;
             TakeName = false;
+            UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
+            UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
         }
         else if (Exit.Clicked())
         {
@@ -120,15 +126,20 @@ public class GUIMainMenu : ScriptComponent
         {
             CameraMaster.instance.SelectedHat -= 1;
         }
-
-        PlayerString = PlayerString.ToUpper();
-        PlayerName.text = PlayerString;
-
+       
         if (TakeName)
         {
-            GUIInput.AppendString(ref PlayerString, 9);
+            string playerString = PlayerName.text;
+            GUIInput.AppendString(ref playerString, 9);
+            PlayerName.text = playerString;
         }
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
+    }
+
+
+    public string GetPlayerName()
+    {
+        return PlayerName != null ? PlayerName.text : "Chad";
     }
 
     public void AddImagesAndText()
@@ -172,7 +183,12 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Player name
-        PlayerName = Canvas.Add(PlayerString);
+
+        string playerString =  UserSettings.GetSetting("PlayerName");
+        if (playerString == null)
+            playerString = "CHAD";
+
+        PlayerName = Canvas.Add(playerString);
         PlayerName.origin = new Vector2(0.5f);
         PlayerName.position = new Vector2(0.55f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
