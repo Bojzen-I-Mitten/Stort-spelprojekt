@@ -50,4 +50,9 @@ public class Hatter : ScriptComponent
 
 #endif
     }
+
+    public int GetHatCount()
+    {
+        return HatManager.Instance.Hats.Count;
+    }
 }

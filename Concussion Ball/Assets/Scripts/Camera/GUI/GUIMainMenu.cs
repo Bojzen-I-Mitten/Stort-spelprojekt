@@ -8,6 +8,7 @@ public class GUIMainMenu : ScriptComponent
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
     public Texture2D MyNameTexture { get; set; }
+    public Texture2D ArrowTexture { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
@@ -15,6 +16,8 @@ public class GUIMainMenu : ScriptComponent
     public Canvas Canvas;
 
     Image MyNameSticker;
+    Image SelectHatRight;
+    Image SelectHatLeft;
     Text Play;
     Text HostGame;
     Text Options;
@@ -109,6 +112,14 @@ public class GUIMainMenu : ScriptComponent
         {
             ThomasWrapper.IssueShutdown();
         }
+        else if (SelectHatRight.Clicked())
+        {
+            CameraMaster.instance.SelectedHat += 1;
+        }
+        else if (SelectHatLeft.Clicked())
+        {
+            CameraMaster.instance.SelectedHat -= 1;
+        }
 
         PlayerString = PlayerString.ToUpper();
         PlayerName.text = PlayerString;
@@ -117,12 +128,9 @@ public class GUIMainMenu : ScriptComponent
         {
             GUIInput.AppendString(ref PlayerString, 9);
         }
-
-        
-
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
-
     }
+
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
@@ -166,7 +174,7 @@ public class GUIMainMenu : ScriptComponent
         #region Player name
         PlayerName = Canvas.Add(PlayerString);
         PlayerName.origin = new Vector2(0.5f);
-        PlayerName.position = new Vector2(0.59f, 0.17f);
+        PlayerName.position = new Vector2(0.55f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
@@ -184,21 +192,40 @@ public class GUIMainMenu : ScriptComponent
         Caret.color = Color.Black;
         Caret.font = TextFont;
         #endregion
-
         #endregion
 
         #region Images
-
+        #region NameSticker
         if (MyNameTexture != null)
         {
             MyNameSticker = Canvas.Add(MyNameTexture);
             MyNameSticker.origin = new Vector2(0.5f);
-            MyNameSticker.position = new Vector2(0.6f, 0.14f);
+            MyNameSticker.position = new Vector2(0.55f, 0.14f);
             MyNameSticker.scale = new Vector2(0.5f);
             MyNameSticker.interactable = true;
             MyNameSticker.depth = 0.9f;
         }
+        #endregion
 
+        #region Arrows
+        if (ArrowTexture != null)
+        {
+            SelectHatRight = Canvas.Add(ArrowTexture);
+            SelectHatRight.origin = new Vector2(0.5f);
+            SelectHatRight.scale = new Vector2(0.25f);
+            SelectHatRight.position = new Vector2(0.85f, 0.25f);
+            SelectHatRight.interactable = true;
+            SelectHatRight.depth = 0.9f;
+
+            SelectHatLeft = Canvas.Add(ArrowTexture);
+            SelectHatLeft.origin = new Vector2(0.5f);
+            SelectHatLeft.scale = new Vector2(0.25f);
+            SelectHatLeft.position = new Vector2(0.68f, 0.25f);
+            SelectHatLeft.rotation = (float)Math.PI;
+            SelectHatLeft.interactable = true;
+            SelectHatLeft.depth = 0.9f;
+        }
+        #endregion
         #endregion
     }
 
@@ -218,6 +245,8 @@ public class GUIMainMenu : ScriptComponent
         Canvas.Remove(Exit);
         Canvas.Remove(PlayerName);
         Canvas.Remove(Caret);
+        Canvas.Remove(SelectHatRight);
+        Canvas.Remove(SelectHatLeft);
     }
 
     IEnumerator CaretBlink()

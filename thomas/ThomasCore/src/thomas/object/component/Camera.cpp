@@ -21,7 +21,10 @@ namespace thomas
 		{
 			void Camera::UpdateProjMatrix()
 			{
-				m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), GetViewport().AspectRatio(), m_near, m_far);
+				if(m_orthographic)
+					m_projMatrix = math::Matrix::CreateOrthographic(m_fixedAspect ? 1.0f : GetViewport().width, m_fixedAspect ? 1.0f : GetViewport().height, m_near, m_far);
+				else
+					m_projMatrix = math::Matrix::CreatePerspectiveFieldOfView(math::DegreesToRadians(m_fov), m_fixedAspect ? 1.0f : GetViewport().AspectRatio(), m_near, m_far);
 				m_frustrum = math::CreateFrustrumFromMatrixRH(m_projMatrix);
 			}
 
@@ -40,6 +43,8 @@ namespace thomas
 				m_skybox = std::make_unique<graphics::SkyBox>();
 				m_viewport = math::Viewport(0, 0, 1, 1);
 				m_targetDisplay = target_display;
+				m_orthographic = false;
+				m_fixedAspect = false;
 				UpdateProjMatrix();
 			}
 
@@ -206,7 +211,7 @@ namespace thomas
 				//graphics::Renderer::Instance()->SubmitCamera(this);
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
-					if(renderComponent->m_gameObject->GetActive())
+					if(renderComponent->m_gameObject->GetActive() && (m_orthographic || GetFrustrum().Contains(renderComponent->m_bounds)))
 						renderComponent->SubmitToRenderer(this);
 				}
 			}
@@ -370,6 +375,25 @@ namespace thomas
 			resource::RenderTexture * Camera::GetRenderTexture()
 			{
 				return m_renderTexture;
+			}
+			void Camera::SetOrtographic(bool value)
+			{
+				m_orthographic = value;
+				UpdateProjMatrix();
+			}
+			bool Camera::GetOrthographic()
+			{
+				return m_orthographic;
+			}
+
+			void Camera::SetFixedAspect(bool value)
+			{
+				m_fixedAspect = value;
+				UpdateProjMatrix();
+			}
+			bool Camera::GetFixedAspect()
+			{
+				return m_fixedAspect;
 			}
 		}
 	}

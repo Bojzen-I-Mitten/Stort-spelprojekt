@@ -102,7 +102,8 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<SpectatorCam>().enabled = true;
+                gameObject.GetComponent<ChadCam>().enabled = true;
+                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
             }
         }
         else if (Team2Image.Clicked())
@@ -115,7 +116,8 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<SpectatorCam>().enabled = true;
+                gameObject.GetComponent<ChadCam>().enabled = true;
+                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
             }
         }
         else if (SpectatorImage.Clicked())
@@ -150,6 +152,7 @@ public class GUISelectTeam : ScriptComponent
             CameraMaster.instance.Canvas.isRendering = false;
             MatchSystem.instance.OnMatchStart();
             gameObject.GetComponent<SpectatorCam>().enabled = true;
+            MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
         }
 
         Team1Text.color = Unselected;

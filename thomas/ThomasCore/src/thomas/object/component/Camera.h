@@ -85,6 +85,12 @@ namespace thomas
 				void SetRenderTexture(resource::RenderTexture* texture);
 				resource::RenderTexture* GetRenderTexture();
 
+				void SetOrtographic(bool value);
+				bool GetOrthographic();
+
+				void SetFixedAspect(bool value);
+				bool GetFixedAspect();
+
 			private:
 				uint32_t m_ID;
 				graphics::render::CAMERA_FRAME_DATA m_frameData;
@@ -92,6 +98,8 @@ namespace thomas
 				float m_fov;
 				float m_near;
 				float m_far;
+				bool m_orthographic;
+				bool m_fixedAspect;
 				int m_targetDisplay;
 				bool m_renderGUI;
 				math::Viewport m_viewport;

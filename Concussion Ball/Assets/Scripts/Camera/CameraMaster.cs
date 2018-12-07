@@ -14,6 +14,7 @@ public enum CAM_STATE
 
 public class CameraMaster : ScriptComponent
 {
+    public GameObject ChadMainMenu { get; set; }
     public GameObject ChadTeam1 { get; set; }
     public GameObject ChadTeam2 { get; set; }
 
@@ -33,8 +34,10 @@ public class CameraMaster : ScriptComponent
     public Canvas Canvas;
     public CAM_STATE State;
 
-    
-    
+    public int SelectedHat;
+    Hatter ChadMMHat = null;
+    Hatter ChadT1Hat = null;
+    Hatter ChadT2Hat = null;
 
     public override void OnAwake()
     {
@@ -60,8 +63,8 @@ public class CameraMaster : ScriptComponent
     public override void Start()
     {
         State = CAM_STATE.MAIN_MENU;
-        
 
+        #region Init GUI
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
 
@@ -102,7 +105,26 @@ public class CameraMaster : ScriptComponent
         Hud = gameObject.GetComponent<ChadHud>();
         if (Hud == null)
             Debug.Log("Camera Master could not find Hud");
+        #endregion
 
+        #region Chad Hats
+        SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count-2)) + 1;
+        if (ChadMainMenu != null)
+        {
+            ChadMMHat = ChadMainMenu.GetComponent<Hatter>();
+            ChadMMHat.SetHat(SelectedHat);
+        }
+        if (ChadTeam1 != null)
+        {
+            ChadT1Hat = ChadTeam1.GetComponent<Hatter>();
+            ChadT1Hat.SetHat(SelectedHat);
+        }
+        if (ChadTeam1 != null)
+        {
+            ChadT2Hat = ChadTeam2.GetComponent<Hatter>();
+            ChadT2Hat.SetHat(SelectedHat);
+        }
+        #endregion
 
     }
 
@@ -156,5 +178,16 @@ public class CameraMaster : ScriptComponent
                 LoadingScreen.Canvas.isRendering = true;
                 break;
         }
+        UpdateHats();
+    }
+
+    void UpdateHats()
+    {
+        SelectedHat = SelectedHat == -1 ? ChadMMHat.GetHatCount()-1 : SelectedHat;
+        SelectedHat %= ChadMMHat.GetHatCount();
+
+        ChadMMHat.SetHat(SelectedHat);
+        ChadT1Hat.SetHat(SelectedHat);
+        ChadT2Hat.SetHat(SelectedHat);
     }
 }
