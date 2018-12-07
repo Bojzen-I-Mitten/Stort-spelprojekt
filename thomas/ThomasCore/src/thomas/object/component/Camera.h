@@ -23,7 +23,7 @@ namespace thomas
 			public:
 				Camera();
 				Camera(int target_display);
-				~Camera();
+				virtual ~Camera();
 
 				void OnEnable() override;
 				void OnDisable() override;
