@@ -164,18 +164,17 @@ public class GUIMainMenu : ScriptComponent
             GUIInput.AppendString(ref playerString, 9);
             PlayerName.text = playerString;
         }
-
-
-
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
         RotateChad();
-    }
-
-        
 
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
-        PlayerString = PlayerName.text;
     }
+
+
+    public string GetPlayerName()
+    {
+        return PlayerName.text;
+    }
+
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
