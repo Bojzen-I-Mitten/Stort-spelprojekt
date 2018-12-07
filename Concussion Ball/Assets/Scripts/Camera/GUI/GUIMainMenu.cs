@@ -38,6 +38,7 @@ public class GUIMainMenu : ScriptComponent
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
     Vector3 MainMenuCamPos;
+    Vector3 MainMenuAspectRation;
     Vector3 MainMenuCamRot;
 
     public override void OnAwake()
@@ -51,6 +52,7 @@ public class GUIMainMenu : ScriptComponent
         TakeName = false;
         AddImagesAndText();
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
+        MainMenuAspectRation = new Vector3(16, 9, 1);
         MainMenuCamRot = Vector3.Zero;
     }
 
@@ -232,8 +234,10 @@ public class GUIMainMenu : ScriptComponent
     public void SetUpScene()
     {
         transform.position = MainMenuCamPos;
+        transform.scale = MainMenuAspectRation;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
-
+        //MatchSystem.instance.Camera.fixedAspectRatio = true;
+        //MatchSystem.instance.Camera.orthographic = true;
     }
 
     public void ClearImagesAndText()
