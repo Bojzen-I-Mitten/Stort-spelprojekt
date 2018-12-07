@@ -13,7 +13,7 @@ namespace thomas
 
 		public:
 			virtual ~Object();
-			void Destroy();
+			void Destroy();	// Rename this...
 			std::string GetName();
 			void SetName(std::string name);
 

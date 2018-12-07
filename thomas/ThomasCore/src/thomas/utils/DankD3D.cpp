@@ -58,217 +58,163 @@ namespace thomas
 		HRESULT __stdcall DankDevice::CreateBuffer(const D3D11_BUFFER_DESC * pDesc, const D3D11_SUBRESOURCE_DATA * pInitialData, ID3D11Buffer ** ppBuffer)
 		{
 			HRESULT hr = m_device->CreateBuffer(pDesc, pInitialData, ppBuffer);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Buffer", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif // BENCHMARK
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateTexture1D(const D3D11_TEXTURE1D_DESC * pDesc, const D3D11_SUBRESOURCE_DATA * pInitialData, ID3D11Texture1D ** ppTexture1D)
 		{
 			HRESULT hr = m_device->CreateTexture1D(pDesc, pInitialData, ppTexture1D);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Texture1D", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateTexture2D(const D3D11_TEXTURE2D_DESC * pDesc, const D3D11_SUBRESOURCE_DATA * pInitialData, ID3D11Texture2D ** ppTexture2D)
 		{
 			HRESULT hr = m_device->CreateTexture2D(pDesc, pInitialData, ppTexture2D);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Texture2D", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateTexture2D(std::string name, const D3D11_TEXTURE2D_DESC * pDesc, const D3D11_SUBRESOURCE_DATA * pInitialData, ID3D11Texture2D ** ppTexture2D)
 		{
 			HRESULT hr = m_device->CreateTexture2D(pDesc, pInitialData, ppTexture2D);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample(name, profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateTexture3D(const D3D11_TEXTURE3D_DESC * pDesc, const D3D11_SUBRESOURCE_DATA * pInitialData, ID3D11Texture3D ** ppTexture3D)
 		{
 			HRESULT hr = m_device->CreateTexture3D(pDesc, pInitialData, ppTexture3D);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Texture3D", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateShaderResourceView(ID3D11Resource * pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC * pDesc, ID3D11ShaderResourceView ** ppSRView)
 		{
 			HRESULT hr = m_device->CreateShaderResourceView(pResource, pDesc, ppSRView);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("SRV", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateShaderResourceView(std::string name, ID3D11Resource * pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC * pDesc, ID3D11ShaderResourceView ** ppSRView)
 		{
 			HRESULT hr = m_device->CreateShaderResourceView(pResource, pDesc, ppSRView);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample(name, profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateUnorderedAccessView(ID3D11Resource * pResource, const D3D11_UNORDERED_ACCESS_VIEW_DESC * pDesc, ID3D11UnorderedAccessView ** ppUAView)
 		{
 			HRESULT hr = m_device->CreateUnorderedAccessView(pResource, pDesc, ppUAView);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("UAV", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateRenderTargetView(ID3D11Resource * pResource, const D3D11_RENDER_TARGET_VIEW_DESC * pDesc, ID3D11RenderTargetView ** ppRTView)
 		{
 			HRESULT hr = m_device->CreateRenderTargetView(pResource, pDesc, ppRTView);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("RTV", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateRenderTargetView(std::string name, ID3D11Resource * pResource, const D3D11_RENDER_TARGET_VIEW_DESC * pDesc, ID3D11RenderTargetView ** ppRTView)
 		{
 			HRESULT hr = m_device->CreateRenderTargetView(pResource, pDesc, ppRTView);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample(name, profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateDepthStencilView(ID3D11Resource * pResource, const D3D11_DEPTH_STENCIL_VIEW_DESC * pDesc, ID3D11DepthStencilView ** ppDepthStencilView)
 		{
 			HRESULT hr = m_device->CreateDepthStencilView(pResource, pDesc, ppDepthStencilView);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("DSV", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateInputLayout(const D3D11_INPUT_ELEMENT_DESC * pInputElementDescs, UINT NumElements, const void * pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength, ID3D11InputLayout ** ppInputLayout)
 		{
 			HRESULT hr = m_device->CreateInputLayout(pInputElementDescs, NumElements, pShaderBytecodeWithInputSignature, BytecodeLength, ppInputLayout);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("InputLayout", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateVertexShader(const void * pShaderBytecode, SIZE_T BytecodeLength, ID3D11ClassLinkage * pClassLinkage, ID3D11VertexShader ** ppVertexShader)
 		{
 			HRESULT hr = m_device->CreateVertexShader(pShaderBytecode, BytecodeLength, pClassLinkage, ppVertexShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("VS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateGeometryShader(const void * pShaderBytecode, SIZE_T BytecodeLength, ID3D11ClassLinkage * pClassLinkage, ID3D11GeometryShader ** ppGeometryShader)
 		{
 			HRESULT hr = m_device->CreateGeometryShader(pShaderBytecode, BytecodeLength, pClassLinkage, ppGeometryShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("GS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateGeometryShaderWithStreamOutput(const void * pShaderBytecode, SIZE_T BytecodeLength, const D3D11_SO_DECLARATION_ENTRY * pSODeclaration, UINT NumEntries, const UINT * pBufferStrides, UINT NumStrides, UINT RasterizedStream, ID3D11ClassLinkage * pClassLinkage, ID3D11GeometryShader ** ppGeometryShader)
 		{
 			HRESULT hr = m_device->CreateGeometryShaderWithStreamOutput(pShaderBytecode, BytecodeLength, pSODeclaration, NumEntries, pBufferStrides, NumStrides, RasterizedStream, pClassLinkage, ppGeometryShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("GS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreatePixelShader(const void * pShaderBytecode, SIZE_T BytecodeLength, ID3D11ClassLinkage * pClassLinkage, ID3D11PixelShader ** ppPixelShader)
 		{
 			HRESULT hr = m_device->CreatePixelShader(pShaderBytecode, BytecodeLength, pClassLinkage, ppPixelShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("PS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateHullShader(const void * pShaderBytecode, SIZE_T BytecodeLength, ID3D11ClassLinkage * pClassLinkage, ID3D11HullShader ** ppHullShader)
 		{
 			HRESULT hr = m_device->CreateHullShader(pShaderBytecode, BytecodeLength, pClassLinkage, ppHullShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("HS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateDomainShader(const void * pShaderBytecode, SIZE_T BytecodeLength, ID3D11ClassLinkage * pClassLinkage, ID3D11DomainShader ** ppDomainShader)
 		{
 			HRESULT hr = m_device->CreateDomainShader(pShaderBytecode, BytecodeLength, pClassLinkage, ppDomainShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("DS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateComputeShader(const void * pShaderBytecode, SIZE_T BytecodeLength, ID3D11ClassLinkage * pClassLinkage, ID3D11ComputeShader ** ppComputeShader)
 		{
 			HRESULT hr = m_device->CreateComputeShader(pShaderBytecode, BytecodeLength, pClassLinkage, ppComputeShader);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("CS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateClassLinkage(ID3D11ClassLinkage ** ppLinkage)
 		{
 			HRESULT hr = m_device->CreateClassLinkage(ppLinkage);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("CL", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateBlendState(const D3D11_BLEND_DESC * pBlendStateDesc, ID3D11BlendState ** ppBlendState)
 		{
 			HRESULT hr = m_device->CreateBlendState(pBlendStateDesc, ppBlendState);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("BlendState", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateDepthStencilState(const D3D11_DEPTH_STENCIL_DESC * pDepthStencilDesc, ID3D11DepthStencilState ** ppDepthStencilState)
 		{
 			HRESULT hr = m_device->CreateDepthStencilState(pDepthStencilDesc, ppDepthStencilState);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("DSS", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateRasterizerState(const D3D11_RASTERIZER_DESC * pRasterizerDesc, ID3D11RasterizerState ** ppRasterizerState)
 		{
 			HRESULT hr = m_device->CreateRasterizerState(pRasterizerDesc, ppRasterizerState);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("RasterizerState", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateSamplerState(const D3D11_SAMPLER_DESC * pSamplerDesc, ID3D11SamplerState ** ppSamplerState)
 		{
 			HRESULT hr = m_device->CreateSamplerState(pSamplerDesc, ppSamplerState);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("SamplerState", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateQuery(const D3D11_QUERY_DESC * pQueryDesc, ID3D11Query ** ppQuery)
 		{
 			HRESULT hr = m_device->CreateQuery(pQueryDesc, ppQuery);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Query", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreatePredicate(const D3D11_QUERY_DESC * pPredicateDesc, ID3D11Predicate ** ppPredicate)
 		{
 			HRESULT hr = m_device->CreatePredicate(pPredicateDesc, ppPredicate);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Prediction", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateCounter(const D3D11_COUNTER_DESC * pCounterDesc, ID3D11Counter ** ppCounter)
 		{
 			HRESULT hr = m_device->CreateCounter(pCounterDesc, ppCounter);
-#ifdef BENCHMARK
 			profiling::ProfileManager::storeVramSample("Counter", profiling::GpuProfiler::Instance()->GetMemoryUsage());
-#endif
 			return hr;
 		}
 		HRESULT __stdcall DankDevice::CreateDeferredContext(UINT ContextFlags, ID3D11DeviceContext ** ppDeferredContext)
@@ -350,7 +296,7 @@ namespace thomas
 		}
 		DankDeviceContext::~DankDeviceContext()
 		{
-			
+	
 		}
 		HRESULT __stdcall DankDeviceContext::QueryInterface(REFIID riid, void ** ppvObject)
 		{

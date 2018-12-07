@@ -4,6 +4,7 @@
 #include "../Window.h"
 #include "../ThomasCore.h"
 #include "GpuProfiler.h"
+#include "ProfileManager.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
 
@@ -110,6 +111,10 @@ namespace thomas
 				TexInitData.SysMemSlicePitch = static_cast<UINT>(4 * width * height);
 
 				hr = m_device->CreateTexture2D(&textureDesc, &TexInitData, &tex);
+#ifdef _DEBUG
+				static const char c_szName[] = "Texture2D";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 			else
 				hr = m_device->CreateTexture2D(&textureDesc, NULL, &tex);
@@ -172,6 +177,10 @@ namespace thomas
 					LOG_HR(hr);
 					return false;
 				}
+#ifdef _DEBUG
+				static const char c_szName[] = "TextureRender ";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 
 			return true;
@@ -238,7 +247,10 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
-
+#ifdef _DEBUG
+			static const char c_szName[] = "TextureArray";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			return true;
 		}
 
@@ -298,6 +310,11 @@ namespace thomas
 			if (FAILED(hr))
 				return false;
 
+#ifdef _DEBUG
+			static const char c_szName[] = "CubeMap";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
+
 			return true;
 		}
 
@@ -314,7 +331,7 @@ namespace thomas
 				scd.Width = width;
 				scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 				scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
 				scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 				scd.SampleDesc.Count = 1;
 				scd.SampleDesc.Quality = 0;
@@ -360,7 +377,12 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), &m_device, D3D11_SDK_VERSION, &fl);
+
+#ifdef BENCHMARK
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl);
+#else
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
+#endif
 
 			if (!CreateDeviceContext())
 				return false;
