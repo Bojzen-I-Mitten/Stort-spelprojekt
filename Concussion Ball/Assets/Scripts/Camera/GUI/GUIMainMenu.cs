@@ -1,6 +1,4 @@
-﻿using System;
-
-using System.Collections;
+﻿using System.Collections;
 using ThomasEngine;
 
 public class GUIMainMenu : ScriptComponent
@@ -24,6 +22,7 @@ public class GUIMainMenu : ScriptComponent
     Text Exit;
     Text Credits;
     Text PlayerName;
+    Text RandomHat;
     Text Caret;
 
     IEnumerator Blink = null;
@@ -37,6 +36,7 @@ public class GUIMainMenu : ScriptComponent
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
     Vector3 MainMenuCamPos;
+    Vector3 MainMenuAspectRation;
     Vector3 MainMenuCamRot;
 
     public override void OnAwake()
@@ -53,6 +53,7 @@ public class GUIMainMenu : ScriptComponent
         TakeName = false;
         AddImagesAndText();
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
+        MainMenuAspectRation = new Vector3(16, 9, 1);
         MainMenuCamRot = Vector3.Zero;
     }
 
@@ -63,6 +64,7 @@ public class GUIMainMenu : ScriptComponent
         Options.color = Unselected;
         Credits.color = Unselected;
         Exit.color = Unselected;
+        RandomHat.color = Unselected;
 
         if (Play.Hovered())
             Play.color = Selected;
@@ -74,6 +76,8 @@ public class GUIMainMenu : ScriptComponent
             Credits.color = Selected;
         else if (Exit.Hovered())
             Exit.color = Selected;
+        else if (RandomHat.Hovered())
+            RandomHat.color = Selected;
 
         if (MyNameSticker.Clicked())
         {
@@ -125,6 +129,10 @@ public class GUIMainMenu : ScriptComponent
         else if (SelectHatLeft.Clicked())
         {
             CameraMaster.instance.SelectedHat -= 1;
+        }
+        else if (RandomHat.Clicked())
+        {
+            CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
         }
        
         if (TakeName)
@@ -199,6 +207,15 @@ public class GUIMainMenu : ScriptComponent
         PlayerName.font = TextFont;
         #endregion
 
+        #region Random Hat
+        RandomHat = Canvas.Add("Random Hat");
+        RandomHat.origin = new Vector2(0.5f);
+        RandomHat.scale = new Vector2(0.6f);
+        RandomHat.position = new Vector2(0.76f, 0.17f);
+        RandomHat.interactable = true;
+        RandomHat.depth = 0.8f;
+        #endregion
+
         #region Caret
         Caret = Canvas.Add("");
         Caret.origin = new Vector2(0, 0.5f);
@@ -237,7 +254,7 @@ public class GUIMainMenu : ScriptComponent
             SelectHatLeft.origin = new Vector2(0.5f);
             SelectHatLeft.scale = new Vector2(0.25f);
             SelectHatLeft.position = new Vector2(0.68f, 0.25f);
-            SelectHatLeft.rotation = (float)Math.PI;
+            SelectHatLeft.rotation = (float)System.Math.PI;
             SelectHatLeft.interactable = true;
             SelectHatLeft.depth = 0.9f;
         }
@@ -248,8 +265,8 @@ public class GUIMainMenu : ScriptComponent
     public void SetUpScene()
     {
         transform.position = MainMenuCamPos;
+        transform.scale = MainMenuAspectRation;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
-
     }
 
     public void ClearImagesAndText()

@@ -65,7 +65,6 @@ public class CameraMaster : ScriptComponent
     public override void Start()
     {
         State = CAM_STATE.MAIN_MENU;
-
         #region Init GUI
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
@@ -164,11 +163,15 @@ public class CameraMaster : ScriptComponent
         {
             case CAM_STATE.MAIN_MENU:
                 MainMenu.SetUpScene();
+                Camera.fixedAspectRatio = true;
+                Camera.orthographic = true;
                 MainMenu.Canvas.isRendering = true;
                 break;
 
             case CAM_STATE.JOIN_HOST:
                 MainMenu.SetUpScene();
+                Camera.fixedAspectRatio = true;
+                Camera.orthographic = true;
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
@@ -193,6 +196,8 @@ public class CameraMaster : ScriptComponent
                 break;
             case CAM_STATE.HOST_MENU:
                 HostMenu.SetUpScene();
+                Camera.fixedAspectRatio = false;
+                Camera.orthographic = false;
                 HostMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.LOADING_SCREEN:
