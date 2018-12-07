@@ -39,7 +39,7 @@ namespace ThomasEditor
                         Resources.AssetTypes type = ThomasEngine.Resources.GetResourceAssetType(res.GetType());
                         if (type == Resources.AssetTypes.TEXTURE2D)
                         {
-
+                            
                             Texture2D tex = res as Texture2D;
                             return AssetBrowser.assetImages[type].UriSource.LocalPath;
                             BitmapSource bitmapSource = null;

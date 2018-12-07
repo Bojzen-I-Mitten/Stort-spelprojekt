@@ -81,6 +81,7 @@
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyMatrix.cpp" />
     <ClCompile Include="src\thomas\resource\ComputeShader.cpp" />
     <ClCompile Include="src\thomas\resource\ShaderProperty\ShaderPropertyTexture2D.cpp" />
+    <ClCompile Include="src\thomas\resource\texture\RenderTexture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2D.cpp" />
     <ClCompile Include="src\thomas\resource\texture\Texture2DArray.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="src\thomas\ThomasTime.cpp" />
     <ClCompile Include="src\thomas\utils\AssimpLoader.cpp" />
     <ClCompile Include="src\thomas\utils\D3D.cpp" />
+    <ClCompile Include="src\thomas\utils\DankD3D.cpp" />
     <ClCompile Include="src\thomas\utils\GpuProfiler.cpp" />
     <ClCompile Include="src\thomas\utils\Math.cpp" />
     <ClCompile Include="src\thomas\utils\Primitives.cpp" />
@@ -212,6 +214,7 @@
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyUnorderedAccessView.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyVector.h" />
     <ClInclude Include="src\thomas\resource\ShaderProperty\ShaderPropertyConstantBuffer.h" />
+    <ClInclude Include="src\thomas\resource\texture\RenderTexture.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2D.h" />
     <ClInclude Include="src\thomas\resource\texture\Texture2DArray.h" />
     <ClInclude Include="src\thomas\resource\texture\TextureCube.h" />
@@ -252,6 +255,7 @@
     <ClInclude Include="src\thomas\ThomasTime.h" />
     <ClInclude Include="src\thomas\utils\AssimpLoader.h" />
     <ClInclude Include="src\thomas\utils\D3D.h" />
+    <ClInclude Include="src\thomas\utils\DankD3D.h" />
     <ClInclude Include="src\thomas\utils\GpuProfiler.h" />
     <ClInclude Include="src\thomas\utils\Math.h" />
     <ClInclude Include="src\thomas\utils\Primitives.h" />

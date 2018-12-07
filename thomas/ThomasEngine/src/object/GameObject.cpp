@@ -64,9 +64,6 @@ namespace ThomasEngine {
 			m_components[i]->InitComponent(s, InitBits);
 		}
 	}
-	void GameObject::TryReleaseComponentLock()
-	{
-	}
 
 	thomas::object::GameObject* GameObject::Native::get() {
 		return reinterpret_cast<thomas::object::GameObject*>(nativePtr);
@@ -135,14 +132,12 @@ namespace ThomasEngine {
 	}
 	void GameObject::OnDestroy()
 	{
-		TryReleaseComponentLock();
-		// OnDisable^
 		for each (Component^ comp in m_components)
 		{
 			// Disable
 			comp->OnParentDestroy(this);
 			if (comp->ComponentState != Comp::Uninitialized)
-				comp->OnDisable();
+				comp->enabled = false; // comp->Disable()
 		}
 	}
 	bool GameObject::RemoveComponent(Component ^ comp)
@@ -157,7 +152,7 @@ namespace ThomasEngine {
 			bool executeInEditor = typ->IsDefined(ExecuteInEditor::typeid, false);
 
 			if (comp->ComponentState == Comp::Enabled)
-				comp->OnDisable();
+				comp->enabled = false; // comp->Disable()
 			//if(comp->m_state != component::Uninitialized) // Always true.
 			comp->OnDestroy();
 			delete comp;	// Begone you foul Clr!!!!

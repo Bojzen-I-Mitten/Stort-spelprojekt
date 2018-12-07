@@ -1,6 +1,6 @@
 #pragma once
 #include "D3D.h"
-#include <dxgi1_6.h>
+
 namespace thomas
 {
 	namespace utils
@@ -11,12 +11,16 @@ namespace thomas
 			enum GTS
 			{
 				GTS_BEGIN_FRAME,
-				GTS_MAIN_CLEAR,
-				GTS_SHADOWS,
-				GTS_MAIN_OBJECTS,
-				GTS_PARTICLES,
-				GTS_GIZMO_OBJECTS,
-				GTS_GUI,
+				GTS_SHADOWS_BEGIN,
+				GTS_SHADOWS_END,
+				GTS_MAIN_OBJECTS_BEGIN,
+				GTS_MAIN_OBJECTS_END,
+				GTS_PARTICLES_BEGIN,
+				GTS_PARTICLES_END,
+				GTS_GIZMO_OBJECTS_BEGIN,
+				GTS_GIZMO_OBJECTS_END,
+				GTS_GUI_BEGIN,
+				GTS_GUI_END,
 				GTS_END_FRAME,
 
 				GTS_MAX
@@ -24,8 +28,9 @@ namespace thomas
 			class GpuProfiler
 			{
 			public:
+				static GpuProfiler* Instance();
+				~GpuProfiler() = default;
 
-				GpuProfiler();
 				bool Init();
 				void Destroy();
 
@@ -35,36 +40,33 @@ namespace thomas
 				void AddDrawCall(size_t faceCount, size_t vertexCount);
 
 				// Wait on GPU for last frame's data (not this frame's) to be available
-				void WaitForDataAndUpdate();
+				void RetriveTimeStamps();
 
 			public:
-				float GetAverageTiming(GTS gts);
-				float GetDrawTotal();
+				int GetNumOfDrawCalls();
+				float GetTimeStamp(GTS gts);
 				float GetFrameTime();
 				float GetMemoryUsage();
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
-				size_t GetVertexCount();
-				size_t GetFaceCount();
+				int GetVertexCount();
+				int GetFaceCount();
 
 			private:
-				int m_frameQuery;								// Which of the two sets of queries are we currently issuing?
-				int m_frameCollect;								// Which of the two did we last collect?
-				ID3D11Query * m_queryDisjoint[2];				// "Timestamp disjoint" query; records whether timestamps are valid
-				ID3D11Query * m_queryTimestamp[GTS_MAX][2];		// Individual timestamp queries for each relevant point in the frame
+				GpuProfiler() = default;
 
-				IDXGIAdapter4* m_dxgiAdapter4 = NULL;			// Adapter for checking VRAM
+				int m_frameQuery;								
+				ID3D11Query * m_queryDisjoint[FRAME_BUFFERS];				// "Timestamp disjoint" query; records whether timestamps are valid
+				ID3D11Query * m_queryTimestamp[GTS_MAX][FRAME_BUFFERS];		// Individual timestamp queries for each relevant point in the frame
+				
+				int m_memoryQuery;
+				DXGI_QUERY_VIDEO_MEMORY_INFO m_info[2];
 
 				float m_timings[GTS_MAX];						// Last frame's timings (each relative to previous GTS)
-				float m_avgTimings[GTS_MAX];					// Timings averaged over 0.5 second
 
-				float m_avgTimingsTotal[GTS_MAX];				// Total timings thus far within this averaging period
-				int m_frameCountAvg;							// Frames rendered in current averaging period
-				float m_beginAvg;								// Time at which current averaging period started
-
-			size_t m_totalVertexCount;
-			size_t m_totalFaceCount;
-			size_t m_drawCalls;
+			int m_totalVertexCount;
+			int m_totalFaceCount;
+			int m_drawCalls;
 			
 			float m_memoryUsage;
 			float m_totalMemory;

@@ -3,28 +3,26 @@
 #include "Input.h"
 #include "WindowManager.h"
 #include "ThomasTime.h"
+
 #include "editor\Editor.h"
 #include "object\Object.h"
 #include "resource\ResourceManager.h"
 #include "resource\Shader.h"
 #include "resource\Material.h"
-#include "resource/MemoryAllocation.h"
+#include "resource\MemoryAllocation.h"
 #include "editor\EditorCamera.h"
 #include "editor\gizmos\Gizmos.h"
 #include "utils\Primitives.h"
-#include "utils\d3d.h"
-#include <d3d11_4.h>
-#include <comdef.h>
-#include "utils/AutoProfile.h"
-#include "utils/GpuProfiler.h"
-#include "graphics/Renderer.h"
-#include "utils/ThreadMap.h"
+#include "utils\D3D.h"
+#include "graphics\Renderer.h"
+#include "utils\ThreadMap.h"
 
-#include "object/ObjectHandler.h"
-#include "object/component/LightComponent.h"
+#include "object\ObjectHandler.h"
+#include "object\component\LightComponent.h"
 #include "Physics.h"
 #include "graphics\ParticleSystem.h"
 
+#include <comdef.h>
 namespace thomas 
 {
 	std::vector<std::string> ThomasCore::s_logOutput;
@@ -42,11 +40,11 @@ namespace thomas
 		//Init all required classes
 		if (!utils::D3D::Instance()->Init())
 			return false;
+
 		resource::ResourceManager::Init();
 		graphics::Renderer::Instance()->init();		// Needs to be initiated after textures, initiates default shaders (default tex needs to be loaded)
 		ThomasTime::Init();
 		SoundManager::GetInstance()->Init();
-		graphics::Renderer::Instance()->init();
 
 		resource::Material::Init();
 		Physics::Init();
@@ -63,25 +61,16 @@ namespace thomas
 
 	void ThomasCore::Update()
 	{
-		//SoundManager::GetInstance()->Update();
+		SoundManager::GetInstance()->Update();
 	}
 
 	void ThomasCore::Render()
 	{
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		profiler->BeginFrame();
-		WindowManager::Instance()->ClearAllWindows();
-		profiler->Timestamp(utils::profiling::GTS_MAIN_CLEAR);
+		WindowManager::Instance()->BeginFrame();
 		graphics::Renderer::Instance()->ProcessCommands();
+		WindowManager::Instance()->EndFrame();
 
-		// Draw performance readout - at end of CPU frame, so hopefully the previous frame
-		//  (whose data we're getting) will have finished on the GPU by now.
-
-		profiler->WaitForDataAndUpdate();
-		WindowManager::Instance()->PresentAllWindows();
-		utils::D3D::Instance()->GetProfiler()->EndFrame();
-
-		graphics::Renderer::Instance()->PostRender();	// Sync. shaders ...?
+		graphics::Renderer::Instance()->PostRender();	
 	}
 
 	void ThomasCore::Exit()

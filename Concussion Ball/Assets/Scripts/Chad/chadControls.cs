@@ -1,5 +1,5 @@
 ﻿#define PRINT_CONSOLE_DEBUG
-#define L_FOR_RAGDOLL
+//#define L_FOR_RAGDOLL
 
 using System.Linq;
 using ThomasEngine;
@@ -620,7 +620,7 @@ public class ChadControls : NetworkComponent
             {
                 yield return null;
             }
-            Debug.Log("The ground has been reached.");
+            //Debug.Log("The ground has been reached.");
             yield return new WaitForSeconds(1);
             State = STATE.CHADING;
             CurrentVelocity.y = BaseSpeed;
@@ -816,32 +816,33 @@ public class ChadControls : NetworkComponent
     {
         if (pickupable.transform.parent == null)
         {
+            if(FadeText != null)
+            {
+                StopCoroutine(FadeText);
+                FadeText = null;
+            }
+
+            ResetAlpha(ref PowerupPickupText);
+
             if (pickupable.gameObject.Name == "ball")
             {
-                ResetAlpha(ref PowerupPickupText);
-
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
-                FadeText = FadePickupText();
-                StartCoroutine(FadeText);
             }
             else if (pickupable.gameObject.Name == "Vindaloo")
             {
-                // Reset to full alpha
-                ResetAlpha(ref PowerupPickupText);
-
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
-                FadeText = FadePickupText();
-                StartCoroutine(FadeText);
             }
             else if (pickupable.gameObject.Name == "ThomasTrain")
             {
-                // Reset to full alpha
-                ResetAlpha(ref PowerupPickupText);
-
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
-                FadeText = FadePickupText();
-                StartCoroutine(FadeText);
             }
+            else if (pickupable.gameObject.Name == "Banana")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
+            }
+
+            FadeText = FadePickupText();
+            StartCoroutine(FadeText);
 
             TakeOwnership(pickupable.gameObject);
             RPCPickup(pickupable.ID);
