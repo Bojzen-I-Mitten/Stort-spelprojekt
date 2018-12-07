@@ -263,8 +263,8 @@ public class SoundBomb : Powerup
 
             if (localChad && otherPlayerTeam != playerTeam)
             {
-                float distance = Vector3.Distance(localChad.transform.position, transform.position);
-                if (distance < ExplosionRadius)
+                float distance2 = Vector3.Distance(localChad.transform.position, transform.position);
+                if (distance2 < ExplosionRadius)
                 {
                     localChad.Direction = Vector3.Zero;
                     localChad.rBody.LinearVelocity = Vector3.Zero;
@@ -276,8 +276,11 @@ public class SoundBomb : Powerup
             yield return null;
         }
         GramophoneClip.Stop();
-        
-        localChad.State = ChadControls.STATE.CHADING;
+
+        float distance = Vector3.Distance(localChad.transform.position, transform.position);
+        if (distance < ExplosionRadius)
+            localChad.State = ChadControls.STATE.CHADING;
+
         Explosion();
 
         if (PointBoi)
