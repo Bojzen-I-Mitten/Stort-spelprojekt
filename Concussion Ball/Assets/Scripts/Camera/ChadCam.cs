@@ -41,12 +41,13 @@ public class ChadCam : ScriptComponent
     //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
     private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
-    private float velocity { get { if (Chad?.rBody) return Chad.rBody.LinearVelocity.z; else return 0; } }
+    private Vector2 velocity { get { if (Chad) return Chad.CurrentVelocity; else return new Vector2(0); } }
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
     private float yStep { get { return Input.GetMouseY() * Time.ActualDeltaTime; } }
 
-    public float MaxFov { get; set; } = 110;
-    private float MinFov;
+    [Newtonsoft.Json.JsonIgnore]
+    public float MaxFov { get; set; } = 77;
+    private float MinFov = 70;
 
     public override void OnAwake()
     {
@@ -55,9 +56,11 @@ public class ChadCam : ScriptComponent
 
     public override void Start()
     {
-        if (Camera)
-            MinFov = Camera.fieldOfView;
-
+        //if (Camera)
+        //{
+        //    MinFov = 70.0f;//Camera.fieldOfView;
+        //    MaxFov = 75.0f;
+        //}
         //CameraSensitivity_x = 0.5f;
         //CameraSensitivity_y = 1.0f;
     }
@@ -109,8 +112,10 @@ public class ChadCam : ScriptComponent
                     }
                     break;
             }
-            //Camera.fieldOfView = MinFov + velocity;
-            //Camera.fieldOfView = Math.Min(Camera.fieldOfView, MaxFov);
+            if (velocity.y > 8.5f)
+                Camera.fieldOfView = Math.Min(MathHelper.Lerp(Camera.fieldOfView, Camera.fieldOfView + 1.150f * velocity.y, Time.DeltaTime), MaxFov);
+            else
+                Camera.fieldOfView = Math.Max(MathHelper.Lerp(Camera.fieldOfView, Camera.fieldOfView - 93, Time.DeltaTime), MinFov);
         }
     }
 
