@@ -18,6 +18,8 @@ namespace thomas
 		void Update();
 		void Create(HWND hWnd, bool isEditor);
 		void UpdateFocus();
+		void setBorderless(bool borderless);
+		void setFullscreen(bool fullscreen);
 
 	public:
 		int GetNumOfWindows();

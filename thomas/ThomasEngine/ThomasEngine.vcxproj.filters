@@ -71,6 +71,7 @@
     <ClCompile Include="src\system\command\CommandQueue.cpp" />
     <ClCompile Include="src\script\ScriptinUtility.cpp" />
     <ClCompile Include="src\resource\texture\RenderTexture.cpp" />
+    <ClCompile Include="src\GUI\game\WindowController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -148,6 +149,7 @@
     <ClInclude Include="src\object\component\AudioListener.h" />
     <ClInclude Include="src\script\ScriptingUtility.h" />
     <ClInclude Include="src\resource\texture\RenderTexture.h" />
+    <ClInclude Include="src\GUI\game\WindowController.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

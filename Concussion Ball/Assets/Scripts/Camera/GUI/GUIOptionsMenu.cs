@@ -4,7 +4,6 @@ using ThomasEngine;
 using System.Collections.Generic;
 public class ImageBaradjustment
 {
-
     Image[] Image = new Image[(int)Imagestate.NUMSTATES];
     Text number;
     public int numbervalue = 0;
@@ -108,11 +107,18 @@ public class GUIOptionsMenu : ScriptComponent
         OPTIONS_TEXT,
         Music_Area_Text,
         sensitivity_TEXT,
+        Window_Text,
         BACK_TEXT,
         MUSIC_TEXT,
         SFX_TEXT,
         MOVEMENTSENSE_TEXT,
         AIMSENSE_TEXT,
+        Fullscreen_TEXT,
+        BorderLess_Text,
+        FullscreenOn_TEXT,
+        BorderLessOn_Text,
+        FullscreenOff_TEXT,
+        BorderLessOff_Text,
         NUMSTATES
     }
     public enum ImageBarstate
@@ -128,7 +134,7 @@ public class GUIOptionsMenu : ScriptComponent
     Camera Camera;
    public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
-
+    WindowController Wcontroller = new WindowController();
     public Textstate TextState { set; get; } = Textstate.NUMSTATES;
     public Textstate OldState = Textstate.NUMSTATES;
     public ImageBarstate ImageState { set; get; } = ImageBarstate.NUMSTATES;
@@ -176,23 +182,101 @@ public class GUIOptionsMenu : ScriptComponent
         Audio.SetFXVolume((float)ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue / (float)100);
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
 
-    /*    if (Input.GetKeyDown(Input.Keys.X))
+
+        if(Text[(int)Textstate.FullscreenOn_TEXT].Clicked())
         {
-            Debug.Log(ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition);
-            Debug.Log(ImageBar[(int)ImageBarstate.Movement].LastMousePosition);
+            Wcontroller.SetFullscreen(true);
         }
-        /*        if (Input.GetKeyDown(Input.Keys.Y))
-                    Debug.Log(Image[(int)ImageBarstate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);*/
+        if (Text[(int)Textstate.FullscreenOff_TEXT].Clicked())
+        {
+            Wcontroller.SetFullscreen(false);
+        }
+        if (Text[(int)Textstate.BorderLessOn_Text].Clicked())
+        {
+            Wcontroller.SetBorderless(true);
+        }
+        if (Text[(int)Textstate.BorderLessOff_Text].Clicked())
+        {
+            Wcontroller.SetBorderless(false);
+        }
+
+        /*    if (Input.GetKeyDown(Input.Keys.X))
+            {
+                Debug.Log(ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition);
+                Debug.Log(ImageBar[(int)ImageBarstate.Movement].LastMousePosition);
+            }
+            /*        if (Input.GetKeyDown(Input.Keys.Y))
+                        Debug.Log(Image[(int)ImageBarstate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x);*/
     }
     void ButtonHovered()
     {
-        for(int i=0;i<(int)Textstate.NUMSTATES;i++)
-        { 
-            if (Text[i].Hovered())
-                Text[i].color = Selected;
-            else
-                Text[i].color = Unselected;
+        if (Text[(int)Textstate.BACK_TEXT].Hovered())
+            Text[(int)Textstate.BACK_TEXT].color = Selected;
+        else
+        {
+            Text[(int)Textstate.BACK_TEXT].color = Unselected;
         }
+
+        //borderlessOFF
+        if (Text[(int)Textstate.BorderLessOff_Text].Clicked())
+        {
+            Text[(int)Textstate.BorderLessOff_Text].interactable = false;
+            Text[(int)Textstate.BorderLessOn_Text].interactable = true;
+        }
+
+        if (Text[(int)Textstate.BorderLessOff_Text].Hovered())
+            Text[(int)Textstate.BorderLessOff_Text].color = Selected;
+        else if (Text[(int)Textstate.BorderLessOff_Text].interactable != false)
+        {
+            Text[(int)Textstate.BorderLessOff_Text].color = Unselected;
+        }
+
+
+        //borderlessOn
+        if (Text[(int)Textstate.BorderLessOn_Text].Clicked())
+        {
+            Text[(int)Textstate.BorderLessOn_Text].interactable = false;
+            Text[(int)Textstate.BorderLessOff_Text].interactable = true;
+        }
+
+        if (Text[(int)Textstate.BorderLessOn_Text].Hovered())
+            Text[(int)Textstate.BorderLessOn_Text].color = Selected;
+        else if (Text[(int)Textstate.BorderLessOn_Text].interactable != false)
+        {
+            Text[(int)Textstate.BorderLessOn_Text].color = Unselected;
+        }
+
+
+
+        //FullscreenOFF
+        if (Text[(int)Textstate.FullscreenOff_TEXT].Clicked())
+        {
+            Text[(int)Textstate.FullscreenOff_TEXT].interactable = false;
+            Text[(int)Textstate.FullscreenOn_TEXT].interactable = true;
+        }
+
+        if (Text[(int)Textstate.FullscreenOff_TEXT].Hovered())
+            Text[(int)Textstate.FullscreenOff_TEXT].color = Selected;
+        else if (Text[(int)Textstate.FullscreenOff_TEXT].interactable != false)
+        {
+            Text[(int)Textstate.FullscreenOff_TEXT].color = Unselected;
+        }
+
+
+        //FullscreenOn
+        if (Text[(int)Textstate.FullscreenOn_TEXT].Clicked())
+        {
+            Text[(int)Textstate.FullscreenOn_TEXT].interactable = false;
+            Text[(int)Textstate.FullscreenOff_TEXT].interactable = true;
+        }
+
+        if (Text[(int)Textstate.FullscreenOn_TEXT].Hovered())
+            Text[(int)Textstate.FullscreenOn_TEXT].color = Selected;
+        else if (Text[(int)Textstate.FullscreenOn_TEXT].interactable != false)
+        {
+            Text[(int)Textstate.FullscreenOn_TEXT].color = Unselected;
+        }
+
     }
     void BackbuttonClicked()
     {
@@ -201,7 +285,7 @@ public class GUIOptionsMenu : ScriptComponent
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
-        Text[(int)Textstate.BACK_TEXT] = Canvas.Add("Back"); Text[(int)Textstate.BACK_TEXT].position = new Vector2(0.01f, 0.62f); Text[(int)Textstate.BACK_TEXT].interactable = true;
+        Text[(int)Textstate.BACK_TEXT] = Canvas.Add("Back"); Text[(int)Textstate.BACK_TEXT].position = new Vector2(0.01f, 0.85f); Text[(int)Textstate.BACK_TEXT].interactable = true;
         Text[(int)Textstate.OPTIONS_TEXT] = Canvas.Add("OPTIONS"); Text[(int)Textstate.OPTIONS_TEXT].scale = new Vector2(1.4f, 1.2f); Text[(int)Textstate.OPTIONS_TEXT].position = new Vector2(0, 0.1f);
         Text[(int)Textstate.AIMSENSE_TEXT] = Canvas.Add("Aim"); Text[(int)Textstate.AIMSENSE_TEXT].position = new Vector2(0.02f, 0.55f);
         Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.5f);
@@ -209,11 +293,22 @@ public class GUIOptionsMenu : ScriptComponent
         Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.02f, 0.32f);
         Text[(int)Textstate.Music_Area_Text] = Canvas.Add("Audio"); Text[1].scale = new Vector2(0.75f); Text[(int)Textstate.Music_Area_Text].position = new Vector2(0.01f, 0.2f);
         Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.42f);
+
+        Text[(int)Textstate.Window_Text] = Canvas.Add("Window"); Text[(int)Textstate.Window_Text].scale = new Vector2(0.75f); Text[(int)Textstate.Window_Text].position = new Vector2(0.01f, 0.64f);
+        ///////////////////////////////////////////////////////////////////
+        Text[(int)Textstate.Fullscreen_TEXT] = Canvas.Add("FullScreen"); Text[(int)Textstate.Fullscreen_TEXT].position = new Vector2(0.02f, 0.72f);
+        Text[(int)Textstate.FullscreenOff_TEXT] = Canvas.Add("Off"); Text[(int)Textstate.FullscreenOff_TEXT].interactable = true; Text[(int)Textstate.FullscreenOff_TEXT].position = new Vector2(0.17f, 0.72f);
+        Text[(int)Textstate.FullscreenOn_TEXT] = Canvas.Add("On"); Text[(int)Textstate.FullscreenOn_TEXT].interactable = true; Text[(int)Textstate.FullscreenOn_TEXT].position = new Vector2(0.21f, 0.72f);
+        ///////////////////////////////////////////////////////////////////
+        Text[(int)Textstate.BorderLess_Text] = Canvas.Add("BorderLess");  Text[(int)Textstate.BorderLess_Text].position = new Vector2(0.02f, 0.77f);
+        Text[(int)Textstate.BorderLessOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.BorderLessOff_Text].interactable = true; Text[(int)Textstate.BorderLessOff_Text].position = new Vector2(0.17f, 0.77f);
+        Text[(int)Textstate.BorderLessOn_Text] = Canvas.Add("On"); Text[(int)Textstate.BorderLessOn_Text].interactable = true; Text[(int)Textstate.BorderLessOn_Text].position = new Vector2(0.21f, 0.77f);
+
         foreach (Text Texture in Text)
         {
             Texture.depth = 0.9f;
         }
-        for(int i=3;i<Text.Length;i++)
+        for(int i=4;i<Text.Length;i++)
         {
             Text[i].scale = new Vector2(0.5f);
         }
