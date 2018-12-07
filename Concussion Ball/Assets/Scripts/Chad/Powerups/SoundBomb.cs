@@ -15,9 +15,8 @@ public class SoundBomb : Powerup
     public Texture2D _NoteTex2 { get; set; }
     public Texture2D _ShockWaveTex { get; set; }
 
-
-    //public AudioClip VindalooExplosionSound { get; set; }
-    //private SoundComponent ExplosionSound;
+    public AudioClip GramophoneSound { get; set; }
+    private SoundComponent GramophoneClip;
 
     public float ExplosionRadius;
     public float ExplosionForce;
@@ -50,11 +49,12 @@ public class SoundBomb : Powerup
         _Hue = 0.0f;
         _SpawnedLight = false;
         _Landed = false;
-        //ExplosionSound = gameObject.AddComponent<SoundComponent>();
-        //ExplosionSound.Type = SoundComponent.SoundType.Effect;
-        //ExplosionSound.Clip = VindalooExplosionSound;
-        //ExplosionSound.Looping = false;
-        //ExplosionSound.Is3D = true;
+
+        GramophoneClip = gameObject.AddComponent<SoundComponent>();
+        GramophoneClip.Type = SoundComponent.SoundType.Effect;
+        GramophoneClip.Clip = GramophoneSound;
+        GramophoneClip.Looping = false;
+        GramophoneClip.Is3D = true;
 
         #region big meme particle emitter bois
         _Note1 = gameObject.AddComponent<ParticleEmitter>();
@@ -204,6 +204,8 @@ public class SoundBomb : Powerup
                 _Note1.Emit = true;
                 _Note2.Emit = true;
             }
+            if (GramophoneClip)
+                GramophoneClip.Play();
             _JumpTimer += Time.DeltaTime;
 
             base.OnCollisionEnter(collider);
