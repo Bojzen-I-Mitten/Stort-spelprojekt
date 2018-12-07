@@ -34,7 +34,7 @@ namespace ThomasEngine
 			thomas::object::component::RenderSkinnedComponent* comp = gObj->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
 			if (comp == NULL)
 				Debug::LogWarning("Warning! Object not skinned - LookAtConstraint can't be applied to object: " + gObj->Name);
-			else if (comp->GetBlendTree()->boneCount() >= boneIndex)
+			else if (comp->GetBlendTree()->boneCount() <= boneIndex)
 				Debug::LogWarning("Warning! Bone does not exist - LookAtConstraint can't be applied to object: " + gObj->Name);
 			else
 				apply(comp, boneIndex);
@@ -43,7 +43,7 @@ namespace ThomasEngine
 		{
 			if (!skinn)
 				Debug::LogWarning("Warning! Skinn parameter was null");
-			else if (skinn->Native->GetBlendTree()->boneCount() < boneIndex)
+			else if (skinn->Native->GetBlendTree()->boneCount() <= boneIndex)
 				Debug::LogWarning("Warning! Bone does not exist (out of bounds) - LookAtConstraint can't be applied to object: " + skinn->gameObject->Name);
 			else
 				apply(skinn->Native, boneIndex);
@@ -51,10 +51,16 @@ namespace ThomasEngine
 		}
 		void LookAtConstraint::apply(thomas::object::component::RenderSkinnedComponent * skinn, uint32_t boneIndex)
 		{
+			m_boneIndex = boneIndex;
 			skinn->GetBlendTree()->addConstraint(m_ptr, boneIndex);
+			m_skinn = skinn;
 		}
 
-
+		void LookAtConstraint::disable()
+		{
+			if(m_skinn && m_boneIndex < m_skinn->GetBlendTree()->boneCount())
+				m_skinn->GetBlendTree()->addConstraint(m_ptr, m_boneIndex);
+		}
 
 		LookAtConstraint::AxisConstraint LookAtConstraint::Mode::get(){
 			return (LookAtConstraint::AxisConstraint)m_ptr->m_axis;

@@ -42,12 +42,14 @@ namespace thomas
 			void DrawBoundingOrientedBox(const math::BoundingOrientedBox& obb);
 			void DrawBoundingSphere(const math::BoundingSphere& sphere);
 			void DrawRing(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
+			void DrawRing(math::Vector3 origin, math::Vector3 aroundAxis, float radius);
 			void DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis);
 			void DrawLine(math::Vector3 from, math::Vector3 to);
 			/* Draw line of length toward the target vector
 			*/
 			void DrawLine(math::Vector3 from, math::Vector3 to, float len);	
 			void DrawMatrixBasis(const math::Matrix & mat, float len = 0.05f);
+			void DrawMatrixBasis(const math::Matrix & mat, math::Vector3 axisLenghts);
 			void DrawSphere(math::Vector3 center, float radius);
 			void DrawWireSphere(math::Vector3 center, float radius);
 			void DrawRay(math::Vector3 from, math::Vector3 direction);

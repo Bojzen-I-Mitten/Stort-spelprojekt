@@ -66,18 +66,18 @@ namespace ThomasEngine
 		{
 			thomas::object::component::RenderSkinnedComponent* comp = gObj->Native->GetComponent<thomas::object::component::RenderSkinnedComponent>();
 			if (comp == NULL)
-				Debug::LogWarning("Warning! Object not skinned - LookAtConstraint can't be applied to object: " + gObj->Name);
-			else if (comp->GetBlendTree()->boneCount() >= boneIndex)
-				Debug::LogWarning("Warning! Bone does not exist - LookAtConstraint can't be applied to object: " + gObj->Name);
+				Debug::LogWarning("Object not skinned - Constraint can't be applied to object: " + gObj->Name);
+			else if (comp->GetBlendTree()->boneCount() <= boneIndex)
+				Debug::LogWarning("Bone does not exist - Constraint can't be applied to object: " + gObj->Name);
 			else
 				apply(comp, boneIndex);
 		}
 		void IK_FABRIK_Constraint::apply(RenderSkinnedComponent ^ skinn, uint32_t boneIndex)
 		{
 			if (!skinn)
-				Debug::LogWarning("Warning! Skinn parameter was null");
+				Debug::LogWarning("Skinn parameter was null");
 			else if (skinn->Native->GetBlendTree()->boneCount() < boneIndex)
-				Debug::LogWarning("Warning! Bone does not exist (out of bounds) - LookAtConstraint can't be applied to object: " + skinn->gameObject->Name);
+				Debug::LogWarning("Bone does not exist (out of bounds) - Constraint can't be applied to object: " + skinn->gameObject->Name);
 			else
 				apply(skinn->Native, boneIndex);
 

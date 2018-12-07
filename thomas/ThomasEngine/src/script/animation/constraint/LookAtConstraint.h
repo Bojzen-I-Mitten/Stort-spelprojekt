@@ -41,11 +41,16 @@ namespace ThomasEngine
 			void apply(GameObject^ obj, uint32_t boneIndex);
 			void apply(RenderSkinnedComponent^ skinn, uint32_t boneIndex);
 			void apply(thomas::object::component::RenderSkinnedComponent* skinn, uint32_t boneIndex);
+			/* Remove the constraint
+			*/
+			void disable();
 
 			thomas::graphics::animation::LookAtConstraint* Native();
 		private:
 
-			thomas::graphics::animation::LookAtConstraint* m_ptr;
+			thomas::graphics::animation::LookAtConstraint* m_ptr;			// Pointer to the constraint
+			thomas::object::component::RenderSkinnedComponent * m_skinn;	// Skinned component constraint added to
+			uint32_t m_boneIndex;											// Index to the bone constraint is added to
 		};
 	}
 }

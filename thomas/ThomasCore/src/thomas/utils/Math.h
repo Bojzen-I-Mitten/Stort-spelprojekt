@@ -42,6 +42,24 @@ namespace DirectX
 			uint32_t i = ind % 3;
 			return Vector3(objectPose(i,0), objectPose(i, 1), objectPose(i, 2)) * (ind > 2 ? -1.f : 1.f);
 		}
+		/*	Find orthogonal axis to the vector
+		*/
+		inline Vector3 orthogonal(const Vector3& vec)
+		{
+			// Orthogonal vector: <v, v_o> = 0
+			// Algortithm by Ahmed F: https://math.stackexchange.com/questions/133177/finding-a-unit-vector-perpendicular-to-another-vector
+			// Find first v_m != 0 and return:
+			// (0,.., v_(m+1), -v_m, 0, 0, 0) 
+			// Which gives: 
+			// v_m * v_(m+1) + v_(m+1)*-v_m = 0
+			// 
+			// Only check first x if 0, otherwise no particular diff. in swizzling y->z to z->x when x=y=0 
+			// (exception when epsilon's magnitude matters)
+			return std::fabs(vec.x) < EPSILON ?
+				Vector3(vec.y, -vec.x, 0.f) :
+				Vector3(0.f, vec.z, -vec.y);
+		}
+
 
 		BoundingFrustum CreateFrustrumFromMatrixRH(CXMMATRIX projection);
 

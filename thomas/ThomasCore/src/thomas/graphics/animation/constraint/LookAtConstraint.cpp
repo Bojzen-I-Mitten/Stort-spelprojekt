@@ -36,22 +36,24 @@ namespace thomas {
 			}
 			void LookAtConstraint::execute(Skeleton & skel, math::Matrix * objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
-				math::Vector3 dir = m_target - objectPose[boneInd].Translation();
-				dir.Normalize();
-				math::Vector3 faceAxis = math::getAxis(objectPose[boneInd], m_faceAxis);	// Axis rotated
+				math::Matrix pInv = objectPose[skel.getBone(boneInd)._parentIndex].Invert();				// Solve in space of parent bone
+				math::Matrix relative = objectPose[boneInd] * pInv;											// Relative transform of bone (from parent) 
+				math::Vector3 local_dir = math::Vector3::Transform(m_target, pInv) - relative.Translation();// Target offset from bone
+				local_dir.Normalize();
+				math::Vector3 faceAxis = math::getAxis(relative, m_faceAxis);								// Axis rotated
 				faceAxis.Normalize();
-				math::Vector3 up = objectPose[boneInd].Up();
+				math::Vector3 up = relative.Up();
 				up.Normalize();
 
 				math::Quaternion rotation;
 				switch (m_axis) {
 					case AxisConstraint::AxisX:
 					{
-						float x = faceAxis.Dot(dir);								// Project on ZY plane
-						float y = up.Dot(dir);
+						float x = faceAxis.Dot(local_dir);								// Project on ZY plane
+						float y = up.Dot(local_dir);
 						float angle = std::atan2f(y, x);							// Angle diff on ZY plane
 						angle *= m_weight;											// Weighted
-						math::Vector3 r = objectPose->Right();						// X
+						math::Vector3 r = relative.Right();							// X
 						r.Normalize();
 						rotation = math::Quaternion::CreateFromAxisAngle(r, angle);	// Create rotation around x
 					}
@@ -60,12 +62,12 @@ namespace thomas {
 					case AxisConstraint::AxisZ:
 						// Not implemented
 					case AxisConstraint::AxisXYZ:
-						rotation = math::getRotationTo(faceAxis, dir);
+						rotation = math::getRotationTo(faceAxis, local_dir);
 						break;
 				}
-				math::Matrix relative = objectPose[boneInd] * objectPose[skel.getBone(boneInd)._parentIndex].Invert();
 				// Apply
-				objectPose[boneInd] = relative * math::Matrix::CreateFromQuaternion(rotation) * objectPose[skel.getBone(boneInd)._parentIndex];
+				math::Matrix orient = math::Matrix::CreateFromQuaternion(rotation);
+				objectPose[boneInd] = relative * orient * objectPose[skel.getBone(boneInd)._parentIndex];
 #ifdef _DEBUG
 #ifdef _EDITOR
 				editor::Gizmos::Gizmo().DrawMatrixBasis(objectPose[boneInd]);

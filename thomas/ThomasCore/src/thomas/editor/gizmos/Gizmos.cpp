@@ -219,6 +219,15 @@ namespace thomas
 
 		}
 
+		void Gizmos::DrawRing(math::Vector3 origin, math::Vector3 aroundAxis, float radius)
+		{
+			math::Vector3 v = math::orthogonal(aroundAxis);
+			v.Normalize();
+			aroundAxis.Normalize();
+			v *= radius;
+			DrawRing(origin, v, aroundAxis.Cross(v));
+		}
+
 		void Gizmos::DrawArc(math::Vector3 origin, math::Vector3 majorAxis, math::Vector3 minorAxis)
 		{
 			const size_t ringSegments = 16;
@@ -263,13 +272,17 @@ namespace thomas
 
 		void Gizmos::DrawMatrixBasis(const math::Matrix& mat, float len)
 		{
+			DrawMatrixBasis(mat, math::Vector3(len));
+		}
+		void Gizmos::DrawMatrixBasis(const math::Matrix& mat, math::Vector3 axisLenghts)
+		{
 			math::Vector3 p = mat.Translation();
-			editor::Gizmos::Gizmo().SetColor(math::Color(0, 1.f, 0.f));
-			DrawLine(p, p + math::Normalize(mat.Up()) * len);
 			editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 0.f, 0.f));
-			DrawLine(p, p + math::Normalize(mat.Right()) * len);
+			DrawLine(p, p + math::Normalize(mat.Right()) * axisLenghts.x);
+			editor::Gizmos::Gizmo().SetColor(math::Color(0, 1.f, 0.f));
+			DrawLine(p, p + math::Normalize(mat.Up()) * axisLenghts.y);
 			editor::Gizmos::Gizmo().SetColor(math::Color(0, 0.f, 1.f));
-			DrawLine(p, p + math::Normalize(mat.Backward()) * len);
+			DrawLine(p, p + math::Normalize(mat.Backward()) * axisLenghts.z);
 		}
 
 		void Gizmos::DrawSphere(math::Vector3 center, float radius)

@@ -22,11 +22,18 @@ namespace thomas {
 					LinkParameter(){}
 					LinkParameter(uint32_t index) : m_index(index) {}
 				};
+			private:
+				struct JointInfo
+				{
+					math::Matrix orientation;	// Joint orientation in relation to parent (rotation from parent orienation to joint orient)
+					float limit_bend = math::PI / 2 - 0.01f * math::PI;
+					float limit_twist = math::PI / 4;
+				};
 
 			private:
 				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
 				void solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
-				void solve_constraint_forward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
+				void solve_constraint_forward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link);
 
 			public:
@@ -53,8 +60,10 @@ namespace thomas {
 
 			private:
 
-				std::unique_ptr<LinkParameter> m_chain;	// Link chain parameters (root at 0)
+				std::unique_ptr<uint32_t> m_chain;		// Link chain bone indices (root at 0)
+				std::unique_ptr<JointInfo> m_joint;		// Link joint parameters (root at 0)
 				uint32_t m_num_link;					// Number of links
+				int m_rootParentBoneIndex;				// Chain root parent bone index (-1 if it does not exist)
 				float m_chainLength;					// Updated length of bone chain (originates as bind pose chain length)
 			};
 

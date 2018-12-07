@@ -561,10 +561,8 @@ namespace thomas
 				LOG(boneMap.m_boneInfo[conflictInd]._boneName);
 			}
 
-			boneMap.m_boneInfo[BoneIndex] = bi;
-			boneMap.m_mapping[boneName] = BoneIndex;
 
-			/* Find parent offset
+			/* Find parent offsets
 			*/
 			if(parentBone>= 0){
 				aiVector3D toChild = extractTrans(object_space) - extractTrans(parentTransform);
@@ -573,8 +571,11 @@ namespace thomas
 				boneUp.Normalize();
 				// Find rotation from parent forward, to child bone (if there is an angle difference)
 				if(toChild * boneUp < 1.f - math::EPSILON)
-					boneMap.m_boneInfo[BoneIndex]._invParentOrient = math::getMatrixRotationTo(convert(toChild), convert(boneUp));;
+					bi._invParentOrient = math::getMatrixRotationTo(convert(toChild), convert(boneUp));;
 			}
+			// Store BoneInfo
+			boneMap.m_boneInfo[BoneIndex] = bi;
+			boneMap.m_mapping[boneName] = BoneIndex;
 			// Return index of processed bone
 			return BoneIndex;
 		}
