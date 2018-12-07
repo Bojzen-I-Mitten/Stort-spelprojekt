@@ -18,7 +18,6 @@ public class Banana : Powerup
     private ChadControls ObjectOwner = null;
 
     private float _BananaTimer;
-    private float _Force;
 
     public override void OnAwake()
     {

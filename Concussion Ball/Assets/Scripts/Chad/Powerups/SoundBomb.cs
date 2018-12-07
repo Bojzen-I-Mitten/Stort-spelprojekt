@@ -11,12 +11,20 @@ public class SoundBomb : Powerup
     Collider _FirstCollider;
 
     public LightComponent PointBoi { get; set; }
+    public Texture2D _NoteTex1 { get; set; }
+    public Texture2D _NoteTex2 { get; set; }
+    public Texture2D _ShockWaveTex { get; set; }
+
 
     //public AudioClip VindalooExplosionSound { get; set; }
     //private SoundComponent ExplosionSound;
 
     public float ExplosionRadius;
     public float ExplosionForce;
+
+    private ParticleEmitter _Note1;
+    private ParticleEmitter _Note2;
+    private ParticleEmitter _ShockWave;
 
     private float _JumpTimer;
     private float _DanceDuration;
@@ -49,80 +57,65 @@ public class SoundBomb : Powerup
         //ExplosionSound.Is3D = true;
 
         #region big meme particle emitter bois
+        _Note1 = gameObject.AddComponent<ParticleEmitter>();
+        if (_NoteTex1 != null)
+            _Note1.Texture = _NoteTex1;
+        _Note1.MinSize = 0.2f;
+        _Note1.MaxSize = 0.5f;
+        _Note1.EndSize = 0.5f;
+        _Note1.MinLifeTime = 1.0f;
+        _Note1.MaxLifeTime = 1.0f;
+        _Note1.EmissionRate = 6;
+        _Note1.MinRotationSpeed = 0.0f;
+        _Note1.MaxRotationSpeed = 0.0f;
+        _Note1.MinSpeed = 0.0f;
+        _Note1.MaxSpeed = 0.0f;
+        _Note1.EndSpeed = 0.0f;
+        _Note1.DistanceFromSphereCenter = 0;
+        _Note1.Radius = 3.0f;
+        _Note1.Gravity = 0.0f;
+        _Note1.SpawnAtEdge = true;
+        _Note1.BlendState = ParticleEmitter.BLEND_STATES.ALPHA;
 
-        //emitterFire = gameObject.AddComponent<ParticleEmitter>();
-        //emitterFire.MinSize = 1.2f;
-        //emitterFire.MaxSize = 1.99f;
-        //emitterFire.EndSize = 1.6f;
-        //emitterFire.MinLifeTime = 0.1f;
-        //emitterFire.MaxLifeTime = 0.2f;
-        //emitterFire.EmissionRate = 100;
-        //emitterFire.MinRotationSpeed = 0.0f;
-        //emitterFire.MaxRotationSpeed = 4.0f;
-        //emitterFire.MinSpeed = 5.5f;
-        //emitterFire.MaxSpeed = 10.0f;
-        //emitterFire.EndSpeed = 20.0f;
-        //emitterFire.DistanceFromSphereCenter = 0;
-        //emitterFire.Radius = 1.0f;
-        //emitterFire.Gravity = 0.0f;
-        //emitterFire.SpawnAtEdge = false;
-        //emitterFire.Texture = fireTexture;
-        //emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
+        _Note2 = gameObject.AddComponent<ParticleEmitter>();
+        if (_NoteTex2 != null)
+            _Note2.Texture = _NoteTex2;
+        _Note2.MinSize = 0.2f;
+        _Note2.MaxSize = 0.5f;
+        _Note2.EndSize = 0.5f;
+        _Note2.MinLifeTime = 1.0f;
+        _Note2.MaxLifeTime = 1.0f;
+        _Note2.EmissionRate = 6;
+        _Note2.MinRotationSpeed = 0.0f;
+        _Note2.MaxRotationSpeed = 0.0f;
+        _Note2.MinSpeed = 0.0f;
+        _Note2.MaxSpeed = 0.0f;
+        _Note2.EndSpeed = 0.0f;
+        _Note2.DistanceFromSphereCenter = 0;
+        _Note2.Radius = 3.0f;
+        _Note2.Gravity = 0.0f;
+        _Note2.SpawnAtEdge = true;
+        _Note2.BlendState = ParticleEmitter.BLEND_STATES.ALPHA;
 
-        //emitterGravel = gameObject.AddComponent<ParticleEmitter>();
-        //emitterGravel.MinSize = 0.1f;
-        //emitterGravel.MaxSize = 0.2f;
-        //emitterGravel.EndSize = 0.05f;
-        //emitterGravel.MinLifeTime = 0.4f;
-        //emitterGravel.MaxLifeTime = 1.3f;
-        //emitterGravel.EmissionRate = 100;
-        //emitterGravel.MinRotationSpeed = -6.0f;
-        //emitterGravel.MaxRotationSpeed = 6.0f;
-        //emitterGravel.MinSpeed = 13.5f;
-        //emitterGravel.MaxSpeed = 18.0f;
-        //emitterGravel.EndSpeed = 0.0f;
-        //emitterGravel.DistanceFromSphereCenter = 0.3f;
-        //emitterGravel.Radius = 0.2f;
-        //emitterGravel.Gravity = 4.0f;
-        //emitterGravel.SpawnAtEdge = false;
-        //emitterGravel.Texture = gravelTexture;
-
-        //emitterFire2 = gameObject.AddComponent<ParticleEmitter>();
-        //emitterFire2.MinSize = 0.1f;
-        //emitterFire2.MaxSize = 0.2f;
-        //emitterFire2.EndSize = 0.05f;
-        //emitterFire2.MinLifeTime = 0.4f;
-        //emitterFire2.MaxLifeTime = 1.3f;
-        //emitterFire2.EmissionRate = 100;
-        //emitterFire2.MinRotationSpeed = -2.0f;
-        //emitterFire2.MaxRotationSpeed = 3.0f;
-        //emitterFire2.MinSpeed = 13.5f;
-        //emitterFire2.MaxSpeed = 18.0f;
-        //emitterFire2.EndSpeed = 0.0f;
-        //emitterFire2.DistanceFromSphereCenter = 0.3f;
-        //emitterFire2.Radius = 0.2f;
-        //emitterFire2.Gravity = 8.0f;
-        //emitterFire2.SpawnAtEdge = false;
-        //emitterFire2.Texture = fire2Texture;
-
-        //emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
-
-        //emitterSmoke.Texture = smokeTexture;
-
-        //emitterSmoke.MinSize = 0.5f;
-        //emitterSmoke.MaxSize = 0.7f;
-        //emitterSmoke.EndSize = 1.3f;
-        //emitterSmoke.MinLifeTime = 0.7f;
-        //emitterSmoke.MaxLifeTime = 2.6f;
-        //emitterSmoke.EmissionRate = 100;
-        //emitterSmoke.MinRotationSpeed = -2.0f;
-        //emitterSmoke.MaxRotationSpeed = 2.0f;
-        //emitterSmoke.MinSpeed = 0.6f;
-        //emitterSmoke.MaxSpeed = 1.5f;
-        //emitterSmoke.EndSpeed = 3.0f;
-        //emitterSmoke.DistanceFromSphereCenter = 0.7f;
-        //emitterSmoke.Radius = 1.7f;
-        //emitterGravel.SpawnAtEdge = false;
+        _ShockWave = gameObject.AddComponent<ParticleEmitter>();
+        if (_ShockWaveTex != null)
+            _ShockWave.Texture = _ShockWaveTex;
+        _ShockWave.MinSize = 0.0f;
+        _ShockWave.MaxSize = 0.0f;
+        _ShockWave.EndSize = 4.0f;
+        _ShockWave.MinLifeTime = 1.0f;
+        _ShockWave.MaxLifeTime = 1.0f;
+        _ShockWave.EmissionRate = 1;
+        _ShockWave.MinRotationSpeed = 0.0f;
+        _ShockWave.MaxRotationSpeed = 0.0f;
+        _ShockWave.MinSpeed = 0.0f;
+        _ShockWave.MaxSpeed = 0.0f;
+        _ShockWave.EndSpeed = 0.0f;
+        _ShockWave.DistanceFromSphereCenter = 0;
+        _ShockWave.Radius = 1.0f;
+        _ShockWave.Gravity = 0.0f;
+        _ShockWave.SpawnAtEdge = false;
+        _ShockWave.BlendState = ParticleEmitter.BLEND_STATES.ALPHA;
         #endregion
     }
 
@@ -142,8 +135,6 @@ public class SoundBomb : Powerup
                 // Jump animation
                 if (_JumpTimer > 1.0f)
                 {
-                    // splash some particles Gustav @gustav @ijäzy
-
                     _JumpTimer = Time.DeltaTime; // reset
                 }
 
@@ -163,9 +154,12 @@ public class SoundBomb : Powerup
             }
             if (_Landed)
             {
+                Debug.Log("Landed, applying force");
                 m_rigidBody.LinearVelocity = Vector3.Zero;
-                m_rigidBody.AddForce(new Vector3(0, 100, 0));
+                m_rigidBody.AddForce(new Vector3(0, 250, 0));
                 _Landed = false;
+                if(_ShockWave)
+                    _ShockWave.EmitOneShot(1);
             }
         }
         else
@@ -196,7 +190,6 @@ public class SoundBomb : Powerup
         if (!colliderPlayer && _JumpTimer == 0 && isOwner)
         {
             _Landed = true;
-            Debug.Log("Roh oh 1: " + collider.gameObject.Name);
             if (PointBoi)
             {
                 _SpawnedLight = true;
@@ -204,19 +197,20 @@ public class SoundBomb : Powerup
             }
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
-            m_rigidBody.FreezeRotation = new Vector3(0, 1, 0); // freeze ya'll's music box
-            //PickupCollider.enabled = true; // for testing
-
+            m_rigidBody.FreezeRotation = new Vector3(0, 0, 0); // freeze ya'll's music box
+            if (_Note1 && _Note2)
+            {
+                _Note1.Emit = true;
+                _Note2.Emit = true;
+            }
             _JumpTimer += Time.DeltaTime;
 
             base.OnCollisionEnter(collider);
         }
         else if (_JumpTimer > 0.1f)
         {
-            Debug.Log("roh oh");
             _Landed = true;
         }
-
     }
 
     public override void SaveObjectOwner(ChadControls chad)
@@ -238,14 +232,6 @@ public class SoundBomb : Powerup
 
     private void Explosion()
     {
-        // Play the vindaloo explosion sound
-        //ExplosionSound.Play();
-
-        //emitterFire.EmitOneShot(25);
-        //emitterFire2.EmitOneShot(45);
-        //emitterGravel.EmitOneShot(20);
-        //emitterSmoke.EmitOneShot(50);
-
         StartCoroutine(RemoveNextFrame());
         //Remove();
     }
@@ -291,8 +277,30 @@ public class SoundBomb : Powerup
             _SpawnedLight = false;
             PointBoi.enabled = false;
         }
+        if (_Note1 && _Note2)
+        {
+            _Note1.Emit = false;
+            _Note2.Emit = false;
+        }
     }
 
+    public override void Reset()
+    {
+        base.Reset();
+
+        if (PointBoi)
+        {
+            _SpawnedLight = false;
+            PointBoi.enabled = false;
+        }
+        if (_Note1 && _Note2)
+        {
+            _Note1.Emit = false;
+            _Note2.Emit = false;
+        }
+        _Landed = false;
+        _JumpTimer = 0.0f;
+    }
 
     // COLOR CALCS FROM ALBIN
     #region ALBIN_COLOR
