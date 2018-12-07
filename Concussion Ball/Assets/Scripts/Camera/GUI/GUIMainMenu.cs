@@ -7,6 +7,7 @@ public class GUIMainMenu : ScriptComponent
     public Texture2D TextBoxBG { get; set; }
     public Texture2D MyNameTexture { get; set; }
     public Texture2D ArrowTexture { get; set; }
+    public Texture2D FrameTexture { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
@@ -16,6 +17,7 @@ public class GUIMainMenu : ScriptComponent
     Image MyNameSticker;
     Image SelectHatRight;
     Image SelectHatLeft;
+    Image ChadArea;
     Text Play;
     Text HostGame;
     Text Options;
@@ -32,12 +34,16 @@ public class GUIMainMenu : ScriptComponent
     public float CaretOffset { get; set; }
     public float NameRotation { get; set; }
     private bool ClearName = true;
+    bool _RotateChad;
+    float rotationSpeed;
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
     Vector3 MainMenuCamPos;
     Vector3 MainMenuAspectRation;
     Vector3 MainMenuCamRot;
+
+    
 
     public override void OnAwake()
     {
@@ -56,11 +62,13 @@ public class GUIMainMenu : ScriptComponent
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
         MainMenuAspectRation = new Vector3(16, 9, 1);
         MainMenuCamRot = Vector3.Zero;
-        
+
     }
 
     public override void Update()
     {
+        
+
         Play.color = Unselected;
         HostGame.color = Unselected;
         Options.color = Unselected;
@@ -81,6 +89,15 @@ public class GUIMainMenu : ScriptComponent
         else if (RandomHat.Hovered())
             RandomHat.color = Selected;
 
+        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        {
+            if (ChadArea.Hovered())
+            {
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                _RotateChad = true;
+            }
+        }
+
         if (MyNameSticker.Clicked())
         {
             TakeName = true;
@@ -97,6 +114,8 @@ public class GUIMainMenu : ScriptComponent
         }
         else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
+            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+            _RotateChad = false;
             TakeName = false;
             if (Blink != null)
             {
@@ -106,6 +125,7 @@ public class GUIMainMenu : ScriptComponent
             Caret.text = "";
         }
 
+        #region Clicked
         if (Play.Clicked() && PlayerName.text != "")
         {
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
@@ -136,13 +156,20 @@ public class GUIMainMenu : ScriptComponent
         {
             CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
         }
-       
+        #endregion
+
         if (TakeName)
         {
-            string str = PlayerName.text;
-            GUIInput.AppendString(ref str, 9);
-            PlayerName.text = str;
+            string playerString = PlayerName.text;
+            GUIInput.AppendString(ref playerString, 9);
+            PlayerName.text = playerString;
         }
+
+
+
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
+        RotateChad();
+    }
 
         
 
@@ -259,6 +286,19 @@ public class GUIMainMenu : ScriptComponent
             SelectHatLeft.depth = 0.9f;
         }
         #endregion
+
+        #region Chad Area
+        if (FrameTexture != null)
+        {
+            ChadArea = Canvas.Add(FrameTexture);
+            ChadArea.position = new Vector2(0.62f, 0.32f);
+            ChadArea.scale = new Vector2(5, 6);
+            ChadArea.interactable = true;
+            ChadArea.color = new Color(1, 1, 1, 0);
+            ChadArea.depth = 0.9f;
+        }
+        #endregion
+
         #endregion
     }
 
@@ -300,5 +340,21 @@ public class GUIMainMenu : ScriptComponent
 
             yield return new WaitForSecondsRealtime(0.5f);
         }
+    }
+
+    public void RotateChad()
+    {
+        if (_RotateChad)
+        {
+            if(Input.GetMouseX() < 500)
+                rotationSpeed += Input.GetMouseX() * 0.1f * Time.DeltaTime;
+        }
+        else
+        {
+            rotationSpeed = MathHelper.Lerp(rotationSpeed, 0, Time.DeltaTime);
+        }
+        
+        CameraMaster.instance.ChadMainMenu.transform.RotateByAxis(Vector3.Up, rotationSpeed);
+        
     }
 }
