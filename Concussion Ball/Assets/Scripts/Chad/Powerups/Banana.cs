@@ -17,7 +17,6 @@ public class Banana : Powerup
     private Collider _FirstCollider;
     private ChadControls ObjectOwner = null;
 
-    private bool _BananaTriggered;
     private float _BananaTimer;
     private float _Force;
 
@@ -35,7 +34,6 @@ public class Banana : Powerup
 
         _FirstCollider = null;
         DespawnTime = 60.0f;
-        _BananaTriggered = false;
         _BananaTimer = 0.0f;
 
 

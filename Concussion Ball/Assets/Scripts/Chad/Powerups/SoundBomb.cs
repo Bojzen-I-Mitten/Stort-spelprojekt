@@ -22,6 +22,7 @@ public class SoundBomb : Powerup
     private float _DanceDuration;
     private float _Hue;
     private bool _SpawnedLight;
+    private bool _Landed;
 
     public override void OnAwake()
     {
@@ -40,6 +41,7 @@ public class SoundBomb : Powerup
         _DanceDuration = 5.0f;
         _Hue = 0.0f;
         _SpawnedLight = false;
+        _Landed = false;
         //ExplosionSound = gameObject.AddComponent<SoundComponent>();
         //ExplosionSound.Type = SoundComponent.SoundType.Effect;
         //ExplosionSound.Clip = VindalooExplosionSound;
@@ -140,12 +142,9 @@ public class SoundBomb : Powerup
                 // Jump animation
                 if (_JumpTimer > 1.0f)
                 {
-                    m_rigidBody.LinearVelocity = Vector3.Zero;
-                    m_rigidBody.AddForce(new Vector3(0, 100, 0));
-
                     // splash some particles Gustav @gustav @ijäzy
 
-                    _JumpTimer = Time.DeltaTime;
+                    _JumpTimer = Time.DeltaTime; // reset
                 }
 
                 // If Sound Bomb falls on side, reset
@@ -161,6 +160,12 @@ public class SoundBomb : Powerup
                     _SpawnedLight = false;
                     PointBoi.enabled = false;
                 }
+            }
+            if (_Landed)
+            {
+                m_rigidBody.LinearVelocity = Vector3.Zero;
+                m_rigidBody.AddForce(new Vector3(0, 100, 0));
+                _Landed = false;
             }
         }
         else
@@ -190,6 +195,8 @@ public class SoundBomb : Powerup
 
         if (!colliderPlayer && _JumpTimer == 0 && isOwner)
         {
+            _Landed = true;
+            Debug.Log("Roh oh 1: " + collider.gameObject.Name);
             if (PointBoi)
             {
                 _SpawnedLight = true;
@@ -197,13 +204,18 @@ public class SoundBomb : Powerup
             }
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
+            m_rigidBody.FreezeRotation = new Vector3(0, 1, 0); // freeze ya'll's music box
             //PickupCollider.enabled = true; // for testing
 
             _JumpTimer += Time.DeltaTime;
 
             base.OnCollisionEnter(collider);
         }
-
+        else if (_JumpTimer > 0.1f)
+        {
+            Debug.Log("roh oh");
+            _Landed = true;
+        }
 
     }
 
@@ -283,6 +295,7 @@ public class SoundBomb : Powerup
 
 
     // COLOR CALCS FROM ALBIN
+    #region ALBIN_COLOR
     private float HueFromRGB(Color rgba)
     {
         Vector3 rgb = rgba.ToVector3() / 255.0f;
@@ -339,6 +352,7 @@ public class SoundBomb : Powerup
         if (3.0d * c < 2.0d) return t1 + (t2 - t1) * (2.0d / 3.0d - c) * 6.0d;
         return t1;
     }
+    #endregion
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
