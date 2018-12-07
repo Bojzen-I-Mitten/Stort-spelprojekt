@@ -99,13 +99,14 @@ public class ChadControls : NetworkComponent
     private Vector3 OrginalCapsuleCenter;
     private float OriginalCapsuleHeight;
     private float OriginalCapsuleRadius;
+    private float OriginalMass;
 
-    private Material ChadFirstMaterial { get; set; }
+    public Material ChadFirstMaterial { get; set; }
     public Material ChadSecondMaterial { get; set; }
     public Material ChadThirdMaterial { get; set; }
 
     // Tweaking constants
-    private float ScaleDuration = 5.0f;
+    private float ScaleDuration = 10.0f;
 
     public override void OnAwake()
     {
@@ -155,6 +156,7 @@ public class ChadControls : NetworkComponent
         OrginalCapsuleCenter = capsule.center;
         OriginalCapsuleHeight = capsule.height;
         OriginalCapsuleRadius = capsule.radius;
+        OriginalMass = rBody.Mass;
     }
 
     public override void OnGotOwnership()
@@ -719,13 +721,10 @@ public class ChadControls : NetworkComponent
         capsule.center = OrginalCapsuleCenter;
         capsule.height = OriginalCapsuleHeight;
         capsule.radius = OriginalCapsuleRadius;
+        rBody.Mass = OriginalMass;
 
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-
-        //MatchSystem.instance.
-        //ChadSecondMaterial.SetColor(MatchSystem.instance.te)
-        //MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
-
+        ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject)].Color);
         render.SetMaterial(0, ChadFirstMaterial);
         render.SetMaterial(1, ChadSecondMaterial);
         render.SetMaterial(2, ChadThirdMaterial);

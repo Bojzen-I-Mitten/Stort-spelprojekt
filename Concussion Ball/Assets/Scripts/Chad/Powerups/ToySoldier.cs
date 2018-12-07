@@ -17,6 +17,7 @@ public class ToySoldier : Powerup
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
         m_throwable = true; // Change depending on power-up
+        gameObject.GetComponent<Rigidbody>().Friction = 2.0f;
     }
 
     public override void Update()
@@ -80,8 +81,10 @@ public class ToySoldier : Powerup
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         // Scale and movement decrease
-        // TODO: apply gravity to reach ground when scaled down
-        // TODO: apply toy soldier material to chad
+        // The scale up effect with the collider look's a bit weird
+        // Chad can still sprint with this powerup
+        // Collider can go through some walls when thrown
+        // Object can spin when thrown to the ground in unrealistic manner (like on powerup spawn)
         localChad.ToySoldierAffected = true;
         localChad.transform.scale *= 0.5f;
         localChad.Acceleration *= 0.5f;
@@ -93,6 +96,7 @@ public class ToySoldier : Powerup
         capsule.center = new Vector3(0, 0.3f, 0);
         capsule.height *= 0.5f;
         capsule.radius *= 0.5f;
+        localChad.rBody.Mass *= 0.5f;
 
         // Material
         RenderSkinnedComponent render = localChad.gameObject.GetComponent<RenderSkinnedComponent>();
