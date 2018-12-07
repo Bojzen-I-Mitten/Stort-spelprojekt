@@ -1,6 +1,6 @@
 #include "ResourceManager.h"
 #include "../utils/Math.h"
-#include "../utils/d3d.h"
+#include "../utils/D3D.h"
 #include <DirectXTex.h>
 #include "texture/Texture2D.h"
 #include "texture/TextureCube.h"

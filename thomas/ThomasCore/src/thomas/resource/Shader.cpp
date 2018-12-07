@@ -1,17 +1,19 @@
 #include "Shader.h"
-#include <AtlBase.h>
-#include <atlconv.h>
-#include <d3dcompiler.h>
 #include "ShaderProperty\shaderProperties.h"
-#include "../utils/Utility.h"
-#include <fstream>
-#include <comdef.h>
+#include "..\utils\Utility.h"
 #include "..\ThomasCore.h"
 #include "..\graphics\Renderer.h"
-#include "../Common.h"
-#include "../utils/Math.h"
+#include "..\Common.h"
+#include "..\utils\Math.h"
+#include "..\utils\GpuProfiler.h"
+
 #include "ResourceManager.h"
 
+#include <d3dcompiler.h>
+#include <AtlBase.h>
+#include <atlconv.h>
+#include <fstream>
+#include <comdef.h>
 namespace thomas
 {
 	namespace resource
@@ -229,14 +231,14 @@ namespace thomas
 
 		void Shader::BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type)
 		{
-			utils::D3D::Instance()->GetDeviceContext()->IASetPrimitiveTopology(type);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetPrimitiveTopology(type);
 		}
 		void Shader::BindVertexBuffer(utils::buffers::VertexBuffer* buffer)
 		{
 			UINT stride = (uint32_t)buffer->GetStride();
 			ID3D11Buffer* buff = buffer->GetBuffer();
 			UINT offset = 0;
-			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
 		}
 
 		void Shader::BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers)
@@ -252,13 +254,13 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 
 		void Shader::BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer)
 		{
-			utils::D3D::Instance()->GetDeviceContext()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
 
 		void Shader::Bind()
@@ -269,11 +271,13 @@ namespace thomas
 		}
 		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
 		{
-			thomas::utils::D3D::Instance()->GetDeviceContext()->Draw(vertexCount, startVertexLocation);
+			thomas::utils::D3D::Instance()->GetDeviceContextDeferred()->Draw(vertexCount, startVertexLocation);
+			utils::profiling::GpuProfiler::Instance()->AddDrawCall(vertexCount, 0);
 		}
 		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
 		{
-			thomas::utils::D3D::Instance()->GetDeviceContext()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+			thomas::utils::D3D::Instance()->GetDeviceContextDeferred()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+			utils::profiling::GpuProfiler::Instance()->AddDrawCall(indexCount, 0);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
 		{
@@ -292,9 +296,12 @@ namespace thomas
 				LOG("Shader: " + this->GetName() + " SetPass(), pass-index is out of range");
 				return;
 			}
-			utils::D3D::Instance()->GetDeviceContext()->IASetInputLayout(m_passes[passIndex].inputLayout);
+			
+			if (m_passes[passIndex].inputLayout != nullptr)
+				utils::D3D::Instance()->GetDeviceContextDeferred()->IASetInputLayout(m_passes[passIndex].inputLayout);
+			
 			ID3DX11EffectPass* pass = m_effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex);
-			pass->Apply(0, utils::D3D::Instance()->GetDeviceContext());
+			pass->Apply(0, utils::D3D::Instance()->GetDeviceContextDeferred());
 			m_currentPass = &m_passes[passIndex];
 		}
 		void Shader::SetProperty(const std::string & name, std::shared_ptr<shaderproperty::ShaderProperty> prop)

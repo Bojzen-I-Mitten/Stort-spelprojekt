@@ -151,11 +151,11 @@ public class CameraMaster : ScriptComponent
     public override void Update()
     {
         //Set all CAM_STATEs exept GAME to false
+        MainMenu.Canvas.isRendering = false;
+        JoinHost.Canvas.isRendering = false;
         SelectTeam.Canvas.isRendering = false;
         Hud.Canvas.isRendering = false;
         ExitMenu.Canvas.isRendering = false;
-        JoinHost.Canvas.isRendering = false;
-        MainMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
         LoadingScreen.Canvas.isRendering = false;
 

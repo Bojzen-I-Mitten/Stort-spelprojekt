@@ -31,8 +31,8 @@ public class GUIMainMenu : ScriptComponent
 
     private bool TakeName;
 
-    public float CaretOffset { get; set; } = -0.015f;
-
+    public float CaretOffset { get; set; }
+    public float NameRotation { get; set; }
     private bool ClearName = true;
     bool _RotateChad;
     float rotationSpeed;
@@ -47,7 +47,8 @@ public class GUIMainMenu : ScriptComponent
 
     public override void OnAwake()
     {
-
+        CaretOffset = -0.02f;
+        NameRotation = -0.1f;
     }
 
     public override void Start()
@@ -157,24 +158,21 @@ public class GUIMainMenu : ScriptComponent
             }
             #endregion
 
-            if (TakeName)
-            {
-                string playerString = PlayerName.text;
-                GUIInput.AppendString(ref playerString, 9);
-                PlayerName.text = playerString;
-            }
-
-
-
-            Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset);
-            RotateChad();
+        if (TakeName)
+        {
+            string playerString = PlayerName.text;
+            GUIInput.AppendString(ref playerString, 9);
+            PlayerName.text = playerString;
         }
+        RotateChad();
+
+        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
     }
 
 
     public string GetPlayerName()
     {
-        return PlayerName != null ? PlayerName.text : "Chad";
+        return PlayerName.text;
     }
 
     public void AddImagesAndText()
@@ -229,7 +227,7 @@ public class GUIMainMenu : ScriptComponent
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
-        PlayerName.rotation = -0.1f;
+        PlayerName.rotation = NameRotation;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
         #endregion
@@ -249,6 +247,7 @@ public class GUIMainMenu : ScriptComponent
         Caret.scale = new Vector2(1.2f);
         Caret.interactable = false;
         Caret.depth = 0.8f;
+        Caret.rotation = NameRotation;
         Caret.color = Color.Black;
         Caret.font = TextFont;
         #endregion

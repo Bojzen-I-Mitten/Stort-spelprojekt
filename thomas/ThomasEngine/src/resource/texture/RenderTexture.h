@@ -13,13 +13,13 @@ namespace ThomasEngine
 	{
 	public:
 		RenderTexture(int width, int height) : Texture2D(new thomas::resource::RenderTexture(width, height)) {};
+		virtual ~RenderTexture() {}
 	internal:
 		RenderTexture(thomas::resource::RenderTexture* nativePtr) : Texture2D(nativePtr) {};
 	public:
 		
 		void WriteCanvas(Canvas^ canvas)
 		{
-			ThomasWrapper::WaitForRender();
 			((thomas::resource::RenderTexture*)m_nativePtr)->WriteCanvas(canvas->nativePtr);
 		}
 	};

@@ -26,6 +26,7 @@ namespace ThomasEngine
 		m_accessLock(gcnew System::Object()),
 		m_commandList(gcnew List<IssuedCommand>()),
 		m_commandSwapList(gcnew List<IssuedCommand>()),
+		m_looseObjects(gcnew List<System::IDisposable^>()),
 		m_name(name)
 	{
 	}
@@ -53,7 +54,6 @@ namespace ThomasEngine
 				// Need to remove failed object?!..
 				Debug::LogException(e);
 				Debug::LogError("Awake on object failed: " + (g != nullptr ? g->Name : "NULL"));
-				g->TryReleaseComponentLock();
 				DeleteInstant(g);
 				objects->RemoveAt(i);
 			}
@@ -75,7 +75,6 @@ namespace ThomasEngine
 				// Need to remove failed object?!..
 				Debug::LogException(e);
 				Debug::LogError("Enable on object failed: " + (g != nullptr ? g->Name : "NULL"));
-				g->TryReleaseComponentLock();
 				DeleteInstant(g);
 				objects->RemoveAt(i);
 			}
@@ -122,6 +121,13 @@ namespace ThomasEngine
 		cmd.m_obj = object;
 		m_commandList->Add(cmd);
 	}
+	void Scene::AddLooseObject(System::IDisposable ^ object)
+	{
+		IssuedCommand cmd;
+		cmd.m_cmd = Command::AddDisposable;
+		cmd.m_obj = object;
+		m_commandList->Add(cmd);
+	}
 	void Scene::DeleteInstant(GameObject ^ object)
 	{
 		if (!m_gameObjects->Remove(object))
@@ -142,11 +148,16 @@ namespace ThomasEngine
 
 	void Scene::UnLoad()
 	{
+		// Flush command lists?
 		Monitor::Enter(m_accessLock);
 		for (int i = 0; i < m_gameObjects->Count; i++)
 		{
 			m_gameObjects[i]->OnDestroy();
 			delete m_gameObjects[i];
+		}
+		for (int i = 0; i < m_looseObjects->Count; i++)
+		{
+			delete m_looseObjects[i];
 		}
 		m_gameObjects->Clear();
 		m_commandList->Clear();
@@ -259,29 +270,29 @@ namespace ThomasEngine
 			switch (c.m_cmd)
 			{
 			case Command::Add:
-				m_gameObjects->Add(c.m_obj);
+				m_gameObjects->Add((GameObject^)c.m_obj);
 #ifdef _EDITOR
 				numChanged++;
-				addedList->Add(c.m_obj);
+				addedList->Add((GameObject^)c.m_obj);
 #endif
 				break;
 			case Command::DisableRemove:
 			{
 				int index;
 				// Verify delete call is valid.
-				if (!InScene(c.m_obj, index))
+				if (!InScene((GameObject^)c.m_obj, index))
 				{
-					Debug::LogWarning("Delete on object: " + c.m_obj->Name + " was called twice");
+					Debug::LogWarning("Delete on object: " + ((GameObject^)c.m_obj)->Name + " was called twice");
 				}
 				else
 				{
 					// Disable object:
-					ThomasWrapper::Selection->UnSelectGameObject(c.m_obj);
+					ThomasWrapper::Selection->UnSelectGameObject((GameObject^)c.m_obj);
 					m_gameObjects->RemoveAt(index);
-					c.m_obj->OnDestroy();
+					((GameObject^)c.m_obj)->OnDestroy();
 #ifdef _EDITOR
 					numChanged++;
-					removedList->Add(c.m_obj);
+					removedList->Add(((GameObject^)c.m_obj));
 #endif
 					// Wait to next frame for delete:
 					IssuedCommand cmd;
@@ -295,6 +306,11 @@ namespace ThomasEngine
 				// Destroy object
 				delete c.m_obj;
 				break;
+			case Command::AddDisposable:
+			{
+				m_looseObjects->Add((IDisposable^)c.m_obj);
+			}
+			break;
 			default:
 				Debug::LogWarning("Scene: Unknown Command issued...");
 			}
@@ -420,58 +436,63 @@ namespace ThomasEngine
 		m_gameObjects = val;
 	}
 
+	void Scene::AddLooseNative(thomas::object::Object* nativePtr)
+	{
+		AddLooseObject(gcnew DisposableNative<thomas::object::Object>(nativePtr));
+	}
+
 	generic<typename T>
-		where T : Component
-		inline List<T>^ Scene::getComponentsOfType()
+	where T : Component
+	inline List<T>^ Scene::getComponentsOfType()
+	{
+		Monitor::Enter(m_gameObjects);
+		List<T>^ list = gcnew List<T>();
+		for each(GameObject^ g in m_gameObjects)
 		{
-			Monitor::Enter(m_gameObjects);
-			List<T>^ list = gcnew List<T>();
-			for each(GameObject^ g in m_gameObjects)
+			// Check if valid object
+			for each(Component^ c in g->Components)
+			{
+				if (T::typeid->IsAssignableFrom(c->GetType()))
+					list->Add((T)c);
+			}
+		}
+		Monitor::Exit(m_gameObjects);
+		return list;
+	}
+	generic<typename T>
+	where T : Component
+	T Scene::findFirstComponent()
+	{
+		Monitor::Enter(m_gameObjects);
+		for each(GameObject^ g in m_gameObjects)
+		{
+			for each(Component^ c in g->Components)
 			{
 				// Check if valid object
-				for each(Component^ c in g->Components)
+				if (T::typeid->IsAssignableFrom(c->GetType()))
 				{
-					if (T::typeid->IsAssignableFrom(c->GetType()))
-						list->Add((T)c);
+					Monitor::Exit(m_gameObjects);
+					return (T)c;
 				}
 			}
-			Monitor::Exit(m_gameObjects);
-			return list;
 		}
-		generic<typename T>
-			where T : Component
-		T Scene::findFirstComponent()
+		Monitor::Exit(m_gameObjects);
+		return T();
+	}
+	List<System::Object^>^ Scene::getComponentsOfType(System::Type^ type)
+	{
+		Monitor::Enter(m_gameObjects);
+		List<System::Object^>^ list = gcnew List<System::Object^>();
+		for each(GameObject^ g in m_gameObjects)
 		{
-			Monitor::Enter(m_gameObjects);
-			for each(GameObject^ g in m_gameObjects)
+			for each(Component^ c in g->Components)
 			{
-				for each(Component^ c in g->Components)
-				{
-					// Check if valid object
-					if (T::typeid->IsAssignableFrom(c->GetType()))
-					{
-						Monitor::Exit(m_gameObjects);
-						return (T)c;
-					}
-				}
+				if(type->IsAssignableFrom(c->GetType()))
+					list->Add(c);
 			}
-			Monitor::Exit(m_gameObjects);
-			return T();
 		}
-		List<System::Object^>^ Scene::getComponentsOfType(System::Type^ type)
-		{
-			Monitor::Enter(m_gameObjects);
-			List<System::Object^>^ list = gcnew List<System::Object^>();
-			for each(GameObject^ g in m_gameObjects)
-			{
-				for each(Component^ c in g->Components)
-				{
-					if(type->IsAssignableFrom(c->GetType()))
-						list->Add(c);
-				}
-			}
-			Monitor::Exit(m_gameObjects);
-			return list;
-		}
+		Monitor::Exit(m_gameObjects);
+		return list;
+	}
 }
 
