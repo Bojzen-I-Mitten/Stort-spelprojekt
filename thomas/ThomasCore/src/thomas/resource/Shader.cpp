@@ -231,14 +231,14 @@ namespace thomas
 
 		void Shader::BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY type)
 		{
-			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetPrimitiveTopology(type);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetPrimitiveTopology(type);
 		}
 		void Shader::BindVertexBuffer(utils::buffers::VertexBuffer* buffer)
 		{
 			UINT stride = (uint32_t)buffer->GetStride();
 			ID3D11Buffer* buff = buffer->GetBuffer();
 			UINT offset = 0;
-			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetVertexBuffers(0, 1, &buff, &stride, &offset);
 		}
 
 		void Shader::BindVertexBuffers(std::vector<utils::buffers::VertexBuffer*> buffers)
@@ -254,13 +254,13 @@ namespace thomas
 				offsets.push_back(0);
 			}
 
-			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetVertexBuffers(0, (uint32_t)buffs.size(), buffs.data(), strides.data(), offsets.data());
 		}
 
 
 		void Shader::BindIndexBuffer(utils::buffers::IndexBuffer* indexBuffer)
 		{
-			utils::D3D::Instance()->GetDeviceContextDeffered()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+			utils::D3D::Instance()->GetDeviceContextDeferred()->IASetIndexBuffer(indexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		}
 
 		void Shader::Bind()
@@ -271,12 +271,12 @@ namespace thomas
 		}
 		void Shader::Draw(UINT vertexCount, UINT startVertexLocation)
 		{
-			thomas::utils::D3D::Instance()->GetDeviceContextDeffered()->Draw(vertexCount, startVertexLocation);
+			thomas::utils::D3D::Instance()->GetDeviceContextDeferred()->Draw(vertexCount, startVertexLocation);
 			utils::profiling::GpuProfiler::Instance()->AddDrawCall(vertexCount, 0);
 		}
 		void Shader::DrawIndexed(UINT indexCount, UINT startIndexLocation, int baseVertexLocation)
 		{
-			thomas::utils::D3D::Instance()->GetDeviceContextDeffered()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+			thomas::utils::D3D::Instance()->GetDeviceContextDeferred()->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
 			utils::profiling::GpuProfiler::Instance()->AddDrawCall(indexCount, 0);
 		}
 		std::vector<Shader::ShaderPass>* Shader::GetPasses()
@@ -298,10 +298,10 @@ namespace thomas
 			}
 			
 			if (m_passes[passIndex].inputLayout != nullptr)
-				utils::D3D::Instance()->GetDeviceContextDeffered()->IASetInputLayout(m_passes[passIndex].inputLayout);
+				utils::D3D::Instance()->GetDeviceContextDeferred()->IASetInputLayout(m_passes[passIndex].inputLayout);
 			
 			ID3DX11EffectPass* pass = m_effect->GetTechniqueByIndex(0)->GetPassByIndex(passIndex);
-			pass->Apply(0, utils::D3D::Instance()->GetDeviceContextDeffered());
+			pass->Apply(0, utils::D3D::Instance()->GetDeviceContextDeferred());
 			m_currentPass = &m_passes[passIndex];
 		}
 		void Shader::SetProperty(const std::string & name, std::shared_ptr<shaderproperty::ShaderProperty> prop)
@@ -605,7 +605,7 @@ namespace thomas
 					else
 					{
 						newProperty = shaderproperty::ShaderPropertyTexture2D::GetDefault();
-						if (semantic == "SHADOWMAP")
+						if (semantic == "RENDERTEXTURE")
 							isMaterialProperty = false;
 					}
 					break;

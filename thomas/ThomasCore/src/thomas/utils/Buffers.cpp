@@ -70,9 +70,9 @@ namespace thomas
 				}
 
 				D3D11_MAPPED_SUBRESOURCE resource;
-				utils::D3D::Instance()->GetDeviceContextDeffered()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+				utils::D3D::Instance()->GetDeviceContextDeferred()->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 				memcpy(resource.pData, data, size);
-				utils::D3D::Instance()->GetDeviceContextDeffered()->Unmap(m_buffer, 0);
+				utils::D3D::Instance()->GetDeviceContextDeferred()->Unmap(m_buffer, 0);
 			}
 			void Buffer::SetName(const char * name)
 			{

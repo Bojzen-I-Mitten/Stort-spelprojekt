@@ -16,7 +16,8 @@ namespace thomas
 			Texture2D(int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(void* initData, int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(std::string path);
-			
+			Texture2D() {};
+
 			void OnChanged();
 			std::vector<math::Color> GetPixels();
 			//byte* GetRawRGBAPixels();
@@ -31,6 +32,7 @@ namespace thomas
 			~Texture2D();
 		private:
 
+		protected:
 			DirectX::ScratchImage* data;
 			int m_mipmapCount;
 			bool m_mipMap;

@@ -4,6 +4,7 @@
 #include "../Window.h"
 #include "../ThomasCore.h"
 #include "GpuProfiler.h"
+#include "ProfileManager.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
 
@@ -110,6 +111,10 @@ namespace thomas
 				TexInitData.SysMemSlicePitch = static_cast<UINT>(4 * width * height);
 
 				hr = m_device->CreateTexture2D(&textureDesc, &TexInitData, &tex);
+#ifdef _DEBUG
+				static const char c_szName[] = "Texture2D";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 			else
 				hr = m_device->CreateTexture2D(&textureDesc, NULL, &tex);
@@ -123,6 +128,60 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(tex, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
+
+			return true;
+		}
+
+		bool D3D::CreateRenderTexture(int width, int height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)
+		{
+			D3D11_TEXTURE2D_DESC bufferDesc;
+			ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+			bufferDesc.Width = width;
+			bufferDesc.Height = height;
+			bufferDesc.MipLevels = 0;
+			bufferDesc.ArraySize = 1;
+			bufferDesc.Format = format;
+			bufferDesc.SampleDesc.Count = 1;
+			bufferDesc.SampleDesc.Quality = 0;
+			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+			rtvDesc.Format = bufferDesc.Format;
+			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			ZeroMemory(&srvDesc, sizeof(srvDesc));
+			srvDesc.Format = bufferDesc.Format;
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+			srvDesc.Texture2D.MipLevels = -1;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			
+			HRESULT hr = m_device->CreateTexture2D(&bufferDesc, NULL, &tex);
+			if (SUCCEEDED(hr))
+			{
+				hr = m_device->CreateShaderResourceView(tex, &srvDesc, &SRV);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
+
+				m_device->CreateRenderTargetView(tex, &rtvDesc, &RTV);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
+#ifdef _DEBUG
+				static const char c_szName[] = "TextureRender ";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
+			}
 
 			return true;
 		}
@@ -188,7 +247,10 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
-
+#ifdef _DEBUG
+			static const char c_szName[] = "TextureArray";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			return true;
 		}
 
@@ -248,6 +310,11 @@ namespace thomas
 			if (FAILED(hr))
 				return false;
 
+#ifdef _DEBUG
+			static const char c_szName[] = "CubeMap";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
+
 			return true;
 		}
 
@@ -264,7 +331,7 @@ namespace thomas
 				scd.Width = width;
 				scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 				scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
 				scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 				scd.SampleDesc.Count = 1;
 				scd.SampleDesc.Quality = 0;
@@ -310,7 +377,12 @@ namespace thomas
 #ifdef _DEBUG_DX
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), &m_device, D3D11_SDK_VERSION, &fl);
+
+#ifdef BENCHMARK
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl);
+#else
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
+#endif
 
 			if (!CreateDeviceContext())
 				return false;
@@ -790,7 +862,7 @@ namespace thomas
 			return m_device;
 		}
 
-		ID3D11DeviceContext * D3D::GetDeviceContextDeffered()
+		ID3D11DeviceContext * D3D::GetDeviceContextDeferred()
 		{
 			return m_deviceContextDeferred;
 		}

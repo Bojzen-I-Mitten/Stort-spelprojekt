@@ -97,8 +97,6 @@ namespace ThomasEngine.Network
             Listener.PeerConnectedEvent += Listener_PeerConnectedEvent;
             Listener.PeerDisconnectedEvent += Listener_PeerDisconnectedEvent;
             Listener.NetworkErrorEvent += Listener_NetworkErrorEvent;
-            
-            Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
         
         private void NatPunchListener_NatIntroductionSuccess(System.Net.IPEndPoint targetEndPoint, string token)
@@ -124,7 +122,7 @@ namespace ThomasEngine.Network
             NetManager.Start(LocalPort);
             Debug.Log("NetManager started on port" + ":" + NetManager.LocalPort);
             LocalPeer = new NetPeer(NetManager, null);
-
+            Scene.InitPlayerPool(PlayerPrefab, MaxPlayers);
         }
 
         public void Host()
@@ -166,15 +164,12 @@ namespace ThomasEngine.Network
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " timed out");
                     break;
                 case DisconnectReason.ConnectionRejected:
-                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " rejected");
                     break;
                 case DisconnectReason.ConnectionFailed:
-                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed");
                     break;
                 case DisconnectReason.SocketReceiveError:
-                    InternalManager.DisconnectAll();
                     Debug.Log("Connection to peer " + peer.EndPoint.ToString() + " failed, peer socket closed"); //Could be the other way around
                     break;
                 case DisconnectReason.SocketSendError:

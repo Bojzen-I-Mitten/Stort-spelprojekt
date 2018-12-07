@@ -45,10 +45,16 @@ namespace thomas
 			if (bindDepth)
 			{
 				utils::D3D::Instance()->CreateDepthStencilTexture(width, height, textureInterface, m_srv);
+
+				static const char c_szName[] = "Stencil";
+				textureInterface->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
 			}
 			else
 			{
 				utils::D3D::Instance()->CreateTexture(initData, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, textureInterface, m_srv, mipMap, 1);
+
+				static const char c_szName[] = "Texture";
+				textureInterface->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
 			}
 
 			m_resource = textureInterface;
@@ -85,7 +91,7 @@ namespace thomas
 
 		/*byte * Texture2D::GetRawRGBAPixels()
 		{
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, *data);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeferred(), m_resource, *data);
 			
 			return data->GetPixels();
 		}*/
@@ -103,7 +109,7 @@ namespace thomas
 		/*bool Texture2D::ChangeFormat(DXGI_FORMAT format)
 		{
 			DirectX::ScratchImage firstData;
-			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered(), m_resource, firstData);
+			HRESULT hr = DirectX::CaptureTexture(utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeferred(), m_resource, firstData);
 
 			hr = DirectX::Convert(*firstData.GetImage(0, 0, 0), format, DirectX::TEX_FILTER_DEFAULT, DirectX::TEX_THRESHOLD_DEFAULT, *data);
 
@@ -162,7 +168,5 @@ namespace thomas
 		{
 			
 		}
-
-
 	}
 }

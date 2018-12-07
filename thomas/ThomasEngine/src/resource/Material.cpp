@@ -125,7 +125,6 @@ namespace ThomasEngine {
 	}
 
 
-
 	void Material::EditorProperties::set(Dictionary<String^, System::Object^>^ value)
 	{
 		properties = value;
