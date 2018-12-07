@@ -83,9 +83,8 @@ namespace thomas
 
 		bool Renderer::BindCameraRenderTarget(const render::CAMERA_FRAME_DATA& frameData)
 		{
-			
-
-			if (frameData.renderTexture) {
+			if (frameData.renderTexture) 
+			{
 				frameData.renderTexture->Bind();
 			}
 			else
@@ -202,7 +201,7 @@ namespace thomas
 			}
 
 
-			utils::D3D::Instance()->ResetCommandList(m_commmandList[0]);
+			/*utils::D3D::Instance()->ResetCommandList(m_commmandList[0]);*/
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_SHADOWS_BEGIN);
 
 			if (m_enableShadows)
@@ -216,10 +215,10 @@ namespace thomas
 			}
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_SHADOWS_END);
-			utils::D3D::Instance()->FinishCommandList(m_commmandList[0]);
-			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[0]);
+		/*	utils::D3D::Instance()->FinishCommandList(m_commmandList[0]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[0]);*/
 
-			utils::D3D::Instance()->ResetCommandList(m_commmandList[1]);
+			/*utils::D3D::Instance()->ResetCommandList(m_commmandList[1]);*/
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS_BEGIN);
 
 			for (auto & perCameraQueue : m_prevFrame->m_queue)
@@ -273,10 +272,10 @@ namespace thomas
 			}
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_MAIN_OBJECTS_END);
-			utils::D3D::Instance()->FinishCommandList(m_commmandList[1]);
-			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[1]);
+			/*utils::D3D::Instance()->FinishCommandList(m_commmandList[1]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[1]);*/
 
-			utils::D3D::Instance()->ResetCommandList(m_commmandList[2]);
+			/*utils::D3D::Instance()->ResetCommandList(m_commmandList[2]);*/
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_PARTICLES_BEGIN);
 
 			{
@@ -299,10 +298,10 @@ namespace thomas
 			}
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_PARTICLES_END);
-			utils::D3D::Instance()->FinishCommandList(m_commmandList[2]);
-			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[2]);
+			/*utils::D3D::Instance()->FinishCommandList(m_commmandList[2]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[2]);*/
 
-			utils::D3D::Instance()->ResetCommandList(m_commmandList[3]);
+			/*utils::D3D::Instance()->ResetCommandList(m_commmandList[3]);*/
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS_BEGIN);
 
 			{
@@ -317,13 +316,13 @@ namespace thomas
 			}
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GIZMO_OBJECTS_END);
-			utils::D3D::Instance()->FinishCommandList(m_commmandList[3]);
-			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[3]);
+			/*utils::D3D::Instance()->FinishCommandList(m_commmandList[3]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[3]);*/
 
 			//Copy rendered objects into the back buffer
 			WindowManager::Instance()->ResolveRenderTarget();
 
-			utils::D3D::Instance()->ResetCommandList(m_commmandList[4]);
+		/*	utils::D3D::Instance()->ResetCommandList(m_commmandList[4]);*/
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GUI_BEGIN);
 
 			{
@@ -342,8 +341,8 @@ namespace thomas
 			}
 
 			utils::profiling::GpuProfiler::Instance()->Timestamp(utils::profiling::GTS_GUI_END);
-			utils::D3D::Instance()->FinishCommandList(m_commmandList[4]);
-			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[4]);
+			/*utils::D3D::Instance()->FinishCommandList(m_commmandList[4]);
+			utils::D3D::Instance()->ExecuteCommandList(m_commmandList[4]);*/
 		}
 	}
 }
