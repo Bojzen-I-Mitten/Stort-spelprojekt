@@ -12,6 +12,7 @@ namespace Concussion_Ball.Assets.Scripts
 {
     public class FeetIK : GroundOffset
     {
+        private static readonly uint NUM_LINK = 4;
         //[Browsable(false)]
         //[Newtonsoft.Json.JsonIgnore]
 
@@ -23,12 +24,25 @@ namespace Concussion_Ball.Assets.Scripts
         private float ikOrientWeight = 0;
         public float IKBlendFactor { get; set; } = 0.5f;        // Factor determining how fast IK is blended in when activated
         public float MaxDistanceOffset { get; set; } = 0.2f;    // Offset from max chain length IK is blended in
+        
+        public IK_FABRIK_Constraint.JointParams[] Joints
+        {
+            get { return IK.Joints; }
+            set
+            {
+                IK.Joints = value;
+            }
+        }
 
+        //public IK_FABRIK_Constraint.JointParams JointRoot { get { return arr[0]; } set { arr[0] = value; IK.setJoint(0, ref value); } }
+        //public IK_FABRIK_Constraint.JointParams JointLeg { get { return arr[1]; } set { arr[1] = value; IK.setJoint(1, ref value); } }
+        //public IK_FABRIK_Constraint.JointParams JointAnkle { get { return arr[2]; } set { arr[2] = value; IK.setJoint(2, ref value); } }
+        //public IK_FABRIK_Constraint.JointParams JointFoot { get { return arr[3]; } set { arr[3] = value; IK.setJoint(3, ref value); } }
 
         public FeetIK()
             : base()
         {
-            IK = new IK_FABRIK_Constraint(4);
+            IK = new IK_FABRIK_Constraint(NUM_LINK);
         }
 
         public override void OnAwake()

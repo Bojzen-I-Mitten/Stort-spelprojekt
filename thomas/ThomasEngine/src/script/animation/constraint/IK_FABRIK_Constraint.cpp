@@ -10,6 +10,7 @@
 #include "../../../object/GameObject.h"
 #include "../../../object/component/RenderSkinnedComponent.h"
 #include "../../../Utility.h"
+#include "../../../utils/MathEngine.h"
 
 
 namespace ThomasEngine
@@ -17,7 +18,8 @@ namespace ThomasEngine
 	namespace Script
 	{
 		IK_FABRIK_Constraint::IK_FABRIK_Constraint(uint32_t num_link)
-			: m_num_link(num_link), m_boneIndex(UINT_MAX), m_ptr(new thomas::graphics::animation::IK_FABRIK_C_Constraint(num_link)), m_skinn(nullptr)
+			: m_num_link(num_link), m_boneIndex(UINT_MAX), m_ptr(new thomas::graphics::animation::IK_FABRIK_C_Constraint(num_link)), m_skinn(nullptr),
+			m_joints(gcnew array<JointParams>(num_link))
 		{
 		}
 
@@ -54,8 +56,20 @@ namespace ThomasEngine
 		uint32_t IK_FABRIK_Constraint::SrcBoneIndex::get() {
 			return m_ptr->getSrcBoneIndex();
 		}
+		uint32_t IK_FABRIK_Constraint::NumLinks::get() {
+			return m_num_link;
+		}
 		float IK_FABRIK_Constraint::BoneChainLength::get() {
 			return m_ptr->getChainLength();
+		}
+		array<IK_FABRIK_Constraint::JointParams>^ IK_FABRIK_Constraint::Joints::get() {
+			return m_joints;
+		}
+		void IK_FABRIK_Constraint::Joints::set(array<IK_FABRIK_Constraint::JointParams>^ value) {
+			if (!value) 
+				return;	// Nope
+			for (uint32_t i = 0; i < m_num_link && i < value->Length; i++)
+				setJoint(i, value[i]);
 		}
 		thomas::graphics::animation::IK_FABRIK_C_Constraint* IK_FABRIK_Constraint::Native()
 		{
@@ -92,18 +106,20 @@ namespace ThomasEngine
 				return;
 			}
 			m_ptr->setLinkAtIndex(m_num_link - 1, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
-				joint_index));
+				joint_index, m_joints[m_num_link - 1].getParam()));
 
-			uint32_t numLinks = 2;
-			for (; numLinks <= m_num_link; numLinks++)
+			int index = int(m_num_link) - 2;
+			uint32_t count = 1;
+			for (; index >= 0; index--)
 			{
 				joint_index = tree->getBoneInfo(joint_index)._parentIndex;
-				m_ptr->setLinkAtIndex(m_num_link - numLinks, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
-					joint_index));
+				m_ptr->setLinkAtIndex(index, thomas::graphics::animation::IK_FABRIK_C_Constraint::LinkParameter(
+					joint_index, m_joints[index].getParam()));
+				count++;	// Count in case of break
 				if (joint_index == 0)
-					break;
+					break;	// Skeleton root has no parent: terminate
 			}
-			m_num_link = numLinks;
+			m_num_link = count;
 			m_skinn = skinn;
 			m_boneIndex = boneIndex;
 			skinn->GetBlendTree()->addConstraint(m_ptr, boneIndex);
@@ -114,5 +130,23 @@ namespace ThomasEngine
 			if (m_skinn)
 				m_skinn->GetBlendTree()->rmvConstraint(m_ptr, m_boneIndex);
 		}
-	}
+		void IK_FABRIK_Constraint::setJoint(uint32_t index, JointParams % value)
+		{
+			if (index >= m_num_link)
+			{
+				Debug::LogWarning("Joint constraint index out of bounds.");
+				return;
+			}
+			m_joints[index] = value;
+			m_ptr->setJointAtIndex(index, value.getParam());
+		}
+		thomas::graphics::animation::IK_FABRIK_C_Constraint::JointParams IK_FABRIK_Constraint::JointParams::getParam()
+		{
+			thomas::graphics::animation::IK_FABRIK_C_Constraint::JointParams param;
+			param.limit_bend = MathEngine::DegreesToRadians(limit_bend);
+			param.limit_twist = MathEngine::DegreesToRadians(limit_twist);
+			param.orientation = Utility::Convert(MathEngine::CreateRotationXYZ(rotation));
+			return param;
+		}
+}
 }

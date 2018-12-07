@@ -14,6 +14,8 @@ namespace thomas {
 				: m_target(), m_targetOrient(), m_weight(1.f), m_orientationWeight(1.f),
 					m_chain(new uint32_t[num_link]), m_joint(new JointInfo[num_link]), m_num_link(num_link)
 			{
+				for (size_t i = 0; i < m_num_link; i++)
+					m_joint.get()[i] = JointInfo();
 			}
 			IK_FABRIK_C_Constraint::IK_FABRIK_C_Constraint(const std::vector<LinkParameter>& link_chain)
 				: IK_FABRIK_C_Constraint((uint32_t)link_chain.size())
@@ -29,9 +31,17 @@ namespace thomas {
 			void IK_FABRIK_C_Constraint::setLinkAtIndex(uint32_t chainIndex, LinkParameter param) {
 				assert(chainIndex < m_num_link);
 				m_chain.get()[chainIndex] = param.m_index;
+				setJointAtIndex(chainIndex, param.m_jointInfo);
+			}
+
+			void IK_FABRIK_C_Constraint::setJointAtIndex(uint32_t chainIndex, JointParams info)
+			{
+				assert(chainIndex < m_num_link);
 				// Set joint limits
-				m_joint.get()[chainIndex].limit_bend = math::PI / 3;
-				m_joint.get()[chainIndex].limit_twist = math::PI / 4;
+				m_joint.get()[chainIndex].limit_bend = info.limit_bend;
+				m_joint.get()[chainIndex].limit_twist = info.limit_twist;
+				m_joint.get()[chainIndex].orient_offset = info.orientation;
+				m_joint.get()[chainIndex].orientation = m_joint.get()[chainIndex].orient_offset * m_joint.get()[chainIndex].base_offset;
 			}
 
 			/* FABRIK out of reach edge case solution.
@@ -89,7 +99,7 @@ namespace thomas {
 				float b = q_i.Length();
 				float a = d_i.Dot(m_i.Up());							// Find distances to Y axis on T_i+1
 				float c = std::fabs(a) * std::tanf(joint.limit_bend);
-				float l_proj = b - c;									// Calc. distance on XZ from p_i -> angle limit
+				float l_proj = b - c;									// Calc. distance on XZ from boundary -> p_i
 				q_i *= l_proj / b;
 				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Backward();				// Vector from p_in -> p_i (edge to point)
 				math::Vector3 p_n = (d_i - proj_diff);												// Calc. p_in (non-normalized)
@@ -205,7 +215,7 @@ namespace thomas {
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
 					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate bone Y toward child's point
-					pose = pose * skel.getBone(chain[i + 1])._invParentOrient;					// Apply orientation offset in relation to child (Y axis of the bone may not face child)
+					//pose = pose * skel.getBone(chain[i + 1])._invParentOrient;					// Apply orientation offset in relation to child (Y axis of the bone may not face child)
 					pose.Translation(p[i]);														// Apply new translation
 					objectPose[chain[i]] = pose;												// Set
 				}
@@ -221,21 +231,33 @@ namespace thomas {
 				objectPose[chain[m_num_link - 1]] = pose;
 
 				const float GIZMO_LEN = 0.05f;
-				const float JOINT_RAD = GIZMO_LEN * 2.5f;
+				const float MAX_JOINT_RAD = GIZMO_LEN * 2.5f;
+				const float MAX_JOINT_LEN = GIZMO_LEN * 2.5f;
 #ifdef _EDITOR
 #ifdef IK_DRAW
 				for (i = 0; i < m_num_link; i++) {
+					float len = MAX_JOINT_LEN;
 					// Calc. joint bounds
 					JointInfo& joint = m_joint.get()[i];
-					math::Matrix j = joint.orientation * orientPtr[i];
-					float len = JOINT_RAD / std::tanf(joint.limit_bend);
-					math::Vector3 up = j.Up();
-					up.Normalize();
-					// Draw joint
-					editor::Gizmos::Gizmo().SetColor(math::Color(0,0,1.f));
-					editor::Gizmos::Gizmo().DrawRing(objectPose[chain[i]].Translation() + up * len, j.Up(), JOINT_RAD);
+					if (i < m_num_link - 1 && joint.limit_bend > math::EPSILON)
+					{
+						math::Matrix j = joint.orientation * orientPtr[i];
+						float tan_a = std::tanf(joint.limit_bend);
+						len = MAX_JOINT_RAD / tan_a;
+						float rad = MAX_JOINT_LEN * tan_a;
+						if (len > rad)
+							len = MAX_JOINT_LEN;
+						else
+							rad = MAX_JOINT_RAD;
+						math::Vector3 up = j.Up();
+						up.Normalize();
+						// Draw joint
+						editor::Gizmos::Gizmo().SetColor(math::Color(0, 0, 1.f));
+						editor::Gizmos::Gizmo().DrawRing(objectPose[chain[i]].Translation() + up * len, j.Up(), rad);
+						// Calc. bone matrix axis length
+						len = rad / std::sinf(joint.limit_bend);
+					}
 					// Draw bone matrix
-					len = JOINT_RAD / std::sinf(joint.limit_bend);
 					editor::Gizmos::Gizmo().DrawMatrixBasis(objectPose[chain[i]], math::Vector3(GIZMO_LEN, len, GIZMO_LEN));
 				}
 #endif
@@ -265,7 +287,8 @@ namespace thomas {
 				for (uint32_t i = 0; i < m_num_link; i++)
 				{
 					// Extract rotation to the base
-					m_joint.get()[i].orientation = math::extractRotation(skel.getBone(m_chain.get()[i])._bindPose);
+					m_joint.get()[i].base_offset = math::extractRotation(skel.getBone(m_chain.get()[i])._bindPose);
+					m_joint.get()[i].orientation = m_joint.get()[i].orient_offset * m_joint.get()[i].base_offset;
 				}
 			}
 			float IK_FABRIK_C_Constraint::getChainLength()

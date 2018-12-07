@@ -13,14 +13,39 @@ public class IKConstraint : ScriptComponent
 {
     public string BoneName { get; set; }        // Name of the bone constraint is added to
     public GameObject Target { get; set; }      // LookAt target
-    public uint ChainLength { get; set; } 
+    public uint ChainLength
+    {
+        get { return IK.NumLinks; }
+        set
+        {
+            if(enabled)
+            {
+                Debug.LogWarning("Chain length change not supported during runtime.");
+                return;
+            }
+            var joint = IK.Joints;
+            IK = new IK_FABRIK_Constraint(value);
+            IK.Joints = joint;
+        }
+    }
     protected uint m_traceBoneIndex;            // Index for lookAt bone
     protected RenderSkinnedComponent m_rC;      // Render component used as animation src
-    IK_FABRIK_Constraint m_iK;
+    IK_FABRIK_Constraint IK;
+
+
+    public IK_FABRIK_Constraint.JointParams[] Joints
+    {
+        get { return IK.Joints; }
+        set
+        {
+            IK.Joints = value;
+        }
+    }
 
     public IKConstraint()
         : base()
     {
+        IK = new IK_FABRIK_Constraint(0);
     }
 
 
@@ -38,10 +63,9 @@ public class IKConstraint : ScriptComponent
 
     public override void OnEnable()
     {
-        m_iK = new IK_FABRIK_Constraint(ChainLength);
-        m_iK.apply(gameObject, m_traceBoneIndex);
-        m_iK.Weight = 1.0f;
-        m_iK.OrientationWeight = 1.0f;
+        IK.apply(gameObject, m_traceBoneIndex);
+        IK.Weight = 1.0f;
+        IK.OrientationWeight = 1.0f;
     }
 
     public override void Start()
@@ -51,7 +75,7 @@ public class IKConstraint : ScriptComponent
 
     public override void OnDisable()
     {
-        m_iK.disable();
+        IK.disable();
     }
 
     public override void OnDestroy()
@@ -63,8 +87,8 @@ public class IKConstraint : ScriptComponent
     {
         if (Target != null)
         {
-            m_iK.Target = Target.transform.localPosition;
-            m_iK.Orientation = Target.transform.localRotation;
+            IK.Target = Target.transform.localPosition;
+            IK.Orientation = Target.transform.localRotation;
         }
     }
 }

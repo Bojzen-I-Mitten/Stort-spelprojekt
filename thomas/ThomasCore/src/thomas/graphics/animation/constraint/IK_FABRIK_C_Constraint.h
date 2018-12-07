@@ -14,22 +14,33 @@ namespace thomas {
 				: public BoneConstraint
 			{
 			public:
-
-				struct LinkParameter 
+				struct JointParams
 				{
-					uint32_t m_index;
-
-					LinkParameter(){}
-					LinkParameter(uint32_t index) : m_index(index) {}
-				};
-			private:
-				struct JointInfo
-				{
-					math::Matrix orientation;	// Joint orientation in relation to parent (rotation from parent orienation to joint orient)
+					math::Matrix orientation = math::Matrix::Identity;		// Boundary orientation offset (rotation)
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
 				};
 
+				struct LinkParameter 
+				{
+					uint32_t m_index;
+					JointParams m_jointInfo;
+
+					LinkParameter(){}
+					LinkParameter(uint32_t index) : m_index(index), m_jointInfo() {}
+					LinkParameter(uint32_t index, JointParams info) : m_index(index), m_jointInfo(info) {}
+				};
+			private:
+				struct JointInfo
+				{
+					math::Matrix orientation = math::Matrix::Identity;		// Joint orientation offset in relation to parent (rotation from parent orienation to joint orient)
+					float limit_bend = math::PI / 2 - 0.01f * math::PI;
+					float limit_twist = math::PI / 4;
+
+
+					math::Matrix base_offset = math::Matrix::Identity;		// Rotation offset from parent orientation
+					math::Matrix orient_offset = math::Matrix::Identity;		// Rotation offset specified
+				};
 			private:
 				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
 				void solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
@@ -42,8 +53,12 @@ namespace thomas {
 				IK_FABRIK_C_Constraint(uint32_t num_link);
 				IK_FABRIK_C_Constraint(const std::vector<LinkParameter>& link_chain);
 				~IK_FABRIK_C_Constraint();
-
-				void setLinkAtIndex(uint32_t chainIndex, LinkParameter boneIndex);
+				/* Specify information for a bone link
+				*/
+				void setLinkAtIndex(uint32_t chainIndex, LinkParameter param);
+				/* Specify joint information for a bone
+				*/
+				void setJointAtIndex(uint32_t chainIndex, JointParams info);
 
 				// Replaces the bone transform from a separate object.
 				virtual void execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd) override;
