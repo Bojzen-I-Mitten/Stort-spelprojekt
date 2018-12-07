@@ -29,6 +29,7 @@ public class CameraMaster : ScriptComponent
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
     ChadHud Hud;
+    SoundComponent MenuSound;
 
     public Canvas Canvas;
     public CAM_STATE State;
@@ -41,6 +42,12 @@ public class CameraMaster : ScriptComponent
         instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
+
+        MenuSound = gameObject.AddComponent<SoundComponent>();
+        MenuSound.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/MenuSoundMetal.mp3");
+        MenuSound.Looping = false;
+        MenuSound.Type = SoundComponent.SoundType.Music;
+        MenuSound.Is3D = false;
     }
 
 
@@ -120,19 +127,27 @@ public class CameraMaster : ScriptComponent
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 MainMenu.SetUpScene();
                 MainMenu.Canvas.isRendering = true;
                 break;
 
             case CAM_STATE.JOIN_HOST:
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 MainMenu.SetUpScene();
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
                 break;
             case CAM_STATE.GAME:
+                if (MenuSound.IsPlaying())
+                    MenuSound.Stop();
                 Hud.Canvas.isRendering = true;
                 if(Input.GetKeyDown(Input.Keys.Escape))
                 {
@@ -149,6 +164,8 @@ public class CameraMaster : ScriptComponent
                 }
                 break;
             case CAM_STATE.HOST_MENU:
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 HostMenu.SetUpScene();
                 HostMenu.Canvas.isRendering = true;
                 break;

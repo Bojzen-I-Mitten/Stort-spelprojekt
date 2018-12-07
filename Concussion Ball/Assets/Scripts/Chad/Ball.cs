@@ -17,6 +17,8 @@ public class Ball : PickupableObject
 
 
     private SoundComponent soundFireThrow;
+    private SoundComponent soundChargeBall;
+    private bool begunCharge;
 
     private float ThrowForce66Procent;
     private float electricityIntensifyerThreshold;
@@ -44,6 +46,15 @@ public class Ball : PickupableObject
         soundFireThrow.Is3D = true;
 
 
+        soundChargeBall = gameObject.AddComponent<SoundComponent>();
+        soundChargeBall.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ChargeBallSound.wav");
+        soundChargeBall.Looping = false;
+        soundChargeBall.Type = SoundComponent.SoundType.Effect;
+        soundChargeBall.MaxDistance = 20;
+        soundChargeBall.MinDistance = 10;
+        soundChargeBall.Is3D = true;
+        begunCharge = false;
+
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
         emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
@@ -54,7 +65,7 @@ public class Ball : PickupableObject
         emitterElectricity1.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el1.png");
         emitterElectricity2.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el2.png");
         emitterElectricity3.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el3.png");
-        emitterSmoke.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/smoke.png");
+        emitterSmoke.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/SmokeParticle.png");
         emitterFire.Texture =  (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire.png");//fireTex;
 
         ResetFireEmitters();
@@ -234,31 +245,39 @@ public class Ball : PickupableObject
 
     override public void ChargeEffect()
     {
-        emitterElectricity1.Emit = true;
-        emitterElectricity2.Emit = true;
-        emitterElectricity3.Emit = true;
-
         float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
-     
+        if (interp > 0)
+        {
+            if (!begunCharge)
+            {
+                begunCharge = true;
+                soundChargeBall.Play();
+            }
+            emitterElectricity1.Emit = true;
+            emitterElectricity2.Emit = true;
+            emitterElectricity3.Emit = true;
 
-        if (interp > 0.7f)
-        {
-            emitterSmoke.Emit = true;
-        }
-        if (interp > 0.99f)
-        {
-            emitterFire.Emit = true;
-        }
-        
-        if (interp > electricityIntensifyerThreshold)
-        {
-            MultiplyWithIntensity(1.25f, emitterElectricity1);
-            MultiplyWithIntensity(1.25f, emitterElectricity2);
-            MultiplyWithIntensity(1.25f, emitterElectricity3);
-            
-            electricityIntensifyerThreshold += 0.1f;
-        }
 
+
+
+            if (interp > 0.7f)
+            {
+                emitterSmoke.Emit = true;
+            }
+            if (interp > 0.99f)
+            {
+                emitterFire.Emit = true;
+            }
+
+            if (interp > electricityIntensifyerThreshold)
+            {
+                MultiplyWithIntensity(1.25f, emitterElectricity1);
+                MultiplyWithIntensity(1.25f, emitterElectricity2);
+                MultiplyWithIntensity(1.25f, emitterElectricity3);
+
+                electricityIntensifyerThreshold += 0.1f;
+            }
+        }
     }
 
     override public void Cleanup()
@@ -271,6 +290,8 @@ public class Ball : PickupableObject
     public override void OnDrop()
     {
         base.OnDrop();
+        soundChargeBall.Stop();
+        begunCharge = false;
         StartCoroutine(PickupDelay());
     }
     IEnumerator PickupDelay()
