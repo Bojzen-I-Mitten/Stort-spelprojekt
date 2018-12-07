@@ -1,4 +1,4 @@
-﻿#define PER_FRAME_HAT_SYNC
+﻿//#define PER_FRAME_HAT_SYNC
 
 using ThomasEngine;
 

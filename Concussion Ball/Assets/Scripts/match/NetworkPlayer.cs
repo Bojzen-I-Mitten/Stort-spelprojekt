@@ -76,7 +76,7 @@ public class NetworkPlayer : NetworkComponent
         text.origin = new Vector2(0.5f, 0.5f);
         nameCanvas.is3D = true;
         if (isOwner)
-            PlayerName = GUIMainMenu.PlayerString;
+            PlayerName = CameraMaster.instance.GetPlayerName();
 
         UpdateHat(_HatIndex);
     }

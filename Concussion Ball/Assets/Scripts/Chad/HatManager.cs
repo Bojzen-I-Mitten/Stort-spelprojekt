@@ -14,6 +14,7 @@ public class HatManager : ScriptComponent
         public Vector3 rotation { get; set; } = Vector3.Zero;
         public Vector3 scale { get; set; } = Vector3.One;
         public Texture2D texture { get; set; } = Texture2D.whiteTexture;
+        public Texture2D specular { get; set; } = Texture2D.blackTexture;
 
         [Newtonsoft.Json.JsonIgnore]
         public Material material;
@@ -33,6 +34,8 @@ public class HatManager : ScriptComponent
             hat.material = new Material(Material.StandardMaterial);
             hat.material.SetColor("color", Color.White);
             hat.material.SetTexture2D("DiffuseTexture", hat.texture);
+            if(hat.specular != null)
+                hat.material.SetTexture2D("SpecularTexture", hat.specular);
         }
     }
 

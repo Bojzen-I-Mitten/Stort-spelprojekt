@@ -1,4 +1,5 @@
 ﻿using ThomasEngine;
+using System.Configuration;
 
 public enum CAM_STATE
 {
@@ -60,6 +61,7 @@ public class CameraMaster : ScriptComponent
         //SpectatorCam.enabled = false;
     }
 
+
     public override void Start()
     {
         State = CAM_STATE.MAIN_MENU;
@@ -107,7 +109,21 @@ public class CameraMaster : ScriptComponent
         #endregion
 
         #region Chad Hats
-        SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count-2)) + 1;
+
+        string settingsHat = UserSettings.GetSetting("Hat");
+        
+        if(settingsHat != null)
+        {
+            SelectedHat = System.Convert.ToInt32(settingsHat);
+        }
+        else
+        {
+            SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
+            settingsHat = SelectedHat.ToString();
+            UserSettings.AddOrUpdateAppSetting("Hat", settingsHat);
+        }
+
+
         if (ChadMainMenu != null)
         {
             ChadMMHat = ChadMainMenu.GetComponent<Hatter>();
@@ -125,6 +141,11 @@ public class CameraMaster : ScriptComponent
         }
         #endregion
 
+    }
+
+    public string GetPlayerName()
+    {
+        return MainMenu != null ? MainMenu.GetPlayerName() : "Chad";
     }
 
     public override void Update()
