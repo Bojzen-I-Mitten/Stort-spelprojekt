@@ -14,9 +14,6 @@ namespace ThomasEditor
 
     public class ThomasWindow : HwndHost
     {
-
-        
-
         public static readonly DependencyProperty IsEditorProperty =
             DependencyProperty.Register(
                 "IsEditor", typeof(Boolean), typeof(ThomasWindow), new PropertyMetadata(false));
@@ -35,27 +32,10 @@ namespace ThomasEditor
             get; set;
         }
 
-        public new IntPtr Handle { get; private set; }
+        public new IntPtr windowHandle { get; private set; }
         const int WM_PAINT = 0x000F;
         const int WM_SIZE = 0x0005;
         const int WM_LBUTTONDOWN = 0x0201;
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct WindowClass
-        {
-            public uint Style;
-            public IntPtr Callback;
-            public int ClassExtra;
-            public int WindowExtra;
-            public IntPtr Instance;
-            public IntPtr Icon;
-            public IntPtr Cursor;
-            public IntPtr Background;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string Menu;
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string Class;
-        }
 
         [StructLayout(LayoutKind.Sequential)]
         struct Rect
@@ -78,61 +58,23 @@ namespace ThomasEditor
             public byte[] Reserved;
         }
 
-        delegate IntPtr Procedure
-            (IntPtr handle,
-            uint message,
-            IntPtr wparam,
-            IntPtr lparam);
-
-        [DllImport("user32.dll")]
-        static extern IntPtr CreateWindowEx
-            (uint extended,
-            [MarshalAs(UnmanagedType.LPWStr)]
-            string name,
-            [MarshalAs(UnmanagedType.LPWStr)]
-            string caption,
-            uint style,
-            int x,
-            int y,
-            int width,
-            int height,
-            IntPtr parent,
-            IntPtr menu,
-            IntPtr instance,
-            IntPtr param);
-
         [DllImport("user32.dll")]
         static extern IntPtr LoadCursor
             (IntPtr instance,
             int name);
 
         [DllImport("user32.dll")]
-        static extern IntPtr SetFocus(IntPtr handle);
+        static extern IntPtr SetFocus(IntPtr hwnd);
 
         [DllImport("user32.dll")]
-        static extern IntPtr DefWindowProc
-            (IntPtr handle,
-            uint message,
-            IntPtr wparam,
-            IntPtr lparam);
+        static extern bool DestroyWindow(IntPtr handle);
 
         [DllImport("user32.dll")]
-        static extern ushort RegisterClass
-            ([In]
-            ref WindowClass register);
-
-        [DllImport("user32.dll")]
-        static extern bool DestroyWindow
-            (IntPtr handle);
-
-        [DllImport("user32.dll")]
-        static extern IntPtr BeginPaint
-            (IntPtr handle,
+        static extern IntPtr BeginPaint(IntPtr handle,
             out Paint paint);
 
         [DllImport("user32.dll")]
-        static extern bool EndPaint
-            (IntPtr handle,
+        static extern bool EndPaint(IntPtr handle,
             [In] ref Paint paint);
 
         protected override HandleRef BuildWindowCore(HandleRef parent)
@@ -140,7 +82,7 @@ namespace ThomasEditor
             var width = Convert.ToInt32(ActualWidth);
             var height = Convert.ToInt32(ActualHeight);
 
-            Handle = ThomasWrapper.CreateThomasWindow(parent.Handle, width, height, IsEditor);
+            windowHandle = ThomasWrapper.CreateThomasWindow(parent.Handle, width, height, IsEditor);
             GotFocus += ThomasWindow_GotFocus;
 
             switch (Type)
@@ -155,51 +97,38 @@ namespace ThomasEditor
                     throw new System.InvalidOperationException("Non-supported window type was added to the execution");
             }
 
-            return new HandleRef(this, Handle);            
+            return new HandleRef(this, windowHandle);            
         }
-
 
         private void ThomasWindow_GotFocus(object sender, RoutedEventArgs e)
         {
-            SetFocus(Handle);
+            SetFocus(windowHandle);
         }
 
-
-        protected override void DestroyWindowCore(HandleRef handle)
+        protected override void DestroyWindowCore(HandleRef hwnd)
         {
-            DestroyWindow(handle.Handle);
+            DestroyWindow(windowHandle);
         }
 
-
-        protected override IntPtr WndProc(IntPtr handle, int message, IntPtr wparam, IntPtr lparam, ref bool handled)
+        /*protected override IntPtr WndProc(IntPtr hwnd, int message, IntPtr wparam, IntPtr lparam, ref bool handled)
         {
-            try
+           try
             {
                 if (message == WM_PAINT)
                 {
                     Paint paint;
-                    BeginPaint(Handle, out paint);
-                    EndPaint(Handle, ref paint);
+                    BeginPaint(hwnd, out paint);
+                    EndPaint(hwnd, ref paint);
                     handled = true;
                 }
-                else
-                {
-                   
-                }
-                ThomasWrapper.eventHandler(Handle, message, wparam, lparam);
-
+                ThomasWrapper.eventHandler(windowHandle, message, wparam, lparam);
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
 
-            return base.WndProc(Handle, message, wparam, lparam, ref handled);
-        }
-
-        static IntPtr WndProc(IntPtr handle, uint message, IntPtr wparam, IntPtr lparam)
-        {
-            return DefWindowProc(handle, message, wparam, lparam);
-        }
+            return base.WndProc(hwnd, message, wparam, lparam, ref handled);
+        }*/
     }
 }

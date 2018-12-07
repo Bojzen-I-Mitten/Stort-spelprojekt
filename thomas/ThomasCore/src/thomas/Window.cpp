@@ -10,9 +10,9 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 
 namespace thomas 
 {
-	Window::Window(HWND& hwnd, HWND parent, int width, int height) :
-		m_shouldResize(false), m_title(std::string("Win32")), 
-		m_showCursor(true), m_fullScreen(false), m_hInstance(nullptr), m_initialized(false), m_input(Input())
+	Window::Window(HWND& hwnd, HWND parent, int width, int height, std::string name) :
+		m_shouldResize(false), m_title(std::string(name)), 
+		m_showCursor(true), m_fullScreen(false), m_borderless(false), m_hInstance(nullptr), m_initialized(false), m_input(Input()), m_windowStyle(0)
 	{
 		m_input.Init();
 		m_hInstance = GetModuleHandle(NULL);
@@ -20,23 +20,36 @@ namespace thomas
 		m_windowClassInfo = { 0 };
 		m_windowClassInfo.cbSize = sizeof(WNDCLASSEX);
 		m_windowClassInfo.style = CS_HREDRAW | CS_VREDRAW;
-		m_windowClassInfo.lpfnWndProc = EventHandler; //Callback for EVENTS
+		m_windowClassInfo.lpfnWndProc = EventHandler;
 		m_windowClassInfo.hInstance = m_hInstance;
+		m_windowClassInfo.hCursor = LoadCursor(NULL, IDC_ARROW);
 		m_windowClassInfo.lpszClassName = "ThomasWindow";
-		m_windowClassInfo.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(101));
+		m_windowClassInfo.hIcon = LoadIcon(m_hInstance, IDI_APPLICATION);
 
-		if (!RegisterClassEx(&m_windowClassInfo))
-			LOG("Failed to create window")
+		RegisterClassEx(&m_windowClassInfo);
+				
+		if (parent == nullptr)
+		{
+			if (!m_borderless)
+				m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU;
+			else
+				m_windowStyle = WS_POPUP;
+		}
+		else
+		{
+			m_windowStyle = WS_CHILD;
+		}
 
 		m_windowRectangle = { 0, 0, width, height };
-		
+		AdjustWindowRect(&m_windowRectangle, m_windowStyle, FALSE);
 
-		AdjustWindowRect(&m_windowRectangle, WS_OVERLAPPEDWINDOW, FALSE);
+		m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
+		m_width = m_windowRectangle.right > 0 ? m_windowRectangle.right : 10;
 
 		hwnd = CreateWindow(
 			m_windowClassInfo.lpszClassName,
 			m_title.c_str(),
-			WS_CHILD,
+			m_windowStyle,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
 			m_width,
@@ -70,31 +83,8 @@ namespace thomas
 		}
 	}
 
-	/*Window::Window(HWND hWnd) : m_shouldResize(false), m_initialized(false), m_input(Input())
-	{
-		m_input.Init();
-
-		bool result = GetClientRect(hWnd, &m_windowRectangle);
-		if (result)
-		{
-			m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
-			m_width = m_windowRectangle.right > 0 ? m_windowRectangle.right : 10;
-			m_showCursor = true; m_fullScreen = false;
-			m_windowHandler = hWnd;
-
-			bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
-			if (hr)
-			{
-				m_waitableObject = m_swapChain->GetFrameLatencyWaitableObject();
-			}
-		}
-		else
-			LOG("Failed to create window");
-	}*/
-
 	Window::~Window()
 	{
-		
 		SAFE_RELEASE(m_dx.commandList);
 
 		SAFE_RELEASE(m_dx.buffer[0]);

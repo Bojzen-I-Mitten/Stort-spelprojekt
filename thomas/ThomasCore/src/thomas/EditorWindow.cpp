@@ -9,35 +9,11 @@
 
 namespace thomas
 {
-	EditorWindow::EditorWindow(HWND& hwnd, HWND parent, int width, int height) :
-		Window(hwnd, parent, width, height)
+	EditorWindow::EditorWindow(HWND& hwnd, HWND parent, int width, int height, std::string name) :
+		Window(hwnd, parent, width, height, name)
 	{
-		ImGui_ImplDX11_Init(hwnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeffered());
+		ImGui_ImplDX11_Init(hwnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeferred());
 	}
-
-	//EditorWindow::EditorWindow(HWND hWnd) : Window(hWnd)
-	//{
-	//	//
-	//	/*ID3D11Resource* resource;
-	//	ID3D11Texture2D* catTexture;
-
-	//	m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeffered());
-	//	DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), L"../Data/cat.png", &resource, &m_texture);
-
-	//	catTexture = (ID3D11Texture2D*)resource;
-	//	CD3D11_TEXTURE2D_DESC catDesc;
-	//	catTexture->GetDesc(&catDesc);
-
-	//	m_origin.x = float(catDesc.Width / 2);
-	//	m_origin.y = float(catDesc.Height / 2);
-	//	m_screenPos.x = 300 / 2.f;
-	//	m_screenPos.y = 300 / 2.f;
-
-	//	resource->Release();*/
-	//	//
-
-	//	
-	//}
 
 	EditorWindow::~EditorWindow()
 	{

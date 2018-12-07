@@ -24,7 +24,7 @@ namespace thomas
 		} m_dx;
 
 	public:
-		Window(HWND& hwnd, HWND parent, int width, int height);
+		Window(HWND& hwnd, HWND parent, int width, int height, std::string name);
 		/*Window(HWND hWnd);*/
 		virtual ~Window();
 
@@ -75,7 +75,9 @@ namespace thomas
 	protected:
 		LONG m_width;
 		LONG m_height;
+		DWORD m_windowStyle;
 		bool m_showCursor;
+		bool m_borderless;
 		bool m_fullScreen;
 		bool m_initialized;
 		bool m_shouldResize;

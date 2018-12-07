@@ -164,7 +164,7 @@ namespace ThomasEngine {
 		static IntPtr CreateThomasWindow(IntPtr parent, int width, int height, bool isEditor);
 
 		//Used for creating window for exported game
-		static IntPtr CreateThomasWindow(int width, int height);
+		static IntPtr CreateThomasWindow(System::String^ name, int width, int height);
 
 		static void eventHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 

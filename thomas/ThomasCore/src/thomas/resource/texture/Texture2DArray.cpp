@@ -1,12 +1,10 @@
 #include "Texture2DArray.h"
 #include "../../Common.h"
-#include "../../utils/d3d.h"
+#include "../../utils/D3D.h"
 
 namespace thomas {
-	namespace resource {
-
-
-
+	namespace resource 
+	{
 		Texture2DArray::Texture2DArray(unsigned width, unsigned height, DXGI_FORMAT format, unsigned nrOfTextures, bool isDepthTexture)
 		{
 			m_width = width;
@@ -29,8 +27,6 @@ namespace thomas {
 				m_resource = textureInterface;	// ;|
 				AddTexture(Texture2D::GetWhiteTexture());
 			}
-
-			
 		}
 
 		Texture2DArray::~Texture2DArray()

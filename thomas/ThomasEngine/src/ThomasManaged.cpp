@@ -484,10 +484,10 @@ namespace ThomasEngine {
 			gcnew MainThreadDelegate(Shutdown));
 	}
 
-	IntPtr ThomasWrapper::CreateThomasWindow(int width, int height)
+	IntPtr ThomasWrapper::CreateThomasWindow(System::String^ name, int width, int height)
 	{
 		HWND hwnd;
-		WindowManager::Instance()->Create(hwnd, nullptr, width, height, false);
+		WindowManager::Instance()->Create(hwnd, nullptr, width, height, Utility::ConvertString(name));
 			
 		return IntPtr(hwnd);
 	}
@@ -672,7 +672,6 @@ namespace ThomasEngine {
 		thomas::editor::EditorCamera::Instance()->ToggleManipulatorMode();
 	}
 
-	
 	bool ThomasWrapper::IsEditorBuild()
 	{
 		return inEditor;

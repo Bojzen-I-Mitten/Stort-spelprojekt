@@ -17,6 +17,7 @@ namespace thomas
 		void ResolveRenderTarget();
 		void Update();
 		void Create(HWND& hwnd, HWND parent, int width, int height, bool isEditor);
+		void Create(HWND& hwnd, HWND parent, int width, int height, std::string name);
 		void UpdateFocus();
 
 	public:
