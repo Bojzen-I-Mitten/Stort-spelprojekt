@@ -156,7 +156,8 @@ public class SoundBomb : Powerup
             {
                 Debug.Log("Landed, applying force");
                 m_rigidBody.LinearVelocity = Vector3.Zero;
-                m_rigidBody.AddForce(new Vector3(0, 250, 0));
+                m_rigidBody.LinearVelocity = new Vector3(0, 3, 0); //works better than forces
+                //m_rigidBody.AddForce(new Vector3(0, 250, 0));
                 _Landed = false;
                 if(_ShockWave)
                     _ShockWave.EmitOneShot(1);
@@ -207,7 +208,7 @@ public class SoundBomb : Powerup
 
             base.OnCollisionEnter(collider);
         }
-        else if (_JumpTimer > 0.1f)
+        else if (_JumpTimer > 0)
         {
             _Landed = true;
         }
