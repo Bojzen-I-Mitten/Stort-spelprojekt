@@ -154,7 +154,6 @@ public class SoundBomb : Powerup
             }
             if (_Landed)
             {
-                Debug.Log("Landed, applying force");
                 m_rigidBody.LinearVelocity = Vector3.Zero;
                 m_rigidBody.LinearVelocity = new Vector3(0, 3, 0); //works better than forces
                 //m_rigidBody.AddForce(new Vector3(0, 250, 0));
@@ -199,6 +198,7 @@ public class SoundBomb : Powerup
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
             m_rigidBody.FreezeRotation = new Vector3(0, 0, 0); // freeze ya'll's music box
+            //m_rigidBody.IsKinematic = true;
             if (_Note1 && _Note2)
             {
                 _Note1.Emit = true;
@@ -266,6 +266,7 @@ public class SoundBomb : Powerup
                 {
                     localChad.Direction = Vector3.Zero;
                     localChad.rBody.LinearVelocity = Vector3.Zero;
+                    localChad.CurrentVelocity = Vector2.Zero;
                     localChad.State = ChadControls.STATE.DANCING;
                 }
             }
@@ -303,6 +304,7 @@ public class SoundBomb : Powerup
         }
         _Landed = false;
         _JumpTimer = 0.0f;
+        GramophoneClip.Pause(true);
     }
 
     // COLOR CALCS FROM ALBIN
