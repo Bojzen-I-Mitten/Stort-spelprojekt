@@ -100,8 +100,12 @@ public class ChadControls : NetworkComponent
     private float OriginalCapsuleHeight;
     private float OriginalCapsuleRadius;
 
+    private Material ChadFirstMaterial { get; set; }
+    public Material ChadSecondMaterial { get; set; }
+    public Material ChadThirdMaterial { get; set; }
+
     // Tweaking constants
-    private float ScaleDuration = 20.0f;
+    private float ScaleDuration = 5.0f;
 
     public override void OnAwake()
     {
@@ -151,8 +155,8 @@ public class ChadControls : NetworkComponent
         OrginalCapsuleCenter = capsule.center;
         OriginalCapsuleHeight = capsule.height;
         OriginalCapsuleRadius = capsule.radius;
-        
     }
+
     public override void OnGotOwnership()
     {
         // Called when NetworkScene::SpawnPlayer is called
@@ -705,7 +709,7 @@ public class ChadControls : NetworkComponent
             ScaleCountdown = 0;
         }
 
-        // Set back original scale and movement speed when timer has expired
+        // Set back original values and properties when timer has expired
         gameObject.transform.localScale = OriginalScale;
         Acceleration = OriginalAcceleration;
         BaseSpeed = OriginalBaseSpeed;
@@ -715,6 +719,16 @@ public class ChadControls : NetworkComponent
         capsule.center = OrginalCapsuleCenter;
         capsule.height = OriginalCapsuleHeight;
         capsule.radius = OriginalCapsuleRadius;
+
+        RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+
+        //MatchSystem.instance.
+        //ChadSecondMaterial.SetColor(MatchSystem.instance.te)
+        //MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color;
+
+        render.SetMaterial(0, ChadFirstMaterial);
+        render.SetMaterial(1, ChadSecondMaterial);
+        render.SetMaterial(2, ChadThirdMaterial);
 
         ScaleCountdown = ScaleDuration;
         ToySoldierAffected = false;
@@ -885,7 +899,7 @@ public class ChadControls : NetworkComponent
                 {
                     StopCoroutine(FadeText);
                     FadeText = null;
-                }
+                } 
 
                 ResetAlpha(ref PowerupPickupText);
 

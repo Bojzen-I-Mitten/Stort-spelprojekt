@@ -7,6 +7,7 @@ using LiteNetLib;
 public class ToySoldier : Powerup
 {
     ChadControls ObjectOwner = null;
+    public Material ToySoldierMaterial { get; set; }
 
     public override void OnAwake()
     {
@@ -87,11 +88,17 @@ public class ToySoldier : Powerup
         localChad.BaseSpeed *= 0.5f;
         localChad.MaxSpeed *= 0.5f;
 
+        // Collider
         CapsuleCollider capsule = localChad.gameObject.GetComponent<CapsuleCollider>();
         capsule.center = new Vector3(0, 0.3f, 0);
         capsule.height *= 0.5f;
         capsule.radius *= 0.5f;
-        //localChad.rBody.LinearVelocity = new Vector3(0, -50, 0);
+
+        // Material
+        RenderSkinnedComponent render = localChad.gameObject.GetComponent<RenderSkinnedComponent>();
+        render.SetMaterial(0, ToySoldierMaterial);
+        render.SetMaterial(1, ToySoldierMaterial);
+        render.SetMaterial(2, ToySoldierMaterial);
     }
 
     private IEnumerator RemoveCube()
