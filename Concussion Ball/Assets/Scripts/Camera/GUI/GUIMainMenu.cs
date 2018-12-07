@@ -102,7 +102,7 @@ public class GUIMainMenu : ScriptComponent
             CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
             TakeName = false;
         }
-        else if (HostGame.Clicked())
+        else if (HostGame.Clicked() && PlayerName.text != "")
         {
             CameraMaster.instance.State = CAM_STATE.HOST_MENU;
             TakeName = false;
