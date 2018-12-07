@@ -70,8 +70,6 @@ namespace ThomasEngine
 
 	Color Text::outlineColor::get() { return Color(Utility::Convert(((thomas::graphics::GUI::Text*)nativePtr)->outlineColor)); }
 
-	void Text::renderable::set(bool renderable) { ((thomas::graphics::GUI::Text*)nativePtr)->renderable = renderable; }
-
 	Image::Image(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
 
 	void Image::texture::set(Texture2D^ texture) { ((thomas::graphics::GUI::Image*)nativePtr)->texture = (thomas::resource::Texture2D*)(texture->m_nativePtr); }

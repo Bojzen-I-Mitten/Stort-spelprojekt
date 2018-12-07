@@ -69,7 +69,7 @@ namespace thomas
 						m_viewport.height * camViewport.height);
 				}
 				else return m_viewport;
-				
+
 			}
 
 			Vector2 Canvas::GetViewportScale()
@@ -85,27 +85,23 @@ namespace thomas
 
 			GUIElement* Canvas::Add(const std::string& text)
 			{
-				lock.lock();
 				Font* font = m_defaultFont.get();
 				std::unique_ptr<GUIElement> newText =
 					std::unique_ptr<GUIElement>(new Text(font, text, this));
+				thomas::utils::atomics::Lock lk(lock);
 				m_GUIElements.push_back(std::move(newText));
-
-				lock.unlock();
 				return m_GUIElements[m_GUIElements.size() - 1].get();
 			}
 
 			GUIElement* Canvas::Add(Texture2D * texture)
 			{
-				lock.lock();
 				if (texture->GetResourceView())
 				{
 					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, this);
+					thomas::utils::atomics::Lock lk(lock);
 					m_GUIElements.push_back(std::move(image));
-
 					return m_GUIElements[m_GUIElements.size() - 1].get();
 				}
-				lock.unlock();
 
 				return nullptr;
 			}
