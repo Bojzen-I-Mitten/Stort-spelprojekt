@@ -69,7 +69,7 @@ public class ChadControls : NetworkComponent
     #endregion
 
     [Browsable(false)]
-    public Rigidbody rBody { get; private set; }
+    public Rigidbody rBody { get; set; }
     private NetworkTransform ragdollSync;
     Chadimations Animations;
     public Ragdoll Ragdoll;
@@ -96,9 +96,12 @@ public class ChadControls : NetworkComponent
     private float OriginalAcceleration;
     private float OriginalBaseSpeed;
     private float OriginalMaxSpeed;
+    private Vector3 OrginalCapsuleCenter;
+    private float OriginalCapsuleHeight;
+    private float OriginalCapsuleRadius;
 
     // Tweaking constants
-    private float ScaleDuration = 5.0f;
+    private float ScaleDuration = 20.0f;
 
     public override void OnAwake()
     {
@@ -138,11 +141,17 @@ public class ChadControls : NetworkComponent
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
 
-        //
+        // Store original values
         OriginalScale = gameObject.transform.scale;
         OriginalAcceleration = Acceleration;
         OriginalBaseSpeed = BaseSpeed;
         OriginalMaxSpeed = MaxSpeed;
+
+        CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
+        OrginalCapsuleCenter = capsule.center;
+        OriginalCapsuleHeight = capsule.height;
+        OriginalCapsuleRadius = capsule.radius;
+        
     }
     public override void OnGotOwnership()
     {
@@ -701,6 +710,12 @@ public class ChadControls : NetworkComponent
         Acceleration = OriginalAcceleration;
         BaseSpeed = OriginalBaseSpeed;
         MaxSpeed = OriginalMaxSpeed;
+
+        CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
+        capsule.center = OrginalCapsuleCenter;
+        capsule.height = OriginalCapsuleHeight;
+        capsule.radius = OriginalCapsuleRadius;
+
         ScaleCountdown = ScaleDuration;
         ToySoldierAffected = false;
         ToySoldierModifier = null;
@@ -862,39 +877,46 @@ public class ChadControls : NetworkComponent
 
     private void Pickup(PickupableObject pickupable)
     {
-        if (pickupable.transform.parent == null)
+        if(!ToySoldierAffected)
         {
-            if(FadeText != null)
+            if (pickupable.transform.parent == null)
             {
-                StopCoroutine(FadeText);
-                FadeText = null;
-            }
+                if (FadeText != null)
+                {
+                    StopCoroutine(FadeText);
+                    FadeText = null;
+                }
 
-            ResetAlpha(ref PowerupPickupText);
+                ResetAlpha(ref PowerupPickupText);
 
-            if (pickupable.gameObject.Name == "ball")
-            {
-                DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
-            }
-            else if (pickupable.gameObject.Name == "Vindaloo")
-            {
-                DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
-            }
-            else if (pickupable.gameObject.Name == "ThomasTrain")
-            {
-                DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
-            }
-            else if (pickupable.gameObject.Name == "Banana")
-            {
-                DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
-            }
+                if (pickupable.gameObject.Name == "ball")
+                {
+                    DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
+                }
+                else if (pickupable.gameObject.Name == "Vindaloo")
+                {
+                    DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
+                }
+                else if (pickupable.gameObject.Name == "ThomasTrain")
+                {
+                    DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
+                }
+                else if (pickupable.gameObject.Name == "Banana")
+                {
+                    DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
+                }
+                else if (pickupable.gameObject.Name == "ToySoldier")
+                {
+                    DisplayPowerupText(ref PowerupPickupText, "Picked up Toy Soldier");
+                }
 
-            FadeText = FadePickupText();
-            StartCoroutine(FadeText);
+                FadeText = FadePickupText();
+                StartCoroutine(FadeText);
 
-            TakeOwnership(pickupable.gameObject);
-            RPCPickup(pickupable.ID);
-            //SendRPC("RPCPickup", pickupable.ID);
+                TakeOwnership(pickupable.gameObject);
+                RPCPickup(pickupable.ID);
+                //SendRPC("RPCPickup", pickupable.ID);
+            }
         }
     }
 

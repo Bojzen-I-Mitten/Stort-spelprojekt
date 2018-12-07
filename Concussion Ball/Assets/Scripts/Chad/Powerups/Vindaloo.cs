@@ -205,7 +205,6 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
-        // This sound will instantly stop playing when the 
         // Play the vindaloo explosion sound
         ExplosionSound.Play();
 

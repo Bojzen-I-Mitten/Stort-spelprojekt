@@ -79,11 +79,19 @@ public class ToySoldier : Powerup
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         // Scale and movement decrease
+        // TODO: apply gravity to reach ground when scaled down
+        // TODO: apply toy soldier material to chad
         localChad.ToySoldierAffected = true;
         localChad.transform.scale *= 0.5f;
         localChad.Acceleration *= 0.5f;
         localChad.BaseSpeed *= 0.5f;
         localChad.MaxSpeed *= 0.5f;
+
+        CapsuleCollider capsule = localChad.gameObject.GetComponent<CapsuleCollider>();
+        capsule.center = new Vector3(0, 0.3f, 0);
+        capsule.height *= 0.5f;
+        capsule.radius *= 0.5f;
+        //localChad.rBody.LinearVelocity = new Vector3(0, -50, 0);
     }
 
     private IEnumerator RemoveCube()
