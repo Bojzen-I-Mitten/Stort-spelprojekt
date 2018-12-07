@@ -9,6 +9,8 @@ public class ImageBaradjustment
     public int numbervalue = 0;
     public float LastMousePosition = 0;
     public Canvas Canvas;
+    public bool fullscreen;
+    public bool borderless;
     public enum Imagestate
     {
         MUSIC_VOLUME_IMAGE,
@@ -167,7 +169,7 @@ public class GUIOptionsMenu : ScriptComponent
     }
     public override void Update()
     {
-        updatePosOrigin();
+      //  updatePosOrigin();
         ButtonHovered();
         if (Text[(int)Textstate.BACK_TEXT].Clicked())
             BackbuttonClicked();
@@ -183,22 +185,7 @@ public class GUIOptionsMenu : ScriptComponent
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
 
 
-        if(Text[(int)Textstate.FullscreenOn_TEXT].Clicked())
-        {
-            Wcontroller.SetFullscreen(true);
-        }
-        if (Text[(int)Textstate.FullscreenOff_TEXT].Clicked())
-        {
-            Wcontroller.SetFullscreen(false);
-        }
-        if (Text[(int)Textstate.BorderLessOn_Text].Clicked())
-        {
-            Wcontroller.SetBorderless(true);
-        }
-        if (Text[(int)Textstate.BorderLessOff_Text].Clicked())
-        {
-            Wcontroller.SetBorderless(false);
-        }
+   
 
         /*    if (Input.GetKeyDown(Input.Keys.X))
             {
@@ -220,6 +207,8 @@ public class GUIOptionsMenu : ScriptComponent
         //borderlessOFF
         if (Text[(int)Textstate.BorderLessOff_Text].Clicked())
         {
+            Wcontroller.SetBorderless(false);
+      //      Debug.Log("button clicked C#");
             Text[(int)Textstate.BorderLessOff_Text].interactable = false;
             Text[(int)Textstate.BorderLessOn_Text].interactable = true;
         }
@@ -235,6 +224,8 @@ public class GUIOptionsMenu : ScriptComponent
         //borderlessOn
         if (Text[(int)Textstate.BorderLessOn_Text].Clicked())
         {
+            Wcontroller.SetBorderless(true);
+      //      Debug.Log("button clicked C#");
             Text[(int)Textstate.BorderLessOn_Text].interactable = false;
             Text[(int)Textstate.BorderLessOff_Text].interactable = true;
         }
@@ -251,6 +242,8 @@ public class GUIOptionsMenu : ScriptComponent
         //FullscreenOFF
         if (Text[(int)Textstate.FullscreenOff_TEXT].Clicked())
         {
+            Wcontroller.SetFullscreen(false);
+       //     Debug.Log("button clicked C#");
             Text[(int)Textstate.FullscreenOff_TEXT].interactable = false;
             Text[(int)Textstate.FullscreenOn_TEXT].interactable = true;
         }
@@ -266,6 +259,8 @@ public class GUIOptionsMenu : ScriptComponent
         //FullscreenOn
         if (Text[(int)Textstate.FullscreenOn_TEXT].Clicked())
         {
+            Wcontroller.SetFullscreen(true);
+         //   Debug.Log("button clicked C#");
             Text[(int)Textstate.FullscreenOn_TEXT].interactable = false;
             Text[(int)Textstate.FullscreenOff_TEXT].interactable = true;
         }
@@ -330,6 +325,33 @@ public class GUIOptionsMenu : ScriptComponent
         ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
+        //load onoff fullscreen
+        bool fullscreen = Wcontroller.getBorderless();
+        bool borderless = Wcontroller.getFullscreen();
+        Wcontroller.SetFullscreen(fullscreen);
+        Wcontroller.SetBorderless(borderless);
+        if(fullscreen)
+        {
+            Text[(int)Textstate.FullscreenOn_TEXT].interactable = false;
+            Text[(int)Textstate.FullscreenOn_TEXT].color = Selected;
+        }
+        else
+        {
+            Text[(int)Textstate.FullscreenOff_TEXT].interactable = false;
+            Text[(int)Textstate.FullscreenOff_TEXT].color = Selected;
+        }
+
+        if (borderless)
+        {
+            Text[(int)Textstate.BorderLessOn_Text].interactable = false;
+            Text[(int)Textstate.BorderLessOn_Text].color = Selected;
+        }
+        else
+        {
+            Text[(int)Textstate.BorderLessOff_Text].interactable = false;
+            Text[(int)Textstate.BorderLessOff_Text].color = Selected;
+        }
+
     }
     public void ClearImagesAndText()
     {
@@ -350,10 +372,13 @@ public class GUIOptionsMenu : ScriptComponent
     {
         //MORGAN SPARA HÄR
 /*      
- *      ImageBar[(int)ImageBarstate.Movement].LastMousePosition;  // save from this call to Movement LastMousePosition here
-        ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition;  // save from this call to sfxBar_Image LastMousePosition here
-        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition;  // save from this call to MUSICBar_IMAGE LastMousePosition here
-        ImageBar[(int)ImageBarstate.AIM].LastMousePosition;  // save from this call to aim LastMousePosition here
+        if(Imagebar != null)
+        {
+            ImageBar[(int)ImageBarstate.Movement].LastMousePosition;  // save from this call to Movement LastMousePosition here
+            ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition;  // save from this call to sfxBar_Image LastMousePosition here
+            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition;  // save from this call to MUSICBar_IMAGE LastMousePosition here
+            ImageBar[(int)ImageBarstate.AIM].LastMousePosition;  // save from this call to aim LastMousePosition here
+        }
           */                                                                //      ClearImagesAndText();
     }
     public void updatePosOrigin()

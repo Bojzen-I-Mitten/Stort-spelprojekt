@@ -13,6 +13,8 @@ namespace ThomasEngine
 		WindowController();
 		void SetBorderless(bool borderless);
 		void SetFullscreen(bool Fullscreen);
+		bool getBorderless();
+		bool getFullscreen();
 	internal:
 		thomas::WindowManager* nativePtr;
 

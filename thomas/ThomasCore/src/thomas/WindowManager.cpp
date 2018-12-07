@@ -1,5 +1,6 @@
 #include "WindowManager.h"
-
+#include "ThomasCore.h"
+#include "Common.h"
 namespace thomas
 {
 	WindowManager WindowManager::s_windowManager;
@@ -32,12 +33,25 @@ namespace thomas
 		}
 	}
 
-	void WindowManager::setBorderless(bool)
+	void WindowManager::setBorderless(bool Toggle)
 	{
+		
+	//	LOG(Toggle);
 	}
 
-	void WindowManager::setFullscreen(bool)
+	void WindowManager::setFullscreen(bool Toggle)
 	{
+	//	LOG(Toggle);
+	}
+
+	bool WindowManager::getFullscreen()
+	{
+		return true;
+	}
+
+	bool WindowManager::getBorderless()
+	{
+		return true;
 	}
 
 	WindowManager* WindowManager::Instance()

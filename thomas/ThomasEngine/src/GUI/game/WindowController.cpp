@@ -14,3 +14,13 @@ void ThomasEngine::WindowController::SetFullscreen(bool Fullscreen)
 {
 	nativePtr->setFullscreen(Fullscreen);
 }
+
+bool ThomasEngine::WindowController::getBorderless()
+{
+	return nativePtr->getBorderless();
+}
+
+bool ThomasEngine::WindowController::getFullscreen()
+{
+	return nativePtr->getFullscreen();
+}
