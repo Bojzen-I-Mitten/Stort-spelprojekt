@@ -69,6 +69,7 @@ namespace thomas
 
 			void Camera::OnDestroy()
 			{
+				m_canvases.clear();
 				m_renderGUI = false;
 			}
 
