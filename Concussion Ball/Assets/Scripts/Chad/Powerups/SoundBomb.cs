@@ -205,7 +205,9 @@ public class SoundBomb : Powerup
                 _Note2.Emit = true;
             }
             if (GramophoneClip)
+            {
                 GramophoneClip.Play();
+            }
             _JumpTimer += Time.DeltaTime;
 
             base.OnCollisionEnter(collider);
@@ -259,7 +261,7 @@ public class SoundBomb : Powerup
         {
             timer += Time.DeltaTime;
 
-            if (localChad /*&& otherPlayerTeam != playerTeam*/)
+            if (localChad && otherPlayerTeam != playerTeam)
             {
                 float distance = Vector3.Distance(localChad.transform.position, transform.position);
                 if (distance < ExplosionRadius)
@@ -273,6 +275,8 @@ public class SoundBomb : Powerup
 
             yield return null;
         }
+        GramophoneClip.Stop();
+        
         localChad.State = ChadControls.STATE.CHADING;
         Explosion();
 
@@ -304,7 +308,6 @@ public class SoundBomb : Powerup
         }
         _Landed = false;
         _JumpTimer = 0.0f;
-        GramophoneClip.Pause(true);
     }
 
     // COLOR CALCS FROM ALBIN
