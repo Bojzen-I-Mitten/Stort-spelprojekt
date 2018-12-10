@@ -1,5 +1,6 @@
 ﻿using ThomasEngine;
 using System.Configuration;
+using System.Collections.Generic;
 
 public enum CAM_STATE
 {
@@ -19,6 +20,10 @@ public class CameraMaster : ScriptComponent
     public GameObject ChadTeam1 { get; set; }
     public GameObject ChadTeam2 { get; set; }
     public GameObject ChadPreviewArea { get; set; }
+    public LightComponent Light1 { get; set; }
+    public LightComponent Light2 { get; set; }
+    
+
 
     public static CameraMaster instance;
 
@@ -46,6 +51,13 @@ public class CameraMaster : ScriptComponent
         instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
+        
+        if (Light1 != null && Light2 != null)
+        {
+            Light1.Intensity = 5;
+            Light2.Intensity = 0.5f;
+
+        }
     }
 
 
@@ -159,6 +171,34 @@ public class CameraMaster : ScriptComponent
         ExitMenu._CanSwitchTeam = true;
     }
 
+    public void TurnOffLights()
+    {
+        if (Light1 != null)
+        {
+            if (Light1.Intensity == 5)
+                Light1.Intensity = 0;
+        }
+        if (Light2 != null)
+        {
+            if (Light2.Intensity == 0.5f)
+                Light2.Intensity = 0;
+        }   
+    }
+
+    public void TurnOnLights()
+    {
+        if (Light1 != null)
+        {
+            if (Light1.Intensity == 0)
+                Light1.Intensity = 5;
+        }
+        if (Light2 != null)
+        {
+            if (Light2.Intensity == 0)
+                Light2.Intensity = 0.5f;
+        }
+    }
+
     public override void Update()
     {
         //Set all CAM_STATEs exept GAME to false
@@ -170,12 +210,10 @@ public class CameraMaster : ScriptComponent
         HostMenu.Canvas.isRendering = false;
         LoadingScreen.Canvas.isRendering = false;
 
-        if (ChadPreviewArea != null)
-            ChadPreviewArea?.SetActive(true);
-
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
+                TurnOnLights();
                 MainMenu.SetUpScene();
                 Camera.fixedAspectRatio = true;
                 Camera.orthographic = true;
@@ -183,19 +221,20 @@ public class CameraMaster : ScriptComponent
                 break;
 
             case CAM_STATE.JOIN_HOST:
+                TurnOnLights();
                 MainMenu.SetUpScene();
                 Camera.fixedAspectRatio = true;
                 Camera.orthographic = true;
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
+                TurnOnLights();
                 SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
                 break;
             case CAM_STATE.GAME:
+                TurnOffLights();
                 Hud.Canvas.isRendering = true;
-                if(ChadPreviewArea != null)
-                    ChadPreviewArea?.SetActive(false);
                 if (Input.GetKeyDown(Input.Keys.Escape))
                 {
                     State = CAM_STATE.EXIT_MENU;
@@ -203,9 +242,8 @@ public class CameraMaster : ScriptComponent
                 }
                 break;
             case CAM_STATE.EXIT_MENU:
+                TurnOffLights();
                 ExitMenu.Canvas.isRendering = true;
-                if (ChadPreviewArea != null)
-                    ChadPreviewArea?.SetActive(false);
                 if (Input.GetKeyDown(Input.Keys.Escape))
                 {
                     State = CAM_STATE.GAME;
@@ -213,12 +251,14 @@ public class CameraMaster : ScriptComponent
                 }
                 break;
             case CAM_STATE.HOST_MENU:
+                TurnOnLights();
                 HostMenu.SetUpScene();
                 Camera.fixedAspectRatio = false;
                 Camera.orthographic = false;
                 HostMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.LOADING_SCREEN:
+                TurnOffLights();
                 LoadingScreen.Canvas.isRendering = true;
                 break;
         }
