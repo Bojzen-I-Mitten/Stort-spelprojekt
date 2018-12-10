@@ -167,6 +167,7 @@ public class GUIMainMenu : ScriptComponent
         RotateChad();
 
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
+        }
     }
 
 
