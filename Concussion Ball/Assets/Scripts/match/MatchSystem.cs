@@ -349,10 +349,19 @@ public class MatchSystem : NetworkManager
 
     void OnMatchEnd()
     {
+        
         if (MatchStarted)
         {
             RPCEndMatch();
             SendRPC(-2, "RPCEndMatch");
+        }
+        if (GoldenGoal)
+        {
+            AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.GOLDENGOAL);
+        }
+        else
+        {
+            AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.WELLPLAYED);
         }
         //Clean up
         //MatchStarted = false;
@@ -361,8 +370,11 @@ public class MatchSystem : NetworkManager
 
     public void OnMatchStart()
     {
+        
         if (MatchStarted)
             return;
+
+        AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.WELCOME);
         RPCStartMatch();
         SendRPC(-2, "RPCStartMatch");
 
@@ -371,6 +383,7 @@ public class MatchSystem : NetworkManager
 
     public void OnRoundStart()
     {
+        
         if (!MatchStarted)
             return;
 
@@ -384,8 +397,11 @@ public class MatchSystem : NetworkManager
 
     public void OnGoal(TEAM_TYPE teamThatScored)
     {
+        AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.GOAL);
         if (hasScored)
             return;
+
+        
         SendRPC(-2, "RPCOnGoal", (int)teamThatScored);
         RPCOnGoal((int)teamThatScored);
     }

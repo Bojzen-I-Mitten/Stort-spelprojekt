@@ -197,6 +197,7 @@ public class Vindaloo : Powerup
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
                 localChad.ActivateRagdoll(2.0f, param);
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.EXPLODED);
             }
         }
 
