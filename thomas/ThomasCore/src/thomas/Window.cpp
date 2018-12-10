@@ -11,7 +11,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 namespace thomas 
 {
 	Window::Window(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name) :
-		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_borderless(true), 
+		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_borderless(false), 
 		m_shouldStyleChange(false), m_hInstance(nullptr), m_initialized(false), m_input(Input()), m_windowStyle(0)
 	{
 		m_input.Init();
@@ -73,45 +73,40 @@ namespace thomas
 
 		if (result)
 		{
-			if (m_height != newHeight || m_width != newWidth)
-			{
-				m_height = newHeight;
-				m_width = newWidth;
+			HRESULT hr = m_swapChain->SetFullscreenState(m_fullScreen, NULL);
+			if (FAILED(hr))
+				LOG("Failed to set fullscreen state");
 
-				utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, NULL, NULL);
+			m_height = newHeight;
+			m_width = newWidth;
 
-				SAFE_RELEASE(m_dx.commandList);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, NULL, NULL);
 
-				SAFE_RELEASE(m_dx.buffer[0]);
-				SAFE_RELEASE(m_dx.buffer[1]);
+			SAFE_RELEASE(m_dx.commandList);
 
-				SAFE_RELEASE(m_dx.RTV[0]);
-				SAFE_RELEASE(m_dx.RTV[1]);
+			SAFE_RELEASE(m_dx.buffer[0]);
+			SAFE_RELEASE(m_dx.buffer[1]);
 
-				SAFE_RELEASE(m_dx.SRV[0]);
-				SAFE_RELEASE(m_dx.SRV[1]);
+			SAFE_RELEASE(m_dx.RTV[0]);
+			SAFE_RELEASE(m_dx.RTV[1]);
 
-				SAFE_RELEASE(m_dx.depthStencilView[0]);
-				SAFE_RELEASE(m_dx.depthStencilView[1]);
+			SAFE_RELEASE(m_dx.SRV[0]);
+			SAFE_RELEASE(m_dx.SRV[1]);
 
-				SAFE_RELEASE(m_dx.depthStencilViewReadOnly[0]);
-				SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1]);
+			SAFE_RELEASE(m_dx.depthStencilView[0]);
+			SAFE_RELEASE(m_dx.depthStencilView[1]);
 
-				SAFE_RELEASE(m_dx.depthBufferSRV);
+			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[0]);
+			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1]);
 
-				SAFE_RELEASE(m_dx.depthStencilState);
+			SAFE_RELEASE(m_dx.depthBufferSRV);
 
-				m_swapChain->ResizeBuffers(FRAME_BUFFERS, 0, 0, DXGI_FORMAT_UNKNOWN,
-					DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
+			SAFE_RELEASE(m_dx.depthStencilState);
 
-				HRESULT hr = m_swapChain->SetFullscreenState(m_fullScreen, NULL);
-				if (FAILED(hr))
-					LOG("Failed to set fullscreen state");
+			m_swapChain->ResizeBuffers(FRAME_BUFFERS, 0, 0, DXGI_FORMAT_UNKNOWN,
+				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
 
-				return InitDxBuffers();
-			}
-
-			return true;
+			return InitDxBuffers();
 		}
 		
 		return false;
@@ -119,13 +114,13 @@ namespace thomas
 
 	bool Window::ChangeWindowStyle()
 	{
-		if (m_borderless)
+		if (!m_borderless)
 		{
-			m_windowStyle = WS_POPUP;
+			m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 		}
 		else
 		{
-			m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+			m_windowStyle = WS_POPUP;
 		}
 
 		SetWindowLong(m_windowHandler, GWL_STYLE, m_windowStyle);
@@ -183,6 +178,11 @@ namespace thomas
 	void Window::QueueResize()
 	{
 		m_shouldResize = true;
+	}
+
+	void Window::QueueWindowStyleChange()
+	{
+		m_shouldStyleChange = true;
 	}
 
 	bool Window::IntersectBounds(int x, int y) const
@@ -256,6 +256,11 @@ namespace thomas
 	bool Window::ShouldResize()
 	{
 		return m_shouldResize;
+	}
+
+	bool Window::ShouldWindowStyleChange()
+	{
+		return m_shouldStyleChange;
 	}
 
 	void Window::Clear()

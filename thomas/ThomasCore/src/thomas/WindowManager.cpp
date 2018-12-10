@@ -88,7 +88,7 @@ namespace thomas
 	bool WindowManager::WaitingForUpdate()
 	{
 		for (Window* window : m_windows)
-			if (window->ShouldResize())
+			if (window->ShouldResize() || window->ShouldWindowStyleChange())
 				return true;
 
 		return false;

@@ -30,6 +30,7 @@ namespace thomas
 	public:
 		virtual void UpdateWindow();
 		void QueueResize();
+		void QueueWindowStyleChange();
 		void BindBackBuffer();
 		void BindRenderTarget();
 		void ResolveRenderTarget();
@@ -39,6 +40,7 @@ namespace thomas
 
 	public:
 		bool ShouldResize();
+		bool ShouldWindowStyleChange();
 		bool Initialized();
 		bool ChangeWindowShowState(int nCmdShow);
 		bool IntersectBounds(int x, int y) const;
