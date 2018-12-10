@@ -11,7 +11,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 namespace thomas 
 {
 	Window::Window(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name) :
-		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_borderless(false), 
+		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_borderless(true), 
 		m_shouldStyleChange(false), m_hInstance(nullptr), m_initialized(false), m_input(Input()), m_windowStyle(0)
 	{
 		m_input.Init();
@@ -125,7 +125,7 @@ namespace thomas
 		}
 		else
 		{
-			m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU;
+			m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 		}
 
 		SetWindowLong(m_windowHandler, GWL_STYLE, m_windowStyle);
@@ -272,7 +272,7 @@ namespace thomas
 		if (parent == nullptr)
 		{
 			if (!m_borderless)
-				m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU;
+				m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 			else
 				m_windowStyle = WS_POPUP;
 		}
