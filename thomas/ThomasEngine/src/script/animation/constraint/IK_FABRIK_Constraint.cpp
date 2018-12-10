@@ -10,7 +10,7 @@
 #include "../../../object/GameObject.h"
 #include "../../../object/component/RenderSkinnedComponent.h"
 #include "../../../Utility.h"
-#include "../../../utils/MathEngine.h"
+#include "../../../math/MathEngine.h"
 
 
 namespace ThomasEngine

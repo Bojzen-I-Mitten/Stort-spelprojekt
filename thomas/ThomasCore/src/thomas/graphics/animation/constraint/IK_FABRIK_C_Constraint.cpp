@@ -5,6 +5,8 @@
 #include "../data/Skeleton.h"
 
 #define IK_DRAW
+//#define DRAW_FORWARD_CONSTRAINT
+#define DRAW_BACKWARD_CONSTRAINT
 
 namespace thomas {
 	namespace graphics {
@@ -41,7 +43,7 @@ namespace thomas {
 				m_joint.get()[chainIndex].limit_bend = info.limit_bend;
 				m_joint.get()[chainIndex].limit_twist = info.limit_twist;
 				m_joint.get()[chainIndex].orient_offset = info.orientation;
-				m_joint.get()[chainIndex].orientation = m_joint.get()[chainIndex].orient_offset * m_joint.get()[chainIndex].base_offset;
+				m_joint.get()[chainIndex].refreshOrient();
 			}
 
 			/* FABRIK out of reach edge case solution.
@@ -55,65 +57,72 @@ namespace thomas {
 					p[i+1] = math::lerp(p[i], target, lambda);
 				}
 			}
-
-			void IK_FABRIK_C_Constraint::solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
+			math::Vector3 IK_FABRIK_C_Constraint::ballJointConstraint(math::Matrix &m_i, math::Vector3 &p_o, math::Vector3 &p_t, float limit_bend, float bone_len)
 			{
-				/*
-				math::Matrix m_ii = *(c_orient + 1);
-				math::Vector3 p_i = *p_c;
-				math::Vector3 p_ii = *(p_c + 1);
-				math::Vector3 d_i = p_i - p_ii;
-				math::Vector2 q_i;										// Project on to XZ plane of T_i+1
-				q_i.x = d_i.Dot(m_ii.Right());						
-				q_i.y = d_i.Dot(m_ii.Backward());
-				float b = q_i.Length();
-				float a = d_i.Dot(-m_ii.Up());							// Find distances to Y axis on T_i+1
-				float c = std::fabs(a) * std::tanf(limit_bend);
-				float l_proj = b - c;									// Calc. distance on XZ from p_i -> angle limit
-				q_i *= l_proj;
-				math::Vector3 proj_diff = q_i.x * m_ii.Right() + q_i.y * m_ii.Backward();			// Vector from p_in -> p_i
-				math::Vector3 p_n = (bone_len / std::sqrtf(a*a + c * c)) * (p_i - proj_diff);		// Calc. p_in (normalized)
-				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
-				{
-					p_n += 2 * a * m_ii.Up();														// Mirror result over T_i+1 XZ plane (always apply)
-					*p_c = p_n; // Update p_i
-				}
-				else if (l_proj > 0.f)																// Don't apply if b < c (inside angle limit)
-					*p_c = p_n; // Update p_i
-				// else			// Do nothing
-
-				// Re-calculate orientation
-				d_i = (*p_c - p_ii) / bone_len;
-				*c_orient = *c_orient * math::getMatrixRotationTo(c_orient->Up(), d_i);
-				*/
-			}
-			void IK_FABRIK_C_Constraint::solve_constraint_forward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
-			{
-				JointInfo& joint = m_joint.get()[index];
-				math::Matrix m_i = joint.orientation * c_orient[-1];
-				math::Vector3 p_i = p_c[1];
-				math::Vector3 d_i = p_i - p_c[0];
+				math::Vector3 d_i = p_t - p_o;
 				math::Vector2 q_i;										// Project on to XZ plane of T_i+1
 				q_i.x = d_i.Dot(m_i.Right());
 				q_i.y = d_i.Dot(m_i.Backward());
 				float b = q_i.Length();
 				float a = d_i.Dot(m_i.Up());							// Find distances to Y axis on T_i+1
-				float c = std::fabs(a) * std::tanf(joint.limit_bend);
-				float l_proj = b - c;									// Calc. distance on XZ from boundary -> p_i
+				float c = std::fabs(a) * std::tanf(limit_bend);
+				float l_proj = b - c;									// Calc. distance on XZ from boundary -> p_t
 				q_i *= l_proj / b;
-				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Backward();				// Vector from p_in -> p_i (edge to point)
+				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Backward();				// Vector from p_in -> p_t (edge to point)
 				math::Vector3 p_n = (d_i - proj_diff);												// Calc. p_in (non-normalized)
 				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
 					p_n -= 2 * a * m_i.Up();														// Mirror result over T_i+1 XZ plane (always apply)
 				p_n = (bone_len / std::sqrtf(a*a + c * c)) * p_n;									// Make offset distance == bone length
 				if (a > 0.f && l_proj <= 0.f)														// Don't apply if b < c (inside angle limit)
-					p_n = p_i;
+					p_n = p_t;
 				else
-					p_n = p_c[0] + p_n;																// Offset from prev.
-				p_c[1] = p_n;
+					p_n = p_o + p_n;																// Offset from prev.
+				return p_n;
+			}
+			
+			void IK_FABRIK_C_Constraint::solve_constraint_backward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
+			{
+				JointInfo& joint = m_joint.get()[index];
+				JointInfo& joint_ii = m_joint.get()[index+1];
+				math::Matrix m_ii = joint_ii.backwardOrient * c_orient[1];
+				math::invertY(m_ii);	// Flip Y axis
+				math::Vector3 p_o = p_c[1];
+				// Apply constraint
+				math::Vector3 p_n = ballJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
 				// Re-calculate orientation
-				d_i = (p_c[1] - p_c[0]) / bone_len;													// new forward orient
+				math::Vector3 d_i = (p_o - p_n) / bone_len;
+				p_c[0] = p_n;																		// New forward orient
 				c_orient[0] = c_orient[0] * math::getMatrixRotationTo(c_orient[0].Up(), d_i);		// Rotate prev.->new
+#ifdef DRAW_BACKWARD_CONSTRAINT
+				{
+					editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 1.f, 0.f));
+					//editor::Gizmos::Gizmo().DrawLine(p_o, *p_c);					// FABRIK output line
+					editor::Gizmos::Gizmo().DrawRay(p_o, m_ii.Up(), 0.1f);			// Joint orientation UP
+					editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 0.f, 0.f));	
+					editor::Gizmos::Gizmo().DrawLine(p_o, p_n);						// Constrained line
+				}
+#endif
+			}
+			void IK_FABRIK_C_Constraint::solve_constraint_forward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len)
+			{
+				JointInfo& joint = m_joint.get()[index];
+				math::Matrix m_i = joint.orientation * c_orient[-1];
+				math::Vector3 p_o = p_c[0];
+				// Apply constraint
+				math::Vector3 p_n = ballJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
+				// Re-calculate orientation
+				math::Vector3 d_i = (p_n - p_o) / bone_len;
+				p_c[1] = p_n;																		// New forward orient
+				c_orient[0] = c_orient[0] * math::getMatrixRotationTo(c_orient[0].Up(), d_i);		// Rotate prev.->new
+#ifdef DRAW_FORWARD_CONSTRAINT
+				{
+					editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 1.f, 0.f));
+					//editor::Gizmos::Gizmo().DrawLine(p_o, *p_c);					// FABRIK output line
+					editor::Gizmos::Gizmo().DrawRay(p_o, m_i.Up(), 0.1f);			// Joint orientation UP
+					editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 0.f, 0.f));
+					editor::Gizmos::Gizmo().DrawLine(p_o, p_n);						// Constrained line
+				}
+#endif
 			}
 			
 
@@ -130,30 +139,23 @@ namespace thomas {
 					// Stage 1: Forward reaching
 					uint32_t i = num_link - 1;
 					p[i] = target;
-					for(; i > 0;){												// Forward reaching loop
+					for(; i > 0;){														// Forward reaching loop
 						i--;
-						float r = math::Vector3::Distance(p[i], p[i+1]);		// Distance to next joint
+						float r = math::Vector3::Distance(p[i], p[i+1]);				// Distance to next joint
 						float lambda = len[i] / r;
-						p[i] = math::lerp(p[i+1], p[i], lambda);				// Next iter. position
+						p[i] = math::lerp(p[i+1], p[i], lambda);						// Next iter. position
 
-						//solve_constraint_backward_iter(p + i, orient + i, len[i]);
+						solve_constraint_backward_iter(i, p + i, orient + i, len[i]);
 					}
 					// Stage 2: Backward reaching
-					*p = p_init;												// Reset root
+					*p = p_init;														// Reset root
 					*orient = orient_init;
-					for (; i < num_link - 1; i++) {								// Backward reaching loop
-						float r = math::Vector3::Distance(p[i], p[i + 1]);		// Distance to next joint
+					for (; i < num_link - 1; i++) {										// Backward reaching loop
+						float r = math::Vector3::Distance(p[i], p[i + 1]);				// Distance to next joint
 						float lambda = len[i] / r;
-						p[i+1] = math::lerp(p[i], p[i + 1], lambda);			// Next iter. position
+						p[i+1] = math::lerp(p[i], p[i + 1], lambda);					// Next iter. position
 
-						solve_constraint_forward_iter(i, p + i, orient + i, len[i]);
-						/*if(i > 0)
-						else 
-						{
-							math::Vector3 d_i = (p[i+1] - p[i]) / len[i];								// new forward orient
-							orient[i] = orient[i] * math::getMatrixRotationTo(orient[i].Up(), d_i);		// Rotate prev.->new 
-						}
-						*/
+						solve_constraint_forward_iter(i, p + i, orient + i, len[i]);	// Constrain iteration
 					}
 					dif = math::Vector3::Distance(p[num_link-1], target);
 				}
@@ -288,7 +290,7 @@ namespace thomas {
 				{
 					// Extract rotation to the base
 					m_joint.get()[i].base_offset = math::extractRotation(skel.getBone(m_chain.get()[i])._bindPose);
-					m_joint.get()[i].orientation = m_joint.get()[i].orient_offset * m_joint.get()[i].base_offset;
+					m_joint.get()[i].refreshOrient();
 				}
 			}
 			float IK_FABRIK_C_Constraint::getChainLength()
@@ -299,6 +301,11 @@ namespace thomas {
 			{
 				return m_chain.get()[0];
 			}
-		}
+			void IK_FABRIK_C_Constraint::JointInfo::refreshOrient()
+			{
+				this->orientation = orient_offset * base_offset;
+				this->backwardOrient = orientation.Invert();
+			}
+}
 	}
 }

@@ -69,6 +69,12 @@ namespace DirectX
 		Matrix getMatrixRotationTo_Nor(Vector3 from, Vector3 dest);
 
 
+		void invertY(Matrix& m)
+		{
+			m._21 = -m._21;
+			m._22 = -m._22;
+			m._23 = -m._23;
+		}
 		/* Extract the length of each axis in the top-left 3x3 matrix.
 		*/
 		Vector3 extractAxisScale(const Matrix& m);
@@ -76,6 +82,7 @@ namespace DirectX
 		*/
 		Matrix normalizeBasisAxis(Matrix m);
 		Matrix extractRotation(Matrix m);
+		Quaternion extractRotationQuat(Matrix m);
 		XMFLOAT3X3 extractRotation3x3(const Matrix &m);
 		/* Multiply first three axis by each component. Equivalent to m * row_vec4(scalars, 1)
 		*/

@@ -34,16 +34,19 @@ namespace thomas {
 				struct JointInfo
 				{
 					math::Matrix orientation = math::Matrix::Identity;		// Joint orientation offset in relation to parent (rotation from parent orienation to joint orient)
+					math::Matrix backwardOrient = math::Matrix::Identity;	// Inverted orientation and rotated 180* over x
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
 
+					void refreshOrient();
 
 					math::Matrix base_offset = math::Matrix::Identity;		// Rotation offset from parent orientation
 					math::Matrix orient_offset = math::Matrix::Identity;		// Rotation offset specified
 				};
 			private:
 				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
-				void solve_constraint_backward_iter(math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
+				math::Vector3 ballJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float bone_len);
+				void solve_constraint_backward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void solve_constraint_forward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link);
 

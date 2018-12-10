@@ -57,6 +57,11 @@ void ThomasEngine::Gizmos::DrawRing(Vector3 origin, Vector3 majorAxis, Vector3 m
 	thomas::editor::Gizmos::Gizmo().DrawRing(Utility::Convert(origin), Utility::Convert(majorAxis),Utility::Convert(minorAxis));
 }
 
+void ThomasEngine::Gizmos::DrawRing(Vector3 origin, Vector3 axis, float radius)
+{
+	thomas::editor::Gizmos::Gizmo().DrawRing(Utility::Convert(origin), Utility::Convert(axis), radius);
+}
+
 void ThomasEngine::Gizmos::DrawLine(Vector3 from, Vector3 to)
 {
 	thomas::editor::Gizmos::Gizmo().DrawLine(Utility::Convert(from), Utility::Convert(to));

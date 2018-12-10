@@ -24,6 +24,7 @@ namespace Concussion_Ball.Assets.Scripts
         private float ikOrientWeight = 0;
         public float IKBlendFactor { get; set; } = 0.5f;        // Factor determining how fast IK is blended in when activated
         public float MaxDistanceOffset { get; set; } = 0.2f;    // Offset from max chain length IK is blended in
+        private Vector3 temp;
         
         public IK_FABRIK_Constraint.JointParams[] Joints
         {
@@ -92,7 +93,12 @@ namespace Concussion_Ball.Assets.Scripts
         public override void Update()
         {
             base.Update();
-            
+            Matrix inv = Matrix.Invert(gameObject.transform.world);
+            Quaternion orient = Orient * MathEngine.ExtractRotation(inv);
+            Vector3 target = Vector3.Transform(Target, inv);
+            temp = target;
+
+
             if (!m_sampleSuccess ||                                   // Verify enough samples found
                 Distance > IK.BoneChainLength - MaxDistanceOffset)    // Verify target point is close enough
             {
@@ -107,10 +113,18 @@ namespace Concussion_Ball.Assets.Scripts
                     LockSearch = true;
             }
 
-            IK.Target = Target;
-            IK.Orientation = Orient;
+            IK.Target = target;
+            //IK.Orientation = orient;
             IK.Weight = blendInFactor(IK.Weight, ikTargetWeight, IKBlendFactor);
-            IK.OrientationWeight = blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
+            //IK.OrientationWeight = blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
+        }
+
+        public override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+            Gizmos.SetMatrix(gameObject.transform.world);
+            Gizmos.SetColor(Color.Yellow);
+            Gizmos.DrawRing(temp, Vector3.Up, 0.02f);
         }
     }
 }

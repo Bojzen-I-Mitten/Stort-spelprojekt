@@ -18,5 +18,7 @@ namespace ThomasEngine
 
 		static float DegreesToRadians(float degree);
 		static float RadiansToDegrees(float radians);
+
+		static Quaternion ExtractRotation(Matrix m);
 	};
 }

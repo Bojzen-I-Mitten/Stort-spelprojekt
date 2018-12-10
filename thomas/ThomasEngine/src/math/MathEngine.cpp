@@ -3,6 +3,7 @@
 #include<algorithm>
 #include <thomas/utils/Math.h>
 #pragma managed
+#include "../Utility.h"
 using namespace System; // ::Math
 
 namespace ThomasEngine
@@ -51,5 +52,9 @@ namespace ThomasEngine
 	float MathEngine::RadiansToDegrees(float radians)
 	{
 		return thomas::math::RadiansToDegrees(radians);
+	}
+	Quaternion MathEngine::ExtractRotation(Matrix m)
+	{
+		return Utility::Convert(thomas::math::extractRotationQuat(Utility::Convert(m)));
 	}
 }

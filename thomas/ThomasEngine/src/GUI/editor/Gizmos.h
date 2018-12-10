@@ -24,6 +24,7 @@ namespace ThomasEngine
 		static void DrawBoundingSphere(const BoundingSphere % sphere);
 
 		static void DrawRing(Vector3 origin, Vector3 majorAxis, Vector3 minorAxis);
+		static void DrawRing(Vector3 origin, Vector3 axis, float radius);
 
 		static void DrawLine(Vector3 from, Vector3 to);
 		static void DrawSphere(Vector3 center, float radius);

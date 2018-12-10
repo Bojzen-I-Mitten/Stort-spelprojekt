@@ -34,7 +34,7 @@ public class GroundOffset : ScriptComponent
     /* Access to trace result
     */
 
-    /* Target point sampled from the ground intersection data.
+    /* Target point sampled from the ground intersection data. In world space.
     */
     [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public Vector3 Target { get { return m_center; } }
@@ -125,7 +125,10 @@ public class GroundOffset : ScriptComponent
         for (int i = 0; i < MAX_SAMPLES; i++)
         {
             if (Physics.Raycast(Src_Points[i], Vector3.Down, out res, RayCastDistance + OffsetCast, m_maskGround))
-                Points[m_foundSamples++] = res.point;
+            {
+                Points[i] = res.point;
+                m_foundSamples++;
+            }
         }
         Vector3 groundTarget, normal;
         m_sampleSuccess = Utility.PlaneFromPointsY(Points, m_foundSamples, out groundTarget, out normal);
@@ -139,13 +142,11 @@ public class GroundOffset : ScriptComponent
         Vector3 forward = m.Up;
         forward = forward - Vector3.Dot(normal, forward) * normal;
         forward.Normalize();
-        // Orient in to local space
-        Matrix inv = Matrix.Invert(world);
-        m_center = Vector3.Transform(groundTarget, inv);
+        m_center = groundTarget;
         // Orientation offset
-        inv = MathEngine.CreateRotationXYZ(Right, Up, Z, OrientAngle) * inv;
-        m_forward = Vector3.TransformNormal(forward, inv);
-        m_normal = Vector3.TransformNormal(normal, inv);
+        Matrix alignment = MathEngine.CreateRotationXYZ(Vector3.Cross(normal, -forward), normal, -forward, OrientAngle);
+        m_forward = Vector3.TransformNormal(forward, alignment);
+        m_normal = Vector3.TransformNormal(normal, alignment);
 
         // Calc. src distance
         float distanceToTarget = Vector3.Distance(m.Translation, groundTarget);
@@ -154,13 +155,13 @@ public class GroundOffset : ScriptComponent
 
     public override void OnDrawGizmos()
     {
-        //Gizmos.SetColor(Color.Green);
-        //Gizmos.DrawRay(center, normal, OffsetCast + OffsetSide);
-        //Gizmos.SetColor(Color.Blue);
-        //Gizmos.DrawRay(center, forward, OffsetForward);
+        Gizmos.SetMatrix(Matrix.Identity);  // In world space
+
+        // Draw orientation
         Quaternion q = Orient;
         Gizmos.DrawQuat(ref q, ref m_center, 0.05f);
 
+        // Draw feet placement in plane (rectangle)
         Matrix orientInv = MathEngine.CreateRotationXYZ(Right, Up, Z, -OrientAngle);
         Vector3 forward = Vector3.TransformNormal(this.m_forward, orientInv);
         Vector3 normal = Vector3.TransformNormal(this.m_normal, orientInv);
@@ -175,9 +176,8 @@ public class GroundOffset : ScriptComponent
         Gizmos.DrawLine(p1, p2);
         Gizmos.DrawLine(p2, p3);
         Gizmos.DrawLine(p3, p0);
-        //Gizmos.DrawBoundingBox()
 
-        Gizmos.SetMatrix(Matrix.Identity);  // In world space
+        // Draw ray samples
         Gizmos.SetColor(Color.Red);
         for (int i = 0; i < m_foundSamples; i++)
             Gizmos.DrawLine(Src_Points[i], Points[i]);

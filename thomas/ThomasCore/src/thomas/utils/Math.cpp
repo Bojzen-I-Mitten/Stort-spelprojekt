@@ -235,6 +235,11 @@ namespace DirectX
 			m._44 = 1;
 			return m;
 		}
+		Quaternion extractRotationQuat(Matrix m)
+		{
+			// Lazy solution
+			return Quaternion::CreateFromRotationMatrix(extractRotation(m));
+		}
 		XMFLOAT3X3 extractRotation3x3(const Matrix & src)
 		{
 			XMFLOAT3X3 m;
