@@ -196,6 +196,7 @@ public class MatchSystem : NetworkManager
 
     void ResetPlayers()
     {
+        CameraMaster.instance.EnableSwitchTeam();
         foreach (var team in Teams)
         {
             team.Value.ResetPlayers();
@@ -339,6 +340,7 @@ public class MatchSystem : NetworkManager
         Team team = FindTeam(type);
         team?.AddScore();
         StartCoroutine(OnGoalCoroutine(team));
+        CameraMaster.instance.DisableSwitchTeam();
     }
 
     #endregion
