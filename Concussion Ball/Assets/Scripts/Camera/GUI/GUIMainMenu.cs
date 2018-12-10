@@ -158,15 +158,15 @@ public class GUIMainMenu : ScriptComponent
             }
             #endregion
 
-        if (TakeName)
-        {
-            string playerString = PlayerName.text;
-            GUIInput.AppendString(ref playerString, 9);
-            PlayerName.text = playerString;
-        }
-        RotateChad();
+            if (TakeName)
+            {
+                string playerString = PlayerName.text;
+                GUIInput.AppendString(ref playerString, 9);
+                PlayerName.text = playerString;
+            }
+            RotateChad();
 
-        Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
+            Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
         }
     }
 
