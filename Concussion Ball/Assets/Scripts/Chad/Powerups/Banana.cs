@@ -118,9 +118,11 @@ public class Banana : Powerup
         if (activated)
             return;
         activated = true;
+        ChadControls otherChad = null;
+        
+        if(_LastCollider)
+            otherChad = _LastCollider.gameObject.GetComponent<ChadControls>();
 
-        //ChadControls otherChad = colliderObject.GetComponent<ChadControls>();
-        ChadControls otherChad = _LastCollider.gameObject.GetComponent<ChadControls>();
         if (otherChad)
         {
             // rustle his jimmies
