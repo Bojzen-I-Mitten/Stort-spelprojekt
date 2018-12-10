@@ -27,13 +27,38 @@ public class NetworkPlayer : NetworkComponent
     Canvas nameCanvas;
     Text text;
     ShirtRenderer shirt;
+    Hatter hatter;
+    private int _HatIndex = 0;
+    public int HatIndex
+    {
+        get
+        {
+            return _HatIndex;
+        }
+        set
+        {
+            if (_HatIndex != value)
+            {
+                if (hatter)
+                {
+                    UpdateHat(value);
+                }
+                else
+                    _HatIndex = value;
+            }
+        }
+    }
+
+
     public override void OnAwake()
     {
         rag = gameObject.GetComponent<Ragdoll>();
         rb = gameObject.GetComponent<Rigidbody>();
         shirt = gameObject.GetComponent<ShirtRenderer>();
+        hatter = gameObject.AddComponent<Hatter>();
         if (Team == null)
             Team = MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED);
+
     }
 
     public override void Start()
@@ -51,7 +76,9 @@ public class NetworkPlayer : NetworkComponent
         text.origin = new Vector2(0.5f, 0.5f);
         nameCanvas.is3D = true;
         if (isOwner)
-            PlayerName = GUIMainMenu.PlayerString;
+            PlayerName = CameraMaster.instance.GetPlayerName();
+
+        UpdateHat(_HatIndex);
     }
 
     public int GetPing()
@@ -59,6 +86,13 @@ public class NetworkPlayer : NetworkComponent
         return Identity.Ping;
     }
 
+    private void UpdateHat(int newHatIndex)
+    {
+        if (hatter.SetHat(newHatIndex))
+        {
+            _HatIndex = newHatIndex;
+        }
+    }
 
     public override void OnDisable()
     {
@@ -148,7 +182,6 @@ public class NetworkPlayer : NetworkComponent
 
     public override void OnRead(NetDataReader reader, bool initialState)
     {
-
 
         PlayerName = reader.GetString();
         ReadyToStart = reader.GetBool();

@@ -20,7 +20,6 @@ namespace ThomasEngine
 		
 		void WriteCanvas(Canvas^ canvas)
 		{
-			ThomasWrapper::WaitForRender();
 			((thomas::resource::RenderTexture*)m_nativePtr)->WriteCanvas(canvas->nativePtr);
 		}
 	};

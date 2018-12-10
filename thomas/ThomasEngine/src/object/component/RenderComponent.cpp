@@ -133,5 +133,13 @@ namespace ThomasEngine
 		render->SetMaterial(index, mat->Native);
 	}
 
+	bool RenderComponent::EnableCulling::get()
+	{
+		return render->EnabledCulling();
+	}
 
+	void RenderComponent::EnableCulling::set(bool value)
+	{
+		render->EnableCulling(value);
+	}
 }
