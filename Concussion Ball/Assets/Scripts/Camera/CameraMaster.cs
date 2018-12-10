@@ -237,6 +237,8 @@ public class CameraMaster : ScriptComponent
                 TurnOnLights();
                 SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
+                Camera.fixedAspectRatio = false;
+                Camera.orthographic = false;
                 break;
             case CAM_STATE.GAME:
                 TurnOffLights();

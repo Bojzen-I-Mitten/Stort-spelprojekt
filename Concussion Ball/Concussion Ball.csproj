@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Chad\Powerups\Gramophone.cs" />
     <Compile Include="Assets\Scripts\Chad\HatManager.cs" />
     <Compile Include="Assets\Scripts\Chad\Hatter.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Banana.cs" />
