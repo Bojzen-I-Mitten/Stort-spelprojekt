@@ -82,7 +82,8 @@ public class ToySoldier : Powerup
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         // Scale and movement decrease
-        // The scale up effect with the collider look's a bit weird
+        // TODO: The scale up effect with the collider look's a bit weird
+        // TOOD: New skinning material doesn't show for the other player
         localChad.ToySoldierAffected = true;
         localChad.transform.scale *= 0.5f;
         localChad.Acceleration *= 0.5f;
@@ -95,6 +96,8 @@ public class ToySoldier : Powerup
         capsule.height *= 0.5f;
         capsule.radius *= 0.5f;
         localChad.rBody.Mass *= 0.5f;
+        localChad.FirstJumpForce *= 0.3f;
+        localChad.SecondJumpForce *= 0.3f;
 
         // Material
         RenderSkinnedComponent render = localChad.gameObject.GetComponent<RenderSkinnedComponent>();

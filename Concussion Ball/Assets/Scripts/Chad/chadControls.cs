@@ -56,6 +56,8 @@ public class ChadControls : NetworkComponent
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
     public float BaseSpeed { get; set; }  = 5.0f;
     public float MaxSpeed { get; set; } = 10.0f;
+    public float FirstJumpForce;
+    public float SecondJumpForce;
 
     public Quaternion DivingRotation = Quaternion.Identity;
     public float MinimumRagdollTimer = 2.0f;
@@ -100,6 +102,8 @@ public class ChadControls : NetworkComponent
     private float OriginalCapsuleHeight;
     private float OriginalCapsuleRadius;
     private float OriginalMass;
+    private float OriginalFirstJumpForce;
+    private float OriginalSecondJumpForce;
 
     public Material ChadFirstMaterial { get; set; }
     public Material ChadSecondMaterial { get; set; }
@@ -145,6 +149,11 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+
+        FirstJumpForce = 450.0f;
+        SecondJumpForce = 350.0f;
+        OriginalFirstJumpForce = FirstJumpForce;
+        OriginalSecondJumpForce = SecondJumpForce;
 
         // Store original values
         OriginalScale = gameObject.transform.scale;
@@ -512,7 +521,7 @@ public class ChadControls : NetworkComponent
             if (CurrentVelocity.y > velocityBetweenBaseAndMax)
                 CurrentVelocity.y = velocityBetweenBaseAndMax;
             rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
-            rBody.AddForce(new Vector3(0, 450, 0), Rigidbody.ForceMode.Impulse);
+            rBody.AddForce(new Vector3(0, FirstJumpForce, 0), Rigidbody.ForceMode.Impulse);
         }
         else if ((Jumping || (!OnGround() && JumpingTimer > 3.0f)) && !PickedUpObject)
         {
@@ -522,7 +531,7 @@ public class ChadControls : NetworkComponent
             DivingRotation = this.gameObject.transform.rotation;
             CurrentVelocity.y = BaseSpeed;
             rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
-            rBody.AddForce(new Vector3(0, 350, 0), Rigidbody.ForceMode.Impulse);
+            rBody.AddForce(new Vector3(0, SecondJumpForce, 0), Rigidbody.ForceMode.Impulse);
         }
     }
 
@@ -716,6 +725,8 @@ public class ChadControls : NetworkComponent
         Acceleration = OriginalAcceleration;
         BaseSpeed = OriginalBaseSpeed;
         MaxSpeed = OriginalMaxSpeed;
+        FirstJumpForce = OriginalFirstJumpForce;
+        SecondJumpForce = OriginalSecondJumpForce;
 
         CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
         capsule.center = OrginalCapsuleCenter;
