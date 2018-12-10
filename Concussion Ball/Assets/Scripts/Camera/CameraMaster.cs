@@ -48,7 +48,7 @@ public class CameraMaster : ScriptComponent
         MenuSound.Looping = false;
         MenuSound.Type = SoundComponent.SoundType.Music;
         MenuSound.Is3D = false;
-        MenuSound.Volume = 0.5f;
+        MenuSound.Volume = 0.2f;
     }
 
 
