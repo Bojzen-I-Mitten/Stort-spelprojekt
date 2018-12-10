@@ -162,31 +162,18 @@ public class GUISelectTeam : ScriptComponent
         if (Team1Image.Hovered())
         {
             Team1Text.color = Selected;
-            if (RunningAnim != null)
-            {
-                if (ChadRSC1.animation != RunningAnim)
-                {
-                    ChadRSC1.animation = RunningAnim;
-                    ChadRSC2.animation = IdleAnim;
-                }
-            }
+            if (RunningAnim != null && ChadRSC1.animation != RunningAnim)
+                ChadRSC1.animation = RunningAnim;
         }
         else if (Team2Image.Hovered())
         {
             Team2Text.color = Selected;
-            if (RunningAnim != null)
-            {
-                if (ChadRSC2.animation != RunningAnim)
-                {
-                    ChadRSC1.animation = IdleAnim;
-                    ChadRSC2.animation = RunningAnim;
-                }
-            }
+            if (RunningAnim != null && ChadRSC2.animation != RunningAnim)
+                ChadRSC2.animation = RunningAnim;
         }
         else if (SpectatorImage.Hovered() || SpectatorText.Hovered())
         {
             SpectatorText.color = Selected;
-            IdleChads();
         }
         else if (ReadyUp.Hovered() && ReadyUp.scale != Vector2.Zero)
         {
@@ -333,8 +320,10 @@ public class GUISelectTeam : ScriptComponent
     {
         if (IdleAnim != null)
         {
-            ChadRSC1.animation = IdleAnim;
-            ChadRSC2.animation = IdleAnim;
+            if (ChadRSC1.animation != IdleAnim)
+                ChadRSC1.animation = IdleAnim;
+            if (ChadRSC2.animation != IdleAnim)
+                ChadRSC2.animation = IdleAnim;
         }
     }
 
