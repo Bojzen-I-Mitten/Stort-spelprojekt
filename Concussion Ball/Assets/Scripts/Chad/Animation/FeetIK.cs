@@ -92,10 +92,9 @@ namespace Concussion_Ball.Assets.Scripts
         public override void Update()
         {
             base.Update();
-
-            Vector3 srcPoint = m_rC.GetLocalBoneMatrix((int)IK.SrcBoneIndex).Translation;
-            if (!m_sampleSuccess ||                                                             // Verify enough samples found
-                Vector3.Distance(srcPoint, Center) > IK.BoneChainLength - MaxDistanceOffset)    // Verify target point is close enough
+            
+            if (!m_sampleSuccess ||                                   // Verify enough samples found
+                Distance > IK.BoneChainLength - MaxDistanceOffset)    // Verify target point is close enough
             {
                 ikTargetWeight = 0;
                 ikOrientWeight = 0;
@@ -104,9 +103,11 @@ namespace Concussion_Ball.Assets.Scripts
             {
                 ikTargetWeight = 1;
                 ikOrientWeight = 1;
+                if (Distance < 0.05f)
+                    LockSearch = true;
             }
 
-            IK.Target = Center;
+            IK.Target = Target;
             IK.Orientation = Orient;
             IK.Weight = blendInFactor(IK.Weight, ikTargetWeight, IKBlendFactor);
             IK.OrientationWeight = blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);

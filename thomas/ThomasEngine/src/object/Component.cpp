@@ -111,9 +111,10 @@ namespace ThomasEngine
 		case Comp::State::Enabled:
 		{
 			// If Component isn't activated, and not explicit call: ignore
+			if (!this->Activated && !utility::hasFlag(InitBits, INIT_EXPLICIT_CALL_BIT))
+				return;
 			// If Component isn't in a valid state for this call:	ignore
-			if ((!this->Activated && !utility::hasFlag(InitBits, INIT_EXPLICIT_CALL_BIT)) ||
-				!(this->ComponentState == Comp::State::Awake || this->ComponentState == Comp::State::Disabled))
+			if(!(this->ComponentState == Comp::State::Awake || this->ComponentState == Comp::State::Disabled))
 				return;
 			this->Enable();
 		}

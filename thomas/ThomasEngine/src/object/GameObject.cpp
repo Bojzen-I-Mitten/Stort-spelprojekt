@@ -118,14 +118,14 @@ namespace ThomasEngine {
 	}
 	void GameObject::OnActivate()
 	{
-		uint32_t bits = INIT_EXPLICIT_CALL_BIT | (ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0u);
+		uint32_t bits = (ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0u);
 		InitComponents(Comp::State::Enabled, bits);
 		for each (Transform^ g in Children)
 			g->gameObject->OnActivate();
 	}
 	void GameObject::OnDeactivate()
 	{
-		uint32_t bits = INIT_EXPLICIT_CALL_BIT | (ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0u);
+		uint32_t bits = (ThomasWrapper::IsPlaying() ? INIT_PLAYING_BIT : 0u);
 		InitComponents(Comp::State::Disabled, bits);
 		for each (Transform^ g in Children)
 			g->gameObject->OnDeactivate();

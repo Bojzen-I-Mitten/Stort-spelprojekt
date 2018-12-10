@@ -34,27 +34,30 @@ public class GroundOffset : ScriptComponent
     /* Access to trace result
     */
 
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
-    public Vector3 Center { get { return m_center; } }
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
+    /* Target point sampled from the ground intersection data.
+    */
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
+    public Vector3 Target { get { return m_center; } }
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public Vector3 Forward { get { return m_forward; } }
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public Vector3 Z { get { return -m_forward; } }
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public Vector3 Up { get { return m_normal; } }
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public Vector3 Right { get { return Vector3.Cross(m_normal, Z); } }
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public Quaternion Orient { get { return MathEngine.CreateRotation(Right, m_normal, Z); } }
-    [Browsable(false)]
-    [Newtonsoft.Json.JsonIgnore]
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public int FoundSamples { get { return m_foundSamples; } }
+    /* Distance between target and source bone position
+    */
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
+    public float Distance { get; private set; }
+    /* Lock sampling search and retain current position/orientation
+    */
+    [Browsable(false), Newtonsoft.Json.JsonIgnore]
+    public bool LockSearch { get; set; } = false;
 
     public GroundOffset() 
         : base()
@@ -104,6 +107,8 @@ public class GroundOffset : ScriptComponent
 
     public override void Update()
     {
+        if (LockSearch)
+            return;
         Matrix m = m_rC.GetLocalBoneMatrix(m_traceBoneIndex);
         Matrix world = gameObject.transform.world;
         m = m * world;
@@ -122,25 +127,29 @@ public class GroundOffset : ScriptComponent
             if (Physics.Raycast(Src_Points[i], Vector3.Down, out res, RayCastDistance + OffsetCast, m_maskGround))
                 Points[m_foundSamples++] = res.point;
         }
-
-        m_sampleSuccess = Utility.PlaneFromPointsY(Points, m_foundSamples, out m_center, out m_normal);
+        Vector3 groundTarget, normal;
+        m_sampleSuccess = Utility.PlaneFromPointsY(Points, m_foundSamples, out groundTarget, out normal);
         if (!m_sampleSuccess)
         {
-            m_center = m.Translation;
-            m_normal = m.Forward;
-            m_normal.Normalize();
+            groundTarget = m.Translation;
+            normal = m.Forward;
         }
-        m_forward = m.Up;
-        m_forward = m_forward - Vector3.Dot(m_normal, m_forward) * m_normal;
-        m_forward.Normalize();
-        m_normal.Normalize();
+        normal.Normalize();
+        // Find forward
+        Vector3 forward = m.Up;
+        forward = forward - Vector3.Dot(normal, forward) * normal;
+        forward.Normalize();
         // Orient in to local space
         Matrix inv = Matrix.Invert(world);
-        m_center = Vector3.Transform(m_center, inv);
-        // Custom orientation of basis
+        m_center = Vector3.Transform(groundTarget, inv);
+        // Orientation offset
         inv = MathEngine.CreateRotationXYZ(Right, Up, Z, OrientAngle) * inv;
-        m_forward = Vector3.TransformNormal(m_forward, inv);
-        m_normal = Vector3.TransformNormal(m_normal, inv);
+        m_forward = Vector3.TransformNormal(forward, inv);
+        m_normal = Vector3.TransformNormal(normal, inv);
+
+        // Calc. src distance
+        float distanceToTarget = Vector3.Distance(m.Translation, groundTarget);
+        Distance = distanceToTarget;
     }
 
     public override void OnDrawGizmos()
@@ -155,11 +164,13 @@ public class GroundOffset : ScriptComponent
         Matrix orientInv = MathEngine.CreateRotationXYZ(Right, Up, Z, -OrientAngle);
         Vector3 forward = Vector3.TransformNormal(this.m_forward, orientInv);
         Vector3 normal = Vector3.TransformNormal(this.m_normal, orientInv);
-
-        Vector3 p0 = m_center + forward * OffsetForward + Right * OffsetSide;
-        Vector3 p1 = m_center + forward * OffsetForward - Right * OffsetSide;
-        Vector3 p2 = m_center - forward * OffsetForward - Right * OffsetSide;
-        Vector3 p3 = m_center - forward * OffsetForward + Right * OffsetSide;
+        forward.Normalize();
+        normal.Normalize();
+        Vector3 right = Vector3.Cross(normal, -forward);
+        Vector3 p0 = m_center + forward * OffsetForward + right * OffsetSide;
+        Vector3 p1 = m_center + forward * OffsetForward - right * OffsetSide;
+        Vector3 p2 = m_center - forward * OffsetForward - right * OffsetSide;
+        Vector3 p3 = m_center - forward * OffsetForward + right * OffsetSide;
         Gizmos.DrawLine(p0, p1);
         Gizmos.DrawLine(p1, p2);
         Gizmos.DrawLine(p2, p3);
