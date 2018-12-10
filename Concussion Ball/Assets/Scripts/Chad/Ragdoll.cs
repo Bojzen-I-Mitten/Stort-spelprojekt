@@ -39,6 +39,8 @@ public class Ragdoll : ScriptComponent
     public AudioClip ImpactSound { get; set; }
     RagdollImpact ImpactSpine;
 
+    RenderSkinnedComponent skin;
+
     /* Struct determining ragdol force parameters
     */
     public class ImpactParams : RPCWriteable
@@ -270,6 +272,7 @@ public class Ragdoll : ScriptComponent
         }
 
         RagdollEnabled = true;
+        skin.EnableCulling = false;
     }
 
 
@@ -299,7 +302,7 @@ public class Ragdoll : ScriptComponent
 
 
 
-        RenderSkinnedComponent skinn = gameObject.GetComponent<RenderSkinnedComponent>();
+        skin = gameObject.GetComponent<RenderSkinnedComponent>();
 
         for (int i =0; i < (int)BODYPART.COUNT; i++)
         {
@@ -319,10 +322,11 @@ public class Ragdoll : ScriptComponent
 
             BT_BodyParts[i].BoneName = BoneNames[i];
             BT_BodyParts[i].AnimatedObject = gameObject;
-            skinn.FetchBoneIndex(BoneNames[i], out BoneIndexes[i]);
-            G_BodyParts[i].transform.local_world = skinn.GetLocalBoneMatrix((int)BoneIndexes[i]);
+            skin.FetchBoneIndex(BoneNames[i], out BoneIndexes[i]);
+            G_BodyParts[i].transform.local_world = skin.GetLocalBoneMatrix((int)BoneIndexes[i]);
 
         }
+
         //J_BodyParts[(int)BODYPART.HEAD].Damping = 50.0f;
 
         Vector3 center;
@@ -335,7 +339,7 @@ public class Ragdoll : ScriptComponent
         //Spine
 
         BoxCollider spineCollider = G_BodyParts[(int)BODYPART.SPINE].AddComponent<BoxCollider>();
-        center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skin);
         center.x = 0;
         center.z = 0;
         spineCollider.center = center;
@@ -345,7 +349,7 @@ public class Ragdoll : ScriptComponent
         //Head
         SphereCollider headCollider = G_BodyParts[(int)BODYPART.HEAD].AddComponent<SphereCollider>();
         headCollider.radius = 0.2f;
-        center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(Neck, Head, skin);
         center.x = 0;
         center.z = 0;
         headCollider.center = center;
@@ -435,7 +439,7 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.HEAD].NoCollision = true;
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.HEAD].SwingAngle2 = 90;
-        J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = headCollider.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skinn);
+        J_BodyParts[(int)BODYPART.HEAD].ConnectedAnchor = headCollider.center + calculatePosbetweenTwoSkeletonschanges(Spine, Neck, skin);
         if (PostiveMapping)
         {
             J_BodyParts[(int)BODYPART.HEAD].SwingAngle1 = 64;
@@ -454,14 +458,14 @@ public class Ragdoll : ScriptComponent
         CapsuleCollider limbCollider;
 
         limbCollider = (C_BodyParts[(int)BODYPART.LEFT_UPPER_ARM] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skin);
 
 
 
-        center = calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(UpperLeftArm, LowerLeftArm, skin);
         center.x = 0;
         center.z = 0;
-        float value = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn);
+        float value = calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skin);
         if (PostiveMapping)
             center.y = value * 0.5f;
         else
@@ -474,7 +478,7 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].NoCollision = true;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].SwingAngle2 = 90;
-        ExtraVector = calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, skinn) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperLeftArm, skinn);
+        ExtraVector = calculatePosbetweenTwoSkeletonschanges(LeftShoulder, UpperLeftArm, skin) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperLeftArm, skin);
         ExtraVector.z = Math.Abs(ExtraVector.z);
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_ARM].Anchor = -limbCollider.center;
@@ -492,13 +496,13 @@ public class Ragdoll : ScriptComponent
 
         //left under arm
         limbCollider = (C_BodyParts[(int)BODYPART.LEFT_LOWER_ARM] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, skin);
 
-        center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, skinn));
+        center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerLeftArm, LowerLeftHand, skin));
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, skinn);
+        value = calculateLengthBetweenSkeleton(LowerLeftArm, LowerLeftHand, skin);
         if (PostiveMapping)
             center.y = value * 0.5f;
         else
@@ -512,8 +516,8 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].Anchor = -limbCollider.center;
-        J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skinn),
-            (-calculateLengthBetweenSkeleton(LeftShoulder, UpperLeftArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperLeftArm, skinn)) * 0.5f, 0);
+        J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor = new Vector3(calculateLengthBetweenSkeleton(UpperLeftArm, LowerLeftArm, skin),
+            (-calculateLengthBetweenSkeleton(LeftShoulder, UpperLeftArm, skin) + calculateLengthBetweenSkeleton(Spine, UpperLeftArm, skin)) * 0.5f, 0);
         if(PostiveMapping)
         {
             ExtraVector = J_BodyParts[(int)BODYPART.LEFT_LOWER_ARM].ConnectedAnchor;
@@ -523,12 +527,12 @@ public class Ragdoll : ScriptComponent
 
         //Right arm
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn);
-        center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, skinn));
+        limbCollider.height = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skin);
+        center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(UpperRightArm, LowerRightArm, skin));
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn);
+        value = calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skin);
         center.y = value * 0.5f;
         limbCollider.center = center;
 
@@ -538,7 +542,7 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].NoCollision = true;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].SwingAngle2 = 90;
-        ExtraVector = calculatePosbetweenTwoSkeletonschanges(RightShoulder, UpperRightArm, skinn) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperRightArm, skinn);
+        ExtraVector = calculatePosbetweenTwoSkeletonschanges(RightShoulder, UpperRightArm, skin) + calculatePosbetweenTwoSkeletonschanges(Spine, UpperRightArm, skin);
         ExtraVector.z = Math.Abs(ExtraVector.z);
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].ConnectedAnchor = ExtraVector;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_ARM].Anchor = -limbCollider.center;
@@ -571,13 +575,13 @@ public class Ragdoll : ScriptComponent
 
         //RightUnderArm
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(LowerRightArm, LowerRightHand, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(LowerRightArm, LowerRightHand, skin);
 
-        center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, skinn));
+        center = -SwapXY(calculatePosbetweenTwoSkeletonschanges(LowerRightArm, LowerRightHand, skin));
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(LowerRightArm, LowerRightHand, skinn);
+        value = calculateLengthBetweenSkeleton(LowerRightArm, LowerRightHand, skin);
         center.y = value * 0.5f;
         limbCollider.center = center;
 
@@ -589,20 +593,20 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].SwingAngle2 = 90;
         J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].Anchor = -limbCollider.center;
         if(PostiveMapping)
-            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(0, (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * -0.5f, 0);
+            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(0, (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skin) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skin)) * -0.5f, 0);
         else
-            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skinn), (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skinn) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skinn)) * 0.5f, 0);
+            J_BodyParts[(int)BODYPART.RIGHT_LOWER_ARM].ConnectedAnchor = -new Vector3(calculateLengthBetweenSkeleton(UpperRightArm, LowerRightArm, skin), (-calculateLengthBetweenSkeleton(RightShoulder, UpperRightArm, skin) + calculateLengthBetweenSkeleton(Spine, UpperRightArm, skin)) * 0.5f, 0);
 
         //RightLeg
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skin);
         limbCollider.radius = 0.065f;
 
-        center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(UpperRightLeg, LowerRightLeg, skin);
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skinn);
+        value = calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skin);
         if (PostiveMapping)
             center.y = value * 0.5f;
         else
@@ -616,8 +620,8 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].SwingAngle2 = 10;
         J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].TwistAngle = 60;
-        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor = new Vector3(0, calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skinn) * 0.5f, 0);
-        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperRightLeg, skinn) * 2;
+        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].Anchor = new Vector3(0, calculateLengthBetweenSkeleton(UpperRightLeg, LowerRightLeg, skin) * 0.5f, 0);
+        J_BodyParts[(int)BODYPART.RIGHT_UPPER_LEG].ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperRightLeg, skin) * 2;
 
         if(PostiveMapping)
         {
@@ -631,14 +635,14 @@ public class Ragdoll : ScriptComponent
 
         //RightUnderLeg
         limbCollider = (C_BodyParts[(int)BODYPART.RIGHT_LOWER_LEG] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, skin);
         limbCollider.radius = 0.065f;
 
-        center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(LowerRightLeg, RightFoot, skin);
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, skinn);
+        value = calculateLengthBetweenSkeleton(LowerRightLeg, RightFoot, skin);
         if (PostiveMapping)
             center.y = value * 0.5f;
         else
@@ -660,14 +664,14 @@ public class Ragdoll : ScriptComponent
 
             //left leg
             limbCollider = (C_BodyParts[(int)BODYPART.LEFT_UPPER_LEG] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skin);
         limbCollider.radius = 0.065f;
 
-        center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(UpperLeftLeg, LowerLeftLeg, skin);
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skinn);
+        value = calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skin);
         if (PostiveMapping)
             center.y = value * 0.5f;
         else
@@ -681,8 +685,8 @@ public class Ragdoll : ScriptComponent
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle1 = 90;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].SwingAngle2 = 10;
         J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].TwistAngle = 60;
-        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor = new Vector3(0, calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skinn) * 0.5f, 0);
-        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperLeftLeg, skinn) * 2;
+        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].Anchor = new Vector3(0, calculateLengthBetweenSkeleton(UpperLeftLeg, LowerLeftLeg, skin) * 0.5f, 0);
+        J_BodyParts[(int)BODYPART.LEFT_UPPER_LEG].ConnectedAnchor = calculatePosbetweenTwoSkeletonschanges(Hips, UpperLeftLeg, skin) * 2;
 
         if (PostiveMapping)
         {
@@ -700,14 +704,14 @@ public class Ragdoll : ScriptComponent
 
         //LeftUnderLeg
         limbCollider = (C_BodyParts[(int)BODYPART.LEFT_LOWER_LEG] as CapsuleCollider);
-        limbCollider.height = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, skinn);
+        limbCollider.height = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, skin);
         limbCollider.radius = 0.065f;
 
-        center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, skinn);
+        center = calculatePosbetweenTwoSkeletonschanges(LowerLeftLeg, LeftFoot, skin);
         center.x = 0;
         center.z = 0;
         limbCollider.center = center;
-        value = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, skinn);
+        value = calculateLengthBetweenSkeleton(LowerLeftLeg, LeftFoot, skin);
         if (PostiveMapping)
             center.y = value * 0.5f;
         else
@@ -740,11 +744,10 @@ public class Ragdoll : ScriptComponent
 
         if (RagdollEnabled)
         {
-            return;
+            
         }
         else
         {
-            RenderSkinnedComponent skin = gameObject.GetComponent<RenderSkinnedComponent>();
 
             for (int i = 0; i < (int)BODYPART.COUNT; i++)
             {
@@ -760,14 +763,14 @@ public class Ragdoll : ScriptComponent
 
     public void DisableRagdoll()
     {
-
-        foreach(GameObject gObj in G_BodyParts)
+       
+        foreach (GameObject gObj in G_BodyParts)
         {
             if(gObj != null)
                 gObj.SetActive(false);
         }
         RagdollEnabled = false;
-
+        skin.EnableCulling = true;
     }
     
 
