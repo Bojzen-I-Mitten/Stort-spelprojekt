@@ -71,12 +71,11 @@ namespace thomas
 		LONG newWidth = m_windowRectangle.right;
 		LONG newHeight = m_windowRectangle.bottom;
 
-		if (result)
-		{
-			if (m_height != newHeight || m_width != newWidth)
-			{
-				m_height = newHeight;
-				m_width = newWidth;
+			if (m_height == newHeight && m_width == newWidth)
+				return false;
+
+			m_height = newHeight;
+			m_width = newWidth;
 
 				utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, NULL, NULL);
 

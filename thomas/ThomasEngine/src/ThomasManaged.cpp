@@ -251,10 +251,11 @@ namespace ThomasEngine {
 			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetTotalMemory(), 512.0f);
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
 			//ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
-			ImGui::Text("	Draw Shadows: %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_SHADOWS_END)*1000.0f);
-			ImGui::Text("	Main objects: %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS_END)*1000.0f);
-			ImGui::Text("	Particles: %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES_END)*1000.0f);
+			ImGui::Text("	Draw Shadows:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_SHADOWS_END)*1000.0f);
+			ImGui::Text("	Main objects:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS_END)*1000.0f);
+			ImGui::Text("	Particles:     %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES_END)*1000.0f);
 			ImGui::Text("	Gizmo objects: %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_GIZMO_OBJECTS_END)*1000.0f);
+			ImGui::Text("    GUI objects:   %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_GUI_END)*1000.0f);
 			ImGui::End();
 		}
 

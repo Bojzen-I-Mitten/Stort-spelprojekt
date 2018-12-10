@@ -11,6 +11,8 @@ public class GUIExitMenu : ScriptComponent
     Text ExitGame;
     Text SwitchTeam;
 
+    public bool _CanSwitchTeam = true;
+
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
@@ -28,12 +30,12 @@ public class GUIExitMenu : ScriptComponent
 
     public override void Update()
     {
-        ExitGame.color = Color.Black;
-        SwitchTeam.color = Color.Black;
+        ExitGame.color = Color.White;
+        SwitchTeam.color = Color.White;
 
         if (ExitGame.Hovered())
             ExitGame.color = Color.IndianRed;
-        else if (SwitchTeam.Hovered())
+        else if (SwitchTeam.Hovered() && _CanSwitchTeam)
             SwitchTeam.color = Color.IndianRed;
 
         if (ExitGame.Clicked())
@@ -44,7 +46,7 @@ public class GUIExitMenu : ScriptComponent
                 ThomasWrapper.IssueRestart();
             } 
         }
-        else if (SwitchTeam.Clicked())
+        else if (SwitchTeam.Clicked() && _CanSwitchTeam)
         {
             CameraMaster.instance.Canvas.isRendering = true;
             gameObject.GetComponent<ChadCam>().enabled = false;
@@ -58,22 +60,24 @@ public class GUIExitMenu : ScriptComponent
 
         #region Exit Game
         ExitGame = Canvas.Add(_exitGame);
-        ExitGame.position = new Vector2(0.4f, 0.25f);
-        ExitGame.color = Color.Black;
+        ExitGame.position = new Vector2(0.5f, 0.25f);
+        ExitGame.origin = new Vector2(0.5f);
+        ExitGame.color = Color.White;
         ExitGame.font = SportNumbers32;
         ExitGame.interactable = true;
         ExitGame.outline = true;
-        ExitGame.outlineColor = Color.White;
+        ExitGame.outlineColor = Color.Black;
         #endregion
 
         #region Switch Team
         SwitchTeam = Canvas.Add("Switch Team");
-        SwitchTeam.position = new Vector2(0.4f, 0.30f);
-        SwitchTeam.color = Color.Black;
+        SwitchTeam.position = new Vector2(0.5f, 0.30f);
+        SwitchTeam.origin = new Vector2(0.5f);
+        SwitchTeam.color = Color.White;
         SwitchTeam.font = SportNumbers32;
         SwitchTeam.interactable = true;
         SwitchTeam.outline = true;
-        SwitchTeam.outlineColor = Color.White;
+        SwitchTeam.outlineColor = Color.Black;
         #endregion
 
         #endregion

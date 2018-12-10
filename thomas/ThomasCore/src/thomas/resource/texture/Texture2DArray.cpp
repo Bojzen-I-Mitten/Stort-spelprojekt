@@ -27,6 +27,8 @@ namespace thomas {
 				m_resource = textureInterface;	// ;|
 				AddTexture(Texture2D::GetWhiteTexture());
 			}
+
+			
 		}
 
 		Texture2DArray::~Texture2DArray()
