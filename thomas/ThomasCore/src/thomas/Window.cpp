@@ -422,6 +422,10 @@ namespace thomas
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;
+		case WM_KILLFOCUS:
+		case WM_SETFOCUS:
+			window->m_input.Reset();
+			break;
 		}
 
 		return DefWindowProc(hWnd, message, wParam, lParam);

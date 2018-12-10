@@ -156,5 +156,8 @@ public class CameraMaster : ScriptComponent
                 LoadingScreen.Canvas.isRendering = true;
                 break;
         }
+
+        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT) && Input.GetMouseMode() == Input.MouseMode.POSITION_ABSOLUTE && State == CAM_STATE.GAME)
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
     }
 }
