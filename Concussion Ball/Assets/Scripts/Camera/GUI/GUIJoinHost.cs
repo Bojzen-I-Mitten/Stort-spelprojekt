@@ -9,7 +9,7 @@ public class GUIJoinHost : ScriptComponent
     public Texture2D TextBoxBG { get; set; }
 
     Camera Camera;
-    
+
     private bool TakeIP;
     private bool TakePort;
 
@@ -220,7 +220,7 @@ public class GUIJoinHost : ScriptComponent
                 ClearPort = false;
             }
         }
-        else if(Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
         {
             if (Blink != null)
             {

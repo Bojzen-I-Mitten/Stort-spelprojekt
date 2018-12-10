@@ -15,6 +15,7 @@ namespace thomas {
 			std::vector<RenderComponent*> RenderComponent::s_renderComponents;
 			RenderComponent::RenderComponent()
 			{
+				m_cullingEnabled = true;
 				m_model = nullptr;
 				m_bounds = math::BoundingOrientedBox();
 				m_bounds.Extents.x = 0;
@@ -214,6 +215,16 @@ namespace thomas {
 			{
 				return m_model;
 			}
+
+			bool RenderComponent::EnabledCulling() 
+			{
+				return m_cullingEnabled;
+			}
+			void RenderComponent::EnableCulling(bool value)
+			{
+				m_cullingEnabled = value;
+			}
+
 		}
 	}
 }

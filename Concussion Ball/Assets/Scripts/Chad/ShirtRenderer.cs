@@ -147,16 +147,11 @@ public class ShirtRenderer : ScriptComponent
         backNumber.font = chadFont;
         backNumber.color = Color.Black;
 
-
-
-
-
         shoulderNumber = canvas.Add(number.ToString());
         shoulderNumber.rotation = MathHelper.ToRadians(-90.0f);
         shoulderNumber.origin = new Vector2(0.5f);
-        shoulderNumber.font = chadFont;
         shoulderNumber.color = Color.Black;
-
+        shoulderNumber.font = chadFont;
 
         shoulderNumber2 = canvas.Add(number.ToString());
         shoulderNumber2.flip = new Vector2(0, 1);

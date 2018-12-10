@@ -186,6 +186,8 @@ namespace thomas
 			return true;
 		}
 
+
+
 		bool D3D::CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels)
 		{
 			D3D11_TEXTURE2D_DESC textureDesc;
