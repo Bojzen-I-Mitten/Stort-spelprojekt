@@ -71,11 +71,12 @@ namespace thomas
 		LONG newWidth = m_windowRectangle.right;
 		LONG newHeight = m_windowRectangle.bottom;
 
-			if (m_height == newHeight && m_width == newWidth)
-				return false;
-
-			m_height = newHeight;
-			m_width = newWidth;
+		if (result)
+		{
+			if (m_height != newHeight || m_width != newWidth)
+			{
+				m_height = newHeight;
+				m_width = newWidth;
 
 				utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, NULL, NULL);
 
@@ -368,12 +369,12 @@ namespace thomas
 		return &m_input;
 	}
 
-	int Window::GetHeight() const
+	LONG Window::GetHeight() const
 	{
 		return m_height;
 	}
 
-	int Window::GetWidth() const
+	LONG Window::GetWidth() const
 	{
 		return m_width;
 	}
@@ -393,7 +394,7 @@ namespace thomas
 		return m_windowHandler;
 	}
 
-	int Window::GetHorizontalResolution() const
+	LONG Window::GetHorizontalResolution() const
 	{
 		RECT desktop;
 		const HWND hDesktop = GetDesktopWindow();
@@ -401,7 +402,7 @@ namespace thomas
 		return desktop.right;
 	}
 
-	int Window::GetVerticalResolution() const
+	LONG Window::GetVerticalResolution() const
 	{
 		RECT desktop;
 		const HWND hDesktop = GetDesktopWindow();
