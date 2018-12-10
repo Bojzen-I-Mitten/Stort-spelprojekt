@@ -12,6 +12,7 @@
 #include "../../utils/Math.h"
 #include "../../resource/Font.h"
 #include "../../object/Object.h"
+#include "../../utils/atomic/Synchronization.h"
 
 using namespace DirectX;
 
@@ -47,7 +48,7 @@ namespace thomas
 				void Set3D(bool value);
 				bool Get3D();
 			private:
-				
+				utils::atomics::SpinLock lock;
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;
 				std::unique_ptr<CommonStates> m_spriteStates;
 				std::unique_ptr<SpriteBatch> m_spriteBatch;
