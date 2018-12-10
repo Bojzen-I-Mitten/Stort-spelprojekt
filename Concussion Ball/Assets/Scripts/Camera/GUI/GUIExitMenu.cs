@@ -11,6 +11,8 @@ public class GUIExitMenu : ScriptComponent
     Text ExitGame;
     Text SwitchTeam;
 
+    public bool _CanSwitchTeam = true;
+
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
@@ -33,7 +35,7 @@ public class GUIExitMenu : ScriptComponent
 
         if (ExitGame.Hovered())
             ExitGame.color = Color.IndianRed;
-        else if (SwitchTeam.Hovered() && !MatchSystem.instance.ReplaySystem.Replaying)
+        else if (SwitchTeam.Hovered() && _CanSwitchTeam)
             SwitchTeam.color = Color.IndianRed;
 
         if (ExitGame.Clicked())
@@ -44,7 +46,7 @@ public class GUIExitMenu : ScriptComponent
                 ThomasWrapper.IssueRestart();
             } 
         }
-        else if (SwitchTeam.Clicked() && !MatchSystem.instance.ReplaySystem.Replaying)
+        else if (SwitchTeam.Clicked() && _CanSwitchTeam)
         {
             CameraMaster.instance.Canvas.isRendering = true;
             gameObject.GetComponent<ChadCam>().enabled = false;

@@ -149,6 +149,16 @@ public class CameraMaster : ScriptComponent
         return MainMenu != null ? MainMenu.GetPlayerName() : "Chad";
     }
 
+    public void DisableSwitchTeam()
+    {
+        ExitMenu._CanSwitchTeam = false;
+    }
+
+    public void EnableSwitchTeam()
+    {
+        ExitMenu._CanSwitchTeam = true;
+    }
+
     public override void Update()
     {
         //Set all CAM_STATEs exept GAME to false
