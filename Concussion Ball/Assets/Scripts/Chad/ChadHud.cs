@@ -448,7 +448,7 @@ public class ChadHud : ScriptComponent
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;
             screenPos -= screenCenter;
 
-            //flip coordinates if more than 90 deg away, makes the math easier and easier to understand
+            //flip coordinates if more than 90 deg away, makes the math simpler and easier to understand
             if (screenPos.z > 1)
             {
                 screenPos *= -1;

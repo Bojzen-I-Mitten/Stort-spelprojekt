@@ -42,6 +42,10 @@ namespace ThomasEngine
 
 	void GUIElement::rendering::set(bool rendering) { nativePtr->rendering = rendering; }
 
+	bool GUIElement::rendering::get() { return nativePtr->rendering; }
+
+	void GUIElement::opacity::set(float opacity) { nativePtr->color.w = opacity; }
+
 	bool GUIElement::Clicked() { return nativePtr->Clicked(); }
 
 	bool GUIElement::Hovered() { return nativePtr->Hovered(); }

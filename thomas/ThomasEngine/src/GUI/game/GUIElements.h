@@ -61,6 +61,11 @@ namespace ThomasEngine
 		property bool rendering
 		{
 			void set(bool rendering);
+			bool get();
+		}
+		property float opacity
+		{
+			void set(float opacity);
 		}
 
 		bool Clicked();

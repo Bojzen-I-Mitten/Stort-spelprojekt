@@ -9,37 +9,32 @@ public class GUIScoreScreen : ScriptComponent
 {
     public static GUIScoreScreen Instance = null;
     Camera cam;
-    Canvas Canvas;
+    public Canvas Canvas;
     public int ScoreScreenTimeLast { get; set; } = 10;
-    public int Timedisplay;
+    public int Timer;
     List<Text> Textdatalist = new List<Text>();
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
-    public bool ToggleBool = true;
+    bool Init = true;
 
-    public override void Start()
+    public override void OnAwake()
     {
         Instance = this;
 
-        ToggleBool = true;
-
-        Timedisplay = ScoreScreenTimeLast + 1;
+        Timer = ScoreScreenTimeLast + 1;
         Canvas = gameObject.GetComponent<Camera>().AddCanvas();
-        ToggleBool = true;
-        Textdatalist.Add(Canvas.Add("Lobby"));
-        Textdatalist.Add(Canvas.Add("Play again"));
+        Textdatalist.Add(Canvas.Add("Play again: "));
         Textdatalist.Add(Canvas.Add("Main Menu"));
+        Textdatalist.Add(Canvas.Add(""));
         for (int i = 0; i < Textdatalist.Count; i++)
         {
-            Textdatalist[i].scale = Vector2.Zero;
+            Textdatalist[i].scale = new Vector2(0.5f);
             Textdatalist[i].interactable = true;
             Textdatalist[i].depth = 0.9f;
+            Textdatalist[i].origin = new Vector2(0.5f);
         }
-        Textdatalist[0].position = new Vector2(0.25f, 0.7f);
-        Textdatalist[1].position = new Vector2(0.4f, 0.7f);
-        Textdatalist[2].position = new Vector2(0.65f, 0.7f);
-
-        //        Lobby.position = new Vector2(0.2f, 0.04f);
+        Textdatalist[0].position = new Vector2(0.33f, 0.7f);
+        Textdatalist[1].position = new Vector2(0.67f, 0.7f);
     }
 
     public override void Update()
@@ -64,8 +59,6 @@ public class GUIScoreScreen : ScriptComponent
             foreach (Text Textdata in Textdatalist)
                 Textdata.scale = Vector2.Zero;
 
-            ToggleBool = true;
-
         }
         if (Textdatalist[2].Clicked()) // Main Menu
         {
@@ -78,44 +71,43 @@ public class GUIScoreScreen : ScriptComponent
             }
         }
 
-
-
+        Textdatalist[2].position = Textdatalist[0].position + new Vector2(Textdatalist[0].size.x / 2 + Textdatalist[2].size.x / 2, 0);
     }
 
-    public void updateTextPlayAgain()
+    public void UpdateTimer()
     {
-
-        Textdatalist[1].text = "Play again: " + (Timedisplay -= 1);
+        Textdatalist[2].text = (Timer -= 1).ToString();
     }
-
-
-    public void DisplayBar(Vector2 OnOff)
+    
+    public override void OnDisable()
     {
+        if(Canvas != null)
+            Canvas.isRendering = false;
 
-    }
+        if (GUIScoreboard.Instance)
+            GUIScoreboard.Instance.enabled = false;
 
-    public void Toggle(bool OnOff)
-    {
-        ToggleBool = OnOff;
-        //GUIPlayerScore.Instance.LastUpdate();
-        if (!OnOff)
+        if (MatchSystem.instance.MatchStarted)
         {
-            GUIPlayerScore.Instance.Toggle = false;
-            for (int i = 0; i < Textdatalist.Count; i++)
-                Textdatalist[i].scale = new Vector2(1.5f);
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-        }
-        else
-        {
-            foreach (Text Textdata in Textdatalist)
-                Textdata.scale = Vector2.Zero;
-            Timedisplay = ScoreScreenTimeLast + 1;
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+            Init = true;
         }
     }
 
-    public bool getToggleBool()
+    public override void OnEnable()
     {
-        return ToggleBool;
+        if (Canvas != null)
+            Canvas.isRendering = true;
+
+        if (GUIScoreboard.Instance)
+        {
+            GUIScoreboard.Instance.enabled = true;
+        }
+
+        if(Init)
+        {
+            Timer = 10;
+            Init = false;
+        }
     }
 }
