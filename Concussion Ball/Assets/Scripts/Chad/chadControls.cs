@@ -733,7 +733,9 @@ public class ChadControls : NetworkComponent
         capsule.height = OriginalCapsuleHeight;
         capsule.radius = OriginalCapsuleRadius;
         rBody.Mass = OriginalMass;
+        rBody.AddForce(new Vector3(0, 200.0f, 0), Rigidbody.ForceMode.Impulse);
 
+        // This needs sync as well
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject)].Color);
         render.SetMaterial(0, ChadFirstMaterial);

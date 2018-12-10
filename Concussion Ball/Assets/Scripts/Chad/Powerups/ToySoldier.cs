@@ -65,25 +65,32 @@ public class ToySoldier : Powerup
 
                 if(peer != null)
                 {
+                   // Network
                     MatchSystem.instance.SendRPC(peer, ID, "RPCIGotHit");
                 }
+
+                // Local changes
+                RenderSkinnedComponent render = collisionChad.gameObject.GetComponent<RenderSkinnedComponent>();
+                render.SetMaterial(0, ToySoldierMaterial);
+                render.SetMaterial(1, ToySoldierMaterial);
+                render.SetMaterial(2, ToySoldierMaterial);
 
                 // Remove powerup
                 PickupCollider.enabled = false;
                 pickedUp = true;
                 activated = true;
-                StartCoroutine(RemoveCube());
+                StartCoroutine(RemoveToySoldier());
             }
         }
     }
 
-    public void RPCIGotHit()
+    public void RPCIGotHit(int ID)
     {
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         // Scale and movement decrease
-        // TODO: The scale up effect with the collider look's a bit weird
         // TOOD: New skinning material doesn't show for the other player
+        // TODO: The powerup can hit the other chad and then dissapear for one client but will remain for the other one
         localChad.ToySoldierAffected = true;
         localChad.transform.scale *= 0.5f;
         localChad.Acceleration *= 0.5f;
@@ -92,7 +99,7 @@ public class ToySoldier : Powerup
 
         // Collider
         CapsuleCollider capsule = localChad.gameObject.GetComponent<CapsuleCollider>();
-        capsule.center = new Vector3(0, 0.3f, 0);
+        capsule.center = new Vector3(0, 0.32f, 0);
         capsule.height *= 0.5f;
         capsule.radius *= 0.5f;
         localChad.rBody.Mass *= 0.5f;
@@ -104,9 +111,14 @@ public class ToySoldier : Powerup
         render.SetMaterial(0, ToySoldierMaterial);
         render.SetMaterial(1, ToySoldierMaterial);
         render.SetMaterial(2, ToySoldierMaterial);
+
+        PickupCollider.enabled = false;
+        pickedUp = true;
+        activated = true;
+        StartCoroutine(RemoveToySoldier());
     }
 
-    private IEnumerator RemoveCube()
+    private IEnumerator RemoveToySoldier()
     {
         yield return null;
         Remove();
