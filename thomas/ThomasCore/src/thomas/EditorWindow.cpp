@@ -2,6 +2,8 @@
 #include "Input.h"
 #include "Common.h"
 #include "utils\D3D.h"
+#include "utils\GpuProfiler.h"
+#include "utils\ProfileManager.h"
 #include <imgui\imgui_impl_dx11.h>
 #include <imgui\ImGuizmo.h>
 
@@ -18,7 +20,7 @@ namespace thomas
 		/*ID3D11Resource* resource;
 		ID3D11Texture2D* catTexture;
 
-		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+		m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeferred());
 		DirectX::CreateWICTextureFromFile(utils::D3D::Instance()->GetDevice(), L"../Data/cat.png", &resource, &m_texture);
 
 		catTexture = (ID3D11Texture2D*)resource;
@@ -33,7 +35,7 @@ namespace thomas
 		resource->Release();*/
 		//
 
-		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContext());
+		ImGui_ImplDX11_Init(hWnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeferred());
 	}
 
 	EditorWindow::~EditorWindow()
@@ -43,39 +45,32 @@ namespace thomas
 
 	void EditorWindow::Present()
 	{
-		this->BindBackBuffer();
-
-		if (ImGui_ImplDx11_Valid() && this->m_guiData)
-			ImGui_ImplDX11_RenderDrawData(this->m_guiData);
-
-		/*m_spriteBatch->Begin();
-
-		m_spriteBatch->Draw(m_texture, m_screenPos, nullptr, Colors::White, 0.f, m_origin);
-
-		m_spriteBatch->Draw(m_texture, Vector2(m_screenPos.x + 50.f, m_screenPos.y), nullptr, Colors::White,
-							0.f, m_origin);
-
-		m_spriteBatch->End();*/
-	
 		m_swapChain->Present(0, 0);
 	}
 
 	void EditorWindow::BeginFrame()
 	{
-		ImGui_ImplDX11_NewFrame();
-		ImGuizmo::BeginFrame();
+		utils::D3D::Instance()->ResetCommandList(m_dx.commandList);
+		Clear();
 	}
 
-	void EditorWindow::EndFrame(bool copyGui)
+	void EditorWindow::EndFrame()
 	{
-		if (copyGui)
-		{
-			ImGui::Render();
-			DeleteGUIData();
-			CloneGUIData();
-		}
-		else
-			ImGui::EndFrame();
+		BindBackBuffer();
+
+		if (ImGui_ImplDx11_Valid() && m_guiData)
+			ImGui_ImplDX11_RenderDrawData(m_guiData);
+
+		utils::D3D::Instance()->FinishCommandList(m_dx.commandList);
+		utils::D3D::Instance()->ExecuteCommandList(m_dx.commandList);
+		Present();
+	}
+
+	void EditorWindow::RenderGUIData()
+	{
+		ImGui::Render();
+		DeleteGUIData();
+		CloneGUIData();
 	}
 
 	void EditorWindow::UpdateWindow()
@@ -87,6 +82,7 @@ namespace thomas
 		}
 		if (m_shouldResize)
 		{
+			utils::profiling::GpuProfiler::Instance()->GetMemoryUsage();
 			ImGui_ImplDX11_InvalidateDeviceObjects();
 			m_initialized = false;
 			Resize();
@@ -94,9 +90,11 @@ namespace thomas
 			m_shouldResize = false;
 			ImGui_ImplDX11_CreateDeviceObjects();
 		}
-		BeginFrame();
 
+		ImGui_ImplDX11_NewFrame();
+		ImGuizmo::BeginFrame();
 	}
+
 	void EditorWindow::CloneGUIData()
 	{
 		ImDrawData* data = ImGui::GetDrawData();

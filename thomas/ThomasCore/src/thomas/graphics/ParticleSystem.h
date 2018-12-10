@@ -131,6 +131,7 @@ namespace thomas
 			bool m_pingpong;
 
 			BLEND_STATE m_blendState;
+			ID3D11CommandList* m_commandList;
 
 			std::vector<InitParticleBufferStruct> m_emitters;
 			

@@ -11,8 +11,8 @@ namespace thomas
 	public:
 		bool WaitingForUpdate();
 		void Destroy();
-		void ClearAllWindows();
-		void PresentAllWindows();
+		void BeginFrame();
+		void EndFrame();
 		void ResolveRenderTarget();
 		void Update();
 		void Create(HWND hWnd, bool isEditor);

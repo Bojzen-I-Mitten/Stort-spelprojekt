@@ -24,6 +24,7 @@ namespace thomas
 			void WriteCanvas(graphics::GUI::Canvas* canvas);
 			void Bind();
 		private:
+			ID3D11CommandList* m_commandList;
 			ID3D11RenderTargetView* m_rtv;
 		};
 	}

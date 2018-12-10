@@ -50,7 +50,7 @@ public class GUISelectTeam : ScriptComponent
     {
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
-        SelectTeamCamPos = new Vector3(0, -198.5f, 8.2f);
+        SelectTeamCamPos = new Vector3(40, -198.5f, 8.2f);
         SelectTeamCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
         Chad1Pos = new Vector3(1.7f, 0, 0);
         Chad1Rot = new Vector3(45, 0, 0);
@@ -102,7 +102,8 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<SpectatorCam>().enabled = true;
+                gameObject.GetComponent<ChadCam>().enabled = true;
+                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
             }
         }
         else if (Team2Image.Clicked())
@@ -115,7 +116,8 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.State = CAM_STATE.GAME;
                 CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<SpectatorCam>().enabled = true;
+                gameObject.GetComponent<ChadCam>().enabled = true;
+                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
             }
         }
         else if (SpectatorImage.Clicked())
@@ -150,6 +152,7 @@ public class GUISelectTeam : ScriptComponent
             CameraMaster.instance.Canvas.isRendering = false;
             MatchSystem.instance.OnMatchStart();
             gameObject.GetComponent<SpectatorCam>().enabled = true;
+            MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
         }
 
         Team1Text.color = Unselected;
@@ -162,31 +165,18 @@ public class GUISelectTeam : ScriptComponent
         if (Team1Image.Hovered())
         {
             Team1Text.color = Selected;
-            if (RunningAnim != null)
-            {
-                if (ChadRSC1.animation != RunningAnim)
-                {
-                    ChadRSC1.animation = RunningAnim;
-                    ChadRSC2.animation = IdleAnim;
-                }
-            }
+            if (RunningAnim != null && ChadRSC1.animation != RunningAnim)
+                ChadRSC1.animation = RunningAnim;
         }
         else if (Team2Image.Hovered())
         {
             Team2Text.color = Selected;
-            if (RunningAnim != null)
-            {
-                if (ChadRSC2.animation != RunningAnim)
-                {
-                    ChadRSC1.animation = IdleAnim;
-                    ChadRSC2.animation = RunningAnim;
-                }
-            }
+            if (RunningAnim != null && ChadRSC2.animation != RunningAnim)
+                ChadRSC2.animation = RunningAnim;
         }
         else if (SpectatorImage.Hovered() || SpectatorText.Hovered())
         {
             SpectatorText.color = Selected;
-            IdleChads();
         }
         else if (ReadyUp.Hovered() && ReadyUp.scale != Vector2.Zero)
         {
@@ -222,6 +212,12 @@ public class GUISelectTeam : ScriptComponent
                 ReadyUp.text = "Unready";
             else
                 ReadyUp.text = "Ready";
+        }
+
+        if (MatchSystem.instance.MatchStarted)
+        {
+            ReadyUp.scale = Vector2.Zero;
+            StartGame.scale = Vector2.Zero;
         }
     }
 
@@ -327,8 +323,10 @@ public class GUISelectTeam : ScriptComponent
     {
         if (IdleAnim != null)
         {
-            ChadRSC1.animation = IdleAnim;
-            ChadRSC2.animation = IdleAnim;
+            if (ChadRSC1.animation != IdleAnim)
+                ChadRSC1.animation = IdleAnim;
+            if (ChadRSC2.animation != IdleAnim)
+                ChadRSC2.animation = IdleAnim;
         }
     }
 

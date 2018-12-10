@@ -33,6 +33,12 @@ namespace ThomasEngine
 			void set(array<Material^>^ value);
 		}
 
+		property bool EnableCulling
+		{
+			bool get();
+			void set(bool value);
+		}
+
 		Material^ GetMaterial(int index);
 		void SetMaterial(int index, Material ^ mat);
 		/* Get material by name. Null if nothing found.

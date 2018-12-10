@@ -1,6 +1,6 @@
 #include "WindowManager.h"
-#include "ThomasCore.h"
-#include "Common.h"
+#include "utils/GpuProfiler.h"
+
 namespace thomas
 {
 	WindowManager WindowManager::s_windowManager;
@@ -67,23 +67,28 @@ namespace thomas
 		m_windows.clear();
 	}
 
-	void WindowManager::ClearAllWindows()
+	void WindowManager::BeginFrame()
 	{
 		for (Window* window : m_windows)
 			if (window->Initialized())
 			{
 				window->WaitOnSwapChain();
-				window->Clear();
+				window->BeginFrame();
 			}
+
+		utils::profiling::GpuProfiler::Instance()->RetriveTimeStamps();
+		utils::profiling::GpuProfiler::Instance()->BeginFrame();
 	}
 
-	void WindowManager::PresentAllWindows()
+	void WindowManager::EndFrame()
 	{
 		for (Window* window : m_windows)
 			if (window->Initialized())
 			{
-				window->Present();
+				window->EndFrame();
 			}
+
+		utils::profiling::GpuProfiler::Instance()->EndFrame();
 	}
 
 	void WindowManager::ResolveRenderTarget()

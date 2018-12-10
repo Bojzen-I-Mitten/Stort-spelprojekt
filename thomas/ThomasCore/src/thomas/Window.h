@@ -9,18 +9,19 @@ namespace thomas
 	class Window
 	{
 	protected:
-		struct DXBuffers
+		struct DX
 		{
+			ID3D11CommandList* commandList;
 			ID3D11Texture2D* buffer[2];
 
-			ID3D11RenderTargetView* RTV[2] = { nullptr, nullptr };
-			ID3D11ShaderResourceView* SRV[2] = { nullptr, nullptr };
-			ID3D11DepthStencilState* depthStencilState = nullptr;
-			ID3D11DepthStencilView* depthStencilView[2] = { nullptr, nullptr };
-			ID3D11DepthStencilView* depthStencilViewReadOnly[2] = { nullptr, nullptr };
-			ID3D11ShaderResourceView* depthBufferSRV = nullptr;
+			ID3D11RenderTargetView* RTV[2];
+			ID3D11ShaderResourceView* SRV[2];
+			ID3D11DepthStencilView* depthStencilView[2];
+			ID3D11DepthStencilView* depthStencilViewReadOnly[2];
+			ID3D11DepthStencilState* depthStencilState;
+			ID3D11ShaderResourceView* depthBufferSRV;
 
-		}m_dxBuffers;
+		} m_dx;
 
 	public:
 		Window(HINSTANCE hInstance, int nCmdShow, const LONG & width, const LONG & height, const LPCSTR & title);
@@ -29,13 +30,13 @@ namespace thomas
 
 	public:
 		virtual void UpdateWindow();
-		virtual void Present();
 		void QueueResize();
 		void BindBackBuffer();
 		void BindRenderTarget();
-		void Clear();
 		void ResolveRenderTarget();
 		void WaitOnSwapChain();
+		virtual void BeginFrame();
+		virtual void EndFrame();
 
 	public:
 		bool ShouldResize();
@@ -68,6 +69,8 @@ namespace thomas
 	protected:
 		bool InitDxBuffers();
 		bool Resize();
+		void Clear();
+		virtual void Present();
 
 	protected:
 		LONG m_width;
@@ -87,6 +90,7 @@ namespace thomas
 		RECT m_windowRectangle;
 
 		IDXGISwapChain3* m_swapChain;
+		HANDLE m_waitableObject;
 	};
 }
 
