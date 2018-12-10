@@ -90,7 +90,9 @@ public class Banana : Powerup
         _LastCollider = collider;
         //Check if colliding with a player
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-        if (otherChad && _BananaTimer > 1)
+        ChadControls localChad = MatchSystem.instance.LocalChad;
+
+        if (otherChad && _BananaTimer > 0.1f)
         {
             base.OnCollisionEnter(collider);
         }
