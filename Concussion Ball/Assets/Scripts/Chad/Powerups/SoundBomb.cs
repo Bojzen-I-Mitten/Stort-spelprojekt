@@ -30,6 +30,7 @@ public class SoundBomb : Powerup
     private float _Hue;
     private bool _SpawnedLight;
     private bool _Landed;
+    private float _Timer;
 
     public override void OnAwake()
     {
@@ -49,6 +50,7 @@ public class SoundBomb : Powerup
         _Hue = 0.0f;
         _SpawnedLight = false;
         _Landed = false;
+        _Timer = 0.0f;
 
         GramophoneClip = gameObject.AddComponent<SoundComponent>();
         GramophoneClip.Type = SoundComponent.SoundType.Effect;
@@ -156,7 +158,6 @@ public class SoundBomb : Powerup
             {
                 m_rigidBody.LinearVelocity = Vector3.Zero;
                 m_rigidBody.LinearVelocity = new Vector3(0, 3, 0); //works better than forces
-                //m_rigidBody.AddForce(new Vector3(0, 250, 0));
                 _Landed = false;
                 if(_ShockWave)
                     _ShockWave.EmitOneShot(1);
@@ -171,6 +172,14 @@ public class SoundBomb : Powerup
             else
             {
                 PointBoi.enabled = false;
+            }
+            if (_Landed)
+            {
+                m_rigidBody.LinearVelocity = Vector3.Zero;
+                m_rigidBody.LinearVelocity = new Vector3(0, 3, 0); //works better than forces
+                _Landed = false;
+                if (_ShockWave)
+                    _ShockWave.EmitOneShot(1);
             }
         }
     }
@@ -198,16 +207,7 @@ public class SoundBomb : Powerup
             m_rigidBody.Friction = 100.0f;
             m_rigidBody.LinearVelocity = Vector3.Zero;
             m_rigidBody.FreezeRotation = new Vector3(0, 0, 0); // freeze ya'll's music box
-            //m_rigidBody.IsKinematic = true;
-            if (_Note1 && _Note2)
-            {
-                _Note1.Emit = true;
-                _Note2.Emit = true;
-            }
-            if (GramophoneClip)
-            {
-                GramophoneClip.Play();
-            }
+            
             _JumpTimer += Time.DeltaTime;
 
             base.OnCollisionEnter(collider);
@@ -230,8 +230,8 @@ public class SoundBomb : Powerup
         if (activated)
             return;
         activated = true;
-        // boom particles, Gustav do your magic, sprinkla lite magic till boisen
 
+        Debug.Log("ACTIVATE");
         StartCoroutine(BlastingMusic());
     }
 
@@ -249,22 +249,31 @@ public class SoundBomb : Powerup
 
     private IEnumerator BlastingMusic()
     {
+
+        if (_Note1 && _Note2)
+        {
+            _Note1.Emit = true;
+            _Note2.Emit = true;
+        }
+        if (GramophoneClip)
+        {
+            GramophoneClip.Play();
+        }
+
         // Start blasting 
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
         TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
 
-        float timer = 0.0f;
-
-        while (timer < _DanceDuration)
+        while (_Timer < _DanceDuration)
         {
-            timer += Time.DeltaTime;
+            _Timer += Time.DeltaTime;
 
-            if (localChad && otherPlayerTeam != playerTeam)
+            if (localChad /*&& otherPlayerTeam != playerTeam*/)
             {
-                float distance2 = Vector3.Distance(localChad.transform.position, transform.position);
-                if (distance2 < ExplosionRadius)
+                float distance = Vector3.Distance(localChad.transform.position, transform.position);
+                if (distance < ExplosionRadius)
                 {
                     localChad.Direction = Vector3.Zero;
                     localChad.rBody.LinearVelocity = Vector3.Zero;
@@ -276,13 +285,18 @@ public class SoundBomb : Powerup
             yield return null;
         }
         GramophoneClip.Stop();
-
-        float distance = Vector3.Distance(localChad.transform.position, transform.position);
-        if (distance < ExplosionRadius)
+        if (localChad)
             localChad.State = ChadControls.STATE.CHADING;
 
         Explosion();
+        
+  
+    }
 
+    public override void Disable()
+    {
+        base.Disable();
+        StopCoroutine(BlastingMusic());
         if (PointBoi)
         {
             _SpawnedLight = false;
@@ -293,12 +307,15 @@ public class SoundBomb : Powerup
             _Note1.Emit = false;
             _Note2.Emit = false;
         }
+        _Landed = false;
+        _JumpTimer = 0.0f;
     }
 
     public override void Reset()
     {
         base.Reset();
 
+        StopCoroutine(BlastingMusic());
         if (PointBoi)
         {
             _SpawnedLight = false;
@@ -378,6 +395,9 @@ public class SoundBomb : Powerup
         base.OnWrite(writer, initialState);
 
         writer.Put(_SpawnedLight);
+        writer.Put(_Landed);
+        writer.Put(_JumpTimer);
+        writer.Put(_Timer);
 
         return true;
     }
@@ -386,6 +406,18 @@ public class SoundBomb : Powerup
     {
         base.OnRead(reader, initialState);
 
+        if(isOwner)
+        {
+            reader.GetBool();
+            reader.GetBool();
+            reader.GetFloat();
+            reader.GetFloat();
+            return;
+        }
         _SpawnedLight = reader.GetBool();
+        _Landed = reader.GetBool();
+        _JumpTimer = reader.GetFloat();
+        _Timer = reader.GetFloat();
     }
+
 }
