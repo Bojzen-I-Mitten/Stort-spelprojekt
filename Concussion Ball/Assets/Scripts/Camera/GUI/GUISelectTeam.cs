@@ -15,7 +15,7 @@ public class GUISelectTeam : ScriptComponent
     Camera Camera;
 
     public Canvas Canvas;
-    
+
     Image Team1Image;
     Image Team2Image;
     Image SpectatorImage;
@@ -85,139 +85,152 @@ public class GUISelectTeam : ScriptComponent
 
     public override void Update()
     {
-        Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
-        Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
-        Chad1Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
-        Chad2Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
+        if (Canvas.isRendering)
+        {
+            Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
+            Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
+            Chad1Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
+            Chad2Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
 
-        ShowPlayers();
+            ShowPlayers();
 
-        if (Team1Image.Clicked())
-        {
-            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
-            MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
-            ReadyUp.scale = Vector2.One;
-            if (MatchSystem.instance.MatchStarted)
+            if (Team1Image.Clicked())
             {
-                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.GAME;
-                CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<ChadCam>().enabled = true;
-                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
-            }
-        }
-        else if (Team2Image.Clicked())
-        {
-            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
-            MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
-            ReadyUp.scale = Vector2.One;
-            if (MatchSystem.instance.MatchStarted)
-            {
-                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.GAME;
-                CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<ChadCam>().enabled = true;
-                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
-            }
-        }
-        else if (SpectatorImage.Clicked())
-        {
-            MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
-            MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
-            ReadyUp.scale = Vector2.Zero;
-            if (MatchSystem.instance.MatchStarted)
-            {
-                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.GAME;
-                CameraMaster.instance.Canvas.isRendering = false;
-                gameObject.GetComponent<SpectatorCam>().enabled = true;
-            }
-        }
-        else if (ReadyUp.Clicked())
-        {
-            if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_1);
                 MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
-            else
+                ReadyUp.rendering = true;
+                if (MatchSystem.instance.MatchStarted)
+                {
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                    CameraMaster.instance.State = CAM_STATE.GAME;
+                    CameraMaster.instance.Canvas.isRendering = false;
+                    gameObject.GetComponent<ChadCam>().enabled = true;
+                    MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
+                }
+            }
+            else if (Team2Image.Clicked())
+            {
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_2);
+                MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
+                ReadyUp.rendering = true;
+                if (MatchSystem.instance.MatchStarted)
+                {
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                    CameraMaster.instance.State = CAM_STATE.GAME;
+                    CameraMaster.instance.Canvas.isRendering = false;
+                    gameObject.GetComponent<ChadCam>().enabled = true;
+                    MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
+                }
+            }
+            else if (SpectatorImage.Clicked())
+            {
+                MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
                 MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
-        }
-        else if (ExitText.Clicked())
-        {
-            MatchSystem.instance.Disconnect();
-            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-        }
-        else if ((StartGame.Clicked() || (MatchSystem.instance.MatchLength == MatchSystem.instance.MatchTimeLeft && MatchSystem.instance.MatchStarted)) && Canvas.isRendering)
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-            CameraMaster.instance.State = CAM_STATE.GAME;
-            CameraMaster.instance.Canvas.isRendering = false;
-            MatchSystem.instance.OnMatchStart();
-            gameObject.GetComponent<SpectatorCam>().enabled = true;
-            MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
-        }
+                ReadyUp.rendering = false;
+                if (MatchSystem.instance.MatchStarted)
+                {
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                    CameraMaster.instance.State = CAM_STATE.GAME;
+                    CameraMaster.instance.Canvas.isRendering = false;
+                    gameObject.GetComponent<SpectatorCam>().enabled = true;
+                }
+            }
+            else if (ReadyUp.Clicked())
+            {
+                if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                    MatchSystem.instance.LocalChad.NetPlayer.Ready(false);
+                else
+                    MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
+            }
+            else if (ExitText.Clicked())
+            {
+                MatchSystem.instance.Disconnect();
+                ThomasWrapper.IssueRestart();
+            }
+            else if ((StartGame.Clicked() || (MatchSystem.instance.MatchLength == MatchSystem.instance.MatchTimeLeft && MatchSystem.instance.MatchStarted)) && Canvas.isRendering)
+            {
+                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.Canvas.isRendering = false;
+                MatchSystem.instance.OnMatchStart();
+                gameObject.GetComponent<SpectatorCam>().enabled = true;
+                MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
+            }
 
-        Team1Text.color = Unselected;
-        Team2Text.color = Unselected;
-        SpectatorText.color = Unselected;
-        ReadyUp.color = Unselected;
-        StartGame.color = Unselected;
-        ExitText.color = Unselected;
+            Team1Text.color = Unselected;
+            Team2Text.color = Unselected;
+            SpectatorText.color = Unselected;
+            ReadyUp.color = Unselected;
+            StartGame.color = Unselected;
+            ExitText.color = Unselected;
 
-        if (Team1Image.Hovered())
-        {
-            Team1Text.color = Selected;
-            if (RunningAnim != null && ChadRSC1.animation != RunningAnim)
-                ChadRSC1.animation = RunningAnim;
-        }
-        else if (Team2Image.Hovered())
-        {
-            Team2Text.color = Selected;
-            if (RunningAnim != null && ChadRSC2.animation != RunningAnim)
-                ChadRSC2.animation = RunningAnim;
-        }
-        else if (SpectatorImage.Hovered() || SpectatorText.Hovered())
-        {
-            SpectatorText.color = Selected;
-        }
-        else if (ReadyUp.Hovered() && ReadyUp.scale != Vector2.Zero)
-        {
-            ReadyUp.color = Selected;
-        }
-        else if (StartGame.Hovered() && CheckReadyPlayers())
-        {
-            StartGame.color = Selected;
-        }
-        else if (ExitText.Hovered())
-        {
-            ExitText.color = Selected;
-        }
-        else
-        {
-            IdleChads();
-        }
-
-        if (CheckReadyPlayers())
-        {
-            StartGame.scale = Vector2.One;
-            StartGame.interactable = true;
-        }
-        else
-        {
-            StartGame.scale = Vector2.Zero;
-            StartGame.interactable = false;
-        }
-
-        if (ReadyUp.scale == Vector2.One)
-        {
-            if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
-                ReadyUp.text = "Unready";
+            if (Team1Image.Hovered())
+            {
+                Team1Text.color = Selected;
+                if (RunningAnim != null)
+                {
+                    if (ChadRSC1.animation != RunningAnim)
+                    {
+                        ChadRSC1.animation = RunningAnim;
+                        ChadRSC2.animation = IdleAnim;
+                    }
+                }
+            }
+            else if (Team2Image.Hovered())
+            {
+                Team2Text.color = Selected;
+                if (RunningAnim != null)
+                {
+                    if (ChadRSC2.animation != RunningAnim)
+                    {
+                        ChadRSC1.animation = IdleAnim;
+                        ChadRSC2.animation = RunningAnim;
+                    }
+                }
+            }
+            else if (SpectatorImage.Hovered() || SpectatorText.Hovered())
+            {
+                SpectatorText.color = Selected;
+            }
+            else if (ReadyUp.Hovered() && ReadyUp.rendering)
+            {
+                ReadyUp.color = Selected;
+            }
+            else if (StartGame.Hovered() && CheckReadyPlayers())
+            {
+                StartGame.color = Selected;
+            }
+            else if (ExitText.Hovered())
+            {
+                ExitText.color = Selected;
+            }
             else
-                ReadyUp.text = "Ready";
-        }
+            {
+                IdleChads();
+            }
 
-        if (MatchSystem.instance.MatchStarted)
-        {
-            ReadyUp.scale = Vector2.Zero;
-            StartGame.scale = Vector2.Zero;
+            if (CheckReadyPlayers())
+            {
+                StartGame.rendering = true;
+            }
+            else
+            {
+                StartGame.rendering = false;
+            }
+
+            if (ReadyUp.rendering)
+            {
+                if (MatchSystem.instance.LocalChad.NetPlayer.GetReady())
+                    ReadyUp.text = "Unready";
+                else
+                    ReadyUp.text = "Ready";
+            }
+
+            if (MatchSystem.instance.MatchStarted)
+            {
+                ReadyUp.rendering = false;
+                StartGame.rendering = false;
+            }
         }
     }
 
@@ -277,17 +290,17 @@ public class GUISelectTeam : ScriptComponent
         ReadyUp.position = new Vector2(0.5f, 0.25f);
         ReadyUp.origin = new Vector2(0.5f);
         ReadyUp.font = SportFont32;
-        ReadyUp.scale = Vector2.Zero;
         ReadyUp.interactable = true;
         ReadyUp.color = Unselected;
+        ReadyUp.rendering = false;
 
         StartGame = Canvas.Add("Start Game");
         StartGame.position = new Vector2(0.5f, 0.35f);
         StartGame.origin = new Vector2(0.5f);
-        StartGame.scale = Vector2.Zero;
         StartGame.font = SportFont32;
         StartGame.interactable = true;
         StartGame.color = Unselected;
+        StartGame.rendering = false;
 
         PlayersInTeam1 = Canvas.Add(MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2);
         PlayersInTeam1.position = new Vector2(0, 0.05f);

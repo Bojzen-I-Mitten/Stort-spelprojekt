@@ -11,6 +11,8 @@ public enum CAM_STATE
     EXIT_MENU,
     HOST_MENU,
     LOADING_SCREEN,
+    SCORE_SCREEN,
+    SCOREBOARD,
     NUMSTATES
 }
 
@@ -209,6 +211,10 @@ public class CameraMaster : ScriptComponent
         ExitMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
         LoadingScreen.Canvas.isRendering = false;
+        if(GUIScoreScreen.Instance)
+            GUIScoreScreen.Instance.enabled = false;
+        if(GUIScoreboard.Instance)
+            GUIScoreboard.Instance.enabled = false;
 
         switch (State)
         {
@@ -235,6 +241,11 @@ public class CameraMaster : ScriptComponent
             case CAM_STATE.GAME:
                 TurnOffLights();
                 Hud.Canvas.isRendering = true;
+                if (GUIScoreboard.Instance)
+                    GUIScoreboard.Instance.enabled = true;
+                
+                if(ChadPreviewArea != null)
+                    ChadPreviewArea?.SetActive(false);
                 if (Input.GetKeyDown(Input.Keys.Escape))
                 {
                     State = CAM_STATE.EXIT_MENU;
@@ -260,6 +271,10 @@ public class CameraMaster : ScriptComponent
             case CAM_STATE.LOADING_SCREEN:
                 TurnOffLights();
                 LoadingScreen.Canvas.isRendering = true;
+                break;
+            case CAM_STATE.SCORE_SCREEN:
+                if (GUIScoreScreen.Instance)
+                    GUIScoreScreen.Instance.enabled = true;
                 break;
         }
         UpdateHats();
