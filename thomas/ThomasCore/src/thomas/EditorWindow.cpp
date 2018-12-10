@@ -9,7 +9,7 @@
 
 namespace thomas
 {
-	EditorWindow::EditorWindow(HWND& hwnd, HWND parent, int width, int height, std::string name) :
+	EditorWindow::EditorWindow(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name) :
 		Window(hwnd, parent, width, height, name)
 	{
 		ImGui_ImplDX11_Init(hwnd, utils::D3D::Instance()->GetDevice(), utils::D3D::Instance()->GetDeviceContextDeferred());

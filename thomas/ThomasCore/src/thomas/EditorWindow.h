@@ -7,7 +7,7 @@ namespace thomas
 	class EditorWindow : public Window
 	{
 	public:
-		EditorWindow(HWND& hwnd, HWND parent, int width, int height, std::string name);
+		EditorWindow(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name);
 		/*EditorWindow(HWND hWnd);*/
 		~EditorWindow();
 

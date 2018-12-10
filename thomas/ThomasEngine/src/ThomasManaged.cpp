@@ -511,7 +511,7 @@ namespace ThomasEngine {
 		thomas::Window::EventHandler((HWND)hWnd.ToPointer(), msg, (WPARAM)wParam.ToPointer(), (LPARAM)lParam.ToPointer());
 	}
 
-	void ThomasWrapper::Resize(IntPtr hWnd, double width, double height)
+	void ThomasWrapper::Resize(IntPtr hWnd)
 	{
 		Window* window = WindowManager::Instance()->GetWindow((HWND)hWnd.ToPointer());
 		if (window)

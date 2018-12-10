@@ -11,7 +11,7 @@ namespace thomas
 	protected:
 		struct DX
 		{
-			ID3D11CommandList* commandList;
+			ID3D11CommandList* commandList = nullptr;
 			ID3D11Texture2D* buffer[2];
 
 			ID3D11RenderTargetView* RTV[2];
@@ -24,8 +24,7 @@ namespace thomas
 		} m_dx;
 
 	public:
-		Window(HWND& hwnd, HWND parent, int width, int height, std::string name);
-		/*Window(HWND hWnd);*/
+		Window(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name);
 		virtual ~Window();
 
 	public:
@@ -60,7 +59,6 @@ namespace thomas
 		RECT GetBounds() const;
 		LONG GetHorizontalResolution() const;
 		LONG GetVerticalResolution() const;
-		IDXGISwapChain* GetSwapChain() const;
 		HWND GetWindowHandler() const;
 		float GetRealAspectRatio() const;
 
@@ -69,7 +67,9 @@ namespace thomas
 	protected:
 		bool InitDxBuffers();
 		bool Resize();
+		bool ChangeWindowStyle();
 		void Clear();
+		void Create(HWND& hwnd, HWND parent);
 		virtual void Present();
 
 	protected:
@@ -80,7 +80,9 @@ namespace thomas
 		bool m_borderless;
 		bool m_fullScreen;
 		bool m_initialized;
+		bool m_shouldStyleChange;
 		bool m_shouldResize;
+		
 		float m_aspectRatio;
 		std::string m_title;
 

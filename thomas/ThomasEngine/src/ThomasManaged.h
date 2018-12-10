@@ -168,7 +168,7 @@ namespace ThomasEngine {
 
 		static void eventHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
-		static void Resize(IntPtr hWnd, double width, double height);
+		static void Resize(IntPtr hWnd);
 
 		static void Update();
 
