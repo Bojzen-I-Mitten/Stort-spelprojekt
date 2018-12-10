@@ -111,6 +111,7 @@ public class GUIOptionsMenu : ScriptComponent
         sensitivity_TEXT,
         Window_Text,
         BACK_TEXT,
+        MASTERVOLUME_TEXT,
         MUSIC_TEXT,
         SFX_TEXT,
         MOVEMENTSENSE_TEXT,
@@ -125,6 +126,7 @@ public class GUIOptionsMenu : ScriptComponent
     }
     public enum ImageBarstate
     {
+        MasterVolume_image,
         MUSICBar_IMAGE,
         sfxBar_Image,
         Movement,
@@ -185,7 +187,7 @@ public class GUIOptionsMenu : ScriptComponent
 
         Audio.SetFXVolume((float)ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue / (float)100);
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
-
+        Audio.SetMasterVolume((float)ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue / (float)100);
 
    
 
@@ -295,11 +297,12 @@ public class GUIOptionsMenu : ScriptComponent
         Text[(int)Textstate.OPTIONS_TEXT] = Canvas.Add("OPTIONS"); Text[(int)Textstate.OPTIONS_TEXT].scale = new Vector2(1.4f, 1.2f); Text[(int)Textstate.OPTIONS_TEXT].position = new Vector2(0, 0.1f);
         Text[(int)Textstate.AIMSENSE_TEXT] = Canvas.Add("Aim"); Text[(int)Textstate.AIMSENSE_TEXT].position = new Vector2(0.02f, 0.55f);
         Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.5f);
-        Text[(int)Textstate.MUSIC_TEXT] = Canvas.Add("Music"); Text[(int)Textstate.MUSIC_TEXT].position = new Vector2(0.02f, 0.27f);
-        Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.02f, 0.32f);
+        Text[(int)Textstate.MASTERVOLUME_TEXT] = Canvas.Add("MasterVolume"); Text[(int)Textstate.MASTERVOLUME_TEXT].position = new Vector2(0.02f, 0.27f);
+        Text[(int)Textstate.MUSIC_TEXT] = Canvas.Add("Music"); Text[(int)Textstate.MUSIC_TEXT].position = new Vector2(0.02f, 0.32f);
+        Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.02f, 0.37f);
         Text[(int)Textstate.Music_Area_Text] = Canvas.Add("Audio"); Text[1].scale = new Vector2(0.75f); Text[(int)Textstate.Music_Area_Text].position = new Vector2(0.01f, 0.2f);
         Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.42f);
-
+        
         Text[(int)Textstate.Window_Text] = Canvas.Add("Window"); Text[(int)Textstate.Window_Text].scale = new Vector2(0.75f); Text[(int)Textstate.Window_Text].position = new Vector2(0.01f, 0.64f);
         ///////////////////////////////////////////////////////////////////
         Text[(int)Textstate.Fullscreen_TEXT] = Canvas.Add("FullScreen"); Text[(int)Textstate.Fullscreen_TEXT].position = new Vector2(0.02f, 0.72f);
@@ -319,11 +322,17 @@ public class GUIOptionsMenu : ScriptComponent
             Text[i].scale = new Vector2(0.5f);
         }
         Texture2D CopyImageBackground = ImageBackground; Texture2D CopyImageImageToggle = ImageToggle; Texture2D CopyImageImageAftermathToggle = ImageAftermathToggle;
-       
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f,0.27f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//music bar
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
+
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.27f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//MasterVolume bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f,0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//music bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.37f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
+        string SettingsMasterVolume = UserSettings.GetSetting("Master");
+        if (SettingsMasterVolume != null)
+        {
+            ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = System.Convert.ToInt32(SettingsMasterVolume);
+        }
         string settingsMusic = UserSettings.GetSetting("Music");
         if (settingsMusic != null)
         {
@@ -353,6 +362,7 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
         ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
         ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
+        ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
         ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
@@ -435,7 +445,10 @@ public class GUIOptionsMenu : ScriptComponent
 
         if (ImageBar != null)
         {
-            Update=ImageBar[(int)ImageBarstate.Movement].LastMousePosition.ToString();  // save from this call to Movement LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition.ToString();
+            UserSettings.AddOrUpdateAppSetting("Master", Update);
+
+            Update =ImageBar[(int)ImageBarstate.Movement].LastMousePosition.ToString();  // save from this call to Movement LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Move", Update);
             Update = ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition.ToString();  // save from this call to sfxBar_Image LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Sfx", Update);
