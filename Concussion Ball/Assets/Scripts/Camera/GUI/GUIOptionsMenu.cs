@@ -154,7 +154,8 @@ public class GUIOptionsMenu : ScriptComponent
     public Texture2D ImageAftermathToggle { set; get;}
     public List<ImageBaradjustment> ImageBar;
     public AudioListener Audio;
-
+    public bool fullscreen;
+    public bool borderless;
     public override void OnAwake()
     {
         instance = this;
@@ -323,11 +324,31 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
-                                                                                                                                                          //ImageBar.Add(new ImageBaradjustment(Canvas));
-        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 373;// load LastMousePosition here
-        ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 460; // load LastMousePosition here
-        ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 373;// load LastMousePosition here
-        ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 460; // load LastMousePosition here
+        string settingsMusic = UserSettings.GetSetting("Music");
+        if (settingsMusic != null)
+        {
+            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = System.Convert.ToInt32(settingsMusic);
+        }
+        string settingsSFX = UserSettings.GetSetting("Sfx");
+        if (settingsSFX != null)
+        {
+            ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = System.Convert.ToInt32(settingsSFX);
+        }
+        string settingsMove = UserSettings.GetSetting("Move");
+        if (settingsMove != null)
+        {
+            ImageBar[(int)ImageBarstate.Movement].LastMousePosition = System.Convert.ToInt32(settingsMove);
+        }
+        string settingsAIM = UserSettings.GetSetting("Aim");
+        if (settingsAIM != null)
+        {
+            ImageBar[(int)ImageBarstate.AIM].LastMousePosition = System.Convert.ToInt32(settingsAIM);
+        }
+        //ImageBar.Add(new ImageBaradjustment(Canvas));
+      //  ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 373;// load LastMousePosition here
+     //   ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 460; // load LastMousePosition here
+     //   ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 373;// load LastMousePosition here
+      //  ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 460; // load LastMousePosition here
         ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
         ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
         ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
@@ -336,8 +357,21 @@ public class GUIOptionsMenu : ScriptComponent
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
         //load onoff fullscreen
-        bool fullscreen = Wcontroller.getBorderless();
-        bool borderless = Wcontroller.getFullscreen();
+        fullscreen = Wcontroller.getFullscreen();
+        borderless = Wcontroller.getBorderless();
+        string settingsFullscreen = UserSettings.GetSetting("Fullscreen");
+        if (settingsFullscreen != null)
+        {
+            fullscreen = System.Convert.ToBoolean(settingsFullscreen);
+        }
+        string settingsBorderless = UserSettings.GetSetting("Borderless");
+        if (settingsBorderless != null)
+        {
+            borderless = System.Convert.ToBoolean(settingsBorderless);
+        }
+
+
+
         Wcontroller.SetFullscreen(fullscreen);
         Wcontroller.SetBorderless(borderless);
         if(fullscreen)
@@ -381,15 +415,41 @@ public class GUIOptionsMenu : ScriptComponent
     public override void OnDestroy()
     {
         //MORGAN SPARA HÄR
-/*      
-        if(Imagebar != null)
+        /*      
+                if(Imagebar != null)
+                {
+                    ImageBar[(int)ImageBarstate.Movement].LastMousePosition;  // save from this call to Movement LastMousePosition here
+                    ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition;  // save from this call to sfxBar_Image LastMousePosition here
+                    ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition;  // save from this call to MUSICBar_IMAGE LastMousePosition here
+                    ImageBar[(int)ImageBarstate.AIM].LastMousePosition;  // save from this call to aim LastMousePosition here
+                }
+                  */
+        //      ClearImagesAndText();
+        string Update;
+        Update = Wcontroller.getFullscreen().ToString();
+//        Debug.Log(Update);
+        UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
+        Update = Wcontroller.getBorderless().ToString();
+//        Debug.Log(Update);
+        UserSettings.AddOrUpdateAppSetting("Borderless", Update);
+
+        if (ImageBar != null)
         {
-            ImageBar[(int)ImageBarstate.Movement].LastMousePosition;  // save from this call to Movement LastMousePosition here
-            ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition;  // save from this call to sfxBar_Image LastMousePosition here
-            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition;  // save from this call to MUSICBar_IMAGE LastMousePosition here
-            ImageBar[(int)ImageBarstate.AIM].LastMousePosition;  // save from this call to aim LastMousePosition here
+            Update=ImageBar[(int)ImageBarstate.Movement].LastMousePosition.ToString();  // save from this call to Movement LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Move", Update);
+            Update = ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition.ToString();  // save from this call to sfxBar_Image LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Sfx", Update);
+            Update = ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition.ToString();  // save from this call to MUSICBar_IMAGE LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Music", Update);
+            Update = ImageBar[(int)ImageBarstate.AIM].LastMousePosition.ToString();  // save from this call to aim LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Aim", Update);
         }
-          */                                                                //      ClearImagesAndText();
+
+
+
+
+
+
     }
     public void updatePosOrigin()
     {
