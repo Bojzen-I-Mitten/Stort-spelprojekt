@@ -842,7 +842,7 @@ public class ChadControls : NetworkComponent
             }
             else if (pickupable.gameObject.Name == "Gramophone")
             {
-                DisplayPowerupText(ref PowerupPickupText, "Picked up Gramophone");
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Grandmaphone");
             }
 
             FadeText = FadePickupText();

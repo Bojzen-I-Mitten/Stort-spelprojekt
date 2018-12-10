@@ -284,6 +284,7 @@ public class Gramophone : Powerup
 
             yield return null;
         }
+        //_Timer = 0.0f;
         GramophoneClip.Stop();
         if (localChad)
             localChad.State = ChadControls.STATE.CHADING;
@@ -293,23 +294,23 @@ public class Gramophone : Powerup
   
     }
 
-    public override void Disable()
-    {
-        base.Disable();
-        StopCoroutine(BlastingMusic());
-        if (PointBoi)
-        {
-            _SpawnedLight = false;
-            PointBoi.enabled = false;
-        }
-        if (_Note1 && _Note2)
-        {
-            _Note1.Emit = false;
-            _Note2.Emit = false;
-        }
-        _Landed = false;
-        _JumpTimer = 0.0f;
-    }
+    //public override void Disable()
+    //{
+    //    base.Disable();
+    //    //StopCoroutine(BlastingMusic());
+    //    //if (PointBoi)
+    //    //{
+    //    //    _SpawnedLight = false;
+    //    //    PointBoi.enabled = false;
+    //    //}
+    //    //if (_Note1 && _Note2)
+    //    //{
+    //    //    _Note1.Emit = false;
+    //    //    _Note2.Emit = false;
+    //    //}
+    //    //_Landed = false;
+    //    //_JumpTimer = 0.0f;
+    //}
 
     public override void Reset()
     {
@@ -328,6 +329,7 @@ public class Gramophone : Powerup
         }
         _Landed = false;
         _JumpTimer = 0.0f;
+        _Timer = 0.0f;
     }
 
     // COLOR CALCS FROM ALBIN
