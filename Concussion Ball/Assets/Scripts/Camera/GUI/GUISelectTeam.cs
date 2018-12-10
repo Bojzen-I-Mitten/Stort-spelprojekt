@@ -344,6 +344,7 @@ public class GUISelectTeam : ScriptComponent
         }
         transform.position = SelectTeamCamPos;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
+        transform.scale = Vector3.One;
     }
 
     private void ShowPlayers()

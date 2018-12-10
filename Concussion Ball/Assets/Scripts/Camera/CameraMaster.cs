@@ -181,6 +181,8 @@ public class CameraMaster : ScriptComponent
             case CAM_STATE.SELECT_TEAM:
                 SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
+                Camera.fixedAspectRatio = false;
+                Camera.orthographic = false;
                 break;
             case CAM_STATE.GAME:
                 Hud.Canvas.isRendering = true;
