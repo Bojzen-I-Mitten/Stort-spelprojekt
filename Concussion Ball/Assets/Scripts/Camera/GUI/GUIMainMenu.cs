@@ -181,7 +181,7 @@ public class GUIMainMenu : ScriptComponent
 
         #region Text
         #region  Play
-        Play = Canvas.Add("Play");
+        Play = Canvas.Add("Join Game");
         Play.position = new Vector2(0.1f, 0.11f);
         Play.interactable = true;
         Play.depth = 0.9f;

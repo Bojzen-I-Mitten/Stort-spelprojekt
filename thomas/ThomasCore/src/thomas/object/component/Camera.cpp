@@ -212,7 +212,7 @@ namespace thomas
 				//graphics::Renderer::Instance()->SubmitCamera(this);
 				for (RenderComponent* renderComponent : RenderComponent::GetAllRenderComponents())
 				{
-					if(renderComponent->m_gameObject->GetActive() && (m_orthographic || GetFrustrum().Contains(renderComponent->m_bounds)))
+					if(renderComponent->m_gameObject->GetActive() && (m_orthographic || !renderComponent->EnabledCulling() || GetFrustrum().Contains(renderComponent->m_bounds)))
 						renderComponent->SubmitToRenderer(this);
 				}
 			}

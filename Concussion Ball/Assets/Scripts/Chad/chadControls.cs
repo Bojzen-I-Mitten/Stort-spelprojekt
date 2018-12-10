@@ -203,11 +203,6 @@ public class ChadControls : NetworkComponent
         }
 
 
-        if(State == STATE.RAGDOLL)
-        {
-            transform.position = Ragdoll.GetHips().transform.position;
-        }
-
 #if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {
