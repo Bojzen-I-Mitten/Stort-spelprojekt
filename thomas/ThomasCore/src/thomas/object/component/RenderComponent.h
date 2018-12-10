@@ -42,6 +42,9 @@ namespace thomas
 				std::vector<resource::Material*> GetMaterials();
 				void SetMaterials(std::vector<resource::Material*> value);
 
+				bool EnabledCulling();
+				void EnableCulling(bool value);
+
 				void OnDrawGizmos();
 				void SubmitToRenderer(Camera* camera);
 				void OnDestroy();
@@ -59,6 +62,7 @@ namespace thomas
 				*/
 				resource::shaderproperty::ShaderPropertyStatic& insertProperty(resource::shaderproperty::ShaderPropertyStatic prop);
 			private:
+				bool m_cullingEnabled;
 				static std::vector<RenderComponent*> s_renderComponents;
 				std::vector<resource::shaderproperty::ShaderPropertyStatic> m_properties;
 				//graphics::Geometry* m_geometry;

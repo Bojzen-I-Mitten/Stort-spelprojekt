@@ -201,6 +201,8 @@ public class ChadControls : NetworkComponent
                 frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
             }
         }
+
+
 #if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {

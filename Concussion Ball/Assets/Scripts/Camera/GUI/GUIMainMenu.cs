@@ -1,6 +1,4 @@
-﻿using System;
-
-using System.Collections;
+﻿using System.Collections;
 using ThomasEngine;
 
 public class GUIMainMenu : ScriptComponent
@@ -8,6 +6,8 @@ public class GUIMainMenu : ScriptComponent
     public Texture2D TextBox { get; set; }
     public Texture2D TextBoxBG { get; set; }
     public Texture2D MyNameTexture { get; set; }
+    public Texture2D ArrowTexture { get; set; }
+    public Texture2D FrameTexture { get; set; }
     public Font TextFont { get; set; }
 
     Camera Camera;
@@ -15,27 +15,35 @@ public class GUIMainMenu : ScriptComponent
     public Canvas Canvas;
 
     Image MyNameSticker;
+    Image SelectHatRight;
+    Image SelectHatLeft;
+    Image ChadArea;
     Text Play;
     Text HostGame;
     Text Options;
     Text Exit;
     Text Credits;
     Text PlayerName;
+    Text RandomHat;
     Text Caret;
 
     IEnumerator Blink = null;
 
     private bool TakeName;
-    public static string PlayerString = "CHAD";
 
     public float CaretOffset { get; set; }
     public float NameRotation { get; set; }
     private bool ClearName = true;
+    bool _RotateChad;
+    float rotationSpeed;
 
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
     Vector3 MainMenuCamPos;
+    Vector3 MainMenuAspectRation;
     Vector3 MainMenuCamRot;
+
+    
 
     public override void OnAwake()
     {
@@ -45,95 +53,135 @@ public class GUIMainMenu : ScriptComponent
 
     public override void Start()
     {
+
+        
+
         Camera = gameObject.GetComponent<Camera>();
         TakeName = false;
         AddImagesAndText();
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
+        MainMenuAspectRation = new Vector3(16, 9, 1);
         MainMenuCamRot = Vector3.Zero;
-        
+
     }
 
     public override void Update()
     {
-        Play.color = Unselected;
-        HostGame.color = Unselected;
-        Options.color = Unselected;
-        Credits.color = Unselected;
-        Exit.color = Unselected;
-
-        if (Play.Hovered())
-            Play.color = Selected;
-        else if (HostGame.Hovered())
-            HostGame.color = Selected;
-        else if (Options.Hovered())
-            Options.color = Selected;
-        else if (Credits.Hovered())
-            Credits.color = Selected;
-        else if (Exit.Hovered())
-            Exit.color = Selected;
-
-        if (MyNameSticker.Clicked())
+        if (Canvas.isRendering)
         {
-            TakeName = true;
-            if (Blink == null)
+            Play.color = Unselected;
+            HostGame.color = Unselected;
+            Options.color = Unselected;
+            Credits.color = Unselected;
+            Exit.color = Unselected;
+            RandomHat.color = Unselected;
+
+            if (Play.Hovered())
+                Play.color = Selected;
+            else if (HostGame.Hovered())
+                HostGame.color = Selected;
+            else if (Options.Hovered())
+                Options.color = Selected;
+            else if (Credits.Hovered())
+                Credits.color = Selected;
+            else if (Exit.Hovered())
+                Exit.color = Selected;
+            else if (RandomHat.Hovered())
+                RandomHat.color = Selected;
+
+            if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
             {
-                Blink = CaretBlink();
-                StartCoroutine(Blink);
+                if (ChadArea.Hovered())
+                {
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                    _RotateChad = true;
+                }
             }
-            if (ClearName)
-            {
-                PlayerName.text = "";
-                ClearName = false;
-            }
-        }
-        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            TakeName = false;
-            if (Blink != null)
-            {
-                StopCoroutine(Blink);
-                Blink = null;
-            }
-            Caret.text = "";
-        }
 
-        if (Play.Clicked() && PlayerName.text != "")
-        {
-            CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-            TakeName = false;
-        }
-        else if (HostGame.Clicked())
-        {
-            CameraMaster.instance.State = CAM_STATE.HOST_MENU;
-            TakeName = false;
-        }
-        else if (Exit.Clicked())
-        {
-            ThomasWrapper.IssueShutdown();
-        }
+            if (MyNameSticker.Clicked())
+            {
+                TakeName = true;
+                if (Blink == null)
+                {
+                    Blink = CaretBlink();
+                    StartCoroutine(Blink);
+                }
+                if (ClearName)
+                {
+                    PlayerName.text = "";
+                    ClearName = false;
+                }
+            }
+            else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+            {
+                Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                _RotateChad = false;
+                TakeName = false;
+                if (Blink != null)
+                {
+                    StopCoroutine(Blink);
+                    Blink = null;
+                }
+                Caret.text = "";
+            }
 
-        //PlayerString = PlayerString.ToUpper();
-        //PlayerName.text = PlayerString;
+            #region Clicked
+            if (Play.Clicked() && PlayerName.text != "")
+            {
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                TakeName = false;
+                UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
+                UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
+            }
+            else if (HostGame.Clicked())
+            {
+                CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+                TakeName = false;
+                UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
+                UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
+            }
+            else if (Exit.Clicked())
+            {
+                ThomasWrapper.IssueShutdown();
+            }
+            else if (SelectHatRight.Clicked())
+            {
+                CameraMaster.instance.SelectedHat += 1;
+            }
+            else if (SelectHatLeft.Clicked())
+            {
+                CameraMaster.instance.SelectedHat -= 1;
+            }
+            else if (RandomHat.Clicked())
+            {
+                CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
+            }
+            #endregion
 
         if (TakeName)
         {
-            string str = PlayerName.text;
-            GUIInput.AppendString(ref str, 9);
-            PlayerName.text = str;
+            string playerString = PlayerName.text;
+            GUIInput.AppendString(ref playerString, 9);
+            PlayerName.text = playerString;
         }
-
-        
+        RotateChad();
 
         Caret.position = PlayerName.position + new Vector2(PlayerName.size.x / 2 - 0.005f, CaretOffset + PlayerName.size.x * NameRotation);
-        PlayerString = PlayerName.text;
     }
+
+
+    public string GetPlayerName()
+    {
+        return PlayerName.text;
+    }
+
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
 
         #region Text
         #region  Play
-        Play = Canvas.Add("Play");
+        Play = Canvas.Add("Join Game");
         Play.position = new Vector2(0.1f, 0.11f);
         Play.interactable = true;
         Play.depth = 0.9f;
@@ -168,15 +216,29 @@ public class GUIMainMenu : ScriptComponent
         #endregion
 
         #region Player name
-        PlayerName = Canvas.Add("CHAD");
+
+        string playerString =  UserSettings.GetSetting("PlayerName");
+        if (playerString == null)
+            playerString = "CHAD";
+
+        PlayerName = Canvas.Add(playerString);
         PlayerName.origin = new Vector2(0.5f);
-        PlayerName.position = new Vector2(0.59f, 0.17f);
+        PlayerName.position = new Vector2(0.55f, 0.17f);
         PlayerName.scale = new Vector2(0.9f);
         PlayerName.interactable = true;
         PlayerName.depth = 0.8f;
         PlayerName.rotation = NameRotation;
         PlayerName.color = Color.Black;
         PlayerName.font = TextFont;
+        #endregion
+
+        #region Random Hat
+        RandomHat = Canvas.Add("Random Hat");
+        RandomHat.origin = new Vector2(0.5f);
+        RandomHat.scale = new Vector2(0.6f);
+        RandomHat.position = new Vector2(0.76f, 0.17f);
+        RandomHat.interactable = true;
+        RandomHat.depth = 0.8f;
         #endregion
 
         #region Caret
@@ -189,20 +251,52 @@ public class GUIMainMenu : ScriptComponent
         Caret.color = Color.Black;
         Caret.font = TextFont;
         #endregion
-
         #endregion
 
         #region Images
-
+        #region NameSticker
         if (MyNameTexture != null)
         {
             MyNameSticker = Canvas.Add(MyNameTexture);
             MyNameSticker.origin = new Vector2(0.5f);
-            MyNameSticker.position = new Vector2(0.6f, 0.14f);
+            MyNameSticker.position = new Vector2(0.55f, 0.14f);
             MyNameSticker.scale = new Vector2(0.5f);
             MyNameSticker.interactable = true;
             MyNameSticker.depth = 0.9f;
         }
+        #endregion
+
+        #region Arrows
+        if (ArrowTexture != null)
+        {
+            SelectHatRight = Canvas.Add(ArrowTexture);
+            SelectHatRight.origin = new Vector2(0.5f);
+            SelectHatRight.scale = new Vector2(0.25f);
+            SelectHatRight.position = new Vector2(0.85f, 0.25f);
+            SelectHatRight.interactable = true;
+            SelectHatRight.depth = 0.9f;
+
+            SelectHatLeft = Canvas.Add(ArrowTexture);
+            SelectHatLeft.origin = new Vector2(0.5f);
+            SelectHatLeft.scale = new Vector2(0.25f);
+            SelectHatLeft.position = new Vector2(0.68f, 0.25f);
+            SelectHatLeft.rotation = (float)System.Math.PI;
+            SelectHatLeft.interactable = true;
+            SelectHatLeft.depth = 0.9f;
+        }
+        #endregion
+
+        #region Chad Area
+        if (FrameTexture != null)
+        {
+            ChadArea = Canvas.Add(FrameTexture);
+            ChadArea.position = new Vector2(0.62f, 0.32f);
+            ChadArea.scale = new Vector2(5, 6);
+            ChadArea.interactable = true;
+            ChadArea.color = new Color(1, 1, 1, 0);
+            ChadArea.depth = 0.9f;
+        }
+        #endregion
 
         #endregion
     }
@@ -210,8 +304,8 @@ public class GUIMainMenu : ScriptComponent
     public void SetUpScene()
     {
         transform.position = MainMenuCamPos;
+        transform.scale = MainMenuAspectRation;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(MainMenuCamRot.x, MainMenuCamRot.y, MainMenuCamRot.z);
-
     }
 
     public void ClearImagesAndText()
@@ -223,6 +317,8 @@ public class GUIMainMenu : ScriptComponent
         Canvas.Remove(Exit);
         Canvas.Remove(PlayerName);
         Canvas.Remove(Caret);
+        Canvas.Remove(SelectHatRight);
+        Canvas.Remove(SelectHatLeft);
     }
 
     IEnumerator CaretBlink()
@@ -243,5 +339,21 @@ public class GUIMainMenu : ScriptComponent
 
             yield return new WaitForSecondsRealtime(0.5f);
         }
+    }
+
+    public void RotateChad()
+    {
+        if (_RotateChad)
+        {
+            if(Input.GetMouseX() < 500)
+                rotationSpeed += Input.GetMouseX() * 0.1f * Time.DeltaTime;
+        }
+        else
+        {
+            rotationSpeed = MathHelper.Lerp(rotationSpeed, 0, Time.DeltaTime);
+        }
+        
+        CameraMaster.instance.ChadMainMenu.transform.RotateByAxis(Vector3.Up, rotationSpeed);
+        
     }
 }
