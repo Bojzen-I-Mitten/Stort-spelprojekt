@@ -140,7 +140,7 @@ public class GUIHostMenu : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
 
-        HostMenuCamPos = new Vector3(0, -198.108f, 8.208f);
+        HostMenuCamPos = new Vector3(40, -198.108f, 8.208f);
         HostMenuCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
         Chad1Pos = new Vector3(0.866f, 0, 0.561f);
         Chad1Rot = new Vector3(45, 0, 0);
@@ -868,6 +868,7 @@ public class GUIHostMenu : ScriptComponent
         }
         transform.position = HostMenuCamPos;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(HostMenuCamRot.x, HostMenuCamRot.y, HostMenuCamRot.z);
+        transform.scale = Vector3.One;
 
     }
 
