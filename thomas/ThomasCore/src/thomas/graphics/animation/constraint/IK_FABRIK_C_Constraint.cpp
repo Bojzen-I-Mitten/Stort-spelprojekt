@@ -215,7 +215,7 @@ namespace thomas {
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
 					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate bone Y toward child's point
-					//pose = pose * skel.getBone(chain[i + 1])._invParentOrient;					// Apply orientation offset in relation to child (Y axis of the bone may not face child)
+					//pose = pose * skel.getBone(chain[i + 1])._invParentOrient;				// Apply orientation offset in relation to child (Y axis of the bone may not face child)
 					pose.Translation(p[i]);														// Apply new translation
 					objectPose[chain[i]] = pose;												// Set
 				}
