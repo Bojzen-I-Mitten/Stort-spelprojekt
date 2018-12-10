@@ -735,16 +735,23 @@ public class ChadControls : NetworkComponent
         rBody.Mass = OriginalMass;
         rBody.AddForce(new Vector3(0, 200.0f, 0), Rigidbody.ForceMode.Impulse);
 
-        // This needs sync as well
+        // This needs sync over network as well
+        RPCResetMaterial();
+        SendRPC("RPCResetMaterial");
+
+        ScaleCountdown = ScaleDuration;
+        ToySoldierAffected = false;
+        ToySoldierModifier = null;
+    }
+
+    public void RPCResetMaterial()
+    {
+        // Need to reset this to the correct team color
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject)].Color);
         render.SetMaterial(0, ChadFirstMaterial);
         render.SetMaterial(1, ChadSecondMaterial);
         render.SetMaterial(2, ChadThirdMaterial);
-
-        ScaleCountdown = ScaleDuration;
-        ToySoldierAffected = false;
-        ToySoldierModifier = null;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -753,8 +760,7 @@ public class ChadControls : NetworkComponent
     }
 
     public void RPCStartThrow()
-    {
-        
+    {      
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
     }

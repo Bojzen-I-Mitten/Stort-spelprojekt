@@ -89,8 +89,6 @@ public class ToySoldier : Powerup
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
         // Scale and movement decrease
-        // TOOD: New skinning material doesn't show for the other player
-        // TODO: The powerup can hit the other chad and then dissapear for one client but will remain for the other one
         localChad.ToySoldierAffected = true;
         localChad.transform.scale *= 0.5f;
         localChad.Acceleration *= 0.5f;
