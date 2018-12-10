@@ -9,7 +9,7 @@ public class GUIExitMenu : ScriptComponent
     public Canvas Canvas;
     //Text ExitMatch;
     Text ExitGame;
-
+    Text OptionsMenu;
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
@@ -23,6 +23,13 @@ public class GUIExitMenu : ScriptComponent
         ExitGame.position = new Vector2(0.4f, 0.25f);
         ExitGame.color = Color.Black;
         ExitGame.interactable = true;
+
+        OptionsMenu = Canvas.Add("Options Menu");
+        OptionsMenu.font = Font;
+        OptionsMenu.position = new Vector2(0.4f, 0.4f);
+        OptionsMenu.color = Color.Black;
+        OptionsMenu.interactable = true;
+
     }
 
     public override void Start()
@@ -54,6 +61,18 @@ public class GUIExitMenu : ScriptComponent
                 }       
             }
         }
-        
+
+        if (OptionsMenu.Hovered())
+            OptionsMenu.color = Color.Red;
+        else
+            OptionsMenu.color = Color.Black;
+
+
+        if (OptionsMenu.Clicked())
+        {
+            GUIOptionsMenu.instance.ActivatedfromExitmenu = true;
+            CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
+        }
+
     }
 }

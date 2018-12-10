@@ -71,6 +71,8 @@ public class ChadCam : ScriptComponent
         }
         if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
+            CameraSensitivity_x = GUIOptionsMenu.instance.getMovement();
+            CameraSensitivity_y = GUIOptionsMenu.instance.getMovement();
             switch (Chad.State)
             {
                 case ChadControls.STATE.CHADING:

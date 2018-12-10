@@ -145,6 +145,7 @@ public class GUIOptionsMenu : ScriptComponent
     public Vector2 SetPositionText { set; get; }
     public Vector2 SetOriginImage { set; get; }
     public Vector2 SetPositionImage { set; get; }
+    public bool ActivatedfromExitmenu { set; get; } = false;
     public Vector2 SetScale { set; get; } = Vector2.One;
     Color Unselected = Color.FloralWhite;
     Color Selected = Color.IndianRed;
@@ -171,7 +172,7 @@ public class GUIOptionsMenu : ScriptComponent
     {
       //  updatePosOrigin();
         ButtonHovered();
-        if (Text[(int)Textstate.BACK_TEXT].Clicked())
+        if (Text[(int)Textstate.BACK_TEXT].Clicked() ||  (Input.GetKeyDown(Input.Keys.Escape) && ActivatedfromExitmenu ==true))
             BackbuttonClicked();
 
         if (Input.GetKeyDown(Input.Keys.P))
@@ -275,7 +276,16 @@ public class GUIOptionsMenu : ScriptComponent
     }
     void BackbuttonClicked()
     {
-        CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+        if(ActivatedfromExitmenu)
+        {
+            CameraMaster.instance.State = CAM_STATE.GAME;
+            Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+            ActivatedfromExitmenu = false;
+        }
+        else
+            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+
+        
     }
     public void AddImagesAndText()
     {
@@ -411,10 +421,16 @@ public class GUIOptionsMenu : ScriptComponent
     }
     public int getAim()
     {
-        return ImageBar[(int)ImageBarstate.AIM].numbervalue;
+        if (ImageBar[(int)ImageBarstate.AIM].numbervalue > 0)
+            return ImageBar[(int)ImageBarstate.AIM].numbervalue;
+        else
+            return 1;
     }
     public int getMovement()
     {
-        return ImageBar[(int)ImageBarstate.Movement].numbervalue;
+        if (ImageBar[(int)ImageBarstate.Movement].numbervalue > 0)
+            return ImageBar[(int)ImageBarstate.Movement].numbervalue;
+        else
+            return 1;
     }
 }
