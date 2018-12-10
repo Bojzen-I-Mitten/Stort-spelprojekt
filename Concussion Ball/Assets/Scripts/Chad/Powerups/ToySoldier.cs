@@ -14,10 +14,11 @@ public class ToySoldier : Powerup
         base.OnAwake();
 
         BaseThrowForce = 15.0f;
+        MovementSpeedModifier = 0.7f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
         m_throwable = true; // Change depending on power-up
-        gameObject.GetComponent<Rigidbody>().Friction = 2.0f;
+        gameObject.GetComponent<Rigidbody>().Friction = 2.5f;
     }
 
     public override void Update()
@@ -82,9 +83,6 @@ public class ToySoldier : Powerup
 
         // Scale and movement decrease
         // The scale up effect with the collider look's a bit weird
-        // Chad can still sprint with this powerup
-        // Collider can go through some walls when thrown
-        // Object can spin when thrown to the ground in unrealistic manner (like on powerup spawn)
         localChad.ToySoldierAffected = true;
         localChad.transform.scale *= 0.5f;
         localChad.Acceleration *= 0.5f;
