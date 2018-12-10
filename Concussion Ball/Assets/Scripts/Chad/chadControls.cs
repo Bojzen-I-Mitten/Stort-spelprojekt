@@ -840,6 +840,10 @@ public class ChadControls : NetworkComponent
             {
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
             }
+            else if (pickupable.gameObject.Name == "Gramophone")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Gramophone");
+            }
 
             FadeText = FadePickupText();
             StartCoroutine(FadeText);

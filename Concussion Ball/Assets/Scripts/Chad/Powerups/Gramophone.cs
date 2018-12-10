@@ -5,7 +5,7 @@ using System.Linq;
 using System;
 using LiteNetLib.Utils;
 
-public class SoundBomb : Powerup
+public class Gramophone : Powerup
 {
     ChadControls ObjectOwner = null;
     Collider _FirstCollider;
