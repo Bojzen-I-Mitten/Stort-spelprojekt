@@ -67,96 +67,96 @@ public class GUIMainMenu : ScriptComponent
 
     public override void Update()
     {
-        
-
-        Play.color = Unselected;
-        HostGame.color = Unselected;
-        Options.color = Unselected;
-        Credits.color = Unselected;
-        Exit.color = Unselected;
-        RandomHat.color = Unselected;
-
-        if (Play.Hovered())
-            Play.color = Selected;
-        else if (HostGame.Hovered())
-            HostGame.color = Selected;
-        else if (Options.Hovered())
-            Options.color = Selected;
-        else if (Credits.Hovered())
-            Credits.color = Selected;
-        else if (Exit.Hovered())
-            Exit.color = Selected;
-        else if (RandomHat.Hovered())
-            RandomHat.color = Selected;
-
-        if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
+        if (Canvas.isRendering)
         {
-            if (ChadArea.Hovered())
+            Play.color = Unselected;
+            HostGame.color = Unselected;
+            Options.color = Unselected;
+            Credits.color = Unselected;
+            Exit.color = Unselected;
+            RandomHat.color = Unselected;
+
+            if (Play.Hovered())
+                Play.color = Selected;
+            else if (HostGame.Hovered())
+                HostGame.color = Selected;
+            else if (Options.Hovered())
+                Options.color = Selected;
+            else if (Credits.Hovered())
+                Credits.color = Selected;
+            else if (Exit.Hovered())
+                Exit.color = Selected;
+            else if (RandomHat.Hovered())
+                RandomHat.color = Selected;
+
+            if (Input.GetMouseButtonDown(Input.MouseButtons.LEFT))
             {
-                Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                _RotateChad = true;
+                if (ChadArea.Hovered())
+                {
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
+                    _RotateChad = true;
+                }
             }
-        }
 
-        if (MyNameSticker.Clicked())
-        {
-            TakeName = true;
-            if (Blink == null)
+            if (MyNameSticker.Clicked())
             {
-                Blink = CaretBlink();
-                StartCoroutine(Blink);
+                TakeName = true;
+                if (Blink == null)
+                {
+                    Blink = CaretBlink();
+                    StartCoroutine(Blink);
+                }
+                if (ClearName)
+                {
+                    PlayerName.text = "";
+                    ClearName = false;
+                }
             }
-            if (ClearName)
+            else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
             {
-                PlayerName.text = "";
-                ClearName = false;
+                Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+                _RotateChad = false;
+                TakeName = false;
+                if (Blink != null)
+                {
+                    StopCoroutine(Blink);
+                    Blink = null;
+                }
+                Caret.text = "";
             }
-        }
-        else if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
-        {
-            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-            _RotateChad = false;
-            TakeName = false;
-            if (Blink != null)
-            {
-                StopCoroutine(Blink);
-                Blink = null;
-            }
-            Caret.text = "";
-        }
 
-        #region Clicked
-        if (Play.Clicked() && PlayerName.text != "")
-        {
-            CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
-            TakeName = false;
-            UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
-            UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
-        }
-        else if (HostGame.Clicked())
-        {
-            CameraMaster.instance.State = CAM_STATE.HOST_MENU;
-            TakeName = false;
-            UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
-            UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
-        }
-        else if (Exit.Clicked())
-        {
-            ThomasWrapper.IssueShutdown();
-        }
-        else if (SelectHatRight.Clicked())
-        {
-            CameraMaster.instance.SelectedHat += 1;
-        }
-        else if (SelectHatLeft.Clicked())
-        {
-            CameraMaster.instance.SelectedHat -= 1;
-        }
-        else if (RandomHat.Clicked())
-        {
-            CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
-        }
-        #endregion
+            #region Clicked
+            if (Play.Clicked() && PlayerName.text != "")
+            {
+                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                TakeName = false;
+                UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
+                UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
+            }
+            else if (HostGame.Clicked())
+            {
+                CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+                TakeName = false;
+                UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
+                UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
+            }
+            else if (Exit.Clicked())
+            {
+                ThomasWrapper.IssueShutdown();
+            }
+            else if (SelectHatRight.Clicked())
+            {
+                CameraMaster.instance.SelectedHat += 1;
+            }
+            else if (SelectHatLeft.Clicked())
+            {
+                CameraMaster.instance.SelectedHat -= 1;
+            }
+            else if (RandomHat.Clicked())
+            {
+                CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
+            }
+            #endregion
 
         if (TakeName)
         {
