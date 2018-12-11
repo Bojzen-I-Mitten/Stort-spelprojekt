@@ -13,14 +13,15 @@ public class GUILoadingScreen : ScriptComponent
 
     public override void OnAwake()
     {
+        Camera = gameObject.GetComponent<Camera>();
+        Canvas = Camera.AddCanvas();
+        if (Background != null)
+            Canvas.Add(Background);
     }
 
     public override void Start()
     {
-        Camera = gameObject.GetComponent<Camera>();
-        Canvas = Camera.AddCanvas();
-        if(Background != null)
-            Canvas.Add(Background);
+       
     }
 
     public override void Update()

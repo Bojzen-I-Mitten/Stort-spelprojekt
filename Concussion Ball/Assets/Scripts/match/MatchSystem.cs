@@ -230,7 +230,7 @@ public class MatchSystem : NetworkManager
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
 
-        CameraMaster.instance.State = CAM_STATE.SCORE_SCREEN;
+        CameraMaster.instance.SetState(CAM_STATE.SCORE_SCREEN);
         for (int i = 0; i < GUIScoreScreen.Instance.ScoreScreenTimeLast; i++)
         {
             GUIScoreScreen.Instance.UpdateTimer();
@@ -240,7 +240,7 @@ public class MatchSystem : NetworkManager
         }
         ResetNetworkplayerPoints();
         RPCStartMatch();
-        CameraMaster.instance.State = CAM_STATE.GAME;
+        CameraMaster.instance.SetState(CAM_STATE.GAME);
     }
 
     IEnumerator RoundStartCountdown(float duration)

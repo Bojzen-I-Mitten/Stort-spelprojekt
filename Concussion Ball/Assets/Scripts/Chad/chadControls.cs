@@ -157,6 +157,7 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
+            Debug.Log("ActivateCamera chadControls");
             ChadCam.instance.gameObject.SetActive(true);
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
         }
@@ -174,7 +175,7 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL && State != STATE.DANCING)
             {
-            if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
+            if (CameraMaster.instance.GetState() != CAM_STATE.EXIT_MENU)
             {
                 HandleKeyboardInput();
                 HandleMouseInput();

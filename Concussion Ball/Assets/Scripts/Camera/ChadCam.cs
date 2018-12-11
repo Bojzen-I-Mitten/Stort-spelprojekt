@@ -67,7 +67,7 @@ public class ChadCam : ScriptComponent
 
     public override void Update()
     {
-        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying && CameraMaster.instance.GetState() == CAM_STATE.GAME)
         {
             switch (Chad.State)
             {
@@ -83,33 +83,15 @@ public class ChadCam : ScriptComponent
                         else
                             ReverseCamera();
                     }
-                    else
-                    {
-                        //ResetCamera();
-                        //transform.rotation = Chad.transform.rotation;
-                        //transform.position = ChadHead + CameraOffset * -transform.forward;
-                    }
                     break;
                 case ChadControls.STATE.THROWING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                         ThrowingCamera();
-                    else
-                    {
-                        //ResetCamera();
-                        //transform.rotation = Chad.transform.rotation;
-                        //transform.position = ChadHead + CameraOffset * -transform.forward;
-                    }
                     break;
                 case ChadControls.STATE.RAGDOLL:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                     {
                         RagdollCamera();
-                    }
-                    else
-                    {
-                        //ResetCamera();
-                        //transform.rotation = Chad.transform.rotation;
-                        //transform.position = ChadHead + CameraOffset * -transform.forward;
                     }
                     break;
             }
@@ -171,7 +153,7 @@ public class ChadCam : ScriptComponent
 
     public override void FixedUpdate()
     {
-        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying && CameraMaster.instance.GetState() == CAM_STATE.GAME)
         {
             float actualOffset = 0;
             if (Chad.State != ChadControls.STATE.THROWING)
