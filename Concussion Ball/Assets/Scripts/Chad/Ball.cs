@@ -47,9 +47,10 @@ public class Ball : PickupableObject
 
 
         soundChargeBall = gameObject.AddComponent<SoundComponent>();
-        soundChargeBall.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ChargeBallSound.wav");
+        soundChargeBall.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ElectricSparks.mp3");
         soundChargeBall.Looping = false;
         soundChargeBall.Type = SoundComponent.SoundType.Effect;
+        soundChargeBall.Volume = 0.15f;
         soundChargeBall.MaxDistance = 20;
         soundChargeBall.MinDistance = 10;
         soundChargeBall.Is3D = true;
@@ -211,6 +212,20 @@ public class Ball : PickupableObject
         base.Update();
         if (transform.position.y < -5)
             Reset();
+
+        if (charging)
+        {
+            if (!begunCharge)
+            {
+                begunCharge = true;
+                soundChargeBall.Play();
+            }
+        }
+        else
+        {
+            begunCharge = false;
+            soundChargeBall.Stop();
+        }
     }
 
     public override void Throw(Vector3 camPos, Vector3 direction)
@@ -248,11 +263,7 @@ public class Ball : PickupableObject
         float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
         if (interp > 0)
         {
-            if (!begunCharge)
-            {
-                begunCharge = true;
-                soundChargeBall.Play();
-            }
+            
             emitterElectricity1.Emit = true;
             emitterElectricity2.Emit = true;
             emitterElectricity3.Emit = true;

@@ -105,10 +105,18 @@ namespace thomas
 					}
 				}
 
-
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
 				j["SlowfilerData"]["build"]["vramTotal"] = s_vramTotal;
-				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
+				j["SlowfilerData"]["build"]["vramUsage"];
+				for (auto& id : s_vramusage)
+				{
+					for (auto& s : id.second)
+					{
+						j["SlowfilerData"]["build"][id.first] += std::to_string(s) + ',';
+					}
+				}
+
+				
 				j["SlowfilerData"]["build"]["contextSwitches"] = s_contextSwitch.load();
 
 				/*

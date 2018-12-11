@@ -14,7 +14,7 @@ namespace thomas
 			
 		public:
 			Texture2DArray(unsigned width, unsigned height, DXGI_FORMAT format, unsigned nrOfTextures = 1u, bool isDepthTexture = false);
-			~Texture2DArray();
+			virtual ~Texture2DArray();
 
 			void UnloadTextures();
 			void DeRefTexture(unsigned i);

@@ -43,6 +43,7 @@ public class AnnouncerSoundManager : ScriptComponent
 
     private float randomClipCooldown;
 
+    private bool announce;
     public static AnnouncerSoundManager Instance;
 
   
@@ -62,6 +63,7 @@ public class AnnouncerSoundManager : ScriptComponent
 
     public override void Start()
     {
+        announce = true;
         rng = new System.Random();
         MasterSound = gameObject.AddComponent<SoundComponent>();
         MasterSound.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/Carl/Random1.wav");
@@ -208,7 +210,12 @@ public class AnnouncerSoundManager : ScriptComponent
 
     public override void Update()
     {
-        randomClipCooldown -= Time.DeltaTime;
+        if (MatchSystem.instance.MatchStarted)
+            randomClipCooldown -= Time.DeltaTime;
+        else
+        {
+            //play random menusounds
+        }
         if (randomClipCooldown < 0.0f)
         {
             Announce(ANNOUNCEMENT_TYPE.RANDOM);
@@ -222,7 +229,7 @@ public class AnnouncerSoundManager : ScriptComponent
         MasterSound.Clip = clip;
         MasterSound.Play();
         while (MasterSound.IsPlaying())
-            yield return new WaitForSeconds(1.0f);
+            yield return null;
 
         yield return new WaitForSeconds(endWait);
         playing = false;
@@ -240,39 +247,46 @@ public class AnnouncerSoundManager : ScriptComponent
 
     public void Announce(ANNOUNCEMENT_TYPE TYPE)
     {
+        if (!announce)
+            return;
+
         switch (TYPE)
         {
             case ANNOUNCEMENT_TYPE.EXPLODED:
-                if (PlaySound(ExplodedSounds[rng.Next(0, ExplodedSounds.Count)], 1.2f, 3.0f))
+                if (PlaySound(ExplodedSounds[rng.Next(0, ExplodedSounds.Count)], 1.0f, 3.0f))
                 {
                     ExplodedSounds.Shuffle();
                 }
                 break;
             case ANNOUNCEMENT_TYPE.TACKLED:
-                if (PlaySound(TackledSounds[rng.Next(0, TackledSounds.Count)], 0.8f, 1.0f))
+                if (PlaySound(TackledSounds[rng.Next(0, TackledSounds.Count)], 0.6f, 1.0f))
                 {
                     TackledSounds.Shuffle();
                 }
                 break;
             case ANNOUNCEMENT_TYPE.GOAL:
-                if (PlaySound(GoalSounds[rng.Next(0, GoalSounds.Count)], 2.0f, 2.0f))
+                StopAllCoroutines();
+                if (PlaySound(GoalSounds[rng.Next(0, GoalSounds.Count)], 1.3f, 2.0f))
                 {
                     GoalSounds.Shuffle();
                 }
                 break;
             case ANNOUNCEMENT_TYPE.GOLDENGOAL:
-                if (PlaySound(GoldenGoalSounds[rng.Next(0, GoldenGoalSounds.Count)], 2.0f, 1.0f))
+                StopAllCoroutines();
+                if (PlaySound(GoldenGoalSounds[rng.Next(0, GoldenGoalSounds.Count)], 1.5f, 1.0f))
                 {
                     GoldenGoalSounds.Shuffle();
                 }
                 break;
             case ANNOUNCEMENT_TYPE.HAT:
+                
                 if (PlaySound(HatSounds[rng.Next(0, HatSounds.Count)], 0.0f, 0.0f))
                 {
                     HatSounds.Shuffle();
                 }
                 break;
             case ANNOUNCEMENT_TYPE.WELLPLAYED:
+                StopAllCoroutines();
                 if (PlaySound(WellPlayedSounds[rng.Next(0, WellPlayedSounds.Count)], 1.0f, 1.0f))
                 {
                     WellPlayedSounds.Shuffle();
@@ -285,19 +299,19 @@ public class AnnouncerSoundManager : ScriptComponent
                 }
                 break;
             case ANNOUNCEMENT_TYPE.PICKUPBALL:
-                if (PlaySound(PickUpBallSounds[rng.Next(0, PickUpBallSounds.Count)], 1.3f, 1.0f))
+                if (PlaySound(PickUpBallSounds[rng.Next(0, PickUpBallSounds.Count)], 0.6f, 1.0f))
                 {
                     PickUpBallSounds.Shuffle();
                 }
                 break;
             case ANNOUNCEMENT_TYPE.RANDOM:
-                if (PlaySound(ChadRandomSounds[rng.Next(0, ChadRandomSounds.Count)], 1.0f, 5.0f))
+                if (PlaySound(ChadRandomSounds[rng.Next(0, ChadRandomSounds.Count)], 0.0f, 3.0f))
                 {
                     ChadRandomSounds.Shuffle();
                 }
                 break;
         }
-        randomClipCooldown = 10.0f;
+        randomClipCooldown = (float)rng.Next(10, 17);
     }
 
     

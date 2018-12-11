@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,6 +59,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Chad\Powerups\Gramophone.cs" />
+    <Compile Include="Assets\Scripts\Chad\HatManager.cs" />
+    <Compile Include="Assets\Scripts\Chad\Hatter.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Banana.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUILoadingScreen.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraMaster.cs" />
@@ -73,7 +77,7 @@
     <Compile Include="Assets\Scripts\Chad\Animation\GroundOffset.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
-    <Compile Include="Assets\Scripts\Camera\GUI\GUIPlayerScore.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreboard.cs" />
     <Compile Include="Assets\Scripts\Chad\ShirtRenderer.cs" />
     <Compile Include="Assets\Scripts\Forcefield.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />
@@ -111,6 +115,7 @@
     <Compile Include="Assets\Scripts\skeletonSyncer.cs" />
     <Compile Include="Assets\Scripts\SoundTest.cs" />
     <Compile Include="Assets\Scripts\throwStrengthVisualizer.cs" />
+    <Compile Include="Assets\Scripts\UserSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

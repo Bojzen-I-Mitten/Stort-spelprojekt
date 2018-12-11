@@ -16,6 +16,7 @@ namespace ThomasEngine
 		Texture2D(int width, int height, bool mipMap) : Texture("", new thomas::resource::Texture2D(width, height, mipMap)) {};
 		Texture2D(thomas::resource::Texture2D* nativePtr) : Texture(Utility::ConvertString(nativePtr->GetPath()), nativePtr) {};
 	public:
+		virtual ~Texture2D() {}
 		static property Texture2D^ blackTexture
 		{
 			Texture2D^ get() { return gcnew Texture2D(thomas::resource::Texture2D::GetBlackTexture()); }
