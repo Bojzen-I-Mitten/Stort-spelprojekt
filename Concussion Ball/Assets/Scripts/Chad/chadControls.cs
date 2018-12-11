@@ -106,6 +106,7 @@ public class ChadControls : NetworkComponent
     private float OriginalFirstJumpForce;
     private float OriginalSecondJumpForce;
 
+    //private Material[] OriginalMaterials;
     public Material ChadFirstMaterial { get; set; }
     public Material ChadSecondMaterial { get; set; }
     public Material ChadThirdMaterial { get; set; }
@@ -167,6 +168,8 @@ public class ChadControls : NetworkComponent
         OriginalCapsuleHeight = capsule.height;
         OriginalCapsuleRadius = capsule.radius;
         OriginalMass = rBody.Mass;
+
+        //OriginalMaterials = gameObject.GetComponent<RenderSkinnedComponent>().materials;
     }
 
     public override void OnGotOwnership()
@@ -215,7 +218,7 @@ public class ChadControls : NetworkComponent
             {
                 if(ToySoldierModifier == null)
                 {
-                    ToySoldierModifier = ToySoldierRoutine(ScaleDuration);
+                    ToySoldierModifier = ToySoldierRoutine();
                     StartCoroutine(ToySoldierModifier);
                 }
             }
@@ -715,15 +718,9 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.rendering = false;
     }
 
-    IEnumerator ToySoldierRoutine(float seconds)
+    IEnumerator ToySoldierRoutine()
     {
-        ScaleCountdown = seconds;
-
-        while (ScaleCountdown > 0)
-        {
-            yield return new WaitForSeconds(ScaleDuration);
-            ScaleCountdown = 0;
-        }
+        yield return new WaitForSeconds(ScaleDuration);
 
         // Set back original values and properties when timer has expired
         gameObject.transform.localScale = OriginalScale;
