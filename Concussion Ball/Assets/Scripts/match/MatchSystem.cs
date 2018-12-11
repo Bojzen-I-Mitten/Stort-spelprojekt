@@ -287,7 +287,6 @@ public class MatchSystem : NetworkManager
     public override void OnWrite(NetDataWriter writer)
     {
         writer.Put(MatchStarted);
-        writer.Put(PowerupManager.NextPowerupID);
         writer.Put(GoldenGoal);
         writer.Put(MatchStartTime);
         writer.Put(MatchLength);
@@ -306,7 +305,6 @@ public class MatchSystem : NetworkManager
     public override void OnRead(NetDataReader reader)
     {
         MatchStarted = reader.GetBool();
-        PowerupManager.NextPowerupID = reader.GetInt();
         GoldenGoal = reader.GetBool();
         MatchStartTime = reader.GetFloat();
         MatchLength = reader.GetInt();
