@@ -116,7 +116,7 @@ public class PickupableObject : NetworkComponent
     {
         if (pickedUp)
         {
-            Debug.Log("Drop!");
+            //Debug.Log("Drop!");
             m_rigidBody.enabled = true;
 
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
