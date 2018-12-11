@@ -21,10 +21,6 @@ public class Chadimations : NetworkComponent
         [BrowsableAttribute(false)]
         public PlaybackNode Node { get; set; }
 
-        [JsonIgnoreAttribute]
-        [BrowsableAttribute(false)]
-        public float Weight;
-
         public float GetWeight(Vector3 target)
         {
             //Vector3 active = new Vector3(Position.x != 0 ? 1 : 0, Position.y != 0 ? 1 : 0, Position.z != 0 ? 1 : 0);
@@ -37,26 +33,16 @@ public class Chadimations : NetworkComponent
     }
     public bool Throwing = false;
     private ChadControls Chad = null;
-    private Vector3 Direction
-    {
-        get
-        {
-            if (Chad != null)
-                return Chad.Direction;
-            return new Vector3(0, 0, 0);
-        }
-    }
-    private ChadControls.STATE m_blendState = ChadControls.STATE.NUM_STATES;
-    private ChadControls.STATE ChadState
-    {
-        get
-        {
-            if (Chad != null)
-                return Chad.State;
-            return 0;
-        }
-    }
-    private ChadControls.STATE AnimState;
+    private AnimationMixer mixer;
+    /* Chad direction input information
+    */
+    private Vector3 Direction   {   get {   return Chad.Direction;  }   }
+    /* Fetch state from chad controller
+     */
+    private ChadControls.STATE ChadState    {   get   { return Chad.State;  }    }
+    /* State of the animation system in last frame.
+    */
+    private ChadControls.STATE AnimState = ChadControls.STATE.NUM_STATES;
 
     public Dictionary<ChadControls.STATE, List<AnimationNode>> Animations { get; set; } = new Dictionary<ChadControls.STATE, List<AnimationNode>>();
     public Dictionary<ChadControls.STATE, BlendNode> BlendNodes = new Dictionary<ChadControls.STATE, BlendNode>();
@@ -67,36 +53,37 @@ public class Chadimations : NetworkComponent
         return node == null ? null : node.getWeightHandle();
     }
     
-    public RenderSkinnedComponent Skin { get; set; }
 
     public override void Start()
     {
+        // Fetch chad
         Chad = gameObject.GetComponent<ChadControls>();
-        if (Skin != null)
+        if (!Chad)
+            throw new InvalidOperationException("No chad found in object.");
+        if(Animations.Count == 0)
+            throw new InvalidOperationException("No animation information found in component.");
+        
+        // Initiate
+        mixer = new AnimationMixer(gameObject);
+        // Generate nodes
+        foreach (var state in Animations)
         {
-            if (Animations.Count > 0)
+            if (state.Key == ChadControls.STATE.RAGDOLL)
+                continue; // No Ragdoll animations
+            // Gen. state blend node
+            BlendNode newBlendNode = new BlendNode(mixer.Skin.model);
+            // Gen. individual playback nodes
+            for (int i = 0; i < state.Value.Count; ++i)
             {
-                foreach (var state in Animations)
-                {
-                    if (state.Key != ChadControls.STATE.RAGDOLL) // No Ragdoll animations
-                    {
-                        BlendNode newBlendNode = new BlendNode(Skin.model);
-                        for (int i = 0; i < state.Value.Count; ++i)
-                        {
-                            if (state.Key == ChadControls.STATE.THROWING)
-                                state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, false);
-                            else
-                                state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, true);
-                        }
-                        BlendNodes.Add(state.Key, newBlendNode);
-                    }
-                }
-
-                getWeightHandle(ChadControls.STATE.CHADING).setWeight(0, new WeightTripple(1f));
-                Skin.setBlendTreeNode(BlendNodes[ChadControls.STATE.CHADING]);
-                AnimState = ChadControls.STATE.CHADING;
+                if (state.Key == ChadControls.STATE.THROWING)
+                    state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, false);
+                else
+                    state.Value[i].Node = newBlendNode.appendNode(state.Value[i].Animation, true);
             }
+            BlendNodes.Add(state.Key, newBlendNode);
         }
+        // Set default playback state.
+        SetBlendState(ChadControls.STATE.CHADING, AnimationMixer.BlendIn.Instant);
     }
     private bool CheckAnimList(List<AnimationNode> list, ChadControls.STATE State)
     {
@@ -116,9 +103,18 @@ public class Chadimations : NetworkComponent
     */
     private void SetBlendState(ChadControls.STATE state)
     {
+        SetBlendState(state, AnimationMixer.BlendIn.Overwrite);
+    }
+    private void SetBlendState(ChadControls.STATE state, AnimationMixer.BlendIn mode)
+    {
         AnimState = state;
-        Skin.setBlendTreeNode(BlendNodes[state]);
-
+        // Currently only overwrite current state (no mixed state)
+        AnimationMixer.MixInfo info;
+        info.mixTime = 0.5f;
+        info.mixWeight = 1.0f;
+        info.mode = mode;
+        // Apply
+        mixer.mixIn(BlendNodes[state], info);
     }
     /* Run update logic on the throwing state
      */
@@ -129,11 +125,11 @@ public class Chadimations : NetworkComponent
         if (CheckAnimList(nodes, ChadControls.STATE.THROWING))
             return;
 
-        // Charge anim control
+        // Charge anim control : node[0]
         if (Chad.PickedUpObject) // charge throw anim
             AnimationSpeed(nodes[0], 2.6f / Chad.PickedUpObject.chargeTimeMax);
 
-        // Pickup anim control
+        // Release anim control : node[1]
         if(Throwing)
         {
             AnimationSpeed(nodes[1], 2.4f);
@@ -193,6 +189,8 @@ public class Chadimations : NetworkComponent
                     break;
             }
         }
+        // Update weight mixer
+        mixer.Update(Time.DeltaTime);
     }
 
 

@@ -22,6 +22,10 @@ namespace ThomasEngine
 		public:
 			BlendNode(Model^model);
 			~BlendNode();
+			/* Max blend node count
+			*/
+			const static uint32_t MAX_ANIMATION_BLEND_NODE = thomas::MAX_ANIMATION_BLEND_NODE;
+
 
 			PlaybackNode^ appendNode(Animation^ anim, bool loop);
 			void appendNode(BlendNode^ action);

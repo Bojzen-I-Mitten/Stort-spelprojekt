@@ -107,8 +107,7 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.font = PickupFont;
 
         State = STATE.CHADING;
-        PrevState = STATE.NUM_STATES;
-
+        
         // Access rigidbody and apply
         rBody = gameObject.GetComponent<Rigidbody>();
         rBody.IsKinematic = false;

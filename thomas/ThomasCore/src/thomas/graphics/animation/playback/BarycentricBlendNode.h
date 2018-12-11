@@ -1,6 +1,6 @@
 #pragma once
-#include "AnimationNode.h"
-#include "WeightMixer.h"
+#include "../AnimationNode.h"
+#include "../WeightMixer.h"
 #include <memory>
 
 namespace thomas {

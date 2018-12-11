@@ -1,5 +1,5 @@
 #include "BarycentricBlendNode.h"
-#include "../../object/component/Transform.h"
+#include "../../../object/component/Transform.h"
 
 
 namespace thomas {
