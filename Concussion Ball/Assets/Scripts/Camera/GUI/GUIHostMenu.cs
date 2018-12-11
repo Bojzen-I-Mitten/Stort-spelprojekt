@@ -140,6 +140,8 @@ public class GUIHostMenu : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
 
+        CaretOffsetBig = 0.04f;
+
         HostMenuCamPos = new Vector3(40, -198.108f, 8.208f);
         HostMenuCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
         Chad1Pos = new Vector3(0.866f, 0, 0.561f);
@@ -436,7 +438,7 @@ public class GUIHostMenu : ScriptComponent
         Caret.origin = new Vector2(0, 0.5f);
         Caret.scale = new Vector2(0.5f);
         Caret.interactable = false;
-        Caret.depth = 0.7f;
+        Caret.depth = 0.6f;
         Caret.color = Color.Black;
     }
 
