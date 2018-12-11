@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Chad\Powerups\Gramophone.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
     <Compile Include="Assets\Scripts\Chad\HatManager.cs" />
     <Compile Include="Assets\Scripts\Chad\Hatter.cs" />
@@ -77,7 +78,7 @@
     <Compile Include="Assets\Scripts\Chad\Animation\GroundOffset.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
-    <Compile Include="Assets\Scripts\Camera\GUI\GUIPlayerScore.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreboard.cs" />
     <Compile Include="Assets\Scripts\Chad\ShirtRenderer.cs" />
     <Compile Include="Assets\Scripts\Forcefield.cs" />
     <Compile Include="Assets\Scripts\HoverScript.cs" />

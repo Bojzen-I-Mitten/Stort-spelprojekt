@@ -328,6 +328,13 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.37f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
+
+        ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = 474;
+        ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 474;
+        ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 474;
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 474;
+        ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 474;
+
         string SettingsMasterVolume = UserSettings.GetSetting("Master");
         if (SettingsMasterVolume != null)
         {

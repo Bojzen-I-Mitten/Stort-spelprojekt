@@ -19,7 +19,6 @@ public class Banana : Powerup
     private ChadControls ObjectOwner = null;
 
     private float _BananaTimer;
-    private float _Force;
 
     public override void OnAwake()
     {
@@ -91,7 +90,9 @@ public class Banana : Powerup
         _LastCollider = collider;
         //Check if colliding with a player
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-        if (otherChad && _BananaTimer > 1)
+        ChadControls localChad = MatchSystem.instance.LocalChad;
+
+        if (otherChad && _BananaTimer > 0.1f)
         {
             base.OnCollisionEnter(collider);
         }
@@ -113,14 +114,15 @@ public class Banana : Powerup
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
     {
-        //Debug.Log("Entered activate");
         //Make sure powerups can only be activated once!
         if (activated)
             return;
         activated = true;
+        ChadControls otherChad = null;
+        
+        if(_LastCollider)
+            otherChad = _LastCollider.gameObject.GetComponent<ChadControls>();
 
-        //ChadControls otherChad = colliderObject.GetComponent<ChadControls>();
-        ChadControls otherChad = _LastCollider.gameObject.GetComponent<ChadControls>();
         if (otherChad)
         {
             // rustle his jimmies
