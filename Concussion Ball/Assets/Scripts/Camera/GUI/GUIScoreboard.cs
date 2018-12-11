@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class PlayerText
 {
-    private int Sign; 
+    private int Sign;
     Canvas Canvas;
 
     public Text Name;

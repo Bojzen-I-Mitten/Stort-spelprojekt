@@ -237,6 +237,7 @@ public class NetworkPlayer : NetworkComponent
             }
             else
             {
+                Debug.Log("Reset NetworkPlayer");
                 CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
                 CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
             }
