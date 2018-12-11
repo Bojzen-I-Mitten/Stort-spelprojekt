@@ -169,11 +169,15 @@ public class Banana : Powerup
         }
     }
 
-    //private void SetModels(bool full, bool peel)
-    //{
-    //    RPCSetModels(full, peel);
-    //    SendRPC("RPCSetModels", (bool)full, (bool)peel);
-    //}
+    public override void Reset()
+    {
+        base.Reset();
+
+        m_throwable = true;
+        SetModels(true, false);
+        _LastCollider = null;
+        _BananaTimer = 0.0f;
+    }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
