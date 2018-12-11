@@ -37,14 +37,10 @@ public class NetworkPlayer : NetworkComponent
         }
         set
         {
-            if (_HatIndex != value)
+            if (hatter)
             {
-                if (hatter)
-                {
+                if(_HatIndex != value)
                     UpdateHat(value);
-                }
-                else
-                    _HatIndex = value;
             }
         }
     }
@@ -161,6 +157,7 @@ public class NetworkPlayer : NetworkComponent
     public override bool OnWrite(NetDataWriter writer, bool initialState)
     {
 
+        writer.Put(HatIndex);
         writer.Put(PlayerName);
         writer.Put(ReadyToStart);
         writer.Put(HasTackled);
@@ -183,6 +180,7 @@ public class NetworkPlayer : NetworkComponent
     public override void OnRead(NetDataReader reader, bool initialState)
     {
 
+        HatIndex = reader.GetInt();
         PlayerName = reader.GetString();
         ReadyToStart = reader.GetBool();
         HasTackled = reader.GetInt();
