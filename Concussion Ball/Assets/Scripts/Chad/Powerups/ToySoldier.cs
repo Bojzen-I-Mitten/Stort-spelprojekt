@@ -8,6 +8,7 @@ public class ToySoldier : Powerup
 {
     ChadControls ObjectOwner = null;
     public Material ToySoldierMaterial { get; set; }
+    private float _DespawnTimer;
 
     public override void OnAwake()
     {
@@ -19,17 +20,26 @@ public class ToySoldier : Powerup
         ThrowForce = BaseThrowForce;
         m_throwable = true; // Change depending on power-up
         gameObject.GetComponent<Rigidbody>().Friction = 2.5f;
+        _DespawnTimer = 0.0f;
     }
 
     public override void Update()
     {
         base.Update();
+
+        // Despawn if Vindaloo has not hit anyone in 30 seconds
+        if (_DespawnTimer > 30)
+            base.Activate();
+        else if (_DespawnTimer > 0)
+            _DespawnTimer += Time.DeltaTime;
     }
 
     // If this is a throwable power-up this function will be called
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+
+        _DespawnTimer += Time.DeltaTime;
     }
 
     public override void SaveObjectOwner(ChadControls chad)
@@ -80,6 +90,7 @@ public class ToySoldier : Powerup
                 pickedUp = true;
                 activated = true;
                 StartCoroutine(RemoveToySoldier());
+                _DespawnTimer = 0.0f;
             }
         }
     }
@@ -114,6 +125,7 @@ public class ToySoldier : Powerup
         pickedUp = true;
         activated = true;
         StartCoroutine(RemoveToySoldier());
+        _DespawnTimer = 0.0f;
     }
 
     private IEnumerator RemoveToySoldier()
