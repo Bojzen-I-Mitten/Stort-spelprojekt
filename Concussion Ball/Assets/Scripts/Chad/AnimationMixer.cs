@@ -53,9 +53,10 @@ public class AnimationMixer
         Skin = gameObject.GetComponent<RenderSkinnedComponent>();
         if (!Skin)
             throw new InvalidOperationException("No skinning component found in object.");
-
-        Master = new BlendNode(Skin.model);
+        // Create and apply master blend node
+        Master = new BlendNode(Skin.model, BlendNode.MAX_ANIMATION_BLEND_NODE);
         Weights = Master.generateWeightHandle();
+        Skin.setBlendTreeNode(Master);
     }
 
     private uint emptySlot()

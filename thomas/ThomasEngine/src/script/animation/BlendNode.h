@@ -21,6 +21,9 @@ namespace ThomasEngine
 			thomas::graphics::animation::AnimationNode* Native();
 		public:
 			BlendNode(Model^model);
+			/* Initiate from the model with number of initiated animation slots.
+			*/ 
+			BlendNode(Model ^ model, uint32_t numNode);
 			~BlendNode();
 			/* Max blend node count
 			*/

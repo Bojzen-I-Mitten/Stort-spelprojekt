@@ -17,7 +17,14 @@ namespace ThomasEngine
 	namespace Script
 	{
 		BlendNode::BlendNode(Model ^ model)
+			: BlendNode(model, 0u)
 		{
+		}
+		BlendNode::BlendNode(Model ^ model, uint32_t numNode)
+		{
+			// Assert node count
+			numNode = min(thomas::MAX_ANIMATION_BLEND_NODE, numNode);
+			// Assert model params
 			thomas::resource::Model *m = (thomas::resource::Model*)model->m_nativePtr;
 			thomas::graphics::animation::Skeleton *skel = m->GetSkeleton();
 			if(!skel)
@@ -25,8 +32,7 @@ namespace ThomasEngine
 					"Blend node can't be created: Skeleton does not exist in model " + 
 					Utility::ConvertString(m->GetName()));
 			// Construct wrapped node
-			this->m_node = new thomas::graphics::animation::AnimBlender(*skel);
-
+			this->m_node = new thomas::graphics::animation::AnimBlender(*skel, numNode);
 			m_weightHandle = gcnew WeightHandle(thomas::MAX_ANIMATION_BLEND_NODE);
 			m_node->setWeightMixer(m_weightHandle->Mixer());
 		}

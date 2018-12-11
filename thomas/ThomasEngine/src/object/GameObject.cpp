@@ -387,7 +387,7 @@ namespace ThomasEngine {
 		}
 		catch (System::Exception^ e)
 		{
-			Debug::LogWarning("GetComponentIndex failed due to wpf thread active in serial state in editor.");
+			Debug::LogWarning("GetComponentIndex failed due to wpf thread active in serial state in editor, with error: " + e->Message);
 		}
 		return index;
 	}
