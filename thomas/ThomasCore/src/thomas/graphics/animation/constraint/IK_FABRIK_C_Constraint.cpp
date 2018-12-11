@@ -84,8 +84,12 @@ namespace thomas {
 			{
 				JointInfo& joint = m_joint.get()[index];
 				JointInfo& joint_ii = m_joint.get()[index+1];
+				/* Define the joint and orient it in relation to bone i, 
+				 * joint_ii is required as it constains the transforms from i->ii and ii->i.
+				*/
 				math::Matrix m_ii = joint_ii.backwardOrient * c_orient[1];
-				math::invertY(m_ii);	// Flip Y axis
+				// Flip Y axis, basis is now facing opposite direction of the joint.
+				math::invertY(m_ii);	
 				math::Vector3 p_o = p_c[1];
 				// Apply constraint
 				math::Vector3 p_n = ballJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
@@ -292,6 +296,7 @@ namespace thomas {
 					m_joint.get()[i].base_offset = math::extractRotation(skel.getBone(m_chain.get()[i])._bindPose);
 					m_joint.get()[i].refreshOrient();
 				}
+				return true;
 			}
 			float IK_FABRIK_C_Constraint::getChainLength()
 			{

@@ -78,6 +78,7 @@ namespace ThomasEngine
 
 		WeightHandle ^ BlendNode::generateWeightHandle()
 		{
+			// Implement simplified weight handle system first...!
 			return m_weightHandle;
 		}
 

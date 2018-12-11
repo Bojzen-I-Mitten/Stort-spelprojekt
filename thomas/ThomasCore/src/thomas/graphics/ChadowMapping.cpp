@@ -22,8 +22,8 @@ namespace thomas
 			s_shader = resource::Shader::CreateShader("../Data/FXIncludes/ShadowPassShader.fx");
 			s_material = std::make_unique<resource::Material>(s_shader.get());
 			
-			s_viewPort.Height = size;
-			s_viewPort.Width = size;
+			s_viewPort.Height = float(size);
+			s_viewPort.Width = float(size);
 			s_viewPort.TopLeftY = 0.0f;
 			s_viewPort.TopLeftX = 0.0f;
 			s_viewPort.MinDepth = 0.0f;

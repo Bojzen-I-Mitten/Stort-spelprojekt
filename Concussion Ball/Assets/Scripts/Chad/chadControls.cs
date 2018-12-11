@@ -15,14 +15,26 @@ public class ChadControls : NetworkComponent
 {
     public enum STATE
     {
-        CHADING,   // Idle/moving
+        CHADING,    // Idle/moving
         THROWING,   // player throws ball / power-up, not all power-ups activate this state
-        DIVING,    // user got tackled / hit by a power-up
-        RAGDOLL,    // user pressed Space to jump tackle
+        DIVING,     // user pressed Space to jump tackle
+        RAGDOLL,    // user got tackled / hit by a power-up
 
         NUM_STATES
     };
-    public STATE State { get; private set; }
+    private STATE m_state;
+    public STATE State {
+        get { return m_state; }
+        private set
+        {
+            if(m_state != value)
+            {
+                PrevState = m_state;
+                m_state = value;
+            }
+        }
+    }
+    public STATE PrevState { get; private set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
 
@@ -106,6 +118,7 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.font = PickupFont;
 
         State = STATE.CHADING;
+        PrevState = STATE.NUM_STATES;
 
         // Access rigidbody and apply
         rBody = gameObject.GetComponent<Rigidbody>();
@@ -137,6 +150,7 @@ public class ChadControls : NetworkComponent
         if (this == MatchSystem.instance.LocalChad) // Currently chad is lost control of
             MatchSystem.instance.LocalChad = null;
     }
+    
 
 
     #region camera state
@@ -344,12 +358,11 @@ public class ChadControls : NetworkComponent
     {
         if (Locked)
             return;
-
+        // Reset input
+        Direction = Vector3.Zero;
+        // Read new input
         if (Input.GetKey(Input.Keys.W))
-        {
             Direction.z = 1 + (CurrentVelocity.y / (MaxSpeed*0.5f));
-        }
-            
         if (Input.GetKey(Input.Keys.S))
             Direction.z -= 1;
         if (Input.GetKey(Input.Keys.D))

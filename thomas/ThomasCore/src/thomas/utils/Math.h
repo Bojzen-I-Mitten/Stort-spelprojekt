@@ -69,7 +69,7 @@ namespace DirectX
 		Matrix getMatrixRotationTo_Nor(Vector3 from, Vector3 dest);
 
 
-		void invertY(Matrix& m)
+		inline void invertY(Matrix& m)
 		{
 			m._21 = -m._21;
 			m._22 = -m._22;

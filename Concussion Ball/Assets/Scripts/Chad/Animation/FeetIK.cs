@@ -109,8 +109,8 @@ namespace Concussion_Ball.Assets.Scripts
             {
                 ikTargetWeight = 1;
                 ikOrientWeight = 1;
-                if (Distance < 0.05f)
-                    LockSearch = true;
+                //if (Distance < 0.05f)
+                //    LockSearch = true;
             }
 
             IK.Target = target;

@@ -62,7 +62,7 @@ namespace thomas
 				thomas::math::Vector3 right;
 				thomas::math::Vector3 up;
 				thomas::math::Vector2 rectangleDimensions;
-				float shadowMapIndex;
+				int shadowMapIndex;
 				float shadowHardness;
 			};
 
