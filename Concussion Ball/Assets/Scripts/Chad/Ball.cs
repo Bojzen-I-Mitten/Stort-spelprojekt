@@ -57,6 +57,10 @@ public class Ball : PickupableObject
         MultiplyWithIntensity((float)(0.5f), emitterElectricity2);
         MultiplyWithIntensity((float)(0.5f), emitterElectricity3);
         #endregion
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
     }
     #region Particle handling
     private void ResetFireEmitters()
