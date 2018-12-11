@@ -135,7 +135,7 @@ public class GUIHostMenu : ScriptComponent
     Vector3 Chad2Pos;
     Vector3 Chad2Rot;
 
-    public override void Start()
+    public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
@@ -433,7 +433,7 @@ public class GUIHostMenu : ScriptComponent
             Team2SliderKnob.origin = new Vector2(0.5f, 0.0f);
         }
         #endregion
-        
+
         Caret = Canvas.Add("");
         Caret.origin = new Vector2(0, 0.5f);
         Caret.scale = new Vector2(0.5f);
@@ -735,7 +735,7 @@ public class GUIHostMenu : ScriptComponent
                     DontTakeInput();
                     AdjustMaxPlayers();
 
-                    CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+                    CameraMaster.instance.SetState(CAM_STATE.SELECT_TEAM);
                     //Set match options
                     MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name = Team1.text;
                     MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
@@ -762,7 +762,7 @@ public class GUIHostMenu : ScriptComponent
             if (ExitBtn.Clicked())
             {
                 DontTakeInput();
-                CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+                CameraMaster.instance.SetState(CAM_STATE.MAIN_MENU);
             }
         }
         else
