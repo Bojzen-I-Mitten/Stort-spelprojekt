@@ -66,6 +66,7 @@ public class ChadHud : ScriptComponent
     public Texture2D HeldObjectIconBananaPeel { get; set; }
     public Texture2D HeldObjectIconThomasTrain { get; set; }
     public Texture2D HeldObjectIconBall { get; set; }
+    public Texture2D HeldObjectGramophone { get; set; }
     public Texture2D HeldObjectIconToySoldier { get; set; }
     #endregion
 
@@ -379,6 +380,10 @@ public class ChadHud : ScriptComponent
         {
             HeldObjectIcon.texture = HeldObjectIconBananaPeel;
         }
+        else if (name == "Gramophone")
+        {
+            HeldObjectIcon.texture = HeldObjectGramophone;
+        }
         else if (name == "ToySoldier")
         {
             HeldObjectIcon.texture = HeldObjectIconToySoldier;
@@ -442,24 +447,6 @@ public class ChadHud : ScriptComponent
         Score2BG.color = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color;
     }
 
-    public void ToggleScoreVisability(bool OnOff)
-    {
-        if (!OnOff)
-        {
-            Score1BG.scale = new Vector2(1, 0.7f);
-            Score2BG.scale = new Vector2(1, 0.7f);
-            Score1.scale = new Vector2(1.6f);
-            Score2.scale = new Vector2(1.6f);
-        }
-        else
-        {
-            Score1BG.scale = new Vector2(0);
-            Score2BG.scale = new Vector2(0);
-            Score1.scale = new Vector2(0);
-            Score2.scale = new Vector2(0);
-        }
-    }
-
     private void BallIndicator()
     {
         Vector3 screenPos = cam.WorldToViewport(Vector3.Zero, Ball.transform.world);
@@ -472,7 +459,7 @@ public class ChadHud : ScriptComponent
             Vector3 screenCenter = new Vector3(cam.viewport.size, 0) / 2;
             screenPos -= screenCenter;
 
-            //flip coordinates if more than 90 deg away, makes the math easier and easier to understand
+            //flip coordinates if more than 90 deg away, makes the math simpler and easier to understand
             if (screenPos.z > 1)
             {
                 screenPos *= -1;

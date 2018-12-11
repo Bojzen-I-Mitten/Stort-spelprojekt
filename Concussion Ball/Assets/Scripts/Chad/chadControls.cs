@@ -19,10 +19,11 @@ public class ChadControls : NetworkComponent
         THROWING,   // player throws ball / power-up, not all power-ups activate this state
         DIVING,    // user got tackled / hit by a power-up
         RAGDOLL,    // user pressed Space to jump tackle
+        DANCING,    // user dances to powerup music
 
         NUM_STATES
     };
-    public STATE State { get; private set; }
+    public STATE State { get; set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
 
@@ -223,7 +224,7 @@ public class ChadControls : NetworkComponent
             JumpingTimer += Time.DeltaTime;
 
             Direction = new Vector3(0, 0, 0);
-            if (State != STATE.RAGDOLL)
+            if (State != STATE.RAGDOLL && State != STATE.DANCING)
             {
             if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
             {
@@ -255,6 +256,8 @@ public class ChadControls : NetworkComponent
                 frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
             }
         }
+
+
 #if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {
@@ -590,6 +593,8 @@ public class ChadControls : NetworkComponent
                 //Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
                 //Camera.transform.LookAt(Ragdoll.GetHips().transform);
                 break;
+            case STATE.DANCING:
+                break;
         }
         //if (Input.GetKeyDown(Input.Keys.M))
         //    Debug.Log(CurrentVelocity.Length());
@@ -707,7 +712,7 @@ public class ChadControls : NetworkComponent
             yield return new WaitForSeconds(0.01f);
         }
 
-        PowerupPickupText.renderable = false;
+        PowerupPickupText.rendering = false;
     }
 
     IEnumerator ToySoldierRoutine(float seconds)
@@ -794,7 +799,6 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
-        //Debug.Log("Deactivating aim hud");
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
@@ -880,10 +884,10 @@ public class ChadControls : NetworkComponent
         Color pickupColor = powerupText.color;
         pickupColor.a = 255;
         powerupText.color = pickupColor;
-        powerupText.renderable = true;
+        powerupText.rendering = true;
     }
-
     #endregion
+
     public override void OnRead(NetDataReader reader, bool initialState)
     {
         if (isOwner)
@@ -948,26 +952,30 @@ public class ChadControls : NetworkComponent
 
                 ResetAlpha(ref PowerupPickupText);
 
-                if (pickupable.gameObject.Name == "ball")
-                {
-                    DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
-                }
-                else if (pickupable.gameObject.Name == "Vindaloo")
-                {
-                    DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
-                }
-                else if (pickupable.gameObject.Name == "ThomasTrain")
-                {
-                    DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
-                }
-                else if (pickupable.gameObject.Name == "Banana")
-                {
-                    DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
-                }
-                else if (pickupable.gameObject.Name == "ToySoldier")
-                {
-                    DisplayPowerupText(ref PowerupPickupText, "Picked up Toy Soldier");
-                }
+            if (pickupable.gameObject.Name == "ball")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
+            }
+            else if (pickupable.gameObject.Name == "Vindaloo")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Vindaloo");
+            }
+            else if (pickupable.gameObject.Name == "ThomasTrain")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Thomas Train");
+            }
+            else if (pickupable.gameObject.Name == "Banana")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
+            }
+            else if (pickupable.gameObject.Name == "Gramophone")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Grandmaphone");
+            }
+            else if (pickupable.gameObject.Name == "ToySoldier")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Toy Soldier");
+            }
 
                 FadeText = FadePickupText();
                 StartCoroutine(FadeText);

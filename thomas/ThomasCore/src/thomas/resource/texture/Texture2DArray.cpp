@@ -21,13 +21,14 @@ namespace thomas {
 			if (isDepthTexture)
 			{
 				utils::D3D::Instance()->CreateDepthStencilTextureArray(m_width, m_height, textureInterface, m_srv, nrOfTextures);
+				m_resource = textureInterface;
 			}
 			else
 			{
 				utils::D3D::Instance()->CreateTextureArray(nullptr, m_width, m_height, m_capacity, m_format, textureInterface, m_srv, false, 1);
+				m_resource = textureInterface;	// ;|
 				AddTexture(Texture2D::GetWhiteTexture());
 			}
-			m_resource = textureInterface;
 
 			
 		}
@@ -122,7 +123,7 @@ namespace thomas {
 				initData[i] = m_textures[i]->GetRawBGRAPixels();
 			}
 
-			utils::D3D::Instance()->GetDeviceContext()->UpdateSubresource(m_resource, 0, NULL, &initData, 4 * m_width, 4 * m_width * m_height);
+			utils::D3D::Instance()->GetDeviceContextImmediate()->UpdateSubresource(m_resource, 0, NULL, &initData, 4 * m_width, 4 * m_width * m_height);
 		}
 	}
 }

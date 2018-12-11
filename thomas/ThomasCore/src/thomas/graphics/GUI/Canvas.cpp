@@ -15,7 +15,7 @@ namespace thomas
 		{
 			Canvas::Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution)
 			{
-				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContext());
+				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeferred());
 				m_defaultFont = std::make_unique<Font>("../Data/Fonts/sportNumbers64.spritefont");
 				m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
 				m_camera = cam;
@@ -44,11 +44,12 @@ namespace thomas
 					}
 					m_spriteBatch->SetViewport(GetViewport());
 					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
-
+					lock.lock();
 					for (int i = 0; i < m_GUIElements.size(); ++i)
 					{
 						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport(), GetViewportScale());
 					}
+					lock.unlock();
 
 					m_spriteBatch->End();
 				}
@@ -68,7 +69,7 @@ namespace thomas
 						m_viewport.height * camViewport.height);
 				}
 				else return m_viewport;
-				
+
 			}
 
 			Vector2 Canvas::GetViewportScale()
@@ -87,8 +88,8 @@ namespace thomas
 				Font* font = m_defaultFont.get();
 				std::unique_ptr<GUIElement> newText =
 					std::unique_ptr<GUIElement>(new Text(font, text, this));
+				thomas::utils::atomics::Lock lk(lock);
 				m_GUIElements.push_back(std::move(newText));
-
 				return m_GUIElements[m_GUIElements.size() - 1].get();
 			}
 
@@ -97,8 +98,8 @@ namespace thomas
 				if (texture->GetResourceView())
 				{
 					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, this);
+					thomas::utils::atomics::Lock lk(lock);
 					m_GUIElements.push_back(std::move(image));
-
 					return m_GUIElements[m_GUIElements.size() - 1].get();
 				}
 
@@ -107,6 +108,7 @@ namespace thomas
 
 			void Canvas::Remove(GUIElement* _element)
 			{
+				lock.lock();
 				auto element = m_GUIElements.begin();
 
 				while (element._Ptr->get() != _element && element != m_GUIElements.end())
@@ -116,6 +118,7 @@ namespace thomas
 				{
 					m_GUIElements.erase(element);
 				}
+				lock.unlock();
 			}
 
 			void Canvas::SetRendering(bool render)

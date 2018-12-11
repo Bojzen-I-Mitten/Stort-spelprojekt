@@ -12,13 +12,15 @@ namespace thomas
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
 			std::vector<long long> ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
-			float ProfileManager::s_vramusage;
-			float ProfileManager::s_vrambudget;
+			std::map<std::string, std::vector<float>> ProfileManager::s_vramusage;
+			float ProfileManager::s_vramTotal;
 			unsigned int ProfileManager::s_frames;
-
+			std::atomic<unsigned int> ProfileManager::s_contextSwitch;
+			utils::atomics::SpinLock ProfileManager::s_profileLock;
 			void ProfileManager::resetFrameCounter()
 			{
 				s_frames = 0;
+				s_contextSwitch = 0;
 			}
 
 			void ProfileManager::newFrame()
@@ -37,7 +39,6 @@ namespace thomas
 
 			void ProfileManager::storeSample(std::string name, long long elapsedTime, long long startTime, DWORD processor_id)
 			{
-		
 				s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));
 			}
 
@@ -47,6 +48,18 @@ namespace thomas
 					s_gpuSamples.push_back(0);
 
 				s_gpuSamples.push_back(gpuTime);
+			}
+
+			void ProfileManager::storeVramSample(std::string name, float usage)
+			{
+				s_profileLock.lock();
+				s_vramusage[name].push_back(usage);
+				s_profileLock.unlock();
+			}
+
+			void ProfileManager::increaseContextSwitches()
+			{
+				s_contextSwitch++;
 			}
 
 			//void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
@@ -62,7 +75,7 @@ namespace thomas
 
 				j["SlowfilerData"]["build"]["fps"] = s_fps;
 
-				j["SlowfilerData"]["gpu"] = s_gpuSamples;
+				j["SlowfilerData"]["build"]["gpu"] = s_gpuSamples;
 
 				j["SlowfilerData"]["processor"];
 
@@ -92,9 +105,20 @@ namespace thomas
 					}
 				}
 
-
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
-				j["SlowfilerData"]["build"]["vramUsage"] = s_vramusage;
+				j["SlowfilerData"]["build"]["vramTotal"] = s_vramTotal;
+				j["SlowfilerData"]["build"]["vramUsage"];
+				for (auto& id : s_vramusage)
+				{
+					for (auto& s : id.second)
+					{
+						j["SlowfilerData"]["build"][id.first] += std::to_string(s) + ',';
+					}
+				}
+
+				
+				j["SlowfilerData"]["build"]["contextSwitches"] = s_contextSwitch.load();
+
 				/*
 
 				j["SlowfilerData"]["timeline"];
@@ -129,13 +153,12 @@ namespace thomas
 			}
 			float ProfileManager::getRAMUsage()
 			{
-				return s_ramusage;
+				return s_ramusage - s_vramTotal;
 			}
 
-			void ProfileManager::setVRAMUsage(float usage, float budget)
+			void ProfileManager::setVRAMUsage(float total)
 			{
-				s_vramusage = usage;
-				s_vrambudget = budget;
+				s_vramTotal = total;
 			}
 
 		}

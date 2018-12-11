@@ -49,6 +49,12 @@ namespace ThomasEngine
 	bool Camera::renderGUI::get() { return camera->GetGUIRendering(); }
 	void Camera::renderGUI::set(bool value) { camera->SetGUIRendering(value); }
 
+	bool Camera::orthographic::get() { return camera->GetOrthographic(); }
+	void Camera::orthographic::set(bool value) { camera->SetOrtographic(value); }
+
+	bool Camera::fixedAspectRatio::get() { return camera->GetFixedAspect(); }
+	void Camera::fixedAspectRatio::set(bool value) { camera->SetFixedAspect(value); }
+
 	TextureCube^ Camera::SkyMap::get() 
 	{ 
 		// Ensure skymap is not null

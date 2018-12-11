@@ -3,12 +3,15 @@ using System.Collections;
 
 public class GUIExitMenu : ScriptComponent
 {
-    public Font Font { get; set; }
+    public Font SportNumbers32 { get; set; }
 
     Camera Camera;
     public Canvas Canvas;
     //Text ExitMatch;
     Text ExitGame;
+    Text SwitchTeam;
+
+    public bool _CanSwitchTeam = true;
 
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
@@ -17,12 +20,8 @@ public class GUIExitMenu : ScriptComponent
     {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
-
-        ExitGame = Canvas.Add(_exitGame);
-        ExitGame.font = Font;
-        ExitGame.position = new Vector2(0.4f, 0.25f);
-        ExitGame.color = Color.Black;
-        ExitGame.interactable = true;
+        AddImagesAndText();
+        
     }
 
     public override void Start()
@@ -31,29 +30,56 @@ public class GUIExitMenu : ScriptComponent
 
     public override void Update()
     {
-        if (ExitGame.Hovered())
-            ExitGame.color = Color.Red;
-        else
-            ExitGame.color = Color.Black;
+        ExitGame.color = Color.White;
+        SwitchTeam.color = Color.White;
 
-        if (Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+        if (ExitGame.Hovered())
+            ExitGame.color = Color.IndianRed;
+        else if (SwitchTeam.Hovered() && _CanSwitchTeam)
+            SwitchTeam.color = Color.IndianRed;
+
+        if (ExitGame.Clicked())
         {
-            if (ExitGame.Clicked())
+            if (ThomasWrapper.IsPlaying())
             {
-                Debug.Log("I'm exciting! :^)");
-                if (ThomasWrapper.IsPlaying())
-                {
-                    //Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-                    CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
-                    ThomasWrapper.IssueRestart();
-                    //if (ThomasWrapper.IsPlaying())
-                    //{
-                    //    Debug.Log("Finished reloading to main menu.");
-                    //    CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
-                    //}
-                }       
-            }
+                CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
+                ThomasWrapper.IssueRestart();
+            } 
         }
-        
+        else if (SwitchTeam.Clicked() && _CanSwitchTeam)
+        {
+            CameraMaster.instance.Canvas.isRendering = true;
+            gameObject.GetComponent<ChadCam>().enabled = false;
+            CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+        }
+    }
+
+    private void AddImagesAndText()
+    {
+        #region Text
+
+        #region Exit Game
+        ExitGame = Canvas.Add(_exitGame);
+        ExitGame.position = new Vector2(0.5f, 0.25f);
+        ExitGame.origin = new Vector2(0.5f);
+        ExitGame.color = Color.White;
+        ExitGame.font = SportNumbers32;
+        ExitGame.interactable = true;
+        ExitGame.outline = true;
+        ExitGame.outlineColor = Color.Black;
+        #endregion
+
+        #region Switch Team
+        SwitchTeam = Canvas.Add("Switch Team");
+        SwitchTeam.position = new Vector2(0.5f, 0.30f);
+        SwitchTeam.origin = new Vector2(0.5f);
+        SwitchTeam.color = Color.White;
+        SwitchTeam.font = SportNumbers32;
+        SwitchTeam.interactable = true;
+        SwitchTeam.outline = true;
+        SwitchTeam.outlineColor = Color.Black;
+        #endregion
+
+        #endregion
     }
 }

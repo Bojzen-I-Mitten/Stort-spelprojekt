@@ -91,7 +91,7 @@ namespace ThomasEngine {
 		if (ThomasCore::Initialized())
 		{
 			Component::LoadExternalComponents();
-
+	
 			RenderFinished = gcnew ManualResetEvent(true);
 			UpdateFinished = gcnew ManualResetEvent(false);
 			StateCommandProcessed = gcnew ManualResetEvent(false);
@@ -119,11 +119,11 @@ namespace ThomasEngine {
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef BENCHMARK
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 * 0.001f * 0.001f);
+		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
-		utils::profiling::ProfileManager::setVRAMUsage(profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+
+		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetTotalMemory());
 #endif
 
 	}
@@ -150,7 +150,6 @@ namespace ThomasEngine {
 		GameWindowLoaded->WaitOne();
 		EditorWindowLoaded->WaitOne();
 		// Render thread start
-
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{
@@ -165,7 +164,7 @@ namespace ThomasEngine {
 			RenderFinished->Set();
 			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
-			float gpuTime = utils::D3D::Instance()->GetProfiler()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
+			float gpuTime = utils::profiling::GpuProfiler::Instance()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
 			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
 
 #ifdef BENCHMARK
@@ -241,7 +240,7 @@ namespace ThomasEngine {
 	void ThomasWrapper::CopyCommandList()
 	{
 		PROFILE("CopyCommandList")
-		utils::profiling::GpuProfiler* profiler = utils::D3D::Instance()->GetProfiler();
+		utils::profiling::GpuProfiler* profiler = utils::profiling::GpuProfiler::Instance();
 		if (showStatistics)
 		{
 			ImGui::Begin("Statistics", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
@@ -249,19 +248,19 @@ namespace ThomasEngine {
 			ImGui::Text("Logic Thread: %.02f ms	 Render Thread: %.02f ms", logicTime*1000.0f, renderTime*1000.0f);
 			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
-			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetMemoryUsage(), profiler->GetTotalMemory());
+			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetTotalMemory(), 512.0f);
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
-			ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
-			ImGui::Text("	Window clear: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_CLEAR)*1000.0f);
-			ImGui::Text("	Draw Shadows: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_SHADOWS)*1000.0f);
-			ImGui::Text("	Main objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_MAIN_OBJECTS)*1000.0f);
-			ImGui::Text("	Particles: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_PARTICLES)*1000.0f);
-			ImGui::Text("	Gizmo objects: %0.2f ms", profiler->GetAverageTiming(utils::profiling::GTS_GIZMO_OBJECTS)*1000.0f);
+			//ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
+			ImGui::Text("	Draw Shadows:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_SHADOWS_END)*1000.0f);
+			ImGui::Text("	Main objects:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS_END)*1000.0f);
+			ImGui::Text("	Particles:     %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES_END)*1000.0f);
+			ImGui::Text("	Gizmo objects: %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_GIZMO_OBJECTS_END)*1000.0f);
+			ImGui::Text("    GUI objects:   %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_GUI_END)*1000.0f);
 			ImGui::End();
 		}
 
-		if(WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
-			WindowManager::Instance()->GetEditorWindow()->EndFrame(true);
+		if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())
+			WindowManager::Instance()->GetEditorWindow()->RenderGUIData();
 
 		// Swap command lists
 		thomas::graphics::Renderer::Instance()->TransferCommandList();
@@ -305,7 +304,6 @@ namespace ThomasEngine {
 		playing = IsEditorBuild() ? RunningState::Editor : RunningState::UnInitialized;
 
 		// Update thread start
-
 		ThomasCore::Core().registerThread();
 		while (ThomasCore::Initialized())
 		{

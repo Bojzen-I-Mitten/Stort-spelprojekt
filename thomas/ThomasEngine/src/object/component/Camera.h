@@ -89,6 +89,18 @@ namespace ThomasEngine
 			Viewport get();
 		}
 
+		property bool orthographic
+		{
+			bool get();
+			void set(bool value);
+		}
+
+		property bool fixedAspectRatio
+		{
+			bool get();
+			void set(bool value);
+		}
+
 		/*[BrowsableAttribute(false)]
 		property FLIP_EFFECTS flipEffects
 		{

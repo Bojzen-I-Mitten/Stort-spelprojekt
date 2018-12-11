@@ -158,6 +158,7 @@ public class Powerup : PickupableObject
 
     public void Remove()
     {
+
         RPCRemove();
         SendRPC("RPCRemove");
     }

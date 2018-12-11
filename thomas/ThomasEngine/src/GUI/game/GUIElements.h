@@ -58,6 +58,15 @@ namespace ThomasEngine
 		{
 			Vector2 get();
 		}
+		property bool rendering
+		{
+			void set(bool rendering);
+			bool get();
+		}
+		property float opacity
+		{
+			void set(float opacity);
+		}
 
 		bool Clicked();
 		bool Hovered();
@@ -81,11 +90,13 @@ namespace ThomasEngine
 		property bool outline
 		{
 			void set(bool outline);
+			bool get();
 		}
 
-		property bool renderable
+		property Color outlineColor
 		{
-			void set(bool renderable);
+			void set(Color outlineColor);
+			Color get();
 		}
 	};
 

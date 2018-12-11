@@ -4,74 +4,22 @@
 #include "../Window.h"
 #include "../ThomasCore.h"
 #include "GpuProfiler.h"
+#include "ProfileManager.h"
 #include "DirectXTK/WICTextureLoader.h"
 #include "DirectXTK/DDSTextureLoader.h"
+
+#include <roapi.h>
 #include <AtlBase.h>
 #include <atlconv.h>
 #include <comdef.h>
-#include <string.h>  
-
 #include <DirectXTex.h>
 
 namespace thomas
 {
 	namespace utils
 	{
-		D3D D3D::s_D3D;
-
-		bool D3D::CreateRenderTarget(LONG width, LONG height, ID3D11Texture2D*& buffer, ID3D11RenderTargetView *& rtv, ID3D11ShaderResourceView *& srv, bool multiSample)
-		{
-			D3D11_TEXTURE2D_DESC bufferDesc;
-			ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-			bufferDesc.Width = width;
-			bufferDesc.Height = height;
-			bufferDesc.MipLevels = 1;
-			bufferDesc.ArraySize = 1;
-			bufferDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			bufferDesc.SampleDesc.Count = multiSample ? THOMAS_AA_COUNT : 1;
-			bufferDesc.SampleDesc.Quality = multiSample ? THOMAS_AA_QUALITY : 0;
-			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-			bufferDesc.CPUAccessFlags = 0;
-			bufferDesc.MiscFlags = 0;
-
-			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
-			rtvDesc.Format = bufferDesc.Format;
-			rtvDesc.ViewDimension = (multiSample || THOMAS_AA_COUNT > 1) ?  D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-
-			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-			ZeroMemory(&srvDesc, sizeof(srvDesc));
-			srvDesc.Format = bufferDesc.Format;
-			srvDesc.ViewDimension = (multiSample || THOMAS_AA_COUNT > 1) ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
-
-			srvDesc.Texture2D.MipLevels = 1;
-			srvDesc.Texture2D.MostDetailedMip = 0;
-
-			HRESULT hr = m_device->CreateTexture2D(&bufferDesc, NULL, &buffer);
-			if (SUCCEEDED(hr))
-			{
-				hr = m_device->CreateShaderResourceView(buffer, &srvDesc, &srv);
-				if (FAILED(hr))
-				{
-					LOG_HR(hr);
-					return false;
-				}
-
-				m_device->CreateRenderTargetView(buffer, &rtvDesc, &rtv);
-				if (FAILED(hr))
-				{
-					LOG_HR(hr);
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		bool D3D::CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv)
 		{
-		 
 				D3D11_TEXTURE2D_DESC bufferDesc = {};
 				backbuffer->GetDesc(&bufferDesc);
 
@@ -83,27 +31,24 @@ namespace thomas
 				{
 
 					D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-					ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+					ZeroMemory(&rtvDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
 					rtvDesc.Format = bufferDesc.Format;
 #if THOMAS_AA_COUNT > 1
 					rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-
 #else
 					rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
+#endif
 
 					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-					ZeroMemory(&srvDesc, sizeof(srvDesc));
+					ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
 					srvDesc.Format = bufferDesc.Format;
 #if THOMAS_AA_COUNT > 1
 					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-
 #else
 					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-#endif // THOMAS_AA_COUNT > 1
+#endif
 					srvDesc.Texture2D.MipLevels = 1;
 					srvDesc.Texture2D.MostDetailedMip = 0;
-
 
 					HRESULT hr = m_device->CreateShaderResourceView(buffer, &srvDesc, &srv);
 					if (FAILED(hr))
@@ -164,7 +109,12 @@ namespace thomas
 				TexInitData.pSysMem = initData;
 				TexInitData.SysMemPitch = static_cast<UINT>(4 * width);
 				TexInitData.SysMemSlicePitch = static_cast<UINT>(4 * width * height);
+
 				hr = m_device->CreateTexture2D(&textureDesc, &TexInitData, &tex);
+#ifdef _DEBUG
+				static const char c_szName[] = "Texture2D";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 			else
 				hr = m_device->CreateTexture2D(&textureDesc, NULL, &tex);
@@ -227,10 +177,16 @@ namespace thomas
 					LOG_HR(hr);
 					return false;
 				}
+#ifdef _DEBUG
+				static const char c_szName[] = "TextureRender ";
+				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			}
 
 			return true;
 		}
+
+
 
 		bool D3D::CreateTextureArray(void** initData, int width, int height, int arraySize, DXGI_FORMAT format, ID3D11Texture2D *& texure2D, ID3D11ShaderResourceView *& SRV, bool mipMaps, int mipLevels)
 		{
@@ -258,7 +214,6 @@ namespace thomas
 			textureDesc.MiscFlags = mipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 			HRESULT hr;
-			
 			if (initData)
 			{
 				D3D11_SUBRESOURCE_DATA* texInitData = new D3D11_SUBRESOURCE_DATA[arraySize];
@@ -294,7 +249,10 @@ namespace thomas
 			hr = m_device->CreateShaderResourceView(texure2D, &viewDesc, &SRV);
 			if (FAILED(hr))
 				return false;
-
+#ifdef _DEBUG
+			static const char c_szName[] = "TextureArray";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
 			return true;
 		}
 
@@ -354,72 +312,66 @@ namespace thomas
 			if (FAILED(hr))
 				return false;
 
+#ifdef _DEBUG
+			static const char c_szName[] = "CubeMap";
+			texure2D->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
+#endif
+
 			return true;
 		}
 
 		bool D3D::CreateSwapChain(LONG width, LONG height, HWND handle, IDXGISwapChain3*& swapchain)
 		{
-			IDXGIDevice* dxgiDevice = nullptr;
-			HRESULT hr = m_device->QueryInterface(__uuidof(IDXGIDevice), (void **)& dxgiDevice);
+			IDXGIFactory5* dxgiFactory = nullptr;
+			HRESULT hr = m_dxgiAdapter->GetParent(__uuidof(IDXGIFactory5), (void **)&dxgiFactory);
 			if (SUCCEEDED(hr))
 			{
-				IDXGIAdapter* dxgiAdapter = nullptr;
-				hr = dxgiDevice->GetAdapter(&dxgiAdapter);
+				DXGI_SWAP_CHAIN_DESC1 scd;
+				ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC1));
+				scd.BufferCount = FRAME_BUFFERS;
+				scd.Height = height;
+				scd.Width = width;
+				scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+				scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+				scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+				scd.SampleDesc.Count = 1;
+				scd.SampleDesc.Quality = 0;
+
+				DXGI_SWAP_CHAIN_FULLSCREEN_DESC scdFull;
+				ZeroMemory(&scdFull, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
+				scdFull.RefreshRate.Numerator = 0;
+				scdFull.RefreshRate.Denominator = 1;
+				scdFull.Windowed = true;
+				scdFull.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+				scdFull.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+
+				IDXGISwapChain1* dxgiSwapChain = nullptr;
+				hr = dxgiFactory->CreateSwapChainForHwnd(m_device, handle, &scd, &scdFull, NULL, &dxgiSwapChain);
 				if (SUCCEEDED(hr))
 				{
-					IDXGIFactory* dxgiFactory = nullptr;
-					hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void **)& dxgiFactory);
-					if (SUCCEEDED(hr))
-					{
-						DXGI_SWAP_CHAIN_DESC scd;
-						ZeroMemory(&scd, sizeof(scd));
-
-						scd.BufferCount = FRAME_BUFFERS;
-						scd.BufferDesc.Height = height;
-						scd.BufferDesc.Width = width;
-						scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-						scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
-						scd.OutputWindow = handle;
-						scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
-						scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-
-						scd.SampleDesc.Count = 1;
-						scd.SampleDesc.Quality = 0;
-						scd.Windowed = TRUE;
-						scd.BufferDesc.RefreshRate.Numerator = 0; 
-						scd.BufferDesc.RefreshRate.Denominator = 1; 
-
-						IDXGISwapChain* dxgiSwapChain = nullptr;
-						hr = dxgiFactory->CreateSwapChain(m_device, &scd, &dxgiSwapChain);
-						if (SUCCEEDED(hr))
-						{
-							dxgiSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&swapchain);
-							swapchain->SetMaximumFrameLatency(FRAME_BUFFERS - 1);
-							SAFE_RELEASE(dxgiSwapChain);
-						}
-
-						SAFE_RELEASE(dxgiFactory);
-					}
-					SAFE_RELEASE(dxgiAdapter)
+					dxgiSwapChain->QueryInterface(__uuidof(IDXGISwapChain3), (void**)&swapchain);
+					swapchain->SetMaximumFrameLatency(FRAME_BUFFERS - 1);
+					SAFE_RELEASE(dxgiSwapChain);
 				}
-				SAFE_RELEASE(dxgiDevice);
+
+				SAFE_RELEASE(dxgiFactory);
+				return true;
 			}
 
-			if (FAILED(hr))
-				return false;
-
-			return true;
+		
+			LOG_HR(hr);
+			return false;
 		}
 
 		D3D* D3D::Instance()
 		{
+			static D3D s_D3D;
 			return &s_D3D;
 		}
 
 		bool D3D::Init()
 		{
-			CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-
 			const D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
 			UINT createDeviceFlags = 0;
 			D3D_FEATURE_LEVEL fl;
@@ -428,36 +380,87 @@ namespace thomas
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-			HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, &m_deviceContext);
-			if (FAILED(hr))
-			{
-				LOG_HR(hr);
+#ifdef BENCHMARK
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl);
+#else
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
+#endif
+
+			if (!CreateDeviceContext())
 				return false;
-			}
 
-			ID3D11Multithread* multi = nullptr;
-			hr = m_device->QueryInterface(IID_PPV_ARGS(&multi));
-			if (FAILED(hr))
-			{
-				LOG_HR(hr);
+			if (!CreateDxgiInterface())
 				return false;
-			}
 
-			multi->SetMultithreadProtected(TRUE);
-			SAFE_RELEASE(multi);
-
+			if (!CreateMultiThreadedInterface())
+				return false;
 #ifdef  _DEBUG_DX
 			CreateDebugInterface();
 #endif
-			m_profiler = new profiling::GpuProfiler();
-			return m_profiler->Init();
+			if (!profiling::GpuProfiler::Instance()->Init())
+				return false;
+
+			return true;
 		}
 
 		void D3D::CreateDebugInterface()
 		{
-			HRESULT hr = m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
+			typedef HRESULT(WINAPI * LPDXGIGETDEBUGINTERFACE)(REFIID, void **);
+
+			HMODULE dxgidebug = LoadLibraryEx("DXGIDEBUG.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+			if (dxgidebug)
+			{
+				LPDXGIGETDEBUGINTERFACE DxgiGetDebugInterface = (LPDXGIGETDEBUGINTERFACE)GetProcAddress(dxgidebug, "DXGIGetDebugInterface");
+				HRESULT hr = DxgiGetDebugInterface(__uuidof(IDXGIDebug), (void**)&m_dxgiDebug);
+				if (FAILED(hr))
+					LOG_HR(hr);
+			}
+		}
+
+		bool D3D::CreateDxgiInterface()
+		{
+			HRESULT hr = m_device->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice));
+			if (SUCCEEDED(hr))
+			{
+				IDXGIAdapter* adapter = nullptr;
+				hr = m_dxgiDevice->GetAdapter(&adapter);
+				if (SUCCEEDED(hr))
+				{
+					adapter->QueryInterface(__uuidof(IDXGIAdapter3), (void**)&m_dxgiAdapter);
+					
+					SAFE_RELEASE(adapter);
+					return true;
+				}
+			}
+
+			LOG_HR(hr);
+			return false;
+		}
+
+		bool D3D::CreateDeviceContext()
+		{
+			m_device->GetImmediateContext(&m_deviceContextImmediate);
+			HRESULT hr = m_device->CreateDeferredContext(0, &m_deviceContextDeferred);
 			if (FAILED(hr))
+			{
 				LOG_HR(hr);
+				return false;
+			}
+
+			return true;
+		}
+
+		bool D3D::CreateMultiThreadedInterface()
+		{
+			HRESULT hr = m_deviceContextImmediate->QueryInterface(IID_PPV_ARGS(&m_multiThreaded));
+			if (FAILED(hr))
+			{
+				LOG_HR(hr);
+				return false;
+			}
+
+			m_multiThreaded->SetMultithreadProtected(true);
+			return true;
 		}
 
 		bool D3D::CreateQuery(D3D11_QUERY type, ID3D11Query *& query)
@@ -470,25 +473,66 @@ namespace thomas
 			return SUCCEEDED(hr);
 		}
 
+		void D3D::FinishCommandList(ID3D11CommandList*& commandList)
+		{
+			HRESULT hr = m_deviceContextDeferred->FinishCommandList(false, &commandList);
+			if (FAILED(hr))
+			{
+				LOG_HR(hr);
+				return;
+			}
+		}
+
+		void D3D::ResetCommandList(ID3D11CommandList*& commandList)
+		{
+			SAFE_RELEASE(commandList);
+		}
+
+		void D3D::ExecuteCommandList(ID3D11CommandList* commandList)
+		{
+			m_deviceContextImmediate->ExecuteCommandList(commandList, true);
+		}
+
+		void D3D::EnterCriticalSection()
+		{
+			m_multiThreaded->Enter();
+		}
+
+		void D3D::ExitCriticalSection()
+		{
+			m_multiThreaded->Leave();
+		}
+
+		void D3D::EnableMultithreadProtection(bool value)
+		{
+			m_multiThreaded->SetMultithreadProtected(value);
+		}
+
 		void D3D::Destroy()
 		{
-			m_profiler->Destroy();
-			delete m_profiler;
+			profiling::GpuProfiler::Instance()->Destroy();
 
-			m_deviceContext->ClearState();
-			m_deviceContext->Flush();
+			m_deviceContextImmediate->ClearState();
+			m_deviceContextImmediate->Flush();
 
-			SAFE_RELEASE(m_deviceContext);
+			m_multiThreaded->SetMultithreadProtected(false);
+
+			SAFE_RELEASE(m_dxgiAdapter);
+			SAFE_RELEASE(m_dxgiDevice);
+			SAFE_RELEASE(m_multiThreaded);
+
+			SAFE_RELEASE(m_deviceContextDeferred);
+			SAFE_RELEASE(m_deviceContextImmediate);
 			SAFE_RELEASE(m_device);
 
-			if (m_debug)
-				m_debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+			if (m_dxgiDebug)
+				m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
 
-			SAFE_RELEASE(m_debug);
+			SAFE_RELEASE(m_dxgiDebug);
 		}
 
 		bool D3D::CreateBackBuffer(IDXGISwapChain3* swapchain, ID3D11Texture2D*& backbuffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv, 
-			ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV)
+			ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly)
 		{
 			HRESULT hr = swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backbuffer);
 			if (SUCCEEDED(hr))
@@ -541,20 +585,6 @@ namespace thomas
 						LOG_HR(hr);
 						return false;
 					}
-
-					D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-					ZeroMemory(&srvDesc, sizeof(srvDesc));
-					srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-					srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-					srvDesc.Texture2D.MostDetailedMip = 0;
-					srvDesc.Texture2D.MipLevels = 1;
-
-					hr = m_device->CreateShaderResourceView(depthStencilBuffer, &srvDesc, &depthBufferSRV);
-					if (FAILED(hr))
-					{
-						LOG_HR(hr);
-						return false;
-					}
 				}
 
 				SAFE_RELEASE(depthStencilBuffer);
@@ -599,7 +629,7 @@ namespace thomas
 			return true;
 		}
 
-		bool D3D::CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly)
+		bool D3D::CreateDepthStencilView(ID3D11Texture2D* buffer, ID3D11DepthStencilView *& stencilView, ID3D11DepthStencilView*& depthStencilViewReadOnly, ID3D11ShaderResourceView *& depthBufferSRV)
 		{
 			D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
 			buffer->GetDesc(&depthStencilBufferDesc);
@@ -639,6 +669,24 @@ namespace thomas
 					LOG_HR(hr);
 					return false;
 				}
+
+				D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+				ZeroMemory(&srvDesc, sizeof(srvDesc));
+				srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+#if THOMAS_AA_COUNT > 1
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+#else
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+#endif
+				srvDesc.Texture2D.MostDetailedMip = 0;
+				srvDesc.Texture2D.MipLevels = 1;
+
+				hr = m_device->CreateShaderResourceView(depthStencilBuffer, &srvDesc, &depthBufferSRV);
+				if (FAILED(hr))
+				{
+					LOG_HR(hr);
+					return false;
+				}
 			}
 
 			SAFE_RELEASE(depthStencilBuffer);
@@ -667,7 +715,6 @@ namespace thomas
 			viewDesc.Texture2D.MostDetailedMip = 0;
 
 			HRESULT hr = m_device->CreateTexture2D(&textureDesc, NULL, &tex);
-
 			if (FAILED(hr))
 			{
 				LOG_HR(hr);
@@ -740,13 +787,13 @@ namespace thomas
 			delete[] filename_c;
 
 			HRESULT hr;
-			if (extension_string == ".dds")
+			if (extension_string == ".dds" || extension_string == ".DDS")
 			{
-				hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContext, CA2W(fileName.c_str()), &texture, &textureView);
+				hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
 			}
 			else
 			{
-				hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContext, CA2W(fileName.c_str()), &texture, &textureView);
+				hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
 			}
 
 			if (FAILED(hr))
@@ -759,7 +806,6 @@ namespace thomas
 			return true;
 		}
 		
-
 		bool D3D::LoadCubeTextureFromFile(std::string fileName, ID3D11Resource *& texture, ID3D11ShaderResourceView *& textureView)
 		{
 			char* filename_c = new char[fileName.length() + 1];
@@ -771,15 +817,20 @@ namespace thomas
 			delete[] filename_c;
 
 			HRESULT hr;
-			if (extension_string == ".dds")
-				hr = DirectX::CreateDDSTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
-					D3D11_RESOURCE_MISC_TEXTURECUBE, false, &texture, &textureView, nullptr);
+			if (extension_string == ".dds" || extension_string == ".DDS")
+			{
+				hr = DirectX::CreateDDSTextureFromFileEx(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
+					D3D11_RESOURCE_MISC_TEXTURECUBE, false, &texture, &textureView);
+			}
 			else
-				hr = DirectX::CreateWICTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
+			{
+				hr = DirectX::CreateWICTextureFromFileEx(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0,
 					D3D11_RESOURCE_MISC_TEXTURECUBE, 0, &texture, &textureView);
+			}
 
 			if (FAILED(hr))
 			{
+				LOG("Failed to load texture: " << fileName << " error: ");
 				LOG_HR(hr);
 				return false;
 			}
@@ -813,14 +864,24 @@ namespace thomas
 			return m_device;
 		}
 
-		ID3D11DeviceContext * D3D::GetDeviceContext()
+		ID3D11DeviceContext * D3D::GetDeviceContextDeferred()
 		{
-			return m_deviceContext;
+			return m_deviceContextDeferred;
 		}
 
-		utils::profiling::GpuProfiler* D3D::GetProfiler()
+		ID3D11DeviceContext* D3D::GetDeviceContextImmediate()
 		{
-			return m_profiler;
+			return m_deviceContextImmediate;
+		}
+
+		IDXGIDevice1* D3D::GetDxgiDevice()
+		{
+			return m_dxgiDevice;
+		}
+
+		IDXGIAdapter3* D3D::GetDxgiAdapter()
+		{
+			return m_dxgiAdapter;
 		}
 
 		void D3D::CreateTextureAndViews(UINT width, UINT height, DXGI_FORMAT format, ID3D11Texture2D *& tex, ID3D11ShaderResourceView *& SRV, ID3D11RenderTargetView *& RTV)

@@ -44,12 +44,11 @@ namespace thomas
 					color = Vector4::One;
 					rotation = 0;
 					interactable = false;
-					outline = false;
-					renderable = true;
+					rendering = true;
 					depth = 0;
 					effect = DirectX::SpriteEffects::SpriteEffects_None;
 				}
-				virtual ~GUIElement(){}
+				virtual ~GUIElement(){ }
 
 				Vector2 position;
 				Vector2 scale;
@@ -57,8 +56,7 @@ namespace thomas
 				Vector4 color;
 				float rotation;
 				bool interactable;
-				bool outline;
-				bool renderable;
+				bool rendering;
 				float depth;
 				Canvas* canvas;
 				DirectX::SpriteEffects effect;
@@ -76,7 +74,8 @@ namespace thomas
 					if (!window ||
 						WindowManager::Instance()->GetCurrentBound() == WindowManager::Instance()->GetEditorWindow() ||
 						!canvas->GetRendering() ||
-						!interactable)
+						!interactable ||
+						!rendering)
 						return false;
 
 					Viewport canvasViewport = canvas->GetViewport();
@@ -94,15 +93,10 @@ namespace thomas
 
 				bool Clicked()
 				{
-					if (renderable)
-					{
-						if (WindowManager::Instance()->GetGameInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
-							return Hovered();
-						else
-							return false;
-					}
-
-					return false;
+					if (WindowManager::Instance()->GetGameInput()->GetMouseButtonUp(Input::MouseButtons::LEFT))
+						return Hovered();
+					else
+						return false;
 				}
 			};
 
@@ -110,23 +104,29 @@ namespace thomas
 			{
 				Text() = default;
 				Text(Font* font, std::string text, Canvas* canvas) :
-					font(font), text(text), GUIElement(canvas) {}
+					font(font), text(text), GUIElement(canvas)
+				{
+					outline = false;
+					outlineColor = Vector4(0.0f, 0.0f, 0.0f, 1);
+				}
+				
 				virtual ~Text() {}
 
 				Font* font;
 				std::string text;
+				bool outline;
+				Vector4 outlineColor;
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					if (renderable)
+					if (rendering)
 					{
 						if (outline)
 						{
-							// Only black outline for now	
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, 1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
-							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(1.0f, -1.0f), Vector4(0, 0, 0, color.w), origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2( 1.0f,  1.0f), outlineColor, origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f,  1.0f), outlineColor, origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2(-1.0f, -1.0f), outlineColor, origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
+							font->DrawGUIText(sb, text, (Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height)) + Vector2( 1.0f, -1.0f), outlineColor, origin * PixelSize(), (scale + Vector2(0.01f)) * vpScale, rotation, effect, depth);
 						}
 
 						font->DrawGUIText(sb, text, Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), color, origin * PixelSize(), scale * vpScale, rotation, effect, depth);
@@ -150,7 +150,8 @@ namespace thomas
 
 				void Draw(SpriteBatch* sb, Viewport vp, Vector2 vpScale)
 				{
-					sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
+					if(rendering)
+						sb->Draw(texture->GetResourceView(), Vector2(vp.x, vp.y) + position * Vector2(vp.width, vp.height), nullptr, color, rotation, origin * PixelSize(), scale * vpScale, effect, depth);
 				}
 
 				Vector2 PixelSize()

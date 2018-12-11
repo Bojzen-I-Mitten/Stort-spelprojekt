@@ -32,13 +32,19 @@ namespace ThomasEngine
 
 	void GUIElement::depth::set(float depth) { nativePtr->depth = depth; }
 
-	void GUIElement::flip::set(Vector2 flip) 
-	{ 
+	void GUIElement::flip::set(Vector2 flip)
+	{
 		Vector2 _flip = Vector2(flip.x ? 2.f : 0.f, flip.y ? 1.f : 0.f);
 		nativePtr->effect = (DirectX::SpriteEffects)((int)_flip.x | (int)_flip.y);
 	}
 
 	Vector2 GUIElement::size::get() { return Utility::Convert(nativePtr->Size()); }
+
+	void GUIElement::rendering::set(bool rendering) { nativePtr->rendering = rendering; }
+
+	bool GUIElement::rendering::get() { return nativePtr->rendering; }
+
+	void GUIElement::opacity::set(float opacity) { nativePtr->color.w = opacity; }
 
 	bool GUIElement::Clicked() { return nativePtr->Clicked(); }
 
@@ -51,8 +57,8 @@ namespace ThomasEngine
 
 	String^ Text::text::get() { return Utility::ConvertString(((thomas::graphics::GUI::Text*)nativePtr)->text); }
 
-	void Text::font::set(Font^ font) 
-	{ 
+	void Text::font::set(Font^ font)
+	{
 		if (!font)
 			Debug::LogWarning("Font was null");
 		else
@@ -60,17 +66,15 @@ namespace ThomasEngine
 
 	}
 
-	void Text::outline::set(bool outline)
-	{
-		((thomas::graphics::GUI::Text*)nativePtr)->outline = outline;
-	}
+	void Text::outline::set(bool outline) { ((thomas::graphics::GUI::Text*)nativePtr)->outline = outline; }
 
-	void Text::renderable::set(bool renderable)
-	{
-		((thomas::graphics::GUI::Text*)nativePtr)->renderable = renderable;
-	}
+	bool Text::outline::get() { return ((thomas::graphics::GUI::Text*)nativePtr)->outline; }
+
+	void Text::outlineColor::set(Color outlineColor) { ((thomas::graphics::GUI::Text*)nativePtr)->outlineColor = Utility::Convert(outlineColor); }
+
+	Color Text::outlineColor::get() { return Color(Utility::Convert(((thomas::graphics::GUI::Text*)nativePtr)->outlineColor)); }
 
 	Image::Image(thomas::graphics::GUI::GUIElement* ptr) { nativePtr = ptr; }
 
-	void Image::texture::set(Texture2D^ texture) { ((thomas::graphics::GUI::Image*)nativePtr)->texture = (thomas::resource::Texture2D*)(texture->m_nativePtr);}
+	void Image::texture::set(Texture2D^ texture) { ((thomas::graphics::GUI::Image*)nativePtr)->texture = (thomas::resource::Texture2D*)(texture->m_nativePtr); }
 }

@@ -41,15 +41,16 @@ namespace ThomasEditor
                         {
                             
                             Texture2D tex = res as Texture2D;
-                            
+                            return AssetBrowser.assetImages[type].UriSource.LocalPath;
                             BitmapSource bitmapSource = null;
                             if (!bitmapCache.TryGetValue(tex, out bitmapSource))
                             {
                                 try
                                 {
                                     bitmapSource = BitmapSource.Create(tex.width, tex.height, 300, 300, PixelFormats.Bgra32, BitmapPalettes.WebPaletteTransparent, tex.GetRawPixelData(), tex.width * tex.height * 4, 4 * tex.width);
-                                    
-                                } catch(Exception e)
+
+                                }
+                                catch (Exception e)
                                 {
                                     Debug.LogWarning("Failed to create editor image of texture: " + tex.Name);
                                 }
@@ -103,16 +104,16 @@ namespace ThomasEditor
             InitializeComponent();
             _property = property;
             Title = "Select " + resourceType.Name;
-           
-                       
-            List<object> resources = ThomasEngine.Resources.GetResourcesOfType(resourceType).Cast<object>().ToList();
-           
 
-            if(resourceType == typeof(Material))
+
+            List<object> resources = ThomasEngine.Resources.GetResourcesOfType(resourceType).Cast<object>().ToList();
+
+
+            if (resourceType == typeof(Material))
             {
                 resources.Insert(0, Material.StandardMaterial);
             }
-            else if(resourceType == typeof(Texture2D))
+            else if (resourceType == typeof(Texture2D))
             {
                 resources.Insert(0, Texture2D.blackTexture);
                 resources.Insert(0, Texture2D.whiteTexture);
@@ -121,12 +122,12 @@ namespace ThomasEditor
             {
                 resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.GameObjectsSynced);
             }
-            
+
             else if ((typeof(ThomasEngine.Component).IsAssignableFrom(resourceType)))
             {
                 resources.AddRange(ThomasEngine.ThomasWrapper.CurrentScene.getComponentsOfType(typeof(ThomasEngine.Component)));
             }
-            
+
             resources.Insert(0, "None");
             ResourceList.ItemsSource = resources;
             CollectionViewSource.GetDefaultView(ResourceList.ItemsSource).Filter = ResourcesFilter;
@@ -143,7 +144,8 @@ namespace ThomasEditor
         private void SetPropertyToSelection()
         {
             ThomasWrapper.ENTER_SYNC_STATELOCK();
-            try {
+            try
+            {
                 if (ResourceList.SelectedItem != null)
                 {
                     if (ResourceList.SelectedItem is Resource)
@@ -174,10 +176,11 @@ namespace ThomasEditor
             {
                 Debug.Log("Error at: ThomasEngine::ResourceListPopup with message: " + e.Message);
             }
-            finally {
+            finally
+            {
                 ThomasWrapper.EXIT_SYNC_STATELOCK();
             }
-            if(OnPropertyChanged != null)
+            if (OnPropertyChanged != null)
                 OnPropertyChanged();
         }
 
@@ -195,7 +198,7 @@ namespace ThomasEditor
             {
                 if (item is String)
                     return true;
-                else if(item is Resource)
+                else if (item is Resource)
                 {
                     return ((item as Resource).ToString().IndexOf(ResourceFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
                 }
