@@ -735,9 +735,26 @@ public class ChadControls : NetworkComponent
         rBody.Mass = OriginalMass;
         rBody.AddForce(new Vector3(0, 200.0f, 0), Rigidbody.ForceMode.Impulse);
 
-        // This needs sync over network as well
-        RPCResetMaterial();
+        // Network
         SendRPC("RPCResetMaterial");
+
+        // Local
+        if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_1)
+        {
+            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
+            render.SetMaterial(0, ChadFirstMaterial);
+            render.SetMaterial(1, ChadSecondMaterial);
+            render.SetMaterial(2, ChadThirdMaterial);
+        }
+        else if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_2)
+        {
+            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
+            render.SetMaterial(0, ChadFirstMaterial);
+            render.SetMaterial(1, ChadSecondMaterial);
+            render.SetMaterial(2, ChadThirdMaterial);
+        }
 
         ScaleCountdown = ScaleDuration;
         ToySoldierAffected = false;
@@ -746,12 +763,22 @@ public class ChadControls : NetworkComponent
 
     public void RPCResetMaterial()
     {
-        // Need to reset this to the correct team color
-        RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-        ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject)].Color);
-        render.SetMaterial(0, ChadFirstMaterial);
-        render.SetMaterial(1, ChadSecondMaterial);
-        render.SetMaterial(2, ChadThirdMaterial);
+        if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_1)
+        {
+            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
+            render.SetMaterial(0, ChadFirstMaterial);
+            render.SetMaterial(1, ChadSecondMaterial);
+            render.SetMaterial(2, ChadThirdMaterial);
+        }
+        else if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_2)
+        {
+            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
+            render.SetMaterial(0, ChadFirstMaterial);
+            render.SetMaterial(1, ChadSecondMaterial);
+            render.SetMaterial(2, ChadThirdMaterial);
+        }
     }
 
     public void RPCSetAnimWeight(int index, float weight)
