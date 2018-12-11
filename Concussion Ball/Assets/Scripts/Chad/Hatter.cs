@@ -23,9 +23,11 @@ public class Hatter : ScriptComponent
 
     public bool SetHat(int hatIndex)
     {
-        hat = HatManager.Instance?.GetHat(hatIndex);
-        if (hat != null)
+        HatManager.Hat newHat = HatManager.Instance?.GetHat(hatIndex);
+        
+        if (newHat != null && hat != newHat)
         {
+            hat = newHat;
             HatRenderer.model = hat.hatModel;
             HatRenderer.material = hat.material;
             if(HatRenderer.materials.Length == 2)

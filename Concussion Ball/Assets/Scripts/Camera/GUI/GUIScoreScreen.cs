@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class GUIScoreScreen : ScriptComponent
 {
     public static GUIScoreScreen Instance = null;
-    Camera cam;
+    Camera Camera;
     public Canvas Canvas;
     public int ScoreScreenTimeLast { get; set; } = 10;
     public int Timer;
@@ -20,9 +20,10 @@ public class GUIScoreScreen : ScriptComponent
     public override void OnAwake()
     {
         Instance = this;
-
+        enabled = false;
         Timer = ScoreScreenTimeLast + 1;
-        Canvas = gameObject.GetComponent<Camera>().AddCanvas();
+        Camera = gameObject.GetComponent<Camera>();
+        Canvas = Camera.AddCanvas();
         Textdatalist.Add(Canvas.Add("Play again: "));
         Textdatalist.Add(Canvas.Add("Main Menu"));
         Textdatalist.Add(Canvas.Add(""));
@@ -66,7 +67,7 @@ public class GUIScoreScreen : ScriptComponent
             if (ThomasWrapper.IsPlaying())
             {
                 Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
-                CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
+                CameraMaster.instance.SetState(CAM_STATE.LOADING_SCREEN);
                 ThomasWrapper.IssueRestart();
             }
         }

@@ -67,7 +67,7 @@ public class ChadCam : ScriptComponent
 
     public override void Update()
     {
-        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying && CameraMaster.instance.GetState() == CAM_STATE.GAME)
         {
             switch (Chad.State)
             {
@@ -153,7 +153,7 @@ public class ChadCam : ScriptComponent
 
     public override void FixedUpdate()
     {
-        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying)
+        if (Chad && !MatchSystem.instance.ReplaySystem.Replaying && CameraMaster.instance.GetState() == CAM_STATE.GAME)
         {
             float actualOffset = 0;
             if (Chad.State != ChadControls.STATE.THROWING)

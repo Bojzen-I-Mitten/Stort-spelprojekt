@@ -21,7 +21,7 @@ public class HighlightParent : ScriptComponent
         Shader s = Shader.Find("HighlightObject");
         highLightMat = new Material(s);
         highLightMat.SetColor("color", Color);
-        //highLightMat->SetRenderQueue(2001);
+        highLightMat.SetRenderQueue(2002);
         
         RenderComponent rc = gameObject.AddComponent<RenderComponent>();
         rc.model = gameObject.transform.parent.gameObject.GetComponent<RenderComponent>().model;

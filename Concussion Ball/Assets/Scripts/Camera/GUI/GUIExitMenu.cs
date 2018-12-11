@@ -42,7 +42,7 @@ public class GUIExitMenu : ScriptComponent
         {
             if (ThomasWrapper.IsPlaying())
             {
-                CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
+                CameraMaster.instance.SetState(CAM_STATE.LOADING_SCREEN);
                 ThomasWrapper.IssueRestart();
             } 
         }
@@ -50,7 +50,7 @@ public class GUIExitMenu : ScriptComponent
         {
             CameraMaster.instance.Canvas.isRendering = true;
             gameObject.GetComponent<ChadCam>().enabled = false;
-            CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+            CameraMaster.instance.SetState(CAM_STATE.SELECT_TEAM);
         }
     }
 
