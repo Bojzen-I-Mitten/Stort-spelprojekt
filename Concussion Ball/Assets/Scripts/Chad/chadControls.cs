@@ -441,7 +441,8 @@ public class ChadControls : NetworkComponent
 
     private void ResetThrow()
     {
-        ChadHud.Instance.DeactivateAimHUD();
+        if (isOwner)
+            ChadHud.Instance.DeactivateAimHUD();
         SendRPC("RPCResetThrow");
         RPCResetThrow();
     }
@@ -675,7 +676,8 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
-        ChadHud.Instance.DeactivateAimHUD();
+        if (isOwner)
+            ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
         Vector3 chosenDirection = ChadCam.instance.transform.forward;
