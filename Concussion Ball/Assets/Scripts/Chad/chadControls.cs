@@ -17,24 +17,13 @@ public class ChadControls : NetworkComponent
     {
         CHADING,    // Idle/moving
         THROWING,   // player throws ball / power-up, not all power-ups activate this state
-        DIVING,     // user pressed Space to jump tackle
-        RAGDOLL,    // user got tackled / hit by a power-up
+        DIVING,    // user got tackled / hit by a power-up
+        RAGDOLL,    // user pressed Space to jump tackle
+        DANCING,    // user dances to powerup music
 
         NUM_STATES
     };
-    private STATE m_state;
-    public STATE State {
-        get { return m_state; }
-        private set
-        {
-            if(m_state != value)
-            {
-                PrevState = m_state;
-                m_state = value;
-            }
-        }
-    }
-    public STATE PrevState { get; private set; }
+    public STATE State { get; set; }
     public bool Locked = false;
     public bool CanBeTackled = true;
 
@@ -183,7 +172,7 @@ public class ChadControls : NetworkComponent
             JumpingTimer += Time.DeltaTime;
 
             Direction = new Vector3(0, 0, 0);
-            if (State != STATE.RAGDOLL)
+            if (State != STATE.RAGDOLL && State != STATE.DANCING)
             {
             if (CameraMaster.instance.State != CAM_STATE.EXIT_MENU)
             {
@@ -215,6 +204,8 @@ public class ChadControls : NetworkComponent
                 frameRagdollDisableTick = FRAME_TICK_WAIT_RAGDOLL;
             }
         }
+
+
 #if (L_FOR_RAGDOLL)
         if (Input.GetKeyDown(Input.Keys.L))
         {
@@ -549,6 +540,8 @@ public class ChadControls : NetworkComponent
                 //Camera.transform.position = Ragdoll.GetHips().transform.position + new Vector3(0, 1, 3);
                 //Camera.transform.LookAt(Ragdoll.GetHips().transform);
                 break;
+            case STATE.DANCING:
+                break;
         }
         //if (Input.GetKeyDown(Input.Keys.M))
         //    Debug.Log(CurrentVelocity.Length());
@@ -666,7 +659,7 @@ public class ChadControls : NetworkComponent
             yield return new WaitForSeconds(0.01f);
         }
 
-        PowerupPickupText.renderable = false;
+        PowerupPickupText.rendering = false;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
@@ -683,7 +676,6 @@ public class ChadControls : NetworkComponent
 
     IEnumerator PlayThrowAnim()
     {
-        //Debug.Log("Deactivating aim hud");
         ChadHud.Instance.DeactivateAimHUD();
         RPCStartThrow();
         SendRPC("RPCStartThrow");
@@ -769,10 +761,10 @@ public class ChadControls : NetworkComponent
         Color pickupColor = powerupText.color;
         pickupColor.a = 255;
         powerupText.color = pickupColor;
-        powerupText.renderable = true;
+        powerupText.rendering = true;
     }
-
     #endregion
+
     public override void OnRead(NetDataReader reader, bool initialState)
     {
         if (isOwner)
@@ -850,6 +842,10 @@ public class ChadControls : NetworkComponent
             else if (pickupable.gameObject.Name == "Banana")
             {
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Banana");
+            }
+            else if (pickupable.gameObject.Name == "Gramophone")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Grandmaphone");
             }
 
             FadeText = FadePickupText();
