@@ -56,7 +56,9 @@ public class Banana : Powerup
             {
                 //Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
                 // Despawn
-                base.OnCollisionEnter(_LastCollider);
+                base.Activate();
+                _BananaTimer = 0.0f;
+                //base.OnCollisionEnter(_LastCollider);
             }
             else if (_BananaTimer > 0)
             {

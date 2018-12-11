@@ -83,7 +83,7 @@ public class Powerup : PickupableObject
         {
             spawner.Free();
             spawner = null;
-            Debug.Log("Cleared spawner");
+            //Debug.Log("Cleared spawner");
         }
             
     }
@@ -98,7 +98,7 @@ public class Powerup : PickupableObject
             {
                 if (!activated)
                 {
-                    Debug.Log("boom!");
+                    //Debug.Log("boom!");
                     Activate();
                     activated = true;
                 }

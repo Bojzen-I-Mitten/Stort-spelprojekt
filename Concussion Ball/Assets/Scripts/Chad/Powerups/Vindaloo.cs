@@ -129,7 +129,10 @@ public class Vindaloo : Powerup
 
         // Despawn if Vindaloo has not hit anyone in 30 seconds
         if (_DespawnTimer > 30)
+        {
+            _DespawnTimer = 0.0f;
             base.Activate();
+        }
         else if (_DespawnTimer > 0)
             _DespawnTimer += Time.DeltaTime;
         
@@ -225,5 +228,11 @@ public class Vindaloo : Powerup
         yield return null;
 
         Remove();
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        _DespawnTimer = 0.0f;
     }
 }

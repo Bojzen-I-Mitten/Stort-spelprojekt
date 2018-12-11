@@ -32,6 +32,9 @@ public class Gramophone : Powerup
     private bool _Landed;
     private float _Timer;
 
+    private float _DespawnTimer;
+    private float _DespawnTime;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -51,6 +54,9 @@ public class Gramophone : Powerup
         _SpawnedLight = false;
         _Landed = false;
         _Timer = 0.0f;
+
+        _DespawnTimer = 0.0f;
+        _DespawnTime = 30.0f;
 
         GramophoneClip = gameObject.AddComponent<SoundComponent>();
         GramophoneClip.Type = SoundComponent.SoundType.Effect;
@@ -154,6 +160,18 @@ public class Gramophone : Powerup
                     PointBoi.enabled = false;
                 }
             }
+
+            // Despawn if thrown off edge 
+            if (_DespawnTimer > 0)
+            {
+                _DespawnTimer += Time.DeltaTime;
+                if (_DespawnTimer > _DespawnTime)
+                {
+                    base.Activate();
+                    _DespawnTimer = 0.0f;
+                }
+            }
+
             if (_Landed)
             {
                 m_rigidBody.LinearVelocity = Vector3.Zero;
@@ -188,6 +206,8 @@ public class Gramophone : Powerup
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+
+        _DespawnTimer += Time.DeltaTime;
     }
 
     public override void OnCollisionEnter(Collider collider)
@@ -286,9 +306,9 @@ public class Gramophone : Powerup
         }
         //_Timer = 0.0f;
         GramophoneClip.Stop();
-        float distance2 = Vector3.Distance(localChad.transform.position, transform.position);
 
-        if (localChad && distance2 < ExplosionRadius)
+        // Reset all dancing Chads, the party is over
+        if (localChad.State == ChadControls.STATE.DANCING)
             localChad.State = ChadControls.STATE.CHADING;
 
         Explosion();
@@ -314,6 +334,9 @@ public class Gramophone : Powerup
         _Landed = false;
         _JumpTimer = 0.0f;
         _Timer = 0.0f;
+
+        _DespawnTimer = 0.0f;
+        _DespawnTime = 30.0f;
     }
 
     // COLOR CALCS FROM ALBIN
