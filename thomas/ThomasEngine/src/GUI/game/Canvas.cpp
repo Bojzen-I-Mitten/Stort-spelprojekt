@@ -8,6 +8,8 @@
 #include "../../object/component/Camera.h"
 #include "../../math/Viewport.h"
 #include "../../resource/texture/Texture2D.h"
+#include "../../ThomasManaged.h"
+#include "../../Scene.h"
 
 namespace ThomasEngine
 {
@@ -27,7 +29,9 @@ namespace ThomasEngine
 	{
 		this->camera = nullptr;
 		nativePtr = new thomas::graphics::GUI::Canvas(Utility::Convert(viewport), nullptr, Utility::Convert(viewport.size));
+		ThomasWrapper::CurrentScene->AddLooseNative(nativePtr);
 	}
+
 
 	Viewport Canvas::viewport::get()
 	{ 

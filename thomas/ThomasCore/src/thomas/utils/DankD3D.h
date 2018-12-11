@@ -688,8 +688,8 @@ inline void D3D11CreateDevice(_In_opt_ IDXGIAdapter* pAdapter,
 	UINT Flags,
 	_In_reads_opt_(FeatureLevels) CONST D3D_FEATURE_LEVEL* pFeatureLevels,
 	UINT FeatureLevels,
-	ID3D11Device** ppDevice,
 	UINT SDKVersion,
+	ID3D11Device** ppDevice,
 	_Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel)
 {
 	*ppDevice = new thomas::utils::DankDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, pFeatureLevel);
