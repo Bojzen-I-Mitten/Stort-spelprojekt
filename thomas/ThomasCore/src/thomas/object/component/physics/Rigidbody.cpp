@@ -426,14 +426,14 @@ namespace thomas
 			math::Vector3 Rigidbody::GetPosition()
 			{
 				btTransform trans = getCenterOfMassTransform();
-				//getMotionState()->getWorldTransform(trans);
+				getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getOrigin());
 			}
 
 			math::Quaternion Rigidbody::GetRotation()
 			{
 				btTransform trans = getCenterOfMassTransform();
-				//getMotionState()->getWorldTransform(trans);
+				getMotionState()->getWorldTransform(trans);
 				return Physics::ToSimple(trans.getRotation());
 			}
 
