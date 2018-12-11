@@ -39,7 +39,7 @@ public class ChadCam : ScriptComponent
     private Vector3 ThrowingOffsetDirection = new Vector3(0.64f, 0.0f, 0.77f);
     public float ThrowingOffset { get; set; } = 1.56f;
     //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
-    private Vector3 ChadHead { get { if (Chad) return Chad.transform.position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
+    private Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private Vector2 velocity { get { if (Chad) return Chad.CurrentVelocity; else return new Vector2(0); } }
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
@@ -85,9 +85,9 @@ public class ChadCam : ScriptComponent
                     }
                     else
                     {
-                        ResetCamera();
-                        transform.rotation = Chad.transform.rotation;
-                        transform.position = ChadHead + CameraOffset * -transform.forward;
+                        //ResetCamera();
+                        //transform.rotation = Chad.transform.rotation;
+                        //transform.position = ChadHead + CameraOffset * -transform.forward;
                     }
                     break;
                 case ChadControls.STATE.THROWING:
@@ -95,9 +95,9 @@ public class ChadCam : ScriptComponent
                         ThrowingCamera();
                     else
                     {
-                        ResetCamera();
-                        transform.rotation = Chad.transform.rotation;
-                        transform.position = ChadHead + CameraOffset * -transform.forward;
+                        //ResetCamera();
+                        //transform.rotation = Chad.transform.rotation;
+                        //transform.position = ChadHead + CameraOffset * -transform.forward;
                     }
                     break;
                 case ChadControls.STATE.RAGDOLL:
@@ -107,9 +107,9 @@ public class ChadCam : ScriptComponent
                     }
                     else
                     {
-                        ResetCamera();
-                        transform.rotation = Chad.transform.rotation;
-                        transform.position = ChadHead + CameraOffset * -transform.forward;
+                        //ResetCamera();
+                        //transform.rotation = Chad.transform.rotation;
+                        //transform.position = ChadHead + CameraOffset * -transform.forward;
                     }
                     break;
             }
@@ -183,7 +183,7 @@ public class ChadCam : ScriptComponent
             Ray ray = new Ray(ChadHead, -transform.forward);
             RaycastHit rayInfo;
             int collisionMask = ~Physics.GetCollisionGroupBit("Chad");
-            if(Physics.Raycast(ray, out rayInfo, actualOffset, collisionMask))
+            if (Physics.Raycast(ray, out rayInfo, actualOffset, collisionMask))
             {
                 actualOffset = rayInfo.distance - 0.1f;
             }
