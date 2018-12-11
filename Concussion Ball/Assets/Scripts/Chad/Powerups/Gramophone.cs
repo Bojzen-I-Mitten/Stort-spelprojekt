@@ -286,31 +286,15 @@ public class Gramophone : Powerup
         }
         //_Timer = 0.0f;
         GramophoneClip.Stop();
-        if (localChad)
+        float distance2 = Vector3.Distance(localChad.transform.position, transform.position);
+
+        if (localChad && distance2 < ExplosionRadius)
             localChad.State = ChadControls.STATE.CHADING;
 
         Explosion();
         
   
     }
-
-    //public override void Disable()
-    //{
-    //    base.Disable();
-    //    //StopCoroutine(BlastingMusic());
-    //    //if (PointBoi)
-    //    //{
-    //    //    _SpawnedLight = false;
-    //    //    PointBoi.enabled = false;
-    //    //}
-    //    //if (_Note1 && _Note2)
-    //    //{
-    //    //    _Note1.Emit = false;
-    //    //    _Note2.Emit = false;
-    //    //}
-    //    //_Landed = false;
-    //    //_JumpTimer = 0.0f;
-    //}
 
     public override void Reset()
     {
