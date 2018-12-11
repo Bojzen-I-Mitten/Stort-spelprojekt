@@ -54,11 +54,9 @@ public class Banana : Powerup
         {
             if (_BananaTimer > DespawnTime)
             {
-                //Debug.Log("Banana not triggered for: " + DespawnTime + " seconds.");
                 // Despawn
                 base.Activate();
                 _BananaTimer = 0.0f;
-                //base.OnCollisionEnter(_LastCollider);
             }
             else if (_BananaTimer > 0)
             {
@@ -67,7 +65,6 @@ public class Banana : Powerup
                 // If Banana falls on side, reset
                 if (m_rigidBody.LinearVelocity.y < 0.1f && (gameObject.transform.rotation.x > 0.4f || gameObject.transform.rotation.z > 0.4f))
                 {
-                    //Debug.Log("Banana fell on side");
                     gameObject.transform.rotation = Quaternion.CreateFromYawPitchRoll(0, 0, 0);
                 }
             }
@@ -94,7 +91,7 @@ public class Banana : Powerup
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
-        if (otherChad && _BananaTimer > 0.1f)
+        if (otherChad && _BananaTimer > 0.1f && otherChad != ObjectOwner || ObjectOwner && _BananaTimer > 0.5f)
         {
             base.OnCollisionEnter(collider);
         }
@@ -134,7 +131,7 @@ public class Banana : Powerup
             param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 5.0f;
             param.bodyPartFactor[(int)Ragdoll.BODYPART.HEAD] = -2.0f;
             param.force = otherChad.transform.forward * otherChad.CurrentVelocity.y * 50.0f;
-            otherChad.ActivateRagdoll(4.0f, param);
+            otherChad.ActivateRagdoll(3.0f, param);
             SlipSound.Play();
         }
         
