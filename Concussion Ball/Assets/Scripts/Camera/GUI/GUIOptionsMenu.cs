@@ -69,10 +69,12 @@ public class ImageBaradjustment
         float valuecalculator = ((numbervalue) * 3.15f);
         Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2(valuecalculator, 1);
 
-       //   Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x* Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x)
-        //      - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x),Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
-         //   Debug.Log((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x));
+              //   Debug.Log((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x));
         Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(-1, -1);
+        /*
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x * Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x * 3.15f) / (Canvas.camera.viewport.size.x)
+       + Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].position.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
+       */
     }
     public void update()
     {
@@ -119,12 +121,15 @@ public class GUIOptionsMenu : ScriptComponent
         SFX_TEXT,
         MOVEMENTSENSE_TEXT,
         AIMSENSE_TEXT,
+        ANOUNCER_TEXT,
         Fullscreen_TEXT,
         BorderLess_Text,
         FullscreenOn_TEXT,
         BorderLessOn_Text,
         FullscreenOff_TEXT,
         BorderLessOff_Text,
+        AnnouncerOn_Text,
+        AnnouncerOff_Text,
         NUMSTATES
     }
     public enum ImageBarstate
@@ -279,6 +284,45 @@ public class GUIOptionsMenu : ScriptComponent
             Text[(int)Textstate.FullscreenOn_TEXT].color = Unselected;
         }
 
+
+
+
+        //////////////
+        //AnnouncerOff_Text
+        if (Text[(int)Textstate.AnnouncerOff_Text].Clicked())
+        {
+           //droppa instancen här toggla av,
+            //     Debug.Log("button clicked C#");
+            Text[(int)Textstate.AnnouncerOff_Text].interactable = false;
+            Text[(int)Textstate.AnnouncerOn_Text].interactable = true;
+        }
+
+        if (Text[(int)Textstate.AnnouncerOff_Text].Hovered())
+            Text[(int)Textstate.AnnouncerOff_Text].color = Selected;
+        else if (Text[(int)Textstate.AnnouncerOff_Text].interactable != false)
+        {
+            Text[(int)Textstate.AnnouncerOff_Text].color = Unselected;
+        }
+
+
+        //AnnouncerOn_Text
+        if (Text[(int)Textstate.AnnouncerOn_Text].Clicked())
+        {
+           //droppa instancen här toogla på
+            //   Debug.Log("button clicked C#");
+            Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
+            Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
+        }
+
+        if (Text[(int)Textstate.AnnouncerOn_Text].Hovered())
+            Text[(int)Textstate.AnnouncerOn_Text].color = Selected;
+        else if (Text[(int)Textstate.AnnouncerOn_Text].interactable != false)
+        {
+            Text[(int)Textstate.AnnouncerOn_Text].color = Unselected;
+        }
+
+
+
     }
     void BackbuttonClicked()
     {
@@ -296,25 +340,30 @@ public class GUIOptionsMenu : ScriptComponent
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
-        Text[(int)Textstate.BACK_TEXT] = Canvas.Add("Back"); Text[(int)Textstate.BACK_TEXT].position = new Vector2(0.01f, 0.85f); Text[(int)Textstate.BACK_TEXT].interactable = true;
+        Text[(int)Textstate.BACK_TEXT] = Canvas.Add("Back"); Text[(int)Textstate.BACK_TEXT].position = new Vector2(0.01f, 0.85f+0.05f); Text[(int)Textstate.BACK_TEXT].interactable = true;
         Text[(int)Textstate.OPTIONS_TEXT] = Canvas.Add("OPTIONS"); Text[(int)Textstate.OPTIONS_TEXT].scale = new Vector2(1.4f, 1.2f); Text[(int)Textstate.OPTIONS_TEXT].position = new Vector2(0, 0.1f);
-        Text[(int)Textstate.AIMSENSE_TEXT] = Canvas.Add("Aim"); Text[(int)Textstate.AIMSENSE_TEXT].position = new Vector2(0.02f, 0.55f);
-        Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.5f);
+        Text[(int)Textstate.AIMSENSE_TEXT] = Canvas.Add("Aim"); Text[(int)Textstate.AIMSENSE_TEXT].position = new Vector2(0.02f, 0.60f);
+        Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.55f);
         Text[(int)Textstate.MASTERVOLUME_TEXT] = Canvas.Add("MasterVolume"); Text[(int)Textstate.MASTERVOLUME_TEXT].position = new Vector2(0.02f, 0.27f);
         Text[(int)Textstate.MUSIC_TEXT] = Canvas.Add("Music"); Text[(int)Textstate.MUSIC_TEXT].position = new Vector2(0.02f, 0.32f);
         Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.02f, 0.37f);
+        Text[(int)Textstate.ANOUNCER_TEXT] = Canvas.Add("Announcer"); Text[(int)Textstate.ANOUNCER_TEXT].position = new Vector2(0.02f, 0.42f);
         Text[(int)Textstate.Music_Area_Text] = Canvas.Add("Audio"); Text[1].scale = new Vector2(0.75f); Text[(int)Textstate.Music_Area_Text].position = new Vector2(0.01f, 0.2f);
-        Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.42f);
+        Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.47f);
         
-        Text[(int)Textstate.Window_Text] = Canvas.Add("Window"); Text[(int)Textstate.Window_Text].scale = new Vector2(0.75f); Text[(int)Textstate.Window_Text].position = new Vector2(0.01f, 0.64f);
+        Text[(int)Textstate.Window_Text] = Canvas.Add("Window"); Text[(int)Textstate.Window_Text].scale = new Vector2(0.75f); Text[(int)Textstate.Window_Text].position = new Vector2(0.01f, 0.64f+0.05f);
         ///////////////////////////////////////////////////////////////////
-        Text[(int)Textstate.Fullscreen_TEXT] = Canvas.Add("FullScreen"); Text[(int)Textstate.Fullscreen_TEXT].position = new Vector2(0.02f, 0.72f);
-        Text[(int)Textstate.FullscreenOff_TEXT] = Canvas.Add("Off"); Text[(int)Textstate.FullscreenOff_TEXT].interactable = true; Text[(int)Textstate.FullscreenOff_TEXT].position = new Vector2(0.17f, 0.72f);
-        Text[(int)Textstate.FullscreenOn_TEXT] = Canvas.Add("On"); Text[(int)Textstate.FullscreenOn_TEXT].interactable = true; Text[(int)Textstate.FullscreenOn_TEXT].position = new Vector2(0.21f, 0.72f);
+        Text[(int)Textstate.Fullscreen_TEXT] = Canvas.Add("FullScreen"); Text[(int)Textstate.Fullscreen_TEXT].position = new Vector2(0.02f, 0.72f + 0.05f);
+        Text[(int)Textstate.FullscreenOff_TEXT] = Canvas.Add("Off"); Text[(int)Textstate.FullscreenOff_TEXT].interactable = true; Text[(int)Textstate.FullscreenOff_TEXT].position = new Vector2(0.17f, 0.72f + 0.05f);
+        Text[(int)Textstate.FullscreenOn_TEXT] = Canvas.Add("On"); Text[(int)Textstate.FullscreenOn_TEXT].interactable = true; Text[(int)Textstate.FullscreenOn_TEXT].position = new Vector2(0.21f, 0.72f + 0.05f);
         ///////////////////////////////////////////////////////////////////
-        Text[(int)Textstate.BorderLess_Text] = Canvas.Add("BorderLess");  Text[(int)Textstate.BorderLess_Text].position = new Vector2(0.02f, 0.77f);
-        Text[(int)Textstate.BorderLessOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.BorderLessOff_Text].interactable = true; Text[(int)Textstate.BorderLessOff_Text].position = new Vector2(0.17f, 0.77f);
-        Text[(int)Textstate.BorderLessOn_Text] = Canvas.Add("On"); Text[(int)Textstate.BorderLessOn_Text].interactable = true; Text[(int)Textstate.BorderLessOn_Text].position = new Vector2(0.21f, 0.77f);
+        Text[(int)Textstate.BorderLess_Text] = Canvas.Add("BorderLess");  Text[(int)Textstate.BorderLess_Text].position = new Vector2(0.02f, 0.77f + 0.05f);
+        Text[(int)Textstate.BorderLessOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.BorderLessOff_Text].interactable = true; Text[(int)Textstate.BorderLessOff_Text].position = new Vector2(0.17f, 0.77f + 0.05f);
+        Text[(int)Textstate.BorderLessOn_Text] = Canvas.Add("On"); Text[(int)Textstate.BorderLessOn_Text].interactable = true; Text[(int)Textstate.BorderLessOn_Text].position = new Vector2(0.21f, 0.77f + 0.05f);
+
+
+        Text[(int)Textstate.AnnouncerOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.AnnouncerOff_Text].interactable = true; Text[(int)Textstate.AnnouncerOff_Text].position = new Vector2(0.17f, 0.42f);
+        Text[(int)Textstate.AnnouncerOn_Text] = Canvas.Add("On"); Text[(int)Textstate.AnnouncerOn_Text].interactable = true; Text[(int)Textstate.AnnouncerOn_Text].position = new Vector2(0.21f, 0.42f);
 
         foreach (Text Texture in Text)
         {
@@ -326,11 +375,11 @@ public class GUIOptionsMenu : ScriptComponent
         }
         Texture2D CopyImageBackground = ImageBackground; Texture2D CopyImageImageToggle = ImageToggle; Texture2D CopyImageImageAftermathToggle = ImageAftermathToggle;
 
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.27f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//MasterVolume bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.27f ), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//MasterVolume bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f,0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//music bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.37f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f + 0.05f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f + 0.05f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
         ImageBar[(int)ImageBarstate.AIM].Settingvalue(20);
         ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(50);
         ImageBar[(int)ImageBarstate.Movement].Settingvalue(10);
