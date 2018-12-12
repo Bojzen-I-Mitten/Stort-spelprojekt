@@ -7,9 +7,7 @@ using LiteNetLib;
 public class ToySoldier : Powerup
 {
     ChadControls ObjectOwner = null;
-    public Material ToySoldierMaterial { get; set; }
 
-    private ChadControls collisionChad;
     private float _DespawnTimer;
     private float _DespawnTime;
 
@@ -21,10 +19,9 @@ public class ToySoldier : Powerup
         MovementSpeedModifier = 0.7f;
         MaxThrowForce = 25.0f;
         ThrowForce = BaseThrowForce;
-        m_throwable = true; // Change depending on power-up
+        m_throwable = true;
         gameObject.GetComponent<Rigidbody>().Friction = 2.5f;
 
-        collisionChad = null;
 
         _DespawnTime = 30.0f;
         _DespawnTimer = 0.0f;
@@ -70,8 +67,6 @@ public class ToySoldier : Powerup
     public override void OnCollisionEnter(Collider collider)
     {
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-        
-
         ChadControls localChad = MatchSystem.instance.LocalChad;
         // Direct Hit with a Chad
         if (otherChad)
@@ -83,7 +78,6 @@ public class ToySoldier : Powerup
                 if (colliderTeam != throwerTeam)
                 {
                     localChad.ToySoldierAffected = true;
-                    collisionChad = localChad;
                     Activate();
                 }
             } 
@@ -109,13 +103,11 @@ public class ToySoldier : Powerup
             RenderSkinnedComponent render = localChad.gameObject.GetComponent<RenderSkinnedComponent>();
             localChad.ChadSecondMaterial = render.GetMaterial(1);
 
-            RPCSetTiny();
+            localChad.SetTiny();
 
             localChad.Acceleration *= 0.5f;
             localChad.BaseSpeed *= 0.5f;
             localChad.MaxSpeed *= 0.5f;
-            localChad.transform.scale *= 0.5f;
-
             
             localChad.FirstJumpForce *= 0.3f;
             localChad.SecondJumpForce *= 0.3f;
@@ -139,33 +131,5 @@ public class ToySoldier : Powerup
         _DespawnTimer = 0.0f;
 
         ObjectOwner = null;
-    }
-
-    public void RPCSetTiny()
-    {
-        SendRPC("SetTiny");
-        SetTiny();
-    }
-
-    private void SetTiny()
-    {
-        //foreach(var player in MatchSystem.instance.Scene.Players)
-        //{
-        //    if (player.Value == collisionChad.gameObject.GetComponent<NetworkIdentity>())
-        //    {
-        //        RenderSkinnedComponent render = 
-        //    }
-        //}
-        RenderSkinnedComponent render = collisionChad.gameObject.GetComponent<RenderSkinnedComponent>();
-        render.SetMaterial(0, ToySoldierMaterial);
-        render.SetMaterial(1, ToySoldierMaterial);
-        render.SetMaterial(2, ToySoldierMaterial);
-
-        collisionChad.rBody.Mass *= 0.5f;
-
-        CapsuleCollider capsule = collisionChad.gameObject.GetComponent<CapsuleCollider>();
-        capsule.center = new Vector3(0, 0.32f, 0);
-        capsule.height *= 0.5f;
-        capsule.radius *= 0.5f;
     }
 }

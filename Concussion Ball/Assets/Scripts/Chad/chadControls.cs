@@ -110,6 +110,8 @@ public class ChadControls : NetworkComponent
     public Material ChadFirstMaterial { get; set; }
     public Material ChadSecondMaterial = null;
     public Material ChadThirdMaterial { get; set; }
+    public Material ToySoldierMaterial { get; set; }
+
 
     // Tweaking constants
     private float ScaleDuration = 10.0f;
@@ -742,10 +744,10 @@ public class ChadControls : NetworkComponent
 
         if(MatchSystem.instance.LocalChad.ToySoldierAffected)
         {
-            Debug.Log("Resetting toy soldier affected");
             MatchSystem.instance.LocalChad.ToySoldierAffected = false;
-            MatchSystem.instance.LocalChad.ScaleCountdown = ScaleDuration;
             MatchSystem.instance.LocalChad.ToySoldierModifier = null;
+            MatchSystem.instance.LocalChad.ScaleCountdown = ScaleDuration;
+            
             SendRPC("RPCResetMaterial");
             RPCResetMaterial();
         }        
@@ -753,12 +755,38 @@ public class ChadControls : NetworkComponent
 
     public void RPCResetMaterial()
     {
-        RenderSkinnedComponent render = MatchSystem.instance.LocalChad.gameObject.GetComponent<RenderSkinnedComponent>();
-        //MatchSystem.instance.LocalChad.ChadSecondMaterial.SetColor("color", 
-        //    MatchSystem.instance.Teams[MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject)].Color);
+        RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         render.SetMaterial(0, ChadFirstMaterial);
         render.SetMaterial(1, ChadSecondMaterial);
         render.SetMaterial(2, ChadThirdMaterial);
+        Debug.Log("reset");
+    }
+
+    public void SetTiny()
+    {
+        SendRPC("RPCSetTiny");
+        RPCSetTiny();
+    }
+
+    public void RPCSetTiny()
+    {
+        //ChadControls localChad = MatchSystem.instance.LocalChad;
+        RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+        if (ToySoldierMaterial != null)
+        {
+            render.SetMaterial(0, ToySoldierMaterial);
+            render.SetMaterial(1, ToySoldierMaterial);
+            render.SetMaterial(2, ToySoldierMaterial);
+            Debug.Log("tinyMat");
+        }
+        Debug.Log("tiny");
+        rBody.Mass *= 0.5f;
+        transform.scale *= 0.5f;
+
+        CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
+        capsule.center = new Vector3(0, 0.32f, 0);
+        capsule.height *= 0.5f;
+        capsule.radius *= 0.5f;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
