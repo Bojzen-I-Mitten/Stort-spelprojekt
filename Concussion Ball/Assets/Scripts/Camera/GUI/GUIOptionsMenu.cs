@@ -63,7 +63,17 @@ public class ImageBaradjustment
             Images.position = input;
         }
     }
+    public void Settingvalue(int value)
+    {
+        numbervalue = value;
+        float valuecalculator = ((numbervalue) * 3.15f);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2(valuecalculator, 1);
 
+       //   Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x* Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x)
+        //      - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x),Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
+         //   Debug.Log((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x));
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(-1, -1);
+    }
     public void update()
     {
         if (Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].Hovered())
@@ -90,6 +100,7 @@ public class ImageBaradjustment
         Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
         numbervalue = ((int)(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x / 3.15f));
         number.text = numbervalue.ToString();
+        
     }
 }
 
@@ -320,37 +331,48 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.37f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
+        ImageBar[(int)ImageBarstate.AIM].Settingvalue(20);
+        ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(50);
+        ImageBar[(int)ImageBarstate.Movement].Settingvalue(10);
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(50);
+        ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(50);
 
 
         string SettingsMasterVolume = UserSettings.GetSetting("Master");
         if (SettingsMasterVolume != null)
         {
-            ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = System.Convert.ToInt32(SettingsMasterVolume);
-            ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
+            //    ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = System.Convert.ToInt32(SettingsMasterVolume);
+            //    ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
+            //  ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(50);
+            ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(System.Convert.ToInt32(SettingsMasterVolume));
         }
         string settingsMusic = UserSettings.GetSetting("Music");
         if (settingsMusic != null)
         {
-            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = System.Convert.ToInt32(settingsMusic);
-            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
+            //    ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = System.Convert.ToInt32(settingsMusic);
+            //    ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(System.Convert.ToInt32(settingsMusic));
         }
         string settingsSFX = UserSettings.GetSetting("Sfx");
         if (settingsSFX != null)
         {
-            ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = System.Convert.ToInt32(settingsSFX);
-            ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
+            //    ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = System.Convert.ToInt32(settingsSFX);
+            //    ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(System.Convert.ToInt32(settingsSFX));
         }
         string settingsMove = UserSettings.GetSetting("Move");
         if (settingsMove != null)
         {
-            ImageBar[(int)ImageBarstate.Movement].LastMousePosition = System.Convert.ToInt32(settingsMove);
-            ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
+            //    ImageBar[(int)ImageBarstate.Movement].LastMousePosition = System.Convert.ToInt32(settingsMove);
+            //    ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.Movement].Settingvalue(System.Convert.ToInt32(settingsMove));
         }
         string settingsAIM = UserSettings.GetSetting("Aim");
         if (settingsAIM != null)
         {
-            ImageBar[(int)ImageBarstate.AIM].LastMousePosition = System.Convert.ToInt32(settingsAIM);
-            ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
+            //    ImageBar[(int)ImageBarstate.AIM].LastMousePosition = System.Convert.ToInt32(settingsAIM);
+            //    ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.AIM].Settingvalue(System.Convert.ToInt32(settingsAIM));
         }
 
         ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
@@ -435,16 +457,16 @@ public class GUIOptionsMenu : ScriptComponent
 
         if (ImageBar != null)
         {
-            Update = ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition.ToString();
+            Update = ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue.ToString();
             UserSettings.AddOrUpdateAppSetting("Master", Update);
 
-            Update =ImageBar[(int)ImageBarstate.Movement].LastMousePosition.ToString();  // save from this call to Movement LastMousePosition here
+            Update =ImageBar[(int)ImageBarstate.Movement].numbervalue.ToString();  // save from this call to Movement LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Move", Update);
-            Update = ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition.ToString();  // save from this call to sfxBar_Image LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue.ToString();  // save from this call to sfxBar_Image LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Sfx", Update);
-            Update = ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition.ToString();  // save from this call to MUSICBar_IMAGE LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue.ToString();  // save from this call to MUSICBar_IMAGE LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Music", Update);
-            Update = ImageBar[(int)ImageBarstate.AIM].LastMousePosition.ToString();  // save from this call to aim LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.AIM].numbervalue.ToString();  // save from this call to aim LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Aim", Update);
         }
 
