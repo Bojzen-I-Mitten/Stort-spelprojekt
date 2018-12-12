@@ -100,9 +100,7 @@ public class ToySoldier : Powerup
 
         if (localChad.ToySoldierAffected)
         {
-            RenderSkinnedComponent render = localChad.gameObject.GetComponent<RenderSkinnedComponent>();
-            localChad.ChadSecondMaterial = render.GetMaterial(1);
-
+            
             localChad.SetTiny();
 
             localChad.Acceleration *= 0.5f;

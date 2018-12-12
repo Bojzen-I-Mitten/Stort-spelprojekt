@@ -106,10 +106,8 @@ public class ChadControls : NetworkComponent
     private float OriginalFirstJumpForce;
     private float OriginalSecondJumpForce;
 
-    //private Material[] OriginalMaterials;
-    public Material ChadFirstMaterial { get; set; }
-    public Material ChadSecondMaterial = null;
-    public Material ChadThirdMaterial { get; set; }
+    private Material[] OriginalMaterials;
+
     public Material ToySoldierMaterial { get; set; }
 
 
@@ -153,8 +151,7 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
-        ChadSecondMaterial = gameObject.GetComponent<RenderSkinnedComponent>().GetMaterial(1);
-
+        
         FirstJumpForce = 450.0f;
         SecondJumpForce = 350.0f;
         OriginalFirstJumpForce = FirstJumpForce;
@@ -756,9 +753,8 @@ public class ChadControls : NetworkComponent
     public void RPCResetMaterial()
     {
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-        render.SetMaterial(0, ChadFirstMaterial);
-        render.SetMaterial(1, ChadSecondMaterial);
-        render.SetMaterial(2, ChadThirdMaterial);
+        render.materials = OriginalMaterials;
+        gameObject.GetComponent<ShirtRenderer>().Reset();
         Debug.Log("reset");
     }
 
@@ -774,11 +770,13 @@ public class ChadControls : NetworkComponent
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         if (ToySoldierMaterial != null)
         {
+            OriginalMaterials = render.materials;
             render.SetMaterial(0, ToySoldierMaterial);
             render.SetMaterial(1, ToySoldierMaterial);
             render.SetMaterial(2, ToySoldierMaterial);
             Debug.Log("tinyMat");
         }
+        rBody.enabled = false;
         Debug.Log("tiny");
         rBody.Mass *= 0.5f;
         transform.scale *= 0.5f;
@@ -787,6 +785,7 @@ public class ChadControls : NetworkComponent
         capsule.center = new Vector3(0, 0.32f, 0);
         capsule.height *= 0.5f;
         capsule.radius *= 0.5f;
+        rBody.enabled = true;
     }
 
     public void RPCSetAnimWeight(int index, float weight)
