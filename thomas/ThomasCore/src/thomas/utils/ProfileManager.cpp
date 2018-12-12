@@ -8,11 +8,13 @@ namespace thomas
 	{
 		namespace profiling
 		{
+			std::map<std::string, std::vector<float>> ProfileManager::s_textureData;
 			std::vector<long long> ProfileManager::s_fps;
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
 			std::vector<long long> ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
 			std::map<std::string, std::vector<float>> ProfileManager::s_vramusage;
+			std::map<std::string, float> ProfileManager::s_totalvramusage;
 			float ProfileManager::s_vramTotal;
 			unsigned int ProfileManager::s_frames;
 			std::atomic<unsigned int> ProfileManager::s_contextSwitch;
@@ -21,6 +23,13 @@ namespace thomas
 			{
 				s_frames = 0;
 				s_contextSwitch = 0;
+			}
+
+			void ProfileManager::addTextureData(std::string name, float usage)
+			{
+				s_profileLock.lock();
+				s_textureData[name].push_back(usage);
+				s_profileLock.unlock();
 			}
 
 			void ProfileManager::newFrame()
@@ -54,12 +63,28 @@ namespace thomas
 			{
 				s_profileLock.lock();
 				s_vramusage[name].push_back(usage);
+				s_totalvramusage[name] += usage;
 				s_profileLock.unlock();
 			}
 
 			void ProfileManager::increaseContextSwitches()
 			{
 				s_contextSwitch++;
+			}
+
+			std::map<std::string, float> ProfileManager::getVramMap()
+			{
+				return s_totalvramusage;
+			}
+
+			float ProfileManager::lastTextureVramUsage()
+			{
+				return s_vramusage["Texture2D"].back();
+			}
+
+			std::map<std::string, std::vector<float>> ProfileManager::getTextureDetails()
+			{
+				return s_textureData;
 			}
 
 			//void ProfileManager::storeSample(const char* name, long elapsedTime, DWORD processor_id)
@@ -108,13 +133,13 @@ namespace thomas
 				j["SlowfilerData"]["build"]["ramUsage"] = s_ramusage;
 				j["SlowfilerData"]["build"]["vramTotal"] = s_vramTotal;
 				j["SlowfilerData"]["build"]["vramUsage"];
-				for (auto& id : s_vramusage)
-				{
-					for (auto& s : id.second)
-					{
-						j["SlowfilerData"]["build"][id.first] += std::to_string(s) + ',';
-					}
-				}
+				//for (auto& id : s_vramusage)
+				//{
+				//	for (auto& s : id.second)
+				//	{
+				//		j["SlowfilerData"]["build"][id.first] += std::to_string(s) + ',';
+				//	}
+				//}
 
 				
 				j["SlowfilerData"]["build"]["contextSwitches"] = s_contextSwitch.load();

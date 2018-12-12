@@ -13,8 +13,8 @@ namespace thomas
 		private:
 			void LoadTextureFromFile(std::string path);
 		public:
-			Texture2D(int width, int height, bool mipMap = false, bool bindDepth = false);
-			Texture2D(void* initData, int width, int height, bool mipMap = false, bool bindDepth = false);
+			Texture2D(std::string path, int width, int height, bool mipMap = false, bool bindDepth = false);
+			Texture2D(std::string path, void* initData, int width, int height, bool mipMap = false, bool bindDepth = false);
 			Texture2D(std::string path);
 			Texture2D() {};
 

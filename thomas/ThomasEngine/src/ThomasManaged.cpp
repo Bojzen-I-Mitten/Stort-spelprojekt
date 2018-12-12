@@ -258,6 +258,25 @@ namespace ThomasEngine {
 			ImGui::Text("	Gizmo objects: %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_GIZMO_OBJECTS_END)*1000.0f);
 			ImGui::Text("    GUI objects:   %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_GUI_END)*1000.0f);
 			ImGui::End();
+
+			ImGui::Begin("VramDetails", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
+			for (const auto& it : utils::profiling::ProfileManager::getVramMap())
+			{
+				std::string temp_string = it.first + " " + std::to_string(it.second);
+				ImGui::Text(temp_string.c_str());
+			}
+			ImGui::End();
+			ImGui::Begin("TextureDetails", &(bool&)showStatistics, ImGuiWindowFlags_AlwaysAutoResize);
+			for (const auto& texture : utils::profiling::ProfileManager::getTextureDetails())
+			{
+				std::string temp_string = texture.first;
+				ImGui::Text(temp_string.c_str());
+				for (const auto& sample : texture.second)
+				{
+					ImGui::Text((std::string("\t") + std::to_string(sample)).c_str());
+				}
+			}
+			ImGui::End();
 		}
 
 		if (WindowManager::Instance()->GetEditorWindow() && WindowManager::Instance()->GetEditorWindow()->Initialized())

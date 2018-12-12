@@ -18,13 +18,13 @@ namespace thomas
 		{
 			DirectX::PackedVector::XMUBYTEN4 colors[1];
 			std::fill(std::begin(colors), std::end(colors), math::Color(0, 0, 0, 1).RGBA());
-			s_blackTexture = new Texture2D((void*)&colors, 1, 1, false);
+			s_blackTexture = new Texture2D("Black Texture", (void*)&colors, 1, 1, false);
 			s_blackTexture->SetPath("Black Texture");
 			std::fill(std::begin(colors), std::end(colors), math::Color(0.5f, 0.5f, 1, 1).RGBA());
-			s_normalTexture = new Texture2D((void*)&colors, 1, 1, false);
+			s_normalTexture = new Texture2D("Normal Texture", (void*)&colors, 1, 1, false);
 			s_blackTexture->SetPath("Normal Texture");
 			std::fill(std::begin(colors), std::end(colors), math::Color(1, 1, 1, 1).RGBA());
-			s_whiteTexture = new Texture2D((void*)&colors, 1, 1, false);
+			s_whiteTexture = new Texture2D("White Texture", (void*)&colors, 1, 1, false);
 			s_blackTexture->SetPath("White Texture");
 
 

@@ -9,7 +9,7 @@
 #include "..\..\..\include\nlohmann\json.hpp"
 #include "..\utils\atomic\Synchronization.h"
 #define BENCHMARK
-#undef BENCHMARK
+//#undef BENCHMARK
 
 namespace thomas
 {
@@ -37,10 +37,12 @@ namespace thomas
 				};
 
 			private:
+				static std::map<std::string, std::vector<float>> s_textureData;
 				static std::vector<long long> s_fps;
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
 				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
+				static std::map<std::string, float> s_totalvramusage;
 				static std::map<std::string, std::vector<float>> s_vramusage;
 				static float s_vramTotal;
 				static unsigned int s_frames;
@@ -48,6 +50,7 @@ namespace thomas
 				static utils::atomics::SpinLock s_profileLock;
 
 			public:
+				static void addTextureData(std::string name, float usage);
 				static void newFrame();
 				static void resetFrameCounter();
 				static void dumpDataToFile();
@@ -55,7 +58,9 @@ namespace thomas
 				static void storeGpuSample(long long gpuTime);
 				static void storeVramSample(std::string name, float usage);
 				static void increaseContextSwitches();
-
+				static std::map<std::string, float> getVramMap();
+				static float lastTextureVramUsage();
+				static std::map<std::string, std::vector<float>> getTextureDetails();
 				static void setRAMUsage(float usage);
 				static float getRAMUsage();
 				static void setVRAMUsage(float total);

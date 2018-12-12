@@ -3,7 +3,7 @@
 #include "../../Common.h"
 #include "../../ThomasCore.h"
 #include "../ResourceManager.h"
-
+#include "../../utils/ProfileManager.h"
 namespace thomas
 {
 	namespace resource
@@ -26,14 +26,18 @@ namespace thomas
 
 				textureInterface->Release();
 				data = new DirectX::ScratchImage();
+#ifdef BENCHMARK
+				float vramUsage = utils::profiling::ProfileManager::lastTextureVramUsage();
+				utils::profiling::ProfileManager::addTextureData(path, vramUsage);
+#endif
 			}
 		}
 
-		Texture2D::Texture2D(int width, int height, bool mipMap, bool bindDepth): Texture2D(nullptr, width, height, mipMap, bindDepth)
+		Texture2D::Texture2D(std::string path, int width, int height, bool mipMap, bool bindDepth): Texture2D(path, nullptr, width, height, mipMap, bindDepth)
 		{
 		}
 
-		Texture2D::Texture2D(void * initData, int width, int height, bool mipMap, bool bindDepth)
+		Texture2D::Texture2D(std::string path, void * initData, int width, int height, bool mipMap, bool bindDepth)
 		{
 			m_width = width;
 			m_height = height;
@@ -60,6 +64,10 @@ namespace thomas
 			m_resource = textureInterface;
 			data = new DirectX::ScratchImage();
 
+#ifdef BENCHMARK
+			float vramUsage = utils::profiling::ProfileManager::lastTextureVramUsage();
+			utils::profiling::ProfileManager::addTextureData(path, vramUsage);
+#endif
 		}
 
 		Texture2D::Texture2D(std::string path) : Texture(path)

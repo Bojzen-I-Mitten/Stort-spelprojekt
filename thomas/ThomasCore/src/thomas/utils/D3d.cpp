@@ -63,7 +63,6 @@ namespace thomas
 						LOG_HR(hr);
 						return false;
 					}
-
 					return true;
 				}
 
@@ -182,7 +181,6 @@ namespace thomas
 				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
 #endif
 			}
-
 			return true;
 		}
 
@@ -789,11 +787,20 @@ namespace thomas
 			HRESULT hr;
 			if (extension_string == ".dds" || extension_string == ".DDS")
 			{
-				hr = DirectX::CreateDDSTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
+				hr = DirectX::CreateDDSTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, &texture, &textureView);
+				if (not SUCCEEDED(hr))
+				{
+					LOG_HR(hr);
+				}
+
 			}
 			else
 			{
-				hr = DirectX::CreateWICTextureFromFile(m_device, m_deviceContextImmediate, CA2W(fileName.c_str()), &texture, &textureView);
+				hr = DirectX::CreateWICTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, 0,  &texture, &textureView);
+				if (not SUCCEEDED(hr))
+				{
+					LOG_HR(hr);
+				}
 			}
 
 			if (FAILED(hr))
