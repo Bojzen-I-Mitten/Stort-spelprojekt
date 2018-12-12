@@ -48,16 +48,17 @@ namespace thomas
 				void Set3D(bool value);
 				bool Get3D();
 			private:
-				utils::atomics::SpinLock lock;
+				
 				std::vector<std::unique_ptr<GUIElement>> m_GUIElements;
-				std::unique_ptr<CommonStates> m_spriteStates;
-				std::unique_ptr<SpriteBatch> m_spriteBatch;
-				std::unique_ptr<Font> m_defaultFont;
+				CommonStates* m_spriteStates;
+				SpriteBatch* m_spriteBatch;
+				Font* m_defaultFont;
 				Viewport m_viewport;
 				object::component::Camera* m_camera;
 				math::Vector2 m_baseResolution;
 				math::Matrix m_worldMatrix;
 				bool m_render;
+				utils::atomics::SpinLock m_lock;
 			};
 		}
 	}
