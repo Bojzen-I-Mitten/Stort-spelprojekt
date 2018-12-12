@@ -62,36 +62,7 @@ public class CameraMaster : ScriptComponent
 
         
 
-        #region Chad Hats
-        string settingsHat = UserSettings.GetSetting("Hat");
-
-        if (settingsHat != null)
-        {
-            SelectedHat = System.Convert.ToInt32(settingsHat);
-        }
-        else
-        {
-            SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
-            settingsHat = SelectedHat.ToString();
-            UserSettings.AddOrUpdateAppSetting("Hat", settingsHat);
-        }
-
-        if (ChadMainMenu != null)
-        {
-            ChadMMHat = ChadMainMenu.GetComponent<Hatter>();
-            ChadMMHat.SetHat(SelectedHat);
-        }
-        if (ChadTeam1 != null)
-        {
-            ChadT1Hat = ChadTeam1.GetComponent<Hatter>();
-            ChadT1Hat.SetHat(SelectedHat);
-        }
-        if (ChadTeam1 != null)
-        {
-            ChadT2Hat = ChadTeam2.GetComponent<Hatter>();
-            ChadT2Hat.SetHat(SelectedHat);
-        }
-        #endregion
+        
 
     }
 
@@ -138,6 +109,37 @@ public class CameraMaster : ScriptComponent
         Hud = gameObject.GetComponent<ChadHud>();
         if (Hud == null)
             Debug.Log("Camera Master could not find Hud");
+        #endregion
+
+        #region Chad Hats
+        string settingsHat = UserSettings.GetSetting("Hat");
+
+        if (settingsHat != null)
+        {
+            SelectedHat = System.Convert.ToInt32(settingsHat);
+        }
+        else
+        {
+            SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
+            settingsHat = SelectedHat.ToString();
+            UserSettings.AddOrUpdateAppSetting("Hat", settingsHat);
+        }
+
+        if (ChadMainMenu != null)
+        {
+            ChadMMHat = ChadMainMenu.GetComponent<Hatter>();
+            ChadMMHat.SetHat(SelectedHat);
+        }
+        if (ChadTeam1 != null)
+        {
+            ChadT1Hat = ChadTeam1.GetComponent<Hatter>();
+            ChadT1Hat.SetHat(SelectedHat);
+        }
+        if (ChadTeam1 != null)
+        {
+            ChadT2Hat = ChadTeam2.GetComponent<Hatter>();
+            ChadT2Hat.SetHat(SelectedHat);
+        }
         #endregion
 
         SetState(CAM_STATE.MAIN_MENU);
