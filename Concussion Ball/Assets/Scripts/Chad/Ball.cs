@@ -14,7 +14,7 @@ public class Ball : PickupableObject
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
 
-
+    private LightComponent pointLight;
 
     private SoundComponent soundFireThrow;
     private SoundComponent soundChargeBall;
@@ -55,6 +55,11 @@ public class Ball : PickupableObject
         soundChargeBall.MinDistance = 10;
         soundChargeBall.Is3D = true;
         begunCharge = false;
+
+        pointLight = gameObject.AddComponent<LightComponent>();
+        pointLight.Type = LightComponent.LIGHT_TYPES.POINT;
+        pointLight.Intensity = 0;
+        pointLight.DiffuseColor = Color.OrangeRed;
 
         #region Init emitters
         emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
@@ -111,6 +116,8 @@ public class Ball : PickupableObject
 
         emitterFire.Emit = false;
         emitterSmoke.Emit = false;
+
+        pointLight.Intensity = 0;
     }
 
     private void ResetElectricityEmitters()
@@ -268,7 +275,7 @@ public class Ball : PickupableObject
             emitterElectricity2.Emit = true;
             emitterElectricity3.Emit = true;
 
-
+            pointLight.Intensity = interp;
 
 
             if (interp > 0.7f)
