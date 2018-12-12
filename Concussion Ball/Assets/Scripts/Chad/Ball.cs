@@ -50,9 +50,9 @@ public class Ball : PickupableObject
         soundChargeBall.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ElectricSparks.mp3");
         soundChargeBall.Looping = false;
         soundChargeBall.Type = SoundComponent.SoundType.Effect;
-        soundChargeBall.Volume = 0.15f;
-        soundChargeBall.MaxDistance = 20;
-        soundChargeBall.MinDistance = 10;
+        soundChargeBall.Volume = 0.01f;
+        soundChargeBall.MaxDistance = 10;
+        soundChargeBall.MinDistance = 3;
         soundChargeBall.Is3D = true;
         begunCharge = false;
 
@@ -253,6 +253,8 @@ public class Ball : PickupableObject
             emitterElectricity2.EmitOneShot(10);
             emitterElectricity3.EmitOneShot(10);
             emitterFire.EmitOneShot(25);
+
+
         }
         if (ThrowForce > ThrowForce66Procent)
         {
