@@ -52,8 +52,8 @@ public class ChadHud : ScriptComponent
     public bool ToggleAim { get; set; } = true;
 
     #region GUI Font & Textures
-    public Font AnnouncementFont { get; set; }
-    public Font Numbers { get; set; }
+    //public Font AnnouncementFont { get; set; }
+    //public Font Numbers { get; set; }
     public Texture2D AnnouncementBackground { get; set; }
     public Texture2D CrosshairTexture { get; set; }
     public Texture2D ChargeBarOutlineTexture { get; set; }
@@ -83,10 +83,11 @@ public class ChadHud : ScriptComponent
 
         #region Timer stuff
         Timer = Canvas.Add("00:00");
-        Timer.scale = new Vector2(2f);
-        Timer.position = new Vector2(0.4975f, 0.01f);
+        //Timer.scale = new Vector2(2f);
+        Timer.scale = new Vector2(0.8f);
+        Timer.position = new Vector2(0.4975f, -0.005f);
         Timer.color = Color.Black;
-        Timer.font = Numbers;
+        //Timer.font = Numbers;
         Timer.origin = new Vector2(0.5f, 0);
         Timer.depth = 0.8f;
 
@@ -123,34 +124,36 @@ public class ChadHud : ScriptComponent
         
 
         Score1 = Canvas.Add("");
-        Score1.scale = new Vector2(1.6f);
+        //Score1.scale = new Vector2(1.6f);
+        Score1.scale = new Vector2(0.4f);
         Score1.origin = new Vector2(0.5f, 0);
         Score1.position = Score1BG.position + new Vector2(0.005f, 0.001f);
         Score1.color = Color.White;
-        Score1.font = Numbers;
+        //Score1.font = Numbers;
         Score1.depth = 0.8f;
 
         Score2 = Canvas.Add("");
-        Score2.scale = new Vector2(1.6f);
+        //Score2.scale = new Vector2(1.6f);
+        Score2.scale = new Vector2(0.4f);
         Score2.origin = new Vector2(0.5f, 0);
         Score2.position = Score2BG.position - new Vector2(0.009f, -0.001f);
         Score2.color = Color.White;
-        Score2.font = Numbers;
+        //Score2.font = Numbers;
         Score2.depth = 0.8f;
         #endregion
 
         #region Announcement stuff
         Announcement1 = Canvas.Add("");
         Announcement1.position = new Vector2(0.5f);
-        Announcement1.scale = new Vector2(2);
-        Announcement1.font = AnnouncementFont;
+        //Announcement1.scale = new Vector2(2);
+        //Announcement1.font = AnnouncementFont;
         Announcement1.color = Color.Green;
         Announcement1.origin = new Vector2(0.5f);
 
         Announcement2 = Canvas.Add("");
         Announcement2.position = new Vector2(0.5f);
-        Announcement2.scale = new Vector2(2);
-        Announcement2.font = AnnouncementFont;
+        //Announcement2.scale = new Vector2(2);
+        //Announcement2.font = AnnouncementFont;
         Announcement2.color = Color.Green;
         Announcement2.origin = new Vector2(0.5f);
 
@@ -291,7 +294,7 @@ public class ChadHud : ScriptComponent
     IEnumerator Countdown(float duration)
     {
         StartCoroutine(AnnouncementAnimation(duration, "Round starts in", "0", Color.Cyan, false));
-        Announcement2.font = Numbers;
+        //Announcement2.font = Numbers;
         float time = duration;
         while(time > 0.0f)
         {
@@ -300,7 +303,7 @@ public class ChadHud : ScriptComponent
             Announcement2.text = string.Format("{0}", timeLeft + 1);
             yield return null;
         }
-        Announcement2.font = AnnouncementFont;
+        //Announcement2.font = AnnouncementFont;
     }
 
     public void StartCountdown(float duration)
@@ -402,15 +405,22 @@ public class ChadHud : ScriptComponent
         {
             Timer.text = "REPLAY";
             Timer.color = Color.Red;
+            Timer.scale = new Vector2(0.75f);
+            Timer.position = new Vector2(0.4975f, -0.01f);
         }
         else if (MatchSystem.instance.GoldenGoal)
         {
             Timer.text = "GOLDEN GOAL";
+            Timer.scale = new Vector2(0.4f);
             Timer.color = Color.Gold;
+            Timer.position = new Vector2(0.4975f, 0.01f);
         }
         else
         {
             Timer.text = string.Format("{0}:{1}", minutes.ToString("00"), seconds.ToString("00"));
+            Timer.scale = new Vector2(0.8f);
+            Timer.color = Color.Black;
+            Timer.position = new Vector2(0.4975f, -0.01f);
         }
 
         Score1.text = string.Format("{0}", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Score);

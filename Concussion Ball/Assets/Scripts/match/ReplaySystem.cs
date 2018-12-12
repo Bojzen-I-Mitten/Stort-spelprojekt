@@ -67,10 +67,10 @@ public class ReplaySystem : ScriptComponent
     private IEnumerator RelayCoroutine(Vector3 goalPos)
     {
         MatchSystem.instance.blockIncomingData = true;
-        CameraMaster.instance.StartReplay();
-        specCam.transform.position = goalPos + new Vector3(goalPos.z / 1.2f, 5, 0);
-        MatchSystem.instance.ReadOwnerAsNormal = true;
         Replaying = true;
+        CameraMaster.instance.StartReplay();
+        //specCam.transform.position = goalPos + new Vector3(goalPos.z / 1.2f, 5, 0);
+        MatchSystem.instance.ReadOwnerAsNormal = true;
         ReplayState initialState = States[0];
         RemoveAllInitialStates();
         float currentTime = initialState.timestamp;

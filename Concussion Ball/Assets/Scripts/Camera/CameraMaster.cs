@@ -24,8 +24,6 @@ public class CameraMaster : ScriptComponent
     public GameObject ChadPreviewArea { get; set; }
     public LightComponent Light1 { get; set; }
     public LightComponent Light2 { get; set; }
-    
-
 
     public static CameraMaster instance;
 
@@ -39,6 +37,7 @@ public class CameraMaster : ScriptComponent
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
     ChadHud Hud;
+    ReplayCamera ReplayCam;
 
     public Canvas Canvas;
     CAM_STATE State;
@@ -101,6 +100,9 @@ public class CameraMaster : ScriptComponent
         Hud = gameObject.GetComponent<ChadHud>();
         if (Hud == null)
             Debug.Log("Camera Master could not find Hud");
+
+        ReplayCam = gameObject.GetComponent<ReplayCamera>();
+        ReplayCam.enabled = false;
         #endregion
 
         #region Chad Hats
@@ -145,11 +147,12 @@ public class CameraMaster : ScriptComponent
     {
         ChadCam.enabled = false;
         SpectatorCam.enabled = false;
-        
+        ReplayCam.enabled = true;
     }
 
     public void StopReplay()
     {
+        ReplayCam.enabled = false;
         //ChadCam.enabled = true;
         //SpectatorCam.enabled = false;
     }
@@ -208,6 +211,8 @@ public class CameraMaster : ScriptComponent
                     SetState(CAM_STATE.EXIT_MENU);
                     Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
                 }
+                if (Input.GetMouseMode() == Input.MouseMode.POSITION_ABSOLUTE && Input.GetMouseButtonUp(Input.MouseButtons.LEFT))
+                    Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 break;
             case CAM_STATE.EXIT_MENU:
                 if (Input.GetKeyDown(Input.Keys.Escape))
