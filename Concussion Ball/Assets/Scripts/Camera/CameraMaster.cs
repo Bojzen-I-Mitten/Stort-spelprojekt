@@ -10,6 +10,7 @@ public enum CAM_STATE
     MAIN_MENU,
     EXIT_MENU,
     HOST_MENU,
+    OPTIONS_MENU,
     LOADING_SCREEN,
     SCORE_SCREEN,
     SCOREBOARD,
@@ -33,14 +34,16 @@ public class CameraMaster : ScriptComponent
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;
     GUIHostMenu HostMenu;
+    GUIOptionsMenu OptionsMenu;
     GUILoadingScreen LoadingScreen;
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
     ChadHud Hud;
+    SoundComponent MenuSound;
     ReplayCamera ReplayCam;
 
     public Canvas Canvas;
-    CAM_STATE State;
+    public CAM_STATE State;
 
     public int SelectedHat;
     Hatter ChadMMHat = null;
@@ -52,6 +55,15 @@ public class CameraMaster : ScriptComponent
         instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
+
+        MenuSound = gameObject.AddComponent<SoundComponent>();
+        MenuSound.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/MenuSoundMetal.mp3");
+        MenuSound.Looping = false;
+        MenuSound.Type = SoundComponent.SoundType.Music;
+        MenuSound.Is3D = false;
+        MenuSound.Volume = 0.1f;
+        MenuSound.enabled = false;
+    
         
         if (Light1 != null && Light2 != null)
         {
@@ -83,6 +95,11 @@ public class CameraMaster : ScriptComponent
         HostMenu = gameObject.GetComponent<GUIHostMenu>();
         if (HostMenu == null)
             Debug.Log("Camera Master cannot find GUI script for host");
+
+        OptionsMenu = gameObject.GetComponent<GUIOptionsMenu>();
+        if (OptionsMenu == null)
+            Debug.Log("Camera Master cannot find GUI script for Options");
+
 
         LoadingScreen = gameObject.GetComponent<GUILoadingScreen>();
         if (LoadingScreen == null)
@@ -272,6 +289,8 @@ public class CameraMaster : ScriptComponent
             GUIScoreboard.Instance.enabled = false;
             GUIScoreboard.Instance.Canvas.isRendering = false;
         }
+        if(OptionsMenu)
+            OptionsMenu.Canvas.isRendering = false;
     }
 
     private void UpdateState()
@@ -280,6 +299,8 @@ public class CameraMaster : ScriptComponent
         {
             case CAM_STATE.MAIN_MENU:
                 TurnOnLights();
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 MainMenu.SetUpScene();
                 Camera.fixedAspectRatio = true;
                 Camera.orthographic = true;
@@ -288,6 +309,8 @@ public class CameraMaster : ScriptComponent
 
             case CAM_STATE.JOIN_HOST:
                 TurnOnLights();
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 MainMenu.SetUpScene();
                 Camera.fixedAspectRatio = true;
                 Camera.orthographic = true;
@@ -295,12 +318,16 @@ public class CameraMaster : ScriptComponent
                 break;
             case CAM_STATE.SELECT_TEAM:
                 TurnOnLights();
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
                 Camera.fixedAspectRatio = false;
                 Camera.orthographic = false;
                 break;
             case CAM_STATE.GAME:
+                if (MenuSound.IsPlaying())
+                    MenuSound.Stop();
                 TurnOffLights();
                 Hud.Canvas.isRendering = true;
                 if (GUIScoreboard.Instance)
@@ -311,11 +338,16 @@ public class CameraMaster : ScriptComponent
                 ExitMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.HOST_MENU:
+                if (!MenuSound.IsPlaying())
+                    MenuSound.Play();
                 TurnOnLights();
                 HostMenu.SetUpScene();
                 Camera.fixedAspectRatio = false;
                 Camera.orthographic = false;
                 HostMenu.Canvas.isRendering = true;
+                break;
+            case CAM_STATE.OPTIONS_MENU:
+                OptionsMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.LOADING_SCREEN:
                 TurnOffLights();

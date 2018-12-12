@@ -84,7 +84,7 @@ public class ChadHud : ScriptComponent
         #region Timer stuff
         Timer = Canvas.Add("00:00");
         //Timer.scale = new Vector2(2f);
-        Timer.scale = new Vector2(0.8f);
+        Timer.scale = new Vector2(0.6f);
         Timer.position = new Vector2(0.4975f, -0.005f);
         Timer.color = Color.Black;
         //Timer.font = Numbers;
@@ -125,18 +125,18 @@ public class ChadHud : ScriptComponent
 
         Score1 = Canvas.Add("");
         //Score1.scale = new Vector2(1.6f);
-        Score1.scale = new Vector2(0.4f);
+        Score1.scale = new Vector2(0.5f);
         Score1.origin = new Vector2(0.5f, 0);
-        Score1.position = Score1BG.position + new Vector2(0.005f, 0.001f);
+        Score1.position = Score1BG.position + new Vector2(0.005f, 0);
         Score1.color = Color.White;
         //Score1.font = Numbers;
         Score1.depth = 0.8f;
 
         Score2 = Canvas.Add("");
         //Score2.scale = new Vector2(1.6f);
-        Score2.scale = new Vector2(0.4f);
+        Score2.scale = new Vector2(0.5f);
         Score2.origin = new Vector2(0.5f, 0);
-        Score2.position = Score2BG.position - new Vector2(0.009f, -0.001f);
+        Score2.position = Score2BG.position - new Vector2(0.009f, 0);
         Score2.color = Color.White;
         //Score2.font = Numbers;
         Score2.depth = 0.8f;
@@ -272,7 +272,9 @@ public class ChadHud : ScriptComponent
             text2Pos.x = MathHelper.Lerp(1 + text1Size.x, 0.45f, xPos);
 
             Announcement1.position = text1Pos;
+            Announcement1.scale = new Vector2(0.5f);
             Announcement2.position = text2Pos;
+            Announcement2.scale = new Vector2(0.5f);
 
             Color c = GetRainbowColor(time, 0.5f);
             Color c2 = GetRainbowColor(time, 0.5f);
@@ -339,7 +341,7 @@ public class ChadHud : ScriptComponent
             ChargeBarOutline.rendering = true;
         if (ChargeBar != null)
         {
-            ChargeBar.color = Color.Red;
+            ChargeBar.color = Color.Blue;
             ChargeBar.rendering = true;
         }
 

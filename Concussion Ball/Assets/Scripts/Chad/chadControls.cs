@@ -617,7 +617,7 @@ public class ChadControls : NetworkComponent
 
     IEnumerator StartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
-
+        AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.TACKLED);
         State = STATE.RAGDOLL;
         EnableRagdoll();
         Ragdoll.AddForce(param);
@@ -838,6 +838,7 @@ public class ChadControls : NetworkComponent
             if (pickupable.gameObject.Name == "ball")
             {
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.PICKUPBALL);
             }
             else if (pickupable.gameObject.Name == "Vindaloo")
             {
@@ -901,6 +902,7 @@ public class ChadControls : NetworkComponent
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
+                    AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.TACKLED);
 
                     NetPlayer.HasTackled += 1;
                     CurrentVelocity.y = modifiedBaseSpeed;

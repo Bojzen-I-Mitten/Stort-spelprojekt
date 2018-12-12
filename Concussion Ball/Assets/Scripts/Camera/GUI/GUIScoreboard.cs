@@ -374,7 +374,7 @@ public class GUIScoreboard : ScriptComponent
 
     public override void OnEnable()
     {
-        if (Canvas != null && GUIScoreScreen.Instance.enabled)
+        if (Canvas != null /*&& GUIScoreScreen.Instance.enabled*/)
             Canvas.isRendering = true;
 
         Toggle = false;

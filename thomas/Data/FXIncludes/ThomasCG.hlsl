@@ -81,7 +81,13 @@ struct appdata_thomas_skin
     float4 boneWeight : BONEWEIGHTS;
     int4 boneIndex : BONEINDICES;
 };
-
+struct appdata_thomas_shadowdata
+{
+    float3 vertex : POSITION;
+    float3 normal : NORMAL;
+    float4 boneWeight : BONEWEIGHTS;
+    int4 boneIndex : BONEINDICES;
+};
 
 struct appdata_base {
     float4 vertex : POSITION;

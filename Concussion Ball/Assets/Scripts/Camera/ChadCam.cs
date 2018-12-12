@@ -109,6 +109,8 @@ public class ChadCam : ScriptComponent
     {
         if (Chad && !MatchSystem.instance.ReplaySystem.Replaying && CameraMaster.instance.GetState() == CAM_STATE.GAME)
         {
+            CameraSensitivity_x = GUIOptionsMenu.instance.getMovement();
+            CameraSensitivity_y = GUIOptionsMenu.instance.getMovement();
             switch (Chad.State)
             {
                 case ChadControls.STATE.CHADING:
@@ -141,7 +143,20 @@ public class ChadCam : ScriptComponent
                     break;
                 case ChadControls.STATE.THROWING:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
+                    {
+                        CameraSensitivity_x = GUIOptionsMenu.instance.getAim();
+                        CameraSensitivity_y = GUIOptionsMenu.instance.getAim();
                         ThrowingCamera();
+                        
+                    }
+                    else
+                    {
+                        CameraSensitivity_x = GUIOptionsMenu.instance.getMovement();
+                        CameraSensitivity_y = GUIOptionsMenu.instance.getMovement();
+                        ResetCamera();
+                        transform.rotation = Chad.transform.rotation;
+                        transform.position = ChadHead + CameraOffset * -transform.forward;
+                    }
                     break;
                 case ChadControls.STATE.RAGDOLL:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
