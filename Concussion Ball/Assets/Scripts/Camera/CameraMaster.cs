@@ -1,6 +1,5 @@
 ﻿using ThomasEngine;
 using System.Configuration;
-using System.Collections.Generic;
 
 public enum CAM_STATE
 {
@@ -10,9 +9,8 @@ public enum CAM_STATE
     MAIN_MENU,
     EXIT_MENU,
     HOST_MENU,
+    OPTIONS_MENU,
     LOADING_SCREEN,
-    SCORE_SCREEN,
-    SCOREBOARD,
     NUMSTATES
 }
 
@@ -22,10 +20,6 @@ public class CameraMaster : ScriptComponent
     public GameObject ChadTeam1 { get; set; }
     public GameObject ChadTeam2 { get; set; }
     public GameObject ChadPreviewArea { get; set; }
-    public LightComponent Light1 { get; set; }
-    public LightComponent Light2 { get; set; }
-    
-
 
     public static CameraMaster instance;
 
@@ -35,6 +29,7 @@ public class CameraMaster : ScriptComponent
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;
     GUIHostMenu HostMenu;
+    GUIOptionsMenu OptionsMenu;
     GUILoadingScreen LoadingScreen;
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
@@ -53,13 +48,6 @@ public class CameraMaster : ScriptComponent
         instance = this;
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
-        
-        if (Light1 != null && Light2 != null)
-        {
-            Light1.Intensity = 5;
-            Light2.Intensity = 0.5f;
-
-        }
     }
 
 
@@ -101,6 +89,11 @@ public class CameraMaster : ScriptComponent
         HostMenu = gameObject.GetComponent<GUIHostMenu>();
         if (HostMenu == null)
             Debug.Log("Camera Master cannot find GUI script for host");
+
+        OptionsMenu = gameObject.GetComponent<GUIOptionsMenu>();
+        if (OptionsMenu == null)
+            Debug.Log("Camera Master cannot find GUI script for Options");
+
 
         LoadingScreen = gameObject.GetComponent<GUILoadingScreen>();
         if (LoadingScreen == null)
@@ -163,44 +156,6 @@ public class CameraMaster : ScriptComponent
         return MainMenu != null ? MainMenu.GetPlayerName() : "Chad";
     }
 
-    public void DisableSwitchTeam()
-    {
-        ExitMenu._CanSwitchTeam = false;
-    }
-
-    public void EnableSwitchTeam()
-    {
-        ExitMenu._CanSwitchTeam = true;
-    }
-
-    public void TurnOffLights()
-    {
-        if (Light1 != null)
-        {
-            if (Light1.Intensity == 5)
-                Light1.Intensity = 0;
-        }
-        if (Light2 != null)
-        {
-            if (Light2.Intensity == 0.5f)
-                Light2.Intensity = 0;
-        }   
-    }
-
-    public void TurnOnLights()
-    {
-        if (Light1 != null)
-        {
-            if (Light1.Intensity == 0)
-                Light1.Intensity = 5;
-        }
-        if (Light2 != null)
-        {
-            if (Light2.Intensity == 0)
-                Light2.Intensity = 0.5f;
-        }
-    }
-
     public override void Update()
     {
         //Set all CAM_STATEs exept GAME to false
@@ -211,15 +166,14 @@ public class CameraMaster : ScriptComponent
         ExitMenu.Canvas.isRendering = false;
         HostMenu.Canvas.isRendering = false;
         LoadingScreen.Canvas.isRendering = false;
-        if(GUIScoreScreen.Instance)
-            GUIScoreScreen.Instance.enabled = false;
-        if(GUIScoreboard.Instance)
-            GUIScoreboard.Instance.enabled = false;
+        OptionsMenu.Canvas.isRendering = false;
+
+        if (ChadPreviewArea != null)
+            ChadPreviewArea?.SetActive(true);
 
         switch (State)
         {
             case CAM_STATE.MAIN_MENU:
-                TurnOnLights();
                 MainMenu.SetUpScene();
                 Camera.fixedAspectRatio = true;
                 Camera.orthographic = true;
@@ -227,25 +181,17 @@ public class CameraMaster : ScriptComponent
                 break;
 
             case CAM_STATE.JOIN_HOST:
-                TurnOnLights();
                 MainMenu.SetUpScene();
                 Camera.fixedAspectRatio = true;
                 Camera.orthographic = true;
                 JoinHost.Canvas.isRendering = true;
                 break;
             case CAM_STATE.SELECT_TEAM:
-                TurnOnLights();
                 SelectTeam.SetUpScene();
                 SelectTeam.Canvas.isRendering = true;
-                Camera.fixedAspectRatio = false;
-                Camera.orthographic = false;
                 break;
             case CAM_STATE.GAME:
-                TurnOffLights();
                 Hud.Canvas.isRendering = true;
-                if (GUIScoreboard.Instance)
-                    GUIScoreboard.Instance.enabled = true;
-                
                 if(ChadPreviewArea != null)
                     ChadPreviewArea?.SetActive(false);
                 if (Input.GetKeyDown(Input.Keys.Escape))
@@ -255,8 +201,9 @@ public class CameraMaster : ScriptComponent
                 }
                 break;
             case CAM_STATE.EXIT_MENU:
-                TurnOffLights();
                 ExitMenu.Canvas.isRendering = true;
+                if (ChadPreviewArea != null)
+                    ChadPreviewArea?.SetActive(false);
                 if (Input.GetKeyDown(Input.Keys.Escape))
                 {
                     State = CAM_STATE.GAME;
@@ -264,20 +211,21 @@ public class CameraMaster : ScriptComponent
                 }
                 break;
             case CAM_STATE.HOST_MENU:
-                TurnOnLights();
                 HostMenu.SetUpScene();
                 Camera.fixedAspectRatio = false;
                 Camera.orthographic = false;
                 HostMenu.Canvas.isRendering = true;
                 break;
+            case CAM_STATE.OPTIONS_MENU:
+                OptionsMenu.Canvas.isRendering = true;
+                break;
             case CAM_STATE.LOADING_SCREEN:
-                TurnOffLights();
                 LoadingScreen.Canvas.isRendering = true;
                 break;
-            case CAM_STATE.SCORE_SCREEN:
-                if (GUIScoreScreen.Instance)
-                    GUIScoreScreen.Instance.enabled = true;
-                break;
+
+
+
+
         }
         UpdateHats();
     }

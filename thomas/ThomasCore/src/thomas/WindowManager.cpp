@@ -39,6 +39,27 @@ namespace thomas
 		}
 	}
 
+	void WindowManager::setBorderless(bool Toggle)
+	{
+		
+	//	LOG(Toggle);
+	}
+
+	void WindowManager::setFullscreen(bool Toggle)
+	{
+	//	LOG(Toggle);
+	}
+
+	bool WindowManager::getFullscreen()
+	{
+		return true;
+	}
+
+	bool WindowManager::getBorderless()
+	{
+		return true;
+	}
+
 	WindowManager* WindowManager::Instance()
 	{
 		return &s_windowManager;

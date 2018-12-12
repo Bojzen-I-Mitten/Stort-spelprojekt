@@ -11,8 +11,7 @@ public class GUIExitMenu : ScriptComponent
     Text ExitGame;
     Text SwitchTeam;
 
-    public bool _CanSwitchTeam = true;
-
+    Text OptionsMenu;
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
@@ -21,7 +20,6 @@ public class GUIExitMenu : ScriptComponent
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
         AddImagesAndText();
-        
     }
 
     public override void Start()
@@ -35,7 +33,7 @@ public class GUIExitMenu : ScriptComponent
 
         if (ExitGame.Hovered())
             ExitGame.color = Color.IndianRed;
-        else if (SwitchTeam.Hovered() && _CanSwitchTeam)
+        else if (SwitchTeam.Hovered())
             SwitchTeam.color = Color.IndianRed;
 
         if (ExitGame.Clicked())
@@ -46,12 +44,25 @@ public class GUIExitMenu : ScriptComponent
                 ThomasWrapper.IssueRestart();
             } 
         }
-        else if (SwitchTeam.Clicked() && _CanSwitchTeam)
+        else if (SwitchTeam.Clicked())
         {
             CameraMaster.instance.Canvas.isRendering = true;
             gameObject.GetComponent<ChadCam>().enabled = false;
             CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
         }
+
+        if (OptionsMenu.Hovered())
+            OptionsMenu.color = Color.Red;
+        else
+            OptionsMenu.color = Color.Black;
+
+
+        if (OptionsMenu.Clicked())
+        {
+            GUIOptionsMenu.instance.ActivatedfromExitmenu = true;
+            CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
+        }
+
     }
 
     private void AddImagesAndText()
@@ -69,6 +80,15 @@ public class GUIExitMenu : ScriptComponent
         ExitGame.outlineColor = Color.Black;
         #endregion
 
+      OptionsMenu = Canvas.Add("Options Menu");
+        OptionsMenu.position = new Vector2(0.5f, 0.35f);
+        OptionsMenu.origin = new Vector2(0.5f);
+        OptionsMenu.color = Color.White;
+        OptionsMenu.font = SportNumbers32;
+        OptionsMenu.interactable = true;
+        OptionsMenu.outline = true;
+        OptionsMenu.outlineColor = Color.Black;
+    
         #region Switch Team
         SwitchTeam = Canvas.Add("Switch Team");
         SwitchTeam.position = new Vector2(0.5f, 0.30f);
@@ -79,6 +99,10 @@ public class GUIExitMenu : ScriptComponent
         SwitchTeam.outline = true;
         SwitchTeam.outlineColor = Color.Black;
         #endregion
+        
+        
+        
+        
 
         #endregion
     }

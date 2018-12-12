@@ -770,7 +770,7 @@ public class Ragdoll : ScriptComponent
                 gObj.SetActive(false);
         }
         RagdollEnabled = false;
-        if (skin)
+        if(skin != null)
             skin.EnableCulling = true;
     }
     

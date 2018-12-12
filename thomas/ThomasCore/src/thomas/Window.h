@@ -81,6 +81,7 @@ namespace thomas
 		bool m_showCursor;
 		bool m_borderless;
 		bool m_fullScreen;
+		bool m_borderless;
 		bool m_initialized;
 		bool m_shouldStyleChange;
 		bool m_shouldResize;
