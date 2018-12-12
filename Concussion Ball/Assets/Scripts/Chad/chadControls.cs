@@ -108,7 +108,7 @@ public class ChadControls : NetworkComponent
 
     //private Material[] OriginalMaterials;
     public Material ChadFirstMaterial { get; set; }
-    public Material ChadSecondMaterial { get; set; }
+    public Material ChadSecondMaterial = null;
     public Material ChadThirdMaterial { get; set; }
 
     // Tweaking constants
@@ -151,6 +151,7 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+        ChadSecondMaterial = gameObject.GetComponent<RenderSkinnedComponent>().GetMaterial(1);
 
         FirstJumpForce = 450.0f;
         SecondJumpForce = 350.0f;
@@ -738,49 +739,26 @@ public class ChadControls : NetworkComponent
         rBody.AddForce(new Vector3(0, 200.0f, 0), Rigidbody.ForceMode.Impulse);
 
         // Network
-        SendRPC("RPCResetMaterial");
 
-        // Local
-        if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_1)
+        if(MatchSystem.instance.LocalChad.ToySoldierAffected)
         {
-            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
-            render.SetMaterial(0, ChadFirstMaterial);
-            render.SetMaterial(1, ChadSecondMaterial);
-            render.SetMaterial(2, ChadThirdMaterial);
-        }
-        else if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_2)
-        {
-            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
-            render.SetMaterial(0, ChadFirstMaterial);
-            render.SetMaterial(1, ChadSecondMaterial);
-            render.SetMaterial(2, ChadThirdMaterial);
-        }
-
-        ScaleCountdown = ScaleDuration;
-        ToySoldierAffected = false;
-        ToySoldierModifier = null;
+            Debug.Log("Resetting toy soldier affected");
+            MatchSystem.instance.LocalChad.ToySoldierAffected = false;
+            MatchSystem.instance.LocalChad.ScaleCountdown = ScaleDuration;
+            MatchSystem.instance.LocalChad.ToySoldierModifier = null;
+            SendRPC("RPCResetMaterial");
+            RPCResetMaterial();
+        }        
     }
 
     public void RPCResetMaterial()
     {
-        if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_1)
-        {
-            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
-            render.SetMaterial(0, ChadFirstMaterial);
-            render.SetMaterial(1, ChadSecondMaterial);
-            render.SetMaterial(2, ChadThirdMaterial);
-        }
-        else if (MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject) == TEAM_TYPE.TEAM_2)
-        {
-            RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
-            ChadSecondMaterial.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
-            render.SetMaterial(0, ChadFirstMaterial);
-            render.SetMaterial(1, ChadSecondMaterial);
-            render.SetMaterial(2, ChadThirdMaterial);
-        }
+        RenderSkinnedComponent render = MatchSystem.instance.LocalChad.gameObject.GetComponent<RenderSkinnedComponent>();
+        //MatchSystem.instance.LocalChad.ChadSecondMaterial.SetColor("color", 
+        //    MatchSystem.instance.Teams[MatchSystem.instance.GetPlayerTeam(MatchSystem.instance.LocalChad.gameObject)].Color);
+        render.SetMaterial(0, ChadFirstMaterial);
+        render.SetMaterial(1, ChadSecondMaterial);
+        render.SetMaterial(2, ChadThirdMaterial);
     }
 
     public void RPCSetAnimWeight(int index, float weight)
