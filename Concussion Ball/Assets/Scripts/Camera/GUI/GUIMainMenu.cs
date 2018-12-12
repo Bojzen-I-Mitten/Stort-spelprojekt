@@ -160,6 +160,11 @@ public class GUIMainMenu : ScriptComponent
                 AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.HAT);
             }
             #endregion
+        if(Options.Clicked())
+        {
+                CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
+           }
+          
 
             if (TakeName)
             {

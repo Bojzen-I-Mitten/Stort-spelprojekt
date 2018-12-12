@@ -10,6 +10,7 @@ public enum CAM_STATE
     MAIN_MENU,
     EXIT_MENU,
     HOST_MENU,
+    OPTIONS_MENU,
     LOADING_SCREEN,
     SCORE_SCREEN,
     SCOREBOARD,
@@ -35,6 +36,7 @@ public class CameraMaster : ScriptComponent
     GUISelectTeam SelectTeam;
     GUIExitMenu ExitMenu;
     GUIHostMenu HostMenu;
+    GUIOptionsMenu OptionsMenu;
     GUILoadingScreen LoadingScreen;
     ChadCam ChadCam;
     SpectatorCam SpectatorCam;
@@ -111,6 +113,11 @@ public class CameraMaster : ScriptComponent
         HostMenu = gameObject.GetComponent<GUIHostMenu>();
         if (HostMenu == null)
             Debug.Log("Camera Master cannot find GUI script for host");
+
+        OptionsMenu = gameObject.GetComponent<GUIOptionsMenu>();
+        if (OptionsMenu == null)
+            Debug.Log("Camera Master cannot find GUI script for Options");
+
 
         LoadingScreen = gameObject.GetComponent<GUILoadingScreen>();
         if (LoadingScreen == null)
@@ -225,6 +232,7 @@ public class CameraMaster : ScriptComponent
             GUIScoreScreen.Instance.enabled = false;
         if(GUIScoreboard.Instance)
             GUIScoreboard.Instance.enabled = false;
+        OptionsMenu.Canvas.isRendering = false;
 
         switch (State)
         {
@@ -289,6 +297,9 @@ public class CameraMaster : ScriptComponent
                 Camera.fixedAspectRatio = false;
                 Camera.orthographic = false;
                 HostMenu.Canvas.isRendering = true;
+                break;
+            case CAM_STATE.OPTIONS_MENU:
+                OptionsMenu.Canvas.isRendering = true;
                 break;
             case CAM_STATE.LOADING_SCREEN:
                 TurnOffLights();
