@@ -213,11 +213,12 @@ public class ChadControls : NetworkComponent
             Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (/*-transform.forward +*/ transform.up * 0.5f) * 200000, 1);
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
-#endif
         if (Input.GetKeyDown(Input.Keys.J))
             Debug.Log(rBody.Position);
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
+#endif
+
 
 
         rBody.Friction = 0.5f;
