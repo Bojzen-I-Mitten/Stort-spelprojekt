@@ -37,9 +37,13 @@ namespace thomas
 					m_spriteBatch->SetViewport(GetViewport());
 					if (Get3D())
 					{
+						m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
 						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
 					}
+					else
+						m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
 					m_spriteBatch->SetViewport(GetViewport());
+					
 					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
 					m_lock.lock();
 					for (int i = 0; i < m_GUIElements.size(); ++i)
@@ -132,14 +136,11 @@ namespace thomas
 			}
 			void Canvas::Set3D(bool value)
 			{
-				if (value)
-					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
-				else
-					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
+				m_3D = value;
 			}
 			bool Canvas::Get3D()
 			{
-				return m_spriteBatch->GetRotation() == DXGI_MODE_ROTATION_UNSPECIFIED;
+				return m_3D;
 			}
 		}
 	}

@@ -58,6 +58,7 @@ namespace thomas
 				math::Vector2 m_baseResolution;
 				math::Matrix m_worldMatrix;
 				bool m_render;
+				bool m_3D;
 				utils::atomics::SpinLock m_lock;
 			};
 		}

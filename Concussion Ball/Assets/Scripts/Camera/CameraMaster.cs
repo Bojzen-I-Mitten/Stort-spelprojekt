@@ -103,6 +103,14 @@ public class CameraMaster : ScriptComponent
             Debug.Log("Camera Master could not find Hud");
         #endregion
 
+
+
+    }
+
+    public override void Start()
+    {
+        SetState(CAM_STATE.MAIN_MENU);
+
         #region Chad Hats
         string settingsHat = UserSettings.GetSetting("Hat");
 
@@ -133,12 +141,6 @@ public class CameraMaster : ScriptComponent
             ChadT2Hat.SetHat(SelectedHat);
         }
         #endregion
-
-    }
-
-    public override void Start()
-    {
-        SetState(CAM_STATE.MAIN_MENU);
     }
 
     public void StartReplay()
