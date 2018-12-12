@@ -11,7 +11,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam
 namespace thomas 
 {
 	Window::Window(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name) :
-		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_borderless(false), 
+		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_shouldSnappOutOfFullscreen(false), m_borderless(false),
 		m_shouldStyleChange(false), m_hInstance(nullptr), m_initialized(false), m_input(Input()), m_windowStyle(0), m_width(width), m_height(height)
 	{
 		m_input.Init();
@@ -70,6 +70,13 @@ namespace thomas
 			m_height = 1080;
 
 			SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER);
+		}
+		else if (m_shouldSnappOutOfFullscreen)
+		{
+			m_width = 800;
+			m_height = 600;
+
+			SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER | SWP_NOMOVE);
 		}
 		else
 		{
@@ -130,7 +137,7 @@ namespace thomas
 		if (!SetWindowPos(m_windowHandler, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOMOVE))
 			return false;
 			
-		return true;
+		return ResizeBackBuffer();
 	}
 
 	void Window::WaitOnSwapChain()
@@ -163,7 +170,11 @@ namespace thomas
 		if (m_shouldResize)
 		{
 			if (Resize())
+			{
 				m_shouldResize = false;
+				m_shouldSnappOutOfFullscreen = false;
+			}
+				
 		}
 
 		if (m_shouldStyleChange)
@@ -348,6 +359,9 @@ namespace thomas
 	void Window::SetFullscreen(bool fullscreen)
 	{
 		m_fullScreen = fullscreen;
+
+		if (!m_fullScreen)
+			m_shouldSnappOutOfFullscreen = true;
 	}
 
 	void Window::SetBorderless(bool borderless)

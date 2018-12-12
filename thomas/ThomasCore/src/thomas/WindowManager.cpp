@@ -41,7 +41,7 @@ namespace thomas
 
 	void WindowManager::SetBorderless(bool borderless)
 	{
-		if (m_current != nullptr && !m_current->IsEditor())
+		if (m_current != nullptr)
 		{
 			m_current->QueueWindowStyleChange();
 			m_current->SetBorderless(borderless);
@@ -50,7 +50,7 @@ namespace thomas
 
 	void WindowManager::SetFullscreen(bool fullscreen)
 	{
-		if (m_current != nullptr && !m_current->IsEditor())
+		if (m_current != nullptr)
 		{
 			m_current->QueueResize();
 			m_current->SetFullscreen(fullscreen);
@@ -59,7 +59,7 @@ namespace thomas
 
 	bool WindowManager::GetFullscreen()
 	{
-		if (m_current != nullptr && !m_current->IsEditor())
+		if (m_current != nullptr)
 		{
 			return m_current->GetFullScreen();
 		}
@@ -69,7 +69,7 @@ namespace thomas
 
 	bool WindowManager::GetBorderless()
 	{
-		if (m_current != nullptr && !m_current->IsEditor())
+		if (m_current != nullptr)
 		{
 			return m_current->GetBorderless();
 		}

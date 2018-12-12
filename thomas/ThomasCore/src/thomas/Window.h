@@ -90,6 +90,7 @@ namespace thomas
 		bool m_initialized;
 		bool m_shouldStyleChange;
 		bool m_shouldResize;
+		bool m_shouldSnappOutOfFullscreen;
 		
 		float m_aspectRatio;
 		std::string m_title;
