@@ -48,4 +48,11 @@ public class SpectatorCam : ScriptComponent
             transform.rotation = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(yaw), MathHelper.ToRadians(pitch), 0);
         }
     }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+        if (CameraMaster.instance.GetState() == CAM_STATE.SELECT_TEAM)
+            transform.position = new Vector3(0, 20, 0);
+    }
 }

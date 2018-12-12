@@ -12,7 +12,7 @@ public class NetworkPlayer : NetworkComponent
     public Team Team { get; set; }
     public float BottomOfTheWorld { get; set; } = -5;
     public float ragdollOffset = 1.0f;
-    public float textOffset = 1.3f;
+    public float textOffset = 1.5f;
     public Font NameFont { get; set; }
     public float textScale { get; set; } = 0.008f;
     public int HasTackled = 0;
@@ -237,6 +237,7 @@ public class NetworkPlayer : NetworkComponent
             }
             else
             {
+                Debug.Log("Reset NetworkPlayer");
                 CameraMaster.instance.gameObject.GetComponent<ChadCam>().enabled = true;
                 CameraMaster.instance.gameObject.GetComponent<SpectatorCam>().enabled = false;
             }

@@ -6,7 +6,7 @@
 #include "../../Common.h"
 #include "../../ThomasCore.h"
 #include "../../object/component/Camera.h"
-
+#include "../../resource/ResourceManager.h"
 namespace thomas
 {
 	namespace graphics
@@ -15,9 +15,9 @@ namespace thomas
 		{
 			Canvas::Canvas(Viewport viewport, object::component::Camera* cam, Vector2 baseResolution)
 			{
-				m_spriteBatch = std::make_unique<SpriteBatch>(utils::D3D::Instance()->GetDeviceContextDeferred());
-				m_defaultFont = std::make_unique<Font>("../Data/Fonts/sportNumbers64.spritefont");
-				m_spriteStates = std::make_unique<CommonStates>(utils::D3D::Instance()->GetDevice());
+				m_spriteBatch = resource::ResourceManager::GetSpriteBatch();
+				m_defaultFont = resource::ResourceManager::GetDefaultFont();
+				m_spriteStates = resource::ResourceManager::GetSpriteStates();
 				m_camera = cam;
 				m_viewport = viewport;
 				m_baseResolution = baseResolution;
@@ -27,9 +27,6 @@ namespace thomas
 			}
 			Canvas::~Canvas()
 			{
-				m_spriteBatch.reset();
-				m_defaultFont.reset();
-				m_spriteStates.reset();
 				m_GUIElements.clear();
 			}
 			void Canvas::Render()
@@ -40,16 +37,20 @@ namespace thomas
 					m_spriteBatch->SetViewport(GetViewport());
 					if (Get3D())
 					{
+						m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
 						matrix = m_worldMatrix * m_camera->GetViewProjMatrix();
 					}
+					else
+						m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
 					m_spriteBatch->SetViewport(GetViewport());
+					
 					m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_spriteStates->NonPremultiplied(), nullptr, nullptr, m_spriteStates->CullNone(), nullptr, matrix);
-					lock.lock();
+					m_lock.lock();
 					for (int i = 0; i < m_GUIElements.size(); ++i)
 					{
-						m_GUIElements[i]->Draw(m_spriteBatch.get(), GetViewport(), GetViewportScale());
+						m_GUIElements[i]->Draw(m_spriteBatch, GetViewport(), GetViewportScale());
 					}
-					lock.unlock();
+					m_lock.unlock();
 
 					m_spriteBatch->End();
 				}
@@ -85,10 +86,10 @@ namespace thomas
 
 			GUIElement* Canvas::Add(const std::string& text)
 			{
-				Font* font = m_defaultFont.get();
+				Font* font = m_defaultFont;
 				std::unique_ptr<GUIElement> newText =
 					std::unique_ptr<GUIElement>(new Text(font, text, this));
-				thomas::utils::atomics::Lock lk(lock);
+				thomas::utils::atomics::Lock lk(m_lock);
 				m_GUIElements.push_back(std::move(newText));
 				return m_GUIElements[m_GUIElements.size() - 1].get();
 			}
@@ -98,7 +99,7 @@ namespace thomas
 				if (texture->GetResourceView())
 				{
 					std::unique_ptr<GUIElement> image = std::make_unique<Image>(texture, this);
-					thomas::utils::atomics::Lock lk(lock);
+					thomas::utils::atomics::Lock lk(m_lock);
 					m_GUIElements.push_back(std::move(image));
 					return m_GUIElements[m_GUIElements.size() - 1].get();
 				}
@@ -108,7 +109,7 @@ namespace thomas
 
 			void Canvas::Remove(GUIElement* _element)
 			{
-				lock.lock();
+				m_lock.lock();
 				auto element = m_GUIElements.begin();
 
 				while (element._Ptr->get() != _element && element != m_GUIElements.end())
@@ -118,7 +119,7 @@ namespace thomas
 				{
 					m_GUIElements.erase(element);
 				}
-				lock.unlock();
+				m_lock.unlock();
 			}
 
 			void Canvas::SetRendering(bool render)
@@ -135,14 +136,11 @@ namespace thomas
 			}
 			void Canvas::Set3D(bool value)
 			{
-				if (value)
-					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_UNSPECIFIED);
-				else
-					m_spriteBatch->SetRotation(DXGI_MODE_ROTATION_IDENTITY);
+				m_3D = value;
 			}
 			bool Canvas::Get3D()
 			{
-				return m_spriteBatch->GetRotation() == DXGI_MODE_ROTATION_UNSPECIFIED;
+				return m_3D;
 			}
 		}
 	}

@@ -46,7 +46,7 @@ public class GUISelectTeam : ScriptComponent
     Vector3 Chad2Pos;
     Vector3 Chad2Rot;
 
-    public override void Start()
+    public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
@@ -61,23 +61,13 @@ public class GUISelectTeam : ScriptComponent
         {
             ChadRSC1 = CameraMaster.instance.ChadTeam1.GetComponent<RenderSkinnedComponent>();
 
-            Material[] mats = ChadRSC1.materials;
-
-            Chad1Mat = mats[1] = new Material(mats[1]);
-
-            ChadRSC1.materials = mats;
-
-
+            Chad1Mat = ChadRSC1.CreateMaterialInstance("Chad66");
         }
         if (CameraMaster.instance.ChadTeam2 != null)
         {
             ChadRSC2 = CameraMaster.instance.ChadTeam2.GetComponent<RenderSkinnedComponent>();
 
-            Material[] mats = ChadRSC2.materials;
-
-            Chad2Mat = mats[1] = new Material(mats[1]);
-
-            ChadRSC2.materials = mats;
+            Chad2Mat = ChadRSC2.CreateMaterialInstance("Chad66");
         }
 
 
@@ -85,13 +75,14 @@ public class GUISelectTeam : ScriptComponent
 
     public override void Update()
     {
+        Chad1Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
+        Chad2Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
         if (Canvas.isRendering)
         {
+            transform.position = SelectTeamCamPos;
+
             Team1Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Name;
             Team2Text.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name;
-            Chad1Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Color);
-            Chad2Mat?.SetColor("color", MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Color);
-
             ShowPlayers();
 
             if (Team1Image.Clicked())
@@ -102,7 +93,7 @@ public class GUISelectTeam : ScriptComponent
                 if (MatchSystem.instance.MatchStarted)
                 {
                     Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
+                    CameraMaster.instance.SetState(CAM_STATE.GAME);
                     CameraMaster.instance.Canvas.isRendering = false;
                     gameObject.GetComponent<ChadCam>().enabled = true;
                     MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
@@ -116,13 +107,13 @@ public class GUISelectTeam : ScriptComponent
                 if (MatchSystem.instance.MatchStarted)
                 {
                     Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
+                    CameraMaster.instance.SetState(CAM_STATE.GAME);
                     CameraMaster.instance.Canvas.isRendering = false;
                     gameObject.GetComponent<ChadCam>().enabled = true;
                     MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
                 }
             }
-            else if (SpectatorImage.Clicked())
+            else if (SpectatorImage.Clicked() || SpectatorText.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
                 MatchSystem.instance.LocalChad.NetPlayer.Ready(true);
@@ -130,7 +121,7 @@ public class GUISelectTeam : ScriptComponent
                 if (MatchSystem.instance.MatchStarted)
                 {
                     Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                    CameraMaster.instance.State = CAM_STATE.GAME;
+                    CameraMaster.instance.SetState(CAM_STATE.GAME);
                     CameraMaster.instance.Canvas.isRendering = false;
                     gameObject.GetComponent<SpectatorCam>().enabled = true;
                 }
@@ -150,7 +141,7 @@ public class GUISelectTeam : ScriptComponent
             else if ((StartGame.Clicked() || (MatchSystem.instance.MatchLength == MatchSystem.instance.MatchTimeLeft && MatchSystem.instance.MatchStarted)) && Canvas.isRendering)
             {
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
-                CameraMaster.instance.State = CAM_STATE.GAME;
+                CameraMaster.instance.SetState(CAM_STATE.GAME);
                 CameraMaster.instance.Canvas.isRendering = false;
                 MatchSystem.instance.OnMatchStart();
                 gameObject.GetComponent<SpectatorCam>().enabled = true;

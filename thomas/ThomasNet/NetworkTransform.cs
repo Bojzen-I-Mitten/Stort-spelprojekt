@@ -139,10 +139,10 @@ namespace ThomasEngine.Network
         {
             if (!isOwner && targetRigidbody && targetRigidbody.enabled)
             {
-                //Vector3 newVelocity = (TargetSyncPosition - targetRigidbody.Position) * InterpolateMovement / SendInterval;
-                //targetRigidbody.LinearVelocity = newVelocity;
+                Vector3 newVelocity = (TargetSyncPosition - targetRigidbody.Position) * InterpolateMovement / SendInterval;
+                targetRigidbody.LinearVelocity = newVelocity;
 
-                //TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
+                TargetSyncPosition += (TargetSyncLinearVelocity * Time.DeltaTime * MoveAheadRatio);
             }
         }
 

@@ -7,6 +7,7 @@ using ThomasEngine.Network;
 using LiteNetLib;
 using System.ComponentModel;
 using System.Collections;
+using LiteNetLib.Utils;
 
 public enum TEAM_TYPE
 {
@@ -229,7 +230,7 @@ public class MatchSystem : NetworkManager
         yield return new WaitForSecondsRealtime(duration);
         GoldenGoal = false;
 
-        CameraMaster.instance.State = CAM_STATE.SCORE_SCREEN;
+        CameraMaster.instance.SetState(CAM_STATE.SCORE_SCREEN);
         for (int i = 0; i < GUIScoreScreen.Instance.ScoreScreenTimeLast; i++)
         {
             GUIScoreScreen.Instance.UpdateTimer();
@@ -239,7 +240,7 @@ public class MatchSystem : NetworkManager
         }
         ResetNetworkplayerPoints();
         RPCStartMatch();
-        CameraMaster.instance.State = CAM_STATE.GAME;
+        CameraMaster.instance.SetState(CAM_STATE.GAME);
     }
 
     IEnumerator RoundStartCountdown(float duration)
@@ -282,30 +283,46 @@ public class MatchSystem : NetworkManager
     }
     #endregion
 
+    #region Read/Write
+    public override void OnWrite(NetDataWriter writer)
+    {
+        writer.Put(MatchStarted);
+        writer.Put(GoldenGoal);
+        writer.Put(MatchStartTime);
+        writer.Put(MatchLength);
+        writer.Put(MaxPlayers);
+        writer.Put(ServerName);
+
+        writer.Put(Teams[TEAM_TYPE.TEAM_1].Color);
+        writer.Put(Teams[TEAM_TYPE.TEAM_1].Name);
+        writer.Put(Teams[TEAM_TYPE.TEAM_1].Score);
+
+        writer.Put(Teams[TEAM_TYPE.TEAM_2].Color);
+        writer.Put(Teams[TEAM_TYPE.TEAM_2].Name);
+        writer.Put(Teams[TEAM_TYPE.TEAM_2].Score);
+
+    }
+    public override void OnRead(NetDataReader reader)
+    {
+        MatchStarted = reader.GetBool();
+        GoldenGoal = reader.GetBool();
+        MatchStartTime = reader.GetFloat();
+        MatchLength = reader.GetInt();
+        MaxPlayers = reader.GetInt();
+        ServerName = reader.GetString();
+
+        Teams[TEAM_TYPE.TEAM_1].Color = reader.GetColor();
+        Teams[TEAM_TYPE.TEAM_1].Name = reader.GetString();
+        Teams[TEAM_TYPE.TEAM_1].Score = reader.GetInt();
+
+        Teams[TEAM_TYPE.TEAM_2].Color = reader.GetColor();
+        Teams[TEAM_TYPE.TEAM_2].Name = reader.GetString();
+        Teams[TEAM_TYPE.TEAM_2].Score = reader.GetInt();
+    }
+    #endregion
+
     #region RPC
 
-    public void RPCMatchInfo(bool matchStarted, float startTime, int length, bool goldenGoal, int powerupID, int players, string name,
-        int team1Score, int team2Score,
-        Color team1Color, Color team2Color,
-        string team1Name, string team2Name)
-    {
-
-        MatchStarted = matchStarted;
-        PowerupManager.NextPowerupID = powerupID;
-        GoldenGoal = goldenGoal;
-        MatchStartTime = startTime;
-        MatchLength = length;
-        MaxPlayers = players;
-        ServerName = name;
-
-        Teams[TEAM_TYPE.TEAM_1].Color = team1Color;
-        Teams[TEAM_TYPE.TEAM_2].Color = team2Color;
-        Teams[TEAM_TYPE.TEAM_1].Name = team1Name;
-        Teams[TEAM_TYPE.TEAM_2].Name = team2Name;
-        Teams[TEAM_TYPE.TEAM_1].Score = team1Score;
-        Teams[TEAM_TYPE.TEAM_2].Score = team2Score;
-        Debug.Log("Got matchinfo from network!");
-    }
 
     public void RPCStartMatch()
     {
@@ -406,18 +423,7 @@ public class MatchSystem : NetworkManager
 
     protected override void OnPeerJoin(NetPeer peer)
     {
-        //if(peer == LocalPeer)
-        //{
-        //    NetworkPlayer np = Scene.Players[peer].gameObject.GetComponent<NetworkPlayer>();
-        //    np.PlayerName = NetUtils.GetLocalIp(LocalAddrType.IPv4);
-        //}
-        if (peer != LocalPeer && Ball.GetComponent<NetworkIdentity>().Owner)
-        {
-            SendRPC(peer, -2, "RPCMatchInfo", MatchStarted, MatchStartTime, MatchLength, GoldenGoal, PowerupManager.NextPowerupID, MaxPlayers, ServerName,
-                Teams[TEAM_TYPE.TEAM_1].Score, Teams[TEAM_TYPE.TEAM_2].Score,
-                Teams[TEAM_TYPE.TEAM_1].Color, Teams[TEAM_TYPE.TEAM_2].Color,
-                Teams[TEAM_TYPE.TEAM_1].Name, Teams[TEAM_TYPE.TEAM_2].Name);
-        }
+
     }
 
     #endregion
