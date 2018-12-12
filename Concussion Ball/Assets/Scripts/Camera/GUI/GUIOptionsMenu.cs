@@ -52,17 +52,9 @@ public class ImageBaradjustment
             Images.interactable = true;
         }
     }
-    public void start(Vector2 input, Canvas Canvas, Texture2D ImageBackground, Texture2D ImageToggle, Texture2D ImageAftermathToggle)
+    public void start()
     {
-        this.Canvas = Canvas;
-        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE] = Canvas.Add(ImageBackground);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE] = Canvas.Add(ImageToggle);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE] = Canvas.Add(ImageAftermathToggle);
-        foreach (Image Images in Image)
-        {
-            Images.interactable = true;
-            Images.position = input;
-        }
+     
     }
     public void UpdatePositionInworld(Vector2 input)
     {
@@ -329,47 +321,38 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
 
-        ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = 474;
-        ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 474;
-        ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 474;
-        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 474;
-        ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 474;
 
         string SettingsMasterVolume = UserSettings.GetSetting("Master");
         if (SettingsMasterVolume != null)
         {
             ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = System.Convert.ToInt32(SettingsMasterVolume);
+            ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
         }
         string settingsMusic = UserSettings.GetSetting("Music");
         if (settingsMusic != null)
         {
             ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = System.Convert.ToInt32(settingsMusic);
+            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
         }
         string settingsSFX = UserSettings.GetSetting("Sfx");
         if (settingsSFX != null)
         {
             ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = System.Convert.ToInt32(settingsSFX);
+            ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
         }
         string settingsMove = UserSettings.GetSetting("Move");
         if (settingsMove != null)
         {
             ImageBar[(int)ImageBarstate.Movement].LastMousePosition = System.Convert.ToInt32(settingsMove);
+            ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
         }
         string settingsAIM = UserSettings.GetSetting("Aim");
         if (settingsAIM != null)
         {
             ImageBar[(int)ImageBarstate.AIM].LastMousePosition = System.Convert.ToInt32(settingsAIM);
+            ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
         }
-        //ImageBar.Add(new ImageBaradjustment(Canvas));
-      //  ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 373;// load LastMousePosition here
-     //   ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 460; // load LastMousePosition here
-     //   ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 373;// load LastMousePosition here
-      //  ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 460; // load LastMousePosition here
-        ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
+
         ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
