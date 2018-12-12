@@ -433,7 +433,6 @@ public class ChadControls : NetworkComponent
         HasThrown = false;
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
-        ChargeTime = 0;
         
         if (PickedUpObject)
         {
@@ -446,7 +445,10 @@ public class ChadControls : NetworkComponent
     private void ResetThrow()
     {
         if (isOwner)
+        {
             ChadHud.Instance.DeactivateAimHUD();
+            ChargeTime = 0;
+        }
         SendRPC("RPCResetThrow");
         RPCResetThrow();
     }
@@ -824,6 +826,7 @@ public class ChadControls : NetworkComponent
     {
         if (pickupable.transform.parent == null)
         {
+            ChargeTime = 0;
             if(FadeText != null)
             {
                 StopCoroutine(FadeText);

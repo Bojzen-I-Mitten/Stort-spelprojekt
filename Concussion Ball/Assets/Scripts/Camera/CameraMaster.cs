@@ -59,6 +59,14 @@ public class CameraMaster : ScriptComponent
             Light2.Intensity = 0.5f;
         }
 
+        
+
+        
+
+    }
+
+    public override void Start()
+    {
         #region Init GUI
         if (Camera == null)
             Debug.Log("Camera Master cannot find camera");
@@ -136,10 +144,6 @@ public class CameraMaster : ScriptComponent
         }
         #endregion
 
-    }
-
-    public override void Start()
-    {
         SetState(CAM_STATE.MAIN_MENU);
     }
 

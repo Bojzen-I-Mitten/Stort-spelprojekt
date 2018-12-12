@@ -77,6 +77,7 @@ public class GUIScoreScreen : ScriptComponent
 
     public void UpdateTimer()
     {
+        if(Timer>0)
         Textdatalist[2].text = (Timer -= 1).ToString();
     }
     
@@ -107,7 +108,7 @@ public class GUIScoreScreen : ScriptComponent
 
         if(Init)
         {
-            Timer = 10;
+            Timer = ScoreScreenTimeLast;
             Init = false;
         }
     }

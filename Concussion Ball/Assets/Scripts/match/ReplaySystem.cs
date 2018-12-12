@@ -59,6 +59,7 @@ public class ReplaySystem : ScriptComponent
     {
         if(!Replaying)
         {
+            ChadHud.Instance.DeactivateAimHUD();
             Vector3 goalPos = MatchSystem.instance.Teams[MatchSystem.instance.GetOpposingTeam(teamThatScored.TeamType)].GoalPosition;
             StartCoroutine(RelayCoroutine(goalPos));
         }

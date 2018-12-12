@@ -49,10 +49,23 @@ public class SpectatorCam : ScriptComponent
         }
     }
 
+    public void EnableSpeCam()
+    {
+        transform.position = new Vector3(0, 20, 0);
+    }
+
     public override void OnEnable()
     {
         base.OnEnable();
-        if (CameraMaster.instance.GetState() == CAM_STATE.SELECT_TEAM)
+        if (CameraMaster.instance.GetState() == CAM_STATE.SELECT_TEAM || CameraMaster.instance.GetState() == CAM_STATE.GAME)
+        {
             transform.position = new Vector3(0, 20, 0);
+        }
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
+
     }
 }
