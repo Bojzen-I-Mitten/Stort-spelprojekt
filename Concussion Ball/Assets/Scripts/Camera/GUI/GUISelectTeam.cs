@@ -124,6 +124,7 @@ public class GUISelectTeam : ScriptComponent
                     CameraMaster.instance.SetState(CAM_STATE.GAME);
                     CameraMaster.instance.Canvas.isRendering = false;
                     gameObject.GetComponent<SpectatorCam>().enabled = true;
+                    gameObject.GetComponent<SpectatorCam>().EnableSpeCam();
                 }
             }
             else if (ReadyUp.Clicked())
@@ -143,8 +144,8 @@ public class GUISelectTeam : ScriptComponent
                 Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
                 CameraMaster.instance.SetState(CAM_STATE.GAME);
                 CameraMaster.instance.Canvas.isRendering = false;
-                MatchSystem.instance.OnMatchStart();
                 gameObject.GetComponent<SpectatorCam>().enabled = true;
+                MatchSystem.instance.OnMatchStart();
                 MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
             }
 
