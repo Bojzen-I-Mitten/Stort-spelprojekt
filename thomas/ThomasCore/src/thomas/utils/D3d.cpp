@@ -20,6 +20,7 @@ namespace thomas
 	{
 		bool D3D::CreateRenderTarget(ID3D11Texture2D* backbuffer, ID3D11Texture2D*& buffer, ID3D11RenderTargetView*& rtv, ID3D11ShaderResourceView*& srv)
 		{
+
 				D3D11_TEXTURE2D_DESC bufferDesc = {};
 				backbuffer->GetDesc(&bufferDesc);
 
@@ -63,6 +64,11 @@ namespace thomas
 						LOG_HR(hr);
 						return false;
 					}
+
+#ifdef BENCHMARK
+					float vramUsage = utils::profiling::ProfileManager::lastTextureVramUsage();
+					utils::profiling::ProfileManager::addTextureData("CreateRenderTarget", vramUsage);
+#endif
 					return true;
 				}
 
@@ -128,6 +134,7 @@ namespace thomas
 			if (FAILED(hr))
 				return false;
 
+
 			return true;
 		}
 
@@ -181,6 +188,12 @@ namespace thomas
 				tex->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof(c_szName) - 1, c_szName);
 #endif
 			}
+
+
+#ifdef BENCHMARK
+			float vramUsage = utils::profiling::ProfileManager::lastTextureVramUsage();
+			utils::profiling::ProfileManager::addTextureData("TextureRender", vramUsage);
+#endif
 			return true;
 		}
 

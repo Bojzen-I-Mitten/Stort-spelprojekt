@@ -132,6 +132,8 @@ namespace ThomasStandalone
         [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
         static extern bool DestroyWindow(IntPtr hWnd);
 
+        [DllImport("user32.dll")]
+        static extern bool SetWindowTextA(IntPtr Hwnd, string title);
 
         [DllImport("user32.dll", SetLastError = true, EntryPoint = "CreateWindowEx")]
         public static extern IntPtr CreateWindowEx(
@@ -176,6 +178,7 @@ namespace ThomasStandalone
         [DllImport("user32.dll")]
         static extern IntPtr DispatchMessage([In] ref MSG lpmsg);
 
+        static IntPtr hWnd;
 
         internal bool create(string name, int width, int height)
         {
@@ -215,7 +218,7 @@ namespace ThomasStandalone
             //IntPtr hWnd = CreateWindowEx(0, wind_class.lpszClassName, "MyWnd", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 30, 40, IntPtr.Zero, IntPtr.Zero, wind_class.hInstance, IntPtr.Zero);
 
             //This version worked and resulted in a non-zero hWnd
-            IntPtr hWnd = CreateWindowEx(0,
+            hWnd = CreateWindowEx(0,
                 regResult,
                 name,
                 WS_OVERLAPPEDWINDOW,
@@ -260,6 +263,8 @@ namespace ThomasStandalone
             {
                 while (GetMessage(out msg, IntPtr.Zero, 0, 0) != 0)
                 {
+                    string title = String.Format("Chads  FPS: {0}  VRAM: {1} RAM: {2}", 60, ThomasWrapper.GetVRAM(), ThomasWrapper.GetRAM());
+                    SetWindowTextA(hWnd, title);
                     TranslateMessage(ref msg);
                     DispatchMessage(ref msg);
                 }

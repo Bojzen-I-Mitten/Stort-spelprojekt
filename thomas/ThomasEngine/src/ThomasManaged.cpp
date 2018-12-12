@@ -174,6 +174,16 @@ namespace ThomasEngine {
 		}
 	}
 
+	float ThomasWrapper::GetVRAM()
+	{
+		return utils::profiling::GpuProfiler::Instance()->GetTotalMemory();
+	}
+
+	float ThomasWrapper::GetRAM()
+	{
+		return utils::profiling::ProfileManager::getRAMUsage();
+	}
+
 	void ThomasWrapper::SynchronousExecution()
 	{
 		Thomas->m_engineCommands->execute();	// Execute editor commands

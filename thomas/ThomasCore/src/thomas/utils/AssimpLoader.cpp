@@ -119,7 +119,7 @@ namespace thomas
 			const aiScene* scene = importer.ReadFile
 			(
 				path,
-				aiProcess_FindDegenerates |
+				//aiProcess_FindDegenerates |
 				aiProcess_FindInvalidData |
 				aiProcess_ImproveCacheLocality |
 				aiProcess_JoinIdenticalVertices |

@@ -29,7 +29,7 @@ namespace thomas
 			static Texture2D* GetBlackTexture();
 			static Texture2D* GetWhiteTexture();
 			static Texture2D* GetNormalTexture();
-			~Texture2D();
+			virtual ~Texture2D();
 		private:
 
 		protected:

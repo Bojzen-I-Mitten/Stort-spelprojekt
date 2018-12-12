@@ -151,6 +151,7 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetMemoryUsage()
 			{
+			
 				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &m_info[m_memoryQuery])))
 				{
 					m_memoryUsage = float(m_info[m_memoryQuery].CurrentUsage);
@@ -158,11 +159,11 @@ namespace thomas
 					m_memoryQuery = (m_memoryQuery + 1) % 2;
 
 					float usage = float(m_info[m_memoryQuery].CurrentUsage);
-					if (m_memoryUsage > usage)
-					{
-						m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
-						return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
-					}
+
+					m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+					m_totalMemory = m_memoryUsage / 1024.0f / 1024.0f;
+					return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+					
 				}
 
 				return 0.0f;
