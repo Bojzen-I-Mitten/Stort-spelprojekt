@@ -69,15 +69,16 @@ public class ReplaySystem : ScriptComponent
     {
         MatchSystem.instance.blockIncomingData = true;
         Replaying = true;
-        CameraMaster.instance.StartReplay();
         //specCam.transform.position = goalPos + new Vector3(goalPos.z / 1.2f, 5, 0);
         MatchSystem.instance.ReadOwnerAsNormal = true;
         ReplayState initialState = States[0];
         RemoveAllInitialStates();
         float currentTime = initialState.timestamp;
         LoadObjectState(initialState);
+        CameraMaster.instance.StopReplay();
+        CameraMaster.instance.StartReplay();
 
-        while(States.Count > 0)
+        while (States.Count > 0)
         {
             while(currentTime < States[0].timestamp)
             {

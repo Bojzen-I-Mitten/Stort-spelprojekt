@@ -28,7 +28,6 @@ public class ReplayCamera : ScriptComponent
 
     public override void Start()
     {
-        enabled = false;
     }
 
     public override void Update()
@@ -54,7 +53,7 @@ public class ReplayCamera : ScriptComponent
                 float x = Random.Range(-5, 5);
                 float y = Random.Range(5, 15);
                 float z = Random.Range(-5, 5);
-                transform.position = new Vector3(x, y, z);//Target.position - Target.forward * ChadCam.instance.CameraOffset;
+                transform.position = /*new Vector3(x, y, z);*/Target.position - Target.forward * ChadCam.instance.CameraOffset;
                 transform.LookAt(Target.transform.position);
             }
         }

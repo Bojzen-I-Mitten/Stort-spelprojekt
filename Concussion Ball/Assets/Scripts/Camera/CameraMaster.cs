@@ -58,11 +58,6 @@ public class CameraMaster : ScriptComponent
             Light1.Intensity = 5;
             Light2.Intensity = 0.5f;
         }
-
-        
-
-        
-
     }
 
     public override void Start()

@@ -77,13 +77,13 @@ public class GUIScoreScreen : ScriptComponent
 
     public void UpdateTimer()
     {
-        if(Timer>0)
-        Textdatalist[2].text = (Timer -= 1).ToString();
+        if (Timer > 0)
+            Textdatalist[2].text = (Timer -= 1).ToString();
     }
-    
+
     public override void OnDisable()
     {
-        if(Canvas != null)
+        if (Canvas != null)
             Canvas.isRendering = false;
 
         if (GUIScoreboard.Instance)
@@ -106,7 +106,7 @@ public class GUIScoreScreen : ScriptComponent
             GUIScoreboard.Instance.enabled = true;
         }
 
-        if(Init)
+        if (Init)
         {
             Timer = ScoreScreenTimeLast;
             Init = false;

@@ -34,7 +34,7 @@ public class HighlightParent : ScriptComponent
 
     public override void Update()
     {
-        if(Ball._Chad == MatchSystem.instance.LocalChad)
+        if(Ball._Chad == MatchSystem.instance.LocalChad && !MatchSystem.instance.ReplaySystem.Replaying)
         {
             gameObject.transform.localScale = new Vector3(0, 0, 0);
         }
