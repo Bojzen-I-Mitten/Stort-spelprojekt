@@ -91,7 +91,7 @@ public class Banana : Powerup
         ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
         ChadControls localChad = MatchSystem.instance.LocalChad;
 
-        if (otherChad && _BananaTimer > 0.1f && otherChad != ObjectOwner || ObjectOwner && _BananaTimer > 0.5f)
+        if (otherChad && _BananaTimer > 0.1f && otherChad != ObjectOwner || otherChad == ObjectOwner && _BananaTimer > 0.5f)
         {
             base.OnCollisionEnter(collider);
         }

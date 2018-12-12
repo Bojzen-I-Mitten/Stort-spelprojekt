@@ -113,7 +113,7 @@ public class GUISelectTeam : ScriptComponent
                     MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
                 }
             }
-            else if (SpectatorImage.Clicked())
+            else if (SpectatorImage.Clicked() || SpectatorText.Clicked())
             {
                 MatchSystem.instance.JoinTeam(TEAM_TYPE.TEAM_SPECTATOR);
                 MatchSystem.instance.LocalChad.NetPlayer.Ready(true);

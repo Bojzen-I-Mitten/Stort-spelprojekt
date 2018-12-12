@@ -62,7 +62,7 @@ public class ChadControls : NetworkComponent
     private float MinimumRagdollTimer = 2.0f;
 
     public float ImpactFactor = 80.0f;//{ get; set; } = 100;
-    public float TackleThreshold { get; set; } = 7;
+    public float TackleThreshold { get; set; } = 8.5f;
     private float DivingTimer = 0.0f;
     private float JumpingTimer = 0.0f;
     private bool Jumping = false;
@@ -124,6 +124,8 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+
+        TackleThreshold = 8.5f;
     }
     public override void OnGotOwnership()
     {
@@ -211,11 +213,12 @@ public class ChadControls : NetworkComponent
             Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, (/*-transform.forward +*/ transform.up * 0.5f) * 200000, 1);
             ActivateRagdoll(MinimumRagdollTimer, param);
         }
-#endif
         if (Input.GetKeyDown(Input.Keys.J))
             Debug.Log(rBody.Position);
         if (Input.GetKeyDown(Input.Keys.K))
             NetPlayer.Reset();
+#endif
+
 
 
         rBody.Friction = 0.5f;
@@ -871,7 +874,7 @@ public class ChadControls : NetworkComponent
         }
     }
 
-    public override void OnCollisionEnter(Collider collider)
+    public override void OnCollisionStay(Collider collider)
     {
         if (MatchSystem.instance && isOwner && State != STATE.RAGDOLL && !Locked)
         {
@@ -887,7 +890,7 @@ public class ChadControls : NetworkComponent
                 {
                     //Debug.Log("Trying to tackle player on same team, you baka.");
                 }
-                else if (otherChad.CanBeTackled && (CurrentVelocity.y/*Length()*/ > TackleThreshold && CurrentVelocity.y/*Length()*/ >= TheirVelocity))
+                else if (otherChad.CanBeTackled && ((CurrentVelocity.y/*Length()*/ > TackleThreshold || (PickedUpObject && CurrentVelocity.y > BaseSpeed)) && CurrentVelocity.y/*Length()*/ >= TheirVelocity))
                 {
                     // Activate ragdoll
                     Vector3 force = (transform.forward + Vector3.Up * 0.5f) * ImpactFactor * CurrentVelocity.Length();
