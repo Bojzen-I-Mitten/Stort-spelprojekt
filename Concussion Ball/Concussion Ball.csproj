@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Chad\Powerups\Gramophone.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
     <Compile Include="Assets\Scripts\Chad\HatManager.cs" />
     <Compile Include="Assets\Scripts\Chad\Hatter.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Banana.cs" />
@@ -70,7 +71,7 @@
     <Compile Include="Assets\Scripts\Camera\GUI\GUIMainMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIExitMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
-    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIOptionsMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\Camera\ReplayCamera.cs" />
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />

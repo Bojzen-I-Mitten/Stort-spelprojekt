@@ -35,7 +35,7 @@ struct v2f
     float4 vertex : SV_POSITION;
 };
 
-v2f vert(appdata_thomas_skin v)
+v2f vert(appdata_thomas_shadowdata v)
 {
     v2f o;
 

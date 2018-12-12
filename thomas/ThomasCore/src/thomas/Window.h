@@ -77,6 +77,7 @@ namespace thomas
 		LONG m_height;
 		bool m_showCursor;
 		bool m_fullScreen;
+		bool m_borderless;
 		bool m_initialized;
 		bool m_shouldResize;
 		float m_aspectRatio;
