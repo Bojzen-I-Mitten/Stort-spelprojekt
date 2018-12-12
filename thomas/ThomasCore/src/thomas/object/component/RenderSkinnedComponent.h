@@ -1,6 +1,8 @@
 #pragma once
 #include "RenderComponent.h"
 #include "../../utils/Math.h"
+
+#include <memory>
 namespace thomas
 {
 	namespace graphics { 

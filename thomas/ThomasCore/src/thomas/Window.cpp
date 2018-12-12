@@ -12,7 +12,7 @@ namespace thomas
 {
 	Window::Window(HWND& hwnd, HWND parent, LONG width, LONG height, std::string name) :
 		m_shouldResize(false), m_title(name), m_showCursor(true), m_fullScreen(false), m_borderless(false), 
-		m_shouldStyleChange(false), m_hInstance(nullptr), m_initialized(false), m_input(Input()), m_windowStyle(0)
+		m_shouldStyleChange(false), m_hInstance(nullptr), m_initialized(false), m_input(Input()), m_windowStyle(0), m_width(width), m_height(height)
 	{
 		m_input.Init();
 		m_hInstance = GetModuleHandle(NULL);
@@ -28,11 +28,8 @@ namespace thomas
 
 		RegisterClassEx(&m_windowClassInfo);
 				
-		m_windowRectangle = { 0, 0, width, height };
-		AdjustWindowRect(&m_windowRectangle, m_windowStyle, FALSE);
-
-		m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
-		m_width = m_windowRectangle.right > 0 ? m_windowRectangle.right : 10;
+		/*m_windowRectangle = { 0, 0, width, height };
+		AdjustWindowRect(&m_windowRectangle, m_windowStyle, FALSE);*/
 
 		Create(hwnd, parent);
 	}
@@ -67,49 +64,55 @@ namespace thomas
 
 	bool Window::Resize()
 	{
-		bool result = GetClientRect(m_windowHandler, &m_windowRectangle);
-		LONG newWidth = m_windowRectangle.right;
-		LONG newHeight = m_windowRectangle.bottom;
-
-		if (result)
+		if (m_fullScreen)
 		{
-			HRESULT hr = m_swapChain->SetFullscreenState(m_fullScreen, NULL);
-			if (FAILED(hr))
-				LOG("Failed to set fullscreen state");
+			m_width = 1920;
+			m_height = 1080;
 
-			m_height = newHeight;
-			m_width = newWidth;
-
-			utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, NULL, NULL);
-
-			SAFE_RELEASE(m_dx.commandList);
-
-			SAFE_RELEASE(m_dx.buffer[0]);
-			SAFE_RELEASE(m_dx.buffer[1]);
-
-			SAFE_RELEASE(m_dx.RTV[0]);
-			SAFE_RELEASE(m_dx.RTV[1]);
-
-			SAFE_RELEASE(m_dx.SRV[0]);
-			SAFE_RELEASE(m_dx.SRV[1]);
-
-			SAFE_RELEASE(m_dx.depthStencilView[0]);
-			SAFE_RELEASE(m_dx.depthStencilView[1]);
-
-			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[0]);
-			SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1]);
-
-			SAFE_RELEASE(m_dx.depthBufferSRV);
-
-			SAFE_RELEASE(m_dx.depthStencilState);
-
-			m_swapChain->ResizeBuffers(FRAME_BUFFERS, 0, 0, DXGI_FORMAT_UNKNOWN,
-				DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
-
-			return InitDxBuffers();
+			SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER);
+		}
+		else
+		{
+			bool result = GetClientRect(m_windowHandler, &m_windowRectangle);
+			if (result)
+			{
+				m_height = m_windowRectangle.bottom;
+				m_width = m_windowRectangle.right;
+			}
 		}
 		
-		return false;
+		return ResizeBackBuffer();
+	}
+
+	bool Window::ResizeBackBuffer()
+	{
+		utils::D3D::Instance()->GetDeviceContextImmediate()->OMSetRenderTargets(0, NULL, NULL);
+
+		SAFE_RELEASE(m_dx.commandList);
+
+		SAFE_RELEASE(m_dx.buffer[0]);
+		SAFE_RELEASE(m_dx.buffer[1]);
+
+		SAFE_RELEASE(m_dx.RTV[0]);
+		SAFE_RELEASE(m_dx.RTV[1]);
+
+		SAFE_RELEASE(m_dx.SRV[0]);
+		SAFE_RELEASE(m_dx.SRV[1]);
+
+		SAFE_RELEASE(m_dx.depthStencilView[0]);
+		SAFE_RELEASE(m_dx.depthStencilView[1]);
+
+		SAFE_RELEASE(m_dx.depthStencilViewReadOnly[0]);
+		SAFE_RELEASE(m_dx.depthStencilViewReadOnly[1]);
+
+		SAFE_RELEASE(m_dx.depthBufferSRV);
+
+		SAFE_RELEASE(m_dx.depthStencilState);
+
+		utils::D3D::Instance()->GetDeviceContextImmediate()->ClearState();
+
+		m_swapChain->ResizeBuffers(FRAME_BUFFERS, m_width, m_height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT);
+		return InitDxBuffers();
 	}
 
 	bool Window::ChangeWindowStyle()
@@ -124,9 +127,9 @@ namespace thomas
 		}
 
 		SetWindowLong(m_windowHandler, GWL_STYLE, m_windowStyle);
-		if (!SetWindowPos(m_windowHandler, m_windowHandler, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER))
+		if (!SetWindowPos(m_windowHandler, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOMOVE))
 			return false;
-	
+			
 		return true;
 	}
 
@@ -302,18 +305,9 @@ namespace thomas
 		if (hwnd)
 		{
 			m_windowHandler = hwnd;
-			bool result = GetClientRect(m_windowHandler, &m_windowRectangle);
-			if (result)
-			{
-				m_height = m_windowRectangle.bottom > 0 ? m_windowRectangle.bottom : 10;
-				m_width = m_windowRectangle.right > 0 ? m_windowRectangle.right : 10;
-
-				bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
-				if (hr)
-				{
-					m_waitableObject = m_swapChain->GetFrameLatencyWaitableObject();
-				}
-			}
+			bool hr = CreateSwapChain();
+			if (!hr)
+				LOG("Failed to create swap chain");
 
 			if (ChangeWindowShowState(SW_SHOW))
 				LOG("Failed to change window state");
@@ -322,6 +316,18 @@ namespace thomas
 		{
 			LOG("Failed to create window handler");
 		}
+	}
+
+	bool Window::CreateSwapChain()
+	{
+		bool hr = utils::D3D::Instance()->CreateSwapChain(m_width, m_height, m_windowHandler, m_swapChain);
+		if (hr)
+		{
+			m_waitableObject = m_swapChain->GetFrameLatencyWaitableObject();
+			return true;
+		}
+
+		return false;
 	}
 
 	void Window::ResolveRenderTarget()
@@ -337,6 +343,16 @@ namespace thomas
 			m_showCursor = visible;
 			ShowCursor(visible);
 		}
+	}
+
+	void Window::SetFullscreen(bool fullscreen)
+	{
+		m_fullScreen = fullscreen;
+	}
+
+	void Window::SetBorderless(bool borderless)
+	{
+		m_borderless = borderless;
 	}
 
 	bool Window::SetHeight(const LONG & height)
@@ -367,6 +383,16 @@ namespace thomas
 			return true;
 
 		return false;
+	}
+
+	bool Window::GetFullScreen()
+	{
+		return m_fullScreen;
+	}
+
+	bool Window::GetBorderless()
+	{
+		return m_borderless;
 	}
 
 	Input* Window::GetInput()

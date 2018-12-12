@@ -32,7 +32,7 @@ namespace ThomasEditor
             get; set;
         }
 
-        public new IntPtr windowHandle { get; private set; }
+        public IntPtr windowHandle { get; private set; }
         const int WM_PAINT = 0x000F;
         const int WM_SIZE = 0x0005;
         const int WM_LBUTTONDOWN = 0x0201;

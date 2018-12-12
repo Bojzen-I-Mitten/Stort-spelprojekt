@@ -50,11 +50,15 @@ namespace thomas
 		bool SetWidth(const LONG & width);
 		bool SetSize(const LONG & height, const LONG & width);
 		void SetCursor(const bool & visible);
+		void SetFullscreen(bool fullscreen);
+		void SetBorderless(bool borderless);
 		
 	public:
 		static LRESULT CALLBACK EventHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	public:
+		bool GetFullScreen();
+		bool GetBorderless();
 		Input* GetInput();
 		LONG GetHeight() const;
 		LONG GetWidth() const;
@@ -69,9 +73,11 @@ namespace thomas
 	protected:
 		bool InitDxBuffers();
 		bool Resize();
+		bool ResizeBackBuffer();
 		bool ChangeWindowStyle();
 		void Clear();
 		void Create(HWND& hwnd, HWND parent);
+		bool CreateSwapChain();
 		virtual void Present();
 
 	protected:
@@ -79,7 +85,6 @@ namespace thomas
 		LONG m_height;
 		DWORD m_windowStyle;
 		bool m_showCursor;
-		bool m_borderless;
 		bool m_fullScreen;
 		bool m_borderless;
 		bool m_initialized;
@@ -96,6 +101,7 @@ namespace thomas
 		HWND m_windowHandler;
 		RECT m_windowRectangle;
 
+		IDXGIOutput* m_output;
 		IDXGISwapChain3* m_swapChain;
 		HANDLE m_waitableObject;
 	};

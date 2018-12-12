@@ -3,7 +3,7 @@
 */
 
 #pragma once
-#include <d3d11.h>
+#include <memory>
 #include <vector>
 #include <string>
 #include <imgui\imgui.h>

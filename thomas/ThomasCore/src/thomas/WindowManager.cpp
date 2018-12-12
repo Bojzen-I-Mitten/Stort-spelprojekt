@@ -39,25 +39,42 @@ namespace thomas
 		}
 	}
 
-	void WindowManager::setBorderless(bool Toggle)
+	void WindowManager::SetBorderless(bool borderless)
 	{
-		
-	//	LOG(Toggle);
+		if (m_current != nullptr && !m_current->IsEditor())
+		{
+			m_current->QueueWindowStyleChange();
+			m_current->SetBorderless(borderless);
+		}
 	}
 
-	void WindowManager::setFullscreen(bool Toggle)
+	void WindowManager::SetFullscreen(bool fullscreen)
 	{
-	//	LOG(Toggle);
+		if (m_current != nullptr && !m_current->IsEditor())
+		{
+			m_current->QueueResize();
+			m_current->SetFullscreen(fullscreen);
+		}
 	}
 
-	bool WindowManager::getFullscreen()
+	bool WindowManager::GetFullscreen()
 	{
-		return true;
+		if (m_current != nullptr && !m_current->IsEditor())
+		{
+			return m_current->GetFullScreen();
+		}
+
+		return false;
 	}
 
-	bool WindowManager::getBorderless()
+	bool WindowManager::GetBorderless()
 	{
-		return true;
+		if (m_current != nullptr && !m_current->IsEditor())
+		{
+			return m_current->GetBorderless();
+		}
+
+		return false;
 	}
 
 	WindowManager* WindowManager::Instance()

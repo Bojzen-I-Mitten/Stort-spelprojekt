@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections.Generic;
 using ThomasEngine;
-using System.Collections.Generic;
 public class ImageBaradjustment
 {
     Image[] Image = new Image[(int)Imagestate.NUMSTATES];
@@ -136,9 +134,9 @@ public class GUIOptionsMenu : ScriptComponent
 
 
     Camera Camera;
-   public Canvas Canvas;
+    public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
-    WindowController Wcontroller = new WindowController();
+    ThomasEngine.WindowManager Wcontroller = new ThomasEngine.WindowManager();
     public Textstate TextState { set; get; } = Textstate.NUMSTATES;
     public Textstate OldState = Textstate.NUMSTATES;
     public ImageBarstate ImageState { set; get; } = ImageBarstate.NUMSTATES;
@@ -367,8 +365,8 @@ public class GUIOptionsMenu : ScriptComponent
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
         //load onoff fullscreen
-        fullscreen = Wcontroller.getFullscreen();
-        borderless = Wcontroller.getBorderless();
+        fullscreen = Wcontroller.GetFullscreen();
+        borderless = Wcontroller.GetBorderless();
         string settingsFullscreen = UserSettings.GetSetting("Fullscreen");
         if (settingsFullscreen != null)
         {
@@ -436,12 +434,12 @@ public class GUIOptionsMenu : ScriptComponent
                   */
         //      ClearImagesAndText();
         string Update;
-        Update = Wcontroller.getFullscreen().ToString();
-//        Debug.Log(Update);
-        UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-        Update = Wcontroller.getBorderless().ToString();
-//        Debug.Log(Update);
-        UserSettings.AddOrUpdateAppSetting("Borderless", Update);
+//        Update = Wcontroller.GetFullscreen().ToString();
+////        Debug.Log(Update);
+//        UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
+//        Update = Wcontroller.GetBorderless().ToString();
+////        Debug.Log(Update);
+//        UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
         if (ImageBar != null)
         {
