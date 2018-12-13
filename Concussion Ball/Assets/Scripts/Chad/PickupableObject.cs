@@ -216,7 +216,8 @@ public class PickupableObject : NetworkComponent
 
         if (!pickedUp && transform.parent != null)
         {
-            Debug.Log("I should not be pickedUp, but I am!");
+            transform.SetParent(null, true);
+            Debug.Log("Something went wrong. It's fixed now tho!");
         }
     }
 
