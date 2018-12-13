@@ -65,7 +65,7 @@ public class ChadCam : ScriptComponent
     {
         get
         {
-            return CameraSensitivity_y * 16f / 9f;
+            return CameraSensitivity_y;
         }
     }
     [Newtonsoft.Json.JsonIgnore]
