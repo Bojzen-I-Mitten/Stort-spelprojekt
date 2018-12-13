@@ -67,6 +67,7 @@ public class ChadHud : ScriptComponent
     public Texture2D HeldObjectIconThomasTrain { get; set; }
     public Texture2D HeldObjectIconBall { get; set; }
     public Texture2D HeldObjectGramophone { get; set; }
+    public Texture2D HeldObjectIconToySoldier { get; set; }
     #endregion
 
     public override void OnAwake()
@@ -215,6 +216,7 @@ public class ChadHud : ScriptComponent
             HeldObjectIcon.origin = new Vector2(0.5f, 0.5f);
             HeldObjectIcon.scale = Vector2.Zero;
         }
+
 
         
 
@@ -381,6 +383,10 @@ public class ChadHud : ScriptComponent
         else if (name == "Gramophone")
         {
             HeldObjectIcon.texture = HeldObjectGramophone;
+        }
+        else if (name == "ToySoldier")
+        {
+            HeldObjectIcon.texture = HeldObjectIconToySoldier;
         }
 
         HeldObjectIcon.scale = Vector2.One;

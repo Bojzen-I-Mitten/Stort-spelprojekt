@@ -162,12 +162,13 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
+#ifdef BENCHMARK
 			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
 			float gpuTime = utils::profiling::GpuProfiler::Instance()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
 			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
 
-#ifdef BENCHMARK
+
 			utils::profiling::ProfileManager::newFrame();
 #endif
 		}

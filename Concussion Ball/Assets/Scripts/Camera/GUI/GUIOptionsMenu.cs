@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using ThomasEngine;
+using System.Collections.Generic;
 public class ImageBaradjustment
 {
     Image[] Image = new Image[(int)Imagestate.NUMSTATES];
@@ -50,17 +52,9 @@ public class ImageBaradjustment
             Images.interactable = true;
         }
     }
-    public void start(Vector2 input, Canvas Canvas, Texture2D ImageBackground, Texture2D ImageToggle, Texture2D ImageAftermathToggle)
+    public void start()
     {
-        this.Canvas = Canvas;
-        Image[(int)Imagestate.MUSIC_VOLUME_IMAGE] = Canvas.Add(ImageBackground);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE] = Canvas.Add(ImageToggle);
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE] = Canvas.Add(ImageAftermathToggle);
-        foreach (Image Images in Image)
-        {
-            Images.interactable = true;
-            Images.position = input;
-        }
+     
     }
     public void UpdatePositionInworld(Vector2 input)
     {
@@ -69,7 +63,19 @@ public class ImageBaradjustment
             Images.position = input;
         }
     }
+    public void Settingvalue(int value)
+    {
+        numbervalue = value;
+        float valuecalculator = ((numbervalue) * 3.15f);
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2(valuecalculator, 1);
 
+              //   Debug.Log((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x));
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(-1, -1);
+        /*
+        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x * Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x * 3.15f) / (Canvas.camera.viewport.size.x)
+       + Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].position.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
+       */
+    }
     public void update()
     {
         if (Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].Hovered())
@@ -96,6 +102,7 @@ public class ImageBaradjustment
         Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x - Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x) * 1920, 1);
         numbervalue = ((int)(Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x / 3.15f));
         number.text = numbervalue.ToString();
+        
     }
 }
 
@@ -114,12 +121,15 @@ public class GUIOptionsMenu : ScriptComponent
         SFX_TEXT,
         MOVEMENTSENSE_TEXT,
         AIMSENSE_TEXT,
+        ANOUNCER_TEXT,
         Fullscreen_TEXT,
         BorderLess_Text,
         FullscreenOn_TEXT,
         BorderLessOn_Text,
         FullscreenOff_TEXT,
         BorderLessOff_Text,
+        AnnouncerOn_Text,
+        AnnouncerOff_Text,
         NUMSTATES
     }
     public enum ImageBarstate
@@ -134,9 +144,9 @@ public class GUIOptionsMenu : ScriptComponent
 
 
     Camera Camera;
-    public Canvas Canvas;
+   public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
-    ThomasEngine.WindowManager Wcontroller = new ThomasEngine.WindowManager();
+    WindowManager Wcontroller = new WindowManager();
     public Textstate TextState { set; get; } = Textstate.NUMSTATES;
     public Textstate OldState = Textstate.NUMSTATES;
     public ImageBarstate ImageState { set; get; } = ImageBarstate.NUMSTATES;
@@ -274,6 +284,45 @@ public class GUIOptionsMenu : ScriptComponent
             Text[(int)Textstate.FullscreenOn_TEXT].color = Unselected;
         }
 
+
+
+
+        //////////////
+        //AnnouncerOff_Text
+        if (Text[(int)Textstate.AnnouncerOff_Text].Clicked())
+        {
+           //droppa instancen här toggla av,
+            //     Debug.Log("button clicked C#");
+            Text[(int)Textstate.AnnouncerOff_Text].interactable = false;
+            Text[(int)Textstate.AnnouncerOn_Text].interactable = true;
+        }
+
+        if (Text[(int)Textstate.AnnouncerOff_Text].Hovered())
+            Text[(int)Textstate.AnnouncerOff_Text].color = Selected;
+        else if (Text[(int)Textstate.AnnouncerOff_Text].interactable != false)
+        {
+            Text[(int)Textstate.AnnouncerOff_Text].color = Unselected;
+        }
+
+
+        //AnnouncerOn_Text
+        if (Text[(int)Textstate.AnnouncerOn_Text].Clicked())
+        {
+           //droppa instancen här toogla på
+            //   Debug.Log("button clicked C#");
+            Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
+            Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
+        }
+
+        if (Text[(int)Textstate.AnnouncerOn_Text].Hovered())
+            Text[(int)Textstate.AnnouncerOn_Text].color = Selected;
+        else if (Text[(int)Textstate.AnnouncerOn_Text].interactable != false)
+        {
+            Text[(int)Textstate.AnnouncerOn_Text].color = Unselected;
+        }
+
+
+
     }
     void BackbuttonClicked()
     {
@@ -291,25 +340,30 @@ public class GUIOptionsMenu : ScriptComponent
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
-        Text[(int)Textstate.BACK_TEXT] = Canvas.Add("Back"); Text[(int)Textstate.BACK_TEXT].position = new Vector2(0.01f, 0.85f); Text[(int)Textstate.BACK_TEXT].interactable = true;
+        Text[(int)Textstate.BACK_TEXT] = Canvas.Add("Back"); Text[(int)Textstate.BACK_TEXT].position = new Vector2(0.01f, 0.85f+0.05f); Text[(int)Textstate.BACK_TEXT].interactable = true;
         Text[(int)Textstate.OPTIONS_TEXT] = Canvas.Add("OPTIONS"); Text[(int)Textstate.OPTIONS_TEXT].scale = new Vector2(1.4f, 1.2f); Text[(int)Textstate.OPTIONS_TEXT].position = new Vector2(0, 0.1f);
-        Text[(int)Textstate.AIMSENSE_TEXT] = Canvas.Add("Aim"); Text[(int)Textstate.AIMSENSE_TEXT].position = new Vector2(0.02f, 0.55f);
-        Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.5f);
+        Text[(int)Textstate.AIMSENSE_TEXT] = Canvas.Add("Aim"); Text[(int)Textstate.AIMSENSE_TEXT].position = new Vector2(0.02f, 0.60f);
+        Text[(int)Textstate.MOVEMENTSENSE_TEXT] = Canvas.Add("Movement"); Text[(int)Textstate.MOVEMENTSENSE_TEXT].position = new Vector2(0.02f, 0.55f);
         Text[(int)Textstate.MASTERVOLUME_TEXT] = Canvas.Add("MasterVolume"); Text[(int)Textstate.MASTERVOLUME_TEXT].position = new Vector2(0.02f, 0.27f);
         Text[(int)Textstate.MUSIC_TEXT] = Canvas.Add("Music"); Text[(int)Textstate.MUSIC_TEXT].position = new Vector2(0.02f, 0.32f);
         Text[(int)Textstate.SFX_TEXT] = Canvas.Add("SFX"); Text[(int)Textstate.SFX_TEXT].position = new Vector2(0.02f, 0.37f);
+        Text[(int)Textstate.ANOUNCER_TEXT] = Canvas.Add("Announcer"); Text[(int)Textstate.ANOUNCER_TEXT].position = new Vector2(0.02f, 0.42f);
         Text[(int)Textstate.Music_Area_Text] = Canvas.Add("Audio"); Text[1].scale = new Vector2(0.75f); Text[(int)Textstate.Music_Area_Text].position = new Vector2(0.01f, 0.2f);
-        Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.42f);
+        Text[(int)Textstate.sensitivity_TEXT] = Canvas.Add("SENSITIVITY"); Text[2].scale = new Vector2(0.75f); Text[(int)Textstate.sensitivity_TEXT].position = new Vector2(0.01f, 0.47f);
         
-        Text[(int)Textstate.Window_Text] = Canvas.Add("Window"); Text[(int)Textstate.Window_Text].scale = new Vector2(0.75f); Text[(int)Textstate.Window_Text].position = new Vector2(0.01f, 0.64f);
+        Text[(int)Textstate.Window_Text] = Canvas.Add("Window"); Text[(int)Textstate.Window_Text].scale = new Vector2(0.75f); Text[(int)Textstate.Window_Text].position = new Vector2(0.01f, 0.64f+0.05f);
         ///////////////////////////////////////////////////////////////////
-        Text[(int)Textstate.Fullscreen_TEXT] = Canvas.Add("FullScreen"); Text[(int)Textstate.Fullscreen_TEXT].position = new Vector2(0.02f, 0.72f);
-        Text[(int)Textstate.FullscreenOff_TEXT] = Canvas.Add("Off"); Text[(int)Textstate.FullscreenOff_TEXT].interactable = true; Text[(int)Textstate.FullscreenOff_TEXT].position = new Vector2(0.17f, 0.72f);
-        Text[(int)Textstate.FullscreenOn_TEXT] = Canvas.Add("On"); Text[(int)Textstate.FullscreenOn_TEXT].interactable = true; Text[(int)Textstate.FullscreenOn_TEXT].position = new Vector2(0.21f, 0.72f);
+        Text[(int)Textstate.Fullscreen_TEXT] = Canvas.Add("FullScreen"); Text[(int)Textstate.Fullscreen_TEXT].position = new Vector2(0.02f, 0.72f + 0.05f);
+        Text[(int)Textstate.FullscreenOff_TEXT] = Canvas.Add("Off"); Text[(int)Textstate.FullscreenOff_TEXT].interactable = true; Text[(int)Textstate.FullscreenOff_TEXT].position = new Vector2(0.17f, 0.72f + 0.05f);
+        Text[(int)Textstate.FullscreenOn_TEXT] = Canvas.Add("On"); Text[(int)Textstate.FullscreenOn_TEXT].interactable = true; Text[(int)Textstate.FullscreenOn_TEXT].position = new Vector2(0.21f, 0.72f + 0.05f);
         ///////////////////////////////////////////////////////////////////
-        Text[(int)Textstate.BorderLess_Text] = Canvas.Add("BorderLess");  Text[(int)Textstate.BorderLess_Text].position = new Vector2(0.02f, 0.77f);
-        Text[(int)Textstate.BorderLessOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.BorderLessOff_Text].interactable = true; Text[(int)Textstate.BorderLessOff_Text].position = new Vector2(0.17f, 0.77f);
-        Text[(int)Textstate.BorderLessOn_Text] = Canvas.Add("On"); Text[(int)Textstate.BorderLessOn_Text].interactable = true; Text[(int)Textstate.BorderLessOn_Text].position = new Vector2(0.21f, 0.77f);
+        Text[(int)Textstate.BorderLess_Text] = Canvas.Add("BorderLess");  Text[(int)Textstate.BorderLess_Text].position = new Vector2(0.02f, 0.77f + 0.05f);
+        Text[(int)Textstate.BorderLessOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.BorderLessOff_Text].interactable = true; Text[(int)Textstate.BorderLessOff_Text].position = new Vector2(0.17f, 0.77f + 0.05f);
+        Text[(int)Textstate.BorderLessOn_Text] = Canvas.Add("On"); Text[(int)Textstate.BorderLessOn_Text].interactable = true; Text[(int)Textstate.BorderLessOn_Text].position = new Vector2(0.21f, 0.77f + 0.05f);
+
+
+        Text[(int)Textstate.AnnouncerOff_Text] = Canvas.Add("Off"); Text[(int)Textstate.AnnouncerOff_Text].interactable = true; Text[(int)Textstate.AnnouncerOff_Text].position = new Vector2(0.17f, 0.42f);
+        Text[(int)Textstate.AnnouncerOn_Text] = Canvas.Add("On"); Text[(int)Textstate.AnnouncerOn_Text].interactable = true; Text[(int)Textstate.AnnouncerOn_Text].position = new Vector2(0.21f, 0.42f);
 
         foreach (Text Texture in Text)
         {
@@ -321,52 +375,61 @@ public class GUIOptionsMenu : ScriptComponent
         }
         Texture2D CopyImageBackground = ImageBackground; Texture2D CopyImageImageToggle = ImageToggle; Texture2D CopyImageImageAftermathToggle = ImageAftermathToggle;
 
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.27f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//MasterVolume bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.27f ), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//MasterVolume bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f,0.32f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//music bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.1f, 0.37f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//sfx bar
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
-        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f + 0.05f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
+        ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f + 0.05f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
+        ImageBar[(int)ImageBarstate.AIM].Settingvalue(20);
+        ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(50);
+        ImageBar[(int)ImageBarstate.Movement].Settingvalue(10);
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(50);
+        ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(50);
+
+
         string SettingsMasterVolume = UserSettings.GetSetting("Master");
         if (SettingsMasterVolume != null)
         {
-            ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = System.Convert.ToInt32(SettingsMasterVolume);
+            //    ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition = System.Convert.ToInt32(SettingsMasterVolume);
+            //    ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
+            //  ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(50);
+            ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(System.Convert.ToInt32(SettingsMasterVolume));
         }
         string settingsMusic = UserSettings.GetSetting("Music");
         if (settingsMusic != null)
         {
-            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = System.Convert.ToInt32(settingsMusic);
+            //    ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = System.Convert.ToInt32(settingsMusic);
+            //    ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(System.Convert.ToInt32(settingsMusic));
         }
         string settingsSFX = UserSettings.GetSetting("Sfx");
         if (settingsSFX != null)
         {
-            ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = System.Convert.ToInt32(settingsSFX);
+            //    ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = System.Convert.ToInt32(settingsSFX);
+            //    ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(System.Convert.ToInt32(settingsSFX));
         }
         string settingsMove = UserSettings.GetSetting("Move");
         if (settingsMove != null)
         {
-            ImageBar[(int)ImageBarstate.Movement].LastMousePosition = System.Convert.ToInt32(settingsMove);
+            //    ImageBar[(int)ImageBarstate.Movement].LastMousePosition = System.Convert.ToInt32(settingsMove);
+            //    ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.Movement].Settingvalue(System.Convert.ToInt32(settingsMove));
         }
         string settingsAIM = UserSettings.GetSetting("Aim");
         if (settingsAIM != null)
         {
-            ImageBar[(int)ImageBarstate.AIM].LastMousePosition = System.Convert.ToInt32(settingsAIM);
+            //    ImageBar[(int)ImageBarstate.AIM].LastMousePosition = System.Convert.ToInt32(settingsAIM);
+            //    ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
+            ImageBar[(int)ImageBarstate.AIM].Settingvalue(System.Convert.ToInt32(settingsAIM));
         }
-        //ImageBar.Add(new ImageBaradjustment(Canvas));
-      //  ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition = 373;// load LastMousePosition here
-     //   ImageBar[(int)ImageBarstate.Movement].LastMousePosition = 460; // load LastMousePosition here
-     //   ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition = 373;// load LastMousePosition here
-      //  ImageBar[(int)ImageBarstate.AIM].LastMousePosition = 460; // load LastMousePosition here
-        ImageBar[(int)ImageBarstate.Movement].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.AIM].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.sfxBar_Image].UpdateWithLoadedvalues();
-        ImageBar[(int)ImageBarstate.MasterVolume_image].UpdateWithLoadedvalues();
+
         ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
         //load onoff fullscreen
-        fullscreen = Wcontroller.GetFullscreen();
-        borderless = Wcontroller.GetBorderless();
+        fullscreen = Wcontroller.getFullscreen();
+        borderless = Wcontroller.getBorderless();
         string settingsFullscreen = UserSettings.GetSetting("Fullscreen");
         if (settingsFullscreen != null)
         {
@@ -434,25 +497,25 @@ public class GUIOptionsMenu : ScriptComponent
                   */
         //      ClearImagesAndText();
         string Update;
-//        Update = Wcontroller.GetFullscreen().ToString();
-////        Debug.Log(Update);
-//        UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-//        Update = Wcontroller.GetBorderless().ToString();
-////        Debug.Log(Update);
-//        UserSettings.AddOrUpdateAppSetting("Borderless", Update);
+        Update = Wcontroller.getFullscreen().ToString();
+//        Debug.Log(Update);
+        UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
+        Update = Wcontroller.getBorderless().ToString();
+//        Debug.Log(Update);
+        UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
         if (ImageBar != null)
         {
-            Update = ImageBar[(int)ImageBarstate.MasterVolume_image].LastMousePosition.ToString();
+            Update = ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue.ToString();
             UserSettings.AddOrUpdateAppSetting("Master", Update);
 
-            Update =ImageBar[(int)ImageBarstate.Movement].LastMousePosition.ToString();  // save from this call to Movement LastMousePosition here
+            Update =ImageBar[(int)ImageBarstate.Movement].numbervalue.ToString();  // save from this call to Movement LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Move", Update);
-            Update = ImageBar[(int)ImageBarstate.sfxBar_Image].LastMousePosition.ToString();  // save from this call to sfxBar_Image LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue.ToString();  // save from this call to sfxBar_Image LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Sfx", Update);
-            Update = ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].LastMousePosition.ToString();  // save from this call to MUSICBar_IMAGE LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue.ToString();  // save from this call to MUSICBar_IMAGE LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Music", Update);
-            Update = ImageBar[(int)ImageBarstate.AIM].LastMousePosition.ToString();  // save from this call to aim LastMousePosition here
+            Update = ImageBar[(int)ImageBarstate.AIM].numbervalue.ToString();  // save from this call to aim LastMousePosition here
             UserSettings.AddOrUpdateAppSetting("Aim", Update);
         }
 

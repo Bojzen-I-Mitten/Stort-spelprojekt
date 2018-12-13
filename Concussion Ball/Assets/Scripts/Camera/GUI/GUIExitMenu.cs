@@ -14,6 +14,7 @@ public class GUIExitMenu : ScriptComponent
     Text OptionsMenu;
     public bool _CanSwitchTeam = true;
 
+    Text OptionsMenu;
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
@@ -56,7 +57,7 @@ public class GUIExitMenu : ScriptComponent
         if (OptionsMenu.Hovered())
             OptionsMenu.color = Color.Red;
         else
-            OptionsMenu.color = Color.Black;
+            OptionsMenu.color = Color.White;
 
 
         if (OptionsMenu.Clicked())

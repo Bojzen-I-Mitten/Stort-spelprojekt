@@ -67,42 +67,7 @@ namespace thomas
 						}
 					}	
 				}
-			}
-
-			void SoundComponent::Play(resource::AudioClip* clip, float volume, bool looping, bool is3D)
-			{
-				if (clip != nullptr)
-				{
-					SoundManager::GetInstance()->GetSystem()->playSound(clip->GetSound(), nullptr, false, &m_channel);
-
-					if (m_channel != nullptr)
-					{
-						// Set channel properties
-						AdjustVolumeType(volume);
-
-						// Sound mode
-						if (is3D)
-						{
-							m_channel->setMode(FMOD_3D | FMOD_3D_LINEARROLLOFF);
-						}
-						else
-						{
-							m_channel->setMode(FMOD_2D);
-						}
-
-						// Looping options
-						if (looping)
-						{
-							m_channel->setMode(FMOD_LOOP_NORMAL);
-							m_channel->setLoopCount(-1); // Loop repeatedly
-						}
-						else
-						{
-							m_channel->setMode(FMOD_LOOP_OFF);
-						}
-					}		
-				}
-			}
+			}		
 
 			void SoundComponent::Stop()
 			{

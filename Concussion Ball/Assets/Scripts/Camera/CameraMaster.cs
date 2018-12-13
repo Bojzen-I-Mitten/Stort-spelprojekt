@@ -223,6 +223,7 @@ public class CameraMaster : ScriptComponent
             GUIScoreScreen.Instance.enabled = false;
         if(GUIScoreboard.Instance)
             GUIScoreboard.Instance.enabled = false;
+        OptionsMenu.Canvas.isRendering = false;
 
         switch (State)
         {

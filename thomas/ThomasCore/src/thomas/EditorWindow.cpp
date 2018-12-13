@@ -94,7 +94,7 @@ namespace thomas
 		{
 			for (int i = 0; i < m_guiData->CmdListsCount; ++i)
 				delete m_guiData->CmdLists[i];
-
+			delete[] m_guiData->CmdLists;
 			m_guiData->Clear();
 			delete m_guiData;
 			m_guiData = nullptr;

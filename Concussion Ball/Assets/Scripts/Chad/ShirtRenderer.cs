@@ -200,6 +200,11 @@ public class ShirtRenderer : ScriptComponent
         mat.SetColor("color", _color);
     }
 
+    public void Reset()
+    {
+        gameObject.GetComponent<RenderSkinnedComponent>().SetMaterial(1, mat);
+    }
+
     void UpdateTextScale()
     {
         nameText.scale = Vector2.One;
