@@ -369,10 +369,10 @@ public class GUIScoreboard : ScriptComponent
         UpdatePlayerBars();
         UpdateList();
 
-        if ((Input.GetKey(Input.Keys.I) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)
+        if ((Input.GetKey(Input.Keys.Tab) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)
             Toggle = true;
 
-        if (Input.GetKeyUp(Input.Keys.I) && !GUIScoreScreen.Instance.enabled)
+        if (Input.GetKeyUp(Input.Keys.Tab) && !GUIScoreScreen.Instance.enabled)
             Toggle = false;
 
         Canvas.isRendering = Toggle;
