@@ -232,7 +232,7 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL && State != STATE.DANCING)
             {
-            if (CameraMaster.instance.GetState() != CAM_STATE.EXIT_MENU)
+            if ((CameraMaster.instance.GetState() != CAM_STATE.EXIT_MENU) && (CameraMaster.instance.GetState() != CAM_STATE.OPTIONS_MENU))
             {
                 HandleKeyboardInput();
                 HandleMouseInput();

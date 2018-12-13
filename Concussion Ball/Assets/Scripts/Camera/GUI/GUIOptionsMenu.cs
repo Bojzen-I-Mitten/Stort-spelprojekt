@@ -178,6 +178,17 @@ public class GUIOptionsMenu : ScriptComponent
     public override void Start()
     {
     }
+
+    void voidAnnouncerToggler(bool toggle)
+    {
+        //dumpa koden här för att sätta på och stänga av använd toggle för av och på. 
+
+        string Update;
+        Update = toggle.ToString();
+        UserSettings.AddOrUpdateAppSetting("Announcer", Update);
+
+    }
+
     public override void Update()
     {
         //  updatePosOrigin();
@@ -196,7 +207,7 @@ public class GUIOptionsMenu : ScriptComponent
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
         Audio.SetMasterVolume((float)ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue / (float)100);
 
-
+   
 
         /*    if (Input.GetKeyDown(Input.Keys.X))
             {
@@ -292,6 +303,7 @@ public class GUIOptionsMenu : ScriptComponent
         {
             //droppa instancen här toggla av,
             //     Debug.Log("button clicked C#");
+            voidAnnouncerToggler(false);
             Text[(int)Textstate.AnnouncerOff_Text].interactable = false;
             Text[(int)Textstate.AnnouncerOn_Text].interactable = true;
         }
@@ -308,6 +320,7 @@ public class GUIOptionsMenu : ScriptComponent
         if (Text[(int)Textstate.AnnouncerOn_Text].Clicked())
         {
             //droppa instancen här toogla på
+            voidAnnouncerToggler(true);
             //   Debug.Log("button clicked C#");
             Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
             Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
@@ -437,7 +450,32 @@ public class GUIOptionsMenu : ScriptComponent
             borderless = System.Convert.ToBoolean(settingsBorderless);
         }
 
+        string SettingsmasterAnnouncer = UserSettings.GetSetting("Announcer");
+        if (SettingsmasterAnnouncer != null)
+        {
+            bool Announcer = System.Convert.ToBoolean(SettingsmasterAnnouncer);
+            voidAnnouncerToggler(Announcer);
+            if (Announcer)
+            {
+                Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
+                Text[(int)Textstate.AnnouncerOn_Text].color = Selected;
+                Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
+            }
+            else
+            {
+                Text[(int)Textstate.AnnouncerOff_Text].interactable = false;
+                Text[(int)Textstate.AnnouncerOff_Text].color = Selected;
+                Text[(int)Textstate.AnnouncerOn_Text].interactable = true;
+            }
 
+        }
+        else
+        {
+            voidAnnouncerToggler(true);
+            Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
+            Text[(int)Textstate.AnnouncerOn_Text].color = Selected;
+            Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
+        }
 
         Wcontroller.SetFullscreen(fullscreen);
         Wcontroller.SetBorderless(borderless);

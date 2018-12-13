@@ -60,9 +60,9 @@ namespace thomas
 		auto inserted = m_sounds.insert(std::make_pair(id, std::move(sound)));
 		m_lock.unlock();
 
-#ifdef _DEBUG
-		assert(inserted.second);
-#endif
+//#ifdef _DEBUG
+//		assert(inserted.second);
+//#endif
 	}
 
 	FMOD_VECTOR SoundManager::Vector3ToFmod(const Vector3& v)
@@ -86,9 +86,9 @@ namespace thomas
 	{
 		m_lock.lock();
 		auto found = m_sounds.find(name);
-#ifdef _DEBUG
-		assert(found != m_sounds.end());
-#endif
+//#ifdef _DEBUG
+//		assert(found != m_sounds.end());
+//#endif
 		m_lock.unlock();
 
 
