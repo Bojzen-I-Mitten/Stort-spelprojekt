@@ -47,6 +47,7 @@ namespace thomas
 				float GetTimeStamp(GTS gts);
 				float GetFrameTime();
 				float GetMemoryUsage();
+				float GetCurrentMemory();
 				float GetTotalMemory();
 				int GetNumberOfDrawCalls();
 				int GetVertexCount();

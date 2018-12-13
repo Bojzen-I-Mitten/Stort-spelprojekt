@@ -52,6 +52,8 @@ namespace thomas
 				delete(this);
 			}
 	
+			utils::profiling::GpuProfiler::Instance()->GetMemoryUsage();
+
 			return count;
 		}
 

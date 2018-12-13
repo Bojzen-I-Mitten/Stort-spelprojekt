@@ -151,18 +151,24 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetMemoryUsage()
 			{
-				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &m_info[m_memoryQuery])))
+				if (FAILED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &m_info[m_memoryQuery])))
+					LOG("Failed to poll vram usage");
+
+				m_memoryUsage = float(m_info[m_memoryQuery].CurrentUsage);
+
+				m_memoryQuery = (m_memoryQuery + 1) % 2;
+
+				float usage = float(m_info[m_memoryQuery].CurrentUsage);
+				if (m_memoryUsage > usage)
 				{
-					m_memoryUsage = float(m_info[m_memoryQuery].CurrentUsage);
+					m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+					return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+				}
 
-					m_memoryQuery = (m_memoryQuery + 1) % 2;
-
-					float usage = float(m_info[m_memoryQuery].CurrentUsage);
-					if (m_memoryUsage > usage)
-					{
-						m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
-						return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
-					}
+				if (m_memoryUsage < usage)
+				{
+					m_totalMemory -= (usage - m_memoryUsage) / 1024.0f / 1024.0f;
+					return (usage - m_memoryUsage) / 1024.0f / 1024.0f;
 				}
 
 				return 0.0f;
@@ -171,6 +177,11 @@ namespace thomas
 			float profiling::GpuProfiler::GetTotalMemory()
 			{
 				return m_totalMemory;
+			}
+
+			float profiling::GpuProfiler::GetCurrentMemory()
+			{
+				return m_memoryUsage;
 			}
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()
