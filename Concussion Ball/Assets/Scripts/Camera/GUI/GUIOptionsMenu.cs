@@ -182,11 +182,9 @@ public class GUIOptionsMenu : ScriptComponent
     void voidAnnouncerToggler(bool toggle)
     {
         //dumpa koden här för att sätta på och stänga av använd toggle för av och på. 
-
         string Update;
         Update = toggle.ToString();
         UserSettings.AddOrUpdateAppSetting("Announcer", Update);
-
     }
 
     public override void Update()
@@ -348,6 +346,32 @@ public class GUIOptionsMenu : ScriptComponent
             CameraMaster.instance.SetState(CAM_STATE.MAIN_MENU);
 
 
+
+        //
+        string Update;
+        Update = Wcontroller.getFullscreen().ToString();
+
+        UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
+        Update = Wcontroller.getBorderless().ToString();
+
+        UserSettings.AddOrUpdateAppSetting("Borderless", Update);
+
+        if (ImageBar != null)
+        {
+            Update = ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue.ToString();
+            UserSettings.AddOrUpdateAppSetting("Master", Update);
+
+            Update = ImageBar[(int)ImageBarstate.Movement].numbervalue.ToString();  // save from this call to Movement LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Move", Update);
+            Update = ImageBar[(int)ImageBarstate.sfxBar_Image].numbervalue.ToString();  // save from this call to sfxBar_Image LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Sfx", Update);
+            Update = ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue.ToString();  // save from this call to MUSICBar_IMAGE LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Music", Update);
+            Update = ImageBar[(int)ImageBarstate.AIM].numbervalue.ToString();  // save from this call to aim LastMousePosition here
+            UserSettings.AddOrUpdateAppSetting("Aim", Update);
+        }
+
+
     }
     public void AddImagesAndText()
     {
@@ -393,10 +417,10 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.5f + 0.05f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//movement bar
         ImageBar.Add(new ImageBaradjustment(new Vector2(0.15f, 0.55f + 0.05f), Canvas, CopyImageBackground, CopyImageImageToggle, CopyImageImageAftermathToggle));//Aim bar
         ImageBar[(int)ImageBarstate.AIM].Settingvalue(20);
-        ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(50);
+        ImageBar[(int)ImageBarstate.MasterVolume_image].Settingvalue(100);
         ImageBar[(int)ImageBarstate.Movement].Settingvalue(10);
-        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(50);
-        ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(50);
+        ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(100);
+        ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(100);
 
 
         string SettingsMasterVolume = UserSettings.GetSetting("Master");
@@ -532,10 +556,10 @@ public class GUIOptionsMenu : ScriptComponent
         //      ClearImagesAndText();
         string Update;
         Update = Wcontroller.getFullscreen().ToString();
-        //        Debug.Log(Update);
+
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
         Update = Wcontroller.getBorderless().ToString();
-        //        Debug.Log(Update);
+ 
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
         if (ImageBar != null)
