@@ -6,7 +6,6 @@ using System.Collections.Generic;
 public class PlayerText
 {
     private int Sign;
-    Canvas Canvas;
 
     public Text Name;
     public Text Goals;
@@ -319,7 +318,7 @@ public class GUIScoreboard : ScriptComponent
         {
             PlayerStandardBarTeam1[i].rendering = true;
             Team1Players[i].IsRendering = true;
-
+            PlayerStandardBarTeam1[i].color = Team1Bar.color;
             if (Team1.Players[i].PlayerName.Length > 9)
                 Team1Players[i].Name.text = Team1.Players[i].PlayerName.Substring(0, 9) + "-";
             else
@@ -334,7 +333,8 @@ public class GUIScoreboard : ScriptComponent
         {
             PlayerStandardBarTeam2[i].rendering = true;
             Team2Players[i].IsRendering = true;
-
+            PlayerStandardBarTeam2[i].rendering = true;
+            PlayerStandardBarTeam2[i].color = Team2Bar.color;
             if (Team2.Players[i].PlayerName.Length > 9)
                 Team2Players[i].Name.text = Team2.Players[i].PlayerName.Substring(0, 9) + "-";
             else

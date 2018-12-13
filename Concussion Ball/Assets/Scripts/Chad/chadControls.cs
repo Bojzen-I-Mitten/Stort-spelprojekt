@@ -153,6 +153,8 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+
+        MinimumRagdollTimer = 2.0f;
         
         FirstJumpForce = 450.0f;
         SecondJumpForce = 350.0f;
@@ -686,7 +688,7 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             yield return new WaitForSeconds(duration);
-
+            Debug.Log("Deactivating them ragdoll bois was good");
             while (Ragdoll.DistanceToWorld() >= 0.75f) // can trigger mid air atm, check if ray hits ground and not chad
             {
                 yield return null;
@@ -781,7 +783,6 @@ public class ChadControls : NetworkComponent
 
     public void RPCSetTiny()
     {
-        //ChadControls localChad = MatchSystem.instance.LocalChad;
         if (PickedUpObject)
             PickedUpObject.Drop();
 

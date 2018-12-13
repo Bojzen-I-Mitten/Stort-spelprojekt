@@ -45,7 +45,6 @@ public class ChadHud : ScriptComponent
     Image Score1BG;
     Image Score2BG;
     Image BallArrow;
-    Image LMB;
     #endregion
 
     public Curve AnnouncementHorizontalSpeed { get; set; }
@@ -61,7 +60,6 @@ public class ChadHud : ScriptComponent
     public Texture2D TimerBGTexture { get; set; }
     public Texture2D ScoreBGTexture { get; set; }
     public Texture2D BallArrowTexture { get; set; }
-    public Texture2D LMBTexture { get; set; }
     public Texture2D HeldObjectIconVindaloo { get; set; }
     public Texture2D HeldObjectIconBananaPeel { get; set; }
     public Texture2D HeldObjectIconThomasTrain { get; set; }
@@ -208,15 +206,6 @@ public class ChadHud : ScriptComponent
             BallArrow.color = Score1BG.color + Score2BG.color;
         }
 
-        if (LMBTexture != null)
-        {
-            LMB = Canvas.Add(LMBTexture);
-            LMB.origin = new Vector2(0.5f);
-            LMB.position = new Vector2(0.85f, 0.9f);
-            LMB.scale = new Vector2(0.75f);
-            LMB.rendering = false;
-        }
-
         if (HeldObjectIconBall != null)
         {
             HeldObjectIcon = Canvas.Add(HeldObjectIconBall);
@@ -337,8 +326,6 @@ public class ChadHud : ScriptComponent
         {
             if (Crosshair != null)
                 Crosshair.rendering = true;
-            if (LMB != null)
-                LMB.rendering = true;
         }
         if (ChargeBarOutline != null)
             ChargeBarOutline.rendering = true;
@@ -354,8 +341,6 @@ public class ChadHud : ScriptComponent
     {
         if (Crosshair != null)
             Crosshair.rendering = false;
-        if (LMB != null)
-            LMB.rendering = false;
         if (ChargeBarOutline != null)
             ChargeBarOutline.rendering = false;
         if (ChargeBar != null)
