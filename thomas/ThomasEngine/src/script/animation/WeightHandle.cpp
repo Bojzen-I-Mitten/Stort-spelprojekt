@@ -69,7 +69,7 @@ namespace ThomasEngine
 		}
 		float WeightTripple::Average()
 		{
-			return m_scale + m_rot + m_translation * 0.333333333f;
+			return (m_scale + m_rot + m_translation) * 0.333333333f;
 		}
 		WeightTripple WeightTripple::fromWeight(float weight)
 		{

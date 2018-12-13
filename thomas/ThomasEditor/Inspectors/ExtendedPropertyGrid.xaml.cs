@@ -7,6 +7,8 @@ using System.Windows.Controls;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 using ThomasEngine;
+using System.Reflection;
+using System.Collections;
 
 namespace ThomasEditor
 {
@@ -161,6 +163,37 @@ namespace ThomasEditor
                     grid.IsReadOnly = (matEditor.DataContext as Material) == Material.StandardMaterial;
                 }
                 grid.CollapseAllProperties();
+            }
+            
+            private void _grid_PropertyValueChanged(object sender, PropertyValueChangedEventArgs e)
+            {
+                // Triggered when a value is edited
+            }
+
+            private void _grid_LostFocus(object sender, RoutedEventArgs e)
+            {
+                if (!(sender is PropertyGrid))
+                    return;
+                PropertyGrid grid = sender as PropertyGrid;
+                if (grid.DataContext == null && !(grid.DataContext is ThomasEngine.IPropertyChanged))
+                    return;
+                ThomasEngine.IPropertyChanged target = grid.DataContext as ThomasEngine.IPropertyChanged;
+
+                if (e.OriginalSource is Xceed.Wpf.Toolkit.PropertyGrid.Editors.PropertyGridEditorCollectionControl)
+                {
+                    var src = e.OriginalSource as Xceed.Wpf.Toolkit.PropertyGrid.Editors.PropertyGridEditorCollectionControl;
+                    target.PropertyDataChanged(src.ItemsSourceType, src.ItemsSource);
+                }
+            }
+
+            private void _grid_SelectedObjectChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+            {
+
+            }
+
+            private void _grid_SelectedPropertyItemChanged(object sender, RoutedPropertyChangedEventArgs<PropertyItemBase> e)
+            {
+                // Can update property from here as it has more info. Not triggered consistently though
             }
         }
     }

@@ -20,8 +20,10 @@ namespace thomas {
 
 				virtual void timeStep(float dT);	// Step elapsed time
 
-				/* Partial state reset, state is set to a new play instance. */
+				/* Reset playback, state is set to a new play instance. */
 				void playOnce();
+				/* Reset playback time. Does not modify play state and does not ensure playback is played.*/
+				void resetTime();
 
 			public:
 				PlayType getPlayType();

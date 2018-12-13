@@ -37,6 +37,10 @@ namespace thomas {
 				m_playType = PlayType::Once;
 				m_elapsedTime = 0.f;
 			}
+			void BaseAnimationTime::resetTime()
+			{
+				m_elapsedTime = 0.f;
+			}
 			bool BaseAnimationTime::isRunning()
 			{
 				return m_playType && m_elapsedTime != m_duration;

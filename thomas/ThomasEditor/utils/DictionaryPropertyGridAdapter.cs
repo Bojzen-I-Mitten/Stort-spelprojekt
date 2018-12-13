@@ -105,6 +105,20 @@ namespace ThomasEditor
         {
             _dictionary = d;
             _key = key;
+            // Construct a default value if necessary
+            if (!_dictionary.Contains(_key))
+            {
+                Type t = _dictionary.GetType();
+                if (t.IsGenericType)
+                {
+                    Type[] typeArguments = t.GetGenericArguments();
+                    if (typeArguments.Length > 0)
+                    {
+                        object item = Activator.CreateInstance(typeArguments[typeArguments.Length - 1]);
+                        d.Add(_key, item);
+                    }
+                }
+            }
         }
 
         public override Type PropertyType

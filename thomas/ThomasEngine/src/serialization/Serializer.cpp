@@ -19,7 +19,7 @@ namespace ThomasEngine
 		serializer->ConstructorHandling = ConstructorHandling::AllowNonPublicDefaultConstructor;
 		serializer->TypeNameHandling = TypeNameHandling::Auto;
 		serializer->NullValueHandling = NullValueHandling::Ignore;
-		serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;									// Specifies if objects are created in-place or not
+		serializer->ObjectCreationHandling = ObjectCreationHandling::Auto;									// Specifies if objects are created in-place or not (reuse / replace)
 		serializer->MetadataPropertyHandling = MetadataPropertyHandling::Default;							// Specifies if $ref $id handling reads forward before resolving conflict?
 		serializer->DefaultValueHandling = DefaultValueHandling::Populate;									// Set to default value
 		serializer->Error += gcnew EventHandler<Serialization::ErrorEventArgs^>(&Serializer::ErrorHandler);

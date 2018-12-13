@@ -44,9 +44,7 @@ public class ChadControls : NetworkComponent
     public float ChargeTime { get; private set; }
 
     
-
-    private uint ChargeAnimIndex = 0;
-    private uint ThrowAnimIndex = 1;
+    
     private bool HasThrown = false;
     #endregion
 
@@ -89,6 +87,9 @@ public class ChadControls : NetworkComponent
 
     public override void OnAwake()
     {
+        Animations = gameObject.GetComponent<Chadimations>();
+        if (!Animations)
+            throw new InvalidOperationException("Chadimations component missing");
         ragdollSync = gameObject.AddComponent<NetworkTransform>();
         NetworkIdentity c = gameObject.GetComponent<NetworkIdentity>();
         gameObject.SetComponentIndex(c, 0xfffffff);  // Ensure network writer is last
@@ -117,7 +118,6 @@ public class ChadControls : NetworkComponent
 
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         rBody.Friction = 0.99f;
-        Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
         ragdollSync.target = Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
@@ -222,9 +222,7 @@ public class ChadControls : NetworkComponent
         if (!OnGround())
             rBody.Friction = 0.0f;
 
-
-        if (State != STATE.DIVING)
-            Animations.ResetTimer(STATE.DIVING, 0);
+        
     }
 
     #region Ragdoll handling
@@ -363,6 +361,7 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.LeftShift) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
+            Animations.EnterState(STATE.DIVING, 0);
             CurrentVelocity.y += 2.0f;
             Diving = DivingCoroutine();
             StartCoroutine(Diving);
@@ -389,7 +388,7 @@ public class ChadControls : NetworkComponent
                         State = STATE.THROWING;
                         ChadHud.Instance.ActivateAimHUD();
 
-                        Animations.SetAnimationWeight(ChargeAnimIndex, 1);
+                        Animations.EnterState(STATE.THROWING, 0); // Throw anim
                     }
                     else if((Input.GetMouseButtonUp(Input.MouseButtons.LEFT) || Input.GetMouseButtonUp(Input.MouseButtons.RIGHT)) && !HasThrown && State == STATE.THROWING)
                     {
@@ -427,8 +426,8 @@ public class ChadControls : NetworkComponent
     public void RPCResetThrow()
     {
         HasThrown = false;
-        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-        Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+        //Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        //Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         ChargeTime = 0;
         
         if (PickedUpObject)
@@ -569,6 +568,7 @@ public class ChadControls : NetworkComponent
     public void Reset()
     {
         DisableRagdoll();
+        Animations.Reset();
         State = STATE.CHADING;
         if (Diving != null)
         {
@@ -665,19 +665,11 @@ public class ChadControls : NetworkComponent
     {
         Animations.SetAnimationWeight((uint)index, weight);
     }
-
-    public void RPCStartThrow()
-    {
-        
-        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
-    }
-
+    
     IEnumerator PlayThrowAnim()
     {
         ChadHud.Instance.DeactivateAimHUD();
-        RPCStartThrow();
-        SendRPC("RPCStartThrow");
+        Animations.EnterState(STATE.THROWING, 1); // Throw release anim
         Vector3 chosenDirection = ChadCam.instance.transform.forward;
         Vector3 ballCamPos = ChadCam.instance.transform.position;
         
@@ -692,8 +684,8 @@ public class ChadControls : NetworkComponent
         if (State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
-            Animations.SetAnimationWeight(ThrowAnimIndex, 0);
-            SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
+            //Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+            //SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
         }
 
         Throwing = null;
@@ -795,9 +787,10 @@ public class ChadControls : NetworkComponent
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
         CanBeTackled = reader.GetBool();
-        if(!Animations)
-            Animations = gameObject.GetComponent<Chadimations>();
-        Animations.Throwing = reader.GetBool();
+        for (STATE i = 0; i < STATE.NUM_STATES; i++)
+        {
+            Animations.EnterState(i, reader.GetInt());
+        }
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -808,9 +801,11 @@ public class ChadControls : NetworkComponent
         writer.Put(CurrentVelocity);
         writer.Put(HasThrown);
         writer.Put(CanBeTackled);
-        if (!Animations)
-            Animations = gameObject.GetComponent<Chadimations>();
-        writer.Put(Animations.Throwing);
+
+        for(STATE i = (STATE)0; i < STATE.NUM_STATES; i++)
+        {
+            writer.Put(Animations.ReadState(i));
+        }
         return true;
     }
 

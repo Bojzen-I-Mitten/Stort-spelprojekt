@@ -151,6 +151,7 @@
     <ClInclude Include="src\script\animation\BoneInfo.h" />
     <ClInclude Include="src\resource\texture\RenderTexture.h" />
     <ClInclude Include="src\math\MathEngine.h" />
+    <ClInclude Include="src\serialization\IPropertyChanged.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

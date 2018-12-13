@@ -213,6 +213,7 @@
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
     <ClInclude Include="src\script\ScriptingUtility.h" />
     <ClInclude Include="src\serialization\Converters.h" />
+    <ClInclude Include="src\serialization\IPropertyChanged.h" />
     <ClInclude Include="src\serialization\Serializer.h" />
     <ClInclude Include="src\script\animation\BlendNode.h" />
     <ClInclude Include="src\script\animation\PlaybackNode.h" />

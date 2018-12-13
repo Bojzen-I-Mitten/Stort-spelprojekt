@@ -32,6 +32,10 @@ namespace ThomasEngine
 		{
 			m_handle->setPlayType(thomas::graphics::animation::PlayType::Loop);
 		}
+		void PlaybackHandle::ResetTime()
+		{
+			m_handle->resetTime();
+		}
 		void PlaybackHandle::SetFrame(float elapsed)
 		{
 			m_handle->m_elapsedTime = std::fmodf(elapsed, m_handle->getDuration());

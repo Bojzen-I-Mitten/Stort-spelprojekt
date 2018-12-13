@@ -16,10 +16,13 @@ namespace ThomasEngine
 			PlaybackHandle(thomas::graphics::animation::BaseAnimationTime * handle);
 			~PlaybackHandle();
 
+			/* Reset playback time, state is set to a new play instance. */
 			void Play();
 			/* Pause animation. Stop timer from being updated.	*/
 			void Pause();
 			void Loop();
+			/* Reset playback time. Does not modify play state and does not ensure playback is played. */
+			void ResetTime();
 			/*	Continue. Playing from paused state. */
 			void Continue();
 			void SetFrame(float elapsed);

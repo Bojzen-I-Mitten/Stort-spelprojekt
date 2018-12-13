@@ -108,7 +108,8 @@
     </UserControl.Resources>
 
     <xctk:PropertyGrid x:Name="_grid" DataContextChanged="PropertyGrid_DataContextChanged" IsCategorized="True" IsMiscCategoryLabelHidden="True"
-                       UpdateTextBoxSourceOnEnterKey="True"  Background="Aqua" AutoGenerateProperties="True" SelectedObject="{Binding}"
+                       UpdateTextBoxSourceOnEnterKey="True"  Background="Aqua" AutoGenerateProperties="True" SelectedObject="{Binding Path=., Mode=TwoWay, UpdateSourceTrigger=LostFocus}" LostFocus="_grid_LostFocus" 
+                       SelectedObjectChanged="_grid_SelectedObjectChanged" SelectedPropertyItemChanged="_grid_SelectedPropertyItemChanged" PropertyValueChanged="_grid_PropertyValueChanged"
                        ShowAdvancedOptions="False" ShowSummary="False" ShowSortOptions="False" ShowTitle="False" ShowSearchBox="False"
                        Loaded="PropertyGrid_Loaded">
         <xctk:PropertyGrid.EditorDefinitions>

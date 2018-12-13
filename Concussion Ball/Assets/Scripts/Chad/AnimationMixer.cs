@@ -3,9 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 using ThomasEngine;
 using ThomasEngine.Script;
 
+    [Newtonsoft.Json.JsonObject]
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public class AnimationParams
+    {
+        public List<Vector2> LeftFootGround { get; set; } = new List<Vector2>();
+        public List<Vector2> RightFootGround { get; set; } = new List<Vector2>();
+
+        public AnimationParams() { }
+}
 /*
  * Basic animation mixer for chad
  */
@@ -16,11 +26,6 @@ public class AnimationMixer
         Additive,
         Overwrite,
         Instant     // No blend in to the node. Applies it
-    }
-    public class AnimationParams
-    {
-        List<Vector2> leftFootGround = new List<Vector2>();
-        List<Vector2> rightFootGround = new List<Vector2>();
     }
     public struct MixInfo
     {
@@ -152,7 +157,6 @@ public class AnimationMixer
             {
                 BlendTargets[i].time = Math.Max(0.0f, BlendTargets[i].time - dT);
                 float w = MathHelper.Lerp(BlendTargets[i].weight, BlendTargets[i].fromWeight, BlendTargets[i].time / BlendTargets[i].totalTime);
-                Debug.Log(i + ": " +w);
                 Weights.setWeight(i, w);
             }
         }

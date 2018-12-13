@@ -1,5 +1,5 @@
 #include "CommandQueue.h"
-
+#include "../../serialization/IPropertyChanged.h"
 
 #pragma managed
 
