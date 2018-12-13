@@ -17,6 +17,8 @@ public class GUIScoreScreen : ScriptComponent
     Color Selected = Color.IndianRed;
     bool Init = true;
 
+    IEnumerator TimerRoutine = null;
+
     public override void OnAwake()
     {
         Instance = this;
@@ -68,12 +70,11 @@ public class GUIScoreScreen : ScriptComponent
         }
 
         Textdatalist[2].position = Textdatalist[0].position + new Vector2(Textdatalist[0].size.x / 2 + Textdatalist[2].size.x / 2, 0);
-    }
-
-    public void UpdateTimer()
-    {
-        if (Timer > 0)
-            Textdatalist[2].text = (Timer -= 1).ToString();
+        if (TimerRoutine == null)
+        {
+            TimerRoutine = CountDown();
+            StartCoroutine(CountDown());
+        }
     }
 
     public override void OnDisable()
@@ -103,10 +104,22 @@ public class GUIScoreScreen : ScriptComponent
 
         if (Init)
         {
+            Debug.Log("Enable scorescreen");
+            Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
             Timer = ScoreScreenTimeLast;
             Init = false;
         }
 
         Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
+    }
+
+    IEnumerator CountDown()
+    {
+        while (Timer > 0)
+        {
+            Textdatalist[2].text = (Timer = Timer - 1).ToString();
+            yield return new WaitForSecondsRealtime(1);
+        }
+        TimerRoutine = null;
     }
 }

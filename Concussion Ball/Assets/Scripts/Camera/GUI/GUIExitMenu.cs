@@ -61,7 +61,7 @@ public class GUIExitMenu : ScriptComponent
         if (OptionsMenu.Clicked())
         {
             GUIOptionsMenu.instance.ActivatedfromExitmenu = true;
-            CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
+            CameraMaster.instance.SetState(CAM_STATE.OPTIONS_MENU);
         }
 
     }

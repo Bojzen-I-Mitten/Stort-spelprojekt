@@ -327,12 +327,12 @@ public class GUIOptionsMenu : ScriptComponent
     {
         if (ActivatedfromExitmenu)
         {
-            CameraMaster.instance.State = CAM_STATE.GAME;
+            CameraMaster.instance.SetState(CAM_STATE.GAME);
             Input.SetMouseMode(Input.MouseMode.POSITION_RELATIVE);
             ActivatedfromExitmenu = false;
         }
         else
-            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            CameraMaster.instance.SetState(CAM_STATE.MAIN_MENU);
 
 
     }

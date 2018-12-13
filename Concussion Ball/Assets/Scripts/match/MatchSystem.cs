@@ -234,13 +234,7 @@ public class MatchSystem : NetworkManager
         GoldenGoal = false;
 
         CameraMaster.instance.SetState(CAM_STATE.SCORE_SCREEN);
-        for (int i = 0; i < GUIScoreScreen.Instance.ScoreScreenTimeLast; i++)
-        {
-            GUIScoreScreen.Instance.UpdateTimer();
-            yield return new WaitForSecondsRealtime(1);
-            if (!GUIScoreScreen.Instance.enabled)
-                break;
-        }
+        yield return new WaitForSecondsRealtime(10);
         ResetNetworkplayerPoints();
         RPCStartMatch();
         CameraMaster.instance.SetState(CAM_STATE.GAME);
