@@ -8,9 +8,9 @@ namespace thomas
 	{
 		namespace profiling
 		{
-			std::vector<long long> ProfileManager::s_fps;
+			long long ProfileManager::s_fps;
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
-			std::vector<long long> ProfileManager::s_gpuSamples;
+			long long ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
 			std::map<std::string, std::vector<float>> ProfileManager::s_vramusage;
 			float ProfileManager::s_vramTotal;
@@ -32,29 +32,29 @@ namespace thomas
 				
 				tracktime = std::chrono::high_resolution_clock::now();
 
-				s_fps.push_back(frametime.count());
+				s_fps = frametime.count();
 
 				s_frames++;
 			}
 
 			void ProfileManager::storeSample(std::string name, long long elapsedTime, long long startTime, DWORD processor_id)
 			{
-				s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));
+				/*s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));*/
 			}
 
 			void ProfileManager::storeGpuSample(long long gpuTime)
 			{
 				if (gpuTime < 0)
-					s_gpuSamples.push_back(0);
+					s_gpuSamples = 0;
 
-				s_gpuSamples.push_back(gpuTime);
+				s_gpuSamples = gpuTime;
 			}
 
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
-				s_profileLock.lock();
+				/*s_profileLock.lock();
 				s_vramusage[name].push_back(usage);
-				s_profileLock.unlock();
+				s_profileLock.unlock();*/
 			}
 
 			void ProfileManager::increaseContextSwitches()

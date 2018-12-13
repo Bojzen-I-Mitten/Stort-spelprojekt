@@ -249,9 +249,8 @@ namespace ThomasEngine {
 			ImGui::Text("Logic Thread: %.02f ms	 Render Thread: %.02f ms", logicTime*1000.0f, renderTime*1000.0f);
 			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
-			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetTotalMemory(), 512.0f);
+			ImGui::Text("VRAM Usage: %.2f MB of (%.2f MB)", profiler->GetCurrentMemory(), 512.0f);
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
-			//ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Draw Shadows:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_SHADOWS_END)*1000.0f);
 			ImGui::Text("	Main objects:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS_END)*1000.0f);
 			ImGui::Text("	Particles:     %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES_END)*1000.0f);
