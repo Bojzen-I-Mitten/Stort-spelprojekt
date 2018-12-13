@@ -41,7 +41,7 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public Transform hand { get; set; }
     [Category("Throwing")]
-    public float ChargeTime { get; private set; }
+    public float ChargeTime { get; set; }
 
     
 
