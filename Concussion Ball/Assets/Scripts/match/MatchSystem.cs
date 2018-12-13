@@ -200,7 +200,6 @@ public class MatchSystem : NetworkManager
 
     void ResetPlayers()
     {
-        CameraMaster.instance.EnableSwitchTeam();
         foreach (var team in Teams)
         {
             team.Value.ResetPlayers();
@@ -252,7 +251,7 @@ public class MatchSystem : NetworkManager
         ChadHud.Instance.StartCountdown(duration);
         yield return new WaitForSecondsRealtime(duration);
         LocalChad.Locked = false;
-
+        CameraMaster.instance.EnableSwitchTeam();
         hasScored = false;
     }
 
