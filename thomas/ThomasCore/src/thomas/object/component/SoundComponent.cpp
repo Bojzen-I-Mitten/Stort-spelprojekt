@@ -67,7 +67,7 @@ namespace thomas
 						}
 					}
 				}
-			}
+			}		
 
 			void SoundComponent::Play(resource::AudioClip* clip, float volume, bool looping, bool is3D)
 			{

@@ -36,13 +36,19 @@ public class ReplayCamera : ScriptComponent
         {
             Vector3 forward = Vector3.Normalize(Target.LinearVelocity);
             Vector3 TargetPosition = Target.Position + new Vector3(0, 1.8f, 0) - forward * ChadCam.instance.CameraOffset;
-            transform.position = Vector3.Lerp(transform.position, TargetPosition, Time.DeltaTime);
+            if (Ball._Chad)
+                Debug.Log("Following Chad");
+            else
+                Debug.Log("Following Ball");
+                Debug.Log("Current pos: " + transform.position);
+            Debug.Log("Target pos: " + TargetPosition);
+            Debug.Log("DeltaTime: " + Time.ActualDeltaTime);
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, Time.ActualDeltaTime);
 
             Vector3 TargetLookAt = Target.Position + new Vector3(0, 1.8f, 0)/* + Target.forward*/;
-            TargetLookAt = Vector3.Lerp(transform.position + transform.forward, TargetLookAt, Time.DeltaTime);
+            TargetLookAt = Vector3.Lerp(transform.position + transform.forward, TargetLookAt, Time.ActualDeltaTime);
             transform.LookAt(TargetLookAt);
         }
-
     }
 
     public override void OnEnable()
