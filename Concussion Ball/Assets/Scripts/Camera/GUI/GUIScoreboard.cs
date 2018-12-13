@@ -281,7 +281,12 @@ public class GUIScoreboard : ScriptComponent
     {
         for (int i = Team1PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
         {
+            PlayerStandardBarTeam1[i].rendering = false;
             Team1Players[i].IsRendering = false;
+        }
+        for (int i = Team2PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
+        {
+            PlayerStandardBarTeam2[i].rendering = false;
             Team2Players[i].IsRendering = false;
         }
     }
@@ -327,6 +332,7 @@ public class GUIScoreboard : ScriptComponent
         }
         for (int i = 0; i < Team2PlayerCount; i++)
         {
+            PlayerStandardBarTeam2[i].rendering = true;
             Team2Players[i].IsRendering = true;
 
             if (Team2.Players[i].PlayerName.Length > 9)
@@ -357,8 +363,8 @@ public class GUIScoreboard : ScriptComponent
 
     public override void Update()
     {
-        UpdateStatistics();
         UpdatePlayerBars();
+        UpdateStatistics();
         UpdateList();
 
         if ((Input.GetKey(Input.Keys.Tab) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)
