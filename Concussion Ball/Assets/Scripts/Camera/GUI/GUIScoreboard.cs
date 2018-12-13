@@ -278,10 +278,19 @@ public class GUIScoreboard : ScriptComponent
 
     void UpdatePlayerBars()
     {
-        for (int i = Team1PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
+        for (int i = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount; i < Team1Players.Count ; i++)
+        { 
+            if(i< Team1Players.Count)
+                Team1Players[i].IsRendering = false;
+            if (i < PlayerStandardBarTeam1.Count)
+                PlayerStandardBarTeam1[i].rendering = false;
+        }
+        for (int i = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount; i < Team2Players.Count;i++)
         {
-            Team1Players[i].IsRendering = false;
-            Team2Players[i].IsRendering = false;
+            if (i < Team2Players.Count)
+                Team2Players[i].IsRendering = false;
+            if (i < PlayerStandardBarTeam2.Count)
+                PlayerStandardBarTeam2[i].rendering = false;
         }
     }
     void UpdatePlayertextbasedonscore()
@@ -327,7 +336,7 @@ public class GUIScoreboard : ScriptComponent
         for (int i = 0; i < Team2PlayerCount; i++)
         {
             Team2Players[i].IsRendering = true;
-
+            PlayerStandardBarTeam2[i].rendering = true;
             if (Team2.Players[i].PlayerName.Length > 9)
                 Team2Players[i].Name.text = Team2.Players[i].PlayerName.Substring(0, 9) + "-";
             else
@@ -360,10 +369,10 @@ public class GUIScoreboard : ScriptComponent
         UpdatePlayerBars();
         UpdateList();
 
-        if ((Input.GetKey(Input.Keys.Tab) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)
+        if ((Input.GetKey(Input.Keys.I) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)
             Toggle = true;
 
-        if (Input.GetKeyUp(Input.Keys.Tab) && !GUIScoreScreen.Instance.enabled)
+        if (Input.GetKeyUp(Input.Keys.I) && !GUIScoreScreen.Instance.enabled)
             Toggle = false;
 
         Canvas.isRendering = Toggle;
