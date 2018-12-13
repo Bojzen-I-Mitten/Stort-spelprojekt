@@ -386,6 +386,7 @@ namespace thomas
 		if (height > 0 && height <= GetVerticalResolution())
 		{
 			m_height = height;
+			m_windowRectangle.bottom = height;
 			return true;
 		}
 
@@ -397,6 +398,7 @@ namespace thomas
 		if (width > 0 && width <= GetHorizontalResolution())
 		{
 			m_width = width;
+			m_windowRectangle.right = width;
 			return true;
 		}
 

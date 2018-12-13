@@ -57,6 +57,22 @@ namespace thomas
 		}
 	}
 
+	void WindowManager::SetWidth(LONG width)
+	{
+		if (m_current != nullptr)
+		{
+			m_current->SetWidth(width);
+		}
+	}
+
+	void WindowManager::SetHeight(LONG height)
+	{
+		if (m_current != nullptr)
+		{
+			m_current->SetHeight(height);
+		}
+	}
+
 	bool WindowManager::GetFullscreen()
 	{
 		if (m_current != nullptr)
@@ -75,6 +91,26 @@ namespace thomas
 		}
 
 		return false;
+	}
+
+	LONG WindowManager::GetWidth()
+	{
+		if (m_current != nullptr)
+		{
+			return m_current->GetWidth();
+		}
+		
+		return 0;
+	}
+
+	LONG WindowManager::GetHeight()
+	{
+		if (m_current != nullptr)
+		{
+			m_current->GetHeight();
+		}
+
+		return 0;
 	}
 
 	WindowManager* WindowManager::Instance()

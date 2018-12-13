@@ -24,6 +24,18 @@ namespace ThomasEngine
 			thomas::WindowManager::Instance()->SetFullscreen(Fullscreen);
 	}
 
+	void WindowManager::SetWidth(LONG width)
+	{
+		if (!ThomasWrapper::IsEditorBuild())
+			thomas::WindowManager::Instance()->SetWidth(width);
+	}
+
+	void WindowManager::SetHeight(LONG height)
+	{
+		if (!ThomasWrapper::IsEditorBuild())
+			thomas::WindowManager::Instance()->SetHeight(height);
+	}
+
 	bool WindowManager::GetBorderless()
 	{
 		if (!ThomasWrapper::IsEditorBuild())
@@ -38,5 +50,21 @@ namespace ThomasEngine
 			return thomas::WindowManager::Instance()->GetFullscreen();
 
 		return false;
+	}
+
+	LONG WindowManager::GetWidth()
+	{
+		if (!ThomasWrapper::IsEditorBuild())
+			return thomas::WindowManager::Instance()->GetWidth();
+
+		return 0;
+	}
+
+	LONG WindowManager::GetHeight()
+	{
+		if (!ThomasWrapper::IsEditorBuild())
+			return thomas::WindowManager::Instance()->GetHeight();
+
+		return 0;
 	}
 }

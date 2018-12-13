@@ -20,8 +20,12 @@ namespace thomas
 		void UpdateFocus();
 		void SetBorderless(bool borderless);
 		void SetFullscreen(bool fullscreen);
+		void SetWidth(LONG width);
+		void SetHeight(LONG height);
 		bool GetFullscreen();
 		bool GetBorderless();
+		LONG GetWidth();
+		LONG GetHeight();
 
 	public:
 		int GetNumOfWindows();
