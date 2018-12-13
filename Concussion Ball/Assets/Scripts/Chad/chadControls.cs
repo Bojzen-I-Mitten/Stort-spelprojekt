@@ -533,9 +533,12 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 break;
             case STATE.THROWING:
-                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
-                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed;
-                
+                if (Direction.z != 0 && Direction.x != 0)
+                {
+                    diagonalModifier = 0.5f;
+                }
+                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed * diagonalModifier;
+                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed * diagonalModifier;
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero; 

@@ -1,6 +1,8 @@
 using ThomasEngine;
 using ThomasEngine.Network;
 using System.Collections;
+//using System.Collections.Generic;
+//using System.ComponentModel;
 using System.Linq;
 using System;
 using LiteNetLib.Utils;
@@ -269,6 +271,7 @@ public class Gramophone : Powerup
 
     private IEnumerator BlastingMusic()
     {
+        //List<ChadControls> affectedChads = new List<ChadControls>();
 
         if (_Note1 && _Note2)
         {
@@ -301,22 +304,38 @@ public class Gramophone : Powerup
                     localChad.State = ChadControls.STATE.DANCING;
                     ChadHud.Instance.DeactivateAimHUD();
                     localChad.ChargeTime = 0;
+                    //affectedChads.Add(localChad);
                 }
                 else if (distance > ExplosionRadius && localChad.State == ChadControls.STATE.DANCING)
                 {
+                    //foreach (var player in affectedChads)
+                    //{
+                    //    if (player == localChad)
+                    //    {
+                    //        localChad.State = ChadControls.STATE.CHADING;
+                    //        affectedChads.Remove(player); // buggy?
+                    //    }
+                    //}
                     localChad.State = ChadControls.STATE.CHADING;
                 }
             }
 
             yield return null;
         }
-        //_Timer = 0.0f;
         GramophoneClip.Stop();
 
         // Reset all dancing Chads, the party is over
+        //foreach (var player in affectedChads)
+        //{
+        //    if (player == localChad && localChad.State == ChadControls.STATE.DANCING)
+        //    {
+        //        localChad.State = ChadControls.STATE.CHADING;
+        //        //affectedChads.Remove(player); // buggy?
+        //    }
+        //}
         if (localChad.State == ChadControls.STATE.DANCING)
             localChad.State = ChadControls.STATE.CHADING;
-
+        //affectedChads.Clear();
         Explosion();
         
   
