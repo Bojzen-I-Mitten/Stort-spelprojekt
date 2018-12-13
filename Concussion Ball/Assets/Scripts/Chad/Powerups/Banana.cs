@@ -44,6 +44,10 @@ public class Banana : Powerup
         SlipSound.Clip = BananaSlipSound;
         SlipSound.Looping = false;
         SlipSound.Is3D = true;
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
     }
 
     public override void Update()
