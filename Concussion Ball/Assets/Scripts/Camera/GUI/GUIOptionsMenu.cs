@@ -196,7 +196,10 @@ public class GUIOptionsMenu : ScriptComponent
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
         Audio.SetMasterVolume((float)ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue / (float)100);
 
-
+        if (Input.GetKeyDown(Input.Keys.X))
+        {
+            Debug.Log("hello");
+        }
 
         /*    if (Input.GetKeyDown(Input.Keys.X))
             {
