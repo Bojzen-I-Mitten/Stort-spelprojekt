@@ -147,7 +147,9 @@ namespace thomas
 		}
 
 		SetWindowLong(m_windowHandler, GWL_STYLE, m_windowStyle);
-		return SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+		SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+
+		return ResizeBackBuffer();
 	}
 
 	void Window::WaitOnSwapChain()
