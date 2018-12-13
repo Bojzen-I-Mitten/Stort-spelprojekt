@@ -12,7 +12,7 @@ class GUIInput
         regexString += c;
 
         // No whitespace allowed
-        if (Regex.IsMatch(regexString, "^[\\w.\\s]*$")) //\w is any character, \s is whitespace
+        if (Regex.IsMatch(regexString, "^[\\w\\. ]*$")) //\w is any character
         {
             if (_string.Length < length)
             {

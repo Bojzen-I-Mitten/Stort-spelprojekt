@@ -79,6 +79,10 @@ public class Ball : PickupableObject
 
         
         #endregion
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
     }
     #region Particle handling
     private void ResetFireEmitters()
@@ -249,10 +253,10 @@ public class Ball : PickupableObject
     {
         if (ThrowForce > MaxThrowForce - 0.01f)
         {
-            emitterElectricity1.EmitOneShot(10);
-            emitterElectricity2.EmitOneShot(10);
-            emitterElectricity3.EmitOneShot(10);
-            emitterFire.EmitOneShot(25);
+            //emitterElectricity1.EmitOneShot(10);
+            //emitterElectricity2.EmitOneShot(10);
+            //emitterElectricity3.EmitOneShot(10);
+            //emitterFire.EmitOneShot(25);
 
 
         }
@@ -273,9 +277,9 @@ public class Ball : PickupableObject
         if (interp > 0)
         {
             
-            emitterElectricity1.Emit = true;
-            emitterElectricity2.Emit = true;
-            emitterElectricity3.Emit = true;
+            //emitterElectricity1.Emit = true;
+            //emitterElectricity2.Emit = true;
+            //emitterElectricity3.Emit = true;
 
             pointLight.Intensity = interp;
 

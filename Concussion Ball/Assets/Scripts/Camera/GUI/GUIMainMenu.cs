@@ -49,20 +49,12 @@ public class GUIMainMenu : ScriptComponent
     {
         CaretOffset = -0.02f;
         NameRotation = -0.1f;
-    }
-
-    public override void Start()
-    {
-
-        
-
         Camera = gameObject.GetComponent<Camera>();
         TakeName = false;
         AddImagesAndText();
         MainMenuCamPos = new Vector3(0, -195.442f, -7.084f);
         MainMenuAspectRation = new Vector3(16, 9, 1);
         MainMenuCamRot = Vector3.Zero;
-
     }
 
     public override void Update()
@@ -128,14 +120,14 @@ public class GUIMainMenu : ScriptComponent
             #region Clicked
             if (Play.Clicked() && PlayerName.text != "")
             {
-                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                CameraMaster.instance.SetState(CAM_STATE.JOIN_HOST);
                 TakeName = false;
                 UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
                 UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
             }
             else if (HostGame.Clicked())
             {
-                CameraMaster.instance.State = CAM_STATE.HOST_MENU;
+                CameraMaster.instance.SetState(CAM_STATE.HOST_MENU);
                 TakeName = false;
                 UserSettings.AddOrUpdateAppSetting("Hat", CameraMaster.instance.SelectedHat.ToString());
                 UserSettings.AddOrUpdateAppSetting("PlayerName", PlayerName.text);
@@ -159,12 +151,12 @@ public class GUIMainMenu : ScriptComponent
                 CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
                 AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.HAT);
             }
+            else if (Options.Clicked())
+            {
+                CameraMaster.instance.SetState(CAM_STATE.OPTIONS_MENU);
+            }
             #endregion
-        if(Options.Clicked())
-        {
-                CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
-           }
-          
+
 
             if (TakeName)
             {

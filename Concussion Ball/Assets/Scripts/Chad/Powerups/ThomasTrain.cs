@@ -65,6 +65,10 @@ public class ThomasTrain : Powerup
 
         m_throwable = true; // change depending on power-up
 
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
+
         #region emitters
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
@@ -134,7 +138,11 @@ public class ThomasTrain : Powerup
 
         // Despawn if Train has not hit anyone in 30 seconds
         if (_DespawnTimer > 30)
+        {
             base.Activate();
+            _DespawnTimer = 0.0f;
+        }
+            
         else if (_DespawnTimer > 0)
             _DespawnTimer += Time.DeltaTime;
     }
@@ -265,5 +273,7 @@ public class ThomasTrain : Powerup
     {
         base.Reset();
         transform.scale = Vector3.One;
+    
+        _DespawnTimer = 0.0f;
     }
 }

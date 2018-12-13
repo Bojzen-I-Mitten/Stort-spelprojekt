@@ -16,16 +16,16 @@ namespace thomas
 		namespace component
 		{
 			SoundComponent::SoundComponent() :
-			m_type(SoundType::Music),
-			m_channel(nullptr),
-			m_clip(nullptr),
-			m_is3D(false),
-			m_looping(false),
-			m_paused(false),
-			m_volume(0.5f),
-			m_spreadAngle(0.f),
-			m_minDistance(1.f),
-			m_maxDistance(100.f)
+				m_type(SoundType::Music),
+				m_channel(nullptr),
+				m_clip(nullptr),
+				m_is3D(false),
+				m_looping(false),
+				m_paused(false),
+				m_volume(0.5f),
+				m_spreadAngle(0.f),
+				m_minDistance(1.f),
+				m_maxDistance(100.f)
 			{
 			}
 
@@ -65,9 +65,9 @@ namespace thomas
 						{
 							m_channel->setMode(FMOD_LOOP_OFF);
 						}
-					}	
+					}
 				}
-			}
+			}		
 
 			void SoundComponent::Play(resource::AudioClip* clip, float volume, bool looping, bool is3D)
 			{
@@ -100,7 +100,7 @@ namespace thomas
 						{
 							m_channel->setMode(FMOD_LOOP_OFF);
 						}
-					}		
+					}
 				}
 			}
 
@@ -114,15 +114,19 @@ namespace thomas
 
 			void SoundComponent::Update()
 			{
-				if (m_channel != nullptr && m_is3D)
+				if (m_channel != nullptr)
 				{
-					// No velocity set on the object
-					m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->GetTransform()->GetPosition()), NULL);
-					m_channel->set3DSpread(m_spreadAngle);
-
-					if (m_minDistance < m_maxDistance)
+					AdjustVolumeType(m_volume);
+					
+					if (m_is3D)
 					{
-						m_channel->set3DMinMaxDistance(m_minDistance, m_maxDistance);
+						m_channel->set3DAttributes(&SoundManager::GetInstance()->Vector3ToFmod(m_gameObject->GetTransform()->GetPosition()), NULL);
+						m_channel->set3DSpread(m_spreadAngle);
+
+						if (m_minDistance < m_maxDistance)
+						{
+							m_channel->set3DMinMaxDistance(m_minDistance, m_maxDistance);
+						}
 					}
 				}
 			}
@@ -258,12 +262,12 @@ namespace thomas
 			}
 
 			bool SoundComponent::IsPlaying() const
-			{				
+			{
 				if (m_channel != nullptr)
 				{
 					bool playing = false;
 					m_channel->isPlaying(&playing);
-					
+
 					return playing;
 				}
 
@@ -282,25 +286,29 @@ namespace thomas
 
 			void SoundComponent::AdjustVolumeType(float volume)
 			{
-				auto listener = AudioListener::GetInstance();
-				auto masterVolume = listener->GetMasterVolume();
-				auto musicVolume = listener->GetMusicVolume();
-				auto fxVolume = listener->GetFXVolume();
-				auto voiceVolume = listener->GetVoiceVolume();
 
-				switch (m_type)
+				auto listener = AudioListener::GetInstance();
+				if (listener)
 				{
-				case SoundType::Music:
-					m_channel->setVolume(masterVolume * musicVolume * volume);
-					break;
-				case SoundType::Effect:
-					m_channel->setVolume(masterVolume * fxVolume * volume);
-					break;
-				case SoundType::Voice:
-					m_channel->setVolume(masterVolume * voiceVolume * volume);
-					break;
-				default:
-					break;
+					auto masterVolume = listener->GetMasterVolume();
+					auto musicVolume = listener->GetMusicVolume();
+					auto fxVolume = listener->GetFXVolume();
+					auto voiceVolume = listener->GetVoiceVolume();
+
+					switch (m_type)
+					{
+					case SoundType::Music:
+						m_channel->setVolume(masterVolume * musicVolume * volume);
+						break;
+					case SoundType::Effect:
+						m_channel->setVolume(masterVolume * fxVolume * volume);
+						break;
+					case SoundType::Voice:
+						m_channel->setVolume(masterVolume * voiceVolume * volume);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}

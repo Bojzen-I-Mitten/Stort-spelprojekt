@@ -9,7 +9,7 @@ cbuffer MATERIAL_PROPERTIES
     float4 color : COLOR;
     float4 uvTiling : UVTILING; // (uv tiling x, uv tiling y, uv offset x, uv offset y)
     float4 ballPosition : POSITION;
-    float maxBallDistance : TEXCOORD0;
+    float hole;
 };
 
 
@@ -93,12 +93,16 @@ float triWave(float t, float offset, float yOffset)
 float4 frag(v2f input) : SV_TARGET
 {
       
+    float maxBallDistance = ballPosition.w;
+
     float rim = 1 - abs(dot(input.TBN[2], normalize(input.viewDir)));
     float ballDist = distance(input.worldPos.xyz, ballPosition.xyz);
 
     float4 forceTex = ForcefieldTexture.Sample(StandardWrapSampler, input.texcoord);
 
     float ballImpact = smoothstep(maxBallDistance, 0.0f, ballDist) * 8.0f;
+
+    ballImpact -= smoothstep(maxBallDistance * hole, 0.0f, ballDist) * 8.0f;
 
     forceTex.r *= ballImpact + triWave(thomas_Time.x * 5, abs((uvTiling.z * input.texcoord.y / uvTiling.y) + 1), -0.7) * 6;
 				// I ended up saturaing the rim calculation because negative values caused weird artifacts

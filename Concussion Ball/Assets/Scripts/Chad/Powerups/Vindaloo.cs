@@ -29,7 +29,7 @@ public class Vindaloo : Powerup
         base.OnAwake();
 
         m_throwable = true; // change depending on power-up
-        MovementSpeedModifier = 0.8f;
+        MovementSpeedModifier = 0.7f;
         ExplosionRadius = 8.0f;
         ExplosionForce = 60.0f;
         BaseThrowForce = 15.0f;
@@ -44,6 +44,10 @@ public class Vindaloo : Powerup
         ExplosionSound.Is3D = true;
         ExplosionSound.MaxDistance = 10000;
         ExplosionSound.MinDistance = 20;
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
 
         #region big meme particle emitter bois
 
@@ -111,7 +115,10 @@ public class Vindaloo : Powerup
 
         // Despawn if Vindaloo has not hit anyone in 30 seconds
         if (_DespawnTimer > 30)
+        {
+            _DespawnTimer = 0.0f;
             base.Activate();
+        }
         else if (_DespawnTimer > 0)
             _DespawnTimer += Time.DeltaTime;
         
@@ -168,7 +175,6 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
-        // This sound will instantly stop playing when the 
         // Play the vindaloo explosion sound
         ExplosionSound.Play();
 
@@ -187,5 +193,11 @@ public class Vindaloo : Powerup
         yield return null;
 
         Remove();
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        _DespawnTimer = 0.0f;
     }
 }

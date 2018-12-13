@@ -32,17 +32,20 @@ public class GUIExitMenu : ScriptComponent
     {
         ExitGame.color = Color.White;
         SwitchTeam.color = Color.White;
+        OptionsMenu.color = Color.FloralWhite;
 
         if (ExitGame.Hovered())
             ExitGame.color = Color.IndianRed;
         else if (SwitchTeam.Hovered() && _CanSwitchTeam)
             SwitchTeam.color = Color.IndianRed;
+        else if (OptionsMenu.Hovered())
+            OptionsMenu.color = Color.IndianRed;
 
         if (ExitGame.Clicked())
         {
             if (ThomasWrapper.IsPlaying())
             {
-                CameraMaster.instance.State = CAM_STATE.LOADING_SCREEN;
+                CameraMaster.instance.SetState(CAM_STATE.LOADING_SCREEN);
                 ThomasWrapper.IssueRestart();
             } 
         }
@@ -50,19 +53,15 @@ public class GUIExitMenu : ScriptComponent
         {
             CameraMaster.instance.Canvas.isRendering = true;
             gameObject.GetComponent<ChadCam>().enabled = false;
-            CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+            CameraMaster.instance.SetState(CAM_STATE.SELECT_TEAM);
         }
 
-        if (OptionsMenu.Hovered())
-            OptionsMenu.color = Color.Red;
-        else
-            OptionsMenu.color = Color.White;
 
 
         if (OptionsMenu.Clicked())
         {
             GUIOptionsMenu.instance.ActivatedfromExitmenu = true;
-            CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
+            CameraMaster.instance.SetState(CAM_STATE.OPTIONS_MENU);
         }
 
     }
