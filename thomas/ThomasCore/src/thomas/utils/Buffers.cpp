@@ -12,7 +12,7 @@ namespace thomas
 			{
 				D3D11_BUFFER_DESC bufferDesc;
 				bufferDesc.ByteWidth = (uint32_t)size;
-				bufferDesc.Usage = usageFlag; 
+				bufferDesc.Usage = usageFlag; // == DYNAMIC_BUFFER ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_IMMUTABLE;
 				bufferDesc.BindFlags = bindFlag;
 				bufferDesc.CPUAccessFlags = usageFlag == DYNAMIC_BUFFER ? D3D11_CPU_ACCESS_WRITE : 0; //CPU if dynamic
 				bufferDesc.MiscFlags = miscFlag;

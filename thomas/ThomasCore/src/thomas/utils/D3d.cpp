@@ -787,6 +787,7 @@ namespace thomas
 		bool D3D::LoadTextureFromFile(std::string fileName,
 			ID3D11Resource*& texture, ID3D11ShaderResourceView*& textureView)
 		{
+			fileName = "C:\\Users\\Carl\\Documents\\Stort-spelprojekt\\Concussion Ball\\Assets\\Textures\\DarkGrey_grey.DDS";
 			// Convert from string to char in order to split by token
 			// convert back from char, since its easier to compare strings than chars
 			// Fuck you, thats why.
@@ -796,7 +797,7 @@ namespace thomas
 			std::string extension_string(extension_char);
 
 			delete[] filename_c;
-
+			
 			HRESULT hr;
 			if (extension_string == ".dds" || extension_string == ".DDS")
 			{
