@@ -14,7 +14,6 @@ public class GUIExitMenu : ScriptComponent
     Text OptionsMenu;
     public bool _CanSwitchTeam = true;
 
-    Text OptionsMenu;
     //private readonly string _exitMatch = "Exit Match";
     private readonly string _exitGame = "Exit Game";
 
