@@ -66,10 +66,13 @@ namespace thomas
 	{
 		if (m_fullScreen)
 		{
-			m_width = 1920;
-			m_height = 1080;
+			m_width = GetHorizontalResolution();
+			m_height = GetVerticalResolution();
 
 			SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER);
+
+			m_windowRectangle.right = m_width;
+			m_windowRectangle.bottom = m_height;
 		}
 		else if (m_shouldSnappOutOfFullscreen)
 		{
@@ -77,6 +80,9 @@ namespace thomas
 			m_height = 600;
 
 			SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER | SWP_NOMOVE);
+			
+			m_windowRectangle.right = m_width;
+			m_windowRectangle.bottom = m_height;
 		}
 		else
 		{
@@ -124,6 +130,13 @@ namespace thomas
 
 	bool Window::ChangeWindowStyle()
 	{
+		bool result = GetClientRect(m_windowHandler, &m_windowRectangle);
+		if (result)
+		{
+			m_height = m_windowRectangle.bottom;
+			m_width = m_windowRectangle.right;
+		}
+
 		if (!m_borderless)
 		{
 			m_windowStyle = WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
@@ -134,10 +147,7 @@ namespace thomas
 		}
 
 		SetWindowLong(m_windowHandler, GWL_STYLE, m_windowStyle);
-		if (!SetWindowPos(m_windowHandler, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOMOVE))
-			return false;
-			
-		return ResizeBackBuffer();
+		return SetWindowPos(m_windowHandler, nullptr, 0, 0, m_width, m_height, SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 	}
 
 	void Window::WaitOnSwapChain()
@@ -300,7 +310,7 @@ namespace thomas
 			m_windowStyle = WS_CHILD;
 		}
 
-		hwnd = CreateWindow(
+		m_windowHandler = CreateWindow(
 			m_windowClassInfo.lpszClassName,
 			m_title.c_str(),
 			m_windowStyle,
@@ -313,9 +323,9 @@ namespace thomas
 			m_hInstance,
 			nullptr);
 
-		if (hwnd)
+		if (m_windowHandler)
 		{
-			m_windowHandler = hwnd;
+			hwnd = m_windowHandler;
 			bool hr = CreateSwapChain();
 			if (!hr)
 				LOG("Failed to create swap chain");
@@ -501,8 +511,9 @@ namespace thomas
 			window->m_input.SetLastKey((unsigned short)wParam);
 		break;
 		case WM_STYLECHANGED:
-			if (window)
-				window->Create(hWnd, nullptr);
+			//SetForegroundWindow(hWnd);
+			ShowWindow(hWnd, 5);
+			/*window->Create(hWnd, nullptr);*/
 		break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
