@@ -1,7 +1,6 @@
 #pragma once
 #include "Window.h"
 #include "EditorWindow.h"
-
 namespace thomas
 {
 	class WindowManager
@@ -18,6 +17,10 @@ namespace thomas
 		void Update();
 		void Create(HWND hWnd, bool isEditor);
 		void UpdateFocus();
+		void setBorderless(bool borderless);
+		void setFullscreen(bool fullscreen);
+		bool getFullscreen();
+		bool getBorderless();
 
 	public:
 		int GetNumOfWindows();

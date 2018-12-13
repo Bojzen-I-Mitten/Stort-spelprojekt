@@ -221,7 +221,7 @@ public class NetworkPlayer : NetworkComponent
             gameObject.GetComponent<ChadControls>().Reset();
 
             transform.position = Team.GetSpawnPosition();
-            transform.LookAt(new Vector3(0, transform.position.y, 0));
+            transform.LookAt(new Vector3(0, 0, 0));
 
             rb.Position = transform.position;
             rb.Rotation = transform.rotation;

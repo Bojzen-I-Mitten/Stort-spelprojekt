@@ -61,8 +61,23 @@ public class ChadCam : ScriptComponent
         }
     }
 
-    public float CameraSensitivity_x { get; set; } = 10;
-    public float CameraSensitivity_y { get; set; } = 20;
+    public float CameraSensitivity_x
+    {
+        get
+        {
+            return CameraSensitivity_y * 16f / 9f;
+        }
+    }
+    public float CameraSensitivity_y
+    {
+        get
+        {
+            if (Chad.State == ChadControls.STATE.THROWING)
+                return GUIOptionsMenu.instance.getAim();
+            else
+                return GUIOptionsMenu.instance.getMovement();
+        }
+    }
 
     public float CameraMaxVertDegrees { get; set; } = 60;
     private float CameraMaxVertRadians { get { return ThomasEngine.MathHelper.ToRadians(CameraMaxVertDegrees); } }
@@ -76,7 +91,9 @@ public class ChadCam : ScriptComponent
     private Vector3 ThrowingOffsetDirection = new Vector3(0.64f, 0.0f, 0.77f);
     public float ThrowingOffset { get; set; } = 1.56f;
     //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
-    private Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
+    [Browsable(false)]
+    [Newtonsoft.Json.JsonIgnore]
+    public Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 0.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private Vector2 velocity { get { if (Chad) return Chad.CurrentVelocity; else return new Vector2(0); } }
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
@@ -143,9 +160,7 @@ public class ChadCam : ScriptComponent
                     break;
                 case ChadControls.STATE.RAGDOLL:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
-                    {
                         RagdollCamera();
-                    }
                     break;
             }
             if (velocity.y > 8.5f)
@@ -159,7 +174,7 @@ public class ChadCam : ScriptComponent
     {
         RotateCamera(false);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(-transform.forward.x, 0, transform.forward.z), Vector3.Up));
-        if (Chad.CurrentVelocity.y > 0)
+        if (Chad.CurrentVelocity.y > 0 && xStep * CameraSensitivity_x > MathHelper.Pi / 8)
             Chad.CurrentVelocity.y -= Math.Abs(xStep * CameraSensitivity_x / 50);
         Chad.CurrentVelocity.y = Math.Max(Chad.CurrentVelocity.y, 0);
         Chad.rBody.IgnoreNextTransformUpdate();
@@ -174,7 +189,7 @@ public class ChadCam : ScriptComponent
     {
         RotateCamera(true);
         Chad.rBody.Rotation = Quaternion.CreateFromRotationMatrix(Matrix.CreateLookAt(Vector3.Zero, new Vector3(transform.forward.x, 0, -transform.forward.z), Vector3.Up));
-        if (Chad.CurrentVelocity.y > 0)
+        if (Chad.CurrentVelocity.y > 0 && xStep * CameraSensitivity_x > MathHelper.Pi / 8)
             Chad.CurrentVelocity.y -= Math.Abs(xStep * CameraSensitivity_x / 50);
         Chad.CurrentVelocity.y = Math.Max(Chad.CurrentVelocity.y, 0);
         Chad.rBody.IgnoreNextTransformUpdate();

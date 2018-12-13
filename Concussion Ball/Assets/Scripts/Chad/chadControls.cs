@@ -41,7 +41,7 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public Transform hand { get; set; }
     [Category("Throwing")]
-    public float ChargeTime { get; private set; }
+    public float ChargeTime { get; set; }
 
     
 
@@ -175,7 +175,7 @@ public class ChadControls : NetworkComponent
             Direction = new Vector3(0, 0, 0);
             if (State != STATE.RAGDOLL && State != STATE.DANCING)
             {
-            if (CameraMaster.instance.GetState() != CAM_STATE.EXIT_MENU)
+            if ((CameraMaster.instance.GetState() != CAM_STATE.EXIT_MENU) && (CameraMaster.instance.GetState() != CAM_STATE.OPTIONS_MENU))
             {
                 HandleKeyboardInput();
                 HandleMouseInput();
@@ -433,7 +433,6 @@ public class ChadControls : NetworkComponent
         HasThrown = false;
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 0);
-        ChargeTime = 0;
         
         if (PickedUpObject)
         {
@@ -446,7 +445,10 @@ public class ChadControls : NetworkComponent
     private void ResetThrow()
     {
         if (isOwner)
+        {
             ChadHud.Instance.DeactivateAimHUD();
+            ChargeTime = 0;
+        }
         SendRPC("RPCResetThrow");
         RPCResetThrow();
     }
@@ -531,9 +533,12 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 break;
             case STATE.THROWING:
-                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
-                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed;
-                
+                if (Direction.z != 0 && Direction.x != 0)
+                {
+                    diagonalModifier = 0.5f;
+                }
+                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed * diagonalModifier;
+                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed * diagonalModifier;
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero; 
@@ -615,7 +620,7 @@ public class ChadControls : NetworkComponent
 
     IEnumerator StartRagdoll(float duration, Ragdoll.ImpactParams param)
     {
-
+        AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.TACKLED);
         State = STATE.RAGDOLL;
         EnableRagdoll();
         Ragdoll.AddForce(param);
@@ -650,14 +655,17 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(1.0f);
 
         Color pickupColor = PowerupPickupText.color;
+        Color outlineColor = PowerupPickupText.outlineColor;
 
         while (pickupColor.a > 0)
         {
             pickupColor.a -= 5;
+            outlineColor.a -= 5;
 
             if (pickupColor.a > 0)
             {
                 PowerupPickupText.color = pickupColor;
+                PowerupPickupText.outlineColor = outlineColor;
             }
 
             yield return new WaitForSeconds(0.01f);
@@ -764,8 +772,11 @@ public class ChadControls : NetworkComponent
     private void ResetAlpha(ref Text powerupText)
     {
         Color pickupColor = powerupText.color;
+        Color outlineColor = powerupText.outlineColor;
         pickupColor.a = 255;
+        outlineColor.a = 255;
         powerupText.color = pickupColor;
+        powerupText.outlineColor = outlineColor;
         powerupText.rendering = true;
     }
     #endregion
@@ -824,6 +835,7 @@ public class ChadControls : NetworkComponent
     {
         if (pickupable.transform.parent == null)
         {
+            ChargeTime = 0;
             if(FadeText != null)
             {
                 StopCoroutine(FadeText);
@@ -835,6 +847,7 @@ public class ChadControls : NetworkComponent
             if (pickupable.gameObject.Name == "ball")
             {
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Ball");
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.PICKUPBALL);
             }
             else if (pickupable.gameObject.Name == "Vindaloo")
             {
@@ -898,6 +911,7 @@ public class ChadControls : NetworkComponent
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.RIGHT_LOWER_LEG] = 1.3f;
                     param.bodyPartFactor[(int)Ragdoll.BODYPART.LEFT_LOWER_LEG] = 1.3f;
                     otherChad.ActivateRagdoll(MinimumRagdollTimer, param);
+                    AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.TACKLED);
 
                     NetPlayer.HasTackled += 1;
                     CurrentVelocity.y = modifiedBaseSpeed;

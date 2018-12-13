@@ -45,6 +45,10 @@ public class Vindaloo : Powerup
         ExplosionSound.MaxDistance = 10000;
         ExplosionSound.MinDistance = 20;
 
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
+
         #region big meme particle emitter bois
 
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
@@ -200,6 +204,7 @@ public class Vindaloo : Powerup
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
                 localChad.ActivateRagdoll(2.0f, param);
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.EXPLODED);
             }
         }
 

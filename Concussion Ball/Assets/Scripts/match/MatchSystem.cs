@@ -1,5 +1,4 @@
 ﻿//#define T_FOR_RESET
-
 using System;
 using System.Collections.Generic;
 using ThomasEngine;
@@ -109,13 +108,17 @@ public class MatchSystem : NetworkManager
         PowerupManager = gameObject.GetComponent<PowerupManager>();
 
         ReplaySystem = gameObject.GetComponent<ReplaySystem>();
+
         countdownSound = gameObject.AddComponent<SoundComponent>();
         countdownSound.Clip = countdownSoundClip;
         countdownSound.Looping = false;
+        countdownSound.Volume = 0.2f;
 
         endroundSound = gameObject.AddComponent<SoundComponent>();
         endroundSound.Clip = endroundSoundClip;
         endroundSound.Looping = false;
+        endroundSound.Is3D = false;
+        endroundSound.Volume = 0.2f;
 
 
         //StartCoroutine(ResetCoroutine(10));
@@ -231,13 +234,7 @@ public class MatchSystem : NetworkManager
         GoldenGoal = false;
 
         CameraMaster.instance.SetState(CAM_STATE.SCORE_SCREEN);
-        for (int i = 0; i < GUIScoreScreen.Instance.ScoreScreenTimeLast; i++)
-        {
-            GUIScoreScreen.Instance.UpdateTimer();
-            yield return new WaitForSecondsRealtime(1);
-            if (!GUIScoreScreen.Instance.enabled)
-                break;
-        }
+        yield return new WaitForSecondsRealtime(10);
         ResetNetworkplayerPoints();
         RPCStartMatch();
         CameraMaster.instance.SetState(CAM_STATE.GAME);
@@ -326,6 +323,7 @@ public class MatchSystem : NetworkManager
 
     public void RPCStartMatch()
     {
+        AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.WELCOME);
         MatchStarted = true;
         MatchStartTime = TimeSinceServerStarted;
         foreach (var team in Teams)
@@ -340,18 +338,21 @@ public class MatchSystem : NetworkManager
         if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
         {
             GoldenGoal = true;
+            AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.GOLDENGOAL);
             OnRoundEnd();
             OnRoundStart();
         }
         else
         {
             Team winningTeam = Teams[TEAM_TYPE.TEAM_1].Score > Teams[TEAM_TYPE.TEAM_2].Score ? Teams[TEAM_TYPE.TEAM_1] : Teams[TEAM_TYPE.TEAM_2];
+            AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.WELLPLAYED);
             StartCoroutine(MatchEndCoroutine(winningTeam, 10.0f));
         }
     }
 
     public void RPCOnGoal(int teamType)
     {
+        AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.GOAL);
         hasScored = true;
         TEAM_TYPE type = (TEAM_TYPE)teamType;
         Team team = FindTeam(type);
@@ -366,11 +367,16 @@ public class MatchSystem : NetworkManager
 
     void OnMatchEnd()
     {
+        
         if (MatchStarted)
         {
             RPCEndMatch();
             SendRPC(-2, "RPCEndMatch");
         }
+        
+            
+        
+        
         //Clean up
         //MatchStarted = false;
     }
@@ -378,8 +384,11 @@ public class MatchSystem : NetworkManager
 
     public void OnMatchStart()
     {
+        
         if (MatchStarted)
             return;
+
+        
         RPCStartMatch();
         SendRPC(-2, "RPCStartMatch");
 
@@ -388,10 +397,15 @@ public class MatchSystem : NetworkManager
 
     public void OnRoundStart()
     {
+        if (Teams[TEAM_TYPE.TEAM_1].Score > 0 || Teams[TEAM_TYPE.TEAM_2].Score > 0)
+            AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.WELLPLAYED);
+
         if (!MatchStarted)
             return;
+        
 
         StartCoroutine(RoundStartCountdown(3.0f));
+
     }
 
     void OnRoundEnd()
@@ -401,8 +415,11 @@ public class MatchSystem : NetworkManager
 
     public void OnGoal(TEAM_TYPE teamThatScored)
     {
+        
         if (hasScored)
             return;
+
+        
         SendRPC(-2, "RPCOnGoal", (int)teamThatScored);
         RPCOnGoal((int)teamThatScored);
     }

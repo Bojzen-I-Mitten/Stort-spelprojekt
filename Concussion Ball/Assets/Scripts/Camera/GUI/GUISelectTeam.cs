@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using ThomasEngine;
 
@@ -13,6 +14,7 @@ public class GUISelectTeam : ScriptComponent
     public Animation IdleAnim { get; set; }
 
     Camera Camera;
+    float camFov;
 
     public Canvas Canvas;
 
@@ -49,6 +51,8 @@ public class GUISelectTeam : ScriptComponent
     public override void OnAwake()
     {
         Camera = gameObject.GetComponent<Camera>();
+        camFov = Camera.fieldOfView;
+
         AddImagesAndText();
         SelectTeamCamPos = new Vector3(40, -198.5f, 8.2f);
         SelectTeamCamRot = new Vector3(MathHelper.Pi, 0.0f, 0.0f);
@@ -124,6 +128,7 @@ public class GUISelectTeam : ScriptComponent
                     CameraMaster.instance.SetState(CAM_STATE.GAME);
                     CameraMaster.instance.Canvas.isRendering = false;
                     gameObject.GetComponent<SpectatorCam>().enabled = true;
+                    gameObject.GetComponent<SpectatorCam>().EnableSpeCam();
                 }
             }
             else if (ReadyUp.Clicked())
@@ -144,7 +149,6 @@ public class GUISelectTeam : ScriptComponent
                 CameraMaster.instance.SetState(CAM_STATE.GAME);
                 CameraMaster.instance.Canvas.isRendering = false;
                 MatchSystem.instance.OnMatchStart();
-                gameObject.GetComponent<SpectatorCam>().enabled = true;
                 MatchSystem.instance.LocalChad.NetPlayer.HatIndex = CameraMaster.instance.SelectedHat;
             }
 
@@ -408,5 +412,28 @@ public class GUISelectTeam : ScriptComponent
         if (ready < players && players > 0)
             return false;
         return true;
+    }
+
+    IEnumerator FovBeforeStartMatch()
+    {
+        
+        for (int i = 0; i < 4; ++i)
+        {
+            Camera.fieldOfView -= 2;
+            yield return new WaitForSecondsRealtime(0.01f);
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            Camera.fieldOfView -= 3;
+            yield return new WaitForSecondsRealtime(0.001f);
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            Camera.fieldOfView -= 6;
+            yield return new WaitForSecondsRealtime(0.0001f);
+        }
+        Camera.fieldOfView = camFov;
+        MatchSystem.instance.OnMatchStart();
+        gameObject.GetComponent<SpectatorCam>().enabled = true;
     }
 }
