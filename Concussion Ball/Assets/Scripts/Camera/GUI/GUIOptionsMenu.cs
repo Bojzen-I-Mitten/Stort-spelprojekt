@@ -70,11 +70,14 @@ public class ImageBaradjustment
         Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale = new Vector2(valuecalculator, 1);
 
               //   Debug.Log((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].position.x));
-        Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(-1, -1);
+       Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(-1, -1);
         /*
         Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2((Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_AFTERMATH_IMAGE].scale.x * Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.x * 3.15f) / (Canvas.camera.viewport.size.x)
        + Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].position.x, Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
        */
+
+    //    Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position = new Vector2(Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].position.x +*(((float)635*Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].scale.x) / (float)Canvas.camera.viewport.size.x) * (float)(numbervalue * (float)((float)1 / (float)635) * Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].scale.x), Image[(int)Imagestate.MUSIC_VOLUME_TOGGLE_IMAGE].position.y);
+    //    Debug.Log((float)(numbervalue * (float)((float)1 / (float)635) * Image[(int)Imagestate.MUSIC_VOLUME_IMAGE].scale.x));
     }
     public void update()
     {
@@ -197,7 +200,7 @@ public class GUIOptionsMenu : ScriptComponent
         Audio.SetMusicVolume((float)ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].numbervalue / (float)100);
         Audio.SetMasterVolume((float)ImageBar[(int)ImageBarstate.MasterVolume_image].numbervalue / (float)100);
 
-   
+        
 
         /*    if (Input.GetKeyDown(Input.Keys.X))
             {
@@ -291,10 +294,12 @@ public class GUIOptionsMenu : ScriptComponent
         //AnnouncerOff_Text
         if (Text[(int)Textstate.AnnouncerOff_Text].Clicked())
         {
-           //droppa instancen här toggla av,
+            //droppa instancen här toggla av,
+            voidAnnouncerToggler(false);
             //     Debug.Log("button clicked C#");
             Text[(int)Textstate.AnnouncerOff_Text].interactable = false;
             Text[(int)Textstate.AnnouncerOn_Text].interactable = true;
+           
         }
 
         if (Text[(int)Textstate.AnnouncerOff_Text].Hovered())
@@ -308,7 +313,8 @@ public class GUIOptionsMenu : ScriptComponent
         //AnnouncerOn_Text
         if (Text[(int)Textstate.AnnouncerOn_Text].Clicked())
         {
-           //droppa instancen här toogla på
+            //droppa instancen här toogla på
+            voidAnnouncerToggler(true);
             //   Debug.Log("button clicked C#");
             Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
             Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
@@ -336,6 +342,15 @@ public class GUIOptionsMenu : ScriptComponent
             CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
 
         
+    }
+    void voidAnnouncerToggler(bool toggle)
+    {
+       //dumpa koden här för att sätta på och stänga av använd toggle för av och på. 
+
+        string Update;
+        Update = toggle.ToString();
+        UserSettings.AddOrUpdateAppSetting("Announcer", Update);
+
     }
     public void AddImagesAndText()
     {
@@ -385,6 +400,8 @@ public class GUIOptionsMenu : ScriptComponent
         ImageBar[(int)ImageBarstate.Movement].Settingvalue(10);
         ImageBar[(int)ImageBarstate.MUSICBar_IMAGE].Settingvalue(50);
         ImageBar[(int)ImageBarstate.sfxBar_Image].Settingvalue(50);
+        
+
 
 
         string SettingsMasterVolume = UserSettings.GetSetting("Master");
@@ -440,6 +457,34 @@ public class GUIOptionsMenu : ScriptComponent
         {
             borderless = System.Convert.ToBoolean(settingsBorderless);
         }
+
+        string SettingsmasterAnnouncer = UserSettings.GetSetting("Announcer");
+        if (SettingsmasterAnnouncer != null)
+        {
+           bool Announcer = System.Convert.ToBoolean(SettingsmasterAnnouncer);
+            voidAnnouncerToggler(Announcer);
+            if (Announcer)
+            { 
+                Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
+                Text[(int)Textstate.AnnouncerOn_Text].color = Selected;
+                Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
+            }
+            else
+            {
+                Text[(int)Textstate.AnnouncerOff_Text].interactable = false;
+                Text[(int)Textstate.AnnouncerOff_Text].color = Selected;
+                Text[(int)Textstate.AnnouncerOn_Text].interactable = true;
+            }
+
+        }
+        else
+        {
+            voidAnnouncerToggler(true);
+            Text[(int)Textstate.AnnouncerOn_Text].interactable = false;
+            Text[(int)Textstate.AnnouncerOn_Text].color = Selected;
+            Text[(int)Textstate.AnnouncerOff_Text].interactable = true;
+        }
+
 
 
 
