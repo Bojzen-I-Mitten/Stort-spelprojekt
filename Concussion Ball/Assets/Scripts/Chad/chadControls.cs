@@ -781,7 +781,6 @@ public class ChadControls : NetworkComponent
 
     public void RPCSetTiny()
     {
-        //ChadControls localChad = MatchSystem.instance.LocalChad;
         if (PickedUpObject)
             PickedUpObject.Drop();
 
