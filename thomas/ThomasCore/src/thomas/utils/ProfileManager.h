@@ -9,7 +9,7 @@
 #include "..\..\..\include\nlohmann\json.hpp"
 #include "..\utils\atomic\Synchronization.h"
 #define BENCHMARK
-//#undef BENCHMARK
+#undef BENCHMARK
 
 namespace thomas
 {

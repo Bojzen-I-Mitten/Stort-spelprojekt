@@ -391,11 +391,11 @@ namespace thomas
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-#ifdef BENCHMARK
+//#ifdef BENCHMARK
 			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl);
-#else
-			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
-#endif
+//#else
+			//D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
+//#endif
 
 			if (!CreateDeviceContext())
 				return false;
@@ -787,7 +787,7 @@ namespace thomas
 		bool D3D::LoadTextureFromFile(std::string fileName,
 			ID3D11Resource*& texture, ID3D11ShaderResourceView*& textureView)
 		{
-			fileName = "C:\\Users\\Carl\\Documents\\Stort-spelprojekt\\Concussion Ball\\Assets\\Textures\\DarkGrey_grey.DDS";
+			//fileName = "C:\\Users\\Carl\\Documents\\Stort-spelprojekt\\Concussion Ball\\Assets\\Textures\\DarkGrey_grey.DDS";
 			// Convert from string to char in order to split by token
 			// convert back from char, since its easier to compare strings than chars
 			// Fuck you, thats why.
