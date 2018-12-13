@@ -151,12 +151,12 @@ public class GUIMainMenu : ScriptComponent
                 CameraMaster.instance.SelectedHat = (int)(Random.Range(0.0f, 1.0f) * (HatManager.Instance.Hats.Count - 2)) + 1;
                 AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.HAT);
             }
+            else if (Options.Clicked())
+            {
+                CameraMaster.instance.SetState(CAM_STATE.OPTIONS_MENU);
+            }
             #endregion
-        if(Options.Clicked())
-        {
-                CameraMaster.instance.State = CAM_STATE.OPTIONS_MENU;
-           }
-          
+
 
             if (TakeName)
             {
