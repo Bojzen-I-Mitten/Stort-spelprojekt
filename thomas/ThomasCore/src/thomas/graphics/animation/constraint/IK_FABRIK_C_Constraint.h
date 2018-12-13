@@ -19,6 +19,7 @@ namespace thomas {
 					math::Matrix orientation = math::Matrix::Identity;		// Boundary orientation offset (rotation)
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
+					uint32_t joint_type = 0;
 				};
 
 				struct LinkParameter 
@@ -37,6 +38,7 @@ namespace thomas {
 					math::Matrix backwardOrient = math::Matrix::Identity;	// Inverted orientation and rotated 180* over x
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
+					uint32_t joint_type = 0;
 
 					void refreshOrient();
 
@@ -46,6 +48,7 @@ namespace thomas {
 			private:
 				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
 				math::Vector3 ballJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float bone_len);
+				math::Vector3 swingJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float bone_len);
 				void solve_constraint_backward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void solve_constraint_forward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link);
@@ -69,11 +72,12 @@ namespace thomas {
 
 				math::Vector3 m_target;					// Target in object space.
 				math::Quaternion m_targetOrient;		// Orientation at target
+				math::Matrix m_originalTransform;		// Pose transform for original target
 				float m_weight;							// IK weight for target point
 				float m_orientationWeight;				// IK weight for orientation
 
 				float getChainLength();					// Access bone chain length
-				uint32_t getSrcBoneIndex();				// Get bone index of bone chain root
+				uint32_t getRootBoneIndex();			// Get bone index of bone chain root
 
 
 			private:

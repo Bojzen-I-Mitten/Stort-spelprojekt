@@ -53,8 +53,11 @@ namespace ThomasEngine
 		void IK_FABRIK_Constraint::OrientationWeight::set(float w) {
 			m_ptr->m_orientationWeight = w;
 		}
-		uint32_t IK_FABRIK_Constraint::SrcBoneIndex::get() {
-			return m_ptr->getSrcBoneIndex();
+		Matrix IK_FABRIK_Constraint::LastPoseTransform::get() {
+			return Utility::Convert(m_ptr->m_originalTransform);
+		}
+		uint32_t IK_FABRIK_Constraint::RootBoneIndex::get() {
+			return m_ptr->getRootBoneIndex();
 		}
 		uint32_t IK_FABRIK_Constraint::NumLinks::get() {
 			return m_num_link;
@@ -146,6 +149,7 @@ namespace ThomasEngine
 			param.limit_bend = MathEngine::DegreesToRadians(limit_bend);
 			param.limit_twist = MathEngine::DegreesToRadians(limit_twist);
 			param.orientation = Utility::Convert(MathEngine::CreateRotationXYZ(rotation));
+			param.joint_type = joint_type;
 			return param;
 		}
 }

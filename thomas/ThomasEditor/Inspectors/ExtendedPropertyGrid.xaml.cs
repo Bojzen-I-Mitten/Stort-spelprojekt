@@ -172,13 +172,17 @@ namespace ThomasEditor
 
             private void _grid_LostFocus(object sender, RoutedEventArgs e)
             {
+                /* Force send data to the target element
+                */
                 if (!(sender is PropertyGrid))
                     return;
                 PropertyGrid grid = sender as PropertyGrid;
-                if (grid.DataContext == null && !(grid.DataContext is ThomasEngine.IPropertyChanged))
+                if (grid.DataContext == null || !(grid.DataContext is ThomasEngine.IPropertyChanged))
                     return;
-                ThomasEngine.IPropertyChanged target = grid.DataContext as ThomasEngine.IPropertyChanged;
 
+                // Cast the data context to our data context receiver
+                ThomasEngine.IPropertyChanged target = grid.DataContext as ThomasEngine.IPropertyChanged;
+                // Logic over the xaml data element and the updated data source
                 if (e.OriginalSource is Xceed.Wpf.Toolkit.PropertyGrid.Editors.PropertyGridEditorCollectionControl)
                 {
                     var src = e.OriginalSource as Xceed.Wpf.Toolkit.PropertyGrid.Editors.PropertyGridEditorCollectionControl;

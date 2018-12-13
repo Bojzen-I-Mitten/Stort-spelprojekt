@@ -12,6 +12,11 @@ namespace Concussion_Ball.Assets.Scripts
 {
     public class FeetIK : GroundOffset
     {
+        private enum State
+        {
+            Enabled,
+            Disabled
+        }
         private static readonly uint NUM_LINK = 4;
         //[Browsable(false)]
         //[Newtonsoft.Json.JsonIgnore]
@@ -20,11 +25,19 @@ namespace Concussion_Ball.Assets.Scripts
         //public string IKResolveBoneName { get; set; }
         //private uint ikBoneIndex;                   // Index for raytraced bone
         private IK_FABRIK_Constraint IK { get; set; }
+        private State state = State.Disabled;
+        private float ikTimeRemaining = 0;
+        private float ikTimeBlending = 0;
+        private float ikFromWeight = 0;
         private float ikTargetWeight = 0;
         private float ikOrientWeight = 0;
-        public float IKBlendFactor { get; set; } = 0.5f;        // Factor determining how fast IK is blended in when activated
-        public float MaxDistanceOffset { get; set; } = 0.2f;    // Offset from max chain length IK is blended in
-        private Vector3 temp;
+        public float IKBlendInTime { get; set; } = 0.33f;
+        public float IKBlendOutTime { get; set; } = 0.33f;
+        public float MaxDistanceOffset { get; set; } = 0.2f;            // Offset from bone -> target IK is blended in
+        public float MaxIKChainDistanceOffset { get; set; } = 0.2f;     // Offset from max chain length IK is blended in
+        public Vector3 BoneTargetOffset { get; set; }                   // Target offset after src is found
+        public float BendAngleMinFadeOut { get; set; } = 20;            // Degree angle for which foot will be considered 'not placed down'
+        private Vector3 ikTarget;                                       // Target stored between frames
         
         public IK_FABRIK_Constraint.JointParams[] Joints
         {
@@ -62,8 +75,9 @@ namespace Concussion_Ball.Assets.Scripts
             //else
             //    ikBoneIndex = 0;
             IK.apply(m_rC, m_traceBoneIndex);
-            IK.Weight = ikTargetWeight;
-            IK.OrientationWeight = ikOrientWeight;
+            IK.Weight = 0.0f; ikTargetWeight = 0.0f; ikFromWeight = 0.0f;
+            IK.OrientationWeight = 0.0f; ikOrientWeight = 0.0f;
+            ikOrientWeight = 0.0f;
         }
 
         public override void Start()
@@ -89,6 +103,19 @@ namespace Concussion_Ball.Assets.Scripts
             weight = MathHelper.Lerp(weight, targetWeight, diff);                           // Lerp, if values are equal minimal diff. has no effect!
             return weight;
         }
+        private float blendInFactor()
+        {
+            ikTimeRemaining = Math.Max(0.0f, ikTimeRemaining  - Time.DeltaTime);
+            return MathHelper.Lerp(ikTargetWeight, ikFromWeight, ikTimeRemaining / Math.Max(0.01f, ikTimeBlending));   // Lerp, if values are equal minimal diff. has no effect!
+        }
+
+        protected override Matrix fetchTransform()
+        {
+            if (IK.Weight < 0.001f)
+                return base.fetchTransform();
+            else
+                return IK.LastPoseTransform;
+        }
 
         public override void Update()
         {
@@ -96,35 +123,64 @@ namespace Concussion_Ball.Assets.Scripts
             Matrix inv = Matrix.Invert(gameObject.transform.world);
             Quaternion orient = Orient * MathEngine.ExtractRotation(inv);
             Vector3 target = Vector3.Transform(Target, inv);
-            temp = target;
+            target += Vector3.Transform(BoneTargetOffset, orient);
+            ikTarget = target;
 
+            Matrix mFoot = fetchTransform();
+            float angle = Math.Abs(MathHelper.ToDegrees((float)Math.Acos(Vector3.Dot(mFoot.Up, Vector3.Up))) - 90);
 
-            if (!m_sampleSuccess ||                                   // Verify enough samples found
-                Distance > IK.BoneChainLength - MaxDistanceOffset)    // Verify target point is close enough
+            float ikWeight = IK.Weight;
+            float distanceToRoot = CalcDistance((int)IK.RootBoneIndex);
+            if (!m_sampleSuccess ||                                                 // Verify enough samples found
+                Distance > MaxDistanceOffset ||                                     // Verify target point is close enough
+                distanceToRoot > IK.BoneChainLength - MaxIKChainDistanceOffset ||   // Verify target point is close enough
+                angle > BendAngleMinFadeOut)
             {
-                ikTargetWeight = 0;
-                ikOrientWeight = 0;
+                if (state == State.Enabled)
+                {
+                    // Fade out
+                    ikFromWeight = ikWeight;
+                    ikTargetWeight = 0;
+                    ikOrientWeight = 0;
+                    ikTimeRemaining = IKBlendOutTime;
+                    ikTimeBlending = IKBlendOutTime;
+                    state = State.Disabled;
+                }
             }
             else
             {
-                ikTargetWeight = 1;
-                ikOrientWeight = 1;
-                //if (Distance < 0.05f)
-                //    LockSearch = true;
+                if (state == State.Disabled)
+                {
+                    // Fade out
+                    ikFromWeight = ikWeight;
+                    ikTargetWeight = 1;
+                    ikOrientWeight = 1;
+                    ikTimeRemaining = IKBlendInTime;
+                    ikTimeBlending = IKBlendInTime;
+                    state = State.Enabled;
+                }
             }
 
             IK.Target = target;
-            //IK.Orientation = orient;
-            IK.Weight = blendInFactor(IK.Weight, ikTargetWeight, IKBlendFactor);
-            //IK.OrientationWeight = blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
+            IK.Orientation = orient;
+            ikWeight = blendInFactor();
+            IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);
+            IK.OrientationWeight = ikWeight; // blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
+
+            if (tick++ > 5)
+            {
+                tick = 0;
+                Debug.Log(IK.Weight);
+            }
         }
+        private int tick = 0;
 
         public override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
             Gizmos.SetMatrix(gameObject.transform.world);
             Gizmos.SetColor(Color.Yellow);
-            Gizmos.DrawRing(temp, Vector3.Up, 0.02f);
+            Gizmos.DrawRing(ikTarget, Vector3.Up, 0.02f);
         }
     }
 }

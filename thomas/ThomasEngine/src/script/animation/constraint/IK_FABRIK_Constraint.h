@@ -25,10 +25,12 @@ namespace ThomasEngine
 				Vector3 rotation;		// Boundary orientation offset (rotation)
 				float limit_bend;
 				float limit_twist;
+				uint32_t joint_type;
 
 				property Vector3 Orientation { void set(Vector3 value) { rotation = value; } Vector3 get() { return rotation; } }
 				property float Limit_bend { void set(float value) { limit_bend = value; } float get() { return limit_bend; } }
 				property float Limit_twist { void set(float value) { limit_twist = value; } float get() { return limit_twist; } }
+				property uint32_t JointType { void set(uint32_t value) { joint_type = value; } uint32_t get() { return joint_type; } }
 
 
 				thomas::graphics::animation::IK_FABRIK_C_Constraint::JointParams getParam();
@@ -59,12 +61,18 @@ namespace ThomasEngine
 				float get();
 				void set(float w);
 			}
+			/* Pose transform for target bone before IK solver was activated. (Not updated when IK is not active)
+			*/
+			property Matrix LastPoseTransform
+			{
+				Matrix get();
+			}
 			property uint32_t NumLinks
 			{
 				uint32_t get();
 			}
 
-			property uint32_t SrcBoneIndex {
+			property uint32_t RootBoneIndex {
 				uint32_t get();
 			}
 			property float BoneChainLength {

@@ -50,7 +50,7 @@ public class GroundOffset : ScriptComponent
     public Quaternion Orient { get { return MathEngine.CreateRotation(Right, m_normal, Z); } }
     [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public int FoundSamples { get { return m_foundSamples; } }
-    /* Distance between target and source bone position
+    /* Distance between target and bone position
     */
     [Browsable(false), Newtonsoft.Json.JsonIgnore]
     public float Distance { get; private set; }
@@ -104,12 +104,21 @@ public class GroundOffset : ScriptComponent
         return sum / num;
     }
     
+    public float CalcDistance(int bone)
+    {
+        return Vector3.Distance(m_rC.GetBoneMatrix(bone).Translation, m_center);
+    }
+
+    protected virtual Matrix fetchTransform()
+    {
+        return m_rC.GetLocalBoneMatrix(m_traceBoneIndex);
+    }
 
     public override void Update()
     {
-        if (LockSearch)
-            return;
-        Matrix m = m_rC.GetLocalBoneMatrix(m_traceBoneIndex);
+        //if (LockSearch)
+        //    return;
+        Matrix m = fetchTransform();
         Matrix world = gameObject.transform.world;
         m = m * world;
         // Result output
