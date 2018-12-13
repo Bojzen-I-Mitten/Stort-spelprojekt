@@ -280,16 +280,13 @@ public class GUIScoreboard : ScriptComponent
     {
         for (int i = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount; i < Team1Players.Count ; i++)
         { 
-            if(i< Team1Players.Count)
+          
                 Team1Players[i].IsRendering = false;
-            if (i < PlayerStandardBarTeam1.Count)
                 PlayerStandardBarTeam1[i].rendering = false;
         }
         for (int i = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount; i < Team2Players.Count;i++)
         {
-            if (i < Team2Players.Count)
                 Team2Players[i].IsRendering = false;
-            if (i < PlayerStandardBarTeam2.Count)
                 PlayerStandardBarTeam2[i].rendering = false;
         }
     }
