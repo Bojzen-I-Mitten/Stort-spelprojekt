@@ -214,6 +214,10 @@ public class PickupableObject : NetworkComponent
         PickupCollider.enabled = reader.GetBool();
         chargeTimeCurrent = reader.GetFloat();
 
+        if (!pickedUp && transform.parent != null)
+        {
+            Debug.Log("I should not be pickedUp, but I am!");
+        }
     }
 
 
