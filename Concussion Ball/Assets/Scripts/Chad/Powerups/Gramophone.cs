@@ -290,15 +290,21 @@ public class Gramophone : Powerup
         {
             _Timer += Time.DeltaTime;
 
-            if (localChad /*&& otherPlayerTeam != playerTeam*/)
+            if (localChad)
             {
                 float distance = Vector3.Distance(localChad.transform.position, transform.position);
-                if (distance < ExplosionRadius && localChad.State != ChadControls.STATE.RAGDOLL)
+                if (distance < ExplosionRadius && localChad.State != ChadControls.STATE.RAGDOLL && localChad.State != ChadControls.STATE.DANCING)
                 {
                     localChad.Direction = Vector3.Zero;
-                    localChad.rBody.LinearVelocity = Vector3.Zero;
+                    localChad.rBody.LinearVelocity = new Vector3(0, localChad.rBody.LinearVelocity.y, 0); ;
                     localChad.CurrentVelocity = Vector2.Zero;
                     localChad.State = ChadControls.STATE.DANCING;
+                    ChadHud.Instance.DeactivateAimHUD();
+                    localChad.ChargeTime = 0;
+                }
+                else if (distance > ExplosionRadius && localChad.State == ChadControls.STATE.DANCING)
+                {
+                    localChad.State = ChadControls.STATE.CHADING;
                 }
             }
 
