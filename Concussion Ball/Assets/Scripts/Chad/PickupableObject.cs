@@ -238,7 +238,6 @@ public class PickupableObject : NetworkComponent
     virtual public void Reset()
     {
         RPCDrop();
-        transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;
         _Chad = null;
         PickupCollider.enabled = false;

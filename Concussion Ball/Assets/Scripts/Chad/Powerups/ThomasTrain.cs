@@ -27,7 +27,7 @@ public class ThomasTrain : Powerup
 
     private float soundcooldown;
     private bool hasPlayedChargeSound;
-    private float _DespawnTimer; 
+    private float _DespawnTimer;
 
     public override void OnAwake()
     {
@@ -69,7 +69,7 @@ public class ThomasTrain : Powerup
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
-        
+
         emitterFire.Texture = fireTexture;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 4.0f;
@@ -154,7 +154,7 @@ public class ThomasTrain : Powerup
         base.Cleanup();
         soundComponentChargeUp.Stop();
     }
-    
+
 
     public override void ChargeEffect()
     {
@@ -259,5 +259,11 @@ public class ThomasTrain : Powerup
     {
         yield return null;//wait one frame to emit particles
         Remove();
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        transform.scale = Vector3.One;
     }
 }
