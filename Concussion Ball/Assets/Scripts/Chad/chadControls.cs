@@ -782,10 +782,12 @@ public class ChadControls : NetworkComponent
     public void RPCSetTiny()
     {
         //ChadControls localChad = MatchSystem.instance.LocalChad;
+        if (PickedUpObject)
+            PickedUpObject.Drop();
+
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         if (ToySoldierMaterial != null)
         {
-            
             render.SetMaterial(0, ToySoldierMaterial);
             render.SetMaterial(1, ToySoldierMaterial);
             render.SetMaterial(2, ToySoldierMaterial);
