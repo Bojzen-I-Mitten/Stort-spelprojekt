@@ -78,7 +78,7 @@ public class ChadCam : ScriptComponent
     //public Vector3 ThrowingOffset { get; set; } = new Vector3(1.2f, 0.5f, 1.2f);
     [Browsable(false)]
     [Newtonsoft.Json.JsonIgnore]
-    public Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 1.8f, 0); else return new Vector3(0, 0, 0); } }
+    public Vector3 ChadHead { get { if (Chad) return Chad.rBody.Position + new Vector3(0, 0.8f, 0); else return new Vector3(0, 0, 0); } }
 
     private Vector2 velocity { get { if (Chad) return Chad.CurrentVelocity; else return new Vector2(0); } }
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
