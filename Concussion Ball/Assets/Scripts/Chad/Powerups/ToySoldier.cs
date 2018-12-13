@@ -71,7 +71,7 @@ public class ToySoldier : Powerup
         // Direct Hit with a Chad
         if (otherChad)
         {
-            if (otherChad == localChad)
+            if (otherChad == localChad && !localChad.ToySoldierAffected)
             {
                 TEAM_TYPE colliderTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
                 TEAM_TYPE throwerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
@@ -112,6 +112,7 @@ public class ToySoldier : Powerup
 
             activated = true;
         }
+
         StartCoroutine(RemoveToySoldier());
     }
 
@@ -129,5 +130,9 @@ public class ToySoldier : Powerup
         _DespawnTimer = 0.0f;
 
         ObjectOwner = null;
+
+        // maybe fix that occassionaly the soldier remainds in the scene after hit?
+        Disable();
+        gameObject.SetActive(false);
     }
 }

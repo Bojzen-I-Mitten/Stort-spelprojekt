@@ -119,6 +119,8 @@ public class ChadControls : NetworkComponent
         ragdollSync = gameObject.AddComponent<NetworkTransform>();
         NetworkIdentity c = gameObject.GetComponent<NetworkIdentity>();
         gameObject.SetComponentIndex(c, 0xfffffff);  // Ensure network writer is last
+
+        OriginalMaterials = gameObject.GetComponent<RenderSkinnedComponent>().materials;
     }
 
     public override void Start()
@@ -780,10 +782,12 @@ public class ChadControls : NetworkComponent
     public void RPCSetTiny()
     {
         //ChadControls localChad = MatchSystem.instance.LocalChad;
+        if (PickedUpObject)
+            PickedUpObject.Drop();
+
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         if (ToySoldierMaterial != null)
         {
-            OriginalMaterials = render.materials;
             render.SetMaterial(0, ToySoldierMaterial);
             render.SetMaterial(1, ToySoldierMaterial);
             render.SetMaterial(2, ToySoldierMaterial);
