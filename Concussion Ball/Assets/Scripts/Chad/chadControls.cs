@@ -41,7 +41,7 @@ public class ChadControls : NetworkComponent
     [Category("Throwing")]
     public Transform hand { get; set; }
     [Category("Throwing")]
-    public float ChargeTime { get; private set; }
+    public float ChargeTime { get; set; }
 
     
 
@@ -533,9 +533,12 @@ public class ChadControls : NetworkComponent
                 CurrentVelocity.y = MathHelper.Clamp(CurrentVelocity.y, -modifiedBaseSpeed, modifiedMaxSpeed);
                 break;
             case STATE.THROWING:
-                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed;
-                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed;
-                
+                if (Direction.z != 0 && Direction.x != 0)
+                {
+                    diagonalModifier = 0.5f;
+                }
+                CurrentVelocity.y = Slope(Direction.z, 1) * modifiedBaseSpeed * diagonalModifier;
+                CurrentVelocity.x = Slope(Direction.x, 1) * modifiedBaseSpeed * diagonalModifier;
                 break;
             case STATE.DIVING:
                 Direction = Vector3.Zero; 
@@ -652,14 +655,17 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(1.0f);
 
         Color pickupColor = PowerupPickupText.color;
+        Color outlineColor = PowerupPickupText.outlineColor;
 
         while (pickupColor.a > 0)
         {
             pickupColor.a -= 5;
+            outlineColor.a -= 5;
 
             if (pickupColor.a > 0)
             {
                 PowerupPickupText.color = pickupColor;
+                PowerupPickupText.outlineColor = outlineColor;
             }
 
             yield return new WaitForSeconds(0.01f);
@@ -766,8 +772,11 @@ public class ChadControls : NetworkComponent
     private void ResetAlpha(ref Text powerupText)
     {
         Color pickupColor = powerupText.color;
+        Color outlineColor = powerupText.outlineColor;
         pickupColor.a = 255;
+        outlineColor.a = 255;
         powerupText.color = pickupColor;
+        powerupText.outlineColor = outlineColor;
         powerupText.rendering = true;
     }
     #endregion
