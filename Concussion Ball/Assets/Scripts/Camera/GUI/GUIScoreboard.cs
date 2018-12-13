@@ -6,7 +6,6 @@ using System.Collections.Generic;
 public class PlayerText
 {
     private int Sign;
-    Canvas Canvas;
 
     public Text Name;
     public Text Goals;
