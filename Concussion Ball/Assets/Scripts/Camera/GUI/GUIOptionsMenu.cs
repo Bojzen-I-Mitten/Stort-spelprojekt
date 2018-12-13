@@ -423,9 +423,6 @@ public class GUIOptionsMenu : ScriptComponent
             ImageBar[(int)ImageBarstate.AIM].Settingvalue(System.Convert.ToInt32(settingsAIM));
         }
 
-        ChadCam.instance.CameraSensitivity_x = ImageBar[(int)ImageBarstate.Movement].numbervalue;
-        ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
-
         //load onoff fullscreen
         fullscreen = Wcontroller.getFullscreen();
         borderless = Wcontroller.getBorderless();

@@ -40,36 +40,31 @@ public class GUIScoreScreen : ScriptComponent
 
     public override void Update()
     {
-        foreach (Text Textdata in Textdatalist)
+        foreach (var text in Textdatalist)
+            text.color = Color.FloralWhite;
+        if (Textdatalist[0].Hovered())
         {
-            if (Textdata.Hovered())
-            {
-                Textdata.color = Selected;
-            }
-            else
-                Textdata.color = Unselected;
+            Textdatalist[0].color = Color.IndianRed;
+            Textdatalist[2].color = Color.IndianRed;
         }
+        if (Textdatalist[1].Hovered())
+            Textdatalist[1].color = Color.IndianRed;
 
-
-        if (Textdatalist[0].Clicked())//Lobby
+        if (Textdatalist[0].Clicked())//Play again
         {
-
-        }
-        if (Textdatalist[1].Clicked())//Play again
-        {
-            foreach (Text Textdata in Textdatalist)
-                Textdata.scale = Vector2.Zero;
 
         }
-        if (Textdatalist[2].Clicked()) // Main Menu
+        if (Textdatalist[1].Clicked())//Main menu
         {
-
             if (ThomasWrapper.IsPlaying())
             {
                 Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
                 CameraMaster.instance.SetState(CAM_STATE.LOADING_SCREEN);
                 ThomasWrapper.IssueRestart();
             }
+            //foreach (Text Textdata in Textdatalist)
+            //    Textdata.scale = Vector2.Zero;
+
         }
 
         Textdatalist[2].position = Textdatalist[0].position + new Vector2(Textdatalist[0].size.x / 2 + Textdatalist[2].size.x / 2, 0);
@@ -111,5 +106,7 @@ public class GUIScoreScreen : ScriptComponent
             Timer = ScoreScreenTimeLast;
             Init = false;
         }
+
+        Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
     }
 }
