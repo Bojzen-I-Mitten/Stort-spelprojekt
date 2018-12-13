@@ -42,6 +42,7 @@ namespace thomas {
 				// Set joint limits
 				m_joint.get()[chainIndex].limit_bend = info.limit_bend;
 				m_joint.get()[chainIndex].limit_twist = info.limit_twist;
+				m_joint.get()[chainIndex].paramA = info.paramA;
 				m_joint.get()[chainIndex].orient_offset = info.orientation;
 				m_joint.get()[chainIndex].joint_type = info.joint_type;
 				m_joint.get()[chainIndex].refreshOrient();
@@ -58,6 +59,7 @@ namespace thomas {
 					p[i+1] = math::lerp(p[i], target, lambda);
 				}
 			}
+#define ASSERT_DIFF(v, v1) assert(std::fabs(v.x - v1.x) +  std::fabs(v.y - v1.y) + std::fabs(v.z - v1.z) > math::EPSILON)
 			math::Vector3 IK_FABRIK_C_Constraint::ballJointConstraint(math::Matrix &m_i, math::Vector3 &p_o, math::Vector3 &p_t, float limit_bend, float bone_len)
 			{
 				math::Vector3 d_i = p_t - p_o;
@@ -80,8 +82,7 @@ namespace thomas {
 					p_n = p_o + p_n;																// Offset from prev.
 				return p_n;
 			}
-#define ASSERT_DIFF(v, v1) assert(std::fabs(v.x - v1.x) +  std::fabs(v.y - v1.y) + std::fabs(v.z - v1.z) > math::EPSILON)
-			math::Vector3 IK_FABRIK_C_Constraint::swingJointConstraint(math::Matrix &m_i, math::Vector3 &p_o, math::Vector3 &p_t, float limit_bend, float bone_len)
+			math::Vector3 IK_FABRIK_C_Constraint::hingeJointConstraint(math::Matrix &m_i, math::Vector3 &p_o, math::Vector3 &p_t, float limit_bend, float bone_len)
 			{
 				math::Vector3 d_i = p_t - p_o;							// Project on YZ
 				math::Vector3 proj_YZ = d_i.Dot(m_i.Right()) / m_i.Right().LengthSquared() * m_i.Right();
@@ -94,6 +95,36 @@ namespace thomas {
 				float l_proj = b - c;																// Calc. distance on XZ from boundary -> p_t
 				q_i *= l_proj / b;
 				math::Vector3 proj_diff = q_i * m_i.Backward();										// Vector from p_in -> p_t (edge to point)
+				math::Vector3 p_n = (d_i - proj_diff);												// Calc. p_in (non-normalized)
+				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
+					p_n -= 2 * a * m_i.Up();														// Mirror result over T_i+1 XZ plane (always apply)
+				//p_n = (bone_len / std::sqrtf(a*a + c * c)) * p_n;									// Make offset distance == bone length
+				if (a >= 0.f && l_proj <= 0.f)														// Use projected FABRIK result if b < c (inside angle limit)
+					p_n = p_o + d_i * (bone_len / d_i.Length());
+				else
+					p_n = p_o + p_n * (bone_len / p_n.Length());									// Offset from p_o (and distance == bone length)
+				ASSERT_DIFF(p_n, p_o);
+				return p_n;
+			}
+			math::Vector3 IK_FABRIK_C_Constraint::slidingHingeJointConstraint(math::Matrix &m_i, math::Vector3 &p_o, math::Vector3 &p_t, float limit_bend, float limit_slideDistance, float bone_len)
+			{
+				math::Vector3 d_i = p_t - p_o;							// Project on YZ
+				math::Vector3 right = m_i.Right(); right.Normalize();
+				float x = d_i.Dot(right); // Distance
+				float mag = std::fmax(0.f, std::fabs(x) - limit_slideDistance);	// Project onto limit_slideDistance
+				math::Vector3 proj_YZ =  std::copysignf(mag, x) * m_i.Right();
+				d_i = d_i - proj_YZ;
+
+
+				math::Vector2 q_i;										// Project on to XZ plane of T_i+1
+				q_i.x = d_i.Dot(m_i.Right());
+				q_i.y = d_i.Dot(m_i.Backward());
+				float b = q_i.Length();
+				float a = d_i.Dot(m_i.Up());							// Find distances to Y axis on T_i+1
+				float c = std::fabs(a) * std::tanf(limit_bend);
+				float l_proj = b - c;									// Calc. distance on XZ from boundary -> p_t
+				q_i *= l_proj / b;
+				math::Vector3 proj_diff = q_i.x * m_i.Right() + q_i.y * m_i.Backward();				// Vector from p_in -> p_t (edge to point)
 				math::Vector3 p_n = (d_i - proj_diff);												// Calc. p_in (non-normalized)
 				if (a < 0.f)																		// If Point is infront of the matrix (should be behind)
 					p_n -= 2 * a * m_i.Up();														// Mirror result over T_i+1 XZ plane (always apply)
@@ -119,8 +150,10 @@ namespace thomas {
 				math::Vector3 p_o = p_c[1];
 				// Apply constraint
 				math::Vector3 p_n;
-				if(joint.joint_type)
-					p_n = swingJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
+				if(joint.joint_type == 1)
+					p_n = hingeJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
+				else if(joint.joint_type == 2)
+					p_n = slidingHingeJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, joint.paramA, bone_len);
 				else
 					p_n = ballJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
 				// Re-calculate orientation
@@ -144,8 +177,10 @@ namespace thomas {
 				math::Vector3 p_o = p_c[0];
 				// Apply constraint
 				math::Vector3 p_n;
-				if (joint.joint_type)
-					p_n = swingJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
+				if (joint.joint_type == 1)
+					p_n = hingeJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
+				else if (joint.joint_type == 2)
+					p_n = slidingHingeJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, joint.paramA, bone_len);
 				else
 					p_n = ballJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
 				// Re-calculate orientation

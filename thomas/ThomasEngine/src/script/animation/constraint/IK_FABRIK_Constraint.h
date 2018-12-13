@@ -26,10 +26,12 @@ namespace ThomasEngine
 				float limit_bend;
 				float limit_twist;
 				uint32_t joint_type;
+				float paramA;
 
 				property Vector3 Orientation { void set(Vector3 value) { rotation = value; } Vector3 get() { return rotation; } }
 				property float Limit_bend { void set(float value) { limit_bend = value; } float get() { return limit_bend; } }
 				property float Limit_twist { void set(float value) { limit_twist = value; } float get() { return limit_twist; } }
+				property float ParamA { void set(float value) { paramA = value; } float get() { return paramA; } }
 				property uint32_t JointType { void set(uint32_t value) { joint_type = value; } uint32_t get() { return joint_type; } }
 
 

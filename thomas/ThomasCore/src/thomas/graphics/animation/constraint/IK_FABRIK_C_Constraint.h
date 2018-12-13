@@ -19,6 +19,7 @@ namespace thomas {
 					math::Matrix orientation = math::Matrix::Identity;		// Boundary orientation offset (rotation)
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
+					float paramA = 1.f;
 					uint32_t joint_type = 0;
 				};
 
@@ -38,6 +39,7 @@ namespace thomas {
 					math::Matrix backwardOrient = math::Matrix::Identity;	// Inverted orientation and rotated 180* over x
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
+					float paramA = 1.f;
 					uint32_t joint_type = 0;
 
 					void refreshOrient();
@@ -48,7 +50,8 @@ namespace thomas {
 			private:
 				void FABRIK_unreachable(math::Vector3 target, float *d, math::Vector3*p, uint32_t num_link);
 				math::Vector3 ballJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float bone_len);
-				math::Vector3 swingJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float bone_len);
+				math::Vector3 hingeJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float bone_len);
+				math::Vector3 slidingHingeJointConstraint(math::Matrix & m_i, math::Vector3 & p_o, math::Vector3 & p_t, float limit_bend, float limit_slide, float bone_len);
 				void solve_constraint_backward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void solve_constraint_forward_iter(uint32_t index, math::Vector3 *p_c, math::Matrix *c_orient, float bone_len);
 				void FABRIK_iteration(math::Vector3 target, float *len, math::Vector3*p, math::Matrix *orient, uint32_t num_link);

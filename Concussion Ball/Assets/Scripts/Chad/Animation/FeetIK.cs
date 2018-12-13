@@ -38,6 +38,7 @@ namespace Concussion_Ball.Assets.Scripts
         public Vector3 BoneTargetOffset { get; set; }                   // Target offset after src is found
         public float BendAngleMinFadeOut { get; set; } = 20;            // Degree angle for which foot will be considered 'not placed down'
         private Vector3 ikTarget;                                       // Target stored between frames
+        private float ikWeight = 0.0f;
         
         public IK_FABRIK_Constraint.JointParams[] Joints
         {
@@ -75,8 +76,8 @@ namespace Concussion_Ball.Assets.Scripts
             //else
             //    ikBoneIndex = 0;
             IK.apply(m_rC, m_traceBoneIndex);
-            IK.Weight = 0.0f; ikTargetWeight = 0.0f; ikFromWeight = 0.0f;
-            IK.OrientationWeight = 0.0f; ikOrientWeight = 0.0f;
+            IK.Weight = 1.0f; ikTargetWeight = 0.0f; ikFromWeight = 0.0f;
+            IK.OrientationWeight = 1.0f; ikOrientWeight = 0.0f;
             ikOrientWeight = 0.0f;
         }
 
@@ -128,8 +129,7 @@ namespace Concussion_Ball.Assets.Scripts
 
             Matrix mFoot = fetchTransform();
             float angle = Math.Abs(MathHelper.ToDegrees((float)Math.Acos(Vector3.Dot(mFoot.Up, Vector3.Up))) - 90);
-
-            float ikWeight = IK.Weight;
+            
             float distanceToRoot = CalcDistance((int)IK.RootBoneIndex);
             if (!m_sampleSuccess ||                                                 // Verify enough samples found
                 Distance > MaxDistanceOffset ||                                     // Verify target point is close enough
@@ -161,16 +161,20 @@ namespace Concussion_Ball.Assets.Scripts
                 }
             }
 
-            IK.Target = target;
-            IK.Orientation = orient;
+            Vector3 s, t;
+            Quaternion r;
+            if(mFoot.Decompose(out s, out r, out t)) { }
+
             ikWeight = blendInFactor();
-            IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);
-            IK.OrientationWeight = ikWeight; // blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
+            IK.Target = Vector3.Lerp(t, target, ikWeight);
+            IK.Orientation = Quaternion.Slerp(r, orient, ikWeight);
+            //IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);
+            //IK.OrientationWeight = ikWeight; // blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
 
             if (tick++ > 5)
             {
                 tick = 0;
-                Debug.Log(IK.Weight);
+                Debug.Log(ikWeight);
             }
         }
         private int tick = 0;

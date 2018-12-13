@@ -150,6 +150,7 @@ namespace ThomasEngine
 			param.limit_twist = MathEngine::DegreesToRadians(limit_twist);
 			param.orientation = Utility::Convert(MathEngine::CreateRotationXYZ(rotation));
 			param.joint_type = joint_type;
+			param.paramA = paramA;
 			return param;
 		}
 }
