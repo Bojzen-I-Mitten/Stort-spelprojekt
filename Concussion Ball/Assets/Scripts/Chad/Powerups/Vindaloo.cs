@@ -8,15 +8,15 @@ public class Vindaloo : Powerup
     ChadControls ObjectOwner = null;
 
     public Texture2D fireTexture { get; set; }
-    public Texture2D fire2Texture { get; set; }
     public Texture2D smokeTexture { get; set; }
     public Texture2D gravelTexture { get; set; }
+
     public AudioClip VindalooExplosionSound { get; set; }
 
     private ParticleEmitter emitterFire;
-    private ParticleEmitter emitterFire2;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
+
     private SoundComponent ExplosionSound;
     private float _DespawnTimer;
 
@@ -83,25 +83,7 @@ public class Vindaloo : Powerup
         emitterGravel.Gravity = 4.0f;
         emitterGravel.SpawnAtEdge = false;
         emitterGravel.Texture = gravelTexture;
-
-        emitterFire2 = gameObject.AddComponent<ParticleEmitter>();
-        emitterFire2.MinSize = 0.1f;
-        emitterFire2.MaxSize = 0.2f;
-        emitterFire2.EndSize = 0.05f;
-        emitterFire2.MinLifeTime = 0.4f;
-        emitterFire2.MaxLifeTime = 1.3f;
-        emitterFire2.EmissionRate = 100;
-        emitterFire2.MinRotationSpeed = -2.0f;
-        emitterFire2.MaxRotationSpeed = 3.0f;
-        emitterFire2.MinSpeed = 13.5f;
-        emitterFire2.MaxSpeed = 18.0f;
-        emitterFire2.EndSpeed = 0.0f;
-        emitterFire2.DistanceFromSphereCenter = 0.3f;
-        emitterFire2.Radius = 0.2f;
-        emitterFire2.Gravity = 8.0f;
-        emitterFire2.SpawnAtEdge = false;
-        emitterFire2.Texture = fire2Texture;
-
+        
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
 
         emitterSmoke.Texture = smokeTexture;
@@ -148,26 +130,6 @@ public class Vindaloo : Powerup
         ObjectOwner = chad;
     }
 
-    //public override void OnCollisionEnter(Collider collider)
-    //{
-    //    //Check if colliding with a player
-    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-    //    if (!otherChad)
-    //    { 
-    //        base.OnCollisionEnter(collider);
-    //    }
-    //    else
-    //    {
-    //        ChadControls localChad = MatchSystem.instance.LocalChad;
-
-    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
-
-    //        if (localChad && (otherPlayerTeam != playerTeam))
-    //            base.OnCollisionEnter(collider);
-    //    }
-        
-    //}
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -210,8 +172,7 @@ public class Vindaloo : Powerup
         // Play the vindaloo explosion sound
         ExplosionSound.Play();
 
-        emitterFire.EmitOneShot(25);
-        emitterFire2.EmitOneShot(45);
+        emitterFire.EmitOneShot(35);
         emitterGravel.EmitOneShot(20);
         emitterSmoke.EmitOneShot(50);
 

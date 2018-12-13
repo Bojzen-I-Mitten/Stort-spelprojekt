@@ -72,9 +72,9 @@ public class ThomasTrain : Powerup
 
         emitterFire.Texture = fireTexture;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
-        emitterFire.MinSize = 4.0f;
-        emitterFire.MaxSize = 6.0f;
-        emitterFire.EndSize = 0.0f;
+        emitterFire.MinSize = 6.0f;
+        emitterFire.MaxSize = 8.0f;
+        emitterFire.EndSize = 3.0f;
         emitterFire.MinLifeTime = 0.1f;
         emitterFire.MaxLifeTime = 1.7f;
         emitterFire.EmissionRate = 10;
@@ -85,7 +85,7 @@ public class ThomasTrain : Powerup
         emitterFire.EndSpeed = -6.0f;
         emitterFire.DistanceFromSphereCenter = 0.0f;
         emitterFire.SpawnAtEdge = true;
-        emitterFire.Radius = 5.2f;
+        emitterFire.Radius = 4.2f;
 
         emitterThomasFace.Texture = thomasTexture;
         emitterThomasFace.MinSize = 5.0f;

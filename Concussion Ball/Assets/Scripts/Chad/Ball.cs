@@ -68,11 +68,11 @@ public class Ball : PickupableObject
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
 
-        emitterElectricity1.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el1.png");
-        emitterElectricity2.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el2.png");
-        emitterElectricity3.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el3.png");
+       // emitterElectricity1.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el1.png");
+        //emitterElectricity2.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el2.png");
+        //emitterElectricity3.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el3.png");
         emitterSmoke.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/SmokeParticle.png");
-        emitterFire.Texture =  (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire.png");//fireTex;
+        emitterFire.Texture =  (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire2.png");//fireTex;
 
         ResetFireEmitters();
         ResetElectricityEmitters();
