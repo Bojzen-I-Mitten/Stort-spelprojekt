@@ -360,12 +360,12 @@ namespace ThomasEngine {
 
 							thomas::Physics::UpdateRigidbodies();
 					}
+					thomas::Physics::Simulate();
 					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
 						if (gameObject->GetActive())
 							gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
 					}
-					thomas::Physics::Simulate();
 				}
 #ifdef _THOMAS_SCENE_LOCK
 				Monitor::Exit(Thomas->m_sceneLock);

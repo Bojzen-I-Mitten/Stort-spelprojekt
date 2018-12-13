@@ -66,6 +66,10 @@ public class Gramophone : Powerup
         GramophoneClip.Looping = false;
         GramophoneClip.Is3D = true;
 
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
+
         #region big meme particle emitter bois
         _Note1 = gameObject.AddComponent<ParticleEmitter>();
         if (_NoteTex1 != null)

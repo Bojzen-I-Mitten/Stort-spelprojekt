@@ -127,7 +127,7 @@ public class ChadHud : ScriptComponent
         //Score1.scale = new Vector2(1.6f);
         Score1.scale = new Vector2(0.5f);
         Score1.origin = new Vector2(0.5f, 0);
-        Score1.position = Score1BG.position + new Vector2(0.005f, -0.004f);
+        Score1.position = Score1BG.position + new Vector2(0.005f, -0.01f);
         Score1.outline = true;
         Score1.color = Color.White;
         //Score1.font = Numbers;
@@ -137,7 +137,7 @@ public class ChadHud : ScriptComponent
         //Score2.scale = new Vector2(1.6f);
         Score2.scale = new Vector2(0.5f);
         Score2.origin = new Vector2(0.5f, 0);
-        Score2.position = Score2BG.position - new Vector2(0.009f, 0.004f);
+        Score2.position = Score2BG.position + new Vector2(-0.009f, -0.01f);
         Score2.outline = true;
         Score2.color = Color.White;
         //Score2.font = Numbers;
@@ -274,9 +274,9 @@ public class ChadHud : ScriptComponent
             text2Pos.x = MathHelper.Lerp(1 + text1Size.x, 0.45f, xPos);
 
             Announcement1.position = text1Pos;
-            Announcement1.scale = new Vector2(0.5f);
+            Announcement1.scale = new Vector2(0.75f);
             Announcement2.position = text2Pos;
-            Announcement2.scale = new Vector2(0.5f);
+            Announcement2.scale = new Vector2(0.75f);
 
             Color c = GetRainbowColor(time, 0.5f);
             Color c2 = GetRainbowColor(time, 0.5f);

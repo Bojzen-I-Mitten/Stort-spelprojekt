@@ -150,7 +150,7 @@ namespace ThomasEngine.Network
             InternalManager.DisconnectAll();
         }
 
-        #region Listners
+        #region Listeners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
@@ -160,7 +160,7 @@ namespace ThomasEngine.Network
                 case DisconnectReason.DisconnectPeerCalled:
                     NetScene.RemovePlayer(peer);
                     OnPeerLeave(peer);
-                    Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
+                    Debug.Log("The peer you were connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:   
                     NetScene.RemovePlayer(peer);

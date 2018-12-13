@@ -45,6 +45,10 @@ public class Vindaloo : Powerup
         ExplosionSound.MaxDistance = 10000;
         ExplosionSound.MinDistance = 20;
 
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
+
         #region big meme particle emitter bois
 
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
