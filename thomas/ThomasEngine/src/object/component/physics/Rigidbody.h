@@ -189,6 +189,7 @@ namespace ThomasEngine
 			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetDeactivationTime(); }
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetDeactivationTime(value); }
 		}
+
 		[BrowsableAttribute(false)]
 		[CategoryAttribute("Thresholds")]
 		property float ContactProcessingThresholds
@@ -196,15 +197,17 @@ namespace ThomasEngine
 			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetContactProcessingThreshold(); }
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetContactProcessingThreshold(value); }
 		}
-		[BrowsableAttribute(false)]
-		[CategoryAttribute("Thresholds")]
+
+		[BrowsableAttribute(true)]
+		[CategoryAttribute("Continous Collision")]
 		property float CcdMotionThreshold
 		{
 			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdMotionThreshold(); }
 			void set(float value) { ((thomas::object::component::Rigidbody*)nativePtr)->SetCcdMotionThreshold(value); }
 		}
-		[BrowsableAttribute(false)]
-		[CategoryAttribute("Thresholds")]
+
+		[BrowsableAttribute(true)]
+		[CategoryAttribute("Continous Collision")]
 		property float CcdSweptSphereRadius
 		{
 			float get() { return ((thomas::object::component::Rigidbody*)nativePtr)->GetCcdSweptSphereRadius(); }

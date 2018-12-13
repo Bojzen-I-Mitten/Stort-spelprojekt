@@ -22,10 +22,12 @@ public class ReplaySystem : ScriptComponent
     public bool Replaying = false;
     public bool recordGame = true;
     SpectatorCam specCam;
+    private IEnumerator _Replay;
 
     public override void Start()
     {
         specCam = CameraMaster.instance.gameObject.GetComponent<SpectatorCam>();
+        _Replay = null;
     }
 
     public override void Update()
@@ -61,12 +63,17 @@ public class ReplaySystem : ScriptComponent
         {
             ChadHud.Instance.DeactivateAimHUD();
             Vector3 goalPos = MatchSystem.instance.Teams[MatchSystem.instance.GetOpposingTeam(teamThatScored.TeamType)].GoalPosition;
-            StartCoroutine(RelayCoroutine(goalPos));
+            if (_Replay == null)
+            {
+                _Replay = ReplayCoroutine(goalPos);
+                StartCoroutine(_Replay);
+            }
         }
     }
 
-    private IEnumerator RelayCoroutine(Vector3 goalPos)
+    private IEnumerator ReplayCoroutine(Vector3 goalPos)
     {
+        Debug.Log("Replay cor is started");
         MatchSystem.instance.blockIncomingData = true;
         Replaying = true;
         //specCam.transform.position = goalPos + new Vector3(goalPos.z / 1.2f, 5, 0);
@@ -90,6 +97,7 @@ public class ReplaySystem : ScriptComponent
             States.RemoveAt(0);
         }
         Replaying = false;
+        _Replay = null;
         MatchSystem.instance.ReadOwnerAsNormal = false;
         MatchSystem.instance.blockIncomingData = false;
         CameraMaster.instance.StopReplay();

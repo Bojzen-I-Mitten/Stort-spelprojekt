@@ -29,7 +29,7 @@ public class Vindaloo : Powerup
         base.OnAwake();
 
         m_throwable = true; // change depending on power-up
-        MovementSpeedModifier = 0.8f;
+        MovementSpeedModifier = 0.7f;
         ExplosionRadius = 8.0f;
         ExplosionForce = 60.0f;
         BaseThrowForce = 15.0f;
@@ -213,7 +213,6 @@ public class Vindaloo : Powerup
 
     private void Explosion()
     {
-        // This sound will instantly stop playing when the 
         // Play the vindaloo explosion sound
         ExplosionSound.Play();
 

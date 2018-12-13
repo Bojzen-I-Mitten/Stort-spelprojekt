@@ -60,7 +60,7 @@ public class ChadCam : ScriptComponent
             return _camera;
         }
     }
-
+    [Newtonsoft.Json.JsonIgnore]
     public float CameraSensitivity_x
     {
         get
@@ -68,6 +68,7 @@ public class ChadCam : ScriptComponent
             return CameraSensitivity_y * 16f / 9f;
         }
     }
+    [Newtonsoft.Json.JsonIgnore]
     public float CameraSensitivity_y
     {
         get
