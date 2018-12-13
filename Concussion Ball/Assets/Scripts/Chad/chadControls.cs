@@ -55,11 +55,13 @@ public class ChadControls : NetworkComponent
 
     public Vector2 CurrentVelocity = new Vector2(0, 0); //Right and forward
     public float Acceleration { get; set; } = 2.0f; //2 m/s^2
-    public float BaseSpeed { get; private set; }  = 5.0f;
-    public float MaxSpeed { get; private set; } = 10.0f;
+    public float BaseSpeed { get; set; }  = 5.0f;
+    public float MaxSpeed { get; set; } = 10.0f;
+    public float FirstJumpForce;
+    public float SecondJumpForce;
 
     public Quaternion DivingRotation = Quaternion.Identity;
-    private float MinimumRagdollTimer = 2.0f;
+    public float MinimumRagdollTimer = 2.0f;
 
     public float ImpactFactor = 80.0f;//{ get; set; } = 100;
     public float TackleThreshold { get; set; } = 7;
@@ -70,7 +72,7 @@ public class ChadControls : NetworkComponent
     #endregion
 
     [Browsable(false)]
-    public Rigidbody rBody { get; private set; }
+    public Rigidbody rBody { get; set; }
     private NetworkTransform ragdollSync;
     Chadimations Animations;
     public Ragdoll Ragdoll;
@@ -86,6 +88,31 @@ public class ChadControls : NetworkComponent
 
     public PickupableObject PickedUpObject;
     private float xStep { get { return Input.GetMouseX() * Time.ActualDeltaTime; } }
+
+    // TOY SOLDIER
+    // Coroutines
+    IEnumerator ToySoldierModifier = null;
+
+    public bool ToySoldierAffected = false;
+    private float ScaleCountdown;
+    private Vector3 OriginalScale;
+    private float OriginalAcceleration;
+    private float OriginalBaseSpeed;
+    private float OriginalMaxSpeed;
+    private Vector3 OrginalCapsuleCenter;
+    private float OriginalCapsuleHeight;
+    private float OriginalCapsuleRadius;
+    private float OriginalMass;
+    private float OriginalFirstJumpForce;
+    private float OriginalSecondJumpForce;
+
+    private Material[] OriginalMaterials;
+
+    public Material ToySoldierMaterial { get; set; }
+
+
+    // Tweaking constants
+    private float ScaleDuration = 10.0f;
 
     public override void OnAwake()
     {
@@ -124,7 +151,27 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+        
+        FirstJumpForce = 450.0f;
+        SecondJumpForce = 350.0f;
+        OriginalFirstJumpForce = FirstJumpForce;
+        OriginalSecondJumpForce = SecondJumpForce;
+
+        // Store original values
+        OriginalScale = gameObject.transform.scale;
+        OriginalAcceleration = Acceleration;
+        OriginalBaseSpeed = BaseSpeed;
+        OriginalMaxSpeed = MaxSpeed;
+
+        CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
+        OrginalCapsuleCenter = capsule.center;
+        OriginalCapsuleHeight = capsule.height;
+        OriginalCapsuleRadius = capsule.radius;
+        OriginalMass = rBody.Mass;
+
+        //OriginalMaterials = gameObject.GetComponent<RenderSkinnedComponent>().materials;
     }
+
     public override void OnGotOwnership()
     {
         // Called when NetworkScene::SpawnPlayer is called
@@ -166,6 +213,16 @@ public class ChadControls : NetworkComponent
     {
         if (isOwner)
         {
+            // Toy solider powerup
+            if (ToySoldierAffected)
+            {
+                if(ToySoldierModifier == null)
+                {
+                    ToySoldierModifier = ToySoldierRoutine();
+                    StartCoroutine(ToySoldierModifier);
+                }
+            }
+
             DivingTimer += Time.DeltaTime;
             JumpingTimer += Time.DeltaTime;
 
@@ -470,7 +527,7 @@ public class ChadControls : NetworkComponent
             if (CurrentVelocity.y > velocityBetweenBaseAndMax)
                 CurrentVelocity.y = velocityBetweenBaseAndMax;
             rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
-            rBody.AddForce(new Vector3(0, 450, 0), Rigidbody.ForceMode.Impulse);
+            rBody.AddForce(new Vector3(0, FirstJumpForce, 0), Rigidbody.ForceMode.Impulse);
         }
         else if ((Jumping || (!OnGround() && JumpingTimer > 3.0f)) && !PickedUpObject)
         {
@@ -480,7 +537,7 @@ public class ChadControls : NetworkComponent
             DivingRotation = this.gameObject.transform.rotation;
             CurrentVelocity.y = BaseSpeed;
             rBody.LinearVelocity = Vector3.Transform(new Vector3(rBody.LinearVelocity.x, 0, rBody.LinearVelocity.z), rBody.Rotation);
-            rBody.AddForce(new Vector3(0, 350, 0), Rigidbody.ForceMode.Impulse);
+            rBody.AddForce(new Vector3(0, SecondJumpForce, 0), Rigidbody.ForceMode.Impulse);
         }
     }
 
@@ -661,14 +718,83 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.rendering = false;
     }
 
+    IEnumerator ToySoldierRoutine()
+    {
+        yield return new WaitForSeconds(ScaleDuration);
+
+        // Set back original values and properties when timer has expired
+        gameObject.transform.localScale = OriginalScale;
+        Acceleration = OriginalAcceleration;
+        BaseSpeed = OriginalBaseSpeed;
+        MaxSpeed = OriginalMaxSpeed;
+        FirstJumpForce = OriginalFirstJumpForce;
+        SecondJumpForce = OriginalSecondJumpForce;
+
+        CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
+        capsule.center = OrginalCapsuleCenter;
+        capsule.height = OriginalCapsuleHeight;
+        capsule.radius = OriginalCapsuleRadius;
+        rBody.Mass = OriginalMass;
+        rBody.AddForce(new Vector3(0, 200.0f, 0), Rigidbody.ForceMode.Impulse);
+
+        // Network
+
+        if(MatchSystem.instance.LocalChad.ToySoldierAffected)
+        {
+            MatchSystem.instance.LocalChad.ToySoldierAffected = false;
+            MatchSystem.instance.LocalChad.ToySoldierModifier = null;
+            MatchSystem.instance.LocalChad.ScaleCountdown = ScaleDuration;
+            
+            SendRPC("RPCResetMaterial");
+            RPCResetMaterial();
+        }        
+    }
+
+    public void RPCResetMaterial()
+    {
+        RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+        render.materials = OriginalMaterials;
+        gameObject.GetComponent<ShirtRenderer>().Reset();
+        Debug.Log("reset");
+    }
+
+    public void SetTiny()
+    {
+        SendRPC("RPCSetTiny");
+        RPCSetTiny();
+    }
+
+    public void RPCSetTiny()
+    {
+        //ChadControls localChad = MatchSystem.instance.LocalChad;
+        RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
+        if (ToySoldierMaterial != null)
+        {
+            OriginalMaterials = render.materials;
+            render.SetMaterial(0, ToySoldierMaterial);
+            render.SetMaterial(1, ToySoldierMaterial);
+            render.SetMaterial(2, ToySoldierMaterial);
+            Debug.Log("tinyMat");
+        }
+        rBody.enabled = false;
+        Debug.Log("tiny");
+        rBody.Mass *= 0.5f;
+        transform.scale *= 0.5f;
+
+        CapsuleCollider capsule = gameObject.GetComponent<CapsuleCollider>();
+        capsule.center = new Vector3(0, 0.32f, 0);
+        capsule.height *= 0.5f;
+        capsule.radius *= 0.5f;
+        rBody.enabled = true;
+    }
+
     public void RPCSetAnimWeight(int index, float weight)
     {
         Animations.SetAnimationWeight((uint)index, weight);
     }
 
     public void RPCStartThrow()
-    {
-        
+    {      
         Animations.SetAnimationWeight(ChargeAnimIndex, 0);
         Animations.SetAnimationWeight(ThrowAnimIndex, 1);
     }
@@ -816,15 +942,17 @@ public class ChadControls : NetworkComponent
 
     private void Pickup(PickupableObject pickupable)
     {
-        if (pickupable.transform.parent == null)
+        if(!ToySoldierAffected)
         {
-            if(FadeText != null)
+            if (pickupable.transform.parent == null)
             {
-                StopCoroutine(FadeText);
-                FadeText = null;
-            }
+                if (FadeText != null)
+                {
+                    StopCoroutine(FadeText);
+                    FadeText = null;
+                } 
 
-            ResetAlpha(ref PowerupPickupText);
+                ResetAlpha(ref PowerupPickupText);
 
             if (pickupable.gameObject.Name == "ball")
             {
@@ -846,13 +974,18 @@ public class ChadControls : NetworkComponent
             {
                 DisplayPowerupText(ref PowerupPickupText, "Picked up Grandmaphone");
             }
+            else if (pickupable.gameObject.Name == "ToySoldier")
+            {
+                DisplayPowerupText(ref PowerupPickupText, "Picked up Toy Soldier");
+            }
 
-            FadeText = FadePickupText();
-            StartCoroutine(FadeText);
+                FadeText = FadePickupText();
+                StartCoroutine(FadeText);
 
-            TakeOwnership(pickupable.gameObject);
-            RPCPickup(pickupable.ID);
-            //SendRPC("RPCPickup", pickupable.ID);
+                TakeOwnership(pickupable.gameObject);
+                RPCPickup(pickupable.ID);
+                //SendRPC("RPCPickup", pickupable.ID);
+            }
         }
     }
 
