@@ -652,14 +652,17 @@ public class ChadControls : NetworkComponent
         yield return new WaitForSeconds(1.0f);
 
         Color pickupColor = PowerupPickupText.color;
+        Color outlineColor = PowerupPickupText.outlineColor;
 
         while (pickupColor.a > 0)
         {
             pickupColor.a -= 5;
+            outlineColor.a -= 5;
 
             if (pickupColor.a > 0)
             {
                 PowerupPickupText.color = pickupColor;
+                PowerupPickupText.outlineColor = outlineColor;
             }
 
             yield return new WaitForSeconds(0.01f);
@@ -766,8 +769,11 @@ public class ChadControls : NetworkComponent
     private void ResetAlpha(ref Text powerupText)
     {
         Color pickupColor = powerupText.color;
+        Color outlineColor = powerupText.outlineColor;
         pickupColor.a = 255;
+        outlineColor.a = 255;
         powerupText.color = pickupColor;
+        powerupText.outlineColor = outlineColor;
         powerupText.rendering = true;
     }
     #endregion
