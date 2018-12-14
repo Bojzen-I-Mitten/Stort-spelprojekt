@@ -1,6 +1,8 @@
 using ThomasEngine;
 using ThomasEngine.Network;
 using System.Collections;
+//using System.Collections.Generic;
+//using System.ComponentModel;
 using System.Linq;
 using System;
 using LiteNetLib.Utils;
@@ -32,6 +34,9 @@ public class Gramophone : Powerup
     private bool _Landed;
     private float _Timer;
 
+    private float _DespawnTimer;
+    private float _DespawnTime;
+
     public override void OnAwake()
     {
         base.OnAwake();
@@ -52,11 +57,18 @@ public class Gramophone : Powerup
         _Landed = false;
         _Timer = 0.0f;
 
+        _DespawnTimer = 0.0f;
+        _DespawnTime = 30.0f;
+
         GramophoneClip = gameObject.AddComponent<SoundComponent>();
         GramophoneClip.Type = SoundComponent.SoundType.Effect;
         GramophoneClip.Clip = GramophoneSound;
         GramophoneClip.Looping = false;
         GramophoneClip.Is3D = true;
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
 
         #region big meme particle emitter bois
         _Note1 = gameObject.AddComponent<ParticleEmitter>();
@@ -154,6 +166,18 @@ public class Gramophone : Powerup
                     PointBoi.enabled = false;
                 }
             }
+
+            // Despawn if thrown off edge 
+            if (_DespawnTimer > 0)
+            {
+                _DespawnTimer += Time.DeltaTime;
+                if (_DespawnTimer > _DespawnTime)
+                {
+                    base.Activate();
+                    _DespawnTimer = 0.0f;
+                }
+            }
+
             if (_Landed)
             {
                 m_rigidBody.LinearVelocity = Vector3.Zero;
@@ -188,6 +212,8 @@ public class Gramophone : Powerup
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
+
+        _DespawnTimer += Time.DeltaTime;
     }
 
     public override void OnCollisionEnter(Collider collider)
@@ -249,6 +275,7 @@ public class Gramophone : Powerup
 
     private IEnumerator BlastingMusic()
     {
+        //List<ChadControls> affectedChads = new List<ChadControls>();
 
         if (_Note1 && _Note2)
         {
@@ -270,47 +297,53 @@ public class Gramophone : Powerup
         {
             _Timer += Time.DeltaTime;
 
-            if (localChad /*&& otherPlayerTeam != playerTeam*/)
+            if (localChad)
             {
                 float distance = Vector3.Distance(localChad.transform.position, transform.position);
-                if (distance < ExplosionRadius)
+                if (distance < ExplosionRadius && localChad.State != ChadControls.STATE.RAGDOLL && localChad.State != ChadControls.STATE.DANCING)
                 {
                     localChad.Direction = Vector3.Zero;
-                    localChad.rBody.LinearVelocity = Vector3.Zero;
+                    localChad.rBody.LinearVelocity = new Vector3(0, localChad.rBody.LinearVelocity.y, 0); ;
                     localChad.CurrentVelocity = Vector2.Zero;
                     localChad.State = ChadControls.STATE.DANCING;
+                    ChadHud.Instance.DeactivateAimHUD();
+                    localChad.ChargeTime = 0;
+                    //affectedChads.Add(localChad);
+                }
+                else if (distance > ExplosionRadius && localChad.State == ChadControls.STATE.DANCING)
+                {
+                    //foreach (var player in affectedChads)
+                    //{
+                    //    if (player == localChad)
+                    //    {
+                    //        localChad.State = ChadControls.STATE.CHADING;
+                    //        affectedChads.Remove(player); // buggy?
+                    //    }
+                    //}
+                    localChad.State = ChadControls.STATE.CHADING;
                 }
             }
 
             yield return null;
         }
-        //_Timer = 0.0f;
         GramophoneClip.Stop();
-        if (localChad)
-            localChad.State = ChadControls.STATE.CHADING;
 
+        // Reset all dancing Chads, the party is over
+        //foreach (var player in affectedChads)
+        //{
+        //    if (player == localChad && localChad.State == ChadControls.STATE.DANCING)
+        //    {
+        //        localChad.State = ChadControls.STATE.CHADING;
+        //        //affectedChads.Remove(player); // buggy?
+        //    }
+        //}
+        if (localChad.State == ChadControls.STATE.DANCING)
+            localChad.State = ChadControls.STATE.CHADING;
+        //affectedChads.Clear();
         Explosion();
         
   
     }
-
-    //public override void Disable()
-    //{
-    //    base.Disable();
-    //    //StopCoroutine(BlastingMusic());
-    //    //if (PointBoi)
-    //    //{
-    //    //    _SpawnedLight = false;
-    //    //    PointBoi.enabled = false;
-    //    //}
-    //    //if (_Note1 && _Note2)
-    //    //{
-    //    //    _Note1.Emit = false;
-    //    //    _Note2.Emit = false;
-    //    //}
-    //    //_Landed = false;
-    //    //_JumpTimer = 0.0f;
-    //}
 
     public override void Reset()
     {
@@ -330,6 +363,9 @@ public class Gramophone : Powerup
         _Landed = false;
         _JumpTimer = 0.0f;
         _Timer = 0.0f;
+
+        _DespawnTimer = 0.0f;
+        _DespawnTime = 30.0f;
     }
 
     // COLOR CALCS FROM ALBIN

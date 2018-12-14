@@ -26,6 +26,7 @@ public class ThomasTrain : Powerup
     public float ExplosionForce { get; set; }
 
     private float soundcooldown;
+    private bool hasPlayedChargeSound;
     private float _DespawnTimer; 
 
     public override void OnAwake()
@@ -63,6 +64,10 @@ public class ThomasTrain : Powerup
         soundComponentExplosion.Clip = soundClipExplosion;
 
         m_throwable = true; // change depending on power-up
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
 
         #region emitters
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
@@ -118,11 +123,26 @@ public class ThomasTrain : Powerup
     public override void Update()
     {
         base.Update();
+
         soundcooldown -= Time.DeltaTime;
+        if (hasPlayedChargeSound)
+        {
+            if (!charging)
+            {
+                if (soundcooldown < 0.0f)
+                {
+                    hasPlayedChargeSound = false;
+                }
+            }
+        }
 
         // Despawn if Train has not hit anyone in 30 seconds
         if (_DespawnTimer > 30)
+        {
             base.Activate();
+            _DespawnTimer = 0.0f;
+        }
+            
         else if (_DespawnTimer > 0)
             _DespawnTimer += Time.DeltaTime;
     }
@@ -147,10 +167,11 @@ public class ThomasTrain : Powerup
     public override void ChargeEffect()
     {
         base.ChargeEffect();
-        if (soundcooldown < 0.0f)
+        if (!hasPlayedChargeSound)
         {
-            soundcooldown = 1.0f;
             soundComponentChargeUp.Play();
+            hasPlayedChargeSound = true;
+            soundcooldown = 5.0f;
         }
     }
 
@@ -219,6 +240,7 @@ public class ThomasTrain : Powerup
                 Vector3 force = forceDir * ExplosionForce * distForce;
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 localChad.ActivateRagdoll(2.0f, param);
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.EXPLODED);
             }
         }
     }
@@ -245,5 +267,12 @@ public class ThomasTrain : Powerup
     {
         yield return null;//wait one frame to emit particles
         Remove();
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+
+        _DespawnTimer = 0.0f;
     }
 }

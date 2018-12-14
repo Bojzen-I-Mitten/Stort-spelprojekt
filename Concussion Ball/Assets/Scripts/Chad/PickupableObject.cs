@@ -22,6 +22,8 @@ public class PickupableObject : NetworkComponent
 
     public bool pickedUp = false;
 
+    private SoundComponent soundThrow;
+
     public Collider PickupCollider { get; set; }
     [Newtonsoft.Json.JsonIgnore]
     public bool charging { get { return chargeTimeCurrent > 0.00001f; } }
@@ -37,6 +39,14 @@ public class PickupableObject : NetworkComponent
         chargeTimeMax = 2.0f;
         if (!PickupCollider)
             Debug.LogError("Pickup collider empty");
+
+        soundThrow = gameObject.AddComponent<SoundComponent>();
+        soundThrow.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ThrowGeneral.wav");
+        soundThrow.Looping = false;
+        soundThrow.Type = SoundComponent.SoundType.Effect;
+        soundThrow.MaxDistance = 30;
+        soundThrow.MinDistance = 10;
+        soundThrow.Is3D = true;
 
     }
 
@@ -76,6 +86,7 @@ public class PickupableObject : NetworkComponent
         transform.LookAt(transform.position + Vector3.Normalize(direction));
         m_rigidBody.Position = transform.position;
         m_rigidBody.Rotation = transform.rotation;
+        soundThrow.Play();
         StartCoroutine(ThrowRoutine(direction));
         OnThrow();
         SendRPC("OnThrow");
@@ -116,7 +127,7 @@ public class PickupableObject : NetworkComponent
     {
         if (pickedUp)
         {
-            Debug.Log("Drop!");
+            //Debug.Log("Drop!");
             m_rigidBody.enabled = true;
 
             gameObject.GetComponent<NetworkTransform>().SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
@@ -203,6 +214,11 @@ public class PickupableObject : NetworkComponent
         PickupCollider.enabled = reader.GetBool();
         chargeTimeCurrent = reader.GetFloat();
 
+        if (!pickedUp && transform.parent != null)
+        {
+            transform.SetParent(null, true);
+            Debug.Log("Something went wrong. It's fixed now tho!");
+        }
     }
 
 

@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 public class PlayerText
 {
-    private int Sign; 
-    Canvas Canvas;
+    private int Sign;
 
     public Text Name;
     public Text Goals;
@@ -281,7 +280,12 @@ public class GUIScoreboard : ScriptComponent
     {
         for (int i = Team1PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
         {
+            PlayerStandardBarTeam1[i].rendering = false;
             Team1Players[i].IsRendering = false;
+        }
+        for (int i = Team2PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
+        {
+            PlayerStandardBarTeam2[i].rendering = false;
             Team2Players[i].IsRendering = false;
         }
     }
@@ -314,7 +318,7 @@ public class GUIScoreboard : ScriptComponent
         {
             PlayerStandardBarTeam1[i].rendering = true;
             Team1Players[i].IsRendering = true;
-
+            PlayerStandardBarTeam1[i].color = Team1Bar.color;
             if (Team1.Players[i].PlayerName.Length > 9)
                 Team1Players[i].Name.text = Team1.Players[i].PlayerName.Substring(0, 9) + "-";
             else
@@ -327,8 +331,10 @@ public class GUIScoreboard : ScriptComponent
         }
         for (int i = 0; i < Team2PlayerCount; i++)
         {
+            PlayerStandardBarTeam2[i].rendering = true;
             Team2Players[i].IsRendering = true;
-
+            PlayerStandardBarTeam2[i].rendering = true;
+            PlayerStandardBarTeam2[i].color = Team2Bar.color;
             if (Team2.Players[i].PlayerName.Length > 9)
                 Team2Players[i].Name.text = Team2.Players[i].PlayerName.Substring(0, 9) + "-";
             else
@@ -357,8 +363,8 @@ public class GUIScoreboard : ScriptComponent
 
     public override void Update()
     {
-        UpdateStatistics();
         UpdatePlayerBars();
+        UpdateStatistics();
         UpdateList();
 
         if ((Input.GetKey(Input.Keys.Tab) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)
@@ -374,7 +380,7 @@ public class GUIScoreboard : ScriptComponent
 
     public override void OnEnable()
     {
-        if (Canvas != null && GUIScoreScreen.Instance.enabled)
+        if (Canvas != null /*&& GUIScoreScreen.Instance.enabled*/)
             Canvas.isRendering = true;
 
         Toggle = false;

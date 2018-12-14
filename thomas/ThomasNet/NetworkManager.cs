@@ -13,6 +13,7 @@ namespace ThomasEngine.Network
         EVENT,
         OBJECT_DATA,
         PLAYER_DATA,
+        SERVER_DATA,
         RPC
     }
 
@@ -51,7 +52,7 @@ namespace ThomasEngine.Network
 
         public int ConnectTo = 0;
 
-        
+        public bool ServerOwner = false;
 
         public long ServerStartTime;
         [Browsable(false)]
@@ -64,6 +65,8 @@ namespace ThomasEngine.Network
                 return (float)elapsedTimespan.TotalSeconds;
             }
         }
+
+        NetDataWriter DataWriter = new NetDataWriter();
 
         internal NetworkScene NetScene;
 
@@ -132,6 +135,7 @@ namespace ThomasEngine.Network
             NetScene.SpawnPlayer(LocalPeer, true);
             OnPeerJoin(LocalPeer);
             NetScene.ActivateSceneObjects();
+            ServerOwner = true;
 
         }
 
@@ -146,7 +150,7 @@ namespace ThomasEngine.Network
             InternalManager.DisconnectAll();
         }
 
-        #region Listners
+        #region Listeners
 
         private void Listener_PeerDisconnectedEvent(NetPeer peer, DisconnectInfo disconnectInfo)
         {
@@ -156,7 +160,7 @@ namespace ThomasEngine.Network
                 case DisconnectReason.DisconnectPeerCalled:
                     NetScene.RemovePlayer(peer);
                     OnPeerLeave(peer);
-                    Debug.Log("The peer you where connected to has disconnected with the IP " + peer.EndPoint.ToString());
+                    Debug.Log("The peer you were connected to has disconnected with the IP " + peer.EndPoint.ToString());
                     break;
                 case DisconnectReason.Timeout:   
                     NetScene.RemovePlayer(peer);
@@ -258,6 +262,11 @@ namespace ThomasEngine.Network
                             NetScene.ReadObjectData(reader);
                         }
                         break;
+                    case PacketType.SERVER_DATA:
+                        {
+                            OnRead(reader);
+                        }
+                        break;
                     case PacketType.EVENT:
                         NetPacketProcessor.ReadAllPackets(reader, peer);
                         break;
@@ -306,6 +315,13 @@ namespace ThomasEngine.Network
                 NetManager.PollEvents();
                 Diagnostics();
 
+                if(ServerOwner)
+                {
+                    DataWriter.Reset();
+                    DataWriter.Put((int)PacketType.SERVER_DATA);
+                    OnWrite(DataWriter);
+                    InternalManager.SendToAll(DataWriter, DeliveryMethod.ReliableOrdered);
+                }
 
                 //Check real owners.
                 //if((int)TimeSinceServerStarted % 3 == 0)
@@ -326,6 +342,16 @@ namespace ThomasEngine.Network
                 //}
                 
             }
+        }
+
+        public virtual void OnRead(NetDataReader reader)
+        {
+
+        }
+
+        public virtual void OnWrite(NetDataWriter writer)
+        {
+
         }
 
         public void RPCTempOwnerStuff(int ID)

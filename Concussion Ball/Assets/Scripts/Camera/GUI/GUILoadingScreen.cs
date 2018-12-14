@@ -10,17 +10,16 @@ public class GUILoadingScreen : ScriptComponent
     public Canvas Canvas;
     public Texture2D Background { get; set; }
 
+    Image BG;
 
     public override void OnAwake()
     {
-    }
-
-    public override void Start()
-    {
         Camera = gameObject.GetComponent<Camera>();
         Canvas = Camera.AddCanvas();
-        if(Background != null)
-            Canvas.Add(Background);
+        if (Background != null)
+        {
+            BG = Canvas.Add(Background);
+        }
     }
 
     public override void Update()
