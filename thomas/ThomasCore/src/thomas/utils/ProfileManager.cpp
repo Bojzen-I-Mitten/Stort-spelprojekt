@@ -57,10 +57,10 @@ namespace thomas
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
 #ifdef MEMORY
-				s_profileLock.lock();
+				/*s_profileLock.lock();
 				s_vramusage[name].push_back(usage);
-				s_profileLock.unlock();
-#endif // MEMORY
+				s_profileLock.unlock();*/
+#endif
 			}
 
 			void ProfileManager::increaseContextSwitches()
