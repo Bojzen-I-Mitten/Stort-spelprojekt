@@ -278,16 +278,15 @@ public class GUIScoreboard : ScriptComponent
 
     void UpdatePlayerBars()
     {
-        for (int i = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount; i < Team1Players.Count ; i++)
-        { 
-          
-                Team1Players[i].IsRendering = false;
-                PlayerStandardBarTeam1[i].rendering = false;
-        }
-        for (int i = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount; i < Team2Players.Count;i++)
+        for (int i = Team1PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
         {
-                Team2Players[i].IsRendering = false;
-                PlayerStandardBarTeam2[i].rendering = false;
+            PlayerStandardBarTeam1[i].rendering = false;
+            Team1Players[i].IsRendering = false;
+        }
+        for (int i = Team2PlayerCount; i < MatchSystem.instance.MaxPlayers / 2; i++)
+        {
+            PlayerStandardBarTeam2[i].rendering = false;
+            Team2Players[i].IsRendering = false;
         }
     }
     void UpdatePlayertextbasedonscore()
@@ -332,6 +331,7 @@ public class GUIScoreboard : ScriptComponent
         }
         for (int i = 0; i < Team2PlayerCount; i++)
         {
+            PlayerStandardBarTeam2[i].rendering = true;
             Team2Players[i].IsRendering = true;
             PlayerStandardBarTeam2[i].rendering = true;
             PlayerStandardBarTeam2[i].color = Team2Bar.color;
@@ -363,8 +363,8 @@ public class GUIScoreboard : ScriptComponent
 
     public override void Update()
     {
-        UpdateStatistics();
         UpdatePlayerBars();
+        UpdateStatistics();
         UpdateList();
 
         if ((Input.GetKey(Input.Keys.Tab) && MatchSystem.instance.MatchStarted) || GUIScoreScreen.Instance.enabled)

@@ -237,6 +237,18 @@ public class Ball : PickupableObject
             begunCharge = false;
             soundChargeBall.Stop();
         }
+
+        if(Input.GetKeyDown(Input.Keys.F12))
+        {
+            if(gameObject.Parent)
+            {
+                Debug.Log("Parent of ball is: " + gameObject.Parent + " of " + gameObject.Parent.Parent.Name);
+            }
+            else
+            {
+                Debug.Log("Ball is not parented to anything.");
+            }
+        }
     }
 
     public override void Throw(Vector3 camPos, Vector3 direction)

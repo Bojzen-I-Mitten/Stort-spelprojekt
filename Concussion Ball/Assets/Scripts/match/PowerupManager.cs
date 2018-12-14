@@ -61,8 +61,16 @@ public class PowerupManager : ScriptComponent
 
     public void RecyclePowerup(Powerup powerup)
     {
+        
+
         powerup.Disable();
-        powerup.gameObject.SetActive(false);
+        {
+            if (MatchSystem.instance.ServerOwner)
+            {
+                powerup.gameObject.GetComponent<NetworkIdentity>().Owner = true;
+                powerup.gameObject.SetActive(false);
+            }   
+        }
     }
 
     public void ResetPowerups()
