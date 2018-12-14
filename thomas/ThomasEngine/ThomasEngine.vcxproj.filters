@@ -72,6 +72,7 @@
     <ClCompile Include="src\script\ScriptinUtility.cpp" />
     <ClCompile Include="src\resource\texture\RenderTexture.cpp" />
     <ClCompile Include="src\math\MathEngine.cpp" />
+    <ClCompile Include="src\GUI\game\WindowController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource\Model.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="src\resource\texture\RenderTexture.h" />
     <ClInclude Include="src\math\MathEngine.h" />
     <ClInclude Include="src\serialization\IPropertyChanged.h" />
+    <ClInclude Include="src\GUI\game\WindowController.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

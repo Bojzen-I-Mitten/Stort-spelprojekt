@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Chad\AnimationMixer.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Gramophone.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
     <Compile Include="Assets\Scripts\Chad\HatManager.cs" />
     <Compile Include="Assets\Scripts\Chad\Hatter.cs" />
     <Compile Include="Assets\Scripts\Chad\Animation\IKConstraint.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="Assets\Scripts\Camera\GUI\GUIMainMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIExitMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIJoinHost.cs" />
-    <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />
+    <Compile Include="Assets\Scripts\Camera\GUI\GUIOptionsMenu.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUISelectTeam.cs" />
     <Compile Include="Assets\Scripts\Camera\ReplayCamera.cs" />
     <Compile Include="Assets\Scripts\Camera\SpectatorCam.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\Scripts\Chad\Animation\FeetIK.cs" />
     <Compile Include="Assets\Scripts\Chad\chadControls.cs" />
     <Compile Include="Assets\Scripts\Chad\ChadHud.cs" />
+    <Compile Include="Assets\Scripts\Chad\Powerups\ToySoldier.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreboard.cs" />
     <Compile Include="Assets\Scripts\Chad\ShirtRenderer.cs" />
     <Compile Include="Assets\Scripts\Forcefield.cs" />
