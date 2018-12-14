@@ -119,6 +119,8 @@ public class ChadControls : NetworkComponent
         ragdollSync = gameObject.AddComponent<NetworkTransform>();
         NetworkIdentity c = gameObject.GetComponent<NetworkIdentity>();
         gameObject.SetComponentIndex(c, 0xfffffff);  // Ensure network writer is last
+
+        OriginalMaterials = gameObject.GetComponent<RenderSkinnedComponent>().materials;
     }
 
     public override void Start()
@@ -151,6 +153,8 @@ public class ChadControls : NetworkComponent
         if (rBody != null)
             rBody.IsKinematic = !isOwner;
         Identity.RefreshCache();
+
+        MinimumRagdollTimer = 2.0f;
         
         FirstJumpForce = 450.0f;
         SecondJumpForce = 350.0f;
@@ -276,7 +280,13 @@ public class ChadControls : NetworkComponent
             NetPlayer.Reset();
 #endif
 
-
+        if (Input.GetKeyDown(Input.Keys.F12))
+        {
+            if (PickedUpObject)
+                Debug.Log("Your current held item: " + PickedUpObject);
+            else
+                Debug.Log("No held item.");
+        }
 
         rBody.Friction = 0.5f;
         if (!OnGround())
@@ -655,7 +665,11 @@ public class ChadControls : NetworkComponent
             PickedUpObject.Drop();
             PickedUpObject = null;
         }
-
+        if (ToySoldierAffected)
+        {
+            ToySoldierAffected = false;
+            RPCResetMaterial();
+        }
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -684,7 +698,7 @@ public class ChadControls : NetworkComponent
         if (isOwner)
         {
             yield return new WaitForSeconds(duration);
-
+            Debug.Log("Deactivating them ragdoll bois was good");
             while (Ragdoll.DistanceToWorld() >= 0.75f) // can trigger mid air atm, check if ray hits ground and not chad
             {
                 yield return null;
@@ -754,10 +768,6 @@ public class ChadControls : NetworkComponent
 
         if(MatchSystem.instance.LocalChad.ToySoldierAffected)
         {
-            MatchSystem.instance.LocalChad.ToySoldierAffected = false;
-            MatchSystem.instance.LocalChad.ToySoldierModifier = null;
-            MatchSystem.instance.LocalChad.ScaleCountdown = ScaleDuration;
-            
             SendRPC("RPCResetMaterial");
             RPCResetMaterial();
         }        
@@ -765,6 +775,9 @@ public class ChadControls : NetworkComponent
 
     public void RPCResetMaterial()
     {
+        ToySoldierAffected = false;
+        ToySoldierModifier = null;
+        ScaleCountdown = ScaleDuration;
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         render.materials = OriginalMaterials;
         gameObject.GetComponent<ShirtRenderer>().Reset();
@@ -779,11 +792,12 @@ public class ChadControls : NetworkComponent
 
     public void RPCSetTiny()
     {
-        //ChadControls localChad = MatchSystem.instance.LocalChad;
+        if (PickedUpObject)
+            PickedUpObject.Drop();
+
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         if (ToySoldierMaterial != null)
         {
-            OriginalMaterials = render.materials;
             render.SetMaterial(0, ToySoldierMaterial);
             render.SetMaterial(1, ToySoldierMaterial);
             render.SetMaterial(2, ToySoldierMaterial);

@@ -86,7 +86,7 @@ public class Ball : PickupableObject
 
         Rigidbody rb = gameObject.GetComponent<Rigidbody>();
         rb.CcdMotionThreshold = 1e-7f;
-        rb.CcdSweptSphereRadius = 0.1f;
+        rb.CcdSweptSphereRadius = 0.5f;
     }
     #region Particle handling
     private void ResetFireEmitters()
@@ -240,6 +240,18 @@ public class Ball : PickupableObject
         {
             begunCharge = false;
             soundChargeBall.Stop();
+        }
+
+        if(Input.GetKeyDown(Input.Keys.F12))
+        {
+            if(gameObject.Parent)
+            {
+                Debug.Log("Parent of ball is: " + gameObject.Parent + " of " + gameObject.Parent.Parent.Name);
+            }
+            else
+            {
+                Debug.Log("Ball is not parented to anything.");
+            }
         }
     }
 

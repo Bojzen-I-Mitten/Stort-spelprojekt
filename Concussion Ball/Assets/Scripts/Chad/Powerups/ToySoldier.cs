@@ -71,7 +71,7 @@ public class ToySoldier : Powerup
         // Direct Hit with a Chad
         if (otherChad)
         {
-            if (otherChad == localChad)
+            if (otherChad == localChad && !localChad.ToySoldierAffected)
             {
                 TEAM_TYPE colliderTeam = MatchSystem.instance.GetPlayerTeam(localChad.gameObject);
                 TEAM_TYPE throwerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
@@ -112,6 +112,7 @@ public class ToySoldier : Powerup
 
             activated = true;
         }
+
         StartCoroutine(RemoveToySoldier());
     }
 
