@@ -162,6 +162,8 @@ public class ChadCam : ScriptComponent
                 case ChadControls.STATE.RAGDOLL:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                         RagdollCamera();
+                    if (Input.GetKeyUp(Input.Keys.LeftAlt) || Input.GetKeyUp(Input.Keys.R))
+                        state = STATE.FONDLE;
                     break;
             }
             if (velocity.y > 8.5f)
