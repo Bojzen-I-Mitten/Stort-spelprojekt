@@ -90,7 +90,7 @@ namespace thomas
 				m_frameQuery = (m_frameQuery + 1) % FRAME_BUFFERS; 
 			}
 
-			void profiling::GpuProfiler::AddDrawCall(size_t faceCount, size_t vertexCount)
+			void profiling::GpuProfiler::AddDrawCall(int faceCount, int vertexCount)
 			{
 				m_totalVertexCount += vertexCount;
 				m_totalFaceCount += faceCount;
@@ -151,19 +151,27 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetMemoryUsage()
 			{
-			
-				if (SUCCEEDED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &m_info[m_memoryQuery])))
+				if (utils::D3D::Instance()->GetDxgiAdapter())
 				{
+					if (FAILED(utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &m_info[m_memoryQuery])))
+						LOG("Failed to poll vram usage");
+
 					m_memoryUsage = float(m_info[m_memoryQuery].CurrentUsage);
 
 					m_memoryQuery = (m_memoryQuery + 1) % 2;
 
 					float usage = float(m_info[m_memoryQuery].CurrentUsage);
+					if (m_memoryUsage > usage)
+					{
+						m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+						return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
+					}
 
-					m_totalMemory += (m_memoryUsage - usage) / 1024.0f / 1024.0f;
-					m_totalMemory = m_memoryUsage / 1024.0f / 1024.0f;
-					return (m_memoryUsage - usage) / 1024.0f / 1024.0f;
-					
+					if (m_memoryUsage < usage)
+					{
+						m_totalMemory -= (usage - m_memoryUsage) / 1024.0f / 1024.0f;
+						return (usage - m_memoryUsage) / 1024.0f / 1024.0f;
+					}
 				}
 
 				return 0.0f;
@@ -172,6 +180,15 @@ namespace thomas
 			float profiling::GpuProfiler::GetTotalMemory()
 			{
 				return m_totalMemory;
+			}
+
+			float profiling::GpuProfiler::GetCurrentMemory()
+			{
+				DXGI_QUERY_VIDEO_MEMORY_INFO info;
+				utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info);
+				float usage = float(info.CurrentUsage);
+
+				return usage / 1024.0f / 1024.0f;
 			}
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()

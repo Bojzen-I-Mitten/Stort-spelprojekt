@@ -48,23 +48,28 @@ namespace thomas
 
 			void ProfileManager::storeSample(std::string name, long long elapsedTime, long long startTime, DWORD processor_id)
 			{
+#ifdef PERFORMANCE
 				s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));
+#endif 
 			}
 
 			void ProfileManager::storeGpuSample(long long gpuTime)
 			{
+#ifdef PERFORMANCE
 				if (gpuTime < 0)
 					s_gpuSamples.push_back(0);
 
 				s_gpuSamples.push_back(gpuTime);
+#endif 
 			}
 
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
-				s_profileLock.lock();
+#ifdef MEMORY
+				/*s_profileLock.lock();
 				s_vramusage[name].push_back(usage);
-				s_totalvramusage[name] += usage;
-				s_profileLock.unlock();
+				s_profileLock.unlock();*/
+#endif
 			}
 
 			void ProfileManager::increaseContextSwitches()
@@ -174,16 +179,24 @@ namespace thomas
 
 			void ProfileManager::setRAMUsage(float usage)
 			{
-				s_ramusage = usage;
+#ifdef MEMORY
+				s_ramusage = (usage - s_vramTotal);
+#endif
 			}
 			float ProfileManager::getRAMUsage()
 			{
+#ifdef MEMORY
 				return s_ramusage - s_vramTotal;
+#else
+				return 0.0f;
+#endif
 			}
 
 			void ProfileManager::setVRAMUsage(float total)
 			{
+#ifdef MEMORY
 				s_vramTotal = total;
+#endif
 			}
 
 		}

@@ -391,11 +391,11 @@ namespace thomas
 			createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-//#ifdef BENCHMARK
+#ifdef MEMORY
 			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl);
-//#else
-			//D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
-//#endif
+#else
+			D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, lvl, _countof(lvl), D3D11_SDK_VERSION, &m_device, &fl, NULL);
+#endif
 
 			if (!CreateDeviceContext())
 				return false;

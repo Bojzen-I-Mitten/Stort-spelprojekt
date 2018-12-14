@@ -175,7 +175,11 @@ namespace thomas
 				CA2W(filePath.c_str()),
 				nullptr,
 				&include,
+#ifdef  _DEBUG
 				D3DCOMPILE_DEBUG,
+#else
+				D3DCOMPILE_OPTIMIZATION_LEVEL1,
+#endif
 				0,
 				utils::D3D::Instance()->GetDevice(),
 				&tempEffect,

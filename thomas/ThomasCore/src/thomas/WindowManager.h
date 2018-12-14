@@ -15,12 +15,17 @@ namespace thomas
 		void EndFrame();
 		void ResolveRenderTarget();
 		void Update();
-		void Create(HWND hWnd, bool isEditor);
+		void Create(HWND& hwnd, HWND parent, int width, int height, bool isEditor);
+		void Create(HWND& hwnd, HWND parent, int width, int height, std::string name);
 		void UpdateFocus();
-		void setBorderless(bool borderless);
-		void setFullscreen(bool fullscreen);
-		bool getFullscreen();
-		bool getBorderless();
+		void SetBorderless(bool borderless);
+		void SetFullscreen(bool fullscreen);
+		void SetWidth(LONG width);
+		void SetHeight(LONG height);
+		bool GetFullscreen();
+		bool GetBorderless();
+		LONG GetWidth();
+		LONG GetHeight();
 
 	public:
 		int GetNumOfWindows();
