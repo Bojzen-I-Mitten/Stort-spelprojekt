@@ -215,9 +215,9 @@ public class Chadimations : NetworkComponent, ThomasEngine.IPropertyChanged
         ChadAnimState = state;
         // Currently only overwrite current state (no mixed state)
         AnimationMixer.MixInfo info;
-        info.mixTime = 1.0f;
+        info.mixTime = 0.0f;
         info.mixWeight = 1.0f;
-        info.mode = mode;
+        info.mode = AnimationMixer.BlendIn.Overwrite;// mode;
         // Apply
         mixer.mixIn(AnimState[(int)state].node, info);
     }

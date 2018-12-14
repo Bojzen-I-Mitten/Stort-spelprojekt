@@ -35,6 +35,12 @@ namespace ThomasEngine
 		void IK_FABRIK_Constraint::Target::set(Vector3 w) {
 			m_ptr->m_target = Utility::Convert(w);
 		}
+		Vector3 IK_FABRIK_Constraint::PoleTarget::get() {
+			return Utility::Convert(m_ptr->m_poleTarget);
+		}
+		void IK_FABRIK_Constraint::PoleTarget::set(Vector3 w) {
+			m_ptr->m_poleTarget = Utility::Convert(w);
+		}
 		Quaternion IK_FABRIK_Constraint::Orientation::get() {
 			return Utility::Convert(m_ptr->m_targetOrient);
 		}
@@ -148,6 +154,7 @@ namespace ThomasEngine
 			thomas::graphics::animation::IK_FABRIK_C_Constraint::JointParams param;
 			param.limit_bend = MathEngine::DegreesToRadians(limit_bend);
 			param.limit_twist = MathEngine::DegreesToRadians(limit_twist);
+			param.pole_influence = std::fmax(0.f, std::fmin(1.f, pole_influence));
 			param.orientation = Utility::Convert(MathEngine::CreateRotationXYZ(rotation));
 			param.joint_type = joint_type;
 			param.paramA = paramA;

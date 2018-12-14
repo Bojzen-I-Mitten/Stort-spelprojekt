@@ -7,6 +7,7 @@
 #define IK_DRAW
 //#define DRAW_FORWARD_CONSTRAINT
 //#define DRAW_BACKWARD_CONSTRAINT
+#define DRAW_POLE_TARGET
 
 namespace thomas {
 	namespace graphics {
@@ -42,6 +43,7 @@ namespace thomas {
 				// Set joint limits
 				m_joint.get()[chainIndex].limit_bend = info.limit_bend;
 				m_joint.get()[chainIndex].limit_twist = info.limit_twist;
+				m_joint.get()[chainIndex].pole_influence = info.pole_influence;
 				m_joint.get()[chainIndex].paramA = info.paramA;
 				m_joint.get()[chainIndex].orient_offset = info.orientation;
 				m_joint.get()[chainIndex].joint_type = info.joint_type;
@@ -211,16 +213,17 @@ namespace thomas {
 				for (uint32_t iter = 0; dif > FABRIK_TOLERANCE && iter < MAX_FABRIK_ITER; iter++) {
 					// Stage 1: Forward reaching
 					uint32_t i = num_link - 1;
+					float loopFactor = (MAX_FABRIK_ITER - iter - 1) / MAX_FABRIK_ITER;
 					p[i] = target;
 					for(; i > 0;){														// Forward reaching loop
 						i--;
-						math::Vector3 bonePoint = p[i];
-						// Prevent FABRIK from locking itself and influence the result. Should be per bone parameter though
-						if(i < num_link - 1)
-							bonePoint += math::Vector3(0, 0, math::EPSILON-len[i] * (MAX_FABRIK_ITER - iter) / MAX_FABRIK_ITER);
-						float r = math::Vector3::Distance(bonePoint, p[i + 1]);				// Distance to next joint
+						math::Vector3 iterP = p[i];
+						// Influence by pole target
+						if(i > 0)
+							iterP += math::Vector3::Lerp(iterP, m_poleTarget, loopFactor * m_joint.get()[i].pole_influence);
+						float r = math::Vector3::Distance(iterP, p[i + 1]);				// Distance to next joint
 						float lambda = len[i] / r;
-						p[i] = math::lerp(p[i + 1], bonePoint, lambda);						// Next iter. position
+						p[i] = math::lerp(p[i + 1], iterP, lambda);						// Next iter. position
 
 						solve_constraint_backward_iter(i, p + i, orient + i, len[i]);
 						/*
@@ -235,9 +238,14 @@ namespace thomas {
 					*p = p_init;														// Reset root
 					*orient = orient_init;
 					for (; i < num_link - 1; i++) {										// Backward reaching loop
-						float r = math::Vector3::Distance(p[i], p[i + 1]);				// Distance to next joint
+
+						math::Vector3 iterP = p[i + 1];
+						// Influence by pole target
+						if (i < num_link - 2)
+							iterP += math::Vector3::Lerp(iterP, m_poleTarget, loopFactor * m_joint.get()[i].pole_influence);
+						float r = math::Vector3::Distance(p[i], iterP);				// Distance to next joint
 						float lambda = len[i] / r;
-						p[i+1] = math::lerp(p[i], p[i + 1], lambda);					// Next iter. position
+						p[i+1] = math::lerp(p[i], iterP, lambda);					// Next iter. position
 
 						solve_constraint_forward_iter(i, p + i, orient + i, len[i]);	// Constrain iteration
 					}
@@ -317,6 +325,7 @@ namespace thomas {
 				pose.Translation(p[m_num_link - 1]);											// Apply new translation
 				objectPose[chain[m_num_link - 1]] = pose;
 
+				const float POINT_RAD = 0.01f;
 				const float GIZMO_LEN = 0.05f;
 				const float MAX_JOINT_RAD = GIZMO_LEN * 2.5f;
 				const float MAX_JOINT_LEN = GIZMO_LEN * 2.5f;
@@ -347,6 +356,18 @@ namespace thomas {
 					// Draw bone matrix
 					editor::Gizmos::Gizmo().DrawMatrixBasis(objectPose[chain[i]], math::Vector3(GIZMO_LEN, len, GIZMO_LEN));
 				}
+#ifdef DRAW_POLE_TARGET
+				// Draw lines to pole target
+				editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 1.f, 0.f));
+				editor::Gizmos::Gizmo().DrawRing(m_poleTarget, math::Vector3::Up, POINT_RAD);
+				editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 1.f, 0.f));
+				for (i = 0; i < m_num_link; i++) 
+				{
+					JointInfo& joint = m_joint.get()[i];
+					if(joint.pole_influence > math::EPSILON)
+						editor::Gizmos::Gizmo().DrawLine(m_poleTarget, p[i]);
+				}
+#endif
 #endif
 #endif
 				// Clean stack

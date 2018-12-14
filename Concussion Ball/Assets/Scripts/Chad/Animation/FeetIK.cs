@@ -36,8 +36,10 @@ namespace Concussion_Ball.Assets.Scripts
         public float MaxDistanceOffset { get; set; } = 0.2f;            // Offset from bone -> target IK is blended in
         public float MaxIKChainDistanceOffset { get; set; } = 0.2f;     // Offset from max chain length IK is blended in
         public Vector3 BoneTargetOffset { get; set; }                   // Target offset after src is found
+        public GameObject PoleTarget { get; set; }
         public float BendAngleMinFadeOut { get; set; } = 20;            // Degree angle for which foot will be considered 'not placed down'
         private Vector3 ikTarget;                                       // Target stored between frames
+        private Quaternion ikTargetOrient;
         private float ikWeight = 0.0f;
         
         public IK_FABRIK_Constraint.JointParams[] Joints
@@ -118,10 +120,19 @@ namespace Concussion_Ball.Assets.Scripts
             else
                 return IK.LastPoseTransform;
         }
+        private float AngleDiff(Quaternion q, Quaternion q2)
+        {
+            float half = (Quaternion.Conjugate(q) * q2).w;
+            return Math.Abs(half) > 0.9999f ? (float)Math.PI : 2.0f * (float)Math.Acos(half);
+        }
 
         public override void Update()
         {
             base.Update();
+            if (PoleTarget != null)
+                IK.PoleTarget = PoleTarget.transform.localPosition;
+
+
             Matrix inv = Matrix.Invert(gameObject.transform.world);
             Quaternion orient = MathEngine.ExtractRotation(inv) * Orient;
             Vector3 target = Vector3.Transform(Target, inv);
@@ -164,18 +175,39 @@ namespace Concussion_Ball.Assets.Scripts
             Vector3 s, t;
             Quaternion r;
             if(mFoot.Decompose(out s, out r, out t)) { }
+            /* Resolve custom targeting
+            */
+            float minimalDistanceTraversal = 0.03f; float clampDistanceTraversal = 0.3f;
+            float minimalAngleTraversal = 0.08f; float clampRotation = 0.3f;
+            Vector3 diff = target - ikTarget;
+            float distance = diff.Length();
+            float targetSmooth = Math.Max(0.0f, distance - minimalDistanceTraversal) / clampDistanceTraversal;
+            targetSmooth = (Math.Min(1.0f - minimalDistanceTraversal, targetSmooth * targetSmooth) * distance)  + minimalDistanceTraversal;
+            target = ikTarget + diff * targetSmooth;
+
+            float angleDiff = AngleDiff(orient, ikTargetOrient);
+            float angleSmooth = Math.Max(0.0f, distance - minimalAngleTraversal) / clampRotation;
+            angleSmooth = (Math.Min(1.0f - minimalAngleTraversal, targetSmooth * targetSmooth) + minimalAngleTraversal) * angleDiff;
+            angleSmooth = MathHelper.Clamp(angleSmooth, 0.0f, 1.0f);
+            orient = Quaternion.Slerp(ikTargetOrient, orient,  angleSmooth);
+
+            /* Apply targets
+            */
 
             ikWeight = blendInFactor();
             ikTarget = Vector3.Lerp(t, target, ikWeight);
+            ikTargetOrient = Quaternion.Slerp(r, orient, ikWeight);
             IK.Target = ikTarget;
-            IK.Orientation = Quaternion.Slerp(r, orient, ikWeight);
+            IK.Orientation = ikTargetOrient;
             //IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);
             //IK.OrientationWeight = ikWeight; // blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
 
             if (tick++ > 5)
             {
                 tick = 0;
-                Debug.Log(ikWeight);
+                //Debug.Log(ikWeight);
+                //Debug.LogWarning(distance - targetSmooth);
+                //Debug.LogWarning(angleDiff - angleSmooth);
             }
         }
         private int tick = 0;

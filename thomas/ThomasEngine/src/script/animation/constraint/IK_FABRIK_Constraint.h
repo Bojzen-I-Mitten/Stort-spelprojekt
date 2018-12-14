@@ -25,12 +25,14 @@ namespace ThomasEngine
 				Vector3 rotation;		// Boundary orientation offset (rotation)
 				float limit_bend;
 				float limit_twist;
+				float pole_influence;
 				uint32_t joint_type;
 				float paramA;
 
 				property Vector3 Orientation { void set(Vector3 value) { rotation = value; } Vector3 get() { return rotation; } }
 				property float Limit_bend { void set(float value) { limit_bend = value; } float get() { return limit_bend; } }
 				property float Limit_twist { void set(float value) { limit_twist = value; } float get() { return limit_twist; } }
+				property float Pole_Influence { void set(float value) { pole_influence = value; } float get() { return pole_influence; } }
 				property float ParamA { void set(float value) { paramA = value; } float get() { return paramA; } }
 				property uint32_t JointType { void set(uint32_t value) { joint_type = value; } uint32_t get() { return joint_type; } }
 
@@ -50,6 +52,10 @@ namespace ThomasEngine
 			property Quaternion Orientation {
 				Quaternion get();
 				void set(Quaternion rot);
+			}
+			property Vector3 PoleTarget {
+				Vector3 get();
+				void set(Vector3 mode);
 			}
 			/* Weight over IK influence over the animated bone chain.
 			*/

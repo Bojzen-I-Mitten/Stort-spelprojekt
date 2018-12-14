@@ -191,9 +191,11 @@ public class GroundOffset : ScriptComponent
         Gizmos.DrawLine(p3, p0);
 
         // Draw ray samples
+        /*
         Gizmos.SetColor(Color.Red);
         for (int i = 0; i < m_foundSamples; i++)
             Gizmos.DrawLine(Src_Points[i], Points[i]);
+       //*/
     }
 
 }

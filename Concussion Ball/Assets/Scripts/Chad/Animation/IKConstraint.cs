@@ -13,6 +13,7 @@ public class IKConstraint : ScriptComponent
 {
     public string BoneName { get; set; }        // Name of the bone constraint is added to
     public GameObject Target { get; set; }      // LookAt target
+    public GameObject PoleTarget { get; set; }
     public uint ChainLength
     {
         get { return IK.NumLinks; }
@@ -85,6 +86,8 @@ public class IKConstraint : ScriptComponent
 
     public override void Update()
     {
+        if (PoleTarget != null)
+            IK.PoleTarget = PoleTarget.transform.localPosition;
         if (Target != null)
         {
             IK.Target = Target.transform.localPosition;

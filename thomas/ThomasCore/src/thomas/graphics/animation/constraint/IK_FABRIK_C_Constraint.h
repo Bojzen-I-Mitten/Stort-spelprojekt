@@ -20,6 +20,7 @@ namespace thomas {
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
 					float paramA = 1.f;
+					float pole_influence = 0.f;
 					uint32_t joint_type = 0;
 				};
 
@@ -39,6 +40,7 @@ namespace thomas {
 					math::Matrix backwardOrient = math::Matrix::Identity;	// Inverted orientation and rotated 180* over x
 					float limit_bend = math::PI / 2 - 0.01f * math::PI;
 					float limit_twist = math::PI / 4;
+					float pole_influence = 0.f;
 					float paramA = 1.f;
 					uint32_t joint_type = 0;
 
@@ -75,6 +77,7 @@ namespace thomas {
 
 				math::Vector3 m_target;					// Target in object space.
 				math::Quaternion m_targetOrient;		// Orientation at target
+				math::Vector3 m_poleTarget;
 				math::Matrix m_originalTransform;		// Pose transform for original target
 				float m_weight;							// IK weight for target point
 				float m_orientationWeight;				// IK weight for orientation
