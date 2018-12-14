@@ -8,9 +8,9 @@ namespace thomas
 	{
 		namespace profiling
 		{
-			long long ProfileManager::s_fps;
+			std::vector<long long> ProfileManager::s_fps;
 			std::map<std::string, std::map<std::string, std::vector<ProfileManager::Stamp>>> ProfileManager::s_samples;
-			long long ProfileManager::s_gpuSamples;
+			std::vector<long long> ProfileManager::s_gpuSamples;
 			float ProfileManager::s_ramusage;
 			std::map<std::string, std::vector<float>> ProfileManager::s_vramusage;
 			float ProfileManager::s_vramTotal;
@@ -32,29 +32,35 @@ namespace thomas
 				
 				tracktime = std::chrono::high_resolution_clock::now();
 
-				s_fps = frametime.count();
+				s_fps.push_back(frametime.count());
 
 				s_frames++;
 			}
 
 			void ProfileManager::storeSample(std::string name, long long elapsedTime, long long startTime, DWORD processor_id)
 			{
-				/*s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));*/
+#ifdef PERFORMANCE
+				s_samples[std::to_string((int)processor_id)][name].push_back(std::move(Stamp(elapsedTime, startTime, s_frames)));
+#endif 
 			}
 
 			void ProfileManager::storeGpuSample(long long gpuTime)
 			{
+#ifdef PERFORMANCE
 				if (gpuTime < 0)
-					s_gpuSamples = 0;
+					s_gpuSamples.push_back(0);
 
-				s_gpuSamples = gpuTime;
+				s_gpuSamples.push_back(gpuTime);
+#endif 
 			}
 
 			void ProfileManager::storeVramSample(std::string name, float usage)
 			{
-				/*s_profileLock.lock();
+#ifdef MEMORY
+				s_profileLock.lock();
 				s_vramusage[name].push_back(usage);
-				s_profileLock.unlock();*/
+				s_profileLock.unlock();
+#endif // MEMORY
 			}
 
 			void ProfileManager::increaseContextSwitches()
@@ -149,16 +155,24 @@ namespace thomas
 
 			void ProfileManager::setRAMUsage(float usage)
 			{
+#ifdef MEMORY
 				s_ramusage = usage;
+#endif
 			}
 			float ProfileManager::getRAMUsage()
 			{
+#ifdef MEMORY
 				return s_ramusage - s_vramTotal;
+#else
+				return 0.0f;
+#endif
 			}
 
 			void ProfileManager::setVRAMUsage(float total)
 			{
+#ifdef MEMORY
 				s_vramTotal = total;
+#endif
 			}
 
 		}

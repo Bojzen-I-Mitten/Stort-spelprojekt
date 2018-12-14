@@ -8,7 +8,8 @@
 #include <atomic>
 #include "..\..\..\include\nlohmann\json.hpp"
 #include "..\utils\atomic\Synchronization.h"
-#define BENCHMARK
+#define MEMORY
+//#define PERFORMANCE
 
 namespace thomas
 {
@@ -36,9 +37,9 @@ namespace thomas
 				};
 
 			private:
-				static long long s_fps;
+				static std::vector<long long> s_fps;
 				static std::map<std::string, std::map<std::string, std::vector<Stamp>>> s_samples;
-				static long long s_gpuSamples;
+				static std::vector<long long> s_gpuSamples;
 				static float s_ramusage;
 				static std::map<std::string, std::vector<float>> s_vramusage;
 				static float s_vramTotal;

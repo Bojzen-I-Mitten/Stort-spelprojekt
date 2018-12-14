@@ -118,12 +118,12 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
-#ifdef BENCHMARK
+#ifdef MEMORY
 		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
 
-		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetTotalMemory());
+		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetCurrentMemory());
 #endif
 
 	}
@@ -162,7 +162,7 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
-#ifdef BENCHMARK
+#ifdef PERFORMANCE
 			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
 			float gpuTime = utils::profiling::GpuProfiler::Instance()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
@@ -448,15 +448,14 @@ namespace ThomasEngine {
 		}
 
 
-#ifdef BENCHMARK
+
 		WaitLogOutput = gcnew ManualResetEvent(false);
 		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
 		ThreadPool::QueueUserWorkItem(logOut);
-#endif
+
 		delete Thomas;				// Delete the thomas instance, unload scene...
-#ifdef BENCHMARK
+
 		WaitLogOutput->WaitOne();
-#endif
 	}
 
 	void ThomasWrapper::DumpProfilerLog(System::Object^ stateInfo)
