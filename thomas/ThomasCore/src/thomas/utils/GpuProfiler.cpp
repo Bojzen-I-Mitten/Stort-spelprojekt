@@ -90,7 +90,7 @@ namespace thomas
 				m_frameQuery = (m_frameQuery + 1) % FRAME_BUFFERS; 
 			}
 
-			void profiling::GpuProfiler::AddDrawCall(size_t faceCount, size_t vertexCount)
+			void profiling::GpuProfiler::AddDrawCall(int faceCount, int vertexCount)
 			{
 				m_totalVertexCount += vertexCount;
 				m_totalFaceCount += faceCount;
@@ -184,7 +184,11 @@ namespace thomas
 
 			float profiling::GpuProfiler::GetCurrentMemory()
 			{
-				return m_memoryUsage;
+				DXGI_QUERY_VIDEO_MEMORY_INFO info;
+				utils::D3D::Instance()->GetDxgiAdapter()->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &info);
+				float usage = float(info.CurrentUsage);
+
+				return usage / 1024.0f / 1024.0f;
 			}
 
 			int profiling::GpuProfiler::GetNumberOfDrawCalls()

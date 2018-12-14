@@ -156,7 +156,7 @@ namespace thomas
 			void ProfileManager::setRAMUsage(float usage)
 			{
 #ifdef MEMORY
-				s_ramusage = usage;
+				s_ramusage = (usage - s_vramTotal);
 #endif
 			}
 			float ProfileManager::getRAMUsage()

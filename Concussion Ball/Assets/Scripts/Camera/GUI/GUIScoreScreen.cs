@@ -8,7 +8,6 @@ using System.Collections.Generic;
 public class GUIScoreScreen : ScriptComponent
 {
     public static GUIScoreScreen Instance = null;
-    Camera cam;
     public Canvas Canvas;
     public int ScoreScreenTimeLast { get; set; } = 10;
     public int Timer;

@@ -428,8 +428,8 @@ public class GUIOptionsMenu : ScriptComponent
         ChadCam.instance.CameraSensitivity_y = ImageBar[(int)ImageBarstate.Movement].numbervalue;
 
         //load onoff fullscreen
-        fullscreen = Wcontroller.getFullscreen();
-        borderless = Wcontroller.getBorderless();
+        fullscreen = Wcontroller.GetFullscreen();
+        borderless = Wcontroller.GetBorderless();
         string settingsFullscreen = UserSettings.GetSetting("Fullscreen");
         if (settingsFullscreen != null)
         {
@@ -497,10 +497,10 @@ public class GUIOptionsMenu : ScriptComponent
                   */
         //      ClearImagesAndText();
         string Update;
-        Update = Wcontroller.getFullscreen().ToString();
+        Update = Wcontroller.GetFullscreen().ToString();
 //        Debug.Log(Update);
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-        Update = Wcontroller.getBorderless().ToString();
+        Update = Wcontroller.GetBorderless().ToString();
 //        Debug.Log(Update);
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 

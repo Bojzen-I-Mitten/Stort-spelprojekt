@@ -37,7 +37,7 @@ namespace thomas
 				void BeginFrame();
 				void Timestamp(GTS gts);
 				void EndFrame();
-				void AddDrawCall(size_t faceCount, size_t vertexCount);
+				void AddDrawCall(int faceCount, int vertexCount);
 
 				// Wait on GPU for last frame's data (not this frame's) to be available
 				void RetriveTimeStamps();
