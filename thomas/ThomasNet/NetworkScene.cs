@@ -133,6 +133,9 @@ namespace ThomasEngine.Network
                     amINewOwner = false;
             }
 
+            if (amINewOwner)
+                NetworkManager.instance.ServerOwner = true;
+
             //If i got the lowest time. I will own the objects.
             if (ObjectOwners.ContainsKey(peer))
             {

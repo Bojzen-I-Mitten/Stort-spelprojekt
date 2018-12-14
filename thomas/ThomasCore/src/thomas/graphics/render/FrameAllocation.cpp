@@ -41,7 +41,7 @@ namespace thomas{
 				unsigned int index = m_alloc.size();
 				for (unsigned int i = 0; i < num; i++) {
 					m_alloc.push_back(alloc[i]);
-					copy(m_alloc[i]);
+					copy(m_alloc[index + i]);
 				}
 				return &m_alloc[index];
 			}
