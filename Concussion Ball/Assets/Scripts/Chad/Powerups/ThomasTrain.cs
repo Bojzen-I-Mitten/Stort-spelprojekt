@@ -10,9 +10,6 @@ public class ThomasTrain : Powerup
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterThomasFace;
     private ParticleEmitter emitterSpark;
-    public Texture2D fireTexture { get; set; }
-    public Texture2D thomasTexture { get; set; }
-    public Texture2D sparkTexture { get; set; }
 
     private SoundComponent soundComponentChargeUp;
     private SoundComponent soundComponentTravel;
@@ -74,27 +71,31 @@ public class ThomasTrain : Powerup
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
 
-        emitterFire.Texture = fireTexture;
+        Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (fireTex != null)
+            emitterFire.Texture = fireTex;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
-        emitterFire.MinSize = 6.0f;
-        emitterFire.MaxSize = 8.0f;
-        emitterFire.EndSize = 3.0f;
+        emitterFire.MinSize = 4.0f;
+        emitterFire.MaxSize = 5.0f;
+        emitterFire.EndSize = 2.0f;
         emitterFire.MinLifeTime = 0.1f;
-        emitterFire.MaxLifeTime = 1.7f;
+        emitterFire.MaxLifeTime = 1.0f;
         emitterFire.EmissionRate = 10;
         emitterFire.MinRotationSpeed = -2.0f;
         emitterFire.MaxRotationSpeed = 2.0f;
-        emitterFire.MinSpeed = 0.5f;
-        emitterFire.MaxSpeed = 1.0f;
-        emitterFire.EndSpeed = -6.0f;
+        emitterFire.MinSpeed = 5.0f;
+        emitterFire.MaxSpeed = 5.0f;
+        emitterFire.EndSpeed = -10.0f;
         emitterFire.DistanceFromSphereCenter = 0.0f;
         emitterFire.SpawnAtEdge = true;
-        emitterFire.Radius = 4.2f;
-
-        emitterThomasFace.Texture = thomasTexture;
-        emitterThomasFace.MinSize = 5.0f;
-        emitterThomasFace.MaxSize = 5.0f;
-        emitterThomasFace.EndSize = 3.0f;
+        emitterFire.Radius = 1.2f;
+   
+        Texture2D thomasTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/thomas_particle.png");
+        if (thomasTex != null)
+            emitterThomasFace.Texture = thomasTex; 
+        emitterThomasFace.MinSize = 2.0f;
+        emitterThomasFace.MaxSize = 3.0f;
+        emitterThomasFace.EndSize = 5.0f;
         emitterThomasFace.MaxLifeTime = 1.5f;
         emitterThomasFace.MinLifeTime = 1.5f;
         emitterThomasFace.MinRotationSpeed = 5.0f;
@@ -103,10 +104,12 @@ public class ThomasTrain : Powerup
         emitterThomasFace.MinSpeed = 0;
         emitterThomasFace.EndSpeed = 0;
 
-        emitterSpark.Texture = sparkTexture;
-        emitterSpark.MinSize = 0.6f;
-        emitterSpark.MaxSize = 1.4f;
-        emitterSpark.EndSize = 0.02f;
+        Texture2D sparkTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/spark_particle.png");
+        if (sparkTex != null)
+            emitterSpark.Texture = sparkTex; 
+        emitterSpark.MinSize = 0.8f;
+        emitterSpark.MaxSize = 1.7f;
+        emitterSpark.EndSize = 0.2f;
         emitterSpark.MaxLifeTime = 0.5f;
         emitterSpark.MinLifeTime = 0.5f;
         emitterSpark.MinRotationSpeed = 5.0f;

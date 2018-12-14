@@ -6,10 +6,7 @@ using System.Linq;
 public class Vindaloo : Powerup
 {
     ChadControls ObjectOwner = null;
-
-    public Texture2D fireTexture { get; set; }
-    public Texture2D smokeTexture { get; set; }
-    public Texture2D gravelTexture { get; set; }
+    
 
     public AudioClip VindalooExplosionSound { get; set; }
 
@@ -67,7 +64,7 @@ public class Vindaloo : Powerup
         emitterFire.Radius = 1.0f;
         emitterFire.Gravity = 0.0f;
         emitterFire.SpawnAtEdge = false;
-        emitterFire.Texture = fireTexture;
+        
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
 
         emitterGravel = gameObject.AddComponent<ParticleEmitter>();
@@ -86,11 +83,11 @@ public class Vindaloo : Powerup
         emitterGravel.Radius = 0.2f;
         emitterGravel.Gravity = 4.0f;
         emitterGravel.SpawnAtEdge = false;
-        emitterGravel.Texture = gravelTexture;
+        
         
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
 
-        emitterSmoke.Texture = smokeTexture;
+        
 
         emitterSmoke.MinSize = 0.5f;
         emitterSmoke.MaxSize = 0.7f;
@@ -106,8 +103,23 @@ public class Vindaloo : Powerup
         emitterSmoke.DistanceFromSphereCenter = 0.7f;
         emitterSmoke.Radius = 1.7f;
         emitterGravel.SpawnAtEdge = false;
+
+
+        Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (fireTex.height > 0)
+            emitterFire.Texture = fireTex;
+        Texture2D smokeTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/smoke_particle.png");
+        if (smokeTex.height > 0)
+            emitterSmoke.Texture = smokeTex;
+        Texture2D nuggetTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/nugget_particle.png");
+        if (nuggetTex.height > 0)
+            emitterGravel.Texture = nuggetTex;
+       
         #endregion
     }
+
+
+    
 
     public override void Update()
     {

@@ -13,9 +13,6 @@ public class Gramophone : Powerup
     Collider _FirstCollider;
 
     public LightComponent PointBoi { get; set; }
-    public Texture2D _NoteTex1 { get; set; }
-    public Texture2D _NoteTex2 { get; set; }
-    public Texture2D _ShockWaveTex { get; set; }
 
     public AudioClip GramophoneSound { get; set; }
     private SoundComponent GramophoneClip;
@@ -72,8 +69,8 @@ public class Gramophone : Powerup
 
         #region big meme particle emitter bois
         _Note1 = gameObject.AddComponent<ParticleEmitter>();
-        if (_NoteTex1 != null)
-            _Note1.Texture = _NoteTex1;
+        
+        _Note1.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/note1_particle.png"); 
         _Note1.MinSize = 0.2f;
         _Note1.MaxSize = 0.5f;
         _Note1.EndSize = 0.5f;
@@ -92,8 +89,8 @@ public class Gramophone : Powerup
         _Note1.BlendState = ParticleEmitter.BLEND_STATES.ALPHA;
 
         _Note2 = gameObject.AddComponent<ParticleEmitter>();
-        if (_NoteTex2 != null)
-            _Note2.Texture = _NoteTex2;
+      
+        _Note2.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/note2_particle.png"); 
         _Note2.MinSize = 0.2f;
         _Note2.MaxSize = 0.5f;
         _Note2.EndSize = 0.5f;
@@ -112,8 +109,8 @@ public class Gramophone : Powerup
         _Note2.BlendState = ParticleEmitter.BLEND_STATES.ALPHA;
 
         _ShockWave = gameObject.AddComponent<ParticleEmitter>();
-        if (_ShockWaveTex != null)
-            _ShockWave.Texture = _ShockWaveTex;
+        
+        _ShockWave.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/shockwave_particle.png");
         _ShockWave.MinSize = 0.0f;
         _ShockWave.MaxSize = 0.0f;
         _ShockWave.EndSize = 4.0f;

@@ -8,9 +8,9 @@ public class Ball : PickupableObject
 {
     public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
 
-    private ParticleEmitter emitterElectricity1;
-    private ParticleEmitter emitterElectricity2;
-    private ParticleEmitter emitterElectricity3;
+   // private ParticleEmitter emitterElectricity1;
+   // private ParticleEmitter emitterElectricity2;
+  //  private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
 
@@ -62,20 +62,24 @@ public class Ball : PickupableObject
         pointLight.DiffuseColor = Color.OrangeRed;
 
         #region Init emitters
-        emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
-        emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
-        emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
+       // emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
+       // emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
+       // emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
 
        // emitterElectricity1.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el1.png");
         //emitterElectricity2.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el2.png");
         //emitterElectricity3.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el3.png");
-        emitterSmoke.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/SmokeParticle.png");
-        emitterFire.Texture =  (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire2.png");//fireTex;
+        Texture2D smokeTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/smoke_particle.png");
+        if (smokeTex.height > 0)
+            emitterSmoke.Texture = smokeTex;
+        Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (fireTex.width > 0)
+            emitterFire.Texture = fireTex;
 
         ResetFireEmitters();
-        ResetElectricityEmitters();
+       // ResetElectricityEmitters();
 
         
         #endregion
@@ -124,7 +128,7 @@ public class Ball : PickupableObject
         pointLight.Intensity = 0;
     }
 
-    private void ResetElectricityEmitters()
+   /* private void ResetElectricityEmitters()
     {
         electricityIntensifyerThreshold = 0.3f;
 
@@ -180,7 +184,7 @@ public class Ball : PickupableObject
         emitterElectricity2.Emit = false;
         emitterElectricity3.Emit = false;
 
-    }
+    }*/
 
     private void MultiplyWithIntensity(float intensity, ParticleEmitter emitter)
     {
@@ -189,7 +193,7 @@ public class Ball : PickupableObject
         emitter.EndSize *= intensity;
         emitter.MinLifeTime *= intensity;
         emitter.MaxLifeTime *= intensity;
-        emitter.EmissionRate = (uint)MathHelper.Max(((float)emitterElectricity3.EmissionRate * intensity), 0.0f);
+        emitter.EmissionRate = (uint)MathHelper.Max(((float)emitter.EmissionRate * intensity), 0.0f);
         emitter.MinRotationSpeed *= intensity;
         emitter.MaxRotationSpeed *= intensity;
         emitter.MinSpeed *= intensity;
@@ -213,7 +217,7 @@ public class Ball : PickupableObject
         }
 
         
-        ResetElectricityEmitters();
+        //ResetElectricityEmitters();
         ResetFireEmitters();
     }
     #endregion
@@ -295,9 +299,9 @@ public class Ball : PickupableObject
 
             if (interp > electricityIntensifyerThreshold)
             {
-                MultiplyWithIntensity(1.25f, emitterElectricity1);
-                MultiplyWithIntensity(1.25f, emitterElectricity2);
-                MultiplyWithIntensity(1.25f, emitterElectricity3);
+                //MultiplyWithIntensity(1.25f, emitterElectricity1);
+                //MultiplyWithIntensity(1.25f, emitterElectricity2);
+               // MultiplyWithIntensity(1.25f, emitterElectricity3);
 
                 electricityIntensifyerThreshold += 0.1f;
             }
@@ -355,6 +359,6 @@ public class Ball : PickupableObject
         yield return new WaitForSeconds(2.0f);
         
         ResetFireEmitters();
-        ResetElectricityEmitters();
+       // ResetElectricityEmitters();
     }
 }
