@@ -20,7 +20,7 @@ public class GroundOffset : ScriptComponent
     private int m_maskGround;                   // Mask index for tracing ground
     protected uint m_traceBoneIndex;            // Index for raytraced bone
     protected RenderSkinnedComponent m_rC;      // Render component used as animation src
-    const int MAX_SAMPLES = 5;                  // Number of samples (hardcoded)
+    const int MAX_SAMPLES = 9;                  // Number of samples (hardcoded)
     /* Trace information
      */
     private int m_foundSamples = 0;
@@ -130,6 +130,10 @@ public class GroundOffset : ScriptComponent
         Src_Points[s++] = m.Translation + m.Down * OffsetForward + Vector3.Up * OffsetCast;       // Heel
         Src_Points[s++] = m.Translation + m.Right * OffsetSide + Vector3.Up * OffsetCast;         // Left side
         Src_Points[s++] = m.Translation + m.Left * OffsetSide + Vector3.Up * OffsetCast;          // Right side
+        Src_Points[s++] = m.Translation + (m.Up * OffsetForward + Vector3.Up * OffsetCast + m.Right * OffsetSide + Vector3.Up * OffsetCast) * 0.66f;      // UR
+        Src_Points[s++] = m.Translation + (m.Up * OffsetForward + Vector3.Up * OffsetCast + m.Left * OffsetSide + Vector3.Up * OffsetCast) * 0.66f;       // UL
+        Src_Points[s++] = m.Translation + (m.Down * OffsetForward + m.Right * OffsetSide + Vector3.Up * OffsetCast) * 0.66f;                              // BR
+        Src_Points[s++] = m.Translation + (m.Down * OffsetForward + m.Left * OffsetSide + Vector3.Up * OffsetCast) * 0.66f;                               // BL
         m_foundSamples = 0;
         for (int i = 0; i < MAX_SAMPLES; i++)
         {

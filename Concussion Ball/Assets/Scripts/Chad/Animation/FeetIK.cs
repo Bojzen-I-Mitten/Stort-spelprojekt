@@ -77,7 +77,8 @@ namespace Concussion_Ball.Assets.Scripts
             //    ikBoneIndex = 0;
             IK.apply(m_rC, m_traceBoneIndex);
             IK.Weight = 1.0f; ikTargetWeight = 0.0f; ikFromWeight = 0.0f;
-            IK.OrientationWeight = 1.0f; ikOrientWeight = 0.0f;
+            IK.OrientationWeight = 1.0f;
+            ikOrientWeight = 0.0f;
             ikOrientWeight = 0.0f;
         }
 
@@ -122,10 +123,9 @@ namespace Concussion_Ball.Assets.Scripts
         {
             base.Update();
             Matrix inv = Matrix.Invert(gameObject.transform.world);
-            Quaternion orient = Orient * MathEngine.ExtractRotation(inv);
+            Quaternion orient = MathEngine.ExtractRotation(inv) * Orient;
             Vector3 target = Vector3.Transform(Target, inv);
             target += Vector3.Transform(BoneTargetOffset, orient);
-            ikTarget = target;
 
             Matrix mFoot = fetchTransform();
             float angle = Math.Abs(MathHelper.ToDegrees((float)Math.Acos(Vector3.Dot(mFoot.Up, Vector3.Up))) - 90);
@@ -166,7 +166,8 @@ namespace Concussion_Ball.Assets.Scripts
             if(mFoot.Decompose(out s, out r, out t)) { }
 
             ikWeight = blendInFactor();
-            IK.Target = Vector3.Lerp(t, target, ikWeight);
+            ikTarget = Vector3.Lerp(t, target, ikWeight);
+            IK.Target = ikTarget;
             IK.Orientation = Quaternion.Slerp(r, orient, ikWeight);
             //IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);
             //IK.OrientationWeight = ikWeight; // blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
