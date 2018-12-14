@@ -6,17 +6,14 @@ using System.Linq;
 public class Vindaloo : Powerup
 {
     ChadControls ObjectOwner = null;
+    
 
-    public Texture2D fireTexture { get; set; }
-    public Texture2D fire2Texture { get; set; }
-    public Texture2D smokeTexture { get; set; }
-    public Texture2D gravelTexture { get; set; }
     public AudioClip VindalooExplosionSound { get; set; }
 
     private ParticleEmitter emitterFire;
-    private ParticleEmitter emitterFire2;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterGravel;
+
     private SoundComponent ExplosionSound;
     private float _DespawnTimer;
 
@@ -45,6 +42,10 @@ public class Vindaloo : Powerup
         ExplosionSound.MaxDistance = 10000;
         ExplosionSound.MinDistance = 20;
 
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
+
         #region big meme particle emitter bois
 
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
@@ -63,7 +64,7 @@ public class Vindaloo : Powerup
         emitterFire.Radius = 1.0f;
         emitterFire.Gravity = 0.0f;
         emitterFire.SpawnAtEdge = false;
-        emitterFire.Texture = fireTexture;
+        
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
 
         emitterGravel = gameObject.AddComponent<ParticleEmitter>();
@@ -82,29 +83,11 @@ public class Vindaloo : Powerup
         emitterGravel.Radius = 0.2f;
         emitterGravel.Gravity = 4.0f;
         emitterGravel.SpawnAtEdge = false;
-        emitterGravel.Texture = gravelTexture;
-
-        emitterFire2 = gameObject.AddComponent<ParticleEmitter>();
-        emitterFire2.MinSize = 0.1f;
-        emitterFire2.MaxSize = 0.2f;
-        emitterFire2.EndSize = 0.05f;
-        emitterFire2.MinLifeTime = 0.4f;
-        emitterFire2.MaxLifeTime = 1.3f;
-        emitterFire2.EmissionRate = 100;
-        emitterFire2.MinRotationSpeed = -2.0f;
-        emitterFire2.MaxRotationSpeed = 3.0f;
-        emitterFire2.MinSpeed = 13.5f;
-        emitterFire2.MaxSpeed = 18.0f;
-        emitterFire2.EndSpeed = 0.0f;
-        emitterFire2.DistanceFromSphereCenter = 0.3f;
-        emitterFire2.Radius = 0.2f;
-        emitterFire2.Gravity = 8.0f;
-        emitterFire2.SpawnAtEdge = false;
-        emitterFire2.Texture = fire2Texture;
-
+        
+        
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
 
-        emitterSmoke.Texture = smokeTexture;
+        
 
         emitterSmoke.MinSize = 0.5f;
         emitterSmoke.MaxSize = 0.7f;
@@ -120,8 +103,23 @@ public class Vindaloo : Powerup
         emitterSmoke.DistanceFromSphereCenter = 0.7f;
         emitterSmoke.Radius = 1.7f;
         emitterGravel.SpawnAtEdge = false;
+
+
+        Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (fireTex.height > 0)
+            emitterFire.Texture = fireTex;
+        Texture2D smokeTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/smoke_particle.png");
+        if (smokeTex.height > 0)
+            emitterSmoke.Texture = smokeTex;
+        Texture2D nuggetTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/nugget_particle.png");
+        if (nuggetTex.height > 0)
+            emitterGravel.Texture = nuggetTex;
+       
         #endregion
     }
+
+
+    
 
     public override void Update()
     {
@@ -129,7 +127,10 @@ public class Vindaloo : Powerup
 
         // Despawn if Vindaloo has not hit anyone in 30 seconds
         if (_DespawnTimer > 30)
+        {
+            _DespawnTimer = 0.0f;
             base.Activate();
+        }
         else if (_DespawnTimer > 0)
             _DespawnTimer += Time.DeltaTime;
         
@@ -148,26 +149,6 @@ public class Vindaloo : Powerup
         ObjectOwner = chad;
     }
 
-    //public override void OnCollisionEnter(Collider collider)
-    //{
-    //    //Check if colliding with a player
-    //    ChadControls otherChad = collider.gameObject.GetComponent<ChadControls>();
-    //    if (!otherChad)
-    //    { 
-    //        base.OnCollisionEnter(collider);
-    //    }
-    //    else
-    //    {
-    //        ChadControls localChad = MatchSystem.instance.LocalChad;
-
-    //        TEAM_TYPE playerTeam = MatchSystem.instance.GetPlayerTeam(ObjectOwner.gameObject);
-    //        TEAM_TYPE otherPlayerTeam = MatchSystem.instance.GetPlayerTeam(collider.gameObject);
-
-    //        if (localChad && (otherPlayerTeam != playerTeam))
-    //            base.OnCollisionEnter(collider);
-    //    }
-        
-    //}
 
     // this function will be called upon powerup use / collision after trown
     public override void OnActivate()
@@ -197,6 +178,7 @@ public class Vindaloo : Powerup
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 param.bodyPartFactor[(int)Ragdoll.BODYPART.SPINE] = 0.88f;
                 localChad.ActivateRagdoll(2.0f, param);
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.EXPLODED);
             }
         }
 
@@ -208,8 +190,7 @@ public class Vindaloo : Powerup
         // Play the vindaloo explosion sound
         ExplosionSound.Play();
 
-        emitterFire.EmitOneShot(25);
-        emitterFire2.EmitOneShot(45);
+        emitterFire.EmitOneShot(35);
         emitterGravel.EmitOneShot(20);
         emitterSmoke.EmitOneShot(50);
 
@@ -224,5 +205,11 @@ public class Vindaloo : Powerup
         yield return null;
 
         Remove();
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        _DespawnTimer = 0.0f;
     }
 }

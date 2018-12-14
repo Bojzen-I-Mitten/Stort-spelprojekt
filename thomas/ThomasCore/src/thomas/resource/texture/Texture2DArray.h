@@ -13,7 +13,7 @@ namespace thomas
 		private:
 			
 		public:
-			Texture2DArray(unsigned width, unsigned height, DXGI_FORMAT format, unsigned nrOfTextures = 1u, bool isDepthTexture = false);
+			Texture2DArray(unsigned dim, DXGI_FORMAT format, unsigned nrOfTextures = 1u, bool isDepthTexture = false);
 			virtual ~Texture2DArray();
 
 			void UnloadTextures();
@@ -22,7 +22,6 @@ namespace thomas
 			unsigned AddTexture(Texture2D* tex);
 
 			void OnChanged();
-			void UpdateTextures();
 		private:
 			std::vector<Texture2D*> m_referenceTextures;//stores a comparison address
 			std::vector<Texture2D*> m_textures;

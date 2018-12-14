@@ -10,9 +10,6 @@ public class ThomasTrain : Powerup
     private ParticleEmitter emitterFire;
     private ParticleEmitter emitterThomasFace;
     private ParticleEmitter emitterSpark;
-    public Texture2D fireTexture { get; set; }
-    public Texture2D thomasTexture { get; set; }
-    public Texture2D sparkTexture { get; set; }
 
     private SoundComponent soundComponentChargeUp;
     private SoundComponent soundComponentTravel;
@@ -26,7 +23,8 @@ public class ThomasTrain : Powerup
     public float ExplosionForce { get; set; }
 
     private float soundcooldown;
-    private float _DespawnTimer; 
+    private bool hasPlayedChargeSound;
+    private float _DespawnTimer;
 
     public override void OnAwake()
     {
@@ -64,32 +62,40 @@ public class ThomasTrain : Powerup
 
         m_throwable = true; // change depending on power-up
 
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.1f;
+
         #region emitters
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
         emitterThomasFace = gameObject.AddComponent<ParticleEmitter>();
         emitterSpark = gameObject.AddComponent<ParticleEmitter>();
-        
-        emitterFire.Texture = fireTexture;
+
+        Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (fireTex != null)
+            emitterFire.Texture = fireTex;
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
         emitterFire.MinSize = 4.0f;
-        emitterFire.MaxSize = 6.0f;
-        emitterFire.EndSize = 0.0f;
+        emitterFire.MaxSize = 5.0f;
+        emitterFire.EndSize = 2.0f;
         emitterFire.MinLifeTime = 0.1f;
-        emitterFire.MaxLifeTime = 1.7f;
+        emitterFire.MaxLifeTime = 1.0f;
         emitterFire.EmissionRate = 10;
         emitterFire.MinRotationSpeed = -2.0f;
         emitterFire.MaxRotationSpeed = 2.0f;
-        emitterFire.MinSpeed = 0.5f;
-        emitterFire.MaxSpeed = 1.0f;
-        emitterFire.EndSpeed = -6.0f;
+        emitterFire.MinSpeed = 5.0f;
+        emitterFire.MaxSpeed = 5.0f;
+        emitterFire.EndSpeed = -10.0f;
         emitterFire.DistanceFromSphereCenter = 0.0f;
         emitterFire.SpawnAtEdge = true;
-        emitterFire.Radius = 5.2f;
-
-        emitterThomasFace.Texture = thomasTexture;
-        emitterThomasFace.MinSize = 5.0f;
-        emitterThomasFace.MaxSize = 5.0f;
-        emitterThomasFace.EndSize = 3.0f;
+        emitterFire.Radius = 1.2f;
+   
+        Texture2D thomasTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/thomas_particle.png");
+        if (thomasTex != null)
+            emitterThomasFace.Texture = thomasTex; 
+        emitterThomasFace.MinSize = 2.0f;
+        emitterThomasFace.MaxSize = 3.0f;
+        emitterThomasFace.EndSize = 5.0f;
         emitterThomasFace.MaxLifeTime = 1.5f;
         emitterThomasFace.MinLifeTime = 1.5f;
         emitterThomasFace.MinRotationSpeed = 5.0f;
@@ -98,10 +104,12 @@ public class ThomasTrain : Powerup
         emitterThomasFace.MinSpeed = 0;
         emitterThomasFace.EndSpeed = 0;
 
-        emitterSpark.Texture = sparkTexture;
-        emitterSpark.MinSize = 0.6f;
-        emitterSpark.MaxSize = 1.4f;
-        emitterSpark.EndSize = 0.02f;
+        Texture2D sparkTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/spark_particle.png");
+        if (sparkTex != null)
+            emitterSpark.Texture = sparkTex; 
+        emitterSpark.MinSize = 0.8f;
+        emitterSpark.MaxSize = 1.7f;
+        emitterSpark.EndSize = 0.2f;
         emitterSpark.MaxLifeTime = 0.5f;
         emitterSpark.MinLifeTime = 0.5f;
         emitterSpark.MinRotationSpeed = 5.0f;
@@ -118,11 +126,26 @@ public class ThomasTrain : Powerup
     public override void Update()
     {
         base.Update();
+
         soundcooldown -= Time.DeltaTime;
+        if (hasPlayedChargeSound)
+        {
+            if (!charging)
+            {
+                if (soundcooldown < 0.0f)
+                {
+                    hasPlayedChargeSound = false;
+                }
+            }
+        }
 
         // Despawn if Train has not hit anyone in 30 seconds
         if (_DespawnTimer > 30)
+        {
             base.Activate();
+            _DespawnTimer = 0.0f;
+        }
+            
         else if (_DespawnTimer > 0)
             _DespawnTimer += Time.DeltaTime;
     }
@@ -142,15 +165,16 @@ public class ThomasTrain : Powerup
         base.Cleanup();
         soundComponentChargeUp.Stop();
     }
-    
+
 
     public override void ChargeEffect()
     {
         base.ChargeEffect();
-        if (soundcooldown < 0.0f)
+        if (!hasPlayedChargeSound)
         {
-            soundcooldown = 1.0f;
             soundComponentChargeUp.Play();
+            hasPlayedChargeSound = true;
+            soundcooldown = 5.0f;
         }
     }
 
@@ -219,6 +243,7 @@ public class ThomasTrain : Powerup
                 Vector3 force = forceDir * ExplosionForce * distForce;
                 Ragdoll.ImpactParams param = new Ragdoll.ImpactParams(gameObject.transform.position, force, 0.0f);
                 localChad.ActivateRagdoll(2.0f, param);
+                AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.EXPLODED);
             }
         }
     }
@@ -245,5 +270,13 @@ public class ThomasTrain : Powerup
     {
         yield return null;//wait one frame to emit particles
         Remove();
+    }
+
+    public override void Reset()
+    {
+        base.Reset();
+        transform.scale = Vector3.One;
+    
+        _DespawnTimer = 0.0f;
     }
 }

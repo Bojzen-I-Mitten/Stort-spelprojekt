@@ -44,7 +44,7 @@ namespace thomas
 
 
 			s_shadowMapSize = 1024;
-			s_shadowMapTextures = new resource::Texture2DArray(s_shadowMapSize, s_shadowMapSize, DXGI_FORMAT_R32_TYPELESS, s_nrOfShadowMapsSupported, true);
+			s_shadowMapTextures = new resource::Texture2DArray(s_shadowMapSize, DXGI_FORMAT_R32_TYPELESS, s_nrOfShadowMapsSupported, true);
 
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC depthViewDesc = {};

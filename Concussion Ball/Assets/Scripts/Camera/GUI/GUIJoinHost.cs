@@ -44,15 +44,16 @@ public class GUIJoinHost : ScriptComponent
 
     public override void OnAwake()
     {
-    }
-
-    public override void Start()
-    {
         TakeIP = false;
         TakePort = false;
         Camera = gameObject.GetComponent<Camera>();
         AddImagesAndText();
         GoToTeamSelect = false;
+    }
+
+    public override void Start()
+    {
+        
 
 
     }
@@ -64,7 +65,7 @@ public class GUIJoinHost : ScriptComponent
 
         if (!hasConnected)
         {
-            CameraMaster.instance.State = CAM_STATE.SELECT_TEAM;
+            CameraMaster.instance.SetState(CAM_STATE.SELECT_TEAM);
             Join.interactable = true;
             hasConnected = true;
         }
@@ -84,15 +85,15 @@ public class GUIJoinHost : ScriptComponent
                 ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " timed out";
                 break;
             case DisconnectReason.ConnectionRejected:
-                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                CameraMaster.instance.SetState(CAM_STATE.JOIN_HOST);
                 ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " rejected";
                 break;
             case DisconnectReason.ConnectionFailed:
-                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                CameraMaster.instance.SetState(CAM_STATE.JOIN_HOST);
                 ConnectingText.text = "Failed to establish connection to\n" + peer.EndPoint.Address.ToString();
                 break;
             case DisconnectReason.SocketReceiveError:
-                CameraMaster.instance.State = CAM_STATE.JOIN_HOST;
+                CameraMaster.instance.SetState(CAM_STATE.JOIN_HOST);
                 ConnectingText.text = "Connection to peer " + peer.EndPoint.Address.ToString() + " failed, peer socket closed"; //Could be the other way around
                 break;
             case DisconnectReason.SocketSendError:
@@ -143,6 +144,7 @@ public class GUIJoinHost : ScriptComponent
             TakePort = false;
             ConnectingText.text = "";
             System.Net.IPAddress ipaddress;
+            UserSettings.AddOrUpdateAppSetting("LastUsedIP", IPText.text);
             try
             {
                 ipaddress = NetUtils.ResolveAddress(IPText.text);
@@ -196,8 +198,9 @@ public class GUIJoinHost : ScriptComponent
         {
             TakeIP = false;
             TakePort = false;
-            CameraMaster.instance.State = CAM_STATE.MAIN_MENU;
+            CameraMaster.instance.SetState(CAM_STATE.MAIN_MENU);
             ConnectingText.text = "";
+            UserSettings.AddOrUpdateAppSetting("LastUsedIP", IPText.text);
         }
 
         if (TextBoxIP.Clicked())
@@ -243,12 +246,18 @@ public class GUIJoinHost : ScriptComponent
     public void AddImagesAndText()
     {
         Canvas = Camera.AddCanvas();
-
-        IPText = Canvas.Add("192.168.1.");
+        string SettingIP = UserSettings.GetSetting("LastUsedIP");
+        if (SettingIP != null)
+            IPText = Canvas.Add(SettingIP);
+        else
+            IPText = Canvas.Add("192.168.1.");
         IPText.origin = new Vector2(0.5f);
         IPText.position = new Vector2(0.2f, 0.15f);
         IPText.color = Color.Black;
         IPText.depth = 0.8f;
+
+
+
 
         PortText = Canvas.Add("9050");
         PortText.origin = new Vector2(0.5f);
@@ -346,6 +355,8 @@ public class GUIJoinHost : ScriptComponent
         Canvas.Remove(IP);
         Canvas.Remove(Port);
         Canvas.Remove(Caret);
+        UserSettings.AddOrUpdateAppSetting("LastUsedIP", IPText.text);
+
     }
 
     IEnumerator Connecting()

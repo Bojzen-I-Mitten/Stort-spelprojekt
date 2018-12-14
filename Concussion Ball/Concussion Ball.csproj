@@ -103,6 +103,7 @@
     <Compile Include="Assets\Scripts\HighlightParent.cs" />
     <Compile Include="Assets\Scripts\Inputs\InputGUI.cs" />
     <Compile Include="Assets\Scripts\InputTest.cs" />
+    <Compile Include="Assets\Scripts\match\AnnouncerSoundManager.cs" />
     <Compile Include="Assets\Scripts\match\MatchSystem.cs" />
     <Compile Include="Assets\Scripts\match\NetworkPlayer.cs" />
     <Compile Include="Assets\Scripts\match\PowerupManager.cs" />

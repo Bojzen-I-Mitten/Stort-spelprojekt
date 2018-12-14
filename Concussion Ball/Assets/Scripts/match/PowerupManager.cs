@@ -10,13 +10,15 @@ public class PowerupManager : ScriptComponent
     private List<PowerupSpawner> spawnPoints;
 
     private List<List<GameObject>> powerupPool = new List<List<GameObject>>();
-    public int NextPowerupID = 1000;
     public int PoolSize { get; set; } = 10;
+
+    System.Random random;
+
     public override void OnAwake()
     {
         spawnPoints = new List<PowerupSpawner>(ScriptUtility.GetComponentsOfType<PowerupSpawner>());
         initPowerupPool();
-        //MatchSystem.instance.SpawnablePrefabs.AddRange(Powerups);
+        random = new System.Random();
     }
 
     void initPowerupPool()
@@ -42,11 +44,8 @@ public class PowerupManager : ScriptComponent
 
     public GameObject InstantiatePowerup()
     {
-        int seed = (int)(MatchSystem.instance.MatchStartTime + NextPowerupID);
-        System.Random random = new System.Random(seed);
         int powerupIndex = random.Next(0, Powerups.Count);
         GameObject powerup = GetAvailablePowerup(powerupIndex);
-        NextPowerupID++;
         return powerup;
     }
 
@@ -62,22 +61,26 @@ public class PowerupManager : ScriptComponent
 
     public void RecyclePowerup(Powerup powerup)
     {
+        
+
         powerup.Disable();
-        powerup.gameObject.SetActive(false);
+        {
+            if (MatchSystem.instance.ServerOwner)
+            {
+                powerup.gameObject.GetComponent<NetworkIdentity>().Owner = true;
+                powerup.gameObject.SetActive(false);
+            }   
+        }
     }
 
     public void ResetPowerups()
     {
-        Debug.Log("reset start");
         foreach (Powerup p in ScriptUtility.GetComponentsOfType<Powerup>())
         {
             if(p.isOwner)
                 p.Remove();
         }
-        
-
         spawnPoints.ForEach(point => { if (point.isOwner) point.Free(); }); //Safety free
         spawnPoints.ForEach(point => point.SpawnPowerup());
-        Debug.Log("reset end");
     }
 }

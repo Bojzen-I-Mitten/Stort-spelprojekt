@@ -8,19 +8,21 @@ public class Ball : PickupableObject
 {
     public Vector3 SpawnPoint { get; set; } = new Vector3(0, 10, 0);
 
-    private ParticleEmitter emitterElectricity1;
-    private ParticleEmitter emitterElectricity2;
-    private ParticleEmitter emitterElectricity3;
+   // private ParticleEmitter emitterElectricity1;
+   // private ParticleEmitter emitterElectricity2;
+  //  private ParticleEmitter emitterElectricity3;
     private ParticleEmitter emitterSmoke;
     private ParticleEmitter emitterFire;
-    public Texture2D electricityTex1 { get; set; }
-    public Texture2D electricityTex2 { get; set; }
-    public Texture2D electricityTex3 { get; set; }
-    public Texture2D smokeTex { get; set; }
-    public Texture2D fireTex { get; set; }
 
+    private LightComponent pointLight;
+
+    private SoundComponent soundFireThrow;
+    private SoundComponent soundChargeBall;
+    private bool begunCharge;
+
+    private float ThrowForce66Procent;
     private float electricityIntensifyerThreshold;
-    private float smokeIntensityThreshold;
+
 
     public override void Start()
     {
@@ -31,48 +33,77 @@ public class Ball : PickupableObject
         chargeTimeMax = 2.0f;
         BaseThrowForce = 12.0f;
         MaxThrowForce = 18.0f;
+        ThrowForce66Procent = BaseThrowForce + (MaxThrowForce - BaseThrowForce) * 0.66f;
+        Debug.Log(ThrowForce66Procent);
         ThrowForce = BaseThrowForce;
 
+        soundFireThrow = gameObject.AddComponent<SoundComponent>();
+        soundFireThrow.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ThrowBall.wav");
+        soundFireThrow.Looping = false;
+        soundFireThrow.Type = SoundComponent.SoundType.Effect;
+        soundFireThrow.MaxDistance = 45;
+        soundFireThrow.MinDistance = 10;
+        soundFireThrow.Is3D = true;
+
+
+        soundChargeBall = gameObject.AddComponent<SoundComponent>();
+        soundChargeBall.Clip = (AudioClip)Resources.LoadThomasPath("%THOMAS_ASSETS%/Sounds/ElectricSparks.mp3");
+        soundChargeBall.Looping = false;
+        soundChargeBall.Type = SoundComponent.SoundType.Effect;
+        soundChargeBall.Volume = 0.01f;
+        soundChargeBall.MaxDistance = 10;
+        soundChargeBall.MinDistance = 3;
+        soundChargeBall.Is3D = true;
+        begunCharge = false;
+
+        pointLight = gameObject.AddComponent<LightComponent>();
+        pointLight.Type = LightComponent.LIGHT_TYPES.POINT;
+        pointLight.Intensity = 0;
+        pointLight.DiffuseColor = Color.OrangeRed;
 
         #region Init emitters
-        emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
-        emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
-        emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
+       // emitterElectricity1 = gameObject.AddComponent<ParticleEmitter>();
+       // emitterElectricity2 = gameObject.AddComponent<ParticleEmitter>();
+       // emitterElectricity3 = gameObject.AddComponent<ParticleEmitter>();
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
         emitterFire = gameObject.AddComponent<ParticleEmitter>();
 
-        emitterElectricity1.Texture = electricityTex1;
-        emitterElectricity2.Texture = electricityTex2;
-        emitterElectricity3.Texture = electricityTex3;
-        emitterSmoke.Texture = smokeTex;
-        emitterFire.Texture = fireTex;
+       // emitterElectricity1.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el1.png");
+        //emitterElectricity2.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el2.png");
+        //emitterElectricity3.Texture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/el3.png");
+        Texture2D smokeTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/smoke_particle.png");
+        if (smokeTex.height > 0)
+            emitterSmoke.Texture = smokeTex;
+        Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (fireTex.width > 0)
+            emitterFire.Texture = fireTex;
 
         ResetFireEmitters();
-        ResetElectricityEmitters();
-        electricityIntensifyerThreshold = 0.6f;
-        smokeIntensityThreshold = 0.85f;
+       // ResetElectricityEmitters();
 
-
-        MultiplyWithIntensity((float)(0.5f), emitterElectricity1);
-        MultiplyWithIntensity((float)(0.5f), emitterElectricity2);
-        MultiplyWithIntensity((float)(0.5f), emitterElectricity3);
+        
         #endregion
+
+        Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+        rb.CcdMotionThreshold = 1e-7f;
+        rb.CcdSweptSphereRadius = 0.5f;
     }
     #region Particle handling
     private void ResetFireEmitters()
     {
         emitterSmoke.MinSize = 0.1f;
-        emitterSmoke.MaxSize = 0.3f;
-        emitterSmoke.EndSize = 0.7f;
-        emitterSmoke.MinLifeTime = 1.0f;
+        emitterSmoke.MaxSize = 0.2f;
+        emitterSmoke.EndSize = 0.5f;
+        emitterSmoke.MinLifeTime = 1.5f;
         emitterSmoke.MaxLifeTime = 2.2f;
-        emitterSmoke.EmissionRate = 100;
+        emitterSmoke.EmissionRate = 40;
         emitterSmoke.MinRotationSpeed = -2.0f;
         emitterSmoke.MaxRotationSpeed = 2.0f;
         emitterSmoke.MinSpeed = 0.2f;
         emitterSmoke.MaxSpeed = 0.5f;
         emitterSmoke.EndSpeed = 0.0f;
         emitterSmoke.DistanceFromSphereCenter = 0;
+        emitterSmoke.Gravity = -0.3f;
         emitterSmoke.Radius = 0.7f;
 
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
@@ -81,9 +112,9 @@ public class Ball : PickupableObject
         emitterFire.EndSize = 0.0f;
         emitterFire.MinLifeTime = 0.5f;
         emitterFire.MaxLifeTime = 1.2f;
-        emitterFire.EmissionRate = 10;
-        emitterFire.MinRotationSpeed = -2.0f;
-        emitterFire.MaxRotationSpeed = 2.0f;
+        emitterFire.EmissionRate = 30;
+        emitterFire.MinRotationSpeed = -4.0f;
+        emitterFire.MaxRotationSpeed = 4.0f;
         emitterFire.MinSpeed = 0.2f;
         emitterFire.MaxSpeed = 0.5f;
         emitterFire.EndSpeed = 0.0f;
@@ -91,21 +122,24 @@ public class Ball : PickupableObject
         emitterFire.DistanceFromSphereCenter = 0;
         emitterFire.Radius = 0.7f;
 
+        emitterFire.Emit = false;
+        emitterSmoke.Emit = false;
 
+        pointLight.Intensity = 0;
     }
 
-    private void ResetElectricityEmitters()
+   /* private void ResetElectricityEmitters()
     {
-        electricityIntensifyerThreshold = 0.6f;
+        electricityIntensifyerThreshold = 0.3f;
 
         emitterElectricity1.MinSize = 0.1f;
         emitterElectricity1.MaxSize = 0.3f;
-        emitterElectricity1.EndSize = 1.0f;
-        emitterElectricity1.MinLifeTime = 0.2f;
-        emitterElectricity1.MaxLifeTime = 0.1f;
+        emitterElectricity1.EndSize = 0.8f;
+        emitterElectricity1.MinLifeTime = 0.03f;
+        emitterElectricity1.MaxLifeTime = 0.08f;
         emitterElectricity1.EmissionRate = 10;
         emitterElectricity1.MinRotationSpeed = 0.1f;
-        emitterElectricity1.MaxRotationSpeed = 2.0f;
+        emitterElectricity1.MaxRotationSpeed = 1.0f;
         emitterElectricity1.MinSpeed = 0.1f;
         emitterElectricity1.MaxSpeed = 0.4f;
         emitterElectricity1.EndSpeed = 1.3f;
@@ -116,9 +150,9 @@ public class Ball : PickupableObject
         emitterElectricity2.MinSize = 0.25f;
         emitterElectricity2.MaxSize = 0.5f;
         emitterElectricity2.EndSize = 0.05f;
-        emitterElectricity2.MinLifeTime = 0.7f;
-        emitterElectricity2.MaxLifeTime = 0.3f;
-        emitterElectricity2.EmissionRate = 5;
+        emitterElectricity2.MinLifeTime = 0.03f;
+        emitterElectricity2.MaxLifeTime = 0.1f;
+        emitterElectricity2.EmissionRate = 10;
         emitterElectricity2.MinRotationSpeed = 2.1f;
         emitterElectricity2.MaxRotationSpeed = -2.0f;
         emitterElectricity2.MinSpeed = 0.8f;
@@ -131,7 +165,7 @@ public class Ball : PickupableObject
         emitterElectricity3.MaxSize = 1.0f;
         emitterElectricity3.EndSize = 0.7f;
         emitterElectricity3.MinLifeTime = 0.01f;
-        emitterElectricity3.MaxLifeTime = 0.1f;
+        emitterElectricity3.MaxLifeTime = 0.05f;
         emitterElectricity3.EmissionRate = 25;
         emitterElectricity3.MinRotationSpeed = -2.1f;
         emitterElectricity3.MaxRotationSpeed = -1.0f;
@@ -141,7 +175,16 @@ public class Ball : PickupableObject
         emitterElectricity3.DistanceFromSphereCenter = 0;
         emitterElectricity3.Radius = 0.7f;
         emitterElectricity3.SpawnAtEdge = true;
-    }
+
+        MultiplyWithIntensity((float)(0.3f), emitterElectricity1);
+        MultiplyWithIntensity((float)(0.3f), emitterElectricity2);
+        MultiplyWithIntensity((float)(0.3f), emitterElectricity3);
+
+        emitterElectricity1.Emit = false;
+        emitterElectricity2.Emit = false;
+        emitterElectricity3.Emit = false;
+
+    }*/
 
     private void MultiplyWithIntensity(float intensity, ParticleEmitter emitter)
     {
@@ -150,7 +193,7 @@ public class Ball : PickupableObject
         emitter.EndSize *= intensity;
         emitter.MinLifeTime *= intensity;
         emitter.MaxLifeTime *= intensity;
-        emitter.EmissionRate = (uint)MathHelper.Max(((float)emitterElectricity3.EmissionRate * intensity), 0.0f);
+        emitter.EmissionRate = (uint)MathHelper.Max(((float)emitter.EmissionRate * intensity), 0.0f);
         emitter.MinRotationSpeed *= intensity;
         emitter.MaxRotationSpeed *= intensity;
         emitter.MinSpeed *= intensity;
@@ -173,12 +216,8 @@ public class Ball : PickupableObject
             yield return null;
         }
 
-        emitterElectricity1.Emit = false;
-        emitterElectricity2.Emit = false;
-        emitterElectricity3.Emit = false;
-        emitterFire.Emit = false;
-        emitterSmoke.Emit = false;
-        ResetElectricityEmitters();
+        
+        //ResetElectricityEmitters();
         ResetFireEmitters();
     }
     #endregion
@@ -188,57 +227,98 @@ public class Ball : PickupableObject
         base.Update();
         if (transform.position.y < -5)
             Reset();
+
+        if (charging)
+        {
+            if (!begunCharge)
+            {
+                begunCharge = true;
+                soundChargeBall.Play();
+            }
+        }
+        else
+        {
+            begunCharge = false;
+            soundChargeBall.Stop();
+        }
+
+        if(Input.GetKeyDown(Input.Keys.F12))
+        {
+            if(gameObject.Parent)
+            {
+                Debug.Log("Parent of ball is: " + gameObject.Parent + " of " + gameObject.Parent.Parent.Name);
+            }
+            else
+            {
+                Debug.Log("Ball is not parented to anything.");
+            }
+        }
     }
 
     public override void Throw(Vector3 camPos, Vector3 direction)
     {
-        RPCParticles(camPos, direction);
-        SendRPC("RPCParticles", camPos, direction);
+        RPCParticles();
+        SendRPC("RPCParticles");
         direction.y += 0.2f;
+        if (ThrowForce > ThrowForce66Procent)
+            soundFireThrow.Play();
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
     }
 
-    public void RPCParticles(Vector3 camPos, Vector3 direction)
+    public void RPCParticles()
     {
-        emitterFire.Emit = true;
-        emitterSmoke.Emit = true;
-        //emitterElectricity1.Emit = true;
-        //emitterElectricity2.Emit = true;
-        //emitterElectricity3.Emit = true;
+        if (ThrowForce > MaxThrowForce - 0.01f)
+        {
+            //emitterElectricity1.EmitOneShot(10);
+            //emitterElectricity2.EmitOneShot(10);
+            //emitterElectricity3.EmitOneShot(10);
+            //emitterFire.EmitOneShot(25);
 
-        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
-        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
-        //MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
 
-        MultiplyWithIntensity(smokeIntensityThreshold, emitterSmoke);
-        MultiplyWithIntensity(2.0f, emitterFire);
+        }
+        if (ThrowForce > ThrowForce66Procent)
+        {
+            
+            emitterFire.Emit = true;
+            emitterSmoke.Emit = true;
+
+        }
+        
     }
+    
 
     override public void ChargeEffect()
     {
-        //emitterElectricity1.Emit = true;
-        //emitterElectricity2.Emit = true;
-        //emitterElectricity3.Emit = true;
-
         float interp = MathHelper.Min(GetChargeTime() / chargeTimeMax, 1.0f);
-
-        //if (interp > 0.7f)
-        //{
-        //    emitterFire.Emit = true;
-        //}
-        //if (interp > 0.9f)
-        //{
-        //    emitterSmoke.Emit = true;
-        //}
-        if (interp > electricityIntensifyerThreshold)
+        if (interp > 0)
         {
-            MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity1);
-            //    MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity2);
-            //    MultiplyWithIntensity((float)(2.0f - electricityIntensifyerThreshold), emitterElectricity3);
-            //    electricityIntensifyerThreshold += 0.2f;
-        }
+            
+            //emitterElectricity1.Emit = true;
+            //emitterElectricity2.Emit = true;
+            //emitterElectricity3.Emit = true;
 
+            pointLight.Intensity = interp;
+
+
+            if (interp > 0.7f)
+            {
+                emitterSmoke.Emit = true;
+            }
+            if (interp > 0.99f)
+            {
+                emitterFire.Emit = true;
+            }
+
+            if (interp > electricityIntensifyerThreshold)
+            {
+                //MultiplyWithIntensity(1.25f, emitterElectricity1);
+                //MultiplyWithIntensity(1.25f, emitterElectricity2);
+               // MultiplyWithIntensity(1.25f, emitterElectricity3);
+
+                electricityIntensifyerThreshold += 0.1f;
+            }
         }
+    }
 
     override public void Cleanup()
     {
@@ -250,6 +330,8 @@ public class Ball : PickupableObject
     public override void OnDrop()
     {
         base.OnDrop();
+        soundChargeBall.Stop();
+        begunCharge = false;
         StartCoroutine(PickupDelay());
     }
     IEnumerator PickupDelay()
@@ -287,15 +369,8 @@ public class Ball : PickupableObject
     private IEnumerator CleanTimer()
     {
         yield return new WaitForSeconds(2.0f);
-
-        emitterElectricity1.Emit = false;
-        emitterElectricity2.Emit = false;
-        emitterElectricity3.Emit = false;
-
-        emitterFire.Emit = false;
-        emitterSmoke.Emit = false;
+        
         ResetFireEmitters();
-        // Reset values
-        ResetElectricityEmitters();
+       // ResetElectricityEmitters();
     }
 }
