@@ -49,6 +49,7 @@ public class GUIExitMenu : ScriptComponent
         {
             if (ThomasWrapper.IsPlaying())
             {
+                Input.SetMouseMode(Input.MouseMode.POSITION_ABSOLUTE);
                 CameraMaster.instance.SetState(CAM_STATE.LOADING_SCREEN);
                 ThomasWrapper.IssueRestart();
             } 

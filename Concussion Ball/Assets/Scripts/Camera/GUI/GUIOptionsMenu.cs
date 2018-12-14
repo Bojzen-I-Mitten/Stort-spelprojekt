@@ -171,6 +171,12 @@ public class GUIOptionsMenu : ScriptComponent
     void voidAnnouncerToggler(bool toggle)
     {
         //dumpa koden här för att sätta på och stänga av använd toggle för av och på. 
+
+        if (toggle)
+            Audio.SetVoiceVolume(1);
+        else
+            Audio.SetVoiceVolume(0);
+
         string Update;
         Update = toggle.ToString();
         UserSettings.AddOrUpdateAppSetting("Announcer", Update);
