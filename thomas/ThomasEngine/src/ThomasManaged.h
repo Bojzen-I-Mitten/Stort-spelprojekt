@@ -117,6 +117,7 @@ namespace ThomasEngine {
 		static void StartRenderer();
 
 		static float GetVRAM();
+		static float GetVRAM2();
 		static float GetRAM();
 #ifdef _EDITOR
 		/* Triggered event on game window load, only called when editor is used

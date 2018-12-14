@@ -1,6 +1,7 @@
 #include "ProfileManager.h"
 #include <fstream>
-
+#include <Windows.h>
+#include <psapi.h>
 
 namespace thomas 
 {
@@ -181,6 +182,32 @@ namespace thomas
 			{
 #ifdef MEMORY
 				s_ramusage = (usage - s_vramTotal);
+#endif
+			}
+
+			void ProfileManager::updateRamUsage()
+			{
+#ifdef MEMORY
+				DWORD currentProcessID = GetCurrentProcessId();
+
+				HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, currentProcessID);
+
+				if (NULL == hProcess)
+					return;
+
+				PROCESS_MEMORY_COUNTERS pmc{};
+				if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
+				{
+					//PagefileUsage is the:
+						//The Commit Charge value in bytes for this process.
+						//Commit Charge is the total amount of memory that the memory manager has committed for a running process.
+
+					float memoryUsage = float(pmc.PagefileUsage / 1024.0 / 1024.0); //MiB
+
+					char msg[100];
+					s_ramusage = memoryUsage;
+				}
+				CloseHandle(hProcess);
 #endif
 			}
 			float ProfileManager::getRAMUsage()

@@ -119,8 +119,8 @@ namespace ThomasEngine {
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
 #ifdef MEMORY
-		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
-		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
+
+		utils::profiling::ProfileManager::updateRamUsage();
 
 
 		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetCurrentMemory());
@@ -176,7 +176,12 @@ namespace ThomasEngine {
 
 	float ThomasWrapper::GetVRAM()
 	{
-		return utils::profiling::GpuProfiler::Instance()->GetTotalMemory();
+		return utils::profiling::GpuProfiler::Instance()->GetCurrentMemory();
+	}
+
+	float ThomasWrapper::GetVRAM2()
+	{
+		return utils::profiling::GpuProfiler::Instance()->GetCurrentMemory();
 	}
 
 	float ThomasWrapper::GetRAM()

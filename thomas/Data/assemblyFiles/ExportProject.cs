@@ -137,6 +137,7 @@ namespace ThomasStandalone
             {
                 while (GetMessage(out msg, IntPtr.Zero, 0, 0) != 0)
                 {
+                    System.Console.Out.WriteLine("RAM: {0} VRAM: {1} VRAM2: {2}", ThomasWrapper.GetRAM(), ThomasWrapper.GetVRAM(), ThomasWrapper.GetVRAM2());
                     TranslateMessage(ref msg);
                     DispatchMessage(ref msg);
                 }
