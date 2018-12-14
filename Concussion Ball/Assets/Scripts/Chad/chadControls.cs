@@ -280,7 +280,13 @@ public class ChadControls : NetworkComponent
             NetPlayer.Reset();
 #endif
 
-
+        if (Input.GetKeyDown(Input.Keys.F12))
+        {
+            if (PickedUpObject)
+                Debug.Log("Your current held item: " + PickedUpObject);
+            else
+                Debug.Log("No held item.");
+        }
 
         rBody.Friction = 0.5f;
         if (!OnGround())
@@ -659,7 +665,11 @@ public class ChadControls : NetworkComponent
             PickedUpObject.Drop();
             PickedUpObject = null;
         }
-
+        if (ToySoldierAffected)
+        {
+            ToySoldierAffected = false;
+            RPCResetMaterial();
+        }
 
         if (isOwner)
             MatchSystem.instance.LocalChad = this;
@@ -758,10 +768,6 @@ public class ChadControls : NetworkComponent
 
         if(MatchSystem.instance.LocalChad.ToySoldierAffected)
         {
-            MatchSystem.instance.LocalChad.ToySoldierAffected = false;
-            MatchSystem.instance.LocalChad.ToySoldierModifier = null;
-            MatchSystem.instance.LocalChad.ScaleCountdown = ScaleDuration;
-            
             SendRPC("RPCResetMaterial");
             RPCResetMaterial();
         }        
@@ -769,6 +775,9 @@ public class ChadControls : NetworkComponent
 
     public void RPCResetMaterial()
     {
+        ToySoldierAffected = false;
+        ToySoldierModifier = null;
+        ScaleCountdown = ScaleDuration;
         RenderSkinnedComponent render = gameObject.GetComponent<RenderSkinnedComponent>();
         render.materials = OriginalMaterials;
         gameObject.GetComponent<ShirtRenderer>().Reset();
