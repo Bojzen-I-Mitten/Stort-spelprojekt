@@ -215,6 +215,7 @@ namespace thomas {
 					for(; i > 0;){														// Forward reaching loop
 						i--;
 						math::Vector3 bonePoint = p[i];
+						// Prevent FABRIK from locking itself and influence the result. Should be per bone parameter though
 						if(i < num_link - 1)
 							bonePoint += math::Vector3(0, 0, math::EPSILON-len[i] * (MAX_FABRIK_ITER - iter) / MAX_FABRIK_ITER);
 						float r = math::Vector3::Distance(bonePoint, p[i + 1]);				// Distance to next joint
@@ -301,7 +302,7 @@ namespace thomas {
 					trans = pose.Translation();
 					pose.Translation(math::Vector3::Zero);										// Remove translation
 					pose = pose * math::getMatrixRotationTo(pose.Up(), p[i + 1] - p[i]);		// Rotate bone Y toward child's point
-					//pose = pose * skel.getBone(chain[i + 1])._invParentOrient;				// Apply orientation offset in relation to child (Y axis of the bone may not face child)
+					pose = pose * skel.getBone(chain[i + 1])._invParentOrient;				// Apply orientation offset in relation to child (Y axis of the bone may not face child)
 					pose.Translation(p[i]);														// Apply new translation
 					objectPose[chain[i]] = pose;												// Set
 				}
