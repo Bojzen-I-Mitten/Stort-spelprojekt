@@ -94,6 +94,7 @@ namespace thomas
 			}
 			else
 			{
+
 				textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 			}
 			textureDesc.CPUAccessFlags = 0;
@@ -798,10 +799,16 @@ namespace thomas
 
 			delete[] filename_c;
 			
+			D3D11_USAGE usage = D3D11_USAGE_IMMUTABLE;
+			if (fileName.find("_particle") != std::string::npos)
+			{
+				usage = D3D11_USAGE_DEFAULT;
+			}
+			
 			HRESULT hr;
 			if (extension_string == ".dds" || extension_string == ".DDS")
 			{
-				hr = DirectX::CreateDDSTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, &texture, &textureView);
+				hr = DirectX::CreateDDSTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, usage, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, &texture, &textureView);
 				if (not SUCCEEDED(hr))
 				{
 					LOG_HR(hr);
@@ -810,7 +817,7 @@ namespace thomas
 			}
 			else
 			{
-				hr = DirectX::CreateWICTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, 0, 0, 0,  &texture, &textureView);
+				hr = DirectX::CreateWICTextureFromFileEx(m_device, CA2W(fileName.c_str()), 0, usage, D3D11_BIND_SHADER_RESOURCE, 0, 0, 0,  &texture, &textureView);
 				if (not SUCCEEDED(hr))
 				{
 					LOG_HR(hr);

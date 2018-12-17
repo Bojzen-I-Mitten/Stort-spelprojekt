@@ -79,7 +79,7 @@ namespace thomas {
 					return i;
 				}
 			}
-			Texture2D* texCpy = new Texture2D(tex->GetRawBGRAPixels(), tex->GetWidth(), tex->GetHeight(), false);
+			Texture2D* texCpy = new Texture2D("particle", tex->GetRawBGRAPixels(), tex->GetWidth(), tex->GetHeight(), false);
 			//resize
 			//tex->ChangeFormat(m_format);
 			texCpy->Resize(m_width, m_height);

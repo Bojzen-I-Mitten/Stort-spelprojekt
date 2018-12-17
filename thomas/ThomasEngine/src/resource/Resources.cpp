@@ -291,6 +291,8 @@ namespace ThomasEngine
 				obj = LoadErrorResource(type);
 				if (obj == nullptr)
 					Debug::LogWarning("Warning Default Object does not exist of type: " + type.ToString());
+
+				throw gcnew IO::FileNotFoundException(error);
 			}
 			return obj;
 		}

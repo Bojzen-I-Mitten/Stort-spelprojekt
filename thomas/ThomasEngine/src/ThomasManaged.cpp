@@ -181,7 +181,7 @@ namespace ThomasEngine {
 
 	float ThomasWrapper::GetVRAM2()
 	{
-		return utils::profiling::GpuProfiler::Instance()->GetCurrentMemory();
+		return utils::profiling::GpuProfiler::Instance()->GetTotalMemory();
 	}
 
 	float ThomasWrapper::GetRAM()

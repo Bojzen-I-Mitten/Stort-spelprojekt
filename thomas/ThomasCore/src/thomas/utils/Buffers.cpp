@@ -102,7 +102,7 @@ namespace thomas
 			{
 				return m_stride;
 			}
-			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = STATIC_BUFFER) : 
+			IndexBuffer::IndexBuffer(void * data, size_t count, D3D11_USAGE usageFlag = DEFAULT_BUFFER) : 
 				Buffer(data, sizeof(UINT) * count, D3D11_BIND_INDEX_BUFFER, usageFlag),
 				m_indexCount((uint32_t)count)
 			{
@@ -177,7 +177,7 @@ namespace thomas
 				return nullptr;
 			}
 
-			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data, D3D11_BIND_FLAG bindFlags) : Buffer(data, count * stride, bindFlags, STATIC_BUFFER, stride, D3D11_RESOURCE_MISC_FLAG(D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS))
+			ByteAddressBuffer::ByteAddressBuffer(size_t stride, size_t count, void* data, D3D11_BIND_FLAG bindFlags) : Buffer(data, count * stride, bindFlags, DEFAULT_BUFFER, stride, D3D11_RESOURCE_MISC_FLAG(D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS | D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS))
 			{
 				m_hasSRV = false;
 				m_hasUAV = false;
