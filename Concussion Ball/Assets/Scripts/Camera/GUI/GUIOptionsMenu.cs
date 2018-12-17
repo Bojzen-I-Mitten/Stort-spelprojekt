@@ -138,7 +138,7 @@ public class GUIOptionsMenu : ScriptComponent
     Camera Camera;
     public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
-    WindowController Wcontroller = new WindowController();
+    WindowManager Wcontroller = new WindowManager();
     public Textstate TextState { set; get; } = Textstate.NUMSTATES;
     public Textstate OldState = Textstate.NUMSTATES;
     public ImageBarstate ImageState { set; get; } = ImageBarstate.NUMSTATES;
@@ -483,8 +483,8 @@ public class GUIOptionsMenu : ScriptComponent
         }
 
         //load onoff fullscreen
-        fullscreen = Wcontroller.getFullscreen();
-        borderless = Wcontroller.getBorderless();
+        fullscreen = Wcontroller.GetFullscreen();
+        borderless = Wcontroller.GetBorderless();
         string settingsFullscreen = UserSettings.GetSetting("Fullscreen");
         if (settingsFullscreen != null)
         {
