@@ -219,8 +219,14 @@ namespace thomas {
 						i--;
 						math::Vector3 iterP = p[i];
 						// Influence by pole target
-						if(i > 0)
-							iterP += math::Vector3::Lerp(iterP, m_poleTarget, loopFactor * m_joint.get()[i].pole_influence);
+						if(i == 0) {}
+						else {
+							math::Vector3 pole = m_poleTarget - iterP;
+							float influence = loopFactor * m_joint.get()[i].pole_influence;
+							iterP = iterP + pole * (len[i] / pole.Length() * influence);
+							// Perf?: use lerp
+							//iterP = math::Vector3::Lerp(iterP, m_poleTarget, loopFactor * m_joint.get()[i].pole_influence);
+						}
 						float r = math::Vector3::Distance(iterP, p[i + 1]);				// Distance to next joint
 						float lambda = len[i] / r;
 						p[i] = math::lerp(p[i + 1], iterP, lambda);						// Next iter. position
@@ -241,8 +247,14 @@ namespace thomas {
 
 						math::Vector3 iterP = p[i + 1];
 						// Influence by pole target
-						if (i < num_link - 2)
-							iterP += math::Vector3::Lerp(iterP, m_poleTarget, loopFactor * m_joint.get()[i].pole_influence);
+						if (i == num_link - 2){ }
+						else{
+							math::Vector3 pole = m_poleTarget - iterP;
+							float influence = loopFactor * m_joint.get()[i].pole_influence;
+							iterP = iterP + pole * (len[i] / pole.Length() * influence);
+							// Perf?: use lerp
+							//iterP = math::Vector3::Lerp(iterP, m_poleTarget, influence);
+						}
 						float r = math::Vector3::Distance(p[i], iterP);				// Distance to next joint
 						float lambda = len[i] / r;
 						p[i+1] = math::lerp(p[i], iterP, lambda);					// Next iter. position

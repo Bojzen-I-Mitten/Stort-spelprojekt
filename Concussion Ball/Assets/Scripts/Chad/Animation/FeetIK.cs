@@ -177,7 +177,7 @@ namespace Concussion_Ball.Assets.Scripts
             if(mFoot.Decompose(out s, out r, out t)) { }
             /* Resolve custom targeting
             */
-            float minimalDistanceTraversal = 0.03f; float clampDistanceTraversal = 0.3f;
+            float minimalDistanceTraversal = 0.05f; float clampDistanceTraversal = 0.3f;
             float minimalAngleTraversal = 0.08f; float clampRotation = 0.3f;
             Vector3 diff = target - ikTarget;
             float distance = diff.Length();

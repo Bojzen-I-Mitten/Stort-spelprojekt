@@ -60,6 +60,6 @@ public class LookAt : ScriptComponent
     public override void Update()
     {
         if(Target != null)
-            m_lK.Target = Target.transform.position;
+            m_lK.Target = Target.transform.localPosition;
     }
 }

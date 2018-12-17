@@ -68,12 +68,10 @@ namespace thomas {
 				// Apply
 				math::Matrix orient = math::Matrix::CreateFromQuaternion(rotation);
 				objectPose[boneInd] = relative * orient * objectPose[skel.getBone(boneInd)._parentIndex];
-#ifdef _DEBUG
 #ifdef _EDITOR
 				editor::Gizmos::Gizmo().DrawMatrixBasis(objectPose[boneInd]);
 				editor::Gizmos::Gizmo().SetColor(math::Color(1.f, 1.f, 0.f));
 				editor::Gizmos::Gizmo().DrawLine(objectPose[boneInd].Translation(), m_target, 0.1f);
-#endif
 #endif
 			}
 			bool LookAtConstraint::apply(Skeleton & skel, uint32_t boneInd)
