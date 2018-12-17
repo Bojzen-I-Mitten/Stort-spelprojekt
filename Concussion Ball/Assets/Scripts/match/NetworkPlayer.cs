@@ -174,7 +174,11 @@ public class NetworkPlayer : NetworkComponent
 
     public override void OnDisconnect()
     {
-        JoinTeam(TEAM_TYPE.UNASSIGNED);
+        HasTackled = 0;
+        Owngoal = 0;
+        GoalsScored = 0;
+        Score = 0;
+        JoinTeam(MatchSystem.instance.FindTeam(TEAM_TYPE.UNASSIGNED));
     }
 
     public override void OnRead(NetDataReader reader, bool initialState)
