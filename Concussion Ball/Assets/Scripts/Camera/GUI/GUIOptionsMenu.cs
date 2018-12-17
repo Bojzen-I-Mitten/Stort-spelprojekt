@@ -317,10 +317,10 @@ public class GUIOptionsMenu : ScriptComponent
 
         //
         string Update;
-        Update = Wcontroller.getFullscreen().ToString();
+        Update = Wcontroller.GetFullscreen().ToString();
 
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-        Update = Wcontroller.getBorderless().ToString();
+        Update = Wcontroller.GetBorderless().ToString();
 
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
@@ -577,10 +577,10 @@ public class GUIOptionsMenu : ScriptComponent
                   */
         //      ClearImagesAndText();
         string Update;
-        Update = Wcontroller.getFullscreen().ToString();
+        Update = Wcontroller.GetFullscreen().ToString();
 
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-        Update = Wcontroller.getBorderless().ToString();
+        Update = Wcontroller.GetBorderless().ToString();
  
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
