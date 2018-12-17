@@ -1,6 +1,6 @@
 #include "Texture2DArray.h"
 #include "../../Common.h"
-#include "../../utils/d3d.h"
+#include "../../utils/D3D.h"
 
 namespace thomas {
 	namespace resource {

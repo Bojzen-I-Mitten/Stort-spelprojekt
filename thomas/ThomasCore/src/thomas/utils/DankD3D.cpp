@@ -50,8 +50,11 @@ namespace thomas
 			if (count == 0)
 			{
 				delete(this);
+				return count;
 			}
 	
+			utils::profiling::GpuProfiler::Instance()->GetMemoryUsage();
+
 			return count;
 		}
 
@@ -312,6 +315,7 @@ namespace thomas
 			if (count == 0)
 			{
 				delete(this);
+				return count;
 			}
 
 			return count;

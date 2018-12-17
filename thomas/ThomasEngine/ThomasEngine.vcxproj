@@ -170,7 +170,6 @@
     <ClInclude Include="src\GUI\editor\Gizmos.h" />
     <ClInclude Include="src\GUI\game\Canvas.h" />
     <ClInclude Include="src\GUI\game\GUIElements.h" />
-    <ClInclude Include="src\GUI\game\WindowController.h" />
     <ClInclude Include="src\math\Curve.h" />
     <ClInclude Include="src\math\Random.h" />
     <ClInclude Include="src\math\Viewport.h" />
@@ -235,6 +234,7 @@
     <ClInclude Include="src\ThomasManaged.h" />
     <ClInclude Include="src\utils\EngineAutoProfiler.h.h" />
     <ClInclude Include="src\utils\ProfileManagerWrapper.h" />
+    <ClInclude Include="src\WindowManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
@@ -246,7 +246,6 @@
     <ClCompile Include="src\GUI\editor\Gizmos.cpp" />
     <ClCompile Include="src\GUI\game\Canvas.cpp" />
     <ClCompile Include="src\GUI\game\GUIElements.cpp" />
-    <ClCompile Include="src\GUI\game\WindowController.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\math\Curve.cpp" />
     <ClCompile Include="src\math\Random.cpp" />
@@ -308,6 +307,7 @@
     <ClCompile Include="src\Utility.cpp" />
     <ClCompile Include="src\utils\EngineAutoProfiler.h.cpp" />
     <ClCompile Include="src\utils\ProfileManagerWrapper.cpp" />
+    <ClCompile Include="src\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

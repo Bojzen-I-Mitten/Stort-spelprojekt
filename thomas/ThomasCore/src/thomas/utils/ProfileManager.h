@@ -8,8 +8,8 @@
 #include <atomic>
 #include "..\..\..\include\nlohmann\json.hpp"
 #include "..\utils\atomic\Synchronization.h"
-#define BENCHMARK
-#undef BENCHMARK
+#define MEMORY
+//#define PERFORMANCE
 
 namespace thomas
 {
