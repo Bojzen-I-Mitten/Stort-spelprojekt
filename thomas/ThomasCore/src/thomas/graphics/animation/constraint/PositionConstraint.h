@@ -25,6 +25,7 @@ namespace thomas {
 				/* Position used for constraining the target
 				*/
 				math::Vector3 m_position;
+				float m_distance;
 			private:
 			};
 

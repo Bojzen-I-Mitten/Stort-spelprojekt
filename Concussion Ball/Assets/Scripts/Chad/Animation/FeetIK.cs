@@ -44,6 +44,7 @@ namespace Concussion_Ball.Assets.Scripts
 
         /* Current target point of the IK script
         */
+        [Browsable(false), Newtonsoft.Json.JsonIgnore]
         public Vector3 IKTarget { get { return ikTarget;  } }
         
         public IK_FABRIK_Constraint.JointParams[] Joints

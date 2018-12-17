@@ -68,5 +68,13 @@ namespace ThomasEngine
 		void PositionConstraint::Position::set(Vector3 w) {
 			m_ptr->m_position = Utility::Convert(w);
 		}
+		float PositionConstraint::Distance::get() {
+			return m_ptr->m_distance;
+		}
+		void PositionConstraint::Distance::set(float w) {
+			m_ptr->m_distance = w;
+		}
+
+
 	}
 }

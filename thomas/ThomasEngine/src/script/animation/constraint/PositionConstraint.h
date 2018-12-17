@@ -22,6 +22,10 @@ namespace ThomasEngine
 				Vector3 get();
 				void set(Vector3 mode);
 			}
+			property float Distance {
+				float get();
+				void set(float Distance);
+			}
 
 			void apply(GameObject^ obj, uint32_t boneIndex);
 			void apply(RenderSkinnedComponent^ skinn, uint32_t boneIndex);

@@ -1,5 +1,4 @@
 #include "LookAtConstraint.h"
-
 #pragma unmanaged
 #include <thomas/resource/Model.h>
 #include <thomas/graphics/animation/IBlendTree.h>
