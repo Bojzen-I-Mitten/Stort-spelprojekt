@@ -83,10 +83,10 @@ public class Ball : PickupableObject
 
         
         #endregion
-
+        /*
         Rigidbody rb = gameObject.GetComponent<Rigidbody>();
         rb.CcdMotionThreshold = 1e-7f;
-        rb.CcdSweptSphereRadius = 0.5f;
+        rb.CcdSweptSphereRadius = 0.5f;*/
     }
     #region Particle handling
     private void ResetFireEmitters()
