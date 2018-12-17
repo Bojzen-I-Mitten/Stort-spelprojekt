@@ -6,7 +6,7 @@
 
 #define IK_DRAW
 //#define DRAW_FORWARD_CONSTRAINT
-//#define DRAW_BACKWARD_CONSTRAINT
+#define DRAW_BACKWARD_CONSTRAINT
 #define DRAW_POLE_TARGET
 
 namespace thomas {
@@ -153,11 +153,12 @@ namespace thomas {
 				// Apply constraint
 				math::Vector3 p_n;
 				if(joint.joint_type == 1)
-					p_n = hingeJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
+					p_n = ballJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
 				else if(joint.joint_type == 2)
 					p_n = slidingHingeJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, joint.paramA, bone_len);
-				else
-					p_n = ballJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
+				else if(joint.joint_type == 3)
+					p_n = hingeJointConstraint(m_ii, p_o, *p_c, joint.limit_bend, bone_len);
+				else {} // No constraint
 				// Re-calculate orientation
 				math::Vector3 d_i = (p_o - p_n) / bone_len;
 				p_c[0] = p_n;																		// New forward orient
@@ -180,11 +181,12 @@ namespace thomas {
 				// Apply constraint
 				math::Vector3 p_n;
 				if (joint.joint_type == 1)
-					p_n = hingeJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
+					p_n = ballJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
 				else if (joint.joint_type == 2)
 					p_n = slidingHingeJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, joint.paramA, bone_len);
-				else
-					p_n = ballJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
+				else if(joint.joint_type == 3)
+					p_n = hingeJointConstraint(m_i, p_o, p_c[1], joint.limit_bend, bone_len);
+				else {} // No constraint
 				// Re-calculate orientation
 				math::Vector3 d_i = (p_n - p_o) / bone_len;
 				p_c[1] = p_n;																		// New forward orient
@@ -213,7 +215,7 @@ namespace thomas {
 				for (uint32_t iter = 0; dif > FABRIK_TOLERANCE && iter < MAX_FABRIK_ITER; iter++) {
 					// Stage 1: Forward reaching
 					uint32_t i = num_link - 1;
-					float loopFactor = (MAX_FABRIK_ITER - iter - 1) / MAX_FABRIK_ITER;
+					float loopFactor = std::fmax(0.f, ((MAX_FABRIK_ITER / 2.f) - iter - 1) / MAX_FABRIK_ITER);
 					p[i] = target;
 					for(; i > 0;){														// Forward reaching loop
 						i--;

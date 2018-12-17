@@ -377,7 +377,7 @@ namespace thomas
 		void Gizmos::DrawLines(math::Vector3* lines, uint32_t num, D3D_PRIMITIVE_TOPOLOGY topology)
 		{
 			// Submit to thread buffer:
-			m_render_buffers[ThomasCore::Core().Thread_Index()]->submitCmd(
+			m_update_buffers[ThomasCore::Core().Thread_Index()]->submitCmd(
 				gizmo::GizmoRenderCommand(
 					lines, num,								// Vertex info
 					m_matrix, s_color,						// Transform, color (Transform 'should'/could be applied to the vertex data).

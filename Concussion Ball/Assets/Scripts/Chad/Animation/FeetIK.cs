@@ -24,7 +24,8 @@ namespace Concussion_Ball.Assets.Scripts
         //public string IKTargetBone { get; set; }    // Name of the bone ray's are traced from
         //public string IKResolveBoneName { get; set; }
         //private uint ikBoneIndex;                   // Index for raytraced bone
-        private IK_FABRIK_Constraint IK { get; set; }
+        [Browsable(false), Newtonsoft.Json.JsonIgnore]
+        public IK_FABRIK_Constraint IK { get; private set; }
         private State state = State.Disabled;
         private float ikTimeRemaining = 0;
         private float ikTimeBlending = 0;
@@ -46,6 +47,10 @@ namespace Concussion_Ball.Assets.Scripts
         */
         [Browsable(false), Newtonsoft.Json.JsonIgnore]
         public Vector3 IKTarget { get { return ikTarget;  } }
+        [Browsable(false), Newtonsoft.Json.JsonIgnore]
+        public Vector3 LocalBoneForward { get; private set; }
+        [Browsable(false), Newtonsoft.Json.JsonIgnore]
+        public bool IsActive { get { return ikTargetWeight > 0.0f; } }
         
         public IK_FABRIK_Constraint.JointParams[] Joints
         {
@@ -187,7 +192,7 @@ namespace Concussion_Ball.Assets.Scripts
             Vector3 diff = target - ikTarget;
             float distance = diff.Length();
             float targetSmooth = Math.Max(0.0f, distance - minimalDistanceTraversal) / clampDistanceTraversal;
-            targetSmooth = (Math.Min(1.0f - minimalDistanceTraversal, targetSmooth * targetSmooth) * distance)  + minimalDistanceTraversal;
+            targetSmooth = Math.Min(1.0f - minimalDistanceTraversal, targetSmooth * targetSmooth)  + minimalDistanceTraversal;
             target = ikTarget + diff * targetSmooth;
 
             float angleDiff = AngleDiff(orient, ikTargetOrient);
@@ -204,6 +209,8 @@ namespace Concussion_Ball.Assets.Scripts
             ikTargetOrient = Quaternion.Slerp(r, orient, ikWeight);
             IK.Target = ikTarget;
             IK.Orientation = ikTargetOrient;
+
+            LocalBoneForward = Vector3.Transform(Vector3.Up, ikTargetOrient);
             //IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);
             //IK.OrientationWeight = ikWeight; // blendInFactor(IK.OrientationWeight, ikOrientWeight, IKBlendFactor);
 

@@ -23,8 +23,8 @@ namespace thomas {
 				{
 					// Find the height y at m_distance from m_position:
 					float h = m_distance * m_distance - math::square(v.x) - math::square(v.z);
-					float y = h < 0.f ? m_position.y : std::sqrtf(h);	// If h < 0 pos is unreachable at the distance
-					objectPose[boneInd]._42 = y;
+					float y = h < 0.f ? 0.f : std::sqrtf(h);	// If h < 0 pos is unreachable at the distance
+					objectPose[boneInd]._42 = m_position.y + y;
 				}
 			}
 
