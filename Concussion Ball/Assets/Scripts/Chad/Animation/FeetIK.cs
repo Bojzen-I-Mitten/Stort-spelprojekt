@@ -41,6 +41,10 @@ namespace Concussion_Ball.Assets.Scripts
         private Vector3 ikTarget;                                       // Target stored between frames
         private Quaternion ikTargetOrient;
         private float ikWeight = 0.0f;
+
+        /* Current target point of the IK script
+        */
+        public Vector3 IKTarget { get { return ikTarget;  } }
         
         public IK_FABRIK_Constraint.JointParams[] Joints
         {

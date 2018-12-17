@@ -32,6 +32,7 @@
     <ClCompile Include="src\thomas\graphics\animation\AnimBlender.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\thomas\graphics\animation\constraint\PositionConstraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\IBlendTree.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\constraint\IK_FABRIK_C_Constraint.cpp" />
     <ClCompile Include="src\thomas\graphics\animation\playback\BinaryBlendNode.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="src\thomas\graphics\animation\AnimBlender.h" />
     <ClInclude Include="src\thomas\graphics\animation\AnimPlayback.h" />
     <ClInclude Include="src\thomas\graphics\animation\BaseAnimationTime.h" />
+    <ClInclude Include="src\thomas\graphics\animation\constraint\PositionConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\playback\BarycentricBlendNode.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneChildTransformConstraint.h" />
     <ClInclude Include="src\thomas\graphics\animation\constraint\BoneConstraint.h" />

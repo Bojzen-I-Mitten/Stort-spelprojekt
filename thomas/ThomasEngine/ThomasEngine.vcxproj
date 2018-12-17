@@ -211,6 +211,7 @@
     <ClInclude Include="src\resource\Shader.h" />
     <ClInclude Include="src\script\animation\BoneInfo.h" />
     <ClInclude Include="src\script\animation\constraint\IK_FABRIK_Constraint.h" />
+    <ClInclude Include="src\script\animation\constraint\PositionConstraint.h" />
     <ClInclude Include="src\script\animation\PlaybackHandle.h" />
     <ClInclude Include="src\script\ScriptingUtility.h" />
     <ClInclude Include="src\serialization\Converters.h" />
@@ -297,6 +298,7 @@
     <ClCompile Include="src\script\animation\BlendNode.cpp" />
     <ClCompile Include="src\script\animation\constraint\IK_FABRIK_Constraint.cpp" />
     <ClCompile Include="src\script\animation\constraint\LookAtConstraint.cpp" />
+    <ClCompile Include="src\script\animation\constraint\PositionConstraint.cpp" />
     <ClCompile Include="src\script\animation\PlaybackHandle.cpp" />
     <ClCompile Include="src\script\animation\PlaybackNode.cpp" />
     <ClCompile Include="src\script\animation\WeightHandle.cpp" />
