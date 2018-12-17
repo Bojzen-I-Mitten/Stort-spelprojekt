@@ -1,14 +1,16 @@
 #include "Texture2DArray.h"
 #include "../../Common.h"
-#include "../../utils/D3D.h"
+#include "../../utils/d3d.h"
 
 namespace thomas {
-	namespace resource 
-	{
-		Texture2DArray::Texture2DArray(unsigned width, unsigned height, DXGI_FORMAT format, unsigned nrOfTextures, bool isDepthTexture)
+	namespace resource {
+
+
+
+		Texture2DArray::Texture2DArray(unsigned dim, DXGI_FORMAT format, unsigned nrOfTextures, bool isDepthTexture)
 		{
-			m_width = width;
-			m_height = height;
+			m_width = dim;
+			m_height = dim;
 			m_format = format;
 			m_capacity = nrOfTextures;
 
@@ -77,7 +79,7 @@ namespace thomas {
 					return i;
 				}
 			}
-			Texture2D* texCpy = new Texture2D("Texture2DArray", tex->GetRawBGRAPixels(), tex->GetWidth(), tex->GetHeight(), false);
+			Texture2D* texCpy = new Texture2D(tex->GetRawBGRAPixels(), tex->GetWidth(), tex->GetHeight(), false);
 			//resize
 			//tex->ChangeFormat(m_format);
 			texCpy->Resize(m_width, m_height);
@@ -109,19 +111,5 @@ namespace thomas {
 			m_resource = textureInterface;
 		}
 
-		void Texture2DArray::UpdateTextures()
-		{
-			
-			unsigned size = m_width * m_height;
-			unsigned arraySize = m_textures.size() * size;
-			std::vector<byte*> initData(arraySize);
-
-			for (unsigned i = 0; i < arraySize; ++size)
-			{
-				initData[i] = m_textures[i]->GetRawBGRAPixels();
-			}
-
-			utils::D3D::Instance()->GetDeviceContextImmediate()->UpdateSubresource(m_resource, 0, NULL, &initData, 4 * m_width, 4 * m_width * m_height);
-		}
 	}
 }

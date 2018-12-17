@@ -60,14 +60,15 @@ public class ChadCam : ScriptComponent
             return _camera;
         }
     }
-
+    [Newtonsoft.Json.JsonIgnore]
     public float CameraSensitivity_x
     {
         get
         {
-            return CameraSensitivity_y * 16f / 9f;
+            return CameraSensitivity_y;
         }
     }
+    [Newtonsoft.Json.JsonIgnore]
     public float CameraSensitivity_y
     {
         get
@@ -161,6 +162,8 @@ public class ChadCam : ScriptComponent
                 case ChadControls.STATE.RAGDOLL:
                     if (Input.GetMouseMode() == Input.MouseMode.POSITION_RELATIVE)
                         RagdollCamera();
+                    if (Input.GetKeyUp(Input.Keys.LeftAlt) || Input.GetKeyUp(Input.Keys.R))
+                        state = STATE.FONDLE;
                     break;
             }
             if (velocity.y > 8.5f)

@@ -214,6 +214,11 @@ public class PickupableObject : NetworkComponent
         PickupCollider.enabled = reader.GetBool();
         chargeTimeCurrent = reader.GetFloat();
 
+        if (!pickedUp && transform.parent != null)
+        {
+            transform.SetParent(null, true);
+            Debug.Log("Something went wrong. It's fixed now tho!");
+        }
     }
 
 
@@ -238,7 +243,6 @@ public class PickupableObject : NetworkComponent
     virtual public void Reset()
     {
         RPCDrop();
-        transform.scale = Vector3.One;
         chargeTimeCurrent = 0.0f;
         _Chad = null;
         PickupCollider.enabled = false;

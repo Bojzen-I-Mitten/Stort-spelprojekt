@@ -15,14 +15,14 @@ public class ReplayCamera : ScriptComponent
     }
 
     [Newtonsoft.Json.JsonIgnore]
-    private Rigidbody Target
+    private Transform Target
     {
         get
         {
             if (Ball._Chad)
-                return Ball._Chad.rBody;
+                return Ball._Chad.transform;
             else
-                return Ball.m_rigidBody;
+                return Ball.transform;
         }
     }
 
@@ -30,19 +30,17 @@ public class ReplayCamera : ScriptComponent
     {
     }
 
-    public override void Update()
+    public override void FixedUpdate()
     {
         if (MatchSystem.instance && MatchSystem.instance.ReplaySystem.Replaying)
         {
-            Vector3 forward = Vector3.Normalize(Target.LinearVelocity);
-            Vector3 TargetPosition = Target.Position + new Vector3(0, 1.8f, 0) - forward * ChadCam.instance.CameraOffset;
-            transform.position = Vector3.Lerp(transform.position, TargetPosition, Time.DeltaTime);
+            Vector3 TargetPosition = Target.position + new Vector3(0, 1.8f, 0) - Target.forward * ChadCam.instance.CameraOffset;
+            transform.position = Vector3.Lerp(transform.position, TargetPosition, Time.ActualDeltaTime);
 
-            Vector3 TargetLookAt = Target.Position + new Vector3(0, 1.8f, 0)/* + Target.forward*/;
-            TargetLookAt = Vector3.Lerp(transform.position + transform.forward, TargetLookAt, Time.DeltaTime);
+            Vector3 TargetLookAt = Target.position + new Vector3(0, 1.8f, 0);
+            TargetLookAt = Vector3.Lerp(transform.position + transform.forward, TargetLookAt, Time.ActualDeltaTime);
             transform.LookAt(TargetLookAt);
         }
-
     }
 
     public override void OnEnable()
@@ -51,11 +49,7 @@ public class ReplayCamera : ScriptComponent
         {
             if (ChadCam.instance)
             {
-                Vector3 forward = Vector3.Normalize(Target.LinearVelocity);
-                float x = Random.Range(-5, 5);
-                float y = Random.Range(5, 15);
-                float z = Random.Range(-5, 5);
-                transform.position = /*new Vector3(x, y, z);*/Target.Position - forward * ChadCam.instance.CameraOffset;
+                transform.position = Target.position - Target.forward * ChadCam.instance.CameraOffset;
                 transform.LookAt(Target.transform.position);
             }
         }

@@ -378,7 +378,14 @@ namespace ThomasEngine {
 						{
 							if (gameObject->GetActive())
 							{
-								gameObject->Update();
+								
+								/*if (gameObject == ChadControls.gameObject)
+								{
+									PROFILE("Chads components");
+									gameObject->Update();
+								}
+								else*/
+									gameObject->Update();
 							}
 						}
 				}
@@ -397,7 +404,16 @@ namespace ThomasEngine {
 					for each (GameObject^ gameObject in CurrentScene->GameObjects)
 					{
 						if (gameObject->GetActive())
-							gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
+						{
+							//PROFILE("All gameObjects")
+							//if (gameObject->Name == "Chad")
+							//{
+							//	PROFILE("Chads components")
+							//	gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
+							//}
+							//else
+								gameObject->FixedUpdate(); //Should only be ran at fixed timeSteps.
+						}
 					}
 				}
 #ifdef _THOMAS_SCENE_LOCK

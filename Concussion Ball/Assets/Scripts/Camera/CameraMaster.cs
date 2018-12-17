@@ -63,8 +63,8 @@ public class CameraMaster : ScriptComponent
         MenuSound.Is3D = false;
         MenuSound.Volume = 0.1f;
         MenuSound.enabled = false;
-
-
+    
+        
         if (Light1 != null && Light2 != null)
         {
             Light1.Intensity = 5;
@@ -199,7 +199,7 @@ public class CameraMaster : ScriptComponent
         {
             if (Light2.Intensity == 0.5f)
                 Light2.Intensity = 0;
-        }
+        }   
     }
 
     public void TurnOnLights()
@@ -243,7 +243,7 @@ public class CameraMaster : ScriptComponent
 
     void UpdateHats()
     {
-        SelectedHat = SelectedHat == -1 ? ChadMMHat.GetHatCount() - 1 : SelectedHat;
+        SelectedHat = SelectedHat == -1 ? ChadMMHat.GetHatCount()-1 : SelectedHat;
         SelectedHat %= ChadMMHat.GetHatCount();
 
         ChadMMHat.SetHat(SelectedHat);
@@ -289,7 +289,7 @@ public class CameraMaster : ScriptComponent
             GUIScoreboard.Instance.enabled = false;
             GUIScoreboard.Instance.Canvas.isRendering = false;
         }
-        if (OptionsMenu)
+        if(OptionsMenu)
             OptionsMenu.Canvas.isRendering = false;
     }
 
@@ -357,7 +357,7 @@ public class CameraMaster : ScriptComponent
                 if (GUIScoreScreen.Instance)
                 {
                     GUIScoreScreen.Instance.enabled = true;
-                    GUIScoreScreen.Instance.Canvas.isRendering = true;
+                    GUIScoreScreen.Instance.Canvas.isRendering = true; 
                 }
                 break;
         }
