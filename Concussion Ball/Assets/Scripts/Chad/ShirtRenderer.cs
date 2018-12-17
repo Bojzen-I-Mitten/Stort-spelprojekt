@@ -1,7 +1,18 @@
 ﻿using ThomasEngine;
 public class ShirtRenderer : ScriptComponent
 {
-    RenderTexture rt = null;
+    RenderTexture _rt;
+    RenderTexture rt
+    {
+        get
+        {
+            if(_rt == null)
+            {
+                _rt = new RenderTexture(1024, 1024);
+            }
+            return _rt;
+        }
+    }
     Canvas canvas;
     Text nameText = null;
     Text teamText = null;
@@ -113,8 +124,7 @@ public class ShirtRenderer : ScriptComponent
     public override void OnAwake()
     {
 
-        rt = new RenderTexture(1024, 1024);
-
+        
         canvas = new Canvas(new Viewport(0, 0, 1024, 1024));
 
 
