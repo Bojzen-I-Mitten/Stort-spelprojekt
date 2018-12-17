@@ -71,6 +71,7 @@
     <ClCompile Include="src\system\command\CommandQueue.cpp" />
     <ClCompile Include="src\script\ScriptinUtility.cpp" />
     <ClCompile Include="src\resource\texture\RenderTexture.cpp" />
+    <ClCompile Include="src\WindowManager.cpp" />
     <ClCompile Include="src\math\MathEngine.cpp" />
     <ClCompile Include="src\GUI\game\WindowController.cpp" />
     <ClCompile Include="src\script\animation\constraint\PositionConstraint.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="src\serialization\IPropertyChanged.h" />
     <ClInclude Include="src\GUI\game\WindowController.h" />
     <ClInclude Include="src\script\animation\constraint\PositionConstraint.h" />
+    <ClInclude Include="src\WindowManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc" />

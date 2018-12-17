@@ -11,12 +11,7 @@ public class TeamGoal : ScriptComponent
     private ParticleEmitter goalEmitterCenter;
     private ParticleEmitter goalEmitterSpark;
     private ParticleEmitter goalEmitterShock;
-
-    public Texture2D goalCenterTexture { get; set; }
-    public Texture2D goalSparkTexture { get; set; }
-    public Texture2D goalShockWaveTexture { get; set; }
-
-
+    
     List<Confetti> confettis;
 
     public override void Start()
@@ -29,10 +24,12 @@ public class TeamGoal : ScriptComponent
         goalEmitterSpark = gameObject.AddComponent<ParticleEmitter>();
         goalEmitterShock = gameObject.AddComponent<ParticleEmitter>();
 
-        goalEmitterCenter.Texture = goalCenterTexture;
+        Texture2D centerTexture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
+        if (centerTexture != null)
+            goalEmitterCenter.Texture = centerTexture;
         goalEmitterCenter.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
-        goalEmitterCenter.MinSize = 1.0f;
-        goalEmitterCenter.MaxSize = 1.0f;
+        goalEmitterCenter.MinSize = 2.0f;
+        goalEmitterCenter.MaxSize = 2.0f;
         goalEmitterCenter.EndSize = 0.25f;
         goalEmitterCenter.MinLifeTime = 1.0f;
         goalEmitterCenter.MaxLifeTime = 1.0f;
@@ -42,7 +39,9 @@ public class TeamGoal : ScriptComponent
         goalEmitterCenter.MaxSpeed = 5.0f;
         goalEmitterCenter.EndSpeed = -5.0f;
 
-        goalEmitterSpark.Texture = goalSparkTexture;
+        Texture2D sparkTexture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/spark_particle.png");
+        if (sparkTexture != null)
+            goalEmitterSpark.Texture = sparkTexture;
         goalEmitterSpark.MinSize = 0.3f;
         goalEmitterSpark.MaxSize = 0.5f;
         goalEmitterSpark.EndSize = 0.04f;
@@ -57,7 +56,9 @@ public class TeamGoal : ScriptComponent
         goalEmitterSpark.Radius = 2.0f;
         goalEmitterSpark.SpawnAtEdge = true;
 
-        goalEmitterShock.Texture = goalShockWaveTexture;
+        Texture2D shockTexture = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/shockwave_particle.png");
+        if (shockTexture != null)
+            goalEmitterShock.Texture = shockTexture;
         goalEmitterShock.MinSize = 0.0f;
         goalEmitterShock.MaxSize = 0.0f;
         goalEmitterShock.EndSize = 100.0f;

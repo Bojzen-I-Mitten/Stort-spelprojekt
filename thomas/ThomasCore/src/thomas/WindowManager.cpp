@@ -5,21 +5,27 @@ namespace thomas
 {
 	WindowManager WindowManager::s_windowManager;
 
-	void WindowManager::Create(HWND hWnd, bool isEditor)
+	void WindowManager::Create(HWND& hwnd, HWND parent, int width, int height, bool isEditor)
 	{
-		
 		if (isEditor)
 		{
-			m_editorWindow = new EditorWindow(hWnd);
+			m_editorWindow = new EditorWindow(hwnd, parent, width, height, "Editor");
 			m_current = m_editorWindow;
 			m_windows.push_back(m_editorWindow);
 		}
 		else
 		{
-			Window* window = new Window(hWnd);
+			Window* window = new Window(hwnd, parent, width, height, "Game View");
 			m_current = window;
 			m_windows.push_back(window);
 		}
+	}
+
+	void WindowManager::Create(HWND& hwnd, HWND parent, int width, int height, std::string name)
+	{
+		Window* window = new Window(hwnd, parent, width, height, name);
+		m_current = window;
+		m_windows.push_back(window);
 	}
 
 	void WindowManager::UpdateFocus()
@@ -33,25 +39,78 @@ namespace thomas
 		}
 	}
 
-	void WindowManager::setBorderless(bool Toggle)
+	void WindowManager::SetBorderless(bool borderless)
 	{
+		if (m_current != nullptr)
+		{
+			m_current->QueueWindowStyleChange();
+			m_current->SetBorderless(borderless);
+		}
+	}
+
+	void WindowManager::SetFullscreen(bool fullscreen)
+	{
+		if (m_current != nullptr)
+		{
+			m_current->QueueResize();
+			m_current->SetFullscreen(fullscreen);
+		}
+	}
+
+	void WindowManager::SetWidth(LONG width)
+	{
+		if (m_current != nullptr)
+		{
+			m_current->SetWidth(width);
+		}
+	}
+
+	void WindowManager::SetHeight(LONG height)
+	{
+		if (m_current != nullptr)
+		{
+			m_current->SetHeight(height);
+		}
+	}
+
+	bool WindowManager::GetFullscreen()
+	{
+		if (m_current != nullptr)
+		{
+			return m_current->GetFullScreen();
+		}
+
+		return false;
+	}
+
+	bool WindowManager::GetBorderless()
+	{
+		if (m_current != nullptr)
+		{
+			return m_current->GetBorderless();
+		}
+
+		return false;
+	}
+
+	LONG WindowManager::GetWidth()
+	{
+		if (m_current != nullptr)
+		{
+			return m_current->GetWidth();
+		}
 		
-	//	LOG(Toggle);
+		return 0;
 	}
 
-	void WindowManager::setFullscreen(bool Toggle)
+	LONG WindowManager::GetHeight()
 	{
-	//	LOG(Toggle);
-	}
+		if (m_current != nullptr)
+		{
+			m_current->GetHeight();
+		}
 
-	bool WindowManager::getFullscreen()
-	{
-		return true;
-	}
-
-	bool WindowManager::getBorderless()
-	{
-		return true;
+		return 0;
 	}
 
 	WindowManager* WindowManager::Instance()
@@ -103,7 +162,7 @@ namespace thomas
 	bool WindowManager::WaitingForUpdate()
 	{
 		for (Window* window : m_windows)
-			if (window->ShouldResize())
+			if (window->ShouldResize() || window->ShouldWindowStyleChange())
 				return true;
 
 		return false;

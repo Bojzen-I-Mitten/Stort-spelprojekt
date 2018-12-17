@@ -98,7 +98,7 @@ namespace thomas
 
 			m_particleShader = graphics::Renderer::Instance()->getShaderList().CreateShader("../Data/FXIncludes/particleShader.fx");
 
-			m_texArr = new resource::Texture2DArray(256, 256, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
+			m_texArr = new resource::Texture2DArray(256, DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM);
 
 			m_blendState = blendState;
 

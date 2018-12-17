@@ -118,12 +118,12 @@ namespace ThomasEngine {
 
 	void ThomasWrapper::SampleRam(System::Object^ stateInfo)
 	{
-#ifdef BENCHMARK
+#ifdef MEMORY
 		float ramUsage = float(System::Diagnostics::Process::GetCurrentProcess()->PrivateMemorySize64 / 1024.0f / 1024.0f);
 		utils::profiling::ProfileManager::setRAMUsage(ramUsage);
 
 
-		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetTotalMemory());
+		utils::profiling::ProfileManager::setVRAMUsage(utils::profiling::GpuProfiler::Instance()->GetCurrentMemory());
 #endif
 
 	}
@@ -162,7 +162,7 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
-#ifdef BENCHMARK
+#ifdef PERFORMANCE
 			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
 			float gpuTime = utils::profiling::GpuProfiler::Instance()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
@@ -249,9 +249,8 @@ namespace ThomasEngine {
 			ImGui::Text("Logic Thread: %.02f ms	 Render Thread: %.02f ms", logicTime*1000.0f, renderTime*1000.0f);
 			ImGui::Text("CPU: %.02f ms	GPU: %.02f ms", (logicTime + renderTime)*1000.0f, profiler->GetFrameTime()*1000.0f);
 			ImGui::Text("Draw calls: %d	Verts: %d", profiler->GetNumberOfDrawCalls(), profiler->GetVertexCount());
-			ImGui::Text("VRAM Usage: %.2f MB (of %.2f MB)", profiler->GetTotalMemory(), 512.0f);
+			ImGui::Text("VRAM Usage: %.2f MB of (%.2f MB)", profiler->GetCurrentMemory(), 512.0f);
 			ImGui::Text("RAM Usage: %.2f MB", utils::profiling::ProfileManager::getRAMUsage());
-			//ImGui::Text("Draw time: %0.2f ms", profiler->GetDrawTotal()*1000.0f);
 			ImGui::Text("	Draw Shadows:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_SHADOWS_END)*1000.0f);
 			ImGui::Text("	Main objects:  %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_MAIN_OBJECTS_END)*1000.0f);
 			ImGui::Text("	Particles:     %0.5f ms", profiler->GetTimeStamp(utils::profiling::GTS_PARTICLES_END)*1000.0f);
@@ -465,15 +464,14 @@ namespace ThomasEngine {
 		}
 
 
-#ifdef BENCHMARK
+
 		WaitLogOutput = gcnew ManualResetEvent(false);
 		WaitCallback^ logOut = gcnew WaitCallback(DumpProfilerLog);
 		ThreadPool::QueueUserWorkItem(logOut);
-#endif
+
 		delete Thomas;				// Delete the thomas instance, unload scene...
-#ifdef BENCHMARK
+
 		WaitLogOutput->WaitOne();
-#endif
 	}
 
 	void ThomasWrapper::DumpProfilerLog(System::Object^ stateInfo)
@@ -502,24 +500,34 @@ namespace ThomasEngine {
 			gcnew MainThreadDelegate(Shutdown));
 	}
 
-	void ThomasWrapper::CreateThomasWindow(IntPtr hWnd, bool isEditor)
+	IntPtr ThomasWrapper::CreateThomasWindow(System::String^ name, int width, int height)
 	{
-		if (thomas::ThomasCore::Initialized())
-			WindowManager::Instance()->Create((HWND)hWnd.ToPointer(), isEditor);
+		HWND hwnd;
+		WindowManager::Instance()->Create(hwnd, nullptr, width, height, Utility::ConvertString(name));
+			
+		return IntPtr(hwnd);
+	}
 
-		if (isEditor) {
+	IntPtr ThomasWrapper::CreateThomasWindow(IntPtr parent, int width, int height, bool isEditor)
+	{
+		HWND hwnd;
+		WindowManager::Instance()->Create(hwnd, (HWND)parent.ToPointer(), width, height, isEditor);
+
+		if (isEditor) 
+		{
 			inEditor = true;
 			thomas::ThomasCore::SetEditor(true);
 		}
-			
+
+		return IntPtr(hwnd);
 	}
 
-
-	void ThomasWrapper::eventHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) {
+	void ThomasWrapper::eventHandler(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam) 
+{
 		thomas::Window::EventHandler((HWND)hWnd.ToPointer(), msg, (WPARAM)wParam.ToPointer(), (LPARAM)lParam.ToPointer());
 	}
 
-	void ThomasWrapper::Resize(IntPtr hWnd, double width, double height)
+	void ThomasWrapper::Resize(IntPtr hWnd)
 	{
 		Window* window = WindowManager::Instance()->GetWindow((HWND)hWnd.ToPointer());
 		if (window)
@@ -680,7 +688,6 @@ namespace ThomasEngine {
 		thomas::editor::EditorCamera::Instance()->ToggleManipulatorMode();
 	}
 
-	
 	bool ThomasWrapper::IsEditorBuild()
 	{
 		return inEditor;
