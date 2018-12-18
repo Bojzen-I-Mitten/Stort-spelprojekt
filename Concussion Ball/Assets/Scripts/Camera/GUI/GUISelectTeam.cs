@@ -33,6 +33,7 @@ public class GUISelectTeam : ScriptComponent
 
     List<Text> Team1Players = new List<Text>();
     List<Text> Team2Players = new List<Text>();
+       
 
     RenderSkinnedComponent ChadRSC1;
     RenderSkinnedComponent ChadRSC2;
@@ -323,7 +324,6 @@ public class GUISelectTeam : ScriptComponent
         Canvas.Remove(Team1Text);
         Canvas.Remove(Team2Text);
         Canvas.Remove(SpectatorText);
-        DeletePlayersLists();
         Canvas.Remove(ExitText);
     }
 
@@ -353,6 +353,21 @@ public class GUISelectTeam : ScriptComponent
         transform.position = SelectTeamCamPos;
         transform.rotation = Quaternion.CreateFromYawPitchRoll(SelectTeamCamRot.x, SelectTeamCamRot.y, SelectTeamCamRot.z);
         transform.scale = Vector3.One;
+
+        for(int i = 0; i < MatchSystem.instance.MaxPlayers/2; i++)
+        {
+            Text p1 = Canvas.Add("");
+            p1.position = new Vector2(0.0f, 0.15f + 0.1f * i);
+            p1.font = ChadFont;
+            
+            Team1Players.Add(p1);
+
+            Text p2 = Canvas.Add("");
+            p2.origin = new Vector2(1, 0);
+            p2.position = new Vector2(1.0f, 0.15f + 0.1f * i);
+            p2.font = ChadFont;
+            Team2Players.Add(p2);
+        }
     }
 
     private void ShowPlayers()
@@ -360,42 +375,26 @@ public class GUISelectTeam : ScriptComponent
         List<NetworkPlayer> team1 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].Players;
         List<NetworkPlayer> team2 = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Players;
 
-        DeletePlayersLists();
-        int i = 0;
-        foreach (NetworkPlayer player in team1)
+
+        for (int i = 0; i < MatchSystem.instance.MaxPlayers / 2; i++)
         {
-            Text p = Canvas.Add(player.PlayerName);
-            p.position = new Vector2(0.0f, 0.15f + 0.1f * i);
-            p.font = ChadFont;
-            if (player.ReadyToStart)
-                p.color = Color.Green;
-            i++;
-            Team1Players.Add(p);
-        }
-        i = 0;
-        foreach (NetworkPlayer player in team2)
-        {
-            Text p = Canvas.Add(player.PlayerName);
-            p.origin = new Vector2(1, 0);
-            p.position = new Vector2(1.0f, 0.15f + 0.1f * i);
-            p.font = ChadFont;
-            if (player.ReadyToStart)
-                p.color = Color.Green;
-            i++;
-            Team2Players.Add(p);
+            Text p1 = Team1Players[i];
+            if (team1.Count > i)
+                p1.text = team1[i].PlayerName;
+            else
+                p1.text = "";
+
+            Text p2 = Team2Players[i];
+            if (team2.Count > i)
+                p2.text = team2[i].PlayerName;
+            else
+                p2.text = "";
         }
 
         PlayersInTeam1.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2;
         PlayersInTeam2.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2;
     }
 
-    private void DeletePlayersLists()
-    {
-        foreach (Text t in Team1Players)
-            Canvas.Remove(t);
-        foreach (Text t in Team2Players)
-            Canvas.Remove(t);
-    }
 
     private bool CheckReadyPlayers()
     {

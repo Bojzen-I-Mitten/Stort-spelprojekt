@@ -67,6 +67,8 @@ public class ChadControls : NetworkComponent
     private float JumpingTimer = 0.0f;
     private bool Jumping = false;
     private bool Landed = false;
+
+    private ParticleEmitter runningFastParticles;
     #endregion
 
     [Browsable(false)]
@@ -176,6 +178,24 @@ public class ChadControls : NetworkComponent
         //OriginalMaterials = gameObject.GetComponent<RenderSkinnedComponent>().materials;
 
         TackleThreshold = 8.5f;
+
+        runningFastParticles = gameObject.AddComponent<ParticleEmitter>();
+        Texture2D smokeTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/smoke_particle.png");
+        if (smokeTex.height > 0)
+            runningFastParticles.Texture = smokeTex;
+        runningFastParticles.MinSize = 0.2f;
+        runningFastParticles.MaxSize = 0.4f;
+        runningFastParticles.EndSize = 0.0f;
+        runningFastParticles.MinLifeTime = 0.2f;
+        runningFastParticles.MaxLifeTime = 0.9f;
+        runningFastParticles.EmissionRate = 40;
+        runningFastParticles.MinRotationSpeed = -5.0f;
+        runningFastParticles.MaxRotationSpeed = 5.0f;
+        runningFastParticles.MinSpeed = 0.0f;
+        runningFastParticles.MaxSpeed = 0.0f;
+        runningFastParticles.EndSpeed = 0.0f;
+        runningFastParticles.DistanceFromSphereCenter = 0;
+        runningFastParticles.Gravity = 0.0f;
     }
 
     public override void OnGotOwnership()
@@ -580,6 +600,8 @@ public class ChadControls : NetworkComponent
                     // Started to move
                     if (CurrentVelocity.y == 0)
                         CurrentVelocity.y = modifiedBaseSpeed;
+
+                    
                 }
                 // Walking backwards
                 else if (Direction.z < 0)
@@ -630,6 +652,10 @@ public class ChadControls : NetworkComponent
         if(Direction.z != 0)
             Direction.x = 0;
 
+        if (CurrentVelocity.y > TackleThreshold)
+            runningFastParticles.Emit = true;
+        else
+            runningFastParticles.Emit = false;
         //rBody.IgnoreNextTransformUpdate();
     }
 

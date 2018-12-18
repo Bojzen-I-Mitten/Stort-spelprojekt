@@ -578,10 +578,10 @@ public class GUIOptionsMenu : ScriptComponent
         //      ClearImagesAndText();
         string Update;
         Update = Wcontroller.GetFullscreen().ToString();
-//        Debug.Log(Update);
+
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
         Update = Wcontroller.GetBorderless().ToString();
-//        Debug.Log(Update);
+ 
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
         if (ImageBar != null)

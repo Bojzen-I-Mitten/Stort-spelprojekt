@@ -110,6 +110,7 @@ public class ThomasTrain : Powerup
         emitterSpark.MinSize = 0.8f;
         emitterSpark.MaxSize = 1.7f;
         emitterSpark.EndSize = 0.2f;
+        emitterSpark.EmissionRate = 100;
         emitterSpark.MaxLifeTime = 0.5f;
         emitterSpark.MinLifeTime = 0.5f;
         emitterSpark.MinRotationSpeed = 5.0f;
@@ -118,7 +119,7 @@ public class ThomasTrain : Powerup
         emitterSpark.MinSpeed = 10;
         emitterSpark.EndSpeed = 0;
         emitterSpark.SpawnAtEdge = true;
-        emitterSpark.Radius = 6.7f;
+        emitterSpark.Radius = 4.7f;
         #endregion
     }
 
@@ -182,6 +183,7 @@ public class ThomasTrain : Powerup
     public override void OnThrow()
     {
         soundComponentTravel.Play();
+        emitterSpark.Emit = true;
     }
 
     // if this is a throwable power-up this function will be called
@@ -257,6 +259,7 @@ public class ThomasTrain : Powerup
 
         emitterThomasFace.EmitOneShot(1);
         emitterFire.EmitOneShot(40);
+        emitterSpark.Emit = false;
         emitterSpark.EmitOneShot(200);
 
         soundComponentExplosion.Play();
