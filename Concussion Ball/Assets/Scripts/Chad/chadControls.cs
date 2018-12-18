@@ -15,7 +15,7 @@ public class ChadControls : NetworkComponent
 {
     public enum STATE
     {
-        CHADING,    // Idle/moving
+        CHADING,   // Idle/moving
         THROWING,   // player throws ball / power-up, not all power-ups activate this state
         DIVING,    // user got tackled / hit by a power-up
         RAGDOLL,    // user pressed Space to jump tackle
@@ -44,7 +44,9 @@ public class ChadControls : NetworkComponent
     public float ChargeTime { get; set; }
 
     
-    
+
+    private uint ChargeAnimIndex = 0;
+    private uint ThrowAnimIndex = 1;
     private bool HasThrown = false;
     #endregion
 
@@ -116,9 +118,6 @@ public class ChadControls : NetworkComponent
 
     public override void OnAwake()
     {
-        Animations = gameObject.GetComponent<Chadimations>();
-        if (!Animations)
-            throw new InvalidOperationException("Chadimations component missing");
         ragdollSync = gameObject.AddComponent<NetworkTransform>();
         NetworkIdentity c = gameObject.GetComponent<NetworkIdentity>();
         gameObject.SetComponentIndex(c, 0xfffffff);  // Ensure network writer is last
@@ -139,7 +138,7 @@ public class ChadControls : NetworkComponent
         PowerupPickupText.font = PickupFont;
 
         State = STATE.CHADING;
-        
+
         // Access rigidbody and apply
         rBody = gameObject.GetComponent<Rigidbody>();
         rBody.IsKinematic = false;
@@ -149,6 +148,7 @@ public class ChadControls : NetworkComponent
 
         NetPlayer = gameObject.GetComponent<NetworkPlayer>();
         rBody.Friction = 0.99f;
+        Animations = gameObject.GetComponent<Chadimations>();
         Ragdoll = gameObject.GetComponent<Ragdoll>();
         ragdollSync.target = Ragdoll.GetHips().transform;
         ragdollSync.SyncMode = NetworkTransform.TransformSyncMode.SyncRigidbody;
@@ -211,7 +211,6 @@ public class ChadControls : NetworkComponent
         if (this == MatchSystem.instance.LocalChad) // Currently chad is lost control of
             MatchSystem.instance.LocalChad = null;
     }
-    
 
 
     #region camera state
@@ -313,7 +312,9 @@ public class ChadControls : NetworkComponent
         if (!OnGround())
             rBody.Friction = 0.0f;
 
-        
+
+        if (State != STATE.DIVING)
+            Animations.ResetTimer(STATE.DIVING, 0);
     }
 
     #region Ragdoll handling
@@ -437,11 +438,12 @@ public class ChadControls : NetworkComponent
     {
         if (Locked)
             return;
-        // Reset input
-        Direction = Vector3.Zero;
-        // Read new input
+
         if (Input.GetKey(Input.Keys.W))
+        {
             Direction.z = 1 + (CurrentVelocity.y / (MaxSpeed*0.5f));
+        }
+            
         if (Input.GetKey(Input.Keys.S))
             Direction.z -= 1;
         if (Input.GetKey(Input.Keys.D))
@@ -452,7 +454,6 @@ public class ChadControls : NetworkComponent
         if (Input.GetKeyDown(Input.Keys.LeftShift) && DivingTimer > 5.0f)
         {
             State = STATE.DIVING;
-            Animations.EnterState(STATE.DIVING, 0);
             CurrentVelocity.y += 2.0f;
             Diving = DivingCoroutine();
             StartCoroutine(Diving);
@@ -479,7 +480,7 @@ public class ChadControls : NetworkComponent
                         State = STATE.THROWING;
                         ChadHud.Instance.ActivateAimHUD();
 
-                        Animations.EnterState(STATE.THROWING, 0); // Throw anim
+                        Animations.SetAnimationWeight(ChargeAnimIndex, 1);
                     }
                     else if((Input.GetMouseButtonUp(Input.MouseButtons.LEFT) || Input.GetMouseButtonUp(Input.MouseButtons.RIGHT)) && !HasThrown && State == STATE.THROWING)
                     {
@@ -517,8 +518,8 @@ public class ChadControls : NetworkComponent
     public void RPCResetThrow()
     {
         HasThrown = false;
-        //Animations.SetAnimationWeight(ChargeAnimIndex, 0);
-        //Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        Animations.SetAnimationWeight(ThrowAnimIndex, 0);
         
         if (PickedUpObject)
         {
@@ -671,7 +672,6 @@ public class ChadControls : NetworkComponent
     public void Reset()
     {
         DisableRagdoll();
-        Animations.Reset();
         State = STATE.CHADING;
         if (Diving != null)
         {
@@ -845,14 +845,19 @@ public class ChadControls : NetworkComponent
     {
         Animations.SetAnimationWeight((uint)index, weight);
     }
-    
+
+    public void RPCStartThrow()
+    {      
+        Animations.SetAnimationWeight(ChargeAnimIndex, 0);
+        Animations.SetAnimationWeight(ThrowAnimIndex, 1);
+    }
+
     IEnumerator PlayThrowAnim()
     {
         if (isOwner)
             ChadHud.Instance.DeactivateAimHUD();
-        //RPCStartThrow();
-        //SendRPC("RPCStartThrow");
-        Animations.EnterState(STATE.THROWING, 1); // Throw release anim
+        RPCStartThrow();
+        SendRPC("RPCStartThrow");
         Vector3 chosenDirection = ChadCam.instance.transform.forward;
         Vector3 ballCamPos = ChadCam.instance.transform.position;
         
@@ -867,8 +872,8 @@ public class ChadControls : NetworkComponent
         if (State != STATE.RAGDOLL)
         {
             State = STATE.CHADING;
-            //Animations.SetAnimationWeight(ThrowAnimIndex, 0);
-            //SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
+            Animations.SetAnimationWeight(ThrowAnimIndex, 0);
+            SendRPC("RPCSetAnimWeight", (int)ThrowAnimIndex, 0);
         }
 
         Throwing = null;
@@ -973,10 +978,9 @@ public class ChadControls : NetworkComponent
         CurrentVelocity = reader.GetVector2();
         HasThrown = reader.GetBool();
         CanBeTackled = reader.GetBool();
-        for (STATE i = 0; i < STATE.NUM_STATES; i++)
-        {
-            Animations.EnterState(i, reader.GetInt());
-        }
+        if(!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        Animations.Throwing = reader.GetBool();
     }
 
     public override bool OnWrite(NetDataWriter writer, bool initialState)
@@ -987,11 +991,9 @@ public class ChadControls : NetworkComponent
         writer.Put(CurrentVelocity);
         writer.Put(HasThrown);
         writer.Put(CanBeTackled);
-
-        for(STATE i = (STATE)0; i < STATE.NUM_STATES; i++)
-        {
-            writer.Put(Animations.ReadState(i));
-        }
+        if (!Animations)
+            Animations = gameObject.GetComponent<Chadimations>();
+        writer.Put(Animations.Throwing);
         return true;
     }
 
