@@ -26,6 +26,7 @@ namespace Concussion_Ball.Assets.Scripts
         private FeetIK feetB;
         private GameObject poleA;
         private GameObject poleB;
+        private ChadControls chad;
 
         public HipAdjustment()
             : base()
@@ -37,6 +38,7 @@ namespace Concussion_Ball.Assets.Scripts
         {
             m_rC = gameObject.GetComponent<RenderSkinnedComponent>();
             m_IK = gameObject.GetComponents<FeetIK>();
+            chad = gameObject.GetComponent<ChadControls>();
             if (m_IK.Count < 2)
                 throw new InvalidOperationException("Missing FeetIK scripts");
             feetA = m_IK[0];
@@ -133,6 +135,7 @@ namespace Concussion_Ball.Assets.Scripts
             if (Vector3.Dot(Vector3.Forward, v) < 0.0f)
                 v.z = -v.z;
             poleB.transform.localPosition = hipRoot.Translation + v * PoleDistance;
+            
         }
     }
 }

@@ -26,6 +26,8 @@ namespace Concussion_Ball.Assets.Scripts
         //private uint ikBoneIndex;                   // Index for raytraced bone
         [Browsable(false), Newtonsoft.Json.JsonIgnore]
         public IK_FABRIK_Constraint IK { get; private set; }
+        [Browsable(false), Newtonsoft.Json.JsonIgnore]
+        public bool Enabled { get; set; } = true;
         private State state = State.Disabled;
         private float ikTimeRemaining = 0;
         private float ikTimeBlending = 0;
@@ -51,7 +53,9 @@ namespace Concussion_Ball.Assets.Scripts
         public Vector3 LocalBoneForward { get; private set; }
         [Browsable(false), Newtonsoft.Json.JsonIgnore]
         public bool IsActive { get { return ikTargetWeight > 0.0f; } }
-        
+        private ChadControls chad;
+        private int frameWaitCounter = 0;
+
         public IK_FABRIK_Constraint.JointParams[] Joints
         {
             get { return IK.Joints; }
@@ -74,6 +78,7 @@ namespace Concussion_Ball.Assets.Scripts
 
         public override void OnAwake()
         {
+            chad = gameObject.GetComponent<ChadControls>();
             base.OnAwake();
         }
 
@@ -125,7 +130,7 @@ namespace Concussion_Ball.Assets.Scripts
 
         protected override Matrix fetchTransform()
         {
-            if (IK.Weight < 0.001f)
+            if (!Enabled || IK.Weight < 0.001f)
                 return base.fetchTransform();
             else
                 return IK.LastPoseTransform;
@@ -138,6 +143,35 @@ namespace Concussion_Ball.Assets.Scripts
 
         public override void Update()
         {
+            /* Enable/Disable IK
+             */
+            if (chad != null)
+            {
+                if (chad.Direction == Vector3.Zero &&
+                    (chad.State == ChadControls.STATE.CHADING ||
+                    chad.State == ChadControls.STATE.THROWING))
+                {
+                    if (frameWaitCounter == 3)
+                    {
+                        Enabled = true;
+                        if (frameWaitCounter == 2)
+                            Debug.Log("Enabled");
+                        Matrix foot = base.fetchTransform();
+                        Vector3 s2, t2;
+                        Quaternion r2;
+                        if (foot.Decompose(out s2, out r2, out t2)) { }
+                        ikTarget = t2;
+                        ikTargetOrient = r2;
+                    }
+                    frameWaitCounter = (frameWaitCounter + 1) % 10000;
+                }
+                else
+                {
+                    Enabled = false;
+                    frameWaitCounter = 0;
+                }
+            }
+
             base.Update();
             if (PoleTarget != null)
                 IK.PoleTarget = PoleTarget.transform.localPosition;
@@ -155,7 +189,8 @@ namespace Concussion_Ball.Assets.Scripts
             if (!m_sampleSuccess ||                                                 // Verify enough samples found
                 Distance > MaxDistanceOffset ||                                     // Verify target point is close enough
                 distanceToRoot > IK.BoneChainLength - MaxIKChainDistanceOffset ||   // Verify target point is close enough
-                angle > BendAngleMinFadeOut)
+                angle > BendAngleMinFadeOut ||
+                !Enabled)
             {
                 if (state == State.Enabled)
                 {
@@ -187,8 +222,8 @@ namespace Concussion_Ball.Assets.Scripts
             if(mFoot.Decompose(out s, out r, out t)) { }
             /* Resolve custom targeting
             */
-            float minimalDistanceTraversal = 0.05f; float clampDistanceTraversal = 0.3f;
-            float minimalAngleTraversal = 0.08f; float clampRotation = 0.3f;
+            float minimalDistanceTraversal = 0.18f; float clampDistanceTraversal = 0.5f;
+            float minimalAngleTraversal = 0.2f; float clampRotation = 0.5f;
             Vector3 diff = target - ikTarget;
             float distance = diff.Length();
             float targetSmooth = Math.Max(0.0f, distance - minimalDistanceTraversal) / clampDistanceTraversal;
@@ -204,11 +239,22 @@ namespace Concussion_Ball.Assets.Scripts
             /* Apply targets
             */
 
-            ikWeight = blendInFactor();
-            ikTarget = Vector3.Lerp(t, target, ikWeight);
-            ikTargetOrient = Quaternion.Slerp(r, orient, ikWeight);
-            IK.Target = ikTarget;
-            IK.Orientation = ikTargetOrient;
+            if (Enabled)
+            {
+                ikWeight = blendInFactor();
+                ikTarget = Vector3.Lerp(t, target, ikWeight);
+                ikTargetOrient = Quaternion.Slerp(r, orient, ikWeight);
+                IK.Target = ikTarget;
+                IK.Orientation = ikTargetOrient;
+                IK.Weight = 1.0f;
+                IK.OrientationWeight = 1.0f;
+            }
+            else
+            {
+            IK.Weight = 0.0f;
+            IK.OrientationWeight = 0.0f;
+
+            }
 
             LocalBoneForward = Vector3.Transform(Vector3.Up, ikTargetOrient);
             //IK.Weight = ikWeight;// blendInFactor(ikWeight, ikTargetWeight, IKBlendFactor);

@@ -60,7 +60,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Chad\AnimationMixer.cs" />
     <Compile Include="Assets\Scripts\Chad\Animation\HipAdjustment.cs" />
     <Compile Include="Assets\Scripts\Chad\Powerups\Gramophone.cs" />
     <Compile Include="Assets\Scripts\Camera\GUI\GUIScoreScreen.cs" />

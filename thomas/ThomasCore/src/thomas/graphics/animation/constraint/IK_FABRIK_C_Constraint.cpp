@@ -4,10 +4,10 @@
 #include "../../../editor/gizmos/Gizmos.h"
 #include "../data/Skeleton.h"
 
-#define IK_DRAW
+//#define IK_DRAW
 //#define DRAW_FORWARD_CONSTRAINT
-#define DRAW_BACKWARD_CONSTRAINT
-#define DRAW_POLE_TARGET
+//#define DRAW_BACKWARD_CONSTRAINT
+//#define DRAW_POLE_TARGET
 
 namespace thomas {
 	namespace graphics {

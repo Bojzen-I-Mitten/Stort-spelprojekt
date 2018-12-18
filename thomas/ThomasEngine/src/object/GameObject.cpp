@@ -366,8 +366,10 @@ namespace ThomasEngine {
 			{
 				if (i == index) break;
 				// Found comp. insert at new index.
-				m_components[i] = m_components[index];
-				m_components[index] = c;
+				auto comp = m_components[i];
+				m_components.RemoveAt(i);
+				int newInd = i > index ? index - 1 : index;
+				m_components.Insert(newInd, comp);
 				m_changeEvent(this, gcnew ComponentsChangedArgs());
 				break;
 			}
