@@ -84,13 +84,12 @@ public class ReplaySystem : ScriptComponent
         LoadObjectState(initialState);
         CameraMaster.instance.StopReplay();
         CameraMaster.instance.StartReplay();
-
+        MatchSystem.instance.Pause();
         while (States.Count > 0)
         {
             while(currentTime < States[0].timestamp)
             {
                 currentTime += Time.ActualDeltaTime;
-                MatchSystem.instance.MatchStartTime += Time.ActualDeltaTime;
                 yield return null;
             }
             LoadObjectState(States[0]);
@@ -101,7 +100,7 @@ public class ReplaySystem : ScriptComponent
         MatchSystem.instance.ReadOwnerAsNormal = false;
         MatchSystem.instance.blockIncomingData = false;
         CameraMaster.instance.StopReplay();
-
+        MatchSystem.instance.UnPause();
     }
 
 

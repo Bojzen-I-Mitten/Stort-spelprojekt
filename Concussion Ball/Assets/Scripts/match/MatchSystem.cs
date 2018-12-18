@@ -43,18 +43,9 @@ public class MatchSystem : NetworkManager
     //public int MaxPlayers = 8;
 
 
-    public float lostTime = 0.0f;
-    public float ElapsedMatchTime
-    {
-        get
-        {
-            if (!MatchStarted)
-                return 0.0f;
+    private bool timePaused = false;
 
-            return TimeSinceServerStarted - MatchStartTime - lostTime;
-        }
-    }
-
+    public float ElapsedMatchTime = 0.0f;
     public int MatchTimeLeft
     {
         get
@@ -74,7 +65,6 @@ public class MatchSystem : NetworkManager
 
     public bool GoldenGoal = false;
 
-    public float MatchStartTime;
     [Browsable(false)]
     public bool MatchStarted { get; private set; } = false;
 
@@ -98,8 +88,6 @@ public class MatchSystem : NetworkManager
         base.OnAwake();
         Ball = GameObject.Instantiate(BallPrefab);
     }
-
-
 
     public override void Start()
     {
@@ -157,17 +145,28 @@ public class MatchSystem : NetworkManager
             }
         }
 
-        if (MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
+
+        if (ServerOwner && MatchStarted && !timePaused)
+        {
+            ElapsedMatchTime += Time.ActualDeltaTime;
+        }
+
+        if (ServerOwner && MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
         {
             OnMatchEnd();
         }
-
-        //if (MatchStarted) //Sync time. (not done atm)
-        //{
-        //    if(MatchTimeLeft % 5 == 0)
-        //        SendRPC(-2, "RPCMatchInfo", MatchStartTime, GoldenGoal);
-        //}
     }
+
+
+    public void Pause()
+    {
+        timePaused = true;
+    }
+    public void UnPause()
+    {
+        timePaused = false;
+    }
+
 
     private void ShowOwnedObjects()
     {
@@ -282,9 +281,11 @@ public class MatchSystem : NetworkManager
     #region Read/Write
     public override void OnWrite(NetDataWriter writer)
     {
+        if (ServerOwner)
+            Debug.Log("why");
         writer.Put(MatchStarted);
         writer.Put(GoldenGoal);
-        writer.Put(MatchStartTime);
+        writer.Put(ElapsedMatchTime);
         writer.Put(MatchLength);
         writer.Put(MaxPlayers);
         writer.Put(ServerName);
@@ -300,9 +301,11 @@ public class MatchSystem : NetworkManager
     }
     public override void OnRead(NetDataReader reader)
     {
+        if (ServerOwner)
+            Debug.Log("hmmm");
         MatchStarted = reader.GetBool();
         GoldenGoal = reader.GetBool();
-        MatchStartTime = reader.GetFloat();
+        ElapsedMatchTime = reader.GetFloat();
         MatchLength = reader.GetInt();
         MaxPlayers = reader.GetInt();
         ServerName = reader.GetString();
@@ -324,7 +327,7 @@ public class MatchSystem : NetworkManager
     {
         AnnouncerSoundManager.Instance.Announce(ANNOUNCEMENT_TYPE.WELCOME);
         MatchStarted = true;
-        MatchStartTime = TimeSinceServerStarted;
+        ElapsedMatchTime = 0.0f;
         foreach (var team in Teams)
         {
             team.Value.ResetScore();
