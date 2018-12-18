@@ -151,7 +151,7 @@ public class MatchSystem : NetworkManager
             ElapsedMatchTime += Time.ActualDeltaTime;
         }
 
-        if (ServerOwner && MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
+        if (MatchTimeLeft <= 0 && MatchStarted && !GoldenGoal)
         {
             OnMatchEnd();
         }
@@ -281,9 +281,9 @@ public class MatchSystem : NetworkManager
     #region Read/Write
     public override void OnWrite(NetDataWriter writer)
     {
-        if (ServerOwner)
-            Debug.Log("why");
+
         writer.Put(MatchStarted);
+
         writer.Put(GoldenGoal);
         writer.Put(ElapsedMatchTime);
         writer.Put(MatchLength);
@@ -301,8 +301,7 @@ public class MatchSystem : NetworkManager
     }
     public override void OnRead(NetDataReader reader)
     {
-        if (ServerOwner)
-            Debug.Log("hmmm");
+
         MatchStarted = reader.GetBool();
         GoldenGoal = reader.GetBool();
         ElapsedMatchTime = reader.GetFloat();
@@ -336,6 +335,12 @@ public class MatchSystem : NetworkManager
     }
     public void RPCEndMatch()
     {
+        if(!MatchStarted || MatchTimeLeft > 0.0f)
+        {
+            Debug.Log("trying to end match before it is over");
+            return;
+        }
+
         hasScored = true;
         if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
         {
@@ -368,16 +373,13 @@ public class MatchSystem : NetworkManager
     #region Match functions
 
     void OnMatchEnd()
-    {
-        
+    { 
         if (MatchStarted)
         {
             RPCEndMatch();
-            SendRPC(-2, "RPCEndMatch");
+            if(ServerOwner)
+                SendRPC(-2, "RPCEndMatch");
         }
-        
-            
-        
         
         //Clean up
         //MatchStarted = false;
