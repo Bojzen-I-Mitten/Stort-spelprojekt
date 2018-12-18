@@ -242,7 +242,7 @@ public class ChadHud : ScriptComponent
 
     IEnumerator AnnouncementAnimation(float duration, string text, string text2, Color color, bool showBG = true)
     {
-
+        MatchSystem.instance.Pause();
         float time = 0.0f;
         float xPos = 0;
         //When xPos = 1 it will be at the center
@@ -278,15 +278,14 @@ public class ChadHud : ScriptComponent
                 AnnouncementBG.scale = new Vector2(10000, 1.0f + (float)Math.Sin(time * 0.5f));
                 AnnouncementBG.color = c2;
             }
-            if (MatchSystem.instance.MatchTimeLeft > 0.0f)
-                MatchSystem.instance.MatchStartTime += Time.ActualDeltaTime;
+            
             yield return null;
         }
         Announcement1.text = "";
         Announcement2.text = "";
         AnnouncementBG.scale = Vector2.Zero;
+        MatchSystem.instance.UnPause();
     }
-
 
     IEnumerator Countdown(float duration)
     {

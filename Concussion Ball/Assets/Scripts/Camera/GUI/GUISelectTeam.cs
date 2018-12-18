@@ -380,15 +380,27 @@ public class GUISelectTeam : ScriptComponent
         {
             Text p1 = Team1Players[i];
             if (team1.Count > i)
+            {
                 p1.text = team1[i].PlayerName;
+                p1.color = team1[i].GetReady() ? Color.Green : Color.White;
+            }
             else
+            {
                 p1.text = "";
-
+                p1.color = Color.White;
+            }
             Text p2 = Team2Players[i];
             if (team2.Count > i)
+            {
                 p2.text = team2[i].PlayerName;
+                p2.color = team2[i].GetReady() ? Color.Green : Color.White;
+            }
             else
+            {
                 p2.text = "";
+                p2.color = Color.White;
+            }
+                
         }
 
         PlayersInTeam1.text = MatchSystem.instance.Teams[TEAM_TYPE.TEAM_1].PlayerCount + " out of " + MatchSystem.instance.MaxPlayers / 2;
