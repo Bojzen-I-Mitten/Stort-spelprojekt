@@ -571,7 +571,7 @@ namespace thomas
 				boneUp.Normalize();
 				// Find rotation from parent forward, to child bone (if there is an angle difference)
 				if(toChild * boneUp < 1.f - math::EPSILON)
-					bi._invParentOrient = math::getMatrixRotationTo(convert(toChild), convert(boneUp));;
+					bi._invParentOrient = math::getMatrixRotationTo(convert(boneUp), convert(toChild));;
 			}
 			// Store BoneInfo
 			boneMap.m_boneInfo[BoneIndex] = bi;

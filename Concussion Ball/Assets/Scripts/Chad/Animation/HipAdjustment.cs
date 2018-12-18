@@ -17,7 +17,8 @@ namespace Concussion_Ball.Assets.Scripts
         public float Distance { get; set; }
         public float ClampOffset { get; set; } = 0.2f;
         public float PoleDistance { get; set; } = 1.0f;
-        public float ForwardPoleBias { get; set; } = 1.0f;
+        public float PoleForwardBias { get; set; } = 2f;
+        public Vector3 PoleOffset { get; set; }
 
         private uint hipBoneIndex;
         private Vector3 targetPoint;
@@ -57,7 +58,6 @@ namespace Concussion_Ball.Assets.Scripts
                 index = 0;
             hipBoneIndex = index;
             m_point.apply(m_rC, index);
-            m_point.Distance = Distance;
         }
 
         public override void Start()
@@ -78,6 +78,7 @@ namespace Concussion_Ball.Assets.Scripts
 
         public override void Update()
         {
+            m_point.Distance = Math.Max(Distance, 0.3f);
             /* Calculate hip adjustment
             */
             Vector3 avg = Vector3.Zero;
@@ -114,8 +115,9 @@ namespace Concussion_Ball.Assets.Scripts
              */
              // Foot A
             Matrix hipRoot = m_rC.GetLocalBoneMatrix(feetA.IK.RootBoneIndex);
-            Vector3 v = Vector3.Normalize(hipRoot.Forward) * ForwardPoleBias +  feetA.LocalBoneForward;
+            Vector3 v = Vector3.Normalize(hipRoot.Forward) * PoleForwardBias +  feetA.LocalBoneForward;
             v.y = 0; v.Normalize();     // Project on xz
+            v += PoleOffset;
             //v.z -= ForwardPoleBias;
             //v.Normalize();
             if (Vector3.Dot(Vector3.Forward, v) < 0.0f)
@@ -123,8 +125,9 @@ namespace Concussion_Ball.Assets.Scripts
             poleA.transform.localPosition = hipRoot.Translation + v * PoleDistance;
             // Foot B
             hipRoot = m_rC.GetLocalBoneMatrix(feetB.IK.RootBoneIndex);
-            v = Vector3.Normalize(hipRoot.Forward) * ForwardPoleBias + feetB.LocalBoneForward;
+            v = Vector3.Normalize(hipRoot.Forward) * PoleForwardBias + feetB.LocalBoneForward;
             v.y = 0; v.Normalize();     // Project on xz
+            v += PoleOffset;
             //v.z -= ForwardPoleBias;
             //v.Normalize();
             if (Vector3.Dot(Vector3.Forward, v) < 0.0f)
