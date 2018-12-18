@@ -162,9 +162,9 @@ namespace ThomasEngine {
 			UpdateFinished->Reset();
 			ThomasCore::Render();
 			RenderFinished->Set();
-#ifdef PERFORMANCE
-			renderTime = ThomasTime::GetElapsedTime() - timeStart;
 
+			renderTime = ThomasTime::GetElapsedTime() - timeStart;
+#ifdef PERFORMANCE
 			float gpuTime = utils::profiling::GpuProfiler::Instance()->GetFrameTime() * 1000.0f * 1000.0f * 1000.0f;
 			utils::profiling::ProfileManager::storeGpuSample((long long)gpuTime);
 
