@@ -2,7 +2,6 @@
 #pragma unmanaged
 #include <thomas\resource\texture\RenderTexture.h>
 #pragma managed
-
 #include "Texture2D.h"
 #include "../../ThomasManaged.h"
 #include "../../GUI/game/Canvas.h"
@@ -20,6 +19,7 @@ namespace ThomasEngine
 		
 		void WriteCanvas(Canvas^ canvas)
 		{
+			ThomasWrapper::WaitForRender();
 			((thomas::resource::RenderTexture*)m_nativePtr)->WriteCanvas(canvas->nativePtr);
 		}
 	};

@@ -2,6 +2,8 @@
 #include "Component.h"
 #include "../../utils/Math.h"
 #include "../../graphics/render/FrameData.h"
+
+#include <memory>
 /**
 *Camera class
 */

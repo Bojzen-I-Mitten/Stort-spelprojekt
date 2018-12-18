@@ -138,7 +138,7 @@ public class GUIOptionsMenu : ScriptComponent
     Camera Camera;
     public Canvas Canvas;
     Text[] Text = new Text[(int)Textstate.NUMSTATES];
-    WindowController Wcontroller = new WindowController();
+    WindowManager Wcontroller = new WindowManager();
     public Textstate TextState { set; get; } = Textstate.NUMSTATES;
     public Textstate OldState = Textstate.NUMSTATES;
     public ImageBarstate ImageState { set; get; } = ImageBarstate.NUMSTATES;
@@ -317,10 +317,10 @@ public class GUIOptionsMenu : ScriptComponent
 
         //
         string Update;
-        Update = Wcontroller.getFullscreen().ToString();
+        Update = Wcontroller.GetFullscreen().ToString();
 
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-        Update = Wcontroller.getBorderless().ToString();
+        Update = Wcontroller.GetBorderless().ToString();
 
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
@@ -483,8 +483,8 @@ public class GUIOptionsMenu : ScriptComponent
         }
 
         //load onoff fullscreen
-        fullscreen = Wcontroller.getFullscreen();
-        borderless = Wcontroller.getBorderless();
+        fullscreen = Wcontroller.GetFullscreen();
+        borderless = Wcontroller.GetBorderless();
         string settingsFullscreen = UserSettings.GetSetting("Fullscreen");
         if (settingsFullscreen != null)
         {
@@ -577,10 +577,10 @@ public class GUIOptionsMenu : ScriptComponent
                   */
         //      ClearImagesAndText();
         string Update;
-        Update = Wcontroller.getFullscreen().ToString();
+        Update = Wcontroller.GetFullscreen().ToString();
 
         UserSettings.AddOrUpdateAppSetting("Fullscreen", Update);
-        Update = Wcontroller.getBorderless().ToString();
+        Update = Wcontroller.GetBorderless().ToString();
  
         UserSettings.AddOrUpdateAppSetting("Borderless", Update);
 
