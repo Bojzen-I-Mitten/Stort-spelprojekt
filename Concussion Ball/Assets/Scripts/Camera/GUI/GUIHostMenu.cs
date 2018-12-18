@@ -68,17 +68,17 @@ public class GUIHostMenu : ScriptComponent
     Text TimeRoundString;
     Image TimeRoundBox;
 
-    Text PublicServer;
+   /* Text PublicServer;
     Image PublicServerCheck;
     Image PublicServerBox;
 
-    Text ScoreLimit;
+   // Text ScoreLimit;
     Text ScoreLimitString;
     Image ScoreLimitBox;
 
-    Text PowerUps;
+    //Text PowerUps;
     Image PowerUpsCheck;
-    Image PowerUpsBox;
+    Image PowerUpsBox;*/
 
     Text SimilarColor;
     Text SameName;
@@ -302,58 +302,58 @@ public class GUIHostMenu : ScriptComponent
             TimeRoundBox.depth = 0.5f;
         }
         #endregion
+        /*
+                #region Public Server
+                PublicServer = Canvas.Add("Public server");
+                PublicServer.position = new Vector2(column3, row1);
+                PublicServer.scale = new Vector2(0.5f);
+                PublicServer.origin = new Vector2(0.0f, 0.5f);
+                PublicServer.color = Unselected;
+                PublicServer.depth = 0.4f;
 
-        #region Public Server
-        PublicServer = Canvas.Add("Public server");
-        PublicServer.position = new Vector2(column3, row1);
-        PublicServer.scale = new Vector2(0.5f);
-        PublicServer.origin = new Vector2(0.0f, 0.5f);
-        PublicServer.color = Unselected;
-        PublicServer.depth = 0.4f;
+                if (TextBoxCross55Texture != null)
+                {
+                    PublicServerCheck = Canvas.Add(TextBoxCross55Texture);
+                    PublicServerCheck.position = new Vector2(column4 , row1);
+                    PublicServerCheck.origin = new Vector2(0.0f, 0.5f);
+                    PublicServerCheck.depth = 0.4f;
+                }
 
-        if (TextBoxCross55Texture != null)
-        {
-            PublicServerCheck = Canvas.Add(TextBoxCross55Texture);
-            PublicServerCheck.position = new Vector2(column4 /*+ PublicServerCheck.size.x / 2*/, row1);
-            PublicServerCheck.origin = new Vector2(0.0f, 0.5f);
-            PublicServerCheck.depth = 0.4f;
-        }
+                if (TextBoxBG55Texture != null)
+                {
+                    PublicServerBox = Canvas.Add(TextBoxBG55Texture);
+                    PublicServerBox.position = new Vector2(column4 , row1);
+                    PublicServerBox.origin = new Vector2(0.0f, 0.5f);
+                    PublicServerBox.interactable = true;
+                    PublicServerBox.depth = 0.5f;
+                }
+                #endregion
 
-        if (TextBoxBG55Texture != null)
-        {
-            PublicServerBox = Canvas.Add(TextBoxBG55Texture);
-            PublicServerBox.position = new Vector2(column4 /*+ PublicServerBox.size.x / 2*/, row1);
-            PublicServerBox.origin = new Vector2(0.0f, 0.5f);
-            PublicServerBox.interactable = true;
-            PublicServerBox.depth = 0.5f;
-        }
-        #endregion
+                #region Score limit
+                ScoreLimit = Canvas.Add("Score Limit");
+                ScoreLimit.position = new Vector2(column3, row2);
+                ScoreLimit.scale = new Vector2(0.5f);
+                ScoreLimit.origin = new Vector2(0.0f, 0.5f);
+                ScoreLimit.color = Unselected;
+                ScoreLimit.depth = 0.4f;
 
-        #region Score limit
-        ScoreLimit = Canvas.Add("Score Limit");
-        ScoreLimit.position = new Vector2(column3, row2);
-        ScoreLimit.scale = new Vector2(0.5f);
-        ScoreLimit.origin = new Vector2(0.0f, 0.5f);
-        ScoreLimit.color = Unselected;
-        ScoreLimit.depth = 0.4f;
+                ScoreLimitString = Canvas.Add("10");
+                ScoreLimitString.position = new Vector2(column4, row2);
+                ScoreLimitString.scale = new Vector2(0.5f);
+                ScoreLimitString.origin = new Vector2(0.0f, 0.5f);
+                ScoreLimitString.color = Unselected;
+                ScoreLimitString.depth = 0.4f;
 
-        ScoreLimitString = Canvas.Add("10");
-        ScoreLimitString.position = new Vector2(column4, row2);
-        ScoreLimitString.scale = new Vector2(0.5f);
-        ScoreLimitString.origin = new Vector2(0.0f, 0.5f);
-        ScoreLimitString.color = Unselected;
-        ScoreLimitString.depth = 0.4f;
-
-        if (TextBox105Texture != null)
-        {
-            ScoreLimitBox = Canvas.Add(TextBox105Texture);
-            ScoreLimitBox.position = new Vector2(column4, row2);
-            ScoreLimitBox.origin = new Vector2(0.0f, 0.5f);
-            ScoreLimitBox.interactable = true;
-            ScoreLimitBox.depth = 0.5f;
-        }
-        #endregion
-
+                if (TextBox105Texture != null)
+                {
+                    ScoreLimitBox = Canvas.Add(TextBox105Texture);
+                    ScoreLimitBox.position = new Vector2(column4, row2);
+                    ScoreLimitBox.origin = new Vector2(0.0f, 0.5f);
+                    ScoreLimitBox.interactable = true;
+                    ScoreLimitBox.depth = 0.5f;
+                }
+                #endregion
+                
         #region Power Ups
         PowerUps = Canvas.Add("Power ups");
         PowerUps.position = new Vector2(column3, row3);
@@ -365,7 +365,7 @@ public class GUIHostMenu : ScriptComponent
         if (TextBoxCross55Texture != null)
         {
             PowerUpsCheck = Canvas.Add(TextBoxCross55Texture);
-            PowerUpsCheck.position = new Vector2(column4 /*+ PowerUpsCheck.size.x / 2*/, row3);
+            PowerUpsCheck.position = new Vector2(column4 , row3);
             PowerUpsCheck.origin = new Vector2(0.0f, 0.5f);
             PowerUpsCheck.depth = 0.4f;
         }
@@ -373,13 +373,13 @@ public class GUIHostMenu : ScriptComponent
         if (TextBoxBG55Texture != null)
         {
             PowerUpsBox = Canvas.Add(TextBoxBG55Texture);
-            PowerUpsBox.position = new Vector2(column4 /*+ PowerUpsBox.size.x / 2*/, row3);
+            PowerUpsBox.position = new Vector2(column4, row3);
             PowerUpsBox.origin = new Vector2(0.0f, 0.5f);
             PowerUpsBox.interactable = true;
             PowerUpsBox.depth = 0.5f;
         }
         #endregion
-
+*/
         #endregion
 
         #region Teams
@@ -634,7 +634,7 @@ public class GUIHostMenu : ScriptComponent
             PortNameBox.color = Unselected;
             MaxPlayersBox.color = Unselected;
             TimeRoundBox.color = Unselected;
-            ScoreLimitBox.color = Unselected;
+          //  ScoreLimitBox.color = Unselected;
 
             if (Team1TextBox.Clicked())
             {
@@ -690,7 +690,7 @@ public class GUIHostMenu : ScriptComponent
                     ClearTime = false;
                 }
             }
-            else if (ScoreLimitBox.Clicked())
+           /* else if (ScoreLimitBox.Clicked())
             {
                 InputScoreLimit = true;
                 if(ClearScoreLimit)
@@ -698,14 +698,14 @@ public class GUIHostMenu : ScriptComponent
                     ScoreLimitString.text = "";
                     ClearScoreLimit = false;
                 }
-            }
+            }*/
             else
             {
                 StopCoroutine(Blink);
                 Blink = null;
                 Caret.text = "";
             }
-
+/*
             if (PublicServerBox.Clicked())
             {
                 if (PublicServerCheck.scale != Vector2.Zero)
@@ -719,7 +719,7 @@ public class GUIHostMenu : ScriptComponent
                     PowerUpsCheck.scale = Vector2.Zero;
                 else
                     PowerUpsCheck.scale = Vector2.One;
-            }
+            }*/
         }
     }
 
@@ -741,10 +741,10 @@ public class GUIHostMenu : ScriptComponent
                     MatchSystem.instance.Teams[TEAM_TYPE.TEAM_2].Name = Team2.text;
                     MatchSystem.instance.MaxPlayers = ConvertToInt(MaxPlayersString.text);
                     MatchSystem.instance.MatchLength = ConvertToInt(TimeRoundString.text) * 60; //Convert to seconds.
-                    MatchSystem.instance.ScoreLimit = ConvertToInt(ScoreLimitString.text);
+                  //  MatchSystem.instance.ScoreLimit = ConvertToInt(ScoreLimitString.text);
                     MatchSystem.instance.ServerName = ServerNameString.text;
-                    MatchSystem.instance.PublicServer = PublicServerCheck.scale != Vector2.Zero ? true : false;
-                    MatchSystem.instance.SpawnPowerupsDuringGame = PowerUpsCheck.scale != Vector2.Zero ? true : false;
+                  //  MatchSystem.instance.PublicServer = PublicServerCheck.scale != Vector2.Zero ? true : false;
+                  //  MatchSystem.instance.SpawnPowerupsDuringGame = PowerUpsCheck.scale != Vector2.Zero ? true : false;
 
                     MatchSystem.instance.LocalPort = ConvertToInt(PortNameString.text);
                     MatchSystem.instance.Init();
@@ -816,13 +816,13 @@ public class GUIHostMenu : ScriptComponent
             TimeRoundString.text = str;
             Caret.position = TimeRoundString.position + new Vector2(TimeRoundString.size.x, -TimeRoundString.size.y * CaretOffsetSmall);
         }
-        else if (InputScoreLimit)
+      /*  else if (InputScoreLimit)
         {
             string str = ScoreLimitString.text;
             GUIInput.AppendString(ref str, 3);
             ScoreLimitString.text = str;
             Caret.position = ScoreLimitString.position + new Vector2(ScoreLimitString.size.x, CaretOffsetSmall);
-        }
+        }*/
     }
 
     private void DontTakeInput()

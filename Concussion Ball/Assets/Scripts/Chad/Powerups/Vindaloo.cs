@@ -68,8 +68,8 @@ public class Vindaloo : Powerup
         emitterFire.BlendState = ParticleEmitter.BLEND_STATES.ADDITIVE;
 
         emitterGravel = gameObject.AddComponent<ParticleEmitter>();
-        emitterGravel.MinSize = 0.1f;
-        emitterGravel.MaxSize = 0.2f;
+        emitterGravel.MinSize = 0.2f;
+        emitterGravel.MaxSize = 0.3f;
         emitterGravel.EndSize = 0.05f;
         emitterGravel.MinLifeTime = 0.4f;
         emitterGravel.MaxLifeTime = 1.3f;
@@ -80,29 +80,29 @@ public class Vindaloo : Powerup
         emitterGravel.MaxSpeed = 18.0f;
         emitterGravel.EndSpeed = 0.0f;
         emitterGravel.DistanceFromSphereCenter = 0.3f;
-        emitterGravel.Radius = 0.2f;
+        emitterGravel.Radius = 0.5f;
         emitterGravel.Gravity = 4.0f;
-        emitterGravel.SpawnAtEdge = false;
+        emitterGravel.SpawnAtEdge = true;
         
         
         emitterSmoke = gameObject.AddComponent<ParticleEmitter>();
 
         
 
-        emitterSmoke.MinSize = 0.5f;
-        emitterSmoke.MaxSize = 0.7f;
+        emitterSmoke.MinSize = 0.3f;
+        emitterSmoke.MaxSize = 0.5f;
         emitterSmoke.EndSize = 1.3f;
         emitterSmoke.MinLifeTime = 0.7f;
-        emitterSmoke.MaxLifeTime = 2.6f;
-        emitterSmoke.EmissionRate = 100;
+        emitterSmoke.MaxLifeTime = 1.2f;
+        emitterSmoke.EmissionRate = 20;
         emitterSmoke.MinRotationSpeed = -2.0f;
         emitterSmoke.MaxRotationSpeed = 2.0f;
-        emitterSmoke.MinSpeed = 0.6f;
-        emitterSmoke.MaxSpeed = 1.5f;
-        emitterSmoke.EndSpeed = 3.0f;
+        emitterSmoke.MinSpeed = 2.6f;
+        emitterSmoke.MaxSpeed = 3.5f;
+        emitterSmoke.EndSpeed = 1.0f;
         emitterSmoke.DistanceFromSphereCenter = 0.7f;
         emitterSmoke.Radius = 1.7f;
-        emitterGravel.SpawnAtEdge = false;
+        emitterSmoke.SpawnAtEdge = false;
 
 
         Texture2D fireTex = (Texture2D)Resources.LoadThomasPath("%THOMAS_ASSETS%/Particles/fire_particle.png");
@@ -142,6 +142,7 @@ public class Vindaloo : Powerup
         base.Throw(camPos, Vector3.Normalize(direction) * ThrowForce);
 
         _DespawnTimer += Time.DeltaTime;
+        emitterSmoke.Emit = true;
     }
 
     public override void SaveObjectOwner(ChadControls chad)
@@ -192,6 +193,7 @@ public class Vindaloo : Powerup
 
         emitterFire.EmitOneShot(35);
         emitterGravel.EmitOneShot(20);
+        emitterSmoke.Emit = false;
         emitterSmoke.EmitOneShot(50);
 
         StartCoroutine(RemoveNextFrame());
