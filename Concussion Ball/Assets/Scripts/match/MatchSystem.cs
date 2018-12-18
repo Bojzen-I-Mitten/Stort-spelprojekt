@@ -335,11 +335,6 @@ public class MatchSystem : NetworkManager
     }
     public void RPCEndMatch()
     {
-        if(!MatchStarted || MatchTimeLeft > 0.0f)
-        {
-            Debug.Log("trying to end match before it is over");
-            return;
-        }
 
         hasScored = true;
         if (Teams[TEAM_TYPE.TEAM_1].Score == Teams[TEAM_TYPE.TEAM_2].Score)
