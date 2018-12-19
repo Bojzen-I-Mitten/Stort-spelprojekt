@@ -176,6 +176,7 @@ namespace thomas {
 					}
 				}
 				// No remaining slot.
+				LOG("No remaining constraint slot.");
 			}
 			void ConstraintList::rmv(BoneConstraint * bC)
 			{

@@ -135,7 +135,6 @@ namespace Concussion_Ball.Assets.Scripts
             if (Vector3.Dot(Vector3.Forward, v) < 0.0f)
                 v.z = -v.z;
             poleB.transform.localPosition = hipRoot.Translation + v * PoleDistance;
-            
         }
     }
 }

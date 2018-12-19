@@ -154,8 +154,8 @@ namespace Concussion_Ball.Assets.Scripts
                     if (frameWaitCounter == 3)
                     {
                         Enabled = true;
-                        if (frameWaitCounter == 2)
-                            Debug.Log("Enabled");
+                        //if (frameWaitCounter == 2)
+                            //Debug.Log("Enabled");
                         Matrix foot = base.fetchTransform();
                         Vector3 s2, t2;
                         Quaternion r2;

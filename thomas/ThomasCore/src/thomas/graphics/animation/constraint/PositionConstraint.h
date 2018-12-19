@@ -26,6 +26,7 @@ namespace thomas {
 				*/
 				math::Vector3 m_position;
 				float m_distance;
+				bool m_active;
 			private:
 			};
 

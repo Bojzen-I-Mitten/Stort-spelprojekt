@@ -26,6 +26,10 @@ namespace ThomasEngine
 				float get();
 				void set(float Distance);
 			}
+			property bool Active {
+				bool get();
+				void set(bool state);
+			}
 
 			void apply(GameObject^ obj, uint32_t boneIndex);
 			void apply(RenderSkinnedComponent^ skinn, uint32_t boneIndex);

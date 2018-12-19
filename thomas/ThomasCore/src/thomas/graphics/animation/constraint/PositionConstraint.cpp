@@ -9,6 +9,7 @@ namespace thomas {
 
 			PositionConstraint::PositionConstraint()
 			{
+				m_active = true;
 			}
 
 			PositionConstraint::~PositionConstraint()
@@ -17,6 +18,8 @@ namespace thomas {
 
 			void PositionConstraint::execute(Skeleton& skel, math::Matrix* objectPose, TransformComponents* comp, uint32_t boneInd)
 			{
+				if (!m_active)
+					return;
 				math::Vector3 v = objectPose[boneInd].Translation() - m_position;
 				// If (transform is childTransform)
 				if (v.Length() > m_distance)

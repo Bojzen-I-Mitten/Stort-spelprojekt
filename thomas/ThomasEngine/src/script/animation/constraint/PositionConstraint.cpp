@@ -74,6 +74,12 @@ namespace ThomasEngine
 		void PositionConstraint::Distance::set(float w) {
 			m_ptr->m_distance = w;
 		}
+		bool PositionConstraint::Active::get() {
+			return m_ptr->m_active;
+		}
+		void PositionConstraint::Active::set(bool w) {
+			m_ptr->m_active = w;
+		}
 
 
 	}

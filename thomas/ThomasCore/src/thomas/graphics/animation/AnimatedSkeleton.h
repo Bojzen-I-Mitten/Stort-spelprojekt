@@ -18,7 +18,7 @@ namespace thomas {
 			class BoneConstraint;
 
 
-			constexpr uint32_t MAX_CONSTRAINT_COUNT = 3;
+			constexpr uint32_t MAX_CONSTRAINT_COUNT = 4;
 			struct ConstraintList {
 				BoneConstraint* m_list[MAX_CONSTRAINT_COUNT + 1]; // Last is NULL
 
