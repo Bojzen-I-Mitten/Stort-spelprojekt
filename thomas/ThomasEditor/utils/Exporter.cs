@@ -38,9 +38,8 @@ namespace ThomasEditor.utils
             CompilerParameters parameters = new CompilerParameters();
             parameters.GenerateExecutable = true;
             parameters.IncludeDebugInformation = false;
-            parameters.CompilerOptions = @"/optimize+ /platform:x64 /target:exe " + @extraCommands;
+            parameters.CompilerOptions = @"/optimize+ /platform:x64 /target:winexe " + @extraCommands;
             parameters.OutputAssembly = dir + "\\Bin\\" + fileName;
-            
             parameters.ReferencedAssemblies.Add("System.dll");
             parameters.ReferencedAssemblies.Add("ThomasEngine.dll");
             parameters.ReferencedAssemblies.Add("WPF\\WindowsBase.dll");

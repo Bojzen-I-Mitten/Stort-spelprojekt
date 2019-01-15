@@ -93,7 +93,10 @@ namespace ThomasEngine.Network
                 if(TimeLeftUntilUpdate <= 0)
                 {
                     TimeLeftUntilUpdate = Manager.InternalManager.UpdateTime/1000.0f;
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
                     WriteFrameData();
+                    watch.Stop();
+                    Manager.totalWriteTime += watch.Elapsed.TotalMilliseconds;
                 }
             }
         }
@@ -146,6 +149,7 @@ namespace ThomasEngine.Network
 
         public void ReadData(NetDataReader reader, bool initialState)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             gameObject.SetActive(reader.GetBool());
             
 
@@ -153,6 +157,9 @@ namespace ThomasEngine.Network
             {
                 comp.OnRead(reader, initialState);
             }
+
+            watch.Stop();
+            Manager.totalReadTime += watch.Elapsed.TotalMilliseconds;
         }
 
         public void ReadRPC(NetDataReader reader)

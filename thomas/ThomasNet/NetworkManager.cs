@@ -54,6 +54,11 @@ namespace ThomasEngine.Network
 
         public bool ServerOwner = false;
 
+        public double totalWriteTime = 0;
+        public double totalReadTime = 0;
+        private double totalWriteTime2 = 0;
+        private double totalReadTime2 = 0;
+
         public long ServerStartTime;
         [Browsable(false)]
         [Newtonsoft.Json.JsonIgnore]
@@ -530,10 +535,28 @@ namespace ThomasEngine.Network
 
         public void Diagnostics()
         {
-            Gizmos.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent, new Vector2(0, 10));
-            Gizmos.ImguiStringUpdate("Total package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
-            Gizmos.ImguiStringUpdate("Total package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
+
+            if(totalWriteTime > 0)
+            {
+                totalWriteTime2 = totalWriteTime;
+                totalReadTime2 = totalReadTime;
+            }
+
+            Gizmos.ImguiStringUpdate("Packetsloss = " + NetManager.Statistics.PacketLossPercent + "%", new Vector2(0, 10));
+            Gizmos.ImguiStringUpdate("package sent = " + NetManager.Statistics.PacketsSent, new Vector2(0, 20));
+            Gizmos.ImguiStringUpdate("package recieved = " + NetManager.Statistics.PacketsReceived, new Vector2(0, 30));
+            Gizmos.ImguiStringUpdate("bytes sent = " + NetManager.Statistics.BytesSent, new Vector2(300, 20));
+            Gizmos.ImguiStringUpdate("bytes recieved = " + NetManager.Statistics.BytesReceived, new Vector2(300, 30));
+            Gizmos.ImguiStringUpdate("Write data = " + totalWriteTime2, new Vector2(600, 10));
+            Gizmos.ImguiStringUpdate("Read data = " + totalReadTime2, new Vector2(600, 20));
             PingToAllClients();
+            if (totalWriteTime > 0)
+            {
+                NetManager.Statistics.Reset();
+                totalWriteTime = 0;
+                totalReadTime = 0;
+            }
+
         }
 
         public void PingToAllClients()
