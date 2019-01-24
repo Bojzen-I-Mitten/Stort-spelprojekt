@@ -175,7 +175,7 @@ namespace ThomasEngine
 
 		List<System::Type^>^ types = gcnew List<System::Type^>();
 		for (int i = 0; i < dlls->Count; i++) {
-			Assembly^ assembly = Assembly::LoadFrom(dlls[i]);
+			Assembly^ assembly = Assembly::UnsafeLoadFrom(dlls[i]);
 			List<System::Type^>^ exportedTypes = gcnew List<System::Type^>(assembly->GetExportedTypes());
 			types->AddRange(exportedTypes);
 		}
