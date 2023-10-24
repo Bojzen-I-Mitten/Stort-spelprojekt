@@ -1,5 +1,6 @@
 #include "BaseAnimationTime.h"
 #include <algorithm>
+#include <cmath>
 
 namespace thomas {
 	namespace graphics {

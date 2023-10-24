@@ -1,5 +1,6 @@
 #include "PlaybackHandle.h"
 #include <algorithm>
+#include <cmath>
 
 namespace ThomasEngine
 {
